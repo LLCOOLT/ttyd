@@ -14,6 +14,9 @@
 #include <demo/DEMOPad.h>
 #include <string.h>
 #include <stdarg.h>
+#ifdef VERSION_G8ME01
+char* strstr(const char* str, const char* sub);
+#endif
 #include "driver/msgdrv.h"
 #include "mario/mario_pouch.h"
 #include "mario/mariost.h"
@@ -163,7 +166,11 @@ void winOpenDisable(void) {
     }
 }
 
+#ifdef VERSION_G8ME01
+typedef struct { const char* s[6]; } WinLangTbl;
+#else
 typedef struct { const char* s[2]; } WinLangTbl;
+#endif
 static const WinLangTbl winLangTbl;
 
 #pragma force_active on
@@ -251,6 +258,11 @@ void winMain(void) {
                     if (keyGetButton(0) & PAD_TRIGGER_L) {
                         break;
                     }
+#ifdef VERSION_G8ME01
+                    if ((gp->flags & 0x1000) && evtGetValue(NULL, GSW(0)) < 7) {
+                        break;
+                    }
+#endif
                 } else {
                     wp->menuSel = 0;
                 }
@@ -286,10 +298,18 @@ void winMain(void) {
                 for (i = 0; i < 4; i++) {
                     padRumbleHardOff(i);
                 }
+#ifdef VERSION_G8ME01
+                fileAsyncf(4, 0, "%s/w/%s/mail.tpl", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us");
+#else
                 fileAsyncf(4, 0, "%s/w/jp/mail.tpl", getMarioStDvdRoot());
+#endif
                 {
+#ifdef VERSION_G8ME01
+                    fileAsyncf(4, 0, "%s/w/%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName());
+#else
                     const char* name = winGetMapTplName();
                     fileAsyncf(4, 0, "%s/w/jp/%s\0", getMarioStDvdRoot(), name);
+#endif
                 }
                 wp->field_0x24_s32 = 0;
                 if (strncmp(gp->currentMapName, "yuu_", 4) == 0) {
@@ -389,7 +409,11 @@ void winMain(void) {
                 break;
 
             case 200: {
+#ifdef VERSION_G8ME01
+                WindowPartyDt* list[11]; /* FAKE */ // US frame is 96 bytes; only 7 entries used
+#else
                 WindowPartyDt* list[7];
+#endif
                 WindowPartyDt* p;
                 WindowPartyDt* base;
                 s32 partyId;
@@ -474,7 +498,11 @@ void winDispKoopa(CameraId camId, void* param) {
     winTexSet(0xB7, (Vec){ 0.0f, 50.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
 }
 
+#ifdef VERSION_G8ME01
+static const WinLangTbl winLangTbl = { { "jp", "us", "ge", "fr", "sp", "it" } };
+#else
 static const WinLangTbl winLangTbl = { { "jp", "us" } };
+#endif
 
 
 EVT_BEGIN(kime_pose)
@@ -740,7 +768,17 @@ EVT_BEGIN(evt_lecture_msg)
     CALL(lecture_step_wait, 2)
     CALL(evt_msg_continue)
     CALL(evt_msg_print, 0, STRING("lecture_badge_02"), 0, 0)
+#ifdef VERSION_G8ME01
+    WAIT_MS(500)
+    CALL(lecture_step_wait, 3)
+    WAIT_MS(500)
+    CALL(lecture_step_wait, 4)
+    WAIT_MS(500)
+#endif
     CALL(lecture_step_wait, 5)
+#ifdef VERSION_G8ME01
+    WAIT_MS(500)
+#endif
     CALL(evt_msg_continue)
     CALL(evt_msg_print, 0, STRING("lecture_badge_03"), 0, 0)
     CALL(lecture_step_wait, 6)
@@ -757,10 +795,24 @@ EVT_BEGIN(evt_lecture_msg)
     CALL(evt_msg_print, 0, STRING("lecture_badge_07"), 0, 0)
     CALL(lecture_step_wait, 10)
     CALL(evt_msg_continue)
+#ifdef VERSION_G8ME01
+    LOOP(0)
+        IF_INT_GREATER_OR_EQUAL(GSW(0), 20)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+#endif
     WAIT_MS(500)
     CALL(lecture_key_mask_off)
     RETURN
+#ifdef VERSION_G8ME01
+    OPCODE_END_SCRIPT,
+    0 // US: the object is 0x1E4 bytes (trailing zero word, the JP gap_05 data word)
+};
+#else
 EVT_END()
+#endif
 
 
 USER_FUNC(itemUseFunc) {
@@ -911,6 +963,44 @@ void winFontInit(void) {
     FontDrawStart();
 }
 
+#ifdef VERSION_G8ME01
+void winFontSet(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
+    char buf[0x1000];
+    const char* msg = fmt;
+    Mtx trans;
+    Mtx scl;
+    va_list args;
+
+    if (strstr(fmt, "%")) {
+        va_start(args, fmt);
+        vsprintf(buf, fmt, args);
+        msg = buf;
+    }
+    PSMTXTrans(trans, pos.x, pos.y, pos.z);
+    PSMTXScale(scl, scale.x, scale.y, scale.z);
+    PSMTXConcat(trans, scl, trans);
+    FontDrawColor(color);
+    FontDrawMessageMtx(trans, msg);
+}
+
+void winFontSetWidth(Vec pos, Vec scale, GXColor color, f32 width, const char* fmt, ...) {
+    char buf[0x1000];
+    const char* msg = fmt;
+    va_list args;
+    f32 w;
+
+    if (strstr(fmt, "%")) {
+        va_start(args, fmt);
+        vsprintf(buf, fmt, args);
+        msg = buf;
+    }
+    w = scale.x * FontGetMessageWidth(msg);
+    if (w > width) {
+        scale.x *= width / w;
+    }
+    winFontSet(pos, scale, color, msg);
+}
+#else
 void winFontSet(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     char buf[0x400];
     Mtx trans;
@@ -925,7 +1015,34 @@ void winFontSet(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     FontDrawColor(color);
     FontDrawMessageMtx(trans, buf);
 }
+#endif
 
+#ifdef VERSION_G8ME01
+void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
+    char buf[0x1000];
+    const char* msg = fmt;
+    Mtx trans;
+    Mtx scl;
+    va_list args;
+    s32 ref;
+
+    if (strstr(fmt, "%")) {
+        va_start(args, fmt);
+        vsprintf(buf, fmt, args);
+        msg = buf;
+    }
+    if ((u32)gp->language != 0) {
+        ref = FontGetMessageWidth("999");
+    } else {
+        ref = FontGetMessageWidth("９９９");
+    }
+    { s32 w = ref - FontGetMessageWidth(msg); PSMTXTrans(trans, pos.x + scale.x * w, pos.y, pos.z); }
+    PSMTXScale(scl, scale.x, scale.y, scale.z);
+    PSMTXConcat(trans, scl, trans);
+    FontDrawColor(color);
+    FontDrawStringMtx(trans, msg);
+}
+#else
 void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     char buf[0x400];
     Mtx trans;
@@ -940,7 +1057,48 @@ void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     FontDrawColor(color);
     FontDrawStringMtx(trans, buf);
 }
+#endif
 
+#ifdef VERSION_G8ME01
+void winFontSetEdge(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
+    char buf[0x1000];
+    const char* msg = fmt;
+    Mtx trans;
+    Mtx scl;
+    va_list args;
+
+    if (strstr(fmt, "%")) {
+        va_start(args, fmt);
+        vsprintf(buf, fmt, args);
+        msg = buf;
+    }
+    PSMTXTrans(trans, pos.x, pos.y, pos.z);
+    PSMTXScale(scl, scale.x, scale.y, scale.z);
+    PSMTXConcat(trans, scl, trans);
+    FontDrawColor(color);
+    FontDrawEdge();
+    FontDrawStringMtx(trans, msg);
+    FontDrawEdgeOff();
+}
+
+void winFontSetEdgeWidth(Vec pos, Vec scale, GXColor color, f32 width, const char* fmt, ...) {
+    char buf[0x1000];
+    const char* msg = fmt;
+    va_list args;
+    f32 w;
+
+    if (strstr(fmt, "%")) {
+        va_start(args, fmt);
+        vsprintf(buf, fmt, args);
+        msg = buf;
+    }
+    w = scale.x * FontGetMessageWidth(msg);
+    if (w > width) {
+        scale.x *= width / w;
+    }
+    winFontSetEdge(pos, scale, color, msg);
+}
+#else
 void winFontSetEdge(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     char buf[0x400];
     Mtx trans;
@@ -957,6 +1115,7 @@ void winFontSetEdge(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     FontDrawStringMtx(trans, buf);
     FontDrawEdgeOff();
 }
+#endif
 
 void winFontSetLabel(Vec pos, Vec scale, GXColor color, const char* msg) {
     Mtx trans;
@@ -971,6 +1130,7 @@ void winFontSetLabel(Vec pos, Vec scale, GXColor color, const char* msg) {
     }
 }
 
+#ifndef VERSION_G8ME01
 void winFontSetPitch(f32 pitch, Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     char buf[0x400];
     va_list args;
@@ -981,6 +1141,7 @@ void winFontSetPitch(f32 pitch, Vec pos, Vec scale, GXColor color, const char* f
     FontDrawScaleVec(scale);
     FontDrawStringVecPitch(&pos, buf, pitch);
 }
+#endif
 
 void winTexInit(TEXPalette* texture) {
     winTexTpl = texture;
@@ -1220,9 +1381,15 @@ void winIconSet(s32 iconId, Vec translate, Vec scale, GXColor color) {
     GXTexObj obj;
     f32 sy;
 
+#ifdef VERSION_G8ME01
+    if (iconId == 0x11C) {
+        iconId = 0x11B;
+    }
+#else
     if (iconId == 0x115) {
         iconId = 0x114;
     }
+#endif
     iconGetTexObj(&obj, iconId);
     GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&obj, GX_TEXMAP0);
@@ -1350,7 +1517,9 @@ BOOL winLectureCheck(void) {
 }
 
 #pragma force_active on
+#ifndef VERSION_G8ME01
 __declspec(section ".data") u32 gap_05_8037631C_data[1] = {0};
+#endif
 
 __declspec(section ".sdata2") const volatile f32 float_0p5_8041dc98 __attribute__((aligned(8))) = 0.5f;
 #pragma force_active reset

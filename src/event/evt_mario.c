@@ -221,12 +221,21 @@ USER_FUNC(evt_mario_dokan_prepare) {
 }
 
 
+#ifdef VERSION_G8ME01
+#define DOKAN_ROT 0x2b8
+#else
+#define DOKAN_ROT 0x2a0
+#endif
+
 USER_FUNC(evt_mario_paper_pose_dokan) {
     s32* args = event->args;
     MarioWork* mp = marioGetPtr();
     s32 type = evtGetValue(event, args[0]);
     PartyEntry* party;
     s32 ret;
+#ifdef VERSION_G8ME01
+    f32 s, c;
+#endif
     {
         static const char names[] = "DOKAN_TATE_DOWNIN\0\0\0DOKAN_TATE_UPIN\0DOKAN_TATE_DOWNOUT\0\0DOKAN_TATE_UPOUT\0\0\0\0DOKAN_YOKO_IN\0\0\0DOKAN_YOKO_OUT\0";
     }
@@ -239,6 +248,9 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
             mp->rot = (Vec){0.0f, 0.0f, 0.0f};
             mp->rotOfs = (Vec){0.0f, 0.0f, 0.0f};
             mp->dispOfs = (Vec){0.0f, 0.0f, 0.0f};
+#ifdef VERSION_G8ME01
+            mp->dispOfs2 = (Vec){0.0f, 0.0f, 0.0f};
+#endif
         } else {
             switch (type) {
                 case 4:
@@ -250,6 +262,11 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
                     if (!(mp->flags & 0x2000000)) {
                         marioUpdateCamPos();
                         camFollowYOn();
+#ifdef VERSION_G8ME01
+                        sincosf(&s, &c, mp->targetYaw);
+                        mp->dispOfs2.x = -0.4f * s;
+                        mp->dispOfs2.z = -0.4f * c;
+#endif
                     }
                     event->userdata[1] = 0;
                     break;
@@ -276,7 +293,7 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
             mp->dispFlags |= 8;
             mp->dispFlags |= 0x100;
             mp->displayDirection = mp->displayDirectionTarget;
-            FLD(mp, f32, 0x2a0) = 0.0f;
+            FLD(mp, f32, DOKAN_ROT) = 0.0f;
             mp->dispOfs = (Vec){0.0f, 0.0f, (mp->flags & 0x2000000) ? -16.0f : 0.0f};
             event->userdata[0] = 0;
             marioNoUpdateCamPos();
@@ -301,7 +318,7 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
             mp->dispFlags |= 0x100;
             ret = 2;
             mp->scale = (Vec){1.0f, 1.0f, 1.0f};
-            FLD(mp, f32, 0x2a0) = 30.0f;
+            FLD(mp, f32, DOKAN_ROT) = 30.0f;
             event->userdata[0] = 8;
             event->userdata[1] = 3;
             break;
@@ -351,16 +368,20 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
             ret = 2;
             break;
         case 10:
-            FLD(mp, f32, 0x2a0) += 1.0f;
-            if (FLD(mp, f32, 0x2a0) > 30.0f) {
-                FLD(mp, f32, 0x2a0) = 30.0f;
+#ifdef VERSION_G8ME01
+            FLD(mp, f32, DOKAN_ROT) = 30.0f;
+#else
+            FLD(mp, f32, DOKAN_ROT) += 1.0f;
+            if (FLD(mp, f32, DOKAN_ROT) > 30.0f) {
+                FLD(mp, f32, DOKAN_ROT) = 30.0f;
             }
+#endif
             event->userdata[0]++;
             if (event->userdata[0] > 10) {
-                mp->displayDirection += FLD(mp, f32, 0x2a0);
-                FLD(mp, f32, 0x2a0) += 0.1f;
-                if (FLD(mp, f32, 0x2a0) > 30.0f) {
-                    FLD(mp, f32, 0x2a0) = 30.0f;
+                mp->displayDirection += FLD(mp, f32, DOKAN_ROT);
+                FLD(mp, f32, DOKAN_ROT) += 0.1f;
+                if (FLD(mp, f32, DOKAN_ROT) > 30.0f) {
+                    FLD(mp, f32, DOKAN_ROT) = 30.0f;
                 }
             }
             if (event->userdata[0] < sysMsec2Frame(300)) {
@@ -462,7 +483,7 @@ USER_FUNC(evt_mario_key_onoff) {
 
 USER_FUNC(evt_mario_set_enable_key) {
     s32 key = evtGetValue(event, event->args[0]);
-    FLD(marioGetPtr(), s32, 0x284) = key;
+    FLD(marioGetPtr(), s32, MWOFF(0x284)) = key;
     return EVT_RETURN_DONE;
 }
 
@@ -703,6 +724,10 @@ USER_FUNC(evt_mario_set_pose) {
     SETPOSE_BODY
 }
 
+#ifdef VERSION_G8ME01
+void partySlitReset(PartyEntry* party);
+#endif
+
 USER_FUNC(evt_mario_normalize) {
     s32 ret = 0;
     MarioWork* mp = marioGetPtr();
@@ -710,6 +735,16 @@ USER_FUNC(evt_mario_normalize) {
     BOOL off;
 
     if (isFirstCall) {
+#ifdef VERSION_G8ME01
+        party = partyGetPtr(marioGetPartyId());
+        if (party) {
+            partySlitReset(party);
+        }
+        party = partyGetPtr(marioGetExtraPartyId());
+        if (party) {
+            partySlitReset(party);
+        }
+#else
         party = partyGetPtr(marioGetPartyId());
         if (party) {
             party->field_37 = 0;
@@ -718,6 +753,7 @@ USER_FUNC(evt_mario_normalize) {
         if (party) {
             party->field_37 = 0;
         }
+#endif
         mp->trigFlags |= 0x80000000;
         event->userdata[1] = 0;
         off = !marioChkCtrl();
@@ -1081,6 +1117,15 @@ USER_FUNC(evt_mario_party_door_move) {
                 party->flags &= ~0x1000000;
                 party->field_8 &= ~0x40000;
             }
+#ifdef VERSION_G8ME01
+            event->userdata[0] = 8;
+            event->userdata[1] = 1;
+            break;
+        case 8:
+            if (--event->userdata[1] > 0) {
+                break;
+            }
+#endif
             ret = 2;
             break;
     }
@@ -1630,18 +1675,18 @@ USER_FUNC(evt_koopa_fire) {
     switch (event->userdata[0]) {
         case 0:
             if (--event->userdata[2] != 0) {
-                FLD(FLD(mp, void*, 0x28c), s32, 0x144) = 1;
+                FLD(FLD(mp, void*, MWOFF(0x28c)), s32, 0x144) = 1;
                 return EVT_RETURN_BLOCK;
             }
     }
-    FLD(FLD(mp, void*, 0x28c), s32, 0x144) = 0;
+    FLD(FLD(mp, void*, MWOFF(0x28c)), s32, 0x144) = 0;
     return EVT_RETURN_YIELD;
 }
 
 USER_FUNC(evt_koopa_chk_dead) {
     s32* args = event->args;
     MarioWork* mp = marioGetPtr();
-    evtSetValue(event, args[0], (FLD(FLD(mp, void*, 0x28c), u32, 0) >> 28) & 1);
+    evtSetValue(event, args[0], (FLD(FLD(mp, void*, MWOFF(0x28c)), u32, 0) >> 28) & 1);
     return EVT_RETURN_DONE;
 }
 
@@ -1649,9 +1694,9 @@ USER_FUNC(evt_koopa_weary) {
     s32* args = event->args;
     MarioWork* mp = marioGetPtr();
     if (args[0]) {
-        FLD(FLD(mp, void*, 0x28c), u32, 0) |= 0x1000000;
+        FLD(FLD(mp, void*, MWOFF(0x28c)), u32, 0) |= 0x1000000;
     } else {
-        FLD(FLD(mp, void*, 0x28c), u32, 0) &= ~0x1000000;
+        FLD(FLD(mp, void*, MWOFF(0x28c)), u32, 0) &= ~0x1000000;
     }
     return EVT_RETURN_DONE;
 }

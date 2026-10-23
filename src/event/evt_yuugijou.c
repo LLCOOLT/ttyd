@@ -1,3 +1,4 @@
+#include "icon_ids.h"
 #include "evt/evt_yuugijou.h"
 #include "evt/evt_cmd.h"
 #include "driver/icondrv.h"
@@ -72,6 +73,166 @@ void yuugijou_init(void) {
 	yuwp = &yuugijouwork;
 	memset(yuwp, 0, sizeof(PiantaParlorWork));
 
+#ifdef VERSION_G8ME01
+	yuwp->recordOn[0][0] = 1;
+	yuwp->recordOn[0][1] = 1;
+	yuwp->recordOn[0][2] = 1;
+	yuwp->recordOn[0][3] = 1;
+	yuwp->recordOn[0][4] = 1;
+
+	yuwp->recordScore[0][0] = 0x5B964;
+	yuwp->recordScore[0][1] = 0x5825A;
+	yuwp->recordScore[0][2] = 0x4F826;
+	yuwp->recordScore[0][3] = 0x4C3D8;
+	yuwp->recordScore[0][4] = 0x4237E;
+
+	yuwp->recordParam[0][0] = 0xE;
+	yuwp->recordParam[0][1] = 0xC;
+	yuwp->recordParam[0][2] = 0xF;
+	yuwp->recordParam[0][3] = 0xB;
+	yuwp->recordParam[0][4] = 0xA;
+
+	yuwp->recordOn[1][0] = 1;
+	yuwp->recordOn[1][1] = 1;
+	yuwp->recordOn[1][2] = 1;
+	yuwp->recordOn[1][3] = 1;
+	yuwp->recordOn[1][4] = 1;
+
+	yuwp->recordScore[1][0] = 2;
+	yuwp->recordScore[1][1] = 5;
+	yuwp->recordScore[1][2] = 0x12;
+	yuwp->recordScore[1][3] = 0x1B;
+	yuwp->recordScore[1][4] = 0x8A;
+
+	yuwp->recordParam[1][0] = MAX0(((700 - (s32)yuwp->recordScore[1][0]) * 15) / 700) + 1;
+	t = (700 - (s32)yuwp->recordScore[1][1]) * 15;
+	yuwp->recordParam[1][1] = MAX0(t / 700);
+	t = (700 - (s32)yuwp->recordScore[1][2]) * 15;
+	yuwp->recordParam[1][2] = MAX0(t / 700);
+	t = (700 - (s32)yuwp->recordScore[1][3]) * 15;
+	yuwp->recordParam[1][3] = MAX0(t / 700);
+	t = (700 - (s32)yuwp->recordScore[1][4]) * 15;
+	yuwp->recordParam[1][4] = MAX0(t / 700);
+
+	yuwp->recordOn[2][0] = 1;
+	yuwp->recordOn[2][1] = 1;
+	yuwp->recordOn[2][2] = 1;
+	yuwp->recordOn[2][3] = 1;
+	yuwp->recordOn[2][4] = 1;
+
+	yuwp->recordScore[2][0] = 0x20850;
+	yuwp->recordScore[2][1] = 0x20436;
+	yuwp->recordScore[2][2] = 0x20184;
+	yuwp->recordScore[2][3] = 0x1F91E;
+	yuwp->recordScore[2][4] = 0x1E3AC;
+
+	yuwp->recordParam[2][0] = MAX0(((s32)yuwp->recordScore[2][0] - 109000) / 2000) + 7;
+	t = (s32)yuwp->recordScore[2][1] - 109000;
+	yuwp->recordParam[2][1] = MAX0(t / 2000) + 6;
+	yuwp->recordParam[2][2] = MAX0(((s32)yuwp->recordScore[2][2] - 109000) / 2000) + 4;
+	t = (s32)yuwp->recordScore[2][3] - 109000;
+	yuwp->recordParam[2][3] = MAX0(t / 2000) + 4;
+	yuwp->recordParam[2][4] = ((t = ((s32)yuwp->recordScore[2][4] - 109000) / 2000) >= 0 ? t : 0) + 1;
+
+	yuwp->recordOn[3][0] = 1;
+	yuwp->recordOn[3][1] = 1;
+	yuwp->recordOn[3][2] = 1;
+	yuwp->recordOn[3][3] = 1;
+	yuwp->recordOn[3][4] = 1;
+
+	yuwp->recordScore[3][0] = 0x16BDE;
+	yuwp->recordScore[3][1] = 0x16968;
+	yuwp->recordScore[3][2] = 0x16382;
+	yuwp->recordScore[3][3] = 0x1627E;
+	yuwp->recordScore[3][4] = 0x15950;
+
+	yuwp->recordParam[3][0] = ((t = ((s32)yuwp->recordScore[3][0] - 74000) / 2000) >= 0 ? t : 0) + 7;
+	yuwp->recordParam[3][1] = ((t = ((s32)yuwp->recordScore[3][1] - 74000) / 2000) >= 0 ? t : 0) + 6;
+	yuwp->recordParam[3][2] = ((t = ((s32)yuwp->recordScore[3][2] - 74000) / 2000) >= 0 ? t : 0) + 4;
+	yuwp->recordParam[3][3] = ((t = ((s32)yuwp->recordScore[3][3] - 74000) / 2000) >= 0 ? t : 0) + 3;
+	yuwp->recordParam[3][4] = ((t = ((s32)yuwp->recordScore[3][4] - 74000) / 2000) >= 0 ? t : 0) + 4;
+
+	yuwp->recordOn[4][0] = 1;
+	yuwp->recordOn[4][1] = 1;
+	yuwp->recordOn[4][2] = 1;
+	yuwp->recordOn[4][3] = 1;
+	yuwp->recordOn[4][4] = 1;
+
+	yuwp->recordScore[4][0] = 0x5B964;
+	yuwp->recordScore[4][1] = 0x5825A;
+	yuwp->recordScore[4][2] = 0x4F826;
+	yuwp->recordScore[4][3] = 0x4C3D8;
+	yuwp->recordScore[4][4] = 0x4237E;
+
+	yuwp->recordParam[4][0] = 0xE;
+	yuwp->recordParam[4][1] = 0xC;
+	yuwp->recordParam[4][2] = 0xF;
+	yuwp->recordParam[4][3] = 0xB;
+	yuwp->recordParam[4][4] = 0xA;
+
+	yuwp->recordOn[5][0] = 1;
+	yuwp->recordOn[5][1] = 1;
+	yuwp->recordOn[5][2] = 1;
+	yuwp->recordOn[5][3] = 1;
+	yuwp->recordOn[5][4] = 1;
+
+	yuwp->recordScore[5][0] = 2;
+	yuwp->recordScore[5][1] = 5;
+	yuwp->recordScore[5][2] = 0x12;
+	yuwp->recordScore[5][3] = 0x1B;
+	yuwp->recordScore[5][4] = 0x8A;
+
+	yuwp->recordParam[5][0] = MAX0(((700 - (s32)yuwp->recordScore[5][0]) * 15) / 700) + 1;
+	t = (700 - (s32)yuwp->recordScore[5][1]) * 15;
+	yuwp->recordParam[5][1] = MAX0(t / 700);
+	t = (700 - (s32)yuwp->recordScore[5][2]) * 15;
+	yuwp->recordParam[5][2] = MAX0(t / 700);
+	t = (700 - (s32)yuwp->recordScore[5][3]) * 15;
+	yuwp->recordParam[5][3] = MAX0(t / 700);
+	yuwp->recordParam[5][4] = MAX0(((700 - (s32)yuwp->recordScore[5][4]) * 15) / 700);
+
+	yuwp->recordOn[6][0] = 1;
+	yuwp->recordOn[6][1] = 1;
+	yuwp->recordOn[6][2] = 1;
+	yuwp->recordOn[6][3] = 1;
+	yuwp->recordOn[6][4] = 1;
+
+	yuwp->recordScore[6][0] = 0x1E3DE;
+	yuwp->recordScore[6][1] = 0x1E00A;
+	yuwp->recordScore[6][2] = 0x1DD8A;
+	yuwp->recordScore[6][3] = 0x1D5BA;
+	yuwp->recordScore[6][4] = 0x1C1CE;
+
+	yuwp->recordParam[6][0] = MAX0(((s32)yuwp->recordScore[6][0] - 109000) / 2000) + 7;
+	t = (s32)yuwp->recordScore[6][1] - 109000;
+	yuwp->recordParam[6][1] = MAX0(t / 2000) + 6;
+	yuwp->recordParam[6][2] = MAX0(((s32)yuwp->recordScore[6][2] - 109000) / 2000) + 4;
+	t = (s32)yuwp->recordScore[6][3] - 109000;
+	yuwp->recordParam[6][3] = MAX0(t / 2000) + 4;
+	t = (s32)yuwp->recordScore[6][4] - 109000;
+	yuwp->recordParam[6][4] = MAX0(t / 2000) + 1;
+
+	yuwp->recordOn[7][0] = 1;
+	yuwp->recordOn[7][1] = 1;
+	yuwp->recordOn[7][2] = 1;
+	yuwp->recordOn[7][3] = 1;
+	yuwp->recordOn[7][4] = 1;
+
+	yuwp->recordScore[7][0] = 0x1525C;
+	yuwp->recordScore[7][1] = 0x15018;
+	yuwp->recordScore[7][2] = 0x14A96;
+	yuwp->recordScore[7][3] = 0x149A6;
+	yuwp->recordScore[7][4] = 0x14122;
+
+	t = (s32)yuwp->recordScore[7][0] - 74000;
+	yuwp->recordParam[7][0] = MAX0(t / 2000) + 7;
+	t = (s32)yuwp->recordScore[7][1] - 74000;
+	yuwp->recordParam[7][1] = MAX0(t / 2000) + 6;
+	yuwp->recordParam[7][2] = MAX0(((s32)yuwp->recordScore[7][2] - 74000) / 2000) + 4;
+	t = (s32)yuwp->recordScore[7][3] - 74000;
+	yuwp->recordParam[7][3] = MAX0(t / 2000) + 3;
+	yuwp->recordParam[7][4] = MAX0(((s32)yuwp->recordScore[7][4] - 74000) / 2000) + 4;
+#else
 	yuwp->recordOn[0][0] = 1;
 	yuwp->recordOn[0][1] = 1;
 	yuwp->recordOn[0][2] = 1;
@@ -152,6 +313,7 @@ void yuugijou_init(void) {
 	t = (s32)yuwp->recordScore[3][3] - 74000;
 	yuwp->recordParam[3][3] = MAX0(t / 2000) + 3;
 	yuwp->recordParam[3][4] = MAX0(((s32)yuwp->recordScore[3][4] - 74000) / 2000) + 4;
+#endif
 }
 static inline s32 cmpSign(s32 a, s32 b) {
 	if (a > b) {
@@ -174,10 +336,10 @@ void monteCountDisp(void) {
 		windowDispGX_Waku_col(0, c1, -288.0f, (f32)(y + 0x2C), 200.0f, 44.0f, 16.0f);
 		PSMTXTrans(mtx, -260.0f, (f32)(y + 2), 0.0f);
 		c2 = (GXColor){255, 255, 255, 255};
-		iconDispGxCol(mtx, 0x10, 0x13F, c2);
+		iconDispGxCol(mtx, 0x10, ICON_13F, c2);
 		PSMTXTrans(mtx, -230.0f, (f32)(y + 2), 0.0f);
 		c3 = (GXColor){255, 255, 255, 255};
-		iconDispGxCol(mtx, 0x10, 0x1D6, c3);
+		iconDispGxCol(mtx, 0x10, ICON_1D6, c3);
 		PSMTXTrans(mtx, -128.0f, (f32)(y + 2), 0.0f);
 		c4 = (GXColor){255, 255, 255, 255};
 		iconNumberDispGx(mtx, yuwp->dispTokens, 0, c4);

@@ -33,7 +33,7 @@ USER_FUNC(evt_btl_camera_set_mode);
 USER_FUNC(evt_msg_print);
 extern s32 battle_evt_majo_disp_off[];
 extern s32 battle_evt_majo_disp_on[];
-extern s32 btl_marilyn_zoom_30_data_123D0[];
+extern s32 btl_marilyn_zoom[];
 extern s32 btldefaultevt_Confuse[];
 extern s32 btldefaultevt_Damage[];
 extern s32 btlevtcmd_AttackDeclare[];
@@ -68,8 +68,8 @@ extern s32 evt_snd_sfxoff[];
 extern s32 evt_snd_sfxon[];
 extern s32 evt_sub_random[];
 extern s32 evt_sub_rumble_onoff[];
-extern s32 majo3_shadow_tail_event_30_data_13F70[];
-extern s32 majo_unison_phase_event_30_data_126FC[];
+extern s32 majo3_shadow_tail_event[];
+extern s32 majo_unison_phase_event[];
 extern s32 subsetevt_confuse_flustered[];
 extern s32 subsetevt_dead_core_nospin_norotate[];
 extern s32 weaponGetPowerDefault[];
@@ -106,7 +106,11 @@ static s32 dead_event[152];
 static s32 unison_phase_event[83];
 static __declspec(section ".data") s32 phase_event[2];
 static s32 attack_event[193];
+#ifdef VERSION_G8ME01
+static s32 kagenuke_attack_event[241];
+#else
 static s32 kagenuke_attack_event[238];
+#endif
 static s32 thunder_attack_event[235];
 static s32 charge_attack_event[58];
 static __declspec(section ".data") s32 wait_event[6];
@@ -271,7 +275,13 @@ static s32 weapon_marilyn_kagenuke_attack1[] = {
 };
 
 static s32 weapon_marilyn_thunder_attack1[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    1677721602,
+#else
+    1677721600,
+#endif
+    1065353216, 16843009, (s32)weaponGetPowerDefault,
     2, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 131140, 2047, -2147475456,
@@ -309,7 +319,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
     CALL(btlevtcmd_SetUnitWork, -2, 8, 0)
     CALL(btlevtcmd_SetUnitWork, -2, 3, 0)
-    SPAWN_EVENT(PTR(majo3_shadow_tail_event_30_data_13F70))
+    SPAWN_EVENT(PTR(majo3_shadow_tail_event))
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
@@ -359,7 +369,7 @@ static EVT_BEGIN(dead_event)
             CASE_EQUAL(0)
             CASE_DEFAULT
             CALL(btlevtcmd_StatusWindowOnOff, 0)
-            CALL_CHILD(PTR(btl_marilyn_zoom_30_data_123D0))
+            CALL_CHILD(PTR(btl_marilyn_zoom))
             CALL(btlevtcmd_SetTalkPose, -2, STRING("MRR_D_1"))
             CALL(btlevtcmd_SetStayPose, -2, STRING("MRR_D_1"))
             CALL(evt_msg_print, 2, STRING("btl_majo3_12"), 0, -2)
@@ -367,7 +377,7 @@ static EVT_BEGIN(dead_event)
         END_SWITCH
     END_SWITCH
     CALL(btlevtcmd_StatusWindowOnOff, 0)
-    CALL_CHILD(PTR(btl_marilyn_zoom_30_data_123D0))
+    CALL_CHILD(PTR(btl_marilyn_zoom))
     CALL(btlevtcmd_SetTalkPose, -2, STRING("MRR_D_1"))
     CALL(btlevtcmd_SetStayPose, -2, STRING("MRR_D_1"))
     CALL(evt_msg_print, 2, STRING("btl_majo3_09"), 0, -2)
@@ -385,7 +395,7 @@ EVT_END()
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(majo_unison_phase_event_30_data_126FC))
+        CALL_CHILD(PTR(majo_unison_phase_event))
         CALL(btlevtcmd_GetUnitWork, -2, 4, LW(3))
         CALL(btlevtcmd_GetUnitWork, -2, 5, LW(4))
         IF_INT_NOT_EQUAL(LW(3), LW(4))
@@ -496,7 +506,11 @@ static s32 kagenuke_attack_event[] = {
     -29999997, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0,
     200, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MARI_ARM_FOLD1", -250000000, 0, -250000000,
     262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"MRR_A1_1", 65630, (s32)marilyn_down, 65546,
-    300, 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000, -29999999, -29999998, 262235,
+    300, 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000, -29999999, -29999998,
+#ifdef VERSION_G8ME01
+    131125, -29999998, 5,
+#endif
+    262235,
     (s32)btlevtcmd_FaceDirectionAdd, -29999997, -30000000, 30, 131122, -29999999, 0, 65630,
     (s32)marilyn_up, 65546, 600, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MARI_HAND_CLAP1", -250000000,
     0, -29999985, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"MRR_A2_1", 65545,

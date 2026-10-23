@@ -105,7 +105,7 @@ __declspec(section ".data") s32 fd_patamet___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_patamet_one_negone_359;
 __declspec(section ".data") s32 fd_patamet___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_patamet_one_364[1];
-BattleUnitKind unit_patamet_15_data_2B728;
+BattleUnitKind unit_patamet;
 static s32 weapon_patamet_attack[48];
 static __declspec(section ".data") BattleUnitDefense defence_pata;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_pata;
@@ -194,7 +194,7 @@ __declspec(section ".data") s32 fd_patamet_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_patamet_15_data_2B728 = {
+BattleUnitKind unit_patamet = {
     89,
     "btl_un_patamet",
     5,

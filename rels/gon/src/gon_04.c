@@ -101,9 +101,17 @@ static __declspec(section ".data") s32 e3_door_close[12];
 static __declspec(section ".data") s32 e3_door_open[12];
 static s32 bero_entry_data[90];
 s32 evt_gon_04flowblock_updown1_init[37];
+#ifdef VERSION_G8ME01
+s32 evt_gon_04flowblock_updown1[465];
+#else
 s32 evt_gon_04flowblock_updown1[491];
+#endif
 s32 evt_gon_04flowblock_updown2_init[37];
+#ifdef VERSION_G8ME01
+s32 evt_gon_04flowblock_updown2[465];
+#else
 s32 evt_gon_04flowblock_updown2[491];
+#endif
 __declspec(section ".data") s32 kemuri_pos1[10];
 __declspec(section ".data") s32 kemuri_pos2[10];
 s32 evt_kaidan_pera_anime[203];
@@ -278,6 +286,9 @@ EVT_BEGIN(evt_gon_04flowblock_updown1)
             SET_FLOAT_VALUE(LW(8), FLOAT(-0.19921875f))
             SET_FLOAT_VALUE(LW(9), 0)
         END_IF
+#ifdef VERSION_G8ME01
+        BEGIN_INLINE_EVENT
+#else
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(10)
             CALL(evt_sub_rumble_onoff, 0, 0)
@@ -285,6 +296,7 @@ EVT_BEGIN(evt_gon_04flowblock_updown1)
             CALL(evt_sub_rumble_onoff, 1, 0)
         END_SIBLING_EVENT
         BEGIN_SIBLING_EVENT
+#endif
             WAIT_FRAMES(10)
             CALL(evt_sub_intpl_init, 11, 10, 3, 4)
             LABEL(0)
@@ -294,7 +306,11 @@ EVT_BEGIN(evt_gon_04flowblock_updown1)
             IF_INT_EQUAL(LW(1), 1)
                 GOTO(0)
             END_IF
+#ifdef VERSION_G8ME01
+        END_INLINE_EVENT
+#else
         END_SIBLING_EVENT
+#endif
         WAIT_MS(500)
         CALL(evt_mobj_get_position, STRING("mobj_fltbl01"), LW(12), LW(13), LW(14))
         CALL(evt_mobj_get_kindname, STRING("mobj_fltbl01"), LW(11))
@@ -403,12 +419,16 @@ EVT_BEGIN(evt_gon_04flowblock_updown1)
             END_IF
         END_INLINE_EVENT
         IF_INT_EQUAL(LW(10), 1)
+#ifdef VERSION_G8ME01
+            BEGIN_INLINE_EVENT
+#else
             BEGIN_SIBLING_EVENT
                 CALL(evt_sub_rumble_onoff, 0, 0)
                 WAIT_MS(300)
                 CALL(evt_sub_rumble_onoff, 1, 0)
             END_SIBLING_EVENT
             BEGIN_SIBLING_EVENT
+#endif
                 CALL(evt_sub_intpl_init, 11, 10, 3, 10)
                 LABEL(2)
                 CALL(evt_sub_intpl_get_value)
@@ -417,7 +437,11 @@ EVT_BEGIN(evt_gon_04flowblock_updown1)
                 IF_INT_EQUAL(LW(1), 1)
                     GOTO(2)
                 END_IF
+#ifdef VERSION_G8ME01
+            END_INLINE_EVENT
+#else
             END_SIBLING_EVENT
+#endif
             WAIT_MS(1000)
         END_IF
         IF_INT_EQUAL(LSWF(6), 0)
@@ -490,6 +514,9 @@ EVT_BEGIN(evt_gon_04flowblock_updown2)
             SET_FLOAT_VALUE(LW(8), FLOAT(-0.19921875f))
             SET_FLOAT_VALUE(LW(9), 0)
         END_IF
+#ifdef VERSION_G8ME01
+        BEGIN_INLINE_EVENT
+#else
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(10)
             CALL(evt_sub_rumble_onoff, 0, 0)
@@ -497,6 +524,7 @@ EVT_BEGIN(evt_gon_04flowblock_updown2)
             CALL(evt_sub_rumble_onoff, 1, 0)
         END_SIBLING_EVENT
         BEGIN_SIBLING_EVENT
+#endif
             WAIT_FRAMES(10)
             CALL(evt_sub_intpl_init, 11, 10, 3, 4)
             LABEL(0)
@@ -506,7 +534,11 @@ EVT_BEGIN(evt_gon_04flowblock_updown2)
             IF_INT_EQUAL(LW(1), 1)
                 GOTO(0)
             END_IF
+#ifdef VERSION_G8ME01
+        END_INLINE_EVENT
+#else
         END_SIBLING_EVENT
+#endif
         WAIT_MS(500)
         CALL(evt_mobj_get_position, STRING("mobj_fltbl02"), LW(12), LW(13), LW(14))
         CALL(evt_mobj_get_kindname, STRING("mobj_fltbl02"), LW(11))
@@ -615,12 +647,16 @@ EVT_BEGIN(evt_gon_04flowblock_updown2)
             END_IF
         END_INLINE_EVENT
         IF_INT_EQUAL(LW(10), 1)
+#ifdef VERSION_G8ME01
+            BEGIN_INLINE_EVENT
+#else
             BEGIN_SIBLING_EVENT
                 CALL(evt_sub_rumble_onoff, 0, 0)
                 WAIT_MS(300)
                 CALL(evt_sub_rumble_onoff, 1, 0)
             END_SIBLING_EVENT
             BEGIN_SIBLING_EVENT
+#endif
                 CALL(evt_sub_intpl_init, 11, 10, 3, 10)
                 LABEL(2)
                 CALL(evt_sub_intpl_get_value)
@@ -629,7 +665,11 @@ EVT_BEGIN(evt_gon_04flowblock_updown2)
                 IF_INT_EQUAL(LW(1), 1)
                     GOTO(2)
                 END_IF
+#ifdef VERSION_G8ME01
+            END_INLINE_EVENT
+#else
             END_SIBLING_EVENT
+#endif
             WAIT_MS(1000)
         END_IF
         IF_INT_EQUAL(LSWF(7), 0)
@@ -992,7 +1032,11 @@ EVT_BEGIN(gon_04_init_evt)
         CALL(evt_item_entry, STRING("key00"), 13, -150, 150, -125, 16, -1, PTR(key_get))
     END_IF
     CALL(evt_item_entry, STRING("item00"), 125, 150, 400, -125, 16, GSWF(5604), 0)
+#ifdef VERSION_G8ME01
+    CALL(evt_item_entry, STRING("item01"), 125, 420, 910, -175, 16, GSWF(5605), 0)
+#else
     CALL(evt_item_entry, STRING("item01"), 125, 400, 900, -175, 16, GSWF(5605), 0)
+#endif
     CALL(evt_mobj_lv_blk, STRING("mobj_blk00"), 395, 200, -125, 0, GSWF(1485), STRING("MOBJ_Lv1BigBlock"))
     CALL(evt_mobj_lv_blk, STRING("mobj_blk01"), 445, 150, -125, 0, GSWF(1486), STRING("MOBJ_Lv2BigBlock"))
     CALL(evt_mobj_lv_blk, STRING("mobj_blk02"), FLOAT(545.0f), 150, -125, 0, GSWF(1487), STRING("MOBJ_Lv2BigBlock"))

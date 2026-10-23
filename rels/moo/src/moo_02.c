@@ -36,6 +36,9 @@ USER_FUNC(evt_run_case_evt);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_offscreen_get_boundingbox2);
+#endif
 extern s32 bero_case_entry[];
 extern s32 evt_bero_info_run[];
 
@@ -56,10 +59,26 @@ __declspec(section ".data") s32 fd_moo_02_one_364[1];
 s32 n_bero_in[25];
 __declspec(section ".data") s32 n_bero_out[12];
 static s32 bero_entry_data[90];
+#ifdef VERSION_G8ME01
+static s32 dokan_evt[122];
+#else
 static s32 dokan_evt[102];
+#endif
+#ifdef VERSION_G8ME01
+extern s32 rock_main[];
+#else
 static s32 rock_main[79];
+#endif
+#ifdef VERSION_G8ME01
+static s32 rock_evt0[15];
+#else
 static s32 rock_evt0[21];
+#endif
+#ifdef VERSION_G8ME01
+static s32 rock_evt1[15];
+#else
 static s32 rock_evt1[21];
+#endif
 s32 moo_02_init_evt[132];
 
 __declspec(section ".data") u64 fd_moo_02_negone_one_374 = 0xBF8000003F800000;
@@ -144,7 +163,11 @@ static s32 bero_entry_data[] = {
 };
 
 static EVT_BEGIN(dokan_evt)
+#ifdef VERSION_G8ME01
+    SET_VALUE(GSW(0), 359)
+#else
     CALL(evt_mario_key_onoff, 0)
+#endif
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
         CALL(evt_mapobj_get_position, STRING("S_iwa_04"), LW(0), LW(1), LW(2))
@@ -152,27 +175,50 @@ static EVT_BEGIN(dokan_evt)
     END_INLINE_EVENT
     CALL(evt_offscreen_entry, STRING("offscreen"))
     CALL(evt_mapobj_set_offscreen, 0, STRING("S_iwa_04"), STRING("offscreen"))
+#ifdef VERSION_G8ME01
+    CALL(evt_offscreen_get_boundingbox2, STRING("offscreen"), LW(0), LW(1), LW(2), LW(3))
+    IF_INT_GREATER(LW(2), 0)
+        IF_INT_GREATER(LW(3), 0)
+#endif
     CALL(evt_img_entry, STRING("img"))
     CALL(evt_img_set_paper, STRING("img"), STRING("OFF_d_bom_ver2"))
+#ifdef VERSION_G8ME01
+            CALL(evt_img_alloc_capture, STRING("img"), 0, STRING("offscreen"), 1, 0, 0, 0, 0)
+#else
     CALL(evt_img_alloc_capture, STRING("img"), 0, STRING("offscreen"), 0, 0, 0, 0, 0)
+#endif
     CALL(evt_img_clear_virtual_point, STRING("img"))
     CALL(evt_img_set_shadow, STRING("img"), 2)
     CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_1"))
     CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_iwa_04"), 1)
+#ifdef VERSION_G8ME01
+            CALL(evt_hitobj_onoff, STRING("A_iwa_04"), 1, 0)
+#endif
     CALL(evt_img_wait_animend, STRING("img"))
     CALL(evt_img_free_capture, STRING("img"), 0)
     CALL(evt_img_set_shadow, STRING("img"), 0)
     CALL(evt_img_onoff, STRING("img"), 0)
     CALL(evt_img_release, STRING("img"))
+#ifdef VERSION_G8ME01
+        END_IF
+    END_IF
+#endif
     CALL(evt_offscreen_delete, STRING("offscreen"))
     CALL(evt_mapobj_clear_offscreen, 0, STRING("S_iwa_04"))
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_iwa_04"), 1)
+#else
     SET_VALUE(GSW(0), 359)
+#endif
     CALL(evt_hitobj_onoff, STRING("A_iwa_04"), 1, 0)
+#ifndef VERSION_G8ME01
     CALL(evt_mario_key_onoff, 1)
+#endif
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01
 static EVT_BEGIN(rock_main)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -195,25 +241,38 @@ static EVT_BEGIN(rock_main)
     CALL(evt_hitobj_onoff, LW(11), 1, 0)
     RETURN
 EVT_END()
+#endif
 
 static EVT_BEGIN(rock_evt0)
+#ifdef VERSION_G8ME01
+    SET_VALUE(GSWF(4029), 1)
+#else
     CALL(evt_mario_key_onoff, 0)
+#endif
     SET_VALUE(LW(10), STRING("S_iwa_01"))
     SET_VALUE(LW(11), STRING("A_iwa_01"))
     CALL_CHILD(PTR(rock_main))
+#ifndef VERSION_G8ME01
     SET_VALUE(GSWF(4029), 1)
     CALL(evt_mario_key_onoff, 1)
+#endif
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(rock_evt1)
+#ifdef VERSION_G8ME01
+    SET_VALUE(GSWF(4030), 1)
+#else
     CALL(evt_mario_key_onoff, 0)
+#endif
     SET_VALUE(LW(10), STRING("S_iwa_07"))
     SET_VALUE(LW(11), STRING("A_iwa_07"))
     CALL_CHILD(PTR(rock_main))
+#ifndef VERSION_G8ME01
     SET_VALUE(GSWF(4030), 1)
     CALL(evt_mario_key_onoff, 1)
+#endif
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()

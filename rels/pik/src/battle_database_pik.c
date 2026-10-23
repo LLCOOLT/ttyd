@@ -6,7 +6,7 @@
 extern s32 battle_flower_drop_param_default2[];
 extern s32 battle_heart_drop_param_default[];
 extern s32 battle_item_purple_teresa[];
-extern s32 unit_purple_teresa_22_data_E620[];
+extern s32 unit_purple_teresa[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_pik_negone_one_374;
@@ -127,8 +127,8 @@ s32 pik_btlstage_data[] = {
 };
 
 s32 btlparty_pik_pik_06_01_off_1[] = {
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1121714176,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_purple_teresa,
 };
 
@@ -137,10 +137,10 @@ __declspec(section ".data") s32 btlgrp_pik_pik_06_01_off_1[] = {
 };
 
 s32 btlparty_pik_pik_06_02_off_1[] = {
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1119092736,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_purple_teresa,
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_purple_teresa,
 };
 
@@ -149,7 +149,7 @@ __declspec(section ".data") s32 btlgrp_pik_pik_06_02_off_1[] = {
 };
 
 __declspec(section ".data") s32 btlparty_pik_pik_06_03_off_1[] = {
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_purple_teresa,
 };
 
@@ -158,8 +158,8 @@ __declspec(section ".data") s32 btlgrp_pik_pik_06_03_off_1[] = {
 };
 
 s32 btlparty_pik_pik_06_04_off_1[] = {
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1121714176,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_purple_teresa,
 };
 
@@ -168,8 +168,8 @@ __declspec(section ".data") s32 btlgrp_pik_pik_06_04_off_1[] = {
 };
 
 s32 btlparty_pik_pik_06_05_off_1[] = {
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1121714176,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_purple_teresa,
 };
 
@@ -178,11 +178,11 @@ __declspec(section ".data") s32 btlgrp_pik_pik_06_05_off_1[] = {
 };
 
 s32 btlparty_pik_pik_06_06_off_1[] = {
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1116471296,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_purple_teresa,
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1125515264,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_purple_teresa,
 };
 
@@ -191,7 +191,7 @@ __declspec(section ".data") s32 btlgrp_pik_pik_06_06_off_1[] = {
 };
 
 __declspec(section ".data") s32 btlparty_pik_pik_06_07_off_1[] = {
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_purple_teresa,
 };
 
@@ -200,10 +200,10 @@ __declspec(section ".data") s32 btlgrp_pik_pik_06_07_off_1[] = {
 };
 
 s32 btlparty_pik_pik_06_08_off_1[] = {
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1119092736,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_purple_teresa,
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_purple_teresa,
 };
 
@@ -212,11 +212,11 @@ __declspec(section ".data") s32 btlgrp_pik_pik_06_08_off_1[] = {
 };
 
 s32 btlparty_pik_pik_06_09_off_1[] = {
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1116471296,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_purple_teresa,
-    (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa_22_data_E620, 16777216, 67108868, 1125515264,
+    (s32)unit_purple_teresa, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_purple_teresa, (s32)unit_purple_teresa, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_purple_teresa,
 };
 

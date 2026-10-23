@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_status_effect.h"
 #include "battle/battle_unit.h"
 #include "battle/battle.h"
@@ -21,8 +22,8 @@ typedef struct StChgMsg {
 	s32 field_0x8; // 0x8
 } StChgMsg;
 
-#define ST_CHG_MSG(i) (((StChgMsg*)((u8*)_battleWorkPointer + 0x18D88)) + (i))
-#define ST_CHG_TEXT ((const char*)((u8*)_battleWorkPointer + 0x18ED8))
+#define ST_CHG_MSG(i) (((StChgMsg*)((u8*)_battleWorkPointer + BWOFF(0x18D88))) + (i))
+#define ST_CHG_TEXT ((const char*)((u8*)_battleWorkPointer + BWOFF(0x18ED8)))
 
 BOOL BattleStatusChangeAnnouceMain_Unit(BattleUnit* unit);
 void BattleStatusChangeMsgSetAnnouce(s32* data, s32 index, s32 arg2);
@@ -314,7 +315,11 @@ void BSE_Kagegakure(BattleUnit* unit) {
 	if (on) {
 		if (KAGE_ICON(unit) == NULL) {
 			sprintf(name, "_biK_%02x\0\0", *(s32*)unit);
+#ifdef VERSION_G8ME01
+			iconEntry(name, 0xA1);
+#else
 			iconEntry(name, 0x99);
+#endif
 			KAGE_ICON(unit) = (u8*)iconNameToPtr(name);
 		}
 		BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &x, &y, &z);
@@ -400,7 +405,7 @@ BOOL BSE_TurnFirstProcessEffectMain(BattleUnit* unit) {
 #pragma optimize_for_size on
 void BattleStatusChangeInfoWorkInit(BattleUnit* unit) {
 	s32 i;
-	StChgInfo* e = (StChgInfo*)((u8*)unit + 0xAE4);
+	StChgInfo* e = (StChgInfo*)((u8*)unit + BUOFF(0xAE4));
 
 	for (i = 0; i < 6; i++) {
 		StChgInfo* p = &e[i];
@@ -432,7 +437,7 @@ s32 _get_pri(s8 type) {
 
 #pragma optimize_for_size on
 void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 arg2, s32 arg3) {
-	StChgInfo* e = (StChgInfo*)((u8*)unit + 0xAE4);
+	StChgInfo* e = (StChgInfo*)((u8*)unit + BUOFF(0xAE4));
 	StChgInfo tmp, swap;
 	s8 pri = _get_pri(type);
 	s32 i, j, n;
@@ -550,7 +555,7 @@ void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 	s32 n, found, k;
 	StChgInfo* e;
 
-	base = (StChgWorkLocal*)((u8*)wp + 0x18D88);
+	base = (StChgWorkLocal*)((u8*)wp + BWOFF(0x18D88));
 
 	for (i = 0; i < 28; i++) {
 		t = i;
@@ -560,7 +565,7 @@ void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 		for (j = 0; j < 64; j++) {
 			unit = BattleGetUnitPtr(wp, j);
 			if (unit && !BtlUnit_CheckStatus(unit, 0x1B)) {
-				e = (StChgInfo*)((u8*)unit + 0xAE4);
+				e = (StChgInfo*)((u8*)unit + BUOFF(0xAE4));
 				found = 0;
 				k = 0;
 				for (n = 0; n < 6; n++) {
@@ -587,7 +592,7 @@ void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 }
 
 BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
-	StChgWorkLocal* base = (StChgWorkLocal*)((u8*)wp + 0x18D88);
+	StChgWorkLocal* base = (StChgWorkLocal*)((u8*)wp + BWOFF(0x18D88));
 	StChgMsg* msg;
 	s8* p;
 	BOOL ret = FALSE;
@@ -643,14 +648,14 @@ void _st_chg_msg_disp(void) {
 	u8* wp = (u8*)_battleWorkPointer + 0x20000;
 	f32 y; f32 x; u16 width; u16 lines;
 	GXColor col0;
-	width = FontGetMessageWidthLine((const char*)(wp - 0x7128), &lines);
+	width = FontGetMessageWidthLine((const char*)(wp - VERSION_PICK(0x7128, 0x7110)), &lines);
 	lines++;
 	col0 = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	y = 0.0f; x = y - (width / 2); y = -120.0f;
 	// the color is passed by address here (same ABI as by-value GXColor)
 	((WakuColByRefFunc)windowDispGX_Waku_col)(0, &col0, x - 20.0f, ((lines - 1) * 29) + -117.0f, (f32)(width + 40), (f32)(lines * 29 + 1), 10.0f);
 	FontDrawStart();
-	FontDrawMessage(x, (s32)y + (lines - 1) * 29, (const char*)(wp - 0x7128));
+	FontDrawMessage(x, (s32)y + (lines - 1) * 29, (const char*)(wp - VERSION_PICK(0x7128, 0x7110)));
 }
 
 #pragma force_active on

@@ -202,7 +202,11 @@ EVT_BEGIN(muj_03_init_evt)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL(evt_mobj_badgeblk, STRING("mobj01"), -50, 9, 0, 121, 0, GSWF(3133), 0)
     CALL(evt_mobj_brick, STRING("mobj02"), -50, 94, 0, 0, 13, 0, GSWF(3134))
+#ifdef VERSION_G8ME01
+    CALL(evt_mobj_brick, STRING("bblk00"), -470, 155, -50, 0, 0, 0, LSWF(3))
+#else
     CALL(evt_mobj_brick, STRING("bblk00"), -470, 155, -50, 0, 0, 0, GSWF(3145))
+#endif
     CALL(evt_mobj_powerupblk, STRING("pblk01"), -470, 240, -50, 0, GSWF(5552), 0)
     CALL(evt_mobj_badgeblk, STRING("mobj03"), -50, 270, -100, 129, 0, GSWF(3147), 0)
     CALL(evt_mobj_brick, STRING("mobj_hidden2"), -50, 209, 0, 156, 11, 0, GSWF(3153))

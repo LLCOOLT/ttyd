@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -256,7 +257,7 @@ static __declspec(section ".data") s32 data_table[] = {
 };
 
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_gesso_right_arm", "c_gesso2", 0.0f, 0.0f, 0.0f, 85.0f, -110.0f, 0.0f, 85.0f, -110.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x680009, 0, pose_table},
+    {1, "btl_un_gesso_right_arm", "c_gesso2", 0.0f, 0.0f, 0.0f, 85.0f, -110.0f, 0.0f, 85.0f, -110.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, VERSION_PICK(0x680009, 0x2680009), 0, pose_table},
 };
 
 static EVT_BEGIN(init_event)
@@ -369,7 +370,12 @@ static s32 attack_event[] = {
     -30000000, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GESSO_ARM_MOVE1", -250000000, 0, -250000000,
     196699, (s32)btlevtcmd_ftof, 55, -30000000, 65545, -30000000, 393307, (s32)btlevtcmd_snd_se,
     -2, (s32)"SFX_BOSS_GESSO_ATTACK1", -250000000, 0, -250000000, 112, 196699, (s32)btlevtcmd_ftof,
-    94, -30000000, 65545, -30000000, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997,
+#ifdef VERSION_G8ME01
+    97,
+#else
+    94,
+#endif
+    -30000000, 65545, -30000000, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997,
     -29999996, -29999988, 256, -29999995, 131097, -29999995, 1, 65570,
     -29999995, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38, 65572,
     6, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 39, 65572, 2, 196699,

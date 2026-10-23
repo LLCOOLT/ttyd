@@ -416,8 +416,13 @@ static EVT_BEGIN(ukishima_apper)
     CALL(evt_sub_intpl_msec_init, 1, -30, 0, 100)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+#ifdef VERSION_G8ME01
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 65, LW(0), 0)
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -71, LW(0), 0)
+#else
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 60, LW(0), 0)
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -66, LW(0), 0)
+#endif
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_1"))
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_2"))
         WAIT_FRAMES(1)
@@ -428,8 +433,13 @@ static EVT_BEGIN(ukishima_apper)
     CALL(evt_sub_intpl_msec_init, 11, 0, -10, 400)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+#ifdef VERSION_G8ME01
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 65, LW(0), 0)
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -71, LW(0), 0)
+#else
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 60, LW(0), 0)
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -66, LW(0), 0)
+#endif
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_1"))
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_2"))
         WAIT_FRAMES(1)
@@ -440,8 +450,13 @@ static EVT_BEGIN(ukishima_apper)
     CALL(evt_sub_intpl_msec_init, 11, -10, 0, 400)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+#ifdef VERSION_G8ME01
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 65, LW(0), 0)
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -71, LW(0), 0)
+#else
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 60, LW(0), 0)
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -66, LW(0), 0)
+#endif
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_1"))
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_2"))
         WAIT_FRAMES(1)
@@ -452,8 +467,13 @@ static EVT_BEGIN(ukishima_apper)
     CALL(evt_sub_intpl_msec_init, 11, 0, -5, 300)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+#ifdef VERSION_G8ME01
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 65, LW(0), 0)
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -71, LW(0), 0)
+#else
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 60, LW(0), 0)
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -66, LW(0), 0)
+#endif
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_1"))
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_2"))
         WAIT_FRAMES(1)
@@ -464,8 +484,13 @@ static EVT_BEGIN(ukishima_apper)
     CALL(evt_sub_intpl_msec_init, 11, -5, 0, 300)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+#ifdef VERSION_G8ME01
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 65, LW(0), 0)
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -71, LW(0), 0)
+#else
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 60, LW(0), 0)
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -66, LW(0), 0)
+#endif
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_1"))
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_2"))
         WAIT_FRAMES(1)
@@ -476,8 +501,13 @@ static EVT_BEGIN(ukishima_apper)
     CALL(evt_sub_intpl_msec_init, 11, 0, -1, 200)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+#ifdef VERSION_G8ME01
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 65, LW(0), 0)
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -71, LW(0), 0)
+#else
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 60, LW(0), 0)
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -66, LW(0), 0)
+#endif
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_1"))
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_2"))
         WAIT_FRAMES(1)
@@ -488,8 +518,13 @@ static EVT_BEGIN(ukishima_apper)
     CALL(evt_sub_intpl_msec_init, 11, -1, 0, 200)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+#ifdef VERSION_G8ME01
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 65, LW(0), 0)
+        CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -71, LW(0), 0)
+#else
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_1"), 60, LW(0), 0)
         CALL(evt_mapobj_trans, 0, STRING("ugo_yuka_2"), -66, LW(0), 0)
+#endif
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_1"))
         CALL(evt_hit_bind_update, STRING("a_ugo_yuka_2"))
         WAIT_FRAMES(1)
@@ -646,15 +681,25 @@ EVT_BEGIN(geso_battle)
     WAIT_MS(500)
     SET_VALUE(LW(4), STRING("ugo_yuka_1"))
     SET_VALUE(LW(5), STRING("a_ugo_yuka_1"))
+#ifdef VERSION_G8ME01
+    SET_FLOAT_VALUE(LW(6), 65)
+    SET_FLOAT_VALUE(LW(7), 32)
+#else
     SET_FLOAT_VALUE(LW(6), 60)
     SET_FLOAT_VALUE(LW(7), 36)
+#endif
     SET_VALUE(LW(8), 1000)
     SET_VALUE(LW(9), 2000)
     SPAWN_EVENT(PTR(ukishima_move))
     SET_VALUE(LW(4), STRING("ugo_yuka_2"))
     SET_VALUE(LW(5), STRING("a_ugo_yuka_2"))
+#ifdef VERSION_G8ME01
+    SET_FLOAT_VALUE(LW(6), -71)
+    SET_FLOAT_VALUE(LW(7), -34)
+#else
     SET_FLOAT_VALUE(LW(6), -66)
     SET_FLOAT_VALUE(LW(7), -40)
+#endif
     SET_VALUE(LW(8), 1000)
     SET_VALUE(LW(9), 2000)
     SPAWN_EVENT(PTR(ukishima_move))
@@ -751,15 +796,25 @@ EVT_BEGIN(tik_02_init_evt)
         ELSE
         SET_VALUE(LW(4), STRING("ugo_yuka_1"))
         SET_VALUE(LW(5), STRING("a_ugo_yuka_1"))
+#ifdef VERSION_G8ME01
+        SET_FLOAT_VALUE(LW(6), 65)
+        SET_FLOAT_VALUE(LW(7), 32)
+#else
         SET_FLOAT_VALUE(LW(6), 60)
         SET_FLOAT_VALUE(LW(7), 36)
+#endif
         SET_VALUE(LW(8), 1000)
         SET_VALUE(LW(9), 2000)
         SPAWN_EVENT(PTR(ukishima_move))
         SET_VALUE(LW(4), STRING("ugo_yuka_2"))
         SET_VALUE(LW(5), STRING("a_ugo_yuka_2"))
+#ifdef VERSION_G8ME01
+        SET_FLOAT_VALUE(LW(6), -71)
+        SET_FLOAT_VALUE(LW(7), -34)
+#else
         SET_FLOAT_VALUE(LW(6), -66)
         SET_FLOAT_VALUE(LW(7), -40)
+#endif
         SET_VALUE(LW(8), 1000)
         SET_VALUE(LW(9), 2000)
         SPAWN_EVENT(PTR(ukishima_move))

@@ -11,6 +11,9 @@ extern MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
 
 #include "mario/mario_party.h"
 #include "mario/mario_sbr.h"
+#ifdef VERSION_G8ME01
+#include "mario/mariost.h"
+#endif
 
 extern int __float_nan[];
 
@@ -381,6 +384,128 @@ static inline void partyWallSlide(Vec* out, Vec n, f32 d, f32 sn, f32 cs) {
     out->z += 0.5f * (mz - dot * n.z);
 }
 
+#ifdef VERSION_G8ME01
+HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
+    Vec qpos;
+    Vec qdir;
+    Vec outPos;
+    Vec bestNrm;
+    Vec nrm;
+    Vec v = {0.0f, 0.0f, 0.0f};
+    f32 arr[4];
+    f32 sn, cs, sn2, cs2;
+    f32 bestD, d;
+    f32 rd, maxD;
+    HitEntry* best;
+    s32 count;
+    HitEntry* hit;
+    s32 i;
+
+    sincosf(&sn, &cs, ang);
+    count = 3;
+    arr[0] = 0.75f * partyGetHeight(party);
+    arr[1] = 0.5f * partyGetHeight(party);
+    if ((party->flags & 0x30) || yoshiGetStatus() == 2) {
+        arr[2] = 1.0f;
+    } else {
+        arr[2] = 11.0f;
+        if (!strcmp(gp->currentMapName, "gor_02") && party->position.y >= 120.0f && party->position.x <= 350.0f) {
+            arr[3] = 1.0f;
+            count = 4;
+        }
+    }
+    rd = 0.5f * party->width;
+    best = NULL;
+    maxD = rd + dist;
+    bestD = maxD;
+    do {
+    qpos = *pos;
+    {
+    Vec dir1 = {0.0f, 0.0f, 0.0f};
+    dir1.x = sn;
+    dir1.z = cs;
+    qdir = dir1;
+    }
+    for (i = 0; i < count; i++) {
+        d = maxD;
+        qpos.y = pos->y + arr[i];
+        hit = marioHitCheckVec(&qpos, &qdir, &outPos, &nrm, &d);
+        if (hit) {
+            if (best) {
+                if (d < bestD) {
+                    best = hit;
+                    bestD = d;
+                    bestNrm = nrm;
+                }
+            } else {
+                best = hit;
+                bestD = d;
+                bestNrm = nrm;
+            }
+        }
+    }
+    if (best) {
+        Vec nn;
+        f32 dot;
+        f32 mx, mz;
+        f32 nz;
+        nn = bestNrm;
+        mx = sn * dist;
+        mz = cs * dist;
+        nz = nn.z;
+        dot = mx * nn.x + mz * nz;
+        v.x += 0.5f * (mx - dot * nn.x);
+        v.z += 0.5f * (mz - dot * nz);
+    }
+    hit = NULL;
+    sincosf(&sn2, &cs2, ang + 45.0f);
+    bestD = rd;
+    qpos = *pos;
+    {
+    Vec dir2 = {0.0f, 0.0f, 0.0f};
+    dir2.x = sn2;
+    dir2.z = cs2;
+    qdir = dir2;
+    }
+    for (i = 0; i < count; i++) {
+        bestD = rd;
+        qpos.y = pos->y + arr[i];
+        hit = marioHitCheckVec(&qpos, &qdir, NULL, NULL, &bestD);
+        if (hit) {
+            break;
+        }
+    }
+    if (hit) {
+        hit = NULL;
+        sincosf(&sn2, &cs2, ang - 45.0f);
+        for (i = 0; i < count; i++) {
+            bestD = rd;
+            qpos.y = pos->y + arr[i];
+            {
+            Vec dd = {0.0f, 0.0f, 0.0f};
+            dd.x = sn2;
+            dd.z = cs2;
+            qdir = dd;
+            }
+            hit = marioHitCheckVec(&qpos, &qdir, NULL, NULL, &bestD);
+        }
+    }
+    if (best) {
+        if (!hit) {
+            pos->x += v.x;
+            pos->z += v.z;
+        }
+        return best;
+    }
+    if (!hit) {
+        pos->x += dist * sn;
+        pos->z += dist * cs;
+    }
+    return NULL;
+    } while (0);
+}
+
+#else
 HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     Vec qpos;
     Vec qdir;
@@ -493,6 +618,59 @@ HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     } while (0);
 }
 
+#endif
+
+#ifdef VERSION_G8ME01
+HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
+    f32 sn, cs;
+    f32 d, dy, hh;
+    f32 w, maxD;
+    HitEntry* hit;
+    Vec p, nrm;
+
+    sincosf(&sn, &cs, ang);
+    w = party->width;
+    if (party->flags & 0x1000) {
+        w = 6.0f;
+    }
+    d = maxD = 0.5f * w + dist;
+    hh = 0.75f * partyGetHeight(party);
+    p = party->position;
+    p.y += hh;
+    {
+    Vec dir = {0.0f, 0.0f, 0.0f};
+    Vec outPos = {0.0f, 0.0f, 0.0f};
+    dir.x = sn;
+    dir.z = cs;
+    hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
+    if (hit) {
+        PF(party, 0xEC) = d;
+        partyWallSlide(pos, nrm, dist, sn, cs);
+        return hit;
+    }
+    dy = 11.0f;
+    if (party->currentMemberId == PARTY_MEMBER_BOBBERY && (party->flags & PARTY_FLAG_IS_BEING_USED)) {
+        dy = 1.0f;
+    }
+    p = party->position;
+    d = maxD;
+    p.y += dy;
+    hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
+    if (hit) {
+        if (partyNrmTo(&nrm) >= 45.0f) {
+            PF(party, 0xEC) = d;
+            partyWallSlide(pos, nrm, dist, sn, cs);
+            return hit;
+        }
+    }
+    }
+    PF(party, 0xEC) = -1.0f;
+    pos->x += dist * sn;
+    pos->z += dist * cs;
+    return NULL;
+}
+
+#else
 HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     f32 sn, cs;
     f32 d, dy, hh;
@@ -536,6 +714,8 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     pos->z += dist * cs;
     return NULL;
 }
+
+#endif
 
 void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
 {
@@ -692,3 +872,107 @@ void partyHitStrippedPool(f32* f, s32 i) {
     f[5] = (f32)i;
 }
 
+#ifdef VERSION_G8ME01
+extern void marioChkWallAround(Vec* pos, s32 a1, f32 a2, f32 angle, f32 radius, f32 height);
+extern f32 toMovedirSimple(f32 angle);
+
+/* FAKE: inline add keeps the original fadds operand order (pos.y, 10.0f) */
+static inline f32 party_addf(f32 a, f32 b) { return a + b; }
+
+static inline HitEntry* partyHitNrm(PartyEntry* party, Vec* pos, Vec* dir, Vec* nrm) {
+    HitCheckQuery query;
+    HitEntry* hit;
+
+    query.targetPos = *pos;
+    query.targetDir = *dir;
+    query.targetDistance = 20.0f;
+    if (yoshiGetStatus()) {
+        hit = hitCheckVecFilter(&query, chkfilterYoshi);
+    } else if (party->currentMemberId == PARTY_MEMBER_KOOPS && (party->flags & PARTY_FLAG_IS_BEING_USED)) {
+        hit = hitCheckVecFilter(&query, chkfilterNokotaro);
+    } else {
+        hit = hitCheckVecFilter(&query, chkfilter);
+    }
+    if (!hit) {
+        return hit;
+    }
+    nrm->x = query.hitNormal.x;
+    nrm->y = query.hitNormal.y;
+    nrm->z = query.hitNormal.z;
+    return hit;
+}
+
+void partyChkWallAround(PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 width, f32 height) {
+    if (party->flags & 0x1000) {
+        width = 6.0f;
+    }
+    marioChkWallAround(pos, 1, spd, dir, width, height);
+}
+
+BOOL partyChkBetweenWalls(PartyEntry* party, Vec pos) {
+    f32 r = party->width;
+    f32 sn, cs;
+    f32 ox, oz;
+    f32 ang1, ang2;
+    Vec p;
+    Vec n;
+    HitEntry* hit1;
+    HitEntry* hit2;
+
+    sincosf(&sn, &cs, toMovedirSimple(270.0f));
+    ox = 0.5f * (sn * r);
+    oz = 0.5f * (cs * r);
+    ang1 = 0.0f;
+    ang2 = ang1;
+    sincosf(&sn, &cs, toMovedirSimple(180.0f));
+    {
+        Vec d;
+        p = pos;
+        p.y += 10.0f;
+        d = (Vec){sn, 0.0f, cs};
+        hit1 = partyHitNrm(party, &p, &d, &n);
+        if (hit1) {
+            ang1 = angleABf(0.0f, 0.0f, n.x, n.z);
+        }
+        if (!hit1) {
+            hit1 = partyHitNrm(party, &(Vec){pos.x + ox, party_addf(pos.y, 10.0f), pos.z + oz}, &d, &n);
+            if (hit1) {
+                ang1 = angleABf(0.0f, 0.0f, n.x, n.z);
+            }
+        }
+        if (!hit1) {
+            hit1 = partyHitNrm(party, &(Vec){pos.x - ox, party_addf(pos.y, 10.0f), pos.z - oz}, &d, &n);
+            if (hit1) {
+                ang1 = angleABf(0.0f, 0.0f, n.x, n.z);
+            }
+        }
+    }
+    sincosf(&sn, &cs, toMovedirSimple(0.0f));
+    {
+        Vec d;
+        p = pos;
+        p.y += 10.0f;
+        d = (Vec){sn, 0.0f, cs};
+        hit2 = partyHitNrm(party, &p, &d, &n);
+        if (hit2) {
+            ang2 = angleABf(0.0f, 0.0f, n.x, n.z);
+        }
+        if (!hit2) {
+            hit2 = partyHitNrm(party, &(Vec){pos.x + ox, party_addf(pos.y, 10.0f), pos.z + oz}, &d, &n);
+            if (hit2) {
+                ang2 = angleABf(0.0f, 0.0f, n.x, n.z);
+            }
+        }
+        if (!hit2) {
+            hit2 = partyHitNrm(party, &(Vec){pos.x - ox, party_addf(pos.y, 10.0f), pos.z - oz}, &d, &n);
+            if (hit2) {
+                ang2 = angleABf(0.0f, 0.0f, n.x, n.z);
+            }
+        }
+    }
+    if (hit1 && hit2 && __fabsf(180.0f - 0.5f * (ang1 + ang2)) <= 10.0f) {
+        return TRUE;
+    }
+    return FALSE;
+}
+#endif

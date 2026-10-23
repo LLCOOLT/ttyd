@@ -1,3 +1,4 @@
+#include "version.h"
 #pragma optimize_for_size on
 #pragma dont_inline on
 #include "battle/battle_damage.h"
@@ -79,7 +80,7 @@ typedef struct CounterWork {
 } CounterWork;
 
 #define WF(w) ((BtlWeaponFull*)(w))
-#define BW_U32(wp, o) (*(u32*)((u8*)(wp) + (o)))
+#define BW_U32(wp, o) (*(u32*)((u8*)(wp) + BWOFF(o)))
 
 BOOL BtlUnit_CanGuardStatus(BattleUnit* unit);
 void btlDispPoseAnime(BattleUnitPart* part);
@@ -127,8 +128,8 @@ void BattleAudience_Case_PartyDown(void);
 void BattleAudience_Case_KillEnemy(s32 level);
 void BattleAudience_Case_FinalAttack(void);
 
-#define BU_S32(u, o) (*(s32*)((u8*)(u) + (o)))
-#define BU_S8(u, o) (*(s8*)((u8*)(u) + (o)))
+#define BU_S32(u, o) (*(s32*)((u8*)(u) + BUOFF(o)))
+#define BU_S8(u, o) (*(s8*)((u8*)(u) + BUOFF(o)))
 
 void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s32 damage, s32 fpDamage, u32 result, u32 pattern, s32 flag) {
     BattleWork* wp = _battleWorkPointer;
@@ -619,7 +620,7 @@ skip:
         if (wp->majinaiState == 2 && target->currentKind == 0xDE) {
             defense += 3;
         }
-        if (part->attributes & 0x20) {
+        if (part->attributes & VERSION_PICK(0x20, 0x80)) {
             if ((defense += target->work[1]) < 0) {
                 defense = 0;
             }
@@ -636,7 +637,7 @@ skip:
             }
         }
         if (weapon->special & 0x20) {
-            if ((damage -= *(s32*)((u8*)attacker + 0x27C)) <= 0) {
+            if ((damage -= *(s32*)((u8*)attacker + BUOFF(0x27C))) <= 0) {
                 damage = 1;
             }
         }
@@ -1196,6 +1197,12 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
                 x -= 300.0f;
                 z += 30.0f;
                 break;
+#ifdef VERSION_G8ME01
+            case 0x95:
+            case 0x96:
+                z += 40.0f;
+                break;
+#endif
         }
         switch (type) {
             case 1:
@@ -1534,7 +1541,7 @@ s32 BattlePreCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPar
     if ((part->counterAttributes & 2) && !(WF(weapon)->counterResistFlags & 4) && !attacker->badgesEquipped.SpikeShield) {
         return 5;
     }
-    if (part->attributes & 0x10) {
+    if (part->attributes & VERSION_PICK(0x10, 0x40)) {
         return 4;
     }
     if (flags & 0x100000) {
@@ -1639,8 +1646,8 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
         flags |= 0x80000;
         psndSFXOn("SFX_SYSTEM_GREAT1");
         BattleAudience_Case_GuardGood();
-        (*(s32*)((u8*)attacker + 0x27C))++;
-        *((u8*)target + 0x26F) = *(s32*)((u8*)attacker + 0x27C);
+        (*(s32*)((u8*)attacker + BUOFF(0x27C)))++;
+        *((u8*)target + BUOFF(0x26F)) = *(s32*)((u8*)attacker + BUOFF(0x27C));
         switch (*(u8*)&weapon->superguardsAllowed) {
             case 2:
                 result = flags | 0x2A;
@@ -1655,8 +1662,8 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
                 flags |= 0x100;
                 result = flags | 0x2A;
                 BattleDamageDirect(attacker->unitId, target, part, 0, 0, result, *(u8*)&weapon->damagePattern, 0);
-                if (*(void**)((u8*)attacker + 0x2CC)) {
-                    BattleRunHitEventDirect(attacker, 0x137, *(void**)((u8*)attacker + 0x2CC));
+                if (*(void**)((u8*)attacker + BUOFF(0x2CC))) {
+                    BattleRunHitEventDirect(attacker, 0x137, *(void**)((u8*)attacker + BUOFF(0x2CC)));
                 } else {
                     BattleDamageDirect(-5, attacker, NULL, 1, 0, 0x137, 0, 1);
                 }
@@ -1790,8 +1797,8 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
         }
         break;
     }
-    (*(s32*)((u8*)attacker + 0x27C))++;
-    *((u8*)target + 0x26F) = *(s32*)((u8*)attacker + 0x27C);
+    (*(s32*)((u8*)attacker + BUOFF(0x27C)))++;
+    *((u8*)target + BUOFF(0x26F)) = *(s32*)((u8*)attacker + BUOFF(0x27C));
     if (cw.msg) {
         if (cw.field_0x4) {
             cw.count += damage * 50 / 100;

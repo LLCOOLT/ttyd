@@ -695,7 +695,11 @@ void mobjMain(void) {
         if (!(entry->flags & 1)) {
             continue;
         }
+#ifdef VERSION_G8ME01
+        if (gp->inBattle == 0 && (gp->inBattle != 0 || ((u32)fbat > 1 && fbat != 8)) && !(entry->flags & 0x400)) {
+#else
         if (gp->inBattle == 0 && (gp->inBattle != 0 || ((u32)fbat > 1 && fbat != 8))) {
+#endif
             goto afterHit;
         }
         if (entry->flags & 4) {

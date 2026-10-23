@@ -127,6 +127,10 @@ USER_FUNC(evt_sub_spline_get_value);
 USER_FUNC(evt_sub_spline_init);
 USER_FUNC(evt_telop_entry);
 USER_FUNC(get_puni_pos);
+#ifdef VERSION_G8ME01
+USER_FUNC(N_evt_sub_status_gauge_force_update);
+USER_FUNC(evt_sub_get_language);
+#endif
 static USER_FUNC(starstone_entry);
 static USER_FUNC(starstone_set_pos);
 static USER_FUNC(starstone_set_ry);
@@ -207,7 +211,11 @@ s32 sekai_yami_puni[70];
 static s32 sekai_yami_evt[322];
 static s32 minnnanokoe_evt[620];
 static s32 evt_switch_init[17];
+#ifdef VERSION_G8ME01
+s32 mri_00_init_evt[377];
+#else
 s32 mri_00_init_evt[296];
+#endif
 
 static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7) {
     EventEntry event;
@@ -1597,9 +1605,16 @@ EVT_BEGIN(mri_00_init_evt)
         IF_INT_EQUAL(LW(15), 0)
             CALL(evt_mario_set_party, 0, 1)
             CALL(evt_party_run, 0)
+#ifdef VERSION_G8ME01
+        END_IF
+#endif
             CALL(evt_pouch_mario_recovery)
             CALL(evt_pouch_all_party_recovery)
+#ifdef VERSION_G8ME01
+        CALL(N_evt_sub_status_gauge_force_update)
+#else
         END_IF
+#endif
         SPAWN_EVENT(PTR(mario_see_you))
     END_IF
     SWITCH(GSW(0))
@@ -1686,5 +1701,27 @@ EVT_BEGIN(mri_00_init_evt)
             SPAWN_EVENT(PTR(minnnanokoe_evt))
         END_IF
     END_IF
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("J_kan"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_kan"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_kan"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_kan"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_kan"), 16384)
+    CALL(evt_sub_get_language, LW(0))
+    SWITCH(LW(0))
+        CASE_OR_EQUAL(0)
+        CASE_OR_EQUAL(1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_kan"), 16384)
+        CASE_END
+        CASE_EQUAL(2)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_kan"), 16384)
+        CASE_EQUAL(3)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_kan"), 16384)
+        CASE_EQUAL(4)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_kan"), 16384)
+        CASE_EQUAL(5)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_kan"), 16384)
+    END_SWITCH
+#endif
     RETURN
 EVT_END()

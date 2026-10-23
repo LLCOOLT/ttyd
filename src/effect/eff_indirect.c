@@ -1,3 +1,6 @@
+#ifdef VERSION_G8ME01
+#include "mario/mariost.h"
+#endif
 #include "eff/eff_indirect.h"
 #include "driver/dispdrv.h"
 #include "memory.h"
@@ -70,8 +73,13 @@ void effIndirectMain(EffectEntry* effect) {
             if (work->timer < 32) {
                 work->alpha = work->timer * 8;
             }
+#ifdef VERSION_G8ME01
+            work->rotZ += -300.0f / (f32)gp->framerate;
+            work->scale += 60.0f / (f32)gp->framerate;
+#else
             work->rotZ += -5.0f;
             work->scale += 1.0f;
+#endif
             break;
     }
     dispEntry(CAMERA_3D_EFFECTB, dispCalcZ(&position), 2, (DispCallback)effIndirectDisp, effect);
@@ -99,7 +107,11 @@ void effIndirectDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
     switch (type) {
         case 0:
+#ifdef VERSION_G8ME01
+            effGetTexObj(0x6A, &texObj);
+#else
             effGetTexObj(0x86, &texObj);
+#endif
             GXLoadTexObj(&texObj, GX_TEXMAP0);
             break;
         case 1:

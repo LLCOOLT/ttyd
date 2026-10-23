@@ -88,7 +88,7 @@ __declspec(section ".data") s32 fd_patakuri___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_patakuri_one_negone_359;
 __declspec(section ".data") s32 fd_patakuri___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_patakuri_one_364[1];
-BattleUnitKind unit_patakuri_9_data_1A0F0;
+BattleUnitKind unit_patakuri;
 static __declspec(section ".data") BattleUnitDefense defence_patakuri;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_patakuri_attr;
 static __declspec(section ".data") StatusVulnerability regist_patakuri;
@@ -163,7 +163,7 @@ __declspec(section ".data") s32 fd_patakuri_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_patakuri_9_data_1A0F0 = {
+BattleUnitKind unit_patakuri = {
     2,
     "btl_un_patakuri",
     2,

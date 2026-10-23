@@ -83,7 +83,7 @@ __declspec(section ".data") s32 fd_ice_pakkun___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_ice_pakkun_one_negone_359;
 __declspec(section ".data") s32 fd_ice_pakkun___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_ice_pakkun_one_364[1];
-BattleUnitKind unit_ice_pakkun_15_data_577D8;
+BattleUnitKind unit_ice_pakkun;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -150,7 +150,7 @@ __declspec(section ".data") s32 fd_ice_pakkun_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_ice_pakkun_15_data_577D8 = {
+BattleUnitKind unit_ice_pakkun = {
     113,
     "btl_un_ice_pakkun",
     10,

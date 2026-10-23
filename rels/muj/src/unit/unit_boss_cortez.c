@@ -441,7 +441,11 @@ __declspec(section ".data") BattleUnitDefense defence_honeduka = {{1, 1, 1, 1, 1
 __declspec(section ".data") BattleUnitDefenseAttr defence_honeduka_attr = {{0, 0, 0, 0, 0}};
 
 s32 weapon_cortez_normal_front_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     4, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 536870912, 770, 0, 135, 2047, 4,
@@ -450,7 +454,11 @@ s32 weapon_cortez_normal_front_attack[] = {
 };
 
 s32 weapon_cortez_normal_rear_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     4, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 536870912, 770, 0, 135, 2047, 8,
@@ -459,7 +467,11 @@ s32 weapon_cortez_normal_rear_attack[] = {
 };
 
 s32 weapon_cortez_midaregiri_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     2, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 536870912, 770, 0, 135, 2047, -2147483648,
@@ -486,7 +498,11 @@ s32 weapon_cortez_mode2_charge[] = {
 };
 
 s32 weapon_cortez_mode2_bone_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     4, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 135, 2047, 4,

@@ -10,7 +10,11 @@
 #include <dolphin/mtx.h>
 double sin(double);
 double cos(double);
-#include <string.h>
+#include <string.h>
+#include "version.h"
+// US effect texture ids are 0x1C lower for these entries.
+#define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
+
 
 void effMahorn2Main(EffectEntry *effect);
 void effMahorn2Disp(CameraId cameraId, EffectEntry *effect);
@@ -211,13 +215,13 @@ void effMahorn2Disp(CameraId cameraId, EffectEntry *effect) {
             case 0:
                 break;
             case 1:
-                effGetTexObj(0x8F, &texObj);
+                effGetTexObj(EFF_TEX(0x8F), &texObj);
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 break;
             case 2:
             case 3:
             case 4:
-                effGetTexObj(0x90, &texObj);
+                effGetTexObj(EFF_TEX(0x90), &texObj);
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 break;
         }

@@ -12,9 +12,9 @@ extern s32 battle_item_monochrome_kurokumorn[];
 extern s32 battle_item_monochrome_sinemon[];
 extern s32 battle_item_vivian1[];
 extern s32 unit_boss_vivian[];
-extern s32 unit_monochrome_kurokumorn_30_data_17868[];
-extern s32 unit_monochrome_pakkun_30_data_166A8[];
-extern s32 unit_monochrome_sinemon_30_data_15620[];
+extern s32 unit_monochrome_kurokumorn[];
+extern s32 unit_monochrome_pakkun[];
+extern s32 unit_monochrome_sinemon[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_win_negone_one_374;
@@ -171,8 +171,8 @@ s32 win_btlstage_data[] = {
 };
 
 s32 btlparty_win_win_00_01_off_1[] = {
-    (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
 };
 
@@ -181,8 +181,8 @@ __declspec(section ".data") s32 btlgrp_win_win_00_01_off_1[] = {
 };
 
 s32 btlparty_win_win_00_01_on_1[] = {
-    (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
 };
 
@@ -191,10 +191,10 @@ __declspec(section ".data") s32 btlgrp_win_win_00_01_on_1[] = {
 };
 
 s32 btlparty_win_win_00_01_on_2[] = {
-    (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1119092736,
+    (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
-    (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
 };
 
@@ -203,11 +203,11 @@ __declspec(section ".data") s32 btlgrp_win_win_00_01_on_2[] = {
 };
 
 s32 btlparty_win_win_00_01_on_3[] = {
-    (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1106247680, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1116471296,
+    (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1106247680, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1116471296,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
-    (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1121714176, 1109393408, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1125515264,
+    (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1121714176, 1109393408, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1125515264,
     1109393408, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
 };
 
@@ -216,8 +216,8 @@ __declspec(section ".data") s32 btlgrp_win_win_00_01_on_3[] = {
 };
 
 s32 btlparty_win_win_00_02_off_1[] = {
-    (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
 };
 
@@ -226,8 +226,8 @@ __declspec(section ".data") s32 btlgrp_win_win_00_02_off_1[] = {
 };
 
 s32 btlparty_win_win_00_02_on_1[] = {
-    (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
 };
 
@@ -236,10 +236,10 @@ __declspec(section ".data") s32 btlgrp_win_win_00_02_on_1[] = {
 };
 
 s32 btlparty_win_win_00_02_on_2[] = {
-    (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1119092736,
+    (s32)unit_monochrome_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
-    (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
 };
 
@@ -248,10 +248,10 @@ __declspec(section ".data") s32 btlgrp_win_win_00_02_on_2[] = {
 };
 
 s32 btlparty_win_win_00_03_off_1[] = {
-    (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1119092736,
+    (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_sinemon,
-    (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
 };
 
@@ -260,8 +260,8 @@ __declspec(section ".data") s32 btlgrp_win_win_00_03_off_1[] = {
 };
 
 s32 btlparty_win_win_00_03_on_1[] = {
-    (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
 };
 
@@ -270,8 +270,8 @@ __declspec(section ".data") s32 btlgrp_win_win_00_03_on_1[] = {
 };
 
 s32 btlparty_win_win_00_03_on_2[] = {
-    (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_kurokumorn, (s32)unit_monochrome_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_sinemon,
 };
 
@@ -289,8 +289,8 @@ __declspec(section ".data") s32 btlgrp_win_win_00_04_off_1[] = {
 };
 
 s32 btlparty_win_win_02_01_off_1[] = {
-    (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
 };
 
@@ -299,8 +299,8 @@ __declspec(section ".data") s32 btlgrp_win_win_02_01_off_1[] = {
 };
 
 s32 btlparty_win_win_02_01_on_1[] = {
-    (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
 };
 
@@ -309,10 +309,10 @@ __declspec(section ".data") s32 btlgrp_win_win_02_01_on_1[] = {
 };
 
 s32 btlparty_win_win_02_01_on_2[] = {
-    (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1119092736,
+    (s32)unit_monochrome_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_monochrome__pakkun,
 };
 
@@ -321,10 +321,10 @@ __declspec(section ".data") s32 btlgrp_win_win_02_01_on_2[] = {
 };
 
 s32 btlparty_win_win_02_01_on_3[] = {
-    (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1119092736,
+    (s32)unit_monochrome_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome_sinemon, (s32)unit_monochrome_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_sinemon,
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_monochrome__pakkun,
 };
 
@@ -333,8 +333,8 @@ __declspec(section ".data") s32 btlgrp_win_win_02_01_on_3[] = {
 };
 
 s32 btlparty_win_win_02_02_off_1[] = {
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_sinemon,
 };
 
@@ -343,8 +343,8 @@ __declspec(section ".data") s32 btlgrp_win_win_02_02_off_1[] = {
 };
 
 s32 btlparty_win_win_02_02_on_1[] = {
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_sinemon,
 };
 
@@ -353,10 +353,10 @@ __declspec(section ".data") s32 btlgrp_win_win_02_02_on_1[] = {
 };
 
 s32 btlparty_win_win_02_02_on_2[] = {
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1119092736,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
-    (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_monochrome_sinemon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_monochrome_sinemon,
 };
 
@@ -365,10 +365,10 @@ __declspec(section ".data") s32 btlgrp_win_win_02_02_on_2[] = {
 };
 
 s32 btlparty_win_win_02_02_on_3[] = {
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1119092736,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_sinemon,
-    (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_monochrome_sinemon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_monochrome_sinemon,
 };
 
@@ -377,11 +377,11 @@ __declspec(section ".data") s32 btlgrp_win_win_02_02_on_3[] = {
 };
 
 s32 btlparty_win_win_03_01_off_1[] = {
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1116471296,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1125515264,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
 };
 
@@ -390,8 +390,8 @@ __declspec(section ".data") s32 btlgrp_win_win_03_01_off_1[] = {
 };
 
 s32 btlparty_win_win_03_01_on_1[] = {
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
 };
 
@@ -400,10 +400,10 @@ __declspec(section ".data") s32 btlgrp_win_win_03_01_on_1[] = {
 };
 
 s32 btlparty_win_win_03_01_on_2[] = {
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1119092736,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_monochrome__pakkun,
 };
 
@@ -412,10 +412,10 @@ __declspec(section ".data") s32 btlgrp_win_win_03_01_on_2[] = {
 };
 
 s32 btlparty_win_win_03_01_on_3[] = {
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_kurokumorn_30_data_17868, 16777216, 67108868, 1119092736,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_kurokumorn, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome_kurokumorn,
-    (s32)unit_monochrome_sinemon_30_data_15620, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_monochrome_sinemon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_monochrome_sinemon,
 };
 
@@ -424,11 +424,11 @@ __declspec(section ".data") s32 btlgrp_win_win_03_01_on_3[] = {
 };
 
 s32 btlparty_win_win_03_01_on_4[] = {
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1116471296,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
-    (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun_30_data_166A8, 16777216, 67108868, 1125515264,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
 };
 

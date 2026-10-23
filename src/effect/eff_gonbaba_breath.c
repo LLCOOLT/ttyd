@@ -7,6 +7,10 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
+#include "version.h"
+// US effect texture ids are 0x1C lower for these entries.
+#define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
+
 double sin(double);
 double cos(double);
 
@@ -53,7 +57,11 @@ static GXColor col_mini[] = {
 };
 static GXColor* col_tbl[] = {col_normal, col_poison, col_mega, col_cold, col_confu, col_sleep, col_mini, col_normal};
 #pragma force_active on
+#ifdef VERSION_G8ME01
+__declspec(section ".sdata") u32 gap_07_8041E0A4_sdata[7] = {0,0,0,0,0,0,0};
+#else
 __declspec(section ".sdata") u32 gap_07_80417E8C_sdata[5] = {0,0,0,0,0};
+#endif
 #pragma force_active reset
 
 // cheap polynomial approximations, valid for x in [0, 2pi]
@@ -470,7 +478,7 @@ void effGonbabaBreathDisp(CameraId cameraId, EffectEntry *effect)
   PSMTXConcat(trans, rot, trans);
   PSMTXConcat(trans, scale, trans);
   PSMTXConcat(cam->view, trans, mtx);
-  effGetTexObj(0x8e, &texObj);
+  effGetTexObj(EFF_TEX(0x8e), &texObj);
   GXLoadTexObj(&texObj, GX_TEXMAP0);
   GXSetNumChans(1);
   GXSetChanCtrl(GX_COLOR0A0, (GXBool) 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);

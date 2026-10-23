@@ -12,6 +12,7 @@
 #include <dolphin/mtx.h>
 #include "driver/camdrv.h"
 #include <string.h>
+#include "icon_ids.h"
 
 extern BattleWork* _battleWorkPointer;
 void BattleAcDrawGauge(s32 x, s32 y, s32 icon, f32 ratio, s32 a, s32 b, s32 c, s32 d, s32 e);
@@ -94,7 +95,7 @@ extern s32 marioAttackEvent_ZubaStar[];
 s32 weaponGetPower_ZubaStar(void* a, s32* tbl);
 
 s32 weapon_zubastar[] = {
-    (s32)"btl_wn_sac_zubastar", 26935296, 0, (s32)"msg_zubastar", 1677723136, 1065353216, 17130546, (s32)weaponGetPower_ZubaStar,
+    (s32)"btl_wn_sac_zubastar", ICON_19B << 16, 0, (s32)"msg_zubastar", 1677723136, 1065353216, 17130546, (s32)weaponGetPower_ZubaStar,
     0, 3, 6, 9, 12, 15, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, (s32)"msg_sac_8", 131272, 2047, 0,
@@ -879,7 +880,7 @@ static inline void
 dispA(Mtx m, s32 i) {
 	GXColor ca = {0xff, 0xff, 0xff, 0};
 	ca.a = 0xff - (i + 1) * 50;
-	iconDispGxCol(m, 0x10, 0x19d, ca);
+	iconDispGxCol(m, 0x10, ICON_19D, ca);
 }
 
 void zubastar_disp2D(CameraId cam, void* param) {
@@ -888,7 +889,7 @@ void zubastar_disp2D(CameraId cam, void* param) {
 	ZSLine* l;
 	s32 i;
 	if (w->gaugeState >= 5) {
-		s32 icon = (w->fa1 <= 3U) ? 0x64 : 0x65;
+		s32 icon = (w->fa1 <= 3U) ? ICON_064 : ICON_065;
 		Vec pos = {0.0f, 0.0f, 0.0f};
 		pos.x = w->gx - 200.0f;
 		pos.y = 60.0f + w->gy;
@@ -925,7 +926,7 @@ void zubastar_disp2D(CameraId cam, void* param) {
 			GXPosition3f32(l->x1, l->y1, 0.0f);
 		}
 	}
-	iconDispGx(&cur->pos, 0x10, 0x19d, 1.0f);
+	iconDispGx(&cur->pos, 0x10, ICON_19D, 1.0f);
 	if (cur->timer >= 25 && cur->timer < 30) {
 		for (i = 0; i < 4; i++) {
 			Mtx m;

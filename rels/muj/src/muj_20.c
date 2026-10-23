@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -1092,7 +1093,11 @@ s32 onryo_event[] = {
     262235, (s32)evt_mario_set_pos, 5, 90, -100, 327771, (s32)evt_party_set_pos, 0,
     0, -1000, 0, 65540, 100, 33, 131163, (s32)evt_mario_key_onoff,
     0, 131163, (s32)evt_mario_cont_onoff, 0, 262235, (s32)evt_mario_set_pos, 0, -1000,
-    0, 589915, (s32)evt_cam3d_evt_set, 0, 600, 2155, 0, 350,
+    0,
+#ifdef VERSION_G8ME01
+    196699, (s32)evt_party_cont_onoff, 0, 0, 327771, (s32)evt_party_set_pos, 0, 0, -1000, 0,
+#endif
+    589915, (s32)evt_cam3d_evt_set, 0, 600, 2155, 0, 350,
     -108, 0, 11, 262235, (s32)evt_map_playanim, (s32)"yoru_hiru", 2, 0,
     131163, (s32)evt_seq_wait, 2, 65546, 4000, 327771, (s32)evt_msg_toge, 1,
     0, 0, 0, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_00", 0,
@@ -1102,10 +1107,16 @@ s32 onryo_event[] = {
     3000, 65630, (s32)yoru_hiru_event, 65546, 1000, 327771, (s32)evt_msg_toge, 1,
     0, 0, 0, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_29", 0,
     0, 65630, (s32)hiru_yoru_event, 65546, 1000, 131122, -170000000, 230,
-    65539, 100, 131163, (s32)evt_mario_cont_onoff, 1, 196699, (s32)evt_party_cont_onoff, 0,
-    0, 262235, (s32)evt_mario_set_pos, 5, 90, -100, 262235, (s32)evt_mario_set_dir,
-    90, 0, 0, 327771, (s32)evt_party_set_pos, 0, 0, -1000,
-    0, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"S_a1", 2, 327771,
+    65539, 100, 131163, (s32)evt_mario_cont_onoff, 1,
+#ifndef VERSION_G8ME01
+    196699, (s32)evt_party_cont_onoff, 0, 0,
+#endif
+    262235, (s32)evt_mario_set_pos, 5, 90, -100, 262235, (s32)evt_mario_set_dir,
+    90, 0, 0,
+#ifndef VERSION_G8ME01
+    327771, (s32)evt_party_set_pos, 0, 0, -1000, 0,
+#endif
+    327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"S_a1", 2, 327771,
     (s32)evt_npc_set_position, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 116, 116, -100, 196699, (s32)evt_npc_set_ry, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52",
     90, 327771, (s32)evt_npc_set_position, (s32)/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76", 25, 90, -163, 196699,
     (s32)evt_npc_set_ry, (s32)/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76", 90, 327771, (s32)evt_npc_set_position, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 21, 90,
@@ -1746,9 +1757,9 @@ static void pressStartGX(LogoWork* wp, s32 alpha, f32 x, f32 y) {
     GXTexObj startText, gradient;
     Mtx v17, v16;
 
-    TEXGetGXTexObjFromPalette(*wp->tpl->data, &startText, 8);
+    TEXGetGXTexObjFromPalette(*wp->tpl->data, &startText, VERSION_PICK(8, 15));
     GXLoadTexObj(&startText, GX_TEXMAP0);
-    TEXGetGXTexObjFromPalette(*wp->tpl->data, &gradient, 9);
+    TEXGetGXTexObjFromPalette(*wp->tpl->data, &gradient, VERSION_PICK(9, 6));
     GXLoadTexObj(&gradient, GX_TEXMAP1);
     GXSetNumTevStages(2);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
@@ -1805,6 +1816,10 @@ static void draw(CameraId camera, void* param) {
     f32 viewport[6];
     f32 projection[7];
     CameraEntry* cam;
+#ifdef VERSION_G8ME01
+    // US: logo texture per language (indexed by gp->language)
+    s32 logoTex[6] = {0x15, 0x15, 0x16, 0x17, 0x18, 0x19};
+#endif
 
     GXGetViewportv(viewport);
     GXGetProjectionv(projection);
@@ -1814,7 +1829,11 @@ static void draw(CameraId camera, void* param) {
     cam = camGetPtr(CAMERA_2D);
     *camGetCurPtr() = *cam;
     winTexInit(*(TEXPalette**)wp->tpl->data);
+#ifdef VERSION_G8ME01
+    winTexSetNearest(logoTex[gp->language], (Vec){0.0f, 100.0f + wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
+#else
     winTexSetNearest(5, (Vec){0.0f, 100.0f + wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
+#endif
     *camGetCurPtr() = saved;
     GXSetViewport(viewport[0], viewport[1], viewport[2], viewport[3], viewport[4], viewport[5]);
     GXSetProjectionv(projection);
@@ -2077,6 +2096,16 @@ EVT_BEGIN(muj_20_init_evt)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+/* FAKE: in the US build the step-count argument (FPS_FRAMES) of logo's second
+ * intplGetValue call is evaluated after the float arguments. Calling through a
+ * prototype with `steps` last reproduces that evaluation order; the registers
+ * (r3 mode, r4 step, r5 steps, f1 start, f2 end) are the same under the EABI,
+ * so the call is behaviour-identical. */
+typedef f32 (*IntplStepsLastFn)(s32 mode, s32 step, f32 start, f32 end, s32 steps);
+#define intplGetValueStepsLast(mode, step, start, end, steps)     ((IntplStepsLastFn)intplGetValue)(mode, step, start, end, steps)
+#endif
+
 USER_FUNC(logo) {
     LogoWork* wp;
 
@@ -2098,9 +2127,13 @@ USER_FUNC(logo) {
             wp->state++;
             break;
         case 1:
-            if (wp->counter < 180) {
-                wp->alpha = intplGetValue(11, ++wp->counter, 180, 0.0f, 255.0f);
+            if (wp->counter < VERSION_PICK(180, FPS_FRAMES(180))) {
+                wp->alpha = intplGetValue(11, ++wp->counter, VERSION_PICK(180, FPS_FRAMES(180)), 0.0f, 255.0f);
+#ifdef VERSION_G8ME01
+                wp->y = intplGetValueStepsLast(11, ++wp->counter, -50.0f, 0.0f, FPS_FRAMES(180)); /* FAKE */
+#else
                 wp->y = intplGetValue(11, ++wp->counter, 180, -50.0f, 0.0f);
+#endif
             } else if (gp->retraceCount % 15 == 0) {
                 wp->state++;
             }
@@ -2113,9 +2146,13 @@ USER_FUNC(logo) {
             }
             break;
         case 3:
-            if (wp->counter < 120) {
-                wp->alpha = intplGetValue(11, ++wp->counter, 120, 255.0f, 0.0f);
+            if (wp->counter < VERSION_PICK(120, FPS_FRAMES(120))) {
+                wp->alpha = intplGetValue(11, ++wp->counter, VERSION_PICK(120, FPS_FRAMES(120)), 255.0f, 0.0f);
+#ifdef VERSION_G8ME01
+                wp->y = intplGetValueStepsLast(11, ++wp->counter, 0.0f, 100.0f, FPS_FRAMES(120)); /* FAKE */
+#else
                 wp->y = intplGetValue(11, ++wp->counter, 120, 0.0f, 100.0f);
+#endif
             } else {
                 wp->state++;
             }

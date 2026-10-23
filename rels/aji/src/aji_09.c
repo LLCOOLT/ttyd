@@ -658,6 +658,9 @@ EVT_BEGIN(peach_evt_kou2_out)
 EVT_END()
 
 EVT_BEGIN(s_bero_out)
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_key_onoff, 0)
+#endif
     IF_INT_EQUAL(GSWF(4204), 0)
         SET_VALUE(LW(1), 0)
         SPAWN_EVENT(PTR(bero_open_door_play_se))
@@ -684,10 +687,17 @@ EVT_BEGIN(s_bero_out)
         CALL(evt_fade_set_mapchange_type, 0, 0, 0, 9, 300)
         CALL(evt_bero_mapchange, STRING("aji_17"), STRING("w_bero"))
         ELSE
+#ifndef VERSION_G8ME01
         CALL(evt_mario_key_onoff, 0)
+#endif
         CALL(evt_msg_print, 0, STRING("peach_aji_155_01"), 0, 0)
-        CALL(evt_mario_key_onoff, 1)
+#ifdef VERSION_G8ME01
     END_IF
+#endif
+        CALL(evt_mario_key_onoff, 1)
+#ifndef VERSION_G8ME01
+    END_IF
+#endif
     RETURN
 EVT_END()
 

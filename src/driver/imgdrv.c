@@ -36,7 +36,7 @@ void imgCapture(CameraId camId, void* param);
 void imgShadowDisp(CameraId camId, void* param);
 
 static void zFill(void) { //almost 1:1
-	static s32 depth_image[32] = {
+	static s32 depth_image[32] ATTRIBUTE_ALIGN(32) = { // GX texture: 32-byte aligned (US .data placement shows it)
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 	CameraEntry* camera;

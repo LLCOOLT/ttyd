@@ -15,11 +15,11 @@ extern s32 battle_item_rampell[];
 extern s32 battle_item_teresa[];
 extern s32 battle_item_togemet[];
 extern s32 unit_atmic_teresa[];
-extern s32 unit_basabasa_14_data_1DE40[];
+extern s32 unit_basabasa[];
 extern s32 unit_boss_rampell[];
 extern s32 unit_faker_mario[];
 extern s32 unit_met[];
-extern s32 unit_teresa_14_data_1EF28[];
+extern s32 unit_teresa[];
 extern s32 unit_togemet[];
 extern s32 weaponGetPowerDefault[];
 
@@ -297,7 +297,7 @@ __declspec(section ".data") s32 btlgrp_jin_jin_00_atmic_teresa[] = {
 };
 
 __declspec(section ".data") s32 btlparty_jin_jin_00_01_off_1[] = {
-    (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_teresa, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_teresa,
 };
 
@@ -306,8 +306,8 @@ __declspec(section ".data") s32 btlgrp_jin_jin_00_01_off_1[] = {
 };
 
 s32 btlparty_jin_jin_00_01_off_2[] = {
-    (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1121714176,
+    (s32)unit_teresa, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_teresa,
 };
 
@@ -316,10 +316,10 @@ __declspec(section ".data") s32 btlgrp_jin_jin_00_01_off_2[] = {
 };
 
 s32 btlparty_jin_jin_00_01_off_3[] = {
-    (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1119092736,
+    (s32)unit_teresa, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_teresa,
-    (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_teresa, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_teresa,
 };
 
@@ -328,11 +328,11 @@ __declspec(section ".data") s32 btlgrp_jin_jin_00_01_off_3[] = {
 };
 
 s32 btlparty_jin_jin_00_01_off_4[] = {
-    (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1116471296,
+    (s32)unit_teresa, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_teresa,
-    (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1125515264,
+    (s32)unit_teresa, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_teresa,
 };
 
@@ -341,8 +341,8 @@ __declspec(section ".data") s32 btlgrp_jin_jin_00_01_off_4[] = {
 };
 
 s32 btlparty_jin_jin_01_01_off_1[] = {
-    (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1121714176,
+    (s32)unit_basabasa, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa, 16777216, 67108868, 1121714176,
     1124204544, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_basabasa,
 };
 
@@ -351,10 +351,10 @@ __declspec(section ".data") s32 btlgrp_jin_jin_01_01_off_1[] = {
 };
 
 s32 btlparty_jin_jin_01_01_off_2[] = {
-    (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1112014848, 1124204544, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1119092736,
+    (s32)unit_basabasa, 16777216, 67108868, 1112014848, 1124204544, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa, 16777216, 67108868, 1119092736,
     1124204544, 0, 0, 0, 0, 0, 0, (s32)battle_item_basabasa,
-    (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1124204544, 1124204544, 1092616192, 0, 0,
+    (s32)unit_basabasa, 16777216, 67108868, 1124204544, 1124204544, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_basabasa,
 };
 
@@ -363,10 +363,10 @@ __declspec(section ".data") s32 btlgrp_jin_jin_01_01_off_2[] = {
 };
 
 s32 btlparty_jin_jin_01_01_off_3[] = {
-    (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1112014848, 1124204544, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1119092736,
+    (s32)unit_basabasa, 16777216, 67108868, 1112014848, 1124204544, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_teresa, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_teresa,
-    (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1124204544, 1124204544, 1092616192, 0, 0,
+    (s32)unit_basabasa, 16777216, 67108868, 1124204544, 1124204544, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_basabasa,
 };
 
@@ -375,8 +375,8 @@ __declspec(section ".data") s32 btlgrp_jin_jin_01_01_off_3[] = {
 };
 
 s32 btlparty_jin_jin_01_03_off_1[] = {
-    (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1121714176,
+    (s32)unit_basabasa, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa, 16777216, 67108868, 1121714176,
     1124204544, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_basabasa,
 };
 
@@ -385,11 +385,11 @@ __declspec(section ".data") s32 btlgrp_jin_jin_01_03_off_1[] = {
 };
 
 s32 btlparty_jin_jin_01_03_off_2[] = {
-    (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1106247680, 1124204544, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1116471296,
+    (s32)unit_basabasa, 16777216, 67108868, 1106247680, 1124204544, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa, 16777216, 67108868, 1116471296,
     1124204544, 0, 0, 0, 0, 0, 0, (s32)battle_item_basabasa,
-    (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1121714176, 1124204544, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1125515264,
+    (s32)unit_basabasa, 16777216, 67108868, 1121714176, 1124204544, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa, 16777216, 67108868, 1125515264,
     1124204544, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_basabasa,
 };
 
@@ -398,8 +398,8 @@ __declspec(section ".data") s32 btlgrp_jin_jin_01_03_off_2[] = {
 };
 
 s32 btlparty_jin_jin_01_03_off_3[] = {
-    (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1121714176,
+    (s32)unit_basabasa, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_teresa, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_teresa,
 };
 
@@ -408,8 +408,8 @@ __declspec(section ".data") s32 btlgrp_jin_jin_01_03_off_3[] = {
 };
 
 s32 btlparty_jin_jin_03_01_off_1[] = {
-    (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 1,
-    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1121714176,
+    (s32)unit_basabasa, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 1,
+    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa, 16777216, 67108868, 1121714176,
     1124204544, 1092616192, 0, 1, 0, 0, 0, (s32)battle_item_basabasa,
 };
 
@@ -418,8 +418,8 @@ __declspec(section ".data") s32 btlgrp_jin_jin_03_01_off_1[] = {
 };
 
 s32 btlparty_jin_jin_03_02_off_1[] = {
-    (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 1,
-    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa_14_data_1DE40, 16777216, 67108868, 1121714176,
+    (s32)unit_basabasa, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 1,
+    0, 0, 0, (s32)battle_item_basabasa, (s32)unit_basabasa, 16777216, 67108868, 1121714176,
     1124204544, 1092616192, 0, 1, 0, 0, 0, (s32)battle_item_basabasa,
 };
 
@@ -428,8 +428,8 @@ __declspec(section ".data") s32 btlgrp_jin_jin_03_02_off_1[] = {
 };
 
 s32 btlparty_jin_jin_07_01_off_1[] = {
-    (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1121714176,
+    (s32)unit_teresa, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_teresa,
 };
 
@@ -438,10 +438,10 @@ __declspec(section ".data") s32 btlgrp_jin_jin_07_01_off_1[] = {
 };
 
 s32 btlparty_jin_jin_07_01_off_2[] = {
-    (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1119092736,
+    (s32)unit_teresa, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_teresa,
-    (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_teresa, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_teresa,
 };
 
@@ -450,8 +450,8 @@ __declspec(section ".data") s32 btlgrp_jin_jin_07_01_off_2[] = {
 };
 
 s32 btlparty_jin_jin_07_02_off_1[] = {
-    (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1121714176,
+    (s32)unit_teresa, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_teresa,
 };
 
@@ -460,10 +460,10 @@ __declspec(section ".data") s32 btlgrp_jin_jin_07_02_off_1[] = {
 };
 
 s32 btlparty_jin_jin_07_02_off_2[] = {
-    (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1119092736,
+    (s32)unit_teresa, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_teresa, (s32)unit_teresa, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_teresa,
-    (s32)unit_teresa_14_data_1EF28, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_teresa, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_teresa,
 };
 

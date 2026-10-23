@@ -1,3 +1,9 @@
+#ifdef VERSION_G8ME01
+#include "mario/mariost.h"
+#include <string.h>
+void camFollowYOn(void);
+BOOL marioPriCheckJabara(void);
+#endif
 #include "dolphin/types.h"
 #include "driver/hitdrv.h"
 #include "mario/mario.h"
@@ -7,6 +13,9 @@
 #include "pmario_sound.h"
 #include <string.h>
 
+#ifdef VERSION_G8ME01
+#define kpa_fall_80213C38 kpa_fall
+#endif
 void kpa_fall_80213C38(void);
 void kpa_jump(void);
 void kpa_jumpNpc(void);
@@ -27,8 +36,9 @@ s32 irand(s32);
 void* mobjHitObjPtrToPtr(void* hit);
 void marioPreJump(void);
 
-#define MF(o) (*(f32*)((u8*)mario + (o)))
-#define MI(o) (*(s32*)((u8*)mario + (o)))
+#define MF(o) (*(f32*)((u8*)mario + MWOFF(o)))
+#define MFUS(o) (*(f32*)((u8*)mario + (o)))
+#define MI(o) (*(s32*)((u8*)mario + MWOFF(o)))
 #define MH(o) (*(s16*)((u8*)mario + (o)))
 #define MO(p, o) (*(f32*)((u8*)(p) + (o)))
 
@@ -56,6 +66,9 @@ void marioPreJump(void) {
 	clear_hitobj_ride();
 	marioSetJumpPara();
 	*(Vec*)((u8*)mario + 0x11C) = mario->position;
+#ifdef VERSION_G8ME01
+	*(f32*)((u8*)mario + 0x190) = mario->baseSpeed;
+#endif
 }
 
 f32 marioGetJumpHeight(void) {
@@ -341,6 +354,14 @@ static inline void jumpSfx(MarioWork* mario) {
 	psndSFXOn_3D((char*)id, &mario->position);
 }
 
+#ifdef VERSION_G8ME01
+void N_mot_jumpNpc_post(void) {
+	MarioWork* mario = marioGetPtr();
+	if (!strcmp(gp->currentMapName, "gon_10") && (mario->dispFlags & 0x20000)) {
+		camFollowYOn();
+	}
+}
+#endif
 void mot_jump(void) {
 	MarioWork* mario = marioGetPtr();
 	if (mario->characterId == 2) {
@@ -457,6 +478,10 @@ void mot_fall(void) {
 		mario->trigFlags &= ~1;
 		mario->flags &= ~0x10000;
 		mario->flags |= 0x20000;
+#ifdef VERSION_G8ME01
+		mario->trigFlags &= ~0x200000;
+		mario->trigFlags &= ~0x400000;
+#endif
 		if (mario->soundId[2] != (u32)-1) {
 			psndSFXOff(mario->soundId[2]);
 			mario->soundId[2] = -1;
@@ -487,6 +512,21 @@ void mot_fall(void) {
 		break;
 	}
 	mario->airTimer++;
+#ifdef VERSION_G8ME01
+	mario->trigFlags &= ~0x100000;
+	if (marioPriCheckJabara() && MFUS(0x190) == 0.0f && mario->jumpPeakAirTime != 0 && mario->jumpPeakAirTime < mario->airTimer) {
+		if (mario->airTimer < 0x12) {
+			if (MFUS(0x194)) {
+				mario->trigFlags |= 0x200000;
+			}
+		} else {
+			mario->trigFlags |= 0x100000;
+			if (!(mario->trigFlags & 0x200000) && MFUS(0x194)) {
+				mario->trigFlags |= 0x400000;
+			}
+		}
+	}
+#endif
 	if (mario->screenY >= 0x1AE) {
 		f32 r = marioGetCamFollowRate();
 		r += 0.1f;

@@ -1,3 +1,4 @@
+#include "mario/mario.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -11,7 +12,7 @@
 typedef struct WhirlwindTarget {
     u8 pad0[0x8C];
     Vec position; // 0x8C
-    u8 pad1[0x1B8 - 0x98];
+    u8 pad1[MWOFF(0x1B8) - 0x98];
     f32 size; // 0x1B8
 } WhirlwindTarget;
 

@@ -27,7 +27,10 @@ USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(lect_juyoitem_rel_set);
-extern s32 all_juyoitem_lecture_rel_7_data_150F8[];
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_mapobj_flag_onoff);
+#endif
+extern s32 all_juyoitem_lecture_rel[];
 extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_eki_05_negone_one_374;
@@ -54,7 +57,11 @@ s32 grass_open_2[23];
 s32 evt_boots[42];
 __declspec(section ".data") s32 evt_elvkey[5];
 static s32 evt_head[38];
+#ifdef VERSION_G8ME01
+s32 eki_05_init_evt[112];
+#else
 s32 eki_05_init_evt[106];
+#endif
 
 __declspec(section ".data") u64 fd_eki_05_negone_one_374 = 0xBF8000003F800000;
 
@@ -161,7 +168,7 @@ EVT_END()
 EVT_BEGIN(evt_boots)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("tbox"), LW(0), LW(1), LW(2))
-    CALL(lect_juyoitem_rel_set, PTR(all_juyoitem_lecture_rel_7_data_150F8))
+    CALL(lect_juyoitem_rel_set, PTR(all_juyoitem_lecture_rel))
     CALL(evt_item_entry, STRING("boots"), 8, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("tbox"))
     CALL(evt_item_get_important_item, STRING("boots"))
@@ -216,6 +223,9 @@ EVT_BEGIN(eki_05_init_evt)
             WAIT_MS(100)
         END_LOOP
     END_INLINE_EVENT
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S"), 2)
+#endif
     RETURN
 EVT_END()
 

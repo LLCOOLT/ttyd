@@ -5,7 +5,11 @@
 #include "driver/icondrv.h"
 #include "pmario_sound.h"
 #include "system.h"
-#include <string.h>
+#include <string.h>
+#include "version.h"
+// US battle texture ids are 0x16 higher for these entries.
+#define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
+
 
 #pragma optimize_for_size on
 
@@ -166,11 +170,11 @@ static void actionCommandDisp(f32 x, f32 y) {
     s32 pressedIcon;
 
     btlGetScreenPoint(&cw->pos, &screen);
-    btlDispTex4(0x42, screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){255, 255, 255, 255});
+    btlDispTex4(BTL_TEX(0x42), screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){255, 255, 255, 255});
     screen.x += 4.0f;
     screen.y -= 4.0f;
     screen.z -= 2.0f;
-    btlDispTex4(0x42, screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){128, 128, 128, 255});
+    btlDispTex4(BTL_TEX(0x42), screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){128, 128, 128, 255});
 
     if (cw->inRange) {
         s32 t = cw->inRangeCnt % 30;
@@ -180,14 +184,14 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
 
     btlGetScreenPoint(&cw->targetPos, &screen2);
-    btlDispTex4(0x41, screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
+    btlDispTex4(BTL_TEX(0x41), screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
     if (alpha > 0.0f) {
-        btlDispTex4(0x41, screen2, (Vec){alpha, alpha, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
+        btlDispTex4(BTL_TEX(0x41), screen2, (Vec){alpha, alpha, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
     }
     screen2.x += 4.0f;
     screen2.y -= 4.0f;
     screen2.z -= 2.0f;
-    btlDispTex4(0x41, screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){128, 128, 128, 255});
+    btlDispTex4(BTL_TEX(0x41), screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){128, 128, 128, 255});
     cw->angle += 2.0f;
 
     pressedIcon = BattleACGetButtonIcon(0x100, 1);

@@ -83,7 +83,7 @@ __declspec(section ".data") s32 fd_pakkun_flower___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_pakkun_flower_one_negone_359;
 __declspec(section ".data") s32 fd_pakkun_flower___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_pakkun_flower_one_364[1];
-BattleUnitKind unit_pakkun_flower_15_data_4C6D0;
+BattleUnitKind unit_pakkun_flower;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -150,7 +150,7 @@ __declspec(section ".data") s32 fd_pakkun_flower_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_pakkun_flower_15_data_4C6D0 = {
+BattleUnitKind unit_pakkun_flower = {
     162,
     "btl_un_pakkun_flower",
     15,

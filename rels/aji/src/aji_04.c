@@ -67,6 +67,10 @@ USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_npc_flag_onoff);
+USER_FUNC(evt_npc_set_stay_anim);
+#endif
 static void callback(s32 type, void** work);
 void kuti_callback(s32 type, void** work);
 extern s32 evt_bero_info_run[];
@@ -104,7 +108,11 @@ s32 quiz_ok[19];
 s32 quiz_ng[21];
 s32 UNK_0x00022be8[21];
 s32 UNK_0x00022c3c[66];
+#ifdef VERSION_G8ME01
+s32 kuizu_sekizou[980];
+#else
 s32 kuizu_sekizou[920];
+#endif
 s32 sekizou_init[47];
 s32 aji_04_init_evt[55];
 
@@ -642,19 +650,57 @@ EVT_BEGIN(kuizu_sekizou)
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(PTR(sekizou_talk))
                 CALL(evt_msg_print, 0, STRING("stg7_aji_29"), PTR(kuti_callback), 0)
+#ifdef VERSION_G8ME01
+                CALL(evt_npc_set_position, STRING("バリアーン１"), 50, 200, -50)
+                CALL(evt_npc_set_position, STRING("バリアーン２"), 50, 200, 50)
+                CALL(evt_npc_flag_onoff, 1, STRING("バリアーン１"), 32768)
+                CALL(evt_npc_flag_onoff, 1, STRING("バリアーン２"), 32768)
+                CALL(evt_npc_set_stay_anim, STRING("バリアーン１"))
+                CALL(evt_npc_set_stay_anim, STRING("バリアーン２"))
+                WAIT_FRAMES(10)
+#else
                 CALL(evt_npc_set_position, STRING("バリアーン１"), 50, 250, -50)
                 CALL(evt_npc_set_position, STRING("バリアーン２"), 50, 250, 50)
+#endif
                 BEGIN_INLINE_EVENT
+#ifdef VERSION_G8ME01
+                    CALL(evt_sub_intpl_msec_init, 2, 200, 20, 300)
+                    LOOP(0)
+                        CALL(evt_sub_intpl_msec_get_value)
+                        CALL(evt_npc_set_position, STRING("バリアーン１"), 50, LW(0), -50)
+                        WAIT_FRAMES(1)
+                        IF_INT_EQUAL(LW(1), 0)
+                            BREAK_LOOP
+                        END_IF
+                    END_LOOP
+#else
                     CALL(evt_npc_jump_position_nohit, STRING("バリアーン１"), 50, 20, -50, 300, 0)
+#endif
                     CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 200)
                 END_INLINE_EVENT
                 WAIT_MS(300)
                 BEGIN_INLINE_EVENT
+#ifdef VERSION_G8ME01
+                    CALL(evt_sub_intpl_msec_init, 2, 200, 20, 300)
+                    LOOP(0)
+                        CALL(evt_sub_intpl_msec_get_value)
+                        CALL(evt_npc_set_position, STRING("バリアーン２"), 50, LW(0), 50)
+                        WAIT_FRAMES(1)
+                        IF_INT_EQUAL(LW(1), 0)
+                            BREAK_LOOP
+                        END_IF
+                    END_LOOP
+#else
                     CALL(evt_npc_jump_position_nohit, STRING("バリアーン２"), 50, 20, 50, 300, 0)
+#endif
                     CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 200)
                 END_INLINE_EVENT
                 WAIT_MS(300)
                 WAIT_MS(500)
+#ifdef VERSION_G8ME01
+                CALL(evt_npc_flag_onoff, 0, STRING("バリアーン１"), 32768)
+                CALL(evt_npc_flag_onoff, 0, STRING("バリアーン２"), 32768)
+#endif
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(PTR(sekizou_talk))
                 CALL(evt_msg_print, 0, STRING("stg7_aji_30"), PTR(kuti_callback), 0)
@@ -737,7 +783,11 @@ EVT_END()
 void psndBGMOff(u32 flags);
 
 static void callback(s32 type, void** work) {
+#ifdef VERSION_G8ME01
+    EventEntry* evt = *(EventEntry**)((u8*)*work + 0xF200);
+#else
     EventEntry* evt = *(EventEntry**)((u8*)*work + 0x7A00);
+#endif
 
     if (strcmp(*(const char**)*work, "stg7_aji_06") == 0) {
         if (type == 3) {
@@ -756,14 +806,22 @@ static void callback(s32 type, void** work) {
             psndBGMOn(1, "BGM_EVT_QUIZ2\0\0\0\0\0\0");
         }
     }
+#ifdef VERSION_G8ME01
+    evt = *(EventEntry**)((u8*)*work + 0xF200);
+#else
     evt = *(EventEntry**)((u8*)*work + 0x7A00);
+#endif
     if (((EventEntry*)evt->lwData[8] == NULL || !evtCheckID(((EventEntry*)evt->lwData[8])->eventId)) && type == 5) {
         evt->lwData[8] = (s32)evtEntry(UNK_0x00022c3c, 0, 0);
     }
 }
 
 void kuti_callback(s32 type, void** work) {
+#ifdef VERSION_G8ME01
+    EventEntry* evt = *(EventEntry**)((u8*)*work + 0xF200);
+#else
     EventEntry* evt = *(EventEntry**)((u8*)*work + 0x7A00);
+#endif
 
     if (((EventEntry*)evt->lwData[8] == NULL || !evtCheckID(((EventEntry*)evt->lwData[8])->eventId)) && type == 5) {
         evt->lwData[8] = (s32)evtEntry(UNK_0x00022c3c, 0, 0);

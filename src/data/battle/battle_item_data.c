@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "battle/battle_unit.h"
@@ -161,7 +162,7 @@ s32 ItemEvent_Teki_Yokeeru_Core[13];
 s32 ItemEvent_Teki_Yokeeru[14];
 s32 ItemWeaponData_Teki_Yokeeru[48];
 s32 ItemWeaponData_Madowaseno_Kona[48];
-s32 ItemEvent_Nemure_Yoikoyo[57];
+s32 ItemEvent_Nemure_Yoikoyo[VERSION_PICK(57, 91)];
 s32 ItemWeaponData_Nemure_Yoikoyo[48];
 s32 ItemEvent_Stop_Watch_Core[143];
 s32 ItemEvent_Stop_Watch[86];
@@ -1239,6 +1240,32 @@ s32 ItemWeaponData_Madowaseno_Kona[] = {
     0, 0, 0, 0, (s32)ItemEvent_Madowaseno_Kona, 100, 0, 0,
 };
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
+    SET_VALUE(LW(12), PTR(ItemWeaponData_Nemure_Yoikoyo))
+    CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    WAIT_FRAMES(30)
+    CALL(evt_btl_camera_shake_h, 0, 1, 0, 10000, 0)
+    CALL(btlevtcmd_check_battleflag, LW(0), 256)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(evt_eff, 0, STRING("sheep"), 0, LW(0), LW(1), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        ELSE
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        ADD(LW(2), 15)
+        CALL(evt_eff, 0, STRING("sheep"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+    END_IF
+    WAIT_FRAMES(300)
+    CALL(evt_btl_camera_noshake, 0)
+    CALL_CHILD(PTR(ItemEvent_Support_Sub_Effect))
+    CALL(evt_audience_ap_recovery)
+    WAIT_FRAMES(150)
+    CALL_CHILD(PTR(_return_home_event))
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
     SET_VALUE(LW(12), PTR(ItemWeaponData_Nemure_Yoikoyo))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
@@ -1256,6 +1283,7 @@ EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
+#endif
 
 s32 ItemWeaponData_Nemure_Yoikoyo[] = {
     0, 0, 138, 0, 1677721600, 1065353216, 16843009, 0,
@@ -2375,11 +2403,11 @@ USER_FUNC(_naniga_okorukana_check) {
         effSetName((EffectEntry*)event->userdata[0], "effNaniga\0\0");
         evtSetValue(event, out, item);
         if (unit->currentKind == 0xDE) {
-            a = (u8*)wp + 0x16F25;
-            b = (u8*)wp + 0x16F26;
+            a = (u8*)wp + BWOFF(0x16F25);
+            b = (u8*)wp + BWOFF(0x16F26);
         } else if (unit->currentKind >= 0xE0 && unit->currentKind < 0xE7) {
-            a = (u8*)wp + 0x16F27;
-            b = (u8*)wp + 0x16F28;
+            a = (u8*)wp + BWOFF(0x16F27);
+            b = (u8*)wp + BWOFF(0x16F28);
         } else {
             goto end;
         }

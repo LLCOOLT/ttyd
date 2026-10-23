@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -349,7 +350,7 @@ __declspec(section ".data") s32 entry_boss_moamoa_mouth[] = {
 };
 
 s32 weapon_moamoa_tsunami_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 135, 2047, 0,
@@ -861,10 +862,10 @@ USER_FUNC(moamoa_on) {
     char anim[32];
     char pose[32];
 
-    wp = __memAlloc(HEAP_BATTLE, sizeof(MoamoaWork));
+    wp = BTL_ALLOC(sizeof(MoamoaWork));
     memset(wp, 0, sizeof(MoamoaWork));
     wp->count = 750;
-    wp->elems = __memAlloc(HEAP_BATTLE, wp->count * sizeof(Moamoa));
+    wp->elems = BTL_ALLOC(wp->count * sizeof(Moamoa));
     memset(wp->elems, 0, wp->count * sizeof(Moamoa));
     elem = wp->elems;
     for (i = 0; i < wp->count; i++, elem++) {

@@ -103,6 +103,16 @@ static ScreenWork* screen_wp;
 
 //.sdata
 static BattleSpotWork* wp = &work;
+
+// US: battle stage memory goes through BattleAlloc/BattleFree
+#ifdef VERSION_G8ME01
+#define STG_ALLOC(size) BattleAlloc(size)
+#define STG_FREE(ptr) BattleFree(ptr)
+void batSpotEnd(void);
+#else
+#define STG_ALLOC(size) __memAlloc(HEAP_BATTLE, size)
+#define STG_FREE(ptr) __memFree(HEAP_BATTLE, ptr)
+#endif
 __declspec(section ".sdata") u32 gap_07_804117E4_sdata[7] = {0};
 
 static u8 inta_tex[32] ATTRIBUTE_ALIGN(32) = {0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0};
@@ -230,7 +240,7 @@ void BattleStageMain(void) {
 					l->target.z = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->targetMode, l->targetStart.z, l->targetTarget.z, l->targetMax - l->targetTime, l->targetMax);
 				}
 				if (l->data != NULL) {
-					__memFree(HEAP_BATTLE, l->data);
+					STG_FREE(l->data);
 					l->data = NULL;
 				}
 			}
@@ -242,7 +252,7 @@ void BattleStageMain(void) {
 			}
 		} else {
 			if (l->data != NULL) {
-				__memFree(HEAP_BATTLE, l->data);
+				STG_FREE(l->data);
 				l->data = NULL;
 			}
 		}
@@ -269,10 +279,13 @@ void BattleStageEnd(void) {
 	s32 i;
 	StageWork* s = STG;
 
+#ifdef VERSION_G8ME01
+	batSpotEnd();
+#endif
 	for (i = 0; i < 12; i++) {
 		StageLight* l = &s->lights[i];
 		if (l->data != NULL) {
-			__memFree(HEAP_BATTLE, l->data);
+			STG_FREE(l->data);
 			l->data = NULL;
 		}
 	}
@@ -659,7 +672,7 @@ void batSpotInit(void) {
 	BattleSpotEntry* entry;
 
 	wp->count = 5;
-	wp->entries = __memAlloc(HEAP_BATTLE, sizeof(BattleSpotEntry) * wp->count);
+	wp->entries = STG_ALLOC(sizeof(BattleSpotEntry) * wp->count);
 	memset(wp->entries, 0, sizeof(BattleSpotEntry) * wp->count);
 
 	for (i = 0; i < 5; i++) {
@@ -682,6 +695,15 @@ void batSpotMain() {
     }
 }
 #pragma dont_inline reset
+
+#ifdef VERSION_G8ME01
+// US: frees the spot entries at battle end
+#pragma dont_inline on
+void batSpotEnd(void) {
+	BattleFree(wp->entries);
+}
+#pragma dont_inline reset
+#endif
 
 void batSpotDisp(CameraId camId, void* param) {
 	int i;

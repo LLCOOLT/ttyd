@@ -20,10 +20,10 @@ static USER_FUNC(evt_shuryolight_delete);
 static USER_FUNC(evt_shuryolight_run_tue_evt);
 static USER_FUNC(evt_shuryolight_run_head_evt);
 static USER_FUNC(evt_shuryolight_run_power_evt);
-USER_FUNC(evt_shuryolight_run_evt_2_text_B538);
+USER_FUNC(evt_shuryolight_run_evt);
 static USER_FUNC(evt_shuryolight_get_status);
 static USER_FUNC(evt_shuryolight_get_anim_time);
-USER_FUNC(evt_shuryolight_init_2_text_B870);
+USER_FUNC(evt_shuryolight_init);
 static s32 shuryolightRunEvt(s32* code, s32 id);
 static void shuryolightSetAnim(s32 index, s32 anim);
 static void shuryolight_callback(void* param, s32 group);
@@ -46,12 +46,12 @@ static __declspec(section ".data") s32 green_light_anim[5];
 static __declspec(section ".data") s32 yellow_light_anim[5];
 static __declspec(section ".data") s32 red_light_anim[5];
 static __declspec(section ".data") s32 orange_light_anim[5];
-s32 shuryolight_pow_normal_2_data_36ED8[44];
+s32 shuryolight_pow_normal[44];
 static s32 shuryolight_pow_tenmetu[31];
-s32 shuryolight_head_normal_2_data_37004[30];
+s32 shuryolight_head_normal[30];
 static s32 shuryolight_head_tenmetu[20];
 static s32 shuryolight_head_off[14];
-s32 shuryolight_tue_normal_2_data_37104[31];
+s32 shuryolight_tue_normal[31];
 
 __declspec(section ".data") u64 fd_evt_shuryolight_negone_one_374 = 0xBF8000003F800000;
 
@@ -117,7 +117,7 @@ static __declspec(section ".data") s32 orange_light_anim[] = {
     (s32)"L_4C", (s32)"L_4B", (s32)"L_4D", (s32)"L_4A", (s32)"L_4E",
 };
 
-EVT_BEGIN(shuryolight_pow_normal_2_data_36ED8)
+EVT_BEGIN(shuryolight_pow_normal)
     LOOP(0)
         CALL(evt_shuryolight_set_anim, 0, 1)
         CALL(evt_sub_random, 3000, LW(0))
@@ -151,7 +151,7 @@ static EVT_BEGIN(shuryolight_pow_tenmetu)
     RETURN
 EVT_END()
 
-EVT_BEGIN(shuryolight_head_normal_2_data_37004)
+EVT_BEGIN(shuryolight_head_normal)
     SET_VALUE(LW(0), 3)
     LOOP(0)
         CALL(evt_shuryolight_set_anim, LW(0), 1)
@@ -183,7 +183,7 @@ static EVT_BEGIN(shuryolight_head_off)
     RETURN
 EVT_END()
 
-EVT_BEGIN(shuryolight_tue_normal_2_data_37104)
+EVT_BEGIN(shuryolight_tue_normal)
     LOOP(0)
         CALL(evt_shuryolight_set_anim, 4, 0)
         CALL(evt_shuryolight_wait_anim_end, 4)
@@ -223,7 +223,7 @@ static s32 shuryolightRunEvt(s32* code, s32 id) {
     }
     return evtEntryType(code, 0, 0, 0)->eventId;
 }
-USER_FUNC(evt_shuryolight_init_2_text_B870) {
+USER_FUNC(evt_shuryolight_init) {
     NpcEntry* base = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
     ShuryoLight* lights;
     NpcEntry* npc;
@@ -309,7 +309,7 @@ static USER_FUNC(evt_shuryolight_get_status) {
     evtSetValue(event, args[1], light->status);
     return EVT_RETURN_DONE;
 }
-USER_FUNC(evt_shuryolight_run_evt_2_text_B538) {
+USER_FUNC(evt_shuryolight_run_evt) {
     s32* args = event->args;
     s32* power = (s32*)evtGetValue(event, args[0]);
     s32* head = (s32*)evtGetValue(event, args[1]);

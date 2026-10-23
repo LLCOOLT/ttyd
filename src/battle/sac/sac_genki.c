@@ -1,3 +1,5 @@
+#include "version.h"
+#include "icon_ids.h"
 #pragma optimize_for_size on
 #include "battle/battle.h"
 #include "battle/battle_audience.h"
@@ -14,6 +16,10 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "version.h"
+// US battle texture ids are 0x16 higher for these entries.
+#define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
+
 
 extern BattleWork* _battleWorkPointer;
 
@@ -1083,7 +1089,7 @@ static void disp_3D(CameraId cam, void* param) {
             switch (o->kind) {
             case 0:
             case 1:
-                icon = 0x1A3;
+                icon = ICON_1A3;
                 if (o->kind == 1) {
                     s = 2.0f;
                     if (genki_blink(o->timer)) {
@@ -1095,47 +1101,47 @@ static void disp_3D(CameraId cam, void* param) {
             case 3:
                 switch (party->currentKind) {
                 case 0xE0:
-                    icon = 0x1A4;
+                    icon = ICON_1A4;
                     break;
                 case 0xE1:
-                    icon = 0x1A5;
+                    icon = ICON_1A5;
                     break;
                 case 0xE3:
-                    icon = 0x1AE;
+                    icon = ICON_1AE;
                     break;
                 case 0xE2:
                     switch (pouchGetPartyColor(4)) {
                     case 1:
-                        icon = 0x1A8;
+                        icon = ICON_1A8;
                         break;
                     case 2:
-                        icon = 0x1A9;
+                        icon = ICON_1A9;
                         break;
                     case 3:
-                        icon = 0x1AA;
+                        icon = ICON_1AA;
                         break;
                     case 4:
-                        icon = 0x1AB;
+                        icon = ICON_1AB;
                         break;
                     case 5:
-                        icon = 0x1AC;
+                        icon = ICON_1AC;
                         break;
                     case 6:
-                        icon = 0x1AD;
+                        icon = ICON_1AD;
                         break;
                     case 0:
-                        icon = 0x1A7;
+                        icon = ICON_1A7;
                         break;
                     }
                     break;
                 case 0xE4:
-                    icon = 0x1AF;
+                    icon = ICON_1AF;
                     break;
                 case 0xE5:
-                    icon = 0x1A6;
+                    icon = ICON_1A6;
                     break;
                 case 0xE6:
-                    icon = 0x1B0;
+                    icon = ICON_1B0;
                     break;
                 default:
                     icon = 0;
@@ -1150,7 +1156,7 @@ static void disp_3D(CameraId cam, void* param) {
                 break;
             case 4:
             case 5:
-                icon = 0x1B1;
+                icon = ICON_1B1;
                 if (o->kind == 5) {
                     s = 2.0f;
                     if (genki_blink(o->timer)) {
@@ -1159,7 +1165,7 @@ static void disp_3D(CameraId cam, void* param) {
                 }
                 break;
             case 6:
-                icon = 0x143;
+                icon = ICON_143;
                 break;
             }
             PSMTXScale(m, s, s, 1.0f);
@@ -1176,9 +1182,9 @@ static void disp_3D(CameraId cam, void* param) {
         mx += 10.0f;
         my += 30.0f;
         mz += 10.0f;
-        btlDispTex4(0x41, (Vec){mx, my, mz}, (Vec){0.5f, 0.5f, 1.0f}, (Vec){0.0f, 0.0f, 6.0f * w->targetAngle},
+        btlDispTex4(BTL_TEX(0x41), (Vec){mx, my, mz}, (Vec){0.5f, 0.5f, 1.0f}, (Vec){0.0f, 0.0f, 6.0f * w->targetAngle},
                     (GXColor){255, 255, 255, 255});
-        btlDispTex4(0x42, (Vec){mx, my, mz}, (Vec){0.5f, 0.5f, 1.0f}, (Vec){0.0f, 0.0f, 6.0f * -(f32)w->targetAngle},
+        btlDispTex4(BTL_TEX(0x42), (Vec){mx, my, mz}, (Vec){0.5f, 0.5f, 1.0f}, (Vec){0.0f, 0.0f, 6.0f * -(f32)w->targetAngle},
                     (GXColor){255, 255, 255, 255});
     }
 }
@@ -1236,6 +1242,54 @@ s32 marioAttackEvent_Genki1[] = {
     131122, -29999985, 1, 65630, (s32)genki_evt_common, 2, 1,
 };
 
+#ifdef VERSION_G8ME01
+s32 genki_evt_common[] = {
+    196699, (s32)btlevtcmd_GetUnitId, -4, -29999987, 196699, (s32)btlevtcmd_GetBodyId, -29999987, -29999986,
+    262235, (s32)btlevtcmd_CheckStatus, -29999987, 27, -30000000, 131097, -30000000, 0,
+    131122, -29999987, -1, 33, 65627, (s32)btlevtcmd_reset_move_color_lv_all, 131163, (s32)btlevtcmd_CommandPayWeaponCost,
+    -2, 110, 196699, (s32)main_genki, -29999987, -29999985, 112, 65630,
+    (s32)sac_start_camera_evt, 65546, 500, 65627, (s32)sac_enemy_slide_go, 393307, (s32)btlevtcmd_snd_se, -2,
+    (s32)"SFX_BTL_SAC_START1", -250000000, 0, -250000000, 65630, (s32)sac_mario_item_on_evt, 65546, 500,
+    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START2", -250000000, 0, -29999989, 131096,
+    -29999985, 0, 65627, (s32)star_appear, 32, 65627, (s32)star_stone_appear, 33,
+    110, 65630, (s32)sac_start_stardust, 112, 65545, 100, 393307, (s32)btlevtcmd_snd_se,
+    -2, (s32)"SFX_BTL_SAC_HEART_SHOOT1", -250000000, 0, -29999990, 131163, (s32)evt_snd_sfxoff, -29999989,
+    196699, (s32)evt_btl_camera_set_mode, 0, 0, 65545, 40, 65630, (s32)sac_mario_item_on_end_evt,
+    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42, 196699, (s32)btlevtcmd_SetMoveSpeed, -2,
+    -229996928, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 524379,
+    (s32)btlevtcmd_MovePosition, -2, -75, -29999999, -29999998, 0, -1, 0,
+    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_I_Y", 65545, 40, 131163,
+    (s32)evt_snd_sfxoff, -29999990, 65627, (s32)sac_ac_help_on, 65627, (s32)start_game, 65627, (s32)wait_game_end,
+    65627, (s32)sac_ac_help_off, 262235, (s32)get_score, -29999990, -29999989, -29999988, 65545,
+    70, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42, 327771, (s32)btlevtcmd_GetHomePos,
+    -2, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229996928,
+    524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, -1,
+    0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 43, 65627, (s32)status_on,
+    196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2,
+    -1, 196699, (s32)evt_btl_camera_set_zoom, 0, 200, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0,
+    2, 196699, (s32)evt_btl_camera_set_zoomSpeedLv, 0, 2, 131122, -29999985, -29999990,
+    131125, -29999985, -29999989, 131125, -29999985, -29999988, 131101, -29999985,
+    1, 65627, (s32)sac_wao, 33, 131097, -29999987, -1, 196699,
+    (s32)evt_snd_sfxon, (s32)"SFX_HP_RECOVER_SHINE2", 0, 131122, -29999991, -2, 65630, (s32)status_recover_evt,
+    262235, (s32)btlevtcmd_RecoverHp, -2, 1, -29999990, 327771, (s32)btlevtcmd_GetPos, -2,
+    -30000000, -29999999, -29999998, 983131, (s32)evt_eff, (s32)"", (s32)"stardust", 2,
+    -30000000, -29999999, -29999998, 50, 50, 50, 100, 0,
+    0, 0, 0, 131122, -29999991, -29999987, 65630, (s32)status_recover_evt,
+    131163, (s32)btlevtcmd_StartWaitEvent, -29999987, 262235, (s32)btlevtcmd_RecoverHp, -29999987, -29999986, -29999989,
+    327771, (s32)btlevtcmd_GetPos, -29999987, -30000000, -29999999, -29999998, 983131, (s32)evt_eff,
+    (s32)"", (s32)"stardust", 2, -30000000, -29999999, -29999998, 50, 50,
+    50, 100, 0, 0, 0, 0, 262235, (s32)btlevtcmd_RecoverFp,
+    -2, 1, -29999988, 32, 196699, (s32)evt_snd_sfxon, (s32)"SFX_HP_RECOVER_SHINE2", 0,
+    131122, -29999991, -2, 65630, (s32)status_recover_evt, 262235, (s32)btlevtcmd_RecoverHp, -2,
+    1, -29999990, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
+    983131, (s32)evt_eff, (s32)"", (s32)"stardust", 2, -30000000, -29999999, -29999998,
+    50, 50, 50, 100, 0, 0, 0, 0,
+    262235, (s32)btlevtcmd_RecoverFp, -2, 1, -29999988, 33, 65546, 1000,
+    65627, (s32)sac_enemy_slide_return, 65546, 1000, 196699, (s32)evt_btl_camera_set_mode, 0, 0,
+    65546, 1000, 65627, (s32)end_genki, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2,
+    1,
+};
+#else
 s32 genki_evt_common[] = {
     196699, (s32)btlevtcmd_GetUnitId, -4, -29999987, 196699, (s32)btlevtcmd_GetBodyId, -29999987, -29999986,
     262235, (s32)btlevtcmd_CheckStatus, -29999987, 27, -30000000, 131097, -30000000, 0,
@@ -1282,6 +1336,7 @@ s32 genki_evt_common[] = {
     65546, 1000, 65627, (s32)end_genki, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2,
     1,
 };
+#endif
 
 s32 status_recover_evt[] = {
     262235, (s32)btlevtcmd_CheckStatus, -29999991, 1, -30000000, 131097, -30000000, 0,
@@ -1411,7 +1466,17 @@ USER_FUNC(recover_cmd_disable) {
     w->commandDisabled[0] = 0;
     w->commandDisabled[1] = 0;
     w->commandDisabled[2] = 0;
+#ifdef VERSION_G8ME01
+    {
+        BattleUnit* party = BattleGetPartyPtr(w);
+        if (party != NULL) {
+            party->usCommandDisabled[0] = 0;
+            party->usCommandDisabled[1] = 0;
+        }
+    }
+#else
     w->commandDisabled[3] = 0;
     w->commandDisabled[4] = 0;
+#endif
     return 2;
 }

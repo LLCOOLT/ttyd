@@ -1,3 +1,4 @@
+#include "version.h"
 #include "dolphin/types.h"
 #include "evt/evt_cmd.h"
 #include "driver/hitdrv.h"
@@ -19,7 +20,7 @@ void marioVoiceGlareOn(void);
 void marioVoiceGlareOff(void);
 void marioPaperOff(void);
 
-#define MW(m, off, T) (*(T*)((u8*)(m) + (off)))
+#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 #define MS(off, T) MW(marioGetPtr()->motStruct, off, T)
 
 
@@ -90,7 +91,7 @@ s32 marioGetJabaraState(void) {
 BOOL marioPriCheckJabara(void) {
 	MarioWork* mario = marioGetPtr();
 	u32 flags = mario->flags;
-	if ((flags & 0x80000000) || (flags & 0x100000)) {
+	if ((flags & 0x80000000) || (flags & VERSION_PICK(0x100000, 0x2100000))) {
 		MW(mario, 0x40, u8) = 0;
 		return FALSE;
 	}
@@ -101,7 +102,7 @@ static inline BOOL priChk(void) {
 	MarioWork* mario = marioGetPtr();
 	u32 flags = mario->flags;
 	BOOL ret;
-	if ((flags & 0x80000000) || (flags & 0x100000)) {
+	if ((flags & 0x80000000) || (flags & VERSION_PICK(0x100000, 0x2100000))) {
 		MW(mario, 0x40, u8) = 0;
 		ret = FALSE;
 	} else {
@@ -130,6 +131,13 @@ BOOL marioChkJabara(void) {
 		}
 		return FALSE;
 	}
+#ifdef VERSION_G8ME01
+	if ((mario->trigFlags & 0x400000) && MW(mario, 0x2e, u16) == 0 && !(MW(mario, 4, u32) & 0x40000000) &&
+	    mario->controlStickSensitivity) {
+		marioChgPose("M_I_Y");
+		marioVoiceGlareOn();
+	}
+#else
 	mario->wMotionTimer++;
 	if (mario->controlStickSensitivity && mario->wMotionTimer > 10 && MW(mario, 0x2e, u16) == 0 &&
 	    !(MW(mario, 4, u32) & 0x40000000)) {
@@ -143,6 +151,7 @@ BOOL marioChkJabara(void) {
 			marioVoiceGlareOn();
 		}
 	}
+#endif
 	if (marioGetRub(0x100, &b, &a, &c) == FALSE) {
 		return FALSE;
 	} else {

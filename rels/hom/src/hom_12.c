@@ -15,10 +15,10 @@ USER_FUNC(evt_party_set_pos);
 USER_FUNC(evt_seq_wait);
 USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_envon);
-extern s32 hom_10_evt_resha_left_13_data_38E4[];
-extern s32 hom_10_evt_resha_right_13_data_3858[];
-extern s32 hom_10_evt_resha_start3_13_data_3220[];
-extern s32 hom_10_evt_resha_start4_13_data_324C[];
+extern s32 hom_10_evt_resha_left[];
+extern s32 hom_10_evt_resha_right[];
+extern s32 hom_10_evt_resha_start3[];
+extern s32 hom_10_evt_resha_start4[];
 
 __declspec(section ".data") u64 fd_hom_12_negone_one_374;
 __declspec(section ".data") s32 fd_hom_12_neg_one_382[1];
@@ -94,8 +94,8 @@ EVT_BEGIN(hom_12_init_evt)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_party_set_pos, 1, 0, -1000, 0)
     IF_INT_EQUAL(GSWF(3578), 0)
-        CALL_CHILD(PTR(hom_10_evt_resha_right_13_data_3858))
-        CALL_CHILD(PTR(hom_10_evt_resha_start3_13_data_3220))
+        CALL_CHILD(PTR(hom_10_evt_resha_right))
+        CALL_CHILD(PTR(hom_10_evt_resha_start3))
         SET_VALUE(LW(0), 500)
         SET_VALUE(LW(1), -500)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("renketu"), 1)
@@ -105,8 +105,8 @@ EVT_BEGIN(hom_12_init_evt)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_4"), 1)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_5"), 1)
         ELSE
-        CALL_CHILD(PTR(hom_10_evt_resha_left_13_data_38E4))
-        CALL_CHILD(PTR(hom_10_evt_resha_start4_13_data_324C))
+        CALL_CHILD(PTR(hom_10_evt_resha_left))
+        CALL_CHILD(PTR(hom_10_evt_resha_start4))
         SET_VALUE(LW(0), 0)
         SET_VALUE(LW(1), 1000)
         CALL(evt_mapobj_trans, 1, STRING("train"), -1500, 0, 0)

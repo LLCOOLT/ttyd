@@ -1,6 +1,15 @@
 #define iconNumberDispGx iconNumberDispGx_f32
 #define iconNumberDispGx3D iconNumberDispGx3D_f32
+#ifdef VERSION_G8ME01
+/* FAKE: the header declares these with s16 ids; the US definitions take s32 (only the low 16 bits are used) */
+#define iconGetTexObj iconGetTexObj_hdr
+#define iconGetWidthHight iconGetWidthHight_hdr
+#endif
 #include "driver/icondrv.h"
+#ifdef VERSION_G8ME01
+#undef iconGetTexObj
+#undef iconGetWidthHight
+#endif
 #undef iconNumberDispGx
 #undef iconNumberDispGx3D
 #include "driver/camdrv.h"
@@ -18,6 +27,7 @@
 #include <string.h>
 
 #include <stdio.h>
+#include "icon_ids.h"
 
 
 extern GlobalWork* gp;
@@ -83,6 +93,29 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color);
         }                                                          \
     }
 
+#ifdef VERSION_G8ME01
+// US: language-specific variants of icons 0x49 and 0x67 (indexed by gp->language)
+u16 icon_049_lang_tbl[6] = {0x49, 0x4A, 0x4B, 0x4C, 0x49, 0x4D};
+u16 icon_067_lang_tbl[6] = {0x67, 0x68, 0x69, 0x6A, 0x67, 0x6B};
+#endif
+
+#ifdef VERSION_G8ME01
+static inline IconBinData* iconGetBinData(s32 iconId) {
+    IconBinary* bin = icon_bin;
+    if (!icon_tpl_ok || !icon_bin_ok) {
+        return NULL;
+    }
+    switch ((u16)iconId) {
+        case 0x49:
+            iconId = icon_049_lang_tbl[gp->language];
+            break;
+        case 0x67:
+            iconId = icon_067_lang_tbl[gp->language];
+            break;
+    }
+    return (IconBinData*)((u8*)bin + bin->offset[(u16)iconId]);
+}
+#else
 static inline IconBinData* iconGetBinData(u16 iconId) {
     IconBinary* bin = icon_bin;
     if (!icon_tpl_ok || !icon_bin_ok) {
@@ -90,6 +123,7 @@ static inline IconBinData* iconGetBinData(u16 iconId) {
     }
     return (IconBinData*)((u8*)bin + bin->offset[iconId]);
 }
+#endif
 
 // local prototypes
 void _callback_tpl(s32 error, DVDFileInfo* info);
@@ -201,7 +235,10 @@ void iconMain(void) {
         if (entry->uflags & 1) {
             if (entry->uflags & 0x2000) {
                 entry->uflags &= ~0x2000;
-                // warning: data may be invalid
+#ifdef VERSION_G8ME01
+                data = iconGetBinData(*(u16*)&entry->iconId);
+#endif
+                // warning: data may be invalid (JP)
                 entry->width = data->width;
                 entry->height = data->height;
                 entry->numIcons = data->numIcons;
@@ -453,8 +490,14 @@ void iconDispGx2(Mtx mtx, s16 flags, s16 iconId)
   if (icon_bin_ok && icon_bin_ok)
   {
   }
+#ifdef VERSION_G8ME01
+  /* FAKE: (u16)(s16) round-trip is a no-op on the s16 field; it steers MWCC's register choice */
+  ep->iconId = (u16)(s16)iconId;
+  data = iconGetBinData((u16)iconId);
+#else
   entry.iconId = (id = iconId);
   data = iconGetBinData(id);
+#endif
   entry.width = data->width;
   entry.height = data->height;
   entry.tplId = data->frames[0].tplId;
@@ -492,7 +535,9 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {
     CameraEntry* camera;
     IconBinData* data;
     IconEntry* ep;
+#ifndef VERSION_G8ME01
     u16 id;
+#endif
 
     camera = camGetCurPtr();
     ep = &entry;
@@ -503,8 +548,14 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {
     entry.color = color;
     if (icon_bin_ok && icon_bin_ok) {
     }
+#ifdef VERSION_G8ME01
+    /* FAKE: (u16)(s16) round-trip is a no-op on the s16 field; it steers MWCC's register choice */
+    ep->iconId = (u16)(s16)iconId;
+    data = iconGetBinData((u16)iconId);
+#else
     entry.iconId = (id = iconId);
     data = iconGetBinData(id);
+#endif
     entry.width = data->width;
     entry.height = data->height;
     entry.tplId = data->frames[0].tplId;
@@ -514,7 +565,11 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {
     iconGX(m, ep);
 }
 
+#ifdef VERSION_G8ME01
+void iconGetTexObj(GXTexObj* texObj, s32 iconId) {
+#else
 void iconGetTexObj(GXTexObj* texObj, s16 iconId) {
+#endif
     static char dummy[] ATTRIBUTE_ALIGN(32) = "";
     IconBinData* data;
     u16 tplId;
@@ -523,14 +578,22 @@ void iconGetTexObj(GXTexObj* texObj, s16 iconId) {
         GXInitTexObj(texObj, dummy, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
         return;
     }
+#ifdef VERSION_G8ME01
+    data = iconGetBinData(iconId);
+#else
     data = iconGetBinData((u16)iconId);
+#endif
     tplId = data->frames[0].tplId;
     ICON_ANIM_TPL_S(data, tplId);
     TEXGetGXTexObjFromPalette(icon_tpl, texObj, tplId);
     GXInitTexObjLOD(texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 }
 
+#ifdef VERSION_G8ME01
+void iconGetWidthHight(u16* width, u16* height, s32 iconId) {
+#else
 void iconGetWidthHight(u16* width, u16* height, s16 iconId) {
+#endif
     IconBinData* entry;
     TEXDescriptor* descriptor;
 
@@ -681,12 +744,12 @@ void iconGX(Mtx mtx, IconEntry* entry) {
         y *= 0.6f;
         w *= 0.6f;
         hn *= 0.6f;
-        if (*(u16*)&entry->iconId == 0x18B) {
+        if (*(u16*)&entry->iconId == ICON_18B) {
             x *= 0.8f;
             y *= 0.8f;
             w *= 0.8f;
             hn *= 0.8f;
-        } else if (*(u16*)&entry->iconId == 0x18D) {
+        } else if (*(u16*)&entry->iconId == ICON_18D) {
             x *= 0.9f;
             y *= 0.9f;
             w *= 0.9f;
@@ -765,8 +828,8 @@ void iconSetAlpha(const char* name, u8 alpha) {
     }
 }
 
-static u16 suuji[] = { 473, 475, 477, 479, 481, 483, 485, 487, 489, 491 };   // 0-9
-u16 suuji_s[] = { 474, 476, 478, 480, 482, 484, 486, 488, 490, 492 }; // 0-9 small
+static u16 suuji[] = { ICON_1D9, ICON_1DB, ICON_1DD, ICON_1DF, ICON_1E1, ICON_1E3, ICON_1E5, ICON_1E7, ICON_1E9, ICON_1EB };   // 0-9
+u16 suuji_s[] = { ICON_1DA, ICON_1DC, ICON_1DE, ICON_1E0, ICON_1E2, ICON_1E4, ICON_1E6, ICON_1E8, ICON_1EA, ICON_1EC }; // 0-9 small
 
 s32 iconNumberDispGx(Mtx mtx, s32 number, BOOL small, GXColor color) {
     s32 digits[5];

@@ -349,7 +349,11 @@ EVT_END()
 static EVT_BEGIN(suifu_e_init)
     SWITCH(GSW(0))
         CASE_BETWEEN(250, 255)
+#ifdef VERSION_G8ME01
+        CALL(evt_npc_set_position, STRING("me"), 736, 50, 113)
+#else
         CALL(evt_npc_set_position, STRING("me"), 750, 50, -25)
+#endif
     END_SWITCH
     IF_INT_EQUAL(GSW(0), 254)
         CALL(evt_npc_set_ry, STRING("me"), 90)
@@ -711,7 +715,11 @@ EVT_BEGIN(ukishima_watari_run)
         CASE_EQUAL(99)
         CALL(evt_nannpc_set_position, 99, 0, -1000, 0)
         CALL(evt_nannpc_ppflag_onoff, 99, 0, 4)
+#ifdef VERSION_G8ME01
+        CALL(evt_npc_set_position, STRING("水夫E"), 736, 50, 113)
+#else
         CALL(evt_npc_set_position, STRING("水夫E"), 750, 50, -25)
+#endif
         CALL(evt_npc_set_ry, STRING("水夫E"), 270)
         CALL(evt_npc_flag_onoff, 0, STRING("水夫E"), 1073741856)
         CASE_DEFAULT
@@ -1216,7 +1224,11 @@ EVT_BEGIN(suifu_orei)
     CALL(evt_npc_set_ry, STRING("水夫C"), 270)
     CALL(evt_npc_set_position, STRING("水夫D"), 775, 50, 50)
     CALL(evt_npc_set_ry, STRING("水夫D"), 270)
+#ifdef VERSION_G8ME01
+    CALL(evt_npc_set_position, STRING("水夫E"), 736, 50, 113)
+#else
     CALL(evt_npc_set_position, STRING("水夫E"), 750, 50, -25)
+#endif
     CALL(evt_npc_set_ry, STRING("水夫E"), 270)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))

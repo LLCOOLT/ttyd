@@ -333,9 +333,19 @@ void moamoa_init(void) {
             if (x < 185.0f) {
                 z = randf(-160.0f, -165.0f);
             } else if (x < 257.0f) {
+#ifdef VERSION_G8ME01
                 z = 0.8f * (x - 185.0f) + -160.0f;
+                z += 50.0f;
+#else
+                z = 0.8f * (x - 185.0f) + -160.0f;
+#endif
             } else {
+#ifdef VERSION_G8ME01
                 z = randf(-90.0f, -20.0f);
+                z += 50.0f;
+#else
+                z = randf(-90.0f, -20.0f);
+#endif
             }
             {
                 Vec pos = {0.0f, 0.0f, 0.0f};

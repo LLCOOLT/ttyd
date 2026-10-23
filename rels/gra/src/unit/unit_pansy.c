@@ -205,11 +205,22 @@ static BattleUnitKindPart parts[] = {
 };
 
 s32 weapon_pansy_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    1677721602,
+#else
+    1677721600,
+#endif
+    1065353216, 16843009, (s32)weaponGetPowerDefault,
     2, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 71, 2047, -2147483648,
-    1258618880, 0, 0, 0, 0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    839188480,
+#else
+    1258618880,
+#endif
+    0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 100, 0, 0,
 };
 

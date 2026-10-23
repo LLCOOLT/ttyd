@@ -1,3 +1,4 @@
+#include "version.h"
 #pragma optimize_for_size on
 #include "battle/battle.h"
 #include "battle/battle_monosiri.h"
@@ -204,7 +205,11 @@ void _btlSamplingEnemy(DetWork* d) {
             }
             if (flags & 0x200000) {
                 u32 a = part->attributes;
+#ifdef VERSION_G8ME01
+                if (!((a & 1) || (a & 2) || (a & 4)) || (a & 0x10) || (a & 0x40000)) {
+#else
                 if (!((a & 1) || (a & 2) || (a & 4)) || (a & 0x40000)) {
+#endif
                     { ok = FALSE; break; }
                 }
             }
@@ -341,7 +346,7 @@ void _btlSamplingEnemy(DetWork* d) {
             tg4 = &t[i];
             part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, tg4->unitIdx), tg4->partIdx);
             do {
-            if ((d->propFlags & 0x1000000) && !(part->attributes & 0x10)) {
+            if ((d->propFlags & 0x1000000) && !(part->attributes & VERSION_PICK(0x10, 0x40))) {
                 ok4 = TRUE;
                 for (j = 0; j < n; j++) {
                     s32 a;
@@ -358,7 +363,7 @@ void _btlSamplingEnemy(DetWork* d) {
                     }
                     if (a > b) {
                         BattleUnitPart* op = BattleGetUnitPartsPtr(o4->unitIdx, o4->partIdx);
-                        if (!(op->attributes & 0x10) && !(op->attributes & 0x400000)) {
+                        if (!(op->attributes & VERSION_PICK(0x10, 0x40)) && !(op->attributes & 0x400000)) {
                             u1 = BattleGetUnitPtr(wp, d->unitId);
                             u2 = BattleGetUnitPtr(wp, o4->unitIdx);
                             if (!(u1->mTokenFlags & 0x10) || u1 != u2) {

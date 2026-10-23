@@ -1,3 +1,4 @@
+#include "version.h"
 #pragma inline_max_total_size(11500)
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -908,7 +909,7 @@ static void ext_moamoa_main(void) {
                 s32 idx;
                 wp->hitCount++;
                 idx = i % 3;
-                if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < 200.0f) {
+                if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < VERSION_PICK(200.0f, 80.0f)) {
                     wp->field_0x3a[idx]++;
                 }
                 }
@@ -921,7 +922,7 @@ static void ext_moamoa_main(void) {
                 s32 idx;
                 wp->hitCount++;
                 idx = i % 3;
-                if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < 200.0f) {
+                if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < VERSION_PICK(200.0f, 80.0f)) {
                     wp->field_0x3a[idx]++;
                 }
                 }
@@ -944,7 +945,7 @@ static void ext_moamoa_main(void) {
                 s32 idx;
                 wp->hitCount++;
                 idx = i % 3;
-                if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < 200.0f) {
+                if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < VERSION_PICK(200.0f, 80.0f)) {
                     wp->field_0x3a[idx]++;
                 }
                 }
@@ -999,7 +1000,7 @@ static void ext_moamoa_main(void) {
         f32 r;
         d = distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[i % 3].x, wp->target[i % 3].z);
         a = angleABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[i % 3].x, wp->target[i % 3].z);
-        if (d < 200.0f)
+        if (d < VERSION_PICK(200.0f, 80.0f))
         {
           a = randf(0.0f, 360.0f);
         }

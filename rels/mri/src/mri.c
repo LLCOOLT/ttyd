@@ -191,7 +191,11 @@ s32 mri_punipuni_itemselect[40];
 s32 mri_punipuni_itemset[36];
 s32 mri_punipuni_itemremove[29];
 s32 mri_hikari_color[66];
+#ifdef VERSION_G8ME01
+s32 mri_countdown[176];
+#else
 s32 mri_countdown[174];
+#endif
 s32 mri_waterfall_effect[26];
 s32 mri_guide_hagure_check[50];
 s32 mri_guide_goryu[63];
@@ -340,7 +344,11 @@ EVT_END()
 
 __declspec(section ".data") EVT_BEGIN(evt_mri_door_close)
     BEGIN_INLINE_EVENT
+#ifdef VERSION_G8ME01
+        WAIT_MS(600)
+#else
         WAIT_MS(200)
+#endif
         CALL(evt_bero_mario_go)
     END_INLINE_EVENT
     CALL_CHILD(PTR(evt_mri_door_close_pure))
@@ -390,7 +398,11 @@ EVT_END()
 
 __declspec(section ".data") EVT_BEGIN(evt_mri_door_naname_close)
     BEGIN_INLINE_EVENT
+#ifdef VERSION_G8ME01
+        WAIT_MS(600)
+#else
         WAIT_MS(200)
+#endif
         CALL(evt_bero_mario_go)
     END_INLINE_EVENT
     CALL_CHILD(PTR(evt_mri_door_naname_close_pure))
@@ -630,6 +642,9 @@ EVT_BEGIN(mri_countdown)
     IF_STR_EQUAL(LW(0), STRING("mri_01"))
         CALL(evt_sub_countdown_set_restart_time, 100000)
     END_IF
+#ifdef VERSION_G8ME01
+    WAIT_FRAMES(5)
+#endif
     LOOP(0)
         CALL(evt_sub_countdown_get_status, LW(0))
         CALL(evt_bero_exec_get, LW(1))

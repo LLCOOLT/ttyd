@@ -1,3 +1,4 @@
+#include "icon_ids.h"
 #pragma optimize_for_size on
 #include "battle/battle.h"
 #include "battle/battle_ac.h"
@@ -377,23 +378,23 @@ void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
 u16 _get_icon_id(s8 dir) {
     switch (dir) {
         case 1:
-            return 0x7C;
+            return ICON_07C;
         case 2:
-            return 0x7D;
+            return ICON_07D;
         case 3:
-            return 0x7A;
+            return ICON_07A;
         case 4:
-            return 0x77;
+            return ICON_077;
         case 5:
-            return 0x76;
+            return ICON_076;
         case 6:
-            return 0x75;
+            return ICON_075;
         case 7:
-            return 0x78;
+            return ICON_078;
         case 8:
-            return 0x7B;
+            return ICON_07B;
         default:
-            return 0x79;
+            return ICON_079;
     }
 }
 
@@ -412,7 +413,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     switch (work->actionCommands.mAcState) {
         case 99:
         case 100:
-            ICON(v0, 0x79);
+            ICON(v0, ICON_079);
             break;
         case 1000:
             ICON(v1, _get_icon_id(sw->iconA));
@@ -433,7 +434,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         case 1004:
         case 1005:
         case 1006:
-            ICON(v5, 0x79);
+            ICON(v5, ICON_079);
             break;
     }
 }
@@ -447,7 +448,7 @@ void actionCommandDisp2(f32 x, f32 y) {
     switch (work->actionCommands.mAcState) {
         case 99:
         case 100:
-            ICON(v0, 0x79);
+            ICON(v0, ICON_079);
             break;
         case 1000:
         case 1001:
@@ -477,7 +478,7 @@ void actionCommandDisp2(f32 x, f32 y) {
         case 1004:
         case 1005:
         case 1006:
-            ICON(v2, 0x79);
+            ICON(v2, ICON_079);
             break;
     }
 }

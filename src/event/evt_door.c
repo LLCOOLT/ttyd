@@ -143,7 +143,11 @@ s32 door_dark2[34];
 s32 door_light[30];
 s32 door_light2[30];
 s32 evt_door_open[508];
+#ifdef VERSION_G8ME01
+s32 evt_door_open_bom_01[336];
+#else
 s32 evt_door_open_bom_01[338];
+#endif
 s32 evt_door_open_roll[225];
 s32 evt_door_close[447];
 s32 evt_door_close_roll[247];
@@ -909,7 +913,9 @@ EVT_BEGIN(evt_door_open_bom_01)
     END_IF
     CALL(door_dark_flag, LW(0), 1)
     SPAWN_EVENT(PTR(door_open_se))
+#ifndef VERSION_G8ME01
     CALL(N_evt_mario_party_door_halve_hitbox)
+#endif
     CALL(evt_door_param, LW(0), 6, LW(7), LW(8), LW(9))
     IF_INT_NOT_EQUAL(LW(7), 0)
         BEGIN_INLINE_EVENT

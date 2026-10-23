@@ -10,10 +10,19 @@ s32 irand(s32 scalar);
 #include "dolphin/mtx.h"
 
 typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; u8 field_0x58[0x64 - 0x58]; Vec rot; } ZakoGun;
-typedef struct ZakoGunWork { s32 flag; s32 targetId; u8 field_0x8[0x48 - 0x8]; Vec start; Vec end; s32 timer; s32 steps; s32 count; s32 sfx; } ZakoGunWork;
+#ifdef VERSION_G8ME01
+#define ZAKOGUNWORK_PAD 0x54
+#else
+#define ZAKOGUNWORK_PAD 0x48
+#endif
+#ifdef VERSION_G8ME01
+typedef struct ZakoGunWork { s32 flag; s32 targetId; Vec targetPos; u8 field_0x14[ZAKOGUNWORK_PAD - 0x14]; Vec start; Vec end; s32 timer; s32 steps; s32 count; s32 sfx; } ZakoGunWork;
+#else
+typedef struct ZakoGunWork { s32 flag; s32 targetId; u8 field_0x8[ZAKOGUNWORK_PAD - 0x8]; Vec start; Vec end; s32 timer; s32 steps; s32 count; s32 sfx; } ZakoGunWork;
+#endif
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 extern ZakoGun* zakogun;
-extern ZakoGunWork* work_20_bss_6C;
+extern ZakoGunWork* work;
 s32 psndSFXOn(const char* name);
 void psndSFXOff(s32 id);
 ExtPose* extGetPosePtr(void);
@@ -66,7 +75,7 @@ USER_FUNC(zakogun_dead2);
 void zakogun_ext_main2(void);
 USER_FUNC(zakogun_ext_init2);
 USER_FUNC(up_ceil);
-USER_FUNC(down_ceil_20_text_9C8C);
+USER_FUNC(down_ceil);
 extern s32 _add_star_point_disp_offset[];
 extern s32 btldefaultevt_Confuse[];
 extern s32 btldefaultevt_Damage[];
@@ -252,8 +261,13 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_gundan_zako_group2", "c_zako_n", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3600009, 0, pose_table},
 };
 
+#ifdef VERSION_G8ME01
+#define ZAKO_WEAPON_W4 1677721602 // US: low byte 2
+#else
+#define ZAKO_WEAPON_W4 1677721600
+#endif
 s32 weapon_gundan_zako_group2_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0, ZAKO_WEAPON_W4, 1065353216, 16843009, (s32)weaponGetPowerDefault,
     1, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 536875008, 770, 0, 135, 2047, -2147483648,
@@ -262,7 +276,7 @@ s32 weapon_gundan_zako_group2_attack[] = {
 };
 
 s32 weapon_gundan_zako_group2_yusuri_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0, ZAKO_WEAPON_W4, 1065353216, 16843009, (s32)weaponGetPowerDefault,
     4, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 135, 2047, 4,
@@ -467,23 +481,23 @@ static EVT_BEGIN(shake_attack_event)
     RETURN
 EVT_END()
 
-USER_FUNC(down_ceil_20_text_9C8C) {
+USER_FUNC(down_ceil) {
     u8* ceil = &_battleWorkPointer->field_180DC;
     BattleStageObject* body = BattleSearchObjectPtr("if_body");
     BattleStageObject* wire = BattleSearchObjectPtr("if_wire");
 
     if (isFirstCall) {
-        work_20_bss_6C->start = (Vec){0.0f, 250.0f, 0.0f};
-        work_20_bss_6C->end = (Vec){0.0f, 130.0f, 0.0f};
-        work_20_bss_6C->timer = 120;
-        work_20_bss_6C->steps = 120;
+        work->start = (Vec){0.0f, 250.0f, 0.0f};
+        work->end = (Vec){0.0f, 130.0f, 0.0f};
+        work->timer = 120;
+        work->steps = 120;
         *ceil &= ~0x20;
-        work_20_bss_6C->sfx = work_20_bss_6C->sfx = psndSFXOn("SFX_BOSS_TEAM_3RD_MOVE_CAILING1");
+        work->sfx = work->sfx = psndSFXOn("SFX_BOSS_TEAM_3RD_MOVE_CAILING1");
     }
-    body->mPosition.y = wire->mPosition.y = intplGetValue(work_20_bss_6C->start.y, work_20_bss_6C->end.y, 4, work_20_bss_6C->steps - work_20_bss_6C->timer, work_20_bss_6C->steps);
-    work_20_bss_6C->timer--;
-    if (work_20_bss_6C->timer < 0) {
-        psndSFXOff(work_20_bss_6C->sfx);
+    body->mPosition.y = wire->mPosition.y = intplGetValue(work->start.y, work->end.y, 4, work->steps - work->timer, work->steps);
+    work->timer--;
+    if (work->timer < 0) {
+        psndSFXOff(work->sfx);
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;
@@ -495,17 +509,17 @@ USER_FUNC(up_ceil) {
     BattleStageObject* wire = BattleSearchObjectPtr("if_wire");
 
     if (isFirstCall) {
-        work_20_bss_6C->start = (Vec){0.0f, 130.0f, 0.0f};
-        work_20_bss_6C->end = (Vec){0.0f, 250.0f, 0.0f};
-        work_20_bss_6C->timer = 120;
-        work_20_bss_6C->steps = 120;
+        work->start = (Vec){0.0f, 130.0f, 0.0f};
+        work->end = (Vec){0.0f, 250.0f, 0.0f};
+        work->timer = 120;
+        work->steps = 120;
         *ceil |= 0x20;
-        work_20_bss_6C->sfx = psndSFXOn("SFX_BOSS_TEAM_3RD_MOVE_CAILING1");
+        work->sfx = psndSFXOn("SFX_BOSS_TEAM_3RD_MOVE_CAILING1");
     }
-    body->mPosition.y = wire->mPosition.y = intplGetValue(work_20_bss_6C->start.y, work_20_bss_6C->end.y, 4, work_20_bss_6C->steps - work_20_bss_6C->timer, work_20_bss_6C->steps);
-    work_20_bss_6C->timer--;
-    if (work_20_bss_6C->timer < 0) {
-        psndSFXOff(work_20_bss_6C->sfx);
+    body->mPosition.y = wire->mPosition.y = intplGetValue(work->start.y, work->end.y, 4, work->steps - work->timer, work->steps);
+    work->timer--;
+    if (work->timer < 0) {
+        psndSFXOff(work->sfx);
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;
@@ -516,13 +530,13 @@ USER_FUNC(shake_ceil) {
     BattleStageObject* wire = BattleSearchObjectPtr("if_wire");
 
     if (isFirstCall) {
-        work_20_bss_6C->start = (Vec){0.0f, 130.0f, 0.0f};
-        work_20_bss_6C->end = (Vec){0.0f, 135.0f, 0.0f};
-        work_20_bss_6C->timer = 0;
+        work->start = (Vec){0.0f, 130.0f, 0.0f};
+        work->end = (Vec){0.0f, 135.0f, 0.0f};
+        work->timer = 0;
     }
-    body->mPosition.y = wire->mPosition.y = intplGetValue(work_20_bss_6C->start.y, work_20_bss_6C->end.y, 4, work_20_bss_6C->timer, 9);
-    work_20_bss_6C->timer++;
-    if (work_20_bss_6C->timer > 17) {
+    body->mPosition.y = wire->mPosition.y = intplGetValue(work->start.y, work->end.y, 4, work->timer, 9);
+    work->timer++;
+    if (work->timer > 17) {
         body->mPosition.y = wire->mPosition.y = 130.0f;
         return EVT_RETURN_DONE;
     }
@@ -533,7 +547,7 @@ USER_FUNC(zakogun_ext_init2) {
     s32 i;
     ExtPose* pose = extGetPosePtr();
 
-    work_20_bss_6C->flag = 1;
+    work->flag = 1;
     for (i = 0; i < 25; i++, pose++) {
         zakogun_ext_init123_common(pose, i);
     }
@@ -588,7 +602,7 @@ void zakogun_ext_main2(void) {
                 zako->pos.z = zako->home.z = -10.0f;
                 break;
             case 20:
-                BtlUnit_GetPos(BattleGetUnitPtr(wp, work_20_bss_6C->targetId), &x, &y, &z);
+                BtlUnit_GetPos(BattleGetUnitPtr(wp, work->targetId), &x, &y, &z);
                 zako->start = zako->pos;
                 if (zako->pos.x >= x) {
                     zako->target.x = zako->pos.x - 30.0f;
@@ -605,7 +619,7 @@ void zakogun_ext_main2(void) {
                 zako->pos.y = intplGetValue(zako->start.y, zako->target.y, 4, (zako->timerMax - zako->timer) * 2, zako->timerMax);
                 zako->timer--;
                 if (zako->timer < 0) {
-                    BtlUnit_GetPos(BattleGetUnitPtr(wp, work_20_bss_6C->targetId), &x, &y, &z);
+                    BtlUnit_GetPos(BattleGetUnitPtr(wp, work->targetId), &x, &y, &z);
                     if (__fabs(zako->pos.x - x) <= 20.0) {
                         zako->state = 30;
                     } else {
@@ -614,11 +628,11 @@ void zakogun_ext_main2(void) {
                 }
                 break;
             case 30:
-                BtlUnit_GetPos(BattleGetUnitPtr(wp, work_20_bss_6C->targetId), &x, &y, &z);
+                BtlUnit_GetPos(BattleGetUnitPtr(wp, work->targetId), &x, &y, &z);
                 zako->vel.x = rand() / 32767.0f - 0.5f;
                 zako->vel.y = 0.0f;
                 zako->vel.z = 1.5f;
-                zako->target.y = y + work_20_bss_6C->count * 2.0f;
+                zako->target.y = y + work->count * 2.0f;
                 zako->state = 35;
                 zakogun_set_pose(zako, 0x2C, 1, 1);
                 psndSFXOn(se1);
@@ -630,14 +644,14 @@ void zakogun_ext_main2(void) {
                 if (zako->pos.y < zako->target.y) {
                     zako->pos.y = zako->target.y;
                     zako->state = 40;
-                    work_20_bss_6C->count++;
-                    if (work_20_bss_6C->count == 25) {
+                    work->count++;
+                    if (work->count == 25) {
                         unit->work[0] = 1;
                     }
                 }
                 break;
             case 40:
-                if (work_20_bss_6C->count == 25) {
+                if (work->count == 25) {
                     zako->state = 45;
                     zako->timer = irand(60);
                 }
@@ -676,7 +690,21 @@ void zakogun_ext_main2(void) {
                 }
                 break;
             case 50:
-                BtlUnit_GetPos(BattleGetUnitPtr(wp, work_20_bss_6C->targetId), &x, &y, &z);
+#ifdef VERSION_G8ME01
+            {
+                BattleUnit* tgt = BattleGetUnitPtr(wp, work->targetId);
+                if (tgt != NULL) {
+                    BtlUnit_GetPos(tgt, &x, &y, &z);
+                    work->targetPos = (Vec){x, y, z};
+                } else {
+                    x = work->targetPos.x;
+                    y = work->targetPos.y;
+                    z = work->targetPos.z;
+                }
+            }
+#else
+                BtlUnit_GetPos(BattleGetUnitPtr(wp, work->targetId), &x, &y, &z);
+#endif
                 zako->rot.y = 0.0f;
                 zako->start = zako->pos;
                 zako->target.x = zako->pos.x - 30.0f;
@@ -810,7 +838,7 @@ USER_FUNC(zakogun_attack2) {
     s32 n;
 
     if (isFirstCall) {
-        work_20_bss_6C->count = 0;
+        work->count = 0;
         for (i = 0; i < 25; i++) {
             zakogun[i].state = 20;
         }

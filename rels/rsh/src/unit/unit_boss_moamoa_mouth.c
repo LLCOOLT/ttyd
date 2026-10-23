@@ -216,7 +216,13 @@ static BattleUnitKindPart parts[] = {
 };
 
 static s32 weapon_moamoa_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    1677721602,
+#else
+    1677721600,
+#endif
+    1065353216, 16843009, (s32)weaponGetPowerDefault,
     10, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 135, 2047, 0,

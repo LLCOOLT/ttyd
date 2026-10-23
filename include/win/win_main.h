@@ -43,6 +43,9 @@ typedef struct WindowWork {
             s32 itemTarget;                  // 0x2DC
         };
     };
+#ifdef VERSION_G8ME01
+    u8 us_pad1210[8];           // 0x1210, US only: struct is 0x1218
+#endif
 } WindowWork;
 
 typedef struct WindowPartyDt {

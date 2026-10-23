@@ -1237,7 +1237,7 @@ static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, s32* table) {
     if (unit->work[4 + n] == -1) {
         return FALSE;
     }
-    sp = __memAlloc(HEAP_BATTLE, sizeof(BarriernSpline));
+    sp = BTL_ALLOC(sizeof(BarriernSpline));
     unit->work[10 + n] = (s32)sp;
     sp->n = 5;
     sp->table = table;
@@ -1262,7 +1262,7 @@ static u8 barriernSatelliteTo_Main(BattleUnit* unit, s32 n) {
     }
     if (sp->count >= 60) {
         if (sp != NULL) {
-            __memFree(HEAP_BATTLE, sp);
+            BTL_FREE(sp);
             unit->work[10 + n] = 0;
         }
         return FALSE;

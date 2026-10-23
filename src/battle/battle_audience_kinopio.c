@@ -1068,7 +1068,7 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
         break;
     case 70:
         BattleStage_NozzleWorkCheck(1);
-        m->statusTimer = AM_S32(bw, 0x18298);
+        m->statusTimer = AM_S32(bw, BWOFF(0x18298));
         m->field_0x4 = 75;
         tx = 300.0f * m->field_0xC;
         tz = 0.0f;

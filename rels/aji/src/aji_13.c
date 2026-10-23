@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -13,7 +14,11 @@
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 BOOL hitIsGroup(HitEntry* target, HitEntry* group);
+#ifndef VERSION_G8ME01
 void* _mapAlloc(u32 size);
+#else
+#include "memory.h"
+#endif
 double sin(double x);
 double cos(double x);
 typedef struct { Vec pos; Vec delta; } BeltWork;
@@ -421,6 +426,105 @@ EVT_BEGIN(move_left_right)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(move_up_down)
+    SET_VALUE(LW(5), LW(0))
+    SET_VALUE(LW(6), LW(1))
+    SET_VALUE(LW(7), LW(2))
+    SET_VALUE(LW(8), LW(3))
+    SET_VALUE(LW(9), LW(4))
+    IF_INT_NOT_EQUAL(LW(5), 0)
+        CALL(evt_hit_bind_mapobj, LW(5), LW(6))
+    END_IF
+    MULTIPLY(LW(7), 100)
+    MULTIPLY(LW(8), 100)
+    SET_VALUE(LW(4), LW(8))
+    IF_STR_EQUAL(LW(5), STRING("A_ugoku_2"))
+        SET_VALUE(LW(3), 1)
+        SET_VALUE(GF(1), 0)
+        BEGIN_SIBLING_EVENT
+            LOOP(0)
+                CALL(evt_mario_get_name_hitobj_head, LW(10))
+                CALL(hit_group_chk, LW(10), LW(5), LW(10))
+                IF_INT_NOT_EQUAL(LW(10), 0)
+                    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+                    IF_FLOAT_GREATER(LW(1), FLOAT(0.099609375f))
+                        SET_VALUE(GF(1), 1)
+                    END_IF
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+        END_SIBLING_EVENT
+        ELSE
+        SET_VALUE(LW(3), 0)
+    END_IF
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_init, 11, LW(7), LW(8), LW(9))
+        LABEL(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
+        CALL(evt_mapobj_trans, 1, LW(6), 0, LW(0), 0)
+        IF_INT_NOT_EQUAL(LW(5), 0)
+            CALL(evt_hit_bind_update, LW(5))
+        END_IF
+        IF_INT_NOT_EQUAL(LW(3), 0)
+            IF_INT_NOT_EQUAL(GF(1), 0)
+                GOTO(5)
+            END_IF
+        END_IF
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 1)
+            GOTO(0)
+        END_IF
+        LABEL(5)
+        IF_INT_NOT_EQUAL(LW(3), 0)
+            IF_INT_EQUAL(GF(1), 0)
+                SET_VALUE(LW(8), LW(4))
+                ELSE
+                MULTIPLY_FLOAT(LW(0), FLOAT(100.0f))
+                SET_VALUE(LW(8), LW(0))
+            END_IF
+            WAIT_MS(300)
+            LOOP(0)
+                IF_INT_EQUAL(GF(1), 0)
+                    BREAK_LOOP
+                END_IF
+                SET_VALUE(GF(1), 0)
+                WAIT_MS(1000)
+            END_LOOP
+            ELSE
+            WAIT_MS(300)
+        END_IF
+        LOOP(0)
+            IF_INT_EQUAL(GF(0), 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(evt_sub_intpl_msec_init, 11, LW(8), LW(7), LW(9))
+        LABEL(1)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
+        CALL(evt_mapobj_trans, 1, LW(6), 0, LW(0), 0)
+        IF_INT_NOT_EQUAL(LW(5), 0)
+            CALL(evt_hit_bind_update, LW(5))
+        END_IF
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 1)
+            GOTO(1)
+        END_IF
+        SET_VALUE(LW(8), LW(4))
+        WAIT_MS(300)
+        LOOP(0)
+            IF_INT_EQUAL(GF(0), 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_LOOP
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(move_up_down)
     SET_VALUE(LW(5), LW(0))
     SET_VALUE(LW(6), LW(1))
@@ -518,6 +622,7 @@ EVT_BEGIN(move_up_down)
     END_LOOP
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(move_r)
     SET_VALUE(LW(5), LW(0))

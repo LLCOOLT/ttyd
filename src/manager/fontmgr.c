@@ -29,8 +29,14 @@ GXColor fontColTbl[3] = {
 	{0xDC, 0xDC, 0xDC, 0xFF},
 	{0xB4, 0x78, 0x14, 0xFF}
 };
+#ifdef VERSION_G8ME01
+s32 charspace[7] = {4, 2, 2, 2, 2, 2, 2};
+const char* fontname[7] = {"papermarioset_JPN", "papermarioset_US", "papermarioset_EU", "papermarioset_EU",
+	"papermarioset_EU", "papermarioset_EU", "papermarioset_US"};
+#else
 s32 charspace[2] = {4, 2};
 const char* fontname[2] = {"papermarioset_JPN", "popjoyB22"};
+#endif
 
 //.sbss
 Vec fontScale;
@@ -42,6 +48,13 @@ BinaryFontGlyph* blockGlyph;
 GXTexObj fgTexObj;
 BinaryFontHeader* pfh; //pointer to font header
 
+// US passes single-byte characters to JUTFont_CodeToGlyph zero-extended
+#ifdef VERSION_G8ME01
+#define FONT_CH(c) ((u8)(c))
+#else
+#define FONT_CH(c) (c)
+#endif
+
 //local prototypes
 void JUTFont_DrawStart(GXColor color);
 void _JUTFont_DrawPos(u16 code, s16 x, s16 y);
@@ -50,6 +63,10 @@ void JUTFontSetup(u16 font);
 GXColor HSV2RGB(GXColor hsv);
 void FontDrawColorIDX(s32 idx);
 void FontDrawStart_alpha(u8 alpha);
+#ifdef VERSION_G8ME01
+extern char* msgGetCommand(char* msg, char* cmd, char* arg);
+void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg);
+#endif
 
 static inline FontWidthEntry* fontGetWidth(u16 code) {
 	FontWidthBlock* block = (FontWidthBlock*)&pfh[1];
@@ -86,7 +103,11 @@ void fontmgrInit(void) {
 }
 
 void fontmgrTexSetup(void) {
+#ifdef VERSION_G8ME01
+	JUTFontSetup(gp->language);
+#else
 	JUTFontSetup(0);
+#endif
 }
 
 void FontDrawStart(void) {
@@ -211,7 +232,7 @@ static inline void FontDrawStringVec(Vec pos, const s8* str) {
 			msg += 2;
 		}
 		else {
-			code = JUTFont_CodeToGlyph(*msg++);
+			code = JUTFont_CodeToGlyph(FONT_CH(*msg++));
 		}
 		width = fontGetWidth(code)->width;
 		PSMTXTransApply(scale, trans, x, pos.y, pos.z);
@@ -222,9 +243,16 @@ static inline void FontDrawStringVec(Vec pos, const s8* str) {
 	}
 }
 
+#ifdef VERSION_G8ME01
+// US: FontDrawString and FontDrawStringPitch are wrappers over FontDrawStringVecPitch
+void FontDrawString(f32 x, f32 y, const char* msg) {
+	FontDrawStringVecPitch((Vec){x, y, 0.0f}, -1.0f, (const s8*)msg);
+}
+#else
 void FontDrawString(f32 x, f32 y, const char* msg) {
 	FontDrawStringVec((Vec){x, y, 0.0f}, (const s8*)msg);
 }
+#endif
 
 static inline void fontDrawStringVecPitch(Vec pos, f32 pitch, const s8* str) {
 	CameraEntry* camera;
@@ -244,7 +272,7 @@ static inline void fontDrawStringVecPitch(Vec pos, f32 pitch, const s8* str) {
 			msg += 2;
 		}
 		else {
-			code = JUTFont_CodeToGlyph(*msg++);
+			code = JUTFont_CodeToGlyph(FONT_CH(*msg++));
 		}
 		width = fontGetWidth(code)->width;
 		PSMTXTransApply(scale, trans, pitch < 0.0f ? x : x + fontScale.x * ((pitch - width) * 0.5f), pos.y, pos.z);
@@ -260,10 +288,66 @@ static inline void fontDrawStringVecPitch(Vec pos, f32 pitch, const s8* str) {
 	}
 }
 
+#ifdef VERSION_G8ME01
+void FontDrawStringPitch(f32 x, f32 y, f32 pitch, const char* msg) {
+	FontDrawStringVecPitch((Vec){x, y, 0.0f}, pitch, (const s8*)msg);
+}
+#else
 void FontDrawStringPitch(f32 x, f32 y, f32 pitch, const char* msg) {
 	fontDrawStringVecPitch((Vec){x, y, 0.0f}, pitch, (const s8*)msg);
 }
+#endif
 
+#ifdef VERSION_G8ME01
+// FAKE: auto_inline off keeps the wrappers from inlining FontDrawStringVecPitch (the US wrappers call it)
+#pragma auto_inline off
+void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg) {
+	CameraEntry* camera;
+	Mtx trans, scale;
+	char cmd[128];
+	char arg[128];
+	u8 width;
+	u16 code;
+	f32 x;
+	s8 c;
+
+	camera = camGetCurPtr();
+	x = pos.x;
+	PSMTXScale(scale, fontScale.x, fontScale.y, fontScale.z);
+	while (*msg) {
+		code = 0xFFFF;
+		if (_ismbblead(*msg)) {
+			code = JUTFont_CodeToGlyph(*(u16*)msg);
+			msg += 2;
+		}
+		else {
+			switch (c = *msg) {
+				case '<':
+					msg = (const s8*)msgGetCommand((char*)msg + 1, cmd, arg);
+					break;
+				default:
+					msg++;
+					code = JUTFont_CodeToGlyph((u8)c);
+					break;
+			}
+		}
+		if (code != 0xFFFF) {
+			width = fontGetWidth(code)->width;
+			PSMTXTransApply(scale, trans, pitch < 0.0f ? x : x + fontScale.x * ((pitch - width) * 0.5f), pos.y, pos.z);
+			PSMTXConcat(camera->view, trans, trans);
+			GXLoadPosMtxImm(trans, 0);
+			fontDrawCodeEdge(code);
+			if (pitch < 0.0f) {
+				x += fontScale.x * (width + charspace[gp->language]);
+			}
+			else {
+				x += pitch * fontScale.x;
+			}
+		}
+	}
+}
+#pragma auto_inline reset
+#else
 void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg) {
 	CameraEntry* camera;
 	Mtx trans, scale;
@@ -280,7 +364,7 @@ void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg) {
 			msg += 2;
 		}
 		else {
-			code = JUTFont_CodeToGlyph(*msg++);
+			code = JUTFont_CodeToGlyph(FONT_CH(*msg++));
 		}
 		width = fontGetWidth(code)->width;
 		PSMTXTransApply(scale, trans, pitch < 0.0f ? x : x + fontScale.x * ((pitch - width) * 0.5f), pos.y, pos.z);
@@ -295,6 +379,7 @@ void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg) {
 		}
 	}
 }
+#endif
 extern char* msgGetCommand(char* msg, char* cmd, char* arg);
 static inline void fontDrawPairXI(u16 code, s16 x, s16 y) {
 	s16 iy = y;
@@ -371,7 +456,7 @@ void FontDrawStringMtx(Mtx mtx, const char* msg) {
 					}
 					break;
 				default:
-					code = JUTFont_CodeToGlyph(*((const s8*)msg)++);
+					code = JUTFont_CodeToGlyph(FONT_CH(*((const s8*)msg)++));
 					break;
 			}
 		}
@@ -411,7 +496,7 @@ void FontDrawStringCenterMtx(Mtx mtx, const s8* msg) {
 			msg += 2;
 		}
 		else {
-			code = JUTFont_CodeToGlyph(*msg++);
+			code = JUTFont_CodeToGlyph(FONT_CH(*msg++));
 		}
 		fontDrawCodeEdgeXY(code, x, 0.0f);
 		x += fontGetWidth(code)->width + charspace[gp->language];
@@ -429,6 +514,16 @@ void FontDrawStringShake(f32 x, f32 y, const s8* msg) {
 	u16 code;
 	f32 sx, sy;
 
+#ifdef VERSION_G8ME01
+	// FAKE: dead guard (folded after register allocation, emits no code). It only creates the -1.0f
+	// .sdata2 literal at this point, which puts it before the 28.0f of FontDrawStringMtx like the target.
+	{
+		s32 gz = 0;
+		if (gz != 0) {
+			x = -1.0f;
+		}
+	}
+#endif
 	camera = camGetCurPtr();
 	PSMTXScale(scale, fontScale.x, fontScale.y, fontScale.z);
 	while (*msg) {
@@ -437,7 +532,7 @@ void FontDrawStringShake(f32 x, f32 y, const s8* msg) {
 			msg += 2;
 		}
 		else {
-			code = JUTFont_CodeToGlyph(*msg++);
+			code = JUTFont_CodeToGlyph(FONT_CH(*msg++));
 		}
 		sx = x + fontScale.x * (irand(10000) % 3);
 		sy = y + fontScale.y * (irand(10000) % 3);
@@ -539,7 +634,7 @@ void FontDrawMessage(s32 x, s32 y, const char* msg) {
 					}
 					break;
 				default:
-					code = JUTFont_CodeToGlyph(*((const s8*)msg)++);
+					code = JUTFont_CodeToGlyph(FONT_CH(*((const s8*)msg)++));
 					break;
 			}
 		}
@@ -623,7 +718,7 @@ void FontDrawMessageMtx(Mtx mtx, const char* msg) {
 					}
 					break;
 				default:
-					code = JUTFont_CodeToGlyph(*((const s8*)msg)++);
+					code = JUTFont_CodeToGlyph(FONT_CH(*((const s8*)msg)++));
 					break;
 			}
 		}
@@ -639,7 +734,7 @@ void FontDrawMessageMtx(Mtx mtx, const char* msg) {
 }
 
 void hankakuSearch(s8 c) {
-	JUTFont_CodeToGlyph(c);
+	JUTFont_CodeToGlyph(FONT_CH(c));
 }
 
 u16 kanjiSearch(u32 code) {
@@ -704,7 +799,7 @@ u16 FontGetMessageWidthLine(const char* msg, u16* lines) {
 					}
 					break;
 				default:
-					code = JUTFont_CodeToGlyph(*((const s8*)msg)++);
+					code = JUTFont_CodeToGlyph(FONT_CH(*((const s8*)msg)++));
 					break;
 			}
 		}
@@ -761,12 +856,44 @@ GXColor HSV2RGB(GXColor hsv) {
 }
 
 void JUTFontSetup(u16 font) {
+#ifdef VERSION_G8ME01
+	DVDEntry* dvd;
+	u32 size;
+#else
 	u32 size;
 	DVDEntry* dvd;
+#endif
 	BinaryFontBlock* ptr;
 	char path[128];
 	u32 i;
+#ifdef VERSION_G8ME01
+	s32 maxsize;
+	s32 j;
+	DVDEntry* other;
+	s32 len;
+#endif
 
+#ifdef VERSION_G8ME01
+	if (!pfh) {
+		sprintf(path, "%s/f/%s.bfn", getMarioStDvdRoot(), fontname[font]);
+		dvd = DVDMgrOpen(path, 2, 0);
+		size = DVDMgrGetLength(dvd);
+		maxsize = size;
+		for (j = 0; j < 7; j++) {
+			sprintf(path, "%s/font/%s.bfn", getMarioStDvdRoot(), fontname[j]);
+			other = DVDMgrOpen(path, 2, 0);
+			if (other) {
+				len = DVDMgrGetLength(other);
+				if (maxsize < len) {
+					maxsize = len;
+				}
+				DVDMgrClose(other);
+			}
+		}
+		pfh = __memAlloc(HEAP_DEFAULT, OSRoundUp32B(maxsize));
+		DVDMgrRead(dvd, pfh, OSRoundUp32B(size), 0);
+		DVDMgrClose(dvd);
+#else
 	if (!pfh) {
 		sprintf(path, "%s/f/%s.bfn", getMarioStDvdRoot(), fontname[font]);
 		dvd = DVDMgrOpen(path, 2, 0);
@@ -774,6 +901,7 @@ void JUTFontSetup(u16 font) {
 		pfh = __memAlloc(HEAP_DEFAULT, size = OSRoundUp32B(size));
 		DVDMgrRead(dvd, pfh, size, 0);
 		DVDMgrClose(dvd);
+#endif
 		ptr = (BinaryFontBlock*)(pfh + 1);
 		for (i = 0; i < pfh->blockcount; i++) {
 			switch (ptr->magic) {
@@ -798,12 +926,14 @@ void JUTFontSetup(u16 font) {
 	}
 }
 
+#ifndef VERSION_G8ME01
 void JUTFont_Free(void) {
 	if (pfh) {
 		__memFree(HEAP_DEFAULT, pfh);
 		pfh = NULL;
 	}
 }
+#endif
 
 u16 JUTFont_CodeToGlyph(u32 code) {
 	BinaryFontMap* map;
@@ -907,7 +1037,16 @@ void JUTFont_DrawStart(GXColor color) {
 	GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_C0, (GXTevColorArg)0xC, GX_CC_ZERO);
 	GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
 	GXLoadTexObj(&fgTexObj, GX_TEXMAP0);
+#ifdef VERSION_G8ME01
+	if ((u32)gp->language == 0) {
+		PSMTXScale(mtx, 0.001953125f, 0.0009765625f, 1.0f);
+	}
+	else {
+		PSMTXScale(mtx, 0.001953125f, 0.00390625f, 1.0f);
+	}
+#else
 	PSMTXScale(mtx, 0.001953125f, 0.0009765625f, 1.0f);
+#endif
 	GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
 	GXLoadPosMtxImm(camera->view, 0);
@@ -964,18 +1103,30 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	tw = entry->width;
 	scale = 1.0f;
 	w = entry->width * scale;
+#ifdef VERSION_G8ME01
+	h = (cellh - 2.0f) * scale;
+#else
 	h = cellh * scale;
+#endif
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	n0 = irand(64);
 	n1 = irand(64);
 	x0 = x;
+#ifdef VERSION_G8ME01
+	y0 = y - 2;
+#else
 	y0 = y - 1;
+#endif
 	x1 = x0 + w;
 	hue = x0 - (u8)gp->retraceCount * 2;
 	hsv = (GXColor){0x00, 0xAA, 0xFF, 0xFF};
 	tv = row * cellh;
+#ifdef VERSION_G8ME01
+	v0 = 2.0f + tv;
+#else
 	v0 = 1.0f + tv;
+#endif
 	GXPosition3s16(x, y0, 0);
 	fontHue(&hsv, x0 + hue);
 	c = HSV2RGB(hsv);
@@ -1000,7 +1151,11 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	fontPos(x1, y1, &hsv, hue);
 	c = HSV2RGB(hsv);
 	GXColor4u8(c.r, c.g, c.b, c.a);
+#ifdef VERSION_G8ME01
+	v1 = v0 + (cellh - 2.0f);
+#else
 	v1 = v0 + cellh;
+#endif
 	t1 = n1 + h;
 	GXTexCoord2u16(u1, v1);
 	GXTexCoord2u8(t0, t1);

@@ -14,6 +14,9 @@
 #include "data/item_data.h"
 #include "memory.h"
 #include <string.h>
+#ifdef VERSION_G8ME01
+#include "mario/mariost.h"
+#endif
 
 #define CHECK_ITEM(id) ((s32 (*)(s32))pouchCheckItem)(id)
 
@@ -92,7 +95,11 @@ void pouchInit(void) {
 			party->techLevel = 0;
 		}
 	}
-	strcpy(mpp->yoshiName, "チビヨッシー\0\0\0"); //TODO: US
+#ifdef VERSION_G8ME01
+	strcpy(mpp->yoshiName, msgSearch("name_party3"));
+#else
+	strcpy(mpp->yoshiName, "チビヨッシー\0\0\0");
+#endif
 }
 
 ItemType pouchKeyItem(s32 id) {
@@ -110,6 +117,12 @@ ItemType pouchKeepItem(s32 id) {
 ItemType pouchHaveBadge(s32 id) {
 	return mpp->badges[id];
 }
+#ifdef VERSION_G8ME01
+ItemType L_pouchEquipBadge(s32 id) {
+	return mpp->equippedBadges[id];
+}
+
+#endif
 
 s32 pouchGetHaveItemCnt(void) {
 	s32 i, count;
@@ -497,6 +510,28 @@ void pouchHiraToKata(const char* src, char* dst) {
 	u16* s = (u16*)src;
 	u16* d = (u16*)dst;
 	s32 i;
+#ifdef VERSION_G8ME01
+	if ((u32)gp->language == 0) {
+		s = (u16*)src; /* FAKE: s and d re-assigned (both already hold these values) inside the language branch */
+		d = (u16*)dst;
+		for (i = 0; i < len; i++) {
+			c = *s;
+			if (c >= 0x829F && c < 0x82DE) {
+				c += 0xA1;
+			}
+			else if (c >= 0x82DE && c <= 0x82F1) {
+				c += 0xA2;
+			}
+			*d = c;
+			s++;
+			d++;
+		}
+		dst[i * 2] = 0;
+	} else {
+		strcpy(dst, src);
+	}
+}
+#else
 	for (i = 0; i < len; i++) {
 		c = *s;
 		if (c >= 0x829F && c < 0x82DE) {
@@ -511,13 +546,44 @@ void pouchHiraToKata(const char* src, char* dst) {
 	}
 	dst[i * 2] = 0;
 }
+#endif
 
 static inline void pouchAiueoConv(const char* src, char* dst) {
+#ifdef VERSION_G8ME01
+	u16* s;
+	u16* d;
+	s32 len = strlen(src) / 2;
+	u16 c;
+	s32 i;
+#else
 	u16* s = (u16*)src;
 	s32 len = strlen(src) / 2;
 	u16* d = (u16*)dst;
 	u16 c;
 	s32 i;
+#endif
+#ifdef VERSION_G8ME01
+	if ((u32)gp->language == 0) {
+		s = (u16*)src; /* FAKE: s and d set inside the language branch, the same spelling as in pouchHiraToKata */
+		d = (u16*)dst;
+		for (i = 0; i < len; i++) {
+			c = *s;
+			if (c >= 0x829F && c < 0x82DE) {
+				c += 0xA1;
+			}
+			else if (c >= 0x82DE && c <= 0x82F1) {
+				c += 0xA2;
+			}
+			*d = c;
+			s++;
+			d++;
+		}
+		dst[i * 2] = 0;
+	} else {
+		strcpy(dst, src);
+	}
+}
+#else
 	for (i = 0; i < len; i++) {
 		c = *s;
 		if (c >= 0x829F && c < 0x82DE) {
@@ -532,6 +598,7 @@ static inline void pouchAiueoConv(const char* src, char* dst) {
 	}
 	dst[i * 2] = 0;
 }
+#endif
 
 s32 comp_aiueo(const void* a, const void* b) {
 	char bufA[0x80];
@@ -579,6 +646,13 @@ void pouchSortItem(s32 mode) {
 	BOOL swap;
 	s16 t2, t1;
 	PouchData* pp[1];
+#ifdef VERSION_G8ME01
+	s16 bn;
+	s16 bj;
+	const char* idb;
+	s32 ca;
+	s32 cb;
+#endif
 
 	pp[0] = mpp;
 	if ((u32)mode <= 1 || mode == 7 || mode == 8) {
@@ -613,6 +687,69 @@ void pouchSortItem(s32 mode) {
 		else if (mode == 10) qqsort(keys, n, 2, comp_kind_r);
 		memcpy(pp[0]->keyItems, keys, sizeof(keys));
 	}
+#ifdef VERSION_G8ME01
+	if ((u32)(mode - 4) <= 2 || (u32)(mode - 11) <= 1 || mode == 13) {
+		/* FAKE: block-scoped (shadowing j/i) locals and separate sort counter m steer register colouring */
+		ItemData* a;
+		ItemData* b;
+		s32 m;
+		s32 j;
+		s32 i;
+		const char* ida;
+
+		i = 0;
+		for (n = 0; n < 200; n++) {
+			if (pp[0]->badges[n] != 0) {
+				badges[i] = pp[0]->badges[n];
+				i++;
+				equipped[i - 1] = pp[0]->equippedBadges[n];
+			}
+		}
+		for (n = i; n < 200; n++) {
+			badges[n] = 0;
+			equipped[n] = 0;
+		}
+		for (m = 0; m < i - 1; m++) {
+			for (j = m + 1; j < i; j++) {
+				BOOL swap;
+				bn = badges[m];
+				bj = badges[j];
+				a = &itemDataTable[bn];
+				ida = msgSearch(a->name);
+				b = &itemDataTable[bj];
+				idb = msgSearch(b->name);
+				ca = a->bp_cost;
+				cb = b->bp_cost;
+				swap = FALSE;
+				if (mode == 4) {
+					if (strcmp(ida, idb) > 0) swap = TRUE;
+				} else if (mode == 11) {
+					if (strcmp(ida, idb) < 0) swap = TRUE;
+				} else if (mode == 5) {
+					if (a->type_sort_order > b->type_sort_order) swap = TRUE;
+				} else if (mode == 12) {
+					if (a->type_sort_order < b->type_sort_order) swap = TRUE;
+				} else if (mode == 6) {
+					if (ca > cb) swap = TRUE;
+					else if (ca == cb && a->type_sort_order > b->type_sort_order) swap = TRUE;
+				} else if (mode == 13) {
+					if (ca < cb) swap = TRUE;
+					else if (ca == cb && a->type_sort_order < b->type_sort_order) swap = TRUE;
+				}
+				if (swap) {
+					t1 = badges[m];
+					t2 = equipped[m];
+					badges[m] = badges[j];
+					equipped[m] = equipped[j];
+					badges[j] = t1;
+					equipped[j] = t2;
+				}
+			}
+		}
+		memcpy(pp[0]->badges, badges, sizeof(badges));
+		memcpy(pp[0]->equippedBadges, equipped, sizeof(equipped));
+	}
+#else
 	if ((u32)(mode - 4) <= 2 || (u32)(mode - 11) <= 1 || mode == 13) {
 		i = 0;
 		for (n = 0; n < 200; n++) {
@@ -663,6 +800,7 @@ void pouchSortItem(s32 mode) {
 		memcpy(pp[0]->badges, badges, sizeof(badges));
 		memcpy(pp[0]->equippedBadges, equipped, sizeof(equipped));
 	}
+#endif
 }
 
 s32 pouchGetCoin(void) {

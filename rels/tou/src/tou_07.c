@@ -92,7 +92,7 @@ USER_FUNC(evt_sub_get_mapname);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_rumble_onoff);
-USER_FUNC(evt_tou_get_ranking_27_text_1ED4);
+USER_FUNC(evt_tou_get_ranking);
 USER_FUNC(mario_recovery);
 static USER_FUNC(paper_off);
 static USER_FUNC(paper_on);
@@ -135,10 +135,30 @@ static s32 evt_champion[578];
 s32 evt_champion_re[308];
 static s32 evt_dakuto[39];
 s32 evt_dakuto2[44];
+#ifdef VERSION_G8ME01
+s32 evt_tou_bed[440];
+#else
 s32 evt_tou_bed[432];
+#endif
 static __declspec(section ".data") s32 bed_entry[10];
 static s32 mobj_box00[34];
 s32 tou_07_init_evt[286];
+
+#ifdef VERSION_G8ME01
+s32 marioKeyOffChk(void);
+s32 marioCtrlOffChk(void);
+
+USER_FUNC(tou_07_mario_keyoff_check) {
+    s32* args = event->args;
+
+    if (marioKeyOffChk() || marioCtrlOffChk()) {
+        evtSetValue(event, args[0], 1);
+    } else {
+        evtSetValue(event, args[0], 0);
+    }
+    return EVT_RETURN_DONE;
+}
+#endif
 
 USER_FUNC(tou_07_snd_on) {
     psndClearFlag(0x80);
@@ -582,6 +602,12 @@ EVT_BEGIN(evt_dakuto2)
 EVT_END()
 
 EVT_BEGIN(evt_tou_bed)
+#ifdef VERSION_G8ME01
+    CALL(tou_07_mario_keyoff_check, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        RETURN
+    END_IF
+#endif
     CALL(evt_mario_key_onoff, 0)
     SET_VALUE(LF(0), 0)
     SET_VALUE(LF(1), 0)
@@ -730,14 +756,14 @@ EVT_BEGIN(tou_07_init_evt)
     CALL(evt_sub_animgroup_async, STRING("p_slit"))
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_EQUAL(GSWF(2389), 0)
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             IF_INT_LESS(GSW(0), 158)
                 SET_VALUE(GSW(0), 158)
             END_IF
         END_IF
     END_IF
-    CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+    CALL(evt_tou_get_ranking, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("e_1"), 1)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("e_2"), 1)

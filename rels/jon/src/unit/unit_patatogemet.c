@@ -106,7 +106,7 @@ __declspec(section ".data") s32 fd_patatogemet___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_patatogemet_one_negone_359;
 __declspec(section ".data") s32 fd_patatogemet___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_patatogemet_one_364[1];
-BattleUnitKind unit_patatogemet_15_data_3B6C8;
+BattleUnitKind unit_patatogemet;
 static s32 weapon_patamet_attack[48];
 static __declspec(section ".data") BattleUnitDefense defence_pata;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_pata;
@@ -197,7 +197,7 @@ __declspec(section ".data") s32 fd_patatogemet_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_patatogemet_15_data_3B6C8 = {
+BattleUnitKind unit_patatogemet = {
     105,
     "btl_un_patatogemet",
     5,
@@ -256,7 +256,11 @@ BattleUnitKind unit_patatogemet_15_data_3B6C8 = {
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
     0x4,
+#ifdef VERSION_G8ME01
+    (StatusVulnerability*)regist_pata,
+#else
     &regist,
+#endif
     1,
     parts_pata,
     init_event_pata,

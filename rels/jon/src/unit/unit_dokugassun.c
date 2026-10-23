@@ -90,7 +90,7 @@ __declspec(section ".data") s32 fd_dokugassun___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_dokugassun_one_negone_359;
 __declspec(section ".data") s32 fd_dokugassun___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_dokugassun_one_364[1];
-BattleUnitKind unit_dokugassun_15_data_5CC90;
+BattleUnitKind unit_dokugassun;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -159,7 +159,7 @@ __declspec(section ".data") s32 fd_dokugassun_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_dokugassun_15_data_5CC90 = {
+BattleUnitKind unit_dokugassun = {
     166,
     "btl_un_dokugassun",
     15,
@@ -245,7 +245,13 @@ static s32 weapon_dokugassun_attack[] = {
 };
 
 static s32 weapon_dokugassun_poisongas_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    1677721602,
+#else
+    1677721600,
+#endif
+    1065353216, 16843009, (s32)weaponGetPowerDefault,
     10, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 71, 2047, -2147483644,

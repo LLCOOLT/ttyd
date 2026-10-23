@@ -69,7 +69,7 @@ __declspec(section ".data") s32 fd_gundan_zako_magician___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_gundan_zako_magician_one_negone_359;
 __declspec(section ".data") s32 fd_gundan_zako_magician___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_gundan_zako_magician_one_364[1];
-BattleUnitKind unit_gundan_zako_magician_20_data_32438;
+BattleUnitKind unit_gundan_zako_magician;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -147,7 +147,7 @@ __declspec(section ".data") s32 fd_gundan_zako_magician_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_gundan_zako_magician_20_data_32438 = {
+BattleUnitKind unit_gundan_zako_magician = {
     119,
     "btl_un_gundan_zako_magician",
     9,
@@ -275,7 +275,11 @@ static s32 weapon_gundan_zako_magician_yokeyoke_bottle[] = {
 };
 
 static s32 weapon_gundan_zako_magician_minimini_bottle[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     3, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 7, 2047, -2147483648,

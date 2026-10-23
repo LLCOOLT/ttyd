@@ -11,7 +11,7 @@ USER_FUNC(evt_cloud_ent);
 USER_FUNC(evt_cloud_init);
 USER_FUNC(evt_hitobj_onoff);
 USER_FUNC(evt_item_entry);
-USER_FUNC(evt_kagemario_init_11_text_804);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_msg_print);
 USER_FUNC(evt_npc_flag_onoff);
@@ -25,7 +25,7 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill_11_data_4F98[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_gra_02_negone_one_374;
 __declspec(section ".data") s32 fd_gra_02_neg_one_382[1];
@@ -180,13 +180,13 @@ static __declspec(section ".data") s32 booboo_name[] = {
 EVT_BEGIN(gra_02_init_evt)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_GRA1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_USU1"))
-    CALL(evt_kagemario_init_11_text_804)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL(evt_item_entry, STRING("item00"), 125, -125, 0, -110, 16, GSWF(5631), 0)
     CALL(evt_item_entry, STRING("item01"), 125, 305, 0, -35, 16, GSWF(5632), 0)
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_11_data_4F98))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_LESS(GSW(0), 184)
         CALL(evt_item_entry, STRING("key00"), 21, -30, 0, 0, 0, -1, PTR(gra02_get_key))

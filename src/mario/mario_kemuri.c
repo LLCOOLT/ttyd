@@ -21,6 +21,9 @@ extern EffectEntry* effMugiKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 dir, 
 extern EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 
 #pragma dont_inline on
+#ifdef VERSION_G8ME01
+#define mario_kemuri_80130474 mario_kemuri
+#endif
 void kemuri(void);
 void kemuri_mugi(void);
 void mario_kemuri_landon(void);
@@ -211,7 +214,11 @@ void kemuri(void) {
     f32 s, c;
     f32 x, y, z;
 
+#ifdef VERSION_G8ME01
+    if (MS16(mario, 0x54) != 0 && MPTR(mario, MWOFF(0x208)) == NULL && mario->hitobjStandOn != NULL) {
+#else
     if (MS16(mario, 0x54) != 0 && MPTR(mario, 0x208) == NULL && mario->hitobjStandOn != NULL) {
+#endif
         if (mario->trigFlags & 0x20000) {
             mario->trigFlags &= ~0x20000;
         }
@@ -280,6 +287,57 @@ void kemuri(void) {
     }
 }
 
+#ifdef VERSION_G8ME01
+void party_kemuri(PartyEntry* party) {
+
+    if ((u32)marioStGetSystemLevel() == 0) {
+        if (party->runMode != 10) {
+            if (MU8(party, 0x32) != 1) {
+                if (party->runMode == 3 && party->currentMemberId == 4) {
+                    if (MPTR(party, 0x138) != NULL) {
+                        if (!(hitGetAttr(MPTR(party, 0x138)) & 0x100)) {
+                            if (party->moveSpeed < 2.0f) {
+                            }
+                            else if (MS8(party, 0x2c)++ > 6) {
+                                {
+                                    f32 x, y, z;
+                                    f32 c, s;
+                                    MS8(party, 0x2c) = 0;
+                                    sincosf(&s, &c, 6.2831855f * reviseAngle(-party->targetDir) / 360.0f);
+                                    effKemuri2Entry(0, party->position.x + 0.2f * (party->width * s), 1.5f + party->position.y, party->position.z + 0.2f * (party->width * c), s, c);
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        MS8(party, 0x2c) = 4;
+                    }
+                }
+                else if (party->field_36 == 1) {
+                    if (MPTR(party, 0x138) != NULL) {
+                        if (!(hitGetAttr(MPTR(party, 0x138)) & 0x100)) {
+                            if (party->moveSpeed < 2.0f) {
+                            }
+                            else if (MS8(party, 0x2c)++ > 6) {
+                                {
+                                    f32 x, y, z;
+                                    f32 c, s;
+                                    MS8(party, 0x2c) = 0;
+                                    sincosf(&s, &c, 6.2831855f * reviseAngle(-party->targetDir) / 360.0f);
+                                    effKemuri2Entry(0, party->position.x + 0.2f * (party->width * s), 1.5f + party->position.y, party->position.z + 0.2f * (party->width * c), s, c);
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        MS8(party, 0x2c) = 4;
+                    }
+                }
+            }
+        }
+    }
+}
+#else
 void party_kemuri(PartyEntry* party) {
 
     if (MU8(party, 0x32) != 1) {
@@ -319,4 +377,5 @@ void party_kemuri(PartyEntry* party) {
         }
     }
 }
+#endif
 #pragma dont_inline reset

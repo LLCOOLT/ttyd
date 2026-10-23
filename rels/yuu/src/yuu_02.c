@@ -14,6 +14,7 @@
 #include "dolphin/mtx.h"
 #include "driver/icondrv.h"
 #include "mario/mariost.h"
+#include "icon_ids.h"
 
 typedef struct MiniGameWork { EventEntry* event; EventEntry* subEvent; u16 flags; s32 type; s32 (*init)(EventEntry* event, BOOL isFirstCall); s32 (*main)(EventEntry* event, BOOL isFirstCall); void (*disp)(CameraId camera, void* param); void* data; } MiniGameWork;
 typedef struct RollWork { u32 flags; s32 phase; s32 coins; s32 result; s32 index; EventEntry* jumpEvent; Vec pos; s32 monteCount; EventEntry* viewEvent; } RollWork;
@@ -80,8 +81,8 @@ USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_yuucounter_alloc);
 USER_FUNC(evt_yuucounter_free);
 USER_FUNC(evt_yuuminigame_alloc);
-USER_FUNC(evt_yuuranking_alloc_31_text_52F8);
-USER_FUNC(evt_yuuranking_free_31_text_5274);
+USER_FUNC(evt_yuuranking_alloc);
+USER_FUNC(evt_yuuranking_free);
 USER_FUNC(evt_yuutitle_alloc);
 USER_FUNC(evt_yuutitle_free);
 static USER_FUNC(fall_rtn);
@@ -103,8 +104,8 @@ USER_FUNC(yuuminigame3_roll_fix_on);
 USER_FUNC(yuuminigame3_set_phase);
 USER_FUNC(yuuminigame_get_dataadr);
 USER_FUNC(yuuminigame_set_dataadr);
-USER_FUNC(yuuranking_get_monte_31_text_51C0);
-USER_FUNC(yuuranking_wait_button_31_text_51F8);
+USER_FUNC(yuuranking_get_monte);
+USER_FUNC(yuuranking_wait_button);
 BOOL yuuminigame3_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp, RollWork* data);
 void yuuminigame_disp_3roll(CameraId camera, void* param);
 void yuuminigame_main_3roll(EventEntry* event, BOOL isFirstCall);
@@ -148,7 +149,11 @@ s32 minigame03_start_cam_cancel[17];
 s32 minigame03_start[193];
 s32 minigame03_end[217];
 s32 s_en1_turn[30];
+#ifdef VERSION_G8ME01
+s32 yuu_02_init_evt[262];
+#else
 s32 yuu_02_init_evt[29];
+#endif
 
 __declspec(section ".data") u64 fd_yuu_02_negone_one_374 = 0xBF8000003F800000;
 
@@ -295,7 +300,7 @@ void yuu_02_icon_monte_disp(CameraId camera, void* param) {
                 if ((gp->retraceCount & 0x1F) < 9) {
                     pos.x -= 5.0f * dir;
                 }
-                iconDispGx(&pos, 0, 0x163, -2.0f * dir);
+                iconDispGx(&pos, 0, ICON_163, -2.0f * dir);
             }
         }
     }
@@ -350,7 +355,7 @@ static void monte_disp(CameraId camera, void* param) {
     if (monte != NULL) {
         for (i = 0; i < monte->num; i++) {
             if (monte[i].hidden == 0) {
-                iconDispGx(&monte[i].sub.pos, 0, 0x13F, 1.0f);
+                iconDispGx(&monte[i].sub.pos, 0, ICON_13F, 1.0f);
             }
         }
     }
@@ -857,18 +862,18 @@ EVT_BEGIN(minigame03_end)
     END_IF
     CALL(evt_yuucounter_free)
     CALL(yuugijou_montemedal_disp_onoff, 1)
-    CALL(evt_yuuranking_alloc_31_text_52F8, 0, 0, 2, 0, LW(0), LW(2), LW(1), 180)
+    CALL(evt_yuuranking_alloc, 0, 0, 2, 0, LW(0), LW(2), LW(1), 180)
     WAIT_FRAMES(1)
-    CALL(yuuranking_wait_button_31_text_51F8)
-    CALL(yuuranking_get_monte_31_text_51C0, LW(3))
+    CALL(yuuranking_wait_button)
+    CALL(yuuranking_get_monte, LW(3))
     CALL(yuugijou_add_montemedal, 0, LW(3))
     CALL(yuugijou_montemedal_wait)
-    CALL(evt_yuuranking_free_31_text_5274)
+    CALL(evt_yuuranking_free)
     WAIT_MS(200)
-    CALL(evt_yuuranking_alloc_31_text_52F8, 0, 0, 2, 1, LW(0), LW(2), LW(1), 180)
+    CALL(evt_yuuranking_alloc, 0, 0, 2, 1, LW(0), LW(2), LW(1), 180)
     WAIT_FRAMES(1)
-    CALL(yuuranking_wait_button_31_text_51F8)
-    CALL(evt_yuuranking_free_31_text_5274)
+    CALL(yuuranking_wait_button)
+    CALL(evt_yuuranking_free)
     SET_VALUE(LW(1), 10)
     CALL(yuugijou_get_montemedal, LW(0))
     IF_INT_LESS(LW(0), LW(1))
@@ -916,9 +921,49 @@ EVT_BEGIN(s_en1_turn)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_mapobj_flag_onoff);
+USER_FUNC(evt_sub_get_language);
+s32 yuu_02_init_evt[] = {
+    262235, (s32)evt_map_playanim, (s32)"den1", 1, 0, 262235, (s32)evt_map_playanim, (s32)"den2",
+    1, 0, 262235, (s32)evt_map_playanim, (s32)"kumo", 1, 0, 262235,
+    (s32)evt_map_playanim, (s32)"wakka", 1, 0, 65628, (s32)s_en1_turn, 65628, (s32)minigame03_main,
+    65630, (s32)evt_yuunpc_minigame3, 327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"J_mon", 16384,
+    327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"E_mon", 16384, 327771, (s32)evt_mapobj_flag_onoff,
+    1, 1, (s32)"D_mon", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 1,
+    (s32)"F_mon", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"Sp_mon", 16384,
+    327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"I_mon", 16384, 327771, (s32)evt_mapobj_flag_onoff,
+    1, 1, (s32)"S_den_mont", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 1,
+    (s32)"D_den_mont", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"E_den_mont", 16384,
+    327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"F_den_mont", 16384, 327771, (s32)evt_mapobj_flag_onoff,
+    1, 1, (s32)"I_den_mont", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 1,
+    (s32)"Sp_den_mont", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"J_kan", 16384,
+    327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"E_kan", 16384, 327771, (s32)evt_mapobj_flag_onoff,
+    1, 1, (s32)"D_kan", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 1,
+    (s32)"F_kan", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"Sp_kan", 16384,
+    327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"I_kan", 16384, 131163, (s32)evt_sub_get_language,
+    -30000000, 65570, -30000000, 65572, 0, 327771, (s32)evt_mapobj_flag_onoff, 1,
+    0, (s32)"J_mon", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"S_den_mont",
+    16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"J_kan", 16384, 65572,
+    1, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"E_mon", 16384, 327771,
+    (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"E_den_mont", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1,
+    0, (s32)"E_kan", 16384, 65572, 2, 327771, (s32)evt_mapobj_flag_onoff, 1,
+    0, (s32)"D_mon", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"D_den_mont",
+    16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"D_kan", 16384, 65572,
+    3, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"F_mon", 16384, 327771,
+    (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"F_den_mont", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1,
+    0, (s32)"F_kan", 16384, 65572, 4, 327771, (s32)evt_mapobj_flag_onoff, 1,
+    0, (s32)"Sp_mon", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"Sp_den_mont",
+    16384, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"Sp_kan", 16384, 65572,
+    5, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"I_mon", 16384, 327771,
+    (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"I_den_mont", 16384, 327771, (s32)evt_mapobj_flag_onoff, 1,
+    0, (s32)"I_kan", 16384, 49, 2, 1,
+};
+#else
 s32 yuu_02_init_evt[] = {
     262235, (s32)evt_map_playanim, (s32)"den1", 1, 0, 262235, (s32)evt_map_playanim, (s32)"den2",
     1, 0, 262235, (s32)evt_map_playanim, (s32)"kumo", 1, 0, 262235,
     (s32)evt_map_playanim, (s32)"wakka", 1, 0, 65628, (s32)s_en1_turn, 65628, (s32)minigame03_main,
     65630, (s32)evt_yuunpc_minigame3, 2, 1, 0,
 };
+#endif

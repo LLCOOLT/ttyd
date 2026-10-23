@@ -1,3 +1,4 @@
+#include "icon_ids.h"
 #include "battle/battle.h"
 #include "battle/battle_ac.h"
 #include "battle/battle_disp.h"
@@ -8,6 +9,10 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
+#include "version.h"
+// US battle texture ids are 0x16 higher for these entries.
+#define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
+
 
 s32 BattleACGetButtonIcon(s32 button, s32 pressed);
 
@@ -369,16 +374,16 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
     btlDispGXInit2DRasta();
     GXLoadPosMtxImm(cam->view, 0);
-    TEXPLANE(0x43, (GXColor){255, 255, 255, 255}, 0, x0, y1, 0.0f, 1.0f, 1.0f);
+    TEXPLANE(BTL_TEX(0x43), (GXColor){255, 255, 255, 255}, 0, x0, y1, 0.0f, 1.0f, 1.0f);
     t = 2.0f + (8.0f + x0);
     for (i = 0; i < q; i++) {
         if (i != q - 1) {
-            TEXPLANE(0x44, (GXColor){255, 255, 255, 255}, 0, t + (f32)(i * 4), y1, 0.0f, 1.0f, 1.0f);
+            TEXPLANE(BTL_TEX(0x44), (GXColor){255, 255, 255, 255}, 0, t + (f32)(i * 4), y1, 0.0f, 1.0f, 1.0f);
         } else {
-            TEXPLANE(0x44, (GXColor){255, 255, 255, 255}, 0, (f32)r + (t + (f32)(i * 4)), y1, 0.0f, 1.0f, 1.0f);
+            TEXPLANE(BTL_TEX(0x44), (GXColor){255, 255, 255, 255}, 0, (f32)r + (t + (f32)(i * 4)), y1, 0.0f, 1.0f, 1.0f);
         }
     }
-    TEXPLANE(0x43, (GXColor){255, 255, 255, 255}, 0, 16.0f + x0 + (f32)v, y1, 0.0f, -1.0f, 1.0f);
+    TEXPLANE(BTL_TEX(0x43), (GXColor){255, 255, 255, 255}, 0, 16.0f + x0 + (f32)v, y1, 0.0f, -1.0f, 1.0f);
     ratio = gw->cursor / 100.0f;
     if (ratio > 1.0f) {
         ratio = 1.0f;
@@ -399,9 +404,9 @@ static void actionCommandDisp(f32 x, f32 y) {
     for (i = 0; i < cnt; i++) {
         f32 target = gw->targets[i];
         if (target <= gw->cursor || __fabs(gw->cursor - target) <= 6.0) {
-            id = 0x95;
+            id = ICON_095;
         } else {
-            id = 0x91;
+            id = ICON_091;
         }
         pos = (Vec){0.0f, 0.0f, 0.0f};
         d0 = (Vec){0.0f, 0.0f, 0.0f};
@@ -450,16 +455,16 @@ static void actionCommandDisp(f32 x, f32 y) {
     for (i = 0; i < ((GT2Params*)ac)->count; i++) {
         switch (gw->state[i]) {
             case 1:
-                id = 0x3E;
+                id = BTL_TEX(0x3E);
                 break;
             case -1:
-                id = 0x3F;
+                id = BTL_TEX(0x3F);
                 break;
             default:
-                id = 0x45;
+                id = BTL_TEX(0x45);
                 break;
         }
-        if ((u16)id != 0x45) {
+        if ((u16)id != BTL_TEX(0x45)) {
             TEXPLANE((u16)id, (GXColor){255, 255, 255, 255}, 0, - 288.0f + x + (((f32)gw->width) * gw->targets[i]) / 100.0f, y4, 0.0f, 1.0f, 1.0f);
         }
     }

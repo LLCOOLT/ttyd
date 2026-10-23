@@ -1,3 +1,5 @@
+#include "version.h"
+#include "icon_ids.h"
 #include "battle/battle.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
@@ -171,10 +173,10 @@ static s32 _restore_koura_pose[47];
 static s32 _koura_rotate_start[199];
 static s32 _koura_rotate_stop[13];
 s32 partyNokotarouAttack_FirstAttack[236];
-s32 partyNokotarouAttack_NormalAttack[793];
-s32 partyNokotarouAttack_SyubibinKoura[691];
+s32 partyNokotarouAttack_NormalAttack[VERSION_PICK(793, 804)];
+s32 partyNokotarouAttack_SyubibinKoura[VERSION_PICK(691, 702)];
 s32 partyNokotarouAttack_KouraGuard[838];
-s32 partyNokotarouAttack_TsuranukiKoura[931];
+s32 partyNokotarouAttack_TsuranukiKoura[VERSION_PICK(931, 942)];
 s32 nokotarou_appeal_event[34];
 static s32 party_win_reaction[16];
 static s32 attack_audience_event[263];
@@ -432,7 +434,7 @@ static EVT_BEGIN(wakeup_event)
 EVT_END()
 
 s32 partyWeapon_NokotarouFirstAttack[] = {
-    0, 22020096, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerFromPartyAttackLv,
+    0, VERSION_PICK(22020096, 22544384), 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerFromPartyAttackLv,
     2, 2, 3, 3, 5, 5, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 553664516, 525058, 0, 131215, 2047, -2147475452,
@@ -441,25 +443,25 @@ s32 partyWeapon_NokotarouFirstAttack[] = {
 };
 
 s32 partyWeapon_NokotarouKouraAttack[] = {
-    (s32)"btl_wn_pnk_normal", 22020096, 0, (s32)"msg_pnk_normal_attack", 1677721600, 1065353216, 16868402, (s32)weaponGetPowerFromPartyAttackLv,
+    (s32)"btl_wn_pnk_normal", VERSION_PICK(22020096, 22544384), 0, (s32)"msg_pnk_normal_attack", 1677721600, 1065353216, 16868402, (s32)weaponGetPowerFromPartyAttackLv,
     1, 2, 2, 3, 3, 5, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 16781920, 553664516, 525058, (s32)"msg_ac_hammer", 196743, 1535, -2147475452,
     0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)partyNokotarouAttack_NormalAttack, 100, 131584, 0,
+    0, 0, 0, 0, (s32)partyNokotarouAttack_NormalAttack, 100, VERSION_PICK(131584, 262656), 0,
 };
 
 s32 partyWeapon_NokotarouSyubibinKoura[] = {
-    (s32)"btl_wn_pnk_lv1", 22085632, 0, (s32)"msg_pnk_syubibin_koura", 1677918208, 1065353216, 33907762, (s32)weaponGetPowerFromPartyAttackLv,
+    (s32)"btl_wn_pnk_lv1", VERSION_PICK(22085632, 22609920), 0, (s32)"msg_pnk_syubibin_koura", 1677918208, 1065353216, VERSION_PICK(33907762, 17130546), (s32)weaponGetPowerFromPartyAttackLv,
     1, 2, 2, 3, 3, 5, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536887300, 525058, (s32)"msg_ac_koura_shubibin", 131207, 1535, -2147475452,
     0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)partyNokotarouAttack_SyubibinKoura, 100, 328960, 0,
+    0, 0, 0, 0, (s32)partyNokotarouAttack_SyubibinKoura, 100, VERSION_PICK(328960, 656640), 0,
 };
 
 s32 partyWeapon_NokotarouKouraGuard[] = {
-    (s32)"btl_wn_pnk_lv2", 22151168, 0, (s32)"msg_pnk_koura_no_mamori", 1677983744, 1065353216, 17130546, 0,
+    (s32)"btl_wn_pnk_lv2", VERSION_PICK(22151168, 22675456), 0, (s32)"msg_pnk_koura_no_mamori", 1677983744, 1065353216, 17130546, 0,
     0, 2, 2, 3, 3, 4, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17891360, 268435456, 770, (s32)"msg_ac_koura_no_mamori", 131072, 2047, -2147475452,
@@ -468,12 +470,12 @@ s32 partyWeapon_NokotarouKouraGuard[] = {
 };
 
 s32 partyWeapon_NokotarouTsuranukiKoura[] = {
-    (s32)"btl_wn_pnk_lv3_tsuranuki", 22216704, 0, (s32)"msg_pnk_koura_tsuranuki", 1678114816, 1065353216, 50684978, (s32)weaponGetACOutputParam,
+    (s32)"btl_wn_pnk_lv3_tsuranuki", VERSION_PICK(22216704, 22740992), 0, (s32)"msg_pnk_koura_tsuranuki", 1678114816, 1065353216, VERSION_PICK(50684978, 17130546), (s32)weaponGetACOutputParam,
     2, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536887300, 770, (s32)"msg_ac_tsuranuki_koura", 131271, 1535, -2147475452,
     0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)partyNokotarouAttack_TsuranukiKoura, 100, 328960, 0,
+    0, 0, 0, 0, (s32)partyNokotarouAttack_TsuranukiKoura, 100, VERSION_PICK(328960, 656640), 0,
 };
 
 static EVT_BEGIN(_change_koura_pose)
@@ -617,6 +619,111 @@ EVT_BEGIN(partyNokotarouAttack_FirstAttack)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+s32 partyNokotarouAttack_NormalAttack[] = {
+    196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096, -29999997, -1, 65540,
+    99, 33, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -29999988, 131163, (s32)btlevtcmd_WeaponAftereffect,
+    -29999988, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996, 65627, (s32)btlevtcmd_WaitGuardMove,
+    131163, (s32)btlevtcmd_CommandPayWeaponCost, -2, 196699, (s32)btlevtcmd_RunDataEventChild, -2, 7, 196699,
+    (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2, 1,
+    196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0, 200,
+    327771, (s32)evt_btl_camera_set_posoffset, 0, 20, 0, 0, 65545, 20,
+    458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996, 16, -29999985,
+    196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 65630, (s32)_change_koura_pose, 262235, (s32)btlevtcmd_AnimeChangePoseType,
+    -2, 1, 50, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_NOKO_ATTACK1", -29999987, 131122,
+    -30000000, 15, 262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 45, 65630,
+    (s32)_koura_rotate_start, 131163, (s32)btlevtcmd_CommandGetWeaponActionLv, -30000000, 196699, (s32)btlevtcmd_AcSetDifficulty, -2, -30000000,
+    131163, (s32)btlevtcmd_AcGetDifficulty, -30000000, 131126, -30000000, 3, 65570, -30000000,
+    65576, -3, 131122, -30000000, 360, 131122, -29999999, 100,
+    65572, -2, 131122, -30000000, 280, 131122, -29999999, 150,
+    65572, -1, 131122, -30000000, 240, 131122, -29999999, 200,
+    65572, 0, 131122, -30000000, 200, 131122, -29999999, 250,
+    65572, 1, 131122, -30000000, 200, 131122, -29999999, 360,
+    65572, 2, 131122, -30000000, 200, 131122, -29999999, 600,
+    42, 131122, -30000000, 200, 131122, -29999999, 960, 49,
+    589915, (s32)btlevtcmd_AcSetParamAll, 2, -30000000, 0, 1, -29999999, -250000000,
+    -250000000, -250000000, 131163, (s32)btlevtcmd_AcSetFlag, 3, 327771, (s32)btlevtcmd_SetupAC, -2,
+    19, 1, 60, 65545, 22, 65647, -29999985, 65541,
+    10000, 196699, (s32)btlevtcmd_AcGetOutputParam, 0, -30000000, 131097, -30000000, 0,
+    7, 33, 65545, 1, 6, 131122, -29999994, 0,
+    65541, 10000, 131125, -29999994, 1, 131099, -29999994, 100,
+    131122, -29999994, 100, 33, 262235, (s32)btlevtcmd_SetUnitWork, -2, 5,
+    -29999994, 262235, (s32)btlevtcmd_GetUnitWork, -2, 4, -30000000, 262235, (s32)btlevtcmd_GetUnitWork,
+    -2, 5, -29999999, 131127, -30000000, -29999999, 131128, -30000000,
+    100, 196699, (s32)evt_snd_sfx_pit, -29999987, -30000000, 65545, 1, 6,
+    112, 393307, (s32)btlevtcmd_CommandPreCheckDamage, -2, -29999997, -29999996, 256, -29999994,
+    196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 4, 196699, (s32)evt_btl_camera_set_zoom, 0, 400,
+    131163, (s32)btlevtcmd_StartAC, 1, 65627, (s32)btlevtcmd_ResultAC, 65631, -29999985, 262235,
+    (s32)btlevtcmd_SetUnitWork, -2, 5, 0, 131163, (s32)evt_snd_sfxoff, -29999987, 196699,
+    (s32)evt_snd_sfxon, (s32)"SFX_BTL_NOKO_ATTACK2", 0, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699,
+    (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 327771, (s32)evt_btl_camera_set_posoffset, 0, 0, 0,
+    0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 50, 196699, (s32)btlevtcmd_SetMoveSpeed,
+    -2, -229989760, 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000, -29999999, -29999998,
+    393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998, 131125,
+    -29999998, 5, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 458843,
+    (s32)btlevtcmd_GetMoveFrame, -2, -30000000, -29999999, -29999998, 0, -29999987, 524379,
+    (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, -29999987, 0, 0,
+    131097, -29999994, 1, 131096, -29999994, 3, 196699, (s32)btlevtcmd_StartAvoid,
+    -29999997, 38, 33, 131096, -29999994, 6, 196699, (s32)btlevtcmd_StartAvoid,
+    -29999997, 39, 33, 131096, -29999994, 2, 196699, (s32)btlevtcmd_StartAvoid,
+    -29999997, 40, 33, 65627, (s32)btlevtcmd_StopAC, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2,
+    -30000000, 40, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998,
+    0, -1, 0, 65630, (s32)_koura_rotate_stop, 65630, (s32)_restore_koura_pose, 262235,
+    (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 43, 65545, 30, 65627, (s32)evt_audience_ap_recovery,
+    65627, (s32)btlevtcmd_InviteApInfoReport, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42, 196699,
+    (s32)btlevtcmd_SetMoveSpeed, -2, -229993856, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999,
+    -29999998, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0,
+    -1, 0, 65540, 99, 33, 196699, (s32)evt_btl_camera_set_mode, 0,
+    0, 393307, (s32)btlevtcmd_CommandPreCheckCounter, -2, -29999997, -29999996, 256, -30000000,
+    131097, -30000000, 0, 262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 0,
+    327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0, 65630, (s32)_koura_rotate_stop,
+    33, 131163, (s32)btlevtcmd_GetResultAC, -30000000, 131102, -30000000, 2, 393307,
+    (s32)btlevtcmd_CommandCheckDamage, -2, -29999997, -29999996, 131328, -29999995, 262235, (s32)btlevtcmd_GetResultPrizeLv,
+    -29999997, 0, -29999994, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000,
+    -29999999, -29999998, 327771, (s32)btlevtcmd_ACSuccessEffect, -29999994, -30000000, -29999999, -29999998,
+    196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000, 196699, (s32)btlevtcmd_AudienceDeclareACResult, -30000000, -29999994,
+    32, 393307, (s32)btlevtcmd_CommandCheckDamage, -2, -29999997, -29999996, 256, -29999995,
+    196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000, 196699, (s32)btlevtcmd_AudienceDeclareACResult, -30000000, -1,
+    33, 65539, 90, 65627, (s32)btlevtcmd_StopAC, 196699, (s32)btlevtcmd_SetFallAccel, -2,
+    -229999284, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 262235,
+    (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000,
+    30, 110, 393307, (s32)btlevtcmd_ACRStart, -2, 0, 17, 17,
+    0, 112, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998,
+    18, -1, 196699, (s32)btlevtcmd_ACRGetResult, -29999994, -29999993, 131096, -29999994,
+    2, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000, 393307, (s32)btlevtcmd_AudienceDeclareAcrobatResult, -30000000,
+    1, 0, 0, 0, 327771, (s32)btlevtcmd_SetRotateOffset, -2, 0,
+    10, 0, 65541, 9, 327771, (s32)btlevtcmd_AddRotate, -2, 0,
+    0, 20, 65545, 1, 6, 196699, (s32)btlevtcmd_SetFallAccel, -2,
+    -229999284, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 180, 0, 262235,
+    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PNK_E_2", 110, 262235, (s32)btlevtcmd_SetUnitWork, -2,
+    1, 45, 65539, 91, 262235, (s32)btlevtcmd_GetUnitWork, -2, 1,
+    -30000000, 131100, -30000000, 0, 65540, 92, 33, 131126,
+    -30000000, 1, 262235, (s32)btlevtcmd_SetUnitWork, -2, 1, -30000000, 65545,
+    2, 65540, 91, 65539, 92, 112, 393307, (s32)btlevtcmd_ACRStart,
+    -2, 60, 90, 90, 0, 196699, (s32)btlevtcmd_ACRGetResult, -29999994,
+    -29999993, 131096, -29999994, 1, 65540, 94, 33, 131097,
+    -29999994, 2, 65540, 94, 33, 65630, (s32)_koura_rotate_stop, 65541,
+    6, 65545, 1, 327771, (s32)btlevtcmd_AddRotate, -2, 0, 45,
+    0, 6, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PNK_E_3", 65541,
+    6, 65545, 1, 327771, (s32)btlevtcmd_AddRotate, -2, 0, 15,
+    0, 6, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000, 393307, (s32)btlevtcmd_AudienceDeclareAcrobatResult,
+    -30000000, 1, 0, 0, 0, 65545, 60, 65540,
+    95, 65539, 94, 65630, (s32)_koura_rotate_stop, 65627, (s32)evt_audience_acrobat_notry, 65630,
+    (s32)_restore_koura_pose, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 43, 65545, 30,
+    65540, 95, 33, 196699, (s32)btlevtcmd_SetFallAccel, -2, -229999386, 262235,
+    (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 20, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000,
+    -29999999, -29999998, 12, -1, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000,
+    8, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 8,
+    -1, 65630, (s32)_restore_koura_pose, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 43,
+    65545, 30, 65539, 95, 65627, (s32)evt_audience_ap_recovery, 65627, (s32)btlevtcmd_InviteApInfoReport,
+    196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1,
+    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42, 196699, (s32)btlevtcmd_SetMoveSpeed, -2,
+    -229993856, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 524379,
+    (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, -1, 0,
+    65539, 99, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 65630, (s32)btldefaultevt_SuitoruBadgeEffect, 131163,
+    (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
+};
+#else
 s32 partyNokotarouAttack_NormalAttack[] = {
     196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096, -29999997, -1, 65540,
     99, 33, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -29999988, 131163, (s32)btlevtcmd_WeaponAftereffect,
@@ -719,7 +826,100 @@ s32 partyNokotarouAttack_NormalAttack[] = {
     (s32)btlevtcmd_ResetFaceDirection, -2, 65630, (s32)btldefaultevt_SuitoruBadgeEffect, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2,
     1,
 };
+#endif
 
+#ifdef VERSION_G8ME01
+s32 partyNokotarouAttack_SyubibinKoura[] = {
+    196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096, -29999997, -1, 65540,
+    99, 33, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -29999988, 131163, (s32)btlevtcmd_WeaponAftereffect,
+    -29999988, 131163, (s32)btlevtcmd_AttackDeclareAll, -2, 65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost,
+    -2, 196699, (s32)btlevtcmd_RunDataEventChild, -2, 7, 196699, (s32)evt_btl_camera_set_mode, 0,
+    7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2, 1, 196699, (s32)evt_btl_camera_set_moveSpeedLv,
+    0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0, 200, 327771, (s32)evt_btl_camera_set_posoffset,
+    0, 20, 0, 0, 65545, 20, 65630, (s32)_change_koura_pose,
+    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 50, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_NOKO_SHUBIBIN1",
+    -29999987, 262235, (s32)btlevtcmd_SetUnitWork, -2, 5, 0, 131122, -30000000,
+    15, 262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 45, 65630, (s32)_koura_rotate_start,
+    131163, (s32)btlevtcmd_CommandGetWeaponActionLv, -30000000, 196699, (s32)btlevtcmd_AcSetDifficulty, -2, -30000000, 131163,
+    (s32)btlevtcmd_AcGetDifficulty, -30000000, 131126, -30000000, 3, 65570, -30000000, 65576,
+    -3, 131122, -30000000, 480, 131122, -29999999, 240, 65572,
+    -2, 131122, -30000000, 300, 131122, -29999999, 180, 65572,
+    -1, 131122, -30000000, 240, 131122, -29999999, 120, 65572,
+    0, 131122, -30000000, 180, 131122, -29999999, 105, 65572,
+    1, 131122, -30000000, 150, 131122, -29999999, 90, 65572,
+    2, 131122, -30000000, 120, 131122, -29999999, 60, 42,
+    131122, -30000000, 100, 131122, -29999999, 30, 49, 589915,
+    (s32)btlevtcmd_AcSetParamAll, 2, -30000000, 1, 95, -29999999, -250000000, -250000000,
+    -250000000, 131163, (s32)btlevtcmd_AcSetFlag, 3, 327771, (s32)btlevtcmd_SetupAC, -2, 19,
+    1, 60, 65545, 22, 65647, -29999985, 65541, 10000,
+    196699, (s32)btlevtcmd_AcGetOutputParam, 0, -30000000, 131097, -30000000, 0, 7,
+    33, 65545, 1, 6, 131122, -29999994, 0, 65541,
+    10000, 131125, -29999994, 1, 131099, -29999994, 200, 131122,
+    -29999994, 200, 33, 131122, -29999993, -29999994, 131128, -29999993,
+    2, 262235, (s32)btlevtcmd_SetUnitWork, -2, 5, -29999993, 262235, (s32)btlevtcmd_GetUnitWork,
+    -2, 4, -30000000, 262235, (s32)btlevtcmd_GetUnitWork, -2, 5, -29999999,
+    131127, -30000000, -29999999, 131128, -30000000, 100, 196699, (s32)evt_snd_sfx_pit,
+    -29999987, -30000000, 65545, 1, 6, 112, 196699, (s32)evt_btl_camera_set_moveSpeedLv,
+    0, 4, 196699, (s32)evt_btl_camera_set_zoom, 0, 400, 131163, (s32)btlevtcmd_StartAC,
+    1, 65627, (s32)btlevtcmd_ResultAC, 65627, (s32)btlevtcmd_StopAC, 65631, -29999985, 262235,
+    (s32)btlevtcmd_SetUnitWork, -2, 5, 0, 131163, (s32)evt_snd_sfxoff, -29999987, 196699,
+    (s32)evt_snd_sfxon, (s32)"SFX_BTL_NOKO_SHUBIBIN2", 0, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699,
+    (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 327771, (s32)evt_btl_camera_set_posoffset, 0, 0, 0,
+    0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 50, 131122, -29999990,
+    0, 65539, 10, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229989760, 327771,
+    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_GetHitPos, -29999997,
+    -29999996, -30000000, -29999995, -29999995, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000,
+    -29999999, -29999998, 0, 0, 0, 393307, (s32)btlevtcmd_CommandPreCheckDamage, -2,
+    -29999997, -29999996, 256, -29999994, 131097, -29999994, 1, 131096,
+    -29999994, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38, 33, 131096,
+    -29999994, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 39, 33, 131096,
+    -29999994, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 33, 65540,
+    50, 33, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv,
+    0, 0, 393307, (s32)btlevtcmd_CommandPreCheckCounter, -2, -29999997, -29999996, 256,
+    -30000000, 131097, -30000000, 0, 262235, (s32)btlevtcmd_SetUnitWork, -2, 1,
+    0, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0, 65630,
+    (s32)_koura_rotate_stop, 33, 131163, (s32)btlevtcmd_GetResultAC, -30000000, 131102, -30000000, 2,
+    393307, (s32)btlevtcmd_CommandCheckDamage, -2, -29999997, -29999996, 131328, -29999995, 262235,
+    (s32)btlevtcmd_GetResultPrizeLv, -29999997, 0, -29999994, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996,
+    -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_ACSuccessEffect, -29999994, -30000000, -29999999,
+    -29999998, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000, 196699, (s32)btlevtcmd_AudienceDeclareACResult, -30000000,
+    -29999994, 32, 393307, (s32)btlevtcmd_CommandCheckDamage, -2, -29999997, -29999996, 256,
+    -29999995, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000, 196699, (s32)btlevtcmd_AudienceDeclareACResult, -30000000,
+    -1, 33, 65539, 50, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996,
+    131097, -29999997, -1, 131125, -29999990, 1, 65540, 10,
+    33, 65539, 80, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998,
+    524379, (s32)btlevtcmd_MovePosition, -2, 400, -29999999, -29999998, 0, 0,
+    0, 65539, 90, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699,
+    (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999,
+    -29999998, 131127, -30000000, -1, 327771, (s32)btlevtcmd_SetPos, -2, -30000000,
+    -29999999, -29999998, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998,
+    524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, 0,
+    0, 393307, (s32)btlevtcmd_ACRStart, -2, 0, 9, 9, 0,
+    196699, (s32)btlevtcmd_ACRGetResult, -29999994, -29999993, 131096, -29999994, 2, 196699,
+    (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000, 393307, (s32)btlevtcmd_AudienceDeclareAcrobatResult, -30000000, 1, 0,
+    0, 0, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0,
+    262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 12, 327771, (s32)btlevtcmd_GetPos, -2,
+    -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetFallAccel, -2, -229999693, 458843,
+    (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 30, -1, 262235,
+    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PNK_E_1", 65545, 10, 393307, (s32)btlevtcmd_ACRStart,
+    -2, 49, 79, 79, 0, 196699, (s32)btlevtcmd_ACRGetResult, -29999994,
+    -29999993, 131097, -29999994, 2, 65630, (s32)_koura_rotate_stop, 262235, (s32)btlevtcmd_AnimeChangePose,
+    -2, 1, (s32)"PNK_E_2", 65541, 6, 65545, 1, 327771,
+    (s32)btlevtcmd_AddRotate, -2, 0, 45, 0, 6, 262235, (s32)btlevtcmd_AnimeChangePose,
+    -2, 1, (s32)"PNK_S_1", 65541, 6, 65545, 1, 327771,
+    (s32)btlevtcmd_AddRotate, -2, 0, 15, 0, 6, 65627, (s32)evt_audience_acrobat_notry,
+    65540, 99, 33, 65630, (s32)_koura_rotate_stop, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
+    1, (s32)"PNK_E_2", 65541, 6, 65545, 1, 327771, (s32)btlevtcmd_AddRotate,
+    -2, 0, 45, 0, 6, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
+    1, (s32)"PNK_E_3", 65541, 6, 65545, 1, 327771, (s32)btlevtcmd_AddRotate,
+    -2, 0, 15, 0, 6, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2,
+    -30000000, 393307, (s32)btlevtcmd_AudienceDeclareAcrobatResult, -30000000, 1, 0, 0, 0,
+    65545, 60, 65540, 99, 33, 65630, (s32)_restore_koura_pose, 262235,
+    (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 43, 65545, 30, 65539, 99,
+    65627, (s32)evt_audience_ap_recovery, 65627, (s32)btlevtcmd_InviteApInfoReport, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 65630,
+    (s32)btldefaultevt_SuitoruBadgeEffect, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
+};
+#else
 s32 partyNokotarouAttack_SyubibinKoura[] = {
     196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096, -29999997, -1, 65540,
     99, 33, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -29999988, 131163, (s32)btlevtcmd_WeaponAftereffect,
@@ -809,6 +1009,7 @@ s32 partyNokotarouAttack_SyubibinKoura[] = {
     (s32)btlevtcmd_InviteApInfoReport, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 65630, (s32)btldefaultevt_SuitoruBadgeEffect, 131163, (s32)btlevtcmd_StartWaitEvent,
     -2, 2, 1,
 };
+#endif
 
 s32 partyNokotarouAttack_KouraGuard[] = {
     196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096, -29999997, -1, 65540,
@@ -918,6 +1119,128 @@ s32 partyNokotarouAttack_KouraGuard[] = {
     -2, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
 };
 
+#ifdef VERSION_G8ME01
+s32 partyNokotarouAttack_TsuranukiKoura[] = {
+    196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096, -29999997, -1, 65540,
+    99, 33, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -29999988, 131163, (s32)btlevtcmd_WeaponAftereffect,
+    -29999988, 131163, (s32)btlevtcmd_AttackDeclareAll, -2, 65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost,
+    -2, 196699, (s32)btlevtcmd_RunDataEventChild, -2, 7, 196699, (s32)evt_btl_camera_set_mode, 0,
+    7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2, 1, 196699, (s32)evt_btl_camera_set_moveSpeedLv,
+    0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0, 200, 327771, (s32)evt_btl_camera_set_posoffset,
+    0, 20, 0, 0, 65545, 20, 196699, (s32)evt_btl_camera_set_moveSpeedLv,
+    0, 4, 196699, (s32)evt_btl_camera_set_zoom, 0, 400, 131163, (s32)btlevtcmd_CommandGetWeaponActionLv,
+    -30000000, 196699, (s32)btlevtcmd_AcSetDifficulty, -2, -30000000, 131163, (s32)btlevtcmd_AcGetDifficulty, -30000000,
+    131126, -30000000, 3, 65570, -30000000, 65576, -3, 131122,
+    -30000000, 25, 131122, -29999999, 15, 65572, -2, 131122,
+    -30000000, 24, 131122, -29999999, 21, 65572, -1, 131122,
+    -30000000, 22, 131122, -29999999, 24, 65572, 0, 131122,
+    -30000000, 20, 131122, -29999999, 25, 65572, 1, 131122,
+    -30000000, 17, 131122, -29999999, 27, 65572, 2, 131122,
+    -30000000, 15, 131122, -29999999, 30, 42, 131122, -30000000,
+    12, 131122, -29999999, 30, 49, 589915, (s32)btlevtcmd_AcSetParamAll, 7,
+    200, 178, -30000000, -29999999, 20, 61, -250000000, 327771,
+    (s32)btlevtcmd_AcSetGaugeParam, 60, 80, 100, 100, 131163, (s32)btlevtcmd_AcSetFlag, 0,
+    327771, (s32)btlevtcmd_SetupAC, -2, 6, 1, 0, 65545, 22,
+    262235, (s32)btlevtcmd_SetUnitWork, -2, 3, -1, 65647, -29999985, 65539,
+    5, 196699, (s32)btlevtcmd_AcGetOutputParam, 0, -30000000, 131096, -30000000, 0,
+    65545, 1, 65540, 5, 33, 65630, (s32)_change_koura_pose_fast, 327771,
+    (s32)btlevtcmd_SetPartsWork, -2, 1, 0, 1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2,
+    1, 50, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_NOKO_IPPATSU1", -29999987, 262235, (s32)btlevtcmd_SetUnitWork,
+    -2, 3, -29999987, 262235, (s32)btlevtcmd_SetUnitWork, -2, 5, 0,
+    131122, -30000000, 15, 262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 15,
+    65630, (s32)_koura_rotate_start, 112, 110, 131163, (s32)btlevtcmd_WaitEventEnd, -29999985, 131163,
+    (s32)_tsuranuki_effect_control, -2, 112, 131163, (s32)btlevtcmd_StartAC, 1, 65647, -29999986,
+    131122, -29999995, 5, 65541, -29999995, 196699, (s32)btlevtcmd_AcGetOutputParam, 2,
+    -30000000, 65570, -30000000, 65576, 1, 327771, (s32)btlevtcmd_SetPartsWork, -2,
+    1, 1, 0, 65572, 2, 327771, (s32)btlevtcmd_SetPartsWork, -2,
+    1, 1, 1, 262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 24,
+    65572, 3, 327771, (s32)btlevtcmd_SetPartsWork, -2, 1, 1, 2,
+    262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 36, 65572, 4, 327771,
+    (s32)btlevtcmd_SetPartsWork, -2, 1, 1, 3, 262235, (s32)btlevtcmd_SetUnitWork, -2,
+    1, 45, 49, 262235, (s32)btlevtcmd_GetUnitWork, -2, 3, -29999987,
+    131097, -29999987, -1, 196699, (s32)btlevtcmd_AcGetOutputParam, 1, -29999999, 262235,
+    (s32)btlevtcmd_SetUnitWork, -2, 5, -29999999, 262235, (s32)btlevtcmd_GetUnitWork, -2, 4,
+    -30000000, 262235, (s32)btlevtcmd_GetUnitWork, -2, 5, -29999999, 131127, -30000000,
+    -29999999, 131128, -30000000, 100, 196699, (s32)evt_snd_sfx_pit, -29999987, -30000000,
+    33, 65545, 1, 131122, -29999995, 5, 6, 112,
+    65627, (s32)btlevtcmd_ResultAC, 65631, -29999986, 196699, (s32)btlevtcmd_AcGetOutputParam, 0, -30000000,
+    131096, -30000000, 0, 65631, -29999985, 327771, (s32)btlevtcmd_SetPartsWork, -2,
+    1, 0, 0, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PNK_K_2",
+    65541, 10, 327771, (s32)btlevtcmd_AddRotate, -2, 0, 12, 0,
+    65545, 1, 6, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PNK_K_1",
+    65541, 16, 327771, (s32)btlevtcmd_AddRotate, -2, 0, 20, 0,
+    65545, 1, 6, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PNK_H_1",
+    65541, 14, 327771, (s32)btlevtcmd_AddRotate, -2, 0, 20, 0,
+    65545, 1, 6, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0,
+    0, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_ACROBAT_SHAKE1", 0, 65545, 40, 327771,
+    (s32)btlevtcmd_SetPartsWork, -2, 1, 2, 1, 65630, (s32)_restore_koura_pose, 262235,
+    (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 43, 65545, 30, 65540, 99,
+    33, 131163, (s32)btlevtcmd_WaitEventEnd, -29999985, 327771, (s32)btlevtcmd_SetPartsWork, -2, 1,
+    0, 0, 262235, (s32)btlevtcmd_GetUnitWork, -2, 3, -29999987, 131163,
+    (s32)evt_snd_sfxoff, -29999987, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_NOKO_IPPATSU2", 0, 65627, (s32)btlevtcmd_StopAC,
+    65631, -29999985, 262235, (s32)btlevtcmd_SetUnitWork, -2, 5, 0, 131163,
+    (s32)evt_snd_sfxoff, -29999987, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_NOKO_SHUBIBIN2", 0, 196699, (s32)evt_btl_camera_set_mode,
+    0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 327771, (s32)evt_btl_camera_set_posoffset,
+    0, 0, 0, 0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1,
+    50, 131122, -29999990, 0, 65539, 10, 196699, (s32)btlevtcmd_SetMoveSpeed,
+    -2, -229989760, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
+    393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -250000000, -250000000, 524379,
+    (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, 0, 0,
+    393307, (s32)btlevtcmd_CommandPreCheckDamage, -2, -29999997, -29999996, 256, -29999994, 131097,
+    -29999994, 1, 131096, -29999994, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
+    38, 33, 131096, -29999994, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
+    39, 33, 131096, -29999994, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
+    40, 33, 65540, 50, 33, 196699, (s32)evt_btl_camera_set_mode, 0,
+    0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 0, 393307, (s32)btlevtcmd_CommandPreCheckCounter, -2,
+    -29999997, -29999996, 256, -30000000, 131097, -30000000, 0, 327771,
+    (s32)btlevtcmd_SetPartsWork, -2, 1, 2, 1, 262235, (s32)btlevtcmd_SetUnitWork, -2,
+    1, 0, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0,
+    65630, (s32)_koura_rotate_stop, 33, 131163, (s32)btlevtcmd_GetResultAC, -30000000, 131102, -30000000,
+    2, 393307, (s32)btlevtcmd_CommandCheckDamage, -2, -29999997, -29999996, 131328, -29999995,
+    196699, (s32)btlevtcmd_AcGetOutputParam, 2, -29999991, 131101, -29999991, 4, 131126,
+    -29999991, 4, 262235, (s32)btlevtcmd_GetResultPrizeLv, -29999997, -29999991, -29999994, 393307,
+    (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_ACSuccessEffect,
+    -29999994, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000,
+    196699, (s32)btlevtcmd_AudienceDeclareACResult, -30000000, -29999994, 32, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2,
+    -30000000, 196699, (s32)btlevtcmd_AudienceDeclareACResult, -30000000, -1, 33, 32, 393307,
+    (s32)btlevtcmd_CommandCheckDamage, -2, -29999997, -29999996, 256, -29999995, 196699, (s32)btlevtcmd_CommandGetWeaponAddress,
+    -2, -30000000, 196699, (s32)btlevtcmd_AudienceDeclareACResult, -30000000, -1, 33, 65539,
+    50, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 131097, -29999997, -1,
+    131125, -29999990, 1, 65540, 10, 33, 65539, 80,
+    262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition, -2,
+    400, -29999999, -29999998, 0, 0, 0, 327771, (s32)btlevtcmd_SetPartsWork,
+    -2, 1, 2, 1, 65546, 100, 65539, 90,
+    196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1,
+    327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 131127, -30000000,
+    -1, 327771, (s32)btlevtcmd_SetPos, -2, -30000000, -29999999, -29999998, 327771,
+    (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition, -2,
+    -30000000, -29999999, -29999998, 0, 0, 0, 393307, (s32)btlevtcmd_ACRStart,
+    -2, 0, 9, 9, 0, 196699, (s32)btlevtcmd_ACRGetResult, -29999994,
+    -29999993, 131096, -29999994, 2, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000,
+    393307, (s32)btlevtcmd_AudienceDeclareAcrobatResult, -30000000, 1, 0, 0, 0, 327771,
+    (s32)btlevtcmd_SetRotate, -2, 0, 0, 0, 262235, (s32)btlevtcmd_SetUnitWork, -2,
+    1, 12, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
+    196699, (s32)btlevtcmd_SetFallAccel, -2, -229999693, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000,
+    -29999999, -29999998, 30, -1, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
+    (s32)"PNK_E_1", 65545, 10, 393307, (s32)btlevtcmd_ACRStart, -2, 49, 79,
+    79, 0, 196699, (s32)btlevtcmd_ACRGetResult, -29999994, -29999993, 131097, -29999994,
+    2, 65627, (s32)evt_audience_acrobat_notry, 65630, (s32)_koura_rotate_stop, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
+    1, (s32)"PNK_E_2", 65541, 6, 65545, 1, 327771, (s32)btlevtcmd_AddRotate,
+    -2, 0, 45, 0, 6, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
+    1, (s32)"PNK_S_1", 65541, 6, 65545, 1, 327771, (s32)btlevtcmd_AddRotate,
+    -2, 0, 15, 0, 6, 65540, 99, 33,
+    65630, (s32)_koura_rotate_stop, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PNK_E_2", 65541,
+    6, 65545, 1, 327771, (s32)btlevtcmd_AddRotate, -2, 0, 45,
+    0, 6, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PNK_E_3", 65541,
+    6, 65545, 1, 327771, (s32)btlevtcmd_AddRotate, -2, 0, 15,
+    0, 6, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000, 393307, (s32)btlevtcmd_AudienceDeclareAcrobatResult,
+    -30000000, 1, 0, 0, 0, 65545, 60, 65540,
+    99, 32, 65627, (s32)evt_audience_acrobat_notry, 33, 65630, (s32)_restore_koura_pose, 262235,
+    (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 43, 65545, 30, 65539, 99,
+    65627, (s32)evt_audience_ap_recovery, 65627, (s32)btlevtcmd_InviteApInfoReport, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 65630,
+    (s32)btldefaultevt_SuitoruBadgeEffect, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
+};
+#else
 s32 partyNokotarouAttack_TsuranukiKoura[] = {
     196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096, -29999997, -1, 65540,
     99, 33, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -29999988, 131163, (s32)btlevtcmd_WeaponAftereffect,
@@ -1037,6 +1360,7 @@ s32 partyNokotarouAttack_TsuranukiKoura[] = {
     (s32)btlevtcmd_InviteApInfoReport, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 65630, (s32)btldefaultevt_SuitoruBadgeEffect, 131163, (s32)btlevtcmd_StartWaitEvent,
     -2, 2, 1,
 };
+#endif
 
 EVT_BEGIN(nokotarou_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, -2, 7)
@@ -1139,7 +1463,7 @@ static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count) {
     command->mWeaponTable[*count].mItem = 0;
     command->mWeaponTable[*count].mWeaponParams = (BattleWeapon*)partyWeapon_NokotarouKouraAttack;
     command->mWeaponTable[*count].field_0x4 = 0;
-    command->mWeaponTable[*count].mIcon = 0x150;
+    command->mWeaponTable[*count].mIcon = ICON_150;
     command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
     (*count)++;
 
@@ -1148,7 +1472,7 @@ static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count) {
         command->mWeaponTable[*count].mItem = 0;
         command->mWeaponTable[*count].mWeaponParams = (BattleWeapon*)partyWeapon_NokotarouSyubibinKoura;
         command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = 0x151;
+        command->mWeaponTable[*count].mIcon = ICON_151;
         command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
         (*count)++;
     }

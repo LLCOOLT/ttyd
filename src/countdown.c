@@ -22,6 +22,11 @@ static const GXColor sShadow = {255, 255, 255, 153};
 //.sbss
 static CountdownWork* wp;
 
+#ifdef VERSION_G8ME01
+#define CD_ICON_OFS 7
+#else
+#define CD_ICON_OFS 0
+#endif
 static void countDownDisp(CameraId cameraId, void* param);
 
 void countDownInit(void) {
@@ -34,7 +39,15 @@ void countDownSaveReStart(void) {
     if ((work->flags & 1) != 0) {
         u32 ticks = OS_TIMER_CLOCK / 1000;
         s64 ms = work->elapsed / ticks;
+#ifdef VERSION_G8ME01
+        s32 rem = work->limit - ms;
+        if (rem < 0) {
+            rem = 0;
+        }
+        if ((u32)rem <= work->restart) {
+#else
         if ((u32)(work->limit - ms) <= work->restart) {
+#endif
             work->elapsed = (s64)ticks * (u32)(work->limit - work->restart);
         }
         wp->prevTime = gp->renderTime;
@@ -43,6 +56,9 @@ void countDownSaveReStart(void) {
         } else {
             wp->sfxId = psndSFXOn("SFX_STG7_ALART_WARNING1");
         }
+#ifdef VERSION_G8ME01
+        wp->flags &= ~2;
+#endif
     }
 }
 
@@ -140,7 +156,7 @@ static void countDownDisp(CameraId cameraId, void* param) {
         PSMTXConcat(base, scale, mtx);
         {
             GXColor shadow = sShadow;
-            iconDispGxCol(mtx, 0x10, 0x1f6, shadow);
+            iconDispGxCol(mtx, 0x10, 0x1f6 + CD_ICON_OFS, shadow);
         }
         digits[0] = sec / 100;
         sec %= 100;
@@ -149,11 +165,11 @@ static void countDownDisp(CameraId cameraId, void* param) {
         for (i = 0; i < 3; i++) {
             PSMTXTrans(mtx, i * 30 - 50, 8.0f, 0.0f);
             PSMTXConcat(base, mtx, mtx);
-            iconDispGxCol(mtx, 0x10, (u16)(digits[i] + 0x1f7), white2);
+            iconDispGxCol(mtx, 0x10, (u16)(digits[i] + 0x1f7 + CD_ICON_OFS), white2);
         }
         PSMTXTrans(mtx, 28.0f, 10.0f, 0.0f);
         PSMTXConcat(base, mtx, mtx);
-        iconDispGxCol(mtx, 0x10, 0x201, white3);
+        iconDispGxCol(mtx, 0x10, 0x201 + CD_ICON_OFS, white3);
         digits[0] = msec / 100;
         digits[1] = (msec % 100) / 10;
         for (i = 0; i < 2; i++) {
@@ -161,7 +177,7 @@ static void countDownDisp(CameraId cameraId, void* param) {
             PSMTXScale(scale, 0.5f, 0.5f, 0.5f);
             PSMTXConcat(mtx, scale, mtx);
             PSMTXConcat(base, mtx, mtx);
-            iconDispGxCol(mtx, 0x10, (u16)(digits[i] + 0x1f7), white2);
+            iconDispGxCol(mtx, 0x10, (u16)(digits[i] + 0x1f7 + CD_ICON_OFS), white2);
         }
     }
 }

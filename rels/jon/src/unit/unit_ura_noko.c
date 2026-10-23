@@ -87,7 +87,7 @@ __declspec(section ".data") s32 fd_ura_noko___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_ura_noko_one_negone_359;
 __declspec(section ".data") s32 fd_ura_noko___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_ura_noko_one_364[1];
-BattleUnitKind unit_ura_noko_15_data_2E060;
+BattleUnitKind unit_ura_noko;
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_turn[17];
 static __declspec(section ".data") BattleDataEntry data_table[3];
@@ -155,7 +155,7 @@ __declspec(section ".data") s32 fd_ura_noko_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_ura_noko_15_data_2E060 = {
+BattleUnitKind unit_ura_noko = {
     47,
     "btl_un_ura_noko",
     8,

@@ -1,3 +1,4 @@
+#include "version.h"
 #include "manager/filemgr.h"
 #include "dolphin/os.h"
 #include "driver/arcdrv.h"
@@ -116,7 +117,7 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 		case 4:
 			tpl = data;
 			if (tpl->versionNumber != 0x0020AF30) {
-				OSPanic("filemgr.c", 147, "invalid version number for texture palette\0");
+				OSPanic("filemgr.c", VERSION_PICK(147, 153), "invalid version number for texture palette\0");
 			}
 			if ((u32)tpl->descriptorArray >= (u32)tpl) {
 				for (i = 0; (u16)i < tpl->numDescriptors; i++) {
@@ -307,7 +308,7 @@ case 4:
 {
 tpl = data;
 if (tpl->versionNumber != 0x0020AF30) {
-				OSPanic("filemgr.c", 106, "invalid version number for texture palette\0");
+				OSPanic("filemgr.c", VERSION_PICK(106, 112), "invalid version number for texture palette\0");
 }
 if ((u32)tpl->descriptorArray < (u32)tpl) {
 *(u32*)&tpl->descriptorArray += (u32)tpl;
@@ -560,7 +561,11 @@ FileEntry* _fileAlloc(const char* filename, s32 type, void (*callback)(FileEntry
 
 	for (search = afp->firstused; search; search = search->next) {
 		if (search->state && !strcmp(search->filename, filename)) {
+#ifdef VERSION_G8ME01
+			while (search->entry) { OSYieldThread(); }
+#else
 			while (search->entry) {;} //infinite loop????
+#endif
 			if (search->state == 3) {
 				search->state = 1;
 				search->references = 0;

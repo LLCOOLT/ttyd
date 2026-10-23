@@ -75,7 +75,7 @@ __declspec(section ".data") s32 fd_kuriboo___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_kuriboo_one_negone_359;
 __declspec(section ".data") s32 fd_kuriboo___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_kuriboo_one_364[1];
-BattleUnitKind unit_kuriboo_3_data_AC58;
+BattleUnitKind unit_kuriboo;
 static PoseTableEntry pose_table[20];
 static __declspec(section ".data") BattleDataEntry data_table[2];
 static __declspec(section ".data") BattleUnitDefense defence;
@@ -137,7 +137,7 @@ __declspec(section ".data") s32 fd_kuriboo_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_kuriboo_3_data_AC58 = {
+BattleUnitKind unit_kuriboo = {
     1,
     "btl_un_kuriboo",
     2,

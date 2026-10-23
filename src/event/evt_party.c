@@ -958,6 +958,35 @@ USER_FUNC(evt_party_cloud_breathout) {
 	return EVT_RETURN_BLOCK;
 }
 
+#ifdef VERSION_G8ME01
+extern void N_cloudLockAnimationsOn(PartyEntry* party);
+extern void N_cloudLockAnimationsOff(PartyEntry* party);
+
+// US only.
+USER_FUNC(N_evt_party_cloud_lock_animations_on_off) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (isFirstCall) {
+		if (p->currentMemberId != 5) {
+			return EVT_RETURN_DONE;
+		}
+		if (p->flags & 0x100) {
+			return EVT_RETURN_DONE;
+		}
+		if (args[1]) {
+			N_cloudLockAnimationsOn(p);
+		} else {
+			N_cloudLockAnimationsOff(p);
+		}
+	}
+	return EVT_RETURN_DONE;
+}
+#endif
+
 void evtPartyStrippedPool(f32* f) {
     f[0] = 1.0f;
     f[1] = 0.5f;

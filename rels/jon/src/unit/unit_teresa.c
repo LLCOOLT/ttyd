@@ -79,7 +79,7 @@ __declspec(section ".data") s32 fd_teresa___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_teresa_one_negone_359;
 __declspec(section ".data") s32 fd_teresa___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_teresa_one_364[1];
-BattleUnitKind unit_teresa_15_data_25D30;
+BattleUnitKind unit_teresa;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -220,7 +220,7 @@ __declspec(section ".data") s32 fd_teresa_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_teresa_15_data_25D30 = {
+BattleUnitKind unit_teresa = {
     75,
     "btl_un_teresa",
     7,

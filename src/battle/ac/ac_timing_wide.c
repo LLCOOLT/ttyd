@@ -1,3 +1,4 @@
+#include "icon_ids.h"
 #include "battle/ac/ac_table.h"
 #include "battle/battle.h"
 #include "battle/battle_ac.h"
@@ -280,13 +281,13 @@ static void actionCommandDisp(f32 x, f32 y) {
     camGetPtr(8);
     tw = TW_WORK(ac);
     switch (tw->button) {
-        case 0x100: b = 0x65; a = 0x64; break;
-        case 0x200: b = 0x67; a = 0x66; break;
-        case 0x400: b = 0x69; a = 0x68; break;
-        case 0x800: b = 0x6B; a = 0x6A; break;
-        case 0x40000: b = 0x78; a = 0x79; break;
-        case 0x80000: b = 0x7A; a = 0x79; break;
-        default: b = 0x78; a = 0x79; break;
+        case 0x100: b = ICON_065; a = ICON_064; break;
+        case 0x200: b = ICON_067; a = ICON_066; break;
+        case 0x400: b = ICON_069; a = ICON_068; break;
+        case 0x800: b = ICON_06B; a = ICON_06A; break;
+        case 0x40000: b = ICON_078; a = ICON_079; break;
+        case 0x80000: b = ICON_07A; a = ICON_079; break;
+        default: b = ICON_078; a = ICON_079; break;
     }
     switch (tw->state) {
         case 0:

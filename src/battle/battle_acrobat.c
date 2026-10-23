@@ -3,6 +3,7 @@
 #include "battle/battle_unit.h"
 #include "driver/dispdrv.h"
 #include "driver/icondrv.h"
+#include "icon_ids.h"
 
 //local prototypes
 void _accrobat_timing_icon_disp(CameraId camId, void* param);
@@ -81,7 +82,7 @@ void _accrobat_timing_icon_disp(CameraId camId, void* param) {
 	BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
 	pos.y += BtlUnit_GetHeight(unit) + 5;
 	pos.x += 15.0f;
-	iconDispGx(&pos, 0, 0x9A, 0.67f);
+	iconDispGx(&pos, 0, ICON_09A, 0.67f);
 }
 
 s32 BattleAcrobatGetResult(BattleWork* work, s32* result, s32* curFrame) {

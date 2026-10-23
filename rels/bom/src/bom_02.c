@@ -146,7 +146,11 @@ s32 urotuku_white[190];
 static s32 init_soncho[13];
 static s32 talk_soncho[421];
 static __declspec(section ".data") s32 init_murabito_e[2];
+#ifdef VERSION_G8ME01
+static s32 talk_murabito_e[281];
+#else
 static s32 talk_murabito_e[253];
+#endif
 static __declspec(section ".data") s32 init_murabito_f[2];
 static s32 talk_murabito_f[44];
 static s32 init_murabito_g[17];
@@ -159,8 +163,14 @@ static s32 talk_murabito_i[44];
 __declspec(section ".data") s32 init_tenin[8];
 __declspec(section ".data") s32 talk_tenin[2];
 static s32 init_white[83];
+#ifdef VERSION_G8ME01
+s32 mario_jump[203];
+#else
 s32 mario_jump[197];
+#endif
+#ifndef VERSION_G8ME01
 __declspec(section ".data") s32 mario_jump_tail[6];
+#endif
 __declspec(section ".data") s32 iri_25_item_tbl[2];
 static s32 talk_white[117];
 s32 iri_25_white_bed[363];
@@ -624,15 +634,33 @@ EVT_END()
 
 static EVT_BEGIN(talk_murabito_e)
     IF_INT_EQUAL(GSW(1420), 30)
+#ifdef VERSION_G8ME01
+        IF_INT_EQUAL(GSWF(5406), 0)
+#endif
         IF_INT_EQUAL(GSWF(5405), 0)
             CALL(evt_msg_print, 0, STRING("irai_30_001"), 0, 0)
             SET_VALUE(GSWF(5405), 1)
             ELSE
             CALL(evt_msg_print, 0, STRING("irai_30_002"), 0, 0)
+#ifndef VERSION_G8ME01
             IF_INT_EQUAL(GSWF(5406), 0)
+#endif
                 CALL(evt_msg_print_add, 0, STRING("irai_30_003"))
+#ifdef VERSION_G8ME01
+            END_IF
+#endif
                 ELSE
+#ifdef VERSION_G8ME01
+            SET_VALUE(LF(0), 0)
+            IF_INT_EQUAL(GSWF(5405), 0)
+                SET_VALUE(LF(0), 1)
+                ELSE
+                CALL(evt_msg_print, 0, STRING("irai_30_002"), 0, 0)
+#endif
                 CALL(evt_msg_continue)
+#ifdef VERSION_G8ME01
+            END_IF
+#endif
                 CALL(evt_npc_flag_onoff, 1, STRING("me"), 32)
                 SET_VALUE(GF(0), 1)
                 BEGIN_INLINE_EVENT
@@ -651,7 +679,15 @@ static EVT_BEGIN(talk_murabito_e)
                 CALL(evt_mario_set_pose, STRING("M_I_2"))
                 WAIT_MS(1000)
                 CALL(evt_mario_set_pose, STRING("M_S_1"))
+#ifdef VERSION_G8ME01
+            IF_INT_EQUAL(LF(0), 0)
+#endif
                 CALL(evt_msg_print, 0, STRING("irai_30_004"), 0, 0)
+#ifdef VERSION_G8ME01
+                ELSE
+                CALL(evt_msg_print, 0, STRING("irai_30_003_1"), 0, 0)
+            END_IF
+#endif
                 CALL(evt_pouch_get_haveitemcnt, LW(0))
                 CALL(evt_pouch_check_item, 1, LW(1))
                 IF_INT_EQUAL(LW(1), 0)
@@ -680,7 +716,9 @@ static EVT_BEGIN(talk_murabito_e)
                 SET_VALUE(GSWF(5404), 1)
                 CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
             END_IF
+#ifndef VERSION_G8ME01
         END_IF
+#endif
         RETURN
     END_IF
     SWITCH(GSW(0))
@@ -870,6 +908,47 @@ static EVT_BEGIN(init_white)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(mario_jump)
+    CALL(evt_mario_cam_keep_on)
+    CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
+    CALL(evt_npc_flag_onoff, 1, STRING("ホワイト"), 32)
+    CALL(evt_npc_get_position, STRING("ホワイト"), LW(0), LW(1), LW(2))
+    ADD(LW(1), 20)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP1"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_mario_jump_pos, LW(0), LW(1), LW(2), 500, 2, -1000)
+    BEGIN_INLINE_EVENT
+        SUBTRACT(LW(0), 40)
+        SUBTRACT(LW(2), 40)
+        CALL(evt_eff, 0, STRING("nice"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+    END_INLINE_EVENT
+    CALL(evt_eff, 0, STRING("small_star"), 3, LW(0), LW(1), LW(2), 0, -1, 0, 3, 0, 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_WHITE_DAMAGED1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_WHITE_NICE1"), LW(0), LW(1), LW(2), 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 100)
+    END_INLINE_EVENT
+    ADD(LW(2), -10)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP4"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_mario_jump_pos, LW(0), LW(1), LW(2), 500, 2, -1000)
+    BEGIN_INLINE_EVENT
+        SUBTRACT(LW(0), 40)
+        SUBTRACT(LW(2), 40)
+        CALL(evt_eff, 0, STRING("nice"), 1, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+    END_INLINE_EVENT
+    CALL(evt_eff, 0, STRING("small_star"), 3, LW(0), LW(1), LW(2), 0, -1, 0, 3, 0, 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_WHITE_DAMAGED1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_WHITE_GOOD1"), LW(0), LW(1), LW(2), 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 100)
+    END_INLINE_EVENT
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP2"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_mario_jump_pos, 335, 30, -130, 500, 2, -1000)
+    CALL(evt_npc_flag_onoff, 0, STRING("ホワイト"), 32)
+    CALL(evt_mario_cam_keep_off)
+    RETURN
+EVT_END()
+#else
 s32 mario_jump[] = {
     65627, (s32)evt_mario_cam_keep_on, 327771, (s32)evt_mario_get_pos, 0, -29999990, -29999989, -29999988,
     262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67", 32, 327771, (s32)evt_npc_get_position, (s32)/*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67",
@@ -897,10 +976,13 @@ s32 mario_jump[] = {
     -29999988, 0, 458843, (s32)evt_mario_jump_pos, 335, 30, -130, 500,
     2, -1000, 262235, (s32)evt_npc_flag_onoff, 0,
 };
+#endif
 
+#ifndef VERSION_G8ME01  // US: this tail is part of mario_jump (US script above)
 __declspec(section ".data") s32 mario_jump_tail[] = {
     (s32)/*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67", 32, 65627, (s32)evt_mario_cam_keep_off, 2, 1,
 };
+#endif
 
 __declspec(section ".data") s32 iri_25_item_tbl[] = {
     109, -1,

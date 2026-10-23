@@ -1,3 +1,4 @@
+#include "version.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -127,7 +128,7 @@ void effSunlightMain(EffectEntry* effect) {
             work->offset[i] -= 256.0f;
         }
     }
-    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effSunlightDisp, effect);
+    dispEntry(CAMERA_3D, dispCalcZ(&position), VERSION_PICK(2, 10), (DispCallback)effSunlightDisp, effect);
 }
 
 void effSunlightDisp(CameraId cameraId, EffectEntry* effect) {

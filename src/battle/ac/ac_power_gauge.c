@@ -1,3 +1,4 @@
+#include "icon_ids.h"
 #include "battle/battle.h"
 #include "battle/battle_ac.h"
 #include "battle/battle_pad.h"
@@ -167,6 +168,11 @@ s32 battleAcMain_PowerGauge(BattleWork* work) {
             }
             if (pw->frame <= ACW(ac, s32, 0x3C)) {
                 pw->gauge = ((f32(*)(s32, f32, f32, s32, s32))intplGetValue)(ACW(ac, s32, 0x44), 0.0f, 100.0f, pw->frame2, ACW(ac, s32, 0x3C));
+#ifdef VERSION_G8ME01
+                if (pw->gauge > 100.0f) {
+                    pw->gauge = 100.0f;
+                }
+#endif
             } else {
                 pw->gauge = 100.0f;
             }
@@ -296,13 +302,13 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -288.0f + x + (f32)(ACW(ac, s32, 0x48) * 0xB0) / 100.0f;
         pos.y = 45.0f + y;
-        ICONGX(&pos, 0x10, 0x96, 1.0f);
+        ICONGX(&pos, 0x10, ICON_096, 1.0f);
     } else {
         s32 icon;
         if (pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) {
-            icon = 0x95;
+            icon = ICON_095;
         } else {
-            icon = 0x91;
+            icon = ICON_091;
         }
         if (flags & 8) {
             Vec pos = {0.0f, 0.0f, 0.0f};
@@ -319,10 +325,10 @@ static void actionCommandDisp(f32 x, f32 y) {
 
     switch (ACW(ac, s32, 0x38)) {
         case 0:
-            a = 0x7F;
-            b = 0x7E;
-            c = 0x81;
-            d = 0x80;
+            a = ICON_07F;
+            b = ICON_07E;
+            c = ICON_081;
+            d = ICON_080;
             break;
         case 1:
             a = BattleACGetButtonIcon(0x100, 1);

@@ -60,7 +60,11 @@ static __declspec(section ".data") s32 door02_close[12];
 static __declspec(section ".data") s32 door02_open[12];
 static s32 bero_entry_data[45];
 static s32 init_0[37];
+#ifdef VERSION_G8ME01
+static s32 main_0[465];
+#else
 static s32 main_0[491];
+#endif
 s32 gon_09_init_evt[239];
 
 __declspec(section ".data") u64 fd_gon_09_negone_one_374 = 0xBF8000003F800000;
@@ -192,6 +196,9 @@ static EVT_BEGIN(main_0)
             SET_FLOAT_VALUE(LW(8), FLOAT(-0.19921875f))
             SET_FLOAT_VALUE(LW(9), 0)
         END_IF
+#ifdef VERSION_G8ME01
+        BEGIN_INLINE_EVENT
+#else
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(10)
             CALL(evt_sub_rumble_onoff, 0, 0)
@@ -199,6 +206,7 @@ static EVT_BEGIN(main_0)
             CALL(evt_sub_rumble_onoff, 1, 0)
         END_SIBLING_EVENT
         BEGIN_SIBLING_EVENT
+#endif
             WAIT_FRAMES(10)
             CALL(evt_sub_intpl_init, 11, 10, 3, 4)
             LABEL(0)
@@ -208,7 +216,11 @@ static EVT_BEGIN(main_0)
             IF_INT_EQUAL(LW(1), 1)
                 GOTO(0)
             END_IF
+#ifdef VERSION_G8ME01
+        END_INLINE_EVENT
+#else
         END_SIBLING_EVENT
+#endif
         WAIT_MS(500)
         CALL(evt_mobj_get_position, STRING("blk_0"), LW(12), LW(13), LW(14))
         CALL(evt_mobj_get_kindname, STRING("blk_0"), LW(11))
@@ -317,12 +329,16 @@ static EVT_BEGIN(main_0)
             END_IF
         END_INLINE_EVENT
         IF_INT_EQUAL(LW(10), 1)
+#ifdef VERSION_G8ME01
+            BEGIN_INLINE_EVENT
+#else
             BEGIN_SIBLING_EVENT
                 CALL(evt_sub_rumble_onoff, 0, 0)
                 WAIT_MS(300)
                 CALL(evt_sub_rumble_onoff, 1, 0)
             END_SIBLING_EVENT
             BEGIN_SIBLING_EVENT
+#endif
                 CALL(evt_sub_intpl_init, 11, 10, 3, 10)
                 LABEL(2)
                 CALL(evt_sub_intpl_get_value)
@@ -331,7 +347,11 @@ static EVT_BEGIN(main_0)
                 IF_INT_EQUAL(LW(1), 1)
                     GOTO(2)
                 END_IF
+#ifdef VERSION_G8ME01
+            END_INLINE_EVENT
+#else
             END_SIBLING_EVENT
+#endif
             WAIT_MS(1000)
         END_IF
         IF_INT_EQUAL(LSWF(1), 0)

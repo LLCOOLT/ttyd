@@ -7,7 +7,10 @@
 #include "system.h"
 #include <string.h>
 
-#define MW(m, off, T) (*(T*)((u8*)(m) + (off)))
+#ifdef VERSION_G8ME01
+void U_allPartySlitOffReq(void);
+#endif
+#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 
 s32 pouchCheckItem(s32 itemId);
 BOOL marioChkKey(void);
@@ -363,11 +366,22 @@ void marioSlitForceCancel(void) {
 }
 
 void mot_slit_post(void) {
+#ifdef VERSION_G8ME01
+	MarioWork* m = marioGetPtr();
+	u16 id;
+	if (MW(m, 0x2D8, s16) >= 10) {
+		id = m->currMotionId;
+		if (id == 0x15 || (u16)(id - 0xb) <= 1 || m->currMotionId <= 7 || m->currMotionId == 8) {
+			return;
+		}
+	}
+#else
 	MarioWork* m = marioGetPtr();
 	u16 id = m->currMotionId;
 	if (id == 0x15 || (u16)(id - 0xb) <= 1 || m->currMotionId <= 7 || m->currMotionId == 8) {
 		return;
 	}
+#endif
 	if (!(m->flags & 0x100000)) {
 		if (m->dispFlags & 0x1000000) {
 			m->wPlayerCollisionBox.x = 20.0f;
@@ -403,7 +417,15 @@ void mot_slit_post(void) {
 		mapResetPaperAmbColor();
 		m->dispFlags &= ~4;
 		marioAdjustMoveDir();
+#ifdef VERSION_G8ME01
+		if (m->currMotionId != 0x16) {
+			allPartyForceSlitOff();
+		} else {
+			U_allPartySlitOffReq();
+		}
+#else
 		allPartyForceSlitOff();
+#endif
 	}
 }
 
@@ -474,8 +496,15 @@ static inline BOOL slitContinueChk(void) {
 	return FALSE;
 }
 
-#define SPEEDCHK(m) \
-	if ((m)->baseSpeed >= (m)->mBaseDashSpeed) { \
+#ifdef VERSION_G8ME01
+#define SPEEDCHK_COND(m) ((m)->baseSpeed >= (m)->mBaseDashSpeed || (m)->controlStickSensitivity)
+#else
+#define SPEEDCHK_COND(m) ((m)->baseSpeed >= (m)->mBaseDashSpeed)
+#endif
+#define SPEEDCHK(m) SPEEDCHK_IF(m, (m)->baseSpeed >= (m)->mBaseDashSpeed)
+#define SPEEDCHK_US(m) SPEEDCHK_IF(m, SPEEDCHK_COND(m))
+#define SPEEDCHK_IF(m, c) \
+	if (c) { \
 		(m)->baseSpeed = (m)->mBaseWalkSpeed; \
 		if (!((m)->trigFlags & 0x8000)) { \
 			marioChgPose("M_R_1"); \
@@ -511,6 +540,31 @@ static inline f32 slitWalkSpeed(void) {
 		MW(p, 0x158, f32) = 0.004f; \
 	}
 
+#ifdef VERSION_G8ME01
+#define SLITSTOP(m) \
+	if (!marioChkKey()) { \
+		(m)->baseSpeed = 0.0f; \
+		MW(m, 0x2d8, s16) = 10; \
+		MW(m, 0x2b6, s16) = 0; \
+		marioChgPose("M_S_1"); \
+		marioChgPaper("PM_S_1B"); \
+		break; \
+	}
+#define SLITSTOP2(m) \
+	if (!marioChkKey()) { \
+		MW(m, 0x2b4, s16) = 0; \
+		(m)->baseSpeed = 0.0f; \
+		MW(m, 0x2d8, s16) = 10; \
+		MW(m, 0x2b6, s16) = 0; \
+		marioChgPose("M_S_1"); \
+		marioChgPaper("PM_S_1B"); \
+		break; \
+	}
+#else
+#define SLITSTOP(m)
+#define SLITSTOP2(m)
+#endif
+
 void mot_slit(void) {
 	MarioWork* m = marioGetPtr();
 	f32 d;
@@ -544,16 +598,27 @@ void mot_slit(void) {
 		MW(m, 0x2a4, s32) = 0;
 		MW(m, 0x2d8, s16) = 2;
 		MW(m, 0x2ac, f32) = m->position.y;
-		SPEEDCHK(m)
+		SPEEDCHK_US(m)
 		marioGetPtr();
 		psndSFXOn_3D((char*)0x177, &m->position);
 		break;
 	case 2:
+#ifdef VERSION_G8ME01
+		if (!m->controlStickSensitivity) {
+			m->baseSpeed = 0.0f;
+			marioChgPose("M_S_1");
+		} else {
+			SPEEDCHK_US(m)
+			m->directionView = m->controlStickAngle;
+		}
+		if (--MW(m, 0x2dc, s32) <= 0) {
+#else
 		if (!m->controlStickSensitivity) {
 			m->baseSpeed = 0.0f;
 			marioChgPose("M_S_1");
 		}
 		if (--MW(m, 0x2dc, s32) <= 0) {
+#endif
 			m->flags |= 0x100000;
 			MW(m, 0x2d8, s16) = 4;
 			m->wPlayerCollisionBox.x = 6.0f;
@@ -647,6 +712,7 @@ void mot_slit(void) {
 			MW(m, 0x2b4, s16) = 0;
 			marioChgPaper("PM_S_1D");
 			SLITDIR(m)
+			SLITSTOP(m)
 		}
 		if (marioChkKey()) {
 			if (slitContinueChk() != TRUE) {
@@ -702,6 +768,7 @@ void mot_slit(void) {
 					MW(m, 0x2ba, s16) = 2;
 					m->baseSpeed = slitWalkSpeed();
 					m->displayDirection = 260.0f;
+					SLITSTOP2(m)
 				}
 			} else if (MW(m, 0x2ba, s16) == 2) {
 				if (d <= 180.0f) {
@@ -711,12 +778,14 @@ void mot_slit(void) {
 					MW(m, 0x2ba, s16) = 1;
 					m->baseSpeed = slitWalkSpeed();
 					m->displayDirection = 280.0f;
+					SLITSTOP2(m)
 				}
 			}
 		}
 		break;
 	case 0x15:
 		if (--MW(m, 0x2b4, s16) > 0) {
+			SLITSTOP2(m)
 			break;
 		}
 		marioChgPaper("PM_S_1D");
@@ -860,6 +929,9 @@ void mot_slit(void) {
 		MW(m, 0x2da, s16) = 0;
 		m->flags &= ~0x100000;
 		m->wPlayerCollisionBox.x = 20.0f;
+#ifdef VERSION_G8ME01
+		SPEEDCHK_IF(m, m->controlStickSensitivity)
+#endif
 		if (m->baseSpeed == 0.0f) {
 			marioChgPose("M_S_1");
 		}
@@ -881,26 +953,47 @@ void mot_slit(void) {
 		}
 		psndSFXOn_3D((char*)0x178, &m->position);
 	case 0x65:
+#ifdef VERSION_G8ME01
+		if (!m->controlStickSensitivity) {
+			m->baseSpeed = 0.0f;
+			marioChgPose("M_S_1");
+		} else {
+			SPEEDCHK_IF(m, 1)
+			m->directionView = m->controlStickAngle;
+		}
+#else
 		if (!m->controlStickSensitivity) {
 			m->baseSpeed = 0.0f;
 			marioChgPose("M_S_1");
 		}
+#endif
 		if (--MW(m, 0x2da, s16) > 0) {
 			break;
 		}
 		MW(m, 0x2d8, s16) = 0x66;
 		break;
 	case 0x66:
+#ifdef VERSION_G8ME01
+		if (!m->controlStickSensitivity) {
+			m->baseSpeed = 0.0f;
+			marioChgPose("M_S_1");
+		} else {
+			SPEEDCHK_IF(m, 1)
+		}
+#else
 		if (!m->controlStickSensitivity) {
 			m->baseSpeed = 0.0f;
 			marioChgPose("M_S_1");
 		}
+#endif
 		m->flags &= ~0x400000; m->flags &= ~0x200000; m->dispFlags &= CLR_DISP;
 		marioPaperOff();
 		mapResetPaperAmbColor();
 		m->dispFlags &= ~4;
 		marioAdjustMoveDir();
+#ifndef VERSION_G8ME01
 		allPartySlitOff();
+#endif
 		CAMFIX(m)
 		marioChgMotSub(0, 0);
 		break;

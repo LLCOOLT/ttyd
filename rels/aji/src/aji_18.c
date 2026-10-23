@@ -42,6 +42,9 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_win_item_select);
+#ifdef VERSION_G8ME01
+USER_FUNC(N_evt_sub_status_gauge_force_update);
+#endif
 static USER_FUNC(make_list);
 static USER_FUNC(sysflag);
 extern s32 bero_case_switch_off[];
@@ -71,7 +74,11 @@ static s32 bero_entry_data[45];
 s32 evt_machine[266];
 s32 key_lock_koujyou[14];
 static s32 evt_koopa_after[118];
+#ifdef VERSION_G8ME01
+s32 aji_18_init_evt[301];
+#else
 s32 aji_18_init_evt[299];
+#endif
 
 static USER_FUNC(make_list) {
     s32 n = 0;
@@ -386,9 +393,16 @@ EVT_BEGIN(aji_18_init_evt)
             IF_INT_EQUAL(LW(15), 0)
                 CALL(evt_mario_set_party, 0, 1)
                 CALL(evt_party_run, 0)
+#ifdef VERSION_G8ME01
+            END_IF
+#endif
                 CALL(evt_pouch_mario_recovery)
                 CALL(evt_pouch_all_party_recovery)
+#ifdef VERSION_G8ME01
+            CALL(N_evt_sub_status_gauge_force_update)
+#else
             END_IF
+#endif
             SPAWN_EVENT(PTR(evt_koopa_after))
         END_IF
     END_SWITCH

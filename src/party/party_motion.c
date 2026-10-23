@@ -7,6 +7,7 @@
 #include <dolphin/mtx.h>
 #include "mario/mariost.h"
 #include <string.h>
+#include "version.h"
 
 // file-local full-layout view of PartyEntry (party.h is not included)
 typedef struct PartyMarioView {
@@ -24,6 +25,9 @@ typedef struct PartyMarioView {
     u8 unk98[0x180 - 0x98]; // 0x98
     f32 unk180;             // 0x180
     u8 unk184[0x190 - 0x184]; // 0x184
+#ifdef VERSION_G8ME01
+    u8 us_pad18C[4]; // US only: +4 from here (as MarioWork)
+#endif
     f32 unk190;             // 0x190
     u8 unk194[0x198 - 0x194]; // 0x194
     f32 unk198;             // 0x198
@@ -133,6 +137,9 @@ static f32 upstairs_dy;
 
 void L_partyForceSlitOff(PartyEntry* party);
 BOOL party_slit(PartyEntry* party);
+#ifdef VERSION_G8ME01
+BOOL partyChkBetweenWalls(PartyEntry* party, Vec pos);
+#endif
 BOOL party_roll(PartyEntry* party);
 void partyFlyAdjustY(PartyEntry* party);
 void partyWalkChkGnd(PartyEntry* party);
@@ -463,6 +470,9 @@ f32 partyGetTargetDist3D(s32 id, Vec* p);
 f32 partyGetTargetDist(s32 id, f32 x, f32 z);
 s32 nokonokoGetStatus(PartyEntry* party);
 HitEntry* marioChkWallAround(Vec* pos, s32 a, f32 spd, f32 dir, f32 w, f32 h);
+#ifdef VERSION_G8ME01
+HitEntry* partyChkWallAround(PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 w, f32 h);
+#endif
 s32 marioChkSlitThrouh(void);
 void partyGetMoveDirSpd(PartyEntry* party, f32* dir, f32* spd);
 PartyEntry* anotherPartyGetPtr(s32 id);
@@ -618,7 +628,11 @@ void party_motion_stay(PartyEntry* party) {
     party->position.x = v.x;
     party->position.z = v.z;
     partyGetMoveDirSpd(party, &dir, &spd);
+#ifdef VERSION_G8ME01
+    partyChkWallAround(party, &v, spd, dir, party->unkF4, party->unkF0);
+#else
     marioChkWallAround(&v, 1, spd, dir, party->unkF4, party->unkF0);
+#endif
     party->position.x = v.x;
     party->position.z = v.z;
     if (party->unk32 == 1) {
@@ -771,6 +785,116 @@ static inline BOOL partyChkMarioFollowY(PartyMarioView* mario) {
     return TRUE;
 }
 
+#ifdef VERSION_G8ME01
+static inline void partyFlyMoveY(PartyEntry* party, f32 target, f32 rate) {
+    f32 add;
+    f32 diff;
+
+    add = 5.0f;
+    if (party->flags2 & 0x8000) {
+        add = 1.0f;
+    }
+    diff = target + add - party->position.y;
+    if (-5.0f > diff || diff >= 0.0f) {
+        party->position.y += diff * rate;
+    }
+}
+
+// US: on las_10 the flying partner is pushed down out of low ceilings
+static inline void partyFlyHeadCheck(PartyEntry* party) {
+    Vec pos;
+    f32 height;
+    void* head;
+    f32 diff;
+    f32 rate;
+
+    if (!strcmp(gp->currentMapName, "las_10")) {
+        pos = party->position;
+        height = party->unkF0;
+        head = partySearchHead(party, &pos, &height, party->unk10C);
+        if (head) {
+            party->unk140 = head;
+            diff = pos.y - party->unkF0 - party->position.y;
+            if (-5.0f > diff || diff >= 0.0f) {
+                rate = 0.1f;
+                party->position.y += diff * rate;
+            }
+        }
+    }
+}
+
+void partyFlyAdjustY(PartyEntry* party) {
+    PartyMarioView* mario = party->playerPtr;
+    HitEntry* hit;
+    s32 attr;
+    f32 target;
+    f32 rate;
+
+    if (party->flags & 0x4000000) {
+        return;
+    }
+    partyFlyHeadCheck(party);
+    hit = partySearchGround(party, 10.0f, 0.0f);
+    if (hit) {
+        attr = hitGetAttr(hit);
+        if (attr & 0x800) {
+            partyChgRunMode(party, 0xD);
+            return;
+        }
+        if (attr & 0x100) {
+            party->flags |= 0x80;
+        } else {
+            party->flags &= ~0x80;
+        }
+    }
+    if (partyChkMarioFollowY(party->playerPtr)) {
+        if (hit) {
+            if (mario->position.y > party->unkE4) {
+                target = mario->position.y;
+                rate = 0.1f;
+            } else {
+                target = party->unkE4;
+                rate = 0.1f;
+            }
+            if (party->position.y < party->unkE4) {
+                target = party->unkE4;
+                rate = 0.2f;
+            }
+            partyFlyMoveY(party, target, rate);
+        } else if (*(f32*)party->unkE8 >= 0.0f) {
+            if (mario->position.y > party->unkE4) {
+                target = mario->position.y;
+                rate = 0.1f;
+            } else {
+                target = party->unkE4;
+                rate = 0.1f;
+            }
+            if (party->position.y < party->unkE4) {
+                target = party->unkE4;
+                rate = 0.2f;
+            }
+            partyFlyMoveY(party, target, rate);
+        }
+    } else {
+        f32 t;
+        rate = 0.05f;
+        if (hit) {
+            t = mario->position.y;
+            if (t > party->unkE4) {
+                t = mario->position.y;
+            } else {
+                t = party->unkE4;
+            }
+            if (party->position.y < party->unkE4) {
+                t = 18.5f + party->unkE4;
+                rate = 0.2f;
+            }
+            partyFlyMoveY(party, t, rate);
+        }
+    }
+}
+
+#else
 void partyFlyAdjustY(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     HitEntry* hit;
@@ -848,6 +972,8 @@ void partyFlyAdjustY(PartyEntry* party) {
     }
 }
 
+#endif
+
 typedef struct PartyFootmark {
     u8 unk0;
     u8 unk1[3];
@@ -911,7 +1037,7 @@ void party_motion_homing_walk(PartyEntry* party) {
     if (party->unk28 != 0) {
         lim = 28.0f;
     } else {
-        lim = 37.5f;
+        lim = VERSION_PICK(37.5f, 45.0f);
     }
     if (!strcmp(gp->currentMapName, "aji_02") || !strcmp(gp->currentMapName, "aji_05") ||
         !strcmp(gp->currentMapName, "aji_12"))
@@ -924,7 +1050,7 @@ void party_motion_homing_walk(PartyEntry* party) {
     if (partyGetTargetMovespd(id)) {
         lim2 = 50.0f;
     } else {
-        lim2 = 35.0f;
+        lim2 = VERSION_PICK(35.0f, 45.0f);
     }
     if ((s32)mario->unk3C == 2) {
         lim2 = 70.0f;
@@ -949,7 +1075,7 @@ void party_motion_homing_walk(PartyEntry* party) {
     spd = partyGetTargetMovespd2(party);
     if (!(party->flags & 8)) {
         d3 = PSVECDistance(&mario->position, &party->position);
-        if (d3 < 35.0f) {
+        if (d3 < VERSION_PICK(35.0f, 45.0f)) {
             spd = 1.0f;
         } else if (d3 >= 50.0f) {
             spd = 3.0f;
@@ -963,7 +1089,7 @@ void party_motion_homing_walk(PartyEntry* party) {
         v = other->position;
         if (nokonokoGetStatus(other) == 3 || PSVECDistance(&mario->position, &other->position) >= 150.0f) {
             d3 = PSVECDistance(&mario->position, &party->position);
-            if (d3 < 35.0f) {
+            if (d3 < VERSION_PICK(35.0f, 45.0f)) {
                 spd = 1.0f;
             } else if (d3 >= 50.0f) {
                 spd = 3.0f;
@@ -974,7 +1100,7 @@ void party_motion_homing_walk(PartyEntry* party) {
             partySetTargetSpd(party, spd);
         } else {
             d3 = PSVECDistance(&other->position, &party->position);
-            if (d3 < 35.0f) {
+            if (d3 < VERSION_PICK(35.0f, 45.0f)) {
                 spd = 1.0f;
             } else if (d3 >= 50.0f) {
                 spd = 3.0f;
@@ -1031,6 +1157,19 @@ found:
                     }
                     partyForceSetSpd(party, mario->unk180 + a);
                 }
+#ifdef VERSION_G8ME01
+                else {
+                    // US: catch up with the speed of Mario when far behind
+                    a = 0.1f * (d3 - lim);
+                    if (a > 4.0f) {
+                        a = 4.0f;
+                    }
+                    if (a < 0.5f) {
+                        a = 0.0f;
+                    }
+                    partyForceSetSpd(party, mario->unk180 + a);
+                }
+#endif
                 break;
             }
             if (marioGetSlitFloorPos(&v)) {
@@ -1310,11 +1449,20 @@ void party_motion_homing_fly(PartyEntry* party) {
     Vec s2;
     Vec ap;
     Vec ff;
+#ifdef VERSION_G8ME01
+    Vec hp;
+#endif
     Vec p2;
     Vec p3;
     f32 dir, sp;
     f32 tx, ty, tz;
     f32 x, z;
+#ifdef VERSION_G8ME01
+    f32 hh;
+    f32 hd;
+    void* head;
+    f32 u1;
+#endif
 
     id = partyGetFootmarkId(party);
     if (party->flags3 & 2) {
@@ -1325,7 +1473,7 @@ void party_motion_homing_fly(PartyEntry* party) {
     if (party->unk28 != 0) {
         lim = 28.0f;
     } else {
-        lim = 32.0f;
+        lim = VERSION_PICK(32.0f, 45.0f);
     }
     if (!strcmp(gp->currentMapName, "aji_02") || !strcmp(gp->currentMapName, "aji_05") ||
         !strcmp(gp->currentMapName, "aji_12"))
@@ -1338,7 +1486,7 @@ void party_motion_homing_fly(PartyEntry* party) {
     if (partyGetTargetMovespd(id)) {
         lim2 = 50.0f;
     } else {
-        lim2 = 35.0f;
+        lim2 = VERSION_PICK(35.0f, 45.0f);
     }
     if ((party->flags3 >> 17) & 1) {
         lim2 = partyStayDist(party);
@@ -1359,7 +1507,7 @@ void party_motion_homing_fly(PartyEntry* party) {
     }
     spd = partyGetTargetMovespd2(party);
     d3 = PSVECDistance(&mario->position, &party->position);
-    if (d3 < 35.0f) {
+    if (d3 < VERSION_PICK(35.0f, 45.0f)) {
         spd = 1.0f;
     } else if (d3 >= 50.0f) {
         spd = 3.0f;
@@ -1407,6 +1555,19 @@ void party_motion_homing_fly(PartyEntry* party) {
                     }
                     partyForceSetSpd(party, mario->unk180 + a);
                 }
+#ifdef VERSION_G8ME01
+                else {
+                    // US: catch up with the speed of Mario when far behind
+                    a = 0.1f * (d3 - lim);
+                    if (a > 4.0f) {
+                        a = 4.0f;
+                    }
+                    if (a < 0.5f) {
+                        a = 0.0f;
+                    }
+                    partyForceSetSpd(party, mario->unk180 + a);
+                }
+#endif
                 near = 1;
                 break;
             }
@@ -1477,8 +1638,10 @@ void party_motion_homing_fly(PartyEntry* party) {
         }
         party->unk138 = hit;
         if (!hit) {
+#ifndef VERSION_G8ME01
             partyChgMot(party, 3);
             party->unk11C = -1.0f;
+#endif
             continue;
         }
         attr = hitGetAttr(hit);
@@ -1579,6 +1742,22 @@ void party_motion_homing_fly(PartyEntry* party) {
     }
     party->position.x = v.x;
     party->position.z = v.z;
+#ifdef VERSION_G8ME01
+    // US: on las_10 the partner is pushed down out of low ceilings
+    if (!strcmp(gp->currentMapName, "las_10")) {
+        hp = party->position;
+        hh = party->unkF0;
+        head = partySearchHead(party, &hp, &hh, party->unk10C);
+        if (head) {
+            party->unk140 = head;
+            hd = hp.y - party->unkF0 - party->position.y;
+            if (-5.0f > hd || hd >= 0.0f) {
+                a = 0.1f;
+                party->position.y += hd * a;
+            }
+        }
+    }
+#endif
     party->flags &= ~0x80;
     hit = partySearchGround(party, 10.0f, 10.0f);
     if (hit) {
@@ -1761,6 +1940,9 @@ void party_motion_behind_mario(PartyEntry* party) {
         party->flags |= 0x80000;
         party->flags3 &= ~0x100000;
         party->flags3 &= ~0x40000;
+#ifdef VERSION_G8ME01
+        party->flags3 &= ~0x200000;
+#endif
     }
     if (party->unk134) {
         party->flags |= 0x80000;
@@ -1770,6 +1952,9 @@ void party_motion_behind_mario(PartyEntry* party) {
         party->unk40 = 50.0f;
         party->flags2 &= ~0x10;
         party->flags3 &= ~0x40000;
+#ifdef VERSION_G8ME01
+        party->flags3 &= ~0x200000;
+#endif
     }
 }
 
@@ -1965,6 +2150,9 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
     party->flags |= 0x80000;
     party->flags3 &= ~0x100000;
     party->flags3 &= ~0x40000;
+#ifdef VERSION_G8ME01
+    party->flags3 &= ~0x200000;
+#endif
     partySetDispDirToMario(party);
     if (party->unk134) {
         party->flags |= 0x80000;
@@ -2167,6 +2355,9 @@ void party_motion_jump(PartyEntry* party) {
     f32 dir;
     f32 dist;
     f32 lim;
+#ifdef VERSION_G8ME01
+    f32 dist2;
+#endif
     Vec fl;
     f32 s, c;
     f32 x, y, z;
@@ -2203,9 +2394,16 @@ void party_motion_jump(PartyEntry* party) {
                 partyGetReadId(id, &x, &y, &z);
                 lim = 50.0f;
                 dist = distABf(party->position.x, party->position.z, x, z);
+#ifdef VERSION_G8ME01
+                dist2 = __fabsf(y - party->position.y);
+                if (50.0f > 1.4f * dist2) {
+                    lim = 1.4f * dist2;
+                }
+#else
                 if (50.0f > 1.4f * (y - party->position.y)) {
                     lim = 1.4f * (y - party->position.y);
                 }
+#endif
                 sincosf(&s, &c, angleABf(party->position.x, party->position.z, x, z));
                 if (dist > lim) {
                     dist = lim;
@@ -2278,6 +2476,9 @@ void party_motion_jump(PartyEntry* party) {
             party->position.y = party->unkE4;
             if (hit) {
                 party->flags |= 2;
+#ifdef VERSION_G8ME01
+                party->flags3 &= ~0x400000;
+#endif
                 party->flags &= ~0x70;
                 N_partyPlaySfxPartyLanding1(party);
                 party->unk114 = 0.0f;
@@ -2362,6 +2563,9 @@ void party_motion_jump2(PartyEntry* party) {
                     N_partyPlaySfxPartyLanding1(party);
                     party->flags &= ~0x70;
                     party->flags |= 2;
+#ifdef VERSION_G8ME01
+                    party->flags3 &= ~0x400000;
+#endif
                     party->unk114 = 0.0f;
                     partyChgMot(party, distABf(party->position.x, party->position.z, party->unk94.x, party->unk94.z) < 5.0f ? 0 : 1);
                 }
@@ -2415,6 +2619,15 @@ s32 party_motion_fall(PartyEntry* party) {
             party->unk114 = -16.0f;
         }
         party->position.y += party->unk114;
+#ifdef VERSION_G8ME01
+        // US: with the stick released the drift of the partner slows down while falling
+        if (!marioKeyOffChk()) {
+            party->unk104 += -0.2f;
+            if (party->unk104 < 0.0f) {
+                party->unk104 = 0.0f;
+            }
+        }
+#endif
         if (party->position.y < -2000.0f) {
             party->position.y = -2001.0f;
             if (mario->motionId == 0x1F || mario->motionId == 0x20) {
@@ -2441,6 +2654,9 @@ s32 party_motion_fall(PartyEntry* party) {
     if (party->flags & 0x20) {
         party->flags &= ~0x70;
         party->flags |= 2;
+#ifdef VERSION_G8ME01
+        party->flags3 &= ~0x400000;
+#endif
         party->unk114 = 0.0f;
         party->position.y = party->unkE4;
         if (party->unk104 == 0.0f) {
@@ -2454,6 +2670,9 @@ s32 party_motion_fall(PartyEntry* party) {
     party->flags &= ~0x2000;
     party->flags &= ~0x70;
     party->flags |= 2;
+#ifdef VERSION_G8ME01
+    party->flags3 &= ~0x400000;
+#endif
     party->unk114 = 0.0f;
     party->position.y = party->unkE4;
     if (party->unk104 == 0.0f) {
@@ -2604,6 +2823,27 @@ void allPartyForceSlitOff(void) {
     }
 }
 
+#ifdef VERSION_G8ME01
+void U_allPartySlitOffReq(void) {
+    PartyEntry* party = partyGetPtr(marioGetPartyId());
+    if (party && ((party->flags & 0x1000) || (party->flags2 & 0x100))) {
+        party->flags2 &= ~0x3C0;
+        partyPaperOff(party);
+        party->flags &= ~0x3000;
+        party->unk37 = 0;
+        partyChgPoseId(party, 1);
+    }
+    party = partyGetPtr(marioGetExtraPartyId());
+    if (party && ((party->flags & 0x1000) || (party->flags2 & 0x100))) {
+        party->flags2 &= ~0x3C0;
+        partyPaperOff(party);
+        party->flags &= ~0x3000;
+        party->unk37 = 0;
+        partyChgPoseId(party, 1);
+    }
+}
+
+#endif
 void L_partyForceSlitOff(PartyEntry* party) {
     if ((party->flags & 0x1000) || (party->flags2 & 0x100)) {
         party->unk10C = revise360(party->unk100 - party->unkF8) >= 180.0f ? 0.0f : 180.0f;
@@ -2629,15 +2869,41 @@ void partyChgMotSlitFloor(PartyEntry* party) {
     party->flags |= 0x2000;
 }
 
+#ifdef VERSION_G8ME01
+void partySlitReset(PartyEntry* party) {
+    if (party) {
+        if (party->unk37 == 1) {
+            L_partyForceSlitOff(party);
+        }
+        party->unk37 = 0;
+    }
+}
+
+#endif
 BOOL party_slit(PartyEntry* party) {
     BOOL ret = TRUE;
     PartyMarioView* mario;
     f32 a;
 
     mario = party->playerPtr;
+#ifdef VERSION_G8ME01
+    // US: a partner not yet in slit mode joins in while Mario is on a slit floor
+    if (party->unk37 != 1) {
+        if (mario->flags0 & 0x100000) {
+            if (mario->flags & 0x80000000) {
+                return TRUE;
+            }
+            party->flags3 |= 1;
+            party->unk37 = 1;
+        } else {
+            return TRUE;
+        }
+    }
+#else
     if (party->unk37 != 1) {
         return TRUE;
     }
+#endif
     if (party->flags3 & 1) {
         party->flags3 &= ~1;
         party->flags2 |= 0x100;
@@ -2700,11 +2966,19 @@ BOOL party_slit(PartyEntry* party) {
                     partyChgPaper(party, "PM_S_1D");
                 }
             }
+#ifdef VERSION_G8ME01
+            if (!partyChkBetweenWalls(party, party->position) && !(mario->flags0 & 0x100000) &&
+                !(hitGetAttr(party->unk12C) & 0x2000) && !(hitGetAttr(party->unk134) & 0x2000))
+            {
+                party->unk3A = 40;
+            }
+#else
             if (!(mario->flags0 & 0x100000) && !(hitGetAttr(party->unk12C) & 0x2000) &&
                 !(hitGetAttr(party->unk134) & 0x2000))
             {
                 party->unk3A = 40;
             }
+#endif
             break;
     }
     switch (party->unk3A) {

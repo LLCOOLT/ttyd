@@ -616,7 +616,11 @@ EVT_BEGIN(evt_down)
 EVT_END()
 
 __declspec(section ".data") EVT_BEGIN(init_miyage)
+#ifdef VERSION_G8ME01
+    CALL(evt_npc_set_position, STRING("me"), -363, 10, 142)
+#else
     CALL(evt_npc_set_position, STRING("me"), -363, 15, 142)
+#endif
     RETURN
 EVT_END()
 

@@ -163,7 +163,11 @@ static s32 garawaru_init[39];
 static s32 garawaru_talk[270];
 static s32 marco_init[31];
 s32 marco_kyorokyoro[28];
+#ifdef VERSION_G8ME01
+static s32 marco_talk[848];
+#else
 static s32 marco_talk[831];
+#endif
 static s32 megane_init[14];
 static s32 megane_talk[54];
 static s32 odoodo_init[14];
@@ -649,7 +653,17 @@ static EVT_BEGIN(marco_talk)
             CALL(evt_msg_print, 0, STRING("stg5_muj_88_01"), 0, 0)
         END_INLINE_EVENT
         WAIT_MS(3000)
+#ifdef VERSION_G8ME01
+        IF_INT_EQUAL(LF(10), 0)
+            CALL(evt_msg_print, 0, STRING("stg5_muj_89"), 0, STRING("party"))
+            ELSE
+            CALL(evt_party_stop, 1)
+            CALL(evt_msg_print, 0, STRING("stg5_muj_89"), 0, STRING("extparty"))
+            CALL(evt_party_run, 1)
+        END_IF
+#else
         CALL(evt_msg_print, 0, STRING("stg5_muj_89"), 0, STRING("me"))
+#endif
         LOOP(3)
             SET_VALUE(LW(0), 0)
             SET_VALUE(LW(1), 180)
@@ -1761,16 +1775,29 @@ static EVT_BEGIN(sekai_yami_evt)
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("stg8_dark_06"), 0, 0)
     BEGIN_INLINE_EVENT
+#ifdef VERSION_G8ME01
+        WAIT_MS(100)
+        LOOP(1)
+#else
         WAIT_MS(500)
         LOOP(2)
+#endif
             CALL(evt_snd_sfxon, STRING("SFX_STG8_LIGHT1"), 0)
             CALL(evt_fade_entry, 10, 0, 255, 255, 255)
             WAIT_MS(100)
             CALL(evt_fade_entry, 9, 0, 255, 255, 255)
+#ifdef VERSION_G8ME01
+            WAIT_MS(400)
+#else
             WAIT_MS(100)
+#endif
         END_LOOP
     END_INLINE_EVENT
+#ifdef VERSION_G8ME01
+    WAIT_MS(1200)
+#else
     WAIT_MS(1000)
+#endif
     CALL(evt_snd_sfxoff, LW(0))
     CALL(evt_fade_set_mapchange_type, 1, 10, 300, 9, 300)
     CALL(evt_bero_mapchange, STRING("pik_01"), STRING("sekai_yami2"))

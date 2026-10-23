@@ -128,6 +128,9 @@ USER_FUNC(evt_win_item_maketable);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(puni_away);
 USER_FUNC(puni_parent);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_mario_normalize);
+#endif
 static void alpha_tev(MapTevCallbackInfo* info);
 static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
@@ -181,9 +184,17 @@ static __declspec(section ".data") s32 evt_unlock00[6];
 __declspec(section ".data") s32 evt_unlock00_01[4];
 __declspec(section ".data") s32 key_table00[2];
 s32 evt_check00[23];
+#ifdef VERSION_G8ME01
+s32 blue_jail_open[60];
+#else
 s32 blue_jail_open[65];
+#endif
 s32 evt_opendoor01[19];
+#ifdef VERSION_G8ME01
+static __declspec(section ".data") s32 evt_unlock01[9];
+#else
 static __declspec(section ".data") s32 evt_unlock01[8];
+#endif
 __declspec(section ".data") s32 key_table01[3];
 s32 evt_check01[90];
 s32 bluejail_alpha[119];
@@ -192,7 +203,11 @@ static s32 mario_kirimomi_event[50];
 s32 party_kirimomi_event[57];
 s32 JailAwayTable_New[15];
 s32 kinoko_small[35];
+#ifdef VERSION_G8ME01
+s32 guide_sister[769];
+#else
 s32 guide_sister[775];
+#endif
 s32 elder_shaberi[13];
 s32 toraware_elder[423];
 s32 guide_sister_before[128];
@@ -790,7 +805,9 @@ EVT_END()
 
 EVT_BEGIN(blue_jail_open)
     SET_VALUE(GSWF(2835), 1)
+#ifndef VERSION_G8ME01
     CALL(evt_mario_key_onoff, 0)
+#endif
     WAIT_MS(1000)
     CALL(evt_mapobj_get_position, STRING("S_hako_l_doa"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_DOOR_GRID_OPEN1"), LW(0), LW(1), LW(2), 0)
@@ -805,9 +822,14 @@ EVT_BEGIN(blue_jail_open)
     END_LOOP
     CALL(evt_hitobj_onoff, STRING("A_hako_l_01"), 1, 0)
     CALL(evt_hitobj_onoff, STRING("S_hako_l1"), 1, 0)
+#ifdef VERSION_G8ME01
+    CALL_CHILD(guide_sister)
+#endif
     CALL(evt_mario_key_onoff, 1)
+#ifndef VERSION_G8ME01
     SPAWN_EVENT(PTR(guide_sister))
     CALL(evt_exit_case_evt)
+#endif
     RETURN
 EVT_END()
 
@@ -819,7 +841,12 @@ EVT_BEGIN(evt_opendoor01)
 EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(evt_unlock01)
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_normalize)
+#else
     CALL(evt_pouch_remove_item, 17, LW(0))
+#endif
     SPAWN_EVENT(PTR(blue_jail_open))
     RETURN
 EVT_END()
@@ -1135,7 +1162,9 @@ EVT_BEGIN(kinoko_small)
 EVT_END()
 
 EVT_BEGIN(guide_sister)
+#ifndef VERSION_G8ME01
     CALL(evt_mario_key_onoff, 0)
+#endif
     SET_VALUE(LW(10), 14)
     SET_VALUE(LW(11), 0)
     SET_VALUE(LW(12), 0)
@@ -1331,7 +1360,9 @@ EVT_BEGIN(guide_sister)
     END_IF
     SET_VALUE(GSW(0), 101)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_MRI1"))
+#ifndef VERSION_G8ME01
     CALL(evt_mario_key_onoff, 1)
+#endif
     RETURN
 EVT_END()
 

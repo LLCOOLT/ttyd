@@ -197,6 +197,9 @@ typedef struct MarioWork {
     f32 mBaseWalkSpeed;            // 0x184
     f32 mBaseDashSpeed;            // 0x188, same on US
     u8 unk18C[0x190 - 0x18C];      // 0x18C
+#ifdef VERSION_G8ME01
+    u8 us_pad18C[4]; // US only: +4 from here
+#endif
 	f32 controlStickSensitivity;   // 0x190
 	f32 controlStickAngle;         // 0x194
     f32 targetYaw;                 // 0x198
@@ -236,10 +239,18 @@ typedef struct MarioWork {
 	void* balloonEffect;           // 0x260, EffectEntry*
 	void* balloonNpc;              // 0x264, NpcEntry*
 	u8 field_0x268[0x278 - 0x268]; // 0x268
+#ifdef VERSION_G8ME01
+    s32 soundId[5];                // 0x278, US: 5 sounds (+8 from here)
+#else
 	s32 soundId[3];                // 0x278
+#endif
 	u8 field_0x284[0x288 - 0x284]; // 0x284
     void* motStruct;               // 0x288, motion userdata, TODO rename?
-    u8 field_0x28C[0x2A8 - 0x28C]; // 0x28C
+    u8 field_0x28C[0x2A0 - 0x28C]; // 0x28C
+#ifdef VERSION_G8ME01
+    u8 us_pad2A0[0xC]; // US only: +0x18 from here
+#endif
+    u8 field_0x2A0[0x2A8 - 0x2A0]; // 0x2A0
     f32 wCamVal1;                  // 0x2A8, TODO: double check
     u8 field_0x2AC[0x2B8 - 0x2AC]; // 0x2AC
     f32 unk2B8;                    // 0x2B8, yoshi z rotation
@@ -310,3 +321,10 @@ void marioRearAnime(void);
 void marioPreDisp(void);
 void marioDispBlur(CameraId camId, void* param);
 void marioDisp(CameraId camId, void* param);
+
+#ifdef VERSION_G8ME01
+/* raw MarioWork offsets (JP) -> US layout; constant-folds */
+#define MWOFF(off) ((off) + ((off) >= 0x2A0 ? 0x18 : (off) >= 0x284 ? 0xC : (off) >= 0x190 ? 4 : 0))
+#else
+#define MWOFF(off) (off)
+#endif

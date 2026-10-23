@@ -21,6 +21,7 @@
 #include "driver/mapdrv.h"
 #include "dolphin/gx.h"
 
+
 f32 reviseAngle(f32 angle);
 typedef struct CamRoadWork { u8 field_0x0[0xD8]; s32 field_0xD8; u8 field_0xDC[0xFC - 0xDC]; char* curveName; } CamRoadWork;
 CamRoadWork* camRoadGetWorkPtr(void);
@@ -264,6 +265,10 @@ USER_FUNC(evt_win_party_lankup_chk);
 USER_FUNC(get_mario_dir_target);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_sub_get_language);
+USER_FUNC(evt_msg_fmt_int);
+#endif
 void kuragarisan_msgcb(s32 type, void* param);
 static USER_FUNC(enzan_set_f_i);
 static USER_FUNC(enzan_set_i_f);
@@ -386,7 +391,11 @@ s32 gor_02_event_00[18];
 s32 gor_02_event_01[30];
 static s32 bero_entry_data[45];
 s32 powerupya_party_lank_rtn[786];
+#ifdef VERSION_G8ME01
+s32 powerupya_party_rtn[170];
+#else
 s32 powerupya_party_rtn[167];
+#endif
 s32 powerupya_table_talk[91];
 s32 powerupya_direct_talk[96];
 __declspec(section ".data") s32 powerupya_item_tbl[2];
@@ -397,7 +406,11 @@ s32 powerupya_orb_use[544];
 s32 powerupya_talk[119];
 s32 mapball_init[19];
 s32 powerupya_init[58];
+#ifdef VERSION_G8ME01
+s32 johoyaperfect_talk[169];
+#else
 s32 johoyaperfect_talk[146];
+#endif
 static s32 kurihakase_init[134];
 static s32 kurihakase_talk[421];
 __declspec(section ".data") s32 oyabun_init[7];
@@ -473,8 +486,16 @@ s32 evt_door_03_roll_entry[20];
 static __declspec(section ".data") s32 evt_door_04_00[12];
 static __declspec(section ".data") s32 evt_door_04_01[12];
 static s32 evt_wall_04[38];
+#ifdef VERSION_G8ME01
+static s32 evt_door_04_open[19];
+#else
 static s32 evt_door_04_open[14];
+#endif
+#ifdef VERSION_G8ME01
+static s32 evt_door_04_close[21];
+#else
 static s32 evt_door_04_close[16];
+#endif
 static __declspec(section ".data") s32 door_data_04_npc[2];
 static __declspec(section ".data") s32 door_data_04_item[4];
 static s32 door_data_04[18];
@@ -516,17 +537,45 @@ s32 kurihakase_first_talk[787];
 s32 kurihakase_wall_remove[257];
 s32 kurihakase_lecture[286];
 s32 kurihakase_door[84];
+#ifdef VERSION_G8ME01
+s32 kurihakase_lecture_badge[282];
+#else
 s32 kurihakase_lecture_badge[272];
+#endif
 s32 Mario_Party_position[33];
 s32 book_open[42];
 s32 book_close[42];
 s32 book_center_init[22];
+#ifdef VERSION_G8ME01
+s32 epigraphy_map[621];
+#else
 s32 epigraphy_map[614];
+#endif
+#ifdef VERSION_G8ME01
+s32 epigraphy_map_after_stage1[258];
+#else
 s32 epigraphy_map_after_stage1[251];
+#endif
+#ifdef VERSION_G8ME01
+s32 epigraphy_map_after_stage2[400];
+#else
 s32 epigraphy_map_after_stage2[393];
+#endif
+#ifdef VERSION_G8ME01
+s32 epigraphy_map_after_stage3[368];
+#else
 s32 epigraphy_map_after_stage3[361];
+#endif
+#ifdef VERSION_G8ME01
+s32 epigraphy_map_after_stage4[297];
+#else
 s32 epigraphy_map_after_stage4[290];
+#endif
+#ifdef VERSION_G8ME01
+s32 epigraphy_map_after_stage5[225];
+#else
 s32 epigraphy_map_after_stage5[218];
+#endif
 s32 epigraphy_map_after_stage6[245];
 s32 kurihakase_after3minutes[177];
 static s32 hitDmgRetPoints[52];
@@ -1051,6 +1100,9 @@ EVT_BEGIN(powerupya_party_rtn)
         IF_INT_NOT_EQUAL(LW(1), LW(8))
             CALL(evt_mario_goodbye_party, 0)
             CALL(evt_mario_hello_party, 0, LW(1))
+#ifdef VERSION_G8ME01
+            CALL(evt_party_stop, 0)
+#endif
         END_IF
         CALL(evt_msg_print, 0, STRING("powerup_02"), 0, STRING("me"))
         CALL(evt_msg_select, 0, STRING("powerup_03"))
@@ -1362,7 +1414,11 @@ EVT_BEGIN(powerupya_talk)
     IF_INT_EQUAL(GSWF(1203), 1)
         IF_INT_EQUAL(GSWF(1204), 0)
             CALL(evt_msg_print, 0, STRING("powerup_ev_01"), 0, STRING("me"))
+#ifdef VERSION_G8ME01
+            CALL(evt_cam3d_evt_set, -320, 114, 371, -320, 45, -23, 500, 11)
+#else
             CALL(evt_cam3d_evt_set, -355, 114, 371, -355, 45, -23, 500, 11)
+#endif
             WAIT_MS(500)
             CALL(evt_msg_print, 0, STRING("powerup_ev_02"), 0, STRING("me"))
             SPAWN_EVENT_GET_ID(PTR(powerupya_direct_talk), LW(10))
@@ -1452,7 +1508,18 @@ EVT_BEGIN(johoyaperfect_talk)
             CALL(evt_msg_print_add, 0, LW(1))
             CALL(evt_msg_print_add, 0, STRING("johoyaperfect_07"))
             ELSE
+#ifdef VERSION_G8ME01
+            CALL(evt_sub_get_language, LW(0))
+            SWITCH(LW(0))
+                CASE_EQUAL(0)
+#endif
             CALL(evt_msg_print_insert, 0, STRING("johoyaperfect_01"), 0, STRING("me"), LW(3), LW(2), LW(4))
+#ifdef VERSION_G8ME01
+                CASE_DEFAULT
+                CALL(evt_msg_fmt_int, 0, LW(14), STRING("johoyaperfect_01"), LW(4))
+                CALL(evt_msg_print_insert, 1, LW(14), 0, STRING("me"), LW(3), LW(2))
+            END_SWITCH
+#endif
             CALL(evt_msg_select, 0, STRING("johoyaperfect_02"))
             IF_INT_EQUAL(LW(0), 0)
                 CALL(evt_pouch_get_coin, LW(0))
@@ -2479,7 +2546,11 @@ EVT_BEGIN(borodo1_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 1073741824)
     SWITCH(GSW(0))
         CASE_BETWEEN(215, 261)
+#ifdef VERSION_G8ME01
+        CALL(evt_npc_set_position, STRING("me"), 475, 0, 275)
+#else
         CALL(evt_npc_set_position, STRING("me"), 550, 0, 275)
+#endif
         CASE_DEFAULT
         CALL(evt_npc_set_position, STRING("me"), 90, 0, 150)
     END_SWITCH
@@ -3276,6 +3347,9 @@ EVT_END()
 
 static EVT_BEGIN(evt_door_04_open)
     SPAWN_EVENT(PTR(gor_02_hitobj_off))
+#ifdef VERSION_G8ME01
+    CALL(evt_hitobj_onoff, STRING("polySurface1317"), 1, 0)
+#endif
     CALL(evt_snd_bgmoff, 18432)
     CALL(evt_snd_envoff, 18432)
     CALL(evt_snd_env_lpf, 0, 800)
@@ -3284,6 +3358,9 @@ EVT_END()
 
 static EVT_BEGIN(evt_door_04_close)
     SPAWN_EVENT(PTR(gor_02_hitobj_on))
+#ifdef VERSION_G8ME01
+    CALL(evt_hitobj_onoff, STRING("polySurface1317"), 1, 1)
+#endif
     CALL(evt_snd_bgmon, 160, 0)
     CALL(evt_snd_envon, 160, 0)
     CALL(evt_snd_env_lpf, 0, 0)
@@ -3798,6 +3875,12 @@ USER_FUNC(camera_front_check) {
     s32* args = event->args;
     f32 angle = reviseAngle((100.0f * camGetPtr(CAMERA_3D)->viewYaw + 5.0f) / 100.0f);
 
+#ifdef VERSION_G8ME01
+    if (marioGetPtr()->position.x < -300.0f) {
+        evtSetValue(event, *args, 0);
+        return EVT_RETURN_DONE;
+    }
+#endif
     if (angle >= 0.0f && angle < 90.0f) {
         evtSetValue(event, *args++, 1);
     }
@@ -4604,6 +4687,11 @@ EVT_BEGIN(kurihakase_lecture_badge)
     WAIT_MS(1000)
     CALL(evt_npc_move_position, STRING("クリハカセ"), -235, 0, 0, FLOAT(120.0f), 0)
     WAIT_MS(500)
+#ifdef VERSION_G8ME01
+    CALL(evt_npc_set_anim, STRING("クリハカセ"), STRING("A_2"))
+    WAIT_MS(300)
+    CALL(evt_npc_set_anim, STRING("クリハカセ"), STRING("S_1"))
+#endif
     DELETE_EVENT(LW(10))
     CALL(evt_item_get_item, STRING("item00"))
     CALL(evt_npc_move_position, STRING("クリハカセ"), -215, 0, 0, FLOAT(120.0f), 0)
@@ -4853,6 +4941,10 @@ EVT_BEGIN(epigraphy_map)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_GOR1"), 2000)
     CALL(evt_snd_envon, 272, STRING("ENV_STG0_GOR3"))
+#ifdef VERSION_G8ME01
+    CALL(evt_snd_envoff, 18496)
+    CALL(evt_snd_env_lpf, 0, 800)
+#endif
     SET_VALUE(GSWF(1246), 1)
     SET_VALUE(GSW(0), 19)
     RETURN
@@ -4915,6 +5007,10 @@ EVT_BEGIN(epigraphy_map_after_stage1)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_GOR1"), 2000)
     CALL(evt_snd_envon, 272, STRING("ENV_STG0_GOR3"))
+#ifdef VERSION_G8ME01
+    CALL(evt_snd_envoff, 18496)
+    CALL(evt_snd_env_lpf, 0, 800)
+#endif
     SET_VALUE(GSW(0), 65)
     RETURN
 EVT_END()
@@ -5006,6 +5102,10 @@ EVT_BEGIN(epigraphy_map_after_stage2)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_GOR1"), 2000)
     CALL(evt_snd_envon, 272, STRING("ENV_STG0_GOR3"))
+#ifdef VERSION_G8ME01
+    CALL(evt_snd_envoff, 18496)
+    CALL(evt_snd_env_lpf, 0, 800)
+#endif
     SET_VALUE(GSW(0), 121)
     RETURN
 EVT_END()
@@ -5091,6 +5191,10 @@ EVT_BEGIN(epigraphy_map_after_stage3)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_GOR1"), 2000)
     CALL(evt_snd_envon, 272, STRING("ENV_STG0_GOR3"))
+#ifdef VERSION_G8ME01
+    CALL(evt_snd_envoff, 18496)
+    CALL(evt_snd_env_lpf, 0, 800)
+#endif
     SET_VALUE(GSW(0), 175)
     RETURN
 EVT_END()
@@ -5156,6 +5260,10 @@ EVT_BEGIN(epigraphy_map_after_stage4)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_GOR1"), 2000)
     CALL(evt_snd_envon, 272, STRING("ENV_STG0_GOR3"))
+#ifdef VERSION_G8ME01
+    CALL(evt_snd_envoff, 18496)
+    CALL(evt_snd_env_lpf, 0, 800)
+#endif
     SET_VALUE(GSW(0), 222)
     RETURN
 EVT_END()
@@ -5211,6 +5319,10 @@ EVT_BEGIN(epigraphy_map_after_stage5)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_GOR1"), 2000)
     CALL(evt_snd_envon, 272, STRING("ENV_STG0_GOR3"))
+#ifdef VERSION_G8ME01
+    CALL(evt_snd_envoff, 18496)
+    CALL(evt_snd_env_lpf, 0, 800)
+#endif
     SET_VALUE(GSW(0), 272)
     RETURN
 EVT_END()
@@ -5271,7 +5383,11 @@ EVT_BEGIN(epigraphy_map_after_stage6)
     SET_VALUE(GSW(0), 348)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_GOR1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG0_GOR3"))
+#ifdef VERSION_G8ME01
+    CALL(evt_snd_envoff, 18496)
+#else
     CALL(evt_snd_envoff, 18432)
+#endif
     CALL(evt_snd_env_lpf, 0, 800)
     RETURN
 EVT_END()
@@ -5319,7 +5435,11 @@ EVT_BEGIN(kurihakase_after3minutes)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_GOR1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG0_GOR3"))
     CALL(evt_snd_bgmoff, 18432)
+#ifdef VERSION_G8ME01
+    CALL(evt_snd_envoff, 18496)
+#else
     CALL(evt_snd_envoff, 18432)
+#endif
     CALL(evt_snd_env_lpf, 0, 800)
     RETURN
 EVT_END()
@@ -5487,7 +5607,11 @@ EVT_END()
 EVT_BEGIN(iri_19_init)
     IF_INT_EQUAL(GSW(1420), 19)
         IF_INT_EQUAL(GSWF(5405), 1)
+#ifdef VERSION_G8ME01
+            CALL(evt_item_entry, STRING("wr"), 73, 525, 0, 160, 16, GSWF(5406), 0)
+#else
             CALL(evt_item_entry, STRING("wr"), 73, -65, 120, 196, 16, GSWF(5406), 0)
+#endif
         END_IF
     END_IF
     RETURN

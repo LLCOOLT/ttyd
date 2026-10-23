@@ -1,6 +1,13 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
+#ifdef VERSION_G8ME01
+// US has no local duplicates of these: use the global functions
+#define bomhei_init_800BFBB0 bomhei_init
+#define kuribo_init_800C23B4 kuribo_init
+#define vivian_init_801809C0 vivian_init
+#endif
+
 extern s32 bomhei_bye[];
 extern s32 bomhei_exit[];
 extern s32 bomhei_init_800BFBB0[];

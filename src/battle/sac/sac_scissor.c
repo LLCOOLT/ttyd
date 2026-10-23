@@ -1,3 +1,4 @@
+#include "icon_ids.h"
 #pragma optimize_for_size on
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
@@ -130,7 +131,7 @@ s32 weapon_scissor_finish[48];
 s32 marioAttackEvent_Scissor[300];
 
 s32 weapon_scissor[] = {
-    (s32)"btl_wn_sac_scissor", 27000832, 0, (s32)"msg_scissor", 1677722624, 1065353216, 17130546, (s32)weaponGetPower_Scissor,
+    (s32)"btl_wn_sac_scissor", ICON_19C << 16, 0, (s32)"msg_scissor", 1677722624, 1065353216, 17130546, (s32)weaponGetPower_Scissor,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, (s32)"msg_sac_5", 131272, 2047, 0,
@@ -756,7 +757,7 @@ void star_disp2D_sub(s32 idx, s32 alpha) {
     PSMTXConcat(rotX, rotMtx, rotMtx);
     PSMTXConcat(scaleMtx, rotMtx, rotMtx);
     PSMTXConcat(transMtx, rotMtx, rotMtx);
-    iconDispGxCol(rotMtx, 0x10, 0x19C, col);
+    iconDispGxCol(rotMtx, 0x10, ICON_19C, col);
 }
 #pragma dont_inline reset
 

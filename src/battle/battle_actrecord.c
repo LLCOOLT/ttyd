@@ -3,7 +3,11 @@
 extern BattleWork* _battleWorkPointer;
 #pragma optimize_for_size on
 #pragma dont_inline on
+#ifdef VERSION_G8ME01
+#define R(o) (hi[0x6f1c + (o)])
+#else
 #define R(o) (hi[0x6f00 + (o)])
+#endif
 s32 _check_turn_count_0_end(s32 n);
 s32 _check_turn_count_0_turn(s32 n);
 s32 _check_use(s32 n);

@@ -10,10 +10,10 @@ extern s32 battle_heart_drop_param_default3[];
 extern s32 battle_item_kurokumorn[];
 extern s32 battle_item_patatogemet[];
 extern s32 battle_item_sambo_mummy[];
-extern s32 unit_kuriboo_7_data_69B8[];
+extern s32 unit_kuriboo[];
 extern s32 unit_kurokumorn[];
-extern s32 unit_patatogemet_7_data_10380[];
-extern s32 unit_sambo_mummy_7_data_BC68[];
+extern s32 unit_patatogemet[];
+extern s32 unit_sambo_mummy[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_eki_negone_one_374;
@@ -212,10 +212,10 @@ s32 eki_btlstage_data[] = {
 };
 
 s32 btlparty_eki_eki_06_01_off_1[] = {
-    (s32)unit_kuriboo_7_data_69B8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, 0, (s32)unit_kuriboo_7_data_69B8, 16777216, 67108868, 1119092736,
+    (s32)unit_kuriboo, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, 0, (s32)unit_kuriboo, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)unit_kuriboo_7_data_69B8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_kuriboo, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, 0,
 };
 
@@ -246,8 +246,8 @@ __declspec(section ".data") s32 btlgrp_eki_eki_02_02_off_1[] = {
 };
 
 s32 btlparty_eki_eki_02_03_off_1[] = {
-    (s32)unit_patatogemet_7_data_10380, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_patatogemet, (s32)unit_patatogemet_7_data_10380, 16777216, 67108868, 1121714176,
+    (s32)unit_patatogemet, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_patatogemet, (s32)unit_patatogemet, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_patatogemet,
 };
 
@@ -256,8 +256,8 @@ __declspec(section ".data") s32 btlgrp_eki_eki_02_03_off_1[] = {
 };
 
 s32 btlparty_eki_eki_03_01_off_1[] = {
-    (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1121714176,
+    (s32)unit_sambo_mummy, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_sambo_mummy, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_sambo_mummy,
 };
 
@@ -266,10 +266,10 @@ __declspec(section ".data") s32 btlgrp_eki_eki_03_01_off_1[] = {
 };
 
 s32 btlparty_eki_eki_03_02_off_1[] = {
-    (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1119092736,
+    (s32)unit_sambo_mummy, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_sambo_mummy, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sambo_mummy,
-    (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_sambo_mummy, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_sambo_mummy,
 };
 
@@ -278,10 +278,10 @@ __declspec(section ".data") s32 btlgrp_eki_eki_03_02_off_1[] = {
 };
 
 s32 btlparty_eki_eki_03_03_off_1[] = {
-    (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    (s32)unit_sambo_mummy, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
     0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_kurokumorn, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_kurokumorn,
-    (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_sambo_mummy, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_sambo_mummy,
 };
 
@@ -291,7 +291,7 @@ __declspec(section ".data") s32 btlgrp_eki_eki_03_03_off_1[] = {
 
 s32 btlparty_eki_eki_03_05_off_1[] = {
     (s32)unit_kurokumorn, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_kurokumorn, (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1121714176,
+    0, 0, 0, (s32)battle_item_kurokumorn, (s32)unit_sambo_mummy, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_sambo_mummy,
 };
 
@@ -301,9 +301,9 @@ __declspec(section ".data") s32 btlgrp_eki_eki_03_05_off_1[] = {
 
 s32 btlparty_eki_eki_03_07_off_1[] = {
     (s32)unit_kurokumorn, 16777216, 67108868, 1106247680, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_kurokumorn, (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1116471296,
+    0, 0, 0, (s32)battle_item_kurokumorn, (s32)unit_sambo_mummy, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sambo_mummy,
-    (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    (s32)unit_sambo_mummy, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_kurokumorn, 16777216, 67108868, 1125515264,
     1109393408, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_kurokumorn,
 };
@@ -313,10 +313,10 @@ __declspec(section ".data") s32 btlgrp_eki_eki_03_07_off_1[] = {
 };
 
 s32 btlparty_eki_eki_04_01_off_1[] = {
-    (s32)unit_patatogemet_7_data_10380, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_patatogemet, (s32)unit_patatogemet_7_data_10380, 16777216, 67108868, 1119092736,
+    (s32)unit_patatogemet, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_patatogemet, (s32)unit_patatogemet, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_patatogemet,
-    (s32)unit_patatogemet_7_data_10380, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_patatogemet, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_patatogemet,
 };
 
@@ -325,10 +325,10 @@ __declspec(section ".data") s32 btlgrp_eki_eki_04_01_off_1[] = {
 };
 
 s32 btlparty_eki_eki_04_02_off_1[] = {
-    (s32)unit_patatogemet_7_data_10380, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_patatogemet, (s32)unit_patatogemet_7_data_10380, 16777216, 67108868, 1119092736,
+    (s32)unit_patatogemet, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_patatogemet, (s32)unit_patatogemet, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_patatogemet,
-    (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_sambo_mummy, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_sambo_mummy,
 };
 
@@ -337,8 +337,8 @@ __declspec(section ".data") s32 btlgrp_eki_eki_04_02_off_1[] = {
 };
 
 s32 btlparty_eki_eki_04_06_off_1[] = {
-    (s32)unit_patatogemet_7_data_10380, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_patatogemet, (s32)unit_patatogemet_7_data_10380, 16777216, 67108868, 1121714176,
+    (s32)unit_patatogemet, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_patatogemet, (s32)unit_patatogemet, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_patatogemet,
 };
 
@@ -347,8 +347,8 @@ __declspec(section ".data") s32 btlgrp_eki_eki_04_06_off_1[] = {
 };
 
 s32 btlparty_eki_eki_04_03_off_1[] = {
-    (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1121714176,
+    (s32)unit_sambo_mummy, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_sambo_mummy, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_sambo_mummy,
 };
 
@@ -357,11 +357,11 @@ __declspec(section ".data") s32 btlgrp_eki_eki_04_03_off_1[] = {
 };
 
 s32 btlparty_eki_eki_04_04_off_1[] = {
-    (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1116471296,
+    (s32)unit_sambo_mummy, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_sambo_mummy, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sambo_mummy,
-    (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1125515264,
+    (s32)unit_sambo_mummy, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_sambo_mummy, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, 0,
 };
 
@@ -370,8 +370,8 @@ __declspec(section ".data") s32 btlgrp_eki_eki_04_04_off_1[] = {
 };
 
 s32 btlparty_eki_eki_04_05_off_1[] = {
-    (s32)unit_sambo_mummy_7_data_BC68, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_patatogemet_7_data_10380, 16777216, 67108868, 1121714176,
+    (s32)unit_sambo_mummy, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_sambo_mummy, (s32)unit_patatogemet, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_patatogemet,
 };
 

@@ -1957,6 +1957,9 @@ USER_FUNC(evt_npc_battle_start) {
     info = &fbat->info;
     if (isFirstCall) {
         fbat->target = npc;
+#ifdef VERSION_G8ME01
+        marioFBattlePrepare();
+#endif
         marioCtrlOff();
         party = partyGetPtr(marioGetPartyId());
         if (party) {
@@ -1986,6 +1989,9 @@ USER_FUNC(evt_npc_wait_battle_end) {
         partyCtrlOn(party);
     }
     L_psndBGM_stop();
+#ifdef VERSION_G8ME01
+    marioFBattlePost();
+#endif
     return EVT_RETURN_DONE;
 }
 
@@ -2688,6 +2694,54 @@ USER_FUNC(evt_fbat_trans_floor_position) {
     evtSetFloat(event, arg2, z);
     return EVT_RETURN_DONE;
 }
+
+#ifdef VERSION_G8ME01
+// US-only: like evt_fbat_trans_floor_position, but also probes at x +/- width/2 and keeps the highest floor
+USER_FUNC(evt_fbat_trans_floor_position_wide) {
+    s32* args = event->args;
+
+    f32 hitX, hitY, hitZ;
+    f32 distance;
+    f32 hitNX, hitNY, hitNZ;
+    f32 half, h;
+
+    s32 arg0 = *args++;
+    f32 x = evtGetFloat(event, arg0);
+    s32 arg1 = *args++;
+    f32 y = evtGetFloat(event, arg1);
+    s32 arg2 = *args++;
+    f32 z = evtGetFloat(event, arg2);
+    f32 floor = evtGetFloat(event, *args++);
+    f32 dist = evtGetFloat(event, *args++);
+    f32 width = evtGetFloat(event, *args++);
+
+    f32 y2 = y;
+    distance = dist;
+
+    y = 1.0f + y;
+    if (hitCheckFilter(0, &hitX, &hitY, &hitZ, &distance, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, -1.0f, 0.0f)) {
+        y2 = (hitY + floor);
+    }
+    half = width * 0.5f;
+    if (hitCheckFilter(0, &hitX, &hitY, &hitZ, &distance, &hitNX, &hitNY, &hitNZ, x + half, y, z, 0.0f, -1.0f, 0.0f)) {
+        h = hitY + floor;
+        if (h > y2) {
+            y2 = h;
+        }
+    }
+    if (hitCheckFilter(0, &hitX, &hitY, &hitZ, &distance, &hitNX, &hitNY, &hitNZ, x - half, y, z, 0.0f, -1.0f, 0.0f)) {
+        h = hitY + floor;
+        if (h > y2) {
+            y2 = h;
+        }
+    }
+
+    evtSetFloat(event, arg0, x);
+    evtSetFloat(event, arg1, y2);
+    evtSetFloat(event, arg2, z);
+    return EVT_RETURN_DONE;
+}
+#endif
 
 USER_FUNC(evt_npc_sound_data_reset) {
     const char* npcName = (const char*)evtGetValue(event, *event->args);

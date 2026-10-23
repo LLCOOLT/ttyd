@@ -183,7 +183,11 @@ static s32 ki_data_evt_01[20];
 s32 ki_data_evt_02[20];
 static s32 ki_data[24];
 static s32 npcEnt[46];
+#ifdef VERSION_G8ME01
+s32 hei_00_koopa_evt[272];
+#else
 s32 hei_00_koopa_evt[269];
+#endif
 static s32 epilogue_npc_entry[30];
 static s32 epilogue_evt[90];
 s32 hei_00_init_evt[297];
@@ -1129,6 +1133,9 @@ EVT_BEGIN(hei_00_koopa_evt)
     CALL(evt_cam3d_evt_set, -148, 195, 539, -148, 95, -22, 0, 11)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_kill_party, 0)
+#endif
     CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_KUPPA1"))
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_snd_envon, 272, STRING("ENV_STG1_HEI1"))

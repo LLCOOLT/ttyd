@@ -90,7 +90,7 @@ __declspec(section ".data") s32 fd_green_chorobon___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_green_chorobon_one_negone_359;
 __declspec(section ".data") s32 fd_green_chorobon___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_green_chorobon_one_364[1];
-BattleUnitKind unit_green_chorobon_20_data_36508;
+BattleUnitKind unit_green_chorobon;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -159,7 +159,7 @@ __declspec(section ".data") s32 fd_green_chorobon_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_green_chorobon_20_data_36508 = {
+BattleUnitKind unit_green_chorobon = {
     86,
     "btl_un_green_chorobon",
     5,
@@ -299,7 +299,7 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 static __declspec(section ".data") s32 entry_chorobon[] = {
-    (s32)&unit_green_chorobon_20_data_36508, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
+    (s32)&unit_green_chorobon, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
     0, 0, 0, 0,
 };
 

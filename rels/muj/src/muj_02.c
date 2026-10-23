@@ -7,6 +7,10 @@
 #include "manager/fontmgr.h"
 #include "driver/camdrv.h"
 #include "stdio.h"
+#ifdef VERSION_G8ME01
+#include "mario/mariost.h"
+void FontDrawString(f32 x, f32 y, const char* str);
+#endif
 
 void printCount(CameraId camera, void* param);
 void FontDrawStringPitch(f32 x, f32 y, f32 pitch, const char* str);
@@ -59,6 +63,9 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_random);
 USER_FUNC(evt_win_item_select);
+#ifdef VERSION_G8ME01
+extern s32 tree_tbl_treeb_evt[];
+#endif
 void printCount(CameraId camera, void* param);
 extern s32 evt_bero_info_run[];
 extern s32 evt_gazigazi_entry[];
@@ -101,7 +108,11 @@ static s32 evt_kusa_2[20];
 static s32 evt_kusa_6[20];
 static s32 tree_tbl[42];
 static s32 kusa_tbl[28];
+#ifdef VERSION_G8ME01
+s32 muj_02_init_evt[115];
+#else
 s32 muj_02_init_evt[104];
+#endif
 
 __declspec(section ".data") u64 fd_muj_02_negone_one_374 = 0xBF8000003F800000;
 
@@ -534,6 +545,25 @@ static EVT_BEGIN(evt_kusa_6)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+static s32 tree_tbl[] = {
+    5, (s32)"A_treeA_01", (s32)"treeA_01_m", (s32)"treeA_01_ha", 0, 0, 5, (s32)"A_treeA_02",
+    (s32)"treeA_02_m", (s32)"treeA_02_ha", 0, 0, 5, (s32)"A_treeB_01", (s32)"treeB_01_m", (s32)"treeB_01_ha",
+    0, 0, 5, (s32)"A_treeB_02", (s32)"treeB_02_m", (s32)"treeB_02_ha", 0, 0,
+    5, (s32)"A_treeB_03", (s32)"treeB_03_m", (s32)"treeB_03_ha", 0, 0, 5, (s32)"A_treeB_04",
+    (s32)"treeB_04_m", (s32)"treeB_04_ha", 0, 0, 7, 0, 0, 0,
+    0, 0,
+};
+
+s32 tree_tbl_treeb_evt[] = {
+    5, (s32)"A_treeA_01", (s32)"treeA_01_m", (s32)"treeA_01_ha", 0, 0, 5, (s32)"A_treeA_02",
+    (s32)"treeA_02_m", (s32)"treeA_02_ha", 0, 0, 5, (s32)"A_treeB_01", (s32)"treeB_01_m", (s32)"treeB_01_ha",
+    0, (s32)evt_treeb_01, 5, (s32)"A_treeB_02", (s32)"treeB_02_m", (s32)"treeB_02_ha", 0, 0,
+    5, (s32)"A_treeB_03", (s32)"treeB_03_m", (s32)"treeB_03_ha", 0, 0, 5, (s32)"A_treeB_04",
+    (s32)"treeB_04_m", (s32)"treeB_04_ha", 0, 0, 7, 0, 0, 0,
+    0, 0,
+};
+#else
 static s32 tree_tbl[] = {
     5, (s32)"A_treeA_01", (s32)"treeA_01_m", (s32)"treeA_01_ha", 0, 0, 5, (s32)"A_treeA_02",
     (s32)"treeA_02_m", (s32)"treeA_02_ha", 0, 0, 5, (s32)"A_treeB_01", (s32)"treeB_01_m", (s32)"treeB_01_ha",
@@ -542,6 +572,7 @@ static s32 tree_tbl[] = {
     (s32)"treeB_04_m", (s32)"treeB_04_ha", 0, 0, 7, 0, 0, 0,
     0, 0,
 };
+#endif
 
 static s32 kusa_tbl[] = {
     1, (s32)"A_kuwa_move_01", (s32)"S_kuwa_move_01", 0, 1, (s32)"A_kuwa_move_02", (s32)"S_kuwa_move_02", (s32)evt_kusa_2,
@@ -560,9 +591,14 @@ EVT_BEGIN(muj_02_init_evt)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_npc_set_tribe, STRING("ピートン"), STRING("ピートン（指輪）"))
+#ifdef VERSION_G8ME01
+    CALL(evt_npc_check_delete, STRING("チョロボン２"))
+#endif
     IF_INT_GREATER_OR_EQUAL(GSW(0), 269)
         CALL(evt_npc_check_delete, STRING("チョロボン１"))
+#ifndef VERSION_G8ME01
         CALL(evt_npc_check_delete, STRING("チョロボン２"))
+#endif
         CALL(evt_npc_check_delete, STRING("チョロボン７"))
     END_IF
     CALL(evt_map_playanim, STRING("mizu"), 1, 0)
@@ -571,7 +607,16 @@ EVT_BEGIN(muj_02_init_evt)
     CALL(evt_eff64, STRING("sunlight"), STRING("sunlight_n64"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_mobj_badgeblk, STRING("mobj_badge_gat"), -200, 60, -90, 251, 0, GSWF(3146), 1)
     CALL(evt_mobj_badgeblk, STRING("mobj_hatena"), -135, 0, 135, 143, 0, GSWF(3150), 0)
+#ifdef VERSION_G8ME01
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 261)
+        SET_VALUE(LW(0), PTR(tree_tbl_treeb_evt))
+        ELSE
+#endif
     SET_VALUE(LW(0), PTR(tree_tbl))
+#ifdef VERSION_G8ME01
+        SET_VALUE(GSWF(3152), 1)
+    END_IF
+#endif
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
     SET_VALUE(LW(0), PTR(kusa_tbl))
     CALL_CHILD(PTR(evt_sub_kusa_access_entry))
@@ -582,9 +627,50 @@ EVT_END()
 // (body lives in countDisp.c to keep the original definition order)
 // printCount comes first so the deferred compile emits both functions in the original order
 void printCount(CameraId camera, void* param) {
+#ifdef VERSION_G8ME01
+    char buf[32];
+#else
     char buf[36];
+#endif
     s32 n;
 
+#ifdef VERSION_G8ME01
+    n = evtGetValue(NULL, GW(0));
+    FontDrawStart();
+    switch ((u32)gp->language) {
+        case 0:
+            // %3d回
+            sprintf(buf, "%3d\x89\xF1", n);
+            FontDrawStringPitch(90.0f, 120.0f, 20.0f, buf);
+            // かい
+            n = evtGetValue(NULL, GW(0));
+            sprintf(buf, "\x82\xA9\x82\xA2", n);
+            FontDrawScale(0.55f);
+            FontDrawStringPitch(148.0f, 131.0f, 20.0f, buf);
+            break;
+        case 1:
+        case 6:
+            sprintf(buf, "%3d", n);
+            FontDrawStringPitch(68.0f, 120.0f, 16.0f, buf);
+            FontDrawString(125.0f, 120.0f, "times");
+            break;
+        case 2:
+            sprintf(buf, "%3d", n);
+            FontDrawStringPitch(73.0f, 120.0f, 16.0f, buf);
+            FontDrawString(125.0f, 120.0f, "-mal");
+            break;
+        case 4:
+            sprintf(buf, "%3d", n);
+            FontDrawStringPitch(68.0f, 120.0f, 16.0f, buf);
+            FontDrawString(125.0f, 120.0f, "veces");
+            break;
+        case 3:
+        case 5:
+            sprintf(buf, "%3d", n);
+            FontDrawString(110.0f, 120.0f, buf);
+            break;
+    }
+#else
     // %3d回
     n = evtGetValue(NULL, GW(0));
     sprintf(buf, "%3d\x89\xF1", n);
@@ -595,6 +681,7 @@ void printCount(CameraId camera, void* param) {
     sprintf(buf, "\x82\xA9\x82\xA2", n);
     FontDrawScale(0.55f);
     FontDrawStringPitch(148.0f, 131.0f, 20.0f, buf);
+#endif
 }
 
 USER_FUNC(countDisp) {

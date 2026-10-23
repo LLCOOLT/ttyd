@@ -27,6 +27,9 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 	signed char* textBase;
 	int i;
 	OSFontHeader* fontHeader;
+#ifdef VERSION_G8ME01
+	s32 scroll;
+#endif
 	int px, py;
 	u32 count, stack;
 	s16 px2, py2, x2, y2;
@@ -45,6 +48,17 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 
 	if (N_getDebugMode() >= 0) {
 		psndExit();
+#if defined(VERSION_G8ME01) && defined(__MWERKS__)
+		// US: same MSR enable sequence as below (original inline asm), then halt
+		asm{
+			mfmsr	r5
+			ori		r5, r5, 0x8000
+			ori		r5, r5, 2
+			mtmsr	r5
+			isync
+		};
+		PPCHalt();
+#endif
 		while (1) {} //softlock
 	}
 
@@ -75,12 +89,20 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 	sprintf(print_buffer2, "DSISR= 0x%08x DAR  = 0x%08x\n", dsisr, dar);
 	strcat(print_buffer, print_buffer2);
 	strcat(print_buffer, "\n");
+#ifdef VERSION_G8ME01
+	sprintf(print_buffer2, "Address:     Back Chain   LR Save\n");
+#else
 	sprintf(print_buffer2, "Address:      Back Chain    LR Save\n");
+#endif
 	strcat(print_buffer, print_buffer2);
 	stack = context->gpr[1]; //get r1 (stack)
 	i = 0;
 	while ((stack != 0) && (stack != 0xFFFFFFFF) && (i++ < 16)) {
+#ifdef VERSION_G8ME01
+		sprintf(print_buffer2, "0x%08x:  0x%08x   0x%08x\n", stack, *(u32*)stack, *(u32*)(stack + 4));
+#else
 		sprintf(print_buffer2, "0x%08x:   0x%08x    0x%08x\n", stack, *(u32*)stack, *(u32*)(stack + 4));
+#endif
 		strcat(print_buffer, print_buffer2);
 		stack = *(u32*)stack;
 	}
@@ -88,6 +110,9 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 	sprintf(print_buffer2, "Instruction at 0x%x\n(read from SRR0) attempted to access\ninvalid address 0x%x (read from DAR)\n", context->srr0, dar);
 	strcat(print_buffer, print_buffer2);
 	psndExit();
+#ifdef VERSION_G8ME01
+	scroll = 0;
+#endif
 	OSFillFPUContext(context);
 #ifdef __MWERKS__
 	asm{
@@ -112,7 +137,11 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 	GXSetScissor(0, 0, 608, 480);
 	MTXOrtho(projection, 0.0f, 608.0f, 0.0f, 480.0f, 0.0f, 1.0f);
 	GXSetProjection(projection, GX_ORTHOGRAPHIC);
+#ifdef VERSION_G8ME01
+	MTXScale(matrix, 0.8f, 1.0f, 1.0f);
+#else
 	MTXScale(matrix, 0.5f, 0.5f, 1.0f);
+#endif
 	GXLoadPosMtxImm(matrix, 0);
 	GXSetCurrentMtx(0);
 	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -131,12 +160,24 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 	textBase = (signed char*)print_buffer;
 	while (1) {
 		count = VIGetRetraceCount();
+#ifdef VERSION_G8ME01
+		px = 40;
+		py = 50 + scroll;
+		if (--scroll < -960) {
+			break;
+		}
+#else
 		px = 50;
 		py = 50;
+#endif
 		i = 0;
 		while (textBase[i] != 0) {
 			if ((s32)print_buffer[i] == '\n') {
+#ifdef VERSION_G8ME01
+				px = 40;
+#else
 				px = 50;
+#endif
 				py += 24;
 				i++;
 				continue;
@@ -191,4 +232,8 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 		else
 			DemoCurrentBuffer = DemoFrameBuffer1;
 	}
+#ifdef VERSION_G8ME01
+	PPCHalt();
+	while (1) {}
+#endif
 }

@@ -94,7 +94,11 @@ __declspec(section ".data") u64 fd_dou_07_one_negone_359;
 __declspec(section ".data") s32 fd_dou_07___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_dou_07_one_364[1];
 static __declspec(section ".data") s32 erumosu_regl[2];
+#ifdef VERSION_G8ME01
+s32 erumosu_dead[28];
+#else
 s32 erumosu_dead[25];
+#endif
 static s32 npcEnt[46];
 static s32 bero_entry_data[30];
 static __declspec(section ".data") s32 key_tbl[2];
@@ -159,8 +163,14 @@ EVT_BEGIN(erumosu_dead)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     SET_VALUE(GSWF(2989), 1)
     SPAWN_EVENT(PTR(enemy_event_dead_event))
+#ifdef VERSION_G8ME01
+    WAIT_MS(1000)
+    ADD(LW(1), 150)
+    CALL(evt_item_entry, STRING("item_key"), 36, LW(0), LW(1), LW(2), 13, GSWF(2987), 0)
+#else
     WAIT_MS(500)
     CALL(evt_item_entry, STRING("item_key"), 36, LW(0), LW(1), LW(2), 4, GSWF(2987), 0)
+#endif
     RETURN
 EVT_END()
 

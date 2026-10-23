@@ -23,13 +23,26 @@ typedef struct EffLevelupWork {
     f32 scaleY;   // 0x20
 } EffLevelupWork;
 
+#ifdef VERSION_G8ME01
+static s32 texid_tbl[6][6] = { { 118, 119, 120, 121, 122, 123 }, { 118, 119, 120, 121, 122, 123 }, { 118, 119, 120, 121, 122, 123 }, { 118, 119, 120, 121, 122, 123 }, { 118, 119, 120, 121, 122, 123 }, { 118, 119, 120, 121, 122, 123 } };
+u16 y_trans[] = { 500, 500, 479, 458, 437, 416, 395, 375, 354, 333, 312, 291, 270, 250, 229, 208, 187, 166, 145, 125, 104, 83, 62, 41, 20, 0, 5, 10, 15, 20, 25, 20, 15, 10, 4, 0, 5, 10, 15, 20, 25, 20, 15, 10, 4, 0 };
+#else
 u16 y_trans[] = { 500, 500, 479, 458, 437, 416, 395, 375, 354, 333, 312, 291, 270, 250, 229, 208, 187, 166, 145, 125, 104, 83, 62, 41, 20, 0, 5, 10, 15, 20, 25, 20, 15, 10, 4, 0, 5, 10, 15, 20, 25, 20, 15, 10, 4, 0 };
 
 static s32 texid_tbl[2][6] = { { 146, 147, 148, 149, 150, 151 }, { 146, 147, 148, 149, 150, 151 } };
+#endif
+#ifdef VERSION_G8ME01
+u8 y_scale[] = { 0, 13, 40, 69, 98, 126, 149, 166, 175, 165, 136, 100, 67, 50, 73, 117, 130, 113, 100 };
+#else
 u8 y_scale[] = { 0, 13, 40, 69, 98, 126, 149, 166, 175, 165, 136, 100, 67, 50, 73, 117, 130, 113, 100, 0 };
+#endif
 
 #pragma force_active on
+#ifdef VERSION_G8ME01
+__declspec(section ".data") u32 gap_05_803B15C4_data[1] = {0};
+#else
 __declspec(section ".data") u32 gap_05_803AE0F4_data[1] = {0};
+#endif
 #pragma force_active reset
 
 static EVT_BEGIN(evt_shake)
@@ -37,16 +50,25 @@ static EVT_BEGIN(evt_shake)
     RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01
 static inline s32 getX(s32 i) {
     s32 arr[2][5] = { { 0, 64, 188, 260, 136 }, { 0, 88, 210, 256, 134 } };
     return arr[(gp->language ? 0 : 1) == 0][i] - arr[(gp->language ? 0 : 1) == 0][4];
 }
+#endif
 
 EffectEntry* effLevelupEntry(s32 type, f32 x, f32 y, f32 z, s32 limit) {
     EffectEntry* effect;
     EffLevelupWork* work;
     EffLevelupWork* w;
     s32 i;
+#ifdef VERSION_G8ME01
+    GXTexObj texObj;
+    f32 a;
+    f32 b;
+    f32 s;
+    s32 j;
+#endif
 
     effect = effEntry();
     effect->type = "Levelup";
@@ -62,7 +84,24 @@ EffectEntry* effLevelupEntry(s32 type, f32 x, f32 y, f32 z, s32 limit) {
     work->state = 0;
     w = work + 1;
     for (i = 1; i < effect->count; i++, w++) {
+#ifdef VERSION_G8ME01
+        a = 0.0f;
+        b = a;
+        s = (u32)gp->language == 3 ? 0.9f : 1.0f;
+        for (j = 0; j < i - 1; j++) {
+            effGetTexObj(texid_tbl[gp->language][j], &texObj);
+            a += s * (f32)GXGetTexObjWidth(&texObj);
+        }
+        effGetTexObj(texid_tbl[gp->language][j], &texObj);
+        a += s * ((f32)GXGetTexObjWidth(&texObj) / 2.0f);
+        for (j = 0; j < 3; j++) {
+            effGetTexObj(texid_tbl[gp->language][j], &texObj);
+            b += s * ((f32)GXGetTexObjWidth(&texObj) / 2.0f);
+        }
+        w->x = a - b;
+#else
         w->x = getX(i);
+#endif
         w->y = y_trans[0];
         w->z = 0.0f;
         w->xOffset = 0.0f;
@@ -160,7 +199,13 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
     f32 dx;
     f32 dy;
     f32 halfScale = 0.5f;
+#ifdef VERSION_G8ME01
+    GXTexObj texObj2;
+    f32 width;
+    f32 height;
+#else
     f32 height = 48.0f;
+#endif
     s32 i;
     s32 j;
 
@@ -185,18 +230,30 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     for (j = 1, xofs = 4; j >= 0; j--, xofs -= 4) {
+#ifdef VERSION_G8ME01
+        for (i = effect->count - 1, ofs = i * 0x24, tofs = i * 4; i >= 1; ofs -= 0x24, tofs -= 4, i--) {
+#else
         for (i = effect->count - 1, ofs = i * 0x24, tofs = i * 4; i >= 1; i--, ofs -= 0x24, tofs -= 4) {
+#endif
             w = effect->userdata;
             (u8*)w += ofs;
             dx = xofs;
             dy = -j * 4;
             if (j != 0) {
+#ifdef VERSION_G8ME01
+                effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language] + tofs + 8), &texObj);
+#else
                 effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language != 0] + tofs + 8), &texObj);
+#endif
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 color = (GXColor){ 0, 0, 0, 0x80 };
                 GXSetChanMatColor(GX_COLOR0A0, color);
             } else {
+#ifdef VERSION_G8ME01
+                effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language] + tofs - 4), &texObj);
+#else
                 effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language != 0] + tofs - 4), &texObj);
+#endif
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
                 GXSetChanMatColor(GX_COLOR0A0, color);
@@ -207,12 +264,25 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXConcat(m0, scale, m0);
             GXLoadPosMtxImm(m0, GX_PNMTX0);
             GXSetCurrentMtx(GX_PNMTX0);
+#ifdef VERSION_G8ME01
+            effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language] + tofs - 4), &texObj2);
+            width = GXGetTexObjWidth(&texObj2);
+            height = GXGetTexObjHeight(&texObj2);
+            if ((u32)gp->language == 3) {
+                width *= 0.9f;
+                height *= 0.9f;
+            }
+#endif
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             {
+#ifdef VERSION_G8ME01
+                f32 half = width * halfScale;
+#else
                 s32 arr[2][4] = { { 0, 128, 120, 24 }, { 0, 176, 68, 24 } };
                 f32 width = *(s32*)((u8*)arr[gp->language != 0] + tofs);
 
                 f32 half = width * halfScale;
+#endif
                 f32 negHalf = -width * halfScale;
                 GXPosition3f32(negHalf, height, 0.0f);
                 GXTexCoord2f32(0.0f, 0.0f);

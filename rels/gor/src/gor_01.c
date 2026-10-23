@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -20,6 +21,10 @@
 #include "memory.h"
 #include "mario/mario_pouch.h"
 #include "driver/swdrv.h"
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_msg_fmt_int);
+USER_FUNC(evt_msg_fmt_str);
+#endif
 
 s32 U_badgeShop_SpecialCheck(void);
 void statusWinForceOpen(void);
@@ -263,8 +268,8 @@ BOOL chkCookItem(s32 item);
 s32 itemNameToID(const char* name);
 s32 naniga_okorukana_cook(void);
 static s32 npc_process(void);
-extern s32 all_juyoitem_lecture_rel_10_data_4C6C0[];
-extern s32 all_party_lecture_10_data_4B0DC[];
+extern s32 all_juyoitem_lecture_rel[];
+extern s32 all_party_lecture[];
 extern s32 bero_case_switch_off[];
 extern s32 bero_case_switch_on[];
 extern s32 door_close_se[];
@@ -307,8 +312,8 @@ __declspec(section ".data") s32 fd_gor_01___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_gor_01_one_negone_359;
 __declspec(section ".data") s32 fd_gor_01___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_gor_01_one_364[1];
-static s32 sell_evt[135];
-s32 zaiko_buy_evt[174];
+static s32 sell_evt[VERSION_PICK(135, 146)];
+s32 zaiko_buy_evt[VERSION_PICK(174, 185)];
 static s32 buy_evt[53];
 s32 badgeshopper_talk_evt[38];
 s32 badgemaster_init[36];
@@ -354,7 +359,7 @@ s32 chusan2_talk[76];
 static __declspec(section ".data") s32 bomhei_init[2];
 s32 bomhei_talk[76];
 s32 bottakuru_init[25];
-s32 bottakuru_talk[292];
+s32 bottakuru_talk[VERSION_PICK(292, 314)];
 static s32 luigi_init[43];
 static __declspec(section ".data") s32 luigi_talk[4];
 static s32 luigi_npcEnt[46];
@@ -395,7 +400,7 @@ s32 evt_door_02_f2_junbityu[14];
 __declspec(section ".data") s32 evt_door_02_00_f2[12];
 s32 evt_wall_02_f2[41];
 __declspec(section ".data") s32 badgemise_npc[3];
-s32 evt_badge_dummy[128];
+s32 evt_badge_dummy[VERSION_PICK(128, 139)];
 s32 uwnobj_list[18];
 s32 evt_open_02_01_f2[22];
 __declspec(section ".data") s32 evt_close_sub[6];
@@ -418,7 +423,7 @@ __declspec(section ".data") s32 door_data_03_item[2];
 s32 door_data_03_f1[18];
 __declspec(section ".data") s32 evt_door_03_00_f2[12];
 s32 house_03_f2_open[48];
-s32 house_03_f2_close[46];
+s32 house_03_f2_close[VERSION_PICK(46, 52)];
 s32 evt_wall_03_f2[54];
 s32 door_data_03_f2[18];
 static __declspec(section ".data") s32 evt_door_04_00[12];
@@ -470,9 +475,12 @@ s32 marco_jewel[22];
 static s32 epilogue_npc_entry[48];
 static s32 epilogue_evt_sub[160];
 static s32 epilogue_evt[313];
-s32 gor_01_init_evt[546];
+#ifdef VERSION_G8ME01
+s32 dai_disp[52];
+#endif
+s32 gor_01_init_evt[VERSION_PICK(546, 548)];
 s32 R_simple_recipe_table[78];
-s32 R_cookbook_recipe_table[867];
+s32 R_cookbook_recipe_table[VERSION_PICK(867, 876)];
 s32 R_mystery_cook_list[20];
 s32 special_cook_list[16];
 s32 cooking_evt_sub[284];
@@ -566,7 +574,11 @@ static USER_FUNC(get_value) {
     s32* args = event->args;
     ShopSel* wp = (ShopSel*)evtGetValue(event, args[0]);
 
+#ifdef VERSION_G8ME01
+    evtSetValue(event, args[1], (s32)msgSearch(itemDataTable[wp->items[wp->sel]].name));
+#else
     evtSetValue(event, args[1], (s32)itemDataTable[wp->items[wp->sel]].id);
+#endif
     evtSetValue(event, args[2], wp->items[wp->sel]);
     evtSetValue(event, args[3], itemDataTable[wp->items[wp->sel]].discount_price);
     evtSetValue(event, args[4], itemDataTable[wp->items[wp->sel]].bp_cost);
@@ -630,6 +642,59 @@ __declspec(section ".data") s32 fd_gor_01_one_364[] = {
     1065353216,
 };
 
+#ifdef VERSION_G8ME01
+static EVT_BEGIN(sell_evt)
+    CALL(evt_pouch_get_havebadgecnt, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("badgeshop_06"))
+        RETURN
+    END_IF
+    CALL(evt_msg_print_add, 0, STRING("badgeshop_07"))
+    CALL(evt_win_coin_on, 0, LW(8))
+    LABEL(0)
+    CALL(evt_win_other_select, 12)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print, 0, STRING("badgeshop_22"), 0, STRING("バッジ店員"))
+        CALL(evt_win_coin_off, LW(8))
+        RETURN
+    END_IF
+    CALL(evt_sub_get_language, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CALL(evt_msg_print_insert, 0, STRING("badgeshop_08"), 0, STRING("バッジ店員"), LW(2), LW(3))
+        CASE_DEFAULT
+        CALL(evt_msg_fmt_int, 0, LW(14), STRING("badgeshop_08"), LW(3))
+        CALL(evt_msg_fmt_str, 1, LW(14), LW(14), LW(2))
+        CALL(evt_msg_print, 1, LW(14), 0, STRING("バッジ店員"))
+    END_SWITCH
+    CALL(evt_msg_select, 0, STRING("badgeshop_24"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print_add, 0, STRING("badgeshop_09"))
+        GOTO(0)
+    END_IF
+    CALL(N_evt_pouch_remove_item_index, LW(1), LW(4), LW(0))
+    CALL(evt_badgeShop_throw_inc, LW(1))
+    CALL(evt_pouch_add_coin, LW(3))
+    CALL(evt_win_coin_wait, LW(8))
+    WAIT_MS(500)
+    CALL(evt_win_coin_off, LW(8))
+    CALL(evt_pouch_get_havebadgecnt, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("badgeshop_11"))
+        RETURN
+    END_IF
+    CALL(evt_msg_print_add, 0, STRING("badgeshop_10"))
+    CALL(evt_msg_select, 0, STRING("badgeshop_24"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print_add, 0, STRING("badgeshop_22"))
+        RETURN
+    END_IF
+    CALL(evt_msg_continue)
+    CALL(evt_win_coin_on, 0, LW(8))
+    GOTO(0)
+    RETURN
+EVT_END()
+#else
 static EVT_BEGIN(sell_evt)
     CALL(evt_pouch_get_havebadgecnt, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -678,7 +743,78 @@ static EVT_BEGIN(sell_evt)
     GOTO(0)
     RETURN
 EVT_END()
+#endif
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(zaiko_buy_evt)
+    CALL(evt_badgeShop_throw_get_kind_cnt, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(badgeshop_special_cnt, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(evt_msg_print_add, 0, STRING("badgeshop_37"))
+            ELSE
+            CALL(evt_msg_print_add, 0, STRING("badgeshop_40"))
+        END_IF
+        RETURN
+    END_IF
+    CALL(evt_msg_continue)
+    CALL(evt_win_coin_on, 0, LW(8))
+    LABEL(0)
+    CALL(evt_win_other_select, 11)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print, 0, STRING("badgeshop_22"), 0, STRING("バッジ店員"))
+        CALL(evt_win_coin_off, LW(8))
+        RETURN
+    END_IF
+    CALL(evt_sub_get_language, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CALL(evt_msg_print_insert, 0, STRING("badgeshop_00"), 0, STRING("バッジ店員"), LW(2), LW(3), LW(4))
+        CASE_DEFAULT
+        CALL(evt_msg_fmt_int, 0, LW(14), STRING("badgeshop_00"), LW(3))
+        CALL(evt_msg_fmt_str, 1, LW(14), LW(14), LW(2))
+        CALL(evt_msg_print_insert, 1, LW(14), 0, STRING("バッジ店員"), LW(4))
+    END_SWITCH
+    CALL(evt_msg_select, 0, STRING("badgeshop_24"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_continue)
+        GOTO(0)
+    END_IF
+    CALL(evt_pouch_get_coin, LW(0))
+    IF_INT_LESS(LW(0), LW(3))
+        CALL(evt_msg_print_add, 0, STRING("badgeshop_01"))
+        CALL(evt_win_coin_off, LW(8))
+        RETURN
+    END_IF
+    CALL(evt_pouch_add_item, LW(1), LW(0))
+    IF_INT_EQUAL(LW(0), -1)
+        CALL(evt_msg_print_add, 0, STRING("badgeshop_02"))
+        CALL(evt_win_coin_off, LW(8))
+        RETURN
+    END_IF
+    CALL(evt_badgeShop_throw_dec, LW(1))
+    MULTIPLY(LW(3), -1)
+    CALL(evt_pouch_add_coin, LW(3))
+    CALL(evt_win_coin_wait, LW(8))
+    WAIT_MS(500)
+    CALL(evt_win_coin_off, LW(8))
+    CALL(evt_badgeShop_throw_get_kind_cnt, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("badgeshop_11"))
+        RETURN
+    END_IF
+    CALL(evt_msg_print_add, 0, STRING("badgeshop_38"))
+    CALL(evt_msg_select, 0, STRING("badgeshop_24"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print_add, 0, STRING("badgeshop_22"))
+        RETURN
+    END_IF
+    CALL(evt_msg_continue)
+    CALL(evt_win_coin_on, 0, LW(8))
+    GOTO(0)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(zaiko_buy_evt)
     CALL(evt_badgeShop_throw_get_kind_cnt, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -744,6 +880,7 @@ EVT_BEGIN(zaiko_buy_evt)
     GOTO(0)
     RETURN
 EVT_END()
+#endif
 
 static EVT_BEGIN(buy_evt)
     CALL(evt_msg_print_add, 0, STRING("badgeshop_36"))
@@ -853,6 +990,211 @@ EVT_BEGIN(kinoji_talk)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(nancy_init_check)
+    CALL(evt_npc_change_interrupt, STRING("me"), 6, 0)
+    LOOP(0)
+        CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
+        SET_VALUE(LW(3), 0)
+        IF_INT_GREATER(LW(10), -580)
+            IF_INT_LESS(LW(10), -400)
+                IF_INT_GREATER(LW(11), -10)
+                    IF_INT_LESS(LW(11), 5)
+                        IF_INT_GREATER(LW(12), 0)
+                            IF_INT_LESS(LW(12), 180)
+                                SET_VALUE(LW(3), 1)
+                            END_IF
+                        END_IF
+                    END_IF
+                END_IF
+            END_IF
+        END_IF
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(3), 1)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_normalize)
+    CALL(evt_npc_get_reglid, STRING("ナンシー"), LW(0))
+    DELETE_EVENT(LW(0))
+    BEGIN_INLINE_EVENT
+        WAIT_MS(100)
+        CALL(evt_mario_set_dir_npc, STRING("ナンシー"))
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(100)
+        CALL(evt_party_wait_landon, 0)
+        CALL(evt_party_stop, 0)
+        CALL(evt_party_set_dir_npc, 0, STRING("ナンシー"))
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(100)
+        CALL(evt_party_wait_landon, 1)
+        CALL(evt_party_stop, 1)
+        CALL(evt_party_set_dir_npc, 1, STRING("ナンシー"))
+    END_INLINE_EVENT
+    CALL(evt_msg_print, 0, STRING("gor_01_000"), 0, STRING("me"))
+    CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
+    SET_VALUE(LW(1), LW(2))
+    ADD(LW(1), 335)
+    ADD(LW(2), -8)
+    IF_INT_LESS_OR_EQUAL(LW(0), -520)
+        SET_VALUE(LW(0), -520)
+    END_IF
+    CALL(evt_cam3d_evt_set, LW(0), 99, LW(1), LW(0), 39, LW(2), 500, 11)
+    WAIT_MS(800)
+    SET_VALUE(LW(3), 90)
+    CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
+    IF_INT_GREATER(LW(0), LW(10))
+        ADD(LW(3), 180)
+    END_IF
+    CALL(evt_npc_set_ry, STRING("me"), LW(3))
+    CALL(evt_msg_print, 0, STRING("gor_01_001"), 0, STRING("me"))
+    CALL(evt_npc_reverse_ry, STRING("me"))
+    WAIT_MS(700)
+    CALL(evt_npc_reverse_ry, STRING("me"))
+    WAIT_MS(800)
+    CALL(evt_msg_print, 0, STRING("gor_01_002"), 0, STRING("me"))
+    CALL(evt_npc_reverse_ry, STRING("me"))
+    WAIT_MS(700)
+    CALL(evt_npc_reverse_ry, STRING("me"))
+    WAIT_MS(700)
+    CALL(evt_npc_reverse_ry, STRING("me"))
+    WAIT_MS(700)
+    CALL(evt_npc_reverse_ry, STRING("me"))
+    WAIT_MS(800)
+    CALL(evt_msg_print, 0, STRING("gor_01_003"), 0, STRING("me"))
+    WAIT_MS(300)
+    CALL(evt_npc_restart_regular_event, STRING("me"))
+    CALL(evt_cam3d_evt_off, 800, 11)
+    WAIT_MS(800)
+    CALL(evt_mario_key_onoff, 1)
+    CALL(evt_party_run, 0)
+    CALL(evt_party_run, 1)
+    SET_VALUE(GF(0), 1)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(1000)
+        SET_VALUE(GF(0), 0)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        LOOP(0)
+            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            IF_INT_GREATER_OR_EQUAL(LW(0), -400)
+                BREAK_LOOP
+            END_IF
+            IF_INT_LESS_OR_EQUAL(LW(0), -550)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        SET_VALUE(GF(0), 0)
+    END_INLINE_EVENT
+    WAIT_WHILE(GF(0))
+    LOOP(0)
+        CALL(evt_mario_get_state, LW(0))
+        IF_INT_EQUAL(LW(0), 1)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_MS(60)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_normalize)
+    CALL(evt_mario_wait_landon)
+    CALL(evt_mario_get_party, LW(0))
+    IF_INT_EQUAL(LW(0), 5)
+        LOOP(0)
+            CALL(evt_mario_party_use_check, LW(0))
+            IF_INT_EQUAL(LW(0), 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(evt_mario_set_pose, STRING("M_S_1"))
+    END_IF
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG0_LENS_BREAK1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
+    CALL(evt_msg_print, 0, STRING("gor_01_004"), 0, 0)
+    CALL(evt_npc_get_reglid, STRING("me"), LW(0))
+    DELETE_EVENT(LW(0))
+    CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
+    SET_VALUE(LW(1), LW(2))
+    ADD(LW(1), 250)
+    ADD(LW(2), 30)
+    IF_INT_LESS_OR_EQUAL(LW(0), -500)
+        SET_VALUE(LW(0), -500)
+    END_IF
+    CALL(evt_cam3d_evt_set, LW(0), 80, LW(1), LW(0), 40, LW(2), 500, 11)
+    WAIT_MS(400)
+    CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
+    CALL(evt_msg_print, 0, STRING("gor_01_005"), 0, STRING("me"))
+    CALL(evt_mario_set_dir_npc, STRING("me"))
+    CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
+    CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
+    IF_INT_LESS(LW(0), LW(10))
+        IF_INT_LESS(LW(10), -550)
+            GOTO(100)
+        END_IF
+        SUBTRACT(LW(10), 30)
+        CALL(evt_npc_set_ry, STRING("me"), 90)
+        ELSE
+        LABEL(100)
+        ADD(LW(10), 30)
+        CALL(evt_npc_set_ry, STRING("me"), 270)
+    END_IF
+    WAIT_FRAMES(1)
+    CALL(evt_cam3d_evt_off, 500, 11)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 1073741856)
+    CALL(evt_npc_move_position, STRING("me"), LW(10), LW(12), 0, FLOAT(180.0f), 0)
+    CALL(evt_mario_set_dir_npc, STRING("me"))
+    CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
+    CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
+    IF_INT_LESS(LW(0), LW(10))
+        CALL(evt_npc_set_ry, STRING("me"), 90)
+        ELSE
+        CALL(evt_npc_set_ry, STRING("me"), 270)
+    END_IF
+    WAIT_MS(300)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NO1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mario_set_pose, STRING("M_N_B"))
+    WAIT_MS(800)
+    CALL(evt_mario_set_pose, STRING("M_S_1"))
+    WAIT_MS(200)
+    CALL(evt_msg_print, 0, STRING("gor_01_006"), 0, STRING("me"))
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NO1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mario_set_pose, STRING("M_N_C"))
+    WAIT_MS(400)
+    CALL(evt_mario_set_pose, STRING("M_S_1"))
+    WAIT_MS(400)
+    CALL(evt_npc_set_ry, STRING("me"), 270)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    SET_VALUE(GF(0), 0)
+    IF_INT_LESS_OR_EQUAL(LW(0), -540)
+        SET_VALUE(GF(0), 1)
+        BEGIN_INLINE_EVENT
+            CALL(evt_mario_mov_pos2, -530, LW(2), FLOAT(180.0f))
+            SET_VALUE(GF(0), 0)
+            CALL(evt_mario_set_dir, 270, 200, 0)
+        END_INLINE_EVENT
+    END_IF
+    CALL(evt_npc_move_position, STRING("me"), -573, 56, 0, FLOAT(180.0f), 0)
+    WAIT_WHILE(GF(0))
+    CALL(evt_npc_flag_onoff, 0, STRING("me"), 1073741856)
+    CALL(evt_npc_set_ry, STRING("me"), 90)
+    WAIT_MS(300)
+    CALL(evt_msg_print, 0, STRING("gor_01_007"), 0, STRING("me"))
+    CALL(evt_npc_restart_regular_event, STRING("me"))
+    CALL(evt_npc_change_interrupt, STRING("me"), 6, PTR(nancy_talk))
+    CALL(evt_cam3d_evt_off, 0, 11)
+    CALL(evt_mario_key_onoff, 1)
+    SET_VALUE(GSWF(1187), 1)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(nancy_init_check)
     CALL(evt_npc_change_interrupt, STRING("me"), 6, 0)
     LOOP(0)
@@ -1056,6 +1398,7 @@ EVT_BEGIN(nancy_init_check)
     SET_VALUE(GSWF(1187), 1)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(nancy_init)
     SET_VALUE(LSWF(1), 0)
@@ -1130,6 +1473,61 @@ __declspec(section ".data") s32 item_tbl_nancy[] = {
     51, -1,
 };
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(nancy_talk)
+    IF_INT_EQUAL(GSWF(1188), 0)
+        CALL(evt_pouch_check_item, 51, LW(0))
+        IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+            CALL(evt_msg_print, 0, STRING("gor_01_008"), 0, STRING("me"))
+            CALL(evt_win_item_select, 0, PTR(item_tbl_nancy), LW(1), 0)
+            IF_INT_EQUAL(LW(1), -1)
+                SET_VALUE(LW(0), 0)
+            END_IF
+        END_IF
+        IF_INT_LESS(LW(0), 1)
+            CALL(evt_mario_set_pose, STRING("M_N_B"))
+            WAIT_MS(800)
+            CALL(evt_mario_set_pose, STRING("M_S_1"))
+            WAIT_MS(200)
+            CALL(evt_msg_print, 0, STRING("gor_01_009"), 0, STRING("me"))
+            ELSE
+            CALL(evt_npc_get_reglid, STRING("me"), LW(10))
+            DELETE_EVENT(LW(10))
+            WAIT_MS(500)
+            CALL(evt_npc_reverse_ry, STRING("me"))
+            WAIT_MS(700)
+            CALL(evt_npc_reverse_ry, STRING("me"))
+            WAIT_MS(1000)
+            CALL(evt_pouch_remove_item, 51, LW(0))
+            CALL(evt_msg_print, 0, STRING("gor_01_010"), 0, STRING("me"))
+            CALL(evt_npc_flag_onoff, 1, STRING("me"), 1073741856)
+            CALL(evt_npc_set_ry, STRING("me"), 90)
+            CALL(evt_npc_move_position, STRING("me"), -380, 50, 0, FLOAT(120.0f), 0)
+            CALL(evt_npc_jump_position_nohit, STRING("me"), -380, 10, 20, 200, 30)
+            CALL(evt_npc_set_ry, STRING("me"), 270)
+            WAIT_MS(60)
+            CALL(evt_msg_print, 0, STRING("gor_01_011"), 0, STRING("me"))
+            WAIT_MS(500)
+            SET_VALUE(GF(0), 1)
+            SPAWN_EVENT(PTR(nancy_door_anime))
+            WAIT_MS(500)
+            CALL(evt_npc_move_position, STRING("me"), -370, -30, 0, FLOAT(80.0f), 0)
+            WAIT_WHILE(GF(0))
+            CALL(evt_npc_set_position, STRING("me"), -405, 10, -100)
+            CALL(evt_npc_set_ry, STRING("me"), 270)
+            CALL(evt_npc_flag_onoff, 0, STRING("me"), 1073741856)
+            SET_VALUE(LW(0), STRING("w_bero"))
+            CALL_CHILD(bero_case_switch_on)
+            CALL(evt_hitobj_attr_onoff, 1, 1, STRING("w_bero"), 8388612)
+            SET_VALUE(GSWF(1188), 1)
+            CALL(evt_door_set_param, GW(6), 0, PTR(door_data_01_npc))
+        END_IF
+        ELSE
+        CALL_CHILD(PTR(cooking_evt))
+    END_IF
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(nancy_talk)
     IF_INT_EQUAL(GSWF(1188), 0)
         CALL(evt_pouch_check_item, 51, LW(0))
@@ -1183,6 +1581,7 @@ EVT_BEGIN(nancy_talk)
     END_IF
     RETURN
 EVT_END()
+#endif
 
 static EVT_BEGIN(marco_init)
     SWITCH(GSW(0))
@@ -1939,6 +2338,120 @@ EVT_BEGIN(bottakuru_init)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(bottakuru_talk)
+    CALL(U_evt_badgeShop_get_special_zaiko, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print, 0, STRING("bottakuru_16"), 0, STRING("me"))
+        RETURN
+        ELSE
+        CALL(evt_badgeShop_bottakuru_get_kind_cnt, LW(0))
+        IF_INT_LESS_OR_EQUAL(LW(0), 0)
+            CALL(evt_msg_print, 0, STRING("bottakuru_03"), 0, STRING("me"))
+            RETURN
+        END_IF
+    END_IF
+    IF_INT_EQUAL(GSWF(1205), 0)
+        CALL(evt_msg_print, 0, STRING("bottakuru_00"), 0, STRING("me"))
+        SET_VALUE(GSWF(1205), 1)
+        ELSE
+        IF_INT_EQUAL(GSWF(1206), 0)
+            CALL(evt_msg_print, 0, STRING("bottakuru_01"), 0, STRING("me"))
+            ELSE
+            CALL(evt_msg_print, 0, STRING("bottakuru_02"), 0, STRING("me"))
+        END_IF
+    END_IF
+    CALL(evt_msg_select, 0, STRING("bottakuru_yesno"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print_add, 0, STRING("bottakuru_04"))
+        RETURN
+    END_IF
+    CALL(evt_msg_continue)
+    LABEL(0)
+    CALL(evt_win_coin_on, 0, LW(12))
+    CALL(evt_win_other_select, 14)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_win_coin_off, LW(12))
+        CALL(evt_msg_print, 0, STRING("bottakuru_14"), 0, STRING("me"))
+        RETURN
+    END_IF
+    CALL(evt_pouch_get_coin, LW(0))
+    IF_INT_LESS(LW(0), LW(3))
+        CALL(evt_win_coin_off, LW(12))
+        CALL(evt_msg_print, 0, STRING("bottakuru_05"), 0, STRING("me"))
+        GOTO(0)
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(LW(1), 240)
+        CALL(evt_sub_get_language, LW(0))
+        SWITCH(LW(0))
+            CASE_EQUAL(0)
+            CALL(evt_msg_print_insert, 0, STRING("bottakuru_07"), 0, STRING("me"), LW(2), LW(3), LW(4))
+            CASE_DEFAULT
+            CALL(evt_msg_fmt_int, 0, LW(14), STRING("bottakuru_07"), LW(3))
+            CALL(evt_msg_fmt_str, 1, LW(14), LW(14), LW(2))
+            CALL(evt_msg_print_insert, 1, LW(14), 0, STRING("me"), LW(4))
+        END_SWITCH
+        ELSE
+        CALL(evt_sub_get_language, LW(0))
+        SWITCH(LW(0))
+            CASE_EQUAL(0)
+            CALL(evt_msg_print_insert, 0, STRING("bottakuru_06"), 0, STRING("me"), LW(2), LW(3))
+            CASE_DEFAULT
+            CALL(evt_msg_fmt_int, 0, LW(14), STRING("bottakuru_06"), LW(3))
+            CALL(evt_msg_fmt_str, 1, LW(14), LW(14), LW(2))
+            CALL(evt_msg_print, 1, LW(14), 0, STRING("me"))
+        END_SWITCH
+    END_IF
+    CALL(evt_msg_select, 0, STRING("bottakuru_yesno"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_win_coin_off, LW(12))
+        CALL(evt_msg_print_add, 0, STRING("bottakuru_08"))
+        RETURN
+    END_IF
+    CALL(evt_pouch_add_item, LW(1), LW(0))
+    IF_INT_EQUAL(LW(0), -1)
+        CALL(evt_win_coin_off, LW(12))
+        IF_INT_GREATER_OR_EQUAL(LW(1), 240)
+            CALL(evt_msg_print_add, 0, STRING("bottakuru_12"))
+            ELSE
+            CALL(evt_msg_print_add, 0, STRING("bottakuru_13"))
+        END_IF
+        RETURN
+    END_IF
+    CALL(evt_badgeShop_bottakuru_dec, LW(1))
+    MULTIPLY(LW(3), -1)
+    CALL(evt_pouch_add_coin, LW(3))
+    CALL(evt_win_coin_wait, LW(12))
+    WAIT_MS(500)
+    CALL(evt_win_coin_off, LW(12))
+    SET_VALUE(GSWF(1206), 1)
+    CALL(U_evt_badgeShop_get_special_zaiko, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("bottakuru_15"))
+        RETURN
+        ELSE
+        CALL(evt_badgeShop_bottakuru_get_kind_cnt, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(evt_msg_print_add, 0, STRING("bottakuru_09"))
+            RETURN
+        END_IF
+    END_IF
+    CALL(evt_pouch_get_coin, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("bottakuru_09"))
+        RETURN
+    END_IF
+    CALL(evt_msg_print_add, 0, STRING("bottakuru_10"))
+    CALL(evt_msg_select, 0, STRING("bottakuru_yesno"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print_add, 0, STRING("bottakuru_11"))
+        RETURN
+    END_IF
+    CALL(evt_msg_continue)
+    GOTO(0)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(bottakuru_talk)
     CALL(U_evt_badgeShop_get_special_zaiko, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -2045,6 +2558,7 @@ EVT_BEGIN(bottakuru_talk)
     GOTO(0)
     RETURN
 EVT_END()
+#endif
 
 static EVT_BEGIN(luigi_init)
     SWITCH(GSW(0))
@@ -2529,6 +3043,54 @@ __declspec(section ".data") s32 badgemise_npc[] = {
     (s32)/*"バッジ店長"*/"\x83\x6F\x83\x62\x83\x57\x93\x58\x92\xB7", (s32)/*"バッジ店員"*/"\x83\x6F\x83\x62\x83\x57\x93\x58\x88\xF5", 0,
 };
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(evt_badge_dummy)
+    CALL(evt_mario_normalize)
+    SET_VALUE(LW(10), LW(0))
+    CALL(disp_off, LW(10))
+    CALL(evt_set_dir_to_target, STRING("バッジ店員"), STRING("mario"))
+    CALL(evt_mario_set_dir_npc, STRING("バッジ店員"))
+    CALL(evt_win_coin_on, 0, LW(8))
+    CALL(get_value, LW(10), LW(11), LW(12), LW(13), LW(14))
+    CALL(evt_sub_get_language, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CALL(evt_msg_print_insert, 0, STRING("badgeshop_00"), 0, STRING("バッジ店員"), LW(11), LW(13), LW(14))
+        CASE_DEFAULT
+        CALL(evt_msg_fmt_int, 0, LW(15), STRING("badgeshop_00"), LW(13))
+        CALL(evt_msg_fmt_str, 1, LW(15), LW(15), LW(11))
+        CALL(evt_msg_print_insert, 1, LW(15), 0, STRING("バッジ店員"), LW(14))
+    END_SWITCH
+    CALL(evt_msg_select, 0, STRING("badgeshop_24"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print_add, 0, STRING("badgeshop_22"))
+        CALL(evt_win_coin_off, LW(8))
+        RETURN
+    END_IF
+    CALL(evt_pouch_get_coin, LW(0))
+    IF_INT_LESS(LW(0), LW(13))
+        CALL(evt_msg_print_add, 0, STRING("badgeshop_01"))
+        CALL(evt_win_coin_off, LW(8))
+        RETURN
+    END_IF
+    CALL(evt_pouch_add_item, LW(12), LW(0))
+    IF_INT_EQUAL(LW(0), -1)
+        CALL(evt_msg_print_add, 0, STRING("badgeshop_02"))
+        CALL(evt_win_coin_off, LW(8))
+        RETURN
+    END_IF
+    CALL(set_new_goods_list, LW(10), 0)
+    CALL(evt_badgeShop_special_dec, LW(12))
+    CALL(unitwin_set_bought, LW(10), LW(12))
+    MULTIPLY(LW(13), -1)
+    CALL(evt_pouch_add_coin, LW(13))
+    CALL(evt_win_coin_wait, LW(8))
+    WAIT_MS(200)
+    CALL(evt_win_coin_off, LW(8))
+    CALL(evt_msg_continue)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(evt_badge_dummy)
     CALL(evt_mario_normalize)
     SET_VALUE(LW(10), LW(0))
@@ -2572,6 +3134,7 @@ EVT_BEGIN(evt_badge_dummy)
     CALL(evt_msg_continue)
     RETURN
 EVT_END()
+#endif
 
 s32 uwnobj_list[] = {
     (s32)"S_item_07", (s32)"A_item_08", (s32)evt_badge_dummy, (s32)"S_item_08", (s32)"A_item_09", (s32)evt_badge_dummy, (s32)"S_item_09", (s32)"A_item_10",
@@ -2935,6 +3498,27 @@ EVT_BEGIN(house_03_f2_open)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(house_03_f2_close)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_i03_f1_naka"), 1)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(1600)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ie_03_f1_doa"), 6144)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ie_03_f21_doa"), 6144)
+    END_INLINE_EVENT
+    CALL(evt_snd_bgmon, 160, 0)
+    CALL(evt_snd_envon, 160, 0)
+    CALL(evt_snd_env_lpf, 0, 0)
+    SET_VALUE(GW(10), 0)
+    DELETE_EVENT(GW(0))
+    CALL(evt_msg_close, STRING("mac_4_004"))
+    DELETE_EVENT(GW(7))
+    DELETE_EVENT(GW(11))
+    DELETE_EVENT(GW(12))
+    DELETE_EVENT(GW(13))
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(house_03_f2_close)
     BEGIN_INLINE_EVENT
         WAIT_MS(1600)
@@ -2953,6 +3537,7 @@ EVT_BEGIN(house_03_f2_close)
     DELETE_EVENT(GW(13))
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(evt_wall_03_f2)
     SET_FLOAT_VALUE(LW(2), LW(0))
@@ -3421,7 +4006,7 @@ EVT_BEGIN(christine_nakama)
     WAIT_MS(800)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 1)
-    CALL_CHILD(PTR(all_party_lecture_10_data_4B0DC))
+    CALL_CHILD(PTR(all_party_lecture))
     CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_GOR1"), 2000)
     CALL(evt_snd_envon, 272, STRING("ENV_STG0_GOR1"))
     CALL(evt_msg_print_party, STRING("mac_0_053"))
@@ -3762,7 +4347,7 @@ EVT_END()
 EVT_BEGIN(ultrahammer_get)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-    CALL(lect_juyoitem_rel_set, PTR(all_juyoitem_lecture_rel_10_data_4C6C0))
+    CALL(lect_juyoitem_rel_set, PTR(all_juyoitem_lecture_rel))
     CALL(evt_item_entry, STRING("hammer"), 11, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_important_item, STRING("hammer"))
@@ -4412,6 +4997,134 @@ static EVT_BEGIN(iri_16_init)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(iri_16_tyutyu_talk)
+    IF_INT_EQUAL(GSW(1420), 16)
+        CALL(evt_snd_bgmoff_f, 1024, 2000)
+        CALL(evt_snd_bgmoff, 1024)
+        CALL(evt_snd_bgmon, 1, STRING("BGM_EVT_CYUCYURINA1"))
+        IF_INT_EQUAL(GSWF(5405), 0)
+            CALL(evt_msg_print, 0, STRING("irai_16_00"), 0, STRING("チュチュリーナ"))
+            SET_VALUE(GSWF(5405), 1)
+            ELSE
+            IF_INT_EQUAL(GSWF(5407), 0)
+                CALL(evt_msg_print, 0, STRING("irai_16_01"), 0, STRING("チュチュリーナ"))
+                ELSE
+                CALL(evt_npc_flag_onoff, 1, STRING("チュチュリーナ"), 32)
+                CALL(evt_party_stop, 0)
+                BEGIN_INLINE_EVENT
+                    CALL(evt_party_move_pos2, 0, -448, -110, 60)
+                    CALL(evt_party_set_dir_npc, 0, STRING("チュチュリーナ"))
+                END_INLINE_EVENT
+                CALL(evt_mario_mov_pos2, -485, -110, 60)
+                CALL(evt_mario_set_dir_npc, STRING("チュチュリーナ"))
+                WAIT_MS(500)
+                CALL(evt_set_dir_to_target, STRING("チュチュリーナ"), STRING("mario"))
+                WAIT_FRAMES(1)
+                CALL(evt_npc_wait_pera, STRING("チュチュリーナ"))
+                CALL(evt_msg_print, 0, STRING("irai_16_02"), 0, STRING("チュチュリーナ"))
+                CALL(evt_win_item_select, 0, PTR(iri_16_item_tbl), LW(0), 0)
+                IF_INT_NOT_EQUAL(LW(0), -1)
+                    CALL(evt_pouch_remove_item, 110, LW(0))
+                    CALL(evt_msg_print, 0, STRING("irai_16_03"), 0, STRING("チュチュリーナ"))
+                    CALL(evt_npc_set_anim, STRING("チュチュリーナ"), STRING("PCH_C_1"))
+                    WAIT_MS(1000)
+                    CALL(evt_msg_print, 0, STRING("irai_16_04"), 0, STRING("チュチュリーナ"))
+                    CALL(evt_mario_set_pose, STRING("M_N_5B"))
+                    WAIT_MS(600)
+                    CALL(evt_mario_set_pose, STRING("M_S_1"))
+                    CALL(evt_msg_print, 0, STRING("irai_16_05"), 0, STRING("チュチュリーナ"))
+                    CALL(evt_pouch_get_havebadgecnt, LW(0))
+                    IF_INT_LESS(LW(0), 200)
+                        CALL(evt_msg_continue)
+                        CALL(evt_item_entry, STRING("mb"), 316, 0, -1000, 0, 17, -1, 0)
+                        CALL(evt_item_get_item, STRING("mb"))
+                        CALL(evt_item_get_item_end_wait, STRING("mb"))
+                        SET_VALUE(GSWF(1201), 1)
+                        ELSE
+                        CALL(evt_msg_print_add, 0, STRING("irai_16_05_1"))
+                        BEGIN_INLINE_EVENT
+                            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+                            LOOP(0)
+                                CALL(evt_npc_get_position, STRING("チュチュリーナ"), LW(3), LW(4), LW(5))
+                                IF_INT_GREATER(LW(3), LW(0))
+                                    BREAK_LOOP
+                                END_IF
+                                WAIT_FRAMES(1)
+                            END_LOOP
+                            CALL(evt_mario_set_dir_npc, STRING("チュチュリーナ"))
+                        END_INLINE_EVENT
+                        CALL(evt_npc_flag_onoff, 1, STRING("チュチュリーナ"), 1073741856)
+                        CALL(evt_npc_get_position, STRING("チュチュリーナ"), LW(0), LW(1), LW(2))
+                        CALL(evt_npc_set_ry, STRING("チュチュリーナ"), 90)
+                        WAIT_FRAMES(1)
+                        CALL(evt_npc_wait_pera, STRING("チュチュリーナ"))
+                        CALL(evt_npc_jump_position_nohit, STRING("チュチュリーナ"), -150, 300, LW(2), 800, 100)
+                        WAIT_MS(2000)
+                        CALL(evt_npc_set_ry, STRING("チュチュリーナ"), 270)
+                        WAIT_FRAMES(1)
+                        CALL(evt_npc_wait_pera, STRING("チュチュリーナ"))
+                        BEGIN_INLINE_EVENT
+                            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+                            LOOP(0)
+                                CALL(evt_npc_get_position, STRING("チュチュリーナ"), LW(3), LW(4), LW(5))
+                                IF_INT_LESS(LW(3), LW(0))
+                                    BREAK_LOOP
+                                END_IF
+                                WAIT_FRAMES(1)
+                            END_LOOP
+                            CALL(evt_mario_set_dir_npc, STRING("チュチュリーナ"))
+                        END_INLINE_EVENT
+                        CALL(evt_npc_jump_position_nohit, STRING("チュチュリーナ"), LW(0), LW(1), LW(2), 800, 50)
+                        CALL(evt_set_dir_to_target, STRING("チュチュリーナ"), STRING("mario"))
+                        WAIT_FRAMES(1)
+                        CALL(evt_npc_wait_pera, STRING("チュチュリーナ"))
+                        CALL(evt_npc_flag_onoff, 0, STRING("チュチュリーナ"), 1073741856)
+                        CALL(evt_msg_print, 0, STRING("irai_16_05_2"), 0, STRING("チュチュリーナ"))
+                        CALL(evt_item_entry, STRING("iri_16"), 316, -150, 153, -120, 16, GSWF(1201), 0)
+                    END_IF
+                    CALL(evt_msg_print, 0, STRING("irai_16_06"), 0, STRING("チュチュリーナ"))
+                    CALL(evt_npc_flag_onoff, 1, STRING("チュチュリーナ"), 32)
+                    CALL(evt_npc_get_position, STRING("チュチュリーナ"), LW(0), LW(1), LW(2))
+                    CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
+                    SUBTRACT(LW(3), 15)
+                    CALL(evt_npc_move_position, STRING("チュチュリーナ"), LW(3), LW(5), 0, 40, 0)
+                    WAIT_FRAMES(1)
+                    CALL(evt_npc_set_anim, STRING("チュチュリーナ"), STRING("PCH_K_1"))
+                    CALL(evt_mario_set_pose, STRING("M_I_O"))
+                    BEGIN_INLINE_EVENT
+                        CALL(evt_npc_get_position, STRING("チュチュリーナ"), LW(0), LW(1), LW(2))
+                        ADD(LW(1), 30)
+                        CALL(evt_eff, 0, STRING("kiss"), 0, LW(0), LW(1), LW(2), -45, 0, 0, 0, 0, 0, 0, 0)
+                        CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_REQUEST_CHURINA_KISS1"), LW(0), LW(1), LW(2), 0)
+                    END_INLINE_EVENT
+                    WAIT_MS(400)
+                    CALL(evt_npc_set_anim, STRING("チュチュリーナ"), STRING("PCH_S_1"))
+                    WAIT_MS(500)
+                    CALL(evt_mario_set_pose, STRING("M_S_1"))
+                    CALL(evt_npc_move_position, STRING("チュチュリーナ"), LW(0), LW(2), 0, 40, 0)
+                    WAIT_MS(1000)
+                    CALL(evt_cam3d_evt_set, -516, 290, 230, -516, 225, -140, 800, 11)
+                    WAIT_MS(800)
+                    SET_VALUE(LW(8), STRING("チュチュリーナ"))
+                    SET_VALUE(LW(9), 7)
+                    CALL_CHILD(all_party_lecture)
+                    SET_VALUE(GSW(1420), 0)
+                    SET_VALUE(GSWF(5390), 1)
+                    CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
+                    CALL(evt_cam3d_evt_off, 500, 11)
+                    CALL(evt_party_run, 0)
+                END_IF
+                CALL(evt_party_run, 0)
+            END_IF
+        END_IF
+        CALL(evt_snd_bgmoff, 513)
+        CALL(evt_snd_bgmon, 288, 0)
+        RETURN
+    END_IF
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(iri_16_tyutyu_talk)
     IF_INT_EQUAL(GSW(1420), 16)
         CALL(evt_snd_bgmoff_f, 1024, 2000)
@@ -4522,7 +5235,7 @@ EVT_BEGIN(iri_16_tyutyu_talk)
                     WAIT_MS(800)
                     SET_VALUE(LW(8), STRING("チュチュリーナ"))
                     SET_VALUE(LW(9), 7)
-                    CALL_CHILD(PTR(all_party_lecture_10_data_4B0DC))
+                    CALL_CHILD(PTR(all_party_lecture))
                     SET_VALUE(GSW(1420), 0)
                     SET_VALUE(GSWF(5390), 1)
                     CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
@@ -4538,6 +5251,7 @@ EVT_BEGIN(iri_16_tyutyu_talk)
     END_IF
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(marco_jewel)
     CALL(evt_mario_key_onoff, 0)
@@ -4719,6 +5433,103 @@ static EVT_BEGIN(epilogue_evt)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(dai_disp)
+    LOOP(0)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        SET_VALUE(LF(0), 0)
+        IF_INT_LESS_OR_EQUAL(LW(0), 60)
+            IF_INT_GREATER_OR_EQUAL(LW(0), -60)
+                IF_INT_LESS_OR_EQUAL(LW(2), -200)
+                    IF_INT_GREATER_OR_EQUAL(LW(2), -300)
+                        SET_VALUE(LF(0), 1)
+                    END_IF
+                END_IF
+            END_IF
+        END_IF
+        IF_INT_EQUAL(LF(0), 0)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_dai"), 1)
+            ELSE
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_dai"), 1)
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    RETURN
+EVT_END()
+#endif
+#ifdef VERSION_G8ME01
+s32 gor_01_init_evt[] = {
+    131122, -70000000, 0, 131096, -170000000, 341, 131163, (s32)evt_mario_set_mode,
+    2, 131122, -70000000, 1, 33, 131096, -170000000, 400,
+    131163, (s32)evt_bero_get_entername, -30000000, 131084, -30000000, (s32)"sekai_yami1", 131122, -69999999,
+    1, 33, 131084, -30000000, (s32)"minnnanokoe", 131122, -69999999, 1,
+    33, 33, 131096, -170000000, 402, 196699, (s32)evt_snd_envon, 272,
+    (s32)"ENV_STG0_GOR1", 32, 131096, -70000000, 0, 131096, -69999999, 1,
+    131163, (s32)evt_bero_get_entername, -30000000, 131084, -30000000, (s32)"sekai_yami1", 196699, (s32)evt_snd_bgmon,
+    512, (s32)"BGM_EVT_STG8_WITCH", 131163, (s32)evt_snd_envoff, 512, 33, 131084, -30000000,
+    (s32)"minnnanokoe", 131163, (s32)evt_snd_bgmoff, 512, 131163, (s32)evt_snd_envoff, 512, 131122,
+    -69999999, 1, 33, 32, 196699, (s32)evt_snd_bgmon, 512, (s32)"BGM_STG0_GOR1",
+    196699, (s32)evt_snd_bgmon, 160, 0, 196699, (s32)evt_snd_envon, 272, (s32)"ENV_STG0_GOR1",
+    33, 32, 196699, (s32)evt_snd_bgmon, 512, (s32)"BGM_EVT_KUPPA1", 196699, (s32)evt_snd_bgm_scope,
+    0, 1, 196699, (s32)evt_snd_bgmon, 160, 0, 196699, (s32)evt_snd_envon,
+    272, (s32)"ENV_STG0_GOR1", 33, 33, 131122, -30000000, (s32)bero_entry_data, 65627,
+    (s32)evt_bero_get_info, 65630, (s32)evt_bero_info_run, 131096, -170000000, 6, 65630, (s32)christine_nakama_init,
+    33, 131096, -170000000, 7, 131096, -129998800, 0, 65628,
+    (s32)christine_nakama_after, 33, 33, 131096, -129998809, 0, 131096, -129998811,
+    1, 131101, -170000000, 56, 131122, -129998809, 1, 33,
+    33, 33, 131096, -129998809, 0, 131101, -170000000, 56,
+    131122, -30000000, -129998811, 131125, -30000000, -129998810, 131097, -30000000,
+    0, 196699, (s32)evt_sub_load_progresstime, -169999892, -30000000, 131101, -30000000, 90000,
+    131122, -129998809, 1, 33, 33, 33, 33, 65630,
+    (s32)luigi_npcEnt, 131163, (s32)evt_npc_setup, (s32)npcEnt, 458843, (s32)evt_npc_sound_data_set, (s32)"マルコ", (s32)"SFX_STG5_MARCO_MOVE1L",
+    (s32)"SFX_STG5_MARCO_MOVE1R", -250000000, -250000000, -250000000, 131096, -70000000, 1, 65630,
+    (s32)koopa_npc_entry, 33, 131097, -70000000, 1, 458843, (s32)evt_mobj_save_blk, (s32)"mobj_save",
+    185, 60, -55, 0, 0, 33, 524379, (s32)evt_mobj_kururing_floor,
+    (s32)"kururin1", -455, 0, -260, (s32)"S_ground", 125, -129994431, 524379,
+    (s32)evt_mobj_kururing_floor, (s32)"kururin2", 0, 0, 450, (s32)"S_ground", 125, -129994427,
+    589915, (s32)evt_item_entry, (s32)"item_00", 125, 490, 0, 245, 16,
+    -129994430, 0, 589915, (s32)evt_item_entry, (s32)"item_01", 125, 550, 0,
+    -150, 16, -129994429, 0, 589915, (s32)evt_item_entry, (s32)"item_02", 125,
+    -565, 162, -160, 16, -129994428, 0, 131098, -170000000,
+    223, 589915, (s32)evt_item_entry, (s32)"ドクロジュエル", 71, 315, 20, -125,
+    16, -1, 0, 196699, (s32)evt_item_flag_on, (s32)"ドクロジュエル", 2, 196699,
+    (s32)evt_item_status_on, (s32)"ドクロジュエル", 33554432, 458843, (s32)evt_run_case_evt, 9, 1, (s32)"A_jewel",
+    0, (s32)marco_jewel, -49999992, 33, 131096, -129998812, 0, 131122,
+    -30000000, (s32)door_data_01, 32, 131122, -30000000, (s32)door_data_01_01, 33, 196699,
+    (s32)evt_door_data_copy, -30000000, -49999994, 131122, -30000000, -49999994, 65630, (s32)evt_door_entry,
+    131122, -30000000, (s32)door_data_02_f1, 131098, -170000000, 223, 131096, -129998809,
+    1, 131122, -30000000, (s32)door_data_02_f1_01, 33, 33, 65630, (s32)evt_door_entry,
+    131098, -170000000, 19, 458843, (s32)evt_run_case_evt, 9, 1, (s32)"A_ie_02_f2_doa01",
+    0, (s32)evt_door_02_f2_junbityu, 0, 32, 131122, -30000000, (s32)door_data_02_f2, 65630,
+    (s32)evt_door_entry, 33, 131122, -30000000, (s32)door_data_03_f1, 65630, (s32)evt_door_entry, 131122,
+    -30000000, (s32)door_data_03_f2, 65630, (s32)evt_door_entry, 131122, -30000000, (s32)door_data_04, 65630,
+    (s32)evt_door_entry, 65630, (s32)gor_01_shop_setup, 131163, (s32)evt_kinopio_setup, (s32)kino_dt, 262235, (s32)evt_map_playanim,
+    (s32)"hae", 1, 0, 65628, (s32)koushukei_dai, 65628, (s32)gate_disp, 65628,
+    (s32)gor_goki1_urouro, 65628, (s32)gor_goki2_urouro, 131096, -69999999, 0, 131096, -169998580,
+    1, 589915, (s32)evt_item_entry, (s32)"item_key00", 49, -280, 153, -100,
+    0, -129994595, 0, 33, 65630, (s32)borodo2_init, 65628, (s32)iri_09_init,
+    65628, (s32)iri_16_init, 131096, -129994610, 1, 589915, (s32)evt_item_entry, (s32)"iri_16",
+    316, -150, 153, -120, 16, -129998799, 0, 33,
+    131096, -129994608, 1, 589915, (s32)evt_item_entry, (s32)"iri_18", 183, -440,
+    30, -80, 16, -129998798, 0, 33, 33, 458843,
+    (s32)evt_run_case_evt, 9, 1, (s32)"A_keizi_mae", 0, (s32)keijiban_omote_joho, 0, 458843,
+    (s32)evt_run_case_evt, 9, 1, (s32)"A_keizi_ura", 0, (s32)keijiban_ura_joho, 0, 196699,
+    (s32)evt_pouch_check_item, 11, -30000000, 131096, -30000000, 0, 131096, -129998804,
+    0, 589915, (s32)evt_mobj_itembox, (s32)"mobj_box00", 340, 110, -20, 1,
+    0, (s32)ultrahammer_get, -129998805, 65628, (s32)ultrahammer_check, 32, 589915, (s32)evt_mobj_itembox,
+    (s32)"mobj_box00", 275, 0, 75, 1, 0, (s32)ultrahammer_get, -129998805,
+    33, 33, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"S_saku", 2,
+    327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"S_dai", 2, 65628, (s32)dai_disp,
+    327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"S_ie_02_f1A", 2, 131096, -70000000,
+    1, 131163, (s32)evt_mario_kill_party, 0, 65628, (s32)gor_01_koopa_evt, 33, 131096,
+    -69999999, 1, 131163, (s32)evt_bero_get_entername, -30000000, 131084, -30000000, (s32)"sekai_yami1",
+    65628, (s32)sekai_yami_evt, 33, 131084, -30000000, (s32)"minnnanokoe", 65628, (s32)minnnanokoe_evt,
+    33, 33, 131096, -170000000, 402, 131163, (s32)evt_mario_kill_party, 0,
+    65630, (s32)epilogue_npc_entry, 65628, (s32)epilogue_evt, 33, 65628, (s32)evt_sub_mail_event, 327771,
+    (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"S_roten", 1, 262235, (s32)evt_hitobj_onoff, (s32)"A_roten",
+    1, 0, 2, 1,
+};
+#else
 s32 gor_01_init_evt[] = {
     131122, -70000000, 0, 131096, -170000000, 341, 131163, (s32)evt_mario_set_mode,
     2, 131122, -70000000, 1, 33, 131096, -170000000, 400,
@@ -4790,6 +5601,7 @@ s32 gor_01_init_evt[] = {
     1, (s32)"S_roten", 1, 262235, (s32)evt_hitobj_onoff, (s32)"A_roten", 1, 0,
     2, 1,
 };
+#endif
 
 s32 R_simple_recipe_table[] = {
     (s32)/*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", (s32)/*"あつあつスープ"*/"\x82\xA0\x82\xC2\x82\xA0\x82\xC2\x83\x58\x81\x5B\x83\x76", (s32)/*"あつあつスープ"*/"\x82\xA0\x82\xC2\x82\xA0\x82\xC2\x83\x58\x81\x5B\x83\x76", (s32)/*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", (s32)/*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF", (s32)/*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF", (s32)/*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", (s32)/*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF",
@@ -4804,6 +5616,120 @@ s32 R_simple_recipe_table[] = {
     (s32)/*"どくキノコ"*/"\x82\xC7\x82\xAD\x83\x4C\x83\x6D\x83\x52", (s32)"", (s32)/*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF", (s32)/*"たんこぶ"*/"\x82\xBD\x82\xF1\x82\xB1\x82\xD4", (s32)"", (s32)/*"ナンシースペシャル"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x58\x83\x79\x83\x56\x83\x83\x83\x8B",
 };
 
+#ifdef VERSION_G8ME01
+s32 R_cookbook_recipe_table[] = {
+    (s32)"キノコ", (s32)"かみなりゴロゴロ", (s32)"びりびりキノコ", (s32)"キノコ", (s32)"かみなりドッカン", (s32)"びりびりキノコ", (s32)"キノコ", (s32)"ファイアフラワー",
+    (s32)"キノコホイルやき", (s32)"キノコ", (s32)"びりびりキノコ", (s32)"キノコホイルやき", (s32)"キノコ", (s32)"ふにゃふにゃくん", (s32)"しなびたキノコ", (s32)"スーパーキノコ",
+    (s32)"かみなりゴロゴロ", (s32)"びりびりキノコ", (s32)"スーパーキノコ", (s32)"かみなりドッカン", (s32)"びりびりキノコ", (s32)"スーパーキノコ", (s32)"ファイアフラワー", (s32)"ナンシーディナー",
+    (s32)"スーパーキノコ", (s32)"びりびりキノコ", (s32)"キノコホイルやき", (s32)"スーパーキノコ", (s32)"ふにゃふにゃくん", (s32)"しなびたキノコ", (s32)"スーパーキノコ", (s32)"キノコ",
+    (s32)"キノコホイルやき", (s32)"ウルトラキノコ", (s32)"かみなりゴロゴロ", (s32)"びりびりキノコ", (s32)"ウルトラキノコ", (s32)"かみなりドッカン", (s32)"びりびりキノコ", (s32)"ウルトラキノコ",
+    (s32)"ファイアフラワー", (s32)"ナンシースペシャル", (s32)"ウルトラキノコ", (s32)"びりびりキノコ", (s32)"キノコステーキ", (s32)"ウルトラキノコ", (s32)"ふにゃふにゃくん", (s32)"しなびたキノコ",
+    (s32)"ウルトラキノコ", (s32)"キノコ", (s32)"キノコステーキ", (s32)"ウルトラキノコ", (s32)"スーパーキノコ", (s32)"キノコステーキ", (s32)"きんきゅうキノコ", (s32)"かみなりゴロゴロ",
+    (s32)"びりびりキノコ", (s32)"きんきゅうキノコ", (s32)"かみなりドッカン", (s32)"びりびりキノコ", (s32)"きんきゅうキノコ", (s32)"ファイアフラワー", (s32)"ナンシーディナー", (s32)"きんきゅうキノコ",
+    (s32)"びりびりキノコ", (s32)"キノコホイルやき", (s32)"きんきゅうキノコ", (s32)"ふにゃふにゃくん", (s32)"しなびたキノコ", (s32)"きんきゅうキノコ", (s32)"キノコ", (s32)"キノコステーキ",
+    (s32)"きんきゅうキノコ", (s32)"スーパーキノコ", (s32)"キノコステーキ", (s32)"きんきゅうキノコ", (s32)"ウルトラキノコ", (s32)"キノコステーキ", (s32)"しなびたキノコ", (s32)"ファイアフラワー",
+    (s32)"キノコいため", (s32)"しなびたキノコ", (s32)"びりびりキノコ", (s32)"キノコいため", (s32)"しなびたキノコ", (s32)"デカデカドリンク", (s32)"キノコ", (s32)"しなびたキノコ",
+    (s32)"キノコ", (s32)"キノコいため", (s32)"しなびたキノコ", (s32)"スーパーキノコ", (s32)"キノコホイルやき", (s32)"しなびたキノコ", (s32)"ウルトラキノコ", (s32)"キノコステーキ",
+    (s32)"しなびたキノコ", (s32)"きんきゅうキノコ", (s32)"キノコステーキ", (s32)"ハニーシロップ", (s32)"こおりのいぶき", (s32)"アイスキャンディ", (s32)"ハニーシロップ", (s32)"びりびりキノコ",
+    (s32)"ハニーキノコ", (s32)"ハニーシロップ", (s32)"キノコ", (s32)"ハニーキノコ", (s32)"ハニーシロップ", (s32)"スーパーキノコ", (s32)"ハニーキノコＳ", (s32)"ハニーシロップ",
+    (s32)"ウルトラキノコ", (s32)"ハニーキノコＺ", (s32)"ハニーシロップ", (s32)"きんきゅうキノコ", (s32)"ハニーキノコＳ", (s32)"メイプルシロップ", (s32)"こおりのいぶき", (s32)"ナンシーフラッペ",
+    (s32)"メイプルシロップ", (s32)"びりびりキノコ", (s32)"メイプルキノコ", (s32)"メイプルシロップ", (s32)"キノコ", (s32)"メイプルキノコ", (s32)"メイプルシロップ", (s32)"スーパーキノコ",
+    (s32)"メイプルキノコＳ", (s32)"メイプルシロップ", (s32)"ウルトラキノコ", (s32)"メイプルキノコＺ", (s32)"メイプルシロップ", (s32)"きんきゅうキノコ", (s32)"メイプルキノコＳ", (s32)"メイプルシロップ",
+    (s32)"ハニーシロップ", (s32)"フレッシュジュース", (s32)"ローヤルゼリー", (s32)"こおりのいぶき", (s32)"ナンシーフラッペ", (s32)"ローヤルゼリー", (s32)"びりびりキノコ", (s32)"ローヤルキノコ",
+    (s32)"ローヤルゼリー", (s32)"キノコ", (s32)"ローヤルキノコ", (s32)"ローヤルゼリー", (s32)"スーパーキノコ", (s32)"ローヤルキノコＳ", (s32)"ローヤルゼリー", (s32)"ウルトラキノコ",
+    (s32)"ローヤルキノコＺ", (s32)"ローヤルゼリー", (s32)"きんきゅうキノコ", (s32)"ローヤルキノコＳ", (s32)"ローヤルゼリー", (s32)"ハニーシロップ", (s32)"フレッシュジュース", (s32)"ローヤルゼリー",
+    (s32)"メイプルシロップ", (s32)"ナンシーティー", (s32)"じわじわキノコ", (s32)"かみなりゴロゴロ", (s32)"びりびりキノコ", (s32)"じわじわキノコ", (s32)"かみなりドッカン", (s32)"びりびりキノコ",
+    (s32)"じわじわキノコ", (s32)"キラキラおとし", (s32)"ナンシーディナー", (s32)"じわじわキノコ", (s32)"ファイアフラワー", (s32)"ナンシーディナー", (s32)"じわじわキノコ", (s32)"びりびりキノコ",
+    (s32)"キノコホイルやき", (s32)"じわじわキノコ", (s32)"キノコ", (s32)"キノコホイルやき", (s32)"じわじわキノコ", (s32)"スーパーキノコ", (s32)"ナンシーディナー", (s32)"じわじわキノコ",
+    (s32)"ウルトラキノコ", (s32)"ナンシースペシャル", (s32)"じわじわキノコ", (s32)"きんきゅうキノコ", (s32)"ナンシーディナー", (s32)"じわじわキノコ", (s32)"ハニーシロップ", (s32)"ハニーキノコ",
+    (s32)"じわじわキノコ", (s32)"メイプルシロップ", (s32)"メイプルキノコ", (s32)"じわじわキノコ", (s32)"ローヤルゼリー", (s32)"ローヤルキノコＳ", (s32)"じわじわシロップ", (s32)"キノコ",
+    (s32)"キノコホイルやき", (s32)"じわじわシロップ", (s32)"スーパーキノコ", (s32)"ナンシーディナー", (s32)"じわじわシロップ", (s32)"ウルトラキノコ", (s32)"ナンシースペシャル", (s32)"じわじわシロップ",
+    (s32)"きんきゅうキノコ", (s32)"ナンシーディナー", (s32)"じわじわシロップ", (s32)"ハニーシロップ", (s32)"フレッシュジュース", (s32)"じわじわシロップ", (s32)"メイプルシロップ", (s32)"フレッシュジュース",
+    (s32)"じわじわシロップ", (s32)"ローヤルゼリー", (s32)"フレッシュジュース", (s32)"じわじわシロップ", (s32)"じわじわキノコ", (s32)"じわじわキノコ", (s32)"イレカエール", (s32)"かみなりゴロゴロ",
+    (s32)"ゆらゆらじしん", (s32)"イレカエール", (s32)"かみなりドッカン", (s32)"キラキラおとし", (s32)"イレカエール", (s32)"キラキラおとし", (s32)"かみなりドッカン", (s32)"イレカエール",
+    (s32)"こおりのいぶき", (s32)"ファイアフラワー", (s32)"イレカエール", (s32)"ファイアフラワー", (s32)"こおりのいぶき", (s32)"イレカエール", (s32)"ゆらゆらじしん", (s32)"かみなりゴロゴロ",
+    (s32)"イレカエール", (s32)"テレサのふく", (s32)"てきヨケール", (s32)"イレカエール", (s32)"びりびりキノコ", (s32)"スーパーキノコ", (s32)"イレカエール", (s32)"てきヨケール",
+    (s32)"テレサのふく", (s32)"イレカエール", (s32)"まどわせのこな", (s32)"しかえしのこな", (s32)"イレカエール", (s32)"しかえしのこな", (s32)"まどわせのこな", (s32)"イレカエール",
+    (s32)"ねむれよいこよ", (s32)"スッキリドリンク", (s32)"イレカエール", (s32)"デカデカドリンク", (s32)"ミニミニくん", (s32)"イレカエール", (s32)"カチカチコウラ", (s32)"ふにゃふにゃくん",
+    (s32)"イレカエール", (s32)"ミニミニくん", (s32)"デカデカドリンク", (s32)"イレカエール", (s32)"ふにゃふにゃくん", (s32)"カチカチコウラ", (s32)"イレカエール", (s32)"キノコ",
+    (s32)"ハニーシロップ", (s32)"イレカエール", (s32)"スーパーキノコ", (s32)"メイプルシロップ", (s32)"イレカエール", (s32)"ウルトラキノコ", (s32)"ローヤルゼリー", (s32)"イレカエール",
+    (s32)"きんきゅうキノコ", (s32)"スーパーキノコ", (s32)"イレカエール", (s32)"しなびたキノコ", (s32)"キノコ", (s32)"イレカエール", (s32)"スッキリドリンク", (s32)"ねむれよいこよ",
+    (s32)"イレカエール", (s32)"ハニーシロップ", (s32)"キノコ", (s32)"イレカエール", (s32)"メイプルシロップ", (s32)"スーパーキノコ", (s32)"イレカエール", (s32)"ローヤルゼリー",
+    (s32)"ウルトラキノコ", (s32)"イレカエール", (s32)"じわじわキノコ", (s32)"どくキノコ", (s32)"イレカエール", (s32)"じわじわシロップ", (s32)"ハニーシロップ", (s32)"ドライフラワー",
+    (s32)"ファイアフラワー", (s32)"あつあつスープ", (s32)"ドライフラワー", (s32)"びりびりキノコ", (s32)"かみなりドッカン", (s32)"ドライフラワー", (s32)"キノコ", (s32)"うちゅうしょく",
+    (s32)"ドライフラワー", (s32)"スーパーキノコ", (s32)"うちゅうしょく", (s32)"ドライフラワー", (s32)"ウルトラキノコ", (s32)"うちゅうしょく", (s32)"ドライフラワー", (s32)"きんきゅうキノコ",
+    (s32)"うちゅうしょく", (s32)"ドライフラワー", (s32)"しなびたキノコ", (s32)"うちゅうしょく", (s32)"ドライフラワー", (s32)"じわじわキノコ", (s32)"うちゅうしょく", (s32)"ドライフラワー",
+    (s32)"ホットドッグ", (s32)"うちゅうしょく", (s32)"ふしぎなタマゴ", (s32)"ファイアフラワー", (s32)"バクハツタマゴ", (s32)"ふしぎなタマゴ", (s32)"キノコ", (s32)"キセツのオムレツ",
+    (s32)"ふしぎなタマゴ", (s32)"スーパーキノコ", (s32)"キセツのオムレツ", (s32)"ふしぎなタマゴ", (s32)"ウルトラキノコ", (s32)"キセツのオムレツ", (s32)"ふしぎなタマゴ", (s32)"きんきゅうキノコ",
+    (s32)"キセツのオムレツ", (s32)"ふしぎなタマゴ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"おうごんはっぱ", (s32)"こおりのいぶき", (s32)"ゆきうさぎ", (s32)"おうごんはっぱ",
+    (s32)"キノコ", (s32)"キノコいため", (s32)"おうごんはっぱ", (s32)"スーパーキノコ", (s32)"キノコホイルやき", (s32)"おうごんはっぱ", (s32)"ウルトラキノコ", (s32)"キノコステーキ",
+    (s32)"おうごんはっぱ", (s32)"きんきゅうキノコ", (s32)"キノコステーキ", (s32)"おうごんはっぱ", (s32)"じわじわキノコ", (s32)"こうちゃキノコ", (s32)"おうごんはっぱ", (s32)"ドライフラワー",
+    (s32)"うちゅうしょく", (s32)"トロピコマンゴー", (s32)"びりびりキノコ", (s32)"ナンシーディナー", (s32)"トロピコマンゴー", (s32)"キノコ", (s32)"ナンシーディナー", (s32)"トロピコマンゴー",
+    (s32)"スーパーキノコ", (s32)"ナンシーディナー", (s32)"トロピコマンゴー", (s32)"ウルトラキノコ", (s32)"ナンシーディナー", (s32)"トロピコマンゴー", (s32)"ハニーシロップ", (s32)"フルーツパフェ",
+    (s32)"トロピコマンゴー", (s32)"メイプルシロップ", (s32)"フルーツパフェ", (s32)"トロピコマンゴー", (s32)"ローヤルゼリー", (s32)"フルーツパフェ", (s32)"トロピコマンゴー", (s32)"じわじわシロップ",
+    (s32)"フルーツパフェ", (s32)"トロピコマンゴー", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"生パスタ", (s32)"びりびりキノコ", (s32)"ナンシーディナー", (s32)"生パスタ",
+    (s32)"キノコ", (s32)"ナンシースペシャル", (s32)"生パスタ", (s32)"スーパーキノコ", (s32)"ナンシースペシャル", (s32)"生パスタ", (s32)"ウルトラキノコ", (s32)"ナンシーデラックス",
+    (s32)"生パスタ", (s32)"きんきゅうキノコ", (s32)"ナンシースペシャル", (s32)"生パスタ", (s32)"しなびたキノコ", (s32)"ナンシースペシャル", (s32)"生パスタ", (s32)"ドライフラワー",
+    (s32)"うちゅうしょく", (s32)"生パスタ", (s32)"ふしぎなタマゴ", (s32)"ナンシーディナー", (s32)"おかしのもと", (s32)"ファイアフラワー", (s32)"ファイアキャンディ", (s32)"おかしのもと",
+    (s32)"びりびりキノコ", (s32)"びりびりキャンディ", (s32)"おかしのもと", (s32)"まどわせのこな", (s32)"メロメロケーキ", (s32)"おかしのもと", (s32)"キノコ", (s32)"キノコケーキ",
+    (s32)"おかしのもと", (s32)"スーパーキノコ", (s32)"キノコケーキ", (s32)"おかしのもと", (s32)"ウルトラキノコ", (s32)"キノコクレープ", (s32)"おかしのもと", (s32)"きんきゅうキノコ",
+    (s32)"キノコケーキ", (s32)"おかしのもと", (s32)"ハニーシロップ", (s32)"ハニーあめ", (s32)"おかしのもと", (s32)"メイプルシロップ", (s32)"ナンシークッキー", (s32)"おかしのもと",
+    (s32)"ローヤルゼリー", (s32)"ローヤルキャンディ", (s32)"おかしのもと", (s32)"じわじわキノコ", (s32)"キノコケーキ", (s32)"おかしのもと", (s32)"じわじわシロップ", (s32)"ナンシークッキー",
+    (s32)"おかしのもと", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"おかしのもと", (s32)"ふしぎなタマゴ", (s32)"ナンシークッキー", (s32)"おかしのもと", (s32)"トロピコマンゴー",
+    (s32)"マンゴープディング", (s32)"レッド・カラリン", (s32)"ファイアフラワー", (s32)"あつあつスープ", (s32)"レッド・カラリン", (s32)"しなびたキノコ", (s32)"キノコ", (s32)"レッド・カラリン",
+    (s32)"スッキリドリンク", (s32)"すみぢる", (s32)"レッド・カラリン", (s32)"ハニーシロップ", (s32)"スッキリドリンク", (s32)"レッド・カラリン", (s32)"メイプルシロップ", (s32)"スッキリドリンク",
+    (s32)"レッド・カラリン", (s32)"ローヤルゼリー", (s32)"スッキリドリンク", (s32)"レッド・カラリン", (s32)"生パスタ", (s32)"カラリーナパスタ", (s32)"レッド・カラリン", (s32)"おかしのもと",
+    (s32)"ファイアキャンディ", (s32)"カメカメはっぱ", (s32)"キノコ", (s32)"キノコいため", (s32)"カメカメはっぱ", (s32)"スーパーキノコ", (s32)"キノコホイルやき", (s32)"カメカメはっぱ",
+    (s32)"ウルトラキノコ", (s32)"キノコステーキ", (s32)"カメカメはっぱ", (s32)"きんきゅうキノコ", (s32)"キノコステーキ", (s32)"カメカメはっぱ", (s32)"ハニーシロップ", (s32)"フレッシュジュース",
+    (s32)"カメカメはっぱ", (s32)"メイプルシロップ", (s32)"フレッシュジュース", (s32)"カメカメはっぱ", (s32)"ローヤルゼリー", (s32)"フレッシュジュース", (s32)"カメカメはっぱ", (s32)"じわじわキノコ",
+    (s32)"こうちゃキノコ", (s32)"カメカメはっぱ", (s32)"じわじわシロップ", (s32)"フレッシュジュース", (s32)"カメカメはっぱ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"カメカメはっぱ",
+    (s32)"おうごんはっぱ", (s32)"ヘルスィーサラダ", (s32)"カメカメはっぱ", (s32)"トロピコマンゴー", (s32)"カメまん", (s32)"カメカメはっぱ", (s32)"生パスタ", (s32)"カメスパ",
+    (s32)"カメカメはっぱ", (s32)"レッド・カラリン", (s32)"すみぢる", (s32)"つくしんぼ", (s32)"キノコ", (s32)"ナンシーディナー", (s32)"つくしんぼ", (s32)"スーパーキノコ",
+    (s32)"ナンシーディナー", (s32)"つくしんぼ", (s32)"ウルトラキノコ", (s32)"ナンシースペシャル", (s32)"つくしんぼ", (s32)"きんきゅうキノコ", (s32)"ナンシーディナー", (s32)"つくしんぼ",
+    (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"つくしんぼ", (s32)"ふしぎなタマゴ", (s32)"キセツのオムレツ", (s32)"つくしんぼ", (s32)"カメカメはっぱ", (s32)"ヘルスィーサラダ",
+    (s32)"ピチピーチ", (s32)"びりびりキノコ", (s32)"ナンシーディナー", (s32)"ピチピーチ", (s32)"まどわせのこな", (s32)"メロメロケーキ", (s32)"ピチピーチ", (s32)"キノコ",
+    (s32)"ナンシーディナー", (s32)"ピチピーチ", (s32)"スーパーキノコ", (s32)"ナンシーディナー", (s32)"ピチピーチ", (s32)"ウルトラキノコ", (s32)"ナンシースペシャル", (s32)"ピチピーチ",
+    (s32)"きんきゅうキノコ", (s32)"ナンシーディナー", (s32)"ピチピーチ", (s32)"しなびたキノコ", (s32)"キノコ", (s32)"ピチピーチ", (s32)"ハニーシロップ", (s32)"フルーツパフェ",
+    (s32)"ピチピーチ", (s32)"メイプルシロップ", (s32)"フルーツパフェ", (s32)"ピチピーチ", (s32)"ローヤルゼリー", (s32)"フルーツパフェ", (s32)"ピチピーチ", (s32)"ドライフラワー",
+    (s32)"うちゅうしょく", (s32)"ピチピーチ", (s32)"トロピコマンゴー", (s32)"フルーツパフェ", (s32)"ピチピーチ", (s32)"おかしのもと", (s32)"ピーチタルト", (s32)"ピチピーチ",
+    (s32)"レッド・カラリン", (s32)"スッキリドリンク", (s32)"ヤシの実", (s32)"ファイアフラワー", (s32)"ココナッツボム", (s32)"ヤシの実", (s32)"ドライフラワー", (s32)"うちゅうしょく",
+    (s32)"ヤシの実", (s32)"トロピコマンゴー", (s32)"フレッシュジュース", (s32)"ヤシの実", (s32)"生パスタ", (s32)"ナンシーディナー", (s32)"ヤシの実", (s32)"おかしのもと",
+    (s32)"ココナツキャンディ", (s32)"ヤシの実", (s32)"カメカメはっぱ", (s32)"フレッシュジュース", (s32)"ヤシの実", (s32)"ピチピーチ", (s32)"フレッシュジュース", (s32)"キノコいため",
+    (s32)"キラキラおとし", (s32)"ほしふるディナー", (s32)"キノコいため", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"キノコホイルやき", (s32)"キラキラおとし", (s32)"ほしふるディナー",
+    (s32)"キノコホイルやき", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"キノコステーキ", (s32)"キラキラおとし", (s32)"ほしふるディナー", (s32)"キノコステーキ", (s32)"ドライフラワー",
+    (s32)"うちゅうしょく", (s32)"しっぱいりょうり", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ハニーキノコ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"メイプルキノコ",
+    (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ローヤルキノコ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ハニーキノコＳ", (s32)"ドライフラワー", (s32)"うちゅうしょく",
+    (s32)"メイプルキノコＳ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ローヤルキノコＳ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ハニーキノコＺ", (s32)"ドライフラワー",
+    (s32)"うちゅうしょく", (s32)"メイプルキノコＺ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ローヤルキノコＺ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ナンシーディナー",
+    (s32)"カチカチコウラ", (s32)"カチカチりょうり", (s32)"ナンシーディナー", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ナンシースペシャル", (s32)"カチカチコウラ", (s32)"カチカチりょうり",
+    (s32)"ナンシースペシャル", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ナンシーデラックス", (s32)"カチカチコウラ", (s32)"カチカチりょうり", (s32)"ナンシーデラックス", (s32)"ドライフラワー",
+    (s32)"うちゅうしょく", (s32)"ナンシーダイナマイ", (s32)"ドライフラワー", (s32)"バクハツタマゴ", (s32)"ナンシーティー", (s32)"レッド・カラリン", (s32)"すみぢる", (s32)"ゆきうさぎ",
+    (s32)"あつあつスープ", (s32)"いつまでもふたりで", (s32)"キノコケーキ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"キノコクレープ", (s32)"ドライフラワー", (s32)"うちゅうしょく",
+    (s32)"ムースケーキ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"フルーツパフェ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"バクハツタマゴ", (s32)"ドライフラワー",
+    (s32)"うちゅうしょく", (s32)"イカスミパスタ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"スパゲティ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"スパゲティ",
+    (s32)"レッド・カラリン", (s32)"カラリーナパスタ", (s32)"スパゲティ", (s32)"カメカメはっぱ", (s32)"カメスパ", (s32)"こうちゃキノコ", (s32)"レッド・カラリン", (s32)"すみぢる",
+    (s32)"どくキノコ", (s32)"イレカエール", (s32)"キノコ", (s32)"どくキノコ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"どくキノコ", (s32)"おうごんはっぱ",
+    (s32)"こうちゃキノコ", (s32)"どくキノコ", (s32)"カメカメはっぱ", (s32)"こうちゃキノコ", (s32)"ショコラケーキ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"マンゴープディング",
+    (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"マンゴープディング", (s32)"ふしぎなタマゴ", (s32)"はつこいプディング", (s32)"はつこいプディング", (s32)"ドライフラワー", (s32)"うちゅうしょく",
+    (s32)"ほしふるディナー", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ほしふるディナー", (s32)"フルーツパフェ", (s32)"ナンシーディナー", (s32)"しれんのナベ", (s32)"ドライフラワー",
+    (s32)"どくキノコ", (s32)"いつまでもふたりで", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"いつまでもふたりで", (s32)"どくキノコ", (s32)"しれんのナベ", (s32)"すみぢる",
+    (s32)"じわじわキノコ", (s32)"どくキノコ", (s32)"すみぢる", (s32)"生パスタ", (s32)"イカスミパスタ", (s32)"すみぢる", (s32)"おかしのもと", (s32)"ショコラケーキ",
+    (s32)"すみぢる", (s32)"ムースケーキ", (s32)"ショコラケーキ", (s32)"すみぢる", (s32)"スパゲティ", (s32)"イカスミパスタ", (s32)"キセツのオムレツ", (s32)"ドライフラワー",
+    (s32)"うちゅうしょく", (s32)"カメカメティー", (s32)"レッド・カラリン", (s32)"すみぢる", (s32)"カメスパ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"カメスパ",
+    (s32)"レッド・カラリン", (s32)"カラリーナパスタ", (s32)"カメスパ", (s32)"すみぢる", (s32)"イカスミパスタ", (s32)"カラリーナパスタ", (s32)"ドライフラワー", (s32)"うちゅうしょく",
+    (s32)"カラリーナパスタ", (s32)"ヤシの実", (s32)"ナンシーディナー", (s32)"カラリーナパスタ", (s32)"すみぢる", (s32)"イカスミパスタ", (s32)"メロメロケーキ", (s32)"ドライフラワー",
+    (s32)"うちゅうしょく", (s32)"ピーチタルト", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"びりびりキャンディ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ファイアキャンディ",
+    (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ハニーあめ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ココナツキャンディ", (s32)"ドライフラワー", (s32)"うちゅうしょく",
+    (s32)"ローヤルキャンディ", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ナンシークッキー", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"ヘルスィーサラダ", (s32)"ドライフラワー",
+    (s32)"うちゅうしょく", (s32)"ヘルスィーサラダ", (s32)"生パスタ", (s32)"ナンシーディナー", (s32)"ヘルスィーサラダ", (s32)"キノコいため", (s32)"ナンシーディナー", (s32)"ヘルスィーサラダ",
+    (s32)"キノコホイルやき", (s32)"ナンシースペシャル", (s32)"ヘルスィーサラダ", (s32)"キノコステーキ", (s32)"ナンシーデラックス", (s32)"ヘルスィーサラダ", (s32)"イカスミパスタ", (s32)"ナンシースペシャル",
+    (s32)"ヘルスィーサラダ", (s32)"スパゲティ", (s32)"ナンシーディナー", (s32)"ヘルスィーサラダ", (s32)"カメスパ", (s32)"ナンシーディナー", (s32)"ヘルスィーサラダ", (s32)"カラリーナパスタ",
+    (s32)"ナンシースペシャル", (s32)"カメまん", (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"フレッシュジュース", (s32)"レッド・カラリン", (s32)"すみぢる", (s32)"たんこぶ",
+    (s32)"ドライフラワー", (s32)"うちゅうしょく", (s32)"たんこぶ", (s32)"おうごんはっぱ", (s32)"ナンシーデラックス", (s32)"きんかい", (s32)"イレカエール", (s32)"キノコ",
+    (s32)"きんかい×３", (s32)"イレカエール", (s32)"きんかい", (s32)"ココナッツボム", (s32)"ドライフラワー", (s32)"ヤシの実", (s32)"ココナッツボム", (s32)"バクハツタマゴ",
+    (s32)"ナンシーダイナマイ", (s32)"カチカチりょうり", (s32)"ドライフラワー", (s32)"カチカチコウラ",
+};
+#else
 s32 R_cookbook_recipe_table[] = {
     (s32)/*"かみなりドッカン"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x68\x83\x62\x83\x4A\x83\x93", (s32)/*"かみなりゴロゴロ"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x53\x83\x8D\x83\x53\x83\x8D", (s32)/*"しれんのナベ"*/"\x82\xB5\x82\xEA\x82\xF1\x82\xCC\x83\x69\x83\x78", (s32)/*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", (s32)/*"かみなりゴロゴロ"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x53\x83\x8D\x83\x53\x83\x8D", (s32)/*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", (s32)/*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", (s32)/*"かみなりドッカン"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x68\x83\x62\x83\x4A\x83\x93",
     (s32)/*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", (s32)/*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", (s32)/*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", (s32)/*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB", (s32)/*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", (s32)/*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", (s32)/*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB", (s32)/*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52",
@@ -4915,6 +5841,7 @@ s32 R_cookbook_recipe_table[] = {
     (s32)/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", (s32)/*"きんかい"*/"\x82\xAB\x82\xF1\x82\xA9\x82\xA2", (s32)/*"ココナッツボム"*/"\x83\x52\x83\x52\x83\x69\x83\x62\x83\x63\x83\x7B\x83\x80", (s32)/*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", (s32)/*"ヤシの実"*/"\x83\x84\x83\x56\x82\xCC\x8E\xC0", (s32)/*"ココナッツボム"*/"\x83\x52\x83\x52\x83\x69\x83\x62\x83\x63\x83\x7B\x83\x80", (s32)/*"バクハツタマゴ"*/"\x83\x6F\x83\x4E\x83\x6E\x83\x63\x83\x5E\x83\x7D\x83\x53", (s32)/*"ナンシーダイナマイ"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x5F\x83\x43\x83\x69\x83\x7D\x83\x43",
     (s32)/*"カチカチりょうり"*/"\x83\x4A\x83\x60\x83\x4A\x83\x60\x82\xE8\x82\xE5\x82\xA4\x82\xE8", (s32)/*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", (s32)/*"カチカチコウラ"*/"\x83\x4A\x83\x60\x83\x4A\x83\x60\x83\x52\x83\x45\x83\x89",
 };
+#endif
 
 s32 R_mystery_cook_list[] = {
     132, 153, 235, 138, 151, 141, 135, 179,
@@ -5004,7 +5931,12 @@ USER_FUNC(wait_mahojin) {
 }
 
 USER_FUNC(iri_09_item_tbl_alloc) {
+#ifdef VERSION_G8ME01
+    s32 n = evtGetValue(event, event->args[0]);
+    iri_09_item_tbl = _mapAlloc((n + 1) * sizeof(s32));
+#else
     iri_09_item_tbl = _mapAlloc((evtGetValue(event, event->args[0]) + 1) * sizeof(s32));
+#endif
     return EVT_RETURN_DONE;
 }
 
@@ -5095,7 +6027,11 @@ USER_FUNC(cook_chk2) {
         evtSetValue(event, (volatile u32)args[2], item2);
         return EVT_RETURN_DONE;
     }
+#ifdef VERSION_G8ME01
+    for (i = 0; i < 292; i++) {
+#else
     for (i = 0; i < 289; i++) {
+#endif
         if ((strcmp(data1->id, (const char*)R_cookbook_recipe_table[i * 3]) == 0 && strcmp(data2->id, (const char*)R_cookbook_recipe_table[i * 3 + 1]) == 0) ||
             (strcmp(data2->id, (const char*)R_cookbook_recipe_table[i * 3]) == 0 && strcmp(data1->id, (const char*)R_cookbook_recipe_table[i * 3 + 1]) == 0)) {
             evtSetValue(event, (volatile u32)args[2], itemNameToID((const char*)R_cookbook_recipe_table[i * 3 + 2]));
@@ -5136,7 +6072,12 @@ USER_FUNC(get_item_name) {
     s32* args = event->args;
     s32 item = evtGetValue(event, args[0]);
 
+#ifdef VERSION_G8ME01
+    ItemData* data = &itemDataTable[item];
+    evtSetValue(event, args[1], (s32)msgSearch(data->name));
+#else
     evtSetValue(event, args[1], (s32)itemDataTable[item].id);
+#endif
     return EVT_RETURN_DONE;
 }
 

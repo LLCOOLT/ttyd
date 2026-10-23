@@ -13,6 +13,15 @@
 #include "system.h"
 #include <dolphin/dvd.h>
 #include <string.h>
+#include "version.h"
+
+#ifdef VERSION_G8ME01
+// US-only named constant (dispdrv reads it by name), followed by a zero word
+#pragma force_active on
+__declspec(section ".sdata2") const f32 float_1_8041f770 = 1.0f;
+__declspec(section ".sdata2") const f32 float_0_8041f774 = 0.0f;
+#pragma force_active reset
+#endif
 
 extern int sprintf(char* str, const char* format, ...);
 double tan(double);
@@ -440,7 +449,7 @@ void fadeMain(void) {
 								entry->delayFrames--;
 							}
 							else {
-								entry->elapsed += 16.666666f;
+								entry->elapsed += VERSION_PICK(16.666666f, 1000.0f / gp->framerate);
 							}
 							entry->progress = entry->elapsed / FADE_DURATION(entry);
 							entry->progress = 1.0f - entry->progress;
@@ -463,7 +472,7 @@ void fadeMain(void) {
 				switch (entry->state) {
 					case 0:
 						if (FADE_DURATION(entry) != 0) {
-							entry->elapsed += 16.666666f;
+							entry->elapsed += VERSION_PICK(16.666666f, 1000.0f / gp->framerate);
 							entry->progress = entry->elapsed / FADE_DURATION(entry);
 							entry->field_0x28 -= 10.0f;
 							if (entry->progress > 1.0f) {
@@ -741,26 +750,26 @@ void fadeMain(void) {
 						animPoseMain(entry->poseId);
 						if (entry->type == 0x22 || entry->type == 0x28) {
 							if (!(entry->flags & 8)) {
-								if (entry->field_0x94 < 180) {
-									entry->field_0x90 = intplGetValue(12, ++entry->field_0x94, 180, 3.0f, 1.0f);
+								if (entry->field_0x94 < FPS_FRAMES(180)) {
+									entry->field_0x90 = intplGetValue(12, ++entry->field_0x94, FPS_FRAMES(180), 3.0f, 1.0f);
 								}
 							}
 							else {
-								if (entry->field_0x94 < 90) {
-									entry->field_0x90 = intplGetValue(12, ++entry->field_0x94, 90, 1.5f, 1.0f);
+								if (entry->field_0x94 < FPS_FRAMES(90)) {
+									entry->field_0x90 = intplGetValue(12, ++entry->field_0x94, FPS_FRAMES(90), 1.5f, 1.0f);
 								}
 							}
 						}
 						if (animPoseGetLoopTimes(entry->poseId) >= 1.0f) {
 							if (entry->type == 0x22 || entry->type == 0x28) {
 								if (!(entry->flags & 8)) {
-									if (entry->field_0x94 == 180) {
+									if (entry->field_0x94 == FPS_FRAMES(180)) {
 										entry->flags |= 2;
 										entry->state++;
 									}
 								}
 								else {
-									if (entry->field_0x94 == 90) {
+									if (entry->field_0x94 == FPS_FRAMES(90)) {
 										entry->flags |= 2;
 										entry->state++;
 									}
@@ -792,8 +801,8 @@ void fadeMain(void) {
 						entry->state++;
 					case 1:
 						animPoseMain(entry->poseId);
-						if (entry->field_0x94 < 120) {
-							entry->field_0x90 = intplGetValue(12, ++entry->field_0x94, 120, 1.0f, 3.0f);
+						if (entry->field_0x94 < FPS_FRAMES(120)) {
+							entry->field_0x90 = intplGetValue(12, ++entry->field_0x94, FPS_FRAMES(120), 1.0f, 3.0f);
 						}
 						else {
 							entry->flags |= 2;

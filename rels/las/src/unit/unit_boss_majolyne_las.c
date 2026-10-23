@@ -106,22 +106,26 @@ s32 weapon_majolyne_powder_attack5[48];
 static s32 majolyne_down[19];
 static s32 majolyne_up[27];
 static s32 majo3_zoom[25];
-__declspec(section ".data") s32 btl_vivian_zoom_17_data_5C29C[7];
-__declspec(section ".data") s32 btl_marilyn_zoom_17_data_5C2B8[7];
-__declspec(section ".data") s32 btl_majolyne_zoom_17_data_5C2D4[7];
+__declspec(section ".data") s32 btl_vivian_zoom[7];
+__declspec(section ".data") s32 btl_marilyn_zoom[7];
+__declspec(section ".data") s32 btl_majolyne_zoom[7];
 static s32 init_event[45];
 static s32 damage_event[22];
 static s32 dead_event[122];
-s32 majo_unison_phase_event_17_data_5C5E4[238];
+s32 majo_unison_phase_event[238];
 static s32 unison_phase_event[83];
 static s32 phase_event[332];
 static s32 attack_event[389];
+#ifdef VERSION_G8ME01
+static s32 kagenuke_attack_event[225];
+#else
 static s32 kagenuke_attack_event[222];
+#endif
 static s32 blizzard_attack_event[243];
 static s32 powder_attack_check[16];
 static s32 powder_attack_event[179];
 static __declspec(section ".data") s32 wait_event[6];
-s32 majo3_shadow_tail_event_17_data_5E094[78];
+s32 majo3_shadow_tail_event[78];
 
 __declspec(section ".data") u64 fd_boss_majolyne_las_negone_one_374 = 0xBF8000003F800000;
 
@@ -283,7 +287,11 @@ static s32 weapon_majolyne_kagenuke_attack1[] = {
 };
 
 static s32 weapon_majolyne_blizzard_attack1[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     5, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 33555202, 0, 67, 2047, -2147475456,
@@ -301,7 +309,11 @@ static s32 weapon_majolyne_powder_attack1[] = {
 };
 
 static s32 weapon_majolyne_powder_attack2[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, 0,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
+#endif
     0, 2, 2, 3, 3, 4, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 536870912, 770, 0, 135, 2047, -2147475456,
@@ -310,7 +322,11 @@ static s32 weapon_majolyne_powder_attack2[] = {
 };
 
 s32 weapon_majolyne_powder_attack3[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, 0,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
+#endif
     0, 2, 2, 3, 3, 4, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 536870912, 770, 0, 135, 2047, -2147475456,
@@ -319,7 +335,11 @@ s32 weapon_majolyne_powder_attack3[] = {
 };
 
 s32 weapon_majolyne_powder_attack4[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, 0,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
+#endif
     0, 2, 2, 3, 3, 4, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 536870912, 770, 0, 135, 2047, -2147475456,
@@ -336,18 +356,41 @@ s32 weapon_majolyne_powder_attack5[] = {
     1677918208, 0, 0, 0, 0, 100, 0, 0,
 };
 
+#ifdef VERSION_G8ME01
+static EVT_BEGIN(majolyne_down)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(250)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MAJO_SHADOW1"), -250000000, 0, -250000000)
+    END_INLINE_EVENT
+    CALL(battle_evt_majo_disp_off, -2, 1, 0, 0)
+    RETURN
+EVT_END()
+#else
 static s32 majolyne_down[] = {
     107, 65546, 250, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MAJO_SHADOW1", -250000000,
     0, -250000000, 109, 327771, (s32)battle_evt_majo_disp_off, -2, 1, 0,
     0, 2, 1,
 };
+#endif
 
+#ifdef VERSION_G8ME01
+static EVT_BEGIN(majolyne_up)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(250)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MAJO_SHADOW2"), -250000000, 0, -250000000)
+    END_INLINE_EVENT
+    CALL(battle_evt_majo_disp_on, -2, 1, LW(0), LW(1), LW(2), 0)
+    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+    RETURN
+EVT_END()
+#else
 static s32 majolyne_up[] = {
     107, 65546, 250, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MAJO_SHADOW2", -250000000,
     0, -250000000, 109, 458843, (s32)battle_evt_majo_disp_on, -2, 1, -30000000,
     -29999999, -29999998, 0, 327771, (s32)btlevtcmd_SetPos, -2, -30000000, -29999999,
     -29999998, 2, 1,
 };
+#endif
 
 static s32 majo3_zoom[] = {
     327771, (s32)btlevtcmd_GetPos, -30000000, -30000000, -250000000, -250000000, 196699, (s32)evt_btl_camera_set_mode,
@@ -356,19 +399,19 @@ static s32 majo3_zoom[] = {
     1,
 };
 
-__declspec(section ".data") EVT_BEGIN(btl_vivian_zoom_17_data_5C29C)
+__declspec(section ".data") EVT_BEGIN(btl_vivian_zoom)
     SET_VALUE(LW(0), GW(10))
     CALL_CHILD(PTR(majo3_zoom))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(btl_marilyn_zoom_17_data_5C2B8)
+__declspec(section ".data") EVT_BEGIN(btl_marilyn_zoom)
     SET_VALUE(LW(0), GW(9))
     CALL_CHILD(PTR(majo3_zoom))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(btl_majolyne_zoom_17_data_5C2D4)
+__declspec(section ".data") EVT_BEGIN(btl_majolyne_zoom)
     SET_VALUE(LW(0), GW(8))
     CALL_CHILD(PTR(majo3_zoom))
     RETURN
@@ -383,7 +426,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetUnitWork, -2, 8, 0)
     CALL(btlevtcmd_SetUnitWork, -2, 9, 0)
     CALL(btlevtcmd_SetUnitWork, -2, 3, 0)
-    SPAWN_EVENT(PTR(majo3_shadow_tail_event_17_data_5E094))
+    SPAWN_EVENT(PTR(majo3_shadow_tail_event))
     ALLOCATE_UW(10, GW(15))
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
@@ -420,7 +463,7 @@ static EVT_BEGIN(dead_event)
     WAIT_FRAMES(1)
     CALL(btlevtcmd_WaitAttackEnd)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
-    CALL_CHILD(PTR(btl_majolyne_zoom_17_data_5C2D4))
+    CALL_CHILD(PTR(btl_majolyne_zoom))
     WAIT_MS(500)
     CALL(btlevtcmd_SetTalkPose, -2, STRING("MJR_D_1"))
     CALL(btlevtcmd_SetStayPose, -2, STRING("MJR_D_1"))
@@ -442,7 +485,7 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
-EVT_BEGIN(majo_unison_phase_event_17_data_5C5E4)
+EVT_BEGIN(majo_unison_phase_event)
     SET_VALUE(LW(0), -1)
     SET_VALUE(LW(1), -1)
     SET_VALUE(LW(2), -1)
@@ -537,7 +580,7 @@ EVT_END()
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(majo_unison_phase_event_17_data_5C5E4))
+        CALL_CHILD(PTR(majo_unison_phase_event))
         CALL(btlevtcmd_GetUnitWork, -2, 4, LW(3))
         CALL(btlevtcmd_GetUnitWork, -2, 5, LW(4))
         IF_INT_NOT_EQUAL(LW(3), LW(4))
@@ -592,7 +635,7 @@ static EVT_BEGIN(phase_event)
             IF_INT_LESS(LW(1), LW(0))
                 CALL(btlevtcmd_SetUnitWork, -2, 6, 1)
                 CALL(btlevtcmd_StatusWindowOnOff, 0)
-                CALL_CHILD(PTR(btl_majolyne_zoom_17_data_5C2D4))
+                CALL_CHILD(PTR(btl_majolyne_zoom))
                 CALL(evt_msg_print, 2, STRING("btl_majo3_03"), 0, -2)
                 WAIT_MS(200)
                 CALL(btlevtcmd_GetUnitWork, -2, 7, LW(0))
@@ -620,7 +663,7 @@ static EVT_BEGIN(phase_event)
                 IF_INT_LESS(LW(1), LW(0))
                     CALL(btlevtcmd_SetUnitWork, GW(9), 6, 1)
                     CALL(btlevtcmd_StatusWindowOnOff, 0)
-                    CALL_CHILD(PTR(btl_majolyne_zoom_17_data_5C2D4))
+                    CALL_CHILD(PTR(btl_majolyne_zoom))
                     CALL(btlevtcmd_CalculateFaceDirection, -2, -1, GW(9), -1, 16, LW(15))
                     CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
                     WAIT_MS(200)
@@ -629,7 +672,7 @@ static EVT_BEGIN(phase_event)
                     CALL(btlevtcmd_SetUnitWork, GW(9), 7, 1)
                     CALL(btlevtcmd_CheckActStatus, GW(9), LW(0))
                     IF_INT_NOT_EQUAL(LW(0), 0)
-                        CALL_CHILD(PTR(btl_marilyn_zoom_17_data_5C2B8))
+                        CALL_CHILD(PTR(btl_marilyn_zoom))
                         CALL(evt_msg_print, 2, STRING("btl_majo3_05"), 0, GW(9))
                         WAIT_MS(200)
                     END_IF
@@ -650,7 +693,7 @@ static EVT_BEGIN(phase_event)
                 IF_INT_LESS(LW(1), LW(0))
                     CALL(btlevtcmd_SetUnitWork, GW(10), 6, 1)
                     CALL(btlevtcmd_StatusWindowOnOff, 0)
-                    CALL_CHILD(PTR(btl_majolyne_zoom_17_data_5C2D4))
+                    CALL_CHILD(PTR(btl_majolyne_zoom))
                     CALL(btlevtcmd_CalculateFaceDirection, -2, -1, GW(10), -1, 16, LW(15))
                     CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
                     WAIT_MS(200)
@@ -659,7 +702,7 @@ static EVT_BEGIN(phase_event)
                     CALL(btlevtcmd_SetUnitWork, GW(10), 7, 1)
                     CALL(btlevtcmd_CheckActStatus, GW(10), LW(0))
                     IF_INT_NOT_EQUAL(LW(0), 0)
-                        CALL_CHILD(PTR(btl_vivian_zoom_17_data_5C29C))
+                        CALL_CHILD(PTR(btl_vivian_zoom))
                         CALL(evt_msg_print, 2, STRING("btl_majo3_07"), 0, GW(10))
                         WAIT_MS(200)
                     END_IF
@@ -823,6 +866,81 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+static EVT_BEGIN(kagenuke_attack_event)
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+        END_IF
+        RETURN
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(evt_btl_camera_set_mode, 0, 8)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 200)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A1_1"))
+    CALL_CHILD(majolyne_down)
+    WAIT_MS(300)
+    CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+    ADD(LW(2), 5)
+    CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 30)
+    SET_VALUE(LW(1), 0)
+    CALL_CHILD(majolyne_up)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MAJO_PUSH1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A1_2"))
+    WAIT_FRAMES(25)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A1_3"))
+    WAIT_MS(350)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A1_4"))
+    WAIT_MS(200)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+    END_SWITCH
+    LABEL(90)
+    GOTO(98)
+    LABEL(91)
+    CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    LABEL(98)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A1_1"))
+    CALL_CHILD(majolyne_down)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_MS(200)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL_CHILD(majolyne_up)
+    RETURN
+EVT_END()
+#else
 static s32 kagenuke_attack_event[] = {
     196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000,
     -29999991, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991, -29999997, -29999996, 131096, -29999997,
@@ -853,7 +971,87 @@ static s32 kagenuke_attack_event[] = {
     0, 0, 65546, 200, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000,
     -29999999, -29999998, 65630, (s32)majolyne_up, 2, 1,
 };
+#endif
 
+#ifdef VERSION_G8ME01
+static EVT_BEGIN(blizzard_attack_event)
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+        END_IF
+        RETURN
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MAJO_HAND_OPEN1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A1_2"))
+    WAIT_FRAMES(25)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A1_3"))
+    WAIT_MS(700)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A1_4"))
+    WAIT_MS(200)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    SET_VALUE(LW(10), 0)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MAJO_ATTACK_ICE1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+    IF_INT_GREATER_OR_EQUAL(LW(5), 0)
+        CALL(evt_eff, 0, STRING("ibuki"), 0, LW(0), LW(1), LW(2), 180, 0, 0, 0, 0, 0, 0, 0)
+        ELSE
+        CALL(evt_eff, 0, STRING("ibuki"), 1, LW(0), LW(1), LW(2), 180, 0, 0, 0, 0, 0, 0, 0)
+    END_IF
+    WAIT_FRAMES(150)
+    CALL(evt_snd_sfxoff, LW(15))
+    LABEL(10)
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+    END_SWITCH
+    LABEL(90)
+    GOTO(97)
+    LABEL(91)
+    IF_INT_EQUAL(LW(10), 0)
+        CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+    END_IF
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    LABEL(97)
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    IF_INT_NOT_EQUAL(LW(3), -1)
+        ADD(LW(10), 1)
+        GOTO(10)
+    END_IF
+    LABEL(98)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_MS(1000)
+    RETURN
+EVT_END()
+#else
 static s32 blizzard_attack_event[] = {
     196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000,
     -29999991, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991, -29999997, -29999996, 131096, -29999997,
@@ -887,6 +1085,7 @@ static s32 blizzard_attack_event[] = {
     33, 65539, 98, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 65546,
     1000, 2, 1,
 };
+#endif
 
 static EVT_BEGIN(powder_attack_check)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
@@ -895,6 +1094,71 @@ static EVT_BEGIN(powder_attack_check)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+static EVT_BEGIN(powder_attack_event)
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    IF_INT_EQUAL(LW(9), PTR(weapon_majolyne_powder_attack1))
+        CALL(evt_btl_camera_set_mode, 0, 9)
+        CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+        CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+        CALL(evt_btl_camera_set_zoom, 0, 200)
+    END_IF
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MAJO_HAND_OPEN1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A2_1"))
+    WAIT_MS(700)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A2_2"))
+    WAIT_MS(100)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A2_3"))
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+    END_SWITCH
+    LABEL(90)
+    GOTO(99)
+    LABEL(91)
+    CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    WAIT_FRAMES(30)
+    GOTO(99)
+    LABEL(99)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_MS(250)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    RETURN
+EVT_END()
+#else
 static s32 powder_attack_event[] = {
     131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16, -30000000,
     131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered, 2, 33, 65540,
@@ -920,13 +1184,14 @@ static s32 powder_attack_event[] = {
     196699, (s32)evt_btl_camera_set_mode, 0, 0, 65546, 250, 131163, (s32)btlevtcmd_ResetFaceDirection,
     -2, 2, 1,
 };
+#endif
 
 static __declspec(section ".data") EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
-EVT_BEGIN(majo3_shadow_tail_event_17_data_5E094)
+EVT_BEGIN(majo3_shadow_tail_event)
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetUnitWork, -2, 0, LW(0))

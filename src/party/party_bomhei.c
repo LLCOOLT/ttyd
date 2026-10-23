@@ -14,6 +14,18 @@
 #include <dolphin/mtx.h>
 #include <string.h>
 
+#ifdef VERSION_G8ME01
+// US has no local duplicate: this is the global bomhei_init
+#define bomhei_init_800BFBB0 bomhei_init
+#endif
+
+// US MarioWork has 4 more bytes before these raw offsets
+#ifdef VERSION_G8ME01
+#define MW_US 4
+#else
+#define MW_US 0
+#endif
+
 extern void partyChgRunMode(PartyEntry* party, s32 mode);
 extern void partyGoodbyeInit(PartyEntry* party);
 extern s32 partyGoodbyeMain(PartyEntry* party);
@@ -394,7 +406,7 @@ void bomhei_use_main(PartyEntry* party) {
         bomheiSetHoldPos(party);
         bomheiChkHitAttr(party);
         if ((party->flags & 0x80000000) ||
-            (mario->hitobjStandOn != NULL && mario->airTimer == 0 && !(PF(mario, 0x246, u16) & 0x400))) {
+            (mario->hitobjStandOn != NULL && mario->airTimer == 0 && !(PF(mario, 0x246 + MW_US, u16) & 0x400))) {
             party->useMotionId = 20;
         }
         break;

@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -11,6 +12,9 @@
 #include "data/item_data.h"
 #include "driver/npcdrv.h"
 #include "driver/mobjdrv.h"
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_mario_get_motion);
+#endif
 
 extern ItemData itemDataTable[];
 void mapObjFlagOn(const char* name, u32 flags);
@@ -54,7 +58,7 @@ USER_FUNC(evt_item_get_item);
 USER_FUNC(evt_item_get_item_end_wait);
 USER_FUNC(evt_item_get_position);
 USER_FUNC(evt_item_set_position);
-USER_FUNC(evt_kagemario_init_29_text_1A0C);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_key_get_buttontrg);
 USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_mapobj_get_position);
@@ -172,7 +176,7 @@ extern s32 evt_bero_info_run[];
 extern s32 evt_door_entry[];
 extern s32 evt_sub_mail_event[];
 extern s32 evt_sub_tree_access_entry[];
-extern s32 evt_usu_kagemario_party_kill_29_data_104A8[];
+extern s32 evt_usu_kagemario_party_kill[];
 extern s32 house_close_se[];
 extern s32 roll_majin_lecture[];
 extern s32 roll_majin_lecture_init[];
@@ -251,9 +255,9 @@ s32 evt_mon_open[112];
 static s32 cam_up[34];
 static __declspec(section ".data") s32 cam_down[8];
 s32 usu01_check_vivian[36];
-s32 usu01_crowFG_talk_event[355];
-s32 usu01_crowHI_talk_event[250];
-s32 usu01_crowJ_talk_event[226];
+s32 usu01_crowFG_talk_event[VERSION_PICK(355, 394)];
+s32 usu01_crowHI_talk_event[VERSION_PICK(250, 289)];
+s32 usu01_crowJ_talk_event[VERSION_PICK(226, 265)];
 __declspec(section ".data") s32 minka_npc[6];
 __declspec(section ".data") s32 minka_item[2];
 __declspec(section ".data") s32 shop_npc[6];
@@ -1583,6 +1587,145 @@ EVT_BEGIN(usu01_check_vivian)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(usu01_crowFG_talk_event)
+    SET_VALUE(LW(15), 0)
+    LABEL(0)
+    IF_INT_NOT_EQUAL(GW(0), 0)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_IF
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_position, STRING("カラスＦ"), LW(3), LW(4), LW(5))
+    CALL(evt_sub_area_check, 1, LW(3), LW(5), 20, LW(0), LW(2), LW(6))
+    CALL(evt_mario_get_party, LW(1))
+    IF_INT_NOT_EQUAL(LW(1), 6)
+        CALL(evt_mario_party_use_check, LW(1))
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            SET_VALUE(LW(6), 0)
+        END_IF
+    END_IF
+    CALL(evt_mario_get_motion, LW(1))
+    IF_INT_NOT_EQUAL(LW(1), 28)
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            IF_INT_NOT_EQUAL(LW(1), 1)
+                IF_INT_NOT_EQUAL(LW(1), 2)
+                    SET_VALUE(LW(6), 0)
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+    IF_INT_EQUAL(LW(6), 1)
+        IF_INT_EQUAL(LW(15), 0)
+            CALL(evt_mario_balloon_tenten)
+            SET_VALUE(LW(15), 1)
+        END_IF
+        ELSE
+        IF_INT_EQUAL(LW(15), 1)
+            CALL(evt_mario_balloon_off)
+            SET_VALUE(LW(15), 0)
+        END_IF
+    END_IF
+    IF_INT_EQUAL(LW(15), 1)
+        CALL(evt_key_get_buttontrg, 0, LW(0))
+        CALL(evt_mario_party_use_check, LW(1))
+        IF_INT_EQUAL(LW(1), 0)
+            IF_BITS_SET(LW(0), 256)
+                CALL(evt_mario_balloon_off)
+                SET_VALUE(LW(15), 0)
+                CALL(evt_mario_key_onoff, 0)
+                CALL(evt_party_cont_onoff, 0, 0)
+                CALL(mainwindow_opendisable)
+                CALL_CHILD(PTR(cam_up))
+                CALL(evt_npc_get_position, STRING("カラスＦ"), LW(0), LW(1), LW(2))
+                CALL(evt_snd_sfxon_3d, STRING("SFX_STG4_CROW_HOWL1"), LW(0), LW(1), LW(2), 0)
+                CALL(evt_msg_print, 0, STRING("stg4_jin_153"), 0, STRING("カラスＦ"))
+                CALL_CHILD(PTR(cam_down))
+                CALL(evt_mario_key_onoff, 1)
+                CALL(evt_party_cont_onoff, 0, 1)
+                CALL(mainwindow_openenable)
+            END_IF
+        END_IF
+    END_IF
+    CALL(evt_mario_get_party, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 6)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_IF
+    CALL(evt_party_get_status, 6, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 2)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_IF
+    IF_INT_EQUAL(LW(15), 1)
+        CALL(evt_mario_balloon_off)
+        SET_VALUE(LW(15), 0)
+        IF_INT_GREATER_OR_EQUAL(GSW(0), 206)
+            CALL(evt_mario_key_onoff, 0)
+            CALL(evt_party_cont_onoff, 0, 0)
+            CALL(mainwindow_opendisable)
+            CALL_CHILD(PTR(cam_up))
+            WAIT_MS(1000)
+            CALL(evt_npc_get_position, STRING("カラスＦ"), LW(0), LW(1), LW(2))
+            CALL(evt_snd_sfxon_3d, STRING("SFX_STG4_CROW_HOWL1"), LW(0), LW(1), LW(2), 0)
+            SWITCH(GSW(0))
+                CASE_LESS(210)
+                CALL(evt_msg_print, 0, STRING("stg4_usu_137"), 0, STRING("カラスＦ"))
+                CALL(evt_msg_print, 0, STRING("stg4_usu_138"), 0, STRING("カラスＧ"))
+                CALL(evt_msg_print, 0, STRING("stg4_usu_139"), 0, STRING("カラスＦ"))
+                CALL(evt_msg_print, 0, STRING("stg4_usu_140"), 0, STRING("カラスＧ"))
+                CALL_CHILD(PTR(cam_down))
+                IF_INT_EQUAL(GSWF(1928), 0)
+                    CALL(evt_party_cont_onoff, 0, 1)
+                    LOOP(0)
+                        CALL(evt_party_get_status, 6, LW(0))
+                        IF_INT_EQUAL(LW(0), 0)
+                            BREAK_LOOP
+                        END_IF
+                        WAIT_FRAMES(1)
+                    END_LOOP
+                    WAIT_MS(400)
+                    CALL(evt_party_stop, 0)
+                    CALL(evt_party_move_pos2, 0, 280, 350, FLOAT(80.0f))
+                    WAIT_FRAMES(1)
+                    CALL(evt_party_set_dir, 0, 270, 200)
+                    CALL(evt_mario_set_dir, 90, 200, 0)
+                    WAIT_MS(300)
+                    CALL(evt_msg_print_party, STRING("stg4_usu_149"))
+                    WAIT_MS(300)
+                    CALL(evt_mario_set_pose, STRING("M_N_2"))
+                    WAIT_MS(500)
+                    CALL(evt_mario_set_pose, STRING("M_S_1"))
+                    CALL(evt_msg_print_party, STRING("stg4_usu_150"))
+                    WAIT_MS(300)
+                    SET_VALUE(GSWF(1928), 1)
+                    CALL(evt_party_cont_onoff, 0, 0)
+                    CALL(evt_party_run, 0)
+                END_IF
+                CASE_LESS(222)
+                CALL(evt_msg_print, 0, STRING("stg4_usu_141"), 0, STRING("カラスＦ"))
+                CALL(evt_msg_print, 0, STRING("stg4_usu_142"), 0, STRING("カラスＧ"))
+                CALL_CHILD(PTR(cam_down))
+                CASE_LESS_OR_EQUAL(402)
+                CALL(evt_msg_print, 0, STRING("stg4_usu_142_1"), 0, STRING("カラスＦ"))
+                CALL(evt_msg_print, 0, STRING("stg4_usu_142_2"), 0, STRING("カラスＧ"))
+                CALL_CHILD(PTR(cam_down))
+                CASE_DEFAULT
+                CALL(evt_msg_print, 0, STRING("stg4_usu_142_2_1"), 0, STRING("カラスＦ"))
+                CALL(evt_msg_print, 0, STRING("stg4_usu_142_2_2"), 0, STRING("カラスＧ"))
+                CALL_CHILD(PTR(cam_down))
+            END_SWITCH
+            CALL(evt_party_cont_onoff, 0, 1)
+            CALL(evt_mario_key_onoff, 1)
+            CALL(mainwindow_openenable)
+            SET_VALUE(GW(0), 1)
+        END_IF
+    END_IF
+    WAIT_FRAMES(1)
+    GOTO(0)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(usu01_crowFG_talk_event)
     SET_VALUE(LW(15), 0)
     LABEL(0)
@@ -1703,7 +1846,111 @@ EVT_BEGIN(usu01_crowFG_talk_event)
     GOTO(0)
     RETURN
 EVT_END()
+#endif
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(usu01_crowHI_talk_event)
+    SET_VALUE(LW(15), 0)
+    LABEL(0)
+    IF_INT_NOT_EQUAL(GW(1), 0)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_IF
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_position, STRING("カラスＨ"), LW(3), LW(4), LW(5))
+    CALL(evt_sub_area_check, 1, LW(3), LW(5), 80, LW(0), LW(2), LW(6))
+    CALL(evt_mario_get_party, LW(1))
+    IF_INT_NOT_EQUAL(LW(1), 6)
+        CALL(evt_mario_party_use_check, LW(1))
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            SET_VALUE(LW(6), 0)
+        END_IF
+    END_IF
+    CALL(evt_mario_get_motion, LW(1))
+    IF_INT_NOT_EQUAL(LW(1), 28)
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            IF_INT_NOT_EQUAL(LW(1), 1)
+                IF_INT_NOT_EQUAL(LW(1), 2)
+                    SET_VALUE(LW(6), 0)
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+    IF_INT_EQUAL(LW(6), 1)
+        IF_INT_EQUAL(LW(15), 0)
+            CALL(evt_mario_balloon_tenten)
+            SET_VALUE(LW(15), 1)
+        END_IF
+        ELSE
+        IF_INT_EQUAL(LW(15), 1)
+            CALL(evt_mario_balloon_off)
+            SET_VALUE(LW(15), 0)
+        END_IF
+    END_IF
+    IF_INT_EQUAL(LW(15), 1)
+        CALL(evt_key_get_buttontrg, 0, LW(0))
+        CALL(evt_mario_party_use_check, LW(1))
+        IF_INT_EQUAL(LW(1), 0)
+            IF_BITS_SET(LW(0), 256)
+                CALL(evt_mario_balloon_off)
+                SET_VALUE(LW(15), 0)
+                CALL(evt_mario_key_onoff, 0)
+                CALL_CHILD(PTR(cam_up))
+                CALL(evt_npc_get_position, STRING("カラスＨ"), LW(0), LW(1), LW(2))
+                CALL(evt_snd_sfxon_3d, STRING("SFX_STG4_CROW_HOWL1"), LW(0), LW(1), LW(2), 0)
+                CALL(evt_msg_print, 0, STRING("stg4_jin_153"), 0, STRING("カラスＨ"))
+                CALL_CHILD(PTR(cam_down))
+                CALL(evt_mario_key_onoff, 1)
+            END_IF
+        END_IF
+    END_IF
+    CALL(evt_mario_get_party, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 6)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_IF
+    CALL(evt_party_get_status, 6, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 2)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_IF
+    IF_INT_EQUAL(LW(15), 1)
+        CALL(evt_mario_balloon_off)
+        SET_VALUE(LW(15), 0)
+        IF_INT_GREATER_OR_EQUAL(GSW(0), 206)
+            CALL(evt_mario_key_onoff, 0)
+            CALL(evt_party_cont_onoff, 0, 0)
+            CALL(mainwindow_opendisable)
+            CALL_CHILD(PTR(cam_up))
+            WAIT_MS(1000)
+            CALL(evt_npc_get_position, STRING("カラスＨ"), LW(0), LW(1), LW(2))
+            CALL(evt_snd_sfxon_3d, STRING("SFX_STG4_CROW_HOWL1"), LW(0), LW(1), LW(2), 0)
+            SWITCH(GSW(0))
+                CASE_LESS(210)
+                CALL(evt_msg_print, 0, STRING("stg4_usu_143"), 0, STRING("カラスＨ"))
+                CALL(evt_msg_print, 0, STRING("stg4_usu_144"), 0, STRING("カラスＩ"))
+                CASE_LESS(222)
+                CALL(evt_msg_print, 0, STRING("stg4_usu_145"), 0, STRING("カラスＨ"))
+                CALL(evt_msg_print, 0, STRING("stg4_usu_146"), 0, STRING("カラスＩ"))
+                CASE_LESS_OR_EQUAL(402)
+                CALL(evt_msg_print, 0, STRING("stg4_usu_146_1"), 0, STRING("カラスＨ"))
+                CALL(evt_msg_print, 0, STRING("stg4_usu_146_2"), 0, STRING("カラスＩ"))
+                CASE_DEFAULT
+                CALL(evt_msg_print, 0, STRING("stg4_usu_146_2_1"), 0, STRING("カラスＨ"))
+                CALL(evt_msg_print, 0, STRING("stg4_usu_146_2_2"), 0, STRING("カラスＩ"))
+            END_SWITCH
+            CALL_CHILD(PTR(cam_down))
+            CALL(evt_party_cont_onoff, 0, 1)
+            CALL(evt_mario_key_onoff, 1)
+            CALL(mainwindow_openenable)
+            SET_VALUE(GW(1), 1)
+        END_IF
+    END_IF
+    WAIT_FRAMES(1)
+    GOTO(0)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(usu01_crowHI_talk_event)
     SET_VALUE(LW(15), 0)
     LABEL(0)
@@ -1788,7 +2035,107 @@ EVT_BEGIN(usu01_crowHI_talk_event)
     GOTO(0)
     RETURN
 EVT_END()
+#endif
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(usu01_crowJ_talk_event)
+    SET_VALUE(LW(15), 0)
+    LABEL(0)
+    IF_INT_NOT_EQUAL(GW(2), 0)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_IF
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_position, STRING("カラスＪ"), LW(3), LW(4), LW(5))
+    CALL(evt_sub_area_check, 1, LW(3), LW(5), 20, LW(0), LW(2), LW(6))
+    CALL(evt_mario_get_party, LW(1))
+    IF_INT_NOT_EQUAL(LW(1), 6)
+        CALL(evt_mario_party_use_check, LW(1))
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            SET_VALUE(LW(6), 0)
+        END_IF
+    END_IF
+    CALL(evt_mario_get_motion, LW(1))
+    IF_INT_NOT_EQUAL(LW(1), 28)
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            IF_INT_NOT_EQUAL(LW(1), 1)
+                IF_INT_NOT_EQUAL(LW(1), 2)
+                    SET_VALUE(LW(6), 0)
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+    IF_INT_EQUAL(LW(6), 1)
+        IF_INT_EQUAL(LW(15), 0)
+            CALL(evt_mario_balloon_tenten)
+            SET_VALUE(LW(15), 1)
+        END_IF
+        ELSE
+        IF_INT_EQUAL(LW(15), 1)
+            CALL(evt_mario_balloon_off)
+            SET_VALUE(LW(15), 0)
+        END_IF
+    END_IF
+    IF_INT_EQUAL(LW(15), 1)
+        CALL(evt_key_get_buttontrg, 0, LW(0))
+        CALL(evt_mario_party_use_check, LW(1))
+        IF_INT_EQUAL(LW(1), 0)
+            IF_BITS_SET(LW(0), 256)
+                CALL(evt_mario_balloon_off)
+                SET_VALUE(LW(15), 0)
+                CALL(evt_mario_key_onoff, 0)
+                CALL_CHILD(PTR(cam_up))
+                CALL(evt_npc_get_position, STRING("カラスＪ"), LW(0), LW(1), LW(2))
+                CALL(evt_snd_sfxon_3d, STRING("SFX_STG4_CROW_HOWL1"), LW(0), LW(1), LW(2), 0)
+                CALL(evt_msg_print, 0, STRING("stg4_jin_153"), 0, STRING("カラスＪ"))
+                CALL_CHILD(PTR(cam_down))
+                CALL(evt_mario_key_onoff, 1)
+            END_IF
+        END_IF
+    END_IF
+    CALL(evt_mario_get_party, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 6)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_IF
+    CALL(evt_party_get_status, 6, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 2)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_IF
+    IF_INT_EQUAL(LW(15), 1)
+        CALL(evt_mario_balloon_off)
+        SET_VALUE(LW(15), 0)
+        IF_INT_GREATER_OR_EQUAL(GSW(0), 206)
+            CALL(evt_mario_key_onoff, 0)
+            CALL(evt_party_cont_onoff, 0, 0)
+            CALL(mainwindow_opendisable)
+            CALL_CHILD(PTR(cam_up))
+            WAIT_MS(1000)
+            CALL(evt_npc_get_position, STRING("カラスＪ"), LW(0), LW(1), LW(2))
+            CALL(evt_snd_sfxon_3d, STRING("SFX_STG4_CROW_HOWL1"), LW(0), LW(1), LW(2), 0)
+            SWITCH(GSW(0))
+                CASE_LESS(210)
+                CALL(evt_msg_print, 0, STRING("stg4_usu_147"), 0, STRING("カラスＪ"))
+                CASE_LESS(222)
+                CALL(evt_msg_print, 0, STRING("stg4_usu_148"), 0, STRING("カラスＪ"))
+                CASE_LESS_OR_EQUAL(402)
+                CALL(evt_msg_print, 0, STRING("stg4_usu_148_1"), 0, STRING("カラスＪ"))
+                CASE_DEFAULT
+                CALL(evt_msg_print, 0, STRING("stg4_usu_148_1_1"), 0, STRING("カラスＪ"))
+            END_SWITCH
+            CALL_CHILD(PTR(cam_down))
+            CALL(evt_mario_key_onoff, 1)
+            CALL(evt_party_cont_onoff, 0, 1)
+            CALL(mainwindow_openenable)
+            SET_VALUE(GW(2), 1)
+        END_IF
+    END_IF
+    WAIT_FRAMES(1)
+    GOTO(0)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(usu01_crowJ_talk_event)
     SET_VALUE(LW(15), 0)
     LABEL(0)
@@ -1869,6 +2216,7 @@ EVT_BEGIN(usu01_crowJ_talk_event)
     GOTO(0)
     RETURN
 EVT_END()
+#endif
 
 __declspec(section ".data") s32 minka_npc[] = {
     (s32)/*"おばさん"*/"\x82\xA8\x82\xCE\x82\xB3\x82\xF1", (s32)/*"ブタおばさん"*/"\x83\x75\x83\x5E\x82\xA8\x82\xCE\x82\xB3\x82\xF1", (s32)/*"子供Ａ"*/"\x8E\x71\x8B\x9F\x82\x60", (s32)/*"子供Ｂ"*/"\x8E\x71\x8B\x9F\x82\x61", (s32)/*"子供Ｃ"*/"\x8E\x71\x8B\x9F\x82\x62", 0,
@@ -2065,10 +2413,18 @@ USER_FUNC(sleep_voice) {
 }
 
 USER_FUNC(get_item_list) {
+#ifdef VERSION_G8ME01
+    s32* args = event->args;
+    s32 cnt = pouchGetHaveItemCnt();
+    s32* list = _mapAlloc((cnt + 1) * sizeof(s32));
+    s32 n;
+    s32 i;
+#else
     s32* args = event->args;
     s32* list = _mapAlloc((pouchGetHaveItemCnt() + 1) * sizeof(s32));
     s32 n;
     s32 i;
+#endif
 
     for (i = 0, n = 0; i < 20; i++) {
         if (pouchHaveItem(i)) {
@@ -2082,7 +2438,12 @@ USER_FUNC(get_item_list) {
 }
 
 USER_FUNC(delete_item_list) {
+#ifdef VERSION_G8ME01
+    void* p = (void*)evtGetValue(event, event->args[0]);
+    _mapFree(p);
+#else
     _mapFree((void*)evtGetValue(event, event->args[0]));
+#endif
     return EVT_RETURN_DONE;
 }
 
@@ -2841,11 +3202,11 @@ EVT_END()
 EVT_BEGIN(usu_01_init_evt)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_USU1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_USU1"))
-    CALL(evt_kagemario_init_29_text_1A0C)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_29_data_104A8))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     CALL(evt_npc_setup, PTR(npcEnt))
     SWITCH(GSW(0))
         CASE_BETWEEN(178, 200)

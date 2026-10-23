@@ -12,9 +12,19 @@
 #include "system.h"
 #include <string.h>
 #include <stdlib.h>
+#include "icon_ids.h"
 #define EXT_LIT(sym, val) (val)
 __declspec(section ".rodata") const char R_no_messages_JP[] = "<col ff0000ff>\203\201\203b\203Z\201[\203W\202\252\202\240\202\350\202\334\202\271\202\361</col>\n<key>\000\000\000";
+#ifdef VERSION_G8ME01
+__declspec(section ".rodata") const char R_no_messages_US[48] = "<col ff0000ff>No messages.[English]<col>\012<key>\000";
+__declspec(section ".rodata") const char R_no_messages_DE[48] = "<col ff0000ff>No messages.[German]<col>\012<key>\000\000";
+__declspec(section ".rodata") const char R_no_messages_FR[48] = "<col ff0000ff>No messages.[French]<col>\012<key>\000\000";
+__declspec(section ".rodata") const char R_no_messages_ES[48] = "<col ff0000ff>No messages.[Spanish]<col>\012<key>\000";
+__declspec(section ".rodata") const char R_no_messages_IT[48] = "<col ff0000ff>No messages.[Italian]<col>\012<key>\000";
+__declspec(section ".rodata") const char R_no_messages_DU[48] = "<col ff0000ff>No messages.[Dutch]<col>\012<key>\000\000\000";
+#else
 __declspec(section ".rodata") const char R_no_messages_US[] = "<col ff0000ff>No messages.<col>\n<key>\000\000";
+#endif
 __declspec(section ".rodata") const char str_802C4E4C[12] = "\123\124\111\103\113\137\114\105\106\124\000";
 __declspec(section ".rodata") const char str_802C4E58[12] = "\102\125\124\124\117\116\137\114\000\000\000";
 __declspec(section ".rodata") const char str_802C4E64[12] = "\102\125\124\124\117\116\137\122\000\000\000";
@@ -35,6 +45,13 @@ __declspec(section ".rodata") const char str_802C4F00[8] = "\120\115\137\103\137
 
 extern const char R_no_messages_JP[];
 extern const char R_no_messages_US[];
+#ifdef VERSION_G8ME01
+extern const char R_no_messages_DE[];
+extern const char R_no_messages_FR[];
+extern const char R_no_messages_ES[];
+extern const char R_no_messages_IT[];
+extern const char R_no_messages_DU[];
+#endif
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
 #pragma force_active on
 
@@ -70,7 +87,11 @@ typedef struct MsgWinData {
 	u8 field_0x2C[0x30 - 0x2C]; //0x2C
 	OSTime time30; //0x30
 	s32 count; //0x38
+#ifdef VERSION_G8ME01
+	MsgChar entries[0xA00]; //0x3C (US: twice as many, so every field below moves by 0x7800)
+#else
 	MsgChar entries[0x500]; //0x3C
+#endif
 	s32 page; //0x783C
 	s32 pageCount; //0x7840, number of pageY entries
 	s32 pageY[(0x79FC - 0x7844) / 4]; //0x7844
@@ -130,24 +151,24 @@ typedef struct MsgIcon {
 //.data
 #define STR(sym, lit) lit
 MsgIcon msgIcon[] = {
-	{STR(str_8041A4B0, "PAD_A"), 0x64},
-	{STR(str_8041A4B8, "PAD_B"), 0x66},
-	{str_802C4E4C, 0x78},
-	{STR(str_8041A4C0, "STICK"), 0x79},
-	{STR(str_8041A4C8, "AC_ON"), 0x95},
-	{str_802C4E58, 0x7E},
-	{str_802C4E64, 0x80},
-	{STR(str_8041A4D0, "HM"), 0x19F},
-	{STR(str_8041A4D4, "PAD_X"), 0x68},
-	{str_802C4E70, 0x69},
-	{STR(str_8041A4DC, "PAD_Y"), 0x6A},
-	{str_802C4E7C, 0x6B},
-	{str_802C4E88, 0x82},
-	{str_802C4E94, 0x84},
-	{str_802C4EA0, 0x130},
-	{str_802C4EAC, 0x20B},
-	{str_802C4EB8, 0x20C},
-	{str_802C4EC8, 0x20D}
+	{STR(str_8041A4B0, "PAD_A"), ICON_064},
+	{STR(str_8041A4B8, "PAD_B"), ICON_066},
+	{str_802C4E4C, ICON_078},
+	{STR(str_8041A4C0, "STICK"), ICON_079},
+	{STR(str_8041A4C8, "AC_ON"), ICON_095},
+	{str_802C4E58, ICON_07E},
+	{str_802C4E64, ICON_080},
+	{STR(str_8041A4D0, "HM"), ICON_19F},
+	{STR(str_8041A4D4, "PAD_X"), ICON_068},
+	{str_802C4E70, ICON_069},
+	{STR(str_8041A4DC, "PAD_Y"), ICON_06A},
+	{str_802C4E7C, ICON_06B},
+	{str_802C4E88, ICON_082},
+	{str_802C4E94, ICON_084},
+	{str_802C4EA0, ICON_130},
+	{str_802C4EAC, ICON_20B},
+	{str_802C4EB8, ICON_20C},
+	{str_802C4EC8, ICON_20D}
 };
 
 s32 msgWindowOpen_SE_Data[] = {
@@ -164,12 +185,21 @@ __declspec(section ".sdata") u16 g5_active_s772;
 
 //.sdata
 MessageWork* msgw = &msgWork;
+#ifdef VERSION_G8ME01
+const char* ErrMessage[7] = {R_no_messages_JP, R_no_messages_US, R_no_messages_DE, R_no_messages_FR,
+                             R_no_messages_ES, R_no_messages_IT, R_no_messages_DU};
+#else
 const char* ErrMessage[2] = {R_no_messages_JP, R_no_messages_US};
+#endif
 __declspec(section ".sdata") const char* paperPoseTbl[6] = {
 	str_802C4ED8, str_802C4EE0, str_802C4EE8,
 	str_802C4EF0, str_802C4EF8, str_802C4F00
 };
+#ifdef VERSION_G8ME01
+const char* language_dir[7] = {"msg/JP", "msg/US", "msg/DE", "msg/FR", "msg/SP", "msg/IT", "msg/US"};
+#else
 const char* language_dir[2] = {STR(str_8041A4E4, "msg"), STR(str_8041A4E8, "emsg")};
+#endif
 
 //local prototypes
 int msg_compare(const void* a, const void* b);
@@ -189,6 +219,18 @@ void msgInit(void) {
 }
 
 void msgLoad(const char* filename, s32 index) {
+#ifdef VERSION_G8ME01
+	MessageEntry* entry;
+	u32 r30;
+	MsgLookupEntry* lookup;
+	u32 msgptr;
+	int i;
+	s32 msgcount;
+	DVDEntry* dvd;
+	s32 max;
+	s32 len;
+	u32 r27;
+#else
 	MessageEntry* entry;
 	u32 r30;
 	MsgLookupEntry* lookup;
@@ -197,10 +239,46 @@ void msgLoad(const char* filename, s32 index) {
 	DVDEntry* dvd;
 	s32 msgcount;
 	u32 r27;
+#endif
 	char filepath[64];
 	char dvdpath[128]; //TODO: double check size
 
 	entry = &msgw->entries[index];
+#ifdef VERSION_G8ME01
+	// US: the global message buffer is allocated once, sized for the largest message file of all languages
+	if (!entry->address && index == 1) {
+		max = 0;
+		for (i = 0; i <= 6; i++) {
+			sprintf(filepath, "./%s/%s.txt", language_dir[i], filename);
+			sprintf(dvdpath, STR(str_8041A6A4, "%s/%s"), getMarioStDvdRoot(), filepath);
+			dvd = DVDMgrOpen(dvdpath, 2, 0);
+			if (dvd) {
+				len = DVDMgrGetLength(dvd);
+				DVDMgrClose(dvd);
+				if (max < len) {
+					max = len;
+				}
+			}
+		}
+		entry->address = __memAlloc(HEAP_DEFAULT, OSRoundUp32B(max));
+	}
+	entry->length = 0;
+	sprintf(filepath, "./%s/%s.txt", language_dir[gp->language], filename);
+	sprintf(dvdpath, STR(str_8041A6A4, "%s/%s"), getMarioStDvdRoot(), filepath);
+	dvd = DVDMgrOpen(dvdpath, 2, 0);
+	if (dvd) {
+		entry->length = DVDMgrGetLength(dvd);
+		switch (index) {
+			case 0:
+				entry->address = _mapAlloc(OSRoundUp32B(entry->length));
+				break;
+			case 1:
+				break;
+		}
+		DVDMgrRead(dvd, entry->address, OSRoundUp32B(entry->length), 0);
+		DVDMgrClose(dvd);
+	}
+#else
 	sprintf(filepath, "./%s/%s.txt", language_dir[gp->language], filename);
 	
 	if (entry->address) {
@@ -228,6 +306,7 @@ void msgLoad(const char* filename, s32 index) {
 			DVDMgrClose(dvd);
 		}
 	}
+#endif
 
 	if (!entry->address) {
 		entry->length = 0;
@@ -349,7 +428,7 @@ s32 msgMain(smartEntry* smart) {
 	}
 	data->time30 = gp->renderTime;
 	entry = &data->entries[data->nextEntry];
-	for (i = data->nextEntry; i < 0x500; i++, entry++) {
+	for (i = data->nextEntry; i < VERSION_PICK(0x500, 0xA00); i++, entry++) {
 		if (entry->time > data->playTime) {
 			break;
 		}
@@ -470,14 +549,26 @@ void FontDrawColorIDX(s32 idx);
 void FontDrawColor_(void);
 GXColor FontGetDrawColor(void);
 void FontDrawScale(f32 scale);
+#ifdef VERSION_G8ME01
+void FontDrawScaleVec(Vec scale);
+
+// US: <scaleX> letters (flag 0x10000) are stretched on x only
+#define MSG_DRAW_SCALE(c)                                   \
+	if ((c)->value & 0x10000) {                             \
+		FontDrawScaleVec((Vec){(c)->scale, 1.0f, 1.0f});      \
+	}                                                       \
+	else {                                                  \
+		FontDrawScale((c)->scale);                            \
+	}
+#endif
 void FontDrawCode(f32 x, f32 y, u16 code);
 void FontDrawCodeMtx(Mtx mtx, u16 code);
 
 #pragma dont_inline on
 BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y);
 BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
-	s32 hide;
 	s32 al;
+	s32 hide;
 	s32 w;
 	MsgWinData* data = smart->address;
 	MsgDispChar* c = (MsgDispChar*)data->entries;
@@ -595,6 +686,11 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 				}
 				if (c->glyph == 0xFFF8) {
 					col4 = FontGetDrawColor();
+#ifdef VERSION_G8ME01
+					if ((((data->scrollPos + c->y) - 40) + c->iconY) > 0) {
+						break;
+					}
+#endif
 					pos.x = EXT_LIT(float_28_8041a550, 20.0f) + (x + c->x);
 					pos.y = c->iconY + (c->y + (y + data->scrollPos) - 40.0f);
 					pos.z = EXT_LIT(float_0_8041a514, 0.0f);
@@ -619,18 +715,31 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 					}
 					gray.a = a;
 					GXSetTevColor(GX_TEVREG0, gray);
+#ifdef VERSION_G8ME01
+					MSG_DRAW_SCALE(c);
+#else
 					FontDrawScale(c->scale);
+#endif
 					FontDrawCode(sx, sy, c->glyph);
 					FontDrawColor_();
 				}
 				else if (c->value & 1) {
-					w = kanjiGetWidth(c->glyph) / 2;
+					w = (u16)(kanjiGetWidth(c->glyph) / 2);
+#ifdef VERSION_G8ME01
+					if (c->value & 2) {
+						sx += irand(10000) % 3;
+						sy += irand(10000) % 3;
+					}
+					hx = sx;
+					hy = sy;
+#else
 					hx = sx;
 					hy = sy;
 					if (c->value & 2) {
 						hx = sx + irand(10000) % 3;
 						hy = sy + irand(10000) % 3;
 					}
+#endif
 					PSMTXTrans(m2, -w, EXT_LIT(float_12_8041a68c, 12.0f), EXT_LIT(float_0_8041a514, 0.0f));
 					PSMTXScaleApply(m2, m2, c->rot, c->rot, c->rot);
 					PSMTXTransApply(m2, m2, (u32)w, EXT_LIT(float_neg12_8041a690, -12.0f), EXT_LIT(float_0_8041a514, 0.0f));
@@ -640,24 +749,46 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 					c->rot = EXT_LIT(float_1_8041a52c, 1.0f) + EXT_LIT(float_0p5_8041a534, 0.5f) * (c->rot - 1.0f);
 				}
 				else if (c->value & 2) {
+#ifdef VERSION_G8ME01
+					sx += irand(10000) % 3;
+					sy += irand(10000) % 3;
+					MSG_DRAW_SCALE(c);
+					FontDrawCode(sx, sy, c->glyph);
+#else
 					hy = sx + irand(10000) % 3;
 					hx = sy + irand(10000) % 3;
 					FontDrawScale(c->scale);
 					FontDrawCode(hy, hx, c->glyph);
+#endif
 				}
 				else if (c->value & 4) {
+#ifdef VERSION_G8ME01
+					t = 0.01f * OSTicksToMilliseconds(gp->renderTime - data->time18) - 0.02f * sx;
+					sx += 3.2f * (f32)cos(t);
+					sy -= 3.2f * (f32)sin(t);
+					MSG_DRAW_SCALE(c);
+					FontDrawCode(sx, sy, c->glyph);
+#else
 					t = 0.01f * OSTicksToMilliseconds(gp->renderTime - data->time18) - 0.02f * sx;
 					hx = cos(t);
 					hy = sin(t);
 					FontDrawScale(c->scale);
 					FontDrawCode(sx + EXT_LIT(float_3p2_8041a69c, 3.2f) * hx, sy - 3.2f * hy, c->glyph);
+#endif
 				}
 				else if (c->value & (0x100 << data->sel)) {
 					f32 hx2;
 					t = EXT_LIT(float_0p01_8041a694, 0.01f) * OSTicksToMilliseconds(gp->renderTime - data->time18) - 0.02f * sx;
+#ifdef VERSION_G8ME01
+					hx2 = sx + 3.2f * (f32)cos(t);
+					sy -= 3.2f * (f32)sin(t);
+					hy = sy;
+					MSG_DRAW_SCALE(c);
+#else
 					hx2 = sx + EXT_LIT(float_3p2_8041a69c, 3.2f) * (f32)cos(t);
 					hy = sy - 3.2f * (f32)sin(t);
 					FontDrawScale(c->scale);
+#endif
 					{
 						GXColor shadow = {0x00, 0x00, 0x00, 0x50};
 						FontDrawColor(shadow);
@@ -675,7 +806,11 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 					FontDrawColorIDX(0);
 				}
 				else {
+#ifdef VERSION_G8ME01
+					MSG_DRAW_SCALE(c);
+#else
 					FontDrawScale(c->scale);
+#endif
 					FontDrawCode(sx, sy, c->glyph);
 				}
 				break;
@@ -697,7 +832,11 @@ void msgDispKeyWait_render(s32 wXluStage) {
 
 char* msgGetCommand(char* msg, char* cmd, char* arg);
 s32 msgIconStr2ID(const char* str);
+#ifdef VERSION_G8ME01
+u16 hankakuSearch(s32 c);
+#else
 u16 hankakuSearch(char c);
+#endif
 
 typedef struct MsgAChar {
 	u32 value; //0x0
@@ -757,7 +896,12 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	char paper[0x20];
 	char paper2[0x20];
 	s32 step;
+#ifdef VERSION_G8ME01
+	Vec scale; // US: x and y scale apart (<scaleX>)
+	u32 maxW; // US: widest line so far, becomes the window width
+#else
 	f32 scale;
+#endif
 	f32 fv;
 	s32 v48;
 	// FAKE: int, not s32 (same width/sign; changes colouring)
@@ -799,7 +943,15 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	entry = (MsgAChar*)(&data->entries[data->count]);
 	flags = 0;
 	maxScale = EXT_LIT(float_0_8041a514, 0.0f);
+#ifdef VERSION_G8ME01
+	{
+		Vec one = {1.0f, 1.0f, 1.0f};
+		scale = one;
+	}
+	maxW = 70;
+#else
 	scale = EXT_LIT(float_1_8041a52c, 1.0f);
+#endif
 	if (window->type < 0) {
 		window->type = 0;
 	}
@@ -836,13 +988,25 @@ void msgAnalize(smartEntry* smart, char* msg) {
 
 	while (TRUE) {
 		check = *(( u8*)msg) ;
+#ifdef VERSION_G8ME01
+		if (_ismbblead((s8)check)) {
+#else
 		if (_ismbblead((u8)check)) {
+#endif
 			glyph = kanjiSearch(*(( u16*)msg) );
+#ifdef VERSION_G8ME01
+			ww = scale.x * (( f32)(kanjiGetWidth((u16)(glyph + 0)) + 4) );
+			entry->glyph = glyph;
+			entry->x = x;
+			entry->y = y - (s16)(10.0f * scale.y);
+			entry->scale = scale.x;
+#else
 			ww = scale * (( f32)(kanjiGetWidth((u16)(glyph + 0)) + 4) );
 			entry->glyph = glyph;
 			entry->x = x;
 			entry->y = y - (s16)(EXT_LIT(float_10_8041a538, 10.0f) * scale);
 			entry->scale = scale;
+#endif
 			entry->value = flags;
 			if (( *( (u16*)msg )) == 0x8145) {
 				entry->value |= 0x10;
@@ -852,9 +1016,15 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			if (( flags & 1) != 0 ) {
 				entry->dyn = fv;
 			}
+#ifdef VERSION_G8ME01
+			if (maxScale < scale.y) {
+				maxScale = scale.y;
+			}
+#else
 			if (maxScale < scale) {
 				maxScale = scale;
 			}
+#endif
 			entry->time = time;
 			x += ww;
 			msg += 2;
@@ -867,6 +1037,14 @@ void msgAnalize(smartEntry* smart, char* msg) {
 		case 0:
 			entry->glyph = 0xFFFF;
 			entry->time = time;
+#ifdef VERSION_G8ME01
+			if (data->selWidth == 0) {
+				if (maxW < x) {
+					maxW = x;
+				}
+				data->selWidth = maxW + 80;
+			}
+#endif
 			data->parseTime = time;
 			data->parseX = x;
 			data->parseY = y;
@@ -874,6 +1052,21 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			data->field_0x7A3A = s230;
 			return;
 		case '\n':
+#ifdef VERSION_G8ME01
+			entry->glyph = 0xFFFB;
+			entry->time = time;
+			if (0.0f == maxScale) {
+				maxScale = 1.0f;
+			}
+			if (data->flags & 0x10) {
+				// US: tighter line spacing
+				y -= 0.7f * (32.0f * maxScale);
+				s230 -= 0.7f * (32.0f * maxScale);
+			} else {
+				y -= 32.0f * maxScale;
+				s230 -= 32.0f * maxScale;
+			}
+#else
 			entry->glyph = 0xFFFB;
 			entry->time = time;
 			x = 0;
@@ -882,6 +1075,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			}
 			y -= EXT_LIT(float_32_8041a588, 32.0f) * maxScale;
 			s230 -= EXT_LIT(float_32_8041a588, 32.0f) * maxScale;
+#endif
 			msg++;
 			entry++;
 			time += step;
@@ -891,7 +1085,17 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				flags &= ~0xFF00;
 				flags |= 0x100 << data->numSel;
 				data->numSel++;
+#ifdef VERSION_G8ME01
+				if (data->selWidth == 0) {
+					if (maxW < x) {
+						maxW = x;
+					}
+				}
+#endif
 			}
+#ifdef VERSION_G8ME01
+			x = 0;
+#endif
 			continue;
 		case '<':
 			next = msgGetCommand(msg + 1, tag, args);
@@ -935,14 +1139,35 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			} else if (strcmp(tag, "pos") == 0) {
 				sscanf(args, "%d%d", &v48, &v44);
 				x = v48;
+#ifdef VERSION_G8ME01
+				if (v44 != 999) {
+					y = s234 - v44;
+					s230 = -v44;
+				}
+#else
 				if (v44 != 999) {
 					y = s234 - v44;
 				}
 				s230 = -v44;
+#endif
+#ifdef VERSION_G8ME01
+			} else if (strcmp(tag, "scale") == 0) {
+				sscanf(args, "%f", &scale.x);
+				flags &= ~0x10000;
+				scale.y = scale.x;
+			} else if (strcmp(tag, "scaleX") == 0) {
+				sscanf(args, "%f", &scale.x);
+				flags |= 0x10000;
+			} else if (strcmp(tag, "/scale") == 0) {
+				Vec one = {1.0f, 1.0f, 1.0f};
+				flags &= ~0x10000;
+				scale = one;
+#else
 			} else if (strcmp(tag, "scale") == 0) {
 				sscanf(args, "%f", &scale);
 			} else if (strcmp(tag, "/scale") == 0) {
 				scale = 1.0f;
+#endif
 			} else if (strcmp(tag, "wait") == 0) {
 				sscanf(args, "%d", &v40);
 				time += v40;
@@ -1083,30 +1308,54 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					((void (*)(u16*, u16*, u16))iconGetWidthHight)(&iw, &ih, iconId);
 					entry->glyph = 0xFFF8;
 					entry->x = (x + (( EXT_LIT(float_0p5_8041a534, 0.5f) * iw ) * iconScale) ) + i38;
+#ifndef VERSION_G8ME01
 					x += 0x28;
+#endif
 					entry->y = y - ( ih * iconScale) ;
 					entry->extra = i34;
 					entry->scale = iconScale;
 					entry->time = time;
 					entry++;
+#ifdef VERSION_G8ME01
+					x += i30 + 0x28;
+#endif
 					time += step;
 					data->count++;
 				} else {
+#ifdef VERSION_G8ME01
+					if ((u32)gp->language == 0) {
+						glyph = kanjiSearch(0x94B5);
+					} else {
+						glyph = hankakuSearch(-48);
+					}
+					iw = scale.x * (( f32)(kanjiGetWidth((u16)(glyph + 0)) + 4) );
+					entry->glyph = glyph;
+					entry->x = x;
+					entry->y = y - (s16)(10.0f * scale.y);
+					entry->scale = scale.x;
+#else
 					glyph = kanjiSearch(0x94B5);
 					iw = scale * (( f32)(kanjiGetWidth((u16)(glyph + 0)) + 4) );
 					entry->glyph = glyph;
 					entry->x = x;
 					entry->y = y - (s16)(EXT_LIT(float_10_8041a538, 10.0f) * scale);
 					entry->scale = scale;
+#endif
 					entry->value = flags;
 					entry->value |= 8;
 					if (flags & 1) {
 
 						entry->dyn = fv;
 					}
+#ifdef VERSION_G8ME01
+					if (maxScale < scale.y) {
+						maxScale = scale.y;
+					}
+#else
 					if (maxScale < scale) {
 						maxScale = scale;
 					}
+#endif
 					entry->time = time;
 					entry++;
 					x += iw;
@@ -1163,11 +1412,20 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				// does it instead and its pointer-IV init in the preheader keeps the dead j/i steps alive, as in the target (FAKES.md)
 				for (k = 0; k < half; k++) {
 					glyph = kanjiSearch(*(u16*)&tag[(u32)j]);
+#ifdef VERSION_G8ME01
+					total += (s32)(0.55f * (scale.y * (( f32)(kanjiGetWidth((u16)(glyph + 0)) + 4) )));
+#else
 					total += (s32)(EXT_LIT(float_0p55_8041a678, 0.55f) * (scale * (( f32)(kanjiGetWidth((u16)(glyph + 0)) + 4) )));
+#endif
 					j += 2;
 				}
+#ifdef VERSION_G8ME01
+				total = (u16)total - ( 0.55f * (4.0f * scale.x));
+				rubyX = ((rubyX + x) - 4.0f * scale.x - (u16)total) / 2;
+#else
 				total = (u16)total - ( EXT_LIT(float_0p55_8041a678, 0.55f) * (EXT_LIT(float_4_8041a67c, 4.0f) * scale));
 				rubyX = ((rubyX + x) - EXT_LIT(float_4_8041a67c, 4.0f) * scale - (u16)total) / 2;
+#endif
 				/* second loop open-coded: kR is its counter and glyph its glyph (split webs, numbered as in the target) */
 				yx[0] = y;
 				ys[0] = y;
@@ -1186,11 +1444,19 @@ void msgAnalize(smartEntry* smart, char* msg) {
 						}
 					}
 					glyph = kanjiSearch(*(u16*)&tag[(u32)nn[0]]);
+#ifdef VERSION_G8ME01
+					wwR = 0.55f * (scale.x * (( f32)(kanjiGetWidth((u16)(glyph + 0)) + 4) ));
+#else
 					wwR = EXT_LIT(float_0p55_8041a678, 0.55f) * (scale * (( f32)(kanjiGetWidth((u16)(glyph + 0)) + 4) ));
+#endif
 					entry->glyph = glyph;
 					entry->x = rubyX;
 					entry->y = ys[0];
+#ifdef VERSION_G8ME01
+					entry->scale = 0.55f * scale.x;
+#else
 					entry->scale = EXT_LIT(float_0p55_8041a678, 0.55f) * scale;
+#endif
 					entry->value = flags;
 					if (fp[0]) {
 						entry->dyn = fv;
@@ -1215,11 +1481,19 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			} else {
 				glyphD = hankakuSearch(check);
 			}
+#ifdef VERSION_G8ME01
+			wwD = scale.x * (( f32)(kanjiGetWidth((u16)(glyphD + 0)) + 2) );
+			entry->glyph = glyphD;
+			entry->x = x;
+			entry->y = y - (s16)(10.0f * scale.y);
+			entry->scale = scale.x;
+#else
 			wwD = scale * (( f32)(kanjiGetWidth((u16)(glyphD + 0)) + 2) );
 			entry->glyph = glyphD;
 			entry->x = x;
 			entry->y = y - (s16)(EXT_LIT(float_10_8041a538, 10.0f) * scale);
 			entry->scale = scale;
+#endif
 			entry->value = flags;
 			if (( *( (s8*)msg )) != ' ') {
 				entry->value |= 8;
@@ -1227,9 +1501,15 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			if (flags & 1) {
 				entry->dyn = fv;
 			}
+#ifdef VERSION_G8ME01
+			if (maxScale < scale.y) {
+				maxScale = scale.y;
+			}
+#else
 			if (maxScale < scale) {
 				maxScale = scale;
 			}
+#endif
 			entry->time = time;
 			x += wwD;
 			msg++;
@@ -1293,6 +1573,11 @@ const char* msgSearch(const char* tag) {
 }
 
 BOOL _ismbblead(u32 a1) {
+#ifdef VERSION_G8ME01
+	if ((u32)gp->language != 0) {
+		return FALSE;
+	}
+#endif
 	a1 = (u8)a1;
 	if ((a1 >= 0x81 && a1 <= 0x9F) || (a1 >= 0xE0 && a1 <= 0xFC)) {
 		return TRUE;
@@ -1367,9 +1652,9 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 	window->flags |= 2;
 	copy = __memAlloc(HEAP_DEFAULT, strlen(msg));
 	strcpy(copy, msg);
-	smart = smartAlloc(0x7A58, 1);
+	smart = smartAlloc(sizeof(MsgWinData), 1);
 	data = smart->address;
-	memset(data, 0, 0x7A58);
+	memset(data, 0, sizeof(MsgWinData));
 	data->window = window;
 	data->flags = 3;
 	data->callback = field_0x79FC;
@@ -1422,9 +1707,13 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 		data->cursorY = window->y - (data->sel * 31 + 58);
 		break;
 	case 1:
+#ifdef VERSION_G8ME01
+		window->field_0x4 = priority + 10;
+#else
 		window->field_0x4 = 10;
-		window->height = EXT_LIT(float_0p7_8041a584, 0.7f) * GXGetTexObjWidth(getWakuTexObj(3));
-		window->width = EXT_LIT(float_0p7_8041a584, 0.7f) * GXGetTexObjHeight(getWakuTexObj(3));
+#endif
+		window->height = VERSION_PICK(0.7f, 0.9f) * GXGetTexObjWidth(getWakuTexObj(3));
+		window->width = VERSION_PICK(0.7f, 0.9f) * GXGetTexObjHeight(getWakuTexObj(3));
 		break;
 	}
 	return id;
@@ -1636,6 +1925,9 @@ void msgWindow_Main(WindowEntry* window) {
 				}
 			}
 		}
+#ifdef VERSION_G8ME01
+		else // US: one key per frame
+#endif
 		if (keyGetButtonTrg(0) & 0x10) {
 			data->page = data->pageCount - 1;
 			if (msgWinPrevPage(window) != 0U) {
@@ -1686,12 +1978,18 @@ void msgWindow_Main(WindowEntry* window) {
 			msgWinNextPage(window);
 			psndSFXOn((const char*)0x20041);
 		}
+#ifdef VERSION_G8ME01
+		else // US: one key per frame
+#endif
 		if (keyGetButtonTrg(0) & 0x200) {
 			WIN_STATE(window) = 10;
 			WIN_TIME(window) = gp->renderTime;
 			data->page = data->pageCount - 1;
 			psndSFXOn((const char*)0x20041);
 		}
+#ifdef VERSION_G8ME01
+		else // US: one key per frame
+#endif
 		if (keyGetButtonTrg(0) & 0x10) {
 			WIN_STATE(window) = 9;
 			WIN_TIME(window) = gp->renderTime;
@@ -1825,7 +2123,7 @@ void msgWindow_Disp(CameraId camId, void* param) {
 					if (sy > 480) { sy = 480;
 					}
 					GXSetScissor(camera->scissor[0], sy, camera->scissor[2], 0x7E);
-					msgDisp(window->userdata, window->alpha, EXT_LIT(float_28_8041a550, 20.0f) + window->x, window->y - 7.0f);
+					msgDisp(window->userdata, window->alpha, VERSION_PICK(20.0f, 28.0f) + window->x, window->y - VERSION_PICK(7.0f, 6.0f));
 				}
 				break;
 			}
@@ -1959,7 +2257,7 @@ void selectWindow_Disp(CameraId camId, void* param) {
 	data->cursorY += EXT_LIT(float_0p3_8041a528, 0.3f) * (window->y - (f32)(data->sel * 31 + 58) - data->cursorY);
 	pos.y = data->cursorY;
 	pos.z = EXT_LIT(float_0_8041a514, 0.0f);
-	iconDispGxAlpha(&pos, 0x14, 0x1F0, window->alpha, EXT_LIT(float_1_8041a52c, 1.0f));
+	iconDispGxAlpha(&pos, 0x14, ICON_1F0, window->alpha, EXT_LIT(float_1_8041a52c, 1.0f));
 }
 
 // target pad words (G5: section sizes must match or later DOL addresses shift)

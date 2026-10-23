@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -9,13 +10,20 @@
 
 BOOL BattlePartyAnimeLoad(s32 id);
 typedef struct FakerStatus { s16 data[15]; } FakerStatus;
+#ifdef VERSION_G8ME01
+typedef struct FakerParam { f32 size; FakerStatus status; s32 statusFlags; u16 commandDisabled[2]; s16 currentHp; s16 maxHp; s16 currentFp; s16 maxFp; } FakerParam;
+#else
 typedef struct FakerParam { f32 size; FakerStatus status; s32 statusFlags; s16 currentHp; s16 maxHp; s16 currentFp; s16 maxFp; } FakerParam;
+#endif
 
 static USER_FUNC(_anime_load);
 static USER_FUNC(_anime_load_wait);
 USER_FUNC(_gullible_party_info_init);
 USER_FUNC(_load_param);
 USER_FUNC(_save_param);
+#ifdef VERSION_G8ME01
+USER_FUNC(faker_mario_sync_max_moves);
+#endif
 USER_FUNC(btlevtcmd_AddScale);
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -151,7 +159,7 @@ s32 fmario_entry_event[24];
 s32 dead_event_fmario_down[53];
 static s32 dead_event_fmario[198];
 static s32 damage_event_fmario[22];
-s32 phase_event_fmario[400];
+s32 phase_event_fmario[VERSION_PICK(400, 403)];
 static s32 attack_event_fmario[60];
 static s32 jump_attack_voice[36];
 static s32 marioAttackEvent_NormalJump[344];
@@ -241,6 +249,10 @@ USER_FUNC(_save_param) {
     }
     p->size = party->mSizeMultiplier;
     p->statusFlags = party->mStatusFlags;
+#ifdef VERSION_G8ME01
+    p->commandDisabled[0] = party->usCommandDisabled[0];
+    p->commandDisabled[1] = party->usCommandDisabled[1];
+#endif
     p->status = *(FakerStatus*)&party->mSleepTurns;
     p->maxHp = party->maxHp;
     p->currentHp = party->currentHp;
@@ -275,6 +287,10 @@ USER_FUNC(_load_param) {
     }
     party->mSizeMultiplier = p->size;
     party->mStatusFlags = p->statusFlags;
+#ifdef VERSION_G8ME01
+    party->usCommandDisabled[0] = p->commandDisabled[0];
+    party->usCommandDisabled[1] = p->commandDisabled[1];
+#endif
     *(FakerStatus*)&party->mSleepTurns = p->status;
     party->maxHp = p->maxHp;
     party->currentHp = p->currentHp;
@@ -668,6 +684,61 @@ static EVT_BEGIN(damage_event_fmario)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+s32 phase_event_fmario[] = {
+    196699, (s32)btlevtcmd_CheckPhase, -30000000, 67108865, 131097, -30000000, 0, 131163,
+    (s32)btlevtcmd_get_turn, -30000000, 131096, -30000000, 3, 131163, (s32)btlevtcmd_StatusWindowOnOff, 0,
+    327771, (s32)evt_msg_print, 0, (s32)"stg4_jin_23", 0, 0, 65546, 200,
+    131122, -49999979, 1, 65627, (s32)vivian_comeback, 262235, (s32)btlevtcmd_SpawnUnit, -29999997,
+    (s32)((u8*)entryunit_party + 192), 0, 327771, (s32)btlevtcmd_SetHomePos, -29999997, -230143360, -230000000, -229994880,
+    327771, (s32)btlevtcmd_GetPos, -29999997, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_TransStageFloorPosition,
+    -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_SetUnitWork, -29999997, 0, -30000000,
+    262235, (s32)btlevtcmd_SetUnitWork, -29999997, 1, -29999999, 262235, (s32)btlevtcmd_SetUnitWork, -29999997,
+    2, -29999998, 131163, (s32)faker_mario_sync_max_moves, -29999997, 65545, 1, 196699,
+    (s32)btlevtcmd_GetMarioId, -29999997, -29999995, 196699, (s32)btlevtcmd_GetBodyId, -29999995, -29999994, 131163,
+    (s32)btlevtcmd_StopWaitEvent, -29999997, 131163, (s32)btlevtcmd_StopWaitEvent, -29999995, 65546, 700, 65628,
+    (s32)mario_zoom, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_VIVIAN_ATTACK2", -250000000, 0, -250000000,
+    327771, (s32)btlevtcmd_SetPos, -29999997, -140, -40, 5, 655451, (s32)btlevtcmd_DivePosition,
+    -29999997, -140, 0, 5, 60, 0, 0, 4,
+    0, 262235, (s32)btlevtcmd_AnimeChangePose, -29999995, -29999994, (s32)"M_Z_1", 65647, -30000000,
+    327771, (s32)evt_sub_intpl_init, 0, 0, 180, 15, 65541, 16,
+    65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_SetRotate, -3, 0, -30000000, 0,
+    65545, 1, 6, 112, 131163, (s32)btlevtcmd_WaitEventEnd, -30000000, 327771,
+    (s32)evt_msg_print, 2, (s32)"stg4_jin_24", 0, -29999997, 65546, 200, 393307,
+    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_VOICE_MARIO_FIND1_3", -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetPos,
+    -29999995, -29999993, -29999992, -29999990, 327771, (s32)btlevtcmd_JumpSetting, -29999995, 12,
+    -229998976, -229998772, 458843, (s32)btlevtcmd_JumpPosition, -29999995, -29999993, -29999992, -29999990,
+    0, -1, 65546, 1000, 327771, (s32)evt_msg_print, 2, (s32)"stg4_jin_25",
+    0, -29999997, 65546, 1000, 65647, -30000000, 327771, (s32)evt_sub_intpl_init,
+    0, 180, 0, 15, 65541, 16, 65627, (s32)evt_sub_intpl_get_value,
+    327771, (s32)btlevtcmd_SetRotate, -3, 0, -30000000, 0, 65545, 1,
+    6, 112, 131163, (s32)btlevtcmd_WaitEventEnd, -30000000, 65546, 200, 262235,
+    (s32)btlevtcmd_AnimeChangePose, -29999995, -29999994, (s32)"M_I_Y", 65546, 1000, 131163, (s32)btlevtcmd_StatusWindowOnOff,
+    1, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 131163, (s32)btlevtcmd_StartWaitEvent, -29999997,
+    33, 33, 196699, (s32)btlevtcmd_CheckPhase, -30000000, 67108867, 131097, -30000000,
+    0, 131097, -49999980, 0, 65630, (s32)party_change_event, 33, 196699,
+    (s32)btlevtcmd_GetHp, -2, -30000000, 262235, (s32)btlevtcmd_GetUnitWork, -2, 0, -29999998,
+    131097, -49999980, 0, 131096, -29999998, 0, 262235, (s32)btlevtcmd_SetUnitWork,
+    -2, 0, 1, 131122, -29999998, 1, 33, 33,
+    65570, -29999998, 65572, 0, 262235, (s32)btlevtcmd_GetUnitWork, -2, 1,
+    -29999999, 131098, -30000000, -29999999, 262235, (s32)btlevtcmd_SetUnitWork, -2, 0,
+    1, 131163, (s32)btlevtcmd_StatusWindowOnOff, 0, 65630, (s32)enemy_zoom, 65570, -49999982,
+    65572, 0, 327771, (s32)evt_msg_print, 2, (s32)"stg4_jin_26_kur", 0, -49999983,
+    65572, 1, 327771, (s32)evt_msg_print, 2, (s32)"stg4_jin_26_nok", 0, -49999983,
+    65572, 2, 327771, (s32)evt_msg_print, 2, (s32)"stg4_jin_26_win", 0, -49999983,
+    65572, 3, 327771, (s32)evt_msg_print, 2, (s32)"stg4_jin_26_yos", 0, -49999983,
+    49, 65546, 200, 131163, (s32)btlevtcmd_StatusWindowOnOff, 1, 33, 65572,
+    1, 262235, (s32)btlevtcmd_GetUnitWork, -2, 2, -29999999, 131098, -30000000,
+    -29999999, 262235, (s32)btlevtcmd_SetUnitWork, -2, 0, 2, 131163, (s32)btlevtcmd_StatusWindowOnOff,
+    0, 65630, (s32)fmario_zoom, 327771, (s32)evt_msg_print, 2, (s32)"stg4_jin_26_01", 0,
+    -2, 65546, 200, 131163, (s32)btlevtcmd_StatusWindowOnOff, 1, 33, 65572,
+    2, 262235, (s32)btlevtcmd_GetUnitWork, -2, 3, -29999999, 131098, -30000000,
+    -29999999, 262235, (s32)btlevtcmd_SetUnitWork, -2, 0, 3, 131163, (s32)btlevtcmd_StatusWindowOnOff,
+    0, 65630, (s32)fmario_zoom, 327771, (s32)evt_msg_print, 2, (s32)"stg4_jin_26_02", 0,
+    -2, 65546, 200, 131163, (s32)btlevtcmd_StatusWindowOnOff, 1, 33, 49,
+    33, 2, 1,
+};
+#else
 s32 phase_event_fmario[] = {
     196699, (s32)btlevtcmd_CheckPhase, -30000000, 67108865, 131097, -30000000, 0, 131163,
     (s32)btlevtcmd_get_turn, -30000000, 131096, -30000000, 3, 131163, (s32)btlevtcmd_StatusWindowOnOff, 0,
@@ -720,6 +791,7 @@ s32 phase_event_fmario[] = {
     327771, (s32)evt_msg_print, 2, (s32)"stg4_jin_26_02", 0, -2, 65546, 200,
     131163, (s32)btlevtcmd_StatusWindowOnOff, 1, 33, 49, 33, 2, 1,
 };
+#endif
 
 static EVT_BEGIN(attack_event_fmario)
     CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
@@ -1038,9 +1110,28 @@ USER_FUNC(_gullible_party_info_init) {
                 break;
         }
         p->maxFp = p->currentFp = pouch->baseMaxFP;
+#ifdef VERSION_G8ME01
+        p->commandDisabled[0] = 0;
+        p->commandDisabled[1] = 0;
+#endif
     }
     return EVT_RETURN_DONE;
 }
+
+#ifdef VERSION_G8ME01
+// US only: restore the moves of the unit for this turn.
+USER_FUNC(faker_mario_sync_max_moves) {
+    BattleUnit* unit;
+    s32 id = evtGetValue(event, event->args[0]);
+
+    id = BattleTransID(event, id);
+    unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    if (unit != NULL) {
+        unit->maxMovesThisTurn = unit->movesRemaining;
+    }
+    return EVT_RETURN_DONE;
+}
+#endif
 
 static USER_FUNC(vivian_comeback) {
     pouchGetPtr()->partyData[6].flags &= ~2;

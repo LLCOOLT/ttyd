@@ -110,8 +110,13 @@ void seq_mapChangeExit(SequenceWork* work) {
     dbg_lotteryinfo = FALSE;
 }
 
+#ifdef VERSION_G8ME01
+typedef struct { const char* s[7]; } LangTbl;
+static const LangTbl lang_tbl = {{"jp", "us", "ge", "fr", "sp", "it", "du"}};
+#else
 typedef struct { const char* s[2]; } LangTbl;
 static const LangTbl lang_tbl = {{"jp", "us"}};
+#endif
 void seq_mapChangeMain(SequenceWork* work) {
     BOOL newarea = strcmp(_next_area, gp->currentAreaName) != 0;
     const char* area_name;
@@ -259,8 +264,16 @@ void seq_mapChangeMain(SequenceWork* work) {
             strncmp(_next_map, "sys", 3) && strncmp(_next_map, "gor_10", 6)) {
             {
             LangTbl lang = lang_tbl;
+#ifdef VERSION_G8ME01
+            fileAsyncf(4, 0, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]);
+#else
             fileAsyncf(4, 0, "%s/window/%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]);
+#endif
             }
+#ifdef VERSION_G8ME01
+            animGroupBaseAsync("p_roll", 0, 0);
+            animGroupBaseAsync("p_slit", 0, 0);
+#endif
             animGroupBaseAsync("p_jyabara", 0, 0);
             animGroupBaseAsync("p_kaiten_h", 0, 0);
             animGroupBaseAsync("p_b_st", 0, 0);

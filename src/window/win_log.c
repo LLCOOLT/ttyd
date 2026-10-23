@@ -8,6 +8,7 @@
 #include "battle/battle_monosiri.h"
 #include "driver/dispdrv.h"
 #include "mario/mariost.h"
+#include "icon_ids.h"
 #include "sdk/texPalette.h"
 #include "mario/mario_pouch.h"
 #include "data/item_data.h"
@@ -44,6 +45,9 @@ typedef struct WinLogPage {
     f32 y;       // 0x8
     f32 ty;      // 0xC
     s32 num;     // 0x10
+#ifdef VERSION_G8ME01
+    s32 page;    // US only: page shown in the "%d/%d" counter
+#endif
     s32 cursor;  // 0x14
     s32 idx;     // 0x18
     f32 f1C;     // 0x1C
@@ -399,9 +403,17 @@ void winLogInit(WinLogWork* w) {
     w->fE74 = w->fE78 = 0.0f;
 
     w->page0.num = 0;
+#ifdef VERSION_G8ME01
+    w->page0.page = 0;
+#endif
     for (i = 0xF0; i < 0x153; i++) {
         if (itemDataTable[i].type_sort_order != -1) {
             w->list0[w->page0.num++] = i - 0xF0;
+#ifdef VERSION_G8ME01
+            if (swGet(i - 0xF0 + 0x80)) {
+                w->page0.page++;
+            }
+#endif
         }
     }
     qqsort(w->list0, w->page0.num, 2, compare_func5_2);
@@ -414,9 +426,17 @@ void winLogInit(WinLogWork* w) {
     w->page0.f2C = w->page0.tf2C = -300.0f;
 
     w->page1.num = 0;
+#ifdef VERSION_G8ME01
+    w->page1.page = 0;
+#endif
     for (i = 0xB3; i < 0xEC; i++) {
         if (itemDataTable[i].type_sort_order != -1) {
             w->list1[w->page1.num++] = i - 0xB3;
+#ifdef VERSION_G8ME01
+            if (swGet(i - 0xB3 + 0x41)) {
+                w->page1.page++;
+            }
+#endif
         }
     }
     qqsort(w->list1, w->page1.num, 2, compare_func6_2);
@@ -610,9 +630,17 @@ s32 winLogMain(WinLogWork* w) {
         winMsgEntry(w, 0, w->menu[w->cursor].msg, 0);
         break;
     case 10:
+#ifdef VERSION_G8ME01
+        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(4, NULL, "%s/w/%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName())) break;
+#else
         if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(4, NULL, "%s/w/jp/%s", getMarioStDvdRoot(), winGetMapTplName())) break;
+#endif
         if (!w->file) {
+#ifdef VERSION_G8ME01
+            w->file = fileAllocf(4, "%s/w/%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName());
+#else
             w->file = fileAllocf(4, "%s/w/jp/%s", getMarioStDvdRoot(), winGetMapTplName());
+#endif
         }
         if (w->pose == -1) {
             if (w->flags & 0x2000) {
@@ -988,6 +1016,7 @@ s32 winLogMain(WinLogWork* w) {
     return 0;
 }
 
+
 void winLogMain2(WinLogWork* w) {
     s32 i;
 
@@ -1037,27 +1066,27 @@ void winLogMain2(WinLogWork* w) {
             w->menu[i].state++;
             break;
         }
-        w->menu[i].x += (w->menu[i].tx - w->menu[i].x) / 8.0f;
-        w->menu[i].y += (w->menu[i].ty - w->menu[i].y) / 8.0f;
+        w->menu[i].x += (w->menu[i].tx - w->menu[i].x) / FPS_EASE(8.0f);
+        w->menu[i].y += (w->menu[i].ty - w->menu[i].y) / FPS_EASE(8.0f);
     }
-    w->fE2C += (w->fE28 - w->fE2C) / 8.0;
-    w->fE34 += (w->fE30 - w->fE34) / 8.0;
-    w->fE68 += (w->fE64 - w->fE68) / 8.0;
-    w->fE70 += (w->fE6C - w->fE70) / 8.0;
-    w->fE78 += (w->fE74 - w->fE78) / 8.0;
-    w->fE80 += (w->fE7C - w->fE80) / 4.0f;
+    w->fE2C += (w->fE28 - w->fE2C) / FPS_EASE_D(8.0f, 8.0);
+    w->fE34 += (w->fE30 - w->fE34) / FPS_EASE_D(8.0f, 8.0);
+    w->fE68 += (w->fE64 - w->fE68) / FPS_EASE_D(8.0f, 8.0);
+    w->fE70 += (w->fE6C - w->fE70) / FPS_EASE_D(8.0f, 8.0);
+    w->fE78 += (w->fE74 - w->fE78) / FPS_EASE_D(8.0f, 8.0);
+    w->fE80 += (w->fE7C - w->fE80) / FPS_EASE(4.0f);
     w->page0.tf1C = w->page0.idx * 0xE8;
-    w->page0.f1C += (w->page0.tf1C - w->page0.f1C) / 6.0f;
-    w->page0.x += (w->page0.tx - w->page0.x) / 6.0f;
-    w->page0.y += (w->page0.ty - w->page0.y) / 6.0f;
-    w->page0.f24 += (w->page0.tf24 - w->page0.f24) / 6.0f;
-    w->page0.f2C += (w->page0.tf2C - w->page0.f2C) / 6.0f;
+    w->page0.f1C += (w->page0.tf1C - w->page0.f1C) / FPS_EASE(6.0f);
+    w->page0.x += (w->page0.tx - w->page0.x) / FPS_EASE(6.0f);
+    w->page0.y += (w->page0.ty - w->page0.y) / FPS_EASE(6.0f);
+    w->page0.f24 += (w->page0.tf24 - w->page0.f24) / FPS_EASE(6.0f);
+    w->page0.f2C += (w->page0.tf2C - w->page0.f2C) / FPS_EASE(6.0f);
     w->page1.tf1C = w->page1.idx * 0xE8;
-    w->page1.f1C += (w->page1.tf1C - w->page1.f1C) / 6.0f;
-    w->page1.x += (w->page1.tx - w->page1.x) / 6.0f;
-    w->page1.y += (w->page1.ty - w->page1.y) / 6.0f;
-    w->page1.f24 += (w->page1.tf24 - w->page1.f24) / 6.0f;
-    w->page1.f2C += (w->page1.tf2C - w->page1.f2C) / 6.0f;
+    w->page1.f1C += (w->page1.tf1C - w->page1.f1C) / FPS_EASE(6.0f);
+    w->page1.x += (w->page1.tx - w->page1.x) / FPS_EASE(6.0f);
+    w->page1.y += (w->page1.ty - w->page1.y) / FPS_EASE(6.0f);
+    w->page1.f24 += (w->page1.tf24 - w->page1.f24) / FPS_EASE(6.0f);
+    w->page1.f2C += (w->page1.tf2C - w->page1.f2C) / FPS_EASE(6.0f);
 }
 
 void winBgGX(WinLogWork* w, s32 a, f32 x, f32 y);
@@ -1070,6 +1099,13 @@ void winIconSet(u32 id, Vec translate, Vec scale, GXColor color);
 void effStarStoneDraw(CameraId cam, EffectEntry* e);
 void mapGX(WinLogWork* w, f32 x, f32 y);
 void monoshiriGX(WinLogWork* w, f32 x, f32 y);
+
+#ifdef VERSION_G8ME01
+void winKirinukiGX(WinLogWork* w, s32 a, f32 x, f32 y, f32 w2, f32 h);
+void winFontInit(void);
+void winFontSet(Vec translate, Vec scale, GXColor color, const char* fmt, ...);
+u16 FontGetMessageWidth(const char* message);
+#endif
 
 void winLogDisp(CameraId cam, void* param, s32 idx) {
     static const GXColor kW = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -1117,6 +1153,21 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
     }
     if (w->page0.x < 320.0f && w->page0.y > -240.0f) {
         winHakoGX(w, 0, x + w->page0.x, y + w->page0.y);
+#ifdef VERSION_G8ME01
+        {
+            GXColor black;
+            char buf[0x100];
+            u16 width;
+
+            black = (GXColor){0x00, 0x00, 0x00, 0xFF};
+            winKirinukiGX(w, 0, (x + w->page0.f24) - 50.0f, (y + w->page0.f2C) - 120.0f, 100.0f, 30.0f);
+            sprintf(buf, (u32)gp->language != 0 ? "%d/%d" : "%d\201^%d", w->page0.page, w->page0.num);
+            width = 0.75f * FontGetMessageWidth(buf);
+            winFontInit();
+            winFontSet((Vec){(f32)((100 - width) / 2) + ((x + w->page0.f24) - 50.0f), (y + w->page0.f2C) - 128.0f, 0.0f},
+                       (Vec){0.75f, 0.75f, 0.75f}, black, buf);
+        }
+#endif
         winTexInit(w->res->tex->tpl);
         winTexSet(0x95, (Vec){x + w->page0.f24, y + w->page0.f2C, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
         if (swGet(((s16*)w->list0)[w->page0.cursor] + 0x80)) {
@@ -1126,6 +1177,21 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
     }
     if (w->page1.x < 320.0f && w->page1.y > -240.0f) {
         winHakoGX(w, 1, x + w->page1.x, y + w->page1.y);
+#ifdef VERSION_G8ME01
+        {
+            GXColor black;
+            char buf[0x100];
+            u16 width;
+
+            black = (GXColor){0x00, 0x00, 0x00, 0xFF};
+            winKirinukiGX(w, 0, (x + w->page1.f24) - 50.0f, (y + w->page1.f2C) - 120.0f, 100.0f, 30.0f);
+            sprintf(buf, (u32)gp->language != 0 ? "%d/%d" : "%d\201^%d", w->page1.page, w->page1.num);
+            width = 0.75f * FontGetMessageWidth(buf);
+            winFontInit();
+            winFontSet((Vec){(f32)((100 - width) / 2) + ((x + w->page1.f24) - 50.0f), (y + w->page1.f2C) - 128.0f, 0.0f},
+                       (Vec){0.75f, 0.75f, 0.75f}, black, buf);
+        }
+#endif
         winTexInit(w->res->tex->tpl);
         winTexSet(0x96, (Vec){x + w->page1.f24, y + w->page1.f2C, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
         if (swGet(((s16*)w->list1)[w->page1.cursor] + 0x41)) {
@@ -1209,25 +1275,25 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
         sw = swByteGet(0);
         id = -1;
         if (sw >= 0x13 && sw < 0x37) {
-            id = 0x197;
+            id = ICON_197;
             k = 0;
         } else if (sw >= 0x41 && sw < 0x70) {
-            id = 0x198;
+            id = ICON_198;
             k = 1;
         } else if (sw >= 0x79 && sw < 0xA4) {
-            id = 0x19A;
+            id = ICON_19A;
             k = 2;
         } else if (sw >= 0xAF && sw < 0xD5) {
-            id = 0x19C;
+            id = ICON_19C;
             k = 3;
         } else if (sw >= 0xDE && sw < 0x105) {
-            id = 0x19D;
+            id = ICON_19D;
             k = 4;
         } else if (sw >= 0x110 && sw < 0x152) {
-            id = 0x199;
+            id = ICON_199;
             k = 5;
         } else if (sw >= 0x15C && sw < 0x175) {
-            id = 0x19B;
+            id = ICON_19B;
             k = 6;
         }
         if (id != -1) {
@@ -1278,6 +1344,10 @@ const char* msgSearch(const char* tag);
 u16 FontGetMessageWidth(const char* msg);
 int sprintf(char* buf, const char* fmt, ...);
 
+#ifdef VERSION_G8ME01
+void winFontSetWidth(Vec translate, Vec scale, GXColor color, f32 width, const char* fmt, ...);
+void winKirinukiGX(WinLogWork* w, s32 a, f32 x, f32 y, f32 w2, f32 h);
+#endif
 void monoshiriGX(WinLogWork* w, f32 x, f32 y) {
     GXColor k1;
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -1299,9 +1369,19 @@ void monoshiriGX(WinLogWork* w, f32 x, f32 y) {
     winKirinukiGX(w, 0, x - 110.0f, y - 160.0f, 100.0f, 50.0f);
     msg = msgSearch("msg_menu_monosiri_kazu");
     tw = 0.75f * FontGetMessageWidth(msg);
+#ifdef VERSION_G8ME01
+    if (tw > 80.0f) {
+        tw = tw * (80.0f / tw);
+    }
+#endif
     winFontInit();
+#ifdef VERSION_G8ME01
+    winFontSetWidth((Vec){(x - 108.0f) + (100 - tw) / 2, y - 166.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k1, 80.0f, msg);
+    sprintf(buf, (u32)gp->language != 0 ? "%d/%d" : "%d\201^%d", w->enemyKnown, w->enemyNum);
+#else
     winFontSet((Vec){(x - 108.0f) + (100 - tw) / 2, y - 166.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k1, msg);
     sprintf(buf, "%d\201^%d", w->enemyKnown, w->enemyNum);
+#endif
     tw = 0.75f * FontGetMessageWidth(buf);
     winFontSet((Vec){(x - 108.0f) + (100 - tw) / 2, y - 184.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k1, buf);
     winFontInit();
@@ -1320,23 +1400,33 @@ void monoshiriGX(WinLogWork* w, f32 x, f32 y) {
                 name = msgSearch(te->enemyTag);
             }
         } else {
+#ifdef VERSION_G8ME01
+            name = (u32)gp->language != 0 ? "???" : "\201H\201H\201H";
+#else
             name = "\201H\201H\201H";
+#endif
         }
+#ifdef VERSION_G8ME01
+        sprintf(num, (u32)gp->language != 0 ? "%d. " : "%d\201D", enemy_monoshiri_sort_table[id]);
+        winFontSetWidth((Vec){((24.0f + x) - 5.0f) + (i / 8) * 216, (y - 16.0f) - (i % 8) * 24, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k2, 40.0f, num);
+        winFontSetWidth((Vec){(56.0f + x) + (i / 8) * 216, (y - 16.0f) - (i % 8) * 24, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k2, 145.0f, name);
+#else
         sprintf(num, "%d\201D", enemy_monoshiri_sort_table[id]);
         winFontSet((Vec){((24.0f + x) - 5.0f) + (i / 8) * 216, (y - 16.0f) - (i % 8) * 24, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k2, num);
         winFontSet((Vec){(56.0f + x) + (i / 8) * 216, (y - 16.0f) - (i % 8) * 24, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k2, name);
+#endif
     }
     if (w->f1044 > 0) {
         winTexInit(w->res->tex->tpl);
         winTexSet(0x17, (Vec){440.0f + x, 18.0f + y, 0.0f}, (Vec){-1.0f, -1.0f, -1.0f}, white);
         winIconInit();
-        winIconSet(0x7E, (Vec){440.0f + x, y, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
+        winIconSet(ICON_07E, (Vec){440.0f + x, y, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
     }
     if (w->f1044 < (w->enemyNum + 15) / 16 - 1) {
         winTexInit(w->res->tex->tpl);
         winTexSet(0x17, (Vec){440.0f + x, (y - 15.0f) - 240.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         winIconInit();
-        winIconSet(0x80, (Vec){440.0f + x, y - 240.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
+        winIconSet(ICON_080, (Vec){440.0f + x, y - 240.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
     }
     msg = msgSearch("msg_menu_sort_narabikae");
     fw = 0.7f * FontGetMessageWidth(msg);
@@ -1344,7 +1434,7 @@ void monoshiriGX(WinLogWork* w, f32 x, f32 y) {
     ix = x + (420.0f - fw);
     winFontSet((Vec){ix, y - 210.0f, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, k1, msg);
     winIconInit();
-    winIconSet(0x217, (Vec){ix - 30.0f, y - 220.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
+    winIconSet(ICON_217, (Vec){ix - 30.0f, y - 220.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
 }
 
 MonosiriWork* monosiriInit(s32 id, f32 x, f32 y) {
@@ -1364,7 +1454,11 @@ MonosiriWork* monosiriInit(s32 id, f32 x, f32 y) {
 
 void monosiriMain(MonosiriWork* m) {
     s32 group = gp->inBattle ? 1 : 0;
+#ifdef VERSION_G8ME01
+    const char* lang[6] = {"jp", "us", "ge", "fr", "sp", "it"};
+#else
     const char* lang[2] = {"jp", "us"};
+#endif
     
     GXTexObj tex;
     TattleEntry* t;
@@ -1372,9 +1466,17 @@ void monosiriMain(MonosiriWork* m) {
     switch (m->state) {
     case 0:
         if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(4, NULL, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang[gp->language])) break;
+#ifdef VERSION_G8ME01
+        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(0, NULL, "%s/w/%s/mono.dat", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us")) break;
+#else
         if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(0, NULL, "%s/w/jp/mono.dat", getMarioStDvdRoot())) break;
+#endif
         m->file1 = fileAllocf(4, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang[gp->language]);
+#ifdef VERSION_G8ME01
+        m->file2 = fileAllocf(0, "%s/w/%s/mono.dat", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us");
+#else
         m->file2 = fileAllocf(0, "%s/w/jp/mono.dat", getMarioStDvdRoot());
+#endif
         m->state++;
         TEXGetGXTexObjFromPalette(*(TEXPalette**)m->file1->data, &tex, 0x37);
         m->smart = smartAlloc(GXGetTexBufferSize(GXGetTexObjWidth(&tex), GXGetTexObjHeight(&tex), 5, 0, 0), 0);
@@ -1407,8 +1509,8 @@ void monosiriMain(MonosiriWork* m) {
         m->y = -400.0f;
         break;
     }
-    m->curX += (m->x - m->curX) / 6.0f;
-    m->curY += (m->y - m->curY) / 6.0f;
+    m->curX += (m->x - m->curX) / FPS_EASE(6.0f);
+    m->curY += (m->y - m->curY) / FPS_EASE(6.0f);
     if (m->state > 0) {
         dispEntry(8, 0.0f, 0, monosiri_disp, m);
     }
@@ -1595,6 +1697,9 @@ void capture(CameraId camera, void* param) {
     GXReadBoundingBox(&bb0, &bb1, &bb2, &bb3);
     GXSetTexCopySrc(0, 0, tw, th);
     GXSetTexCopyDst(tw, th, GX_TF_RGB5A3, GX_FALSE);
+#ifdef VERSION_G8ME01
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+#endif
     GXCopyTex(m->smart->address, GX_TRUE);
     GXPixModeSync();
     GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
@@ -1702,6 +1807,19 @@ void monosiri_disp(CameraId camera, void* param) {
             GXPosition3f32(x1 + qw, y1, 0.0f);
             GXTexCoord2f32(1.0f, 0.0f);
         }
+#ifdef VERSION_G8ME01
+        id = m->id;
+        te = battleGetUnitMonosiriPtr(id);
+        if (id == 0x4D || id == 0x87) {
+            if (evtGetValue(NULL, GSW(0)) < 0xD2) {
+                sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d\201D%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_hatena"));
+            } else {
+                sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d\201D%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_rampell"));
+            }
+        } else {
+            sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d\201D%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
+        }
+#else
         id = m->id;
         te = battleGetUnitMonosiriPtr(id);
         if (id == 0x4D || id == 0x87) {
@@ -1713,10 +1831,15 @@ void monosiri_disp(CameraId camera, void* param) {
         } else {
             sprintf(buf, "%d\201D%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
         }
+#endif
         w = 0.75f * FontGetMessageWidth(buf);
         winFontInit();
         winFontSet((Vec){(16.0f + x) + (248.0f - w) / 2.0f, y - 180.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
+#ifdef VERSION_G8ME01
+        sprintf(buf, (u32)gp->language != 0 ? "%s %s" : "%s\201@%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
+#else
         sprintf(buf, "%s\201@%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
+#endif
         w = 0.75f * FontGetMessageWidth(buf);
         winFontSet((Vec){1.0f + ((16.0f + x) + (248.0f - w) / 2.0f), y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
     }

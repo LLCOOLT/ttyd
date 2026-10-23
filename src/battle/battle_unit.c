@@ -95,9 +95,9 @@ typedef struct BtlHpGauge {
 #define PART_POSE_SOUND(part) ((BtlPartPoseSound*)(part)->poseSound)
 #define POSE_TIME(pose) (*(f32*)((u8*)(pose) + 0x24))
 #define POSE_LOOP(pose) (*(f32*)((u8*)(pose) + 0x84))
-#define UNIT_TALK_PART(unit) (*(s32*)((u8*)(unit) + 0x2D0))
-#define UNIT_TALK_ANIM(unit) (*(const char**)((u8*)(unit) + 0x2D4))
-#define UNIT_STAY_ANIM(unit) (*(const char**)((u8*)(unit) + 0x2D8))
+#define UNIT_TALK_PART(unit) (*(s32*)((u8*)(unit) + BUOFF(0x2D0)))
+#define UNIT_TALK_ANIM(unit) (*(const char**)((u8*)(unit) + BUOFF(0x2D4)))
+#define UNIT_STAY_ANIM(unit) (*(const char**)((u8*)(unit) + BUOFF(0x2D8)))
 
 
 
@@ -175,7 +175,7 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
     unit->phaseEventId = 0;
     unit->waitEventCode = NULL;
     unit->waitEventId = 0;
-    UNIT_FIELD(unit, s32, 0x29C) = 0;
+    UNIT_FIELD(unit, s32, BUOFF(0x29C)) = 0;
     unit->attackEventId = 0;
     BtlUnit_SetPos(unit, SETUP_F32(setup, 0xC), SETUP_F32(setup, 0x10), SETUP_F32(setup, 0x14));
     BtlUnit_SetOffsetPos(unit, SETUP_F32(setup, 0xC), SETUP_F32(setup, 0x10), SETUP_F32(setup, 0x14));
@@ -290,7 +290,7 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
     unit->moveColorLvDisp = 0xFF;
     btlDispEntAnime(unit);
     unit->countersetWeapon = NULL;
-    UNIT_FIELD(unit, void*, 0x314) = NULL;
+    UNIT_FIELD(unit, void*, BUOFF(0x314)) = NULL;
     switch (unit->currentKind) {
         case 0xD0:
             unit->countersetWeapon = BattleAlloc(0x44);
@@ -348,15 +348,15 @@ BOOL BtlUnit_Delete(BattleUnit* unit) {
     BattleStatusEffectDelete(unit);
     BattleStatusIconDelete(unit);
     if (unit->countersetWeapon) {
-        if (UNIT_FIELD(unit, UnitDeleteFunc, 0x314)) {
-            UNIT_FIELD(unit, UnitDeleteFunc, 0x314)(unit);
+        if (UNIT_FIELD(unit, UnitDeleteFunc, BUOFF(0x314))) {
+            UNIT_FIELD(unit, UnitDeleteFunc, BUOFF(0x314))(unit);
         } else {
             BattleFree(unit->countersetWeapon);
         }
     }
-    if (UNIT_FIELD(unit, void*, 0x318)) {
-        smartFree(UNIT_FIELD(unit, smartEntry*, 0x318));
-        UNIT_FIELD(unit, void*, 0x318) = NULL;
+    if (UNIT_FIELD(unit, void*, BUOFF(0x318))) {
+        smartFree(UNIT_FIELD(unit, smartEntry*, BUOFF(0x318)));
+        UNIT_FIELD(unit, void*, BUOFF(0x318)) = NULL;
     }
     for (part = unit->mParts; part; part = part->mNextPart) {
         if (part->field_0x4E8 != -1) {
@@ -1658,6 +1658,10 @@ void BtlUnit_SetParamFromPouch(BattleUnit* unit) {
         unit->mSizeMultiplier = info->field_0;
         unit->mStatusFlags = info->field_24;
         *(BtlStatusCopy*)&unit->mSleepTurns = *(BtlStatusCopy*)info->field_4;
+#ifdef VERSION_G8ME01
+        unit->usCommandDisabled[0] = info->usCommandDisabled[0];
+        unit->usCommandDisabled[1] = info->usCommandDisabled[1];
+#endif
         if (unit->currentHp <= 0) {
             BtlUnit_SetStatus(unit, 0x1B, 1, 1);
         }
@@ -1717,6 +1721,10 @@ void BtlUnit_SetParamToPouch(BattleUnit* unit) {
         info->field_0 = unit->mSizeMultiplier;
         info->field_24 = unit->mStatusFlags;
         *(BtlStatusCopy*)info->field_4 = *(BtlStatusCopy*)&unit->mSleepTurns;
+#ifdef VERSION_G8ME01
+        info->usCommandDisabled[0] = unit->usCommandDisabled[0];
+        info->usCommandDisabled[1] = unit->usCommandDisabled[1];
+#endif
     }
 }
 
@@ -1922,12 +1930,12 @@ void BtlUnit_PayWeaponCost(BattleUnit* unit, BattleWeapon* weapon) {
 
     BtlUnit_SetFp(unit, fp - cost);
     if (unit->currentKind == UNIT_MARIO) {
-        BtlActRec_AddPoint((u8*)wp + 0x16F2F, cost);
-        BtlActRec_AddCount((u8*)wp + 0x16F30);
+        BtlActRec_AddPoint((u8*)wp + BWOFF(0x16F2F), cost);
+        BtlActRec_AddCount((u8*)wp + BWOFF(0x16F30));
     }
     else if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
-        BtlActRec_AddPoint((u8*)wp + 0x16F31, cost);
-        BtlActRec_AddCount((u8*)wp + 0x16F32);
+        BtlActRec_AddPoint((u8*)wp + BWOFF(0x16F31), cost);
+        BtlActRec_AddCount((u8*)wp + BWOFF(0x16F32));
     }
     ((void (*)(s32))pouchAddAP)(-(u8)weapon->baseSpCost * 100);
 }

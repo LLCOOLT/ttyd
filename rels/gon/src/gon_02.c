@@ -165,7 +165,11 @@ EVT_BEGIN(gon_02_init_evt)
     CALL(evt_npc_set_width, STRING("\"カロン02\""), 30)
     CALL(evt_npc_set_height, STRING("\"カロン02\""), 7)
     CALL(evt_npc_entry, STRING("\"カロン03\""), STRING("c_karon_g"))
+#ifdef VERSION_G8ME01
+    CALL(evt_npc_set_position, STRING("\"カロン03\""), 360, 0, -33)
+#else
     CALL(evt_npc_set_position, STRING("\"カロン03\""), 310, 0, -33)
+#endif
     CALL(evt_npc_set_rotate, STRING("\"カロン03\""), 0, 180, 0)
     CALL(evt_npc_set_anim, STRING("\"カロン03\""), STRING("KRN_Z_2"))
     CALL(evt_npc_pera_onoff, STRING("\"カロン03\""), 0)

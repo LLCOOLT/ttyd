@@ -162,8 +162,13 @@ EVT_BEGIN(eki_02_init_evt)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL(evt_snd_bgmoff, 512)
     CALL(evt_snd_envon, 272, STRING("ENV_STG6_EKI3"))
+#ifdef VERSION_G8ME01
+    CALL(evt_map_playanim, STRING("anm_sikake_1"), 1, 1)
+    CALL(evt_map_playanim, STRING("anm_sikake_2"), 1, 1)
+#else
     CALL(evt_map_playanim, STRING("anm_sikake_1"), 1, 0)
     CALL(evt_map_playanim, STRING("anm_sikake_2"), 1, 0)
+#endif
     IF_INT_LESS(GSW(0), 314)
         CALL(evt_item_entry, STRING("key"), 25, 525, 220, 29, 16, -1, PTR(evt_key))
     END_IF

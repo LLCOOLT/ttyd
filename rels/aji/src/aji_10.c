@@ -67,8 +67,8 @@ USER_FUNC(evt_peach_set_condition);
 USER_FUNC(evt_peach_transform_gundan_on);
 USER_FUNC(evt_seq_wait);
 USER_FUNC(evt_set_dir_to_target);
-USER_FUNC(evt_shuryolight_init_2_text_B870);
-USER_FUNC(evt_shuryolight_run_evt_2_text_B538);
+USER_FUNC(evt_shuryolight_init);
+USER_FUNC(evt_shuryolight_run_evt);
 USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
@@ -95,9 +95,9 @@ extern s32 bero_open_door_play_se[];
 extern s32 evt_bero_info_run[];
 extern s32 evt_emergency[];
 extern s32 npc_init_evt[];
-extern s32 shuryolight_head_normal_2_data_37004[];
-extern s32 shuryolight_pow_normal_2_data_36ED8[];
-extern s32 shuryolight_tue_normal_2_data_37104[];
+extern s32 shuryolight_head_normal[];
+extern s32 shuryolight_pow_normal[];
+extern s32 shuryolight_tue_normal[];
 
 __declspec(section ".data") u64 fd_aji_10_negone_one_374;
 __declspec(section ".data") s32 fd_aji_10_neg_one_382[1];
@@ -1306,8 +1306,8 @@ EVT_BEGIN(aji_10_init_evt)
         DEBUG_PUT_MSG(STRING("npc setup"))
         CALL(evt_npc_setup, PTR(npcEnt))
         CALL(evt_npc_check_delete, STRING("バリアーンカスタム"))
-        CALL(evt_shuryolight_init_2_text_B870, STRING("シュリョー"))
-        CALL(evt_shuryolight_run_evt_2_text_B538, PTR(shuryolight_pow_normal_2_data_36ED8), PTR(shuryolight_head_normal_2_data_37004), PTR(shuryolight_tue_normal_2_data_37104))
+        CALL(evt_shuryolight_init, STRING("シュリョー"))
+        CALL(evt_shuryolight_run_evt, PTR(shuryolight_pow_normal), PTR(shuryolight_head_normal), PTR(shuryolight_tue_normal))
     END_IF
     SWITCH(GSW(0))
         CASE_EQUAL(56)

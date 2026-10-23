@@ -12,6 +12,75 @@
 
 extern GlobalWork* gp;
 
+#ifdef VERSION_G8ME01
+//.sdata
+const char* anim_jp[] = {
+	"EFF_nice",
+	"EFF_good",
+	"EFF_great",
+	"EFF_wonderful",
+	"EFF_excellent",
+	NULL,
+	"EFF_lucky"
+};
+const char* anim_us[] = {
+	"EFF_nice_us",
+	"EFF_good_us",
+	"EFF_great_us",
+	"EFF_wonderful_us",
+	"EFF_excellent_us",
+	NULL,
+	"EFF_lucky_us"
+};
+const char* anim_lang3[] = {
+	"EFF_nice_D",
+	"EFF_good_D",
+	"EFF_great_D",
+	"EFF_wonderful_D",
+	"EFF_excellent_D",
+	NULL,
+	"EFF_lucky_D"
+};
+const char* anim_lang4[] = {
+	"EFF_nice_F",
+	"EFF_good_F",
+	"EFF_great_F",
+	"EFF_wonderful_F",
+	"EFF_excellent_us",
+	NULL,
+	"EFF_lucky_F"
+};
+const char* anim_lang5[] = {
+	"EFF_nice_Sp",
+	"EFF_good_Sp",
+	"EFF_great_Sp",
+	"EFF_wonderful_Sp",
+	"EFF_excellent_Sp",
+	NULL,
+	"EFF_lucky_Sp"
+};
+const char* anim_lang6[] = {
+	"EFF_nice_I",
+	"EFF_good_I",
+	"EFF_great_D",
+	"EFF_wonderful_I",
+	"EFF_excellent_I",
+	NULL,
+	"EFF_lucky_I"
+};
+const char** anim_tbl[6] = { anim_jp, anim_us, anim_lang3, anim_lang4, anim_lang5, anim_lang6 };
+s16 acrobat_jp[] = {151, 152, 153, 154, 155, 156, 157};
+s16 acrobat_us[] = {161, 162, 163, 164, 165, 161, 166, 167};
+s16 acrobat_lang3[] = {157, 158, 158, 159, 160};
+s16 acrobat_lang4[] = {163, 164, 165, 166, 167, 168};
+s16 acrobat_lang5[] = {166, 167, 168, 166, 169, 166, 170, 171, 166};
+s16 acrobat_lang6[] = {197, 198, 155, -1, 151, 152, 153, 154, 155, 156};
+typedef struct AcrobatSet {
+	s16* tex;
+	s32 count;
+} AcrobatSet;
+AcrobatSet acrobat_tbl[6] = { { acrobat_jp, 7 }, { acrobat_us, 8 }, { acrobat_lang3, 5 }, { acrobat_lang4, 6 }, { acrobat_lang5, 9 }, { acrobat_lang6, 10 } };
+#else
 //.sdata
 const char* anim_jp[] = {
 	"EFF_nice",
@@ -35,6 +104,7 @@ static const char** anim_tbl[2] = { anim_jp, anim_us };
 s32 acrobat_jp[] = {179, 180, 181, 182, 183, 184, 185};
 s32 acrobat_us[] = {183, 184, 185, 186, 187, 188}; //includes nonexistant textures
 s32* acrobat_tbl[2] = { acrobat_jp, acrobat_us };
+#endif
  // unreferenced zero word in target
 
 //forward declarations
@@ -78,11 +148,15 @@ EffectEntry* effNiceEntry(s32 type, f32 x, f32 y, f32 z) {
 	}
 	switch (type) {
 		case 7:
+#ifdef VERSION_G8ME01
+			count = acrobat_tbl[gp->language].count + 1;
+#else
 			if ((u32)gp->language == 0) {
 				count = 8;
 			} else {
 				count = 7;
 			}
+#endif
 			break;
 		default:
 			count = 1;
@@ -140,7 +214,11 @@ void effNiceMain(EffectEntry* effect) {
 	s32 type;
 	AnimationPose* pose;
 	AnimData* data;
+#ifdef VERSION_G8ME01
+	f32 len, start, t;
+#else
 	f32 start, len, t;
+#endif
 
 	tmp.x = wp->position.x;
 	tmp.y = wp->position.y;
@@ -159,6 +237,37 @@ void effNiceMain(EffectEntry* effect) {
 		pose = animPoseGetAnimPosePtr(wp->poseId);
 		data = animPoseGetAnimDataPtr(wp->poseId);
 		animPoseMain(wp->poseId);
+#ifdef VERSION_G8ME01
+		switch (type) {
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+			len = *(f32*)((u8*)*(void**)((u8*)data + 0x24) + 8);
+			{
+			f32 tbl[7][6] = {
+				{ 32.0f, 34.0f, 34.0f, 34.0f, 34.0f, 36.0f },
+				{ 32.0f, 34.0f, 39.0f, 34.0f, 34.0f, 41.0f },
+				{ 35.0f, 37.0f, 39.0f, 35.0f, 35.0f, 39.0f },
+				{ 45.0f, 40.0f, 42.0f, 46.0f, 39.0f, 40.0f },
+				{ 48.0f, 40.0f, 80.0f, 40.0f, 58.0f, 58.0f },
+				{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f },
+				{ 1000.0f, 37.0f, 46.0f, 42.0f, 39.0f, 62.0f },
+			};
+			start = tbl[type][gp->language];
+			if (pose->localFrame > start) {
+				t = 1.0f - (pose->localFrame - start) / (len - start);
+				if (t < 0.0f) t = 0.0f;
+				animPoseSetMaterialFlagOn(wp->poseId, 0x40);
+				animPoseSetMaterialEvtColor(wp->poseId, (GXColor){0xFF, 0xFF, 0xFF, 255.0f * t});
+			}
+			}
+			break;
+		}
+#else
 		switch (type) {
 		case 0:
 		case 1: {
@@ -208,6 +317,7 @@ void effNiceMain(EffectEntry* effect) {
 		case 6:
 			break;
 		}
+#endif
 		if (animPoseGetLoopTimes(wp->poseId) >= 1.0f) {
 			animPoseRelease(wp->poseId);
 			effDelete(effect);
@@ -233,6 +343,12 @@ void effNiceDisp(CameraId cameraId, void* param) {
 	PSMTXConcat(mtx, scale, mtx);
 	PSMTXScale(scale, 8.0f, 8.0f, 8.0f);
 	PSMTXConcat(mtx, scale, mtx);
+#ifdef VERSION_G8ME01
+	if (((u32)gp->language == 1 && wp->type == 3) || ((u32)gp->language == 1 && wp->type == 4) || ((u32)gp->language == 5 && wp->type == 6)) {
+		PSMTXScale(scale, 0.7f, 0.7f, 0.7f);
+		PSMTXConcat(mtx, scale, mtx);
+	}
+#endif
 	animPoseDrawMtx(wp->poseId, mtx, 1, 0.0f, 1.0f);
 	animPoseDrawMtx(wp->poseId, mtx, 2, 0.0f, 1.0f);
 	animPoseDrawMtx(wp->poseId, mtx, 3, 0.0f, 1.0f);
@@ -347,8 +463,14 @@ void effAcrobatDisp(CameraId cameraId, void* param) {
 	CameraEntry* camera = camGetPtr(cameraId);
 	Mtx trans, rot, scale, mtx;
 	GXTexObj tex;
+#ifdef VERSION_G8ME01
 	f32 size, half, ofsX, ofsY, ten;
 	int i;
+	s32 id;
+#else
+	f32 size, half, ofsX, ofsY, ten;
+	int i;
+#endif
 
 	PSMTXTrans(trans, wp->position.x, wp->position.y, wp->position.z);
 	PSMTXScale(scale, wp->field_0x1C, wp->field_0x1C, wp->field_0x1C);
@@ -376,6 +498,47 @@ void effAcrobatDisp(CameraId cameraId, void* param) {
 	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+#ifdef VERSION_G8ME01
+	size = 20.0f;
+	size = -size;
+	wp++;
+	for (i = 1; i < effect->count; i++, wp++) {
+		if (wp->state < 6) {
+			ofsX = size / 2.0f;
+			ofsY = 0.0f;
+		} else {
+			ofsX = 0.0f;
+			ofsY = size / 2.0f;
+		}
+		PSMTXTrans(trans, wp->position.x, wp->position.y, wp->position.z);
+		PSMTXTrans(rot, ofsX, ofsY, 0.0f);
+		PSMTXScale(scale, wp->scaleX, wp->scaleY, wp->scaleZ);
+		PSMTXConcat(rot, scale, scale);
+		PSMTXTrans(rot, -ofsX, -ofsY, 0.0f);
+		PSMTXConcat(scale, rot, scale);
+		PSMTXConcat(trans, scale, scale);
+		PSMTXConcat(mtx, scale, scale);
+		PSMTXConcat(camera->view, scale, scale);
+		GXLoadPosMtxImm(scale, 0);
+		GXSetCurrentMtx(0);
+		id = acrobat_tbl[gp->language].tex[i - 1];
+		if (id != -1) {
+			effGetTexObj(id, &tex);
+			GXLoadTexObj(&tex, GX_TEXMAP0);
+			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+			half = size / 2.0f;
+			ten = 10.0f;
+			GXPosition3f32(half, ten, 0.0f);
+			GXTexCoord2f32(0.0f, 0.0f);
+			GXPosition3f32(ten, ten, 0.0f);
+			GXTexCoord2f32(1.0f, 0.0f);
+			GXPosition3f32(ten, half, 0.0f);
+			GXTexCoord2f32(1.0f, 1.0f);
+			GXPosition3f32(half, half, 0.0f);
+			GXTexCoord2f32(0.0f, 1.0f);
+		}
+	}
+#else
 	size = 20.0f;
 	ten = 10.0f;
 	size = -size;
@@ -412,5 +575,6 @@ void effAcrobatDisp(CameraId cameraId, void* param) {
 		GXPosition3f32(half, half, 0.0f);
 		GXTexCoord2f32(0.0f, 1.0f);
 	}
+#endif
 }
 

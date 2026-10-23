@@ -32,39 +32,89 @@ typedef struct StageClearWork {
 void effStageClearMain(EffectEntry* effect);
 void effStageClearDisp(CameraId cameraId, EffectEntry* effect);
 
+#ifndef VERSION_G8ME01
 static s32 tex_us[] = {0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA0, 0x9E, 0xA3, 0xA0, 0xA4, 0xA5};
 s32 tex_shadow_us[] = {0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAA, 0xA8, 0xAD, 0xAA, 0xAE, 0xAF};
+#endif
+#ifndef VERSION_G8ME01
 static s32 evt_shake[] = {
     0x00020018, 0xFE363C81, 0x00000000, 0x0005005B, (s32)evt_cam_shake, 0x00000005, 0xF24A7A8A, 0xF24A7A8A, 0x00000032,
     0x00000020, 0x0005005B, (s32)evt_cam_shake, 0x00000005, 0xF24A7A94, 0xF24A7A94, 0x00000064, 0x00000021, 0x00000002,
     0x00000001,
 };
+#endif
 
+#ifdef VERSION_G8ME01
+static s16 tex_jp[] = {128, 129, 130, 131, 132, 133, 134, 135};
+s16 tex_shadow_jp[] = {136, 137, 138, 139, 140, 141, 142, 143};
+static s16 tex_us[] = {132, 133, 134, -1, 135, 136, -1, 137, 138, 139, 140, 141, 132, 142};
+static s16 tex_shadow_us[] = {143, 144, 145, -1, 146, 147, -1, 148, 149, 150, 151, 152, 143, 153};
+static s16 tex_lang3[] = {130, 131, 132, 133, 134, 135, 136, 137, 135, 138, 139, 135};
+static s16 tex_shadow_lang3[] = {140, 141, 142, 143, 144, 145, 146, 147, 145, 148, 149, 145};
+static s16 tex_lang4[] = {130, 131, 132, -1, 133, 134, -1, 135, 136, 137, 138, 131, 139, 140, 141, 142};
+static s16 tex_shadow_lang4[] = {143, 144, 145, -1, 146, 147, -1, 148, 149, 150, 151, 144, 152, 153, 154, 155};
+static s16 tex_lang5[] = {135, 136, 137, -1, 138, 139, 140, -1, 141, 142, 143, 144};
+static s16 tex_shadow_lang5[] = {147, 148, 149, -1, 150, 151, 152, -1, 153, 154, 155, 156};
+static s16 tex_lang6[] = {130, 131, 132, 133, 134, 131, 135, 136};
+static s16 tex_shadow_lang6[] = {137, 138, 139, 140, 141, 138, 142, 143};
+typedef struct TexSet { s16* tex; s16* shadow; s32 count; } TexSet;
+static TexSet texid_tbl[6] = { { tex_jp, tex_shadow_jp, 8 }, { tex_us, tex_shadow_us, 14 }, { tex_lang3, tex_shadow_lang3, 12 }, { tex_lang4, tex_shadow_lang4, 16 }, { tex_lang5, tex_shadow_lang5, 12 }, { tex_lang6, tex_shadow_lang6, 8 } };
+s32 niji_tbl[] = {144, 154, 150, 156, 158, 144};
+static s32 evt_shake[] = {
+    0x00020018, 0xFE363C81, 0x00000000, 0x0005005B, (s32)evt_cam_shake, 0x00000005, 0xF24A7A8A, 0xF24A7A8A, 0x00000032,
+    0x00000020, 0x0005005B, (s32)evt_cam_shake, 0x00000005, 0xF24A7A94, 0xF24A7A94, 0x00000064, 0x00000021, 0x00000002,
+    0x00000001,
+};
+#else
 static s32 tex_jp[] = {0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3};
 s32 tex_shadow_jp[] = {0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB};
 static s32* texid_tbl[] = {tex_jp, tex_shadow_jp, tex_us, tex_shadow_us};
 static s32 niji_tbl[] = {0xAC, 0xB0};
+#endif
 s32 shake_dt[] = {2, 6, 2, 0, -1};
 s32 shake_dt2[] = {12, 36, 12, 0, -1};
+#ifdef VERSION_G8ME01
+static u8 scale_dt[] = {0x00, 0x00, 0x16, 0x2E, 0x47, 0x5D, 0x6E, 0x78, 0x77, 0x6E, 0x66, 0x00}; /* US: trailing pad byte kept in the table */
+#else
 static u8 scale_dt[] = {0x00, 0x00, 0x16, 0x2E, 0x47, 0x5D, 0x6E, 0x78, 0x77, 0x6E, 0x66, 0x00};
+#endif
 
 EffectEntry* effStageClearEntry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     StageClearWork* work;
     StageClearWork* p;
     s32 i;
+#ifdef VERSION_G8ME01
+    s32 n;
+    GXTexObj texObj;
+    f32 a;
+    f32 b;
+    s32 j;
+#else
     s32 n = 9;
+#endif
 
     if (type == 1 && gp->language != 0U) {
         return effMiniGameEntry(1);
     }
     effect = effEntry();
+#ifdef VERSION_G8ME01
+    switch (type % 10) {
+        case 0:
+            n = texid_tbl[gp->language].count + 1;
+            break;
+        case 1:
+            n = 7;
+            break;
+    }
+#else
     if (gp->language != 0U) {
         n = 14;
     }
     if (type % 10 == 1) {
         n = 7;
     }
+#endif
     effect->type = "StageClear\0";
     effect->count = n;
     work = __memAlloc(HEAP_EFFECT, effect->count * sizeof(StageClearWork));
@@ -80,11 +130,42 @@ EffectEntry* effStageClearEntry(s32 type, f32 x, f32 y, f32 z) {
     work->confetti = irand(5) + 1;
     work->done = 0;
     for (i = 1, p = work + 1; i < effect->count; i++, p++) {
+#ifdef VERSION_G8ME01
+        a = 0.0f;
+        b = a;
+        for (j = 0; j < i - 1; j++) {
+            if (texid_tbl[gp->language].tex[j] != -1) {
+                effGetTexObj(texid_tbl[gp->language].tex[j], &texObj);
+                a += 0.8f * (f32)GXGetTexObjWidth(&texObj);
+            } else {
+                a += 16.0f;
+            }
+        }
+        if (texid_tbl[gp->language].tex[j] != -1) {
+            effGetTexObj(texid_tbl[gp->language].tex[j], &texObj);
+            a += ((f32)GXGetTexObjWidth(&texObj) / 2.0f) * 0.8f;
+        } else {
+            a += 8.0f;
+        }
+        for (j = 0; j < effect->count - 1; j++) {
+            if (texid_tbl[gp->language].tex[j] != -1) {
+                effGetTexObj(texid_tbl[gp->language].tex[j], &texObj);
+                b += ((f32)GXGetTexObjWidth(&texObj) / 2.0f) * 0.8f;
+            } else {
+                b += 8.0f;
+            }
+        }
+        p->position.x = a - b;
+#else
         p->position.x = (f32)((i - 1) * 38 - (effect->count - 1) * 38 / 2 + 20);
+#endif
         p->position.y = 0.0f;
         p->position.z = 0.0f;
         p->scale = 0.0f;
         p->delay = (s32)((f32)i * (0.2f * (f32)gp->framerate));
+#ifdef VERSION_G8ME01
+        p->delay = (s32)((f32)gp->framerate * (96.0f * (f32)i / (f32)texid_tbl[gp->language].count) / 60.0f);
+#endif
         p->frame = 0;
         p->shake = 0;
     }
@@ -217,7 +298,14 @@ void effStageClearDisp(CameraId cameraId, EffectEntry* effect) {
             dy = (f32)(-s * 4);
             if (s != 0) {
                 if (type % 10 == 0) {
+#ifdef VERSION_G8ME01
+                    if (texid_tbl[gp->language].shadow[i - 1] == -1) {
+                        continue;
+                    }
+                    effGetTexObj(texid_tbl[gp->language].shadow[i - 1], &tex);
+#else
                     effGetTexObj(texid_tbl[gp->language * 2 + 1][i - 1], &tex);
+#endif
                     GXLoadTexObj(&tex, GX_TEXMAP0);
                 } else {
                     effGetTexObj(i + 0x4F, &tex);
@@ -231,9 +319,20 @@ void effStageClearDisp(CameraId cameraId, EffectEntry* effect) {
                 GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_A0, GX_CA_ZERO);
                 GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, 0x80});
             } else if (type % 10 == 0) {
+#ifdef VERSION_G8ME01
+                if (texid_tbl[gp->language].tex[i - 1] == -1) {
+                    continue;
+                }
+                effGetTexObj(texid_tbl[gp->language].tex[i - 1], &tex);
+#else
                 effGetTexObj(texid_tbl[gp->language * 2][i - 1], &tex);
+#endif
                 GXLoadTexObj(&tex, GX_TEXMAP0);
+#ifdef VERSION_G8ME01
+                effGetTexObj(niji_tbl[gp->language], &tex);
+#else
                 effGetTexObj(niji_tbl[gp->language != 0], &tex);
+#endif
                 GXLoadTexObj(&tex, GX_TEXMAP1);
                 GXSetNumTevStages(3);
                 GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
@@ -303,7 +402,12 @@ s32 effStageClearEndChk(EffectEntry* effect) {
 
 #pragma force_active on
 #pragma force_active on
+#ifdef VERSION_G8ME01
+__declspec(section ".data") u32 gap_05_803B114C_data[5] = {0, 0, 0, 0, 0};
+__declspec(section ".sdata") u8 gap_07_8041BCDB_sdata[4] = {0, 0, 0, 0};
+#else
 __declspec(section ".data") u32 gap_05_803ADD14_data[3] = {0, 0, 0};
 __declspec(section ".sdata") u32 gap_07_80415C34_sdata[3] = {0, 0, 0};
+#endif
 #pragma force_active reset
 #pragma force_active reset

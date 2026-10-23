@@ -375,8 +375,8 @@ void BattleStage_NozzleWorkCheck(s32 a);
 void BattleGetFirstAttackUnit(BattleWork* wp, BattleUnit** a, BattleUnit** b);
 BOOL fadeIsFinish(void);
 
-#define U_EVT(u) FIELD(u, s32*, 0x2B4)
-#define U_EVTID(u) FIELD(u, s32, 0x2B8)
+#define U_EVT(u) FIELD(u, s32*, BUOFF(0x2B4))
+#define U_EVTID(u) FIELD(u, s32, BUOFF(0x2B8))
 
 void btlseqFirstAct(BattleWork* wp) {
 	s32 type;
@@ -436,16 +436,16 @@ void btlseqFirstAct(BattleWork* wp) {
 			wp->flags |= 2;
 			BattleGetFirstAttackUnit(wp, &a, &b);
 			wp->activeUnitId = a->unitId;
-			FIELD(a, u32, 0x278) |= 0x1000;
+			FIELD(a, u32, BUOFF(0x278)) |= 0x1000;
 			evt = evtEntry(b->damageEventCode, 10, 0x20);
 			if (evt) {
 				evt->unitId = b->unitId;
 				b->damageCode = 0x39;
 				b->damageEventId = evt->eventId;
 			}
-			FIELD(a, u32, 0x1C) |= 0x4000000;
+			FIELD(a, u32, BUOFF(0x1C)) |= 0x4000000;
 			if (type < 9) {
-				FIELD(a, s32, 0x29C) = FIELD(_GetFirstAttackWeapon(type), s32, 0xB0);
+				FIELD(a, s32, BUOFF(0x29C)) = FIELD(_GetFirstAttackWeapon(type), s32, 0xB0);
 				a->attackEventFlags = 0;
 				BattleStatusWindowEventOff();
 			}
@@ -503,7 +503,7 @@ void btlseqFirstAct(BattleWork* wp) {
 				BattleSetSeq(wp, SEQ_FIRST_ACT, 0x2000003);
 				unit = BattleGetUnitPtr(wp, wp->activeUnitId);
 				if (unit) {
-					FIELD(unit, u32, 0x1C) &= ~0x4000000;
+					FIELD(unit, u32, BUOFF(0x1C)) &= ~0x4000000;
 				}
 			}
 			break;
@@ -566,7 +566,7 @@ void btlseqFirstAct(BattleWork* wp) {
 
 		case 0x2000009:
 		{
-			s32* id = &FIELD(wp, s32, 0x182A4);
+			s32* id = &FIELD(wp, s32, BWOFF(0x182A4));
 			if (*id != 0 && !evtCheckID(*id)) {
 				*id = 0;
 			}
@@ -582,7 +582,7 @@ void btlseqFirstAct(BattleWork* wp) {
 			k = 0;
 			do {
 				unit = BattleGetUnitPtr(wp, k);
-				if (unit && FIELD(unit, u8, 0x300) && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
+				if (unit && FIELD(unit, u8, BUOFF(0x300)) && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
 					flag = 1;
 				}
 			} while (++k < 64);
@@ -590,7 +590,7 @@ void btlseqFirstAct(BattleWork* wp) {
 				evt = evtEntry(nanika_luck_event, 10, 0);
 				evt->unitId = -5;
 				wp->luckEventId = evt->eventId;
-				FIELD(wp, s64, 0x18FD8) |= -1;
+				FIELD(wp, s64, BWOFF(0x18FD8)) |= -1;
 				BattleStatusChangeMsgAdjust(wp);
 				BattleSetSeq(wp, SEQ_FIRST_ACT, 0x200000B);
 				wp->luckTimer = 0;
@@ -2074,20 +2074,42 @@ void btlseqTurn(BattleWork *wp)
       break;
 
     case 0x3000046:
+#ifdef VERSION_G8ME01
+      for (i = 0; i < 64; i++)
+      {
+        unit = BattleGetUnitPtr(wp, i);
+        if (unit && !BtlUnit_CheckStatus(unit, 27) && unit->currentHp > 0 && unit->usCommandDisabled[0])
+        {
+          unit->usCommandDisabled[0]--;
+        }
+      }
+#else
       if (wp->commandDisabled[3])
     {
       wp->commandDisabled[3]--;
     }
+#endif
       BattleIncSeq(wp, SEQ_TURN);
       BattleIncSeq(wp, SEQ_TURN);
       btlseqTurn(wp);
       break;
 
     case 0x3000048:
+#ifdef VERSION_G8ME01
+      for (i = 0; i < 64; i++)
+      {
+        unit = BattleGetUnitPtr(wp, i);
+        if (unit && !BtlUnit_CheckStatus(unit, 27) && unit->currentHp > 0 && unit->usCommandDisabled[1])
+        {
+          unit->usCommandDisabled[1]--;
+        }
+      }
+#else
       if (wp->commandDisabled[4])
     {
       wp->commandDisabled[4]--;
     }
+#endif
       BattleIncSeq(wp, SEQ_TURN);
       BattleIncSeq(wp, SEQ_TURN);
       btlseqTurn(wp);
@@ -2271,12 +2293,12 @@ void btlseqMove(BattleWork* wp) {
 						unit->totalHpDamageTaken = 0;
 						unit->hpDamageTaken = 0;
 						unit->hpDamageCount = 0;
-						FIELD(unit, s8, 0x26F) = 0;
-						FIELD(unit, s32, 0x264) = 0;
+						FIELD(unit, s8, BUOFF(0x26F)) = 0;
+						FIELD(unit, s32, BUOFF(0x264)) = 0;
 						unit->fpDamageTaken = 0;
-						FIELD(unit, s32, 0x268) = 0;
-						FIELD(unit, s8, 0x26E) = 0;
-						FIELD(unit, s32, 0x27C) = 0;
+						FIELD(unit, s32, BUOFF(0x268)) = 0;
+						FIELD(unit, s8, BUOFF(0x26E)) = 0;
+						FIELD(unit, s32, BUOFF(0x27C)) = 0;
 					}
 				}
 				for (i = 0; i < 64; i++) {
@@ -2423,7 +2445,7 @@ void btlseqAct(BattleWork* wp) {
 			unit = BattleGetUnitPtr(wp, wp->activeUnitId);
 			effNiceAsync(1);
 			unit->totalDamageDealt = 0;
-			FIELD(unit, s32, 0x2CC) = 0;
+			FIELD(unit, s32, BUOFF(0x2CC)) = 0;
 			BattleAudience_ActInit();
 			cantMove = TRUE;
 			switch (unit->currentKind) {
@@ -2566,7 +2588,7 @@ void btlseqAct(BattleWork* wp) {
 				if (wp->majinaiState == 1) {
 					wp->majinaiState = 0;
 				}
-				FIELD(unit, s32, 0x258) = 0;
+				FIELD(unit, s32, BUOFF(0x258)) = 0;
 				switch (unit->moveState) {
 					case 5:
 						unit->moveState = 6;
@@ -2642,11 +2664,11 @@ void btlseqAct(BattleWork* wp) {
 			}
 			unit = BattleGetUnitPtr(wp, wp->activeUnitId);
 			if (unit) {
-				FIELD(unit, s32, 0x2C8) = 0;
-				if (FIELD(unit, void*, 0x2C4)) {
-					evt = evtEntry(FIELD(unit, void*, 0x2C4), 10, 0);
+				FIELD(unit, s32, BUOFF(0x2C8)) = 0;
+				if (FIELD(unit, void*, BUOFF(0x2C4))) {
+					evt = evtEntry(FIELD(unit, void*, BUOFF(0x2C4)), 10, 0);
 					if (evt) {
-						FIELD(unit, s32, 0x2C8) = evt->eventId;
+						FIELD(unit, s32, BUOFF(0x2C8)) = evt->eventId;
 						evt->unitId = unit->unitId;
 						if (unit->waitEventId) {
 							evtDeleteID(unit->waitEventId);
@@ -2658,11 +2680,11 @@ void btlseqAct(BattleWork* wp) {
 			BattleIncSeq(wp, SEQ_ACT);
 		case 0x600000D:
 			unit = BattleGetUnitPtr(wp, wp->activeUnitId);
-			if (unit && FIELD(unit, s32, 0x2C8)) {
-				if (evtCheckID(FIELD(unit, s32, 0x2C8))) {
+			if (unit && FIELD(unit, s32, BUOFF(0x2C8))) {
+				if (evtCheckID(FIELD(unit, s32, BUOFF(0x2C8)))) {
 					break;
 				}
-				FIELD(unit, s32, 0x2C8) = 0;
+				FIELD(unit, s32, BUOFF(0x2C8)) = 0;
 			}
 			BattleIncSeq(wp, SEQ_ACT);
 		case 0x600000E:
@@ -2708,8 +2730,8 @@ void btlseqPhaseFirstProcess(BattleWork* wp) {
 	s32 count;
 	int i;
 
-	FIELD(wp, s32, 0x1C70) = 0;
-	FIELD(wp, u8, 0x1C74) = 0;
+	FIELD(wp, s32, BWOFF(0x1C70)) = 0;
+	FIELD(wp, u8, BWOFF(0x1C74)) = 0;
 	for (i = 0; i < 64; i++) {
 		wp->movePriorityQueue[i] = -1;
 	}
@@ -2895,12 +2917,12 @@ BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
 				unit->damageEventId = 0;
 				break;
 			}
-			while (FIELD(unit, s32, 0x2B8)) {
-				if (evtCheckID(FIELD(unit, s32, 0x2B8))) {
+			while (FIELD(unit, s32, BUOFF(0x2B8))) {
+				if (evtCheckID(FIELD(unit, s32, BUOFF(0x2B8)))) {
 					done = FALSE;
 					break;
 				}
-				FIELD(unit, s32, 0x2B8) = 0;
+				FIELD(unit, s32, BUOFF(0x2B8)) = 0;
 				break;
 			}
 		}

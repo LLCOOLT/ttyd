@@ -70,7 +70,7 @@ extern s32 btlevtcmd_get_turn[];
 extern s32 btlevtcmd_snd_se[];
 extern s32 evt_btl_camera_set_mode[];
 extern s32 subsetevt_confuse_flustered[];
-extern s32 unit_togezo_28_data_35BD0[];
+extern s32 unit_togezo[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_jyugem_negone_one_374;
@@ -87,7 +87,7 @@ __declspec(section ".data") s32 fd_jyugem___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_jyugem_one_negone_359;
 __declspec(section ".data") s32 fd_jyugem___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_jyugem_one_364[1];
-BattleUnitKind unit_jyugem_28_data_2B678;
+BattleUnitKind unit_jyugem;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -168,7 +168,7 @@ __declspec(section ".data") s32 fd_jyugem_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_jyugem_28_data_2B678 = {
+BattleUnitKind unit_jyugem = {
     40,
     "btl_un_jyugem",
     5,
@@ -301,7 +301,7 @@ static s32 weapon_jyugem_attack[] = {
 };
 
 static __declspec(section ".data") s32 entry_togezo[] = {
-    (s32)unit_togezo_28_data_35BD0, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
+    (s32)unit_togezo, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
     0, 0, 0, 0,
 };
 

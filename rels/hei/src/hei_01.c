@@ -94,8 +94,11 @@ USER_FUNC(evt_sub_get_dist);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_rumble_onoff);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_party_move_behind_mario);
+#endif
 static USER_FUNC(set_dir);
-extern s32 all_party_lecture_12_data_1CF80[];
+extern s32 all_party_lecture[];
 extern s32 bero_case_switch_off[];
 extern s32 bero_case_switch_on[];
 extern s32 evt_bero_info_run[];
@@ -127,7 +130,11 @@ s32 kusa_dokan[59];
 static s32 name_tbl[25];
 s32 bridge_evt_02[192];
 s32 bridge_evt[30];
+#ifdef VERSION_G8ME01
+s32 nokotaro_get[73];
+#else
 s32 nokotaro_get[55];
+#endif
 s32 nokotaro_kanyu[40];
 s32 nokotaro_nakama[276];
 static __declspec(section ".data") s32 nokotarou_init[7];
@@ -346,11 +353,21 @@ EVT_BEGIN(nokotaro_get)
     CALL(evt_npc_set_anim, STRING("ノコタロウ"), STRING("PNK_S_1"))
     CALL(evt_npc_flag_onoff, 1, STRING("ノコタロウ"), 512)
     WAIT_MS(500)
+#ifdef VERSION_G8ME01
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_mov_pos2, 450, 0, FLOAT(80.0f))
+        CALL(evt_mario_set_dir_npc, STRING("ノコタロウ"))
+        CALL(evt_party_move_behind_mario, 0)
+    END_INLINE_EVENT
+#endif
     CALL(evt_cam3d_evt_set, 400, 85, 255, 400, 40, -10, 800, 11)
     WAIT_MS(800)
     SET_VALUE(LW(8), STRING("ノコタロウ"))
     SET_VALUE(LW(9), 2)
-    CALL_CHILD(PTR(all_party_lecture_12_data_1CF80))
+    CALL_CHILD(PTR(all_party_lecture))
+#ifdef VERSION_G8ME01
+    CALL(evt_party_set_dir, 0, 90, 200)
+#endif
     CALL(evt_msg_print, 0, STRING("stg1_hei_09"), 0, STRING("party"))
     SET_VALUE(GSW(0), 33)
     RETURN

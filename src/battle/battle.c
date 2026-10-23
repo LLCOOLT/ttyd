@@ -21,6 +21,9 @@ typedef enum EquipFlags {
 } EquipFlags;
 
 BattleWork* _battleWorkPointer;
+#ifdef VERSION_G8ME01
+extern void* R_battlemapalloc_base_ptr;
+#endif
 
 extern BattleUnitKind unitdata_Mario;
 f32 BattleGetFloorHeight(f32 x, f32 y, f32 z);
@@ -50,7 +53,11 @@ BOOL battleSeqEndCheck() {
 void BattleInit(FieldBattleInfo* info) {
     BattleWork* wp;
 
+#ifdef VERSION_G8ME01
+    wp = _battleWorkPointer = (BattleWork*)BattleAlloc(sizeof(BattleWork));
+#else
     wp = _battleWorkPointer = (BattleWork*)_mapAlloc(sizeof(BattleWork));
+#endif
     memset(_battleWorkPointer, 0, sizeof(BattleWork));
     wp->field_19060 = -1;
     wp->field_424 = -1;
@@ -147,7 +154,11 @@ void BattleEnd(void) {
     if (field_55C) {
         BattleFree(field_55C);
     }
+#ifdef VERSION_G8ME01
+    BattleFree(wp);
+#else
     _mapFree(wp);
+#endif
     _battleWorkPointer = NULL;
 }
 
@@ -330,12 +341,20 @@ void BattleIncSeq(BattleWork* wp, BattleSequence seq) {
 }
 
 void* BattleAlloc(u32 size) {
+#ifdef VERSION_G8ME01
+    return (_mapAlloc)(R_battlemapalloc_base_ptr, size);
+#else
     return __memAlloc(HEAP_BATTLE, size);
+#endif
 }
 
 void BattleFree(void* ptr) {
     if (ptr)
+#ifdef VERSION_G8ME01
+        (_mapFree)(R_battlemapalloc_base_ptr, ptr);
+#else
         __memFree(HEAP_BATTLE, ptr);
+#endif
 }
 
 BattleUnit* BattleGetUnitPtr(BattleWork* wp, s32 index) {
@@ -741,6 +760,10 @@ void BattlePartyInfoWorkInit(BattleWork* wp) {
         partyInfo->field_0 = 1.0;
         partyInfo->field_24 = 0;
         memset(partyInfo->field_4, 0, sizeof(partyInfo->field_4));
+#ifdef VERSION_G8ME01
+        partyInfo->usCommandDisabled[0] = 0;
+        partyInfo->usCommandDisabled[1] = 0;
+#endif
     }
 }
 
@@ -785,7 +808,7 @@ void BattleCheckUnitBroken(BattleWork* wp) {
 }
 
 void BattleAfterReactionQueueInit(void) {
-    s32* base = (s32*)((u8*)_battleWorkPointer + 0x16F40);
+    s32* base = (s32*)((u8*)_battleWorkPointer + BWOFF(0x16F40));
     s32 i;
     for (i = 0; i < 64; i++) {
         base[i * 2] = -1;
@@ -794,7 +817,7 @@ void BattleAfterReactionQueueInit(void) {
 }
 
 void BattleAfterReactionEntry(s32 a, s32 b) {
-    s32* base = (s32*)((u8*)_battleWorkPointer + 0x16F40);
+    s32* base = (s32*)((u8*)_battleWorkPointer + BWOFF(0x16F40));
     s32 i;
     for (i = 0; i < 64; i++) {
         if (base[i * 2] != -1 && a == base[i * 2]) {
@@ -815,7 +838,7 @@ void BattleAfterReactionEntry(s32 a, s32 b) {
 void BattleAfterReactionRelease(s32 a, s32 b) {
     s32 i;
     s32 j;
-    s32* base = (s32*)((u8*)_battleWorkPointer + 0x16F40);
+    s32* base = (s32*)((u8*)_battleWorkPointer + BWOFF(0x16F40));
     for (i = 0; i < 64; i++) {
         if (base[i * 2] != -1 && a == base[i * 2] && b == base[i * 2 + 1]) {
             for (j = i; j < 63; j++) {
@@ -835,7 +858,7 @@ void BattleConsumeReserveItem(void);
 BOOL BattleAfterReactionMain(void) {
     s32 id;
     BattleWork* wp = _battleWorkPointer;
-    s32* base = (s32*)((u8*)wp + 0x16F40);
+    s32* base = (s32*)((u8*)wp + BWOFF(0x16F40));
     s32 i;
     for (i = 0; i < 64; i++) {
         id = base[i * 2];

@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -14,6 +15,11 @@
 #include "dolphin/mtx.h"
 #include "driver/effdrv.h"
 #include "system.h"
+#include "icon_ids.h"
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_mapobj_flag_onoff);
+USER_FUNC(evt_sub_get_language);
+#endif
 
 void camShiftReset(void);
 typedef struct MiniGameWork { EventEntry* event; EventEntry* subEvent; u16 flags; s32 type; s32 (*init)(EventEntry* event, BOOL isFirstCall); s32 (*main)(EventEntry* event, BOOL isFirstCall); void (*disp)(CameraId camera, void* param); void* data; } MiniGameWork;
@@ -86,8 +92,8 @@ USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_yuucounter_alloc);
 USER_FUNC(evt_yuucounter_free);
 USER_FUNC(evt_yuuminigame_alloc);
-USER_FUNC(evt_yuuranking_alloc_31_text_52F8);
-USER_FUNC(evt_yuuranking_free_31_text_5274);
+USER_FUNC(evt_yuuranking_alloc);
+USER_FUNC(evt_yuuranking_free);
 USER_FUNC(evt_yuutitle_alloc);
 USER_FUNC(evt_yuutitle_free);
 USER_FUNC(re_init_yuunpc);
@@ -103,8 +109,8 @@ USER_FUNC(yuuminigame4_set_phase);
 USER_FUNC(yuuminigame_get_dataadr);
 USER_FUNC(yuuminigame_set_dataadr);
 USER_FUNC(yuunpc_go);
-USER_FUNC(yuuranking_get_monte_31_text_51C0);
-USER_FUNC(yuuranking_wait_button_31_text_51F8);
+USER_FUNC(yuuranking_get_monte);
+USER_FUNC(yuuranking_wait_button);
 BOOL yuuminigame4_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp, SlitWork* data);
 void yuuminigame_disp_4slit(CameraId camera, void* param);
 void yuuminigame_main_4slit(EventEntry* event, BOOL isFirstCall);
@@ -142,7 +148,7 @@ s32 minigame04_start_cam[40];
 s32 minigame04_start_cam_cancel[20];
 s32 minigame04_start[91];
 s32 minigame04_end[256];
-s32 yuu_03_init_evt[26];
+s32 yuu_03_init_evt[VERSION_PICK(26, 140)];
 
 USER_FUNC(yuu_03_cam_shift_reset) {
     camShiftReset();
@@ -161,7 +167,7 @@ void yuu_03_icon_monte_disp(CameraId camera, void* param) {
                 if ((gp->retraceCount & 0x1F) < 9) {
                     pos.y += 5.0f;
                 }
-                iconDispGx(&pos, 0, 0x1B6, 1.0f);
+                iconDispGx(&pos, 0, ICON_1B6, 1.0f);
             }
         }
     }
@@ -756,18 +762,18 @@ EVT_BEGIN(minigame04_end)
     END_IF
     CALL(evt_yuucounter_free)
     CALL(yuugijou_montemedal_disp_onoff, 1)
-    CALL(evt_yuuranking_alloc_31_text_52F8, 0, 0, 1, 0, LW(0), 0, LW(1), 701)
+    CALL(evt_yuuranking_alloc, 0, 0, 1, 0, LW(0), 0, LW(1), 701)
     WAIT_FRAMES(1)
-    CALL(yuuranking_wait_button_31_text_51F8)
-    CALL(yuuranking_get_monte_31_text_51C0, LW(3))
+    CALL(yuuranking_wait_button)
+    CALL(yuuranking_get_monte, LW(3))
     CALL(yuugijou_add_montemedal, 0, LW(3))
     CALL(yuugijou_montemedal_wait)
-    CALL(evt_yuuranking_free_31_text_5274)
+    CALL(evt_yuuranking_free)
     WAIT_MS(200)
-    CALL(evt_yuuranking_alloc_31_text_52F8, 0, 0, 1, 1, LW(0), 0, LW(1), 701)
+    CALL(evt_yuuranking_alloc, 0, 0, 1, 1, LW(0), 0, LW(1), 701)
     WAIT_FRAMES(1)
-    CALL(yuuranking_wait_button_31_text_51F8)
-    CALL(evt_yuuranking_free_31_text_5274)
+    CALL(yuuranking_wait_button)
+    CALL(evt_yuuranking_free)
     SET_VALUE(LW(1), 10)
     CALL(yuugijou_get_montemedal, LW(0))
     IF_INT_LESS(LW(0), LW(1))
@@ -804,6 +810,42 @@ EVT_BEGIN(minigame04_end)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(yuu_03_init_evt)
+    CALL(evt_map_playanim, STRING("yajirushi"), 1, 0)
+    CALL(evt_map_playanim, STRING("tama"), 1, 0)
+    CALL(evt_map_playanim, STRING("gurade"), 1, 0)
+    CALL(evt_map_playanim, STRING("kyaku"), 1, 0)
+    SPAWN_EVENT(PTR(minigame04_main))
+    CALL_CHILD(evt_yuunpc_minigame4)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("J_mon"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("E_mon"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_mon"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_mon"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_mon"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_mon"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("mon_10"), 16384)
+    CALL(evt_sub_get_language, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("mon_10"), 16384)
+        CASE_EQUAL(1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_mon"), 16384)
+        CASE_EQUAL(2)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("mon_10"), 16384)
+        CASE_EQUAL(3)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_mon"), 16384)
+        CASE_EQUAL(4)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("mon_10"), 16384)
+        CASE_EQUAL(5)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_mon"), 16384)
+    END_SWITCH
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(yuu_03_init_evt)
     CALL(evt_map_playanim, STRING("yajirushi"), 1, 0)
     CALL(evt_map_playanim, STRING("tama"), 1, 0)
@@ -813,6 +855,7 @@ EVT_BEGIN(yuu_03_init_evt)
     CALL_CHILD(PTR(evt_yuunpc_minigame4))
     RETURN
 EVT_END()
+#endif
 
 
 void yuuminigame_init_4slit(EventEntry* event, BOOL isFirstCall) {

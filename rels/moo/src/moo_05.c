@@ -27,6 +27,9 @@ USER_FUNC(evt_run_case_evt);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_offscreen_get_boundingbox2);
+#endif
 extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_moo_05_negone_one_374;
@@ -44,8 +47,16 @@ __declspec(section ".data") u64 fd_moo_05_one_negone_359;
 __declspec(section ".data") s32 fd_moo_05___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_moo_05_one_364[1];
 static s32 bero_entry_data[45];
+#ifdef VERSION_G8ME01
+extern s32 rock_main[];
+#else
 static s32 rock_main[79];
+#endif
+#ifdef VERSION_G8ME01
+static s32 rock_evt0[15];
+#else
 static s32 rock_evt0[21];
+#endif
 s32 moo_05_init_evt[59];
 
 __declspec(section ".data") u64 fd_moo_05_negone_one_374 = 0xBF8000003F800000;
@@ -105,6 +116,7 @@ static s32 bero_entry_data[] = {
     0, 0, 0, 0, 0,
 };
 
+#ifndef VERSION_G8ME01
 static EVT_BEGIN(rock_main)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -127,14 +139,21 @@ static EVT_BEGIN(rock_main)
     CALL(evt_hitobj_onoff, LW(11), 1, 0)
     RETURN
 EVT_END()
+#endif
 
 static EVT_BEGIN(rock_evt0)
+#ifdef VERSION_G8ME01
+    SET_VALUE(GSWF(4031), 1)
+#else
     CALL(evt_mario_key_onoff, 0)
+#endif
     SET_VALUE(LW(10), STRING("S_iwa_07"))
     SET_VALUE(LW(11), STRING("A_iwa_07"))
     CALL_CHILD(PTR(rock_main))
+#ifndef VERSION_G8ME01
     SET_VALUE(GSWF(4031), 1)
     CALL(evt_mario_key_onoff, 1)
+#endif
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()

@@ -10,9 +10,9 @@ extern s32 battle_heart_drop_param_default[];
 extern s32 battle_item_bllizard[];
 extern s32 battle_item_default_param_list[];
 extern s32 battle_item_ice_pakkun[];
-extern s32 unit_bllizard_3_data_B7F0[];
-extern s32 unit_ice_pakkun_3_data_CDB0[];
-extern s32 unit_kuriboo_3_data_AC58[];
+extern s32 unit_bllizard[];
+extern s32 unit_ice_pakkun[];
+extern s32 unit_kuriboo[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_bom_negone_one_374;
@@ -140,7 +140,7 @@ s32 bom_btlstage_data[] = {
 };
 
 __declspec(section ".data") s32 btlparty_bom_bom_00_01_off_1[] = {
-    (s32)unit_kuriboo_3_data_AC58, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_kuriboo, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_default_param_list,
 };
 
@@ -149,8 +149,8 @@ __declspec(section ".data") s32 btlgrp_bom_bom_00_01_off_1[] = {
 };
 
 s32 btlparty_bom_bom_03_01_off_1[] = {
-    (s32)unit_bllizard_3_data_B7F0, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_bllizard, (s32)unit_bllizard_3_data_B7F0, 16777216, 67108868, 1121714176,
+    (s32)unit_bllizard, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_bllizard, (s32)unit_bllizard, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_bllizard,
 };
 
@@ -159,10 +159,10 @@ __declspec(section ".data") s32 btlgrp_bom_bom_03_01_off_1[] = {
 };
 
 s32 btlparty_bom_bom_03_01_off_2[] = {
-    (s32)unit_bllizard_3_data_B7F0, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_bllizard, (s32)unit_bllizard_3_data_B7F0, 16777216, 67108868, 1119092736,
+    (s32)unit_bllizard, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_bllizard, (s32)unit_bllizard, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_bllizard,
-    (s32)unit_bllizard_3_data_B7F0, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_bllizard, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_bllizard,
 };
 
@@ -171,8 +171,8 @@ __declspec(section ".data") s32 btlgrp_bom_bom_03_01_off_2[] = {
 };
 
 s32 btlparty_bom_bom_03_03_off_1[] = {
-    (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_ice_pakkun, (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1121714176,
+    (s32)unit_ice_pakkun, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_ice_pakkun, (s32)unit_ice_pakkun, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_ice_pakkun,
 };
 
@@ -181,10 +181,10 @@ __declspec(section ".data") s32 btlgrp_bom_bom_03_03_off_1[] = {
 };
 
 s32 btlparty_bom_bom_03_03_off_2[] = {
-    (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_ice_pakkun, (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1119092736,
+    (s32)unit_ice_pakkun, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_ice_pakkun, (s32)unit_ice_pakkun, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_ice_pakkun,
-    (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_ice_pakkun, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_ice_pakkun,
 };
 
@@ -193,8 +193,8 @@ __declspec(section ".data") s32 btlgrp_bom_bom_03_03_off_2[] = {
 };
 
 s32 btlparty_bom_bom_04_01_off_1[] = {
-    (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_ice_pakkun, (s32)unit_bllizard_3_data_B7F0, 16777216, 67108868, 1121714176,
+    (s32)unit_ice_pakkun, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_ice_pakkun, (s32)unit_bllizard, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_bllizard,
 };
 
@@ -203,10 +203,10 @@ __declspec(section ".data") s32 btlgrp_bom_bom_04_01_off_1[] = {
 };
 
 s32 btlparty_bom_bom_04_01_off_2[] = {
-    (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_ice_pakkun, (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1119092736,
+    (s32)unit_ice_pakkun, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_ice_pakkun, (s32)unit_ice_pakkun, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_ice_pakkun,
-    (s32)unit_bllizard_3_data_B7F0, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_bllizard, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_bllizard,
 };
 
@@ -215,8 +215,8 @@ __declspec(section ".data") s32 btlgrp_bom_bom_04_01_off_2[] = {
 };
 
 s32 btlparty_bom_bom_04_02_off_1[] = {
-    (s32)unit_bllizard_3_data_B7F0, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_bllizard, (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1121714176,
+    (s32)unit_bllizard, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_bllizard, (s32)unit_ice_pakkun, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_ice_pakkun,
 };
 
@@ -225,10 +225,10 @@ __declspec(section ".data") s32 btlgrp_bom_bom_04_02_off_1[] = {
 };
 
 s32 btlparty_bom_bom_04_02_off_2[] = {
-    (s32)unit_bllizard_3_data_B7F0, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_bllizard, (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1119092736,
+    (s32)unit_bllizard, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_bllizard, (s32)unit_ice_pakkun, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_ice_pakkun,
-    (s32)unit_bllizard_3_data_B7F0, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_bllizard, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_bllizard,
 };
 
@@ -237,11 +237,11 @@ __declspec(section ".data") s32 btlgrp_bom_bom_04_02_off_2[] = {
 };
 
 s32 btlparty_bom_bom_04_03_off_1[] = {
-    (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_ice_pakkun, (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1116471296,
+    (s32)unit_ice_pakkun, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_ice_pakkun, (s32)unit_ice_pakkun, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_ice_pakkun,
-    (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_ice_pakkun, (s32)unit_ice_pakkun_3_data_CDB0, 16777216, 67108868, 1125515264,
+    (s32)unit_ice_pakkun, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_ice_pakkun, (s32)unit_ice_pakkun, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_ice_pakkun,
 };
 

@@ -1,3 +1,7 @@
+#ifdef VERSION_G8ME01
+void N_battleMapFree(void);
+void N_battleMapAlloc(void);
+#endif
 #include "battle/battle.h"
 #include "battle/battle_information.h"
 #include "driver/animdrv.h"
@@ -280,8 +284,12 @@ BOOL battle_init(void) {
             msgLoad(gon11, 0);
         }
     }
+#ifdef VERSION_G8ME01
+    N_battleMapAlloc();
+#else
     memClear(4);
     smartAutoFree(2);
+#endif
     _battleWorkPointer = NULL;
     animPoseBattleInit();
     npcReleaseFieldNpc();
@@ -348,6 +356,10 @@ void battle_exit(void) {
     Mtx mtx;
 
     BattleEnd();
+#ifdef VERSION_G8ME01
+    N_battleMapFree();
+    smartAutoFree(2);
+#endif
     itemReInit();
     iconReInit();
     extReset();
@@ -366,7 +378,9 @@ void battle_exit(void) {
     evtmgrReInit();
     npcRecoveryFieldNpc();
     gp->inBattle = 0;
+#ifndef VERSION_G8ME01
     memClear(4);
+#endif
     evtStartAll(4);
     if (debug_battle_flag == 0) {
         marioCtrlOn();

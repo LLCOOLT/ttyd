@@ -37,7 +37,7 @@ __declspec(section ".data") s32 fd_barriern_satellite___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_barriern_satellite_one_negone_359;
 __declspec(section ".data") s32 fd_barriern_satellite___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_barriern_satellite_one_364[1];
-BattleUnitKind unit_barriern_satellite_2_data_3D950;
+BattleUnitKind unit_barriern_satellite;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static BattleUnitKindPart parts[6];
@@ -99,7 +99,7 @@ __declspec(section ".data") s32 fd_barriern_satellite_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_barriern_satellite_2_data_3D950 = {
+BattleUnitKind unit_barriern_satellite = {
     30,
     "btl_un_barriern_satellite",
     1,

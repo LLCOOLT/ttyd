@@ -1,3 +1,4 @@
+#include "version.h"
 /* "cardmgr" - Memory Card Manager
 * Status: almost 1:1, some functions don't work right with memcard_probe's opt_propagation it seems
 *
@@ -24,8 +25,13 @@ extern int sprintf(char* str, const char* format, ...);
 #include "assets/_mariost_icon_tlut.inc"
 #include "assets/_mariost_banner_tex.inc"
 const char str_802CCC80[0x14] = "mariost_save_file";
+#ifdef VERSION_G8ME01
+const char str_802CCC94[0xC] = "Paper Mario";
+const char str_802CCCAC[0x12] = "%2d/%2d save data";
+#else
 const char str_802CCC94[0x18] = "ペーパーマリオＲＰＧ";
 const char str_802CCCAC[0x20] = "%2d月%2d日のセーブデータです";
+#endif
 __declspec(section ".rodata") const u32 gap_04_802CCCCC_rodata[1] = {0};
 
 //.sbss
@@ -33,7 +39,7 @@ static CardWork* wp;
 u32 gap_08_8041889C_sbss;
 
 //.sdata
-const char* version = "009";
+const char* version = VERSION_PICK("009", "010");
 __declspec(section ".sdata") u32 gap_07_80410584_sdata[1] = {0};
 
 //local prototypes
@@ -290,6 +296,16 @@ void cardMain(void) {
 #pragma opt_propagation on
 
 void cardCopy2Main(s32 slot) {
+#ifdef VERSION_G8ME01
+    void* backup2;
+    s32 backup4;
+    CardSaveSlot* save;
+    void* backup1;
+    s32 backup5;
+    s32 backup6;
+    u32 backup3;
+    s32 language;
+#else
     void* backup2;
     u32 backup3;
     CardSaveSlot* save;
@@ -297,11 +313,15 @@ void cardCopy2Main(s32 slot) {
     s32 backup4;
     s32 backup5;
     s32 backup6;
+#endif
 
     save = &wp->data->saves[slot];
     backup1 = gp->fbatData;
     backup2 = gp->mapAlloc;
     backup3 = (u32)(gp->flags & 8);
+#ifdef VERSION_G8ME01
+    language = gp->language;
+#endif
     backup4 = gp->unk1274;
     backup5 = gp->rumbleEnabled;
     backup6 = gp->lastSlot;
@@ -314,6 +334,9 @@ void cardCopy2Main(s32 slot) {
     memcpy(&_jdt.readFlags, &save->data.informant, sizeof(InformantUnknown));
     gp->resetType = 0;
     gp->resetButtonDown = 0;
+#ifdef VERSION_G8ME01
+    gp->softResetWait = 0;
+#endif
     gp->dvdError = 0;
     gp->retraceTime = OSGetTime();
     strcpy(gp->currentAreaName, "123");
@@ -330,6 +353,9 @@ void cardCopy2Main(s32 slot) {
     else {
         gp->flags &= ~8;
     }
+#ifdef VERSION_G8ME01
+    gp->language = language;
+#endif
 }
 
 void cardErase(s32 slotNo) {
@@ -400,6 +426,10 @@ void cardWrite(s32 slot) {
         gp->flags &= ~1;
         gp->flags &= ~2;
         gp->resetType = 0;
+#ifdef VERSION_G8ME01
+        gp->resetButtonDown = 0;
+        gp->softResetWait = 0;
+#endif
         gp->dvdError = 0;
         memcpy(&save->data.global, gp, sizeof(GlobalWork));
         memcpy(&save->data.pouch, pouchGetPtr(), sizeof(PouchData));

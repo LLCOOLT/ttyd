@@ -14,6 +14,14 @@
 
 #define DISP_MAX_ENTRIES 1024
 
+#ifdef VERSION_G8ME01
+// US shares this constant with the fadedrv pool
+extern const f32 float_1_8041f770;
+#define DISP_ONE float_1_8041f770
+#else
+#define DISP_ONE 1.0f
+#endif
+
 //.sdata
 f32 offset_tbl[] = {
 	400000.0f, 400000.0f, 600000.0f, 100000.0f, 100000.0f, 
@@ -104,7 +112,7 @@ void dispDraw(CameraId camId) {
 					GXSetAlphaUpdate(GX_TRUE);
 					break;
 			}
-			GXSetZScaleOffset(1.0f, 0.0f);
+			GXSetZScaleOffset(DISP_ONE, 0.0f);
 			switch (entry->renderMode) {
 				case 0:
 					GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_OR);

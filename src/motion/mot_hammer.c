@@ -28,10 +28,10 @@ static HitEntry* hammerHitWall(f32 ang, f32* s, f32* co, f32* len, f32* hx, f32*
 void marioChgMotSub(s32 a, s32 b);
 s32 marioGetRub(s32 mask, s32* a, s32* b, f32* c);
 
-#define MF(o) (*(f32*)((u8*)mario + (o)))
-#define MI(o) (*(s32*)((u8*)mario + (o)))
-#define MB(o) (*(s8*)((u8*)mario + (o)))
-#define MH(o) (*(u16*)((u8*)mario + (o)))
+#define MF(o) (*(f32*)((u8*)mario + MWOFF(o)))
+#define MI(o) (*(s32*)((u8*)mario + MWOFF(o)))
+#define MB(o) (*(s8*)((u8*)mario + MWOFF(o)))
+#define MH(o) (*(u16*)((u8*)mario + MWOFF(o)))
 
 
 s32 se_data[] = {315, 357, 316, 359, 317, 358, 318, 360, 319, 361};
@@ -343,7 +343,15 @@ s32 marioChkHammer2(void) {
 		}
 		return 0;
 	}
+#ifdef VERSION_G8ME01
+	if (mario->flags & 0x2000000) {
+		mario->wMotionTimer = 0;
+	} else {
+		mario->wMotionTimer++;
+	}
+#else
 	mario->wMotionTimer++;
+#endif
 	if (mario->controlStickSensitivity && mario->wMotionTimer > 10 && mario->currMotionId == 0 && !(mario->dispFlags & 0x40000000)) {
 		marioChgPose("M_I_Y");
 		marioVoiceGlareOn();
@@ -367,7 +375,7 @@ s32 marioChkHammer2(void) {
 }
 
 
-#define MS(o) (*(s16*)((u8*)mario + (o)))
+#define MS(o) (*(s16*)((u8*)mario + MWOFF(o)))
 
 
 static inline void mot_ham(f32 a148, f32 a68) {
@@ -404,9 +412,15 @@ static inline void mot_ham(f32 a148, f32 a68) {
 		}                                                           \
 	}
 
+#ifdef VERSION_G8ME01
+#define H2_LIGHT_ON()
+#else
+#define H2_LIGHT_ON() marioPaperLightOn();
+#endif
+
 #define H2_CLR_PAPER()                                              \
 	marioPaperOff();                                                \
-	marioPaperLightOn();                                            \
+	H2_LIGHT_ON()                                            \
 	marioChgPose("M_S_1");                                          \
 	mario->dispFlags &= ~0x4;                                       \
 	mario->dispFlags &= ~0x8;                                       \
@@ -427,6 +441,9 @@ void mot_hammer2(void) {
 		MS(0x2B4) = 0;
 		MI(0x44) = 0;
 		MI(0x2B8) = -1;
+#ifdef VERSION_G8ME01
+		MF(0x1B0) = MF(0x1A8);
+#endif
 	}
 	switch (MI(0x44)) {
 	case 0:
@@ -652,7 +669,9 @@ void mot_ham2_post(void) {
 		*(f32*)((u8*)m + 0x158) = 0.01f;
 	}
 	marioPaperOff();
+#ifndef VERSION_G8ME01
 	marioPaperLightOn();
+#endif
 	mario->dispFlags &= ~0x100;
 	mario->dispFlags &= ~0x8;
 	mario->dispFlags &= ~0x10;
@@ -690,7 +709,7 @@ HitEntry *hitEstimate(s32 *out)
     }
   }
   sincosf(&s, &c, a);
-  h = *((f32 *) (((u8 *) mario) + 0x1B8));
+  h = *((f32 *) (((u8 *) mario) + MWOFF(0x1B8)));
   cy = (f32) cos(3.14159265f);
   pos = mario->position;
   {
@@ -804,6 +823,6 @@ static const char isB3_str[] = "MOBJ_Lv3BigBlock";
 static HitEntry* hammerHitWall(f32 ang, f32* s, f32* co, f32* len, f32* hx, f32* hy, f32* hz, f32* nx, f32* ny, f32* nz) {
 	MarioWork* m = marioGetPtr();
 	sincosf(s, co, ang);
-	*len = 2.0f * *(f32*)((u8*)m + 0x1B4);
-	return hitCheckFilter(0, hx, hy, hz, len, nx, ny, nz, m->position.x, 0.5f * *(f32*)((u8*)m + 0x1B8) + m->position.y, m->position.z, *s, 0.0f, *co);
+	*len = 2.0f * *(f32*)((u8*)m + MWOFF(0x1B4));
+	return hitCheckFilter(0, hx, hy, hz, len, nx, ny, nz, m->position.x, 0.5f * *(f32*)((u8*)m + MWOFF(0x1B8)) + m->position.y, m->position.z, *s, 0.0f, *co);
 }

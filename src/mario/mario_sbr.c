@@ -9,7 +9,7 @@
 #include "system.h"
 #include <string.h>
 
-#define MW(m, off, T) (*(T*)((u8*)(m) + (off)))
+#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 #define REVISE360(a) while ((a) < 0.0f) { (a) += 360.0f; } while ((a) >= 360.0f) { (a) -= 360.0f; }
 
 typedef struct RubWork {
@@ -157,12 +157,20 @@ void marioAdjustMoveDir(void) {
     MarioWork* mp = marioGetPtr();
 
     if (mp->displayDirection >= 90.0f && mp->displayDirection <= 270.0f) {
+#ifdef VERSION_G8ME01
+        mp->moveDirection = toMovedir(180.0f);
+#else
         mp->moveDirection = toMovedir(90.0f);
+#endif
         mp->directionView = mp->moveDirection;
         mp->displayDirection = 180.0f;
         mp->displayDirectionTarget = 180.0f;
     } else {
+#ifdef VERSION_G8ME01
+        mp->moveDirection = toMovedir(0.0f);
+#else
         mp->moveDirection = toMovedir(90.0f);
+#endif
         mp->directionView = mp->moveDirection;
         mp->displayDirection = 0.0f;
         mp->displayDirectionTarget = 0.0f;
@@ -198,7 +206,11 @@ f32 toMovedir(f32 angle) {
             angle = 180.0f;
         }
     }
+#ifdef VERSION_G8ME01
+    angle = (s32)(1000.0f * (270.0f - angle + mp->targetYaw) + ((270.0f - angle + mp->targetYaw) >= 0.0f ? 0.5f : -0.5f)) / 1000.0f;
+#else
     angle = (s32)(100.0f * (0.05f + (270.0f - angle + mp->targetYaw))) / 100.0f;
+#endif
     REVISE360(angle);
     return angle;
 }
@@ -217,14 +229,22 @@ f32 partyToMovedir(PartyEntry* party, f32 angle) {
             angle = 180.0f;
         }
     }
+#ifdef VERSION_G8ME01
+    angle = (s32)(1000.0f * (270.0f - angle + MW(cam, 0x198, f32)) + ((270.0f - angle + MW(cam, 0x198, f32)) >= 0.0f ? 0.5f : -0.5f)) / 1000.0f;
+#else
     angle = (s32)(100.0f * (0.05f + (270.0f - angle + MW(cam, 0x198, f32)))) / 100.0f;
+#endif
     REVISE360(angle);
     return angle;
 }
 
 f32 toMovedirSimple(f32 angle) {
     MarioWork* mp = marioGetPtr();
+#ifdef VERSION_G8ME01
+    angle = (s32)(1000.0f * (270.0f - angle + mp->targetYaw) + ((270.0f - angle + mp->targetYaw) >= 0.0f ? 0.5f : -0.5f)) / 1000.0f;
+#else
     angle = (s32)(100.0f * (0.05f + (270.0f - angle + mp->targetYaw))) / 100.0f;
+#endif
     while (angle < 0.0f) {
         angle += 360.0f;
     }
@@ -248,7 +268,11 @@ f32 toMovedir2(f32 angle, f32 ofs) {
             angle = 180.0f;
         }
     }
+#ifdef VERSION_G8ME01
+    angle = (s32)(1000.0f * (270.0f - angle + mp->targetYaw) + ((270.0f - angle + mp->targetYaw) >= 0.0f ? 0.5f : -0.5f)) / 1000.0f;
+#else
     angle = (s32)(100.0f * (0.05f + (270.0f - angle + mp->targetYaw))) / 100.0f;
+#endif
     REVISE360(angle);
     angle += revise360(angle - mp->targetYaw) >= 180.0f ? -ofs : ofs;
     return revise360(angle);
@@ -282,7 +306,11 @@ void marioSetForceMove(f32 dir, s32 time, f32 speed) {
     if (MW(mp, 0x2E, u16) == 0x19 || (MW(mp, 0x2E, u16) == 0x15 || MW(mp, 0x2E, u16) == 0x16) || MW(mp, 0x2E, u16) == 0x1A) {
         return;
     } else {
+#ifdef VERSION_G8ME01
+            marioChgMot(speed >= mp->mBaseDashSpeed ? MARIO_MOTION_DASH : MARIO_MOTION_WALK);
+#else
             marioChgMot(speed > mp->mBaseWalkSpeed ? MARIO_MOTION_DASH : MARIO_MOTION_WALK);
+#endif
             mp->moveDirection = dir;
             mp->directionView = dir;
             mp->forceMoveTimer = time;

@@ -12,11 +12,11 @@ extern s32 battle_item_gundan_zako[];
 extern s32 battle_item_magnum_battender[];
 extern s32 battle_item_monochrome__pakkun[];
 extern s32 battle_item_piders[];
-extern s32 unit_barriern_19_data_2B8A8[];
+extern s32 unit_barriern[];
 extern s32 unit_boss_magnum_battender[];
-extern s32 unit_gundan_zako_19_data_2A2B8[];
-extern s32 unit_monochrome_pakkun_19_data_389E0[];
-extern s32 unit_piders_19_data_2E9C8[];
+extern s32 unit_gundan_zako[];
+extern s32 unit_monochrome_pakkun[];
+extern s32 unit_piders[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_mri_negone_one_374;
@@ -237,8 +237,8 @@ s32 mri_btlstage_data[] = {
 };
 
 s32 btlparty_mri_mri_01_01[] = {
-    (s32)unit_gundan_zako_19_data_2A2B8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako_19_data_2A2B8, 16777216, 67108868, 1121714176,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako,
 };
 
@@ -247,7 +247,7 @@ __declspec(section ".data") s32 btlgrp_mri_mri_01_01[] = {
 };
 
 __declspec(section ".data") s32 btlparty_mri_mri_04_01[] = {
-    (s32)unit_gundan_zako_19_data_2A2B8, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_gundan_zako,
 };
 
@@ -256,8 +256,8 @@ __declspec(section ".data") s32 btlgrp_mri_mri_04_01[] = {
 };
 
 s32 btlparty_mri_mri_05_01[] = {
-    (s32)unit_gundan_zako_19_data_2A2B8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako_19_data_2A2B8, 16777216, 67108868, 1121714176,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako,
 };
 
@@ -266,10 +266,10 @@ __declspec(section ".data") s32 btlgrp_mri_mri_05_01[] = {
 };
 
 s32 btlparty_mri_mri_06_2F_02[] = {
-    (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_piders, (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1119092736,
+    (s32)unit_piders, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_piders, (s32)unit_piders, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_piders,
-    (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_piders, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_piders,
 };
 
@@ -278,11 +278,11 @@ __declspec(section ".data") s32 btlgrp_mri_mri_06_2F_02[] = {
 };
 
 s32 btlparty_mri_mri_06_2F_03[] = {
-    (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1106247680, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_piders, (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1116471296,
+    (s32)unit_piders, 16777216, 67108868, 1106247680, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_piders, (s32)unit_piders, 16777216, 67108868, 1116471296,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_piders,
-    (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1121714176, 1109393408, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_piders, (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1125515264,
+    (s32)unit_piders, 16777216, 67108868, 1121714176, 1109393408, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_piders, (s32)unit_piders, 16777216, 67108868, 1125515264,
     1109393408, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_piders,
 };
 
@@ -291,8 +291,8 @@ __declspec(section ".data") s32 btlgrp_mri_mri_06_2F_03[] = {
 };
 
 s32 btlparty_mri_mri_12_01[] = {
-    (s32)unit_monochrome_pakkun_19_data_389E0, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun_19_data_389E0, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
 };
 
@@ -301,11 +301,11 @@ __declspec(section ".data") s32 btlgrp_mri_mri_12_01[] = {
 };
 
 s32 btlparty_mri_mri_12_02[] = {
-    (s32)unit_monochrome_pakkun_19_data_389E0, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun_19_data_389E0, 16777216, 67108868, 1116471296,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
-    (s32)unit_monochrome_pakkun_19_data_389E0, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun_19_data_389E0, 16777216, 67108868, 1125515264,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_monochrome_pakkun, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_monochrome__pakkun,
 };
 
@@ -314,8 +314,8 @@ __declspec(section ".data") s32 btlgrp_mri_mri_12_02[] = {
 };
 
 s32 btlparty_mri_mri_15_01[] = {
-    (s32)unit_gundan_zako_19_data_2A2B8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako_19_data_2A2B8, 16777216, 67108868, 1121714176,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako,
 };
 
@@ -324,8 +324,8 @@ __declspec(section ".data") s32 btlgrp_mri_mri_15_01[] = {
 };
 
 s32 btlparty_mri_mri_17_01[] = {
-    (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_piders, (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1121714176,
+    (s32)unit_piders, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_piders, (s32)unit_piders, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_piders,
 };
 
@@ -334,10 +334,10 @@ __declspec(section ".data") s32 btlgrp_mri_mri_17_01[] = {
 };
 
 s32 btlparty_mri_mri_18_02[] = {
-    (s32)unit_gundan_zako_19_data_2A2B8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako_19_data_2A2B8, 16777216, 67108868, 1119092736,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako,
-    (s32)unit_barriern_19_data_2B8A8, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_barriern, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_barriern,
 };
 
@@ -346,10 +346,10 @@ __declspec(section ".data") s32 btlgrp_mri_mri_18_02[] = {
 };
 
 s32 btlparty_mri_mri_18_03[] = {
-    (s32)unit_barriern_19_data_2B8A8, 16777216, 67108868, 0, 1109393408, -1046478848, 0, 0,
-    0, 0, 0, (s32)battle_item_barriern, (s32)unit_barriern_19_data_2B8A8, 16777216, 67108868, 1117126656,
+    (s32)unit_barriern, 16777216, 67108868, 0, 1109393408, -1046478848, 0, 0,
+    0, 0, 0, (s32)battle_item_barriern, (s32)unit_barriern, 16777216, 67108868, 1117126656,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_barriern,
-    (s32)unit_barriern_19_data_2B8A8, 16777216, 67108868, 1125515264, 1109393408, 1101004800, 0, 0,
+    (s32)unit_barriern, 16777216, 67108868, 1125515264, 1109393408, 1101004800, 0, 0,
     0, 0, 0, (s32)battle_item_barriern,
 };
 
@@ -358,8 +358,8 @@ __declspec(section ".data") s32 btlgrp_mri_mri_18_03[] = {
 };
 
 s32 btlparty_mri_mri_19_01[] = {
-    (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_piders, (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1121714176,
+    (s32)unit_piders, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_piders, (s32)unit_piders, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_piders,
 };
 
@@ -368,8 +368,8 @@ __declspec(section ".data") s32 btlgrp_mri_mri_19_01[] = {
 };
 
 s32 btlparty_mri_mri_19_02[] = {
-    (s32)unit_monochrome_pakkun_19_data_389E0, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1121714176,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_piders, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_piders,
 };
 
@@ -378,11 +378,11 @@ __declspec(section ".data") s32 btlgrp_mri_mri_19_02[] = {
 };
 
 s32 btlparty_mri_mri_19_04[] = {
-    (s32)unit_monochrome_pakkun_19_data_389E0, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1116471296,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_piders, 16777216, 67108868, 1116471296,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_piders,
-    (s32)unit_monochrome_pakkun_19_data_389E0, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_piders_19_data_2E9C8, 16777216, 67108868, 1125515264,
+    (s32)unit_monochrome_pakkun, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_monochrome__pakkun, (s32)unit_piders, 16777216, 67108868, 1125515264,
     1109393408, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_piders,
 };
 
@@ -391,8 +391,8 @@ __declspec(section ".data") s32 btlgrp_mri_mri_19_04[] = {
 };
 
 s32 btlparty_mri_mri_20_02[] = {
-    (s32)unit_gundan_zako_19_data_2A2B8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_barriern_19_data_2B8A8, 16777216, 67108868, 1121714176,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_barriern, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_barriern,
 };
 
@@ -401,10 +401,10 @@ __declspec(section ".data") s32 btlgrp_mri_mri_20_02[] = {
 };
 
 s32 btlparty_mri_mri_20_03[] = {
-    (s32)unit_barriern_19_data_2B8A8, 16777216, 67108868, 1092616192, 1109393408, -1046478848, 0, 0,
-    0, 0, 0, (s32)battle_item_barriern, (s32)unit_barriern_19_data_2B8A8, 16777216, 67108868, 1119092736,
+    (s32)unit_barriern, 16777216, 67108868, 1092616192, 1109393408, -1046478848, 0, 0,
+    0, 0, 0, (s32)battle_item_barriern, (s32)unit_barriern, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_barriern,
-    (s32)unit_gundan_zako_19_data_2A2B8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_gundan_zako,
 };
 

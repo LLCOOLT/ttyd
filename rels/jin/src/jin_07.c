@@ -54,7 +54,7 @@ USER_FUNC(evt_item_set_gravity);
 USER_FUNC(evt_item_set_jump_power);
 USER_FUNC(evt_item_set_move_dir_speed);
 USER_FUNC(evt_item_status_on);
-USER_FUNC(evt_kagemario_init_14_text_4DB8);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_map_replace_mapobj);
 USER_FUNC(evt_mapobj_get_position);
 USER_FUNC(evt_mapobj_rotate);
@@ -110,7 +110,7 @@ static f32 randf(f32 min, f32 max);
 extern s32 bero_case_switch_off[];
 extern s32 bero_case_switch_on[];
 extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill_14_data_AF00[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_jin_07_negone_one_374;
 __declspec(section ".data") s32 fd_jin_07_neg_one_382[1];
@@ -650,11 +650,11 @@ EVT_BEGIN(jin_07_init_evt)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_JIN3"))
     CALL(evt_snd_set_rev_mode, 2)
-    CALL(evt_kagemario_init_14_text_4DB8)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_14_data_AF00))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     CALL(evt_npc_setup, PTR(npcEnt))
     SPAWN_EVENT(PTR(jin_07_juyo_oumu_vivian))
     CALL(evt_item_entry, STRING("item_00"), 125, 220, 75, -20, 16, GSWF(5636), 0)

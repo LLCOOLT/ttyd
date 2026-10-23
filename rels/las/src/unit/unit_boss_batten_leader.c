@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -317,7 +318,7 @@ static EVT_BEGIN(mario_party_zoom)
 EVT_END()
 
 s32 weapon_batten_leader_thunder[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
     7, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 67109634, 0, 71, 2047, -2147475452,
@@ -326,16 +327,16 @@ s32 weapon_batten_leader_thunder[] = {
 };
 
 s32 weapon_batten_leader_fire[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
     6, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 16777986, 0, 71, 2047, -2147475456,
-    0, 0, 0, 20, 50331648, 0, 0, 0,
+    0, 0, 0, VERSION_PICK(20, 75), 50331648, 0, 0, 0,
     0, 0, 0, 0, 0, 100, 0, 0,
 };
 
 s32 weapon_batten_leader_ice[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
     5, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 536870912, 33555202, 0, 71, 2047, -2147475456,
@@ -362,7 +363,7 @@ s32 weapon_batten_leader_yokeyoke[] = {
 };
 
 s32 weapon_batten_leader_stop[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
+    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 7, 2047, 0,
@@ -2232,7 +2233,7 @@ USER_FUNC(_hp_gauge_flag_on) {
 u8 battenSatelliteTo_Init(BattleUnit* unit, s32 n, s32* table) {
     BattenSpline* sp;
 
-    sp = __memAlloc(HEAP_BATTLE, sizeof(BattenSpline));
+    sp = BTL_ALLOC(sizeof(BattenSpline));
     if (unit->work[9 + n] == -1) {
         return FALSE;
     }
@@ -2259,7 +2260,7 @@ u8 battenSatelliteTo_Main(BattleUnit* unit, s32 n) {
     }
     if (sp->count >= 60) {
         if (sp != NULL) {
-            __memFree(HEAP_BATTLE, sp);
+            BTL_FREE(sp);
             unit->work[13 + n] = 0;
         }
         return FALSE;

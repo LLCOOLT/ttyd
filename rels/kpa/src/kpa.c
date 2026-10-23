@@ -578,10 +578,18 @@ EVT_BEGIN(kpa_stage_start)
     CALL(evt_mario_set_dispdir, 180)
     CALL(evt_seq_wait, 2)
     CALL(evt_twoddisp_init)
+#ifdef VERSION_G8ME01
+    CALL(evt_twoddisp_entry, STRING("batu"), 477)
+#else
     CALL(evt_twoddisp_entry, STRING("batu"), 469)
+#endif
     CALL(evt_twoddisp_set_base_position, STRING("batu"), 20, -50)
     CALL(evt_twoddisp_set_position, STRING("batu"), 10, 0)
+#ifdef VERSION_G8ME01
+    CALL(evt_twoddisp_entry, STRING("mugen"), 529)
+#else
     CALL(evt_twoddisp_entry, STRING("mugen"), 526)
+#endif
     CALL(evt_twoddisp_set_base_position, STRING("mugen"), 20, -50)
     CALL(evt_twoddisp_set_position, STRING("mugen"), 54, 3)
     CALL(kpa_get_msg, LW(0))
@@ -605,8 +613,19 @@ EVT_BEGIN(kpa_stage_start)
 EVT_END()
 
 __declspec(section ".data") s32 numeric_id[] = {
+#ifdef VERSION_G8ME01
+    31523299, 31785447, 32047595, 32309743, 32571891,
+#else
     30999003, 31261151, 31523299, 31785447, 32047595,
+#endif
 };
+
+#ifdef VERSION_G8ME01
+u16 kpa_status_icon_tbl[6][3] = {
+    { 0x21A, 0x221, 0x21C }, { 0x21B, 0x221, 0x21C }, { 0x21B, 0x222, 0x21D },
+    { 0x21B, 0x223, 0x21E }, { 0x21B, 0x224, 0x21F }, { 0x21B, 0x225, 0x220 },
+};
+#endif
 
 __declspec(section ".data") EVT_BEGIN(kpa_status_main_evt)
     LOOP(0)
@@ -677,6 +696,12 @@ USER_FUNC(kpa_muteki_check) {
     return EVT_RETURN_DONE;
 }
 
+#ifdef VERSION_G8ME01
+#define KPA_ICON_OFS 8
+#else
+#define KPA_ICON_OFS 0
+#endif
+
 void kpa_status_disp(CameraId camera, void* param) {
     Vec pos;
     s32 digit[6];
@@ -685,13 +710,25 @@ void kpa_status_disp(CameraId camera, void* param) {
 
     pos.x = -210.0f;
     pos.y = 160.0f;
+#ifdef VERSION_G8ME01
+    iconDispGx(1.0f, &pos, 0x10, kpa_status_icon_tbl[gp->language][0]);
+#else
     iconDispGx(1.0f, &pos, 0x10, (u32)gp->language ? 0x210 : 0x206);
+#endif
     pos.x = 50.0f;
     pos.y = 160.0f;
+#ifdef VERSION_G8ME01
+    iconDispGx(1.0f, &pos, 0x10, kpa_status_icon_tbl[gp->language][1]);
+#else
     iconDispGx(1.0f, &pos, 0x10, 0x208);
+#endif
     pos.x = 220.0f;
     pos.y = 160.0f;
+#ifdef VERSION_G8ME01
+    iconDispGx(1.0f, &pos, 0x10, kpa_status_icon_tbl[gp->language][2]);
+#else
     iconDispGx(1.0f, &pos, 0x10, 0x207);
+#endif
 
     n = pouchGetKpaScore();
     digit[0] = n / 100000;
@@ -711,9 +748,9 @@ void kpa_status_disp(CameraId camera, void* param) {
         pos.x += 20.0f;
     }
     pos.x += 20.0f;
-    iconDispGx(0.7f, &pos, 0x10, 0x18B);
+    iconDispGx(0.7f, &pos, 0x10, 0x18B + KPA_ICON_OFS);
     pos.x += 30.0f;
-    iconDispGx(1.0f, &pos, 0x10, 0x1D5);
+    iconDispGx(1.0f, &pos, 0x10, 0x1D5 + KPA_ICON_OFS);
 
     n = pouchGetKpaCoin();
     digit[0] = n / 10;
@@ -727,7 +764,7 @@ void kpa_status_disp(CameraId camera, void* param) {
     pos.x = 50.0f;
     iconDispGx(1.0f, &pos, 0x10, NUMERIC_ID[kwp->stage]);
     pos.x += 20.0f;
-    iconDispGx(1.0f, &pos, 0x10, 0x1EE);
+    iconDispGx(1.0f, &pos, 0x10, 0x1EE + KPA_ICON_OFS);
 
     n = kwp->lives;
     digit[0] = n / 10;

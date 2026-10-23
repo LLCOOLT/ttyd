@@ -99,9 +99,9 @@ USER_FUNC(evt_party_set_pos);
 USER_FUNC(evt_party_set_pose);
 USER_FUNC(evt_party_stop);
 USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_shuryolight_init_17_text_10B60);
-USER_FUNC(evt_shuryolight_run_evt_17_text_10828);
-USER_FUNC(evt_shuryolight_run_head_evt_17_text_10718);
+USER_FUNC(evt_shuryolight_init);
+USER_FUNC(evt_shuryolight_run_evt);
+USER_FUNC(evt_shuryolight_run_head_evt);
 USER_FUNC(evt_snd_bgm_scope);
 USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_bgmon);
@@ -123,12 +123,12 @@ extern s32 bero_close_door_play_se[];
 extern s32 bero_open_door_play_se[];
 extern s32 evt_bero_info_run[];
 extern s32 npc_init_evt[];
-extern s32 shuryolight_head_normal_17_data_53EDC[];
-extern s32 shuryolight_head_off_17_data_53FA4[];
-extern s32 shuryolight_head_tenmetu_17_data_53F54[];
-extern s32 shuryolight_pow_normal_17_data_53DB0[];
-extern s32 shuryolight_pow_tenmetu_17_data_53E60[];
-extern s32 shuryolight_tue_normal_17_data_53FDC[];
+extern s32 shuryolight_head_normal[];
+extern s32 shuryolight_head_off[];
+extern s32 shuryolight_head_tenmetu[];
+extern s32 shuryolight_pow_normal[];
+extern s32 shuryolight_pow_tenmetu[];
+extern s32 shuryolight_tue_normal[];
 
 __declspec(section ".data") u64 fd_las_28_negone_one_374;
 __declspec(section ".data") s32 fd_las_28_neg_one_382[1];
@@ -598,7 +598,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_npc_battle_start, STRING("シュリョー"))
     CALL(evt_npc_wait_battle_end)
     CALL(evt_snd_bgmoff, 512)
-    CALL(evt_shuryolight_run_evt_17_text_10828, PTR(shuryolight_pow_tenmetu_17_data_53E60), PTR(shuryolight_head_off_17_data_53FA4), PTR(shuryolight_tue_normal_17_data_53FDC))
+    CALL(evt_shuryolight_run_evt, PTR(shuryolight_pow_tenmetu), PTR(shuryolight_head_off), PTR(shuryolight_tue_normal))
     CALL(evt_party_stop, 0)
     CALL(evt_mario_set_pos, -75, 0, 0)
     CALL(evt_party_set_pos, 0, -100, 0, 25)
@@ -717,7 +717,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_cam3d_evt_set, 60, 95, 328, 60, 45, -18, 800, 11)
     WAIT_MS(800)
     CALL(evt_msg_print, 0, STRING("stg8_las_78"), 0, STRING("シュリョー"))
-    CALL(evt_shuryolight_run_head_evt_17_text_10718, PTR(shuryolight_head_tenmetu_17_data_53F54))
+    CALL(evt_shuryolight_run_head_evt, PTR(shuryolight_head_tenmetu))
     CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("A_3A"))
     WAIT_MS(170)
     CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("A_3B"))
@@ -726,7 +726,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_cam3d_evt_set, -15, 185, 675, -15, 85, -18, 500, 11)
     CALL(evt_env_blur_on, 0, 500)
     CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("S_3"))
-    CALL(evt_shuryolight_run_head_evt_17_text_10718, PTR(shuryolight_head_off_17_data_53FA4))
+    CALL(evt_shuryolight_run_head_evt, PTR(shuryolight_head_off))
     WAIT_MS(300)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -743,7 +743,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_cam3d_evt_set, 75, 86, 230, 75, 50, -18, 500, 11)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg8_las_80"), 0, STRING("シュリョー"))
-    CALL(evt_shuryolight_run_head_evt_17_text_10718, PTR(shuryolight_head_tenmetu_17_data_53F54))
+    CALL(evt_shuryolight_run_head_evt, PTR(shuryolight_head_tenmetu))
     CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("A_3A"))
     WAIT_MS(170)
     CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("A_3B"))
@@ -789,7 +789,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_msg_print_party, STRING("stg8_las_82"))
     CALL(evt_msg_select, 0, STRING("stg8_las_82_yesno"))
     CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("S_3"))
-    CALL(evt_shuryolight_run_head_evt_17_text_10718, PTR(shuryolight_head_off_17_data_53FA4))
+    CALL(evt_shuryolight_run_head_evt, PTR(shuryolight_head_off))
     CALL(evt_cam3d_evt_set, 70, 86, 230, 70, 50, -18, 0, 11)
     WAIT_FRAMES(1)
     IF_INT_EQUAL(LW(0), 0)
@@ -799,7 +799,7 @@ EVT_BEGIN(syuryo_evt)
         CALL(evt_npc_set_ry, STRING("シュリョー"), 90)
         WAIT_MS(300)
     END_IF
-    CALL(evt_shuryolight_run_head_evt_17_text_10718, PTR(shuryolight_head_tenmetu_17_data_53F54))
+    CALL(evt_shuryolight_run_head_evt, PTR(shuryolight_head_tenmetu))
     CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("A_3A"))
     WAIT_MS(170)
     CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("A_3B"))
@@ -849,7 +849,7 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 1500)
     CALL(evt_snd_sfxoff, LW(0))
     CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("S_3"))
-    CALL(evt_shuryolight_run_head_evt_17_text_10718, PTR(shuryolight_head_off_17_data_53FA4))
+    CALL(evt_shuryolight_run_head_evt, PTR(shuryolight_head_off))
     CALL(evt_snd_bgmoff, 512)
     WAIT_MS(1000)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_CEILING_BREAK1"), 75, 300, 0, LW(0))
@@ -1282,8 +1282,8 @@ EVT_END()
 static EVT_BEGIN(shuryolight_init)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 398)
         IF_INT_LESS(GSW(0), 400)
-            CALL(evt_shuryolight_init_17_text_10B60, STRING("シュリョー"))
-            CALL(evt_shuryolight_run_evt_17_text_10828, PTR(shuryolight_pow_normal_17_data_53DB0), PTR(shuryolight_head_normal_17_data_53EDC), PTR(shuryolight_tue_normal_17_data_53FDC))
+            CALL(evt_shuryolight_init, STRING("シュリョー"))
+            CALL(evt_shuryolight_run_evt, PTR(shuryolight_pow_normal), PTR(shuryolight_head_normal), PTR(shuryolight_tue_normal))
         END_IF
     END_IF
     RETURN
@@ -1348,7 +1348,7 @@ EVT_BEGIN(las_28_init_evt)
                 CALL(evt_npc_set_position, STRING("ピーチ姫"), 420, 25, 0)
                 CALL(evt_npc_set_ry, STRING("ピーチ姫"), 270)
                 CALL(evt_cam3d_evt_set, 70, 86, 230, 70, 50, -18, 0, 11)
-                CALL(evt_shuryolight_run_evt_17_text_10828, PTR(shuryolight_pow_tenmetu_17_data_53E60), PTR(shuryolight_head_off_17_data_53FA4), PTR(shuryolight_tue_normal_17_data_53FDC))
+                CALL(evt_shuryolight_run_evt, PTR(shuryolight_pow_tenmetu), PTR(shuryolight_head_off), PTR(shuryolight_tue_normal))
                 CALL(syuryo_baria)
                 CALL(evt_seq_wait, 2)
                 CALL(evt_mario_set_pose, STRING("M_S_3"))

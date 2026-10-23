@@ -161,10 +161,18 @@ __declspec(section ".data") s32 elv_key2[2];
 s32 elv_unlock2[131];
 s32 ele1_door_open[139];
 s32 ele1_door_close[139];
+#ifdef VERSION_G8ME01
+s32 ele_1[607];
+#else
 s32 ele_1[595];
+#endif
 s32 ele2_door_open[139];
 s32 ele2_door_close[139];
+#ifdef VERSION_G8ME01
+s32 ele_2[634];
+#else
 s32 ele_2[622];
+#endif
 static s32 evt_elv_init[271];
 s32 key_lock[14];
 s32 last_key_lock[36];
@@ -854,6 +862,10 @@ EVT_BEGIN(ele_1)
     CALL(evt_sub_intpl_msec_get_value)
     CALL(evt_mapobj_trans, 1, STRING("ere1_m"), 0, LW(0), 0)
     CALL(evt_hit_bind_update, STRING("A_ere1_m"))
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_get_position, STRING("ere1_m"), LW(2), LW(3), LW(4))
+    CALL(evt_snd_sfx_pos, LW(9), LW(2), LW(3), LW(4))
+#endif
     ADD(LW(0), 1000)
     CALL(evt_mario_get_pos, 0, LW(2), LW(3), LW(4))
     CALL(evt_mario_set_pos, LW(2), LW(0), LW(4))
@@ -1164,6 +1176,10 @@ EVT_BEGIN(ele_2)
     CALL(evt_sub_intpl_msec_get_value)
     CALL(evt_mapobj_trans, 1, STRING("ere2_m"), 0, LW(0), 0)
     CALL(evt_hit_bind_update, STRING("A_ere2_m"))
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_get_position, STRING("ere2_m"), LW(2), LW(3), LW(4))
+    CALL(evt_snd_sfx_pos, LW(9), LW(2), LW(3), LW(4))
+#endif
     ADD(LW(0), -998)
     CALL(evt_mario_get_pos, 0, LW(2), LW(3), LW(4))
     CALL(evt_mario_set_pos, LW(2), LW(0), LW(4))

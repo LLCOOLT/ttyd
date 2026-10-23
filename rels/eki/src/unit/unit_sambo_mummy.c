@@ -112,7 +112,7 @@ __declspec(section ".data") s32 fd_sambo_mummy___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_sambo_mummy_one_negone_359;
 __declspec(section ".data") s32 fd_sambo_mummy___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_sambo_mummy_one_364[1];
-BattleUnitKind unit_sambo_mummy_7_data_BC68;
+BattleUnitKind unit_sambo_mummy;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -195,7 +195,7 @@ __declspec(section ".data") s32 fd_sambo_mummy_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_sambo_mummy_7_data_BC68 = {
+BattleUnitKind unit_sambo_mummy = {
     104,
     "btl_un_sambo_mummy",
     8,
@@ -1101,7 +1101,7 @@ static s32 call_friend_event[] = {
 };
 
 static __declspec(section ".data") s32 entry_sambo[] = {
-    (s32)&unit_sambo_mummy_7_data_BC68, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
+    (s32)&unit_sambo_mummy, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
     0, 0, 0, 0,
 };
 

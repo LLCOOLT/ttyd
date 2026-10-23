@@ -17,6 +17,10 @@
 #include "memory.h"
 #include <string.h>
 
+#ifdef VERSION_G8ME01
+BOOL partyGetAppearPos(PartyEntry* party, Vec* out);
+#endif
+
 
 //external prototypes (TODO: move to headers)
 s32 marioShipChanging(void);
@@ -448,9 +452,21 @@ BOOL marioCheckMenuDisable(void) {
 	if (!mario_bomhei_keychk()) {
 		return TRUE;
 	}
+#ifdef VERSION_G8ME01
+	if (vivianGetStatus()) {
+		if (!(partyGetPtr(marioGetPartyId())->flags & 0x80000000)) {
+			if (vivianGetStatus() == 2) {
+				return FALSE;
+			}
+		} else {
+			return TRUE;
+		}
+	}
+#else
 	if (vivianGetStatus() && vivianGetStatus() == 2) {
 		return FALSE;
 	}
+#endif
 	if (marioChkYoshiKey()) {
 		return FALSE;
 	}
@@ -534,6 +550,16 @@ void marioFBattlePost(void) {
 	if (wp->currMotionId == MARIO_MOTION_YOSHI) {
 		marioYoshiForceCancel();
 	}
+#ifdef VERSION_G8ME01
+	{
+		PartyEntry* party = partyGetPtr(marioGetPartyId());
+		if (party) {
+			Vec pos;
+			partyGetAppearPos(party, &pos);
+			party->position = pos;
+		}
+	}
+#endif
 	((void (*)(void))partyCtrlOn)();
 	if (wp->currMotionId == MARIO_MOTION_HAMMER || wp->currMotionId == MARIO_MOTION_JABARA) {
 		marioChgMot(MARIO_MOTION_STAY);
@@ -719,6 +745,10 @@ void marioSoundInit(void) {
 	wp->soundId[0] = -1;
 	wp->soundId[1] = -1;
 	wp->soundId[2] = -1;
+#ifdef VERSION_G8ME01
+	wp->soundId[3] = -1;
+	wp->soundId[4] = -1;
+#endif
 }
 
 void marioPoseInit(void) {
@@ -812,7 +842,7 @@ void marioReInit(void) {
 	slot0 = wp->currPartySlotId[0];
 	slot1 = wp->currPartySlotId[1];
 	peachFlags = wp->peachFlags;
-	motStruct = *(void**)((u8*)wp + 0x28C);
+	motStruct = *(void**)((u8*)wp + MWOFF(0x28C));
 	trigFlags = wp->trigFlags;
 	motion = wp->currMotionId;
 	f1A8 = wp->displayDirection;
@@ -838,7 +868,7 @@ void marioReInit(void) {
 		wp->flags |= 0x80000000;
 	}
 	wp->peachFlags = peachFlags;
-	*(void**)((u8*)wp + 0x28C) = motStruct;
+	*(void**)((u8*)wp + MWOFF(0x28C)) = motStruct;
 	wp->camId = camId;
 	wp->characterId = charId;
 	wp->trigFlags = trigFlags;
@@ -925,6 +955,9 @@ void peachMain(void);
 void marioSearchUnder(void);
 void marioBottomless(void);
 void marioBalloonMain(void);
+#ifdef VERSION_G8ME01
+#define mario_kemuri_80130474 mario_kemuri // US: global name
+#endif
 void mario_kemuri_80130474(void);
 void marioForceMoveMain(void);
 void marioBoots(void);
@@ -940,7 +973,7 @@ static inline void marioMainBlur(MarioWork* wp) {
 
 static inline void marioMainEnd(MarioWork* wp) {
 	MFLD(wp, s16, 0x54) = wp->airTimer;
-	MFLD(wp, void*, 0x208) = wp->hitobjStandOn;
+	MFLD(wp, void*, MWOFF(0x208)) = wp->hitobjStandOn;
 	if (((s32 (*)(void))pouchGetHP)() <= 0) {
 		seqSetSeq(SEQ_GAME_OVER, NULL, NULL);
 	}
@@ -1013,9 +1046,9 @@ void marioMain(void) {
 	if (wp->unk4C > 0) {
 		wp->unk4C--;
 	}
-	if (MFLD(wp, s16, 0x2C0) > 0) {
-		MFLD(wp, s16, 0x2C0)--;
-		if (MFLD(wp, s16, 0x2C0) % 30 == 0 && MFLD(wp, s16, 0x2C0) > 0) {
+	if (MFLD(wp, s16, MWOFF(0x2C0)) > 0) {
+		MFLD(wp, s16, MWOFF(0x2C0))--;
+		if (MFLD(wp, s16, MWOFF(0x2C0)) % 30 == 0 && MFLD(wp, s16, MWOFF(0x2C0)) > 0) {
 			Vec drop;
 			Vec pos = {0.0f, 0.0f, 0.0f};
 			pos.x = wp->position.x;
@@ -1298,7 +1331,7 @@ void marioMove(void) {
 				}
 			}
 			else {
-				stick = MFLD(wp, s8, 0x24E);
+				stick = MFLD(wp, s8, MWOFF(0x24E));
 				stick = stick * stick;
 				if (stick < 25) {
 					marioChgPose("M_Z_1");
@@ -1430,11 +1463,11 @@ void marioMoveMain(void) {
 	vx += spd * sn;
 	vz2 = vz + spd * cs;
 	if (!(wp->flags & 0x2080000)) {
-		if (*(f32*)((u8*)wp + 0x220) != 0.0f) {
-			vx *= (f32)cos(3.1415927f * *(f32*)((u8*)wp + 0x214) / 180.0f);
+		if (*(f32*)((u8*)wp + MWOFF(0x220)) != 0.0f) {
+			vx *= (f32)cos(3.1415927f * *(f32*)((u8*)wp + MWOFF(0x214)) / 180.0f);
 		}
-		if (*(f32*)((u8*)wp + 0x218) != 0.0f) {
-			vz2 *= (f32)cos(3.1415927f * *(f32*)((u8*)wp + 0x214) / 180.0f);
+		if (*(f32*)((u8*)wp + MWOFF(0x218)) != 0.0f) {
+			vz2 *= (f32)cos(3.1415927f * *(f32*)((u8*)wp + MWOFF(0x214)) / 180.0f);
 		}
 	}
 	vx += wp->unk174.x;
@@ -1482,7 +1515,7 @@ void marioMoveMain(void) {
 		else {
 			marioCheckWall_roll(dist, spd);
 		}
-		N_dou10_yoko_yari3((u8*)wp + 0x210);
+		N_dou10_yoko_yari3((u8*)wp + MWOFF(0x210));
 		if (wp->hitobjFront && (hitGetAttr(wp->hitobjFront) & 0x800)) {
 			set_damage_root_ypos(wp->position.y);
 			marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
@@ -1973,7 +2006,7 @@ void marioPreDisp(void) {
 		return;
 	}
 	if (wp->currMotionId == MARIO_MOTION_PLANE) {
-		shadowEntryMode(2, wp->position.x, *(f32*)((u8*)wp + 0x1C0), wp->position.z, 13.333333f);
+		shadowEntryMode(2, wp->position.x, *(f32*)((u8*)wp + MWOFF(0x1C0)), wp->position.z, 13.333333f);
 		return;
 	}
 	if (wp->characterId == 2) {
@@ -1982,6 +2015,14 @@ void marioPreDisp(void) {
 		dy = (f32)cos(3.1415927f * wp->targetYaw / 180.0f);
 		zo = 14.0f * -dy;
 	}
+#ifdef VERSION_G8ME01
+	else if (wp->characterId == 1) {
+		size = 13.333333f;
+		xo = 6.0f * (f32)sin(3.1415927f * wp->targetYaw / 180.0f);
+		dy = (f32)cos(3.1415927f * wp->targetYaw / 180.0f);
+		zo = 6.0f * -dy;
+	}
+#endif
 	else {
 		xo = 0.0f;
 		size = 13.333333f;
@@ -1999,7 +2040,7 @@ void marioPreDisp(void) {
 		shadowEntryMode(t, wp->position.x + xo, wp->position.y, wp->position.z + zo, sz);
 	}
 	else {
-		dy = wp->position.y - *(f32*)((u8*)wp + 0x1C0);
+		dy = wp->position.y - *(f32*)((u8*)wp + MWOFF(0x1C0));
 		if (dy >= -2.0f) {
 			size -= dy / 13.333333f;
 			if (size < 0.1f) {

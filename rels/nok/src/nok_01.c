@@ -107,6 +107,9 @@ static USER_FUNC(starstone_set_pos);
 static USER_FUNC(starstone_set_ry);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_party_move_behind_mario);
+#endif
 static USER_FUNC(yami_view);
 void iri_08_msg(s32 type, void** work);
 extern s32 envSetYami[];
@@ -145,11 +148,19 @@ static s32 nokotarou_talk[36];
 s32 nokopapa_init[19];
 s32 nokopapa_talk[72];
 s32 nokonoko_K_talk[69];
+#ifdef VERSION_G8ME01
+s32 boss_noko_open_gate[184];
+#else
 s32 boss_noko_open_gate[181];
+#endif
 static __declspec(section ".data") s32 iri_17_item_tbl[2];
 s32 boss_noko_talk[352];
 s32 nokorin_init[30];
+#ifdef VERSION_G8ME01
+s32 nokorin_talk[281];
+#else
 s32 nokorin_talk[267];
+#endif
 static s32 odoriko_1_talk[44];
 static s32 odoriko_1_init[33];
 static s32 odoriko_2_talk[44];
@@ -502,6 +513,9 @@ EVT_BEGIN(boss_noko_open_gate)
         CALL(evt_mario_set_dir, 270, 0, 0)
     END_INLINE_EVENT
     WAIT_MS(1000)
+#ifdef VERSION_G8ME01
+    CALL(evt_party_move_behind_mario, 0)
+#endif
     CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
     CALL(evt_mario_set_pose, STRING("M_N_B"))
     WAIT_MS(800)
@@ -739,7 +753,16 @@ EVT_BEGIN(nokorin_talk)
         CALL(evt_msg_print, 0, STRING("stg1_nok_78"), 0, 0)
     END_IF
     CASE_DEFAULT
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_get_party, LW(0))
+    IF_INT_EQUAL(LW(0), 2)
+        CALL(evt_msg_print, 0, STRING("stg1_nok_77"), 0, 0)
+        ELSE
+        CALL(evt_msg_print, 0, STRING("stg1_nok_78"), 0, 0)
+    END_IF
+#else
     CALL(evt_msg_print, 0, STRING("stg1_nok_78_01"), 0, 0)
+#endif
 END_SWITCH
 RETURN
 EVT_END()

@@ -6,6 +6,7 @@
 #include "driver/icondrv.h"
 #include "battle/battle_disp.h"
 #include "battle/battle_unit.h"
+#include "icon_ids.h"
 
 extern ActionCommandEntry ActionCommandList[];
 extern BattleWork* _battleWorkPointer;
@@ -277,49 +278,49 @@ u16 BattleACGetButtonIcon(s32 button, s32 pressed) {
 
 	switch (button) {
 	case 0x100:
-		if (pressed) icon = 0x65; else icon = 0x64;
+		if (pressed) icon = ICON_065; else icon = ICON_064;
 		break;
 	case 0x200:
-		if (pressed) icon = 0x67; else icon = 0x66;
+		if (pressed) icon = ICON_067; else icon = ICON_066;
 		break;
 	case 0x400:
-		if (pressed) icon = 0x69; else icon = 0x68;
+		if (pressed) icon = ICON_069; else icon = ICON_068;
 		break;
 	case 0x800:
-		if (pressed) icon = 0x6B; else icon = 0x6A;
+		if (pressed) icon = ICON_06B; else icon = ICON_06A;
 		break;
 	case 0x20:
-		if (pressed) icon = 0x81; else icon = 0x80;
+		if (pressed) icon = ICON_081; else icon = ICON_080;
 		break;
 	case 0x40:
-		if (pressed) icon = 0x7F; else icon = 0x7E;
+		if (pressed) icon = ICON_07F; else icon = ICON_07E;
 		break;
 	case 0x10:
-		if (pressed) icon = 0x83; else icon = 0x82;
+		if (pressed) icon = ICON_083; else icon = ICON_082;
 		break;
 	case 0x10000:
-		if (pressed) icon = 0x7C; else icon = 0x79;
+		if (pressed) icon = ICON_07C; else icon = ICON_079;
 		break;
 	case 0x20000:
-		if (pressed) icon = 0x76; else icon = 0x79;
+		if (pressed) icon = ICON_076; else icon = ICON_079;
 		break;
 	case 0x40000:
-		if (pressed) icon = 0x78; else icon = 0x79;
+		if (pressed) icon = ICON_078; else icon = ICON_079;
 		break;
 	case 0x80000:
-		if (pressed) icon = 0x7A; else icon = 0x79;
+		if (pressed) icon = ICON_07A; else icon = ICON_079;
 		break;
 	case 0x90000:
-		if (pressed) icon = 0x7D; else icon = 0x79;
+		if (pressed) icon = ICON_07D; else icon = ICON_079;
 		break;
 	case 0xA0000:
-		if (pressed) icon = 0x77; else icon = 0x79;
+		if (pressed) icon = ICON_077; else icon = ICON_079;
 		break;
 	case 0x50000:
-		if (pressed) icon = 0x7B; else icon = 0x79;
+		if (pressed) icon = ICON_07B; else icon = ICON_079;
 		break;
 	case 0x60000:
-		if (pressed) icon = 0x75; else icon = 0x79;
+		if (pressed) icon = ICON_075; else icon = ICON_079;
 		break;
 	}
 	return icon;
@@ -356,7 +357,7 @@ void BattleAcDrawGauge(s32 x, s32 y, s32 width, f32 ratio, s32 level, s32 a, s32
 	pos = (Vec){0.0f, 0.0f, 0.0f};
 	pos.x = x - 200;
 	pos.y = y + 25;
-	iconDispGx(&pos, 0x10, 0x8C, 1.0f);
+	iconDispGx(&pos, 0x10, ICON_08C, 1.0f);
 
 	if (level >= 2) {
 		gaugeQuad(cam, x - 289, y + 50, x - 289 + width * a / max, y + 32, 0x21, 0x21, 0x75, 0xFF);

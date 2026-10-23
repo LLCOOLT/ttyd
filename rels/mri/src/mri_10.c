@@ -22,7 +22,7 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envoff);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(lect_juyoitem_rel_set);
-extern s32 all_juyoitem_lecture_rel_19_data_3A540[];
+extern s32 all_juyoitem_lecture_rel[];
 extern s32 evt_bero_info_run[];
 extern s32 mri_countdown[];
 extern s32 mri_puni_init[];
@@ -107,7 +107,7 @@ static EVT_BEGIN(item_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_puni_puninum_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-    CALL(lect_juyoitem_rel_set, PTR(all_juyoitem_lecture_rel_19_data_3A540))
+    CALL(lect_juyoitem_rel_set, PTR(all_juyoitem_lecture_rel))
     CALL(evt_item_entry, STRING("item00"), 7, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_important_item, STRING("item00"))

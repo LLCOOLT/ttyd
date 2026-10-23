@@ -1,3 +1,4 @@
+#include "version.h"
 #pragma dollar_identifiers on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -10,10 +11,14 @@
 #include "dolphin/mtx.h"
 
 typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; Vec ofs; Vec rot; } ZakoGun;
-typedef struct ZakoGunWork { s32 flag; s32 targetId; s32 state; s32 timer; Vec pos; u8 field_0x1c[0x34 - 0x1c]; f32 radius; f32 angle; f32 speed; u8 field_0x40[0x48 - 0x40]; Vec start; Vec end; s32 timer2; s32 steps; s32 count; s32 sfx; } ZakoGunWork;
+typedef struct ZakoGunWork { s32 flag; s32 targetId;
+#ifdef VERSION_G8ME01
+    u8 us_pad08[0xC]; // US: 12 more bytes here
+#endif
+    s32 state; s32 timer; Vec pos; u8 field_0x1c[0x34 - 0x1c]; f32 radius; f32 angle; f32 speed; u8 field_0x40[0x48 - 0x40]; Vec start; Vec end; s32 timer2; s32 steps; s32 count; s32 sfx; } ZakoGunWork;
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 extern ZakoGun* zakogun;
-extern ZakoGunWork* work_20_bss_6C;
+extern ZakoGunWork* work;
 ExtPose* extGetPosePtr(void);
 BattleUnit* zakogun_get_ptr(void);
 s32 zakogun_get_kanbu_id(void);
@@ -122,7 +127,7 @@ static __declspec(section ".data") s32 wait_event[6];
 
 USER_FUNC(zakogun_kanbu_on_ball) {
     BattleUnit* kanbu = BattleGetUnitPtr(_battleWorkPointer, zakogun_get_kanbu_id());
-    BtlUnit_SetPos(kanbu, work_20_bss_6C->pos.x, 45.0f + work_20_bss_6C->pos.y, work_20_bss_6C->pos.z);
+    BtlUnit_SetPos(kanbu, work->pos.x, 45.0f + work->pos.y, work->pos.z);
     return EVT_RETURN_DONE;
 }
 
@@ -134,7 +139,7 @@ USER_FUNC(zakogun_ext_init3) {
     s32 b;
     f32 dx, dy, dz, dist;
 
-    work_20_bss_6C->flag = 2;
+    work->flag = 2;
     for (i = 0; i < 500; i++, pose++) {
         zakogun_ext_init123_common(pose, i);
         zakogun[i].home.x = -50.0f + 20.0f * (i % 12) + (5.0f * rand() / 32767.0f - 2.5f);
@@ -304,7 +309,7 @@ static BattleUnitKindPart parts[] = {
 };
 
 s32 weapon_gundan_zako_group3_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
     5, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 536887300, 770, 0, 135, 2047, 4,
@@ -481,22 +486,22 @@ void zakogun_ext_main3(void) {
                 break;
             case 20:
                 if (i >= 0 && i < 484) {
-                    left = work_20_bss_6C->pos.x - work_20_bss_6C->radius;
-                    top = work_20_bss_6C->pos.y + work_20_bss_6C->radius;
-                    zako->target.x = left + (i % 22) * (2.0f * work_20_bss_6C->radius / 22.0f);
-                    zako->target.y = top - (i / 22) * (2.0f * work_20_bss_6C->radius / 22.0f);
-                    zako->target.z = work_20_bss_6C->pos.z + rand() / 32767.0f - 0.5f;
-                    dx = work_20_bss_6C->pos.x - zako->target.x;
-                    dy = work_20_bss_6C->pos.y - zako->target.y;
-                    if ((f32)sqrt(dx * dx + dy * dy) > work_20_bss_6C->radius) {
-                        zako->target.x = work_20_bss_6C->pos.x;
-                        zako->target.y = work_20_bss_6C->pos.y;
-                        zako->target.z = work_20_bss_6C->pos.z - 10.0f;
+                    left = work->pos.x - work->radius;
+                    top = work->pos.y + work->radius;
+                    zako->target.x = left + (i % 22) * (2.0f * work->radius / 22.0f);
+                    zako->target.y = top - (i / 22) * (2.0f * work->radius / 22.0f);
+                    zako->target.z = work->pos.z + rand() / 32767.0f - 0.5f;
+                    dx = work->pos.x - zako->target.x;
+                    dy = work->pos.y - zako->target.y;
+                    if ((f32)sqrt(dx * dx + dy * dy) > work->radius) {
+                        zako->target.x = work->pos.x;
+                        zako->target.y = work->pos.y;
+                        zako->target.z = work->pos.z - 10.0f;
                     }
                 } else {
-                    zako->target.x = work_20_bss_6C->pos.x;
-                    zako->target.y = work_20_bss_6C->pos.y;
-                    zako->target.z = work_20_bss_6C->pos.z - 10.0f;
+                    zako->target.x = work->pos.x;
+                    zako->target.y = work->pos.y;
+                    zako->target.z = work->pos.z - 10.0f;
                 }
                 zako->start.x = zako->pos.x;
                 zako->start.y = zako->pos.y;
@@ -522,14 +527,14 @@ void zakogun_ext_main3(void) {
                     zako->state = 35;
                     zako->pos.y = zako->target.y;
                     zako->rot.z = 360.0f * rand() / 32767.0f;
-                    zako->ofs.x = zako->pos.x - work_20_bss_6C->pos.x;
-                    zako->ofs.y = zako->pos.y - work_20_bss_6C->pos.y;
+                    zako->ofs.x = zako->pos.x - work->pos.x;
+                    zako->ofs.y = zako->pos.y - work->pos.y;
                     zakogun_set_pose(zako, 0, 20, 2);
-                    work_20_bss_6C->count++;
+                    work->count++;
                 }
                 break;
             case 35:
-                if (work_20_bss_6C->count == 500) {
+                if (work->count == 500) {
                     zako->state = 40;
                 }
                 break;
@@ -612,12 +617,12 @@ void zakogun_ext_main3(void) {
             PSMTXConcat(pose->mtx, m, pose->mtx);
             pose->mtx[0][3] = zako->ofs.x;
             pose->mtx[1][3] = zako->ofs.y;
-            pose->mtx[2][3] = work_20_bss_6C->pos.z + 0.05f * i;
-            PSMTXRotRad(m, 'z', 0.017453292f * work_20_bss_6C->angle);
+            pose->mtx[2][3] = work->pos.z + 0.05f * i;
+            PSMTXRotRad(m, 'z', 0.017453292f * work->angle);
             PSMTXConcat(m, pose->mtx, pose->mtx);
-            pose->mtx[0][3] += work_20_bss_6C->pos.x;
-            pose->mtx[1][3] += work_20_bss_6C->pos.y;
-            pose->mtx[2][3] += work_20_bss_6C->pos.z;
+            pose->mtx[0][3] += work->pos.x;
+            pose->mtx[1][3] += work->pos.y;
+            pose->mtx[2][3] += work->pos.z;
             zako->pos.x = pose->mtx[0][3];
             zako->pos.y = pose->mtx[1][3];
             zako->pos.z = pose->mtx[2][3];
@@ -642,10 +647,10 @@ USER_FUNC(zakogun_attack3_1) {
 
     if (isFirstCall) {
         Vec pos = {0.0f, 55.0f, 0.0f};
-        work_20_bss_6C->pos = pos;
-        work_20_bss_6C->radius = 25.0f;
-        work_20_bss_6C->angle = 0.0f;
-        work_20_bss_6C->count = 0;
+        work->pos = pos;
+        work->radius = 25.0f;
+        work->angle = 0.0f;
+        work->count = 0;
         for (i = 0; i < 500; i++) {
             zakogun[i].state = 20;
         }
@@ -663,56 +668,56 @@ USER_FUNC(zakogun_attack3_2) {
     s32 sfx = evtGetValue(event, event->args[0]);
 
     if (isFirstCall) {
-        work_20_bss_6C->count = 0;
-        work_20_bss_6C->state = 0;
+        work->count = 0;
+        work->state = 0;
     }
-    switch (work_20_bss_6C->state) {
+    switch (work->state) {
         case 0:
-            work_20_bss_6C->state = 5;
-            work_20_bss_6C->speed = 0.0f;
+            work->state = 5;
+            work->speed = 0.0f;
         case 5:
-            work_20_bss_6C->pos.x += work_20_bss_6C->speed;
-            work_20_bss_6C->angle -= work_20_bss_6C->speed;
-            work_20_bss_6C->speed -= 0.06f;
-            if (work_20_bss_6C->targetId != -1) {
-                BattleUnit* target = BattleGetUnitPtr(_battleWorkPointer, work_20_bss_6C->targetId);
-                if (work_20_bss_6C->pos.x <= target->mPosition.x) {
+            work->pos.x += work->speed;
+            work->angle -= work->speed;
+            work->speed -= 0.06f;
+            if (work->targetId != -1) {
+                BattleUnit* target = BattleGetUnitPtr(_battleWorkPointer, work->targetId);
+                if (work->pos.x <= target->mPosition.x) {
                     unit->work[0] = 1;
                 }
             }
-            if (work_20_bss_6C->pos.x <= -200.0f) {
-                work_20_bss_6C->state = 8;
+            if (work->pos.x <= -200.0f) {
+                work->state = 8;
             }
             break;
         case 8:
-            work_20_bss_6C->pos.x += work_20_bss_6C->speed;
-            work_20_bss_6C->angle -= work_20_bss_6C->speed;
-            work_20_bss_6C->speed += 5.0f;
-            if (work_20_bss_6C->speed >= 0.0f) {
-                work_20_bss_6C->state = 10;
+            work->pos.x += work->speed;
+            work->angle -= work->speed;
+            work->speed += 5.0f;
+            if (work->speed >= 0.0f) {
+                work->state = 10;
             }
             break;
         case 10:
-            work_20_bss_6C->pos.x += work_20_bss_6C->speed;
-            work_20_bss_6C->angle -= work_20_bss_6C->speed;
-            work_20_bss_6C->speed += 0.06f;
-            if (work_20_bss_6C->pos.x >= -30.0f) {
-                work_20_bss_6C->state = 13;
+            work->pos.x += work->speed;
+            work->angle -= work->speed;
+            work->speed += 0.06f;
+            if (work->pos.x >= -30.0f) {
+                work->state = 13;
             }
             break;
         case 13:
-            work_20_bss_6C->pos.x += work_20_bss_6C->speed;
-            work_20_bss_6C->angle -= work_20_bss_6C->speed;
-            work_20_bss_6C->speed -= 1.0f;
-            if (work_20_bss_6C->speed <= 0.0f) {
-                work_20_bss_6C->state = 15;
+            work->pos.x += work->speed;
+            work->angle -= work->speed;
+            work->speed -= 1.0f;
+            if (work->speed <= 0.0f) {
+                work->state = 15;
                 psndSFXOff(sfx);
-                work_20_bss_6C->timer = 20;
+                work->timer = 20;
             }
             break;
         case 15:
-            work_20_bss_6C->timer--;
-            if (work_20_bss_6C->timer < 0) {
+            work->timer--;
+            if (work->timer < 0) {
                 return EVT_RETURN_DONE;
             }
             break;

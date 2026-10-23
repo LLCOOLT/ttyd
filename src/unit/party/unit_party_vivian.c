@@ -1,3 +1,4 @@
+#include "version.h"
 #pragma dollar_identifiers on
 #include "battle/battle.h"
 #include "battle/battle_database_common.h"
@@ -26,6 +27,7 @@ typedef struct HeartWork {
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "icon_ids.h"
 
 USER_FUNC(_vivian_make_extra_work_area);
 USER_FUNC(battle_evt_majo_disp_on);
@@ -178,7 +180,7 @@ s32 partyWeapon_VivianMagicalPowder[48];
 s32 partyWeapon_VivianCharmKissAttack[48];
 s32 partyVivianAttack_NormalAttack[581];
 s32 partyVivianAttack_ShadowGuard[430];
-s32 partyVivianAttack_MagicalPowder[442];
+s32 partyVivianAttack_MagicalPowder[VERSION_PICK(442, 448)];
 s32 partyVivianAttack_CharmKissAttack[464];
 s32 vivian_shadow_tail_event[78];
 s32 vivian_counter_damage_event[177];
@@ -531,16 +533,16 @@ EVT_BEGIN(vivian_hide_event)
 EVT_END()
 
 s32 partyWeapon_VivianNormalAttack[] = {
-    (s32)"btl_wn_ptr_normal", 22020096, 0, (s32)"msg_ptr_kagenuke", 1677721600, 1065353216, 16868402, (s32)weaponGetPowerFromPartyAttackLv,
+    (s32)"btl_wn_ptr_normal", VERSION_PICK(22020096, 22544384), 0, (s32)"msg_ptr_kagenuke", 1677721600, 1065353216, 16868402, (s32)weaponGetPowerFromPartyAttackLv,
     3, 3, 4, 4, 5, 5, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 536870912, 770, (s32)"msg_ac_kagenuke", 196615, 2, -2147475452,
     0, 0, 0, 100, 33554432, 0, 0, 0,
-    0, 0, 0, 0, (s32)partyVivianAttack_NormalAttack, 100, 131584, 0,
+    0, 0, 0, 0, (s32)partyVivianAttack_NormalAttack, 100, VERSION_PICK(131584, 262656), 0,
 };
 
 s32 partyWeapon_VivianShadowGuard[] = {
-    (s32)"btl_wn_ptr_lv1", 22085632, 0, (s32)"msg_ptr_kagegakure", 1677787136, 1065353216, 33907762, 0,
+    (s32)"btl_wn_ptr_lv1", VERSION_PICK(22085632, 22609920), 0, (s32)"msg_ptr_kagegakure", 1677787136, 1065353216, VERSION_PICK(33907762, 17130546), 0,
     0, 2, 2, 3, 3, 4, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830240, 268435458, 770, (s32)"msg_ac_kagegakure", 131080, 2047, -2147475452,
@@ -549,23 +551,100 @@ s32 partyWeapon_VivianShadowGuard[] = {
 };
 
 s32 partyWeapon_VivianMagicalPowder[] = {
-    (s32)"btl_wn_ptr_lv2", 22151168, 0, (s32)"msg_ptr_mahou_no_kona", 1678114816, 1065353216, 17130546, (s32)weaponGetACOutputParam,
+    (s32)"btl_wn_ptr_lv2", VERSION_PICK(22151168, 22675456), 0, (s32)"msg_ptr_mahou_no_kona", 1678114816, 1065353216, 17130546, (s32)weaponGetACOutputParam,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 16777986, (s32)"msg_ac_mahou_no_kona", 131143, 2047, -2147475456,
     0, 0, 0, 100, 50331648, 0, 0, 0,
-    0, 0, 0, 0, (s32)partyVivianAttack_MagicalPowder, 100, 328960, 0,
+    0, 0, 0, 0, (s32)partyVivianAttack_MagicalPowder, 100, VERSION_PICK(328960, 656640), 0,
 };
 
 s32 partyWeapon_VivianCharmKissAttack[] = {
-    (s32)"btl_wn_ptr_lv3", 22216704, 0, (s32)"msg_ptr_meromero_kiss", 1677983744, 1065353216, 33907762, 0,
+    (s32)"btl_wn_ptr_lv3", VERSION_PICK(22216704, 22740992), 0, (s32)"msg_ptr_meromero_kiss", 1677983744, 1065353216, VERSION_PICK(33907762, 17130546), 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, (s32)"msg_ac_meromero_kiss", 131072, 2047, -2147475452,
     0, 0, 6554368, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)partyVivianAttack_CharmKissAttack, 100, 328960, 0,
+    0, 0, 0, 0, (s32)partyVivianAttack_CharmKissAttack, 100, VERSION_PICK(328960, 656640), 0,
 };
 
+#ifdef VERSION_G8ME01
+s32 partyVivianAttack_NormalAttack[] = {
+    327771, (s32)btlevtcmd_JumpSetting, -2, 20, -230000000, -229999284, 196699, (s32)btlevtcmd_GetSelectEnemy,
+    -29999997, -29999996, 131096, -29999997, -1, 65540, 99, 33,
+    196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -29999988, 131163, (s32)btlevtcmd_WeaponAftereffect, -29999988, 196699,
+    (s32)btlevtcmd_GetPartyTechLv, -2, -30000000, 65570, -30000000, 65572, 2, 196699,
+    (s32)_make_kagenuke_weapon, -29999988, 2, 65572, 1, 196699, (s32)_make_kagenuke_weapon, -29999988,
+    2, 42, 196699, (s32)_make_kagenuke_weapon, -29999988, 2, 49, 262235,
+    (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996, 65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost,
+    -2, 196699, (s32)btlevtcmd_RunDataEventChild, -2, 7, 196699, (s32)evt_btl_camera_set_mode, 0,
+    11, 393307, (s32)evt_btl_camera_set_homing_unitparts, 0, -2, 1, -29999997, -29999996,
+    196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0, 200,
+    131163, (s32)btlevtcmd_CommandGetWeaponActionLv, -30000000, 196699, (s32)btlevtcmd_AcSetDifficulty, -2, -30000000, 589915,
+    (s32)btlevtcmd_AcSetParamAll, 1, 1, 40, 1, 2, 0, 3,
+    0, 131163, (s32)btlevtcmd_AcSetFlag, 23, 327771, (s32)btlevtcmd_SetupAC, -2, 18,
+    1, 0, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_VIVIAN_ATTACK1", 0, 327771, (s32)battle_evt_majo_disp_off,
+    -2, 1, 0, 0, 131163, (s32)btlevtcmd_StartAC, 1, 393307,
+    (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998, 327771, (s32)_get_vivian_attack_position,
+    -29999997, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_GetPos, -2, -250000000,
+    -29999999, -250000000, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999, -29999998,
+    50, 0, 5, 0, -1, 262235, (s32)btlevtcmd_SetUnitWork, -2,
+    3, 1, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 393307,
+    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_VIVIAN_ATTACK2", -250000000, 0, -250000000, 458843, (s32)battle_evt_majo_disp_on,
+    -2, 1, -30000000, -29999999, -29999998, 0, 327771, (s32)btlevtcmd_SetPos,
+    -2, -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996,
+    -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999994,
+    -29999993, -29999992, 327771, (s32)_get_vivian_attack_position, -29999997, -30000000, -29999999, -29999998,
+    327771, (s32)_get_vivian_attack_position, -29999997, -29999994, -29999993, -29999992, 262235, (s32)btlevtcmd_TransStageFloorPosition,
+    -29999994, -29999993, -29999992, 196699, (s32)btlevtcmd_GetFaceDirection, -29999997, -29999985, 131127,
+    -29999985, -1, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 327771, (s32)btlevtcmd_GetPos,
+    -2, -29999994, -29999993, -29999992, 589915, (s32)_get_move_frame, -30000000, -29999999,
+    -29999998, -29999994, -29999993, -29999992, -229995904, -29999994, 131101, -29999994,
+    1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_VIVIAN_ATTACK3", -250000000, 0, -250000000,
+    655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999, -29999998, 12, 0,
+    5, 0, -1, 33, 65539, 9, 393307, (s32)btlevtcmd_CommandPreCheckDamage,
+    -2, -29999997, -29999996, 256, -29999995, 131096, -29999995, 5,
+    458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999988, 256, -29999995,
+    33, 65627, (s32)btlevtcmd_ResultAC, 131122, -29999990, 0, 65539, 10,
+    131101, -29999990, 1, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996,
+    -29999988, 1048832, -29999995, 32, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997,
+    -29999996, -29999988, 256, -29999995, 33, 65570, -29999995, 65579,
+    2, 65579, 3, 65579, 6, 65579, 4, 46,
+    65572, 1, 42, 49, 131097, -29999995, 1, 262235,
+    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PTR_A1_2", 65546, 166, 131096, -29999995,
+    3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38, 33, 131096, -29999995,
+    6, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 39, 33, 131096, -29999995,
+    2, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 33, 65546, 500,
+    65540, 90, 33, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PTR_A1_2",
+    196699, (s32)btlevtcmd_ftomsec, 4, -30000000, 65546, -30000000, 196699, (s32)evt_snd_sfxon,
+    (s32)"SFX_BTL_VIVIAN_ATTACK4", 0, 131163, (s32)btlevtcmd_GetResultAC, -30000000, 131102, -30000000, 2,
+    458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999988, 131328, -29999995,
+    32, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999988, 536871168,
+    -29999995, 33, 131102, -30000000, 2, 262235, (s32)btlevtcmd_GetResultPrizeLv, -29999997,
+    0, -29999994, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999,
+    -29999998, 327771, (s32)btlevtcmd_ACSuccessEffect, -29999994, -30000000, -29999999, -29999998, 196699,
+    (s32)btlevtcmd_AudienceDeclareACResult, -29999988, -29999994, 32, 196699, (s32)btlevtcmd_AudienceDeclareACResult, -29999988, -1,
+    33, 65546, 500, 65539, 90, 65627, (s32)btlevtcmd_StopAC, 65539,
+    95, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0,
+    1, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PTR_A1_1", 327771, (s32)btlevtcmd_GetPos,
+    -2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999,
+    -29999998, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999, -29999998, 12,
+    0, 5, 0, -1, 262235, (s32)btlevtcmd_SetUnitWork, -2, 3,
+    0, 327771, (s32)battle_evt_majo_disp_off, -2, 1, 0, 0, 327771,
+    (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_GetPos, -2,
+    -250000000, -29999999, -250000000, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999,
+    -29999998, 40, 0, 5, 0, -1, 110, 393307,
+    (s32)btlevtcmd_ACRStart, -2, 14, 29, 29, 0, 112, 327771,
+    (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 458843, (s32)battle_evt_majo_disp_on, -2,
+    1, -30000000, -29999999, -29999998, 0, 327771, (s32)btlevtcmd_SetPos, -2,
+    -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_ACRGetResult, -29999994, -29999993, 131096,
+    -29999994, 2, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000, 393307, (s32)btlevtcmd_AudienceDeclareAcrobatResult,
+    -30000000, 1, 0, 0, 0, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
+    1, (s32)"PTR_Y_1", 65545, 52, 33, 65539, 99, 65627,
+    (s32)evt_audience_ap_recovery, 65627, (s32)btlevtcmd_InviteApInfoReport, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 65630, (s32)btldefaultevt_SuitoruBadgeEffect,
+    131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
+};
+#else
 s32 partyVivianAttack_NormalAttack[] = {
     327771, (s32)btlevtcmd_JumpSetting, -2, 20, -230000000, -229999284, 196699, (s32)btlevtcmd_GetSelectEnemy,
     -29999997, -29999996, 131096, -29999997, -1, 65540, 99, 33,
@@ -641,6 +720,7 @@ s32 partyVivianAttack_NormalAttack[] = {
     (s32)evt_audience_ap_recovery, 65627, (s32)btlevtcmd_InviteApInfoReport, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 65630, (s32)btldefaultevt_SuitoruBadgeEffect,
     131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
 };
+#endif
 
 s32 partyVivianAttack_ShadowGuard[] = {
     131122, -29999997, -3, 196699, (s32)btlevtcmd_GetBodyId, -29999997, -29999996, 131163,
@@ -699,6 +779,66 @@ s32 partyVivianAttack_ShadowGuard[] = {
     99, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
 };
 
+#ifdef VERSION_G8ME01
+s32 partyVivianAttack_MagicalPowder[] = {
+    196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096, -29999997, -1, 65540,
+    99, 33, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -29999988, 131163, (s32)btlevtcmd_WeaponAftereffect,
+    -29999988, 131163, (s32)btlevtcmd_AttackDeclareAll, -2, 65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost,
+    -2, 196699, (s32)btlevtcmd_RunDataEventChild, -2, 7, 65545, 20, 131163,
+    (s32)btlevtcmd_CommandGetWeaponActionLv, -30000000, 196699, (s32)btlevtcmd_AcSetDifficulty, -2, -30000000, 131163, (s32)btlevtcmd_AcGetDifficulty,
+    -30000000, 131126, -30000000, 3, 65570, -30000000, 65576, -3,
+    131122, -30000000, 360, 65572, -2, 131122, -30000000, 270,
+    65572, -1, 131122, -30000000, 210, 65572, 0, 131122,
+    -30000000, 180, 65572, 1, 131122, -30000000, 160, 65572,
+    2, 131122, -30000000, 140, 42, 131122, -30000000, 120,
+    49, 589915, (s32)btlevtcmd_AcSetParamAll, -30000000, 1, 5, -3, 1,
+    -250000000, -250000000, -250000000, 131163, (s32)btlevtcmd_AcSetFlag, 7, 327771, (s32)btlevtcmd_SetupAC,
+    -2, 10, 1, 0, 65545, 22, 196699, (s32)evt_btl_camera_set_mode,
+    0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2, 1, 196699,
+    (s32)evt_btl_camera_set_moveSpeedLv, 0, 4, 196699, (s32)evt_btl_camera_set_zoom, 0, 400, 327771,
+    (s32)evt_btl_camera_set_posoffset, 0, 20, 0, 0, 131163, (s32)btlevtcmd_StartAC, 1,
+    65627, (s32)btlevtcmd_ResultAC, 65627, (s32)btlevtcmd_StopAC, 110, 327771, (s32)btlevtcmd_GetPos, -2,
+    -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_GetWidth, -2, -29999995, 196699,
+    (s32)btlevtcmd_GetHeight, -2, -29999994, 983131, (s32)evt_eff, 0, (s32)"stardust", 4,
+    -30000000, -29999999, -29999998, -29999995, -29999994, 30, 60, 0,
+    0, 0, 0, 112, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_VIVIAN_MAGIC1",
+    -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PTR_A3_1",
+    196699, (s32)btlevtcmd_ftof, 20, -30000000, 65545, 20, 196699, (s32)btlevtcmd_ftof,
+    26, -30000000, 196699, (s32)btlevtcmd_ftof, 46, -29999999, 393307, (s32)btlevtcmd_ACRStart,
+    -2, -30000000, -29999999, -29999999, 0, 196699, (s32)btlevtcmd_ACRGetResult, -29999994,
+    -29999993, 65570, -29999994, 65577, 2, 393307, (s32)btlevtcmd_AudienceDeclareAcrobatResult, -29999988,
+    1, 0, 0, 0, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
+    (s32)"PTR_Y_1", 42, 65627, (s32)evt_audience_acrobat_notry, 49, 196699, (s32)evt_btl_camera_set_mode, 0,
+    0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 327771, (s32)evt_btl_camera_set_posoffset, 0,
+    0, 0, 0, 65545, 40, 131122, -29999990, 0,
+    65539, 10, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999,
+    -29999998, 983131, (s32)evt_eff, 0, (s32)"kemuri_test", 6, -30000000, -29999999,
+    -29999998, -229998976, 0, 0, 0, 0, 0, 0,
+    0, 393307, (s32)btlevtcmd_CommandPreCheckDamage, -2, -29999997, -29999996, 256, -29999994,
+    131097, -29999994, 1, 131096, -29999994, 3, 196699, (s32)btlevtcmd_StartAvoid,
+    -29999997, 38, 33, 131096, -29999994, 6, 196699, (s32)btlevtcmd_StartAvoid,
+    -29999997, 39, 33, 131096, -29999994, 2, 196699, (s32)btlevtcmd_StartAvoid,
+    -29999997, 40, 33, 65540, 50, 33, 196699, (s32)btlevtcmd_AcGetOutputParam,
+    0, -30000000, 131100, -30000000, 3, 393307, (s32)btlevtcmd_CommandCheckDamage, -2,
+    -29999997, -29999996, 131328, -29999995, 32, 393307, (s32)btlevtcmd_CommandCheckDamage, -2,
+    -29999997, -29999996, 256, -29999995, 33, 131096, -29999995, 18,
+    196699, (s32)btlevtcmd_AcGetOutputParam, 0, -30000000, 65570, -30000000, 65576, 0,
+    131122, -30000000, -1, 65579, 1, 65579, 2, 131122,
+    -30000000, 0, 46, 65579, 3, 65579, 4, 131122,
+    -30000000, 1, 46, 42, 131122, -30000000, 2, 49,
+    131101, -30000000, 0, 262235, (s32)btlevtcmd_GetResultPrizeLv, -29999997, -30000000, -29999994,
+    393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998, 327771,
+    (s32)btlevtcmd_ACSuccessEffect, -29999994, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_AudienceDeclareACResult, -29999988,
+    -29999994, 32, 196699, (s32)btlevtcmd_AudienceDeclareACResult, -29999988, -1, 33, 33,
+    65539, 50, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 131097, -29999997,
+    -1, 131125, -29999990, 1, 65540, 10, 33, 65539,
+    80, 65627, (s32)evt_audience_ap_recovery, 65627, (s32)btlevtcmd_InviteApInfoReport, 65539, 90, 196699,
+    (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 327771,
+    (s32)evt_btl_camera_set_posoffset, 0, 0, 0, 0, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
+    1, (s32)"PTR_A1_1", 65546, 800, 65539, 99, 131163, (s32)btlevtcmd_ResetFaceDirection,
+    -2, 65630, (s32)btldefaultevt_SuitoruBadgeEffect, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
+};
+#else
 s32 partyVivianAttack_MagicalPowder[] = {
     196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096, -29999997, -1, 65540,
     99, 33, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -29999988, 131163, (s32)btlevtcmd_WeaponAftereffect,
@@ -757,6 +897,7 @@ s32 partyVivianAttack_MagicalPowder[] = {
     131163, (s32)btlevtcmd_ResetFaceDirection, -2, 65630, (s32)btldefaultevt_SuitoruBadgeEffect, 131163, (s32)btlevtcmd_StartWaitEvent, -2,
     2, 1,
 };
+#endif
 
 s32 partyVivianAttack_CharmKissAttack[] = {
     196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096, -29999997, -1, 65540,
@@ -1176,8 +1317,8 @@ void _disp_heart(CameraId camera, void* param) {
             c = p;
             b.y = 16.0f * scale + a.y;
             b.z = 5.0f + a.z;
-            iconDispGx(&a, 0, 0x1f2, scale);
-            iconDispGx(&b, 0, 0x189, scale);
+            iconDispGx(&a, 0, ICON_1F2, scale);
+            iconDispGx(&b, 0, ICON_189, scale);
         }
     }
 }
@@ -1195,5 +1336,9 @@ USER_FUNC(_disp_heart_entry_stop_check) {
 
 
 #pragma force_active on
+#ifdef VERSION_G8ME01
+__declspec(section ".sdata") u8 gap_07_80418358_sdata[8] = {0};
+#else
 __declspec(section ".sdata") u8 gap_07_80412488_sdata[24] = {0};
+#endif
 #pragma force_active reset

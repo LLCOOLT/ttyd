@@ -113,7 +113,7 @@ extern s32 btlevtcmd_get_turn[];
 extern s32 btlevtcmd_snd_se[];
 extern s32 evt_snd_sfxoff[];
 extern s32 subsetevt_confuse_flustered[];
-extern s32 unit_barriern_z_satellite_2_data_2FE88[];
+extern s32 unit_barriern_z_satellite[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_barriern_z_negone_one_374;
@@ -130,7 +130,7 @@ __declspec(section ".data") s32 fd_barriern_z___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_barriern_z_one_negone_359;
 __declspec(section ".data") s32 fd_barriern_z___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_barriern_z_one_364[1];
-BattleUnitKind unit_barriern_z_2_data_303C8;
+BattleUnitKind unit_barriern_z;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static BattleUnitKindPart parts[11];
@@ -228,7 +228,7 @@ __declspec(section ".data") s32 fd_barriern_z_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_barriern_z_2_data_303C8 = {
+BattleUnitKind unit_barriern_z = {
     115,
     "btl_un_barriern_z",
     7,
@@ -333,7 +333,7 @@ static s32 weapon_wawawa_attack[] = {
 };
 
 static __declspec(section ".data") s32 entry_barriern_satellite[] = {
-    (s32)unit_barriern_z_satellite_2_data_2FE88, 16777216, 67108868, 1148846080, 0, 1148846080, 0, 0,
+    (s32)unit_barriern_z_satellite, 16777216, 67108868, 1148846080, 0, 1148846080, 0, 0,
     0, 0, 0, 0,
 };
 
@@ -1237,7 +1237,7 @@ static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, s32* table) {
     if (unit->work[4 + n] == -1) {
         return FALSE;
     }
-    sp = __memAlloc(HEAP_BATTLE, sizeof(BarriernSpline));
+    sp = BTL_ALLOC(sizeof(BarriernSpline));
     unit->work[10 + n] = (s32)sp;
     sp->n = 5;
     sp->table = table;
@@ -1262,7 +1262,7 @@ static u8 barriernSatelliteTo_Main(BattleUnit* unit, s32 n) {
     }
     if (sp->count >= 60) {
         if (sp != NULL) {
-            __memFree(HEAP_BATTLE, sp);
+            BTL_FREE(sp);
             unit->work[10 + n] = 0;
         }
         return FALSE;

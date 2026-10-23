@@ -11,7 +11,11 @@
 
 EffectEntry* effOpukuJetwN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 
+#ifdef VERSION_G8ME01
+USER_FUNC(btlevtcmd_CheckActStatus);
+#else
 USER_FUNC(_test_rtn);
+#endif
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_AnimeSetPoseTable);
 USER_FUNC(btlevtcmd_CheckDamageCode);
@@ -107,13 +111,23 @@ static PoseTableEntry pose_table_ceil[12];
 s32 gesso_pose_table_turn[20];
 static __declspec(section ".data") BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
+#ifndef VERSION_G8ME01
 __declspec(section ".data") s32 gesso_arm_wait_event[4];
+#endif
+#ifdef VERSION_G8ME01
+static s32 battle_entry_event[313];
+#else
 static s32 battle_entry_event[315];
+#endif
 static s32 init_event[121];
 __declspec(section ".data") s32 entry_gesso_left_arm_entry_data[12];
 __declspec(section ".data") s32 entry_gesso_right_arm_entry_data[12];
 static s32 damage_event[34];
+#ifdef VERSION_G8ME01
+static s32 phase_event[497];
+#else
 static s32 phase_event[488];
+#endif
 static s32 attack_event[48];
 s32 weapon_gesso_ikasumi_attack[48];
 s32 gesso_ikasumi_attack[193];
@@ -308,10 +322,12 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_gesso", "c_gesso", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 103, -175, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+#ifndef VERSION_G8ME01
 __declspec(section ".data") EVT_BEGIN(gesso_arm_wait_event)
     CALL(_test_rtn)
     RETURN
 EVT_END()
+#endif
 
 static s32 battle_entry_event[] = {
     196699, (s32)btlevtcmd_OnAttribute, -2, 16777216, 65546, 1000, 393307, (s32)btlevtcmd_snd_se,
@@ -343,7 +359,14 @@ static s32 battle_entry_event[] = {
     -18, 65644, -29999985, 65545, 5, 393307, (s32)btlevtcmd_snd_se, -29999997,
     (s32)"SFX_BOSS_GESSO_ARM_APPEAR1", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -29999997, 1,
     (s32)"GSO_F2_1", 196699, (s32)btlevtcmd_OffAttribute, -29999997, 16777216, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -29999997,
-    1, 131163, (s32)btlevtcmd_StartWaitEvent, -29999997, 109, 65628, (s32)gesso_arm_wait_event, 131163,
+    1, 131163, (s32)btlevtcmd_StartWaitEvent, -29999997, 109,
+#ifndef VERSION_G8ME01
+    65628,
+#endif
+#ifndef VERSION_G8ME01
+    (s32)gesso_arm_wait_event,
+#endif
+    131163,
     (s32)btlevtcmd_WaitEventEnd, -29999986, 131163, (s32)btlevtcmd_WaitEventEnd, -29999985, 196699, (s32)evt_btl_camera_set_mode, 0,
     3, 655451, (s32)evt_btl_camera_set_moveto, 0, 84, 177, 558, 84,
     140, 10, 30, 11, 65545, 30, 327771, (s32)evt_msg_print,
@@ -409,6 +432,9 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 static s32 phase_event[] = {
+#ifdef VERSION_G8ME01
+    196699, (s32)btlevtcmd_CheckActStatus, -2, -30000000, 131096, -30000000, 0, 2, 33,
+#endif
     196699, (s32)btlevtcmd_CheckPhase, -30000000, 67108865, 131097, -30000000, 0, 262235,
     (s32)btlevtcmd_GetUnitWork, -2, 0, -30000000, 131096, -30000000, 1, 262235,
     (s32)btlevtcmd_GetUnitWork, -2, 3, -30000000, 131125, -30000000, 1, 262235,
@@ -496,7 +522,13 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 s32 weapon_gesso_ikasumi_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    1677721602,
+#else
+    1677721600,
+#endif
+    1065353216, 16843009, (s32)weaponGetPowerDefault,
     1, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 852738, 0, 135, 2047, 4,
@@ -555,6 +587,7 @@ USER_FUNC(_ikasumi_effect) {
     return EVT_RETURN_DONE;
 }
 
+#ifndef VERSION_G8ME01
 USER_FUNC(_test_rtn) {
     BattleWork* wp = _battleWorkPointer;
     s32 id = BattleTransID(event, -2);
@@ -614,6 +647,7 @@ USER_FUNC(_test_rtn) {
     BattlePadMultiCheckTrigger(2, 0x100);
     return EVT_RETURN_BLOCK;
 }
+#endif
 
 static __declspec(section ".data") EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)

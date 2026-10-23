@@ -1,3 +1,4 @@
+#include "version.h"
 #include "mri_puni.h"
 #include "party.h"
 #include "mario/mario_party.h"
@@ -130,10 +131,10 @@ void evt_icon_disp_func(CameraId camId, void* param) {
                     b = a;
                     puniSinCosRet(*(s16*)&p->unk116[0] + gp->retraceCount * 10, &a.z, &a.x, 9.0f, 9.0f);
                     a.y += 13.0f;
-                    iconDispGx(&a, 0, 0x14d, 0.6f);
+                    iconDispGx(&a, 0, VERSION_PICK(0x14d, 0x155), 0.6f);
                     puniSinCosRet(*(s16*)&p->unk116[0] + gp->retraceCount * 10 + 180, &b.z, &b.x, 9.0f, 9.0f);
                     b.y += 15.0f;
-                    iconDispGx(&b, 0, 0x14d, 0.5f);
+                    iconDispGx(&b, 0, VERSION_PICK(0x14d, 0x155), 0.5f);
                 }
             }
         }
@@ -2758,6 +2759,9 @@ void puniModePiyori(PuniData* p) {
                 }
             } else {
                 p->unkC = p->unkE;
+#ifdef VERSION_G8ME01
+                p->anim = 2;
+#endif
                 if (p->unkE == 2) {
                     p->unkC = 1;
                 }
@@ -3380,7 +3384,11 @@ void puniModeWonder(PuniData* p) {
             pos = p->pos;
             pos.y += 15.0f;
             pos.z += 3.0f;
+#ifdef VERSION_G8ME01
+            effPuniBalloonEntry(1, pos.x, pos.y, pos.z, 1.5f);
+#else
             p->effect = effPuniBalloonEntry(1, pos.x, pos.y, pos.z, 1.5f);
+#endif
             p->unk128 = 20;
             p->anim = 9;
             p->unk124 = 0;
@@ -3399,6 +3407,42 @@ void puniModeWonder(PuniData* p) {
 }
 
 extern double sin(double);
+static inline void puniMoveHitLimitedInl(PuniData* p, Vec* s2, Vec* d2, f32 dist) {
+    Vec pa;
+    Vec hit;
+    Vec diff;
+    Vec old;
+    f32 b1, b2, b3;
+    f32 c1, c2, c3;
+    f32 d;
+    PF(p, 0x214) = NULL;
+    PF(p, 0x210) = NULL;
+    d = dist;
+    PF(p, 0x210) = hitCheckFilter(NULL, &pa.x, &pa.y, &pa.z, &d, &hit.x, &hit.y, &hit.z, s2->x, s2->y, s2->z, d2->x, d2->y, d2->z);
+    if (PF(p, 0x210) == NULL) {
+        PSVECAdd(&p->pos, &p->vel, &p->pos);
+    } else if (Punigp->unk328 != 0x12) {
+        old = p->pos;
+        *PV(p, 0x560) = hit;
+        PSVECAdd(&p->pos, &p->vel, &p->pos);
+        if (p->vel.y == 0.0f) {
+            hit.y = 0.0f;
+        }
+        PSVECNormalize(&hit, &hit);
+        { f32 dp = PSVECDotProduct(d2, &hit); PSVECScale(&hit, &hit, dp * -(dist - d) + 0.1f); }
+        PSVECAdd(&p->pos, &hit, &p->pos);
+        PSVECSubtract(&p->pos, &old, &diff);
+        d = PSVECMag(&diff);
+        if (d > 0.0f) {
+            PSVECNormalize(&diff, &diff);
+            PF(p, 0x214) = hitCheckFilter(NULL, &b1, &b2, &b3, &d, &c1, &c2, &c3, old.x, old.y + 1.0f, old.z, diff.x, diff.y, diff.z);
+            if (PF(p, 0x214) != NULL) {
+                p->pos = old;
+            }
+        }
+    }
+}
+
 void puniModeFunbari(PuniData* p) {
     switch (p->unk114) {
         case 0: {
@@ -3422,6 +3466,9 @@ void puniModeFunbari(PuniData* p) {
             p->vel.x = 0.5f;
             p->unk128 = 68;
             FF(p, 0x1EC) = 1.0f;
+#ifdef VERSION_G8ME01
+            FF(p, 0x148) = 0.0f;
+#endif
             p->npc->flags |= 4;
             p->unk114 = 1;
             break;
@@ -3438,9 +3485,30 @@ void puniModeFunbari(PuniData* p) {
             }
             FF(p, 0x1EC) += 7.0f;
             if (FF(p, 0x1EC) >= 360.0f) FF(p, 0x1EC) = 360.0f;
+#ifdef VERSION_G8ME01
+            {
+                Vec start;
+                Vec s2;
+                Vec d2;
+                f32 dist;
+                start = p->pos;
+                dist = __fabs(FF(p, 0x1F4));
+                p->vel.x = 0.5f * FF(p, 0x1F4);
+                p->vel.z = p->vel.y = 0.0f;
+                d2 = p->vel;
+                s2 = start;
+                puniMoveHitLimitedInl(p, &s2, &d2, dist);
+            }
+            FF(p, 0x148) += FF(p, 0x1F0);
+            if (p->unk128-- == 0) {
+                p->unk114 = 10;
+                FF(p, 0x148) = 0.0f;
+            }
+#else
             p->pos.y += FF(p, 0x1F0);
             p->pos.x += p->vel.x * FF(p, 0x1F4);
             if (p->unk128-- == 0) p->unk114 = 10;
+#endif
             break;
         case 10:
             {
@@ -4331,42 +4399,6 @@ static inline void puniMoveHitInl(PuniData* p, Vec* s2, Vec* d2, f32 dist) {
         C_VECReflect(d2, &hit, &refl);
         PSVECScale(&refl, &p->vel, dist);
         { f32 dot = PSVECDotProduct(d2, &hit); PSVECScale(&hit, &hit, -(dist - d) * dot + 0.1f); }
-        PSVECAdd(&p->pos, &hit, &p->pos);
-        PSVECSubtract(&p->pos, &old, &diff);
-        d = PSVECMag(&diff);
-        if (d > 0.0f) {
-            PSVECNormalize(&diff, &diff);
-            PF(p, 0x214) = hitCheckFilter(NULL, &b1, &b2, &b3, &d, &c1, &c2, &c3, old.x, old.y + 1.0f, old.z, diff.x, diff.y, diff.z);
-            if (PF(p, 0x214) != NULL) {
-                p->pos = old;
-            }
-        }
-    }
-}
-
-static inline void puniMoveHitLimitedInl(PuniData* p, Vec* s2, Vec* d2, f32 dist) {
-    Vec pa;
-    Vec hit;
-    Vec diff;
-    Vec old;
-    f32 b1, b2, b3;
-    f32 c1, c2, c3;
-    f32 d;
-    PF(p, 0x214) = NULL;
-    PF(p, 0x210) = NULL;
-    d = dist;
-    PF(p, 0x210) = hitCheckFilter(NULL, &pa.x, &pa.y, &pa.z, &d, &hit.x, &hit.y, &hit.z, s2->x, s2->y, s2->z, d2->x, d2->y, d2->z);
-    if (PF(p, 0x210) == NULL) {
-        PSVECAdd(&p->pos, &p->vel, &p->pos);
-    } else if (Punigp->unk328 != 0x12) {
-        old = p->pos;
-        *PV(p, 0x560) = hit;
-        PSVECAdd(&p->pos, &p->vel, &p->pos);
-        if (p->vel.y == 0.0f) {
-            hit.y = 0.0f;
-        }
-        PSVECNormalize(&hit, &hit);
-        { f32 dp = PSVECDotProduct(d2, &hit); PSVECScale(&hit, &hit, dp * -(dist - d) + 0.1f); }
         PSVECAdd(&p->pos, &hit, &p->pos);
         PSVECSubtract(&p->pos, &old, &diff);
         d = PSVECMag(&diff);
@@ -6669,9 +6701,9 @@ void puniCountDisp(s32 unused, s32 packed) {
     c2.a = c2.a * Punigp->puniCounterAlpha / 255;
     c3.a = c3.a * Punigp->puniCounterAlpha / 255;
     PSMTXTrans(m, -160.0f, -180.0f, 0.0f);
-    iconDispGxCol(m, 0x10, 0x203, c1);
+    iconDispGxCol(m, 0x10, VERSION_PICK(0x203, 0x20A), c1);
     PSMTXTrans(m, -232.0f, -178.0f, 0.0f);
-    iconDispGxCol(m, 0x10, 0x204, c2);
+    iconDispGxCol(m, 0x10, VERSION_PICK(0x204, 0x20B), c2);
     PSMTXTrans(m, -160.0f, -178.0f, 0.0f);
     if (Punigp->unk448) {
         if (gp->retraceCount & 0x10) {
@@ -6681,7 +6713,7 @@ void puniCountDisp(s32 unused, s32 packed) {
         iconNumberDispGx(m, num2, FALSE, c3);
     }
     PSMTXTrans(m, -140.0f, -178.0f, 0.0f);
-    iconDispGxCol(m, 0x10, 0x1D8, c3);
+    iconDispGxCol(m, 0x10, VERSION_PICK(0x1D8, 0x1E0), c3);
     PSMTXTrans(m, -90.0f, -178.0f, 0.0f);
     iconNumberDispGx(m, num1, TRUE, c3);
 }

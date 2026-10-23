@@ -112,11 +112,17 @@ typedef struct WinPauseWork {
     /* 0xD64 */ s32 badgeNum;
     /* 0xD68 */ u8 pad_D68[0xE94 - 0xD68];
     /* 0xE94 */ s32 recipeNum;
+#ifdef VERSION_G8ME01
+    u8 us_padE98[4]; // US only: +4 from here
+#endif
     /* 0xE98 */ s32 recipeSel;
     /* 0xE9C */ s32 recipePage;
     /* 0xEA0 */ u8 pad_EA0[0xEB8 - 0xEA0];
     /* 0xEB8 */ s16 recipeList[0x6C];
     /* 0xF90 */ s32 badgeLogNum;
+#ifdef VERSION_G8ME01
+    u8 us_padF94[4]; // US only: another +4 from here
+#endif
     /* 0xF94 */ s32 badgeLogSel;
     /* 0xF98 */ s32 badgeLogPage;
     /* 0xF9C */ u8 pad_F9C[0xFB4 - 0xF9C];
@@ -303,6 +309,14 @@ void winBgMain(WinPauseWork* wp);
 void winMsgMain(WinPauseWork* wp);
 void winSortMain(WinPauseWork* wp);
 
+#ifdef VERSION_G8ME01
+#define WR_FRAMES(n) (gp->framerate * (n) / 60)
+#define WR_FSTEP(n) ((n) * gp->framerate / 60.0f)
+#else
+#define WR_FRAMES(n) (n)
+#define WR_FSTEP(n) (n)
+#endif
+
 static inline void winRootTabMain(WinRootWork* w) {
     s32 i;
 
@@ -322,8 +336,8 @@ static inline void winRootTabMain(WinRootWork* w) {
             }
             break;
         case 2:
-            w->tab[i].y = intplGetValue(11, w->tab[i].timer++, 10, 300.0f, 185.0f);
-            if (w->tab[i].timer > 10) {
+            w->tab[i].y = intplGetValue(11, w->tab[i].timer++, WR_FRAMES(10), 300.0f, 185.0f);
+            if (w->tab[i].timer > WR_FRAMES(10)) {
                 w->tab[i].state++;
             }
             break;
@@ -332,8 +346,8 @@ static inline void winRootTabMain(WinRootWork* w) {
             w->tab[i].state++;
             break;
         case 12:
-            w->tab[i].y = intplGetValue(11, w->tab[i].timer++, 10, 180.0f, 300.0f);
-            if (w->tab[i].timer > 10) {
+            w->tab[i].y = intplGetValue(11, w->tab[i].timer++, WR_FRAMES(10), 180.0f, 300.0f);
+            if (w->tab[i].timer > WR_FRAMES(10)) {
                 w->tab[i].state++;
             }
             break;
@@ -455,7 +469,11 @@ s32 winRootMain(WinRootWork* w) {
                 winLogInit2(w);
                 break;
             }
+#ifdef VERSION_G8ME01
+        } else if (w->dirRep & 0x4000 && w->menu[0].state == 100) {
+#else
         } else if (w->dirRep & 0x4000) {
+#endif
             psndSFXOn((const char*)0x20032);
             psndSFXOn((const char*)0x20031);
             w->tabSel--;
@@ -470,7 +488,11 @@ s32 winRootMain(WinRootWork* w) {
             w->menu[0].id = w->tab[w->tabSel].id;
             w->helpTgtX = w->tabSel * 105 - 270;
             winMsgEntry((WinPauseWork*)w, 0, w->tab[w->tabSel].msg, 0);
+#ifdef VERSION_G8ME01
+        } else if (w->dirRep & 0x8000 && w->menu[0].state == 100) {
+#else
         } else if (w->dirRep & 0x8000) {
+#endif
             psndSFXOn((const char*)0x20032);
             psndSFXOn((const char*)0x20031);
             w->tabSel++;
@@ -488,7 +510,11 @@ s32 winRootMain(WinRootWork* w) {
         }
         break;
     case 100:
+#ifdef VERSION_G8ME01
+        if (w->menu[0].state == 100) {
+#else
         if (w->menu[w->tabSel].state == 100) {
+#endif
             w->active = 10;
         }
         break;
@@ -578,22 +604,22 @@ s32 winRootMain(WinRootWork* w) {
 
     if (w->active < 20) {
         if (w->flags & 0x4000) {
-            w->helpX += (w->helpTgtX - w->helpX) / 4.0f;
-            w->helpY += (w->helpTgtY - w->helpY) / 4.0f;
+            w->helpX += (w->helpTgtX - w->helpX) / WR_FSTEP(4.0f);
+            w->helpY += (w->helpTgtY - w->helpY) / WR_FSTEP(4.0f);
         } else {
-            w->helpX += (w->helpTgtX - w->helpX) / 4.0f;
-            w->helpY += ((w->helpTgtY + (w->tab[w->tabSel].y - 185.0f)) - w->helpY) / 4.0f;
+            w->helpX += (w->helpTgtX - w->helpX) / WR_FSTEP(4.0f);
+            w->helpY += ((w->helpTgtY + (w->tab[w->tabSel].y - 185.0f)) - w->helpY) / WR_FSTEP(4.0f);
         }
     } else if (w->helpY > 180.0f) {
-        w->helpX += (w->helpTgtX - w->helpX) / 4.0f;
-        w->helpY += ((w->helpTgtY + (w->tab[w->tabSel].y - 185.0f)) - w->helpY) / 4.0f;
+        w->helpX += (w->helpTgtX - w->helpX) / WR_FSTEP(4.0f);
+        w->helpY += ((w->helpTgtY + (w->tab[w->tabSel].y - 185.0f)) - w->helpY) / WR_FSTEP(4.0f);
     } else {
-        w->helpX += ((w->helpTgtX + w->menu[0].x) - w->helpX) / 4.0f;
-        w->helpY += (w->helpTgtY - w->helpY) / 4.0f;
+        w->helpX += ((w->helpTgtX + w->menu[0].x) - w->helpX) / WR_FSTEP(4.0f);
+        w->helpY += (w->helpTgtY - w->helpY) / WR_FSTEP(4.0f);
     }
     w->helpX += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
-    w->sortPosX += (w->sortTgtX - w->sortPosX) / 4.0f;
-    w->sortPosY += (w->sortTgtY - w->sortPosY) / 4.0f;
+    w->sortPosX += (w->sortTgtX - w->sortPosX) / WR_FSTEP(4.0f);
+    w->sortPosY += (w->sortTgtY - w->sortPosY) / WR_FSTEP(4.0f);
     dispEntry(CAMERA_2D, 1000.0f, 0, (DispCallback)winRootBgDrawDisp, w);
     return 0;
 }
@@ -680,8 +706,8 @@ void winBgMain(WinPauseWork* wp) {
                 wp->menu[i].state++;
                 break;
             case 1:
-                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, 16, 800.0f, 0.0f);
-                if (wp->menu[i].timer > 16) {
+                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, WR_FRAMES(16), 800.0f, 0.0f);
+                if (wp->menu[i].timer > WR_FRAMES(16)) {
                     wp->menu[i].state = 100;
                 }
                 break;
@@ -691,8 +717,8 @@ void winBgMain(WinPauseWork* wp) {
                 wp->menu[i].state++;
                 break;
             case 11:
-                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, 16, 0.0f, 800.0f);
-                if (wp->menu[i].timer > 16) {
+                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, WR_FRAMES(16), 0.0f, 800.0f);
+                if (wp->menu[i].timer > WR_FRAMES(16)) {
                     wp->menu[i].state = -1;
                 }
                 break;
@@ -702,8 +728,8 @@ void winBgMain(WinPauseWork* wp) {
                 wp->menu[i].state++;
                 break;
             case 21:
-                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, 24, 640.0f, 0.0f);
-                if (wp->menu[i].timer > 24) {
+                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, WR_FRAMES(24), 640.0f, 0.0f);
+                if (wp->menu[i].timer > WR_FRAMES(24)) {
                     wp->menu[i].state = 100;
                 }
                 break;
@@ -713,8 +739,8 @@ void winBgMain(WinPauseWork* wp) {
                 wp->menu[i].state++;
                 break;
             case 31:
-                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, 24, -640.0f, 0.0f);
-                if (wp->menu[i].timer > 24) {
+                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, WR_FRAMES(24), -640.0f, 0.0f);
+                if (wp->menu[i].timer > WR_FRAMES(24)) {
                     wp->menu[i].state = 100;
                 }
                 break;
@@ -724,8 +750,8 @@ void winBgMain(WinPauseWork* wp) {
                 wp->menu[i].state++;
                 break;
             case 41:
-                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, 24, 0.0f, -640.0f);
-                if (wp->menu[i].timer > 24) {
+                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, WR_FRAMES(24), 0.0f, -640.0f);
+                if (wp->menu[i].timer > WR_FRAMES(24)) {
                     wp->menu[i].state = -1;
                 }
                 break;
@@ -850,12 +876,17 @@ void winMsgMain(WinPauseWork* wp) {
             wp->msgState++;
             break;
         case 1:
-            wp->msgOfsX = intplGetValue(11, wp->msgTimer++, 16, -800.0f, 0.0f);
-            if (wp->msgTimer > 16) {
+            wp->msgOfsX = intplGetValue(11, wp->msgTimer++, WR_FRAMES(16), -800.0f, 0.0f);
+            if (wp->msgTimer > WR_FRAMES(16)) {
                 wp->msgState++;
             }
             break;
         case 2:
+#ifdef VERSION_G8ME01
+            if (*(s32*)((u8*)wp + 0x20C) == 202) {
+                break;
+            }
+#endif
             if (keyGetDirTrg(0) & 0x100) {
                 wp->msgLine -= 2;
                 if (wp->msgLine < 0) {
@@ -883,8 +914,8 @@ void winMsgMain(WinPauseWork* wp) {
             wp->msgState++;
             break;
         case 11:
-            wp->msgOfsX = intplGetValue(11, wp->msgTimer++, 16, 0.0f, -800.0f);
-            if (wp->msgTimer > 16) {
+            wp->msgOfsX = intplGetValue(11, wp->msgTimer++, WR_FRAMES(16), 0.0f, -800.0f);
+            if (wp->msgTimer > WR_FRAMES(16)) {
                 wp->msgState++;
             }
             break;
@@ -894,6 +925,7 @@ void winMsgMain(WinPauseWork* wp) {
 }
 
 #include "evt/evt_lottery.h"
+#include "icon_ids.h"
 void windowDispGX_Waku_col(u16 gxTexMapID, GXColor color, f32 x, f32 y, f32 width, f32 height, f32 curve);
 void winIconInit(void);
 void winIconSet(u32 id, Vec translate, Vec scale, GXColor color);
@@ -903,6 +935,9 @@ void winFontSetEdge(Vec translate, Vec scale, GXColor color, const char* fmt, ..
 void winFontSetLabel(Vec translate, Vec scale, GXColor color, const char* msg);
 void winNameGX(WinPauseWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h);
 
+#ifdef VERSION_G8ME01
+void winFontSetEdgeWidth(Vec pos, Vec scale, GXColor color, f32 width, const char* fmt, ...);
+#endif
 void winMsgDisp(WinPauseWork* wp, f32 x, f32 y) {
     GXColor white = { 0xFF, 0xFF, 0xFF, 0xFF };
     GXColor black = { 0x00, 0x00, 0x00, 0xFF };
@@ -935,8 +970,17 @@ void winMsgDisp(WinPauseWork* wp, f32 x, f32 y) {
         m = msgSearch((const char*)wp->msgY);
         fw = FontGetMessageWidth(m);
         winNameGX(wp, 1, (x - 120.0f) + ofs, ny = 8.0f + (16.0f + by), 240.0f, 32.0f);
+#ifdef VERSION_G8ME01
+        // US: long names are squeezed to 210 wide
+        if (fw > 210.0f) {
+            fw = 210.0f;
+        }
+        winFontInit();
+        winFontSetEdgeWidth((Vec){ ofs + ((x - 120.0f) + (240.0f - fw) / 2.0f), ny - 4.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white, 210.0f, m);
+#else
         winFontInit();
         winFontSetEdge((Vec){ ofs + ((x - 120.0f) + (240.0f - fw) / 2.0f), ny - 4.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white, m);
+#endif
     }
     if (wp->msg != NULL) {
         GXSetScissor(0, (u32)(240.0f - (by -= 14.0f)), 0x260, 0x38);
@@ -951,24 +995,28 @@ void winMsgDisp(WinPauseWork* wp, f32 x, f32 y) {
         }
         GXSetScissor(0, 0, 0x260, 0x1E0);
     }
+#ifdef VERSION_G8ME01
+    if (*(s32*)((u8*)wp + 0x20C) != 202 && wp->msgLines > 2) {
+#else
     if (wp->msgLines > 2) {
+#endif
         winIconInit();
         if (wp->msgLine == 0) {
             if ((gp->retraceCount & 0x1F) < 0x14) {
-                winIconSet(0x1B6, (Vec){ (250.0f + x) - 10.0f, (40.0f + (y - 40.0f)) - 24.0f, 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                winIconSet(ICON_1B6, (Vec){ (250.0f + x) - 10.0f, (40.0f + (y - 40.0f)) - 24.0f, 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
             }
         } else if (wp->msgLine / 2 == (wp->msgLines + 1) / 2 - 1) {
             if ((gp->retraceCount & 0x1F) < 0x14) {
-                winIconSet(0x1B5, (Vec){ (250.0f + x) - 10.0f, 24.0f + (40.0f + (y - 40.0f)), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                winIconSet(ICON_1B5, (Vec){ (250.0f + x) - 10.0f, 24.0f + (40.0f + (y - 40.0f)), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
             }
         } else {
             if ((gp->retraceCount & 0x1F) < 0x14) {
                 ix = (250.0f + x) - 10.0f;
-                winIconSet(0x1B5, (Vec){ ix, 24.0f + (by = 40.0f + (y - 40.0f)), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
-                winIconSet(0x1B6, (Vec){ ix, by - 24.0f, 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                winIconSet(ICON_1B5, (Vec){ ix, 24.0f + (by = 40.0f + (y - 40.0f)), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                winIconSet(ICON_1B6, (Vec){ ix, by - 24.0f, 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
             }
         }
-        winIconSet(0x70, (Vec){ (250.0f + x) - 10.0f, 40.0f + (y - 40.0f), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+        winIconSet(ICON_070, (Vec){ (250.0f + x) - 10.0f, 40.0f + (y - 40.0f), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
     }
 }
 
@@ -1027,8 +1075,10 @@ static inline void winRootTexQuad(WinPauseWork* wp, s32 id, f32 x, f32 y, f32 w,
 
 #pragma inline_max_total_size(100000)
 void winKirinukiGX(WinPauseWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
+#ifndef VERSION_G8ME01
     f32 w74 = 74.0f;
     f32 w66 = 66.0f;
+#endif
     GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
@@ -1057,6 +1107,25 @@ void winKirinukiGX(WinPauseWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
         winRootTexQuad(wp, 0x8, x + 8, y - (h - 8), w - 8 - 8, 8);
         winRootTexQuad(wp, 0xE, x + w - 8, y - (h - 8), 8, 8);
     } else {
+#ifdef VERSION_G8ME01
+        // US: the tab under the frame is sized to the "remaining" label
+        f32 nk = 0.5f * FontGetMessageWidth(msgSearch("msg_menu_badge_nokori")) + 60.0f;
+
+        winRootTexQuad(wp, 0xB, x, y, 8, 8);
+        winRootTexQuad(wp, 0x9, x + 8, y, w - 8 - 8, 8);
+        winRootTexQuad(wp, 0xD, x + w - 8, y, 8, 8);
+        winRootTexQuad(wp, 0xA, x, y - 8, 8, h - 8 - 8);
+        winRootTexQuad(wp, 0x8, x + 8, y - 8, w - 8, h - 8 - 8);
+        winRootTexQuad(wp, 0xC, x, y - (h - 8), 8, 8);
+        winRootTexQuad(wp, 0x8, x + 8, y - (h - 8), w - 8, 8);
+        winRootTexQuad(wp, 0xF, x + (w - nk), y - h, 16, 8);
+        winRootTexQuad(wp, 0x8, x + (w - nk) + 16, y - h, nk - 16, 8);
+        winRootTexQuad(wp, 0xA, x + (w - nk) + 8, y - h - 8, 8, 8);
+        winRootTexQuad(wp, 0x8, x + (w - nk) + 16, y - h - 8, nk - 16, 8);
+        winRootTexQuad(wp, 0xC, x + (w - nk) + 8, y - h - 16, 8, 8);
+        winRootTexQuad(wp, 0x8, x + (w - nk) + 16, y - h - 16, nk - 16 - 8, 8);
+        winRootTexQuad(wp, 0xE, x + w - 8, y - h - 16, 8, 8);
+#else
         winRootTexQuad(wp, 0xB, x, y, 8, 8);
         winRootTexQuad(wp, 0x9, x + 8, y, w - 8 - 8, 8);
         winRootTexQuad(wp, 0xD, x + w - 8, y, 8, 8);
@@ -1071,6 +1140,7 @@ void winKirinukiGX(WinPauseWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
         winRootTexQuad(wp, 0xC, x + (w - 90) + 8, y - h - 16, 8, 8);
         winRootTexQuad(wp, 0x8, x + (w - 90) + 16, y - h - 16, w66, 8);
         winRootTexQuad(wp, 0xE, x + w - 8, y - h - 16, 8, 8);
+#endif
     }
 }
 
@@ -1412,6 +1482,9 @@ BOOL swGet(s32 id);
 
 typedef struct WinHakoList {
     s32 num;     // 0x0
+#ifdef VERSION_G8ME01
+    u8 us_pad4[4]; // US only: +4 from here (as WinPauseWork)
+#endif
     s32 pad_4;   // 0x4
     s32 page;    // 0x8
     f32 scroll;  // 0xC
@@ -1421,7 +1494,7 @@ typedef struct WinHakoList {
 
 typedef struct WinHakoWork {
     u8 pad_0[0xE94];
-    WinHakoList list[2]; // 0xE94, 0xF90
+    WinHakoList list[2]; // 0xE94, 0xF90 (US 0xF94)
 } WinHakoWork;
 
 void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
@@ -1594,14 +1667,14 @@ void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
         fx = 395.0f + x;
         winTexSet(0x17, (Vec){fx, 15.0f + y, 0.0f}, (Vec){-1.0f, -1.0f, -1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         winIconInit();
-        winIconSet(0x7E, (Vec){fx, y, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+        winIconSet(ICON_07E, (Vec){fx, y, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     }
     if (num > page * 28 + 28) {
         winTexInit(((WinPauseWork*)w)->res->tex->tpl);
         fx = 395.0f + x;
         winTexSet(0x17, (Vec){fx, y - 235.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         winIconInit();
-        winIconSet(0x80, (Vec){fx, y - 220.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+        winIconSet(ICON_080, (Vec){fx, y - 220.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     }
 
     msg = msgSearch("msg_menu_sort_narabikae");
@@ -1610,7 +1683,7 @@ void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
     fx = x + (380.0f - mw);
     winFontSet((Vec){fx, y - 228.0f, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, (GXColor){0x00, 0x00, 0x00, 0xFF}, msg);
     winIconInit();
-    winIconSet(0x217, (Vec){fx - 30.0f, y - 237.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+    winIconSet(ICON_217, (Vec){fx - 30.0f, y - 237.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 }
 
 static inline void winWazaQuad(WinPauseWork* wp, s32 id, f32 x, f32 y, f32 w, f32 h) {
@@ -2350,6 +2423,13 @@ void winSortMain(WinPauseWork* wp) {
         trg = 0;
         rep = 0;
     }
+#ifdef VERSION_G8ME01
+    // US: the 0x1000 button closes the sort menu first, without a sound
+    if (trg & 0x1000) {
+        wp->sortActive = 0;
+        wp->sortTgtX = -600.0f;
+    } else
+#endif
     if (trg & 0x200) {
         ((void (*)(s32))psndSFXOn)(0x20013);
         wp->sortActive = 0;
@@ -2369,10 +2449,13 @@ void winSortMain(WinPauseWork* wp) {
     } else if (trg & 0x100) {
         ((void (*)(s32))psndSFXOn)(0x20012);
         sort_data[wp->sortType][wp->sortSel].func(wp);
-    } else if (trg & 0x1000) {
+    }
+#ifndef VERSION_G8ME01
+    else if (trg & 0x1000) {
         wp->sortActive = 0;
         wp->sortTgtX = -600.0f;
     }
+#endif
     if (wp->sortActive) {
         wp->sortMsgX = 30.0f + wp->sortTgtX;
         wp->sortMsgY = (wp->sortTgtY - 40.0f) - (f32)(wp->sortSel * 40);
@@ -2614,6 +2697,9 @@ typedef struct WinMailData {
 #define WM_LINES WM_F(u16, 0x26C)
 #define WM_RES2 WM_F(WinRes*, 0x2C)
 
+#ifdef VERSION_G8ME01
+void winFontSetWidth(Vec pos, Vec scale, GXColor color, f32 width, const char* fmt, ...);
+#endif
 void winMailDisp(WinPauseWork* wp) {
     s32 i;
     s32 id;
@@ -2648,7 +2734,11 @@ void winMailDisp(WinPauseWork* wp) {
                 winTexSet(0x65 + (kind + 1) / 10, (Vec){ 2.0f + (88.0f + WM_X), WM_SCR + (((WM_Y - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
                 winTexSet(0x65 + (kind + 1) % 10, (Vec){ 2.0f + (104.0f + WM_X), WM_SCR + (((WM_Y - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
                 winFontInit();
+#ifdef VERSION_G8ME01
+                winFontSetWidth((Vec){ 120.0f + WM_X, WM_SCR + (8.0f + ((WM_Y - 56.0f) - (f32)(i * 40))), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, black, 230.0f, msgSearch(mail->name));
+#else
                 winFontSetLabel((Vec){ 120.0f + WM_X, WM_SCR + (8.0f + ((WM_Y - 56.0f) - (f32)(i * 40))), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, black, mail->name);
+#endif
                 }
             }
             GXSetScissor(0, 0, 0x260, 0x1E0);
@@ -2674,12 +2764,20 @@ void winMailDisp(WinPauseWork* wp) {
             winTexSet(0x65 + (kind2 + 1) / 10, (Vec){ 2.0f + (88.0f + WM_X), (WM_Y - 56.0f) - 3.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
             winTexSet(0x65 + (kind2 + 1) % 10, (Vec){ 2.0f + (104.0f + WM_X), (WM_Y - 56.0f) - 3.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
             winFontInit();
+#ifdef VERSION_G8ME01
+            winFontSetWidth((Vec){ 120.0f + WM_X, 8.0f + (WM_Y - 56.0f), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, black, 230.0f, msgSearch(mail->name));
+#else
             winFontSetLabel((Vec){ 120.0f + WM_X, 8.0f + (WM_Y - 56.0f), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, black, mail->name);
+#endif
             GXSetScissor((u32)(32.0f + (304.0f + WM_X)), (u32)(72.0f + (240.0f - WM_Y)), 0x158, 0xB1);
             winTexInit(wp->res->tex->tpl);
             winTexSet(0x77, (Vec){ 4.0f + (208.0f + WM_X), (WM_Y - 56.0f) - 80.0f, 0.0f }, (Vec){ 1.0f, 7.5f, 1.0f }, col);
             winFontInit();
+#ifdef VERSION_G8ME01
+            winFontSetWidth((Vec){ 80.0f + WM_X, (WM_Y - 80.0f) + (f32)(WM_LINE * 21), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, (GXColor){ 0x00, 0x00, 0x00, 0xFF }, 280.0f, msgSearch(mail->body));
+#else
             winFontSetLabel((Vec){ 80.0f + WM_X, (WM_Y - 80.0f) + (f32)(WM_LINE * 21), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, (GXColor){ 0x00, 0x00, 0x00, 0xFF }, mail->body);
+#endif
             if (mail->flags & 0x1000) {
                 winTexInit(WM_RES2->tex->tpl);
                 winTexSet(mail->icon, (Vec){ 210.0f + WM_X, 7.0f + ((WM_Y - (f32)((WM_LINES - 1) * 21)) + (f32)(WM_LINE * 21)), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
@@ -2689,19 +2787,19 @@ void winMailDisp(WinPauseWork* wp) {
                 winIconInit();
                 if (WM_LINE == 0) {
                     if ((gp->retraceCount & 0x1F) < 0x14) {
-                        winIconSet(0x1B6, (Vec){ 360.0f + WM_X, (20.0f + (WM_Y - 230.0f)) - 24.0f, 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                        winIconSet(ICON_1B6, (Vec){ 360.0f + WM_X, (20.0f + (WM_Y - 230.0f)) - 24.0f, 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
                     }
                 } else if (WM_LINE + 6 == WM_LINES) {
                     if ((gp->retraceCount & 0x1F) < 0x14) {
-                        winIconSet(0x1B5, (Vec){ 360.0f + WM_X, 24.0f + (20.0f + (WM_Y - 230.0f)), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                        winIconSet(ICON_1B5, (Vec){ 360.0f + WM_X, 24.0f + (20.0f + (WM_Y - 230.0f)), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
                     }
                 } else {
                     if ((gp->retraceCount & 0x1F) < 0x14) {
-                        winIconSet(0x1B5, (Vec){ 360.0f + WM_X, 24.0f + (20.0f + (WM_Y - 230.0f)), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
-                        winIconSet(0x1B6, (Vec){ 360.0f + WM_X, (20.0f + (WM_Y - 230.0f)) - 24.0f, 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                        winIconSet(ICON_1B5, (Vec){ 360.0f + WM_X, 24.0f + (20.0f + (WM_Y - 230.0f)), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                        winIconSet(ICON_1B6, (Vec){ 360.0f + WM_X, (20.0f + (WM_Y - 230.0f)) - 24.0f, 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
                     }
                 }
-                winIconSet(0x70, (Vec){ 360.0f + WM_X, 20.0f + (WM_Y - 230.0f), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                winIconSet(ICON_070, (Vec){ 360.0f + WM_X, 20.0f + (WM_Y - 230.0f), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
             }
         }
     }

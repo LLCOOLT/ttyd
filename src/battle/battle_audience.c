@@ -5,6 +5,7 @@
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/icondrv.h"
+#include "icon_ids.h"
 #include "driver/windowdrv.h"
 #include "data/item_data.h"
 #include "driver/npcdrv.h"
@@ -269,6 +270,15 @@ s32 haiti_data[][10] = {
 	{ 20, 20, 20, 20, 18, 18, 18, 16, 0, 0 },
 	{ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20 },
 };
+#ifdef VERSION_G8ME01
+// US: front rows thinned (12/14/14) for the first-pick seat search
+s32 haiti_data_front_narrow[][10] = {
+	{ 12, 14, 14, 0, 0, 0, 0, 0, 0, 0 },
+	{ 12, 14, 14, 16, 16, 14, 0, 0, 0, 0 },
+	{ 12, 14, 14, 20, 18, 18, 18, 16, 0, 0 },
+	{ 12, 14, 14, 20, 20, 20, 20, 20, 20, 20 },
+};
+#endif
 
 //@@ tplRead
 FileEntry* tplRead(const char* path) {
@@ -972,6 +982,13 @@ void BattleAudience_End(void) {
 		pouchSetAudienceNum(audience->mTargetAudienceCount);
 		}
 	}
+#ifdef VERSION_G8ME01
+	// US frees the star-power bonus info allocated in BattleAudience_PerAct
+	if (*(void**)audience->field_137C8) {
+		BattleFree(*(void**)audience->field_137C8);
+		*(void**)audience->field_137C8 = NULL;
+	}
+#endif
 }
 
 //@@ BattleAudienceSettingAudience
@@ -998,7 +1015,7 @@ void BattleAudienceSettingAudience(void) {
 	s32 weights[12];
 	s32 counts[13];
 	AudWArr w;
-	s32* bflags = (s32*)((u8*)_battleWorkPointer + 0x19068);
+	s32* bflags = (s32*)((u8*)_battleWorkPointer + BWOFF(0x19068));
 	BattleAudience* audience = BattleAudienceBaseGetPtr();
 	s8* rec = *(s8**)(*(u8**)((u8*)_battleWorkPointer + 0x2738) + 0xC) + 0xAC;
 	PouchData* pouch = pouchGetPtr();
@@ -1236,7 +1253,7 @@ extern s32 irand(s32);
 void BattleAudienceCtrlProcess(void) {
 	s32 chance;
 	BattleWork* wp = _battleWorkPointer;
-	u32* bflags = (u32*)((u8*)wp + 0x19068);
+	u32* bflags = (u32*)((u8*)wp + BWOFF(0x19068));
 	BattleAudience* audience = BattleAudienceBaseGetPtr();
 	BattleAudienceMember* member;
 	s32 i, j, index;
@@ -2294,7 +2311,7 @@ void BattleAudienceDispApSrc(CameraId camId, void* param) {
 			PSMTXTrans(trans, star->x, star->y, 0.0f);
 			PSMTXConcat(scale, rot, mtx);
 			PSMTXConcat(trans, mtx, mtx);
-			iconDispGxCol(mtx, 0x10, 0x1B2, (GXColor){0xFF, 0xFF, 0xFF, star->alpha});
+			iconDispGxCol(mtx, 0x10, ICON_1B2, (GXColor){0xFF, 0xFF, 0xFF, star->alpha});
 
 		}
 	}
@@ -2314,7 +2331,7 @@ void BattleAudienceDispWin(CameraId camId, void* param) {
 		Vec pos = {0.0f, 0.0f, 0.0f};
 		pos.x = 17.0f + AUD_F32(win, 0x8);
 		pos.y = AUD_F32(win, 0xC) - 40.0f;
-		iconDispGx(&pos, 0x10, 0x209, 0.8f);
+		iconDispGx(&pos, 0x10, ICON_209, 0.8f);
 	}
 	PSMTXTrans(mtx, 75.0f + AUD_F32(win, 0x8), AUD_F32(win, 0xC) - 40.0f, 0.0f);
 	{
@@ -2816,6 +2833,102 @@ s32 BattleAudience_NoUsedHaitiRand(void) {
 	return -1;
 }
 
+#ifdef VERSION_G8ME01
+s32 BattleAudience_NoUsedFCHaitiRandFull(void);
+s32 BattleAudience_NoUsedFCHaitiRandCenter(void);
+
+s32 BattleAudience_NoUsedFCHaitiRandFull(void) {
+	BattleAudience* audience = BattleAudienceBaseGetPtr();
+	s32 rank = pouchGetPtr()->rank;
+	s32* haiti;
+	s32 count = 0;
+	s32 total = 0;
+	s32 rowW[10] = { 10000, 1000, 100, 10, 5, 2, 1, 1, 1, 1 };
+	s32 colW[20] = { 1, 1, 2, 2, 4, 4, 8, 8, 16, 16, 16, 16, 8, 8, 4, 4, 2, 2, 1, 1 };
+	s32 list[200];
+	s32 cumul[200];
+	s32 i, j, k, id, w, r;
+
+	haiti = haiti_data[rank];
+	for (i = 0; i < 10; i++) {
+		for (j = 0, k = (20 - haiti[i]) / 2; j < haiti[i]; j++, k++) {
+			id = k + i * 20;
+			if (!(BattleAudienceGetPtr(id)->flags & 1) && !(BattleAudienceGetPtr(id)->flags & 0x100)) {
+				w = rowW[i] * colW[k] + 1;
+				list[count] = id;
+				if (count) {
+					cumul[count] = w + cumul[count - 1];
+				} else {
+					cumul[count] = w;
+				}
+				total += w;
+				count++;
+			}
+		}
+	}
+	r = (f32)total * (f32)rand() / 32767.0f;
+	for (i = 0; i < count; i++) {
+		if (r < cumul[i]) {
+			return list[i];
+		}
+	}
+	return -1;
+}
+
+s32 BattleAudience_NoUsedFCHaitiRandCenter(void) {
+	BattleAudience* audience = BattleAudienceBaseGetPtr();
+	s32 rank = pouchGetPtr()->rank;
+	s32* haiti;
+	s32 count = 0;
+	s32 total = 0;
+	s32 rowW[10] = { 10000, 1000, 100, 10, 5, 2, 1, 1, 1, 1 };
+	s32 colW[20] = { 1, 1, 2, 2, 4, 4, 8, 8, 16, 16, 16, 16, 8, 8, 4, 4, 2, 2, 1, 1 };
+	s32 list[200];
+	s32 cumul[200];
+	s32 i, j, k, id, w, r;
+
+	haiti = haiti_data_front_narrow[rank];
+	for (i = 0; i < 10; i++) {
+		for (j = 0, k = (20 - haiti[i]) / 2; j < haiti[i]; j++, k++) {
+			id = k + i * 20;
+			if (!(BattleAudienceGetPtr(id)->flags & 1) && !(BattleAudienceGetPtr(id)->flags & 0x100)) {
+				w = rowW[i] * colW[k] + 1;
+				list[count] = id;
+				if (count) {
+					cumul[count] = w + cumul[count - 1];
+				} else {
+					cumul[count] = w;
+				}
+				total += w;
+				count++;
+			}
+		}
+	}
+	r = (f32)total * (f32)rand() / 32767.0f;
+	for (i = 0; i < count; i++) {
+		if (r < cumul[i]) {
+			return list[i];
+		}
+	}
+	return -1;
+}
+
+//@@ BattleAudience_NoUsedFCHaitiRand
+s32 BattleAudience_NoUsedFCHaitiRand(void) {
+	s32 id;
+
+	if (BattleAudience_GetAudienceNum() >= 20) {
+		id = BattleAudience_NoUsedFCHaitiRandFull();
+	} else {
+		id = BattleAudience_NoUsedFCHaitiRandCenter();
+		if (id == -1) {
+			id = BattleAudience_NoUsedFCHaitiRandFull();
+		}
+	}
+	return id;
+}
+
+#else
 //@@ BattleAudience_NoUsedFCHaitiRand
 s32 BattleAudience_NoUsedFCHaitiRand(void) {
 	BattleAudience* audience = BattleAudienceBaseGetPtr();
@@ -2854,6 +2967,8 @@ s32 BattleAudience_NoUsedFCHaitiRand(void) {
 	}
 	return -1;
 }
+
+#endif
 
 //@@ BattleAudience_GetAudienceNum
 s32 BattleAudience_GetAudienceNum(void) {

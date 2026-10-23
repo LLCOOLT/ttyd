@@ -88,7 +88,7 @@ USER_FUNC(evt_item_set_jump_power);
 USER_FUNC(evt_item_set_move_dir_speed);
 USER_FUNC(evt_item_set_position);
 USER_FUNC(evt_item_status_on);
-USER_FUNC(evt_kagemario_init_29_text_1A0C);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_key_get_buttontrg);
 USER_FUNC(evt_kinopio_setup);
 USER_FUNC(evt_koopa_fire);
@@ -219,7 +219,11 @@ s32 calcPose(s32 i, s32 lo, s32 hi, s32 flag);
 void kpaSen_ext_init(void);
 void kpa_stg5_009_7_cb(s32 type, UsuCbInfo** param);
 USER_FUNC(party_tev);
-extern s32 all_party_lecture_29_data_10988[];
+#ifdef VERSION_G8ME01
+USER_FUNC(N_evt_sub_status_gauge_force_update);
+extern s32 evt_memcard_save_wrapper[];
+#endif
+extern s32 all_party_lecture[];
 extern s32 bero_case_switch_off[];
 extern s32 bero_case_switch_on[];
 extern s32 envSetYami[];
@@ -229,7 +233,7 @@ extern s32 evt_door_open[];
 extern s32 evt_memcard_save[];
 extern s32 evt_sub_kusa_access_entry[];
 extern s32 evt_sub_tree_access_entry[];
-extern s32 evt_usu_kagemario_party_kill_29_data_104A8[];
+extern s32 evt_usu_kagemario_party_kill[];
 extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_usu_00_negone_one_374;
@@ -292,8 +296,16 @@ s32 usu00_vivian_joinup_event[608];
 static s32 cam_up[34];
 static __declspec(section ".data") s32 cam_down[8];
 s32 usu00_check_vivian[33];
+#ifdef VERSION_G8ME01
+s32 usu00_crowAB_talk_event[338];
+#else
 s32 usu00_crowAB_talk_event[299];
+#endif
+#ifdef VERSION_G8ME01
+s32 usu00_crowCDE_talk_event[346];
+#else
 s32 usu00_crowCDE_talk_event[307];
+#endif
 s32 chief_pig_event[66];
 static s32 kino_dt[38];
 static __declspec(section ".data") s32 yado_npc[2];
@@ -358,7 +370,11 @@ static s32 evt_after_peach[151];
 static s32 epilogue_npc_entry[48];
 static s32 epilogue_evt_sub[167];
 static s32 epilogue_evt[73];
+#ifdef VERSION_G8ME01
+s32 usu_00_init_evt[660];
+#else
 s32 usu_00_init_evt[658];
+#endif
 
 static USER_FUNC(getYoshiColor) {
     s32* args = event->args;
@@ -1450,7 +1466,7 @@ EVT_BEGIN(usu00_vivian_joinup_event)
     WAIT_MS(800)
     SET_VALUE(LW(8), STRING("ビビアン"))
     SET_VALUE(LW(9), 6)
-    CALL_CHILD(PTR(all_party_lecture_29_data_10988))
+    CALL_CHILD(PTR(all_party_lecture))
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_USU1"))
     CALL(evt_msg_print_party, STRING("stg4_usu_123"))
     CALL(evt_mario_set_pose, STRING("M_N_2"))
@@ -1517,6 +1533,25 @@ EVT_BEGIN(usu00_crowAB_talk_event)
         SET_VALUE(LW(8), 20)
     END_IF
     CALL(evt_sub_area_check, 1, LW(3), LW(5), LW(8), LW(0), LW(2), LW(6))
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_get_party, LW(1))
+    IF_INT_NOT_EQUAL(LW(1), 6)
+        CALL(evt_mario_party_use_check, LW(1))
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            SET_VALUE(LW(6), 0)
+        END_IF
+    END_IF
+    CALL(evt_mario_get_motion, LW(1))
+    IF_INT_NOT_EQUAL(LW(1), 28)
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            IF_INT_NOT_EQUAL(LW(1), 1)
+                IF_INT_NOT_EQUAL(LW(1), 2)
+                    SET_VALUE(LW(6), 0)
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+#endif
     IF_INT_EQUAL(LW(6), 1)
         IF_INT_EQUAL(LW(15), 0)
             CALL(evt_mario_balloon_tenten)
@@ -1612,6 +1647,25 @@ EVT_BEGIN(usu00_crowCDE_talk_event)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_npc_get_position, STRING("カラスＤ"), LW(3), LW(4), LW(5))
     CALL(evt_sub_area_check, 1, LW(3), LW(5), 60, LW(0), LW(2), LW(6))
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_get_party, LW(1))
+    IF_INT_NOT_EQUAL(LW(1), 6)
+        CALL(evt_mario_party_use_check, LW(1))
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            SET_VALUE(LW(6), 0)
+        END_IF
+    END_IF
+    CALL(evt_mario_get_motion, LW(1))
+    IF_INT_NOT_EQUAL(LW(1), 28)
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            IF_INT_NOT_EQUAL(LW(1), 1)
+                IF_INT_NOT_EQUAL(LW(1), 2)
+                    SET_VALUE(LW(6), 0)
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+#endif
     IF_INT_LESS_OR_EQUAL(LW(2), -250)
         SET_VALUE(LW(6), 0)
     END_IF
@@ -2898,7 +2952,11 @@ EVT_BEGIN(usu_00_koopa_second_evt)
     CALL(evt_cam_letter_box_disable, 0)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 15)
+#ifdef VERSION_G8ME01
+    CALL_CHILD(evt_memcard_save_wrapper)
+#else
     CALL_CHILD(PTR(evt_memcard_save))
+#endif
     CALL(evt_mario_set_mode, 0)
     CALL(evt_fade_set_mapchange_type, 1, 59, 0, 58, 0)
     CALL(evt_bero_mapchange, STRING("muj_00"), STRING(""))
@@ -3033,12 +3091,20 @@ static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_cam3d_evt_set, 0, 80, 687, 0, 70, -13, 0, 11)
     CALL(evt_seq_wait, 2)
     WAIT_MS(1000)
+#ifdef VERSION_G8ME01
+    LOOP(1)
+#else
     LOOP(2)
+#endif
         CALL(evt_snd_sfxon, STRING("SFX_STG8_LIGHT1"), 0)
         CALL(evt_fade_entry, 10, 0, 255, 255, 255)
         WAIT_MS(100)
         CALL(evt_fade_entry, 9, 0, 255, 255, 255)
+#ifdef VERSION_G8ME01
+        WAIT_MS(500)
+#else
         WAIT_MS(100)
+#endif
     END_LOOP
     SET_VALUE(LW(0), STRING("村人Ａ"))
     SPAWN_EVENT(PTR(sekai_yami_npc))
@@ -3415,7 +3481,7 @@ EVT_BEGIN(usu_00_init_evt)
         CALL(evt_snd_envon, 272, STRING("ENV_STG4_USU1"))
     END_IF
     IF_INT_EQUAL(GF(1), 0)
-        CALL(evt_kagemario_init_29_text_1A0C)
+        CALL(evt_kagemario_init)
     END_IF
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -3455,7 +3521,7 @@ EVT_BEGIN(usu_00_init_evt)
     IF_INT_EQUAL(GF(1), 0)
         CALL(evt_item_entry, STRING("item00"), 125, -220, 0, -225, 16, GSWF(5629), 0)
     END_IF
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_29_data_104A8))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_EQUAL(GF(1), 1)
         CALL_CHILD(PTR(koopa_npc_entry))
@@ -3559,9 +3625,16 @@ EVT_BEGIN(usu_00_init_evt)
         IF_INT_EQUAL(LW(15), 0)
             CALL(evt_mario_set_party, 0, 1)
             CALL(evt_party_run, 0)
+#ifdef VERSION_G8ME01
+        END_IF
+#endif
             CALL(evt_pouch_mario_recovery)
             CALL(evt_pouch_all_party_recovery)
+#ifdef VERSION_G8ME01
+        CALL(N_evt_sub_status_gauge_force_update)
+#else
         END_IF
+#endif
         CALL(evt_party_stop, 0)
         CALL(evt_party_set_pos, 0, -130, 0, -60)
         SPAWN_EVENT(PTR(evt_after_peach))

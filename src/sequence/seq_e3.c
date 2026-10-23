@@ -45,17 +45,46 @@ static seq_e3_work work;
 
 //.sdata
 static seq_e3_work* wp = &work;
+#ifdef VERSION_G8ME01
+seq_e3_entry e3_tbl[4] = {
+    { 3, -140.0f, 100.0f },
+    { 23, 140.0f, 100.0f },
+    { 35, -140.0f, -100.0f },
+    { 96, 140.0f, -100.0f },
+};
+#else
 seq_e3_entry e3_tbl[3] = {
     { 23, -140.0f, 100.0f },
     { 35, 140.0f, 100.0f },
     { 96, 0.0f, -100.0f },
 };
+#endif
+#ifndef VERSION_G8ME01
 char* anim_tbl[] = { "b_mario", "PKR_W_1", "PKR_S_1", "PKR_A_2A", "PNK_W_1", "PNK_S_1",
                      "PNK_O_1", "c_windy", "PWD_W_1", "PWD_S_1",  "PWD_A_7" };
+#endif
+
+#ifdef VERSION_G8ME01
+// US: anim_tbl is gone (dead-stripped) but its strings stayed at the start of .rodata
+const char e3_anim_str0[] = "b_mario";
+const char e3_anim_str1[] = "PKR_W_1";
+const char e3_anim_str2[] = "PKR_S_1";
+const char e3_anim_str3[] = "PKR_A_2A";
+const char e3_anim_str4[] = "PNK_W_1";
+const char e3_anim_str5[] = "PNK_S_1";
+const char e3_anim_str6[] = "PNK_O_1";
+const char e3_anim_str7[] = "c_windy";
+const char e3_anim_str8[] = "PWD_W_1";
+const char e3_anim_str9[] = "PWD_S_1";
+const char e3_anim_str10[] = "PWD_A_7";
+#endif
 
 // Forward Declarations
 void e3Disp(CameraId cameraId, void* param);
 void e3DispOffscreen(CameraId cameraId, void* param);
+#ifdef VERSION_G8ME01
+static
+#endif
 void pressStartGX(s32 alpha, f32 x, f32 y);
 
 void alarm_handler(OSAlarm* alarm, OSContext* context) {
@@ -69,7 +98,11 @@ void seq_e3Init(SequenceWork* seq) {
     wp->scenario = 0;
     wp->field_64 = 270.0f;
     OSCreateAlarm(&wp->alarm);
+#ifdef VERSION_G8ME01
+    OSSetAlarm(&wp->alarm, (OSTime)OS_TIMER_CLOCK * 300, alarm_handler);
+#else
     OSSetAlarm(&wp->alarm, (OSTime)OS_TIMER_CLOCK * 600, alarm_handler);
+#endif
     wp->initTime = OSGetTime();
     gp->flags &= ~2;
     gp->flags |= 0x20;
@@ -137,6 +170,16 @@ void seq_e3Main(SequenceWork* seq) {
             break;
 
         case 4: {
+#ifdef VERSION_G8ME01
+            prev = wp->scenario;
+            keyGetStickX(0);
+            keyGetStickY(0);
+            if (keyGetDirTrg(0) & 0xC000) {
+                wp->scenario ^= 1;
+            } else if (keyGetDirTrg(0) & 0x3000) {
+                wp->scenario ^= 2;
+            }
+#else
             prev = wp->scenario;
             stickX = keyGetStickX(0);
             stickY = keyGetStickY(0);
@@ -167,6 +210,7 @@ void seq_e3Main(SequenceWork* seq) {
                     break;
             }
 
+#endif
             if (prev != wp->scenario) {
                 psndSFXOn((void*)5);
             } else if (keyGetButtonTrg(0) & PAD_BUTTON_B || OSTicksToSeconds(OSGetTime() - none_key) > 120) {
@@ -266,9 +310,17 @@ void seq_e3Main(SequenceWork* seq) {
                 marioPartyEntry(found[foundIdx].partners[1]);
             }
 
+#ifdef VERSION_G8ME01
+            if (wp->scenario == 0) {
+                seqSetSeq(SEQ_MAP_CHANGE, "gor_00", NULL);
+            } else if (wp->scenario == 1) {
+                seqSetSeq(SEQ_MAP_CHANGE, "hei_00", "dokan_2");
+            } else {
+#else
             if (wp->scenario == 0) {
                 seqSetSeq(SEQ_MAP_CHANGE, "hei_00", "dokan_2");
             } else {
+#endif
                 seqSetSeq(SEQ_MAP_CHANGE, found[foundIdx].mapName, found[foundIdx].beroName);
             }
 
@@ -321,7 +373,11 @@ void e3Disp(CameraId cameraId, void* param) {
     f32 projBackup[GX_PROJECTION_SZ];
     f32 viewportBackup[GX_VIEWPORT_SZ];
     CameraEntry camBackup;
+#ifdef VERSION_G8ME01
+    char* keys[4];
+#else
     char* keys[3];
+#endif
     s32 active;
     s32 alpha;
     s32 i;
@@ -357,7 +413,11 @@ void e3Disp(CameraId cameraId, void* param) {
         }
 
         winTexInit(*wp->handle->data);
+#ifdef VERSION_G8ME01
+        winTexSet(12, (Vec){ 0.0f, 0.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+#else
         winTexSet(MODE_11, (Vec){ 0.0f, 0.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+#endif
         pressStartGX(alpha, 0.0f, -110.0f);
     } else {
         // Tiled background fill (40 x 32 quads)
@@ -369,7 +429,11 @@ void e3Disp(CameraId cameraId, void* param) {
             }
         }
 
+#ifdef VERSION_G8ME01
+        for (i = 0; i < 4; i++) {
+#else
         for (i = 0; i < 3; i++) {
+#endif
             winTexInit(*wp->handle->data);
 
             if (i == wp->scenario) {
@@ -385,7 +449,11 @@ void e3Disp(CameraId cameraId, void* param) {
             }
 
             {
+#ifdef VERSION_G8ME01
+                char* keys[4] = { "menu_monosiri_gor", "menu_monosiri_hei", "menu_monosiri_gon", "menu_monosiri_win" };
+#else
                 char* keys[3] = { "menu_monosiri_hei", "menu_monosiri_gon", "menu_monosiri_win" };
+#endif
                 step = (i == wp->scenario) ? 0 : 10;
 
                 windowDispGX_Waku_col(0, (GXColor){ 0x4A, 0x56, 0xB5, 0xFF }, (((f32)step + e3_tbl[i].x) - 100.0f),
@@ -436,6 +504,7 @@ void e3Disp(CameraId cameraId, void* param) {
                   viewportBackup[5]);
 }
 
+// JP and US both pool 30.0f via this dead-stripped stand-in
 f32 forceSdata(void) {
     return 30.0f;
 }
@@ -452,6 +521,9 @@ void e3DispOffscreen(CameraId cameraId, void* param) {
     offscreenAddBoundingBox(offscreenNameToId("fOff_peron"), left, top, right, bottom);
 }
 
+#ifdef VERSION_G8ME01 // US: local here, seq_title has the global copy
+static
+#endif
 void pressStartGX(s32 alpha, f32 x, f32 y) {
     CameraEntry* camera = camGetCurPtr();
     GXTexObj startText, gradient;

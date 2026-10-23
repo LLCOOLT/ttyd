@@ -113,7 +113,7 @@ __declspec(section ".data") s32 fd_piders___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_piders_one_negone_359;
 __declspec(section ".data") s32 fd_piders___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_piders_one_364[1];
-BattleUnitKind unit_piders_15_data_66660;
+BattleUnitKind unit_piders;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -151,7 +151,7 @@ static USER_FUNC(piders_yarn_init) {
     s32 id = BattleTransID(event, -2);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
 
-    *(PidersYarn**)&unit->countersetWeapon = __memAlloc(HEAP_BATTLE, sizeof(PidersYarn));
+    *(PidersYarn**)&unit->countersetWeapon = BTL_ALLOC(sizeof(PidersYarn));
     return EVT_RETURN_DONE;
 }
 
@@ -203,7 +203,7 @@ __declspec(section ".data") s32 fd_piders_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_piders_15_data_66660 = {
+BattleUnitKind unit_piders = {
     27,
     "btl_un_piders",
     5,

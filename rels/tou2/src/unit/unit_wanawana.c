@@ -246,7 +246,7 @@ void replace_disp(CameraId camera, void* param) {
 }
 
 void replace_callback(BattleUnitPart* part, s32 type) {
-    WanaWork* wp = *(WanaWork**)((u8*)part->mOwner + 0x310);
+    WanaWork* wp = *(WanaWork**)((u8*)part->mOwner + BUOFF(0x310));
 
     if (wp->ready) {
         Mtx mtx;
@@ -282,7 +282,7 @@ USER_FUNC(replace_evt) {
     }
     w += w & 1;
     h += h & 1;
-    wp = __memAlloc(HEAP_BATTLE, sizeof(WanaWork));
+    wp = BTL_ALLOC(sizeof(WanaWork));
     wp->tex = smartAlloc(GXGetTexBufferSize(w / 2, h / 2, GX_TF_RGB5A3, GX_FALSE, 0), 1);
     wp->poseId = part->poseId;
     wp->part = part;
@@ -291,8 +291,8 @@ USER_FUNC(replace_evt) {
     PSMTXIdentity(wp->mtx);
     animGetPtr()->poses[part->poseId].flags |= 0x10;
     *(void**)((u8*)part + 0x210) = replace_callback;
-    *(WanaWork**)((u8*)unit + 0x310) = wp;
-    *(smartEntry**)((u8*)unit + 0x318) = wp->tex;
+    *(WanaWork**)((u8*)unit + BUOFF(0x310)) = wp;
+    *(smartEntry**)((u8*)unit + BUOFF(0x318)) = wp->tex;
     wp->ready = 0;
     dispEntry(CAMERA_SHADOW, 0.0f, 0, replace_disp, wp);
     return EVT_RETURN_DONE;

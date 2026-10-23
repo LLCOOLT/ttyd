@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -23,6 +24,11 @@
 #include "evt/evt_badgeshop.h"
 #include "driver/effdrv.h"
 #include "driver/animdrv.h"
+#include "icon_ids.h"
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_msg_fmt_int);
+USER_FUNC(evt_msg_fmt_str);
+#endif
 
 typedef struct FuwaTable { f32 v[40]; } FuwaTable;
 static const FuwaTable fuwa_table = {{0.0f, 0.5f, 1.0f, 1.4f, 1.8f, 2.0f, 2.3f, 2.5f, 2.6f, 2.7f, 2.7f, 2.7f, 2.6f, 2.5f, 2.3f, 2.0f, 1.8f, 1.4f, 1.0f, 0.5f, -0.0f, -0.5f, -1.0f, -1.4f, -1.8f, -2.0f, -2.3f, -2.5f, -2.6f, -2.7f, -2.7f, -2.7f, -2.6f, -2.5f, -2.3f, -2.0f, -1.8f, -1.4f, -1.0f, -0.5f}};
@@ -229,8 +235,8 @@ USER_FUNC(evt_unitwin_alloc);
 USER_FUNC(evt_unitwin_free);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(evt_win_other_select);
-USER_FUNC(evt_yuuranking_alloc_10_text_A47C);
-USER_FUNC(evt_yuuranking_free_10_text_A3F8);
+USER_FUNC(evt_yuuranking_alloc);
+USER_FUNC(evt_yuuranking_free);
 USER_FUNC(exchange_ryokin_medal);
 static USER_FUNC(fall_rtn);
 USER_FUNC(get_mario_dispReqDir);
@@ -263,7 +269,7 @@ USER_FUNC(yuugijou_montemedal_keep);
 USER_FUNC(yuugijou_montemedal_return);
 USER_FUNC(yuugijou_montemedal_wait);
 USER_FUNC(yuugijou_set_yupflag);
-USER_FUNC(yuuranking_wait_button_10_text_A37C);
+USER_FUNC(yuuranking_wait_button);
 void kuji_bomb_055_callback(s32 type, KujiMsgWork** work);
 void goryuugijo_disp_slot(CameraId camera, void* param);
 void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall);
@@ -325,7 +331,7 @@ s32 maffiaboss_train_ticket_init[50];
 s32 maffiaboss_train_ticket[824];
 s32 maffiaboss_talk_common[106];
 __declspec(section ".data") s32 maffiaboss_talk[10];
-s32 maffiaboss_desk_talk[46];
+s32 maffiaboss_desk_talk[VERSION_PICK(46, 54)];
 s32 maffiaboss_casino_init[17];
 s32 maffiaboss_casino_talk[45];
 s32 maffiaboss_nekomu00[14];
@@ -354,14 +360,14 @@ __declspec(section ".data") s32 cherry_talk[8];
 s32 cherryEnt[46];
 s32 bteresa_n_fadein[45];
 s32 bteresa_n_fadeout[42];
-s32 exchange_return_sub[111];
-s32 exchange_keep_sub[111];
+s32 exchange_return_sub[VERSION_PICK(111, 132)];
+s32 exchange_keep_sub[VERSION_PICK(111, 132)];
 s32 gor_03_dokan_init_evt[35];
 s32 gor_03_dokan_up_evt[60];
 s32 gor_03_dokan_down_evt[63];
 s32 exchange_ryokin_medal_tbl[54];
 s32 bteresa_talk_sub_minigame[245];
-s32 bteresa_talk_sub_keihin[220];
+s32 bteresa_talk_sub_keihin[VERSION_PICK(220, 242)];
 s32 bteresa_table_talk[437];
 s32 bteresa_init[18];
 s32 bteresa_talk[81];
@@ -371,7 +377,7 @@ __declspec(section ".data") s32 kyaku4_init[2];
 s32 kyaku4_talk[66];
 __declspec(section ".data") s32 montemedalzpos[2];
 __declspec(section ".data") s32 slot_fall_monte[4];
-s32 slot_set[148];
+s32 slot_set[VERSION_PICK(148, 168)];
 __declspec(section ".data") s32 slot1_set[7];
 __declspec(section ".data") s32 slot2_set[7];
 s32 drumname[34];
@@ -379,7 +385,7 @@ __declspec(section ".data") s32 slotevttbl[2];
 s32 slotgara[48];
 s32 upsidegara[48];
 s32 ranking_set[65];
-s32 exchange_set[195];
+s32 exchange_set[VERSION_PICK(195, 210)];
 s32 roten_4_init[13];
 s32 roten_4_regl[19];
 s32 roten_4_talk[68];
@@ -473,7 +479,7 @@ __declspec(section ".data") s32 casino_fuwafuwa[7];
 s32 debug_event_mode[144];
 s32 monte_evt_door_close[16];
 s32 monte_evt_door_entry[73];
-s32 gor_03_init_evt[462];
+s32 gor_03_init_evt[VERSION_PICK(462, 681)];
 
 static USER_FUNC(setmertn) {
     event->ownerNPC = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
@@ -572,7 +578,15 @@ USER_FUNC(evt_exchange_msg_set) {
     const char* msg = msgSearch((const char*)evtGetValue(event, args[1]));
     s32 n = exchange_ret_tbl_no();
 
+#ifdef VERSION_G8ME01
+    if ((u32)gp->language == 0) {
+        sprintf(exchange_msgp, msg, value, exchange_ryokin_medal_tbl[n * 6 + 1], exchange_ryokin_medal_tbl[n * 6], exchange_ryokin_medal_tbl[n * 6 + 3], exchange_ryokin_medal_tbl[n * 6 + 2], exchange_ryokin_medal_tbl[n * 6 + 5], exchange_ryokin_medal_tbl[n * 6 + 4]);
+    } else {
+        sprintf(exchange_msgp, msg, value);
+    }
+#else
     sprintf(exchange_msgp, msg, value, exchange_ryokin_medal_tbl[n * 6 + 1], exchange_ryokin_medal_tbl[n * 6], exchange_ryokin_medal_tbl[n * 6 + 3], exchange_ryokin_medal_tbl[n * 6 + 2], exchange_ryokin_medal_tbl[n * 6 + 5], exchange_ryokin_medal_tbl[n * 6 + 4]);
+#endif
     evtSetValue(event, args[2], (s32)exchange_msgp);
     return EVT_RETURN_DONE;
 }
@@ -729,7 +743,7 @@ static void monte_disp(CameraId camera, void* param) {
 
     for (i = 0; i < monte->owner->monteCount; i++) {
         if (monte[i].hidden == 0) {
-            iconDispGx(&monte[i].sub.pos, 0x40, 0x13F, 1.0f);
+            iconDispGx(&monte[i].sub.pos, 0x40, ICON_13F, 1.0f);
         }
     }
 }
@@ -844,6 +858,86 @@ EVT_BEGIN(maffiaboss_ticket_put)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(maffiaboss_ticket_check)
+    LOOP(0)
+        SET_VALUE(LF(0), 0)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        IF_INT_GREATER_OR_EQUAL(LW(0), -296)
+            IF_INT_LESS_OR_EQUAL(LW(0), -104)
+                IF_INT_GREATER_OR_EQUAL(LW(1), 155)
+                    IF_INT_LESS_OR_EQUAL(LW(1), 180)
+                        IF_INT_GREATER_OR_EQUAL(LW(2), -110)
+                            ADD(LF(0), 1)
+                        END_IF
+                    END_IF
+                END_IF
+            END_IF
+        END_IF
+        CALL(evt_mario_get_name_hitobj_ride, LW(0))
+        IF_STR_EQUAL(LW(0), STRING("A_i02_tke_ue"))
+            SET_VALUE(LW(5), 2)
+            BREAK_LOOP
+        END_IF
+        IF_INT_EQUAL(LF(0), 1)
+            SET_VALUE(LW(5), 0)
+            BREAK_LOOP
+        END_IF
+        IF_INT_EQUAL(GF(15), 1)
+            SET_VALUE(LW(5), 1)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_normalize)
+    CALL(evt_snd_bgmon, 513, STRING("BGM_STG0_CSN1"))
+    CALL(evt_msg_print, 0, STRING("mac_2_116"), 0, STRING("マフィアボス"))
+    CALL(evt_npc_set_ry_lr, STRING("マフィアボス"), 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("マフィアボス"), LW(10), LW(11), LW(12))
+        IF_INT_LESS_OR_EQUAL(LW(2), LW(12))
+            CALL(evt_mario_set_dir, 90, 200, 0)
+            ELSE
+            CALL(evt_mario_set_dir, 270, 200, 0)
+        END_IF
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("マフィアボス"), LW(10), LW(11), LW(12))
+        IF_INT_LESS_OR_EQUAL(LW(2), LW(12))
+            CALL(evt_party_set_dir, 0, 90, 200)
+            ELSE
+            CALL(evt_party_set_dir, 0, 270, 200)
+        END_IF
+    END_INLINE_EVENT
+    CALL(evt_set_dir_to_target, STRING("マフィアボス"), STRING("mario"))
+    WAIT_MS(200)
+    CALL(evt_msg_print, 0, STRING("mac_2_117"), 0, STRING("マフィアボス"))
+    IF_INT_EQUAL(LW(5), 0)
+        CALL(evt_npc_flag_onoff, 1, STRING("マフィアボス"), 1073741856)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("マフィアボス"), LW(10), LW(11), LW(12))
+        CALL(evt_npc_move_position, STRING("マフィアボス"), LW(0), -68, 0, FLOAT(60.0f), 0)
+        WAIT_MS(500)
+        CALL_CHILD(PTR(maffiaboss_ticket_put))
+        CALL(evt_msg_print, 0, STRING("mac_2_118"), 0, STRING("マフィアボス"))
+        CALL(evt_npc_move_position, STRING("マフィアボス"), LW(10), LW(12), 0, FLOAT(60.0f), 0)
+        CALL(evt_npc_flag_onoff, 0, STRING("マフィアボス"), 1073741856)
+        ELSE
+        CALL_CHILD(PTR(maffiaboss_ticket_put))
+        CALL(evt_msg_print, 0, STRING("mac_2_118"), 0, STRING("マフィアボス"))
+    END_IF
+    CALL(evt_npc_move_position, STRING("マフィアボス"), -198, -80, 0, FLOAT(60.0f), 0)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("mac_2_119"), 0, STRING("マフィアボス"))
+    SET_VALUE(GSW(0), 124)
+    CALL(evt_mario_key_onoff, 1)
+    SET_VALUE(GF(14), 0)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(maffiaboss_ticket_check)
     LOOP(0)
         SET_VALUE(LF(0), 0)
@@ -922,6 +1016,7 @@ EVT_BEGIN(maffiaboss_ticket_check)
     SET_VALUE(GF(14), 0)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(maffiaboss_init)
     SWITCH(GSW(0))
@@ -1555,6 +1650,33 @@ __declspec(section ".data") EVT_BEGIN(maffiaboss_talk)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(maffiaboss_desk_talk)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_party_stop, 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_set_dir_npc, STRING("マフィアボス"))
+    END_INLINE_EVENT
+    SET_VALUE(GF(10), 1)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_set_pose, STRING("M_I_2"))
+        WAIT_MS(800)
+        CALL(evt_mario_set_pose, STRING("M_S_1"))
+        SET_VALUE(GF(10), 0)
+    END_INLINE_EVENT
+    CALL(evt_npc_flag_check, STRING("マフィアボス"), 16777216, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        BEGIN_INLINE_EVENT
+            CALL(evt_set_dir_to_target, STRING("マフィアボス"), STRING("mario"))
+        END_INLINE_EVENT
+    END_IF
+    CALL_CHILD(PTR(maffiaboss_talk_common))
+    WAIT_WHILE(GF(10))
+    CALL(evt_party_run, 0)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(maffiaboss_desk_talk)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -1577,6 +1699,7 @@ EVT_BEGIN(maffiaboss_desk_talk)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(maffiaboss_casino_init)
     SWITCH(GSW(0))
@@ -1634,6 +1757,47 @@ EVT_BEGIN(maffia1_init)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(maffia1_talk)
+    SWITCH(GSW(0))
+        CASE_LESS_OR_EQUAL(120)
+        CALL(evt_msg_print, 0, STRING("mac_2_044_02"), 0, STRING("me"))
+        CASE_BETWEEN(122, 123)
+        IF_INT_EQUAL(GSWF(1236), 0)
+            CALL(evt_msg_print, 0, STRING("mac_2_070"), 0, STRING("me"))
+            ELSE
+            CALL(evt_msg_print, 0, STRING(VERSION_PICK("mac_2_116_buka", "mac_2_116_buka1")), 0, STRING("me"))
+        END_IF
+        CASE_BETWEEN(124, 126)
+        CALL(evt_msg_print, 0, STRING("mac_2_121"), 0, STRING("me"))
+        CASE_BETWEEN(268, 272)
+        CALL_CHILD(PTR(maffiaboss_nekomu00))
+        CASE_EQUAL(273)
+        CALL_CHILD(PTR(maffiaboss_nekomu01))
+        CASE_BETWEEN(274, 275)
+        CALL_CHILD(PTR(maffiaboss_nekomu02))
+        CASE_EQUAL(278)
+        CALL(evt_msg_print, 0, STRING("mac_5_042"), 0, STRING("me"))
+        CASE_LESS(121)
+        CALL(evt_msg_print, 0, STRING("gor_03_02_01"), 0, STRING("me"))
+        CASE_LESS(122)
+        CALL(evt_msg_print, 0, STRING("gor_03_02_02"), 0, STRING("me"))
+        CASE_LESS(230)
+        CALL(evt_msg_print, 0, STRING("gor_03_02_03"), 0, STRING("me"))
+        CASE_LESS(272)
+        CALL(evt_msg_print, 0, STRING("gor_03_02_04"), 0, STRING("me"))
+        CASE_LESS(352)
+        CALL(evt_msg_print, 0, STRING("gor_03_02_05"), 0, STRING("me"))
+        CASE_LESS(382)
+        CALL(evt_msg_print, 0, STRING("gor_03_02_06"), 0, STRING("me"))
+        CASE_LESS(403)
+        CALL(evt_msg_print, 0, STRING("gor_03_02_07"), 0, STRING("me"))
+        CASE_GREATER_OR_EQUAL(403)
+        CALL(evt_msg_print, 0, STRING("gor_03_02_08"), 0, STRING("me"))
+    END_SWITCH
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(maffia1_talk)
     SWITCH(GSW(0))
         CASE_LESS_OR_EQUAL(120)
@@ -1673,6 +1837,7 @@ EVT_BEGIN(maffia1_talk)
     END_SWITCH
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(maffia2_init)
     CALL(evt_npc_set_position, STRING("me"), -135, 155, -210)
@@ -2003,6 +2168,52 @@ EVT_BEGIN(bteresa_n_fadeout)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(exchange_return_sub)
+    IF_INT_NOT_EQUAL(LW(11), 0)
+        CALL(evt_cam3d_evt_set, FLOAT(-541.0f), FLOAT(125.0f), FLOAT(-407.0f), FLOAT(-197.0f), FLOAT(64.0f), FLOAT(-407.0f), 600, 11)
+        WAIT_MS(600)
+    END_IF
+    CALL(evt_npc_get_position, STRING("バニーテレサ"), LW(6), LW(7), LW(10))
+    CALL(evt_npc_get_dir, STRING("バニーテレサ"), LW(9))
+    SET_VALUE(LW(0), 48)
+    CALL_CHILD(PTR(bteresa_n_fadeout))
+    IF_INT_NOT_EQUAL(LW(11), 0)
+        CALL(evt_cam3d_evt_off, 0, 11)
+        WAIT_FRAMES(1)
+    END_IF
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    SUBTRACT(LW(0), 30)
+    SUBTRACT(LW(2), 20)
+    CALL(evt_npc_set_position, STRING("バニーテレサ"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_set_ry, STRING("バニーテレサ"), 180)
+    SET_VALUE(LW(0), 48)
+    CALL_CHILD(PTR(bteresa_n_fadein))
+    CALL(yuugijou_get_montemedal_keep, LW(1))
+    CALL(evt_sub_get_language, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CALL(evt_msg_print_insert, 0, STRING("bunny_teresa_90"), 0, STRING("バニーテレサ"), LW(1))
+        CASE_DEFAULT
+        CALL(evt_msg_fmt_int, 0, LW(14), STRING("bunny_teresa_90"), LW(1))
+        CALL(evt_msg_print, 1, LW(14), 0, STRING("バニーテレサ"))
+    END_SWITCH
+    CALL(yuugijou_montemedal_return)
+    SET_VALUE(LW(0), 48)
+    CALL_CHILD(PTR(bteresa_n_fadeout))
+    CALL(evt_npc_set_position, STRING("バニーテレサ"), LW(6), LW(7), LW(10))
+    CALL(evt_npc_set_ry, STRING("バニーテレサ"), LW(9))
+    SET_VALUE(LW(0), 48)
+    IF_INT_EQUAL(LW(11), 0)
+        CALL_CHILD(PTR(bteresa_n_fadein))
+        ELSE
+        BEGIN_INLINE_EVENT
+            CALL_CHILD(PTR(bteresa_n_fadein))
+        END_INLINE_EVENT
+    END_IF
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(exchange_return_sub)
     IF_INT_NOT_EQUAL(LW(11), 0)
         CALL(evt_cam3d_evt_set, FLOAT(-541.0f), FLOAT(125.0f), FLOAT(-407.0f), FLOAT(-197.0f), FLOAT(64.0f), FLOAT(-407.0f), 600, 11)
@@ -2040,7 +2251,52 @@ EVT_BEGIN(exchange_return_sub)
     END_IF
     RETURN
 EVT_END()
+#endif
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(exchange_keep_sub)
+    CALL(yuugijou_get_takeoutflag, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(yuugijou_get_montemedal, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(evt_cam3d_evt_set, FLOAT(-541.0f), FLOAT(125.0f), FLOAT(-407.0f), FLOAT(-197.0f), FLOAT(64.0f), FLOAT(-407.0f), 600, 11)
+            WAIT_MS(600)
+            CALL(evt_npc_get_position, STRING("バニーテレサ"), LW(6), LW(7), LW(10))
+            CALL(evt_npc_get_dir, STRING("バニーテレサ"), LW(9))
+            SET_VALUE(LW(0), 48)
+            CALL_CHILD(PTR(bteresa_n_fadeout))
+            CALL(evt_cam3d_evt_off, 0, 11)
+            WAIT_FRAMES(1)
+            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            SUBTRACT(LW(0), 20)
+            SUBTRACT(LW(2), 30)
+            CALL(evt_npc_set_position, STRING("バニーテレサ"), LW(0), LW(1), LW(2))
+            CALL(evt_npc_set_ry, STRING("バニーテレサ"), 180)
+            SET_VALUE(LW(0), 48)
+            CALL_CHILD(PTR(bteresa_n_fadein))
+            CALL(yuugijou_get_montemedal, LW(1))
+            CALL(evt_sub_get_language, LW(0))
+            SWITCH(LW(0))
+                CASE_EQUAL(0)
+                CALL(evt_msg_print_insert, 0, STRING("bunny_teresa_91"), 0, STRING("バニーテレサ"), LW(1))
+                CASE_DEFAULT
+                CALL(evt_msg_fmt_int, 0, LW(14), STRING("bunny_teresa_91"), LW(1))
+                CALL(evt_msg_print, 1, LW(14), 0, STRING("バニーテレサ"))
+            END_SWITCH
+            CALL(yuugijou_montemedal_keep)
+            SET_VALUE(LW(0), 48)
+            CALL_CHILD(PTR(bteresa_n_fadeout))
+            CALL(evt_npc_set_position, STRING("バニーテレサ"), LW(6), LW(7), LW(10))
+            CALL(evt_npc_set_ry, STRING("バニーテレサ"), LW(9))
+            SET_VALUE(LW(0), 1)
+            CALL_CHILD(PTR(bteresa_n_fadein))
+            ELSE
+            CALL(yuugijou_montemedal_keep)
+        END_IF
+    END_IF
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(exchange_keep_sub)
     CALL(yuugijou_get_takeoutflag, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -2076,6 +2332,7 @@ EVT_BEGIN(exchange_keep_sub)
     END_IF
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(gor_03_dokan_init_evt)
     CALL(evt_hit_bind_mapobj, STRING("A_dokan_l_02"), STRING("S_dokan_1"))
@@ -2226,6 +2483,93 @@ EVT_BEGIN(bteresa_talk_sub_minigame)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(bteresa_talk_sub_keihin)
+    CALL(evt_badgeShop_bteresa_get_kind_cnt, LW(0))
+    IF_INT_LESS_OR_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("bunny_teresa_64"))
+        GOTO(0)
+    END_IF
+    IF_INT_EQUAL(GSWF(1228), 0)
+        CALL(evt_msg_print_add, 0, STRING("bunny_teresa_60"))
+        SET_VALUE(GSWF(1228), 1)
+        ELSE
+        CALL(evt_msg_continue)
+    END_IF
+    LABEL(1)
+    CALL(yuugijou_set_yupflag, 1)
+    CALL(evt_win_other_select, 16)
+    CALL(yuugijou_set_yupflag, 0)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print, 0, STRING("bunny_teresa_74"), 0, STRING("me"))
+        GOTO(0)
+    END_IF
+    CALL(yuugijou_get_montemedal, LW(0))
+    IF_INT_LESS(LW(0), LW(3))
+        CALL(evt_msg_print, 0, STRING("bunny_teresa_65"), 0, STRING("me"))
+        GOTO(1)
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(LW(1), 240)
+        CALL(evt_sub_get_language, LW(0))
+        SWITCH(LW(0))
+            CASE_EQUAL(0)
+            CALL(evt_msg_print_insert, 0, STRING("bunny_teresa_67"), 0, STRING("me"), LW(2), LW(3), LW(4))
+            CASE_DEFAULT
+            CALL(evt_msg_fmt_int, 0, LW(14), STRING("bunny_teresa_67"), LW(3))
+            CALL(evt_msg_fmt_str, 1, LW(14), LW(14), LW(2))
+            CALL(evt_msg_print_insert, 1, LW(14), 0, STRING("me"), LW(4))
+        END_SWITCH
+        ELSE
+        CALL(evt_sub_get_language, LW(0))
+        SWITCH(LW(0))
+            CASE_EQUAL(0)
+            CALL(evt_msg_print_insert, 0, STRING("bunny_teresa_66"), 0, STRING("me"), LW(2), LW(3))
+            CASE_DEFAULT
+            CALL(evt_msg_fmt_int, 0, LW(14), STRING("bunny_teresa_66"), LW(3))
+            CALL(evt_msg_fmt_str, 1, LW(14), LW(14), LW(2))
+            CALL(evt_msg_print, 1, LW(14), 0, STRING("me"))
+        END_SWITCH
+    END_IF
+    CALL(evt_msg_select, 0, STRING("bunny_teresa_yesno"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print_add, 0, STRING("bunny_teresa_68"))
+        GOTO(0)
+    END_IF
+    CALL(evt_pouch_add_item, LW(1), LW(0))
+    IF_INT_EQUAL(LW(0), -1)
+        IF_INT_GREATER_OR_EQUAL(LW(1), 240)
+            CALL(evt_msg_print_add, 0, STRING("bunny_teresa_72"))
+            ELSE
+            CALL(evt_msg_print_add, 0, STRING("bunny_teresa_73"))
+        END_IF
+        GOTO(0)
+    END_IF
+    MULTIPLY(LW(3), -1)
+    CALL(yuugijou_add_montemedal, 0, LW(3))
+    CALL(yuugijou_montemedal_wait)
+    WAIT_MS(200)
+    CALL(evt_badgeShop_bteresa_get_kind_cnt, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("bunny_teresa_69"))
+        GOTO(0)
+    END_IF
+    CALL(yuugijou_get_montemedal, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("bunny_teresa_69"))
+        GOTO(0)
+    END_IF
+    CALL(evt_msg_print_add, 0, STRING("bunny_teresa_70"))
+    CALL(evt_msg_select, 0, STRING("bunny_teresa_yesno"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print_add, 0, STRING("bunny_teresa_71"))
+        GOTO(0)
+    END_IF
+    CALL(evt_msg_continue)
+    GOTO(1)
+    LABEL(0)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(bteresa_talk_sub_keihin)
     CALL(evt_badgeShop_bteresa_get_kind_cnt, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 0)
@@ -2305,6 +2649,7 @@ EVT_BEGIN(bteresa_talk_sub_keihin)
     LABEL(0)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(bteresa_table_talk)
     CALL(setmertn, STRING("バニーテレサ"))
@@ -2585,6 +2930,71 @@ EVT_END()
 static inline Vec fall_pos0(void) { Vec v = {-113.0f, 70.0f, 0.0f}; return v; } /* @place "slot_mess_01" */
 static inline Vec fall_vel0(void) { Vec v = {0.0f, 10.0f, 0.0f}; return v; } /* @place "slot_mess_01" */
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(slot_set)
+    CALL(goryuugijo_get_dataadr, 1, LW(0))
+    CALL(evt_goryuugijo_set_nowslot, LW(0), LW(8))
+    CALL(goryuugijo_get_slot_phase, LW(0), LW(1))
+    IF_INT_NOT_EQUAL(LW(1), 0)
+        RETURN
+    END_IF
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_party_stop, 0)
+    CALL(yuugijou_get_takeoutflag, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(yuugijou_get_montemedal_keep, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            SET_VALUE(LW(11), 2)
+            CALL_CHILD(PTR(exchange_return_sub))
+            ELSE
+            CALL(yuugijou_montemedal_return)
+        END_IF
+    END_IF
+    BEGIN_SIBLING_EVENT
+        CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_party_move_pos2, 0, -225, LW(2), FLOAT(60.0f))
+    END_SIBLING_EVENT
+    SWITCH(LW(8))
+        CASE_EQUAL(0)
+        CALL(evt_cam3d_evt_set, FLOAT(-393.8994f), FLOAT(113.09961f), FLOAT(-235.0f), FLOAT(-197.0f), FLOAT(78.69922f), FLOAT(-235.0f), 600, 11)
+        WAIT_MS(600)
+        CASE_EQUAL(1)
+        CALL(evt_cam3d_evt_set, FLOAT(-393.8994f), FLOAT(113.09961f), FLOAT(-160.0f), FLOAT(-197.0f), FLOAT(78.69922f), FLOAT(-160.0f), 600, 11)
+        WAIT_MS(600)
+    END_SWITCH
+    LOOP(0)
+        CALL(yuugijou_get_montemedal, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(evt_msg_print, 0, STRING("slot_mess_01"), 0, 0)
+            GOTO(0)
+        END_IF
+        CALL(evt_msg_select, 0, STRING("slot_mess_00"))
+        IF_INT_EQUAL(LW(0), 1)
+            GOTO(0)
+        END_IF
+        CALL(yuugijou_add_montemedal, 0, -1)
+        CALL(goryuugijo_get_dataadr, 1, LW(0))
+        CALL(goryuugijo_set_slot_phase, LW(0), 1)
+        LOOP(0)
+            CALL(goryuugijo_get_slot_phase, LW(0), LW(1))
+            IF_INT_EQUAL(LW(1), 0)
+                WAIT_MS(300)
+                BREAK_LOOP
+            END_IF
+            IF_INT_EQUAL(LW(1), 8)
+                GOTO(0)
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_LOOP
+    LABEL(0)
+    CALL(evt_cam3d_evt_off, 600, 11)
+    WAIT_MS(600)
+    CALL(evt_party_run, 0)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(slot_set)
     CALL(goryuugijo_get_dataadr, 1, LW(0))
     CALL(evt_goryuugijo_set_nowslot, LW(0), LW(8))
@@ -2642,6 +3052,7 @@ EVT_BEGIN(slot_set)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
+#endif
 
 __declspec(section ".data") EVT_BEGIN(slot1_set)
     SET_VALUE(LW(8), 0)
@@ -2686,8 +3097,9 @@ s32 upsidegara[] = {
 };
 
 typedef struct I3 { s32 v[3]; } I3;
-static const I3 disp_slot_icons = {{0x1F3, 0x1F3, 0x1F3}};
+static const I3 disp_slot_icons = {{ICON_1F3, ICON_1F3, ICON_1F3}};
 
+#ifdef VERSION_G8ME01
 EVT_BEGIN(ranking_set)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, FLOAT(-541.8994f), FLOAT(115.5f), FLOAT(-115.0f), FLOAT(-197.0f), FLOAT(56.799805f), FLOAT(-115.0f), 600, 11)
@@ -2699,10 +3111,10 @@ EVT_BEGIN(ranking_set)
         IF_INT_EQUAL(LW(0), 5)
             GOTO(0)
         END_IF
-        CALL(evt_yuuranking_alloc_10_text_A47C, 0, 0, LW(0), 2, 0, 0, 0, 0)
+        CALL(evt_yuuranking_alloc, 0, 0, LW(0), 2, 0, 0, 0, 0)
         WAIT_FRAMES(1)
-        CALL(yuuranking_wait_button_10_text_A37C)
-        CALL(evt_yuuranking_free_10_text_A3F8)
+        CALL(yuuranking_wait_button)
+        CALL(evt_yuuranking_free)
     END_LOOP
     LABEL(0)
     CALL(evt_cam3d_evt_off, 600, 11)
@@ -2710,7 +3122,107 @@ EVT_BEGIN(ranking_set)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
+#else
+EVT_BEGIN(ranking_set)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_cam3d_evt_set, FLOAT(-541.8994f), FLOAT(115.5f), FLOAT(-115.0f), FLOAT(-197.0f), FLOAT(56.799805f), FLOAT(-115.0f), 600, 11)
+    WAIT_MS(600)
+    LOOP(0)
+        CALL(evt_msg_print, 0, STRING("ranking_mess_00"), 0, 0)
+        CALL(evt_msg_select, 0, STRING("ranking_mess_01"))
+        CALL(evt_msg_continue)
+        IF_INT_EQUAL(LW(0), 5)
+            GOTO(0)
+        END_IF
+        CALL(evt_yuuranking_alloc, 0, 0, LW(0), 2, 0, 0, 0, 0)
+        WAIT_FRAMES(1)
+        CALL(yuuranking_wait_button)
+        CALL(evt_yuuranking_free)
+    END_LOOP
+    LABEL(0)
+    CALL(evt_cam3d_evt_off, 600, 11)
+    WAIT_MS(600)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+#endif
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(exchange_set)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(yuugijou_get_takeoutflag, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(yuugijou_get_montemedal_keep, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            SET_VALUE(LW(11), 1)
+            CALL_CHILD(PTR(exchange_return_sub))
+            SET_VALUE(LW(0), 0)
+            ELSE
+            CALL(yuugijou_montemedal_return)
+            SET_VALUE(LW(0), 0)
+        END_IF
+        ELSE
+        SET_VALUE(LW(0), 0)
+    END_IF
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_cam3d_evt_set, FLOAT(-541.5996f), FLOAT(147.39941f), FLOAT(-314.5996f), FLOAT(-197.0f), FLOAT(86.899414f), FLOAT(-314.5996f), 600, 11)
+        WAIT_MS(600)
+    END_IF
+    CALL(evt_msg_toge, 2, FLOAT(-147.0f), FLOAT(82.19922f), FLOAT(-307.8994f))
+    IF_INT_EQUAL(GSWF(1225), 0)
+        CALL(exchange_ryokin_medal, 0, LW(1), LW(2))
+        CALL(evt_sub_get_language, LW(0))
+        SWITCH(LW(0))
+            CASE_EQUAL(0)
+            CALL(evt_msg_print_insert, 0, STRING("exchange_mess_00"), 0, 0, LW(1), LW(2))
+            CASE_DEFAULT
+            CALL(evt_msg_print, 0, STRING("exchange_mess_00"), 0, 0)
+        END_SWITCH
+        SET_VALUE(GSWF(1225), 1)
+        ELSE
+        CALL(evt_msg_print, 0, STRING("exchange_mess_01"), 0, 0)
+    END_IF
+    CALL(evt_exchange_msg_alloc)
+    CALL(evt_unitwin_alloc, 0)
+    CALL(unitwincoin_disp_onoff, 1)
+    SET_VALUE(LW(0), 0)
+    LOOP(0)
+        CALL(evt_exchange_msg_set, LW(0), STRING("exchange_mess_02"), LW(1))
+        CALL(evt_msg_select, 1, LW(1))
+        IF_INT_EQUAL(LW(0), 3)
+            CALL(unitwincoin_disp_onoff, 0)
+            CALL(evt_unitwin_free)
+            CALL(evt_exchange_msg_free)
+            CALL(evt_msg_print_add, 0, STRING("exchange_mess_05"))
+            GOTO(0)
+        END_IF
+        CALL(exchange_ryokin_medal, LW(0), LW(1), LW(2))
+        CALL(evt_pouch_get_coin, LW(3))
+        IF_INT_LESS(LW(3), LW(1))
+            CALL(evt_msg_print_add, 0, STRING("exchange_mess_03"))
+            CALL(unitwincoin_disp_onoff, 0)
+            CALL(evt_unitwin_free)
+            CALL(evt_exchange_msg_free)
+            GOTO(0)
+        END_IF
+        CALL(evt_msg_continue)
+        MULTIPLY(LW(1), -1)
+        CALL(evt_pouch_add_coin, LW(1))
+        CALL(unitwincoin_wait)
+        CALL(yuugijou_add_montemedal, 0, LW(2))
+        CALL(yuugijou_add_montemedal_moto, LW(2))
+        CALL(yuugijou_montemedal_wait)
+        WAIT_MS(200)
+        CALL(evt_msg_toge, 2, FLOAT(-147.0f), FLOAT(82.19922f), FLOAT(-307.8994f))
+        CALL(evt_msg_print, 0, STRING("exchange_mess_04"), 0, 0)
+    END_LOOP
+    LABEL(0)
+    CALL(evt_cam3d_evt_off, 600, 11)
+    WAIT_MS(600)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(exchange_set)
     CALL(evt_mario_key_onoff, 0)
     CALL(yuugijou_get_takeoutflag, LW(0))
@@ -2779,6 +3291,7 @@ EVT_BEGIN(exchange_set)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(roten_4_init)
     CALL(evt_npc_set_position, STRING("me"), 0, -5, 335)
@@ -4735,6 +5248,182 @@ EVT_BEGIN(monte_evt_door_entry)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(gor_03_init_evt)
+    IF_INT_EQUAL(GSWF(1229), 0)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_GOR1"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG0_GOR4"))
+        ELSE
+        CALL(evt_snd_bgmoff, 512)
+        CALL(evt_snd_envoff, 512)
+    END_IF
+    IF_INT_NOT_EQUAL(GSWF(1229), 0)
+        CALL(evt_mario_normalize)
+    END_IF
+    CALL_CHILD(PTR(gor_03_dokan_init_evt))
+    SET_VALUE(LW(0), PTR(bero_entry_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(evt_bero_info_run)
+    CALL(evt_hitobj_attr_onoff, 1, 0, STRING("s_bero"), 4)
+    CALL_CHILD(PTR(luigi_npcEnt))
+    CALL(evt_npc_setup, PTR(npcEnt))
+    SWITCH(GSW(0))
+        CASE_BETWEEN(278, 280)
+        CALL(evt_npc_set_tribe, STRING("モニー"), STRING("モニー（指輪）"))
+        CALL(evt_npc_set_tribe, STRING("ピートン"), STRING("ピートン（指輪）"))
+        CASE_GREATER_OR_EQUAL(281)
+        CALL(evt_npc_set_tribe, STRING("モニー"), STRING("モニー（指輪）"))
+        IF_INT_EQUAL(GSWF(5393), 1)
+            CALL(evt_npc_set_tribe, STRING("ピートン"), STRING("ピートン（指輪）"))
+        END_IF
+    END_SWITCH
+    CALL(evt_map_playanim, STRING("mizu"), 1, 0)
+    SET_VALUE(LW(0), PTR(door_data_01_0))
+    CALL_CHILD(evt_door_entry)
+    IF_INT_EQUAL(GSWF(1230), 1)
+        SET_VALUE(LW(0), PTR(door_data_01_1))
+        CALL_CHILD(evt_door_entry)
+    END_IF
+    SET_VALUE(LW(0), PTR(door_data_02_0l))
+    CALL_CHILD(PTR(monte_evt_door_entry))
+    SET_VALUE(LW(0), PTR(door_data_02_0r))
+    CALL_CHILD(PTR(monte_evt_door_entry))
+    SET_VALUE(LW(0), PTR(door_data_02_1))
+    CALL_CHILD(evt_door_entry)
+    SET_VALUE(LW(0), PTR(door_data_03))
+    CALL_CHILD(evt_door_entry)
+    SET_VALUE(LW(0), PTR(door_data_03_roll))
+    CALL_CHILD(PTR(evt_door_03_entry))
+    SET_VALUE(LW(0), PTR(door_data_04))
+    CALL_CHILD(evt_door_entry)
+    SET_VALUE(LW(0), PTR(door_data_04_roll))
+    CALL_CHILD(PTR(evt_door_04_entry))
+    SPAWN_EVENT(PTR(wall_bomb_init))
+    CALL(evt_run_case_evt, 15, 1, STRING("A_ana_ana"), 0, PTR(wall_bomb), 0)
+    CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(shopper_data), PTR(trade_list))
+    CALL(evt_item_entry, STRING("item_00"), 125, 550, 0, 180, 16, GSWF(5580), 0)
+    CALL(evt_item_entry, STRING("item_01"), 125, -585, 0, 220, 16, GSWF(5581), 0)
+    CALL(evt_item_entry, STRING("item_02"), 125, 220, 10, 225, 16, GSWF(5582), 0)
+    CALL(evt_mobj_kururing_floor, STRING("kururin1"), -200, 0, 125, STRING("S_ground_A"), 125, GSWF(5579))
+    CALL(evt_mobj_powerupblk, STRING("pblk1"), 250, 60, -510, 0, GSWF(5527), 90)
+    CALL(evt_mobj_powerupblk, STRING("pblk2"), -563, 0, -150, 0, GSWF(5528), 90)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_kou_kusas01"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_kou_kusas02"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_kou_kusas03"), 1)
+    SWITCH(GSW(0))
+        CASE_LESS(56)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kou_kusas01"), 1)
+        CASE_LESS(112)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kou_kusas01"), 1)
+        CASE_LESS(164)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kou_kusas01"), 1)
+        CASE_LESS(215)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kou_kusas02"), 1)
+        CASE_LESS(261)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kou_kusas02"), 1)
+        CASE_LESS(339)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kou_kusas02"), 1)
+        CASE_LESS(373)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kou_kusas03"), 1)
+        CASE_LESS(401)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kou_kusas03"), 1)
+        CASE_DEFAULT
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kou_kusas03"), 1)
+    END_SWITCH
+    SPAWN_EVENT_GET_ID(PTR(desk_talk_check), GW(15))
+    CALL_CHILD(PTR(debug_event_mode))
+    CALL(evt_goryuugijo_alloc, LW(0), 0)
+    CALL(goryuugijo_set_dataadr, 0, LW(0))
+    CALL(evt_goryuugijo_alloc, LW(0), 1)
+    CALL(goryuugijo_set_dataadr, 1, LW(0))
+    CALL(evt_run_case_evt, 9, 1, STRING("A_srot01"), 0, PTR(slot1_set), LW(1))
+    CALL(evt_goryuugijo_set_caseid, LW(0), 0, LW(1))
+    CALL(evt_run_case_evt, 9, 1, STRING("A_srot02"), 0, PTR(slot2_set), LW(1))
+    CALL(evt_goryuugijo_set_caseid, LW(0), 1, LW(1))
+    CALL(evt_run_case_evt, 9, 1, STRING("A_gb_a"), 0, PTR(ranking_set), 0)
+    CALL(evt_run_case_evt, 9, 1, STRING("A_mot_a"), 0, PTR(exchange_set), 0)
+    IF_INT_NOT_EQUAL(GSWF(1229), 0)
+        SET_VALUE(GSWF(1229), 0)
+        SPAWN_EVENT(PTR(yuureturn_rtn))
+    END_IF
+    IF_INT_EQUAL(GSW(0), 172)
+        SPAWN_EVENT(PTR(peach_mail))
+    END_IF
+    SPAWN_EVENT(PTR(tenin_fuwafuwa))
+    SPAWN_EVENT(PTR(casino_fuwafuwa))
+    SPAWN_EVENT(evt_sub_mail_event)
+    CALL(evt_run_case_evt, 9, 1, STRING("A_kuzi"), 0, PTR(kuzi_keiziban_entry), 0)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ie_02"), 2)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("J_i02_f1_kanD"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("E_i02_f1_kanD"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_i02_f1_kanD"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_i02_f1_kanD"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_i02_f1_kanD"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_i02_f1_kanD"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_i02_f1_hon07"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("E_i02_f1_kan"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_i02_f1_kan"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_i02_f1_kan"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_i02_f1_kan"), 16384)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_i02_f1_kan"), 16384)
+    CALL(evt_sub_get_language, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_i02_f1_kanD"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_i02_f1_hon07"), 16384)
+        CASE_EQUAL(1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_i02_f1_kanD"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_i02_f1_kan"), 16384)
+        CASE_EQUAL(2)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_i02_f1_kanD"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_i02_f1_kan"), 16384)
+        CASE_EQUAL(3)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_i02_f1_kanD"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_i02_f1_kan"), 16384)
+        CASE_EQUAL(4)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_i02_f1_kanD"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_i02_f1_kan"), 16384)
+        CASE_EQUAL(5)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_i02_f1_kanD"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_i02_f1_kan"), 16384)
+    END_SWITCH
+    CALL(evt_sub_get_language, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_sro_light01"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_sro_light02"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("E_sro_light01"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("E_sro_light02"), 16384)
+        CASE_DEFAULT
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("J_sro_light01"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("J_sro_light02"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_sro_light01"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_sro_light02"), 16384)
+    END_SWITCH
+    IF_INT_EQUAL(GSW(0), 121)
+        SPAWN_EVENT(PTR(maffiaboss_maffiaboss))
+    END_IF
+    IF_INT_EQUAL(GSW(0), 123)
+        IF_INT_EQUAL(GSWF(1236), 0)
+            SPAWN_EVENT(PTR(maffiaboss_airship_ticket))
+        END_IF
+    END_IF
+    SWITCH(GSW(0))
+        CASE_LESS(268)
+        CALL(evt_run_case_evt, 9, 0, STRING("A_i02_f2_set00C"), 0, PTR(maffiaboss_desk_talk), 0)
+        CASE_LESS(279)
+        SET_VALUE(LW(15), 1)
+        CALL(evt_run_case_evt, 9, 0, STRING("A_i02_bed_l"), 0, PTR(maffiaboss_desk_talk), GW(12))
+        SET_VALUE(LW(15), 0)
+        CALL(evt_run_case_evt, 9, 0, STRING("A_i02_bed_m"), 0, PTR(maffiaboss_desk_talk), GW(13))
+        CASE_LESS(282)
+        CASE_DEFAULT
+        CALL(evt_run_case_evt, 9, 0, STRING("A_i02_f2_set00C"), 0, PTR(peton_desk_talk), 0)
+    END_SWITCH
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kou_kabe"), 2)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(gor_03_init_evt)
     IF_INT_EQUAL(GSWF(1229), 0)
         CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_GOR1"))
@@ -4863,6 +5552,7 @@ EVT_BEGIN(gor_03_init_evt)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kou_kabe"), 2)
     RETURN
 EVT_END()
+#endif
 
 static USER_FUNC(fall_rtn) {
     Vec pos;
@@ -5080,7 +5770,7 @@ void slot_neon_sub(GoryuuWork* wp, SlotWork* data) {
         if ((data->flags & 4) && (data->flags & 2)) {
             data->speed[0] = data->speed[1] = data->speed[2] = 2.8125f;
         } else {
-            data->speed[0] = data->speed[1] = data->speed[2] = 11.25f;
+            data->speed[0] = data->speed[1] = data->speed[2] = VERSION_PICK(11.25f, 15.0f);
         }
         data->state[0] = data->state[1] = data->state[2] = 2;
     } else if (data->flags & 4) {
@@ -5548,7 +6238,7 @@ void goryuugijo_disp_slot(CameraId camera, void* param) {
             PSMTXScale(scale, 1.1f, 1.1f, 1.1f);
             PSMTXTrans(trans, -304.0f + sx, 240.0f - sy, 0.0f);
             PSMTXConcat(trans, scale, mtx);
-            iconDispGx2(mtx, 0x10, 0x1F2);
+            iconDispGx2(mtx, 0x10, ICON_1F2);
             PSMTXTrans(trans, -304.0f + sx, 31.35f + (240.0f - sy), 0.0f);
             PSMTXConcat(trans, scale, mtx);
             ((void (*)(Mtx, s16, u16))iconDispGx2)(mtx, 0x10, icons.v[i]);

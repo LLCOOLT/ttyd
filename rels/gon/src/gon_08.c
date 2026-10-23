@@ -55,6 +55,19 @@ USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_rumble_onoff);
 USER_FUNC(evt_sub_save_playtime);
 USER_FUNC(evt_win_item_select);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_mario_mov_pos2);
+USER_FUNC(evt_mario_set_dir);
+USER_FUNC(evt_npc_get_position);
+USER_FUNC(evt_npc_set_ry_lr);
+USER_FUNC(evt_npc_wait_pera);
+USER_FUNC(evt_party_get_pos);
+USER_FUNC(evt_party_move_pos2);
+USER_FUNC(evt_party_run);
+USER_FUNC(evt_party_set_dir);
+USER_FUNC(evt_party_stop);
+USER_FUNC(evt_set_dir_to_target);
+#endif
 extern s32 bero_case_switch_off[];
 extern s32 bero_case_switch_on[];
 extern s32 evt_bero_info_run[];
@@ -81,12 +94,20 @@ static __declspec(section ".data") s32 door03_close[12];
 static __declspec(section ".data") s32 door03_open[12];
 static s32 bero_entry_data[60];
 static s32 init_0[37];
+#ifdef VERSION_G8ME01
+static s32 main_0[465];
+#else
 static s32 main_0[491];
+#endif
 static __declspec(section ".data") s32 key_tbl[2];
 static s32 evt_chk[23];
 static __declspec(section ".data") s32 evt_unlock[10];
 s32 nokkosu_init[16];
+#ifdef VERSION_G8ME01
+s32 nokkosu_talk[226];
+#else
 s32 nokkosu_talk[157];
+#endif
 static s32 npcEnt[46];
 s32 gon_08_init_evt[220];
 
@@ -233,6 +254,9 @@ static EVT_BEGIN(main_0)
             SET_FLOAT_VALUE(LW(8), FLOAT(-0.19921875f))
             SET_FLOAT_VALUE(LW(9), 0)
         END_IF
+#ifdef VERSION_G8ME01
+        BEGIN_INLINE_EVENT
+#else
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(10)
             CALL(evt_sub_rumble_onoff, 0, 0)
@@ -240,6 +264,7 @@ static EVT_BEGIN(main_0)
             CALL(evt_sub_rumble_onoff, 1, 0)
         END_SIBLING_EVENT
         BEGIN_SIBLING_EVENT
+#endif
             WAIT_FRAMES(10)
             CALL(evt_sub_intpl_init, 11, 10, 3, 4)
             LABEL(0)
@@ -249,7 +274,11 @@ static EVT_BEGIN(main_0)
             IF_INT_EQUAL(LW(1), 1)
                 GOTO(0)
             END_IF
+#ifdef VERSION_G8ME01
+        END_INLINE_EVENT
+#else
         END_SIBLING_EVENT
+#endif
         WAIT_MS(500)
         CALL(evt_mobj_get_position, STRING("blk_0"), LW(12), LW(13), LW(14))
         CALL(evt_mobj_get_kindname, STRING("blk_0"), LW(11))
@@ -358,12 +387,16 @@ static EVT_BEGIN(main_0)
             END_IF
         END_INLINE_EVENT
         IF_INT_EQUAL(LW(10), 1)
+#ifdef VERSION_G8ME01
+            BEGIN_INLINE_EVENT
+#else
             BEGIN_SIBLING_EVENT
                 CALL(evt_sub_rumble_onoff, 0, 0)
                 WAIT_MS(300)
                 CALL(evt_sub_rumble_onoff, 1, 0)
             END_SIBLING_EVENT
             BEGIN_SIBLING_EVENT
+#endif
                 CALL(evt_sub_intpl_init, 11, 10, 3, 10)
                 LABEL(2)
                 CALL(evt_sub_intpl_get_value)
@@ -372,7 +405,11 @@ static EVT_BEGIN(main_0)
                 IF_INT_EQUAL(LW(1), 1)
                     GOTO(2)
                 END_IF
+#ifdef VERSION_G8ME01
+            END_INLINE_EVENT
+#else
             END_SIBLING_EVENT
+#endif
             WAIT_MS(1000)
         END_IF
         IF_INT_EQUAL(LSWF(3), 0)
@@ -421,7 +458,11 @@ EVT_END()
 
 EVT_BEGIN(nokkosu_init)
     IF_INT_EQUAL(GSW(1420), 7)
+#ifdef VERSION_G8ME01
+        CALL(evt_npc_set_position, STRING("me"), -185, 500, -165)
+#else
         CALL(evt_npc_set_position, STRING("me"), -230, 500, -120)
+#endif
         CALL(evt_npc_set_ry, STRING("me"), 90)
     END_IF
     RETURN
@@ -429,7 +470,14 @@ EVT_END()
 
 EVT_BEGIN(nokkosu_talk)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 1073741856)
+#ifdef VERSION_G8ME01
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_mov_pos2, -206, -147, FLOAT(120.0f))
+        CALL(evt_mario_set_dir, 90, 200, 0)
+    END_INLINE_EVENT
+#else
     CALL(evt_msg_print, 0, STRING("irai_07_00"), 0, STRING("me"))
+#endif
     LOOP(0)
         CALL(evt_mario_party_use_check, LW(0))
         IF_INT_EQUAL(LW(0), 0)
@@ -440,26 +488,61 @@ EVT_BEGIN(nokkosu_talk)
     CALL(evt_party_wait_landon, 0)
     CALL(evt_party_outofscreen, 0, LW(0))
     IF_INT_EQUAL(LW(0), 0)
+#ifdef VERSION_G8ME01
+        CALL(evt_party_set_pos, 0, -200, 500, -87)
+#else
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         ADD(LW(0), 5)
         ADD(LW(2), -15)
         CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
+#endif
     END_IF
+#ifdef VERSION_G8ME01
+    CALL(evt_party_move_pos2, 0, -228, -130, FLOAT(120.0f))
+    CALL(evt_party_set_dir, 0, 90, 200)
+    CALL(evt_npc_set_ry_lr, STRING("me"), 0)
+    CALL(evt_msg_print, 0, STRING("irai_07_00"), 0, STRING("me"))
+#endif
     CALL(evt_mario_get_party, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 2)
         CALL(evt_mario_goodbye_party, 0)
         CALL(evt_mario_hello_party, 0, 2)
     END_IF
+#ifdef VERSION_G8ME01
+    CALL(evt_party_stop, 0)
+#endif
     CALL(evt_msg_print, 0, STRING("irai_07_01"), 0, STRING("party"))
+#ifdef VERSION_G8ME01
+    CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
+    CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
+    IF_INT_GREATER_OR_EQUAL(LW(3), LW(0))
+        CALL(evt_npc_set_ry, STRING("me"), 90)
+        ELSE
+        CALL(evt_npc_set_ry, STRING("me"), 270)
+    END_IF
+    WAIT_FRAMES(1)
+    CALL(evt_npc_wait_pera, STRING("me"))
+#endif
     CALL(evt_msg_print, 0, STRING("irai_07_02"), 0, STRING("me"))
     CALL(evt_msg_print, 0, STRING("irai_07_03"), 0, STRING("party"))
     CALL(evt_msg_print, 0, STRING("irai_07_04"), 0, STRING("me"))
     CALL(evt_msg_print, 0, STRING("irai_07_05"), 0, STRING("party"))
     CALL(evt_msg_print, 0, STRING("irai_07_06"), 0, STRING("me"))
+#ifdef VERSION_G8ME01
+    CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
+    WAIT_FRAMES(1)
+    CALL(evt_npc_wait_pera, STRING("me"))
+    CALL(evt_party_run, 0)
+#endif
     CALL(evt_item_entry, STRING("irai_item"), 91, 0, -1000, 0, 16, -1, 0)
     CALL(evt_item_flag_on, STRING("irai_item"), 2)
     CALL(evt_item_get_item, STRING("irai_item"))
     CALL(evt_msg_print, 0, STRING("irai_07_07"), 0, STRING("me"))
+#ifdef VERSION_G8ME01
+    CALL(evt_npc_set_ry, STRING("me"), 90)
+    WAIT_FRAMES(1)
+    CALL(evt_npc_wait_pera, STRING("me"))
+#endif
     CALL(evt_npc_jump_position_nohit, STRING("me"), -66, 100, -112, 800, 220)
     CALL(evt_npc_set_position, STRING("me"), 0, -1000, 0)
     CALL(evt_sub_save_playtime, GSW(1421))

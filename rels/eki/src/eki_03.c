@@ -32,6 +32,9 @@ USER_FUNC(evt_mobj_powerupblk);
 USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_mobj_blk);
+#endif
 static USER_FUNC(test_glare);
 static void sun_tev(MapTevCallbackInfo* info);
 extern s32 bero_case_switch_off[];
@@ -76,7 +79,11 @@ s32 evt_poster_12[22];
 __declspec(section ".data") s32 evt_poster_13[7];
 __declspec(section ".data") s32 evt_poster_14[7];
 __declspec(section ".data") s32 evt_poster_15[7];
+#ifdef VERSION_G8ME01
+s32 eki_03_init_evt[470];
+#else
 s32 eki_03_init_evt[471];
+#endif
 
 __declspec(section ".data") u64 negone_one$374 = 0xBF8000003F800000;
 
@@ -321,7 +328,11 @@ EVT_BEGIN(eki_03_init_evt)
     CALL(evt_snd_bgmoff, 26624)
     CALL(evt_item_entry, STRING("item"), 278, -550, 220, -50, 16, GSWF(3746), 0)
     CALL(evt_mobj_powerupblk, STRING("pblk01"), 450, 100, 10, 0, GSWF(5561), 0)
+#ifdef VERSION_G8ME01
+    CALL(evt_mobj_blk, STRING("blk01"), 250, 300, -100, 0, 0, LSWF(1))
+#else
     CALL(evt_mobj_brick, STRING("blk01"), 250, 300, -100, 0, 0, 0, LSWF(1))
+#endif
     CALL(evt_mobj_brick, STRING("blk02"), 250, 385, -100, 129, 11, 0, GSWF(3754))
     CALL(evt_map_set_tevcallback, 2, PTR(sun_tev))
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("sun"), 33554432)
@@ -510,4 +521,6 @@ static USER_FUNC(test_glare) {
 }
 
 
+#ifndef VERSION_G8ME01
 __declspec(section ".data") u32 gap_04_00003CBC_data[1] = {0};
+#endif

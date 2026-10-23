@@ -207,7 +207,11 @@ __declspec(section ".data") u64 unit_party_clauda_one_negone_b = 0x3F800000BF800
 __declspec(section ".data") u64 fd_clauda_one_negone_359 = 0x3F800000BF800000;
 
 s32 partyWeapon_ClaudaNormalAttack[] = {
+#ifdef VERSION_G8ME01
+    (s32)"btl_wn_pwd_normal", 22544384, 0, (s32)"msg_pwd_body_press", 1677721600, 1065353216, 16868402, (s32)weaponGetPowerFromPartyAttackLv,
+#else
     (s32)"btl_wn_pwd_normal", 22020096, 0, (s32)"msg_pwd_body_press", 1677721600, 1065353216, 16868402, (s32)weaponGetPowerFromPartyAttackLv,
+#endif
     1, 2, 2, 4, 3, 6, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 16781920, 536870912, 656130, (s32)"msg_ac_body_press", 217223, 12, -2147475452,
@@ -216,16 +220,28 @@ s32 partyWeapon_ClaudaNormalAttack[] = {
 };
 
 s32 partyWeapon_ClaudaBreathAttack[] = {
+#ifdef VERSION_G8ME01
+    (s32)"btl_wn_pwd_lv1", 22609920, 0, (s32)"msg_pwd_breath", 1677983744, 1065353216, 17130546, 0,
+#else
     (s32)"btl_wn_pwd_lv1", 22085632, 0, (s32)"msg_pwd_breath", 1677983744, 1065353216, 17130546, 0,
+#endif
     1, 2, 2, 3, 3, 4, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 1639170, (s32)"msg_ac_breath", 131719, 2047, -2147475452,
     0, 0, 0, 0, 0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    0, 6553600, 0, 0, (s32)partyClaudaAttack_BreathAttack, 100, 656640, 0,
+#else
     0, 6553600, 0, 0, (s32)partyClaudaAttack_BreathAttack, 100, 328960, 0,
+#endif
 };
 
 s32 partyWeapon_ClaudaPredationAttack[] = {
+#ifdef VERSION_G8ME01
+    (s32)"btl_wn_pwd_lv2", 22675456, 0, (s32)"msg_pwd_sexy_kiss", 1677918208, 1065353216, 17130546, (s32)weaponGetACOutputParam,
+#else
     (s32)"btl_wn_pwd_lv2", 22151168, 0, (s32)"msg_pwd_sexy_kiss", 1677918208, 1065353216, 33907762, (s32)weaponGetACOutputParam,
+#endif
     0, 1, 0, 0, 0, 0, 0, 0,
     0, 3, 3, 0, 0, 0, 0, 0,
     0, 17830496, 536870912, 770, (s32)"msg_ac_sexy_kiss", 131271, 2, -2147475452,
@@ -234,7 +250,11 @@ s32 partyWeapon_ClaudaPredationAttack[] = {
 };
 
 s32 partyWeapon_ClaudaKumogakureAttack[] = {
+#ifdef VERSION_G8ME01
+    (s32)"btl_wn_pwd_lv3", 22740992, 0, (s32)"msg_pwd_kumogakure", 1677983744, 1065353216, 17130546, 0,
+#else
     (s32)"btl_wn_pwd_lv3", 22216704, 0, (s32)"msg_pwd_kumogakure", 1677983744, 1065353216, 17130546, 0,
+#endif
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830240, 268435456, 770, (s32)"msg_ac_kumogakure", 131080, 2047, -2147475452,

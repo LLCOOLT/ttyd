@@ -15,7 +15,7 @@ s32 partyEntryPos(s32 memberId, f32 x, f32 y, f32 z);
 f32 toMovedirSimple(f32 angle);
 void marioSlitForceCancel(void);
 
-#define MW(m, off, T) (*(T*)((u8*)(m) + (off)))
+#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 
 static void _partyEntry(s32 flag) {
 	MarioWork* mario;
@@ -194,10 +194,24 @@ void mot_dokan(void) {
 			marioPaperLightOff();
 			marioChgPaper("PM_D_1A");
 			marioChgPose("M_Z_1");
+#ifdef VERSION_G8ME01
+			if (mario->displayDirectionTarget >= 90.0f && mario->displayDirectionTarget <= 270.0f) {
+				MW(mario, 0x2A0, f32) = 30.0f;
+			} else {
+				mario->dispFlags |= 8;
+				MW(mario, 0x2A0, f32) = -30.0f;
+			}
+			mario->dispFlags |= 0x100;
+			marioPaperLightOff();
+			mario->displayDirection = mario->displayDirectionTarget;
+			mario->currSubMotionId = 40;
+			_partyEntry(1);
+#else
 			mario->displayDirection = mario->displayDirectionTarget;
 			MW(mario, 0x2A0, f32) = 30.0f;
 			mario->currSubMotionId = 40;
 			_partyEntry(1);
+#endif
 			mario->dispFlags |= 0x1000;
 			partyShadowOff(partyGetPtr(marioGetPartyId()));
 			partyShadowOff(partyGetPtr(marioGetExtraPartyId()));
@@ -317,10 +331,12 @@ void mot_dokan(void) {
 			mario->multiTimer = 20;
 			mario->currSubMotionId = 102;
 			mario->rot.x = 0.0f;
+#ifndef VERSION_G8ME01
 			mario->displayDirectionTarget = revise360(180.0f + mario->displayDirectionTarget);
 			mario->displayDirection = mario->displayDirectionTarget;
 			mario->directionView = toMovedirSimple(mario->displayDirection);
 			mario->moveDirection = mario->directionView;
+#endif
 			partyDokanEnd(marioGetPartyId(), MW(mario, 0x3E, s8));
 			partyDokanEnd(marioGetExtraPartyId(), MW(mario, 0x3E, s8));
 		}

@@ -18,13 +18,13 @@ extern s32 battle_item_hermos[];
 extern s32 battle_item_killer[];
 extern s32 battle_item_killer_cannon[];
 extern s32 battle_item_patamet[];
-extern s32 unit_bubble_6_data_11C80[];
-extern s32 unit_heavy_bom_6_data_15A08[];
-extern s32 unit_hermos_6_data_17118[];
+extern s32 unit_bubble[];
+extern s32 unit_heavy_bom[];
+extern s32 unit_hermos[];
 extern s32 unit_killer[];
 extern s32 unit_killer_cannon[];
-extern s32 unit_kuriboo_6_data_110E8[];
-extern s32 unit_patamet_6_data_19100[];
+extern s32 unit_kuriboo[];
+extern s32 unit_patamet[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_dou_negone_one_374;
@@ -292,10 +292,10 @@ s32 dou_btlstage_data[] = {
 };
 
 s32 btlparty_dou_dou_00_01_off_1[] = {
-    (s32)unit_kuriboo_6_data_110E8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, 0, (s32)unit_kuriboo_6_data_110E8, 16777216, 67108868, 1119092736,
+    (s32)unit_kuriboo, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, 0, (s32)unit_kuriboo, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)unit_kuriboo_6_data_110E8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_kuriboo, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, 0,
 };
 
@@ -304,10 +304,10 @@ __declspec(section ".data") s32 btlgrp_dou_dou_00_01_off_1[] = {
 };
 
 s32 btlparty_dou_dou_01_01_off_01[] = {
-    (s32)unit_hermos_6_data_17118, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_hermos, (s32)unit_hermos_6_data_17118, 16777216, 67108868, 1119092736,
+    (s32)unit_hermos, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_hermos, (s32)unit_hermos, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_hermos,
-    (s32)unit_hermos_6_data_17118, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_hermos, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_hermos,
 };
 
@@ -316,8 +316,8 @@ __declspec(section ".data") s32 btlgrp_dou_dou_01_01_off_01[] = {
 };
 
 s32 btlparty_dou_dou_02_01_off_01[] = {
-    (s32)unit_bubble_6_data_11C80, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_bubble, (s32)unit_bubble_6_data_11C80, 16777216, 67108868, 1121714176,
+    (s32)unit_bubble, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_bubble, (s32)unit_bubble, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_bubble,
 };
 
@@ -326,11 +326,11 @@ __declspec(section ".data") s32 btlgrp_dou_dou_02_01_off_01[] = {
 };
 
 s32 btlparty_dou_dou_02_02_off_01[] = {
-    (s32)unit_bubble_6_data_11C80, 16777216, 67108868, 1106247680, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_bubble, (s32)unit_bubble_6_data_11C80, 16777216, 67108868, 1116471296,
+    (s32)unit_bubble, 16777216, 67108868, 1106247680, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_bubble, (s32)unit_bubble, 16777216, 67108868, 1116471296,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_bubble,
-    (s32)unit_bubble_6_data_11C80, 16777216, 67108868, 1121714176, 1109393408, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_bubble, (s32)unit_bubble_6_data_11C80, 16777216, 67108868, 1125515264,
+    (s32)unit_bubble, 16777216, 67108868, 1121714176, 1109393408, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_bubble, (s32)unit_bubble, 16777216, 67108868, 1125515264,
     1109393408, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_bubble,
 };
 
@@ -340,7 +340,7 @@ __declspec(section ".data") s32 btlgrp_dou_dou_02_02_off_01[] = {
 
 s32 btlparty_dou_dou_03_01_off_01[] = {
     (s32)unit_killer_cannon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_killer_cannon, (s32)unit_heavy_bom_6_data_15A08, 16777216, 67108868, 1125515264,
+    0, 0, 0, (s32)battle_item_killer_cannon, (s32)unit_heavy_bom, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_heavy_bom,
 };
 
@@ -359,8 +359,8 @@ __declspec(section ".data") s32 btlgrp_dou_dou_03_99_off_01[] = {
 };
 
 s32 btlparty_dou_dou_03_02_off_01[] = {
-    (s32)unit_heavy_bom_6_data_15A08, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_heavy_bom, (s32)unit_heavy_bom_6_data_15A08, 16777216, 67108868, 1121714176,
+    (s32)unit_heavy_bom, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_heavy_bom, (s32)unit_heavy_bom, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_heavy_bom,
 };
 
@@ -369,10 +369,10 @@ __declspec(section ".data") s32 btlgrp_dou_dou_03_02_off_01[] = {
 };
 
 s32 btlparty_dou_dou_03_03_off_01[] = {
-    (s32)unit_heavy_bom_6_data_15A08, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_heavy_bom, (s32)unit_heavy_bom_6_data_15A08, 16777216, 67108868, 1119092736,
+    (s32)unit_heavy_bom, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_heavy_bom, (s32)unit_heavy_bom, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_heavy_bom,
-    (s32)unit_heavy_bom_6_data_15A08, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_heavy_bom, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_heavy_bom,
 };
 
@@ -381,8 +381,8 @@ __declspec(section ".data") s32 btlgrp_dou_dou_03_03_off_01[] = {
 };
 
 s32 btlparty_dou_dou_05_01_off_01[] = {
-    (s32)unit_hermos_6_data_17118, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_hermos, (s32)unit_hermos_6_data_17118, 16777216, 67108868, 1121714176,
+    (s32)unit_hermos, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_hermos, (s32)unit_hermos, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_hermos,
 };
 
@@ -391,8 +391,8 @@ __declspec(section ".data") s32 btlgrp_dou_dou_05_01_off_01[] = {
 };
 
 s32 btlparty_dou_dou_05_02_off_01[] = {
-    (s32)unit_patamet_6_data_19100, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_patamet, (s32)unit_patamet_6_data_19100, 16777216, 67108868, 1121714176,
+    (s32)unit_patamet, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_patamet, (s32)unit_patamet, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_patamet,
 };
 
@@ -401,10 +401,10 @@ __declspec(section ".data") s32 btlgrp_dou_dou_05_02_off_01[] = {
 };
 
 s32 btlparty_dou_dou_06_01_off_01[] = {
-    (s32)unit_patamet_6_data_19100, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_patamet, (s32)unit_patamet_6_data_19100, 16777216, 67108868, 1119092736,
+    (s32)unit_patamet, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_patamet, (s32)unit_patamet, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_patamet,
-    (s32)unit_patamet_6_data_19100, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_patamet, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_patamet,
 };
 
@@ -413,11 +413,11 @@ __declspec(section ".data") s32 btlgrp_dou_dou_06_01_off_01[] = {
 };
 
 s32 btlparty_dou_dou_06_02_off_01[] = {
-    (s32)unit_patamet_6_data_19100, 16777216, 67108868, 1106247680, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_patamet, (s32)unit_patamet_6_data_19100, 16777216, 67108868, 1116471296,
+    (s32)unit_patamet, 16777216, 67108868, 1106247680, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_patamet, (s32)unit_patamet, 16777216, 67108868, 1116471296,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_patamet,
-    (s32)unit_bubble_6_data_11C80, 16777216, 67108868, 1121714176, 1109393408, 1092616192, 0, 0,
-    0, 0, 0, 0, (s32)unit_patamet_6_data_19100, 16777216, 67108868, 1125515264,
+    (s32)unit_bubble, 16777216, 67108868, 1121714176, 1109393408, 1092616192, 0, 0,
+    0, 0, 0, 0, (s32)unit_patamet, 16777216, 67108868, 1125515264,
     1109393408, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_patamet,
 };
 
@@ -426,7 +426,7 @@ __declspec(section ".data") s32 btlgrp_dou_dou_06_02_off_01[] = {
 };
 
 __declspec(section ".data") s32 btlparty_dou_dou_06_03_off_01[] = {
-    (s32)unit_patamet_6_data_19100, 16777216, 67108868, 1119092736, 1109393408, 0, 0, 0,
+    (s32)unit_patamet, 16777216, 67108868, 1119092736, 1109393408, 0, 0, 0,
     0, 0, 0, (s32)battle_item_patamet,
 };
 
@@ -435,10 +435,10 @@ __declspec(section ".data") s32 btlgrp_dou_dou_06_03_off_01[] = {
 };
 
 s32 btlparty_dou_dou_07_01_off_01[] = {
-    (s32)unit_hermos_6_data_17118, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_hermos, (s32)unit_hermos_6_data_17118, 16777216, 67108868, 1119092736,
+    (s32)unit_hermos, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_hermos, (s32)unit_hermos, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_hermos,
-    (s32)unit_hermos_6_data_17118, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_hermos, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_hermos,
 };
 
@@ -447,11 +447,11 @@ __declspec(section ".data") s32 btlgrp_dou_dou_07_01_off_01[] = {
 };
 
 s32 btlparty_dou_dou_08_01_off_01[] = {
-    (s32)unit_heavy_bom_6_data_15A08, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_heavy_bom, (s32)unit_heavy_bom_6_data_15A08, 16777216, 67108868, 1116471296,
+    (s32)unit_heavy_bom, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_heavy_bom, (s32)unit_heavy_bom, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_heavy_bom,
-    (s32)unit_heavy_bom_6_data_15A08, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_heavy_bom, (s32)unit_heavy_bom_6_data_15A08, 16777216, 67108868, 1125515264,
+    (s32)unit_heavy_bom, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_heavy_bom, (s32)unit_heavy_bom, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_heavy_bom,
 };
 
@@ -460,10 +460,10 @@ __declspec(section ".data") s32 btlgrp_dou_dou_08_01_off_01[] = {
 };
 
 s32 btlparty_dou_dou_09_01_off_01[] = {
-    (s32)unit_bubble_6_data_11C80, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_bubble, (s32)unit_bubble_6_data_11C80, 16777216, 67108868, 1119092736,
+    (s32)unit_bubble, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_bubble, (s32)unit_bubble, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_bubble,
-    (s32)unit_hermos_6_data_17118, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_hermos, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_hermos,
 };
 
@@ -472,10 +472,10 @@ __declspec(section ".data") s32 btlgrp_dou_dou_09_01_off_01[] = {
 };
 
 s32 btlparty_dou_dou_09_02_off_01[] = {
-    (s32)unit_hermos_6_data_17118, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_hermos, (s32)unit_hermos_6_data_17118, 16777216, 67108868, 1119092736,
+    (s32)unit_hermos, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_hermos, (s32)unit_hermos, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_hermos,
-    (s32)unit_bubble_6_data_11C80, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_bubble, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_bubble,
 };
 

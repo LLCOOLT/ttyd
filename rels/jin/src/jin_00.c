@@ -70,7 +70,7 @@ USER_FUNC(evt_hit_bind_update);
 USER_FUNC(evt_hitobj_attr_onoff);
 USER_FUNC(evt_hitobj_onoff);
 USER_FUNC(evt_item_entry);
-USER_FUNC(evt_kagemario_init_14_text_4DB8);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_map_playanim);
 USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_mapobj_get_position);
@@ -169,7 +169,7 @@ extern s32 evt_party_dispflg_onoff[];
 extern s32 evt_party_get_pos[];
 extern s32 evt_party_run[];
 extern s32 evt_party_stop[];
-extern s32 evt_usu_kagemario_party_kill_14_data_AF00[];
+extern s32 evt_usu_kagemario_party_kill[];
 extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_jin_00_negone_one_374;
@@ -1733,7 +1733,7 @@ EVT_BEGIN(jin_00_init_evt)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_JIN1"))
     CALL(evt_snd_set_rev_mode, 2)
-    CALL(evt_kagemario_init_14_text_4DB8)
+    CALL(evt_kagemario_init)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -500, 260, -200, 0, 0)
     IF_INT_LESS(GSW(0), 194)
         SET_VALUE(LW(0), PTR(bero_entry_data))
@@ -1744,7 +1744,7 @@ EVT_BEGIN(jin_00_init_evt)
         CALL(evt_bero_get_info)
         CALL_CHILD(PTR(evt_bero_info_run))
     END_IF
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_14_data_AF00))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_LESS(GSW(0), 198)
         CALL(evt_item_entry, STRING("key00"), 22, -555, 200, 190, 0, -1, PTR(evt_key))

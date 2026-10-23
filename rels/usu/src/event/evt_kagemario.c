@@ -20,7 +20,7 @@ USER_FUNC(evt_party_set_pos);
 USER_FUNC(evt_party_stop);
 static USER_FUNC(test);
 static USER_FUNC(evt_kagemario_change);
-USER_FUNC(evt_kagemario_init_29_text_1A0C);
+USER_FUNC(evt_kagemario_init);
 static s32 color_change_evt(s32 on);
 static void callback(MapTevCallbackInfo* info);
 
@@ -39,7 +39,7 @@ __declspec(section ".data") u64 fd_evt_kagemario_one_negone_359;
 __declspec(section ".data") s32 fd_evt_kagemario___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_evt_kagemario_one_364[1];
 static __declspec(section ".data") s32 evt_check[4];
-s32 evt_usu_kagemario_party_kill_29_data_104A8[42];
+s32 evt_usu_kagemario_party_kill[42];
 
 static void callback(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
@@ -91,7 +91,7 @@ static USER_FUNC(check) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(evt_kagemario_init_29_text_1A0C) {
+USER_FUNC(evt_kagemario_init) {
     s32 sequence = swByteGet(0);
 
     if (sequence >= 201 && sequence < 212) {
@@ -167,7 +167,7 @@ static __declspec(section ".data") EVT_BEGIN(evt_check)
     RETURN
 EVT_END()
 
-EVT_BEGIN(evt_usu_kagemario_party_kill_29_data_104A8)
+EVT_BEGIN(evt_usu_kagemario_party_kill)
     SWITCH(GSW(0))
         CASE_BETWEEN(201, 205)
         CALL(evt_party_stop, 0)

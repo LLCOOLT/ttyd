@@ -77,7 +77,7 @@ __declspec(section ".data") s32 fd_basabasa___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_basabasa_one_negone_359;
 __declspec(section ".data") s32 fd_basabasa___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_basabasa_one_364[1];
-BattleUnitKind unit_basabasa_14_data_1DE40;
+BattleUnitKind unit_basabasa;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static s32 weapon_basabasa_drain_attack_biribiri_counterd[48];
@@ -146,7 +146,7 @@ __declspec(section ".data") s32 fd_basabasa_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_basabasa_14_data_1DE40 = {
+BattleUnitKind unit_basabasa = {
     74,
     "btl_un_basabasa",
     6,

@@ -5,6 +5,10 @@
 #include "mario/mariost.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "version.h"
+// US effect texture ids are 0x1C lower for these entries.
+#define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
+
 
 extern double sin(double x);
 extern double cos(double x);
@@ -141,7 +145,7 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 	GXSetNumTevStages(1);
 	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 	GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-	effGetTexObj(0x8C, &texObj);
+	effGetTexObj(EFF_TEX(0x8C), &texObj);
 	GXLoadTexObj(&texObj, GX_TEXMAP0);
 	GXSetCullMode(GX_CULL_NONE);
 	GXClearVtxDesc();

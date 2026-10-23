@@ -271,7 +271,11 @@ static s32 hitDmgRetPoints[] = {
 
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
+#ifdef VERSION_G8ME01
+    CALL(evt_item_entry, STRING("item00"), 275, 0, -1000, 0, 16, -1, 0)
+#else
     CALL(evt_item_entry, STRING("item00"), 277, 0, -1000, 0, 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, STRING("item00"), 258)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))

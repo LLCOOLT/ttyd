@@ -594,6 +594,9 @@ typedef struct BattleUnit {
     s8 mInstantKillStrength;                     // 0x135
     u8 pad_0x136[2];                             // 0x136, TODO remove?
     s32 mStatusFlags;                            // 0x138
+#ifdef VERSION_G8ME01
+    u16 usCommandDisabled[2]; // US only (+4 from here): per-unit turns left for the two command blocks JP keeps in BattleWork commandDisabled[3..4]
+#endif
     s32 protectId;                               // 0x13C
     BattleVulnerableStatus* vulnStatus;          // 0x140
     Vec mMoveStartPos;                           // 0x144
@@ -813,3 +816,9 @@ void BtlUnit_ReviseHpFp(BattleUnit* unit);
 void BtlUnit_SetParamFromPouch(BattleUnit* unit);
 s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s32 pan);
 BattleUnit* BtlUnit_GetGuardKouraPtr(BattleUnit* unit);
+
+#ifdef VERSION_G8ME01
+#define BUOFF(off) ((off) + ((off) >= 0x13C ? 4 : 0))
+#else
+#define BUOFF(off) (off)
+#endif

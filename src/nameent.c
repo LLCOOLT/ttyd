@@ -9,6 +9,7 @@
 #include "manager/fontmgr.h"
 #include "win/win_main.h"
 #include "mario/mariost.h"
+#include "version.h"
 #include "pmario_sound.h"
 
 void winTexInit_x2(TEXPalette* texture);
@@ -29,6 +30,23 @@ double sin(double);
 void nameEntDisp(CameraId cameraId, void* param);
 
 //.data
+#ifdef VERSION_G8ME01
+#define NAME_LANG_PICK(jp, en) ((u32)gp->language == 0 ? (jp) : (en))
+#else
+#define NAME_LANG_PICK(jp, en) (jp)
+#endif
+
+#ifdef VERSION_G8ME01
+/* US: eight unreferenced {+-1.0f, -+1.0f} pairs open nameent .data (r31 anchors here) */
+__declspec(section ".data") u64 nameent_unused_pm1_0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 nameent_unused_pm1_1 = 0xBF8000003F800000;
+__declspec(section ".data") u64 nameent_unused_pm1_2 = 0x3F800000BF800000;
+__declspec(section ".data") u64 nameent_unused_pm1_3 = 0x3F800000BF800000;
+__declspec(section ".data") u64 nameent_unused_pm1_4 = 0xBF8000003F800000;
+__declspec(section ".data") u64 nameent_unused_pm1_5 = 0xBF8000003F800000;
+__declspec(section ".data") u64 nameent_unused_pm1_6 = 0x3F800000BF800000;
+__declspec(section ".data") u64 nameent_unused_pm1_7 = 0x3F800000BF800000;
+#endif
 const char* hiragana_tbl[] = {
 	"\x82\xA0", "\x82\xA2", "\x82\xA4", "\x82\xA6", "\x82\xA8", "\x82\xED",
 	"\x81\x40", "\x82\xF0", "\x81\x40", "\x82\xF1", "\x82\x4F", "\x82\x50",
@@ -52,6 +70,10 @@ const char* hiragana_tbl[] = {
 	"\x82\xE9", "\x82\xEA", "\x82\xEB", "\x81\x7C", "\x81\x60", "\x81\x45",
 	"\x81\x44", "\x81\x40", NULL,       NULL,       NULL,       NULL
 };
+
+#ifdef VERSION_G8ME01
+extern const char* latin_tbl[];
+#endif
 const char* katakana_tbl[] = {
 	"\x83\x41", "\x83\x43", "\x83\x45", "\x83\x47", "\x83\x49", "\x83\x8F",
 	"\x81\x40", "\x83\x92", "\x81\x40", "\x83\x93", "\x82\x4F", "\x82\x50",
@@ -97,8 +119,39 @@ void nameEntReInit(void) {
 	wp->loadState = 3;
 }
 
+#ifdef VERSION_G8ME01
+const char* latin_tbl[] = {
+	"A", "B", "C", "D", "E", "a",
+	"b", "c", "d", "e", "\xFC", "\xFA",
+	"\xF9", "\xFB", "F", "G", "H", "I",
+	"J", "f", "g", "h", "i", "j",
+	"\xDF", "-", "/", "&", "K", "L",
+	"M", "N", "O", "k", "l", "m",
+	"n", "o", "\xA1", "!", "\xBF", "?",
+	"P", "Q", "R", "S", "T", "p",
+	"q", "r", "s", "t", ".", ",",
+	"0", "1", "U", "V", "W", "X",
+	"Y", "u", "v", "w", "x", "y",
+	"2", "3", "4", "5", "Z", "\xC4",
+	"\xC1", "\xC0", "\xC7", "z", "\xE4", "\xE1",
+	"\xE0", "\xE2", "6", "7", "8", "9",
+	"\xC9", "\xC8", "\xCD", "\xCC", "\xD1", "\xE7",
+	"\xEB", "\xE9", "\xE8", "\xEA", NULL, NULL,
+	NULL, NULL, "\xD6", "\xD3", "\xD2", "\x8C",
+	"\xDC", "\xEF", "\xED", "\xEC", "\xEE", "\xF1",
+	NULL, NULL, NULL, NULL, "\xDA", "\xD9",
+	"\xD0", "\xDE", " ", "\xF6", "\xF3", "\xF2",
+	"\xF4", "\x9C", NULL, NULL, NULL, NULL
+};
+#endif
+
 BOOL nameEntPrepare(void) {
+#ifdef VERSION_G8ME01
+	const char* lang[6] = {"jp", "us", "ge", "fr", "sp", "it"};
+	return fileAsyncf(4, NULL, "%s/w/%s/name.tpl", getMarioStDvdRoot(), lang[gp->language]) != 0;
+#else
 	return fileAsyncf(4, NULL, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot()) != 0;
+#endif
 }
 
 void nameEntOn(s32 type) {
@@ -108,7 +161,15 @@ void nameEntOn(s32 type) {
 	wp->type = type;
 	wp->loadState = 1;
 	wp->state = 0;
+#ifdef VERSION_G8ME01
+	if ((u32)gp->language == 0) {
+		wp->charTable = hiragana_tbl;
+	} else {
+		wp->charTable = latin_tbl;
+	}
+#else
 	wp->charTable = hiragana_tbl;
+#endif
 	wp->nameLen = 0;
 	wp->cursorX = 0;
 	wp->cursorY = 0;
@@ -118,9 +179,36 @@ void nameEntOn(s32 type) {
 	wp->caretY = wp->caretTargetY = 135.0f;
 	strcpy(wp->name, "\0\0\0");
 	for (i = 0; i < 8; i++) {
+#ifdef VERSION_G8ME01
+		strcat(wp->name, (u32)gp->language == 0 ? "\x81\x40" : " ");
+#else
 		strcat(wp->name, "\x81\x40");
+#endif
 	}
 	wp->maskAlpha = 0.0f;
+#ifdef VERSION_G8ME01
+	if ((u32)gp->language == 0) {
+		switch (type) {
+			case 2:
+				hiragana_tbl[9] = "\x81\x40";
+				katakana_tbl[9] = "\x81\x40";
+				break;
+			default:
+				hiragana_tbl[9] = "\x82\xF1";
+				katakana_tbl[9] = "\x83\x93";
+				break;
+		}
+	} else {
+		switch (type) {
+			case 2:
+				latin_tbl[47] = " ";
+				break;
+			default:
+				latin_tbl[47] = "p";
+				break;
+		}
+	}
+#else
 	switch (type) {
 		case 2:
 			hiragana_tbl[9] = "\x81\x40";
@@ -131,6 +219,7 @@ void nameEntOn(s32 type) {
 			katakana_tbl[9] = "\x83\x93";
 			break;
 	}
+#endif
 }
 
 void nameEntOff(void) {
@@ -152,6 +241,24 @@ const char* nameEntGetName(void) {
 	if (wp->state != 0x65) {
 		return NULL;
 	}
+#ifdef VERSION_G8ME01
+	if ((u32)gp->language == 0) {
+		for (j = 7; j >= 1; j--) {
+			if (strncmp(&wp->name[j * 2], "\x81\x40", 2)) {
+				break;
+			}
+			wp->name[j * 2] = 0;
+			wp->name[j * 2 + 1] = 0;
+		}
+	} else {
+		for (j = 7; j >= 1; j--) {
+			if (strncmp(&wp->name[j], " ", 1)) {
+				break;
+			}
+			wp->name[j] = 0;
+		}
+	}
+#else
 	for (j = 7; j >= 1; j--) {
 		if (strncmp(&wp->name[j * 2], "\x81\x40", 2)) {
 			break;
@@ -159,12 +266,24 @@ const char* nameEntGetName(void) {
 		wp->name[j * 2] = 0;
 		wp->name[j * 2 + 1] = 0;
 	}
+#endif
 	return wp->name;
 }
 
 static inline BOOL nameEntLoad(void) {
+#ifdef VERSION_G8ME01
+	const char* lang[6] = {"jp", "us", "ge", "fr", "sp", "it"};
+#endif
+#ifdef VERSION_G8ME01
+	if (fileAsyncf(4, NULL, "%s/w/%s/name.tpl", getMarioStDvdRoot(), lang[gp->language]) != 0U) {
+#else
 	if (fileAsyncf(4, NULL, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot()) != 0U) {
+#endif
+#ifdef VERSION_G8ME01
+		wp->tplFile = fileAllocf(4, "%s/w/%s/name.tpl", getMarioStDvdRoot(), lang[gp->language]);
+#else
 		wp->tplFile = fileAllocf(4, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot());
+#endif
 		return TRUE;
 	}
 	return FALSE;
@@ -208,7 +327,11 @@ s32 nameMain(void) {
 			if ((wp->flags & 1) && gp->unk8 == 0) {
 				if (keyGetButtonTrg(0) & 0x100) {
 					off = wp->cursorX;
+#ifdef VERSION_G8ME01
+					if (off >= 10 && wp->cursorY >= (s32)((u32)gp->language == 0 ? 4 : 6)) {
+#else
 					if (off >= 10 && wp->cursorY >= 4) {
+#endif
 						switch (wp->cursorY) {
 							case 4:
 								wp->charTable = hiragana_tbl;
@@ -228,6 +351,47 @@ s32 nameMain(void) {
 								s32 n;
 								s32 k;
 								s32 o;
+#ifdef VERSION_G8ME01
+								if ((u32)gp->language == 0) {
+									n = strlen(wp->name) / 2;
+									for (k = 0, o = 0; k < n; o += 2, k++) {
+										if (strncmp(&wp->name[o], "\x81\x40", 2)) {
+											break;
+										}
+									}
+									if (k < n || wp->type != 0) {
+										wp->confirmSel = 1;
+										wp->state = 100;
+										psndSFXOn((const char*)0x20012);
+										if (wp->type == 1 && k >= n) {
+											strcpy(wp->name, msgSearch("name_party3"));
+											wp->nameLen = strlen(wp->name) / 2;
+										}
+									} else {
+										psndSFXOn((const char*)0x20014);
+									}
+								} else {
+									s32 m;
+
+									n = strlen(wp->name);
+									for (m = 0; m < n; m++) {
+										if (strncmp(&wp->name[m], " ", 1)) {
+											break;
+										}
+									}
+									if (m < n || wp->type != 0) {
+										wp->confirmSel = 1;
+										wp->state = 100;
+										psndSFXOn((const char*)0x20012);
+										if (wp->type == 1 && m >= n) {
+											strcpy(wp->name, msgSearch("name_party3"));
+											wp->nameLen = strlen(wp->name);
+										}
+									} else {
+										psndSFXOn((const char*)0x20014);
+									}
+								}
+#else
 								n = strlen(wp->name) / 2;
 								for (k = 0, o = 0; k < n; o += 2, k++) {
 									if (strncmp(&wp->name[o], "\x81\x40", 2)) {
@@ -245,11 +409,20 @@ s32 nameMain(void) {
 								} else {
 									psndSFXOn((const char*)0x20014);
 								}
+#endif
 }
 								break;
 						}
 					} else if (wp->nameLen < 8) {
+#ifdef VERSION_G8ME01
+						if ((u32)gp->language == 0) {
+							((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * 14 + off];
+						} else {
+							((u8*)wp->name)[wp->nameLen] = *(u8*)wp->charTable[wp->cursorY * 14 + off];
+						}
+#else
 						((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * 14 + off];
+#endif
 						wp->nameLen++;
 						if (wp->nameLen >= 8) {
 							wp->nameLen = 7;
@@ -259,12 +432,61 @@ s32 nameMain(void) {
 						psndSFXOn((const char*)0xA);
 					} else if (wp->nameLen == 8) {
 						wp->nameLen = 7;
+#ifdef VERSION_G8ME01
+						if ((u32)gp->language == 0) {
+							((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * 14 + wp->cursorX];
+						} else {
+							((u8*)wp->name)[wp->nameLen] = *(u8*)wp->charTable[wp->cursorY * 14 + wp->cursorX];
+						}
+#else
 						((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * 14 + wp->cursorX];
+#endif
 						wp->cursorX = 10;
 						wp->cursorY = 7;
 						psndSFXOn((const char*)0xA);
 					}
 				} else if (keyGetButtonTrg(0) & 0x1000) {
+#ifdef VERSION_G8ME01
+					if ((u32)gp->language == 0) {
+						len = strlen(wp->name) / 2;
+						for (j = 0, off = 0; j < len; off += 2, j++) {
+							if (strncmp(&wp->name[off], "\x81\x40", 2)) {
+								break;
+							}
+						}
+						if (j < len || wp->type != 0) {
+							wp->confirmSel = 1;
+							wp->state = 100;
+							psndSFXOn((const char*)0x12);
+							if (wp->type == 1 && j >= len) {
+								strcpy(wp->name, msgSearch("name_party3"));
+								wp->nameLen = strlen(wp->name) / 2;
+							}
+						} else {
+							psndSFXOn((const char*)0x20014);
+						}
+					} else {
+						s32 m;
+
+						len = strlen(wp->name);
+						for (m = 0; m < len; m++) {
+							if (strncmp(&wp->name[m], " ", 1)) {
+								break;
+							}
+						}
+						if (m < len || wp->type != 0) {
+							wp->confirmSel = 1;
+							wp->state = 100;
+							psndSFXOn((const char*)0x12);
+							if (wp->type == 1 && m >= len) {
+								strcpy(wp->name, msgSearch("name_party3"));
+								wp->nameLen = strlen(wp->name);
+							}
+						} else {
+							psndSFXOn((const char*)0x20014);
+						}
+					}
+#else
 					len = strlen(wp->name) / 2;
 					for (j = 0, off = 0; j < len; off += 2, j++) {
 						if (strncmp(&wp->name[off], "\x81\x40", 2)) {
@@ -282,7 +504,37 @@ s32 nameMain(void) {
 					} else {
 						psndSFXOn((const char*)0x20014);
 					}
+#endif
 				} else if (keyGetButtonTrg(0) & 0x200) {
+#ifdef VERSION_G8ME01
+					if ((u32)gp->language == 0) {
+						if (wp->nameLen == 0 && wp->type == 0 && !strncmp(wp->name, "\x81\x40", 2)) {
+							psndSFXOn((const char*)0x13);
+							wp->state = 0x65;
+							wp->flags |= 2;
+						} else {
+							((u16*)wp->name)[wp->nameLen] = *(u16*)"\x81\x40";
+							wp->nameLen--;
+							if (wp->nameLen < 0) {
+								wp->nameLen = 0;
+							}
+							psndSFXOn((const char*)0xB);
+						}
+					} else {
+						if (wp->nameLen == 0 && wp->type == 0 && !strncmp(wp->name, " ", 1)) {
+							psndSFXOn((const char*)0x13);
+							wp->state = 0x65;
+							wp->flags |= 2;
+						} else {
+							((u8*)wp->name)[wp->nameLen] = *(u8*)" ";
+							wp->nameLen--;
+							if (wp->nameLen < 0) {
+								wp->nameLen = 0;
+							}
+							psndSFXOn((const char*)0xB);
+						}
+					}
+#else
 					if (wp->nameLen == 0 && wp->type == 0 && !strncmp(wp->name, "\x81\x40", 2)) {
 						psndSFXOn((const char*)0x13);
 						wp->state = 0x65;
@@ -295,10 +547,11 @@ s32 nameMain(void) {
 						}
 						psndSFXOn((const char*)0xB);
 					}
+#endif
 				} else if (keyGetDirRep(0) & 0x4000) {
 					if (dist < 10.0f) {
 						wp->cursorX--;
-						if (wp->cursorY > 3) {
+						if (wp->cursorY > NAME_LANG_PICK(3, 5)) {
 							if (wp->cursorX < 0) {
 								wp->cursorX = 10;
 								if (wp->cursorY > 7) {
@@ -313,7 +566,7 @@ s32 nameMain(void) {
 				} else if (keyGetDirRep(0) & 0x8000) {
 					if (dist < 10.0f) {
 						wp->cursorX++;
-						if (wp->cursorY > 3) {
+						if (wp->cursorY > NAME_LANG_PICK(3, 5)) {
 							if (wp->cursorX >= 10 && wp->cursorY > 7) {
 								wp->cursorY = 7;
 							}
@@ -342,7 +595,7 @@ s32 nameMain(void) {
 					if (dist < 10.0f) {
 						wp->cursorY++;
 						if (wp->cursorX > 9) {
-							if (wp->cursorY >= 4) {
+							if (wp->cursorY >= NAME_LANG_PICK(4, 6)) {
 								wp->cursorX = 10;
 							}
 							if (wp->cursorY >= 8) {
@@ -356,7 +609,11 @@ s32 nameMain(void) {
 				}
 			}
 			idx = wp->cursorX;
+#ifdef VERSION_G8ME01
+			if (idx > 9 && wp->cursorY > ((u32)gp->language == 0 ? 3 : 5)) {
+#else
 			if (idx > 9 && wp->cursorY > 3) {
+#endif
 				wp->x2 = 100.0f;
 				wp->y2 = (f32)(-20 - (wp->cursorY - 4) * 34);
 				wp->x2 -= 6.0f;
@@ -396,14 +653,14 @@ s32 nameMain(void) {
 			}
 			break;
 	}
-	wp->x1 += (wp->x2 - wp->x1) / 4.0f;
-	wp->y1 += (wp->y2 - wp->y1) / 4.0f;
+	wp->x1 += (wp->x2 - wp->x1) / FPS_EASE(4.0f);
+	wp->y1 += (wp->y2 - wp->y1) / FPS_EASE(4.0f);
 	wp->x1 += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
 	idx = wp->nameLen >= 8 ? wp->nameLen - 1 : wp->nameLen;
 	wp->caretTargetX = idx * 32 - 106;
 	wp->caretTargetY = 135.0f;
-	wp->caretX += (wp->caretTargetX - wp->caretX) / 4.0f;
-	wp->caretY += (wp->caretTargetY - wp->caretY) / 4.0f;
+	wp->caretX += (wp->caretTargetX - wp->caretX) / FPS_EASE(4.0f);
+	wp->caretY += (wp->caretTargetY - wp->caretY) / FPS_EASE(4.0f);
 	wp->caretY += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
 	return 0;
 }
@@ -453,15 +710,19 @@ void nameEntDisp(CameraId cameraId, void* param) {
 			}
 		}
 	}
+#ifdef VERSION_G8ME01
+	for (j = (u32)gp->language == 0 ? 0 : 2; j < 4; j++) {
+#else
 	for (j = 0; j < 4; j++) {
+#endif
 		if (wp->cursorX >= 10 && wp->cursorY - 4 == j) {
 			winTexInit(*wp->tplFile->data);
-			winTexSet(0x33, (Vec){160.0f, (f32)(-20 - j * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x40});
+			winTexSet(VERSION_PICK(0x33, 0x37), (Vec){160.0f, (f32)(-20 - j * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x40});
 			winTexInit_x2(*wp->tplFile->data);
-			winTexSet_x2(j + 0x25, 0x33, (Vec){154.0f, (f32)(-14 - j * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
+			winTexSet_x2(j + 0x25, VERSION_PICK(0x33, 0x37), (Vec){154.0f, (f32)(-14 - j * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
 		} else {
 			winTexInit_x2(*wp->tplFile->data);
-			winTexSet_x2(j + 0x25, 0x33, (Vec){160.0f, (f32)(-20 - j * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
+			winTexSet_x2(j + 0x25, VERSION_PICK(0x33, 0x37), (Vec){160.0f, (f32)(-20 - j * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
 		}
 	}
 	winTexInit(*wp->tplFile->data);
@@ -470,7 +731,15 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	FontDrawStart();
 	for (n = 0; n < 8; n++) {
 		memset(buf, 0, sizeof(buf));
+#ifdef VERSION_G8ME01
+		if ((u32)gp->language == 0) {
+			strncpy(buf, &wp->name[n * 2], 2);
+		} else {
+			strncpy(buf, &wp->name[n], 1);
+		}
+#else
 		strncpy(buf, &wp->name[n * 2], 2);
+#endif
 		if (strlen(buf)) {
 			FontDrawString((28.0f - FontGetMessageWidth(buf)) / 2.0f + (f32)(n * 32 - 120)
 , 171.0f, buf);
@@ -779,3 +1048,4 @@ void nameWinGX(f32 x, f32 y, f32 w, f32 h, TEXPalette* tpl, s32 type) {
 	nameWinQuad(tpl, type + 4, type + 6, type + 1, x, y - h + 16, w - 16, 16);
 	nameWinQuad(tpl, type + 4, type + 8, type + 3, x + w - 16, y - h + 16, 16, 16);
 }
+

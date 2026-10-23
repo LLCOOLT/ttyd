@@ -34,6 +34,9 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_sub_get_sincos);
+#ifdef VERSION_G8ME01
+USER_FUNC(las_24_adjust_for_framerate);
+#endif
 extern s32 evt_bero_info_run[];
 extern s32 move_dai[];
 
@@ -62,7 +65,11 @@ static s32 haguruma_evt[194];
 __declspec(section ".data") s32 cloud_blk_evt[10];
 __declspec(section ".data") s32 break_floor_evt[5];
 s32 jump_evt[68];
+#ifdef VERSION_G8ME01
+static s32 dai_evt[17];
+#else
 static s32 dai_evt[13];
+#endif
 static s32 box_evt[33];
 s32 las_24_init_evt[190];
 
@@ -264,6 +271,9 @@ static EVT_BEGIN(dai_evt)
     SET_VALUE(LW(0), STRING("S_move_dai"))
     SET_VALUE(LW(1), STRING("A_move_dai"))
     SET_VALUE(LW(2), 7200)
+#ifdef VERSION_G8ME01
+    CALL(las_24_adjust_for_framerate, LW(2), LW(2))
+#endif
     CALL_CHILD(PTR(move_dai))
     RETURN
 EVT_END()
@@ -323,3 +333,19 @@ EVT_BEGIN(las_24_init_evt)
     RETURN
 EVT_END()
 
+
+#ifdef VERSION_G8ME01
+#include "mario/mariost.h"
+#include "manager/evtmgr_cmd.h"
+
+USER_FUNC(las_24_adjust_for_framerate) {
+    s32* args = event->args;
+    s32 value = evtGetValue(event, args[0]);
+
+    if (gp->framerate != 60) {
+        value *= 1.2f;
+    }
+    evtSetValue(event, args[1], value);
+    return EVT_RETURN_DONE;
+}
+#endif

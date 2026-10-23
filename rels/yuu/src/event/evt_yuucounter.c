@@ -11,6 +11,7 @@
 #include "dolphin/mtx.h"
 #include "mario/mario.h"
 #include "driver/camdrv.h"
+#include "icon_ids.h"
 
 typedef struct YuuCounterWork { EventEntry* event; u16 flags; u32 dispFlags; s32 type; f32 x; f32 y; s32 data; s32 field_0x1C; s64 elapsed; OSTime lastTime; s32 limit; s32 field_0x34; } YuuCounterWork;
 static void* yuunpc_wp;
@@ -180,7 +181,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
             }
             scale = 2.5f;
             xOfs = -50.0f;
-            iconId = 0x202;
+            iconId = ICON_202;
             if (wp->data < 0) {
                 return;
             }
@@ -200,7 +201,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
                 }
             }
             scale = 3.0f;
-            iconId = 0x201;
+            iconId = ICON_201;
             xOfs = -42.0f;
             break;
         case 2:
@@ -227,7 +228,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
     PSMTXTrans(base, wp->x, wp->y, 0.0f);
     PSMTXScale(scaleMtx, scale, 1.0f, 1.0f);
     PSMTXConcat(base, scaleMtx, mtx);
-    iconDispGxCol(mtx, 0x10, 0x1F6, bgColor);
+    iconDispGxCol(mtx, 0x10, ICON_1F6, bgColor);
 
     switch (wp->type) {
         case 0: {
@@ -245,7 +246,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
                 if (!skip) {
                     PSMTXTrans(mtx, xOfs + (f32)(j * 30), 8.0f, 0.0f);
                     PSMTXConcat(base, mtx, mtx);
-                    iconDispGxCol(mtx, 0x10, digit + 0x1F7, numColor);
+                    iconDispGxCol(mtx, 0x10, digit + ICON_1F7, numColor);
                 }
             }
             break;
@@ -258,7 +259,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
             for (i = 0; i < 3; i++) {
                 PSMTXTrans(mtx, xOfs + (f32)(i * 30) - (f32)((i == 0) * 16), 8.0f, 0.0f);
                 PSMTXConcat(base, mtx, mtx);
-                iconDispGxCol(mtx, 0x10, digits[i] + 0x1F7, numColor);
+                iconDispGxCol(mtx, 0x10, digits[i] + ICON_1F7, numColor);
             }
             PSMTXTrans(mtx, 8.0f + xOfs, 12.0f, 0.0f);
             PSMTXScale(scaleMtx, 2.0f, 2.0f, 2.0f);
@@ -283,7 +284,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
                 if (!skip2) {
                     PSMTXTrans(mtx, xOfs + (f32)(k * 30), 8.0f, 0.0f);
                     PSMTXConcat(base, mtx, mtx);
-                    iconDispGxCol(mtx, 0x10, digit + 0x1F7, numColor);
+                    iconDispGxCol(mtx, 0x10, digit + ICON_1F7, numColor);
                 }
             }
             break;
@@ -305,7 +306,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
                 PSMTXScale(scaleMtx, 0.5f, 0.5f, 0.5f);
                 PSMTXConcat(mtx, scaleMtx, mtx);
                 PSMTXConcat(base, mtx, mtx);
-                iconDispGxCol(mtx, 0x10, digits[i] + 0x1F7, numColor);
+                iconDispGxCol(mtx, 0x10, digits[i] + ICON_1F7, numColor);
             }
             break;
         case 2:

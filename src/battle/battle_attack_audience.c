@@ -1,3 +1,8 @@
+#ifdef VERSION_G8ME01
+#include "mario/mariost.h"
+#include <string.h>
+void evtMsgFmtStr(char* dst, const char* src);
+#endif
 #include "battle/battle.h"
 #include "battle/battle_audience.h"
 #include "battle/battle_database_common.h"
@@ -159,8 +164,18 @@ void _get_item_announce_disp(s32 cameraId, void* param) {
 
     no = BattleAudience_GetPresentItemNo();
     itemName = msgSearch(itemDataTable[no].name);
+#ifdef VERSION_G8ME01
+    if ((u32)gp->language == 0) {
+        msg = msgSearch("btl_msg_get_item");
+        sprintf(buf, msg, itemName);
+    } else {
+        strcpy(buf, msgSearch("btl_msg_get_item"));
+        evtMsgFmtStr(buf, itemName);
+    }
+#else
     msg = msgSearch("btl_msg_get_item");
     sprintf(buf, msg, itemName);
+#endif
     width = FontGetMessageWidthLine(buf, &lines);
     lines++;
     x = 0.0f;
@@ -231,7 +246,9 @@ s32* btlataudGetMoveEventPtr(void) {
 
 
 
+#ifndef VERSION_G8ME01
 __declspec(section ".data") static s32 btlataudevtDummyPad[1] = {0};
+#endif
 s32 btlataudevtDummy[] = {
     327771, (s32)_get_attack_aud_no, -29999997, -30000000, -29999999, -29999998, 196699,
     (s32)_attack_aud, -29999997, 0, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,

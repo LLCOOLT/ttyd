@@ -568,6 +568,11 @@ static inline DEMOPadStatus* GET_DEMO_PAD_STATUS(u32 i) {
     return DemoPad + i;
 }
 
+#ifdef VERSION_G8ME01
+#define KEYFR(n) ((gp->framerate * (n)) / 60)
+#else
+#define KEYFR(n) (n)
+#endif
 void makeKey(void) {
     s32 delay;
     u16 button;
@@ -582,10 +587,10 @@ void makeKey(void) {
         if (dirs && dirs == gp->dirs[i]) {
             if (!--gp->dirsRepeatDelay[i]) {
                 gp->dirsRepeat[i] = dirs;
-                gp->dirsRepeatDelay[i] = 6;
+                gp->dirsRepeatDelay[i] = KEYFR(6);
             }
         } else {
-            gp->dirsRepeatDelay[i] = 24;
+            gp->dirsRepeatDelay[i] = KEYFR(24);
         }
         gp->dirs[i] = dirs;
     }
@@ -597,10 +602,10 @@ void makeKey(void) {
         if (button && button == gp->button[i]) {
             if (!--gp->buttonRepeatDelay[i]) {
                 gp->buttonRepeat[i] = button;
-                gp->buttonRepeatDelay[i] = 6;
+                gp->buttonRepeatDelay[i] = KEYFR(6);
             }
         } else {
-            gp->buttonRepeatDelay[i] = 24;
+            gp->buttonRepeatDelay[i] = KEYFR(24);
         }
         gp->button[i] = button;
         gp->buttonUp[i] = GET_DEMO_PAD_STATUS(i)->buttonUp;
@@ -614,6 +619,28 @@ void makeKey(void) {
         gp->triggerLeft[i] = GET_DEMO_PAD_STATUS(i)->pst.triggerLeft;
         gp->triggerRight[i] = GET_DEMO_PAD_STATUS(i)->pst.triggerRight;
     }
+
+#ifdef VERSION_G8ME01
+    for (i = 0; i < 4; i++) {
+        if ((gp->button[i] & (PAD_BUTTON_X | PAD_BUTTON_Y | PAD_BUTTON_START)) == (PAD_BUTTON_X | PAD_BUTTON_Y | PAD_BUTTON_START)) {
+            gp->button[i] = 0;
+            gp->buttonNew[i] = 0;
+            gp->buttonRepeat[i] = 0;
+            gp->buttonRepeatDelay[i] = KEYFR(24);
+            gp->buttonUp[i] = 0;
+            gp->dirs[i] = 0;
+            gp->dirsNew[i] = 0;
+            gp->dirsRepeat[i] = 0;
+            gp->dirsRepeatDelay[i] = KEYFR(24);
+            gp->stickX[i] = 0;
+            gp->stickY[i] = 0;
+            gp->substickX[i] = 0;
+            gp->substickY[i] = 0;
+            gp->triggerLeft[i] = 0;
+            gp->triggerRight[i] = 0;
+        }
+    }
+#endif
 
     if (gp->rumbleEnabled) {
         for (i = 0; i < 4; i++) {
@@ -795,11 +822,19 @@ f32 sysFrame2SecFloat(f32 frame) {
 }
 
 s32 sysMsec2Frame(s32 msec) {
+#ifdef VERSION_G8ME01
+    return (msec * gp->framerate) / 1000;
+#else
     return (msec * 60) / 1000;
+#endif
 }
 
 f32 sysMsec2FrameFloat(f32 msec) {
+#ifdef VERSION_G8ME01
+    return (msec * (f32)gp->framerate) / 1000.0f;
+#else
     return (msec * 60.0f) / 1000.0f;
+#endif
 }
 
 void mtxGetRotationElement(Mtx arg0, Mtx arg1, s8 arg2, s8 arg3) {
@@ -976,6 +1011,36 @@ asm void* memcpy_as4(void* dest, const void* src, u32 count) {
 
 // The original file had debug functions that the linker dead-stripped; their constants
 // stayed in the literal pools. These stand-ins recreate the pool contents in order.
+#ifdef VERSION_G8ME01
+// US pools the int->float constant between the strings and the doubles; functions are emitted in
+// reverse order, so the doubles come first in the source
+void systemStrippedPool1b(f32* f, f64* d) {
+    d[0] = 1.5;
+    d[1] = 2.5;
+    d[2] = 1.7;
+    f[2] = 1000.0f;
+}
+
+f32 systemStrippedPool2(s32 x) {
+    return (f32)x;
+}
+
+void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
+    f[0] = 1.0f;
+    str[0] = "LINEAR";
+    str[1] = "DOUBLE_ACCEL";
+    str[2] = "TRIPLE_ACCEL";
+    str[3] = "DOUBLE_DECEL";
+    str[4] = "TRIPLE_DECEL";
+    str[5] = "GEMINI";
+    str[6] = "BURURUN";
+    str[7] = "BURURUN_DECEL";
+    str[8] = "SIN_ACCEL";
+    str[9] = "SIN_DECEL";
+    f[1] = sqrtf(x);
+    str[10] = "[%8s:% 4d] %s";
+}
+#else
 void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
     f[0] = 1.0f;
     str[0] = "LINEAR";
@@ -995,5 +1060,6 @@ void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
     d[2] = 1.7;
     f[2] = 1000.0f;
 }
+#endif
 
 #pragma pool_data off

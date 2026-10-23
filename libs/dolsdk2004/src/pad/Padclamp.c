@@ -4,7 +4,12 @@
 #include <dolphin/pad.h>
 
 // FAKE: wrapper pads the object to the original 12-byte symbol size
+#ifdef VERSION_G8ME01
+// US object is the bare 10-byte region (section ends at 0x803041D2)
+static const struct { PADClampRegion r; } ClampRegion = { {
+#else
 static const struct { PADClampRegion r; u8 pad[2]; } ClampRegion = { {
+#endif
     // Triggers
     30,
     180,

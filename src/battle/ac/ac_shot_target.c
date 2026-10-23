@@ -5,6 +5,10 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
+#include "version.h"
+// US battle texture ids are 0x16 higher for these entries.
+#define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
+
 
 void btlDispTex4(s32 id, Vec pos, Vec scale, Vec rot, GXColor color);
 void btlGetScreenPoint(Vec* in, Vec* out);
@@ -157,7 +161,7 @@ s32 battleAcMain_ShotTarget(BattleWork* work) {
                     cw->inRange = 0;
                 }
                 cw->frame--;
-                if ((ac->setupFlags & 1) && (*(u32*)((u8*)ac->mAcUnit + 0x278) & 0x10)) {
+                if ((ac->setupFlags & 1) && (*(u32*)((u8*)ac->mAcUnit + BUOFF(0x278)) & 0x10)) {
                     if (irand(100) >= 0) {
                         ac->result = 0;
                     } else {
@@ -307,17 +311,17 @@ static void actionCommandDisp(f32 x, f32 y) {
         case 1002:
             cw->angle += 2.0f;
             btlGetScreenPoint(&cw->pos, &screen);
-            btlDispTex4(0x42, screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){255, 255, 255, 255});
+            btlDispTex4(BTL_TEX(0x42), screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){255, 255, 255, 255});
             screen.x += 4.0f;
             screen.y -= 4.0f;
             screen.z -= 2.0f;
-            btlDispTex4(0x42, screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){128, 128, 128, 255});
+            btlDispTex4(BTL_TEX(0x42), screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){128, 128, 128, 255});
             btlGetScreenPoint(&cw->hitPos, &screen2);
-            btlDispTex4(0x41, screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
+            btlDispTex4(BTL_TEX(0x41), screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
             screen2.x += 4.0f;
             screen2.y -= 4.0f;
             screen2.z -= 2.0f;
-            btlDispTex4(0x41, screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){128, 128, 128, 255});
+            btlDispTex4(BTL_TEX(0x41), screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){128, 128, 128, 255});
             break;
     }
 }

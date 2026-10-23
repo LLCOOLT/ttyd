@@ -436,3 +436,9 @@ EVT_BEGIN(mri_16_init_evt)
     RETURN
 EVT_END()
 
+
+#ifdef VERSION_G8ME01
+#pragma force_active on
+__declspec(section ".data") u32 gap_04_0002354C_data[5] = {0, 0, 0, 0, 0};
+#pragma force_active reset
+#endif

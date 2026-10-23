@@ -85,11 +85,17 @@ USER_FUNC(evt_sub_animgroup_async);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_rumble_onoff);
-USER_FUNC(evt_tou_get_ranking_27_text_1ED4);
+USER_FUNC(evt_tou_get_ranking);
 static USER_FUNC(get_yoshi_color);
 USER_FUNC(icon_off);
-USER_FUNC(tou_champion_belt_27_text_34);
+USER_FUNC(tou_champion_belt);
 USER_FUNC(tou_08_belt_camid);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_npc_check);
+USER_FUNC(evt_npc_get_reglid);
+USER_FUNC(evt_npc_restart_regular_event);
+extern s32 evt_match_after_stop_npcs[];
+#endif
 extern s32 bero_close_door_play_se[];
 extern s32 bero_open_door_play_se[];
 extern s32 evt_bero_info_run[];
@@ -134,7 +140,11 @@ s32 evt_1st_sub[107];
 static s32 evt_1st_leagu[747];
 s32 evt_toile_door[236];
 s32 evt_toile_door2[136];
+#ifdef VERSION_G8ME01
+s32 evt_champion_win[290];
+#else
 s32 evt_champion_win[271];
+#endif
 static __declspec(section ".data") s32 bed_entry[10];
 s32 evt_tou_08_cake[53];
 static s32 epilogue_npc_entry[84];
@@ -263,7 +273,7 @@ EVT_BEGIN(talk_togenoko)
                 RETURN
             END_IF
         END_IF
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(10)
             CALL(evt_msg_print, 0, STRING("stg3_npc_08_01_04"), 0, 0)
@@ -314,7 +324,7 @@ EVT_BEGIN(talk_togemet)
                 RETURN
             END_IF
         END_IF
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(10)
             CALL(evt_msg_print, 0, STRING("stg3_npc_08_02_04"), 0, 0)
@@ -365,7 +375,7 @@ EVT_BEGIN(talk_hammerbros)
                 RETURN
             END_IF
         END_IF
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(10)
             CALL(evt_msg_print, 0, STRING("stg3_npc_08_03_04"), 0, 0)
@@ -416,7 +426,7 @@ static EVT_BEGIN(talk_uranoko)
                 RETURN
             END_IF
         END_IF
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(10)
             CALL(evt_msg_print, 0, STRING("stg3_npc_08_04_04"), 0, 0)
@@ -544,7 +554,7 @@ static EVT_BEGIN(evt_1st_leagu)
     CALL(evt_party_set_pos, 0, 0, 0, -200)
     CALL(evt_seq_wait, 2)
     BEGIN_INLINE_EVENT
-        CALL(tou_champion_belt_27_text_34, STRING("チャンピョン"))
+        CALL(tou_champion_belt, STRING("チャンピョン"))
     END_INLINE_EVENT
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT(PTR(bero_open_door_play_se))
@@ -873,6 +883,16 @@ EVT_END()
 
 EVT_BEGIN(evt_champion_win)
     CALL(evt_mario_key_onoff, 0)
+#ifdef VERSION_G8ME01
+    CALL(evt_npc_check, STRING("ハンマーブロス"), LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        BEGIN_INLINE_EVENT
+            CALL(evt_seq_wait, 2)
+            CALL(evt_npc_get_reglid, STRING("ハンマーブロス"), LW(0))
+            DELETE_EVENT(LW(0))
+        END_INLINE_EVENT
+    END_IF
+#endif
     CALL(evt_mario_set_pos, -90, 0, -95)
     CALL(evt_party_set_pos, 0, -120, 0, -105)
     CALL(evt_npc_set_position, STRING("ガンス"), -45, 0, -95)
@@ -1141,8 +1161,38 @@ static EVT_BEGIN(epilogue_evt)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(evt_match_after_stop_npcs)
+    SPAWN_EVENT_GET_ID(PTR(evt_tou_match_after_default), LW(10))
+    CALL(evt_npc_check, STRING("ハンマーブロス"), LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_seq_wait, 2)
+        CALL(evt_npc_get_reglid, STRING("ハンマーブロス"), LW(0))
+        DELETE_EVENT(LW(0))
+        CALL(evt_npc_check, STRING("トゲメット"), LW(0))
+        IF_INT_EQUAL(LW(0), 1)
+            CALL(evt_npc_get_reglid, STRING("トゲメット"), LW(0))
+            DELETE_EVENT(LW(0))
+        END_IF
+        LOOP(0)
+            IS_EVENT_RUNNING(LW(10), LW(0))
+            IF_INT_EQUAL(LW(0), 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(evt_npc_restart_regular_event, STRING("ハンマーブロス"))
+        CALL(evt_npc_check, STRING("トゲメット"), LW(0))
+        IF_INT_EQUAL(LW(0), 1)
+            CALL(evt_npc_restart_regular_event, STRING("トゲメット"))
+        END_IF
+    END_IF
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(tou_08_init_evt)
-    CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+    CALL(evt_tou_get_ranking, LW(0))
     SWITCH(LW(0))
         CASE_LESS_OR_EQUAL(3)
         IF_INT_LESS(GSW(0), 152)
@@ -1196,12 +1246,16 @@ EVT_BEGIN(tou_08_init_evt)
         CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU1"))
         CALL(evt_snd_bgmoff, 26624)
         CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU6"))
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             SET_VALUE(GSWF(2389), 1)
             SPAWN_EVENT(PTR(evt_champion_win))
             ELSE
+#ifdef VERSION_G8ME01
+            SPAWN_EVENT(PTR(evt_match_after_stop_npcs))
+#else
             SPAWN_EVENT(PTR(evt_tou_match_after_default))
+#endif
         END_IF
         RETURN
     END_IF

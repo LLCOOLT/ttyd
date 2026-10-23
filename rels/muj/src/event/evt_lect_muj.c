@@ -1,3 +1,4 @@
+#include "icon_ids.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -137,7 +138,7 @@ __declspec(section ".data") s32 fd_evt_lect_muj_one_364[1];
 s32 sanders_party_lecture_init[48];
 s32 sanders_party_lecture[71];
 static __declspec(section ".data") s32 all_party_lecture_otosub[11];
-s32 all_party_lecture_20_data_3C908[492];
+s32 all_party_lecture[492];
 
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start) {
     f32 rem = total - elapsed;
@@ -227,15 +228,15 @@ static void lecture_button_disp(CameraId camera, void* param) {
             Vec pos;
 
             switch (btn->iconId) {
-                case 0x75:
-                case 0x76:
-                case 0x77:
-                case 0x78:
-                case 0x79:
-                case 0x7A:
-                case 0x7B:
-                case 0x7C:
-                case 0x7D:
+                case ICON_075:
+                case ICON_076:
+                case ICON_077:
+                case ICON_078:
+                case ICON_079:
+                case ICON_07A:
+                case ICON_07B:
+                case ICON_07C:
+                case ICON_07D:
                     ofs = -15.0f;
                     break;
                 default:
@@ -269,7 +270,7 @@ static USER_FUNC(lecture_button_rtn) {
         btn = &lbtn[i];
         switch (btn->seq) {
             case 0:
-                btn->iconId = 0x68;
+                btn->iconId = ICON_068;
                 btn->seq = 1;
                 break;
             case 2:
@@ -533,7 +534,7 @@ static __declspec(section ".data") EVT_BEGIN(all_party_lecture_otosub)
     RETURN
 EVT_END()
 
-EVT_BEGIN(all_party_lecture_20_data_3C908)
+EVT_BEGIN(all_party_lecture)
     CALL(evt_mario_normalize)
     IF_INT_NOT_EQUAL(LW(9), 1)
         IF_INT_NOT_EQUAL(LW(9), 5)

@@ -528,7 +528,11 @@ EVT_BEGIN(evt_shabon_s)
             END_LOOP
             CALL(evt_eff_delete, STRING("shabon1eff"))
             IF_INT_LESS(LW(4), 40)
+#ifdef VERSION_G8ME01
+                CALL(evt_eff, STRING("_shabon1eff"), STRING("puni_balloon"), 1, LW(3), LW(0), LW(2), FLOAT(0.32910156f), 0, 0, 0, 0, 0, 0, 0)
+#else
                 CALL(evt_eff, STRING("shabon1eff"), STRING("puni_balloon"), 1, LW(3), LW(0), LW(2), FLOAT(0.32910156f), 0, 0, 0, 0, 0, 0, 0)
+#endif
             END_IF
             CALL(evt_sub_random, 700, LW(0))
             ADD(LW(0), 2000)
@@ -557,7 +561,11 @@ EVT_BEGIN(evt_shabon_s)
             END_LOOP
             CALL(evt_eff_delete, STRING("shabon2eff"))
             IF_INT_LESS(LW(4), 40)
+#ifdef VERSION_G8ME01
+                CALL(evt_eff, STRING("_shabon2eff"), STRING("puni_balloon"), 1, LW(3), LW(0), LW(2), FLOAT(0.32910156f), 0, 0, 0, 0, 0, 0, 0)
+#else
                 CALL(evt_eff, STRING("shabon2eff"), STRING("puni_balloon"), 1, LW(3), LW(0), LW(2), FLOAT(0.32910156f), 0, 0, 0, 0, 0, 0, 0)
+#endif
             END_IF
             CALL(evt_sub_random, 950, LW(0))
             ADD(LW(0), 2000)
@@ -585,7 +593,11 @@ EVT_BEGIN(evt_shabon_s)
         END_LOOP
         CALL(evt_eff_delete, STRING("shabon3eff"))
         IF_INT_LESS(LW(4), 40)
+#ifdef VERSION_G8ME01
+            CALL(evt_eff, STRING("_shabon3eff"), STRING("puni_balloon"), 1, LW(3), LW(0), LW(2), FLOAT(0.32910156f), 0, 0, 0, 0, 0, 0, 0)
+#else
             CALL(evt_eff, STRING("shabon3eff"), STRING("puni_balloon"), 1, LW(3), LW(0), LW(2), FLOAT(0.32910156f), 0, 0, 0, 0, 0, 0, 0)
+#endif
         END_IF
         CALL(evt_sub_random, 500, LW(0))
         ADD(LW(0), 2000)

@@ -43,7 +43,12 @@ typedef struct BattleAnnounce {
     s16 x;                           // 0x0
     s16 y;                           // 0x2
     s32 params[4];                   // 0x4
-    char text[0x18FD8 - 0x18C84];    // 0x14
+#ifdef VERSION_G8ME01
+    char text[0x100];                 // 0x14 (US 4 shorter)
+#else
+    char text[0x104];                 // 0x14
+#endif
+    u8 field_118[0x18FD8 - 0x18D88];  // 0x118
     s32 field_368;                   // 0x368
     s32 field_36C;                   // 0x36C
 } BattleAnnounce;
@@ -143,6 +148,9 @@ typedef struct BattleWorkPartyInfo {
     u8 field_4[0x1E];         // 0x4
     u8 field_22[0x24 - 0x22]; // 0x22
     s32 field_24;             // 0x24
+#ifdef VERSION_G8ME01
+    u16 usCommandDisabled[2]; // US only: saved BattleUnit usCommandDisabled
+#endif
 } BattleWorkPartyInfo;
 
 typedef struct BattleWorkTarget {
@@ -234,7 +242,11 @@ struct BattleWork {
     const char* acHelpMsg;              // 0x18FF0
     s32 acHelpDispType;                 // 0x18FF4
     u8 field_18FF8[0x19038 - 0x18FF8];  // 0x18FF8
+#ifdef VERSION_G8ME01
+    s32 commandDisabled[3]; // US
+#else
     s32 commandDisabled[5];             // 0x19038, set to 3 by Bowser's command-blocking attacks
+#endif
     s32 luckEventId;                    // 0x1904C
     u32 reserveItems[4];                // 0x19050
     s32 field_19060;                    // 0x19060
@@ -257,6 +269,15 @@ void BattleSetUnitPtr(BattleWork* wp, s32 index, BattleUnit* unit);
 BattleUnit* BattleGetUnitPtr(BattleWork* wp, s32 index);
 void BattleFree(void* ptr);
 void* BattleAlloc(u32 size);
+
+// BTL_ALLOC/BTL_FREE: US routes these battle-heap sites through BattleAlloc/BattleFree; JP calls the heap directly.
+#ifdef VERSION_G8ME01
+#define BTL_ALLOC(size) BattleAlloc(size)
+#define BTL_FREE(ptr) BattleFree(ptr)
+#else
+#define BTL_ALLOC(size) __memAlloc(HEAP_BATTLE, size)
+#define BTL_FREE(ptr) __memFree(HEAP_BATTLE, ptr)
+#endif
 void BattleIncSeq(BattleWork* wp, BattleSequence seq);
 s32 BattleGetSeq(BattleWork* wp, BattleSequence seq);
 void BattleSetSeq(BattleWork* wp, BattleSequence seq, u32 value);
@@ -270,3 +291,10 @@ struct BattleUnit* BattleChangeParty(BattleWork* wp);
 s32 BattleTransPartyId(BattleUnitType kind);
 
 BOOL battleDisableHResetCheck(void);
+
+#ifdef VERSION_G8ME01
+/* raw BattleWork offsets (JP) -> US; constant-folds */
+#define BWOFF(off) ((off) + ((off) >= 0x1904C ? 0x10 : (off) >= 0x18D88 ? 0x18 : (off) >= 0x163B8 ? 0x1C : 0))
+#else
+#define BWOFF(off) (off)
+#endif

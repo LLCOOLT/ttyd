@@ -63,6 +63,10 @@ USER_FUNC(evt_mario_set_pose);
 USER_FUNC(evt_mario_set_dir);
 USER_FUNC(evt_mario_adjust_dir);
 USER_FUNC(evt_cam_ctrl_onoff);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_sub_get_language);
+extern s32 fall_gameover_es[];
+#endif
 
 static GameOverWork work;
 static GameOverWork* wp = &work;
@@ -99,25 +103,53 @@ EVT_END()
 EVT_BEGIN(fall_gameover)
     SET_VALUE(LW(0), STRING("g"))
     SPAWN_EVENT(_fall_char)
+#ifdef VERSION_G8ME01
+    WAIT_MS(166)
+#else
     WAIT_FRAMES(10)
+#endif
     SET_VALUE(LW(0), STRING("a"))
     SPAWN_EVENT(_fall_char)
+#ifdef VERSION_G8ME01
+    WAIT_MS(333)
+#else
     WAIT_FRAMES(20)
+#endif
     SET_VALUE(LW(0), STRING("m"))
     SPAWN_EVENT(_fall_char)
+#ifdef VERSION_G8ME01
+    WAIT_MS(166)
+#else
     WAIT_FRAMES(10)
+#endif
     SET_VALUE(LW(0), STRING("e"))
     SPAWN_EVENT(_fall_char)
+#ifdef VERSION_G8ME01
+    WAIT_MS(166)
+#else
     WAIT_FRAMES(10)
+#endif
     SET_VALUE(LW(0), STRING("o"))
     SPAWN_EVENT(_fall_char)
+#ifdef VERSION_G8ME01
+    WAIT_MS(166)
+#else
     WAIT_FRAMES(10)
+#endif
     SET_VALUE(LW(0), STRING("v"))
     SPAWN_EVENT(_fall_char)
+#ifdef VERSION_G8ME01
+    WAIT_MS(166)
+#else
     WAIT_FRAMES(10)
+#endif
     SET_VALUE(LW(0), STRING("e2"))
     SPAWN_EVENT(_fall_char)
+#ifdef VERSION_G8ME01
+    WAIT_MS(500)
+#else
     WAIT_FRAMES(30)
+#endif
     SET_VALUE(LW(0), STRING("r"))
     SPAWN_EVENT_GET_ID(PTR(_fall_char_last), LW(10))
     LOOP(0)
@@ -127,9 +159,60 @@ EVT_BEGIN(fall_gameover)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+#ifdef VERSION_G8ME01
+    WAIT_MS(1000)
+#else
     WAIT_FRAMES(60)
+#endif
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01
+EVT_BEGIN(fall_gameover_es)
+    SET_VALUE(LW(0), STRING("f"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_MS(133)
+    SET_VALUE(LW(0), STRING("i"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_MS(233)
+    SET_VALUE(LW(0), STRING("n"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_MS(133)
+    SET_VALUE(LW(0), STRING("d"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_MS(133)
+    SET_VALUE(LW(0), STRING("e3"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_MS(133)
+    SET_VALUE(LW(0), STRING("l"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_MS(233)
+    SET_VALUE(LW(0), STRING("j"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_MS(133)
+    SET_VALUE(LW(0), STRING("u"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_MS(133)
+    SET_VALUE(LW(0), STRING("e4"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_MS(133)
+    SET_VALUE(LW(0), STRING("g1"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_MS(400)
+    SET_VALUE(LW(0), STRING("o289"))
+    SPAWN_EVENT_GET_ID(PTR(_fall_char_last), LW(10))
+    LOOP(0)
+        IS_EVENT_RUNNING(LW(10), LW(11))
+        IF_INT_EQUAL(LW(11), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_MS(1000)
+    RETURN
+    END
+EVT_END()
+#endif
 
 EVT_BEGIN(evt_gameover)
     CALL(evt_mario_key_onoff, 0)
@@ -149,6 +232,30 @@ EVT_BEGIN(evt_gameover)
     CALL(evt_mario_set_pose, STRING("M_D_2"))
     CALL(evt_mario_set_dir, 180, 0, 0)
     CALL(evt_mario_adjust_dir)
+#ifdef VERSION_G8ME01
+    CALL(evt_sub_get_language, LW(0))
+    IF_INT_EQUAL(LW(0), 4)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("g"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("a"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("m"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("e"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("o"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("v"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("e2"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("r"), 1)
+        CALL(evt_mapobj_trans, 1, STRING("f"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("i"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("n"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("d"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("e3"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("l"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("j"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("u"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("e4"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("g1"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("o289"), 0, 200, 0)
+        ELSE
+#endif
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("f"), 1)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("i"), 1)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n"), 1)
@@ -168,11 +275,23 @@ EVT_BEGIN(evt_gameover)
     CALL(evt_mapobj_trans, 1, STRING("v"), 0, 200, 0)
     CALL(evt_mapobj_trans, 1, STRING("e2"), 0, 200, 0)
     CALL(evt_mapobj_trans, 1, STRING("r"), 0, 200, 0)
+#ifdef VERSION_G8ME01
+    END_IF
+#endif
     CALL(evt_cam_ctrl_onoff, 4, 1)
     CALL(evt_cam3d_evt_set, 0, 208, 653, 0, 91, -30, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_map_playanim, STRING("anm_hokori"), 1, 0)
+#ifdef VERSION_G8ME01
+    CALL(evt_sub_get_language, LW(0))
+    IF_INT_EQUAL(LW(0), 4)
+        CALL_CHILD(fall_gameover_es)
+        ELSE
+#endif
     CALL_CHILD(fall_gameover)
+#ifdef VERSION_G8ME01
+    END_IF
+#endif
     RETURN
 EVT_END()
 

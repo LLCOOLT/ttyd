@@ -130,7 +130,11 @@ EVT_BEGIN(hari_trap)
             WAIT_FRAMES(1)
         END_LOOP
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("a_yuka"), 2048)
+#ifdef VERSION_G8ME01
+        WAIT_MS(2000)
+#else
         WAIT_MS(2200)
+#endif
     END_LOOP
     RETURN
 EVT_END()

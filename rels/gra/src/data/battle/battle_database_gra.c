@@ -17,10 +17,10 @@ extern s32 battle_item_twinkling_pansy[];
 extern s32 unit_faker_mario_gra[];
 extern s32 unit_hyper_kuriboo[];
 extern s32 unit_hyper_patakuri[];
-extern s32 unit_hyper_sinemon_11_data_DA78[];
+extern s32 unit_hyper_sinemon[];
 extern s32 unit_hyper_togekuri[];
 extern s32 unit_pansy[];
-extern s32 unit_twinkling_pansy_11_data_F890[];
+extern s32 unit_twinkling_pansy[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_gra_negone_one_374;
@@ -407,7 +407,7 @@ s32 btlparty_gra_gra_03_04_off_2[] = {
     (s32)unit_pansy, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
     0, 0, 0, (s32)battle_item_pansy, (s32)unit_pansy, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_pansy,
-    (s32)unit_twinkling_pansy_11_data_F890, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_twinkling_pansy, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_twinkling_pansy,
 };
 
@@ -444,7 +444,7 @@ s32 btlparty_gra_gra_03_05_off_2[] = {
     (s32)unit_pansy, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
     0, 0, 0, (s32)battle_item_pansy, (s32)unit_pansy, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_pansy,
-    (s32)unit_twinkling_pansy_11_data_F890, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_twinkling_pansy, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_twinkling_pansy,
 };
 
@@ -467,7 +467,7 @@ __declspec(section ".data") s32 btlgrp_gra_gra_03_05_off_3[] = {
 
 s32 btlparty_gra_gra_04_02_off_1[] = {
     (s32)unit_pansy, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_pansy, (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1119092736,
+    0, 0, 0, (s32)battle_item_pansy, (s32)unit_hyper_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_hyper_sinemon,
     (s32)unit_pansy, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_pansy,
@@ -479,7 +479,7 @@ __declspec(section ".data") s32 btlgrp_gra_gra_04_02_off_1[] = {
 
 s32 btlparty_gra_gra_04_02_off_2[] = {
     (s32)unit_pansy, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_pansy, (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1121714176,
+    0, 0, 0, (s32)battle_item_pansy, (s32)unit_hyper_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_hyper_sinemon,
 };
 
@@ -491,7 +491,7 @@ s32 btlparty_gra_gra_04_02_off_3[] = {
     (s32)unit_pansy, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
     0, 0, 0, (s32)battle_item_pansy, (s32)unit_pansy, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_pansy,
-    (s32)unit_twinkling_pansy_11_data_F890, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_twinkling_pansy, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_twinkling_pansy,
 };
 
@@ -500,8 +500,8 @@ __declspec(section ".data") s32 btlgrp_gra_gra_04_02_off_3[] = {
 };
 
 s32 btlparty_gra_gra_05_01_off_1[] = {
-    (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_hyper_sinemon, (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1121714176,
+    (s32)unit_hyper_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_hyper_sinemon, (s32)unit_hyper_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_hyper_sinemon,
 };
 
@@ -510,10 +510,10 @@ __declspec(section ".data") s32 btlgrp_gra_gra_05_01_off_1[] = {
 };
 
 s32 btlparty_gra_gra_05_01_off_2[] = {
-    (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_hyper_sinemon, (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1119092736,
+    (s32)unit_hyper_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_hyper_sinemon, (s32)unit_hyper_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_hyper_sinemon,
-    (s32)unit_twinkling_pansy_11_data_F890, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_twinkling_pansy, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_twinkling_pansy,
 };
 
@@ -522,10 +522,10 @@ __declspec(section ".data") s32 btlgrp_gra_gra_05_01_off_2[] = {
 };
 
 s32 btlparty_gra_gra_05_03_off_1[] = {
-    (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_hyper_sinemon, (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1119092736,
+    (s32)unit_hyper_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_hyper_sinemon, (s32)unit_hyper_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_hyper_sinemon,
-    (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_hyper_sinemon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_hyper_sinemon,
 };
 
@@ -534,10 +534,10 @@ __declspec(section ".data") s32 btlgrp_gra_gra_05_03_off_1[] = {
 };
 
 s32 btlparty_gra_gra_05_03_off_2[] = {
-    (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_hyper_sinemon, (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1119092736,
+    (s32)unit_hyper_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_hyper_sinemon, (s32)unit_hyper_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_hyper_sinemon,
-    (s32)unit_twinkling_pansy_11_data_F890, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_twinkling_pansy, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_twinkling_pansy,
 };
 
@@ -546,11 +546,11 @@ __declspec(section ".data") s32 btlgrp_gra_gra_05_03_off_2[] = {
 };
 
 s32 btlparty_gra_gra_05_03_off_3[] = {
-    (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    (s32)unit_hyper_sinemon, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
     0, 0, 0, (s32)battle_item_hyper_sinemon, (s32)unit_pansy, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_hyper_sinemon,
     (s32)unit_pansy, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_twinkling_pansy, (s32)unit_hyper_sinemon_11_data_DA78, 16777216, 67108868, 1125515264,
+    0, 0, 0, (s32)battle_item_twinkling_pansy, (s32)unit_hyper_sinemon, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_hyper_sinemon,
 };
 

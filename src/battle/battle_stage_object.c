@@ -71,7 +71,7 @@ typedef struct BattleStageObjectWork {
 
 #define STAGE_WORK(wp) ((BattleStageObjectWork*)(wp)->field_180C0)
 #define EVT_UW(evt, n) (((s32*)(evt)->userdata)[n])
-#define UNIT_FIELD(unit, type, off) (*(type*)((u8*)(unit) + (off)))
+#define UNIT_FIELD(unit, type, off) (*(type*)((u8*)(unit) + BUOFF(off)))
 
 extern BattleWork* _battleWorkPointer;
 extern s32 weaponGetPowerDefault[];
@@ -126,7 +126,11 @@ USER_FUNC(_fall_frame_delete);
 USER_FUNC(_fall_frame);
 USER_FUNC(_fall_frame_wait_unit_ready);
 USER_FUNC(_fall_frame_wait);
+#ifdef VERSION_G8ME01
+USER_FUNC(btlevtcmd_AnnounceMessage);
+#else
 USER_FUNC(_announce_wall_message);
+#endif
 USER_FUNC(_nozzle_turn);
 USER_FUNC(_set_mobj_shake);
 USER_FUNC(_bgset_audience_bgset_access);
@@ -619,7 +623,11 @@ BattleWeaponData _nozzle_at_base_monster = {{
 
 BattleStageNozzleData battle_stage_nozzle_data[] = {
 	{
+#ifdef VERSION_G8ME01
+		{{0, 0, 40, 60}, {0, 30, 0, 70}, {0, 40, 60, 0}}, {100, 0, 0, 0},
+#else
 		{{0, 0, 50, 50}, {0, 50, 0, 50}, {0, 50, 50, 0}}, {100, 0, 0, 0},
+#endif
 		{
 			{{
 				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
@@ -656,7 +664,11 @@ BattleStageNozzleData battle_stage_nozzle_data[] = {
 		},
 	},
 	{
+#ifdef VERSION_G8ME01
+		{{0, 0, 30, 70}, {0, 30, 0, 70}, {0, 40, 60, 0}}, {65, 35, 0, 0},
+#else
 		{{0, 0, 50, 50}, {0, 50, 0, 50}, {0, 50, 50, 0}}, {60, 40, 0, 0},
+#endif
 		{
 			{{
 				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
@@ -693,7 +705,11 @@ BattleStageNozzleData battle_stage_nozzle_data[] = {
 		},
 	},
 	{
+#ifdef VERSION_G8ME01
+		{{0, 0, 40, 60}, {0, 30, 0, 70}, {0, 40, 60, 0}}, {35, 25, 40, 0},
+#else
 		{{0, 0, 50, 50}, {0, 50, 0, 50}, {0, 50, 50, 0}}, {40, 30, 30, 0},
+#endif
 		{
 			{{
 				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
@@ -730,7 +746,11 @@ BattleStageNozzleData battle_stage_nozzle_data[] = {
 		},
 	},
 	{
+#ifdef VERSION_G8ME01
+		{{0, 0, 40, 60}, {0, 30, 0, 70}, {0, 40, 60, 0}}, {20, 20, 25, 35},
+#else
 		{{0, 0, 50, 50}, {0, 50, 0, 50}, {0, 50, 50, 0}}, {20, 30, 30, 20},
+#endif
 		{
 			{{
 				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
@@ -1331,12 +1351,15 @@ EVT_BEGIN(_nozzle_turn_event)
     RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01
 EVT_BEGIN(_close_wall_event)
     CALL(btlevtcmd_WaitAttackEnd)
     CALL(_announce_wall_message)
     RETURN
 EVT_END()
+#endif
 
+#ifndef VERSION_G8ME01
 EVT_BEGIN(_nozzle_work_event_0)
     SET_VALUE(LW(10), 0)
     CALL_CHILD(PTR(_nozzle_work_event_core))
@@ -1348,6 +1371,7 @@ EVT_BEGIN(_nozzle_work_event_1)
     CALL_CHILD(PTR(_nozzle_work_event_core))
     RETURN
 EVT_END()
+#endif
 USER_FUNC(_set_mobj_rotate_x) {
 	const char* fall1;
 	const char* fall3;
@@ -1434,6 +1458,26 @@ USER_FUNC(_set_mobj_rotate_x) {
 	}
 	return busy ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
+/* US: these three scripts sit after _set_mobj_rotate_x so the message string pools after its Vec literal */
+#ifdef VERSION_G8ME01
+EVT_BEGIN(_close_wall_event)
+    CALL(btlevtcmd_WaitAttackEnd)
+    CALL(btlevtcmd_AnnounceMessage, 2, 0, -225, STRING("btl_msg_escape_wall_close2"), 180)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_nozzle_work_event_0)
+    SET_VALUE(LW(10), 0)
+    CALL_CHILD(PTR(_nozzle_work_event_core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_nozzle_work_event_1)
+    SET_VALUE(LW(10), 1)
+    CALL_CHILD(PTR(_nozzle_work_event_core))
+    RETURN
+EVT_END()
+#endif
 
 USER_FUNC(_mobj_set_alpha) {
 	s32* args = event->args;
@@ -1786,6 +1830,7 @@ void BattleStage_WallCloseCheck(void) {
 	}
 }
 
+#ifndef VERSION_G8ME01
 USER_FUNC(_announce_wall_message) {
 	if (isFirstCall) {
 		event->userdata[0] = 60;
@@ -1809,6 +1854,8 @@ void _disp_escape_wall_message(CameraId camera, void* param) {
 	FontDrawStart();
 	FontDrawString(zero - (width / 2), -120.0f, msg);
 }
+
+#endif
 
 void BattleStage_IronFrameFallCheck(void) {
 	BattleWork* wp = _battleWorkPointer;
@@ -2407,7 +2454,11 @@ USER_FUNC(_fall_frame_delete);
 USER_FUNC(_fall_frame);
 USER_FUNC(_fall_frame_wait_unit_ready);
 USER_FUNC(_fall_frame_wait);
+#ifdef VERSION_G8ME01
+USER_FUNC(btlevtcmd_AnnounceMessage);
+#else
 USER_FUNC(_announce_wall_message);
+#endif
 USER_FUNC(_nozzle_turn);
 USER_FUNC(_set_mobj_shake);
 USER_FUNC(_set_mobj_shake_init);

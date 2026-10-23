@@ -24,6 +24,7 @@
 #include <dolphin/mtx.h>
 #include <stdio.h>
 #include <string.h>
+#include "icon_ids.h"
 
 extern ItemData itemDataTable[];
 extern GlobalWork* gp;
@@ -101,9 +102,9 @@ WinMgrDesc unitwin_desc[3] = {
 };
 
 static s32 party_id_table[8] = {1, 2, 5, 4, 6, 3, 7, 0};
-static s32 party_icon_table[7] = {0x155, 0x156, 0x15F, 0x158, 0x160, 0x157, 0x161};
+static s32 party_icon_table[7] = {ICON_155, ICON_156, ICON_15F, ICON_158, ICON_160, ICON_157, ICON_161};
 static const char* party_labelname_table[7] = {("_kur"), ("_nok"), ("_win"), ("_yos"), ("_viv"), ("_bom"), ("_chu")};
-static s32 mario_status_icon_table[3] = {0x19F, 0x1A0, 0x1A1};
+static s32 mario_status_icon_table[3] = {ICON_19F, ICON_1A0, ICON_1A1};
 static const char* mario_status_labelname_table[3] = {("_hp"), ("_fp"), ("_bp")};
 static const char* mario_status_name_table[3] = {("\202g\202o"), ("\202e\202o"), ("\202a\202o")};
 static s32 mario_status_henka_table[3] = {5, 5, 3};
@@ -176,11 +177,11 @@ void unitwin_point_disp(WinMgrEntry* entry) {
 		if ((u32)gp->language == 0) {
 			PSMTXScale(scale, 1.1f, 1.1f, 1.1f);
 			PSMTXConcat(trans, scale, trans);
-			iconDispGx2(trans, 0x10, 0x1F1);
+			iconDispGx2(trans, 0x10, VERSION_PICK(0x1F1, 0x226));
 		} else {
 			PSMTXScale(scale, 0.8f, 1.1f, 1.1f);
 			PSMTXConcat(trans, scale, trans);
-			iconDispGx2(trans, 0x10, 0x20A);
+			iconDispGx2(trans, 0x10, VERSION_PICK(0x20A, 0x227));
 		}
 		PSMTXTrans(trans, 124.0f + entry->x, entry->y - 38.0f, 0.0f);
 		{
@@ -209,7 +210,7 @@ USER_FUNC(evt_unitwin_alloc) {
 	} else {
 		wp->flags &= ~0x80;
 	}
-	iconEntry2D("yubicursor_2", 0x1F0);
+	iconEntry2D("yubicursor_2", ICON_1F0);
 	iconFlagOn("yubicursor_2", 2);
 	iconFlagOn("yubicursor_2", 4);
 	if (!(wp->flags & 0x80)) {
@@ -436,29 +437,29 @@ USER_FUNC(evt_unitwin_main_func) {
 }
 
 static inline s32 unitwin_party_icon(s32 icon) {
-	if (icon == 0x158) {
+	if (icon == ICON_158) {
 		switch (pouchGetPartyColor(4)) {
 			case 0:
-				icon = 0x158;
+				icon = ICON_158;
 				break;
 			case 1:
-				icon = 0x159;
+				icon = ICON_159;
 				break;
 			case 2:
-				icon = 0x15A;
+				icon = ICON_15A;
 				break;
 			case 3:
-				icon = 0x15B;
+				icon = ICON_15B;
 				break;
 			case 4:
-				icon = 0x15C;
+				icon = ICON_15C;
 				break;
 			case 5:
-				icon = 0x15D;
+				icon = ICON_15D;
 				break;
 			case 6:
 			default:
-				icon = 0x15E;
+				icon = ICON_15E;
 				break;
 		}
 	}
@@ -562,17 +563,17 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		PSMTXScale(scale, 0.7f, 0.7f, 0.7f);
 		PSMTXConcat(mtx, scale, mtx);
 		if (wp->flags & 0x1000) {
-			iconDispGx2(mtx, 0x10, 0x18B);
+			iconDispGx2(mtx, 0x10, ICON_18B);
 			coin = pouchGetCoin();
 		} else if (wp->flags & 0x4000) {
-			iconDispGx2(mtx, 0x10, 0x102);
+			iconDispGx2(mtx, 0x10, ICON_102);
 			coin = ((s32 (*)(void))pouchGetSuperCoin)();
 		} else {
-			iconDispGx2(mtx, 0x10, 0x18D);
+			iconDispGx2(mtx, 0x10, ICON_18D);
 			coin = ((s32 (*)(void))pouchGetStarPiece)();
 		}
 		PSMTXTrans(mtx, -192.0f, -113.0f, 0.0f);
-		iconDispGx2(mtx, 0x10, 0x1D6);
+		iconDispGx2(mtx, 0x10, ICON_1D6);
 		PSMTXTrans(mtx, -126.0f, -113.0f, 0.0f);
 		iconNumberDispGx(mtx, wp->coin, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 		if ((delta = coin - wp->coin)) {
@@ -605,7 +606,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		PSMTXTrans(mtx, -210.0f, -166.0f, 0.0f);
 		PSMTXScale(scale, 1.1f, 1.1f, 1.1f);
 		PSMTXConcat(mtx, scale, mtx);
-		iconDispGx2(mtx, 0x10, 0x1F1);
+		iconDispGx2(mtx, 0x10, VERSION_PICK(0x1F1, 0x226));
 		PSMTXTrans(mtx, -126.0f, -168.0f, 0.0f);
 		iconNumberDispGx(mtx, wp->coinDisp, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 		if (!(gp->retraceCount & 3)) {
@@ -625,7 +626,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 
 		windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -250.0f, -130.0f, 150.0f, 45.0f, 20.0f);
 		PSMTXTrans(mtx, -220.0f, -172.0f, 0.0f);
-		iconDispGx2(mtx, 0x10, 0x140);
+		iconDispGx2(mtx, 0x10, ICON_140);
 		sprintf(buf, "%04d", *(s16*)((u8*)lotteryGetPtr() + 0x20));
 		for (i = 0; i < 4; i++) {
 			PSMTXTrans(mtx, 20.0f * i + -126.0f - 60.0f, -168.0f, 0.0f);
@@ -743,13 +744,13 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 				PSMTXTrans(mtx, 244.0f, 82.0f, 0.0f);
 				PSMTXScale(scale, 0.6f, 0.6f, 0.6f);
 				PSMTXConcat(mtx, scale, mtx);
-				iconDispGxCol(mtx, 0x10, 0x211, (GXColor){0xF0, 0xF0, 0xF0, 0xFF});
+				iconDispGxCol(mtx, 0x10, ICON_211, (GXColor){0xF0, 0xF0, 0xF0, 0xFF});
 				if (wp->field_0x50 == 13) {
-					icon = 0x18D;
+					icon = ICON_18D;
 				} else if (wp->field_0x50 == 16) {
-					icon = 0x13F;
+					icon = ICON_13F;
 				} else {
-					icon = 0x18B;
+					icon = ICON_18B;
 				}
 				{
 					iconDispGx(&(Vec){244.0f, 86.0f, 0.0f}, 0x10, icon, 0.6f);
@@ -906,9 +907,9 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 				PSMTXTrans(mtx, 244.0f, 82.0f, 0.0f);
 				PSMTXScale(scale, 0.6f, 0.6f, 0.6f);
 				PSMTXConcat(mtx, scale, mtx);
-				iconDispGxCol(mtx, 0x10, 0x211, (GXColor){0xF0, 0xF0, 0xF0, 0xFF});
+				iconDispGxCol(mtx, 0x10, ICON_211, (GXColor){0xF0, 0xF0, 0xF0, 0xFF});
 				{
-					iconDispGx(&(Vec){244.0f, 86.0f, 0.0f}, 0x10, 0x18B, 0.6f);
+					iconDispGx(&(Vec){244.0f, 86.0f, 0.0f}, 0x10, ICON_18B, 0.6f);
 				}
 			}
 			GXGetScissor(&sl, &st, &sw, &sh);
@@ -1117,9 +1118,9 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 					sprintf(msgName, "%s_levelup%s", help, mario_status_labelname_table[i]);
 					v = *mario_status_point_table[i] + mario_status_henka_table[i] * 2;
 					if (v > 0) {
-						icon = 0x1B5;
+						icon = ICON_1B5;
 					} else {
-						icon = 0x162;
+						icon = ICON_162;
 						bob = 0;
 					}
 					{
@@ -1131,9 +1132,9 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 				} else {
 					v = *mario_status_point_table[i] - mario_status_henka_table[i];
 					if (v > 0) {
-						icon = 0x1B6;
+						icon = ICON_1B6;
 					} else {
-						icon = 0x162;
+						icon = ICON_162;
 						bob = 0;
 					}
 					{

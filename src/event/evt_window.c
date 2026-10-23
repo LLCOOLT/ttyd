@@ -37,6 +37,11 @@ typedef struct OneMsgWin {
 	s32 id;    // 0x8
 } OneMsgWin;
 
+#ifdef VERSION_G8ME01
+#define EW_ICON_OFS 8
+#else
+#define EW_ICON_OFS 0
+#endif
 s32 coinwin_se_wait;
 s32 unk_80418b3c;
 static void coin_disp(WinMgrEntry* entry);
@@ -145,7 +150,12 @@ USER_FUNC(evt_win_item_maketable) {
 
 USER_FUNC(evt_win_item_desttable) {
 	s32* args = event->args;
+#ifdef VERSION_G8ME01
+	void* p = (void*)evtGetValue(event, args[0]);
+	_mapFree(p);
+#else
 	_mapFree((void*)evtGetValue(event, args[0]));
+#endif
 	return EVT_RETURN_DONE;
 }
 
@@ -256,15 +266,15 @@ static void coin_disp(WinMgrEntry* entry) {
 	switch (w->type) {
 	case 0:
 		target = pouchGetCoin();
-		icon = 0x18B;
+		icon = 0x18B + EW_ICON_OFS;
 		break;
 	case 1:
 		target = RAW_GET(pouchGetSuperCoin)();
-		icon = 0x102;
+		icon = 0x102 + EW_ICON_OFS;
 		break;
 	case 2:
 		target = RAW_GET(pouchGetStarPiece)();
-		icon = 0x18D;
+		icon = 0x18D + EW_ICON_OFS;
 		break;
 	}
 	PSMTXTrans(pos, -220.f, -113.f, 0.f);
@@ -272,7 +282,7 @@ static void coin_disp(WinMgrEntry* entry) {
 	PSMTXConcat(pos, scale, pos);
 	iconDispGx2(pos, 0x10, icon);
 	PSMTXTrans(pos, -192.f, -113.f, 0.f);
-	iconDispGx2(pos, 0x10, 0x1D6);
+	iconDispGx2(pos, 0x10, 0x1D6 + EW_ICON_OFS);
 	PSMTXTrans(pos, -126.f, -113.f, 0.f);
 	{
 		GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};

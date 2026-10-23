@@ -9,12 +9,13 @@
 #include <dolphin/types.h>
 #include <string.h>
 #include <dolphin/mtx.h>
+#include "version.h"
 
 extern MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
 extern double sin(double);
 extern double cos(double);
 
-#define MF(w, off, T) (*(T*)((u8*)(w) + (off)))
+#define MF(w, off, T) (*(T*)((u8*)(w) + MWOFF(off)))
 
 static const Vec zv0 = {0.0f, 0.0f, 0.0f};
 static const Vec zv1 = {0.0f, 0.0f, 0.0f};
@@ -34,6 +35,9 @@ extern void kpaCamFollow(void);
 extern BOOL jabaraNoHitChk(void);
 extern HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, HitEntry** out, f32 d);
 extern HitEntry* marioSearchHead(Vec* pos, f32* h, f32 d);
+#ifdef VERSION_G8ME01
+extern s32 kpaGetLevel(void);
+#endif
 extern HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w);
 extern void marioSearchFrontWall_staying(f32 dz);
 extern HitEntry* dou10_yoko_yari(f32* p);
@@ -555,7 +559,7 @@ void marioChkGnd(void) {
         if (!(w->flags & 0x1000000)) {
             hit = marioChkFrontStep(&sy, &sb, &sc);
             d = sy - w->position.y;
-            if (hit && d <= 11.0f && d >= 5.0f && *(f32*)((u8*)w + 0x214) <= 30.0f) {
+            if (hit && d <= 11.0f && d >= 5.0f && *(f32*)((u8*)w + MWOFF(0x214)) <= 30.0f) {
                 MF(w, 0x1c4, f32) = sy;
                 if (w->baseSpeed) {
                     if (!(MF(w, 0x4, u32) & 0x1000000)) {
@@ -694,11 +698,23 @@ HitEntry* marioSearchGround(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     spd += 0.01f;
     yl = 5.0f + __fabsf(h);
     *b = -1.0f;
+#ifdef VERSION_G8ME01
+    if (w->currMotionId != 0x13) {
+        if (w->baseSpeed) {
+            a = revise360(w->directionView - w->targetYaw);
+        } else {
+            a = toMovedir(w->displayDirection);
+        }
+    } else {
+        a = toMovedir(MF(w, 0x1b0, f32));
+    }
+#else
     if (w->baseSpeed) {
         a = revise360(w->directionView - w->targetYaw);
     } else {
         a = toMovedir(w->displayDirection);
     }
+#endif
     if (w->flags & 0x100000) {
         a = (3.1415927f * a) / 180.0f;
         sn = (f32)sin(a);
@@ -1335,7 +1351,17 @@ f32 marioChkOverhead(void) {
                         marioChgStayMotion();
                     }
                 } else {
+#ifdef VERSION_G8ME01
+                    {
+                        /* FAKE: redundant second test reproduces the target's double beq */
+                        s32 m = w->baseSpeed > w->mBaseWalkSpeed ? 2 : 1;
+                        if (m != w->prevMotionId && m != w->prevMotionId) {
+                            marioChgMot(w->baseSpeed > w->mBaseWalkSpeed ? 2 : 1);
+                        }
+                    }
+#else
                     marioChgMot(w->baseSpeed > w->mBaseWalkSpeed ? 2 : 1);
+#endif
                 }
             }
         }
@@ -1492,6 +1518,12 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
         } else {
             if (hit) {
                 outPos.y = (s32)(100.0f * outPos.y + hh) / 100.0f;
+#ifdef VERSION_G8ME01
+                if (w->jumpVelocityY < -10.0f) {
+                    *((f32*)vp) = outPos.y - pos->y - a;
+                    return NULL;
+                }
+#endif
                 if (pos->y + a >= outPos.y) {
                     pos->y = outPos.y;
                     *((f32*)vp) = 0.0f;
@@ -1651,7 +1683,7 @@ void marioCheckWall(f32 dx, f32 dz) {
     }
     if (!dx) {
         marioSearchFrontWall_staying(dz);
-        dou10_yoko_yari((f32*)((u32)w + 0x210));
+        dou10_yoko_yari((f32*)((u32)w + MWOFF(0x210)));
         return;
     }
     pos = w->position;
@@ -1672,19 +1704,31 @@ void marioCheckWall(f32 dx, f32 dz) {
         } else {
             MF(w, 0x210, f32) = h;
             w->hitobjWall = hit;
+#ifdef VERSION_G8ME01
+            {
+                s32 lim = strncmp(hitGetName(hit), "dokan", 5) != 0 ? 20 : 10;
+                if (++MF(w, 0x3f, s8) >= lim) {
+                    MF(w, 0x3f, s8) = lim;
+                    if (!(hitGetAttr(hit) & 0x80) ? TRUE : marioGetPtr()->currMotionId == 0x19) {
+                        w->hitobjPush = hit;
+                    }
+                }
+            }
+#else
             if (++MF(w, 0x3f, s8) >= 20) {
                 MF(w, 0x3f, s8) = 20;
                 if (!(hitGetAttr(hit) & 0x80) ? TRUE : marioGetPtr()->currMotionId == 0x19) {
                     w->hitobjPush = hit;
                 }
             }
+#endif
             w->position = pos;
         }
     } else {
         w->position = pos;
     }
     marioChkWallAround(&w->position, NULL, dx, dz, w->wPlayerCollisionBox.z, w->wPlayerCollisionBox.y);
-    dou10_yoko_yari((f32*)((u32)w + 0x210));
+    dou10_yoko_yari((f32*)((u32)w + MWOFF(0x210)));
 }
 
 void marioSearchFrontWall_staying(f32 dz) {
@@ -1952,6 +1996,12 @@ HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w) {
             heights[0] = 0.75f * mp->wPlayerCollisionBox.y;
             heights[1] = 0.5f * mp->wPlayerCollisionBox.y;
             heights[2] = 11.0f;
+#ifdef VERSION_G8ME01
+            if (kpaGetLevel() == 2) {
+                count = 4;
+                heights[3] = 30.0f;
+            }
+#endif
         } else {
             heights[0] = 0.75f * mp->wPlayerCollisionBox.y;
             heights[1] = 11.0f;
@@ -1960,7 +2010,7 @@ HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w) {
         heights[0] = 0.75f * marioGetHeightInl();
         heights[1] = 11.0f;
     } else if (!(mp->flags & 0x1000000)) {
-        heights[0] = 27.75f;
+        heights[0] = VERSION_PICK(27.75f, 26.640001f);
         heights[1] = 11.0f;
         if (mp->airTimer) {
             count = 3;

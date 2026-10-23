@@ -18,9 +18,28 @@ typedef struct EffBreakWork {
     f32 scale;     // 0x20
 } EffBreakWork;
 
+#ifdef VERSION_G8ME01
+static s16 tex_jp[] = { 145, 146, 147, 148, 149, 150 };
+static s16 tex_us[] = { 155, 156, 157, 158, 159, 160 };
+static s16 tex_lang3[] = { 151, 152, 153, 154, 155, 156 };
+static s16 tex_lang4[] = { 157, 158, 159, 160, 161, 162 };
+static s16 tex_lang5[] = { 159, 160, 161, 162, 163, 164, 165 };
+static s16 tex_lang6[] = { 145, 146, 147, 148, 149, 150 };
+typedef struct TexIdEntry {
+    s16* ids;
+    s32 count;
+} TexIdEntry;
+static TexIdEntry texid_tbl[] = {
+    { tex_jp, 6 }, { tex_us, 6 }, { tex_lang3, 6 }, { tex_lang4, 6 }, { tex_lang5, 7 }, { tex_lang6, 6 },
+};
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_8041BE74_sdata[3] = {0, 0, 0};
+#pragma force_active reset
+#else
 static s32 tex_jp[] = { 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2 };
 static s32 tex_us[] = { 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6 };
 static s32* texid_tbl[] = { tex_jp, tex_us };
+#endif
 
 static f32 ty_data[] = { 3.0f, 3.0f, 2.7857144f, 2.5714285f, 2.357143f, 2.142857f, 1.9285715f, 1.7142857f, 1.5f, 1.2857143f, 1.0714285f, 0.85714287f, 0.64285713f, 0.42857143f, 0.21428572f, 0.0f, 0.083333336f, 0.16666667f, 0.25f, 0.125f, 0.0f };
 static f32 ty_data2[] = { 0.0f, 0.15f, 0.3f, 0.45f, 0.6f, 0.75f, 0.9f, 1.05f, 1.2f, 1.35f, 1.5f, 1.65f, 1.8f, 1.95f, 2.1f, 2.25f, 2.4f, 2.55f, 2.7f, 2.85f, 3.0f };
@@ -32,12 +51,23 @@ EffectEntry* effBreakEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     s32 count;
     s32 i;
 
+#ifdef VERSION_G8ME01
+    GXTexObj texObj;
+    f32 a;
+    f32 b;
+    s32 j;
+
+    effect = effEntry();
+    count = texid_tbl[gp->language].count + 1;
+    effect->type = "Break";
+#else
     effect = effEntry();
     count = 7;
     if ((u32)gp->language != 0) {
         count = 7;
     }
     effect->type = "Break";
+#endif
     effect->count = count;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffBreakWork) * count);
     effect->userdata = work;
@@ -50,7 +80,23 @@ EffectEntry* effBreakEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     work->scale = 2.0f;
     w = work + 1;
     for (i = 1; i < effect->count; i++, w++) {
+#ifdef VERSION_G8ME01
+        a = 0.0f;
+        b = a;
+        for (j = 0; j < i - 1; j++) {
+            effGetTexObj(texid_tbl[gp->language].ids[j], &texObj);
+            a += 72.0f;
+        }
+        effGetTexObj(texid_tbl[gp->language].ids[j], &texObj);
+        a += 36.0f;
+        for (j = 0; j < effect->count - 1; j++) {
+            effGetTexObj(texid_tbl[gp->language].ids[j], &texObj);
+            b += 36.0f;
+        }
+        w->position.x = a - b;
+#else
         w->position.x = 2.0f * (s32)((i - 1) * 36 + 18 - (((effect->count - 2) * 36 + 24) / 2));
+#endif
         w->position.y = 0.0f;
         w->position.z = 0.0f;
         w->offsetY = 10.0f;
@@ -173,7 +219,11 @@ void effBreakDisp(CameraId cameraId, EffectEntry* effect) {
     width = 48.0f;
     work++;
     for (i = 1; i < effect->count; i++, work++) {
+#ifdef VERSION_G8ME01
+        effGetTexObj(texid_tbl[gp->language].ids[i - 1], &texObj);
+#else
         effGetTexObj(texid_tbl[gp->language != 0][i - 1], &texObj);
+#endif
         GXLoadTexObj(&texObj, GX_TEXMAP0);
         PSMTXTrans(mtx, 0.0f, work->offsetY, 0.0f);
         GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);

@@ -22,10 +22,10 @@ extern s32 battle_item_poison_pakkun[];
 extern s32 unit_boss_cortez[];
 extern s32 unit_boss_gundan_zako_group1[];
 extern s32 unit_boss_kanbu3[];
-extern s32 unit_flower_chorobon_20_data_347E8[];
-extern s32 unit_green_chorobon_20_data_36508[];
-extern s32 unit_hermos_20_data_39998[];
-extern s32 unit_kuriboo_20_data_2C5C8[];
+extern s32 unit_flower_chorobon[];
+extern s32 unit_green_chorobon[];
+extern s32 unit_hermos[];
+extern s32 unit_kuriboo[];
 extern s32 unit_poison_pakkun[];
 extern s32 weaponGetPowerDefault[];
 
@@ -268,10 +268,10 @@ __declspec(section ".data") s32 btlgrp_muj_muj_kanbu[] = {
 };
 
 s32 btlparty_muj_muj_01_01[] = {
-    (s32)unit_hermos_20_data_39998, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, 0, (s32)unit_hermos_20_data_39998, 16777216, 67108868, 1119092736,
+    (s32)unit_hermos, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, 0, (s32)unit_hermos, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, 0,
-    (s32)unit_hermos_20_data_39998, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_hermos, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, 0,
 };
 
@@ -280,10 +280,10 @@ __declspec(section ".data") s32 btlgrp_muj_muj_01_01[] = {
 };
 
 s32 btlparty_muj_muj_05_01[] = {
-    (s32)unit_hermos_20_data_39998, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, 0, (s32)unit_hermos_20_data_39998, 16777216, 67108868, 1119092736,
+    (s32)unit_hermos, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, 0, (s32)unit_hermos, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, 0,
-    (s32)unit_hermos_20_data_39998, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_hermos, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, 0,
 };
 
@@ -292,10 +292,10 @@ __declspec(section ".data") s32 btlgrp_muj_muj_05_01[] = {
 };
 
 s32 btlparty_muj_muj_05_02[] = {
-    (s32)unit_hermos_20_data_39998, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, 0, (s32)unit_hermos_20_data_39998, 16777216, 67108868, 1119092736,
+    (s32)unit_hermos, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, 0, (s32)unit_hermos, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, 0,
-    (s32)unit_hermos_20_data_39998, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
+    (s32)unit_hermos, 16777216, 67108868, 1124204544, 1109393408, 1092616192, 0, 0,
     0, 0, 0, 0,
 };
 
@@ -304,10 +304,10 @@ __declspec(section ".data") s32 btlgrp_muj_muj_05_02[] = {
 };
 
 s32 btlparty_muj_muj_00_01[] = {
-    (s32)unit_kuriboo_20_data_2C5C8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, 0, (s32)unit_kuriboo_20_data_2C5C8, 16777216, 67108868, 1119092736,
+    (s32)unit_kuriboo, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, 0, (s32)unit_kuriboo, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)unit_kuriboo_20_data_2C5C8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_kuriboo, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, 0,
 };
 
@@ -316,7 +316,7 @@ __declspec(section ".data") s32 btlgrp_muj_muj_00_01[] = {
 };
 
 __declspec(section ".data") s32 btlparty_muj_muj_02_01_off_01[] = {
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_green_chorobon,
 };
 
@@ -325,8 +325,8 @@ __declspec(section ".data") s32 btlgrp_muj_muj_02_01_off_01[] = {
 };
 
 s32 btlparty_muj_muj_02_01_off_02[] = {
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1121714176,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_green_chorobon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_green_chorobon,
 };
 
@@ -335,10 +335,10 @@ __declspec(section ".data") s32 btlgrp_muj_muj_02_01_off_02[] = {
 };
 
 s32 btlparty_muj_muj_02_01_off_03[] = {
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1119092736,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_green_chorobon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_green_chorobon,
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_green_chorobon,
 };
 
@@ -347,11 +347,11 @@ __declspec(section ".data") s32 btlgrp_muj_muj_02_01_off_03[] = {
 };
 
 s32 btlparty_muj_muj_02_01_off_04[] = {
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1116471296,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_green_chorobon, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_green_chorobon,
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1125515264,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_green_chorobon, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_green_chorobon,
 };
 
@@ -360,7 +360,7 @@ __declspec(section ".data") s32 btlgrp_muj_muj_02_01_off_04[] = {
 };
 
 __declspec(section ".data") s32 btlparty_muj_muj_02_04_off_01[] = {
-    (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_flower_chorobon, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_flower_chorobon,
 };
 
@@ -369,8 +369,8 @@ __declspec(section ".data") s32 btlgrp_muj_muj_02_04_off_01[] = {
 };
 
 s32 btlparty_muj_muj_02_04_off_02[] = {
-    (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_flower_chorobon, (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1121714176,
+    (s32)unit_flower_chorobon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_flower_chorobon, (s32)unit_flower_chorobon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_flower_chorobon,
 };
 
@@ -379,10 +379,10 @@ __declspec(section ".data") s32 btlgrp_muj_muj_02_04_off_02[] = {
 };
 
 s32 btlparty_muj_muj_02_04_off_03[] = {
-    (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_flower_chorobon, (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1119092736,
+    (s32)unit_flower_chorobon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_flower_chorobon, (s32)unit_flower_chorobon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_flower_chorobon,
-    (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_flower_chorobon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_flower_chorobon,
 };
 
@@ -391,8 +391,8 @@ __declspec(section ".data") s32 btlgrp_muj_muj_02_04_off_03[] = {
 };
 
 s32 btlparty_muj_muj_02_07_off_01[] = {
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1121714176,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_flower_chorobon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_flower_chorobon,
 };
 
@@ -401,10 +401,10 @@ __declspec(section ".data") s32 btlgrp_muj_muj_02_07_off_01[] = {
 };
 
 s32 btlparty_muj_muj_02_07_off_02[] = {
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1119092736,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_flower_chorobon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_flower_chorobon,
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_green_chorobon,
 };
 
@@ -413,11 +413,11 @@ __declspec(section ".data") s32 btlgrp_muj_muj_02_07_off_02[] = {
 };
 
 s32 btlparty_muj_muj_02_07_off_03[] = {
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1116471296,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_flower_chorobon, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_flower_chorobon,
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1125515264,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_green_chorobon, (s32)unit_flower_chorobon, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_flower_chorobon,
 };
 
@@ -439,7 +439,7 @@ s32 btlparty_muj_muj_03_01_off_02[] = {
     (s32)unit_poison_pakkun, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
     0, 0, 0, (s32)battle_item_poison_pakkun, (s32)unit_poison_pakkun, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_poison_pakkun,
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_green_chorobon,
 };
 
@@ -473,7 +473,7 @@ s32 btlparty_muj_muj_03_02_off_02[] = {
     (s32)unit_poison_pakkun, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
     0, 0, 0, (s32)battle_item_poison_pakkun, (s32)unit_poison_pakkun, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_poison_pakkun,
-    (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_flower_chorobon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_flower_chorobon,
 };
 
@@ -494,7 +494,7 @@ __declspec(section ".data") s32 btlgrp_muj_muj_03_02_off_03[] = {
 };
 
 s32 btlparty_muj_muj_03_04_off_01[] = {
-    (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    (s32)unit_flower_chorobon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_flower_chorobon, (s32)unit_poison_pakkun, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_poison_pakkun,
 };
@@ -504,10 +504,10 @@ __declspec(section ".data") s32 btlgrp_muj_muj_03_04_off_01[] = {
 };
 
 s32 btlparty_muj_muj_03_04_off_02[] = {
-    (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    (s32)unit_flower_chorobon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
     0, 0, 0, (s32)battle_item_flower_chorobon, (s32)unit_poison_pakkun, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_poison_pakkun,
-    (s32)unit_green_chorobon_20_data_36508, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_green_chorobon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_green_chorobon,
 };
 
@@ -516,10 +516,10 @@ __declspec(section ".data") s32 btlgrp_muj_muj_03_04_off_02[] = {
 };
 
 s32 btlparty_muj_muj_03_04_off_03[] = {
-    (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    (s32)unit_flower_chorobon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
     0, 0, 0, (s32)battle_item_flower_chorobon, (s32)unit_poison_pakkun, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_poison_pakkun,
-    (s32)unit_flower_chorobon_20_data_347E8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_flower_chorobon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_flower_chorobon,
 };
 

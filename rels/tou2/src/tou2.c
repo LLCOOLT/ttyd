@@ -22,6 +22,8 @@
 #include "memory.h"
 #include "string.h"
 #include "stdio.h"
+#include "icon_ids.h"
+#include "mario/mariost.h"
 
 #pragma force_active on
 
@@ -334,12 +336,12 @@ static void rankingControll(void);
 static void insert(s32* arr, s32 n, s32 from, s32 to);
 static void rankingExit(void);
 static void rankingInit(void);
-USER_FUNC(tou_champion_belt_onoff_28_text_29DC) {
+USER_FUNC(tou_champion_belt_onoff) {
     champion_belt_onoff = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(tou_champion_belt_28_text_2A10) {
+USER_FUNC(tou_champion_belt) {
     NpcEntry* npc;
     EffectEntry* eff;
     AnimationPose* pose;
@@ -449,20 +451,40 @@ static void disp_proc(CameraId cameraId, void* param) {
     Mtx scale;
     Mtx mtx;
     char entry[0x100];
+#ifdef VERSION_G8ME01
+    const char* title;
+    const char* name;
+    f32 nameW;
+#endif
 
     fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
     winW = 250.0f;
     left = -winW / 2.0f;
     windowDispGX_System(0, 0xFF, left - 30.0f, 165.0f, 310.0f, 330.0f);
+#ifdef VERSION_G8ME01
+    if ((u32)gp->language == 0) {
+        title = "\x83\x89\x83\x93\x83\x4C\x83\x93\x83\x4F";
+    } else {
+        title = msgSearch("stg3_ranking");
+    }
+    FontDrawStart();
+    FontDrawScale(1.0f);
+    width = FontGetMessageWidth(title);
+#else
     FontDrawStart();
     FontDrawScale(1.0f);
     width = FontGetMessageWidth("\x83\x89\x83\x93\x83\x4C\x83\x93\x83\x4F");
+#endif
     {
         GXColor color = titleColor;
         FontDrawColor(color);
     }
     top = 135.0f;
+#ifdef VERSION_G8ME01
+    FontDrawMessage(-width / 2, top, title);
+#else
     FontDrawMessage(-width / 2, top, "\x83\x89\x83\x93\x83\x4C\x83\x93\x83\x4F");
+#endif
     {
         f32 sy = 145.0f;
         f32 sh = 220.0f;
@@ -481,7 +503,15 @@ static void disp_proc(CameraId cameraId, void* param) {
         }
         PSMTXScale(scale, 0.8f, 0.8f, 0.8f);
         if (num != 0) {
+#ifdef VERSION_G8ME01
+            if ((u32)gp->language == 0) {
+                sprintf(entry, "%s%s", num / 10 ? suuji[num / 10] : "", suuji[num % 10]);
+            } else {
+                sprintf(entry, "%2d", num);
+            }
+#else
             sprintf(entry, "%s%s", num / 10 ? suuji[num / 10] : "", suuji[num % 10]);
+#endif
             FontDrawStart();
             {
                 GXColor color = numberColor;
@@ -499,10 +529,23 @@ static void disp_proc(CameraId cameraId, void* param) {
             GXColor color = nameColor;
             FontDrawColor(color);
         }
+#ifdef VERSION_G8ME01
+        name = msgSearch(fighters[rank_wp->entries[i].id].name);
+        nameW = FontGetMessageWidth(name);
+        x = 40.0f + x;
+        PSMTXTrans(mtx, x, y, 0.0f);
+        PSMTXConcat(mtx, scale, mtx);
+        if (nameW > 220.0f) {
+            PSMTXScale(scale, 220.0f / nameW, 1.0f, 1.0f);
+            PSMTXConcat(mtx, scale, mtx);
+        }
+        FontDrawMessageMtx(mtx, name);
+#else
         x = 40.0f + x;
         PSMTXTrans(mtx, x, y, 0.0f);
         PSMTXConcat(mtx, scale, mtx);
         FontDrawMessageMtx(mtx, msgSearch(fighters[rank_wp->entries[i].id].name));
+#endif
         num++;
     }
     {
@@ -515,31 +558,31 @@ static void disp_proc(CameraId cameraId, void* param) {
         Vec pos = cursorPos;
         pos.x = 15.0f + left;
         pos.y = y - 24.0f;
-        iconDispGx(&pos, 0x10, 0x123, 0.8f);
+        iconDispGx(&pos, 0x10, ICON_123, 0.8f);
     }
     GXSetScissor(0, 0, 608, 480);
     if (dwp->page > 0) {
         {
             Vec pos = upArrowPos;
             pos.x = left + winW;
-            iconDispGx(&pos, 0x10, 0x205, -1.0f);
+            iconDispGx(&pos, 0x10, ICON_205, -1.0f);
         }
         {
             Vec pos = upButtonPos;
             pos.x = left + winW;
-            iconDispGx(&pos, 0x10, 0x7E, 0.6f);
+            iconDispGx(&pos, 0x10, ICON_07E, 0.6f);
         }
     }
     if (dwp->page < 1) {
         {
             Vec pos = downArrowPos;
             pos.x = left + winW;
-            iconDispGx(&pos, 0x10, 0x205, 1.0f);
+            iconDispGx(&pos, 0x10, ICON_205, 1.0f);
         }
         {
             Vec pos = downButtonPos;
             pos.x = left + winW;
-            iconDispGx(&pos, 0x10, 0x80, 0.6f);
+            iconDispGx(&pos, 0x10, ICON_080, 0.6f);
         }
     }
 }
@@ -554,7 +597,7 @@ static void printRanking(void) {
 }
 #pragma dont_inline reset
 
-USER_FUNC(evt_tou_set_rule_result_28_text_355C) {
+USER_FUNC(evt_tou_set_rule_result) {
     s32 result = evtGetValue(event, event->args[0]);
 
     if (result & 4) {
@@ -567,7 +610,7 @@ USER_FUNC(evt_tou_set_rule_result_28_text_355C) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_tou_set_ranking_win_lose_28_text_35C0) {
+USER_FUNC(evt_tou_set_ranking_win_lose) {
     s32* args = event->args;
     s32 lose = evtGetValue(event, args[0]);
     s32 id = evtGetValue(event, args[1]);
@@ -764,7 +807,7 @@ USER_FUNC(evt_tou_get_fighter_num) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_tou_get_fighter_battle_msg_28_text_3CB4) {
+USER_FUNC(evt_tou_get_fighter_battle_msg) {
     s32* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
@@ -793,7 +836,7 @@ static USER_FUNC(evt_tou_get_fighter_rank) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_tou_get_fighter_name2_28_text_3DD4) {
+USER_FUNC(evt_tou_get_fighter_name2) {
     s32* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
@@ -802,7 +845,7 @@ USER_FUNC(evt_tou_get_fighter_name2_28_text_3DD4) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_tou_get_fighter_info_28_text_3E58) {
+USER_FUNC(evt_tou_get_fighter_info) {
     s32* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
@@ -850,7 +893,7 @@ static USER_FUNC(evt_tou_get_next_match) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_tou_get_ranking_28_text_4048) {
+USER_FUNC(evt_tou_get_ranking) {
     s32* args = event->args;
     s32 i;
     s32 rank;

@@ -8,6 +8,11 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
+#include "icon_ids.h"
+#include "version.h"
+// US battle texture ids are 0x16 higher for these entries.
+#define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
+
 
 u16 BattleACGetButtonIcon(s32 button, s32 pressed);
 void btlDispTexPlane(u32 id, GXColor color, s32 unk, f32 tX, f32 tY, f32 tZ, f32 sX, f32 sY);
@@ -470,12 +475,12 @@ static void actionCommandDisp(f32 x, f32 y) {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = -200.0f + x;
             pos.y = 70.0f + y;
-            iconDispGx(&pos, 0x10, 0x65, 1.0f);
+            iconDispGx(&pos, 0x10, ICON_065, 1.0f);
         } else {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = -200.0f + x;
             pos.y = 70.0f + y;
-            iconDispGx(&pos, 0x10, 0x64, 1.0f);
+            iconDispGx(&pos, 0x10, ICON_064, 1.0f);
         }
     }
 
@@ -501,19 +506,19 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -288.0f + x;
         pos.y = yb = 25.0f + y;
-        iconDispGx(&pos, 0x10, 0x8F, 1.0f);
+        iconDispGx(&pos, 0x10, ICON_08F, 1.0f);
     }
     for (i = 1; i < n; i++) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = x + (f32)(i * 16 - 288);
         pos.y = yb;
-        iconDispGx(&pos, 0x10, 0x8E, 1.0f);
+        iconDispGx(&pos, 0x10, ICON_08E, 1.0f);
     }
     {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = x + (f32)(i * 16 - 288);
         pos.y = yb;
-        iconDispGx(&pos, 0x10, 0x90, 1.0f);
+        iconDispGx(&pos, 0x10, ICON_090, 1.0f);
     }
 
     if (!(ST_FLAGS(work) & 4)) {
@@ -535,18 +540,18 @@ PSMTXTrans(mTrans, fx + (f32)((ST_FLAGS(work) & 1) ? count * 0x30 - 26 + ST_LEAD
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = x + (f32)(i * 33 - 258);
                 pos.y = yb;
-                iconDispGx(&pos, 0x10, (u16)(0x92 + i), 1.0f);
+                iconDispGx(&pos, 0x10, (u16)(ICON_092 + i), 1.0f);
             } else {
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = x + (f32)(i * 33 - 258);
                 pos.y = yb;
-                iconDispGx(&pos, 0x10, 0x94, 1.0f);
+                iconDispGx(&pos, 0x10, ICON_094, 1.0f);
             }
         } else {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = x + (f32)(i * 33 - 258);
             pos.y = yb;
-            iconDispGx(&pos, 0x10, 0x91, 0.5f);
+            iconDispGx(&pos, 0x10, ICON_091, 0.5f);
         }
     }
 
@@ -556,12 +561,12 @@ PSMTXTrans(mTrans, fx + (f32)((ST_FLAGS(work) & 1) ? count * 0x30 - 26 + ST_LEAD
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250));
                 pos.y = yb;
-                iconDispGx(&pos, 0x10, 0x95, 1.0f);
+                iconDispGx(&pos, 0x10, ICON_095, 1.0f);
             } else {
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250));
                 pos.y = yb;
-                iconDispGx(&pos, 0x10, 0x91, 1.0f);
+                iconDispGx(&pos, 0x10, ICON_091, 1.0f);
             }
         }
     } else if (!(ST_FLAGS(work) & 2)) {
@@ -599,7 +604,7 @@ PSMTXTrans(mTrans, fx + (f32)((ST_FLAGS(work) & 1) ? count * 0x30 - 26 + ST_LEAD
                 iconDispGx(&pos, 0x10, BattleACGetButtonIcon(w->buttons[i], 0), 0.8f);
             } else if (w->next <= (i + ST_LEAD(work))) {
                 if (i >= count - 1) {
-                    btlDispTexPlane(0x40, (GXColor){255, 255, 255, 255}, 0, x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250)), yc, 0.0f, 0.8f, 0.8f);
+                    btlDispTexPlane(BTL_TEX(0x40), (GXColor){255, 255, 255, 255}, 0, x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250)), yc, 0.0f, 0.8f, 0.8f);
                 }
             } else {
                 Vec pos = {0.0f, 0.0f, 0.0f};
@@ -613,9 +618,9 @@ PSMTXTrans(mTrans, fx + (f32)((ST_FLAGS(work) & 1) ? count * 0x30 - 26 + ST_LEAD
     yd = yb - 25.0f;
     for (i = 0; i < count; i++) {
         if (w->results[i] == 1) {
-            btlDispTexPlane(0x3E, (GXColor){255, 255, 255, 255}, 0, x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250)), yd, 0.0f, 1.0f, 1.0f);
+            btlDispTexPlane(BTL_TEX(0x3E), (GXColor){255, 255, 255, 255}, 0, x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250)), yd, 0.0f, 1.0f, 1.0f);
         } else if (w->results[i] == -1) {
-            btlDispTexPlane(0x3F, (GXColor){255, 255, 255, 255}, 0, x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250)), yd, 0.0f, 1.0f, 1.0f);
+            btlDispTexPlane(BTL_TEX(0x3F), (GXColor){255, 255, 255, 255}, 0, x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250)), yd, 0.0f, 1.0f, 1.0f);
         }
     }
 }

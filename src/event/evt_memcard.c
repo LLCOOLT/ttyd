@@ -588,7 +588,24 @@ EVT_BEGIN(evt_memcard_save)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(evt_memcard_save_wrapper)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL_CHILD(evt_memcard_save)
+    ELSE
+        CALL_CHILD(evt_memcard_save)
+        WAIT_MS(1000)
+    END_IF
+    RETURN
+EVT_END()
+
+// trailing 16-byte padding before eff_ultra_hammer .data
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_803BAC70_data[4] = {0, 0, 0, 0};
+#pragma force_active reset
+#else
 // trailing 12-byte padding before eff_ultra_hammer .data (keep active so the linker does not strip it)
 #pragma force_active on
 __declspec(section ".data") u32 gap_05_803B70B4_data[3] = {0, 0, 0};
 #pragma force_active reset
+#endif

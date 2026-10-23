@@ -65,7 +65,7 @@ __declspec(section ".data") s32 fd_hannya___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_hannya_one_negone_359;
 __declspec(section ".data") s32 fd_hannya___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_hannya_one_364[1];
-BattleUnitKind unit_hannya_28_data_3BF68;
+BattleUnitKind unit_hannya;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -127,7 +127,7 @@ __declspec(section ".data") s32 fd_hannya_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_hannya_28_data_3BF68 = {
+BattleUnitKind unit_hannya = {
     5,
     "btl_un_hannya",
     3,

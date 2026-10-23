@@ -3,6 +3,10 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "version.h"
+// US effect texture ids are 0x1C lower for these entries.
+#define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
+
 
 extern double sin(double x);
 extern double cos(double x);
@@ -63,7 +67,7 @@ void effMachinegunDisp(CameraId cameraId, EffectEntry* effect) {
     f32 size, half;
 
     camera = camGetPtr(cameraId);
-    effGetTexObj(0x89, &texObj);
+    effGetTexObj(EFF_TEX(0x89), &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);

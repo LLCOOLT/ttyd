@@ -29,6 +29,11 @@ void SoundSetOutputMode(s32 mode);
 extern SoundWork sound;
 extern PaperSoundBGM psbgm[2];
 extern GlobalWork* gp;
+#ifdef VERSION_G8ME01
+#define PSTATIC
+#else
+#define PSTATIC static
+#endif
 extern const char* build_date_ptr;
 extern const char* build_time_ptr;
 
@@ -42,11 +47,16 @@ TitleWork work2;
 TitleWork* wp2 = &work2;
 
 //local prototypes
+#ifdef VERSION_G8ME01
+#define TFR (gp->framerate)
+#else
+#define TFR 60
+#endif
 void L_titleInit(SequenceWork* work);
 void titleMain(SequenceWork* work);
 void disp1(CameraId cameraId, void* param);
 void disp2(CameraId cameraId, void* param);
-static void pressStartGX(s32 alpha, f32 x, f32 y);
+PSTATIC void pressStartGX(s32 alpha, f32 x, f32 y);
 static void titleLoadDemo(void);
 
 const char* DbgBtlSel_GetMsgDataPtr(void) {
@@ -166,6 +176,9 @@ void titleMain(SequenceWork* work) {
 				else {
 					wp2->topPosY = 120.0f;
 					wp2->bottomPosY = -170.0f;
+#ifdef VERSION_G8ME01
+					wp2->counter = 0;
+#endif
 					wp2->frame = 0;
 					wp2->state = 3;
 				}
@@ -173,7 +186,7 @@ void titleMain(SequenceWork* work) {
 			break;
 		case 2:
 			wp2->topPosX = 0.0f;
-			wp2->topPosY = intplGetValue(10, wp2->counter, 60, 300.0f, 120.0f);
+			wp2->topPosY = intplGetValue(10, wp2->counter, TFR, 300.0f, 120.0f);
 			wp2->timer--;
 			if (wp2->timer == 0) {
 				if ((u32)psbgm[0].streamId != 0xFFFFFFFFU) {
@@ -184,15 +197,22 @@ void titleMain(SequenceWork* work) {
 				}
 			}
 			wp2->bottomPosX = 0.0f;
-			wp2->bottomPosY = intplGetValue(11, wp2->counter, 60, -300.0f, -170.0f);
+			wp2->bottomPosY = intplGetValue(11, wp2->counter, TFR, -300.0f, -170.0f);
 			wp2->counter++;
-			if (wp2->counter > 60) {
+			if (wp2->counter > TFR) {
 				titleLoadDemo();
+#ifdef VERSION_G8ME01
+				wp2->counter = 0;
+#endif
 				wp2->frame = 0;
 				wp2->state++;
 			}
 			break;
 		case 3:
+#ifdef VERSION_G8ME01
+			wp2->counter++;
+			if (wp2->counter > TFR) {
+#endif
 			wp2->fadeAlpha += 0.1f;
 			if (wp2->fadeAlpha > 1.0f) {
 				wp2->fadeAlpha = 1.0f;
@@ -201,9 +221,12 @@ void titleMain(SequenceWork* work) {
 				psndSFXOn((const char*)8);
 				wp2->state = 10;
 			}
-			else if (++wp2->idle > 1140) {
+			else if (++wp2->idle > TFR * 20 - TFR) {
 				wp2->state = 20;
 			}
+#ifdef VERSION_G8ME01
+			}
+#endif
 			break;
 		case 10:
 			fadeEntry(0x3F, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -228,11 +251,11 @@ void titleMain(SequenceWork* work) {
 			wp2->state++;
 			break;
 		case 21:
-			wp2->topPosY = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(120.0f, 400.0f, 11, wp2->counter, 60);
-			wp2->bottomPosY = intplGetValue(11, wp2->counter, 60, -170.0f, -400.0f);
+			wp2->topPosY = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(120.0f, 400.0f, 11, wp2->counter, TFR);
+			wp2->bottomPosY = intplGetValue(11, wp2->counter, TFR, -170.0f, -400.0f);
 			wp2->counter++;
-			if (wp2->counter > 60) {
-				wp2->counter = 60;
+			if (wp2->counter > TFR) {
+				wp2->counter = TFR;
 			}
 			wp2->fadeAlpha -= 0.1f;
 			if (wp2->fadeAlpha < 0.0f) {
@@ -319,7 +342,11 @@ void disp1(CameraId cameraId, void* param) {
 	GXSetViewport(cam->viewport[0], cam->viewport[1], cam->viewport[2],
 				  cam->viewport[3], cam->viewport[4], cam->viewport[5]);
 	winTexInit(*wp2->texture->data);
+#ifdef VERSION_G8ME01
+	winTexSet(5, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#else
 	winTexSet(7, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#endif
 	*camGetPtr(cameraId) = saved;
 	GXSetProjectionv(proj);
 	GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
@@ -332,6 +359,9 @@ void disp2(CameraId cameraId, void* param) {
 	f32 vp[6];
 	s32 alpha;
 	f32 s;
+#ifdef VERSION_G8ME01
+	s32 tbl[6] = { 21, 21, 22, 23, 24, 25 };
+#endif
 
 	saved = *camGetPtr(cameraId);
 	*camGetPtr(cameraId) = *cam;
@@ -341,8 +371,13 @@ void disp2(CameraId cameraId, void* param) {
 	GXSetViewport(cam->viewport[0], cam->viewport[1], cam->viewport[2],
 				  cam->viewport[3], cam->viewport[4], cam->viewport[5]);
 	winTexInit(*wp2->texture->data);
+#ifdef VERSION_G8ME01
+	winTexSetNearest(tbl[gp->language], (Vec){wp2->topPosX, wp2->topPosY - 20.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	winTexSet(gp->language + 9, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#else
 	winTexSetNearest(5, (Vec){wp2->topPosX, wp2->topPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 	winTexSet(6, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#endif
 	wp2->frame++;
 	s = (f32)sin(6.2831855f * (f32)wp2->frame / 120.0f);
 	alpha = (s32)(wp2->fadeAlpha * (459.0f * s));
@@ -352,7 +387,11 @@ void disp2(CameraId cameraId, void* param) {
 	if (alpha > 255) {
 		alpha = 255;
 	}
+#ifdef VERSION_G8ME01
+	pressStartGX(alpha, 0.0f, -122.0f);
+#else
 	pressStartGX(alpha, 0.0f, -110.0f);
+#endif
 	if (wp2->debug < 0 && (keyGetButton(0) & 0x10)) {
 		FontDrawStart();
 		FontDrawEdge();
@@ -366,14 +405,20 @@ void disp2(CameraId cameraId, void* param) {
 	GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
 }
 
-static void pressStartGX(s32 alpha, f32 x, f32 y) {
+PSTATIC void pressStartGX(s32 alpha, f32 x, f32 y) {
 	CameraEntry* camera = camGetCurPtr();
 	GXTexObj startText, gradient;
 	Mtx v17, v16;
 
+#ifdef VERSION_G8ME01
+	TEXGetGXTexObjFromPalette(*wp2->texture->data, &startText, gp->language + 15);
+	GXLoadTexObj(&startText, GX_TEXMAP0);
+	TEXGetGXTexObjFromPalette(*wp2->texture->data, &gradient, 6);
+#else
 	TEXGetGXTexObjFromPalette(*wp2->texture->data, &startText, 8);
 	GXLoadTexObj(&startText, GX_TEXMAP0);
 	TEXGetGXTexObjFromPalette(*wp2->texture->data, &gradient, 9);
+#endif
 	GXLoadTexObj(&gradient, GX_TEXMAP1);
 	GXSetNumTevStages(2);
 	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);

@@ -235,7 +235,11 @@ BattleUnitKind unit_boss_champion = {
     100,
     0,
     50,
+#ifdef VERSION_G8ME01
+    7,
+#else
     8,
+#endif
     50,
     64,
     3,
@@ -402,7 +406,11 @@ s32 weapon_champion_healing[] = {
 };
 
 s32 weapon_champion_roof_shake_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     1, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 135, 2047, -2147475452,
@@ -411,7 +419,11 @@ s32 weapon_champion_roof_shake_attack[] = {
 };
 
 s32 weapon_champion_roof_shake_last_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, 0,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
+#endif
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 1770242, 0, 131207, 2047, -2147475452,

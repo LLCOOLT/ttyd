@@ -79,7 +79,7 @@ __declspec(section ".data") s32 fd_nokonoko___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_nokonoko_one_negone_359;
 __declspec(section ".data") s32 fd_nokonoko___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_nokonoko_one_364[1];
-BattleUnitKind unit_nokonoko_26_data_2DCC8;
+BattleUnitKind unit_nokonoko;
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_turn[17];
 static __declspec(section ".data") BattleDataEntry data_table[3];
@@ -145,7 +145,7 @@ __declspec(section ".data") s32 fd_nokonoko_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_nokonoko_26_data_2DCC8 = {
+BattleUnitKind unit_nokonoko = {
     14,
     "btl_un_nokonoko",
     4,

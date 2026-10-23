@@ -17,6 +17,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "icon_ids.h"
 
 extern BattleWork* _battleWorkPointer;
 
@@ -163,7 +164,7 @@ extern s32 flash_main_evt[];
 extern s32 flash_cancel_evt[];
 
 static s32 weapon[] = {
-    (s32)"btl_wn_sac_sukkari_sukkiri", 26804224, 0, (s32)"msg_sukkari_sukkiri", 1677722112, 1065353216, 17130546, 0,
+    (s32)"btl_wn_sac_sukkari_sukkiri", ICON_199 << 16, 0, (s32)"msg_sukkari_sukkiri", 1677722112, 1065353216, 17130546, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, (s32)"msg_sac_7", 131080, 2047, 0,
@@ -491,20 +492,20 @@ static void disp_2D(CameraId cam, void* param) {
 
     PSMTXScale(m, 26.0f, 1.0f, 1.0f);
     PSMTXTransApply(m, m, w->pos.x, 60.0f + w->pos.y, w->pos.z);
-    iconDispGx2(m, 0x10, 0x8E);
+    iconDispGx2(m, 0x10, ICON_08E);
     {
         Vec a = {0.0f, 0.0f, 0.0f};
         a.x = 215.0f + w->pos.x;
         a.y = 60.0f + w->pos.y;
         a.z = w->pos.z;
-        iconDispGx(&a, 0x10, 0x90, 1.0f);
+        iconDispGx(&a, 0x10, ICON_090, 1.0f);
     }
     {
         Vec b = {0.0f, 0.0f, 0.0f};
         b.x = w->pos.x - 215.0f;
         b.y = 60.0f + w->pos.y;
         b.z = w->pos.z;
-        iconDispGx(&b, 0x10, 0x8F, 1.0f);
+        iconDispGx(&b, 0x10, ICON_08F, 1.0f);
     }
     GXSetScissor(0, 0x91, gp->fbWidth, 0x50);
     for (i = 0; i < 7; i++) {
@@ -539,51 +540,51 @@ void N__disp_2D(s32 side, s32 idx) {
     }
     switch (b->button) {
     case 0x100:
-        t = 0x64;
+        t = ICON_064;
         if (idx < cur) {
-            t = 0x65;
+            t = ICON_065;
         }
         icon = t;
         break;
     case 0x200:
-        t = 0x66;
+        t = ICON_066;
         if (idx < cur) {
-            t = 0x67;
+            t = ICON_067;
         }
         icon = t;
         break;
     case 0x400:
-        t = 0x68;
+        t = ICON_068;
         if (idx < cur) {
-            t = 0x69;
+            t = ICON_069;
         }
         icon = t;
         break;
     case 0x800:
-        t = 0x6A;
+        t = ICON_06A;
         if (idx < cur) {
-            t = 0x6B;
+            t = ICON_06B;
         }
         icon = t;
         break;
     case 0x40:
-        t = 0x7E;
+        t = ICON_07E;
         if (idx < cur) {
-            t = 0x7F;
+            t = ICON_07F;
         }
         icon = t;
         break;
     case 0x20:
-        t = 0x80;
+        t = ICON_080;
         if (idx < cur) {
-            t = 0x81;
+            t = ICON_081;
         }
         icon = t;
         break;
     case 0x10:
-        t = 0x82;
+        t = ICON_082;
         if (idx < cur) {
-            t = 0x83;
+            t = ICON_083;
         }
         icon = t;
         break;

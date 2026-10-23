@@ -6,6 +6,11 @@
 #include "manager/evtmgr_cmd.h"
 #include "manager/fontmgr.h"
 #include <stdio.h>
+#ifdef VERSION_G8ME01
+#include <string.h>
+#include "mario/mariost.h"
+void evtMsgFmtStr(char* dst, const char* src);
+#endif
 
 extern ItemData itemDataTable[];
 
@@ -14,10 +19,15 @@ void _disp(CameraId cameraId, void* param);
 // s32 type, s32 x, s32 y, const char* msg, s32 frames
 USER_FUNC(btlevtcmd_AnnounceMessage) {
     BattleAnnounce* announce = &_battleWorkPointer->announce;
+#ifdef VERSION_G8ME01
+    const char* text;
+#endif
     s32* args = event->args;
     s32 type, x, y, frames;
     const char* msg;
+#ifndef VERSION_G8ME01
     const char* text;
+#endif
 
     type = evtGetValue(event, args[0]);
     x = evtGetValue(event, args[1]);
@@ -34,7 +44,16 @@ USER_FUNC(btlevtcmd_AnnounceMessage) {
         text = msgSearch(msg);
         switch (type) {
             case 1:
+#ifdef VERSION_G8ME01
+                if ((u32)gp->language == 0) {
+                    sprintf(announce->text, text, msgSearch(itemDataTable[announce->params[0]].name));
+                } else {
+                    strcpy(announce->text, text);
+                    evtMsgFmtStr(announce->text, msgSearch(itemDataTable[announce->params[0]].name));
+                }
+#else
                 sprintf(announce->text, text, itemDataTable[announce->params[0]].id);
+#endif
                 break;
             default:
                 sprintf(announce->text, text);
@@ -42,6 +61,13 @@ USER_FUNC(btlevtcmd_AnnounceMessage) {
         }
     }
     dispEntry(CAMERA_2D, 900.0f, 1, _disp, NULL);
+#ifdef VERSION_G8ME01
+    if (type == 2) {
+        if (BattlePadCheckTrigger(0x100) || BattlePadCheckTrigger(0x200)) {
+            event->userdata[0] = 0;
+        }
+    }
+#endif
     event->userdata[0]--;
     return event->userdata[0] <= 0;
 }

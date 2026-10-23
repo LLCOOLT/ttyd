@@ -71,6 +71,9 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(suifu_option_func);
 USER_FUNC(suifu_option_init_func);
+#ifdef VERSION_G8ME01
+extern s32 korutesu_appear_event[];
+#endif
 static USER_FUNC(tornade_alpha_func);
 void elmosalpha_func(NanNpc* npc);
 extern s32 bero_close_door_play_se[];
@@ -123,10 +126,18 @@ static s32 suifu_animtbl[21];
 static __declspec(section ".data") s32 elmos_animtbl[11];
 s32 senin_event_suifupos[380];
 s32 senin_event_erumospos[180];
+#ifdef VERSION_G8ME01
+s32 senin_event[282];
+#else
 s32 senin_event[374];
+#endif
 static s32 dai3_shurai_after[46];
 static s32 hitDmgRetPoints[28];
+#ifdef VERSION_G8ME01
+s32 muj_10_init_evt[207];
+#else
 s32 muj_10_init_evt[204];
+#endif
 
 static USER_FUNC(tornade_alpha_func) {
     s32* args = event->args;
@@ -568,6 +579,34 @@ EVT_BEGIN(senin_event)
     CALL(evt_npc_set_position, STRING("オドオド水夫"), -18, 120, -179)
     CALL(evt_npc_flag_onoff, 1, STRING("オドオド水夫"), 688656)
     CALL(evt_npc_flag_onoff, 0, STRING("オドオド水夫"), 1024)
+#ifndef VERSION_G8ME01
+    CALL(evt_cam3d_evt_set, -71, 178, 259, -71, 83, -282, 0, 11)
+    CALL(evt_bero_exec_wait, 65536)
+    WAIT_MS(1000)
+    CALL(evt_msg_print, 0, STRING("stg5_dou_19_01"), 0, STRING("水夫D"))
+    CALL(evt_msg_print, 0, STRING("stg5_dou_19_02"), 0, STRING("モニー"))
+    CALL(evt_msg_print, 0, STRING("stg5_dou_19_03"), 0, STRING("ガラの悪い水夫"))
+    CALL(evt_cam3d_evt_set, -150, 300, 682, -150, 150, -175, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_npc_set_position, STRING("コルテス"), -215, 120, -160)
+    CALL_CHILD(PTR(korutesu_apper))
+    CALL(evt_msg_print, 0, STRING("stg5_dou_19_04"), 0, STRING("コルテス"))
+    CALL(evt_snd_sfxon, STRING("SFX_STG5_ELMOS_APPEAR3"), 0)
+    SET_VALUE(LW(0), 95)
+    LOOP(60)
+        CALL(evt_nannpc_set_func, LW(0), PTR(elmosalpha_func))
+        ADD(LW(0), 1)
+    END_LOOP
+    WAIT_MS(3000)
+    SET_VALUE(GSW(0), 259)
+    CALL(evt_fade_set_mapchange_type, 0, 2, 500, 1, 500)
+    CALL(evt_bero_mapchange, STRING("muj_00"), STRING(""))
+#endif
+    RETURN
+EVT_END()
+
+#ifdef VERSION_G8ME01
+EVT_BEGIN(korutesu_appear_event)
     CALL(evt_cam3d_evt_set, -71, 178, 259, -71, 83, -282, 0, 11)
     CALL(evt_bero_exec_wait, 65536)
     WAIT_MS(1000)
@@ -591,6 +630,7 @@ EVT_BEGIN(senin_event)
     CALL(evt_bero_mapchange, STRING("muj_00"), STRING(""))
     RETURN
 EVT_END()
+#endif
 
 static EVT_BEGIN(dai3_shurai_after)
     LOOP(0)
@@ -614,6 +654,74 @@ static s32 hitDmgRetPoints[] = {
     0, 0, 0, 0,
 };
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(muj_10_init_evt)
+    IF_INT_LESS(GSW(0), 253)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_STG5_GHOST1"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG5_MUJ8"))
+        ELSE
+        CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_DOU1"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG5_MUJ8"))
+    END_IF
+    CALL(evt_snd_set_rev_mode, 2)
+    SET_VALUE(LW(0), PTR(bero_entry_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL(evt_cam_road_reset)
+    CALL(evt_npc_setup, PTR(npcEnt))
+    CALL(evt_npc_sound_data_set, STRING("めがね水夫"), STRING("SFX_STG5_KANBU_GLASSES_MOVE1L"), STRING("SFX_STG5_KANBU_GLASSES_MOVE1R"), -250000000, -250000000, -250000000)
+    IF_INT_EQUAL(GSW(0), 250)
+        SPAWN_EVENT(PTR(nazo_event))
+    END_IF
+    IF_INT_EQUAL(GSW(0), 253)
+        SPAWN_EVENT(PTR(oidasare_event))
+    END_IF
+    IF_INT_EQUAL(GSW(0), 258)
+        CALL_CHILD(PTR(senin_event))
+        SPAWN_EVENT(PTR(korutesu_appear_event))
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 260)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_b"), 1)
+    END_IF
+    CALL(evt_map_playanim, STRING("mizu"), 1, 0)
+    CALL(evt_map_playanim, STRING("noname"), 1, 0)
+    IF_INT_LESS(GSW(0), 260)
+        IF_INT_NOT_EQUAL(GSW(0), 258)
+            CALL(evt_map_playanim, STRING("fune"), 1, 0)
+        END_IF
+        BEGIN_INLINE_EVENT
+            LOOP(0)
+                CALL(evt_mapobj_get_position, STRING("S_b"), LW(0), LW(1), LW(2))
+                CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_SHIP_KOR_SHAKE1"), LW(0), LW(1), LW(2), 0)
+                WAIT_MS(2000)
+            END_LOOP
+        END_INLINE_EVENT
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 260)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hasi_rope01"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hasi_rope02"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hasi_m"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_10_sui02_01"), 1)
+        CALL(evt_hitobj_onoff, STRING("A_hasi_ita"), 1, 0)
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hasi_zan"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_10_sui02_02"), 1)
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 257)
+        IF_INT_LESS(GSW(0), 258)
+            SPAWN_EVENT(PTR(dai3_shurai_after))
+        END_IF
+    END_IF
+    CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
+    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL(evt_hitobj_onoff, STRING("A_b_bero02"), 1, 0)
+    IF_INT_LESS(GSW(0), 258)
+        CALL(evt_mobj_recovery_blk, STRING("r_blk"), 12, -260, 135, -145, 0, 0)
+        CALL(evt_mobj_save_blk, STRING("s_blk"), -45, 83, 0, 0, 0)
+    END_IF
+    RETURN
+EVT_END()
+#else
 s32 muj_10_init_evt[] = {
     131098, -170000000, 253, 196699, (s32)evt_snd_bgmon, 512, (s32)"BGM_EVT_STG5_GHOST1", 196699,
     (s32)evt_snd_envon, 272, (s32)"ENV_STG5_MUJ8", 32, 196699, (s32)evt_snd_bgmon, 512, (s32)"BGM_STG5_DOU1",
@@ -642,6 +750,7 @@ s32 muj_10_init_evt[] = {
     0, 458843, (s32)evt_mobj_save_blk, (s32)"s_blk", -45, 83, 0, 0,
     0, 33, 2, 1,
 };
+#endif
 
 void elmosalpha_func(NanNpc* npc) {
     s32 elapsed;

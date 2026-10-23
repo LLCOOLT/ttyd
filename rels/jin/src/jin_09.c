@@ -6,7 +6,7 @@
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_cam_road_reset);
-USER_FUNC(evt_kagemario_init_14_text_4DB8);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_map_checkanim);
 USER_FUNC(evt_map_playanim);
 USER_FUNC(evt_mario_cont_onoff);
@@ -26,7 +26,7 @@ USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_random);
 extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill_14_data_AF00[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_jin_09_negone_one_374;
 __declspec(section ".data") s32 fd_jin_09_neg_one_382[1];
@@ -112,11 +112,11 @@ EVT_BEGIN(jin_09_init_evt)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_JIN1"))
     CALL(evt_snd_set_rev_mode, 2)
-    CALL(evt_kagemario_init_14_text_4DB8)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_14_data_AF00))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     CALL(evt_mobj_powerupblk, STRING("blk00"), -120, 60, 90, 0, GSWF(5550), 0)
     BEGIN_INLINE_EVENT
         LOOP(0)

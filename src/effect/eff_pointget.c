@@ -23,7 +23,41 @@ EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 dur
 void effPointGetMain(EffectEntry* effect);
 void effPointGetDisp(CameraId cameraId, EffectEntry* effect);
 
+#ifdef VERSION_G8ME01
+typedef struct PointGetTex {
+    s32 kind;
+    s32 id;
+    s32 idShadow;
+} PointGetTex;
+
+typedef struct PointGetTexSet {
+    PointGetTex* tbl[2];
+    s32 count;
+} PointGetTexSet;
+
+static PointGetTex tex_jp[3] = { { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x7C, 0x7D } };
+static PointGetTex tex_us[5] = { { 1, 0x7C, 0x7D }, { -1, -1, -1 }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x80, 0x81 } };
+static PointGetTex tex_shadow_us[5] = { { 1, 0x7C, 0x7D }, { -1, -1, -1 }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x82, 0x83 } };
+static PointGetTex tex_lang3[3] = { { 0, 0x7C, 0x7D }, { -1, -1, -1 }, { 1, 0x7E, 0x7F } };
+static PointGetTex tex_shadow_lang3[3] = { { 0, 0x7C, 0x7D }, { -1, -1, -1 }, { 1, 0x80, 0x81 } };
+static PointGetTex tex_lang4[3] = { { 0, 0x7C, 0x7D }, { -1, -1, -1 }, { 1, 0x7E, 0x7F } };
+static PointGetTex tex_shadow_lang4[3] = { { 0, 0x7C, 0x7D }, { -1, -1, -1 }, { 1, 0x80, 0x81 } };
+static PointGetTex tex_lang5[7] = { { 1, 0x7C, 0x7D }, { -1, -1, -1 }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x80, 0x81 }, { -1, -1, -1 }, { 1, 0x84, 0x85 } };
+static PointGetTex tex_shadow_lang5[7] = { { 1, 0x7C, 0x7D }, { -1, -1, -1 }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x82, 0x83 }, { -1, -1, -1 }, { 1, 0x84, 0x85 } };
+static PointGetTex tex_lang6[2] = { { 0, 0x7E, 0x7F }, { 1, 0x7C, 0x7D } };
+static PointGetTex tex_shadow_lang6[2] = { { 0, 0x7E, 0x7F }, { 1, 0x80, 0x81 } };
+
+static PointGetTexSet texid_tbl[6] = {
+    { { tex_jp, tex_jp }, 3 },
+    { { tex_us, tex_shadow_us }, 5 },
+    { { tex_lang3, tex_shadow_lang3 }, 3 },
+    { { tex_lang4, tex_shadow_lang4 }, 3 },
+    { { tex_lang5, tex_shadow_lang5 }, 7 },
+    { { tex_lang6, tex_shadow_lang6 }, 2 },
+};
+#else
 static s32 texid_tbl[2][4] = { { 0x98, 0x99, 0x9A, 0x9B }, { 0x98, 0x99, 0x9A, 0x9B } };
+#endif
 
 EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 duration) {
     EffectEntry* effect;
@@ -38,7 +72,11 @@ EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 dur
     effect->flags |= 2;
     work->type = type;
     work->position.x = x - 2000.0f;
+#ifdef VERSION_G8ME01
+    work->position.y = y - 30.0f;
+#else
     work->position.y = y;
+#endif
     work->position.z = z;
     work->number = number;
     work->scale = 1.0f;
@@ -89,6 +127,149 @@ void effPointGetMain(EffectEntry* effect) {
     dispEntry(CAMERA_2D, dispCalcZ(&position), 2, (DispCallback)effPointGetDisp, effect);
 }
 
+#ifdef VERSION_G8ME01
+void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
+    f32 w;
+    f32 w1;
+    EffPointGetWork* work = effect->userdata;
+    CameraEntry* camera = camGetPtr(cameraId);
+    f32 scale = work->scale;
+    f32 pos;
+    f32 total;
+    f32 ox;
+    f32 oy;
+    f32 h;
+    GXColor color;
+    GXTexObj texObj;
+    Mtx mtx;
+    Mtx scaleMtx;
+    Mtx baseMtx;
+    char buf[32];
+    s32 i;
+    s32 pass;
+    s32 j;
+    PointGetTex* tbl = ((PointGetTex**)texid_tbl)[gp->language * 3 + (work->number > 1 ? 1 : 0)];
+    s32 count = texid_tbl[gp->language].count;
+    s32 kind;
+    s32 id;
+    s32 idShadow;
+
+    sprintf(buf, "%d", work->number);
+    total = 0.0f;
+    for (i = 0; i < count; i++) {
+        kind = tbl[i].kind;
+        id = tbl[i].id;
+        switch (kind) {
+            case 0:
+                effGetTexObj(id, &texObj);
+                w = (f32)strlen(buf) * GXGetTexObjWidth(&texObj) / 10.0f;
+                total += w / 2.0f;
+                break;
+            case 1:
+                effGetTexObj(id, &texObj);
+                total += GXGetTexObjWidth(&texObj) / 2.0f;
+                break;
+            case -1:
+                total += 5.0f;
+                break;
+        }
+    }
+    if (total > 200.0f) {
+        scale *= 200.0f / total;
+    }
+    PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
+    PSMTXScale(scaleMtx, scale, scale, scale);
+    PSMTXConcat(mtx, scaleMtx, baseMtx);
+    PSMTXConcat(camera->view, baseMtx, baseMtx);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    GXSetNumTevStages(1);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    GXSetCullMode(GX_CULL_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    for (pass = 1; pass >= 0; pass--) {
+        ox = (f32)(pass * 4);
+        oy = (f32)(-pass * 4);
+        color = pass != 0 ? (GXColor){ 0, 0, 0, 0x80 } : (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
+        pos = 0.0f;
+        for (i = 0; i < count; i++) {
+            kind = tbl[i].kind;
+            id = tbl[i].id;
+            idShadow = tbl[i].idShadow;
+            switch (kind) {
+                case 0:
+                    effGetTexObj(pass != 0 ? idShadow : id, &texObj);
+                    GXLoadTexObj(&texObj, GX_TEXMAP0);
+                    effGetTexObj(id, &texObj);
+                    GXSetChanMatColor(GX_COLOR0A0, color);
+                    for (j = 0; j < strlen(buf); j++) {
+                        pos += (GXGetTexObjWidth(&texObj) / 10.0f) / 2.0f;
+                        PSMTXTrans(mtx, ox + (pos - total), oy, 0.0f);
+                        PSMTXScale(scaleMtx, 1.4285715f, 1.4285715f, 1.4285715f);
+                        PSMTXConcat(baseMtx, mtx, mtx);
+                        PSMTXConcat(mtx, scaleMtx, mtx);
+                        GXLoadPosMtxImm(mtx, GX_PNMTX0);
+                        GXSetCurrentMtx(GX_PNMTX0);
+                        PSMTXScale(scaleMtx, 0.1f, 1.0f, 1.0f);
+                        PSMTXTrans(mtx, (f32)((s8)buf[j] - 0x30), 0.0f, 0.0f);
+                        PSMTXConcat(scaleMtx, mtx, mtx);
+                        GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
+                        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                        w = GXGetTexObjWidth(&texObj) / 10.0f;
+                        h = GXGetTexObjHeight(&texObj);
+                        GXPosition3f32(-w / 2.0f, h, 0.0f);
+                        GXTexCoord2f32(0.0f, 0.0f);
+                        GXPosition3f32(w / 2.0f, h, 0.0f);
+                        GXTexCoord2f32(1.0f, 0.0f);
+                        GXPosition3f32(w / 2.0f, 0.0f, 0.0f);
+                        GXTexCoord2f32(1.0f, 1.0f);
+                        GXPosition3f32(-w / 2.0f, 0.0f, 0.0f);
+                        GXTexCoord2f32(0.0f, 1.0f);
+                        pos += (GXGetTexObjWidth(&texObj) / 10.0f) / 2.0f;
+                    }
+                    break;
+                case 1:
+                    effGetTexObj(pass != 0 ? idShadow : id, &texObj);
+                    GXLoadTexObj(&texObj, GX_TEXMAP0);
+                    effGetTexObj(id, &texObj);
+                    GXSetChanMatColor(GX_COLOR0A0, color);
+                    pos += GXGetTexObjWidth(&texObj) / 2.0f;
+                    PSMTXTrans(mtx, ox + (pos - total), oy, 0.0f);
+                    PSMTXConcat(baseMtx, mtx, mtx);
+                    GXLoadPosMtxImm(mtx, GX_PNMTX0);
+                    GXSetCurrentMtx(GX_PNMTX0);
+                    PSMTXIdentity(mtx);
+                    GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
+                    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                    w1 = GXGetTexObjWidth(&texObj);
+                    h = GXGetTexObjHeight(&texObj);
+                    GXPosition3f32(-w1 / 2.0f, h, 0.0f);
+                    GXTexCoord2f32(0.0f, 0.0f);
+                    GXPosition3f32(w1 / 2.0f, h, 0.0f);
+                    GXTexCoord2f32(1.0f, 0.0f);
+                    GXPosition3f32(w1 / 2.0f, 0.0f, 0.0f);
+                    GXTexCoord2f32(1.0f, 1.0f);
+                    GXPosition3f32(-w1 / 2.0f, 0.0f, 0.0f);
+                    GXTexCoord2f32(0.0f, 1.0f);
+                    pos += GXGetTexObjWidth(&texObj) / 2.0f;
+                    break;
+                case -1:
+                    pos += 10.0f;
+                    break;
+            }
+        }
+    }
+}
+#else
 void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     EffPointGetWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
@@ -191,3 +372,4 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
         GXTexCoord2f32(0.0f, 1.0f);
     }
 }
+#endif

@@ -69,7 +69,7 @@ void marioSetSplash(s32 kind, Vec* pos) {
 s32 gazigazi(EventEntry* evt, BOOL isFirstCall) {
     MarioWork* mario = marioGetPtr();
     evt->lwData[0] = (s32)mario->position.x;
-    evt->lwData[1] = (s32)MF(0x2A0);
+    evt->lwData[1] = (s32)MF(MWOFF(0x2A0));
     evt->lwData[2] = (s32)mario->position.z;
     return 2;
 }
@@ -84,7 +84,7 @@ BOOL marioChkDamageSink(void) {
 
 void set_damage_root_ypos(f32 y) {
     MarioWork* mario = marioGetPtr();
-    MF(0x2A0) = y;
+    MF(MWOFF(0x2A0)) = y;
 }
 
 void mot_damage(void) {
@@ -133,7 +133,7 @@ void mot_damage(void) {
 
     switch (mario->currSubMotionId) {
     case 0:
-        if (mario->position.y >= MF(0x2A0) - 160.0f) {
+        if (mario->position.y >= MF(MWOFF(0x2A0)) - 160.0f) {
             marioMakeJumpPara();
             if (mario->jumpVelocityY <= -6.0f) {
                 mario->jumpVelocityY = -6.0f;
@@ -154,7 +154,7 @@ void mot_damage(void) {
         }
         MI(0x48) = 0;
         mario->currSubMotionId = 10;
-        MF(0x2AC) = 20.0f;
+        MF(MWOFF(0x2AC)) = 20.0f;
         break;
     case 10:
         if (++MI(0x48) == 2) {
@@ -167,18 +167,18 @@ void mot_damage(void) {
     case 11: {
         f32 v;
         f32 prevY = mario->position.y;
-        v = MF(0x2AC);
+        v = MF(MWOFF(0x2AC));
         mario->position.y += v;
         v -= 1.0f;
         if (v < 10.0f) {
             v = 10.0f;
         }
-        MF(0x2AC) = v;
-        if (mario->position.y >= MF(0x2A0) && MF(0x2A0) > prevY) {
+        MF(MWOFF(0x2AC)) = v;
+        if (mario->position.y >= MF(MWOFF(0x2A0)) && MF(MWOFF(0x2A0)) > prevY) {
             Vec pos = mario->position;
             marioSetSplash(1, &pos);
         }
-        if (mario->position.y < 500.0f + MF(0x2A0)) {
+        if (mario->position.y < 500.0f + MF(MWOFF(0x2A0))) {
             break;
         }
         {
@@ -216,12 +216,12 @@ void mot_damage(void) {
             d = distABf(dest.x, dest.z, mario->position.x, mario->position.z);
             mario->multiTimer = (s16)(d / 8);
             mario->directionView = angleABf(mario->position.x, mario->position.z, dest.x, dest.z);
-            mario->wCamVal1 = (dest.y - MF(0x2A0)) / (f32)MI(0x48);
+            mario->wCamVal1 = (dest.y - MF(MWOFF(0x2A0))) / (f32)MI(0x48);
             mario->currSubMotionId = 12;
             mario->dispFlags |= 1;
             if (MI(0x48) == 0) {
                 MI(0x48) = 10;
-                mario->wCamVal1 = (dest.y - MF(0x2A0)) / (f32)MI(0x48);
+                mario->wCamVal1 = (dest.y - MF(MWOFF(0x2A0))) / (f32)MI(0x48);
                 mario->currSubMotionId = 14;
             }
         }
@@ -365,9 +365,9 @@ void mot_damageToge(void) {
         mario->currSubMotionId = 0;
         mario->airTimer = 0;
         mario->baseSpeed = 0.0f;
-        MF(0x2A0) = mario->position.y;
+        MF(MWOFF(0x2A0)) = mario->position.y;
         mario->multiTimer = 5;
-        MF(0x2AC) = 4.0f;
+        MF(MWOFF(0x2AC)) = 4.0f;
     }
 
     switch (mario->currSubMotionId) {
@@ -384,14 +384,14 @@ void mot_damageToge(void) {
         mario_simple_kemuri();
         mario->currSubMotionId = 11;
     case 11: {
-        f32 v = MF(0x2AC);
+        f32 v = MF(MWOFF(0x2AC));
         mario->position.y += v;
         v -= 1.0f;
         if (v < 10.0f) {
             v = 10.0f;
         }
-        MF(0x2AC) = v;
-        if (mario->position.y < 500.0f + MF(0x2A0)) {
+        MF(MWOFF(0x2AC)) = v;
+        if (mario->position.y < 500.0f + MF(MWOFF(0x2A0))) {
             break;
         }
         {
@@ -410,7 +410,7 @@ void mot_damageToge(void) {
             d = distABf(dest.x, dest.z, mario->position.x, mario->position.z);
             mario->multiTimer = (s16)(d / 8);
             mario->directionView = angleABf(mario->position.x, mario->position.z, dest.x, dest.z);
-            mario->wCamVal1 = (dest.y - MF(0x2A0)) / (f32)MI(0x48);
+            mario->wCamVal1 = (dest.y - MF(MWOFF(0x2A0))) / (f32)MI(0x48);
             mario->currSubMotionId = 12;
         }
         break;

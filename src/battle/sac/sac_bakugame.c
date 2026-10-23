@@ -1,3 +1,4 @@
+#include "icon_ids.h"
 #pragma optimize_for_size on
 #pragma dont_inline on
 #include "battle/battle.h"
@@ -204,7 +205,7 @@ extern s32 hitCheck_EnemyTeam[];
 extern s32 hitCheck_AudienceTeam[];
 
 static s32 weapon[] = {
-    (s32)"btl_wn_sac_bakugame", 26738688, 0, (s32)"msg_bakugame", 1677722112, 1065353216, 17130546, 0,
+    (s32)"btl_wn_sac_bakugame", ICON_198 << 16, 0, (s32)"msg_bakugame", 1677722112, 1065353216, 17130546, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34603104, 536870912, 770, (s32)"msg_sac_3", 131208, 2047, 0,
@@ -475,7 +476,7 @@ USER_FUNC(bakuGameMain) {
             for (i = 0; i < 3; i++) {
                 b = &w->btn[i];
                 if (b->target == t) {
-                    b->hp -= 5.0f;
+                    b->hp -= VERSION_PICK(5.0f, 2.5f);
                 }
             }
         }
@@ -725,6 +726,11 @@ state_end:
                 w->s7c = 20;
                 w->s80 = 0;
                 w->cd = b->target;
+#ifdef VERSION_G8ME01
+                if (w->cc == w->cd) {
+                    w->s7c = 30;
+                }
+#endif
                 break;
             }
         }
@@ -766,10 +772,12 @@ state_end:
         }
         break;
     case 20:
+#ifndef VERSION_G8ME01
         if (w->cc == w->cd) {
             w->s7c = 30;
             break;
         }
+#endif
         switch (w->cc) {
         case 0:
             if (w->s80 == 0) {
@@ -1330,13 +1338,13 @@ void bakuGameDisp2D(CameraId cam, void* param) {
         b = &w->btn[i];
         switch (b->button) {
         case 0x100:
-            icon = 100;
+            icon = ICON_064;
             break;
         case 0x200:
-            icon = 102;
+            icon = ICON_066;
             break;
         case 0x400:
-            icon = 104;
+            icon = ICON_068;
             break;
         default:
             icon = 0;

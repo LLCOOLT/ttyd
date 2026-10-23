@@ -199,7 +199,11 @@ BattleUnitKind unit_atmic_teresa = {
     100,
     0,
     50,
+#ifdef VERSION_G8ME01
+    6,
+#else
     9999,
+#endif
     120,
     110,
     30,
@@ -316,7 +320,11 @@ s32 weapon_atmic_teresa_press[] = {
 };
 
 s32 weapon_atmic_teresa_bikkuri[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     4, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 71, 2047, 0,
@@ -325,7 +333,11 @@ s32 weapon_atmic_teresa_bikkuri[] = {
 };
 
 s32 weapon_atmic_teresa_surprise[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     4, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 103, 2047, 0,
@@ -334,7 +346,11 @@ s32 weapon_atmic_teresa_surprise[] = {
 };
 
 s32 weapon_atmic_teresa_breath[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     3, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 151, 2047, -2147483644,

@@ -77,6 +77,15 @@ void DrawSubMenuCommonProcessSub1(BattleSubMenu* menu, BattleCursor* cursor, s32
 void btlDispGXQuads2D(f32 x0, f32 y0, f32 x1, f32 y1, u8 r, u8 g, u8 b, u8 a);
 #include "mario/mariost.h"
 #include "sdk/texPalette.h"
+#include "icon_ids.h"
+// US: menu animation lengths scale with the display rate (gp->framerate is 60 or 50)
+#ifdef VERSION_G8ME01
+#define FRAMES(n) (gp->framerate * (n) / 60)
+#define FRAMES_STEP(jp, n, x) ((x) * ((n) / gp->framerate))
+#else
+#define FRAMES(n) (n)
+#define FRAMES_STEP(jp, n, x) ((jp) * (x))
+#endif
 extern GlobalWork* gp;
 void FontDrawStringCenterMtx(Mtx mtx, const char* msg);
 void btlDispGXPoint2D(f32 x, f32 y, u8 r, u8 g, u8 b, u8 a, f32 s, f32 t);
@@ -263,7 +272,7 @@ void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32
     PSMTXConcat(out, scl, out);
     icon = *(u16*)&act->icon;
     if (!icon) {
-        icon = 0x18B;
+        icon = ICON_18B;
     }
     if (act->enabled == 1) {
         ((void (*)(Mtx, s16, u16))iconDispGx2)(out, 0x10, icon);
@@ -272,7 +281,15 @@ void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32
     }
     name = act->name;
     PSMTXTrans(trn, 0.0f, 52.5f, 0.0f);
+#ifdef VERSION_G8ME01
+    {
+        // US: long command names are squeezed to 90 units wide
+        f32 w = FontGetMessageWidth(name);
+        PSMTXScale(scl, w > 90.0f ? 0.9f * (90.0f / w) : 0.9f, 0.9f, 0.9f);
+    }
+#else
     PSMTXScale(scl, 0.9f, 0.9f, 0.9f);
+#endif
     PSMTXRotRad(rot, 'y', rad);
     PSMTXConcat(m, rot, out);
     PSMTXConcat(out, trn, out);
@@ -357,7 +374,7 @@ void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v
     PSMTXConcat(out, trn, out);
     icon = *(u16*)&act->icon;
     if (!icon) {
-        icon = 0x18B;
+        icon = ICON_18B;
     }
     if (act->enabled == 1) {
         iconDispGxCol(out, 0x10, icon, (GXColor){c, c, c, 0xFF});
@@ -446,7 +463,7 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
     PSMTXConcat(m, trn, out);
     PSMTXConcat(out, scl, out);
     if (!(( u16)icon) ) {
-        icon = 0x18B;
+        icon = ICON_18B;
     }
     if (enabled == 1) {
         iconDispGxCol(out, 0x10, icon, (GXColor){0xFF, 0xFF, 0xFF, alpha});
@@ -658,6 +675,136 @@ void DrawMenuPartyChangeButton_Sub(u32 id, f32 x, f32 y, f32 angle) {
     btlDispTexPlane2(mtx, id, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, 0);
 }
 
+#ifdef VERSION_G8ME01
+// US: per-language "DANGER"/"PERIL" textures, the marks drawn larger outside Japanese, and the
+// Mario and partner marks split into two functions drawn in an order that keeps the front one on top.
+u16 danger_icon_tbl[6] = {6, 7, 8, 7, 9, 10};
+u16 peril_icon_tbl[6] = {11, 12, 13, 14, 15, 16};
+
+void N_DrawMenuMarioPinchMark(void) {
+    Mtx m;
+    Mtx out;
+    Mtx s;
+    GXTexObj texobj;
+    Vec p;
+    BattleWork* wp = _battleWorkPointer;
+    CameraEntry* cam;
+    BattleUnit* unit;
+    u8 r;
+    u8 g;
+    u8 b;
+    u8 a;
+    u32 id;
+
+    cam = camGetPtr(8);
+    unit = BattleGetMarioPtr(wp);
+    if (unit->currentHp > 0 && unit->currentHp < unit->maxHp && unit->currentHp <= 5) {
+        if (unit->currentHp == 1) {
+            id = peril_icon_tbl[gp->language];
+            if (gp->retraceCount % 50 <= 24) {
+                r = 0xFF;
+                g = 0xE9;
+                b = 0x40;
+                a = 0xFF;
+            } else {
+                r = 0xE9;
+                g = 0x52;
+                b = 0x2F;
+                a = 0xFF;
+            }
+        } else {
+            r = 0xFF;
+            g = 0xE9;
+            b = 0x40;
+            a = 0xFF;
+            id = danger_icon_tbl[gp->language];
+        }
+        TEXGetGXTexObjFromPalette(*wp->menuTex->data, &texobj, id);
+        GXLoadTexObj(&texobj, GX_TEXMAP0);
+        btlGetScreenPoint((Vec*)((u8*)unit + 0x3C), &p);
+        if (unit->mPosition.x > -120.0f) {
+            PSMTXTrans(m, p.x - 20.0f, 60.0f + p.y, 20.0f);
+        } else {
+            PSMTXTrans(m, p.x - 20.0f, 60.0f + p.y, 0.0f);
+        }
+        PSMTXConcat(cam->view, m, out);
+        if ((u32)gp->language != 0) {
+            PSMTXScale(s, 1.5f, 1.5f, 1.5f);
+            PSMTXConcat(out, s, out);
+        }
+        GXLoadPosMtxImm(out, 0);
+        btlDispGXQuads2D(-28.0f, 12.0f, 28.0f, -12.0f, r, g, b, a);
+    }
+}
+
+void N_DrawMenuPartyPinchMark(void) {
+    Mtx m;
+    Mtx out;
+    Mtx s;
+    GXTexObj texobj;
+    Vec p;
+    BattleWork* wp = _battleWorkPointer;
+    CameraEntry* cam;
+    BattleUnit* unit;
+    u8 r;
+    u8 g;
+    u8 b;
+    u8 a;
+    u32 id;
+
+    cam = camGetPtr(8);
+    unit = BattleGetPartyPtr(wp);
+    if (unit && unit->currentHp > 0 && unit->currentHp < unit->maxHp && unit->currentHp <= 5) {
+        if (unit->currentHp == 1) {
+            id = peril_icon_tbl[gp->language];
+            if (gp->retraceCount % 50 <= 24) {
+                r = 0xFF;
+                g = 0xE9;
+                b = 0x40;
+                a = 0xFF;
+            } else {
+                r = 0xE9;
+                g = 0x52;
+                b = 0x2F;
+                a = 0xFF;
+            }
+        } else {
+            r = 0xFF;
+            g = 0xE9;
+            b = 0x40;
+            a = 0xFF;
+            id = danger_icon_tbl[gp->language];
+        }
+        TEXGetGXTexObjFromPalette(*wp->menuTex->data, &texobj, id);
+        GXLoadTexObj(&texobj, GX_TEXMAP0);
+        btlGetScreenPoint((Vec*)((u8*)unit + 0x3C), &p);
+        if (unit->mPosition.x > -120.0f) {
+            PSMTXTrans(m, p.x - 20.0f, 60.0f + p.y, 10.0f);
+        } else {
+            PSMTXTrans(m, p.x - 20.0f, 60.0f + p.y, 0.0f);
+        }
+        PSMTXConcat(cam->view, m, out);
+        if ((u32)gp->language != 0) {
+            PSMTXScale(s, 1.5f, 1.5f, 1.5f);
+            PSMTXConcat(out, s, out);
+        }
+        GXLoadPosMtxImm(out, 0);
+        btlDispGXQuads2D(-28.0f, 12.0f, 28.0f, -12.0f, r, g, b, a);
+    }
+}
+
+void DrawMenuPinchMark(void) {
+    BattleUnit* unit = BattleGetMarioPtr(_battleWorkPointer);
+    btlDispGXInit2D();
+    if (((Vec*)((u8*)unit + 0x3C))->x > -120.0f) {
+        N_DrawMenuPartyPinchMark();
+        N_DrawMenuMarioPinchMark();
+    } else {
+        N_DrawMenuMarioPinchMark();
+        N_DrawMenuPartyPinchMark();
+    }
+}
+#else
 void DrawMenuPinchMark(void) {
     Mtx m;
     Mtx out;
@@ -736,6 +883,7 @@ void DrawMenuPinchMark(void) {
         btlDispGXQuads2D(-28.0f, 12.0f, 28.0f, -12.0f, r, g, b, a);
     }
 }
+#endif
 
 void DrawMenuHelpWin(const char* msg, f32 x, f32 y) {
     f32 tx;
@@ -805,20 +953,24 @@ void DrawMenuCursorAndScrollArrow(const Vec* v) {
 
     bob = intplGetValue(4, menu->field_11C, 6, 0.0f, 10.0f);
     menu->field_11C++;
+#ifdef VERSION_G8ME01
+    if (menu->field_11C >= gp->framerate * 12 / 60) {
+#else
     if (menu->field_11C >= 12) {
+#endif
         menu->field_11C = 0;
     }
     if (cursor->field_4 > 0) {
         pos.x = 155.0f + v->x;
         pos.y = 15.0f + v->y + bob;
         pos.z = 0.0f;
-        iconDispGx(&pos, 0x10, 0x1B5, 0.75f);
+        iconDispGx(&pos, 0x10, ICON_1B5, 0.75f);
     }
     if (cursor->field_4 < cursor->unk8 - 6) {
         pos.x = 155.0f + v->x;
         pos.y = 20.0f + v->y - 164.0f - bob;
         pos.z = 0.0f;
-        iconDispGx(&pos, 0x10, 0x1B6, 0.75f);
+        iconDispGx(&pos, 0x10, ICON_1B6, 0.75f);
     }
     n = cursor->field_0 - cursor->field_4;
     if (n < 0) {
@@ -830,7 +982,7 @@ void DrawMenuCursorAndScrollArrow(const Vec* v) {
     pos.x = v->x;
     pos.y = v->y - (f32)n * 24.0f;
     pos.z = 0.0f;
-    iconDispGx(&pos, 0x14, 0x1F0, 1.0f);
+    iconDispGx(&pos, 0x14, ICON_1F0, 1.0f);
 }
 
 void InitSubMenuCommonProcess(BattleSubMenu** out, BattleCursor** mainCursor, BattleCursor* cursor) {
@@ -1039,12 +1191,12 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
                 {
                     f32 px = ((Vec*)b)[i].x;
                     f32 py;
-                    ((Vec*)b)[i].x = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(4, px, -60.0f, menu->field_48[i], 12);
+                    ((Vec*)b)[i].x = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(4, px, -60.0f, menu->field_48[i], FRAMES(12));
                     py = ((Vec*)b)[i].y;
-                    ((Vec*)b)[i].y = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(4, py, 55.0f, menu->field_48[i], 12);
+                    ((Vec*)b)[i].y = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(4, py, 55.0f, menu->field_48[i], FRAMES(12));
                 }
                 PSMTXTrans(((Mtx*)a)[i], 20.0f + ((Vec*)b)[i].x, ((Vec*)b)[i].y, ((Vec*)b)[i].z);
-                ((f32*)c)[i] = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(0, 0.0f, 360.0f, menu->field_48[i], 12);
+                ((f32*)c)[i] = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(0, 0.0f, 360.0f, menu->field_48[i], FRAMES(12));
                 if (((f32*)c)[i] > 360.0f) {
                     ((f32*)c)[i] -= 360.0f;
                 }
@@ -1052,7 +1204,7 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
                     menu->field_1C = 1;
                 }
                 menu->field_48[i]++;
-                if (menu->field_48[i] > 12) {
+                if (menu->field_48[i] > FRAMES(12)) {
                     menu->field_34[i] = 1;
                 }
                 break;
@@ -1097,12 +1249,12 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
                 menu->field_A4[i] &= ~1;
                 menu->field_114[i] = 0xFF;
                 if (menu->field_DC[i] >= 0 && i != 6) {
-                    s = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(0, 90.0f, 0.0f, menu->field_DC[i], 12);
+                    s = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(0, 90.0f, 0.0f, menu->field_DC[i], FRAMES(12));
                     menu->field_A4[i] |= 1;
                     PSMTXRotRad(((Mtx*)d)[i], 'y', 0.017453292f * s);
                 }
                 menu->field_DC[i]++;
-                if (menu->field_DC[i] > 12) {
+                if (menu->field_DC[i] > FRAMES(12)) {
                     menu->field_C0[i] = 2;
                 }
                 break;
@@ -1184,7 +1336,11 @@ void BattleMenuDisp_ActSelect_Init(BattleWork* wp, BattleCursor* cursor, BattleC
                 idx = 0;
             }
             menu->field_34[idx] = 0;
+#ifdef VERSION_G8ME01
+            menu->field_48[idx] = (i * (gp->framerate * 10 / 60)) / 2;
+#else
             menu->field_48[idx] = (i * 10) / 2;
+#endif
             menu->field_84[idx] = i;
             menu->field_20[idx] = 0;
         }
@@ -1301,7 +1457,7 @@ void DrawMainMenu(BattleWork* wp_) {
         case 1:
             menu->field_20[i] |= 1;
             c = 0.0f;
-            a = c + 0.2f * menu->field_48[i];
+            a = c + FRAMES_STEP(0.2f, 12.0f, menu->field_48[i]);
             b = 3.1415927f * kakutable[cursor->unk8 - 3][menu->field_84[i]] / 180.0f;
             if (a >= b) {
                 a = b;
@@ -1312,7 +1468,7 @@ void DrawMainMenu(BattleWork* wp_) {
             pos[i].y += oy;
             pos[i].z = oy;
             if (i == cursor->field_0) {
-                c = 270.0f + 90.0f * menu->field_48[i] / 10.0f;
+                c = 270.0f + 90.0f * menu->field_48[i] / (f32)FRAMES(10);
                 if (c >= 360.0f) {
                     c = 0.0f;
                 }
@@ -1321,7 +1477,7 @@ void DrawMainMenu(BattleWork* wp_) {
                 PSMTXConcat(trans, rot, mtx[i]);
                 menu->field_20[i] |= 2;
             } else {
-                c = 270.0f + 90.0f * menu->field_48[i] / 10.0f;
+                c = 270.0f + 90.0f * menu->field_48[i] / (f32)FRAMES(10);
                 if (c >= 360.0f) {
                     c = 0.0f;
                 }
@@ -1330,7 +1486,7 @@ void DrawMainMenu(BattleWork* wp_) {
                 PSMTXConcat(trans, rot, mtx[i]);
             }
             z[i] = 0.0f;
-            if (a >= b && menu->field_48[i] >= 10) {
+            if (a >= b && menu->field_48[i] >= FRAMES(10)) {
                 menu->field_34[i] = 3;
                 menu->field_48[i] = -1;
             }
@@ -1357,7 +1513,7 @@ void DrawMainMenu(BattleWork* wp_) {
             if (0.0f == b) {
                 b = 360.0f;
             }
-            a = 3.1415927f * c / 180.0f + 0.2f * menu->field_48[i];
+            a = 3.1415927f * c / 180.0f + FRAMES_STEP(0.2f, 12.0f, menu->field_48[i]);
             b = 3.1415927f * b / 180.0f;
             if (a >= b) {
                 a = b;
@@ -1379,7 +1535,7 @@ void DrawMainMenu(BattleWork* wp_) {
             if (0.0f == c) {
                 c = 360.0f;
             }
-            a = 3.1415927f * c / 180.0f - 0.2f * menu->field_48[i];
+            a = 3.1415927f * c / 180.0f - FRAMES_STEP(0.2f, 12.0f, menu->field_48[i]);
             b = 3.1415927f * kakutable[cursor->unk8 - 3][menu->field_84[i]] / 180.0f;
             if (a <= b) {
                 a = b;
@@ -1404,12 +1560,12 @@ void DrawMainMenu(BattleWork* wp_) {
             pos[i].x += ox;
             pos[i].y += oy;
             pos[i].z = oy;
-            pos[i].x = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(4, -60.0f, pos[i].x, menu->field_48[i], 12);
-            pos[i].y = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(4, 55.0f, pos[i].y, menu->field_48[i], 12);
+            pos[i].x = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(4, -60.0f, pos[i].x, menu->field_48[i], FRAMES(12));
+            pos[i].y = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(4, 55.0f, pos[i].y, menu->field_48[i], FRAMES(12));
             PSMTXTrans(mtx[i], 20.0f + pos[i].x, pos[i].y, pos[i].z);
-            z[i] = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(0, 360.0f, 0.0f, menu->field_48[i], 12);
+            z[i] = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(0, 360.0f, 0.0f, menu->field_48[i], FRAMES(12));
             menu->field_48[i]++;
-            if (menu->field_48[i] > 12) {
+            if (menu->field_48[i] > FRAMES(12)) {
                 menu->field_34[i] = 3;
             }
             break;
@@ -1595,7 +1751,7 @@ void DrawOperationWin(void) {
             if (*(u16*)&items[i].icon) {
                 icons[i] = *(u16*)&items[idx].icon;
             } else {
-                icons[i] = 0x18B;
+                icons[i] = ICON_18B;
             }
             names[i] = items[idx].name;
             costs[i] = items[idx].cost;
@@ -1667,7 +1823,7 @@ void DrawChangePartyWin(void) {
             if (*(u16*)&items[idx].icon) {
                 icons[i] = *(u16*)&items[idx].icon;
             } else {
-                icons[i] = 0x18B;
+                icons[i] = ICON_18B;
             }
             names[i] = items[idx].name;
             costs[i] = 0;
@@ -1739,7 +1895,7 @@ void DrawMultiItemWin(void) {
             if (*(u16*)&items[idx].icon) {
                 icons[i] = *(u16*)&items[idx].icon;
             } else {
-                icons[i] = 0x18B;
+                icons[i] = ICON_18B;
             }
             names[i] = items[idx].name;
             costs[i] = items[idx].cost;

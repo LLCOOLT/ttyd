@@ -308,6 +308,19 @@ static USER_FUNC(mario_chk) {
     mapGrpFlagOn(name, 1);
     sprintf(name, "A_hikaru_%02d", n);
     hitGrpAttrOff(name, 0x800);
+#ifdef VERSION_G8ME01
+    j++;
+    if (j >= 50) {
+        j = 49;
+    }
+    sscanf((const char*)hit_list[j], "A_hikaru_%02d", &n);
+    sprintf(name, "hikaru_%02d", n);
+    mapGrpFlagOff(name, 1);
+    sprintf(name, "nashi_%02d", n);
+    mapGrpFlagOn(name, 1);
+    sprintf(name, "A_hikaru_%02d", n);
+    hitGrpAttrOff(name, 0x800);
+#endif
     event->userdata[1]++;
     if (event->userdata[1] > (event->userdata[2] == 0 ? 20 : 60)) {
         event->userdata[1] = 0;

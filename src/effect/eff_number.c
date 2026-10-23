@@ -3,7 +3,11 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdio.h>
-#include <string.h>
+#include <string.h>
+#include "version.h"
+// US effect texture ids are 0x1C lower for these entries.
+#define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
+
 
 static const f32 padz = 0.0f;
 
@@ -74,7 +78,7 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
             GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
             GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
         } else {
-            effGetTexObj(0x88, &texObj);
+            effGetTexObj(EFF_TEX(0x88), &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
             GXSetNumTevStages(3);
             GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);

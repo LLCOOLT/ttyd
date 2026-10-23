@@ -38,12 +38,12 @@ extern int __float_nan[];
 
 #define PF(p, o) (*(f32*)((u8*)(p) + (o)))
 #define PI(p, o) (*(s32*)((u8*)(p) + (o)))
-#define MF(o) (*(f32*)((u8*)mario + (o)))
-#define MI(o) (*(s32*)((u8*)mario + (o)))
-#define MH(o) (*(s16*)((u8*)mario + (o)))
-#define MV(o) (*(Vec*)((u8*)mario + (o)))
-#define MB(o) (*(s8*)((u8*)mario + (o)))
-#define MU(o) (*(u16*)((u8*)mario + (o)))
+#define MF(o) (*(f32*)((u8*)mario + MWOFF(o)))
+#define MI(o) (*(s32*)((u8*)mario + MWOFF(o)))
+#define MH(o) (*(s16*)((u8*)mario + MWOFF(o)))
+#define MV(o) (*(Vec*)((u8*)mario + MWOFF(o)))
+#define MB(o) (*(s8*)((u8*)mario + MWOFF(o)))
+#define MU(o) (*(u16*)((u8*)mario + MWOFF(o)))
 #define CAMF() (*(u16*)camGetPtr(8))
 
 typedef struct RollWork {
@@ -52,6 +52,9 @@ typedef struct RollWork {
     s32 state;
     s32 scaleState;
     s32 pad;
+#ifdef VERSION_G8ME01
+    s32 sfx; // US: roll sound id moved here from MarioWork 0x2A8
+#endif
 } RollWork;
 
 #define RW() ((RollWork*)marioGetPtr()->motStruct)
@@ -155,7 +158,7 @@ static inline s32 makeVec(f32 half) {
     s32 r = w;
     MarioWork* m = marioGetPtr();
     f32 c = (f32)(s32)(10.0f * m->moveDirection) / 10.0f;
-    f32 x = angleABf(0.0f, 0.0f, (f32)(s32)*((s8*)m + 0x24e), (f32)(s32)*((s8*)m + 0x24f));
+    f32 x = angleABf(0.0f, 0.0f, (f32)(s32)*((s8*)m + MWOFF(0x24e)), (f32)(s32)*((s8*)m + MWOFF(0x24f)));
     f32 lo;
     f32 hi;
     lo = c - half;
@@ -384,7 +387,7 @@ s32 marioRollTryCancel(void) {
     {
         s32 r;
         MarioWork* m = marioGetPtr();
-        if (*(s32*)((u8*)m + 0x2a4) & 0x200) {
+        if (*(s32*)((u8*)m + MWOFF(0x2a4)) & 0x200) {
             r = 1;
         } else if (m->flags & 0x8000000) {
             r = 1;
@@ -420,10 +423,17 @@ s32 marioRollCancel(void) {
 void mot_roll_post(void) {
     MarioWork* mario = marioGetPtr();
     MarioWork* m = marioGetPtr();
+#ifdef VERSION_G8ME01
+    if (marioGetPtr()->motStruct && (u32)RW()->sfx != (u32)-1) {
+        psndSFXOff(RW()->sfx);
+        RW()->sfx = -1;
+    }
+#else
     if (*(u32*)((u8*)m + 0x2a8) != (u32)-1) {
         psndSFXOff(*(s32*)((u8*)m + 0x2a8));
         *(s32*)((u8*)m + 0x2a8) = -1;
     }
+#endif
     m = marioGetPtr();
     m->camShiftTargetZ = 0.0f;
     m->camShiftRate.z = 0.004f;
@@ -454,10 +464,17 @@ void marioRollForceCancel(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->currMotionId == 0x16) {
         MarioWork* m = marioGetPtr();
+#ifdef VERSION_G8ME01
+        if (marioGetPtr()->motStruct && (u32)RW()->sfx != (u32)-1) {
+            psndSFXOff(RW()->sfx);
+            RW()->sfx = -1;
+        }
+#else
         if (*(u32*)((u8*)m + 0x2a8) != (u32)-1) {
             psndSFXOff(*(s32*)((u8*)m + 0x2a8));
             *(s32*)((u8*)m + 0x2a8) = -1;
         }
+#endif
         m = marioGetPtr();
         m->camShiftTargetZ = 0.0f;
         m->camShiftRate.z = 0.004f;
@@ -518,12 +535,16 @@ void marioReInit_roll(void) {
     MarioWork* mario = marioGetPtr();
     f32 z0;
     f32 z1;
-    p = __memAlloc(0, 0x14);
+    p = __memAlloc(0, sizeof(RollWork));
     marioGetPtr()->motStruct = p;
-    memset(marioGetPtr()->motStruct, 0, 0x14);
+    memset(marioGetPtr()->motStruct, 0, sizeof(RollWork));
     {
         MarioWork* t = marioGetPtr();
+#ifdef VERSION_G8ME01
+        if (marioGetPtr()->motStruct) RW()->sfx = -1;
+#else
         PI(t, 0x2a8) = -1;
+#endif
     }
     mario->trigFlags &= ~1;
     mario->currMotionId = 0x16;
@@ -557,7 +578,7 @@ void marioReInit_roll(void) {
 static inline s32 rollChk(void) {
     s32 r;
     MarioWork* m = marioGetPtr();
-    if (PI(m, 0x2a4) & 0x200) {
+    if (PI(m, MWOFF(0x2a4)) & 0x200) {
         r = 1;
     } else if (m->flags & 0x8000000) {
         r = 1;
@@ -595,13 +616,17 @@ void mot_roll(void) {
         MI(0x2b0) = 0;
         MI(0x2b4) = 0;
         {
-            void* p = __memAlloc(0, 0x14);
+            void* p = __memAlloc(0, sizeof(RollWork));
             marioGetPtr()->motStruct = p;
         }
-        memset(marioGetPtr()->motStruct, 0, 0x14);
+        memset(marioGetPtr()->motStruct, 0, sizeof(RollWork));
         {
             MarioWork* t = marioGetPtr();
+#ifdef VERSION_G8ME01
+            if (marioGetPtr()->motStruct) RW()->sfx = -1;
+#else
             PI(t, 0x2a8) = -1;
+#endif
         }
         MI(0x44) = 0;
     }
@@ -693,10 +718,17 @@ void mot_roll(void) {
         mario->displayDirection = 0.0f;
         {
             MarioWork* m = marioGetPtr();
+#ifdef VERSION_G8ME01
+            if (marioGetPtr()->motStruct && (u32)RW()->sfx != (u32)-1) {
+                psndSFXOff(RW()->sfx);
+                RW()->sfx = -1;
+            }
+#else
             if ((u32)PI(m, 0x2a8) != (u32)-1) {
                 psndSFXOff(PI(m, 0x2a8));
                 PI(m, 0x2a8) = -1;
             }
+#endif
         }
         {
             MarioWork* m = marioGetPtr();
@@ -958,7 +990,7 @@ void mot_roll(void) {
             nz = nz * (f32)cos(3.1415927f * MF(0x1a0) / 180.0f);
         }
     }
-    if (*(void**)((u8*)mario + 0x1d8)) {
+    if (*(void**)((u8*)mario + MWOFF(0x1d8))) {
         if (!marioChkBero(mario->hitobjFront)) {
             v29 = 0.05f * -v29 + v29;
             v28 = 0.05f * -v28 + v28;
@@ -1118,16 +1150,30 @@ void mot_roll(void) {
     }
     if (mario->baseSpeed) {
         MarioWork* m = marioGetPtr();
+#ifdef VERSION_G8ME01
+        if (marioGetPtr()->motStruct && (u32)RW()->sfx == (u32)-1) {
+            RW()->sfx = (s32)psndSFXOn_3D((char*)0x17b, &m->position);
+            PI(m, MWOFF(0x2a4)) |= 0x1000;
+        }
+#else
         if ((u32)PI(m, 0x2a8) == (u32)-1) {
             PI(m, 0x2a8) = (s32)psndSFXOn_3D((char*)0x17b, &m->position);
             PI(m, 0x2a4) |= 0x1000;
         }
+#endif
     } else {
         MarioWork* m = marioGetPtr();
+#ifdef VERSION_G8ME01
+        if (marioGetPtr()->motStruct && (u32)RW()->sfx != (u32)-1) {
+            psndSFXOff(RW()->sfx);
+            RW()->sfx = -1;
+        }
+#else
         if ((u32)PI(m, 0x2a8) != (u32)-1) {
             psndSFXOff(PI(m, 0x2a8));
             PI(m, 0x2a8) = -1;
         }
+#endif
     }
     rd = rollData[4];
     {

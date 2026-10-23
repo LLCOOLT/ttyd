@@ -303,6 +303,9 @@ USER_FUNC(camGetPos);
 USER_FUNC(chain_main);
 USER_FUNC(kamec_fire_magic_delete);
 USER_FUNC(kamec_fire_magic);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_fbat_trans_floor_position_wide);
+#endif
 extern s32 evt_eff64[];
 extern s32 evt_mario_get_mov_spd[];
 extern s32 evt_npc_set_color[];
@@ -355,7 +358,11 @@ s32 patamet_move_event[151];
 s32 patamet_find_event[108];
 s32 patamet_lost_event[34];
 s32 patamet_return_event[143];
+#ifdef VERSION_G8ME01
+s32 chorobon_move_event[71];
+#else
 s32 chorobon_move_event[69];
+#endif
 s32 chorobon_find_event[63];
 s32 chorobon_lost_event[14];
 s32 chorobon_return_event[43];
@@ -402,12 +409,24 @@ s32 togedaruma_find_event[61];
 s32 togedaruma_lost_event[38];
 s32 togedaruma_return_event[44];
 s32 barriern_init_event[37];
+#ifdef VERSION_G8ME01
+s32 barriern_move_event[90];
+#else
 s32 barriern_move_event[89];
+#endif
+#ifdef VERSION_G8ME01
+s32 barriern2_move_event[90];
+#else
 s32 barriern2_move_event[70];
+#endif
 s32 barriern_dead_event[17];
 s32 barriern_find_event[189];
 s32 barriern_lost_event[17];
+#ifdef VERSION_G8ME01
+s32 barriern_return_event[43];
+#else
 s32 barriern_return_event[42];
+#endif
 s32 barriern_blow_event[27];
 s32 piders_move_event[111];
 s32 piders_find_event[206];
@@ -423,7 +442,11 @@ s32 dokugassun_find_event[69];
 s32 dokugassun_lost_event[27];
 s32 dokugassun_return_event[158];
 s32 basabasa_init_event[17];
+#ifdef VERSION_G8ME01
+s32 basabasa_move_event[72];
+#else
 s32 basabasa_move_event[67];
+#endif
 s32 basabasa_find_event[69];
 s32 basabasa_lost_event[31];
 s32 basabasa_return_event[44];
@@ -1501,10 +1524,17 @@ EVT_BEGIN(chorobon_move_event)
     CALL(evt_sub_random, 3, LW(4))
     ADD(LW(4), 2)
     LOOP(LW(4))
+#ifdef VERSION_G8ME01
+        WAIT_FRAMES(1)
+#endif
         CALL(evt_sub_random, 360, LW(3))
         CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
         CALL(evt_npc_add_dirdist, LW(0), LW(2), LW(3), 50)
+#ifdef VERSION_G8ME01
+        CALL(evt_npc_jump_position, STRING("me"), LW(0), LW(1), LW(2), 300, 0, FLOAT(30.0f), 0)
+#else
         CALL(evt_npc_jump_position, STRING("me"), LW(0), -10000, LW(2), 300, 0, FLOAT(30.0f), 0)
+#endif
     END_LOOP
     CALL(evt_get_target_dir, STRING("me"), STRING("mario"), LW(3))
     CALL(evt_npc_set_ry, STRING("me"), LW(3))
@@ -1522,7 +1552,11 @@ EVT_BEGIN(chorobon_find_event)
         CALL(evt_npc_set_ry, STRING("me"), LW(3))
         CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
         CALL(evt_npc_add_dirdist, LW(0), LW(2), LW(3), 50)
+#ifdef VERSION_G8ME01
+        CALL(evt_npc_jump_position, STRING("me"), LW(0), LW(1), LW(2), 300, 0, FLOAT(30.0f), 0)
+#else
         CALL(evt_npc_jump_position, STRING("me"), LW(0), -10000, LW(2), 300, 0, FLOAT(30.0f), 0)
+#endif
         WAIT_MS(50)
     END_LOOP
     CALL(evt_npc_set_scale, STRING("me"), 1, 1, 1)
@@ -1545,7 +1579,11 @@ EVT_BEGIN(chorobon_return_event)
     CALL(evt_npc_get_dir, STRING("me"), LW(3))
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(evt_npc_add_dirdist, LW(0), LW(2), LW(3), 50)
+#ifdef VERSION_G8ME01
+    CALL(evt_npc_jump_position, STRING("me"), LW(0), LW(1), LW(2), 300, 0, FLOAT(30.0f), 0)
+#else
     CALL(evt_npc_jump_position, STRING("me"), LW(0), -10000, LW(2), 300, 0, FLOAT(30.0f), 0)
+#endif
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
 EVT_END()
@@ -2297,7 +2335,11 @@ EVT_BEGIN(barriern_move_event)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(evt_npc_get_loiter_dir, LW(3), FLOAT(120.0f), FLOAT(240.0f))
     CALL(evt_npc_add_dirdist, LW(0), LW(2), LW(3), FLOAT(100.0f))
+#ifdef VERSION_G8ME01
+    CALL(evt_fbat_trans_floor_position_wide, LW(0), LW(1), LW(2), 30, 50, 60)
+#else
     CALL(evt_fbat_trans_floor_position, LW(0), LW(1), LW(2), 30, 50)
+#endif
     CALL(evt_npc_glide_position, STRING("me"), LW(0), LW(1), LW(2), 2000, FLOAT(40.0f), 0, 0, 1)
     GOTO(0)
     RETURN
@@ -2306,6 +2348,12 @@ EVT_END()
 EVT_BEGIN(barriern2_move_event)
     CALL_CHILD(PTR(enemy_common_flag_init_event))
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 1024)
+#ifdef VERSION_G8ME01
+    CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 32)
+    CALL(evt_npc_set_anim, STRING("me"), STRING("S_1"))
+    CALL(evt_npc_flag_onoff, 0, STRING("me"), 2097152)
+#endif
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 131072)
     CALL(evt_npc_flag_onoff, 0, STRING("slave_0"), 131072)
     LABEL(0)
@@ -2316,7 +2364,11 @@ EVT_BEGIN(barriern2_move_event)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(evt_npc_get_loiter_dir, LW(3), FLOAT(120.0f), FLOAT(240.0f))
     CALL(evt_npc_add_dirdist, LW(0), LW(2), LW(3), FLOAT(100.0f))
+#ifdef VERSION_G8ME01
+    CALL(evt_fbat_trans_floor_position_wide, LW(0), LW(1), LW(2), 30, 50, 60)
+#else
     CALL(evt_fbat_trans_floor_position, LW(0), LW(1), LW(2), 30, 50)
+#endif
     CALL(evt_npc_glide_position, STRING("me"), LW(0), LW(1), LW(2), 1000, FLOAT(120.0f), 0, 0, 1)
     GOTO(0)
     RETURN
@@ -2480,7 +2532,11 @@ EVT_BEGIN(barriern_return_event)
     CALL(evt_npc_get_dir, STRING("me"), LW(3))
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(evt_npc_add_dirdist, LW(0), LW(2), LW(3), FLOAT(100.0f))
+#ifdef VERSION_G8ME01
+    CALL(evt_fbat_trans_floor_position_wide, LW(0), LW(1), LW(2), 30, 50, 60)
+#else
     CALL(evt_fbat_trans_floor_position, LW(0), LW(1), LW(2), 30, 50)
+#endif
     CALL(evt_npc_glide_position, STRING("me"), LW(0), LW(1), LW(2), 2000, FLOAT(40.0f), 0, 0, 1)
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
@@ -2750,6 +2806,27 @@ s32 basabasa_init_event[] = {
     1,
 };
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(basabasa_move_event)
+    CALL(evt_npc_get_home_position, STRING("me"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_position, STRING("me"), LW(3), LW(4), LW(5))
+    IF_INT_LESS(LW(4), LW(1))
+        CALL(evt_npc_set_walk_anim, STRING("me"))
+        CALL(evt_set_dir_to_home, STRING("me"))
+        CALL(evt_npc_get_dir, STRING("me"), LW(3))
+        CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_add_dirdist, LW(0), LW(2), LW(3), FLOAT(25.0f))
+        CALL(evt_npc_get_home_position, STRING("me"), LW(4), LW(1), LW(5))
+        CALL(evt_npc_glide_position, STRING("me"), LW(0), LW(1), LW(2), 500, 0, FLOAT(-50.0f), 0, 2)
+    END_IF
+    CALL(evt_npc_flag_onoff, 0, STRING("me"), 2097152)
+    LABEL(0)
+    CALL(evt_npc_set_anim, STRING("me"), STRING("BSA_S_2"))
+    WAIT_FRAMES(60)
+    GOTO(0)
+    RETURN
+EVT_END()
+#else
 s32 basabasa_move_event[] = {
     327771, (s32)evt_npc_get_home_position, (s32)"me", -30000000, -29999999, -29999998, 327771, (s32)evt_npc_get_position,
     (s32)"me", -29999997, -29999996, -29999995, 131098, -29999996, -29999999, 131163,
@@ -2761,6 +2838,7 @@ s32 basabasa_move_event[] = {
     0, 196699, (s32)evt_npc_set_anim, (s32)"me", (s32)"BSA_S_2", 65545, 60, 65540,
     0, 2, 1,
 };
+#endif
 
 s32 basabasa_find_event[] = {
     262235, (s32)evt_npc_flag_onoff, 1, (s32)"me", 2097152, 131163, (s32)evt_npc_set_run_anim, (s32)"me",

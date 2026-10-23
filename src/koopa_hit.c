@@ -34,7 +34,7 @@ typedef struct KpaHitWork {
     f32 headDist[10];
 } KpaHitWork;
 
-#define KPW (*(KpaHitWork**)((u8*)marioGetPtr() + 0x28C))
+#define KPW (*(KpaHitWork**)((u8*)marioGetPtr() + MWOFF(0x28C)))
 #define MF(m, off) (*(f32*)((u8*)(m) + (off)))
 #define MS16(m, off) (*(s16*)((u8*)(m) + (off)))
 #define KHEAD(i) (*(HitEntry**)((u8*)KPW + 0x20 + (i) * 4))
@@ -50,9 +50,9 @@ static inline f32 kpa_nrmToAngle(f32 x, f32 y, f32 z) {
 }
 
 static inline f32 kpa_nrmSet(MarioWork* m, f32 x, f32 y, f32 z) {
-    MF(m, 0x218) = (s32)(angleABf(0.0f, 0.0f, 100.0f * z, 100.0f * y) - 180.0f);
-    MF(m, 0x21C) = 0.0f;
-    MF(m, 0x220) = (s32)(angleABf(0.0f, 0.0f, 100.0f * x, 100.0f * y) - 180.0f);
+    MF(m, MWOFF(0x218)) = (s32)(angleABf(0.0f, 0.0f, 100.0f * z, 100.0f * y) - 180.0f);
+    MF(m, MWOFF(0x21C)) = 0.0f;
+    MF(m, MWOFF(0x220)) = (s32)(angleABf(0.0f, 0.0f, 100.0f * x, 100.0f * y) - 180.0f);
     return kpa_nrmToAngle(x, y, z);
 }
 
@@ -173,10 +173,10 @@ HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
 
     m = marioGetPtr();
     best = NULL;
-    MF(m, 0x218) = 0.0f;
-    MF(m, 0x21C) = 0.0f;
-    MF(m, 0x220) = 0.0f;
-    MF(m, 0x214) = 0.0f;
+    MF(m, MWOFF(0x218)) = 0.0f;
+    MF(m, MWOFF(0x21C)) = 0.0f;
+    MF(m, MWOFF(0x220)) = 0.0f;
+    MF(m, MWOFF(0x214)) = 0.0f;
     if (m->flags & 0x200) {
         *outY = m->position.y;
         return NULL;
@@ -262,7 +262,7 @@ HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
         }
         hy = (s32)(100.0f * hy + 0.5f) / 100.0f;
         if (hit) {
-            MF(m, 0x214) = kpa_nrmSet(marioGetPtr(), nx, ny, nz);
+            MF(m, MWOFF(0x214)) = kpa_nrmSet(marioGetPtr(), nx, ny, nz);
             if (hy < py && __fabsf(hy - py) >= 2.0f) {
                 *outDepth = py - hy;
                 *outAng = angleABf(px, pz, hx, hz);
@@ -383,7 +383,21 @@ HitEntry* kpaGetHitobjHead(s32 i) {
 }
 
 HitEntry* kpaGetHitobjHead2(void) {
+#ifdef VERSION_G8ME01
+    s32 i;
+    HitEntry* hit;
+    HitEntry* ret;
+    for (i = 0; i < 10; i++) {
+        hit = KHEAD(i);
+        ret = hit;
+        if (hit) {
+            break;
+        }
+    }
+    return ret;
+#else
     return KPW->head[0];
+#endif
 }
 
 HitEntry* kpaGetHitobjRide(s32 i) {
@@ -427,16 +441,16 @@ return r;
 
 long kpaClearHitobjRide(void) {
     MarioWork* m = marioGetPtr();
-    *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x4C) = NULL;
-    *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x50) = NULL;
-    *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x54) = NULL;
-    *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x58) = NULL;
-    *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x5C) = NULL;
-    *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x60) = NULL;
-    *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x64) = NULL;
-    *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x68) = NULL;
-    *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x6C) = NULL;
-    *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x70) = NULL;
+    *(HitEntry**)(*(u8**)((u8*)m + MWOFF(0x28C)) + 0x4C) = NULL;
+    *(HitEntry**)(*(u8**)((u8*)m + MWOFF(0x28C)) + 0x50) = NULL;
+    *(HitEntry**)(*(u8**)((u8*)m + MWOFF(0x28C)) + 0x54) = NULL;
+    *(HitEntry**)(*(u8**)((u8*)m + MWOFF(0x28C)) + 0x58) = NULL;
+    *(HitEntry**)(*(u8**)((u8*)m + MWOFF(0x28C)) + 0x5C) = NULL;
+    *(HitEntry**)(*(u8**)((u8*)m + MWOFF(0x28C)) + 0x60) = NULL;
+    *(HitEntry**)(*(u8**)((u8*)m + MWOFF(0x28C)) + 0x64) = NULL;
+    *(HitEntry**)(*(u8**)((u8*)m + MWOFF(0x28C)) + 0x68) = NULL;
+    *(HitEntry**)(*(u8**)((u8*)m + MWOFF(0x28C)) + 0x6C) = NULL;
+    *(HitEntry**)(*(u8**)((u8*)m + MWOFF(0x28C)) + 0x70) = NULL;
 }
 
 HitEntry* kpaGetHitobj(void) {
@@ -444,7 +458,7 @@ HitEntry* kpaGetHitobj(void) {
     if (m->characterId != 2) {
         return NULL;
     }
-    return (*(KpaHitWork**)((u8*)m + 0x28C))->obj;
+    return (*(KpaHitWork**)((u8*)m + MWOFF(0x28C)))->obj;
 }
 
 HitEntry* kpaGetHitFlame(void) {
@@ -452,7 +466,7 @@ HitEntry* kpaGetHitFlame(void) {
     if (m->characterId != 2) {
         return NULL;
     }
-    return (*(KpaHitWork**)((u8*)m + 0x28C))->flame;
+    return (*(KpaHitWork**)((u8*)m + MWOFF(0x28C)))->flame;
 }
 
 static s32 head_sphere_data_lv1[] = {3, 32, 55, 24, 0, 26, 30, 16, 2, -10, 44, 25, 1};
@@ -476,7 +490,7 @@ HitEntry* kpaHitCheck(void) {
     if (m->characterId != 2) {
         return NULL;
     }
-    (*(KpaHitWork**)((u8*)m + 0x28C))->obj = NULL;
+    (*(KpaHitWork**)((u8*)m + MWOFF(0x28C)))->obj = NULL;
     kpa_headClear();
     if (kpaFireAttackCheck() == 1) {
         return NULL;
@@ -519,7 +533,7 @@ HitEntry* kpaHitCheck(void) {
             best = hit;
         }
     }
-    (*(KpaHitWork**)((u8*)m + 0x28C))->obj = best;
+    (*(KpaHitWork**)((u8*)m + MWOFF(0x28C)))->obj = best;
     return best;
 }
 

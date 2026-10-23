@@ -9,6 +9,9 @@
 #include "string.h"
 
 static USER_FUNC(_set_draw_callback);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_btl_camera_shake_h);
+#endif
 USER_FUNC(btlevtcmd_AfterReactionEntry);
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -93,7 +96,11 @@ static s32 phase_event[126];
 static s32 attack_event[175];
 static __declspec(section ".data") s32 wait_event[6];
 static s32 dead_event[52];
+#ifdef VERSION_G8ME01
+static s32 explosion_event[254];
+#else
 static s32 explosion_event[247];
+#endif
 
 void animPoseSetDispCallBack(s32 poseId, void (*callback)(BattleUnitPart*, s32), void* userdata);
 
@@ -223,7 +230,13 @@ BattleUnitKind unit_giant_bomb = {
 };
 
 static s32 weapon_heavy_bomb_super_explosion[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    1677721602,
+#else
+    1677721600,
+#endif
+    1065353216, 16843009, (s32)weaponGetPowerDefault,
     4, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607136, 536870912, 50332418, 0, 139399, 2047, 4,
@@ -623,7 +636,11 @@ EVT_END()
 
 static s32 explosion_event[] = {
     262235, (s32)btlevtcmd_GetUnitWork, -2, 2, -30000000, 131163, (s32)evt_snd_sfxoff, -30000000,
-    262235, (s32)btlevtcmd_SetUnitWork, -2, 2, -1, 393307, (s32)btlevtcmd_snd_se, -2,
+    262235, (s32)btlevtcmd_SetUnitWork, -2, 2, -1,
+#ifdef VERSION_G8ME01
+    393307, (s32)evt_btl_camera_shake_h, 0, 10, 0, 60, 4,
+#endif
+    393307, (s32)btlevtcmd_snd_se, -2,
     (s32)"SFX_ENM_HEAVYB_ATTACK3", -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
     -29999999, -29999998, 196699, (s32)btlevtcmd_GetHeight, -2, -29999995, 131128, -29999995,
     2, 196699, (s32)btlevtcmd_GetStatusMg, -2, -29999994, 131132, -29999995, -29999994,

@@ -750,11 +750,27 @@ void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
     w = 108.0f;
     for (i = 0; i < 2; i++) {
         if (i == 0) {
+#ifdef VERSION_G8ME01
+            if ((u32)gp->language == 4) {
+                effGetTexObj(173, &texObj);
+            } else {
+                effGetTexObj(111, &texObj);
+            }
+#else
             effGetTexObj(0x8B, &texObj);
+#endif
             GXLoadTexObj(&texObj, GX_TEXMAP0);
             GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0x00, 0x00, 0x00, 0xA0 });
         } else {
+#ifdef VERSION_G8ME01
+            if ((u32)gp->language == 4) {
+                effGetTexObj(172, &texObj);
+            } else {
+                effGetTexObj(110, &texObj);
+            }
+#else
             effGetTexObj(0x8A, &texObj);
+#endif
             GXLoadTexObj(&texObj, GX_TEXMAP0);
             if (type == 4) {
                 GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xF5, 0x98, 0x9D, 0xFF });

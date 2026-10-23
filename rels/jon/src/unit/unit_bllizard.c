@@ -88,7 +88,7 @@ __declspec(section ".data") s32 fd_bllizard___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_bllizard_one_negone_359;
 __declspec(section ".data") s32 fd_bllizard___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_bllizard_one_364[1];
-BattleUnitKind unit_bllizard_15_data_60E68;
+BattleUnitKind unit_bllizard;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -157,7 +157,7 @@ __declspec(section ".data") s32 fd_bllizard_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_bllizard_15_data_60E68 = {
+BattleUnitKind unit_bllizard = {
     112,
     "btl_un_bllizard",
     9,
@@ -243,11 +243,23 @@ static s32 weapon_bllizard_attack[] = {
 };
 
 static s32 weapon_bllizard_bllizard_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    1677721602,
+#else
+    1677721600,
+#endif
+    1065353216, 16843009, (s32)weaponGetPowerDefault,
     5, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536875008, 33555202, 0, 71, 2047, -2147483644,
-    0, 0, 0, 0, 1966592, 0, 0, 0,
+    0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    3932672,
+#else
+    1966592,
+#endif
+    0, 0, 0,
     0, 0, 0, 0, 0, 100, 0, 0,
 };
 

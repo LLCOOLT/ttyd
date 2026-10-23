@@ -92,7 +92,7 @@ __declspec(section ".data") s32 fd_wanwan___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_wanwan_one_negone_359;
 __declspec(section ".data") s32 fd_wanwan___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_wanwan_one_364[1];
-BattleUnitKind unit_wanwan_15_data_3F3F0;
+BattleUnitKind unit_wanwan;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -159,7 +159,7 @@ __declspec(section ".data") s32 fd_wanwan_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_wanwan_15_data_3F3F0 = {
+BattleUnitKind unit_wanwan = {
     127,
     "btl_un_wanwan",
     7,

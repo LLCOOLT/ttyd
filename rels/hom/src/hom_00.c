@@ -94,11 +94,11 @@ extern s32 evt_sub_intpl_msec_get_value[];
 extern s32 evt_sub_intpl_msec_init[];
 extern s32 evt_sub_mail_event[];
 extern s32 evt_telop_entry[];
-extern s32 hom_10_evt_resha_left_13_data_38E4[];
-extern s32 hom_10_evt_resha_right_13_data_3858[];
-extern s32 hom_10_evt_resha_start2_13_data_2E14[];
-extern s32 hom_10_evt_resha_start_13_data_2A44[];
-extern s32 hom_10_evt_resha_stop_13_data_3548[];
+extern s32 hom_10_evt_resha_left[];
+extern s32 hom_10_evt_resha_right[];
+extern s32 hom_10_evt_resha_start2[];
+extern s32 hom_10_evt_resha_start[];
+extern s32 hom_10_evt_resha_stop[];
 
 __declspec(section ".data") u64 fd_hom_00_negone_one_374;
 __declspec(section ".data") s32 fd_hom_00_neg_one_382[1];
@@ -139,7 +139,11 @@ static s32 evt_train[262];
 s32 evt_train_nidome[307];
 s32 evt_hom_touchaku[460];
 s32 evt_hom_touchaku_nidome[56];
+#ifdef VERSION_G8ME01
+s32 hom_00_init_evt[259];
+#else
 s32 hom_00_init_evt[247];
+#endif
 
 __declspec(section ".data") u64 fd_hom_00_negone_one_374 = 0xBF8000003F800000;
 
@@ -469,7 +473,7 @@ static EVT_BEGIN(evt_train)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("group614"), 1)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
-    SPAWN_EVENT(PTR(hom_10_evt_resha_start_13_data_2A44))
+    SPAWN_EVENT(PTR(hom_10_evt_resha_start))
     WAIT_MS(4500)
     CALL(evt_cam3d_evt_set, 50, 125, 500, 50, 75, 0, 1500, 12)
     WAIT_MS(1500)
@@ -552,13 +556,13 @@ EVT_BEGIN(evt_train_nidome)
             WAIT_MS(6000)
             CALL(evt_npc_set_ry, STRING("駅員2"), 90)
         END_INLINE_EVENT
-        SPAWN_EVENT(PTR(hom_10_evt_resha_start_13_data_2A44))
+        SPAWN_EVENT(PTR(hom_10_evt_resha_start))
         ELSE
         BEGIN_INLINE_EVENT
             WAIT_MS(6000)
             CALL(evt_npc_set_ry, STRING("駅員2"), 270)
         END_INLINE_EVENT
-        SPAWN_EVENT(PTR(hom_10_evt_resha_start2_13_data_2E14))
+        SPAWN_EVENT(PTR(hom_10_evt_resha_start2))
     END_IF
     WAIT_MS(10000)
     SET_VALUE(GSWF(3582), 1)
@@ -586,7 +590,7 @@ s32 evt_hom_touchaku[] = {
     327771, (s32)evt_npc_set_position, (s32)/*"コナリキン"*/"\x83\x52\x83\x69\x83\x8A\x83\x4C\x83\x93", 0, -1000, 0, 196699, (s32)evt_npc_set_ry,
     (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", 90, 196699, (s32)evt_npc_set_ry, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 90, 327771, (s32)evt_npc_set_position,
     (s32)/*"駅員2"*/"\x89\x77\x88\xF5\x32", -750, 80, 100, 131163, (s32)evt_seq_wait, 2, 107,
-    65546, 3000, 131163, (s32)evt_telop_entry, 11, 109, 65630, (s32)hom_10_evt_resha_stop_13_data_3548,
+    65546, 3000, 131163, (s32)evt_telop_entry, 11, 109, 65630, (s32)hom_10_evt_resha_stop,
     65546, 2500, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"train_4", 1,
     589915, (s32)evt_cam3d_evt_set, 458, 97, 366, 78, 110, 189,
     3000, 11, 65541, 0, 131096, -50000000, 0, 7,
@@ -643,7 +647,7 @@ EVT_BEGIN(evt_hom_touchaku_nidome)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_cam3d_evt_set, 406, 317, 596, -389, 137, -44, 0, 11)
     CALL(evt_seq_wait, 2)
-    CALL_CHILD(PTR(hom_10_evt_resha_stop_13_data_3548))
+    CALL_CHILD(PTR(hom_10_evt_resha_stop))
     WAIT_MS(2500)
     LOOP(0)
         IF_INT_EQUAL(GW(0), 0)
@@ -659,6 +663,10 @@ EVT_END()
 
 EVT_BEGIN(hom_00_init_evt)
     SET_VALUE(GF(15), 0)
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("hasi_L"), 2)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("hasi_R"), 2)
+#endif
     CALL(evt_npc_setup, PTR(npc_data))
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_HOM1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG6_EKI1"))
@@ -666,12 +674,12 @@ EVT_BEGIN(hom_00_init_evt)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -175, 140, -170, 0, 0)
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 15, -125, 140, -170, 0, 0)
     IF_INT_EQUAL(GSWF(3578), 0)
-        CALL_CHILD(PTR(hom_10_evt_resha_right_13_data_3858))
+        CALL_CHILD(PTR(hom_10_evt_resha_right))
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_4"), 1)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_5"), 1)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_6"), 1)
         ELSE
-        CALL_CHILD(PTR(hom_10_evt_resha_left_13_data_38E4))
+        CALL_CHILD(PTR(hom_10_evt_resha_left))
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(0), 339)
         CALL(evt_bero_get_entername, LW(0))

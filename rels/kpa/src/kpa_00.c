@@ -30,6 +30,9 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_get_sincos);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
+#ifdef VERSION_G8ME01
+extern s32 evt_memcard_save_wrapper[];
+#endif
 extern s32 evt_memcard_save[];
 extern s32 evt_npc_setup[];
 extern s32 evt_snd_envon[];
@@ -244,7 +247,11 @@ EVT_BEGIN(kpa_00_fly_evt)
     WAIT_MS(2000)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 3)
+#ifdef VERSION_G8ME01
+    CALL_CHILD(PTR(evt_memcard_save_wrapper))
+#else
     CALL_CHILD(PTR(evt_memcard_save))
+#endif
     CALL(evt_mario_set_mode, 0)
     CALL(evt_fade_set_mapchange_type, 1, 59, 0, 58, 0)
     CALL(evt_bero_mapchange, STRING("nok_01"), STRING("nokotarou"))

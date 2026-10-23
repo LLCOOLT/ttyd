@@ -8,7 +8,7 @@ typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
 extern s32 hom_00_init_evt[];
-extern s32 hom_10_init_evt_13_data_3954[];
+extern s32 hom_10_init_evt[];
 extern s32 hom_11_init_evt[];
 extern s32 hom_12_init_evt[];
 
@@ -40,7 +40,7 @@ void _prolog(void) {
         (*ctor)();
     }
     relSetEvtAddr("hom_00", hom_00_init_evt);
-    relSetEvtAddr("hom_10", hom_10_init_evt_13_data_3954);
+    relSetEvtAddr("hom_10", hom_10_init_evt);
     relSetEvtAddr("hom_11", hom_11_init_evt);
     relSetEvtAddr("hom_12\0", hom_12_init_evt);
 }

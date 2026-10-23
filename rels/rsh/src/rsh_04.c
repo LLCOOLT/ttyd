@@ -62,6 +62,10 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_win_item_select);
 static USER_FUNC(mario_flag);
 USER_FUNC(evt_party_trigflg_onoff);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_mario_adjust_dir);
+USER_FUNC(evt_mario_get_dispdir);
+#endif
 extern s32 bero_case_entry[];
 extern s32 bero_case_switch_off[];
 extern s32 bero_case_switch_on[];
@@ -97,17 +101,33 @@ static s32 bero_data_c[45];
 static __declspec(section ".data") s32 door_3[7];
 static __declspec(section ".data") s32 door_4[7];
 static __declspec(section ".data") s32 door_5[7];
+#ifdef VERSION_G8ME01
+s32 evt_rsh_konarikin_irai_party_talk[89];
+#else
 s32 evt_rsh_konarikin_irai_party_talk[85];
+#endif
+#ifdef VERSION_G8ME01
+s32 evt_allow_kamotsu[77];
+#else
 s32 evt_allow_kamotsu[73];
+#endif
 __declspec(section ".data") s32 evt_mario_chuumoku[10];
 __declspec(section ".data") s32 evt_party_chuumoku[11];
+#ifdef VERSION_G8ME01
+s32 evt_shorui_funshitu[362];
+#else
 s32 evt_shorui_funshitu[352];
+#endif
 static __declspec(section ".data") s32 item_tbl[2];
 s32 evt_daijisouna_kami[208];
 s32 evt_syasyou_auto_talk[27];
 static s32 init_syashou[56];
 static __declspec(section ".data") s32 item_tbl2[2];
+#ifdef VERSION_G8ME01
+static s32 talk_syashou[413];
+#else
 static s32 talk_syashou[367];
+#endif
 s32 talk_sarary_repeat[43];
 static s32 init_sarary[55];
 static s32 talk_sarary[72];
@@ -120,7 +140,11 @@ static s32 init_mama[37];
 static s32 talk_mama[57];
 static s32 init_konari[46];
 __declspec(section ".data") s32 item_tbl3[2];
+#ifdef VERSION_G8ME01
+static s32 talk_konari[265];
+#else
 static s32 talk_konari[219];
+#endif
 s32 talk_powan_repeat[43];
 static s32 init_powan[64];
 static s32 talk_powan[204];
@@ -132,7 +156,11 @@ static s32 evt_access_entry[25];
 static s32 evt_door_msg[102];
 s32 evt_narikin_room[87];
 s32 evt_powan_room[83];
+#ifdef VERSION_G8ME01
+s32 rsh_04_init_evt[214];
+#else
 s32 rsh_04_init_evt[201];
+#endif
 s32 rsh_04_a_init_evt[96];
 s32 rsh_04_b_init_evt[44];
 static __declspec(section ".data") s32 window_tbl[4];
@@ -259,13 +287,25 @@ EVT_BEGIN(evt_rsh_konarikin_irai_party_talk)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_107_6"), 0, STRING("party"))
     END_SWITCH
     CALL(evt_party_run, 0)
+#ifdef VERSION_G8ME01
+    IF_INT_LESS(GSW(0), 292)
+#endif
     SET_VALUE(GSW(0), 292)
+#ifdef VERSION_G8ME01
+    END_IF
+#endif
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_allow_kamotsu)
+#ifdef VERSION_G8ME01
+    CALL(evt_npc_flag_onoff, 1, STRING("車掌"), 32)
+#endif
     CALL(evt_mario_mov_pos, -360, -100, 500)
     CALL(evt_mario_set_dir_npc, STRING("車掌"))
+#ifdef VERSION_G8ME01
+    CALL(evt_set_dir_to_target, STRING("車掌"), STRING("mario"))
+#endif
     CALL(evt_msg_print, 0, STRING("stg6_rsh_126"), 0, STRING("車掌"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAND_UP1_4"), LW(0), LW(1), LW(2), 0)
@@ -273,7 +313,9 @@ EVT_BEGIN(evt_allow_kamotsu)
     WAIT_MS(600)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_127"), 0, STRING("車掌"))
+#ifndef VERSION_G8ME01
     CALL(evt_npc_flag_onoff, 1, STRING("車掌"), 32)
+#endif
     CALL(evt_npc_move_position, STRING("車掌"), -395, -145, 1000, 0, 1)
     CALL(evt_npc_flag_onoff, 0, STRING("車掌"), 32)
     CALL(evt_set_dir_to_target, STRING("車掌"), STRING("mario"))
@@ -299,6 +341,108 @@ __declspec(section ".data") EVT_BEGIN(evt_party_chuumoku)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(evt_shorui_funshitu)
+    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_POWAN1"))
+    CALL(evt_cam3d_evt_set, 220, 130, 250, 220, 55, -180, 500, 11)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_get_party, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(evt_party_move_pos, 0, 255, -150, 500)
+            CALL(evt_party_set_dir_npc, 0, STRING("ポワン探偵"))
+        END_IF
+    END_INLINE_EVENT
+    CALL(evt_npc_flag_onoff, 1, STRING("ポワン探偵"), 32)
+    CALL(evt_mario_mov_pos, 260, -135, 500)
+    CALL(evt_mario_set_dir_npc, STRING("ポワン探偵"))
+    CALL(evt_set_dir_to_target, STRING("サラリーマン"), STRING("mario"))
+    CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
+    CALL(evt_npc_flag_onoff, 0, STRING("ポワン探偵"), 32)
+    CALL(evt_npc_status_onoff, 1, STRING("ポワン探偵"), 2)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_167"), 0, STRING("me"))
+    CALL(evt_set_dir_to_target, STRING("me"), STRING("サラリーマン"))
+    WAIT_MS(500)
+    CALL(evt_mario_set_dir_npc, STRING("サラリーマン"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_168"), 0, STRING("サラリーマン"))
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_168_01"), 0, STRING("ポワン探偵"))
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_168_02"), 0, STRING("サラリーマン"))
+    WAIT_MS(500)
+    SPAWN_EVENT_GET_ID(PTR(evt_mario_chuumoku), LW(10))
+    SPAWN_EVENT_GET_ID(PTR(evt_party_chuumoku), LW(11))
+    CALL(evt_npc_flag_onoff, 1, STRING("ポワン探偵"), 32)
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(2000)
+        CALL(evt_npc_flag_onoff, 0, STRING("me"), 512)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_169_00"), 0, 0)
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), 512)
+        SET_VALUE(GF(0), 1)
+    END_INLINE_EVENT
+    CALL(evt_npc_move_position, STRING("me"), 220, -125, 0, FLOAT(30.0f), 0)
+    CALL(evt_npc_move_position, STRING("me"), 210, -115, 0, FLOAT(30.0f), 0)
+    CALL(evt_npc_move_position, STRING("me"), 180, -110, 0, FLOAT(30.0f), 0)
+    LOOP(0)
+        IF_INT_EQUAL(GF(0), 1)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_MS(500)
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(2000)
+        CALL(evt_npc_flag_onoff, 0, STRING("me"), 512)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_169_01"), 0, 0)
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), 512)
+        SET_VALUE(GF(0), 1)
+    END_INLINE_EVENT
+    CALL(evt_npc_move_position, STRING("me"), 270, -100, 0, FLOAT(30.0f), 0)
+    LOOP(0)
+        IF_INT_EQUAL(GF(0), 1)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(2000)
+        CALL(evt_npc_flag_onoff, 0, STRING("me"), 512)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_169_02"), 0, 0)
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), 512)
+        SET_VALUE(GF(0), 1)
+    END_INLINE_EVENT
+    CALL(evt_npc_move_position, STRING("me"), 290, -140, 0, FLOAT(30.0f), 0)
+    CALL(evt_npc_move_position, STRING("me"), 280, -170, 0, FLOAT(30.0f), 0)
+    CALL(evt_npc_move_position, STRING("me"), 250, -200, 0, FLOAT(30.0f), 0)
+    LOOP(0)
+        IF_INT_EQUAL(GF(0), 1)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_npc_move_position, STRING("me"), 230, -180, 0, FLOAT(30.0f), 0)
+    WAIT_MS(2000)
+    CALL(evt_cam3d_evt_set, 225, 71, 17, 225, 35, -180, 200, 11)
+    BEGIN_INLINE_EVENT
+        CALL(evt_env_blur_on, 0, 500)
+    END_INLINE_EVENT
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_169_03"), 0, 0)
+    CALL(evt_cam3d_evt_set, 225, 93, 115, 225, 40, -180, 500, 11)
+    CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_169_04"), 0, 0)
+    CALL(evt_cam3d_evt_off, 500, 11)
+    DELETE_EVENT(LW(10))
+    DELETE_EVENT(LW(11))
+    CALL(evt_npc_flag_onoff, 0, STRING("ポワン探偵"), 32)
+    CALL(evt_npc_flag_onoff, 0, STRING("ポワン探偵"), -2147483648)
+    CALL(evt_npc_flag_onoff, 0, STRING("サラリーマン"), -2147483648)
+    SET_VALUE(GSW(0), 304)
+    RETURN
+EVT_END()
+#else
 s32 evt_shorui_funshitu[] = {
     196699, (s32)evt_snd_bgmon, 512, (s32)"BGM_EVT_POWAN1", 589915, (s32)evt_cam3d_evt_set, 220, 130,
     250, 220, 55, -180, 500, 11, 107, 131163,
@@ -345,6 +489,7 @@ s32 evt_shorui_funshitu[] = {
     32, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", -2147483648, 262235, (s32)evt_npc_flag_onoff,
     0, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", -2147483648, 131122, -170000000, 304, 2, 1,
 };
+#endif
 
 static __declspec(section ".data") s32 item_tbl[] = {
     80, -1,
@@ -355,7 +500,11 @@ EVT_BEGIN(evt_daijisouna_kami)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_party, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
+#ifdef VERSION_G8ME01
+            CALL(evt_party_move_pos, 0, 275, -160, 500)
+#else
             CALL(evt_party_move_pos, 0, 245, -160, 500)
+#endif
             CALL(evt_party_set_dir_npc, 0, STRING("ポワン探偵"))
         END_IF
     END_INLINE_EVENT
@@ -504,6 +653,22 @@ static EVT_BEGIN(talk_syashou)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_142"), 0, 0)
         CALL(evt_win_item_select, 0, PTR(item_tbl2), LW(1), 0)
         IF_INT_NOT_EQUAL(LW(1), -1)
+#ifdef VERSION_G8ME01
+            CALL(evt_mario_adjust_dir)
+            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            CALL(evt_mario_get_dispdir, LW(3))
+            IF_INT_LESS(LW(3), 90)
+                ADD(LW(0), -18)
+                ELSE
+                ADD(LW(0), 18)
+            END_IF
+            ADD(LW(1), 18)
+            CALL(evt_item_entry, STRING("mofu"), 79, LW(0), LW(1), LW(2), 17, -1, 0)
+            CALL(evt_mario_set_pose, STRING("M_C_3"))
+            WAIT_MS(1000)
+            CALL(evt_mario_set_pose, STRING("M_S_1"))
+            CALL(evt_item_delete, STRING("mofu"))
+#endif
             CALL(evt_msg_print, 0, STRING("stg6_rsh_143"), 0, 0)
             CALL(evt_item_entry, STRING("orei"), 148, 0, 0, 0, 17, -1, 0)
             CALL(evt_item_get_item, STRING("orei"))
@@ -555,6 +720,22 @@ static EVT_BEGIN(talk_syashou)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(talk_sarary_repeat)
+    CALL(evt_npc_flag_onoff, 1, STRING("サラリーマン"), -2147483648)
+    CALL(evt_npc_get_position, STRING("サラリーマン"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_height, STRING("サラリーマン"), LW(3))
+    ADD(LW(0), -5)
+    ADD(LW(1), LW(3))
+    ADD(LW(1), 10)
+    CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_165_01"), 0, STRING("サラリーマン"))
+    LOOP(0)
+        CALL(evt_msg_repeat)
+    END_LOOP
+    RETURN
+EVT_END()
+#else
 s32 talk_sarary_repeat[] = {
     262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", -2147483648, 327771, (s32)evt_npc_get_position, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93",
     -30000000, -29999999, -29999998, 196699, (s32)evt_npc_get_height, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", -29999997, 131125,
@@ -563,6 +744,7 @@ s32 talk_sarary_repeat[] = {
     0, (s32)"stg6_rsh_165_01", 0, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", 65541, 0, 65627, (s32)evt_msg_repeat,
     6, 2, 1,
 };
+#endif
 
 static EVT_BEGIN(init_sarary)
     SWITCH(GSW(0))
@@ -655,6 +837,21 @@ EVT_BEGIN(talk_papa_mama)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(talk_papa_repeat)
+    CALL(evt_npc_flag_onoff, 1, STRING("ナリキンパパ"), -2147483648)
+    CALL(evt_npc_get_position, STRING("ナリキンパパ"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_height, STRING("ナリキンパパ"), LW(3))
+    ADD(LW(1), LW(3))
+    ADD(LW(1), 15)
+    CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_85_01"), 0, STRING("ナリキンパパ"))
+    LOOP(0)
+        CALL(evt_msg_repeat)
+    END_LOOP
+    RETURN
+EVT_END()
+#else
 s32 talk_papa_repeat[] = {
     262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70", -2147483648, 327771, (s32)evt_npc_get_position, (s32)/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70",
     -30000000, -29999999, -29999998, 196699, (s32)evt_npc_get_height, (s32)/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70", -29999997, 131125,
@@ -662,6 +859,7 @@ s32 talk_papa_repeat[] = {
     -30000000, -29999999, -29999998, 327771, (s32)evt_msg_print, 0, (s32)"stg6_rsh_85_01", 0,
     (s32)/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70", 65541, 0, 65627, (s32)evt_msg_repeat, 6, 2, 1,
 };
+#endif
 
 static EVT_BEGIN(init_papa)
     SWITCH(GSW(0))
@@ -697,6 +895,21 @@ static EVT_BEGIN(talk_papa)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(talk_mama_repeat)
+    CALL(evt_npc_flag_onoff, 1, STRING("ナリキンママ"), -2147483648)
+    CALL(evt_npc_get_position, STRING("ナリキンママ"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_height, STRING("ナリキンママ"), LW(3))
+    ADD(LW(1), LW(3))
+    ADD(LW(1), 10)
+    CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_85_02"), 0, STRING("ナリキンママ"))
+    LOOP(0)
+        CALL(evt_msg_repeat)
+    END_LOOP
+    RETURN
+EVT_END()
+#else
 s32 talk_mama_repeat[] = {
     262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D", -2147483648, 327771, (s32)evt_npc_get_position, (s32)/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D",
     -30000000, -29999999, -29999998, 196699, (s32)evt_npc_get_height, (s32)/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D", -29999997, 131125,
@@ -704,6 +917,7 @@ s32 talk_mama_repeat[] = {
     -30000000, -29999999, -29999998, 327771, (s32)evt_msg_print, 0, (s32)"stg6_rsh_85_02", 0,
     (s32)/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D", 65541, 0, 65627, (s32)evt_msg_repeat, 6, 2, 1,
 };
+#endif
 
 static EVT_BEGIN(init_mama)
     SWITCH(GSW(0))
@@ -805,6 +1019,22 @@ static EVT_BEGIN(talk_konari)
                 IF_INT_NOT_EQUAL(LW(1), 77)
                     CALL(evt_msg_print, 0, STRING("stg6_rsh_100"), 0, 0)
                     ELSE
+#ifdef VERSION_G8ME01
+                    CALL(evt_mario_adjust_dir)
+                    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+                    CALL(evt_mario_get_dispdir, LW(3))
+                    IF_INT_LESS(LW(3), 90)
+                        ADD(LW(0), -18)
+                        ELSE
+                        ADD(LW(0), 18)
+                    END_IF
+                    ADD(LW(1), 18)
+                    CALL(evt_item_entry, STRING("sign"), 77, LW(0), LW(1), LW(2), 17, -1, 0)
+                    CALL(evt_mario_set_pose, STRING("M_C_3"))
+                    WAIT_MS(1000)
+                    CALL(evt_mario_set_pose, STRING("M_S_1"))
+                    CALL(evt_item_delete, STRING("sign"))
+#endif
                     CALL(evt_msg_print, 0, STRING("stg6_rsh_97"), 0, 0)
                     CALL(evt_item_entry, STRING("orei"), 87, 0, 0, 0, 17, -1, 0)
                     CALL(evt_item_get_item, STRING("orei"))
@@ -828,6 +1058,22 @@ static EVT_BEGIN(talk_konari)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(talk_powan_repeat)
+    CALL(evt_npc_flag_onoff, 1, STRING("ポワン探偵"), -2147483648)
+    CALL(evt_npc_get_position, STRING("ポワン探偵"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_height, STRING("ポワン探偵"), LW(3))
+    ADD(LW(0), 15)
+    ADD(LW(1), LW(3))
+    SUBTRACT(LW(1), 4)
+    CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_165_02"), 0, STRING("ポワン探偵"))
+    LOOP(0)
+        CALL(evt_msg_repeat)
+    END_LOOP
+    RETURN
+EVT_END()
+#else
 s32 talk_powan_repeat[] = {
     262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", -2147483648, 327771, (s32)evt_npc_get_position, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3",
     -30000000, -29999999, -29999998, 196699, (s32)evt_npc_get_height, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", -29999997, 131125,
@@ -836,6 +1082,7 @@ s32 talk_powan_repeat[] = {
     0, (s32)"stg6_rsh_165_02", 0, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 65541, 0, 65627, (s32)evt_msg_repeat,
     6, 2, 1,
 };
+#endif
 
 static EVT_BEGIN(init_powan)
     SWITCH(GSW(0))
@@ -1138,6 +1385,14 @@ EVT_BEGIN(rsh_04_init_evt)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 328)
         SET_VALUE(LW(0), 0)
         CALL_CHILD(PTR(bero_case_switch_on))
+#ifdef VERSION_G8ME01
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 334)
+        IF_INT_LESS(GSW(0), 340)
+            SET_VALUE(LW(0), 0)
+            CALL_CHILD(PTR(bero_case_switch_off))
+        END_IF
+#endif
     END_IF
     CALL_CHILD(PTR(evt_access_entry))
     SPAWN_EVENT(PTR(evt_narikin_room))

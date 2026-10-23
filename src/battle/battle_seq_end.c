@@ -28,8 +28,17 @@
 #include "pmario_sound.h"
 #include "driver/msgdrv.h"
 #include "manager/fontmgr.h"
+#ifdef VERSION_G8ME01
+#include "mario/mariost.h"
+#endif
 #include <stdio.h>
 #include <string.h>
+
+#ifdef VERSION_G8ME01
+#define EXP_ICON 0x194
+#else
+#define EXP_ICON 0x18C
+#endif
 
 void FontDrawString(f32 x, f32 y, const char* msg);
 
@@ -195,6 +204,12 @@ __declspec(section ".sdata") EVT_BEGIN(_event_MajinaiEnd)
     WAIT_FRAMES(60)
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01
+__declspec(section ".sdata") s32 hp_tex_tbl[6] = {52, 52, 53, 54, 54, 55};
+__declspec(section ".sdata") s32 fp_tex_tbl[6] = {56, 56, 57, 58, 58, 58};
+__declspec(section ".sdata") s32 bp_tex_tbl[6] = {59, 59, 60, 61, 62, 63};
+#endif
 
 __declspec(section ".sdata") EVT_BEGIN(_rank_up_event)
     CALL(_get_rank_up_msg, LW(0))
@@ -624,6 +639,9 @@ void btlseqEnd(BattleWork* wp) {
                 e = evtEntry(_move_to_badge_point_event, 10, 0);
                 break;
             }
+#ifdef VERSION_G8ME01
+            BP(u32, work, 0x30) &= ~0x20;
+#endif
             if (e) {
                 BP(s32, work, 0x1FC) = BP(s32, e, 0x15C);
                 break;
@@ -933,7 +951,7 @@ void _MarioExpDisp(CameraId camId, void* param) {
         { u32 len = strlen(buf); width = 12.5f * len + 65.0f; }
         ((void (*)(f32, f32, f32, f32, f32, u16, GXColor))windowDispGX_Waku_col)(180.0f, -160.0f, width, 32.0f, 10.0f, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 
-        iconDispGx(&pos, 0x10, 0x18C, 1.0f);
+        iconDispGx(&pos, 0x10, EXP_ICON, 1.0f);
         FontDrawStart();
         FontDrawString(225.0f, -163.0f, buf);
     }
@@ -953,7 +971,7 @@ void _LvupParamConfirmDisp(CameraId camId, void* param) {
     pos.x = -40.0f;
     pos.y = -50 - (*new_var) * 25;
     pos.z = 0.0f;
-    iconDispGx(&pos, 0x10, 0x18C, 1.0f);
+    iconDispGx(&pos, 0x10, EXP_ICON, 1.0f);
 }
 
 void L__LvupParamHelpMsgDisp(CameraId camId, void* param) {
@@ -1002,7 +1020,7 @@ void _GetExpIcon_Init(SeqEndWork* work) {
 
     for (i = 0; i < 10; i++) {
         sprintf(name, "_Bgsp%d", i);
-        iconEntry2D(name, 0x18C);
+        iconEntry2D(name, EXP_ICON);
         work->icons[i] = iconNameToPtr(name);
         iconSetScale(name, 0.9f);
         iconFlagOn(name, 2);
@@ -1014,7 +1032,7 @@ void _GetExpIcon_Init(SeqEndWork* work) {
     }
     for (i = 10; i < 19; i++) {
         sprintf(name, "_Bgsp%d", i);
-        iconEntry2D(name, 0x18C);
+        iconEntry2D(name, EXP_ICON);
         work->icons[i] = iconNameToPtr(name);
         iconSetScale(name, 0.45f);
         iconFlagOn(name, 2);
@@ -1092,6 +1110,102 @@ void _GetExpIcon_End(SeqEndWork* work) {
     }
 }
 
+#ifdef VERSION_G8ME01
+USER_FUNC(btlevtcmd_PadCheckTrigger);
+USER_FUNC(N__display_select_one_to_upgrade_text);
+USER_FUNC(N__set_initial_upgrade_cursor_position);
+
+s32 _curtain_close_event[] = {
+    110, 262235, (s32)evt_batstage_set_stg_dark, 80, 30, 0, 262235, (s32)evt_batstage_set_stg_dark_base,
+    80, 30, 0, 112, 110, 393307, (s32)evt_fade_entry, 24,
+    1000, 0, 0, 0, 196699, (s32)evt_fade_set_anim_ofs_pos, 0, 130,
+    262235, (s32)evt_fade_set_anim_virtual_pos, 0, 0, 80, 65627, (s32)evt_fade_end_wait, 112,
+    196699, (s32)btlevtcmd_check_battleflag, -30000000, 256, 131097, -30000000, 0, 110,
+    262235, (s32)btlevtcmd_AnimeChangePoseType, -3, 1, 42, 327771, (s32)btlevtcmd_GetPos, -3,
+    -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition, -3, -300, -29999999,
+    -29999998, 120, -1, 0, 112, 196699, (s32)btlevtcmd_GetUnitId, -4,
+    -29999997, 131097, -29999997, -1, 110, 196699, (s32)btlevtcmd_GetBodyId, -29999997,
+    -29999996, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999997, -29999996, 42, 327771, (s32)btlevtcmd_GetPos,
+    -29999997, -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition, -29999997, -330,
+    -29999999, -29999998, 120, -1, 0, 112, 33, 33,
+    110, 327771, (s32)evt_sub_intpl_init_float, 0, 0, -230040960, 29, 65541,
+    30, 196699, (s32)evt_sub_intpl_get_float, -30000000, -250000000, 196699, (s32)_nozzle_set_offset, (s32)"nozzle_l",
+    -30000000, 65545, 1, 6, 112, 110, 327771, (s32)evt_sub_intpl_init_float,
+    0, 0, -230040960, 29, 65541, 30, 196699, (s32)evt_sub_intpl_get_float,
+    -30000000, -250000000, 196699, (s32)_nozzle_set_offset, (s32)"nozzle_c", -30000000, 65545, 1,
+    6, 112, 110, 327771, (s32)evt_sub_intpl_init_float, 0, 0, -230040960,
+    29, 65541, 30, 196699, (s32)evt_sub_intpl_get_float, -30000000, -250000000, 196699,
+    (s32)_nozzle_set_offset, (s32)"nozzle_r", -30000000, 65545, 1, 6, 112, 196699,
+    (s32)btlevtcmd_onoff_battleflag, 0, 256, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699,
+    (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 65546, 1500, 110, 65541, 6,
+    983131, (s32)evt_eff, (s32)"", (s32)"confetti", 13, 0, 300, 95,
+    180, 0, 0, 0, 0, 0, 0, 0,
+    65545, 20, 6, 112, 131165, (s32)_confetti_control_event, -30000000, 131163,
+    (s32)_set_confetti_control_evtid, -30000000, 983131, (s32)evt_eff, (s32)"", (s32)"levelup", 0, 0,
+    50, 100, 60, 0, 0, 0, 0, 0,
+    0, 0, 65545, 48, 65627, (s32)_lvup_ap_recover_full, 65546, 1000,
+    65647, -29999985, 65545, 2, 131163, (s32)_lvup_spot_on, 0, 131163,
+    (s32)_lvup_spot_move, 0, 112, 65627, (s32)_disable_enemy_unit_disp, 110, 196699, (s32)btlevtcmd_GetUnitId,
+    -4, -29999997, 131097, -29999997, -1, 327771, (s32)btlevtcmd_SetPos, -29999997,
+    -230, 0, 90, 131163, (s32)btlevtcmd_ClearAllStatus, -29999997, 196699, (s32)btlevtcmd_GetBodyId,
+    -29999997, -29999996, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999997, -29999996, 40, 131122,
+    -30000000, -155, 131122, -29999999, 0, 131122, -29999998, 90,
+    131122, -29999994, 28, 196699, (s32)btlevtcmd_GetUnitKind, -29999997, -29999995, 65570,
+    -29999995, 65579, 224, 65579, 225, 589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997,
+    (s32)"SFX_PARTY_BATTLE_SUBMOVE1L", (s32)"SFX_PARTY_BATTLE_SUBMOVE1R", 6, 12, 16, 0, 0, 524379,
+    (s32)btlevtcmd_MovePosition, -29999997, -30000000, -29999999, -29999998, -29999994, -2, 1,
+    46, 65572, 226, 589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997, (s32)"SFX_PARTY_BATTLE_SUBMOVE1L", (s32)"SFX_PARTY_BATTLE_SUBMOVE1R",
+    0, 6, 6, 0, 0, 524379, (s32)btlevtcmd_MovePosition, -29999997,
+    -30000000, -29999999, -29999998, -29999994, -2, 1, 65572, 227,
+    589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997, (s32)"SFX_PARTY_BATTLE_SUBHANG1", (s32)"SFX_PARTY_BATTLE_SUBHANG1", 6, 12, 16,
+    0, 0, 524379, (s32)btlevtcmd_MovePosition, -29999997, -30000000, -29999999, -29999998,
+    -29999994, -2, 1, 65572, 228, 589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997,
+    (s32)"SFX_PARTY_BATTLE_SUBHANG1", (s32)"SFX_PARTY_BATTLE_SUBHANG1", 0, 15, 13, 0, 0, 524379,
+    (s32)btlevtcmd_MovePosition, -29999997, -30000000, -29999999, -29999998, -29999994, -2, 1,
+    65572, 229, 589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997, (s32)"SFX_PARTY_BATTLE_SUBMOVE1L", (s32)"SFX_PARTY_BATTLE_SUBMOVE1R", 0,
+    18, 18, 0, 0, 524379, (s32)btlevtcmd_MovePosition, -29999997, -30000000,
+    -29999999, -29999998, -29999994, -2, 1, 65572, 230, 589915,
+    (s32)btlevtcmd_SetMoveSoundDataWork, -29999997, (s32)"SFX_PARTY_BATTLE_SUBMOVE1L", (s32)"SFX_PARTY_BATTLE_SUBMOVE1R", 0, 15, 13, 0,
+    0, 524379, (s32)btlevtcmd_MovePosition, -29999997, -30000000, -29999999, -29999998, -29999994,
+    -2, 1, 49, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999997, -29999996, 43,
+    33, 112, 327771, (s32)btlevtcmd_SetPos, -3, -200, 0, 90,
+    131163, (s32)btlevtcmd_ClearAllStatus, -3, 262235, (s32)btlevtcmd_AnimeChangePoseType, -3, 1, 40,
+    524379, (s32)btlevtcmd_MovePosition, -3, 0, 0, 90, 75, -1,
+    0, 393307, (s32)btlevtcmd_snd_se, -3, (s32)"SFX_VOICE_MARIO_PAUSE2", -250000000, 0, -250000000,
+    262235, (s32)btlevtcmd_AnimeChangePose, -3, 1, (s32)"M_V_2", 196699, (s32)evt_audience_sound_cheer, 180,
+    40, 65546, 1000, 65627, (s32)_lvup_select_object_init, 110, 131163, (s32)_lvup_spot_off,
+    30, 112, 65644, -29999990, 262235, (s32)evt_batstage_set_stg_dark, 0, 30,
+    0, 262235, (s32)evt_batstage_set_stg_dark_base, 0, 30, 0, 393307, (s32)_lvup_obj_set_color,
+    0, 100, 128, 128, 255, 393307, (s32)_lvup_obj_set_color, 1,
+    100, 128, 128, 255, 393307, (s32)_lvup_obj_set_color, 2, 100,
+    128, 128, 255, 262235, (s32)evt_batstage_set_aud_dark, 0, 60, 0,
+    393307, (s32)evt_fade_entry, 25, 1000, 0, 0, 0, 196699,
+    (s32)evt_fade_set_anim_ofs_pos, 0, 130, 262235, (s32)evt_fade_set_anim_virtual_pos, 0, 0, 80,
+    65627, (s32)evt_fade_end_wait, 109, 131163, (s32)btlevtcmd_WaitEventEnd, -29999990, 65647, -29999990,
+    131122, -29999995, 5, 65541, -29999995, 65627, (s32)N__display_select_one_to_upgrade_text, 65545,
+    1, 131122, -29999995, 5, 6, 112, 65539, 60,
+    262235, (s32)btlevtcmd_PadCheckTrigger, 0, 262144, -30000000, 131097, -30000000, 0,
+    65647, -30000000, 131163, (s32)N__set_initial_upgrade_cursor_position, 2, 327771, (s32)btlevtcmd_BtlStageObjSetRotate, (s32)"spotlight",
+    0, 0, 70, 262235, (s32)btlevtcmd_BtlStageObjFlagOnOff, (s32)"spotlight", 1, 0,
+    327771, (s32)evt_sub_intpl_init, 5, 70, 30, 10, 65541, 11,
+    65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_BtlStageObjSetRotate, (s32)"spotlight", 0, 0, -30000000,
+    65545, 1, 6, 393307, (s32)_lvup_obj_set_color, 2, 255, 255,
+    255, 255, 196699, (s32)_lvup_disp_flag_onoff, 2, 32, 65627, (s32)_lvup_select_obj_disp_on,
+    112, 131163, (s32)btlevtcmd_WaitEventEnd, -30000000, 65540, 69, 33, 65539,
+    61, 262235, (s32)btlevtcmd_PadCheckTrigger, 0, 524288, -30000000, 131097, -30000000,
+    0, 65647, -30000000, 131163, (s32)N__set_initial_upgrade_cursor_position, 0, 327771, (s32)btlevtcmd_BtlStageObjSetRotate,
+    (s32)"spotlight", 0, 0, -70, 262235, (s32)btlevtcmd_BtlStageObjFlagOnOff, (s32)"spotlight", 1,
+    0, 327771, (s32)evt_sub_intpl_init, 5, -70, -30, 10, 65541,
+    11, 65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_BtlStageObjSetRotate, (s32)"spotlight", 0, 0,
+    -30000000, 65545, 1, 6, 393307, (s32)_lvup_obj_set_color, 0, 255,
+    255, 255, 255, 196699, (s32)_lvup_disp_flag_onoff, 0, 32, 65627,
+    (s32)_lvup_select_obj_disp_on, 112, 131163, (s32)btlevtcmd_WaitEventEnd, -30000000, 65540, 69, 33,
+    65545, 1, 65540, 60, 65539, 69, 65631, -29999990,
+    262235, (s32)btlevtcmd_BtlStageObjFlagOnOff, (s32)"spotlight", 1, 0, 65627, (s32)_lvup_select_obj_lvup_param_disp, 196699,
+    (s32)_lvup_disp_flag_onoff, 1, 32, 2, 1,
+
+};
+#else
 s32 _curtain_close_event[] = {
     110, 262235, (s32)evt_batstage_set_stg_dark, 80, 30, 0, 262235, (s32)evt_batstage_set_stg_dark_base,
     80, 30, 0, 112, 110, 393307, (s32)evt_fade_entry, 24,
@@ -1163,6 +1277,7 @@ s32 _curtain_close_event[] = {
     255, 255, 196699, (s32)_lvup_disp_flag_onoff, 1, 32, 65627, (s32)_lvup_select_obj_disp_on,
     112, 131163, (s32)btlevtcmd_WaitEventEnd, -30000000, 65627, (s32)_lvup_select_obj_lvup_param_disp, 2, 1,
 };
+#endif
 
 EVT_BEGIN(_confetti_control_event)
     SET_VALUE(LW(0), 1)
@@ -1248,6 +1363,34 @@ EVT_BEGIN(_koura_delete_event)
     END_IF
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01
+USER_FUNC(N__set_initial_upgrade_cursor_position) {
+    SEW(_battleWorkPointer)->selected = evtGetValue(event, event->args[0]);
+    return 2;
+}
+
+void N__draw_select_one_to_upgrade_text(CameraId camId, void* param) {
+    const char* msg;
+    u16 lines;
+    s32 width;
+    f32 y;
+    f32 zero = 0.0f;
+
+    msg = msgSearch("select_HPFPBP");
+    width = FontGetMessageWidthLine(msg, &lines);
+    lines++;
+    windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, (zero - width / 2) - 20.0f, -145.0f + (lines - 1) * 29, width + 40, lines * 29 + 1, 10.0f);
+    FontDrawStart_alpha(0xFF);
+    y = -148.0f;
+    FontDrawMessage(zero - width / 2, (s32)y + (lines - 1) * 29, msg);
+}
+
+USER_FUNC(N__display_select_one_to_upgrade_text) {
+    dispEntry(CAMERA_2D, 900.0f, 1, N__draw_select_one_to_upgrade_text, _battleWorkPointer);
+    return 2;
+}
+#endif
 
 USER_FUNC(_nozzle_set_offset) {
     s32* args = event->args;
@@ -1651,11 +1794,28 @@ s32 _keta_get(s32 n) {
     return k;
 }
 
+#ifdef VERSION_G8ME01
+#define LVOBJ_TEX2 0x31
+#define LVOBJ_ICON 0x16B
+// FAKE: same registers as (id, color, 0, x, y, z, sx, sy); listing the float arguments
+// first makes MWCC evaluate the texture-table load last, as in the US build.
+#define LVOBJ_TEXPLANE(o, n, tbl)                                                   \
+    ((void (*)(f32, f32, f32, f32, f32, u32, GXColor, s32))btlDispTexPlane)(        \
+        (o)->pos.x - 16.0f, 20.0f + (o)->pos.y, 2.0f + (o)->pos.z,                  \
+        (o)->scale.x, (o)->scale.y, tbl[gp->language], (o)->color, 0)
+#else
+#define LVOBJ_TEX2 0x24
+#define LVOBJ_ICON 0x163
+#define LVOBJ_TEXPLANE(o, n, tbl)                                                   \
+    ((void (*)(u32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(        \
+        0x27 + n, (o)->color, 0, (o)->pos.x - 16.0f, 20.0f + (o)->pos.y,             \
+        2.0f + (o)->pos.z, (o)->scale.x, (o)->scale.y)
+#endif
 void btlDispTexPlane(u32 id, GXColor color, f32 tX, f32 tY, f32 tZ, f32 sX, f32 sY);
 void btlDispTexPlane2(Mtx mtx, u32 id, GXColor color);
 #define LVOBJ_TIMER(o) ((o)->field_0x29[0])
 #define LVOBJ_DISP(o) (*(s32*)&(o)->field_0x29[3])
-#define LVOBJ_PLANE(o, n)                                                              \
+#define LVOBJ_PLANE(o, n, tbl)                                                            \
     if (LVOBJ_DISP(o)) {                                                               \
         PSMTXIdentity(m);                                                              \
         PSMTXTrans(trans, (o)->pos.x, (o)->pos.y, (o)->pos.z);                         \
@@ -1668,10 +1828,8 @@ void btlDispTexPlane2(Mtx mtx, u32 id, GXColor color);
         PSMTXConcat(rotX, m, m);                                                       \
         PSMTXConcat(rotY, m, m);                                                       \
         PSMTXConcat(trans, m, m);                                                      \
-        ((void (*)(Mtx, u32, GXColor, s32))btlDispTexPlane2)(m, 0x24 + n, (o)->color, 0); \
-        ((void (*)(u32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(        \
-            0x27 + n, (o)->color, 0, (o)->pos.x - 16.0f, 20.0f + (o)->pos.y,             \
-            2.0f + (o)->pos.z, (o)->scale.x, (o)->scale.y);                              \
+        ((void (*)(Mtx, u32, GXColor, s32))btlDispTexPlane2)(m, LVOBJ_TEX2 + n, (o)->color, 0); \
+        LVOBJ_TEXPLANE(o, n, tbl);                              \
     }
 
 void _lvup_select_object_disp(CameraId camId, void* param) {
@@ -1706,9 +1864,9 @@ void _lvup_select_object_disp(CameraId camId, void* param) {
             break;
         }
     }
-    LVOBJ_PLANE(&work->objs[0], 0)
-    LVOBJ_PLANE(&work->objs[1], 1)
-    LVOBJ_PLANE(&work->objs[2], 2)
+    LVOBJ_PLANE(&work->objs[0], 0, hp_tex_tbl)
+    LVOBJ_PLANE(&work->objs[1], 1, fp_tex_tbl)
+    LVOBJ_PLANE(&work->objs[2], 2, bp_tex_tbl)
 
     for (i = 0; i < 3; i++) {
         obj = &work->objs[i];
@@ -1739,7 +1897,7 @@ void _lvup_select_object_disp(CameraId camId, void* param) {
                     PSMTXTrans(m3, pos3.x, pos3.y, pos3.z);
                     PSMTXScale(ms, -0.6f, 0.6f, 1.0f);
                     PSMTXConcat(m3, ms, m3);
-                    iconDispGxCol(m3, 0, 0x163, obj->color);
+                    iconDispGxCol(m3, 0, LVOBJ_ICON, obj->color);
                 }
             } else if (obj->paramDisp == 2 || obj->paramDisp == 5) {
                 pos2 = obj->pos;

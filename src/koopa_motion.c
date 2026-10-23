@@ -5,6 +5,11 @@
 #include "system.h"
 #include <dolphin/types.h>
 
+#ifdef VERSION_G8ME01
+// US exports this as the global kpa_fall (mot_jump calls it by that name)
+#define kpa_fall_80213C38 kpa_fall
+#endif
+
 extern s32 evt_cam_shake[];
 extern s32 kpaGetLevel(void);
 extern s32 kpaGetStageType(void);
@@ -34,18 +39,18 @@ extern void* marioChkLandon(f32* outY, f32 y);
 extern void marioChgMotSub(s32 a, s32 b);
 f32 kpaStickSpd(s32 dash);
 
-#define MF(m, off) (*(f32*)((u8*)(m) + (off)))
-#define MI(m, off) (*(s32*)((u8*)(m) + (off)))
-#define MS16(m, off) (*(s16*)((u8*)(m) + (off)))
-#define MS8(m, off) (*(s8*)((u8*)(m) + (off)))
-#define MU(m, off) (*(u32*)((u8*)(m) + (off)))
-#define MU16(m, off) (*(u16*)((u8*)(m) + (off)))
-#define MU8(m, off) (*(u8*)((u8*)(m) + (off)))
-#define MV(m, off) (*(Vec*)((u8*)(m) + (off)))
+#define MF(m, off) (*(f32*)((u8*)(m) + MWOFF(off)))
+#define MI(m, off) (*(s32*)((u8*)(m) + MWOFF(off)))
+#define MS16(m, off) (*(s16*)((u8*)(m) + MWOFF(off)))
+#define MS8(m, off) (*(s8*)((u8*)(m) + MWOFF(off)))
+#define MU(m, off) (*(u32*)((u8*)(m) + MWOFF(off)))
+#define MU16(m, off) (*(u16*)((u8*)(m) + MWOFF(off)))
+#define MU8(m, off) (*(u8*)((u8*)(m) + MWOFF(off)))
+#define MV(m, off) (*(Vec*)((u8*)(m) + MWOFF(off)))
 typedef struct V3 {
     s32 a, b, c;
 } V3;
-#define KPW(m) (*(s32**)((u8*)(m) + 0x28C))
+#define KPW(m) (*(s32**)((u8*)(m) + MWOFF(0x28C)))
 
 f32 _walkSpdTbl[4] = {0.6f, 1.4f, 1.4f, 1.4f};
 f32 _dashSpdTbl[4] = {1.2f, 2.0f, 2.0f, 2.0f};
@@ -156,7 +161,7 @@ f32 kpaStickSpd(s32 dash) {
     spd = MF(m, 0x2C4);
     if (!stick) {
         k = -0.2f;
-        if (*(u32*)((u8*)m + 0x1F0)) {
+        if (*(u32*)((u8*)m + MWOFF(0x1F0))) {
             k = -0.7f;
         }
         spd += spd * k;
@@ -546,7 +551,7 @@ void kpa_hip(void) {
             if (m->position.y > 75.0f) {
                 camFollowYOn();
             }
-            if ((MU16(m, 0x246) & 0x100) && !*(u32*)((u8*)m + 0x1E4)) {
+            if ((MU16(m, 0x246) & 0x100) && !*(u32*)((u8*)m + MWOFF(0x1E4))) {
                 kpa_hip_launch(m);
             } else {
                 m->flags &= ~0x80;
@@ -789,7 +794,7 @@ void kpa_swim(void) {
     kpa_swim_splash();
     switch (MI(m, 0x44)) {
     case 0:
-        if (*(u32*)((u8*)m + 0x1E4) != 0) {
+        if (*(u32*)((u8*)m + MWOFF(0x1E4)) != 0) {
             m->jumpVelocityY = 1.0f;
             m->jumpAccelerationY = 0.0f;
             m->jumpJerkY = 0.0f;
@@ -823,10 +828,12 @@ void kpa_swim(void) {
             if (v < 0.0f) {
                 MI(m, 0x44) = 0x28;
             }
+#ifndef VERSION_G8ME01
             m->jumpVelocityY += 0.02f * (-2.0f - m->jumpVelocityY);
             m->jumpAccelerationY = 0.0f;
             m->jumpJerkY = 0.0f;
             m->jumpSnapY = 0.0f;
+#endif
         } else if (v < 0.0f) {
             MI(m, 0x44) = 0x1E;
         }

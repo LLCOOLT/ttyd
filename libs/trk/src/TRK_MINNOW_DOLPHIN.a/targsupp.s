@@ -2,7 +2,12 @@
 .file "targsupp.s"
 
 .text
+# US (BUILD_VERSION 1): the TRK file stubs start on a 16-byte boundary; JP keeps 4.
+.if BUILD_VERSION == 1
+.balign 16
+.else
 .balign 4
+.endif
 
 .fn TRKAccessFile, global
 	twui r0, 0x0

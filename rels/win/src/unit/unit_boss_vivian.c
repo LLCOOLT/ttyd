@@ -38,9 +38,9 @@ USER_FUNC(evt_msg_print);
 USER_FUNC(evt_sub_random);
 extern s32 battle_evt_majo_disp_off[];
 extern s32 battle_evt_majo_disp_on[];
-extern s32 btl_majolyne_zoom_30_data_123EC[];
-extern s32 btl_marilyn_zoom_30_data_123D0[];
-extern s32 btl_vivian_zoom_30_data_123B4[];
+extern s32 btl_majolyne_zoom[];
+extern s32 btl_marilyn_zoom[];
+extern s32 btl_vivian_zoom[];
 extern s32 btldefaultevt_Confuse[];
 extern s32 btldefaultevt_Damage[];
 extern s32 btlevtcmd_AttackDeclare[];
@@ -67,8 +67,8 @@ extern s32 evt_btl_camera_set_homing_unit[];
 extern s32 evt_btl_camera_set_moveSpeedLv[];
 extern s32 evt_btl_camera_set_zoom[];
 extern s32 evt_eff[];
-extern s32 majo3_shadow_tail_event_30_data_13F70[];
-extern s32 majo_unison_phase_event_30_data_126FC[];
+extern s32 majo3_shadow_tail_event[];
+extern s32 majo_unison_phase_event[];
 extern s32 subsetevt_confuse_flustered[];
 extern s32 subsetevt_dead_core_nospin_norotate[];
 extern s32 unit_boss_majolyne[];
@@ -109,9 +109,17 @@ static s32 dead_event[189];
 static s32 unison_phase_event[81];
 static __declspec(section ".data") s32 phase_event[2];
 static s32 attack_event[98];
+#ifdef VERSION_G8ME01
+static s32 kagenuke_attack_event[207];
+#else
 static s32 kagenuke_attack_event[204];
+#endif
 s32 flame_attack_event[185];
+#ifdef VERSION_G8ME01
+static __declspec(section ".data") s32 wait_event[7];
+#else
 static __declspec(section ".data") s32 wait_event[6];
+#endif
 
 __declspec(section ".data") u64 fd_boss_vivian_negone_one_374 = 0xBF8000003F800000;
 
@@ -273,7 +281,13 @@ s32 weapon_vivian_kagenuke_attack1[] = {
 };
 
 s32 weapon_vivian_flame_attack1[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    1677721602,
+#else
+    1677721600,
+#endif
+    1065353216, 16843009, (s32)weaponGetPowerDefault,
     1, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 16777986, 0, 131136, 2047, -2147475456,
@@ -342,7 +356,7 @@ static EVT_BEGIN(init_event)
     SET_VALUE(GW(14), 2)
     CALL(btlevtcmd_SetUnitWork, -2, 8, 0)
     CALL(btlevtcmd_SetUnitWork, -2, 3, 0)
-    SPAWN_EVENT(PTR(majo3_shadow_tail_event_30_data_13F70))
+    SPAWN_EVENT(PTR(majo3_shadow_tail_event))
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
@@ -351,13 +365,13 @@ static EVT_BEGIN(entry_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     WAIT_FRAMES(60)
     WAIT_FRAMES(60)
-    CALL_CHILD(PTR(btl_majolyne_zoom_30_data_123EC))
+    CALL_CHILD(PTR(btl_majolyne_zoom))
     CALL(evt_msg_print, 2, STRING("btl_majo3_00"), 0, GW(8))
     WAIT_MS(300)
-    CALL_CHILD(PTR(btl_marilyn_zoom_30_data_123D0))
+    CALL_CHILD(PTR(btl_marilyn_zoom))
     CALL(evt_msg_print, 2, STRING("btl_majo3_01"), 0, GW(9))
     WAIT_MS(300)
-    CALL_CHILD(PTR(btl_vivian_zoom_30_data_123B4))
+    CALL_CHILD(PTR(btl_vivian_zoom))
     CALL(evt_msg_print, 2, STRING("btl_majo3_02"), 0, -2)
     WAIT_MS(300)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
@@ -430,7 +444,7 @@ static EVT_BEGIN(dead_event)
             GOTO(99)
             CASE_EQUAL(2)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
-            CALL_CHILD(PTR(btl_vivian_zoom_30_data_123B4))
+            CALL_CHILD(PTR(btl_vivian_zoom))
             CALL(evt_msg_print, 2, STRING("btl_majo3_13"), 0, -2)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
             GOTO(90)
@@ -443,7 +457,7 @@ static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(btlevtcmd_SetTalkPose, -2, STRING("PTR_D_1"))
     CALL(btlevtcmd_SetStayPose, -2, STRING("PTR_D_1"))
-    CALL_CHILD(PTR(btl_vivian_zoom_30_data_123B4))
+    CALL_CHILD(PTR(btl_vivian_zoom))
     CALL(evt_msg_print, 2, STRING("btl_majo3_10"), 0, -2)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     LABEL(90)
@@ -459,7 +473,7 @@ EVT_END()
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(majo_unison_phase_event_30_data_126FC))
+        CALL_CHILD(PTR(majo_unison_phase_event))
         CALL(btlevtcmd_GetUnitWork, -2, 4, LW(3))
         CALL(btlevtcmd_GetUnitWork, -2, 5, LW(4))
         IF_INT_NOT_EQUAL(LW(3), LW(4))
@@ -542,7 +556,11 @@ static s32 kagenuke_attack_event[] = {
     196699, (s32)evt_btl_camera_set_mode, 0, 8, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2,
     -29999997, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0,
     200, 65630, (s32)vivian_down, 65546, 300, 327771, (s32)btlevtcmd_GetPos, -29999997,
-    -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionAdd, -29999997, -30000000, 30,
+    -30000000, -29999999, -29999998,
+#ifdef VERSION_G8ME01
+    131125, -29999998, 5,
+#endif
+    262235, (s32)btlevtcmd_FaceDirectionAdd, -29999997, -30000000, 30,
     131122, -29999999, 0, 65630, (s32)vivian_up, 65546, 300, 262235,
     (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PTR_A1_2", 65546, 70, 393307, (s32)btlevtcmd_snd_se,
     -2, (s32)"SFX_BOSS_VIVI_ATTACK4", -250000000, 0, -250000000, 458843, (s32)btlevtcmd_PreCheckDamage, -2,

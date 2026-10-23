@@ -82,7 +82,7 @@ __declspec(section ".data") s32 fd_monochrome_kurokumorn___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_monochrome_kurokumorn_one_negone_359;
 __declspec(section ".data") s32 fd_monochrome_kurokumorn___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_monochrome_kurokumorn_one_364[1];
-BattleUnitKind unit_monochrome_kurokumorn_28_data_59A08;
+BattleUnitKind unit_monochrome_kurokumorn;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -151,7 +151,7 @@ __declspec(section ".data") s32 fd_monochrome_kurokumorn_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_monochrome_kurokumorn_28_data_59A08 = {
+BattleUnitKind unit_monochrome_kurokumorn = {
     24,
     "btl_un_monochrome_kurokumorn",
     3,
@@ -237,7 +237,13 @@ static s32 weapon_kurokumorn_attack[] = {
 };
 
 static s32 weapon_kurokumorn_thunder_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    1677721602,
+#else
+    1677721600,
+#endif
+    1065353216, 16843009, (s32)weaponGetPowerDefault,
     2, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 67109634, 0, 71, 2047, -2147483644,

@@ -5,7 +5,7 @@
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_gra_vivian_pose_set);
-USER_FUNC(evt_kagemario_init_11_text_804);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_mario_key_onoff);
 USER_FUNC(evt_mario_mov_pos2);
 USER_FUNC(evt_mario_set_dir);
@@ -24,7 +24,7 @@ USER_FUNC(evt_snd_envon);
 extern s32 bero_case_entry[];
 extern s32 evt_bero_info_run[];
 extern s32 evt_sub_tree_access_entry[];
-extern s32 evt_usu_kagemario_party_kill_11_data_4F98[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_gra_01_negone_one_374;
 __declspec(section ".data") s32 fd_gra_01_neg_one_382[1];
@@ -140,7 +140,7 @@ static s32 tree_tbl[] = {
 EVT_BEGIN(gra_01_init_evt)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_GRA1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_USU1"))
-    CALL(evt_kagemario_init_11_text_804)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(tree_tbl))
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
     SET_VALUE(LW(0), PTR(bero_entry_data))
@@ -162,7 +162,7 @@ EVT_BEGIN(gra_01_init_evt)
         ELSE
         SPAWN_EVENT(PTR(gra_01_after_ranpel2))
     END_IF
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_11_data_4F98))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     RETURN
 EVT_END()
 

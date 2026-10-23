@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -11,10 +12,14 @@
 #include "mario/mariost.h"
 
 typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; Vec ofs; Vec rot; } ZakoGun;
-typedef struct ZakoGunWork { s32 flag; s32 targetId; s32 state; s32 timer; Vec pos; u8 field_0x1c[0x34 - 0x1c]; f32 radius; f32 angle; f32 speed; u8 field_0x40[0x48 - 0x40]; Vec start; Vec end; s32 timer2; s32 steps; s32 count; s32 sfx; ZakoGun* zako; } ZakoGunWork;
+typedef struct ZakoGunWork { s32 flag; s32 targetId;
+#ifdef VERSION_G8ME01
+    u8 us_pad08[0xC]; // US: 12 more bytes here
+#endif
+    s32 state; s32 timer; Vec pos; u8 field_0x1c[0x34 - 0x1c]; f32 radius; f32 angle; f32 speed; u8 field_0x40[0x48 - 0x40]; Vec start; Vec end; s32 timer2; s32 steps; s32 count; s32 sfx; ZakoGun* zako; } ZakoGunWork;
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 extern ZakoGun* zakogun;
-extern ZakoGunWork* work_20_bss_6C;
+extern ZakoGunWork* work;
 ExtPose* extGetPosePtr(void);
 void extLoadRenderMode(void);
 void extLoadVertex(void);
@@ -129,7 +134,7 @@ s32 zakogun_ext_entry_data[147];
 s32 zakogun_entry[19];
 
 USER_FUNC(zakogun_set_target_id) {
-    work_20_bss_6C->targetId = evtGetValue(event, event->args[0]);
+    work->targetId = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
@@ -148,7 +153,7 @@ USER_FUNC(zakogun_damage_pose) {
         for (i = 0; i < 500; i++) {
             zako = &zakogun[i];
             if (zako != NULL) {
-                switch (work_20_bss_6C->flag) {
+                switch (work->flag) {
                     case 0:
                     case 2:
                         zakogun_set_pose(zako, 0x21, 3, 3);
@@ -171,7 +176,7 @@ USER_FUNC(zakogun_damage_pose_cancel) {
         for (i = 0; i < 500; i++) {
             zako = &zakogun[i];
             if (zako != NULL) {
-                switch (work_20_bss_6C->flag) {
+                switch (work->flag) {
                     case 0:
                         zakogun_set_pose(zako, 0x15, 1, 1);
                         break;
@@ -341,7 +346,7 @@ static BattleUnitKindPart parts[] = {
 };
 
 s32 weapon_gundan_zako_group1_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
     5, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 553656320, 770, 0, 4231, 2047, 4,
@@ -554,10 +559,10 @@ void zakogun_ext_init(void) {
     BattleStageObject* body;
     BattleStageObject* wire;
 
-    work_20_bss_6C = BattleAlloc(sizeof(ZakoGunWork));
-    work_20_bss_6C->zako = BattleAlloc(500 * sizeof(ZakoGun));
-    zakogun = work_20_bss_6C->zako;
-    work_20_bss_6C->flag = 0;
+    work = BattleAlloc(sizeof(ZakoGunWork));
+    work->zako = BattleAlloc(500 * sizeof(ZakoGun));
+    zakogun = work->zako;
+    work->flag = 0;
     body = BattleSearchObjectPtr("if_body");
     wire = BattleSearchObjectPtr("if_wire");
     wire->mPosition = (Vec){0.0f, 250.0f, 0.0f};
@@ -566,7 +571,7 @@ void zakogun_ext_init(void) {
 }
 
 void zakogun_ext_main(void) {
-    switch (work_20_bss_6C->flag) {
+    switch (work->flag) {
         case 0:
             zakogun_ext_main1();
             break;
@@ -625,7 +630,7 @@ USER_FUNC(zakogun_ext_init1) {
     s32 i;
     ExtPose* pose = extGetPosePtr();
 
-    work_20_bss_6C->flag = 0;
+    work->flag = 0;
     for (i = 0; i < 6; i++, pose++) {
         zakogun_ext_init123_common(pose, i);
     }
@@ -914,7 +919,7 @@ void zakogun_ext_main1(void) {
                 }
                 break;
             case 40:
-                BtlUnit_GetPos(BattleGetUnitPtr(wp, work_20_bss_6C->targetId), &x, &y, &z);
+                BtlUnit_GetPos(BattleGetUnitPtr(wp, work->targetId), &x, &y, &z);
                 x += 100.0f;
                 zako->start.x = zako->pos.x;
                 zako->start.y = zako->pos.y;
@@ -941,7 +946,7 @@ void zakogun_ext_main1(void) {
             case 50: {
                 f32 ofs[6] = {-20.0f, -10.0f, 0.0f, 10.0f, 20.0f, 30.0f};
 
-                BtlUnit_GetPos(BattleGetUnitPtr(wp, work_20_bss_6C->targetId), &x, &y, &z);
+                BtlUnit_GetPos(BattleGetUnitPtr(wp, work->targetId), &x, &y, &z);
                 zako->start.x = zako->pos.x;
                 zako->start.y = zako->pos.y;
                 zako->start.z = zako->pos.z;
@@ -958,7 +963,7 @@ void zakogun_ext_main1(void) {
                 break;
             }
             case 55:
-                BtlUnit_GetPos(BattleGetUnitPtr(wp, work_20_bss_6C->targetId), &x, &y, &z);
+                BtlUnit_GetPos(BattleGetUnitPtr(wp, work->targetId), &x, &y, &z);
                 zako->pos.x = intplGetValue(0, zako->timerMax - zako->timer, zako->timerMax, zako->start.x, zako->target.x);
                 zako->pos.z = intplGetValue(0, zako->timerMax - zako->timer, zako->timerMax, zako->start.z, zako->target.z);
                 zako->pos.y += zako->vel.y;
@@ -1235,6 +1240,6 @@ USER_FUNC(zakogun_end_sukima) {
     return EVT_RETURN_DONE;
 }
 
-ZakoGunWork* work_20_bss_6C;
+ZakoGunWork* work;
 ZakoGun* zakogun;
 

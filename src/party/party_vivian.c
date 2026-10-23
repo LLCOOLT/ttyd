@@ -7,6 +7,19 @@
 #include "system.h"
 #include <string.h>
 
+#ifdef VERSION_G8ME01
+// US has no local duplicate: this is the global vivian_init
+#define vivian_init_801809C0 vivian_init
+#endif
+
+#ifdef VERSION_G8ME01
+#define MW_US 4 // US MarioWork has 4 more bytes before these raw offsets
+#define VIVIAN_FOLLOW_DIST 30.0f
+#else
+#define MW_US 0
+#define VIVIAN_FOLLOW_DIST 22.0f
+#endif
+
 typedef struct VivianParty {
     u32 flags;               // 0x0
     u32 flags2;              // 0x4
@@ -83,10 +96,10 @@ void mot_vivian(void) {
         mario->airTimer = 0;
         mario->currSubMotionId = 0;
         mario->baseSpeed = 0.0f;
-        *(s32*)((u8*)mario + 0x1E0) = 0;
-        *(s32*)((u8*)mario + 0x1DC) = 0;
-        *(s32*)((u8*)mario + 0x1EC) = 0;
-        *(s32*)((u8*)mario + 0x1F0) = 0;
+        *(s32*)((u8*)mario + 0x1E0 + MW_US) = 0;
+        *(s32*)((u8*)mario + 0x1DC + MW_US) = 0;
+        *(s32*)((u8*)mario + 0x1EC + MW_US) = 0;
+        *(s32*)((u8*)mario + 0x1F0 + MW_US) = 0;
     }
 }
 
@@ -210,9 +223,9 @@ void vivianShadow(VivianParty* party) {
         party->shadow.x += dx;
         party->shadow.y += dy;
         party->shadow.z += dz;
-        if (distABf(party->position.x, party->position.z, party->shadow.x, party->shadow.z) >= 22.0f) {
+        if (distABf(party->position.x, party->position.z, party->shadow.x, party->shadow.z) >= VIVIAN_FOLLOW_DIST) {
             party->shadow = party->position;
-            movePos(&party->shadow.x, &party->shadow.z, 22.0f,
+            movePos(&party->shadow.x, &party->shadow.z, VIVIAN_FOLLOW_DIST,
                     angleABf(party->position.x, party->position.z, party->shadow.x, party->shadow.z));
         }
     }
@@ -241,6 +254,9 @@ extern s32 hitGetAttr(void* hit);
 extern f32 toMovedirSimple(f32 angle);
 extern f32 toMovedir(f32 angle);
 extern void marioChkWallAround(Vec* pos, s32 arg, f32 a, f32 b, f32 c, f32 d);
+#ifdef VERSION_G8ME01
+extern void partyChkWallAround(struct PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 width, f32 height);
+#endif
 extern void partyChgPose(VivianParty* party, const char* name);
 extern void partyChgPaper(VivianParty* party, const char* name);
 extern s32 psndSFXOn_3D(s32 id, Vec* pos);
@@ -302,7 +318,11 @@ static inline void vivianFollow(VivianParty* party) {
         movePos(&PF(f32, 0x94), &PF(f32, 0x9C), ofs, toMovedir(270.0f + m->displayDirection));
     }
     if (strcmp(gp->currentMapName, "eki_02") == 0) {
+#ifdef VERSION_G8ME01
+        partyChkWallAround((PartyEntry*)party, &m->position, 0.0f, m->directionView, m->wPlayerCollisionBox.z, 0.5f);
+#else
         marioChkWallAround(&m->position, 1, 0.0f, m->directionView, m->wPlayerCollisionBox.z, 0.5f);
+#endif
     }
 }
 

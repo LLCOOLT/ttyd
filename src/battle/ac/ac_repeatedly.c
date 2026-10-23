@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle.h"
 #include "battle/battle_ac.h"
 #include "battle/battle_pad.h"
@@ -7,6 +8,7 @@
 #include "system.h"
 #include <dolphin/os.h>
 #include <string.h>
+#include "icon_ids.h"
 
 u32 SIProbe(s32 chan);
 void BattleAcDrawGauge();
@@ -354,25 +356,25 @@ static void actionCommandDisp(f32 x, f32 y) {
     if (*(s32*)((u8*)r - 0x2BC + 0x38) != 16) {
         switch (r->btn0) {
             case 0x100:
-                icon1 = 0x65;
-                icon2 = 0x64;
+                icon1 = ICON_065;
+                icon2 = ICON_064;
                 break;
             case 0x200:
-                icon1 = 0x67;
-                icon2 = 0x66;
+                icon1 = ICON_067;
+                icon2 = ICON_066;
                 break;
             case 0x400:
-                icon1 = 0x69;
-                icon2 = 0x68;
+                icon1 = ICON_069;
+                icon2 = ICON_068;
                 break;
             case 0x800:
-                icon1 = 0x6B;
-                icon2 = 0x6A;
+                icon1 = ICON_06B;
+                icon2 = ICON_06A;
                 break;
             case 0x40000:
             default:
-                icon1 = 0x78;
-                icon2 = 0x79;
+                icon1 = ICON_078;
+                icon2 = ICON_079;
                 break;
         }
         if ((d->frame / 7 & 1) == 1) {
@@ -392,16 +394,16 @@ static void actionCommandDisp(f32 x, f32 y) {
             BOOL match;
             u16 a, b, icon;
             if (i == 0) {
-                a = 0x65;
-                b = 0x64;
+                a = ICON_065;
+                b = ICON_064;
                 if (r->btn0 == r->btn1) {
                     match = TRUE;
                 } else {
                     match = FALSE;
                 }
             } else {
-                a = 0x67;
-                b = 0x66;
+                a = ICON_067;
+                b = ICON_066;
                 if (r->btn0 == r->btn2) {
                     match = TRUE;
                 } else {
@@ -429,12 +431,12 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
     target = r->gauge / 100.0f;
     if (d->gauge <= target) {
-        d->gauge += 0.01f;
+        d->gauge += VERSION_PICK(0.01f, 0.0125f);
         if (d->gauge > target) {
             d->gauge = target;
         }
     } else {
-        d->gauge -= 0.01f;
+        d->gauge -= VERSION_PICK(0.01f, 0.0125f);
         if (d->gauge < target) {
             d->gauge = target;
         }
@@ -460,7 +462,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = (-288.0f + x) + (176.0f * r->pos) / 100.0f;
         pos.y = 45.0f + y;
-        iconDispGx(&pos, 0x10, 0x96, 1.0f);
+        iconDispGx(&pos, 0x10, ICON_096, 1.0f);
     }
     d->frame++;
     d->frame2++;

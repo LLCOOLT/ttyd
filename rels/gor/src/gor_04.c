@@ -109,6 +109,9 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(evt_sub_rumble_onoff);
+#ifdef VERSION_G8ME01
+USER_FUNC(N_evt_sub_status_gauge_force_update);
+#endif
 static USER_FUNC(ramp_r);
 static USER_FUNC(kpa_hikousen_yure);
 static void resha_tev(MapTevCallbackInfo* info);
@@ -196,7 +199,11 @@ s32 evt_hikousen[224];
 static s32 evt_wing[97];
 s32 evt_hikousen_return[490];
 s32 gor_04_koopa_evt[1123];
+#ifdef VERSION_G8ME01
+s32 gor_04_init_evt[255];
+#else
 s32 gor_04_init_evt[253];
+#endif
 
 __declspec(section ".data") u64 fd_gor_04_negone_one_374 = 0xBF8000003F800000;
 
@@ -1558,11 +1565,19 @@ EVT_BEGIN(evt_hikousen_return)
     BEGIN_INLINE_EVENT
         CALL(evt_mapobj_get_position, STRING("hikousen"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_AIR_SHIP_DRIVE1"), LW(0), LW(1), LW(2), LW(10))
+#ifdef VERSION_G8ME01
+        WAIT_MS(7500)
+#else
         WAIT_MS(15000)
+#endif
         CALL(evt_snd_sfxoff, LW(10))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+#ifdef VERSION_G8ME01
+        CALL(evt_sub_intpl_msec_init, 11, 4000, 0, 7500)
+#else
         CALL(evt_sub_intpl_msec_init, 11, 4000, 0, 15000)
+#endif
         LABEL(10)
         CALL(evt_sub_intpl_msec_get_value)
         DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
@@ -1574,7 +1589,11 @@ EVT_BEGIN(evt_hikousen_return)
         SET_VALUE(GF(0), 1)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+#ifdef VERSION_G8ME01
+        CALL(evt_sub_intpl_msec_init, 11, 1000, 0, 7500)
+#else
         CALL(evt_sub_intpl_msec_init, 11, 1000, 0, 15000)
+#endif
         LABEL(20)
         CALL(evt_sub_intpl_msec_get_value)
         DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
@@ -1889,9 +1908,16 @@ EVT_BEGIN(gor_04_init_evt)
         IF_INT_EQUAL(LW(15), 0)
             CALL(evt_mario_set_party, 0, 1)
             CALL(evt_party_run, 0)
+#ifdef VERSION_G8ME01
+        END_IF
+#endif
             CALL(evt_pouch_mario_recovery)
             CALL(evt_pouch_all_party_recovery)
+#ifdef VERSION_G8ME01
+        CALL(N_evt_sub_status_gauge_force_update)
+#else
         END_IF
+#endif
     END_IF
     SPAWN_EVENT(PTR(evt_sub_mail_event))
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("train_2"), 2)

@@ -1,7 +1,11 @@
+#include "version.h"
 #pragma optimize_for_size on
 #include "battle/battle_status_icon.h"
 #include "battle/battle.h"
 #include <string.h>
+#ifdef VERSION_G8ME01
+#include "mario/mariost.h"
+#endif
 
 extern BattleWork* _battleWorkPointer;
 
@@ -19,6 +23,116 @@ BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusI
 BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
 BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
 
+#ifdef VERSION_G8ME01
+__declspec(section ".data") u32 fd_bsi_0[2] = {0xBF800000, 0x3F800000}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") u32 fd_bsi_1[2] = {0xBF800000, 0x3F800000}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") u32 fd_bsi_2[2] = {0x3F800000, 0xBF800000}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") u32 fd_bsi_3[2] = {0x3F800000, 0xBF800000}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") u32 fd_bsi_4[2] = {0xBF800000, 0x3F800000}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") u32 fd_bsi_5[2] = {0xBF800000, 0x3F800000}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") u32 fd_bsi_6[2] = {0x3F800000, 0xBF800000}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") u32 fd_bsi_7[2] = {0x3F800000, 0xBF800000}; // MWCC trig-pool pair (+-1.0f)
+IconDispTableEntry _disp_table[0x17] = {
+		{1, _bsi_default_turn, 22, 1},
+		{4, _bsi_default_turn, 20, 1},
+		{21, _bsi_default_turn, 21, 1},
+		{2, _bsi_default_turn, 23, 1},
+		{8, _bsi_default_turn, 24, 1},
+		{9, _bsi_default_turn, 25, 1},
+		{19, _bsi_default_turn, 26, 1},
+		{20, _bsi_default_turn, 27, 1},
+		{14, _bsi_default_turn, 28, 1},
+		{15, _bsi_default_turn, 29, 1},
+		{7, _bsi_default_turn, 41, 1},
+		{10, _bsi_default_turn, 42, 1},
+		{11, _bsi_default_turn, 43, 1},
+		{5, _bsi_default_turn, 44, 1},
+		{12, _bsi_default_turn, 45, 1},
+		{13, _bsi_default_turn, 46, 1},
+		{18, _bsi_default_turn, 47, 1},
+		{3, _bsi_guruguru, 39, 0},
+		{6, _bsi_biribiri, 38, 0},
+		{0, _bsi_allergy, 40, 0},
+		{23, _bsi_regeneration, 30, 0},
+		{24, _bsi_regeneration, 31, 0},
+		{-1, NULL, 0, 0},
+};
+IconDispTableEntry _disp_table_1[0x17] = {
+		{1, _bsi_default_turn, 22, 1},
+		{4, _bsi_default_turn, 20, 1},
+		{21, _bsi_default_turn, 21, 1},
+		{2, _bsi_default_turn, 23, 1},
+		{8, _bsi_default_turn, 24, 1},
+		{9, _bsi_default_turn, 25, 1},
+		{19, _bsi_default_turn, 26, 1},
+		{20, _bsi_default_turn, 27, 1},
+		{14, _bsi_default_turn, 28, 1},
+		{15, _bsi_default_turn, 29, 1},
+		{7, _bsi_default_turn, 41, 1},
+		{10, _bsi_default_turn, 42, 1},
+		{11, _bsi_default_turn, 43, 1},
+		{5, _bsi_default_turn, 44, 1},
+		{12, _bsi_default_turn, 45, 1},
+		{13, _bsi_default_turn, 46, 1},
+		{18, _bsi_default_turn, 47, 1},
+		{3, _bsi_guruguru, 39, 0},
+		{6, _bsi_biribiri, 38, 0},
+		{0, _bsi_allergy, 40, 0},
+		{23, _bsi_regeneration, 32, 0},
+		{24, _bsi_regeneration, 33, 0},
+		{-1, NULL, 0, 0},
+};
+IconDispTableEntry _disp_table_2[0x17] = {
+		{1, _bsi_default_turn, 22, 1},
+		{4, _bsi_default_turn, 20, 1},
+		{21, _bsi_default_turn, 21, 1},
+		{2, _bsi_default_turn, 23, 1},
+		{8, _bsi_default_turn, 24, 1},
+		{9, _bsi_default_turn, 25, 1},
+		{19, _bsi_default_turn, 26, 1},
+		{20, _bsi_default_turn, 27, 1},
+		{14, _bsi_default_turn, 28, 1},
+		{15, _bsi_default_turn, 29, 1},
+		{7, _bsi_default_turn, 41, 1},
+		{10, _bsi_default_turn, 42, 1},
+		{11, _bsi_default_turn, 43, 1},
+		{5, _bsi_default_turn, 44, 1},
+		{12, _bsi_default_turn, 45, 1},
+		{13, _bsi_default_turn, 46, 1},
+		{18, _bsi_default_turn, 47, 1},
+		{3, _bsi_guruguru, 39, 0},
+		{6, _bsi_biribiri, 38, 0},
+		{0, _bsi_allergy, 40, 0},
+		{23, _bsi_regeneration, 34, 0},
+		{24, _bsi_regeneration, 35, 0},
+		{-1, NULL, 0, 0},
+};
+IconDispTableEntry _disp_table_3[0x17] = {
+		{1, _bsi_default_turn, 22, 1},
+		{4, _bsi_default_turn, 20, 1},
+		{21, _bsi_default_turn, 21, 1},
+		{2, _bsi_default_turn, 23, 1},
+		{8, _bsi_default_turn, 24, 1},
+		{9, _bsi_default_turn, 25, 1},
+		{19, _bsi_default_turn, 26, 1},
+		{20, _bsi_default_turn, 27, 1},
+		{14, _bsi_default_turn, 28, 1},
+		{15, _bsi_default_turn, 29, 1},
+		{7, _bsi_default_turn, 41, 1},
+		{10, _bsi_default_turn, 42, 1},
+		{11, _bsi_default_turn, 43, 1},
+		{5, _bsi_default_turn, 44, 1},
+		{12, _bsi_default_turn, 45, 1},
+		{13, _bsi_default_turn, 46, 1},
+		{18, _bsi_default_turn, 47, 1},
+		{3, _bsi_guruguru, 39, 0},
+		{6, _bsi_biribiri, 38, 0},
+		{0, _bsi_allergy, 40, 0},
+		{23, _bsi_regeneration, 36, 0},
+		{24, _bsi_regeneration, 37, 0},
+		{-1, NULL, 0, 0},
+};
+#else
 IconDispTableEntry _disp_table[0x17] = {
 	{1, _bsi_default_turn, 15, 1},
 	{4, _bsi_default_turn, 13, 1},
@@ -44,6 +158,7 @@ IconDispTableEntry _disp_table[0x17] = {
 	{24, _bsi_regeneration, 24, 0},
 	{-1, NULL, 0, 0},
 };
+#endif
 
 
 __declspec(section ".sdata2") GXColor bsi_disp_color = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -88,8 +203,32 @@ void BattleStatusIconMain(BattleUnit* unit) {
 		}
 
 		for (i = 0; i < 0x17; i++) {
+#ifdef VERSION_G8ME01
+			IconDispTableEntry* d;
+			BattleWorkStatusIconEntry* e;
+			switch (gp->language) {
+				case 2:
+					d = &_disp_table_1[i];
+					break;
+				case 3:
+				case 4:
+					d = &_disp_table_2[i];
+					break;
+				case 5:
+					d = &_disp_table_3[i];
+					break;
+				default:
+					d = &_disp_table[i];
+					break;
+			}
+#else
 			IconDispTableEntry* d = (IconDispTableEntry*)((u8*)_disp_table + i * 16);
+#endif
+#ifdef VERSION_G8ME01
+			e = &icon->mIcons[icon->mNumStatusIcons];
+#else
 			BattleWorkStatusIconEntry* e = &icon->mIcons[icon->mNumStatusIcons];
+#endif
 			if (d->id == -1) break;
 			if (d->callback(unit, d, e)) {
 				icon->mNumStatusIcons++;
@@ -141,9 +280,9 @@ void BattleStatusIconDisp(CameraId camId, void* param) {
 		p.z -= (f32)(-(i * 2));
 		if (!(e->flags & 1)) {
 			if (!(icon->mFlags & 1)) {
-				btlDispTexPlane(0x23, col, p.x, p.y, p.z, 0.8f, 0.8f, 0);
+				btlDispTexPlane(VERSION_PICK(0x23, 0x30), col, p.x, p.y, p.z, 0.8f, 0.8f, 0);
 			} else {
-				btlDispTexPlane(0x23, col, p.x, p.y, p.z, 0.8f, -0.8f, 0);
+				btlDispTexPlane(VERSION_PICK(0x23, 0x30), col, p.x, p.y, p.z, 0.8f, -0.8f, 0);
 			}
 		}
 		if (e->icon == 0) continue;
@@ -192,8 +331,8 @@ typedef struct BsiEntry {
 #include "system.h"
 
 
-#define BSI_S(u, o) (*(s16*)((u8*)(u) + (o)))
-#define BSI_F(u, o) (*(f32*)((u8*)(u) + (o)))
+#define BSI_S(u, o) (*(s16*)((u8*)(u) + BUOFF(o)))
+#define BSI_F(u, o) (*(f32*)((u8*)(u) + BUOFF(o)))
 
 BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry_) {
 	BsiEntry* entry = (BsiEntry*)entry_;

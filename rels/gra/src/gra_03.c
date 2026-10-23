@@ -4,13 +4,13 @@
 #pragma force_active on
 
 USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_kagemario_init_11_text_804);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_mobj_badgeblk);
 USER_FUNC(evt_mobj_brick);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill_11_data_4F98[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_gra_03_negone_one_374;
 __declspec(section ".data") s32 fd_gra_03_neg_one_382[1];
@@ -91,11 +91,11 @@ EVT_BEGIN(gra_03_init_evt)
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_GRA1"))
     CALL(evt_mobj_brick, STRING("blk00"), -120, 60, 90, 0, 3, 0, GSWF(2083))
     CALL(evt_mobj_badgeblk, STRING("blk01\0\0"), 230, 60, -88, 133, 0, GSWF(2084), 0)
-    CALL(evt_kagemario_init_11_text_804)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_11_data_4F98))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     RETURN
 EVT_END()
 

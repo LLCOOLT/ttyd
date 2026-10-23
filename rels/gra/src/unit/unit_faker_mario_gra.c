@@ -568,3 +568,23 @@ static USER_FUNC(vivian_comeback) {
     pouchGetPtr()->partyData[6].flags &= ~2;
     return 1;
 }
+
+#ifdef VERSION_G8ME01
+#include "battle/battle.h"
+#include "battle/battle_sub.h"
+#include "manager/evtmgr_cmd.h"
+
+// US only: restore the moves of the unit for this turn.
+USER_FUNC(faker_mario_gra_sync_max_moves) {
+    BattleUnit* unit;
+    s32 id = evtGetValue(event, event->args[0]);
+
+    id = BattleTransID(event, id);
+    unit = BattleGetUnitPtr(_battleWorkPointer, id);
+
+    if (unit != NULL) {
+        unit->maxMovesThisTurn = unit->movesRemaining;
+    }
+    return EVT_RETURN_DONE;
+}
+#endif

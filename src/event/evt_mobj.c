@@ -179,6 +179,9 @@ extern void itemFlagOn(void* item, u32 flag);
 extern s16 pouchAddCoin(s16 coins);
 extern void marioStSystemLevel(s32 level);
 extern s32 mobj_save_blk_sysevt[];
+#ifdef VERSION_G8ME01
+extern s32 evt_memcard_save_wrapper[];
+#endif
 s32 mobj_recovery_blk(MapObjectEntry* mobj);
 
 extern void mobjHitEntry(MapObjectEntry* mobj, s32 idx);
@@ -996,7 +999,7 @@ s32 mobj_jumpstand_red(MapObjectEntry* mobj) {
             FLD(s32, gp, 0x18) |= 0x10;
             ev = mobjRunEvent(mobj, (s32*)mobj->event);
             if (ev) {
-                FLD(s32, ev, 0x9c) = FLD(f32, mario, 0xd8) < FLD(f32, mario, 0x90) ? 0 : (FLD(f32, mario, 0xd8) < mobj->position.y + FLD(f32, mario, 0x1b8) ? 0 : 1);
+                FLD(s32, ev, 0x9c) = FLD(f32, mario, 0xd8) < FLD(f32, mario, 0x90) ? 0 : (FLD(f32, mario, 0xd8) < mobj->position.y + FLD(f32, mario, MWOFF(0x1b8)) ? 0 : 1);
             }
             if ((s32)FLD(u8, mario, 0x3c) != 2) {
                 if (!strcmp(mobj->animName, "MOBJ_RedJumpStand")) {
@@ -1673,8 +1676,13 @@ extern s32 windowCheckID(s32 id);
 extern void partyKeyOn(void);
 
 s32 mobj_lock(MapObjectEntry* mobj) {
+#ifdef VERSION_G8ME01
+    s32 i;
+    s32 item;
+#else
     s32 item;
     s32 i;
+#endif
     EventEntry* ev;
     f32 hx, hy, hz, dist, nx, ny, nz;
     switch (mobj->state) {
@@ -1708,6 +1716,20 @@ s32 mobj_lock(MapObjectEntry* mobj) {
     case 2:
         if (mobj->typeDataU[0] & 0x80000000) {
             item = 0;
+#ifdef VERSION_G8ME01
+            for (i = 0; ; i++) {
+                s32* list = (s32*)mobj->typeDataP[0];
+                s32 r;
+                if (list[i] == -1) {
+                    break;
+                }
+                r = pouchCheckItem(list[i]);
+                if (r) {
+                    item = list[i];
+                    break;
+                }
+            }
+#else
             for (i = 0; ; i++) {
                 s32 it = ((s32*)mobj->typeDataP[0])[i];
                 s32 r;
@@ -1720,6 +1742,7 @@ s32 mobj_lock(MapObjectEntry* mobj) {
                     break;
                 }
             }
+#endif
         } else if ((i = pouchCheckItem(mobj->typeData[0])) != 0) {
             item = mobj->typeData[0];
         } else {
@@ -2315,7 +2338,11 @@ EVT_BEGIN(mobj_save_blk_sysevt)
         SET_VALUE(GSWF(236), 1)
     END_IF
     SET_VALUE(LW(0), 0)
+#ifdef VERSION_G8ME01
+    CALL_CHILD(PTR(evt_memcard_save_wrapper))
+#else
     CALL_CHILD(PTR(evt_memcard_save))
+#endif
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -2404,6 +2431,95 @@ USER_FUNC(evt_mobj_save_blk) {
     animPoseSetAnim(mobj->poseId, "S_1", 1);
     return EVT_RETURN_DONE;
 }
+
+#ifdef VERSION_G8ME01
+// US-only plain block (MOBJ_Block / MOBJ_PinkBlock) that runs an event when hit.
+s32 mobj_blk(MapObjectEntry* mobj) {
+    switch (mobj->state) {
+    case 0:
+        if (mobj->flags & 8) {
+            psndSFXOn_3D((const char*)0x1b7, &mobj->position);
+            animPoseSetAnim(mobj->poseId, "A_1", 1);
+            mobj->flags &= ~8;
+            mobj->state++;
+        }
+        break;
+    case 1:
+        if ((void*)mobj->event) {
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            mobj->state++;
+        } else {
+            mobj->state = 3;
+        }
+        break;
+    case 2:
+        if (evtCheckID(mobj->eventId) != 1) {
+            mobj->eventId = 0;
+            mobj->state++;
+        }
+        break;
+    case 3:
+        if (!(mobj->flags & 8)) {
+            mobj->state = 0;
+            break;
+        }
+        if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+            break;
+        }
+        animPoseSetAnim(mobj->poseId, "S_1", 1);
+        mobj->state = 0;
+        mobj->flags &= ~8;
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_blk) {
+    s32* args = event->args;
+    const char* name;
+    f32 x, y, z;
+    s32 kind;
+    s32 val;
+    s32 arg6;
+    const char* anim;
+    MapObjectEntry* mobj;
+    BOOL inBattle;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    kind = args[4];
+    val = evtGetValue(event, args[5]);
+    arg6 = args[6];
+    inBattle = gp->inBattle != 0;
+    switch (kind) {
+    case 0:
+        anim = "MOBJ_Block";
+        break;
+    case 1:
+        anim = "MOBJ_PinkBlock";
+        break;
+    default:
+        anim = "MOBJ_Block";
+        break;
+    }
+    if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_blk;
+    mobj->event = val;
+    mobj->flags |= 4;
+    mobj->flags |= 0x400000;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "S_1", 1);
+    return EVT_RETURN_DONE;
+}
+#endif
 
 s32 mobj_badgeblk(MapObjectEntry* mobj) {
     void* item;
@@ -3149,13 +3265,21 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
             FLD(f32, item, 0x90) = FLD(f32, joint, 0);
         }
         p = partyGetPtr(marioGetPartyId());
+#ifdef VERSION_G8ME01
+        if (p && !(FLD(u32, p, 0) & 0x100)) {
+#else
         if (p) {
+#endif
             if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, p, 0x58), FLD(f32, p, 0x60), 30.0f)) {
                 FLD(f32, p, 0x5c) = FLD(f32, joint, 0);
             }
         }
         p = partyGetPtr(marioGetExtraPartyId());
+#ifdef VERSION_G8ME01
+        if (p && !(FLD(u32, p, 0) & 0x100)) {
+#else
         if (p) {
+#endif
             if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, p, 0x58), FLD(f32, p, 0x60), 30.0f)) {
                 FLD(f32, p, 0x5c) = FLD(f32, joint, 0);
             }
@@ -4197,7 +4321,11 @@ USER_FUNC(evt_mobj_koopa_fireber_dodai) {
         FLD(u16, npc, 0x31e) |= 0xf;
         FLD(f32, npc, 0x8c) = x;
         FLD(f32, npc, 0x90) = 25.0f + y + 25.0f * i;
+#ifdef VERSION_G8ME01
+        FLD(f32, npc, 0x94) = 175.0f + z + i;
+#else
         FLD(f32, npc, 0x94) = 175.0f + z;
+#endif
         animPoseSetAnim(FLD(s32, npc, 0x104), "FRB_S_1", 1);
         FLD(u32, npc, 0) |= 0x40000;
     }

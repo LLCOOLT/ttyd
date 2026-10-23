@@ -175,6 +175,10 @@ USER_FUNC(shikakeFlag);
 USER_FUNC(wait_landon);
 USER_FUNC(wanwan_set_home_pos);
 USER_FUNC(yattukeFlag);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_msg_fmt_int);
+USER_FUNC(evt_msg_fmt_str);
+#endif
 void iri_12_msgcb(s32 type, void* param);
 void raster_disp(CameraId cameraId, void* param);
 void _unresolved(void);
@@ -325,7 +329,11 @@ __declspec(section ".data") s32 fd_jon___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_jon_one_negone_359;
 __declspec(section ".data") s32 fd_jon___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_jon_one_364[1];
+#ifdef VERSION_G8ME01
+s32 jon_init_evt[400];
+#else
 s32 jon_init_evt[391];
+#endif
 s32 enemy_100[25];
 s32 npcEnt_kuriboo[46];
 s32 npcEnt_patakuri[46];
@@ -361,7 +369,11 @@ s32 get_map_name[111];
 s32 talk_idouya[141];
 s32 npcEnt_idouya[46];
 s32 idouya_setup[38];
+#ifdef VERSION_G8ME01
+s32 talk_gyousyou[219];
+#else
 s32 talk_gyousyou[207];
+#endif
 s32 npcEnt_gyousyou[46];
 s32 gyousyou_setup[47];
 s32 shikake_setup[117];
@@ -545,6 +557,12 @@ EVT_BEGIN(jon_init_evt)
     IF_STR_EQUAL(LW(0), STRING("jon_04"))
         IF_INT_EQUAL(GSW(1321), 49)
             IF_INT_EQUAL(GSWF(5404), 0)
+#ifdef VERSION_G8ME01
+                IF_INT_NOT_EQUAL(GSW(1420), 30)
+                    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("after"), 1)
+                    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("s_rakugaki"), 1)
+                    ELSE
+#endif
                 SET_VALUE(LF(0), 0)
                 IF_INT_EQUAL(GSW(1420), 30)
                     IF_INT_EQUAL(GSWF(5406), 1)
@@ -554,15 +572,22 @@ EVT_BEGIN(jon_init_evt)
                 IF_INT_EQUAL(LF(0), 0)
                     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("after"), 1)
                     CALL(evt_run_case_evt, 9, 1, STRING("a_rakugaki"), 0, PTR(evt_iri_30_touch_rakugaki), LW(0))
+#ifndef VERSION_G8ME01
                     IF_INT_EQUAL(GSW(1420), 30)
                         IF_INT_EQUAL(GSWF(5405), 1)
+#endif
                             CALL(evt_run_case_evt, 15, 1, STRING("a_rakugaki"), 0, PTR(evt_iri_30_bomb_rakugaki), LW(1))
                             CALL(evt_set_case_wrk, LW(1), 15, LW(0))
+#ifndef VERSION_G8ME01
                         END_IF
                     END_IF
+#endif
                     ELSE
                     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("before"), 1)
                     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("s_rakugaki"), 1)
+#ifdef VERSION_G8ME01
+                    END_IF
+#endif
                 END_IF
                 ELSE
                 CALL(evt_mapobj_flag_onoff, 1, 1, STRING("before"), 1)
@@ -1353,18 +1378,42 @@ EVT_BEGIN(talk_gyousyou)
     END_IF
     IF_INT_GREATER_OR_EQUAL(LW(1), 240)
         CALL(evt_sub_get_language, LW(0))
+#ifdef VERSION_G8ME01
+        SWITCH(LW(0))
+            CASE_EQUAL(0)
+            CALL(evt_msg_print_insert, 0, STRING("100kai_item_04"), 0, STRING("me"), LW(2), LW(3), LW(4))
+            CASE_DEFAULT
+#else
         IF_INT_NOT_EQUAL(LW(0), 0)
+#endif
             CALL(evt_msg_print_insert, 0, STRING("100kai_item_04"), 0, STRING("me"), LW(3), LW(2), LW(4))
+#ifdef VERSION_G8ME01
+        END_SWITCH
+#else
             ELSE
             CALL(evt_msg_print_insert, 0, STRING("100kai_item_04"), 0, STRING("me"), LW(2), LW(3), LW(4))
         END_IF
+#endif
         ELSE
         CALL(evt_sub_get_language, LW(0))
+#ifdef VERSION_G8ME01
+        SWITCH(LW(0))
+            CASE_EQUAL(0)
+#else
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL(evt_msg_print_insert, 0, STRING("100kai_item_04"), 0, STRING("me"), LW(3), LW(2))
             ELSE
+#endif
             CALL(evt_msg_print_insert, 0, STRING("100kai_item_04"), 0, STRING("me"), LW(2), LW(3))
+#ifdef VERSION_G8ME01
+            CASE_DEFAULT
+            CALL(evt_msg_fmt_int, 0, LW(14), STRING("100kai_item_04"), LW(3))
+            CALL(evt_msg_fmt_str, 1, LW(14), LW(14), LW(2))
+            CALL(evt_msg_print, 1, LW(14), 0, STRING("me"))
+        END_SWITCH
+#else
         END_IF
+#endif
     END_IF
     CALL(evt_msg_select, 0, STRING("100kai_item_00"))
     IF_INT_EQUAL(LW(0), 1)
@@ -1481,7 +1530,11 @@ EVT_END()
 EVT_BEGIN(dokan_open)
     CALL(evt_mario_key_onoff, 0)
     WAIT_MS(1000)
+#ifdef VERSION_G8ME01
+    WAIT_MS(1000)
+#else
     CALL(evt_cam_letter_box_wait)
+#endif
     WAIT_MS(500)
     SET_VALUE(LW(2), STRING("a_dokan_1"))
     SET_VALUE(LW(3), STRING("dokan_1_s"))

@@ -1,3 +1,4 @@
+#include "icon_ids.h"
 #include "battle/battle.h"
 #include "battle/battle_ac.h"
 #include "battle/battle_pad.h"
@@ -139,7 +140,7 @@ s32 battleAcMain_GaugeTiming(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if ((GAC(work)->field_0x4 & 1) && (*(u32*)((u8*)work->actionCommands.mAcUnit + 0x278) & 0x10)) {
+            if ((GAC(work)->field_0x4 & 1) && (*(u32*)((u8*)work->actionCommands.mAcUnit + BUOFF(0x278)) & 0x10)) {
                 if (irand(100) >= 0) {
                     GAC(work)->field_0x8 = 30;
                     cw->passed = 0;
@@ -411,9 +412,9 @@ static void actionCommandDisp(f32 x, f32 y) {
             BattleAcDrawGauge((s32)x, (s32)y, 0xB2, t, 100, 100, 100, 100, 0);
         }
         if (cw->gauge >= (f32)g->target) {
-            icon = 0x95;
+            icon = ICON_095;
         } else {
-            icon = 0x91;
+            icon = ICON_091;
         }
         {
         Vec pos = {0.0f, 0.0f, 0.0f};
@@ -437,11 +438,11 @@ static void actionCommandDisp(f32 x, f32 y) {
         bx = -288.0f + x;
         by = 20.0f + y;
         for (i = 0; i < n; i++) {
-            u16 icon = 0x91;
+            u16 icon = ICON_091;
             f32 step;
             step = 100.0f / (f32)(n + 1) * (f32)(i + 1);
             if (cw->inRange) {
-                icon = 0x95;
+                icon = ICON_095;
             }
             {
                 Vec pos = {0.0f, 0.0f, 0.0f};

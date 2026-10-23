@@ -1,3 +1,4 @@
+#include "icon_ids.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -199,15 +200,15 @@ static void lecture_button_disp(CameraId camera, void* param) {
             Vec pos;
 
             switch (btn->iconId) {
-                case 0x75:
-                case 0x76:
-                case 0x77:
-                case 0x78:
-                case 0x79:
-                case 0x7A:
-                case 0x7B:
-                case 0x7C:
-                case 0x7D:
+                case ICON_075:
+                case ICON_076:
+                case ICON_077:
+                case ICON_078:
+                case ICON_079:
+                case ICON_07A:
+                case ICON_07B:
+                case ICON_07C:
+                case ICON_07D:
                     ofs = -15.0f;
                     break;
                 default:
@@ -241,7 +242,7 @@ static USER_FUNC(lecture_button_rtn) {
         btn = &lbtn[i];
         switch (btn->seq) {
             case 0:
-                btn->iconId = 0x68;
+                btn->iconId = ICON_068;
                 btn->seq = 1;
                 break;
             case 2:
@@ -623,11 +624,11 @@ s32 plane_majin_lecture[] = {
     7, 33, 65545, 1, 6, 112, 262235, (s32)evt_mario_mov_pos2,
     -230204800, -230000000, -229918080, 196699, (s32)evt_msg_print_add, 0, (s32)"mac_majin_15_1", 327771,
     (s32)lecture_button_set_pos, 0, -230204800, -230025600, -230000000, 262235, (s32)lecture_button_flag_on_off, 0,
-    2, 1, 196699, (s32)lecture_button_set_icon_id, 0, 106, 196699, (s32)lecture_button_set_seq,
+    2, 1, 196699, (s32)lecture_button_set_icon_id, 0, ICON_06A, 196699, (s32)lecture_button_set_seq,
     0, 2, 196699, (s32)lecture_button_seq_wait, 0, 1, 196699, (s32)x_flag_set,
     0, 1, 107, 65541, 0, 196699, (s32)lecture_button_set_icon_id, 0,
-    107, 65546, 300, 196699, (s32)x_flag_get, 0, -30000000, 131096,
-    -30000000, 2, 7, 33, 196699, (s32)lecture_button_set_icon_id, 0, 106,
+    ICON_06B, 65546, 300, 196699, (s32)x_flag_get, 0, -30000000, 131096,
+    -30000000, 2, 7, 33, 196699, (s32)lecture_button_set_icon_id, 0, ICON_06A,
     65546, 300, 196699, (s32)x_flag_get, 0, -30000000, 131096, -30000000,
     2, 7, 33, 6, 109, 65541, 0, 196699,
     (s32)evt_key_get_buttontrg, 0, -30000000, 131102, -30000000, 2048, 7, 33,

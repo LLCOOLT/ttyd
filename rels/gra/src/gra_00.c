@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -7,6 +8,9 @@
 #include "manager/evtmgr_cmd.h"
 #include "mario/mario.h"
 #include "dolphin/mtx.h"
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_sub_get_language);
+#endif
 
 double sin(double x);
 
@@ -31,7 +35,7 @@ USER_FUNC(evt_img_set_position);
 USER_FUNC(evt_img_set_virtual_point);
 USER_FUNC(evt_img_wait_animend);
 USER_FUNC(evt_item_entry);
-USER_FUNC(evt_kagemario_init_11_text_804);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_mario_dispflag_onoff);
 USER_FUNC(evt_mario_get_pos);
 USER_FUNC(evt_mario_key_onoff);
@@ -87,7 +91,7 @@ static USER_FUNC(zoom);
 void msg_callback(s32 type, void* param);
 extern s32 evt_bero_info_run[];
 extern s32 evt_sub_tree_access_entry[];
-extern s32 evt_usu_kagemario_party_kill_11_data_4F98[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_gra_00_negone_one_374;
 __declspec(section ".data") s32 fd_gra_00_neg_one_382[1];
@@ -109,7 +113,7 @@ s32 evt_yabure_on[56];
 __declspec(section ".data") s32 evt_yabure_off[5];
 s32 evt_nameent[109];
 s32 name_seikai[682];
-s32 evt_machibuse[666];
+s32 evt_machibuse[VERSION_PICK(666, 694)];
 static s32 bero_entry_data[45];
 static s32 npcEnt[46];
 static __declspec(section ".data") s32 tree_tbl[12];
@@ -432,6 +436,214 @@ EVT_BEGIN(name_seikai)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(evt_machibuse)
+    SET_VALUE(LF(0), 0)
+    LOOP(0)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        IF_INT_LESS_OR_EQUAL(LW(0), 30)
+            IF_INT_GREATER_OR_EQUAL(LW(0), -126)
+                BREAK_LOOP
+            END_IF
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_snd_bgmoff_f, 512, 120)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(200)
+        CALL(evt_mario_key_onoff, 0)
+        CALL(evt_mario_normalize)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        IF_INT_LESS(LW(0), -48)
+            CALL(evt_mario_set_dir, 90, 200, 0)
+            CALL(evt_party_set_dir, 0, 90, 200)
+            ELSE
+            CALL(evt_mario_set_dir, 270, 200, 0)
+            CALL(evt_party_set_dir, 0, 270, 200)
+        END_IF
+        CALL(evt_mario_set_pose, STRING("M_N_3"))
+    END_INLINE_EVENT
+    CALL(evt_npc_set_position, STRING("にせマリオ"), -125, 240, -25)
+    IF_INT_EQUAL(GSW(0), 206)
+        CALL(evt_msg_print, 0, STRING("stg4_gra_05"), 0, STRING("にせマリオ"))
+        ELSE
+        CALL(evt_msg_print, 0, STRING("stg4_gra_00"), 0, STRING("にせマリオ"))
+    END_IF
+    CALL(evt_npc_set_position, STRING("にせマリオ"), 0, -1000, 0)
+    CALL(evt_cam3d_evt_set, -88, 352, 517, -88, 257, -25, 800, 11)
+    WAIT_MS(800)
+    CALL(evt_mario_set_pose, STRING("M_S_1"))
+    CALL(evt_snd_bgmon, 512, STRING("BGM_FF_ENV_RPL_APPEAR1"))
+    CALL(evt_snd_envoff, 1024)
+    CALL_CHILD(PTR(evt_yabure_on))
+    IF_INT_LESS(LW(0), -48)
+        SET_VALUE(LF(0), 1)
+        ELSE
+        SET_VALUE(LF(0), 0)
+    END_IF
+    IF_INT_EQUAL(LF(0), 1)
+        CALL(evt_mario_set_pos, -100, 0, 0)
+        ELSE
+        CALL(evt_mario_set_pos, 0, 0, 0)
+    END_IF
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    IF_INT_EQUAL(LF(0), 1)
+        ADD(LW(0), -40)
+        ELSE
+        ADD(LW(0), 40)
+    END_IF
+    CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    IF_INT_EQUAL(LF(0), 1)
+        ADD(LW(0), 75)
+        ELSE
+        ADD(LW(0), -75)
+    END_IF
+    WAIT_MS(200)
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_set_position, STRING("にせマリオ"), -145, 270, -25)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG4_LANPEL_M_FALL1"), -145, 270, -25, LW(10))
+        CALL(evt_npc_jump_position_nohit, STRING("にせマリオ"), LW(0), LW(1), LW(2), 700, FLOAT(130.0f))
+        CALL(evt_snd_sfxoff, LW(10))
+        CALL(evt_set_dir_to_target, STRING("にせマリオ"), STRING("mario"))
+    END_INLINE_EVENT
+    WAIT_MS(500)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_NM_HAPPY1"), -145, 270, -25, 0)
+    CALL_CHILD(PTR(evt_yabure_off))
+    CALL(evt_gra_vivian_pose_set, 1, STRING("PTR_S_4"))
+    CALL(evt_gra_vivian_pose_set, 2, STRING("PTR_S_4"))
+    CALL(evt_gra_vivian_pose_set, 3, STRING("PTR_S_4"))
+    CALL(evt_gra_vivian_pose_set, 7, STRING("PTR_T_5"))
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_position, STRING("にせマリオ"), LW(3), LW(4), LW(5))
+    ADD(LW(0), LW(3))
+    DIVIDE(LW(0), 2)
+    ADD(LW(2), LW(5))
+    DIVIDE(LW(2), 2)
+    SET_VALUE(LW(3), LW(2))
+    ADD(LW(3), 542)
+    CALL(evt_cam3d_evt_set, LW(0), 137, LW(3), LW(0), 30, LW(2), 0, 11)
+    WAIT_FRAMES(1)
+    IF_INT_LESS(GSW(0), 203)
+        WAIT_MS(500)
+        CALL(evt_msg_print, 0, STRING("stg4_gra_01"), 0, STRING("にせマリオ"))
+        CALL(zoom, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5))
+        CALL(evt_cam3d_evt_set, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), 900, 11)
+        WAIT_MS(900)
+        CALL(evt_msg_print, 0, STRING("stg4_gra_02"), 0, STRING("にせマリオ"))
+        ELSE
+        CALL(zoom, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5))
+        CALL(evt_cam3d_evt_set, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), 1200, 11)
+        WAIT_MS(200)
+    END_IF
+    CALL(evt_mario_dispflag_onoff, 1, 2)
+    CALL(evt_mario_set_pose, STRING("M_I_Y"))
+    WAIT_MS(1000)
+    SWITCH(GSW(0))
+        CASE_LESS(203)
+        CALL(evt_msg_print, 0, STRING("stg4_gra_03"), 0, STRING("にせマリオ"))
+        CASE_LESS(206)
+        CALL(evt_msg_print, 0, STRING("stg4_gra_09"), 0, STRING("にせマリオ"))
+        CASE_LESS(207)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        SUBTRACT(LW(0), 15)
+        ADD(LW(2), 30)
+        CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(70.0f))
+        WAIT_MS(500)
+        CALL(evt_party_stop, 0)
+        WAIT_MS(300)
+        CALL(evt_msg_print_party, STRING("stg4_gra_06"))
+        CALL(evt_msg_print, 0, STRING("stg4_gra_07"), 0, STRING("にせマリオ"))
+        CALL(evt_party_run, 0)
+        CASE_DEFAULT
+        CALL(evt_msg_print, 0, STRING("stg4_gra_09"), 0, STRING("にせマリオ"))
+    END_SWITCH
+    SWITCH(GSW(0))
+        CASE_LESS(209)
+        SET_VALUE(LW(0), 2)
+        CALL_CHILD(PTR(evt_nameent))
+        WAIT_MS(300)
+        CASE_DEFAULT
+        SET_VALUE(LW(0), 3)
+        CALL_CHILD(PTR(evt_nameent))
+        WAIT_MS(300)
+        CALL(evt_sub_get_language, LW(1))
+        SWITCH(LW(1))
+            CASE_EQUAL(0)
+            SET_VALUE(LW(2), STRING("ランペル"))
+            CASE_OR_EQUAL(1)
+            CASE_OR_EQUAL(6)
+            SET_VALUE(LW(2), STRING("Doopliss"))
+            CASE_END
+            CASE_EQUAL(5)
+            SET_VALUE(LW(2), STRING("Rampel"))
+            CASE_DEFAULT
+            SET_VALUE(LW(2), STRING("Rumpel"))
+        END_SWITCH
+        IF_STR_EQUAL(LW(0), LW(2))
+            CALL_CHILD(PTR(name_seikai))
+            SET_VALUE(GSW(0), 210)
+            CALL(evt_pouch_remove_item, 68, LW(0))
+            CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_GRA1"))
+            CALL(evt_snd_envoff, 513)
+            CALL(evt_snd_envon, 288, 0)
+            CALL(evt_gra_vivian_pose_set, 1, STRING("PTR_S_1"))
+            CALL(evt_gra_vivian_pose_set, 2, STRING("PTR_W_1"))
+            CALL(evt_gra_vivian_pose_set, 3, STRING("PTR_R_1"))
+            CALL(evt_gra_vivian_pose_set, 7, STRING("PTR_T_1"))
+            CALL(evt_mario_dispflag_onoff, 0, 2)
+            CALL(evt_mario_key_onoff, 1)
+            CALL(evt_party_run, 0)
+            RETURN
+        END_IF
+    END_SWITCH
+    CALL(evt_msg_print, 0, STRING("stg4_gra_04"), 0, STRING("にせマリオ"))
+    CALL(evt_npc_set_battle_info, STRING("にせマリオ"), 2)
+    CALL(evt_npc_battle_start, STRING("にせマリオ"))
+    CALL(evt_npc_wait_battle_end)
+    SWITCH(GSW(0))
+        CASE_LESS(203)
+        SET_VALUE(GSW(0), 203)
+        CASE_LESS(206)
+        CASE_LESS(207)
+        SET_VALUE(GSW(0), 207)
+    END_SWITCH
+    CALL(evt_mario_dispflag_onoff, 0, 2)
+    CALL(evt_gra_vivian_pose_set, 1, STRING("PTR_S_4"))
+    CALL(evt_gra_vivian_pose_set, 7, STRING("PTR_T_5"))
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_position, STRING("にせマリオ"), LW(10), LW(11), LW(12))
+    CALL(evt_mario_set_pos, LW(10), LW(1), LW(2))
+    CALL(evt_npc_set_position, STRING("にせマリオ"), LW(0), LW(11), LW(12))
+    CALL(evt_set_dir_to_target, STRING("にせマリオ"), STRING("mario"))
+    IF_INT_LESS(LW(10), LW(0))
+        CALL(evt_cam3d_evt_set, -225, 134, 534, -225, 39, -8, 0, 11)
+        WAIT_FRAMES(1)
+        CALL(evt_npc_flag_onoff, 1, STRING("にせマリオ"), 32)
+        BEGIN_INLINE_EVENT
+            CALL(evt_mario_mov_pos2, -385, 0, FLOAT(200.0f))
+        END_INLINE_EVENT
+        WAIT_MS(1100)
+        CALL(evt_cam3d_evt_set, -88, 137, 517, -88, 42, -25, 800, 11)
+        WAIT_MS(800)
+        CALL(evt_msg_print, 0, STRING("stg4_gra_11"), 0, STRING("にせマリオ"))
+        CALL(evt_bero_mapchange, STRING("usu_01"), STRING("e_bero"))
+        ELSE
+        CALL(evt_cam3d_evt_set, 186, 149, 534, 186, 54, -8, 0, 11)
+        WAIT_FRAMES(1)
+        CALL(evt_npc_flag_onoff, 1, STRING("にせマリオ"), 32)
+        BEGIN_INLINE_EVENT
+            CALL(evt_mario_mov_pos2, 385, 0, FLOAT(200.0f))
+        END_INLINE_EVENT
+        WAIT_MS(1250)
+        CALL(evt_cam3d_evt_set, -20, 137, 517, -20, 42, -25, 800, 11)
+        WAIT_MS(850)
+        CALL(evt_msg_print, 0, STRING("stg4_gra_11"), 0, STRING("にせマリオ"))
+        CALL(evt_bero_mapchange, STRING("gra_01"), STRING("w_bero1"))
+    END_IF
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(evt_machibuse)
     SET_VALUE(LF(0), 0)
     LOOP(0)
@@ -625,6 +837,7 @@ EVT_BEGIN(evt_machibuse)
     END_IF
     RETURN
 EVT_END()
+#endif
 
 static s32 bero_entry_data[] = {
     (s32)"e_bero", 0, 20000, 100000, 0, 0, -1, 0,
@@ -658,11 +871,11 @@ EVT_BEGIN(gra_00_init_evt)
     SET_VALUE(GSWF(256), 1)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_GRA1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_USU1"))
-    CALL(evt_kagemario_init_11_text_804)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_11_data_4F98))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     CALL(evt_npc_setup, PTR(npcEnt))
     SET_VALUE(LW(0), PTR(tree_tbl))
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
@@ -697,7 +910,7 @@ static USER_FUNC(cam_r) {
 }
 
 void msg_callback(s32 type, void* param) {
-    EventEntry* ev = *(EventEntry**)(*(u8**)param + 0x7A00);
+    EventEntry* ev = *(EventEntry**)(*(u8**)param + VERSION_PICK(0x7A00, 0xF200));
 
     switch (type) {
         case 0:

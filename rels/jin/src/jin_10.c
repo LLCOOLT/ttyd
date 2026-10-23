@@ -9,7 +9,7 @@
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_hit_bind_mapobj);
 USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_kagemario_init_14_text_4DB8);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_mapobj_get_position);
 USER_FUNC(evt_mapobj_rotate);
 USER_FUNC(evt_mapobj_trans);
@@ -32,7 +32,7 @@ static USER_FUNC(get_pos);
 USER_FUNC(get_width);
 USER_FUNC(set_pos);
 extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill_14_data_AF00[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_jin_10_negone_one_374;
 __declspec(section ".data") s32 fd_jin_10_neg_one_382[1];
@@ -307,11 +307,11 @@ EVT_BEGIN(jin_10_init_evt)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_JIN1"))
     CALL(evt_snd_set_rev_mode, 2)
-    CALL(evt_kagemario_init_14_text_4DB8)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_14_data_AF00))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     CALL(evt_mobj_badgeblk, STRING("m"), 60, 60, -25, 243, 0, GSWF(2241), 1)
     SET_FLOAT_VALUE(GW(10), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(11), FLOAT(0.0f))

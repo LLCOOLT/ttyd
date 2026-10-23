@@ -25,6 +25,19 @@ USER_FUNC(btlevtcmd_SetRunSound);
 USER_FUNC(btlevtcmd_SetWalkSound);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(evt_sub_random);
+#ifdef VERSION_G8ME01
+USER_FUNC(btlevtcmd_AddRotate);
+USER_FUNC(btlevtcmd_ClearAllStatus);
+USER_FUNC(btlevtcmd_ConsumeItemReserve);
+USER_FUNC(btlevtcmd_DispItemIcon);
+USER_FUNC(btlevtcmd_JumpSetting);
+USER_FUNC(btlevtcmd_OffUnitFlag);
+USER_FUNC(btlevtcmd_OnOffStatus);
+USER_FUNC(btlevtcmd_RecoverHp);
+USER_FUNC(btlevtcmd_SetHp);
+USER_FUNC(btlevtcmd_SetRotateOffset);
+USER_FUNC(evt_eff);
+#endif
 static USER_FUNC(_steal_item);
 extern s32 btldefaultevt_Damage[];
 extern s32 btlevtcmd_AnimeChangePose[];
@@ -101,7 +114,11 @@ static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
 static PoseTableEntry pose_table[20];
 static PoseTableEntry pose_table_item_have[18];
+#ifdef VERSION_G8ME01
+static __declspec(section ".data") BattleDataEntry data_table[2];
+#else
 static __declspec(section ".data") BattleDataEntry data_table[1];
+#endif
 static BattleUnitKindPart parts[1];
 static s32 init_event[57];
 static __declspec(section ".data") s32 damage_event[10];
@@ -150,7 +167,11 @@ static USER_FUNC(_steal_item) {
         }
         if (num > 0) {
             evtSetValue(event, itemVar, ITEM_COIN);
+#ifdef VERSION_G8ME01
+            evtSetValue(event, iconVar, 403);
+#else
             evtSetValue(event, iconVar, 395);
+#endif
             evtSetValue(event, numVar, num);
             unit->heldItem = ITEM_COIN;
             unit->field_0x30C[0] = num;
@@ -392,9 +413,17 @@ static PoseTableEntry pose_table_item_have[] = {
     {69, "S_2"},
 };
 
+#ifdef VERSION_G8ME01
+extern s32 _badge_borodo_emergency_revival_event[];
+static __declspec(section ".data") BattleDataEntry data_table[] = {
+    {51, _badge_borodo_emergency_revival_event},
+    {0, NULL},
+};
+#else
 static __declspec(section ".data") BattleDataEntry data_table[] = {
     {0, NULL},
 };
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_badge_borodo", "c_borodo_t", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -630,4 +659,60 @@ static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
+#ifdef VERSION_G8ME01
+EVT_BEGIN(_badge_borodo_emergency_revival_event)
+    CALL(btlevtcmd_OnUnitFlag, LW(10), 134217728)
+    SET_VALUE(LW(0), 48)
+    LABEL(5)
+    WAIT_FRAMES(1)
+    CALL(btlevtcmd_AddRotate, LW(10), 0, -15, 0)
+    SUBTRACT(LW(0), 1)
+    IF_INT_GREATER(LW(0), 0)
+        GOTO(5)
+    END_IF
+    CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
+    CALL(btlevtcmd_SetRotateOffset, LW(10), 0, 0, 0)
+    SET_VALUE(LW(0), 30)
+    LABEL(6)
+    WAIT_FRAMES(1)
+    CALL(btlevtcmd_AddRotate, LW(10), 3, 0, 0)
+    SUBTRACT(LW(0), 1)
+    IF_INT_GREATER(LW(0), 0)
+        GOTO(6)
+    END_IF
+    CALL(btlevtcmd_ClearAllStatus, LW(10))
+    CALL(btlevtcmd_ConsumeItemReserve, LW(10), 151)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+        ADD(LW(1), 40)
+        CALL(btlevtcmd_DispItemIcon, LW(0), LW(1), LW(2), 151, 120)
+    END_SIBLING_EVENT
+    WAIT_FRAMES(90)
+    SET_VALUE(LW(0), 30)
+    LABEL(7)
+    WAIT_FRAMES(1)
+    CALL(btlevtcmd_AddRotate, LW(10), -3, 0, 0)
+    SUBTRACT(LW(0), 1)
+    IF_INT_GREATER(LW(0), 0)
+        GOTO(7)
+    END_IF
+    CALL(btlevtcmd_OnOffStatus, LW(10), 27, 0, 0, 0)
+    CALL(btlevtcmd_SetHp, LW(10), 0)
+    CALL(btlevtcmd_RecoverHp, LW(10), LW(11), 10)
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+    ADD(LW(1), 30)
+    CALL(evt_eff, 0, STRING("recovery"), 0, LW(0), LW(1), LW(2), 10, 0, 0, 0, 0, 0, 0, 0)
+    WAIT_MS(2000)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 42)
+    CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(0.0f), FLOAT(0.69921875f))
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 20, -1)
+    CALL(btlevtcmd_OffUnitFlag, LW(10), 134217728)
+    CALL(btlevtcmd_OffUnitFlag, LW(10), 1073741824)
+    CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table))
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+#endif
+
 

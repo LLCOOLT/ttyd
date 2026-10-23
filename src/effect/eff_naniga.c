@@ -12,6 +12,7 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "icon_ids.h"
 
 extern s32 evt_snd_sfxon_3d[];
 extern ItemData itemDataTable[];
@@ -378,7 +379,7 @@ void effNanigaDisp3(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(mT, mR, mT);
     PSMTXConcat(mT, mS, mC);
     if (work->state < 4) {
-        iconDispGxCol(mC, 0, 0x184, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+        iconDispGxCol(mC, 0, ICON_184, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
     } else {
         iconDispGxCol(mC, 0, item->icon_id, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
     }

@@ -186,7 +186,11 @@ BattleUnitKind unit_boss_zonbaba = {
     100,
     0,
     50,
+#ifdef VERSION_G8ME01
+    5,
+#else
     7,
+#endif
     230,
     170,
     -210,
@@ -202,7 +206,11 @@ BattleUnitKind unit_boss_zonbaba = {
     115.0f,
     0.0f,
     -10.0f,
+#ifdef VERSION_G8ME01
+    115.0f,
+#else
     0.0f,
+#endif
     0.0f,
     0.0f,
     20.0f,
@@ -281,7 +289,11 @@ static BattleUnitKindPart parts[] = {
 };
 
 s32 weapon_zonbaba_fumituke_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     8, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 553656320, 721666, 0, 7, 2047, 8196,
@@ -290,7 +302,11 @@ s32 weapon_zonbaba_fumituke_attack[] = {
 };
 
 s32 weapon_zonbaba_kamituki_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     8, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 553656320, 770, 0, 131079, 2047, 0,
@@ -299,7 +315,11 @@ s32 weapon_zonbaba_kamituki_attack[] = {
 };
 
 s32 weapon_zonbaba_cold_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     8, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 71, 2047, 0,
@@ -308,7 +328,11 @@ s32 weapon_zonbaba_cold_attack[] = {
 };
 
 s32 weapon_zonbaba_confuze_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     8, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 71, 2047, 0,
@@ -317,7 +341,11 @@ s32 weapon_zonbaba_confuze_attack[] = {
 };
 
 s32 weapon_zonbaba_sleep_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     8, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 71, 2047, 0,
@@ -326,7 +354,11 @@ s32 weapon_zonbaba_sleep_attack[] = {
 };
 
 s32 weapon_zonbaba_minimini_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     8, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 71, 2047, 0,

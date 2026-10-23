@@ -91,7 +91,7 @@ __declspec(section ".data") s32 fd_bubble___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_bubble_one_negone_359;
 __declspec(section ".data") s32 fd_bubble___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_bubble_one_364[1];
-BattleUnitKind unit_bubble_15_data_35518;
+BattleUnitKind unit_bubble;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -181,7 +181,7 @@ __declspec(section ".data") s32 fd_bubble_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_bubble_15_data_35518 = {
+BattleUnitKind unit_bubble = {
     85,
     "btl_un_bubble",
     6,
@@ -305,7 +305,7 @@ static s32 weapon_bubble_fire_attack[] = {
 };
 
 static __declspec(section ".data") s32 entry_bubble[] = {
-    (s32)&unit_bubble_15_data_35518, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
+    (s32)&unit_bubble, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
     0, 0, 0, 0,
 };
 
@@ -590,7 +590,11 @@ static s32 all_fire_attack_event[] = {
     0, 250, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1A", 393307,
     (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BUBBLE_MOVE1", -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetPos,
     -2, -30000000, -29999999, -29999998, 655451, (s32)btlevtcmd_DivePosition, -2, -40,
+#ifdef VERSION_G8ME01
+    -29999999, -15, 30, 0, 4, 0, -1, 458843,
+#else
     -29999999, -29999998, 30, 0, 4, 0, -1, 458843,
+#endif
     (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996, 16, -29999985, 196699,
     (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BUBBLE_ATTACK4", -250000000,
     0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_2A", 65541,

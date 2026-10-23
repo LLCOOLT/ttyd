@@ -34,21 +34,21 @@ extern s32 battle_item_super_killer[];
 extern s32 battle_item_super_killer_cannon[];
 extern s32 battle_item_super_mahorn[];
 extern s32 battle_item_wanwan[];
-extern s32 unit_basabasa_chururu_17_data_528D0[];
+extern s32 unit_basabasa_chururu[];
 extern s32 unit_black_karon[];
 extern s32 unit_boss_batten_leader[];
 extern s32 unit_boss_black_peach[];
 extern s32 unit_boss_bunbaba[];
 extern s32 unit_boss_koopa[];
 extern s32 unit_boss_rampell_las[];
-extern s32 unit_honenoko_17_data_57250[];
-extern s32 unit_karon_17_data_3F680[];
-extern s32 unit_phantom_17_data_540A8[];
-extern s32 unit_red_honenoko_17_data_58C90[];
+extern s32 unit_honenoko[];
+extern s32 unit_karon[];
+extern s32 unit_phantom[];
+extern s32 unit_red_honenoko[];
 extern s32 unit_super_killer[];
 extern s32 unit_super_killer_cannon[];
-extern s32 unit_super_mahorn_17_data_4CA30[];
-extern s32 unit_wanwan_17_data_50DF8[];
+extern s32 unit_super_mahorn[];
+extern s32 unit_wanwan[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_las_negone_one_374;
@@ -479,13 +479,13 @@ s32 las_btlstage_data[] = {
 };
 
 s32 btlparty_las_las_05_01[] = {
-    (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1092616192, 0, -1046478848, 0, 0,
-    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1112014848,
+    (s32)unit_karon, 16777216, 67108868, 1092616192, 0, -1046478848, 0, 0,
+    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon, 16777216, 67108868, 1112014848,
     0, -1054867456, 0, 0, 0, 0, 0, (s32)battle_item_karon,
     (s32)unit_black_karon, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1124204544,
+    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon, 16777216, 67108868, 1124204544,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_karon,
-    (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1126825984, 0, 1101004800, 0, 0,
+    (s32)unit_karon, 16777216, 67108868, 1126825984, 0, 1101004800, 0, 0,
     0, 0, 0, (s32)battle_item_karon,
 };
 
@@ -494,7 +494,7 @@ __declspec(section ".data") s32 btlgrp_las_las_05_01[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_17_01_off_1[] = {
-    (s32)unit_honenoko_17_data_57250, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_honenoko, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_NONE,
 };
 
@@ -503,7 +503,7 @@ __declspec(section ".data") s32 btlgrp_las_las_17_01_off_1[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_17_02_off_1[] = {
-    (s32)unit_red_honenoko_17_data_58C90, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_red_honenoko, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_NONE,
 };
 
@@ -512,7 +512,7 @@ __declspec(section ".data") s32 btlgrp_las_las_17_02_off_1[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_17_03_off_1[] = {
-    (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_karon, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_NONE,
 };
 
@@ -584,8 +584,8 @@ __declspec(section ".data") s32 btlgrp_las_las_29_black_peach_2[] = {
 };
 
 s32 btlparty_las_las_01_01_off_1[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 1,
-    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1121714176,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 1,
+    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu, 16777216, 67108868, 1121714176,
     1124204544, 1092616192, 0, 1, 0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -594,10 +594,10 @@ __declspec(section ".data") s32 btlgrp_las_las_01_01_off_1[] = {
 };
 
 s32 btlparty_las_las_01_02_off_1[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1112014848, 1124204544, -1054867456, 0, 1,
-    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1119092736,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1112014848, 1124204544, -1054867456, 0, 1,
+    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu, 16777216, 67108868, 1119092736,
     1124204544, 0, 0, 1, 0, 0, 0, (s32)battle_item_basabasa_chururu,
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1124204544, 1124204544, 1092616192, 0, 1,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1124204544, 1124204544, 1092616192, 0, 1,
     0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -606,11 +606,11 @@ __declspec(section ".data") s32 btlgrp_las_las_01_02_off_1[] = {
 };
 
 s32 btlparty_las_las_01_03_off_1[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1106247680, 1124204544, -1054867456, 0, 1,
-    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1116471296,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1106247680, 1124204544, -1054867456, 0, 1,
+    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu, 16777216, 67108868, 1116471296,
     1124204544, 0, 0, 1, 0, 0, 0, (s32)battle_item_basabasa_chururu,
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1121714176, 1124204544, 1092616192, 0, 1,
-    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1125515264,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1121714176, 1124204544, 1092616192, 0, 1,
+    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu, 16777216, 67108868, 1125515264,
     1124204544, 1101004800, 0, 1, 0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -619,8 +619,8 @@ __declspec(section ".data") s32 btlgrp_las_las_01_03_off_1[] = {
 };
 
 s32 btlparty_las_las_01_01_off_2[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1121714176,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1116471296, 1124204544, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu, 16777216, 67108868, 1121714176,
     1124204544, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -629,10 +629,10 @@ __declspec(section ".data") s32 btlgrp_las_las_01_01_off_2[] = {
 };
 
 s32 btlparty_las_las_01_02_off_2[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1112014848, 1124204544, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1119092736,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1112014848, 1124204544, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu, 16777216, 67108868, 1119092736,
     1124204544, 0, 0, 0, 0, 0, 0, (s32)battle_item_basabasa_chururu,
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1124204544, 1124204544, 1092616192, 0, 0,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1124204544, 1124204544, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -641,11 +641,11 @@ __declspec(section ".data") s32 btlgrp_las_las_01_02_off_2[] = {
 };
 
 s32 btlparty_las_las_01_03_off_2[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1106247680, 1124204544, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1116471296,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1106247680, 1124204544, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu, 16777216, 67108868, 1116471296,
     1124204544, 0, 0, 0, 0, 0, 0, (s32)battle_item_basabasa_chururu,
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1121714176, 1124204544, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1125515264,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1121714176, 1124204544, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_basabasa_chururu, 16777216, 67108868, 1125515264,
     1124204544, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -654,8 +654,8 @@ __declspec(section ".data") s32 btlgrp_las_las_01_03_off_2[] = {
 };
 
 s32 btlparty_las_las_02_01_off_1[] = {
-    (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1121714176,
+    (s32)unit_karon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_karon,
 };
 
@@ -664,10 +664,10 @@ __declspec(section ".data") s32 btlgrp_las_las_02_01_off_1[] = {
 };
 
 s32 btlparty_las_las_02_02_off_1[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1112014848, 1124204544, -1054867456, 0, 1,
-    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1119092736,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1112014848, 1124204544, -1054867456, 0, 1,
+    0, 0, 0, (s32)battle_item_basabasa_chururu, (s32)unit_karon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_karon,
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1124204544, 1124204544, 1092616192, 0, 1,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1124204544, 1124204544, 1092616192, 0, 1,
     0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -676,10 +676,10 @@ __declspec(section ".data") s32 btlgrp_las_las_02_02_off_1[] = {
 };
 
 s32 btlparty_las_las_02_03_off_1[] = {
-    (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1119092736,
+    (s32)unit_karon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_karon,
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1124204544, 1124204544, 1092616192, 0, 1,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1124204544, 1124204544, 1092616192, 0, 1,
     0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -688,11 +688,11 @@ __declspec(section ".data") s32 btlgrp_las_las_02_03_off_1[] = {
 };
 
 s32 btlparty_las_las_02_04_off_1[] = {
-    (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1116471296,
+    (s32)unit_karon, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_karon,
-    (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1125515264,
+    (s32)unit_karon, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_karon,
 };
 
@@ -731,7 +731,7 @@ __declspec(section ".data") s32 btlgrp_las_las_02_99_off_1[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_03_01_off_1[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1119092736, 1124204544, 0, 0, 1,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1119092736, 1124204544, 0, 0, 1,
     0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -740,7 +740,7 @@ __declspec(section ".data") s32 btlgrp_las_las_03_01_off_1[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_03_02_off_1[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1119092736, 1124204544, 0, 0, 1,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1119092736, 1124204544, 0, 0, 1,
     0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -749,7 +749,7 @@ __declspec(section ".data") s32 btlgrp_las_las_03_02_off_1[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_03_03_off_1[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1119092736, 1124204544, 0, 0, 1,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1119092736, 1124204544, 0, 0, 1,
     0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -758,7 +758,7 @@ __declspec(section ".data") s32 btlgrp_las_las_03_03_off_1[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_03_01_off_2[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1119092736, 1124204544, 0, 0, 0,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1119092736, 1124204544, 0, 0, 0,
     0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -767,7 +767,7 @@ __declspec(section ".data") s32 btlgrp_las_las_03_01_off_2[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_03_02_off_2[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1119092736, 1124204544, 0, 0, 0,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1119092736, 1124204544, 0, 0, 0,
     0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -776,7 +776,7 @@ __declspec(section ".data") s32 btlgrp_las_las_03_02_off_2[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_03_03_off_2[] = {
-    (s32)unit_basabasa_chururu_17_data_528D0, 16777216, 67108868, 1119092736, 1124204544, 0, 0, 0,
+    (s32)unit_basabasa_chururu, 16777216, 67108868, 1119092736, 1124204544, 0, 0, 0,
     0, 0, 0, (s32)battle_item_basabasa_chururu,
 };
 
@@ -785,7 +785,7 @@ __declspec(section ".data") s32 btlgrp_las_las_03_03_off_2[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_04_01_off_1[] = {
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_phantom, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_phantom,
 };
 
@@ -814,8 +814,8 @@ __declspec(section ".data") s32 btlgrp_las_las_06_02_off_1[] = {
 };
 
 s32 btlparty_las_las_06_03_off_1[] = {
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1121714176,
+    (s32)unit_phantom, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_phantom,
 };
 
@@ -824,11 +824,11 @@ __declspec(section ".data") s32 btlgrp_las_las_06_03_off_1[] = {
 };
 
 s32 btlparty_las_las_06_04_off_1[] = {
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1116471296,
+    (s32)unit_phantom, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_phantom,
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1125515264,
+    (s32)unit_phantom, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_phantom,
 };
 
@@ -867,10 +867,10 @@ __declspec(section ".data") s32 btlgrp_las_las_06_99_off_1[] = {
 };
 
 s32 btlparty_las_las_07_01_off_1[] = {
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1119092736,
+    (s32)unit_phantom, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_phantom,
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_phantom, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_phantom,
 };
 
@@ -879,10 +879,10 @@ __declspec(section ".data") s32 btlgrp_las_las_07_01_off_1[] = {
 };
 
 s32 btlparty_las_las_07_02_off_1[] = {
-    (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1119092736,
+    (s32)unit_karon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_karon,
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_phantom, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_phantom,
 };
 
@@ -891,10 +891,10 @@ __declspec(section ".data") s32 btlgrp_las_las_07_02_off_1[] = {
 };
 
 s32 btlparty_las_las_07_03_off_1[] = {
-    (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon_17_data_3F680, 16777216, 67108868, 1119092736,
+    (s32)unit_karon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_karon, (s32)unit_karon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_karon,
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_phantom, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_phantom,
 };
 
@@ -903,8 +903,8 @@ __declspec(section ".data") s32 btlgrp_las_las_07_03_off_1[] = {
 };
 
 s32 btlparty_las_las_09_01_off_1[] = {
-    (s32)unit_wanwan_17_data_50DF8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_wanwan, (s32)unit_wanwan_17_data_50DF8, 16777216, 67108868, 1121714176,
+    (s32)unit_wanwan, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_wanwan, (s32)unit_wanwan, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_wanwan,
 };
 
@@ -913,10 +913,10 @@ __declspec(section ".data") s32 btlgrp_las_las_09_01_off_1[] = {
 };
 
 s32 btlparty_las_las_09_02_off_1[] = {
-    (s32)unit_wanwan_17_data_50DF8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_wanwan, (s32)unit_wanwan_17_data_50DF8, 16777216, 67108868, 1119092736,
+    (s32)unit_wanwan, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_wanwan, (s32)unit_wanwan, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_wanwan,
-    (s32)unit_wanwan_17_data_50DF8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_wanwan, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_wanwan,
 };
 
@@ -925,7 +925,7 @@ __declspec(section ".data") s32 btlgrp_las_las_09_02_off_1[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_19_01_off_1[] = {
-    (s32)unit_super_mahorn_17_data_4CA30, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_super_mahorn, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_super_mahorn,
 };
 
@@ -934,8 +934,8 @@ __declspec(section ".data") s32 btlgrp_las_las_19_01_off_1[] = {
 };
 
 s32 btlparty_las_las_19_02_off_1[] = {
-    (s32)unit_super_mahorn_17_data_4CA30, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_super_mahorn, (s32)unit_super_mahorn_17_data_4CA30, 16777216, 67108868, 1121714176,
+    (s32)unit_super_mahorn, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_super_mahorn, (s32)unit_super_mahorn, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_super_mahorn,
 };
 
@@ -944,10 +944,10 @@ __declspec(section ".data") s32 btlgrp_las_las_19_02_off_1[] = {
 };
 
 s32 btlparty_las_las_19_03_off_1[] = {
-    (s32)unit_super_mahorn_17_data_4CA30, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_super_mahorn, (s32)unit_super_mahorn_17_data_4CA30, 16777216, 67108868, 1119092736,
+    (s32)unit_super_mahorn, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_super_mahorn, (s32)unit_super_mahorn, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_super_mahorn,
-    (s32)unit_super_mahorn_17_data_4CA30, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_super_mahorn, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_super_mahorn,
 };
 
@@ -956,7 +956,7 @@ __declspec(section ".data") s32 btlgrp_las_las_19_03_off_1[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_20_01_off_1[] = {
-    (s32)unit_super_mahorn_17_data_4CA30, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_super_mahorn, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_super_mahorn,
 };
 
@@ -965,8 +965,8 @@ __declspec(section ".data") s32 btlgrp_las_las_20_01_off_1[] = {
 };
 
 s32 btlparty_las_las_21_01_off_1[] = {
-    (s32)unit_wanwan_17_data_50DF8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_wanwan, (s32)unit_wanwan_17_data_50DF8, 16777216, 67108868, 1121714176,
+    (s32)unit_wanwan, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_wanwan, (s32)unit_wanwan, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_wanwan,
 };
 
@@ -975,8 +975,8 @@ __declspec(section ".data") s32 btlgrp_las_las_21_01_off_1[] = {
 };
 
 s32 btlparty_las_las_21_02_off_1[] = {
-    (s32)unit_wanwan_17_data_50DF8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_wanwan, (s32)unit_wanwan_17_data_50DF8, 16777216, 67108868, 1121714176,
+    (s32)unit_wanwan, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_wanwan, (s32)unit_wanwan, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_wanwan,
 };
 
@@ -985,8 +985,8 @@ __declspec(section ".data") s32 btlgrp_las_las_21_02_off_1[] = {
 };
 
 s32 btlparty_las_las_22_01_off_1[] = {
-    (s32)unit_super_mahorn_17_data_4CA30, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_super_mahorn, (s32)unit_super_mahorn_17_data_4CA30, 16777216, 67108868, 1121714176,
+    (s32)unit_super_mahorn, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_super_mahorn, (s32)unit_super_mahorn, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_super_mahorn,
 };
 
@@ -995,11 +995,11 @@ __declspec(section ".data") s32 btlgrp_las_las_22_01_off_1[] = {
 };
 
 s32 btlparty_las_las_22_02_off_1[] = {
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1116471296,
+    (s32)unit_phantom, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_phantom,
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1125515264,
+    (s32)unit_phantom, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_phantom,
 };
 
@@ -1008,8 +1008,8 @@ __declspec(section ".data") s32 btlgrp_las_las_22_02_off_1[] = {
 };
 
 s32 btlparty_las_las_22_03_off_1[] = {
-    (s32)unit_wanwan_17_data_50DF8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_wanwan, (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1121714176,
+    (s32)unit_wanwan, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_wanwan, (s32)unit_phantom, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_phantom,
 };
 
@@ -1018,8 +1018,8 @@ __declspec(section ".data") s32 btlgrp_las_las_22_03_off_1[] = {
 };
 
 s32 btlparty_las_las_24_01_off_1[] = {
-    (s32)unit_wanwan_17_data_50DF8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_wanwan, (s32)unit_super_mahorn_17_data_4CA30, 16777216, 67108868, 1121714176,
+    (s32)unit_wanwan, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_wanwan, (s32)unit_super_mahorn, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_super_mahorn,
 };
 
@@ -1028,7 +1028,7 @@ __declspec(section ".data") s32 btlgrp_las_las_24_01_off_1[] = {
 };
 
 __declspec(section ".data") s32 btlparty_las_las_25_01_off_1[] = {
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    (s32)unit_phantom, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_phantom,
 };
 
@@ -1037,10 +1037,10 @@ __declspec(section ".data") s32 btlgrp_las_las_25_01_off_1[] = {
 };
 
 s32 btlparty_las_las_25_02_off_1[] = {
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1119092736,
+    (s32)unit_phantom, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_phantom,
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_phantom, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_phantom,
 };
 
@@ -1049,11 +1049,11 @@ __declspec(section ".data") s32 btlgrp_las_las_25_02_off_1[] = {
 };
 
 s32 btlparty_las_las_25_03_off_1[] = {
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1116471296,
+    (s32)unit_phantom, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_phantom,
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_phantom, (s32)unit_super_mahorn_17_data_4CA30, 16777216, 67108868, 1125515264,
+    (s32)unit_phantom, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_phantom, (s32)unit_super_mahorn, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_super_mahorn,
 };
 
@@ -1062,8 +1062,8 @@ __declspec(section ".data") s32 btlgrp_las_las_25_03_off_1[] = {
 };
 
 s32 btlparty_las_las_25_04_off_1[] = {
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1121714176,
+    (s32)unit_phantom, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_phantom,
 };
 
@@ -1072,10 +1072,10 @@ __declspec(section ".data") s32 btlgrp_las_las_25_04_off_1[] = {
 };
 
 s32 btlparty_las_las_25_05_off_1[] = {
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1119092736,
+    (s32)unit_phantom, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_phantom,
-    (s32)unit_super_mahorn_17_data_4CA30, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_super_mahorn, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_super_mahorn,
 };
 
@@ -1084,10 +1084,10 @@ __declspec(section ".data") s32 btlgrp_las_las_25_05_off_1[] = {
 };
 
 s32 btlparty_las_las_25_06_off_1[] = {
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1119092736,
+    (s32)unit_phantom, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_phantom, (s32)unit_phantom, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_phantom,
-    (s32)unit_phantom_17_data_540A8, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_phantom, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_phantom,
 };
 

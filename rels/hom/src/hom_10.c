@@ -54,20 +54,20 @@ static s32 evt_clank_main[104];
 static s32 evt_clank[21];
 static s32 evt_bg[81];
 static s32 evt_hoshi[88];
-s32 hom_10_evt_resha_start_13_data_2A44[244];
-s32 hom_10_evt_resha_start2_13_data_2E14[259];
-__declspec(section ".data") s32 hom_10_evt_resha_start3_13_data_3220[11];
-__declspec(section ".data") s32 hom_10_evt_resha_start4_13_data_324C[11];
+s32 hom_10_evt_resha_start[244];
+s32 hom_10_evt_resha_start2[259];
+__declspec(section ".data") s32 hom_10_evt_resha_start3[11];
+__declspec(section ".data") s32 hom_10_evt_resha_start4[11];
 static s32 stop_1[90];
 static s32 stop_2[90];
-s32 hom_10_evt_resha_stop_13_data_3548[36];
+s32 hom_10_evt_resha_stop[36];
 static s32 evt_ramp[33];
 static s32 pika_tbl[15];
 static __declspec(section ".data") s32 pika_tbl_rsh_06[10];
 static s32 hom_10_evt_resha_sub[102];
-s32 hom_10_evt_resha_right_13_data_3858[35];
-s32 hom_10_evt_resha_left_13_data_38E4[28];
-s32 hom_10_init_evt_13_data_3954[140];
+s32 hom_10_evt_resha_right[35];
+s32 hom_10_evt_resha_left[28];
+s32 hom_10_init_evt[140];
 
 __declspec(section ".data") u64 fd_hom_10_negone_one_374 = 0xBF8000003F800000;
 
@@ -317,7 +317,7 @@ static EVT_BEGIN(evt_hoshi)
     RETURN
 EVT_END()
 
-EVT_BEGIN(hom_10_evt_resha_start_13_data_2A44)
+EVT_BEGIN(hom_10_evt_resha_start)
     SET_VALUE(GSWF(3583), 1)
     SET_VALUE(GSWF(3579), 0)
     SET_VALUE(GSWF(3580), 0)
@@ -415,7 +415,7 @@ EVT_BEGIN(hom_10_evt_resha_start_13_data_2A44)
     RETURN
 EVT_END()
 
-EVT_BEGIN(hom_10_evt_resha_start2_13_data_2E14)
+EVT_BEGIN(hom_10_evt_resha_start2)
     SET_VALUE(GSWF(3583), 1)
     SET_VALUE(GSWF(3579), 0)
     SET_VALUE(GSWF(3580), 0)
@@ -519,14 +519,14 @@ EVT_BEGIN(hom_10_evt_resha_start2_13_data_2E14)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(hom_10_evt_resha_start3_13_data_3220)
+__declspec(section ".data") EVT_BEGIN(hom_10_evt_resha_start3)
     SET_VALUE(GSWF(3583), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(-15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(-15.0f))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(hom_10_evt_resha_start4_13_data_324C)
+__declspec(section ".data") EVT_BEGIN(hom_10_evt_resha_start4)
     SET_VALUE(GSWF(3583), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(15.0f))
@@ -601,7 +601,7 @@ static EVT_BEGIN(stop_2)
     RETURN
 EVT_END()
 
-EVT_BEGIN(hom_10_evt_resha_stop_13_data_3548)
+EVT_BEGIN(hom_10_evt_resha_stop)
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("pik_00"))
         SPAWN_EVENT(PTR(stop_1))
@@ -690,7 +690,7 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
     RETURN
 EVT_END()
 
-EVT_BEGIN(hom_10_evt_resha_right_13_data_3858)
+EVT_BEGIN(hom_10_evt_resha_right)
     CALL_CHILD(PTR(hom_10_evt_resha_sub))
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_NOT_EQUAL(LW(0), STRING("rsh_06_a"))
@@ -702,7 +702,7 @@ EVT_BEGIN(hom_10_evt_resha_right_13_data_3858)
     RETURN
 EVT_END()
 
-EVT_BEGIN(hom_10_evt_resha_left_13_data_38E4)
+EVT_BEGIN(hom_10_evt_resha_left)
     CALL_CHILD(PTR(hom_10_evt_resha_sub))
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_1"), 1)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_6"), 1)
@@ -711,7 +711,7 @@ EVT_BEGIN(hom_10_evt_resha_left_13_data_38E4)
     RETURN
 EVT_END()
 
-EVT_BEGIN(hom_10_init_evt_13_data_3954)
+EVT_BEGIN(hom_10_init_evt)
     CALL(evt_snd_bgmoff, 512)
     CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH2"))
     CALL(evt_mario_cont_onoff, 0)
@@ -721,8 +721,8 @@ EVT_BEGIN(hom_10_init_evt_13_data_3954)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_party_set_pos, 1, 0, -1000, 0)
     IF_INT_EQUAL(GSWF(3578), 0)
-        CALL_CHILD(PTR(hom_10_evt_resha_right_13_data_3858))
-        CALL_CHILD(PTR(hom_10_evt_resha_start3_13_data_3220))
+        CALL_CHILD(PTR(hom_10_evt_resha_right))
+        CALL_CHILD(PTR(hom_10_evt_resha_start3))
         SET_VALUE(LW(0), 500)
         SET_VALUE(LW(1), -500)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("renketu"), 1)
@@ -732,8 +732,8 @@ EVT_BEGIN(hom_10_init_evt_13_data_3954)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_4"), 1)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_5"), 1)
         ELSE
-        CALL_CHILD(PTR(hom_10_evt_resha_left_13_data_38E4))
-        CALL_CHILD(PTR(hom_10_evt_resha_start4_13_data_324C))
+        CALL_CHILD(PTR(hom_10_evt_resha_left))
+        CALL_CHILD(PTR(hom_10_evt_resha_start4))
         SET_VALUE(LW(0), 0)
         SET_VALUE(LW(1), 1000)
         CALL(evt_mapobj_trans, 1, STRING("train"), -1500, 0, 0)

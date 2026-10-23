@@ -11,6 +11,9 @@ int strcmp(const char*, const char*);
 void marioChkOverhead(void);
 void marioBottomless(void);
 void marioBalloonMain(void);
+#ifdef VERSION_G8ME01
+#define mario_kemuri_80130474 mario_kemuri // US: global name
+#endif
 void mario_kemuri_80130474(void);
 void partyMain(void);
 void marioCamMain(void);
@@ -314,12 +317,12 @@ void peach_stay(void) {
                 marioChgPose("P_N_1");
                 MT = 0;
                 mp->currSubMotionId = 20;
-                *(s32*)((u8*)mp + 0x2b4) = 0;
+                *(s32*)((u8*)mp + MWOFF(0x2b4)) = 0;
             }
             break;
         case 20:
-            if (++*(s32*)((u8*)mp + 0x2b4) >= sysMsec2Frame(10000)) {
-                *(s32*)((u8*)mp + 0x2b4) = sysMsec2Frame(10000);
+            if (++*(s32*)((u8*)mp + MWOFF(0x2b4)) >= sysMsec2Frame(10000)) {
+                *(s32*)((u8*)mp + MWOFF(0x2b4)) = sysMsec2Frame(10000);
             }
             if (++MT >= 100) {
                 MT = 0;

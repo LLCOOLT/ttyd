@@ -6,6 +6,14 @@
 #include "system.h"
 #include <string.h>
 
+#ifdef VERSION_G8ME01
+#define AC_ICON_OFS 8
+#define AC_TEX_OFS 0x16
+#else
+#define AC_ICON_OFS 0
+#define AC_TEX_OFS 0
+#endif
+
 #pragma optimize_for_size on
 
 void btlDispTex4(s32 id, Vec pos, Vec scale, Vec rot, GXColor color);
@@ -334,7 +342,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         f32 px = -200.0f + x;
         pos.x = px;
         pos.y = 25.0f + y;
-        iconDispGx(&pos, 0x10, 0x8c, 1.0f);
+        iconDispGx(&pos, 0x10, 0x8c + AC_ICON_OFS, 1.0f);
         limit = sw->speed / 100.0f;
         if (disp->progress <= limit) {
             disp->progress += 0.01f;
@@ -360,7 +368,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         MTXTrans(m1, px - 88.0f * (1.0f - disp->progress), 33.0f + y, 0.0f);
         MTXScale(m2, disp->progress, 1.0f, 1.0f);
         MTXConcat(m1, m2, m3);
-        iconDispGxCol(m3, 0x10, 0x8d, (GXColor){disp->col.r, disp->col.g, disp->col.b, disp->col.a});
+        iconDispGxCol(m3, 0x10, 0x8d + AC_ICON_OFS, (GXColor){disp->col.r, disp->col.g, disp->col.b, disp->col.a});
     }
 }
 #pragma dont_inline reset
@@ -371,8 +379,8 @@ static void _draw_target_mark(GXColor color, f32 x, f32 y, f32 z, f32 angle) {
     pos.x = x;
     pos.y = y;
     pos.z = z;
-    btlDispTex4(0x42, pos, (Vec){0.5f, 0.5f, 1.0f}, (Vec){0.0f, 0.0f, reviseAngle(-angle)}, color);
-    btlDispTex4(0x41, pos, (Vec){0.5f, 0.5f, 1.0f}, (Vec){0.0f, 0.0f, reviseAngle(angle)}, color);
+    btlDispTex4(0x42 + AC_TEX_OFS, pos, (Vec){0.5f, 0.5f, 1.0f}, (Vec){0.0f, 0.0f, reviseAngle(-angle)}, color);
+    btlDispTex4(0x41 + AC_TEX_OFS, pos, (Vec){0.5f, 0.5f, 1.0f}, (Vec){0.0f, 0.0f, reviseAngle(angle)}, color);
 }
 #pragma dont_inline reset
 

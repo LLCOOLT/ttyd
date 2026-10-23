@@ -1,3 +1,4 @@
+#include "version.h"
 #include "win/win_main.h"
 #include "data/item_data.h"
 #include "driver/animdrv.h"
@@ -5,6 +6,8 @@
 #include "manager/fontmgr.h"
 #include "mario/mario_pouch.h"
 #include <dolphin/gx.h>
+#include "mario/mariost.h"
+#include "icon_ids.h"
 
 extern int sprintf(char* str, const char* format, ...);
 extern ItemData itemDataTable[];
@@ -218,7 +221,7 @@ s32 winBadgeMain(BWin* w) {
             w->state = 1000;
         }
         w->msgX = -270.0f;
-        w->msgY = 125 - w->tab * 40;
+        w->msgY = VERSION_PICK(125, 130) - w->tab * VERSION_PICK(40, 45);
         winMsgEntry(w, 0, w->tab == 0 ? "msg_menu_badge_all" : "msg_menu_badge_equip", 0);
         break;
     case 10:
@@ -332,6 +335,9 @@ void winBadgeMain2(BWin* w) {
     }
 }
 
+#ifdef VERSION_G8ME01
+void winFontSetWidth(Vec translate, Vec scale, GXColor color, f32 width, const char* fmt, ...);
+#endif
 void badge_disp(BWin* w, f32 xo, f32 yo);
 
 #define Q ((pouch->maximumBP + 9) / 10)
@@ -350,6 +356,9 @@ void winBadgeDisp(s32 camId, void* param, s32 n) {
     f32 d;
     f32 x = w->pos[n].x;
     f32 y = w->pos[n].y;
+#ifdef VERSION_G8ME01
+    f32 tw;
+#endif
 
     winBgGX(w, 3, x, y);
     winKirinukiGX(w, 0, x - 100.0f, 20.0f + (120.0f + y), 365.0f, 210.0f);
@@ -357,23 +366,36 @@ void winBadgeDisp(s32 camId, void* param, s32 n) {
     c = (x - 190.0f) - 4.0f;
     b = 4.0f + a;
     for (i = 0; i < 2; i++) {
-        off = i * 40;
+        off = i * VERSION_PICK(40, 45);
         if (i == w->tab) {
             winTexInit(w->res->tex->tpl);
-            winTexSet(0xB4, (Vec){x - 190.0f, 20.0f + (a - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x80});
+            winTexSet(0xB4, (Vec){x - 190.0f, VERSION_PICK(20.0f, 25.0f) + (a - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x80});
             winTexInit_x2(w->res->tex->tpl);
-            winTexSet_x2(i + 0x1A, 0xB4, (Vec){c, 20.0f + (b - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+            winTexSet_x2(i + 0x1A, 0xB4, (Vec){c, VERSION_PICK(20.0f, 25.0f) + (b - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         } else {
             winTexInit_x2(w->res->tex->tpl);
-            winTexSet_x2(i + 0x1A, 0xB4, (Vec){x - 190.0f, 20.0f + (a - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0x80, 0x80, 0x80, 0xFF});
+            winTexSet_x2(i + 0x1A, 0xB4, (Vec){x - 190.0f, VERSION_PICK(20.0f, 25.0f) + (a - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0x80, 0x80, 0x80, 0xFF});
         }
     }
     winKirinukiGX(w, 1, x - 260.0f, yy = 20.0f + (40.0f + y), 150.0f, 158 - (10 - Q) * 13);
     winFontInit();
+#ifdef VERSION_G8ME01
+    {
+        // US: BP label per language (indexed by gp->language)
+        const char* bpLabel[7] = {"\202a\202o", "BP", "OP", "PB", "PM", "PT", "BP"};
+        winFontSet((Vec){x - 220.0f, yy = yy - 4.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, bpLabel[gp->language]);
+    }
+#else
     winFontSet((Vec){x - 220.0f, yy = yy - 4.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "\202a\202o");
+#endif
     winFontSetR((Vec){(x - 175.0f) - 18.0f, yy, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%s", winZenkakuStr(pouch->maximumBP));
+#ifdef VERSION_G8ME01
+    tw = FontGetMessageWidth(msgSearch("msg_menu_badge_nokori")) * 0.5f + 60.0f;
+    winFontSet((Vec){4.0f + (16.0f + ((x - 260.0f) + (150.0f - tw))), ((20.0f + (y - 108.0f)) - 18.0f) + (10 - Q) * 13, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black, msgSearch("msg_menu_badge_nokori"));
+#else
     winFontSet((Vec){x - 180.0f, ((20.0f + (y - 108.0f)) - 18.0f) + (10 - Q) * 13, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black, msgSearch("msg_menu_badge_nokori"));
-    winFontSetR((Vec){(x - 145.0f) - 16.0f, ((20.0f + (y - 102.0f)) - 18.0f) + (10 - Q) * 13, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%s", winZenkakuStr(pouch->availableBP));
+#endif
+    winFontSetR((Vec){VERSION_PICK((x - 145.0f) - 16.0f, 4.0f + ((x - 145.0f) - 16.0f)), ((20.0f + (y - 102.0f)) - 18.0f) + (10 - Q) * 13, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%s", winZenkakuStr(pouch->availableBP));
     winTexInit(w->res->tex->tpl);
     d = 28.0f + y;
     for (i = 0; i < pouch->availableBP; i++) {
@@ -451,7 +473,11 @@ void badge_disp(BWin* w, f32 xo, f32 yo) {
         winIconSet(itemDataTable[badge].icon_id, (Vec){xo - 75.0f, (scroll + ((yo + 110.0f) - (f32)rowOff)), 0.0f}, (Vec){0.54f, 0.54f, 0.54f}, colA);
         item = &itemDataTable[badge];
         winFontInit();
+#ifdef VERSION_G8ME01
+        winFontSetWidth((Vec){xo - 55.0f, scroll + (12.0f + ((yo + 110.0f) - (f32)rowOff)), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, colB, 170.0f, msgSearch(item->name));
+#else
         winFontSet((Vec){xo - 55.0f, scroll + (12.0f + ((yo + 110.0f) - (f32)rowOff)), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, colB, item->id);
+#endif
         cost = &item->bp_cost;
         sprintf(buf, "%s", winZenkakuStr(*cost));
         winFontSet((Vec){(142.0f + xo) - (f32)(FontGetMessageWidth(buf) / 2), scroll + (12.0f + ((yo + 110.0f) - (f32)rowOff)), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, colB, buf);
@@ -471,21 +497,21 @@ void badge_disp(BWin* w, f32 xo, f32 yo) {
             ax = 250.0f + xo;
             winTexSet(0x17, (Vec){ax, 20.0f + (18.0f + (110.0f + yo)), 0.0f}, (Vec){-1.0f, -1.0f, -1.0f}, colU);
             winIconInit();
-            winIconSet(0x7E, (Vec){ax, 20.0f + (113.0f + yo), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, colU);
+            winIconSet(ICON_07E, (Vec){ax, 20.0f + (113.0f + yo), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, colU);
         }
         if (cnt > w->page[w->tab] * 8 + 8) {
             winTexInit(w->res->tex->tpl);
             ax = 250.0f + xo;
             winTexSet(0x17, (Vec){ax, 20.0f + ((yo - 90.0f) - 15.0f), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, colU);
             winIconInit();
-            winIconSet(0x80, (Vec){ax, 20.0f + (yo - 90.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, colU);
+            winIconSet(ICON_080, (Vec){ax, 20.0f + (yo - 90.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, colU);
         }
         width = 0.7f * (f32)(u32)FontGetMessageWidth(msgSearch("msg_menu_sort_narabikae"));
         winFontInit();
         width = xo + (220.0f - width);
         winFontSet((Vec){width, 20.0f + ((yo - 92.0f) - 10.0f), 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, colD, msgSearch("msg_menu_sort_narabikae"));
         winIconInit();
-        winIconSet(0x217, (Vec){width - 30.0f, 20.0f + ((yo - 100.0f) - 10.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, colU);
+        winIconSet(ICON_217, (Vec){width - 30.0f, 20.0f + ((yo - 100.0f) - 10.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, colU);
         winFontInit();
         winFontSet((Vec){120.0f + xo, 135.0f + yo, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, colD, msgSearch("msg_menu_badge_hituyou"));
     }

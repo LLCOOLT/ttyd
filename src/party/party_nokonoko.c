@@ -51,6 +51,9 @@ extern ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range);
 extern void itemPickUp(ItemEntry* entry);
 extern void* mobjHitObjPtrToPtr(HitEntry* hit);
 extern void marioChkWallAround(Vec* pos, s32 a1, f32 a2, f32 angle, f32 radius, f32 height);
+#ifdef VERSION_G8ME01
+void partyChkWallAround(PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 width, f32 height);
+#endif
 extern void partyGetMoveDirSpd(PartyEntry* party, f32* dir, f32* spd);
 extern void partyGetReturnPos(Vec* pos);
 extern void partyMove(PartyEntry* party);
@@ -404,7 +407,7 @@ void nokonoko_use(PartyEntry* party) {
             if (party->moveSpeed <= EXT_LIT(float_0_8041b51c, 0.0f)) {
                 party->moveSpeed = 0.0f;
                 if (!(party->flags & 0x80000000)) {
-                    if (MH(mario, 0x246) & 0x400) {
+                    if (MH(mario, MWOFF(0x246)) & 0x400) {
                         party->useMotionId = 13;
                         party->moveFrames = 0;
                     } else {
@@ -453,7 +456,7 @@ void nokonoko_use(PartyEntry* party) {
                 noko_se_off();
                 break;
             }
-            if (MH(mario, 0x246) & 0x400) {
+            if (MH(mario, MWOFF(0x246)) & 0x400) {
                 break;
             }
             party->useMotionId = PH(party, 0x17c) != 0 ? 80 : 50;
@@ -498,7 +501,11 @@ void nokonoko_use(PartyEntry* party) {
     case 52:
         if (ccwall(party, 1) != NULL) {
             partyGetMoveDirSpd(party, &dir, &spd);
+#ifdef VERSION_G8ME01
+            partyChkWallAround(party, &party->position, spd, dir, party->width, party->height);
+#else
             marioChkWallAround(&party->position, 1, spd, dir, party->width, party->height);
+#endif
             party->useMotionId = 70;
             psndSFXOn_3D((const char*)0x92c, &party->position);
             noko_star(party, 1);

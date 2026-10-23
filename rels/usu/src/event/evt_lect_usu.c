@@ -1,3 +1,5 @@
+#include "version.h"
+#include "icon_ids.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -19,6 +21,9 @@
 #include "evt/evt_npc.h"
 #include "driver/fadedrv.h"
 #include "system.h"
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_mario_wait_landon);
+#endif
 
 static OSTime wwstart;
 void statusWinForceClose(void);
@@ -169,9 +174,9 @@ __declspec(section ".data") u64 fd_evt_lect_usu_one_negone_359;
 __declspec(section ".data") s32 fd_evt_lect_usu___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_evt_lect_usu_one_364[1];
 s32 vivian_party_lecture_init[43];
-s32 vivian_party_lecture[196];
+s32 vivian_party_lecture[VERSION_PICK(196, 198)];
 static __declspec(section ".data") s32 all_party_lecture_otosub[11];
-s32 all_party_lecture_29_data_10988[474];
+s32 all_party_lecture[474];
 s32 roll_majin_lecture_init[26];
 s32 roll_majin_lecture_sub01[29];
 s32 roll_majin_lecture_sub02[65];
@@ -265,15 +270,15 @@ static void lecture_button_disp(CameraId camera, void* param) {
             Vec pos;
 
             switch (btn->iconId) {
-                case 0x75:
-                case 0x76:
-                case 0x77:
-                case 0x78:
-                case 0x79:
-                case 0x7A:
-                case 0x7B:
-                case 0x7C:
-                case 0x7D:
+                case ICON_075:
+                case ICON_076:
+                case ICON_077:
+                case ICON_078:
+                case ICON_079:
+                case ICON_07A:
+                case ICON_07B:
+                case ICON_07C:
+                case ICON_07D:
                     ofs = -15.0f;
                     break;
                 default:
@@ -307,7 +312,7 @@ static USER_FUNC(lecture_button_rtn) {
         btn = &lbtn[i];
         switch (btn->seq) {
             case 0:
-                btn->iconId = 0x68;
+                btn->iconId = ICON_068;
                 btn->seq = 1;
                 break;
             case 2:
@@ -764,6 +769,56 @@ EVT_BEGIN(vivian_party_lecture_init)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(vivian_party_lecture)
+    CALL(evt_msg_print, 0, STRING("lecture_friends_12_0_1"), 0, 0)
+    CALL(evt_msg_print, 0, STRING("lecture_friends_12_1"), 0, 0)
+    CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(105.0f), FLOAT(597.0f), FLOAT(0.0f), FLOAT(63.0f), FLOAT(-101.799805f), 1000, 11)
+    WAIT_MS(1000)
+    CALL(evt_cam_letter_box_disable, 1)
+    CALL(evt_party_vivian_hold, 0)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    ADD(LW(0), 200)
+    ADD(LW(1), 50)
+    CALL(evt_npc_start_for_one_event, STRING("テレサ"))
+    CALL(evt_npc_flag_onoff, 1, STRING("テレサ"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING("テレサ"), 1073741856)
+    CALL(evt_npc_set_position, STRING("テレサ"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_set_camid, STRING("テレサ"), 7)
+    CALL(evt_npc_set_ry, STRING("テレサ"), 270)
+    CALL(evt_npc_get_position, STRING("テレサ"), LW(0), LW(1), LW(2))
+    SUBTRACT(LW(0), 200)
+    CALL(evt_npc_move_position, STRING("テレサ"), LW(0), LW(2), 0, FLOAT(80.0f), 0)
+    CALL(evt_eff_fukidashi, 1, STRING("fuki"), STRING("テレサ"), 1, 0, 0, 0, 0, 0, 0, 60)
+    CALL(efffukidashichange_cam, STRING("fuki"), 7)
+    WAIT_MS(1000)
+    LOOP(2)
+        CALL(evt_npc_reverse_ry, STRING("テレサ"))
+        WAIT_MS(800)
+    END_LOOP
+    SUBTRACT(LW(0), 200)
+    CALL(evt_npc_move_position, STRING("テレサ"), LW(0), LW(2), 0, FLOAT(80.0f), 0)
+    CALL(evt_npc_set_position, STRING("テレサ"), 0, -1000, 0)
+    CALL(evt_npc_stop_for_one_event, STRING("テレサ"))
+    CALL(evt_msg_print_add, 0, STRING("lecture_friends_13"))
+    CALL(evt_party_vivian_unhold, 0)
+    CALL(evt_cam_letter_box_disable, 0)
+    CALL(evt_party_stop, 0)
+    WAIT_FRAMES(16)
+    CALL(evt_mario_wait_landon)
+    CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(80.0f), FLOAT(455.7998f), FLOAT(0.0f), FLOAT(30.0f), FLOAT(-101.799805f), 1000, 0)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    SUBTRACT(LW(0), 40)
+    CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
+    CALL(evt_party_set_dir, 0, 90, 300)
+    WAIT_MS(1000)
+    CALL(evt_msg_print_add, 0, STRING("lecture_friends_14"))
+    CALL(evt_party_set_pose, 0, STRING("PTR_O_1"))
+    WAIT_MS(1000)
+    CALL(evt_party_set_pose, 0, STRING("PTR_S_1"))
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(vivian_party_lecture)
     CALL(evt_msg_print, 0, STRING("lecture_friends_12_0_1"), 0, 0)
     CALL(evt_msg_print, 0, STRING("lecture_friends_12_1"), 0, 0)
@@ -811,6 +866,7 @@ EVT_BEGIN(vivian_party_lecture)
     CALL(evt_party_set_pose, 0, STRING("PTR_S_1"))
     RETURN
 EVT_END()
+#endif
 
 static __declspec(section ".data") EVT_BEGIN(all_party_lecture_otosub)
     CALL(evt_snd_bgmoff, 1024)
@@ -819,7 +875,7 @@ static __declspec(section ".data") EVT_BEGIN(all_party_lecture_otosub)
     RETURN
 EVT_END()
 
-EVT_BEGIN(all_party_lecture_29_data_10988)
+EVT_BEGIN(all_party_lecture)
     CALL(evt_mario_normalize)
     IF_INT_NOT_EQUAL(LW(9), 1)
         IF_INT_NOT_EQUAL(LW(9), 5)
@@ -966,11 +1022,11 @@ EVT_END()
 EVT_BEGIN(roll_majin_lecture_sub01)
     CALL(lecture_button_set_alpha, 0, 255)
     CALL(lecture_button_set_alpha, 1, 128)
-    CALL(lecture_button_set_icon_id, 1, 121)
+    CALL(lecture_button_set_icon_id, 1, ICON_079)
     LOOP(0)
-        CALL(lecture_button_set_icon_id, 0, 129)
+        CALL(lecture_button_set_icon_id, 0, ICON_081)
         WAIT_MS(300)
-        CALL(lecture_button_set_icon_id, 0, 128)
+        CALL(lecture_button_set_icon_id, 0, ICON_080)
         WAIT_MS(300)
     END_LOOP
     RETURN
@@ -979,23 +1035,23 @@ EVT_END()
 EVT_BEGIN(roll_majin_lecture_sub02)
     CALL(lecture_button_set_alpha, 0, 128)
     CALL(lecture_button_set_alpha, 1, 255)
-    CALL(lecture_button_set_icon_id, 0, 129)
+    CALL(lecture_button_set_icon_id, 0, ICON_081)
     LOOP(0)
-        CALL(lecture_button_set_icon_id, 1, 120)
+        CALL(lecture_button_set_icon_id, 1, ICON_078)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 123)
+        CALL(lecture_button_set_icon_id, 1, ICON_07B)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 124)
+        CALL(lecture_button_set_icon_id, 1, ICON_07C)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 125)
+        CALL(lecture_button_set_icon_id, 1, ICON_07D)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 122)
+        CALL(lecture_button_set_icon_id, 1, ICON_07A)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 119)
+        CALL(lecture_button_set_icon_id, 1, ICON_077)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 118)
+        CALL(lecture_button_set_icon_id, 1, ICON_076)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 117)
+        CALL(lecture_button_set_icon_id, 1, ICON_075)
         WAIT_MS(15)
     END_LOOP
     RETURN
@@ -1040,10 +1096,10 @@ EVT_BEGIN(roll_majin_lecture)
     CALL(evt_msg_print_add, 0, STRING("stg4_usu_majin3_14"))
     LOOP(0)
         CALL(lecture_button_flag_on_off, 0, 2, 1)
-        CALL(lecture_button_set_icon_id, 0, 128)
+        CALL(lecture_button_set_icon_id, 0, ICON_080)
         CALL(lecture_button_set_seq, 0, 2)
         CALL(lecture_button_flag_on_off, 1, 2, 1)
-        CALL(lecture_button_set_icon_id, 1, 121)
+        CALL(lecture_button_set_icon_id, 1, ICON_079)
         CALL(lecture_button_set_seq, 1, 2)
         CALL(lecture_button_seq_wait, 0, 1)
         CALL(lecture_button_seq_wait, 1, 1)

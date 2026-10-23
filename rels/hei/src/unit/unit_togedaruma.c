@@ -76,7 +76,7 @@ __declspec(section ".data") s32 fd_togedaruma___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_togedaruma_one_negone_359;
 __declspec(section ".data") s32 fd_togedaruma___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_togedaruma_one_364[1];
-BattleUnitKind unit_togedaruma_12_data_1A788;
+BattleUnitKind unit_togedaruma;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") s32 defence_turn[2];
@@ -143,7 +143,7 @@ __declspec(section ".data") s32 fd_togedaruma_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_togedaruma_12_data_1A788 = {
+BattleUnitKind unit_togedaruma = {
     19,
     "btl_un_togedaruma",
     2,

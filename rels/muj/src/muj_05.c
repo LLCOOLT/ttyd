@@ -110,7 +110,7 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(muj_npc_guruguru);
-extern s32 all_party_lecture_20_data_3C908[];
+extern s32 all_party_lecture[];
 extern s32 evt_bero_get_info[];
 extern s32 evt_bero_info_run[];
 extern s32 evt_mobj_recovery_blk[];
@@ -295,7 +295,7 @@ EVT_END()
 EVT_BEGIN(sanders_nakama_sub)
     SET_VALUE(LW(8), STRING("me"))
     SET_VALUE(LW(9), 3)
-    CALL_CHILD(PTR(all_party_lecture_20_data_3C908))
+    CALL_CHILD(PTR(all_party_lecture))
     CALL(evt_party_run, 0)
     RETURN
 EVT_END()

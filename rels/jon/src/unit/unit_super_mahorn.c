@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -131,7 +132,7 @@ __declspec(section ".data") s32 fd_super_mahorn___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_super_mahorn_one_negone_359;
 __declspec(section ".data") s32 fd_super_mahorn___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_super_mahorn_one_364[1];
-BattleUnitKind unit_super_mahorn_15_data_43F68;
+BattleUnitKind unit_super_mahorn;
 static s32 unit_super_mahorn_bunsin[49];
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -231,7 +232,7 @@ __declspec(section ".data") s32 fd_super_mahorn_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_super_mahorn_15_data_43F68 = {
+BattleUnitKind unit_super_mahorn = {
     128,
     "btl_un_super_mahorn",
     10,
@@ -335,7 +336,7 @@ static s32 weapon_mahorn_attack_magic[] = {
 };
 
 static s32 weapon_mahorn_all_attack_magic[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
     5, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 67109634, 0, 7, 2047, -2147475456,
@@ -1604,7 +1605,7 @@ static USER_FUNC(hand_init) {
     BtlUnit_GetPos(unit, &x, &y, &z);
     for (j = 0, i = 2; i <= 5; i++, j++) {
         BtlUnit_SetAnim(BtlUnit_GetPartsPtr(unit, i), "MAH_Z_2");
-        dest = __memAlloc((HEAP_TYPE)4, 12);
+        dest = BTL_ALLOC(12);
         unit->work[j] = (s32)dest;
         dest[0] = 0.0f;
         dest[1] = 0.0f;

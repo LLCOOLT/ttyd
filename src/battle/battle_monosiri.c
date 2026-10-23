@@ -780,5 +780,9 @@ void battleSetUnitMonosiriFlag(BattleUnitType kind) {
 	wp->tattledUnitTypeFlags[kind / 32] |= 1 << (kind % 32);
 }
 #pragma force_active on
+#ifdef VERSION_G8ME01
+__declspec(section ".data") u32 gap_05_8036BE94_data[1] = {0};
+#else
 __declspec(section ".data") u32 gap_05_8036BE94_data[3] = {0, 0, 0};
+#endif
 #pragma force_active reset

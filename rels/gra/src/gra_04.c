@@ -13,7 +13,7 @@ USER_FUNC(evt_cloud_ent);
 USER_FUNC(evt_cloud_init);
 USER_FUNC(evt_cloud_set_cap_size);
 USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_kagemario_init_11_text_804);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_mario_bgmode_off);
 USER_FUNC(evt_mario_bgmode_on);
@@ -39,7 +39,7 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(roll_release_check);
 extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill_11_data_4F98[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_gra_04_negone_one_374;
 __declspec(section ".data") s32 fd_gra_04_neg_one_382[1];
@@ -249,11 +249,11 @@ static __declspec(section ".data") s32 fukitobashi_tbl[] = {
 EVT_BEGIN(gra_04_init_evt)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_GRA1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_GRA1"))
-    CALL(evt_kagemario_init_11_text_804)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_11_data_4F98))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     IF_INT_LESS(GSW(0), 189)
         CALL(evt_cloud_init)
         CALL(evt_cloud_ent, 1, PTR(fukitobashi_tbl), STRING("A_futa"), PTR(gra_04_tree_open_evt))

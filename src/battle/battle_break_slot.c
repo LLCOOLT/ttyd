@@ -197,8 +197,16 @@ EVT_END()
 
 
 
+#ifdef VERSION_G8ME01
+// US battle textures are 0x16 higher
+u16 tex_id_list_small[6] = {0x41, 0x43, 0x45, 0x44, 0x42, 0};
+u16 tex_id_list_big[6] = {0x46, 0x48, 0x4A, 0x49, 0x47, 0};
+#define BBS_ICON_OFS 8
+#else
 u16 tex_id_list_small[6] = {0x2B, 0x2D, 0x2F, 0x2E, 0x2C, 0};
 u16 tex_id_list_big[6] = {0x30, 0x32, 0x34, 0x33, 0x31, 0};
+#define BBS_ICON_OFS 0
+#endif
 
 EVT_BEGIN(star_effect)
     RETURN
@@ -286,6 +294,13 @@ extern s32 msg_super_max[];
 extern s32 msg_fault[];
 
 s32 BattleAudienceAddAudienceNum(s32 num);
+#ifdef VERSION_G8ME01
+#define BS_WK_A 0x6F88
+#define BS_WK_B 0x6F74
+#else
+#define BS_WK_A 0x6F98
+#define BS_WK_B 0x6F84
+#endif
 void BattleAudienceAddTargetNum(f32 a, f32 b);
 void btl_camera_shake_h(s32 pri, f32 a, f32 b, s32 frames, s32 x);
 void btl_camera_noshake(s32 pri);
@@ -549,7 +564,11 @@ void BattleBreakSlot_Main(void) {
 				BattleAudienceAddTargetNum(0.0f, updown);
 				slot->phase = 8;
 				slot->flags &= ~4;
+#ifdef VERSION_G8ME01
+				{
+#else
 				if (gp->language == 0U) {
+#endif
 					switch (BattleBreakSlotReelGetPtr(0)->item) {
 						case 0:
 							slot->evt = evtEntry(msg_hp_max, 0, 0x20);
@@ -742,7 +761,7 @@ void BattleBreakSlot_Main(void) {
 					if ((slot->flags & 4) && rr->item != 3) {
 						break;
 					}
-					if ((*(u32*)(wp2 - 0x6F98) & 0x80000) && rr->item != *(s32*)(wp2 - 0x6F84)) {
+					if ((*(u32*)(wp2 - BS_WK_A) & 0x80000) && rr->item != *(s32*)(wp2 - BS_WK_B)) {
 						break;
 					}
 					rr->pos.y = 0.0f;
@@ -816,7 +835,7 @@ void BattleBreakSlotDispReel(CameraId camId, void* param) {
 	for (; i < 3; i++, reel++) {
 		if ((reel->flags & 1) && reel->state >= 1 && reel->state <= 4) {
 			PSMTXTrans(trans, 42.0f * i + 226.0f, 122.0f, 0.0f);
-			iconDispGxCol(trans, 0x10, 0x1D4, (GXColor){0xFF, 0xFF, 0xFF, 0xD0});
+			iconDispGxCol(trans, 0x10, 0x1D4 + BBS_ICON_OFS, (GXColor){0xFF, 0xFF, 0xFF, 0xD0});
 		}
 	}
 
@@ -875,7 +894,13 @@ void BattleBreakSlotDispReel(CameraId camId, void* param) {
 }
 
 void BattleBreakSlot_End(void) {
+#ifdef VERSION_G8ME01
+	BattleFree(BattleBreakSlotReelGetPtr(0)->cards);
+	BattleFree(BattleBreakSlotReelGetPtr(1)->cards);
+	BattleFree(BattleBreakSlotReelGetPtr(2)->cards);
+#else
 	//stubbed in retail
+#endif
 }
 
 void BattleBreakSlot_PointInc(void) {
@@ -902,8 +927,8 @@ void BattleBreakSlot_PointInc(void) {
 				reel->index = reel->numCards - 1;
 			}
 			reel->item = reel->cards[reel->index];
-			if (*(u32*)(wp - 0x6F98) & 0x80000) {
-				item_appear_force(reel, *(s32*)(wp - 0x6F84));
+			if (*(u32*)(wp - BS_WK_A) & 0x80000) {
+				item_appear_force(reel, *(s32*)(wp - BS_WK_B));
 			}
 			if (slot->flags & 1) {
 				item_appear_force(reel, 3);
@@ -918,8 +943,8 @@ void BattleBreakSlot_PointInc(void) {
 				reel->index = reel->numCards - 1;
 			}
 			reel->item = reel->cards[reel->index];
-			if (*(u32*)(wp - 0x6F98) & 0x80000) {
-				item_appear_force(reel, *(s32*)(wp - 0x6F84));
+			if (*(u32*)(wp - BS_WK_A) & 0x80000) {
+				item_appear_force(reel, *(s32*)(wp - BS_WK_B));
 			}
 			if (slot->flags & 1) {
 				item_appear_force(reel, 3);

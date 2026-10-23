@@ -12,6 +12,7 @@
 #pragma optimize_for_size on
 f32 sinfd(f32 degrees);
 #include <stdlib.h>
+#include "icon_ids.h"
 
 typedef struct PendulumParams {
     u8 field_0x0[0x3C - 0x0];
@@ -272,7 +273,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = px = -200.0f + x;
         pos.y = 25.0f + y;
-        iconDispGx(&pos, 0x10, 0x8C, 1.0f);
+        iconDispGx(&pos, 0x10, ICON_08C, 1.0f);
     }
     cam = camGetPtr(8);
     btlDispGXInit2DRasta();
@@ -288,7 +289,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos2 = {0.0f, 0.0f, 0.0f};
         pos2.x = (-288.0f + x) + (f32)(*(s32*)((u8*)work + 0x1F8C) * 176) / 100.0f;
         pos2.y = 45.0f + y;
-        iconDispGx(&pos2, 0x10, 0x96, 1.0f);
+        iconDispGx(&pos2, 0x10, ICON_096, 1.0f);
     }
 }
 #pragma dont_inline reset

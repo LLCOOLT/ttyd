@@ -10,6 +10,10 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
+#include "mario/mariost.h"
+#ifdef VERSION_G8ME01
+void marioChkWallAround(Vec* pos, s32 a1, f32 a2, f32 angle, f32 radius, f32 height);
+#endif
 
 void marioClearJumpPara(void);
 void marioPaperOff(void);
@@ -31,7 +35,7 @@ void marioSetFallPara(void);
 void marioPreJump(void);
 void marioChkOverhead(void);
 
-#define MW(m, off, T) (*(T*)((u8*)(m) + (off)))
+#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 #define MS(off, T) MW(marioGetPtr()->motStruct, off, T)
 #define MD(off, T) MW(mp->motStruct, off, T)
 #define SFX3D(id, pos) ((s32 (*)(s32, Vec*))psndSFXOn_3D)(id, pos)
@@ -170,6 +174,21 @@ static inline void planeRoll2(MarioWork* mp, f32 rate, f32 max) {
 	*p += rate * (max * DIRF(mp) - *p);
 }
 
+#ifdef VERSION_G8ME01
+static inline f32 planeCamFloor(void) {
+	if (strcmp(gp->currentMapName, "tik_01") == 0) {
+		return 30.0f;
+	} else if (strcmp(gp->currentMapName, "tik_19") == 0) {
+		return -510.0f;
+	} else if (strcmp(gp->currentMapName, "mri_19") == 0) {
+		return -230.0f;
+	} else if (strcmp(gp->currentMapName, "las_25") == 0) {
+		return -510.0f;
+	}
+	return 90.0f;
+}
+#endif
+
 void mot_plane(void) {
 	MarioWork* mp;
 	BOOL done;
@@ -221,7 +240,7 @@ void mot_plane(void) {
 			marioChgPose("M_Z_1");
 			MW(mp, 4, u32) |= 8;
 			animPoseSetLocalTime(mp->paperPoseId, 0.0f);
-			animPoseSetLocalTime(((s32*)((u8*)mp + 0x228))[marioAnimeId()], 0.0f);
+			animPoseSetLocalTime(((s32*)((u8*)mp + MWOFF(0x228)))[marioAnimeId()], 0.0f);
 			evt = evtEntry(sound_evt, 0, 0);
 			MW(evt, 0x9c, s32) = (s32)(1024.0f * mp->position.x) + -230000000;
 			MW(evt, 0xa0, s32) = (s32)(1024.0f * mp->position.y) + -230000000;
@@ -233,7 +252,7 @@ void mot_plane(void) {
 		break;
 	case 2:
 		animPoseSetLocalTime(mp->paperPoseId, 0.0f);
-		animPoseSetLocalTime(((s32*)((u8*)mp + 0x228))[marioAnimeId()], 0.0f);
+		animPoseSetLocalTime(((s32*)((u8*)mp + MWOFF(0x228)))[marioAnimeId()], 0.0f);
 		planeRoll1(mp, 0.125f, 30.0f);
 		done = FALSE;
 		mp->displayDirection += MW(mp, 0x2a4, f32);
@@ -289,9 +308,17 @@ void mot_plane(void) {
 		mp->camShiftTargetY = -70.0f;
 		break;
 	}
+#ifdef VERSION_G8ME01
+	// US: per-map floor below which the camera stops following the plane
+	if (mp->position.y < planeCamFloor()) {
+		mp->camShiftTargetY = __fabsf(planeData[38]);
+		camFollowYOff();
+	}
+#else
 	if (mp->position.y < 100.0f) {
 		mp->camShiftTargetY = __fabsf(planeData[38]);
 	}
+#endif
 	flyMain();
 	if (marioKeyOffChk() && !(mp->trigFlags & 4)) {
 		if (planeCancel()) {
@@ -434,6 +461,9 @@ void mot_plane(void) {
 			mp->camShiftTargetY = 0.0f;
 			marioChgMot(0);
 		}
+#ifdef VERSION_G8ME01
+		marioChkWallAround(&mp->position, 0, 0.0f, 0.0f, mp->wPlayerCollisionBox.z, mp->wPlayerCollisionBox.y);
+#endif
 		break;
 	case 70: {
 		Vec p;

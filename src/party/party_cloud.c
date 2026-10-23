@@ -18,6 +18,11 @@ Vec cloud_at;
 
 
 #define CLD_F(p, off) (*(f32*)((u8*)(p) + (off)))
+#ifdef VERSION_G8ME01
+#define MW_US 4 // US MarioWork has 4 more bytes before these raw offsets
+#else
+#define MW_US 0
+#endif
 #define CLD_S(p, off) (*(s32*)((u8*)(p) + (off)))
 #define CLD_B(p, off) (*(u8*)((u8*)(p) + (off)))
 void partyMoveFlyInit(PartyEntry* party, s32 arg);
@@ -65,7 +70,7 @@ void* memset(void*, int, unsigned long);
 
 
 
-#define cloudCalcPos(party) {                                                          u8* m_ = CLD_P(party, 0x160);                                                         f32 dir_;                                                                                                                                                                   *(Vec*)&CLD_F(party, 0x94) = *(Vec*)&CLD_F(m_, 0x8C);                                 dir_ = CLD_F(m_, 0x1AC);                                                              movePos((f32*)((u32)party + 0x94), (f32*)((u32)party + 0x9C), 3.3f,                           toMovedir(dir_ + ((dir_ < 90.0f || dir_ >= 270.0f) ? -90.0f : 90.0f)));       CLD_F(party, 0x98) += 10.0f;                                                      }
+#define cloudCalcPos(party) {                                                          u8* m_ = CLD_P(party, 0x160);                                                         f32 dir_;                                                                                                                                                                   *(Vec*)&CLD_F(party, 0x94) = *(Vec*)&CLD_F(m_, 0x8C);                                 dir_ = CLD_F(m_, 0x1AC + MW_US);                                                              movePos((f32*)((u32)party + 0x94), (f32*)((u32)party + 0x9C), 3.3f,                           toMovedir(dir_ + ((dir_ < 90.0f || dir_ >= 270.0f) ? -90.0f : 90.0f)));       CLD_F(party, 0x98) += 10.0f;                                                      }
 
 void mot_cloud() {
     MarioWork* mario = marioGetPtr();
@@ -231,6 +236,18 @@ f32 cloudGetBreathDist() {
     return breathDist;
 }
 
+#ifdef VERSION_G8ME01
+void N_cloudLockAnimationsOff(PartyEntry* party) {
+    *(s32*)((u8*)party + 0x184) = 0;
+    partyChgPose(party, (s32)"PWD_S_1");
+}
+
+void N_cloudLockAnimationsOn(PartyEntry* party) {
+    *(s32*)((u8*)party + 0x184) = 1;
+    partyChgPose(party, (s32)"PWD_Z_1");
+}
+#endif
+
 void cloud_hover_init(PartyEntry* party) {
     CLD_F(party, 0x17C) = 0.0f;
     CLD_F(party, 0x180) = 4.25f;
@@ -243,6 +260,27 @@ void cloud_hover_main(PartyEntry* party) {
     CLD_F(party, 0x80) = 3.0f + 3.0f * a;
 }
 
+#ifdef VERSION_G8ME01
+void cloud_move(PartyEntry* party) {
+    f32 a;
+
+    if (party->field_8 & 8) {
+        party->field_8 &= ~8;
+        partyMoveFlyInit(party, 1);
+        CLD_F(party, 0x17C) = 0.0f;
+        CLD_F(party, 0x180) = 4.25f;
+    }
+    if (CLD_S(party, 0x184) == 0) {
+        partyFlyMain(party);
+        CLD_F(party, 0x17C) = revise360(CLD_F(party, 0x17C) - CLD_F(party, 0x180));
+        a = sin((3.1415927f * CLD_F(party, 0x17C)) / 180.0f);
+        CLD_F(party, 0x80) = 3.0f + 3.0f * a;
+        if (CLD_B(party, 0x3B) != 2) {
+            party->field_8 &= ~0x40000;
+        }
+    }
+}
+#else
 void cloud_move(PartyEntry* party) {
     if (party->field_8 & 8) {
         party->field_8 &= ~8;
@@ -255,6 +293,7 @@ void cloud_move(PartyEntry* party) {
         party->field_8 &= ~0x40000;
     }
 }
+#endif
 
 void cloud_init(PartyEntry* party) {
     CLD_B(party, 0x33) = 5;
@@ -265,6 +304,9 @@ void cloud_init(PartyEntry* party) {
     CLD_S(party, 0x178) = 0;
     CLD_S(party, 0x17C) = 0;
     CLD_S(party, 0x180) = 0;
+#ifdef VERSION_G8ME01
+    CLD_S(party, 0x184) = 0;
+#endif
     party->useStruct = NULL;
     CLD_S(party, 0x178) = 0;
 }
@@ -348,8 +390,8 @@ void N__cloud_use(PartyEntry* party) {
         party->useMotionId = 1;
     case 1:
         cloudCalcPos(party);
-        party->displayDirection = CLD_F(mario, 0x1A8);
-        party->displayDirectionTarget = CLD_F(mario, 0x1AC);
+        party->displayDirection = CLD_F(mario, 0x1A8 + MW_US);
+        party->displayDirectionTarget = CLD_F(mario, 0x1AC + MW_US);
         party->position.x += (party->moveTarget.x - party->position.x) / (f32)party->moveFrames;
         party->position.y += (party->moveTarget.y - party->position.y) / (f32)party->moveFrames;
         party->position.z += (party->moveTarget.z - party->position.z) / (f32)party->moveFrames;
@@ -379,10 +421,10 @@ void N__cloud_use(PartyEntry* party) {
         CLD_U(mario, 4) |= 0x100;
         party->flags2 |= 0x10;
         CLD_F(CLD_P(party, 0x170), 8) = 0.0f;
-        CLD_F(CLD_P(party, 0x170), 4) = CLD_F(mario, 0x1A8);
+        CLD_F(CLD_P(party, 0x170), 4) = CLD_F(mario, 0x1A8 + MW_US);
         if (!(party->flags & 0x80000000)) {
             CLD_F(mario, 0x150) = 0.03f;
-            CLD_F(mario, 0x138) = 70.0f * (revise360(270.0f - CLD_F(mario, 0x1AC)) <= 180.0f ? -1.0f : 1.0f);
+            CLD_F(mario, 0x138) = 70.0f * (revise360(270.0f - CLD_F(mario, 0x1AC + MW_US)) <= 180.0f ? -1.0f : 1.0f);
         }
         if (CLD_P(party, 0x170) != NULL && CLD_U(CLD_P(party, 0x170), 0x34) == 0xFFFFFFFF) {
             CLD_S(CLD_P(party, 0x170), 0x34) =
@@ -395,20 +437,23 @@ void N__cloud_use(PartyEntry* party) {
             break;
         }
         partyChgPose(party, (s32)"PWD_A_6");
+#ifdef VERSION_G8ME01
+        if (CLD_H(mario, 0x2E) == 0x1B)
+#endif
         marioChgPose("M_A_2B\0");
         party->useMotionId = 12;
     case 12:
         cloudCalcPos(party);
         party->position = *(Vec*)&party->moveTarget.x;
         partyUpdateKeyData(party);
-        CLD_F(mario, 0x1A8) = CLD_F(CLD_P(party, 0x170), 4);
-        CLD_F(mario, 0x1AC) = CLD_F(CLD_P(party, 0x170), 4);
+        CLD_F(mario, 0x1A8 + MW_US) = CLD_F(CLD_P(party, 0x170), 4);
+        CLD_F(mario, 0x1AC + MW_US) = CLD_F(CLD_P(party, 0x170), 4);
         party->displayDirection = CLD_F(CLD_P(party, 0x170), 4);
         party->displayDirectionTarget = CLD_F(CLD_P(party, 0x170), 4);
         ofsX = CLD_F(mario, 0x8C);
         ofsZ = CLD_F(mario, 0x94);
         flag = 0;
-        dir = CLD_F(mario, 0x1A8);
+        dir = CLD_F(mario, 0x1A8 + MW_US);
         if (dir < 90.0f || dir >= 270.0f) {
             flag = 1;
         }

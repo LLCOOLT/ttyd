@@ -114,10 +114,22 @@ static __declspec(section ".data") s32 door_1_open[12];
 static s32 door_1_close[14];
 static s32 door_1[18];
 static s32 evt_prologue[713];
+#ifdef VERSION_G8ME01
+s32 evt_prologue2[196];
+#else
 s32 evt_prologue2[193];
+#endif
+#ifdef VERSION_G8ME01
+static s32 epilogue_evt[328];
+#else
 static s32 epilogue_evt[318];
+#endif
 static s32 epilogue_npc_entry[68];
+#ifdef VERSION_G8ME01
+static s32 epilogue_evt2[500];
+#else
 static s32 epilogue_evt2[495];
+#endif
 static __declspec(section ".data") s32 ki_data[12];
 static s32 kusa_data[44];
 static s32 bero_entry_data[30];
@@ -447,7 +459,9 @@ EVT_BEGIN(evt_prologue2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -85, 30, -310)
     CALL(evt_mario_set_dir, 90, 0, 0)
+#ifndef VERSION_G8ME01
     CALL(evt_mario_adjust_dir)
+#endif
     CALL(evt_party_stop, 0)
     CALL(evt_npc_flag_onoff, 0, STRING("ルイージ"), 1024)
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("L_8"))
@@ -457,6 +471,9 @@ EVT_BEGIN(evt_prologue2)
     CALL(evt_npc_flag_onoff, 1, STRING("ルイージ"), 32768)
     CALL(evt_cam3d_evt_set, -376, 154, 65, -63, 75, -247, 0, 11)
     CALL(evt_seq_wait, 2)
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_set_dir, 90, 0, 0)
+#endif
     CALL(evt_fade_end_wait)
     CALL(evt_cam_letter_box_camid, 8)
     CALL(evt_msg_print, 0, STRING("pro_05"), 0, STRING("ルイージ"))
@@ -549,9 +566,15 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_sub_rumble_onoff, 1, 0)
     CALL(evt_msg_print, 0, STRING("ep_34"), 0, STRING("ルイージ"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_set_dir, 90, 0, 0)
+#endif
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP3"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_jump_pos, -128, 30, -196, 400, 1, 20)
     CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_LANDING3"), LW(0), LW(1), LW(2), 0)
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_set_dir, 90, 0, 0)
+#endif
     CALL(evt_cam3d_evt_set, -307, 117, 9, -58, 58, -244, 1200, 11)
     CALL(evt_npc_flag_onoff, 1, STRING("ルイージ"), 32)
     CALL(evt_npc_jump_position_nohit, STRING("ルイージ"), -68, 30, -149, 400, 20)
@@ -614,6 +637,9 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_cam3d_evt_set, -375, 154, 66, -62, 81, -248, 800, 11)
     WAIT_MS(800)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_set_dir, 90, 0, 0)
+#endif
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("ep_48"), 0, STRING("ルイージ"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))

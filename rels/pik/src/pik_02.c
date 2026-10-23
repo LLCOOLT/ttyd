@@ -104,6 +104,9 @@ USER_FUNC(hoshi_jump);
 USER_FUNC(hoshi_r);
 USER_FUNC(kpa_chg_pose);
 USER_FUNC(reset_stone_cam);
+#ifdef VERSION_G8ME01
+extern s32 evt_memcard_save_wrapper[];
+#endif
 static USER_FUNC(set_starstone_pos);
 static USER_FUNC(starstone_entry);
 static USER_FUNC(starstone_fall);
@@ -155,7 +158,11 @@ s32 evt_kaiga[14];
 static s32 evt_daiza[27];
 s32 pik_02_koopa_evt[1256];
 s32 nise_starstone_init[18];
+#ifdef VERSION_G8ME01
+s32 pik_02_init_evt[172];
+#else
 s32 pik_02_init_evt[166];
+#endif
 
 __declspec(section ".data") u64 fd_pik_02_negone_one_374 = 0xBF8000003F800000;
 
@@ -290,7 +297,11 @@ static EVT_BEGIN(s_door_close)
 EVT_END()
 
 static s32 bero_data[] = {
+#ifdef VERSION_G8ME01
+    (s32)"s_bero", 65542, 20000, 100000, 0, 0, 80, (s32)haikei_off,
+#else
     (s32)"s_bero", 65542, 20000, 100000, 0, 0, -1, (s32)haikei_off,
+#endif
     -1, 0, (s32)"pik_01", (s32)"n_bero", 327685, (s32)s_door_close, (s32)s_door_open, (s32)"dokan",
     131072, 9, 100000, 0, 0, -1, (s32)evt_return, 6,
     (s32)evt_go, 0, (s32)"h_dokan", 65537, 0, 0, (s32)"h_dokan", 268566528,
@@ -1056,7 +1067,11 @@ EVT_BEGIN(pik_02_koopa_evt)
     WAIT_MS(2000)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 20)
+#ifdef VERSION_G8ME01
+    CALL_CHILD(evt_memcard_save_wrapper)
+#else
     CALL_CHILD(PTR(evt_memcard_save))
+#endif
     CALL(evt_mario_set_mode, 0)
     CALL(evt_snd_bgmoff_f, 512, 2000)
     CALL(evt_snd_envoff_f, 512, 2000)
@@ -1127,6 +1142,9 @@ EVT_BEGIN(pik_02_init_evt)
         SPAWN_EVENT(PTR(pik_02_koopa_evt))
     END_IF
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hi1"))
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("s_jav"), 2)
+#endif
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("saku_2"), 2)
     CALL(evt_cam_letter_box_disable, 0)
     RETURN

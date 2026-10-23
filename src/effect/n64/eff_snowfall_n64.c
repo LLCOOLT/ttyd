@@ -2,6 +2,9 @@
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
+#ifdef VERSION_G8ME01
+#include "mario/mariost.h"
+#endif
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -199,7 +202,15 @@ void effSnowfallMain(EffectEntry* effect) {
         p->position.z += p->velocity.z;
         cam_clip_chk(p, 550, h, life);
     }
+#ifdef VERSION_G8ME01
+    if (gp->inBattle == 0) {
+        dispEntry(CAMERA_3D, dispCalcZ(&position), 10, (DispCallback)effSnowfallDisp, effect);
+    } else {
+        dispEntry(CAMERA_3D_EFFECTB, dispCalcZ(&position), 10, (DispCallback)effSnowfallDisp, effect);
+    }
+#else
     dispEntry(CAMERA_3D, dispCalcZ(&position), 10, (DispCallback)effSnowfallDisp, effect);
+#endif
 }
 
 #undef W

@@ -99,6 +99,12 @@ static USER_FUNC(mario_flag);
 USER_FUNC(omiseFukki);
 USER_FUNC(omiseHozon);
 USER_FUNC(npc_alpha_except_tenin);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_item_delete);
+USER_FUNC(evt_mario_adjust_dir);
+USER_FUNC(evt_mario_get_dispdir);
+USER_FUNC(evt_sub_get_language);
+#endif
 extern s32 evt_bero_info_run[];
 extern s32 evt_rsh_03_rnd_npc_entry[];
 extern s32 evt_rsh_moamoa_on_window[];
@@ -129,7 +135,11 @@ __declspec(section ".data") s32 iri_22_item_tbl[4];
 s32 talk_cook[351];
 static s32 init_waitless[29];
 __declspec(section ".data") s32 item_tbl_waitless[2];
+#ifdef VERSION_G8ME01
+s32 talk_waitless_pias_return[158];
+#else
 s32 talk_waitless_pias_return[112];
+#endif
 static s32 talk_waitless[268];
 s32 move_waitless[49];
 static s32 npc_data[92];
@@ -140,7 +150,11 @@ s32 evt_lanch_missing[761];
 static s32 talk_powan[184];
 s32 npc_data_lunch[161];
 static __declspec(section ".data") s32 msg_tbl[10];
+#ifdef VERSION_G8ME01
+s32 evt_lunch_talk[113];
+#else
 s32 evt_lunch_talk[101];
+#endif
 s32 evt_shop_moamoa_talk[59];
 static __declspec(section ".data") s32 obj_list[12];
 static __declspec(section ".data") s32 goods_list[12];
@@ -149,21 +163,45 @@ static s32 shopper_data[38];
 s32 shop_door_open[27];
 s32 shop_door_close[31];
 s32 evt_shop_open[267];
+#ifdef VERSION_G8ME01
+s32 evt_shop_close[420];
+#else
 s32 evt_shop_close[317];
+#endif
 s32 evt_shop_door_init[36];
 static s32 evt_yuka_simi[45];
 static s32 access_tbl[16];
 static s32 evt_access[25];
 static s32 evt_access_entry[24];
 s32 rsh_03_init_evt[269];
+#ifdef VERSION_G8ME01
+s32 rsh_03_a_init_evt[141];
+#else
 s32 rsh_03_a_init_evt[62];
+#endif
+#ifdef VERSION_G8ME01
+__declspec(section ".data") s32 rsh_03_b_init_evt[90];
+#else
 __declspec(section ".data") s32 rsh_03_b_init_evt[11];
+#endif
 static __declspec(section ".data") s32 window_tbl[5];
+#ifdef VERSION_G8ME01
+s32 rsh_03_c_init_evt[217];
+#else
 s32 rsh_03_c_init_evt[71];
+#endif
+#ifdef VERSION_G8ME01
+s32 rsh_03_init_evt_nidome[219];
+#else
 s32 rsh_03_init_evt_nidome[140];
+#endif
 s32 rsh_03_a_init_evt_nidome[23];
 __declspec(section ".data") s32 rsh_03_b_init_evt_nidome[11];
+#ifdef VERSION_G8ME01
+s32 rsh_03_c_init_evt_nidome[80];
+#else
 s32 rsh_03_c_init_evt_nidome[50];
+#endif
 
 USER_FUNC(iri_22_make_item_tbl) {
     s32* args = event->args;
@@ -480,17 +518,42 @@ EVT_BEGIN(talk_waitless_pias_return)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_195"), 0, STRING("ウェイトレス"))
     CALL(evt_win_item_select, 0, PTR(item_tbl_waitless), LW(1), 0)
     IF_INT_NOT_EQUAL(LW(1), -1)
+#ifdef VERSION_G8ME01
+        CALL(evt_mario_adjust_dir)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_mario_get_dispdir, LW(3))
+        IF_INT_LESS(LW(3), 90)
+            ADD(LW(0), -18)
+            ELSE
+            ADD(LW(0), 18)
+        END_IF
+        ADD(LW(1), 18)
+        CALL(evt_item_entry, STRING("yubiwa"), 76, LW(0), LW(1), LW(2), 17, -1, 0)
+        CALL(evt_mario_set_pose, STRING("M_C_3"))
+        WAIT_MS(1000)
+        CALL(evt_mario_set_pose, STRING("M_S_1"))
+        CALL(evt_item_delete, STRING("yubiwa"))
+#endif
         CALL(evt_npc_set_autotalkpose, STRING("me"), STRING("S_1"), STRING("T_4"))
         CALL(evt_msg_print, 0, STRING("stg6_rsh_196"), 0, STRING("ウェイトレス"))
         CALL(evt_npc_set_autotalkpose, STRING("me"), STRING("S_1"), STRING("T_1"))
+#ifdef VERSION_G8ME01
+        CALL(evt_npc_set_anim, STRING("ウェイトレス"), STRING("A_1"))
+        WAIT_MS(500)
+#endif
         CALL(evt_item_entry, STRING("orei"), 125, 0, 0, 0, 17, -1, 0)
         CALL(evt_item_get_item, STRING("orei"))
         CALL(evt_item_get_item_end_wait, STRING("orei"))
         SET_VALUE(GSWF(5651), 1)
+#ifdef VERSION_G8ME01
+        CALL(evt_npc_set_anim, STRING("ウェイトレス"), STRING("S_1"))
+#endif
         CALL(evt_msg_print, 0, STRING("stg6_rsh_197"), 0, STRING("ウェイトレス"))
+#ifndef VERSION_G8ME01
         CALL(evt_npc_set_anim, STRING("ウェイトレス"), STRING("A_1"))
         WAIT_MS(500)
         CALL(evt_npc_set_anim, STRING("ウェイトレス"), STRING("S_1"))
+#endif
         CALL(evt_pouch_remove_item, 76, LW(0))
         ELSE
         CALL(evt_msg_print, 0, STRING("stg6_rsh_196_2"), 0, STRING("ウェイトレス"))
@@ -955,7 +1018,11 @@ EVT_BEGIN(evt_lunch_talk)
         END_LOOP
         CALL(mario_flag, LW(10), LW(0))
         IF_INT_EQUAL(LW(0), 0)
+#ifdef VERSION_G8ME01
+            BEGIN_INLINE_EVENT_GET_ID(LW(3))
+#else
             BEGIN_INLINE_EVENT
+#endif
                 CALL(evt_npc_get_position, LW(10), LW(0), LW(1), LW(2))
                 CALL(evt_npc_get_height, LW(10), LW(3))
                 ADD(LW(3), 10)
@@ -972,7 +1039,17 @@ EVT_BEGIN(evt_lunch_talk)
                     WAIT_FRAMES(1)
                 END_LOOP
             END_INLINE_EVENT
+#ifdef VERSION_G8ME01
+            LOOP(0)
+                IS_EVENT_RUNNING(LW(3), LW(4))
+                IF_INT_EQUAL(LW(4), 0)
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+#else
             WAIT_MS(1000)
+#endif
             DELETE_EVENT(LW(0))
         END_IF
         WAIT_FRAMES(1)
@@ -1186,9 +1263,41 @@ EVT_BEGIN(evt_shop_close)
     CALL(evt_sub_get_mapname, LW(10))
     IF_STR_EQUAL(LW(10), STRING("rsh_03_c"))
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("shop_close_yuka1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("close"), 1)
+#ifdef VERSION_G8ME01
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("shop_close_sc"), 1)
+#endif
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("close"), 1)
+#ifdef VERSION_G8ME01
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_close"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_close"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_close"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_close"), 1)
+#else
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("shop_close_sc"), 1)
+#endif
     END_IF
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_open"), 1)
+    CALL(evt_sub_get_language, LW(0))
+    SWITCH(LW(0))
+        CASE_OR_EQUAL(0)
+        CASE_OR_EQUAL(1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("open"), 1)
+        CASE_END
+        CASE_EQUAL(2)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_open"), 1)
+        CASE_EQUAL(3)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_open"), 1)
+        CASE_EQUAL(4)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_open"), 1)
+        CASE_EQUAL(5)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_open"), 1)
+    END_SWITCH
+#endif
     CALL(evt_sub_get_mapname, LW(10))
     IF_STR_EQUAL(LW(10), STRING("rsh_03_a"))
         SWITCH(GSW(0))
@@ -1417,6 +1526,28 @@ EVT_BEGIN(rsh_03_a_init_evt)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("s_yuka_simi"), 1)
     END_SWITCH
     SPAWN_EVENT(PTR(evt_sub_mail_event))
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_open"), 1)
+    CALL(evt_sub_get_language, LW(0))
+    SWITCH(LW(0))
+        CASE_OR_EQUAL(0)
+        CASE_OR_EQUAL(1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("open"), 1)
+        CASE_END
+        CASE_EQUAL(2)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_open"), 1)
+        CASE_EQUAL(3)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_open"), 1)
+        CASE_EQUAL(4)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_open"), 1)
+        CASE_EQUAL(5)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_open"), 1)
+    END_SWITCH
+#endif
     RETURN
 EVT_END()
 
@@ -1425,6 +1556,28 @@ __declspec(section ".data") EVT_BEGIN(rsh_03_b_init_evt)
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL_CHILD(PTR(rsh_03_init_evt))
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_open"), 1)
+    CALL(evt_sub_get_language, LW(0))
+    SWITCH(LW(0))
+        CASE_OR_EQUAL(0)
+        CASE_OR_EQUAL(1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("open"), 1)
+        CASE_END
+        CASE_EQUAL(2)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_open"), 1)
+        CASE_EQUAL(3)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_open"), 1)
+        CASE_EQUAL(4)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_open"), 1)
+        CASE_EQUAL(5)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_open"), 1)
+    END_SWITCH
+#endif
     RETURN
 EVT_END()
 
@@ -1443,16 +1596,65 @@ EVT_BEGIN(rsh_03_c_init_evt)
     CALL_CHILD(PTR(evt_rsh_window))
     CALL(fire, STRING("rousoku_1"))
     CALL(fire, STRING("rousoku_2"))
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("close"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_close"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_close"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_close"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_close"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_open"), 1)
+#endif
     SWITCH(GSW(0))
         CASE_OR_EQUAL(301)
         CASE_OR_EQUAL(326)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("shop_open_yuka"), 1)
+#ifdef VERSION_G8ME01
+        CALL(evt_sub_get_language, LW(0))
+        SWITCH(LW(0))
+            CASE_OR_EQUAL(0)
+            CASE_OR_EQUAL(1)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("close"), 1)
+            CASE_END
+            CASE_EQUAL(2)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_close"), 1)
+            CASE_EQUAL(3)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_close"), 1)
+            CASE_EQUAL(4)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_close"), 1)
+            CASE_EQUAL(5)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_close"), 1)
+        END_SWITCH
+#else
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("open"), 1)
+#endif
         CASE_END
         CASE_DEFAULT
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("shop_close_yuka1"), 1)
+#ifndef VERSION_G8ME01
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("close"), 1)
+#endif
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("shop_close_sc"), 1)
+#ifdef VERSION_G8ME01
+        CALL(evt_sub_get_language, LW(0))
+        SWITCH(LW(0))
+            CASE_OR_EQUAL(0)
+            CASE_OR_EQUAL(1)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("open"), 1)
+            CASE_END
+            CASE_EQUAL(2)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_open"), 1)
+            CASE_EQUAL(3)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_open"), 1)
+            CASE_EQUAL(4)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_open"), 1)
+            CASE_EQUAL(5)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_open"), 1)
+        END_SWITCH
+#endif
     END_SWITCH
     RETURN
 EVT_END()
@@ -1504,6 +1706,28 @@ EVT_BEGIN(rsh_03_init_evt_nidome)
     END_IF
     CALL_CHILD(PTR(evt_rsh_03_rnd_npc_entry))
     CALL_CHILD(PTR(evt_access_entry))
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_open"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_open"), 1)
+    CALL(evt_sub_get_language, LW(0))
+    SWITCH(LW(0))
+        CASE_OR_EQUAL(0)
+        CASE_OR_EQUAL(1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("open"), 1)
+        CASE_END
+        CASE_EQUAL(2)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_open"), 1)
+        CASE_EQUAL(3)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_open"), 1)
+        CASE_EQUAL(4)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_open"), 1)
+        CASE_EQUAL(5)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_open"), 1)
+    END_SWITCH
+#endif
     RETURN
 EVT_END()
 
@@ -1539,6 +1763,13 @@ EVT_BEGIN(rsh_03_c_init_evt_nidome)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("shop_close_yuka1"), 1)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("close"), 1)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("shop_close_sc"), 1)
+#ifdef VERSION_G8ME01
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("close"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_close"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_close"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_close"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_close"), 1)
+#endif
     RETURN
 EVT_END()
 

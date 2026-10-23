@@ -151,7 +151,7 @@ static USER_FUNC(piders_yarn_init) {
     s32 id = BattleTransID(event, -2);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
 
-    *(PidersYarn**)&unit->countersetWeapon = __memAlloc(HEAP_BATTLE, sizeof(PidersYarn));
+    *(PidersYarn**)&unit->countersetWeapon = BTL_ALLOC(sizeof(PidersYarn));
     return EVT_RETURN_DONE;
 }
 

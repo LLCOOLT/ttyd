@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -209,15 +210,15 @@ BattleUnitKind unit_yamitogedaruma = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{4, 4, 4, 4, 4}};
+static __declspec(section ".data") BattleUnitDefense defence = {{4, VERSION_PICK(4, 99), 4, 4, 4}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, VERSION_PICK(0, 2), 0, 0, 0}};
 
 static __declspec(section ".data") s32 defence_turn[] = {
     0, 0,
 };
 
-static __declspec(section ".data") StatusVulnerability regist = {20, 80, 20, 100, 20, 100, 100, 40, 100, 50, 100, 50, 100, 100, 40, 30, 20, 100, 40, 100, 100, 30};
+static __declspec(section ".data") StatusVulnerability regist = {20, 80, 20, 100, 20, 100, VERSION_PICK(100, 0), 40, 100, 50, 100, 50, 100, 100, 40, 30, 20, 100, 40, 100, 100, 30};
 
 static PoseTableEntry pose_table[] = {
     {1, "TGD_N_1"},

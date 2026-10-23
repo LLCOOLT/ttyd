@@ -6,6 +6,7 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
+#include "icon_ids.h"
 
 typedef struct BDWork {
     s32 timer;
@@ -38,7 +39,7 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
   s32 done;
   s32 flag = 0;
   const char *sfx;
-  if (*(((u8 *) ac->mAcUnit) + 0x303))
+  if (*(((u8 *) ac->mAcUnit) + BUOFF(0x303)))
   {
     flag = 1;
   }
@@ -152,7 +153,7 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
         p->timer = *((s32 *) (((u8 *) work) + 0x1cc8));
 
       case 1000:
-        if ((ac->setupFlags & 1) && ((*((u32 *) (((u8 *) ac->mAcUnit) + 0x278))) & 0x10))
+        if ((ac->setupFlags & 1) && ((*((u32 *) (((u8 *) ac->mAcUnit) + BUOFF(0x278)))) & 0x10))
       {
         if (ac->setupFlags & 2)
         {
@@ -340,7 +341,7 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y)
   by = 70.0f + y;
   pos.x = lx;
   pos.y = by;
-  iconDispGx(&pos, 16, 0x8f, 1.0f);
+  iconDispGx(&pos, 16, ICON_08F, 1.0f);
   lx += 16.0f;
   for (k = 1; k < end; k++)
   {
@@ -348,7 +349,7 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y)
     pos2.x = lx;
     pos2.y = by;
     size = 16;
-    iconDispGx(&pos2, size, 0x8e, 1.0f);
+    iconDispGx(&pos2, size, ICON_08E, 1.0f);
     lx += 16.0f;
   }
 
@@ -356,7 +357,7 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y)
     Vec pos3 = {0.0f, 0.0f, -2.0f};
     pos3.x = lx;
     pos3.y = by;
-    iconDispGx(&pos3, 16, 0x90, 1.0f);
+    iconDispGx(&pos3, 16, ICON_090, 1.0f);
   }
   if ((*((u32 *) (((u8 *) work) + 0x1cc4))) & 1)
   {
@@ -388,45 +389,45 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y)
     switch (p->button[(j >> 1) >> 1])
     {
       case 0x100:
-        a = 0x65;
-        b = 0x64;
+        a = ICON_065;
+        b = ICON_064;
         break;
 
       case 0x200:
-        a = 0x67;
-        b = 0x66;
+        a = ICON_067;
+        b = ICON_066;
         break;
 
       case 0x400:
-        a = 0x69;
-        b = 0x68;
+        a = ICON_069;
+        b = ICON_068;
         break;
 
       case 0x800:
-        a = 0x6b;
-        b = 0x6a;
+        a = ICON_06B;
+        b = ICON_06A;
         break;
 
       case 0x40:
-        a = 0x7f;
-        b = 0x7e;
+        a = ICON_07F;
+        b = ICON_07E;
         break;
 
       case 0x20:
-        a = 0x81;
-        b = 0x80;
+        a = ICON_081;
+        b = ICON_080;
         break;
 
       case 0x10:
-        a = 0x83;
-        b = 0x82;
+        a = ICON_083;
+        b = ICON_082;
         break;
 
       case 0x40000:
 
       default:
-        a = 0x78;
-        b = 0x79;
+        a = ICON_078;
+        b = ICON_079;
         break;
 
     }

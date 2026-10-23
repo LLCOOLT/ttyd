@@ -79,7 +79,7 @@ __declspec(section ".data") s32 fd_purple_teresa___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_purple_teresa_one_negone_359;
 __declspec(section ".data") s32 fd_purple_teresa___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_purple_teresa_one_364[1];
-BattleUnitKind unit_purple_teresa_22_data_E620;
+BattleUnitKind unit_purple_teresa;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -220,7 +220,7 @@ __declspec(section ".data") s32 fd_purple_teresa_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_purple_teresa_22_data_E620 = {
+BattleUnitKind unit_purple_teresa = {
     106,
     "btl_un_purple_teresa",
     8,

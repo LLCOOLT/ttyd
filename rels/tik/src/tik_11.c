@@ -76,6 +76,10 @@ USER_FUNC(unitwin_setmariolevel);
 USER_FUNC(unitwin_setpartylank);
 USER_FUNC(evt_mario_set_dir_pos);
 USER_FUNC(evt_win_party_lankdown_chk);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_sub_get_language);
+USER_FUNC(evt_msg_fmt_int);
+#endif
 static USER_FUNC(wariai_enzan_1f);
 static USER_FUNC(enzan_set_f_i);
 static USER_FUNC(enzan_set_i_f);
@@ -100,9 +104,21 @@ __declspec(section ".data") u64 fd_tik_11_one_negone_359;
 __declspec(section ".data") s32 fd_tik_11___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_tik_11_one_364[1];
 s32 powerdownya_face_left[16];
+#ifdef VERSION_G8ME01
+s32 powerdownya_mario_level_rtn[639];
+#else
 s32 powerdownya_mario_level_rtn[616];
+#endif
+#ifdef VERSION_G8ME01
+s32 powerdownya_party_lank_rtn[963];
+#else
 s32 powerdownya_party_lank_rtn[937];
+#endif
+#ifdef VERSION_G8ME01
+s32 powerdownya_table_talk[105];
+#else
 s32 powerdownya_table_talk[84];
+#endif
 __declspec(section ".data") s32 powerdownya_direct_talk[8];
 __declspec(section ".data") s32 powerdownya_init[10];
 static s32 npcEnt[46];
@@ -352,7 +368,18 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
             WAIT_MS(240)
             CONTINUE_LOOP
         END_IF
+#ifdef VERSION_G8ME01
+        CALL(evt_sub_get_language, LW(15))
+        SWITCH(LW(15))
+            CASE_EQUAL(0)
+#endif
         CALL(evt_msg_print_insert, 0, STRING("powerdown_06"), 0, STRING("me"), LW(2), LW(3), 39)
+#ifdef VERSION_G8ME01
+            CASE_DEFAULT
+            CALL(evt_msg_fmt_int, 0, LW(14), STRING("powerdown_06"), 39)
+            CALL(evt_msg_print_insert, 1, LW(14), 0, STRING("me"), LW(2), LW(3))
+        END_SWITCH
+#endif
         CALL(evt_msg_select, 0, STRING("powerdown_09"))
         IF_INT_EQUAL(LW(0), 0)
             BREAK_LOOP
@@ -545,7 +572,18 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
             WAIT_MS(240)
             CONTINUE_LOOP
         END_IF
+#ifdef VERSION_G8ME01
+        CALL(evt_sub_get_language, LW(15))
+        SWITCH(LW(15))
+            CASE_EQUAL(0)
+#endif
         CALL(evt_msg_print_insert, 0, STRING("powerdown_08"), 0, STRING("me"), LW(3), LW(4), 39)
+#ifdef VERSION_G8ME01
+            CASE_DEFAULT
+            CALL(evt_msg_fmt_int, 0, LW(14), STRING("powerdown_08"), 39)
+            CALL(evt_msg_print_insert, 1, LW(14), 0, STRING("me"), LW(3), LW(4))
+        END_SWITCH
+#endif
         CALL(evt_msg_select, 0, STRING("powerdown_09"))
         IF_INT_EQUAL(LW(0), 0)
             BREAK_LOOP
@@ -568,6 +606,9 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
     CALL(bgScrollControll, 0)
     CALL(evt_mario_goodbye_party, 0)
     CALL(evt_mario_hello_party, 0, LW(2))
+#ifdef VERSION_G8ME01
+    CALL(evt_party_stop, 0)
+#endif
     CALL(evt_sub_intpl_msec_init, 11, 0, -20, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(5))
@@ -814,7 +855,18 @@ EVT_BEGIN(powerdownya_table_talk)
     CALL(evt_party_stop, 0)
     CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
     IF_INT_EQUAL(GSWF(1342), 0)
+#ifdef VERSION_G8ME01
+        CALL(evt_sub_get_language, LW(15))
+        SWITCH(LW(15))
+            CASE_EQUAL(0)
+#endif
         CALL(evt_msg_print_insert, 0, STRING("powerdown_00"), 0, STRING("me"), 39)
+#ifdef VERSION_G8ME01
+            CASE_DEFAULT
+            CALL(evt_msg_fmt_int, 0, LW(14), STRING("powerdown_00"), 39)
+            CALL(evt_msg_print, 1, LW(14), 0, STRING("me"))
+        END_SWITCH
+#endif
         SET_VALUE(GSWF(1342), 1)
         SET_VALUE(GSWF(1371), 1)
         ELSE

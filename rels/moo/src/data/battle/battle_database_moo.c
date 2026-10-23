@@ -11,9 +11,9 @@ extern s32 battle_heart_drop_param_default2[];
 extern s32 battle_item_barriern_z[];
 extern s32 battle_item_default_param_list[];
 extern s32 battle_item_sinemon[];
-extern s32 unit_barriern_z_18_data_72F0[];
-extern s32 unit_kuriboo_18_data_4608[];
-extern s32 unit_sinemon_18_data_5D28[];
+extern s32 unit_barriern_z[];
+extern s32 unit_kuriboo[];
+extern s32 unit_sinemon[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_moo_negone_one_374;
@@ -173,10 +173,10 @@ s32 moo_btlstage_data[] = {
 };
 
 s32 btlparty_moo_moo_00_01_off_1[] = {
-    (s32)unit_kuriboo_18_data_4608, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_default_param_list, (s32)unit_kuriboo_18_data_4608, 16777216, 67108868, 1119092736,
+    (s32)unit_kuriboo, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_default_param_list, (s32)unit_kuriboo, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)unit_kuriboo_18_data_4608, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_kuriboo, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, 0,
 };
 
@@ -185,8 +185,8 @@ __declspec(section ".data") s32 btlgrp_moo_moo_00_01_off_1[] = {
 };
 
 s32 btlparty_moo_moo_01_01_off_1[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1121714176,
+    (s32)unit_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -195,8 +195,8 @@ __declspec(section ".data") s32 btlgrp_moo_moo_01_01_off_1[] = {
 };
 
 s32 btlparty_moo_moo_01_02_off_1[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1121714176,
+    (s32)unit_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -205,10 +205,10 @@ __declspec(section ".data") s32 btlgrp_moo_moo_01_02_off_1[] = {
 };
 
 s32 btlparty_moo_moo_01_02_off_2[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1119092736,
+    (s32)unit_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_sinemon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -217,10 +217,10 @@ __declspec(section ".data") s32 btlgrp_moo_moo_01_02_off_2[] = {
 };
 
 s32 btlparty_moo_moo_01_03_off_1[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1119092736,
+    (s32)unit_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_sinemon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -229,8 +229,8 @@ __declspec(section ".data") s32 btlgrp_moo_moo_01_03_off_1[] = {
 };
 
 s32 btlparty_moo_moo_01_04_off_1[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1121714176,
+    (s32)unit_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -239,10 +239,10 @@ __declspec(section ".data") s32 btlgrp_moo_moo_01_04_off_1[] = {
 };
 
 s32 btlparty_moo_moo_01_04_off_2[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1119092736,
+    (s32)unit_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_sinemon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -251,11 +251,11 @@ __declspec(section ".data") s32 btlgrp_moo_moo_01_04_off_2[] = {
 };
 
 s32 btlparty_moo_moo_01_04_off_3[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1116471296,
+    (s32)unit_sinemon, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1125515264,
+    (s32)unit_sinemon, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -264,11 +264,11 @@ __declspec(section ".data") s32 btlgrp_moo_moo_01_04_off_3[] = {
 };
 
 s32 btlparty_moo_moo_01_05_off_1[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1116471296,
+    (s32)unit_sinemon, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1125515264,
+    (s32)unit_sinemon, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -277,8 +277,8 @@ __declspec(section ".data") s32 btlgrp_moo_moo_01_05_off_1[] = {
 };
 
 s32 btlparty_moo_moo_02_01_off_1[] = {
-    (s32)unit_barriern_z_18_data_72F0, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_barriern_z, (s32)unit_barriern_z_18_data_72F0, 16777216, 67108868, 1124204544,
+    (s32)unit_barriern_z, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_barriern_z, (s32)unit_barriern_z, 16777216, 67108868, 1124204544,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_barriern_z,
 };
 
@@ -287,8 +287,8 @@ __declspec(section ".data") s32 btlgrp_moo_moo_02_01_off_1[] = {
 };
 
 s32 btlparty_moo_moo_02_02_off_1[] = {
-    (s32)unit_barriern_z_18_data_72F0, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_barriern_z, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1121714176,
+    (s32)unit_barriern_z, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_barriern_z, (s32)unit_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -297,8 +297,8 @@ __declspec(section ".data") s32 btlgrp_moo_moo_02_02_off_1[] = {
 };
 
 s32 btlparty_moo_moo_02_03_off_1[] = {
-    (s32)unit_barriern_z_18_data_72F0, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_barriern_z, (s32)unit_barriern_z_18_data_72F0, 16777216, 67108868, 1124204544,
+    (s32)unit_barriern_z, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_barriern_z, (s32)unit_barriern_z, 16777216, 67108868, 1124204544,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_barriern_z,
 };
 
@@ -307,10 +307,10 @@ __declspec(section ".data") s32 btlgrp_moo_moo_02_03_off_1[] = {
 };
 
 s32 btlparty_moo_moo_02_04_off_1[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_barriern_z_18_data_72F0, 16777216, 67108868, 1119092736,
+    (s32)unit_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_barriern_z, 16777216, 67108868, 1119092736,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_barriern_z,
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_sinemon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -319,8 +319,8 @@ __declspec(section ".data") s32 btlgrp_moo_moo_02_04_off_1[] = {
 };
 
 s32 btlparty_moo_moo_02_05_off_1[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_barriern_z_18_data_72F0, 16777216, 67108868, 1121714176,
+    (s32)unit_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_barriern_z, 16777216, 67108868, 1121714176,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_barriern_z,
 };
 
@@ -329,8 +329,8 @@ __declspec(section ".data") s32 btlgrp_moo_moo_02_05_off_1[] = {
 };
 
 s32 btlparty_moo_moo_05_01_off_1[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1121714176,
+    (s32)unit_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -339,10 +339,10 @@ __declspec(section ".data") s32 btlgrp_moo_moo_05_01_off_1[] = {
 };
 
 s32 btlparty_moo_moo_05_01_off_2[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1119092736,
+    (s32)unit_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_sinemon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -351,11 +351,11 @@ __declspec(section ".data") s32 btlgrp_moo_moo_05_01_off_2[] = {
 };
 
 s32 btlparty_moo_moo_05_01_off_3[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1116471296,
+    (s32)unit_sinemon, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1125515264,
+    (s32)unit_sinemon, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -364,8 +364,8 @@ __declspec(section ".data") s32 btlgrp_moo_moo_05_01_off_3[] = {
 };
 
 s32 btlparty_moo_moo_05_02_off_1[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1121714176,
+    (s32)unit_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -374,8 +374,8 @@ __declspec(section ".data") s32 btlgrp_moo_moo_05_02_off_1[] = {
 };
 
 s32 btlparty_moo_moo_05_03_off_1[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1121714176,
+    (s32)unit_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -384,10 +384,10 @@ __declspec(section ".data") s32 btlgrp_moo_moo_05_03_off_1[] = {
 };
 
 s32 btlparty_moo_moo_05_03_off_2[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1119092736,
+    (s32)unit_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_sinemon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -396,10 +396,10 @@ __declspec(section ".data") s32 btlgrp_moo_moo_05_03_off_2[] = {
 };
 
 s32 btlparty_moo_moo_05_04_off_1[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1119092736,
+    (s32)unit_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_sinemon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -408,8 +408,8 @@ __declspec(section ".data") s32 btlgrp_moo_moo_05_04_off_1[] = {
 };
 
 s32 btlparty_moo_moo_05_05_off_1[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1121714176,
+    (s32)unit_sinemon, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -418,10 +418,10 @@ __declspec(section ".data") s32 btlgrp_moo_moo_05_05_off_1[] = {
 };
 
 s32 btlparty_moo_moo_05_05_off_2[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1119092736,
+    (s32)unit_sinemon, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
+    (s32)unit_sinemon, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_sinemon,
 };
 
@@ -430,11 +430,11 @@ __declspec(section ".data") s32 btlgrp_moo_moo_05_05_off_2[] = {
 };
 
 s32 btlparty_moo_moo_05_05_off_3[] = {
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1116471296,
+    (s32)unit_sinemon, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
-    (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon_18_data_5D28, 16777216, 67108868, 1125515264,
+    (s32)unit_sinemon, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_sinemon, (s32)unit_sinemon, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_sinemon,
 };
 

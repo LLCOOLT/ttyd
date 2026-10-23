@@ -402,7 +402,11 @@ s32 kinopio_house_talk_evt[] = {
 	0x0001005B, (s32)snd_off,
 	0x0002005B, (s32)evt_snd_bgmoff, 0x00000400,
 	0x0003005B, (s32)evt_snd_bgmon, 0x00000001, (s32)"BGM_FF_GO_SLEEPING1",
+#ifdef VERSION_G8ME01
+	0x0006005B, (s32)evt_fade_entry, 0x00000004, 0x1770, 0x00000000, 0x00000000, 0x00000000,
+#else
 	0x0006005B, (s32)evt_fade_entry, 0x00000004, 0x00000BB8, 0x00000000, 0x00000000, 0x00000000,
+#endif
 	0x0005005B, (s32)evt_mario_get_pos, 0x00000000, 0xFE363C80, 0xFE363C81, 0xFE363C82,
 	0x0004005B, (s32)evt_fade_set_spot_pos, 0xFE363C80, 0xFE363C81, 0xFE363C82,
 	0x0001005B, (s32)evt_fade_end_wait,

@@ -96,7 +96,7 @@ __declspec(section ".data") s32 fd_togenoko_ace___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_togenoko_ace_one_negone_359;
 __declspec(section ".data") s32 fd_togenoko_ace___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_togenoko_ace_one_364[1];
-BattleUnitKind unit_togenoko_ace_28_data_48988;
+BattleUnitKind unit_togenoko_ace;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -180,7 +180,7 @@ __declspec(section ".data") s32 fd_togenoko_ace_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_togenoko_ace_28_data_48988 = {
+BattleUnitKind unit_togenoko_ace = {
     60,
     "btl_un_togenoko_ace",
     25,
@@ -470,7 +470,7 @@ static s32 wakeup_event[] = {
 };
 
 static __declspec(section ".data") s32 entry_togenoko[] = {
-    (s32)&unit_togenoko_ace_28_data_48988, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
+    (s32)&unit_togenoko_ace, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
     0, 0, 0, 0,
 };
 

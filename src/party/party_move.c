@@ -59,6 +59,9 @@ extern void cloud_hover_init(PartyEntry* party);
 extern void party_motion_wait(PartyEntry* party);
 extern void vivianShadow(PartyEntry* party);
 extern HitEntry* marioChkWallAround(Vec* pos, s32 a, f32 spd, f32 dir, f32 w, f32 h);
+#ifdef VERSION_G8ME01
+void partyChkWallAround(PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 width, f32 height);
+#endif
 extern HitEntry* partySearchHead(PartyEntry* party, Vec* pos, f32* h, f32 a);
 extern f32 toMovedirSimple(f32 dir);
 extern HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist);
@@ -781,7 +784,11 @@ s32 partyMoveMain(PartyEntry* party, s32 hosei) {
             party->position.x = pos.x;
             party->position.z = pos.z;
         } else {
+#ifdef VERSION_G8ME01
+            partyChkWallAround(party, &pos, spd, dir, party->width, party->height);
+#else
             marioChkWallAround(&pos, 1, spd, dir, party->width, party->height);
+#endif
             party->position.x = pos.x;
             party->position.z = pos.z;
         }
@@ -1922,7 +1929,11 @@ BOOL partyGetAppearPos3(PartyEntry* party, Vec* out) {
             }
         } else {
             out->y = query.hitPos.y;
+#ifdef VERSION_G8ME01
+            partyChkWallAround(party, out, 2.0f, 0.0f, party->width, party->height);
+#else
             marioChkWallAround(out, 1, 2.0f, 0.0f, party->width, party->height);
+#endif
             return TRUE;
         }
     }
@@ -2030,7 +2041,11 @@ BOOL partyGetAppearPos4(PartyEntry* party, Vec* out) {
             continue;
         }
         out->y = query.hitPos.y;
+#ifdef VERSION_G8ME01
+        partyChkWallAround(party, out, 0.0f, 0.0f, 28.0f, 5.0f);
+#else
         marioChkWallAround(out, 1, 0.0f, 0.0f, 28.0f, 5.0f);
+#endif
         partyAppearAdjustY(party, mario, out);
         return TRUE;
     }

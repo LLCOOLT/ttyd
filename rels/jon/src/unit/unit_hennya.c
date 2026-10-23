@@ -65,7 +65,7 @@ __declspec(section ".data") s32 fd_hennya___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_hennya_one_negone_359;
 __declspec(section ".data") s32 fd_hennya___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_hennya_one_364[1];
-BattleUnitKind unit_hennya_15_data_5A9C0;
+BattleUnitKind unit_hennya;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -127,7 +127,7 @@ __declspec(section ".data") s32 fd_hennya_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_hennya_15_data_5A9C0 = {
+BattleUnitKind unit_hennya = {
     163,
     "btl_un_hennya",
     12,

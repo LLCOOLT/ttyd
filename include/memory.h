@@ -39,9 +39,19 @@ void memInit(void);
 void memClear(HEAP_TYPE heap);
 void* __memAlloc(HEAP_TYPE heap, u32 size);
 void __memFree(HEAP_TYPE heap, void* ptr);
+#if defined(VERSION_G8ME01) && !defined(MEMORY_C_DEFS)
+extern void* mapalloc_base_ptr;
+void* _mapAlloc(void* base, u32 size);
+void* _mapAllocTail(void* base, u32 size);
+void _mapFree(void* base, void* alloc);
+#define _mapAlloc(size) _mapAlloc(mapalloc_base_ptr, size)
+#define _mapAllocTail(size) _mapAllocTail(mapalloc_base_ptr, size)
+#define _mapFree(alloc) _mapFree(mapalloc_base_ptr, alloc)
+#else
 void* _mapAlloc(u32 size);
 void* _mapAllocTail(u32 size);
 void _mapFree(void* alloc);
+#endif
 void smartInit(void);
 void smartReInit(void);
 void smartAutoFree(s32 a1);

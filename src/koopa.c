@@ -22,6 +22,9 @@ void marioSetPeakYpos(void);
 void marioBottomless(void);
 void marioPreDisp(void);
 void marioBalloonMain(void);
+#ifdef VERSION_G8ME01
+#define mario_kemuri_80130474 mario_kemuri // US: global name
+#endif
 void mario_kemuri_80130474(void);
 void partyMain(void);
 void marioCamMain(void);
@@ -52,7 +55,7 @@ s32 marioCtrlOffChk(void);
 
 #define MU32(m, off) (*(u32*)((u8*)(m) + (off)))
 #define MF(m, off) (*(f32*)((u8*)(m) + (off)))
-#define KPW(m) (*(u8**)((u8*)(m) + 0x28C))
+#define KPW(m) (*(u8**)((u8*)(m) + MWOFF(0x28C)))
 
 f32 kpaWidthDat[4] = {20.0f, 60.0f, 84.0f, 186.0f};
 f32 baseScaleTbl[4] = {0.3f, 1.0f, 1.4f, 3.1f};
@@ -262,15 +265,15 @@ void kpaPreInit(void) {
     if (strcmp((char*)gp + 0x12C, "kpa_02") == 0 || strcmp((char*)gp + 0x12C, "kpa_03") == 0 ||
         strcmp((char*)gp + 0x12C, "kpa_04") == 0 || strcmp((char*)gp + 0x12C, "kpa_05") == 0 ||
         strcmp((char*)gp + 0x12C, "kpa_06\0") == 0) {
-        MU32(mp, 0x14) |= 1;
+        MU32(mp, MWOFF(0x14)) |= 1;
     } else {
-        MU32(mp, 0x14) &= ~1;
+        MU32(mp, MWOFF(0x14)) &= ~1;
     }
     mp = marioGetPtr();
     if (strcmp((char*)gp + 0x12C, "kpa_03") == 0) {
-        MU32(mp, 0x14) |= 2;
+        MU32(mp, MWOFF(0x14)) |= 2;
     } else {
-        MU32(mp, 0x14) &= ~2;
+        MU32(mp, MWOFF(0x14)) &= ~2;
     }
     fireefp = 0;
 }
@@ -297,11 +300,11 @@ void kpa2DMain(void) {
     if (*(s16*)((u8*)mp + 0x78)) {
         (*(s16*)((u8*)mp + 0x78))--;
     }
-    MU32(mp, 0x1F4) = 0;
-    MU32(mp, 0x1E0) = 0;
-    MU32(mp, 0x1DC) = 0;
-    MU32(mp, 0x1EC) = 0;
-    MU32(mp, 0x1F0) = 0;
+    MU32(mp, MWOFF(0x1F4)) = 0;
+    MU32(mp, MWOFF(0x1E0)) = 0;
+    MU32(mp, MWOFF(0x1DC)) = 0;
+    MU32(mp, MWOFF(0x1EC)) = 0;
+    MU32(mp, MWOFF(0x1F0)) = 0;
     marioItemGetChk();
     kpaFireAttack();
     kpaFireMain();
@@ -323,7 +326,7 @@ void kpa2DMain(void) {
         marioPreDisp();
         mario_kemuri_80130474();
         marioCamMain();
-        MU32(mp, 0x34)++;
+        MU32(mp, MWOFF(0x34))++;
         return;
     }
     saved = mp->position;
@@ -379,7 +382,7 @@ void kpa2DMain(void) {
     marioBalloonMain();
     mario_kemuri_80130474();
     marioCamMain();
-    MU32(mp, 0x34)++;
+    MU32(mp, MWOFF(0x34))++;
     *(Vec*)((u8*)mp + 0x110) = mp->position;
     mp->unk174.x = 0.0f;
     mp->unk174.y = 0.0f;
@@ -390,7 +393,7 @@ void kpa3DMain(void) {
     MarioWork* mp = marioGetPtr();
     void* h = kpaHitCheck();
     if (h) {
-        MU32(mp, 0x1F4) = (u32)h;
+        MU32(mp, MWOFF(0x1F4)) = (u32)h;
     }
     if (*(s16*)((u8*)mp + 0x78)) {
         (*(s16*)((u8*)mp + 0x78))--;
@@ -398,14 +401,14 @@ void kpa3DMain(void) {
     if (mp->currMotionId == 0x18 || mp->currMotionId == 0x1F || mp->currMotionId == 0x20) {
         marioPreDisp();
         marioBottomless();
-        MU32(mp, 0x34)++;
+        MU32(mp, MWOFF(0x34))++;
         partyMain();
         marioCamMain();
-        MU32(mp, 0x1F4) = 0;
-        MU32(mp, 0x1E0) = 0;
-        MU32(mp, 0x1DC) = 0;
-        MU32(mp, 0x1EC) = 0;
-        MU32(mp, 0x1F0) = 0;
+        MU32(mp, MWOFF(0x1F4)) = 0;
+        MU32(mp, MWOFF(0x1E0)) = 0;
+        MU32(mp, MWOFF(0x1DC)) = 0;
+        MU32(mp, MWOFF(0x1EC)) = 0;
+        MU32(mp, MWOFF(0x1F0)) = 0;
         return;
     }
     marioItemGetChk();
@@ -431,7 +434,7 @@ void kpa3DMain(void) {
         mario_kemuri_80130474();
         partyMain();
         marioCamMain();
-        MU32(mp, 0x34)++;
+        MU32(mp, MWOFF(0x34))++;
         return;
     }
     if (mp->flags & 0x40000) {
@@ -469,7 +472,7 @@ void kpa3DMain(void) {
     mario_kemuri_80130474();
     partyMain();
     marioCamMain();
-    MU32(mp, 0x34)++;
+    MU32(mp, MWOFF(0x34))++;
     *(Vec*)((u8*)mp + 0x110) = mp->position;
     mp->unk174.x = 0.0f;
     mp->unk174.y = 0.0f;
@@ -505,7 +508,7 @@ f32 kpaSetJumpPara(void) {
 f32 kpaSetFallPara(void);
 f32 kpaSetFallPara(void) {
     MarioWork* mp = marioGetPtr();
-    if ((*(u16*)((u8*)mp + 0x246) & 0x100)) {
+    if ((*(u16*)((u8*)mp + MWOFF(0x246)) & 0x100)) {
         SETP(mp, -0.05f, -0.08f, -0.006f, -0.002f);
     } else {
         SETP(mp, -0.1f, -0.2f, -0.024f, -0.01f);
@@ -590,7 +593,7 @@ void kpaFall(void) {
             }
         }
         if (mp->currMotionId != 4) {
-            if (*(u16*)((u8*)mp + 0x246) & 0x100) {
+            if (*(u16*)((u8*)mp + MWOFF(0x246)) & 0x100) {
                 JP(mp, 3) = -0.001f;
             } else {
                 JP(mp, 3) = -0.01f;
@@ -673,7 +676,7 @@ void kpaFireAttack(void) {
         *(s32*)(KPW(mp) + 0x13C) = 20;
         if (!(mp->flags & 0x20)) {
             mp->baseSpeed = 0.0f;
-            MF(mp, 0x2C4) = 0.0f;
+            MF(mp, MWOFF(0x2C4)) = 0.0f;
         }
     case 20:
         kpaChgPose("KPA_A_1A", "KPA2_A_1A");
@@ -703,7 +706,7 @@ void kpaFireAttack(void) {
         if (--*(s32*)(KPW(mp) + 0x140) > 0) {
             break;
         }
-        if (*(u16*)((u8*)mp + 0x246) & 0x200) {
+        if (*(u16*)((u8*)mp + MWOFF(0x246)) & 0x200) {
             break;
         }
         if (*(s32*)(KPW(mp) + 0x144) != 0) {
@@ -730,7 +733,7 @@ void kpaFireAttack(void) {
         *(s32*)(KPW(mp) + 0x13C) = 40;
         if (!(mp->flags & 0x20)) {
             mp->baseSpeed = 0.0f;
-            MF(mp, 0x2C4) = 0.0f;
+            MF(mp, MWOFF(0x2C4)) = 0.0f;
         }
     case 40:
         kpaChgPose("KPA_A_1A", "KPA2_A_1A");
@@ -760,7 +763,7 @@ void kpaFireAttack(void) {
         if (--*(s32*)(KPW(mp) + 0x140) > 0) {
             break;
         }
-        if (*(u16*)((u8*)mp + 0x246) & 0x200) {
+        if (*(u16*)((u8*)mp + MWOFF(0x246)) & 0x200) {
             break;
         }
         if (*(s32*)(KPW(mp) + 0x144) != 0) {

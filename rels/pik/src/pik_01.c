@@ -289,7 +289,11 @@ EVT_BEGIN(evt_powan)
     CALL(evt_msg_print, 0, STRING("stg6_pik_06"), 0, 0)
     WAIT_MS(300)
     CALL(evt_npc_flag_onoff, 1, STRING("ポワン探偵"), 131088)
+#ifdef VERSION_G8ME01
+    CALL(evt_npc_set_position, STRING("ポワン探偵"), -70, 5, -248)
+#else
     CALL(evt_npc_set_position, STRING("ポワン探偵"), -50, 10, -235)
+#endif
     WAIT_FRAMES(1)
     CALL(evt_party_stop, 0)
     WAIT_MS(300)

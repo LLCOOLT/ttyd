@@ -7,6 +7,7 @@
 #include "mario/mariost.h"
 #include "system.h"
 #include <string.h>
+#include "icon_ids.h"
 
 #pragma optimize_for_size on
 
@@ -319,7 +320,7 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
             Vec p = {0.0f, 0.0f, 0.0f};
             p.x = -200.0f + x;
             p.y = 70.0f + y;
-            iconDispGx(&p, 0x10, 0x79, 1.0f);
+            iconDispGx(&p, 0x10, ICON_079, 1.0f);
             break;
         }
         case 0x3E8:
@@ -327,12 +328,12 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = -200.0f + x;
                 p.y = 70.0f + y;
-                iconDispGx(&p, 0x10, 0x78, 1.0f);
+                iconDispGx(&p, 0x10, ICON_078, 1.0f);
             } else {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = -200.0f + x;
                 p.y = 70.0f + y;
-                iconDispGx(&p, 0x10, 0x79, 1.0f);
+                iconDispGx(&p, 0x10, ICON_079, 1.0f);
             }
             break;
         default:
@@ -340,12 +341,12 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = -200.0f + x;
                 p.y = 70.0f + y;
-                iconDispGx(&p, 0x10, 0x78, 1.0f);
+                iconDispGx(&p, 0x10, ICON_078, 1.0f);
             } else {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = -200.0f + x;
                 p.y = 70.0f + y;
-                iconDispGx(&p, 0x10, 0x79, 1.0f);
+                iconDispGx(&p, 0x10, ICON_079, 1.0f);
             }
             break;
     }
@@ -366,19 +367,19 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
         p.x = -288.0f + x;
         yy = 25.0f + y;
         p.y = yy;
-        iconDispGx(&p, 0x10, 0x8f, 1.0f);
+        iconDispGx(&p, 0x10, ICON_08F, 1.0f);
     }
     for (i = 1; i < n; i++) {
         Vec p = {0.0f, 0.0f, 0.0f};
         p.x = x + (spacing * (f32)i + -288.0f);
         p.y = yy;
-        iconDispGx(&p, 0x10, 0x8e, 1.0f);
+        iconDispGx(&p, 0x10, ICON_08E, 1.0f);
     }
     {
         Vec p = {0.0f, 0.0f, 0.0f};
         p.x = x + (spacing * (f32)i + -288.0f);
         p.y = yy;
-        iconDispGx(&p, 0x10, 0x90, 1.0f);
+        iconDispGx(&p, 0x10, ICON_090, 1.0f);
     }
     sp2 = 33.0f;
     if (ac->flags & 1) {
@@ -391,29 +392,29 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = x + (sp2 * (f32)j + -258.0f);
                 p.y = yy;
-                iconDispGx(&p, 0x10, (u16)(0x92 + j), 1.0f);
+                iconDispGx(&p, 0x10, (u16)(ICON_092 + j), 1.0f);
             } else {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = x + (sp2 * (f32)j + -258.0f);
                 p.y = yy;
-                iconDispGx(&p, 0x10, 0x94, 1.0f);
+                iconDispGx(&p, 0x10, ICON_094, 1.0f);
             }
         } else {
             Vec p = {0.0f, 0.0f, 0.0f};
             p.x = x + (sp2 * (f32)j + -258.0f);
             p.y = yy;
-            iconDispGx(&p, 0x10, 0x91, 0.5f);
+            iconDispGx(&p, 0x10, ICON_091, 0.5f);
         }
     }
     if (idx < count) {
         Vec p = {0.0f, 0.0f, 0.0f};
         p.x = x + (sp2 * (f32)m + -250.0f);
         p.y = yy;
-        iconDispGx(&p, 0x10, 0x91, 1.0f);
+        iconDispGx(&p, 0x10, ICON_091, 1.0f);
     } else {
         Vec p = {0.0f, 0.0f, 0.0f};
         p.x = x + (sp2 * (f32)m + -250.0f);
         p.y = yy;
-        iconDispGx(&p, 0x10, 0x95, 1.0f);
+        iconDispGx(&p, 0x10, ICON_095, 1.0f);
     }
 }

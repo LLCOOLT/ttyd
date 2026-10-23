@@ -1,3 +1,4 @@
+#include "mario/mario.h"
 #include "evt/evt_eff.h"
 #include "driver/effdrv.h"
 #include "eff/n64/eff_expbom_n64.h"
@@ -907,7 +908,6 @@ USER_FUNC(evt_eff_delete_ptr) {
 	return EVT_RETURN_DONE;
 }
 
-extern void* marioGetPtr(void);
 extern s32 marioGetPartyId(void);
 extern s32 marioGetExtraPartyId(void);
 extern void* partyGetPtr(s32 id);
@@ -935,7 +935,7 @@ USER_FUNC(evt_eff_fukidashi) {
 
 	switch (mode) {
 		case 0:
-			h = *(f32*)((u8*)marioGetPtr() + 0x1b8);
+			h = *(f32*)((u8*)marioGetPtr() + MWOFF(0x1b8));
 			{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, -1, d, 0.0f, yy, 0.0f, ww, e); }
 			break;
 		case 1:
@@ -948,8 +948,13 @@ USER_FUNC(evt_eff_fukidashi) {
 		case 3:
 			p = partyGetPtr(marioGetPartyId());
 			if (p) {
+#ifdef VERSION_G8ME01
+				// US: the Flurrie bubble sits at a fixed height
+				{ f32 yy = 2.0f * *(f32*)((u8*)p + 0xf0) / 3.0f; f32 ww; if (*(s8*)((u8*)p + 0x31) == 5) yy = 30.0f; ww = *(f32*)((u8*)p + 0xf0) / 3.0f; entry = effFukidashiEntry(a, b, -2, d, 0.0f, yy, 0.0f, ww, e); }
+#else
 				h = *(f32*)((u8*)p + 0xf0);
 				{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, -2, d, 0.0f, yy, 0.0f, ww, e); }
+#endif
 			}
 			break;
 		case 4:

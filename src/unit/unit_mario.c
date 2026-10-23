@@ -87,7 +87,11 @@ BattleUnitKind unitdata_Mario;
 static s32 battle_entry_event[73];
 s32 mario_ride_btl_entry_event[120];
 static s32 init_event[75];
+#ifdef VERSION_G8ME01
+s32 mario_dead_event[67];
+#else
 s32 mario_dead_event[57];
+#endif
 s32 mario_emergency_revival_event[130];
 s32 mario_appeal_event[30];
 static s32 attack_audience_event[15];
@@ -444,9 +448,22 @@ static USER_FUNC(_get_mario_hammer_lv) {
     return EVT_RETURN_DONE;
 }
 
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_btl_camera_nomove_y_onoff);
+#endif
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_btl_camera_set_posoffset);
+#endif
 s32 mario_dead_event[] = {
-    131163, (s32)evt_btl_camera_set_prilimit, 1, 196699, (s32)evt_btl_camera_set_mode, 1, 7, 262235,
+    131163, (s32)evt_btl_camera_set_prilimit, 1,
+#ifdef VERSION_G8ME01
+    196699, (s32)evt_btl_camera_nomove_y_onoff, 1, 0,
+#endif
+    196699, (s32)evt_btl_camera_set_mode, 1, 7, 262235,
     (s32)evt_btl_camera_set_homing_unit, 1, -29999990, -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 1, 2,
+#ifdef VERSION_G8ME01
+    327771, (s32)evt_btl_camera_set_posoffset, 1, 0, 0, 0,
+#endif
     196699, (s32)evt_btl_camera_set_zoom, 1, 500, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_VOICE_MARIO_DOWN1",
     -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -29999990, -29999989, (s32)"M_I_S",
     65546, 2066, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_CONDITION_DOWN1", -250000000, 0,

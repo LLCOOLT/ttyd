@@ -77,7 +77,7 @@ extern s32 evt_btl_camera_set_zoom[];
 extern s32 evt_eff64[];
 extern s32 evt_sub_random[];
 extern s32 subsetevt_confuse_flustered[];
-extern s32 unit_hyper_togezo_28_data_4E9D8[];
+extern s32 unit_hyper_togezo[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_hyper_jyugem_negone_one_374;
@@ -270,7 +270,7 @@ static s32 weapon_jyugem_charge[] = {
 };
 
 static __declspec(section ".data") s32 entry_togezo[] = {
-    (s32)unit_hyper_togezo_28_data_4E9D8, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
+    (s32)unit_hyper_togezo, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
     0, 0, 0, 0,
 };
 

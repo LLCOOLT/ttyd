@@ -7,6 +7,18 @@
 #include "driver/hitdrv.h"
 #include "mario/mario_pouch.h"
 
+#ifdef VERSION_G8ME01
+// US has no local duplicate: this is the global kuribo_init
+#define kuribo_init_800C23B4 kuribo_init
+#endif
+
+// US MarioWork has 4 more bytes before these raw offsets
+#ifdef VERSION_G8ME01
+#define MW_US 4
+#else
+#define MW_US 0
+#endif
+
 void* mobjHitObjPtrToPtr(void* hit);
 s32 mobjCheckItemboxOpen(void* mobj);
 void partyChgPoseId(PartyEntry* party, s32 id);
@@ -48,11 +60,11 @@ USER_FUNC(pre_kurio_use) {
     }
     {
         struct { u8 pad[0x15]; char n[0x20]; }* mobj;
-        hit = *(void**)((u8*)mario + 0x1ec);
+        hit = *(void**)((u8*)mario + 0x1ec + MW_US);
         if (!hit || !(hitGetAttr(hit) & 0x80000000)) {
-            hit = *(void**)((u8*)mario + 0x1e0);
+            hit = *(void**)((u8*)mario + 0x1e0 + MW_US);
             if (!hit || !(hitGetAttr(hit) & 0x80000000)) {
-                hit = *(void**)((u8*)mario + 0x1e4);
+                hit = *(void**)((u8*)mario + 0x1e4 + MW_US);
                 if (!hit || !(hitGetAttr(hit) & 0x80000000)) {
                     event->lwData[0] = (s32)"msg_kuri_map";
                     return EVT_RETURN_DONE;

@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_stage.h"
@@ -44,8 +45,8 @@ void psndSFX_pos(s32 id, Vec* position);
 #include "eff/eff_kemu_test.h"
 #include "eff/n64/eff_sweat_n64.h"
 f32 sinfd(f32 degrees);
-#define UF32(u, o) (*(f32*)((u8*)(u) + (o)))
-#define US32(u, o) (*(s32*)((u8*)(u) + (o)))
+#define UF32(u, o) (*(f32*)((u8*)(u) + BUOFF(o)))
+#define US32(u, o) (*(s32*)((u8*)(u) + BUOFF(o)))
 typedef struct YoshiSweatWork {
     s32 pad0;
     f32 x;
@@ -54,7 +55,7 @@ typedef struct YoshiSweatWork {
 } YoshiSweatWork;
 
 typedef struct YoshiSlideW {
-    u8 pad[0x224];
+    u8 pad[BUOFF(0x224)];
     s32 a;
     s32 b;
 } YoshiSlideW;
@@ -448,34 +449,34 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 s32 partyWeapon_YoshiNormalAttack[] = {
-    (s32)"btl_wn_pys_normal", 22020096, 0, (s32)"msg_pys_hip_drop", 1677721600, 1065353216, 16868402, (s32)weaponGetPowerFromPartyAttackLv,
+    (s32)"btl_wn_pys_normal", VERSION_PICK(22020096, 22544384), 0, (s32)"msg_pys_hip_drop", 1677721600, 1065353216, 16868402, (s32)weaponGetPowerFromPartyAttackLv,
     1, 1, 1, 1, 1, 1, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 16781920, 536875012, 770, (s32)"msg_ac_hip_drop", 217239, 12, -2147475452,
     0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)partyYoshiAttack_NormalAttack, 658020, 168101125, 84213760,
+    0, 0, 0, 0, (s32)partyYoshiAttack_NormalAttack, 658020, VERSION_PICK(168101125, 168428805), 84213760,
 };
 
 s32 partyWeapon_YoshiNomikomi_Shot[] = {
-    (s32)"btl_wn_pys_lv1", 22085632, 0, (s32)"msg_pys_nomikomi", 1677983744, 1065353216, 17130546, (s32)weaponGetPowerFromPartyAttackLv,
+    (s32)"btl_wn_pys_lv1", VERSION_PICK(22085632, 22609920), 0, (s32)"msg_pys_nomikomi", 1677983744, 1065353216, 17130546, (s32)weaponGetPowerFromPartyAttackLv,
     2, 4, 3, 5, 3, 6, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 553656320, 393986, (s32)"msg_ac_nomikomi", 131143, 2043, -2147475452,
     0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)partyYoshiAttack_Nomikomi, 100, 328960, 0,
+    0, 0, 0, 0, (s32)partyYoshiAttack_Nomikomi, 100, VERSION_PICK(328960, 656640), 0,
 };
 
 s32 partyWeapon_YoshiNomikomi_Spew[] = {
-    (s32)"btl_wn_pys_lv1", 22085632, 0, (s32)"msg_pys_nomikomi", 1677983744, 1065353216, 17130546, (s32)weaponGetPowerFromPartyAttackLv,
+    (s32)"btl_wn_pys_lv1", VERSION_PICK(22085632, 22609920), 0, (s32)"msg_pys_nomikomi", 1677983744, 1065353216, 17130546, (s32)weaponGetPowerFromPartyAttackLv,
     2, 4, 3, 5, 3, 6, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 553656320, 328450, (s32)"msg_ac_nomikomi", 131143, 2047, -2147475452,
     0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)partyYoshiAttack_Nomikomi, 100, 328965, 0,
+    0, 0, 0, 0, (s32)partyYoshiAttack_Nomikomi, 100, VERSION_PICK(328965, 656645), 0,
 };
 
 s32 partyWeapon_YoshiNomikomi_Dmg0[] = {
-    (s32)"btl_wn_pys_lv1", 22085632, 0, (s32)"msg_pys_nomikomi", 1677852672, 1065353216, 17130546, (s32)weaponGetPowerDefault,
+    (s32)"btl_wn_pys_lv1", VERSION_PICK(22085632, 22609920), 0, (s32)"msg_pys_nomikomi", 1677852672, 1065353216, 17130546, (s32)weaponGetPowerDefault,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 553656320, 770, (s32)"msg_ac_nomikomi", 131136, 2047, -2147475452,
@@ -484,7 +485,7 @@ s32 partyWeapon_YoshiNomikomi_Dmg0[] = {
 };
 
 s32 partyWeapon_YoshiNomikomi_Fire[] = {
-    (s32)"btl_wn_pys_lv1", 22085632, 0, (s32)"msg_pys_nomikomi", 1677852672, 1065353216, 17130546, (s32)weaponGetPowerDefault,
+    (s32)"btl_wn_pys_lv1", VERSION_PICK(22085632, 22609920), 0, (s32)"msg_pys_nomikomi", 1677852672, 1065353216, 17130546, (s32)weaponGetPowerDefault,
     1, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 16777986, (s32)"msg_ac_nomikomi", 131136, 2047, -2147483644,
@@ -502,21 +503,21 @@ s32 partyWeapon_YoshiNomikomi_Involved[] = {
 };
 
 s32 partyWeapon_YoshiEggAttack_Minimini[] = {
-    (s32)"btl_wn_pys_lv2", 22151168, 0, (s32)"msg_pys_wonder_egg", 1677918208, 1065353216, 33907762, (s32)weaponGetPowerDefault,
+    (s32)"btl_wn_pys_lv2", VERSION_PICK(22151168, 22675456), 0, (s32)"msg_pys_wonder_egg", 1677918208, 1065353216, VERSION_PICK(33907762, 17130546), (s32)weaponGetPowerDefault,
     1, 1, 1, 1, 1, 1, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, (s32)"msg_ac_wonder_egg", 131075, 2047, -2147475456,
     0, 0, 0, 0, 100, 66977792, 0, 0,
-    0, 0, 0, 0, (s32)partyYoshiAttack_EggAttack, 100, 197376, 0,
+    0, 0, 0, 0, (s32)partyYoshiAttack_EggAttack, 100, VERSION_PICK(197376, 393984), 0,
 };
 
 s32 partyWeapon_YoshiCallGuard[] = {
-    (s32)"btl_wn_pys_lv3", 22216704, 0, (s32)"msg_pys_taigun_yoshi", 1678114816, 1065353216, 17130546, (s32)weaponGetPowerFromPartyAttackLv,
+    (s32)"btl_wn_pys_lv3", VERSION_PICK(22216704, 22740992), 0, (s32)"msg_pys_taigun_yoshi", 1678114816, 1065353216, 17130546, (s32)weaponGetPowerFromPartyAttackLv,
     1, 1, 1, 1, 1, 1, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, (s32)"msg_ac_taigun_yoshi", 131095, 2047, -2147475452,
     0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)partyYoshiAttack_CallGuard, 1315940, 336856325, 335872000,
+    0, 0, 0, 0, (s32)partyYoshiAttack_CallGuard, 1315940, VERSION_PICK(336856325, 338167045), 335872000,
 };
 
 s32 posesound_normal_attack[] = {
@@ -1188,7 +1189,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 s32 _yoshig_tpl_no_tbl[] = {
-    1179207494, 1246232576,
+    VERSION_PICK(1179207494, 0x5C5F5D5C), VERSION_PICK(1246232576, 0x605E0000), // US battle tex ids +0x16
 };
 
 USER_FUNC(yoshi_original_color_anim_set) {
@@ -1509,8 +1510,8 @@ static inline s32 _gundan_part_update(YoshiGundanPart* p, s32 i) {
         }
     case 2:
         p->z += p->vz;
-        if (p->z >= 80.0f) {
-            p->z = 80.0f;
+        if (p->z >= VERSION_PICK(80.0f, 65.0f)) {
+            p->z = VERSION_PICK(80.0f, 65.0f);
             p->vz *= -1.0f;
         }
         if (p->z <= -80.0f) {
@@ -1600,7 +1601,7 @@ USER_FUNC(_gundan_yoshi_run_effect) {
         return EVT_RETURN_DONE;
     }
     for (i = 0; i < 256; i++) {
-        dispEntry(CAMERA_3D, dispCalcZ((Vec*)p), 2, (DispCallback)_btlYoshiDisp, &w->parts[i]);
+        dispEntry(CAMERA_3D, dispCalcZ((Vec*)p), VERSION_PICK(2, 1), (DispCallback)_btlYoshiDisp, &w->parts[i]);
     }
     } while (0);
     return EVT_RETURN_BLOCK;

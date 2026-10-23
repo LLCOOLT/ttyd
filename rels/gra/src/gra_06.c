@@ -14,7 +14,7 @@ USER_FUNC(evt_hit_bind_mapobj);
 USER_FUNC(evt_hit_bind_update);
 USER_FUNC(evt_hitobj_onoff);
 USER_FUNC(evt_item_entry);
-USER_FUNC(evt_kagemario_init_11_text_804);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_mapobj_get_position);
 USER_FUNC(evt_mapobj_rotate);
@@ -52,11 +52,14 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_telop_entry);
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_mario_dispflag_onoff);
+#endif
 extern s32 bero_case_entry[];
 extern s32 bero_case_switch_off[];
 extern s32 bero_case_switch_on[];
 extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill_11_data_4F98[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_gra_06_negone_one_374;
 __declspec(section ".data") s32 fd_gra_06_neg_one_382[1];
@@ -80,7 +83,11 @@ __declspec(section ".data") s32 gra_06_ido_in[7];
 static s32 bero_entry_data[60];
 s32 gra_06_saku_open[288];
 s32 first_gra06jin[138];
+#ifdef VERSION_G8ME01
+s32 teresa_oidasare_evt[282];
+#else
 s32 teresa_oidasare_evt[274];
+#endif
 s32 gra_06_init_evt[148];
 
 __declspec(section ".data") u64 fd_gra_06_negone_one_374 = 0xBF8000003F800000;
@@ -333,6 +340,10 @@ EVT_BEGIN(teresa_oidasare_evt)
     CALL(evt_cam3d_event_from_road, 65, 60, -115, 0, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5))
     CALL(evt_cam3d_evt_set, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), 0, 11)
     CALL(evt_seq_wait, 2)
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_cont_onoff, 1)
+    CALL(evt_mario_dispflag_onoff, 1, 2)
+#endif
     CALL(evt_mario_set_pose, STRING("M_D_1"))
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
@@ -402,8 +413,13 @@ EVT_BEGIN(teresa_oidasare_evt)
         CALL(evt_party_set_pose, 0, STRING("PWD_S_1"))
     END_SWITCH
     CALL(evt_cam3d_evt_off, 0, 11)
+#ifndef VERSION_G8ME01
     CALL(evt_mario_cont_onoff, 1)
+#endif
     CALL(evt_party_cont_onoff, 0, 1)
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_dispflag_onoff, 0, 2)
+#endif
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
     SET_VALUE(GSWF(2227), 0)
@@ -414,7 +430,7 @@ EVT_END()
 
 EVT_BEGIN(gra_06_init_evt)
     CALL(evt_item_entry, STRING("item00"), 125, -130, 0, 150, 16, GSWF(5633), 0)
-    CALL(evt_kagemario_init_11_text_804)
+    CALL(evt_kagemario_init)
     IF_INT_EQUAL(GSWF(2227), 1)
         SET_VALUE(LW(0), PTR(bero_entry_data))
         CALL(evt_bero_get_info)
@@ -434,7 +450,7 @@ EVT_BEGIN(gra_06_init_evt)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -125, 60, 235, 0, 0)
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 10, -270, 60, 270, 0, 0)
     CALL(evt_mobj_brick, STRING("mobj_hidden1\0\0\0"), 67, 90, -13, 121, 11, 0, GSWF(2090))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_11_data_4F98))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     IF_INT_EQUAL(GSWF(2078), 0)
         CALL(evt_hitobj_onoff, STRING("A_Mon"), 1, 0)
         CALL(evt_run_case_evt, 9, 1, STRING("a_saku01"), 0, PTR(gra_06_saku_open), 0)

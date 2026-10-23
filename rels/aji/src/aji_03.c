@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -10,6 +11,7 @@
 #include "string.h"
 #include "system.h"
 #include "stdio.h"
+#include "icon_ids.h"
 
 void icon_disp(CameraId camera, void* param);
 
@@ -92,7 +94,7 @@ s32 ufo_main[525];
 s32 evt_ufo_init[115];
 s32 evt_zenmai[141];
 s32 blink_sw[33];
-s32 evt_ufo_sousaban[267];
+s32 evt_ufo_sousaban[VERSION_PICK(267, 279)];
 static s32 evt_sw[141];
 s32 evt_sw_reinit[88];
 s32 evt_sw0[72];
@@ -648,6 +650,117 @@ EVT_BEGIN(blink_sw)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(evt_ufo_sousaban)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_cam3d_evt_set, 230, 200, 380, 230, 130, -13, 1000, 11)
+    WAIT_MS(1200)
+    CALL(evt_mapobj_get_position, STRING("S_kure"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_CRANE_MOVE1"), LW(0), LW(1), LW(2), LW(3))
+    SPAWN_EVENT(PTR(evt_ufo_init))
+    WAIT_MS(2200)
+    CALL(evt_snd_sfxoff, LW(3))
+    BEGIN_INLINE_EVENT
+        CALL(evt_sub_intpl_msec_init, 11, 2300, 400, 3000)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value)
+            DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+            SET_FLOAT_VALUE(GW(10), LW(0))
+            CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+    END_INLINE_EVENT
+    CALL(evt_cam3d_evt_set, -65, 175, 529, -65, 80, -13, 3000, 11)
+    WAIT_MS(3400)
+    IF_INT_EQUAL(GSWF(4218), 0)
+        SET_VALUE(GSWF(4218), 1)
+        CALL(evt_msg_print, 0, STRING("stg7_aji_00_01"), 0, 0)
+    END_IF
+    WAIT_MS(300)
+    BEGIN_INLINE_EVENT_GET_ID(LW(10))
+        LOOP(0)
+            CALL(evt_sousa_icon, 0, 200, 130)
+        END_LOOP
+    END_INLINE_EVENT
+    WAIT_FRAMES(1)
+    LOOP(0)
+        CALL(evt_key_get_button, 0, LW(0))
+        IF_BITS_SET(LW(0), 256)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_FRAMES(1)
+    SET_VALUE(GF(10), 1)
+    LOOP(0)
+        CALL(evt_key_get_button, 0, LW(0))
+        IF_BITS_SET(LW(0), 256)
+            ELSE
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_FRAMES(1)
+    SET_VALUE(GF(10), 0)
+    DELETE_EVENT(LW(10))
+    BEGIN_INLINE_EVENT_GET_ID(LW(10))
+        LOOP(0)
+            CALL(evt_sousa_icon, 1, 200, 70)
+        END_LOOP
+    END_INLINE_EVENT
+    WAIT_FRAMES(1)
+    LOOP(0)
+        CALL(evt_key_get_button, 0, LW(0))
+        IF_BITS_SET(LW(0), 512)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_FRAMES(1)
+    SET_VALUE(GF(11), 1)
+    LOOP(0)
+        CALL(evt_key_get_button, 0, LW(0))
+        IF_BITS_SET(LW(0), 512)
+            ELSE
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_FRAMES(1)
+    SET_VALUE(GF(11), 0)
+    DELETE_EVENT(LW(10))
+    LOOP(0)
+        IF_INT_EQUAL(GF(12), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_sub_intpl_msec_init, 11, 400, 2300, 3000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        SET_FLOAT_VALUE(GW(10), LW(0))
+        CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    SET_VALUE(GW(10), 230)
+    SET_VALUE(GW(11), 100)
+    CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hikari"), 1)
+    SET_VALUE(GF(14), 1)
+    CALL(evt_cam_shift_reset)
+    CALL(evt_cam3d_evt_off, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(evt_ufo_sousaban)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 230, 200, 380, 230, 130, -13, 1000, 11)
@@ -751,6 +864,7 @@ EVT_BEGIN(evt_ufo_sousaban)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
+#endif
 
 static EVT_BEGIN(evt_sw)
     IF_INT_EQUAL(GSWF(4188), 0)
@@ -1130,22 +1244,22 @@ void icon_disp(CameraId camera, void* param) {
         PSMTXRotRad(rot, 'z', 0.0f);
         PSMTXConcat(trans, scale, trans);
         PSMTXConcat(trans, rot, trans);
-        iconDispGx2(trans, 0x10, 0x163);
+        iconDispGx2(trans, 0x10, ICON_163);
         PSMTXTrans(trans, event->userdata[1], event->userdata[2], 0.0f);
         PSMTXScale(scale, 1.5f, 1.5f, 1.5f);
         PSMTXConcat(trans, scale, trans);
-        iconDispGx2(trans, 0x10, 0x64);
+        iconDispGx2(trans, 0x10, ICON_064);
     } else {
         PSMTXTrans(trans, event->userdata[1] - 30, event->userdata[2] + 100, 0.0f);
         PSMTXScale(scale, 1.5f, 1.5f, 1.5f);
         PSMTXRotRad(rot, 'z', 4.712389f);
         PSMTXConcat(trans, scale, trans);
         PSMTXConcat(trans, rot, trans);
-        iconDispGx2(trans, 0x10, 0x163);
+        iconDispGx2(trans, 0x10, ICON_163);
         PSMTXTrans(trans, event->userdata[1], event->userdata[2], 0.0f);
         PSMTXScale(scale, 1.5f, 1.5f, 1.5f);
         PSMTXConcat(trans, scale, trans);
-        iconDispGx2(trans, 0x10, 0x66);
+        iconDispGx2(trans, 0x10, ICON_066);
     }
 }
 

@@ -328,7 +328,11 @@ void mot_dash(void) {
         if (!(player->flags & MARIO_FLAG_FORCED_MOVEMENT)) {
             stickDir1 = player->wStickDir1;
             stickDir2 = player->wStickDir2;
+#ifdef VERSION_G8ME01
+            if ((stickDir1 * stickDir1) + (stickDir2 * stickDir2) <= 0xBD1 || pouchEquipCheckBadge(323)) {
+#else
             if ((stickDir1 * stickDir1) + (stickDir2 * stickDir2) <= 0xBD1) {
+#endif
                 marioChgMot(MARIO_MOTION_WALK);
                 return;
             }

@@ -6,6 +6,7 @@
 #include "driver/icondrv.h"
 #include "system.h"
 #include <string.h>
+#include "icon_ids.h"
 
 #pragma optimize_for_size on
 
@@ -190,7 +191,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -200.0f + x;
         pos.y = 25.0f + y;
-        iconDispGx(&pos, 0x10, 0x8C, 1.0f);
+        iconDispGx(&pos, 0x10, ICON_08C, 1.0f);
     }
     ratio = tw->gauge / 100.0f;
     if (ratio > 1.0f) {
@@ -210,12 +211,12 @@ static void actionCommandDisp(f32 x, f32 y) {
             y = 70.0f + y;
             pos.x = x;
             pos.y = y;
-            iconDispGx(&pos, 0x10, 0x7E, 1.0f);
+            iconDispGx(&pos, 0x10, ICON_07E, 1.0f);
             {
 Vec pos2 = {0.0f, 0.0f, 0.0f};
             pos2.x = 56.0f + x;
             pos2.y = y;
-            iconDispGx(&pos2, 0x10, 0x80, 1.0f);
+            iconDispGx(&pos2, 0x10, ICON_080, 1.0f);
             }
             break;
         }
@@ -226,12 +227,12 @@ Vec pos2 = {0.0f, 0.0f, 0.0f};
                 y = 70.0f + y;
                 pos.x = x;
                 pos.y = y;
-                iconDispGx(&pos, 0x10, 0x7F, 1.0f);
+                iconDispGx(&pos, 0x10, ICON_07F, 1.0f);
                 {
 Vec pos2 = {0.0f, 0.0f, 0.0f};
                 pos2.x = 56.0f + x;
                 pos2.y = y;
-                iconDispGx(&pos2, 0x10, 0x81, 1.0f);
+                iconDispGx(&pos2, 0x10, ICON_081, 1.0f);
                 }
             } else {
                 Vec pos = {0.0f, 0.0f, 0.0f};
@@ -239,12 +240,12 @@ Vec pos2 = {0.0f, 0.0f, 0.0f};
                 y = 70.0f + y;
                 pos.x = x;
                 pos.y = y;
-                iconDispGx(&pos, 0x10, 0x7E, 1.0f);
+                iconDispGx(&pos, 0x10, ICON_07E, 1.0f);
                 {
 Vec pos2 = {0.0f, 0.0f, 0.0f};
                 pos2.x = 56.0f + x;
                 pos2.y = y;
-                iconDispGx(&pos2, 0x10, 0x80, 1.0f);
+                iconDispGx(&pos2, 0x10, ICON_080, 1.0f);
                 }
             }
             break;

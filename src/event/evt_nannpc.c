@@ -787,4 +787,10 @@ USER_FUNC(evt_nannpcwork_flag_onoff) {
 
 #pragma force_active reset
 
+#ifdef VERSION_G8ME01
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_804113E8_sdata[4] = {0}; /* US pad is 0x10 */ /* FAKE: kept (MWLD strips it in the US link) */
+#pragma force_active reset
+#else
 __declspec(section ".sdata") u32 gap_07_804113E8_sdata[6] = {0};
+#endif

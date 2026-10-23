@@ -1,3 +1,4 @@
+#include "icon_ids.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -186,12 +187,12 @@ __declspec(section ".data") s32 fd_evt_lect_tou_one_364[1];
 s32 yoshi_party_lecture_init[43];
 s32 yoshi_party_lecture[271];
 static __declspec(section ".data") s32 all_party_lecture_otosub[11];
-s32 all_party_lecture_27_data_2DF64[474];
+s32 all_party_lecture[474];
 s32 hammer_lv2_juyoitem_lecture_init[104];
 s32 hammer_lv2_juyoitem_lecture_sub01[29];
 s32 hammer_lv2_juyoitem_lecture_sub02[65];
 s32 hammer_lv2_juyoitem_lecture[682];
-s32 all_juyoitem_lecture_rel_27_data_2F48C[252];
+s32 all_juyoitem_lecture_rel[252];
 
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start) {
     f32 rem = total - elapsed;
@@ -281,15 +282,15 @@ static void lecture_button_disp(CameraId camera, void* param) {
             Vec pos;
 
             switch (btn->iconId) {
-                case 0x75:
-                case 0x76:
-                case 0x77:
-                case 0x78:
-                case 0x79:
-                case 0x7A:
-                case 0x7B:
-                case 0x7C:
-                case 0x7D:
+                case ICON_075:
+                case ICON_076:
+                case ICON_077:
+                case ICON_078:
+                case ICON_079:
+                case ICON_07A:
+                case ICON_07B:
+                case ICON_07C:
+                case ICON_07D:
                     ofs = -15.0f;
                     break;
                 default:
@@ -323,7 +324,7 @@ static USER_FUNC(lecture_button_rtn) {
         btn = &lbtn[i];
         switch (btn->seq) {
             case 0:
-                btn->iconId = 0x68;
+                btn->iconId = ICON_068;
                 btn->seq = 1;
                 break;
             case 2:
@@ -652,7 +653,7 @@ static __declspec(section ".data") EVT_BEGIN(all_party_lecture_otosub)
     RETURN
 EVT_END()
 
-EVT_BEGIN(all_party_lecture_27_data_2DF64)
+EVT_BEGIN(all_party_lecture)
     CALL(evt_mario_normalize)
     IF_INT_NOT_EQUAL(LW(9), 1)
         IF_INT_NOT_EQUAL(LW(9), 5)
@@ -813,11 +814,11 @@ EVT_END()
 EVT_BEGIN(hammer_lv2_juyoitem_lecture_sub01)
     CALL(lecture_button_set_alpha, 0, 255)
     CALL(lecture_button_set_alpha, 1, 128)
-    CALL(lecture_button_set_icon_id, 1, 121)
+    CALL(lecture_button_set_icon_id, 1, ICON_079)
     LOOP(0)
-        CALL(lecture_button_set_icon_id, 0, 103)
+        CALL(lecture_button_set_icon_id, 0, ICON_067)
         WAIT_MS(300)
-        CALL(lecture_button_set_icon_id, 0, 102)
+        CALL(lecture_button_set_icon_id, 0, ICON_066)
         WAIT_MS(300)
     END_LOOP
     RETURN
@@ -826,23 +827,23 @@ EVT_END()
 EVT_BEGIN(hammer_lv2_juyoitem_lecture_sub02)
     CALL(lecture_button_set_alpha, 0, 128)
     CALL(lecture_button_set_alpha, 1, 255)
-    CALL(lecture_button_set_icon_id, 0, 103)
+    CALL(lecture_button_set_icon_id, 0, ICON_067)
     LOOP(0)
-        CALL(lecture_button_set_icon_id, 1, 120)
+        CALL(lecture_button_set_icon_id, 1, ICON_078)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 123)
+        CALL(lecture_button_set_icon_id, 1, ICON_07B)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 124)
+        CALL(lecture_button_set_icon_id, 1, ICON_07C)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 125)
+        CALL(lecture_button_set_icon_id, 1, ICON_07D)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 122)
+        CALL(lecture_button_set_icon_id, 1, ICON_07A)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 119)
+        CALL(lecture_button_set_icon_id, 1, ICON_077)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 118)
+        CALL(lecture_button_set_icon_id, 1, ICON_076)
         WAIT_MS(15)
-        CALL(lecture_button_set_icon_id, 1, 117)
+        CALL(lecture_button_set_icon_id, 1, ICON_075)
         WAIT_MS(15)
     END_LOOP
     RETURN
@@ -893,10 +894,10 @@ EVT_BEGIN(hammer_lv2_juyoitem_lecture)
         CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(85.0f), FLOAT(520.0f), FLOAT(0.0f), FLOAT(40.0f), FLOAT(-100.0f), 1000, 11)
         WAIT_MS(1000)
         CALL(lecture_button_flag_on_off, 0, 2, 1)
-        CALL(lecture_button_set_icon_id, 0, 102)
+        CALL(lecture_button_set_icon_id, 0, ICON_066)
         CALL(lecture_button_set_seq, 0, 2)
         CALL(lecture_button_flag_on_off, 1, 2, 1)
-        CALL(lecture_button_set_icon_id, 1, 121)
+        CALL(lecture_button_set_icon_id, 1, ICON_079)
         CALL(lecture_button_set_seq, 1, 2)
         CALL(lecture_button_seq_wait, 0, 1)
         CALL(lecture_button_seq_wait, 1, 1)
@@ -1058,7 +1059,7 @@ EVT_BEGIN(hammer_lv2_juyoitem_lecture)
     RETURN
 EVT_END()
 
-s32 all_juyoitem_lecture_rel_27_data_2F48C[] = {
+s32 all_juyoitem_lecture_rel[] = {
     65627, (s32)evt_mario_normalize, 131163, (s32)juyoitem_get_no, -29999990, 131163, (s32)evt_mario_set_camid, 7,
     131163, (s32)effitemget_open_ptr, -29999991, 65627, (s32)juyoitem_gogo, 327771, (s32)evt_mario_get_pos, 0,
     -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_OFF_PARTY_LECTURE1_1", -30000000, -29999999,

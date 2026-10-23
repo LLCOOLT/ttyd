@@ -98,7 +98,7 @@ __declspec(section ".data") s32 fd_karon___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_karon_one_negone_359;
 __declspec(section ".data") s32 fd_karon___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_karon_one_364[1];
-BattleUnitKind unit_karon_15_data_55368;
+BattleUnitKind unit_karon;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -170,7 +170,7 @@ __declspec(section ".data") s32 fd_karon_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_karon_15_data_55368 = {
+BattleUnitKind unit_karon = {
     130,
     "btl_un_karon",
     8,
@@ -270,7 +270,7 @@ static s32 weapon_honenoko_link_attack[] = {
 };
 
 static __declspec(section ".data") s32 entry_honenoko[] = {
-    (s32)&unit_karon_15_data_55368, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
+    (s32)&unit_karon, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
     0, 0, 0, 0,
 };
 

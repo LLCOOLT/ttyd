@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_database_common.h"
 #include "driver/animdrv.h"
 #include "mario/mario.h"
@@ -11,6 +12,7 @@
 #include "sdk/texPalette.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "icon_ids.h"
 
 extern ItemData itemDataTable[];
 extern int sprintf(char* str, const char* format, ...);
@@ -102,6 +104,9 @@ void winFontSet(Vec pos, Vec scale, GXColor color, const char* fmt, ...);
 void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...);
 void winFontSetEdge(Vec pos, Vec scale, GXColor color, const char* fmt, ...);
 void winFontSetLabel(Vec pos, Vec scale, GXColor color, const char* msg);
+#ifdef VERSION_G8ME01
+void winFontSetWidth(Vec translate, Vec scale, GXColor color, f32 width, const char* fmt, ...);
+#endif
 const char* winZenkakuStr(s32 num);
 void animPoseVivianMain(s32 poseId, Vec* pos);
 
@@ -149,13 +154,13 @@ BattleWeapon* chu_waza[4] = {
 };
 
 WinPartyDt winPartyDt[7] = {
-    {1, 0x155, "name_party0", "msg_menu_party_kuri", "EFF_m_kuriko", "W_1", "d_mario", "R_2", chri_waza},
-    {2, 0x156, "name_party1", "msg_menu_party_noko", "EFF_m_noko", "W_1", "d_mario", "R_3", noko_waza},
-    {5, 0x15F, "name_party4", "msg_menu_party_cloud", "EFF_m_cloud", "W_1", "d_mario", "R_4", cloud_waza},
-    {4, 0x158, "name_party3", "msg_menu_party_yoshi", "EFF_m_yoshi", "W_1", "d_mario", "R_5", yoshi_waza},
-    {6, 0x160, "name_party5", "msg_menu_party_vivi", "c_vivian", "PTR_S_1", "d_mario", "R_12", vivi_waza},
-    {3, 0x157, "name_party2", "msg_menu_party_bom", "EFF_m_bomb", "W_1", "d_mario", "R_13", sand_waza},
-    {7, 0x161, "name_party6", "msg_menu_party_chu", "EFF_m_chu", "W_1", "d_mario", "R_14", chu_waza},
+    {1, ICON_155, "name_party0", "msg_menu_party_kuri", "EFF_m_kuriko", "W_1", "d_mario", "R_2", chri_waza},
+    {2, ICON_156, "name_party1", "msg_menu_party_noko", "EFF_m_noko", "W_1", "d_mario", "R_3", noko_waza},
+    {5, ICON_15F, "name_party4", "msg_menu_party_cloud", "EFF_m_cloud", "W_1", "d_mario", "R_4", cloud_waza},
+    {4, ICON_158, "name_party3", "msg_menu_party_yoshi", "EFF_m_yoshi", "W_1", "d_mario", "R_5", yoshi_waza},
+    {6, ICON_160, "name_party5", "msg_menu_party_vivi", "c_vivian", "PTR_S_1", "d_mario", "R_12", vivi_waza},
+    {3, ICON_157, "name_party2", "msg_menu_party_bom", "EFF_m_bomb", "W_1", "d_mario", "R_13", sand_waza},
+    {7, ICON_161, "name_party6", "msg_menu_party_chu", "EFF_m_chu", "W_1", "d_mario", "R_14", chu_waza},
 };
 
 void winPartyInit(WinPartyWork* wp) {
@@ -259,26 +264,26 @@ void winPartyInit(WinPartyWork* wp) {
     wp->wazaCount = pouchGetPartyAttackLv(winPartyDt[wp->dtIdx].partyId) + 2;
     switch (pouchGetPartyColor(4)) {
         case 0:
-            winPartyDt[3].nameMsgId = 0x158;
+            winPartyDt[3].nameMsgId = ICON_158;
             break;
         case 1:
-            winPartyDt[3].nameMsgId = 0x159;
+            winPartyDt[3].nameMsgId = ICON_159;
             break;
         case 2:
-            winPartyDt[3].nameMsgId = 0x15A;
+            winPartyDt[3].nameMsgId = ICON_15A;
             break;
         case 3:
-            winPartyDt[3].nameMsgId = 0x15B;
+            winPartyDt[3].nameMsgId = ICON_15B;
             break;
         case 4:
-            winPartyDt[3].nameMsgId = 0x15C;
+            winPartyDt[3].nameMsgId = ICON_15C;
             break;
         case 5:
-            winPartyDt[3].nameMsgId = 0x15D;
+            winPartyDt[3].nameMsgId = ICON_15D;
             break;
         case 6:
         default:
-            winPartyDt[3].nameMsgId = 0x15E;
+            winPartyDt[3].nameMsgId = ICON_15E;
             break;
     }
 }
@@ -482,7 +487,7 @@ void winPartyDisp(s32 camId, void* param, s32 idx) {
     winIconInit();
     bx = 60.0f + bx;
     fy = 4.0f + by;
-    winIconSet(0x19F, (Vec){bx, fy, 0.0f}, (Vec){0.82f, 0.82f, 0.82f}, white);
+    winIconSet(ICON_19F, (Vec){bx, fy, 0.0f}, (Vec){0.82f, 0.82f, 0.82f}, white);
     for (i = 0; i < ( wp->wazaCount - 2) ; i++) {
         winIconSet(itemDataTable[0x57].icon_id, (Vec){bx + (( f32)(i * 34) ), iy = 4.0f + (by - 32.0f), 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white2);
     }
@@ -646,7 +651,7 @@ void winPartyDisp(s32 camId, void* param, s32 idx) {
         fy = ((-230.0f - w1) / 2.0f) + x;
         winFontSet((Vec){fy, y - 90.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, msgSearch("msg_menu_party_henkou"));
         winIconInit();
-        winIconSet(100, (Vec){fy - 30.0f, y - 100.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
+        winIconSet(ICON_064, (Vec){fy - 30.0f, y - 100.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
         winTexInit(*wp->file->data);
         winTexSet(0xC0, (Vec){(x - 150.0f) - 50.0f, y - 16.0f, 0.0f}, (Vec){-0.6f, 0.6f, 0.6f}, white);
         winTexSet(0xC0, (Vec){50.0f + (x - 150.0f), y - 16.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
@@ -657,19 +662,23 @@ void winPartyDisp(s32 camId, void* param, s32 idx) {
     fy = x + (250.0f - w1);
     winFontSet((Vec){fy, y - 100.0f, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, black, msgSearch("msg_menu_party_waza_kakunin"));
     winIconInit();
-    winIconSet(0x1F5, (Vec){fy - 20.0f, y - 110.0f, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, white);
+    winIconSet(ICON_1F5, (Vec){fy - 20.0f, y - 110.0f, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, white);
     winWazaGX(wp, 0, x - 5.0f, wy = 50.0f + y, 260.0f, 144.0f);
     winFontInit();
     w1 = 0.8f * FontGetMessageWidth(msgSearch("msg_menu_party_waza"));
     fy = 45.0f + y;
     winFontSetEdge((Vec){((200.0f - w1) / 2.0f) + x, fy, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, msgSearch("msg_menu_party_waza"));
     bx = 230.0f + x;
-    winFontSetEdge((Vec){bx - 20.0f, fy, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, "\x82\x65\x82\x6F");
+    winFontSetEdge((Vec){bx - 20.0f, fy, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, VERSION_PICK("\x82\x65\x82\x6F", msgSearch("btl_cost_disp_FP")));
     for (i = 0; i < wp->wazaCount; i++) {
         char buf[0x40];
+#ifdef VERSION_G8ME01
+        winFontSetWidth((Vec){10.0f + x, fy = (wy - (( f32)(i * 26) )) - 30.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black2, 175.0f, msgSearch(winPartyDt[wp->dtIdx].waza[i]->name));
+#else
         winFontSetLabel((Vec){10.0f + x, fy = (wy - (( f32)(i * 26) )) - 30.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black2, winPartyDt[wp->dtIdx].waza[i]->name);
+#endif
         sprintf(buf, "%s", winZenkakuStr((u8)winPartyDt[wp->dtIdx].waza[i]->baseFpCost));
         winFontSet((Vec){(((238.0f + x) - 20.0f) - (( f32)(FontGetMessageWidth(buf) / 2) )) - 2.0f, fy, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black2, buf);
-        winFontSet((Vec){2.0f + (2.0f + ((17.0f + bx) - 20.0f)), fy - 10.0f, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black2, "\x82\x65\x82\x6F");
+        winFontSet((Vec){2.0f + (2.0f + ((17.0f + bx) - 20.0f)), fy - 10.0f, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black2, VERSION_PICK("\x82\x65\x82\x6F", msgSearch("btl_cost_disp_FP")));
     }
 }

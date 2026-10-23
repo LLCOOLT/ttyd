@@ -102,7 +102,11 @@ static EffectWork work;
 
 //.sdata
 static EffectWork* wp = &work;
+#ifdef VERSION_G8ME01
+const char* prefix_tbl[7] = {"jp", "us", "ge", "fr", "sp", "it", "du"};
+#else
 const char* prefix_tbl[2] = {"jp", "us"};
+#endif
 
 //local prototypes
 static void _callback_tpl(s32 error, DVDFileInfo* info);
@@ -115,7 +119,11 @@ static void _callback_tpl(s32 error, DVDFileInfo* info) {
 }
 
 void effInit(void) {
+#ifdef VERSION_G8ME01
+	wp->count = 0x200;
+#else
 	wp->count = 0x100;
+#endif
 	wp->entries = __memAlloc(HEAP_DEFAULT, wp->count * sizeof(EffectEntry));
 	memset(wp->entries, 0, wp->count * sizeof(EffectEntry));
 	wp->handle = NULL;
@@ -124,6 +132,12 @@ void effInit(void) {
 	wp->texLoaded = FALSE;
 	effInit64();
 }
+
+#ifdef VERSION_G8ME01
+#define EFF_NTEX 118
+#else
+#define EFF_NTEX 146
+#endif
 
 void effTexSetup(void) {
 	DVDEntry* entry;
@@ -134,7 +148,11 @@ void effTexSetup(void) {
 	wp->texLoaded = FALSE;
 	wp->texture = arcOpen("effect.tpl", 0, 0);
 	if (!wp->texture) {
+#ifdef VERSION_G8ME01
+		sprintf(path, "%s/e/%s/effect.tpl", getMarioStDvdRoot(), gp->language == 0U ? "jp" : "us");
+#else
 		sprintf(path, "%s/e/jp/effect.tpl\0", getMarioStDvdRoot());
+#endif
 		entry = DVDMgrOpen(path, 2, 0);
 		size = OSRoundUp32B(DVDMgrGetLength(entry));
 		wp->texture = __memAlloc(HEAP_DEFAULT, size);
@@ -151,7 +169,7 @@ void effTexSetup(void) {
 #pragma explicit_zero_data on
 void effGetTexObj(u32 id, GXTexObj* obj) {
 #ifdef __MWERKS__
-	if ((s32)id < 146) { //number of images in effect.tpl
+	if ((s32)id < EFF_NTEX) { //number of images in effect.tpl
 		if (!wp->texLoaded) {
 			static char dummy ATTRIBUTE_ALIGN(32) = '\0';
 			GXInitTexObj(obj, &dummy, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
@@ -166,7 +184,7 @@ void effGetTexObj(u32 id, GXTexObj* obj) {
 			GXInitTexObj(obj, &dummy, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
 		}
 		else {
-			TEXGetGXTexObjFromPalette(*wp->handle->data, obj, id - 146);
+			TEXGetGXTexObjFromPalette(*wp->handle->data, obj, id - EFF_NTEX);
 		}
 	}
 #endif

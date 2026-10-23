@@ -22,7 +22,7 @@ USER_FUNC(evt_hit_get_position);
 USER_FUNC(evt_hitobj_onoff);
 USER_FUNC(evt_iwamove_ent);
 USER_FUNC(evt_iwamove_init);
-USER_FUNC(evt_kagemario_init_11_text_804);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_mapobj_get_position);
 USER_FUNC(evt_mapobj_trans);
@@ -58,7 +58,7 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill_11_data_4F98[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_gra_05_negone_one_374;
 __declspec(section ".data") s32 fd_gra_05_neg_one_382[1];
@@ -434,11 +434,11 @@ EVT_BEGIN(gra_05_init_evt)
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_GRA1"))
     CALL(evt_mobj_brick, STRING("blk00"), -475, 60, 25, 0, 13, 0, GSWF(2085))
     CALL(evt_mobj_powerupblk, STRING("blk01"), 630, 60, 40, 0, GSWF(5548), 0)
-    CALL(evt_kagemario_init_11_text_804)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_11_data_4F98))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     IF_INT_LESS(GSW(0), 190)
         CALL(evt_cloud_init)
         CALL(evt_cloud_ent, 1, PTR(fukitobashi_tbl), STRING("A_futa"), PTR(gra_05_futa_open_evt))

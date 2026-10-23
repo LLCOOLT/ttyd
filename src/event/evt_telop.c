@@ -23,6 +23,13 @@ typedef struct TelopWork {
 	OSTime time;
 } TelopWork;
 
+#ifdef VERSION_G8ME01
+#define TELOP_TEX_A 0x65
+#define TELOP_TEX_B 0x64
+#else
+#define TELOP_TEX_A 0x81
+#define TELOP_TEX_B 0x80
+#endif
 static const char* msg_tbl[] = {
 	"menu_monosiri_gor", "menu_monosiri_hei", "menu_monosiri_nok", "menu_monosiri_gon",
 	"menu_monosiri_win", "menu_monosiri_mri", "menu_monosiri_tou", "menu_monosiri_usu",
@@ -102,7 +109,7 @@ void telop(CameraId cameraId, void* param) {
 	u16 width;
 
 	camera = camGetPtr(cameraId);
-	effGetTexObj(0x81, &texObj);
+	effGetTexObj(TELOP_TEX_A, &texObj);
 	texW = GXGetTexObjWidth(&texObj);
 	texH = GXGetTexObjHeight(&texObj);
 
@@ -142,9 +149,9 @@ void telop(CameraId cameraId, void* param) {
 
 	GXSetTevColorS10(GX_TEVREG0, (GXColorS10){0, 0, 0, wp->alpha});
 
-	effGetTexObj(0x81, &texObj);
+	effGetTexObj(TELOP_TEX_A, &texObj);
 	GXLoadTexObj(&texObj, GX_TEXMAP0);
-	effGetTexObj(0x80, &texObj);
+	effGetTexObj(TELOP_TEX_B, &texObj);
 	GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 	GXLoadTexObj(&texObj, GX_TEXMAP1);
 	GXSetCullMode(GX_CULL_NONE);
@@ -178,7 +185,14 @@ void telop(CameraId cameraId, void* param) {
 		k -= 5;
 	} while (--i >= 0);
 
+#ifdef VERSION_G8ME01
+	{
+		const char* def = (u32)gp->language != 0 ? "???" : "\x81H\x81H\x81H";
+		msg = (msg_tbl[wp->id] != NULL) ? msgSearch(msg_tbl[wp->id]) : def;
+	}
+#else
 	msg = (msg_tbl[wp->id] != NULL) ? msgSearch(msg_tbl[wp->id]) : "\x81H\x81H\x81H";
+#endif
 	width = FontGetMessageWidth(msg);
 	scale = 1.0f;
 	if ((u32)gp->language != 0U) {

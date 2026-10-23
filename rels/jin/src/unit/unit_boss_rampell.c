@@ -173,6 +173,22 @@ static USER_FUNC(_mario_makkuro_set) {
     return EVT_RETURN_DONE;
 }
 
+#ifdef VERSION_G8ME01
+// US only: restore the moves of the unit for this turn.
+USER_FUNC(boss_rampell_sync_max_moves) {
+    BattleUnit* unit;
+    s32 id = evtGetValue(event, event->args[0]);
+
+    id = BattleTransID(event, id);
+    unit = BattleGetUnitPtr(_battleWorkPointer, id);
+
+    if (unit != NULL) {
+        unit->maxMovesThisTurn = unit->movesRemaining;
+    }
+    return EVT_RETURN_DONE;
+}
+#endif
+
 static USER_FUNC(vivian_comeback) {
     pouchGetPtr()->partyData[6].flags &= ~2;
     return 1;

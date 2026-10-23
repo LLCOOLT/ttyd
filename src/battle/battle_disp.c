@@ -12,6 +12,7 @@
 #include "data/item_data.h"
 #include "system.h"
 #include <string.h>
+#include "icon_ids.h"
 
 f32 BattleGetFloorHeight(BattleWork* wp, f32 x, f32 y, f32 z);
 
@@ -368,7 +369,7 @@ void btlDispMain(void) {
 			target = BattleGetUnitPtr(wp, unit->work[0]);
 			if (target) {
 				if (target->attackEventId && evtCheckID(target->attackEventId)) {
-					if (!(UNF(target, u32, 0x2A8) & 4)) goto next;
+					if (!(UNF(target, u32, BUOFF(0x2A8)) & 4)) goto next;
 				}
 				if (target->damageEventId && evtCheckID(target->damageEventId)) goto next;
 				BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
@@ -1347,13 +1348,13 @@ void _btlStockExpDisp(CameraId camId, void* param) {
 			Vec pos = {0.0f, 0.0f, -100.0f};
 			pos.x = 308.0f + x - 3.5f - 13.0f * i;
 			pos.y = y - 220.0f;
-			iconDispGx(&pos, 0x10, 0x18C, 0.35f);
+			iconDispGx(&pos, 0x10, ICON_18C, 0.35f);
 		}
 		for (i = 0; i < tens; i++) {
 			Vec pos = {0.0f, 0.0f, -100.0f};
 			pos.x = 4.0f + (308.0f + x - 10.0f - 20.0f * i);
 			pos.y = 16.0f + (y - 220.0f);
-			iconDispGx(&pos, 0x10, 0x18C, 0.5f);
+			iconDispGx(&pos, 0x10, ICON_18C, 0.5f);
 		}
 	}
 }

@@ -19,6 +19,11 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "icon_ids.h"
+#include "version.h"
+// US battle texture ids are 0x16 higher for these entries.
+#define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
+
 
 extern BattleWork* _battleWorkPointer;
 
@@ -884,15 +889,15 @@ static void disp_2D(CameraId cam, void* param) {
     if (w->gaugeState >= 2 && w->gaugeState <= 5) {
         col = (GXColor){0xFF, 0xFF, 0xFF, w->alpha};
         PSMTXTrans(m, w->gaugePos.x - 0.5f * w->gaugeW - 8.0f, w->gaugePos.y, w->gaugePos.z);
-        TEXPLANE(m, 0x43, col);
+        TEXPLANE(m, BTL_TEX(0x43), col);
         PSMTXScale(sc, w->gaugeW / 4.0f, 1.0f, 1.0f);
         PSMTXTrans(tr, w->gaugePos.x, w->gaugePos.y, w->gaugePos.z);
         PSMTXConcat(tr, sc, m);
-        TEXPLANE(m, 0x44, col);
+        TEXPLANE(m, BTL_TEX(0x44), col);
         PSMTXScale(sc, -1.0f, 1.0f, 1.0f);
         PSMTXTrans(tr, 8.0f + (0.5f * w->gaugeW + w->gaugePos.x), w->gaugePos.y, w->gaugePos.z);
         PSMTXConcat(tr, sc, m);
-        TEXPLANE(m, 0x43, col);
+        TEXPLANE(m, BTL_TEX(0x43), col);
     }
     if (w->gaugeState >= 2 && w->gaugeState <= 5) {
         ratio = w->cursor / w->gaugeLen;
@@ -915,12 +920,12 @@ static void disp_2D(CameraId cam, void* param) {
                 PSMTXScale(sc, 0.75f, 0.75f, 0.75f);
                 PSMTXTrans(tr, x, 40.0f + (w->offsetY + (w->gaugePos.y - 18.0f + t->off.y)), w->gaugePos.z + t->off.z);
                 PSMTXConcat(tr, sc, m);
-                iconDispGxCol(m, 0x10, 0x95, col);
+                iconDispGxCol(m, 0x10, ICON_095, col);
             } else if (t->type == 2) {
                 PSMTXScale(sc, 1.0f, 1.0f, 1.0f);
                 PSMTXTrans(tr, x, 40.0f + (w->offsetY + (w->gaugePos.y + t->off.y)), w->gaugePos.z + t->off.z);
                 PSMTXConcat(tr, sc, m);
-                TEXPLANE(m, 0x2C, col);
+                TEXPLANE(m, BTL_TEX(0x2C), col);
             }
         }
         for (i = 0; i < 8; i++) {
@@ -937,9 +942,9 @@ static void disp_2D(CameraId cam, void* param) {
                     {
                         s32 id;
                         if (w->cursor >= t->pos - 7.0f) {
-                            id = 0x95;
+                            id = ICON_095;
                         } else {
-                            id = 0x91;
+                            id = ICON_091;
                         }
                         iconDispGxCol(m, 0x10, id, col);
                     }
@@ -947,7 +952,7 @@ static void disp_2D(CameraId cam, void* param) {
                     PSMTXScale(sc, 1.0f, 1.0f, 1.0f);
                     PSMTXTrans(tr, x, w->offsetY + (w->gaugePos.y + t->off.y), w->gaugePos.z + t->off.z);
                     PSMTXConcat(tr, sc, m);
-                    TEXPLANE(m, 0x2C, col);
+                    TEXPLANE(m, BTL_TEX(0x2C), col);
                 }
             }
             PSMTXScale(sc, 1.0f, 1.0f, 1.0f);
@@ -957,10 +962,10 @@ static void disp_2D(CameraId cam, void* param) {
             case 0:
                 break;
             case 1:
-                TEXPLANE(m, 0x3E, col);
+                TEXPLANE(m, BTL_TEX(0x3E), col);
                 break;
             case 2:
-                TEXPLANE(m, 0x3F, col);
+                TEXPLANE(m, BTL_TEX(0x3F), col);
                 break;
             }
         }

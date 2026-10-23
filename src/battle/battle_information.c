@@ -44,7 +44,11 @@ s32 BattleInformationGetResult(FieldBattleInfo* info) {
 	return info->result;
 }
 typedef struct ItemHogTable {
+#ifdef VERSION_G8ME01
+	ItemType items[25];
+#else
 	ItemType items[20];
+#endif
 } ItemHogTable;
 
 const ItemHogTable N_item_hog_table = {
@@ -170,10 +174,19 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 				if (i >= 8) {
 					setup->itemDropped = 0;
 				}
-			} else if (pouchEquipCheckBadge(ITEM_ITEM_HOG) >= 1) {
+			}
+#ifndef VERSION_G8ME01
+			else if (pouchEquipCheckBadge(ITEM_ITEM_HOG) >= 1) {
 				hog = N_item_hog_table;
 				setup->itemDropped = hog.items[irand(20)];
 			}
+#endif
 			break;
 	}
+#ifdef VERSION_G8ME01
+	if (setup->itemDropped == 0 && pouchEquipCheckBadge(ITEM_ITEM_HOG) >= 1) {
+		hog = N_item_hog_table;
+		setup->itemDropped = hog.items[irand(25)];
+	}
+#endif
 }

@@ -1,9 +1,15 @@
+#ifdef VERSION_G8ME01
+#include "mario/mariost.h"
+#endif
 #include "eff/eff_irekaeru.h"
 #include "driver/animdrv.h"
 #include "driver/dispdrv.h"
 #include "mario/mariost.h"
 #include "memory.h"
 #include <dolphin/mtx.h>
+#ifdef VERSION_G8ME01
+const char* eff_irekae_str_tbl[6] = {"EFF_Irekae", "EFF_Irekae", "EFF_Irekae_D", "EFF_Irekae_F_Sp", "EFF_Irekae_F_Sp", "EFF_Irekae_I"};
+#endif
 
 typedef struct EffIrekaeruWork {
     s32 type;       // 0x0
@@ -44,7 +50,11 @@ void effIrekaeruMain(EffectEntry* effect) {
     BOOL inBattle;
 
     position = (Vec){ work->position.x, work->position.y, work->position.z };
+#ifdef VERSION_G8ME01
+    inBattle = !!gp->inBattle;
+#else
     inBattle = gp->inBattle != 0;
+#endif
 
     // soft delete
     if (effect->flags & 4) {
@@ -57,10 +67,18 @@ void effIrekaeruMain(EffectEntry* effect) {
     }
     switch (work->state) {
         case 0:
+#ifdef VERSION_G8ME01
+            if (!animGroupBaseAsync(eff_irekae_str_tbl[gp->language], inBattle, NULL)) {
+#else
             if (!animGroupBaseAsync("EFF_Irekae", inBattle, NULL)) {
+#endif
                 return;
             }
+#ifdef VERSION_G8ME01
+            work->poseId = animPoseEntry(eff_irekae_str_tbl[gp->language], (u32)inBattle);
+#else
             work->poseId = animPoseEntry("EFF_Irekae", (u32)inBattle);
+#endif
             animPoseSetAnim(work->poseId, "Z_1", TRUE);
             work->state++;
             break;

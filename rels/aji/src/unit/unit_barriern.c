@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -113,7 +114,7 @@ extern s32 btlevtcmd_get_turn[];
 extern s32 btlevtcmd_snd_se[];
 extern s32 evt_snd_sfxoff[];
 extern s32 subsetevt_confuse_flustered[];
-extern s32 unit_barriern_satellite_2_data_3D950[];
+extern s32 unit_barriern_satellite[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_barriern_negone_one_374;
@@ -130,7 +131,7 @@ __declspec(section ".data") s32 fd_barriern___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_barriern_one_negone_359;
 __declspec(section ".data") s32 fd_barriern___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_barriern_one_364[1];
-BattleUnitKind unit_barriern_2_data_3A830;
+BattleUnitKind unit_barriern;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static BattleUnitKindPart parts[11];
@@ -228,7 +229,7 @@ __declspec(section ".data") s32 fd_barriern_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_barriern_2_data_3A830 = {
+BattleUnitKind unit_barriern = {
     29,
     "btl_un_barriern",
     3,
@@ -318,7 +319,7 @@ static s32 weapon_wakka_attack[] = {
     0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
     2, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 135, 2047, 8196,
+    0, 17830496, 536870912, 770, 0, VERSION_PICK(135, 199), 2047, 8196,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 100, 0, 0,
 };
@@ -327,13 +328,13 @@ static s32 weapon_wawawa_attack[] = {
     0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
     1, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 135, 2047, -2147475456,
+    0, 34607712, 536870912, 770, 0, VERSION_PICK(135, 199), 2047, -2147475456,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 100, 0, 0,
 };
 
 static __declspec(section ".data") s32 entry_barriern_satellite[] = {
-    (s32)unit_barriern_satellite_2_data_3D950, 16777216, 67108868, 1148846080, 0, 1148846080, 0, 0,
+    (s32)unit_barriern_satellite, 16777216, 67108868, 1148846080, 0, 1148846080, 0, 0,
     0, 0, 0, 0,
 };
 
@@ -1237,7 +1238,7 @@ static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, s32* table) {
     if (unit->work[4 + n] == -1) {
         return FALSE;
     }
-    sp = __memAlloc(HEAP_BATTLE, sizeof(BarriernSpline));
+    sp = BTL_ALLOC(sizeof(BarriernSpline));
     unit->work[10 + n] = (s32)sp;
     sp->n = 5;
     sp->table = table;
@@ -1262,7 +1263,7 @@ static u8 barriernSatelliteTo_Main(BattleUnit* unit, s32 n) {
     }
     if (sp->count >= 60) {
         if (sp != NULL) {
-            __memFree(HEAP_BATTLE, sp);
+            BTL_FREE(sp);
             unit->work[10 + n] = 0;
         }
         return FALSE;

@@ -80,7 +80,7 @@ __declspec(section ".data") s32 fd_dark_keeper___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_dark_keeper_one_negone_359;
 __declspec(section ".data") s32 fd_dark_keeper___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_dark_keeper_one_364[1];
-BattleUnitKind unit_dark_keeper_28_data_1DE40;
+BattleUnitKind unit_dark_keeper;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -147,7 +147,7 @@ __declspec(section ".data") s32 fd_dark_keeper_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_dark_keeper_28_data_1DE40 = {
+BattleUnitKind unit_dark_keeper = {
     55,
     "btl_un_dark_keeper",
     20,

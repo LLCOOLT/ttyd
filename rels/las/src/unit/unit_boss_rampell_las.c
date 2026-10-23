@@ -95,9 +95,9 @@ static USER_FUNC(vivian_comeback);
 static USER_FUNC(eff_scanning);
 extern s32 battle_evt_majo_disp_off[];
 extern s32 battle_evt_majo_disp_on[];
-extern s32 btl_majolyne_zoom_17_data_5C2D4[];
-extern s32 btl_marilyn_zoom_17_data_5C2B8[];
-extern s32 btl_vivian_zoom_17_data_5C29C[];
+extern s32 btl_majolyne_zoom[];
+extern s32 btl_marilyn_zoom[];
+extern s32 btl_vivian_zoom[];
 extern s32 btl_yoshi_yoroyoro_jump_calc_param[];
 extern s32 btl_yoshi_yoroyoro_jump_move[];
 extern s32 btldefaultevt_Confuse[];
@@ -144,7 +144,7 @@ extern s32 evt_sub_intpl_init[];
 extern s32 evt_sub_intpl_init_float[];
 extern s32 evt_sub_intpl_msec_get_value_para[];
 extern s32 evt_sub_intpl_msec_init[];
-extern s32 majo_unison_phase_event_17_data_5C5E4[];
+extern s32 majo_unison_phase_event[];
 extern s32 pose_table_christine_stay[];
 extern s32 pose_table_chuchurina_stay[];
 extern s32 pose_table_clauda_stay[];
@@ -604,13 +604,13 @@ static EVT_BEGIN(entry_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     WAIT_FRAMES(60)
     WAIT_FRAMES(60)
-    CALL_CHILD(PTR(btl_majolyne_zoom_17_data_5C2D4))
+    CALL_CHILD(PTR(btl_majolyne_zoom))
     CALL(evt_msg_print, 2, STRING("btl_majo3_00"), 0, GW(8))
     WAIT_MS(300)
-    CALL_CHILD(PTR(btl_marilyn_zoom_17_data_5C2B8))
+    CALL_CHILD(PTR(btl_marilyn_zoom))
     CALL(evt_msg_print, 2, STRING("btl_majo3_01"), 0, GW(9))
     WAIT_MS(300)
-    CALL_CHILD(PTR(btl_vivian_zoom_17_data_5C29C))
+    CALL_CHILD(PTR(btl_vivian_zoom))
     CALL(evt_msg_print, 2, STRING("btl_majo3_02"), 0, -2)
     WAIT_MS(300)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
@@ -656,10 +656,10 @@ static s32 dead_event[] = {
     65545, 1, 6, 65540, 99, 65572, 2, 65570,
     -49999988, 65572, 0, 65572, 1, 65541, 0, 131096,
     -49999988, 2, 7, 33, 65545, 1, 6, 65540,
-    99, 65572, 2, 131163, (s32)btlevtcmd_StatusWindowOnOff, 0, 65630, (s32)btl_vivian_zoom_17_data_5C29C,
+    99, 65572, 2, 131163, (s32)btlevtcmd_StatusWindowOnOff, 0, 65630, (s32)btl_vivian_zoom,
     327771, (s32)evt_msg_print, 2, (s32)"btl_majo3_13", 0, -2, 131163, (s32)btlevtcmd_StatusWindowOnOff,
     1, 65540, 90, 49, 49, 131163, (s32)btlevtcmd_StatusWindowOnOff, 0,
-    65630, (s32)btl_vivian_zoom_17_data_5C29C, 327771, (s32)evt_msg_print, 2, (s32)"btl_majo3_10", 0, -2,
+    65630, (s32)btl_vivian_zoom, 327771, (s32)evt_msg_print, 2, (s32)"btl_majo3_10", 0, -2,
     131163, (s32)btlevtcmd_StatusWindowOnOff, 1, 65539, 90, 196699, (s32)evt_btl_camera_set_mode, 0,
     0, 65539, 99, 131122, -49999987, 2, 131122, -29999990,
     -2, 65630, (s32)subsetevt_dead_core_nospin_norotate, 2, 1,
@@ -669,7 +669,7 @@ static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
     IF_INT_NOT_EQUAL(LW(0), 0)
         DEBUG_PUT_MSG(STRING("ランペル　ユニゾンフェーズ"))
-        CALL_CHILD(PTR(majo_unison_phase_event_17_data_5C5E4))
+        CALL_CHILD(PTR(majo_unison_phase_event))
         CALL(btlevtcmd_GetUnitWork, -2, 4, LW(3))
         CALL(btlevtcmd_GetUnitWork, -2, 5, LW(4))
         IF_INT_NOT_EQUAL(LW(3), LW(4))
@@ -2473,6 +2473,22 @@ static USER_FUNC(vivian_comeback) {
     pouchGetPtr()->partyData[6].flags &= ~2;
     return 1;
 }
+
+#ifdef VERSION_G8ME01
+// US only: restore the moves of the unit for this turn.
+USER_FUNC(boss_rampell_las_sync_max_moves) {
+    BattleUnit* unit;
+    s32 id = evtGetValue(event, event->args[0]);
+
+    id = BattleTransID(event, id);
+    unit = BattleGetUnitPtr(_battleWorkPointer, id);
+
+    if (unit != NULL) {
+        unit->maxMovesThisTurn = unit->movesRemaining;
+    }
+    return EVT_RETURN_DONE;
+}
+#endif
 static USER_FUNC(_krb_get_dir) {
     s32* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);

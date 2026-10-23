@@ -471,10 +471,33 @@ void itemModeChange(ItemEntry* entry, s32 mode) {
 	entry->subState = 0;
 }
 
+#ifdef VERSION_G8ME01
+static inline ItemEntry* itemFindDeletable(ItemWork* wp, s32 itemId) {
+	ItemEntry* entry;
+	ItemEntry* found;
+	int i;
+
+	found = NULL;
+	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
+		if (entry->flags & 1 && entry->itemId == itemId && entry->flags & 0x400) {
+			found = entry;
+			break;
+		}
+	}
+	return found;
+}
+#endif
+
 ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z) {
 	ItemWork* wp = itemGetWork();
 	int i;
 	ItemEntry* entry;
+#ifdef VERSION_G8ME01
+	// FAKE: e/base and the explicit 0x79/0x7C search loops (0x7B uses the helper) steer register
+	// numbering: the search pointer must be a named local and the entries base a named web.
+	ItemEntry* e;
+	ItemEntry* base;
+#endif
 	BOOL isGswf, isLswf;
 	char itemName[8];
 
@@ -512,12 +535,46 @@ ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, 
 		}
 	}
 
+#ifdef VERSION_G8ME01
+	base = wp->entries;
+	for (entry = base, i = 0; i < wp->count; i++, entry++) {
+#else
 	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
+#endif
 		if (!(entry->flags & 1)) {
 			break;
 		}
 	}
 
+#ifdef VERSION_G8ME01
+	if (i >= wp->count) {
+		entry = NULL;
+		for (e = base, i = 0; i < wp->count; i++, e++) {
+			if (e->flags & 1 && e->itemId == 0x79 && e->flags & 0x400) {
+				entry = e;
+				break;
+			}
+		}
+		if (entry) {
+			itemDelete(entry->name);
+		}
+		else {
+			entry = NULL;
+			for (e = base, i = 0; i < wp->count; i++, e++) {
+				if (e->flags & 1 && e->itemId == 0x7C && e->flags & 0x400) {
+					entry = e;
+					break;
+				}
+			}
+			if (entry) {
+				itemDelete(entry->name);
+			}
+			else {
+				entry = itemFindDeletable(wp, 0x7B);
+				entry = NULL;
+			}
+		}
+#else
 	if (i >= wp->count) {
 		entry = wp->entries;
 		if (entry->flags & 1 && entry->itemId == 0x79 && entry->flags & 0x400) {
@@ -538,6 +595,7 @@ ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, 
 				}
 			}
 		}
+#endif
 		if (entry == NULL) {
 			return NULL;
 		}
@@ -765,6 +823,48 @@ ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range) {
 	return found;
 }
 
+#ifdef VERSION_G8ME01
+void evtMsgFmtStr(char* dst, const char* src);
+
+void winNameDisp(WinMgrEntry* win) {
+	ItemEntry* entry = win->param;
+	const char* name;
+	u16 width;
+	u16 lines;
+	char buffer[1024];
+
+	name = msgSearch(itemDataTable[entry->itemId].name);
+	if ((u32)gp->language == 0) {
+		if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+			sprintf(buffer, msgSearch("msg_window_badge_get"), name);
+		}
+		else {
+			sprintf(buffer, msgSearch("msg_window_item_get"), name);
+		}
+	}
+	else {
+		if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+			strcpy(buffer, msgSearch("msg_window_badge_get"));
+		}
+		else {
+			strcpy(buffer, msgSearch("msg_window_item_get"));
+		}
+		evtMsgFmtStr(buffer, name);
+	}
+	width = FontGetMessageWidthLine(buffer, &lines);
+	if (width + 20 > win->width) {
+		win->width = width + 20;
+		win->x = -win->width / 2;
+	}
+	win->height = win->description->height + lines * 24;
+	if (!winMgrAction(entry->winId[0])) {
+		FontDrawStart();
+		FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+		FontDrawMessage(-width / 2, win->y - 8, buffer);
+	}
+}
+
+#else
 void winNameDisp(WinMgrEntry* win) {
 	ItemEntry* entry = win->param;
 	const char* name;
@@ -790,6 +890,38 @@ void winNameDisp(WinMgrEntry* win) {
 	}
 }
 
+#endif
+
+#ifdef VERSION_G8ME01
+void winNameDisp2(WinMgrEntry* win) {
+	ItemEntry* entry = win->param;
+	const char* name;
+	u16 width;
+	u16 lines;
+	char buffer[1024];
+
+	name = msgSearch(itemDataTable[entry->itemId].name);
+	if ((u32)gp->language == 0) {
+		sprintf(buffer, msgSearch("msg_window_item_release"), name);
+	}
+	else {
+		strcpy(buffer, msgSearch("msg_window_item_release"));
+		evtMsgFmtStr(buffer, name);
+	}
+	width = FontGetMessageWidthLine(buffer, &lines);
+	if (width + 20 > win->width) {
+		win->width = width + 20;
+		win->x = -win->width / 2;
+	}
+	win->height = win->description->height + lines * 24;
+	if (!winMgrAction(entry->winId[0])) {
+		FontDrawStart();
+		FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+		FontDrawMessage(-width / 2, win->y - 8, buffer);
+	}
+}
+
+#else
 void winNameDisp2(WinMgrEntry* win) {
 	ItemEntry* entry = win->param;
 	const char* name;
@@ -809,6 +941,8 @@ void winNameDisp2(WinMgrEntry* win) {
 		FontDrawMessage(-width / 2, win->y - 8, buffer);
 	}
 }
+
+#endif
 
 void winHelpMain(WinMgrEntry* win) {
 	winMgrHelpMain(win);
@@ -1006,7 +1140,11 @@ void itemseq_GetItem(ItemEntry* entry) {
 				winMgrSetParam(entry->winId[2], entry);
 			}
 			if (entry->itemId == 0x49) {
+#ifdef VERSION_G8ME01
+				iconChange(entry->name, 0x11B);
+#else
 				iconChange(entry->name, 0x114);
+#endif
 			}
 			if (!entry->effect) {
 				iconNameToPtr(entry->name)->uflags |= 0x80;
@@ -1058,7 +1196,11 @@ void itemseq_GetItem(ItemEntry* entry) {
 			marioSetCamId(4);
 			iconFlagOff(entry->name, 0x100);
 			if (entry->itemId == 0x49) {
+#ifdef VERSION_G8ME01
+				iconChange(entry->name, 0x11C);
+#else
 				iconChange(entry->name, 0x115);
+#endif
 			}
 			if (!entry->effect) {
 				iconNameToPtr(entry->name)->uflags &= ~0x80;
@@ -1265,6 +1407,11 @@ void itemseq_Bound(ItemEntry* entry) {
 								}
 								break;
 						}
+#ifdef VERSION_G8ME01
+						if (!strcmp(gp->currentMapName, "aji_03")) {
+							entry->direction = irand(90);
+						}
+#endif
 					}
 					else {
 						entry->direction = _move_dir;

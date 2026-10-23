@@ -251,7 +251,11 @@ static __declspec(section ".data") PoseTableEntry pose_table[] = {
 };
 
 s32 _lec_weapon_jump[] = {
+#ifdef VERSION_G8ME01
+    (s32)"btl_wn_mario_normal_jump", 10944512, 0, (s32)"msg_normal_jump", 1677721600, 1065353216, 16868402, (s32)weaponGetPowerFromMarioJumpLv,
+#else
     (s32)"btl_wn_mario_normal_jump", 10420224, 0, (s32)"msg_normal_jump", 1677721600, 1065353216, 16868402, (s32)weaponGetPowerFromMarioJumpLv,
+#endif
     1, 1, 2, 2, 3, 3, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 16781920, 536875012, 770, (s32)"msg_ac_jump", 219143, 12, -2147475452,
@@ -260,7 +264,11 @@ s32 _lec_weapon_jump[] = {
 };
 
 s32 _lec_weapon_hammer[] = {
+#ifdef VERSION_G8ME01
+    (s32)"btl_wn_mario_normal_hammer", 10747904, 0, (s32)"msg_normal_hammer", 1677721600, 1065353216, 16868402, (s32)weaponGetPowerFromMarioHammerLv,
+#else
     (s32)"btl_wn_mario_normal_hammer", 10223616, 0, (s32)"msg_normal_hammer", 1677721600, 1065353216, 16868402, (s32)weaponGetPowerFromMarioHammerLv,
+#endif
     1, 2, 2, 4, 3, 6, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 16781920, 553656320, 770, (s32)"msg_ac_hammer", 198791, 2043, -2147475452,

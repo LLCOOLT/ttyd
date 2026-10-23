@@ -5,7 +5,7 @@
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_kagemario_init_14_text_4DB8);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_mapobj_rotate);
 USER_FUNC(evt_mobj_kururing_floor);
@@ -13,7 +13,7 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill_14_data_AF00[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_jin_03_negone_one_374;
 __declspec(section ".data") s32 fd_jin_03_neg_one_382[1];
@@ -190,11 +190,11 @@ EVT_BEGIN(jin_03_init_evt)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_JIN1"))
     CALL(evt_snd_set_rev_mode, 2)
-    CALL(evt_kagemario_init_14_text_4DB8)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_14_data_AF00))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     IF_INT_EQUAL(LSW(1), 0)
         SPAWN_EVENT(PTR(jin_03_kaidan_temae_kesu))
         SPAWN_EVENT(PTR(jin_03_kaidan_oku_kesu))

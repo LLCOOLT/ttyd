@@ -198,7 +198,7 @@ USER_FUNC(evt_map_blend_set_flag) {
     u32 flags = evtGetValue(event, args[2]);
     if (strcmp(name, "mario") == 0) {
         MarioWork* mp = marioGetPtr();
-        s32* poses = (s32*)((u8*)mp + 0x228);
+        s32* poses = (s32*)((u8*)mp + MWOFF(0x228));
         if (on == 1) {
             if (poses[0] != -1) animPoseSetMaterialFlagOn(poses[0], flags);
             if (poses[1] != -1) animPoseSetMaterialFlagOn(poses[1], flags);

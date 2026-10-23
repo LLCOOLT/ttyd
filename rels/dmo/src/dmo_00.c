@@ -128,7 +128,11 @@ static s32 koushukei_dai[63];
 s32 roten_move[25];
 s32 kuribo_move[25];
 s32 chusan_move[25];
+#ifdef VERSION_G8ME01
+s32 dmo_00_init_evt[268];
+#else
 s32 dmo_00_init_evt[262];
+#endif
 
 USER_FUNC(demo_init) {
     if (isFirstCall) {
@@ -1100,6 +1104,72 @@ EVT_BEGIN(chusan_move)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(dmo_00_init_evt)
+    CALL(demo_init)
+    CALL(evt_npc_entry, STRING("peach"), STRING("c_peach"))
+    CALL(evt_npc_set_tribe, STRING("peach"), STRING("デモピーチ標準2"))
+    CALL(evt_npc_set_ry, STRING("peach"), 90)
+    CALL(evt_npc_set_position, STRING("peach"), -2, 0, 550)
+    CALL(evt_npc_status_onoff, 1, STRING("peach"), 2)
+    CALL(evt_npc_flag_onoff, 1, STRING("peach"), 1074267648)
+    CALL(evt_npc_entry, STRING("nazo"), STRING("c_nazo"))
+    CALL(evt_npc_set_tribe, STRING("nazo"), STRING("謎の人"))
+    CALL(evt_npc_set_ry, STRING("nazo"), 90)
+    CALL(evt_npc_set_position, STRING("nazo"), -145, 0, 450)
+    CALL(evt_npc_status_onoff, 1, STRING("nazo"), 2)
+    CALL(evt_npc_flag_onoff, 1, STRING("nazo"), 1074266112)
+    CALL(evt_npc_set_height, STRING("nazo"), 40)
+    CALL(evt_npc_entry, STRING("hako"), STRING("MOBJ_GoldenTreasureBox"))
+    CALL(evt_npc_set_anim, STRING("hako"), STRING("S_1"))
+    CALL(evt_npc_set_position, STRING("hako"), -125, 0, 450)
+    CALL(evt_npc_flag_onoff, 1, STRING("hako"), 1073741824)
+    CALL(evt_npc_pera_onoff, STRING("hako"), 0)
+    CALL(evt_mobj_itembox, STRING("hako"), 340, 110, -20, 1, 0, 0, 0)
+    CALL(evt_mobj_flag_onoff, 1, STRING("hako"), 16384)
+    CALL(evt_npc_entry, STRING("ロテン１"), STRING("c_roten"))
+    CALL(evt_npc_set_tribe, STRING("ロテン１"), STRING("ロテン"))
+    CALL(evt_npc_flag_onoff, 1, STRING("ロテン１"), 1074267648)
+    CALL(evt_npc_status_onoff, 1, STRING("ロテン１"), 2)
+    CALL(evt_npc_change_interrupt, STRING("ロテン１"), 1, PTR(roten_move))
+    CALL(evt_npc_entry, STRING("クリボー１"), STRING("c_kuribo_n"))
+    CALL(evt_npc_set_tribe, STRING("クリボー１"), STRING("NPCクリボー"))
+    CALL(evt_npc_flag_onoff, 1, STRING("クリボー１"), 1074267648)
+    CALL(evt_npc_status_onoff, 1, STRING("クリボー１"), 2)
+    CALL(evt_npc_change_interrupt, STRING("クリボー１"), 1, PTR(kuribo_move))
+    CALL(evt_npc_entry, STRING("チューさん１"), STRING("c_tyusan"))
+    CALL(evt_npc_set_tribe, STRING("チューさん１"), STRING("チューさん"))
+    CALL(evt_npc_flag_onoff, 1, STRING("チューさん１"), 1074267648)
+    CALL(evt_npc_status_onoff, 1, STRING("チューさん１"), 2)
+    CALL(evt_npc_change_interrupt, STRING("チューさん１"), 1, PTR(chusan_move))
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(evt_party_cont_onoff, 0, 0)
+    CALL(evt_mario_set_pos, 0, -1000, 0)
+    CALL(evt_party_set_pos, 0, 0, -1000, 0)
+    CALL(evt_paper_entry, STRING("OFF_d_meku_right"))
+    CALL(evt_cam3d_evt_set, 0, 385, 1473, 0, 100, 0, 0, 11)
+    CALL(evt_cam_letter_box_onoff, 1, 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S"), 1)
+    CALL(evt_bg_disp_onoff, 0)
+    CALL(evt_npc_flag_onoff, 1, STRING("peach"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("nazo"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("hako"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("ロテン１"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("クリボー１"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("チューさん１"), 128)
+    BEGIN_INLINE_EVENT_GET_ID(GW(0))
+        SET_TYPE(0)
+        CALL(demo_draw)
+    END_INLINE_EVENT
+    SPAWN_EVENT(PTR(demo_evt))
+    SPAWN_EVENT(PTR(koushukei_dai))
+    BEGIN_INLINE_EVENT
+        CALL(evt_sub_animgroup_async, STRING("OFF_d_maku_center"))
+    END_INLINE_EVENT
+    CALL(evt_fade_set_mapchange_type, 1, -1, -1, -1, 900)
+    RETURN
+EVT_END()
+#else
 s32 dmo_00_init_evt[] = {
     65627, (s32)demo_init, 196699, (s32)evt_npc_entry, (s32)"peach", (s32)"c_peach", 196699, (s32)evt_npc_set_tribe,
     (s32)"peach", (s32)/*"デモピーチ標準2"*/"\x83\x66\x83\x82\x83\x73\x81\x5B\x83\x60\x95\x57\x8F\x80\x32", 196699, (s32)evt_npc_set_ry, (s32)"peach", 90, 327771, (s32)evt_npc_set_position,
@@ -1135,4 +1205,5 @@ s32 dmo_00_init_evt[] = {
     (s32)demo_draw, 109, 65628, (s32)demo_evt, 65628, (s32)koushukei_dai, 107, 131163,
     (s32)evt_sub_animgroup_async, (s32)"OFF_d_maku_center", 109, 2, 1, 0,
 };
+#endif
 

@@ -12,6 +12,18 @@ float cosf(float);
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
+#ifdef VERSION_G8ME01
+#define PSND_FPS gp->framerate
+#define PSND_FRAME_MS (1000.0f / gp->framerate)
+#define PSND_FADE45 (750.0f / PSND_FRAME_MS)
+#define PSND_SET_FADE(w) ((w)->sfxFadeTime = (w)->sfxFadeMax = PSND_FADE45)
+#else
+#define PSND_FPS 60
+#define PSND_FRAME_MS 16.666666f
+#define PSND_FADE45 45
+#define PSND_SET_FADE(w) ((w)->sfxFadeMax = PSND_FADE45, (w)->sfxFadeTime = PSND_FADE45)
+#endif
+
 typedef struct SoundBGMEntry { const char* name; u32 flags; const char* path; u32 unkC; } SoundBGMEntry;
 //TODO: put this in a folder?
 
@@ -5249,8 +5261,7 @@ void psndStopAllFadeOut(void) {
 		}
 	}
 	wp->sfxFadeState = 2;
-	wp->sfxFadeMax = 45;
-	wp->sfxFadeTime = 45;
+	PSND_SET_FADE(wp);
 }
 
 void psndSetReverb(s32 mode) {
@@ -5312,8 +5323,7 @@ void psndSFXAllOff(void) {
 	}
 	if (wp->sfxFadeState != 2) {
 		wp->sfxFadeState = 2;
-		wp->sfxFadeMax = 45;
-		wp->sfxFadeTime = 45;
+		PSND_SET_FADE(wp);
 	}
 }
 
@@ -5713,7 +5723,7 @@ BOOL psndBGMOn_f_d(u32 flags, char *bgm_name, u32 fadetime, u32 fadeout, s32 r7)
         if (fl & 0x100)
         {
           fade2->state = 1;
-          fade2->time = ft / 16.666666f;
+          fade2->time = ft / PSND_FRAME_MS;
           fade2->timeMax = 0;
         }
         else
@@ -5725,7 +5735,7 @@ BOOL psndBGMOn_f_d(u32 flags, char *bgm_name, u32 fadetime, u32 fadeout, s32 r7)
         if ((fl & 0x80) && (fade2->dipState == 8))
         {
           fade2->dipState = 0x10;
-          fade2->dipTimeMax = ft / 16.666666f;
+          fade2->dipTimeMax = ft / PSND_FRAME_MS;
           fade2->dipTime = (fade2->dipTimeMax * fade2->dipPercent) / 100;
           if (fl & 0x40)
           {
@@ -5831,7 +5841,7 @@ BOOL psndBGMOn_f_d(u32 flags, char *bgm_name, u32 fadetime, u32 fadeout, s32 r7)
   if (fl & 0x100)
   {
     fade2->state = 1;
-    fade2->time = ft / 16.666666f;
+    fade2->time = ft / PSND_FRAME_MS;
     fade2->timeMax = 0;
     fade2->dipState = 0;
     fade2->dipTimeMax = 1;
@@ -5891,7 +5901,7 @@ BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
 		}
 		else if (fade->state != 4) {
 			fade->state = 2;
-			fade->time = fadetime / 16.666666f;
+			fade->time = fadetime / PSND_FRAME_MS;
 			fade->timeMax = fade->time;
 		}
 		else {
@@ -5901,7 +5911,7 @@ BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
 	else if (flags & 0x400) {
 		if (fade->state != 2 && fade->state != 4) {
 			fade->state = 4;
-			fade->time = fadetime / 16.666666f;
+			fade->time = fadetime / PSND_FRAME_MS;
 			fade->timeMax = fade->time;
 		}
 	}
@@ -5909,7 +5919,7 @@ BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
 		if (fade->dipState != 8) {
 			fade->dipState = 8;
 			fade->dipPercent = silent;
-			fade->dipTimeMax = fadetime / 16.666666f;
+			fade->dipTimeMax = fadetime / PSND_FRAME_MS;
 			fade->dipTime = fade->dipTimeMax;
 			if ((flags & 0x40) || (gp->flags & 1)) {
 				bgm->flags |= 0x40;
@@ -6443,7 +6453,7 @@ s32 __psndSFXOn(const char *name, u8 vol, u8 pan, u16 pitch, Vec *pos, u32 r8, u
   sfx->unk8 = vol;
   sfx->unk9 = entry->field_0xC;
   sfx->unkA = pan;
-  sfx->unkE = entry->field_0x11 + ((pitch / 16.666666f) + delay);
+  sfx->unkE = entry->field_0x11 + ((pitch / PSND_FRAME_MS) + delay);
   sfx->unk10 = delay * 5;
   sfx->unkB = entry->field_0xF;
   sfx->unkC = entry->field_0x10;
@@ -6661,7 +6671,7 @@ typedef struct EnvF_ {
 	u8 state, u1; s16 time, timeMax; u8 u6, u7; s16 u8_, uA;
 } EnvF_;
 #define ENVVOL(e, p, out) 	{ 		EnvF_* f = NULL; 		s16 v; 		if ((p)->envId[0] == (e)->id) f = (EnvF_*)&(p)->fade[0]; 		if ((p)->envId[1] == (e)->id) f = (EnvF_*)&(p)->fade[1]; 		if (f == NULL) out = (e)->f6 * (p)->envVolume / 100; 		else { 			if (f->u6 == 0) v = 0x7f; else v = f->uA * 0x7f / f->u8_; 			if (f->state == 0) out = (p)->envVolume * ((e)->f6 * v / 127) / 100; 			else { 				{ s16 w = f->timeMax * ((e)->f6 * v / 127) / f->time; out = w * (p)->envVolume / 100; } 			} 		} 	}
-#define ENVDONE(e) 	{ 		(e)->sfx = -1; 		(e)->state = 0; 		(e)->fE = 0; 		switch ((e)->type) { 		case 0: (e)->fE = (e)->fA * 60; (e)->fE += irand((e)->f9) * 60; break; case 2: (e)->fE = (e)->fA * 60; (e)->fE += irand((e)->f9) * 60; break; case 3: break; 		} 	}
+#define ENVDONE(e) 	{ 		(e)->sfx = -1; 		(e)->state = 0; 		(e)->fE = 0; 		switch ((e)->type) { 		case 0: (e)->fE = (e)->fA * PSND_FPS; (e)->fE += irand((e)->f9) * PSND_FPS; break; case 2: (e)->fE = (e)->fA * PSND_FPS; (e)->fE += irand((e)->f9) * PSND_FPS; break; case 3: break; 		} 	}
 #pragma dont_inline on
 void psndENVMain(void) {
 	char* B = (char*)_buf;
@@ -6867,7 +6877,7 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 r6) {
 			if (flags & 0x20) {
 				if (flags & 0x100) {
 					fade->state = 1;
-					fade->time = fadetime / 16.666666f;
+					fade->time = fadetime / PSND_FRAME_MS;
 					fade->timeMax = 0;
 				}
 				else {
@@ -6878,7 +6888,7 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 r6) {
 				if (flags & 0x80) {
 					if (fade->dipState == 8) {
 						fade->dipState = 0x10;
-						fade->dipTimeMax = fadetime / 16.666666f;
+						fade->dipTimeMax = fadetime / PSND_FRAME_MS;
 						fade->dipTime = fade->dipTimeMax * fade->dipPercent / 100;
 					}
 				}
@@ -6911,12 +6921,12 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 r6) {
 		e->fE = 0;
 		switch (e->f8) {
 		case 0:
-			e->fE = e->fA * 60;
-			e->fE += irand(e->f9) * 60;
+			e->fE = e->fA * PSND_FPS;
+			e->fE += irand(e->f9) * PSND_FPS;
 			break;
 		case 2:
-			e->fE = e->fA * 60;
-			e->fE += irand(e->f9) * 60;
+			e->fE = e->fA * PSND_FPS;
+			e->fE += irand(e->f9) * PSND_FPS;
 			break;
 		case 3:
 			break;
@@ -6928,7 +6938,7 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 r6) {
 	*(u16*)((u8*)psnd.envFreq + o) = 0x7D00;
 	if (flags & 0x100) {
 		fade->state = 1;
-		fade->time = fadetime / 16.666666f;
+		fade->time = fadetime / PSND_FRAME_MS;
 		fade->timeMax = 0;
 		fade->dipTimeMax = 1;
 		fade->dipTime = 1;
@@ -6951,7 +6961,11 @@ end:
 }
 #pragma dont_inline reset
 
+#ifndef VERSION_G8ME01
 #pragma dont_inline on
+#else
+#pragma dont_inline off
+#endif
 BOOL psndENVOff(u32 flags) {
 	return psndENVOff_f_d(flags, 1000, 0);
 }
@@ -6973,7 +6987,7 @@ BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 r5) {
 		}
 		else if (fade->state != 4) {
 			fade->state = 2;
-			fade->time = fadetime / 16.666666f;
+			fade->time = fadetime / PSND_FRAME_MS;
 			fade->timeMax = fade->time;
 		}
 		else {
@@ -6984,15 +6998,20 @@ BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 r5) {
 	else if (flags & 0x400) {
 		if (fade->state != 2 && fade->state != 4) {
 			fade->state = 4;
-			fade->time = fadetime / 16.666666f;
+			fade->time = fadetime / PSND_FRAME_MS;
 			fade->timeMax = fade->time;
 		}
 	}
 	else if (flags & 0x800) {
 		fade->dipState = 8;
-		fade->dipTimeMax = fadetime / 16.666666f;
+		fade->dipTimeMax = fadetime / PSND_FRAME_MS;
 		fade->dipTime = fade->dipTimeMax;
 		fade->dipPercent = silent;
+#ifdef VERSION_G8ME01
+		if (flags & 0x40) {
+			fade->dipTime = (fade->dipTimeMax * fade->dipPercent) / 100;
+		}
+#endif
 	}
 	else {
 		psndENV_stop(*(&psnd.envId[flags & 0xF]));

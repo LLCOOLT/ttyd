@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -24,6 +25,9 @@
 #include "data/mapdata.h"
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
+#ifdef VERSION_G8ME01
+extern s32 evt_memcard_save_wrapper[];
+#endif
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
@@ -126,6 +130,10 @@ extern s32 evt_memcard_save[];
 
 s32 end_credit_npc_parade[44];
 s32 end_image_blend_loop[123];
+#ifdef VERSION_G8ME01
+// US: "THE END" texture per language (indexed by gp->language)
+extern s32 end_overlay_tex_tbl[6];
+#endif
 s32 end_image_main_evt[187];
 s32 end_return_title_evt[49];
 s32 end_00_init_evt[63];
@@ -162,6 +170,11 @@ void _prolog(void) {
         (*ctor)();
     }
     relSetEvtAddr("end_00", end_00_init_evt);
+#ifdef VERSION_G8ME01
+    camGetPtr(CAMERA_2D)->flags |= 0x200;
+    camGetPtr(CAMERA_2D)->flags &= ~0x100;
+    camGetPtr(CAMERA_2D)->flags |= 0x400;
+#endif
 }
 
 void _epilog(void) {
@@ -171,6 +184,9 @@ void _epilog(void) {
         (*dtor)();
     }
     end_staff_roll_exit();
+#ifdef VERSION_G8ME01
+    camGetPtr(CAMERA_2D)->flags &= ~0x200;
+#endif
 }
 
 void _unresolved(void) {
@@ -222,6 +238,67 @@ USER_FUNC(evt_end_credit_npc_get_wait_type) {
 
 __declspec(section ".data") EndWork* end_wp = &end_work;
 
+#ifdef VERSION_G8ME01
+CreditMsg end_staff_roll_msg_tbl[] = {
+    0, 0, 0, 0, 0, 0, "a00", 0,
+    0, 0, 0, 1, 0, "a01", 0, "b00",
+    0, 0, 0, 0, 2, 0, "a02", 0,
+    "b01", 0, 0, 0, 0, 3, 0, 0,
+    0, "b02", "b03", 0, 0, 0, 4, 0,
+    "a03", 0, "b04", 0, 0, 0, 0, 5,
+    0, "a04", 0, "b05", 0, 0, 0, 0,
+    6, 0, "a05", 0, "b06", 0, 0, 0,
+    0, 7, 0, "a06", 0, "b07", 0, 0,
+    0, 0, 8, 0, "a07", 0, "b08", 0,
+    0, 0, 0, 9, 0, "a08", 0, "b09",
+    0, 0, 0, 0, 10, 0, 0, 0,
+    "b10", "b11", 0, 0, 1, 11, 0, "a09",
+    0, "b12", 0, 0, 0, 1, 12, 0,
+    0, 0, "b13", 0, 0, 0, 1, 13,
+    0, 0, 0, "b14", 0, 0, 0, 1,
+    14, 0, 0, 0, "b15", "b16", 0, 0,
+    1, 15, 0, "a10", 0, "b17", 0, 0,
+    0, 1, 16, 0, "a11", 0, "b18", 0,
+    0, 0, 1, 17, 0, "a12", 0, "b19",
+    0, 0, 0, 1, 18, 0, "a13", 0,
+    "b20", 0, 0, 0, 1, 19, 0, 0,
+    0, "b21", 0, 0, 0, 2, 20, 0,
+    "a14", 0, "b22", 0, 0, 0, 2, 21,
+    0, 0, 0, "b23", 0, 0, 0, 2,
+    22, 0, 0, 0, "b24", 0, 0, 0,
+    2, 23, 0, 0, 0, "b25", 0, 0,
+    0, 2, 24, 0, "a15", 0, "b26", 0,
+    0, 0, 2, 25, 0, 0, 0, "b27",
+    0, 0, 0, 2, 26, 0, "a17", 0,
+    "b28", 0, 0, 0, 2, 27, 0, 0,
+    0, "b29", 0, 0, 0, 2, 28, 0,
+    "a18", 0, "b30", 0, 0, 0, 2, 29,
+    0, 0, 0, "b31", "b32", 0, 0, 3,
+    30, 0, "a19", 0, "b33", 0, 0, 0,
+    3, 31, 0, "a20", 0, "b34", "b35", "b36",
+    0, 3, 32, 0, "a31", 0, "b73", "b74",
+    "b75", 0, 3, 33, 0, 0, 0, "b76",
+    "b77", "b92", 0, 3, 34, 0, "a36", 0,
+    "b78", "b79", 0, 0, 3, 35, 0, "a37",
+    0, "b80", "b81", 0, 0, 3, 36, 0,
+    "a21", 0, "b37", "b38", 0, 0, 3, 37,
+    0, 0, 0, "b39", "b40", "b41", 0, 3,
+    38, 0, 0, 0, "b46", "b47", 0, 0,
+    3, 39, 0, "a22", 0, "b48", "b49", 0,
+    0, 3, 40, 0, 0, 0, "b50", "b51",
+    0, 0, 0, 41, 0, "a23", 0, "b52",
+    "b53", "b84", 0, 0, 42, 0, "a25", 0,
+    "b55", "b86", 0, 0, 0, 43, 0, "a26",
+    0, "b88", "b89", "b56", 0, 0, 44, 0,
+    "a27", 0, "b57", 0, 0, 0, 0, 45,
+    0, "a28", 0, "b58", "b59", 0, 0, 0,
+    46, 0, 0, 0, "b60", "b61", 0, 0,
+    0, 47, 0, "a29", 0, "b62", "b63", 0,
+    0, 0, 48, 0, "a30", 0, "b64", 0,
+    0, 0, 4, 49, "c00", 0, 0, "c01",
+    0, 0,
+};
+#else
 CreditMsg end_staff_roll_msg_tbl[] = {
     0, 0, 0, 0, 0, 0, "a00", 0,
     0, 0, 0, 1, 0, "a01", 0, "b00",
@@ -281,6 +358,7 @@ CreditMsg end_staff_roll_msg_tbl[] = {
     0, 0, 4, 49, "c00", 0, 0, "c01",
     0, 0,
 };
+#endif
 
 CreditNpc R_credits_npc_info[] = {
     "c_luigi", "W_1", 0, "c_pkr", "PKR_W_1", 0, "c_kuri_h", "W_1",
@@ -308,7 +386,7 @@ CreditNpc R_credits_npc_info[] = {
     0, "c_sinemon", "SIN_W_1", 0, "c_paid", "PAI_W_1", 0, "c_m_boss",
     "W_1", 0, "c_m_buka", "W_1", 0, "c_m_waka", "W_1", 0,
     "c_m_ojo", "W_1", 0, "c_binbo", "W_1", 0, "c_monban", "W_1",
-    0, "c_bteresa", "BTS_W_1", 0, "c_babyyoshi", "PYS_W_1", 0, "c_ksikowa",
+    0, VERSION_PICK("c_bteresa", "c_bteresa2"), VERSION_PICK("BTS_W_1", "W_1"), 0, "c_babyyoshi", "PYS_W_1", 0, "c_ksikowa",
     "W_1", 0, "c_k_chof", "W_1", 0, "c_gans", "W_1", 0,
     "c_bred_h", "W_1", 0, "c_report", "W_1", 0, "c_hotdog", "W_1",
     0, "c_shasho_g", "W_1", 0, "c_jugem_n", "W_1", 0, "c_togezo",
@@ -421,6 +499,10 @@ USER_FUNC(evt_end_credit_npc_main) {
     }
     switch (actor->state) {
         case 0:
+#ifdef VERSION_G8ME01
+            actor->poseId = animPoseEntry(R_credits_npc_info[id].agb, inBattle);
+            animPoseSetAnim(actor->poseId, R_credits_npc_info[id].anim, 1);
+#else
             EXIGetType(0, 2, &type);
             if (type != 0x05070000) {
                 actor->poseId = animPoseEntry(R_credits_npc_info[id].agb, inBattle);
@@ -429,10 +511,15 @@ USER_FUNC(evt_end_credit_npc_main) {
                 actor->poseId = animPoseEntry("a_mario", inBattle);
                 animPoseSetAnim(actor->poseId, "M_W_1", 1);
             }
+#endif
             actor->state++;
             break;
         case 1:
+#ifdef VERSION_G8ME01
+            actor->angle += 9.0f / gp->framerate;
+#else
             actor->angle += 0.15f;
+#endif
             if (actor->angle > actor->limit) {
                 animPoseRelease(actor->poseId);
                 _mapFree(actor);
@@ -486,6 +573,10 @@ EVT_BEGIN(end_credit_npc_parade)
     END_LOOP
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01
+s32 end_overlay_tex_tbl[6] = {52, 52, 54, 55, 55, 56};
+#endif
 
 EVT_BEGIN(end_image_blend_loop)
     LOOP(0)
@@ -675,7 +766,11 @@ void end_image_disp(CameraId cameraId, void* param) {
         GXSetNumTevStages(1);
         GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
         GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+#ifdef VERSION_G8ME01
+        TEXGetGXTexObjFromPalette(*end_wp->tpl->data, &obj, end_overlay_tex_tbl[gp->language]);
+#else
         TEXGetGXTexObjFromPalette(*end_wp->tpl->data, &obj, 52);
+#endif
         GXLoadTexObj(&obj, GX_TEXMAP0);
         GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, end_wp->alpha2});
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
@@ -787,6 +882,24 @@ EVT_BEGIN(end_image_main_evt)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(end_return_title_evt)
+    CALL(evt_fade_entry, 12, 2000, 0, 0, 0)
+    CALL(evt_fade_end_wait)
+    WAIT_MS(1500)
+    SET_VALUE(GF(10), 1)
+    CALL(evt_end_font_restore)
+    SET_VALUE(GSW(0), 404)
+    SET_VALUE(LF(10), 0)
+    SET_VALUE(LW(0), 21)
+    CALL_CHILD(PTR(evt_memcard_save_wrapper))
+    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, 513, 2000)
+    CALL(evt_fade_set_mapchange_type, 1, 17, 2000, -1, -1)
+    CALL(evt_seq_set_seq, 3, STRING("title"), 0)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(end_return_title_evt)
     CALL(evt_fade_entry, 12, 2000, 0, 0, 0)
     CALL(evt_fade_end_wait)
@@ -803,6 +916,7 @@ EVT_BEGIN(end_return_title_evt)
     CALL(evt_seq_set_seq, 3, STRING("title"), 0)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(end_00_init_evt)
     CALL(evt_mario_cont_onoff, 0)
@@ -1218,9 +1332,11 @@ USER_FUNC(evt_end_staff_roll_init) {
         end_wp->mode = 0;
         end_wp->pos = 0;
         psndSetFlag(4);
+#ifndef VERSION_G8ME01
         gp->language = 1;
         JUTFont_Free();
         JUTFontSetup(1);
+#endif
     }
     if ((u32)fileAsyncf(4, NULL, "%s/ending.tpl", getMarioStDvdRoot()) == 0) {
         return 0;
@@ -1242,16 +1358,20 @@ USER_FUNC(evt_end_staff_roll_init) {
 void end_staff_roll_exit(void) {
     fileFree(end_wp->tpl);
     psndClearFlag(4);
+#ifndef VERSION_G8ME01
     gp->language = 0;
     JUTFont_Free();
     JUTFontSetup(0);
+#endif
 }
 #pragma dont_inline reset
 
 USER_FUNC(evt_end_font_restore) {
+#ifndef VERSION_G8ME01
     gp->language = 0;
     JUTFont_Free();
     JUTFontSetup(0);
+#endif
     psndClearFlag(4);
     return 2;
 }

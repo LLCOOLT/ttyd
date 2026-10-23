@@ -7,6 +7,10 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
+#include "version.h"
+// US effect texture ids are 0x1C lower for these entries.
+#define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
+
 
 double sin(double);
 double cos(double);
@@ -205,7 +209,7 @@ void effFallLeafDisp(CameraId cameraId, EffectEntry* effect) {
         default:
             PSMTXScale(scale, 0.03125f, 0.015625f, 1.0f);
             GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-            effGetTexObj(0x87, &texObj);
+            effGetTexObj(EFF_TEX(0x87), &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
             GXSetNumTevStages(1);
             GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);

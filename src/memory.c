@@ -1,3 +1,6 @@
+#ifndef VERSION_G8ME01
+#define MEMORY_C_DEFS
+#endif
 #include "memory.h"
 #include "system.h"
 #include <dolphin/os.h>
@@ -21,7 +24,21 @@ SmartWork smartWork;
 
 //.sdata
 //flag, size / 0x400 (>> 10)
-s32 size_table[6][2] = {
+#ifdef VERSION_G8ME01
+// US: no fixed battle heap (battle maps use a map sub-heap); the smart heap is index 4
+#define HEAP_COUNT 5
+#define SMART_HEAP 4
+s32 size_table[HEAP_COUNT][2] = {
+	{1, 0x1C84},
+	{1, 0xD90},
+	{1, 0xE0},
+	{1, 0x80},
+	{0, 0x64}
+};
+#else
+#define HEAP_COUNT 6
+#define SMART_HEAP 5
+s32 size_table[HEAP_COUNT][2] = {
 	{1, 0x1C84}, //0x721000, 7300 KiB/7.13 MiB
 	{1, 0xD90}, //0x364000, 3472 KiB/3.39 MiB
 	{1, 0xE0}, //0x38000, 224 KiB
@@ -29,20 +46,38 @@ s32 size_table[6][2] = {
 	{1, 0x100}, //0x40000, 256 KiB
 	{0, 0x64}
 };
+#endif
 static SmartWork* wp = &smartWork;
 #pragma force_active on
 __declspec(section ".sdata") u32 gap_07_8040F50C_sdata[1] = {0};
 #pragma force_active reset
 
 //.sbss
-OSHeapHandle heapHandle[6];
-void* heapStart[6];
-void* heapEnd[6];
+OSHeapHandle heapHandle[HEAP_COUNT];
+void* heapStart[HEAP_COUNT];
+void* heapEnd[HEAP_COUNT];
+#ifdef VERSION_G8ME01
+// uninitialized .sbss is laid out in reverse definition order
+u32 mapalloc_size;
+u32 R_battlemapalloc_size;
+BOOL g_bFirstSmartAlloc;
+void* R_battlemapalloc_base_ptr;
+void* mapalloc_base_ptr;
+#else
 void* mapalloc_base_ptr;
 u32 mapalloc_size;
 BOOL g_bFirstSmartAlloc;
+#endif
+#ifdef VERSION_G8ME01
+// US map heap: callers pass the heap base; battle maps get their own sub-heap
+#define MAPBASE_PARAM void* base_,
+#define MAPBASE ((MapAllocEntry*)base_)
+#else
 u32 count;
 #define COUNT (*(u16*)&count)
+#define MAPBASE_PARAM
+#define MAPBASE mapalloc_base_ptr
+#endif
 
 //local prototypes
 void smartGarbage(void);
@@ -59,13 +94,13 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
 
     arenaLo = OSGetArenaLo();
     arenaHi = OSGetArenaHi();
-    arenaLo = OSInitAlloc(arenaLo, arenaHi, 6);
+    arenaLo = OSInitAlloc(arenaLo, arenaHi, HEAP_COUNT);
     OSSetArenaLo(arenaLo);
     arenaLo = (void*)OSRoundUp32B(arenaLo);
     arenaHi = (void*)OSRoundDown32B(arenaHi);
     temp = (u32)arenaLo;
 
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < HEAP_COUNT; i++) {
         if (size_table[i][0] == 1) {
             heapStart[i] = (void*)temp;
             size = size_table[i][1] << 10;
@@ -75,7 +110,7 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
     }
 
     temp_r31 = (u32)arenaHi - temp;
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < HEAP_COUNT; i++) {
         if (size_table[i][0] == 0) {
             size = (size_table[i][1] * (u64)temp_r31) / 100Ull;
             heapStart[i] = (void*)temp;
@@ -84,17 +119,37 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
             temp += size;
         }
     }
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < HEAP_COUNT; i++) {
         heapHandle[i] = OSCreateHeap(heapStart[i], heapEnd[i]);
     }
     OSSetArenaLo((void* ) arenaHi);
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < HEAP_COUNT; i++) {
         memClear(i);
     }
 }
 
 void* __memAlloc(HEAP_TYPE heap, u32 size);
 
+#ifdef VERSION_G8ME01
+static inline void mapallocInit(void) {
+	u32 size;
+	MapAllocEntry* entry;
+	u32 total;
+
+	size = (u32)heapEnd[1] - (u32)heapStart[1] - 0x20;
+	mapalloc_size = size;
+	entry = OSAllocFromHeap(heapHandle[HEAP_MALLOC], size);
+	if (entry) {
+		memset(entry, 0, size);
+		DCFlushRange(entry, size);
+	}
+	total = mapalloc_size;
+	mapalloc_base_ptr = entry;
+	entry->next = NULL;
+	entry->size = total - 0x20;
+	entry->inuse = 0;
+}
+#else
 static inline void mapallocInit(void) {
 	MapAllocEntry* entry;
 	u32 size;
@@ -112,6 +167,7 @@ static inline void mapallocInit(void) {
 	mapalloc_size = size;
 	COUNT = 0;
 }
+#endif
 
 void memClear(HEAP_TYPE heap) {
 	OSDestroyHeap(heapHandle[heap]);
@@ -136,7 +192,27 @@ void __memFree(HEAP_TYPE heap, void* ptr) {
 	OSFreeToHeap(heapHandle[heap], ptr);
 }
 
-void* _mapAlloc(u32 size) {
+#ifdef VERSION_G8ME01
+void N_battleMapAlloc(void) {
+	MapAllocEntry* entry;
+	u32 size;
+
+	R_battlemapalloc_size = 0x64000;
+	entry = (_mapAlloc)(mapalloc_base_ptr, 0x64000);
+	size = R_battlemapalloc_size;
+	R_battlemapalloc_base_ptr = entry;
+	entry->next = NULL;
+	entry->size = size - 0x20;
+	entry->inuse = 0;
+}
+
+void N_battleMapFree(void) {
+	(_mapFree)(mapalloc_base_ptr, R_battlemapalloc_base_ptr);
+	R_battlemapalloc_base_ptr = NULL;
+}
+#endif
+
+void* (_mapAlloc)(MAPBASE_PARAM u32 size) {
 	MapAllocEntry* nextptr; //shorthand to make sure regalloc is correct
 	MapAllocEntry* entry; //for our loop
 	MapAllocEntry* tailEntry; //make sure we don't lose when inserting, might need better name
@@ -150,7 +226,7 @@ void* _mapAlloc(u32 size) {
 	if (!usableSize) {
 		return NULL;
 	}
-	entry = mapalloc_base_ptr;
+	entry = MAPBASE;
 	fullSize = usableSize + 0x20;
 	maxSize = 0;
 	tailEntry = 0;
@@ -171,13 +247,17 @@ void* _mapAlloc(u32 size) {
 		currEntry->next = (void*)((u32)currEntry + fullSize);
 		currEntry->size = usableSize;
 		currEntry->inuse = 1;
+#ifndef VERSION_G8ME01
 		currEntry->currId = COUNT++;
+#endif
 
 		nextptr = currEntry->next;
 		nextptr->next = tailEntry;
 		nextptr->size = maxSize - fullSize;
 		nextptr->inuse = 0;
+#ifndef VERSION_G8ME01
 		nextptr->currId = 0;
+#endif
 
 		memset(usableData, 0, usableSize);
 		DCFlushRange(usableData, usableSize);
@@ -188,7 +268,7 @@ void* _mapAlloc(u32 size) {
 	}
 }
 
-void* _mapAllocTail(u32 size) {
+void* (_mapAllocTail)(MAPBASE_PARAM u32 size) {
 	MapAllocEntry* nextptr; //shorthand to make sure regalloc is correct
 	MapAllocEntry* entry; //for our loop
 	MapAllocEntry* tailEntry; //make sure we don't lose when inserting, might need better name
@@ -202,7 +282,7 @@ void* _mapAllocTail(u32 size) {
 	if (!usableSize) {
 		return NULL;
 	}
-	entry = mapalloc_base_ptr;
+	entry = MAPBASE;
 	fullSize = usableSize + 0x20;
 	maxSize = 0;
 	tailEntry = 0;
@@ -222,14 +302,18 @@ void* _mapAllocTail(u32 size) {
 		currEntry->next = (MapAllocEntry*)(((u32)currEntry + maxSize) - fullSize);
 		currEntry->size = maxSize - fullSize;
 		currEntry->inuse = 0;
+#ifndef VERSION_G8ME01
 		currEntry->currId = 0;
+#endif
 
 		nextptr = currEntry->next;
 		nextptr->next = tailEntry;
 		tailEntry = (void*)((u32)nextptr + 0x20);
 		nextptr->size = usableSize;
 		nextptr->inuse = 1;
+#ifndef VERSION_G8ME01
 		nextptr->currId = COUNT++;
+#endif
 
 		memset(tailEntry, 0, usableSize);
 		DCFlushRange(tailEntry, usableSize);
@@ -240,7 +324,10 @@ void* _mapAllocTail(u32 size) {
 	}
 }
 
-void _mapFree(void* alloc) {
+#ifdef VERSION_G8ME01
+#pragma dont_inline on // US N_battleMapFree calls it
+#endif
+void (_mapFree)(MAPBASE_PARAM void* alloc) {
 	MapAllocEntry* loopEntry;
 	MapAllocEntry* nextEntry;
 	u32 newSize;
@@ -255,7 +342,7 @@ void _mapFree(void* alloc) {
 		newSize += nextEntry->size + 0x20;
 		nextEntry = nextEntry->next;
 	}
-	loopEntry = mapalloc_base_ptr;
+	loopEntry = MAPBASE;
 	while (1) {
 		if (loopEntry->next == entry) {
 			if (!loopEntry->inuse) {
@@ -271,6 +358,9 @@ void _mapFree(void* alloc) {
 	entry->size = newSize;
 	entry->inuse = 0;
 }
+#ifdef VERSION_G8ME01
+#pragma dont_inline reset
+#endif
 
 void smartInit(void) {
 	smartEntry* e;
@@ -278,8 +368,8 @@ void smartInit(void) {
 	void* ptr;
 	int i;
 
-	size = (u32)heapEnd[5] - (u32)heapStart[5] - 32;
-	ptr = OSAllocFromHeap(heapHandle[5], size);
+	size = (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32;
+	ptr = OSAllocFromHeap(heapHandle[SMART_HEAP], size);
 	if (ptr) {
 		memset(ptr, 0, size);
 		DCFlushRange(ptr, size);
@@ -287,8 +377,8 @@ void smartInit(void) {
 	wp->ptr = ptr;
 	wp->allocHead = 0;
 	wp->allocTail = 0;
-	wp->bytesLeft = (u32)heapEnd[5] - (u32)heapStart[5] - 32;
-	memset(wp->ptr, 0, (u32)heapEnd[5] - (u32)heapStart[5] - 32);
+	wp->bytesLeft = (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32;
+	memset(wp->ptr, 0, (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32);
 	memset(wp->work, 0, sizeof(wp->work));
 	e = wp->work;
 	for (i = 0; i < 0x800; i++, e++) {
@@ -309,8 +399,8 @@ void L_smartReInit(void) {
 
 	wp->allocHead = 0;
 	wp->allocTail = 0;
-	wp->bytesLeft = (u32)heapEnd[5] - (u32)heapStart[5] - 32;
-	memset(wp->ptr, 0, (u32)heapEnd[5] - (u32)heapStart[5] - 32);
+	wp->bytesLeft = (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32;
+	memset(wp->ptr, 0, (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32);
 	memset(wp->work, 0, sizeof(wp->work));
 	e = wp->work;
 	for (i = 0; i < 0x800; i++, e++) {
@@ -453,7 +543,7 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 		}
 		wp->allocHead = entry2;
 		if (!entry2->next) {
-			entry2->spaceAfter = ((u32)heapEnd[5] - (u32)heapStart[5] - 32) + (u32)wp->ptr - (u32)entry2->address - entry2->size;
+			entry2->spaceAfter = ((u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32) + (u32)wp->ptr - (u32)entry2->address - entry2->size;
 			wp->allocTail = entry2;
 		}
 		return entry2;
@@ -521,7 +611,7 @@ void smartGarbage(void) {
 		wp->bytesLeft = 0;
 	}
 	else {
-		wp->bytesLeft = (u32)heapEnd[5] - (u32)heapStart[5] - 32;
+		wp->bytesLeft = (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32;
 	}
 	prev = NULL;
 	ptr = wp->ptr;
@@ -552,9 +642,9 @@ void smartGarbage(void) {
 	}
 	entry = wp->allocTail;
 	if (entry) {
-		entry->spaceAfter = ((u32)heapEnd[5] - (u32)heapStart[5] - 32) + (u32)wp->ptr - (u32)entry->address - entry->size;
+		entry->spaceAfter = ((u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32) + (u32)wp->ptr - (u32)entry->address - entry->size;
 	}
-	DCFlushRange(wp->ptr, (u32)heapEnd[5] - (u32)heapStart[5] - 32);
+	DCFlushRange(wp->ptr, (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32);
 }
 
 GXTexObj* smartTexObj(GXTexObj* obj, void** image_ptr) {

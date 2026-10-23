@@ -13,6 +13,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdio.h>
+#include "icon_ids.h"
 
 extern double sin(double x);
 extern double cos(double x);
@@ -548,10 +549,10 @@ void effFukidashiDisp(CameraId cameraId, EffectEntry* effect) {
                     PSMTXConcat(mH, mD, mH);
                     PSMTXConcat(mH, mA, mH);
                     if (pass == 0) {
-                        iconDispGxCol(mH, 0x400, 0x18B, (GXColor){ 0xFF, 0xFF, 0xFF, alpha });
+                        iconDispGxCol(mH, 0x400, ICON_18B, (GXColor){ 0xFF, 0xFF, 0xFF, alpha });
                     }
                     else {
-                        iconDispGxCol(mH, 0x800, 0x18B, (GXColor){ 0xA0, 0xA0, 0xA0, alpha });
+                        iconDispGxCol(mH, 0x800, ICON_18B, (GXColor){ 0xA0, 0xA0, 0xA0, alpha });
                     }
                     PSMTXTrans(mA, 10.0f, 22.0f, 0.0f);
                     PSMTXConcat(mH, mA, mH);

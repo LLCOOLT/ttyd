@@ -4,7 +4,7 @@
 #include "mario/mario_motion.h"
 #include <string.h>
 
-#define MW(m, off, T) (*(T*)((u8*)(m) + (off)))
+#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 #define JP0(m) MW(m, 0x7c, f32)
 #define JP1(m) MW(m, 0x80, f32)
 #define JP2(m) MW(m, 0x84, f32)
@@ -36,6 +36,9 @@ void mot_walk(void);
 void mot_dash(void);
 void mot_jump(void);
 void mot_jumpNpc(void);
+#ifdef VERSION_G8ME01
+void N_mot_jumpNpc_post(void);
+#endif
 void mot_jumpSw(void);
 void mot_jumpStand(void);
 void mot_jumpSmall(void);
@@ -153,7 +156,11 @@ MarioMotTblEntry marioMotTbl[] = {
 	{mot_walk, NULL, NULL},
 	{mot_dash, NULL, NULL},
 	{mot_jump, NULL, NULL},
+#ifdef VERSION_G8ME01
+	{mot_jumpNpc, NULL, N_mot_jumpNpc_post},
+#else
 	{mot_jumpNpc, NULL, NULL},
+#endif
 	{mot_jumpSw, NULL, NULL},
 	{mot_jumpStand, NULL, NULL},
 	{mot_jump, NULL, NULL},
@@ -209,6 +216,11 @@ void marioChgMoveMotion(void) {
 		allPartyForceRideOn();
 		return;
 	}
+#ifdef VERSION_G8ME01
+	if ((u16)(mario->currMotionId - MARIO_MOTION_DAMAGE) <= 1) {
+		return;
+	}
+#endif
 	if (mario->currMotionId == MARIO_MOTION_YOSHI) {
 		return;
 	}
@@ -645,7 +657,16 @@ void marioFall(void) {
 		mot_fall_roll();
 		return;
 	}
+#ifdef VERSION_G8ME01
+	if (!(mario->trigFlags & 0x200000) && (mario->trigFlags & 0x100000)) {
+		rub = marioGetRub(0x100, &a, &b, &c);
+		if (MW(mario, 0x246, u16) & 0x100) {
+			mario->trigFlags |= 0x400000;
+		}
+	}
+#else
 	rub = marioGetRub(0x100, &a, &b, &c);
+#endif
 	spd = marioGetFallSpd();
 	hit = marioChkLandon(&y, spd);
 	if (hit) {
@@ -655,7 +676,11 @@ void marioFall(void) {
 			mario->position.y += spd;
 		} else {
 			mario->position.y = y;
+#ifdef VERSION_G8ME01
+			if (!(mario->trigFlags & 0x200000) && (mario->trigFlags & 0x100000) && marioPriCheckJabara() && a != -1 && rub >= 0) {
+#else
 			if (marioPriCheckJabara() && a != -1 && rub >= 0) {
+#endif
 				camFollowYOn();
 				marioChgMot(MARIO_MOTION_JABARA);
 				return;
@@ -759,7 +784,11 @@ void marioLandOn(void) {
 		}
 		return;
 	}
+#ifdef VERSION_G8ME01
+	if (mario->controlStickSensitivity > 0.0f && !(mario->trigFlags & 0x400000) && !(mario->flags & 0x20)) {
+#else
 	if (mario->controlStickSensitivity > 0.0f && !(mario->flags & 0x20)) {
+#endif
 		if (mario->characterId == 2) {
 			if (kpaFireAttackCheck()) {
 				marioChgMot(MARIO_MOTION_STAY);
@@ -770,7 +799,19 @@ void marioLandOn(void) {
 			return;
 		}
 		if (!(mario->dispFlags & 0x1000000)) {
+#ifdef VERSION_G8ME01
+			if (marioPriCheckJabara()) {
+				if (MW(mario, 0x246, u16) & 0x100) {
+					marioChgMot(MARIO_MOTION_STAY);
+				} else {
+					marioChgMot(MARIO_MOTION_WALK);
+				}
+			} else {
+				marioChgMot(MARIO_MOTION_WALK);
+			}
+#else
 			marioChgMot(MARIO_MOTION_WALK);
+#endif
 			return;
 		}
 		N_marioSlitSetAfterLand();

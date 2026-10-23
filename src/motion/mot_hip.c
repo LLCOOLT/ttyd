@@ -20,6 +20,18 @@ void kpa_hip(void);
 
 #define MF(o) (*(f32*)((u8*)mario + (o)))
 #define MI(o) (*(s32*)((u8*)mario + (o)))
+#ifdef VERSION_G8ME01
+typedef struct HipExt {
+    u8 pad[0x288];
+    s32 snd1;
+    s32 snd2;
+    u8 pad2[0x2B8 - 0x290];
+    f32 ang;
+} HipExt;
+#define EX ((HipExt*)mario)
+#define SND1 (EX->snd1)
+#define SND2 (EX->snd2)
+#else
 typedef struct HipExt {
     u8 pad[0x2A0];
     f32 ang;
@@ -28,6 +40,9 @@ typedef struct HipExt {
 } HipExt;
 
 #define EX ((HipExt*)mario)
+#define SND1 (EX->snd1)
+#define SND2 (EX->snd2)
+#endif
 #define MH(o) (*(s16*)((u8*)mario + (o)))
 
 static s32 quake_evt[] = {
@@ -40,6 +55,11 @@ static s32 quake_bgmode_evt[] = {
 
 s32 U_chkground(void);
 void mot_hip_post(void);
+#ifdef VERSION_G8ME01
+#define MHPOST() hip_post_inl()
+#else
+#define MHPOST() mot_hip_post()
+#endif
 
 BOOL marioChkHipAttack(void) {
     BOOL ret;
@@ -62,6 +82,49 @@ BOOL marioChkHipBump(void) {
     return ret;
 }
 
+#ifdef VERSION_G8ME01
+static inline void hip_snd_reset(void) {
+    MarioWork* mario = marioGetPtr();
+
+    SND1 = -1;
+    SND2 = -1;
+}
+
+static inline void hip_snd_on(void) {
+    MarioWork* mario = marioGetPtr();
+
+    if ((u32)SND1 == 0xFFFFFFFFU) {
+        SND1 = psndSFXOn_3D((char*)0x158, &mario->position);
+    }
+    if ((u32)SND2 == 0xFFFFFFFFU) {
+        SND2 = psndSFXOn_3D((char*)0xDB, &mario->position);
+    }
+}
+
+static inline void hip_snd_off(void) {
+    MarioWork* mario = marioGetPtr();
+
+    if ((u32)SND1 != 0xFFFFFFFFU) {
+        psndSFXOff(SND1);
+        SND1 = -1;
+    }
+    if ((u32)SND2 != 0xFFFFFFFFU) {
+        psndSFXOff(SND2);
+        SND2 = -1;
+    }
+}
+
+static inline void hip_post_inl(void) {
+    MarioWork* mario;
+
+    mario = marioGetPtr();
+    marioOfsRotReset();
+    mario->airTimer = 0;
+    mario->jumpPeakAirTime = 0;
+    hip_snd_off();
+}
+
+#endif
 void mot_hip(void) {
     MarioWork* mario;
     HitEntry* hit;
@@ -102,13 +165,21 @@ void mot_hip(void) {
         mario->rotOfs.y += d;
         mario->dispOfs2.y = 0.0f;
         mario->currSubMotionId = 0;
-        EX->snd1 = -1;
-        EX->snd2 = -1;
+#ifdef VERSION_G8ME01
+        hip_snd_reset();
+#else
+        SND1 = -1;
+        SND2 = -1;
+#endif
     }
     switch (mario->currSubMotionId) {
     case 0:
-        EX->snd1 = psndSFXOn_3D((char*)0x158, &mario->position);
-        EX->snd2 = psndSFXOn_3D((char*)0xDB, &mario->position);
+#ifdef VERSION_G8ME01
+        hip_snd_on();
+#else
+        SND1 = psndSFXOn_3D((char*)0x158, &mario->position);
+        SND2 = psndSFXOn_3D((char*)0xDB, &mario->position);
+#endif
         EX->ang = 0.0f;
         mario->baseSpeed = 0.0f;
         mario->currSubMotionId = 1;
@@ -130,7 +201,7 @@ void mot_hip(void) {
             return;
         case 2:
             marioChgMotSub(0, 0);
-            mot_hip_post();
+            MHPOST();
             return;
         }
         break;
@@ -149,7 +220,7 @@ void mot_hip(void) {
             return;
         case 2:
             marioChgMotSub(0, 0);
-            mot_hip_post();
+            MHPOST();
             return;
         }
         break;
@@ -170,7 +241,7 @@ void mot_hip(void) {
             return;
         case 2:
             marioChgMotSub(0, 0);
-            mot_hip_post();
+            MHPOST();
             return;
         }
         break;
@@ -194,8 +265,8 @@ void mot_hip(void) {
             mario->currMotionId = MARIO_MOTION_HIP_2;
             mario->currSubMotionId = 22;
             MI(0x48) = 20;
-            MI(0x1E4) = (s32)hit;
-            MI(0x1E8) = 0;
+            MI(MWOFF(0x1E4)) = (s32)hit;
+            MI(MWOFF(0x1E8)) = 0;
             mario->position.y = y;
             EX->ang = 0.0f;
             mario->rotOfs.y = 0.0f;
@@ -245,7 +316,7 @@ void mot_hip(void) {
             mario->dispFlags &= ~4;
             mario->flags &= ~0x80;
             marioChgMotSub(0, 0);
-            mot_hip_post();
+            MHPOST();
         }
         break;
     case 50:
@@ -276,8 +347,8 @@ s32 U_chkground(void) {
     mario = marioGetPtr();
     hit = marioChkLandon(&y, 1.0f);
     if (hit != NULL) {
-        MI(0x1E4) = (s32)hit;
-        MI(0x1E8) = 0;
+        MI(MWOFF(0x1E4)) = (s32)hit;
+        MI(MWOFF(0x1E8)) = 0;
         mario->position.y = y;
         EX->ang = 0.0f;
         mario->rotOfs.y = 0.0f;
@@ -310,6 +381,11 @@ s32 U_chkground(void) {
 
 #pragma dont_inline reset
 
+#ifdef VERSION_G8ME01
+void mot_hip_post(void) {
+    hip_post_inl();
+}
+#else
 void mot_hip_post(void) {
     MarioWork* mario;
 
@@ -317,12 +393,13 @@ void mot_hip_post(void) {
     marioOfsRotReset();
     mario->airTimer = 0;
     mario->jumpPeakAirTime = 0;
-    if ((u32)EX->snd1 != 0xFFFFFFFFU) {
-        psndSFXOff(EX->snd1);
-        EX->snd1 = -1;
+    if ((u32)SND1 != 0xFFFFFFFFU) {
+        psndSFXOff(SND1);
+        SND1 = -1;
     }
-    if ((u32)EX->snd2 != 0xFFFFFFFFU) {
-        psndSFXOff(EX->snd2);
-        EX->snd2 = -1;
+    if ((u32)SND2 != 0xFFFFFFFFU) {
+        psndSFXOff(SND2);
+        SND2 = -1;
     }
 }
+#endif

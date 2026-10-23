@@ -1,3 +1,4 @@
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -16,6 +17,12 @@
 #include "string.h"
 #include "mario/mario_pouch.h"
 #include "evt/evt_cmd.h"
+#ifdef VERSION_G8ME01
+USER_FUNC(evt_mario_set_dir);
+USER_FUNC(evt_party_set_dir);
+USER_FUNC(evt_item_delete_check);
+USER_FUNC(evt_item_delete);
+#endif
 
 typedef struct IraiWork { s32 state; s32 count; s32 list[30]; s32 cursor; s32 last; s32 top; s32 yubiX; s32 yubiY; s32 field_0x94; f32 scroll; char client[30][21]; char contents[30][31]; u8 field_0x6B4[0x416C - 0x6B4]; } IraiWork;
 void FontDrawString(const char* message, f32 x, f32 y);
@@ -89,11 +96,14 @@ s32 irai_start_event[30];
 __declspec(section ".data") s32 irai_end_event_null[2];
 s32 irai_end_event01[13];
 __declspec(section ".data") s32 irai_end_event04[8];
+#ifdef VERSION_G8ME01
+s32 irai_end_event19[15];
+#endif
 s32 irai_end_event[30];
 s32 gor_irai_init[18];
 s32 gor_irai_lecture[40];
-s32 gor_irai_main[105];
-s32 gor_irai_tenshu_main[258];
+s32 gor_irai_main[VERSION_PICK(105, 126)];
+s32 gor_irai_tenshu_main[VERSION_PICK(258, 261)];
 
 __declspec(section ".data") u64 fd_gor_irai_negone_one_374 = 0xBF8000003F800000;
 
@@ -262,10 +272,25 @@ __declspec(section ".data") EVT_BEGIN(irai_end_event04)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(irai_end_event19)
+    DEBUG_PUT_MSG(STRING("ピートンの依頼キャンセル"))
+    CALL(evt_item_delete_check, STRING("wr"), LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_item_delete, STRING("wr"))
+    END_IF
+    RETURN
+EVT_END()
+#endif
+
 s32 irai_end_event[] = {
     (s32)irai_end_event01, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event04, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null,
     (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null,
+#ifdef VERSION_G8ME01
+    (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event19, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null,
+#else
     (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null,
+#endif
     (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null,
 };
 
@@ -290,6 +315,58 @@ EVT_BEGIN(gor_irai_lecture)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(gor_irai_main)
+    IF_INT_EQUAL(GSWF(5374), 0)
+        BEGIN_INLINE_EVENT
+            CALL(evt_mario_set_dir, 270, 200, 0)
+        END_INLINE_EVENT
+        BEGIN_INLINE_EVENT
+            CALL(evt_party_set_dir, 0, 270, 200)
+        END_INLINE_EVENT
+        BEGIN_INLINE_EVENT
+            CALL(evt_party_set_dir, 1, 270, 200)
+        END_INLINE_EVENT
+        CALL_CHILD(PTR(gor_irai_lecture))
+        RETURN
+    END_IF
+    CALL(evt_mario_key_onoff, 0)
+    CALL(irai_init_func)
+    LABEL(10)
+    CALL(irai_main_func)
+    CALL(irai_check_func)
+    IF_INT_EQUAL(LW(0), -1)
+        GOTO(100)
+    END_IF
+    SET_INT_READ_ADDR(PTR(irai_msg_exposition))
+    SET_VALUE(LW(0), LW(11))
+    ADD(LW(0), -1)
+    READ_INT_INDEXED(LW(1), LW(0))
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, LW(1), 0, 0)
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, LW(12), 0, 0)
+    CALL(evt_msg_select, 0, STRING("irai_01"))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("irai_73"))
+        CALL(irai_start_func)
+        SET_INT_READ_ADDR(PTR(irai_start_event))
+        SET_VALUE(LW(0), LW(11))
+        ADD(LW(0), -1)
+        READ_INT_INDEXED(LW(1), LW(0))
+        SPAWN_EVENT(LW(1))
+        SET_VALUE(GSW(1420), LW(11))
+        DEBUG_PUT_REG(GSW(1420))
+        ELSE
+        CALL(evt_msg_continue)
+        GOTO(10)
+    END_IF
+    LABEL(100)
+    CALL(irai_end_func)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(gor_irai_main)
     IF_INT_EQUAL(GSWF(5374), 0)
         CALL_CHILD(PTR(gor_irai_lecture))
@@ -331,6 +408,7 @@ EVT_BEGIN(gor_irai_main)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(gor_irai_tenshu_main)
     SET_VALUE(LW(0), GSWF(5375))
@@ -415,6 +493,9 @@ EVT_BEGIN(gor_irai_tenshu_main)
                 ELSE
                 CALL(evt_msg_print_add, 0, STRING("irai_12"))
             END_IF
+#ifdef VERSION_G8ME01
+            SET_VALUE(LW(0), 1)
+#endif
         END_IF
         IF_INT_EQUAL(LW(0), 2)
             CALL(evt_msg_print_add, 0, STRING("irai_04"))
@@ -567,14 +648,14 @@ USER_FUNC(irai_main_func) {
 
     switch (wp->state) {
         case 0:
-            iconEntry2D("iraiYubi", 0x1F0);
+            iconEntry2D("iraiYubi", VERSION_PICK(0x1F0, 0x1F8));
             iconFlagOn("iraiYubi", 4);
-            iconEntry2D("iraiArrowUp", 0x205);
+            iconEntry2D("iraiArrowUp", VERSION_PICK(0x205, 0x20C));
             iconFlagOn("iraiArrowUp", 8);
-            iconEntry2D("iraiArrowDown", 0x205);
-            iconEntry2D("iraiLButton", 0x7E);
+            iconEntry2D("iraiArrowDown", VERSION_PICK(0x205, 0x20C));
+            iconEntry2D("iraiLButton", VERSION_PICK(0x7E, 0x86));
             iconSetScale("iraiLButton", 0.8f);
-            iconEntry2D("iraiRButton", 0x80);
+            iconEntry2D("iraiRButton", VERSION_PICK(0x80, 0x88));
             iconSetScale("iraiRButton", 0.8f);
             iconFlagOn("iraiYubi", 2);
             iconFlagOn("iraiArrowUp", 2);
@@ -725,6 +806,96 @@ USER_FUNC(irai_end_func) {
     return EVT_RETURN_DONE;
 }
 
+#ifdef VERSION_G8ME01
+void FontDrawScaleVec(Vec scale);
+
+// US: text centered in a boxW-wide box at x, x-squeezed to maxW; w is the width variable of the caller.
+#define iraiDrawCentered(msg, x, y, boxW, maxW, scale, trans, w) { \
+    w = FontGetMessageWidth(msg);                                    \
+    if (w > (maxW)) {                                                \
+        PSMTXScale(scale, (maxW) / w, 1.0f, 1.0f);                   \
+        w = (maxW);                                                  \
+    } else {                                                         \
+        PSMTXScale(scale, 1.0f, 1.0f, 1.0f);                         \
+    }                                                                \
+    PSMTXTrans(trans, (x) + ((boxW) - w) / 2, y, 0.0f);              \
+    PSMTXConcat(trans, scale, trans);                                \
+    FontDrawStringMtx(trans, msg);                                   \
+}
+
+// US: one row cell, x-squeezed to fit maxW. "y" is stored in the caller's float var v (the
+// original reuses one float local for these; this keeps the MWCC float register choice).
+#define iraiDrawFit(msg, x, y, maxW, v) {                                              \
+    f32 w_;                                                                            \
+    v = (y);                                                                           \
+    w_ = FontGetMessageWidth(msg);                                                     \
+    FontDrawScaleVec((Vec){w_ > (maxW) ? 0.85f * ((maxW) / w_) : 0.85f, 0.85f, 0.85f}); \
+    FontDrawString(msg, x, v);                                                         \
+}
+
+void irai_window_disp(CameraId camera, void* param) {
+    IraiWork* wp = param;
+    u32 left;
+    u32 top;
+    u32 width;
+    u32 height;
+    const char* msg2;
+    s32 i;
+    const char* msg;
+    s32 no;
+    Mtx trans;
+    Mtx scale;
+    Mtx trans2;
+    Mtx scale2;
+    f32 nameW;
+    f32 w;
+
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+    windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA3, 0xFF, 0xFF}, -280.0f, 170.0f, 135.0f, 90.0f, 12.0f);
+    FontDrawStart();
+    FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+    FontDrawScale(0.85f);
+    msg = msgSearch("irai_name1_win");
+    FontDrawEdge();
+    iraiDrawCentered(msg, -280.0f, 152.0f, 135.0f, 115.0f, scale, trans, nameW);
+    msg2 = msgSearch("irai_name2_win");
+    iraiDrawCentered(msg2, -280.0f, 127.0f, 135.0f, 115.0f, scale, trans, nameW);
+    FontDrawEdgeOff();
+    windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -129.0f, 170.0f, 410.0f, 340.0f, 12.0f);
+    windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA3, 0xFF, 0xFF}, -103.0f, 190.0f, 120.0f, 40.0f, 12.0f);
+    windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA3, 0xFF, 0xFF}, 91.0f, 190.0f, 120.0f, 40.0f, 12.0f);
+    FontDrawStart();
+    FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+    FontDrawScale(0.85f);
+    msg2 = msgSearch("irai_client_win");
+    FontDrawEdge();
+    iraiDrawCentered(msg2, -103.0f, 180.0f, 120.0f, 100.0f, scale2, trans2, w);
+    FontDrawEdgeOff();
+    msg2 = msgSearch("irai_contents_win");
+    FontDrawEdge();
+    iraiDrawCentered(msg2, 91.0f, 180.0f, 120.0f, 100.0f, scale2, trans2, w);
+    FontDrawEdgeOff();
+    GXGetScissor(&left, &top, &width, &height);
+    GXSetScissor(175, 98, 410, 304);
+    FontDrawStart();
+    FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+    FontDrawScale(0.85f);
+    for (i = 0; i < wp->count; i++) {
+        if (swGet(wp->list[i] + 5374)) {
+            FontDrawColor((GXColor){0x80, 0x80, 0x80, 0xFF});
+        } else {
+            FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+        }
+        if (wp->list[i] == swByteGet(1420)) {
+            FontDrawColor((GXColor){0xFF, 0x00, 0x00, 0xFF});
+        }
+        no = wp->list[i] - 1;
+        iraiDrawFit(wp->client[no], -119.0f, wp->scroll + (140 - i * 30), 180.0f, w);
+        iraiDrawFit(wp->contents[no], 51.0f, wp->scroll + (140 - i * 30), 260.0f, w);
+    }
+    GXSetScissor(left, top, width, height);
+}
+#else
 static inline f32 iraiAddI(f32 a, s32 b) {
     return a + b;
 }
@@ -785,3 +956,4 @@ void irai_window_disp(CameraId camera, void* param) {
     }
     GXSetScissor(left, top, width, height);
 }
+#endif

@@ -199,7 +199,11 @@ BattleUnitKind unit_boss_bunbaba = {
     115.0f,
     0.0f,
     -10.0f,
+#ifdef VERSION_G8ME01
+    115.0f,
+#else
     0.0f,
+#endif
     0.0f,
     0.0f,
     20.0f,
@@ -266,7 +270,11 @@ static BattleUnitKindPart parts[] = {
 };
 
 s32 weapon_bunbaba_fumituke_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     8, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 553656320, 721666, 0, 7, 2047, 8196,
@@ -275,7 +283,11 @@ s32 weapon_bunbaba_fumituke_attack[] = {
 };
 
 s32 weapon_bunbaba_kamituki_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     8, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 17830496, 553656320, 770, 0, 131079, 2047, 0,
@@ -284,7 +296,11 @@ s32 weapon_bunbaba_kamituki_attack[] = {
 };
 
 s32 weapon_bunbaba_poison_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     8, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 71, 2047, 0,
@@ -293,7 +309,11 @@ s32 weapon_bunbaba_poison_attack[] = {
 };
 
 s32 weapon_bunbaba_eq_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     10, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870920, 770, 0, 4167, 2047, 0,
@@ -311,7 +331,11 @@ s32 weapon_bunbaba_charge[] = {
 };
 
 s32 weapon_bunbaba_mega_attack[] = {
+#ifdef VERSION_G8ME01
+    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#else
     0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+#endif
     8, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 71, 2047, 0,

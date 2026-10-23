@@ -19,7 +19,11 @@
 #include "driver/animdrv.h"
 void PSMTXIdentity(Mtx m);
 f32 PSVECDistance(const Vec* a, const Vec* b);
+#ifndef VERSION_G8ME01
 void* _mapAlloc(u32 size);
+#else
+#include "memory.h"
+#endif
 AnimationPose* animPoseGetAnimPosePtr(s32 poseId);
 f32 animPoseGetLoopTimes(s32 id);
 void dispEntry(CameraId camera, f32 order, s32 renderMode, DispCallback callback, void* param);

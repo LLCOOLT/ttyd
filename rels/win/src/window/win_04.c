@@ -101,7 +101,7 @@ USER_FUNC(ss_ch_set);
 static f32 randf(f32 min, f32 max);
 void flower_disp(CameraId camera, void* param);
 void mirror_ball(void* param);
-extern s32 all_party_lecture_30_data_192D4[];
+extern s32 all_party_lecture[];
 extern s32 bero_case_switch_off[];
 extern s32 bero_case_switch_on[];
 extern s32 evt_bero_info_run[];
@@ -982,7 +982,7 @@ EVT_BEGIN(clouda_nakama)
     WAIT_MS(500)
     SET_VALUE(LW(8), STRING("クラウダ"))
     SET_VALUE(LW(9), 5)
-    CALL_CHILD(PTR(all_party_lecture_30_data_192D4))
+    CALL_CHILD(PTR(all_party_lecture))
     CALL(evt_party_move_pos2, 1, 148, 30, FLOAT(120.0f))
     CALL(evt_msg_print, 0, STRING("stg2_win_e09_09"), 0, STRING("extparty"))
     CALL(evt_cam3d_evt_off, 300, 11)

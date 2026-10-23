@@ -19,8 +19,8 @@ USER_FUNC(evt_item_entry);
 USER_FUNC(evt_item_get_position);
 USER_FUNC(evt_item_set_position);
 USER_FUNC(evt_jin_vivian_pose_set);
-USER_FUNC(evt_kagemario_change_14_text_4CF4);
-USER_FUNC(evt_kagemario_init_14_text_4DB8);
+USER_FUNC(evt_kagemario_change);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_key_get_buttontrg);
 USER_FUNC(evt_mapobj_rotate);
 USER_FUNC(evt_mario_dispflag_onoff);
@@ -90,7 +90,7 @@ static USER_FUNC(getYoshiColor);
 USER_FUNC(vivian_away);
 extern s32 evt_bero_info_run[];
 extern s32 evt_sub_starstone[];
-extern s32 evt_usu_kagemario_party_kill_14_data_AF00[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_jin_04_negone_one_374;
 __declspec(section ".data") s32 fd_jin_04_neg_one_382[1];
@@ -287,7 +287,7 @@ EVT_END()
 
 EVT_BEGIN(irekawatta_mario_init)
     CALL(evt_party_stop, 0)
-    CALL(evt_kagemario_change_14_text_4CF4, 1)
+    CALL(evt_kagemario_change, 1)
     CALL(evt_npc_set_position, STRING("ランペル"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("にせマリオ"), -8, 670, 41)
     CALL(evt_npc_set_ry, STRING("にせマリオ"), 90)
@@ -365,7 +365,7 @@ EVT_BEGIN(irekawatta_mario)
     LABEL(100)
     CALL(evt_party_stop, 0)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_kagemario_change_14_text_4CF4, 1)
+    CALL(evt_kagemario_change, 1)
     CALL(evt_npc_set_position, STRING("ランペル"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("にせマリオ"), -8, 670, 41)
     CALL(evt_npc_set_ry, STRING("にせマリオ"), 90)
@@ -694,14 +694,14 @@ EVT_BEGIN(hontonosugata_mario)
             IF_INT_GREATER(LW(0), 6480)
                 IF_INT_EQUAL(LF(1), 0)
                     SET_VALUE(LF(1), 1)
-                    CALL(evt_kagemario_change_14_text_4CF4, 0)
+                    CALL(evt_kagemario_change, 0)
                 END_IF
             END_IF
         END_LOOP
     END_INLINE_EVENT
     WAIT_MS(4100)
     CALL(evt_mario_set_dispdir, LW(0))
-    CALL(evt_kagemario_change_14_text_4CF4, 0)
+    CALL(evt_kagemario_change, 0)
     WAIT_MS(300)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     WAIT_MS(300)
@@ -949,11 +949,11 @@ EVT_BEGIN(jin_04_init_evt)
         CALL(evt_snd_envon, 272, STRING("ENV_STG4_JIN1"))
     END_SWITCH
     CALL(evt_snd_set_rev_mode, 2)
-    CALL(evt_kagemario_init_14_text_4DB8)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_14_data_AF00))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 10, -100, 60, 150, 0, 0)
     CALL(evt_mobj_jumpstand_red, 0, STRING("mobj_jump"), -75, 450, 100, PTR(jin_04_jumpstand), 0)

@@ -8,7 +8,7 @@ USER_FUNC(evt_exit_case_evt);
 USER_FUNC(evt_item_entry);
 USER_FUNC(evt_item_flag_on);
 USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_kagemario_init_14_text_4DB8);
+USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_key_get_buttontrg);
 USER_FUNC(evt_mapobj_get_position);
 USER_FUNC(evt_mapobj_rotate);
@@ -46,7 +46,7 @@ USER_FUNC(mainwindow_openenable);
 extern s32 bero_case_switch_off[];
 extern s32 bero_case_switch_on[];
 extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill_14_data_AF00[];
+extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_jin_08_negone_one_374;
 __declspec(section ".data") s32 fd_jin_08_neg_one_382[1];
@@ -378,11 +378,11 @@ EVT_BEGIN(jin_08_init_evt)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG4_JIN1"))
     CALL(evt_snd_set_rev_mode, 2)
-    CALL(evt_kagemario_init_14_text_4DB8)
+    CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill_14_data_AF00))
+    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_LESS(GSW(0), 209)
         CALL(evt_mapobj_rotate, 1, STRING("hako_futa"), 90, 0, 0)

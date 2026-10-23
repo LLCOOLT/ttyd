@@ -75,6 +75,9 @@ GlobalWork* gp = &marioSt;
 //.sbss
 OSTime none_key;
 s32 _mariostSystemLevel;
+#ifdef VERSION_G8ME01
+BOOL R_bReset; // before DvdCheckTreadOn: .sbss is emitted in reverse
+#endif
 BOOL DvdCheckTreadOn;
 
 //.data
@@ -207,16 +210,28 @@ void marioStInit(void) {
 	gp->areaFadeOutDuration = 300;
 	gp->areaFadeInType = FADE_OUT_BLACK;
 	gp->areaFadeInDuration = 300;
+#ifdef VERSION_G8ME01
+	if (VIGetTvFormat() == 0)
+		gp->framerate = 60;
+	else
+		gp->framerate = 50;
+	gp->language = 1;
+#else
 	if ((OSGetFontEncode() == OS_FONT_ENCODE_SJIS) && !(gp->flags & 0x1000))
 		gp->language = 0;
 	else
 		gp->language = 1;
 	gp->framerate = 60;
+#endif
 	gp->systemLevelFlags = 0;
 	badgeShop_init(); //Badge Shop
 	yuugijou_init(); //Pianta Parlor
 	johoya_init(); //?????
+#ifdef VERSION_G8ME01
+	gp->mapAlloc = __memAlloc(HEAP_DEFAULT, 670 * 1024);
+#else
 	gp->mapAlloc = __memAlloc(HEAP_DEFAULT, 660 * 1024);
+#endif
 	VISetPostRetraceCallback(viPostCallback);
 	romFontInit();
 	OSCreateThread(&DvdCheckThread, gcDvdCheckThread, NULL, (void*)((u32)&stack + sizeof(stack)), sizeof(stack), 16, OS_THREAD_ATTR_DETACH);
@@ -383,6 +398,26 @@ void viPostCallback(u32 retraceCount) {
 	if (gp->retraceLocalTime > (OS_TIMER_CLOCK * (OSTime)359999999)) {
 		gp->retraceLocalTime = (OS_TIMER_CLOCK * (OSTime)359999999);
 	}
+#ifdef VERSION_G8ME01
+	if (!gp->dvdError && !winCheck()) {
+		if (!(gp->systemLevelFlags & 8)) {
+			gp->systemLv3Time += gp->retraceDeltaTime;
+		}
+		if (!(gp->systemLevelFlags & 4)) {
+			gp->systemLv2Time += gp->retraceDeltaTime;
+		}
+		if (!(gp->systemLevelFlags & 2)) {
+			gp->systemLv1Time += gp->retraceDeltaTime;
+		}
+		if (!(gp->systemLevelFlags & 1)) {
+			gp->systemLv0Time += gp->retraceDeltaTime;
+		}
+		gp->renderTime += gp->retraceDeltaTime;
+		if (!gp->inBattle) {
+			gp->renderFieldTime += gp->retraceDeltaTime;
+		}
+	}
+#else
 	if (!(gp->systemLevelFlags & 8)) {
 		gp->systemLv3Time += gp->retraceDeltaTime;
 	}
@@ -401,6 +436,7 @@ void viPostCallback(u32 retraceCount) {
 			gp->renderFieldTime += gp->retraceDeltaTime;
 		}
 	}
+#endif
 	gp->retraceTime = time;
 	gp->retraceCount = retraceCount;
 	if (battleDisableHResetCheck()) {
@@ -451,6 +487,11 @@ exitcheck:
 
 //TODO: fuck up float conversions for 1:1 cuz this is cleaner
 void* gcDvdCheckThread(void* param) {
+#ifdef VERSION_G8ME01
+	s32 prevStatus = 0;
+	s32 stableCount = 0;
+	u32 prevRetrace = 0;
+#endif
 	const char* message;
 	s32 msgId;
 	s32 width;
@@ -461,23 +502,43 @@ void* gcDvdCheckThread(void* param) {
 		msgId = 0;
 		switch (DVDGetDriveStatus()) {
 			case DVD_STATE_COVER_OPEN:
+#ifdef VERSION_G8ME01
+				msgId = 10;
+#else
 				msgId = 5;
+#endif
 				gp->dvdError = TRUE;
 				break;
 			case DVD_STATE_NO_DISK:
+#ifdef VERSION_G8ME01
+				msgId = 11;
+#else
 				msgId = 6;
+#endif
 				gp->dvdError = TRUE;
 				break;
 			case DVD_STATE_WRONG_DISK:
+#ifdef VERSION_G8ME01
+				msgId = 11;
+#else
 				msgId = 6;
+#endif
 				gp->dvdError = TRUE;
 				break;
 			case DVD_STATE_RETRY:
+#ifdef VERSION_G8ME01
+				msgId = 12;
+#else
 				msgId = 7;
+#endif
 				gp->dvdError = TRUE;
 				break;
 			case DVD_RESULT_FATAL_ERROR:
+#ifdef VERSION_G8ME01
+				msgId = 13;
+#else
 				msgId = 8;
+#endif
 				gp->dvdError = TRUE;
 				break;
 			default:
@@ -486,6 +547,18 @@ void* gcDvdCheckThread(void* param) {
 			case DVD_STATE_BUSY:
 				break;
 		}
+#ifdef VERSION_G8ME01
+		if (DVDGetDriveStatus() != prevStatus) {
+			prevStatus = DVDGetDriveStatus();
+			stableCount = 0;
+		} else if (VIGetRetraceCount() != prevRetrace) {
+			prevRetrace = VIGetRetraceCount();
+			stableCount++;
+			if (stableCount > 100) {
+				stableCount = 100;
+			}
+		}
+#endif
 		if (gp->dvdError) {
 			SoundOpenCover();
 		}
@@ -497,7 +570,11 @@ void* gcDvdCheckThread(void* param) {
 				gp->dvdError = FALSE;
 			}
 		}
+#ifdef VERSION_G8ME01
+		if (gp->dvdError && stableCount > 10) {
+#else
 		if (gp->dvdError) {
+#endif
 			DEMOBeforeRender();
 			if (msgId) {
 				message = romFontGetMessage(msgId);
@@ -583,7 +660,11 @@ diff = (s32)now - (s32)gp->rumbleForcedOffTime[i];
 void L_gcResetCheck(void) {
 	u32 code;
 
+#ifdef VERSION_G8ME01
+	if ((gp->resetType || R_bReset) && (R_bReset = TRUE, !cardIsExec())) {
+#else
 	if (gp->resetType) {
+#endif
 		VISetBlack(TRUE);
 		VIFlush();
 		VIWaitForRetrace();
@@ -611,6 +692,9 @@ void L_gcResetCheck(void) {
 					code = OS_RESET_HOTRESET;
 				}
 			}
+#ifdef VERSION_G8ME01
+			code |= gp->language << 2;
+#endif
 			OSResetSystem(OS_RESET_RESTART, code, FALSE);
 		}
 		else {

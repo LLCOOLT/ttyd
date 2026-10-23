@@ -1,3 +1,4 @@
+#include "icon_ids.h"
 #include "battle/battle.h"
 #include "battle/battle_ac.h"
 #include "battle/battle_pad.h"
@@ -68,7 +69,7 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
     s32 flag = 0;
     s32 pressed;
     s32 i;
-    if (*((u8*)ac->mAcUnit + 0x303)) {
+    if (*((u8*)ac->mAcUnit + BUOFF(0x303))) {
         flag = 1;
     }
     switch (ac->mAcState) {
@@ -102,7 +103,7 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if ((ac->setupFlags & 1) && (*(u32*)((u8*)ac->mAcUnit + 0x278) & 0x10)) {
+            if ((ac->setupFlags & 1) && (*(u32*)((u8*)ac->mAcUnit + BUOFF(0x278)) & 0x10)) {
                 if (irand(100) >= 0) {
                     ac->setupParam = 30;
                     AC_S32(ac, 0x58) = 0;
@@ -272,7 +273,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = px;
         pos.y = py;
-        ICON(&pos, 0x10, 0x8C, 1.0f);
+        ICON(&pos, 0x10, ICON_08C, 1.0f);
     }
     full = 0;
     ratio = ac->w.gauge / 100.0f;
@@ -333,10 +334,10 @@ static void actionCommandDisp(f32 x, f32 y) {
             break;
     }
     {
-        s32 id = 0x91;
+        s32 id = ICON_091;
         Vec pos;
         if (ac->w.inZone) {
-            id = 0x95;
+            id = ICON_095;
         }
         {
             Vec zero = {0.0f, 0.0f, 0.0f};

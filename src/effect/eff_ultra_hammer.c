@@ -9,6 +9,10 @@
 #include <dolphin/os.h>
 #include <dolphin/vi.h>
 #include <string.h>
+#include "version.h"
+// US effect texture ids are 0x1C lower for these entries.
+#define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
+
 
 u8 wakka_dl_0_0[];
 u8 wakka_dl_0_1[];
@@ -549,7 +553,7 @@ void effUltraHammerDisp(enum CameraId camId, void *param)
   GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
   GXSetNumTexGens(1);
   GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 30, 0, 125);
-  effGetTexObj(145, &sp10);
+  effGetTexObj(EFF_TEX(145), &sp10);
   GXLoadTexObj(&sp10, GX_TEXMAP0);
   GXSetCullMode(GX_CULL_NONE);
   GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, data->alpha});

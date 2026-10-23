@@ -66,7 +66,7 @@ __declspec(section ".data") s32 fd_twinkling_pansy___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_twinkling_pansy_one_negone_359;
 __declspec(section ".data") s32 fd_twinkling_pansy___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_twinkling_pansy_one_364[1];
-BattleUnitKind unit_twinkling_pansy_11_data_F890;
+BattleUnitKind unit_twinkling_pansy;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
@@ -130,7 +130,7 @@ __declspec(section ".data") s32 fd_twinkling_pansy_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_twinkling_pansy_11_data_F890 = {
+BattleUnitKind unit_twinkling_pansy = {
     70,
     "btl_un_twinkling_pansy",
     20,
@@ -207,7 +207,13 @@ static BattleUnitKindPart parts[] = {
 };
 
 static s32 weapon_twinkling_pansy_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, 0, 0, 0,
+#ifdef VERSION_G8ME01
+    1677721602,
+#else
+    1677721600,
+#endif
+    1065353216, 16843009, (s32)weaponGetPowerDefault,
     20, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 34607712, 536870912, 770, 0, 71, 2047, -2147483648,

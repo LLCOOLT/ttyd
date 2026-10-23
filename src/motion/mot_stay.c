@@ -7,6 +7,14 @@
 #include "system.h"
 #include <string.h>
 
+#ifdef VERSION_G8ME01
+/* the pouch header declares these with other return types; this file uses the s32 forms */
+#define pouchGetHP pouchGetHP_hdr
+#define pouchEquipCheckBadge pouchEquipCheckBadge_hdr
+#include "mario/mariost.h"
+#undef pouchGetHP
+#undef pouchEquipCheckBadge
+#endif
 s32 pouchGetHP(void);
 s32 pouchEquipCheckBadge(s32 badgeId);
 void kpa_stay(void);
@@ -21,7 +29,7 @@ static inline BOOL lowHP(void) {
 	return r;
 }
 
-#define MW(m, off, T) (*(T*)((u8*)(m) + (off)))
+#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 
 void marioVoiceGlareOn(void) {
 	MarioWork* mario = marioGetPtr();
@@ -41,12 +49,16 @@ void marioVoiceGlareOff(void) {
 BOOL marioChkDeepSleep(void) {
 	BOOL result = FALSE;
 	MarioWork* mario = marioGetPtr();
-	if (mario->currMotionId == MARIO_MOTION_STAY && MW(mario, 0x2B4, s32) >= sysMsec2Frame(10000)) {
+	if (mario->currMotionId == MARIO_MOTION_STAY && (*(s32*)((u8*)mario + 0x2B4)) >= sysMsec2Frame(10000)) {
 		result = TRUE;
 	}
 	return result;
 }
 
+#ifdef VERSION_G8ME01
+BOOL marioPriCheckJabara(void);
+s32 marioGetHammerLevel(void);
+#endif
 void mot_stay(void) {
 	MarioWork* mario;
 	MarioWork* m;
@@ -64,6 +76,12 @@ void mot_stay(void) {
 		peach_stay();
 		return;
 	}
+#ifdef VERSION_G8ME01
+	if (!(*(u16*)((u8*)mario + 0x24A) & 0x100)) {
+		mario->trigFlags &= ~0x200000;
+		mario->trigFlags &= ~0x400000;
+	}
+#endif
 	if (mario->trigFlags & 1) {
 		mario->trigFlags &= ~1;
 		mario->flags &= ~(MARIO_FLAG_HAS_INPUT_JUMP | MARIO_FLAG_IS_JUMPING | MARIO_FLAG_IS_FALLING | MARIO_FLAG_IS_STEPPING);
@@ -72,11 +90,25 @@ void mot_stay(void) {
 		mario->airTimer = 0;
 		mario->multiTimer = 0;
 		mario->currSubMotionId = 0;
+#ifdef VERSION_G8ME01
+		if (marioPriCheckJabara()) {
+			mario->wMotionTimer = (mario->trigFlags & 0x100000) ? 10 : 0;
+		} else {
+			mario->wMotionTimer = 0;
+		}
+		mario->trigFlags &= ~0x100000;
+#else
 		mario->wMotionTimer = 0;
+#endif
 		MW(mario, 0x11C, Vec) = mario->position;
+#ifdef VERSION_G8ME01
+		*(s32*)((u8*)mario + 0x2AC) = 0;
+		*(s32*)((u8*)mario + 0x2B0) = 0;
+#else
 		MW(mario, 0x2B0, s32) = 0;
 		MW(mario, 0x2B8, s32) = 0;
-		MW(mario, 0x2B4, s32) = 0;
+#endif
+		(*(s32*)((u8*)mario + 0x2B4)) = 0;
 		MW(mario, 0x5A, s16) = 0;
 		marioSoundInit();
 		marioResetCamFollowRate();
@@ -144,6 +176,20 @@ void mot_stay(void) {
 		}
 	}
 	if (strcmp(mario->animName, "M_S_3") == 0 && marioChkKey()) {
+#ifdef VERSION_G8ME01
+		m = marioGetPtr();
+		MW(m, 0x58, s16) = MW(m, 0x58, s16) + 1;
+		if (MW(m, 0x58, s16) >= gp->framerate * 4) {
+			MW(m, 0x58, s16) = 0;
+			m->poseTime = 0;
+		}
+		if (MW(m, 0x58, s16) == 0) {
+			m->soundId[0] = psndSFXOn_3D((char*)0xE1, &m->position);
+		}
+		if (MW(m, 0x58, s16) == gp->framerate * 2) {
+			m->soundId[0] = psndSFXOn_3D((char*)0xE2, &m->position);
+		}
+#else
 		m = marioGetPtr();
 		MW(m, 0x58, s16) = MW(m, 0x58, s16) + 1;
 		if (MW(m, 0x58, s16) > 0xF0) {
@@ -155,6 +201,7 @@ void mot_stay(void) {
 		if (MW(m, 0x58, s16) == 0x87) {
 			m->soundId[0] = psndSFXOn_3D((char*)0xE2, &m->position);
 		}
+#endif
 	}
 	if (mario->flags & MARIO_FLAG_IS_CARRYING_BOBBERY) {
 		if (mario->controlStickSensitivity > 0.0f) {
@@ -165,15 +212,30 @@ void mot_stay(void) {
 	if (!newMot && marioChkItemMotion()) {
 		return;
 	}
+#ifdef VERSION_G8ME01
+	if (marioGetHammerLevel() < 2) {
+		if (*(u16*)((u8*)mario + 0x24C) & 0x200) {
+			return;
+		}
+	} else if (*(u16*)((u8*)mario + 0x24A) & 0x200) {
+		return;
+	}
+#else
 	if (MW(mario, 0x246, u16) & 0x200) {
 		return;
 	}
+#endif
 	if (marioSlitAbilityChk() && marioSlitButton() == 1) {
 		marioChgMot(MARIO_MOTION_SLIT);
 		return;
 	}
+#ifdef VERSION_G8ME01
+	if (++*(s32*)((u8*)mario + 0x2AC) >= 10) {
+		*(s32*)((u8*)mario + 0x2AC) = 10;
+#else
 	if (++MW(mario, 0x2B0, s32) >= 10) {
 		MW(mario, 0x2B0, s32) = 10;
+#endif
 		if (marioChkJabara()) {
 			marioChgMot(MARIO_MOTION_JABARA);
 			return;
@@ -181,6 +243,10 @@ void mot_stay(void) {
 	}
 	marioChkJump();
 	marioChkTransform();
+#ifdef VERSION_G8ME01
+	held = mario->controlStickSensitivity && !(mario->trigFlags & 0x400000);
+	if (held) {
+#else
 	held = FALSE;
 	if (MW(mario, 0x246, u16) & 0x100) {
 		MW(mario, 0x2B8, s32) = MW(mario, 0x2B8, s32) + 1;
@@ -195,6 +261,7 @@ void mot_stay(void) {
 		}
 	}
 	if (mario->wMotionTimer == 0 && mario->controlStickSensitivity > 0.0f && held == FALSE) {
+#endif
 		if ((s8)mario->wStickDir1 * (s8)mario->wStickDir1 + (s8)mario->wStickDir2 * (s8)mario->wStickDir2 > 0xBD1) {
 			if (pouchEquipCheckBadge(0x143) == 0) {
 				marioChgMot(MARIO_MOTION_DASH);
@@ -238,19 +305,29 @@ void mot_stay(void) {
 			break;
 		case 3:
 			if ((s32)--mario->multiTimer < 0) {
+#ifdef VERSION_G8ME01
+				marioChgEvtPose("M_N_5A\0");
+				mario->poseTime = 0;
+				mario->multiTimer = 0;
+#else
 				marioChgEvtPose("M_N_5A\0");
 				mario->multiTimer = 0;
+#endif
 				mario->currSubMotionId = 4;
-				MW(mario, 0x2B4, s32) = 0;
+				(*(s32*)((u8*)mario + 0x2B4)) = 0;
 				m = marioGetPtr();
 				m->soundId[0] = psndSFXOn_3D((char*)0xE4, &m->position);
 			}
 			break;
 		case 4:
-			if (++MW(mario, 0x2B4, s32) >= sysMsec2Frame(10000)) {
-				MW(mario, 0x2B4, s32) = sysMsec2Frame(10000);
+			if (++(*(s32*)((u8*)mario + 0x2B4)) >= sysMsec2Frame(10000)) {
+				(*(s32*)((u8*)mario + 0x2B4)) = sysMsec2Frame(10000);
 			}
+#ifdef VERSION_G8ME01
+			if ((s32)++mario->multiTimer >= gp->framerate * 2) {
+#else
 			if ((s32)++mario->multiTimer >= 0x8C) {
+#endif
 				mario->multiTimer = 0;
 				m = marioGetPtr();
 				m->soundId[0] = psndSFXOn_3D((char*)0xE4, &m->position);

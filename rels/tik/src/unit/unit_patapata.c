@@ -93,7 +93,7 @@ __declspec(section ".data") s32 fd_patapata___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_patapata_one_negone_359;
 __declspec(section ".data") s32 fd_patapata___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_patapata_one_364[1];
-BattleUnitKind unit_patapata_26_data_29498;
+BattleUnitKind unit_patapata;
 static s32 weapon_patapata_attack[48];
 static __declspec(section ".data") BattleUnitDefense defence_patapata;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_patapata_attr;
@@ -171,7 +171,7 @@ __declspec(section ".data") s32 fd_patapata_one_364[] = {
     1065353216,
 };
 
-BattleUnitKind unit_patapata_26_data_29498 = {
+BattleUnitKind unit_patapata = {
     15,
     "btl_un_patapata",
     4,

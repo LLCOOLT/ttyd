@@ -4,6 +4,7 @@
 #include "memory.h"
 #include <dolphin/mtx.h>
 #include <stdlib.h>
+#include "icon_ids.h"
 
 #define PI 3.1415927f
 #define HALF_PI 1.5707964f
@@ -191,7 +192,7 @@ void effStarPointDisp(CameraId cameraId, EffectEntry* effect) {
         if (work->alpha) {
             PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
             PSMTXConcat(mtx, trans, trans);
-            iconDispGx2(trans, 0, 0x18C);
+            iconDispGx2(trans, 0, ICON_18C);
         }
     }
 }

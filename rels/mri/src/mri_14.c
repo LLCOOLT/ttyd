@@ -130,7 +130,11 @@ s32 starstone_rotate_exec[13];
 static s32 starstone_fuwafuwa[71];
 s32 npc_dokan[209];
 static s32 punipuni_mario_halt[33];
+#ifdef VERSION_G8ME01
+s32 time_bomb[931];
+#else
 s32 time_bomb[937];
+#endif
 s32 bomb_check[14];
 static s32 yuka_move[96];
 static s32 yuka_check[116];
@@ -557,15 +561,21 @@ EVT_BEGIN(time_bomb)
     CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 300)
     CALL(evt_cam_shake, 4, FLOAT(0.005859375f), FLOAT(0.0f), 300)
     CALL(evt_cam_shake, 4, FLOAT(0.0068359375f), FLOAT(0.0f), 300)
+#ifndef VERSION_G8ME01
     SPAWN_EVENT(PTR(flash2_and_wait))
+#endif
     CALL(evt_cam_shake, 4, FLOAT(0.0078125f), FLOAT(0.0f), 300)
     CALL(evt_cam_shake, 4, FLOAT(0.0087890625f), FLOAT(0.0f), 300)
     CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
     CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
+#ifndef VERSION_G8ME01
     SPAWN_EVENT(PTR(flash2_and_wait))
+#endif
     CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
     CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
+#ifndef VERSION_G8ME01
     SPAWN_EVENT(PTR(flash_and_wait))
+#endif
     CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
     CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
     BEGIN_INLINE_EVENT

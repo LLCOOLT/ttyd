@@ -16,13 +16,13 @@ extern s32 battle_item_default_param_list[];
 extern s32 battle_item_gundan_zako[];
 extern s32 battle_item_gundan_zako_elite[];
 extern s32 battle_item_gundan_zako_magician[];
-extern s32 unit_barriern_2_data_3A830[];
+extern s32 unit_barriern[];
 extern s32 unit_barriern_custom[];
-extern s32 unit_barriern_z_2_data_303C8[];
+extern s32 unit_barriern_z[];
 extern s32 unit_boss_magnum_battender_mkII[];
-extern s32 unit_gundan_zako_2_data_2E898[];
+extern s32 unit_gundan_zako[];
 extern s32 unit_gundan_zako_elite[];
-extern s32 unit_gundan_zako_magician_2_data_34AD8[];
+extern s32 unit_gundan_zako_magician[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_aji_negone_one_374;
@@ -305,8 +305,8 @@ __declspec(section ".data") s32 btlgrp_aji_aji_01_01_off_1[] = {
 };
 
 s32 btlparty_aji_aji_01_02_off_1[] = {
-    (s32)unit_gundan_zako_2_data_2E898, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako_2_data_2E898, 16777216, 67108868, 1119092736,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1112014848, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako, 16777216, 67108868, 1119092736,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako,
     (s32)unit_gundan_zako_elite, 16777216, 67108868, 1124204544, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_gundan_zako_elite,
@@ -318,10 +318,10 @@ __declspec(section ".data") s32 btlgrp_aji_aji_01_02_off_1[] = {
 
 s32 btlparty_aji_aji_01_03_off_1[] = {
     (s32)unit_gundan_zako_elite, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako_elite, (s32)unit_gundan_zako_2_data_2E898, 16777216, 67108868, 1116471296,
+    0, 0, 0, (s32)battle_item_gundan_zako_elite, (s32)unit_gundan_zako, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako,
-    (s32)unit_gundan_zako_2_data_2E898, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako_2_data_2E898, 16777216, 67108868, 1125515264,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako,
 };
 
@@ -330,7 +330,7 @@ __declspec(section ".data") s32 btlgrp_aji_aji_01_03_off_1[] = {
 };
 
 s32 btlparty_aji_aji_01_04_off_1[] = {
-    (s32)unit_gundan_zako_magician_2_data_34AD8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    (s32)unit_gundan_zako_magician, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
     0, 0, 0, (s32)battle_item_gundan_zako_magician, (s32)unit_gundan_zako_elite, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako_elite,
 };
@@ -340,8 +340,8 @@ __declspec(section ".data") s32 btlgrp_aji_aji_01_04_off_1[] = {
 };
 
 s32 btlparty_aji_aji_01_05_off_1[] = {
-    (s32)unit_barriern_z_2_data_303C8, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_barriern_z, (s32)unit_gundan_zako_magician_2_data_34AD8, 16777216, 67108868, 1121714176,
+    (s32)unit_barriern_z, 16777216, 67108868, 1116471296, 1109393408, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_barriern_z, (s32)unit_gundan_zako_magician, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako_magician,
 };
 
@@ -363,10 +363,10 @@ __declspec(section ".data") s32 btlgrp_aji_aji_01_06_off_1[] = {
 };
 
 s32 btlparty_aji_aji_01_07_off_1[] = {
-    (s32)unit_gundan_zako_2_data_2E898, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_barriern_z_2_data_303C8, 16777216, 67108868, 1116471296,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_barriern_z, 16777216, 67108868, 1116471296,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_barriern_z,
-    (s32)unit_barriern_z_2_data_303C8, 16777216, 67108868, 1125515264, 1109393408, 1101004800, 0, 0,
+    (s32)unit_barriern_z, 16777216, 67108868, 1125515264, 1109393408, 1101004800, 0, 0,
     0, 0, 0, (s32)battle_item_barriern_z,
 };
 
@@ -375,10 +375,10 @@ __declspec(section ".data") s32 btlgrp_aji_aji_01_07_off_1[] = {
 };
 
 s32 btlparty_aji_aji_01_08_off_1[] = {
-    (s32)unit_gundan_zako_2_data_2E898, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako_2_data_2E898, 16777216, 67108868, 1116471296,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako,
-    (s32)unit_gundan_zako_magician_2_data_34AD8, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    (s32)unit_gundan_zako_magician, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
     0, 0, 0, (s32)battle_item_gundan_zako_magician, (s32)unit_gundan_zako_elite, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako_elite,
 };
@@ -398,8 +398,8 @@ __declspec(section ".data") s32 btlgrp_aji_aji_04_01_off_1[] = {
 };
 
 s32 btlparty_aji_aji_06_01_off_1[] = {
-    (s32)unit_gundan_zako_magician_2_data_34AD8, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako_magician, (s32)unit_gundan_zako_magician_2_data_34AD8, 16777216, 67108868, 1121714176,
+    (s32)unit_gundan_zako_magician, 16777216, 67108868, 1116471296, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako_magician, (s32)unit_gundan_zako_magician, 16777216, 67108868, 1121714176,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako_magician,
 };
 
@@ -408,10 +408,10 @@ __declspec(section ".data") s32 btlgrp_aji_aji_06_01_off_1[] = {
 };
 
 s32 btlparty_aji_aji_08_01_off_1[] = {
-    (s32)unit_gundan_zako_magician_2_data_34AD8, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako_magician, (s32)unit_barriern_2_data_3A830, 16777216, 67108868, 1116471296,
+    (s32)unit_gundan_zako_magician, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako_magician, (s32)unit_barriern, 16777216, 67108868, 1116471296,
     1109393408, 0, 0, 0, 0, 0, 0, (s32)battle_item_barriern,
-    (s32)unit_barriern_z_2_data_303C8, 16777216, 67108868, 1125515264, 1109393408, 1101004800, 0, 0,
+    (s32)unit_barriern_z, 16777216, 67108868, 1125515264, 1109393408, 1101004800, 0, 0,
     0, 0, 0, (s32)battle_item_barriern_z,
 };
 
@@ -420,13 +420,13 @@ __declspec(section ".data") s32 btlgrp_aji_aji_08_01_off_1[] = {
 };
 
 s32 btlparty_aji_aji_09_01_off_1[] = {
-    (s32)unit_gundan_zako_2_data_2E898, 16777216, 67108868, 1092616192, 0, -1046478848, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako_2_data_2E898, 16777216, 67108868, 1112014848,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1092616192, 0, -1046478848, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako, 16777216, 67108868, 1112014848,
     0, -1054867456, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako,
-    (s32)unit_gundan_zako_2_data_2E898, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako_2_data_2E898, 16777216, 67108868, 1124204544,
+    (s32)unit_gundan_zako, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako, (s32)unit_gundan_zako, 16777216, 67108868, 1124204544,
     0, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako,
-    (s32)unit_gundan_zako_magician_2_data_34AD8, 16777216, 67108868, 1126825984, 0, 1101004800, 0, 0,
+    (s32)unit_gundan_zako_magician, 16777216, 67108868, 1126825984, 0, 1101004800, 0, 0,
     0, 0, 0, (s32)battle_item_gundan_zako_magician,
 };
 
@@ -444,11 +444,11 @@ __declspec(section ".data") s32 btlgrp_aji_aji_10_01_off_1[] = {
 };
 
 s32 btlparty_aji_aji_13_01_off_1[] = {
-    (s32)unit_gundan_zako_magician_2_data_34AD8, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako_magician, (s32)unit_gundan_zako_magician_2_data_34AD8, 16777216, 67108868, 1116471296,
+    (s32)unit_gundan_zako_magician, 16777216, 67108868, 1106247680, 0, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako_magician, (s32)unit_gundan_zako_magician, 16777216, 67108868, 1116471296,
     0, 0, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako_magician,
-    (s32)unit_gundan_zako_magician_2_data_34AD8, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
-    0, 0, 0, (s32)battle_item_gundan_zako_magician, (s32)unit_gundan_zako_magician_2_data_34AD8, 16777216, 67108868, 1125515264,
+    (s32)unit_gundan_zako_magician, 16777216, 67108868, 1121714176, 0, 1092616192, 0, 0,
+    0, 0, 0, (s32)battle_item_gundan_zako_magician, (s32)unit_gundan_zako_magician, 16777216, 67108868, 1125515264,
     0, 1101004800, 0, 0, 0, 0, 0, (s32)battle_item_gundan_zako_magician,
 };
 
@@ -457,8 +457,8 @@ __declspec(section ".data") s32 btlgrp_aji_aji_13_01_off_1[] = {
 };
 
 s32 btlparty_aji_aji_13_02_off_1[] = {
-    (s32)unit_barriern_z_2_data_303C8, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
-    0, 0, 0, (s32)battle_item_barriern_z, (s32)unit_barriern_z_2_data_303C8, 16777216, 67108868, 1124204544,
+    (s32)unit_barriern_z, 16777216, 67108868, 1112014848, 1109393408, -1054867456, 0, 0,
+    0, 0, 0, (s32)battle_item_barriern_z, (s32)unit_barriern_z, 16777216, 67108868, 1124204544,
     1109393408, 1092616192, 0, 0, 0, 0, 0, (s32)battle_item_barriern_z,
 };
 

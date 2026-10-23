@@ -100,6 +100,9 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(toron_check);
 USER_FUNC(mario_normalize_wait);
+#ifdef VERSION_G8ME01
+extern s32 evt_sub_mail_event[];
+#endif
 void yuurei_callback(s32 type, void* param);
 void powan_callback(s32 type, void* param);
 extern s32 bero_case_entry[];
@@ -151,14 +154,22 @@ s32 evt_bed[22];
 s32 evt_toron_catch[281];
 static __declspec(section ".data") s32 item_tbl[2];
 s32 evt_toron_catch2[359];
+#ifdef VERSION_G8ME01
+s32 evt_toron_appear[437];
+#else
 s32 evt_toron_appear[414];
+#endif
 static s32 evt_daiji_kami[88];
 static s32 evt_yuka_simi[45];
 static s32 evt_access[14];
 static s32 evt_access2[44];
 static s32 evt_access_entry[62];
 s32 rsh_02_init_evt[247];
+#ifdef VERSION_G8ME01
+s32 rsh_02_a_init_evt[687];
+#else
 s32 rsh_02_a_init_evt[685];
+#endif
 s32 rsh_02_b_init_evt[168];
 static __declspec(section ".data") s32 window_tbl[4];
 s32 rsh_02_c_init_evt[142];
@@ -339,7 +350,11 @@ EVT_END()
 
 static EVT_BEGIN(talk_gurume)
     SWITCH(GSW(0))
+#ifdef VERSION_G8ME01
+        CASE_LESS(284)
+#else
         CASE_LESS(283)
+#endif
         CALL(evt_msg_print, 0, STRING("stg6_rsh_12"), 0, 0)
         CASE_LESS(285)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_54_00"), 0, 0)
@@ -758,7 +773,11 @@ EVT_BEGIN(evt_1day_end)
 EVT_END()
 
 void yuurei_callback(s32 type, void* param) {
+#ifdef VERSION_G8ME01
+    EventEntry* ev = *(EventEntry**)(*(u8**)param + 0xF200);
+#else
     EventEntry* ev = *(EventEntry**)(*(u8**)param + 0x7A00);
+#endif
 
     if (ev->lwData[13] != 0 && type == 3) {
         ev->lwData[14]++;
@@ -775,7 +794,11 @@ void powan_callback(s32 type, void* param) {
     u8* work = *(u8**)param;
 
     if (type == 3) {
+#ifdef VERSION_G8ME01
+        EventEntry* ev = *(EventEntry**)(work + 0xF200);
+#else
         EventEntry* ev = *(EventEntry**)(work + 0x7A00);
+#endif
         s32 count = evtGetValue(ev, LW(10));
 
         switch (count) {
@@ -1120,7 +1143,13 @@ EVT_BEGIN(evt_toron_appear)
         CALL(evt_npc_pera_onoff, STRING("トロン"), 0)
         CALL(evt_npc_set_rotate, STRING("トロン"), 180, 180, 90)
         CALL(evt_npc_set_position, STRING("トロン"), -300, 2, -220)
+#ifdef VERSION_G8ME01
+        CALL(evt_npc_set_ry, STRING("トロン"), 90)
+#endif
         CALL(evt_npc_get_position, STRING("トロン"), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01
+        ADD(LW(1), 2)
+#endif
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRON_APPEAR1"), LW(0), LW(1), LW(2), 0)
         SET_FLOAT_VALUE(LW(3), FLOAT(0.5f))
         SET_VALUE(LW(4), 1)
@@ -1158,6 +1187,13 @@ EVT_BEGIN(evt_toron_appear)
     CALL(evt_npc_pera_onoff, STRING("トロン"), 1)
     CALL(evt_npc_set_rotate, STRING("トロン"), 0, 0, 0)
     CALL(evt_npc_get_position, STRING("トロン"), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01
+    CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
+    IF_INT_GREATER(LW(10), -200)
+        SET_VALUE(LW(0), -260)
+    END_IF
+    SET_VALUE(LW(1), 2)
+#endif
     CALL(evt_npc_jump_position_nohit, STRING("トロン"), LW(0), LW(1), LW(2), 300, 20)
     WAIT_FRAMES(1)
     CALL(evt_npc_set_anim, STRING("トロン"), STRING("B_1"))
@@ -1528,6 +1564,9 @@ EVT_BEGIN(rsh_02_a_init_evt)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_5_kami_2"), 1)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yuka_5"), 1)
     END_SWITCH
+#ifdef VERSION_G8ME01
+    SPAWN_EVENT(evt_sub_mail_event)
+#endif
     CALL_CHILD(PTR(evt_rsh_moamoa_on_window))
     RETURN
 EVT_END()

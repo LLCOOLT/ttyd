@@ -41,7 +41,11 @@ static s32 e2_door_open[22];
 static s32 bero_entry_data[90];
 static s32 w_bero_mapchg[15];
 static s32 dmgRetPoint[24];
+#ifdef VERSION_G8ME01
+s32 las_23_init_evt[98];
+#else
 s32 las_23_init_evt[93];
+#endif
 
 __declspec(section ".data") u64 fd_las_23_negone_one_374 = 0xBF8000003F800000;
 
@@ -182,6 +186,9 @@ EVT_BEGIN(las_23_init_evt)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_paipu"), 1)
         CALL(evt_hitobj_onoff, STRING("jav_01"), 1, 0)
         CALL(evt_hitobj_onoff, STRING("jav_02"), 1, 0)
+#ifdef VERSION_G8ME01
+        CALL(evt_hitobj_onoff, STRING("jav_03"), 1, 0)
+#endif
         ELSE
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_yuka"), 1)
         CALL(evt_hitobj_onoff, STRING("A_be\0\0\0"), 1, 0)

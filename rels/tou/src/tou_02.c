@@ -1,3 +1,4 @@
+#include "version.h"
 #pragma dollar_identifiers on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -18,6 +19,10 @@
 #include "driver/hitdrv.h"
 #include "driver/dispdrv.h"
 #include "party.h"
+#ifdef VERSION_G8ME01
+USER_FUNC(N_evt_sub_status_gauge_force_update);
+USER_FUNC(evt_sub_get_language);
+#endif
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct Fan { u16 flags; s16 state; s16 animIdx; u8 pad_0x6[2]; u64 time; Vec pos; Vec vel; f32 field_0x28; Vec target; Vec param; s16 timer; } Fan;
@@ -135,7 +140,7 @@ s32 evt_sub_intpl_msec_get_value(EventEntry* event, BOOL isFirstCall);
 s32 evt_sub_intpl_msec_init(EventEntry* event, BOOL isFirstCall);
 s32 evt_sub_random(EventEntry* event, BOOL isFirstCall);
 s32 evt_sub_rumble_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_tou_get_ranking_27_text_1ED4(EventEntry* event, BOOL isFirstCall);
+s32 evt_tou_get_ranking(EventEntry* event, BOOL isFirstCall);
 s32 check_hammer(Fan* fan);
 void ext_fan_dispent(void);
 void ext_fan_dispent(void);
@@ -234,10 +239,10 @@ __declspec(section ".data") static s32 evt_poster_4[5];
 __declspec(section ".data") static s32 evt_poster_5[5];
 __declspec(section ".data") static s32 evt_poster_6[5];
 __declspec(section ".data") static s32 evt_poster_7[5];
-static s32 evt_poster_8[46];
+static s32 evt_poster_8[VERSION_PICK(46, 60)];
 __declspec(section ".data") static s32 evt_poster_9[5];
 static s32 evt_after_peach[188];
-s32 tou_02_init_evt[576];
+s32 tou_02_init_evt[VERSION_PICK(576, 919)];
 
 void C_VECReflect(const Vec* src, const Vec* normal, Vec* dst);
 void PSMTXIdentity(Mtx m);
@@ -621,7 +626,7 @@ static EVT_BEGIN(talk_madam)
         CASE_LESS(131)
         CALL(evt_msg_print, 0, STRING(("stg3_npc_02_01_01")), 0, 0)
         CASE_LESS(164)
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_GREATER(15)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_01_02")), 0, 0)
@@ -650,7 +655,7 @@ EVT_BEGIN(talk_repo)
         CASE_LESS(131)
         CALL(evt_msg_print, 0, STRING(("stg3_npc_02_02_01")), 0, 0)
         CASE_LESS(164)
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_GREATER(15)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_02_02")), 0, 0)
@@ -667,7 +672,7 @@ EVT_BEGIN(talk_repo)
         IF_INT_EQUAL(GSWF(2500), 0)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_02_07")), 0, 0)
             ELSE
-            CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+            CALL(evt_tou_get_ranking, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(0)
                 CALL(evt_msg_print, 0, STRING(("stg3_npc_re_024")), 0, 0)
@@ -695,7 +700,7 @@ EVT_BEGIN(talk_cam1)
         CASE_LESS(131)
         CALL(evt_msg_print, 0, STRING(("stg3_npc_02_03_01")), 0, 0)
         CASE_LESS(164)
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_GREATER(15)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_03_02")), 0, 0)
@@ -712,7 +717,7 @@ EVT_BEGIN(talk_cam1)
         IF_INT_EQUAL(GSWF(2500), 0)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_03_07")), 0, 0)
             ELSE
-            CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+            CALL(evt_tou_get_ranking, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(0)
                 CALL(evt_msg_print, 0, STRING(("stg3_npc_re_026")), 0, 0)
@@ -744,7 +749,7 @@ EVT_BEGIN(talk_cam2)
         CASE_LESS(131)
         CALL(evt_msg_print, 0, STRING(("stg3_npc_02_04_01")), 0, 0)
         CASE_LESS(164)
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_GREATER(15)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_04_02")), 0, 0)
@@ -761,7 +766,7 @@ EVT_BEGIN(talk_cam2)
         IF_INT_EQUAL(GSWF(2500), 0)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_04_07")), 0, 0)
             ELSE
-            CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+            CALL(evt_tou_get_ranking, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(0)
                 CALL(evt_msg_print, 0, STRING(("stg3_npc_re_028")), 0, 0)
@@ -802,7 +807,7 @@ EVT_BEGIN(talk_kino4)
         CASE_LESS(131)
         CALL(evt_msg_print, 0, STRING(("stg3_npc_02_05_01")), 0, 0)
         CASE_LESS(164)
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_GREATER(15)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_05_02")), 0, 0)
@@ -819,7 +824,7 @@ EVT_BEGIN(talk_kino4)
         IF_INT_EQUAL(GSWF(2500), 0)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_05_07")), 0, 0)
             ELSE
-            CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+            CALL(evt_tou_get_ranking, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(0)
                 CALL(evt_msg_print, 0, STRING(("stg3_npc_re_030")), 0, 0)
@@ -848,7 +853,7 @@ EVT_BEGIN(talk_kino5)
         CASE_LESS(131)
         CALL(evt_msg_print, 0, STRING(("stg3_npc_02_06_01")), 0, 0)
         CASE_LESS(164)
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_GREATER(15)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_06_02")), 0, 0)
@@ -885,7 +890,7 @@ EVT_BEGIN(talk_kino5)
                 CALL(evt_msg_print, 0, STRING(("stg3_npc_02_06_07")), 0, 0)
             END_IF
             ELSE
-            CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+            CALL(evt_tou_get_ranking, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(0)
                 CALL(evt_mario_get_party, LW(0))
@@ -933,7 +938,7 @@ EVT_BEGIN(talk_kinopiko)
         CASE_LESS(131)
         CALL(evt_msg_print, 0, STRING(("stg3_npc_02_07_01")), 0, 0)
         CASE_LESS(164)
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_GREATER(15)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_07_02")), 0, 0)
@@ -950,7 +955,7 @@ EVT_BEGIN(talk_kinopiko)
         IF_INT_EQUAL(GSWF(2500), 0)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_07_07")), 0, 0)
             ELSE
-            CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+            CALL(evt_tou_get_ranking, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(0)
                 CALL(evt_msg_print, 0, STRING(("stg3_npc_re_034")), 0, 0)
@@ -978,7 +983,7 @@ EVT_BEGIN(talk_kinopio_f)
         CASE_LESS(131)
         CALL(evt_msg_print, 0, STRING(("stg3_npc_02_08_01")), 0, 0)
         CASE_LESS(164)
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_GREATER(15)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_08_02")), 0, 0)
@@ -995,7 +1000,7 @@ EVT_BEGIN(talk_kinopio_f)
         IF_INT_EQUAL(GSWF(2500), 0)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_08_07")), 0, 0)
             ELSE
-            CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+            CALL(evt_tou_get_ranking, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(0)
                 CALL(evt_msg_print, 0, STRING(("stg3_npc_re_036")), 0, 0)
@@ -1028,7 +1033,7 @@ EVT_BEGIN(talk_chu)
         CASE_LESS(131)
         CALL(evt_msg_print, 0, STRING(("stg3_npc_02_10_01")), 0, 0)
         CASE_LESS(164)
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_GREATER(15)
             CALL(evt_msg_print, 0, STRING(("stg3_npc_02_10_02")), 0, 0)
@@ -1767,7 +1772,7 @@ EVT_BEGIN(evt_momikucha)
             SET_VALUE(GF(10), 0)
         END_IF
     END_IF
-    CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+    CALL(evt_tou_get_ranking, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         IF_INT_EQUAL(GSWF(2403), 0)
             SET_VALUE(GSWF(2403), 1)
@@ -1943,6 +1948,26 @@ __declspec(section ".data") static EVT_BEGIN(evt_poster_7)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+static EVT_BEGIN(evt_poster_8)
+    SET_VALUE(GSWF(2463), 1)
+    IF_INT_EQUAL(GSW(0), 153)
+        CALL(evt_sub_get_language, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(evt_mapobj_get_position, STRING("p_m_8"), LW(0), LW(1), LW(2))
+            ELSE
+            CALL(evt_mapobj_get_position, STRING("p_m_8_e"), LW(0), LW(1), LW(2))
+        END_IF
+        CALL(evt_item_entry, STRING("key"), 19, LW(0), LW(1), LW(2), 4, -1, PTR(evt_key))
+        CALL(evt_item_set_move_dir_speed, STRING("key"), FLOAT(180.0f), FLOAT(90.0f))
+        CALL(evt_item_set_gravity, STRING("key"), FLOAT(1.0f))
+        CALL(evt_item_set_bound_rate, STRING("key"), FLOAT(0.5996094f))
+        CALL(evt_item_set_jump_power, STRING("key"), FLOAT(500.0f))
+        CALL(evt_item_status_on, STRING("key"), 16)
+    END_IF
+    RETURN
+EVT_END()
+#else
 static EVT_BEGIN(evt_poster_8)
     SET_VALUE(GSWF(2463), 1)
     IF_INT_EQUAL(GSW(0), 153)
@@ -1956,6 +1981,7 @@ static EVT_BEGIN(evt_poster_8)
     END_IF
     RETURN
 EVT_END()
+#endif
 
 __declspec(section ".data") static EVT_BEGIN(evt_poster_9)
     SET_VALUE(GSWF(2464), 1)
@@ -2007,6 +2033,274 @@ static EVT_BEGIN(evt_after_peach)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01
+EVT_BEGIN(tou_02_init_evt)
+    SWITCH(GSW(0))
+        CASE_BETWEEN(127, 137)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU2"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU2"))
+        CALL(evt_snd_bgmoff, 26624)
+        CASE_GREATER_OR_EQUAL(165)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU2"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU2"))
+        CALL(evt_snd_bgmoff, 26624)
+        CASE_DEFAULT
+        CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU1"))
+        CALL(evt_snd_bgmon, 160, 0)
+        CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU2"))
+    END_SWITCH
+    SET_VALUE(LW(0), PTR(bero_data))
+    CALL(evt_bero_get_info)
+    IF_INT_EQUAL(GSWF(2374), 1)
+        CALL_CHILD(bero_case_entry)
+        SPAWN_EVENT(PTR(evt_tougi2))
+        ELSE
+        CALL_CHILD(evt_bero_info_run)
+    END_IF
+    CALL(evt_npc_setup, PTR(npcEnt))
+    CALL_CHILD(PTR(init_kinopio_f))
+    CALL(evt_npc_change_interrupt, STRING("キノピオ女"), 6, PTR(talk_kinopio_f))
+    CALL(evt_mobj_kururing_floor, STRING("kururin1"), -260, 0, -120, STRING("sita"), 125, GSWF(5623))
+    IF_INT_LESS(GSW(0), 129)
+        SET_VALUE(LW(0), 3)
+        CALL_CHILD(bero_case_switch_off)
+        SET_VALUE(LW(0), 4)
+        CALL_CHILD(bero_case_switch_off)
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 172)
+        IF_INT_EQUAL(GSWF(2497), 0)
+            SET_VALUE(LW(0), 3)
+            CALL_CHILD(bero_case_switch_off)
+            SET_VALUE(LW(0), 4)
+            CALL_CHILD(bero_case_switch_off)
+        END_IF
+    END_IF
+    IF_INT_EQUAL(GSW(0), 171)
+        IF_INT_EQUAL(GSWF(2496), 0)
+            CALL(evt_npc_set_position, STRING("キノピオ女"), 0, -1000, 0)
+            CALL(evt_npc_set_position, STRING("キノピオ４"), 0, -1000, 0)
+        END_IF
+    END_IF
+    IF_INT_EQUAL(GSW(0), 171)
+        CALL(evt_mario_get_party, LW(15))
+        IF_INT_EQUAL(LW(15), 0)
+            CALL(evt_mario_set_party, 0, 1)
+            CALL(evt_party_run, 0)
+        END_IF
+        CALL(evt_pouch_mario_recovery)
+        CALL(evt_pouch_all_party_recovery)
+        CALL(N_evt_sub_status_gauge_force_update)
+        CALL(evt_pouch_remove_item, 65, LW(0))
+        SPAWN_EVENT(PTR(evt_after_peach))
+        SET_VALUE(GSWF(2402), 1)
+        SET_VALUE(GSWF(2403), 1)
+    END_IF
+    CALL(evt_map_playanim, STRING("anm_paneru"), 1, 0)
+    BEGIN_INLINE_EVENT
+        LOOP(0)
+            LOOP(0)
+                CALL(evt_map_checkanim, STRING("anm_paneru"), LW(0), LW(1))
+                IF_INT_LESS(LW(1), 5333)
+                    CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_AMB_OBJ_SCREEN2"), 178, 0, -98, 0)
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+            WAIT_FRAMES(10)
+            CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_AMB_OBJ_SCREEN1"), 178, 0, -98, 0)
+            LOOP(0)
+                CALL(evt_map_checkanim, STRING("anm_paneru"), LW(0), LW(1))
+                IF_INT_LESS(LW(1), 2000)
+                    CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_AMB_OBJ_SCREEN2"), 178, 0, -98, 0)
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+            WAIT_FRAMES(5)
+            CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_AMB_OBJ_SCREEN1"), 178, 0, -98, 0)
+            LOOP(0)
+                CALL(evt_map_checkanim, STRING("anm_paneru"), LW(0), LW(1))
+                IF_INT_GREATER(LW(1), 6333)
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+        END_LOOP
+    END_INLINE_EVENT
+    CALL_CHILD(PTR(evt_momikucha))
+    CALL(evt_sub_get_language, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_1_e"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_2_e"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_3_e"), 16384)
+        CALL(evt_tou_get_ranking, LW(0))
+        SWITCH(LW(0))
+            CASE_LESS(2)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_1"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_2"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("p_p_3"), 1)
+            CALL(evt_hitobj_onoff, STRING("a_p_p_2"), 1, 0)
+            CALL(evt_hitobj_onoff, STRING("a_p_p_3"), 1, 1)
+            CALL(evt_cloud_init)
+            IF_INT_EQUAL(GSWF(2457), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_2"), STRING("a_p_m_2"), PTR(evt_poster_2))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_2"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_2"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2458), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_3"), STRING("a_p_m_3"), PTR(evt_poster_3))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_3"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_3"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2459), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_4"), STRING("a_p_m_4"), PTR(evt_poster_4))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_4"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_4"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2460), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_5"), STRING("a_p_m_5"), PTR(evt_poster_5))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_5"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_5"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2461), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_6"), STRING("a_p_m_6"), PTR(evt_poster_6))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_6"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_6"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2462), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_7"), STRING("a_p_m_7"), PTR(evt_poster_7))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_7"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_7"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2463), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_8"), STRING("a_p_m_8"), PTR(evt_poster_8))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_8"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_8"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2464), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_9"), STRING("a_p_m_9"), PTR(evt_poster_9))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_9"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_9"), 1, 0)
+            END_IF
+            CASE_LESS(11)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_1"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("p_p_2"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_3"), 1)
+            CALL(evt_hitobj_onoff, STRING("a_p_p_2"), 1, 1)
+            CALL(evt_hitobj_onoff, STRING("a_p_p_3"), 1, 0)
+            CALL(evt_cloud_init)
+            IF_INT_EQUAL(GSWF(2456), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_1"), STRING("a_p_m_1"), PTR(evt_poster_1))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_1"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_1"), 1, 0)
+            END_IF
+            CASE_DEFAULT
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("p_p_1"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_2"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_3"), 1)
+            CALL(evt_hitobj_onoff, STRING("a_p_p_2"), 1, 0)
+            CALL(evt_hitobj_onoff, STRING("a_p_p_3"), 1, 0)
+        END_SWITCH
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_1"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_2"), 16384)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_3"), 16384)
+        CALL(evt_tou_get_ranking, LW(0))
+        SWITCH(LW(0))
+            CASE_LESS(2)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_1_e"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_2_e"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("p_p_3_e"), 1)
+            CALL(evt_hitobj_onoff, STRING("a_p_p_2"), 1, 0)
+            CALL(evt_hitobj_onoff, STRING("a_p_p_3"), 1, 1)
+            CALL(evt_cloud_init)
+            IF_INT_EQUAL(GSWF(2457), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_2_e"), STRING("a_p_m_2"), PTR(evt_poster_2))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_2_e"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_2"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2458), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_3_e"), STRING("a_p_m_3"), PTR(evt_poster_3))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_3_e"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_3"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2459), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_4_e"), STRING("a_p_m_4"), PTR(evt_poster_4))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_4_e"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_4"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2460), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_5_e"), STRING("a_p_m_5"), PTR(evt_poster_5))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_5_e"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_5"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2461), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_6_e"), STRING("a_p_m_6"), PTR(evt_poster_6))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_6_e"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_6"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2462), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_7_e"), STRING("a_p_m_7"), PTR(evt_poster_7))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_7_e"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_7"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2463), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_8_e"), STRING("a_p_m_8"), PTR(evt_poster_8))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_8_e"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_8"), 1, 0)
+            END_IF
+            IF_INT_EQUAL(GSWF(2464), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_9_e"), STRING("a_p_m_9"), PTR(evt_poster_9))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_9_e"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_9"), 1, 0)
+            END_IF
+            CASE_LESS(11)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_1_e"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("p_p_2_e"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_3_e"), 1)
+            CALL(evt_hitobj_onoff, STRING("a_p_p_2"), 1, 1)
+            CALL(evt_hitobj_onoff, STRING("a_p_p_3"), 1, 0)
+            CALL(evt_cloud_init)
+            IF_INT_EQUAL(GSWF(2456), 0)
+                CALL(evt_cloud_ent, 0, STRING("p_m_1_e"), STRING("a_p_m_1"), PTR(evt_poster_1))
+                ELSE
+                CALL(evt_mapobj_flag_onoff, 0, 1, STRING("p_m_1_e"), 1)
+                CALL(evt_hitobj_onoff, STRING("a_p_m_1"), 1, 0)
+            END_IF
+            CASE_DEFAULT
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("p_p_1_e"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_2_e"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_p_3_e"), 1)
+            CALL(evt_hitobj_onoff, STRING("a_p_p_2"), 1, 0)
+            CALL(evt_hitobj_onoff, STRING("a_p_p_3"), 1, 0)
+        END_SWITCH
+    END_IF
+    IF_INT_EQUAL(GSWF(2463), 1)
+        IF_INT_EQUAL(GSW(0), 153)
+            CALL(evt_item_entry, STRING("key"), 19, -110, 200, -180, 16, -1, PTR(evt_key))
+        END_IF
+    END_IF
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("s_kaidan_7"), 2)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(tou_02_init_evt)
     SWITCH(GSW(0))
         CASE_BETWEEN(127, 137)
@@ -2100,7 +2394,7 @@ EVT_BEGIN(tou_02_init_evt)
         END_LOOP
     END_INLINE_EVENT
     CALL_CHILD(PTR(evt_momikucha))
-    CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+    CALL(evt_tou_get_ranking, LW(0))
     SWITCH(LW(0))
         CASE_LESS(2)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("p_p_1")), 1)
@@ -2185,5 +2479,6 @@ EVT_BEGIN(tou_02_init_evt)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("s_kaidan_7")), 2)
     RETURN
 EVT_END()
+#endif
 
 

@@ -171,6 +171,9 @@ USER_FUNC(kpa_chg_pose);
 static USER_FUNC(evtflash);
 void bossrobot_batu(CameraId camera, void* param);
 USER_FUNC(evt_countdown_stop);
+#ifdef VERSION_G8ME01
+extern s32 evt_memcard_save_wrapper[];
+#endif
 void mri_stg3_012_cb(s32 type, void* param);
 extern s32 bero_case_switch_off[];
 extern s32 evt_bero_info_run[];
@@ -3250,7 +3253,11 @@ EVT_BEGIN(mri_01_koopa_second_evt)
     WAIT_MS(2000)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 9)
+#ifdef VERSION_G8ME01
+    CALL_CHILD(evt_memcard_save_wrapper)
+#else
     CALL_CHILD(PTR(evt_memcard_save))
+#endif
     CALL(evt_mario_set_mode, 0)
     CALL(evt_fade_set_mapchange_type, 1, 59, 0, 58, 0)
     CALL(evt_bero_mapchange, STRING("tou_02"), 0)

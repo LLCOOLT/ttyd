@@ -5,6 +5,10 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "version.h"
+// US effect texture ids are 0x1C lower for these entries.
+#define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
+
 
 double sin(double);
 double cos(double);
@@ -444,9 +448,9 @@ void effKumokumoDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetNumTexGens(2);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
-    effGetTexObj(0x84, &texObj);
+    effGetTexObj(EFF_TEX(0x84), &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
-    effGetTexObj(0x85, &texObj);
+    effGetTexObj(EFF_TEX(0x85), &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
     PSMTXTrans(mtx, work->s1, work->t1, 0.0f);
     GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);

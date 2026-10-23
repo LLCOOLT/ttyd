@@ -71,7 +71,7 @@ USER_FUNC(evt_sub_get_dist);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
-USER_FUNC(evt_tou_get_ranking_27_text_1ED4);
+USER_FUNC(evt_tou_get_ranking);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(kemuri_stop);
 static USER_FUNC(make_list);
@@ -179,7 +179,11 @@ s32 evt_souko_talk[272];
 s32 evt_bred_nigeru[116];
 s32 boss_msg[14];
 s32 out_from_tou_10_re[22];
+#ifdef VERSION_G8ME01
+s32 tou_04_init_evt[652];
+#else
 s32 tou_04_init_evt[668];
+#endif
 
 USER_FUNC(memoryRY) {
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
@@ -532,7 +536,7 @@ EVT_BEGIN(talk_g_1)
         CASE_EQUAL(163)
         CALL(evt_msg_print, 0, STRING("stg3_tou_96_01"), 0, 0)
         CASE_LESS(172)
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         IF_INT_LESS_OR_EQUAL(LW(0), 10)
             CALL(evt_msg_print, 0, STRING("stg3_tou_96"), 0, 0)
             ELSE
@@ -542,7 +546,7 @@ EVT_BEGIN(talk_g_1)
         IF_INT_EQUAL(GSWF(2500), 0)
             CALL(evt_msg_print, 0, STRING("stg3_tou_39"), 0, 0)
             ELSE
-            CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+            CALL(evt_tou_get_ranking, LW(0))
             IF_INT_LESS_OR_EQUAL(LW(0), 10)
                 CALL(evt_msg_print, 0, STRING("stg3_tou_96"), 0, 0)
                 ELSE
@@ -564,14 +568,14 @@ EVT_BEGIN(move_g_1)
             CALL_CHILD(PTR(move_g))
         END_IF
         CASE_LESS(172)
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         IF_INT_GREATER(LW(0), 10)
             SET_VALUE(LW(0), 0)
             CALL_CHILD(PTR(move_g))
         END_IF
         CASE_DEFAULT
         IF_INT_EQUAL(GSWF(2500), 1)
-            CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+            CALL(evt_tou_get_ranking, LW(0))
             IF_INT_GREATER(LW(0), 10)
                 SET_VALUE(LW(0), 0)
                 CALL_CHILD(PTR(move_g))
@@ -659,7 +663,7 @@ EVT_BEGIN(init_g_3)
 EVT_END()
 
 EVT_BEGIN(talk_g_3)
-    CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+    CALL(evt_tou_get_ranking, LW(0))
     SWITCH(LW(0))
         CASE_LESS(1)
         CALL(evt_msg_print, 0, STRING("stg3_tou_99"), 0, 0)
@@ -680,7 +684,7 @@ EVT_BEGIN(move_g_3)
     IF_INT_EQUAL(GSWF(2381), 1)
         RETURN
     END_IF
-    CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+    CALL(evt_tou_get_ranking, LW(0))
     SWITCH(LW(0))
         CASE_LESS(1)
         IF_INT_EQUAL(GSWF(2378), 1)
@@ -884,7 +888,7 @@ EVT_BEGIN(init_g_6)
 EVT_END()
 
 EVT_BEGIN(talk_g_6)
-    CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+    CALL(evt_tou_get_ranking, LW(0))
     SWITCH(LW(0))
         CASE_LESS(1)
         CALL(evt_msg_print, 0, STRING("stg3_tou_101"), 0, 0)
@@ -900,7 +904,7 @@ EVT_BEGIN(move_g_6)
     IF_INT_EQUAL(GSWF(2382), 1)
         RETURN
     END_IF
-    CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+    CALL(evt_tou_get_ranking, LW(0))
     SWITCH(LW(0))
         CASE_LESS(1)
         SET_VALUE(LW(0), 5)
@@ -1047,7 +1051,7 @@ EVT_END()
 static EVT_BEGIN(init_brots)
     IF_INT_LESS(GSW(0), 172)
         IF_INT_EQUAL(GSWF(2421), 0)
-            CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+            CALL(evt_tou_get_ranking, LW(0))
             SWITCH(LW(0))
                 CASE_LESS(5)
                 CASE_LESS(19)
@@ -1085,7 +1089,20 @@ static USER_FUNC(make_list) {
     if (tmp == NULL) {
         tmp = _mapAlloc(0x1000);
     }
+#ifdef VERSION_G8ME01
+    {
+        s32 maxw = 0;
+        for (i = 0; i < 7; i++) {
+            s32 w = (u16)FontGetMessageWidth(msgSearch(list[i]));
+            if (maxw < w) {
+                maxw = w;
+            }
+        }
+        sprintf(tmp, "<select %d %d %d %d>", 0, 7, maxw + 80, 140);
+    }
+#else
     sprintf(tmp, "<select %d %d %d %d>", 0, 7, 300, 140);
+#endif
     for (i = 0; i < 7; i++) {
         strcat(tmp, "\n\0\0");
         strcat(tmp, msgSearch(list[i]));
@@ -2064,7 +2081,7 @@ EVT_BEGIN(tou_04_init_evt)
         SET_VALUE(LW(0), 5)
         CALL_CHILD(PTR(bero_case_switch_on))
         CASE_DEFAULT
-        CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+        CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_LESS(1)
             SET_VALUE(LW(0), 3)
@@ -2108,8 +2125,10 @@ EVT_BEGIN(tou_04_init_evt)
         CALL_CHILD(PTR(bero_case_switch_off))
         SET_VALUE(LW(0), 8)
         CALL_CHILD(PTR(bero_case_switch_off))
+#ifndef VERSION_G8ME01
         CALL(evt_run_case_evt, 9, 1, STRING("w_bero"), 0, PTR(boss_msg), 0)
         CALL(evt_run_case_evt, 9, 1, STRING("e_bero"), 0, PTR(boss_msg), 0)
+#endif
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(0), 163)
         IF_INT_EQUAL(GSWF(2496), 0)
@@ -2149,7 +2168,7 @@ EVT_BEGIN(tou_04_init_evt)
     END_IF
     IF_INT_NOT_EQUAL(GSWF(2377), 1)
         IF_INT_NOT_EQUAL(GSWF(2378), 1)
-            CALL(evt_tou_get_ranking_27_text_1ED4, LW(0))
+            CALL(evt_tou_get_ranking, LW(0))
             IF_INT_LESS_OR_EQUAL(LW(0), 11)
                 IF_INT_LESS(GSW(0), 147)
                     SPAWN_EVENT(PTR(evt_souko_talk))
@@ -2163,7 +2182,7 @@ EVT_BEGIN(tou_04_init_evt)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 172)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("s_bero_7"))
-            CALL(evt_tou_get_ranking_27_text_1ED4, LW(1))
+            CALL(evt_tou_get_ranking, LW(1))
             IF_INT_EQUAL(LW(1), 10)
                 SPAWN_EVENT(PTR(out_from_tou_10_re))
             END_IF

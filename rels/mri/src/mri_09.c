@@ -65,6 +65,9 @@ USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
+#ifdef VERSION_G8ME01
+USER_FUNC(N_evt_party_cloud_lock_animations_on_off);
+#endif
 extern s32 bero_case_switch_off[];
 extern s32 bero_case_switch_on[];
 extern s32 evt_bero_info_run[];
@@ -91,7 +94,11 @@ __declspec(section ".data") s32 fd_mri_09_one_364[1];
 s32 bero_bluejail[15];
 static s32 bero_entry_data[75];
 s32 wall_roll_sub[96];
+#ifdef VERSION_G8ME01
+s32 wall_roll[272];
+#else
 s32 wall_roll[264];
+#endif
 static s32 breakyuka_init[17];
 static __declspec(section ".data") s32 breakyuka_main[9];
 static s32 ueki_access_data[24];
@@ -101,7 +108,11 @@ s32 slot02_event[52];
 s32 slot03_event[52];
 s32 slot_event[66];
 s32 get_blue_jail_key[143];
+#ifdef VERSION_G8ME01
+s32 mri_09_init_evt[230];
+#else
 s32 mri_09_init_evt[228];
+#endif
 
 __declspec(section ".data") u64 fd_mri_09_negone_one_374 = 0xBF8000003F800000;
 
@@ -200,6 +211,9 @@ EVT_END()
 EVT_BEGIN(wall_roll)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
+#ifdef VERSION_G8ME01
+    CALL(N_evt_party_cloud_lock_animations_on_off, 0, 1)
+#endif
     WAIT_MS(500)
     BEGIN_INLINE_EVENT
         CALL(evt_snd_sfxon, STRING("SFX_STG2_QUAKE2"), LW(10))
@@ -264,6 +278,9 @@ EVT_BEGIN(wall_roll)
     CALL(evt_mobj_delete, STRING("slot03"))
     WAIT_MS(500)
     SET_VALUE(GSW(0), 104)
+#ifdef VERSION_G8ME01
+    CALL(N_evt_party_cloud_lock_animations_on_off, 0, 0)
+#endif
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -387,9 +404,15 @@ EVT_END()
 
 EVT_BEGIN(slot_event)
     SET_VALUE(GW(0), 0)
+#ifdef VERSION_G8ME01
+    SET_VALUE(GW(1), 90)
+    SET_VALUE(GW(2), 180)
+    SET_VALUE(GW(3), 270)
+#else
     SET_VALUE(GW(1), 0)
     SET_VALUE(GW(2), 0)
     SET_VALUE(GW(3), 0)
+#endif
     LOOP(0)
         CALL(evt_mapobj_rotate, 1, STRING("S_isk_01A01a"), GW(0), 0, 0)
         CALL(evt_mapobj_rotate, 1, STRING("S_isk_01A02a"), GW(1), 0, 0)
@@ -483,6 +506,9 @@ EVT_BEGIN(mri_09_init_evt)
     SWITCH(GSW(0))
         CASE_LESS(103)
         CALL(evt_hitobj_onoff, STRING("A_f2_rak03"), 1, 0)
+#ifdef VERSION_G8ME01
+        SPAWN_EVENT(slot_event)
+#endif
         CASE_EQUAL(103)
         CALL(evt_hitobj_onoff, STRING("A_f2_rak03"), 1, 0)
         SPAWN_EVENT(PTR(slot_event))
