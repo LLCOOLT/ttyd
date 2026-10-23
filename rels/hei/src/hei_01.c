@@ -3,6 +3,10 @@
 
 #pragma force_active on
 #include "party.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
+#include "evt/evt_sub.h"
+#include "hei.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
@@ -98,13 +102,6 @@ USER_FUNC(evt_sub_rumble_onoff);
 USER_FUNC(evt_party_move_behind_mario);
 #endif
 static USER_FUNC(set_dir);
-extern s32 all_party_lecture[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 evt_sub_mail_vibration[];
 
 __declspec(section ".data") u64 fd_hei_01_negone_one_374;
 __declspec(section ".data") s32 fd_hei_01_neg_one_382[1];

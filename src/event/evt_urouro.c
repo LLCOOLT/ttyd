@@ -7,11 +7,11 @@
 #include "memory.h"
 #include "pmario_sound.h"
 #include "system.h"
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
 #define fabs(x) __fabs(x)
 #define fabsf(x) __fabsf(x)
-extern double sin(double x);
-extern double cos(double x);
 
 NpcEntry* marioGetTouchNpcPtr(void);
 

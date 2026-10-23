@@ -111,8 +111,6 @@ s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s16 pi
 BOOL BtlUnit_CanActStatus(BattleUnit* unit);
 void BtlUnit_SetAnimType(BattleUnitPart* part, s32 type);
 
-extern BattleWork* _battleWorkPointer;
-
 //local prototypes
 void _CheckMoveCount(BattleUnit* unit);
 

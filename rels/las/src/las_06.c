@@ -3,6 +3,7 @@
 
 #pragma force_active on
 #include "stdio.h"
+#include "evt/evt_bero.h"
 
 static char name[8];
 
@@ -18,7 +19,6 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 static USER_FUNC(make_name);
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_las_06_negone_one_374;
 __declspec(section ".data") s32 fd_las_06_neg_one_382[1];

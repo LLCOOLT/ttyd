@@ -5,6 +5,8 @@
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
 #include "party.h"
+#include "evt/evt_bero.h"
+#include "jin.h"
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_hit_bind_mapobj);
@@ -31,8 +33,6 @@ USER_FUNC(evt_snd_sfxon_3d);
 static USER_FUNC(get_pos);
 USER_FUNC(get_width);
 USER_FUNC(set_pos);
-extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_jin_10_negone_one_374;
 __declspec(section ".data") s32 fd_jin_10_neg_one_382[1];

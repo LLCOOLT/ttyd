@@ -8,6 +8,7 @@
 #include "memory.h"
 #include "pmario_sound.h"
 #include <string.h>
+#include "libc_decls.h"
 
 f32 revise360(f32);
 f32 distABf(f32, f32, f32, f32);
@@ -34,7 +35,6 @@ void camFollowYOn(void);
 void marioOfsRotReset(void);
 void marioSetSpec(void);
 void marioAdjustMoveDir(void);
-extern int __float_nan[];
 
 #define PF(p, o) (*(f32*)((u8*)(p) + (o)))
 #define PI(p, o) (*(s32*)((u8*)(p) + (o)))

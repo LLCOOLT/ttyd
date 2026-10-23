@@ -5,6 +5,11 @@
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "manager/evtmgr_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_sub.h"
 
 USER_FUNC(btlevtcmd_AddHomePos);
 USER_FUNC(btlevtcmd_AddPos);
@@ -27,20 +32,6 @@ USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(killer_get_angle);
 static USER_FUNC(killer_copy_status);
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_CheckStatus[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_OnOffStatus[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetJumpSpeed[];
-extern s32 btlevtcmd_SetPos[];
-extern s32 btlevtcmd_SpawnUnit[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_shake_w[];
-extern s32 evt_eff[];
-extern s32 evt_sub_get_dir[];
 extern s32 unit_killer[];
 
 __declspec(section ".data") u64 fd_killer_cannon_negone_one_374;

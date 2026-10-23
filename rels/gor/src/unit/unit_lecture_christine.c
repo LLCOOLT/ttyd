@@ -7,6 +7,13 @@
 #include "system.h"
 #include "manager/evtmgr_cmd.h"
 #include "battle/battle_sub.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_msg.h"
+#include "party/party_motion.h"
+#include "unit/party/unit_party_christine.h"
 
 static USER_FUNC(_battle_set_lecture_unit_id);
 USER_FUNC(_set_lecture_mode);
@@ -40,43 +47,7 @@ USER_FUNC(evt_msg_print);
 USER_FUNC(_get_defence_ac_result);
 USER_FUNC(_config_key_record);
 static USER_FUNC(_krb_get_dir);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AddRotate[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetMoveFrame[];
-extern s32 btlevtcmd_GetPosFloat[];
-extern s32 btlevtcmd_GetRotate[];
-extern s32 btlevtcmd_GetTakeoffPosition[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_MarioJumpPosition[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_PadCheckTrigger[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_RunDataEventChild[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 evt_btl_camera_set_homing_unitparts[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_msg_continue[];
-extern s32 evt_snd_sfxon[];
-extern s32 pose_table_christine_stay[];
 extern s32 unit_lecture_frankli[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_lecture_christine_negone_one_374;
 __declspec(section ".data") s32 fd_lecture_christine_neg_one_382[1];

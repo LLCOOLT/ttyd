@@ -3,6 +3,7 @@
 
 #pragma force_active on
 #include "stdio.h"
+#include "evt/evt_bero.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_get_info);
@@ -36,8 +37,6 @@ USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_telop_entry);
 static USER_FUNC(make_name);
-extern s32 bero_case_entry[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_las_00_negone_one_374;
 __declspec(section ".data") s32 fd_las_00_neg_one_382[1];

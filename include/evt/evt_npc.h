@@ -64,3 +64,29 @@ USER_FUNC(evt_npc_flag_onoff);
 
 
 USER_FUNC(evt_npc_change_fbat_mode);
+
+USER_FUNC(evt_npc_battle_start);
+USER_FUNC(evt_npc_change_interrupt);
+USER_FUNC(evt_npc_get_dir);
+USER_FUNC(evt_npc_glide_position);
+USER_FUNC(evt_npc_jump_position_nohit);
+USER_FUNC(evt_npc_kamek_move_position);
+USER_FUNC(evt_npc_majo_disp_off);
+USER_FUNC(evt_npc_pera_onoff);
+USER_FUNC(evt_npc_set_anim);
+USER_FUNC(evt_npc_set_autotalkpose);
+USER_FUNC(evt_npc_set_battle_info);
+USER_FUNC(evt_npc_set_camid);
+USER_FUNC(evt_npc_set_color);
+USER_FUNC(evt_npc_set_ry);
+USER_FUNC(evt_npc_sound_data_reset);
+USER_FUNC(evt_npc_sound_data_set);
+USER_FUNC(evt_npc_start_for_event);
+USER_FUNC(evt_npc_start_for_one_event);
+USER_FUNC(evt_npc_status_check);
+USER_FUNC(evt_npc_status_onoff);
+USER_FUNC(evt_npc_stop_for_event);
+USER_FUNC(evt_npc_wait_battle_end);
+USER_FUNC(evt_npc_wait_pera);
+USER_FUNC(evt_set_dir_to_target);
+extern s32 npc_init_evt[];

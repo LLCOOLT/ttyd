@@ -4,6 +4,7 @@
 #include "driver/swdrv.h"
 #define evtEntry evtEntry_hdr
 #include "manager/evtmgr.h"
+#include "party/party_yoshi.h"
 #undef evtEntry
 extern EventEntry* evtEntry(void* evtCode, s32 priority, u8 flags);
 #include "mario/mario.h"
@@ -15,8 +16,6 @@ extern EventEntry* evtEntry(void* evtCode, s32 priority, u8 flags);
 #include "win/win_main.h"
 #include <string.h>
 
-extern s32 yoshiGetStatus(void);
-extern BOOL N_fbatPreventMarioEventChk(void);
 extern void* fbatNpcTalkCheck(void);
 
 typedef struct CaseWork {

@@ -54,3 +54,15 @@ MessageWork* msgGetWork(void);
 
 const char* msgSearch(const char* tag);
 BOOL _ismbblead(u32 a1);
+
+char* msgGetCommand(char* msg, char* cmd, char* arg);
+s32 msgIconStr2ID(const char* str);
+
+extern const char R_no_messages_JP[];
+extern const char R_no_messages_US[];
+
+extern const char R_no_messages_DE[];
+extern const char R_no_messages_DU[];
+extern const char R_no_messages_ES[];
+extern const char R_no_messages_FR[];
+extern const char R_no_messages_IT[];

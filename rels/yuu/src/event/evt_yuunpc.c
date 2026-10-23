@@ -16,6 +16,7 @@
 #include "memory.h"
 #include "driver/dispdrv.h"
 #include "pmario_sound.h"
+#include "yuu.h"
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct YuuNpcPose { char name[16]; char anim[8]; u16 field_0x18; f32 frames; f32 jump; s32 start; s32 count; u16 flags; f32 field_0x30; } YuuNpcPose;
@@ -96,7 +97,6 @@ __declspec(section ".data") s32 fd_evt_yuunpc___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_evt_yuunpc_one_negone_359;
 __declspec(section ".data") s32 fd_evt_yuunpc___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_evt_yuunpc_one_364[1];
-extern signed char hitdata[];
 s32 ext_yuunpc_minigame1_data[18];
 s32 ext_yuunpc_minigame2_data[18];
 s32 ext_yuunpc_minigame3_data[18];

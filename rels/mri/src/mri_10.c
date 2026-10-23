@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "mri.h"
 
 #pragma force_active on
 
@@ -22,11 +24,6 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envoff);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(lect_juyoitem_rel_set);
-extern s32 all_juyoitem_lecture_rel[];
-extern s32 evt_bero_info_run[];
-extern s32 mri_countdown[];
-extern s32 mri_puni_init[];
-extern s32 puni_disp_info[];
 
 __declspec(section ".data") u64 fd_mri_10_negone_one_374;
 __declspec(section ".data") s32 fd_mri_10_neg_one_382[1];

@@ -17,6 +17,14 @@
 #include "driver/mobjdrv.h"
 #include "driver/fadedrv.h"
 #include "system.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_snd.h"
 
 static OSTime wwstart;
 void statusWinForceClose(void);
@@ -71,29 +79,6 @@ static USER_FUNC(lect_status_on);
 static USER_FUNC(lect_status_off);
 static USER_FUNC(lect_mario_ido_sum);
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start);
-extern s32 evt_cam3d_evt_set[];
-extern s32 evt_cam_get_at[];
-extern s32 evt_hit_bind_mapobj[];
-extern s32 evt_hit_bind_update[];
-extern s32 evt_key_get_buttontrg[];
-extern s32 evt_mapobj_trans[];
-extern s32 evt_mario_cont_onoff[];
-extern s32 evt_mario_mov_pos2[];
-extern s32 evt_mario_paper_plane[];
-extern s32 evt_mario_set_pose[];
-extern s32 evt_mario_wait_landon[];
-extern s32 evt_msg_continue[];
-extern s32 evt_msg_print[];
-extern s32 evt_msg_print_add[];
-extern s32 evt_msg_select[];
-extern s32 evt_msg_toge[];
-extern s32 evt_nonride_airport[];
-extern s32 evt_npc_flag_onoff[];
-extern s32 evt_npc_set_anim[];
-extern s32 evt_npc_set_camid[];
-extern s32 evt_npc_set_position[];
-extern s32 evt_ride_airport[];
-extern s32 evt_snd_sfxon_3d[];
 
 __declspec(section ".data") u64 fd_evt_lect_tik_negone_one_374;
 __declspec(section ".data") s32 fd_evt_lect_tik_neg_one_382[1];

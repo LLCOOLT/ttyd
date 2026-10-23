@@ -32,3 +32,5 @@ typedef struct NameEntryWork {
 void nameEntInit(void);
 void nameEntReInit(void);
 void nameEntMain(void);
+
+extern const char* latin_tbl[];

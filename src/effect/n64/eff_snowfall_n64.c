@@ -10,6 +10,7 @@
 #include <dolphin/mtx.h>
 #include <stdlib.h>
 #include <string.h>
+#include "driver/mapdrv.h"
 
 typedef struct EffSnowfallParticle {
     u8 pad0[8];   // 0x0
@@ -33,8 +34,6 @@ typedef struct EffSnowfallWork {
     s32 pad30;                 // 0x30
     EffSnowfallParticle p[1];  // 0x34
 } EffSnowfallWork;
-
-extern void mapGetBlend(GXColor* color);
 
 void effSnowfallMain(EffectEntry* effect);
 void effSnowfallDisp(CameraId cameraId, EffectEntry* effect);

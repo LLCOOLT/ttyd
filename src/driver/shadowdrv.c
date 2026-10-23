@@ -7,7 +7,6 @@
 #include "system.h"
 #include <string.h>
 
-extern GlobalWork* gp;
 void* mobjHitObjPtrToPtr(HitEntry* hit);
 void effGetTexObjN64(u32 id, GXTexObj* obj);
 

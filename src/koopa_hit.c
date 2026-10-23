@@ -7,22 +7,18 @@
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
 #include <string.h>
+#include "mario/mario_sbr.h"
+#include "koopa.h"
+#include "libc_decls.h"
+#include "eff/eff_magic1_n64.h"
 s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w);
 void _restfpr_28(void);
 void _savefpr_28(void);
 BOOL kpaFlameHitFilter(HitCheckQuery* query, HitEntry* entry);
 
 
-extern int __float_nan[];
-extern double sin(double);
-extern double cos(double);
-extern f32 toMovedir(f32 angle);
 extern MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
-extern s32 kpaGetLevel(void);
-extern s32 kpaGetStageType(void);
 extern s32 kpaFireAttackCheck(void);
-extern s32 kpaMutekiCheck(void);
-extern u8* getKoopaFireEfp(void);
 
 typedef struct KpaHitWork {
     u8 pad0[0x18];

@@ -12,10 +12,9 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <dolphin/gx.h>
+#include "win/win_item.h"
+#include "libc_decls.h"
 
-extern int sprintf(char* str, const char* format, ...);
-extern int strcmp(const char* a, const char* b);
-extern char* strncpy(char* dst, const char* src, unsigned long n);
 extern ItemData itemDataTable[];
 void qqsort(void* base, u32 n, u32 size, s32 (*compare)(const void*, const void*));
 void pouchHiraToKata(const char* msg, char* out);
@@ -1241,7 +1240,6 @@ void animPoseSetAnim(s32 poseId, const char* animName, BOOL reset);
 void animPoseSetLocalTime(s32 poseId, f32 localTimeFrames);
 void animPoseMain(s32 poseId);
 void animPoseDraw(s32 poseId, f32 x, f32 y, f32 z, f32 rotY, f32 scale, s32 xluMode);
-extern const char** luigi_book_list[];
 
 typedef struct WinBookWork {
     u8 pad_0[0x28];

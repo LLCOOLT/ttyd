@@ -14,6 +14,14 @@
 #include "driver/animdrv.h"
 #include "string.h"
 #include "memory.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "party/party_motion.h"
 
 EffectEntry* effPokopiThunderN64Entry(s32 type, s32 time, f32 x1, f32 y1, f32 z1, f32 x2, f32 y2, f32 z2, f32 scale);
 int rand(void);
@@ -99,46 +107,10 @@ USER_FUNC(evt_eff_firechange00);
 USER_FUNC(evt_eff_barriersizechange);
 USER_FUNC(evt_eff_colorchange00);
 USER_FUNC(evt_eff_pokopi_thunder);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AddPos[];
-extern s32 btlevtcmd_AnimeChangePoseFromTable[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_AttackDeclareAll[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetPosFloat[];
-extern s32 btlevtcmd_GetRandomValue[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SpawnUnit[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
 extern s32 bts_x_flag_add[];
 extern s32 bts_x_flag_set[];
 extern s32 bts_x_flag_wait[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_cam_get_at[];
-extern s32 evt_cam_shake[];
-extern s32 evt_eff[];
-extern s32 evt_eff64[];
-extern s32 evt_snd_sfxoff[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 subsetevt_dead_core[];
-extern s32 subsetevt_dead_core_nospin_norotate[];
 extern s32 unit_boss_batten_satellite[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_batten_leader_negone_one_374;
 __declspec(section ".data") s32 fd_boss_batten_leader_neg_one_382[1];

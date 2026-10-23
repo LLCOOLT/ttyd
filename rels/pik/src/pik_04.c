@@ -1,5 +1,10 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_door.h"
+#include "evt/evt_damage.h"
+#include "evt/evt_kinopio.h"
+#include "pik.h"
 
 #pragma force_active on
 
@@ -87,11 +92,6 @@ USER_FUNC(evt_unitwin_alloc);
 USER_FUNC(evt_unitwin_free);
 USER_FUNC(unitwincoin_disp_onoff);
 USER_FUNC(unitwincoin_wait);
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_entry[];
-extern s32 evt_gazigazi_entry[];
-extern s32 evt_pik_yajirushi[];
-extern s32 kinopio_house_talk_evt[];
 
 __declspec(section ".data") u64 fd_pik_04_negone_one_374;
 __declspec(section ".data") s32 fd_pik_04_neg_one_382[1];

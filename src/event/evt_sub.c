@@ -16,6 +16,9 @@
 #include "driver/icondrv.h"
 #include "memory.h"
 #include "mario/mario_pouch.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_memcard.h"
+#include "evt/evt_sub.h"
 
 s32 marioKeyOffChk();
 void marioSetCamId(s32);
@@ -36,7 +39,6 @@ void evtMsgFmtInt(char* buf, s32 value);
 void statusWinForceUpdate(void);
 #endif
 #ifdef VERSION_G8ME01
-extern s32 evt_memcard_save_wrapper[];
 #endif
 
 int rand(void);
@@ -184,35 +186,12 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_intpl_get_float);
 USER_FUNC(evt_sub_intpl_init_float);
 USER_FUNC(evt_sub_intpl_get_value_para);
-extern s32 evt_mario_get_mode[];
-extern s32 evt_memcard_save[];
 
-extern s32 tree_data[75];
 extern s32 evt_sub_stopwatch[7];
-extern s32 coinget_window_desc[10];
-extern s32 tree_evt[251];
 extern s32 evt_sub_tree_access_entry[28];
-extern s32 kusa_evt[43];
 extern s32 evt_sub_kusa_access_entry[26];
 extern s32 evt_sub_starstone[VERSION_PICK(1043, 1084)];
 extern s32 evt_sub_mail_vibration[26];
-extern s32 mail_evt[80];
-extern s32 mail_evt_nok_01[64];
-extern s32 mail_evt_gor_03[87];
-extern s32 mail_evt_gor_02[87];
-extern s32 mail_evt_gor_01[61];
-extern s32 mail_evt_gor_04[97];
-extern s32 mail_evt_rsh_03_a[61];
-extern s32 mail_evt_hom_00[61];
-extern s32 mail_evt_gor_02_2[61];
-extern s32 mail_evt_bom_01[65];
-extern s32 mail_evt_tik_00[80];
-extern s32 mail_evt_win_01[61];
-extern s32 mail_evt_tou_01[67];
-extern s32 mail_evt_usu_01[61];
-extern s32 mail_evt_gor_01_2[93];
-extern s32 mail_evt_rsh_03_a_2[61];
-extern s32 mail_evt_pik_00[71];
 extern s32 evt_sub_mail_event[VERSION_PICK(117, 123)];
 #ifndef VERSION_G8ME01
 __declspec(section ".data") s32 evt_sub_mail_event_end[1];

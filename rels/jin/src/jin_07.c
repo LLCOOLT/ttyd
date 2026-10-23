@@ -12,6 +12,8 @@
 #include "mario/mario.h"
 #include "mario/mariost.h"
 #include "memory.h"
+#include "evt/evt_bero.h"
+#include "jin.h"
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 ExtPose* extGetPosePtr(void);
@@ -107,10 +109,6 @@ void computePosHermite(ExtPose* pose, Teresa* ter);
 static f32 computePos(f32 a, f32 b, f32 t);
 static void senteresa_ext_init(void);
 static f32 randf(f32 min, f32 max);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_jin_07_negone_one_374;
 __declspec(section ".data") s32 fd_jin_07_neg_one_382[1];

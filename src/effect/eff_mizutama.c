@@ -4,9 +4,8 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-extern double sin(double x);
-extern double cos(double x);
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
 typedef struct EffMizutamaWork {
     s32 type;       // 0x0

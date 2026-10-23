@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dolphin/mtx.h>
+#include "party.h"
 
 typedef struct PartyCloud {
     f32 unk0; //0x0
@@ -19,3 +20,10 @@ void cloudResetAt();
 u8 cloudGetStatus();
 f32 cloudGetBreathDir(void);
 s32 cloudGetHitBreathout(s32 param_1);
+
+void cloud_exit(PartyEntry* party);
+void cloud_hover_init(PartyEntry* party);
+void cloud_hover_main(PartyEntry* party);
+void cloud_init(PartyEntry* party);
+void cloud_move(PartyEntry* party);
+void cloud_use(PartyEntry* party);

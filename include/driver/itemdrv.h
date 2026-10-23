@@ -51,3 +51,6 @@ void itemInit(void);
 void itemReInit(void);
 void itemMain(void);
 ItemEntry* itemNameToPtr(char*);
+
+void itemNokoForceGet(ItemEntry* entry);
+void itemPickUp(ItemEntry* entry);

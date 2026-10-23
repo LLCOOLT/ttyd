@@ -8,6 +8,14 @@
 #include "dolphin/gx.h"
 #include "dolphin/os.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_map.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_telop.h"
+#include "party/party_motion.h"
+#include "hom.h"
 
 double sin(double x);
 static smartEntry* ind_lp;
@@ -76,29 +84,6 @@ USER_FUNC(evt_win_item_select);
 static USER_FUNC(test_glare);
 USER_FUNC(tokei);
 static void sun_tev(MapTevCallbackInfo* info);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_eff[];
-extern s32 evt_mapobj_trans[];
-extern s32 evt_npc_flag_onoff[];
-extern s32 evt_npc_get_position[];
-extern s32 evt_npc_jump_position_nohit[];
-extern s32 evt_npc_set_anim[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_set_dir_to_target[];
-extern s32 evt_snd_bgm_scope[];
-extern s32 evt_sub_intpl_msec_get_value[];
-extern s32 evt_sub_intpl_msec_init[];
-extern s32 evt_sub_mail_event[];
-extern s32 evt_telop_entry[];
-extern s32 hom_10_evt_resha_left[];
-extern s32 hom_10_evt_resha_right[];
-extern s32 hom_10_evt_resha_start2[];
-extern s32 hom_10_evt_resha_start[];
-extern s32 hom_10_evt_resha_stop[];
 
 __declspec(section ".data") u64 fd_hom_00_negone_one_374;
 __declspec(section ".data") s32 fd_hom_00_neg_one_382[1];

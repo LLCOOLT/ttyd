@@ -21,6 +21,16 @@
 #include "memory.h"
 #include "mario/mario_pouch.h"
 #include "driver/swdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_door.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_kinopio.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_case.h"
+#include "evt/evt_sub.h"
+#include "gor.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_msg_fmt_int);
 USER_FUNC(evt_msg_fmt_str);
@@ -43,18 +53,14 @@ typedef struct MahojinStone { EffectEntry* eff; void* draw; u8 field_0x8[0x30 - 
 typedef struct MahojinWork { u8 field_0x0[0x88]; MahojinStone stones[7]; } MahojinWork;
 s32* iri_09_item_tbl;
 int rand(void);
-extern s32 R_mystery_cook_list[];
 typedef struct CookRecipe { const char* a; const char* b; const char* out; } CookRecipe;
 s32 naniga_okorukana_cook(void);
 s32 itemNameToID(const char* name);
-extern s32 R_simple_recipe_table[];
-extern s32 R_cookbook_recipe_table[];
 static s32 item_tbl[21];
 s32 chk_cook_eff_type(s32 item);
 s32 psndSFXOn_3D(const char* name, Vec* position);
 EffectEntry* effFireEntry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
 EffectEntry* effKemuri12N64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
-extern s32 special_cook_list[];
 
 USER_FUNC(N_evt_pouch_remove_item_index);
 USER_FUNC(U_evt_badgeShop_get_special_zaiko);
@@ -268,35 +274,7 @@ BOOL chkCookItem(s32 item);
 s32 itemNameToID(const char* name);
 s32 naniga_okorukana_cook(void);
 static s32 npc_process(void);
-extern s32 all_juyoitem_lecture_rel[];
-extern s32 all_party_lecture[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 door_close_se[];
-extern s32 door_open_se[];
 extern s32 envSetYami[];
-extern s32 evt_bero_get_entername[];
-extern s32 evt_bero_get_info[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_data_copy[];
-extern s32 evt_door_entry[];
-extern s32 evt_hitobj_onoff[];
-extern s32 evt_item_status_on[];
-extern s32 evt_kinopio_setup[];
-extern s32 evt_mario_kill_party[];
-extern s32 evt_mario_set_mode[];
-extern s32 evt_mobj_itembox[];
-extern s32 evt_mobj_kururing_floor[];
-extern s32 evt_mobj_save_blk[];
-extern s32 evt_npc_sound_data_reset[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_run_case_evt[];
-extern s32 evt_sub_load_progresstime[];
-extern s32 evt_sub_mail_event[];
-extern s32 evt_sub_stopwatch[];
-extern s32 gor_villager_urouro[];
-extern s32 luigi_gor_first_talk[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_gor_01_negone_one_374;
 __declspec(section ".data") s32 fd_gor_01_neg_one_382[1];

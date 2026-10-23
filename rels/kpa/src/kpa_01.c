@@ -5,6 +5,11 @@
 #include "stdio.h"
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_case.h"
+#include "evt/evt_sub.h"
 
 typedef struct KpaCbInfo { u8 field_0x0[0x8]; u16 field_0x8; u8 field_0xA[0x10 - 0xA]; s32 field_0x10; } KpaCbInfo;
 
@@ -78,12 +83,6 @@ void kpa_stg1_008_cb(s32 type, KpaCbInfo** param);
 void kpa_stg1_014_2_cb(s32 type, KpaCbInfo** param);
 void kpa_stg1_036_cb(s32 type, KpaCbInfo** param);
 void kpa_stg1_034_cb(s32 type, KpaCbInfo** param);
-extern s32 evt_bero_get_entername[];
-extern s32 evt_mario_set_mode[];
-extern s32 evt_npc_setup[];
-extern s32 evt_run_case_evt[];
-extern s32 evt_sub_stopwatch[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_kpa_01_negone_one_374;
 __declspec(section ".data") s32 fd_kpa_01_neg_one_382[1];

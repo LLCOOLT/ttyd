@@ -1,5 +1,12 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_audience.h"
+#include "evt/evt_msg.h"
+#include "party/party_motion.h"
 
 #pragma force_active on
 
@@ -29,66 +36,6 @@ USER_FUNC(evt_msg_print_add);
 USER_FUNC(evt_msg_select);
 USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_SuitoruBadgeEffect[];
-extern s32 btlevtcmd_ACSuccessEffect[];
-extern s32 btlevtcmd_AcGetOutputParam[];
-extern s32 btlevtcmd_AcGetParam[];
-extern s32 btlevtcmd_AcSetDifficulty[];
-extern s32 btlevtcmd_AcSetFlag[];
-extern s32 btlevtcmd_AcSetParam[];
-extern s32 btlevtcmd_AcSetParamAll[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_AudienceDeclareACResult[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CommandCheckDamage[];
-extern s32 btlevtcmd_CommandGetWeaponActionLv[];
-extern s32 btlevtcmd_CommandGetWeaponAddress[];
-extern s32 btlevtcmd_CommandPayWeaponCost[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_FaceDirectionSub[];
-extern s32 btlevtcmd_GetDamage[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetResultAC[];
-extern s32 btlevtcmd_GetResultCountAC[];
-extern s32 btlevtcmd_GetResultPrizeLv[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetTakeoffPosition[];
-extern s32 btlevtcmd_InviteApInfoReport[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_MarioJumpPosition[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_PadCheckNow[];
-extern s32 btlevtcmd_PadCheckTrigger[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultAC[];
-extern s32 btlevtcmd_RunDataEventChild[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetupAC[];
-extern s32 btlevtcmd_StartAC[];
-extern s32 btlevtcmd_StopAC[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_ac_timing_flag_onoff[];
-extern s32 btlevtcmd_ac_timing_get_success_frame[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 btlevtcmd_snd_voice[];
-extern s32 evt_audience_ap_recovery[];
-extern s32 evt_btl_camera_set_homing_unitparts[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_msg_continue[];
-extern s32 evt_snd_sfxon[];
-extern s32 weaponGetPowerFromMarioHammerLv[];
-extern s32 weaponGetPowerFromMarioJumpLv[];
 
 __declspec(section ".data") u64 fd_lecture_frankli_negone_one_374;
 __declspec(section ".data") s32 fd_lecture_frankli_neg_one_382[1];

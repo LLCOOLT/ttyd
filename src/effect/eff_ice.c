@@ -8,6 +8,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
+#include "eff/eff_ice.h"
 
 typedef struct MayaPoly {
     s32 pad0[2];
@@ -57,24 +58,6 @@ typedef struct EffIceWork {
     s32 state;      // 0x28
     MayaAnim* anim; // 0x2C
 } EffIceWork;
-
-extern u32* ice_effFaceDt_pPlane1;
-extern u32* ice_effFaceDt_pPlane2;
-extern u32* ice_effFaceDt_pPlane3;
-extern u32* ice_effFaceDt_pPlane4;
-extern u32* ice_effFaceDt_pPlane5;
-extern u32* ice_effFaceDt_pPlane6;
-extern u32* ice_effFaceDt_pPlane7;
-extern u32* ice_effFaceDt_pPlane8;
-extern u32* ice_effFaceDt_pPlane9;
-extern u32* ice_effFaceDt_pPlane10;
-extern u32* ice_effFaceDt_pPlane11;
-extern u32* ice_effFaceDt_pPlane12;
-extern u32* ice_effFaceDt_pPlane13;
-extern u32* ice_effFaceDt_pPlane14;
-extern u32* ice_effFaceDt_pPlane15;
-extern u32* ice_effFaceDt_pPlane16;
-extern u32* ice_effFaceDt_pPlane17;
 
 u32 ice_effHermit_0[] = {
     0x00000000, 0x00000000, 0x00000000, 0x00000000,

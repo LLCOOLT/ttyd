@@ -18,8 +18,11 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
-
-extern BattleWork* _battleWorkPointer;
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/sac/sac_common.h"
+#include "party/party_motion.h"
+#include "battle/sac/sac_bakugame.h"
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 size);
 EffectEntry* effSandarsEntry(s32 type, f32 x, f32 y, f32 z, f32 w);
@@ -160,22 +163,6 @@ USER_FUNC(btlevtcmd_GetUnitId);
 USER_FUNC(btlevtcmd_ResetFaceDirection);
 USER_FUNC(btlevtcmd_SetRotate);
 USER_FUNC(evt_audience_abnormal_natural_all);
-extern s32 btlevtcmd_CommandGetWeaponAddress[];
-extern s32 btlevtcmd_CommandPayWeaponCost[];
-extern s32 btlevtcmd_StartWaitEvent[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_reset_move_color_lv_all[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_snd_sfxoff[];
-extern s32 sac_ac_help_off[];
-extern s32 sac_ac_help_on[];
-extern s32 sac_mario_back_home[];
-extern s32 sac_mario_item_on_end_evt[];
-extern s32 sac_mario_item_on_evt[];
-extern s32 sac_start_camera_evt[];
-extern s32 sac_start_stardust[];
 
 BakuWork* GetBakuGamePtr(void);
 static USER_FUNC(star_stone_appear);
@@ -198,11 +185,6 @@ void bakuGameAudienceSurprise(void);
 void bakuGameDisp2D(CameraId cam, void* param);
 void bakuGameDisp3D(CameraId cam, void* param);
 void bakuGameDispStar(CameraId cam, void* param);
-
-extern s32 marioAttackEvent_BakuGame[];
-extern s32 hitCheck_MarioTeam[];
-extern s32 hitCheck_EnemyTeam[];
-extern s32 hitCheck_AudienceTeam[];
 
 static s32 weapon[] = {
     (s32)"btl_wn_sac_bakugame", ICON_198 << 16, 0, (s32)"msg_bakugame", 1677722112, 1065353216, 17130546, 0,

@@ -58,3 +58,37 @@ USER_FUNC(evt_bero_set_now_number);
 USER_FUNC(evt_bero_get_now_number);
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_bero_get_into_info);
+
+extern s32 bero_case_entry[];
+extern s32 bero_case_exec_pipe[];
+extern s32 bero_case_switch_off[];
+extern s32 bero_case_switch_on[];
+extern s32 bero_close_door_play_se[];
+extern s32 bero_open_door_play_se[];
+extern s32 bero_play_enter_anime[];
+extern s32 evt_bero_info_run[];
+
+extern s32 BeroID[16];
+extern BeroEntry* BeroINFOARR[16];
+extern s32 BeroSW[16]; //switches
+extern s32 bero_case_entry_sub[];
+extern s32 bero_case_exec_door[];
+extern s32 bero_case_exec_gate[];
+extern s32 bero_case_exec_none[];
+extern s32 bero_case_exec_pipe_sub[];
+extern s32 bero_case_exec_road[];
+extern s32 bero_case_init_check[];
+void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end);
+extern s32 bero_null[];
+extern s32 bero_play_out_anime[];
+extern s32 default_entevt[];
+extern s32 default_outevt[];
+extern s32 evt_bero_info_run_door[];
+extern s32 evt_bero_info_run_gate[];
+extern s32 evt_bero_info_run_none[];
+extern s32 evt_bero_info_run_pipe[];
+extern s32 evt_bero_info_run_pipe_sub00[];
+extern s32 evt_bero_info_run_road[];
+extern s32 evt_bero_initial_pos[];
+extern s32 evt_bero_mario_enter[];
+extern s32 evt_bero_nonride_check[];

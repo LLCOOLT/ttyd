@@ -272,11 +272,6 @@ __declspec(section ".sdata") const char* msg_es_article_tbl[6] = {(const char*)s
 char* strcat(char* dst, const char* src);
 char* strstr(const char* s, const char* sub);
 
-extern char msg_count_buf[0xA00];
-extern char msg_plural_buf[0xA00];
-extern char msg_num_buf[0xA00];
-extern char msg_article_buf[0xA00];
-
 s32 evt_msg_fmt_int(EventEntry* event, BOOL isFirstCall);
 void evtMsgFmtInt(char* buf, s32 count);
 s32 evt_msg_fmt_str(EventEntry* event, BOOL isFirstCall);

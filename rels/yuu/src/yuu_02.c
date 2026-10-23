@@ -15,6 +15,9 @@
 #include "driver/icondrv.h"
 #include "mario/mariost.h"
 #include "icon_ids.h"
+#include "evt/evt_map.h"
+#include "evt/evt_movefloor.h"
+#include "yuu.h"
 
 typedef struct MiniGameWork { EventEntry* event; EventEntry* subEvent; u16 flags; s32 type; s32 (*init)(EventEntry* event, BOOL isFirstCall); s32 (*main)(EventEntry* event, BOOL isFirstCall); void (*disp)(CameraId camera, void* param); void* data; } MiniGameWork;
 typedef struct RollWork { u32 flags; s32 phase; s32 coins; s32 result; s32 index; EventEntry* jumpEvent; Vec pos; s32 monteCount; EventEntry* viewEvent; } RollWork;
@@ -27,15 +30,9 @@ static Monte* icon_monte_p;
 s32 yuucounter_get_data(void);
 void yuucounter_flag_on(s32 flag);
 void partyKeyOff(void);
-extern s32 yuu_02_jumpret[];
-extern Vec fukkipoint[];
 void marioResetRollSpd(void);
 void clrRollEvtFlag(void);
 void monteCountDisp(void);
-extern s32 minigame03_start[];
-extern s32 minigame03_end[];
-extern s32 minigame_view_monte[];
-extern s32 yuu_02_icon_monte_entry_evt[];
 void marioChgRollMotion(void);
 void marioRollFixOn(void);
 extern MonteTable montetable[];
@@ -116,9 +113,6 @@ void yuu_02_icon_monte_disp(CameraId camera, void* param);
 USER_FUNC(yuu_02_icon_monte_onoff);
 void yuu_02_icon_monte_off(s32 idx);
 void yuu_02_icon_monte_on(s32 idx);
-extern s32 evt_map_playanim[];
-extern s32 evt_yuunpc_minigame3[];
-extern s32 moving_floor[];
 
 __declspec(section ".data") u64 fd_yuu_02_negone_one_374;
 __declspec(section ".data") s32 fd_yuu_02_neg_one_382[1];

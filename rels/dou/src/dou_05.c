@@ -5,6 +5,8 @@
 #include "memory.h"
 #include "driver/mapdrv.h"
 #include "dolphin/gx.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
 
 static u8* _ap;
 
@@ -50,10 +52,6 @@ USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_win_item_select);
 static void alpha_tev(MapTevCallbackInfo* info);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
 
 __declspec(section ".data") u64 fd_dou_05_negone_one_374;
 __declspec(section ".data") s32 fd_dou_05_neg_one_382[1];

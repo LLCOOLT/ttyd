@@ -9,9 +9,9 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-extern double sin(double);
-extern double cos(double);
+#include "eff/n64/eff_water_damage_n64.h"
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
 typedef struct EffFallWork {
     s32 type;       // 0x0
@@ -95,7 +95,6 @@ EVT_END()
 
 s32 psndSFXOn_3D(const char* name, Vec* position);
 void psndSFXOff(s32 id);
-extern EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 EffectEntry* effKemuri1N64Entry(s32 type, f32 a2, f32 a3, f32 a4, f32 a5);
 void effFallMain(EffectEntry* effect);
 void effFallDisp(CameraId cameraId, EffectEntry* effect);

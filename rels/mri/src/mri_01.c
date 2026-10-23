@@ -13,6 +13,12 @@
 #include "memory.h"
 #include "eff/n64/eff_akari_charge_n64.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_memcard.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "mri.h"
 
 void* puniGetPunigp(void);
 void* puniGetPunidat(void);
@@ -172,32 +178,8 @@ static USER_FUNC(evtflash);
 void bossrobot_batu(CameraId camera, void* param);
 USER_FUNC(evt_countdown_stop);
 #ifdef VERSION_G8ME01
-extern s32 evt_memcard_save_wrapper[];
 #endif
 void mri_stg3_012_cb(s32 type, void* param);
-extern s32 bero_case_switch_off[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_memcard_save[];
-extern s32 evt_mri_door_close[];
-extern s32 evt_mri_door_close_pure[];
-extern s32 evt_mri_door_open[];
-extern s32 evt_mri_door_open_pure[];
-extern s32 evt_npc_set_width[];
-extern s32 evt_npc_sound_data_reset[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_snd_sfxon[];
-extern s32 evt_sub_countdown_end[];
-extern s32 evt_sub_countdown_flag_onoff[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 evt_sub_starstone[];
-extern s32 mri_countdown[];
-extern s32 mri_guide_goryu[];
-extern s32 mri_puni_init[];
-extern s32 mri_puni_save[];
-extern s32 mri_puni_walk_se[];
-extern s32 mri_waterfall_effect[];
-extern s32 npc_init_evt[];
-extern s32 puni_disp_info[];
 
 __declspec(section ".data") u64 fd_mri_01_negone_one_374;
 __declspec(section ".data") s32 fd_mri_01_neg_one_382[1];

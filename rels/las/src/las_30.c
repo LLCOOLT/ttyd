@@ -3,6 +3,10 @@
 
 #pragma force_active on
 #include "stdio.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_mobj.h"
+#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 
 static char name[8];
 
@@ -17,16 +21,6 @@ USER_FUNC(evt_mario_key_onoff);
 USER_FUNC(evt_mobj_get_position);
 USER_FUNC(evt_mobj_wait_animation_end);
 static USER_FUNC(make_name);
-extern s32 evt_bero_get_info[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_mobj_itembox[];
-extern s32 evt_mobj_recovery_blk[];
-extern s32 evt_mobj_save_blk[];
-extern s32 evt_snd_bgmoff[];
-extern s32 evt_snd_bgmon[];
-extern s32 evt_snd_envoff[];
-extern s32 evt_snd_envon[];
-extern s32 evt_snd_set_rev_mode[];
 
 __declspec(section ".data") u64 fd_las_30_negone_one_374;
 __declspec(section ".data") s32 fd_las_30_neg_one_382[1];

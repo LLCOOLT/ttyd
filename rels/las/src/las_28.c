@@ -10,6 +10,9 @@
 #include "dolphin/mtx.h"
 #include "manager/evtmgr_cmd.h"
 #include "stdio.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_npc.h"
+#include "las.h"
 
 static char name[8];
 
@@ -118,17 +121,6 @@ USER_FUNC(evt_sub_random);
 static USER_FUNC(make_name);
 USER_FUNC(syuryo_baria);
 USER_FUNC(syuryo_baria_recalc_pos);
-extern s32 bero_case_entry[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 npc_init_evt[];
-extern s32 shuryolight_head_normal[];
-extern s32 shuryolight_head_off[];
-extern s32 shuryolight_head_tenmetu[];
-extern s32 shuryolight_pow_normal[];
-extern s32 shuryolight_pow_tenmetu[];
-extern s32 shuryolight_tue_normal[];
 
 __declspec(section ".data") u64 fd_las_28_negone_one_374;
 __declspec(section ".data") s32 fd_las_28_neg_one_382[1];

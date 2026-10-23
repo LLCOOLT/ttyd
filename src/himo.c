@@ -2,14 +2,13 @@
 #include "mario/mariost.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "libc_decls.h"
 
-extern int __float_nan[];
 double sin(double);
 double tan(double);
 static inline s32 himo_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 himo_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (himo_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 
-extern GlobalWork* gp;
 extern void spline_getvalue(Vec* out, s32 n, Vec* pts, f32* t1, f32* t2, f32 t);
 extern void spline_maketable(s32 n, Vec* pts, f32* t1, f32* t2);
 

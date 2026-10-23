@@ -2,9 +2,7 @@
 #include "evt/evt_cmd.h"
 #include "mario/mariost.h"
 #include <dolphin/os.h>
-
-extern GlobalWork* gp;
-extern int rand(void);
+#include "libc_decls.h"
 
 typedef struct LotteryWork {
 	u16 flags; //0x0

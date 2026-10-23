@@ -6,6 +6,12 @@
 #include <dolphin/types.h>
 #include <string.h>
 #include <dolphin/mtx.h>
+#include "party/party_yoshi.h"
+#include "party/party_move.h"
+#include "mario/mario_hit.h"
+#include "party/party_hit.h"
+#include "libc_decls.h"
+#include "eff/eff_magic1_n64.h"
 
 extern MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
 
@@ -15,21 +21,9 @@ extern MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
 #include "mario/mariost.h"
 #endif
 
-extern int __float_nan[];
-
-extern double sin(double);
-extern double cos(double);
-extern f32 partyGetHeight(PartyEntry* party);
-extern f32 partyToMovedir(PartyEntry* party, f32 angle);
-
-extern HitEntry* marioHitCheckVec(Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist);
-extern s32 yoshiGetStatus(void);
-
 #define PF(p, off) (*(f32*)((u8*)(p) + (off)))
 
-extern void partyChgMot(PartyEntry* party, s32 mot);
 HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth);
-extern HitEntry* partySearchGround(PartyEntry* party, f32 a, f32 b);
 HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDist, f32* outAng);
 extern HitEntry* partyChkFrontStep(PartyEntry* party, f32 a, f32* x, f32* y, f32* z);
 
@@ -874,7 +868,6 @@ void partyHitStrippedPool(f32* f, s32 i) {
 
 #ifdef VERSION_G8ME01
 extern void marioChkWallAround(Vec* pos, s32 a1, f32 a2, f32 angle, f32 radius, f32 height);
-extern f32 toMovedirSimple(f32 angle);
 
 /* FAKE: inline add keeps the original fadds operand order (pos.y, 10.0f) */
 static inline f32 party_addf(f32 a, f32 b) { return a + b; }

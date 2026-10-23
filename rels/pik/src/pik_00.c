@@ -16,6 +16,10 @@
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/mtx.h"
 #include "driver/mapdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_door.h"
+#include "evt/evt_damage.h"
+#include "evt/evt_sub.h"
 
 HitEntry* marioSearchUnder(void);
 void mapGrpFlagOn(const char* name, u32 flags);
@@ -134,12 +138,6 @@ USER_FUNC(pik_00_statuswin_force_off);
 #endif
 void irai_29_15_cb(s32 type, PikCbInfo** param);
 static void resha_tev(MapTevCallbackInfo* info);
-extern s32 bero_case_switch_off[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_entry[];
-extern s32 evt_gazigazi_entry[];
-extern s32 evt_sub_mail_event[];
-extern s32 evt_sub_stopwatch[];
 
 __declspec(section ".data") u64 fd_pik_00_negone_one_374;
 __declspec(section ".data") s32 fd_pik_00_neg_one_382[1];

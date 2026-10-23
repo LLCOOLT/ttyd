@@ -20,6 +20,8 @@
 #include "stdlib.h"
 #include "driver/effdrv.h"
 #include "driver/fadedrv.h"
+#include "evt/evt_bero.h"
+#include "mri.h"
 
 USER_FUNC(evt_img_alloc_capture);
 typedef struct CloudWork { s32 used; s32 state; char animName[0x20]; char imgName[0x20]; char offscreenName[0x20]; char groupNames[8][0x20]; char hitName[0x20]; s32 limit; s32 counter; EventEntry* evt; void* endEvt; s32 timer; s32 x; s32 y; s32 w; s32 h; f32 lastFrame; } CloudWork;
@@ -31,7 +33,6 @@ static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
 static s32 _ofs_get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
 static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
-extern s32 evt_cloud_main_evt[];
 void envSetYamiView(Mtx mtx);
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
@@ -140,18 +141,7 @@ static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s
 static s32 _ofs_get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
 static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
 extern s32 envSetYami[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_mri_door_naname_close[];
-extern s32 evt_mri_door_naname_close_pure[];
-extern s32 evt_mri_door_naname_open[];
-extern s32 evt_mri_door_naname_open_pure[];
-extern s32 mri_puni_init[];
-extern s32 mri_puni_jump_se[];
-extern s32 mri_puni_walk_se[];
-extern s32 mri_waterfall_effect[];
 
 __declspec(section ".data") u64 fd_mri_00_negone_one_374;
 __declspec(section ".data") s32 fd_mri_00_neg_one_382[1];

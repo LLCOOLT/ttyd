@@ -8,7 +8,6 @@
 #include <dolphin/mtx.h>
 
 double sin(double);
-extern void mapGetBlend(GXColor* color);
 
 typedef struct EffBoobooN64Work {
     s32 unk0;         // 0x0

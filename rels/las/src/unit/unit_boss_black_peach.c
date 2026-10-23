@@ -18,6 +18,9 @@
 #include "dolphin/mtx.h"
 #include "dolphin/os.h"
 #include "manager/evtmgr_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(btlevtcmd_WaitEventEnd);
 #endif
@@ -181,10 +184,6 @@ void hand_draw(CameraId cameraId, void* param);
 static void hand_init(void);
 static void pose_main(void);
 static void pose_init(void);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_black_peach_negone_one_374;
 __declspec(section ".data") s32 fd_boss_black_peach_neg_one_382[1];

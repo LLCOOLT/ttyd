@@ -8,8 +8,7 @@
 #include "data/mapdata.h"
 #include "parse.h"
 #include <string.h>
-
-extern int sprintf(char* str, const char* format, ...);
+#include "libc_decls.h"
 
 //.sbss
 void* ptr; //but why
@@ -46,10 +45,7 @@ typedef struct MapAttrEntry {
 } MapAttrEntry;
 
 extern MapAttrEntry _map_attr_data[];
-extern NpcTerritoryInfo npc_define_territory_type[];
-extern NpcAiInfo npc_ai_type_table[];
 extern void* memset(void*, int, u32);
-extern char* strcpy(char*, const char*);
 extern void animPoseSetAnim(s32, const char*, int);
 
 

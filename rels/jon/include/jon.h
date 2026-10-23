@@ -1,0 +1,59 @@
+#pragma once
+
+#include "dolphin/types.h"
+
+extern s32 btl_jon_setup_no_tbl[];
+extern s32 btlsetup_jon_tbl[];
+extern s32 unit_badge_borodo[];
+extern s32 unit_basabasa_chururu[];
+extern s32 unit_basabasa_green[];
+extern s32 unit_bllizard[];
+extern s32 unit_bomhei[];
+extern s32 unit_borodo[];
+extern s32 unit_boss_zonbaba[];
+extern s32 unit_bubble[];
+extern s32 unit_burst_wanwan[];
+extern s32 unit_chorobon[];
+extern s32 unit_churantalar[];
+extern s32 unit_dark_keeper[];
+extern s32 unit_dokugassun[];
+extern s32 unit_flower_chorobon[];
+extern s32 unit_giant_bomb[];
+extern s32 unit_hannya[];
+extern s32 unit_heavy_bom[];
+extern s32 unit_hennya[];
+extern s32 unit_hinnya[];
+extern s32 unit_honenoko[];
+extern s32 unit_hyper_sinemon[];
+extern s32 unit_ice_pakkun[];
+extern s32 unit_karon[];
+extern s32 unit_mahorn[];
+extern s32 unit_mahorn_custom[];
+extern s32 unit_monochrome_kurokumorn[];
+extern s32 unit_monochrome_sinemon[];
+extern s32 unit_pakkun_flower[];
+extern s32 unit_patamet[];
+extern s32 unit_patatogemet[];
+extern s32 unit_phantom[];
+extern s32 unit_piders[];
+extern s32 unit_purple_teresa[];
+extern s32 unit_sambo[];
+extern s32 unit_sambo_mummy[];
+extern s32 unit_sinemon[];
+extern s32 unit_super_mahorn[];
+extern s32 unit_teresa[];
+extern s32 unit_togenoko_ace[];
+extern s32 unit_twinkling_pansy[];
+extern s32 unit_ura_noko[];
+extern s32 unit_wanwan[];
+extern s32 unit_yami_kuriboo[];
+extern s32 unit_yami_noko[];
+extern s32 unit_yami_pata[];
+extern s32 unit_yami_patakuri[];
+extern s32 unit_yami_togekuri[];
+extern s32 unit_yamitogedaruma[];
+
+extern s32 enemy_100[];
+extern s32 iri_12_makkino_okiru[];
+extern s32 jon_init_evt[];
+extern s32 npcEnt_wanwan[];

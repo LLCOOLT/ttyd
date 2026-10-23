@@ -3,14 +3,11 @@
 
 #pragma force_active on
 #include "data/mapdata.h"
+#include "hom.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 hom_00_init_evt[];
-extern s32 hom_10_init_evt[];
-extern s32 hom_11_init_evt[];
-extern s32 hom_12_init_evt[];
 
 void _unresolved(void);
 void _epilog(void);

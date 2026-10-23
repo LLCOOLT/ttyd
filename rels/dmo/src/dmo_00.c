@@ -20,6 +20,13 @@
 #include "dolphin/os.h"
 #include "string.h"
 #include "stdio.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_sub.h"
 
 typedef struct DemoWork { s32 field_0x0; f32 bookRot; s32 page; s32 captured; f32 fade; f32 scale; f32 x; f32 y; void** capBuf; FileEntry* tpl; s32 winOn; s32 winAlpha; } DemoWork;
 static DemoWork work;
@@ -93,18 +100,6 @@ void demo_desk(CameraId cameraId, void* param);
 void demo_cap(void);
 void demo_exit(void);
 USER_FUNC(demo_init);
-extern s32 evt_cam_letter_box_onoff[];
-extern s32 evt_mario_cont_onoff[];
-extern s32 evt_mario_set_pos[];
-extern s32 evt_mobj_itembox[];
-extern s32 evt_npc_change_interrupt[];
-extern s32 evt_npc_entry[];
-extern s32 evt_npc_pera_onoff[];
-extern s32 evt_npc_set_height[];
-extern s32 evt_paper_entry[];
-extern s32 evt_party_cont_onoff[];
-extern s32 evt_party_set_pos[];
-extern s32 evt_sub_animgroup_async[];
 
 __declspec(section ".data") u64 fd_dmo_00_negone_one_374;
 __declspec(section ".data") s32 fd_dmo_00_neg_one_382[1];

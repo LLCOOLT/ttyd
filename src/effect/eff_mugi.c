@@ -6,6 +6,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "libc_decls.h"
 
 double sin(double);
 double cos(double);
@@ -14,8 +15,6 @@ double cos(double);
 #include "driver/effdrv.h"
 #include "mario/mariost.h"
 #include "mario/mario.h"
-
-extern GlobalWork* gp;
 
 
 typedef struct effMugiKemuriData {
@@ -92,7 +91,6 @@ EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 angle) {
 
 void effMugiKemuri2Main(EffectEntry* effect);
 void effMugiKemuri2Disp(CameraId camId, void* param);
-extern int rand(void);
 
 EffectEntry* effMugiKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 dir) {
 	EffectEntry* effect;

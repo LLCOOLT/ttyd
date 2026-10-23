@@ -12,6 +12,8 @@
 #include "system.h"
 #include "stdio.h"
 #include "icon_ids.h"
+#include "evt/evt_bero.h"
+#include "aji.h"
 
 void icon_disp(CameraId camera, void* param);
 
@@ -59,8 +61,6 @@ USER_FUNC(evt_win_item_select);
 USER_FUNC(item_chk);
 void icon_disp(CameraId camera, void* param);
 USER_FUNC(evt_itemNameToItemID);
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
 
 __declspec(section ".data") u64 fd_aji_03_negone_one_374;
 __declspec(section ".data") s32 fd_aji_03_neg_one_382[1];

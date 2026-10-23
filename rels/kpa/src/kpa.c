@@ -13,6 +13,8 @@
 #include "stdio.h"
 #include "mario/mario.h"
 #include "data/mapdata.h"
+#include "evt/evt_sub.h"
+#include "kpa.h"
 
 typedef struct KpaWork { u8 stage; u8 lives; u8 time; } KpaWork;
 KpaWork* kwp;
@@ -20,7 +22,6 @@ void kpaAddScore(s32 score);
 void kpa_stageclear_disp(CameraId camera, void* param);
 void FontDrawScale(f32 scale);
 void FontDrawString(f32 x, f32 y, const char* message);
-extern s32 kpa_status_main_evt[];
 void kpa_status_disp(CameraId camera, void* param);
 void iconDispGx(f32 scale, Vec* position, s16 flags, u16 iconId);
 #define NUMERIC_ID ((u16*)numeric_id)
@@ -32,14 +33,6 @@ void mobjKoopaOn(void);
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 kpa_00_init_evt[];
-extern s32 kpa_01_init_evt[];
-extern s32 kpa_02_init_evt[];
-extern s32 kpa_03_init_evt[];
-extern s32 kpa_04_init_evt[];
-extern s32 kpa_05_init_evt[];
-extern s32 kpa_06_init_evt[];
-extern s32 kpa_07_init_evt[];
 
 USER_FUNC(evt_bero_get_entername);
 USER_FUNC(evt_bero_mapchange);
@@ -120,7 +113,6 @@ void kpa_status_disp(CameraId camera, void* param);
 void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
-extern s32 evt_sub_stopwatch[];
 
 __declspec(section ".data") u64 fd_kpa_negone_one_374;
 __declspec(section ".data") s32 fd_kpa_neg_one_382[1];

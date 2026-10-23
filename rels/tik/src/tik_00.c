@@ -19,6 +19,12 @@
 #include "stdio.h"
 #include "driver/msgdrv.h"
 #include "manager/fontmgr.h"
+#include "evt/evt_door.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_movefloor.h"
+#include "evt/evt_npc.h"
+#include "tik.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_msg_fmt_int);
 USER_FUNC(evt_msg_fmt_str);
@@ -29,7 +35,6 @@ typedef struct UranaiWork { s32 lwData[16]; s32 gwData[32]; smartEntry* buf; GXT
 void uranai_cap(CameraId cameraId, void* param);
 double tan(double);
 static inline f32 tanf(f32 x) { return tan(x); }
-extern s32 evt_uranai_cap[];
 const char* search_evt_moji(s32 id);
 s32 uranaisi_ryokin_rtn(s32 type);
 static s32 ssf;
@@ -194,17 +199,6 @@ USER_FUNC(card_xlu);
 void card_tev(MapTevCallbackInfo* info);
 void uranai_cap(CameraId cameraId, void* param);
 static USER_FUNC(ss_check);
-extern s32 door_close_se[];
-extern s32 door_open_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_close[];
-extern s32 evt_door_entry[];
-extern s32 evt_door_open[];
-extern s32 evt_door_open_quick[];
-extern s32 evt_sub_mail_event[];
-extern s32 moving_floor[];
-extern s32 npc_init_evt[];
-extern s32 tik_villager_urouro[];
 
 __declspec(section ".data") u64 fd_tik_00_negone_one_374;
 __declspec(section ".data") s32 fd_tik_00_neg_one_382[1];

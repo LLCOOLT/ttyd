@@ -21,7 +21,6 @@ typedef struct SoundWork {
 } SoundWork;
 
 extern SoundWork sound;
-extern PaperSoundBGM psbgm[2];
 
 void psndSetReverb(s32 mode);
 BOOL N_pouchUnEquipBadgeID(s32 badgeId);

@@ -3,6 +3,7 @@
 #include "mario/mariost.h"
 #include "mario/mario_motion.h"
 #include <string.h>
+#include "mot/mot_jump.h"
 
 #define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 #define JP0(m) MW(m, 0x7c, f32)
@@ -27,8 +28,6 @@ typedef struct MotCaseEntry {
 	s32 unk0;
 	s32 type;
 } MotCaseEntry;
-
-extern f32 marioJumpSwData[];
 
 void mot_stay(void);
 void mot_stay_post(void);

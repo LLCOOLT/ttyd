@@ -11,6 +11,8 @@
 #include "string.h"
 #include "mario/mario.h"
 #include "driver/effdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 BOOL hitIsGroup(HitEntry* target, HitEntry* group);
@@ -93,10 +95,6 @@ USER_FUNC(ripple_scale_func);
 USER_FUNC(tik_npc_buruburu);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
 
 __declspec(section ".data") u64 fd_tik_02_negone_one_374;
 __declspec(section ".data") s32 fd_tik_02_neg_one_382[1];

@@ -11,6 +11,10 @@
 #include "system.h"
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "party/party_hit.h"
+#include "mario/mario_hit.h"
+#include "mot/mot_damage.h"
+#include "mot/mot_jump.h"
 
 typedef struct YoshiWork {
     u8 pad0[0x4];         // 0x0
@@ -28,30 +32,16 @@ extern void partyChgRunMode(PartyEntry* party, s32 mode);
 extern void partyChgPose(PartyEntry* party, const char* pose);
 extern void partyGoodbyeInit(PartyEntry* party);
 extern s32 partyGoodbyeMain(PartyEntry* party);
-extern void party_force_ride_yoshi(PartyEntry* party);
 void yoshi_use(PartyEntry* party);
 extern f32 marioGetMoveRate(void);
-extern HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth);
-extern void marioSetSplash(s32 kind, Vec* pos);
-extern HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang);
-extern BOOL marioChkBero(HitEntry* hit);
 extern HitEntry* dou10_yoko_yari2(void* out);
 extern void* partyChkFrontStep(PartyEntry* party, f32 range, f32* y, f32* a, f32* b);
-extern void set_damage_root_ypos(f32 y);
 extern void psndSFXOff(s32 id);
 extern void partyUpdateKeyData(PartyEntry* party);
-extern void L_partyClearCont(PartyEntry* party);
-extern void marioChgSmallJumpMotion(void);
-extern void partyChkGnd(PartyEntry* party);
 extern s32 psndSFXOn_3D(s32 id, Vec* pos);
-extern f32 partyGetHeight(PartyEntry* party);
 extern void* marioSearchHead(Vec* pos, f32 range, f32* height);
-extern void party_ride_yoshi_force_move(void);
 extern EffectEntry* effSweatN64Entry(s32 type, f32 x, f32 y, f32 z, f32 base, f32 angle, s32 life);
-extern f32 marioGetJumpHeight(void);
-extern void marioSetPeakYpos(void);
 extern s32 marioChkDamageSink(void);
-extern void marioSetFallPara(void);
 extern void marioUpdateCamCollision(Vec* pos);
 double sin(double);
 

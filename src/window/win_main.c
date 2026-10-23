@@ -20,11 +20,11 @@ char* strstr(const char* str, const char* sub);
 #include "driver/msgdrv.h"
 #include "mario/mario_pouch.h"
 #include "mario/mariost.h"
+#include "win/win_party.h"
+#include "libc_decls.h"
 
 extern ItemData itemDataTable[];
-extern int sprintf(char* str, const char* format, ...);
 
-extern const volatile f32 float_0p5_8041dc98;
 #define HALF_F float_0p5_8041dc98
 USER_FUNC(cam_r);
 USER_FUNC(evt_eff);
@@ -97,7 +97,6 @@ static WindowWork* wp;
 #include "statuswindow.h"
 typedef struct PartyData { const char* name; u8 pad[0x28 - 0x4]; } PartyData;
 extern PartyData partyDataTbl[];
-extern WindowPartyDt winPartyDt[];
 s32 winRootMain(WindowWork* wp);
 void winRootDisp(CameraId camId, WindowWork* wp);
 const char* winGetMapTplName(void);

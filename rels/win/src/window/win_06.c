@@ -8,6 +8,7 @@
 #include "memory.h"
 #include "string.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_bero.h"
 
 typedef struct KaitenParam { Vec pos; Vec target; f32 angle; f32 dist; } KaitenParam;
 static KaitenParam* ckp0;
@@ -50,7 +51,6 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_telop_entry);
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_win_06_negone_one_374;
 __declspec(section ".data") s32 fd_win_06_neg_one_382[1];

@@ -12,124 +12,19 @@
 #include <string.h>
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
-extern s32 _attack_aud[];
-extern s32 _get_attack_aud_no[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btldefaultevt_SuitoruBadgeEffect[];
-extern s32 btldefaultevt_avoid_counter_event[];
-extern s32 btlevtcmd_ACRGetResult[];
-extern s32 btlevtcmd_ACRStart[];
-extern s32 btlevtcmd_ACSuccessEffect[];
-extern s32 btlevtcmd_AcGetDifficulty[];
-extern s32 btlevtcmd_AcGetOutputParam[];
-extern s32 btlevtcmd_AcSetDifficulty[];
-extern s32 btlevtcmd_AcSetFlag[];
-extern s32 btlevtcmd_AcSetGaugeParam[];
-extern s32 btlevtcmd_AcSetParamAll[];
-extern s32 btlevtcmd_AddRotate[];
-extern s32 btlevtcmd_AnimeFlagOnOff[];
-extern s32 btlevtcmd_AnnounceMessage[];
-extern s32 btlevtcmd_AnnounceSetParam[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_AttackDeclareAll[];
-extern s32 btlevtcmd_AudienceAppeal[];
-extern s32 btlevtcmd_AudienceDeclareACResult[];
-extern s32 btlevtcmd_AudienceDeclareAcrobatResult[];
-extern s32 btlevtcmd_BtlIconDelete[];
-extern s32 btlevtcmd_BtlIconEntryItemId[];
-extern s32 btlevtcmd_BtlIconSetPosition[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CommandCheckDamage[];
-extern s32 btlevtcmd_CommandGetWeaponActionLv[];
-extern s32 btlevtcmd_CommandGetWeaponAddress[];
-extern s32 btlevtcmd_CommandPayWeaponCost[];
-extern s32 btlevtcmd_CommandPreCheckDamage[];
-extern s32 btlevtcmd_DivePartsPosition[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_FallPartsPosition[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetHeight[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetMoveFrame[];
-extern s32 btlevtcmd_GetPartsPos[];
-extern s32 btlevtcmd_GetPartyTechLv[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetResultAC[];
-extern s32 btlevtcmd_GetResultPrizeLv[];
-extern s32 btlevtcmd_GetRotate[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetStageAudienceAreaSize[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_GetStatusMg[];
-extern s32 btlevtcmd_GetUnitId[];
-extern s32 btlevtcmd_GetUnitWork[];
-extern s32 btlevtcmd_GetWidth[];
-extern s32 btlevtcmd_InviteApInfoReport[];
-extern s32 btlevtcmd_JumpContinue[];
-extern s32 btlevtcmd_JumpPartsPosition[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_OffUnitFlag[];
-extern s32 btlevtcmd_OnPartsAttribute[];
-extern s32 btlevtcmd_OnUnitFlag[];
-extern s32 btlevtcmd_PreCheckCounter[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_RecoverHp[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultAC[];
-extern s32 btlevtcmd_RunDataEventChild[];
-extern s32 btlevtcmd_SetDiveSound[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetPartsBlur[];
-extern s32 btlevtcmd_SetPartsDiveSound[];
-extern s32 btlevtcmd_SetPartsFallAccel[];
-extern s32 btlevtcmd_SetPartsJumpSound[];
-extern s32 btlevtcmd_SetPartsMoveSpeed[];
-extern s32 btlevtcmd_SetPartsPos[];
-extern s32 btlevtcmd_SetPartsRotate[];
-extern s32 btlevtcmd_SetPartsRunSound[];
-extern s32 btlevtcmd_SetPartsWalkSound[];
-extern s32 btlevtcmd_SetRGB[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_SetScale[];
-extern s32 btlevtcmd_SetUnitWork[];
-extern s32 btlevtcmd_SetupAC[];
-extern s32 btlevtcmd_StartAC[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_StopAC[];
-extern s32 btlevtcmd_TransStageFloorPosition[];
-extern s32 btlevtcmd_WaitEventEnd[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_ftof[];
-extern s32 btlevtcmd_ftomsec[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_audience_acrobat_notry[];
-extern s32 evt_audience_ap_recovery[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_homing_unit_audience[];
-extern s32 evt_btl_camera_set_homing_unitparts[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_moveto[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_eff[];
-extern s32 evt_snd_sfxon[];
-extern s32 evt_snd_sfxon_3d[];
-extern s32 evt_sub_intpl_get_value[];
-extern s32 evt_sub_intpl_init[];
-extern s32 subset_attack_ready_jump_event[];
-extern s32 subsetevt_check_target_movable[];
-extern s32 weaponGetACOutputParam[];
+#include "battle/battle_attack_audience.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_message.h"
+#include "battle/battle_icon.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_audience.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 
 void btlUnitPartsDisp(CameraId camId, BattleUnitPart* parts);
 void BtlUnit_EquipItem(BattleUnit* unit, s32 flags, ItemType type);

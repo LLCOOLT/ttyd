@@ -8,6 +8,14 @@
 #include "driver/effdrv.h"
 #include "battle/battle_pad.h"
 #include "system.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_msg.h"
+#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 
 EffectEntry* effOpukuJetwN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 
@@ -45,42 +53,8 @@ USER_FUNC(btlevtcmd_SetUnitWork);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(btlevtcmd_WaitEventEnd);
 USER_FUNC(_ikasumi_effect);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AnimeWaitPlayComplete[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckPhase[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_OffAttribute[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PhaseEventStartDeclare[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetStayPose[];
-extern s32 btlevtcmd_SetTalkPose[];
-extern s32 btlevtcmd_SpawnUnit[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_StatusWindowOnOff[];
-extern s32 btlevtcmd_StopWaitEvent[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_ftof[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveto[];
-extern s32 evt_eff_fukidashi[];
-extern s32 evt_msg_print[];
-extern s32 evt_snd_sfxoff[];
-extern s32 evt_snd_sfxon_3d[];
 extern s32 unit_boss_gesso_left_arm[];
 extern s32 unit_boss_gesso_right_arm[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_gesso_negone_one_374;
 __declspec(section ".data") s32 fd_boss_gesso_neg_one_382[1];

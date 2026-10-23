@@ -6,11 +6,9 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
-extern double sin(double x);
-extern double cos(double x);
-
-extern int __float_nan[];
 #define NAN (*(f32*)__float_nan)
 
 #define FP_NAN 1

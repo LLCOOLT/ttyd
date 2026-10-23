@@ -12,6 +12,14 @@
 #include "driver/animdrv.h"
 #include "pmario_sound.h"
 #include <string.h>
+#include "battle/battle_attack_audience.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 
 typedef struct HeartWork {
     u8 pad[0x78];
@@ -83,72 +91,6 @@ USER_FUNC(_get_vivian_attack_position);
 USER_FUNC(_get_move_frame);
 static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
 USER_FUNC(battle_evt_majo_disp_off);
-extern s32 _attack_aud[];
-extern s32 _get_attack_aud_no[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btldefaultevt_SuitoruBadgeEffect[];
-extern s32 btldefaultevt_avoid_counter_event[];
-extern s32 btlevtcmd_ACSuccessEffect[];
-extern s32 btlevtcmd_AcGetDifficulty[];
-extern s32 btlevtcmd_AcGetOutputParam[];
-extern s32 btlevtcmd_AcSetDifficulty[];
-extern s32 btlevtcmd_AcSetFlag[];
-extern s32 btlevtcmd_AcSetParamAll[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_AttackDeclareAll[];
-extern s32 btlevtcmd_AudienceDeclareACResult[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CommandCheckDamage[];
-extern s32 btlevtcmd_CommandGetWeaponActionLv[];
-extern s32 btlevtcmd_CommandGetWeaponAddress[];
-extern s32 btlevtcmd_CommandPayWeaponCost[];
-extern s32 btlevtcmd_CommandPreCheckDamage[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetHeight[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetPartyTechLv[];
-extern s32 btlevtcmd_GetResultAC[];
-extern s32 btlevtcmd_GetResultPrizeLv[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetStageAudienceAreaSize[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_GetWidth[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_OnAttribute[];
-extern s32 btlevtcmd_OnPartsAttribute[];
-extern s32 btlevtcmd_OnUnitFlag[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultAC[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetScale[];
-extern s32 btlevtcmd_SetupAC[];
-extern s32 btlevtcmd_StartAC[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_StopAC[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_ftof[];
-extern s32 btlevtcmd_ftomsec[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_homing_unit_audience[];
-extern s32 evt_btl_camera_set_homing_unitparts[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_posoffset[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_snd_sfxon[];
-extern s32 evt_sub_random[];
-extern s32 subset_attack_ready_jump_event[];
-extern s32 weaponGetACOutputParam[];
-extern s32 weaponGetPowerFromPartyAttackLv[];
 
 __declspec(section ".data") u64 unit_party_vivian_negone_one_a;
 __declspec(section ".data") static u64 negone_one$374;

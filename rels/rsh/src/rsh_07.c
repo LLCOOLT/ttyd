@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "rsh.h"
 
 #pragma force_active on
 
@@ -16,8 +18,6 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envoff);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_sub_get_mapname);
-extern s32 evt_bero_info_run[];
-extern s32 evt_rsh_window[];
 
 __declspec(section ".data") u64 fd_rsh_07_negone_one_374;
 __declspec(section ".data") s32 fd_rsh_07_neg_one_382[1];

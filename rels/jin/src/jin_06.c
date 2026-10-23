@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "jin.h"
 
 #pragma force_active on
 
@@ -33,8 +35,6 @@ USER_FUNC(evt_seq_wait);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
-extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_jin_06_negone_one_374;
 __declspec(section ".data") s32 fd_jin_06_neg_one_382[1];

@@ -1,5 +1,6 @@
 #include "sdk/arc.h"
 #include <dolphin/os.h>
+#include "libc_decls.h"
 
 #pragma unsigned_char off
 
@@ -9,7 +10,6 @@ typedef struct FSTEntry {
 	u32 entrySizeOrNext; //file = size, dir = next entry
 } FSTEntry;
 
-extern unsigned char __lower_map[];
 static inline int tolower(int c) { return (c == -1) ? -1 : (int)__lower_map[c & 0xFF]; }
 
 #define entryIsDir(i) (((FstStart[i].entryInfo & 0xff000000) == 0) ? FALSE : TRUE)

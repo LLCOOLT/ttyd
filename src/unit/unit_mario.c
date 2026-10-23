@@ -7,6 +7,13 @@
 #include <dolphin/gx.h>
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_attack_audience.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "evt/evt_eff.h"
+#include "party/party_motion.h"
 
 USER_FUNC(_get_local_frame);
 static USER_FUNC(_mario_makkuro_set);
@@ -42,39 +49,6 @@ static USER_FUNC(_get_mario_hammer_lv);
 void faker_mario_makkuro_set(void);
 static void callback(MapTevCallbackInfo* info);
 s32 mario_pinch_pose_sound_callback(BattleUnit* unit);
-extern s32 _attack_aud[];
-extern s32 _get_attack_aud_no[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btldefaultevt_avoid_counter_event[];
-extern s32 btlevtcmd_AnimeWaitPlayComplete[];
-extern s32 btlevtcmd_ClearAllStatus[];
-extern s32 btlevtcmd_ConsumeItemReserve[];
-extern s32 btlevtcmd_DispItemIcon[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetStageAudienceAreaSize[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_MarioJumpParam[];
-extern s32 btlevtcmd_MarioJumpPosition[];
-extern s32 btlevtcmd_OnOffStatus[];
-extern s32 btlevtcmd_RecoverHp[];
-extern s32 btlevtcmd_SetHp[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_WaitEventEnd[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_homing_unit_audience[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_prilimit[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_eff[];
-extern s32 evt_snd_sfxon[];
-extern s32 subset_attack_ready_jump_event[];
 
 PoseTableEntry pose_table_mario_stay[34];
 BattleDataEntry data_table_mario[10];

@@ -15,9 +15,10 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
+#include "eff/n64/eff_kemuri10_n64.h"
+#include "eff/eff_magic1_n64.h"
 
 extern char* strcat(char* dest, const char* src);
-extern EffectEntry* effKemuri10N64Entry(s32 a1, f32 a2, f32 a3, f32 a4, f32 a5, f32 a6, f32 a7, f32 a8);
 
 // TODO: need to figure out better flags, since I've had to use dont_inline in a couple places, this
 // might just be -inline deferred? No auto
@@ -31,7 +32,6 @@ extern EffectEntry* effKemuri10N64Entry(s32 a1, f32 a2, f32 a3, f32 a4, f32 a5, 
 double fabs(double x);
 float fabsf(float x);
 #endif
-extern double sin(double x);
 extern double cos(double x);
 extern double fmod(double x, double y);
 

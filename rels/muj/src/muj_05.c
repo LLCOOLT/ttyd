@@ -4,6 +4,12 @@
 #pragma force_active on
 #include "string.h"
 #include "memory.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "muj.h"
 
 s32* command_work;
 
@@ -110,16 +116,6 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(muj_npc_guruguru);
-extern s32 all_party_lecture[];
-extern s32 evt_bero_get_info[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_mobj_recovery_blk[];
-extern s32 evt_npc_setup[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_snd_envon[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 evt_sub_tree_access_entry[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_muj_05_negone_one_374;
 __declspec(section ".data") s32 fd_muj_05_neg_one_382[1];

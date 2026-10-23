@@ -4,6 +4,8 @@
 #pragma force_active on
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
+#include "evt/evt_bero.h"
+#include "gra.h"
 
 static USER_FUNC(booboo_main);
 USER_FUNC(evt_bero_get_info);
@@ -24,8 +26,6 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
-extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_gra_02_negone_one_374;
 __declspec(section ".data") s32 fd_gra_02_neg_one_382[1];

@@ -17,6 +17,7 @@
 #include "driver/npcdrv.h"
 #include "manager/evtmgr_cmd.h"
 #include "driver/animdrv.h"
+#include "evt/evt_bero.h"
 void PSMTXIdentity(Mtx m);
 f32 PSVECDistance(const Vec* a, const Vec* b);
 #ifndef VERSION_G8ME01
@@ -100,7 +101,6 @@ static void ext_shadow_disp(CameraId camera, void* param);
 static void ext_disp(CameraId camera, void* param);
 static void ext_init(void);
 static f32 randf(f32 min, f32 max);
-extern s32 evt_bero_info_run[];
 extern s32 hei_test_water_tev[];
 
 __declspec(section ".data") u64 fd_hei_10_negone_one_374;

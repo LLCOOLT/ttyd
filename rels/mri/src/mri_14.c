@@ -10,6 +10,9 @@
 #include "driver/animdrv.h"
 #include "evt/evt_npc.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "mri.h"
 
 USER_FUNC(evt_bero_exec_onoff);
 USER_FUNC(evt_bero_get_info);
@@ -90,19 +93,6 @@ USER_FUNC(evt_target_flag_onoff);
 USER_FUNC(evt_target_set_position);
 static USER_FUNC(evtflash);
 USER_FUNC(starstone_rotate_func);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 mri_countdown[];
-extern s32 mri_hikari_color[];
-extern s32 mri_puni_init[];
-extern s32 mri_puni_init_none[];
-extern s32 mri_punipuni_itemremove[];
-extern s32 mri_punipuni_itemselect[];
-extern s32 mri_punipuni_itemset[];
-extern s32 mri_punipuni_setup[];
-extern s32 puni_disp_info[];
 
 __declspec(section ".data") u64 fd_mri_14_negone_one_374;
 __declspec(section ".data") s32 fd_mri_14_neg_one_382[1];

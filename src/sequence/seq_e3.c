@@ -17,10 +17,8 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
-
-extern double tan(double arg);
-extern double sin(double arg);
-extern OSTime none_key;
+#include "libc_decls.h"
+#include "eff/eff_magic1_n64.h"
 
 // TODO: move all this into other TUs
 typedef enum winTexMode {

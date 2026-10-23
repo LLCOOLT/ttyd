@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
 
 #pragma force_active on
 
@@ -68,9 +69,6 @@ USER_FUNC(evt_party_set_dir);
 USER_FUNC(evt_party_stop);
 USER_FUNC(evt_set_dir_to_target);
 #endif
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_gon_08_negone_one_374;
 __declspec(section ".data") s32 fd_gon_08_neg_one_382[1];

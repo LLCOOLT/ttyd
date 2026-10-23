@@ -5,8 +5,7 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-extern double sin(double x);
+#include "eff/eff_magic1_n64.h"
 
 typedef struct EffTogeFlushWork {
     s32 type;       // 0x0

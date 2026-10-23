@@ -10,6 +10,11 @@
 #include "driver/dispdrv.h"
 #include "mario/mariost.h"
 #include "driver/camdrv.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_eff.h"
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct Chorogun { u8 flags; u8 state; u8 pad_2[2]; Vec vel; f32 speed; Vec pos; s32 timer; Vec target; } Chorogun;
@@ -68,18 +73,7 @@ void chorogun_ext_disp(CameraId camera, void* param);
 void chorogun_ext_main(void);
 void chorogun_ext_init(void);
 BattleUnit* chorogun_get_ptr(void);
-extern s32 _add_star_point_disp_offset[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btlevtcmd_GetCoin[];
-extern s32 btlevtcmd_GetExp[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_StoreCoin[];
-extern s32 btlevtcmd_StoreExp[];
-extern s32 btlevtcmd_snd_se[];
 extern s32 escape_chorogun_event[];
-extern s32 evt_eff[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 negone_one$374;
 __declspec(section ".data") s32 neg_one$382[1];

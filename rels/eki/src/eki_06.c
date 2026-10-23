@@ -9,9 +9,10 @@
 #include "mario/mario_motion.h"
 #include "pmario_sound.h"
 #include "string.h"
+#include "evt/evt_bero.h"
+#include "eki.h"
 
 static s32 lock;
-extern s32 evt_sw_complete[];
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_off);
@@ -43,7 +44,6 @@ s32 sw_main(MapObjectEntry* mobj);
 void sw_reset(void);
 s32 sw_cnt(MapObjectEntry* mobj);
 void sw_cntup(MapObjectEntry* mobj);
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_eki_06_negone_one_374;
 __declspec(section ".data") s32 fd_eki_06_neg_one_382[1];

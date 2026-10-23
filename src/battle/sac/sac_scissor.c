@@ -14,8 +14,14 @@
 #include "driver/offscreendrv.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/sac/sac_common.h"
+#include "evt/evt_img.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "party/party_motion.h"
 
-extern BattleWork* _battleWorkPointer;
 #define SW(t, o) (*(t*)((u8*)w + (o)))
 double sqrt(double);
 double fabs(double);
@@ -75,43 +81,6 @@ s32 scissor_intersection(f32, f32, f32, f32, f32, f32, f32, f32, f32*, f32*);
 
 
 
-extern s32 btlevtcmd_ACSuccessEffect[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CommandGetWeaponAddress[];
-extern s32 btlevtcmd_CommandPayWeaponCost[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetTotalDamage[];
-extern s32 btlevtcmd_StartWaitEvent[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveto[];
-extern s32 evt_img_alloc_capture[];
-extern s32 evt_img_clear_virtual_point[];
-extern s32 evt_img_entry[];
-extern s32 evt_img_onoff[];
-extern s32 evt_img_release[];
-extern s32 evt_img_set_paper[];
-extern s32 evt_img_set_paper_anim[];
-extern s32 evt_img_set_shadow[];
-extern s32 evt_offscreen_delete[];
-extern s32 evt_offscreen_entry[];
-extern s32 evt_paper_delete[];
-extern s32 evt_paper_entry[];
-extern s32 evt_snd_sfxoff[];
-extern s32 evt_snd_sfxon[];
-extern s32 sac_ac_help_off[];
-extern s32 sac_ac_help_on[];
-extern s32 sac_cheer[];
-extern s32 sac_cheer_end[];
-extern s32 sac_mario_back_home[];
-extern s32 sac_mario_item_on_end_evt[];
-extern s32 sac_mario_item_on_evt[];
-extern s32 sac_start_camera_evt[];
-extern s32 sac_start_stardust[];
 s32 weaponGetPower_Scissor();
 static s32 star_stone_appear();
 s32 wait_star_standby();

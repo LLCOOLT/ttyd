@@ -1,5 +1,7 @@
 #define npcCheckInterrupt npcCheckInterrupt_hdr_void
 #include "driver/npcdrv.h"
+#include "data/npc_data.h"
+#include "libc_decls.h"
 #undef npcCheckInterrupt
 BOOL npcCheckInterrupt(NpcEntry* npc);
 #include "dolphin/gx/GXStruct.h"
@@ -30,9 +32,6 @@ BOOL npcCheckInterrupt(NpcEntry* npc);
 #include "battle/battle_information.h"
 #include <string.h>
 
-extern GlobalWork* gp;
-extern NpcTribeInfo npcTribe[];
-
 f32 cloudGetBreathPower(Vec pos, f32 width);
 BOOL kpaMutekiCheck(void);
 void kpaAddScorePos(s32 score, Vec* pos);
@@ -46,7 +45,6 @@ void FontDrawScale(f32 scale);
 void FontDrawStringShake(f32 x, f32 y, const char* message);
 
 #define NPC_RAD2DEG(r) ((r) * 57.29579f)
-extern int __float_nan[];
 static inline s32 npc_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 npc_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * (0.5 * guess * (3.0 - guess * guess * x)); } else if (x < 0.0) { return *(f32*)__float_nan; } else if (npc_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 USER_FUNC(btlevtcmd_ftomsec);
@@ -2060,7 +2058,6 @@ void fbatTalkMode(void) {
 #define NPC_ENEMY_LEVEL(npc) (*(u8*)((u8*)*(void**)(npc)->battleInfo.groupSetup->enemyData + 0xE))
 
 void BattleMajinaiDone(void);
-extern s32 _evt_majinai_coin_up_effect[];
 void marioChgMoveMotion(void);
 
 // FAKE: the recovered-item loop as a static inline helper (counter = inline-local @ temp, ptr r30), with

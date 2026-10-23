@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dolphin/mtx.h>
+#include "evt/evt_cmd.h"
 
 typedef struct {
     s32 flags; //0x0
@@ -44,3 +45,23 @@ typedef struct {
 } BattleCameraWork;
 
 void battleCameraInit(void);
+
+USER_FUNC(evt_btl_camera_add_zoom);
+USER_FUNC(evt_btl_camera_nomove_x_onoff);
+USER_FUNC(evt_btl_camera_nomove_y_onoff);
+USER_FUNC(evt_btl_camera_nomove_z_onoff);
+USER_FUNC(evt_btl_camera_noshake);
+USER_FUNC(evt_btl_camera_off_posoffset_manual);
+USER_FUNC(evt_btl_camera_set_homing_unit);
+USER_FUNC(evt_btl_camera_set_homing_unit_audience);
+USER_FUNC(evt_btl_camera_set_homing_unitparts);
+USER_FUNC(evt_btl_camera_set_mode);
+USER_FUNC(evt_btl_camera_set_moveSpeedLv);
+USER_FUNC(evt_btl_camera_set_moveto);
+USER_FUNC(evt_btl_camera_set_posoffset);
+USER_FUNC(evt_btl_camera_set_prilimit);
+USER_FUNC(evt_btl_camera_set_zoom);
+USER_FUNC(evt_btl_camera_set_zoomSpeedLv);
+USER_FUNC(evt_btl_camera_shake_h);
+USER_FUNC(evt_btl_camera_shake_w);
+USER_FUNC(evt_btl_camera_wait_move_end);

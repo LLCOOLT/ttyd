@@ -20,8 +20,6 @@
 
 #define CHECK_ITEM(id) ((s32 (*)(s32))pouchCheckItem)(id)
 
-extern PiantaParlorWork* yuwp;
-extern BadgeShopWork* bdsw;
 extern ItemData itemDataTable[];
 
 PouchData* mpp_gap;

@@ -13,8 +13,6 @@
 #include "mario/mariost.h"
 #include "pmario_sound.h"
 
-extern GlobalWork* gp;
-
 //.sbss
 static OSTime none_key;
 

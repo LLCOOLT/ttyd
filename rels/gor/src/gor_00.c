@@ -19,11 +19,17 @@
 #include "memory.h"
 #include "string.h"
 #include "dolphin/gx.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
+#include "evt/evt_memcard.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_nannpc.h"
+#include "evt/evt_npc.h"
+#include "gor.h"
 
 s32 marioShipChanging(void);
 void mapGrpFlagOn(const char* name, u32 flags);
 void mapGrpFlagOff(const char* name, u32 flags);
-extern f32 gor_ship_puka_data[];
 EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5);
 EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 void mapObjGetPos(const char* name, Vec* pos);
@@ -31,11 +37,8 @@ typedef struct GorCbInfo { u8 field_0x0[0x8]; u16 field_0x8; } GorCbInfo;
 typedef struct NanNpc { u8 field_0x0[0x18]; Vec pos; Vec posA; Vec posB; u8 field_0x3C[0x50 - 0x3C]; OSTime time; u8 field_0x58[0x60 - 0x58]; f32 dir; void (*func)(struct NanNpc*); s32 state; s32 work6C; s32 work70; s32 work74; f32 work78; f32 work7C; f32 work80; u8 field_0x84[0x88 - 0x84]; Vec posC; u8 field_0x94[0xA4 - 0x94]; s32 workA4; s32 workA8; u8 field_0xAC[0xC0 - 0xAC]; } NanNpc;
 typedef struct NanNpcWork { NanNpc* entries; u8 field_0x4[0xC - 0x4]; s32 count; } NanNpcWork;
 extern NanNpcWork* nanNPCWork;
-extern Vec suifu100kaidanDOWN[];
-extern Vec suifu100kaidanUP[];
 void suifu100taikikan_seq01(NanNpc* npc);
 void suifu100taikikan_seq00(NanNpc* npc);
-extern s32 partyCtrlNo;
 typedef struct KaitenParam { Vec pos; Vec target; f32 angle; f32 dist; } KaitenParam;
 u32 gap_05_0000001C_bss;
 static u8* _ap;
@@ -267,20 +270,12 @@ void geundan1000tai_circle_pos(Vec* pos);
 static f32 accdec_type(s32 step, s32 total, f32 start, f32 end);
 f32 lineardec_type(s32 step, s32 total, f32 start, f32 end);
 static void alpha_tev(MapTevCallbackInfo* info);
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
-extern s32 evt_memcard_save[];
 #ifdef VERSION_G8ME01
 // US: map save blocks call the US save wrapper script
-extern s32 evt_memcard_save_wrapper[];
 #define SAVE_EVT evt_memcard_save_wrapper
 #else
 #define SAVE_EVT evt_memcard_save
 #endif
-extern s32 evt_sub_mail_vibration[];
-extern s32 luigi_gor_first_talk[];
-extern s32 nannpc_ext_main_sub_fast[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 negone_one$374;
 __declspec(section ".data") s32 neg_one$382[1];

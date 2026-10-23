@@ -3,6 +3,12 @@
 
 #pragma force_active on
 #include "battle/battle.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_eff.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_CheckStatus);
@@ -20,40 +26,6 @@ USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(btlevtcmd_check_battleflag);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(kanbu_get_id);
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AttackDeclareAll[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_GetHeight[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetPartsPos[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetStatusMg[];
-extern s32 btlevtcmd_JumpPartsContinue[];
-extern s32 btlevtcmd_JumpPartsPosition[];
-extern s32 btlevtcmd_JumpPartsSetting[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_OnPartsAttribute[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_RecoverHp[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SetPartsPos[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_eff[];
-extern s32 evt_eff64[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_gundan_zako_magician_negone_one_374;
 __declspec(section ".data") s32 fd_gundan_zako_magician_neg_one_382[1];

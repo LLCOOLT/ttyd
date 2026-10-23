@@ -14,12 +14,13 @@
 #include "manager/evtmgr_cmd.h"
 #include "system.h"
 #include <stdlib.h>
+#include "battle/battle.h"
+#include "battle/battle_event_subset.h"
+#include "libc_decls.h"
+#include "eff/eff_magic1_n64.h"
 #ifdef VERSION_G8ME01
 #include "mario/mariost.h"
-extern GlobalWork* gp;
 #endif
-
-extern BattleWork* _battleWorkPointer;
 
 //s32* eventId
 USER_FUNC(btlevtcmd_WaitEventEnd) {
@@ -3109,7 +3110,6 @@ USER_FUNC(btlevtcmd_GetMoveFrame) {
     }
     return EVT_RETURN_DONE;
 }
-extern int __float_nan[];
 
 static inline s32 bec_fpclassifyf(f32 x) {
     switch (*(s32*)&x & 0x7F800000) {
@@ -3540,7 +3540,6 @@ void psndSFX_pos(s32 id, Vec* pos);
 void _MoveSoundControlEndCore(BattleUnit* unit, BecSndWork* work);
 void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnitPart* part, f32 x, f32 y, f32 z);
 void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit);
-extern s32 subsetevt_confuse_flustered[];
 void BattleSamplingEnemy(BattleWorkWeaponTargets* targets, BattleWeapon* weapon, s32 unitId, s8 belong, u32 classFlags, u32 propFlags, s8 direction);
 void BattleAttackDeclare(s32* unitIdx, s32* partIdx);
 void BattleActionCommandDeclareACResult(BattleWork* work, BattleWeapon* weapon, s32 result);
@@ -4371,7 +4370,6 @@ USER_FUNC(btlevtcmd_MarioJumpParam) {
     return EVT_RETURN_DONE;
 }
 
-extern double sin(double);
 f32 reviseAngle(f32 a);
 #define MJ_F(u, off) BEC_FIELD(u, BUOFF(off), f32)
 USER_FUNC(btlevtcmd_MarioJumpPosition) {

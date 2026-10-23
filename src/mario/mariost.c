@@ -56,14 +56,12 @@
 
 #include <dolphin/vi.h>
 #include <string.h>
+#include "sdk/DEMOPad.h"
 
-extern void DEMOPadInit(void);
-extern void N_setupErrorHandler(void);
 extern void SoundSetOutputMode(s32 mode);
 extern void SoundOpenCover(void);
 extern void SoundCloseCover(void);
 #define OSIsRestart() ((OSGetResetCode() & 0x80000000) ? TRUE : FALSE)
-extern BOOL g_bFirstSmartAlloc;
 
 //.bss
 GlobalWork marioSt;

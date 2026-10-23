@@ -1,5 +1,66 @@
 #pragma once
 
 #include "evt/evt_cmd.h"
+#include "battle/battle_database_common.h"
 
 USER_FUNC(_full_ap_recover);
+
+extern BattleWeapon ItemWeaponData_Attiike_Shisshi;
+extern BattleWeapon ItemWeaponData_BiribiriCandy;
+extern BattleWeapon ItemWeaponData_Biribiri_Kinoko;
+extern BattleWeapon ItemWeaponData_BomberEgg;
+extern BattleWeapon ItemWeaponData_CoconutsBomb;
+extern BattleWeapon ItemWeaponData_CookingItem;
+extern BattleWeapon ItemWeaponData_Dekadeka_Drink;
+extern BattleWeapon ItemWeaponData_Fire_Flower;
+extern BattleWeapon ItemWeaponData_FirstLovePuddingBiribiri;
+extern BattleWeapon ItemWeaponData_FreshJuice;
+extern BattleWeapon ItemWeaponData_Funyafunya_Kun;
+extern BattleWeapon ItemWeaponData_FutarideForever;
+extern BattleWeapon ItemWeaponData_Guruguru_Memawashi;
+extern BattleWeapon ItemWeaponData_HealthySalad;
+extern BattleWeapon ItemWeaponData_Honey_Syrup;
+extern BattleWeapon ItemWeaponData_IceCandy;
+extern BattleWeapon ItemWeaponData_Irekaeeru;
+extern BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko;
+extern BattleWeapon ItemWeaponData_Jiwajiwa_Syrup;
+extern BattleWeapon ItemWeaponData_KachikachiDish;
+extern BattleWeapon ItemWeaponData_Kameno_Noroi;
+extern BattleWeapon ItemWeaponData_Kaminari_Dokkan;
+extern BattleWeapon ItemWeaponData_Kaminari_Gorogoro;
+extern BattleWeapon ItemWeaponData_KararinaPasta;
+extern BattleWeapon ItemWeaponData_Katikati_Koura;
+extern BattleWeapon ItemWeaponData_Kinkyuu_Kinoko;
+extern BattleWeapon ItemWeaponData_Kinoko;
+extern BattleWeapon ItemWeaponData_Kirakira_Otoshi;
+extern BattleWeapon ItemWeaponData_Koorino_Ibuki;
+extern BattleWeapon ItemWeaponData_LastDinner;
+extern BattleWeapon ItemWeaponData_Madowaseno_Kona;
+extern BattleWeapon ItemWeaponData_Maple_Syrup;
+extern BattleWeapon ItemWeaponData_MeromeroCake;
+extern BattleWeapon ItemWeaponData_Minimini_Kun;
+extern BattleWeapon ItemWeaponData_NancyDynamite;
+extern BattleWeapon ItemWeaponData_NancyFrappe;
+extern BattleWeapon ItemWeaponData_Naniga_Okorukana;
+extern BattleWeapon ItemWeaponData_Nemure_Yoikoyo;
+extern BattleWeapon ItemWeaponData_PeachTaltBiribiri;
+extern BattleWeapon ItemWeaponData_PoisonKinoko;
+extern BattleWeapon ItemWeaponData_Pow_Block;
+extern BattleWeapon ItemWeaponData_RedKararing;
+extern BattleWeapon ItemWeaponData_Royal_Jelly;
+extern BattleWeapon ItemWeaponData_Shikaeshino_Kona;
+extern BattleWeapon ItemWeaponData_Sinabita_Kinoko;
+extern BattleWeapon ItemWeaponData_SnowRabbit;
+extern BattleWeapon ItemWeaponData_SpaceFood;
+extern BattleWeapon ItemWeaponData_StarryDinner;
+extern BattleWeapon ItemWeaponData_Stop_Watch;
+extern BattleWeapon ItemWeaponData_Suitooru;
+extern BattleWeapon ItemWeaponData_Sukkiri_Drink;
+extern BattleWeapon ItemWeaponData_Super_Kinoko;
+extern BattleWeapon ItemWeaponData_Tankobu;
+extern BattleWeapon ItemWeaponData_TeaKinoko;
+extern BattleWeapon ItemWeaponData_Teki_Kyouka;
+extern BattleWeapon ItemWeaponData_Teki_Yokeeru;
+extern BattleWeapon ItemWeaponData_Teresano_Fuku;
+extern BattleWeapon ItemWeaponData_Ultra_Kinoko;
+extern BattleWeapon ItemWeaponData_Yurayura_Jishin;

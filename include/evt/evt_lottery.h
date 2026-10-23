@@ -8,3 +8,5 @@ typedef struct lottery_info {
 } lottery_info;
 
 lottery_info* lotteryGetPtr(void);
+
+extern BOOL dbg_lotteryinfo; // evt_lottery

@@ -15,6 +15,8 @@
 #include "system.h"
 #include "dolphin/mtx.h"
 #include "driver/icondrv.h"
+#include "evt/evt_movefloor.h"
+#include "yuu.h"
 
 #ifdef VERSION_G8ME01
 #define YUU_ICON_OFS 8
@@ -27,14 +29,10 @@ s32 yuucounter_get_data(void);
 void yuucounter_flag_on(s32 flag);
 void partyKeyOff(void);
 void monteCountDisp(void);
-extern s32 minigame01_start[];
-extern s32 minigame01_end[];
 #ifdef VERSION_G8ME01
-extern s32 minigame01_floor_delete[];
 USER_FUNC(yuuminigame1_floor_chk);
 USER_FUNC(yuuminigame1_floor_on_off);
 #endif
-extern s32 minigame_view_monte[];
 typedef struct MonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } MonteSub;
 typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
 typedef struct MonteTable { f32 x0; f32 x1; f32 y0; f32 y1; s32 num; } MonteTable;
@@ -105,8 +103,6 @@ void yuuminigame_disp_1hikoki(CameraId camera, void* param);
 void yuuminigame_main_1hikoki(EventEntry* event, BOOL isFirstCall);
 void yuuminigame_init_1hikoki(EventEntry* event, BOOL isFirstCall);
 static void monte_disp(CameraId camera, void* param);
-extern s32 evt_yuunpc_minigame1[];
-extern s32 moving_floor[];
 
 __declspec(section ".data") u64 fd_yuu_00_negone_one_374;
 __declspec(section ".data") s32 fd_yuu_00_neg_one_382[1];

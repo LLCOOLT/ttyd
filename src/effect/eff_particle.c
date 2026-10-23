@@ -6,8 +6,8 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "libc_decls.h"
 
-extern int __float_nan[];
 double log(double);
 
 typedef struct ParticleItem {

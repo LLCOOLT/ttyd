@@ -1,8 +1,7 @@
 #include "evt/evt_johoya.h"
 #include "driver/msgdrv.h"
 #include <string.h>
-
-extern int sprintf(char* str, const char* format, ...);
+#include "libc_decls.h"
 
 //.data
 InformantWork _jdt = {0};

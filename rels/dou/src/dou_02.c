@@ -1,5 +1,8 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
+#include "dou.h"
 
 #pragma force_active on
 
@@ -22,10 +25,6 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
-extern s32 dou_normal_puka[];
-extern s32 dou_puka_event[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
 
 __declspec(section ".data") u64 fd_dou_02_negone_one_374;
 __declspec(section ".data") s32 fd_dou_02_neg_one_382[1];

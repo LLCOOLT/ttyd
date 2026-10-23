@@ -15,11 +15,13 @@
 #include <string.h>
 #include "icon_ids.h"
 #include "version.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/sac/sac_common.h"
+#include "party/party_motion.h"
 // US battle texture ids are 0x16 higher for these entries.
 #define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
 
-
-extern BattleWork* _battleWorkPointer;
 
 double cos(double);
 double sin(double);
@@ -46,38 +48,6 @@ static USER_FUNC(start_game);
 static USER_FUNC(set_weapon);
 USER_FUNC(end_muki);
 USER_FUNC(main_muki);
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckStatus[];
-extern s32 btlevtcmd_CommandGetWeaponAddress[];
-extern s32 btlevtcmd_CommandPayWeaponCost[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetUnitId[];
-extern s32 btlevtcmd_StartWaitEvent[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_reset_move_color_lv_all[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_btl_camera_set_zoomSpeedLv[];
-extern s32 evt_snd_sfxoff[];
-extern s32 sac_ac_help_off[];
-extern s32 sac_ac_help_on[];
-extern s32 sac_enemy_slide_go[];
-extern s32 sac_enemy_slide_return[];
-extern s32 sac_handbeat[];
-extern s32 sac_handbeat_end[];
-extern s32 sac_mario_back_home[];
-extern s32 sac_mario_item_on_end_evt[];
-extern s32 sac_mario_item_on_evt[];
-extern s32 sac_start_camera_evt[];
-extern s32 sac_start_stardust[];
-extern s32 sac_wao[];
 
 typedef struct MukiObj { // 0x38
     s32 kind;          // 0x

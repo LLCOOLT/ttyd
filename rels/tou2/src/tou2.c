@@ -24,6 +24,7 @@
 #include "stdio.h"
 #include "icon_ids.h"
 #include "mario/mariost.h"
+#include "data/npc_data.h"
 
 #pragma force_active on
 
@@ -151,9 +152,6 @@ typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
 extern TouBattleSetup btlsetup_tou_tbl[];
-extern s32 btl_tou_setup_no_tbl[];
-extern s32 tou_03_init_evt[];
-extern NpcTribeInfo npcTribe[];
 
 double atan2(double y, double x);
 int rand(void);

@@ -11,6 +11,8 @@
 #include "system.h"
 #include "dolphin/mtx.h"
 #include "driver/camdrv.h"
+#include "evt/evt_bero.h"
+#include "aji.h"
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 BOOL hitIsGroup(HitEntry* target, HitEntry* group);
@@ -81,10 +83,6 @@ static USER_FUNC(mario_chk);
 USER_FUNC(hit_group_chk);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
 
 __declspec(section ".data") u64 fd_aji_13_negone_one_374;
 __declspec(section ".data") s32 fd_aji_13_neg_one_382[1];

@@ -17,9 +17,7 @@
 #include <dolphin/mtx.h>
 #include <string.h>
 #include <stdlib.h>
-
-extern BattleWork* _battleWorkPointer;
-extern GlobalWork* gp;
+#include "battle/battle_weapon_power.h"
 
 typedef struct BreakSlotReel {
 	s32 kind;        // 0x00
@@ -77,8 +75,6 @@ USER_FUNC(btlevtcmd_GetUnitId);
 USER_FUNC(btlevtcmd_RecoverFp);
 USER_FUNC(btlevtcmd_RecoverHp);
 USER_FUNC(evt_eff);
-extern s32 weaponGetFPPowerFPHalf[];
-extern s32 weaponGetPowerHPHalf[];
 
 __declspec(section ".data") u64 battle_break_slot_negone_one_a = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_battle_break_slot_negone_one_374 = 0xBF8000003F800000;
@@ -281,17 +277,6 @@ void BattleBreakSlot_Init(void) {
 	reel->cards = BattleAlloc(reel->numCards * 4);
 	memcpy(reel->cards, &c3, reel->numCards * 4);
 }
-
-extern s32 kinoko_effect[];
-extern s32 flower_effect[];
-extern s32 shine_effect[];
-extern s32 doku_kinoko_effect[];
-extern s32 star_effect[];
-extern s32 msg_hp_max[];
-extern s32 msg_fp_max[];
-extern s32 msg_star_max[];
-extern s32 msg_super_max[];
-extern s32 msg_fault[];
 
 s32 BattleAudienceAddAudienceNum(s32 num);
 #ifdef VERSION_G8ME01

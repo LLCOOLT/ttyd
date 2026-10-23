@@ -4,6 +4,7 @@
 #pragma force_active on
 #include "driver/effdrv.h"
 #include "mario/mariost.h"
+#include "muj.h"
 
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_cam3d_evt_set);
@@ -43,10 +44,6 @@ USER_FUNC(evt_sub_get_sincos);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(fune_eff);
-extern s32 anm_entotsu[];
-extern s32 anm_kaji[];
-extern s32 anm_neji[];
-extern s32 anm_wakka[];
 
 __declspec(section ".data") u64 fd_muj_21_negone_one_374;
 __declspec(section ".data") s32 fd_muj_21_neg_one_382[1];

@@ -11,8 +11,6 @@
 #include <string.h>
 #include "driver/icondrv.h"
 
-extern BattleWork* _battleWorkPointer;
-
 typedef struct StChgMsg {
 	s8 type; // 0x0
 	u8 flags; // 0x1
@@ -73,7 +71,6 @@ StChgMsgData _st_chg_msg_data[] = {
 	{ 24, "\202\266\202\355\202\266\202\355\202e\202o", "msg_st_chg_reg_fp", "msg_st_chg_reg_fp" },
 	{ -1, "", "", "" },
 };
-extern s8 _st_pri_data[];
 
 
 //.sdata

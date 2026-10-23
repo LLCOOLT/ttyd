@@ -5,9 +5,9 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
-extern double sin(double);
-extern double cos(double);
 EffectEntry* effVaporN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale);
 void effIbukiMain(EffectEntry* effect);
 void effIbukiDisp(CameraId cameraId, EffectEntry* effect);

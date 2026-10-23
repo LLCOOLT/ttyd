@@ -17,6 +17,8 @@
 #include "memory.h"
 #include "system.h"
 #include <string.h>
+#include "koopa.h"
+#include "driver/shadowdrv.h"
 
 
 
@@ -284,8 +286,6 @@ void* front2DJ[26] = {
 HitEntry* hitEntryMOBJ(MapFileJoint* joint, Mtx mtx);
 
 #define MAX_MOBJ_WORK 3
-
-extern GlobalWork* gp;
 
 //.sbss
 BOOL koopaRunFlag;
@@ -603,13 +603,8 @@ extern void* kpaGetHitobjHead(s32 idx);
 extern void* kpaGetHitobjRide(s32 idx);
 extern BOOL kpaHipAttackCheck(void);
 extern void* kpaGetHitobj(void);
-extern s32 kpaGetLevel(void);
 extern void* kpaGetHitFlame(void);
-extern void mapGetBlend(GXColor* color);
-extern void mapGetBlend2(GXColor* color);
-extern s32 shadowEntry(f32 x, f32 y, f32 z, f32 size);
 extern void shadowSetType(s32 id, s32 type);
-extern void shadowSetSize(s32 id, f32 size);
 
 #define MB(p, off, T) (*(T*)((u8*)(p) + (off)))
 typedef struct MobjWorkHit {
@@ -1054,7 +1049,6 @@ BOOL mobjCheckExec() {
     return FALSE;
 }
 
-extern const char kururinName[];
 static inline int mobjCheckKururingFloorItem(MapObjectEntry* entry) { // was always inlined in retail but not in demo
     if (!strcmp(entry->animName, kururinName)) {
         ItemEntry* item = itemNameToPtr(entry->name);

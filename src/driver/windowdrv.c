@@ -7,8 +7,7 @@
 #include "system.h"
 #include "sdk/texPalette.h"
 #include <string.h>
-
-extern int sprintf(char* str, const char* format, ...);
+#include "libc_decls.h"
 
 //.sbss
 #pragma force_active on
@@ -16,8 +15,6 @@ u32 gap_08_8041880C_sbss;
 #pragma force_active reset
 WindowEntry* WinObjects;
 GXTexObj* wakuTexObj;
-extern BOOL tpl_loaded;
-extern TEXPalette* winTpl;
 
 #define fabsf(x) __fabsf(x)
 

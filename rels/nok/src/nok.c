@@ -5,14 +5,11 @@
 #include "data/mapdata.h"
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/mtx.h"
+#include "nok.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 btl_nok_setup_no_tbl[];
-extern s32 btlsetup_nok_tbl[];
-extern s32 nok_00_init_evt[];
-extern s32 nok_01_init_evt[];
 
 USER_FUNC(evt_nokonoko_urouro_check_func);
 USER_FUNC(evt_npc_add_dirdist);

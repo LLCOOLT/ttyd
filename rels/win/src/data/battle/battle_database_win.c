@@ -1,21 +1,12 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
+#include "win.h"
 
 #pragma force_active on
 
-extern s32 battle_flower_drop_param_default[];
-extern s32 battle_flower_drop_param_default2[];
-extern s32 battle_heart_drop_param_default[];
-extern s32 battle_heart_drop_param_default2[];
-extern s32 battle_item_monochrome__pakkun[];
-extern s32 battle_item_monochrome_kurokumorn[];
-extern s32 battle_item_monochrome_sinemon[];
-extern s32 battle_item_vivian1[];
 extern s32 unit_boss_vivian[];
-extern s32 unit_monochrome_kurokumorn[];
-extern s32 unit_monochrome_pakkun[];
-extern s32 unit_monochrome_sinemon[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_win_negone_one_374;
 __declspec(section ".data") s32 fd_battle_database_win_neg_one_382[1];

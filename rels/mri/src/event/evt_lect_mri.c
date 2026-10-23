@@ -18,6 +18,16 @@
 #include "driver/itemdrv.h"
 #include "driver/animdrv.h"
 #include "system.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_img.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_lecture.h"
+#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 
 static OSTime wwstart;
 void statusWinForceClose(void);
@@ -100,38 +110,7 @@ static USER_FUNC(lect_mobj_set_nosysblend);
 static USER_FUNC(lect_push_a_check);
 static USER_FUNC(lect_push_b_check);
 static USER_FUNC(bgm_start_wait);
-extern s32 evt_cam3d_evt_off[];
-extern s32 evt_cam_road_reset[];
-extern s32 evt_eff_softdelete_ptr[];
-extern s32 evt_img_alloc_capture[];
-extern s32 evt_img_clear_virtual_point[];
-extern s32 evt_img_entry[];
-extern s32 evt_img_free_capture[];
-extern s32 evt_img_onoff[];
-extern s32 evt_img_release[];
-extern s32 evt_img_set_paper[];
-extern s32 evt_img_set_paper_anim[];
-extern s32 evt_img_wait_animend[];
 extern s32 evt_mario_dispflag_onoff[];
-extern s32 evt_mario_init_camid[];
-extern s32 evt_mario_normalize[];
-extern s32 evt_mario_set_camid[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_npc_start_for_event[];
-extern s32 evt_npc_start_for_one_event[];
-extern s32 evt_npc_stop_for_event[];
-extern s32 evt_paper_delete[];
-extern s32 evt_paper_entry[];
-extern s32 evt_party_run[];
-extern s32 evt_party_stop[];
-extern s32 evt_snd_bgmoff[];
-extern s32 evt_snd_bgmon[];
-extern s32 evt_snd_envoff[];
-extern s32 evt_snd_envon[];
-extern s32 evt_snd_sfxon_3d[];
-extern s32 lect_cam_load[];
-extern s32 lect_cam_save[];
-extern s32 lect_test_systemlevel[];
 
 __declspec(section ".data") u64 fd_evt_lect_mri_negone_one_374;
 __declspec(section ".data") s32 fd_evt_lect_mri_neg_one_382[1];

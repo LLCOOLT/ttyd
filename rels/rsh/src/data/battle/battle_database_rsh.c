@@ -4,13 +4,12 @@
 #pragma force_active on
 #include "battle/battle_stage_object.h"
 #include "battle/battle.h"
+#include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
 
 USER_FUNC(_set_destroy_flag);
 USER_FUNC(_set_offset);
-extern s32 battle_heart_drop_param_default[];
-extern s32 battle_item_moamoa[];
 extern s32 unit_boss_moamoa[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_rsh_negone_one_374;
 __declspec(section ".data") s32 fd_battle_database_rsh_neg_one_382[1];

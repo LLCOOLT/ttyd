@@ -7,12 +7,12 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "eff/eff_funemizu.h"
+#include "eff/n64/eff_water_damage_n64.h"
+#include "eff/eff_kemu_test.h"
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
-extern double sin(double);
-extern double cos(double);
-extern GXColor effFunemizuGetMapColor(void);
-extern EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
-extern EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 void effSplashMain(EffectEntry* effect);
 void effSplashDisp(CameraId cameraId, EffectEntry* effect);
 void effSplashGetCol(CameraId cameraId, EffectEntry* effect);

@@ -6,6 +6,7 @@
 #include "evt/evt_npc.h"
 #include "mario/mariost.h"
 #include "system.h"
+#include "evt/evt_bero.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_get_info);
@@ -59,10 +60,6 @@ USER_FUNC(evt_snd_envoff);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
-extern s32 bero_case_entry[];
-extern s32 bero_play_enter_anime[];
-extern s32 evt_bero_info_run[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_gon_12_negone_one_374;
 __declspec(section ".data") s32 fd_gon_12_neg_one_382[1];

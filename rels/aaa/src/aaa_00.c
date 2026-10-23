@@ -10,6 +10,9 @@
 #include "system.h"
 #include "string.h"
 #include "driver/dispdrv.h"
+#include "evt/evt_door.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
 
 static void draw(CameraId camera, void* param);
 typedef struct AaaWork { FileEntry* tpl; s32 alpha; } AaaWork;
@@ -83,13 +86,6 @@ USER_FUNC(evt_sub_rumble_onoff);
 USER_FUNC(mapdraw);
 void mapdelete(void);
 static void draw(CameraId camera, void* param);
-extern s32 door_open_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_entry[];
-extern s32 evt_door_open_quick[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 evt_sub_mail_vibration[];
-extern s32 evt_sub_tree_access_entry[];
 
 __declspec(section ".data") u64 fd_aaa_00_negone_one_374;
 __declspec(section ".data") s32 fd_aaa_00_neg_one_382[1];

@@ -10,6 +10,16 @@
 #include "mario/mario_party.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_attack_audience.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_audience.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "unit/unit_koura.h"
 
 USER_FUNC(btlevtcmd_AddRotate);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -66,83 +76,6 @@ USER_FUNC(_tsuranuki_effect_control);
 USER_FUNC(_color_lv_set);
 USER_FUNC(_check_mario_move_count);
 static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
-extern s32 _attack_aud[];
-extern s32 _get_attack_aud_no[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btldefaultevt_SuitoruBadgeEffect[];
-extern s32 btldefaultevt_avoid_counter_event[];
-extern s32 btlevtcmd_ACRGetResult[];
-extern s32 btlevtcmd_ACRStart[];
-extern s32 btlevtcmd_ACSuccessEffect[];
-extern s32 btlevtcmd_AcGetDifficulty[];
-extern s32 btlevtcmd_AcGetOutputParam[];
-extern s32 btlevtcmd_AcSetDifficulty[];
-extern s32 btlevtcmd_AcSetFlag[];
-extern s32 btlevtcmd_AcSetGaugeParam[];
-extern s32 btlevtcmd_AcSetParamAll[];
-extern s32 btlevtcmd_AddPartsRotate[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_AttackDeclareAll[];
-extern s32 btlevtcmd_AudienceDeclareACResult[];
-extern s32 btlevtcmd_AudienceDeclareAcrobatResult[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CommandCheckDamage[];
-extern s32 btlevtcmd_CommandGetWeaponActionLv[];
-extern s32 btlevtcmd_CommandGetWeaponAddress[];
-extern s32 btlevtcmd_CommandPayWeaponCost[];
-extern s32 btlevtcmd_CommandPreCheckCounter[];
-extern s32 btlevtcmd_CommandPreCheckDamage[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_FallPosition[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetMoveFrame[];
-extern s32 btlevtcmd_GetPartsWork[];
-extern s32 btlevtcmd_GetResultAC[];
-extern s32 btlevtcmd_GetResultPrizeLv[];
-extern s32 btlevtcmd_GetRotate[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetStageAudienceAreaSize[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_GetUnitId[];
-extern s32 btlevtcmd_GetUnitWork[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_OffAttribute[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_OnAttribute[];
-extern s32 btlevtcmd_OnPartsAttribute[];
-extern s32 btlevtcmd_ResultAC[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetHp[];
-extern s32 btlevtcmd_SetPartsRotateOffset[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_SetupAC[];
-extern s32 btlevtcmd_SpawnUnit[];
-extern s32 btlevtcmd_StartAC[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_StopAC[];
-extern s32 btlevtcmd_TransStageFloorPosition[];
-extern s32 btlevtcmd_WaitEventEnd[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_audience_acrobat_notry[];
-extern s32 evt_btl_camera_off_posoffset_manual[];
-extern s32 evt_btl_camera_set_homing_unit_audience[];
-extern s32 evt_btl_camera_set_posoffset[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_snd_sfx_pit[];
-extern s32 evt_snd_sfxoff[];
-extern s32 evt_sub_intpl_get_value_para[];
-extern s32 evt_sub_intpl_init[];
-extern s32 subset_attack_ready_jump_event[];
-extern s32 unit_koura[];
-extern s32 weaponGetACOutputParam[];
-extern s32 weaponGetPowerFromPartyAttackLv[];
 
 __declspec(section ".data") s32 unit_party_nokotarou_negone_one_a[2];
 __declspec(section ".data") s32 nokotarou_negone_one_374[2];

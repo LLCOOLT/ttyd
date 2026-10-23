@@ -8,6 +8,7 @@
 #include "dolphin/mtx.h"
 #include "mario/mariost.h"
 #include "driver/camdrv.h"
+#include "evt/evt_bero.h"
 
 static s32 xlw[16];
 void bgTransOffsetOn(void);
@@ -87,7 +88,6 @@ static USER_FUNC(enzan_cam_turn_keisan);
 static USER_FUNC(wariai_enzan_0f);
 static USER_FUNC(wariai_enzan_0);
 static USER_FUNC(wariai_enzan_1);
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_tik_11_negone_one_374;
 __declspec(section ".data") s32 fd_tik_11_neg_one_382[1];

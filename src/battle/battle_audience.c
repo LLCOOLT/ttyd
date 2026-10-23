@@ -20,6 +20,11 @@
 
 
 #include "evt/evt_cmd.h"
+#include "battle/battle_break_slot.h"
+#include "battle/battle_audience_kinopio.h"
+#include "battle/battle_audience_kind_data.h"
+#include "libc_decls.h"
+#include "eff/eff_magic1_n64.h"
 USER_FUNC(btlevtcmd_AnnounceMessage);
 EVT_BEGIN(msg_puni_all_escape)
     CALL(btlevtcmd_AnnounceMessage, 0, 0, -225, STRING("btl_msg_audience_puni_escape"), 120)
@@ -41,9 +46,7 @@ typedef struct { f32 v[65]; } AudDeltaArr;
 typedef struct { s32 v[11]; } AudWArr;
 const AudDeltaArr R_audience_delta_multiplier = {{8.0f,11.0f,14.0f,17.0f,20.0f,23.0f,26.0f,29.0f,32.0f,35.0f,38.0f,41.0f,44.0f,47.0f,50.0f,53.0f,56.0f,59.0f,62.0f,65.0f,68.0f,71.0f,74.0f,77.0f,80.0f,83.0f,86.0f,89.0f,92.0f,95.0f,98.0f,101.0f,104.0f,107.0f,110.0f,113.0f,116.0f,119.0f,122.0f,125.0f,128.0f,131.0f,134.0f,137.0f,140.0f,143.0f,146.0f,149.0f,152.0f,155.0f,158.0f,161.0f,164.0f,167.0f,170.0f,173.0f,176.0f,179.0f,182.0f,185.0f,188.0f,191.0f,194.0f,197.0f,200.0f}};
 const AudWArr R_num_audience_type_weights = {{20,40,20,5,3,2,1,1,1,1,1}};
-extern BattleWork* _battleWorkPointer;
 extern s32 swGet(s32);
-extern int sprintf(char* str, const char* format, ...);
 extern s32 weaponGetPowerFromMarioHammerLv();
 extern s32 weaponGetPowerDefault();
 
@@ -113,7 +116,6 @@ double sqrt(double);
 s32 BattleBreakSlot_GetBreakTurn();
 void* BattleBreakSlotGetPtr();
 void BattleBreakSlot_PointInc();
-extern s32 audience_kind[];
 void BattleAudienceNumToTarget(void);
 s32 BattleAudienceNumToTargetSub(void);
 void BattleAudienceAddTargetNum(f32 value, f32 value2);
@@ -557,9 +559,6 @@ void BattleAudience_PerPhase(u32 value) {
 	}
 }
 
-extern s32 irand(s32);
-extern void* memcpy(void*, const void*, unsigned long);
-extern void BattleBreakSlot_DecBreakTurn(void);
 #define SUB pe->sub
 #define CLR pe->count = 0;
 #define QSEL(t) for (counter = 0, i = 0; i <= 59; i++) { if (check_exe_phase_evt_status(i, t)) { list[counter] = i; counter++; } }
@@ -992,9 +991,6 @@ void BattleAudience_End(void) {
 }
 
 //@@ BattleAudienceSettingAudience
-extern s32 irand(s32);
-extern void* memset(void*, int, unsigned long);
-extern void* memcpy(void*, const void*, unsigned long);
 
 void BattleAudienceSettingAudience(void) {
 	s32 hasKind = 0;
@@ -1247,8 +1243,6 @@ void BattleAudienceGuestTPLRead(s32 id, AudienceMemberType member, const char* p
 }
 
 //@@ BattleAudienceCtrlProcess
-extern void BattleAudienceCtrlProcessKinopio(s32 index);
-extern s32 irand(s32);
 
 void BattleAudienceCtrlProcess(void) {
 	s32 chance;
@@ -1486,12 +1480,6 @@ typedef struct AudItemX {
 	BattleUnit* target;
 	s32 mode;
 } AudItemX;
-extern const Vec vec3_802f972c[];
-extern const Vec vec3_802f9738[];
-extern void BattleAudience_SetPresentItemType(s32);
-extern void BattleAudience_SetPresentTargetUnitId(s32);
-extern void BattleAudience_SetPresentItemNo(s32);
-extern s32 BattleAudience_GetPresentItemType(void);
 extern s32 BtlUnit_CheckShadowGuard(BattleUnit*);
 extern double __fabs(double);
 void BattleAudienceItemCtrlProcess(void) {
@@ -1786,9 +1774,6 @@ void BattleAudienceItemCtrlProcess(void) {
 
 
 //@@ BattleAudienceApSrcCtrlProcess
-extern double asin(double);
-extern double cos(double);
-extern double sin(double);
 extern void statusGetApPos(Vec* pos);
 void BattleAudienceApSrcCtrlProcess(void) {
 	BattleAudience* base = BattleAudienceBaseGetPtr();
@@ -1917,8 +1902,6 @@ void BattleAudienceApSrcCtrlProcess(void) {
 }
 
 //@@ BattleAudienceApSrcEntry
-extern const Vec vec3_802f9750[];
-extern const Vec vec3_802f975c[];
 BOOL BattleAudienceApSrcEntry(void) {
 	AudApSrc* star;
 	CameraEntry* cam;

@@ -2,6 +2,7 @@
 
 #include <dolphin/types.h>
 #include "driver/icondrv.h"
+#include "evt/evt_cmd.h"
 
 typedef struct BattleWorkIcon {
 	u16 flags; //0x0
@@ -30,3 +31,10 @@ void BattleIconMain(void);
 void BattleIconEnd(void);
 BattleIcon* BtlIcon_Entry(u16 iconId, f32 x, f32 y, f32 z);
 void BtlIcon_Delete(BattleIcon* icon);
+
+USER_FUNC(btlevtcmd_BtlIconDelete);
+USER_FUNC(btlevtcmd_BtlIconEntry);
+USER_FUNC(btlevtcmd_BtlIconEntryItemId);
+USER_FUNC(btlevtcmd_BtlIconJumpPosition);
+USER_FUNC(btlevtcmd_BtlIconSetFallAccel);
+USER_FUNC(btlevtcmd_BtlIconSetPosition);

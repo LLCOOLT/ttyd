@@ -7,6 +7,9 @@
 #include "manager/evtmgr_cmd.h"
 #include "system.h"
 #include "mario/mario.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "npc_event.h"
 
 u16 itemFlag(ItemEntry* item, u16 mask);
 
@@ -82,9 +85,6 @@ USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 USER_FUNC(win_item_move_3d_position);
 USER_FUNC(mariowalk_wait);
-extern s32 enemy_common_dead_event[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_tree_access_entry[];
 
 __declspec(section ".data") u64 fd_win_00_negone_one_374;
 __declspec(section ".data") s32 fd_win_00_neg_one_382[1];

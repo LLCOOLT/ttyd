@@ -30,8 +30,6 @@
 #include "icon_ids.h"
 
 
-extern GlobalWork* gp;
-
 //.sbss
 static IconWork work[2];
 BOOL icon_bin_ok;
@@ -54,7 +52,6 @@ typedef struct IconBinData {
     IconFrame frames[1]; // 0x8
 } IconBinData;
 
-extern void mapGetBlend(GXColor* color);
 void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color);
 
 #define ICON_ANIM_TPL(data, dst)                                   \

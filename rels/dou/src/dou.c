@@ -6,26 +6,11 @@
 #include "manager/evtmgr_cmd.h"
 #include "mario/mario.h"
 #include "system.h"
+#include "dou.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 btl_dou_setup_no_tbl[];
-extern s32 btlsetup_dou_tbl[];
-extern s32 dou_00_init_evt[];
-extern s32 dou_01_init_evt[];
-extern s32 dou_02_init_evt[];
-extern s32 dou_03_init_evt[];
-extern s32 dou_04_init_evt[];
-extern s32 dou_05_init_evt[];
-extern s32 dou_06_init_evt[];
-extern s32 dou_07_init_evt[];
-extern s32 dou_08_init_evt[];
-extern s32 dou_09_init_evt[];
-extern s32 dou_10_init_evt[];
-extern s32 dou_11_init_evt[];
-extern s32 dou_12_init_evt[];
-extern s32 dou_13_init_evt[];
 
 USER_FUNC(dou_mario_pos_osreport_func);
 USER_FUNC(evt_dou_normal_puka);

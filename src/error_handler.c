@@ -7,11 +7,10 @@
 #include <dolphin/os.h>
 #include <dolphin/vi.h>
 #include <string.h>
+#include "seq/seq_title.h"
+#include "libc_decls.h"
 
 extern void* DemoCurrentBuffer, * DemoFrameBuffer1, * DemoFrameBuffer2;
-extern int sprintf(char* str, const char* format, ...);
-extern s32 N_getDebugMode(void);
-extern void L_smartReInit(void);
 
 //local prototypes
 void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar);

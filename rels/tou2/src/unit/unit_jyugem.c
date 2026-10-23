@@ -4,6 +4,11 @@
 #pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -37,41 +42,7 @@ USER_FUNC(btlevtcmd_WaitAttackEnd);
 USER_FUNC(evt_eff);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(togezo_copy_status);
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AddRotate[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckActStatus[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckDamageCode[];
-extern s32 btlevtcmd_CheckPhase[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetPartsPos[];
-extern s32 btlevtcmd_JumpPartsContinue[];
-extern s32 btlevtcmd_OnPartsCounterAttribute[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_SpawnUnit[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_get_turn[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 subsetevt_confuse_flustered[];
 extern s32 unit_togezo[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_jyugem_negone_one_374;
 __declspec(section ".data") s32 fd_jyugem_neg_one_382[1];

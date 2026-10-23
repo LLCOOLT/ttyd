@@ -14,7 +14,6 @@
 #include "pmario_sound.h"
 #include <string.h>
 
-extern GlobalWork* gp;
 double cos(double);
 
 typedef StatusValue SVal;

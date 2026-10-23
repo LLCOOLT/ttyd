@@ -13,6 +13,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "eff/eff_magic1_n64.h"
 
 typedef struct SoundStream {
 	u16 flags; //0x0
@@ -27,17 +28,12 @@ typedef struct SoundWork {
 void SoundSetOutputMode(s32 mode);
 
 extern SoundWork sound;
-extern PaperSoundBGM psbgm[2];
-extern GlobalWork* gp;
 #ifdef VERSION_G8ME01
 #define PSTATIC
 #else
 #define PSTATIC static
 #endif
-extern const char* build_date_ptr;
-extern const char* build_time_ptr;
 
-extern double sin(double);
 void FontDrawEdge(void);
 void FontDrawScale(f32 scale);
 void FontDrawString(f32 x, f32 y, const char* msg);

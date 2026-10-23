@@ -3,17 +3,11 @@
 
 #pragma force_active on
 #include "data/mapdata.h"
+#include "pik.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 btl_pik_setup_no_tbl[];
-extern s32 btlsetup_pik_tbl[];
-extern s32 pik_00_init_evt[];
-extern s32 pik_01_init_evt[];
-extern s32 pik_02_init_evt[];
-extern s32 pik_03_init_evt[];
-extern s32 pik_04_init_evt[];
 
 void _unresolved(void);
 void _epilog(void);

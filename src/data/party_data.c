@@ -1,5 +1,12 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "party/party_bomhei.h"
+#include "party/party_chuchu.h"
+#include "party/party_cloud.h"
+#include "party/party_kuribo.h"
+#include "party/party_nokonoko.h"
+#include "party/party_move.h"
+#include "party/party_yoshi.h"
 
 #ifdef VERSION_G8ME01
 // US has no local duplicates of these: use the global functions
@@ -8,36 +15,11 @@
 #define vivian_init_801809C0 vivian_init
 #endif
 
-extern s32 bomhei_bye[];
-extern s32 bomhei_exit[];
 extern s32 bomhei_init_800BFBB0[];
-extern s32 bomhei_use[];
-extern s32 bomhei_use_post[];
-extern s32 chuchu_exit[];
-extern s32 chuchu_init[];
-extern s32 chuchu_move[];
-extern s32 chuchu_use[];
-extern s32 cloud_exit[];
-extern s32 cloud_init[];
-extern s32 cloud_move[];
-extern s32 cloud_use[];
-extern s32 kuribo_bye[];
 extern s32 kuribo_init_800C23B4[];
-extern s32 kuribo_use[];
-extern s32 kuribo_use_post[];
-extern s32 nokonoko_bye[];
-extern s32 nokonoko_init[];
-extern s32 nokonoko_move[];
-extern s32 nokonoko_use[];
-extern s32 nokonoko_use_post[];
-extern s32 partyMoveWalk[];
 extern s32 vivian_init_801809C0[];
 extern s32 vivian_move[];
 extern s32 vivian_use[];
-extern s32 yoshi_bye[];
-extern s32 yoshi_exit[];
-extern s32 yoshi_init[];
-extern s32 yoshi_use[];
 
 
 s32 partyDataTbl[] = {

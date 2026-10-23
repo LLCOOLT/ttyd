@@ -1,5 +1,13 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_mario.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 
 #pragma force_active on
 
@@ -44,59 +52,6 @@ USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(btlevtcmd_TransStageFloorPosition);
 USER_FUNC(evt_eff);
 USER_FUNC(evt_sub_random);
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckDamagePattern[];
-extern s32 btlevtcmd_CheckStatus[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetFriendBelong[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetPartsPos[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_GetUnitId[];
-extern s32 btlevtcmd_JumpPartsSetting[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetPartsMoveSpeed[];
-extern s32 btlevtcmd_SetPartsScale[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_SpawnUnit[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_add_zoom[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_snd_sfxoff[];
-extern s32 evt_sub_intpl_get_value[];
-extern s32 evt_sub_intpl_init[];
-extern s32 marioWeapon_KaitenHammerInvolved[];
-extern s32 marioWeapon_UltraHammerFinish[];
-extern s32 marioWeapon_UltraHammerInvolved[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 subsetevt_nodamage_motion[];
-extern s32 subsetevt_shot_damage[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_sambo_negone_one_374;
 __declspec(section ".data") s32 fd_sambo_neg_one_382[1];

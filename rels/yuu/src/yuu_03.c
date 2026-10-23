@@ -16,6 +16,7 @@
 #include "driver/effdrv.h"
 #include "system.h"
 #include "icon_ids.h"
+#include "yuu.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_sub_get_language);
@@ -27,7 +28,6 @@ typedef struct SlitWork { u32 flags; s32 phase; s32 coins; s32 result; s32 state
 typedef struct MonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } MonteSub;
 typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
 void yuu_03_icon_monte_disp(CameraId camera, void* param);
-extern s32 yuu_03_icon_monte_entry_evt[];
 void marioSlitForceCancel(void);
 void ext_yuunpc_minigame4_init_sub(void);
 void yuunpc_wp_flag_off(s32 flag);
@@ -39,21 +39,17 @@ static void* yuunpc_wp;
 s32 ryuwp;
 RyushiWork* xwp;
 Monte* yuu_03_monte_p;
-extern f32 yuusintbl[];
 static void polygon(f32 x, f32 y, f32 w, f32 h, f32 u, f32 v);
 int rand(void);
 static f32 randf(f32 min, f32 max);
 void ryushi_disp(CameraId camera, void* param);
 USER_FUNC(evt_ryushi_init);
-extern s32 minigame04_start[];
-extern s32 minigame04_end[];
 void mapObjRotate(const char* name, f32 x, f32 y, f32 z);
 BOOL yuuminigame4_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp, SlitWork* data);
 void monteCountDisp(void);
 s32 yuucounter_get_data(void);
 void yuucounter_flag_on(s32 flag);
 void partyKeyOff(void);
-extern s32 ryushi_event[];
 #define REVISE360(a) ((3600.0f + (a)) - (s32)((3600.0f + (a)) / 360.0f) * 360)
 
 USER_FUNC(eff_call_minigame);
@@ -123,7 +119,6 @@ static USER_FUNC(evt_nomal_cange);
 USER_FUNC(evt_slit_cancel);
 USER_FUNC(yuu_03_icon_monte_restart);
 void yuu_03_icon_monte_disp(CameraId camera, void* param);
-extern s32 evt_yuunpc_minigame4[];
 
 __declspec(section ".data") u64 fd_yuu_03_negone_one_374;
 __declspec(section ".data") s32 fd_yuu_03_neg_one_382[1];

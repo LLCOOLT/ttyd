@@ -4,6 +4,9 @@
 #include "driver/effdrv.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "system.h"
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
 typedef struct effKemuri1Data {
 	u16 type; //0x0
@@ -18,10 +21,6 @@ typedef struct effKemuri1Data {
 
 //local prototypes
 void effKemuri1Main(EffectEntry* effect);
-
-extern double sin(double);
-extern double cos(double);
-extern f32 reviseAngle(f32);
 
 typedef struct effKemuri1EWork {
 	u16 type;

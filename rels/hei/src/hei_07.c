@@ -9,6 +9,7 @@
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
 #include "system.h"
+#include "evt/evt_bero.h"
 
 USER_FUNC(evt_bero_get_entername);
 USER_FUNC(evt_bero_get_info);
@@ -75,9 +76,6 @@ USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(mario_set_dir);
 static void callback(s32 type, void** work);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_hei_07_negone_one_374;
 __declspec(section ".data") s32 fd_hei_07_neg_one_382[1];

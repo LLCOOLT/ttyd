@@ -9,6 +9,11 @@
 #include "manager/evtmgr_cmd.h"
 #include "string.h"
 #include "system.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_weapon_power.h"
+#include "party/party_motion.h"
 
 EffectEntry* effMagic1N64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5, f32 arg6, f32 arg7);
 EffectEntry* effPokopiPchargeN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime);
@@ -77,41 +82,6 @@ static USER_FUNC(eff_magic_get_posX);
 static USER_FUNC(eff_staff2);
 static USER_FUNC(eff_staff1);
 static USER_FUNC(kamec_shuffle);
-extern s32 _add_star_point_disp_offset[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btlevtcmd_AddRotate[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_CheckDamageCode[];
-extern s32 btlevtcmd_CheckDataOfDataTable[];
-extern s32 btlevtcmd_CheckSpace[];
-extern s32 btlevtcmd_ClearAllStatus[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_FaceDirectionSub[];
-extern s32 btlevtcmd_GetBackItem[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetCoin[];
-extern s32 btlevtcmd_GetExp[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetFirstAttackTarget[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_OnUnitFlag[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_RunDataEventChild[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetPartsPos[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_StoreCoin[];
-extern s32 btlevtcmd_StoreExp[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_snd_sfxon[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_kamec_negone_one_374;
 __declspec(section ".data") s32 fd_kamec_neg_one_382[1];

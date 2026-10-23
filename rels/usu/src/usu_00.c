@@ -19,6 +19,12 @@
 #include "eff/eff_kemu_test.h"
 #include "driver/fadedrv.h"
 #include "driver/effdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_door.h"
+#include "evt/evt_memcard.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_npc.h"
+#include "usu.h"
 
 typedef struct UsuCbInfo { u8 field_0x0[0x8]; u16 field_0x8; } UsuCbInfo;
 typedef struct KpaSen { s8 state; u8 field_0x1; u16 wait; f32 t; Vec start; Vec end; u8 pose99Lo; u8 pose99Hi; u8 pose1Lo; u8 pose1Hi; } KpaSen;
@@ -221,20 +227,8 @@ void kpa_stg5_009_7_cb(s32 type, UsuCbInfo** param);
 USER_FUNC(party_tev);
 #ifdef VERSION_G8ME01
 USER_FUNC(N_evt_sub_status_gauge_force_update);
-extern s32 evt_memcard_save_wrapper[];
 #endif
-extern s32 all_party_lecture[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
 extern s32 envSetYami[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_entry[];
-extern s32 evt_door_open[];
-extern s32 evt_memcard_save[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 evt_sub_tree_access_entry[];
-extern s32 evt_usu_kagemario_party_kill[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_usu_00_negone_one_374;
 __declspec(section ".data") s32 fd_usu_00_neg_one_382[1];

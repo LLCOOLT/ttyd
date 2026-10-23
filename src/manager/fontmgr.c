@@ -5,10 +5,8 @@
 #include "mario/mariost.h"
 #include "memory.h"
 #include "system.h"
-
-extern int sprintf(char* str, const char* format, ...);
-extern double floor(double);
-extern GXTexObj* wakuTexObj;
+#include "driver/windowdrv.h"
+#include "libc_decls.h"
 
 typedef struct FontWidthEntry {
 	u8 kerning; //0x0
@@ -64,7 +62,6 @@ GXColor HSV2RGB(GXColor hsv);
 void FontDrawColorIDX(s32 idx);
 void FontDrawStart_alpha(u8 alpha);
 #ifdef VERSION_G8ME01
-extern char* msgGetCommand(char* msg, char* cmd, char* arg);
 void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg);
 #endif
 
@@ -380,7 +377,6 @@ void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg) {
 	}
 }
 #endif
-extern char* msgGetCommand(char* msg, char* cmd, char* arg);
 static inline void fontDrawPairXI(u16 code, s16 x, s16 y) {
 	s16 iy = y;
 	s16 ix = x;
@@ -544,9 +540,6 @@ void FontDrawStringShake(f32 x, f32 y, const s8* msg) {
 		x += fontScale.x * (width + charspace[gp->language]);
 	}
 }
-extern int strcmp(const char* a, const char* b);
-extern int sscanf(const char* s, const char* format, ...);
-extern s32 msgIconStr2ID(const char* str);
 extern void iconGetWidthHight(u16* width, u16* height, u16 id);
 extern void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale);
 

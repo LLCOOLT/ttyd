@@ -13,17 +13,14 @@
 #include "mario/mario_party.h"
 #include "mario/mario_pouch.h"
 #include "mario/mariost.h"
+#include "evt/evt_badgeshop.h"
+#include "evt/evt_yuugijou.h"
+#include "evt/evt_johoya.h"
 //TODO: put in /evt?
 //funcs sorted backwards aka original source file
 
 void statusWinForceUpdate(void);
 s32 yoshiSetColor(void);
-
-extern void badgeShop_init(void);
-extern void yuugijou_init(void);
-extern void johoya_init(void);
-
-extern GlobalWork* gp;
 
 #ifdef VERSION_G8ME01
 #define NAME_EN(x) , x

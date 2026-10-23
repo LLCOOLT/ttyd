@@ -4,6 +4,8 @@
 #pragma force_active on
 #include "eff/eff_small_star.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
+#include "las.h"
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_off);
@@ -27,8 +29,6 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 static USER_FUNC(small_star);
-extern s32 box_syutugen[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_las_13_negone_one_374;
 __declspec(section ".data") s32 fd_las_13_neg_one_382[1];

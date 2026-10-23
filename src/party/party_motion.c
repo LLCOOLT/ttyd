@@ -8,6 +8,7 @@
 #include "mario/mariost.h"
 #include <string.h>
 #include "version.h"
+#include "libc_decls.h"
 
 // file-local full-layout view of PartyEntry (party.h is not included)
 typedef struct PartyMarioView {
@@ -437,7 +438,6 @@ void partySetTargetSpd(PartyEntry* party, f32 spd);
 HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist);
 void partyGetAppearPos3(PartyEntry* party, Vec* pos);
 s32 marioCtrlOffChk(void);
-extern int __float_nan[];
 static inline HitEntry* partyBehindGround(PartyEntry* party) {
     HitEntry* hit = partySearchGround(party, 10.0f, 0.0f);
     if (hit && (hitGetAttr(hit) & 0x200)) {

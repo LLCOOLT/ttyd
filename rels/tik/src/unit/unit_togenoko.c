@@ -3,6 +3,12 @@
 
 #pragma force_active on
 #include "battle/battle.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_sub.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_CheckSpace);
@@ -25,62 +31,6 @@ USER_FUNC(btlevtcmd_check_battleflag);
 USER_FUNC(evt_eff);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(togenoko_getnum);
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btlevtcmd_AddRotate[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_AnimeSetPoseTable[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeDataTable[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetFirstAttackTarget[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_OffPartsCounterAttribute[];
-extern s32 btlevtcmd_OffStatusFlag[];
-extern s32 btlevtcmd_OnPartsCounterAttribute[];
-extern s32 btlevtcmd_OnStatusFlag[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetHitOffset[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetOverTurnCount[];
-extern s32 btlevtcmd_SetPartsDefenceAttrTable[];
-extern s32 btlevtcmd_SetPartsDefenceTable[];
-extern s32 btlevtcmd_SetPos[];
-extern s32 btlevtcmd_SetRegistStatus[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_SetUnitWork[];
-extern s32 btlevtcmd_SpawnUnit[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_add_zoom[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_sub_get_sincos[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_togenoko_negone_one_374;
 __declspec(section ".data") s32 fd_togenoko_neg_one_382[1];

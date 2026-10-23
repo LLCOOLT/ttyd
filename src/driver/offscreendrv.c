@@ -6,8 +6,6 @@
 #include "memory.h"
 #include <string.h>
 
-extern GlobalWork* gp;
-
 //.sbss
 static OffscreenWork work[2]; //field, battle
 

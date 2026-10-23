@@ -3,6 +3,8 @@
 
 #pragma force_active on
 #include "driver/npcdrv.h"
+#include "evt/evt_bero.h"
+#include "npc_event.h"
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_item_entry);
@@ -33,9 +35,6 @@ USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
 static USER_FUNC(npc_dead);
 static USER_FUNC(npc_set_me);
-extern s32 chorobon_move_event[];
-extern s32 enemy_common_dead_event[];
-extern s32 evt_bero_info_run[];
 extern s32 hei_test_water_tev[];
 
 __declspec(section ".data") u64 fd_hei_08_negone_one_374;

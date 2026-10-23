@@ -5,161 +5,162 @@
 #include "eff/eff_n64.h"
 #include "evt/evt_cmd.h"
 #include <string.h>
+#include "eff/n64/eff_kemuri1_n64.h"
+#include "eff/n64/eff_kemuri2_n64.h"
+#include "eff/n64/eff_kemuri3_n64.h"
+#include "eff/n64/eff_kemuri4_n64.h"
+#include "eff/n64/eff_kemuri5_n64.h"
+#include "eff/n64/eff_kemuri6_n64.h"
+#include "eff/n64/eff_kemuri7_n64.h"
+#include "eff/n64/eff_snow_n64.h"
+#include "eff/n64/eff_sstar_n64.h"
+#include "eff/n64/eff_stardust_n64.h"
+#include "eff/eff_magic1_n64.h"
+#include "eff/n64/eff_magic2_n64.h"
+#include "eff/n64/eff_hokori_n64.h"
+#include "eff/n64/eff_kemuri8_n64.h"
+#include "eff/n64/eff_small_star_n64.h"
+#include "eff/n64/eff_bomb_n64.h"
+#include "eff/n64/eff_kemuri9_n64.h"
+#include "eff/n64/eff_kemuri10_n64.h"
+#include "eff/n64/eff_rappa_n64.h"
+#include "eff/n64/eff_stardust2_n64.h"
+#include "eff/n64/eff_ripple_n64.h"
+#include "eff/n64/eff_explosion_n64.h"
+#include "eff/n64/eff_kemuri11_n64.h"
+#include "eff/n64/eff_onpu_n64.h"
+#include "eff/n64/eff_kemuri12_n64.h"
+#include "eff/n64/eff_sweat_n64.h"
+#include "eff/n64/eff_balloon_n64.h"
+#include "eff/n64/eff_cool_leaf_n64.h"
+#include "eff/n64/eff_bush_n64.h"
+#include "eff/n64/eff_guruguru_n64.h"
+#include "eff/n64/eff_ice_n64.h"
+#include "eff/n64/eff_stamp_n64.h"
+#include "eff/n64/eff_thruhammer_n64.h"
+#include "eff/n64/eff_radiation_n64.h"
+#include "eff/n64/eff_thunder_n64.h"
+#include "eff/n64/eff_breath_fire_n64.h"
+#include "eff/n64/eff_broken_barrier_n64.h"
+#include "eff/n64/eff_fire_ring_n64.h"
+#include "eff/n64/eff_fire_dust_n64.h"
+#include "eff/n64/eff_flame_n64.h"
+#include "eff/n64/eff_blow_n64.h"
+#include "eff/n64/eff_bomhei_n64.h"
+#include "eff/n64/eff_recover_heart_n64.h"
+#include "eff/n64/eff_pturn_n64.h"
+#include "eff/n64/eff_hit_n64.h"
+#include "eff/n64/eff_confetti_n64.h"
+#include "eff/n64/eff_snowfall_n64.h"
+#include "eff/n64/eff_shock_n64.h"
+#include "eff/n64/eff_balloon_heiho_n64.h"
+#include "eff/n64/eff_rubble_n64.h"
+#include "eff/n64/eff_crystal_n64.h"
+#include "eff/n64/eff_butterfly_n64.h"
+#include "eff/n64/eff_akari_charge_n64.h"
+#include "eff/n64/eff_akari_sflush_n64.h"
+#include "eff/n64/eff_opuku_wgun_n64.h"
+#include "eff/n64/eff_opuku_wprotect_n64.h"
+#include "eff/n64/eff_opuku_wcurtain_n64.h"
+#include "eff/n64/eff_opuku_jetw_n64.h"
+#include "eff/n64/eff_pokopi_thunder_n64.h"
+#include "eff/n64/eff_water_damage_n64.h"
+#include "eff/n64/eff_snowman_n64.h"
+#include "eff/n64/eff_holography_n64.h"
+#include "eff/n64/eff_packn_bfire_n64.h"
+#include "eff/n64/eff_pokopi_pipo_n64.h"
+#include "eff/n64/eff_cloud_n64.h"
+#include "eff/n64/eff_dogabon_attack_n64.h"
+#include "eff/n64/eff_kameki_tornade_n64.h"
+#include "eff/n64/eff_stone_smoke_n64.h"
+#include "eff/n64/eff_pokopi_pcharge_n64.h"
+#include "eff/n64/eff_kumokumo_n64.h"
+#include "eff/n64/eff_vapor_n64.h"
+#include "eff/n64/eff_fire_spark_n64.h"
+#include "eff/n64/eff_horao_spell_n64.h"
+#include "eff/n64/eff_snow_dust_n64.h"
+#include "eff/n64/eff_akari_pose_n64.h"
+#include "eff/n64/eff_kumokumo_chip_n64.h"
+#include "eff/n64/eff_fireworks_n64.h"
+#include "eff/n64/eff_glass_n64.h"
+#include "eff/n64/eff_pikkyolo_n64.h"
+#include "eff/n64/eff_freeze_n64.h"
+#include "eff/n64/eff_sunlight_n64.h"
+#include "eff/n64/eff_release_n64.h"
+#include "eff/n64/eff_peach_dust_n64.h"
+#include "eff/n64/eff_star_power_n64.h"
+#include "eff/eff_kemu_test.h"
+#include "eff/eff_starstone.h"
+#include "eff/eff_confetti.h"
+#include "eff/eff_butterfly.h"
+#include "eff/eff_recovery.h"
+#include "eff/eff_breath_fire.h"
+#include "eff/eff_hit.h"
+#include "eff/eff_bomb.h"
+#include "eff/eff_charge.h"
+#include "eff/eff_ice.h"
+#include "eff/eff_damage_star.h"
+#include "eff/eff_starpoint.h"
+#include "eff/eff_itemget.h"
+#include "eff/eff_stageclear.h"
+#include "eff/eff_mahojin.h"
+#include "eff/eff_puniballoon.h"
+#include "eff/eff_kiss.h"
+#include "eff/eff_splash.h"
+#include "eff/eff_nice.h"
+#include "eff/eff_mist.h"
+#include "eff/eff_mist2.h"
+#include "eff/eff_scanning.h"
+#include "eff/eff_stardust.h"
+#include "eff/eff_treasure_map.h"
+#include "eff/eff_sandars.h"
+#include "eff/eff_sheep.h"
+#include "eff/eff_rankup.h"
+#include "eff/eff_irekaeru.h"
+#include "eff/eff_small_star.h"
+#include "eff/eff_ibuki.h"
+#include "eff/eff_mahorn.h"
+#include "eff/eff_toiki.h"
+#include "eff/eff_uranoko.h"
+#include "eff/eff_syuryou.h"
+#include "eff/eff_hibashira.h"
+#include "eff/eff_fire.h"
+#include "eff/eff_machinegun.h"
+#include "eff/eff_ripple.h"
+#include "eff/eff_las_mon.h"
+#include "eff/eff_laser.h"
+#include "eff/eff_indirect.h"
+#include "eff/eff_queen.h"
+#include "eff/eff_queen2.h"
+#include "eff/eff_gonbaba_breath.h"
+#include "eff/eff_majinai.h"
+#include "mario/mario_party.h"
+#include "manager/evtmgr_cmd.h"
 
-extern EffectEntry* effKemuri1N64Entry(s32, f32, f32, f32, f32);
-extern EffectEntry* effKemuri2N64Entry(s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effKemuri3N64Entry(f32, f32, f32, f32);
-extern EffectEntry* effKemuri4N64Entry(s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effKemuri5N64Entry(f32, f32, f32, f32);
-extern EffectEntry* effKemuri6N64Entry(s32, f32, f32, f32);
-extern EffectEntry* effKemuri7N64Entry(f32, f32, f32, f32, f32);
 extern EffectEntry* effFlowerN64Entry(s32, s32, f32, f32, f32);
-extern EffectEntry* effSnowN64Entry(s32, f32, f32, f32);
-extern EffectEntry* effSstarN64Entry(s32, f32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effStardustN64Entry(s32, f32, f32, f32, f32);
-extern EffectEntry* effMagic1N64Entry(s32, s32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effMagic2N64Entry(s32, s32, f32, f32, f32, f32);
 extern EffectEntry* effFallLeafN64Entry(s32, s32, f32, f32, f32);
-extern EffectEntry* effHokoriN64Entry(s32, s32, f32, f32, f32);
 extern EffectEntry* effGarekiN64Entry(s32, f32, f32, f32, f32);
-extern EffectEntry* effKemuri8N64Entry(s32, f32, f32, f32);
-extern EffectEntry* effSmallStarN64Entry(s32, s32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effBombN64Entry(s32, f32, f32, f32);
 extern EffectEntry* effWangFlushN64Entry(s32, s32, f32, f32, f32);
 extern EffectEntry* effMagic3N64Entry(s32, s32, f32, f32, f32);
-extern EffectEntry* effKemuri9N64Entry(s32, s32, s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effKemuri10N64Entry(s32, f32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effRappaN64Entry(s32, s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effStardust2N64Entry(s32, s32, s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effRippleN64Entry(s32, f32, f32, f32, f32);
-extern EffectEntry* effExplosionN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effKemuri11N64Entry(s32, f32, f32, f32);
-extern EffectEntry* effOnpuN64Entry(s32, f32, f32, f32);
-extern EffectEntry* effKemuri12N64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effSweatN64Entry(s32, s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effBalloonN64Entry(s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effCoolLeafN64Entry(s32, f32, f32, f32);
-extern EffectEntry* effBushN64Entry(s32, f32, f32, f32);
 extern EffectEntry* effRotHammerSuccessN64Entry(s32, s32, s32, f32, f32, f32);
 extern EffectEntry* effRotHammerFailN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effGuruguruN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effIceN64Entry(s32, f32, f32, f32);
-extern EffectEntry* effStampN64Entry(s32, f32, f32, f32);
-extern EffectEntry* effThruHammerN64Entry(s32, f32, f32, f32, f32);
-extern EffectEntry* effRadiationN64Entry(s32, f32, f32, f32, f32);
-extern EffectEntry* effThunderN64Entry(s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effBreathFireN64Entry(s32, s32, s32, s32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effBrokenBarrierN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effFireRingN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effFireDustN64Entry(s32, s32, s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effFlameN64Entry(s32, f32, f32, f32, f32);
-extern EffectEntry* effBlowN64Entry(s32, s32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effBomheiN64Entry(s32, s32, f32, f32, f32, f32);
 extern EffectEntry* effFireFlowerN64Entry(s32, s32, f32, f32, f32);
-extern EffectEntry* effRecoverHeartN64Entry(s32, s32, f32, f32, f32);
-extern EffectEntry* effPturnN64Entry(s32, s32, f32, f32, f32);
-extern EffectEntry* effHitN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effConfettiN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effSnowfallN64Entry(s32, s32);
 extern EffectEntry* effWhirlwindN64Entry(s32, s32, s32, f32);
 extern EffectEntry* effThunderflareN64Entry(s32, s32, f32, f32, f32, f32);
 extern EffectEntry* effCoinN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effShockN64Entry(s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effBalloonHeihoN64Entry(s32, s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effRubbleN64Entry(s32, s32, f32, f32, f32, f32, f32, f32, f32);
 extern EffectEntry* effMagicHoraoN64Entry(s32, s32, s32, s32, f32, f32, f32, f32, f32, f32);
 extern EffectEntry* effLensflareN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effCrystalN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effButterflyN64Entry(s32, f32, f32, f32);
-extern EffectEntry* effAkariChargeN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effAkariSflushN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effOpukuWgunN64Entry(s32, s32, f32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effOpukuWprotectN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effOpukuWcurtainN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effOpukuJetwN64Entry(s32, s32, f32, f32, f32, f32);
 extern EffectEntry* effOpukuJetwrainN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effPokopiThunderN64Entry(s32, s32, f32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effWaterDamageN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effSnowmanN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effHolographyN64Entry(s32, s32, f32, f32, f32, f32);
 extern EffectEntry* effTimestampN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effPacknBfireN64Entry(s32, s32, s32, f32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effPokopiPipoN64Entry(s32, s32, f32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effCloudN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effDogabonAttackN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effKamekiTornadeN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effStoneSmokeN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effPokopiPchargeN64Entry(s32, s32, f32, f32, f32, f32);
 extern EffectEntry* effHagetakaFlushN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effKumokumoN64Entry(s32, s32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effVaporN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effFireSparkN64Entry(s32, s32, s32, f32, f32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effHoraoSpellN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effSnowDustN64Entry(s32, s32, s32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effAkariPoseN64Entry(s32, s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effKumokumoChipN64Entry(s32, f32, f32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effFireworksN64Entry(s32, s32, f32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effGlassN64Entry(s32, s32, f32, f32, f32, f32);
 extern EffectEntry* effBoobooN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effPikkyoloN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effFreezeN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effSunlightN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effReleaseN64Entry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effPeachDustN64Entry(s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effStarPowerN64Entry(s32, s32, f32, f32, f32, f32);
-extern f32 evtGetFloat(EventEntry* entry, s32 index);
 
 extern EffectEntry* effKemuriEntry(s32, f32, f32, f32, f32);
-extern EffectEntry* effKemuTestEntry(s32, f32, f32, f32, f32);
-extern EffectEntry* effStarStoneEntry(s32, f32, f32, f32, f32);
-extern EffectEntry* effConfettiEntry(s32, s32, f32, f32, f32);
-extern EffectEntry* effButterflyEntry(s32, f32, f32, f32);
-extern EffectEntry* effRecoveryEntry(s32, s32, f32, f32, f32);
-extern EffectEntry* effBreathFireEntry(s32, s32, s32, s32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effHitEntry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effBombEntry(s32, f32, f32, f32, f32);
-extern EffectEntry* effChargeEntry(s32, s32, f32, f32, f32, f32);
 extern EffectEntry* effTogeFlushEntry(s32, s32, f32, f32, f32);
-extern EffectEntry* effIceEntry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effDamageStarEntry(s32, s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effStarPointEntry(s32, s32, f32, f32, f32);
-extern EffectEntry* effItemGetEntry(s32, f32, f32, f32);
-extern EffectEntry* effStageClearEntry(s32, f32, f32, f32);
 extern EffectEntry* effLevelupEntry(s32, s32, f32, f32, f32);
 extern EffectEntry* effFallEntry(s32, s32, s32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effMahojinEntry(s32, f32, f32, f32);
 extern EffectEntry* effNozleEntry(s32, s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effPuniBalloonEntry(s32, f32, f32, f32, f32);
-extern EffectEntry* effKissEntry(s32, f32, f32, f32, f32);
-extern EffectEntry* effSplashEntry(s32, f32, f32, f32, f32);
-extern EffectEntry* effNiceEntry(s32, f32, f32, f32);
-extern EffectEntry* effMistEntry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effMist2Entry(s32, s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effScanningEntry(s32, f32, f32, f32);
 extern EffectEntry* effParticleEntry(s32, s32, s32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effStardustEntry(s32, s32, s32, f32, f32, f32, f32, f32);
-extern EffectEntry* effTreasureMapEntry(s32, f32, f32, f32);
-extern EffectEntry* effSandarsEntry(s32, f32, f32, f32, f32);
-extern EffectEntry* effSheepEntry(s32, f32, f32, f32);
-extern EffectEntry* effRankupEntry(s32, f32, f32, f32);
-extern EffectEntry* effIrekaeruEntry(s32, f32, f32, f32);
-extern EffectEntry* effSmallStarEntry(s32, s32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effIbukiEntry(s32, s32, f32, f32, f32);
-extern EffectEntry* effMahornEntry(s32, s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effToikiEntry(s32, s32, f32, f32, f32);
-extern EffectEntry* effUranokoEntry(s32, s32, f32, f32, f32);
-extern EffectEntry* effSyuryouEntry(s32, s32, f32, f32, f32);
-extern EffectEntry* effHibashiraEntry(s32, s32, s32, f32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effFireEntry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effMachinegunEntry(s32, f32, f32, f32, f32, f32, f32);
-extern EffectEntry* effRippleEntry(s32, f32, f32, f32);
-extern EffectEntry* effLasMonEntry(s32, f32, f32, f32);
-extern EffectEntry* effLaserEntry(s32, f32, f32, f32);
-extern EffectEntry* effIndirectEntry(s32, s32, f32, f32, f32);
-extern EffectEntry* effQueenEntry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effQueen2Entry(s32, f32, f32, f32);
-extern EffectEntry* effGonbabaBreathEntry(s32, s32, f32, f32, f32, f32);
-extern EffectEntry* effMajinaiEntry(s32, f32, f32, f32);
 
 USER_FUNC(evt_eff) {
 	s32* args = event->args;
@@ -908,8 +909,6 @@ USER_FUNC(evt_eff_delete_ptr) {
 	return EVT_RETURN_DONE;
 }
 
-extern s32 marioGetPartyId(void);
-extern s32 marioGetExtraPartyId(void);
 extern void* partyGetPtr(s32 id);
 extern EffectEntry* effFukidashiEntry(s32 a, s32 b, s32 c, s32 d, f32 x, f32 y, f32 z, f32 w, f32 e);
 

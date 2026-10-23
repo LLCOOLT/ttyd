@@ -4,6 +4,8 @@
 #pragma force_active on
 #include "driver/mobjdrv.h"
 #include "driver/animdrv.h"
+#include "evt/evt_bero.h"
+#include "tik.h"
 
 static USER_FUNC(bgm_start_wait);
 USER_FUNC(evt_bero_get_info);
@@ -60,9 +62,6 @@ USER_FUNC(evt_win_item_select);
 USER_FUNC(lect_cam_load);
 USER_FUNC(lect_cam_save);
 static void majin_callback(s32 type);
-extern s32 evt_bero_info_run[];
-extern s32 plane_majin_lecture[];
-extern s32 plane_majin_lecture_init[];
 
 __declspec(section ".data") u64 fd_tik_19_negone_one_374;
 __declspec(section ".data") s32 fd_tik_19_neg_one_382[1];

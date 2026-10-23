@@ -5,6 +5,8 @@
 #include "manager/evtmgr.h"
 #include "pmario_sound.h"
 #include "string.h"
+#include "evt/evt_bero.h"
+#include "aji.h"
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_off);
@@ -73,8 +75,6 @@ USER_FUNC(evt_npc_set_stay_anim);
 #endif
 static void callback(s32 type, void** work);
 void kuti_callback(s32 type, void** work);
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
 
 __declspec(section ".data") u64 fd_aji_04_negone_one_374;
 __declspec(section ".data") s32 fd_aji_04_neg_one_382[1];

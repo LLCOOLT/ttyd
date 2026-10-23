@@ -7,6 +7,11 @@
 #include "string.h"
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_eff.h"
 
 static USER_FUNC(_set_draw_callback);
 #ifdef VERSION_G8ME01
@@ -31,28 +36,6 @@ USER_FUNC(btlevtcmd_SetUnitWork);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(evt_snd_sfxoff);
 static void _fire_point_callback(BattleUnitPart* part, s32 group);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckPhase[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetHeight[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetStatusMg[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_OnUnitFlag[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PhaseEventStartDeclare[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_StageDispellFog[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_eff[];
-extern s32 subsetevt_dead_core[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_heavy_bom_negone_one_374;
 __declspec(section ".data") s32 fd_heavy_bom_neg_one_382[1];

@@ -2,8 +2,7 @@
 #include "battle/battle_monosiri.h"
 #include "battle/battle_unit.h"
 #include "driver/swdrv.h"
-
-extern BattleWork* _battleWorkPointer;
+#include "battle/battle.h"
 
 //.sdata
 BattleUnitType same_tbl_gesso[] = {

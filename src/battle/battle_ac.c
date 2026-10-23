@@ -8,9 +8,6 @@
 #include "battle/battle_unit.h"
 #include "icon_ids.h"
 
-extern ActionCommandEntry ActionCommandList[];
-extern BattleWork* _battleWorkPointer;
-
 s32 psndSFXOn(const char* name);
 void psndSFXOff(s32 id);
 void psndSFX_pit(s32 id, s32 pitch);

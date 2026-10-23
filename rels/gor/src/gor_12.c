@@ -1,5 +1,8 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_sub.h"
 
 #pragma force_active on
 
@@ -14,9 +17,6 @@ USER_FUNC(evt_seq_wait);
 USER_FUNC(evt_snd_bgmoff_f);
 USER_FUNC(evt_snd_envoff_f);
 USER_FUNC(evt_snd_envon);
-extern s32 evt_map_playanim[];
-extern s32 evt_mario_kill_party[];
-extern s32 evt_sub_get_system_flag[];
 
 __declspec(section ".data") u64 fd_gor_12_negone_one_374;
 __declspec(section ".data") s32 fd_gor_12_neg_one_382[1];

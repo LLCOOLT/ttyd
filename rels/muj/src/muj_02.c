@@ -7,6 +7,10 @@
 #include "manager/fontmgr.h"
 #include "driver/camdrv.h"
 #include "stdio.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
+#include "evt/evt_sub.h"
+#include "muj.h"
 #ifdef VERSION_G8ME01
 #include "mario/mariost.h"
 void FontDrawString(f32 x, f32 y, const char* str);
@@ -64,13 +68,8 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_random);
 USER_FUNC(evt_win_item_select);
 #ifdef VERSION_G8ME01
-extern s32 tree_tbl_treeb_evt[];
 #endif
 void printCount(CameraId camera, void* param);
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 evt_sub_tree_access_entry[];
 
 __declspec(section ".data") u64 fd_muj_02_negone_one_374;
 __declspec(section ".data") s32 fd_muj_02_neg_one_382[1];

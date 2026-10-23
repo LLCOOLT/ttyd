@@ -21,11 +21,14 @@
 #include <string.h>
 #include "icon_ids.h"
 #include "version.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/sac/sac_common.h"
+#include "party/party_motion.h"
+#include "battle/sac/sac_deka.h"
 // US battle texture ids are 0x16 higher for these entries.
 #define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
 
-
-extern BattleWork* _battleWorkPointer;
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 size);
 void BattleAudienceSoundWhistleKind(s32 kind);
@@ -159,39 +162,6 @@ USER_FUNC(btlevtcmd_CheckPartsAttribute);
 USER_FUNC(btlevtcmd_CommandCheckDamage);
 USER_FUNC(btlevtcmd_GetSelectEnemy);
 USER_FUNC(btlevtcmd_GetSelectNextEnemy);
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CheckActStatus[];
-extern s32 btlevtcmd_CommandGetWeaponAddress[];
-extern s32 btlevtcmd_CommandPayWeaponCost[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetUnitId[];
-extern s32 btlevtcmd_GetUnitKind[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_SacBgsetMove[];
-extern s32 btlevtcmd_SetPos[];
-extern s32 btlevtcmd_SetUnitWork[];
-extern s32 btlevtcmd_StartWaitEvent[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_reset_move_color_lv_all[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_snd_sfxoff[];
-extern s32 sac_ac_help_off[];
-extern s32 sac_ac_help_on[];
-extern s32 sac_cheer[];
-extern s32 sac_cheer_end[];
-extern s32 sac_mario_back_home[];
-extern s32 sac_mario_item_on_end_evt[];
-extern s32 sac_mario_item_on_evt[];
-extern s32 sac_start_camera_evt[];
-extern s32 sac_start_stardust[];
-extern s32 dmg_evt[];
 
 static EVT_BEGIN(nice_event)
     CALL(btlevtcmd_ACSuccessEffect, LW(0), 0, 100, 0)

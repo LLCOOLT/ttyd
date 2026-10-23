@@ -98,3 +98,7 @@ BOOL fadeIsFinish(void);
 void fadeReset(s32 id);
 TEXPalette* fadeGetTpl(void);
 void fadeSetNarrowFast(void);
+
+#ifdef VERSION_G8ME01
+extern const f32 float_1_8041f770;
+#endif

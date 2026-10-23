@@ -136,3 +136,17 @@ void partyCtrlOn(PartyEntry* party);
 void partyCtrlOff(PartyEntry* party);
 PartyEntry* anotherPartyGetPtr(s32 index);
 BOOL partyPaperOn(PartyEntry* party, const char* animName);
+
+void L_partyClearCont(PartyEntry* party);
+extern s32 partyCtrlNo;
+f32 partyGetHeight(PartyEntry* party);
+void partyInitCamId(PartyEntry* party);
+void partyKeyOff(void);
+void partyKeyOn(void);
+void partyRestoreRunMode(PartyEntry* party);
+void partyRun(PartyEntry* party);
+void partyStop(PartyEntry* party);
+void party_force_ride_yoshi(PartyEntry* party);
+void party_ride_yoshi_force_move(void);
+
+extern char* yoshigroup[7];

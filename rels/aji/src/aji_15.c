@@ -4,6 +4,8 @@
 #pragma force_active on
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
+#include "aji.h"
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_off);
@@ -43,8 +45,6 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(peach_chk_aftershower);
 USER_FUNC(peach_set_pos);
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
 
 __declspec(section ".data") u64 fd_aji_15_negone_one_374;
 __declspec(section ".data") s32 fd_aji_15_neg_one_382[1];

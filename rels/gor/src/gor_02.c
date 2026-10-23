@@ -20,6 +20,12 @@
 #include "eff/eff_stardust.h"
 #include "driver/mapdrv.h"
 #include "dolphin/gx.h"
+#include "evt/evt_door.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_npc.h"
+#include "gor.h"
 
 
 f32 reviseAngle(f32 angle);
@@ -283,19 +289,6 @@ static USER_FUNC(alpha_init_func);
 static void alpha_tev(MapTevCallbackInfo* info);
 void _door_color2_tev(MapTevCallbackInfo* info);
 void _door_color_tev(MapTevCallbackInfo* info);
-extern s32 door_close_se[];
-extern s32 door_open_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_close[];
-extern s32 evt_door_entry[];
-extern s32 evt_door_open[];
-extern s32 evt_door_open_quick[];
-extern s32 evt_door_open_roll[];
-extern s32 evt_gazigazi_entry[];
-extern s32 evt_sub_mail_event[];
-extern s32 gor_irai_init[];
-extern s32 luigi_gor_first_talk[];
-extern s32 npc_init_evt[];
 
 void _door_color_tev(MapTevCallbackInfo* info) {
     GXTevStageID stage = info->tevStage;

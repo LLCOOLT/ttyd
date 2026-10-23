@@ -8,6 +8,8 @@
 #include "driver/swdrv.h"
 #include "driver/msgdrv.h"
 #include "string.h"
+#include "evt/evt_bero.h"
+#include "tou.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
@@ -114,19 +116,6 @@ USER_FUNC(tou_10_mario_free_wait);
 USER_FUNC(evt_sub_get_language);
 USER_FUNC(evt_msg_fmt_int);
 #endif
-extern s32 all_party_lecture[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_tou_bed[];
-extern s32 evt_tou_locker_init[];
-extern s32 evt_tou_match_after_default[];
-extern s32 evt_tou_match_make_default[];
-extern s32 evt_tou_monitor_init[];
-extern s32 evt_tou_monitor_off[];
-extern s32 evt_tou_monitor_on[];
-extern s32 evt_tou_ranking_msg[];
 
 __declspec(section ".data") u64 fd_tou_10_negone_one_374;
 __declspec(section ".data") s32 fd_tou_10_neg_one_382[1];

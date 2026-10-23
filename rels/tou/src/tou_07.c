@@ -10,6 +10,9 @@
 #include "driver/icondrv.h"
 #include "driver/effdrv.h"
 #include "driver/npcdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "tou.h"
 
 USER_FUNC(evt_bero_get_entername);
 USER_FUNC(evt_bero_get_info);
@@ -100,15 +103,6 @@ USER_FUNC(tou_07_snd_on);
 USER_FUNC(tou_07_snd_off);
 USER_FUNC(tou_07_icon_off);
 USER_FUNC(tou_07_belt_camid);
-extern s32 bero_case_switch_off[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_mail_vibration[];
-extern s32 evt_tou_match_after_default[];
-extern s32 evt_tou_match_make_default[];
-extern s32 evt_tou_monitor_init[];
-extern s32 evt_gardman_spawn[];
 
 __declspec(section ".data") u64 fd_tou_07_negone_one_374;
 __declspec(section ".data") s32 fd_tou_07_neg_one_382[1];

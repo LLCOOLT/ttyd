@@ -14,6 +14,8 @@
 #include "driver/dispdrv.h"
 #include "driver/icondrv.h"
 #include "icon_ids.h"
+#include "evt/evt_movefloor.h"
+#include "yuu.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_sub_get_language);
@@ -28,15 +30,8 @@ void partyKeyOn(void);
 void mapObjGetPos(const char* name, Vec* pos);
 BOOL marioChkSwirlPower(void);
 void marioSetSwirlPower(s32 time, f32 speed, f32 angle);
-extern s32 s_nametbl[];
-extern s32 turn_tbl[];
-extern s32 hoko_tbl[];
 void monteCountDisp(void);
-extern s32 minigame02_start[];
-extern s32 minigame02_end[];
-extern s32 minigame_view_monte[];
 void marioChgShipMotion(void);
-extern s32 a_nametbl[];
 typedef struct MonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } MonteSub;
 typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
 typedef struct MonteTable { f32 x0; f32 x1; f32 y0; f32 y1; s32 num; } MonteTable;
@@ -100,8 +95,6 @@ void yuuminigame_main_2fune(EventEntry* event, BOOL isFirstCall);
 void yuuminigame_init_2fune(EventEntry* event, BOOL isFirstCall);
 static void monte_disp(CameraId camera, void* param);
 static BOOL get_monte_check(Vec* a, Vec* b);
-extern s32 evt_yuunpc_minigame2[];
-extern s32 moving_floor[];
 
 __declspec(section ".data") u64 fd_yuu_01_negone_one_374;
 __declspec(section ".data") s32 fd_yuu_01_neg_one_382[1];

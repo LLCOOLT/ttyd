@@ -11,11 +11,11 @@
 #include <dolphin/os/OSFastCast.h>
 #include <stdlib.h>
 #include <string.h>
+#include "libc_decls.h"
 
 double sin(double);
 double cos(double);
 
-extern int __float_nan[];
 #define NAN (*(f32*)__float_nan)
 
 #define FP_NAN 1

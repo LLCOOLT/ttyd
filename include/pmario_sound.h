@@ -139,3 +139,5 @@ void L_psndBGM_stop(void);
 void psndClearFlag(s32 flag);
 
 void psndSetPosDirListener(Vec* position, f32 direction);
+
+extern PaperSoundBGM psbgm[2];

@@ -18,8 +18,8 @@
 #include <dolphin/mtx.h>
 #include <string.h>
 #include "icon_ids.h"
-
-extern BattleWork* _battleWorkPointer;
+#include "battle/sac/sac_common.h"
+#include "battle/sac/sac_suki.h"
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 size);
 EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 size);
@@ -125,11 +125,6 @@ USER_FUNC(sac_ac_help_off);
 USER_FUNC(sac_ac_help_on);
 USER_FUNC(sac_cheer);
 USER_FUNC(sac_cheer_end);
-extern s32 sac_mario_back_home[];
-extern s32 sac_mario_item_on_end_evt[];
-extern s32 sac_mario_item_on_evt[];
-extern s32 sac_start_camera_evt[];
-extern s32 sac_start_stardust[];
 extern s32 tou_gamen_screen_tev[];
 
 USER_FUNC(aud_set_draw);
@@ -157,11 +152,6 @@ static void main_star(void);
 static void main_base(void);
 void main_button(s32 idx);
 void N__disp_2D(s32 side, s32 idx);
-
-extern s32 marioAttackEvent_Suki[];
-extern s32 flash_evt[];
-extern s32 flash_main_evt[];
-extern s32 flash_cancel_evt[];
 
 static s32 weapon[] = {
     (s32)"btl_wn_sac_sukkari_sukkiri", ICON_199 << 16, 0, (s32)"msg_sukkari_sukkiri", 1677722112, 1065353216, 17130546, 0,

@@ -16,6 +16,11 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <dolphin/mtx.h>
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_audience.h"
+#include "evt/evt_mobj.h"
 
 extern ItemData itemDataTable[];
 void BattleSamplingEnemy(BattleWorkWeaponTargets* targets, BattleWeapon* weapon, s32 unitId, s8 belong, u32 classFlags, u32 propFlags, s8 direction);
@@ -98,24 +103,6 @@ USER_FUNC(_hpfp_change_declare_2);
 USER_FUNC(_hpfp_change_declare_1);
 USER_FUNC(_rank_up);
 USER_FUNC(_sampling_random_target);
-extern s32 btlevtcmd_CheckAttribute[];
-extern s32 btlevtcmd_GetFp[];
-extern s32 btlevtcmd_GetHp[];
-extern s32 btlevtcmd_GetMaxFp[];
-extern s32 btlevtcmd_GetMaxHp[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_WaitEventEnd[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_audience_reflesh_natural_all[];
-extern s32 evt_btl_camera_set_moveto[];
-extern s32 evt_mobj_delete[];
-extern s32 evt_mobj_entry[];
-extern s32 evt_mobj_set_anim[];
-extern s32 evt_mobj_set_position[];
-extern s32 weaponGetPowerDefault[];
-extern s32 weaponGetPowerHPHalf2[];
 
 s32 _return_home_event[44];
 s32 ItemEvent_Automatic_Target[38];

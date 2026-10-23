@@ -4,6 +4,14 @@
 #pragma force_active on
 #include "driver/camdrv.h"
 #include "mario/mariost.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_case.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 
 USER_FUNC(camera_action);
 USER_FUNC(evt_bero_mapchange);
@@ -34,16 +42,6 @@ USER_FUNC(evt_seq_wait);
 USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_sfxon_3d);
-extern s32 bero_case_entry[];
-extern s32 evt_bero_get_info[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_hitobj_onoff[];
-extern s32 evt_mapobj_flag_onoff[];
-extern s32 evt_mobj_recovery_blk[];
-extern s32 evt_npc_check_delete[];
-extern s32 evt_run_case_evt[];
-extern s32 evt_snd_envon[];
-extern s32 evt_sub_tree_access_entry[];
 
 __declspec(section ".data") u64 fd_win_03_negone_one_374;
 __declspec(section ".data") s32 fd_win_03_neg_one_382[1];

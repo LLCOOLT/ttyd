@@ -14,11 +14,14 @@
 #include "eff/eff_kemu_test.h"
 #include "system.h"
 #include "party/party_vivian.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
+#include "las.h"
+#include "libc_decls.h"
 
 typedef struct FirebarBall { s32 pose; Vec pos; } FirebarBall;
 typedef struct FirebarSetup { u8 type; u8 count; u8 field_0x2[2]; Vec pos; f32 spacing; f32 field_0x14; f32 speed; void* callback; f32 field_0x20; f32 radius; } FirebarSetup;
 typedef struct FirebarWork { u8 type; u8 count; u16 flags; Vec pos; f32 prevAngle; f32 angle; f32 speed; f32 spacing; f32 field_0x20; f32 scale; f32 field_0x28; f32 radius; void (*callback)(struct FirebarWork* wp, s32 type); s32 hitCount; s32 sfxId; s32 state; f32 shadowAngle; FirebarBall* balls; FirebarSetup* setup; } FirebarWork;
-extern s32 firebar_coin[];
 void set_damage_root_ypos(f32 y);
 void marioChgMot(s32 motion);
 ItemEntry* itemEntry(const char* name, s32 itemId, s32 mode, s32 flag, void* script, f32 x, f32 y, f32 z);
@@ -35,7 +38,6 @@ void _firebar_rot(FirebarWork* wp);
 void _firebar_trans(FirebarWork* wp);
 double cos(double x);
 s32 _firebar_hitCheck2(FirebarWork* wp);
-extern int __float_nan[];
 static inline s32 fb_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 fb_sqrtf(f32 x) { const f64 _half = .5; const f64 _three = 3.0; if (x > 0.0f) { f64 guess = __frsqrte(x); guess = _half * guess * (_three - guess * guess * x); guess = _half * guess * (_three - guess * guess * x); guess = _half * guess * (_three - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (fb_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 
@@ -58,8 +60,6 @@ void _firebar_trans(FirebarWork* wp);
 void _firebar_rot(FirebarWork* wp);
 s32 _firebar_hitCheck2(FirebarWork* wp);
 s32 _firebar_hitCheck(FirebarWork* wp, FirebarBall* ball);
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
 
 __declspec(section ".data") u64 fd_las_04_negone_one_374;
 __declspec(section ".data") s32 fd_las_04_neg_one_382[1];

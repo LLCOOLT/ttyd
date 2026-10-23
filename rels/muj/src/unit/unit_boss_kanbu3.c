@@ -3,6 +3,12 @@
 
 #pragma force_active on
 #include "battle/battle.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "party/party_motion.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -68,34 +74,11 @@ USER_FUNC(check_exist_kenkyu);
 #ifdef VERSION_G8ME01
 USER_FUNC(btlevtcmd_GetDamageCode);
 #endif
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_CheckDamageCode[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_FaceDirectionSub[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetFirstAttackTarget[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetHp[];
-extern s32 btlevtcmd_JumpContinue[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_check_battleflag[];
-extern s32 btlevtcmd_snd_se[];
 extern s32 down_ceil[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_snd_sfxoff[];
-extern s32 subsetevt_confuse_flustered[];
 extern s32 unit_boss_gundan_zako_group1[];
 extern s32 unit_boss_gundan_zako_group2[];
 extern s32 unit_boss_gundan_zako_group3[];
 extern s32 unit_gundan_zako_magician[];
-extern s32 weaponGetPowerDefault[];
 extern s32 zakogun_entry[];
 extern s32 zakogun_escape3[];
 extern s32 zakogun_ext_init2[];

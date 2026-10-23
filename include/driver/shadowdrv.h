@@ -98,3 +98,8 @@ typedef struct ShadowConfig {
 
 void shadowInit(void);
 void shadowMain(void);
+
+void shadowDepthShadowDrawCountUp(void);
+s32 shadowEntry(f32 x, f32 y, f32 z, f32 size);
+void shadowProjShadowDrawCountUp(void);
+void shadowSetSize(s32 id, f32 size);

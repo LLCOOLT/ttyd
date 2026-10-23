@@ -9,9 +9,8 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 #include <string.h>
-extern void __div2u();
+#include "libc_decls.h"
 
-extern int sprintf(char* str, const char* format, ...);
 void qqsort(void* array, s32 num, s32 size, s32 (*cmp)(void*, void*));
 
 typedef struct ExtPose {

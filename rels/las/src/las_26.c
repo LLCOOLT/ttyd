@@ -3,6 +3,7 @@
 
 #pragma force_active on
 #include "driver/npcdrv.h"
+#include "evt/evt_bero.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(bonbaba_wait_landon);
@@ -90,9 +91,6 @@ USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
-extern s32 bero_case_entry[];
-extern s32 bero_close_door_play_se[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_las_26_negone_one_374;
 __declspec(section ".data") s32 fd_las_26_neg_one_382[1];

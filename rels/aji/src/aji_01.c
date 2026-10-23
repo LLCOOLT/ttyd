@@ -4,6 +4,9 @@
 #pragma force_active on
 #include "driver/msgdrv.h"
 #include "mario/mario.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_npc.h"
+#include "aji.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_exec_wait);
@@ -104,12 +107,6 @@ USER_FUNC(evt_win_nameent_wait);
 USER_FUNC(get_password);
 static USER_FUNC(peach_evt_toumei);
 static USER_FUNC(peach_set_pose);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_aji_01_negone_one_374;
 __declspec(section ".data") s32 fd_aji_01_neg_one_382[1];

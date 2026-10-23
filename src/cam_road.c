@@ -4,7 +4,8 @@
 #include "manager/dvdmgr.h"
 #include "memory.h"
 #include "mario/mariost.h"
-extern void camShiftInit(void);
+#include "cam_shift.h"
+#include "libc_decls.h"
 typedef struct CamRoadCurve {
     char name[0x28];
     s32 off;               // 0x28
@@ -117,14 +118,10 @@ typedef struct CamRoadHit {
     s32 f_24;              // 0x24
     u32 flags;             // 0x28
 } CamRoadHit;
-extern int strcmp(const char*, const char*);
-extern void* memset(void*, int, unsigned long);
-extern int sprintf(char*, const char*, ...);
 double sin(double);
 double cos(double);
 double acos(double);
 double atan2(double, double);
-extern int __float_nan[];
 static inline s32 cr_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 cr_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (cr_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 static const Vec unk_vec0 = {0.0f, 1.0f, 0.0f};

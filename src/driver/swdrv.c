@@ -8,8 +8,6 @@
 #include "mario/mariost.h"
 #include <string.h>
 
-extern GlobalWork* gp;
-
 void swInit(void) {
 	memset(gp->mGSWF, 0, sizeof(gp->mGSWF));
 	memset(gp->mGSW, 0, sizeof(gp->mGSW));

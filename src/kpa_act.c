@@ -6,6 +6,7 @@
 #include "mario/mario_pouch.h"
 #include "memory.h"
 #include <string.h>
+#include "kpa_act.h"
 
 typedef struct KpaScore {
 	char str[8];
@@ -15,7 +16,6 @@ typedef struct KpaScore {
 } KpaScore;
 
 KpaScore* ksdp;
-extern const Vec vec3_802fe200;
 USER_FUNC(kpa_score_disp_main);
 s32 kpa_score_disp_evt[] = {0x00010005, 0, 0x0001005B, (s32)kpa_score_disp_main, 0x00010009, 1, 6, 2, 1};
 

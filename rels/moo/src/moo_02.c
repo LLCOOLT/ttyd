@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "moo.h"
 
 #pragma force_active on
 
@@ -39,8 +41,6 @@ USER_FUNC(evt_snd_sfxon_3d);
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_offscreen_get_boundingbox2);
 #endif
-extern s32 bero_case_entry[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_moo_02_negone_one_374;
 __declspec(section ".data") s32 fd_moo_02_neg_one_382[1];
@@ -65,7 +65,6 @@ static s32 dokan_evt[122];
 static s32 dokan_evt[102];
 #endif
 #ifdef VERSION_G8ME01
-extern s32 rock_main[];
 #else
 static s32 rock_main[79];
 #endif

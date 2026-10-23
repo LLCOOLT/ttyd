@@ -2,8 +2,7 @@
 #include "mario/mario.h"
 #include "mario/mariost.h"
 #include "system.h"
-
-extern f32 camRoadGetCurrentShiftXRate(void);
+#include "cam_road.h"
 
 typedef struct CamShiftWork {
     f32 current;        // 0x0

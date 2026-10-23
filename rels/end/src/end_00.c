@@ -25,8 +25,9 @@
 #include "data/mapdata.h"
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_memcard.h"
+#include "end.h"
 #ifdef VERSION_G8ME01
-extern s32 evt_memcard_save_wrapper[];
 #endif
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
@@ -45,10 +46,7 @@ EndMoa* end_moa_tbl;
 extern EndWork* end_wp;
 extern CreditMsg end_staff_roll_msg_tbl[50];
 extern CreditNpc R_credits_npc_info[152];
-extern const char* end_moa_ext_anim;
-extern const char* end_moa_ext_pose;
 extern const char* g_moamoa_chain_tbl[][2];
-extern const s32 g_moamoa_chain_num;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
 void extReset(void);
@@ -126,13 +124,10 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-extern s32 evt_memcard_save[];
-
 s32 end_credit_npc_parade[44];
 s32 end_image_blend_loop[123];
 #ifdef VERSION_G8ME01
 // US: "THE END" texture per language (indexed by gp->language)
-extern s32 end_overlay_tex_tbl[6];
 #endif
 s32 end_image_main_evt[187];
 s32 end_return_title_evt[49];

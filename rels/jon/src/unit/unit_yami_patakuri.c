@@ -4,6 +4,11 @@
 #pragma force_active on
 #include "system.h"
 #include "manager/evtmgr_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_AnimeSetPoseSoundTable);
@@ -19,60 +24,6 @@ USER_FUNC(btlevtcmd_SetWalkSound);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(btlevtcmd_WaitAttackEnd);
 static USER_FUNC(krb_get_dir);
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_AnimeSetPoseTable[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeDataTable[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_ChangeKind[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_EnemyItemUseCheck[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_FaceDirectionSub[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetFirstAttackTarget[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetPosFloat[];
-extern s32 btlevtcmd_JumpContinue[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_MoveDirectionAdd[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_OffAttribute[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_OnUnitFlag[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ReplaceParts[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetMoveSoundDataWork[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_check_battleflag[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_add_zoom[];
-extern s32 evt_btl_camera_nomove_y_onoff[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_yami_patakuri_negone_one_374;
 __declspec(section ".data") s32 fd_yami_patakuri_neg_one_382[1];

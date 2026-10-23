@@ -5,6 +5,9 @@
 #include "driver/effdrv.h"
 #include "battle/battle.h"
 #include "battle/battle_stage_object.h"
+#include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
+#include "las.h"
 
 EffectEntry* hi_fire_eff[6];
 s8 hi_fire_end_flag[4];
@@ -19,37 +22,12 @@ USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_mapobj_get_position);
 USER_FUNC(hi_fire_end);
 USER_FUNC(hi_fire_main);
-extern s32 battle_flower_drop_param_default[];
-extern s32 battle_flower_drop_param_default3[];
-extern s32 battle_heart_drop_param_default[];
-extern s32 battle_heart_drop_param_default2[];
-extern s32 battle_heart_drop_param_default3[];
-extern s32 battle_heart_drop_param_default4[];
-extern s32 battle_item_NONE[];
-extern s32 battle_item_basabasa_chururu[];
-extern s32 battle_item_default_param_list[];
-extern s32 battle_item_karon[];
-extern s32 battle_item_phantom[];
-extern s32 battle_item_super_killer[];
-extern s32 battle_item_super_killer_cannon[];
-extern s32 battle_item_super_mahorn[];
-extern s32 battle_item_wanwan[];
-extern s32 unit_basabasa_chururu[];
 extern s32 unit_black_karon[];
 extern s32 unit_boss_batten_leader[];
-extern s32 unit_boss_black_peach[];
-extern s32 unit_boss_bunbaba[];
 extern s32 unit_boss_koopa[];
 extern s32 unit_boss_rampell_las[];
-extern s32 unit_honenoko[];
-extern s32 unit_karon[];
-extern s32 unit_phantom[];
 extern s32 unit_red_honenoko[];
-extern s32 unit_super_killer[];
 extern s32 unit_super_killer_cannon[];
-extern s32 unit_super_mahorn[];
-extern s32 unit_wanwan[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_las_negone_one_374;
 __declspec(section ".data") s32 fd_battle_database_las_neg_one_382[1];

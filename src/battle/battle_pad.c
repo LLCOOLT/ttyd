@@ -7,9 +7,6 @@
 #include "battle/battle.h"
 #include "mario/mariost.h"
 
-extern BattleWork* _battleWorkPointer;
-extern GlobalWork* gp;
-
 #pragma dont_inline on
 #pragma optimize_for_size on
 

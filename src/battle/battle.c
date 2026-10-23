@@ -13,6 +13,8 @@
 #include "mario/mariost.h"
 #include "system.h"
 #include "manager/evtmgr.h"
+#include "unit/unit_mario.h"
+#include "unit/unit_system.h"
 
 typedef enum EquipFlags {
     EQUIP_RESET = 1 << 0,   // 0x1, clear/reset equipped badges
@@ -22,12 +24,9 @@ typedef enum EquipFlags {
 
 BattleWork* _battleWorkPointer;
 #ifdef VERSION_G8ME01
-extern void* R_battlemapalloc_base_ptr;
 #endif
 
-extern BattleUnitKind unitdata_Mario;
 f32 BattleGetFloorHeight(f32 x, f32 y, f32 z);
-extern BattleUnitKind unit_system;
 BattleUnitSetup entryunit_mario = { &unitdata_Mario, { 0,0,0,0, 4,0,0,2, 0xC2,0xC8,0,0, 0,0,0,0, 0xC0,0xA0,0,0 } };
 BattleUnitSetup entryunit_system = { &unit_system, { 0,0,0,0, 4,0,0,2 } };
 

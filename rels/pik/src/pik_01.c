@@ -10,6 +10,10 @@
 #include "driver/effdrv.h"
 #include "driver/mobjdrv.h"
 #include "driver/mapdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
+#include "evt/evt_npc.h"
+#include "pik.h"
 
 static USER_FUNC(anim_tevcallback);
 USER_FUNC(chk_luigi_color);
@@ -118,14 +122,7 @@ static USER_FUNC(starstone_set_ry);
 static USER_FUNC(yami_view);
 void test_tev2(MapTevCallbackInfo* info);
 void test_tev(MapTevCallbackInfo* info);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 bero_open_door_play_se[];
 extern s32 envSetYami[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
-extern s32 evt_pik_yajirushi[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_pik_01_negone_one_374;
 __declspec(section ".data") s32 fd_pik_01_neg_one_382[1];

@@ -8,8 +8,8 @@
 #include "driver/mapdrv.h"
 #include "memory.h"
 #include <string.h>
+#include "libc_decls.h"
 
-extern int sprintf(char* str, const char* format, ...);
 void qqsort(void* base, u32 n, u32 size, s32 (*compare)(const void*, const void*));
 
 //.sbss

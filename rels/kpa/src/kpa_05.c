@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "kpa.h"
 
 #pragma force_active on
 
@@ -18,13 +19,6 @@ USER_FUNC(evt_mobj_get_position);
 USER_FUNC(evt_npc_setup);
 static USER_FUNC(kpa_get_level);
 USER_FUNC(kpa_status_init);
-extern s32 kpa_dead[];
-extern s32 kpa_fall_sub[];
-extern s32 kpa_init[];
-extern s32 kpa_read_item[];
-extern s32 kpa_read_mobj[];
-extern s32 kpa_stage_start[];
-extern s32 kpa_time[];
 
 __declspec(section ".data") u64 fd_kpa_05_negone_one_374;
 __declspec(section ".data") s32 fd_kpa_05_neg_one_382[1];

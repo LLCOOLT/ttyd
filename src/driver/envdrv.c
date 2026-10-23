@@ -11,8 +11,8 @@
 #include <string.h>
 #include "memory.h"
 #include "sdk/texPalette.h"
+#include "libc_decls.h"
 #define EXT_LIT(sym, val) (val)
-extern GlobalWork* gp;
 
 //.data
 // static data from an inlined header function
@@ -799,7 +799,6 @@ void envGlareFilterZ(f32 zscale) {
     f->flags |= 1;
 }
 
-extern int __float_nan[];
 int rand(void);
 static inline s32
 env_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }

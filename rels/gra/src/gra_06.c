@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "gra.h"
 
 #pragma force_active on
 
@@ -55,11 +57,6 @@ USER_FUNC(evt_telop_entry);
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_mario_dispflag_onoff);
 #endif
-extern s32 bero_case_entry[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_gra_06_negone_one_374;
 __declspec(section ".data") s32 fd_gra_06_neg_one_382[1];

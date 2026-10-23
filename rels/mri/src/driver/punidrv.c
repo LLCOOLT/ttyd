@@ -8,8 +8,8 @@
 #include "string.h"
 #include "win/win_main.h"
 #include "system.h"
+#include "driver/animdrv.h"
 
-extern u32 anim_ext_tex_size;
 void animPoseDisp_MakeExtTexture(const char* group, const char* anim, f32 frame, f32 scale, GXTexObj* obj, void*** image, s32* x0, s32* y0, s32* x1, s32* y1);
 static f32 camGetRy(void);
 static s32 compare(const void* a, const void* b);

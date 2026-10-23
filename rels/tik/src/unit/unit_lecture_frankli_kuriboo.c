@@ -3,6 +3,7 @@
 
 #pragma force_active on
 #include "battle/battle.h"
+#include "battle/battle_event_default.h"
 
 static USER_FUNC(_battle_set_lecture_unit_id);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -30,8 +31,6 @@ USER_FUNC(evt_btl_camera_set_moveto);
 USER_FUNC(evt_msg_print);
 USER_FUNC(evt_msg_toge);
 static USER_FUNC(lecture_init);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
 
 __declspec(section ".data") u64 fd_lecture_frankli_kuriboo_negone_one_374;
 __declspec(section ".data") s32 fd_lecture_frankli_kuriboo_neg_one_382[1];

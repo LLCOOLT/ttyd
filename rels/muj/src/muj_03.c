@@ -1,5 +1,12 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_party.h"
+#include "evt/evt_sub.h"
 
 #pragma force_active on
 
@@ -12,26 +19,6 @@ USER_FUNC(evt_mobj_brick);
 USER_FUNC(evt_mobj_powerupblk);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
-extern s32 evt_bero_info_run[];
-extern s32 evt_cam3d_evt_off[];
-extern s32 evt_cam3d_evt_set[];
-extern s32 evt_mario_key_onoff[];
-extern s32 evt_mario_normalize[];
-extern s32 evt_mario_set_dir[];
-extern s32 evt_mario_set_pos[];
-extern s32 evt_msg_print[];
-extern s32 evt_msg_print_party[];
-extern s32 evt_npc_flag_onoff[];
-extern s32 evt_npc_jump_position_nohit[];
-extern s32 evt_npc_set_position[];
-extern s32 evt_npc_set_ry[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_party_run[];
-extern s32 evt_party_set_dir[];
-extern s32 evt_party_set_pos[];
-extern s32 evt_party_stop[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 evt_sub_tree_access_entry[];
 
 __declspec(section ".data") u64 fd_muj_03_negone_one_374;
 __declspec(section ".data") s32 fd_muj_03_neg_one_382[1];

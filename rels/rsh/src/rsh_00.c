@@ -13,6 +13,8 @@
 #include "system.h"
 #include "driver/dispdrv.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
+#include "rsh.h"
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
@@ -94,8 +96,6 @@ static f32 randf(f32 min, f32 max);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 static void moamoa_pose_main(void);
 static void moamoa_pose_init(void);
-extern s32 evt_bero_info_run[];
-extern s32 evt_rsh_window[];
 
 __declspec(section ".data") u64 fd_rsh_00_negone_one_374;
 __declspec(section ".data") s32 fd_rsh_00_neg_one_382[1];

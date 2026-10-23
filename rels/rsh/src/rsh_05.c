@@ -27,6 +27,7 @@
 #include "pmario_sound.h"
 #include "driver/dispdrv.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
 #undef EXT_LIT
 #define EXT_LIT(sym, val) (val)
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
@@ -162,9 +163,6 @@ static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 static void moamoa_pose_main(void);
 static void moamoa_pose_init(void);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_rsh_05_negone_one_374;
 __declspec(section ".data") s32 fd_rsh_05_neg_one_382[1];

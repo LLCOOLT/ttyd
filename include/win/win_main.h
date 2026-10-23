@@ -72,3 +72,7 @@ void winMain(void);
 
 void winTexInit(TEXPalette* texture);
 void winTexSet(u32 textureId, Vec translate, Vec scale, GXColor color);
+
+void winTexSetNearest(u32 textureId, Vec translate, Vec scale, GXColor color);
+
+extern const volatile f32 float_0p5_8041dc98;

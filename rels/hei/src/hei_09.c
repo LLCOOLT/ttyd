@@ -4,6 +4,7 @@
 #pragma force_active on
 #include "driver/mapdrv.h"
 #include "driver/envdrv.h"
+#include "evt/evt_bero.h"
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_map_playanim);
@@ -14,7 +15,6 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 void hei_test_water_tev(MapTevCallbackInfo* info);
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_hei_09_negone_one_374;
 __declspec(section ".data") s32 fd_hei_09_neg_one_382[1];

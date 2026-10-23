@@ -3,11 +3,11 @@
 
 #pragma force_active on
 #include "data/mapdata.h"
+#include "dig.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 dig_00_init_evt[];
 void dig_thpInit(void);
 void dig_thpStop(void);
 

@@ -13,10 +13,10 @@
 #include "manager/evtmgr_cmd.h"
 #include "pmario_sound.h"
 #include <string.h>
+#include "evt/evt_kinopio.h"
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
-extern double sin(double x);
-extern double cos(double x);
-extern GlobalWork* gp;
 extern ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z);
 
 extern USER_FUNC(evt_eff);
@@ -102,8 +102,6 @@ USER_FUNC(coin_chk);
 USER_FUNC(power_chk);
 USER_FUNC(msg_no);
 USER_FUNC(evt_kinopio_setup);
-extern s32 evt_50[];
-extern s32 kinopio_house_talk_evt[];
 
 //.sbss
 static KinopioWork* work;

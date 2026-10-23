@@ -11,8 +11,10 @@
 #include "driver/dispdrv.h"
 #include "mario/mariost.h"
 #include <string.h>
-
-extern GlobalWork* gp;
+#include "system.h"
+#include "driver/offscreendrv.h"
+#include "driver/shadowdrv.h"
+#include "libc_decls.h"
 
 //.data
 
@@ -105,9 +107,7 @@ typedef struct ImgDispSh {
 	void* data;
 	s32 alloc;
 } ImgDispSh;
-extern double tan(double);
 extern void* DEMOGetRenderModeObj(void);
-extern void sysWaitDrawSync(void);
 
 void imgDisp(CameraId camId, void* param) {
 	ImageEntry* entry = param;
@@ -288,8 +288,6 @@ typedef struct ImgShd {
 	smartEntry* data;
 	s32 alloc;
 } ImgShd;
-extern void offscreenGetTexObj(s32 id, GXTexObj** texObj, smartEntry** texBuf);
-extern BOOL offscreenGetBoundingBox(s32 id, u16* left, u16* top, u16* right, u16* bottom);
 
 static inline void imgCaptureCopy(ImgShd* sh, ImageEntry* entry) {
 	s32 fmt, dstFmt, alloc;
@@ -576,8 +574,6 @@ void imgSetShadow(ImageEntry* entry, s32 shadowId) { //1:1
 	entry->shadowId = shadowId;
 }
 
-extern void shadowProjShadowDrawCountUp(void);
-extern void shadowDepthShadowDrawCountUp(void);
 extern void* DEMOGetRenderModeObj(void);
 typedef struct { u16 a, b, c, d; } ImgRect;
 

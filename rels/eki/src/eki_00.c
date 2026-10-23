@@ -24,6 +24,7 @@
 #include "pmario_sound.h"
 #include "driver/dispdrv.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
 #undef EXT_LIT
 #define EXT_LIT(sym, val) (val)
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
@@ -50,7 +51,6 @@ static void moamoa_pose_main(void);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 extern const char* g_moamoa_chain_tbl[][2];
-extern const s32 g_moamoa_chain_num;
 static void ext_moamoa_main(void);
 static void ext_moamoa_main(void);
 void extLoadRenderMode(void);
@@ -170,7 +170,6 @@ static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 static void moamoa_pose_main(void);
 static void moamoa_pose_init(void);
-extern s32 evt_bero_info_run[];
 
 s32 evt_cam3d_evt_off(EventEntry* event, BOOL isFirstCall);
 s32 evt_cam_shake(EventEntry* event, BOOL isFirstCall);
@@ -215,7 +214,6 @@ s32 evt_snd_bgmoff_f(EventEntry* event, BOOL isFirstCall);
 s32 evt_win_item_select(EventEntry* event, BOOL isFirstCall);
 s32 img_set_color(EventEntry* event, BOOL isFirstCall);
 s32 img_set_color(EventEntry* event, BOOL isFirstCall);
-extern s32 bero_case_entry[];
 
 __declspec(section ".data") u64 fd_eki_00_negone_one_374;
 __declspec(section ".data") s32 fd_eki_00_neg_one_382[1];

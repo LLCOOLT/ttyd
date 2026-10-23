@@ -8,6 +8,15 @@
 #include "mario/mario_pouch.h"
 #include "data/item_data.h"
 #include "system.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_message.h"
+#include "battle/battle_icon.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 
 extern ItemData itemDataTable[];
 void BtlUnit_EquipItem(BattleUnit* unit, s32 flags, ItemType type);
@@ -39,59 +48,6 @@ USER_FUNC(btlevtcmd_SetRotateOffset);
 USER_FUNC(evt_eff);
 #endif
 static USER_FUNC(_steal_item);
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_AnnounceMessage[];
-extern s32 btlevtcmd_AnnounceSetParam[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_BtlIconDelete[];
-extern s32 btlevtcmd_BtlIconEntry[];
-extern s32 btlevtcmd_BtlIconJumpPosition[];
-extern s32 btlevtcmd_BtlIconSetFallAccel[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetResultACDefence[];
-extern s32 btlevtcmd_GetStatusMg[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_OnPartsAttribute[];
-extern s32 btlevtcmd_OnUnitFlag[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetMoveSoundDataWork[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetPartsBlur[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_SetRotateOffsetFromCenterOffset[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_TransStageFloorPosition[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_snd_sfxoff[];
-extern s32 evt_sub_intpl_get_value[];
-extern s32 evt_sub_intpl_init[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_borodo_king_negone_one_374;
 __declspec(section ".data") s32 fd_borodo_king_neg_one_382[1];

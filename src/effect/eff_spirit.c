@@ -5,10 +5,10 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "version.h"
+#include "eff/eff_magic1_n64.h"
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
 
-extern double sin(double x);
 #define INTPL(a, b, m, c, n) ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(a, b, m, c, n)
 
 typedef struct EffSpiritWork {

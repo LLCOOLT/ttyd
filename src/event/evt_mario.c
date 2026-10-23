@@ -13,6 +13,7 @@
 #include "party.h"
 #include "system.h"
 #include <string.h>
+#include "evt/evt_mario.h"
 
 #define FLD(p, T, off) (*(T*)((u8*)(p) + (off)))
 
@@ -109,8 +110,6 @@ void marioRollForceCancel(void);
         mp->trigFlags |= 0x8000;                           \
     }                                                      \
     return EVT_RETURN_DONE;
-
-extern const char* a_mario_group[];
 
 static inline BOOL marioChkLanding(void) {
     MarioWork* mp = marioGetPtr();

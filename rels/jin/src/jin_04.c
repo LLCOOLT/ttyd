@@ -3,6 +3,9 @@
 
 #pragma force_active on
 #include "mario/mario_pouch.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "jin.h"
 
 USER_FUNC(L_evt_party_dokan);
 USER_FUNC(evt_bero_get_info);
@@ -88,9 +91,6 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(getYoshiColor);
 USER_FUNC(vivian_away);
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_starstone[];
-extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_jin_04_negone_one_374;
 __declspec(section ".data") s32 fd_jin_04_neg_one_382[1];

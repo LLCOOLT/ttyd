@@ -7,22 +7,19 @@
 #include "memory.h"
 #include "system.h"
 #include "texPalette.h"
-extern double sin(double);
-extern double cos(double);
+#include "driver/mapdrv.h"
 #include <string.h>
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
 #define PI 3.14159265358979323846264338327950288419716939937510
 #define TWO_PI 6.2831855f
-
-extern GlobalWork* gp;
-extern int sprintf(char* str, const char* format, ...);
 
 //.bss
 static BackgroundWork work[2];
 
 //local prototypes
 void bgDisp(CameraId camId, void* param);
-extern void mapGetBlend(GXColor* color);
 
 //TODO: inline function? I see nothing in the symbol map
 #define bgGetWork() (gp->inBattle ? &work[1] : &work[0])

@@ -5,8 +5,8 @@
 #include "mario/mario_pouch.h"
 #include "party.h"
 #include "driver/camdrv.h"
+#include "evt/evt_bero.h"
 
-extern s32 partyCtrlNo;
 void mapGrpFlagOn(const char* name, u32 flags);
 void mapGrpFlagOff(const char* name, u32 flags);
 
@@ -76,7 +76,6 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(make_kagi_tbl);
 USER_FUNC(temae_kesu);
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_las_10_negone_one_374;
 __declspec(section ".data") s32 fd_las_10_neg_one_382[1];

@@ -15,6 +15,10 @@
 #include "evt/evt_cmd.h"
 #include "pmario_sound.h"
 #include "icon_ids.h"
+#include "battle/battle_mario.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_item_data.h"
 
 #define CMD_S32(cmd, off) (*(s32*)((u8*)(cmd) + (off)))
 #define CMD_U8(cmd, off) (*(u8*)((u8*)(cmd) + (off)))
@@ -65,20 +69,9 @@ void BattleCommandDisplay_ProtectPartnerSelectMenuDisp(CameraId camId, void* par
 
 //local prototypes
 extern ItemData itemDataTable[];
-extern BattleWeapon badgeWeapon_2KaiItem;
-extern BattleWeapon badgeWeapon_3KaiItem;
 extern BattleWeapon marioDefaultWeapon_Jump;
 extern BattleWeapon marioWeapon_KururinJump;
-extern BattleWeapon marioWeapon_JyabaraJump;
 extern BattleWeapon marioDefaultWeapon_Hammer;
-extern BattleWeapon marioWeapon_KaitenHammer;
-extern BattleWeapon marioWeapon_UltraHammer;
-extern BattleWeapon ItemWeaponData_CookingItem;
-extern BattleWeapon* superActionTable[];
-extern BattleWeapon badgeWeapon_Charge;
-extern BattleWeapon badgeWeapon_ChargeP;
-extern BattleWeapon badgeWeapon_SuperCharge;
-extern BattleWeapon badgeWeapon_SuperChargeP;
 BOOL BtlUnit_CanActStatus(BattleUnit* unit);
 s32 BtlUnit_GetWeaponCost(BattleUnit* unit, BattleWeapon* weapon);
 s32 BtlUnit_CheckWeaponCost(BattleUnit* unit, BattleWeapon* weapon);
@@ -2347,16 +2340,6 @@ void BattleCommandDisplay_AllEnd(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
-extern s32 btldefaultevt_Wait[];
-extern s32 btldefaultevt_Defend[];
-extern s32 btldefaultevt_DefendParty[];
-extern s32 btldefaultevt_Appeal[];
-extern s32 btldefaultevt_Escape[];
-extern s32 btldefaultevt_ChangeParty[];
-extern s32 btldefaultevt_ProtectPartner[];
-extern s32 btldefaultevt_ChangePosition[];
-extern s32 btldefaultevt_LectureEnd[];
-extern BattleWeapon ItemWeaponData_Naniga_Okorukana;
 void BtlActRec_AddCount(u8* p);
 void* btlataudGetAttackEventPtr(s32 id);
 void* btlataudGetMoveEventPtr(s32 id);
@@ -2567,9 +2550,6 @@ BattleWeapon* BattleGetSelectWeapon(BattleWork* wp) {
 	return cmd->weapon[cursor->field_0].weapon;
 }
 
-extern s32 BattleAudience_GetPresentItemNo(void);
-extern s32 BattleAudience_GetPresentTargetUnitId(void);
-extern void BattleAudience_SetPresentItemNo(s32 no);
 void effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z);
 
 s32 _check_present_item(void) {
@@ -2661,7 +2641,6 @@ void BattleDrawEnemyHP(CameraId camId, void* param) {
 	}
 }
 
-extern s32 subsetevt_confuse_flustered[];
 void BattleAcHelpSetDispType(s32 type);
 s32 irand(s32 scalar);
 #define WPN_U32(w, o) (*(u32*)((u8*)(w) + (o)))

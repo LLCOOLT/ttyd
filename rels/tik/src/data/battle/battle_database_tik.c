@@ -4,43 +4,14 @@
 #pragma force_active on
 #include "battle/battle_stage_object.h"
 #include "system.h"
+#include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
+#include "tik.h"
 
 f32 sinfd(f32 degrees);
 
 static USER_FUNC(_wave_offset);
-extern s32 battle_flower_drop_param_default[];
-extern s32 battle_flower_drop_param_default2[];
-extern s32 battle_flower_drop_param_default4[];
-extern s32 battle_heart_drop_param_default[];
-extern s32 battle_heart_drop_param_default3[];
-extern s32 battle_heart_drop_param_default4[];
-extern s32 battle_item_gesso[];
-extern s32 battle_item_hammer_bros[];
-extern s32 battle_item_hannya[];
-extern s32 battle_item_hennya[];
-extern s32 battle_item_hinnya[];
-extern s32 battle_item_kamec[];
-extern s32 battle_item_kuriboo[];
-extern s32 battle_item_kurikuri[];
-extern s32 battle_item_nokonoko[];
-extern s32 battle_item_patakuri[];
-extern s32 battle_item_patapata[];
-extern s32 battle_item_togekuri[];
-extern s32 battle_item_togenoko[];
 extern s32 unit_boss_gesso[];
-extern s32 unit_hammer_bros[];
-extern s32 unit_hannya[];
-extern s32 unit_hennya[];
-extern s32 unit_hinnya[];
-extern s32 unit_kamec[];
-extern s32 unit_kuriboo[];
-extern s32 unit_lecture_frankli_kuriboo[];
-extern s32 unit_nokonoko[];
-extern s32 unit_patakuri[];
-extern s32 unit_patapata[];
-extern s32 unit_togekuri[];
-extern s32 unit_togenoko[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_tik_negone_one_374;
 __declspec(section ".data") s32 fd_battle_database_tik_neg_one_382[1];

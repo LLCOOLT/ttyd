@@ -6,11 +6,10 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "eff/n64/eff_magic3_n64.h"
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
-extern double sin(double x);
-extern double cos(double x);
-
-extern int __float_nan[];
 #define NAN (*(f32*)__float_nan)
 
 #define FP_NAN 1
@@ -72,8 +71,6 @@ typedef struct EffMagic3N64Work {
     s32 life;     // 0x28
     s32 age;      // 0x2C
 } EffMagic3N64Work;
-
-extern effN64Vtx size32x16_tex64x32_vtx[];
 
 void effMagic3Main(EffectEntry* effect);
 void effMagic3Disp(CameraId cameraId, EffectEntry* effect);

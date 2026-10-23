@@ -3,6 +3,9 @@
 
 #pragma force_active on
 #include "mario/mario.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "aji.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_entername);
@@ -51,12 +54,6 @@ USER_FUNC(evt_sub_get_stopwatch);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(peach_set_pose);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
-extern s32 evt_sub_stopwatch[];
 
 __declspec(section ".data") u64 fd_aji_16_negone_one_374;
 __declspec(section ".data") s32 fd_aji_16_neg_one_382[1];

@@ -3,27 +3,11 @@
 
 #pragma force_active on
 #include "data/mapdata.h"
+#include "hei.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 btl_hei_setup_no_tbl[];
-extern s32 btlsetup_hei_tbl[];
-extern s32 hei_00_init_evt[];
-extern s32 hei_01_init_evt[];
-extern s32 hei_02_init_evt[];
-extern s32 hei_03_init_evt[];
-extern s32 hei_04_init_evt[];
-extern s32 hei_05_init_evt[];
-extern s32 hei_06_init_evt[];
-extern s32 hei_07_init_evt[];
-extern s32 hei_08_init_evt[];
-extern s32 hei_09_init_evt[];
-extern s32 hei_10_init_evt[];
-extern s32 hei_11_init_evt[];
-extern s32 hei_12_init_evt[];
-extern s32 hei_13_init_evt[];
-extern s32 hei_bt00_init_evt[];
 
 void _unresolved(void);
 void _epilog(void);

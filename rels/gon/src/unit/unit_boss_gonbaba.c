@@ -9,6 +9,17 @@
 #include "dolphin/mtx.h"
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_audience.h"
+#include "evt/evt_batstage.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_map.h"
+#include "evt/evt_msg.h"
+#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 
 f32 sinfd(f32 degrees);
 f32 cosfd(f32 degrees);
@@ -37,97 +48,6 @@ static USER_FUNC(_leg_smoke_effect);
 USER_FUNC(_btlgon_get_escape_param);
 USER_FUNC(_set_gonbaba_light);
 USER_FUNC(_wait_damage_event_end);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_AnimeFlagOnOff[];
-extern s32 btlevtcmd_AnimeSetPoseTable[];
-extern s32 btlevtcmd_AnimeWaitPlayComplete[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_AttackDeclareAll[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckDamageCode[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_ClearAllStatus[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_FaceDirectionSub[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetDamage[];
-extern s32 btlevtcmd_GetDamagePartsId[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetExp[];
-extern s32 btlevtcmd_GetGuardKouraId[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetHp[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetStageAudienceAreaSize[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_GetUnitKind[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_OnPartsAttribute[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_RunDataEventChild[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetHp[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetPos[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_SetStayPose[];
-extern s32 btlevtcmd_SetTalkPose[];
-extern s32 btlevtcmd_SetTogeOffset[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_StatusWindowOnOff[];
-extern s32 btlevtcmd_StoreExp[];
-extern s32 btlevtcmd_WaitAttackEnd[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_ftomsec[];
-extern s32 btlevtcmd_onoff_battleflag[];
-extern s32 btlevtcmd_reset_move_color_lv_all[];
-extern s32 btlevtcmd_reset_turn[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 btlevtcmd_snd_se_offset[];
-extern s32 evt_audience_flag_check[];
-extern s32 evt_audience_flag_off[];
-extern s32 evt_audience_get_position[];
-extern s32 evt_audience_jump_position_firstsp[];
-extern s32 evt_audience_move_position_speed[];
-extern s32 evt_audience_num_updown_in_event[];
-extern s32 evt_audience_set_animpose[];
-extern s32 evt_audience_set_position[];
-extern s32 evt_audience_set_rotate[];
-extern s32 evt_audience_set_rotate_offset[];
-extern s32 evt_batstage_set_aud_dark[];
-extern s32 evt_batstage_set_aud_dark_base[];
-extern s32 evt_btl_camera_noshake[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_moveto[];
-extern s32 evt_btl_camera_set_prilimit[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_btl_camera_wait_move_end[];
-extern s32 evt_eff[];
-extern s32 evt_map_replayanim[];
-extern s32 evt_msg_continue[];
-extern s32 evt_msg_print[];
-extern s32 evt_msg_select[];
-extern s32 evt_msg_toge[];
-extern s32 evt_snd_sfx_pos[];
-extern s32 evt_snd_sfxoff[];
-extern s32 evt_snd_sfxon[];
-extern s32 evt_snd_sfxon_3d[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_gonbaba_negone_one_374;
 __declspec(section ".data") s32 fd_boss_gonbaba_neg_one_382[1];

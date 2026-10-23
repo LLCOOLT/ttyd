@@ -21,6 +21,8 @@
 #include "driver/fadedrv.h"
 #include "dolphin/os.h"
 #include "mario/mario.h"
+#include "evt/evt_bero.h"
+#include "libc_decls.h"
 
 double sin(double);
 double cos(double);
@@ -39,7 +41,6 @@ static KaitenParam* ckp1;
 static KaitenParam* ckpw;
 BrokenWork broken_work;
 s32 select;
-extern int __float_nan[];
 static inline s32 tb_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 tb_sqrtf(f32 x) { const f64 _half = .5; const f64 _three = 3.0; if (x > 0.0f) { f64 guess = __frsqrte(x); guess = _half * guess * (_three - guess * guess * x); guess = _half * guess * (_three - guess * guess * x); return x * (_half * guess * (_three - guess * guess * x)); } else if (x < 0.0) { return *(f32*)__float_nan; } else if (tb_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 static inline f32 tb_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
@@ -182,8 +183,6 @@ USER_FUNC(map_disp_onoff);
 void tiz_broken_draw(CameraId cameraId, void* param);
 static void alpha_tev(MapTevCallbackInfo* info);
 USER_FUNC(starstone_set_scale);
-extern s32 bero_case_switch_off[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 negone_one$374;
 __declspec(section ".data") s32 neg_one$382[1];

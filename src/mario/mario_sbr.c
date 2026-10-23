@@ -8,6 +8,12 @@
 #include "party.h"
 #include "system.h"
 #include <string.h>
+#include "party/party_yoshi.h"
+#include "sdk/DEMOPad.h"
+#include "koopa.h"
+#include "mot/mot_slit.h"
+#include "mot/mot_walk.h"
+#include "libc_decls.h"
 
 #define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 #define REVISE360(a) while ((a) < 0.0f) { (a) += 360.0f; } while ((a) >= 360.0f) { (a) -= 360.0f; }
@@ -26,15 +32,6 @@ typedef struct RubWork {
     u8 unk28[0x3C - 0x28]; // 0x28
     s16 hist[21];   // 0x3C
 } RubWork;
-
-extern GlobalWork* gp;
-extern u8 DemoPad[];
-extern s32 kpaGetStageViewType(void);
-extern s32 yoshiGetStatus(void);
-extern BOOL marioGetMotSlitCancel3(void);
-extern f32 marioGetDashSpd(void);
-extern f32 marioGetWalkSpd(void);
-extern double cos(double);
 
 void marioGetRubInit(void);
 void marioGetStick(f32* dir, f32* mag);

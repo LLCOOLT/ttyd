@@ -12,8 +12,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
-
-extern int rand(void);
+#include "libc_decls.h"
 
 typedef struct StageLight {
 	u32 flags;              // 0x0

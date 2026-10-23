@@ -31,7 +31,6 @@ USER_FUNC(evt_msg_fmt_str);
 
 #define SHOP_PTS(p) (*(s16*)&(p)->mShopPoints)
 
-extern GlobalWork* gp;
 extern ItemData itemDataTable[];
 void FontDrawString(f32 x, f32 y, const char* str);
 void FontDrawMessageMtx(Mtx mtx, const char* msg);

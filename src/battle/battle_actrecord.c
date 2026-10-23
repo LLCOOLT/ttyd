@@ -1,6 +1,6 @@
 #include "battle/battle_actrecord.h"
+#include "battle/battle.h"
 
-extern BattleWork* _battleWorkPointer;
 #pragma optimize_for_size on
 #pragma dont_inline on
 #ifdef VERSION_G8ME01

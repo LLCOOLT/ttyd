@@ -13,17 +13,16 @@
 #include "party.h"
 #include <string.h>
 #include <stddef.h>
-
-extern GlobalWork* gp;
-extern BadgeShopWork* bdsw;
-extern PiantaParlorWork* yuwp;
-extern InformantWork _jdt;
-extern int sprintf(char* str, const char* format, ...);
+#include "evt/evt_badgeshop.h"
+#include "evt/evt_yuugijou.h"
+#include "evt/evt_johoya.h"
+#include "mario/mariost.h"
 
 //.rodata
 #include "assets/_mariost_icon_tex.inc"
 #include "assets/_mariost_icon_tlut.inc"
 #include "assets/_mariost_banner_tex.inc"
+#include "libc_decls.h"
 const char str_802CCC80[0x14] = "mariost_save_file";
 #ifdef VERSION_G8ME01
 const char str_802CCC94[0xC] = "Paper Mario";

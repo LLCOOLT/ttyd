@@ -4,6 +4,8 @@
 #pragma force_active on
 #include "driver/mobjdrv.h"
 #include "driver/animdrv.h"
+#include "evt/evt_bero.h"
+#include "las.h"
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_off);
@@ -31,8 +33,6 @@ USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(get_mobj_seq);
 USER_FUNC(switch_alpha_off);
 USER_FUNC(switch_set_alpha);
-extern s32 box_syutugen[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_las_18_negone_one_374;
 __declspec(section ".data") s32 fd_las_18_neg_one_382[1];

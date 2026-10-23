@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "eki.h"
 
 #pragma force_active on
 
@@ -30,8 +32,6 @@ USER_FUNC(lect_juyoitem_rel_set);
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_mapobj_flag_onoff);
 #endif
-extern s32 all_juyoitem_lecture_rel[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_eki_05_negone_one_374;
 __declspec(section ".data") s32 fd_eki_05_neg_one_382[1];

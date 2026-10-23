@@ -8,17 +8,13 @@
 #include "party.h"
 #include "system.h"
 #include <string.h>
+#include "mario/mario_sbr.h"
+#include "eff/eff_mugi.h"
+#include "eff/n64/eff_water_damage_n64.h"
+#include "koopa.h"
+#include "libc_decls.h"
 
-extern s32 kpaGetLevel(void);
-extern f32 kpaGetBaseScale(s32 level);
-extern s32 kpaGetStageViewType(void);
-extern s32 kpaGetBodyStatus(void);
-extern f32 toMovedirSimple(f32 angle);
-extern int rand(void);
 extern EffectEntry* effKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 s, f32 c);
-extern EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 dir);
-extern EffectEntry* effMugiKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 dir, f32 side);
-extern EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 
 #pragma dont_inline on
 #ifdef VERSION_G8ME01

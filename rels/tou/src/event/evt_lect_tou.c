@@ -21,6 +21,9 @@
 #include "driver/itemdrv.h"
 #include "driver/animdrv.h"
 #include "system.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_party.h"
 
 static OSTime wwstart;
 void statusWinForceClose(void);
@@ -32,7 +35,6 @@ typedef struct LectButton { u8 flags; u8 seq; u8 pad_2[0x8 - 0x2]; LectButtonDis
 static LectButton lbtn[2];
 static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) { camera->presetPos = camera->cameraPos; camera->presetAt = camera->cameraAt; PSVECAdd(&camera->cameraPos, &ofs, &camera->storedPos); PSVECAdd(&camera->cameraAt, &ofs, &camera->storedAt); camera->startTimeA = gp->renderTime; camera->durationA = 0; camera->stateA = 3; camera->curveA = 11; }
 void hitGrpFlagOn(const char* name, u32 flags);
-extern s32 partyCtrlNo;
 EffectEntry* effMarioBalloonEntry(s32 type, NpcEntry* npc);
 static EffectEntry* eff;
 void itemSetPosition(ItemEntry* item, f32 x, f32 y, f32 z);
@@ -163,12 +165,6 @@ static void lecture_button_disp(CameraId camera, void* param);
 static USER_FUNC(x_flag_wait);
 static USER_FUNC(x_flag_add);
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start);
-extern s32 evt_cam3d_evt_off[];
-extern s32 evt_cam_road_reset[];
-extern s32 evt_eff_softdelete_ptr[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_npc_start_for_one_event[];
-extern s32 evt_party_run[];
 
 __declspec(section ".data") u64 fd_evt_lect_tou_negone_one_374;
 __declspec(section ".data") s32 fd_evt_lect_tou_neg_one_382[1];

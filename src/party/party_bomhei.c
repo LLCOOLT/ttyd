@@ -13,6 +13,10 @@
 #include "driver/hitdrv.h"
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "party/party_hit.h"
+#include "party/party_move.h"
+#include "eff/eff_sandars.h"
+#include "driver/npcdrv.h"
 
 #ifdef VERSION_G8ME01
 // US has no local duplicate: this is the global bomhei_init
@@ -31,7 +35,6 @@ extern void partyGoodbyeInit(PartyEntry* party);
 extern s32 partyGoodbyeMain(PartyEntry* party);
 extern void partyGetAppearPos(PartyEntry* party, Vec* pos);
 
-extern f32 partyToMovedir(PartyEntry* party, f32 dir);
 extern void* mobjHitObjPtrToPtr(HitEntry* hit);
 extern u8* caseCheckHitObj2(void* hit);
 
@@ -209,12 +212,9 @@ typedef struct BomheiMobj {
     char name[0x10];
 } BomheiMobj;
 
-extern void partyChkGnd(PartyEntry* party);
-extern void partyChgMot(PartyEntry* party, s32 mot);
 void bomhei_use_main(PartyEntry* party);
 void mario_controll(PartyEntry* party);
 HitEntry* check_front(PartyEntry* party);
-extern f32 toMovedirSimple(f32 dir);
 
 void bomhei_use(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
@@ -267,13 +267,8 @@ typedef struct BomheiWork {
     s32 timer;  // 0x4
 } BomheiWork;
 
-extern void partyMoveNoHosei(PartyEntry* party);
-extern void partyMove(PartyEntry* party);
 extern void partyChgPose(PartyEntry* party, const char* pose);
-extern HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth);
 extern void marioSetSplash(s32 kind, Vec pos);
-extern EffectEntry* effSandarsEntry(s32 lv, f32 x, f32 y, f32 z, f32 w);
-extern void fbatSandersBombTriggerOn(void);
 
 typedef struct BomheiTarget {
     u8 pad[0x94];
@@ -767,8 +762,6 @@ void mario_controll(PartyEntry* party) {
         break;
     }
 }
-
-extern f32 toMovedirSimple(f32 dir);
 
 static inline BOOL bomheiChkReturnGround(Vec* pos, f32 dist, f32 angle) {
     HitCheckQuery query;

@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "las.h"
 
 #pragma force_active on
 
@@ -37,8 +39,6 @@ USER_FUNC(evt_sub_get_sincos);
 #ifdef VERSION_G8ME01
 USER_FUNC(las_24_adjust_for_framerate);
 #endif
-extern s32 evt_bero_info_run[];
-extern s32 move_dai[];
 
 __declspec(section ".data") u64 fd_las_24_negone_one_374;
 __declspec(section ".data") s32 fd_las_24_neg_one_382[1];

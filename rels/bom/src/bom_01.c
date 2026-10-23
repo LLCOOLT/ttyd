@@ -23,6 +23,10 @@
 #include "stdio.h"
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_door.h"
+#include "evt/evt_sub.h"
+#include "bom.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_msg_pri);
 #endif
@@ -269,12 +273,6 @@ static void pose_init(void);
 void disp_sight(CameraId camera, void* param);
 void drawNum(s32 num, s32 digits, f32 x, f32 y, f32 scale);
 void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot);
-extern s32 bero_case_entry[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_bom_snowfall[];
-extern s32 evt_door_open_bom_01[];
-extern s32 evt_sub_mail_event[];
 
 __declspec(section ".data") s32 evt_door_1[12];
 __declspec(section ".data") static s32 evt_door_2[12];

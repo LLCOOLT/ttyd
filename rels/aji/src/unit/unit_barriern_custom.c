@@ -8,6 +8,11 @@
 #include "driver/effdrv.h"
 #include "eff/eff_syuryou.h"
 #include "memory.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "party/party_motion.h"
 
 s32 irand(s32 scalar);
 EffectEntry* effGlassN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
@@ -87,34 +92,7 @@ static s32 barriern_zanzou_sub(BOOL isFirstCall, BattleUnit* unit, f32* scales, 
 static USER_FUNC(barriern_zanzou3);
 static USER_FUNC(barriern_zanzou2);
 static USER_FUNC(barriern_zanzou);
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AddPos[];
-extern s32 btlevtcmd_AddRotate[];
-extern s32 btlevtcmd_AddUnitWork[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_AttackDeclareAll[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckPhase[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetPartsPos[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_StopWaitEvent[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_get_turn[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_snd_sfxoff[];
-extern s32 subsetevt_confuse_flustered[];
 extern s32 unit_barriern_custom_satellite[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_barriern_custom_negone_one_374;
 __declspec(section ".data") s32 fd_barriern_custom_neg_one_382[1];

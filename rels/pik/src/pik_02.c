@@ -8,6 +8,9 @@
 #include "driver/npcdrv.h"
 #include "system.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_memcard.h"
+#include "evt/evt_sub.h"
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 static inline f32 hoshi_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
@@ -105,20 +108,12 @@ USER_FUNC(hoshi_r);
 USER_FUNC(kpa_chg_pose);
 USER_FUNC(reset_stone_cam);
 #ifdef VERSION_G8ME01
-extern s32 evt_memcard_save_wrapper[];
 #endif
 static USER_FUNC(set_starstone_pos);
 static USER_FUNC(starstone_entry);
 static USER_FUNC(starstone_fall);
 static USER_FUNC(stone_bg);
 static USER_FUNC(npc_set_pos);
-extern s32 bero_case_entry[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 bero_close_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_memcard_save[];
-extern s32 evt_sub_stopwatch[];
 
 __declspec(section ".data") u64 fd_pik_02_negone_one_374;
 __declspec(section ".data") s32 fd_pik_02_neg_one_382[1];

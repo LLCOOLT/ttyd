@@ -12,6 +12,15 @@
 #include "driver/mapdrv.h"
 #include "dolphin/gx.h"
 #include "pmario_sound.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_party.h"
+#include "evt/evt_sub.h"
+#include "las.h"
 
 double sin(double);
 double cos(double);
@@ -28,8 +37,6 @@ void mapObjGetPos(const char* name, Vec* pos);
 void _hikariEntry(const char* name, s32 type, f32 scale);
 typedef struct HikariData { s32 key; s32 id; } HikariData;
 #define HIKARI_DATA ((HikariData*)hikari_data)
-extern s32 hikari_on_evt[];
-extern s32 hikari_off_evt[];
 void mapGrpFlagOn(const char* name, u32 flags);
 void mapGrpFlagOff(const char* name, u32 flags);
 
@@ -167,33 +174,6 @@ USER_FUNC(radiation_set_pos);
 void b_peach_msgcb(s32 type, void* param);
 void map_color_tev(MapTevCallbackInfo* info);
 void _hikariEntry(const char* name, s32 type, f32 scale);
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_fade_out[];
-extern s32 evt_map_get_fog[];
-extern s32 evt_map_set_fog[];
-extern s32 evt_mario_mov_pos[];
-extern s32 evt_mario_wait_move_end[];
-extern s32 evt_mobj_flag_onoff[];
-extern s32 evt_mobj_get_position[];
-extern s32 evt_mobj_get_x_position[];
-extern s32 evt_mobj_get_y_position[];
-extern s32 evt_mobj_itembox[];
-extern s32 evt_mobj_set_scale[];
-extern s32 evt_mobj_set_x_position[];
-extern s32 evt_mobj_set_y_position[];
-extern s32 evt_npc_majo_disp_off[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_party_move_pos[];
-extern s32 evt_sub_get_sincos[];
-extern s32 evt_sub_get_stopwatch[];
-extern s32 evt_sub_intpl_msec_get_value_para[];
-extern s32 evt_sub_stopwatch[];
-extern s32 npc_init_evt[];
-extern s32 shuryolight_head_off[];
-extern s32 shuryolight_pow_tenmetu[];
-extern s32 shuryolight_tue_normal[];
 
 __declspec(section ".data") u64 fd_las_29_negone_one_374;
 __declspec(section ".data") s32 fd_las_29_neg_one_382[1];

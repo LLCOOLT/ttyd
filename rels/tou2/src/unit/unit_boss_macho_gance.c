@@ -3,6 +3,16 @@
 
 #pragma force_active on
 #include "manager/evtmgr_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_msg.h"
+#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 
 static s32 x_flag_data[2];
 f32 intplGetValue(s32 mode, s32 currStep, f32 start, f32 end, s32 steps);
@@ -42,76 +52,6 @@ USER_FUNC(wariai_enzan_1f_intpl_w);
 static USER_FUNC(wariai_enzan_1f_intpl);
 static USER_FUNC(wariai_enzan_1f);
 static USER_FUNC(wariai_enzan_1);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_AnimeSetPoseTable[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_AttackDeclareAll[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckActStatus[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckPhase[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_FaceDirectionSub[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetHp[];
-extern s32 btlevtcmd_GetMaxHp[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetPosFloat[];
-extern s32 btlevtcmd_GetRotate[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetUnitKind[];
-extern s32 btlevtcmd_JumpContinue[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_MoveDirectionAdd[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_OnUnitFlag[];
-extern s32 btlevtcmd_PartsFaceDirectionSub[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_RunDataEventChild[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetBaseScale[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_SetStayPose[];
-extern s32 btlevtcmd_SetStayPoseType[];
-extern s32 btlevtcmd_SetTalkPose[];
-extern s32 btlevtcmd_SetTalkPoseType[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_StatusWindowOnOff[];
-extern s32 btlevtcmd_StopWaitEvent[];
-extern s32 btlevtcmd_TransStageFloorPosition[];
-extern s32 btlevtcmd_WaitAttackEnd[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_cam_shake[];
-extern s32 evt_eff64[];
-extern s32 evt_eff_delete[];
-extern s32 evt_msg_print[];
-extern s32 evt_msg_print_battle_party[];
-extern s32 evt_snd_sfxoff[];
-extern s32 evt_snd_sfxon[];
-extern s32 evt_snd_sfxon_3d[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 subsetevt_dead_core_nospin_norotate[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_macho_gance_negone_one_374;
 __declspec(section ".data") s32 fd_boss_macho_gance_neg_one_382[1];

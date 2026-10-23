@@ -13,9 +13,16 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "icon_ids.h"
+#include "unit/party/unit_party_christine.h"
+#include "unit/party/unit_party_nokotarou.h"
+#include "unit/party/unit_party_clauda.h"
+#include "unit/party/unit_party_yoshi.h"
+#include "unit/party/unit_party_vivian.h"
+#include "unit/party/unit_party_sanders.h"
+#include "unit/party/unit_party_chuchurina.h"
+#include "libc_decls.h"
 
 extern ItemData itemDataTable[];
-extern int sprintf(char* str, const char* format, ...);
 
 typedef struct WinPartyWork {
     u16 flags;                    // 0x0
@@ -58,35 +65,6 @@ typedef struct WinPartyDt {
     const char* animName2; // 0x1C
     BattleWeapon** waza;  // 0x20
 } WinPartyDt;
-
-extern BattleWeapon partyWeapon_ChristineNormalAttack;
-extern BattleWeapon partyWeapon_ChristineMonosiri;
-extern BattleWeapon partyWeapon_ChristineRenzokuAttack;
-extern BattleWeapon partyWeapon_ChristineKiss;
-extern BattleWeapon partyWeapon_NokotarouKouraAttack;
-extern BattleWeapon partyWeapon_NokotarouSyubibinKoura;
-extern BattleWeapon partyWeapon_NokotarouKouraGuard;
-extern BattleWeapon partyWeapon_NokotarouTsuranukiKoura;
-extern BattleWeapon partyWeapon_ClaudaNormalAttack;
-extern BattleWeapon partyWeapon_ClaudaBreathAttack;
-extern BattleWeapon partyWeapon_ClaudaPredationAttack;
-extern BattleWeapon partyWeapon_ClaudaKumogakureAttack;
-extern BattleWeapon partyWeapon_YoshiNormalAttack;
-extern BattleWeapon partyWeapon_YoshiNomikomi_Shot;
-extern BattleWeapon partyWeapon_YoshiEggAttack_Minimini;
-extern BattleWeapon partyWeapon_YoshiCallGuard;
-extern BattleWeapon partyWeapon_VivianNormalAttack;
-extern BattleWeapon partyWeapon_VivianShadowGuard;
-extern BattleWeapon partyWeapon_VivianMagicalPowder;
-extern BattleWeapon partyWeapon_VivianCharmKissAttack;
-extern BattleWeapon partyWeapon_SandersNormalAttack;
-extern BattleWeapon partyWeapon_SandersTimeBombSet;
-extern BattleWeapon partyWeapon_SandersCounterSet;
-extern BattleWeapon partyWeapon_SandersSuperBombAttack;
-extern BattleWeapon partyWeapon_ChuchurinaNormalAttackLeft;
-extern BattleWeapon partyWeapon_ChuchurinaItemSteal;
-extern BattleWeapon partyWeapon_ChuchurinaMadowaseAttack;
-extern BattleWeapon partyWeapon_ChuchurinaKiss;
 
 void winMsgEntry(WinPartyWork* wp, s32 a, const char* msg, s32 b);
 void winBgGX(WinPartyWork* wp, s32 a, f32 x, f32 y);

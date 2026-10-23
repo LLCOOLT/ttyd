@@ -8,8 +8,8 @@
 #include <dolphin/gx.h>
 #include "mario/mariost.h"
 #include "icon_ids.h"
+#include "libc_decls.h"
 
-extern int sprintf(char* str, const char* format, ...);
 extern ItemData itemDataTable[];
 
 typedef struct BTexRef {

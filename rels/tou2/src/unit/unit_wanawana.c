@@ -12,6 +12,7 @@
 #include "dolphin/mtx.h"
 #include "battle/battle.h"
 #include "driver/dispdrv.h"
+#include "battle/battle_event_default.h"
 
 double tan(double x);
 typedef struct WanaWork { s32 ready; s32 poseId; Mtx mtx; GXTexObj obj; BattleUnitPart* part; smartEntry* tex; } WanaWork;
@@ -32,8 +33,6 @@ USER_FUNC(replace_evt);
 void replace_callback(BattleUnitPart* part, s32 type);
 void replace_disp(CameraId camera, void* param);
 static f32 tanf(f32 x);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
 
 __declspec(section ".data") u64 fd_wanawana_negone_one_374;
 __declspec(section ".data") s32 fd_wanawana_neg_one_382[1];

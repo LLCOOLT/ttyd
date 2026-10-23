@@ -6,6 +6,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "dolphin/os.h"
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 typedef struct effN64Vtx {
     s16 x, y, z;
     s16 s, t;
@@ -15,10 +17,6 @@ void effGetTexObjN64(u32 id, GXTexObj* obj);
 void effSetVtxDescN64(effN64Vtx* vtx);
 void tri2();
 
-extern double sin(double x);
-extern double cos(double x);
-
-extern int __float_nan[];
 #define NAN (*(f32*)__float_nan)
 
 #define FP_NAN 1

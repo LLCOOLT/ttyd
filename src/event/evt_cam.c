@@ -9,8 +9,7 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <dolphin/os.h>
-
-extern GlobalWork* gp;
+#include "libc_decls.h"
 
 typedef struct CamRoadOut {
     Vec f_0;
@@ -22,7 +21,6 @@ void camRoadMain(CamRoadOut* out, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 
 void camRoadReset(void);
 void camShiftReset(void);
 void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out);
-extern int __float_nan[];
 void OSReport(const char* msg, ...);
 double sin(double);
 double cos(double);

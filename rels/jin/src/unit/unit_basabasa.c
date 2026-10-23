@@ -1,5 +1,8 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
 
 #pragma force_active on
 
@@ -58,10 +61,6 @@ USER_FUNC(evt_btl_camera_set_mode);
 USER_FUNC(evt_btl_camera_set_moveSpeedLv);
 USER_FUNC(evt_btl_camera_set_zoom);
 USER_FUNC(evt_btl_camera_shake_h);
-extern s32 btldefaultevt_Damage[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 subsetevt_counter_damage[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_basabasa_negone_one_374;
 __declspec(section ".data") s32 fd_basabasa_neg_one_382[1];

@@ -7,8 +7,9 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <string.h>
+#include "evt/evt_twoddisp.h"
+#include "libc_decls.h"
 
-extern int sprintf(char* str, const char* format, ...);
 void FontDrawScale(f32 scale);
 void FontDrawString(f32 x, f32 y, const char* str);
 
@@ -27,8 +28,6 @@ typedef struct TwodEntry {
 
 TwodEntry* twodPtr;
 s32 twodID;
-extern const GXColor twod_icon_fog_color;
-extern const GXColor twod_text_fog_color;
 USER_FUNC(twoddisp_main);
 
 static void twoddisp_disp(CameraId camera, void* param) {
@@ -75,8 +74,6 @@ USER_FUNC(twoddisp_main) {
     dispEntry((CameraId)8, 1000.0f, 0, twoddisp_disp, NULL);
     return 2;
 }
-
-extern s32 twoddisp_main_event[];
 
 s32 evt_twoddisp_init(EventEntry* evt, BOOL isFirstCall) {
     EventEntry* e;

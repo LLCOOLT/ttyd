@@ -1,5 +1,10 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 
 #pragma force_active on
 
@@ -21,46 +26,12 @@ USER_FUNC(btlevtcmd_SetMaxMoveCount);
 USER_FUNC(btlevtcmd_SetUnitWork);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(evt_eff);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AddRotate[];
-extern s32 btlevtcmd_AttackDeclareAll[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_FaceDirectionSub[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetMoveFrame[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_GetUnitWork[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetPos[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_TransStageFloorPosition[];
-extern s32 btlevtcmd_WaitEventEnd[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
 extern s32 cortez_weapon_blow_dead_event[];
 extern s32 cortez_weapon_break_event[];
 extern s32 cortez_weapon_counter_damage_event[];
 extern s32 cortez_weapon_dead_event[];
 extern s32 cortez_weapon_phase_event[];
 extern s32 cortez_weapon_unison_phase_event[];
-extern s32 evt_snd_sfx_pos[];
-extern s32 evt_snd_sfxoff[];
-extern s32 evt_sub_intpl_get_value[];
-extern s32 evt_sub_intpl_init[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_cortez_rapier_negone_one_374;
 __declspec(section ".data") s32 fd_boss_cortez_rapier_neg_one_382[1];

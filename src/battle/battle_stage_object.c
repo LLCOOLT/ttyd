@@ -23,6 +23,9 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
+#include "battle/battle_weapon_power.h"
+#include "unit/unit_object_tree.h"
+#include "unit/unit_object_switch.h"
 
 #pragma optimize_for_size on
 #pragma dont_inline on
@@ -72,11 +75,6 @@ typedef struct BattleStageObjectWork {
 #define STAGE_WORK(wp) ((BattleStageObjectWork*)(wp)->field_180C0)
 #define EVT_UW(evt, n) (((s32*)(evt)->userdata)[n])
 #define UNIT_FIELD(unit, type, off) (*(type*)((u8*)(unit) + BUOFF(off)))
-
-extern BattleWork* _battleWorkPointer;
-extern s32 weaponGetPowerDefault[];
-extern BattleUnitKind unit_object_tree;
-extern BattleUnitKind unit_object_switch;
 
 void mapGrpFlagOn(const char* name, u32 flags);
 void mapGrpFlagOff(const char* name, u32 flags);
@@ -158,22 +156,6 @@ extern BattleWeaponData _nozzle_at_base_mario;
 extern BattleWeaponData _nozzle_at_base_monster;
 extern BattleStageNozzleData battle_stage_nozzle_data[];
 extern BattleStageFallObjectData battle_stage_fall_object_data[];
-extern BattleStageObjectData _object_nozzle_data[];
-extern s32 _object_turn_event_core[];
-extern s32 _fall_frame_event[];
-extern s32 _nozzle_work_event_core[];
-extern s32 _object_fall_event[];
-extern BattleStageObjectData _object_wall_data;
-extern BattleStageObjectData _object_spot_light_data[];
-extern s32 _entry_tree_data[];
-extern s32 _entry_switch_data[];
-extern s32 _object_turn_event_A1[];
-extern s32 _object_turn_event_A2[];
-extern s32 _object_turn_event_B[];
-extern s32 _nozzle_turn_event[];
-extern s32 _close_wall_event[];
-extern s32 _nozzle_work_event_0[];
-extern s32 _nozzle_work_event_1[];
 
 BattleStageObject* BattleGetObjectPtr(s32 id) {
 	BattleWork* wp = _battleWorkPointer;
@@ -2419,7 +2401,6 @@ typedef struct FallObjectWork {
 	s8 prevTypes[3]; //0x1
 	FallObjectEntry entries[1]; //0x4
 } FallObjectWork;
-extern void* jumptable_80374848[];
 s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall);
 s32 BattleStage_ObjectFallCheck(void);
 void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src);

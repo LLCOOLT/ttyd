@@ -4,30 +4,16 @@
 #pragma force_active on
 #include "battle/battle_stage_object.h"
 #include "system.h"
+#include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
+#include "muj.h"
 
 f32 sinfd(f32 degrees);
 
 static USER_FUNC(_wave_offset);
 USER_FUNC(evt_eff64);
-extern s32 battle_flower_drop_param_default[];
-extern s32 battle_flower_drop_param_default2[];
-extern s32 battle_flower_drop_param_default3[];
-extern s32 battle_heart_drop_param_default[];
-extern s32 battle_item_cortez[];
-extern s32 battle_item_flower_chorobon[];
-extern s32 battle_item_green_chorobon[];
-extern s32 battle_item_gundan_zako[];
-extern s32 battle_item_kanbu1[];
-extern s32 battle_item_poison_pakkun[];
 extern s32 unit_boss_cortez[];
-extern s32 unit_boss_gundan_zako_group1[];
 extern s32 unit_boss_kanbu3[];
-extern s32 unit_flower_chorobon[];
-extern s32 unit_green_chorobon[];
-extern s32 unit_hermos[];
-extern s32 unit_kuriboo[];
-extern s32 unit_poison_pakkun[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_muj_negone_one_374;
 __declspec(section ".data") s32 fd_battle_database_muj_neg_one_382[1];

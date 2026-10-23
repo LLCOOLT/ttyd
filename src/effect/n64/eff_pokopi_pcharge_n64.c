@@ -6,8 +6,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-
-extern double sin(double x);
+#include "eff/eff_magic1_n64.h"
 
 typedef struct EffPokopiPchargeN64Elem {
     s32 type;     // 0x0

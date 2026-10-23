@@ -4,6 +4,12 @@
 #pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_sub.h"
 
 f32 intplGetValue(f32 start, f32 end, s32 mode, s32 currStep, s32 steps);
 
@@ -26,48 +32,6 @@ static USER_FUNC(shadow_scale_memory);
 static USER_FUNC(shadow_scale_return);
 static USER_FUNC(shadow_scale_small);
 static USER_FUNC(pakkun_ceil_exist);
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btlevtcmd_AnimeSetPoseTable[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckAttribute[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetFirstAttackTarget[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_OffAttribute[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_OnAttribute[];
-extern s32 btlevtcmd_OnPartsAttribute[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetEventCeilFall[];
-extern s32 btlevtcmd_SetHitOffset[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetKissHitOffset[];
-extern s32 btlevtcmd_SetPos[];
-extern s32 btlevtcmd_SetStatusIconOffset[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_add_zoom[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_sub_random[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_ice_pakkun_negone_one_374;
 __declspec(section ".data") s32 fd_ice_pakkun_neg_one_382[1];

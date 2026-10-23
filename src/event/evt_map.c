@@ -12,6 +12,7 @@
 #include "party.h"
 #include <dolphin/gx.h>
 #include <string.h>
+#include "evt/evt_map.h"
 
 EffectEntry* effTorchEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 EffectEntry* effFireEntry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
@@ -81,9 +82,6 @@ USER_FUNC(evt_map_set_fog);
 USER_FUNC(evt_mapobj_scale);
 USER_FUNC(evt_mapobj_rotate);
 USER_FUNC(evt_mapobj_trans);
-
-extern s32 evt_ride_airport[];
-extern s32 evt_nonride_airport[];
 
 USER_FUNC(evt_mapobj_trans) {
     s32* args = event->args;

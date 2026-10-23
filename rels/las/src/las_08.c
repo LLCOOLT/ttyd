@@ -5,6 +5,7 @@
 #include "driver/mapdrv.h"
 #include "driver/hitdrv.h"
 #include "driver/effdrv.h"
+#include "evt/evt_bero.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
@@ -19,9 +20,6 @@ USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_sub_get_sincos);
 USER_FUNC(hi_onoff);
 USER_FUNC(mugen_kairou_get_list);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_las_08_negone_one_374;
 __declspec(section ".data") s32 fd_las_08_neg_one_382[1];

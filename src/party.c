@@ -7,6 +7,7 @@
 #include "system.h"
 #include "mario/mariost.h"
 #include <string.h>
+#include "data/party_data.h"
 
 //.data
 typedef void (*PartyFunc)(PartyEntry* party);
@@ -25,12 +26,6 @@ typedef struct PartyData {
 } PartyData;
 
 extern PartyData partyDataTbl[];
-
-extern char* yoshigroup[7];
-
-extern char* partyPoseTbl[20][15];
-extern char* partyDotPoseTbl[8][15];
-extern char* yoshiDotPoseTbl[7][15];
 
 /*
     000b95ec 000020 800bebcc  4 partyGetPtr 	party.o

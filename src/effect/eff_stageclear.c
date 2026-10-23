@@ -9,10 +9,10 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "evt/evt_cam.h"
 
 double tan(double);
 int rand(void);
-extern s32 evt_cam_shake[];
 EffectEntry* effMiniGameEntry(s32);
 
 typedef struct StageClearWork {

@@ -8,8 +8,7 @@
 #include "mario/mario_sbr.h"
 #include "manager/evtmgr.h"
 #include "system.h"
-
-extern s32 evt_cam_shake[];
+#include "evt/evt_cam.h"
 
 HitEntry* marioChkLandon(f32* outY, f32 y);
 HitEntry* marioSearchGround(f32* a, f32* b, f32* c, f32 d, f32 e);

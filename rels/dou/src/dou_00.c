@@ -4,6 +4,7 @@
 #pragma force_active on
 #include "driver/mapdrv.h"
 #include "driver/envdrv.h"
+#include "evt/evt_bero.h"
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_item_entry);
@@ -26,7 +27,6 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_telop_entry);
 void water_tev(MapTevCallbackInfo* info);
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_dou_00_negone_one_374;
 __declspec(section ".data") s32 fd_dou_00_neg_one_382[1];

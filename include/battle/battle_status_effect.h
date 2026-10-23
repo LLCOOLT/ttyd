@@ -50,3 +50,5 @@ void BattleStatusChangeInfoWorkInit(struct BattleUnit* unit);
 
 
 void BattleStatusChangeMsgWorkInit(void);
+
+extern s8 _st_pri_data[];

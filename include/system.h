@@ -39,3 +39,6 @@ s32 LZ77Decode(u8* input, u8* output);
 void* memcpy_as4(void* dest, const void* src, u32 count);
 
 inline Vec initializeVec(Vec* input);
+
+extern const char* build_date_ptr;
+extern const char* build_time_ptr;

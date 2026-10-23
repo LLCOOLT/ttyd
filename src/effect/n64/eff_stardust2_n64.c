@@ -5,10 +5,10 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "libc_decls.h"
 
 double sin(double);
 double cos(double);
-extern int rand(void);
 
 typedef struct EffStardust2N64Work {
     s16 flag;     // 0x0

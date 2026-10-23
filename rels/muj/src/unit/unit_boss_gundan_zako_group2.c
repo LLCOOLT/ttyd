@@ -5,6 +5,10 @@
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
 #include "battle/battle_stage_object.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_weapon_power.h"
 f32 intplGetValue(f32 start, f32 end, s32 mode, s32 cur, s32 steps);
 s32 irand(s32 scalar);
 #include "dolphin/mtx.h"
@@ -76,19 +80,6 @@ void zakogun_ext_main2(void);
 USER_FUNC(zakogun_ext_init2);
 USER_FUNC(up_ceil);
 USER_FUNC(down_ceil);
-extern s32 _add_star_point_disp_offset[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btlevtcmd_CheckDamageCode[];
-extern s32 btlevtcmd_GetCoin[];
-extern s32 btlevtcmd_GetExp[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_StoreCoin[];
-extern s32 btlevtcmd_StoreExp[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_gundan_zako_group2_negone_one_374;
 __declspec(section ".data") s32 fd_boss_gundan_zako_group2_neg_one_382[1];

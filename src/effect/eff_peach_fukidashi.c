@@ -6,9 +6,9 @@
 #include "memory.h"
 #include <dolphin/mtx.h>
 #include "icon_ids.h"
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
-extern double sin(double x);
-extern double cos(double x);
 #define fabsf(x) __fabsf(x)
 
 typedef struct EffPeachFukidashiWork {

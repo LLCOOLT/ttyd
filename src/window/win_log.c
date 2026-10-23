@@ -14,6 +14,7 @@
 #include "data/item_data.h"
 #include "manager/evtmgr_cmd.h"
 #include <dolphin/gx.h>
+#include "win/win_root.h"
 
 typedef struct TubuDt {
     s16 x;
@@ -169,7 +170,6 @@ EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 void qqsort(void* base, u32 n, u32 size, int (*compare)(void*, void*));
 int compare_func5_2(void* a, void* b);
 int compare_func6_2(void* a, void* b);
-extern u8 enemy_monoshiri_sort_table[];
 extern ItemData itemDataTable[];
 
 void winMsgEntry(void* wp, s32 a, const char* msg, const char* b);

@@ -8,6 +8,20 @@
 #include "driver/effdrv.h"
 #include "mario/mario_pouch.h"
 #include "system.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_sub.h"
+#include "unit/party/unit_party_vivian.h"
+#include "unit/party/unit_party_yoshi.h"
+#include "unit/party/unit_party_christine.h"
+#include "unit/party/unit_party_chuchurina.h"
+#include "unit/party/unit_party_clauda.h"
+#include "unit/party/unit_party_nokotarou.h"
+#include "unit/party/unit_party_sanders.h"
 
 USER_FUNC(btlevtcmd_AddRotate);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -93,73 +107,12 @@ USER_FUNC(yoshi_original_color_anim_set);
 static USER_FUNC(_krb_get_dir);
 static USER_FUNC(vivian_comeback);
 static USER_FUNC(eff_scanning);
-extern s32 battle_evt_majo_disp_off[];
-extern s32 battle_evt_majo_disp_on[];
 extern s32 btl_majolyne_zoom[];
 extern s32 btl_marilyn_zoom[];
 extern s32 btl_vivian_zoom[];
-extern s32 btl_yoshi_yoroyoro_jump_calc_param[];
-extern s32 btl_yoshi_yoroyoro_jump_move[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AddScale[];
-extern s32 btlevtcmd_AnimeSetMotionSpeed[];
-extern s32 btlevtcmd_AttackDeclareAll[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetMoveFrame[];
-extern s32 btlevtcmd_GetPosFloat[];
-extern s32 btlevtcmd_GetResultAC[];
-extern s32 btlevtcmd_GetRotate[];
-extern s32 btlevtcmd_GetScale[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetTakeoffPosition[];
-extern s32 btlevtcmd_GetUnitKind[];
-extern s32 btlevtcmd_JumpContinue[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_MarioJumpPosition[];
-extern s32 btlevtcmd_MoveDirectionAdd[];
-extern s32 btlevtcmd_OnStatusFlag[];
-extern s32 btlevtcmd_SetDispOffset[];
-extern s32 btlevtcmd_SetRGB[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_SetScale[];
-extern s32 btlevtcmd_SetStayPose[];
-extern s32 btlevtcmd_SetStayPoseType[];
-extern s32 btlevtcmd_SetTalkPose[];
-extern s32 btlevtcmd_SetTalkPoseType[];
-extern s32 btlevtcmd_WaitAttackEnd[];
-extern s32 btlevtcmd_WaitEventEnd[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_posoffset[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_eff[];
-extern s32 evt_sub_intpl_get_float[];
-extern s32 evt_sub_intpl_get_value[];
-extern s32 evt_sub_intpl_get_value_para[];
-extern s32 evt_sub_intpl_init[];
-extern s32 evt_sub_intpl_init_float[];
-extern s32 evt_sub_intpl_msec_get_value_para[];
-extern s32 evt_sub_intpl_msec_init[];
 extern s32 majo_unison_phase_event[];
-extern s32 pose_table_christine_stay[];
-extern s32 pose_table_chuchurina_stay[];
-extern s32 pose_table_clauda_stay[];
-extern s32 pose_table_nokotarou_stay[];
-extern s32 pose_table_nokotarou_turn[];
-extern s32 pose_table_sanders_stay[];
-extern s32 pose_table_vivian_stay[];
-extern s32 pose_table_yoshi_stay[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 subsetevt_dead_core_nospin_norotate[];
 extern s32 unit_boss_majolyne_las[];
 extern s32 unit_boss_marilyn_las[];
-extern s32 vivian_shadow_tail_event[];
-extern s32 weaponGetPowerDefault[];
-extern s32 weaponGetPowerFromGulliblePartyAttackLv[];
 
 __declspec(section ".data") u64 fd_boss_rampell_las_negone_one_374;
 __declspec(section ".data") s32 fd_boss_rampell_las_neg_one_382[1];

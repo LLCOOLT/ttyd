@@ -49,3 +49,6 @@ typedef struct StatusWindowWork {
 void statusWinInit(void);
 void statusWinReInit(void);
 void statusWinMain(void);
+
+void statusWinForceOff(void);
+void statusWinForceOpen(void);

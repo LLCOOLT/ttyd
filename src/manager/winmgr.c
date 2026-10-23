@@ -20,6 +20,7 @@
 #include "system.h"
 #include <stdio.h>
 #include <string.h>
+#include "win/win_item.h"
 
 typedef struct WinMgrSelectTbl {
     u16 numDescriptors; // 0x0
@@ -28,11 +29,6 @@ WinMgrDesc* descriptors; // 0x4
 } WinMgrSelectTbl;
 
 extern ItemData itemDataTable[];
-extern u16 menu_skip_list[];
-extern BadgeShopWork* bdsw;
-extern s32 badge_bottakuru_table[];
-extern s32 badge_bottakuru100_table[];
-extern InformantWork _jdt;
 void statusWinForceOpen(void);
 void winFontInit(void);
 void winFontSet(Vec pos, Vec scale, GXColor color, const char* fmt, ...);

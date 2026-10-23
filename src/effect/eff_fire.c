@@ -52,8 +52,6 @@ typedef struct EffFireSmokeWork {
     f32 scale;      // 0x3C
 } EffFireSmokeWork;
 
-extern void mapGetBlend(GXColor* color);
-
 typedef struct FireScaleKey {
     s32 frame;
     f32 value;

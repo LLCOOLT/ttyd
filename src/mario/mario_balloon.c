@@ -5,11 +5,11 @@
 #include "driver/mobjdrv.h"
 #include "driver/npcdrv.h"
 #include <string.h>
+#include "mario/mario_hit.h"
 
 extern MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
 extern s32 mobjGetHint(MapObjectEntry* mobj);
 extern s32 mobjCheckItemboxOpen(MapObjectEntry* mobj);
-extern BOOL marioChkBero(HitEntry* hit);
 extern NpcEntry* fbatNpcTalkCheck(void);
 extern EffectEntry* effMarioBalloonEntry(s32 type, NpcEntry* npc);
 

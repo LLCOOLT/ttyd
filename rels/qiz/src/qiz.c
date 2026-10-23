@@ -3,11 +3,11 @@
 
 #pragma force_active on
 #include "data/mapdata.h"
+#include "qiz.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 qiz_00_init_evt[];
 
 void _unresolved(void);
 void _epilog(void);

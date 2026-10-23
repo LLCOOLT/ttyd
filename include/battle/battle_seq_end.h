@@ -12,3 +12,14 @@ typedef struct RankUpData {
 typedef struct BattleSeqEndWork {
     u8 unk0[0x2AC - 0x0]; //0x0
 } BattleSeqEndWork;
+
+extern s32 _event_MajinaiEnd[];
+
+extern s32 _confetti_control_event[];
+extern s32 _curtain_close_event[];
+extern s32 _jump_event[];
+extern s32 _koura_delete_event[];
+extern s32 _move_to_badge_point_event[];
+extern s32 _move_to_flower_event[];
+extern s32 _move_to_heart_event[];
+extern s32 _rank_up_event[];

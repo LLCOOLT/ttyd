@@ -4,6 +4,9 @@
 #pragma force_active on
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "aji.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_entername);
@@ -61,9 +64,6 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(waku);
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
-extern s32 evt_sub_starstone[];
 
 __declspec(section ".data") u64 fd_aji_14_negone_one_374;
 __declspec(section ".data") s32 fd_aji_14_neg_one_382[1];

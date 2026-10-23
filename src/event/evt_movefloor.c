@@ -7,7 +7,6 @@
 #include "pmario_sound.h"
 #include <string.h>
 
-extern GlobalWork* gp;
 s32 psndGetFlag();
 void mapObjGetPos();
 

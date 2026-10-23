@@ -7,6 +7,8 @@
 #include "memory.h"
 #include "stdio.h"
 #include "string.h"
+#include "evt/evt_bero.h"
+#include "party/party_motion.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_entername);
@@ -76,14 +78,6 @@ USER_FUNC(evt_win_item_select);
 USER_FUNC(kemuri_stop);
 static USER_FUNC(make_list);
 USER_FUNC(memoryRY);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_snd_bgmoff_f[];
-extern s32 evt_snd_bgmon_f[];
 
 __declspec(section ".data") u64 fd_tou_04_negone_one_374;
 __declspec(section ".data") s32 fd_tou_04_neg_one_382[1];

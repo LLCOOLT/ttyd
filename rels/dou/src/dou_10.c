@@ -8,6 +8,8 @@
 #include "mario/mariost.h"
 #include "memory.h"
 #include "string.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
 
 void marioShipForceStop(void);
 static inline f32 addf(f32 a, f32 b) { return a + b; }
@@ -63,8 +65,6 @@ USER_FUNC(nami_running_init_func);
 USER_FUNC(namiyoke_fail_stop);
 USER_FUNC(namiyoke_se_check);
 USER_FUNC(namiyoke_set_mapobj);
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
 
 __declspec(section ".data") u64 fd_dou_10_negone_one_374;
 __declspec(section ".data") s32 fd_dou_10_neg_one_382[1];

@@ -17,6 +17,14 @@
 #include "driver/camdrv.h"
 #include "driver/extdrv.h"
 #include "eff/eff_teresa.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_ext.h"
+#include "evt/evt_item.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_party.h"
+#include "jin.h"
 
 int rand(void);
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
@@ -144,33 +152,6 @@ void computeMtx(ExtPose* pose, f32 angle);
 f32 computeAngle(ExtPose* pose, MarioWork* mp);
 static f32 randf(f32 min, f32 max);
 s32 randn(s32 min, s32 max);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_cam3d_event_from_road[];
-extern s32 evt_cam3d_get_shift[];
-extern s32 evt_ext_entry[];
-extern s32 evt_item_flag_on[];
-extern s32 evt_mario_cam_y_off[];
-extern s32 evt_mario_cont_onoff[];
-extern s32 evt_msg_continue[];
-extern s32 evt_msg_print_add[];
-extern s32 evt_msg_select[];
-extern s32 evt_msg_toge[];
-extern s32 evt_npc_battle_start[];
-extern s32 evt_npc_get_dir[];
-extern s32 evt_npc_glide_position[];
-extern s32 evt_npc_set_anim[];
-extern s32 evt_npc_set_battle_info[];
-extern s32 evt_npc_set_scale[];
-extern s32 evt_npc_wait_battle_end[];
-extern s32 evt_party_cont_onoff[];
-extern s32 evt_party_dispflg_onoff[];
-extern s32 evt_party_get_pos[];
-extern s32 evt_party_run[];
-extern s32 evt_party_stop[];
-extern s32 evt_usu_kagemario_party_kill[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_jin_00_negone_one_374;
 __declspec(section ".data") s32 fd_jin_00_neg_one_382[1];

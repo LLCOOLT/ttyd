@@ -4,8 +4,8 @@
 #include "manager/evtmgr_cmd.h"
 #include "memory.h"
 #include <string.h>
+#include "libc_decls.h"
 
-extern int sprintf(char* str, const char* format, ...);
 s16 johoya_get(u8* table, s16 id);
 s16 johoya_set(u8* table, s16 id, s16 val);
 

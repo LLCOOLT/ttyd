@@ -4,6 +4,8 @@
 #pragma force_active on
 #include "driver/effdrv.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 static USER_FUNC(eff_guruguru);
@@ -101,11 +103,6 @@ USER_FUNC(evt_sub_area_check);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
-extern s32 bero_case_entry[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
 
 __declspec(section ".data") u64 fd_las_09_negone_one_374;
 __declspec(section ".data") s32 fd_las_09_neg_one_382[1];

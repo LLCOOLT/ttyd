@@ -9,6 +9,15 @@
 #include "battle/battle_audience.h"
 #include "system.h"
 #include "driver/effdrv.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_batstage.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_msg.h"
+#include "party/party_motion.h"
 
 typedef struct CortezWork { s16 state; s16 count; s16 audienceId[100]; s16 wait[100]; s16 timer[100]; s16 seq[100]; void* eff[100]; Vec srcPos[100]; Vec dstPos[100]; } CortezWork;
 void BattleAudienceAddTargetNum(f32 a, f32 b);
@@ -73,75 +82,12 @@ USER_FUNC(_cortez_recovery_audience);
 USER_FUNC(_cortez_drain_energy);
 USER_FUNC(_cortez_collect_energy);
 USER_FUNC(_cortez_get_sfx_vol);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AnimeChangeGroup[];
-extern s32 btlevtcmd_AnimeSetPoseSoundTable[];
-extern s32 btlevtcmd_AnimeWaitPlayComplete[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_AttackDeclareAll[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckPhase[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_ClearAllStatus[];
-extern s32 btlevtcmd_GetCoin[];
-extern s32 btlevtcmd_GetDataFromDataTable[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetExp[];
-extern s32 btlevtcmd_GetPartsPos[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_JumpPartsContinue[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_OffAttribute[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PhaseEventStartDeclare[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_RecoverHp[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_RunHitEventDirect[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetCutBaseOffset[];
-extern s32 btlevtcmd_SetCutHeight[];
-extern s32 btlevtcmd_SetCutWidth[];
-extern s32 btlevtcmd_SetDiveSound[];
-extern s32 btlevtcmd_SetHp[];
-extern s32 btlevtcmd_SetMaxMoveCount[];
-extern s32 btlevtcmd_SetPartsRotateOffset[];
-extern s32 btlevtcmd_SetStayPose[];
-extern s32 btlevtcmd_SetTalkPose[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_StatusWindowOnOff[];
-extern s32 btlevtcmd_StopWaitEvent[];
-extern s32 btlevtcmd_StoreCoin[];
-extern s32 btlevtcmd_StoreExp[];
-extern s32 btlevtcmd_WaitAttackEnd[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_ftomsec[];
-extern s32 btlevtcmd_reset_turn[];
-extern s32 btlevtcmd_snd_se[];
 extern s32 cortez_weapon_get_home_height[];
 extern s32 cortez_weapon_set_formation_attribute[];
-extern s32 evt_batstage_return_aud_dark_base[];
-extern s32 evt_batstage_set_aud_dark[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveto[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_eff[];
-extern s32 evt_fade_end_wait[];
-extern s32 evt_fade_entry[];
-extern s32 evt_fade_set_anim_ofs_pos[];
-extern s32 evt_fade_set_anim_virtual_pos[];
-extern s32 evt_msg_print[];
-extern s32 evt_snd_sfx_vol[];
-extern s32 evt_snd_sfxoff[];
-extern s32 evt_snd_sfxon[];
 extern s32 unit_boss_cortez_claw[];
 extern s32 unit_boss_cortez_rapier[];
 extern s32 unit_boss_cortez_saber[];
 extern s32 unit_boss_cortez_sword[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_cortez_negone_one_374;
 __declspec(section ".data") s32 fd_boss_cortez_neg_one_382[1];

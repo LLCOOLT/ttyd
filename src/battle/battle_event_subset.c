@@ -5,6 +5,12 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr.h"
 #include "manager/evtmgr_cmd.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_mario.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_snd.h"
+#include "unit/party/unit_party_yoshi.h"
 
 #define BTL_WORK_1C70(wp) (*(s32*)((u8*)(wp) + 0x1C70))
 #define BTL_WORK_1C74(wp) (*(u8*)((u8*)(wp) + 0x1C74))
@@ -63,58 +69,6 @@ USER_FUNC(_set_hp_gauge_fade_flag);
 USER_FUNC(_add_star_point_disp_offset);
 USER_FUNC(_check_at_dm_event_wait);
 USER_FUNC(_disable_restore_command_cursor);
-extern s32 btlevtcmd_AnimeFlagOnOff[];
-extern s32 btlevtcmd_AnimeWaitPlayComplete[];
-extern s32 btlevtcmd_CheckAttribute[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckDamageCode[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ClearAllStatus[];
-extern s32 btlevtcmd_ConsumeItemReserve[];
-extern s32 btlevtcmd_DispItemIcon[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_GetBackItem[];
-extern s32 btlevtcmd_GetCoin[];
-extern s32 btlevtcmd_GetDamage[];
-extern s32 btlevtcmd_GetDamageCode[];
-extern s32 btlevtcmd_GetExp[];
-extern s32 btlevtcmd_GetFriendBelong[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetScale[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_GetUnitId[];
-extern s32 btlevtcmd_GetUnitKind[];
-extern s32 btlevtcmd_JumpContinue[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_OffUnitFlag[];
-extern s32 btlevtcmd_OnOffStatus[];
-extern s32 btlevtcmd_OnUnitFlag[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_RecoverHp[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetDispOffset[];
-extern s32 btlevtcmd_SetHp[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetPos[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_SetRotateOffsetFromCenterOffset[];
-extern s32 btlevtcmd_SetScale[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_StoreCoin[];
-extern s32 btlevtcmd_StoreExp[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_eff[];
-extern s32 evt_snd_sfxon_3d[];
-extern s32 evt_sub_intpl_get_float[];
-extern s32 evt_sub_intpl_init_float[];
-extern s32 marioWeapon_KaitenHammerInvolved[];
-extern s32 marioWeapon_UltraHammerInvolved[];
-extern s32 partyWeapon_YoshiNomikomi_Involved[];
 
 #ifdef VERSION_G8ME01
 s32 subsetevt_dead[612];

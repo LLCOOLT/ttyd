@@ -14,6 +14,14 @@
 #include "eff/eff_kemu_test.h"
 #include "driver/animdrv.h"
 #include "driver/camdrv.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_batstage.h"
+#include "evt/evt_eff.h"
+#include "party/party_motion.h"
 
 typedef struct ArmWork { Vec prevPos; Vec pos; f32 rot; f32 targetRot; EffectEntry* eff; } ArmWork;
 double atan(double x);
@@ -111,56 +119,6 @@ USER_FUNC(aud_jet_end);
 USER_FUNC(aud_jet);
 USER_FUNC(drill_jet);
 USER_FUNC(drill_tor);
-extern s32 _add_star_point_disp_offset[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_AnimeSetPoseTable[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_DivePartsPosition[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_GetBackItem[];
-extern s32 btlevtcmd_GetCoin[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetExp[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetPartsPos[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetPartsPos[];
-extern s32 btlevtcmd_SetPartsRotate[];
-extern s32 btlevtcmd_SetStayPose[];
-extern s32 btlevtcmd_SetTalkPose[];
-extern s32 btlevtcmd_SpawnUnit[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_StoreCoin[];
-extern s32 btlevtcmd_StoreExp[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_batstage_return_aud_dark_base[];
-extern s32 evt_batstage_set_aud_dark[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_btl_camera_shake_w[];
-extern s32 evt_eff[];
-extern s32 evt_snd_sfxoff[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 subsetevt_dead_core[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_magnum_battender_mkII_negone_one_374;
 __declspec(section ".data") s32 fd_boss_magnum_battender_mkII_neg_one_382[1];

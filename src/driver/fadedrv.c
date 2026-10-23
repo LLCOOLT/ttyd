@@ -14,6 +14,7 @@
 #include <dolphin/dvd.h>
 #include <string.h>
 #include "version.h"
+#include "libc_decls.h"
 
 #ifdef VERSION_G8ME01
 // US-only named constant (dispdrv reads it by name), followed by a zero word
@@ -23,10 +24,8 @@ __declspec(section ".sdata2") const f32 float_0_8041f774 = 0.0f;
 #pragma force_active reset
 #endif
 
-extern int sprintf(char* str, const char* format, ...);
 double tan(double);
 s32 evt_img_alloc_capture(EventEntry* event, BOOL isFirstCall);
-extern GlobalWork* gp;
 
 #pragma force_active on
 u32 gap_fd_sbss;

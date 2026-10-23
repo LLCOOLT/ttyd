@@ -11,12 +11,12 @@
 #include "system.h"
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "driver/fadedrv.h"
 
 #define DISP_MAX_ENTRIES 1024
 
 #ifdef VERSION_G8ME01
 // US shares this constant with the fadedrv pool
-extern const f32 float_1_8041f770;
 #define DISP_ONE float_1_8041f770
 #else
 #define DISP_ONE 1.0f

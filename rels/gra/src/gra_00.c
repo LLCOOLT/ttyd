@@ -8,6 +8,9 @@
 #include "manager/evtmgr_cmd.h"
 #include "mario/mario.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "gra.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_sub_get_language);
 #endif
@@ -89,9 +92,6 @@ USER_FUNC(evt_win_nameent_on);
 USER_FUNC(evt_win_nameent_wait);
 static USER_FUNC(zoom);
 void msg_callback(s32 type, void* param);
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_tree_access_entry[];
-extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_gra_00_negone_one_374;
 __declspec(section ".data") s32 fd_gra_00_neg_one_382[1];

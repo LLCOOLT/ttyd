@@ -13,8 +13,13 @@
 #include "driver/camdrv.h"
 #include <string.h>
 #include "icon_ids.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/sac/sac_common.h"
+#include "evt/evt_fade.h"
+#include "party/party_motion.h"
+#include "battle/sac/sac_zubastar.h"
 
-extern BattleWork* _battleWorkPointer;
 void BattleAcDrawGauge(s32 x, s32 y, s32 icon, f32 ratio, s32 a, s32 b, s32 c, s32 d, s32 e);
 #define INTPL(m, c, n, a, b) ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(a, b, m, c, n)
 int rand(void);
@@ -91,7 +96,6 @@ typedef struct ZubaStarWork {
 
 ZubaStarWork* GetZubaStarPtr(void);
 
-extern s32 marioAttackEvent_ZubaStar[];
 s32 weaponGetPower_ZubaStar(void* a, s32* tbl);
 
 s32 weapon_zubastar[] = {
@@ -937,31 +941,6 @@ void zubastar_disp2D(CameraId cam, void* param) {
 }
 
 USER_FUNC(btlevtcmd_ACSuccessEffect);
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckPartsAttribute[];
-extern s32 btlevtcmd_CommandGetWeaponAddress[];
-extern s32 btlevtcmd_CommandPayWeaponCost[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_StartWaitEvent[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_btl_camera_shake_w[];
-extern s32 evt_fade_entry[];
-extern s32 evt_snd_sfxoff[];
-extern s32 sac_ac_help_off[];
-extern s32 sac_ac_help_on[];
-extern s32 sac_handbeat[];
-extern s32 sac_handbeat_end[];
-extern s32 sac_mario_back_home[];
-extern s32 sac_mario_item_on_end_evt[];
-extern s32 sac_mario_item_on_evt[];
-extern s32 sac_start_camera_evt[];
-extern s32 sac_start_stardust[];
 s32 star_stone_appear(void);
 s32 wait_star_stone_up(void);
 s32 main_star(void);

@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "hom.h"
 
 #pragma force_active on
 
@@ -15,10 +16,6 @@ USER_FUNC(evt_party_set_pos);
 USER_FUNC(evt_seq_wait);
 USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_envon);
-extern s32 hom_10_evt_resha_left[];
-extern s32 hom_10_evt_resha_right[];
-extern s32 hom_10_evt_resha_start3[];
-extern s32 hom_10_evt_resha_start4[];
 
 __declspec(section ".data") u64 fd_hom_12_negone_one_374;
 __declspec(section ".data") s32 fd_hom_12_neg_one_382[1];

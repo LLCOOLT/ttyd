@@ -1,11 +1,10 @@
 #pragma optimize_for_size on
 #include "battle/battle_sub.h"
 #include "battle/battle_unit.h"
+#include "battle/battle.h"
 double cos(double);
 double sin(double);
 double atan2(double, double);
-
-extern BattleWork* _battleWorkPointer;
 
 f32 sinfd(f32 deg) {
 	return sin((6.2831855f * deg) / 360.0f);

@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "gra.h"
 
 #pragma force_active on
 
@@ -38,8 +40,6 @@ USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(roll_release_check);
-extern s32 evt_bero_info_run[];
-extern s32 evt_usu_kagemario_party_kill[];
 
 __declspec(section ".data") u64 fd_gra_04_negone_one_374;
 __declspec(section ".data") s32 fd_gra_04_neg_one_382[1];

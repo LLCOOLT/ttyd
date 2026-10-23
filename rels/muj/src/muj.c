@@ -12,24 +12,12 @@
 #include "dolphin/os.h"
 #include "pmario_sound.h"
 #include "data/mapdata.h"
+#include "muj.h"
 
 s32 psndSFXOnEx_3D(const char* name, Vec* position, s32 vol, s32 pan, s32 pitch, s32 flags);
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 btl_muj_setup_no_tbl[];
-extern s32 btlsetup_muj_tbl[];
-extern s32 muj_00_init_evt[];
-extern s32 muj_01_init_evt[];
-extern s32 muj_02_init_evt[];
-extern s32 muj_03_init_evt[];
-extern s32 muj_04_init_evt[];
-extern s32 muj_05_init_evt[];
-extern s32 muj_10_init_evt[];
-extern s32 muj_11_init_evt[];
-extern s32 muj_12_init_evt[];
-extern s32 muj_20_init_evt[];
-extern s32 muj_21_init_evt[];
 
 USER_FUNC(evt_eff64);
 USER_FUNC(evt_eff_softdelete);

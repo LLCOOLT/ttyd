@@ -11,6 +11,8 @@
 #include "system.h"
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "party/party_hit.h"
+#include "party/party_move.h"
 
 typedef struct ChuchuParty {
     u32 flags;                 // 0x0
@@ -55,12 +57,9 @@ typedef struct ChuchuTreasure {
 extern void partyGetAppearPos3(PartyEntry* party, Vec* pos);
 extern char* partyChgPoseId(PartyEntry* party, s32 index);
 extern void partyChgPose(PartyEntry* party, char* pose);
-extern void partyChkGnd(PartyEntry* party);
 extern void partyChgRunMode(PartyEntry* party, s32 mode);
 extern void partyWalkInit(PartyEntry* party, s32 mode);
-extern void partyWalkMain(PartyEntry* party);
 extern void partyUpdMoveSpd(PartyEntry* party);
-extern f32 partyToMovedir(PartyEntry* party, f32 angle);
 extern void* effFukidashiEntry(s32 a, s32 b, s32 c, f32 d, f32 e, f32 f, f32 g, f32 h, s32 frames);
 extern void* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range);
 extern void* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 range, char** names);

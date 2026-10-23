@@ -1,3 +1,8 @@
+#include "evt/evt_memcard.h"
+#include "evt/evt_sub.h"
+#include "seq/seq_load.h"
+#include "sdk_decls.h"
+
 #ifdef VERSION_G8ME01
 // US C port: all functions exact (loadDraw needs the two FAKE spellings marked inside it).
 #include "countdown.h"
@@ -58,16 +63,7 @@ typedef struct WinDt {
     u8 next[4]; // 0x18
 } WinDt;
 
-extern s32 evt_memcard_check[];
-extern s32 evt_memcard_start[];
-extern s32 evt_memcard_save[];
-extern s32 evt_memcard_save_wrapper[];
-extern s32 evt_memcard_delete[];
-extern s32 evt_memcard_copy[];
-extern s32 evt_sub_rumble_onoff(EventEntry* evt, BOOL isFirstCall);
-extern s32 evt_sub_animgroup_async(EventEntry* evt, BOOL isFirstCall);
 extern void SoundSetOutputMode(s32 mode);
-extern void OSSetSoundMode(u32 mode);
 extern BOOL psndENVOn(u32 flags, const char* name);
 extern BOOL psndBGMOff(u32 flags);
 void nameEntOn(s32 type);
@@ -137,9 +133,7 @@ static LoadWork work;
 static LoadWork* wp = &work;
 __declspec(section ".sdata2") const u32 seq_logo_zero_color[2];
 
-extern s32 stone_id[];
 static s32 evt_shake[12];
-extern s32 evt_continue[];
 
 s32 evt_seq_load_keep_msg_window(EventEntry* evt, BOOL isFirstCall) {
     fadeReset(4);

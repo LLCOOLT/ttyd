@@ -8,9 +8,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "eff/eff_magic1_n64.h"
-
-extern double sin(double x);
-extern double cos(double x);
+#include "libc_decls.h"
 
 typedef struct EffMagic1N64Work {
     s32 type;     // 0x0
@@ -22,8 +20,6 @@ typedef struct EffMagic1N64Work {
     s32 life;     // 0x30
     s32 alpha;    // 0x34
 } EffMagic1N64Work;
-
-extern GXColor magic1_zero_color;
 
 static u8 anime_data[12] = {0x00, 0xFF, 0xD0, 0x1A, 0x78, 0x4D, 0xD0, 0xFE, 0xF0, 0xFE, 0x4C, 0x6E};
 

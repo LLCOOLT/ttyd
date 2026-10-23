@@ -12,6 +12,9 @@
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
 #include "memory.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_npc.h"
+#include "aji.h"
 
 typedef struct MonitorWork { void* buf; s32 ready; s32 kanbu; } MonitorWork;
 static MonitorWork* monitor_wp;
@@ -88,16 +91,6 @@ static USER_FUNC(viewport);
 
 void monitor_cap_tev(MapTevCallbackInfo* info);
 void monitor_cap_capture(CameraId cameraId, void* param);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
-extern s32 npc_init_evt[];
-extern s32 shuryolight_head_normal[];
-extern s32 shuryolight_pow_normal[];
-extern s32 shuryolight_tue_normal[];
 
 __declspec(section ".data") u64 fd_aji_10_negone_one_374;
 __declspec(section ".data") s32 fd_aji_10_neg_one_382[1];

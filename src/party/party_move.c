@@ -8,6 +8,17 @@
 #include "system.h"
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "party/party_nokonoko.h"
+#include "party/party_chuchu.h"
+#include "party/party_hit.h"
+#include "party/party_motion.h"
+#include "party/party_bomhei.h"
+#include "party/party_cloud.h"
+#include "mot/mot_stay.h"
+#include "mot/mot_damage.h"
+#include "mot/mot_slit.h"
+#include "party/party_move.h"
+#include "libc_decls.h"
 
 #define PF(p, off) (*(f32*)((u8*)(p) + (off)))
 #define PU8(p, off) (*(u8*)((u8*)(p) + (off)))
@@ -22,49 +33,21 @@ typedef struct Footmark {
     Vec pos;    // 0x4
 } Footmark;
 
-extern s32 nokonokoGetStatus(PartyEntry* party);
-extern BOOL chuchu_searchObject(void);
 extern char* partyChgPoseId(PartyEntry* party, s32 index);
-extern BOOL marioChkDeepSleep(void);
-extern HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang);
 extern void* mobjHitObjPtrToPtr(HitEntry* hit);
 
 s32 partyMoveMain(PartyEntry* party, s32 hosei);
 f32 partyUpdMoveSpd(PartyEntry* party, f32 spd);
-extern s32 N_marioGetMovementSpeed(void);
 extern void party_set_behind_dir(PartyEntry* party);
-extern void party_motion_beside_mario(PartyEntry* party);
-extern void party_motion_behind_mario(PartyEntry* party);
-extern void party_motion_behind_mario_fly(PartyEntry* party);
-extern void party_motion_behind_mario_continue(PartyEntry* party);
-extern void party_motion_jump2(PartyEntry* party);
 extern void party_motion_fall(PartyEntry* party);
-extern void party_motion_upstairs(PartyEntry* party);
-extern void party_motion_damage(PartyEntry* party);
-extern void party_motion_stay(PartyEntry* party);
-extern void party_motion_homing_walk(PartyEntry* party);
-extern void party_motion_homing_fly(PartyEntry* party);
-extern void party_motion_jump(PartyEntry* party);
-extern void marioSetSplash(s32 type, Vec* pos);
-extern void partyWalkMain(PartyEntry* party);
-extern void walkMain(PartyEntry* party);
-extern void bomhei_use_cancel(void);
-extern void nokonoko_finish(PartyEntry* party);
-extern void partyRestoreRunMode(PartyEntry* party);
 static void flyMain(PartyEntry* party);
-extern BOOL marioChkSlitThrouh(void);
 extern void partyChgRunMode(PartyEntry* party, s32 mode);
-extern void cloud_hover_main(PartyEntry* party);
-extern void cloud_hover_init(PartyEntry* party);
-extern void party_motion_wait(PartyEntry* party);
 extern void vivianShadow(PartyEntry* party);
 extern HitEntry* marioChkWallAround(Vec* pos, s32 a, f32 spd, f32 dir, f32 w, f32 h);
 #ifdef VERSION_G8ME01
 void partyChkWallAround(PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 width, f32 height);
 #endif
 extern HitEntry* partySearchHead(PartyEntry* party, Vec* pos, f32* h, f32 a);
-extern f32 toMovedirSimple(f32 dir);
-extern HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist);
 double sin(double);
 double cos(double);
 
@@ -91,7 +74,6 @@ static inline void partyModeTail(PartyEntry* party) {
         }
     }
 }
-extern HitEntry* partySearchGround(PartyEntry* party, f32 a, f32 b);
 void partyGetMoveDirSpd(PartyEntry* party, f32* dir, f32* spd);
 
 Footmark footmarkBuf[2][80];
@@ -959,7 +941,6 @@ void partyMoveCheckWall(PartyEntry* party) {
     }
 }
 
-extern int __float_nan[];
 s16 partyMarioHosei(PartyEntry* party);
 
 static inline s32 pm_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
@@ -1572,8 +1553,6 @@ typedef struct AppearNpc {
     u8 pad[0x8c];
     Vec position; // 0x8C
 } AppearNpc;
-extern f32 toMovedir2(f32 base, f32 ofs);
-extern f32 toMovedir(f32 angle);
 extern AppearNpc* npcNearDistCheck(f32 x, f32 y, f32 z, f32 r);
 extern f32 partyNrmToAngle(Vec* n);
 extern s32 marioPlaneGetFlyingDir(void);

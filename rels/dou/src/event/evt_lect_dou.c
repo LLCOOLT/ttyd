@@ -17,6 +17,7 @@
 #include "driver/mobjdrv.h"
 #include "driver/fadedrv.h"
 #include "system.h"
+#include "evt/evt_map.h"
 
 static OSTime wwstart;
 void statusWinForceClose(void);
@@ -94,8 +95,6 @@ static void lecture_button_disp(CameraId camera, void* param);
 static USER_FUNC(x_flag_add);
 static USER_FUNC(lect_mario_ido_sum);
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start);
-extern s32 evt_nonride_airport[];
-extern s32 evt_ride_airport[];
 
 __declspec(section ".data") u64 fd_evt_lect_dou_negone_one_374;
 __declspec(section ".data") s32 fd_evt_lect_dou_neg_one_382[1];

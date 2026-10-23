@@ -9,6 +9,11 @@
 #include "string.h"
 #include "pmario_sound.h"
 #include "eff/n64/eff_akari_charge_n64.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mobj.h"
+#include "aji.h"
 
 void mapGrpFlagOn(const char* name, u32 flags);
 void mapGrpFlagOff(const char* name, u32 flags);
@@ -32,11 +37,6 @@ USER_FUNC(evt_snd_set_rev_mode);
 static USER_FUNC(ride_chk);
 static USER_FUNC(thunder_main);
 static USER_FUNC(loop_onoff);
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
-extern s32 evt_hit_damage_return_set[];
-extern s32 evt_map_playanim[];
-extern s32 evt_mobj_itembox[];
 
 __declspec(section ".data") u64 fd_aji_05_negone_one_374;
 __declspec(section ".data") s32 fd_aji_05_neg_one_382[1];

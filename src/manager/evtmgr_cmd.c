@@ -12,8 +12,7 @@
 #include "driver/swdrv.h"
 #include <dolphin/os.h>
 #include <string.h>
-
-extern int sprintf(char* str, const char* fmt, ...);
+#include "libc_decls.h"
 
 //local prototypes
 static inline f32 check_float(s32 val);

@@ -8,6 +8,7 @@
 #include "system.h"
 #include <stdlib.h>
 #include <string.h>
+#include "libc_decls.h"
 
 //.data
 eff_set eff_set_n64[] = {
@@ -157,8 +158,6 @@ static eff_n64_work work;
 
 //.sdata
 static eff_n64_work* wp = &work;
-
-extern int sprintf(char* str, const char* format, ...);
 
 //local prototypes
 static void _callback_tpl(s32 error, DVDFileInfo* info);

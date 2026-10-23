@@ -34,3 +34,5 @@ USER_FUNC(johoya_data_alloc);
 USER_FUNC(johoya_data_free);
 void johoya_init(void);
 s32 search_evt_no(const char* label);
+
+extern InformantWork _jdt;

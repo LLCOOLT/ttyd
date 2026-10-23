@@ -8,9 +8,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
-extern double sin(double);
-extern double cos(double);
 void effFunemizuMain(EffectEntry* effect);
 void effFunemizuDisp(CameraId cameraId, EffectEntry* effect);
 void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect);

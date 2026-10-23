@@ -13,9 +13,6 @@
 #include "manager/evtmgr_cmd.h"
 #include <string.h>
 
-extern GlobalWork* gp;
-extern s32 _mariostSystemLevel;
-
 //.bss
 static EventWork work[2];
 s32 priTbl[0x100];

@@ -6,6 +6,13 @@
 #include "mario/mariost.h"
 #include "driver/mapdrv.h"
 #include "driver/npcdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "gor.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_get_entername);
@@ -115,26 +122,6 @@ USER_FUNC(N_evt_sub_status_gauge_force_update);
 static USER_FUNC(ramp_r);
 static USER_FUNC(kpa_hikousen_yure);
 static void resha_tev(MapTevCallbackInfo* info);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_cam3d_evt_zoom_in[];
-extern s32 evt_fade_end_wait[];
-extern s32 evt_fade_set_mapchange_type[];
-extern s32 evt_npc_get_dir[];
-extern s32 evt_npc_get_position[];
-extern s32 evt_npc_jump_position_nohit[];
-extern s32 evt_npc_kamek_move_position[];
-extern s32 evt_npc_pera_onoff[];
-extern s32 evt_npc_set_autotalkpose[];
-extern s32 evt_npc_set_ry[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_npc_wait_pera[];
-extern s32 evt_snd_sfxchk[];
-extern s32 evt_sub_mail_event[];
-extern s32 evt_sub_mail_vibration[];
-extern s32 evt_sub_stopwatch[];
-extern s32 luigi_gor_first_talk[];
 
 __declspec(section ".data") u64 fd_gor_04_negone_one_374;
 __declspec(section ".data") s32 fd_gor_04_neg_one_382[1];

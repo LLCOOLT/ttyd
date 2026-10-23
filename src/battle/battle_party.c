@@ -1,13 +1,13 @@
 #include "battle/battle_party.h"
 #include "battle/battle_unit.h"
+#include "unit/party/unit_party_nokotarou.h"
+#include "unit/party/unit_party_yoshi.h"
+#include "unit/party/unit_party_clauda.h"
+#include "unit/party/unit_party_vivian.h"
+#include "unit/party/unit_party_sanders.h"
+#include "unit/party/unit_party_chuchurina.h"
 
 extern BattleUnitKind unitdata_Party_Christine;
-extern BattleUnitKind unitdata_Party_Nokotarou;
-extern BattleUnitKind unitdata_Party_Yoshi;
-extern BattleUnitKind unitdata_Party_Clauda;
-extern BattleUnitKind unitdata_Party_Vivian;
-extern BattleUnitKind unitdata_Party_Sanders;
-extern BattleUnitKind unitdata_Party_Chuchurina;
 
 // field_4 bytes: alliance 0, attack phase 0x04000002, position {1000.0f, 0.0f, 1000.0f}
 #define PARTY_SETUP(kind) \

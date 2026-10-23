@@ -10,8 +10,6 @@
 #include <dolphin/gx.h>
 
 
-extern GlobalWork* gp;
-
 #ifdef VERSION_G8ME01
 //.sdata
 const char* anim_jp[] = {

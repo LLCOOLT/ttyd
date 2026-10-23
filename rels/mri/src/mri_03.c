@@ -6,10 +6,12 @@
 #include "dolphin/gx.h"
 #include "memory.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "mri.h"
 
 static u8* _ap;
 typedef struct PuniData { u8 field_0x0[0x4]; u32 flags; u8 field_0x8[0xC - 0x8]; s16 field_0xC; u8 field_0xE[0x114 - 0xE]; u16 field_0x114; u8 field_0x116[0x118 - 0x116]; s16 field_0x118; u8 field_0x11A[0x11E - 0x11A]; s16 field_0x11E; u8 field_0x120[0x12C - 0x120]; Vec position; u8 field_0x138[0x15C - 0x138]; Vec field_0x15C; u8 field_0x168[0x174 - 0x168]; f32 field_0x174; u8 field_0x178[0x180 - 0x178]; f32 field_0x180; u8 field_0x184[0x1E0 - 0x184]; s32 field_0x1E0; s32 field_0x1E4; u8 field_0x1E8[0x56C - 0x1E8]; void* field_0x56C; void* field_0x570; u8 field_0x574[0x5A8 - 0x574]; } PuniData;
-extern s32 JailAwayTable_New[];
 void puniMoveAtari(PuniData* puni, Vec pos, Vec dir, s32 flag, f32 speed);
 PuniData* puniGetPunidat(void);
 void puniModeEventparent(PuniData* puni);
@@ -135,14 +137,6 @@ static void alpha_tev(MapTevCallbackInfo* info);
 static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
 void puniModeEventparent(PuniData* puni);
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 mri_countdown[];
-extern s32 mri_guide_goryu[];
-extern s32 mri_guide_hagure_check[];
-extern s32 mri_puni_init[];
-extern s32 mri_puni_walk_se[];
-extern s32 puni_disp_info[];
 
 __declspec(section ".data") u64 fd_mri_03_negone_one_374;
 __declspec(section ".data") s32 fd_mri_03_neg_one_382[1];

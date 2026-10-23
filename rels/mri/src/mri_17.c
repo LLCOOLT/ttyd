@@ -5,6 +5,9 @@
 #include "manager/evtmgr_cmd.h"
 #include "driver/imgdrv.h"
 #include "mario/mariost.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "mri.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
@@ -88,17 +91,6 @@ USER_FUNC(evt_sub_area_check);
 USER_FUNC(evt_target_flag_onoff);
 USER_FUNC(evt_target_set_position);
 static USER_FUNC(set_depthPlaneOffset);
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 mri_countdown[];
-extern s32 mri_guide_goryu[];
-extern s32 mri_puni_init[];
-extern s32 mri_puni_walk_se[];
-extern s32 mri_punipuni_itemremove[];
-extern s32 mri_punipuni_itemselect[];
-extern s32 mri_punipuni_itemset[];
-extern s32 mri_punipuni_setup[];
-extern s32 puni_disp_info[];
 
 __declspec(section ".data") u64 fd_mri_17_negone_one_374;
 __declspec(section ".data") s32 fd_mri_17_neg_one_382[1];

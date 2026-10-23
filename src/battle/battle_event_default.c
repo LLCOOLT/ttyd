@@ -6,6 +6,13 @@
 #include "driver/effdrv.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
+#include "battle/battle_seq_end.h"
+#include "battle/battle_mario.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "evt/evt_batstage.h"
+#include "evt/evt_sub.h"
 
 #define BTL_UNIT_280(unit) (*(s32*)((u8*)(unit) + 0x280))
 #define BTL_WORK_1C68(wp) (*(s32*)((u8*)(wp) + 0x1C68))
@@ -114,30 +121,6 @@ USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_random);
-extern s32 _event_MajinaiEnd[];
-extern s32 badgeWeapon_DefenceCommand[];
-extern s32 badgeWeapon_DefenceCommandP[];
-extern s32 btldefaultevt_avoid_guard[];
-extern s32 btlevtcmd_AddRotate[];
-extern s32 btlevtcmd_AudienceAppeal[];
-extern s32 btlevtcmd_GetUnitId[];
-extern s32 btlevtcmd_OnStatusFlag[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_ftof[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_batstage_light_set_player_off[];
-extern s32 evt_batstage_light_set_player_on[];
-extern s32 evt_btl_camera_set_moveto[];
-extern s32 evt_sub_intpl_get_value_para[];
-extern s32 subset_ultra_hammer_acrobat_damage_event[];
-extern s32 subsetevt_binta_damage_left[];
-extern s32 subsetevt_binta_damage_right[];
-extern s32 subsetevt_blow_dead[];
-extern s32 subsetevt_counter_damage[];
-extern s32 subsetevt_damage[];
-extern s32 subsetevt_dead[];
-extern s32 subsetevt_terror[];
 
 s32 btldefaultevt_Damage[1133];
 s32 btldefaultevt_ChangeParty[174];

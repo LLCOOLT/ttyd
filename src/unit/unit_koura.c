@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
 
 USER_FUNC(btlevtcmd_AddRotate);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -25,14 +27,6 @@ USER_FUNC(btlevtcmd_SetRotateOffset);
 USER_FUNC(btlevtcmd_SetUnitWork);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(evt_eff);
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AddPartsDispOffset[];
-extern s32 btlevtcmd_AddPartsRotate[];
-extern s32 btlevtcmd_AddPartsRotateOffset[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AnimeSetPoseTable[];
-extern s32 btlevtcmd_SetPartsRotateOffset[];
-extern s32 btlevtcmd_snd_se[];
 
 BattleUnitKind unit_koura;
 static BattleDataEntry data_table[7];

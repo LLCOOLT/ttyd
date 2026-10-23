@@ -3,6 +3,22 @@
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "battle/battle_unit.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/sac/sac_bakugame.h"
+#include "battle/sac/sac_deka.h"
+#include "battle/sac/sac_genki.h"
+#include "battle/sac/sac_muki.h"
+#include "battle/sac/sac_scissor.h"
+#include "battle/sac/sac_suki.h"
+#include "battle/sac/sac_zubastar.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_audience.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "driver/npcdrv.h"
 static USER_FUNC(_get_mario_hammer_lv);
 #include "driver/animdrv.h"
 #include "driver/effdrv.h"
@@ -16,7 +32,6 @@ static USER_FUNC(_get_mario_hammer_lv);
 #include "system.h"
 #include "pmario_sound.h"
 
-extern BattleWork* _battleWorkPointer;
 EffectEntry* effFireEntry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 duration);
 void BattleMajinaiDone(void);
 void BattleMajinaiEndCheck(void);
@@ -89,115 +104,6 @@ USER_FUNC(_wait_jyabara_hit_iron_frame);
 USER_FUNC(_bgset_iron_frame_check);
 USER_FUNC(_jump_star_effect);
 USER_FUNC(_whirlwind_effect);
-extern s32 btldefaultevt_SuitoruBadgeEffect[];
-extern s32 btlevtcmd_ACHelpSet[];
-extern s32 btlevtcmd_ACRGetResult[];
-extern s32 btlevtcmd_ACRStart[];
-extern s32 btlevtcmd_AcGetDifficulty[];
-extern s32 btlevtcmd_AcGetOutputParam[];
-extern s32 btlevtcmd_AcSetDifficulty[];
-extern s32 btlevtcmd_AcSetFlag[];
-extern s32 btlevtcmd_AcSetParamAll[];
-extern s32 btlevtcmd_AnimeChangePaperAnime[];
-extern s32 btlevtcmd_AnimeChangePaperGroup[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AnimeWaitPlayComplete[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_AttackDeclareAll[];
-extern s32 btlevtcmd_AudienceDeclareAcrobatResult[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_CommandGetWeaponActionLv[];
-extern s32 btlevtcmd_CommandPayWeaponCost[];
-extern s32 btlevtcmd_CommandPreCheckDamage[];
-extern s32 btlevtcmd_DamageDirect[];
-extern s32 btlevtcmd_DivePartsPosition[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_FaceDirectionSub[];
-extern s32 btlevtcmd_FallPartsPosition[];
-extern s32 btlevtcmd_FallPosition[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetFirstAttackTarget[];
-extern s32 btlevtcmd_GetFriendBelong[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetMoveFrame[];
-extern s32 btlevtcmd_GetResultCountAC[];
-extern s32 btlevtcmd_GetRotate[];
-extern s32 btlevtcmd_GetScale[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_GetTakeoffPosition[];
-extern s32 btlevtcmd_GetUnitWork[];
-extern s32 btlevtcmd_GetWeaponActionLv[];
-extern s32 btlevtcmd_InviteApInfoReport[];
-extern s32 btlevtcmd_JumpContinue[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_MarioJumpParam[];
-extern s32 btlevtcmd_MarioJumpPosition[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_OffToken[];
-extern s32 btlevtcmd_PadCheckNow[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_ResultAC[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetMoveSoundDataWork[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetPartsBlur[];
-extern s32 btlevtcmd_SetPartsWork[];
-extern s32 btlevtcmd_SetPos[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_SetScale[];
-extern s32 btlevtcmd_SetUnitWork[];
-extern s32 btlevtcmd_SetupAC[];
-extern s32 btlevtcmd_StartAC[];
-extern s32 btlevtcmd_TransStageFloorPosition[];
-extern s32 btlevtcmd_WaitEventEnd[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_ac_timing_flag_onoff[];
-extern s32 btlevtcmd_ac_timing_get_success_frame[];
-extern s32 btlevtcmd_check_battleflag[];
-extern s32 btlevtcmd_ftof[];
-extern s32 btlevtcmd_ftomsec[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 btlevtcmd_snd_voice[];
-extern s32 evt_audience_acrobat_notry[];
-extern s32 evt_audience_ap_recovery[];
-extern s32 evt_audience_reflesh_natural_all[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_homing_unitparts[];
-extern s32 evt_btl_camera_set_posoffset[];
-extern s32 evt_btl_camera_set_zoomSpeedLv[];
-extern s32 evt_eff[];
-extern s32 evt_majinai_effect_se_btl[];
-extern s32 evt_snd_sfx_pit[];
-extern s32 evt_snd_sfx_pos[];
-extern s32 evt_snd_sfxoff[];
-extern s32 evt_sub_intpl_get_float[];
-extern s32 evt_sub_intpl_get_value[];
-extern s32 evt_sub_intpl_init[];
-extern s32 evt_sub_intpl_init_float[];
-extern s32 evt_sub_random[];
-extern s32 marioAttackEvent_BakuGame[];
-extern s32 marioAttackEvent_Deka[];
-extern s32 marioAttackEvent_Genki0[];
-extern s32 marioAttackEvent_Genki1[];
-extern s32 marioAttackEvent_Muki[];
-extern s32 marioAttackEvent_Scissor[];
-extern s32 marioAttackEvent_Suki[];
-extern s32 marioAttackEvent_ZubaStar[];
-extern s32 weaponGetPowerDefault[];
-extern s32 weaponGetPowerFromMarioHammerLv[];
-extern s32 weaponGetPowerFromMarioJumpLv[];
-extern s32 weaponGetPowerOverlapHammer1[];
-extern s32 weaponGetPowerOverlapJump1[];
-extern s32 weaponGetPowerTatsumaki[];
-extern s32 weaponGetPower_Deka[];
-extern s32 weaponGetPower_Scissor[];
-extern s32 weaponGetPower_ZubaStar[];
 
 s32 marioDefaultWeapon_Jump[48];
 s32 marioWeapon_KururinJump[48];

@@ -14,3 +14,8 @@ typedef struct NpcAiInfo {
 	s32* returnEvent; //0x1C
 	s32* blowEvent; //0x20
 } NpcAiInfo;
+
+extern NpcTribeInfo npcTribe[];
+
+extern NpcAiInfo npc_ai_type_table[];
+extern NpcTerritoryInfo npc_define_territory_type[];

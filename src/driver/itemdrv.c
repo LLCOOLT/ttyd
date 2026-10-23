@@ -29,6 +29,8 @@
 #include "memory.h"
 #include "system.h"
 #include <string.h>
+#include "evt/evt_lecture.h"
+#include "libc_decls.h"
 
 inline Vec unknownVec0(void) {
     return (Vec){ 0.0f, 0.0f, 0.0f };
@@ -50,12 +52,9 @@ inline Vec makeVecByValue(f32 x, f32 y, f32 z) {
     return v;
 }
 
-extern int __float_nan[];
 static inline s32 item_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 item_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (item_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 
-extern GlobalWork* gp;
-extern int sprintf(char* str, const char* format, ...);
 extern ItemData itemDataTable[];
 void iconEntry(const char* name, u16 iconId);
 void iconChange(const char* name, u16 iconId);
@@ -68,7 +67,6 @@ u32 psndBGMChkSilent(s32 a1);
 BOOL psndBGMChk(s32 a1);
 BOOL psndBGMOff(u32 flags);
 s32 msgWindow_Entry(const char* msg, s32 a2, s32 a3);
-extern s32 all_juyoitem_lecture[];
 BOOL nokonoko_holdItem(void);
 BOOL N_fbatPreventMarioEventChk(void);
 s32 marioGetJabaraState(void);

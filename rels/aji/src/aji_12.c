@@ -9,6 +9,8 @@
 #include "driver/hitdrv.h"
 #include "stdio.h"
 #include "string.h"
+#include "evt/evt_bero.h"
+#include "aji.h"
 
 void mapGrpFlagOn(const char* name, u32 flags);
 void mapGrpFlagOff(const char* name, u32 flags);
@@ -35,8 +37,6 @@ USER_FUNC(evt_snd_set_rev_mode);
 static USER_FUNC(hikaru_off);
 static USER_FUNC(mario_chk);
 static USER_FUNC(thunder_main);
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
 
 __declspec(section ".data") u64 fd_aji_12_negone_one_374;
 __declspec(section ".data") s32 fd_aji_12_neg_one_382[1];

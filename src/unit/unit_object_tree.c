@@ -4,6 +4,7 @@
 #include "battle/battle_unit.h"
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_event_default.h"
 
 USER_FUNC(_rumble_tree);
 USER_FUNC(_turn_tree);
@@ -13,7 +14,6 @@ USER_FUNC(btlevtcmd_SetEventDamage);
 USER_FUNC(btlevtcmd_SetEventWait);
 USER_FUNC(btlevtcmd_SetMaxMoveCount);
 USER_FUNC(btlevtcmd_StartWaitEvent);
-extern s32 btldefaultevt_Confuse[];
 
 static BattleUnitKindPart parts[1];
 static s32 init_event[25];

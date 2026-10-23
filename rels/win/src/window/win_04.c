@@ -10,6 +10,8 @@
 #include "dolphin/mtx.h"
 #include "driver/fadedrv.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
+#include "win.h"
 
 typedef struct Flower { s16 state; s16 timer; f32 x; f32 y; f32 scale; f32 targetScale; s32 alpha; } Flower;
 typedef struct FlowerWork { s32 count; Flower* flowers; } FlowerWork;
@@ -101,13 +103,6 @@ USER_FUNC(ss_ch_set);
 static f32 randf(f32 min, f32 max);
 void flower_disp(CameraId camera, void* param);
 void mirror_ball(void* param);
-extern s32 all_party_lecture[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_win_door_close[];
-extern s32 evt_win_door_open[];
-extern s32 evt_win_door_open_pure[];
 
 __declspec(section ".data") u64 fd_win_04_negone_one_374;
 __declspec(section ".data") s32 fd_win_04_neg_one_382[1];

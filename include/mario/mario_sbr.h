@@ -1,8 +1,16 @@
 #pragma once
 
 #include <dolphin/types.h>
+#include "party.h"
 
 void marioSetBottomlessResetPosition(f32 x, f32 y, f32 z);
 f32 revise360(f32 angle);
 f32 toMovedir(f32 angle);
 void marioAdjustMoveDir(void);
+
+s32 N_marioGetMovementSpeed(void);
+void N_marioReloadMapOnBottomlessOn(void);
+void marioSetPeakYpos(void);
+f32 partyToMovedir(PartyEntry* party, f32 angle);
+f32 toMovedir2(f32 angle, f32 ofs);
+f32 toMovedirSimple(f32 angle);

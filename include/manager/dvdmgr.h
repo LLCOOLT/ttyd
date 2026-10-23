@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dolphin/dvd.h>
+#include "dolphin/os/OSThread.h"
 
 #define DVDEntryCount 0x100
 
@@ -38,3 +39,5 @@ void DVDMgrReadAsync(DVDEntry* entry, void* address, u32 size, s32 offset, DVDCa
 void DVDMgrClose(DVDEntry* entry);
 u32 DVDMgrGetLength(DVDEntry* entry);
 void DVDMgrSetupCallback(DVDMgrCallback callback);
+
+extern OSThread dvdmgr_thread;

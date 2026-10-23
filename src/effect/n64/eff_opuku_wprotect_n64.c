@@ -6,6 +6,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
+#include "eff/n64/eff_water_damage_n64.h"
 
 typedef struct effN64Vtx {
     s16 x, y, z;   // 0x0
@@ -25,7 +26,6 @@ u32 effTblRandN64(u32 rand, s32 index);
 void tri2();
 double sin(double);
 double cos(double);
-extern EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 
 typedef struct EffOpukuWprotectN64Work {
     s32 type;     // 0x0

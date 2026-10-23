@@ -15,6 +15,7 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
+#include "seq/seq_gameover.h"
 #undef mapPreLoad
 
 // sound.h pulls in math.h's sqrt localstatics (.rodata); use a minimal view instead
@@ -33,7 +34,6 @@ typedef struct GameOverWork {
 } GameOverWork;
 
 extern SoundWork sound;
-extern PaperSoundBGM psbgm[2];
 
 BOOL mapPreLoad(const char* map);
 void _relUnLoad(void);
@@ -65,7 +65,6 @@ USER_FUNC(evt_mario_adjust_dir);
 USER_FUNC(evt_cam_ctrl_onoff);
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_sub_get_language);
-extern s32 fall_gameover_es[];
 #endif
 
 static GameOverWork work;

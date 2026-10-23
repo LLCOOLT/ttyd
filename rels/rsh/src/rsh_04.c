@@ -4,6 +4,11 @@
 #pragma force_active on
 #include "mario/mario.h"
 #include "driver/npcdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_env.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "rsh.h"
 
 USER_FUNC(evt_bero_get_entername);
 USER_FUNC(evt_bero_get_info);
@@ -66,20 +71,6 @@ USER_FUNC(evt_party_trigflg_onoff);
 USER_FUNC(evt_mario_adjust_dir);
 USER_FUNC(evt_mario_get_dispdir);
 #endif
-extern s32 bero_case_entry[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_env_blur_on[];
-extern s32 evt_msg_repeat[];
-extern s32 evt_msg_toge[];
-extern s32 evt_npc_get_height[];
-extern s32 evt_npc_status_onoff[];
-extern s32 evt_rsh_04_rnd_npc_entry[];
-extern s32 evt_rsh_door_entry[];
-extern s32 evt_rsh_door_init[];
-extern s32 evt_rsh_moamoa_on_window[];
-extern s32 evt_rsh_window[];
 
 __declspec(section ".data") u64 fd_rsh_04_negone_one_374;
 __declspec(section ".data") s32 fd_rsh_04_neg_one_382[1];

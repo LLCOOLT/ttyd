@@ -6,6 +6,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
+#include "eff/n64/eff_kemuri4_n64.h"
 
 typedef struct EffFlowerN64Work {
     s32 type;     // 0x0
@@ -25,8 +26,6 @@ typedef struct EffFlowerN64Work {
     s32 swing;    // 0x40
     s32 texIdx;   // 0x44
 } EffFlowerN64Work;
-
-extern effN64Vtx flowers_v[];
 
 void effFlowerMain(EffectEntry* effect);
 void effFlowerDisp(CameraId cameraId, EffectEntry* effect);

@@ -5,25 +5,12 @@
 #include "data/mapdata.h"
 #include "memory.h"
 #include "string.h"
+#include "data/party_data.h"
+#include "jin.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 btl_jin_setup_no_tbl[];
-extern s32 btlsetup_jin_tbl[];
-extern s32 jin_00_init_evt[];
-extern s32 jin_01_init_evt[];
-extern s32 jin_02_init_evt[];
-extern s32 jin_03_init_evt[];
-extern s32 jin_04_init_evt[];
-extern s32 jin_05_init_evt[];
-extern s32 jin_06_init_evt[];
-extern s32 jin_07_init_evt[];
-extern s32 jin_08_init_evt[];
-extern s32 jin_09_init_evt[];
-extern s32 jin_10_init_evt[];
-extern s32 jin_11_init_evt[];
-extern char* partyPoseTbl[20][15];
 static void* pose_buf;
 
 void _unresolved(void);

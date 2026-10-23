@@ -4,6 +4,10 @@
 #pragma force_active on
 #include "battle/battle.h"
 #include "system.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
 
 USER_FUNC(btlevtcmd_AddPartsRotate);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -46,19 +50,6 @@ USER_FUNC(evt_sub_random);
 static USER_FUNC(hammer_bros_nagemakuri_set_target);
 static void hammer_bros_get_next_target(s32* unitIdx, s32* partIdx);
 static void hammer_bros_get_target(s32* unitIdx, s32* partIdx);
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_FaceDirectionSub[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetPartsPos[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_JumpPartsContinue[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_SetPartsPos[];
-extern s32 btlevtcmd_SetPartsRotate[];
-extern s32 btlevtcmd_SetPartsRotateOffset[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_hammer_bros_negone_one_374;
 __declspec(section ".data") s32 fd_hammer_bros_neg_one_382[1];

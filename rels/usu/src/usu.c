@@ -5,13 +5,12 @@
 #include "data/mapdata.h"
 #include "memory.h"
 #include "string.h"
+#include "data/party_data.h"
+#include "usu.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 usu_00_init_evt[];
-extern s32 usu_01_init_evt[];
-extern char* partyPoseTbl[20][15];
 static void* pose_buf;
 
 void _unresolved(void);

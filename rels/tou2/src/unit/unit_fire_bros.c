@@ -4,6 +4,10 @@
 #pragma force_active on
 #include "battle/battle.h"
 #include "system.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
 
 USER_FUNC(btlevtcmd_AddUnitWork);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -42,22 +46,6 @@ USER_FUNC(evt_sub_random);
 USER_FUNC(fire_bros_nagemakuri_set_target);
 void fire_bros_get_next_target(s32* unitIdx, s32* partIdx);
 void fire_bros_get_target(s32* unitIdx, s32* partIdx);
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AddPartsRotate[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetPartsPos[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_JumpPartsPosition[];
-extern s32 btlevtcmd_JumpPartsSetting[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_OnPartsAttribute[];
-extern s32 btlevtcmd_SetPartsPos[];
-extern s32 btlevtcmd_SetPartsRotate[];
-extern s32 btlevtcmd_SetPartsRotateOffset[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_fire_bros_negone_one_374;
 __declspec(section ".data") s32 fd_fire_bros_neg_one_382[1];

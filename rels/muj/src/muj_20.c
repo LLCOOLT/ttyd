@@ -18,6 +18,15 @@
 #include "driver/dispdrv.h"
 #include "manager/filemgr.h"
 #include "string.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_nannpc.h"
+#include "party/party_motion.h"
+#include "muj.h"
 
 NpcEntry* evtNpcNameToPtr(EventEntry* event, const char* name);
 typedef struct MarcoShip { f32 angle; f32 speed; f32 max; s32 stopped; s32 state; s32 field_0x14; OSTime time; } MarcoShip;
@@ -124,31 +133,8 @@ USER_FUNC(evt_set_fune_anim_rate);
 USER_FUNC(evt_map_anim_rate);
 USER_FUNC(marcoship_stop_wait_func);
 USER_FUNC(marcoship_stop_func);
-extern s32 evt_cam_shake[];
-extern s32 evt_eff[];
-extern s32 evt_eff_fukidashi[];
-extern s32 evt_fade_end_wait[];
-extern s32 evt_fade_entry[];
-extern s32 evt_mario_set_dir[];
-extern s32 evt_mario_set_pose[];
-extern s32 evt_msg_close[];
-extern s32 evt_msg_print[];
-extern s32 evt_msg_print_add[];
-extern s32 evt_msg_repeat[];
-extern s32 evt_msg_toge[];
-extern s32 evt_npc_glide_position[];
-extern s32 evt_npc_jump_position_nohit[];
-extern s32 evt_npc_move_position[];
-extern s32 evt_npc_set_color[];
 extern s32 evt_npc_set_run_anim[];
 extern s32 evt_npc_set_stay_anim[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_snd_bgmoff[];
-extern s32 evt_snd_bgmon_f[];
-extern s32 evt_snd_envoff[];
-extern s32 muj_npc_guruguru[];
-extern s32 muj_ship_puka[];
-extern s32 nannpc_ext_main_sub_fast[];
 
 __declspec(section ".data") u64 fd_muj_20_negone_one_374;
 __declspec(section ".data") s32 fd_muj_20_neg_one_382[1];
@@ -1809,7 +1795,6 @@ static void pressStartGX(LogoWork* wp, s32 alpha, f32 x, f32 y) {
     GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 }
 
-extern void winTexSetNearest(u32 textureId, Vec translate, Vec scale, GXColor color);
 static void draw(CameraId camera, void* param) {
     LogoWork* wp = param;
     CameraEntry saved;

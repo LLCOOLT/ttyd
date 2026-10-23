@@ -22,6 +22,12 @@
 #include "memory.h"
 #include "mario/mariost.h"
 #include "driver/hitdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_party.h"
+#include "evt/evt_sub.h"
+#include "tou2.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_mario_balloon_off);
 USER_FUNC(evt_mario_balloon_tenten);
@@ -246,17 +252,6 @@ void __tou_srand(u32 seed);
 static void pose_change(Kyaku* kyaku, const char* name, const char* anim);
 static void pose_main(void);
 static void pose_init(void);
-extern s32 bero_case_entry[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_close_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_msg_continue[];
-extern s32 evt_npc_get_height[];
-extern s32 evt_npc_sound_data_reset[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_party_set_dir_npc[];
-extern s32 evt_sub_starstone[];
-extern s32 evt_tou_get_fighter_tribe[];
 
 __declspec(section ".data") u64 fd_tou_03_negone_one_374;
 __declspec(section ".data") s32 fd_tou_03_neg_one_382[1];

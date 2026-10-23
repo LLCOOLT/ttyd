@@ -1,5 +1,8 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_item.h"
+#include "evt/evt_npc.h"
 
 #pragma force_active on
 
@@ -97,14 +100,6 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_save_playtime);
 void gans_msg_callback(s32 type, void** work);
-extern s32 bero_case_switch_on[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_item_delete[];
-extern s32 evt_npc_jump_position_nohit[];
-extern s32 evt_npc_sound_data_reset[];
-extern s32 evt_npc_sound_data_set[];
 extern s32 evt_pouch_add_coin[];
 
 __declspec(section ".data") u64 fd_tou_05_negone_one_374;

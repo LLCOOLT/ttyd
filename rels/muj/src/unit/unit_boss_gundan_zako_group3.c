@@ -9,6 +9,13 @@
 #include "battle/battle_stage_object.h"
 #include "system.h"
 #include "dolphin/mtx.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 
 typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; Vec ofs; Vec rot; } ZakoGun;
 typedef struct ZakoGunWork { s32 flag; s32 targetId;
@@ -55,43 +62,6 @@ USER_FUNC(zakogun_attack3_1);
 void zakogun_ext_main3(void);
 USER_FUNC(zakogun_ext_init3);
 USER_FUNC(zakogun_kanbu_on_ball);
-extern s32 _add_star_point_disp_offset[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckActStatus[];
-extern s32 btlevtcmd_CheckDamageCode[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_FaceDirectionSub[];
-extern s32 btlevtcmd_GetCoin[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetExp[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetSelectEnemy[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_ResetFaceDirection[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_StoreCoin[];
-extern s32 btlevtcmd_StoreExp[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_eff[];
-extern s32 evt_snd_sfxoff[];
-extern s32 evt_snd_sfxon[];
-extern s32 evt_sub_random[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 extern s32 zakogun_get_kanbu_id_evtcmd[];
 
 __declspec(section ".data") u64 negone_one$374;

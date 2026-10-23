@@ -5,6 +5,10 @@
 #include <dolphin/os.h>
 #include <dolphin/vi.h>
 #include <string.h>
+#include "sdk/DEMOPad.h"
+#include "system.h"
+#include "sdk_decls.h"
+#include "libc_decls.h"
 
 char __GXErrorMessage[0x400];
 static GXRenderModeObj rmodeobj;
@@ -17,19 +21,11 @@ static GXRenderModeObj* rmode;
 static vu32 FrameCount;
 static u32 FrameMissThreshold;
 static BOOL GPHangWorkaround = FALSE;
-extern u8 DemoStatEnable;
 static GXBool DemoFirstFrame = GX_TRUE;
 
 
 static const char demo_file[] = "DEMOInit.c";
 static const char demo_msg[] = "DEMOInit: invalid TV format\n";
-
-extern void DEMOPadInit(void); //easier to declare this way
-extern void DEMOUpdateStats(GXBool inc);
-extern void DEMOPrintStats(void);
-
-extern u16 sysGetToken(void);
-extern int sprintf(char* str, const char* format, ...);
 
 //internal, inline
 static inline void __DEMOInitRenderMode(GXRenderModeObj* mode);

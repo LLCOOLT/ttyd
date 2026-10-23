@@ -9,9 +9,9 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
-extern double sin(double);
-extern double cos(double);
 extern double __fabs(double);
 extern void* shadowEntry();
 extern void U_shadowSetMode();

@@ -5,20 +5,12 @@
 #include "data/mapdata.h"
 #include "memory.h"
 #include "string.h"
+#include "data/party_data.h"
+#include "gra.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 btl_gra_setup_no_tbl[];
-extern s32 btlsetup_gra_tbl[];
-extern s32 gra_00_init_evt[];
-extern s32 gra_01_init_evt[];
-extern s32 gra_02_init_evt[];
-extern s32 gra_03_init_evt[];
-extern s32 gra_04_init_evt[];
-extern s32 gra_05_init_evt[];
-extern s32 gra_06_init_evt[];
-extern char* partyPoseTbl[20][15];
 static void* pose_buf;
 
 void _unresolved(void);

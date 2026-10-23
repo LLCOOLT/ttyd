@@ -7,6 +7,11 @@
 #include "battle/battle_sub.h"
 #include "driver/effdrv.h"
 #include "manager/evtmgr_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_sub.h"
 
 EffectEntry* effStardustEntry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 width, f32 height, s32 time);
 EffectEntry* effMagic1N64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5, f32 arg6, f32 arg7);
@@ -63,38 +68,6 @@ USER_FUNC(eff_magic_support);
 static USER_FUNC(eff_magic_get_posX);
 static USER_FUNC(eff_magic);
 static USER_FUNC(eff_staff);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AddUnitWork[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_CheckActStatus[];
-extern s32 btlevtcmd_CheckPhase[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_OffAttribute[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_OnAttribute[];
-extern s32 btlevtcmd_OnPartsAttribute[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_SetAlpha[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetPartsPos[];
-extern s32 btlevtcmd_SetPos[];
-extern s32 btlevtcmd_SetStayPoseType[];
-extern s32 btlevtcmd_SetTalkPoseType[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_sub_intpl_get_value_para[];
-extern s32 evt_sub_intpl_init[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 subsetevt_dead_core_nospin_norotate[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_kamec_obaba_negone_one_374;
 __declspec(section ".data") s32 fd_boss_kamec_obaba_neg_one_382[1];

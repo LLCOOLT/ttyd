@@ -17,11 +17,15 @@
 #include <dolphin/mtx.h>
 #include <string.h>
 #include "version.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/sac/sac_common.h"
+#include "evt/evt_eff.h"
+#include "party/party_motion.h"
+#include "battle/sac/sac_genki.h"
 // US battle texture ids are 0x16 higher for these entries.
 #define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
 
-
-extern BattleWork* _battleWorkPointer;
 
 typedef struct GenkiEffWork {
     u8 pad0[8];
@@ -1196,43 +1200,8 @@ static void disp_3D_alpha(CameraId cam, void* param) {
 #pragma dont_inline reset
 
 static USER_FUNC(start_game);
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_CheckStatus[];
-extern s32 btlevtcmd_CommandPayWeaponCost[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetUnitId[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_OnOffStatus[];
-extern s32 btlevtcmd_RecoverFp[];
-extern s32 btlevtcmd_RecoverHp[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_StartWaitEvent[];
-extern s32 btlevtcmd_reset_move_color_lv_all[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_btl_camera_set_zoomSpeedLv[];
-extern s32 evt_eff[];
-extern s32 evt_snd_sfxoff[];
-extern s32 evt_snd_sfxon[];
-extern s32 sac_ac_help_off[];
-extern s32 sac_ac_help_on[];
-extern s32 sac_enemy_slide_go[];
-extern s32 sac_enemy_slide_return[];
-extern s32 sac_mario_item_on_end_evt[];
-extern s32 sac_mario_item_on_evt[];
-extern s32 sac_start_camera_evt[];
-extern s32 sac_start_stardust[];
-extern s32 sac_wao[];
 
 
-extern s32 genki_evt_common[];
-extern s32 status_recover_evt[];
 static GenkiWork* get_ptr(void);
 s32 marioAttackEvent_Genki0[] = {
     131122, -29999985, 0, 65630, (s32)genki_evt_common, 2, 1,

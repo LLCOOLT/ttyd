@@ -15,8 +15,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern GlobalWork* gp;
-
 typedef struct TelopWork {
 	s32 id;
 	s32 alpha;

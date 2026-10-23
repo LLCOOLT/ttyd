@@ -5,6 +5,13 @@
 #pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_sub.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_AnimeChangePoseType);
@@ -27,53 +34,7 @@ static USER_FUNC(_check_zenei_kouei);
 extern s32 R_defence_attr_turn[];
 extern s32 R_defence_turn[];
 extern s32 R_regist_turn[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AnimeSetPoseTable[];
-extern s32 btlevtcmd_AnimeWaitPlayComplete[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_EnemyItemUseCheck[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetUnitId[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_OffAttribute[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetHitCursorOffset[];
-extern s32 btlevtcmd_SetHitOffset[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetHpGaugeOffset[];
-extern s32 btlevtcmd_SetPartsDefenceAttrTable[];
-extern s32 btlevtcmd_SetPartsDefenceTable[];
-extern s32 btlevtcmd_SetPos[];
-extern s32 btlevtcmd_SetRegistStatus[];
-extern s32 btlevtcmd_SetStatusIconOffset[];
-extern s32 btlevtcmd_SetUnitWork[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_StatusWindowOnOff[];
-extern s32 btlevtcmd_TransStageFloorPosition[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_ftof[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_msg_continue[];
-extern s32 evt_msg_print[];
-extern s32 evt_msg_select[];
-extern s32 evt_msg_toge[];
-extern s32 evt_sub_random[];
 extern s32 gesso_pose_table_turn[];
-extern s32 subsetevt_damage[];
-extern s32 subsetevt_dead[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_gesso_right_arm_negone_one_374;
 __declspec(section ".data") s32 fd_boss_gesso_right_arm_neg_one_382[1];

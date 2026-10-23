@@ -7,10 +7,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
+#include "gxsub.h"
+#include "driver/animdrv.h"
 
-extern GlobalWork* gp;
-extern f32 queen_uv[];
-extern u32 anim_ext_tex_size;
 void animPoseDisp_MakeExtTexture(const char* group, const char* anim, f32 frame, f32 scale, GXTexObj* obj, void*** image, s32* x0, s32* y0, s32* x1, s32* y1);
 void effGetTexObjN64(u32 id, GXTexObj* obj);
 void qqsort(void* array, u32 num, u32 size, s32 (*compare)(const void*, const void*));

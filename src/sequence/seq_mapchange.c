@@ -20,9 +20,7 @@
 #include "pmario_sound.h"
 #include <stdio.h>
 #include <string.h>
-
-extern BadgeShopWork* bdsw;
-extern BOOL dbg_lotteryinfo; // evt_lottery
+#include "evt/evt_lottery.h"
 
 //.sbss
 char _next_area[0x20];
@@ -55,7 +53,6 @@ BOOL npcWaitAllInitEvtEnd(void);
 void npcExecAllReglEvt(void);
 void statusWinForceUpdate(void);
 void camRoadMain(void* out, f32 x0, f32 y0, f32 z0, f32 x1, f32 y1, f32 z1, f32 w);
-extern GXColor mapchange_zero_color;
 double cos(double);
 double sin(double);
 

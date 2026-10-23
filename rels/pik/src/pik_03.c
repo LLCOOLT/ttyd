@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
 
 #pragma force_active on
 
@@ -29,9 +31,6 @@ USER_FUNC(evt_snd_bgmoff_f);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
-extern s32 bero_case_entry[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_starstone[];
 
 __declspec(section ".data") u64 fd_pik_03_negone_one_374;
 __declspec(section ".data") s32 fd_pik_03_neg_one_382[1];

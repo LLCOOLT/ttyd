@@ -27,7 +27,6 @@
 #include "icon_ids.h"
 
 extern ItemData itemDataTable[];
-extern GlobalWork* gp;
 
 void mapObjGetPos(const char* name, Vec* pos);
 void mapObjFlagOn(const char* name, u32 flags);
@@ -40,9 +39,6 @@ BOOL N_itemPickUpFromFieldCheck(void);
 void statusWinForceUpdateCoin(void);
 void FontDrawScale(f32 scale);
 s16 johoya_get(u8* table, s16 id);
-extern BadgeShopWork* bdsw;
-extern s32 badge_bottakuru100_table[];
-extern InformantWork _jdt;
 s32 marioKeyOn(void);
 
 typedef struct UnitWinEntry {

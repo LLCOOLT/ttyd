@@ -13,6 +13,9 @@
 #include "memory.h"
 #include "driver/dispdrv.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_npc.h"
 
 typedef struct GonbabaProj { GXTexObj obj; smartEntry* tex; } GonbabaProj;
 void mapSetProjTexObj(GXTexObj* obj, smartEntry* tex);
@@ -140,11 +143,6 @@ USER_FUNC(shake_reset);
 USER_FUNC(hei_00_mario_keyoff_check);
 USER_FUNC(cam_test2);
 void make_gonbaba_projection(CameraId camera, void* param);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_tree_access_entry[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_hei_00_negone_one_374;
 __declspec(section ".data") s32 fd_hei_00_neg_one_382[1];

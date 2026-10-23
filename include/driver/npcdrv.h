@@ -298,3 +298,10 @@ void npcSetBattleInfo(NpcEntry* npc, s32 battleInfoId);
 void fbatChangeMode(s16 mode);
 
 NpcTerritoryType dbGetDefData(NpcTerritoryInfo* info, const char* description);
+
+BOOL N_fbatPreventMarioEventChk(void);
+
+extern s32 evt_majinai_effect_se_btl[];
+void fbatSandersBombTriggerOn(void);
+
+extern s32 _evt_majinai_coin_up_effect[];

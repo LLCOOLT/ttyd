@@ -13,13 +13,10 @@
 #include <string.h>
 #include "driver/camdrv.h"
 #include "manager/filemgr.h"
+#include "libc_decls.h"
 
 #define TESTHEAP_SIZE (u32)(1.5 * 1024 * 1024)
 #define PI 3.14159265358979323846264338327950288419716939937510f
-
-extern GlobalWork* gp;
-extern int sprintf(char* str, const char* format, ...);
-extern double tan(double arg);
 
 //.data
 u8 _vivihimoData[0xC00] ATTRIBUTE_ALIGN(32) = {  // G5: target .data is 32-aligned
@@ -391,9 +388,7 @@ int strcmp(const char *s1, const char *s2);
 void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f32 scale);
 void animPose_AllocBuffer(AnimationPose* pose);
 void animSetMaterial_Texture(s32 texCount, s32 *texIdRemap, AnimPoseTexEntry *pTexEntries, AnimTexMtx *animEntries, s32 texBindsCapacity, AnimTexBind *texBinds, AnimationTextureFile *texFile);
-extern double atan2(double y, double x);
 void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 arg3, f32 arg4);
-extern BOOL mapTestXLU(u32 flags, GXColor* color, GXColor* matColor);
 void materialProc(s32 shapeId, s32 xluStage);
 void vivihimo(Mtx a, Mtx b, f32 speed, f32 scale, f32 offA, f32 offB);
 void animInit(void) {
@@ -1033,7 +1028,6 @@ GXColor animPoseGetMaterialEvtColor(s32 poseId) {
     return pose->materialColor;
 }
 
-extern double atan2(double y, double x);
 #define APM_U(p, o) (*(u32*)((u8*)(p) + (o)))
 #define APM_S(p, o) (*(s32*)((u8*)(p) + (o)))
 #define APM_F(p, o) (*(f32*)((u8*)(p) + (o)))
@@ -2374,8 +2368,6 @@ void animPoseDraw(s32 poseId, f32 x, f32 y, f32 z, f32 rotY, f32 scale, s32 xluM
 }
 
 // _animPoseDrawMtx
-extern BOOL mapTestXLU(u32 flags, GXColor* color, GXColor* matColor);
-extern double atan2(double y, double x);
 void animPoseMainSub(AnimationPose* pose);
 
 static inline f32 _animClampAngle(f32 a) {

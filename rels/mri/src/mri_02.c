@@ -4,6 +4,9 @@
 #pragma force_active on
 #include "pmario_sound.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "mri.h"
 
 typedef struct Mri02Switch { f32 base; f32 weight; f32 target; f32 pos; } Mri02Switch;
 Mri02Switch mri02switch;
@@ -51,16 +54,6 @@ USER_FUNC(getSwitch);
 USER_FUNC(moveSwitch);
 USER_FUNC(setPuniWeight);
 f32 getMri02Yuka(void);
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 mri_countdown[];
-extern s32 mri_hikari_color[];
-extern s32 mri_puni_init[];
-extern s32 mri_punipuni_itemremove[];
-extern s32 mri_punipuni_itemselect[];
-extern s32 mri_punipuni_itemset[];
-extern s32 mri_punipuni_setup[];
-extern s32 puni_disp_info[];
 
 __declspec(section ".data") u64 fd_mri_02_negone_one_374;
 __declspec(section ".data") s32 fd_mri_02_neg_one_382[1];

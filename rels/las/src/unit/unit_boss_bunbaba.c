@@ -3,6 +3,13 @@
 
 #pragma force_active on
 #include "manager/evtmgr_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_map.h"
+#include "party/party_motion.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -45,40 +52,6 @@ USER_FUNC(evt_msg_print);
 USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_snd_sfxon_3d);
 static USER_FUNC(_leg_smoke_effect);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetExp[];
-extern s32 btlevtcmd_GetHomePos[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetStageAudienceAreaSize[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetPos[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_SetStayPose[];
-extern s32 btlevtcmd_SetTalkPose[];
-extern s32 btlevtcmd_StoreExp[];
-extern s32 btlevtcmd_WaitAttackEnd[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 btlevtcmd_snd_se_offset[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_moveto[];
-extern s32 evt_btl_camera_set_prilimit[];
-extern s32 evt_btl_camera_wait_move_end[];
-extern s32 evt_eff[];
-extern s32 evt_map_replayanim[];
-extern s32 evt_snd_sfxoff[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_bunbaba_negone_one_374;
 __declspec(section ".data") s32 fd_boss_bunbaba_neg_one_382[1];

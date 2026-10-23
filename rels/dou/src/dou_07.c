@@ -4,6 +4,9 @@
 #pragma force_active on
 #include "driver/mobjdrv.h"
 #include "driver/animdrv.h"
+#include "evt/evt_bero.h"
+#include "npc_event.h"
+#include "dou.h"
 
 static USER_FUNC(bgm_start_wait);
 USER_FUNC(evt_bero_get_info);
@@ -69,15 +72,6 @@ USER_FUNC(evt_win_item_select);
 USER_FUNC(lect_cam_load);
 USER_FUNC(lect_cam_save);
 static void majin_callback(s32 type);
-extern s32 bubble_find_event[];
-extern s32 bubble_init_event[];
-extern s32 bubble_lost_event[];
-extern s32 bubble_move_event[];
-extern s32 bubble_return_event[];
-extern s32 enemy_event_dead_event[];
-extern s32 evt_bero_info_run[];
-extern s32 ship_majin_lecture[];
-extern s32 ship_majin_lecture_init[];
 
 __declspec(section ".data") u64 fd_dou_07_negone_one_374;
 __declspec(section ".data") s32 fd_dou_07_neg_one_382[1];

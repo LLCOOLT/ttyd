@@ -8,6 +8,11 @@
 #include "manager/evtmgr_cmd.h"
 #include "party.h"
 #include "system.h"
+#include "party/party_move.h"
+#include "party/party_nokonoko.h"
+#include "party/party_yoshi.h"
+#include "party/party_vivian.h"
+#include "mario/mario_sbr.h"
 
 #define PF(p, off) (*(f32*)((u8*)(p) + (off)))
 #define PS(p, off) (*(s32*)((u8*)(p) + (off)))
@@ -15,37 +20,24 @@
 #define GETPARTY(args) partyGetPtr((args)[0] == 0 ? partyCtrlNo : 1)
 #define PARTY_ID(args) ((args)[0] == 0 ? partyCtrlNo : 1)
 
-extern s32 partyCtrlNo;
-extern f32 revise360(f32);
-extern f32 toMovedirSimple(f32);
 extern void partyChgRunMode(PartyEntry* party, s32 mode);
-extern void partyChgMot(PartyEntry* party, s32 mot);
 extern void partyChgPose();
 extern void partyChgPoseId();
 extern void partySetForceMove(PartyEntry* party, s32 a2, f32 a3, f32 a4);
 extern void partyMoveBesideMario();
 extern void partyMoveBehindMario();
-extern void partyRun(PartyEntry* party);
-extern void partyStop(PartyEntry* party);
 extern void partySetCamId();
-extern void partyInitCamId(PartyEntry* party);
-extern void partyClearFootmark(void);
 extern void* partySearchGround();
 extern void* partyHitCheck();
 extern void* searchUnder2();
-extern void partyRestoreRunMode(PartyEntry* party);
 extern s32 nokonokoGetStatus();
-extern void nokotaro_hold_cancel(PartyEntry* party);
-extern s32 yoshiGetStatus();
 extern s32 bomheiGetStatus();
-extern s32 vivianGetStatus();
 extern void vivianUnhold(PartyEntry* party);
 extern void L_partyVivianTailStart();
 extern void L_partyVivianTailStop();
 extern void marioGetoffYoshi();
 extern void evt_set_yoshi_spd();
 extern void evt_set_yoshi_frm();
-extern s32 evt_get_yoshi_frm();
 extern s32 cloudGetStatus();
 
 USER_FUNC(evt_party_flg_onoff) {

@@ -16,6 +16,8 @@
 #include "string.h"
 #include "memory.h"
 #include "stdio.h"
+#include "evt/evt_bero.h"
+#include "las.h"
 
 USER_FUNC(evt_img_alloc_capture);
 typedef struct CloudWork { s32 used; s32 state; char animName[0x20]; char imgName[0x20]; char offscreenName[0x20]; char groupNames[8][0x20]; char hitName[0x20]; s32 limit; s32 counter; EventEntry* evt; void* endEvt; s32 timer; s32 x; s32 y; s32 w; s32 h; f32 lastFrame; } CloudWork;
@@ -27,7 +29,6 @@ static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
 static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
 static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
-extern s32 evt_cloud_main_evt[];
 
 USER_FUNC(evt_bero_get_info);
 static USER_FUNC(evt_cloud_main);
@@ -53,7 +54,6 @@ static void _mapclsofs_all(CloudWork* wp);
 static void _mapsetofs_all(CloudWork* wp);
 static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
 static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_las_14_negone_one_374;
 __declspec(section ".data") s32 fd_las_14_neg_one_382[1];

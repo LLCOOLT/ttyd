@@ -3,6 +3,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "memory.h"
+#include "sdk/texPalette.h"
 
 typedef struct WindowEntry WindowEntry;
 
@@ -55,3 +56,8 @@ void windowDispGX2_Waku_col(Mtx mtx, u16 gxTexMapID, GXColor color, f32 x, f32 y
 s32 windowCheckID(s32 id);
 WindowEntry* windowGetPointer(s32 id);
 GXTexObj* getWakuTexObj(s32 id);
+
+extern GXTexObj* wakuTexObj;
+
+extern BOOL tpl_loaded;
+extern TEXPalette* winTpl;

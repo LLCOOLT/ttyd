@@ -6,6 +6,7 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "eff/n64/eff_sunlight_n64.h"
 
 double sin(double);
 
@@ -20,8 +21,6 @@ typedef struct EffSunlightN64Work {
     s32 alpha;     // 0x38
     s32 alphaMax;  // 0x3C
 } EffSunlightN64Work;
-
-extern effN64Vtx testsrc__s_v[];
 
 void effSunlightMain(EffectEntry* effect);
 void effSunlightDisp(CameraId cameraId, EffectEntry* effect);

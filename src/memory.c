@@ -5,6 +5,7 @@
 #include "system.h"
 #include <dolphin/os.h>
 #include <string.h>
+#include "manager/dvdmgr.h"
 
 //HEAP_MALLOC block is a series of these nodes
 typedef struct MapAllocEntry MapAllocEntry;
@@ -81,7 +82,6 @@ u32 count;
 
 //local prototypes
 void smartGarbage(void);
-extern OSThread dvdmgr_thread;
 
 void memInit(void) { //almost 1:1, stubborn regalloc at the end
     MapAllocEntry* entry;

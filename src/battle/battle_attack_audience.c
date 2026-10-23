@@ -17,19 +17,16 @@ void evtMsgFmtStr(char* dst, const char* src);
 #include "manager/fontmgr.h"
 #include "mario/mario_pouch.h"
 #include "pmario_sound.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_attack_audience.h"
+#include "libc_decls.h"
 
 #pragma optimize_for_size on
 
-extern BattleWork* _battleWorkPointer;
 extern ItemData itemDataTable[];
-extern int sprintf(char* str, const char* format, ...);
 extern void* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z);
 extern void itemDelete(const char* name);
 extern void psndSFX_pit(s32 id, s32 pitch);
-extern s32 BattleAudience_GetPresentItemType(void);
-extern s32 BattleAudience_GetPresentItemNo(void);
-extern s32 BattleAudience_GetPresentTargetUnitId(void);
-extern void BattleAudience_SetPresentItemNo(s32 no);
 
 USER_FUNC(_damage);
 USER_FUNC(_delete_present_item);
@@ -38,15 +35,6 @@ USER_FUNC(_get_present_target_id);
 USER_FUNC(_get_present_item);
 USER_FUNC(_attack_aud);
 USER_FUNC(_get_attack_aud_no);
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetUnitId[];
-extern s32 btlevtcmd_StartWaitEvent[];
-extern s32 btlevtcmd_StopWaitEvent[];
-extern s32 btlevtcmd_WaitEventEnd[];
-
-extern s32 btlataudevtPresentItem_Damage[];
-extern s32 btlataudevtPresentItem_Get[];
 
 s32 _get_attack_aud_no(EventEntry* event, BOOL isFirstCall) {
     s32* args = event->args;

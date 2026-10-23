@@ -31,8 +31,6 @@ s32 BtlUnit_EnemyItemCanUseCheck(s32 item);
 #define PART_POSETYPE(p) ((p)->poseType)
 #define PART_POSETIMER(p) ((p)->poseTimer)
 
-extern BattleWork* _battleWorkPointer;
-
 //.sdata
 s32 _status_pose_table[] = {
 	STATUS_INSTANT_KILL,

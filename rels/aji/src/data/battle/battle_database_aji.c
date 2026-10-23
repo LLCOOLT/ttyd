@@ -3,27 +3,14 @@
 
 #pragma force_active on
 #include "battle/battle_stage_object.h"
+#include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
+#include "aji.h"
 
 static USER_FUNC(_space_rotate);
-extern s32 battle_flower_drop_param_default[];
-extern s32 battle_flower_drop_param_default3[];
-extern s32 battle_heart_drop_param_default[];
-extern s32 battle_heart_drop_param_default3[];
-extern s32 battle_item_barriern[];
-extern s32 battle_item_barriern_custom[];
-extern s32 battle_item_barriern_z[];
-extern s32 battle_item_default_param_list[];
-extern s32 battle_item_gundan_zako[];
-extern s32 battle_item_gundan_zako_elite[];
-extern s32 battle_item_gundan_zako_magician[];
 extern s32 unit_barriern[];
 extern s32 unit_barriern_custom[];
 extern s32 unit_barriern_z[];
-extern s32 unit_boss_magnum_battender_mkII[];
-extern s32 unit_gundan_zako[];
-extern s32 unit_gundan_zako_elite[];
-extern s32 unit_gundan_zako_magician[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_aji_negone_one_374;
 __declspec(section ".data") s32 fd_battle_database_aji_neg_one_382[1];

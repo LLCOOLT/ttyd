@@ -10,6 +10,7 @@
 #include "driver/camdrv.h"
 #include "driver/lightdrv.h"
 #include "driver/shadowdrv.h"
+#include "gxsub.h"
 double sin(double);
 double cos(double);
 static inline f32 sinf(f32 x) { return sin(x); }
@@ -60,8 +61,6 @@ void mapDispMapObj(CameraId cam, MapObject* obj);
 void mapDispMapObj_bbox(CameraId cam, MapObject* obj);
 void mapDispMapObj_off(CameraId cam, MapObject* obj);
 void bmapUnLoad(void);
-extern f32 queen_uv[]; //gxsub.c
-extern GlobalWork* gp;
 extern int sprintf(char* str, const char* format, ...);
 
 #define TWO_PI 6.28318530717958647692528676655900576839433879875021f
@@ -115,8 +114,6 @@ LightEntry* lightGetCharaAmbient(void);
 void mapGetJointsSub(MapFileJoint* joint, s32* numJoints);
 s32 lightCheckCharaLight(void);
 #define lightGetNearObj(pos, out, count, flags) ((s32 (*)(Vec*, LightEntry**, s32, LightEntryFlags))lightGetNearObj)(pos, out, count, flags)
-
-extern s32 fog_type[5];
 
 //local prototypes
 void mapGetJointsSub(MapFileJoint* joint, s32* numJoints);
@@ -1825,7 +1822,6 @@ void _mapDispMapGrp_NoMaterial(CameraId cam, MapObject* obj);
 void _mapDispMapGrp_NoMaterial(CameraId cam, MapObject* obj);
 void mapSetPolygon(MapObject* obj, MapFileMesh* mesh);
 void mapSetPolygon(MapObject* obj, MapFileMesh* mesh);
-extern const GXCullMode culling[4];
 void mapSetMaterialLastStageBlend(s32 flags, GXColor color1, GXColor color2);
 void mapSetTextureMatrix(MapMaterial* mat);
 void mapSetTextureMatrix(struct MapMaterial* mat);

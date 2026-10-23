@@ -1,5 +1,8 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "mri.h"
 
 #pragma force_active on
 
@@ -18,12 +21,6 @@ USER_FUNC(evt_puni_set_yuka);
 USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 mri_countdown[];
-extern s32 mri_puni_init[];
-extern s32 puni_disp_info[];
-extern s32 puni_piders_check[];
 
 __declspec(section ".data") u64 fd_mri_19_negone_one_374;
 __declspec(section ".data") s32 fd_mri_19_neg_one_382[1];

@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "aji.h"
 
 #pragma force_active on
 
@@ -39,9 +41,6 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_telop_entry);
-extern s32 bero_case_switch_off[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
 
 __declspec(section ".data") u64 fd_aji_00_negone_one_374;
 __declspec(section ".data") s32 fd_aji_00_neg_one_382[1];

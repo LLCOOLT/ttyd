@@ -22,7 +22,11 @@
 #include "driver/punidrv.h"
 #include "driver/mapdrv.h"
 #include <dolphin/gx.h>
-extern int rand(void);
+#include "evt/evt_shop.h"
+#include "system.h"
+#include "mri.h"
+#include "libc_decls.h"
+#include "eff/eff_magic1_n64.h"
 void PuniDokuritsu(PuniData* p);
 void puniHagurePos(PuniData* p);
 void puniMapdata_MRI_06_getidx(f32 x, f32 z, s32* bx, s32* bz);
@@ -521,7 +525,6 @@ void _ymode_mri_16_01(PuniData* p) {
 }
 
 #define AC(p, x0, x1, z0, z1) (_aok = 1, _ax = (p)->pos.x, _az = (p)->pos.z, ((x0) > _ax ? _aok = 0 : 0), ((x1) < _ax ? _aok = 0 : 0), ((z0) > _az ? _aok = 0 : 0), ((z1) < _az ? _aok = 0 : 0), _aok)
-extern f32 getMri02Yuka(void);
 //(x0,x1,z0,z1) (ok = 1, (p->pos.x < (x0) ? ok = 0 : 0), (p->pos.x > (x1) ? ok = 0 : 0), (p->pos.z < (z0) ? ok = 0 : 0), (p->pos.z > (z1) ? ok = 0 : 0), ok)
 void puniSetYPosition(PuniData* p) {
     if (p->unk4 & 1) {
@@ -3406,7 +3409,6 @@ void puniModeWonder(PuniData* p) {
     }
 }
 
-extern double sin(double);
 static inline void puniMoveHitLimitedInl(PuniData* p, Vec* s2, Vec* d2, f32 dist) {
     Vec pa;
     Vec hit;
@@ -3523,7 +3525,6 @@ void puniModeFunbari(PuniData* p) {
     }
 }
 
-extern f32 intplGetValue(s32 mode, s32 currStep, s32 steps, f32 start, f32 end);
 void puniModeWater(PuniData* p) {
     Vec d;
     switch (p->unk114) {
@@ -5183,10 +5184,6 @@ USER_FUNC(evt_puni_set_hamari) {
 }
 
 #define puniMapDataSetI(w_, h_, src_, x_, z_)     do {         s32 w = (w_);         s32 h = (h_);                  Punimap->x = (x_);         Punimap->z = (z_);         if ((src_) == NULL) {             Punimap->enabled = 0;         } else {             Punimap->width = w;             Punimap->height = h;             Punimap->enabled = 1;             Punimap->src = (src_);             Punimap->unk1C = 0;             Punimap->size = h * (w * 4);             Punimap->data = _mapAlloc(Punimap->size);             memcpy(Punimap->src, (src_), Punimap->size);         }     } while (0)
-extern u8 puniMapdata_MRI_06[];
-extern u8 puniMapdata_MRI_09[];
-extern u8 puniMapdata_MRI_09_01[];
-extern u8 puniMapdata_MRI_16[];
 
 USER_FUNC(evt_puni_set_maze) {
     switch (Punigp->mapKind) {
@@ -5355,7 +5352,6 @@ USER_FUNC(evt_puni_wait_systemmode) {
     return Punigp->systemMode != mode ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
-extern int sprintf(char*, const char*, ...);
 static inline void puni_swget_idx(s32 idx, s32* val, Vec* pos) {
     s32 off;
     u8 b6, b5, b4, b3, b2, b1, b0;
@@ -6108,9 +6104,6 @@ typedef struct PuniMoveView {
     Vec a;
     Vec b;
 } PuniMoveView;
-extern f32 intplGetValue(s32 mode, s32 currStep, s32 steps, f32 start, f32 end);
-extern f32 sysFrame2SecFloat(f32 frame);
-extern f32 sysMsec2FrameFloat(f32 msec);
 USER_FUNC(evt_puni_move_position) {
     s32* args = event->args;
     PuniData* p = &Punidat[evtGetValue(event, args[0])];
@@ -6686,7 +6679,6 @@ USER_FUNC(puni_disp_info_kassencheck) {
     return EVT_RETURN_DONE;
 }
 
-extern BOOL evtShopIsActive(void);
 void puniCountDisp(s32 unused, s32 packed) {
     Mtx m;
     GXColor c1 = {0xFF, 0xFF, 0xFF, 0x99};
@@ -6776,11 +6768,6 @@ USER_FUNC(evt_npc_set_tribe);
 USER_FUNC(evt_sub_get_mapname);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
-extern s32 mri_puni_init_dvd[];
-extern s32 mri_puni_main[];
-extern s32 mri_puni_position_init[];
-extern s32 mri_puninum_fadein[];
-extern s32 mri_puninum_fadeout[];
 
 s32 puni_piders_check[] = {
     0x0002005B, (s32)evt_seq_wait, 0x00000002, 0x00010005,

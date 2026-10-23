@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "rsh.h"
 
 #pragma force_active on
 
@@ -46,16 +48,6 @@ USER_FUNC(evt_sub_get_coin);
 USER_FUNC(evt_sub_get_mapname);
 USER_FUNC(evt_sub_get_system_flag);
 USER_FUNC(evt_win_item_select);
-extern s32 bero_case_entry[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_rsh_01_rnd_npc_entry[];
-extern s32 evt_rsh_door_entry[];
-extern s32 evt_rsh_door_init[];
-extern s32 evt_rsh_konarikin_irai_party_talk[];
-extern s32 evt_rsh_moamoa_on_window[];
-extern s32 evt_rsh_window[];
 
 __declspec(section ".data") u64 fd_rsh_01_negone_one_374;
 __declspec(section ".data") s32 fd_rsh_01_neg_one_382[1];

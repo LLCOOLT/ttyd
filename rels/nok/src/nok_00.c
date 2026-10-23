@@ -7,8 +7,12 @@
 #include "driver/animdrv.h"
 #include "memory.h"
 #include "string.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_door.h"
+#include "evt/evt_damage.h"
+#include "evt/evt_memcard.h"
+#include "evt/evt_npc.h"
 #ifdef VERSION_G8ME01
-extern s32 evt_memcard_save_wrapper[];
 #endif
 
 typedef struct PosterWork { u32 flags; s32 group; s32 shape; } PosterWork;
@@ -103,12 +107,6 @@ USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 void nok_stg2_013_cb(s32 type, void** work);
 void draw_poster(void* userdata, s32 group);
-extern s32 bero_case_entry[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_setup[];
-extern s32 evt_gazigazi_entry[];
-extern s32 evt_memcard_save[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_nok_00_negone_one_374;
 __declspec(section ".data") s32 fd_nok_00_neg_one_382[1];

@@ -12,6 +12,20 @@
 #include "mario/mario.h"
 #include "party.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_light.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_memcard.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_nannpc.h"
+#include "party/party_motion.h"
+#include "muj.h"
 
 static u8 muj_00_bss_0C[4];
 static u8* _ap;
@@ -184,35 +198,12 @@ USER_FUNC(tobikakaru_end);
 USER_FUNC(tobikakaru_init);
 #ifdef VERSION_G8ME01
 USER_FUNC(N_evt_sub_status_gauge_force_update);
-extern s32 evt_memcard_save_wrapper[];
 #endif
 void tobikakari_seq00(NanNpc* npc);
 NanNpc* random_choice_target(s32 type);
 void suifu_kyorokyoro_init(NanNpc* npc);
 void suifu_kyorokyoro(NanNpc* npc);
 static void alpha_tev(MapTevCallbackInfo* info);
-extern s32 evt_bero_get_info[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
-extern s32 evt_hit_bind_mapobj[];
-extern s32 evt_hit_damage_return_set[];
-extern s32 evt_hitobj_onoff[];
-extern s32 evt_light_bind_mapobj[];
-extern s32 evt_map_playanim[];
-extern s32 evt_mario_get_party[];
-extern s32 evt_mario_set_party[];
-extern s32 evt_memcard_save[];
-extern s32 evt_mobj_kururing_floor[];
-extern s32 evt_npc_setup[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_paper_entry[];
-extern s32 evt_pouch_all_party_recovery[];
-extern s32 evt_pouch_mario_recovery[];
-extern s32 evt_snd_envon[];
-extern s32 muj_ship_puka[];
-extern s32 nanNPCOption[];
-extern s32 nannpc_ext_main_sub_fast[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_muj_00_negone_one_374;
 __declspec(section ".data") s32 fd_muj_00_neg_one_382[1];

@@ -17,6 +17,7 @@
 #include "string.h"
 #include "mario/mario_pouch.h"
 #include "evt/evt_cmd.h"
+#include "gor.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_mario_set_dir);
 USER_FUNC(evt_party_set_dir);
@@ -27,14 +28,10 @@ USER_FUNC(evt_item_delete);
 typedef struct IraiWork { s32 state; s32 count; s32 list[30]; s32 cursor; s32 last; s32 top; s32 yubiX; s32 yubiY; s32 field_0x94; f32 scroll; char client[30][21]; char contents[30][31]; u8 field_0x6B4[0x416C - 0x6B4]; } IraiWork;
 void FontDrawString(const char* message, f32 x, f32 y);
 void FontDrawScale(f32 scale);
-extern s32 irai_msg_kakunin[];
 void psndSFXOn(const char* name);
 void irai_window_disp(CameraId camera, void* param);
 void irai_flag_disp(void);
-extern s32 irai_msg_client[];
-extern s32 irai_msg_contents[];
 void irai_flag_clear(void);
-extern s32 irai_item_table[];
 
 USER_FUNC(evt_door_set_param);
 USER_FUNC(evt_mario_key_onoff);
@@ -56,8 +53,6 @@ USER_FUNC(irai_start_func);
 void irai_window_disp(CameraId camera, void* param);
 void irai_flag_disp(void);
 void irai_flag_clear(void);
-extern s32 door_data_05_npc[];
-extern s32 door_data_05_npc_01[];
 
 __declspec(section ".data") u64 fd_gor_irai_negone_one_374;
 __declspec(section ".data") s32 fd_gor_irai_neg_one_382[1];

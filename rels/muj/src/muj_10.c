@@ -6,6 +6,17 @@
 #include "manager/evtmgr_cmd.h"
 #include "mario/mariost.h"
 #include "system.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_damage.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_nannpc.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "muj.h"
 
 typedef struct NanNpc { u8 field_0x0[0x18]; Vec pos; u8 field_0x24[0x30 - 0x24]; Vec basePos; u8 field_0x3C[0x50 - 0x3C]; OSTime time; u8 field_0x58[0x68 - 0x58]; s32 state; s32 duration; u8 field_0x70[0xBF - 0x70]; u8 alpha; } NanNpc;
 typedef struct NanNpcWork { NanNpc* entries; } NanNpcWork;
@@ -72,30 +83,9 @@ USER_FUNC(evt_sub_random);
 USER_FUNC(suifu_option_func);
 USER_FUNC(suifu_option_init_func);
 #ifdef VERSION_G8ME01
-extern s32 korutesu_appear_event[];
 #endif
 static USER_FUNC(tornade_alpha_func);
 void elmosalpha_func(NanNpc* npc);
-extern s32 bero_close_door_play_se[];
-extern s32 evt_bero_get_info[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_cam_road_reset[];
-extern s32 evt_gazigazi_entry[];
-extern s32 evt_hit_damage_return_set[];
-extern s32 evt_hitobj_onoff[];
-extern s32 evt_map_playanim[];
-extern s32 evt_mapobj_flag_onoff[];
-extern s32 evt_mapobj_get_position[];
-extern s32 evt_mobj_recovery_blk[];
-extern s32 evt_mobj_save_blk[];
-extern s32 evt_npc_setup[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_snd_bgmon[];
-extern s32 evt_snd_envon[];
-extern s32 evt_snd_set_rev_mode[];
-extern s32 korutesu_apper[];
-extern s32 muj_ship_puka[];
-extern s32 nannpc_ext_main_sub_fast[];
 
 __declspec(section ".data") u64 fd_muj_10_negone_one_374;
 __declspec(section ".data") s32 fd_muj_10_neg_one_382[1];

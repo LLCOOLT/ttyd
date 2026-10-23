@@ -1,3 +1,5 @@
+#include "libc_decls.h"
+
 #define _MATH_H_
 double cos(double);
 double sin(double);
@@ -5038,7 +5040,6 @@ static f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2) {
 	return v13;
 }
 
-extern int __float_nan[];
 static inline s32 ps_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 ps_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (ps_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 

@@ -6,6 +6,10 @@
 #include "evt/evt_npc.h"
 #include "mario/mariost.h"
 #include "system.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "npc_event.h"
+#include "mri.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(bero_get_position_normal);
@@ -81,12 +85,6 @@ USER_FUNC(evt_snd_envoff);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(mri_npc_buruburu);
-extern s32 enemy_event_dead_event_sub[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 mri_countdown[];
-extern s32 mri_puni_init[];
-extern s32 puni_disp_info[];
 
 __declspec(section ".data") u64 fd_mri_04_negone_one_374;
 __declspec(section ".data") s32 fd_mri_04_neg_one_382[1];

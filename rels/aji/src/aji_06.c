@@ -8,13 +8,13 @@
 #include "dolphin/os.h"
 #include "mario/mario.h"
 #include "dolphin/gx.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "aji.h"
 
 typedef struct YukaAnimData { u16 flags; u8 field_0x2[6]; OSTime time; f32 frame; f32 speed; struct { u8 field_0x0[8]; f32 length; }* data; } YukaAnimData;
 typedef struct YukaAnim { YukaAnimData* anim; u32 flags; } YukaAnim;
 #define YUKA_NOW() OSTicksToMilliseconds(gp->inBattle ? gp->renderTime : gp->renderFieldTime)
-extern s32 kusuri_tyogo_list[];
-extern s32 kusuri_id[];
-extern s32 kusuri_list[];
 #define KUSURI_COL (*(GXColor*)g_Kusuri_Col)
 #define KUSURI_SRC ((GXColor*)g_Kusuri_Src_Col)
 #define KUSURI4_NO g_Kusuri4_No[0]
@@ -118,12 +118,6 @@ void kusuri_3_color_tev(MapTevCallbackInfo* info);
 void kusuri_2_color_tev(MapTevCallbackInfo* info);
 void kusuri_1_color_tev(MapTevCallbackInfo* info);
 void kusuri_naka_color_tev(MapTevCallbackInfo* info);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
-extern s32 evt_sub_stopwatch[];
 
 __declspec(section ".data") u64 fd_aji_06_negone_one_374;
 __declspec(section ".data") s32 fd_aji_06_neg_one_382[1];

@@ -7,6 +7,12 @@
 #include "battle/battle_sub.h"
 #include "mario/mario_pouch.h"
 #include "string.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_sub.h"
 
 BOOL BattlePartyAnimeLoad(s32 id);
 typedef struct FakerStatus { s16 data[15]; } FakerStatus;
@@ -70,56 +76,11 @@ USER_FUNC(evt_msg_print);
 USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(vivian_comeback);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AddRotate[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckPhase[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_GetFaceDirection[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetHp[];
-extern s32 btlevtcmd_GetMarioId[];
-extern s32 btlevtcmd_GetTakeoffPosition[];
-extern s32 btlevtcmd_GetUnitWork[];
-extern s32 btlevtcmd_JumpContinue[];
-extern s32 btlevtcmd_JumpSetting[];
-extern s32 btlevtcmd_MarioJumpPosition[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_SetStayPose[];
-extern s32 btlevtcmd_SetTalkPose[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_StopWaitEvent[];
-extern s32 btlevtcmd_WaitEventEnd[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_get_turn[];
-extern s32 btlevtcmd_snd_se[];
 extern s32 entryunit_party[];
-extern s32 evt_btl_camera_set_homing_unitparts[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_sub_intpl_get_value[];
-extern s32 evt_sub_intpl_init[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 subsetevt_dead_core_nospin_norotate[];
 extern s32 unit_gullible_christine[];
 extern s32 unit_gullible_clauda[];
 extern s32 unit_gullible_nokotarou[];
 extern s32 unit_gullible_yoshi[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_faker_mario_negone_one_374;
 __declspec(section ".data") s32 fd_faker_mario_neg_one_382[1];

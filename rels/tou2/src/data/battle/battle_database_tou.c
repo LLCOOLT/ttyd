@@ -1,78 +1,16 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
+#include "tou2.h"
 
 #pragma force_active on
 
 USER_FUNC(evt_map_set_tevcallback);
 USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(tou_gamen_screen_tev_init);
-extern s32 battle_heart_drop_param_default[];
-extern s32 battle_item_basabasa[];
-extern s32 battle_item_bllizard[];
-extern s32 battle_item_bomhei[];
-extern s32 battle_item_boomerang_bros[];
-extern s32 battle_item_borodo[];
-extern s32 battle_item_borodo_king[];
-extern s32 battle_item_burst_wanwan[];
-extern s32 battle_item_champion[];
-extern s32 battle_item_dokugassun[];
-extern s32 battle_item_fire_bros[];
-extern s32 battle_item_hammer_bros[];
-extern s32 battle_item_hyper_sinnosuke[];
-extern s32 battle_item_hyper_togemet[];
-extern s32 battle_item_iron_sinemon[];
-extern s32 battle_item_iron_sinemon2[];
-extern s32 battle_item_kamec[];
-extern s32 battle_item_kurikuri[];
-extern s32 battle_item_kurokumorn[];
-extern s32 battle_item_macho_gance[];
-extern s32 battle_item_monban[];
-extern s32 battle_item_nokonoko_fighter[];
-extern s32 battle_item_patapata_fighter[];
-extern s32 battle_item_sambo[];
-extern s32 battle_item_togezo[];
-extern s32 battle_item_ura_noko[];
-extern s32 battle_item_ura_pata[];
 extern s32 tou_gamen_screen_tev[];
-extern s32 unit_basabasa[];
-extern s32 unit_bomhei[];
-extern s32 unit_boomerang_bros[];
-extern s32 unit_borodo[];
-extern s32 unit_borodo_king[];
-extern s32 unit_boss_champion[];
-extern s32 unit_boss_koopa_tou[];
-extern s32 unit_boss_macho_gance[];
-extern s32 unit_burst_wanwan[];
-extern s32 unit_chorobon[];
-extern s32 unit_crimson_togemet[];
-extern s32 unit_dark_keeper[];
-extern s32 unit_fire_bros[];
-extern s32 unit_flower_chorobon[];
-extern s32 unit_green_chorobon[];
-extern s32 unit_hammer_bros[];
-extern s32 unit_hannya[];
-extern s32 unit_hinnya[];
-extern s32 unit_honenoko[];
-extern s32 unit_hyper_sinnosuke[];
-extern s32 unit_iron_sinemon[];
-extern s32 unit_iron_sinemon2[];
 extern s32 unit_jyugem[];
-extern s32 unit_kamec_green[];
-extern s32 unit_kamec_red[];
-extern s32 unit_kamec_white[];
-extern s32 unit_kurikuri[];
-extern s32 unit_monochrome_kurokumorn[];
-extern s32 unit_monochrome_pakkun[];
-extern s32 unit_nokonoko_fighter[];
-extern s32 unit_patapata_fighter[];
-extern s32 unit_piders[];
-extern s32 unit_sambo[];
-extern s32 unit_togedaruma[];
-extern s32 unit_togenoko_ace[];
-extern s32 unit_togezo[];
-extern s32 unit_ura_noko[];
-extern s32 unit_ura_pata[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_tou_negone_one_374;
 __declspec(section ".data") s32 fd_battle_database_tou_neg_one_382[1];

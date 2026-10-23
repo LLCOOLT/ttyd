@@ -1,0 +1,53 @@
+#pragma once
+
+#include "dolphin/types.h"
+
+extern s32 btl_rsh_setup_no_tbl[];
+extern s32 btlsetup_rsh_tbl[];
+extern s32 evt_rsh_01_rnd_npc_entry[];
+extern s32 evt_rsh_03_rnd_npc_entry[];
+extern s32 evt_rsh_04_rnd_npc_entry[];
+extern s32 evt_rsh_door_entry[];
+extern s32 evt_rsh_door_init[];
+extern s32 evt_rsh_konarikin_irai_party_talk[];
+extern s32 evt_rsh_moamoa_on_window[];
+extern s32 evt_rsh_rnd_npc_init[];
+extern s32 evt_rsh_window[];
+extern s32 rsh_00_a_init_evt[];
+extern s32 rsh_00_a_init_evt_nidome[];
+extern s32 rsh_00_b_init_evt[];
+extern s32 rsh_00_b_init_evt_nidome[];
+extern s32 rsh_00_c_init_evt[];
+extern s32 rsh_00_c_init_evt_nidome[];
+extern s32 rsh_01_a_init_evt[];
+extern s32 rsh_01_a_init_evt_nidome[];
+extern s32 rsh_01_b_init_evt[];
+extern s32 rsh_01_b_init_evt_nidome[];
+extern s32 rsh_01_c_init_evt[];
+extern s32 rsh_01_c_init_evt_nidome[];
+extern s32 rsh_02_a_init_evt[];
+extern s32 rsh_02_a_init_evt_nidome[];
+extern s32 rsh_02_b_init_evt[];
+extern s32 rsh_02_b_init_evt_nidome[];
+extern s32 rsh_02_c_init_evt[];
+extern s32 rsh_02_c_init_evt_nidome[];
+extern s32 rsh_03_a_init_evt[];
+extern s32 rsh_03_a_init_evt_nidome[];
+extern s32 rsh_03_b_init_evt[];
+extern s32 rsh_03_b_init_evt_nidome[];
+extern s32 rsh_03_c_init_evt[];
+extern s32 rsh_03_c_init_evt_nidome[];
+extern s32 rsh_04_a_init_evt[];
+extern s32 rsh_04_a_init_evt_nidome[];
+extern s32 rsh_04_b_init_evt[];
+extern s32 rsh_04_b_init_evt_nidome[];
+extern s32 rsh_04_c_init_evt[];
+extern s32 rsh_04_c_init_evt_nidome[];
+extern s32 rsh_05_a_init_evt[];
+extern s32 rsh_05_a_init_evt_nidome[];
+extern s32 rsh_06_a_init_evt[];
+extern s32 rsh_06_a_init_evt_nidome[];
+extern s32 rsh_07_a_init_evt[];
+extern s32 rsh_07_b_init_evt[];
+extern s32 rsh_07_c_init_evt[];
+extern s32 rsh_08_a_init_evt[];

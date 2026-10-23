@@ -4,12 +4,11 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 #include <string.h>
+#include "battle/battle_sub.h"
+#include "libc_decls.h"
 
-extern BattleWork* _battleWorkPointer;
 extern ItemData itemDataTable[];
 #include "system.h"
-extern void btlMovePos(f32 speed, f32 angle, f32* x, f32* z);
-extern int sprintf(char* str, const char* format, ...);
 
 #pragma optimize_for_size on
 #pragma dont_inline on

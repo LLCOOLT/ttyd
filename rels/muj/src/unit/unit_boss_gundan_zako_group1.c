@@ -10,6 +10,12 @@
 #include "dolphin/mtx.h"
 #include "driver/dispdrv.h"
 #include "mario/mariost.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_sub.h"
 
 typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; Vec ofs; Vec rot; } ZakoGun;
 typedef struct ZakoGunWork { s32 flag; s32 targetId;
@@ -84,22 +90,6 @@ void zakogun_ext_main(void);
 void zakogun_ext_init(void);
 BattleUnit* zakogun_get_ptr(void);
 void zakogun_set_pose(ZakoGun* zako, s32 base, s32 num, s32 div);
-extern s32 _add_star_point_disp_offset[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btlevtcmd_CheckDamageCode[];
-extern s32 btlevtcmd_GetCoin[];
-extern s32 btlevtcmd_GetExp[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_StoreCoin[];
-extern s32 btlevtcmd_StoreExp[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_eff[];
-extern s32 evt_sub_random[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_gundan_zako_group1_negone_one_374;
 __declspec(section ".data") s32 fd_boss_gundan_zako_group1_neg_one_382[1];

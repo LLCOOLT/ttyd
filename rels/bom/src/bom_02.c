@@ -7,6 +7,10 @@
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
 #include "driver/mobjdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_door.h"
+#include "evt/evt_mario.h"
+#include "bom.h"
 
 static USER_FUNC(anim_tevcallback);
 static USER_FUNC(anim_tevcallback_mobj);
@@ -97,13 +101,6 @@ USER_FUNC(evt_sub_save_playtime);
 USER_FUNC(evt_win_item_select);
 static USER_FUNC(yami_view);
 extern s32 envSetYami[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_bom_01_karakara[];
-extern s32 evt_bom_snowfall[];
-extern s32 evt_door_entry[];
-extern s32 evt_mario_cam_keep_off[];
-extern s32 evt_mario_cam_keep_on[];
-extern s32 evt_mario_jump_pos[];
 
 __declspec(section ".data") u64 fd_bom_02_negone_one_374;
 __declspec(section ".data") s32 fd_bom_02_neg_one_382[1];

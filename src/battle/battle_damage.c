@@ -10,6 +10,7 @@
 #include "eff/eff_miss_star.h"
 #include "eff/n64/eff_kemuri12_n64.h"
 #include <string.h>
+#include "battle/battle_mario.h"
 
 typedef struct BtlWeaponFull {
     u8 field_0x0[0x74];       // 0x0
@@ -88,10 +89,6 @@ u32 pouchCheckItem(u32 itemId);
 
 void _getSickStatusParam(BattleUnit* unit, BattleWeapon* weapon, u32 type, s8* outTime, s8* outStrength);
 s32 pouchEquipCheckBadge(s32 badgeId);
-extern BattleWeapon badgeWeapon_Charge;
-extern BattleWeapon badgeWeapon_ChargeP;
-extern BattleWeapon badgeWeapon_SuperCharge;
-extern BattleWeapon badgeWeapon_SuperChargeP;
 s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u32 special, s32 type, s32 rate, s32 levelDiff, s8 time, s8 strength);
 void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s32 damage, s32 fpDamage, u32 result, u32 pattern, s32 flag);
 u32 BattleCheckPikkyoro(BattleWeapon* weapon, u32* flags);

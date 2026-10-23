@@ -19,19 +19,14 @@
 #include "driver/dispdrv.h"
 #include "driver/camdrv.h"
 #include "stdio.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "las.h"
+#include "libc_decls.h"
 
-extern u8 kurokaron_move_flag;
-extern u8 kurokaron_move_index;
-extern f32 kurokaron_move_list[6][2];
 int rand(void);
 s32 _kurokaron_run_away(f32 x, f32 z, f32 tx, f32 tz);
 void npcTuningRy(NpcEntry* npc, f32 ry);
-extern u8 kurokaron_same_goal;
-extern u8 kurokaron_prev_goal;
-extern s32 kurokaron_vivian_prev_sts;
-extern u8 kurokaron_stop_cnt;
-extern u16 kurokaron_run_cnt;
-extern int __float_nan[];
 double sin(double x);
 double cos(double x);
 s32 psndSFXOn_3D(const char* name, Vec* position);
@@ -51,7 +46,6 @@ s32 nokonokoGetStatus(void);
 f32 cloudGetBreathDist(void);
 double sqrt(double x);
 f32 marioGetAngleKaitenHammer(void);
-extern s32 move_check_list[];
 s32 party_hit_check(f32 x, f32 z, f32* dir);
 void calc_area(s32 i, f32 x, f32 z);
 void move_check(ExtPose* pose, s32 idx);
@@ -68,7 +62,6 @@ void extLoadShadowRenderMode(void);
 void extLoadShadowVertex(void);
 void extLoadShadowTev(void);
 void extDrawShadow(void);
-extern s32 partyCtrlNo;
 
 USER_FUNC(chk_mario_ctrloff);
 USER_FUNC(evt_bero_get_info);
@@ -174,10 +167,6 @@ static f32 randf(f32 min, f32 max);
 void _kurokaron_next_move_index(void);
 s32 kurokaron_move2(NpcEntry* npc, MarioWork* mario);
 s32 _kurokaron_run_away(f32 x, f32 z, f32 tx, f32 tz);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_stopwatch[];
 
 __declspec(section ".data") u64 fd_las_05_negone_one_374;
 __declspec(section ".data") s32 fd_las_05_neg_one_382[1];

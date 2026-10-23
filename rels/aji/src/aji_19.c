@@ -7,6 +7,7 @@
 #include "party.h"
 #include "driver/hitdrv.h"
 #include "string.h"
+#include "evt/evt_bero.h"
 
 BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
@@ -28,7 +29,6 @@ USER_FUNC(evt_telop_entry);
 static USER_FUNC(mario_chk);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_aji_19_negone_one_374;
 __declspec(section ".data") s32 fd_aji_19_neg_one_382[1];

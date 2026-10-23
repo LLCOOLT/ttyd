@@ -5,6 +5,7 @@
 #include "manager/evtmgr_cmd.h"
 #include "mario/mariost.h"
 #include "driver/mapdrv.h"
+#include "evt/evt_sub.h"
 
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_cam3d_evt_set);
@@ -30,7 +31,6 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(ramp_r);
 static void resha_tev(MapTevCallbackInfo* info);
-extern s32 evt_sub_stopwatch[];
 
 __declspec(section ".data") u64 fd_hom_10_negone_one_374;
 __declspec(section ".data") s32 fd_hom_10_neg_one_382[1];

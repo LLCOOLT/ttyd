@@ -4,6 +4,8 @@
 #pragma force_active on
 #include "driver/mapdrv.h"
 #include "mario/mario.h"
+#include "evt/evt_bero.h"
+#include "aji.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
@@ -43,10 +45,6 @@ USER_FUNC(evt_sub_system_flag_onoff);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(map_anim_flag_off);
 static USER_FUNC(peach_evt_toumei);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
 
 __declspec(section ".data") u64 fd_aji_11_negone_one_374;
 __declspec(section ".data") s32 fd_aji_11_neg_one_382[1];

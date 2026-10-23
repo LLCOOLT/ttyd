@@ -25,6 +25,10 @@
 #include "driver/effdrv.h"
 #include "driver/animdrv.h"
 #include "icon_ids.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_door.h"
+#include "evt/evt_sub.h"
+#include "gor.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_msg_fmt_int);
 USER_FUNC(evt_msg_fmt_str);
@@ -285,20 +289,6 @@ void goryuugijo_disp_montemedal(CameraId camera, void* param);
 void goryuugijo_main_montemedal(EventEntry* event, BOOL isFirstCall);
 void goryuugijo_init_montemedal(EventEntry* event, BOOL isFirstCall);
 s32 exchange_ret_tbl_no(void);
-extern s32 bero_case_exec_pipe[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_close[];
-extern s32 evt_door_close_roll[];
-extern s32 evt_door_entry[];
-extern s32 evt_door_open[];
-extern s32 evt_door_open_quick[];
-extern s32 evt_door_open_roll[];
-extern s32 evt_sub_mail_event[];
-extern s32 evt_sub_mail_vibration[];
-extern s32 evt_sub_stopwatch[];
-extern s32 luigi_gor_first_talk[];
 
 __declspec(section ".data") u64 fd_gor_03_negone_one_374;
 __declspec(section ".data") s32 fd_gor_03_neg_one_382[1];

@@ -3,6 +3,9 @@
 
 #pragma force_active on
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
+#include "mri.h"
 
 static s32 ssf;
 typedef struct PuniData { u8 field_0x0[0x116]; s16 id; u8 field_0x118[0x5A8 - 0x118]; } PuniData;
@@ -55,11 +58,6 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(puni_get_id);
 static USER_FUNC(ss_check);
 static USER_FUNC(ss_set);
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
-extern s32 mri_countdown[];
-extern s32 mri_puni_init[];
-extern s32 puni_disp_info[];
 
 __declspec(section ".data") u64 fd_mri_16_negone_one_374;
 __declspec(section ".data") s32 fd_mri_16_neg_one_382[1];

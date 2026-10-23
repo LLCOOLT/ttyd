@@ -1,5 +1,8 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "bom.h"
 
 #pragma force_active on
 
@@ -8,9 +11,6 @@ USER_FUNC(evt_item_entry);
 USER_FUNC(evt_mobj_powerupblk);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
-extern s32 evt_bero_info_run[];
-extern s32 evt_bom_snowfall[];
-extern s32 evt_sub_tree_access_entry[];
 
 __declspec(section ".data") u64 fd_bom_03_negone_one_374;
 __declspec(section ".data") s32 fd_bom_03_neg_one_382[1];

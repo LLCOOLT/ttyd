@@ -1,5 +1,8 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
+#include "evt/evt_movefloor.h"
 
 #pragma force_active on
 
@@ -12,9 +15,6 @@ USER_FUNC(evt_mobj_powerupblk);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
-extern s32 moving_floor[];
 
 __declspec(section ".data") u64 fd_tik_20_negone_one_374;
 __declspec(section ".data") s32 fd_tik_20_neg_one_382[1];

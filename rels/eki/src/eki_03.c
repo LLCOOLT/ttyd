@@ -9,6 +9,7 @@
 #include "dolphin/gx.h"
 #include "dolphin/os.h"
 #include "mario/mario.h"
+#include "evt/evt_bero.h"
 
 double sin(double x);
 #pragma force_active on
@@ -37,9 +38,6 @@ USER_FUNC(evt_mobj_blk);
 #endif
 static USER_FUNC(test_glare);
 static void sun_tev(MapTevCallbackInfo* info);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 negone_one$374;
 __declspec(section ".data") s32 neg_one$382[1];

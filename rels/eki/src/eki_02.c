@@ -7,6 +7,7 @@
 #include "driver/mapdrv.h"
 #include "system.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_bero.h"
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_item_entry);
@@ -15,7 +16,6 @@ USER_FUNC(evt_mapobj_rotate);
 USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(hit_move);
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_eki_02_negone_one_374;
 __declspec(section ".data") s32 fd_eki_02_neg_one_382[1];

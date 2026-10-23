@@ -6,6 +6,11 @@
 #include "battle/battle_unit.h"
 #include "battle/battle_sub.h"
 #include "driver/effdrv.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_sub.h"
+#include "unit/party/unit_party_christine.h"
 
 EffectEntry* effKumokumoN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 arg5, f32 arg6, f32 scale);
 
@@ -36,39 +41,11 @@ USER_FUNC(evt_audience_joy_ending);
 USER_FUNC(evt_eff);
 USER_FUNC(evt_eff_delete_ptr);
 USER_FUNC(evt_sub_random);
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_CalculateFaceDirection[];
-extern s32 btlevtcmd_ChangeFaceDirection[];
-extern s32 btlevtcmd_FaceDirectionAdd[];
-extern s32 btlevtcmd_GetMoveFrame[];
-extern s32 btlevtcmd_GetPos[];
-extern s32 btlevtcmd_GetScale[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_GetUnitId[];
-extern s32 btlevtcmd_JumpContinue[];
-extern s32 btlevtcmd_JumpPosition[];
-extern s32 btlevtcmd_MarioJumpParam[];
-extern s32 btlevtcmd_MarioJumpPosition[];
-extern s32 btlevtcmd_MovePosition[];
-extern s32 btlevtcmd_SetFallAccel[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetPos[];
-extern s32 btlevtcmd_SetRotate[];
-extern s32 btlevtcmd_SetScale[];
-extern s32 btlevtcmd_SetUnitWork[];
-extern s32 btlevtcmd_SpawnUnit[];
-extern s32 btlevtcmd_StatusWindowOnOff[];
-extern s32 btlevtcmd_onoff_battleflag[];
-extern s32 evt_msg_print[];
-extern s32 evt_sub_intpl_get_float[];
-extern s32 evt_sub_intpl_init_float[];
 extern s32 unit_act_atmic_teresa[];
 extern s32 unit_act_clauda[];
 extern s32 unit_act_kinopiko[];
 extern s32 unit_act_kinopio[];
 extern s32 unit_act_teresa[];
-extern s32 unitdata_Party_Christine[];
 
 __declspec(section ".data") u64 fd_act_mario_negone_one_374;
 __declspec(section ".data") s32 fd_act_mario_neg_one_382[1];

@@ -15,52 +15,14 @@
 #include "driver/imgdrv.h"
 #include "data/mapdata.h"
 #include "driver/swdrv.h"
+#include "npc_event.h"
+#include "rsh.h"
 
 typedef struct RshRndNpc { const char* name; const char* model; s32* talkEvt; } RshRndNpc;
 double tan(double x);
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 btl_rsh_setup_no_tbl[];
-extern s32 btlsetup_rsh_tbl[];
-extern s32 rsh_00_a_init_evt[];
-extern s32 rsh_00_a_init_evt_nidome[];
-extern s32 rsh_00_b_init_evt[];
-extern s32 rsh_00_b_init_evt_nidome[];
-extern s32 rsh_00_c_init_evt[];
-extern s32 rsh_00_c_init_evt_nidome[];
-extern s32 rsh_01_a_init_evt[];
-extern s32 rsh_01_a_init_evt_nidome[];
-extern s32 rsh_01_b_init_evt[];
-extern s32 rsh_01_b_init_evt_nidome[];
-extern s32 rsh_01_c_init_evt[];
-extern s32 rsh_01_c_init_evt_nidome[];
-extern s32 rsh_02_a_init_evt[];
-extern s32 rsh_02_a_init_evt_nidome[];
-extern s32 rsh_02_b_init_evt[];
-extern s32 rsh_02_b_init_evt_nidome[];
-extern s32 rsh_02_c_init_evt[];
-extern s32 rsh_02_c_init_evt_nidome[];
-extern s32 rsh_03_a_init_evt[];
-extern s32 rsh_03_a_init_evt_nidome[];
-extern s32 rsh_03_b_init_evt[];
-extern s32 rsh_03_b_init_evt_nidome[];
-extern s32 rsh_03_c_init_evt[];
-extern s32 rsh_03_c_init_evt_nidome[];
-extern s32 rsh_04_a_init_evt[];
-extern s32 rsh_04_a_init_evt_nidome[];
-extern s32 rsh_04_b_init_evt[];
-extern s32 rsh_04_b_init_evt_nidome[];
-extern s32 rsh_04_c_init_evt[];
-extern s32 rsh_04_c_init_evt_nidome[];
-extern s32 rsh_05_a_init_evt[];
-extern s32 rsh_05_a_init_evt_nidome[];
-extern s32 rsh_06_a_init_evt[];
-extern s32 rsh_06_a_init_evt_nidome[];
-extern s32 rsh_07_a_init_evt[];
-extern s32 rsh_07_b_init_evt[];
-extern s32 rsh_07_c_init_evt[];
-extern s32 rsh_08_a_init_evt[];
 
 USER_FUNC(debug_print_func);
 USER_FUNC(evt_bero_mapchange);
@@ -117,9 +79,6 @@ void rsh_window_tev(MapTevCallbackInfo* info);
 void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
-extern s32 npc_urouro_init_event[];
-extern s32 npc_urouro_move_event[];
-extern s32 npc_urouro_return_event[];
 
 __declspec(section ".data") u64 fd_rsh_negone_one_374;
 __declspec(section ".data") s32 fd_rsh_neg_one_382[1];

@@ -8,8 +8,9 @@
 #include "driver/animdrv.h"
 #include "driver/effdrv.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_memcard.h"
+#include "evt/evt_npc.h"
 #ifdef VERSION_G8ME01
-extern s32 evt_memcard_save_wrapper[];
 #endif
 
 typedef struct KpaCbInfo { u8 field_0x0[0x8]; u16 field_0x8; u8 field_0xA[0x10 - 0xA]; s32 field_0x10; } KpaCbInfo;
@@ -68,8 +69,6 @@ static USER_FUNC(starstone_entry);
 static USER_FUNC(starstone_fall);
 void kpa_stg6_014_cb(s32 type, KpaCbInfo** param);
 void kpa_stg6_012_1_cb(s32 type, KpaCbInfo** param);
-extern s32 evt_memcard_save[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_kpa_07_negone_one_374;
 __declspec(section ".data") s32 fd_kpa_07_neg_one_382[1];

@@ -1,5 +1,8 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "mri.h"
 
 #pragma force_active on
 
@@ -52,18 +55,6 @@ USER_FUNC(evt_target_flag_onoff);
 USER_FUNC(evt_target_set_position);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
-extern s32 bero_case_switch_off[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_mri_door_close[];
-extern s32 evt_mri_door_open[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 mri_countdown[];
-extern s32 mri_guide_goryu[];
-extern s32 mri_puni_init[];
-extern s32 mri_puni_save[];
-extern s32 mri_puni_walk_se[];
-extern s32 puni_disp_info[];
-extern s32 puni_piders_check[];
 
 __declspec(section ".data") u64 fd_mri_06_negone_one_374;
 __declspec(section ".data") s32 fd_mri_06_neg_one_382[1];

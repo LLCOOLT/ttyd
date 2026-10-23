@@ -14,17 +14,16 @@
 // #include <string.h>
 #include <demo/DEMOPad.h>
 #include "mario/mariost.h"
+#include "R_build.h"
+#include "driver/mapdrv.h"
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
-extern const char R_build_date[];
-extern const char R_build_time[];
 #pragma pool_data on
 
 #define HALF_PI 1.570796f
 #define PI 3.141592653589793f
 #define TWO_PI 6.283185307179586f
-
-extern BOOL __mapdrv_make_dl; // mapdrv.c
-extern GlobalWork* gp;
 
 #ifdef __MWERKS__
 #define fabs(x) __fabs(x)
@@ -33,9 +32,6 @@ extern GlobalWork* gp;
 double fabs(double x);
 float fabsf(float x);
 #endif
-extern double sin(double x);
-extern double cos(double x);
-extern double fmod(double x, double y);
 
 int __float_nan[];
 #define NAN (*(f32*)__float_nan)

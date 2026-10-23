@@ -11,9 +11,8 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
-
-extern s32 evt_cam_shake[];
-extern s32 evt_gazigazi_appear[];
+#include "evt/evt_cam.h"
+#include "evt/evt_damage.h"
 
 EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 HitEntry* marioChkLandon(f32* outY, f32 y);

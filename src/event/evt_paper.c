@@ -3,8 +3,6 @@
 #include "driver/animdrv.h"
 #include "mario/mariost.h"
 
-extern GlobalWork* gp;
-
 // const char* animName
 USER_FUNC(evt_paper_entry) {
     const char* name;

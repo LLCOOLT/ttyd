@@ -19,6 +19,11 @@
 #include "driver/dispdrv.h"
 #include "driver/camdrv.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_memcard.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_npc.h"
+#include "aji.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(N_evt_sub_status_gauge_force_update);
 #endif
@@ -197,23 +202,12 @@ void disp_horogram(CameraId cameraId, void* param);
 static void polygon(f32 x, f32 y, f32 w, f32 h, f32 s, f32 t);
 static void polygon(f32 x, f32 y, f32 w, f32 h, f32 s, f32 t);
 void noiseDisp(CameraId cameraId, void* param);
-extern s32 bero_case_entry[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_memcard_save[];
 #ifdef VERSION_G8ME01
 // US: map save blocks call the US save wrapper script
-extern s32 evt_memcard_save_wrapper[];
 #define SAVE_EVT evt_memcard_save_wrapper
 #else
 #define SAVE_EVT evt_memcard_save
 #endif
-extern s32 evt_sub_stopwatch[];
-extern s32 npc_init_evt[];
-extern s32 shuryolight_head_normal[];
-extern s32 shuryolight_pow_normal[];
-extern s32 shuryolight_tue_normal[];
 
 static s32 w_door_close[22];
 static s32 w_door_open[22];

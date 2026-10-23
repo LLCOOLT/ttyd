@@ -33,6 +33,7 @@
 #endif
 #include <stdio.h>
 #include <string.h>
+#include "battle/battle_mario.h"
 
 #ifdef VERSION_G8ME01
 #define EXP_ICON 0x194
@@ -114,10 +115,7 @@ BattleSpotWork* BatSpotGetPtr(void);
 
 #define SEW(wp) ((SeqEndWork*)(wp)->seqEndWork)
 
-extern s32 _koura_delete_event[];
-
 //.data
-extern s32 _confetti_control_event[];
 USER_FUNC(_check_guard_koura);
 USER_FUNC(_disable_enemy_unit_disp);
 USER_FUNC(_get_rank_up_msg);
@@ -268,14 +266,6 @@ void btl_camera_set_posoffset(s32 pri, f32 x, f32 y, f32 z);
 EffectEntry* effPointGetEntry(s32 a, s32 exp, f32 x, f32 y, f32 z, s32 c);
 
 extern PoseTableEntry pose_table_nokotarou_stay[];
-extern s32 marioAttackEvent_MajinaiExpUp[];
-extern s32 _event_MajinaiEnd[];
-extern s32 _rank_up_event[];
-extern s32 _curtain_close_event[];
-extern s32 _jump_event[];
-extern s32 _move_to_heart_event[];
-extern s32 _move_to_flower_event[];
-extern s32 _move_to_badge_point_event[];
 
 void btlseqEnd(BattleWork* wp) {
     SeqEndWork* work = *(SeqEndWork**)((u8*)wp + 0xF28);

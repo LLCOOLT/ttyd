@@ -29,25 +29,14 @@
 #include "manager/evtmgr.h"
 #include "driver/effdrv.h"
 #include "icon_ids.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "tou.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
 static void rankingInit(void);
-extern s32 tou_00_init_evt[];
-extern s32 tou_01_init_evt[];
-extern s32 tou_02_init_evt[];
-extern s32 tou_04_init_evt[];
-extern s32 tou_05_init_evt[];
-extern s32 tou_06_init_evt[];
-extern s32 tou_07_init_evt[];
-extern s32 tou_08_init_evt[];
-extern s32 tou_09_init_evt[];
-extern s32 tou_10_init_evt[];
-extern s32 tou_11_init_evt[];
-extern s32 tou_12_init_evt[];
-extern s32 tou_13_init_evt[];
-extern s32 tou_20_init_evt[];
 void rankingInit(void);
 typedef struct RankEntry { u16 flags; s32 id; union { s16 score; u8 sw[2]; }; } RankEntry;
 typedef struct RankWork { s32 num; RankEntry* entries; } RankWork;
@@ -225,12 +214,6 @@ static void rankingInit(void);
 void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
-extern s32 bero_case_switch_off[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_sub_mail_vibration[];
-extern s32 evt_tou_08_cake[];
-extern s32 evt_tou_chibi_yoshi[];
 
 __declspec(section ".data") u64 fd_tou_negone_one_374;
 __declspec(section ".data") s32 fd_tou_neg_one_382[1];

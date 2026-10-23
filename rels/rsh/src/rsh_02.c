@@ -6,6 +6,9 @@
 #include "mario/mariost.h"
 #include "driver/npcdrv.h"
 #include "pmario_sound.h"
+#include "evt/evt_bero.h"
+#include "rsh.h"
+#include "evt/evt_sub.h"
 
 s32 marioRollCancelDisable(void);
 s32 U_marioSlitContinueChk(void);
@@ -101,17 +104,9 @@ USER_FUNC(evt_win_item_select);
 USER_FUNC(toron_check);
 USER_FUNC(mario_normalize_wait);
 #ifdef VERSION_G8ME01
-extern s32 evt_sub_mail_event[];
 #endif
 void yuurei_callback(s32 type, void* param);
 void powan_callback(s32 type, void* param);
-extern s32 bero_case_entry[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_rsh_door_entry[];
-extern s32 evt_rsh_door_init[];
-extern s32 evt_rsh_moamoa_on_window[];
-extern s32 evt_rsh_rnd_npc_init[];
-extern s32 evt_rsh_window[];
 
 __declspec(section ".data") u64 fd_rsh_02_negone_one_374;
 __declspec(section ".data") s32 fd_rsh_02_neg_one_382[1];

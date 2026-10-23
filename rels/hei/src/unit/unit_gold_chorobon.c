@@ -3,6 +3,10 @@
 
 #pragma force_active on
 #include "battle/battle.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
 
 USER_FUNC(btlevtcmd_AddScale);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -61,16 +65,9 @@ USER_FUNC(evt_btl_camera_set_zoom);
 USER_FUNC(evt_btl_camera_shake_h);
 USER_FUNC(evt_msg_print);
 USER_FUNC(get_gold_chorobon_id);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btlevtcmd_snd_se[];
 extern s32 chorogun_entry[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 subsetevt_counter_damage[];
 extern s32 unit_chorobon_gundan[];
 extern s32 chorogun_dead_reward[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_gold_chorobon_negone_one_374;
 __declspec(section ".data") s32 fd_gold_chorobon_neg_one_382[1];

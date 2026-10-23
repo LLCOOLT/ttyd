@@ -7,13 +7,13 @@
 #include "driver/camdrv.h"
 #include "string.h"
 #include "driver/dispdrv.h"
+#include "yuu.h"
 
 static s32 dataadr[32];
 s32 stackt[4];
 s32 stackp;
 void* effMiniGameEntry(s32 type, f32 x, f32 y, f32 z);
 typedef struct MiniGameWork { EventEntry* event; EventEntry* subEvent; u16 flags; s32 type; s32 (*init)(EventEntry* event, BOOL isFirstCall); s32 (*main)(EventEntry* event, BOOL isFirstCall); void (*disp)(CameraId camera, void* param); void* data; } MiniGameWork;
-extern void* yuunpc_yuuminigame4_ptr;
 s32 yuuminigame_init_1hikoki(EventEntry* event, BOOL isFirstCall);
 s32 yuuminigame_main_1hikoki(EventEntry* event, BOOL isFirstCall);
 void yuuminigame_disp_1hikoki(CameraId camera, void* param);

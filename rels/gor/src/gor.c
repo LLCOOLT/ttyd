@@ -12,20 +12,11 @@
 #include "dolphin/mtx.h"
 #include "system.h"
 #include "pmario_sound.h"
+#include "gor.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 btl_gor_setup_no_tbl[];
-extern s32 btlsetup_gor_tbl[];
-extern s32 gor_00_init_evt[];
-extern s32 gor_01_init_evt[];
-extern s32 gor_02_init_evt[];
-extern s32 gor_03_init_evt[];
-extern s32 gor_04_init_evt[];
-extern s32 gor_10_init_evt[];
-extern s32 gor_11_init_evt[];
-extern s32 gor_12_init_evt[];
 void tegami_delete(void);
 static s32 gor_inemuri_snd_id;
 static char* gor_msg_cat_buf;

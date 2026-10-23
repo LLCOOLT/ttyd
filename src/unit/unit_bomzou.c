@@ -1,5 +1,10 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_eff.h"
 
 USER_FUNC(btlevtcmd_AfterReactionEntry);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -20,23 +25,6 @@ USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(evt_eff64);
 USER_FUNC(evt_snd_sfxoff);
 USER_FUNC(evt_sub_random);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetSelectNextEnemy[];
-extern s32 btlevtcmd_GetUnitId[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_OnAttribute[];
-extern s32 btlevtcmd_OnPartsAttribute[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_StageDispellFog[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_shake_h[];
-extern s32 evt_eff[];
-extern s32 weaponGetPowerDefault[];
 
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;

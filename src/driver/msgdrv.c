@@ -13,6 +13,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "icon_ids.h"
+#include "libc_decls.h"
 #define EXT_LIT(sym, val) (val)
 __declspec(section ".rodata") const char R_no_messages_JP[] = "<col ff0000ff>\203\201\203b\203Z\201[\203W\202\252\202\240\202\350\202\334\202\271\202\361</col>\n<key>\000\000\000";
 #ifdef VERSION_G8ME01
@@ -43,21 +44,10 @@ __declspec(section ".rodata") const char str_802C4EF0[8] = "\120\115\137\106\137
 __declspec(section ".rodata") const char str_802C4EF8[8] = "\120\115\137\103\137\061\102";
 __declspec(section ".rodata") const char str_802C4F00[8] = "\120\115\137\103\137\062\102";
 
-extern const char R_no_messages_JP[];
-extern const char R_no_messages_US[];
 #ifdef VERSION_G8ME01
-extern const char R_no_messages_DE[];
-extern const char R_no_messages_FR[];
-extern const char R_no_messages_ES[];
-extern const char R_no_messages_IT[];
-extern const char R_no_messages_DU[];
 #endif
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
 #pragma force_active on
-
-extern GlobalWork* gp;
-extern int sprintf(char* str, const char* format, ...);
-extern int sscanf(const char* str, const char* format, ...);
 
 #define WIN_STATE(w) (*(u16*)(w)->field_0x0)
 

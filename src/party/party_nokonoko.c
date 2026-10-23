@@ -5,14 +5,12 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <dolphin/mtx.h>
+#include "party/party_move.h"
+#include "party/party_bomhei.h"
+#include "mario/mario_motion.h"
 
 extern void partyUpdMoveSpd(PartyEntry* party);
-extern void partyRecordFootmark(PartyEntry* party);
 extern void partyWalkInit(PartyEntry* party, s32 mode);
-extern void party_move_mode_stay(PartyEntry* party);
-extern void party_move_mode_walk(PartyEntry* party);
-extern void party_move_mode_behind_mario(PartyEntry* party);
-extern void party_move_mode_beside_mario(PartyEntry* party);
 extern void partyGoodbyeInit(PartyEntry* party);
 extern s32 partyGoodbyeMain(PartyEntry* party);
 extern void partyChgRunMode(PartyEntry* party, s32 mode);
@@ -28,7 +26,6 @@ double cos(double);
 #include "driver/hitdrv.h"
 #include "mario/mario_sbr.h"
 
-extern void itemNokoForceGet(ItemEntry* entry);
 #include "eff/eff_kemu_test.h"
 #include "eff/n64/eff_small_star_n64.h"
 #include "mario/mariost.h"
@@ -48,29 +45,12 @@ void sincosf(f32* ret_sin, f32* ret_cos, f32 degree);
 f32 toMovedir(f32 angle);
 #define EXT_LIT(sym, val) (val)
 extern ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range);
-extern void itemPickUp(ItemEntry* entry);
 extern void* mobjHitObjPtrToPtr(HitEntry* hit);
 extern void marioChkWallAround(Vec* pos, s32 a1, f32 a2, f32 angle, f32 radius, f32 height);
 #ifdef VERSION_G8ME01
 void partyChkWallAround(PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 width, f32 height);
 #endif
-extern void partyGetMoveDirSpd(PartyEntry* party, f32* dir, f32* spd);
-extern void partyGetReturnPos(Vec* pos);
-extern void partyMove(PartyEntry* party);
-extern void partyMoveNoHosei(PartyEntry* party);
-extern void partyClearJumpPara(PartyEntry* party);
 extern void partyChgPose(PartyEntry* party, char* pose);
-extern void marioChgSmallJumpMotion(void);
-extern s32 marioKeyOffChk(void);
-extern BOOL marioChkKey(void);
-extern void marioAdjustMoveDir(void);
-extern BOOL marioChkInScreen(s32 x, s32 y);
-extern f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2);
-extern f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2);
-extern void movePos(float* ret_sin, float* ret_cos, f32 a3, f32 degree);
-extern f32 toMovedirSimple(f32 a);
-extern f32 toMovedir2(f32 a, f32 b);
-extern s32 sysMsec2Frame(s32 msec);
 double sqrt(double);
 void nokonoko_finish(PartyEntry* party);
 HitEntry* ccwall(PartyEntry* party, s32 mode);

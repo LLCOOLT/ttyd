@@ -11,13 +11,13 @@
 #include "manager/evtmgr_cmd.h"
 #include <string.h>
 #include "driver/camdrv.h"
-
-extern GlobalWork* gp;
+#include "driver/animdrv.h"
+#include "cam_road.h"
+#include "cam_shift.h"
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
 //.bss
-extern s32 BeroID[16];
-extern s32 BeroSW[16]; //switches
-extern BeroEntry* BeroINFOARR[16];
 
 //.sbss, NOTE: all are reversed because of -inline deferred
 s32 BeroEXEC;
@@ -116,34 +116,6 @@ USER_FUNC(evt_bero_get_start_position);
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_entername);
 extern s32 bero_set_disp_position_pipe();
-extern s32 bero_null[];
-extern s32 default_entevt[];
-extern s32 default_outevt[];
-extern s32 evt_bero_info_run_none[];
-extern s32 evt_bero_info_run_gate[];
-extern s32 evt_bero_nonride_check[];
-extern s32 bero_open_door_play_se[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_play_enter_anime[];
-extern s32 bero_play_out_anime[];
-extern s32 bero_case_init_check[];
-extern s32 bero_case_exec_none[];
-extern s32 bero_case_exec_road[];
-extern s32 bero_case_exec_door[];
-extern s32 bero_case_exec_pipe_sub[];
-extern s32 bero_case_exec_pipe[];
-extern s32 bero_case_exec_gate[];
-extern s32 bero_case_entry[];
-extern s32 bero_case_entry_sub[];
-extern s32 bero_case_switch_on[];
-extern s32 bero_case_switch_off[];
-extern s32 evt_bero_info_run_road[];
-extern s32 evt_bero_info_run_door[];
-extern s32 evt_bero_info_run_pipe_sub00[];
-extern s32 evt_bero_info_run_pipe[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_bero_initial_pos[];
-extern s32 evt_bero_mario_enter[];
 
 s32 bero_null[] = {
     0, 251658240, 20000, 100000, 0, 0, -1, 0,
@@ -443,11 +415,6 @@ USER_FUNC(evt_bero_get_info) {
 	return EVT_RETURN_DONE;
 }
 
-extern void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end);
-extern void N_marioReloadMapOnBottomlessOn(void);
-extern double sin(double);
-extern double cos(double);
-
 // FAKE: walk flag picks a pointer-walk loop (evt_bero_get_info_num) or the index loop (evt_bero_get_into_info); constant-folded per call site
 static inline s32 bero_get_kind(BeroEntry* bero, s32 walk) {
 	u32 i;
@@ -529,8 +496,6 @@ USER_FUNC(evt_bero_get_into_info) {
 		return EVT_RETURN_DONE;
 	}
 }
-
-extern BOOL animGroupBaseAsync(const char* name, s32 group, void* callback);
 
 USER_FUNC(evt_bero_read_mario_pera) {
 	if (isFirstCall) {
@@ -746,8 +711,6 @@ USER_FUNC(bero_get_position_pipe_pure) {
 
 typedef struct { Vec f_0; Vec pos; Vec at; } BeroCamRoadOut;
 extern void camRoadMain(BeroCamRoadOut* out, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
-extern void camRoadReset(void);
-extern void camShiftReset(void);
 
 USER_FUNC(bero_get_position_pipe2) {
 	s32* args = event->args;
@@ -1165,8 +1128,6 @@ USER_FUNC(evt_bero_disppos_load) {
 }
 
 #include "system.h"
-extern double sin(double);
-extern double cos(double);
 
 USER_FUNC(evt_bero_move_mario_speed) {
 	s32* args = event->args;
@@ -1293,8 +1254,6 @@ USER_FUNC(evt_bero_1stcheck) {
 	}
 	return EVT_RETURN_DONE;
 }
-
-extern void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out);
 
 USER_FUNC(evt_camera_change_event_from_road) {
 	MarioWork* mario = marioGetPtr();

@@ -7,8 +7,6 @@
 #include "mario/mariost.h"
 #endif
 
-extern BattleWork* _battleWorkPointer;
-
 typedef struct IconDispTableEntry IconDispTableEntry;
 struct IconDispTableEntry {
 	s32 id;

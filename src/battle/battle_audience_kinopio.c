@@ -9,6 +9,7 @@
 #include "eff/eff_sleep.h"
 #include "eff/eff_small_star.h"
 #include <string.h>
+#include "battle/battle_audience_kinopio.h"
 
 #pragma optimize_for_size on
 #pragma dont_inline on
@@ -16,12 +17,10 @@
 #define AM_F32(p, off) (*(f32*)((u8*)(p) + (off)))
 #define AM_S32(p, off) (*(s32*)((u8*)(p) + (off)))
 
-extern BattleWork* _battleWorkPointer;
 double sin(double);
 double sqrt(double);
 double fabs(double);
 double __fabs(double);
-extern s32 intrudeSound;
 s32 rand();
 s32 BattleAudienceDetectPakkunEatTarget(s32 index);
 void BattleAudiencePuniAllEscape(void);

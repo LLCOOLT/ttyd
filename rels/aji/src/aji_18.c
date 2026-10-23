@@ -5,6 +5,8 @@
 #include "mario/mario_pouch.h"
 #include "mario/mariost.h"
 #include "driver/fadedrv.h"
+#include "evt/evt_bero.h"
+#include "aji.h"
 
 s32 key_list[4];
 
@@ -47,10 +49,6 @@ USER_FUNC(N_evt_sub_status_gauge_force_update);
 #endif
 static USER_FUNC(make_list);
 static USER_FUNC(sysflag);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_emergency[];
 
 __declspec(section ".data") u64 fd_aji_18_negone_one_374;
 __declspec(section ".data") s32 fd_aji_18_neg_one_382[1];

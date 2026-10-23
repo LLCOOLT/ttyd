@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
 
 #pragma force_active on
 
@@ -11,7 +12,6 @@ USER_FUNC(evt_npc_change_fbat_mode);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
-extern s32 evt_bero_info_run[];
 extern s32 hei_test_water_tev[];
 
 __declspec(section ".data") u64 fd_hei_11_negone_one_374;

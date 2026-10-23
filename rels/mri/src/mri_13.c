@@ -4,6 +4,9 @@
 #pragma force_active on
 #include "driver/hitdrv.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "mri.h"
 
 typedef struct PuniData { u8 field_0x0[0x4]; u32 flags; u8 field_0x8[0x12C - 0x8]; Vec position; u8 field_0x138[0x148 - 0x138]; f32 field_0x148; u8 field_0x14C[0x15C - 0x14C]; Vec field_0x15C; u8 field_0x168[0x184 - 0x168]; f32 field_0x184; f32 field_0x188; u8 field_0x18C[0x5A8 - 0x18C]; } PuniData;
 PuniData* puniGetPunidat(void);
@@ -59,19 +62,6 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_target_flag_onoff);
 USER_FUNC(evt_target_set_position);
 USER_FUNC(yuka_fall_check);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 mri_countdown[];
-extern s32 mri_hikari_color[];
-extern s32 mri_puni_init[];
-extern s32 mri_puni_save[];
-extern s32 mri_punipuni_itemremove[];
-extern s32 mri_punipuni_itemselect[];
-extern s32 mri_punipuni_itemset[];
-extern s32 mri_punipuni_setup[];
-extern s32 puni_disp_info[];
 
 __declspec(section ".data") u64 fd_mri_13_negone_one_374;
 __declspec(section ".data") s32 fd_mri_13_neg_one_382[1];

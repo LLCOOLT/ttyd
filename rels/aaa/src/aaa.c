@@ -3,11 +3,11 @@
 
 #pragma force_active on
 #include "data/mapdata.h"
+#include "aaa.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 aaa_00_init_evt[];
 void mapdelete(void);
 
 void _unresolved(void);

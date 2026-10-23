@@ -9,8 +9,6 @@
 #include "manager/evtmgr_cmd.h"
 #include "system.h"
 
-extern BattleWork* _battleWorkPointer;
-
 USER_FUNC(evt_btl_camera_set_mode);
 USER_FUNC(evt_btl_camera_set_homing_unit);
 USER_FUNC(evt_btl_camera_set_zoom);

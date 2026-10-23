@@ -21,8 +21,12 @@
 #include "driver/camdrv.h"
 #include <stdio.h>
 #include <string.h>
-
-extern BattleWork* _battleWorkPointer;
+#include "battle/battle_event_default.h"
+#include "battle/battle_mario.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_event_cmd.h"
+#include "unit/party/unit_party_nokotarou.h"
+#include "unit/party/unit_party_sanders.h"
 
 #define FIELD(p, type, off) (*(type*)((u8*)(p) + (off)))
 
@@ -60,29 +64,18 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp);
 BOOL BattleStatusChangeAnnouceMain(BattleWork* wp);
 void BattleConsumeReserveItem(void);
 BOOL BattleBreakSlot_CheckReaction(void);
-extern s32 btldefaultevt_CantMoveZeroGravity[];
-extern s32 btldefaultevt_BiribiriMove[];
 void BattleMajinaiDone(void);
 void BattleMajinaiEndCheck(void);
-extern s32 marioAttackEvent_MajinaiDefenceUp[];
 void BtlUnit_SetTotalHitDamage(BattleUnit* unit, s32 damage);
 BOOL BtlUnit_CheckShadowGuard(BattleUnit* unit);
 s32 BattleDamageDirect(s32 unitIdx, BattleUnit* unit, BattleUnitPart* part, s32 damage, s32 fpDamage, u32 stopFlags, u32 damageEffect, u32 pattern);
 void effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z);
 void effFreezeN64Entry(s32 a, s32 b, f32 x, f32 y, f32 z, f32 scale);
 void BattleAudience_Case_TurnEnd(void);
-extern s32 subsetevt_status_recovery[];
-extern s32 subsetevt_regeneration[];
-extern s32 subsetevt_happy_heart[];
-extern s32 subsetevt_happy_flower[];
 void BattleSetStatusDamageFromWeapon(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32 flags);
 extern s32 marioDefaultWeapon_Jump[];
 extern s32 marioWeapon_KururinJump[];
 extern s32 marioDefaultWeapon_Hammer[];
-extern s32 marioDefaultWeapon_FirstAttackKaitenHammer[];
-extern s32 marioDefaultWeapon_FirstAttackUltraHammer[];
-extern s32 partyWeapon_NokotarouFirstAttack[];
-extern s32 partyWeapon_SandersFirstAttack[];
 
 //local prototypes
 USER_FUNC(_set_haikei_entry_scale);
@@ -101,7 +94,6 @@ void btlseqPhase(BattleWork* wp);
 void _rule_disp(CameraId cameraId, void* param);
 USER_FUNC(_set_effect_luck);
 
-extern s32 btlevtcmd_WaitEventEnd(EventEntry* event, BOOL isFirstCall);
 s32 _set_haikei_entry_scale(EventEntry* event, BOOL isFirstCall);
 __declspec(section ".sdata") s32 nanika_luck_event[] = {
 	0x1006f, (s32)0xfe363c8f, 0x10009, 0x3c, 0x70, 0x1005b, (s32)_set_effect_luck, 0x2005b,

@@ -48,3 +48,21 @@ USER_FUNC(_set_mobj_shake_init);
 
 
 void BattleStageObjectInit(void);
+
+extern s32 _close_wall_event[];
+extern s32 _entry_switch_data[];
+extern s32 _entry_tree_data[];
+extern s32 _fall_frame_event[];
+extern s32 _nozzle_turn_event[];
+extern s32 _nozzle_work_event_0[];
+extern s32 _nozzle_work_event_1[];
+extern s32 _nozzle_work_event_core[];
+extern s32 _object_fall_event[];
+extern BattleStageObjectData _object_nozzle_data[];
+extern BattleStageObjectData _object_spot_light_data[];
+extern s32 _object_turn_event_A1[];
+extern s32 _object_turn_event_A2[];
+extern s32 _object_turn_event_B[];
+extern s32 _object_turn_event_core[];
+extern BattleStageObjectData _object_wall_data;
+extern void* jumptable_80374848[];

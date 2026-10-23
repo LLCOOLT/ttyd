@@ -6,10 +6,7 @@
 #include "memory.h"
 #include "system.h"
 #include <string.h>
-
-extern int sprintf(char* str, const char* format, ...);
-
-extern GlobalWork* gp;
+#include "libc_decls.h"
 
 //.data
 EffectSet eff_set_table[] = {

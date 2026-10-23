@@ -1,5 +1,7 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
 
 #pragma force_active on
 
@@ -25,8 +27,6 @@ USER_FUNC(evt_seq_wait);
 USER_FUNC(evt_snd_bgm_scope);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_tree_access_entry[];
 
 __declspec(section ".data") u64 fd_bom_00_negone_one_374;
 __declspec(section ".data") s32 fd_bom_00_neg_one_382[1];

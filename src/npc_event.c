@@ -12,6 +12,8 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <string.h>
+#include "evt/evt_eff.h"
+#include "evt/evt_mario.h"
 static void piders_draw_yarn_sub(CameraId cameraId, void* param);
 
 double sqrt(double);
@@ -306,10 +308,6 @@ USER_FUNC(kamec_fire_magic);
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_fbat_trans_floor_position_wide);
 #endif
-extern s32 evt_eff64[];
-extern s32 evt_mario_get_mov_spd[];
-extern s32 evt_npc_set_color[];
-extern s32 evt_npc_status_check[];
 
 s32 enemy_common_dead_event[156];
 s32 enemy_event_dead_event_sub[36];

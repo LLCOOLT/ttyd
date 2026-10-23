@@ -6,6 +6,8 @@
 #include "manager/evtmgr_cmd.h"
 #include "driver/hitdrv.h"
 #include "string.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
 
 f32 sinfd(f32 degrees);
 f32 reviseAngle(f32 angle);
@@ -73,8 +75,6 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_mapgrp_translate2);
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
 
 __declspec(section ".data") u64 fd_dou_04_negone_one_374;
 __declspec(section ".data") s32 fd_dou_04_neg_one_382[1];

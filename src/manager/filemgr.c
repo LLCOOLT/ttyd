@@ -6,9 +6,8 @@
 #include "sdk/texPalette.h"
 #include <stdarg.h>
 #include <string.h>
-
-extern int vsprintf(char* string, const char* format, va_list arg);
-extern OSThread dvdmgr_thread;
+#include "manager/dvdmgr.h"
+#include "libc_decls.h"
 
 //.bss
 char _filename[0x400]; //for fileAllocf/fileAsyncf vsprintf

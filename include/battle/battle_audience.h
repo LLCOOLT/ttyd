@@ -226,3 +226,19 @@ BOOL BattleAudience_GetWaiting(s32 index);
 s32 BattleAudience_HaitiRandForFallObject(void);
 s32 BattleAudience_GetAudienceNum(void);
 void BattleAudience_WinSetActive(u8 active);
+
+void BattleAudienceAddTargetNum(f32 value, f32 value2);
+void BattleAudienceJoyEnding(void);
+void BattleAudienceSoundCheer(s32 duration, s32 fade);
+void BattleAudience_Case_AcrobatNoTry(void);
+s32 BattleAudience_GetPresentItemNo(void);
+s32 BattleAudience_GetPresentItemType(void);
+s32 BattleAudience_GetPresentTargetUnitId(void);
+void BattleAudience_SetPresentItemNo(s32 no);
+
+void BattleAudience_SetPresentItemType(s32 type);
+void BattleAudience_SetPresentTargetUnitId(s32 unitId);
+extern const Vec vec3_802f972c[];
+extern const Vec vec3_802f9738[];
+extern const Vec vec3_802f9750[];
+extern const Vec vec3_802f975c[];

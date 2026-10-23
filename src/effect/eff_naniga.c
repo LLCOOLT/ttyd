@@ -13,10 +13,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "icon_ids.h"
+#include "evt/evt_snd.h"
 
-extern s32 evt_snd_sfxon_3d[];
 extern ItemData itemDataTable[];
-extern GlobalWork* gp;
 void effKemuTestDrawCam(EffectEntry* effect, s32 camera);
 EffectEntry* effItemGetEntry(s32 type, f32 x, f32 y, f32 z);
 extern s32 rand(void);

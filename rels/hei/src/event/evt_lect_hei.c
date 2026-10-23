@@ -29,7 +29,6 @@ typedef struct LectButton { u8 flags; u8 seq; u8 pad_2[0x8 - 0x2]; LectButtonDis
 static LectButton lbtn[2];
 static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) { camera->presetPos = camera->cameraPos; camera->presetAt = camera->cameraAt; PSVECAdd(&camera->cameraPos, &ofs, &camera->storedPos); PSVECAdd(&camera->cameraAt, &ofs, &camera->storedAt); camera->startTimeA = gp->renderTime; camera->durationA = 0; camera->stateA = 3; camera->curveA = 11; }
 void hitGrpFlagOn(const char* name, u32 flags);
-extern s32 partyCtrlNo;
 EffectEntry* effMarioBalloonEntry(s32 type, NpcEntry* npc);
 static EffectEntry* eff;
 

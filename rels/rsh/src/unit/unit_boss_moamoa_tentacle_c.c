@@ -1,5 +1,11 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_weapon_power.h"
+#include "party/party_motion.h"
 
 #pragma force_active on
 
@@ -13,39 +19,8 @@ USER_FUNC(btlevtcmd_SetEventWait);
 USER_FUNC(btlevtcmd_SetHpGaugeOffset);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 extern s32 boss_moamoa_check_zenei_kouei[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AnimeChangePose[];
-extern s32 btlevtcmd_AnimeSetPoseTable[];
-extern s32 btlevtcmd_AnimeWaitPlayComplete[];
-extern s32 btlevtcmd_AttackDeclare[];
-extern s32 btlevtcmd_CheckDamage[];
-extern s32 btlevtcmd_CheckToken[];
-extern s32 btlevtcmd_ChoiceSamplingEnemy[];
-extern s32 btlevtcmd_GetEnemyBelong[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_PayWeaponCost[];
-extern s32 btlevtcmd_PreCheckDamage[];
-extern s32 btlevtcmd_ResultACDefence[];
-extern s32 btlevtcmd_SamplingEnemy[];
-extern s32 btlevtcmd_SetHitCursorOffset[];
-extern s32 btlevtcmd_SetHitOffset[];
-extern s32 btlevtcmd_SetPartsDefenceTable[];
-extern s32 btlevtcmd_SetUnitWork[];
-extern s32 btlevtcmd_StartAvoid[];
-extern s32 btlevtcmd_WaitGuardMove[];
-extern s32 btlevtcmd_WeaponAftereffect[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_btl_camera_set_homing_unit[];
-extern s32 evt_btl_camera_set_mode[];
-extern s32 evt_btl_camera_set_moveSpeedLv[];
-extern s32 evt_btl_camera_set_zoom[];
-extern s32 evt_snd_sfxoff[];
 extern s32 moamoa1_weakness_pose_table[];
 extern s32 moamoa_defence_no_parts[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_moamoa_tentacle_c_negone_one_374;
 __declspec(section ".data") s32 fd_boss_moamoa_tentacle_c_neg_one_382[1];

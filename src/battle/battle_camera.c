@@ -8,7 +8,6 @@
 #include "system.h"
 #include <string.h>
 
-extern BattleWork *_battleWorkPointer;
 double sqrt(double);
 #pragma dont_inline on
 #pragma optimize_for_size on

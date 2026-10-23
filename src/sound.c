@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "musyx/musyx.h"
 #include "system.h"
+#include "libc_decls.h"
 double sin(double);
 double cos(double);
 #include <string.h>
@@ -13,8 +14,6 @@ double cos(double);
 #endif
 
 // TODO: use SoundInit to fill in SoundStream/Entry
-
-extern int sprintf(char* str, const char* format, ...);
 
 //.bss
 SND_AUX_REVERBHI revH;

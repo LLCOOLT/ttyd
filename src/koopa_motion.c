@@ -4,37 +4,25 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <dolphin/types.h>
+#include "evt/evt_cam.h"
+#include "mario/mario_cam.h"
+#include "mario/mario_sbr.h"
+#include "koopa.h"
+#include "mot/mot_jump.h"
+#include "driver/animdrv.h"
+#include "koopa_motion.h"
 
 #ifdef VERSION_G8ME01
 // US exports this as the global kpa_fall (mot_jump calls it by that name)
 #define kpa_fall_80213C38 kpa_fall
 #endif
 
-extern s32 evt_cam_shake[];
-extern s32 kpaGetLevel(void);
-extern s32 kpaGetStageType(void);
-extern s32 kpaGetBodyStatus(void);
-extern f32 kpaGetWidth(s32 level);
-extern void kpaCancelAttackMode(void);
-extern void kpaMSetMutekiTimer(void);
-extern void kpaMutekiOn(void);
 extern s32 kpaFireAttackCheck(void);
-extern void kpaChgPose(const char* a, const char* b);
 extern void kpaClearHitobjRide(void);
 extern void kpaCamFollow(void);
 extern void kpaSetFallPara(void);
-extern void camFollowYOn(void);
-extern void camFollowYOff(void);
-extern void marioPreJump(void);
 extern f32 marioMakeJumpPara(void);
-extern void marioSetPeakYpos(void);
 extern void marioChgMot2(s32 id);
-extern void marioChgPose(const char* name);
-extern s32 kpaGetAttackMode(void);
-extern s32 kpaGetStageViewType(void);
-extern void kpaAttackStart(void);
-extern void marioAdjustMoveDir(void);
-extern f32 marioGetFallSpd(void);
 extern void* marioChkLandon(f32* outY, f32 y);
 extern void marioChgMotSub(s32 a, s32 b);
 f32 kpaStickSpd(s32 dash);
@@ -66,20 +54,9 @@ s32 quake_kpaHipAttack_evt[] = {
     0x0005005B, (s32)evt_cam_shake, 4, -230000000, -229999980, 60, 2, 1,
 };
 
-extern void animPoseSetLocalTime(s32 poseId, f32 time);
-extern s32 marioAnimeId(void);
-extern s32 marioKeyOffChk(void);
-extern void marioCamZoomOffReq(void);
 extern void* effMizutamaEntry(s32 type, f32 x, f32 y, f32 z, f32 angle);
-extern s32 irand(s32 scalar);
 extern void* kpaGetHitobjHead2(void);
 extern void* kpaChkHitobjRide(void);
-extern BOOL marioBgmodeChk(void);
-extern void kpaAttackStart2(void);
-extern void kpaSwimMove(void);
-extern f32 kpaGetBaseScale(s32 level);
-extern void kpaMutekiOff(void);
-extern void marioResetCamShiftRate(void);
 void kpaSetSpec(void);
 
 static inline void kpa_hip_launch(MarioWork* m) {

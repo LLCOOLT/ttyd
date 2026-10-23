@@ -10,6 +10,12 @@
 #include "dolphin/gx.h"
 #include "driver/dispdrv.h"
 #include "system.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_eff.h"
+#include "party/party_motion.h"
 
 typedef struct PidersYarn { f32 x0; f32 y0; f32 z0; f32 x1; f32 y1; f32 z1; u8 alpha; } PidersYarn;
 static void piders_draw_yarn_sub(CameraId camera, void* param);
@@ -67,37 +73,6 @@ static USER_FUNC(piders_yarn_init);
 static void piders_get_next_target(s32* unitIdx, s32* partIdx);
 static void piders_get_target(s32* unitIdx, s32* partIdx);
 static void piders_draw_yarn_sub(CameraId camera, void* param);
-extern s32 _add_star_point_disp_offset[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AnimeChangePoseFromTable[];
-extern s32 btlevtcmd_AnimeChangePoseType[];
-extern s32 btlevtcmd_DivePosition[];
-extern s32 btlevtcmd_GetBodyId[];
-extern s32 btlevtcmd_GetCoin[];
-extern s32 btlevtcmd_GetExp[];
-extern s32 btlevtcmd_GetHitPos[];
-extern s32 btlevtcmd_GetStageSize[];
-extern s32 btlevtcmd_GetStatusMg[];
-extern s32 btlevtcmd_JumpPartsPosition[];
-extern s32 btlevtcmd_JumpPartsSetting[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_OnAttribute[];
-extern s32 btlevtcmd_SetHomePos[];
-extern s32 btlevtcmd_SetMaxMoveCount[];
-extern s32 btlevtcmd_SetMoveSpeed[];
-extern s32 btlevtcmd_SetPartsPos[];
-extern s32 btlevtcmd_SetPartsRotateOffset[];
-extern s32 btlevtcmd_SetPartsScale[];
-extern s32 btlevtcmd_SetRotateOffset[];
-extern s32 btlevtcmd_StoreCoin[];
-extern s32 btlevtcmd_StoreExp[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_eff[];
-extern s32 evt_eff64[];
-extern s32 evt_snd_sfxon[];
-extern s32 subsetevt_confuse_flustered[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_piders_negone_one_374;
 __declspec(section ".data") s32 fd_piders_neg_one_382[1];

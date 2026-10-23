@@ -5,7 +5,6 @@
 #include "data/item_data.h"
 #include "system.h"
 
-extern BattleWork* _battleWorkPointer;
 extern ItemData itemDataTable[];
 BOOL BtlUnit_CanActStatus(BattleUnit* unit);
 void BattleSamplingEnemy(BattleWorkWeaponTargets* targets, BattleWeapon* weapon, s32 unitId, s8 belong, u32 classFlags, u32 propFlags, s32 direction);

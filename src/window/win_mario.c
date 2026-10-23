@@ -10,9 +10,9 @@
 #include "pmario_sound.h"
 #include <dolphin/gx.h>
 #include <string.h>
+#include "libc_decls.h"
 
 extern ItemData itemDataTable[];
-extern int sprintf(char* str, const char* format, ...);
 void winMsgEntry(void* wp, s32 a, const char* msg, s32 b);
 void winIconInit(void);
 void winIconSet(u32 id, Vec translate, Vec scale, GXColor color);

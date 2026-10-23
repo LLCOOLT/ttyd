@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "system.h"
 #include <string.h>
+#include "libc_decls.h"
 
 //.data
 eff_set eff_set_n64[] = {
@@ -154,8 +155,6 @@ static eff_n64_work work;
 //.sdata
 static eff_n64_work* wp = &work;
 static u8 dummy; //TODO: make sure it aligns to 8 bytes
-
-extern int sprintf(char* str, const char* format, ...);
 
 //local prototypes
 static void _callback_tpl(s32 error, DVDFileInfo* info);

@@ -99,3 +99,4 @@ typedef struct PiantaParlorWork {
 
 void yuugijou_init(void);
 
+extern PiantaParlorWork* yuwp;

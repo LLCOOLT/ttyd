@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
 
 #pragma force_active on
 
@@ -73,9 +74,6 @@ USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(evt_sub_rumble_onoff);
 USER_FUNC(evt_win_item_select);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_gon_04_negone_one_374;
 __declspec(section ".data") s32 fd_gon_04_neg_one_382[1];

@@ -4,11 +4,6 @@
 #include "manager/evtmgr_cmd.h"
 double sqrt(double);
 
-extern void BattleAudienceJoyEnding(void);
-extern void BattleAudience_Case_AcrobatNoTry(void);
-extern void BattleAudienceAddTargetNum(f32 a, f32 b);
-extern void BattleAudienceSoundCheer(s32 a, s32 b);
-
 //s32* mask
 USER_FUNC(evt_audience_base_flag_on) {
 	BattleAudience* audience;

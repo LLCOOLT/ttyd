@@ -4,28 +4,14 @@
 #pragma force_active on
 #include "battle/battle_stage_object.h"
 #include "system.h"
+#include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
+#include "dou.h"
 
 f32 sinfd(f32 degrees);
 
 static USER_FUNC(_wave_offset);
-extern s32 battle_flower_drop_param_default[];
-extern s32 battle_flower_drop_param_default2[];
-extern s32 battle_heart_drop_param_default[];
-extern s32 battle_heart_drop_param_default2[];
-extern s32 battle_item_bubble[];
-extern s32 battle_item_heavy_bom[];
-extern s32 battle_item_hermos[];
-extern s32 battle_item_killer[];
-extern s32 battle_item_killer_cannon[];
-extern s32 battle_item_patamet[];
-extern s32 unit_bubble[];
-extern s32 unit_heavy_bom[];
-extern s32 unit_hermos[];
-extern s32 unit_killer[];
 extern s32 unit_killer_cannon[];
-extern s32 unit_kuriboo[];
-extern s32 unit_patamet[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_dou_negone_one_374;
 __declspec(section ".data") s32 fd_battle_database_dou_neg_one_382[1];

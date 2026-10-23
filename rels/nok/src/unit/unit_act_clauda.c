@@ -1,12 +1,12 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "unit/party/unit_party_clauda.h"
 
 #pragma force_active on
 
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_SetEventWait);
 USER_FUNC(btlevtcmd_StartWaitEvent);
-extern s32 pose_table_clauda_stay[];
 
 __declspec(section ".data") u64 fd_act_clauda_negone_one_374;
 __declspec(section ".data") s32 fd_act_clauda_neg_one_382[1];

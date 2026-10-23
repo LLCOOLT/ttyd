@@ -9,6 +9,9 @@
 #include "driver/camdrv.h"
 #include "mario/mariost.h"
 #include "driver/effdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "rsh.h"
 
 NpcEntry* fbatNpcTalkCheck(void);
 static char tmp[32];
@@ -105,11 +108,6 @@ USER_FUNC(evt_mario_adjust_dir);
 USER_FUNC(evt_mario_get_dispdir);
 USER_FUNC(evt_sub_get_language);
 #endif
-extern s32 evt_bero_info_run[];
-extern s32 evt_rsh_03_rnd_npc_entry[];
-extern s32 evt_rsh_moamoa_on_window[];
-extern s32 evt_rsh_window[];
-extern s32 evt_sub_mail_event[];
 
 __declspec(section ".data") u64 fd_rsh_03_negone_one_374;
 __declspec(section ".data") s32 fd_rsh_03_neg_one_382[1];

@@ -1,5 +1,8 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_damage.h"
+#include "las.h"
 
 #pragma force_active on
 
@@ -12,11 +15,6 @@ USER_FUNC(evt_mapobj_rotate);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_gazigazi_entry[];
-extern s32 hikari_evt[];
 
 __declspec(section ".data") u64 fd_las_23_negone_one_374;
 __declspec(section ".data") s32 fd_las_23_neg_one_382[1];

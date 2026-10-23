@@ -5,6 +5,7 @@
 #include "eff/eff_stardust.h"
 #include "manager/evtmgr_cmd.h"
 #include "driver/npcdrv.h"
+#include "evt/evt_bero.h"
 
 static USER_FUNC(effect_stardust);
 USER_FUNC(evt_bero_get_info);
@@ -61,7 +62,6 @@ USER_FUNC(majinaisi_ryokin_kaisu);
 static USER_FUNC(setmertn);
 USER_FUNC(unitwincoin_disp_onoff);
 USER_FUNC(unitwincoin_wait);
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_tik_12_negone_one_374;
 __declspec(section ".data") s32 fd_tik_12_neg_one_382[1];

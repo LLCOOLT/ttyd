@@ -14,6 +14,14 @@
 #include "driver/hitdrv.h"
 #include "memory.h"
 #include "mario/mario_pouch.h"
+#include "evt/evt_door.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_kinopio.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_shop.h"
 
 static s32* itemsel_table_ram;
 
@@ -124,22 +132,7 @@ static USER_FUNC(starstone_set_ry);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 static USER_FUNC(yami_view);
-extern s32 door_dark[];
-extern s32 door_light[];
-extern s32 door_open_se[];
 extern s32 envSetYami[];
-extern s32 evt_bero_get_entername[];
-extern s32 evt_bero_get_info[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_close[];
-extern s32 evt_eff64[];
-extern s32 evt_kinopio_setup[];
-extern s32 evt_mario_kill_party[];
-extern s32 evt_mobj_save_blk[];
-extern s32 evt_npc_setup[];
-extern s32 evt_npc_sound_data_set[];
-extern s32 evt_shop_setup[];
-extern s32 npc_init_evt[];
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 void envSetYamiView(Mtx mtx);

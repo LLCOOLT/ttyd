@@ -9,15 +9,15 @@
 #include "driver/msgdrv.h"
 #include "driver/windowdrv.h"
 #include "manager/fontmgr.h"
+#include "battle/battle.h"
+#include "battle/battle_item_data.h"
+#include "libc_decls.h"
 
-extern BattleWork* _battleWorkPointer;
 void FontDrawString(f32 x, f32 y, const char* msg);
 void FontDrawScale(f32 scale);
 void FontDrawColorIDX(s32 idx);
 extern ItemData itemDataTable[];
-extern BattleWeapon ItemWeaponData_CookingItem;
 s32 BtlUnit_GetWeaponCost(BattleUnit* unit, BattleWeapon* weapon);
-extern int sprintf(char* str, const char* format, ...);
 double sin(double);
 double cos(double);
 void btlGetScreenPoint(Vec* pos, Vec* out);
@@ -86,7 +86,6 @@ void btlDispGXQuads2D(f32 x0, f32 y0, f32 x1, f32 y1, u8 r, u8 g, u8 b, u8 a);
 #define FRAMES(n) (n)
 #define FRAMES_STEP(jp, n, x) ((jp) * (x))
 #endif
-extern GlobalWork* gp;
 void FontDrawStringCenterMtx(Mtx mtx, const char* msg);
 void btlDispGXPoint2D(f32 x, f32 y, u8 r, u8 g, u8 b, u8 a, f32 s, f32 t);
 void FontDrawColor(GXColor color);

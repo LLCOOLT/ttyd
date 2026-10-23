@@ -3,18 +3,12 @@
 
 #pragma force_active on
 #include "battle/battle_stage_object.h"
+#include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
+#include "moo.h"
 
 static USER_FUNC(_space_rotate);
-extern s32 battle_flower_drop_param_default[];
-extern s32 battle_heart_drop_param_default[];
-extern s32 battle_heart_drop_param_default2[];
-extern s32 battle_item_barriern_z[];
-extern s32 battle_item_default_param_list[];
-extern s32 battle_item_sinemon[];
 extern s32 unit_barriern_z[];
-extern s32 unit_kuriboo[];
-extern s32 unit_sinemon[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_moo_negone_one_374;
 __declspec(section ".data") s32 fd_battle_database_moo_neg_one_382[1];

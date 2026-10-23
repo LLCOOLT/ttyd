@@ -11,7 +11,6 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-extern GlobalWork* gp;
 s32 psndSFXOff(s32 id);
 s32 psndSFXOn(const char* name);
 

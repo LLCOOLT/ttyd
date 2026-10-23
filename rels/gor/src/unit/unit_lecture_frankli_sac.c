@@ -11,6 +11,7 @@
 #include "battle/battle.h"
 #include "battle/battle_audience.h"
 #include "battle/battle_unit.h"
+#include "battle/battle_event_default.h"
 
 u8 dark;
 s32 darkCount;
@@ -60,8 +61,6 @@ static USER_FUNC(lecture_init);
 void spot_square_disp(CameraId cameraId, void* param);
 void Quads2D(f32 x0, f32 y0, f32 x1, f32 y1);
 void Quads2D(f32 x0, f32 y0, f32 x1, f32 y1);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
 
 __declspec(section ".data") u64 fd_lecture_frankli_sac_negone_one_374;
 __declspec(section ".data") s32 fd_lecture_frankli_sac_neg_one_382[1];

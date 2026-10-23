@@ -7,6 +7,11 @@
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
 #include "driver/effdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_door.h"
+#include "evt/evt_damage.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_npc.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 static USER_FUNC(anim_tevcallback);
@@ -113,12 +118,6 @@ USER_FUNC(evt_party_move_behind_mario);
 static USER_FUNC(yami_view);
 void iri_08_msg(s32 type, void** work);
 extern s32 envSetYami[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_setup[];
-extern s32 evt_gazigazi_entry[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 evt_sub_mail_event[];
-extern s32 npc_init_evt[];
 
 __declspec(section ".data") u64 fd_nok_01_negone_one_374;
 __declspec(section ".data") s32 fd_nok_01_neg_one_382[1];

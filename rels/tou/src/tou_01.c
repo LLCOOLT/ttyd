@@ -17,6 +17,10 @@
 #include "eff/eff_sleep.h"
 #include "driver/camdrv.h"
 #include "driver/mobjdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_door.h"
+#include "evt/evt_sub.h"
+#include "tou.h"
 
 double tan(double x);
 typedef struct ShadowWork { GXTexObj obj; smartEntry* tex; } ShadowWork;
@@ -183,12 +187,7 @@ USER_FUNC(tou_01_kanban_moji_flag_sync);
 #endif
 static USER_FUNC(yami_view);
 void make_shadow_disp(CameraId camera, void* param);
-extern s32 all_juyoitem_lecture_rel[];
 extern s32 envSetYami[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_entry[];
-extern s32 evt_sub_mail_event[];
-extern s32 evt_sub_mail_vibration[];
 
 __declspec(section ".data") u64 fd_tou_01_negone_one_374;
 __declspec(section ".data") s32 fd_tou_01_neg_one_382[1];

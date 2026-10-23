@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_event_default.h"
 
 #pragma force_active on
 
@@ -11,7 +12,6 @@ USER_FUNC(btlevtcmd_SetEventDamage);
 USER_FUNC(btlevtcmd_SetEventWait);
 USER_FUNC(btlevtcmd_SetMaxMoveCount);
 USER_FUNC(btlevtcmd_StartWaitEvent);
-extern s32 btldefaultevt_Damage[];
 
 __declspec(section ".data") u64 fd_boss_honeduka_negone_one_374;
 __declspec(section ".data") s32 fd_boss_honeduka_neg_one_382[1];

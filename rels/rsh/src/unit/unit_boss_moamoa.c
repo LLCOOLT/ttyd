@@ -14,6 +14,11 @@
 #include "dolphin/mtx.h"
 #include "dolphin/os.h"
 #include "manager/evtmgr_cmd.h"
+#include "battle/battle_event_subset.h"
+#include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "battle/battle_weapon_power.h"
+#include "evt/evt_eff.h"
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct MoamoaGroup { char anim[16]; char pose[8]; f32 speed; s32 start; s32 num; } MoamoaGroup;
@@ -27,7 +32,6 @@ int rand(void);
 void moamoa_mainUnitIdClear(void);
 static f32 randf(f32 min, f32 max);
 extern const char* g_moamoa_chain_tbl[][2];
-extern const s32 g_moamoa_chain_num;
 USER_FUNC(moamoa1_on);
 void moamoa_pose(Moamoa* elem);
 void moamoa_draw(CameraId cameraId, void* param);
@@ -80,29 +84,10 @@ void moamoa_mainUnitIdClear(void);
 static f32 randf(f32 min, f32 max);
 USER_FUNC(evt_moamoa_mainUnitIdClear);
 USER_FUNC(boss_moamoa_check_zenei_kouei);
-extern s32 _add_star_point_disp_offset[];
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
-extern s32 btlevtcmd_AnimeSetPoseTable[];
-extern s32 btlevtcmd_AnimeWaitPlayComplete[];
-extern s32 btlevtcmd_CheckDamageCode[];
-extern s32 btlevtcmd_GetBackItem[];
-extern s32 btlevtcmd_GetCoin[];
-extern s32 btlevtcmd_GetExp[];
-extern s32 btlevtcmd_KillUnit[];
-extern s32 btlevtcmd_OffPartsAttribute[];
-extern s32 btlevtcmd_OnPartsAttribute[];
-extern s32 btlevtcmd_SetPartsDefenceTable[];
-extern s32 btlevtcmd_StoreCoin[];
-extern s32 btlevtcmd_StoreExp[];
-extern s32 btlevtcmd_WaitAttackEnd[];
-extern s32 btlevtcmd_snd_se[];
-extern s32 evt_eff[];
 extern s32 unit_boss_moamoa_mouth[];
 extern s32 unit_boss_moamoa_tentacle_a[];
 extern s32 unit_boss_moamoa_tentacle_b[];
 extern s32 unit_boss_moamoa_tentacle_c[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_boss_moamoa_negone_one_374;
 __declspec(section ".data") s32 fd_boss_moamoa_neg_one_382[1];

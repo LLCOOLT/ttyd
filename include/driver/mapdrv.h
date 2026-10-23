@@ -212,3 +212,13 @@ void mapSetTevCallback(s32 index, MapTevCallback callback);
 void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx);
 
 MapObject* mapGetMapObj(const char* name);
+
+void mapGetBlend(GXColor* color);
+void mapGetBlend2(GXColor* color);
+BOOL mapTestXLU(u32 flags, GXColor* color, GXColor* matColor);
+
+extern BOOL __mapdrv_make_dl; // mapdrv.c
+void mapGrpFlagOn(const char* name, u32 flags);
+
+extern const GXCullMode culling[4];
+extern s32 fog_type[5];

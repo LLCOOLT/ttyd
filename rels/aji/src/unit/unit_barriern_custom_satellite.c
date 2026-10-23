@@ -5,6 +5,7 @@
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
 #include "battle/battle_sub.h"
+#include "battle/battle_event_default.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -20,8 +21,6 @@ USER_FUNC(btlevtcmd_SetEventWait);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(battleGetBarriernSatelliteInitPos);
-extern s32 btldefaultevt_Confuse[];
-extern s32 btldefaultevt_Damage[];
 
 __declspec(section ".data") u64 fd_barriern_custom_satellite_negone_one_374;
 __declspec(section ".data") s32 fd_barriern_custom_satellite_neg_one_382[1];

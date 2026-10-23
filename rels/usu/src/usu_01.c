@@ -12,6 +12,10 @@
 #include "data/item_data.h"
 #include "driver/npcdrv.h"
 #include "driver/mobjdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_door.h"
+#include "evt/evt_sub.h"
+#include "usu.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_mario_get_motion);
 #endif
@@ -165,21 +169,6 @@ USER_FUNC(sleep_voice);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 static void majin_callback(s32 type);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 door_close_se[];
-extern s32 door_light[];
-extern s32 door_light2[];
-extern s32 door_open_se[];
-extern s32 door_up_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_door_entry[];
-extern s32 evt_sub_mail_event[];
-extern s32 evt_sub_tree_access_entry[];
-extern s32 evt_usu_kagemario_party_kill[];
-extern s32 house_close_se[];
-extern s32 roll_majin_lecture[];
-extern s32 roll_majin_lecture_init[];
 
 __declspec(section ".data") u64 fd_usu_01_negone_one_374;
 __declspec(section ".data") s32 fd_usu_01_neg_one_382[1];

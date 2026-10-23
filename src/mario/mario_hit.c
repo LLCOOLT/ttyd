@@ -10,37 +10,36 @@
 #include <string.h>
 #include <dolphin/mtx.h>
 #include "version.h"
+#include "mario/mario_cam.h"
+#include "mario/mario_party.h"
+#include "mario/mario_balloon.h"
+#include "mot/mot_damage.h"
+#include "koopa_motion.h"
+#include "mot/mot_jabara.h"
+#include "mot/mot_roll.h"
+#include "mot/mot_ship.h"
+#include "koopa_hit.h"
+#include "mot/mot_slit.h"
+#include "mario/mario_hit.h"
+#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
 extern MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
-extern double sin(double);
-extern double cos(double);
 
 #define MF(w, off, T) (*(T*)((u8*)(w) + MWOFF(off)))
 
 static const Vec zv0 = {0.0f, 0.0f, 0.0f};
 static const Vec zv1 = {0.0f, 0.0f, 0.0f};
 
-extern HitEntry* marioSearchGround(f32* a, f32* b, f32* c, f32 d, f32 e);
-extern HitEntry* marioSearchGroundRoll(f32* a, f32* b, f32* c, f32 d, f32 e);
-extern HitEntry* marioLandonChk_old(f32* a, f32 d);
-extern void set_damage_root_ypos(f32 y);
 extern void kpaClearHitobjRide(void);
 extern BOOL marioChgMot(s32 mot);
 extern HitEntry* kpaSearchGround(f32* a, f32* b, f32* c, f32 d);
 extern BOOL kpaFireAttackCheck(void);
-extern void quake_kpaLandOn(void);
-extern BOOL marioBgmodeChk(void);
-extern void camFollowYOn(void);
 extern void kpaCamFollow(void);
-extern BOOL jabaraNoHitChk(void);
-extern HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, HitEntry** out, f32 d);
 extern HitEntry* marioSearchHead(Vec* pos, f32* h, f32 d);
 #ifdef VERSION_G8ME01
 extern s32 kpaGetLevel(void);
 #endif
-extern HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w);
-extern void marioSearchFrontWall_staying(f32 dz);
-extern HitEntry* dou10_yoko_yari(f32* p);
 extern BOOL marioChkWallAround(Vec* pos, void* p, f32 dx, f32 dz, f32 w, f32 h);
 
 static inline BOOL marioChkBeroSub(s32 attr) {
@@ -53,7 +52,6 @@ static inline BOOL marioChkBeroSub(s32 attr) {
     }
     return r;
 }
-extern HitEntry* marioHitCheck2(Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist);
 
 static inline BOOL marioChkBeroInl(HitEntry* hit) {
     s32 attr = hitGetAttr(hit);
@@ -102,7 +100,6 @@ static inline BOOL marioChkBeroSub6(s32 attr) {
     }
 }
 
-extern int __float_nan[];
 static inline s32 hit_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 hit_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (hit_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 
@@ -387,8 +384,6 @@ BOOL marioChkBero(HitEntry* hit) {
     return w->currMotionId == 0x19;
 }
 
-extern f32 roll_grx;
-extern f32 roll_grz;
 #pragma inline_max_size(1000)
 static inline void marioChkGndRoll(MarioWork* w) {
             HitEntry* hit;
@@ -453,15 +448,8 @@ HitEntry* searchUnder2(f32* out, f32 x, f32 y, f32 z) {
     return hit;
 }
 
-extern f32 roll_grx;
-extern f32 roll_grz;
-extern BOOL marioChkShipMoveMode(void);
-extern void marioShipChgFall(void);
-extern HitEntry* kpaChkHitobjRide(void);
-extern void roll_upstairs_on(void);
 extern void marioSetFallPara(void);
 extern BOOL marioChgMotSub(s32 mot, s32 a);
-extern HitEntry* marioChkFrontStep(f32* y, f32* b, f32* c);
 
 static inline BOOL marioChkGndOk(void) {
     MarioWork* w = marioGetPtr();
@@ -1244,18 +1232,12 @@ HitEntry* marioChkLandon2(f32* y, f32 spd, f32 ofs) {
     return NULL;
 }
 
-extern HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d);
 extern HitEntry* kpaSearchHead(Vec* pos, f32* h, f32 d);
 extern s32 kpaGetBodyStatus(void);
 extern void marioClearJumpPara(void);
-extern f32 partyGetHeight(PartyEntry* p);
-extern BOOL marioChkSlitEnd(void);
 extern void marioChgStayMotion(void);
 extern void marioSetFallPara(void);
 extern s32 psndSFXOn_3D(const char* name, Vec* position);
-extern s32 marioGetPartyId(void);
-extern PartyEntry* partyGetPtr(s32 index);
-extern void marioItemGetDisable(void);
 
 typedef struct { u8 pad[0x15]; char name[16]; } MobjNameView;
 
@@ -1938,8 +1920,6 @@ HitEntry* marioChkFront(f32* out, const Vec* pos, f32 angle, f32 dist) {
     *out = -1.0f;
     return NULL;
 }
-
-extern BOOL chkBalloon(HitEntry* hit);
 
 static inline void sfwVecSet(Vec* d, Vec v) {
     *d = v;

@@ -3,12 +3,12 @@
 
 #pragma force_active on
 #include "data/mapdata.h"
+#include "dmo.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
 void demo_exit(void);
-extern s32 dmo_00_init_evt[];
 
 void _unresolved(void);
 void _epilog(void);

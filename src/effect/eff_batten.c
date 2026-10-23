@@ -7,8 +7,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern GlobalWork* gp;
-
 typedef struct EffBattenWork {
     s32 type;      // 0x0
     Vec position;  // 0x4

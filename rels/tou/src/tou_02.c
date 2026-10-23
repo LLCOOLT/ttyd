@@ -19,6 +19,8 @@
 #include "driver/hitdrv.h"
 #include "driver/dispdrv.h"
 #include "party.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(N_evt_sub_status_gauge_force_update);
 USER_FUNC(evt_sub_get_language);
@@ -153,13 +155,6 @@ static f32 randf(f32 min, f32 max);
 static void pose_change(Fan* fan, const char* name, const char* anim);
 static void pose_main(void);
 static void pose_init(void);
-extern s32 bero_case_entry[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_mail_vibration[];
 
 __declspec(section ".data") static u64 negone_one$374;
 __declspec(section ".data") static s32 neg_one$382[1];

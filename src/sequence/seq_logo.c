@@ -24,12 +24,6 @@
 #include <dolphin/vi.h>
 #include <string.h>
 
-extern GlobalWork* gp;
-extern GXRenderModeObj sRMObjHReso;
-extern GXRenderModeObj GXNtsc480ProgMarioSt;
-extern GXRenderModeObj GXNtsc480IntDfMarioSt;
-extern GXRenderModeObj sRMObjHReso_prog;
-
 #ifdef VERSION_G8ME01
 typedef struct LogoWork {
 	FileEntry* texture; //0x0

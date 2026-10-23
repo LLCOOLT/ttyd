@@ -6,6 +6,9 @@
 #include "mario/mario_motion.h"
 #include "driver/effdrv.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
+#include "mri.h"
 
 EffectEntry* effPuniBalloonEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 EffectEntry* marioeff;
@@ -56,19 +59,6 @@ USER_FUNC(mario_shabon_eff);
 USER_FUNC(mario_shabon_effdel);
 USER_FUNC(mario_shabon_effpos);
 USER_FUNC(mario_shabon_init);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_mri_door_close[];
-extern s32 evt_mri_door_open[];
-extern s32 evt_sub_kusa_access_entry[];
-extern s32 mri_countdown[];
-extern s32 mri_puni_init[];
-extern s32 mri_punipuni_itemremove[];
-extern s32 mri_punipuni_itemselect[];
-extern s32 mri_punipuni_itemset[];
-extern s32 mri_punipuni_setup[];
-extern s32 puni_disp_info[];
 
 __declspec(section ".data") u64 fd_mri_05_negone_one_374;
 __declspec(section ".data") s32 fd_mri_05_neg_one_382[1];

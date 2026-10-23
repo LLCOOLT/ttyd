@@ -6,9 +6,9 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "libc_decls.h"
 
 
-extern int __float_nan[];
 #define NAN (*(f32*)__float_nan)
 
 #define FP_NAN 1

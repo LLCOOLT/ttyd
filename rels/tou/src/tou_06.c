@@ -5,6 +5,8 @@
 #include "stdio.h"
 #include "memory.h"
 #include "stdlib.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_sub.h"
 
 s32* tbl;
 
@@ -95,12 +97,6 @@ USER_FUNC(free_tbl);
 static USER_FUNC(get_pos);
 USER_FUNC(iri_13_make_name);
 USER_FUNC(make_tbl);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 evt_bero_info_run[];
-extern s32 evt_sub_mail_vibration[];
 
 __declspec(section ".data") u64 fd_tou_06_negone_one_374;
 __declspec(section ".data") s32 fd_tou_06_neg_one_382[1];

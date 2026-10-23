@@ -14,8 +14,23 @@
 #include <dolphin/mtx.h>
 #include "manager/fontmgr.h"
 #include <string.h>
-extern void _restfpr_28(void);
-extern void _savefpr_28(void);
+#include "evt/evt_cam.h"
+#include "evt/evt_img.h"
+#include "evt/evt_memcard.h"
+#include "mario/mario_party.h"
+#include "mario/mario_pouch.h"
+#include "eff/eff_stardust.h"
+#include "eff/eff_fire.h"
+#include "koopa.h"
+#include "kpa_act.h"
+#include "driver/mapdrv.h"
+#include "driver/msgdrv.h"
+#include "driver/windowdrv.h"
+#include "driver/effdrv.h"
+#include "driver/swdrv.h"
+#include "statuswindow.h"
+#include "evt/evt_mobj.h"
+#include "libc_decls.h"
 s32 mobj_koopa_pole_evt(MapObjectEntry* mobj);
 void kpa_disp_pole_score(CameraId camId, void* param);
 static USER_FUNC(kpa_get_level);
@@ -112,14 +127,9 @@ USER_FUNC(evt_mobj_check);
 USER_FUNC(evt_mobj_delete);
 USER_FUNC(evt_mobj_entry);
 
-extern s32 mobjEntry(const char* name, const char* animPoseName);
-extern void mobjDelete(const char* name);
 extern void hitGrpFlagOn(const char* name, u32 flag);
 extern EventEntry* mobjRunEvent(MapObjectEntry* mobj, s32* eventCode);
 extern s32 psndSFXOn_3D(const char* name, Vec* position);
-extern s32 kpaGetLevel(void);
-extern void kpaAddScore(s32 score);
-extern void kpaAddScorePos(s32 score, Vec* pos);
 extern void kpaPowUp(void);
 extern void hitGrpFlagOff(const char* name, u32 flag);
 
@@ -147,15 +157,11 @@ __declspec(section ".data") u64 fd_evt_mobj_one_negone_359 = 0x3F800000BF800000;
 
 __declspec(section ".data") u64 evt_mobj_one_negone_b = 0x3F800000BF800000;
 
-extern s32 evt_cam_shake(EventEntry* event, BOOL isFirstCall);
 static s32 evt_shake[] = {0x0005005B, (s32)evt_cam_shake, 4, 0xF24A7A80, 0xF24A7A8A, 200, 2, 1};
 const char* _switch_anim[] = {"A_1", "A_2", "A_3", "A_4", "A_5", "S_1"};
 
 #define FLD(type, p, off) (*(type*)((u8*)(p) + (off)))
-extern void marioChgJumpStandMotion(f32 power);
-extern s32 irand(s32 max);
 extern s32 psndSFXOn(const char* name);
-extern s32 marioGetPartyId(void);
 
 s32 mobj_lv_blk_evt(MapObjectEntry* mobj);
 
@@ -176,15 +182,10 @@ extern void* itemEntry(f32 x, f32 y, f32 z, const char* name, s32 id, s32 mode, 
 extern void itemForceGet(void* item);
 extern void* itemNameToPtr(char* name);
 extern void itemFlagOn(void* item, u32 flag);
-extern s16 pouchAddCoin(s16 coins);
-extern void marioStSystemLevel(s32 level);
-extern s32 mobj_save_blk_sysevt[];
 #ifdef VERSION_G8ME01
-extern s32 evt_memcard_save_wrapper[];
 #endif
 s32 mobj_recovery_blk(MapObjectEntry* mobj);
 
-extern void mobjHitEntry(MapObjectEntry* mobj, s32 idx);
 extern void npcKoopaModeMobjBoundDeadCheck(void* hit);
 extern void effMObjBrokenEntry(s32 type, f32 x, f32 y, f32 z);
 s32 mobj_koopa_brickblk(MapObjectEntry* mobj);
@@ -192,30 +193,22 @@ s32 mobj_koopa_badgeblk(MapObjectEntry* mobj);
 
 s32 mobj_brickblk(MapObjectEntry* mobj);
 
-extern s32 kpaMutekiCheck(void);
-extern void kpaAddCoin(s32 coin);
 extern void itemStatusOn(void* item, u32 flag);
 s32 kpa_powerup(EventEntry* event, BOOL isFirstCall);
 s32 fire_func(EventEntry* event, BOOL isFirstCall);
 s32 kpa_powerup_evt[] = {0x0004005B, (s32)kpa_powerup, 0xFE363C80, 0xFE363C81, 0xFE363C82, 2, 1};
 s32 evt_fire[] = {0x0005005B, (s32)fire_func, 0xFE363C80, 0xFE363C81, 0xFE363C82, 0xFE363C83, 2, 1};
 
-extern void partyKeyOff(void);
-extern void mapGrpFlagOn(const char* name, u32 flag);
-extern void animPoseWorldPositionEvalOn(s32 poseId);
 s32 mobj_koopa_sango_evt(MapObjectEntry* mobj);
 s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj);
 #include "driver/imgdrv.h"
 #include "driver/offscreendrv.h"
 #include "driver/camdrv.h"
 #include "system.h"
-extern s32 evt_img_alloc_capture(EventEntry* event, BOOL isFirstCall);
 extern void test_kururing_mapdisp(s32 camId);
-extern double tan(double);
 #include "driver/npcdrv.h"
 extern void mobjSetPosition();
 extern void strcat();
-extern int sprintf(char*, const char*, ...);
 s32 mobj_kururing_floor(MapObjectEntry* mobj);
 s32 mobj_lock(MapObjectEntry* mobj);
 
@@ -253,7 +246,6 @@ USER_FUNC(kpa_get_width);
 USER_FUNC(kpa_powerup);
 USER_FUNC(kpa_score_to_str);
 static USER_FUNC(kpa_get_level);
-extern s32 evt_memcard_save[];
 
 // ---- BEGIN tail (defined in reverse of target order) ----
 
@@ -1670,10 +1662,7 @@ EVT_BEGIN(evt_lock_sound)
     RETURN
 EVT_END()
 
-extern const char* msgSearch(const char* tag);
 extern s32 msgWindow_Entry(const char* msg, s32 a, s32 b);
-extern s32 windowCheckID(s32 id);
-extern void partyKeyOn(void);
 
 s32 mobj_lock(MapObjectEntry* mobj) {
 #ifdef VERSION_G8ME01
@@ -2118,17 +2107,7 @@ void mobj_sign(void) {
 }
 
 extern EffectEntry* effCoinFukidashiEntry(f32 x, f32 y, f32 z, s32 type, s32 number, s32 duration);
-extern EffectEntry* effStardustEntry(s32 type, s32 arg1, s32 arg2, f32 x, f32 y, f32 z, f32 arg6, f32 arg7);
-extern void effSoftDelete(EffectEntry* effect);
-extern BOOL swGet(s32 index);
-extern void swSet(s32 index);
-extern s32 pouchGetCoin(void);
-extern PouchData* pouchGetPtr(void);
-extern void statusWinForceOpen(void);
-extern void statusWinForceOff(void);
-extern const char* msgSearch(const char* tag);
 extern s32 msgWindow_Entry(const char* msg, s32 a, s32 b);
-extern s32 windowCheckID(s32 id);
 
 // case 3 heal sequence; case 4 spells the same steps out inline (only this split reproduces the target registers)
 static inline void recoveryHeal(void) {
@@ -3145,12 +3124,10 @@ void kururing_capture(CameraId camId, MapObjectEntry* mobj) {
     memcpy(camGetPtr(camId), saved, 0x260);
 }
 
-extern s32 pouchGetJumpLv(void);
 extern void* itemHitCheck(f32 x, f32 y, f32 z, f32 r);
 extern void* npcNearDistCheck(f32 x, f32 y, f32 z, f32 r);
 extern void* itemNearDistCheck(f32 x, f32 y, f32 z, f32 r);
 extern s32 psndSFXOnEx_3D(const char* name, Vec* pos, s32 a, s32 b, s32 c, s32 d);
-extern s32 marioGetExtraPartyId(void);
 
 static inline BOOL kururing_in_box(f32 x, f32 z, f32 px, f32 pz, f32 r) {
     if (x - r <= px && px <= x + r && z - r <= pz && pz <= z + r) {
@@ -4011,8 +3988,6 @@ USER_FUNC(evt_mobj_koopa_dokan) {
     return EVT_RETURN_DONE;
 }
 
-extern EffectEntry* effFireEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale);
-
 USER_FUNC(fire_func) {
     s32* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -4152,7 +4127,6 @@ USER_FUNC(evt_mobj_koopa_sango) {
 
 extern s32 psndSFXChk(s32 id);
 extern void psndSFXOff(s32 id);
-extern f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2);
 
 s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
     Mtx mtx;

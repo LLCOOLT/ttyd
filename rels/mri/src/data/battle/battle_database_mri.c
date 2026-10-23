@@ -1,23 +1,13 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
+#include "mri.h"
 
 #pragma force_active on
 
 USER_FUNC(evt_mapobj_flag_onoff);
-extern s32 battle_flower_drop_param_default[];
-extern s32 battle_flower_drop_param_default2[];
-extern s32 battle_heart_drop_param_default[];
-extern s32 battle_item_barriern[];
-extern s32 battle_item_gundan_zako[];
-extern s32 battle_item_magnum_battender[];
-extern s32 battle_item_monochrome__pakkun[];
-extern s32 battle_item_piders[];
 extern s32 unit_barriern[];
-extern s32 unit_boss_magnum_battender[];
-extern s32 unit_gundan_zako[];
-extern s32 unit_monochrome_pakkun[];
-extern s32 unit_piders[];
-extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_battle_database_mri_negone_one_374;
 __declspec(section ".data") s32 fd_battle_database_mri_neg_one_382[1];

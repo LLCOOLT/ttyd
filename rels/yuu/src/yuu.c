@@ -3,14 +3,11 @@
 
 #pragma force_active on
 #include "data/mapdata.h"
+#include "yuu.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern s32 yuu_00_init_evt[];
-extern s32 yuu_01_init_evt[];
-extern s32 yuu_02_init_evt[];
-extern s32 yuu_03_init_evt[];
 
 void _unresolved(void);
 void _epilog(void);

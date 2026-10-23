@@ -53,3 +53,5 @@ typedef struct ShopWork {
 } ShopWork;
 
 USER_FUNC(evt_shop_setup);
+
+BOOL evtShopIsActive(void);

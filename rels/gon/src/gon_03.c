@@ -13,6 +13,7 @@
 #include "pmario_sound.h"
 #include "driver/dispdrv.h"
 #include "driver/camdrv.h"
+#include "evt/evt_bero.h"
 
 extern s32 partyCtrlNo;
 void partyChgPose(PartyEntry* party, const char* pose);
@@ -125,9 +126,6 @@ static void senkaron_ext_main(void);
 static void senkaron_ext_dispent(void);
 static void senkaron_ext_disp(CameraId camera, void* param);
 static void senkaron_ext_shadow_disp(CameraId camera, void* param);
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 evt_bero_info_run[];
 
 __declspec(section ".data") u64 fd_gon_03_negone_one_374;
 __declspec(section ".data") s32 fd_gon_03_neg_one_382[1];
