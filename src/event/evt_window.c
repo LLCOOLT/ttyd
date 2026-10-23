@@ -37,7 +37,7 @@ typedef struct OneMsgWin {
 	s32 id;    // 0x8
 } OneMsgWin;
 
-s32 unk_80418b38;
+s32 coinwin_se_wait;
 s32 unk_80418b3c;
 static void coin_disp(WinMgrEntry* entry);
 static void oneMessageDisp(WinMgrEntry* entry);
@@ -290,13 +290,13 @@ static void coin_disp(WinMgrEntry* entry) {
 		}
 		w->timer++;
 		w->timer = w->timer % 1200;
-		if (unk_80418b38 == 0) {
+		if (coinwin_se_wait == 0) {
 			psndSFXOn(0x2005B);
-			unk_80418b38 = 7;
+			coinwin_se_wait = 7;
 		}
 	}
-	if (unk_80418b38 > 0) {
-		unk_80418b38--;
+	if (coinwin_se_wait > 0) {
+		coinwin_se_wait--;
 	}
 }
 

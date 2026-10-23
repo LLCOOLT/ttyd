@@ -29,13 +29,13 @@ typedef struct EffIbukiWork {
     s32 delay;     // 0x50
 } EffIbukiWork;
 
-__declspec(section ".data") u64 lbl_ibuki_0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 ibuki_negone_one_a = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_eff_ibuki_negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_ibuki_1 = 0x3F800000BF800000;
+__declspec(section ".data") u64 ibuki_one_negone_a = 0x3F800000BF800000;
 __declspec(section ".data") u64 fd_eff_ibuki_one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_ibuki_2 = 0xBF8000003F800000;
+__declspec(section ".data") u64 ibuki_negone_one_b = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_eff_ibuki_negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_ibuki_3 = 0x3F800000BF800000;
+__declspec(section ".data") u64 ibuki_one_negone_b = 0x3F800000BF800000;
 __declspec(section ".data") u64 fd_eff_ibuki_one_negone_359 = 0x3F800000BF800000;
 
 static s16 ibuki_vertex_tbl[] __attribute__((aligned(32))) = { 0, 0, 0, 3840, 0, 0, 7679, 0, 0, 17919, 0, 0, 21760, 0, 0, 0, 1280, 0, 3840, 1280, 0, 7679, 1280, 0, 17919, 1280, 0, 21760, 1280, 0, 0, 2560, 0, 3840, 3840, 0, 7679, 5120, 0, 17919, 8960, 0, 21760, 10240, 0, 0, 0, 0 };

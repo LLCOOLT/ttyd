@@ -108,7 +108,7 @@ extern s32 evt_sub_mail_vibration[];
 extern s32 evt_tou_match_after_default[];
 extern s32 evt_tou_match_make_default[];
 extern s32 evt_tou_monitor_init[];
-extern s32 unk_evt_tou_00012b54[];
+extern s32 evt_gardman_spawn[];
 
 __declspec(section ".data") u64 fd_tou_07_negone_one_374;
 __declspec(section ".data") s32 fd_tou_07_neg_one_382[1];
@@ -823,7 +823,7 @@ EVT_BEGIN(tou_07_init_evt)
         IF_INT_EQUAL(GSWF(2388), 1)
             SET_VALUE(LW(0), STRING("n_bero"))
             CALL_CHILD(PTR(bero_case_switch_off))
-            SPAWN_EVENT(PTR(unk_evt_tou_00012b54))
+            SPAWN_EVENT(PTR(evt_gardman_spawn))
         END_IF
     END_IF
     RETURN

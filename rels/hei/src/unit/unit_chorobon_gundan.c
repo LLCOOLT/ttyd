@@ -108,7 +108,7 @@ static PoseTableEntry pose_table[15];
 static __declspec(section ".data") BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 s32 weapon_chorobon_gundan_attack[48];
-s32 unk_evt_hei_00019e30[73];
+s32 chorogun_dead_reward[73];
 static s32 init_event[26];
 static s32 damage_event[59];
 static s32 attack_event[217];
@@ -290,7 +290,7 @@ s32 weapon_chorobon_gundan_attack[] = {
     0, 0, 0, 0, 0, 100, 0, 0,
 };
 
-s32 unk_evt_hei_00019e30[] = {
+s32 chorogun_dead_reward[] = {
     393307, (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_BTL_ENEMY_DIE1_2", -250000000, 0, -250000000, 327771,
     (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999, -29999998, 131125, -29999998, 10,
     196699, (s32)btlevtcmd_GetCoin, -29999990, -30000000, 131163, (s32)btlevtcmd_StoreCoin, -30000000, 196699,

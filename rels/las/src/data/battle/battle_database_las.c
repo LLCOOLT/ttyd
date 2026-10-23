@@ -6,8 +6,8 @@
 #include "battle/battle.h"
 #include "battle/battle_stage_object.h"
 
-EffectEntry* unk_las_bss0000009c[6];
-s8 unk_las_bss00000098[4];
+EffectEntry* hi_fire_eff[6];
+s8 hi_fire_end_flag[4];
 EffectEntry* effFireEntry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime);
 void mapObjGetPos(const char* name, Vec* pos);
 
@@ -254,7 +254,7 @@ s32 stg_08_6_init_sub_event[46];
 __declspec(section ".data") s32 stg_08_6_init_event[4];
 
 USER_FUNC(hi_fire_end) {
-    unk_las_bss00000098[0] = 1;
+    hi_fire_end_flag[0] = 1;
     return EVT_RETURN_DONE;
 }
 
@@ -1549,21 +1549,21 @@ USER_FUNC(hi_fire_main) {
     s32 i;
 
     if (isFirstCall) {
-        unk_las_bss00000098[0] = 0;
+        hi_fire_end_flag[0] = 0;
         for (i = 0; i < 6; i++) {
-            unk_las_bss0000009c[i] = effFireEntry(8, 0.0f, -1000.0f, 0.0f, 1.0f, 1000);
+            hi_fire_eff[i] = effFireEntry(8, 0.0f, -1000.0f, 0.0f, 1.0f, 1000);
         }
     }
-    if (unk_las_bss00000098[0]) {
+    if (hi_fire_end_flag[0]) {
         for (i = 0; i < 6; i++) {
-            effSoftDelete(unk_las_bss0000009c[i]);
+            effSoftDelete(hi_fire_eff[i]);
         }
         return EVT_RETURN_DONE;
     }
     for (i = 0; i < 6; i++) {
         mapObjGetPos(names[i], &pos);
         if (pos.y > 0.0f) {
-            f32* wk = unk_las_bss0000009c[i]->userdata;
+            f32* wk = hi_fire_eff[i]->userdata;
 
             wk[1] = pos.x;
             wk[2] = pos.y - 15.0f;

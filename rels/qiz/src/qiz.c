@@ -19,10 +19,10 @@ __declspec(section ".data") s32 fd_qiz___local_PI_383[1];
 __declspec(section ".data") s32 fd_qiz___local_3PIO2_385[1];
 __declspec(section ".data") u64 fd_qiz_one_negone_373;
 __declspec(section ".data") s32 fd_qiz___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_qiz___local_PI_366[1];
+__declspec(section ".data") s32 fd_qiz_one_381[1];
 __declspec(section ".data") u64 fd_qiz_negone_one_360;
 __declspec(section ".data") s32 fd_qiz_neg_one_365[1];
-__declspec(section ".data") s32 lbl_23_data_9C[1];
+__declspec(section ".data") s32 fd_qiz___local_PI_366[1];
 __declspec(section ".data") s32 fd_qiz___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_qiz_one_negone_359;
 __declspec(section ".data") s32 fd_qiz___local_PIO2_367[1];
@@ -57,7 +57,7 @@ __declspec(section ".data") s32 fd_qiz___local_PIO2_384[] = {
     1070141403,
 };
 
-__declspec(section ".data") s32 fd_qiz___local_PI_366[] = {
+__declspec(section ".data") s32 fd_qiz_one_381[] = {
     1065353216,
 };
 
@@ -67,7 +67,7 @@ __declspec(section ".data") s32 fd_qiz_neg_one_365[] = {
     -1082130432,
 };
 
-__declspec(section ".data") s32 lbl_23_data_9C[] = {
+__declspec(section ".data") s32 fd_qiz___local_PI_366[] = {
     1078530011,
 };
 

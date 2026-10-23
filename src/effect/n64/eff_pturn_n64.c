@@ -33,25 +33,25 @@ typedef struct PturnElem {
     s32 delay;  // 0x44
 } PturnElem;
 
-__declspec(section ".data") s32 lbl_803A4790[] = {
+__declspec(section ".data") s32 eff_pturn_n64_negone_one_a[] = {
     -1082130432, 1065353216,
 };
 __declspec(section ".data") s32 pturn_negone_one_374[] = {
     -1082130432, 1065353216,
 };
-__declspec(section ".data") s32 lbl_803A47A0[] = {
+__declspec(section ".data") s32 eff_pturn_n64_one_negone_a[] = {
     1065353216, -1082130432,
 };
 __declspec(section ".data") s32 pturn_one_negone_373[] = {
     1065353216, -1082130432,
 };
-__declspec(section ".data") s32 lbl_803A47B0[] = {
+__declspec(section ".data") s32 eff_pturn_n64_negone_one_b[] = {
     -1082130432, 1065353216,
 };
 __declspec(section ".data") s32 pturn_negone_one_360[] = {
     -1082130432, 1065353216,
 };
-__declspec(section ".data") s32 lbl_803A47C0[] = {
+__declspec(section ".data") s32 eff_pturn_n64_one_negone_b[] = {
     1065353216, -1082130432,
 };
 __declspec(section ".data") s32 pturn_one_negone_359[] = {

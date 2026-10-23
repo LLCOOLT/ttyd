@@ -147,13 +147,13 @@ extern s32 subset_attack_ready_jump_event[];
 extern s32 weaponGetACOutputParam[];
 extern s32 weaponGetPowerFromPartyAttackLv[];
 
-__declspec(section ".data") u64 lbl_80376320;
+__declspec(section ".data") u64 unit_party_clauda_negone_one_a;
 __declspec(section ".data") u64 fd_clauda_negone_one_374;
-__declspec(section ".data") u64 lbl_80376330;
+__declspec(section ".data") u64 unit_party_clauda_one_negone_a;
 __declspec(section ".data") u64 fd_clauda_one_negone_373;
-__declspec(section ".data") u64 lbl_80376340;
+__declspec(section ".data") u64 unit_party_clauda_negone_one_b;
 __declspec(section ".data") u64 fd_clauda_negone_one_360;
-__declspec(section ".data") u64 lbl_80376350;
+__declspec(section ".data") u64 unit_party_clauda_one_negone_b;
 __declspec(section ".data") u64 fd_clauda_one_negone_359;
 s32 partyWeapon_ClaudaNormalAttack[48];
 s32 partyWeapon_ClaudaBreathAttack[48];
@@ -190,19 +190,19 @@ static s32 party_win_reaction[11];
 
 
 
-__declspec(section ".data") u64 lbl_80376320 = 0xBF8000003F800000;
+__declspec(section ".data") u64 unit_party_clauda_negone_one_a = 0xBF8000003F800000;
 
 __declspec(section ".data") u64 fd_clauda_negone_one_374 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 lbl_80376330 = 0x3F800000BF800000;
+__declspec(section ".data") u64 unit_party_clauda_one_negone_a = 0x3F800000BF800000;
 
 __declspec(section ".data") u64 fd_clauda_one_negone_373 = 0x3F800000BF800000;
 
-__declspec(section ".data") u64 lbl_80376340 = 0xBF8000003F800000;
+__declspec(section ".data") u64 unit_party_clauda_negone_one_b = 0xBF8000003F800000;
 
 __declspec(section ".data") u64 fd_clauda_negone_one_360 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 lbl_80376350 = 0x3F800000BF800000;
+__declspec(section ".data") u64 unit_party_clauda_one_negone_b = 0x3F800000BF800000;
 
 __declspec(section ".data") u64 fd_clauda_one_negone_359 = 0x3F800000BF800000;
 

@@ -40,13 +40,13 @@ typedef struct AnimeEntry {
 void effReleaseMain(EffectEntry* effect);
 void effReleaseDisp(CameraId cameraId, EffectEntry* effect);
 
-__declspec(section ".data") f32 lbl_803A4C60[2] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 eff_release_n64_negone_one_a[2] = {-1.0f, 1.0f};
 __declspec(section ".data") static f32 negone_one_374[2] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 lbl_803A4C70[2] = {1.0f, -1.0f};
+__declspec(section ".data") f32 eff_release_n64_one_negone_a[2] = {1.0f, -1.0f};
 __declspec(section ".data") static f32 one_negone_373[2] = {1.0f, -1.0f};
-__declspec(section ".data") f32 lbl_803A4C80[2] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 eff_release_n64_negone_one_b[2] = {-1.0f, 1.0f};
 __declspec(section ".data") static f32 negone_one_360[2] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 lbl_803A4C90[2] = {1.0f, -1.0f};
+__declspec(section ".data") f32 eff_release_n64_one_negone_b[2] = {1.0f, -1.0f};
 __declspec(section ".data") static f32 one_negone_359[2] = {1.0f, -1.0f};
 
 static AnimeEntry anime_data[30] = {

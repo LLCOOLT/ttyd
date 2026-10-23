@@ -22,8 +22,8 @@ typedef struct EffShockN64Work {
     s32 col1[3];  // 0x3c
 } EffShockN64Work;
 
-GXColor unk_80423258;
-GXColor unk_8042325c;
+GXColor shock_zero_color0;
+GXColor shock_zero_color1;
 
 effN64Vtx testsrc_shock_v[] = {
     {242, -140, 0, 1800, 576, 0xFF, 0xFF, 0xFF, 0xFF},

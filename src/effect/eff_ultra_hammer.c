@@ -38,13 +38,13 @@ u8 wakka_color0_tbl[];
 s16 wakka_texcoord0_tbl[];
 
 #ifdef __MWERKS__
-__declspec(section ".data") u64 lbl_803B70C0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_ultra_hammer_negone_one_a = 0xBF8000003F800000;
 static __declspec(section ".data") u64 negone_one$374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803B70D0 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_ultra_hammer_one_negone_a = 0x3F800000BF800000;
 static __declspec(section ".data") u64 one_negone$373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_803B70E0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_ultra_hammer_negone_one_b = 0xBF8000003F800000;
 static __declspec(section ".data") u64 negone_one$360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803B70F0 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_ultra_hammer_one_negone_b = 0x3F800000BF800000;
 static __declspec(section ".data") u64 one_negone$359 = 0x3F800000BF800000;
 
 s16 wakka_vertex_tbl[] ATTRIBUTE_ALIGN(32) = {

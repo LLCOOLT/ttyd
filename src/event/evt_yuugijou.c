@@ -28,7 +28,7 @@ PiantaParlorWork yuugijouwork;
 //.sbss
 s32 gap_08_80418B5C_sbss;
 PiantaParlorWork* yuwp;
-s32 unk_80418b54;
+s32 yuu_window_evt;
 
 s32 minigame_end[] = {
 	0x00020032, 0xFD050F80, 0x00000002,
@@ -306,12 +306,12 @@ USER_FUNC(yuuminigame_end) {
 }
 
 USER_FUNC(yuuminigame_get_window_evt) {
-	evtSetValue(event, event->args[0], unk_80418b54);
+	evtSetValue(event, event->args[0], yuu_window_evt);
 	return EVT_RETURN_DONE;
 }
 
 void evtYuuSetWindowEvt(s32 value) {
-	unk_80418b54 = value;
+	yuu_window_evt = value;
 }
 
 void evtYuuWindow(void) {

@@ -128,8 +128,8 @@ void sincosf(f32* ret_sin, f32* ret_cos, f32 degree);
 
 static s32 unk_804189f4;
 static f32 touch_wall_ct;
-static s32 unk_804189ec;
-static f32 unk_804189e8;
+static s32 upstairs_count;
+static f32 upstairs_dy;
 
 void L_partyForceSlitOff(PartyEntry* party);
 BOOL party_slit(PartyEntry* party);
@@ -447,7 +447,7 @@ s32 partyGetFootmarkWriteId(s32 id);
 s32 partyGetFootmarkReadId(s32 id);
 f32 partyGetTargetDist(s32 id, f32 x, f32 z);
 f32 partyGetTargetDir(s32 id, f32 x, f32 z);
-f32 partyGetTargetDistY(s32 id);
+f32 partyGetTargetMovespd(s32 id);
 void partyGetReadId(s32 id, f32* x, f32* y, f32* z);
 static f32 partyStayDist(PartyEntry* party);
 static u32 partyGetFrontAttr(PartyEntry* party, f32 dir);
@@ -857,7 +857,7 @@ typedef struct PartyFootmark {
 f32 partyGetTargetMovespd2(PartyEntry* party);
 PartyFootmark* partyGetFootmarkPtr(s32 id);
 s32 marioGetSlitFloorPos(Vec* pos);
-f32 partyGetTargetHeightDiff(s32 id, f32 y);
+f32 partyGetTargetDistY(s32 id, f32 y);
 
 PartyMarioView* marioGetPtr(void);
 void partyGetReadId2(s32 id, Vec* pos);
@@ -921,7 +921,7 @@ void party_motion_homing_walk(PartyEntry* party) {
             party->flags3 |= 0x20000;
         }
     }
-    if (partyGetTargetDistY(id)) {
+    if (partyGetTargetMovespd(id)) {
         lim2 = 50.0f;
     } else {
         lim2 = 35.0f;
@@ -1210,7 +1210,7 @@ found:
                 party->unk4D++;
                 if (party->unk4D > 8) {
                     party->unk4D = 0;
-                    if (partyGetTargetHeightDiff(id, party->position.y) >= 1.0f) {
+                    if (partyGetTargetDistY(id, party->position.y) >= 1.0f) {
                         getFrontFloor(party, &t, party->unk100);
                         if (t.y - party->position.y > 5.0f) {
                             party->unk94 = t;
@@ -1335,7 +1335,7 @@ void party_motion_homing_fly(PartyEntry* party) {
             party->flags3 |= 0x20000;
         }
     }
-    if (partyGetTargetDistY(id)) {
+    if (partyGetTargetMovespd(id)) {
         lim2 = 50.0f;
     } else {
         lim2 = 35.0f;
@@ -1565,7 +1565,7 @@ void party_motion_homing_fly(PartyEntry* party) {
                     party->position.y += 0.05f * ((gy + party->unkF0) - party->position.y);
                 } else {
                     party->unk4E++;
-                    if (partyGetTargetHeightDiff(id, party->position.y) >= 1.0f &&
+                    if (partyGetTargetDistY(id, party->position.y) >= 1.0f &&
                         __fabsf(mario->position.y - party->position.y) >= 10.0f)
                     {
                         party->position.y = party->position.y + 0.1f * ((10.0f + mario->position.y) - party->position.y);
@@ -2209,7 +2209,7 @@ void party_motion_jump(PartyEntry* party) {
                 sincosf(&s, &c, angleABf(party->position.x, party->position.z, x, z));
                 if (dist > lim) {
                     dist = lim;
-                    if (partyGetTargetDistY(id) == 0.0f) {
+                    if (partyGetTargetMovespd(id) == 0.0f) {
                         dist = 0.0f;
                     }
                     x = party->position.x;
@@ -2219,7 +2219,7 @@ void party_motion_jump(PartyEntry* party) {
                     y += 10.0f;
                     party->unk94 = (Vec){x, y, z};
                 } else {
-                    if (partyGetTargetDistY(id) == 0.0f) {
+                    if (partyGetTargetMovespd(id) == 0.0f) {
                         dist = 0.0f;
                     }
                     x = x + dist * s;
@@ -2474,11 +2474,11 @@ void party_motion_upstairs(PartyEntry* party) {
     if (party->flags3 & 2) {
         party->flags3 &= ~2;
         party->flags |= 0x40;
-        unk_804189ec = 3;
-        unk_804189e8 = (party->unk120 - party->position.y) / 3.0f;
+        upstairs_count = 3;
+        upstairs_dy = (party->unk120 - party->position.y) / 3.0f;
     }
-    party->position.y += unk_804189e8;
-    if (--unk_804189ec <= 0) {
+    party->position.y += upstairs_dy;
+    if (--upstairs_count <= 0) {
         party->flags &= ~0x40;
         partyChgMot(party, 1);
     }

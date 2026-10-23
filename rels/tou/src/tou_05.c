@@ -124,7 +124,7 @@ __declspec(section ".data") s32 fd_tou_05_one_364[1];
 static s32 evt_dakuto[90];
 static __declspec(section ".data") s32 n_door_open[12];
 static __declspec(section ".data") s32 n_door_close[12];
-s32 unk_evt_tou_0002b6c8[14];
+s32 n_bero_match_reset[14];
 static s32 bero_data[45];
 s32 evt_takurami[352];
 s32 evt_hiki_close[86];
@@ -233,7 +233,7 @@ static __declspec(section ".data") EVT_BEGIN(n_door_close)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_tou_0002b6c8)
+EVT_BEGIN(n_bero_match_reset)
     IF_INT_EQUAL(GSWF(2388), 1)
         DEBUG_PUT_MSG(STRING("登録していた試合をリセット"))
     END_IF
@@ -244,7 +244,7 @@ EVT_END()
 
 static s32 bero_data[] = {
     (s32)"n_bero", 65540, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)unk_evt_tou_0002b6c8, (s32)"tou_04", (s32)"s_bero_5", 327685, (s32)n_door_close, (s32)n_door_open, (s32)"w_bero",
+    -1, (s32)n_bero_match_reset, (s32)"tou_04", (s32)"s_bero_5", 327685, (s32)n_door_close, (s32)n_door_open, (s32)"w_bero",
     0, 20000, 100000, 0, 0, -1, (s32)evt_dakuto, -1,
     0, (s32)"tou_13", (s32)"w_bero_", 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,

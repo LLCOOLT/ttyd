@@ -221,7 +221,7 @@ typedef struct MoaChain {
     const char* a;
     const char* b;
 } MoaChain;
-const s32 dat_80419a28 = 0x2F;
+const s32 g_moamoa_chain_num = 0x2F;
 MoaChain g_moamoa_chain_tbl[47] = {
     { "joint_00", "jointdai1_A01" },
     { "jointdai1_A01", "jointdai1_A02" },

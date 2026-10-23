@@ -99,7 +99,7 @@ __declspec(section ".data") s32 fd_tik_11___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_tik_11_one_negone_359;
 __declspec(section ".data") s32 fd_tik_11___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_tik_11_one_364[1];
-s32 unk_evt_tik_00021280[16];
+s32 powerdownya_face_left[16];
 s32 powerdownya_mario_level_rtn[616];
 s32 powerdownya_party_lank_rtn[937];
 s32 powerdownya_table_talk[84];
@@ -321,7 +321,7 @@ __declspec(section ".data") s32 fd_tik_11_one_364[] = {
     1065353216,
 };
 
-EVT_BEGIN(unk_evt_tik_00021280)
+EVT_BEGIN(powerdownya_face_left)
     LOOP(0)
         CALL(evt_party_set_dir_pos, 0, -9, 0)
         CALL(evt_mario_set_dir_pos, -9, 0)
@@ -366,7 +366,7 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
     WAIT_MS(500)
     CALL(evt_win_coin_off, LW(12))
     CALL(enzan_lw_save)
-    SPAWN_EVENT_GET_ID(PTR(unk_evt_tik_00021280), GW(1))
+    SPAWN_EVENT_GET_ID(PTR(powerdownya_face_left), GW(1))
     CALL(evt_snd_bgmoff_f, 1024, 2000)
     CALL(evt_msg_print_add, 0, STRING("powerdown_11"))
     CALL(bgScrollControll, 0)
@@ -584,7 +584,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
     CALL(evt_eff64, STRING("aaax"), STRING("lensflare_n64"), 0, -9, 49, 0, FLOAT(1.0f), -1, 0, 0, 0, 0, 0, 0)
     WAIT_MS(500)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("down_pira"), 1)
-    SPAWN_EVENT_GET_ID(PTR(unk_evt_tik_00021280), GW(1))
+    SPAWN_EVENT_GET_ID(PTR(powerdownya_face_left), GW(1))
     CALL(evt_msg_print, 0, STRING("powerdown_12"), 0, STRING("me"))
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 0, 255, 0, 1200)
@@ -680,7 +680,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
         CALL(evt_mario_hello_party, 0, LW(1))
         WAIT_MS(500)
         CALL(evt_party_stop, 0)
-        SPAWN_EVENT_GET_ID(PTR(unk_evt_tik_00021280), GW(1))
+        SPAWN_EVENT_GET_ID(PTR(powerdownya_face_left), GW(1))
         CALL(evt_mario_get_party, LW(1))
         SWITCH(LW(1))
             CASE_EQUAL(1)

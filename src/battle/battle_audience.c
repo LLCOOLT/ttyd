@@ -219,7 +219,7 @@ typedef struct AudMemberAnim {
 void BattleStatusWindowAPRecoveryOn(void);
 #pragma force_active on
 
-__declspec(section ".data") u8 lbl_80399940[8] = {0xBF, 0x80, 0x00, 0x00, 0x3F, 0x80, 0x00, 0x00};
+__declspec(section ".data") u8 battle_audience_negone_one_a[8] = {0xBF, 0x80, 0x00, 0x00, 0x3F, 0x80, 0x00, 0x00};
 __declspec(section ".data") f32 aud_uv0[2] = {-1.0f, 1.0f};
 __declspec(section ".data") f32 aud_uv1[2] = {1.0f, -1.0f};
 __declspec(section ".data") f32 aud_uv2[2] = {1.0f, -1.0f};
@@ -1478,7 +1478,7 @@ extern s32 BattleAudience_GetPresentItemType(void);
 extern s32 BtlUnit_CheckShadowGuard(BattleUnit*);
 extern double __fabs(double);
 void BattleAudienceItemCtrlProcess(void) {
-	u8* d = lbl_80399940;
+	u8* d = battle_audience_negone_one_a;
 	Vec hv;
 	s32 i;
 	BattleWork* wp = _battleWorkPointer;

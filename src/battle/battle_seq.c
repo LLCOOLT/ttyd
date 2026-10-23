@@ -119,25 +119,25 @@ void btlseqTurn(BattleWork* wp);
 void btlseqEnd(BattleWork* wp);
 
 // static data from an inlined header function (see unit_party_sanders.c)
-__declspec(section ".data") s32 lbl_80360FE0[] = {
+__declspec(section ".data") s32 battle_seq_negone_one_a[] = {
 	-1082130432, 1065353216,
 };
 static __declspec(section ".data") s32 seq_negone_one_374[] = {
 	-1082130432, 1065353216,
 };
-__declspec(section ".data") s32 lbl_80360FF0[] = {
+__declspec(section ".data") s32 battle_seq_one_negone_a[] = {
 	1065353216, -1082130432,
 };
 static __declspec(section ".data") s32 seq_one_negone_373[] = {
 	1065353216, -1082130432,
 };
-__declspec(section ".data") s32 lbl_80361000[] = {
+__declspec(section ".data") s32 battle_seq_negone_one_b[] = {
 	-1082130432, 1065353216,
 };
 static __declspec(section ".data") s32 seq_negone_one_360[] = {
 	-1082130432, 1065353216,
 };
-__declspec(section ".data") s32 lbl_80361010[] = {
+__declspec(section ".data") s32 battle_seq_one_negone_b[] = {
 	1065353216, -1082130432,
 };
 static __declspec(section ".data") s32 seq_one_negone_359[] = {

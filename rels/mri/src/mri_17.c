@@ -126,7 +126,7 @@ static s32 npcEnt[92];
 static s32 ueki_access_data[16];
 s32 trap_position[102];
 s32 trap_main[122];
-s32 unk_evt_mri_0005be38[59];
+s32 trap_restore[59];
 s32 wana_kemuri[130];
 s32 wana_offscreen[219];
 s32 trap_event[716];
@@ -307,7 +307,7 @@ EVT_BEGIN(trap_main)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_mri_0005be38)
+EVT_BEGIN(trap_restore)
     CALL(evt_puni_wait_systemmode, 2)
     SET_VALUE(LW(10), 1)
     SET_VALUE(LW(11), 0)
@@ -810,7 +810,7 @@ EVT_BEGIN(mri_17_init_evt)
         CASE_BETWEEN(102, 105)
         SPAWN_EVENT(PTR(trap_main))
         CASE_BETWEEN(106, 107)
-        SPAWN_EVENT(PTR(unk_evt_mri_0005be38))
+        SPAWN_EVENT(PTR(trap_restore))
         CASE_GREATER_OR_EQUAL(106)
     END_SWITCH
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_hako_saku_mae"), 2)

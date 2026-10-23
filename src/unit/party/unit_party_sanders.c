@@ -139,13 +139,13 @@ extern s32 unit_bomzou[];
 extern s32 weaponGetACOutputParam[];
 extern s32 weaponGetPowerFromPartyAttackLv[];
 
-__declspec(section ".data") s32 lbl_803848D8[2];
+__declspec(section ".data") s32 unit_party_sanders_negone_one_a[2];
 __declspec(section ".data") s32 sanders_negone_one_374[2];
-__declspec(section ".data") s32 lbl_803848E8[2];
+__declspec(section ".data") s32 unit_party_sanders_one_negone_a[2];
 __declspec(section ".data") s32 sanders_one_negone_373[2];
-__declspec(section ".data") s32 lbl_803848F8[2];
+__declspec(section ".data") s32 unit_party_sanders_negone_one_b[2];
 __declspec(section ".data") s32 sanders_negone_one_360[2];
-__declspec(section ".data") s32 lbl_80384908[2];
+__declspec(section ".data") s32 unit_party_sanders_one_negone_b[2];
 __declspec(section ".data") s32 sanders_one_negone_359[2];
 PoseTableEntry pose_table_sanders_stay[25];
 PoseTableEntry pose_table_counter_sanders[20];
@@ -169,7 +169,7 @@ s32 partySandersAttack_TimeBombSet[290];
 s32 _shot_bomb_event[155];
 s32 sanders_appeal_event[121];
 static s32 attack_audience_event[284];
-s32 unk_evt_80388830[14];
+s32 sanders_battle_end_event[14];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
@@ -177,7 +177,7 @@ static s32 attack_event[2];
 s32 entry_bomzou[12];
 static s32 party_win_reaction[9];
 
-__declspec(section ".data") s32 lbl_803848D8[] = {
+__declspec(section ".data") s32 unit_party_sanders_negone_one_a[] = {
     -1082130432, 1065353216,
 };
 
@@ -185,7 +185,7 @@ __declspec(section ".data") s32 sanders_negone_one_374[] = {
     -1082130432, 1065353216,
 };
 
-__declspec(section ".data") s32 lbl_803848E8[] = {
+__declspec(section ".data") s32 unit_party_sanders_one_negone_a[] = {
     1065353216, -1082130432,
 };
 
@@ -193,7 +193,7 @@ __declspec(section ".data") s32 sanders_one_negone_373[] = {
     1065353216, -1082130432,
 };
 
-__declspec(section ".data") s32 lbl_803848F8[] = {
+__declspec(section ".data") s32 unit_party_sanders_negone_one_b[] = {
     -1082130432, 1065353216,
 };
 
@@ -201,7 +201,7 @@ __declspec(section ".data") s32 sanders_negone_one_360[] = {
     -1082130432, 1065353216,
 };
 
-__declspec(section ".data") s32 lbl_80384908[] = {
+__declspec(section ".data") s32 unit_party_sanders_one_negone_b[] = {
     1065353216, -1082130432,
 };
 
@@ -267,7 +267,7 @@ static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {64, party_win_reaction},
     {7, subset_attack_ready_jump_event},
-    {66, unk_evt_80388830},
+    {66, sanders_battle_end_event},
     {47, btldefaultevt_avoid_counter_event},
     {0, NULL},
 };
@@ -963,7 +963,7 @@ static s32 attack_audience_event[] = {
     (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
 };
 
-EVT_BEGIN(unk_evt_80388830)
+EVT_BEGIN(sanders_battle_end_event)
     CALL(btlevtcmd_OnOffStatus, -2, 22, 0, 0, 0)
     CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_sanders_stay))
     RETURN

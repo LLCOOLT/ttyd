@@ -152,7 +152,7 @@ static s32 damage_event[97];
 s32 base_size_change[99];
 static s32 phase_event[482];
 static s32 dead_event[64];
-s32 unk_evt_tou2_000219a8[238];
+s32 macho_gance_damage_event[238];
 static s32 attack_event[151];
 s32 gance_macho_speed_attack_event[119];
 s32 gance_build_up_attack_event[119];
@@ -328,19 +328,19 @@ static PoseTableEntry pose_table_furafura[] = {
 
 static BattleDataEntry data_table[] = {
     {49, dead_event},
-    {36, unk_evt_tou2_000219a8},
-    {24, unk_evt_tou2_000219a8},
-    {25, unk_evt_tou2_000219a8},
-    {26, unk_evt_tou2_000219a8},
-    {27, unk_evt_tou2_000219a8},
-    {28, unk_evt_tou2_000219a8},
-    {29, unk_evt_tou2_000219a8},
-    {30, unk_evt_tou2_000219a8},
-    {31, unk_evt_tou2_000219a8},
-    {32, unk_evt_tou2_000219a8},
-    {33, unk_evt_tou2_000219a8},
-    {34, unk_evt_tou2_000219a8},
-    {35, unk_evt_tou2_000219a8},
+    {36, macho_gance_damage_event},
+    {24, macho_gance_damage_event},
+    {25, macho_gance_damage_event},
+    {26, macho_gance_damage_event},
+    {27, macho_gance_damage_event},
+    {28, macho_gance_damage_event},
+    {29, macho_gance_damage_event},
+    {30, macho_gance_damage_event},
+    {31, macho_gance_damage_event},
+    {32, macho_gance_damage_event},
+    {33, macho_gance_damage_event},
+    {34, macho_gance_damage_event},
+    {35, macho_gance_damage_event},
     {0, NULL},
 };
 
@@ -649,7 +649,7 @@ static s32 dead_event[] = {
     500, 131122, -29999990, -2, 65630, (s32)subsetevt_dead_core_nospin_norotate, 2, 1,
 };
 
-s32 unk_evt_tou2_000219a8[] = {
+s32 macho_gance_damage_event[] = {
     131163, (s32)btlevtcmd_ResetFaceDirection, -29999990, 196699, (s32)btlevtcmd_OnUnitFlag, -29999990, 1, 110,
     65570, -30000000, 65579, 43, 65579, 44, 65579, 45,
     196699, (s32)btlevtcmd_GetUnitKind, -29999990, -29999998, 131096, -29999998, 222, 327771,

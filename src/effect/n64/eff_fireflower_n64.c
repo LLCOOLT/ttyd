@@ -30,13 +30,13 @@ typedef struct EffFireFlowerN64Work {
 } EffFireFlowerN64Work;
 
 #ifdef __MWERKS__
-__declspec(section ".data") u64 lbl_8039CA10 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_fireflower_n64_negone_one_a = 0xBF8000003F800000;
 __declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_8039CA20 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_fireflower_n64_one_negone_a = 0x3F800000BF800000;
 __declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_8039CA30 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_fireflower_n64_negone_one_b = 0xBF8000003F800000;
 __declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_8039CA40 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_fireflower_n64_one_negone_b = 0x3F800000BF800000;
 __declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
 #endif
 

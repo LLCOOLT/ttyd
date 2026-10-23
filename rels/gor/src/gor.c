@@ -27,8 +27,8 @@ extern s32 gor_10_init_evt[];
 extern s32 gor_11_init_evt[];
 extern s32 gor_12_init_evt[];
 void tegami_delete(void);
-static s32 unk_gor_bss00000004;
-static char* unk_gor_bss00000000;
+static s32 gor_inemuri_snd_id;
+static char* gor_msg_cat_buf;
 
 USER_FUNC(evt_mario_get_party);
 USER_FUNC(evt_mario_get_pos);
@@ -116,11 +116,11 @@ void _unresolved(void) {
 }
 
 USER_FUNC(evt_gor_msg_cat_free) {
-    if (unk_gor_bss00000000 == NULL) {
+    if (gor_msg_cat_buf == NULL) {
         return EVT_RETURN_DONE;
     }
-    _mapFree(unk_gor_bss00000000);
-    unk_gor_bss00000000 = NULL;
+    _mapFree(gor_msg_cat_buf);
+    gor_msg_cat_buf = NULL;
     return EVT_RETURN_DONE;
 }
 
@@ -131,10 +131,10 @@ USER_FUNC(evt_gor_msg_cat_alloc) {
     const char* tail = (const char*)evtGetValue(event, args[2]);
     s32 size = strlen(head) + strlen(msg) + strlen(tail) + 1;
 
-    unk_gor_bss00000000 = _mapAlloc(size);
-    memset(unk_gor_bss00000000, 0, size);
-    sprintf(unk_gor_bss00000000, "%s%s%s", head, msg, tail);
-    evtSetValue(event, args[3], (s32)unk_gor_bss00000000);
+    gor_msg_cat_buf = _mapAlloc(size);
+    memset(gor_msg_cat_buf, 0, size);
+    sprintf(gor_msg_cat_buf, "%s%s%s", head, msg, tail);
+    evtSetValue(event, args[3], (s32)gor_msg_cat_buf);
     return EVT_RETURN_DONE;
 }
 
@@ -187,13 +187,13 @@ USER_FUNC(evt_goki_sub_intpl_get_value) {
 }
 
 USER_FUNC(evt_gor_inemuri_snd_set) {
-    unk_gor_bss00000004 = evtGetValue(event, event->args[0]);
+    gor_inemuri_snd_id = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_gor_inemuri_snd_off) {
-    if (unk_gor_bss00000004 != -1) {
-        psndSFXOff(unk_gor_bss00000004);
+    if (gor_inemuri_snd_id != -1) {
+        psndSFXOff(gor_inemuri_snd_id);
     }
     return EVT_RETURN_DONE;
 }

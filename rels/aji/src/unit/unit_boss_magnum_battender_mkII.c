@@ -41,9 +41,9 @@ s32 jetCount;
 static s32* list;
 EffectEntry* eff_suikomi;
 s32 screamId;
-s32 unk_aji_bss00000168;
-u8 unk_aji_bss00000165;
-u8 unk_aji_bss00000164;
+s32 scream_fade_timer;
+u8 scream_fade_start_vol;
+u8 scream_fade_vol;
 TargetWork* wp_target;
 s32 targetSoundId;
 static EffectEntry* eff_charge;
@@ -671,13 +671,13 @@ USER_FUNC(aud_suikomi) {
 
 USER_FUNC(aud_scream_fadeout) {
     if (isFirstCall) {
-        unk_aji_bss00000168 = 120;
-        unk_aji_bss00000165 = psndSFX_get_vol(screamId);
+        scream_fade_timer = 120;
+        scream_fade_start_vol = psndSFX_get_vol(screamId);
     }
-    unk_aji_bss00000168--;
-    unk_aji_bss00000164 = intplGetValue(unk_aji_bss00000165, 0.0f, 0, 120 - unk_aji_bss00000168, 120);
-    psndSFX_vol(screamId, unk_aji_bss00000164);
-    if (unk_aji_bss00000168 <= 0) {
+    scream_fade_timer--;
+    scream_fade_vol = intplGetValue(scream_fade_start_vol, 0.0f, 0, 120 - scream_fade_timer, 120);
+    psndSFX_vol(screamId, scream_fade_vol);
+    if (scream_fade_timer <= 0) {
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;

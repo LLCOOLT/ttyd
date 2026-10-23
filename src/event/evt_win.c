@@ -82,7 +82,7 @@ typedef struct UnitWinWork {
 } UnitWinWork;
 
 static s16* mario_status_point_table[3];
-s32 unk_804189fc;
+s32 unitwin_coin_se_wait;
 static UnitWinWork* _wp;
 
 USER_FUNC(evt_unitwin_main_func);
@@ -94,7 +94,7 @@ void unitwin_help_disp(WinMgrEntry* entry);
 void unitwin_point_disp(WinMgrEntry* entry);
 void unitwin_name_disp(WinMgrEntry* entry);
 
-WinMgrDesc unk_80375478[3] = {
+WinMgrDesc unitwin_desc[3] = {
 	{0, 0, 8, -150, 120, 300, 50, {0x2B, 0xA4, 0xFF, 0xFF}, NULL, unitwin_name_disp},
 	{0, 0, 8, -240, -130, 500, 80, {0xF0, 0xF0, 0xF0, 0xFF}, unitwin_help_main, unitwin_help_disp},
 	{2, 0, 8, -250, -130, 150, 45, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, unitwin_point_disp},
@@ -278,7 +278,7 @@ USER_FUNC(evt_unitwin_selltable_setup) {
 	wp->evt = evtEntryType(select_evt, 0, 0x20, 0);
 	wp->evt->lwData[0] = (s32)wp;
 	for (i = 0; i < 3; i++) {
-		wp->winId[i] = winMgrEntry(&unk_80375478[i]);
+		wp->winId[i] = winMgrEntry(&unitwin_desc[i]);
 	}
 	wp->selected = -1;
 	return EVT_RETURN_DONE;
@@ -586,13 +586,13 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			}
 			wp->field_0x5C++;
 			wp->field_0x5C %= 1200;
-			if (!unk_804189fc) {
+			if (!unitwin_coin_se_wait) {
 				psndSFXOn("SFX_COUNT_COIN1");
-				unk_804189fc = 7;
+				unitwin_coin_se_wait = 7;
 			}
 		}
-		if (unk_804189fc > 0) {
-			unk_804189fc--;
+		if (unitwin_coin_se_wait > 0) {
+			unitwin_coin_se_wait--;
 		}
 	}
 

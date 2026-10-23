@@ -31,13 +31,13 @@ typedef struct EffWaterDamageN64Work {
 
 #ifdef __MWERKS__
 static __declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803A8908 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_water_damage_n64_negone_one_a = 0xBF8000003F800000;
 static __declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_803A8918 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_water_damage_n64_one_negone_a = 0x3F800000BF800000;
 static __declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803A8928 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_water_damage_n64_negone_one_b = 0xBF8000003F800000;
 static __declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_803A8938 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_water_damage_n64_one_negone_b = 0x3F800000BF800000;
 #endif
 
 u32 size8x8_tex16x16_0_vtx[14] = { 0xFFFCFFFC, 0x00000000, 0x00000000, 0x00FF0004, 0xFFFC0000, 0x02000000, 0x000000FF,
@@ -47,7 +47,7 @@ u32 size8x8_tex16x16_1_vtx[14] = { 0xFFFBFFFD, 0x00000000, 0x00000000, 0x00FF000
 u32 size8x8_tex16x16_2_vtx[14] = { 0xFFFDFFFB, 0x00000000, 0x00000000, 0x00FF0003, 0xFFFB0000, 0x02000000, 0x000000FF,
                                    0x00030005, 0x00000200, 0x02000000, 0x00FFFFFD, 0x00050000, 0x00000200, 0x000000FF };
 
-u32 unk_803a8a00[32] __attribute__((aligned(32))) = {
+u32 water_damage_tex[32] __attribute__((aligned(32))) = {
     0x78A31427, 0x572B0B52, 0x5167133A, 0x7FDF7F2F, 0x653E32A7, 0xF5FFFF8B, 0x32670486, 0x8BFFD55E,
     0x60830B26, 0xF8E8FA55, 0x602011C5, 0x2E020278, 0x59A40486, 0xF7155555, 0x90200486, 0xBC555555,
     0xE77F1BFF, 0x6258577A, 0xAE9A0C4F, 0xF5B5D522, 0xF7BF241F, 0x78002AFF, 0xF7DF1BFF, 0x022AFFDD,
@@ -289,7 +289,7 @@ void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     GXSetCullMode(GX_CULL_NONE);
     work++;
-    GXInitTexObj(&texObj, unk_803a8a00, 16, 16, GX_TF_CMPR, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj(&texObj, water_damage_tex, 16, 16, GX_TF_CMPR, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
     for (i = 1; i < effect->count; i++, work++) {

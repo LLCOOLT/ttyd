@@ -40,13 +40,13 @@ typedef struct EffKumokumoN64Particle {
 } EffKumokumoN64Particle;
 
 #ifdef __MWERKS__
-__declspec(section ".data") u64 lbl_803A2280 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_kumokumo_n64_negone_one_a = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_kumokumo_negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803A2290 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_kumokumo_n64_one_negone_a = 0x3F800000BF800000;
 __declspec(section ".data") u64 fd_kumokumo_one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_803A22A0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_kumokumo_n64_negone_one_b = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_kumokumo_negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803A22B0 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_kumokumo_n64_one_negone_b = 0x3F800000BF800000;
 __declspec(section ".data") u64 fd_kumokumo_one_negone_359 = 0x3F800000BF800000;
 #endif
 

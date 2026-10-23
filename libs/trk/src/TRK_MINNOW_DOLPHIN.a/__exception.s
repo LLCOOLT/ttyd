@@ -47,8 +47,8 @@ rfi_2:
 	li r3, 0x300
 	rfi
 	.skip 0x78
-.global lbl_80003500
-lbl_80003500:
+.global gTRKInterruptVectorTable_500
+gTRKInterruptVectorTable_500:
 	.skip 0x54
 rfi_3:
 	mtsprg 1, r2

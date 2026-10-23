@@ -102,7 +102,7 @@ s32 msg_evt[] = {
     0x00000001,
 };
 
-ChuchuTreasure unk_8038bb34[] = {
+ChuchuTreasure chuchu_treasure_tbl[] = {
     {"hei_00", 0xF840715E, -468, 139, -127},
     {"hei_00", 0xF8406272, -408, 139, -127},
     {"hei_01", 0xF840628A, -200, 0, 120},
@@ -183,7 +183,7 @@ static inline int chuchu_findTreasure2(ChuchuParty* cpp, f32 range, Vec* bestPos
     found = 0;
     pl = cpp->player;
     minDist = 10000.0f;
-    tbl = unk_8038bb34;
+    tbl = chuchu_treasure_tbl;
     for (i = 0; i < 40; i++, tbl++) {
         if (strcmp(gp->currentMapName, tbl->map) == 0 && evtGetValue(NULL, tbl->flag) == 0) {
             Vec pos;
@@ -312,7 +312,7 @@ static inline int chuchu_findTreasure(ChuchuParty* cpp, f32 range) {
 
     found = 0;
     player2 = cpp->player;
-    tbl = unk_8038bb34;
+    tbl = chuchu_treasure_tbl;
     minDist = 10000.0f;
     for (i = 0; i < 40; i++, tbl++) {
         if (strcmp(gp->currentMapName, tbl->map) == 0 && evtGetValue(NULL, tbl->flag) == 0) {

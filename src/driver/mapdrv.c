@@ -76,7 +76,7 @@ GXTexObj projTexObj;
 void* projTexImgRef;
 Mtx projMtx;
 BOOL __mapdrv_make_dl;
-BOOL unk_80418458;
+BOOL disableMapDraw;
 s32 error_count;
 BOOL error_flag;
 MapObject* current_mp;
@@ -152,11 +152,11 @@ const char* getMapDataDvdRoot(void) {
 }
 
 void N_mapDispOff(void) {
-	unk_80418458 = TRUE;
+	disableMapDraw = TRUE;
 }
 
 void N_mapDispOn(void) {
-	unk_80418458 = FALSE;
+	disableMapDraw = FALSE;
 }
 
 MapWork* mapGetWork(void) {
@@ -1033,7 +1033,7 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 			o->flags |= 0x100;
 		}
 	}
-	unk_80418458 = FALSE;
+	disableMapDraw = FALSE;
 }
 
 void hitReInit(void);
@@ -1065,7 +1065,7 @@ void mapUnLoad(void) {
 			entry->dispListSize = 0;
 		}
 	}
-	unk_80418458 = FALSE;
+	disableMapDraw = FALSE;
 	hitReInit();
 	lightReInit();
 	envReInit();
@@ -1145,7 +1145,7 @@ void bmapUnLoad(void) {
 			entry->dispListSize = 0;
 		}
 	}
-	unk_80418458 = FALSE;
+	disableMapDraw = FALSE;
 	hitReInit();
 	lightReInit();
 	envReInit();
@@ -2172,7 +2172,7 @@ void mapDisp(void) {
 	u8* joint;
 	BOOL clipped;
 
-	if (unk_80418458) {
+	if (disableMapDraw) {
 		return;
 	}
 	entry = wp->entries;

@@ -223,7 +223,7 @@ s32 flush_on[106];
 s32 flush_off[106];
 s32 last_evt_1[1078];
 s32 last_evt_2[383];
-s32 unk_evt_las_00034ca0[29];
+s32 nise_mario_init[29];
 s32 last_evt_3[1379];
 s32 b_peach_fuwafuwa[39];
 s32 last_evt_3_1[540];
@@ -1303,7 +1303,7 @@ EVT_BEGIN(last_evt_2)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_las_00034ca0)
+EVT_BEGIN(nise_mario_init)
     CALL(evt_npc_entry, STRING("にせマリオ"), STRING("c_mario"))
     CALL(evt_npc_set_tribe, STRING("にせマリオ"), STRING("にせマリオ"))
     CALL(evt_npc_set_position, STRING("にせマリオ"), 0, -1000, 0)
@@ -2565,7 +2565,7 @@ EVT_BEGIN(las_29_init_evt)
             CALL(evt_snd_envon, 272, STRING("ENV_STG8_LAS8"))
             CALL(evt_snd_set_rev_mode, 2)
             CALL(rousoku_init, 1)
-            CALL_CHILD(PTR(unk_evt_las_00034ca0))
+            CALL_CHILD(PTR(nise_mario_init))
             SPAWN_EVENT(PTR(last_evt_3))
         END_IF
         IF_STR_EQUAL(LW(15), STRING("sekai_yami1"))

@@ -86,13 +86,13 @@ static inline void xf(Mtx m, effN64Vtx* dst, effN64Vtx* src) {
 }
 
 
-__declspec(section ".data") u64 lbl_flame_0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 flame_negone_one_a = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_eff_flame_negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_flame_1 = 0x3F800000BF800000;
+__declspec(section ".data") u64 flame_one_negone_a = 0x3F800000BF800000;
 __declspec(section ".data") u64 fd_eff_flame_one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_flame_2 = 0xBF8000003F800000;
+__declspec(section ".data") u64 flame_negone_one_b = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_eff_flame_negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_flame_3 = 0x3F800000BF800000;
+__declspec(section ".data") u64 flame_one_negone_b = 0x3F800000BF800000;
 __declspec(section ".data") u64 fd_eff_flame_one_negone_359 = 0x3F800000BF800000;
 
 static effN64Vtx stg_flame_v[] = {

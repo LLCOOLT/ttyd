@@ -230,7 +230,7 @@ s32 uranai_exit[98];
 s32 uranaisi_table_talk[226];
 __declspec(section ".data") s32 uranaisi_direct_talk[8];
 __declspec(section ".data") s32 uranaisi_init[10];
-s32 unk_evt_tik_0000f438[14];
+s32 starmaniac_init[14];
 __declspec(section ".data") s32 starmaniac_get_event[5];
 s32 starmaniac_talk[227];
 s32 johoyaketi_talk[186];
@@ -1084,7 +1084,7 @@ __declspec(section ".data") EVT_BEGIN(uranaisi_init)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_tik_0000f438)
+EVT_BEGIN(starmaniac_init)
     CALL_CHILD(PTR(npc_init_evt))
     IF_INT_LESS(GSW(0), 20)
         CALL(evt_npc_set_position, STRING("me"), 400, -20, 175)
@@ -1433,7 +1433,7 @@ static s32 npcEnt[] = {
     (s32)/*"うらない師"*/"\x82\xA4\x82\xE7\x82\xC8\x82\xA2\x8E\x74", 525824, 0, (s32)uranaisi_init, 0, (s32)uranaisi_direct_talk, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, (s32)/*"星マニア"*/"\x90\xAF\x83\x7D\x83\x6A\x83\x41",
-    525824, 0, (s32)unk_evt_tik_0000f438, 0, (s32)starmaniac_talk, 0, 0, 0,
+    525824, 0, (s32)starmaniac_init, 0, (s32)starmaniac_talk, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, (s32)/*"情報屋ケチ"*/"\x8F\xEE\x95\xF1\x89\xAE\x83\x50\x83\x60", 525824,
     0, (s32)npc_init_evt, 0, (s32)johoyaketi_talk, 0, 0, 0, 0,

@@ -107,7 +107,7 @@ static PoseTableEntry pose_table_ceil[12];
 s32 gesso_pose_table_turn[20];
 static __declspec(section ".data") BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
-__declspec(section ".data") s32 unk_evt_tik_000243c8[4];
+__declspec(section ".data") s32 gesso_arm_wait_event[4];
 static s32 battle_entry_event[315];
 static s32 init_event[121];
 __declspec(section ".data") s32 entry_gesso_left_arm_entry_data[12];
@@ -308,7 +308,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_gesso", "c_gesso", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 103, -175, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
-__declspec(section ".data") EVT_BEGIN(unk_evt_tik_000243c8)
+__declspec(section ".data") EVT_BEGIN(gesso_arm_wait_event)
     CALL(_test_rtn)
     RETURN
 EVT_END()
@@ -343,7 +343,7 @@ static s32 battle_entry_event[] = {
     -18, 65644, -29999985, 65545, 5, 393307, (s32)btlevtcmd_snd_se, -29999997,
     (s32)"SFX_BOSS_GESSO_ARM_APPEAR1", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -29999997, 1,
     (s32)"GSO_F2_1", 196699, (s32)btlevtcmd_OffAttribute, -29999997, 16777216, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -29999997,
-    1, 131163, (s32)btlevtcmd_StartWaitEvent, -29999997, 109, 65628, (s32)unk_evt_tik_000243c8, 131163,
+    1, 131163, (s32)btlevtcmd_StartWaitEvent, -29999997, 109, 65628, (s32)gesso_arm_wait_event, 131163,
     (s32)btlevtcmd_WaitEventEnd, -29999986, 131163, (s32)btlevtcmd_WaitEventEnd, -29999985, 196699, (s32)evt_btl_camera_set_mode, 0,
     3, 655451, (s32)evt_btl_camera_set_moveto, 0, 84, 177, 558, 84,
     140, 10, 30, 11, 65545, 30, 327771, (s32)evt_msg_print,

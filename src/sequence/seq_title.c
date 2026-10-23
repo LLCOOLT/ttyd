@@ -29,8 +29,8 @@ void SoundSetOutputMode(s32 mode);
 extern SoundWork sound;
 extern PaperSoundBGM psbgm[2];
 extern GlobalWork* gp;
-extern const char* dat_ptr_8040f260;
-extern const char* dat_ptr_8040f264;
+extern const char* build_date_ptr;
+extern const char* build_time_ptr;
 
 extern double sin(double);
 void FontDrawEdge(void);
@@ -358,8 +358,8 @@ void disp2(CameraId cameraId, void* param) {
 		FontDrawEdge();
 		FontDrawColor((GXColor){0xFA, 0xFA, 0xFA, 0xFF});
 		FontDrawScale(0.8f);
-		FontDrawString(60.0f, 220.0f, dat_ptr_8040f260);
-		FontDrawString(200.0f, 220.0f, dat_ptr_8040f264);
+		FontDrawString(60.0f, 220.0f, build_date_ptr);
+		FontDrawString(200.0f, 220.0f, build_time_ptr);
 	}
 	*camGetPtr(cameraId) = saved;
 	GXSetProjectionv(proj);

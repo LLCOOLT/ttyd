@@ -142,13 +142,13 @@ extern s32 unit_koura[];
 extern s32 weaponGetACOutputParam[];
 extern s32 weaponGetPowerFromPartyAttackLv[];
 
-__declspec(section ".data") s32 lbl_8038BEB8[2];
+__declspec(section ".data") s32 unit_party_nokotarou_negone_one_a[2];
 __declspec(section ".data") s32 nokotarou_negone_one_374[2];
-__declspec(section ".data") s32 lbl_8038BEC8[2];
+__declspec(section ".data") s32 unit_party_nokotarou_one_negone_a[2];
 __declspec(section ".data") s32 nokotarou_one_negone_373[2];
-__declspec(section ".data") s32 lbl_8038BED8[2];
+__declspec(section ".data") s32 unit_party_nokotarou_negone_one_b[2];
 __declspec(section ".data") s32 nokotarou_negone_one_360[2];
-__declspec(section ".data") s32 lbl_8038BEE8[2];
+__declspec(section ".data") s32 unit_party_nokotarou_one_negone_b[2];
 __declspec(section ".data") s32 nokotarou_one_negone_359[2];
 PoseTableEntry pose_table_nokotarou_stay[26];
 PoseTableEntry pose_table_nokotarou_turn[12];
@@ -178,7 +178,7 @@ s32 partyNokotarouAttack_TsuranukiKoura[931];
 s32 nokotarou_appeal_event[34];
 static s32 party_win_reaction[16];
 static s32 attack_audience_event[263];
-s32 unk_evt_80390b30[16];
+s32 nokotarou_revive_event[16];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static s32 defence_turn[2];
@@ -188,7 +188,7 @@ static s32 attack_event[2];
 static s32 wait_event[6];
 s32 entry_koura[12];
 
-__declspec(section ".data") s32 lbl_8038BEB8[] = {
+__declspec(section ".data") s32 unit_party_nokotarou_negone_one_a[] = {
     -1082130432, 1065353216,
 };
 
@@ -196,7 +196,7 @@ __declspec(section ".data") s32 nokotarou_negone_one_374[] = {
     -1082130432, 1065353216,
 };
 
-__declspec(section ".data") s32 lbl_8038BEC8[] = {
+__declspec(section ".data") s32 unit_party_nokotarou_one_negone_a[] = {
     1065353216, -1082130432,
 };
 
@@ -204,7 +204,7 @@ __declspec(section ".data") s32 nokotarou_one_negone_373[] = {
     1065353216, -1082130432,
 };
 
-__declspec(section ".data") s32 lbl_8038BED8[] = {
+__declspec(section ".data") s32 unit_party_nokotarou_negone_one_b[] = {
     -1082130432, 1065353216,
 };
 
@@ -212,7 +212,7 @@ __declspec(section ".data") s32 nokotarou_negone_one_360[] = {
     -1082130432, 1065353216,
 };
 
-__declspec(section ".data") s32 lbl_8038BEE8[] = {
+__declspec(section ".data") s32 unit_party_nokotarou_one_negone_b[] = {
     1065353216, -1082130432,
 };
 
@@ -274,7 +274,7 @@ static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {64, party_win_reaction},
     {7, subset_attack_ready_jump_event},
-    {67, unk_evt_80390b30},
+    {67, nokotarou_revive_event},
     {47, btldefaultevt_avoid_counter_event},
     {0, NULL},
 };
@@ -1094,7 +1094,7 @@ static s32 attack_audience_event[] = {
     -1, 0, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
 };
 
-s32 unk_evt_80390b30[] = {
+s32 nokotarou_revive_event[] = {
     262235, (s32)btlevtcmd_SetPartsDefenceTable, -29999990, -29999989, (s32)&defence, 196699, (s32)btlevtcmd_OffStatusFlag, -29999990,
     1, 262235, (s32)btlevtcmd_AnimeSetPoseTable, -29999990, -29999989, (s32)pose_table_nokotarou_stay, 2, 1,
 };

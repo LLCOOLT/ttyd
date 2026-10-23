@@ -529,7 +529,7 @@ EVT_BEGIN(kime_pose2)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_803757f0)
+EVT_BEGIN(win_main_child_evt)
     CALL(evt_party_nokotaro_get_status, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         RETURN
@@ -587,7 +587,7 @@ EVT_BEGIN(evt_item_use)
     WAIT_FRAMES(1)
     CALL(evt_mario_adjust_dir)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
-    CALL_CHILD(PTR(unk_evt_803757f0))
+    CALL_CHILD(PTR(win_main_child_evt))
     IF_INT_EQUAL(LW(11), 0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         ADD(LW(1), 50)
@@ -638,7 +638,7 @@ EVT_BEGIN(evt_item_use)
         CALL(itemUseFunc)
         WAIT_MS(1500)
         CALL(itemUseFunc2)
-        CALL_CHILD(PTR(unk_evt_803757f0))
+        CALL_CHILD(PTR(win_main_child_evt))
         CALL(evt_mario_set_normal_pose)
         RETURN
     END_IF

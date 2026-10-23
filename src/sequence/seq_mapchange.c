@@ -55,7 +55,7 @@ BOOL npcWaitAllInitEvtEnd(void);
 void npcExecAllReglEvt(void);
 void statusWinForceUpdate(void);
 void camRoadMain(void* out, f32 x0, f32 y0, f32 z0, f32 x1, f32 y1, f32 z1, f32 w);
-extern GXColor unk_80422f60;
+extern GXColor mapchange_zero_color;
 double cos(double);
 double sin(double);
 

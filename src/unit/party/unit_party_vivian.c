@@ -148,13 +148,13 @@ extern s32 subset_attack_ready_jump_event[];
 extern s32 weaponGetACOutputParam[];
 extern s32 weaponGetPowerFromPartyAttackLv[];
 
-__declspec(section ".data") u64 lbl_80388868;
+__declspec(section ".data") u64 unit_party_vivian_negone_one_a;
 __declspec(section ".data") static u64 negone_one$374;
-__declspec(section ".data") u64 lbl_80388878;
+__declspec(section ".data") u64 unit_party_vivian_one_negone_a;
 __declspec(section ".data") static u64 one_negone$373;
-__declspec(section ".data") u64 lbl_80388888;
+__declspec(section ".data") u64 unit_party_vivian_negone_one_b;
 __declspec(section ".data") static u64 negone_one$360;
-__declspec(section ".data") u64 lbl_80388898;
+__declspec(section ".data") u64 unit_party_vivian_one_negone_b;
 __declspec(section ".data") static u64 one_negone$359;
 PoseTableEntry pose_table_vivian_stay[24];
 static BattleDataEntry data_table[20];
@@ -197,19 +197,19 @@ static s32 attack_audience_event[189];
 
 
 
-__declspec(section ".data") u64 lbl_80388868 = 0xBF8000003F800000;
+__declspec(section ".data") u64 unit_party_vivian_negone_one_a = 0xBF8000003F800000;
 
 __declspec(section ".data") static u64 negone_one$374 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 lbl_80388878 = 0x3F800000BF800000;
+__declspec(section ".data") u64 unit_party_vivian_one_negone_a = 0x3F800000BF800000;
 
 __declspec(section ".data") static u64 one_negone$373 = 0x3F800000BF800000;
 
-__declspec(section ".data") u64 lbl_80388888 = 0xBF8000003F800000;
+__declspec(section ".data") u64 unit_party_vivian_negone_one_b = 0xBF8000003F800000;
 
 __declspec(section ".data") static u64 negone_one$360 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 lbl_80388898 = 0x3F800000BF800000;
+__declspec(section ".data") u64 unit_party_vivian_one_negone_b = 0x3F800000BF800000;
 
 __declspec(section ".data") static u64 one_negone$359 = 0x3F800000BF800000;
 

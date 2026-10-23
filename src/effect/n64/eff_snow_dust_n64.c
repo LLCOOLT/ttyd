@@ -44,13 +44,13 @@ typedef struct EffSnowDustN64Work {
 void effSnowDustMain(EffectEntry* effect);
 void effSnowDustDisp(CameraId cameraId, EffectEntry* effect);
 
-__declspec(section ".data") u64 lbl_snowdust_0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 snowdust_negone_one_a = 0xBF8000003F800000;
 __declspec(section ".data") static u64 negone_one$374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_snowdust_1 = 0x3F800000BF800000;
+__declspec(section ".data") u64 snowdust_one_negone_a = 0x3F800000BF800000;
 __declspec(section ".data") static u64 one_negone$373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_snowdust_2 = 0xBF8000003F800000;
+__declspec(section ".data") u64 snowdust_negone_one_b = 0xBF8000003F800000;
 __declspec(section ".data") static u64 negone_one$360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_snowdust_3 = 0x3F800000BF800000;
+__declspec(section ".data") u64 snowdust_one_negone_b = 0x3F800000BF800000;
 __declspec(section ".data") static u64 one_negone$359 = 0x3F800000BF800000;
 
 effN64Vtx size8x8_tex64x64_vtx[] = {

@@ -107,8 +107,8 @@ static f32 angleABTBL[] = { 1.0f,       1.273187f,  1.27303f,   1.272768f,  1.27
 
 
 
-const char* dat_ptr_8040f260 = R_build_date;
-const char* dat_ptr_8040f264 = R_build_time;
+const char* build_date_ptr = R_build_date;
+const char* build_time_ptr = R_build_time;
 
 const char* systemStrippedPool0(void) {
     return "assertion \"%s\" failed.\n \"%s\"\n\0\0";

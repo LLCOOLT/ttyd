@@ -132,16 +132,16 @@ extern s32 evt_msg_print[];
 extern s32 evt_snd_sfxon_3d[];
 extern s32 mario_get_renzoku_count_max[];
 extern s32 subset_attack_ready_jump_event[];
-extern s32 unk_evt_803510ec[];
+extern s32 subsetevt_check_target_movable[];
 extern s32 weaponGetPowerFromPartyAttackLv[];
 
-__declspec(section ".data") s32 lbl_80390B70[2];
+__declspec(section ".data") s32 unit_party_christine_negone_one_a[2];
 __declspec(section ".data") s32 christine_negone_one_374[2];
-__declspec(section ".data") s32 lbl_80390B80[2];
+__declspec(section ".data") s32 unit_party_christine_one_negone_a[2];
 __declspec(section ".data") s32 christine_one_negone_373[2];
-__declspec(section ".data") s32 lbl_80390B90[2];
+__declspec(section ".data") s32 unit_party_christine_negone_one_b[2];
 __declspec(section ".data") s32 christine_negone_one_360[2];
-__declspec(section ".data") s32 lbl_80390BA0[2];
+__declspec(section ".data") s32 unit_party_christine_one_negone_b[2];
 __declspec(section ".data") s32 christine_one_negone_359[2];
 PoseTableEntry pose_table_christine_stay[25];
 static BattleDataEntry data_table[8];
@@ -168,7 +168,7 @@ static StatusVulnerability regist;
 static s32 attack_event[2];
 static s32 wait_event[6];
 
-__declspec(section ".data") s32 lbl_80390B70[] = {
+__declspec(section ".data") s32 unit_party_christine_negone_one_a[] = {
     -1082130432, 1065353216,
 };
 
@@ -176,7 +176,7 @@ __declspec(section ".data") s32 christine_negone_one_374[] = {
     -1082130432, 1065353216,
 };
 
-__declspec(section ".data") s32 lbl_80390B80[] = {
+__declspec(section ".data") s32 unit_party_christine_one_negone_a[] = {
     1065353216, -1082130432,
 };
 
@@ -184,7 +184,7 @@ __declspec(section ".data") s32 christine_one_negone_373[] = {
     1065353216, -1082130432,
 };
 
-__declspec(section ".data") s32 lbl_80390B90[] = {
+__declspec(section ".data") s32 unit_party_christine_negone_one_b[] = {
     -1082130432, 1065353216,
 };
 
@@ -192,7 +192,7 @@ __declspec(section ".data") s32 christine_negone_one_360[] = {
     -1082130432, 1065353216,
 };
 
-__declspec(section ".data") s32 lbl_80390BA0[] = {
+__declspec(section ".data") s32 unit_party_christine_one_negone_b[] = {
     1065353216, -1082130432,
 };
 
@@ -697,7 +697,7 @@ s32 partyChristineAttack_Kiss[] = {
     0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2, -2, 196699,
     (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 196699, (s32)evt_btl_camera_set_zoom, 0, 250, 458843,
     (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996, 16, -29999985, 196699,
-    (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 65630, (s32)unk_evt_803510ec, 131097, -30000000, 0,
+    (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 65630, (s32)subsetevt_check_target_movable, 131097, -30000000, 0,
     458843, (s32)btlevtcmd_CalculateFaceDirection, -29999997, -29999996, -2, -1, 16, -29999985,
     196699, (s32)btlevtcmd_ChangeFaceDirection, -29999997, -29999985, 33, 131163, (s32)btlevtcmd_CommandGetWeaponActionLv, -30000000,
     196699, (s32)btlevtcmd_AcSetDifficulty, -2, -30000000, 131163, (s32)btlevtcmd_AcGetDifficulty, -30000000, 131126,
@@ -731,7 +731,7 @@ s32 partyChristineAttack_Kiss[] = {
     -29999986, 131127, -29999986, 45, 983131, (s32)evt_eff, (s32)"", (s32)"kiss",
     1, -30000000, -29999999, -29999998, -29999986, 0, 0, 0,
     0, 0, 0, 0, 65644, -29999985, 131102, -29999994,
-    2, 65630, (s32)unk_evt_803510ec, 131097, -30000000, 0, 262235, (s32)btlevtcmd_AnimeChangePoseType,
+    2, 65630, (s32)subsetevt_check_target_movable, 131097, -30000000, 0, 262235, (s32)btlevtcmd_AnimeChangePoseType,
     -29999997, -29999996, 58, 33, 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000,
     -29999999, -29999998, 131125, -29999998, 15, 196699, (s32)btlevtcmd_GetHeight, -29999997,
     -29999985, 196699, (s32)btlevtcmd_GetStatusMg, -29999997, -29999986, 131132, -29999985, -29999986,
@@ -753,7 +753,7 @@ s32 partyChristineAttack_Kiss[] = {
     0, (s32)"msg_st_chg_mario_quick", 60, 32, 65546, 500, 33, 196699,
     (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 131163,
     (s32)btlevtcmd_WaitEventEnd, -29999985, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 65627, (s32)evt_audience_ap_recovery, 65627,
-    (s32)btlevtcmd_InviteApInfoReport, 65630, (s32)unk_evt_803510ec, 131097, -30000000, 0, 131163, (s32)btlevtcmd_ResetFaceDirection,
+    (s32)btlevtcmd_InviteApInfoReport, 65630, (s32)subsetevt_check_target_movable, 131097, -30000000, 0, 131163, (s32)btlevtcmd_ResetFaceDirection,
     -29999997, 131163, (s32)btlevtcmd_StartWaitEvent, -29999997, 33, 196699, (s32)btlevtcmd_SetMoveSpeed, -2,
     -229993856, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 40, 327771, (s32)btlevtcmd_GetHomePos,
     -2, -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000,

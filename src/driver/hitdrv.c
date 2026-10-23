@@ -97,7 +97,7 @@ HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapI
 */
 
 s32 unk_8041840C;
-HitEntry* unk_80418408; // TODO: proper name
+HitEntry* hitActiveListTop; // TODO: proper name
 
 // local prototypes
 void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion);
@@ -272,7 +272,7 @@ inline void hitPreCheck(void) {
     HitEntry* hit;
     HitEntry* prev;
 
-    prev = unk_80418408 = NULL;
+    prev = hitActiveListTop = NULL;
     i = 0;
     entry = wp->entries;
     for (; i < wp->entries->count; entry++, i++) {
@@ -280,7 +280,7 @@ inline void hitPreCheck(void) {
         for (j = 0; j < entry->hitNumJoints; j++, hit++) {
             if (hit->joint->partCount != 0 && !(hit->flags & 0x81)) {
                 if (prev == NULL) {
-                    unk_80418408 = hit;
+                    hitActiveListTop = hit;
                     prev = hit;
                 } else {
                     prev->siblingActive = hit;
@@ -875,7 +875,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { 
     temp_f28 = query->targetDistance * temp;
     PSVECScale(&query->targetDir, &spA4, temp_f28);
     PSVECAdd(&query->targetPos, &spA4, &spA4);
-    var_r29 = unk_80418408;
+    var_r29 = hitActiveListTop;
     if (query->targetDir.y == 0.0f) {
         while (var_r29 != NULL) {
             if (callback == NULL || callback(query, var_r29)) {

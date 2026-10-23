@@ -141,7 +141,7 @@ s32 subsetevt_binta_damage_right[48];
 s32 subsetevt_binta_damage_left_last[69];
 s32 subsetevt_binta_damage_right_last[69];
 s32 subsetevt_status_recovery[48];
-s32 unk_evt_803510ec[57];
+s32 subsetevt_check_target_movable[57];
 s32 subsetevt_nodamage_motion[6];
 s32 subsetevt_regeneration[4];
 s32 subset_attack_ready_jump_event[2];
@@ -893,7 +893,7 @@ EVT_BEGIN(subsetevt_status_recovery)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_803510ec)
+EVT_BEGIN(subsetevt_check_target_movable)
     CALL(btlevtcmd_CheckStatus, LW(3), 27, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(0), 0)

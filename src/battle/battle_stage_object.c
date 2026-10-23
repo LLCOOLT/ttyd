@@ -590,13 +590,13 @@ void BattleStage_DestroyB(void) {
 	}
 }
 
-__declspec(section ".data") u64 lbl_80371490 = 0xBF8000003F800000;
+__declspec(section ".data") u64 battle_stage_object_negone_one_a = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_battle_stage_object_negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803714A0 = 0x3F800000BF800000;
+__declspec(section ".data") u64 battle_stage_object_one_negone_a = 0x3F800000BF800000;
 __declspec(section ".data") u64 fd_battle_stage_object_one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_803714B0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 battle_stage_object_negone_one_b = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_battle_stage_object_negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803714C0 = 0x3F800000BF800000;
+__declspec(section ".data") u64 battle_stage_object_one_negone_b = 0x3F800000BF800000;
 __declspec(section ".data") u64 fd_battle_stage_object_one_negone_359 = 0x3F800000BF800000;
 
 BattleWeaponData _nozzle_at_base_mario = {{

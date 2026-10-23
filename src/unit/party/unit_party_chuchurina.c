@@ -126,9 +126,8 @@ extern s32 evt_snd_sfxon[];
 extern s32 evt_snd_sfxon_3d[];
 extern s32 evt_sub_intpl_get_value[];
 extern s32 evt_sub_intpl_init[];
-extern s32 lbl_80003500[];
 extern s32 subset_attack_ready_jump_event[];
-extern s32 unk_evt_803510ec[];
+extern s32 subsetevt_check_target_movable[];
 extern s32 weaponGetACOutputParam[];
 
 void btlUnitPartsDisp(CameraId camId, BattleUnitPart* parts);
@@ -202,19 +201,19 @@ USER_FUNC(_get_binta_hit_position);
 USER_FUNC(_chuchu_make_extra_work_area);
 static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
 
-__declspec(section ".data") u64 lbl_8037EC10 = 0xBF8000003F800000;
+__declspec(section ".data") u64 unit_party_chuchurina_negone_one_a = 0xBF8000003F800000;
 
 __declspec(section ".data") u64 fd_chuchurina_negone_one_374 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 lbl_8037EC20 = 0x3F800000BF800000;
+__declspec(section ".data") u64 unit_party_chuchurina_one_negone_a = 0x3F800000BF800000;
 
 __declspec(section ".data") u64 fd_chuchurina_one_negone_373 = 0x3F800000BF800000;
 
-__declspec(section ".data") u64 lbl_8037EC30 = 0xBF8000003F800000;
+__declspec(section ".data") u64 unit_party_chuchurina_negone_one_b = 0xBF8000003F800000;
 
 __declspec(section ".data") u64 fd_chuchurina_negone_one_360 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 lbl_8037EC40 = 0x3F800000BF800000;
+__declspec(section ".data") u64 unit_party_chuchurina_one_negone_b = 0x3F800000BF800000;
 
 __declspec(section ".data") u64 fd_chuchurina_one_negone_359 = 0x3F800000BF800000;
 
@@ -423,7 +422,7 @@ s32 partyWeapon_ChuchurinaKiss[] = {
     (s32)"btl_wn_pcr_kiss", 22216704, 0, (s32)"msg_pch_kiss", 1678376960, 1065353216, 17130546, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830240, 268435456, 770, (s32)"msg_ac_chuchurina_kiss", 131080, 2047, (s32)lbl_80003500,
+    0, 17830240, 268435456, 770, (s32)"msg_ac_chuchurina_kiss", 131080, 2047, 0x80003500,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, (s32)partyChuchurinaAttack_Kiss, 100, 1280, 0,
 };
@@ -996,7 +995,7 @@ s32 partyChuchurinaAttack_Kiss[] = {
     -2, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 196699, (s32)evt_btl_camera_set_zoom, 0,
     250, 196699, (s32)btlevtcmd_GetUnitId, -2, -30000000, 131097, -30000000, -29999997,
     458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996, 16, -29999985,
-    196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 33, 65630, (s32)unk_evt_803510ec, 131097,
+    196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 33, 65630, (s32)subsetevt_check_target_movable, 131097,
     -30000000, 0, 458843, (s32)btlevtcmd_CalculateFaceDirection, -29999997, -29999996, -2, -1,
     16, -29999985, 196699, (s32)btlevtcmd_ChangeFaceDirection, -29999997, -29999985, 33, 131163,
     (s32)btlevtcmd_CommandGetWeaponActionLv, -30000000, 196699, (s32)btlevtcmd_AcSetDifficulty, -2, -30000000, 131163, (s32)btlevtcmd_AcGetDifficulty,
@@ -1031,7 +1030,7 @@ s32 partyChuchurinaAttack_Kiss[] = {
     196699, (s32)btlevtcmd_AudienceDeclareACResult, -29999988, -1, 33, 131163, (s32)btlevtcmd_GetResultAC, -29999994,
     65627, (s32)btlevtcmd_StopAC, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom,
     0, 350, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PCH_K_1", 65545,
-    6, 131101, -29999995, 0, 65630, (s32)unk_evt_803510ec, 131097, -30000000,
+    6, 131101, -29999995, 0, 65630, (s32)subsetevt_check_target_movable, 131097, -30000000,
     0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999997, -29999996, 59, 33, 33,
     196699, (s32)btlevtcmd_GetStatusMg, -2, -29999994, 131132, -29999994, 16, 327771,
     (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2,
@@ -1054,7 +1053,7 @@ s32 partyChuchurinaAttack_Kiss[] = {
     -2, 1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 43, 65546,
     300, 42, 65627, (s32)evt_audience_acrobat_notry, 49, 131163, (s32)btlevtcmd_WaitEventEnd, -29999985,
     196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1,
-    65627, (s32)evt_audience_ap_recovery, 65627, (s32)btlevtcmd_InviteApInfoReport, 65630, (s32)unk_evt_803510ec, 131097, -30000000,
+    65627, (s32)evt_audience_ap_recovery, 65627, (s32)btlevtcmd_InviteApInfoReport, 65630, (s32)subsetevt_check_target_movable, 131097, -30000000,
     0, 131163, (s32)btlevtcmd_ResetFaceDirection, -29999997, 131163, (s32)btlevtcmd_StartWaitEvent, -29999997, 33,
     262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42, 327771, (s32)btlevtcmd_GetHomePos, -2,
     -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229995904, 524379,

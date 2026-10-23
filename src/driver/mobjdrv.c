@@ -30,13 +30,13 @@ u32 front2MSJ[5] = {
 
 // static data from inlined header functions
 __declspec(section ".data") s32 fd_mobjdrv_negone_one_374[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 lbl_803083C8[] = {-1082130432, 1065353216};
+__declspec(section ".data") s32 mobjdrv_negone_one_a[] = {-1082130432, 1065353216};
 __declspec(section ".data") s32 fd_mobjdrv_one_negone_373[] = {1065353216, -1082130432};
-__declspec(section ".data") s32 lbl_803083D8[] = {1065353216, -1082130432};
+__declspec(section ".data") s32 mobjdrv_one_negone_a[] = {1065353216, -1082130432};
 __declspec(section ".data") s32 fd_mobjdrv_negone_one_360[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 lbl_803083E8[] = {-1082130432, 1065353216};
+__declspec(section ".data") s32 mobjdrv_negone_one_b[] = {-1082130432, 1065353216};
 __declspec(section ".data") s32 fd_mobjdrv_one_negone_359[] = {1065353216, -1082130432};
-__declspec(section ".data") s32 lbl_803083F8[] = {1065353216, -1082130432};
+__declspec(section ".data") s32 mobjdrv_one_negone_b[] = {1065353216, -1082130432};
 
 u32 cubeDVP[103] = {
     0x00000008, 0xBF000000, 0x00000000, 0x3F000000, 0x3F000000, 0x00000000, 0x3F000000, 0xBF000000,

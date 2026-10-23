@@ -258,7 +258,7 @@ static s32 evt_tamago_scale2[83];
 s32 evt_tamago_byebye[160];
 s32 talk_gardman[191];
 static s32 evt_gardman[318];
-__declspec(section ".data") s32 unk_evt_tou_00012b54[4];
+__declspec(section ".data") s32 evt_gardman_spawn[4];
 s32 evt_tou_match_make_default_sub[406];
 s32 evt_tou_match_make_default[303];
 s32 evt_talk_doku_cake[14];
@@ -1714,7 +1714,7 @@ static EVT_BEGIN(evt_gardman)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(unk_evt_tou_00012b54)
+__declspec(section ".data") EVT_BEGIN(evt_gardman_spawn)
     CALL_CHILD(PTR(evt_gardman))
     RETURN
 EVT_END()

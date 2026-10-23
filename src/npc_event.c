@@ -313,7 +313,7 @@ s32 enemy_event_dead_event_sub[36];
 s32 enemy_common_blow_event[13];
 s32 enemy_2d_common_dead_event[415];
 s32 _2d_dead_rotate_event[16];
-s32 unk_evt_8033d458[13];
+s32 testenemynpc_move_event[13];
 s32 npc_urouro_move_event[21];
 s32 npc_urouro_return_event[37];
 s32 kuriboo_move_event[39];
@@ -523,7 +523,7 @@ s32 fall2D_regl_event[34];
 s32 zakoM2D_init_event[37];
 s32 zakoM2D_move_event[95];
 s32 zakoM2D_find_event[179];
-s32 unk_evt_803497e8[88];
+s32 zakoM2D_find_start_event[88];
 s32 gesso2D_init_event[34];
 s32 gesso2D_move_event[262];
 
@@ -706,7 +706,7 @@ EVT_BEGIN(_2d_dead_rotate_event)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_8033d458)
+EVT_BEGIN(testenemynpc_move_event)
     CALL_CHILD(PTR(enemy_common_flag_init_event))
     CALL(evt_npc_set_stay_anim, STRING("me"))
     LABEL(0)
@@ -4174,7 +4174,7 @@ s32 zakoM2D_find_event[] = {
     32, 2, 1,
 };
 
-s32 unk_evt_803497e8[] = {
+s32 zakoM2D_find_start_event[] = {
     110, 65541, 0, 327771, (s32)evt_npc_get_position, (s32)"me", -30000000, -29999999,
     -29999998, 458843, (s32)evt_npc_move_position, (s32)"me", -30000000, -29999998, 100, 0,
     0, 65545, 1, 6, 112, 262235, (s32)evt_get_target_dir, (s32)"me",

@@ -296,14 +296,14 @@ __declspec(section ".data") s32 dai3_run_animtbl[11];
 s32 no00_custom[48];
 static s32 bero_entry_data[30];
 static s32 mony_init[18];
-__declspec(section ".data") s32 unk_evt_gor_0001f4b4[9];
+__declspec(section ".data") s32 gor_00_mony_regl[9];
 s32 mony_peton_talk[286];
 static s32 mony_talk[28];
 static s32 peton_init[18];
-__declspec(section ".data") s32 unk_evt_gor_0001fa08[9];
+__declspec(section ".data") s32 gor_00_peton_regl[9];
 static s32 peton_talk[28];
 static s32 marco_init[32];
-s32 unk_evt_gor_0001fb1c[120];
+s32 marco_party_move[120];
 static s32 marco_talk[364];
 s32 garawaru_urouro2[25];
 static s32 garawaru_init[74];
@@ -388,12 +388,12 @@ static s32 suifu_animtbl[21];
 static __declspec(section ".data") s32 suifu_run_animtbl[11];
 __declspec(section ".data") Vec suifu100kaidanDOWN[];
 __declspec(section ".data") Vec suifu100kaidanUP[];
-s32 unk_evt_gor_000277f4[100];
+s32 marco_run_away[100];
 s32 gorotsuki_kikan[599];
 s32 into_gor_ship[265];
-s32 unk_evt_gor_00028704[108];
-s32 unk_evt_gor_000288b4[88];
-s32 unk_evt_gor_00028a14[61];
+s32 mony_run_away[108];
+s32 peton_run_away[88];
+s32 mony_peton_depart[61];
 s32 gor_00_koopa_evt[1095];
 static s32 peach_mail[209];
 f32 gor_ship_puka_data[];
@@ -545,10 +545,10 @@ static EVT_BEGIN(mony_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(unk_evt_gor_0001f4b4)
+__declspec(section ".data") EVT_BEGIN(gor_00_mony_regl)
     SWITCH(GSW(0))
         CASE_EQUAL(278)
-        CALL_CHILD(PTR(unk_evt_gor_00028704))
+        CALL_CHILD(PTR(mony_run_away))
     END_SWITCH
     RETURN
 EVT_END()
@@ -646,10 +646,10 @@ static EVT_BEGIN(peton_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(unk_evt_gor_0001fa08)
+__declspec(section ".data") EVT_BEGIN(gor_00_peton_regl)
     SWITCH(GSW(0))
         CASE_EQUAL(278)
-        CALL_CHILD(PTR(unk_evt_gor_000288b4))
+        CALL_CHILD(PTR(peton_run_away))
     END_SWITCH
     RETURN
 EVT_END()
@@ -680,7 +680,7 @@ static EVT_BEGIN(marco_init)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_gor_0001fb1c)
+EVT_BEGIN(marco_party_move)
     CALL(evt_party_stop, 0)
     CALL(evt_party_force_reset_outofscreen, 0)
     CALL(evt_party_get_pos, 0, LW(10), LW(11), LW(12))
@@ -812,7 +812,7 @@ static EVT_BEGIN(marco_talk)
         CASE_LESS(227)
         CALL(evt_msg_print, 0, STRING("mac_4_045_02"), 0, STRING("me"))
         CASE_EQUAL(228)
-        SPAWN_EVENT(PTR(unk_evt_gor_0001fb1c))
+        SPAWN_EVENT(PTR(marco_party_move))
         IF_INT_EQUAL(GSWF(1177), 1)
             CALL(evt_msg_print, 0, STRING("mac_4_091"), 0, STRING("me"))
             GOTO(100)
@@ -1761,10 +1761,10 @@ s32 rakganEnt[] = {
 };
 
 static s32 npcEnt[] = {
-    (s32)/*"モニー"*/"\x83\x82\x83\x6A\x81\x5B", 525824, 0, (s32)mony_init, (s32)unk_evt_gor_0001f4b4, (s32)mony_talk, 0, 0,
+    (s32)/*"モニー"*/"\x83\x82\x83\x6A\x81\x5B", 525824, 0, (s32)mony_init, (s32)gor_00_mony_regl, (s32)mony_talk, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, (s32)/*"ピートン"*/"\x83\x73\x81\x5B\x83\x67\x83\x93",
-    525824, 0, (s32)peton_init, (s32)unk_evt_gor_0001fa08, (s32)peton_talk, 0, 0, 0,
+    525824, 0, (s32)peton_init, (s32)gor_00_peton_regl, (s32)peton_talk, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 525824,
     0, (s32)marco_init, 0, (s32)marco_talk, 0, 0, 0, 0,
@@ -3879,7 +3879,7 @@ void suifu100taikikan_seq01(NanNpc* npc) {
     }
 }
 
-EVT_BEGIN(unk_evt_gor_000277f4)
+EVT_BEGIN(marco_run_away)
     CALL(evt_npc_set_ry, STRING("マルコ"), 270)
     CALL(evt_npc_move_position, STRING("マルコ"), -130, 200, 0, FLOAT(240.0f), 0)
     CALL(evt_npc_move_position, STRING("マルコ"), -230, -170, 0, FLOAT(240.0f), 0)
@@ -4110,7 +4110,7 @@ EVT_BEGIN(into_gor_ship)
     CALL(evt_party_cont_onoff, 0, 1)
     CALL(evt_party_cont_onoff, 1, 1)
     IF_INT_EQUAL(GSW(0), 277)
-        CALL_CHILD(PTR(unk_evt_gor_00028a14))
+        CALL_CHILD(PTR(mony_peton_depart))
     END_IF
     DELETE_EVENT(LW(9))
     CALL(evt_cam3d_evt_off, 500, 11)
@@ -4119,7 +4119,7 @@ EVT_BEGIN(into_gor_ship)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_gor_00028704)
+EVT_BEGIN(mony_run_away)
     CALL(evt_npc_jump_position_nohit, STRING("モニー"), 145, 15, 225, 400, 20)
     CALL(evt_npc_set_ry, STRING("モニー"), 270)
     CALL(evt_npc_move_position, STRING("モニー"), -130, 200, 0, FLOAT(240.0f), 0)
@@ -4138,7 +4138,7 @@ EVT_BEGIN(unk_evt_gor_00028704)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_gor_000288b4)
+EVT_BEGIN(peton_run_away)
     CALL(evt_npc_move_position, STRING("ピートン"), -230, -170, 0, FLOAT(240.0f), 0)
     CALL(evt_npc_move_position, STRING("ピートン"), -230, -400, 0, FLOAT(240.0f), 0)
     CALL(evt_npc_set_ry, STRING("ピートン"), 90)
@@ -4154,7 +4154,7 @@ EVT_BEGIN(unk_evt_gor_000288b4)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_gor_00028a14)
+EVT_BEGIN(mony_peton_depart)
     SET_VALUE(GSW(0), 278)
     CALL(evt_msg_print, 0, STRING("mac_5_038"), 0, STRING("モニー"))
     CALL(evt_msg_print, 0, STRING("mac_5_039"), 0, STRING("ピートン"))

@@ -133,19 +133,19 @@ static inline MapObjectEntry* MOBJ_PTR2(EventEntry* event, const char* name) {
 
 __declspec(section ".data") u64 fd_evt_mobj_negone_one_374 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 lbl_80309CF0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 evt_mobj_negone_one_a = 0xBF8000003F800000;
 
 __declspec(section ".data") u64 fd_evt_mobj_one_negone_373 = 0x3F800000BF800000;
 
-__declspec(section ".data") u64 lbl_80309D00 = 0x3F800000BF800000;
+__declspec(section ".data") u64 evt_mobj_one_negone_a = 0x3F800000BF800000;
 
 __declspec(section ".data") u64 fd_evt_mobj_negone_one_360 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 lbl_80309D10 = 0xBF8000003F800000;
+__declspec(section ".data") u64 evt_mobj_negone_one_b = 0xBF8000003F800000;
 
 __declspec(section ".data") u64 fd_evt_mobj_one_negone_359 = 0x3F800000BF800000;
 
-__declspec(section ".data") u64 lbl_80309D20 = 0x3F800000BF800000;
+__declspec(section ".data") u64 evt_mobj_one_negone_b = 0x3F800000BF800000;
 
 extern s32 evt_cam_shake(EventEntry* event, BOOL isFirstCall);
 static s32 evt_shake[] = {0x0005005B, (s32)evt_cam_shake, 4, 0xF24A7A80, 0xF24A7A8A, 200, 2, 1};

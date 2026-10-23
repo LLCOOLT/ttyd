@@ -23,7 +23,7 @@ typedef struct EffMagic1N64Work {
     s32 alpha;    // 0x34
 } EffMagic1N64Work;
 
-extern GXColor unk_804231a8;
+extern GXColor magic1_zero_color;
 
 static u8 anime_data[12] = {0x00, 0xFF, 0xD0, 0x1A, 0x78, 0x4D, 0xD0, 0xFE, 0xF0, 0xFE, 0x4C, 0x6E};
 

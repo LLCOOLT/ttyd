@@ -69,7 +69,7 @@ extern s32 chorogun_entry[];
 extern s32 subsetevt_confuse_flustered[];
 extern s32 subsetevt_counter_damage[];
 extern s32 unit_chorobon_gundan[];
-extern s32 unk_evt_hei_00019e30[];
+extern s32 chorogun_dead_reward[];
 extern s32 weaponGetPowerDefault[];
 
 __declspec(section ".data") u64 fd_gold_chorobon_negone_one_374;
@@ -344,7 +344,7 @@ EVT_BEGIN(escape_chorogun_event)
     END_IF
     CALL(btlevtcmd_SetUnitWork, LW(4), 1, 1)
     CALL(btlevtcmd_GetUnitId, -2, LW(10))
-    CALL_CHILD(PTR(unk_evt_hei_00019e30))
+    CALL_CHILD(PTR(chorogun_dead_reward))
     CALL(chorogun_escape_all)
     WAIT_MS(1000)
     CALL(btlevtcmd_GetUnitWork, LW(4), 2, LW(3))
@@ -383,7 +383,7 @@ static EVT_BEGIN(damage_event)
                         CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
                         CALL(btlevtcmd_WaitAttackEnd)
                         CALL(btlevtcmd_GetUnitWork, -2, 2, LW(10))
-                        CALL_CHILD(PTR(unk_evt_hei_00019e30))
+                        CALL_CHILD(PTR(chorogun_dead_reward))
                         SET_VALUE(LW(10), -2)
                         CALL(chorogun_escape_all)
                         CALL(btlevtcmd_GetUnitWork, -2, 2, LW(3))

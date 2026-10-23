@@ -46,17 +46,17 @@ IconDispTableEntry _disp_table[0x17] = {
 };
 
 
-__declspec(section ".sdata2") GXColor dat_804221e8 = {0xFF, 0xFF, 0xFF, 0xFF};
-__declspec(section ".sdata2") GXColor dat_804221ec = {0xFF, 0xFF, 0xFF, 0xFF};
-__declspec(section ".sdata2") GXColor dat_804221f0 = {0xFF, 0xFF, 0xFF, 0xFF};
-__declspec(section ".sdata2") GXColor dat_804221f4 = {0xFF, 0xFF, 0xFF, 0xFF};
-__declspec(section ".sdata2") GXColor dat_804221f8 = {0xFF, 0xFF, 0xFF, 0xFF};
-__declspec(section ".sdata2") GXColor dat_804221fc = {0xFF, 0xFF, 0xFF, 0xFF};
-__declspec(section ".sdata2") GXColor dat_80422200 = {0xED, 0x14, 0x5B, 0xFF};
-__declspec(section ".sdata2") GXColor dat_80422204 = {0xFF, 0xEA, 0x05, 0xFF};
+__declspec(section ".sdata2") GXColor bsi_disp_color = {0xFF, 0xFF, 0xFF, 0xFF};
+__declspec(section ".sdata2") GXColor bsi_turn_num_color = {0xFF, 0xFF, 0xFF, 0xFF};
+__declspec(section ".sdata2") GXColor bsi_default_turn_color = {0xFF, 0xFF, 0xFF, 0xFF};
+__declspec(section ".sdata2") GXColor bsi_guruguru_color = {0xFF, 0xFF, 0xFF, 0xFF};
+__declspec(section ".sdata2") GXColor bsi_allergy_color = {0xFF, 0xFF, 0xFF, 0xFF};
+__declspec(section ".sdata2") GXColor bsi_biribiri_color = {0xFF, 0xFF, 0xFF, 0xFF};
+__declspec(section ".sdata2") GXColor bsi_hp_regen_color0 = {0xED, 0x14, 0x5B, 0xFF};
+__declspec(section ".sdata2") GXColor bsi_hp_regen_color1 = {0xFF, 0xEA, 0x05, 0xFF};
 __declspec(section ".sdata2") GXColor float_0p10207_80422208 = {0x3D, 0xD1, 0x09, 0xFF};
-__declspec(section ".sdata2") GXColor dat_8042220c = {0x61, 0xE9, 0xE7, 0xFF};
-__declspec(section ".sdata2") GXColor dat_80422210 = {0x00, 0x00, 0x00, 0xFF};
+__declspec(section ".sdata2") GXColor bsi_fp_regen_color1 = {0x61, 0xE9, 0xE7, 0xFF};
+__declspec(section ".sdata2") GXColor bsi_regen_color = {0x00, 0x00, 0x00, 0xFF};
 
 //local prototypes
 void BattleStatusIconDisp(CameraId camId, void* param);
@@ -124,7 +124,7 @@ typedef struct BsiDispEntry {
 
 void BattleStatusIconDisp(CameraId camId, void* param) {
 	BattleWorkStatusIcon* icon = &((BattleUnit*)param)->mStatusIconWork;
-	GXColor col = dat_804221e8;
+	GXColor col = bsi_disp_color;
 	Vec screen, p, n;
 	Mtx m, trans, scale, npivot, pivot, rx, ry, rz, nm;
 	BsiDispEntry* e;
@@ -172,7 +172,7 @@ void BattleStatusIconDisp(CameraId camId, void* param) {
 			PSMTXIdentity(nm);
 			PSMTXTrans(trans, n.x, n.y, n.z);
 			PSMTXConcat(trans, nm, nm);
-			iconNumberDispGx(nm, e->turns, TRUE, dat_804221ec);
+			iconNumberDispGx(nm, e->turns, TRUE, bsi_turn_num_color);
 		}
 	}
 }
@@ -214,7 +214,7 @@ BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkSta
 	entry->v0 = (Vec){1.0f,1.0f,1.0f};
 	entry->v1 = (Vec){0.0f,0.0f,0.0f};
 	entry->v2 = (Vec){0.0f,0.0f,0.0f};
-	entry->color = *(u32*)&dat_804221f0;
+	entry->color = *(u32*)&bsi_default_turn_color;
 	entry->flags = disp->something2;
 	entry->v3 = (Vec){0.0f,0.0f,0.0f};
 	return TRUE;
@@ -239,7 +239,7 @@ BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusI
 	v = (Vec){0.0f,0.0f,0.0f};
 	v.z = BSI_F(unit, 0xad4);
 	entry->v2 = v;
-	entry->color = *(u32*)&dat_804221f4;
+	entry->color = *(u32*)&bsi_guruguru_color;
 	entry->flags = disp->something2;
 	entry->v3 = (Vec){0.0f,4.0f,0.0f};
 	return TRUE;
@@ -260,7 +260,7 @@ BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIc
 	entry->v0 = (Vec){1.0f,1.0f,1.0f};
 	entry->v1 = (Vec){0.0f,0.0f,0.0f};
 	entry->v2 = (Vec){0.0f,0.0f,0.0f};
-	entry->color = *(u32*)&dat_804221f8;
+	entry->color = *(u32*)&bsi_allergy_color;
 	entry->flags = disp->something2;
 	entry->v3 = (Vec){0.0f,0.0f,0.0f};
 	BSI_S(unit, 0xada)++;
@@ -305,7 +305,7 @@ BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusI
 	entry->icon = disp->something;
 	entry->v1 = (Vec){0.0f,0.0f,0.0f};
 	entry->v2 = (Vec){0.0f,0.0f,0.0f};
-	entry->color = *(u32*)&dat_804221fc;
+	entry->color = *(u32*)&bsi_biribiri_color;
 	entry->flags = disp->something2;
 	entry->v3 = (Vec){0.0f,0.0f,0.0f};
 	return TRUE;
@@ -321,12 +321,12 @@ BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkSta
 	s8 turns, strength;
 	if (type == 0x17) {
 		ctr = &BSI_S(unit, 0xadc);
-		c0 = dat_80422200;
-		c1 = dat_80422204;
+		c0 = bsi_hp_regen_color0;
+		c1 = bsi_hp_regen_color1;
 	} else if (type == 0x18) {
 		ctr = &BSI_S(unit, 0xade);
 		c0 = float_0p10207_80422208;
-		c1 = dat_8042220c;
+		c1 = bsi_fp_regen_color1;
 	} else {
 		return FALSE;
 	}
@@ -343,7 +343,7 @@ BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkSta
 	entry->v0 = (Vec){1.0f,1.0f,1.0f};
 	entry->v1 = (Vec){0.0f,0.0f,0.0f};
 	entry->v2 = (Vec){0.0f,0.0f,0.0f};
-	col = dat_80422210;
+	col = bsi_regen_color;
 	col.r = intplGetValue(11, t, 360, c0.r, c1.r);
 	col.g = intplGetValue(11, t, 360, c0.g, c1.g);
 	col.b = intplGetValue(11, t, 360, c0.b, c1.b);

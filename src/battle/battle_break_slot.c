@@ -80,13 +80,13 @@ USER_FUNC(evt_eff);
 extern s32 weaponGetFPPowerFPHalf[];
 extern s32 weaponGetPowerHPHalf[];
 
-__declspec(section ".data") u64 lbl_803AB118 = 0xBF8000003F800000;
+__declspec(section ".data") u64 battle_break_slot_negone_one_a = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_battle_break_slot_negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803AB128 = 0x3F800000BF800000;
+__declspec(section ".data") u64 battle_break_slot_one_negone_a = 0x3F800000BF800000;
 __declspec(section ".data") u64 fd_battle_break_slot_one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_803AB138 = 0xBF8000003F800000;
+__declspec(section ".data") u64 battle_break_slot_negone_one_b = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_battle_break_slot_negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803AB148 = 0x3F800000BF800000;
+__declspec(section ".data") u64 battle_break_slot_one_negone_b = 0x3F800000BF800000;
 __declspec(section ".data") u64 fd_battle_break_slot_one_negone_359 = 0x3F800000BF800000;
 
 EVT_BEGIN(kinoko_effect)

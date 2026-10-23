@@ -209,13 +209,13 @@ extern s32 subset_attack_ready_jump_event[];
 extern s32 weaponGetPowerDefault[];
 extern s32 weaponGetPowerFromPartyAttackLv[];
 
-__declspec(section ".data") u64 lbl_80379A00;
+__declspec(section ".data") u64 unit_party_yoshi_negone_one_a;
 __declspec(section ".data") u64 fd_yoshi_negone_one_374;
-__declspec(section ".data") u64 lbl_80379A10;
+__declspec(section ".data") u64 unit_party_yoshi_one_negone_a;
 __declspec(section ".data") u64 fd_yoshi_one_negone_373;
-__declspec(section ".data") u64 lbl_80379A20;
+__declspec(section ".data") u64 unit_party_yoshi_negone_one_b;
 __declspec(section ".data") u64 fd_yoshi_negone_one_360;
-__declspec(section ".data") u64 lbl_80379A30;
+__declspec(section ".data") u64 unit_party_yoshi_one_negone_b;
 __declspec(section ".data") u64 fd_yoshi_one_negone_359;
 PoseTableEntry pose_table_yoshi_stay[25];
 static BattleDataEntry data_table[8];
@@ -252,19 +252,19 @@ static s32 wait_event[6];
 s32 _yoshig_tpl_no_tbl[2];
 
 
-__declspec(section ".data") u64 lbl_80379A00 = 0xBF8000003F800000;
+__declspec(section ".data") u64 unit_party_yoshi_negone_one_a = 0xBF8000003F800000;
 
 __declspec(section ".data") u64 fd_yoshi_negone_one_374 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 lbl_80379A10 = 0x3F800000BF800000;
+__declspec(section ".data") u64 unit_party_yoshi_one_negone_a = 0x3F800000BF800000;
 
 __declspec(section ".data") u64 fd_yoshi_one_negone_373 = 0x3F800000BF800000;
 
-__declspec(section ".data") u64 lbl_80379A20 = 0xBF8000003F800000;
+__declspec(section ".data") u64 unit_party_yoshi_negone_one_b = 0xBF8000003F800000;
 
 __declspec(section ".data") u64 fd_yoshi_negone_one_360 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 lbl_80379A30 = 0x3F800000BF800000;
+__declspec(section ".data") u64 unit_party_yoshi_one_negone_b = 0x3F800000BF800000;
 
 __declspec(section ".data") u64 fd_yoshi_one_negone_359 = 0x3F800000BF800000;
 

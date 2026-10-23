@@ -16,7 +16,7 @@ u32 gap_08_8041880C_sbss;
 #pragma force_active reset
 WindowEntry* WinObjects;
 GXTexObj* wakuTexObj;
-extern BOOL unk_804187fc;
+extern BOOL tpl_loaded;
 extern TEXPalette* winTpl;
 
 #define fabsf(x) __fabsf(x)
@@ -57,7 +57,7 @@ void windowInit(void) {
 	w[6].flags = 0;
 	w[6].userdata = NULL;
 	winTpl = NULL;
-	unk_804187fc = FALSE;
+	tpl_loaded = FALSE;
 }
 
 //new in retail
@@ -72,7 +72,7 @@ void windowTexSetup_callback(s32 error, DVDFileInfo* info) {
 	for (i = 0; i < winTpl->numDescriptors; i++) {
 		TEXGetGXTexObjFromPalette(winTpl, &wakuTexObj[i], i);
 	}
-	unk_804187fc = TRUE;
+	tpl_loaded = TRUE;
 }
 
 void windowTexSetup(void) {
@@ -82,7 +82,7 @@ void windowTexSetup(void) {
 	s32 i;
 
 	winTpl = NULL;
-	unk_804187fc = FALSE;
+	tpl_loaded = FALSE;
 	winTpl = arcOpen("font/msgWindow.tpl", NULL, NULL);
 	if (!winTpl) {
 		sprintf(path, "%s/f/msgWindow.tpl\0", getMarioStDvdRoot());
@@ -1050,7 +1050,7 @@ end:
 	;
 }
 
-BOOL unk_804187fc; //new in retail, tpl loaded
+BOOL tpl_loaded; //new in retail, tpl loaded
 TEXPalette* winTpl; //new in retail
 
 void windowDispGX_Message(s32 type, s32 a2, u8 alpha, f32 x, f32 y, f32 height, f32 width, f32 a9, f32 a10) {
@@ -1094,7 +1094,7 @@ void windowDispGX_Waku_col(u16 gxTexMapID, GXColor color, f32 x, f32 y, f32 widt
 	f32 twothirds, third;
 	f32 fVar1, fVar4, fVar2, fVar6, fVar5, fVar3; //TODO: rename
 
-	if (unk_804187fc) {
+	if (tpl_loaded) {
 		if (gxTexMapID) {
 			gxTexMapID = 0;
 		}
@@ -1272,7 +1272,7 @@ void windowDispGX2_Waku_col(Mtx mtx, u16 gxTexMapID, GXColor color, f32 x, f32 y
 	f32 twothirds, third;
 	f32 fVar1, fVar4, fVar2, fVar6, fVar5, fVar3; //TODO: rename
 
-	if (unk_804187fc) {
+	if (tpl_loaded) {
 		if (gxTexMapID) {
 			gxTexMapID = 0;
 		}

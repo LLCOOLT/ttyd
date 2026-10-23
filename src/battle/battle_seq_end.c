@@ -166,19 +166,19 @@ USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_intpl_init_float);
 
-__declspec(section ".data") u64 lbl_803ACB10 = 0xBF8000003F800000;
+__declspec(section ".data") u64 battle_seq_end_negone_one_a = 0xBF8000003F800000;
 
 __declspec(section ".data") u64 fd_battle_seq_end_negone_one_374 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 lbl_803ACB20 = 0x3F800000BF800000;
+__declspec(section ".data") u64 battle_seq_end_one_negone_a = 0x3F800000BF800000;
 
 __declspec(section ".data") u64 fd_battle_seq_end_one_negone_373 = 0x3F800000BF800000;
 
-__declspec(section ".data") u64 lbl_803ACB30 = 0xBF8000003F800000;
+__declspec(section ".data") u64 battle_seq_end_negone_one_b = 0xBF8000003F800000;
 
 __declspec(section ".data") u64 fd_battle_seq_end_negone_one_360 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 lbl_803ACB40 = 0x3F800000BF800000;
+__declspec(section ".data") u64 battle_seq_end_one_negone_b = 0x3F800000BF800000;
 
 __declspec(section ".data") u64 fd_battle_seq_end_one_negone_359 = 0x3F800000BF800000;
 

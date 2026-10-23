@@ -49,7 +49,7 @@ static void moamoa_pose_main(void);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 extern const char* g_moamoa_chain_tbl[][2];
-extern const s32 dat_80419a28;
+extern const s32 g_moamoa_chain_num;
 void evalOn(void);
 void evalOn(void);
 static void ext_moamoa_main(void);
@@ -571,13 +571,13 @@ void evalOn(void) {
     for (i = 0; i < n; i++) {
         pos[i] = (Vec){0.0f, -1000.0f, 0.0f};
     }
-    for (i = 0; i < dat_80419a28; i++) {
+    for (i = 0; i < g_moamoa_chain_num; i++) {
         wp->chainIdx[i][0] = animPoseGetGroupIdx(npc->poseId, g_moamoa_chain_tbl[i][0]);
         wp->chainIdx[i][1] = animPoseGetGroupIdx(npc->poseId, g_moamoa_chain_tbl[i][1]);
     }
     moa = wp->moa;
     for (j = 0; j < wp->count; j++, moa++) {
-        moa->group = j % dat_80419a28;
+        moa->group = j % g_moamoa_chain_num;
         moa->order = wp->chainNum[moa->group]++;
     }
     moa = wp->moa;

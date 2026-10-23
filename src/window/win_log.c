@@ -1470,7 +1470,7 @@ typedef struct MoaChain {
     const char* b;
 } MoaChain;
 
-extern const s32 dat_80419a28;
+extern const s32 g_moamoa_chain_num;
 extern MoaChain g_moamoa_chain_tbl[];
 double tan(double);
 void animPoseVivianMain(s32 poseId, Vec* v);
@@ -1567,16 +1567,16 @@ void capture(CameraId camera, void* param) {
     animPosePeraOn(m->pose1);
     if (m->id == 0x6B) {
         gpos = **(Vec***)((u8*)animPoseGetAnimPosePtr(m->pose1) + 0x15C);
-        cnt = smartAlloc(dat_80419a28 * 4, 3)->address;
+        cnt = smartAlloc(g_moamoa_chain_num * 4, 3)->address;
         idx = smartAlloc(2000, 3)->address;
-        memset(cnt, 0, dat_80419a28 * 4);
+        memset(cnt, 0, g_moamoa_chain_num * 4);
         for (i = 0; 500 > i; i++) {
-            idx[i] = cnt[i % dat_80419a28]++;
+            idx[i] = cnt[i % g_moamoa_chain_num]++;
         }
         animPoseSetMaterialFlagOn(m->pose2, 0x1800);
         animPosePeraOff(m->pose2);
         for (i = 0; i < 500; i++) {
-            k = i % dat_80419a28;
+            k = i % g_moamoa_chain_num;
             f = (f32)idx[i] / (f32)cnt[k];
             a = &gpos[animPoseGetGroupIdx(m->pose1, g_moamoa_chain_tbl[k].a)];
             b = &gpos[animPoseGetGroupIdx(m->pose1, g_moamoa_chain_tbl[k].b)];

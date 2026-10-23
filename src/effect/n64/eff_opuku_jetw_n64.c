@@ -31,13 +31,13 @@ typedef struct JetwEnt {
     u8 alpha, pad;
 } JetwEnt;
 
-static __declspec(section ".data") u64 lbl_803A33D8 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 eff_opuku_jetw_n64_negone_one_a = 0xBF8000003F800000;
 static __declspec(section ".data") u64 negone_one$374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803A33E8 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_opuku_jetw_n64_one_negone_a = 0x3F800000BF800000;
 static __declspec(section ".data") u64 one_negone$373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_803A33F8 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_opuku_jetw_n64_negone_one_b = 0xBF8000003F800000;
 static __declspec(section ".data") u64 negone_one$360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803A3408 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_opuku_jetw_n64_one_negone_b = 0x3F800000BF800000;
 static __declspec(section ".data") u64 one_negone$359 = 0x3F800000BF800000;
 
 static JetwEnt adata[] = {
@@ -157,7 +157,7 @@ effN64Vtx size6x22_tex32x32_vtx[] = {
 };
 
 
-static s32 dat_ry[] = {0, 40, 55, 190, 20, 130, 270, 300};
+static s32 jetw_ry_tbl[] = {0, 40, 55, 190, 20, 130, 270, 300};
 #pragma force_active on
 __declspec(section ".data") u32 gap_05_803A382C_data[1] = {0};
 #pragma force_active reset
@@ -303,7 +303,7 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
                     PSMTXTrans(mtx, (f32)ptr[idx].x, 10.0f + (f32)ptr[idx].y, 0.0f);
                     PSMTXScale(scale, 0.01f * (f32)tbl[idx].sx, 0.01f * (f32)tbl[idx].sy, 1.0f);
                     PSMTXConcat(mtx, scale, mtx);
-                    PSMTXRotRad(rot, 'z', 0.017453292f * ((f32)ptr[idx].rot + (f32)dat_ry[(j + i) & 7]));
+                    PSMTXRotRad(rot, 'z', 0.017453292f * ((f32)ptr[idx].rot + (f32)jetw_ry_tbl[(j + i) & 7]));
                     PSMTXConcat(mtx, rot, mtx);
                     PSMTXConcat(mtx2, mtx, mtx);
                     GXLoadPosMtxImm(mtx, GX_PNMTX0);

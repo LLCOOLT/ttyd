@@ -260,7 +260,7 @@ f32 partyGetTargetDist3D(s32 id, Vec* p) {
     return PSVECDistance(&marioGetPtr()->position, p);
 }
 
-f32 partyGetTargetHeightDiff(s32 id, f32 y) {
+f32 partyGetTargetDistY(s32 id, f32 y) {
     MarioWork* mario = marioGetPtr();
     BOOL far = FALSE;
     PartyEntry* other = anotherPartyGetPtr(id != 0);
@@ -282,7 +282,7 @@ f32 partyGetTargetHeightDiff(s32 id, f32 y) {
     return __fabsf(mario->position.y - y);
 }
 
-f32 partyGetTargetDistY(s32 id) {
+f32 partyGetTargetMovespd(s32 id) {
     MarioWork* mario = marioGetPtr();
     BOOL far;
     PartyEntry* other;

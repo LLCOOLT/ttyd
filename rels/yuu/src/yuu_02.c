@@ -21,7 +21,7 @@ typedef struct MonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; }
 typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
 typedef struct MonteTable { f32 x0; f32 x1; f32 z0; f32 z1; s32 num; s32 type; } MonteTable;
 static void* yuunpc_wp;
-static Monte* monte_p; /* unk_yuu_bss00000004 */
+static Monte* monte_p; /* monte_p */
 static Monte* icon_monte_p;
 s32 yuucounter_get_data(void);
 void yuucounter_flag_on(s32 flag);
@@ -34,7 +34,7 @@ void monteCountDisp(void);
 extern s32 minigame03_start[];
 extern s32 minigame03_end[];
 extern s32 minigame_view_monte[];
-extern s32 unk_evt_yuu_000152bc[];
+extern s32 yuu_02_icon_monte_entry_evt[];
 void marioChgRollMotion(void);
 void marioRollFixOn(void);
 extern MonteTable montetable[];
@@ -136,7 +136,7 @@ __declspec(section ".data") s32 fd_yuu_02_one_364[1];
 __declspec(section ".data") s32 fd_yuu_02__three_localstatic4_sqrtf[2];
 __declspec(section ".data") s32 fd_yuu_02__half_localstatic3_sqrtf[2];
 Vec fukkipoint[15];
-__declspec(section ".data") s32 unk_evt_yuu_000152bc[4];
+__declspec(section ".data") s32 yuu_02_icon_monte_entry_evt[4];
 static MonteTable montetable[11];
 static __declspec(section ".data") s32 minigame_view_monte[4];
 s32 yuu_02_jumpret[164];
@@ -224,7 +224,7 @@ Vec fukkipoint[] = {
     {250.0f, 0.0f, 300.0f},
 };
 
-__declspec(section ".data") EVT_BEGIN(unk_evt_yuu_000152bc)
+__declspec(section ".data") EVT_BEGIN(yuu_02_icon_monte_entry_evt)
     CALL(yuu_02_icon_monte_entry)
     RETURN
 EVT_END()
@@ -555,7 +555,7 @@ void yuuminigame_init_3roll(EventEntry* event, BOOL isFirstCall) {
     RollWork* data = ((MiniGameWork*)event->lwData[0])->data;
     EventEntry* e;
 
-    e = evtEntryType(unk_evt_yuu_000152bc, 0, 0, 0xEF);
+    e = evtEntryType(yuu_02_icon_monte_entry_evt, 0, 0, 0xEF);
     e->lwData[0] = event->lwData[0];
     data->viewEvent = evtEntryType(minigame_view_monte, 0, 0, 0);
     data->viewEvent->lwData[0] = event->lwData[0];

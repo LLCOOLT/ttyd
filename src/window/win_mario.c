@@ -315,7 +315,7 @@ const char* winZenkakuStr(s32 n) {
     return tmp2;
 }
 
-char unk_803dfbf8[0x100];
+char winZenkakuStrPad_tmp[0x100];
 
 char* winZenkakuStrPad(s32 n, s32 digits) {
     const char* tbl[10] = {"\x82\x4f", "\x82\x50", "\x82\x51", "\x82\x52", "\x82\x53",
@@ -323,20 +323,20 @@ char* winZenkakuStrPad(s32 n, s32 digits) {
     char buf[0x100];
     s32 i;
     if (n < 0) {
-        strcpy(unk_803dfbf8, "\x81\x7c");
+        strcpy(winZenkakuStrPad_tmp, "\x81\x7c");
         n = -n;
     } else {
-        strcpy(unk_803dfbf8, "");
+        strcpy(winZenkakuStrPad_tmp, "");
     }
     sprintf(buf, "%d", n);
     for (i = 0; i < digits; i++) {
         if ((u32)i < (u32)(digits - strlen(buf))) {
-            strcat(unk_803dfbf8, "\x82\x4f");
+            strcat(winZenkakuStrPad_tmp, "\x82\x4f");
         } else {
-            strcat(unk_803dfbf8, tbl[(s8)buf[i - (digits - strlen(buf))] - '0']);
+            strcat(winZenkakuStrPad_tmp, tbl[(s8)buf[i - (digits - strlen(buf))] - '0']);
         }
     }
-    return unk_803dfbf8;
+    return winZenkakuStrPad_tmp;
 }
 
 static inline void fukiKey(WinMarioWork* w, u16 icon, f32 x, f32 y) {

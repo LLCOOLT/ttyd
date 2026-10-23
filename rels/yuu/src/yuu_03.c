@@ -21,7 +21,7 @@ typedef struct SlitWork { u32 flags; s32 phase; s32 coins; s32 result; s32 state
 typedef struct MonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } MonteSub;
 typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
 void yuu_03_icon_monte_disp(CameraId camera, void* param);
-extern s32 unk_evt_yuu_00015fe0[];
+extern s32 yuu_03_icon_monte_entry_evt[];
 void marioSlitForceCancel(void);
 void ext_yuunpc_minigame4_init_sub(void);
 void yuunpc_wp_flag_off(s32 flag);
@@ -32,7 +32,7 @@ typedef struct RyushiWork { s32 flag; s32 mode; Vec base; Vec pos; s32 alpha; s3
 static void* yuunpc_wp;
 s32 ryuwp;
 RyushiWork* xwp;
-Monte* unk_yuu_bss00000010;
+Monte* yuu_03_monte_p;
 extern f32 yuusintbl[];
 static void polygon(f32 x, f32 y, f32 w, f32 h, f32 u, f32 v);
 int rand(void);
@@ -133,7 +133,7 @@ __declspec(section ".data") s32 fd_yuu_03___local_3PIO2_368[1];
 __declspec(section ".data") u64 fd_yuu_03_one_negone_359;
 __declspec(section ".data") s32 fd_yuu_03___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_yuu_03_one_364[1];
-__declspec(section ".data") s32 unk_evt_yuu_00015fe0[4];
+__declspec(section ".data") s32 yuu_03_icon_monte_entry_evt[4];
 s32 ryushi_event[25];
 __declspec(section ".data") s32 yuu_03_kaijo_init[12];
 __declspec(section ".data") s32 yuu_03_kaijo_init2[12];
@@ -177,26 +177,26 @@ USER_FUNC(yuu_03_icon_monte_entry) {
     Monte* m;
 
     if (isFirstCall) {
-        if (unk_yuu_bss00000010 != NULL) {
+        if (yuu_03_monte_p != NULL) {
             exists = TRUE;
         }
         total = 0;
         for (i = 0; i < 1; i++) {
             total++;
         }
-        unk_yuu_bss00000010 = _mapAlloc(total * sizeof(Monte));
-        memset(unk_yuu_bss00000010, 0, total * sizeof(Monte));
-        unk_yuu_bss00000010->num = total;
-        unk_yuu_bss00000010->wp = wp;
-        for (i = 0; i < unk_yuu_bss00000010->num; i++) {
-            sub = &unk_yuu_bss00000010[i].sub;
+        yuu_03_monte_p = _mapAlloc(total * sizeof(Monte));
+        memset(yuu_03_monte_p, 0, total * sizeof(Monte));
+        yuu_03_monte_p->num = total;
+        yuu_03_monte_p->wp = wp;
+        for (i = 0; i < yuu_03_monte_p->num; i++) {
+            sub = &yuu_03_monte_p[i].sub;
             sub->pos = mario->position;
             sub->pos.y += 40.0f;
             sub->scale = 1.0f;
         }
     }
-    for (i = 0; i < unk_yuu_bss00000010->num; i++) {
-        m = &unk_yuu_bss00000010[i];
+    for (i = 0; i < yuu_03_monte_p->num; i++) {
+        m = &yuu_03_monte_p[i];
         switch (m->state) {
             case 0:
                 m->sub.pos = mario->position;
@@ -207,7 +207,7 @@ USER_FUNC(yuu_03_icon_monte_entry) {
         }
     }
     if (!exists) {
-        dispEntry(CAMERA_3D, 0.0f, 1, yuu_03_icon_monte_disp, unk_yuu_bss00000010);
+        dispEntry(CAMERA_3D, 0.0f, 1, yuu_03_icon_monte_disp, yuu_03_monte_p);
     }
     return EVT_RETURN_BLOCK;
 }
@@ -215,14 +215,14 @@ USER_FUNC(yuu_03_icon_monte_entry) {
 USER_FUNC(yuu_03_icon_monte_restart) {
     SlitWork* data;
 
-    if (unk_yuu_bss00000010 != NULL) {
-        data = unk_yuu_bss00000010->wp->data;
+    if (yuu_03_monte_p != NULL) {
+        data = yuu_03_monte_p->wp->data;
         if (data->viewEvent != NULL) {
             evtDeleteID(data->viewEvent->eventId);
             data->viewEvent = NULL;
-            _mapFree(unk_yuu_bss00000010);
-            data->viewEvent = evtEntryType(unk_evt_yuu_00015fe0, 0, 0, 0);
-            data->viewEvent->lwData[0] = (s32)unk_yuu_bss00000010->wp;
+            _mapFree(yuu_03_monte_p);
+            data->viewEvent = evtEntryType(yuu_03_icon_monte_entry_evt, 0, 0, 0);
+            data->viewEvent->lwData[0] = (s32)yuu_03_monte_p->wp;
         }
     }
     return EVT_RETURN_DONE;
@@ -601,7 +601,7 @@ __declspec(section ".data") s32 fd_yuu_03_one_364[] = {
     1065353216,
 };
 
-__declspec(section ".data") EVT_BEGIN(unk_evt_yuu_00015fe0)
+__declspec(section ".data") EVT_BEGIN(yuu_03_icon_monte_entry_evt)
     CALL(yuu_03_icon_monte_entry)
     RETURN
 EVT_END()
@@ -818,7 +818,7 @@ EVT_END()
 void yuuminigame_init_4slit(EventEntry* event, BOOL isFirstCall) {
     SlitWork* data = ((MiniGameWork*)event->lwData[0])->data;
 
-    data->viewEvent = evtEntryType(unk_evt_yuu_00015fe0, 0, 0, 0);
+    data->viewEvent = evtEntryType(yuu_03_icon_monte_entry_evt, 0, 0, 0);
     data->viewEvent->lwData[0] = event->lwData[0];
     data->flags |= 1;
     evt_ryushi_init(event, isFirstCall);

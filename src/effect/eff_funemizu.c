@@ -40,15 +40,15 @@ typedef struct ColorEntry {
     GXColor color;
 } ColorEntry;
 
-static const GXColor dat_80421468 = {0xFF, 0xFF, 0xFF, 0xFF};
+static const GXColor funemizu_default_color = {0xFF, 0xFF, 0xFF, 0xFF};
 
-__declspec(section ".data") u64 lbl_803B0200 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_funemizu_negone_one_a = 0xBF8000003F800000;
 __declspec(section ".data") static u64 negone_one$374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803B0210 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_funemizu_one_negone_a = 0x3F800000BF800000;
 __declspec(section ".data") static u64 one_negone$373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_803B0220 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_funemizu_negone_one_b = 0xBF8000003F800000;
 __declspec(section ".data") static u64 negone_one$360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_803B0230 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_funemizu_one_negone_b = 0x3F800000BF800000;
 __declspec(section ".data") static u64 one_negone$359 = 0x3F800000BF800000;
 
 static s16 funemizu_vertex_tbl[] = { 20079, -636, 0, 13766, 0, 0, 8902, 0, 0, 5574, 0, 0, 0, 0, 0, 13766, 1536, 0, 8902, 2560, 0, 5574, 2560, 0, 512, 0, 0, 18154, 899, 0, 13766, 3328, 0, 8902, 5376, 0, 5574, 5488, 0, 2246, 2982, 0, 14542, -396, 1249, 10016, 0, 1249, 6528, 0, 1249, 4142, 0, 1249, 512, 0, 1249, 10016, 957, 1249, 6528, 1596, 1249, 4142, 1596, 1249, 13161, 560, 1249, 10016, 2074, 1249, 6528, 3351, 1249, 4142, 3422, 1249, 1755, 1859, 1249, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -133,7 +133,7 @@ GXColor effFunemizuGetMapColor(void) {
             return e->color;
         }
     }
-    return dat_80421468;
+    return funemizu_default_color;
 }
 
 

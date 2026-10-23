@@ -28,13 +28,13 @@ typedef struct EffHokoriN64Work {
 
 
 #ifdef __MWERKS__
-__declspec(section ".data") u64 lbl_8039D5D0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_hokori_n64_negone_one_a = 0xBF8000003F800000;
 static __declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_8039D5E0 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_hokori_n64_one_negone_a = 0x3F800000BF800000;
 static __declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_8039D5F0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 eff_hokori_n64_negone_one_b = 0xBF8000003F800000;
 static __declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_8039D600 = 0x3F800000BF800000;
+__declspec(section ".data") u64 eff_hokori_n64_one_negone_b = 0x3F800000BF800000;
 static __declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
 #endif
 

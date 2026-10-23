@@ -160,7 +160,7 @@ __declspec(section ".data") s32 init_tenin[8];
 __declspec(section ".data") s32 talk_tenin[2];
 static s32 init_white[83];
 s32 mario_jump[197];
-__declspec(section ".data") s32 lbl_3_data_76CC[6];
+__declspec(section ".data") s32 mario_jump_tail[6];
 __declspec(section ".data") s32 iri_25_item_tbl[2];
 static s32 talk_white[117];
 s32 iri_25_white_bed[363];
@@ -898,7 +898,7 @@ s32 mario_jump[] = {
     2, -1000, 262235, (s32)evt_npc_flag_onoff, 0,
 };
 
-__declspec(section ".data") s32 lbl_3_data_76CC[] = {
+__declspec(section ".data") s32 mario_jump_tail[] = {
     (s32)/*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67", 32, 65627, (s32)evt_mario_cam_keep_off, 2, 1,
 };
 

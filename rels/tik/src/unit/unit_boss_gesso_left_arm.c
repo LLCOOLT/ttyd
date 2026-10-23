@@ -63,12 +63,12 @@ static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
 static __declspec(section ".data") PoseTableEntry pose_table[4];
-BattleDataEntry unk_tik_00029f1c[13];
+BattleDataEntry gesso_left_arm_data_table[13];
 static __declspec(section ".data") s32 data_table[6];
 static BattleUnitKindPart parts[1];
 static s32 init_event[25];
 static s32 damage_event[31];
-s32 unk_evt_tik_0002a0c8[93];
+s32 gesso_left_arm_damage_event[93];
 static __declspec(section ".data") s32 phase_event[2];
 s32 weapon_gesso_left_arm_attack[48];
 static s32 attack_event[171];
@@ -185,7 +185,7 @@ BattleUnitKind unit_boss_gesso_left_arm = {
     1,
     parts,
     init_event,
-    unk_tik_00029f1c,
+    gesso_left_arm_data_table,
 };
 
 static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
@@ -201,20 +201,20 @@ static __declspec(section ".data") PoseTableEntry pose_table[] = {
     {69, "GSO_S1_1"},
 };
 
-BattleDataEntry unk_tik_00029f1c[] = {
-    {24, unk_evt_tik_0002a0c8},
-    {25, unk_evt_tik_0002a0c8},
-    {26, unk_evt_tik_0002a0c8},
-    {27, unk_evt_tik_0002a0c8},
-    {28, unk_evt_tik_0002a0c8},
-    {29, unk_evt_tik_0002a0c8},
-    {30, unk_evt_tik_0002a0c8},
-    {31, unk_evt_tik_0002a0c8},
-    {32, unk_evt_tik_0002a0c8},
-    {33, unk_evt_tik_0002a0c8},
-    {34, unk_evt_tik_0002a0c8},
-    {35, unk_evt_tik_0002a0c8},
-    {36, unk_evt_tik_0002a0c8},
+BattleDataEntry gesso_left_arm_data_table[] = {
+    {24, gesso_left_arm_damage_event},
+    {25, gesso_left_arm_damage_event},
+    {26, gesso_left_arm_damage_event},
+    {27, gesso_left_arm_damage_event},
+    {28, gesso_left_arm_damage_event},
+    {29, gesso_left_arm_damage_event},
+    {30, gesso_left_arm_damage_event},
+    {31, gesso_left_arm_damage_event},
+    {32, gesso_left_arm_damage_event},
+    {33, gesso_left_arm_damage_event},
+    {34, gesso_left_arm_damage_event},
+    {35, gesso_left_arm_damage_event},
+    {36, gesso_left_arm_damage_event},
 };
 
 static __declspec(section ".data") s32 data_table[] = {
@@ -249,7 +249,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_tik_0002a0c8)
+EVT_BEGIN(gesso_left_arm_damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_OnUnitFlag, LW(10), 1)

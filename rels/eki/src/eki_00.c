@@ -50,7 +50,7 @@ static void moamoa_pose_main(void);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 extern const char* g_moamoa_chain_tbl[][2];
-extern const s32 dat_80419a28;
+extern const s32 g_moamoa_chain_num;
 static void ext_moamoa_main(void);
 static void ext_moamoa_main(void);
 void extLoadRenderMode(void);

@@ -202,7 +202,7 @@ extern s32 mail_evt_gor_01_2[93];
 extern s32 mail_evt_rsh_03_a_2[61];
 extern s32 mail_evt_pik_00[71];
 extern s32 evt_sub_mail_event[117];
-__declspec(section ".data") s32 lbl_803080CC[1];
+__declspec(section ".data") s32 evt_sub_mail_event_end[1];
 
 s32 tree_data[] = {
     -230000000, -230000000, -230000000, -230000547, -229998519, -229998338, -230001199, -229996749,
@@ -1100,7 +1100,7 @@ s32 evt_sub_mail_event[] = {
 };
 
 #pragma force_active on
-__declspec(section ".data") s32 lbl_803080CC[] = {
+__declspec(section ".data") s32 evt_sub_mail_event_end[] = {
     1,
 };
 #pragma force_active reset

@@ -159,8 +159,8 @@ s32 ukishima_init1[34];
 s32 ukishima_part1[50];
 s32 ukishima_init2[34];
 s32 ukishima_part2[50];
-s32 unk_evt_dou_00011744[23];
-s32 unk_evt_dou_000117a0[23];
+s32 ukishima_switch1_evt[23];
+s32 ukishima_switch2_evt[23];
 s32 torinoko_suifu_pukapuka[69];
 s32 _suifu_sakebu[101];
 s32 torinoko_suifu_sakebu[103];
@@ -168,7 +168,7 @@ s32 torinoko_suifu_init[192];
 s32 torinoko_suifu[172];
 s32 suifu_orei[339];
 s32 escapeway_event[98];
-s32 unk_evt_dou_000128c4[58];
+s32 bombwall_escape_move[58];
 static s32 bombwall_bomb[187];
 static s32 bombwall_init[128];
 s32 bombwall_suifuout_secheck[77];
@@ -964,7 +964,7 @@ EVT_BEGIN(ukishima_part2)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_dou_00011744)
+EVT_BEGIN(ukishima_switch1_evt)
     SET_VALUE(GSWF(2983), 1)
     SET_VALUE(LW(0), GSWF(2983))
     ADD(LW(0), GSWF(2984))
@@ -977,7 +977,7 @@ EVT_BEGIN(unk_evt_dou_00011744)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_dou_000117a0)
+EVT_BEGIN(ukishima_switch2_evt)
     SET_VALUE(GSWF(2984), 1)
     SET_VALUE(LW(0), GSWF(2983))
     ADD(LW(0), GSWF(2984))
@@ -1334,7 +1334,7 @@ EVT_BEGIN(escapeway_event)
     RETURN
 EVT_END()
 
-EVT_BEGIN(unk_evt_dou_000128c4)
+EVT_BEGIN(bombwall_escape_move)
     CALL(evt_npc_flag_onoff, 1, STRING("水夫C"), 1073741856)
     BEGIN_INLINE_EVENT
         CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1365,7 +1365,7 @@ static EVT_BEGIN(bombwall_bomb)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_wait_landon)
         CALL(evt_mario_normalize)
-        SPAWN_EVENT(PTR(unk_evt_dou_000128c4))
+        SPAWN_EVENT(PTR(bombwall_escape_move))
     END_INLINE_EVENT
     CALL(evt_img_entry, STRING("capture_img"))
     CALL(evt_img_set_paper, STRING("capture_img"), STRING("OFF_d_bom_ver2"))
@@ -2330,8 +2330,8 @@ EVT_BEGIN(dou_11_init_evt)
             SPAWN_EVENT(PTR(watarikiri_suifu_init))
         END_IF
     END_IF
-    CALL(evt_mobj_switch_blue, 2, STRING("mobj01"), -220, 120, -450, PTR(unk_evt_dou_00011744), GSWF(2983))
-    CALL(evt_mobj_switch_blue, 2, STRING("mobj02"), 80, 120, -450, PTR(unk_evt_dou_000117a0), GSWF(2984))
+    CALL(evt_mobj_switch_blue, 2, STRING("mobj01"), -220, 120, -450, PTR(ukishima_switch1_evt), GSWF(2983))
+    CALL(evt_mobj_switch_blue, 2, STRING("mobj02"), 80, 120, -450, PTR(ukishima_switch2_evt), GSWF(2984))
     SPAWN_EVENT(PTR(ukishima_init1))
     SPAWN_EVENT(PTR(ukishima_init2))
     IF_INT_GREATER_OR_EQUAL(GSW(0), 253)

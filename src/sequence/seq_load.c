@@ -91,13 +91,13 @@ void loadMain(SequenceWork* seq);
 void loadDraw(CameraId camera, void* param);
 void continueGame(void);
 
-__declspec(section ".data") f32 lbl_80349DE8[] = { -1.0f, 1.0f };
+__declspec(section ".data") f32 seq_load_negone_one_a[] = { -1.0f, 1.0f };
 __declspec(section ".data") static f32 negone_one_374[] = { -1.0f, 1.0f };
-__declspec(section ".data") f32 lbl_80349DF8[] = { 1.0f, -1.0f };
+__declspec(section ".data") f32 seq_load_one_negone_a[] = { 1.0f, -1.0f };
 __declspec(section ".data") static f32 one_negone_373[] = { 1.0f, -1.0f };
-__declspec(section ".data") f32 lbl_80349E08[] = { -1.0f, 1.0f };
+__declspec(section ".data") f32 seq_load_negone_one_b[] = { -1.0f, 1.0f };
 __declspec(section ".data") static f32 negone_one_360[] = { -1.0f, 1.0f };
-__declspec(section ".data") f32 lbl_80349E18[] = { 1.0f, -1.0f };
+__declspec(section ".data") f32 seq_load_one_negone_b[] = { 1.0f, -1.0f };
 __declspec(section ".data") static f32 one_negone_359[] = { 1.0f, -1.0f };
 
 WinDt win_dt[9] = {

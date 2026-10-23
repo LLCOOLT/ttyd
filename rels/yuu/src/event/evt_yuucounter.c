@@ -48,8 +48,8 @@ __declspec(section ".data") u64 fd_evt_yuucounter_one_negone_359;
 __declspec(section ".data") s32 fd_evt_yuucounter___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_evt_yuucounter_one_364[1];
 static __declspec(section ".data") s32 main_evt[4];
-__declspec(section ".data") s32 unk_evt_yuu_00019728[6];
-__declspec(section ".data") s32 unk_evt_yuu_00019740[2];
+__declspec(section ".data") s32 yuucounter_window_disp_evt[6];
+__declspec(section ".data") s32 yuucounter_window_null_evt[2];
 
 u32 yuucounter_flag(u32 mask) {
     if (_wp == NULL) {
@@ -128,9 +128,9 @@ USER_FUNC(evt_yuucounter_alloc) {
     wp->event = evtEntry(main_evt, 0, 0);
     wp->event->lwData[0] = (s32)wp;
     if (wp->type == 1) {
-        evtYuuSetWindowEvt(unk_evt_yuu_00019728);
+        evtYuuSetWindowEvt(yuucounter_window_disp_evt);
     } else {
-        evtYuuSetWindowEvt(unk_evt_yuu_00019740);
+        evtYuuSetWindowEvt(yuucounter_window_null_evt);
     }
     return EVT_RETURN_DONE;
 }
@@ -380,11 +380,11 @@ static __declspec(section ".data") EVT_BEGIN(main_evt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(unk_evt_yuu_00019728)
+__declspec(section ".data") EVT_BEGIN(yuucounter_window_disp_evt)
     CALL(yuucounter_disp_flag_onoff, 1, 4)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(unk_evt_yuu_00019740)
+__declspec(section ".data") EVT_BEGIN(yuucounter_window_null_evt)
     RETURN
 EVT_END()

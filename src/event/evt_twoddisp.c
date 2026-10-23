@@ -27,8 +27,8 @@ typedef struct TwodEntry {
 
 TwodEntry* twodPtr;
 s32 twodID;
-extern const GXColor unk_80423048;
-extern const GXColor unk_8042304c;
+extern const GXColor twod_icon_fog_color;
+extern const GXColor twod_text_fog_color;
 USER_FUNC(twoddisp_main);
 
 static void twoddisp_disp(CameraId camera, void* param) {
@@ -45,7 +45,7 @@ static void twoddisp_disp(CameraId camera, void* param) {
         p = &twodPtr[i];
         if (((s8*)p->name)[0] != 0 && (p->flags & 1)) {
             if (!(p->id & 0x80000000)) {
-                fogi = unk_80423048;
+                fogi = twod_icon_fog_color;
                 pos.x = p->baseX + p->x;
                 pos.y = p->baseY + p->y;
                 pos.z = 0.0f;
@@ -54,7 +54,7 @@ static void twoddisp_disp(CameraId camera, void* param) {
             } else {
                 FontDrawStart();
                 FontDrawScale(p->scale);
-                fogt = unk_8042304c;
+                fogt = twod_text_fog_color;
                 GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fogt);
                 sprintf(buf, (const char*)p->id);
                 col = (GXColor){0, 0, 0, 255};
@@ -206,8 +206,8 @@ EVT_BEGIN(twoddisp_main_event)
     RETURN
 EVT_END()
 
-__declspec(section ".sdata2") const GXColor unk_8042304c;
-__declspec(section ".sdata2") const GXColor unk_80423048;
+__declspec(section ".sdata2") const GXColor twod_text_fog_color;
+__declspec(section ".sdata2") const GXColor twod_icon_fog_color;
 
 #pragma force_active on
 __declspec(section ".sdata") u32 gap_07_80411DDC_sdata[1] = {0};
