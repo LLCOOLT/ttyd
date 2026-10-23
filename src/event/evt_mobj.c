@@ -1,5 +1,3 @@
-// the C is kept beside each one under NONMATCHING. .rodata/.sdata2 are re-declared in target order. Dead C not in the
-// target object (mobj_koopa_stone_blk, mobj_sign, evt_mobj_rideswitch, mobj_itemb) is under NONMATCHING. See docs/FAKES.md.
 #include "evt/evt_cmd.h"
 #include "driver/mobjdrv.h"
 #include "driver/animdrv.h"
