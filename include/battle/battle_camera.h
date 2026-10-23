@@ -5,7 +5,7 @@
 
 typedef struct {
     s32 flags; //0x0
-    s32 unk4; //0x4
+    s32 modeFrame; //0x4, frames in the current camera mode (1 = first frame)
     s32 priLimit; //0x8
     s32 mode; //0xC
     s32 unitId; //0x10

@@ -4,6 +4,7 @@
 
 #pragma force_active on
 #include "manager/evtmgr.h"
+#include "driver/msgdrv.h"
 #include "pmario_sound.h"
 #include "string.h"
 #include "evt/evt_bero.h"
@@ -782,11 +783,7 @@ EVT_END()
 void psndBGMOff(u32 flags);
 
 static void callback(s32 type, void** work) {
-#ifdef VERSION_G8ME01
-    EventEntry* evt = *(EventEntry**)((u8*)*work + 0xF200);
-#else
-    EventEntry* evt = *(EventEntry**)((u8*)*work + 0x7A00);
-#endif
+    EventEntry* evt = ((MsgWinData*)*work)->event;
 
     if (strcmp(*(const char**)*work, "stg7_aji_06") == 0) {
         if (type == 3) {
@@ -805,22 +802,14 @@ static void callback(s32 type, void** work) {
             psndBGMOn(1, "BGM_EVT_QUIZ2\0\0\0\0\0\0");
         }
     }
-#ifdef VERSION_G8ME01
-    evt = *(EventEntry**)((u8*)*work + 0xF200);
-#else
-    evt = *(EventEntry**)((u8*)*work + 0x7A00);
-#endif
+    evt = ((MsgWinData*)*work)->event;
     if (((EventEntry*)evt->lwData[8] == NULL || !evtCheckID(((EventEntry*)evt->lwData[8])->eventId)) && type == 5) {
         evt->lwData[8] = (s32)evtEntry(UNK_0x00022c3c, 0, 0);
     }
 }
 
 void kuti_callback(s32 type, void** work) {
-#ifdef VERSION_G8ME01
-    EventEntry* evt = *(EventEntry**)((u8*)*work + 0xF200);
-#else
-    EventEntry* evt = *(EventEntry**)((u8*)*work + 0x7A00);
-#endif
+    EventEntry* evt = ((MsgWinData*)*work)->event;
 
     if (((EventEntry*)evt->lwData[8] == NULL || !evtCheckID(((EventEntry*)evt->lwData[8])->eventId)) && type == 5) {
         evt->lwData[8] = (s32)evtEntry(UNK_0x00022c3c, 0, 0);

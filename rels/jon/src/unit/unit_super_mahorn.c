@@ -264,7 +264,7 @@ static BattleUnitKind unit_super_mahorn_bunsin = {
     {0}, // talkTogeBaseOffset
     {24.0f, 0.0f, -10.0f}, // heldItemBaseOffset
     {0}, // burnFlameOffset
-    0.0f, 0.0f, // field_0x54..field_0x58
+    0.0f, 0.0f, // vivianOffsetX..vivianOffsetZ
     {24.0f, 0.0f, 0.0f}, // bintaHitOffset
     {16.0f, 28.6f, 10.0f}, // kissHitOffset
     {0.0f, 22.0f, 0.0f}, // cutBaseOffset
@@ -305,16 +305,16 @@ static BattleUnitKindPart parts[] = {
 
 static BattleWeapon weapon_mahorn_attack_magic = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     2, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -323,7 +323,7 @@ static BattleWeapon weapon_mahorn_attack_magic = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0xC7, // special
     0x7FF, // counterResistFlags
@@ -334,14 +334,14 @@ static BattleWeapon weapon_mahorn_attack_magic = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_mahorn_all_attack_magic = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
@@ -350,11 +350,11 @@ static BattleWeapon weapon_mahorn_all_attack_magic = {
 #else
     0, // superguardsAllowed
 #endif
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -364,7 +364,7 @@ static BattleWeapon weapon_mahorn_all_attack_magic = {
     4, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     7, // special
     0x7FF, // counterResistFlags
@@ -375,23 +375,23 @@ static BattleWeapon weapon_mahorn_all_attack_magic = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_mahorn_attack_punch = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -400,7 +400,7 @@ static BattleWeapon weapon_mahorn_attack_punch = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     2, // counterResistFlags
@@ -411,22 +411,22 @@ static BattleWeapon weapon_mahorn_attack_punch = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_mahorn_trans_magic = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -435,7 +435,7 @@ static BattleWeapon weapon_mahorn_trans_magic = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x108, // special
     0x7FF, // counterResistFlags
@@ -448,22 +448,22 @@ static BattleWeapon weapon_mahorn_trans_magic = {
     100, // invisibleChance
     3, // invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_mahorn_yokeyoke_magic = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -472,7 +472,7 @@ static BattleWeapon weapon_mahorn_yokeyoke_magic = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x108, // special
     0x7FF, // counterResistFlags
@@ -484,22 +484,22 @@ static BattleWeapon weapon_mahorn_yokeyoke_magic = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_mahorn_dekadeka_magic = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -508,7 +508,7 @@ static BattleWeapon weapon_mahorn_dekadeka_magic = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x108, // special
     0x7FF, // counterResistFlags
@@ -521,22 +521,22 @@ static BattleWeapon weapon_mahorn_dekadeka_magic = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_mahorn_katikati_magic = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -545,7 +545,7 @@ static BattleWeapon weapon_mahorn_katikati_magic = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x108, // special
     0x7FF, // counterResistFlags
@@ -559,22 +559,22 @@ static BattleWeapon weapon_mahorn_katikati_magic = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_mahorn_recover_magic = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -583,7 +583,7 @@ static BattleWeapon weapon_mahorn_recover_magic = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, 0, // acHelpMsg..special
     0x7FF, // counterResistFlags
     0x1500, // targetWeightFlags
@@ -593,9 +593,9 @@ static BattleWeapon weapon_mahorn_recover_magic = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleUnitSetup entry_mahorn = {
@@ -1886,9 +1886,9 @@ static USER_FUNC(mahorn_copy_status) {
 
     unit2->currentHp = unit1->currentHp;
     memcpy(&unit2->mSleepTurns, &unit1->mSleepTurns, 0x1E);
-    unit2->hpGauge.field_0xC = unit2->currentHp;
-    unit2->hpGauge.field_0x10 = unit2->currentHp;
-    unit2->hpGauge.field_0x14 = unit2->hpGauge.field_0x18 = (f32)unit2->currentHp / unit2->maxHp;
+    unit2->hpGauge.prevHp = unit2->currentHp;
+    unit2->hpGauge.targetHp = unit2->currentHp;
+    unit2->hpGauge.barRatio = unit2->hpGauge.trailRatio = (f32)unit2->currentHp / unit2->maxHp;
     return EVT_RETURN_DONE;
 }
 

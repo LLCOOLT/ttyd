@@ -8,7 +8,7 @@ typedef struct ItemData {
 	const char* name; //0x4
 	const char* description; //0x8
 	const char* menu_description; //0xC
-	s16 usable_locations; //0x10
+	u16 usable_locations; //0x10, bit flags (1 battle, 2 field?, 4 menu)
 	s16 type_sort_order; //0x12
 	u16 buy_price; //0x14
 	u16 discount_price; //0x16

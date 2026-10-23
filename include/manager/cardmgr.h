@@ -15,9 +15,9 @@ typedef struct {
         u8 bannerTex[0x1800]; //0x40
         u8 iconTex[0x400]; //0x1840
         u8 iconTlut[0x200]; //0x1C40
-        u16 unk1E40; //0x1E40
-        u16 unk1E42; //0x1E42
-        u16 unk1E44; //0x1E44
+        u16 rumbleEnabled; //0x1E40
+        u16 soundMode; //0x1E42
+        u16 lastSlot; //0x1E44
     } data;
     u8 __align[0x1FF8 - 0x1E46]; //0x1E46
     u32 checksum1; //0x1FF8
@@ -27,7 +27,7 @@ typedef struct {
 typedef struct {
     struct {
         u16 flags; //0x0
-        u8 unk2[0x8 - 0x2]; //0x2
+        u8 pad_2[0x8 - 0x2]; //0x2
         GlobalWork global; //0x8
         PouchData pouch; //0x13E0
         NpcDeadInfo deadInfo[64]; //0x19B4
@@ -35,12 +35,12 @@ typedef struct {
         PiantaParlorWork parlor; //0x1FD8
 #ifdef VERSION_G8ME01
         InformantUnknown informant; //0x2230 (US parlor work is 0x120 bigger)
-        u8 unk225B[0x2260 - 0x225B]; //0x225B
+        u8 pad_225B[0x2260 - 0x225B]; //0x225B
     } data;
     u8 __align[0x3FF0 - 0x2260]; //0x2260
 #else
         InformantUnknown informant; //0x2110
-        u8 unk213B[0x2140 - 0x213B]; //0x213B
+        u8 pad_213B[0x2140 - 0x213B]; //0x213B
     } data;
     u8 __align[0x3FF0 - 0x2140]; //0x2140
 #endif
@@ -57,12 +57,12 @@ typedef struct {
 
 typedef struct {
     vu16 flags; //0x0
-    u8 unk2[0x4 - 0x2]; //0x2
+    u8 pad_2[0x4 - 0x2]; //0x2
     void* workArea; //0x4
     s32 chan; //0x8
     s32 fileNo; //0xC
     u64 serialNo; //0x10
-    u8 unk18[0x1C - 0x18]; //0x18
+    u8 pad_18[0x1C - 0x18]; //0x18
     CARDFileInfo info; //0x1C
     CARDStat status; //0x30
     s32 result; //0x9C
@@ -73,16 +73,16 @@ typedef struct {
     CardSaveSlot* writeBuf; //0xB0, save slot staged for writing
     BOOL validSave1; //0xB4, is main save valid?
     BOOL validSave2; //0xB8, is backup save valid?
-    s32 unkBC; //0xBC
-    s32 unkC0; //0xC0
-    u8 unkC4[0xC8 - 0xC4]; //0xC4
+    s32 writeFirst; //0xBC
+    s32 writeSecond; //0xC0
+    u8 pad_C4[0xC8 - 0xC4]; //0xC4
     OSTime lastSaveTime1; //0xC8
     OSTime lastSaveTime2; //0xD0
     s32 opStep; //0xD8, step within the current operation
-    u8 unkDC[0xE0 - 0xDC]; //0xDC
+    u8 pad_DC[0xE0 - 0xDC]; //0xDC
     s32 op; //0xE0, current operation (0 = idle, 8 = finishing/error)
     s32 prevInserted; //0xE4, last CARDProbe result; a change sets flag 0x4000
-    u8 unkE8[0xEC - 0xE8]; //0xE8
+    u8 pad_E8[0xEC - 0xE8]; //0xE8
     s32 busyFrames; //0xEC, counts down; nonzero keeps cardIsExec returning TRUE
 } CardWork;
 

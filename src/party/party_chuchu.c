@@ -365,8 +365,8 @@ void chuchu_exit(PartyEntry* party) {
 }
 
 void chuchu_move(PartyEntry* party) {
-    if (party->field_8 & 8) {
-        party->field_8 &= ~8;
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
         party->flags &= ~0x100;
         partyWalkInit(party, 1);
     }

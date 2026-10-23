@@ -35,9 +35,9 @@ typedef struct CubeMesh {
 } CubeMesh;
 typedef struct CubeJoint { MapFileJoint joint; MapFileJointPart part; } CubeJoint;
 
-CubeDrawMode cubeMSJ = {{{0}, 1, {0}, (s32)0x80000000}, 0};
+CubeDrawMode cubeMSJ = {{0, 1, 0, 0, 0, (s32)0x80000000}, 0};
 
-CubeDrawMode front2MSJ = {{{0}, 1, {0}, 0}, 0};
+CubeDrawMode front2MSJ = {{0, 1, 0, 0, 0, 0}, 0};
 
 // static data from inlined header functions
 __declspec(section ".data") f32 fd_mobjdrv_negone_one_374[] = {-1.0f, 1.0f};
@@ -449,11 +449,11 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
                 MTXConcat(trans, xrot, trans);
                 MTXConcat(trans, scale, mtx);
             }
-            memcpy(entry->hitObj[0].unk4 + 8, &cubeDJ, sizeof(CubeJoint));
+            memcpy(entry->hitObj[0].jointData + 8, &cubeDJ, sizeof(CubeJoint));
             strcpy(entry->hitObj[0].name, "MOBJ_");
             strcat(entry->hitObj[0].name, entry->name);
-            *(char**)(entry->hitObj[0].unk4 + 8) = entry->hitObj[0].name;
-            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].unk4 + 8), mtx);
+            *(char**)(entry->hitObj[0].jointData + 8) = entry->hitObj[0].name;
+            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].jointData + 8), mtx);
             entry->hitObj[0].hitObject->mobj = entry;
             break;
         case 1:
@@ -470,11 +470,11 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
                 MTXConcat(trans, xrot, trans);
                 MTXConcat(trans, scale, mtx);
             }
-            memcpy(entry->hitObj[0].unk4 + 8, &headDJ, sizeof(CubeJoint));
+            memcpy(entry->hitObj[0].jointData + 8, &headDJ, sizeof(CubeJoint));
             strcpy(entry->hitObj[0].name, "MOBJ_");
             strcat(entry->hitObj[0].name, entry->name);
-            *(char**)(entry->hitObj[0].unk4 + 8) = entry->hitObj[0].name;
-            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].unk4 + 8), mtx);
+            *(char**)(entry->hitObj[0].jointData + 8) = entry->hitObj[0].name;
+            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].jointData + 8), mtx);
             entry->hitObj[0].hitObject->mobj = entry;
             break;
         case 2:
@@ -491,17 +491,17 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
                 MTXConcat(trans, xrot, trans);
                 MTXConcat(trans, scale, mtx);
             }
-            memcpy(entry->hitObj[0].unk4 + 8, &frontDJ, sizeof(CubeJoint));
+            memcpy(entry->hitObj[0].jointData + 8, &frontDJ, sizeof(CubeJoint));
             strcpy(entry->hitObj[0].name, "MOBJ_");
             strcat(entry->hitObj[0].name, entry->name);
-            *(char**)(entry->hitObj[0].unk4 + 8) = entry->hitObj[0].name;
-            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].unk4 + 8), mtx);
+            *(char**)(entry->hitObj[0].jointData + 8) = entry->hitObj[0].name;
+            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].jointData + 8), mtx);
             entry->hitObj[0].hitObject->mobj = entry;
-            memcpy(entry->hitObj[1].unk4 + 8, &front2DJ, sizeof(CubeJoint));
+            memcpy(entry->hitObj[1].jointData + 8, &front2DJ, sizeof(CubeJoint));
             strcpy(entry->hitObj[1].name, "MOBJ~");
             strcat(entry->hitObj[1].name, entry->name);
-            *(char**)(entry->hitObj[1].unk4 + 8) = entry->hitObj[1].name;
-            entry->hitObj[1].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[1].unk4 + 8), mtx);
+            *(char**)(entry->hitObj[1].jointData + 8) = entry->hitObj[1].name;
+            entry->hitObj[1].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[1].jointData + 8), mtx);
             entry->hitObj[1].hitObject->mobj = entry;
             break;
     }
@@ -598,7 +598,6 @@ extern void* kpaGetHitobj(void);
 extern void* kpaGetHitFlame(void);
 extern void shadowSetType(s32 id, s32 type);
 
-#define MB(p, off, T) (*(T*)((u8*)(p) + (off)))
 typedef struct MobjWorkHit {
     s32 count;
     MapObjectEntry* entries;
@@ -744,7 +743,7 @@ void mobjMain(void) {
                     goto hitDone;
                 }
                 if (marioFrontActionValidChk() && (entry->flags & 0x40000) && mario->hitobjFront == hitPtr &&
-                    (mario->buttonBuffer & 0x100) && !partyFlag) {
+                    (mario->buttonTrg & 0x100) && !partyFlag) {
                     entry->hitFlag = 0x40000;
                     hit = 1;
                     goto hitDone;
@@ -754,7 +753,7 @@ void mobjMain(void) {
                         entry->hitFlag = 0x800000;
                         hit = 1;
                         goto hitDone;
-                    } else if (party->hitobjAction != NULL && (s32)MB(party, 0x31, u8) == 3) {
+                    } else if (party->hitobjAction != NULL && (s32)(u8)party->currentMemberId == 3) {
                         if (PSVECDistance(&party->position, &entry->position) <
                             entry->hitObj[0].hitObject->radius + party->width) {
                             entry->hitFlag = 0x800000;
@@ -763,7 +762,7 @@ void mobjMain(void) {
                         }
                     }
                 }
-                if ((entry->flags & 0x2000000) && party != NULL && (s32)MB(party, 0x31, u8) == 3) {
+                if ((entry->flags & 0x2000000) && party != NULL && (s32)(u8)party->currentMemberId == 3) {
                     if (party->hitobjAction == hitPtr) {
                         entry->hitFlag = 0x2000000;
                         hit = 1;
@@ -933,9 +932,9 @@ MapObjectEntry* mobjNameToPtrNoAssert(const char* name) {
     return entry;
 }
 
-MapObject* mobjHitObjPtrToPtr(HitEntry* hitObj) {
+MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hitObj) {
     if (hitObj->attributes & (1 << 31)) {
-        return hitObj->mapObj;
+        return hitObj->mobj;
     }
 
     return NULL;
@@ -1012,8 +1011,6 @@ void mobjCalcMtx2(MapObjectEntry* entry) {
 
     PSVECAdd(&entry->position, &entry->translation, &position);
 
-    // TODO: Try matching using calcMtx inline function - had issues with lining up the stack offsets
-    // Matches fine here
     calcMtx(mtx, &position, &entry->scale2, &entry->rotation);
 
     for (i = 0; i < 2; i++) {

@@ -796,12 +796,12 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
         if (dist < range) {
             angle = angleABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]);
             if (__fabsf(compAngle(angle, mario->directionView)) < 40.0f) {
-                mario->unk174.x = -((range - dist) * moa_sinx(6.2831855f * mario->directionView / 360.0f));
-                mario->unk174.z = (range - dist) * moa_cosx(6.2831855f * mario->directionView / 360.0f);
+                mario->floorMove.x = -((range - dist) * moa_sinx(6.2831855f * mario->directionView / 360.0f));
+                mario->floorMove.z = (range - dist) * moa_cosx(6.2831855f * mario->directionView / 360.0f);
             } else {
                 rad = 6.2831855f * angle / 360.0f;
-                mario->unk174.x = pose->mtx[0][3] - range * moa_sin(rad) - mario->position.x;
-                mario->unk174.z = pose->mtx[2][3] + range * moa_cos(rad) - mario->position.z;
+                mario->floorMove.x = pose->mtx[0][3] - range * moa_sin(rad) - mario->position.x;
+                mario->floorMove.z = pose->mtx[2][3] + range * moa_cos(rad) - mario->position.z;
             }
         }
     }
@@ -1383,19 +1383,19 @@ static void ext_moamoa_main(void)
   moamoa_pose_main();
   if (wp->flags & 0x10)
   {
-    mario->unk174.x = 0.0f;
-    mario->unk174.y = 0.0f;
-    mario->unk174.z = 0.0f;
+    mario->floorMove.x = 0.0f;
+    mario->floorMove.y = 0.0f;
+    mario->floorMove.z = 0.0f;
   }
   else
   {
-    pv = (Vec){mario->unk174.x, mario->unk174.y, mario->unk174.z};
+    pv = (Vec){mario->floorMove.x, mario->floorMove.y, mario->floorMove.z};
     if (PSVECMag(&pv) > 2.0f)
     {
       PSVECNormalize(&pv, &pv);
-      mario->unk174.x = 2.0f * pv.x;
-      mario->unk174.y = 2.0f * pv.y;
-      mario->unk174.z = 2.0f * pv.z;
+      mario->floorMove.x = 2.0f * pv.x;
+      mario->floorMove.y = 2.0f * pv.y;
+      mario->floorMove.z = 2.0f * pv.z;
     }
   }
 }

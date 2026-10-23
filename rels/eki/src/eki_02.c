@@ -140,8 +140,8 @@ USER_FUNC(hit_move) {
     dist = distABf(mario->position.x, mario->position.z, pos.x, pos.z);
     theta = angleABf(pos.x, pos.z, mario->position.x, mario->position.z);
     theta = 6.2831855f * (theta + delta) / 360.0f;
-    mario->unk174.x = pos.x + dist * (f32)sin(theta) - mario->position.x;
-    mario->unk174.z = pos.z - dist * (f32)cos(theta) - mario->position.z;
+    mario->floorMove.x = pos.x + dist * (f32)sin(theta) - mario->position.x;
+    mario->floorMove.z = pos.z - dist * (f32)cos(theta) - mario->position.z;
     event->userdataf[1] = angle;
     return EVT_RETURN_BLOCK;
 }

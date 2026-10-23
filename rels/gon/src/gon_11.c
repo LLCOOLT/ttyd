@@ -219,7 +219,7 @@ static BeroEntry bero_entry_data[] = {
 
 static USER_FUNC(gonbaba_wait_landon) {
     // ゴンババ
-    return npcNameToPtr("\203S\203\223\203o\203o")->field_0x300 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
+    return npcNameToPtr("\203S\203\223\203o\203o")->groundHit ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
 static EVT_BEGIN(gonbaba_standup_shake)
@@ -835,7 +835,7 @@ static s32 evt_cloud_main(EventEntry *event, BOOL isFirstCall)
       animPaperPoseEntry(wp->animName, inBattle);
       offscreenEntry(wp->offscreenName);
       off = offscreenNameToPtr(wp->offscreenName);
-      off->unk40 = (off->unk3C = 4);
+      off->texFmt = (off->copyFmt = 4);
       _mapsetofs_all(wp);
       wp->state++;
       break;

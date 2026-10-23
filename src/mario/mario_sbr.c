@@ -9,7 +9,7 @@
 #include "system.h"
 #include <string.h>
 #include "party/party_yoshi.h"
-#include "sdk/DEMOPad.h"
+#include <demo/DEMOPad.h>
 #include "koopa.h"
 #include "mot/mot_slit.h"
 #include "mot/mot_walk.h"
@@ -330,7 +330,7 @@ void marioUpdateKeyData(void) {
     mp->analogB = 0;
     mask = mp->enableKeyMask ? mp->enableKeyMask : 0xFFFFFFFF;
     mp->buttonHold = gp->button[0] & mask;
-    mp->buttonBuffer = gp->buttonNew[0] & mask;
+    mp->buttonTrg = gp->buttonNew[0] & mask;
     mp->buttonRepeat = gp->buttonRepeat[0] & mask;
     mp->buttonUp = gp->buttonUp[0] & mask;
     if (!(mp->flags & 0xE)) {
@@ -362,7 +362,7 @@ void marioUpdateKeyData(void) {
         mp->analogB = 0;
         if (!mp->enableKeyMask) {
             mp->buttonHold = 0;
-            mp->buttonBuffer = 0;
+            mp->buttonTrg = 0;
             mp->buttonRepeat = 0;
             mp->buttonUp = 0;
         }
@@ -370,7 +370,7 @@ void marioUpdateKeyData(void) {
             mp->buttonHold = 0x20;
         }
     }
-    btn = MW(DemoPad, 0x10, u16);
+    btn = DemoPad[0].dirs;
     mp->demoButtonNew = btn & (btn ^ mp->demoButtonPrev);
     mp->demoButtonPrev = btn;
 }

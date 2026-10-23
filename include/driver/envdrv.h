@@ -45,13 +45,13 @@ typedef struct EnvironmentWork {
     GXTexObj captureObj2; //0x2C
     void* envBlur; //0x4C, see envBlurOn
     GXTexObj envBlurObj; //0x50
-    u8 unk70[0x88 - 0x70]; //0x70
+    u8 texMtxWork[0x88 - 0x70]; //0x70, EnvTexMtxWork view (view, mtx, model, scale, rotY, rotX)
     EnvironmentDof dof; //0x88
-    u8 unk94[0x98 - 0x94]; //0x94
-    u16 unk98; //0x98, some substruct
-    u8 unk9A[0xB0 - 0x9A]; //0x9A
+    u8 pad_94[0x98 - 0x94]; //0x94, never accessed
+    u16 blurWork; //0x98, start of the EnvBlurWork view; bit 1 = blur on
+    u8 blurWorkRest[0xB0 - 0x9A]; //0x9A, rest of the EnvBlurWork view
     EnvironmentGlareFilter filter; //0xB0
-    u8 unkC0[0xF0 - 0xC0]; //0xC0
+    u8 yamiView[0xF0 - 0xC0]; //0xC0, Mtx set by envSetYamiView
 } EnvironmentWork;
 
 void envInit(void);

@@ -118,7 +118,7 @@ static BattleUnitKind unit_patapata = {
     {0}, // talkTogeBaseOffset
     {9.0f, 6.0f, -10.0f}, // heldItemBaseOffset
     {0}, // burnFlameOffset
-    0.0f, 0.0f, // field_0x54..field_0x58
+    0.0f, 0.0f, // vivianOffsetX..vivianOffsetZ
     {18.0f, 0.0f, 0.0f}, // bintaHitOffset
     {11.0f, 24.0f, 0.0f}, // kissHitOffset
     {0.0f, 24.0f, 0.0f}, // cutBaseOffset
@@ -143,16 +143,16 @@ static BattleUnitKind unit_patapata = {
 
 static BattleWeapon weapon_patapata_attack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -161,7 +161,7 @@ static BattleWeapon weapon_patapata_attack = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x5087, // special
     0, // counterResistFlags
@@ -172,9 +172,9 @@ static BattleWeapon weapon_patapata_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleUnitDefense defence_patapata = {{1, 1, 1, 1, 1}};
@@ -191,8 +191,8 @@ static BattleUnitKindPart parts_patapata[] = {
         {0}, // positionOffset
         {0.0f, 30.0f, 0.0f}, // hitBaseOffset
         {0.0f, 40.0f, 0.0f}, // hitCursorBaseOffset
-        20, // field_0x30
-        30, // field_0x32
+        20, // shadowSize
+        30, // reserved_32
         255, // baseAlpha
         &defence_patapata, // defense
         &defence_patapata_attr, // defenseAttr
@@ -509,8 +509,8 @@ static BattleUnitKindPart parts[] = {
         {0}, // positionOffset
         {0.0f, 30.0f, 0.0f}, // hitBaseOffset
         {0.0f, 40.0f, 0.0f}, // hitCursorBaseOffset
-        20, // field_0x30
-        30, // field_0x32
+        20, // shadowSize
+        30, // reserved_32
         255, // baseAlpha
         &defence, // defense
         &defence_attr, // defenseAttr
@@ -522,16 +522,16 @@ static BattleUnitKindPart parts[] = {
 
 static BattleWeapon weapon_nokonoko_attack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -541,7 +541,7 @@ static BattleWeapon weapon_nokonoko_attack = {
     0, // element
     8, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0x5FF, // counterResistFlags
@@ -552,9 +552,9 @@ static BattleWeapon weapon_nokonoko_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(init_event)

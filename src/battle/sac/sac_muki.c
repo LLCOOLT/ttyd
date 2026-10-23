@@ -1,4 +1,5 @@
 #pragma optimize_for_size on
+#include "eff/eff_starstone.h"
 #include "battle/battle.h"
 #include "battle/battle_audience.h"
 #include "battle/battle_unit.h"
@@ -144,18 +145,18 @@ s32 marioAttackEvent_Muki[254];
 static BattleWeapon weapon = {
     "btl_wn_sac_mukimuki_body", // name
     ICON_19A, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_mukimuki_body", // description
     100, // baseAccuracy
     0, // baseFpCost
     3, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -164,7 +165,7 @@ static BattleWeapon weapon = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_4", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -174,9 +175,9 @@ static BattleWeapon weapon = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Muki, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(nice_event_pow)
@@ -738,7 +739,7 @@ USER_FUNC(end_muki) {
     MukiWork* w = get_ptr();
     s32 i;
 
-    effDelete(*(EffectEntry**)((u8*)w->eff->userdata + 0x34));
+    effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
     effDelete(w->eff);
     for (i = 0; i < 9; i++) {
         effDelete(w->obj[i].eff);
@@ -946,7 +947,7 @@ break;
 
 #pragma dont_inline on
 static MukiWork* get_ptr(void) {
-    return (MukiWork*)((u8*)_battleWorkPointer + 0x1f4c);
+    return (MukiWork*)_battleWorkPointer->actionCommands.work;
 }
 
 #pragma dont_inline reset

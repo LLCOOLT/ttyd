@@ -5,7 +5,7 @@
 
 typedef struct NameEntryWork {
 	u16 flags; //0x0, bit0 = done/closing, bit1 = cancelled
-	u8 field_0x2[2]; //0x2, padding?
+	u8 pad_2[2]; //0x2, padding?
 	s32 loadState; //0x4, tpl load step (0 idle, 1 load, 3 free)
 	s32 state; //0x8, input state; 100 = confirm, 0x65 = cancelled
 	s32 type; //0xC, nameEntInit type; 1 = partner (default name "name_party3")
@@ -21,10 +21,10 @@ typedef struct NameEntryWork {
 	f32 caretTargetX; //0x34
 	f32 caretTargetY; //0x38
 	char name[16]; //0x3C
-	u8 field_0x4C[0x50 - 0x4C]; //0x4C
+	u8 pad_4C[0x50 - 0x4C]; //0x4C
 	const char** charTable; //0x50, hiragana_tbl or katakana_tbl
 	f32 maskAlpha; //0x54, 0..1 fade of the confirm mask
-	u8 field_0x58[0x5C - 0x58]; //0x58
+	u8 pad_58[0x5C - 0x58]; //0x58
 	s32 confirmSel; //0x5C, yes/no toggle on the confirm prompt
 	FileEntry* tplFile; //0x60, name.tpl
 } NameEntryWork;

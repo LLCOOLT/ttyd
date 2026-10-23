@@ -4,6 +4,7 @@
 
 #pragma force_active on
 #include "driver/camdrv.h"
+#include "driver/msgdrv.h"
 #include "mario/mariost.h"
 #include "manager/evtmgr_cmd.h"
 #include "mario/mario.h"
@@ -919,7 +920,7 @@ static USER_FUNC(cam_r) {
 }
 
 void msg_callback(s32 type, void* param) {
-    EventEntry* ev = *(EventEntry**)(*(u8**)param + VERSION_PICK(0x7A00, 0xF200));
+    EventEntry* ev = (*(MsgWinData**)param)->event;
 
     switch (type) {
         case 0:

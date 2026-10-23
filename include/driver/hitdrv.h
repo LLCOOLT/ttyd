@@ -35,7 +35,7 @@ typedef struct HitDamageReturn {
 
 struct HitEntry {
     u16 flags;                      // 0x0
-    u8 unk2[0x4 - 0x2];             // 0x2
+    u8 pad_02[0x4 - 0x2];             // 0x2, never accessed
     s32 attributes;                 // 0x4
     MapFileJoint* joint;            // 0x8
     Mtx worldMtx;                   // 0xC
@@ -46,7 +46,7 @@ struct HitEntry {
     s16 mapIndex;                   // 0xAA
     HitVector* vectors;             // 0xAC
     HitDamageReturn* damage;        // 0xB0
-    u8 unkB4[0xC0 - 0xB4];          // 0xB4
+    u8 pad_B4[0xC0 - 0xB4];          // 0xB4, never accessed
     Vec centerWorld;                // 0xC0
     f32 radius;                     // 0xCC
     union {                         // 0xD0, owner: map object, or the mobj for mobj hit objects

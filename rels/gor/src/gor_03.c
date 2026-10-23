@@ -4106,16 +4106,16 @@ EVT_BEGIN(evt_door_01_1_close)
 EVT_END()
 
 DoorParam door_data_01_0 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_i01_doa_m", // mapobj
     "A_ie01_doa_m02", // hitIn
     "A_ie01_doa_m01", // hitOut
-    "S_ie_01_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_01_naka", // mapOut
-    "A_ie_01C", // hitOutOut
+    "S_ie_01_soto", // outside
+    NULL, // outsideHit
+    "S_ie_01_naka", // inside
+    "A_ie_01C", // insideHit
     evt_door_01_00, // evtIn
     NULL, // evtOut
     evt_wall_01, // evtWall
@@ -4126,16 +4126,16 @@ DoorParam door_data_01_0 = {
 };
 
 DoorParam door_data_01_1 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_i01_doa_o", // mapobj
     "A_ie01_doa_o02", // hitIn
     "A_ie01_doa_o01", // hitOut
-    "S_ie_01_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_01_naka", // mapOut
-    "A_ie_01C", // hitOutOut
+    "S_ie_01_soto", // outside
+    NULL, // outsideHit
+    "S_ie_01_naka", // inside
+    "A_ie_01C", // insideHit
     evt_door_01_10, // evtIn
     NULL, // evtOut
     evt_wall_01, // evtWall
@@ -4231,16 +4231,16 @@ const char* door_data_02_mobj[] = {
 };
 
 DoorParam door_data_02_0l = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_02_f1_doa01", // mapobj
     "A_ie_02_f1_doa_l02______", // hitIn
     "A_ie_02_f1_doa_l01", // hitOut
-    "S_ie_02_soto", // mapIn
-    NULL, // hitInIn
-    "S_i02_f1", // mapOut
-    "A_ie_02C", // hitOutOut
+    "S_ie_02_soto", // outside
+    NULL, // outsideHit
+    "S_i02_f1", // inside
+    "A_ie_02C", // insideHit
     evt_door_02_00, // evtIn
     NULL, // evtOut
     evt_wall_02_0, // evtWall
@@ -4251,16 +4251,16 @@ DoorParam door_data_02_0l = {
 };
 
 DoorParam door_data_02_0r = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_02_f1_doa02", // mapobj
     "A_ie_02_f1_doa_r02", // hitIn
     "A_ie_02_f1_doa_r01", // hitOut
-    "S_ie_02_soto", // mapIn
-    NULL, // hitInIn
-    "S_i02_f1", // mapOut
-    "A_ie_02C", // hitOutOut
+    "S_ie_02_soto", // outside
+    NULL, // outsideHit
+    "S_i02_f1", // inside
+    "A_ie_02C", // insideHit
     evt_door_02_00, // evtIn
     NULL, // evtOut
     evt_wall_02_0, // evtWall
@@ -4432,16 +4432,16 @@ EVT_BEGIN(evt_door_02_1_close)
 EVT_END()
 
 DoorParam door_data_02_1 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_02_f2_doa", // mapobj
     "A_ie_02_f2_doa02", // hitIn
     "A_ie_02_f2_doa01", // hitOut
-    "S_ie_02_soto", // mapIn
-    NULL, // hitInIn
-    "S_i02_f2", // mapOut
-    "A_ie_02C", // hitOutOut
+    "S_ie_02_soto", // outside
+    NULL, // outsideHit
+    "S_i02_f2", // inside
+    "A_ie_02C", // insideHit
     evt_door_02_10, // evtIn
     evt_door_02_11, // evtOut
     evt_wall_02_1, // evtWall
@@ -4489,16 +4489,16 @@ EVT_BEGIN(door_data_03_close)
 EVT_END()
 
 static DoorParam door_data_03 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_03_doa", // mapobj
     "A_ie_03_doa02", // hitIn
     "A_ie_03_doa01", // hitOut
-    "S_ie_03_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_03_naka", // mapOut
-    "S_ie_03_C", // hitOutOut
+    "S_ie_03_soto", // outside
+    NULL, // outsideHit
+    "S_ie_03_naka", // inside
+    "S_ie_03_C", // insideHit
     evt_door_03_00, // evtIn
     NULL, // evtOut
     evt_wall_03, // evtWall
@@ -4568,16 +4568,16 @@ static EVT_BEGIN(evt_door_03_close)
 EVT_END()
 
 static DoorParam door_data_03_roll = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_03_doa", // mapobj
     NULL, // hitIn
     "A_ie_03_rol", // hitOut
-    "S_ie_03_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_03_naka", // mapOut
-    "S_ie_03_C", // hitOutOut
+    "S_ie_03_soto", // outside
+    NULL, // outsideHit
+    "S_ie_03_naka", // inside
+    "S_ie_03_C", // insideHit
     evt_door_03_00, // evtIn
     NULL, // evtOut
     evt_wall_03, // evtWall
@@ -4634,16 +4634,16 @@ EVT_BEGIN(evt_door_04_close_snd)
 EVT_END()
 
 static DoorParam door_data_04 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_04_doa", // mapobj
     "A_ie_04_doa02", // hitIn
     "A_ie_04_doa01", // hitOut
-    "S_ie_04_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_04_naka", // mapOut
-    "A_ie_04_C", // hitOutOut
+    "S_ie_04_soto", // outside
+    NULL, // outsideHit
+    "S_ie_04_naka", // inside
+    "A_ie_04_C", // insideHit
     evt_door_04_00, // evtIn
     NULL, // evtOut
     evt_wall_04, // evtWall
@@ -4678,16 +4678,16 @@ static EVT_BEGIN(evt_door_04_close)
 EVT_END()
 
 DoorParam door_data_04_roll = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_04_doa", // mapobj
     "A_ie_04_rol", // hitIn
     NULL, // hitOut
-    "S_ie_04_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_04_naka", // mapOut
-    "A_ie_04_C", // hitOutOut
+    "S_ie_04_soto", // outside
+    NULL, // outsideHit
+    "S_ie_04_naka", // inside
+    "A_ie_04_C", // insideHit
     evt_door_04_00, // evtIn
     NULL, // evtOut
     evt_wall_04, // evtWall

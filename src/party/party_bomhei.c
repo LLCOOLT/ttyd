@@ -11,6 +11,7 @@
 #include "mario/mario_motion.h"
 #include "driver/camdrv.h"
 #include "driver/hitdrv.h"
+#include "driver/mobjdrv.h"
 #include <dolphin/mtx.h>
 #include <string.h>
 #include "party/party_hit.h"
@@ -36,7 +37,6 @@ extern void partyGoodbyeInit(PartyEntry* party);
 extern s32 partyGoodbyeMain(PartyEntry* party);
 extern void partyGetAppearPos(PartyEntry* party, Vec* pos);
 
-extern void* mobjHitObjPtrToPtr(HitEntry* hit);
 extern u8* caseCheckHitObj2(void* hit);
 
 extern s32 evt_cam_shake(void* evt, BOOL isFirstCall);
@@ -59,7 +59,7 @@ static inline BOOL isBombRock(HitEntry* hit) {
         return FALSE;
     }
     if (hitGetAttr(hit) & 0x80000000) {
-        if (strcmp((char*)mobjHitObjPtrToPtr(hit) + 0x15, "MOBJ_BombRock") == 0) {
+        if (strcmp(mobjHitObjPtrToPtr(hit)->animName, "MOBJ_BombRock") == 0) {
             return TRUE;
         }
     } else {
@@ -74,13 +74,13 @@ static inline BOOL isBombRock(HitEntry* hit) {
 #define PF(p, off, T) (*(T*)((u8*)(p) + (off)))
 
 #define BOMHEI_CLEAN_SFX(p)                    \
-    if ((u32)PF(p, 0x180, s32) != 0xFFFFFFFFU) {             \
-        psndSFXOff(PF(p, 0x180, s32));         \
-        PF(p, 0x180, s32) = -1;                \
+    if ((u32)(p)->work.bomhei.sfxId != 0xFFFFFFFFU) {             \
+        psndSFXOff((p)->work.bomhei.sfxId);         \
+        (p)->work.bomhei.sfxId = -1;                \
     }                                          \
-    if ((u32)PF(p, 0x184, s32) != 0xFFFFFFFFU) {             \
-        psndSFXOff(PF(p, 0x184, s32));         \
-        PF(p, 0x184, s32) = -1;                \
+    if ((u32)(p)->work.bomhei.sfxId2 != 0xFFFFFFFFU) {             \
+        psndSFXOff((p)->work.bomhei.sfxId2);         \
+        (p)->work.bomhei.sfxId2 = -1;                \
     }
 
 #define BOMHEI_CLEAN_FLAGS(p)                  \
@@ -90,17 +90,17 @@ static inline BOOL isBombRock(HitEntry* hit) {
     (p)->flags &= ~(1 << 8);
 
 #define BOMHEI_FREE(p)                         \
-    if (PF(p, 0x170, void*) != NULL) {         \
-        __memFree(0, PF(p, 0x170, void*));     \
-        PF(p, 0x170, void*) = NULL;            \
+    if ((p)->useStruct != NULL) {         \
+        __memFree(0, (p)->useStruct);     \
+        (p)->useStruct = NULL;            \
     }
 
 #pragma explicit_zero_data on
 void bomhei_bye(PartyEntry* party) {
     static const volatile u32 gap_09_8041B2C4_sdata2 = 0;
     (void)&gap_09_8041B2C4_sdata2;
-    if (party->field_8 & 8) {
-        party->field_8 &= ~8;
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
         partyGoodbyeInit(party);
         party->playerPtr->flags &= ~(1 << 13);
         BOMHEI_CLEAN_SFX(party);
@@ -117,7 +117,7 @@ void bomhei_init_800BFBB0(PartyEntry* party) {
     party->height = 28.0f;
     party->width = 28.0f;
     party->work.bomhei.state = 100;
-    party->work.bomhei.unk17C = -1;
+    party->work.bomhei.reserved_17C = -1;
     party->work.bomhei.sfxId = -1;
     party->work.bomhei.sfxId2 = -1;
 }
@@ -144,7 +144,7 @@ void bomhei_exit(PartyEntry* party) {
         p->playerPtr->flags &= ~(1 << 13);
         if (p->runMode != 9) {
             partyChgRunMode(p, 2);
-            p->field_3B = 0;
+            p->moveMode = 0;
         }
         BOMHEI_CLEAN_FLAGS(p);
         BOMHEI_CLEAN_SFX(p);
@@ -158,7 +158,7 @@ void bomhei_use_cancel() {
         p->playerPtr->flags &= ~(1 << 13);
         if (p->runMode != 9) {
             partyChgRunMode(p, 2);
-            p->field_3B = 0;
+            p->moveMode = 0;
         }
         BOMHEI_CLEAN_FLAGS(p);
         BOMHEI_CLEAN_SFX(p);
@@ -173,7 +173,7 @@ void bomhei_use_cancel2() {
         marioChgPose("M_S_1");
         if (p->runMode != 9) {
             partyChgRunMode(p, 2);
-            p->field_3B = 0;
+            p->moveMode = 0;
         }
         BOMHEI_CLEAN_FLAGS(p);
         BOMHEI_CLEAN_SFX(p);
@@ -202,18 +202,13 @@ void bomhei_use_post(PartyEntry* party) {
     }
     BOMHEI_CLEAN_FLAGS(party);
     if (party->runMode != 9) {
-        party->field_3B = 0;
-        party->field_8 |= 8;
+        party->moveMode = 0;
+        party->trigFlags |= 8;
     }
     party->playerPtr->flags &= ~(1 << 13);
     BOMHEI_CLEAN_SFX(party);
     BOMHEI_FREE(party);
 }
-
-typedef struct BomheiMobj {
-    u8 pad[0x15];
-    char name[0x10];
-} BomheiMobj;
 
 void bomhei_use_main(PartyEntry* party);
 void mario_controll(PartyEntry* party);
@@ -221,7 +216,7 @@ HitEntry* check_front(PartyEntry* party);
 
 void bomhei_use(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
-    BomheiMobj* mobj;
+    MapObjectEntry* mobj;
 
     if (party->flags & PARTY_FLAG_IS_BEING_USED) {
         bomhei_use_main(party);
@@ -232,8 +227,8 @@ void bomhei_use(PartyEntry* party) {
                 partyChgMot(party, 0);
                 party->velY = 0.0f;
             }
-            if (strcmp(gp->currentMapName, "muj_05") == 0 && party->field_138 != NULL &&
-                strcmp(hitGetName(party->field_138), "A_dokuro_bero") == 0) {
+            if (strcmp(gp->currentMapName, "muj_05") == 0 && party->hitobjStandOn != NULL &&
+                strcmp(hitGetName(party->hitobjStandOn), "A_dokuro_bero") == 0) {
                 party->targetDir = angleABf(party->position.x, party->position.z, 638.0f, 12.5f);
                 party->moveDir = party->targetDir;
             }
@@ -246,11 +241,11 @@ void bomhei_use(PartyEntry* party) {
             mario_controll(party);
         }
         if (party->useMotionId <= 10 && mario->hitobjStandOn != NULL && (hitGetAttr(mario->hitobjStandOn) & 0x80000000)) {
-            mobj = (BomheiMobj*)mobjHitObjPtrToPtr(mario->hitobjStandOn);
-            if (strcmp(mobj->name, "MOBJ_RedJumpStand") == 0 ||
-                strcmp(mobj->name, "MOBJ_RedJumpStand2") == 0 ||
-                strcmp(mobj->name, "MOBJ_BlueJumpStand") == 0 ||
-                strcmp(mobj->name, "MOBJ_BlueJumpStand2") == 0) {
+            mobj = mobjHitObjPtrToPtr(mario->hitobjStandOn);
+            if (strcmp(mobj->animName, "MOBJ_RedJumpStand") == 0 ||
+                strcmp(mobj->animName, "MOBJ_RedJumpStand2") == 0 ||
+                strcmp(mobj->animName, "MOBJ_BlueJumpStand") == 0 ||
+                strcmp(mobj->animName, "MOBJ_BlueJumpStand2") == 0) {
                 bomhei_use_cancel();
                 return;
             }
@@ -306,7 +301,7 @@ static inline BOOL bomheiChkHitAttr(PartyEntry* party) {
         party->useMotionId = 60;
         return TRUE;
     }
-    hit = party->field_138;
+    hit = party->hitobjStandOn;
     if (hit != NULL) {
         attr = hitGetAttr(hit);
         if (attr & 0xC00) {
@@ -343,8 +338,8 @@ void bomhei_use_main(PartyEntry* party) {
     f32 x, z;
     f32 tmp;
 
-    if (party->field_8 & 8) {
-        party->field_8 &= ~8;
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
         party->flags &= ~0x70;
         party->flags &= ~0x3000000;
         party->flags &= ~0x4000000;
@@ -441,7 +436,7 @@ void bomhei_use_main(PartyEntry* party) {
         tmp = 10.5f;
         BTIMER(party) = (s16)tmp;
         party->flags &= ~0x10;
-        if (party->field_138 != NULL) {
+        if (party->hitobjStandOn != NULL) {
             party->useMotionId = 30;
         } else {
             party->useMotionId = 22;
@@ -450,7 +445,7 @@ void bomhei_use_main(PartyEntry* party) {
         break;
     case 22:
         partyMoveNoHosei(party);
-        if (party->field_138 != NULL && !bomheiChkHitAttr(party)) {
+        if (party->hitobjStandOn != NULL && !bomheiChkHitAttr(party)) {
             party->useMotionId = !(BWORK(party)->flags & 4) ? 30 : 50;
         }
         break;
@@ -585,7 +580,7 @@ void bomhei_use_main(PartyEntry* party) {
         }
         eff = effSandarsEntry(pouchGetPartyAttackLv((PartyId)3), party->position.x,
                               party->position.y + party->height, party->position.z, 0.0f);
-        PF(eff->userdata, 0x40, s32) = party->camId;
+        ((EffSandarsWork*)eff->userdata)->camId = party->camId;
         fbatSandersBombTriggerOn();
         party->useMotionId = 70;
         break;
@@ -636,7 +631,7 @@ void bomhei_use_main(PartyEntry* party) {
         if (sy > limit) {
             party->flags &= ~0x2000000;
         } else if (hit != NULL) {
-            party->field_138 = hit;
+            party->hitobjStandOn = hit;
             party->flags &= ~0x2000000;
         }
         partyMove(party);
@@ -650,7 +645,7 @@ void bomhei_use_main(PartyEntry* party) {
                 party->position.y += 200.0f;
                 party->flags &= ~0x70;
             }
-            if (party->field_138 != NULL && !((hitGetAttr(party->field_138) >> 9) & 1)) {
+            if (party->hitobjStandOn != NULL && !((hitGetAttr(party->hitobjStandOn) >> 9) & 1)) {
                 partyChgPose(party, "F_1");
                 party->useMotionId = 82;
                 BTIMER(party) = 30;
@@ -667,7 +662,7 @@ void bomhei_use_main(PartyEntry* party) {
         break;
     case 100:
         partyChgRunMode(party, 2);
-        party->field_3B = 0;
+        party->moveMode = 0;
         party->flags2 &= ~0x10;
         party->flags &= ~0x80000000;
         party->flags &= ~0x100;
@@ -918,7 +913,7 @@ HitEntry* check_front(PartyEntry* party) {
         last = hit;
     }
 
-    hit = party->field_138;
+    hit = party->hitobjStandOn;
     if (hit != NULL && isBombRock(hit)) {
         return hit;
     }

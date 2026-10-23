@@ -29,75 +29,9 @@ typedef struct BtlPoseEntry {
     char* name;
 } BtlPoseEntry;
 
-typedef struct BtlStatusCopy {
-    u8 data[0x1E];
-} BtlStatusCopy;
-
-typedef struct BtlPoseSoundEntry {
-    const char* name0;
-    const char* name1;
-    s16 a;
-    s16 b;
-    s16 c;
-} BtlPoseSoundEntry;
-
-typedef struct BtlPoseSoundTable {
-    const char* name0;
-    const char* name1;
-    BtlPoseSoundEntry entry[3];
-} BtlPoseSoundTable;
-
-typedef struct BtlPoseSoundWork {
-    const char* name0; // 0x0
-    const char* name1; // 0x4
-    s16 field_0x8;
-    s16 field_0xA;
-    s16 field_0xC;
-    s16 field_0xE;
-    s16 field_0x10;
-    s16 field_0x12;
-    s16 field_0x14;
-    s32 field_0x18;
-} BtlPoseSoundWork;
-
-typedef struct BtlPoseSoundData {
-    const char* animName; // 0x0
-    f32 time;             // 0x4
-    s32 (*callback)(BattleUnit*, struct BtlPoseSoundData*, void*); // 0x8
-    const char* sfxName;  // 0xC
-    s16 pitch;            // 0x10
-    u16 flags;            // 0x12
-} BtlPoseSoundData;
-
-typedef struct BtlPartPoseSound {
-    BtlPoseSoundData* table; // 0x0
-    u32 loopCount;           // 0x4
-    f32 time;                // 0x8
-    f32 prevTime;            // 0xC
-    s32 count;               // 0x10
-    u8 flag;                 // 0x14
-} BtlPartPoseSound;
-
-typedef struct BtlHpGauge {
-    u16 mode;        // 0x0
-    u16 flags;       // 0x2
-    s16 field_0x4;
-    s16 field_0x6;
-    s16 field_0x8;
-    s16 field_0xA;
-    s32 field_0xC;
-    s32 field_0x10;
-    f32 field_0x14;
-    f32 field_0x18;
-} BtlHpGauge;
 
 #define PART_FLAGS(part) ((part)->animFlags)
-#define PART_POSE_SOUND(part) ((BtlPartPoseSound*)(part)->poseSound)
-#define POSE_TIME(pose) (*(f32*)((u8*)(pose) + 0x24))
-#define POSE_LOOP(pose) (*(f32*)((u8*)(pose) + 0x84))
-#define UNIT_TALK_PART(unit) (*(s32*)((u8*)(unit) + BUOFF(0x2D0)))
-#define UNIT_TALK_ANIM(unit) (*(const char**)((u8*)(unit) + BUOFF(0x2D4)))
-#define UNIT_STAY_ANIM(unit) (*(const char**)((u8*)(unit) + BUOFF(0x2D8)))
+#define PART_POSE_SOUND(part) (&(part)->poseSound)
 
 
 
@@ -117,7 +51,7 @@ void BtlUnit_SetAnimType(BattleUnitPart* part, s32 type);
 //local prototypes
 void _CheckMoveCount(BattleUnit* unit);
 
-BOOL BtlUnit_Init(void) { //TODO: force stmw/lmw, otherwise 1:1
+BOOL BtlUnit_Init(void) {
     int i;
     BattleWork* wp = _battleWorkPointer;
 
@@ -127,11 +61,9 @@ BOOL BtlUnit_Init(void) { //TODO: force stmw/lmw, otherwise 1:1
     return TRUE;
 }
 
-#define UNIT_FIELD(u, T, o) (*(T*)((u8*)(u) + (o)))
 
 void BtlUnit_HpGaugeInit(BattleUnit* unit);
 void BattleStatusEffectDelete(BattleUnit* unit);
-typedef void (*UnitDeleteFunc)(BattleUnit*);
 
 BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
     BattleWork* wp = _battleWorkPointer;
@@ -184,7 +116,7 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
     BtlUnit_SetScale(unit, 1.0f, 1.0f, 1.0f);
     BtlUnit_SetBaseScale(unit, 1.0f, 1.0f, 1.0f);
     unit->offsetCenter = unit->mKindParams->centerOffset;
-    UNIT_FIELD(unit, Vec, 0xB4) = unit->mKindParams->heldItemBaseOffset;
+    unit->heldItemBaseOffset = unit->mKindParams->heldItemBaseOffset;
     unit->bintaHitOffset = unit->mKindParams->bintaHitOffset;
     unit->kissHitOffset = unit->mKindParams->kissHitOffset;
     unit->baseMaxHp = setup->mUnitKindParams->maxHp;
@@ -232,12 +164,12 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
         part->attributes = part->mKindPartParams->attributes;
         part->counterAttributes = part->mKindPartParams->counterAttributes;
         if (part->attributes & 1) {
-            unit->unk2D0 = part->mKindPartParams->partNum;
+            unit->talkPartId = part->mKindPartParams->partNum;
         }
         part->defense = part->mKindPartParams->defense;
         part->defenseAttr = part->mKindPartParams->defenseAttr;
-        part->shadowSize = part->mKindPartParams->field_0x30;
-        part->field_0x1A4 = part->mKindPartParams->field_0x32;
+        part->shadowSize = part->mKindPartParams->shadowSize;
+        part->reserved_1A4 = part->mKindPartParams->reserved_32;
         part->shadowScale = 1.0f;
         part->moveDirection = 0;
         part->faceDirection = wp->alliances[unit->mAlliance].attackDirection;
@@ -271,7 +203,7 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
         part->animSpeed2 = 1.0f;
         part->poseType = 0;
         part->poseState = 0;
-        part->field_0x4E8 = -1;
+        part->handle = -1;
         part->partName = part->mKindPartParams->partName;
         if (--n <= 0) break;
         body = part;
@@ -282,13 +214,13 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
     part->mNextPart = NULL;
 
     body = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
-    UNIT_TALK_ANIM(unit) = BtlUnit_GetPoseNameFromType(body, 0x41);
-    UNIT_STAY_ANIM(unit) = BtlUnit_GetPoseNameFromType(body, 0x2B);
+    unit->talkPose = BtlUnit_GetPoseNameFromType(body, 0x41);
+    unit->stayPose = BtlUnit_GetPoseNameFromType(body, 0x2B);
     unit->mMoveColorLv = 0xFF;
     unit->moveColorLvDisp = 0xFF;
     btlDispEntAnime(unit);
     unit->countersetWeapon = NULL;
-    UNIT_FIELD(unit, void*, BUOFF(0x314)) = NULL;
+    unit->deleteFunc = NULL;
     switch (unit->currentKind) {
         case 0xD0:
             unit->countersetWeapon = BattleAlloc(0x44);
@@ -346,19 +278,19 @@ BOOL BtlUnit_Delete(BattleUnit* unit) {
     BattleStatusEffectDelete(unit);
     BattleStatusIconDelete(unit);
     if (unit->countersetWeapon) {
-        if (UNIT_FIELD(unit, UnitDeleteFunc, BUOFF(0x314))) {
-            UNIT_FIELD(unit, UnitDeleteFunc, BUOFF(0x314))(unit);
+        if (unit->deleteFunc) {
+            unit->deleteFunc(unit);
         } else {
             BattleFree(unit->countersetWeapon);
         }
     }
-    if ((void*)unit->unk318) {
-        smartFree(unit->unk318);
-        unit->unk318 = NULL;
+    if ((void*)unit->screenTexBuf) {
+        smartFree(unit->screenTexBuf);
+        unit->screenTexBuf = NULL;
     }
     for (part = unit->mParts; part; part = part->mNextPart) {
-        if (part->field_0x4E8 != -1) {
-            part->field_0x4E8 = -1;
+        if (part->handle != -1) {
+            part->handle = -1;
         }
         if (part->poseId != -1) {
             animPoseSetEffect(part->poseId, NULL, 0);
@@ -1539,12 +1471,12 @@ void BtlUnit_SetBodyAnim(BattleUnit* unit, const char* name) {
 
 void BtlUnit_ChangeTalkAnim(s32 unitId) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, unitId);
-    btlDispChangeAnime(BtlUnit_GetPartsPtr(unit, unit->unk2D0), UNIT_TALK_ANIM(unit), 0);
+    btlDispChangeAnime(BtlUnit_GetPartsPtr(unit, unit->talkPartId), unit->talkPose, 0);
 }
 
 void BtlUnit_ChangeStayAnim(s32 unitId) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, unitId);
-    btlDispChangeAnime(BtlUnit_GetPartsPtr(unit, unit->unk2D0), UNIT_STAY_ANIM(unit), 0);
+    btlDispChangeAnime(BtlUnit_GetPartsPtr(unit, unit->talkPartId), unit->stayPose, 0);
 }
 
 void BtlUnit_GetTalkTogePos(s32 unitId, f32* x, f32* y, f32* z) {
@@ -1653,9 +1585,9 @@ void BtlUnit_SetParamFromPouch(BattleUnit* unit) {
         unit->currentHp = *(s16*)((u8*)pouch + BattleTransPartyId(unit->currentKind) * 0xE + 6);
         BtlUnit_ReviseHpFp(unit);
         info = &wp->partyInfo[unit->currentKind - TYPE_PARTNER_MIN];
-        unit->mSizeMultiplier = info->field_0;
-        unit->mStatusFlags = info->field_24;
-        *(BtlStatusCopy*)&unit->mSleepTurns = *(BtlStatusCopy*)info->field_4;
+        unit->mSizeMultiplier = info->sizeMultiplier;
+        unit->mStatusFlags = info->statusFlags;
+        *(BtlStatusCopy*)&unit->mSleepTurns = info->statusTurns;
 #ifdef VERSION_G8ME01
         unit->usCommandDisabled[0] = info->usCommandDisabled[0];
         unit->usCommandDisabled[1] = info->usCommandDisabled[1];
@@ -1716,9 +1648,9 @@ void BtlUnit_SetParamToPouch(BattleUnit* unit) {
         s32 id = BattleTransPartyId(unit->currentKind);
         *(s16*)((u8*)pouch + id * 0xE + 6) = unit->currentHp;
         info = &wp->partyInfo[unit->currentKind - TYPE_PARTNER_MIN];
-        info->field_0 = unit->mSizeMultiplier;
-        info->field_24 = unit->mStatusFlags;
-        *(BtlStatusCopy*)info->field_4 = *(BtlStatusCopy*)&unit->mSleepTurns;
+        info->sizeMultiplier = unit->mSizeMultiplier;
+        info->statusFlags = unit->mStatusFlags;
+        info->statusTurns = *(BtlStatusCopy*)&unit->mSleepTurns;
 #ifdef VERSION_G8ME01
         info->usCommandDisabled[0] = unit->usCommandDisabled[0];
         info->usCommandDisabled[1] = unit->usCommandDisabled[1];
@@ -1928,12 +1860,12 @@ void BtlUnit_PayWeaponCost(BattleUnit* unit, BattleWeapon* weapon) {
 
     BtlUnit_SetFp(unit, fp - cost);
     if (unit->currentKind == UNIT_MARIO) {
-        BtlActRec_AddPoint((u8*)wp + BWOFF(0x16F2F), cost);
-        BtlActRec_AddCount((u8*)wp + BWOFF(0x16F30));
+        BtlActRec_AddPoint(&wp->actRecord.marioFpSpent, cost);
+        BtlActRec_AddCount(&wp->actRecord.marioFpMoves);
     }
     else if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
-        BtlActRec_AddPoint((u8*)wp + BWOFF(0x16F31), cost);
-        BtlActRec_AddCount((u8*)wp + BWOFF(0x16F32));
+        BtlActRec_AddPoint(&wp->actRecord.partnerFpSpent, cost);
+        BtlActRec_AddCount(&wp->actRecord.partnerFpMoves);
     }
     ((void (*)(s32))pouchAddAP)(-(u8)weapon->baseSpCost * 100);
 }
@@ -1990,74 +1922,74 @@ void BtlUnit_ResetMoveStatus(BattleUnit* unit) {
     }
 }
 
-void BtlUnit_LoadSeMode(s32 mode, s32 kind, BtlPoseSoundTable* table, BtlPoseSoundWork* work) {
-    work->field_0x14 = 0;
-    work->field_0x18 = -1;
+void BtlUnit_LoadSeMode(s32 mode, s32 kind, BtlPoseSoundTable* table, BecSndWork* work) {
+    work->count = 0;
+    work->sfxId = -1;
     switch (kind) {
         case -1:
             switch (mode) {
                 case 0:
                     work->name0 = table->entry[0].name0;
                     work->name1 = table->entry[0].name1;
-                    work->field_0xC = table->entry[0].a;
-                    work->field_0xE = table->entry[0].b;
-                    work->field_0x10 = table->entry[0].c;
+                    work->delay = table->entry[0].delay;
+                    work->period0 = table->entry[0].period0;
+                    work->period1 = table->entry[0].period1;
                     break;
                 case 1:
                     work->name0 = table->entry[1].name0;
                     work->name1 = table->entry[1].name1;
-                    work->field_0xC = table->entry[1].a;
-                    work->field_0xE = table->entry[1].b;
-                    work->field_0x10 = table->entry[1].c;
+                    work->delay = table->entry[1].delay;
+                    work->period0 = table->entry[1].period0;
+                    work->period1 = table->entry[1].period1;
                     break;
                 case 2:
-                    work->name0 = table->name0;
-                    work->name1 = table->name1;
-                    work->field_0xC = 0;
-                    work->field_0xE = 0;
-                    work->field_0x10 = 0;
+                    work->name0 = table->jumpName0;
+                    work->name1 = table->jumpName1;
+                    work->delay = 0;
+                    work->period0 = 0;
+                    work->period1 = 0;
                     break;
                 case 3:
                     work->name0 = table->entry[2].name0;
                     work->name1 = table->entry[2].name1;
-                    work->field_0xC = table->entry[2].a;
-                    work->field_0xE = table->entry[2].b;
-                    work->field_0x10 = table->entry[2].c;
+                    work->delay = table->entry[2].delay;
+                    work->period0 = table->entry[2].period0;
+                    work->period1 = table->entry[2].period1;
                     break;
                 default:
                     work->name0 = NULL;
                     work->name1 = NULL;
-                    work->field_0xC = 0;
-                    work->field_0xE = 0;
-                    work->field_0x10 = 0;
+                    work->delay = 0;
+                    work->period0 = 0;
+                    work->period1 = 0;
                     break;
             }
-            work->field_0x12 = work->field_0xC;
+            work->timer = work->delay;
             return;
         case -2:
-            work->field_0x12 = work->field_0xC;
+            work->timer = work->delay;
             return;
         case 0:
             break;
     }
     work->name0 = NULL;
     work->name1 = NULL;
-    work->field_0xC = 0;
-    work->field_0xE = 0;
-    work->field_0x10 = 0;
-    work->field_0x12 = work->field_0xC;
+    work->delay = 0;
+    work->period0 = 0;
+    work->period1 = 0;
+    work->timer = work->delay;
 }
 
-void BtlUnit_SetSeMode(BtlPoseSoundWork* work, const char* name0, const char* name1, s16 c, s16 e, s16 unused, s16 a, s16 b) {
+void BtlUnit_SetSeMode(BecSndWork* work, const char* name0, const char* name1, s16 c, s16 e, s16 unused, s16 a, s16 b) {
     work->name0 = name0;
     work->name1 = name1;
-    work->field_0xC = c;
-    work->field_0xE = e;
-    work->field_0x10 = e;
-    work->field_0x14 = 0;
-    work->field_0x8 = a;
-    work->field_0xA = b;
-    work->field_0x18 = -1;
+    work->delay = c;
+    work->period0 = e;
+    work->period1 = e;
+    work->count = 0;
+    work->reserved_08 = a;
+    work->reserved_0A = b;
+    work->sfxId = -1;
 }
 
 void BtlUnit_SetCommandAnimPose(BattleUnit* unit) {
@@ -2203,55 +2135,55 @@ s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s16 pi
 }
 
 void BtlUnit_HpGaugeInit(BattleUnit* unit) {
-    BtlHpGauge* gauge = (BtlHpGauge*)&unit->hpGauge;
+    BattleWorkHpGauge* gauge = &unit->hpGauge;
 
-    gauge->field_0x4 = 0;
-    gauge->field_0x8 = 0;
+    gauge->drainTimer = 0;
+    gauge->visibleTimer = 0;
     gauge->mode = 0;
-    gauge->field_0xC = unit->currentHp;
-    gauge->field_0x10 = unit->currentHp;
-    gauge->field_0x18 = gauge->field_0x14 = (f32)unit->currentHp / (f32)unit->maxHp;
+    gauge->prevHp = unit->currentHp;
+    gauge->targetHp = unit->currentHp;
+    gauge->trailRatio = gauge->barRatio = (f32)unit->currentHp / (f32)unit->maxHp;
     switch (gauge->mode) {
         case 1:
-            gauge->field_0x6 = 40;
-            gauge->field_0xA = gauge->field_0x6 + 30;
+            gauge->drainLength = 40;
+            gauge->visibleLength = gauge->drainLength + 30;
             break;
         default:
-            gauge->field_0x6 = 20;
-            gauge->field_0xA = gauge->field_0x6 + 30;
+            gauge->drainLength = 20;
+            gauge->visibleLength = gauge->drainLength + 30;
             break;
     }
 }
 
 void BtlUnit_HpGaugeMain(BattleUnit* unit) {
-    BtlHpGauge* gauge = (BtlHpGauge*)&unit->hpGauge;
+    BattleWorkHpGauge* gauge = &unit->hpGauge;
     f32 t;
     s16 maxHp;
 
-    if (gauge->field_0x4 > 0) {
-        gauge->field_0x4--;
-        if (gauge->field_0x4 <= 0) {
-            gauge->field_0xC = gauge->field_0x10;
-            gauge->field_0x14 = gauge->field_0x18 = (f32)unit->currentHp / (f32)unit->maxHp;
+    if (gauge->drainTimer > 0) {
+        gauge->drainTimer--;
+        if (gauge->drainTimer <= 0) {
+            gauge->prevHp = gauge->targetHp;
+            gauge->barRatio = gauge->trailRatio = (f32)unit->currentHp / (f32)unit->maxHp;
         }
         else {
             switch (gauge->mode) {
                 case 1:
-                    gauge->field_0x14 = (f32)unit->currentHp / (f32)unit->maxHp;
-                    gauge->field_0x18 = gauge->field_0x14 + (f32)(gauge->field_0xC - gauge->field_0x10) * intplGetValue(2, gauge->field_0x4, gauge->field_0x6, 0.0f, 1.0f) / (f32)unit->maxHp;
+                    gauge->barRatio = (f32)unit->currentHp / (f32)unit->maxHp;
+                    gauge->trailRatio = gauge->barRatio + (f32)(gauge->prevHp - gauge->targetHp) * intplGetValue(2, gauge->drainTimer, gauge->drainLength, 0.0f, 1.0f) / (f32)unit->maxHp;
                     break;
                 default:
-                    gauge->field_0x18 = 0.0f;
+                    gauge->trailRatio = 0.0f;
                     maxHp = unit->maxHp;
-                    gauge->field_0x14 = (f32)(gauge->field_0xC - gauge->field_0x10) * intplGetValue(0, gauge->field_0x4, gauge->field_0x6, 0.0f, 1.0f) / (f32)maxHp + (f32)unit->currentHp / (f32)maxHp;
+                    gauge->barRatio = (f32)(gauge->prevHp - gauge->targetHp) * intplGetValue(0, gauge->drainTimer, gauge->drainLength, 0.0f, 1.0f) / (f32)maxHp + (f32)unit->currentHp / (f32)maxHp;
                     break;
             }
         }
     }
-    if (gauge->field_0x8 > 0) {
-        gauge->field_0x8--;
+    if (gauge->visibleTimer > 0) {
+        gauge->visibleTimer--;
     }
-    if ((unit->flags & 1) && gauge->field_0x8 <= 0 && (gauge->flags & 1)) {
+    if ((unit->flags & 1) && gauge->visibleTimer <= 0 && (gauge->flags & 1)) {
         unit->flags &= ~1;
         gauge->flags &= ~1;
     }

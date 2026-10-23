@@ -18,7 +18,7 @@ typedef struct StatusValue {
 } StatusValue;
 
 typedef struct StatusWindowWork {
-    u8 field_0x0[0x4];  // 0x0
+    u8 pad_0[0x4];  // 0x0
     u16 flags;          // 0x4
     u8 align_0x6[2];    // 0x6
     f32 timer;          // 0x8
@@ -29,13 +29,13 @@ typedef struct StatusWindowWork {
     f32 speed;          // 0x1C
     f32 x;              // 0x20
     f32 y;              // 0x24
-    u8 field_0x28[0x8]; // 0x28
+    u8 pad_28[0x8]; // 0x28
     f32 openX;          // 0x30
     f32 openY;          // 0x34
-    u8 field_0x38[0x8]; // 0x38
+    u8 pad_38[0x8]; // 0x38
     f32 closeX;         // 0x40
     f32 closeY;         // 0x44
-    u8 field_0x48[0x8]; // 0x48
+    u8 pad_48[0x8]; // 0x48
     StatusValue cur;    // 0x50
     Vec prevPos;        // 0x68
     s32 idle;           // 0x74

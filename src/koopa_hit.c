@@ -1,3 +1,4 @@
+#include "eff/eff_gonbaba_breath.h"
 #include "driver/camdrv.h"
 #include "driver/hitdrv.h"
 #include "driver/mobjdrv.h"
@@ -18,13 +19,10 @@ void _savefpr_28(void);
 BOOL kpaFlameHitFilter(HitCheckQuery* query, HitEntry* entry);
 
 
-extern MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
 extern s32 kpaFireAttackCheck(void);
 
 
 #define KPW (marioGetPtr()->kpaWork)
-#define MF(m, off) (*(f32*)((u8*)(m) + (off)))
-#define MS16(m, off) (*(s16*)((u8*)(m) + (off)))
 #define KHEAD(i) (KPW->headHit[i])
 #define KHEADD(i) (KPW->headDist[i])
 #define KRIDE(i) (KPW->rideHit[i])
@@ -53,8 +51,8 @@ s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     Vec b;
     Vec diff;
     Vec a;
-    u8* efp;
-    u8* e;
+    EffectEntry* efp;
+    EffGonbabaBreathWork* e;
     f32 half;
     f32 r;
     f32 s;
@@ -72,23 +70,23 @@ s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     if (!efp) {
         return 0;
     }
-    e = *(u8**)(efp + 0xC);
-    s = MF(e, 0x40);
-    PSMTXTrans(m1, MF(e, 4), MF(e, 8), MF(e, 0xC));
-    PSMTXRotRad(m2, 'y', 0.017453292f * (MF(e, 0x48) - camGetPtr(4)->viewYaw));
-    if (MF(e, 0x48) > 90.0f && MF(e, 0x48) < 270.0f) {
-        PSMTXScale(m3, MF(e, 0x40), MF(e, 0x40), -MF(e, 0x40));
+    e = (EffGonbabaBreathWork*)efp->userdata;
+    s = e->scale;
+    PSMTXTrans(m1, e->position.x, e->position.y, e->position.z);
+    PSMTXRotRad(m2, 'y', 0.017453292f * (e->yaw - camGetPtr(4)->viewYaw));
+    if (e->yaw > 90.0f && e->yaw < 270.0f) {
+        PSMTXScale(m3, e->scale, e->scale, -e->scale);
     } else {
-        PSMTXScale(m3, MF(e, 0x40), MF(e, 0x40), MF(e, 0x40));
+        PSMTXScale(m3, e->scale, e->scale, e->scale);
     }
     PSMTXConcat(m1, m2, m1);
     PSMTXConcat(m1, m3, m4);
     half = 0.5f * w;
-    e += 0x50;
-    for (i = 1; i < *(s32*)(efp + 8); i++, e += 0x50) {
-        if (*(s32*)(e + 0x44) == 0) {
-            r = 7.0f * MF(e, 0x40);
-            PSMTXTrans(m1, MF(e, 4), MF(e, 8), MF(e, 0xC));
+    e++;
+    for (i = 1; i < efp->count; i++, e++) {
+        if (e->delay == 0) {
+            r = 7.0f * e->scale;
+            PSMTXTrans(m1, e->position.x, e->position.y, e->position.z);
             PSMTXScale(m3, r, r, r);
             PSMTXConcat(m1, m3, m1);
             PSMTXConcat(m4, m1, m1);
@@ -122,7 +120,7 @@ s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     dy = __fabsf(m->position.y + 0.5f * m->wPlayerCollisionBox.y - y - 0.5f * h);
     if (dy <= dh && dx <= dw) {
         if ((m->flags & 0x20000) && m->position.y > y) {
-            if (kpaGetLevel() == 0 && kpaGetStageType() != 1 && m->unk4C == 0 && z < 50.0f) {
+            if (kpaGetLevel() == 0 && kpaGetStageType() != 1 && m->mutekiTimer == 0 && z < 50.0f) {
                 marioChgMot(4);
             }
             return 1;
@@ -130,7 +128,7 @@ s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
         if (kpaMutekiCheck() == 1) {
             return 3;
         }
-        if (m->unk4C != 0) {
+        if (m->mutekiTimer != 0) {
             return 3;
         }
         if (m->kpaNoHitTimer == 0) {

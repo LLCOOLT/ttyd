@@ -185,16 +185,16 @@ BattleWeapon _lec_weapon_jump = {
 #else
     159, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_normal_jump", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -203,7 +203,7 @@ BattleWeapon _lec_weapon_jump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x35807, // special
     0xC, // counterResistFlags
@@ -214,9 +214,9 @@ BattleWeapon _lec_weapon_jump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     lecAttackEvent_Jump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon _lec_weapon_hammer = {
@@ -226,16 +226,16 @@ BattleWeapon _lec_weapon_hammer = {
 #else
     156, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_normal_hammer", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -244,7 +244,7 @@ BattleWeapon _lec_weapon_hammer = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x30887, // special
     0x7FB, // counterResistFlags
@@ -255,9 +255,9 @@ BattleWeapon _lec_weapon_hammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     lecAttackEvent_Hammer, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleDataEntry data_table[] = {

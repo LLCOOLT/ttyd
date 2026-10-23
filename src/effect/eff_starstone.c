@@ -1,4 +1,6 @@
 #pragma dollar_identifiers on
+#include "eff/n64/eff_snow_dust_n64.h"
+#include "eff/eff_starstone.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -27,32 +29,6 @@ void effStarStoneDisp_2(CameraId cameraId, EffectEntry* effect);
 void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect);
 void effStarStoneMain(EffectEntry* effect);
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
-
-typedef struct EffStarStoneWork {
-    s32 type;        // 0x0
-    u16 flags;       // 0x4
-    Vec position;    // 0x8
-    f32 scale;       // 0x14
-    f32 f18;         // 0x18
-    f32 f1c;         // 0x1C
-    f32 f20;         // 0x20
-    f32 f24;         // 0x24
-    f32 f28;         // 0x28
-    s32 timer;       // 0x2C
-    GXColor color;   // 0x30
-    EffectEntry* dust; // 0x34
-    s32 cam;         // 0x38
-    s32 state;       // 0x3C
-    f32 f40;         // 0x40
-    f32 f44;         // 0x44
-    f32 f48;         // 0x48
-    f32 f4c;         // 0x4C
-    f32 f50;         // 0x50
-    f32 f54;         // 0x54
-    f32 f58;         // 0x58
-    u8 r, g, b, a;   // 0x5C
-    s32 sfx;         // 0x60
-} EffStarStoneWork;
 
 u8 diamond_1_dl_0_0[] = { 0x98, 0x00, 0x04, 0x0D, 0x19, 0x04, 0x0A, 0x0E, 0x1D, 0x04, 0x0A, 0x0C, 0x15, 0x04, 0x0A, 0x0B, 0x10, 0x04, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 u8 diamond_1_dl_0_1[] = { 0x98, 0x00, 0x04, 0x0F, 0x02, 0x02, 0x0A, 0x13, 0x0A, 0x02, 0x0A, 0x10, 0x00, 0x02, 0x0A, 0x11, 0x04, 0x02, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -337,7 +313,7 @@ static u8* color_tbl[] = { diamond_1_color0_tbl, diamond_2_color0_tbl, diamond_3
     PSMTXTrans(m, (w)->position.x + (tx), (w)->position.y, (w)->position.z + (tz));    \
     PSMTXScale(s, sc, sc, sc);                                                         \
     PSMTXConcat(m, s, m);                                                              \
-    PSMTXRotRad(r, 'y', MTXDegToRad((w)->f1c));                                        \
+    PSMTXRotRad(r, 'y', MTXDegToRad((w)->rotY));                                        \
     PSMTXConcat(m, r, m);                                                              \
     PSMTXRotRad(r, 'z', MTXDegToRad(nz(w)->f20));                                      \
     PSMTXConcat(m, r, m);                                                              \
@@ -383,7 +359,7 @@ EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
-    work->f1c = 0.0f;
+    work->rotY = 0.0f;
     work->scale = 1.5f * scale;
     work->f24 = 0.0f;
     work->f28 = 0.0f;
@@ -412,9 +388,9 @@ EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     if (!(work->flags & 2)) {
         c = color_tbl[work->type];
         work->dust = effSnowDustN64Entry(2, 4, 0, x, y - 10.0f * work->scale, z, 20.0f * work->scale, 20.0f * work->scale, 1.0f);
-        *(s32*)((u8*)work->dust->userdata + 0x4c) = c[0];
-        *(s32*)((u8*)work->dust->userdata + 0x50) = c[1];
-        *(s32*)((u8*)work->dust->userdata + 0x54) = c[2];
+        ((EffSnowDustN64Work*)work->dust->userdata)->kr = c[0];
+        ((EffSnowDustN64Work*)work->dust->userdata)->kg = c[1];
+        ((EffSnowDustN64Work*)work->dust->userdata)->kb = c[2];
     }
     ((EffStarStoneWork*)effect->userdata)->flags |= 4;
     if (type >= 7) {
@@ -598,7 +574,7 @@ void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
     PSMTXTrans(m, w->position.x, w->position.y, w->position.z);
     PSMTXScale(s, 1.1f * w->scale, 1.1f * w->scale, 1.1f * w->scale);
     PSMTXConcat(m, s, m);
-    PSMTXRotRad(r, 'y', MTXDegToRad(w->f1c));
+    PSMTXRotRad(r, 'y', MTXDegToRad(w->rotY));
     PSMTXConcat(m, r, m);
     PSMTXConcat(cam->view, m, m);
     GXLoadPosMtxImm(m, 0);
@@ -620,7 +596,7 @@ void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
     PSMTXTrans(m, w->position.x, w->position.y, w->position.z);
     PSMTXScale(s, w->scale, w->scale, w->scale);
     PSMTXConcat(m, s, m);
-    PSMTXRotRad(r, 'y', MTXDegToRad(w->f1c));
+    PSMTXRotRad(r, 'y', MTXDegToRad(w->rotY));
     PSMTXConcat(m, r, m);
     PSMTXConcat(cam->view, m, m);
     GXLoadPosMtxImm(m, 0);
@@ -686,7 +662,7 @@ void effStarStoneDisp_2(CameraId cameraId, EffectEntry *effect)
   PSMTXTrans(m, w->position.x + w->f48, w->position.y, w->position.z + w->f4c);
   PSMTXScale(s, 1.1f * w->scale, 1.1f * w->scale, 1.1f * w->scale);
   PSMTXConcat(m, s, m);
-  PSMTXRotRad(r, 'y', w->f1c * 0.01745329252f);
+  PSMTXRotRad(r, 'y', w->rotY * 0.01745329252f);
   PSMTXConcat(m, r, m);
   PSMTXRotRad(r, 'z', w->f20 * 0.01745329252f);
   PSMTXConcat(m, r, m);
@@ -718,7 +694,7 @@ void effStarStoneDisp_2(CameraId cameraId, EffectEntry *effect)
   PSMTXTrans(m, w->position.x + w->f50, w->position.y, w->position.z + w->f54);
   PSMTXScale(s, 1.1f * w->scale, 1.1f * w->scale, 1.1f * w->scale);
   PSMTXConcat(m, s, m);
-  PSMTXRotRad(r, 'y', w->f1c * 0.01745329252f);
+  PSMTXRotRad(r, 'y', w->rotY * 0.01745329252f);
   PSMTXConcat(m, r, m);
   PSMTXRotRad(r, 'z', (-w->f20) * 0.01745329252f);
   PSMTXConcat(m, r, m);
@@ -781,7 +757,7 @@ void effStarStoneDisp_2(CameraId cameraId, EffectEntry *effect)
   PSMTXTrans(m, w->position.x + w->f48, w->position.y, w->position.z + w->f4c);
   PSMTXScale(s, w->scale, w->scale, w->scale);
   PSMTXConcat(m, s, m);
-  PSMTXRotRad(r, 'y', w->f1c * 0.01745329252f);
+  PSMTXRotRad(r, 'y', w->rotY * 0.01745329252f);
   PSMTXConcat(m, r, m);
   PSMTXRotRad(r, 'z', w->f20 * 0.01745329252f);
   PSMTXConcat(m, r, m);
@@ -813,7 +789,7 @@ void effStarStoneDisp_2(CameraId cameraId, EffectEntry *effect)
   PSMTXTrans(m, w->position.x + w->f50, w->position.y, w->position.z + w->f54);
   PSMTXScale(s, w->scale, w->scale, w->scale);
   PSMTXConcat(m, s, m);
-  PSMTXRotRad(r, 'y', w->f1c * 0.01745329252f);
+  PSMTXRotRad(r, 'y', w->rotY * 0.01745329252f);
   PSMTXConcat(m, r, m);
   PSMTXRotRad(r, 'z', (-w->f20) * 0.01745329252f);
   PSMTXConcat(m, r, m);

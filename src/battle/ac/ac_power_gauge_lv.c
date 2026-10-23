@@ -19,28 +19,24 @@ typedef struct PowerGaugeWork {
 } PowerGaugeWork;
 
 #define PG_WORK(ac) ((PowerGaugeWork*)(ac)->work)
-#define PG_DISP(ac) ((u8*)&(ac)->disp)
-#define PG_F32(p, off) (*(f32*)((u8*)(p) + (off)))
-#define PG_S32(p, off) (*(s32*)((u8*)(p) + (off)))
-#define PG_THR(ac, i) (*(s32*)((u8*)(ac) + 0x40 + (i)*4))
 
 void BattleAcDrawGauge(s32 x, s32 y, s32 icon, f32 ratio, s32 a, s32 b, s32 c, s32 d, s32 e);
 
 s32 battleAcMain_PowerGaugeLv(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     PowerGaugeWork* tw = PG_WORK(ac);
-    u8* disp = PG_DISP(ac);
+    BattleACDispParams* disp = &ac->disp;
 
     switch (work->actionCommands.mAcState) {
         case 99:
             break;
         case 0:
             memset(disp, 0, 0x2C);
-            PG_F32(disp, 0x14) = -300.0f;
-            PG_F32(disp, 0x18) = 0.0f;
-            PG_S32(disp, 0x20) = 20;
-            PG_F32(disp, 0x28) = 0.0f;
-            *(GXColor*)((u8*)disp + 0xC) = (GXColor){255, 255, 255, 255};
+            disp->iconX = -300.0f;
+            disp->iconY = 0.0f;
+            disp->slideTimer = 20;
+            disp->gaugeRatio = 0.0f;
+            disp->color = (GXColor){255, 255, 255, 255};
             tw->counter = 0;
             work->actionCommands.outputParams[0] = 0;
             work->actionCommands.mAcState = 99;
@@ -113,7 +109,7 @@ s32 battleAcMain_PowerGaugeLv(BattleWork* work) {
         case 1002:
             work->actionCommands.mAcState = 1003;
         case 1003:
-            work->actionCommands.field_0x30 |= 1;
+            work->actionCommands.doneFlags |= 1;
             tw->timer = 60;
             work->actionCommands.mAcState = 1004;
         case 1004:
@@ -146,25 +142,25 @@ void battleAcDisp_PowerGaugeLv(CameraId cameraId, void* param) {
     s32 i = 4;
     switch (work->actionCommands.mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[i], 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->slideTimerBase[i], 20, -300.0f, 30.0f);
         case 100:
         case 1000:
         case 1002:
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[i] > 0) {
-                (*(s32*)&disp->field_0x1C[i])--;
+            if (*(s32*)&disp->slideTimerBase[i] > 0) {
+                (*(s32*)&disp->slideTimerBase[i])--;
             }
             break;
         case 1003:
         case 1004:
-            if (*(s32*)&disp->field_0x1C[i] >= 40) {
-                disp->iconX = intplGetValue(4, *(s32*)&disp->field_0x1C[i] - 40, 20, 30.0f, -300.0f);
+            if (*(s32*)&disp->slideTimerBase[i] >= 40) {
+                disp->iconX = intplGetValue(4, *(s32*)&disp->slideTimerBase[i] - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[i] < 60) {
-                (*(s32*)&disp->field_0x1C[i])++;
+            if (*(s32*)&disp->slideTimerBase[i] < 60) {
+                (*(s32*)&disp->slideTimerBase[i])++;
             }
             break;
     }
@@ -172,7 +168,7 @@ void battleAcDisp_PowerGaugeLv(CameraId cameraId, void* param) {
 
 #pragma opt_propagation reset
 void battleAcDelete_PowerGaugeLv(BattleWork* work) {
-    if (work->actionCommands.field_0x30 & 1) {
+    if (work->actionCommands.doneFlags & 1) {
         return;
     }
     work->actionCommands.mAcState = 1003;
@@ -182,7 +178,7 @@ void battleAcDelete_PowerGaugeLv(BattleWork* work) {
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
-    u8* disp = PG_DISP(ac);
+    BattleACDispParams* disp = &ac->disp;
     PowerGaugeWork* tw;
     f32 ratio;
     camGetPtr(8);
@@ -197,9 +193,9 @@ static void actionCommandDisp(f32 x, f32 y) {
     if (ratio > 1.0f) {
         ratio = 1.0f;
     }
-    PG_F32(disp, 0x28) = ratio;
-    BattleAcDrawGauge((s32)x, (s32)y, 0xB2, PG_F32(disp, 0x28), PG_S32(&work->actionCommands, 0x3C), PG_S32(&work->actionCommands, 0x40),
-                                    PG_S32(&work->actionCommands, 0x44), PG_S32(&work->actionCommands, 0x48), 0);
+    disp->gaugeRatio = ratio;
+    BattleAcDrawGauge((s32)x, (s32)y, 0xB2, disp->gaugeRatio, work->actionCommands.params[1], work->actionCommands.params[2],
+                                    work->actionCommands.params[3], work->actionCommands.params[4], 0);
     switch (work->actionCommands.mAcState) {
         case 99:
         case 100:
@@ -221,7 +217,7 @@ Vec pos2 = {0.0f, 0.0f, 0.0f};
             break;
         }
         case 1000:
-            if (tw->gauge >= (f32)PG_THR(&work->actionCommands, 0) && tw->gauge <= 100.0f) {
+            if (tw->gauge >= (f32)work->actionCommands.params[2 + 0] && tw->gauge <= 100.0f) {
                 Vec pos = {0.0f, 0.0f, 0.0f};
                     x = -220.0f + x;
                 y = 70.0f + y;

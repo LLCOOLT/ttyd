@@ -102,7 +102,7 @@ void caseMain(void) {
 	push = mario->hitobjPush;
 	h1fc = mario->hitobjHammer;
 	h1f4 = mario->hitobjHead;
-	btn = mario->buttonBuffer;
+	btn = mario->buttonTrg;
 	if ((u32)marioStGetSystemLevel() == 0 && !winCheck() && gp->inBattle == 0 &&
 	    !N_fbatPreventMarioEventChk() && marioCaseEventValidChk()) {
 		if (mario->currMotionId != 0 && mario->currMotionId != 1 && mario->currMotionId != 2 &&
@@ -139,7 +139,7 @@ void caseMain(void) {
 				break;
 			case 4:
 				if (jumpFrom != NULL && mario->airTimer == 1 && fbatNpcTalkCheck() == NULL &&
-				    !strcmp(hitGetName(jumpFrom), entry->hitObjName) && (mario->buttonBuffer & 0x100)) {
+				    !strcmp(hitGetName(jumpFrom), entry->hitObjName) && (mario->buttonTrg & 0x100)) {
 					SET_HIT(entry);
 				}
 				break;

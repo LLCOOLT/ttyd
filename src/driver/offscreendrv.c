@@ -59,8 +59,8 @@ s32 offscreenEntry(const char* name) { //1:1, needs variable names
 	entry->prevTop = 2;
 	entry->prevRight = 2;
 	entry->prevBottom = 2;
-	entry->unk3C = 5;
-	entry->unk40 = 5;
+	entry->copyFmt = 5;
+	entry->texFmt = 5;
 	return i;
 }
 
@@ -75,12 +75,12 @@ void offscreenDisp(CameraId camId, void* param) {
 			width = entry->currRight - entry->currLeft;
 			height = entry->currBottom - entry->currTop;
 			GXSetTexCopySrc(entry->currLeft, entry->currTop, width, height);
-			GXSetTexCopyDst(width, height, (GXTexFmt)entry->unk3C, GX_FALSE);
-			entry->texBuf = smartAlloc(GXGetTexBufferSize(width, height, (u32)entry->unk3C, GX_FALSE, 0), 3);
+			GXSetTexCopyDst(width, height, (GXTexFmt)entry->copyFmt, GX_FALSE);
+			entry->texBuf = smartAlloc(GXGetTexBufferSize(width, height, (u32)entry->copyFmt, GX_FALSE, 0), 3);
 			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 			GXCopyTex(entry->texBuf->address, GX_TRUE);
 			GXPixModeSync();
-			GXInitTexObj(&entry->texObj, entry->texBuf->address, width, height, (GXTexFmt)entry->unk40,
+			GXInitTexObj(&entry->texObj, entry->texBuf->address, width, height, (GXTexFmt)entry->texFmt,
 				GX_CLAMP, GX_CLAMP, GX_FALSE);
 			entry->flags |= 4;
 		}

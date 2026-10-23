@@ -20,7 +20,6 @@ extern ItemData itemDataTable[];
 f32 sinfd(f32 degrees);
 s32 BtlUnit_EnemyItemCanUseCheck(s32 item);
 
-#define PART_FIELD(p, T, o) (*(T*)((u8*)(p) + (o)))
 #define PART_GRAVITY(p) ((p)->gravityTimer)
 #define PART_FLOAT(p) ((p)->floatTimer)
 #define PART_POSENAME(p) ((p)->poseName)
@@ -293,7 +292,7 @@ void btlDispInit(void) {
 	wp->dispFlags |= 2;
 }
 
-StatusEffectType _GetStatusPoseType(BattleUnit* unit) { //TODO: extsb
+StatusEffectType _GetStatusPoseType(BattleUnit* unit) {
 	s32* table = _status_pose_table;
 	StatusEffectType type;
 
@@ -311,7 +310,6 @@ StatusEffectType _GetStatusPoseType(BattleUnit* unit) { //TODO: extsb
 	return STATUS_INVALID;
 }
 
-#define UNF(u, T, o) (*(T*)((u8*)(u) + (o)))
 typedef void (*PartsDispCb)(BattleUnitPart*, s32);
 void shadowEntry(f32 x, f32 y, f32 z, f32 s);
 void BtlUnit_HpGaugeMain(BattleUnit* unit);
@@ -904,9 +902,9 @@ void btlUnitItemDisp(CameraId camId, BattleUnit* unit) {
 	}
 	if (item) {
 		BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-		pos.x += ((Vec*)unit->field_0xB4)->x;
-		pos.y += ((Vec*)unit->field_0xB4)->y;
-		pos.z += ((Vec*)unit->field_0xB4)->z;
+		pos.x += unit->heldItemBaseOffset.x;
+		pos.y += unit->heldItemBaseOffset.y;
+		pos.z += unit->heldItemBaseOffset.z;
 		pos.x += unit->heldItemOffset.x;
 		pos.y += unit->heldItemOffset.y;
 		pos.z += unit->heldItemOffset.z;
@@ -953,7 +951,6 @@ void btlUnitPartsBlurControl(BattleUnitPart* part, s32 unused, Mtx orientation, 
 	}
 }
 
-//TODO: probably needs Entry* pointer to make offsets relative and then it should match
 void _partsBlurControl(BattleUnitPart* part, s32 flags, Mtx orientation, GXColor color, f32 rotation) {
 	BattleWorkUnitPartBlur* blur;
 	int i;

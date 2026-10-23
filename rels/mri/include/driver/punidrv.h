@@ -24,7 +24,7 @@ typedef struct PunidrvPose {
     Mtx* mtx;      // 0x18
     s32 texId;     // 0x1C
     f32 ry;        // 0x20
-    u8 unk24[4];   // 0x24
+    u8 pad_24[4];   // 0x24
     f32 targetRy;  // 0x28
 } PunidrvPose;
 

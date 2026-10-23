@@ -74,9 +74,9 @@ void pouchInit(void) {
 	mpp->currentHP = mpp->maximumHP;
 	mpp->currentFP = mpp->maximumFP;
 	mpp->currentSP = 0;
-	mpp->field_0x7E = 0;
+	mpp->reserved_7E = 0;
 	mpp->maximumSP = 0;
-	mpp->field_0x80 = 0;
+	mpp->reserved_80 = 0;
 	mpp->audienceCount = 0.0f;
 	mpp->rank = 0;
 	mpp->level = 1;
@@ -982,7 +982,6 @@ s32 pouchGetPartyAttackLv(PartyId partyId) {
 	return *(s16*)((u8*)mpp + partyId * 14 + 0xA);
 }
 
-//TODO: this function
 BOOL pouchAddKeepItem(s16 id) {
 	s32 i, j;
 

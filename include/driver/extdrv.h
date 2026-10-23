@@ -1,13 +1,56 @@
 #pragma once
 
 #include <dolphin/types.h>
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
-typedef struct ExtWork {
-	s32 poseNum; //0x0, TODO: poseId
-	u8 field_0x4[4]; //0x4
-	s32 field_0x8; //0x8
-	u8 field_0xC[0x70 - 0xC]; //0xC
-} ExtWork;
+typedef struct ExtdrvTexInfo {
+    const char* group; // 0x0
+    const char* anim;  // 0x4
+    f32 frame;         // 0x8
+} ExtdrvTexInfo;
+
+typedef struct ExtdrvPose {
+    u32 flags;     // 0x0
+    f32 dir;       // 0x4
+    f32 shadowY;   // 0x8
+    Mtx* mtx;      // 0xC
+    s32 texId;     // 0x10
+    f32 ry;        // 0x14
+    u8 pad_18[4];   // 0x18
+    f32 targetRy;  // 0x1C
+} ExtdrvPose;
+
+typedef struct ExtdrvTex {
+    void** image;       // 0x0
+    GXTexObj obj;       // 0x4
+    GXTexRegion region; // 0x24
+} ExtdrvTex;
+
+typedef struct ExtdrvSort {
+    s32 index; // 0x0
+    f32 z;     // 0x4
+} ExtdrvSort;
+
+typedef struct ExtdrvWork {
+    s32 poseNum;             // 0x0
+    s32 texNum;              // 0x4
+    ExtdrvPose* poses;       // 0x8
+    ExtdrvTex* texs;         // 0xC
+    Mtx* mtxs;               // 0x10
+    f32* vtx;                // 0x14
+    f32* normals;            // 0x18
+    GXColor* colors;         // 0x1C
+    f32* uvs;                // 0x20
+    ExtdrvSort* sort;        // 0x24
+    u8* dl;                  // 0x28
+    u32* dlSize;             // 0x2C
+    void (*mainFunc)(void);  // 0x30
+    void (*mainFunc2)(void); // 0x34
+    s32 curTex;              // 0x38
+    Mtx shadowMtx;           // 0x3C
+    u32 usedTmem;            // 0x6C
+} ExtdrvWork; // size 0x70
 
 void extInit(void);
 void extMain(void);

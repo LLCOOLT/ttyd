@@ -1461,7 +1461,7 @@ EVT_END()
 
 #pragma dont_inline on
 static GenkiWork* get_ptr(void) {
-    return (GenkiWork*)((u8*)_battleWorkPointer + 0x1F4C);
+    return (GenkiWork*)_battleWorkPointer->actionCommands.work;
 }
 #pragma dont_inline reset
 
@@ -1541,9 +1541,9 @@ USER_FUNC(star_appear) {
     GenkiWork* w = get_ptr();
     s32 i;
     for (i = 0; i < 7; i++) {
-        s32* p = (s32*)((u8*)w + 0x510 + i * 0x64);
-        p[0] = 1;
-        p[2] = 0;
+        GenkiStar* s = &w->star[i];
+        s->state = 1;
+        s->unk8 = 0;
     }
     return 2;
 }

@@ -1,3 +1,4 @@
+#include "eff/eff_starstone.h"
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -3248,16 +3249,16 @@ static EVT_BEGIN(evt_door_01_close)
 EVT_END()
 
 static DoorParam door_data_01 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_01_doa", // mapobj
     "A_ie_01_doa02", // hitIn
     "A_ie_01_doa01", // hitOut
-    "S_ie_01_soto", // mapIn
-    "A_ie_01_A", // hitInIn
-    "S_ie_01_naka", // mapOut
-    "A_ie_01_C", // hitOutOut
+    "S_ie_01_soto", // outside
+    "A_ie_01_A", // outsideHit
+    "S_ie_01_naka", // inside
+    "A_ie_01_C", // insideHit
     evt_door_01_00, // evtIn
     evt_door_01_01, // evtOut
     evt_wall_01, // evtWall
@@ -3268,16 +3269,16 @@ static DoorParam door_data_01 = {
 };
 
 DoorParam door_data_01_01 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_01_doa", // mapobj
     "A_ie_01_doa02", // hitIn
     "A_ie_01_doa01", // hitOut
-    "S_ie_01_soto", // mapIn
-    "A_ie_01_A", // hitInIn
-    "S_ie_01_naka", // mapOut
-    "A_ie_01_C", // hitOutOut
+    "S_ie_01_soto", // outside
+    "A_ie_01_A", // outsideHit
+    "S_ie_01_naka", // inside
+    "A_ie_01_C", // insideHit
     evt_door_01_00, // evtIn
     evt_door_01_01, // evtOut
     evt_wall_01, // evtWall
@@ -3333,16 +3334,16 @@ EVT_BEGIN(evt_door_02f1_close)
 EVT_END()
 
 DoorParam door_data_02_f1 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_02_f1_doa", // mapobj
     "A_ie_02_f1_doa02", // hitIn
     "A_ie_02_f1_doa01", // hitOut
-    "S_ie_02_f1_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_02_f1_naka", // mapOut
-    "A_ie_02_f1_C", // hitOutOut
+    "S_ie_02_f1_soto", // outside
+    NULL, // outsideHit
+    "S_ie_02_f1_naka", // inside
+    "A_ie_02_f1_C", // insideHit
     evt_door_02_00_f1, // evtIn
     NULL, // evtOut
     evt_wall_02_f1, // evtWall
@@ -3353,16 +3354,16 @@ DoorParam door_data_02_f1 = {
 };
 
 DoorParam door_data_02_f1_01 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_02_f1_doa", // mapobj
     "A_ie_02_f1_doa02", // hitIn
     "A_ie_02_f1_doa01", // hitOut
-    "S_ie_02_f1_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_02_f1_naka", // mapOut
-    "A_ie_02_f1_C", // hitOutOut
+    "S_ie_02_f1_soto", // outside
+    NULL, // outsideHit
+    "S_ie_02_f1_naka", // inside
+    "A_ie_02_f1_C", // insideHit
     evt_door_02_00_f1, // evtIn
     NULL, // evtOut
     evt_wall_02_f1, // evtWall
@@ -3531,16 +3532,16 @@ EVT_BEGIN(evt_close_02_01_f2)
 EVT_END()
 
 DoorParam door_data_02_f2 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_02_f2_doaD", // mapobj
     "A_ie_02_f2_doa02", // hitIn
     "A_ie_02_f2_doa01", // hitOut
-    "S_ie_02_f2_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_02_f2_naka", // mapOut
-    "A_ie_02_f2_C", // hitOutOut
+    "S_ie_02_f2_soto", // outside
+    NULL, // outsideHit
+    "S_ie_02_f2_naka", // inside
+    "A_ie_02_f2_C", // insideHit
     evt_door_02_00_f2, // evtIn
     NULL, // evtOut
     evt_wall_02_f2, // evtWall
@@ -3856,16 +3857,16 @@ const char* door_data_03_item[] = {
 };
 
 DoorParam door_data_03_f1 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_03_f1_doa", // mapobj
     "A_ie_03_f1_doa02", // hitIn
     "A_ie_03_f1_doa01", // hitOut
-    "S_ie_03_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_03_naka", // mapOut
-    NULL, // hitOutOut
+    "S_ie_03_soto", // outside
+    NULL, // outsideHit
+    "S_ie_03_naka", // inside
+    NULL, // insideHit
     evt_door_03_00_f1, // evtIn
     evt_door_03_01_f1, // evtOut
     evt_wall_03_f1, // evtWall
@@ -3958,16 +3959,16 @@ EVT_BEGIN(evt_wall_03_f2)
 EVT_END()
 
 DoorParam door_data_03_f2 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_03_f21_doa", // mapobj
     "S_ie_03_f2_doa02", // hitIn
     "S_ie_03_f2_doa01", // hitOut
-    "S_ie_03_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_03_naka", // mapOut
-    NULL, // hitOutOut
+    "S_ie_03_soto", // outside
+    NULL, // outsideHit
+    "S_ie_03_naka", // inside
+    NULL, // insideHit
     evt_door_03_00_f2, // evtIn
     NULL, // evtOut
     evt_wall_03_f2, // evtWall
@@ -4029,16 +4030,16 @@ static const char* door_data_04_item[] = {
 };
 
 static DoorParam door_data_04 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_04_doa", // mapobj
     "A_ie_04_doa02", // hitIn
     "A_ie_04_doa01", // hitOut
-    "S_ie_04_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_04_naka", // mapOut
-    "A_ie_04_C", // hitOutOut
+    "S_ie_04_soto", // outside
+    NULL, // outsideHit
+    "S_ie_04_naka", // inside
+    "A_ie_04_C", // insideHit
     evt_door_04_00, // evtIn
     evt_door_04_01, // evtOut
     evt_wall_04, // evtWall
@@ -6951,8 +6952,8 @@ static USER_FUNC(starstone_entry) {
         sprintf(name, "starstone%d", i);
         eff = effStarStoneEntry(i, 140.0f * s + x, y, z - 140.0f * c, 1.0f);
         effSetName(eff, name);
-        *(u16*)((u8*)eff->userdata + 4) &= ~4;
-        *(u16*)((u8*)eff->userdata + 4) |= 0x20;
+        ((EffStarStoneWork*)eff->userdata)->flags &= ~4;
+        ((EffStarStoneWork*)eff->userdata)->flags |= 0x20;
         ((MahojinWork*)effNameToPtr("mahojin")->userdata)->stones[i].eff = eff;
         ((MahojinWork*)effNameToPtr("mahojin")->userdata)->stones[i].draw = effStarStoneDraw;
     }

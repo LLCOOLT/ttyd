@@ -56,7 +56,7 @@
 
 #include <dolphin/vi.h>
 #include <string.h>
-#include "sdk/DEMOPad.h"
+#include <demo/DEMOPad.h>
 
 extern void SoundSetOutputMode(s32 mode);
 extern void SoundOpenCover(void);
@@ -186,7 +186,7 @@ void marioStInit(void) {
 	gp->fbWidth = DEMOGetRenderModeObj()->fbWidth;
 	gp->efbHeight = DEMOGetRenderModeObj()->efbHeight;
 	gp->rumbleEnabled = 1;
-	gp->unk1274 = 0;
+	gp->soundMode = 0;
 
 	gp->retraceLocalTime = 0;
 	gp->retraceDeltaTime = 0;
@@ -274,7 +274,7 @@ void marioStInit(void) {
 	winMgrInit();
 	seqInit_MARIOSTORY();
 	seqSetSeq(0, NULL, NULL);
-	gp->unk1274 = 0;
+	gp->soundMode = 0;
 	if (OSGetSoundMode() == OS_SOUND_MODE_MONO) {
 		SoundSetOutputMode(0);
 	}
@@ -388,7 +388,7 @@ s32 marioStGetSystemLevel(void) {
 
 void viPostCallback(u32 retraceCount) {
 	OSTime time;
-	u32 reset = PAD_BUTTON_B | PAD_BUTTON_X | PAD_BUTTON_START; //TODO: make sure it inlines right
+	u32 reset = PAD_BUTTON_B | PAD_BUTTON_X | PAD_BUTTON_START;
 
 	time = OSGetTime();
 	gp->retraceDeltaTime = time - gp->retraceTime;
@@ -483,7 +483,6 @@ exitcheck:
 	psndMainInt();
 }
 
-//TODO: fuck up float conversions for 1:1 cuz this is cleaner
 void* gcDvdCheckThread(void* param) {
 #ifdef VERSION_G8ME01
 	s32 prevStatus = 0;

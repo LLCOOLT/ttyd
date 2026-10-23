@@ -30,7 +30,6 @@ typedef struct PowerGaugeWork {
 } PowerGaugeWork;
 
 #define PG_WORK(ac) ((PowerGaugeWork*)(ac)->work)
-#define ACW(ac, T, off) (*(T*)((u8*)(ac) + (off)))
 
 #define ICONGX ((void (*)(Vec*, s32, s32, f32))iconDispGx)
 static void actionCommandDisp(f32 x, f32 y);
@@ -50,9 +49,9 @@ s32 battleAcMain_PowerGauge(BattleWork* work) {
             memset(disp, 0, 0x2C);
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            disp->unk20 = 20;
-            disp->unk28 = 0.0f;
-            disp->unkC = (GXColor){255, 255, 255, 255};
+            disp->slideTimer = 20;
+            disp->gaugeRatio = 0.0f;
+            disp->color = (GXColor){255, 255, 255, 255};
             pw->frame = 0;
             pw->frame2 = 0;
             ac->outputParams[0] = 0;
@@ -204,7 +203,7 @@ s32 battleAcMain_PowerGauge(BattleWork* work) {
                 } else {
                     ac->result = 0;
                 }
-                ac->field_0x30 |= 1;
+                ac->doneFlags |= 1;
                 pw->endTimer = 60;
                 ac->mAcState = 1005;
                 return 0;
@@ -213,7 +212,7 @@ s32 battleAcMain_PowerGauge(BattleWork* work) {
         case 1003:
             ac->mAcState = 1004;
         case 1004:
-            ac->field_0x30 |= 1;
+            ac->doneFlags |= 1;
             BattleAcGaugeSeDelete();
             pw->endTimer = 60;
             ac->mAcState = 1005;
@@ -243,33 +242,33 @@ void battleAcDisp_PowerGauge(CameraId cameraId, BattleWork* work) {
     BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
     switch (ac->mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
         case 100:
         case 1000:
         case 1001:
         case 1003:
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->unk20 > 0) {
-                disp->unk20--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 1004:
         case 1005:
-            if (disp->unk20 >= 40) {
-                disp->iconX = intplGetValue(4, disp->unk20 - 40, 20, 30.0f, -300.0f);
+            if (disp->slideTimer >= 40) {
+                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->unk20 < 60) {
-                disp->unk20++;
+            if (disp->slideTimer < 60) {
+                disp->slideTimer++;
             }
             break;
     }
 }
 
 void battleAcDelete_PowerGauge(BattleWork* work) {
-    if (!(work->actionCommands.field_0x30 & 1)) {
+    if (!(work->actionCommands.doneFlags & 1)) {
         work->actionCommands.mAcState = 1004;
     }
 }
@@ -289,7 +288,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     if (ratio > 1.0f) {
         ratio = 1.0f;
     }
-    disp->unk28 = ratio;
+    disp->gaugeRatio = ratio;
 
     if (ac->acFlags & 2) {
         BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ratio, 1, 100, 100, 100, 0);

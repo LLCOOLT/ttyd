@@ -26,10 +26,10 @@ void BattleInformationInit(FieldBattleInfo* info) {
 	BattleInformationSetResult(info, 0);
 	info->setup = NULL;
 	info->coins = 0;
-	info->field_0x18 = 0;
+	info->ruleType = 0;
 	info->ruleKeepResult = 0;
-	info->field_0x1A = 0;
-	info->field_0x1B = 0;
+	info->ruleParam = 0;
+	info->ruleParam2 = 0;
 }
 
 void BattleInfomationSetBattleSetupInfo(FieldBattleInfo* info, NpcBattleInfo* setup) {

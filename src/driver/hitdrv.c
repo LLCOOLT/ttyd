@@ -176,7 +176,7 @@ HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapI
     hit->vectors = NULL;
 
     if (joint->drawMode != NULL) {
-        hit->attributes = joint->drawMode->unk8;
+        hit->attributes = joint->drawMode->hitAttributes;
     } else {
         hit->attributes = 0;
     }
@@ -351,7 +351,7 @@ void hitMain(void) {
     for (i = 0; i < wp->entries->count; entry++, i++) {
         anim = entry->animData;
         for (recalc = FALSE, j = 0; j < entry->numAnims; j++, anim++) {
-            list = *(HitAnimJointList**)(*(u8**)((u8*)anim + 0x18) + 0xC);
+            list = (HitAnimJointList*)anim->anim->jointAnims;
             if (!(anim->flags & 1)) {
                 continue;
             }
@@ -523,7 +523,7 @@ void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion) {
             PSMTXConcat(mtx, hit->localMtx, hit->worldMtx);
         }
         if (hit->flags & 0x20) {
-            PSMTXConcat(hit->worldMtx, hit->mapObj->unkAC, hit->worldMtx);
+            PSMTXConcat(hit->worldMtx, hit->mapObj->transformMtx, hit->worldMtx);
         }
         PSMTXMultVec(hit->worldMtx, &hit->centerLocal, &hit->centerWorld);
         hitCalcVtxPosition(hit);
@@ -591,7 +591,7 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                     i1 = *(s16*)((u8*)list + (k + 1) * 0x18 + 4);
                     i2 = *(s16*)((u8*)list + (k + 2) * 0x18 + 4);
                     vec = &hit->vectors[count++];
-                    pos = (Vec*)(*(u8**)mesh->vcdTableOffset + 4);
+                    pos = (Vec*)mesh->vcdTable->positions->data;
                     MTXMultVec(hit->worldMtx, &pos[*idx], &vec->v0);
                     MTXMultVec(hit->worldMtx, &pos[!(k & 1) ? i2 : i1], &vec->v1);
                     MTXMultVec(hit->worldMtx, &pos[!(k & 1) ? i1 : i2], &vec->v2);
@@ -624,7 +624,7 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                     u16 i1;
                     register u32 gqr;
                     HitVector* v2;
-                    base = (s16*)(*(u8**)mesh->vcdTableOffset + 4);
+                    base = (s16*)mesh->vcdTable->positions->data;
                     v2 = &hit->vectors[count];
                     m = (u32)list; // FAKE: m (the popcount counter) reused as the i1/i2/i0 address temp gives the target add list,X; lhz 3 and leaves o1 a single web (o0/o1/base colour r4/r5/r3)
                     m += stride * (j + 1);
@@ -639,7 +639,7 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                     o0 = i0 * 3;
                     o1 = (u16)(even ? i2 : i1) * 3;
                     o2 = (u16)(even ? i1 : i2) * 3;
-                    gqr = (*(s32*)((u8*)wp->entries[hit->mapIndex].vcdTable + 0x44) << 8) | 7;
+                    gqr = (wp->entries[hit->mapIndex].vcdTable->posFrac << 8) | 7;
                     gqr |= gqr << 16;
                     asm { mtspr GQR5, gqr }
                     a.x = hitDequant(base, o0);

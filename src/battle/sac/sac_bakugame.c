@@ -1,3 +1,4 @@
+#include "eff/eff_starstone.h"
 #include "icon_ids.h"
 #pragma optimize_for_size on
 #pragma dont_inline on
@@ -190,18 +191,18 @@ void bakuGameDispStar(CameraId cam, void* param);
 static BattleWeapon weapon = {
     "btl_wn_sac_bakugame", // name
     ICON_198, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_bakugame", // description
     100, // baseAccuracy
     0, // baseFpCost
     2, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -210,7 +211,7 @@ static BattleWeapon weapon = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_3", // acHelpMsg
     0x20088, // special
     0x7FF, // counterResistFlags
@@ -223,13 +224,13 @@ static BattleWeapon weapon = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_BakuGame, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BakuWork* GetBakuGamePtr(void) {
-    return (BakuWork*)((u8*)_battleWorkPointer + 0x1F4C);
+    return (BakuWork*)_battleWorkPointer->actionCommands.work;
 }
 
 static USER_FUNC(star_stone_appear) {
@@ -309,7 +310,7 @@ USER_FUNC(init_bakugame) {
 
 USER_FUNC(end_bakugame) {
     BakuWork* w = GetBakuGamePtr();
-    effDelete(*(EffectEntry**)((u8*)w->eff->userdata + 0x34));
+    effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
     effDelete(w->eff);
     return 2;
 }
@@ -1342,7 +1343,7 @@ void bakuGameAudienceSurprise(void) {
 
 void bakuGameDisp2D(CameraId cam, void* param) {
     BakuWork* w = GetBakuGamePtr();
-    GaugeCol* col = (GaugeCol*)((u8*)_battleWorkPointer + 0x1F2C);
+    GaugeCol* col = (GaugeCol*)&_battleWorkPointer->actionCommands.disp.color;
     BakuBtn* b;
     s32 i;
     u16 icon;

@@ -939,7 +939,7 @@ USER_FUNC(evt_eff_fukidashi) {
 			break;
 		case 1:
 			p = !strcmp(npcName, "me") ? (void*)event->ownerNPC : (void*)npcNameToPtr(npcName);
-			{ f32 yy = 2.0f * *(f32*)((u8*)p + 0x150) / 3.0f; f32 ww = *(f32*)((u8*)p + 0x150) / 3.0f; entry = effFukidashiEntry(a, b, (s32)p, d, 0.0f, yy, 0.0f, ww, e); }
+			{ f32 yy = 2.0f * ((NpcEntry*)p)->height / 3.0f; f32 ww = ((NpcEntry*)p)->height / 3.0f; entry = effFukidashiEntry(a, b, (s32)p, d, 0.0f, yy, 0.0f, ww, e); }
 			break;
 		case 2:
 			entry = effFukidashiEntry(a, b, 0, d, x, y, z, w, e);

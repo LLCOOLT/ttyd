@@ -196,7 +196,7 @@ BattleUnitKind unit_giant_bomb = {
 
 static BattleWeapon weapon_heavy_bomb_super_explosion = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
@@ -205,11 +205,11 @@ static BattleWeapon weapon_heavy_bomb_super_explosion = {
 #else
     0, // superguardsAllowed
 #endif
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -219,7 +219,7 @@ static BattleWeapon weapon_heavy_bomb_super_explosion = {
     3, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x22087, // special
     0x7FF, // counterResistFlags
@@ -230,22 +230,22 @@ static BattleWeapon weapon_heavy_bomb_super_explosion = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 50, 50, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 50, 50, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_heavy_bomb_guard = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -254,7 +254,7 @@ static BattleWeapon weapon_heavy_bomb_guard = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -268,22 +268,22 @@ static BattleWeapon weapon_heavy_bomb_guard = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_heavy_bomb_guard_2 = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -292,7 +292,7 @@ static BattleWeapon weapon_heavy_bomb_guard_2 = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -305,22 +305,22 @@ static BattleWeapon weapon_heavy_bomb_guard_2 = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_heavy_bomb_guard_3 = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -329,7 +329,7 @@ static BattleWeapon weapon_heavy_bomb_guard_3 = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -340,9 +340,9 @@ static BattleWeapon weapon_heavy_bomb_guard_3 = {
     9, // chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};

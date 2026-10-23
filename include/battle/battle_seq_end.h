@@ -10,7 +10,7 @@ typedef struct RankUpData {
 } RankUpData;
 
 typedef struct BattleSeqEndWork {
-    u8 unk0[0x2AC - 0x0]; //0x0
+    u8 work[0x2AC - 0x0]; //0x0, blob; real layout is SeqEndWork in battle_seq_end.c
 } BattleSeqEndWork;
 
 extern s32 _event_MajinaiEnd[];

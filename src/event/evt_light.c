@@ -98,7 +98,7 @@ USER_FUNC(evt_light_bind_mapobj) {
     if (isFirstCall) {
         offset = (Vec){ 0.0f, 0.0f, 0.0f };
         PSMTXMultVec(mapobj->modelWorldMtx, &offset, &offset);
-        PSVECSubtract(&light->field_0x3C, &offset, &offset);
+        PSVECSubtract(&light->basePosition, &offset, &offset);
         event->userdataf[0] = offset.x;
         event->userdataf[1] = offset.y;
         event->userdataf[2] = offset.z;
@@ -108,10 +108,10 @@ USER_FUNC(evt_light_bind_mapobj) {
     offset.z = event->userdataf[2];
     switch (mode) {
         case 0:
-            PSMTXMultVec(mapobj->unkAC, &offset, &offset);
+            PSMTXMultVec(mapobj->transformMtx, &offset, &offset);
             break;
         case 1:
-            PSMTXTrans(mtx, mapobj->unkAC[0][3], mapobj->unkAC[1][3], mapobj->unkAC[2][3]);
+            PSMTXTrans(mtx, mapobj->transformMtx[0][3], mapobj->transformMtx[1][3], mapobj->transformMtx[2][3]);
             PSMTXMultVec(mtx, &offset, &offset);
             break;
     }

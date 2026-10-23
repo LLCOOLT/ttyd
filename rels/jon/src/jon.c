@@ -2982,7 +2982,7 @@ EVT_END()
 
 static USER_FUNC(gonbaba_wait_landon) {
     // 敵
-    return npcNameToPtr("\223G")->field_0x300 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
+    return npcNameToPtr("\223G")->groundHit ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
 void iri_12_msgcb(s32 type, void* param) {
@@ -2997,7 +2997,7 @@ USER_FUNC(wait_landon) {
     // マッキノ
     NpcEntry* npc = npcNameToPtr("\203}\203b\203L\203m");
 
-    if (!(npc->flags & 0x10) || (u32)npc->field_0x300 != 0) {
+    if (!(npc->flags & 0x10) || (u32)npc->groundHit != 0) {
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;

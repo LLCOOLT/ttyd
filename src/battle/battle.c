@@ -58,8 +58,8 @@ void BattleInit(FieldBattleInfo* info) {
     wp = _battleWorkPointer = (BattleWork*)_mapAlloc(sizeof(BattleWork));
 #endif
     memset(_battleWorkPointer, 0, sizeof(BattleWork));
-    wp->field_19060 = -1;
-    wp->field_424 = -1;
+    wp->curtainSfxId = -1;
+    wp->lectureUnitId = -1;
     wp->fbatInfo = info;
     BattlePadInit();
     BattleAcHelpInit();
@@ -71,28 +71,28 @@ void BattleInit(FieldBattleInfo* info) {
     BattleSetSeq(wp, SEQ_UNKNOWN, 0);
     BattleSetSeq(wp, SEQ_INIT, 0x1000000);
     wp->seqEndWork = NULL;
-    wp->commandMenu.field_4 = 0;
-    wp->commandMenu.cursor[0].field_0 = 0;
-    wp->commandMenu.cursor[0].field_4 = 0;
-    wp->commandMenu.cursor[1].field_0 = 0;
-    wp->commandMenu.cursor[1].field_4 = 0;
-    wp->commandMenu.cursor[2].field_0 = 0;
-    wp->commandMenu.cursor[2].field_4 = 0;
-    wp->commandMenu.cursor[3].field_0 = 0;
-    wp->commandMenu.cursor[3].field_4 = 0;
-    wp->commandMenu.cursor[4].field_0 = 0;
-    wp->commandMenu.cursor[4].field_4 = 0;
-    wp->commandMenu.cursor[5].field_0 = 0;
-    wp->commandMenu.cursor[5].field_4 = 0;
-    wp->commandMenu.cursor[6].field_0 = 0;
-    wp->commandMenu.cursor[6].field_4 = 0;
-    wp->commandMenu.cursor[7].field_0 = 0;
-    wp->commandMenu.cursor[7].field_4 = 0;
-    wp->commandMenu.cursor[8].field_0 = 0;
-    wp->commandMenu.cursor[8].field_4 = 0;
-    wp->commandMenu.cursor[9].field_0 = 0;
-    wp->commandMenu.cursor[9].field_4 = 0;
-    wp->commandMenu.field_55C = 0;
+    wp->commandMenu.flags = 0;
+    wp->commandMenu.cursor[0].absPos = 0;
+    wp->commandMenu.cursor[0].relPos = 0;
+    wp->commandMenu.cursor[1].absPos = 0;
+    wp->commandMenu.cursor[1].relPos = 0;
+    wp->commandMenu.cursor[2].absPos = 0;
+    wp->commandMenu.cursor[2].relPos = 0;
+    wp->commandMenu.cursor[3].absPos = 0;
+    wp->commandMenu.cursor[3].relPos = 0;
+    wp->commandMenu.cursor[4].absPos = 0;
+    wp->commandMenu.cursor[4].relPos = 0;
+    wp->commandMenu.cursor[5].absPos = 0;
+    wp->commandMenu.cursor[5].relPos = 0;
+    wp->commandMenu.cursor[6].absPos = 0;
+    wp->commandMenu.cursor[6].relPos = 0;
+    wp->commandMenu.cursor[7].absPos = 0;
+    wp->commandMenu.cursor[7].relPos = 0;
+    wp->commandMenu.cursor[8].absPos = 0;
+    wp->commandMenu.cursor[8].relPos = 0;
+    wp->commandMenu.cursor[9].absPos = 0;
+    wp->commandMenu.cursor[9].relPos = 0;
+    wp->commandMenu.subMenu = 0;
     wp->turnCount = 0;
     memset(wp->reserveItems, 0, sizeof(wp->reserveItems));
     wp->flags = 0;
@@ -136,7 +136,7 @@ void BattleEnd(void) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     int i;
-    void* field_55C;
+    void* subMenu;
 
     for (i = 0; i < 64; i++) {
         unit = BattleGetUnitPtr(wp, i);
@@ -149,9 +149,9 @@ void BattleEnd(void) {
     BattleStageEnd();
     BattleAudience_End();
     BattleBreakSlot_End();
-    field_55C = wp->commandMenu.field_55C;
-    if (field_55C) {
-        BattleFree(field_55C);
+    subMenu = wp->commandMenu.subMenu;
+    if (subMenu) {
+        BattleFree(subMenu);
     }
 #ifdef VERSION_G8ME01
     BattleFree(wp);
@@ -426,7 +426,9 @@ BattleUnit* BattleGetPartnerPtr(BattleWork* wp, BattleUnit* unit) {
 }
 
 void BattlePartyAnimeLoad(s32 partyId) {
-    animEffectAsync(*(const char**)(*(u8**)((u8*)*(void**)&entryunit_party[partyId - 0xE0] + 0xB8) + 8), 1);
+    BattleUnitSetup* setup = &entryunit_party[partyId - 0xE0];
+
+    animEffectAsync(setup->mUnitKindParams->mParts->modelName, 1);
 }
 
 BOOL statusWinCheck(void);
@@ -434,7 +436,7 @@ void statusWinOpen(void);
 void statusWinClose(void);
 
 BattleUnit* BattleChangeParty(BattleWork* wp) {
-    s32 kind = wp->commandMenu.unk54C;
+    s32 kind = wp->commandMenu.partyKind;
     BattleUnit* party = BattleGetPartyPtr(wp);
     s32 oldId = *(s32*)party;
     BattleUnit* unit;
@@ -756,9 +758,9 @@ void BattlePartyInfoWorkInit(BattleWork* wp) {
     // TODO: add macros for Party IDs
     for (i = 0xE0; i < 0xE7; i++) {
         partyInfo = &wp->partyInfo[i - 0xE0];
-        partyInfo->field_0 = 1.0;
-        partyInfo->field_24 = 0;
-        memset(partyInfo->field_4, 0, sizeof(partyInfo->field_4));
+        partyInfo->sizeMultiplier = 1.0;
+        partyInfo->statusFlags = 0;
+        memset(&partyInfo->statusTurns, 0, sizeof(partyInfo->statusTurns));
 #ifdef VERSION_G8ME01
         partyInfo->usCommandDisabled[0] = 0;
         partyInfo->usCommandDisabled[1] = 0;
@@ -807,45 +809,45 @@ void BattleCheckUnitBroken(BattleWork* wp) {
 }
 
 void BattleAfterReactionQueueInit(void) {
-    s32* base = &_battleWorkPointer->unk16F40;
+    BattleAfterReaction* base = _battleWorkPointer->afterReactions;
     s32 i;
     for (i = 0; i < 64; i++) {
-        base[i * 2] = -1;
-        base[i * 2 + 1] = 0;
+        base[i].unitId = -1;
+        base[i].tag = 0;
     }
 }
 
 void BattleAfterReactionEntry(s32 a, s32 b) {
-    s32* base = &_battleWorkPointer->unk16F40;
+    BattleAfterReaction* base = _battleWorkPointer->afterReactions;
     s32 i;
     for (i = 0; i < 64; i++) {
-        if (base[i * 2] != -1 && a == base[i * 2]) {
+        if (base[i].unitId != -1 && a == base[i].unitId) {
             return;
         }
     }
     for (i = 0; i < 64; i++) {
-        if (base[i * 2] == -1) {
+        if (base[i].unitId == -1) {
             break;
         }
     }
     if (i < 64) {
-        base[i * 2] = a;
-        base[i * 2 + 1] = b;
+        base[i].unitId = a;
+        base[i].tag = b;
     }
 }
 
 void BattleAfterReactionRelease(s32 a, s32 b) {
     s32 i;
     s32 j;
-    s32* base = &_battleWorkPointer->unk16F40;
+    BattleAfterReaction* base = _battleWorkPointer->afterReactions;
     for (i = 0; i < 64; i++) {
-        if (base[i * 2] != -1 && a == base[i * 2] && b == base[i * 2 + 1]) {
+        if (base[i].unitId != -1 && a == base[i].unitId && b == base[i].tag) {
             for (j = i; j < 63; j++) {
-                base[j * 2] = base[j * 2 + 2];
-                base[j * 2 + 1] = base[j * 2 + 3];
+                base[j].unitId = base[j + 1].unitId;
+                base[j].tag = base[j + 1].tag;
             }
-            base[126] = -1;
-            base[127] = 0;
+            base[63].unitId = -1;
+            base[63].tag = 0;
             i--;
         }
     }
@@ -857,12 +859,12 @@ void BattleConsumeReserveItem(void);
 BOOL BattleAfterReactionMain(void) {
     s32 id;
     BattleWork* wp = _battleWorkPointer;
-    s32* base = &wp->unk16F40;
+    BattleAfterReaction* base = wp->afterReactions;
     s32 i;
     for (i = 0; i < 64; i++) {
-        id = base[i * 2];
+        id = base[i].unitId;
         if (id != -1) {
-            s32 tag = base[i * 2 + 1];
+            s32 tag = base[i].tag;
             BattleUnit* unit = BattleGetUnitPtr(wp, id);
             EventEntry* evt;
             if (unit == NULL) {

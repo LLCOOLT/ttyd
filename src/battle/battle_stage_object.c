@@ -30,49 +30,7 @@
 #pragma optimize_for_size on
 #pragma dont_inline on
 
-// raw words, so the tables don't depend on how much of BattleWeapon is named
-typedef union BattleWeaponData {
-	u32 raw[0xC0 / 4];
-	BattleWeapon weapon;
-} BattleWeaponData;
-
-typedef struct BattleStageNozzleData {
-	u8 dirRate[3][4]; //0x0, weights for each nozzle's next direction
-	u8 typeRate[4]; //0xC
-	BattleWeaponData weapons[4]; //0x10, per nozzle type
-} BattleStageNozzleData;
-
-typedef struct BattleStageFallObjectData {
-	BattleWeaponData frameWeapon; //0x0, falling iron frame
-	u8 rates[9]; //0xC0
-	BattleWeaponData weapons[9]; //0xCC
-} BattleStageFallObjectData;
-
-// lives in BattleWork at 0x180C0
-typedef struct BattleStageObjectWork {
-	u8 field_0x0[0x4 - 0x0]; //0x0
-	Vec bgRotation; //0x4
-	Vec bgRotationPrev; //0x10
-	u8 flags; //0x1C
-	s32 bgDestroyEvtId; //0x20
-	s32 bgEvtId[4]; //0x24
-	BattleStageNozzleData* nozzleData; //0x34
-	BattleStageFallObjectData* fallObjectData; //0x38
-	BattleWeapon* nozzleWeapons[2]; //0x3C
-	BattleWeapon nozzleWeaponWork[2]; //0x44
-	u8 nozzleDir[3]; //0x1C4
-	u8 nozzleNextDir[3]; //0x1C7
-	s8 nozzleType; //0x1CA
-	s32 nozzleTurnEvtId[3]; //0x1CC
-	s32 nozzleWorkEvtId; //0x1D8
-	s32 fogTimer; //0x1DC
-	EffectEntry* fogEffect; //0x1E0
-	s32 closeWallEvtId; //0x1E4
-	s32 fallFrameEvtId; //0x1E8
-	s32 objectFallEvtId; //0x1EC
-} BattleStageObjectWork;
-
-#define STAGE_WORK(wp) ((BattleStageObjectWork*)(wp)->field_180C0)
+#define STAGE_WORK(wp) (&(wp)->stageObjectWork)
 #define EVT_UW(evt, n) (((s32*)(evt)->userdata)[n])
 #define UNIT_FIELD(unit, type, off) (*(type*)((u8*)(unit) + BUOFF(off)))
 
@@ -534,14 +492,14 @@ void BattleStage_DestroyA1(void) {
 	evtDeleteID(STAGE_WORK(wp)->bgEvtId[0]);
 	STAGE_WORK(wp)->bgEvtId[0] = 0;
 	if (STAGE_WORK(wp)->bgDestroyEvtId && evtCheckID(STAGE_WORK(wp)->bgDestroyEvtId)) {
-		evtDeleteID(*(s32*)(wp->field_180C0 + 0x20));
+		evtDeleteID(wp->stageObjectWork.bgDestroyEvtId);
 	}
 	if (!evt) {
 		evt = _object_turn_event_A1;
 	}
 	entry = evtEntry(evt, 10, 0);
 	if (entry) {
-		*(s32*)(wp->field_180C0 + 0x20) = entry->eventId;
+		wp->stageObjectWork.bgDestroyEvtId = entry->eventId;
 	}
 }
 
@@ -565,14 +523,14 @@ void BattleStage_DestroyB(void) {
 	evtDeleteID(STAGE_WORK(wp)->bgEvtId[2]);
 	STAGE_WORK(wp)->bgEvtId[2] = 0;
 	if (STAGE_WORK(wp)->bgDestroyEvtId && evtCheckID(STAGE_WORK(wp)->bgDestroyEvtId)) {
-		evtDeleteID(*(s32*)(wp->field_180C0 + 0x20));
+		evtDeleteID(wp->stageObjectWork.bgDestroyEvtId);
 	}
 	if (!evt) {
 		evt = _object_turn_event_B;
 	}
 	entry = evtEntry(evt, 10, 0);
 	if (entry) {
-		*(s32*)(wp->field_180C0 + 0x20) = entry->eventId;
+		wp->stageObjectWork.bgDestroyEvtId = entry->eventId;
 	}
 }
 
@@ -1608,7 +1566,7 @@ USER_FUNC(_set_mobj_shake_init) {
 	for (i = 0; i < 32; i++) {
 		obj = &wp->stageObjects[i];
 		if (obj->id > 0 && obj->data->mLayer == layer) {
-			obj->field_0x72 = 0;
+			obj->reserved_72 = 0;
 			obj->mShakePeriodLength = irand(10) + 60;
 			if (irand(100) & 1) {
 				position = 0;
@@ -1868,22 +1826,22 @@ USER_FUNC(_fall_frame_wait_unit_ready) {
 	if (isFirstCall) {
 		for (i = 0; i < 64; i++) {
 			unit = BattleGetUnitPtr(wp, i);
-			if (unit && !(unit->flags & 0x80000000) && !BtlUnit_CheckStatus(unit, 0x1B) && UNIT_FIELD(unit, void*, 0x2BC)) {
-				evt = evtEntry(UNIT_FIELD(unit, void*, 0x2BC), 10, 0);
+			if (unit && !(unit->flags & 0x80000000) && !BtlUnit_CheckStatus(unit, 0x1B) && unit->ceilFallEventCode) {
+				evt = evtEntry(unit->ceilFallEventCode, 10, 0);
 				if (evt) {
 					evt->unitId = unit->unitId;
 				}
-				unit->evtId2C0 = evt->eventId;
+				unit->ceilFallEventId = evt->eventId;
 			}
 		}
 	}
 	for (i = 0; i < 64; i++) {
 		unit = BattleGetUnitPtr(wp, i);
 		if (unit && !(unit->flags & 0x80000000)) {
-			if (unit->evtId2C0 && !evtCheckID(unit->evtId2C0)) {
-				unit->evtId2C0 = 0;
+			if (unit->ceilFallEventId && !evtCheckID(unit->ceilFallEventId)) {
+				unit->ceilFallEventId = 0;
 			}
-			if (unit->evtId2C0) {
+			if (unit->ceilFallEventId) {
 				return EVT_RETURN_BLOCK;
 			}
 		}
@@ -2298,8 +2256,8 @@ void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src) {
 		dst->hpDamageWork[i] += src->hpDamageWork[i];
 	}
 	dst->element = src->element;
-	s = (s8*)src + 0x80;
-	d = (s8*)dst + 0x80;
+	s = (s8*)&src->sleepChance; // status chance/time block from 0x80, indexed below
+	d = (s8*)&dst->sleepChance;
 	_rate_mix(&d[0x0], &d[0x1], &s[0x0], &s[0x1]);
 	_rate_mix(&d[0x2], &d[0x3], &s[0x2], &s[0x3]);
 	_rate_mix(&d[0x4], &d[0x5], &s[0x4], &s[0x5]);
@@ -2447,7 +2405,7 @@ USER_FUNC(_set_mobj_rotate_x);
 s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
 {
   BattleWork *wp = _battleWorkPointer;
-  BattleStageFallObjectData *fd = ((BattleStageObjectWork *) wp->field_180C0)->fallObjectData;
+  BattleStageFallObjectData *fd = wp->stageObjectWork.fallObjectData;
   const char *sfxNormal;
   BOOL done;
   s32 acCount;
@@ -2554,7 +2512,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
       e->kind = 0;
       if (((pouchGetPtr()->mStarPowersObtained && (!(BattleAudienceBaseGetPtr()->flags & 0x4000))) && (e->type != 6)) && (e->type != 7))
       {
-        if (((*((u32 *) (&wp->field_19064[4]))) & 2) || (irand(100) < 10))
+        if (((u32)wp->debug.flags & 2) || (irand(100) < 10))
         {
           e->kind = 1;
           e->partId = -1;
@@ -2916,7 +2874,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
       }
       e3->index = -1;
     }
-  w->entries[0].weapon.weapon.field_0x14 = w->entries[0].weapon.weapon.field_0x14; // FAKE: no-op self-assign (no code) raises w spill cost
+  w->entries[0].weapon.weapon.reserved_14 = w->entries[0].weapon.weapon.reserved_14; // FAKE: no-op self-assign (no code) raises w spill cost
   }
 
   if (!done)

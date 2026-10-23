@@ -205,16 +205,16 @@ static StatusVulnerability regist = {75, 60, 60, 100, 70, 100, 100, 40, 100, 85,
 
 static BattleWeapon weapon_sambo_mummy_head_attack_4 = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -223,7 +223,7 @@ static BattleWeapon weapon_sambo_mummy_head_attack_4 = {
     0x21000004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0, // counterResistFlags
@@ -237,23 +237,23 @@ static BattleWeapon weapon_sambo_mummy_head_attack_4 = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_sambo_mummy_head_attack_3 = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -262,7 +262,7 @@ static BattleWeapon weapon_sambo_mummy_head_attack_3 = {
     0x21000004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0, // counterResistFlags
@@ -276,23 +276,23 @@ static BattleWeapon weapon_sambo_mummy_head_attack_3 = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_sambo_mummy_head_attack_2 = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -301,7 +301,7 @@ static BattleWeapon weapon_sambo_mummy_head_attack_2 = {
     0x21004004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0, // counterResistFlags
@@ -315,23 +315,23 @@ static BattleWeapon weapon_sambo_mummy_head_attack_2 = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_sambo_mummy_head_attack_1 = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -340,7 +340,7 @@ static BattleWeapon weapon_sambo_mummy_head_attack_1 = {
     0x21004004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x1087, // special
     0, // counterResistFlags
@@ -354,23 +354,23 @@ static BattleWeapon weapon_sambo_mummy_head_attack_1 = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_sambo_mummy_spike_attack_4 = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     2, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -379,7 +379,7 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_4 = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0x7FF, // counterResistFlags
@@ -390,23 +390,23 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_4 = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_sambo_mummy_spike_attack_3 = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     2, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -415,7 +415,7 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_3 = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0x7FF, // counterResistFlags
@@ -426,23 +426,23 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_3 = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_sambo_mummy_spike_attack_2 = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     2, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -451,7 +451,7 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_2 = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0x7FF, // counterResistFlags
@@ -462,9 +462,9 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_2 = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static PoseTableEntry pose_table_body4[] = {

@@ -1284,14 +1284,14 @@ EVT_BEGIN(mise_data_close)
 EVT_END()
 
 static DoorParam mise_data = {
-    0, // field_0x0
+    0, // flags
     3, // type
     0, NULL, // se..mapobj
     "A_mise_in_doa", // hitIn
     "A_mise_doa", // hitOut
-    NULL, NULL, // mapIn..hitInIn
-    "S_mise", // mapOut
-    NULL, NULL, NULL, NULL, // hitOutOut..evtWall
+    NULL, NULL, // outside..outsideHit
+    "S_mise", // inside
+    NULL, NULL, NULL, NULL, // insideHit..evtWall
     mise_npc, // npcs
     NULL, NULL, // mobjs..items
     mise_data_open, // evtOpen
@@ -1325,14 +1325,14 @@ EVT_BEGIN(mise_close_event)
 EVT_END()
 
 static DoorParam yado_data = {
-    0, // field_0x0
+    0, // flags
     3, // type
     0, NULL, // se..mapobj
     "A_yado_in_doa", // hitIn
     "A_yado_doa", // hitOut
-    NULL, NULL, // mapIn..hitInIn
-    "S_yado_in", // mapOut
-    NULL, NULL, NULL, NULL, // hitOutOut..evtWall
+    NULL, NULL, // outside..outsideHit
+    "S_yado_in", // inside
+    NULL, NULL, NULL, NULL, // insideHit..evtWall
     yado_npc, // npcs
     NULL, NULL, // mobjs..items
     mise_open_event, // evtOpen

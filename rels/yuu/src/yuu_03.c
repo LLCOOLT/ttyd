@@ -1077,7 +1077,7 @@ BOOL yuuminigame4_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                 speed = speed * (60 - data->timer) / 60.0f;
                 break;
         }
-        mario->unk174.z += speed;
+        mario->floorMove.z += speed;
     }
     if (mario->position.y <= -100.0f || mario->position.x >= 1500.0f) {
         if (mario->position.y <= -100.0f) {

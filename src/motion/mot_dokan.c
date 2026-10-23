@@ -15,7 +15,6 @@ s32 partyEntryPos(s32 memberId, f32 x, f32 y, f32 z);
 f32 toMovedirSimple(f32 angle);
 void marioSlitForceCancel(void);
 
-#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 
 static void _partyEntry(s32 flag) {
 	MarioWork* mario;
@@ -104,7 +103,7 @@ void mot_dokan(void) {
 		mario->dispFlags |= 0x1000;
 		mario->dispFlags |= 8;
 		mario->dispFlags |= 0x100;
-		mario->mot.dokan.unk4 = 0.0f;
+		mario->mot.dokan.reserved_4 = 0.0f;
 		mario->mot.dokan.startZ = mario->position.z;
 		mario->multiTimer = 0;
 		mario->airTimer = 0;
@@ -266,8 +265,8 @@ void mot_dokan(void) {
 			}
 			mario->scale.y = mario->scale.x;
 			mario->scale.z = mario->scale.x;
-			mario->field_0xB4 = 16.0f * mario->scale.x;
-			mario->dispOfs.y = 16.0f - mario->field_0xB4;
+			mario->rotOfs.y = 16.0f * mario->scale.x;
+			mario->dispOfs.y = 16.0f - mario->rotOfs.y;
 			mario->dispOfs.z = -3.0f;
 		}
 		break;
@@ -279,8 +278,8 @@ void mot_dokan(void) {
 		}
 		mario->scale.y = mario->scale.x;
 		mario->scale.z = mario->scale.x;
-		mario->field_0xB4 = 16.0f * mario->scale.x;
-		mario->dispOfs.y = 16.0f - mario->field_0xB4;
+		mario->rotOfs.y = 16.0f * mario->scale.x;
+		mario->dispOfs.y = 16.0f - mario->rotOfs.y;
 		mario->dispOfs.z = -3.0f;
 		party = partyGetPtr(marioGetPartyId());
 		if (party != NULL) {
@@ -288,7 +287,7 @@ void mot_dokan(void) {
 			party->scale.x = mario->scale.x;
 			party->scale.y = mario->scale.y;
 			party->scale.z = mario->scale.z;
-			party->field_8C = mario->field_0xB4;
+			party->rotOfsY = mario->rotOfs.y;
 			party->dispOfs.y = mario->dispOfs.y;
 			party->dispOfs.z = mario->dispOfs.z;
 		}
@@ -298,7 +297,7 @@ void mot_dokan(void) {
 			party->scale.x = mario->scale.x;
 			party->scale.y = mario->scale.y;
 			party->scale.z = mario->scale.z;
-			party->field_8C = mario->field_0xB4;
+			party->rotOfsY = mario->rotOfs.y;
 			party->dispOfs.y = mario->dispOfs.y;
 			party->dispOfs.z = mario->dispOfs.z;
 		}

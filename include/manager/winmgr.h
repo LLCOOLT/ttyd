@@ -37,7 +37,7 @@ struct WinMgrEntry {
 	const char* msg; //0x34
 	s32 scroll; //0x38
 	s32 lines; //0x3C
-	u8 field_0x40[0x44 - 0x40]; //0x40
+	u8 pad_40[0x44 - 0x40]; //0x40
 };
 
 typedef struct WinMgrWork {

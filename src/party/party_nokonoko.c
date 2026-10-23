@@ -15,9 +15,6 @@ extern void partyGoodbyeInit(PartyEntry* party);
 extern s32 partyGoodbyeMain(PartyEntry* party);
 extern void partyChgRunMode(PartyEntry* party, s32 mode);
 
-#define PB(p, o) (*(u8*)((u8*)(p) + (o)))
-#define PH(p, o) (*(s16*)((u8*)(p) + (o)))
-#define PW(p, o) (*(u32*)((u8*)(p) + (o)))
 
 static u8 gap_08_804188DC_sbss[4];  // .sbss pad after nokoSe
 static s32 nokoSe;
@@ -103,8 +100,8 @@ BOOL nokonoko_holdItem(void) {
 }
 
 void nokonoko_bye(PartyEntry* party) {
-    if (party->field_8 & 8) {
-        party->field_8 &= ~8;
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
         partyGoodbyeInit(party);
     }
     if (partyGoodbyeMain(party)) {
@@ -122,13 +119,13 @@ void nokonoko_init(PartyEntry* party) {
 
 void nokonoko_move(PartyEntry* party) {
     marioGetPtr();
-    if (party->field_8 & 8) {
-        party->field_8 &= ~8;
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
         partyWalkInit(party, 1);
     }
     partyUpdMoveSpd(party);
     partyRecordFootmark(party);
-    switch (party->field_3B) {
+    switch (party->moveMode) {
     case 0:
         party_move_mode_stay(party);
         break;
@@ -170,7 +167,7 @@ void nokonoko_use_cancel(void) {
         }
         if (party->runMode != 8 && party->runMode != 0xd) {
             partyChgRunMode(party, 2);
-            party->field_3B = 0;
+            party->moveMode = 0;
         }
     }
 }
@@ -197,14 +194,11 @@ void nokonoko_use_post(PartyEntry* party) {
     party->work.nokonoko.word180 = 0;
 }
 
-#define PF(p, o) (*(f32*)((u8*)(p) + (o)))
-#define PS32(p, o) (*(s32*)((u8*)(p) + (o)))
 typedef struct NokoPad94 {
     u8 pad[0x94];
     Vec v;
 } NokoPad94;
 #define PV(p, o) (((NokoPad94*)(p))->v)
-#define MH(p, o) (*(u16*)((u8*)(p) + (o)))
 
 static inline void noko_se_off(void) {
     marioGetPtr();
@@ -216,7 +210,7 @@ static inline void noko_se_off(void) {
 
 static inline void noko_spin(PartyEntry* party) {
     f32 dir;
-    if (revise360(party->targetDir - party->unkF8) > EXT_LIT(float_180_8041b514, 180.0f)) {
+    if (revise360(party->targetDir - party->camDir) > EXT_LIT(float_180_8041b514, 180.0f)) {
         dir = 1.0f;
     } else {
         dir = -1.0f;
@@ -230,7 +224,7 @@ static inline void noko_star(PartyEntry* party, s32 n) {
     effSmallStarN64Entry(3, n, party->position.x, party->position.y + party->height, party->position.z, s, EXT_LIT(float_neg1_8041b520, -1.0f), -c);
 }
 
-#define NOKO_ITEM(party, body)                                                                              if (PW(party, 0x174) == 0) {                                                                                  PW(party, 0x174) = (u32)itemNearDistCheck(party->position.x, party->position.y, party->position.z,                                                   0.5f * party->width + 12.0f);                                    if (PW(party, 0x174) != 0) {                                                                                  itemPickUp((ItemEntry*)PW(party, 0x174));                                                                 body                                                                                                  }                                                                                                     }
+#define NOKO_ITEM(party, body)                                                                              if (party->work.nokonoko.heldItem == 0) {                                                                                  party->work.nokonoko.heldItem = (u32)itemNearDistCheck(party->position.x, party->position.y, party->position.z,                                                   0.5f * party->width + 12.0f);                                    if (party->work.nokonoko.heldItem != 0) {                                                                                  itemPickUp((ItemEntry*)party->work.nokonoko.heldItem);                                                                 body                                                                                                  }                                                                                                     }
 void nokonoko_use(PartyEntry* party);
 void nokonoko_use(PartyEntry* party) {
     Vec out;
@@ -273,14 +267,14 @@ void nokonoko_use(PartyEntry* party) {
             return;
         }
     }
-    if (party->field_8 & 8) {
-        party->field_8 &= ~8;
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
         party->work.nokonoko.heldItem = 0;
         party->work.nokonoko.shellSpinBits = 0;
         party->work.nokonoko.word17C = 0;
         party->work.nokonoko.word180 = 0;
         if (party->flags & 0x80000000) {
-            if (party->unk16C > 0) {
+            if (party->actionTime > 0) {
                 party->work.nokonoko.shellFlags |= 1;
             }
         } else {
@@ -459,7 +453,7 @@ void nokonoko_use(PartyEntry* party) {
         break;
     }
 
-    new_var = ((u8*)party) + 0x128;
+    new_var = (u8*)&party->moveDistance;
     switch (party->useMotionId) {
     case 50:
         partyClearJumpPara(party);
@@ -516,7 +510,7 @@ void nokonoko_use(PartyEntry* party) {
         if (party->moveSpeed <= EXT_LIT(float_0_8041b51c, 0.0f)) {
             party->moveSpeed = 0.0f;
             flags = lookupSafetyPos(PV(party, 0x94), party->height, &out);
-            if (party->field_138 != NULL && ((u32)(flags - 1) <= 1 || flags == 4 || flags == 8)) {
+            if (party->hitobjStandOn != NULL && ((u32)(flags - 1) <= 1 || flags == 4 || flags == 8)) {
                 party->useMotionId = 70;
                 break;
             }
@@ -698,7 +692,7 @@ void nokonoko_use(PartyEntry* party) {
             itemNokoForceGet((ItemEntry*)party->work.nokonoko.heldItem);
             party->work.nokonoko.heldItem = 0;
         }
-        if (party->field_138 == NULL) {
+        if (party->hitobjStandOn == NULL) {
             party->useMotionId = 88;
             break;
         }
@@ -711,7 +705,7 @@ void nokonoko_use(PartyEntry* party) {
     case 88:
         party->moveSpeed = EXT_LIT(float_0_8041b51c, 0.0f);
         flags = lookupSafetyPos(PV(party, 0x94), party->height, &out2);
-        if (party->field_138 != NULL && ((u32)(flags - 1) <= 1 || flags == 4 || flags == 8)) {
+        if (party->hitobjStandOn != NULL && ((u32)(flags - 1) <= 1 || flags == 4 || flags == 8)) {
             party->useMotionId = 70;
             break;
         }
@@ -818,10 +812,10 @@ void nokonoko_use(PartyEntry* party) {
             party->position = mario->position;
             party->position.y += EXT_LIT(float_200_8041b5dc, 200.0f);
         }
-        if (party->field_138 != NULL) {
+        if (party->hitobjStandOn != NULL) {
             party->displayDirectionTarget = mario->displayDirectionTarget;
             party->displayDirection = party->displayDirectionTarget;
-            if (!((hitGetAttr(party->field_138) >> 9) & 1)) {
+            if (!((hitGetAttr(party->hitobjStandOn) >> 9) & 1)) {
                 party->useMotionId = 114;
                 party->moveFrames = 30;
             }
@@ -845,7 +839,7 @@ void nokonoko_finish(PartyEntry* party) {
         if (party->runMode != 9) {
             if (!(party->flags & 0x80000000)) {
                 partyChgRunMode(party, 2);
-                party->field_3B = 0;
+                party->moveMode = 0;
             } else {
                 party->flags &= 0x7FFFFFFF;
                 partyChgRunMode(party, 0);
@@ -899,7 +893,7 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
     if (((hitGetAttr(hit) >> 9) & 1) == 1) {
         hit = NULL;
     }
-    party->field_138 = hit;
+    party->hitobjStandOn = hit;
     if (hit != NULL) {
         hy = (f32)(s32)(100.0f * hy + 0.5f) / 100.0f;
         py = (f32)(s32)(100.0f * party->position.y + 0.5f) / 100.0f;

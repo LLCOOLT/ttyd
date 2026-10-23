@@ -1,3 +1,4 @@
+#include "eff/n64/eff_kemuri10_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -59,23 +60,6 @@ static inline f32 sqrtf(f32 x) {
         return x;
     }
 }
-
-typedef struct EffKemuri10N64Work {
-    s32 type;       // 0x0
-    Vec position;   // 0x4
-    Vec velocity;   // 0x10
-    Mtx rot;        // 0x1C
-    f32 texOffset;  // 0x4C
-    f32 texSpeed;   // 0x50
-    f32 scale;      // 0x54
-    s32 alpha;      // 0x58
-    s32 timer;      // 0x5C
-    s32 counter;    // 0x60
-    u8 r, g, b;     // 0x64
-    u8 r2, g2, b2;  // 0x67
-    u8 pad_6a[2];   // 0x6A
-    s32 camera;     // 0x6C
-} EffKemuri10N64Work;
 
 static effN64Vtx stg_houki_kemuri_v[] = {
     {0, -50, 20, 0, 512, 255, 255, 255, 255},

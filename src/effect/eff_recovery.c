@@ -645,7 +645,7 @@ void effRecoveryDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXTrans(scaleMtx, 0.0f, 2.0f, 0.0f);
     PSMTXConcat(transMtx, scaleMtx, transMtx);
     if (type <= 1u || (u32)(type - 7) <= 1u || type == 4 || type == 5) {
-        PSMTXConcat(transMtx, (void*)((u8*)p->anim + 0x14), transMtx);
+        PSMTXConcat(transMtx, p->anim->joints[0].mtx, transMtx);
     }
     PSMTXConcat(cam->view, transMtx, transMtx);
     PSMTXScale(scaleMtx, 0.1f, 0.1f, 0.1f);
@@ -716,7 +716,7 @@ void effRecoveryDisp2(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(mtx, tmp, mtx);
     PSMTXTrans(tmp, 0.0f, 2.0f, 0.0f);
     PSMTXConcat(mtx, tmp, mtx);
-    PSMTXConcat(mtx, (void*)((u8*)work->anim + 0x14), mtx);
+    PSMTXConcat(mtx, work->anim->joints[0].mtx, mtx);
     PSMTXScale(tmp, 0.035f, 0.035f, 0.035f);
     PSMTXConcat(mtx, tmp, mtx);
     off = 24.0f * (f32)(-(len - 1));
@@ -766,7 +766,7 @@ void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(mtx, tmp, mtx);
     PSMTXTrans(tmp, 0.0f, 2.0f, 0.0f);
     PSMTXConcat(mtx, tmp, mtx);
-    PSMTXConcat(mtx, (void*)((u8*)work->anim + 0x14), base);
+    PSMTXConcat(mtx, work->anim->joints[0].mtx, base);
     PSMTXConcat(cam->view, base, base);
     PSMTXScale(tmp, 0.05f, 0.05f, 0.05f);
     PSMTXConcat(base, tmp, base);

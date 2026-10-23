@@ -236,29 +236,18 @@ void btlDispTexPlane2(Mtx mtx, u32 id, GXColor color, s32 extra);
 #include "driver/icondrv.h"
 extern void btlGetScreenPoint(Vec* in, Vec* out);
 
-typedef struct BsiDispEntry {
-	s32 type; //0x0
-	s32 turns; //0x4
-	u32 icon; //0x8
-	Vec scale; //0xC
-	Vec pivot; //0x18
-	Vec rot; //0x24
-	Vec trans; //0x30
-	GXColor color; //0x3C
-	s32 flags; //0x40
-} BsiDispEntry;
 
 void BattleStatusIconDisp(CameraId camId, void* param) {
 	BattleWorkStatusIcon* icon = &((BattleUnit*)param)->mStatusIconWork;
 	GXColor col = {0xFF, 0xFF, 0xFF, 0xFF};
 	Vec screen, p, n;
 	Mtx m, trans, scale, npivot, pivot, rx, ry, rz, nm;
-	BsiDispEntry* e;
+	BattleWorkStatusIconEntry* e;
 	s32 i;
 
 	btlGetScreenPoint(&icon->mPosition, &screen);
 	for (i = icon->mNumStatusIcons - 1; i >= 0; i--) {
-		e = (BsiDispEntry*)&icon->mIcons[i];
+		e = &icon->mIcons[i];
 		p = screen;
 		p.y += icon->mDistanceBetweenIcons * (f32)i;
 		p.y += icon->mScreenSpaceOffset.y;
@@ -303,26 +292,12 @@ void BattleStatusIconDisp(CameraId camId, void* param) {
 	}
 }
 
-typedef struct BsiEntry {
-	s32 type; //0x0
-	s32 turns; //0x4
-	s32 icon; //0x8
-	Vec v0; //0xC
-	Vec v1; //0x18
-	Vec v2; //0x24
-	Vec v3; //0x30
-	u32 color; //0x3C
-	s32 flags; //0x40
-} BsiEntry;
 
 #include "system.h"
 
 
-#define BSI_S(u, o) (*(s16*)((u8*)(u) + BUOFF(o)))
-#define BSI_F(u, o) (*(f32*)((u8*)(u) + BUOFF(o)))
 
-BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry_) {
-	BsiEntry* entry = (BsiEntry*)entry_;
+BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
 	s32 type = disp->id;
 	s8 turns, strength;
 	s32 kind;
@@ -337,91 +312,88 @@ BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkSta
 	entry->type = type;
 	entry->turns = turns >= 0 ? turns : -turns;
 	entry->icon = disp->something;
-	entry->v0 = (Vec){1.0f,1.0f,1.0f};
-	entry->v1 = (Vec){0.0f,0.0f,0.0f};
-	entry->v2 = (Vec){0.0f,0.0f,0.0f};
+	entry->scale = (Vec){1.0f,1.0f,1.0f};
+	entry->pivot = (Vec){0.0f,0.0f,0.0f};
+	entry->rot = (Vec){0.0f,0.0f,0.0f};
 	*(GXColor*)&entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	entry->flags = disp->something2;
-	entry->v3 = (Vec){0.0f,0.0f,0.0f};
+	entry->trans = (Vec){0.0f,0.0f,0.0f};
 	return TRUE;
 }
 
-BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry_) {
-	BsiEntry* entry = (BsiEntry*)entry_;
+BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
 	int type = disp->id;
 	s8 turns, strength;
 	Vec v;
 	if (!((BOOL(*)(BattleUnit*, s8))BtlUnit_CheckStatus)(unit, type)) {
-		BSI_F(unit, 0xad4) = 0.0f;
+		unit->mStatusIconWork.dizzyAngle = 0.0f;
 		return FALSE;
 	}
-	BSI_F(unit, 0xad4) += 4.0f;
+	unit->mStatusIconWork.dizzyAngle += 4.0f;
 	((void(*)(BattleUnit*, s8, s8*, s8*))BtlUnit_GetStatus)(unit, type, &turns, &strength);
 	entry->type = type;
 	entry->turns = turns >= 0 ? turns : -turns;
 	entry->icon = disp->something;
-	entry->v0 = (Vec){1.0f,1.0f,1.0f};
-	entry->v1 = (Vec){0.0f,0.0f,0.0f};
+	entry->scale = (Vec){1.0f,1.0f,1.0f};
+	entry->pivot = (Vec){0.0f,0.0f,0.0f};
 	v = (Vec){0.0f,0.0f,0.0f};
-	v.z = BSI_F(unit, 0xad4);
-	entry->v2 = v;
+	v.z = unit->mStatusIconWork.dizzyAngle;
+	entry->rot = v;
 	*(GXColor*)&entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	entry->flags = disp->something2;
-	entry->v3 = (Vec){0.0f,4.0f,0.0f};
+	entry->trans = (Vec){0.0f,4.0f,0.0f};
 	return TRUE;
 }
 
-BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry_) {
-	BsiEntry* entry = (BsiEntry*)entry_;
+BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
 	int type = disp->id;
 	s8 turns, strength;
 	if (!((BOOL(*)(BattleUnit*, s8))BtlUnit_CheckStatus)(unit, type)) {
-		BSI_S(unit, 0xada) = 0;
+		unit->mStatusIconWork.allergyBlinkTimer = 0;
 		return FALSE;
 	}
 	((void(*)(BattleUnit*, s8, s8*, s8*))BtlUnit_GetStatus)(unit, type, &turns, &strength);
 	entry->type = type;
 	entry->turns = turns >= 0 ? turns : -turns;
 	entry->icon = disp->something;
-	entry->v0 = (Vec){1.0f,1.0f,1.0f};
-	entry->v1 = (Vec){0.0f,0.0f,0.0f};
-	entry->v2 = (Vec){0.0f,0.0f,0.0f};
+	entry->scale = (Vec){1.0f,1.0f,1.0f};
+	entry->pivot = (Vec){0.0f,0.0f,0.0f};
+	entry->rot = (Vec){0.0f,0.0f,0.0f};
 	*(GXColor*)&entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	entry->flags = disp->something2;
-	entry->v3 = (Vec){0.0f,0.0f,0.0f};
-	BSI_S(unit, 0xada)++;
-	if (BSI_S(unit, 0xada) & 0x10) entry->flags |= 2;
+	entry->trans = (Vec){0.0f,0.0f,0.0f};
+	unit->mStatusIconWork.allergyBlinkTimer++;
+	if (unit->mStatusIconWork.allergyBlinkTimer & 0x10) entry->flags |= 2;
 	return TRUE;
 }
 
-BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry_) {
-	BsiEntry* entry = (BsiEntry*)entry_;
+BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
 	s32 type = disp->id;
 	s8 turns, strength;
 	if (!((BOOL(*)(BattleUnit*, s8))BtlUnit_CheckStatus)(unit, disp->id)) {
-		BSI_S(unit, 0xae0) = 0;
-		BSI_S(unit, 0xae2) = 0;
+		unit->mStatusIconWork.elecState = 0;
+		unit->mStatusIconWork.elecTimer = 0;
 		return FALSE;
 	}
-	entry->v0 = (Vec){1.0f,1.0f,1.0f};
-	switch (BSI_S(unit, 0xae0)) {
+	entry->scale = (Vec){1.0f,1.0f,1.0f};
+	switch (unit->mStatusIconWork.elecState) {
 		case 0:
-			BSI_S(unit, 0xae0)++;
-			BSI_S(unit, 0xae2) = irand(6) + 4;
+			unit->mStatusIconWork.elecState++;
+			unit->mStatusIconWork.elecTimer = irand(6) + 4;
 		case 1:
-			entry->v0 = (Vec){1.0f,1.0f,1.0f};
-			BSI_S(unit, 0xae2)--;
-			if (BSI_S(unit, 0xae2) < 0) {
-				BSI_S(unit, 0xae0)++;
-				BSI_S(unit, 0xae2) = irand(100) + 30;
+			entry->scale = (Vec){1.0f,1.0f,1.0f};
+			unit->mStatusIconWork.elecTimer--;
+			if (unit->mStatusIconWork.elecTimer < 0) {
+				unit->mStatusIconWork.elecState++;
+				unit->mStatusIconWork.elecTimer = irand(100) + 30;
 			}
 			break;
 		case 2:
-			entry->v0 = (Vec){0.8f,0.8f,1.0f};
-			BSI_S(unit, 0xae2)--;
-			if (BSI_S(unit, 0xae2) < 0) {
-				BSI_S(unit, 0xae2) = irand(6) + 4;
-				BSI_S(unit, 0xae0) = 1;
+			entry->scale = (Vec){0.8f,0.8f,1.0f};
+			unit->mStatusIconWork.elecTimer--;
+			if (unit->mStatusIconWork.elecTimer < 0) {
+				unit->mStatusIconWork.elecTimer = irand(6) + 4;
+				unit->mStatusIconWork.elecState = 1;
 			}
 			break;
 	}
@@ -429,28 +401,27 @@ BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusI
 	entry->type = type;
 	entry->turns = turns >= 0 ? turns : -turns;
 	entry->icon = disp->something;
-	entry->v1 = (Vec){0.0f,0.0f,0.0f};
-	entry->v2 = (Vec){0.0f,0.0f,0.0f};
+	entry->pivot = (Vec){0.0f,0.0f,0.0f};
+	entry->rot = (Vec){0.0f,0.0f,0.0f};
 	*(GXColor*)&entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	entry->flags = disp->something2;
-	entry->v3 = (Vec){0.0f,0.0f,0.0f};
+	entry->trans = (Vec){0.0f,0.0f,0.0f};
 	return TRUE;
 }
 
 
-BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry_) {
-	BsiEntry* entry = (BsiEntry*)entry_;
+BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
 	s32 type = disp->id;
 	s16* ctr;
 	GXColor c0, c1, col;
 	s32 t;
 	s8 turns, strength;
 	if (type == 0x17) {
-		ctr = &BSI_S(unit, 0xadc);
+		ctr = &unit->mStatusIconWork.hpRegenTimer;
 		c0 = (GXColor){0xED, 0x14, 0x5B, 0xFF};
 		c1 = (GXColor){0xFF, 0xEA, 0x05, 0xFF};
 	} else if (type == 0x18) {
-		ctr = &BSI_S(unit, 0xade);
+		ctr = &unit->mStatusIconWork.fpRegenTimer;
 		c0 = (GXColor){0x3D, 0xD1, 0x09, 0xFF};
 		c1 = (GXColor){0x61, 0xE9, 0xE7, 0xFF};
 	} else {
@@ -466,15 +437,15 @@ BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkSta
 	entry->type = type;
 	entry->turns = turns >= 0 ? turns : -turns;
 	entry->icon = disp->something;
-	entry->v0 = (Vec){1.0f,1.0f,1.0f};
-	entry->v1 = (Vec){0.0f,0.0f,0.0f};
-	entry->v2 = (Vec){0.0f,0.0f,0.0f};
+	entry->scale = (Vec){1.0f,1.0f,1.0f};
+	entry->pivot = (Vec){0.0f,0.0f,0.0f};
+	entry->rot = (Vec){0.0f,0.0f,0.0f};
 	col = (GXColor){0x00, 0x00, 0x00, 0xFF};
 	col.r = intplGetValue(11, t, 360, c0.r, c1.r);
 	col.g = intplGetValue(11, t, 360, c0.g, c1.g);
 	col.b = intplGetValue(11, t, 360, c0.b, c1.b);
 	*(GXColor*)&entry->color = col;
 	entry->flags = disp->something2;
-	entry->v3 = (Vec){0.0f,0.0f,0.0f};
+	entry->trans = (Vec){0.0f,0.0f,0.0f};
 	return TRUE;
 }

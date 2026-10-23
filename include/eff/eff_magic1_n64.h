@@ -2,6 +2,18 @@
 
 #include <dolphin/types.h>
 #include "driver/effdrv.h"
+#include <dolphin/mtx.h>
+
+typedef struct EffMagic1N64Work {
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    Vec offset;   // 0x10
+    Vec velocity; // 0x1C
+    f32 scale;    // 0x28
+    s32 age;      // 0x2C
+    s32 life;     // 0x30
+    s32 alpha;    // 0x34
+} EffMagic1N64Work;
 
 extern double sin(double x);
 

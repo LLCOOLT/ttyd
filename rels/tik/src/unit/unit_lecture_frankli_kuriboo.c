@@ -69,7 +69,7 @@ static USER_FUNC(_battle_set_lecture_unit_id) {
     s32 value;
 
     value = evtGetValue(event, *args++);
-    wp->field_424 = value;
+    wp->lectureUnitId = value;
     return EVT_RETURN_DONE;
 }
 

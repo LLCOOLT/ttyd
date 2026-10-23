@@ -278,7 +278,7 @@ EVT_END()
 
 BattleWeapon weapon_batten_leader_thunder = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
@@ -287,11 +287,11 @@ BattleWeapon weapon_batten_leader_thunder = {
 #else
     0, // superguardsAllowed
 #endif
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -301,7 +301,7 @@ BattleWeapon weapon_batten_leader_thunder = {
     4, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x47, // special
     0x7FF, // counterResistFlags
@@ -312,14 +312,14 @@ BattleWeapon weapon_batten_leader_thunder = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon weapon_batten_leader_fire = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
@@ -328,11 +328,11 @@ BattleWeapon weapon_batten_leader_fire = {
 #else
     0, // superguardsAllowed
 #endif
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -342,7 +342,7 @@ BattleWeapon weapon_batten_leader_fire = {
     1, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x47, // special
     0x7FF, // counterResistFlags
@@ -359,14 +359,14 @@ BattleWeapon weapon_batten_leader_fire = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon weapon_batten_leader_ice = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
@@ -375,11 +375,11 @@ BattleWeapon weapon_batten_leader_ice = {
 #else
     0, // superguardsAllowed
 #endif
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -389,7 +389,7 @@ BattleWeapon weapon_batten_leader_ice = {
     2, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x47, // special
     0x7FF, // counterResistFlags
@@ -403,22 +403,22 @@ BattleWeapon weapon_batten_leader_ice = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon weapon_batten_leader_shikaeshi = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -427,7 +427,7 @@ BattleWeapon weapon_batten_leader_shikaeshi = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     8, // special
     0x7FF, // counterResistFlags
@@ -439,22 +439,22 @@ BattleWeapon weapon_batten_leader_shikaeshi = {
     0, 0, 0, 0, 0, 0, // fastChance..galeForceChance
     3, // paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon weapon_batten_leader_yokeyoke = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -463,7 +463,7 @@ BattleWeapon weapon_batten_leader_yokeyoke = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     8, // special
     0x7FF, // counterResistFlags
@@ -476,14 +476,14 @@ BattleWeapon weapon_batten_leader_yokeyoke = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon weapon_batten_leader_stop = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
@@ -492,11 +492,11 @@ BattleWeapon weapon_batten_leader_stop = {
 #else
     0, // superguardsAllowed
 #endif
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -505,7 +505,7 @@ BattleWeapon weapon_batten_leader_stop = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     7, // special
     0x7FF, // counterResistFlags
@@ -518,9 +518,9 @@ BattleWeapon weapon_batten_leader_stop = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleUnitKind unit_boss_batten_leader = {
@@ -2752,7 +2752,7 @@ USER_FUNC(_hp_gauge_flag_on) {
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
     if (unit != NULL) {
-        unit->hpGauge.field_0x2 |= 1;
+        unit->hpGauge.flags |= 1;
     }
     return EVT_RETURN_DONE;
 }

@@ -90,13 +90,13 @@ void seq_battleInit(BattleSeqWork* work) {
     FBatView* fbat;
     NpcEntry* npc;
 
-    debug_battle_flag = gp->field_C;
+    debug_battle_flag = gp->debugBattle;
     fbat = (FBatView*)fbatGetPointer();
     npc = fbat->target;
     if (evtGetValue(NULL, GSW0) < 109 || evtGetValue(NULL, GSW0) >= 111) {
         if (evtGetValue(NULL, GSW0) != 402) {
             psndBGMOff(0x400);
-            psndBGMOn(1, (char*)npc->battleInfo.field_C0);
+            psndBGMOn(1, (char*)npc->battleInfo.bgmName);
         }
     }
     psndENVOff(0x400);
@@ -226,7 +226,7 @@ void seq_battleMain(BattleSeqWork* work) {
             if (battleSeqEndCheck()) {
                 work->counter = 0;
                 work->state++;
-                if (gp->field_C) {
+                if (gp->debugBattle) {
                     work->state = 11;
                 }
             }
@@ -258,7 +258,7 @@ void seq_battleMain(BattleSeqWork* work) {
         }
         case 11:
             if (fadeIsFinish()) {
-                gp->field_C = 0;
+                gp->debugBattle = 0;
                 seqSetSeq(5, (const char*)1, NULL);
             }
             break;
@@ -276,7 +276,7 @@ BOOL battle_init(void) {
     npc = fbat->target;
     pouch = pouchGetPtr();
     camSetMode(4, 2);
-    if (gp->field_C) {
+    if (gp->debugBattle) {
         const char* msg = DbgBtlSel_GetMsgDataPtr();
         if (msg) {
             msgLoad(msg, 0);
@@ -344,9 +344,9 @@ BOOL battle_init(void) {
         }
     }
     BattleInfomationSetBattleSetupInfo(info, &npc->battleInfo);
-    info->field_0x18 = npc->battleInfo.battleRule[0];
-    info->field_0x1A = npc->battleInfo.battleRule[1];
-    info->field_0x1B = npc->battleInfo.battleRule[2];
+    info->ruleType = npc->battleInfo.battleRule[0];
+    info->ruleParam = npc->battleInfo.battleRule[1];
+    info->ruleParam2 = npc->battleInfo.battleRule[2];
     BattleInit(info);
     return FALSE;
 }

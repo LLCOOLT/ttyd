@@ -72,7 +72,6 @@ BOOL N_fbatPreventMarioEventChk(void);
 s32 marioGetJabaraState(void);
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
-MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
 double sin(double);
 double cos(double);
 EffectEntry* effHagetakaFlushN64Entry(s32 a1, s32 a2, f32 x, f32 y, f32 z, f32 scale);
@@ -1013,8 +1012,8 @@ void itemseq_GetItem(ItemEntry* entry) {
 			marioKeyOff();
 			marioStSystemLevel(2);
 			psndSetFlag(0x80);
-			mario->unk174.x = 0.0f;
-			mario->unk174.z = 0.0f;
+			mario->floorMove.x = 0.0f;
+			mario->floorMove.z = 0.0f;
 			mario->baseSpeed = 0.0f;
 			mario->moveDist = 0.0f;
 			if (entry->itemId == 7 || entry->itemId == 8 || entry->itemId == 10 || entry->itemId == 11) {

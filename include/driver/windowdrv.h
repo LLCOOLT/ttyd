@@ -23,23 +23,24 @@ typedef enum WindowType {
 } WindowType;
 
 struct WindowEntry {
-	u8 field_0x0[2]; //0x0
+	u8 state[2]; //0x0, u16 message-window state (WIN_STATE in msgdrv.c)
 	u16 flags; //0x2
-	u16 field_0x4; //0x4
+	u16 priority; //0x4, windowEntry argument; display z = 400 - priority
 	s16 alpha; //0x6, window alpha
 	s32 type; //0x8, WindowType
 	f32 x; //0xC, window xpos
 	f32 y; //0x10, window ypos
 	f32 height; //0x14
 	f32 width; //0x18
-	u8 field_0x1C[0x20 - 0x1C]; // 0x1C
-	OSTime unk20;               // 0x20
+	u8 pad_1C[0x20 - 0x1C]; // 0x1C, never accessed
+	OSTime timestamp;               // 0x20, gp->renderTime at the start of the current fade/scroll step
 	smartEntry* userdata; //0x28, TODO: verify? could be wrong
-	s16 field_0x2C; //0x2C
-	u8 field_0x2E[0x3C - 0x2E]; //0x2E
+	s16 tailMode; //0x2C, speech-bubble tail: 0 none, 0x10 position already on screen, 8 window above the speaker
+	u8 pad_2E[2]; //0x2E
+	Vec speakerPos; //0x30, speech-bubble tail target (world position unless tailMode & 0x10)
 	void (*main)(WindowEntry* entry); //0x3C
 	void (*delete)(WindowEntry* entry); //0x40
-	u8 field_0x44[0x48 - 0x44]; //0x44
+	u8 pad_44[0x48 - 0x44]; //0x44, never accessed
 };
 
 void windowInit(void);

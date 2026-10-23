@@ -1,9 +1,5 @@
 /* "imgdrv" - Image Driver
- * Status: All functions added, needs Disps done, struct names, and a couple register tweaks
- *
  * Function: still not quite sure, TODO something about shadows that shadowdrv doesn't handle
- *
- * Last Update: 5/17/2021 decompile most of the file
  */
 #include "driver/imgdrv.h"
 #include "driver/animdrv.h"
@@ -96,22 +92,11 @@ static void zFill(void) { //almost 1:1
 	GXSetColorUpdate(GX_TRUE);
 }
 
-typedef struct ImgDispSh {
-	u32 flags;
-	u16 x, y;
-	u16 left, top, right, bottom;
-	s32 offId;
-	s32 dstFmt;
-	s32 fmt;
-	GXTexObj tex;
-	void* data;
-	s32 alloc;
-} ImgDispSh;
 extern void* DEMOGetRenderModeObj(void);
 
 void imgDisp(CameraId camId, void* param) {
 	ImageEntry* entry = param;
-	ImgDispSh* sh;
+	ImageShadow* sh;
 	GXTexObj* texs[3];
 	void* datas[3];
 	Mtx mtxs[3];
@@ -125,7 +110,7 @@ void imgDisp(CameraId camId, void* param) {
 	ImageEntry* e2;
 
 	for (i = 0; i < 3; i++) {
-		sh = (ImgDispSh*)entry + i;
+		sh = entry->shadows + i;
 		if (!(sh->flags & 4)) {
 			texs[i] = NULL;
 			datas[i] = NULL;
@@ -134,20 +119,20 @@ void imgDisp(CameraId camId, void* param) {
 			datas[i] = NULL;
 		} else {
 			if (entry->flags & 4) {
-				fx = sh->left;
-				fy = sh->top;
-				fw = sh->right;
-				fh = sh->bottom;
+				fx = sh->rect.left;
+				fy = sh->rect.top;
+				fw = sh->rect.width;
+				fh = sh->rect.height;
 			} else {
 				fx = sh->x;
 				fy = sh->y;
 				fw = entry->width;
 				fh = entry->height;
 			}
-			PSMTXTrans(m1, -((f32)sh->left - fx) / (f32)sh->right, -((f32)sh->top - fy) / (f32)sh->bottom, 0.0f);
-			PSMTXScale(m2, fw / (f32)sh->right, fh / (f32)sh->bottom, 1.0f);
+			PSMTXTrans(m1, -((f32)sh->rect.left - fx) / (f32)sh->rect.width, -((f32)sh->rect.top - fy) / (f32)sh->rect.height, 0.0f);
+			PSMTXScale(m2, fw / (f32)sh->rect.width, fh / (f32)sh->rect.height, 1.0f);
 			PSMTXConcat(m1, m2, mtxs[i]);
-			texs[i] = &sh->tex;
+			texs[i] = &sh->texObj;
 			datas[i] = sh->data;
 		}
 		if (texs[i] != NULL) {
@@ -164,7 +149,7 @@ void imgDisp(CameraId camId, void* param) {
 	entry->flags &= ~0x10000000;
 	animSetPaperTexMtx(mp[0], mp[1], mp[2]);
 	animSetPaperTexObj(texs[0], texs[1], texs[2], datas[0], datas[1], datas[2],
-	                   entry->shadows[0].field_0x10 != -1 ? 1 : 0, entry->shadows[1].field_0x10 != -1 ? 1 : 0);
+	                   entry->shadows[0].offscreenId != -1 ? 1 : 0, entry->shadows[1].offscreenId != -1 ? 1 : 0);
 	if ((u32)entry->animName != 0) {
 		animPoseSetAnim(entry->poseId, (const char*)entry->animName, FALSE);
 	}
@@ -192,9 +177,9 @@ void imgDisp(CameraId camId, void* param) {
 	}
 	{
 		if (entry->flags & 4) {
-			fl = ((ImgDispSh*)entry + first)->left; ft = ((ImgDispSh*)entry + first)->top; fr = ((ImgDispSh*)entry + first)->right; fb = ((ImgDispSh*)entry + first)->bottom;
+			fl = entry->shadows[first].rect.left; ft = entry->shadows[first].rect.top; fr = entry->shadows[first].rect.width; fb = entry->shadows[first].rect.height;
 		} else {
-			fl = ((ImgDispSh*)entry + first)->x; ft = ((ImgDispSh*)entry + first)->y; fr = entry->width; fb = entry->height;
+			fl = entry->shadows[first].x; ft = entry->shadows[first].y; fr = entry->width; fb = entry->height;
 		}
 	}
 	PSMTXTrans(m3, 64.0f * ((entry->offsetX + fl) / (f32)((GXRenderModeObj*)DEMOGetRenderModeObj())->fbWidth), 48.0f * (-(entry->offsetY + ft) / (f32)((GXRenderModeObj*)DEMOGetRenderModeObj())->efbHeight), zoff);
@@ -212,7 +197,7 @@ void imgDisp(CameraId camId, void* param) {
 	e2 = wp->entries;
 	for (i = 0; i < wp->count; i++, e2++) {
 		if ((e2->flags & 1) && e2->poseId != -1 && !(e2->flags & 2) && strcmp(e2->name, entry->name) != 0 &&
-		    strcmp(((char*)animPoseGetAnimBaseDataPtr(e2->poseId) + 4), ((char*)animPoseGetAnimBaseDataPtr(entry->poseId) + 4)) == 0)
+		    strcmp(animPoseGetAnimBaseDataPtr(e2->poseId)->fileName, animPoseGetAnimBaseDataPtr(entry->poseId)->fileName) == 0)
 			break;
 	}
 	if (i < wp->count) sysWaitDrawSync();
@@ -277,33 +262,22 @@ void imgDisp_ProjPlane(CameraId camId, void* param) {
 
 #pragma push
 #pragma dont_inline on
-typedef struct ImgShd {
-	u32 flags;
-	u16 x, y;
-	u16 left, top, right, bottom;
-	s32 offId;
-	s32 dstFmt;
-	s32 fmt;
-	GXTexObj tex;
-	smartEntry* data;
-	s32 alloc;
-} ImgShd;
 
-static inline void imgCaptureCopy(ImgShd* sh, ImageEntry* entry) {
+static inline void imgCaptureCopy(ImageShadow* sh, ImageEntry* entry) {
 	s32 fmt, dstFmt, alloc;
 	u16 h, w;
 	u32 size;
 	smartEntry* data;
-	sh->left = sh->x;
-	sh->top = sh->y;
-	sh->right = entry->width;
-	sh->bottom = entry->height;
-	h = sh->bottom;
-	w = sh->right;
-	fmt = sh->fmt;
-	dstFmt = sh->dstFmt;
-	alloc = sh->alloc;
-	GXSetTexCopySrc(sh->left, sh->top, w, h);
+	sh->rect.left = sh->x;
+	sh->rect.top = sh->y;
+	sh->rect.width = entry->width;
+	sh->rect.height = entry->height;
+	h = sh->rect.height;
+	w = sh->rect.width;
+	fmt = sh->texFmt;
+	dstFmt = sh->copyFmt;
+	alloc = sh->allocMode;
+	GXSetTexCopySrc(sh->rect.left, sh->rect.top, w, h);
 	GXSetTexCopyDst(w, h, dstFmt, 0);
 	size = GXGetTexBufferSize(w, h, fmt, 0, 0);
 	if (alloc == 1) data = smartAlloc(size, 1);
@@ -312,13 +286,13 @@ static inline void imgCaptureCopy(ImgShd* sh, ImageEntry* entry) {
 	GXSetZMode(1, 3, 1);
 	GXCopyTex(data->address, 0);
 	GXPixModeSync();
-	GXInitTexObj(&sh->tex, data->address, w, h, fmt, 0, 0, 0);
-	GXInitTexObjLOD(&sh->tex, 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
+	GXInitTexObj(&sh->texObj, data->address, w, h, fmt, 0, 0, 0);
+	GXInitTexObjLOD(&sh->texObj, 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
 	sh->data = data;
 }
 
 void imgCapture_Prim(ImageEntry* entry, s32 id) {
-	ImgShd* sh = (ImgShd*)&entry->shadows[id];
+	ImageShadow* sh = &entry->shadows[id];
 	s32 offId;
 	u16 w, h;
 	s32 alloc, fmt, dstFmt;
@@ -327,10 +301,10 @@ void imgCapture_Prim(ImageEntry* entry, s32 id) {
 	GXTexObj* obj;
 	smartEntry* buf;
 	if (!(sh->flags & 4)) return;
-	offId = sh->offId;
+	offId = sh->offscreenId;
 	sh->flags |= 0x10;
 	if (offId != -1) {
-		if (sh->alloc) {
+		if (sh->allocMode) {
 			if (sh->flags & 0x100) {
 				offscreenGetTexObj(offId, &obj, &buf);
 				if (obj) {
@@ -338,18 +312,18 @@ void imgCapture_Prim(ImageEntry* entry, s32 id) {
 					h = GXGetTexObjHeight(obj);
 					fmt = GXGetTexObjFmt(obj);
 					size = GXGetTexBufferSize(w, h, fmt, 0, 0);
-					if (sh->alloc == 1) {
+					if (sh->allocMode == 1) {
 						sh->data = smartAlloc(size, 1);
-					} else if (sh->alloc == 2) {
+					} else if (sh->allocMode == 2) {
 						sh->data = smartAlloc(size, 0);
 					}
 					memcpy(sh->data->address, buf->address, size);
 					DCFlushRange(sh->data->address, size);
-					GXInitTexObj(&sh->tex, sh->data->address, w, h, fmt, 0, 0, 0);
-					GXInitTexObjLOD(&sh->tex, 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
-					offscreenGetBoundingBox(offId, &sh->left, &sh->top, &sh->right, &sh->bottom);
-					sh->right -= sh->left;
-					sh->bottom -= sh->top;
+					GXInitTexObj(&sh->texObj, sh->data->address, w, h, fmt, 0, 0, 0);
+					GXInitTexObjLOD(&sh->texObj, 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
+					offscreenGetBoundingBox(offId, &sh->rect.left, &sh->rect.top, &sh->rect.width, &sh->rect.height);
+					sh->rect.width -= sh->rect.left;
+					sh->rect.height -= sh->rect.top;
 					sh->flags &= ~0x100;
 				}
 			}
@@ -358,15 +332,15 @@ void imgCapture_Prim(ImageEntry* entry, s32 id) {
 			GXTexObj* o2; smartEntry* b2;
 			offscreenGetTexObj(offId, &o2, &b2);
 			if (o2) {
-				sh->tex = *o2;
+				sh->texObj = *o2;
 				sh->data = b2;
-				offscreenGetBoundingBox(offId, &sh->left, &sh->top, &sh->right, &sh->bottom);
-				sh->right -= sh->left;
-				sh->bottom -= sh->top;
+				offscreenGetBoundingBox(offId, &sh->rect.left, &sh->rect.top, &sh->rect.width, &sh->rect.height);
+				sh->rect.width -= sh->rect.left;
+				sh->rect.height -= sh->rect.top;
 				sh->flags &= ~0x10;
 			}
 		}
-	} else if (sh->alloc) {
+	} else if (sh->allocMode) {
 		if (sh->flags & 0x100) {
 			imgCaptureCopy(sh, entry);
 			sh->flags &= ~0x100;
@@ -455,28 +429,28 @@ s32 imgEntry(const char* name, s32 type) { //1:1, needs variable names
 	entry->shadows[0].flags = 0;
 	entry->shadows[0].x = 0;
 	entry->shadows[0].y = 0;
-	entry->shadows[0].field_0x10 = -1;
-	entry->shadows[0].field_0x14 = 6;
-	entry->shadows[0].field_0x18 = 6;
-	entry->shadows[0].field_0x40 = 0;
+	entry->shadows[0].offscreenId = -1;
+	entry->shadows[0].copyFmt = 6;
+	entry->shadows[0].texFmt = 6;
+	entry->shadows[0].allocMode = 0;
 
 	entry->shadows[1].flags = 0;
 	entry->shadows[1].x = 0;
 	entry->shadows[1].y = 0;
-	entry->shadows[1].field_0x10 = -1;
-	entry->shadows[1].field_0x14 = 6;
-	entry->shadows[1].field_0x18 = 6;
-	entry->shadows[1].field_0x40 = 0;
+	entry->shadows[1].offscreenId = -1;
+	entry->shadows[1].copyFmt = 6;
+	entry->shadows[1].texFmt = 6;
+	entry->shadows[1].allocMode = 0;
 
 	entry->shadows[2].flags = 0;
 	entry->shadows[2].x = 0;
 	entry->shadows[2].y = 0;
-	entry->shadows[2].field_0x10 = -1;
-	entry->shadows[2].field_0x14 = 6;
-	entry->shadows[2].field_0x18 = 6;
-	entry->shadows[2].field_0x40 = 0;
-	entry->shadows[2].field_0x14 = 39;
-	entry->shadows[2].field_0x18 = 1;
+	entry->shadows[2].offscreenId = -1;
+	entry->shadows[2].copyFmt = 6;
+	entry->shadows[2].texFmt = 6;
+	entry->shadows[2].allocMode = 0;
+	entry->shadows[2].copyFmt = 39;
+	entry->shadows[2].texFmt = 1;
 
 	return i;
 }
@@ -541,7 +515,7 @@ void imgFreeCapture(ImageEntry* entry, s32 shadowId) { //1:1, needs enums
 		if (shadow->flags & 0x100) {
 			shadow->flags = 0;
 		}
-		else if (!shadow->field_0x40) {
+		else if (!shadow->allocMode) {
 			shadow->flags = 0;
 		}
 		else {
@@ -564,7 +538,7 @@ void imgRelease(ImageEntry* entry, s32 type) { //1:1 after inlining
 	int i;
 
 	for (i = 0; i < 3; i++) {
-		imgFreeCapture(entry, i); //TODO: double check this inlines correctly
+		imgFreeCapture(entry, i);
 	}
 	entry->flags = 0;
 	memset(entry, 0, sizeof(ImageEntry));
@@ -575,7 +549,6 @@ void imgSetShadow(ImageEntry* entry, s32 shadowId) { //1:1
 }
 
 extern void* DEMOGetRenderModeObj(void);
-typedef struct { u16 a, b, c, d; } ImgRect;
 
 void imgShadowDisp(CameraId camId, void* param) {
 	ImageShadow* sh;
@@ -600,23 +573,23 @@ void imgShadowDisp(CameraId camId, void* param) {
 			objs[i] = NULL;
 			datas[i] = NULL;
 		} else {
-			ImgRect* r = (ImgRect*)sh->field_0x8;
+			ImageRect* r = &sh->rect;
 			if (entry->flags & 4) {
-				x0 = r->a;
-				y0 = r->b;
-				w = r->c;
-				h = r->d;
+				x0 = r->left;
+				y0 = r->top;
+				w = r->width;
+				h = r->height;
 			} else {
 				x0 = sh->x;
 				y0 = sh->y;
 				w = entry->width;
 				h = entry->height;
 			}
-			r = (ImgRect*)sh->field_0x8;
-			PSMTXTrans(m, -((f32)r->a - x0) / (f32)r->c, -((f32)r->b - y0) / (f32)r->d, 0.0f);
-			PSMTXScale(m1, w / (f32)r->c, h / (f32)r->d, 1.0f);
+			r = &sh->rect;
+			PSMTXTrans(m, -((f32)r->left - x0) / (f32)r->width, -((f32)r->top - y0) / (f32)r->height, 0.0f);
+			PSMTXScale(m1, w / (f32)r->width, h / (f32)r->height, 1.0f);
 			PSMTXConcat(m, m1, mtxs[i]);
-			objs[i] = (GXTexObj*)((u8*)sh + 0x1C);
+			objs[i] = &sh->texObj;
 			datas[i] = sh->data;
 		}
 		if (objs[i] != NULL) {
@@ -633,7 +606,7 @@ void imgShadowDisp(CameraId camId, void* param) {
 	entry->flags &= ~0x10000000;
 	animSetPaperTexMtx((void*)mp[0], (void*)mp[1], (void*)mp[2]);
 	animSetPaperTexObj(objs[0], objs[1], objs[2], datas[0], datas[1], datas[2],
-	                   entry->shadows[0].field_0x10 != -1 ? 1 : 0, entry->shadows[1].field_0x10 != -1 ? 1 : 0);
+	                   entry->shadows[0].offscreenId != -1 ? 1 : 0, entry->shadows[1].offscreenId != -1 ? 1 : 0);
 	if ((u32)entry->animName != 0) animPoseSetAnim(entry->poseId, (const char*)entry->animName, 0);
 	animPoseSetStartTime(entry->poseId, entry->animTime);
 	animPoseMain(entry->poseId);

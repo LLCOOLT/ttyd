@@ -24,24 +24,24 @@ typedef struct ExtTexInfo {
 
 /* door_entry / evt_door_set_param: per-door parameter block (npcs/mobjs/items are NULL-terminated name lists) */
 typedef struct DoorParam {
-    s32 field_0x0;         // 0x0
-    s32 type;              // 0x4
-    s32 se;                // 0x8
-    const char* mapobj;    // 0xC
-    const char* hitIn;     // 0x10
-    const char* hitOut;    // 0x14
-    const char* mapIn;     // 0x18
-    const char* hitInIn;   // 0x1C
-    const char* mapOut;    // 0x20
-    const char* hitOutOut; // 0x24
-    void* evtIn;           // 0x28
-    void* evtOut;          // 0x2C
-    void* evtWall;         // 0x30
-    const char** npcs;     // 0x34
-    const char** mobjs;    // 0x38
-    const char** items;    // 0x3C
-    void* evtOpen;         // 0x40
-    void* evtClose;        // 0x44
+    s32 flags;              // 0x0, evt_door_param kind 9; 1 = hide/show NPCs through the door, 2 = skip the open SFX
+    s32 type;               // 0x4
+    s32 se;                 // 0x8
+    const char* mapobj;     // 0xC
+    const char* hitIn;      // 0x10
+    const char* hitOut;     // 0x14
+    const char* outside;    // 0x18
+    const char* outsideHit; // 0x1C
+    const char* inside;     // 0x20
+    const char* insideHit;  // 0x24
+    void* evtIn;            // 0x28
+    void* evtOut;           // 0x2C
+    void* evtWall;          // 0x30
+    const char** npcs;      // 0x34
+    const char** mobjs;     // 0x38
+    const char** items;     // 0x3C
+    void* evtOpen;          // 0x40
+    void* evtClose;         // 0x44
 } DoorParam;
 
 /* evt_unitwin_selltable_setup */
@@ -89,7 +89,7 @@ typedef struct TreeAccess {
     const char* hit;   // 0x4
     const char* trunk; // 0x8
     const char* leaf;  // 0xC
-    s32 field_0x10;    // 0x10
+    s32 reserved_10;    // 0x10, 0 in every table, no C reader
     void* evt;         // 0x14
 } TreeAccess;
 

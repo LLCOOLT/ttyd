@@ -4,19 +4,6 @@
 #include <dolphin/os.h>
 #include "libc_decls.h"
 
-typedef struct LotteryWork {
-	u16 flags; //0x0
-	u8 pad_0x2[0x6]; //0x2
-	OSTime lastTime; //0x8
-	s16 todayNum; //0x10
-	u8 pad_0x12[0x6]; //0x12
-	OSTime buyTime; //0x18
-	s16 number; //0x20
-	s16 days[4]; //0x22
-	u8 pad_0x2A[0x6]; //0x2A
-	OSTime times[2]; //0x30
-} LotteryWork;
-
 //.sbss
 BOOL dbg_lotteryinfo;
 static s32 lotteryUnused;
@@ -33,7 +20,7 @@ lottery_info* lotteryGetPtr(void) {
 }
 
 USER_FUNC(evt_lottery) {
-	LotteryWork* lot;
+	lottery_info* lot;
 	s32 day;
 	s32 v;
 	OSCalendarTime a1, a2, b1, b2, c1, c2, d1, d2, e;
@@ -43,7 +30,7 @@ USER_FUNC(evt_lottery) {
 	OSTime now = OSGetTime();
 
 	dbg_lotteryinfo = TRUE;
-	lot = (LotteryWork*)&gp->mLotteryInfo;
+	lot = &gp->mLotteryInfo;
 
 	lot->flags &= ~0x1000;
 	lot->flags &= ~0x2000;
@@ -200,7 +187,7 @@ USER_FUNC(evt_lottery) {
 USER_FUNC(evt_lottery_buy) {
 	s32* args = event->args;
 	OSTime now = OSGetTime();
-	LotteryWork* lot = (LotteryWork*)&gp->mLotteryInfo;
+	lottery_info* lot = &gp->mLotteryInfo;
 
 	do {
 		lot->number = rand() % 10000;
@@ -229,12 +216,12 @@ USER_FUNC(evt_lottery_buy) {
 }
 
 USER_FUNC(evt_lottery_flag) {
-	evtSetValue(event, event->args[0], ((LotteryWork*)&gp->mLotteryInfo)->flags);
+	evtSetValue(event, event->args[0], (&gp->mLotteryInfo)->flags);
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_lottery_todaynum) {
-	evtSetValue(event, event->args[0], ((LotteryWork*)&gp->mLotteryInfo)->todayNum);
+	evtSetValue(event, event->args[0], (&gp->mLotteryInfo)->todayNum);
 	return EVT_RETURN_DONE;
 }
 
@@ -243,7 +230,7 @@ USER_FUNC(evt_lottery_error_check) {
 	GlobalWork* g = gp;
 	s32* args = event->args;
 	OSTime now = OSGetTime();
-	LotteryWork* lot = (LotteryWork*)&g->mLotteryInfo;
+	lottery_info* lot = &g->mLotteryInfo;
 	u16 flags = lot->flags;
 	BOOL err = FALSE;
 

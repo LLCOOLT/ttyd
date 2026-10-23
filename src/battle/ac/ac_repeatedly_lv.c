@@ -326,22 +326,22 @@ void battleAcDisp_RepeatedlyLv(CameraId cameraId, BattleWork* work) {
         case 100:
         case 1000:
         case 1001:
-            disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->unk20 > 0) {
-                disp->unk20--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 1002:
         case 1003:
-            if (disp->unk20 >= 40) {
-                disp->iconX = intplGetValue(4, disp->unk20 - 40, 20, 30.0f, -300.0f);
+            if (disp->slideTimer >= 40) {
+                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->unk20 < 60) {
-                disp->unk20++;
+            if (disp->slideTimer < 60) {
+                disp->slideTimer++;
             }
             break;
     }

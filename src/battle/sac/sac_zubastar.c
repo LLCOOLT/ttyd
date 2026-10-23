@@ -1,4 +1,5 @@
 #pragma optimize_for_size on
+#include "eff/eff_starstone.h"
 #include "battle/battle.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -102,18 +103,18 @@ s32 weaponGetPower_ZubaStar(void* a, s32* tbl);
 BattleWeapon weapon_zubastar = {
     "btl_wn_sac_zubastar", // name
     ICON_19B, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_zubastar", // description
     100, // baseAccuracy
     0, // baseFpCost
     6, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPower_ZubaStar, // hpDamageFn
     {0, 3, 6, 9, 12, 15, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -122,7 +123,7 @@ BattleWeapon weapon_zubastar = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_8", // acHelpMsg
     0x200C8, // special
     0x7FF, // counterResistFlags
@@ -132,9 +133,9 @@ BattleWeapon weapon_zubastar = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_ZubaStar, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 s32 zubastar_get_kouten(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy);
 
@@ -228,7 +229,7 @@ void zubaStarDispStar(CameraId cam, void* param) {
 
 #pragma dont_inline on
 ZubaStarWork* GetZubaStarPtr(void) {
-	return (ZubaStarWork*)((u8*)_battleWorkPointer + 0x1f4c);
+	return (ZubaStarWork*)_battleWorkPointer->actionCommands.work;
 }
 
 #pragma dont_inline reset
@@ -824,7 +825,7 @@ s32 zubastar_init(void) {
 s32 zubastar_end(void) {
 	ZubaStarWork* w = GetZubaStarPtr();
 	s32 i;
-	effDelete(*(EffectEntry**)((u8*)w->eff->userdata + 0x34));
+	effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
 	effDelete(w->eff);
 	for (i = 0; i < 200; i++) {
 		if (w->ptrs[i] != NULL) {

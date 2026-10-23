@@ -21,10 +21,10 @@ typedef struct SequenceWork {
 	s32 state; //0x4, 0-7
 	const char* mapName; //0x8
 	const char* beroName; //0xC
-	u32 field_0x10; //0x10
-	u32 field_0x14; //0x14
-	u32 field_0x18; //0x18
-	u32 field_0x1C; //0x1C
+	u32 pad_10; //0x10, never accessed
+	u32 pad_14; //0x14, never accessed
+	u32 pad_18; //0x18, never accessed
+	u32 pad_1C; //0x1C, never accessed
 } SequenceWork;
 
 void seqInit_MARIOSTORY(void);

@@ -356,7 +356,7 @@ USER_FUNC(koburon_get_encount_info) {
     s32 arg = event->args[0];
     FieldBattleData* fbat = fbatGetPointer();
 
-    evtSetValue(event, arg, fbat->unk10);
+    evtSetValue(event, arg, fbat->hitKind);
     return EVT_RETURN_DONE;
 }
 

@@ -219,9 +219,9 @@ s32 peachMain(void) {
     MarioWork* mp = marioGetPtr();
     if (mp->currMotionId == 8) {
         mp->basePos = mp->position;
-        mp->unk174.x = 0.0f;
-        mp->unk174.y = 0.0f;
-        mp->unk174.z = 0.0f;
+        mp->floorMove.x = 0.0f;
+        mp->floorMove.y = 0.0f;
+        mp->floorMove.z = 0.0f;
         marioBottomless();
         marioPreDisp();
         marioBalloonMain();
@@ -269,9 +269,9 @@ s32 peachMain(void) {
     marioCamMain();
     mp->frameCounter++;
     mp->basePos = mp->position;
-    mp->unk174.x = 0.0f;
-    mp->unk174.y = 0.0f;
-    mp->unk174.z = 0.0f;
+    mp->floorMove.x = 0.0f;
+    mp->floorMove.y = 0.0f;
+    mp->floorMove.z = 0.0f;
     return 1;
 }
 

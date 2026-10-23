@@ -235,7 +235,7 @@ static BattleUnitKindPart parts[] = {
 
 BattleWeapon weapon_gundan_zako_group2_attack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
@@ -244,11 +244,11 @@ BattleWeapon weapon_gundan_zako_group2_attack = {
 #else
     0, // superguardsAllowed
 #endif
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -257,7 +257,7 @@ BattleWeapon weapon_gundan_zako_group2_attack = {
     0x20001000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0x7FF, // counterResistFlags
@@ -268,14 +268,14 @@ BattleWeapon weapon_gundan_zako_group2_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon weapon_gundan_zako_group2_yusuri_attack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
@@ -284,11 +284,11 @@ BattleWeapon weapon_gundan_zako_group2_yusuri_attack = {
 #else
     0, // superguardsAllowed
 #endif
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -297,7 +297,7 @@ BattleWeapon weapon_gundan_zako_group2_yusuri_attack = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0x7FF, // counterResistFlags
@@ -308,9 +308,9 @@ BattleWeapon weapon_gundan_zako_group2_yusuri_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(init_event)
@@ -531,7 +531,7 @@ static EVT_BEGIN(shake_attack_event)
 EVT_END()
 
 USER_FUNC(down_ceil) {
-    u8* ceil = &_battleWorkPointer->field_180DC;
+    u8* ceil = &_battleWorkPointer->stageObjectWork.flags;
     BattleStageObject* body = BattleSearchObjectPtr("if_body");
     BattleStageObject* wire = BattleSearchObjectPtr("if_wire");
 
@@ -553,7 +553,7 @@ USER_FUNC(down_ceil) {
 }
 
 USER_FUNC(up_ceil) {
-    u8* ceil = &_battleWorkPointer->field_180DC;
+    u8* ceil = &_battleWorkPointer->stageObjectWork.flags;
     BattleStageObject* body = BattleSearchObjectPtr("if_body");
     BattleStageObject* wire = BattleSearchObjectPtr("if_wire");
 

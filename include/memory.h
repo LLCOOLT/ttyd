@@ -16,9 +16,9 @@ typedef struct smartEntry {
 	void* address; //0x0
 	u32 size; //0x4
 	FileEntry* file; //0x8, file whose data lives in this block (smartGarbage checks its state)
-	u16 field_0xC; //0xC
+	u16 reserved_C; //0xC
 	u8 type; //0xE, total guess, no way to know
-	u8 field_0xF; //0xF
+	u8 pad_F; //0xF
 	u32 spaceAfter; //0x10, free bytes after this block (heap size - 32 at init; prev->spaceAfter += size on free)
 	struct smartEntry* next; //0x14
 	struct smartEntry* prev; //0x18

@@ -10,17 +10,6 @@
 #include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 
-typedef struct EffMagic1N64Work {
-    s32 type;     // 0x0
-    Vec position; // 0x4
-    Vec offset;   // 0x10
-    Vec velocity; // 0x1C
-    f32 scale;    // 0x28
-    s32 age;      // 0x2C
-    s32 life;     // 0x30
-    s32 alpha;    // 0x34
-} EffMagic1N64Work;
-
 static u8 anime_data[12] = {0x00, 0xFF, 0xD0, 0x1A, 0x78, 0x4D, 0xD0, 0xFE, 0xF0, 0xFE, 0x4C, 0x6E};
 
 void effMagic1Main(EffectEntry* effect);

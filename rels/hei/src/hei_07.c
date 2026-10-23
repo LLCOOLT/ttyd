@@ -2,6 +2,7 @@
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "driver/msgdrv.h"
 
 #pragma force_active on
 #include "driver/mapdrv.h"
@@ -832,7 +833,7 @@ EVT_END()
 void mapPlayAnimationLv(const char* animName, s32 arg1, s32 arg2);
 
 static void callback(s32 type, void** work) {
-    EventEntry* evt = *(EventEntry**)((u8*)*work + VERSION_PICK(0x7A00, 0xF200));
+    EventEntry* evt = ((MsgWinData*)*work)->event;
     BOOL valid;
     f32 frame;
 

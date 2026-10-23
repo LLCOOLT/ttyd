@@ -1485,7 +1485,7 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     Mtx mtx;
     f32 t;
 
-    p = *(MapObject**)info->field_0x0;
+    p = *(MapObject**)info->mapObj;
     tevStage = info->tevStage;
     texMap = info->texCoord;
     texCoord = info->texMap;

@@ -68,10 +68,8 @@ typedef struct ShotParams {
 
 #define SH_DISP(ac) ((ShotDisp*)&(ac)->disp)
 #define SH_WORK(ac) ((ShotWork*)(ac)->work)
-#define SH_PARAMS(ac) ((ShotParams*)((u8*)(ac) + 0x38))
-#define SH_FLAGS(ac) (*(u32*)((u8*)(ac) + 0x34))
-#define SH_OUT(ac) ((s32*)((u8*)(ac) + 0x58))
-#define SH_S16(ac) (*(s16*)((u8*)(ac) + 0x88))
+#define SH_PARAMS(ac) ((ShotParams*)(ac)->params)
+#define SH_OUT(ac) ((s32*)(ac)->outputParams)
 
 
 static void _disp_target_mark(CameraId cameraId, void* param);

@@ -5,6 +5,7 @@
 #include "manager/evtmgr.h"
 #include "manager/filemgr.h"
 #include "mario/mario_pouch.h"
+#include "battle/battle_database_common.h"
 
 #pragma enumsalwaysint off
 typedef enum AudienceMemberType {
@@ -28,93 +29,122 @@ typedef enum AudienceMemberType {
 typedef struct StarPowerInfo {
     struct BattleWeapon* mWeapon; // 0x0
     f32 mSpAcSuccessMultiplier;   // 0x4
-    s8 mStylishCommandMultiplier; // 0x8
-    s8 field_0x9;                 // 0x9
+    u8 mStylishCommandMultiplier; // 0x8
+    s8 reserved_09;               // 0x9, copied from BattleWeapon.reserved_19, never read
     s8 mBingoSlotChance;          // 0xA
-    s8 field_0xB;                 // 0xB
+    s8 pad_0B;                    // 0xB, never accessed
 } StarPowerInfo;
 
 typedef struct BattleAudienceMember {
-    s32 flags;                     // 0x0
-    s32 field_0x4;                 // 0x4
-    s32 field_0x8;                 // 0x8
-    f32 field_0xC;                 // 0xC
-    f32 field_0x10;                // 0x10
-    f32 field_0x14;                // 0x14
-    u8 field_0x18;                 // 0x18
-    u8 status;                     // 0x19
-    u8 field_0x1A;                 // 0x1A
-    u8 type;                       // 0x1B, AudienceMemberType
-    s16 itemId;                    // 0x1C, -1 is invalid
-    u8 field_0x1E[0x20 - 0x1E];    // 0x1E
-    s32** animTable;               // 0x20, set in BattleAudience_Entry_Sub
-    s32 unk24;                     // 0x24
-    u8 field_0x28[0x30 - 0x28];    // 0x28
-    s32 field_0x30;                // 0x30
-    u8 field_0x34[0x41 - 0x34];    // 0x34
-    u8 colorR;                     // 0x41, draw colour (read with G/B/A in the member draw)
-    u8 colorG;                     // 0x42
-    u8 colorB;                     // 0x43
-    u8 colorA;                     // 0x44, 0xFF = opaque (separate draw pass)
-    u8 field_0x45[0x48 - 0x45];    // 0x45
-    Vec position;                  // 0x48
-    Vec scale;                     // 0x54, final draw scale: baseScale * kind texture size (PSMTXScale in the member draw)
-    Vec baseScale;                 // 0x60
-    Vec dispOffset;                // 0x6C, added to position for the drawn quad
-    Vec field_0x78;                // 0x78
-    u8 field_0x84[0x88 - 0x84];    // 0x84
-    f32 unk88;                     // 0x88
-    f32 unk8C;                     // 0x8C
-    Vec facingDir;                 // 0x90, (0,0,-1) rotated by the member matrix; dot-product facing test
-    Vec mRotation;                 // 0x9C
-    Vec mRotationOffset;           // 0xA8
-    Vec mHomePosition;             // 0xB4
-    f32 unkC0;                     // 0xC0
-    f32 unkC4;                     // 0xC4
-    f32 unkC8;                     // 0xC8
-    f32 unkCC;                     // 0xCC
-    f32 unkD0;                     // 0xD0
-    f32 unkD4;                     // 0xD4
-    u8 field_0xD8[0xDC - 0xD8];    // 0xD8
-    f32 unkDC;                     // 0xDC
-    u8 field_0xE0[0xE4 - 0xE0];    // 0xE0
-    f32 unkE4;                     // 0xE4
-    f32 angle;                     // 0xE8, init 270, wrapped to 0..360
-    s32 unkEC;                     // 0xEC
-    s16 unkF0;                     // 0xF0
-    u8 field_0xF2[0xF4 - 0xF2];    // 0xF2
-    s32 unkF4;                     // 0xF4
-    s32 interpFramesLeft;          // 0xF8
-    s32 interpFramesTotal;         // 0xFC
-    f32 startPosX;                 // 0x100
-    f32 targetPosX;                // 0x104
-    f32 startPosY;                 // 0x108
-    f32 targetPosY;                // 0x10C
-    f32 startPosZ;                 // 0x110
-    f32 targetPosZ;                // 0x114
-    Vec interpDelta;               // 0x118
-    f32 interpGravity;             // 0x124
-    s32 interpType;                // 0x128
-    s32 statusTimer;               // 0x12C, set to 5 and counted down while status == 18
-    f32 unk130;                    // 0x130
+    s32 flags;                 // 0x0
+    s32 step;                  // 0x4, sub-step of the current status handler
+    s32 counter;               // 0x8, per-status counter
+    f32 counterF;              // 0xC, per-status float counter
+    f32 workF1;                // 0x10, per-status float, cleared on status change
+    f32 workF2;                // 0x14, per-status float, cleared on status change
+    u8 colorStep;              // 0x18, added to colorB each frame (+-4)
+    u8 status;                 // 0x19
+    u8 texId;                  // 0x1A, palette texture index for the member quad
+    u8 type;                   // 0x1B, AudienceMemberType
+    s16 itemId;                // 0x1C, -1 is invalid
+    u8 pad_1E[0x20 - 0x1E];    // 0x1E, never accessed
+    s32** animTable;           // 0x20, set in BattleAudience_Entry_Sub
+    s32* animStart;            // 0x24, current anim script (animTable entry); -3 jumps back here
+    s32* animPc;               // 0x28, anim script read pointer (BattleAudienceAnimProcess)
+    s32 animWait;              // 0x2C, frames left before the next script op
+    s32 timer;                 // 0x30, per-status frame timer
+    s32 animLoop[3];           // 0x34, loop counters for script ops -6/-7
+    u8 animDepth;              // 0x40, loop nesting depth
+    u8 colorR;                 // 0x41, draw colour (read with G/B/A in the member draw)
+    u8 colorG;                 // 0x42
+    u8 colorB;                 // 0x43
+    u8 colorA;                 // 0x44, 0xFF = opaque (separate draw pass)
+    u8 pad_45[0x48 - 0x45];    // 0x45, never accessed
+    Vec position;              // 0x48
+    Vec scale;                 // 0x54, final draw scale: baseScale * kind texture size (PSMTXScale in the member draw)
+    Vec baseScale;             // 0x60
+    Vec dispOffset;            // 0x6C, added to position for the drawn quad
+    Vec velocity;              // 0x78, added to position each frame
+    f32 accelX;                // 0x84, added to velocity.x
+    f32 accelY;                // 0x88, added to velocity.y
+    f32 accelZ;                // 0x8C, added to velocity.z
+    Vec facingDir;             // 0x90, (0,0,-1) rotated by the member matrix; dot-product facing test
+    Vec mRotation;             // 0x9C
+    Vec mRotationOffset;       // 0xA8
+    Vec mHomePosition;         // 0xB4
+    f32 drawPosX;              // 0xC0, position + hop (+ bob), used as the thrown-item origin
+    f32 drawPosY;              // 0xC4
+    f32 drawPosZ;              // 0xC8
+    f32 hopX;                  // 0xCC, hop offset added in the draw
+    f32 hopY;                  // 0xD0, hop height, += hopSpeed, stops at 0
+    f32 hopZ;                  // 0xD4
+    u8 pad_D8[0xDC - 0xD8];    // 0xD8, never accessed
+    f32 hopSpeed;              // 0xDC, += hopAccel per frame
+    u8 pad_E0[0xE4 - 0xE0];    // 0xE0, never accessed
+    f32 hopAccel;              // 0xE4, hop gravity (0 = hop finished)
+    f32 angle;                 // 0xE8, init 270, wrapped to 0..360
+    s32 targetUnit;            // 0xEC, BattleUnit* the member targets (stored as s32)
+    s16 targetMemberId;        // 0xF0, index of another member it interacts with
+    u8 pad_F2[0xF4 - 0xF2];    // 0xF2, never accessed
+    s32 statusDelay;           // 0xF4, countdown before status 13 -> 3
+    s32 interpFramesLeft;      // 0xF8
+    s32 interpFramesTotal;     // 0xFC
+    f32 startPosX;             // 0x100
+    f32 targetPosX;            // 0x104
+    f32 startPosY;             // 0x108
+    f32 targetPosY;            // 0x10C
+    f32 startPosZ;             // 0x110
+    f32 targetPosZ;            // 0x114
+    Vec interpDelta;           // 0x118
+    f32 interpGravity;         // 0x124
+    s32 interpType;            // 0x128
+    union {
+        s32 statusTimer;       // 0x12C, set to 5 and counted down while status == 18
+        f32 bobAngle;          // 0x12C, kinopio bob phase (radians)
+    };
+    f32 bobOffset;             // 0x130, type 2: 5 * sin(phase) added to the drawn y
 } BattleAudienceMember;
 
 typedef struct BattleAudienceItem {
-    u32 flags;                  // 0x0
-    s32 state;                  // 0x4
-    u8 field_0x8[0xC - 0x8];    // 0x8
-    s32 unkC;                   // 0xC
-    ItemType mItemType;         // 0x10
-    u8 field_0x14[0x48 - 0x14]; // 0x14
+    u32 flags;              // 0x0
+    s32 state;              // 0x4
+    s32 timer;              // 0x8, per-state frame timer
+    s32 audienceId;         // 0xC, member that threw it
+    ItemType mItemType;     // 0x10
+    Vec position;           // 0x14
+    f32 scale;              // 0x20
+    f32 rotZ;               // 0x24
+    Vec velocity;           // 0x28
+    Vec accel;              // 0x34, added to velocity each frame
+    struct BattleUnit* target; // 0x40, unit the item is thrown at
+    s32 mode;               // 0x44, nonzero once it is a hazard (lands on a unit)
 } BattleAudienceItem;
 
 typedef struct BattleAudienceStar {
-    u8 field_0x0[0x60 - 0x0]; // 0x0
+    s32 flags;                // 0x0
+    s32 state;                // 0x4, 0 spawn, 5 rise, 10 wait, 15 spiral to the AP gauge, 20 fade
+    f32 x;                    // 0x8
+    f32 y;                    // 0xC
+    f32 z;                    // 0x10, z of the x/y/z position (Vec at 0x8)
+    f32 reserved_14;          // 0x14, random -20..20 at spawn, never read
+    f32 reserved_18;          // 0x18, random 0..10 at spawn, never read
+    f32 reserved_1C;          // 0x1C, 0 at spawn, never read
+    Vec startPos;             // 0x20, interpolation start
+    Vec targetPos;            // 0x2C, interpolation target / spiral centre
+    Vec scale;                // 0x38
+    s32 timer;                // 0x44, frames in the current state
+    s32 duration;             // 0x48, frames for the current state
+    f32 radius;               // 0x4C, spiral radius
+    f32 startRadius;          // 0x50, spiral radius at the start of state 15
+    f32 angle;                // 0x54, spiral angle (radians)
+    f32 angleSpeed;           // 0x58, spiral angle step per frame
+    u8 alpha;                 // 0x5C
+    u8 pad_5D[0x60 - 0x5D];
 } BattleAudienceStar;
 
 // TODO: verify variable names
 typedef struct BattleAudienceSound {
-    u8 field_0x0[0x10 - 0x0];      // 0x0
+    u8 header[0x10 - 0x0];         // 0x0, raw head (AudSound view in battle_audience.c)
     s32 mFadeoutTime;              // 0x10
     s32 mForceFadeTimer;           // 0x14
     s32 mForceFadeLength;          // 0x18
@@ -123,63 +153,26 @@ typedef struct BattleAudienceSound {
     u8 mVolumeMultiplier;          // 0x1E
     u8 mFadeStartVolumeMultiplier; // 0x1F
     u8 mFadeEndVolumeMultiplier;   // 0x20
-    u8 field_0x21[3];              // 0x21, TODO verify padding
+    u8 pad_21[3];                  // 0x21, never accessed
 } BattleAudienceSound;
 
 typedef struct BattleAudienceWindow {
-    u8 mActive;               // 0x0, TODO "bool"?
-    u8 field_0x1[0x8 - 0x1];  // 0x1
-    f32 unk8;                 // 0x8
-    f32 unkC;                 // 0xC
-    u8 field_0x10[0x18 - 0x10]; // 0x10
-    f32 count;                // 0x18, number to display for audience count
+    u8 mActive;             // 0x0, TODO "bool"?
+    u8 pad_01[0x8 - 0x1];   // 0x1, never accessed
+    f32 x;                  // 0x8, window x
+    f32 y;                  // 0xC, window y
+    u8 pad_10[0x18 - 0x10]; // 0x10, never accessed
+    f32 count;              // 0x18, number to display for audience count
 } BattleAudienceWindow;
-
-/*
-typedef struct BattleAudience {
-        s32 flags; //0x0
-        EventEntry* evt; //0x4
-        u8 field_0x8[0xC - 0x8]; //0x8
-        FileEntry* normalTex; //0xC
-        FileEntry* guestTex[2]; //0x10
-        AudienceMemberType guestType[2]; //0x18
-        u8 field_20[0x1BC - 0x20]; //0x20
-        BattleAudienceMember members[200]; //0x1BC
-        BattleAudienceItem items[100]; //0xF25C
-        BattleAudienceStar starpower[100]; //0x10E7C
-        BattleAudienceSound sounds[24]; //0x133FC
-        BattleAudienceWindow window; //0x1375C
-        f32 mAudienceDeltaMultiplier; //0x13778
-        f32 mTargetAudienceCount; //0x1377C
-        f32 mAddedAudienceCount; //013780
-        s32 mCurrentAudienceIntCount; //0x13784, TODO verify name
-        s32 mCurrentAudienceIntCountRight; //0x13788, TODO verify name
-        s32 mCurrentAudienceIntCountLeft; //0x1378C, TODO verify name
-        s32 mMaxAudience; //0x13790
-        u8 field_0x13794[0x137C8 - 0x13794]; //0x13794
-        StarPowerInfo* impendingBonuses; //0x137C8
-        s32 crowdPleasedStreak; //0x137CC
-        s32 crowdDispleasedStreak; //0x137D0
-        s32 mNumStylishCommandsThisAttack; //0x137D4
-        u8 field_0x137D8[0x137DC - 0x137D8]; //0x137D8
-        s32 mCheckPhaseReactionState; //0x137DC, TODO: rename
-        u8 field_0x137E0[0x138BC - 0x137E0]; //0x137E0
-        s32 mItemOnMemberId; //0x138BC, TODO better name
-        Vec mItemOnMemberPos; //0x138C0, TODO better name?
-        u8 field_0x138CC[0x13908 - 0x138CC]; //0x138CC
-        s32 mTurnEndPhaseEventChance; //0x13908, TODO verify name
-        u8 field_0x1390C[0x13910 - 0x1390C]; //0x1390C
-        BOOL excited; //0x13910, if toads are cheering
-} BattleAudience;*/
 
 typedef struct BattleAudience {
     s32 flags;                         // 0x0
     EventEntry* event;                 // 0x4
-    u8 field_8[0xC - 0x8];             // 0x8
+    u8 apStarSfxId[0xC - 0x8];         // 0x8, s32 SFX_BTL_SYS_AP_STAR1 handle (raw ((s32*)aud)[2] in battle_audience.c)
     FileEntry* normalTex;              // 0xC
     FileEntry* guestTex[2];            // 0x10
     AudienceMemberType guestType[2];   // 0x18
-    u8 field_1A[0x1BC - 0x1A];         // 0x1A
+    u8 pad_1A[0x1BC - 0x1A];           // 0x1A, never accessed (guestType is 2 bytes: AudienceMemberType is under enumsalwaysint off)
     BattleAudienceMember members[200]; // 0x1BC
     BattleAudienceItem items[100];     // 0xF25C
     BattleAudienceStar starpower[100]; // 0x10E7C
@@ -192,25 +185,28 @@ typedef struct BattleAudience {
     s32 mCurrentAudienceIntCountRight; // 0x13788, TODO verify name
     s32 mCurrentAudienceIntCountLeft;  // 0x1378C, TODO verify name
     s32 mMaxAudience;                  // 0x13790
-    u8 field_13794[0x137C4 - 0x13794]; // 0x13794
-    s32 field_137C4;                   // 0x137C4
-    u8 field_137C8[0x137D4 - 0x137C8]; // 0x137C8
+    s32 typeWeights[12];               // 0x13794, per-type audience weights (BattleAudienceSettingAudience)
+    s32 starPowerGain;                 // 0x137C4, star power gained this action
+    StarPowerInfo* impendingBonuses;   // 0x137C8, copy of the last StarPowerInfo (BattleAudience_ApRecoveryBuild)
+    s32 crowdPleasedStreak;            // 0x137CC, consecutive good actions, capped at 2
+    s32 crowdDispleasedStreak;         // 0x137D0, consecutive bad actions, capped at 5
     s32 mNumStylishCommandsThisAttack; // 0x137D4
-    u8 field_137D8[0x137DC - 0x137D8]; // 0x137D8
+    u8 pad_137D8[0x137DC - 0x137D8];   // 0x137D8, never accessed
     s32 mCheckPhaseReactionState;      // 0x137DC, TODO: rename
-    u8 field_137E0[0x137E4 - 0x137E0]; // 0x137E0
+    s32 phaseSub;                      // 0x137E0, phase sub-state
     s32 presentItemNo;                 // 0x137E4
     s32 presentItemType;               // 0x137E8
     s32 presentTargetUnitId;           // 0x137EC
     s32 itemThrowCount;                // 0x137F0, audience item throws this battle
     s32 itemThrowMax;                  // 0x137F4, throw limit rolled at battle start (0-3; 10000 when forced)
-    s32 unk137F8;                      // 0x137F8
-    u8 field_137FC[0x138BC - 0x137FC]; // 0x137FC
+    s32 presentHitCount;               // 0x137F8, thrown items that landed, capped at 3; adds to presentWeapon damage
+    BattleWeapon presentWeapon;        // 0x137FC, BattleWeapon copy (0xC0) for a thrown hazard item, passed to BattleCheckDamage
     s32 mItemOnMemberId;               // 0x138BC, TODO better name
     Vec mItemOnMemberPos;              // 0x138C0, TODO better name?
-    u8 field_138CC[0x13908 - 0x138CC]; // 0x138CC
+    s32 phaseList[14];                 // 0x138CC
+    s32 phaseListCount;                // 0x13904
     s32 mTurnEndPhaseEventChance;      // 0x13908, TODO verify name
-    u8 field_1390C[0x13910 - 0x1390C]; // 0x1390C
+    s32 joyLevel;                      // 0x1390C, audience joy level
     BOOL excited;                      // 0x13910, if toads are cheering
 } BattleAudience;
 

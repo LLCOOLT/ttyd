@@ -182,11 +182,11 @@ void seq_loadMain(SequenceWork* seq) {
                     wp->flags &= ~0x40;
                     if (OSGetSoundMode() == 0) {
                         SoundSetOutputMode(0);
-                        gp->unk1274 = 0;
+                        gp->soundMode = 0;
                         wp->unk40 = 0;
                     } else {
                         SoundSetOutputMode(1);
-                        if (gp->unk1274 == 0) {
+                        if (gp->soundMode == 0) {
                             wp->unk40 = 1;
                         } else {
                             wp->unk40 = 2;
@@ -438,7 +438,7 @@ void loadMain(SequenceWork* seq) {
                     fadeEntry(0x1c, 0, (GXColor){0, 0, 0, 255});
                     wp->unk18 = 1;
                 } else {
-                    strcpy((char*)gp->field_0x11BC, nameEntGetName());
+                    strcpy((char*)gp->playerName, nameEntGetName());
                     gp->lastSlot = wp->slot;
                     stg0_00_init();
                     gp->saveSlot = wp->slot;
@@ -628,15 +628,15 @@ void loadMain(SequenceWork* seq) {
                 switch (sound) {
                     case 0:
                         OSSetSoundMode(0);
-                        gp->unk1274 = 0;
+                        gp->soundMode = 0;
                         break;
                     case 1:
                         OSSetSoundMode(1);
-                        gp->unk1274 = 0;
+                        gp->soundMode = 0;
                         break;
                     case 2:
                         OSSetSoundMode(1);
-                        gp->unk1274 = 1;
+                        gp->soundMode = 1;
                         break;
                 }
                 if (OSGetSoundMode() == 0) {
@@ -876,7 +876,7 @@ void loadDraw(CameraId camera, void* param) {
         time = save->data.global.retraceLocalTime;
         stars = *(u16*)&save->data.pouch.mStarPowersObtained;
         gsw0 = save->data.global.mGSW0;
-        name = (char*)save->data.global.field_0x11BC;
+        name = (char*)save->data.global.playerName;
 
         FontDrawStart();
         FontDrawColor((GXColor){192, 192, 192, 255});
@@ -1472,11 +1472,11 @@ void seq_loadMain(SequenceWork* seq) {
                     wp->flags &= ~0x40;
                     if (OSGetSoundMode() == 0) {
                         SoundSetOutputMode(0);
-                        gp->unk1274 = 0;
+                        gp->soundMode = 0;
                         wp->unk40 = 0;
                     } else {
                         SoundSetOutputMode(1);
-                        if (gp->unk1274 == 0) {
+                        if (gp->soundMode == 0) {
                             wp->unk40 = 1;
                         } else {
                             wp->unk40 = 2;
@@ -1718,7 +1718,7 @@ void loadMain(SequenceWork* seq) {
                     fadeEntry(0x1c, 0, (GXColor){0, 0, 0, 255});
                     wp->unk18 = 1;
                 } else {
-                    strcpy((char*)gp->field_0x11BC, nameEntGetName());
+                    strcpy((char*)gp->playerName, nameEntGetName());
                     gp->lastSlot = wp->slot;
                     stg0_00_init();
                     gp->saveSlot = wp->slot;
@@ -1908,15 +1908,15 @@ void loadMain(SequenceWork* seq) {
                 switch (sound) {
                     case 0:
                         OSSetSoundMode(0);
-                        gp->unk1274 = 0;
+                        gp->soundMode = 0;
                         break;
                     case 1:
                         OSSetSoundMode(1);
-                        gp->unk1274 = 0;
+                        gp->soundMode = 0;
                         break;
                     case 2:
                         OSSetSoundMode(1);
-                        gp->unk1274 = 1;
+                        gp->soundMode = 1;
                         break;
                 }
                 if (OSGetSoundMode() == 0) {
@@ -2150,7 +2150,7 @@ void loadDraw(CameraId camera, void* param) {
         OSTime time = save->data.global.retraceLocalTime;
         u16 stars = *(u16*)&save->data.pouch.mStarPowersObtained;
         s32 gsw0 = save->data.global.mGSW0;
-        char* name = (char*)save->data.global.field_0x11BC;
+        char* name = (char*)save->data.global.playerName;
         const char* str;
         s32 hours;
         s32 mins;

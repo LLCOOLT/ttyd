@@ -444,7 +444,7 @@ EffectEntry* effUltraHammerEntry(BOOL arg0, s32 counter, f32 x, f32 y, f32 z, f3
     data = __memAlloc(HEAP_EFFECT, sizeof(EffUltraHammerData) * 4);
     effect->userdata = data;
     effect->callback = effUltraHammerMain;
-    data->unk0 = arg0;
+    data->mode = arg0;
     data->position.x = x;
     data->position.y = y;
     data->position.z = z;
@@ -532,7 +532,7 @@ void effUltraHammerDisp(enum CameraId camId, void *param)
   effect = param;
   data = effect->userdata;
   cam = camGetPtr(camId);
-  mode = data->unk0;
+  mode = data->mode;
   PSMTXTrans(mtx, data->position.x, data->position.y, data->position.z);
   PSMTXScale(scaleMtx, data->scale, data->scale, data->scale);
   PSMTXRotRad(yawMtx, 'y', (-camGetPtr(camId)->viewYaw) * 0.01745329252f);

@@ -502,7 +502,7 @@ USER_FUNC(party_reset) {
     PartyEntry* party = partyGetPtr(0);
 
     party->scale.x = party->scale.y = party->scale.z = 1.0f;
-    party->field_8C = 0.0f;
+    party->rotOfsY = 0.0f;
     party->rotation = 0.0f;
     return EVT_RETURN_DONE;
 }
@@ -511,8 +511,8 @@ USER_FUNC(mario_reset) {
     MarioWork* mario = marioGetPtr();
 
     mario->scale.x = mario->scale.y = mario->scale.z = 1.0f;
-    mario->field_0xB4 = 0.0f;
-    mario->field_0xC4 = 0.0f;
+    mario->rotOfs.y = 0.0f;
+    mario->rot.z = 0.0f;
     return EVT_RETURN_DONE;
 }
 
@@ -521,7 +521,7 @@ USER_FUNC(party_kirimomi) {
     PartyEntry* party = partyGetPtr(0);
 
     party->scale.x = party->scale.y = party->scale.z = 1.0f;
-    party->field_8C = party->height / 2 * party->scale.y;
+    party->rotOfsY = party->height / 2 * party->scale.y;
     party->rotation = angle;
     party->rotation = fmod(party->rotation, 360.0);
     return EVT_RETURN_DONE;
@@ -532,9 +532,9 @@ static USER_FUNC(mario_kirimomi) {
     MarioWork* mario = marioGetPtr();
 
     mario->scale.x = mario->scale.y = mario->scale.z = 1.0f;
-    mario->field_0xB4 = mario->wPlayerCollisionBox.y / 2 * mario->scale.y;
-    mario->field_0xC4 = angle;
-    mario->field_0xC4 = fmod(mario->field_0xC4, 360.0);
+    mario->rotOfs.y = mario->wPlayerCollisionBox.y / 2 * mario->scale.y;
+    mario->rot.z = angle;
+    mario->rot.z = fmod(mario->rot.z, 360.0);
     return EVT_RETURN_DONE;
 }
 

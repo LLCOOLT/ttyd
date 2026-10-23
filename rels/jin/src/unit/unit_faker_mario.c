@@ -77,7 +77,7 @@ USER_FUNC(evt_msg_print);
 USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(vivian_comeback);
-extern s32 entryunit_party[];
+extern BattleUnitSetup entryunit_party[];
 extern BattleUnitKind unit_gullible_christine;
 extern BattleUnitKind unit_gullible_clauda;
 extern BattleUnitKind unit_gullible_nokotarou;
@@ -390,16 +390,16 @@ static BattleUnitKindPart parts_fmario[] = {
 
 static BattleWeapon weapon_masao_jump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -408,7 +408,7 @@ static BattleWeapon weapon_masao_jump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x15807, // special
     0xC, // counterResistFlags
@@ -419,23 +419,23 @@ static BattleWeapon weapon_masao_jump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_masao_hammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -444,7 +444,7 @@ static BattleWeapon weapon_masao_hammer = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x10807, // special
     0x20C, // counterResistFlags
@@ -455,23 +455,23 @@ static BattleWeapon weapon_masao_hammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_masao_kururin_jump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -480,7 +480,7 @@ static BattleWeapon weapon_masao_kururin_jump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x15807, // special
     0xC, // counterResistFlags
@@ -491,23 +491,23 @@ static BattleWeapon weapon_masao_kururin_jump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_masao_kaiten_hammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -516,7 +516,7 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x10807, // special
     0x20C, // counterResistFlags
@@ -527,9 +527,9 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleUnitSetup entry_gullible_christine = {
@@ -709,7 +709,7 @@ static EVT_BEGIN(dead_event_fmario)
     IF_INT_EQUAL(GW(21), 0)
         SET_VALUE(GW(21), 1)
         CALL(vivian_comeback)
-        CALL(btlevtcmd_SpawnUnit, LW(3), PTR((u8*)entryunit_party + 0xC0), 0)
+        CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entryunit_party[4]), 0)
         CALL(btlevtcmd_SetHomePos, LW(3), FLOAT(-140.0f), FLOAT(0.0f), FLOAT(5.0f))
         CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
@@ -775,7 +775,7 @@ EVT_BEGIN(phase_event_fmario)
             WAIT_MS(200)
             SET_VALUE(GW(21), 1)
             CALL(vivian_comeback)
-            CALL(btlevtcmd_SpawnUnit, LW(3), PTR((u8*)entryunit_party + 192), 0)
+            CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entryunit_party[4]), 0)
             CALL(btlevtcmd_SetHomePos, LW(3), FLOAT(-140.0f), FLOAT(0.0f), FLOAT(5.0f))
             CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
             CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
@@ -897,7 +897,7 @@ EVT_BEGIN(phase_event_fmario)
             WAIT_MS(200)
             SET_VALUE(GW(21), 1)
             CALL(vivian_comeback)
-            CALL(btlevtcmd_SpawnUnit, LW(3), PTR((void*)((u8*)entryunit_party + 0xC0)), 0)
+            CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entryunit_party[4]), 0)
             CALL(btlevtcmd_SetHomePos, LW(3), FLOAT(-140.0f), FLOAT(0.0f), FLOAT(5.0f))
             CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
             CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))

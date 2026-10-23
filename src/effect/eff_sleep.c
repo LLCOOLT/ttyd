@@ -45,7 +45,7 @@ EffectEntry* effSleepEntry(s32 a1, s32 a2, f32 x, f32 y, f32 z, f32 scale, f32 r
 	}
 	data->age = 0;
 
-	radians = (6.2831855f * rotation) / 360.0f; //TODO: get radians to f26
+	radians = (6.2831855f * rotation) / 360.0f;
 	for (data++, i = 1, smth = 16; i < effect->count; i++, smth += 16, data++) {
 		data->position.x = (r = 16.0f * (f32)i) * (f32)cos(radians);
 		data->position.y = r * (f32)sin(radians);

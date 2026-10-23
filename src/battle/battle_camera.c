@@ -52,7 +52,7 @@ void battleCameraInit(void) {
   camera->moveSpeedLv = 1;
   camera->zoomSpeedLv = 1;
   camera->position = (Vec){0.0f, 0.0f, 0.0f};
-  camera->unk4 = 0;
+  camera->modeFrame = 0;
 }
 
 void battleCameraMain(void) {
@@ -396,8 +396,8 @@ void battleCameraMain(void) {
     strcpy(name, "\202\251\202\337\202\347\201\100\202\344\202\311\202\301\202\306\202\251\202\361\202\253\202\341\202\255\202\251\202\361\202\302\202\242\202\321");
     break;
   case 14:
-    wp->cameraWork.unk4++;
-    if (wp->cameraWork.unk4 == 1) {
+    wp->cameraWork.modeFrame++;
+    if (wp->cameraWork.modeFrame == 1) {
       switch (pouchGetPtr()->rank) {
       case 0:
         zoomZ = 750.0f;
@@ -416,8 +416,8 @@ void battleCameraMain(void) {
       wp->cameraWork.zoomSpeedLv = 3;
       battleCameraMoveTo(1, 1, 0.0f, 110.0f, zoomZ, 0.0f, 60.0f, 0.0f, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
     }
-    if (wp->cameraWork.unk4 == 10) {
-      wp->cameraWork.unk4 = 0;
+    if (wp->cameraWork.modeFrame == 10) {
+      wp->cameraWork.modeFrame = 0;
       btl_camera_set_mode(0, 3);
       btl_camera_set_moveto(0, 0.0f, 110.0f, 750.0f, 0.0f, 60.0f, 0.0f, 120, 4);
     }
@@ -745,7 +745,7 @@ void btl_camera_set_mode(s32 pri, s32 mode) {
     wp->cameraWork.zoom = 0.0f;
     wp->cameraWork.moveSpeedLv = 1;
     wp->cameraWork.zoomSpeedLv = 1;
-    wp->cameraWork.unk4 = 0;
+    wp->cameraWork.modeFrame = 0;
     btl_camera_nomove_x_onoff(0, 0);
     btl_camera_nomove_y_onoff(0, 0);
     btl_camera_nomove_z_onoff(0, 0);

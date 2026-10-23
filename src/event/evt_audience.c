@@ -389,8 +389,8 @@ USER_FUNC(evt_audience_reflesh_natural_all) {
 	i = 0;
 	member = BattleAudienceGetPtr(0);
 	for (; i < 200; i++, member++) {
-		if (member->flags & 1 && member->status == 13 && member->field_0x4 == 1 && irand(100) < chance) {
-			member->field_0x4 = 2;
+		if (member->flags & 1 && member->status == 13 && member->step == 1 && irand(100) < chance) {
+			member->step = 2;
 		}
 	}
 	return EVT_RETURN_DONE;

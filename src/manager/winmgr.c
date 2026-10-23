@@ -550,7 +550,7 @@ void winMgrHelpDraw(WinMgrEntry* entry) {
     if (!(entry->flags & 4)) {
         GXSetScissor(0, 384, 608, 56);
         if (!strcmp(entry->msg, msgSearch("msg_lottery_number\0"))) {
-            sprintf(buf, entry->msg, *(s16*)((u8*)lotteryGetPtr() + 0x20));
+            sprintf(buf, entry->msg, lotteryGetPtr()->number);
             FontDrawStart();
             FontDrawMessage(-210, -144.0f + 28.0f * entry->scroll, buf);
         }
@@ -1079,7 +1079,7 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
                 evt->lwData[4] = 0;
             }
             else {
-                evt->lwData[4] = jdt->info[id].unkA;
+                evt->lwData[4] = jdt->info[id].cost;
             }
             break;
         case 18:
@@ -1716,7 +1716,7 @@ void select_disp_luigi(WinMgrEntry* entry) {
 #endif
             ((char*)info->initEndPos)[info->tagEndPos] = save;
             if (sel->type == 17 && !(sel->items[i].flags & 1)) {
-                sprintf(buf, "%3d", info->unkA);
+                sprintf(buf, "%3d", info->cost);
                 winFontInit();
                 col = &black;
                 if (sel->items[i].flags & 1) {

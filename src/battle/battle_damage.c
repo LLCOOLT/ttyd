@@ -1,3 +1,5 @@
+#include "eff/eff_nice.h"
+#include "eff/n64/eff_vapor_n64.h"
 #include "version.h"
 #pragma optimize_for_size on
 #pragma dont_inline on
@@ -81,7 +83,6 @@ typedef struct CounterWork {
 } CounterWork;
 
 #define WF(w) ((BtlWeaponFull*)(w))
-#define BW_U32(wp, o) (*(u32*)((u8*)(wp) + BWOFF(o)))
 
 BOOL BtlUnit_CanGuardStatus(BattleUnit* unit);
 void btlDispPoseAnime(BattleUnitPart* part);
@@ -125,8 +126,6 @@ void BattleAudience_Case_PartyDown(void);
 void BattleAudience_Case_KillEnemy(s32 level);
 void BattleAudience_Case_FinalAttack(void);
 
-#define BU_S32(u, o) (*(s32*)((u8*)(u) + BUOFF(o)))
-#define BU_S8(u, o) (*(s8*)((u8*)(u) + BUOFF(o)))
 
 void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s32 damage, s32 fpDamage, u32 result, u32 pattern, s32 flag) {
     BattleWork* wp = _battleWorkPointer;
@@ -289,10 +288,10 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
     target->hpDamageTaken = damage;
     target->totalHpDamageTaken += target->hpDamageTaken;
     target->fpDamageTaken = fpDamage;
-    target->unk26E = fpDamage;
-    target->unk264 += target->fpDamageTaken;
+    target->fpLost = fpDamage;
+    target->totalFpDamageTaken += target->fpDamageTaken;
     if (!(target->mAttributeFlags & 0x40000000) && !(part->attributes & 0x800000)) {
-        target->hpGauge.field_0xC = target->currentHp;
+        target->hpGauge.prevHp = target->currentHp;
         target->currentHp -= target->hpDamageTaken;
         if (target->currentHp > target->maxHp) {
             target->currentHp = target->maxHp;
@@ -300,39 +299,39 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
         if (target->currentHp < 0) {
             target->currentHp = 0;
         }
-        target->hpGauge.field_0x10 = target->currentHp;
+        target->hpGauge.targetHp = target->currentHp;
         if (target->hpDamageTaken) {
-            target->hpGauge.field_0x4 = target->hpGauge.field_0x6;
-            target->hpGauge.field_0x8 = target->hpGauge.field_0xA;
+            target->hpGauge.drainTimer = target->hpGauge.drainLength;
+            target->hpGauge.visibleTimer = target->hpGauge.visibleLength;
         }
         if (result & 0x100) {
-            target->hpGauge.field_0x2 |= 1;
+            target->hpGauge.flags |= 1;
         } else {
-            target->hpGauge.field_0x2 &= ~1;
+            target->hpGauge.flags &= ~1;
         }
     }
     if (target->fpDamageTaken) {
         s32 fp = BtlUnit_GetFp(target);
         s32 newFp;
         if (fp < fpDamage) {
-            target->unk26E = fp;
+            target->fpLost = fp;
         } else {
-            target->unk26E = fpDamage;
+            target->fpLost = fpDamage;
         }
         newFp = fp - fpDamage;
         if (newFp < 0) {
             newFp = 0;
         }
         BtlUnit_SetFp(target, newFp);
-        target->unk268 += target->unk26E;
+        target->totalFpLost += target->fpLost;
     }
     if (damage > 0) {
         if (target->currentKind == 0xde) {
-            BtlActRec_AddCount(&wp->field_16F1C[6]);
-            BtlActRec_AddPoint(&wp->field_16F1C[4], damage);
+            BtlActRec_AddCount(&wp->actRecord.marioHitsTaken);
+            BtlActRec_AddPoint(&wp->actRecord.marioDamageTaken, damage);
         } else if (target->currentKind >= 0xe0 && target->currentKind < 0xe7) {
-            BtlActRec_AddCount(&wp->field_16F1C[7]);
-            BtlActRec_AddPoint(&wp->field_16F1C[5], damage);
+            BtlActRec_AddCount(&wp->actRecord.partnerHitsTaken);
+            BtlActRec_AddPoint(&wp->actRecord.partnerDamageTaken, damage);
         }
     }
     if (flag && (damage > 0 || fpDamage > 0) && BtlUnit_CheckStatus(target, 1) && irand(100) < 50) {
@@ -634,7 +633,7 @@ skip:
             }
         }
         if (weapon->special & 0x20) {
-            if ((damage -= attacker->unk27C) <= 0) {
+            if ((damage -= attacker->superguardedCount) <= 0) {
                 damage = 1;
             }
         }
@@ -1326,12 +1325,12 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
                 break;
             case 9:
                 eff = effVaporN64Entry(0, 0x3c, x, y, z, 1.0f);
-                *(s32*)((u8*)eff->userdata + 0x18) = 0xff;
-                *(s32*)((u8*)eff->userdata + 0x1c) = 0xff;
-                *(s32*)((u8*)eff->userdata + 0x20) = 0xff;
-                *(s32*)((u8*)eff->userdata + 0x28) = 0xff;
-                *(s32*)((u8*)eff->userdata + 0x2c) = 0xff;
-                *(s32*)((u8*)eff->userdata + 0x30) = 0xff;
+                ((EffVaporN64Work*)eff->userdata)->r1 = 0xff;
+                ((EffVaporN64Work*)eff->userdata)->g1 = 0xff;
+                ((EffVaporN64Work*)eff->userdata)->b1 = 0xff;
+                ((EffVaporN64Work*)eff->userdata)->r2 = 0xff;
+                ((EffVaporN64Work*)eff->userdata)->g2 = 0xff;
+                ((EffVaporN64Work*)eff->userdata)->b2 = 0xff;
                 break;
         }
     }
@@ -1572,7 +1571,7 @@ s32 BattlePreCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPar
     if (BtlUnit_CheckStatus(attacker, 3)) {
         n = n * 50 / 100;
     }
-    if (wp->unk182A0) {
+    if (wp->stageObjectWork.fogEffect) {
         n *= 0.5f;
     }
     if (irand(100) >= n) {
@@ -1639,12 +1638,12 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
     if (!(weapon->special & 0x20000) && BtlUnit_GetACPossibility(target) && BattleActionCommandGetDefenceResult() == 5) {
         BtlUnit_GetHitPos(target, part, &hit.x, &hit.y, &hit.z);
         eff = effNiceEntry(2, hit.x - 60.0f, 45.0f + hit.y, hit.z - 10.0f);
-        ((f32*)eff->userdata)[7] = 0.75f;
+        ((NiceEffectWork*)eff->userdata)->overallScale = 0.75f;
         flags |= 0x80000;
         psndSFXOn("SFX_SYSTEM_GREAT1");
         BattleAudience_Case_GuardGood();
-        attacker->unk27C++;
-        *((u8*)target + BUOFF(0x26F)) = attacker->unk27C;
+        attacker->superguardedCount++;
+        target->superguardCountTaken = attacker->superguardedCount;
         switch (*(u8*)&weapon->superguardsAllowed) {
             case 2:
                 result = flags | 0x2A;
@@ -1659,8 +1658,8 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
                 flags |= 0x100;
                 result = flags | 0x2A;
                 BattleDamageDirect(attacker->unitId, target, part, 0, 0, result, *(u8*)&weapon->damagePattern, 0);
-                if (*(void**)((u8*)attacker + BUOFF(0x2CC))) {
-                    BattleRunHitEventDirect(attacker, 0x137, *(void**)((u8*)attacker + BUOFF(0x2CC)));
+                if (attacker->hitEventCode) {
+                    BattleRunHitEventDirect(attacker, 0x137, attacker->hitEventCode);
                 } else {
                     BattleDamageDirect(-5, attacker, NULL, 1, 0, 0x137, 0, 1);
                 }
@@ -1694,7 +1693,7 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
             if (BattleActionCommandGetDefenceResult() > 3) {
                 BtlUnit_GetHitPos(target, part, &hit2.x, &hit2.y, &hit2.z);
                 eff = effNiceEntry(0, hit2.x - 60.0f, 45.0f + hit2.y, hit2.z - 10.0f);
-                ((f32*)eff->userdata)[7] = 0.75f;
+                ((NiceEffectWork*)eff->userdata)->overallScale = 0.75f;
                 flags |= 0x40000;
                 psndSFXOn("SFX_SYSTEM_NICE1");
                 BattleAudience_Case_GuardGood();
@@ -1780,7 +1779,7 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
             if (target->mAttributeFlags & 0x4000) {
                 pattern = 0;
             }
-            if (irand(100) >= *((u8*)target->mKindParams + 0x8C)) {
+            if (irand(100) >= target->mKindParams->hammerKnockbackChance) {
                 pattern = 0;
             }
             if (!(flags & 0x20000)) {
@@ -1794,8 +1793,8 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
         }
         break;
     }
-    attacker->unk27C++;
-    *((u8*)target + BUOFF(0x26F)) = attacker->unk27C;
+    attacker->superguardedCount++;
+    target->superguardCountTaken = attacker->superguardedCount;
     if (cw.msg) {
         if (cw.field_0x4) {
             cw.count += damage * 50 / 100;

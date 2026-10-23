@@ -123,7 +123,7 @@ USER_FUNC(johoya_keti_newjoho_makelabel) {
                 evtSetValue(event, args[1], (s32)wp->infoEnd);
                 evtSetValue(event, args[2], (s32)msg);
                 evtSetValue(event, args[3], strlen(msg));
-                evtSetValue(event, args[4], wp->info[i].unkA);
+                evtSetValue(event, args[4], wp->info[i].cost);
                 wp->curIndex = i;
                 return 2;
             }
@@ -297,7 +297,7 @@ s32 johoya_data_make(const char* prefix, s32 type) {
                     wp->info[infoId].labelId = (s16)labelId;
                     wp->info[infoId].initEndPos = initEndPos;
                     wp->info[infoId].tagEndPos = tagEndPos;
-                    wp->info[infoId].unkA = 5;
+                    wp->info[infoId].cost = 5;
                     wp->info[infoId].storyId = (s16)storyId;
                 }
                 infoId++;

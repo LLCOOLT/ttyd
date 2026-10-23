@@ -3,18 +3,26 @@
 #include "driver/camdrv.h"
 #include "memory.h"
 #include <dolphin/mtx.h>
+#include <dolphin/gx.h>
+
+typedef struct ImageRect {
+	u16 left; //0x0
+	u16 top; //0x2
+	u16 width; //0x4
+	u16 height; //0x6
+} ImageRect;
 
 typedef struct ImageShadow {
-	s32 flags; //0x0
-	u16 x; //0x4
-	u16 y; //0x6
-	u8 field_0x8[0x10 - 0x8]; //0x8
-	s32 field_0x10; //0x10
-	s32 field_0x14; //0x14
-	s32 field_0x18; //0x18
-	u8 field_0x1C[0x3C - 0x1C]; //0x1C
+	s32 flags;        //0x0
+	u16 x;            //0x4
+	u16 y;            //0x6
+	ImageRect rect;   //0x8, capture rectangle
+	s32 offscreenId;  //0x10, offscreen id, -1 = none
+	s32 copyFmt;      //0x14, capture copy format
+	s32 texFmt;       //0x18, texture format
+	GXTexObj texObj;  //0x1C
 	smartEntry* data; //0x3C
-	s32 field_0x40; //0x40, TODO: "hasData" or smth?
+	s32 allocMode;    //0x40, 1/2: smartAlloc heap for the captured copy
 } ImageShadow;
 
 typedef struct ImageEntry {
@@ -31,7 +39,7 @@ typedef struct ImageEntry {
 	s32 shadowId; //0x100
 	s32 poseId; //0x104
 	s32 animName; //0x108, const char* anim to play, 0 = none
-	u8 field_0x10C[0x110 - 0x10C]; //0x10C
+	u8 pad_10C[0x110 - 0x10C]; //0x10C, never accessed
 	OSTime animTime; //0x110, animTimeGetTime() at anim start
 	f32 loopTimes; //0x118, animPoseGetLoopTimes result
 	f32 offsetZ; //0x11C

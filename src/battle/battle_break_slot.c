@@ -20,37 +20,6 @@
 #include "battle/battle_weapon_power.h"
 #include "battle/battle_database_common.h"
 
-typedef struct BreakSlotReel {
-	s32 kind;        // 0x00
-	u32 flags;       // 0x04
-	s32 state;       // 0x08
-	s32 counter;     // 0x0C
-	s32 item;        // 0x10
-	s32* cards;      // 0x14
-	s32 numCards;    // 0x18
-	s32 index;       // 0x1C
-	Vec pos;         // 0x20
-	Vec rot;         // 0x2C
-	Vec scale;       // 0x38
-	Vec pivot;       // 0x44
-	f32 field_50;    // 0x50
-	f32 field_54;    // 0x54
-	u8 alpha;        // 0x58
-	u8 pad_59[3];    // 0x59
-} BreakSlotReel;
-
-typedef struct BreakSlotWork {
-	u32 flags;                // 0x000
-	s32 phase;                // 0x004
-	s32 field_8;              // 0x008
-	s32 reelNo;               // 0x00C
-	s32 breakTurn;            // 0x010
-	f32 field_14;             // 0x014
-	BreakSlotReel reels[3];   // 0x018
-	s32 field_12C;            // 0x12C
-	EventEntry* evt;           // 0x130
-} BreakSlotWork;
-
 typedef struct { s32 v[8]; } SlotCards8;
 typedef struct { s32 v[5]; } SlotCards5;
 
@@ -157,10 +126,10 @@ EVT_END()
 
 BattleWeapon weapon_doku_kinoko = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
-    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..reserved_1B
     weaponGetPowerHPHalf, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -169,7 +138,7 @@ BattleWeapon weapon_doku_kinoko = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20048, // special
     0x7FF, // counterResistFlags
@@ -179,17 +148,17 @@ BattleWeapon weapon_doku_kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon weapon_doku_kinoko_fp = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
-    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     weaponGetFPPowerFPHalf, // fpDamageFn
@@ -198,7 +167,7 @@ BattleWeapon weapon_doku_kinoko_fp = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20048, // special
     0x7FF, // counterResistFlags
@@ -208,9 +177,9 @@ BattleWeapon weapon_doku_kinoko_fp = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(doku_kinoko_effect)
@@ -277,7 +246,7 @@ EVT_END()
 
 #pragma dont_inline on
 BreakSlotWork* BattleBreakSlotGetPtr(void) {
-	return (BreakSlotWork*)&_battleWorkPointer->field_1616C;
+	return &_battleWorkPointer->breakSlot;
 }
 
 BreakSlotReel* BattleBreakSlotReelGetPtr(s32 no) {
@@ -320,13 +289,6 @@ void BattleBreakSlot_Init(void) {
 }
 
 s32 BattleAudienceAddAudienceNum(s32 num);
-#ifdef VERSION_G8ME01
-#define BS_WK_A 0x6F88
-#define BS_WK_B 0x6F74
-#else
-#define BS_WK_A 0x6F98
-#define BS_WK_B 0x6F84
-#endif
 void BattleAudienceAddTargetNum(f32 a, f32 b);
 void btl_camera_shake_h(s32 pri, f32 a, f32 b, s32 frames, s32 x);
 void btl_camera_noshake(s32 pri);
@@ -341,7 +303,7 @@ double sin(double);
 void BattleBreakSlot_Main(void) {
 	static f32 updown;
 	BattleWork* wp = _battleWorkPointer;
-	u8* wp2 = (u8*)wp + 0x20000;
+	BattleDebugCtrl* dbg2 = &wp->debug;
 	BattleAudience* aud = BattleAudienceBaseGetPtr();
 	BreakSlotWork* slot = BattleBreakSlotGetPtr();
 	BattleUnit* mario = BattleGetMarioPtr(wp);
@@ -367,12 +329,12 @@ void BattleBreakSlot_Main(void) {
 
 				if (BattleBreakSlotReelGetPtr(0)->item != BattleBreakSlotReelGetPtr(1)->item) {
 					slot->phase = 1;
-					slot->field_8 = 0;
+					slot->phaseTimer = 0;
 				}
 			}
 			break;
 		case 1:
-			if (slot->field_8 == 60) {
+			if (slot->phaseTimer == 60) {
 				reel = BattleBreakSlotReelGetPtr(0);
 				for (i = 2; i != 0; i--, reel++) {
 					reel->state = 3;
@@ -390,7 +352,7 @@ void BattleBreakSlot_Main(void) {
 				slot->phase = 8;
 				slot->reelNo = 0;
 			}
-			slot->field_8++;
+			slot->phaseTimer++;
 			break;
 		case 2:
 			count = 0;
@@ -402,14 +364,14 @@ void BattleBreakSlot_Main(void) {
 			}
 			if (count == 3) {
 				slot->phase = 3;
-				slot->field_8 = 0;
+				slot->phaseTimer = 0;
 				reel = BattleBreakSlotReelGetPtr(0);
 				for (i = 0; i < 3; i++, reel++) {
 					if (reel->state == 6) {
 						reel->state = 7;
 					}
 				}
-				slot->field_12C = SFX_ON("SFX_BTL_SLOT_START1");
+				slot->startSfxId = SFX_ON("SFX_BTL_SLOT_START1");
 			}
 			break;
 		case 3:
@@ -422,24 +384,24 @@ void BattleBreakSlot_Main(void) {
 			}
 			if (count == 3) {
 				slot->phase = 4;
-				slot->field_8 = 0;
-				psndSFXOff(slot->field_12C);
+				slot->phaseTimer = 0;
+				psndSFXOff(slot->startSfxId);
 			}
-			if ((keyGetButtonTrg(0) & 0x100) && slot->field_8 >= 15) {
+			if ((keyGetButtonTrg(0) & 0x100) && slot->phaseTimer >= 15) {
 				reel = BattleBreakSlotReelGetPtr(0);
 				for (i = 0; i < 3; i++, reel++) {
 					if (reel->state == 8) {
 						reel->state = 9;
-						reel->field_54 = -1.0f * (0.2f + 0.15f * rand() / 32767.0f);
-						reel->field_54 = -1.0f;
+						reel->spinAccel = -1.0f * (0.2f + 0.15f * rand() / 32767.0f);
+						reel->spinAccel = -1.0f;
 						break;
 					}
 				}
 			}
-			slot->field_8++;
+			slot->phaseTimer++;
 			break;
 		case 4:
-			if (slot->field_8 == 20) {
+			if (slot->phaseTimer == 20) {
 				count = 0;
 				reel = BattleBreakSlotReelGetPtr(0);
 				for (i = 0; i < 2; i++, reel++) {
@@ -465,7 +427,7 @@ void BattleBreakSlot_Main(void) {
 					}
 				}
 			}
-			slot->field_8++;
+			slot->phaseTimer++;
 			break;
 		case 5:
 			count = 0;
@@ -477,50 +439,50 @@ void BattleBreakSlot_Main(void) {
 			}
 			if (count == 3) {
 				slot->phase = 6;
-				slot->field_8 = 0;
+				slot->phaseTimer = 0;
 			}
 			break;
 		case 6:
-			if (slot->field_8 == 0) {
+			if (slot->phaseTimer == 0) {
 				if (BattleBreakSlotReelGetPtr(0)->item != 4) {
 					effBreakEntry(0, 240, 0.0f, 80.0f, 0.0f);
 				} else {
-					slot->field_8 = 101;
+					slot->phaseTimer = 101;
 					BattleAudienceSoundBooing();
 				}
 			}
-			if (slot->field_8 == 20 || slot->field_8 == 40 || slot->field_8 == 60 || slot->field_8 == 80 ||
-			    slot->field_8 == 100 || slot->field_8 == 120) {
+			if (slot->phaseTimer == 20 || slot->phaseTimer == 40 || slot->phaseTimer == 60 || slot->phaseTimer == 80 ||
+			    slot->phaseTimer == 100 || slot->phaseTimer == 120) {
 				SFX_ON("SFX_BTL_SYS_BREAK1");
 				btl_camera_shake_h(0, 5.0f, 0.0f, 10, 0);
 			}
-			if (slot->field_8 == 120) {
+			if (slot->phaseTimer == 120) {
 				BattleAudienceSoundCheer(240, 240);
 			}
-			if (slot->field_8 == 130) {
+			if (slot->phaseTimer == 130) {
 				switch (BattleBreakSlotReelGetPtr(0)->item) {
 					case 0:
 						evtEntry(kinoko_effect, 0, 0x20);
 						slot->breakTurn = 4;
-						slot->field_14 = 2.0f;
+						slot->spMultiplier = 2.0f;
 						break;
 					case 1:
 						evtEntry(flower_effect, 0, 0x20);
 						slot->breakTurn = 4;
-						slot->field_14 = 2.0f;
+						slot->spMultiplier = 2.0f;
 						break;
 					case 2:
 						evtEntry(star_effect, 0, 0x20);
 						pouchSetAP(pouchGetMaxAP());
 						SFX_ON("SFX_HP_RECOVER_BIG1");
 						slot->breakTurn = 4;
-						slot->field_14 = 2.0f;
+						slot->spMultiplier = 2.0f;
 						break;
 					case 3:
 						evtEntry(shine_effect, 0, 0x20);
 						pouchSetAP(pouchGetMaxAP());
 						slot->breakTurn = 6;
-						slot->field_14 = 3.0f;
+						slot->spMultiplier = 3.0f;
 						break;
 					case 4:
 						evtEntry(doku_kinoko_effect, 0, 0x20);
@@ -528,7 +490,7 @@ void BattleBreakSlot_Main(void) {
 						break;
 				}
 			}
-			if (slot->field_8 == 140) {
+			if (slot->phaseTimer == 140) {
 				switch (BattleBreakSlotReelGetPtr(0)->item) {
 					case 0:
 					case 1:
@@ -543,7 +505,7 @@ void BattleBreakSlot_Main(void) {
 					btl_camera_set_mode(0, 0);
 				}
 			}
-			if (slot->field_8 == 180) {
+			if (slot->phaseTimer == 180) {
 				updown = 0.0f;
 				switch (BattleBreakSlotReelGetPtr(0)->item) {
 					case 0:
@@ -562,17 +524,17 @@ void BattleBreakSlot_Main(void) {
 					updown = 0.0f;
 				}
 			}
-			if (slot->field_8 == 209 && updown != 0.0f) {
+			if (slot->phaseTimer == 209 && updown != 0.0f) {
 				BattleAudienceSoundRun(0);
 			}
-			if (slot->field_8 == 210) {
+			if (slot->phaseTimer == 210) {
 				if (!((u32)_battleWorkPointer->cameraWork.flags & 2)) {
 					btl_camera_shake_h(0, 2.0f, 2.0f, 1000, 0);
 				}
 				for (k = 0; k < 200; k++) {
 					if ((u8)BattleAudience_GetExist(k) == 1) {
 						if (BattleAudienceGetPtr(k)->status == 11 || BattleAudienceGetPtr(k)->status == 12) {
-							slot->field_8--;
+							slot->phaseTimer--;
 							break;
 						}
 					}
@@ -582,11 +544,11 @@ void BattleBreakSlot_Main(void) {
 					BattleAudienceSoundStop(13);
 				}
 			}
-			if (slot->field_8 == 220 && k == 200) {
+			if (slot->phaseTimer == 220 && k == 200) {
 				btl_camera_set_mode(0, 0);
 				btl_camera_noshake(0);
 			}
-			if (slot->field_8 == 270) {
+			if (slot->phaseTimer == 270) {
 				BattleAudienceAddTargetNum(0.0f, updown);
 				slot->phase = 8;
 				slot->flags &= ~4;
@@ -614,7 +576,7 @@ void BattleBreakSlot_Main(void) {
 					}
 				}
 			}
-			slot->field_8++;
+			slot->phaseTimer++;
 			break;
 		case 7:
 			count = 0;
@@ -725,8 +687,8 @@ void BattleBreakSlot_Main(void) {
 			case 6:
 				break;
 			case 7:
-				rr->field_50 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 22.5f, 0, rr->counter, 20);
-				rr->pos = (Vec){128.0f * i + -128.0f, rr->pos.y + rr->field_50, 0.0f};
+				rr->spinSpeed = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 22.5f, 0, rr->counter, 20);
+				rr->pos = (Vec){128.0f * i + -128.0f, rr->pos.y + rr->spinSpeed, 0.0f};
 				rr->scale = (Vec){1.0f, 1.0f, 1.0f};
 				rr->rot = (Vec){0.0f, 0.0f, 0.0f};
 				rr->pivot = (Vec){0.0f, 0.0f, 0.0f};
@@ -745,8 +707,8 @@ void BattleBreakSlot_Main(void) {
 				}
 				break;
 			case 8:
-				rr->field_50 = 22.5f;
-				rr->pos = (Vec){128.0f * i + -128.0f, rr->pos.y + rr->field_50, 0.0f};
+				rr->spinSpeed = 22.5f;
+				rr->pos = (Vec){128.0f * i + -128.0f, rr->pos.y + rr->spinSpeed, 0.0f};
 				rr->scale = (Vec){1.0f, 1.0f, 1.0f};
 				rr->rot = (Vec){0.0f, 0.0f, 0.0f};
 				if (rr->pos.y >= 128.0f) {
@@ -759,14 +721,14 @@ void BattleBreakSlot_Main(void) {
 				}
 				break;
 			case 9:
-				rr->field_50 += rr->field_54;
-				if (rr->field_50 < 20.0f) {
-					rr->field_50 = 20.0f;
+				rr->spinSpeed += rr->spinAccel;
+				if (rr->spinSpeed < 20.0f) {
+					rr->spinSpeed = 20.0f;
 				}
-				rr->pos = (Vec){128.0f * i + -128.0f, rr->pos.y + rr->field_50, 0.0f};
+				rr->pos = (Vec){128.0f * i + -128.0f, rr->pos.y + rr->spinSpeed, 0.0f};
 				rr->scale = (Vec){1.0f, 1.0f, 1.0f};
 				rr->rot = (Vec){0.0f, 0.0f, 0.0f};
-				if (rr->field_50 >= 0.0f && rr->pos.y >= 128.0f) {
+				if (rr->spinSpeed >= 0.0f && rr->pos.y >= 128.0f) {
 					rr->pos.y -= 128.0f;
 					rr->index++;
 					if (rr->index == rr->numCards) {
@@ -787,24 +749,24 @@ void BattleBreakSlot_Main(void) {
 					if ((slot->flags & 4) && rr->item != 3) {
 						break;
 					}
-					if ((*(u32*)(wp2 - BS_WK_A) & 0x80000) && rr->item != *(s32*)(wp2 - BS_WK_B)) {
+					if (((u32)dbg2->flags & 0x80000) && rr->item != dbg2->slotItem) {
 						break;
 					}
 					rr->pos.y = 0.0f;
 					rr->state = 10;
 					rr->counter = 0;
-					rr->field_54 = rr->field_50;
+					rr->spinAccel = rr->spinSpeed;
 				}
 				break;
 			case 10:
 				if (i == 2) {
 					rr->counter++;
-					rr->field_50 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(rr->field_50, 0.0f, 0, rr->counter, 20);
-					rr->pos.y = rr->field_50 * (f32)sin(3.141592f * (2.0f * rr->counter) / 8.0f);
+					rr->spinSpeed = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(rr->spinSpeed, 0.0f, 0, rr->counter, 20);
+					rr->pos.y = rr->spinSpeed * (f32)sin(3.141592f * (2.0f * rr->counter) / 8.0f);
 				}
 				break;
 			case 11:
-				rr->field_50 = 0.0f;
+				rr->spinSpeed = 0.0f;
 				rr->pos.y = 0.0f;
 				y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(1.0f, 2.0f, 0, rr->counter, 60);
 				rr->scale = (Vec){y, y, 1.0f};
@@ -816,7 +778,7 @@ void BattleBreakSlot_Main(void) {
 				}
 				break;
 			case 12:
-				rr->field_50 = 0.0f;
+				rr->spinSpeed = 0.0f;
 				rr->pos.y = 0.0f;
 				y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 128.0f, 0, rr->counter, 40);
 				rr->pos = (Vec){128.0f * i + -128.0f, y, 0.0f};
@@ -930,7 +892,7 @@ void BattleBreakSlot_End(void) {
 }
 
 void BattleBreakSlot_PointInc(void) {
-	u8* wp = (u8*)_battleWorkPointer + 0x20000;
+	BattleDebugCtrl* dbg = &_battleWorkPointer->debug;
 	BreakSlotReel* reel;
 	BreakSlotReel* reel2;
 	BreakSlotWork* slot = BattleBreakSlotGetPtr();
@@ -953,8 +915,8 @@ void BattleBreakSlot_PointInc(void) {
 				reel->index = reel->numCards - 1;
 			}
 			reel->item = reel->cards[reel->index];
-			if (*(u32*)(wp - BS_WK_A) & 0x80000) {
-				item_appear_force(reel, *(s32*)(wp - BS_WK_B));
+			if ((u32)dbg->flags & 0x80000) {
+				item_appear_force(reel, dbg->slotItem);
 			}
 			if (slot->flags & 1) {
 				item_appear_force(reel, 3);
@@ -969,8 +931,8 @@ void BattleBreakSlot_PointInc(void) {
 				reel->index = reel->numCards - 1;
 			}
 			reel->item = reel->cards[reel->index];
-			if (*(u32*)(wp - BS_WK_A) & 0x80000) {
-				item_appear_force(reel, *(s32*)(wp - BS_WK_B));
+			if ((u32)dbg->flags & 0x80000) {
+				item_appear_force(reel, dbg->slotItem);
 			}
 			if (slot->flags & 1) {
 				item_appear_force(reel, 3);

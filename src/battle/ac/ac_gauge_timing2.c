@@ -271,7 +271,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
         work->actionCommands.result = 0;
         work->actionCommands.outputParams[0] = 0;
       }
-      work->actionCommands.field_0x30 |= 1;
+      work->actionCommands.doneFlags |= 1;
       return 0;
     }
       break;
@@ -281,7 +281,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
 
     case 1003:
       work->actionCommands.outputParams[1] = 1;
-      work->actionCommands.field_0x30 |= 1;
+      work->actionCommands.doneFlags |= 1;
       gw->endTimer = 60;
       work->actionCommands.mAcState = 1004;
 
@@ -341,7 +341,7 @@ void battleAcDisp_GaugeTiming2(CameraId cameraId, BattleWork* work) {
 
 #pragma opt_propagation reset
 void battleAcDelete_GaugeTiming2(BattleWork* work) {
-    if (!(work->actionCommands.field_0x30 & 1)) {
+    if (!(work->actionCommands.doneFlags & 1)) {
         work->actionCommands.mAcState = 1003;
     }
 }

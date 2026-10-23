@@ -436,7 +436,8 @@ void badge_disp(BWin* w, f32 xo, f32 yo) {
     }
     GXSetScissor(0, 0x77, 0x260, 0xB8);
     p0 = w;
-    for (i = 0, rowOff = 0; i < cnt; p0 = (BWin*)((u8*)p0 + 12), rowOff += 23, i++) {
+    // FAKE: p0 is a BWin* stepped one BEnt at a time, so list[0] reads w->list[i] with the 0x404 kept in the load displacement (w->list[i] or a BEnt* walk: 99.95-99.96%, induction order / base differ)
+    for (i = 0, rowOff = 0; i < cnt; p0 = (BWin*)((BEnt*)p0 + 1), rowOff += 23, i++) {
         if (w->tab == 0) {
             badge = pouchHaveBadge(i);
         } else {

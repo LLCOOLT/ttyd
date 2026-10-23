@@ -321,7 +321,7 @@ void cardCopy2Main(s32 slot) {
 #ifdef VERSION_G8ME01
     language = gp->language;
 #endif
-    backup4 = gp->unk1274;
+    backup4 = gp->soundMode;
     backup5 = gp->rumbleEnabled;
     backup6 = gp->lastSlot;
     memcpy(gp, &save->data.global, sizeof(GlobalWork));
@@ -340,12 +340,12 @@ void cardCopy2Main(s32 slot) {
     gp->retraceTime = OSGetTime();
     strcpy(gp->currentAreaName, "123");
     gp->relocationBase = NULL;
-    gp->unk1274 = backup4;
+    gp->soundMode = backup4;
     gp->rumbleEnabled = backup5;
     gp->lastSlot = backup6;
     gp->mapAlloc = backup2;
-    gp->unk8 = 0;
-    gp->field_C = 0;
+    gp->debugFlag = 0;
+    gp->debugBattle = 0;
     if (backup3 != 0) {
         gp->flags |= 8;
     }
@@ -521,23 +521,23 @@ void write_main(void) {
                 break;
             case 10:
                 if (wp->validSave1 && !wp->validSave2) {
-                    wp->unkBC = 1;
-                    wp->unkC0 = 0;
+                    wp->writeFirst = 1;
+                    wp->writeSecond = 0;
                 } else {
-                    wp->unkBC = 0;
-                    wp->unkC0 = 1;
+                    wp->writeFirst = 0;
+                    wp->writeSecond = 1;
                 }
                 if (wp->flags & 0x800) {
-                    memcard_write(wp->writeBuf, sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->unkBC * (sizeof(CardSaveSlot) * 4))));
+                    memcard_write(wp->writeBuf, sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->writeFirst * (sizeof(CardSaveSlot) * 4))));
                 } else {
-                    memcard_write(&wp->data->saves[wp->currSlot], sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->unkBC * (sizeof(CardSaveSlot) * 4))));
+                    memcard_write(&wp->data->saves[wp->currSlot], sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->writeFirst * (sizeof(CardSaveSlot) * 4))));
                 }
                 break;
             case 11:
                 if (wp->flags & 0x800) {
-                    memcard_write(wp->writeBuf, sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->unkC0 * (sizeof(CardSaveSlot) * 4))));
+                    memcard_write(wp->writeBuf, sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->writeSecond * (sizeof(CardSaveSlot) * 4))));
                 } else {
-                    memcard_write(&wp->data->saves[wp->currSlot], sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->unkC0 * (sizeof(CardSaveSlot) * 4))));
+                    memcard_write(&wp->data->saves[wp->currSlot], sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->writeSecond * (sizeof(CardSaveSlot) * 4))));
                 }
                 break;
             case 12:
@@ -766,9 +766,9 @@ void read_all_main(void) {
                     make_header();
                     wp->flags |= 0x400;
                 }
-                gp->unk1274 = wp->data->metadata.data.unk1E42;
-                gp->rumbleEnabled = wp->data->metadata.data.unk1E40;
-                gp->lastSlot = wp->data->metadata.data.unk1E44;
+                gp->soundMode = wp->data->metadata.data.soundMode;
+                gp->rumbleEnabled = wp->data->metadata.data.rumbleEnabled;
+                gp->lastSlot = wp->data->metadata.data.lastSlot;
                 break;
             case 6:
                 memcard_read(wp->readBuf, 0x4000, (wp->opSlot << 0xE) + 0x2000);
@@ -1120,9 +1120,9 @@ static inline void make_header(void) {
 	memcpy(metadata->data.bannerTex, _mariost_banner_tex, sizeof(metadata->data.bannerTex));
 	memcpy(metadata->data.iconTex, _mariost_icon_tex, sizeof(metadata->data.iconTex));
 	memcpy(metadata->data.iconTlut, _mariost_icon_tlut, sizeof(metadata->data.iconTlut));
-	metadata->data.unk1E40 = (gp->rumbleEnabled != 0);
-	metadata->data.unk1E42 = (u16)gp->unk1274;
-	metadata->data.unk1E44 = (u16)gp->lastSlot;
+	metadata->data.rumbleEnabled = (gp->rumbleEnabled != 0);
+	metadata->data.soundMode = (u16)gp->soundMode;
+	metadata->data.lastSlot = (u16)gp->lastSlot;
 	metadata->checksum1 = (checksum = 0u);
 	metadata->checksum2 = ~0u;
 

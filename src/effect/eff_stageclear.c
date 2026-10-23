@@ -28,7 +28,6 @@ typedef struct StageClearWork {
     s32 done;     // 0x28
 } StageClearWork;
 
-#define EV_W(e, off) (*(s32*)((u8*)(e) + (off)))
 
 void effStageClearMain(EffectEntry* effect);
 void effStageClearDisp(CameraId cameraId, EffectEntry* effect);
@@ -216,8 +215,8 @@ void effStageClearMain(EffectEntry* effect) {
                     if (i == effect->count - 1) {
                         d = shake_dt2;
                     }
-                    EV_W(p->shake, 0x9C) = (s32)d;
-                    EV_W(p->shake, 0xA0) = (effect->count - 1 - i) == 0;
+                    ((EventEntry*)p->shake)->lwData[0] = (s32)d;
+                    ((EventEntry*)p->shake)->lwData[1] = (effect->count - 1 - i) == 0;
                 }
                 n++;
             }

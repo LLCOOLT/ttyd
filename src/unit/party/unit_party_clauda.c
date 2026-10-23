@@ -62,7 +62,7 @@ USER_FUNC(_make_breath_weapon);
 static USER_FUNC(_clauda_breath_effect_fire);
 static USER_FUNC(_clauda_breath_effect_ready);
 USER_FUNC(_check_blow_rate);
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
+static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
 __declspec(section ".data") f32 unit_party_clauda_negone_one_a[2] __attribute__((aligned(8)));
 __declspec(section ".data") f32 fd_clauda_negone_one_374[2] __attribute__((aligned(8)));
@@ -130,16 +130,16 @@ BattleWeapon partyWeapon_ClaudaNormalAttack = {
 #else
     336, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pwd_body_press", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -149,7 +149,7 @@ BattleWeapon partyWeapon_ClaudaNormalAttack = {
     0, // element
     10, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_body_press", // acHelpMsg
     0x35087, // special
     0xC, // counterResistFlags
@@ -160,9 +160,9 @@ BattleWeapon partyWeapon_ClaudaNormalAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyClaudaAttack_NormalAttack, // mAttackEvtScript
-    {0, 20, 20, 100, 20, 10, 2, 5, 10, 0, 0, 0}, // field_B4
+    {0, 20, 20, 100, 20, 10, 2, 5, 10, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_ClaudaBreathAttack = {
@@ -172,17 +172,17 @@ BattleWeapon partyWeapon_ClaudaBreathAttack = {
 #else
     337, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pwd_breath", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {1, 2, 2, 3, 3, 4, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -192,7 +192,7 @@ BattleWeapon partyWeapon_ClaudaBreathAttack = {
     0, // element
     25, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_breath", // acHelpMsg
     0x20287, // special
     0x7FF, // counterResistFlags
@@ -204,12 +204,12 @@ BattleWeapon partyWeapon_ClaudaBreathAttack = {
     0, 0, 0, 0, 0, // fastChance..frightChance
     100, // galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyClaudaAttack_BreathAttack, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -220,21 +220,21 @@ BattleWeapon partyWeapon_ClaudaPredationAttack = {
 #else
     338, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pwd_sexy_kiss", // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
 #ifdef VERSION_G8ME01
     1, // mStylishCommandMultiplier
 #else
     2, // mStylishCommandMultiplier
 #endif
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetACOutputParam, // hpDamageFn
     {0, 1, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -243,7 +243,7 @@ BattleWeapon partyWeapon_ClaudaPredationAttack = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_sexy_kiss", // acHelpMsg
     0x200C7, // special
     2, // counterResistFlags
@@ -254,9 +254,9 @@ BattleWeapon partyWeapon_ClaudaPredationAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyClaudaAttack_PredationAttack, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_ClaudaKumogakureAttack = {
@@ -266,17 +266,17 @@ BattleWeapon partyWeapon_ClaudaKumogakureAttack = {
 #else
     339, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pwd_kumogakure", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -285,7 +285,7 @@ BattleWeapon partyWeapon_ClaudaKumogakureAttack = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_kumogakure", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -298,9 +298,9 @@ BattleWeapon partyWeapon_ClaudaKumogakureAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyClaudaAttack_KumoGuard, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 PoseTableEntry pose_table_clauda_stay[] = {
@@ -1337,44 +1337,44 @@ USER_FUNC(_clauda_make_extra_work_area) {
     return EVT_RETURN_DONE;
 }
 
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count) {
+static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
     techLv = partyGetTechLv(BattleTransPartyId(BattleGetPartyPtr(_battleWorkPointer)->currentKind));
 
-    command->mWeaponTable[*count].mIndex = -1;
-    command->mWeaponTable[*count].mItem = 0;
-    command->mWeaponTable[*count].mWeaponParams = &partyWeapon_ClaudaNormalAttack;
-    command->mWeaponTable[*count].field_0x4 = 0;
-    command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-    command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+    command->weapon[*count].index = -1;
+    command->weapon[*count].itemId = 0;
+    command->weapon[*count].weapon = &partyWeapon_ClaudaNormalAttack;
+    command->weapon[*count].enabled = 0;
+    command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+    command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
     (*count)++;
 
     if (techLv >= 0) {
-        command->mWeaponTable[*count].mIndex = -1;
-        command->mWeaponTable[*count].mItem = 0;
-        command->mWeaponTable[*count].mWeaponParams = &partyWeapon_ClaudaBreathAttack;
-        command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-        command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+        command->weapon[*count].index = -1;
+        command->weapon[*count].itemId = 0;
+        command->weapon[*count].weapon = &partyWeapon_ClaudaBreathAttack;
+        command->weapon[*count].enabled = 0;
+        command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+        command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
         (*count)++;
     }
     if (techLv >= 1) {
-        command->mWeaponTable[*count].mIndex = -1;
-        command->mWeaponTable[*count].mItem = 0;
-        command->mWeaponTable[*count].mWeaponParams = &partyWeapon_ClaudaPredationAttack;
-        command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-        command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+        command->weapon[*count].index = -1;
+        command->weapon[*count].itemId = 0;
+        command->weapon[*count].weapon = &partyWeapon_ClaudaPredationAttack;
+        command->weapon[*count].enabled = 0;
+        command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+        command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
         (*count)++;
     }
     if (techLv >= 2) {
-        command->mWeaponTable[*count].mIndex = -1;
-        command->mWeaponTable[*count].mItem = 0;
-        command->mWeaponTable[*count].mWeaponParams = &partyWeapon_ClaudaKumogakureAttack;
-        command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-        command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+        command->weapon[*count].index = -1;
+        command->weapon[*count].itemId = 0;
+        command->weapon[*count].weapon = &partyWeapon_ClaudaKumogakureAttack;
+        command->weapon[*count].enabled = 0;
+        command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+        command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
         (*count)++;
     }
 }

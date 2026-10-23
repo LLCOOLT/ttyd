@@ -1,3 +1,4 @@
+#include "eff/eff_gonbaba_breath.h"
 #include "mario/mario.h"
 #include "koopa.h"
 #include "mario/mariost.h"
@@ -54,8 +55,6 @@ s32 hitGetAttr(void* hit);
 s32 marioKeyOffChk(void);
 s32 marioCtrlOffChk(void);
 
-#define MU32(m, off) (*(u32*)((u8*)(m) + (off)))
-#define MF(m, off) (*(f32*)((u8*)(m) + (off)))
 #define KPW(m) ((m)->kpaWork)
 
 f32 kpaWidthDat[4] = {20.0f, 60.0f, 84.0f, 186.0f};
@@ -63,11 +62,10 @@ f32 baseScaleTbl[4] = {0.3f, 1.0f, 1.4f, 3.1f};
 s32 kpaPauseSeTable[28] = {0x10C, 0x10D, 0x10E, 0x10F, 0x111, 0x112, 0x113, 0x114, 0x116, 0x117,
                            0x118, 0x119, 0x11B, 0x11E, 0x11F, 0x120, 0x122, 0x123, 0x124, 0x125,
                            0x127, 0x128, 0x129, 0x12A, 0x12C, 0x12D, 0x12E, 0x12F};
-static u8* fireefp;
+static EffectEntry* fireefp;
 static u8* fireefp_pad;
 s32 kpaGetLevel(void);
 f32 kpaGetBaseScale(s32 lv);
-u8* effGonbabaBreathEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scale);
 
 static inline void kpaFireEntry2(Vec pos) {
     MarioWork* mp = marioGetPtr();
@@ -81,7 +79,7 @@ static inline void kpaFireEntry2(Vec pos) {
         f32 z;
         f32 sz;
         s32 type;
-        u8* child;
+        EffectEntry* child;
         s32 t;
         dir = (mp->displayDirection >= 90.0f && mp->displayDirection <= 270.0f) ? 1.0f : -1.0f;
         scale = kpaGetBaseScale(kpaGetLevel());
@@ -111,15 +109,15 @@ static inline void kpaFireEntry2(Vec pos) {
         if (mp->displayDirectionTarget >= 90.0f && mp->displayDirectionTarget <= 270.0f) {
             flag = 1;
         }
-        MF(*(u8**)(fireefp + 0xC), 0x48) = (f32)(flag ? 180 : 0);
-        child = *(u8**)(*(u8**)(fireefp + 0xC) + 0x4C);
+        ((EffGonbabaBreathWork*)fireefp->userdata)->yaw = (f32)(flag ? 180 : 0);
+        child = ((EffGonbabaBreathWork*)fireefp->userdata)->child;
         if (child) {
             flag = 0;
             if (mp->displayDirectionTarget >= 90.0f && mp->displayDirectionTarget <= 270.0f) {
                 flag = 1;
             }
             ang = flag ? 180 : 0;
-            MF(*(u8**)(child + 0xC), 0x48) = (f32)ang;
+            ((EffGonbabaBreathWork*)child->userdata)->yaw = (f32)ang;
         }
     }
 }
@@ -146,7 +144,7 @@ static inline void kpaFireSEOff(void) {
 }
 
 
-u8* getKoopaFireEfp(void) {
+EffectEntry* getKoopaFireEfp(void) {
     return fireefp;
 }
 
@@ -213,7 +211,7 @@ s32 kpaGetBodyStatus(void) {
         return -1;
     }
     st = 0;
-    if (strcmp((char*)gp + 0x12C, "kpa_03") == 0) {
+    if (strcmp(gp->currentMapName, "kpa_03") == 0) {
         if (mp->position.y > 370.0f) {
             return 0;
         }
@@ -230,7 +228,7 @@ s32 kpaGetStageType(void) {
     return (marioGetPtr()->stageFlags >> 1) & 1;
 }
 
-#define JP(m, i) (*(f32*)((u8*)(m) + 0x7C + (i) * 4))
+#define JP(m, i) ((&(m)->jumpVelocityY)[i]) // jumpVelocityY..jumpSnapY as f32[4]
 #define SETP(m, a, b, c, d)     do { JP(m, 0) = (a); JP(m, 1) = (b); JP(m, 2) = (c); JP(m, 3) = (d); } while (0)
 
 s32 kpaGetStageViewType(void) {
@@ -263,15 +261,15 @@ void kpaPreInit(void) {
     new_var = &KPW(marioGetPtr())->fireSfxId; // FAKE: address temp; direct store differs
     *new_var = -1;
     mp = marioGetPtr();
-    if (strcmp((char*)gp + 0x12C, "kpa_02") == 0 || strcmp((char*)gp + 0x12C, "kpa_03") == 0 ||
-        strcmp((char*)gp + 0x12C, "kpa_04") == 0 || strcmp((char*)gp + 0x12C, "kpa_05") == 0 ||
-        strcmp((char*)gp + 0x12C, "kpa_06\0") == 0) {
+    if (strcmp(gp->currentMapName, "kpa_02") == 0 || strcmp(gp->currentMapName, "kpa_03") == 0 ||
+        strcmp(gp->currentMapName, "kpa_04") == 0 || strcmp(gp->currentMapName, "kpa_05") == 0 ||
+        strcmp(gp->currentMapName, "kpa_06\0") == 0) {
         mp->stageFlags |= 1;
     } else {
         mp->stageFlags &= ~1;
     }
     mp = marioGetPtr();
-    if (strcmp((char*)gp + 0x12C, "kpa_03") == 0) {
+    if (strcmp(gp->currentMapName, "kpa_03") == 0) {
         mp->stageFlags |= 2;
     } else {
         mp->stageFlags &= ~2;
@@ -320,9 +318,9 @@ void kpa2DMain(void) {
     }
     if (mp->currMotionId == 8) {
         mp->basePos = mp->position;
-        mp->unk174.x = 0.0f;
-        mp->unk174.y = 0.0f;
-        mp->unk174.z = 0.0f;
+        mp->floorMove.x = 0.0f;
+        mp->floorMove.y = 0.0f;
+        mp->floorMove.z = 0.0f;
         marioBottomless();
         marioPreDisp();
         mario_kemuri_80130474();
@@ -352,7 +350,7 @@ void kpa2DMain(void) {
         }
         marioCheckWall(spd, ang);
     }
-    mp->position.y += mp->unk174.y;
+    mp->position.y += mp->floorMove.y;
     PSVECSubtract(&mp->position, &saved, &diff);
     {
         f32 mag = PSVECMag(&diff);
@@ -385,9 +383,9 @@ void kpa2DMain(void) {
     marioCamMain();
     mp->frameCounter++;
     mp->basePos = mp->position;
-    mp->unk174.x = 0.0f;
-    mp->unk174.y = 0.0f;
-    mp->unk174.z = 0.0f;
+    mp->floorMove.x = 0.0f;
+    mp->floorMove.y = 0.0f;
+    mp->floorMove.z = 0.0f;
 }
 
 void kpa3DMain(void) {
@@ -426,9 +424,9 @@ void kpa3DMain(void) {
     }
     if (mp->currMotionId == 8) {
         mp->basePos = mp->position;
-        mp->unk174.x = 0.0f;
-        mp->unk174.y = 0.0f;
-        mp->unk174.z = 0.0f;
+        mp->floorMove.x = 0.0f;
+        mp->floorMove.y = 0.0f;
+        mp->floorMove.z = 0.0f;
         marioBottomless();
         marioPreDisp();
         marioBalloonMain();
@@ -475,9 +473,9 @@ void kpa3DMain(void) {
     marioCamMain();
     mp->frameCounter++;
     mp->basePos = mp->position;
-    mp->unk174.x = 0.0f;
-    mp->unk174.y = 0.0f;
-    mp->unk174.z = 0.0f;
+    mp->floorMove.x = 0.0f;
+    mp->floorMove.y = 0.0f;
+    mp->floorMove.z = 0.0f;
 }
 
 #define SETPV(m, v, a, b, c, d) do { JP(m, v) = (a); JP(m, 1) = (b); JP(m, 2) = (c); JP(m, 3) = (d); } while (v)
@@ -553,7 +551,7 @@ void kpaFall(void) {
     MarioWork* mp = marioGetPtr();
     f32 fs;
     f32 ly;
-    if (strcmp((char*)gp + 0x12C, "kpa_03") == 0) {
+    if (strcmp(gp->currentMapName, "kpa_03") == 0) {
         void* h;
         mp->hitobjStandOn = NULL;
         kpaClearHitobjRide();
@@ -840,8 +838,8 @@ void kpaFireMain(void) {
     Vec zero;
     s32 flag;
     s32 lv;
-    u8* fe;
-    u8* w;
+    EffectEntry* fe;
+    EffGonbabaBreathWork* w;
     s32 i;
     f32 f31;
     f32 f30;
@@ -860,40 +858,40 @@ void kpaFireMain(void) {
         t = (marioGetPtr()->stageFlags & 1) ^ 1;
         y = mp->position.y + (20.0f * scale + (t == 1 ? 6.0f : 0.0f));
         z = mp->position.z;
-                MF(*(u8**)(fireefp + 0xC), 4) = f30;
-        MF(*(u8**)(fireefp + 0xC), 8) = y;
-        MF(*(u8**)(fireefp + 0xC), 0xC) = z;
+                ((EffGonbabaBreathWork*)fireefp->userdata)->position.x = f30;
+        ((EffGonbabaBreathWork*)fireefp->userdata)->position.y = y;
+        ((EffGonbabaBreathWork*)fireefp->userdata)->position.z = z;
         {
-            u8* w2 = *(u8**)(*(u8**)(fireefp + 0xC) + 0x4C);
+            EffectEntry* w2 = ((EffGonbabaBreathWork*)fireefp->userdata)->child;
             if (w2) {
-                MF(*(u8**)(w2 + 0xC), 4) = f30;
-                MF(*(u8**)(*(u8**)(*(u8**)(fireefp + 0xC) + 0x4C) + 0xC), 8) = y;
-                MF(*(u8**)(*(u8**)(*(u8**)(fireefp + 0xC) + 0x4C) + 0xC), 0xC) = z;
+                ((EffGonbabaBreathWork*)w2->userdata)->position.x = f30;
+                ((EffGonbabaBreathWork*)((EffGonbabaBreathWork*)fireefp->userdata)->child->userdata)->position.y = y;
+                ((EffGonbabaBreathWork*)((EffGonbabaBreathWork*)fireefp->userdata)->child->userdata)->position.z = z;
             }
         }
         lv = kpaGetLevel();
         if (lv != 0) {
             fe = fireefp;
             camGetPtr(4);
-            w = *(u8**)(fe + 0xC);
-            f29 = MF(w, 0x40);
-            PSMTXTrans(m80, MF(w, 4), MF(w, 8), MF(w, 0xC));
-            PSMTXRotRad(m50, 'y', 0.017453292f * (MF(w, 0x48) - camGetPtr(4)->viewYaw));
-            if (MF(w, 0x48) > 90.0f && MF(w, 0x48) < 270.0f) {
-                PSMTXScale(mb0, MF(w, 0x40), MF(w, 0x40), -MF(w, 0x40));
+            w = (EffGonbabaBreathWork*)fe->userdata;
+            f29 = w->scale;
+            PSMTXTrans(m80, w->position.x, w->position.y, w->position.z);
+            PSMTXRotRad(m50, 'y', 0.017453292f * (w->yaw - camGetPtr(4)->viewYaw));
+            if (w->yaw > 90.0f && w->yaw < 270.0f) {
+                PSMTXScale(mb0, w->scale, w->scale, -w->scale);
             } else {
-                PSMTXScale(mb0, MF(w, 0x40), MF(w, 0x40), MF(w, 0x40));
+                PSMTXScale(mb0, w->scale, w->scale, w->scale);
             }
             PSMTXConcat(m80, m50, m80);
             PSMTXConcat(m80, mb0, m20);
-            w = w + 0x50;
-            for (i = 1; i < *(s32*)(fe + 8); i++, w += 0x50) {
-                if (((i - 1) & 3) == 0 && *(s32*)(w + 0x44) == 0 && *(s32*)(w + 0x1C) > 0x10) {
+            w = w + 1;
+            for (i = 1; i < fe->count; i++, w++) {
+                if (((i - 1) & 3) == 0 && w->delay == 0 && w->life > 0x10) {
                     void* hit;
-                    f31 = 7.0f * MF(w, 0x40);
+                    f31 = 7.0f * w->scale;
                     f30 = f31 * f29;
                     if (!(f30 < 7.0f)) {
-                        PSMTXTrans(m80, MF(w, 4), MF(w, 8), MF(w, 0xC));
+                        PSMTXTrans(m80, w->position.x, w->position.y, w->position.z);
                         PSMTXScale(mb0, f31, f31, f31);
                         PSMTXConcat(m80, mb0, m80);
                         PSMTXConcat(m20, m80, m80);

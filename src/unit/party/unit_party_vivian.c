@@ -89,7 +89,7 @@ USER_FUNC(_disp_heart_entry);
 USER_FUNC(_make_kagenuke_weapon);
 USER_FUNC(_get_vivian_attack_position);
 USER_FUNC(_get_move_frame);
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
+static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 USER_FUNC(battle_evt_majo_disp_off);
 
 __declspec(section ".data") f32 unit_party_vivian_negone_one_a[2] __attribute__((aligned(8)));
@@ -481,16 +481,16 @@ BattleWeapon partyWeapon_VivianNormalAttack = {
 #else
     336, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_ptr_kagenuke", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {3, 3, 4, 4, 5, 5, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -499,7 +499,7 @@ BattleWeapon partyWeapon_VivianNormalAttack = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_kagenuke", // acHelpMsg
     0x30007, // special
     2, // counterResistFlags
@@ -512,12 +512,12 @@ BattleWeapon partyWeapon_VivianNormalAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyVivianAttack_NormalAttack, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 4, 2, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 4, 2, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 2, 2, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 2, 2, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -528,21 +528,21 @@ BattleWeapon partyWeapon_VivianShadowGuard = {
 #else
     337, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_ptr_kagegakure", // description
     100, // baseAccuracy
     1, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
 #ifdef VERSION_G8ME01
     1, // mStylishCommandMultiplier
 #else
     2, // mStylishCommandMultiplier
 #endif
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0, 2, 2, 3, 3, 4, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -551,7 +551,7 @@ BattleWeapon partyWeapon_VivianShadowGuard = {
     0x10000002, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_kagegakure", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -562,9 +562,9 @@ BattleWeapon partyWeapon_VivianShadowGuard = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyVivianAttack_ShadowGuard, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_VivianMagicalPowder = {
@@ -574,17 +574,17 @@ BattleWeapon partyWeapon_VivianMagicalPowder = {
 #else
     338, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_ptr_mahou_no_kona", // description
     100, // baseAccuracy
     6, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetACOutputParam, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -594,7 +594,7 @@ BattleWeapon partyWeapon_VivianMagicalPowder = {
     1, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_mahou_no_kona", // acHelpMsg
     0x20047, // special
     0x7FF, // counterResistFlags
@@ -607,12 +607,12 @@ BattleWeapon partyWeapon_VivianMagicalPowder = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyVivianAttack_MagicalPowder, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -623,21 +623,21 @@ BattleWeapon partyWeapon_VivianCharmKissAttack = {
 #else
     339, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_ptr_meromero_kiss", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
 #ifdef VERSION_G8ME01
     1, // mStylishCommandMultiplier
 #else
     2, // mStylishCommandMultiplier
 #endif
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -646,7 +646,7 @@ BattleWeapon partyWeapon_VivianCharmKissAttack = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_meromero_kiss", // acHelpMsg
     0x20000, // special
     0x7FF, // counterResistFlags
@@ -660,12 +660,12 @@ BattleWeapon partyWeapon_VivianCharmKissAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyVivianAttack_CharmKissAttack, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -1731,18 +1731,18 @@ USER_FUNC(_vivian_make_extra_work_area) {
     return EVT_RETURN_DONE;
 }
 
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count) {
+static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
     techLv = partyGetTechLv(BattleTransPartyId(BattleGetPartyPtr(_battleWorkPointer)->currentKind));
 
 #define ADD_W(w)                                                                                   \
-    command->mWeaponTable[*count].mIndex = -1;                                                     \
-    command->mWeaponTable[*count].mItem = 0;                                                       \
-    command->mWeaponTable[*count].mWeaponParams = (BattleWeapon*)(w);                              \
-    command->mWeaponTable[*count].field_0x4 = 0;                                                   \
-    command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;       \
-    command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name); \
+    command->weapon[*count].index = -1;                                                     \
+    command->weapon[*count].itemId = 0;                                                       \
+    command->weapon[*count].weapon = (BattleWeapon*)(w);                              \
+    command->weapon[*count].enabled = 0;                                                   \
+    command->weapon[*count].icon = command->weapon[*count].weapon->icon;       \
+    command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name); \
     (*count)++;
     ADD_W(&partyWeapon_VivianNormalAttack)
     if (techLv >= 0) {
@@ -1804,8 +1804,8 @@ USER_FUNC(_get_vivian_attack_position) {
     self = BattleGetUnitPtr(wp, BattleTransID(event, -2));
     target = BattleGetUnitPtr(wp, BattleTransID(event, targetId));
     BtlUnit_GetScale(target, &sx, &sy, &sz);
-    ix = (s32)((f32)target->faceDirection * (target->mKindParams->field_0x54 * sx));
-    iy = (s32)(target->mKindParams->field_0x58 * sz);
+    ix = (s32)((f32)target->faceDirection * (target->mKindParams->vivianOffsetX * sx));
+    iy = (s32)(target->mKindParams->vivianOffsetZ * sz);
     {
         x += -30.0f * self->mSizeMultiplier * (f32)self->faceDirection + ix;
         z = z + iy;
@@ -1909,7 +1909,7 @@ USER_FUNC(_disp_heart_entry_stop) {
 }
 
 USER_FUNC(_disp_heart_entry_stop_check) {
-    evtSetValue(event, *event->args, *(s32*)((u8*)event + 0x8c));
+    evtSetValue(event, *event->args, ((HeartWork*)event)->stop);
     return EVT_RETURN_DONE;
 }
 

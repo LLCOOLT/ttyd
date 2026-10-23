@@ -83,30 +83,7 @@ BOOL mapClipOffFlag;
 s32 activeGroup;
 MapWork* mapWork; //allocates two entries
 
-typedef struct MapAnimHeader {
-	const char* name; // 0x0
-	u8 field_0x4[0x8 - 0x4]; // 0x4
-	f32 length; // 0x8
-} MapAnimHeader;
-
-typedef struct MapAnim {
-	u16 flags; // 0x0
-	u8 field_0x2[0x8 - 0x2]; // 0x2
-	OSTime startTime; // 0x8
-	f32 time; // 0x10
-	f32 rate; // 0x14
-	MapAnimHeader* anim; // 0x18
-	u8 field_0x1C[0x20 - 0x1C]; // 0x1C
-} MapAnim;
-
-#define MAPENT_FIELD(entry, type, off) (*(type*)((u8*)(entry) + (off)))
-
-typedef struct MapJointDrawModeEx {
-	u8 field_0x0[0x2 - 0x0]; // 0x0
-	u8 flags;                 // 0x2
-	u8 field_0x3;             // 0x3
-	u32 lightMask;            // 0x4
-} MapJointDrawModeEx;
+typedef MapEntryAnimData MapAnim;
 
 LightEntry* lightGetPaper(void);
 LightEntry* lightGetPaperCraft(void);
@@ -137,8 +114,8 @@ void mapErrorEntry(s32 arg0, const char* arg1) { //1:1
 	MapError* error = error_data;
 
 	error += error_count;
-	error->field_0x20 = arg0;
-	strncpy(error->field_0x0, arg1, sizeof(error->field_0x0) - 1);
+	error->type = arg0;
+	strncpy(error->name, arg1, sizeof(error->name) - 1);
 	error_flag = TRUE;
 	error_count++;
 	error_count %= 32;
@@ -223,30 +200,6 @@ void mapInit(void) {
 	mapClipOffFlag = FALSE;
 }
 
-typedef struct MapTexInfo {
-	char* name;   // 0x0
-	u8 format;    // 0x4
-	u8 pad5[3];
-	u16 width;    // 0x8
-	u16 height;   // 0xA
-	void* data;   // 0xC
-} MapTexInfo;
-
-typedef struct MapTexSampler {
-	MapTexInfo* tex; // 0x0
-} MapTexSampler;
-
-typedef struct MapTexMaterial {
-	u8 pad0[0xB];
-	u8 samplerCount;          // 0xB
-	MapTexSampler* samplers[]; // 0xC
-} MapTexMaterial;
-
-typedef struct MapTexTable {
-	s32 count;
-	char* names[];
-} MapTexTable;
-
 static inline s32 mapSearchTexName(MapTexTable* table, char* name) {
 	s32 i;
 
@@ -263,8 +216,8 @@ void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table) {
 	int j;
 	int k;
 	int idx;
-	MapTexMaterial* mat;
-	MapTexSampler* sampler;
+	MapMaterial* mat;
+	MapMatSampler* sampler;
 	TEXDescriptor* desc;
 
 	for (i = 0; i < obj->joints->partCount; i++) {
@@ -330,29 +283,29 @@ MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
 	PSMTXConcat(trans, rotX, trans);
 	PSMTXConcat(trans, scale, obj->localMtx);
 	PSMTXConcat(mtx, obj->localMtx, obj->modelWorldMtx);
-	PSMTXIdentity(obj->unkAC);
+	PSMTXIdentity(obj->transformMtx);
 	obj->flags |= 0x200;
-	obj->unk5 = 4;
+	obj->cameraId = 4;
 	obj->offscreenId = -1;
 	obj->parent = parent;
 	obj->next = NULL;
 	obj->child = NULL;
 	if (joint->drawMode) {
-		if (((u8*)joint->drawMode)[2] & 1) {
+		if (joint->drawMode->modeFlags & 1) {
 			obj->flags |= 8;
 		}
-		switch (joint->drawMode->unk0[0]) {
+		switch (joint->drawMode->blendType) {
 			case 0: {
 				MapFileJoint* j = obj->joints;
 				s32 k, n2 = 0, n1 = 0;
 				for (i = 0; i < obj->joints->partCount; i++) {
-					u8 t = *((u8*)obj->joints->parts[i].material + 0xa);
+					u8 t = obj->joints->parts[i].material->blendMode;
 					if (t == 2) { n2++; if (!obj) { } }
 					else if (t == 1) { if (1) { } n1++; }
 					for (k = 0; k < 8; k++) {
-						u8* tex = *(u8**)((u8*)obj->joints->parts[i].material + 0xc + k * 4);
+						MapMatSampler* tex = obj->joints->parts[i].material->samplers[k];
 						if (!tex) break;
-						t = tex[0xa];
+						t = tex->blendMode;
 						if (t == 2) n2++;
 						else if (t == 1) n1++;
 					}
@@ -372,12 +325,12 @@ MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
 				obj->blendMode = (obj->flags & 8) ? 5 : 2;
 				break;
 		}
-		if (((u8*)joint->drawMode)[2] & 2) {
+		if (joint->drawMode->modeFlags & 2) {
 			obj->flags |= 0x10;
-			if (((u8*)joint->drawMode)[2] & 0x10) {
+			if (joint->drawMode->modeFlags & 0x10) {
 				obj->flags |= 0x8000;
 			}
-			switch (joint->drawMode->unk0[0]) {
+			switch (joint->drawMode->blendType) {
 				case 0: obj->blendMode = 2; break;
 				case 1: obj->blendMode = 0; break;
 				case 2: obj->blendMode = 1; break;
@@ -395,7 +348,7 @@ MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
 				obj->flags |= 0x8000;
 			}
 		}
-		if (((u8*)joint->drawMode)[2] & 4) {
+		if (joint->drawMode->modeFlags & 4) {
 			obj->flags |= 4;
 		}
 	} else {
@@ -464,14 +417,6 @@ void mapResetPaperAmbColor(void);
 void mapResetPaperAmbColor(void);
 static inline void mapResetPaperCraftAmbColor(void);
 
-typedef struct MapObjectDL {
-	u8 field_0x0[0xF4];  // 0x0
-	void* dl[8];         // 0xF4
-	u32 dlSize[8];       // 0x114
-} MapObjectDL;
-#define MAPOBJ_DL(obj) (((MapObjectDL*)(obj))->dl)
-#define MAPOBJ_DLSIZE(obj) (((MapObjectDL*)(obj))->dlSize)
-
 void makeDisplayList(BOOL group) {
 	static const GXCullMode culling[4] = {GX_CULL_FRONT, GX_CULL_BACK, GX_CULL_ALL, GX_CULL_NONE};
 	MapEntry* e;
@@ -483,7 +428,7 @@ void makeDisplayList(BOOL group) {
 	u32 total;
 	u8* dst;
 	MapObject* obj;
-	MapJointDrawModeEx* dm;
+	MapJointDrawMode* dm;
 	s32 k;
 	void* material;
 
@@ -494,15 +439,15 @@ void makeDisplayList(BOOL group) {
 	for (pass = 0; pass < 2; pass++) {
 		obj = e->objects;
 		for (k = 0; k < 8; k++) {
-			MAPOBJ_DL(obj)[k] = NULL;
-			MAPOBJ_DLSIZE(obj)[k] = 0;
+			obj->displayList[k] = NULL;
+			obj->displayListSize[k] = 0;
 		}
 		for (i = 0; i < wp->entries[group].numJoints; i++, obj++) {
 			if (obj->joints->partCount < 1 || obj->joints->partCount > 8) {
 				continue;
 			}
-			dm = (MapJointDrawModeEx*)obj->joints->drawMode;
-			if (dm->flags & 8) {
+			dm = obj->joints->drawMode;
+			if (dm->modeFlags & 8) {
 				continue;
 			}
 			if (dm->lightMask) {
@@ -522,15 +467,15 @@ void makeDisplayList(BOOL group) {
 				GXResetWriteGatherPipe();
 				mapSetMaterial(obj, material);
 				GXSetCullMode(culling[obj->joints->drawMode->cullMode]);
-				MAPOBJ_DLSIZE(obj)[j] = GXEndDisplayList();
+				obj->displayListSize[j] = GXEndDisplayList();
 				if (pass == 0) {
-					total += MAPOBJ_DLSIZE(obj)[j];
+					total += obj->displayListSize[j];
 				}
 				else {
-					MAPOBJ_DL(obj)[j] = dst;
-					dst += MAPOBJ_DLSIZE(obj)[j];
-					memcpy(MAPOBJ_DL(obj)[j], buf, MAPOBJ_DLSIZE(obj)[j]);
-					DCFlushRange(MAPOBJ_DL(obj)[j], MAPOBJ_DLSIZE(obj)[j]);
+					obj->displayList[j] = dst;
+					dst += obj->displayListSize[j];
+					memcpy(obj->displayList[j], buf, obj->displayListSize[j]);
+					DCFlushRange(obj->displayList[j], obj->displayListSize[j]);
 				}
 			}
 		}
@@ -541,7 +486,7 @@ void makeDisplayList(BOOL group) {
 				dst = e->dispListBuf;
 			}
 			else {
-				((void**)((u8*)wp + 0x16C))[group * 0x5E] = NULL;
+				wp->entries[group].dispListBuf = NULL;
 				break;
 			}
 		}
@@ -727,20 +672,6 @@ void mapSetPlayRate(const char* name, f32 rate) {
 	}
 }
 
-typedef struct MapFileLightEx {
-	const char* name;   // 0x0
-	const char* type;   // 0x4
-	Vec position;       // 0x8
-	Vec rotation;       // 0x14
-	u8 pad20[0x2C - 0x20];
-	GXColor color;      // 0x2C
-	f32 spotAngle;      // 0x30
-	f32 attenAngle;     // 0x34
-	s32 attenType;      // 0x38
-	s32 lflags;         // 0x3C
-	s32 magic;          // 0x40
-} MapFileLightEx;
-
 struct HitEntry* hitEntry(MapFileJoint* root, Mtx rootMtx, s32 mapIndex);
 MapFileJoint* mapSearchDmdJoint(MapFileJoint* joint, const char* name);
 MapFileJoint* mapSearchDmdJoint(MapFileJoint* joint, const char* name);
@@ -756,22 +687,6 @@ static inline void* mapSearchChunk(MapHeader* header, const char* name) {
 	return NULL;
 }
 
-typedef struct MapEntryOv {
-	u8 pad0[0x24];
-	s32 fogEnable;
-	u8 pad28[0x78 - 0x28];
-	void* hdr40;
-	u8 pad7C[0x94 - 0x7C];
-	void* textureTable;
-	void* lightTable;
-	void* fogTable;
-	void* materialNameTable;
-	void* vcdTable;
-	u8 padA8[0x178 - 0xA8];
-} MapEntryOv;
-typedef struct MapWorkOv {
-	MapEntryOv entries[2];
-} MapWorkOv;
 static inline void mapLoadReloc_(MapEntry* entry) {
 	u32 k;
 	for (k = 0; k < (u32)entry->header.file.relCount; k++) {
@@ -794,7 +709,7 @@ static inline void mapLoadHeader_(MapWork* wp, BOOL group) {
 	MapHeader* header = &wp->entries[group].header;
 	if (header != NULL) {
 		memset(header, 0, sizeof(MapHeader));
-		wp->entries[group].header.field_0x3C |= 1;
+		wp->entries[group].header.loadFlags |= 1;
 		memcpy(header, data, sizeof(MapFileHeader));
 		if (mapHdrSizeOk_(&wp->entries[group].header, datSize)) {
 			sizeCheck = sizeof(MapFileHeader);
@@ -818,13 +733,13 @@ static inline void mapLoadHeader_(MapWork* wp, BOOL group) {
 			if (sizeCheck < wp->entries[group].header.file.fileSize) {
 				wp->entries[group].header.strings = (const char*)&data[sizeCheck];
 			}
-			{ MapWorkOv* wo2 = (MapWorkOv*)wp; wo2->entries[group].hdr40 = data; } // FAKE: overlay-typed copy so the entry address is recomputed (not CSE'd with &wp->entries[group]); same store
+			{ MapWork* wo2 = wp; wo2->entries[group].header.rawFile = data; } // FAKE: second MapWork pointer so the entry address is recomputed (not CSE'd with &wp->entries[group]); same store
 
 			mapLoadReloc_(&wp->entries[group]);
 		}
 	}
 }
-// FAKE: chunk search written out here (was mapLoadFindChunk_) with k declared last, for the target k/w register order; same search
+// FAKE: chunk search written out here with k declared last, for the target k/w register order; same search
 static inline void mapLoadAnim_(BOOL group) {
 	MapWork* w;
 	u32* animTbl;
@@ -853,7 +768,7 @@ found:
 				int i;
 				for (i = 0; i < w->entries[group].numAnims; i++) {
 					a->flags = 0;
-					MAPENT_FIELD(a, u32, 0x18) = *++animTbl;
+					a->anim = (MapAnimHeader*)*++animTbl;
 					a++;
 				}
 			}
@@ -871,11 +786,11 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 	char str2[128];
 	char str3[128];
 	DVDEntry* dvd;
-	MapWorkOv* wo;
+	MapWork* wo; // FAKE: alias of wp; the chunk-table stores go through it to keep the original address reloads
 	u8 *data;
 	MapHeader* header;
 
-	wo = (MapWorkOv*)wp;
+	wo = wp;
 	error_flag = FALSE;
 	error_count = 0;
 	strncpy(wp->entries[group].name, map, sizeof(wp->entries[group].name));
@@ -936,8 +851,8 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 		wp->entries[group].rootMapObj = mapEntry(mapJoint, scale, group);
 		wp->entries[group].rootHitObj = hitEntry(hitJoint, scale, group);
 		{
-			for (i = 0; i < ((s32*)wp->entries[group].lightTable)[0]; i++) {
-				MapFileLightEx* light = (MapFileLightEx*)((u32*)wp->entries[group].lightTable)[i + 1];
+			for (i = 0; i < wp->entries[group].lightTable->count; i++) {
+				MapFileLight* light = wp->entries[group].lightTable->lights[i];
 				Vec pos;
 				GXColor lcolor;
 				s32 type = 1;
@@ -965,11 +880,11 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 		mapResetPaperAmbColor();
 		mapResetPaperCraftAmbColor();
 		if ((&wo->entries[group])->fogTable != NULL) {
-			wo->entries[group].fogEnable = ((s32*)(&wo->entries[group])->fogTable)[0];
-			wp->entries[group].fogType = ((s32*)(&wo->entries[group])->fogTable)[1];
-			wp->entries[group].fogStart = ((f32*)(&wo->entries[group])->fogTable)[2];
-			wp->entries[group].fogEnd = ((f32*)(&wo->entries[group])->fogTable)[3];
-			wp->entries[group].fogColor = ((GXColor*)(&wo->entries[group])->fogTable)[4];
+			wo->entries[group].fogEnable = (&wo->entries[group])->fogTable->enable;
+			wp->entries[group].fogType = (&wo->entries[group])->fogTable->type;
+			wp->entries[group].fogStart = (&wo->entries[group])->fogTable->start;
+			wp->entries[group].fogEnd = (&wo->entries[group])->fogTable->end;
+			wp->entries[group].fogColor = (&wo->entries[group])->fogTable->color;
 			if (wo->entries[group].fogEnable != 0) {
 				wp->entries[group].flags |= 1;
 			}
@@ -1010,12 +925,12 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 		MapWork* w3 = &mapWork[activeGroup];
 		MapObject* o = w3->entries[group].objects;
 		for (i = 0; i < w3->entries[group].numJoints; i++, o++) {
-			MapJointDrawModeEx* dm;
+			MapJointDrawMode* dm;
 			if (o->joints->partCount < 1 || o->joints->partCount > 8) {
 				continue;
 			}
-			dm = (MapJointDrawModeEx*)o->joints->drawMode;
-			if (dm->flags & 8) {
+			dm = o->joints->drawMode;
+			if (dm->modeFlags & 8) {
 				continue;
 			}
 			if (dm->lightMask) {
@@ -1174,16 +1089,14 @@ void bmapUnLoad(void) {
 	for (i = 0, entry = wp->entries; i < wp->entries[0].count; entry++, i++) {
 
 
-		// NB: +0x178 is past sizeof(MapEntry) (0x178): it is the next entry's count (or MapWork.field_2F0 for entry 1).
-		// The original strides entries by 0x178 everywhere, so this matches the game; the real layout is probably
-		// MapWork { s32 count; entries } with a tplAram as each entry's last field (all MapEntry offsets +4).
+		// the tpl ARAM copy sits in the word after the entry (MAPENT_TPLARAM; a MapWork { count; entries@4 } layout was tried and changes codegen: the original addresses entries from wp itself)
 		if (entry->datAram) {
 			entry->dat = _mapAllocTail(entry->datSize);
 			entry->tpl = _mapAllocTail(entry->tplSize);
 			aramMgrToMram(entry->datAram, entry->dat);
-			aramMgrToMram(MAPENT_FIELD(entry, ARAMEntry*, 0x178), entry->tpl);
+			aramMgrToMram(MAPENT_TPLARAM(entry), entry->tpl);
 			entry->datAram = NULL;
-			MAPENT_FIELD(entry, void*, 0x178) = NULL;
+			MAPENT_TPLARAM(entry) = NULL;
 		}
 		else {
 			entry->arcData = _mapAllocTail(entry->arcSize);
@@ -1219,18 +1132,16 @@ void bmapLoad(const char *map, const char *map2)
     }
     e->dispListSize = 0;
     e->dispListBuf = (void *) 0;
-    // NB: +0x178 is past sizeof(MapEntry) (0x178): it is the next entry's count (or MapWork.field_2F0 for entry 1).
-    // The original strides entries by 0x178 everywhere, so this matches the game; the real layout is probably
-    // MapWork { s32 count; entries } with a tplAram as each entry's last field (all MapEntry offsets +4).
+    // the tpl ARAM copy sits in the word after the entry (MAPENT_TPLARAM; a MapWork { count; entries@4 } layout was tried and changes codegen: the original addresses entries from wp itself)
     entry->datAram = (void *) 0;
-    *((void **) (((u8 *) entry) + 0x178)) = (void *) 0;
+    MAPENT_TPLARAM(entry) = (void *) 0;
     entry->arcAram = (void *) 0;
     if (entry->dat)
     {
       if (!arcDataCheck(entry->dat))
       {
         entry->datAram = aramMgrToAram(entry->dat, entry->datSize);
-        *((ARAMEntry **) (((u8 *) entry) + 0x178)) = aramMgrToAram(entry->tpl, entry->tplSize);
+        MAPENT_TPLARAM(entry) = aramMgrToAram(entry->tpl, entry->tplSize);
         _mapFree(entry->tpl);
         _mapFree(entry->dat);
         entry->tpl = (void *) 0;
@@ -1398,13 +1309,13 @@ void mapReCalcMatrix(MapObject* obj, Mtx mtx, BOOL force) {
 	}
 	if (dirty) {
 		if (obj->flags & 0x2000) {
-			PSMTXConcat(mtx, obj->unk7C, obj->modelWorldMtx);
+			PSMTXConcat(mtx, obj->animMtx, obj->modelWorldMtx);
 		}
 		else {
 			PSMTXConcat(mtx, obj->localMtx, obj->modelWorldMtx);
 		}
 		if (obj->flags & 0x200000) {
-			PSMTXConcat(obj->modelWorldMtx, obj->unkAC, obj->modelWorldMtx);
+			PSMTXConcat(obj->modelWorldMtx, obj->transformMtx, obj->modelWorldMtx);
 		}
 		obj->flags &= ~0x200;
 		if (obj->child) {
@@ -1492,14 +1403,14 @@ static inline void mapMainMatKeys_(MapAnim* a_, MapAnimMatData* d, u8* obj) {
 
 		for (c = 0; c < 5; c++) {
 			if (k0->ch[c].step) {
-				*(f32*)(obj + d->idx * 0x1c + c * 4 + 0x2c) = k0->ch[c].value;
+				(&((MapMaterial*)obj)->xforms[d->idx].tx)[c] = k0->ch[c].value;
 			}
 			else {
-				*(f32*)(obj + d->idx * 0x1c + c * 4 + 0x2c) = mapHermiteCh(cur, k0->time, k1->time, &k0->ch[c], &k1->ch[c]);
+				(&((MapMaterial*)obj)->xforms[d->idx].tx)[c] = mapHermiteCh(cur, k0->time, k1->time, &k0->ch[c], &k1->ch[c]);
 			}
 		}
-		*(f32*)(obj + d->idx * 0x1c + 0x40) = d->u;
-		*(f32*)(obj + d->idx * 0x1c + 0x44) = d->v;
+		((MapMaterial*)obj)->xforms[d->idx].cx = d->u;
+		((MapMaterial*)obj)->xforms[d->idx].cy = d->v;
 		break;
 	}
 }
@@ -1520,10 +1431,10 @@ static inline void mapMainAlphaKeys_(MapAnim* a_, MapAnimAlphaData* d, u8* obj) 
 		else { continue; }
 
 		if (k0->ch[0].step) {
-			*(u8*)(obj + 0x10c) = (u8)(255.0f - 255.0f * k0->ch[0].value);
+			((MapMaterial*)obj)->blendColor.r = (u8)(255.0f - 255.0f * k0->ch[0].value);
 		}
 		else {
-			*(u8*)(obj + 0x10c) = (u8)(255.0f - 255.0f * mapHermiteCh(cur, k0->time, k1->time, (MapAnimKeyCh*)&k0->ch[0], (MapAnimKeyCh*)&k1->ch[0]));
+			((MapMaterial*)obj)->blendColor.r = (u8)(255.0f - 255.0f * mapHermiteCh(cur, k0->time, k1->time, (MapAnimKeyCh*)&k0->ch[0], (MapAnimKeyCh*)&k1->ch[0]));
 		}
 
 		break;
@@ -1602,19 +1513,19 @@ static inline u8* mapMainFindTbl_(const char* nm_) {
 	MapEntry* e_;
 	MapWork* w_;
 	int j_;
-	u32* pr_;
+	MapMaterialName* pr_;
 	int i_;
 	w_ = &mapWork[activeGroup];
 
 	for (i_ = 0; i_ < w_->entries[0].count; i_++) {
 		e_ = &w_->entries[i_];
-		if (!((u32*)e_->materialNameTable)) {
+		if (!e_->materialNameTable) {
 			return NULL;
 		}
-		for (j_ = 0; j_ < (s32)((u32*)e_->materialNameTable)[0]; j_++) {
-			pr_ = (u32*)&((struct { u32 n_; struct { const char* nm; u8* p; } e_[1]; }*)((u32*)e_->materialNameTable))->e_[j_];
-			if (!strcmp((const char*)pr_[0], nm_)) {
-				return (u8*)pr_[1];
+		for (j_ = 0; j_ < e_->materialNameTable->count; j_++) {
+			pr_ = &e_->materialNameTable->entries[j_];
+			if (!strcmp(pr_->name, nm_)) {
+				return (u8*)pr_->data;
 			}
 		}
 	}
@@ -1673,11 +1584,11 @@ void mapMain(void) {
 		changed = FALSE;
 		anim = (MapAnim*)entry->animData;
 		for (j = 0; j < entry->numAnims; j++, anim++) {
-			MapAnimList* jl = MAPENT_FIELD(anim->anim, MapAnimList*, 0xC);
-			MapAnimList* ml = MAPENT_FIELD(anim->anim, MapAnimList*, 0x10);
-			MapAnimList* al = MAPENT_FIELD(anim->anim, MapAnimList*, 0x14);
-			MapAnimList* ll = MAPENT_FIELD(anim->anim, MapAnimList*, 0x18);
-			MapAnimList* lc = MAPENT_FIELD(anim->anim, MapAnimList*, 0x1C);
+			MapAnimList* jl = anim->anim->jointAnims;
+			MapAnimList* ml = anim->anim->materialAnims;
+			MapAnimList* al = anim->anim->alphaAnims;
+			MapAnimList* ll = anim->anim->lightAnims;
+			MapAnimList* lc = anim->anim->lightColorAnims;
 
 			if (!(anim->flags & 1) || (anim->flags & 2)) {
 				continue;
@@ -1737,7 +1648,7 @@ void mapMain(void) {
 				for (k = 0; k < jl->count; k++) {
 					o = mapGetMapObj((const char*)jl->items[k]->name);
 					if (o) {
-						mapCalcAnimMatrix(o->unk7C, o->localMtx, anim, (MapAnimJoint*)jl->items[k]);
+						mapCalcAnimMatrix(o->animMtx, o->localMtx, anim, (MapAnimJoint*)jl->items[k]);
 						changed = TRUE;
 						o->flags |= 0x2000;
 						o->flags |= 0x200;
@@ -1782,35 +1693,7 @@ void mapMain(void) {
 	}
 }
 
-typedef struct MapTexXform {
-	f32 tx;  // 0x0
-	f32 ty;  // 0x4
-	f32 sx;  // 0x8
-	f32 sy;  // 0xC
-	f32 rot; // 0x10
-	f32 cx;  // 0x14
-	f32 cy;  // 0x18
-} MapTexXform;
-
-typedef struct MapMatSampler {
-	MapTexInfo* tex; // 0x0
-	u8 pad4[4];      // 0x4
-	u8 wrapS;        // 0x8
-	u8 wrapT;        // 0x9
-} MapMatSampler;
-
 void mapSetMaterialLastStageBlend(s32 flags, GXColor color1, GXColor color2);
-typedef struct MapMaterial {
-	char* name;                  // 0x0
-	GXColor color;               // 0x4
-	u8 lightMode;                // 0x8
-	u8 pad9[2];                  // 0x9
-	u8 samplerCount;             // 0xB
-	MapMatSampler* samplers[8];  // 0xC
-	MapTexXform xforms[8];       // 0x2C
-	GXColor blendColor;          // 0x10C, last-stage blend colour (translucency test, mapSetMaterialLastStageBlend)
-	u8* tevMode;                 // 0x110
-} MapMaterial;
 void mapSetTextureMatrix(MapMaterial* mat);
 
 void _mapDispMapObj(CameraId cam, MapObject *obj);
@@ -1898,7 +1781,7 @@ void _mapDispMapObj(CameraId cam, MapObject *obj)
   mode = obj->blendMode;
   if (obj->joints->partCount > 0)
   {
-    if (mapObjIsTranslucent(obj->flags, obj->color, *((GXColor *) (((u8 *) obj->joints->parts[0].material) + 0x10C))))
+    if (mapObjIsTranslucent(obj->flags, obj->color, obj->joints->parts[0].material->blendColor))
     {
       mode = 2;
     }
@@ -1988,9 +1871,9 @@ void _mapDispMapObj(CameraId cam, MapObject *obj)
       mesh = obj->joints->parts[i].mesh;
       material = obj->joints->parts[i].material;
       mapSetTextureMatrix(material);
-      mapSetMaterialLastStageBlend(obj->flags, obj->color, *((GXColor *) (((u8 *) material) + 0x10C)));
+      mapSetMaterialLastStageBlend(obj->flags, obj->color, ((MapMaterial*)material)->blendColor);
       mapSetPolygonVtxDesc(obj, mesh);
-      GXCallDisplayList(((MapObjectDL *) obj)->dl[i], ((MapObjectDL *) obj)->dlSize[i]);
+      GXCallDisplayList(obj->displayList[i], obj->displayListSize[i]);
       callPackedLists(mesh);
 
     }
@@ -2003,7 +1886,7 @@ void _mapDispMapObj(CameraId cam, MapObject *obj)
       material = obj->joints->parts[i].material;
       mesh = obj->joints->parts[i].mesh;
       mapSetTextureMatrix(material);
-      mapSetMaterialLastStageBlend(obj->flags, obj->color, *((GXColor *) (((u8 *) material) + 0x10C)));
+      mapSetMaterialLastStageBlend(obj->flags, obj->color, ((MapMaterial*)material)->blendColor);
       mapSetMaterial(obj, material);
       mapSetPolygon(obj, mesh);
     }
@@ -2151,7 +2034,6 @@ static inline BOOL mapClipTest(Vec* v) {
 
 void dispEntry(CameraId camera, f32 order, s32 renderMode, void* callback, void* param);
 #define MAP_CLIP_IN(v) ((v).z > -1.0f && (v).z < 0.0f && (v).x >= -1.0f && (v).x <= 1.0f && (v).y >= -1.0f && (v).y <= 1.0f)
-#define MJF(j, off) (*(f32*)((u8*)(j) + (off)))
 
 void mapDisp(void) {
 	MapWork* wp = &mapWork[activeGroup];
@@ -2245,7 +2127,7 @@ void mapDisp(void) {
 			mode = obj->blendMode;
 			if (obj->joints->partCount > 0) {
 				if (mapObjIsTranslucent(obj->flags, obj->color,
-						((MapMaterial*)obj->joints->parts[0].material)->blendColor)) {
+						obj->joints->parts[0].material->blendColor)) {
 					mode = 2;
 				}
 			}
@@ -2256,41 +2138,30 @@ void mapDisp(void) {
 				dispEntry((CameraId)1, z, mode, !(obj->flags & 0x10) ? mapDispMapObj_off : mapDispMapGrp_off, obj);
 			}
 			if (!(obj->flags & 1)) {
-				dispEntry(obj->unk5, z, mode, !(obj->flags & 0x10) ? mapDispMapObj : mapDispMapGrp, obj);
+				dispEntry(obj->cameraId, z, mode, !(obj->flags & 0x10) ? mapDispMapObj : mapDispMapGrp, obj);
 			}
 		}
 	}
 }
-
-typedef struct MapFileLight {
-	const char* name; // 0x0
-} MapFileLight;
-
-typedef struct MapFileLightTable {
-	s32 count;              // 0x0
-	MapFileLight* lights[]; // 0x4
-} MapFileLightTable;
-
-#define MAP_LIGHT_TABLE(entry) ((MapFileLightTable*)(entry)->lightTable)
 
 s32 mapSetLight(MapObject* obj, LightEntry** lights) {
 	Vec pos;
 	s32 count;
 	s32 i;
 	LightEntry* light;
-	MapJointDrawModeEx* dm;
+	MapJointDrawMode* dm;
 
 	count = 0;
 	PSMTXMultVec(obj->modelWorldMtx, &obj->center, &pos);
-	dm = (MapJointDrawModeEx*)obj->joints->drawMode;
-	if (dm->flags & 8) {
+	dm = obj->joints->drawMode;
+	if (dm->modeFlags & 8) {
 		if (!dm->lightMask) {
 			count = lightGetNearObj(&pos, lights, 8, 0);
 		}
 		else {
 			for (i = 0; i < 32; i++) {
-				if (((MapJointDrawModeEx*)obj->joints->drawMode)->lightMask & (1 << i)) {
-					light = lightNameToPtr(MAP_LIGHT_TABLE(&mapWork[activeGroup].entries[obj->groupIndex])->lights[i]->name);
+				if ((obj->joints->drawMode)->lightMask & (1 << i)) {
+					light = lightNameToPtr(mapWork[activeGroup].entries[obj->groupIndex].lightTable->lights[i]->name);
 					if (!(light->flags & 0x8000)) {
 						lights[count] = light;
 						count++;
@@ -2307,8 +2178,8 @@ s32 mapSetLight(MapObject* obj, LightEntry** lights) {
 	}
 	else if (dm->lightMask) {
 		for (i = 0; i < 32; i++) {
-			if (((MapJointDrawModeEx*)obj->joints->drawMode)->lightMask & (1 << i)) {
-				light = lightNameToPtr(MAP_LIGHT_TABLE(&mapWork[activeGroup].entries[obj->groupIndex])->lights[i]->name);
+			if ((obj->joints->drawMode)->lightMask & (1 << i)) {
+				light = lightNameToPtr(mapWork[activeGroup].entries[obj->groupIndex].lightTable->lights[i]->name);
 				if (!(light->flags & 0x8000)) {
 					lights[count] = light;
 						count++;
@@ -3015,9 +2886,9 @@ void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx) {
 		MapTevCallback callback;
 		MapTevCallbackInfo* ip = &info;
 
-		*(MapObject**)info.field_0x0 = current_mp;
+		*(MapObject**)info.mapObj = current_mp;
 		info.mtx = mtx;
-		*(s32*)info.field_0x8 = drawMode;
+		*(s32*)info.drawMode = drawMode;
 		info.tevStage = tevStage;
 		info.texCoord = map;
 		info.texMap = coord;
@@ -3267,7 +3138,7 @@ void mapSetMaterial(MapObject* obj, void* material) {
 	for (i = mat->samplerCount - 1; i >= 0; i--) {
 		sampler = mat->samplers[i];
 		wp = mapGetWork();
-		k = mapSearchTexName((MapTexTable*)wp->entries[obj->groupIndex].textureTable, sampler->tex->name);
+		k = mapSearchTexName(wp->entries[obj->groupIndex].textureTable, sampler->tex->name);
 		desc = TEXGet(wp->entries[obj->groupIndex].tpl, k);
 		if (desc->textureHeader->minLOD == desc->textureHeader->maxLOD) {
 			mip = GX_FALSE;
@@ -3425,22 +3296,6 @@ void mapSetMaterialLight(s32 flags, Vec position) {
 	}
 }
 
-typedef struct MapVcdTable {
-	void* positions;          // 0x0
-	void* normals;            // 0x4
-	u8 field_0x8[0xC - 0x8];  // 0x8
-	void* colors[2];          // 0xC
-	s32 texCount;             // 0x14
-	void* texCoords[8];       // 0x18
-} MapVcdTable;
-
-typedef struct MapVtxFmtInfo {
-	u8 field_0x0[0x44 - 0x0]; // 0x0
-	s32 posFrac;              // 0x44
-	s32 texFrac[8];           // 0x48
-} MapVtxFmtInfo;
-
-#define MAP_VTXFMT(entry) ((MapVtxFmtInfo*)(entry)->vcdTable)
 
 typedef struct MapVtxRec {
 	s16 pos;     // 0x0
@@ -3484,9 +3339,9 @@ void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
 	MapVtxRec* v;
 
 	wp = mapGetWork();
-	vcd = (MapVcdTable*)mesh->vcdTableOffset;
-	pos = (u8*)vcd->positions + 4;
-	nrm = (u8*)vcd->normals + 4;
+	vcd = mesh->vcdTable;
+	pos = vcd->positions->data;
+	nrm = vcd->normals->data;
 	texCount = vcd->texCount;
 
 	GXSetCullMode(culling[obj->joints->drawMode->cullMode]);
@@ -3498,10 +3353,10 @@ void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
 		GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
 		GXSetArray(GX_VA_NRM, nrm, 12);
 		GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-		GXSetArray(GX_VA_CLR0, (u8*)((MapVcdTable*)mesh->vcdTableOffset)->colors[0] + 4, 4);
+		GXSetArray(GX_VA_CLR0, mesh->vcdTable->colors[0]->data, 4);
 		for (i = 0; i < texCount; i++) {
 			GXSetVtxDesc(GX_VA_TEX0 + i, GX_INDEX16);
-			GXSetArray(GX_VA_TEX0 + i, (u8*)((MapVcdTable*)mesh->vcdTableOffset)->texCoords[i] + 4, 8);
+			GXSetArray(GX_VA_TEX0 + i, mesh->vcdTable->texCoords[i]->data, 8);
 		}
 		for (i = 0; i < mesh->displayListCount; i++) {
 			dl = (MapRawDL*)mesh->displayLists.normalLists[i];
@@ -3522,7 +3377,7 @@ void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
 		u32 mask = mesh->elementMask;
 		GXClearVtxDesc();
 		GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, (u8)((MapVtxFmtInfo*)wp->entries[obj->groupIndex].vcdTable)->posFrac);
+		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, (u8)wp->entries[obj->groupIndex].vcdTable->posFrac);
 		GXSetArray(GX_VA_POS, pos, 6);
 		GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
 		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S8, 6);
@@ -3533,7 +3388,7 @@ void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
 			}
 			GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
 			GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-			GXSetArray(GX_VA_CLR0, (u8*)((MapVcdTable*)mesh->vcdTableOffset)->colors[i] + 4, 4);
+			GXSetArray(GX_VA_CLR0, mesh->vcdTable->colors[i]->data, 4);
 		}
 		for (i = 0; i < 8; i++) {
 			if (!(mask & (1 << (i + 4)))) {
@@ -3541,8 +3396,8 @@ void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
 				break;
 			}
 			GXSetVtxDesc(GX_VA_TEX0 + i, GX_INDEX16);
-			GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0 + i, GX_TEX_ST, GX_S16, (u8)MAP_VTXFMT(&wp->entries[obj->groupIndex])->texFrac[i]);
-			GXSetArray(GX_VA_TEX0 + i, (u8*)((MapVcdTable*)mesh->vcdTableOffset)->texCoords[i] + 4, 4);
+			GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0 + i, GX_TEX_ST, GX_S16, (u8)wp->entries[obj->groupIndex].vcdTable->texFrac[i]);
+			GXSetArray(GX_VA_TEX0 + i, mesh->vcdTable->texCoords[i]->data, 4);
 		}
 		for (i = 0; i < mesh->displayListCount; i++) {
 			GXCallDisplayList((void*)mesh->displayLists.packedLists[i].offset, *(u32*)&mesh->displayLists.packedLists[i].vertexCount);
@@ -3561,13 +3416,13 @@ void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh) {
 
 	wp = mapGetWork();
 
-	vcd = (MapVcdTable*)mesh->vcdTableOffset;
+	vcd = mesh->vcdTable;
 	mask = mesh->elementMask;
-	pos = (u8*)vcd->positions + 4;
-	nrm = (u8*)vcd->normals + 4;
+	pos = vcd->positions->data;
+	nrm = vcd->normals->data;
 	GXClearVtxDesc();
 	GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, (u8)((MapVtxFmtInfo*)wp->entries[obj->groupIndex].vcdTable)->posFrac);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, (u8)wp->entries[obj->groupIndex].vcdTable->posFrac);
 	GXSetArray(GX_VA_POS, pos, 6);
 	GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S8, 6);
@@ -3578,15 +3433,15 @@ void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh) {
 		}
 		GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
 		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-		GXSetArray(GX_VA_CLR0, (u8*)((MapVcdTable*)mesh->vcdTableOffset)->colors[i] + 4, 4);
+		GXSetArray(GX_VA_CLR0, mesh->vcdTable->colors[i]->data, 4);
 	}
 	for (i = 0; i < 8; i++) {
 		if (!(mask & (1 << (i + 4)))) {
 			break;
 		}
 		GXSetVtxDesc(GX_VA_TEX0 + i, GX_INDEX16);
-		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0 + i, GX_TEX_ST, GX_S16, (u8)MAP_VTXFMT(&wp->entries[obj->groupIndex])->texFrac[i]);
-		GXSetArray(GX_VA_TEX0 + i, (u8*)((MapVcdTable*)mesh->vcdTableOffset)->texCoords[i] + 4, 4);
+		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0 + i, GX_TEX_ST, GX_S16, (u8)wp->entries[obj->groupIndex].vcdTable->texFrac[i]);
+		GXSetArray(GX_VA_TEX0 + i, mesh->vcdTable->texCoords[i]->data, 4);
 	}
 }
 
@@ -3672,14 +3527,14 @@ void mapObjFlagOn(const char* name, u32 flags) {
 	MapObject* obj = mapGetMapObj(name);
 
 	if (!obj) {
-		error_data[error_count].field_0x20 = 0;
-		strncpy(error_data[error_count].field_0x0, name, sizeof(error_data[0].field_0x0) - 1);
+		error_data[error_count].type = 0;
+		strncpy(error_data[error_count].name, name, sizeof(error_data[0].name) - 1);
 		error_flag = TRUE;
 		error_count++;
 		error_count %= 32;
 		return;
 	}
-	if (!(flags & 0x100) || obj->unk114) {
+	if (!(flags & 0x100) || obj->displayListSize[0]) {
 		obj->flags |= flags;
 	}
 }
@@ -3688,8 +3543,8 @@ void mapObjFlagOff(const char* name, u32 flags) {
 	MapObject* obj = mapGetMapObj(name);
 
 	if (!obj) {
-		error_data[error_count].field_0x20 = 0;
-		strncpy(error_data[error_count].field_0x0, name, sizeof(error_data[0].field_0x0) - 1);
+		error_data[error_count].type = 0;
+		strncpy(error_data[error_count].name, name, sizeof(error_data[0].name) - 1);
 		error_flag = TRUE;
 		error_count++;
 		error_count %= 32;
@@ -3699,7 +3554,7 @@ void mapObjFlagOff(const char* name, u32 flags) {
 }
 
 void mapFlgOn(MapObject* obj, u32 flags, BOOL doNext) {
-	if (!(flags & 0x100) || obj->unk114) {
+	if (!(flags & 0x100) || obj->displayListSize[0]) {
 		obj->flags |= flags;
 	}
 	if (obj->child) {
@@ -3724,8 +3579,8 @@ void mapGrpFlagOn(const char* name, u32 flags) {
 	MapObject* obj = mapGetMapObj(name);
 
 	if (!obj) {
-		error_data[error_count].field_0x20 = 0;
-		strncpy(error_data[error_count].field_0x0, name, sizeof(error_data[0].field_0x0) - 1);
+		error_data[error_count].type = 0;
+		strncpy(error_data[error_count].name, name, sizeof(error_data[0].name) - 1);
 		error_flag = TRUE;
 		error_count++;
 		error_count %= 32;
@@ -3738,8 +3593,8 @@ void mapGrpFlagOff(const char* name, u32 flags) {
 	MapObject* obj = mapGetMapObj(name);
 
 	if (!obj) {
-		error_data[error_count].field_0x20 = 0;
-		strncpy(error_data[error_count].field_0x0, name, sizeof(error_data[0].field_0x0) - 1);
+		error_data[error_count].type = 0;
+		strncpy(error_data[error_count].name, name, sizeof(error_data[0].name) - 1);
 		error_flag = TRUE;
 		error_count++;
 		error_count %= 32;
@@ -3820,15 +3675,15 @@ void mapObjRotate(const char* name, f32 x, f32 y, f32 z) {
 
 	if (obj) {
 		if (!(obj->flags & 0x200)) {
-			MTXIdentity(obj->unkAC);
+			MTXIdentity(obj->transformMtx);
 		}
 		MTXRotRad(rotX, 'x', MTXDegToRad(x));
 		MTXRotRad(rotY, 'y', MTXDegToRad(y));
 		MTXRotRad(rotZ, 'z', MTXDegToRad(z));
 		if (1) {
-			MTXConcat(obj->unkAC, rotZ, obj->unkAC);
-			MTXConcat(obj->unkAC, rotY, obj->unkAC);
-			MTXConcat(obj->unkAC, rotX, obj->unkAC);
+			MTXConcat(obj->transformMtx, rotZ, obj->transformMtx);
+			MTXConcat(obj->transformMtx, rotY, obj->transformMtx);
+			MTXConcat(obj->transformMtx, rotX, obj->transformMtx);
 		}
 		obj->flags |= 0x200000;
 		obj->flags |= 0x200;
@@ -3841,10 +3696,10 @@ void mapObjTranslate(const char* name, f32 x, f32 y, f32 z) {
 
 	if (obj) {
 		if (!(obj->flags & 0x200)) {
-			MTXIdentity(obj->unkAC);
+			MTXIdentity(obj->transformMtx);
 		}
 		MTXTrans(trans, x / 10.0f, y / 10.0f, z / 10.0f);
-		MTXConcat(obj->unkAC, trans, obj->unkAC);
+		MTXConcat(obj->transformMtx, trans, obj->transformMtx);
 		obj->flags |= 0x200000;
 		obj->flags |= 0x200;
 	}
@@ -3856,10 +3711,10 @@ void mapObjScale(const char* name, f32 x, f32 y, f32 z) {
 
 	if (obj) {
 		if (!(obj->flags & 0x200)) {
-			MTXIdentity(obj->unkAC);
+			MTXIdentity(obj->transformMtx);
 		}
 		MTXScale(scale, x, y, z);
-		MTXConcat(obj->unkAC, scale, obj->unkAC);
+		MTXConcat(obj->transformMtx, scale, obj->transformMtx);
 		obj->flags |= 0x200000;
 		obj->flags |= 0x200;
 	}
@@ -4159,8 +4014,8 @@ void mapObjGetFlushColor(const char* name, u8* r, u8* g, u8* b, u8* a) {
 	MapObject* obj = mapGetMapObj(name);
 
 	if (!obj) {
-		error_data[error_count].field_0x20 = 0;
-		strncpy(error_data[error_count].field_0x0, name, sizeof(error_data[0].field_0x0) - 1);
+		error_data[error_count].type = 0;
+		strncpy(error_data[error_count].name, name, sizeof(error_data[0].name) - 1);
 		error_flag = TRUE;
 		error_count++;
 		error_count %= 32;

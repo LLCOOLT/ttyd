@@ -549,7 +549,7 @@ void winPartyDisp(s32 camId, void* param, s32 idx) {
                 animName = winPartyDt[j].animName;
             }
             animPoseSetAnim(pose, animName, 0);
-            animPoseSetLocalTime(pose, (f32)(gp->retraceCount % (( s32)(*(( f32*)(( *( (u8**)((( u8*)anim ) + 0x24) )) + 8)) ))));
+            animPoseSetLocalTime(pose, (f32)(gp->retraceCount % (s32)anim->loopInfo[2]));
         } else {
             PSMTXTrans(m, (x - 140.0f) + v.x, 20.0f + (y + v.y), v.z);
             PSMTXScale(s, 0.8f, 0.8f, -0.8f);

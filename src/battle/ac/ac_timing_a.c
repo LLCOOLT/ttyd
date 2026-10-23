@@ -17,12 +17,6 @@ typedef struct TimingAEntry {
     s32 value;
 } TimingAEntry;
 
-typedef struct TimingAWork {
-    s32 field_0x0;
-    u32 flags;
-    s32 endTimer;
-} TimingAWork;
-
 #define TA_WORK(ac) ((TimingAWork*)(ac)->work)
 
 TimingAEntry _ac_timing_a_timing_lv_0[] = {
@@ -84,25 +78,25 @@ void battleAcDisp_TimingA(CameraId cameraId, void* param) {
     int new_var;
     switch (work->actionCommands.mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
         case 100:
             disp->iconX = 30.0f;
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->unk20 > 0) {
-                disp->unk20--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 1000:
         case 1001:
-            if (disp->unk20 >= 40) {
+            if (disp->slideTimer >= 40) {
                 new_var = 4; // FAKE: register-held index; also read uninitialized on the else path below. Literal 4 / slot = 4 at decl both differ
-                disp->iconX = intplGetValue(new_var, *(s32*)&disp->field_0x1C[new_var] - 40, 20, 30.0f, -300.0f);
+                disp->iconX = intplGetValue(new_var, *(s32*)&disp->slideTimerBase[new_var] - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[new_var] < 60) {
-                disp->unk20++;
+            if (*(s32*)&disp->slideTimerBase[new_var] < 60) {
+                disp->slideTimer++;
             }
             break;
     }
@@ -195,7 +189,7 @@ s32 battleAcMain_TimingA(BattleWork* work) {
             memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            disp->unk20 = 20;
+            disp->slideTimer = 20;
             work->actionCommands.mAcState = 99;
             TA_WORK(&work->actionCommands)->flags &= ~1;
             work->actionCommands.outputParams[0] = 0;

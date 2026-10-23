@@ -308,43 +308,35 @@ EVT_BEGIN(firebar_evt)
         CALL(firebar_disp_evt)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT_GET_ID(LW(0))
-        CALL(firebar_entry, PTR((u8*)firebardesc + 0x28))
+        CALL(firebar_entry, PTR(&firebardesc[1]))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         SET_TYPE(0)
         CALL(firebar_disp_evt)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT_GET_ID(LW(0))
-        CALL(firebar_entry, PTR((u8*)firebardesc + 0x50))
+        CALL(firebar_entry, PTR(&firebardesc[2]))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         SET_TYPE(0)
         CALL(firebar_disp_evt)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT_GET_ID(LW(0))
-        CALL(firebar_entry, PTR((u8*)firebardesc + 0x78))
+        CALL(firebar_entry, PTR(&firebardesc[3]))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         SET_TYPE(0)
         CALL(firebar_disp_evt)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT_GET_ID(LW(0))
-        CALL(firebar_entry, PTR((u8*)firebardesc + 0xA0))
+        CALL(firebar_entry, PTR(&firebardesc[4]))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         SET_TYPE(0)
         CALL(firebar_disp_evt)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT_GET_ID(LW(0))
-        CALL(firebar_entry, PTR((u8*)firebardesc + 0xC8))
-    END_INLINE_EVENT
-    BEGIN_INLINE_EVENT
-        SET_TYPE(0)
-        CALL(firebar_disp_evt)
-    END_INLINE_EVENT
-    WAIT_MS(2000)
-    BEGIN_INLINE_EVENT_GET_ID(LW(0))
-        CALL(firebar_entry, PTR((u8*)firebardesc + 0xF0))
+        CALL(firebar_entry, PTR(&firebardesc[5]))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         SET_TYPE(0)
@@ -352,7 +344,15 @@ EVT_BEGIN(firebar_evt)
     END_INLINE_EVENT
     WAIT_MS(2000)
     BEGIN_INLINE_EVENT_GET_ID(LW(0))
-        CALL(firebar_entry, PTR((u8*)firebardesc + 0xC8))
+        CALL(firebar_entry, PTR(&firebardesc[6]))
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        SET_TYPE(0)
+        CALL(firebar_disp_evt)
+    END_INLINE_EVENT
+    WAIT_MS(2000)
+    BEGIN_INLINE_EVENT_GET_ID(LW(0))
+        CALL(firebar_entry, PTR(&firebardesc[5]))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         SET_TYPE(0)
@@ -650,7 +650,7 @@ USER_FUNC(firebar_entry) {
         return EVT_RETURN_DONE;
     }
     mario = marioGetPtr();
-    if (*(u16*)&mario->currMotionId == 0x20 || *(u16*)&mario->currMotionId == 0x1F || mario->unk4C > 0) {
+    if (*(u16*)&mario->currMotionId == 0x20 || *(u16*)&mario->currMotionId == 0x1F || mario->mutekiTimer > 0) {
         wp->flags |= 4;
     } else {
         wp->flags &= ~4;

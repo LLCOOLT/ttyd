@@ -29,14 +29,6 @@ extern void* marioChkLandon(f32* outY, f32 y);
 extern void marioChgMotSub(s32 a, s32 b);
 f32 kpaStickSpd(s32 dash);
 
-#define MF(m, off) (*(f32*)((u8*)(m) + MWOFF(off)))
-#define MI(m, off) (*(s32*)((u8*)(m) + MWOFF(off)))
-#define MS16(m, off) (*(s16*)((u8*)(m) + MWOFF(off)))
-#define MS8(m, off) (*(s8*)((u8*)(m) + MWOFF(off)))
-#define MU(m, off) (*(u32*)((u8*)(m) + MWOFF(off)))
-#define MU16(m, off) (*(u16*)((u8*)(m) + MWOFF(off)))
-#define MU8(m, off) (*(u8*)((u8*)(m) + MWOFF(off)))
-#define MV(m, off) (*(Vec*)((u8*)(m) + MWOFF(off)))
 typedef struct V3 {
     s32 a, b, c;
 } V3;
@@ -76,7 +68,7 @@ static inline s32 kpa_stay_chk(void) {
     if (kpaGetStageViewType() == 1) {
         return 0;
     }
-    if (!(m2->buttonBuffer & 0x100)) {
+    if (!(m2->buttonTrg & 0x100)) {
         return 0;
     }
     if (kpaGetBodyStatus() == 2) {
@@ -207,7 +199,7 @@ void kpa_stay(void) {
     if (kpaGetAttackMode() == 0) {
         s32 r = kpa_stay_chk();
         if (r == 0) {
-            if (m->buttonBuffer & 0x200) {
+            if (m->buttonTrg & 0x200) {
                 kpaAttackStart();
             } else {
                 if (m->forceMoveTimer == 0) {
@@ -241,12 +233,12 @@ void kpa_walk(void) {
             kpaChgPose("KPA_W_2", "KPA2_W_1");
         }
         m->mot.kpa.animFrame = 0;
-        m->mot.kpa.unk2 = 0;
-        KPW(m)->field_0x10 = 0.02f;
-        KPW(m)->field_0x14 = -0.02f;
+        m->mot.kpa.reserved_2 = 0;
+        KPW(m)->standParamA = 0.02f;
+        KPW(m)->standParamB = -0.02f;
     }
     if (!kpa_stay_chk()) {
-        if (m->buttonBuffer & 0x200) {
+        if (m->buttonTrg & 0x200) {
             kpaAttackStart();
             marioChgMot(0);
             return;
@@ -320,7 +312,7 @@ void kpa_dash(void) {
         m->mot.kpa.animFrame = 0;
     }
     if (!kpa_stay_chk()) {
-        if (m->buttonBuffer & 0x200) {
+        if (m->buttonTrg & 0x200) {
             kpaAttackStart();
             marioChgMot(0);
             return;
@@ -438,14 +430,14 @@ void kpa_fall_80213C38(void) {
             m->flags |= 0x80;
         }
         if (m->airTimer == 0) {
-            MV(m, 0xD4) = m->position;
+            m->fallStartPos = m->position;
         }
     }
     switch ((s32)m->currSubMotionId) {
     case 0:
         if (m->position.y <= m->lastGroundPos.y) {
             if (m->position.y <= 75.0f) {
-                if ((MU(m, 4) |= 0x20000) != 0) {
+                if ((m->dispFlags |= 0x20000) != 0) {
                     camFollowYOn();
                 }
             }
@@ -639,7 +631,7 @@ void kpa_powup(void) {
             m2->camShiftTargetX = 20.0f * (f32)(-KPW(m2)->level);
             m->flags &= ~0x10000000;
             marioChgMot(0);
-            m->unk4C = 0;
+            m->mutekiTimer = 0;
         }
     }
 }
@@ -757,13 +749,13 @@ void kpa_swim(void) {
         m->kpaSpeed = 0.0f;
         KPW(marioGetPtr())->flags |= 0x10;
     }
-    if (m->buttonBuffer & 0x200) {
+    if (m->buttonTrg & 0x200) {
         kpaAttackStart2();
     }
     if (kpaFireAttackCheck() == 1) {
         m->wStickDir1 = 0;
         m->wStickDir2 = 0;
-    } else if (kpaGetBodyStatus() == 2 && (m->buttonBuffer & 0x100)) {
+    } else if (kpaGetBodyStatus() == 2 && (m->buttonTrg & 0x100)) {
         s32 st = (s32)m->currSubMotionId;
         if (st >= 0 && st <= 1 && m->position.y < 280.0f) {
             m->currSubMotionId = 0;
@@ -940,7 +932,7 @@ void kpa_swim(void) {
         m->currSubMotionId = 0x29;
         m->multiTimer = 0x18;
     case 0x29:
-        if ((m->buttonBuffer & 0x100) && !kpaFireAttackCheck()) {
+        if ((m->buttonTrg & 0x100) && !kpaFireAttackCheck()) {
             m->currSubMotionId = 0x14;
         } else {
             m->multiTimer = (s32)m->multiTimer - 1;

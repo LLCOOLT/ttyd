@@ -125,23 +125,23 @@ CameraEntry* camEntryPersp(CameraCallback callback, f32 fovY, f32 aspect, f32 ne
     camera->viewport[3] = (f32)DEMOGetRenderModeObj()->efbHeight;
     camera->viewport[4] = nearZ;
     camera->viewport[5] = farZ;
-    camera->field_1F0.x = 0.0f;
-    camera->field_1F0.y = 8.0f;
-    camera->field_1F0.z = 400.0f;
-    camera->field_20C.x = 0.0f;
-    camera->field_20C.y = 0.0f;
-    camera->field_20C.z = 0.0f;
-    camera->field_200.x = 0.0f;
-    camera->field_200.y = 0.0f;
-    camera->field_200.z = 0.0f;
-    camera->field_218 = 0;
-    camera->field_21A = 0;
-    camera->field_21C = 0;
-    camera->field_21E = 0;
-    camera->field_224 = (Vec){ 0.0f, 0.0f, 0.0f };
-    camera->field_230 = (Vec){ 10.0f, 10.0f, 10.0f };
-    camera->field_23C = (Vec){ 0.0f, 0.0f, 0.0f };
-    camera->field_248 = (Vec){ 0.0f, 0.0f, 0.0f };
+    camera->reserved_1F0.x = 0.0f;
+    camera->reserved_1F0.y = 8.0f;
+    camera->reserved_1F0.z = 400.0f;
+    camera->reserved_20C.x = 0.0f;
+    camera->reserved_20C.y = 0.0f;
+    camera->reserved_20C.z = 0.0f;
+    camera->reserved_200.x = 0.0f;
+    camera->reserved_200.y = 0.0f;
+    camera->reserved_200.z = 0.0f;
+    camera->reserved_218 = 0;
+    camera->reserved_21A = 0;
+    camera->reserved_21C = 0;
+    camera->reserved_21E = 0;
+    camera->reserved_224 = (Vec){ 0.0f, 0.0f, 0.0f };
+    camera->reserved_230 = (Vec){ 10.0f, 10.0f, 10.0f };
+    camera->reserved_23C = (Vec){ 0.0f, 0.0f, 0.0f };
+    camera->reserved_248 = (Vec){ 0.0f, 0.0f, 0.0f };
     return camera;
 }
 
@@ -213,16 +213,16 @@ void camMain(void) {
         MTXConcat(trans, camera->view, camera->view);
 
         if (cameraId == CAMERA_3D && !gp->inBattle) {
-            weight = marioGetPtr()->field_64;
+            weight = marioGetPtr()->camZoomWeight;
 
             // Focus, M.
             focus = (Vec){ 0.0f, 0.0f, 0.0f };
-            focus.x = marioGetPtr()->position.x + marioGetPtr()->field_6C.x;
-            focus.y = marioGetPtr()->position.y + marioGetPtr()->field_6C.y;
-            focus.z = marioGetPtr()->position.z + marioGetPtr()->field_6C.z;
+            focus.x = marioGetPtr()->position.x + marioGetPtr()->camZoomOfs.x;
+            focus.y = marioGetPtr()->position.y + marioGetPtr()->camZoomOfs.y;
+            focus.z = marioGetPtr()->position.z + marioGetPtr()->camZoomOfs.z;
             projPt = focus;
 
-            zoom = marioGetPtr()->field_68;
+            zoom = marioGetPtr()->camZoom;
 
             hExtent = weight * (1.0f - 1.0f / zoom) * (f32)DEMOGetRenderModeObj()->fbWidth;
             vExtent = weight * (1.0f - 1.0f / zoom) * (f32)DEMOGetRenderModeObj()->efbHeight;

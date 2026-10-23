@@ -6,12 +6,8 @@
 #include "mot/mot_jump.h"
 #include "party.h"
 #include "driver/npcdrv.h"
+#include "driver/mobjdrv.h"
 
-#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
-#define JP0(m) MW(m, 0x7c, f32)
-#define JP1(m) MW(m, 0x80, f32)
-#define JP2(m) MW(m, 0x84, f32)
-#define JP3(m) MW(m, 0x88, f32)
 
 typedef struct MarioJumpData {
 	f32 jump[4];   // 0x0
@@ -108,8 +104,6 @@ s32 marioGetHammerLevel(void);
 BOOL marioChkHammer2(void);
 BOOL marioChkShipPlace(void* hit);
 BOOL marioChkPlanePlace(void* hit);
-s32 hitGetAttr(void* hit);
-void* mobjHitObjPtrToPtr(void* hit);
 s32 mobjGetHint(void* mobj);
 MotCaseEntry* caseCheckHitObj(void* hit);
 void* fbatNpcTalkCheck(void);
@@ -292,10 +286,10 @@ void marioChgSmallJumpMotion(void) {
 	mario->flags |= 0x80;
 	mario->hitobjJumpFrom = mario->hitobjStandOn;
 	mario->hitobjStandOn = NULL;
-	JP0(mario) = 6.0f;
-	JP1(mario) = -0.5f;
-	JP2(mario) = 0.0f;
-	JP3(mario) = 0.0f;
+	mario->jumpVelocityY = 6.0f;
+	mario->jumpAccelerationY = -0.5f;
+	mario->jumpJerkY = 0.0f;
+	mario->jumpSnapY = 0.0f;
 }
 
 BOOL marioChkItemGetMotion(void) {
@@ -319,7 +313,7 @@ BOOL marioChkTalkable(void) {
 	MarioWork* mario = marioGetPtr();
 	BOOL ret = FALSE;
 	PartyEntry* party = partyGetPtr(marioGetPartyId());
-	if (party != NULL && (s32)MW(party, 0x31, u8) == 4 && (party->flags & 0x100)) {
+	if (party != NULL && (s32)(u8)party->currentMemberId == 4 && (party->flags & 0x100)) {
 		return FALSE;
 	}
 	switch (mario->currMotionId) {
@@ -353,7 +347,7 @@ void marioBoots(void) {
 		if (!kpaHipAttackOk()) {
 			return;
 		}
-		if (!(mario->buttonBuffer & 0x100)) {
+		if (!(mario->buttonTrg & 0x100)) {
 			return;
 		}
 		marioChgMot(MARIO_MOTION_HIP);
@@ -439,10 +433,10 @@ void marioChgMot2(MarioMotion id) {
 
 void marioClearJumpPara(void) {
 	MarioWork* mario = marioGetPtr();
-	JP0(mario) = 0.0f;
-	JP1(mario) = 0.0f;
-	JP2(mario) = 0.0f;
-	JP3(mario) = 0.0f;
+	mario->jumpVelocityY = 0.0f;
+	mario->jumpAccelerationY = 0.0f;
+	mario->jumpJerkY = 0.0f;
+	mario->jumpSnapY = 0.0f;
 }
 
 void marioSetJumpPara(void) {
@@ -450,10 +444,10 @@ void marioSetJumpPara(void) {
 	f32* jd;
 	switch (mario->currMotionId) {
 		case MARIO_MOTION_JUMP_SW:
-			JP0(mario) = marioJumpSwData[0];
-			JP1(mario) = marioJumpSwData[1];
-			JP2(mario) = marioJumpSwData[2];
-			JP3(mario) = marioJumpSwData[3];
+			mario->jumpVelocityY = marioJumpSwData[0];
+			mario->jumpAccelerationY = marioJumpSwData[1];
+			mario->jumpJerkY = marioJumpSwData[2];
+			mario->jumpSnapY = marioJumpSwData[3];
 			break;
 		case MARIO_MOTION_JUMP:
 		case MARIO_MOTION_UPSTAIRS:
@@ -463,48 +457,48 @@ void marioSetJumpPara(void) {
 			if (mario->trigFlags & 0x10000) {
 				jd = marioJumpData.jump;
 				if (mario->flags & 0x1000) {
-					JP0(mario) = 0.5f * jd[0];
-					JP1(mario) = 0.5f * jd[1];
-					JP2(mario) = 0.5f * jd[2];
-					JP3(mario) = 0.5f * jd[3];
+					mario->jumpVelocityY = 0.5f * jd[0];
+					mario->jumpAccelerationY = 0.5f * jd[1];
+					mario->jumpJerkY = 0.5f * jd[2];
+					mario->jumpSnapY = 0.5f * jd[3];
 				}
 			} else {
 				jd = marioJumpData.jump;
 				if (!(mario->flags & 0x1000)) {
-					JP0(mario) = jd[0];
-					JP1(mario) = jd[1];
-					JP2(mario) = jd[2];
-					JP3(mario) = jd[3];
+					mario->jumpVelocityY = jd[0];
+					mario->jumpAccelerationY = jd[1];
+					mario->jumpJerkY = jd[2];
+					mario->jumpSnapY = jd[3];
 				} else {
-					JP0(mario) = 0.5f * jd[0];
-					JP1(mario) = 0.5f * jd[1];
-					JP2(mario) = 0.5f * jd[2];
-					JP3(mario) = 0.5f * jd[3];
+					mario->jumpVelocityY = 0.5f * jd[0];
+					mario->jumpAccelerationY = 0.5f * jd[1];
+					mario->jumpJerkY = 0.5f * jd[2];
+					mario->jumpSnapY = 0.5f * jd[3];
 				}
 				if (1.0f != mario->playerGravity) {
-					JP0(mario) = 2.0f;
-					JP1(mario) = -0.003f;
-					JP2(mario) = 0.029f;
-					JP3(mario) = -0.003f;
+					mario->jumpVelocityY = 2.0f;
+					mario->jumpAccelerationY = -0.003f;
+					mario->jumpJerkY = 0.029f;
+					mario->jumpSnapY = -0.003f;
 				}
 			}
 			break;
 		case MARIO_MOTION_JUMP_NPC:
-			JP0(mario) = 2.0f;
-			JP1(mario) = -0.04f;
-			JP2(mario) = -0.01f;
-			JP3(mario) = -0.003f;
+			mario->jumpVelocityY = 2.0f;
+			mario->jumpAccelerationY = -0.04f;
+			mario->jumpJerkY = -0.01f;
+			mario->jumpSnapY = -0.003f;
 			break;
 		case MARIO_MOTION_ROLL:
-			JP0(mario) = (jd = marioJumpData.jump)[0];
-			JP1(mario) = jd[1];
-			JP2(mario) = jd[2];
-			JP3(mario) = jd[3];
+			mario->jumpVelocityY = (jd = marioJumpData.jump)[0];
+			mario->jumpAccelerationY = jd[1];
+			mario->jumpJerkY = jd[2];
+			mario->jumpSnapY = jd[3];
 			if (1.0f != mario->playerGravity) {
-				JP0(mario) = 2.7f;
-				JP1(mario) = -0.002f;
-				JP2(mario) = 0.016f;
-				JP3(mario) = -0.002f;
+				mario->jumpVelocityY = 2.7f;
+				mario->jumpAccelerationY = -0.002f;
+				mario->jumpJerkY = 0.016f;
+				mario->jumpSnapY = -0.002f;
 			}
 			break;
 	}
@@ -519,15 +513,15 @@ void marioSetFallPara(void) {
 	if (mario->currMotionId == MARIO_MOTION_JUMP_SW) {
 		fall = &marioJumpSwData[4];
 	}
-	JP0(mario) = fall[0];
-	JP1(mario) = fall[1];
-	JP2(mario) = fall[2];
-	JP3(mario) = fall[3];
+	mario->jumpVelocityY = fall[0];
+	mario->jumpAccelerationY = fall[1];
+	mario->jumpJerkY = fall[2];
+	mario->jumpSnapY = fall[3];
 	if (1.0f != mario->playerGravity) {
-		JP0(mario) = 0.34f;
-		JP1(mario) = -0.002f;
-		JP2(mario) = -0.01f;
-		JP3(mario) = 0.0f;
+		mario->jumpVelocityY = 0.34f;
+		mario->jumpAccelerationY = -0.002f;
+		mario->jumpJerkY = -0.01f;
+		mario->jumpSnapY = 0.0f;
 	}
 }
 
@@ -535,29 +529,29 @@ f32 marioGetFallSpd(void) {
 	MarioWork* mario = marioGetPtr();
 	MarioJumpData* jd;
 	f32 min;
-	JP2(mario) = JP2(mario) + JP3(mario);
-	if (JP2(mario) > 0.0f) {
-		JP2(mario) = 0.0f;
+	mario->jumpJerkY = mario->jumpJerkY + mario->jumpSnapY;
+	if (mario->jumpJerkY > 0.0f) {
+		mario->jumpJerkY = 0.0f;
 	}
 	jd = &marioJumpData;
-	JP1(mario) = JP1(mario) + JP2(mario);
-	JP0(mario) = JP0(mario) + JP1(mario);
-	if (JP0(mario) <= (min = jd->minFall)) {
-		JP0(mario) = min;
-		JP1(mario) = 0.0f;
-		JP2(mario) = 0.0f;
-		JP3(mario) = 0.0f;
+	mario->jumpAccelerationY = mario->jumpAccelerationY + mario->jumpJerkY;
+	mario->jumpVelocityY = mario->jumpVelocityY + mario->jumpAccelerationY;
+	if (mario->jumpVelocityY <= (min = jd->minFall)) {
+		mario->jumpVelocityY = min;
+		mario->jumpAccelerationY = 0.0f;
+		mario->jumpJerkY = 0.0f;
+		mario->jumpSnapY = 0.0f;
 	}
-	return JP0(mario);
+	return mario->jumpVelocityY;
 }
 
 f32 marioMakeJumpPara(void) {
 	MarioWork* mario = marioGetPtr();
 	f32 div = (mario->flags & 0x1000) ? 1.7f : 1.0f;
-	JP2(mario) = JP2(mario) + JP3(mario) / div;
-	JP1(mario) = JP1(mario) + JP2(mario) / div;
-	JP0(mario) = JP0(mario) + JP1(mario) / div;
-	return JP0(mario);
+	mario->jumpJerkY = mario->jumpJerkY + mario->jumpSnapY / div;
+	mario->jumpAccelerationY = mario->jumpAccelerationY + mario->jumpJerkY / div;
+	mario->jumpVelocityY = mario->jumpVelocityY + mario->jumpAccelerationY / div;
+	return mario->jumpVelocityY;
 }
 
 void marioJump(void) {
@@ -578,12 +572,12 @@ void marioJump(void) {
 	if ((s32)mario->currSubMotionId < 10) {
 		return;
 	}
-	prev = JP0(mario);
+	prev = mario->jumpVelocityY;
 	marioMakeJumpPara();
-	if (JP0(mario) > 0.0f && mario->airTimer >= 4 && !(mario->buttonHold & 0x100)) {
-		JP0(mario) += -0.526f;
+	if (mario->jumpVelocityY > 0.0f && mario->airTimer >= 4 && !(mario->buttonHold & 0x100)) {
+		mario->jumpVelocityY += -0.526f;
 	}
-	if (JP0(mario) <= 0.0f) {
+	if (mario->jumpVelocityY <= 0.0f) {
 		if (prev > 0.0f) {
 			mario->jumpPeakAirTime = mario->airTimer;
 		}
@@ -593,15 +587,15 @@ void marioJump(void) {
 		if (!marioChkSts(0x10)) {
 			marioChgMot(MARIO_MOTION_FALL);
 		} else {
-			JP0(mario) = -0.03f;
-			JP1(mario) = -0.02f;
-			JP2(mario) = -0.02f;
-			JP3(mario) = -0.002f;
+			mario->jumpVelocityY = -0.03f;
+			mario->jumpAccelerationY = -0.02f;
+			mario->jumpJerkY = -0.02f;
+			mario->jumpSnapY = -0.002f;
 			mario->flags &= ~0x10000;
 			mario->flags |= 0x20000;
 		}
 	}
-	mario->position.y += JP0(mario);
+	mario->position.y += mario->jumpVelocityY;
 }
 
 void marioFall(void) {
@@ -700,7 +694,7 @@ void marioFall(void) {
 
 void marioLandOn(void) {
 	MarioWork* mario = marioGetPtr();
-	struct { u8 pad[0x15]; char name[1]; }* mobj;
+	MapObjectEntry* mobj;
 	Vec pos;
 	s32 attr;
 	u32 flags;
@@ -759,11 +753,11 @@ void marioLandOn(void) {
 	}
 	if (hitGetAttr(mario->hitobjStandOn) & 0x80000000) {
 		mobj = mobjHitObjPtrToPtr(mario->hitobjStandOn);
-		if (!strcmp(mobj->name, "MOBJ_RedSwitch")) {
+		if (!strcmp(mobj->animName, "MOBJ_RedSwitch")) {
 			marioChgMot(MARIO_MOTION_JUMP_SW);
 			return;
 		}
-		if (!strcmp(mobj->name, "MOBJ_BlueJumpStand")) {
+		if (!strcmp(mobj->animName, "MOBJ_BlueJumpStand")) {
 			marioChgJumpStandMotion(100.0f);
 			return;
 		}
@@ -882,9 +876,9 @@ void mot_talk(void) {
 			kpaChgPose("KPA_S_1", "KPA2_S_1");
 			return;
 		}
-		fbat = MW(fbatGetPointer(), 0x4, void*);
+		fbat = fbatGetPointer()->npc;
 		if (fbat != NULL) {
-			marioChgPose(MW(fbat, 0x10c, const char*));
+			marioChgPose(((NpcEntry*)fbat)->checkPose);
 		}
 		if (!strcmp(mario->animName, "M_I_2")) {
 			mario->multiTimer = 60;
@@ -920,7 +914,7 @@ void mot_getItem(void) {
 BOOL marioChkJump(void) {
 	MarioWork* mario = marioGetPtr();
 	MotCaseEntry* ce;
-	if (!(mario->buttonBuffer & 0x100)) {
+	if (!(mario->buttonTrg & 0x100)) {
 		return FALSE;
 	}
 	if (mario->currMotionId == MARIO_MOTION_YOSHI) {
@@ -962,10 +956,10 @@ BOOL marioChkJump(void) {
 
 BOOL marioChkTransform(void) {
 	MarioWork* mario = marioGetPtr();
-	if (!(mario->buttonBuffer & 0x800)) {
+	if (!(mario->buttonTrg & 0x800)) {
 		return FALSE;
 	}
-	if (!(mario->trigFlags & 4) && mario->field_0x3B) {
+	if (!(mario->trigFlags & 4) && mario->partyUseDelay) {
 		return FALSE;
 	}
 	if (mario->currMotionId == MARIO_MOTION_YOSHI) {
@@ -995,7 +989,7 @@ BOOL marioChkItemMotion(void) {
 		marioChgMot(MARIO_MOTION_HAMMER_2);
 		return TRUE;
 	}
-	trig = mario->buttonBuffer & 0x200;
+	trig = mario->buttonTrg & 0x200;
 	if (!trig) {
 		return FALSE;
 	}
@@ -1112,7 +1106,7 @@ void mot_shadow(void) {
 	}
 	switch ((s32)mario->currSubMotionId) {
 		case 0:
-			if (mario->buttonBuffer & 0x200) {
+			if (mario->buttonTrg & 0x200) {
 				mario->rot.x = 0.0f;
 				mario->rot.z = 0.0f;
 				mario->multiTimer = 0;

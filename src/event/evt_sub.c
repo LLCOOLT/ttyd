@@ -5,6 +5,7 @@
 #include "driver/animdrv.h"
 #include "driver/camdrv.h"
 #include "driver/effdrv.h"
+#include "eff/eff_starstone.h"
 #include "driver/itemdrv.h"
 #include "driver/npcdrv.h"
 #include "driver/swdrv.h"
@@ -2348,9 +2349,9 @@ USER_FUNC(stone_ry) {
 	s32* args = event->args;
 	s32 name = evtGetValue(event, args[0]);
 	s32 ang = evtGetValue(event, args[1]);
-	u8* item = *(u8**)((u8*)itemNameToPtr((char*)name) + 0x1c);
-	*(u16*)(*(u8**)(item + 0xc) + 4) &= ~4;
-	*(f32*)(*(u8**)(item + 0xc) + 0x1c) = ang % 360;
+	EffectEntry* item = itemNameToPtr((char*)name)->effect;
+	((EffStarStoneWork*)item->userdata)->flags &= ~4;
+	((EffStarStoneWork*)item->userdata)->rotY = ang % 360;
 	return EVT_RETURN_DONE;
 }
 
@@ -2365,7 +2366,7 @@ USER_FUNC(stone_bg) {
 	eff = effNameToPtr("sub_bg");
 	((s32*)eff->userdata)[14] = 5;
 	item = (u8*)itemNameToPtr(name);
-	*(s32*)(*(u8**)(*(u8**)(item + 0x1c) + 0xc) + 0x38) = 5;
+	((EffStarStoneWork*)((ItemEntry*)item)->effect->userdata)->cam = 5;
 	if (npcNameToPtr_NoAssert("\x82\xC9\x82\xB9\x83\x7D\x83\x8A\x83\x49") != NULL && evtGetValue(event, GSW(0)) < 211) {
 		npcNameToPtr_NoAssert("\x82\xC9\x82\xB9\x83\x7D\x83\x8A\x83\x49")->cameraId = 5;
 	} else {

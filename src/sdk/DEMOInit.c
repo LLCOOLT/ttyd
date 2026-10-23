@@ -5,7 +5,7 @@
 #include <dolphin/os.h>
 #include <dolphin/vi.h>
 #include <string.h>
-#include "sdk/DEMOPad.h"
+#include <demo/DEMOPad.h>
 #include "system.h"
 #include "sdk_decls.h"
 #include "libc_decls.h"

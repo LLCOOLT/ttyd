@@ -396,16 +396,16 @@ static BattleUnitKindPart parts[] = {
 
 static BattleWeapon weapon_rampell_attack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -414,7 +414,7 @@ static BattleWeapon weapon_rampell_attack = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x11007, // special
     6, // counterResistFlags
@@ -425,9 +425,9 @@ static BattleWeapon weapon_rampell_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleUnitSetup entry_marilyn = {
@@ -1028,8 +1028,8 @@ static BattleUnitKindPart parts_fmario[] = {
         {0}, // positionOffset
         {3.0f, 27.0f, 0.0f}, // hitBaseOffset
         {0.0f, 30.0f, 0.0f}, // hitCursorBaseOffset
-        20, // field_0x30
-        30, // field_0x32
+        20, // shadowSize
+        30, // reserved_32
         255, // baseAlpha
         &defence_fmario, // defense
         &defence_attr_fmario, // defenseAttr
@@ -1041,16 +1041,16 @@ static BattleUnitKindPart parts_fmario[] = {
 
 static BattleWeapon weapon_masao_jump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1059,7 +1059,7 @@ static BattleWeapon weapon_masao_jump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x15807, // special
     0xC, // counterResistFlags
@@ -1070,23 +1070,23 @@ static BattleWeapon weapon_masao_jump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_masao_hammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1095,7 +1095,7 @@ static BattleWeapon weapon_masao_hammer = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x10807, // special
     0x20C, // counterResistFlags
@@ -1106,23 +1106,23 @@ static BattleWeapon weapon_masao_hammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_masao_kururin_jump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {8, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1131,7 +1131,7 @@ static BattleWeapon weapon_masao_kururin_jump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x15807, // special
     0xC, // counterResistFlags
@@ -1142,23 +1142,23 @@ static BattleWeapon weapon_masao_kururin_jump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_masao_kaiten_hammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {8, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1167,7 +1167,7 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x10807, // special
     0x20C, // counterResistFlags
@@ -1178,9 +1178,9 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(mario_zoom)
@@ -1676,16 +1676,16 @@ EVT_END()
 
 static BattleWeapon enemyWeapon_ChristineNormalAttack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerFromGulliblePartyAttackLv, // hpDamageFn
     {1, 2, 3, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1694,7 +1694,7 @@ static BattleWeapon enemyWeapon_ChristineNormalAttack = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x15017, // special
     0xC, // counterResistFlags
@@ -1705,9 +1705,9 @@ static BattleWeapon enemyWeapon_ChristineNormalAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleUnitDefense defence_christine = {0};
@@ -1729,8 +1729,8 @@ static BattleUnitKindPart parts_christine[] = {
         {0}, // positionOffset
         {15.0f, 25.0f, 0.0f}, // hitBaseOffset
         {0.0f, 30.0f, 0.0f}, // hitCursorBaseOffset
-        20, // field_0x30
-        30, // field_0x32
+        20, // shadowSize
+        30, // reserved_32
         255, // baseAlpha
         &defence_christine, // defense
         &defence_attr_christine, // defenseAttr
@@ -1994,16 +1994,16 @@ EVT_END()
 
 static BattleWeapon enemyWeapon_NokotarouKouraAttack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerFromGulliblePartyAttackLv, // hpDamageFn
     {2, 3, 5, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2013,7 +2013,7 @@ static BattleWeapon enemyWeapon_NokotarouKouraAttack = {
     0, // element
     8, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x10087, // special
     0x5FF, // counterResistFlags
@@ -2024,23 +2024,23 @@ static BattleWeapon enemyWeapon_NokotarouKouraAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon enemyWeapon_NokotarouShubibinAttack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerFromGulliblePartyAttackLv, // hpDamageFn
     {2, 3, 5, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2050,7 +2050,7 @@ static BattleWeapon enemyWeapon_NokotarouShubibinAttack = {
     0, // element
     8, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x10087, // special
     0x5FF, // counterResistFlags
@@ -2061,9 +2061,9 @@ static BattleWeapon enemyWeapon_NokotarouShubibinAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleUnitDefense defence_nokotarou = {{1, 1, 1, 1, 1}};
@@ -2088,8 +2088,8 @@ static BattleUnitKindPart parts_nokotarou[] = {
         {0}, // positionOffset
         {15.0f, 25.0f, 0.0f}, // hitBaseOffset
         {0.0f, 30.0f, 0.0f}, // hitCursorBaseOffset
-        20, // field_0x30
-        30, // field_0x32
+        20, // shadowSize
+        30, // reserved_32
         255, // baseAlpha
         &defence_nokotarou, // defense
         &defence_attr_nokotarou, // defenseAttr
@@ -2494,16 +2494,16 @@ EVT_END()
 
 static BattleWeapon enemyWeapon_ClaudaNormalAttack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerFromGulliblePartyAttackLv, // hpDamageFn
     {2, 4, 6, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2513,7 +2513,7 @@ static BattleWeapon enemyWeapon_ClaudaNormalAttack = {
     0, // element
     10, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x14087, // special
     0xC, // counterResistFlags
@@ -2524,9 +2524,9 @@ static BattleWeapon enemyWeapon_ClaudaNormalAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleUnitDefense defence_clauda = {0};
@@ -2548,8 +2548,8 @@ static BattleUnitKindPart parts_clauda[] = {
         {0}, // positionOffset
         {15.0f, 25.0f, 0.0f}, // hitBaseOffset
         {0.0f, 30.0f, 0.0f}, // hitCursorBaseOffset
-        20, // field_0x30
-        30, // field_0x32
+        20, // shadowSize
+        30, // reserved_32
         255, // baseAlpha
         &defence_clauda, // defense
         &defence_attr_clauda, // defenseAttr
@@ -2721,16 +2721,16 @@ EVT_END()
 
 static BattleWeapon enemyWeapon_YoshiNormalAttack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerFromGulliblePartyAttackLv, // hpDamageFn
     {1, 1, 1, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2739,7 +2739,7 @@ static BattleWeapon enemyWeapon_YoshiNormalAttack = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x15097, // special
     0xC, // counterResistFlags
@@ -2750,9 +2750,9 @@ static BattleWeapon enemyWeapon_YoshiNormalAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleUnitDefense defence_yoshi = {0};
@@ -2774,8 +2774,8 @@ static BattleUnitKindPart parts_yoshi[] = {
         {0}, // positionOffset
         {15.0f, 25.0f, 0.0f}, // hitBaseOffset
         {0.0f, 30.0f, 0.0f}, // hitCursorBaseOffset
-        20, // field_0x30
-        30, // field_0x32
+        20, // shadowSize
+        30, // reserved_32
         255, // baseAlpha
         &defence_yoshi, // defense
         &defence_attr_yoshi, // defenseAttr
@@ -3046,8 +3046,8 @@ BattleUnitKindPart parts_vivian[] = {
         {0}, // positionOffset
         {15.0f, 25.0f, 0.0f}, // hitBaseOffset
         {0.0f, 30.0f, 0.0f}, // hitCursorBaseOffset
-        20, // field_0x30
-        30, // field_0x32
+        20, // shadowSize
+        30, // reserved_32
         255, // baseAlpha
         &defence_vivian, // defense
         &defence_attr_vivian, // defenseAttr
@@ -3059,16 +3059,16 @@ BattleUnitKindPart parts_vivian[] = {
 
 BattleWeapon weapon_vivian_kagenuke_attack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerFromGulliblePartyAttackLv, // hpDamageFn
     {3, 4, 5, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3077,7 +3077,7 @@ BattleWeapon weapon_vivian_kagenuke_attack = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x14087, // special
     0xC, // counterResistFlags
@@ -3088,9 +3088,9 @@ BattleWeapon weapon_vivian_kagenuke_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(vivian_down)
@@ -3256,8 +3256,8 @@ BattleUnitKindPart parts_sanders[] = {
         {0}, // positionOffset
         {16.0f, 24.0f, 5.0f}, // hitBaseOffset
         {0.0f, 24.0f, 0.0f}, // hitCursorBaseOffset
-        20, // field_0x30
-        24, // field_0x32
+        20, // shadowSize
+        24, // reserved_32
         255, // baseAlpha
         &defence_sanders, // defense
         &defence_attr_sanders, // defenseAttr
@@ -3269,16 +3269,16 @@ BattleUnitKindPart parts_sanders[] = {
 
 BattleWeapon enemyWeapon_SandersNormalAttack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerFromGulliblePartyAttackLv, // hpDamageFn
     {4, 5, 6, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3288,7 +3288,7 @@ BattleWeapon enemyWeapon_SandersNormalAttack = {
     3, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x14087, // special
     0x7FB, // counterResistFlags
@@ -3299,9 +3299,9 @@ BattleWeapon enemyWeapon_SandersNormalAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(init_event_sanders)
@@ -3463,8 +3463,8 @@ BattleUnitKindPart parts_chuchurina[] = {
         {0}, // positionOffset
         {16.0f, 24.0f, 5.0f}, // hitBaseOffset
         {0.0f, 24.0f, 0.0f}, // hitCursorBaseOffset
-        20, // field_0x30
-        24, // field_0x32
+        20, // shadowSize
+        24, // reserved_32
         255, // baseAlpha
         &defence_chuchurina, // defense
         &defence_attr_chuchurina, // defenseAttr
@@ -3476,16 +3476,16 @@ BattleUnitKindPart parts_chuchurina[] = {
 
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackR = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3495,7 +3495,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackR = {
     0, // element
     22, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x140C7, // special
     0x20C, // counterResistFlags
@@ -3506,23 +3506,23 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackR = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackL = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3532,7 +3532,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackL = {
     0, // element
     21, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x140C7, // special
     0x20C, // counterResistFlags
@@ -3543,23 +3543,23 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackL = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackRlast = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerFromGulliblePartyAttackLv, // hpDamageFn
     {2, 3, 4, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3569,7 +3569,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackRlast = {
     0, // element
     24, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x140C7, // special
     0xC, // counterResistFlags
@@ -3580,23 +3580,23 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackRlast = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackLlast = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerFromGulliblePartyAttackLv, // hpDamageFn
     {2, 3, 4, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3606,7 +3606,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackLlast = {
     0, // element
     23, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x140C7, // special
     0xC, // counterResistFlags
@@ -3617,9 +3617,9 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackLlast = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(init_event_chuchurina)

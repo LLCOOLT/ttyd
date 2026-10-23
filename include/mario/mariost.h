@@ -9,8 +9,8 @@
 typedef struct GlobalWork {
 	s32 flags; //0x0
 	s32 framerate; //0x4
-	s32 unk8; //0x8
-	s32 field_C; //0xC
+	s32 debugFlag; //0x8
+	s32 debugBattle; //0xC
 	BOOL dvdError; //0x10
 	s32 inBattle; //0x14, verified s32
 	s32 systemLevelFlags; //0x18
@@ -26,7 +26,7 @@ typedef struct GlobalWork {
 	OSTime systemLv3Time; //0x60
 	CountdownWork countdown; //0x68
 	lottery_info mLotteryInfo; //0xA8
-	u8 field_0xE8[0xF8 - 0xE8]; //0xE8
+	u8 pad_E8[0xF8 - 0xE8]; //0xE8
 	FadeType mapFadeOutType; //0xF8
 	s32 mapFadeOutDuration; //0xFC
 	FadeType mapFadeInType; //0x100
@@ -52,33 +52,32 @@ typedef struct GlobalWork {
 	u32 mLSWF[0x10]; //0xD78
 	u8 mLSW[0x400]; //0xDB8
 	s32 lastSlot; //0x11B8, last used save slot, start cursor on load screen
-	u8 field_0x11BC[0x11D0 - 0x11BC]; //0x11BC
+	u8 playerName[0x11D0 - 0x11BC]; //0x11BC
 	s32 saveSlot; //0x11D0
 	Vec savePlayerPos; //0x11D4
     s32 savePartyId[2]; //0x11E0
     OSTime saveTime; //0x11E8
     s32 saveCount; //0x11F0
-	u8 field_0x11F4[0x1274 - 0x11F4]; //0x11F4
-	s32 unk1274; //0x1274
+	u8 pad_11F4[0x1274 - 0x11F4]; //0x11F4
+	s32 soundMode; //0x1274
 	s32 resetType; //0x1278, 0 = no reset, 1 = soft reset, 2 = menu
 	BOOL resetButtonDown; //0x127C, reset button was down (mariost.c)
 	BOOL softResetWait; //0x1280
-	u8 field_0x1284[0x1288 - 0x1284]; //0x1284
+	u8 pad_1284[0x1288 - 0x1284]; //0x1284
 	OSTime softResetTimeout; //0x1288
 	BOOL restartChecked; //0x1290, restart reset-combo check done
 	BOOL rumbleEnabled; //0x1294, rumble option, 0 = off
-	u8 field_0x1298[0x12C0 - 0x1298]; //0x1298
+	u8 pad_1298[0x12C0 - 0x1298]; //0x1298
 	u8 rumbleStart[4]; //0x12C0
-	u8 field_0x12C4[4]; //0x12C4
+	u8 pad_12C4[4]; //0x12C4
 	OSTime rumbleStartTime[4]; //0x12C8
 	u8 rumbleForcedOff[4]; //0x12E8, rumble cut after 30 s
 	u8 rumbleForcedOffLatch[4]; //0x12EC, rumble cut latch
-	OSTime rumbleForcedOffTime[4]; //time rumble was cut
-	//u8 field_0x1300[0x1310 - 0x1300]; //0x1300
+	OSTime rumbleForcedOffTime[4]; //0x12F0, time rumble was cut
 	u8 rumbleHardStop[4]; //0x1310, stop motor hard (PADControlMotor 2)
 	OSTick mDeltaGame; //0x1314
 	OSTick mDeltaRender; //0x1318
-	u8 field_0x131C[0x1324 - 0x131C]; //0x131C
+	u8 pad_131C[0x1324 - 0x131C]; //0x131C
 // system.c "key" controller data, TODO sub-struct?
 	BOOL keyDataValid; //0x1324, key data valid (system.c)
 	u32 button[4]; //0x1328

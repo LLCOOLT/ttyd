@@ -1,3 +1,4 @@
+#include "eff/eff_fire.h"
 #include "driver/animdrv.h"
 #include "driver/hitdrv.h"
 #include "driver/mapdrv.h"
@@ -498,7 +499,7 @@ USER_FUNC(evt_map_replace_mapobj) {
         break;
     case 1: {
         EffectEntry* eff = effFireEntry(5, 0, pos.x, pos.y, pos.z, 0.4f);
-        *(s32*)((u8*)eff->userdata + 0x88) = 1;
+        ((EffFireWork*)eff->userdata)->useMapBlend = 1;
         break;
     }
     }

@@ -156,7 +156,7 @@ void seq_mapChangeMain(SequenceWork* work) {
             if (strcmp(_next_map, "dmo_00") && strcmp(_next_map, "title")) {
                 if (OSGetSoundMode() == 0) {
                     SoundSetOutputMode(0);
-                } else if (gp->unk1274 == 0) {
+                } else if (gp->soundMode == 0) {
                     SoundSetOutputMode(1);
                 } else {
                     SoundSetOutputMode(2);
@@ -200,7 +200,7 @@ void seq_mapChangeMain(SequenceWork* work) {
                     if (gp->relocationBase) {
                         memset(rel_bss, 0, 0x3c4);
                         OSLink(gp->relocationBase, rel_bss);
-                        (*(void (**)(void))((u8*)gp->relocationBase + 0x34))();
+                        ((void (*)(void))((OSModuleHeader*)gp->relocationBase)->prolog)();
                     }
                     _load(gp->currentMapName, _next_map, _next_bero);
                     work->state++;
@@ -390,7 +390,7 @@ void _load(const char* prevMapName, const char* newMapName, const char* beroName
         mapLoad(map->mapName);
     }
     camCtrlOff(4);
-    if (gp->field_C) {
+    if (gp->debugBattle) {
         msgLoad("gon_11", 0);
     } else {
         memset(mapFile, 0, sizeof(mapFile));
@@ -486,7 +486,7 @@ static const char mc_jon[] = "jon";
 
 void _relUnLoad(void) {
     if (gp->relocationBase) {
-        (*(void (**)(void))((u8*)gp->relocationBase + 0x38))();
+        ((void (*)(void))((OSModuleHeader*)gp->relocationBase)->epilog)();
         OSUnlink(gp->relocationBase);
         if (gp->relocationBase != gp->mapAlloc) {
             _mapFree(gp->relocationBase);

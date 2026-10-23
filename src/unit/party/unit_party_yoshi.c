@@ -29,7 +29,7 @@ void btlDispTexPlane(u32 id, GXColor color, s32 unk, f32 tX, f32 tY, f32 tZ, f32
 typedef struct YoshiGundanPart YoshiGundanPart;
 void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p);
 void _yoshi_slide_move_sound(void* w, void* s);
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
+static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
 typedef struct YoshiGundanPart {
     f32 x, y, z;
@@ -54,8 +54,6 @@ void psndSFX_pos(s32 id, Vec* position);
 #include "eff/n64/eff_sweat_n64.h"
 #include "data_tables.h"
 f32 sinfd(f32 degrees);
-#define UF32(u, o) (*(f32*)((u8*)(u) + BUOFF(o)))
-#define US32(u, o) (*(s32*)((u8*)(u) + BUOFF(o)))
 typedef struct YoshiSweatWork {
     s32 pad0;
     f32 x;
@@ -384,16 +382,16 @@ BattleWeapon partyWeapon_YoshiNormalAttack = {
 #else
     336, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pys_hip_drop", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {1, 1, 1, 1, 1, 1, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -402,7 +400,7 @@ BattleWeapon partyWeapon_YoshiNormalAttack = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hip_drop", // acHelpMsg
     0x35097, // special
     0xC, // counterResistFlags
@@ -413,12 +411,12 @@ BattleWeapon partyWeapon_YoshiNormalAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyYoshiAttack_NormalAttack, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 10, 10, 100, 10, 10, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 10, 10, 100, 10, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 #else
-    {0, 10, 10, 100, 10, 5, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 10, 10, 100, 10, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -429,17 +427,17 @@ BattleWeapon partyWeapon_YoshiNomikomi_Shot = {
 #else
     337, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pys_nomikomi", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {2, 4, 3, 5, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -449,7 +447,7 @@ BattleWeapon partyWeapon_YoshiNomikomi_Shot = {
     0, // element
     6, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_nomikomi", // acHelpMsg
     0x20047, // special
     0x7FB, // counterResistFlags
@@ -460,12 +458,12 @@ BattleWeapon partyWeapon_YoshiNomikomi_Shot = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyYoshiAttack_Nomikomi, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -476,17 +474,17 @@ BattleWeapon partyWeapon_YoshiNomikomi_Spew = {
 #else
     337, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pys_nomikomi", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {2, 4, 3, 5, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -496,7 +494,7 @@ BattleWeapon partyWeapon_YoshiNomikomi_Spew = {
     0, // element
     5, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_nomikomi", // acHelpMsg
     0x20047, // special
     0x7FF, // counterResistFlags
@@ -507,12 +505,12 @@ BattleWeapon partyWeapon_YoshiNomikomi_Spew = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyYoshiAttack_Nomikomi, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 10, 5, 5, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 5, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 5, 5, 5, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 5, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -523,17 +521,17 @@ BattleWeapon partyWeapon_YoshiNomikomi_Dmg0 = {
 #else
     337, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pys_nomikomi", // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -542,7 +540,7 @@ BattleWeapon partyWeapon_YoshiNomikomi_Dmg0 = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_nomikomi", // acHelpMsg
     0x20040, // special
     0x7FF, // counterResistFlags
@@ -553,9 +551,9 @@ BattleWeapon partyWeapon_YoshiNomikomi_Dmg0 = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyYoshiAttack_Nomikomi, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_YoshiNomikomi_Fire = {
@@ -565,17 +563,17 @@ BattleWeapon partyWeapon_YoshiNomikomi_Fire = {
 #else
     337, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pys_nomikomi", // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -585,7 +583,7 @@ BattleWeapon partyWeapon_YoshiNomikomi_Fire = {
     1, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_nomikomi", // acHelpMsg
     0x20040, // special
     0x7FF, // counterResistFlags
@@ -596,17 +594,17 @@ BattleWeapon partyWeapon_YoshiNomikomi_Fire = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyYoshiAttack_Nomikomi, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_YoshiNomikomi_Involved = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
-    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {1, 4, 2, 5, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -615,7 +613,7 @@ BattleWeapon partyWeapon_YoshiNomikomi_Involved = {
     0x20102000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20040, // special
     0x7FF, // counterResistFlags
@@ -626,9 +624,9 @@ BattleWeapon partyWeapon_YoshiNomikomi_Involved = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_YoshiEggAttack_Minimini = {
@@ -638,21 +636,21 @@ BattleWeapon partyWeapon_YoshiEggAttack_Minimini = {
 #else
     338, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pys_wonder_egg", // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
 #ifdef VERSION_G8ME01
     1, // mStylishCommandMultiplier
 #else
     2, // mStylishCommandMultiplier
 #endif
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {1, 1, 1, 1, 1, 1, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -661,7 +659,7 @@ BattleWeapon partyWeapon_YoshiEggAttack_Minimini = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_wonder_egg", // acHelpMsg
     0x20003, // special
     0x7FF, // counterResistFlags
@@ -675,12 +673,12 @@ BattleWeapon partyWeapon_YoshiEggAttack_Minimini = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyYoshiAttack_EggAttack, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 6, 3, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 6, 3, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 3, 3, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 3, 3, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -691,17 +689,17 @@ BattleWeapon partyWeapon_YoshiCallGuard = {
 #else
     339, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pys_taigun_yoshi", // description
     100, // baseAccuracy
     6, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {1, 1, 1, 1, 1, 1, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -710,7 +708,7 @@ BattleWeapon partyWeapon_YoshiCallGuard = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_taigun_yoshi", // acHelpMsg
     0x20017, // special
     0x7FF, // counterResistFlags
@@ -721,12 +719,12 @@ BattleWeapon partyWeapon_YoshiCallGuard = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyYoshiAttack_CallGuard, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 20, 20, 100, 20, 40, 5, 5, 20, 5, 0, 0}, // field_B4
+    {0, 20, 20, 100, 20, 40, 5, 5, 20, 5, 0, 0}, // stageEffectRates
 #else
-    {0, 20, 20, 100, 20, 20, 5, 5, 20, 5, 0, 0}, // field_B4
+    {0, 20, 20, 100, 20, 20, 5, 5, 20, 5, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -2060,15 +2058,15 @@ USER_FUNC(yoshi_original_color_anim_set) {
 }
 
 #define ADD_WEAPON(w)                                                                              \
-    command->mWeaponTable[*count].mIndex = -1;                                                     \
-    command->mWeaponTable[*count].mItem = 0;                                                       \
-    command->mWeaponTable[*count].mWeaponParams = (BattleWeapon*)(w);                              \
-    command->mWeaponTable[*count].field_0x4 = 0;                                                   \
-    command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;       \
-    command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name); \
+    command->weapon[*count].index = -1;                                                     \
+    command->weapon[*count].itemId = 0;                                                       \
+    command->weapon[*count].weapon = (BattleWeapon*)(w);                              \
+    command->weapon[*count].enabled = 0;                                                   \
+    command->weapon[*count].icon = command->weapon[*count].weapon->icon;       \
+    command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name); \
     (*count)++;
 
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count) {
+static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
     techLv = partyGetTechLv(BattleTransPartyId(BattleGetPartyPtr(_battleWorkPointer)->currentKind));
@@ -2112,17 +2110,17 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_calc_param) {
     BtlUnit_SetMoveStartPos(unit, x, y, z);
     BtlUnit_SetMoveCurrentPos(unit, x, y, z);
     unit->mMoveDirection = angleABf(x, z, tx, tz);
-    UF32(unit, 0x17C) = distABf(x, z, tx, tz);
+    unit->mMoveDistance = distABf(x, z, tx, tz);
     if (tx - x > 0.0f) {
         unit->moveDirection = 1;
     } else if (tx - x < 0.0f) {
         unit->moveDirection = -1;
     }
-    UF32(unit, 0x17C) = __fabs(tx - x);
+    unit->mMoveDistance = __fabs(tx - x);
     unit->moveFrames = 180;
-    UF32(unit, 0x180) = (f32)unit->moveFrames;
+    unit->mMoveTotalFrames = (f32)unit->moveFrames;
     unit->mMoveSpeedY = 0.0f;
-    unit->mMoveSpeedXZ = UF32(unit, 0x17C) / (f32)unit->moveFrames;
+    unit->mMoveSpeedXZ = unit->mMoveDistance / (f32)unit->moveFrames;
     evtSetFloat(event, outSpeed, unit->mMoveSpeedXZ);
     evtSetValue(event, outFrames, unit->moveFrames);
     return EVT_RETURN_DONE;
@@ -2167,11 +2165,11 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_move) {
             unit->mMoveCurrentPos.z -= unit->mMoveSpeedXZ;
         }
     }
-    sweatAngle = 10.0f * sinfd(180.0f + 360.0f * (UF32(unit, 0x180) - (f32)(unit->moveFrames % 90)) / 90.0f);
+    sweatAngle = 10.0f * sinfd(180.0f + 360.0f * (unit->mMoveTotalFrames - (f32)(unit->moveFrames % 90)) / 90.0f);
     BtlUnit_GetPartsPtr(unit, 1);
-    unit->mMoveCurrentPos.y = unit->mMoveSpeedY + (unit->mMoveStartPos.y + (unit->mMoveTargetPos.y - unit->mMoveStartPos.y) * (UF32(unit, 0x180) - (f32)unit->moveFrames) / UF32(unit, 0x180));
+    unit->mMoveCurrentPos.y = unit->mMoveSpeedY + (unit->mMoveStartPos.y + (unit->mMoveTargetPos.y - unit->mMoveStartPos.y) * (unit->mMoveTotalFrames - (f32)unit->moveFrames) / unit->mMoveTotalFrames);
     unit->mMoveSpeedY = sweatAngle;
-    unit->work[5] = (s32)(75.0f - 25.0f * sinfd(360.0f * (UF32(unit, 0x180) - (f32)(unit->moveFrames % 90)) / 90.0f));
+    unit->work[5] = (s32)(75.0f - 25.0f * sinfd(360.0f * (unit->mMoveTotalFrames - (f32)(unit->moveFrames % 90)) / 90.0f));
     BtlUnit_SetPos(unit, unit->mMoveCurrentPos.x, unit->mMoveCurrentPos.y, unit->mMoveCurrentPos.z);
     event->userdata[1]++;
     if (event->userdata[1] > 20) {

@@ -248,16 +248,16 @@ EVT_BEGIN(evt_ie1_door_close)
 EVT_END()
 
 DoorParam ie1_door = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie1_door", // mapobj
     "A_ie1_door1", // hitIn
     "A_ie1_door1_u", // hitOut
-    "S_ie1_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie1_naka", // mapOut
-    NULL, // hitOutOut
+    "S_ie1_soto", // outside
+    NULL, // outsideHit
+    "S_ie1_naka", // inside
+    NULL, // insideHit
     evt_ie1_door_1, // evtIn
     NULL, // evtOut
     evt_ie1_wall, // evtWall
@@ -299,16 +299,16 @@ EVT_BEGIN(evt_ie2_door_close)
 EVT_END()
 
 DoorParam ie2_door = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie2_door", // mapobj
     "A__ie2_door2", // hitIn
     "A__ie2_door2_u", // hitOut
-    "S_ie2_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie2_naka", // mapOut
-    NULL, // hitOutOut
+    "S_ie2_soto", // outside
+    NULL, // outsideHit
+    "S_ie2_naka", // inside
+    NULL, // insideHit
     evt_ie2_door_1, // evtIn
     NULL, // evtOut
     evt_ie2_wall, // evtWall
@@ -362,16 +362,16 @@ const char* ie3_item[] = {
 };
 
 DoorParam ie3_door = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie3_door", // mapobj
     "A_ie3_door3_u", // hitIn
     "A_ie3_door3", // hitOut
-    "S_ie3_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie3_naka", // mapOut
-    NULL, // hitOutOut
+    "S_ie3_soto", // outside
+    NULL, // outsideHit
+    "S_ie3_naka", // inside
+    NULL, // insideHit
     evt_ie3_door_1, // evtIn
     evt_ie3_door_2, // evtOut
     evt_ie3_wall, // evtWall

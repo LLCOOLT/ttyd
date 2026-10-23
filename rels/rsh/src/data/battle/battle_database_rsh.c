@@ -184,6 +184,6 @@ USER_FUNC(_set_offset) {
     return EVT_RETURN_DONE;
 }
 USER_FUNC(_set_destroy_flag) {
-    _battleWorkPointer->field_180DC |= 8;
+    _battleWorkPointer->stageObjectWork.flags |= 8;
     return EVT_RETURN_DONE;
 }

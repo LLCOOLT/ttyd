@@ -635,12 +635,12 @@ s16 marioSetMutekiTime(s32 msec) {
 	MarioWork* wp = mp;
 	PartyEntry* party;
 
-	wp->unk4C = sysMsec2Frame(msec);
+	wp->mutekiTimer = sysMsec2Frame(msec);
 	party = partyGetPtr(marioGetPartyId());
 	if (party) {
-		party->unk2A = wp->unk4C;
+		party->mutekiTimer = wp->mutekiTimer;
 	}
-	return wp->unk4C;
+	return wp->mutekiTimer;
 }
 
 BOOL marioBgmodeChk(void) {
@@ -791,7 +791,7 @@ void marioInit(void) {
 	mp->basePos = mp->position;
 	mp->wPlayerCollisionBox.z = 20.0f;
 	marioChgPose("M_S_1");
-	mp->field_0x20 = NULL;
+	mp->reserved_20 = NULL;
 	mp->bottomlessResetPosition = (Vec){0.0f, 74.0f, 0.0f};
 	marioChgMot(MARIO_MOTION_STAY);
 	marioBaloonInit();
@@ -943,7 +943,6 @@ void marioReInit(void) {
 	wp->returnPos = (Vec){0.0f, -10000.0f, 0.0f};
 }
 
-#define MFLD(p, t, off) (*(t*)((u8*)(p) + (off)))
 void marioSetDirEventMain(void);
 void marioHitCheckWidth(void);
 void itemCoinDrop(Vec* position);
@@ -979,9 +978,9 @@ static inline void marioMainEnd(MarioWork* wp) {
 		seqSetSeq(SEQ_GAME_OVER, NULL, NULL);
 	}
 	wp->basePos = wp->position;
-	wp->unk174.x = 0.0f;
-	wp->unk174.y = 0.0f;
-	wp->unk174.z = 0.0f;
+	wp->floorMove.x = 0.0f;
+	wp->floorMove.y = 0.0f;
+	wp->floorMove.z = 0.0f;
 	wp->frameCounter++;
 }
 
@@ -1044,8 +1043,8 @@ void marioMain(void) {
 	}
 	marioPreCamera();
 	marioHitCheckWidth();
-	if (wp->unk4C > 0) {
-		wp->unk4C--;
+	if (wp->mutekiTimer > 0) {
+		wp->mutekiTimer--;
 	}
 	if (wp->coinDropTimer > 0) {
 		wp->coinDropTimer--;
@@ -1059,8 +1058,8 @@ void marioMain(void) {
 			itemCoinDrop(&drop);
 		}
 	}
-	if (wp->unk5E > 0) {
-		if (--wp->unk5E <= 0) {
+	if (wp->zoomOffTimer > 0) {
+		if (--wp->zoomOffTimer <= 0) {
 			wp->dispFlags &= ~0x100000;
 		}
 	}
@@ -1470,10 +1469,10 @@ void marioMoveMain(void) {
 			vz2 *= (f32)cos(3.1415927f * wp->groundSlope / 180.0f);
 		}
 	}
-	vx += wp->unk174.x;
-	vz2 += wp->unk174.z;
+	vx += wp->floorMove.x;
+	vz2 += wp->floorMove.z;
 	vy = 0.0f;
-	wp->position.y += vy + wp->unk174.y;
+	wp->position.y += vy + wp->floorMove.y;
 	dist = mm_sqrtf(vx * vx + vz2 * vz2);
 	if (dist != vy) {
 		spd = angleABf(0.0f, 0.0f, vx, vz2);
@@ -1495,7 +1494,7 @@ void marioMoveMain(void) {
 	}
 	wp->moveDist = dist;
 	if (wp->flags & 0x40) {
-		spd = wp->unk1A4;
+		spd = wp->forceDir;
 		wp->directionView = spd;
 	}
 	else if (wp->flags & 0x400) {
@@ -1515,7 +1514,7 @@ void marioMoveMain(void) {
 		else {
 			marioCheckWall_roll(dist, spd);
 		}
-		N_dou10_yoko_yari3((u8*)wp + MWOFF(0x210));
+		N_dou10_yoko_yari3(&wp->frontWallDist);
 		if (wp->hitobjFront && (hitGetAttr(wp->hitobjFront) & 0x800)) {
 			set_damage_root_ypos(wp->position.y);
 			marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
@@ -1985,7 +1984,7 @@ void marioPreDisp(void) {
 			t = kpaNoHitEnemyCheck();
 		}
 		else {
-			t = wp->unk4C;
+			t = wp->mutekiTimer;
 		}
 		if (t > 0) {
 			if (!(t & 2)) {
@@ -2127,7 +2126,7 @@ void marioDispBlurSub(Mtx unused, s32 blurId) {
 	MTXTrans(rotMtx, wp->rotOfs.x, wp->rotOfs.y, wp->rotOfs.z);
 	MTXConcat(rotMtx, mtx, mtx);
 	if (wp->flags & 0x1000000) {
-		MTXScale(scaleMtx, 1.0f, wp->unk130, 1.0f);
+		MTXScale(scaleMtx, 1.0f, wp->tubeScaleY, 1.0f);
 		MTXConcat(scaleMtx, mtx, mtx);
 	}
 	if (wp->currMotionId == MARIO_MOTION_YOSHI) {
@@ -2231,7 +2230,7 @@ void marioDisp(CameraId camId, void* param) {
 	MTXTrans(rotMtx, wp->rotOfs.x, wp->rotOfs.y, wp->rotOfs.z);
 	MTXConcat(rotMtx, mtx, mtx);
 	if (wp->flags & 0x1000000) {
-		MTXScale(scaleMtx, 1.0f, wp->unk130, 1.0f);
+		MTXScale(scaleMtx, 1.0f, wp->tubeScaleY, 1.0f);
 		MTXConcat(scaleMtx, mtx, mtx);
 	}
 	MTXTrans(rotMtx,

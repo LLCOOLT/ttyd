@@ -32,11 +32,15 @@ typedef struct StreamHeader {
     u16 initHist1;  // 0x22
     u16 loopHist0;  // 0x24, ADPCM loop history
     u16 loopHist1;  // 0x26
+    u8 pad_28[0x5C - 0x28];       // 0x28
+    SND_ADPCMSTREAM_INFO coef0;   // 0x5C, type 2: channel 0 DSP header (at 0x40) coefficients
+    u8 pad_7C[0xBC - 0x7C];       // 0x7C
+    SND_ADPCMSTREAM_INFO coef1;   // 0xBC, type 2: channel 1 DSP header (at 0xA0) coefficients
 } StreamHeader;
 
 typedef struct SoundGroup {  // TODO: rename
     u16 flags;               // 0x0
-    u16 unk2;                // 0x2
+    u16 index;               // 0x2, position in the group list (SoundSongGetGroup lookup key)
     SND_GROUPID groupId;     // 0x4
     SND_SONGID songId;       // 0x6
     void* arrfile;           // 0x8
@@ -51,30 +55,30 @@ typedef struct SoundSong {
 } SoundSong;
 
 typedef struct SoundEffect {
-    u16 flags;             // 0x0
-    u16 unk2;              // 0x2, count or active or smth
-    u16 vol;               // 0x4
-    u16 pan;               // 0x6
-    u16 span;              // 0x8
-    u16 unkA;              // 0xA
-    SND_VOICEID voiceId;   // 0xC
-    u16 fid;               // 0x10
-    u8 unk12[0x14 - 0x12]; // 0x12
-    SND_EMITTER emitter;   // 0x14
-    SND_FVECTOR pos;       // 0x64
-    SND_FVECTOR prevPos;   // 0x70
-    SND_FVECTOR dir;       // 0x7C
+    u16 flags;              // 0x0
+    u16 priority;           // 0x2, SoundEfxPlayEx priority; a full table steals the first slot with priority <= the new one
+    u16 vol;                // 0x4
+    u16 pan;                // 0x6
+    u16 span;               // 0x8
+    u16 checkDelay;         // 0xA, 3D voices: frames before SoundEfxCheckCh runs again (decremented, never set nonzero in C)
+    SND_VOICEID voiceId;    // 0xC
+    u16 fid;                // 0x10
+    u8 pad_12[0x14 - 0x12]; // 0x12
+    SND_EMITTER emitter;    // 0x14
+    SND_FVECTOR pos;        // 0x64
+    SND_FVECTOR prevPos;    // 0x70
+    SND_FVECTOR dir;        // 0x7C
 } SoundEffect;
 
 typedef struct SoundDVD {
-    u16 flags;              // 0x0
-    u16 unk2;               // 0x2
-    f32 unk4;               // 0x4
-    f32 unk8;               // 0x8
-    f32 unkC;               // 0xC
-    u8 unk10[0x114 - 0x10]; // 0x10
-    u32 samples;            // 0x114
-    DVDFileInfo info;       // 0x118
+    u16 flags;               // 0x0
+    u16 pan;                 // 0x2, SoundDVDSetPanCh
+    f32 volTarget;           // 0x4, fade-in stops here
+    f32 vol;                 // 0x8, current volume, split into left/right by pan
+    f32 volStep;             // 0xC, added/subtracted per frame while fading
+    u8 pad_10[0x114 - 0x10]; // 0x10
+    u32 samples;             // 0x114
+    DVDFileInfo info;        // 0x118
 } SoundDVD;
 
 typedef struct SoundStreamEntry {
@@ -124,9 +128,9 @@ typedef struct SoundStream {
 typedef struct SoundTemp {
     void* callback; // 0x0
     void* data;     // 0x4
-    u8 unk8;        // 0x8
+    u8 midi;        // 0x8, sndSetAuxProcessingCallbacks midi (0xFF = none)
     u8 pad9[3];     // 0x9
-    s32 unkC;       // 0xC
+    s32 seqId;      // 0xC, sndSetAuxProcessingCallbacks seqID
 } SoundTemp;
 
 typedef struct SoundWork {
@@ -139,30 +143,30 @@ typedef struct SoundWork {
     u32 groupCount[8];         // 0xC0
     u32 dataId;                // 0xE0, not incremented, memory leak if SoundLoadDVD2 called multiple times
     u32 slibId;                // 0xE4
-    s32 unkE8;                 // 0xE8
+    s32 nextGroupId;           // 0xE8, next SND_GROUPID pushed by SoundLoadDVD2
     SoundGroup* groups;        // 0xEC
     SoundSong* songs;          // 0xF0
     SoundEffect* effects;      // 0xF4
     SoundDVD* dvds;            // 0xF8
-    s32 unkFC;                 // 0xFC
+    s32 dvdChannel;            // 0xFC, set to -1 whenever a DVD stream stops; never read
     SoundStream* streams;      // 0x100
-    s32 unk104;                // 0x104
-    SoundTemp unk108[2];       // 0x108
+    s32 streamChannel;         // 0x104, channel of the last started SoundSS stream, -1 after stop
+    SoundTemp aux[2];          // 0x108, aux A/B (reverb HI, chorus) callback setup
     SND_LISTENER listener;     // 0x128
     SND_FVECTOR pos;           // 0x1B8
     SND_FVECTOR prevPos;       // 0x1C4
     SND_FVECTOR dir;           // 0x1D0
     SND_FVECTOR heading;       // 0x1DC
     SND_FVECTOR up;            // 0x1E8
-    f32 unk1F4;                // 0x1F4
-    u8 unk1F8[0x204 - 0x1F8];  // 0x1F8
+    f32 listenerDir;           // 0x1F4, degrees, turned into the listener heading in SoundMain; never written in C
+    u8 pad_1F8[0x204 - 0x1F8]; // 0x1F8
     u32 listenerVol;           // 0x204
     u16 fadeIn;                // 0x208
     u16 fadeOut;               // 0x20A
-    u16 unk20C;                // 0x20C
-    u8 unk20E[0x210 - 0x20E];  // 0x20E
+    u16 interruptDepth;        // 0x20C, OSDisableInterrupts nesting count
+    u8 pad_20E[0x210 - 0x20E]; // 0x20E
     BOOL interrupts;           // 0x210
-    u16 unk214;                // 0x214, some "mute" thing
+    u16 coverState;            // 0x214, 0: closed, 1: cover opened, 2: waiting for streams to reload after close
     u8 pad216[2];              // 0x216
     SND_OUTPUTMODE outputMode; // 0x218
     u32 aramAddr[2];           // 0x21C

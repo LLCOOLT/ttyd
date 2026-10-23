@@ -111,27 +111,7 @@ void winIconGrayInit(void);
 void winIconSet(u32 id, Vec translate, Vec scale, GXColor color);
 void winFontSetPitch(f32 pitch, Vec translate, Vec scale, GXColor color, const char* fmt, ...);
 void winBookGX(ItemWork* w, s32 a, f32 x, f32 y);
-/* ItemData view with an unsigned usable_locations (lhz loads) */
-typedef struct ItemDataU {
-    const char* id;
-    const char* name;
-    const char* description;
-    const char* menu_description;
-    u16 usable_locations;
-    s16 type_sort_order;
-    u16 buy_price;
-    u16 discount_price;
-    u16 star_piece_price;
-    u16 sell_price;
-    s8 bp_cost;
-    s8 hp_restored;
-    s8 fp_restored;
-    s8 sp_restored;
-    u16 icon_id;
-    s16 field_0x22;
-    BattleWeapon* battle_params;
-} ItemDataU;
-extern ItemDataU itemDataTable[];
+extern ItemData itemDataTable[];
 void winFontSetR(Vec translate, Vec scale, GXColor color, const char* fmt, ...);
 
 typedef struct WinPartyDt {
@@ -290,7 +270,7 @@ void winItemInit(ItemWork* w) {
     w->scrollCur = w->scrollTgt = 0.0f;
     for (i = 0; i < w->mailCount; i++) {
         w->mail[i][0] = w->mailCount - i - 1;
-        w->mail[i][1] = ((u8*)pouchGetPtr())[w->mailCount - i + 0x519];
+        w->mail[i][1] = pouchGetPtr()->mEmailIds[w->mailCount - i - 1];
     }
     w->f2D4 = 0;
     winMakeSkipList(w);
@@ -323,8 +303,6 @@ void winItemExit(ItemWork* w) {
     winMgrDelete(w->winId0);
     winMgrDelete(w->winId1);
 }
-
-typedef struct { u8 pad[0x10]; u16 usable; u8 pad2[0x16]; } ItemDataU16;
 
 s32 winItemMain(ItemWork* w) {
     s32 cnt;
@@ -862,7 +840,7 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
             id = p->skip[0];
         }
         scroll = (&w->curX)[w->mode];
-        ok = (w->mode != 0 || (*(u16*)&itemDataTable[id].usable_locations & 4)) == 0;
+        ok = (w->mode != 0 || (itemDataTable[id].usable_locations & 4)) == 0;
         y = scroll + (20.0f + ((yBase = (100.0f + yo) - row * 38) - 10.0f));
         if (y > 240.0f) {
             continue;

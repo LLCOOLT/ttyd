@@ -223,7 +223,7 @@ typedef struct EventWork {
     s32 gwData[32];      // 0x4
     s32 gfData[3];       // 0x84
     EventEntry* entries; // 0x90
-    u32 field_0x94;      // 0x94
+    u32 pad_94;      // 0x94
     OSTime lastUpdate;   // 0x98
 } EventWork;
 

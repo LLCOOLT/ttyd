@@ -323,7 +323,7 @@ s32 nameMain(void) {
 	dist = distABf(wp->x2, wp->y2, wp->x1, wp->y1);
 	switch (wp->state) {
 		case 0:
-			if ((wp->flags & 1) && gp->unk8 == 0) {
+			if ((wp->flags & 1) && gp->debugFlag == 0) {
 				if (keyGetButtonTrg(0) & 0x100) {
 					off = wp->cursorX;
 #ifdef VERSION_G8ME01

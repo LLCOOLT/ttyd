@@ -389,7 +389,7 @@ static USER_FUNC(lecture_button_set_pos) {
 }
 
 static void lect_map_cam_chg_sub(MapObject* obj, s32 camId, BOOL siblings) {
-    obj->field_0x4[1] = camId;
+    obj->cameraId = camId;
     if (obj->child != NULL) {
         lect_map_cam_chg_sub(obj->child, camId, TRUE);
     }

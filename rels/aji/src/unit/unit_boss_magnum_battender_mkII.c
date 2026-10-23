@@ -32,7 +32,7 @@ typedef struct TargetWork { s32 state; s32 count; EffectEntry* eff; } TargetWork
 f32 intplGetValue(f32 start, f32 end, s32 mode, s32 cur, s32 steps);
 s32 psndSFXOn(const char* name);
 void psndSFXOff(s32 id);
-typedef struct AudMember { s32 flags; s32 field_0x4; s32 field_0x8; u8 field_0xC[0x48 - 0xC]; Vec position; u8 field_0x54[0x60 - 0x54]; Vec scale; u8 field_0x6C[0x9C - 0x6C]; Vec rotation; u8 field_0xA8[0xB4 - 0xA8]; Vec home; u8 field_0xC0[0xF8 - 0xC0]; s32 frame; s32 frames; } AudMember;
+typedef struct AudMember { s32 flags; s32 step; s32 counter; u8 pad_0C[0x48 - 0xC]; Vec position; u8 pad_54[0x60 - 0x54]; Vec scale; u8 pad_6C[0x9C - 0x6C]; Vec rotation; u8 pad_A8[0xB4 - 0xA8]; Vec home; u8 pad_C0[0xF8 - 0xC0]; s32 frame; s32 frames; } AudMember;
 s32 irand(s32 scalar);
 int rand(void);
 extern s32 aud_hit_event[];
@@ -334,7 +334,7 @@ static BattleUnitKindPart parts[] = {
 
 BattleWeapon weapon_batten_drill_attack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
@@ -343,11 +343,11 @@ BattleWeapon weapon_batten_drill_attack = {
 #else
     0, // superguardsAllowed
 #endif
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -356,7 +356,7 @@ BattleWeapon weapon_batten_drill_attack = {
     0x20001000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0x7FF, // counterResistFlags
@@ -367,14 +367,14 @@ BattleWeapon weapon_batten_drill_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon weapon_batten_boomerang_attack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
@@ -383,11 +383,11 @@ BattleWeapon weapon_batten_boomerang_attack = {
 #else
     0, // superguardsAllowed
 #endif
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -396,7 +396,7 @@ BattleWeapon weapon_batten_boomerang_attack = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0x7FF, // counterResistFlags
@@ -407,14 +407,14 @@ BattleWeapon weapon_batten_boomerang_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon weapon_batten_aud_attack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
@@ -423,11 +423,11 @@ BattleWeapon weapon_batten_aud_attack = {
 #else
     0, // superguardsAllowed
 #endif
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -436,7 +436,7 @@ BattleWeapon weapon_batten_aud_attack = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0x7FF, // counterResistFlags
@@ -447,9 +447,9 @@ BattleWeapon weapon_batten_aud_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleUnitSetup entry_rocket_punch = {
@@ -678,7 +678,7 @@ USER_FUNC(aud_suikomi) {
             mem->flags |= 0x10;
             BattleAudience_SetAnim(ids[i], 9, FALSE);
             mem->frames = i * 3 + 60;
-            mem->field_0x8 = 0;
+            mem->counter = 0;
             mem->rotation.y = 0.0f;
             list[i] = ids[i];
         }
@@ -763,7 +763,7 @@ USER_FUNC(aud_fire_hit) {
             BattleAudience_SetAnim(list[i], 9, FALSE);
             mem->position = (Vec){x, y, z};
             mem->frames = 0;
-            mem->field_0x8 = 0;
+            mem->counter = 0;
             mem->rotation.y = 0.0f;
             mem->scale.x = mem->scale.y = 1.0f;
             mem->flags |= 4;
@@ -812,7 +812,7 @@ USER_FUNC(aud_fire_no_hit) {
             BattleAudience_SetAnim(list[i], 9, FALSE);
             mem->position = (Vec){x, y, z};
             mem->frames = 0;
-            mem->field_0x8 = 0;
+            mem->counter = 0;
             mem->rotation.y = 0.0f;
             mem->scale.x = mem->scale.y = 1.0f;
             mem->flags |= 4;
@@ -1882,16 +1882,16 @@ static BattleUnitKindPart parts_r[] = {
 
 static BattleWeapon weapon_batten_rocket_attack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     2, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {9, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1900,7 +1900,7 @@ static BattleWeapon weapon_batten_rocket_attack = {
     0x20001000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
     0x7FF, // counterResistFlags
@@ -1911,9 +1911,9 @@ static BattleWeapon weapon_batten_rocket_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(init_event_r)

@@ -1318,7 +1318,7 @@ USER_FUNC(yuuminigame1_opening_chk) {
 #ifdef VERSION_G8ME01
 USER_FUNC(yuuminigame1_floor_on_off) {
     s32* args = event->args;
-    u32* flags = *(u32**)((u8*)evtGetValue(event, args[0]) + 0x1C);
+    u32* flags = &((HikokiWork*)((MiniGameWork*)evtGetValue(event, args[0]))->data)->flags;
 
     if (evtGetValue(event, args[1])) {
         *flags |= 2;
@@ -1330,7 +1330,7 @@ USER_FUNC(yuuminigame1_floor_on_off) {
 
 USER_FUNC(yuuminigame1_floor_chk) {
     s32* args = event->args;
-    u32* flags = *(u32**)((u8*)evtGetValue(event, args[0]) + 0x1C);
+    u32* flags = &((HikokiWork*)((MiniGameWork*)evtGetValue(event, args[0]))->data)->flags;
 
     if (*flags & 2) {
         evtSetValue(event, args[1], 1);

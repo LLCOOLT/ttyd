@@ -9,7 +9,7 @@ typedef struct CaseSetup {
 	u32 swFlag; //0x8
 	void* activeFunc; //0xC
 	s32 lwData[16]; //0x10
-	u8 field_0x50[0x54 - 0x50]; //0x50
+	u8 pad_50[0x54 - 0x50]; //0x50, never accessed
 	void* evtCode; //0x54, TODO re-type
 	s32 priority; //0x58
 } CaseSetup;

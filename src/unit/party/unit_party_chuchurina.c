@@ -95,7 +95,7 @@ USER_FUNC(_get_itemsteal_param);
 USER_FUNC(_make_madowase_weapon);
 USER_FUNC(_get_binta_hit_position);
 USER_FUNC(_chuchu_make_extra_work_area);
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
+static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
 __declspec(section ".data") f32 unit_party_chuchurina_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -267,16 +267,16 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackLeft = {
 #else
     336, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pch_binta", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -286,7 +286,7 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackLeft = {
     0, // element
     21, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_binta", // acHelpMsg
     0x34047, // special
     0x202, // counterResistFlags
@@ -297,12 +297,12 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackLeft = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyChuchurinaAttack_NormalAttack, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 4, 3, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 4, 3, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 2, 3, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 2, 3, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -313,16 +313,16 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackRight = {
 #else
     336, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pch_binta", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -332,7 +332,7 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackRight = {
     0, // element
     22, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_binta", // acHelpMsg
     0x34047, // special
     0x202, // counterResistFlags
@@ -343,12 +343,12 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackRight = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyChuchurinaAttack_NormalAttack, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 4, 3, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 4, 3, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 2, 3, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 2, 3, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -359,16 +359,16 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackLeftLast = {
 #else
     336, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pch_binta", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetACOutputParam, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -378,7 +378,7 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackLeftLast = {
     0, // element
     23, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_binta", // acHelpMsg
     0x34047, // special
     2, // counterResistFlags
@@ -389,12 +389,12 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackLeftLast = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyChuchurinaAttack_NormalAttack, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 4, 2, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 4, 2, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 2, 2, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 2, 2, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -405,16 +405,16 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackRightLast = {
 #else
     336, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pch_binta", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetACOutputParam, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -424,7 +424,7 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackRightLast = {
     0, // element
     24, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_binta", // acHelpMsg
     0x34047, // special
     2, // counterResistFlags
@@ -435,12 +435,12 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackRightLast = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyChuchurinaAttack_NormalAttack, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 4, 2, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 4, 2, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 2, 2, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 2, 2, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -451,21 +451,21 @@ BattleWeapon partyWeapon_ChuchurinaMadowaseAttack = {
 #else
     338, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pch_madowaseru", // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
 #ifdef VERSION_G8ME01
     1, // mStylishCommandMultiplier
 #else
     3, // mStylishCommandMultiplier
 #endif
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -474,7 +474,7 @@ BattleWeapon partyWeapon_ChuchurinaMadowaseAttack = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_madowaseru", // acHelpMsg
     0x20000, // special
     0x7FF, // counterResistFlags
@@ -487,9 +487,9 @@ BattleWeapon partyWeapon_ChuchurinaMadowaseAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyChuchurinaAttack_MadowaseAttack, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_ChuchurinaItemSteal = {
@@ -499,17 +499,17 @@ BattleWeapon partyWeapon_ChuchurinaItemSteal = {
 #else
     337, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pch_heart_catch", // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -519,7 +519,7 @@ BattleWeapon partyWeapon_ChuchurinaItemSteal = {
     0, // element
     20, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_heart_catch", // acHelpMsg
     0x20000, // special
     0x202, // counterResistFlags
@@ -530,9 +530,9 @@ BattleWeapon partyWeapon_ChuchurinaItemSteal = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyChuchurinaAttack_ItemSteal, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_ChuchurinaKiss = {
@@ -542,17 +542,17 @@ BattleWeapon partyWeapon_ChuchurinaKiss = {
 #else
     339, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pch_kiss", // description
     100, // baseAccuracy
     10, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -561,7 +561,7 @@ BattleWeapon partyWeapon_ChuchurinaKiss = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_chuchurina_kiss", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -572,9 +572,9 @@ BattleWeapon partyWeapon_ChuchurinaKiss = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyChuchurinaAttack_Kiss, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
@@ -2716,7 +2716,6 @@ static EVT_BEGIN(main_evt)
     RETURN
 EVT_END()
 
-#define UNIT_TEX(u) (*(smartEntry**)((u8*)(u) + BUOFF(0x318)))
 
 s32 mono_alpha;
 
@@ -2732,15 +2731,15 @@ USER_FUNC(_chuchu_make_extra_work_area) {
 }
 
 #define ADD_WEAPON(w)                                                                              \
-    command->mWeaponTable[*count].mIndex = -1;                                                     \
-    command->mWeaponTable[*count].mItem = 0;                                                       \
-    command->mWeaponTable[*count].mWeaponParams = (BattleWeapon*)(w);                              \
-    command->mWeaponTable[*count].field_0x4 = 0;                                                   \
-    command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;       \
-    command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name); \
+    command->weapon[*count].index = -1;                                                     \
+    command->weapon[*count].itemId = 0;                                                       \
+    command->weapon[*count].weapon = (BattleWeapon*)(w);                              \
+    command->weapon[*count].enabled = 0;                                                   \
+    command->weapon[*count].icon = command->weapon[*count].weapon->icon;       \
+    command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name); \
     (*count)++;
 
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count) {
+static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
     techLv = partyGetTechLv(BattleTransPartyId(BattleGetPartyPtr(_battleWorkPointer)->currentKind));
@@ -2914,17 +2913,17 @@ USER_FUNC(_chuchu_item_steal) {
 void mono_capture(CameraId camId, void* param) {
     BattleUnit* unit = param;
     BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, 1);
-    unit->unk318 = smartAlloc(GXGetTexBufferSize(0x260, 0x1E0, 1, 0, 0), 1);
+    unit->screenTexBuf = smartAlloc(GXGetTexBufferSize(0x260, 0x1E0, 1, 0, 0), 1);
     GXSetTexCopySrc(0, 0, 0x260, 0x1E0);
     GXSetTexCopyDst(0x260, 0x1E0, 1, 0);
-    GXCopyTex(unit->unk318->address, 0);
+    GXCopyTex(unit->screenTexBuf->address, 0);
     GXPixModeSync();
     part->animFlags &= ~0x100;
 }
 
 void mono_disp(CameraId camId, BattleUnit* unit) {
     CameraEntry* cam = camGetPtr(camId);
-    smartEntry* e = unit->unk318;
+    smartEntry* e = unit->screenTexBuf;
     void* buf = NULL;
     GXTexObj tex;
     if (e != NULL) {
@@ -3021,14 +3020,11 @@ USER_FUNC(mono_off) {
     if (mono_alpha < 0) {
         mono_alpha = 0;
         BtlUnit_GetPartsPtr(unit, 1);
-        if (unit->unk318 != NULL) {
-            smartFree(unit->unk318);
+        if (unit->screenTexBuf != NULL) {
+            smartFree(unit->screenTexBuf);
         }
-        unit->unk318 = NULL;
+        unit->screenTexBuf = NULL;
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;
 }
-
-// TODO: USER_FUNC(_chuchu_make_extra_work_area) { }
-

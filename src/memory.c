@@ -242,7 +242,7 @@ void* (_mapAlloc)(MAPBASE_PARAM u32 size) {
 		entry = entry->next;
 	}
 	if (maxSize) {
-		usableData = (void*)((u32)currEntry + 0x20);
+		usableData = (void*)(currEntry + 1);
 
 		currEntry->next = (void*)((u32)currEntry + fullSize);
 		currEntry->size = usableSize;
@@ -308,7 +308,7 @@ void* (_mapAllocTail)(MAPBASE_PARAM u32 size) {
 
 		nextptr = currEntry->next;
 		nextptr->next = tailEntry;
-		tailEntry = (void*)((u32)nextptr + 0x20);
+		tailEntry = (void*)(nextptr + 1);
 		nextptr->size = usableSize;
 		nextptr->inuse = 1;
 #ifndef VERSION_G8ME01
@@ -477,7 +477,7 @@ void smartFree(smartEntry* entry) {
 		wp->tail->next = entry;
 		entry->prev = wp->tail;
 	}
-	entry->field_0xC = 0;
+	entry->reserved_C = 0;
 	entry->next = NULL;
 	entry->size = 0;
 	entry->spaceAfter = 0;
@@ -528,7 +528,7 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 		sz += 32 - (sz & 31);
 	}
 
-	entry2->field_0xC = 1;
+	entry2->reserved_C = 1;
 	entry2->type = type;
 	entry2->size = sz;
 	entry2->file = 0;

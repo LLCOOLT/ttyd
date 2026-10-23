@@ -1,3 +1,4 @@
+#include "eff/eff_gonbaba_breath.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -16,23 +17,6 @@ double cos(double);
 
 #define PI 3.1415927f
 #define HALF_PI 1.5707964f
-
-typedef struct EffGonbabaBreathWork {
-    s32 type;           // 0x0
-    Vec position;       // 0x4
-    f32 velX;           // 0x10
-    f32 velY;           // 0x14
-    f32 unk18;          // 0x18
-    s32 life;           // 0x1C
-    s32 timer;          // 0x20
-    s32 from[3];        // 0x24
-    s32 to[3];          // 0x30
-    s32 alpha;          // 0x3C
-    f32 scale;          // 0x40
-    s32 delay;          // 0x44
-    f32 yaw;            // 0x48
-    EffectEntry* child; // 0x4C
-} EffGonbabaBreathWork;
 
 static GXColor col_normal[] = {
     {0xF2, 0x65, 0x22, 0xFF}, {0xF6, 0x86, 0x1E, 0xFF}, {0xF6, 0xAC, 0x1E, 0xFF}, {0xFF, 0xF5, 0x68, 0xFF}, {0x96, 0x5E, 0x1A, 0xFF},

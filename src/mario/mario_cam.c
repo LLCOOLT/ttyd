@@ -14,9 +14,9 @@ void marioResetCamShift(void) {
     mario->camShiftTargetX = 0.0f;
     mario->camShiftTargetY = 0.0f;
     mario->camShiftTargetZ = 0.0f;
-    mario->field_64 = 0.0f;
-    mario->field_68 = 2.0f;
-    mario->field_6C = (Vec){ 0.0f, 0.0f, 0.0f };
+    mario->camZoomWeight = 0.0f;
+    mario->camZoom = 2.0f;
+    mario->camZoomOfs = (Vec){ 0.0f, 0.0f, 0.0f };
 }
 
 void marioResetCamShiftRate(void) {
@@ -25,9 +25,9 @@ void marioResetCamShiftRate(void) {
     mario->camShiftRate.x = 0.03;
     mario->camShiftRate.y = 0.06;
     mario->camShiftRate.z = 0.06;
-    mario->field_64 = 0.0f;
-    mario->field_68 = 2.0f;
-    mario->field_6C = (Vec){ 0.0f, 0.0f, 0.0f };
+    mario->camZoomWeight = 0.0f;
+    mario->camZoom = 2.0f;
+    mario->camZoomOfs = (Vec){ 0.0f, 0.0f, 0.0f };
 }
 
 void marioInitCamId(void) {
@@ -115,11 +115,11 @@ void marioUpdateCam(void) {
             if (mario->currMotionId == 0x19) {
                 mario->camTarget.y += 10.0f;
             }
-            mario->field_64 = mario->camShiftZ;
+            mario->camZoomWeight = mario->camShiftZ;
         } else {
             mario->camTarget.x = mario->position.x + sin * mario->camShiftX + sin * mario->camShiftZ;
             mario->camTarget.z = mario->position.z + cos * mario->camShiftX + cos * mario->camShiftZ;
-            mario->field_64 = mario->camShiftZ;
+            mario->camZoomWeight = mario->camShiftZ;
         }
     }
 }
@@ -147,8 +147,8 @@ void marioCamZoomOffReq(void) {
 
     if (mario->dispFlags & 0x100000 && !(mario->dispFlags & 0x200000)) {
         mario->dispFlags |= 0x200000;
-        mario->unk62 = 220;
-        mario->unk5C = 32;
+        mario->zoomOffTime = 220;
+        mario->zoomOffDelay = 32;
     }
 }
 
@@ -157,8 +157,8 @@ void marioCamZoomOffReq2(s32 value) {
 
     if (mario->dispFlags & 0x100000) {
         mario->dispFlags |= 0x200000;
-        mario->unk62 = value / 10;
-        mario->unk5C = 32;
+        mario->zoomOffTime = value / 10;
+        mario->zoomOffDelay = 32;
     }
 }
 
@@ -166,7 +166,7 @@ BOOL marioCamZoomOff(void) {
     MarioWork* mario = marioGetPtr();
     EventEntry event;
     s32 args[10];
-    s32 temp_r8;
+    s32 durationMs;
 
     if (!(mario->dispFlags & 0x100000)) {
         mario->dispFlags &= ~0x200000;
@@ -177,16 +177,16 @@ BOOL marioCamZoomOff(void) {
         return FALSE;
     }
 
-    if (--mario->unk5C > 0) {
+    if (--mario->zoomOffDelay > 0) {
         return FALSE;
     }
 
-    mario->unk5C = 0;
-    mario->unk60 = 0;
+    mario->zoomOffDelay = 0;
+    mario->zoomLevel = 0;
     mario->dispFlags &= ~0x300000;
-    temp_r8 = mario->unk62 * 10;
-    mario->unk5E = ((temp_r8 * 60) / 1000);
-    args[0] = temp_r8;
+    durationMs = mario->zoomOffTime * 10;
+    mario->zoomOffTimer = ((durationMs * 60) / 1000);
+    args[0] = durationMs;
     args[1] = 11;
     event.args = args;
     evt_cam3d_evt_off(&event, TRUE);
@@ -201,7 +201,7 @@ BOOL marioCamZoomUp(void) {
     Vec cloudPos;
     Vec targetPos;
     Vec cameraDir;
-    Vec sp8;
+    Vec cloudTarget;
     f32 xOffset;
     f32 yOffset;
     f32 angleAdjust;
@@ -232,7 +232,7 @@ BOOL marioCamZoomUp(void) {
     }
 
     mario->dispFlags |= 0x100000;
-    mario->unk5E = 0;
+    mario->zoomOffTimer = 0;
 
     zoomDistance = (mario->characterId == 2) ? 750.0f : 450.0f;
 
@@ -252,11 +252,11 @@ BOOL marioCamZoomUp(void) {
 
     camera = camGetPtr(CAMERA_3D);
 
-    sp8 = (Vec){ 0.0f, 0.0f, 0.0f };
-    sp8.x = camera->cameraAt.x + xOffset;
-    sp8.y = camera->cameraAt.y + yOffset;
-    sp8.z = camera->cameraAt.z;
-    cloudPos = sp8;
+    cloudTarget = (Vec){ 0.0f, 0.0f, 0.0f };
+    cloudTarget.x = camera->cameraAt.x + xOffset;
+    cloudTarget.y = camera->cameraAt.y + yOffset;
+    cloudTarget.z = camera->cameraAt.z;
+    cloudPos = cloudTarget;
 
     cloudGetAt(&cloudPos);
     targetPos = cloudPos;
@@ -287,7 +287,7 @@ BOOL marioCamZoomUpLevelMain(void) {
     Vec cloudPos;
     Vec targetPos;
     Vec cameraDir;
-    Vec sp8;
+    Vec cloudTarget;
     f32 xOffset;
     f32 yOffset;
     f32 zoomDistance;
@@ -304,13 +304,13 @@ BOOL marioCamZoomUpLevelMain(void) {
     }
 
     mario->dispFlags |= 0x100000;
-    mario->unk5E = 0;
+    mario->zoomOffTimer = 0;
 
-    if (mario->unk60 == 1) {
+    if (mario->zoomLevel == 1) {
         zoomDistance = 520.0f;
-    } else if (mario->unk60 == 2) {
+    } else if (mario->zoomLevel == 2) {
         zoomDistance = 475.0f;
-    } else if (mario->unk60 == 3) {
+    } else if (mario->zoomLevel == 3) {
         zoomDistance = 440.0f;
     } else {
         zoomDistance = 450.0f;
@@ -325,11 +325,11 @@ BOOL marioCamZoomUpLevelMain(void) {
 
     camera = camGetPtr(CAMERA_3D);
 
-    sp8 = (Vec){ 0.0f, 0.0f, 0.0f };
-    sp8.x = camera->cameraAt.x + xOffset;
-    sp8.y = camera->cameraAt.y + yOffset;
-    sp8.z = camera->cameraAt.z;
-    cloudPos = sp8;
+    cloudTarget = (Vec){ 0.0f, 0.0f, 0.0f };
+    cloudTarget.x = camera->cameraAt.x + xOffset;
+    cloudTarget.y = camera->cameraAt.y + yOffset;
+    cloudTarget.z = camera->cameraAt.z;
+    cloudPos = cloudTarget;
     targetPos = cloudPos;
 
     PSVECSubtract(&camera->cameraPos, &camera->cameraAt, &cameraDir);

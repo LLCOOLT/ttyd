@@ -1,6 +1,7 @@
 #include "version.h"
 #include "manager/filemgr.h"
 #include "dolphin/os.h"
+#include "driver/animdrv.h"
 #include "driver/arcdrv.h"
 #include "memory.h"
 #include "sdk/texPalette.h"
@@ -50,67 +51,87 @@ void fileInit(void) {
 	afp->lastavailable->next = NULL;
 }
 
-#define FLD(b, o) (*(u32*)((u8*)(b) + (o)))
-typedef struct Anim40 {
-	u8 pad[0x3c];
-	u8* p;
-} Anim40;
+// file types 3 and 6-10 have no C reader; only the pointer words relocated here are known
+typedef struct FileReloc48 {  // types 3, 6, 10
+	u8 reserved_00[0x48];       // 0x0
+	u32 ptrs[1];                // 0x48
+} FileReloc48;
+typedef struct FileReloc7 {
+	u8 reserved_00[0x64];       // 0x0
+	u32 ptrs[3];                // 0x64
+} FileReloc7;
+typedef struct FileReloc8 {
+	u8 reserved_00[0xC8];       // 0x0
+	u32 ptrs[23];               // 0xC8
+} FileReloc8;
+typedef struct FileReloc9 {
+	u8 reserved_00[0x58];       // 0x0
+	u32 ptrs[4];                // 0x58
+} FileReloc9;
+#define FT48(d) ((FileReloc48*)(d))
+#define FT7(d) ((FileReloc7*)(d))
+#define FT8(d) ((FileReloc8*)(d))
+#define FT9(d) ((FileReloc9*)(d))
+// relocate a file pointer field in place (offset <-> address)
+#define ADR(f) (*(u32*)&(f))
+#define POSE(d) ((AnimationPoseData*)(d))
+#define ANIM(d) ((AnimData*)(d))
 
 void fileGarbageDataAdrClear(FileEntry* entry) {
 	u16 i;
 	u32 off;
 	TEXPalette* tpl;
 	s32 j, n;
-	Anim40* e;
+	AnimTableEntry* e;
 	u8* q;
 	TEXHeader* img;
 	CLUTHeader* pal;
 	void* data = *entry->data;
 	switch (entry->type) {
 		case 1:
-			if (FLD(data, 0x14c) >= (u32)data) {
-				FLD(data, 0x14c) -= (u32)data;
-				FLD(data, 0x150) -= (u32)data;
-				FLD(data, 0x154) -= (u32)data;
-				FLD(data, 0x158) -= (u32)data;
-				FLD(data, 0x15c) -= (u32)data;
-				FLD(data, 0x160) -= (u32)data;
-				FLD(data, 0x164) -= (u32)data;
-				FLD(data, 0x168) -= (u32)data;
-				FLD(data, 0x16c) -= (u32)data;
-				FLD(data, 0x170) -= (u32)data;
-				FLD(data, 0x174) -= (u32)data;
-				FLD(data, 0x178) -= (u32)data;
-				FLD(data, 0x17c) -= (u32)data;
-				FLD(data, 0x180) -= (u32)data;
-				FLD(data, 0x184) -= (u32)data;
-				FLD(data, 0x188) -= (u32)data;
-				FLD(data, 0x18c) -= (u32)data;
-				FLD(data, 0x190) -= (u32)data;
-				FLD(data, 0x194) -= (u32)data;
-				FLD(data, 0x198) -= (u32)data;
-				FLD(data, 0x19c) -= (u32)data;
-				FLD(data, 0x1a0) -= (u32)data;
-				FLD(data, 0x1a4) -= (u32)data;
-				FLD(data, 0x1a8) -= (u32)data;
-				FLD(data, 0x1ac) -= (u32)data;
+			if (ADR(POSE(data)->shapes) >= (u32)data) {
+				ADR(POSE(data)->shapes) -= (u32)data;
+				ADR(POSE(data)->drawCalls) -= (u32)data;
+				ADR(POSE(data)->bufferVtxPos) -= (u32)data;
+				ADR(POSE(data)->posIndex) -= (u32)data;
+				ADR(POSE(data)->nrmVtxBuffer) -= (u32)data;
+				ADR(POSE(data)->nrmIndex) -= (u32)data;
+				ADR(POSE(data)->clr0VtxBuffer) -= (u32)data;
+				ADR(POSE(data)->clr0Index) -= (u32)data;
+				ADR(POSE(data)->texIndex[0]) -= (u32)data;
+				ADR(POSE(data)->texIndex[1]) -= (u32)data;
+				ADR(POSE(data)->texIndex[2]) -= (u32)data;
+				ADR(POSE(data)->texIndex[3]) -= (u32)data;
+				ADR(POSE(data)->texIndex[4]) -= (u32)data;
+				ADR(POSE(data)->texIndex[5]) -= (u32)data;
+				ADR(POSE(data)->texIndex[6]) -= (u32)data;
+				ADR(POSE(data)->texIndex[7]) -= (u32)data;
+				ADR(POSE(data)->texVtxBuffer) -= (u32)data;
+				ADR(POSE(data)->texAnimEntries) -= (u32)data;
+				ADR(POSE(data)->texData) -= (u32)data;
+				ADR(POSE(data)->texBinds) -= (u32)data;
+				ADR(POSE(data)->draws) -= (u32)data;
+				ADR(POSE(data)->groupVisibility) -= (u32)data;
+				ADR(POSE(data)->nodeData) -= (u32)data;
+				ADR(POSE(data)->groups) -= (u32)data;
+				ADR(POSE(data)->mpAnims) -= (u32)data;
 			}
 			break;
 		case 2:
-			if (FLD(data, 0x24) >= (u32)data) {
-				FLD(data, 0x24) -= (u32)data;
-				FLD(data, 0x28) -= (u32)data;
-				FLD(data, 0x2c) -= (u32)data;
-				FLD(data, 0x30) -= (u32)data;
-				FLD(data, 0x34) -= (u32)data;
-				FLD(data, 0x38) -= (u32)data;
-				FLD(data, 0x3c) -= (u32)data;
-				FLD(data, 0x40) -= (u32)data;
+			if (ADR(ANIM(data)->loopInfo) >= (u32)data) {
+				ADR(ANIM(data)->loopInfo) -= (u32)data;
+				ADR(ANIM(data)->keyframes) -= (u32)data;
+				ADR(ANIM(data)->vtxPosDeltas) -= (u32)data;
+				ADR(ANIM(data)->vtxNrmDeltas) -= (u32)data;
+				ADR(ANIM(data)->texDeltas) -= (u32)data;
+				ADR(ANIM(data)->visDeltas) -= (u32)data;
+				ADR(ANIM(data)->nodeDeltas) -= (u32)data;
+				ADR(ANIM(data)->valueKeys) -= (u32)data;
 			}
 			break;
 		case 3:
-			if (FLD(data, 0x48) >= (u32)data) {
-				FLD(data, 0x48) -= (u32)data;
+			if (FT48(data)->ptrs[0] >= (u32)data) {
+				FT48(data)->ptrs[0] -= (u32)data;
 			}
 			break;
 		case 4:
@@ -144,100 +165,100 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 			}
 			break;
 		case 5:
-			if (FLD(data, 0x14c) >= (u32)data) {
-				n = *(s32*)((u8*)data + 0x148);
+			if (ADR(POSE(data)->shapes) >= (u32)data) {
+				n = ((AnimationPoseData*)data)->mAnimCount;
 				for (j = 0; j < n; j++) {
-					e = &(*(Anim40**)((u8*)data + 0x1ac))[j];
-					q = e->p;
-					e->p = q - (u32)data;
-					if (FLD(q, 0x24) >= (u32)q) {
-						FLD(q, 0x24) -= (u32)q;
-						FLD(q, 0x28) -= (u32)q;
-						FLD(q, 0x2c) -= (u32)q;
-						FLD(q, 0x30) -= (u32)q;
-						FLD(q, 0x34) -= (u32)q;
-						FLD(q, 0x38) -= (u32)q;
-						FLD(q, 0x3c) -= (u32)q;
-						FLD(q, 0x40) -= (u32)q;
+					e = &((AnimationPoseData*)data)->mpAnims[j];
+					q = (u8*)e->data;
+					e->data = (AnimData*)(q - (u32)data);
+					if (ADR(ANIM(q)->loopInfo) >= (u32)q) {
+						ADR(ANIM(q)->loopInfo) -= (u32)q;
+						ADR(ANIM(q)->keyframes) -= (u32)q;
+						ADR(ANIM(q)->vtxPosDeltas) -= (u32)q;
+						ADR(ANIM(q)->vtxNrmDeltas) -= (u32)q;
+						ADR(ANIM(q)->texDeltas) -= (u32)q;
+						ADR(ANIM(q)->visDeltas) -= (u32)q;
+						ADR(ANIM(q)->nodeDeltas) -= (u32)q;
+						ADR(ANIM(q)->valueKeys) -= (u32)q;
 					}
 				}
-				FLD(data, 0x14c) -= (u32)data;
-				FLD(data, 0x150) -= (u32)data;
-				FLD(data, 0x154) -= (u32)data;
-				FLD(data, 0x158) -= (u32)data;
-				FLD(data, 0x15c) -= (u32)data;
-				FLD(data, 0x160) -= (u32)data;
-				FLD(data, 0x164) -= (u32)data;
-				FLD(data, 0x168) -= (u32)data;
-				FLD(data, 0x16c) -= (u32)data;
-				FLD(data, 0x170) -= (u32)data;
-				FLD(data, 0x174) -= (u32)data;
-				FLD(data, 0x178) -= (u32)data;
-				FLD(data, 0x17c) -= (u32)data;
-				FLD(data, 0x180) -= (u32)data;
-				FLD(data, 0x184) -= (u32)data;
-				FLD(data, 0x188) -= (u32)data;
-				FLD(data, 0x18c) -= (u32)data;
-				FLD(data, 0x190) -= (u32)data;
-				FLD(data, 0x194) -= (u32)data;
-				FLD(data, 0x198) -= (u32)data;
-				FLD(data, 0x19c) -= (u32)data;
-				FLD(data, 0x1a0) -= (u32)data;
-				FLD(data, 0x1a4) -= (u32)data;
-				FLD(data, 0x1a8) -= (u32)data;
-				FLD(data, 0x1ac) -= (u32)data;
+				ADR(POSE(data)->shapes) -= (u32)data;
+				ADR(POSE(data)->drawCalls) -= (u32)data;
+				ADR(POSE(data)->bufferVtxPos) -= (u32)data;
+				ADR(POSE(data)->posIndex) -= (u32)data;
+				ADR(POSE(data)->nrmVtxBuffer) -= (u32)data;
+				ADR(POSE(data)->nrmIndex) -= (u32)data;
+				ADR(POSE(data)->clr0VtxBuffer) -= (u32)data;
+				ADR(POSE(data)->clr0Index) -= (u32)data;
+				ADR(POSE(data)->texIndex[0]) -= (u32)data;
+				ADR(POSE(data)->texIndex[1]) -= (u32)data;
+				ADR(POSE(data)->texIndex[2]) -= (u32)data;
+				ADR(POSE(data)->texIndex[3]) -= (u32)data;
+				ADR(POSE(data)->texIndex[4]) -= (u32)data;
+				ADR(POSE(data)->texIndex[5]) -= (u32)data;
+				ADR(POSE(data)->texIndex[6]) -= (u32)data;
+				ADR(POSE(data)->texIndex[7]) -= (u32)data;
+				ADR(POSE(data)->texVtxBuffer) -= (u32)data;
+				ADR(POSE(data)->texAnimEntries) -= (u32)data;
+				ADR(POSE(data)->texData) -= (u32)data;
+				ADR(POSE(data)->texBinds) -= (u32)data;
+				ADR(POSE(data)->draws) -= (u32)data;
+				ADR(POSE(data)->groupVisibility) -= (u32)data;
+				ADR(POSE(data)->nodeData) -= (u32)data;
+				ADR(POSE(data)->groups) -= (u32)data;
+				ADR(POSE(data)->mpAnims) -= (u32)data;
 			}
 			break;
 		case 6:
-			if (FLD(data, 0x48) >= (u32)data) {
-				FLD(data, 0x48) -= (u32)data;
+			if (FT48(data)->ptrs[0] >= (u32)data) {
+				FT48(data)->ptrs[0] -= (u32)data;
 			}
 			break;
 		case 7:
-			if (FLD(data, 0x64) >= (u32)data) {
-				FLD(data, 0x64) -= (u32)data;
-				FLD(data, 0x68) -= (u32)data;
-				FLD(data, 0x6c) -= (u32)data;
+			if (FT7(data)->ptrs[0] >= (u32)data) {
+				FT7(data)->ptrs[0] -= (u32)data;
+				FT7(data)->ptrs[1] -= (u32)data;
+				FT7(data)->ptrs[2] -= (u32)data;
 			}
 			break;
 		case 8:
-			if (FLD(data, 0xc8) >= (u32)data) {
-				FLD(data, 0xc8) -= (u32)data;
-				FLD(data, 0xcc) -= (u32)data;
-				FLD(data, 0xd0) -= (u32)data;
-				FLD(data, 0xd4) -= (u32)data;
-				FLD(data, 0xd8) -= (u32)data;
-				FLD(data, 0xdc) -= (u32)data;
-				FLD(data, 0xe0) -= (u32)data;
-				FLD(data, 0xe4) -= (u32)data;
-				FLD(data, 0xe8) -= (u32)data;
-				FLD(data, 0xec) -= (u32)data;
-				FLD(data, 0xf0) -= (u32)data;
-				FLD(data, 0xf4) -= (u32)data;
-				FLD(data, 0xf8) -= (u32)data;
-				FLD(data, 0xfc) -= (u32)data;
-				FLD(data, 0x100) -= (u32)data;
-				FLD(data, 0x104) -= (u32)data;
-				FLD(data, 0x108) -= (u32)data;
-				FLD(data, 0x10c) -= (u32)data;
-				FLD(data, 0x110) -= (u32)data;
-				FLD(data, 0x114) -= (u32)data;
-				FLD(data, 0x118) -= (u32)data;
-				FLD(data, 0x11c) -= (u32)data;
-				FLD(data, 0x120) -= (u32)data;
+			if (FT8(data)->ptrs[0] >= (u32)data) {
+				FT8(data)->ptrs[0] -= (u32)data;
+				FT8(data)->ptrs[1] -= (u32)data;
+				FT8(data)->ptrs[2] -= (u32)data;
+				FT8(data)->ptrs[3] -= (u32)data;
+				FT8(data)->ptrs[4] -= (u32)data;
+				FT8(data)->ptrs[5] -= (u32)data;
+				FT8(data)->ptrs[6] -= (u32)data;
+				FT8(data)->ptrs[7] -= (u32)data;
+				FT8(data)->ptrs[8] -= (u32)data;
+				FT8(data)->ptrs[9] -= (u32)data;
+				FT8(data)->ptrs[10] -= (u32)data;
+				FT8(data)->ptrs[11] -= (u32)data;
+				FT8(data)->ptrs[12] -= (u32)data;
+				FT8(data)->ptrs[13] -= (u32)data;
+				FT8(data)->ptrs[14] -= (u32)data;
+				FT8(data)->ptrs[15] -= (u32)data;
+				FT8(data)->ptrs[16] -= (u32)data;
+				FT8(data)->ptrs[17] -= (u32)data;
+				FT8(data)->ptrs[18] -= (u32)data;
+				FT8(data)->ptrs[19] -= (u32)data;
+				FT8(data)->ptrs[20] -= (u32)data;
+				FT8(data)->ptrs[21] -= (u32)data;
+				FT8(data)->ptrs[22] -= (u32)data;
 			}
 			break;
 		case 9:
-			if (FLD(data, 0x58) >= (u32)data) {
-				FLD(data, 0x58) -= (u32)data;
-				FLD(data, 0x5c) -= (u32)data;
-				FLD(data, 0x60) -= (u32)data;
-				FLD(data, 0x64) -= (u32)data;
+			if (FT9(data)->ptrs[0] >= (u32)data) {
+				FT9(data)->ptrs[0] -= (u32)data;
+				FT9(data)->ptrs[1] -= (u32)data;
+				FT9(data)->ptrs[2] -= (u32)data;
+				FT9(data)->ptrs[3] -= (u32)data;
 			}
 			break;
 		case 10:
-			if (FLD(data, 0x48) >= (u32)data) {
-				FLD(data, 0x48) -= (u32)data;
+			if (FT48(data)->ptrs[0] >= (u32)data) {
+				FT48(data)->ptrs[0] -= (u32)data;
 			}
 			break;
 		case 0:
@@ -258,49 +279,49 @@ void fileGarbageDataAdrSet(void* data, s32 type) {
 	CLUTHeader* pal2;
 	switch (type) {
 		case 1:
-			if (FLD(data, 0x14c) < (u32)data) {
-				FLD(data, 0x14c) += (u32)data;
-				FLD(data, 0x150) += (u32)data;
-				FLD(data, 0x154) += (u32)data;
-				FLD(data, 0x158) += (u32)data;
-				FLD(data, 0x15c) += (u32)data;
-				FLD(data, 0x160) += (u32)data;
-				FLD(data, 0x164) += (u32)data;
-				FLD(data, 0x168) += (u32)data;
-				FLD(data, 0x16c) += (u32)data;
-				FLD(data, 0x170) += (u32)data;
-				FLD(data, 0x174) += (u32)data;
-				FLD(data, 0x178) += (u32)data;
-				FLD(data, 0x17c) += (u32)data;
-				FLD(data, 0x180) += (u32)data;
-				FLD(data, 0x184) += (u32)data;
-				FLD(data, 0x188) += (u32)data;
-				FLD(data, 0x18c) += (u32)data;
-				FLD(data, 0x190) += (u32)data;
-				FLD(data, 0x194) += (u32)data;
-				FLD(data, 0x198) += (u32)data;
-				FLD(data, 0x19c) += (u32)data;
-				FLD(data, 0x1a0) += (u32)data;
-				FLD(data, 0x1a4) += (u32)data;
-				FLD(data, 0x1a8) += (u32)data;
-				FLD(data, 0x1ac) += (u32)data;
+			if (ADR(POSE(data)->shapes) < (u32)data) {
+				ADR(POSE(data)->shapes) += (u32)data;
+				ADR(POSE(data)->drawCalls) += (u32)data;
+				ADR(POSE(data)->bufferVtxPos) += (u32)data;
+				ADR(POSE(data)->posIndex) += (u32)data;
+				ADR(POSE(data)->nrmVtxBuffer) += (u32)data;
+				ADR(POSE(data)->nrmIndex) += (u32)data;
+				ADR(POSE(data)->clr0VtxBuffer) += (u32)data;
+				ADR(POSE(data)->clr0Index) += (u32)data;
+				ADR(POSE(data)->texIndex[0]) += (u32)data;
+				ADR(POSE(data)->texIndex[1]) += (u32)data;
+				ADR(POSE(data)->texIndex[2]) += (u32)data;
+				ADR(POSE(data)->texIndex[3]) += (u32)data;
+				ADR(POSE(data)->texIndex[4]) += (u32)data;
+				ADR(POSE(data)->texIndex[5]) += (u32)data;
+				ADR(POSE(data)->texIndex[6]) += (u32)data;
+				ADR(POSE(data)->texIndex[7]) += (u32)data;
+				ADR(POSE(data)->texVtxBuffer) += (u32)data;
+				ADR(POSE(data)->texAnimEntries) += (u32)data;
+				ADR(POSE(data)->texData) += (u32)data;
+				ADR(POSE(data)->texBinds) += (u32)data;
+				ADR(POSE(data)->draws) += (u32)data;
+				ADR(POSE(data)->groupVisibility) += (u32)data;
+				ADR(POSE(data)->nodeData) += (u32)data;
+				ADR(POSE(data)->groups) += (u32)data;
+				ADR(POSE(data)->mpAnims) += (u32)data;
 			}
 			break;
 		case 2:
-			if (FLD(data, 0x24) < (u32)data) {
-				FLD(data, 0x24) += (u32)data;
-				FLD(data, 0x28) += (u32)data;
-				FLD(data, 0x2c) += (u32)data;
-				FLD(data, 0x30) += (u32)data;
-				FLD(data, 0x34) += (u32)data;
-				FLD(data, 0x38) += (u32)data;
-				FLD(data, 0x3c) += (u32)data;
-				FLD(data, 0x40) += (u32)data;
+			if (ADR(ANIM(data)->loopInfo) < (u32)data) {
+				ADR(ANIM(data)->loopInfo) += (u32)data;
+				ADR(ANIM(data)->keyframes) += (u32)data;
+				ADR(ANIM(data)->vtxPosDeltas) += (u32)data;
+				ADR(ANIM(data)->vtxNrmDeltas) += (u32)data;
+				ADR(ANIM(data)->texDeltas) += (u32)data;
+				ADR(ANIM(data)->visDeltas) += (u32)data;
+				ADR(ANIM(data)->nodeDeltas) += (u32)data;
+				ADR(ANIM(data)->valueKeys) += (u32)data;
 			}
 			break;
 		case 3:
-			if (FLD(data, 0x48) < (u32)data) {
-				FLD(data, 0x48) += (u32)data;
+			if (FT48(data)->ptrs[0] < (u32)data) {
+				FT48(data)->ptrs[0] += (u32)data;
 			}
 			break;
 case 4:
@@ -337,99 +358,99 @@ pal2->data = (char*)((u32)tpl + (u32)pal2->data);
 }
 break;
 		case 5:
-			if (FLD(data, 0x14c) < (u32)data) {
-				FLD(data, 0x14c) += (u32)data;
-				FLD(data, 0x150) += (u32)data;
-				FLD(data, 0x154) += (u32)data;
-				FLD(data, 0x158) += (u32)data;
-				FLD(data, 0x15c) += (u32)data;
-				FLD(data, 0x160) += (u32)data;
-				FLD(data, 0x164) += (u32)data;
-				FLD(data, 0x168) += (u32)data;
-				FLD(data, 0x16c) += (u32)data;
-				FLD(data, 0x170) += (u32)data;
-				FLD(data, 0x174) += (u32)data;
-				FLD(data, 0x178) += (u32)data;
-				FLD(data, 0x17c) += (u32)data;
-				FLD(data, 0x180) += (u32)data;
-				FLD(data, 0x184) += (u32)data;
-				FLD(data, 0x188) += (u32)data;
-				FLD(data, 0x18c) += (u32)data;
-				FLD(data, 0x190) += (u32)data;
-				FLD(data, 0x194) += (u32)data;
-				FLD(data, 0x198) += (u32)data;
-				FLD(data, 0x19c) += (u32)data;
-				FLD(data, 0x1a0) += (u32)data;
-				FLD(data, 0x1a4) += (u32)data;
-				FLD(data, 0x1a8) += (u32)data;
-				FLD(data, 0x1ac) += (u32)data;
-				n = *(s32*)((u8*)data + 0x148);
+			if (ADR(POSE(data)->shapes) < (u32)data) {
+				ADR(POSE(data)->shapes) += (u32)data;
+				ADR(POSE(data)->drawCalls) += (u32)data;
+				ADR(POSE(data)->bufferVtxPos) += (u32)data;
+				ADR(POSE(data)->posIndex) += (u32)data;
+				ADR(POSE(data)->nrmVtxBuffer) += (u32)data;
+				ADR(POSE(data)->nrmIndex) += (u32)data;
+				ADR(POSE(data)->clr0VtxBuffer) += (u32)data;
+				ADR(POSE(data)->clr0Index) += (u32)data;
+				ADR(POSE(data)->texIndex[0]) += (u32)data;
+				ADR(POSE(data)->texIndex[1]) += (u32)data;
+				ADR(POSE(data)->texIndex[2]) += (u32)data;
+				ADR(POSE(data)->texIndex[3]) += (u32)data;
+				ADR(POSE(data)->texIndex[4]) += (u32)data;
+				ADR(POSE(data)->texIndex[5]) += (u32)data;
+				ADR(POSE(data)->texIndex[6]) += (u32)data;
+				ADR(POSE(data)->texIndex[7]) += (u32)data;
+				ADR(POSE(data)->texVtxBuffer) += (u32)data;
+				ADR(POSE(data)->texAnimEntries) += (u32)data;
+				ADR(POSE(data)->texData) += (u32)data;
+				ADR(POSE(data)->texBinds) += (u32)data;
+				ADR(POSE(data)->draws) += (u32)data;
+				ADR(POSE(data)->groupVisibility) += (u32)data;
+				ADR(POSE(data)->nodeData) += (u32)data;
+				ADR(POSE(data)->groups) += (u32)data;
+				ADR(POSE(data)->mpAnims) += (u32)data;
+				n = ((AnimationPoseData*)data)->mAnimCount;
 				for (j = 0; j < n; j++) {
-					*(u32*)&(*(Anim40**)((u8*)data + 0x1ac))[j].p += (u32)data;
-					q = (*(Anim40**)((u8*)data + 0x1ac))[j].p;
-					if (FLD(q, 0x24) < (u32)q) {
-						FLD(q, 0x24) += (u32)q;
-						FLD(q, 0x28) += (u32)q;
-						FLD(q, 0x2c) += (u32)q;
-						FLD(q, 0x30) += (u32)q;
-						FLD(q, 0x34) += (u32)q;
-						FLD(q, 0x38) += (u32)q;
-						FLD(q, 0x3c) += (u32)q;
-						FLD(q, 0x40) += (u32)q;
+					*(u32*)&((AnimationPoseData*)data)->mpAnims[j].data += (u32)data;
+					q = (u8*)((AnimationPoseData*)data)->mpAnims[j].data;
+					if (ADR(ANIM(q)->loopInfo) < (u32)q) {
+						ADR(ANIM(q)->loopInfo) += (u32)q;
+						ADR(ANIM(q)->keyframes) += (u32)q;
+						ADR(ANIM(q)->vtxPosDeltas) += (u32)q;
+						ADR(ANIM(q)->vtxNrmDeltas) += (u32)q;
+						ADR(ANIM(q)->texDeltas) += (u32)q;
+						ADR(ANIM(q)->visDeltas) += (u32)q;
+						ADR(ANIM(q)->nodeDeltas) += (u32)q;
+						ADR(ANIM(q)->valueKeys) += (u32)q;
 					}
 				}
 			}
 			break;
 		case 6:
-			if (FLD(data, 0x48) < (u32)data) {
-				FLD(data, 0x48) += (u32)data;
+			if (FT48(data)->ptrs[0] < (u32)data) {
+				FT48(data)->ptrs[0] += (u32)data;
 			}
 			break;
 		case 7:
-			if (FLD(data, 0x64) < (u32)data) {
-				FLD(data, 0x64) += (u32)data;
-				FLD(data, 0x68) += (u32)data;
-				FLD(data, 0x6c) += (u32)data;
+			if (FT7(data)->ptrs[0] < (u32)data) {
+				FT7(data)->ptrs[0] += (u32)data;
+				FT7(data)->ptrs[1] += (u32)data;
+				FT7(data)->ptrs[2] += (u32)data;
 			}
 			break;
 		case 8:
-			if (FLD(data, 0xc8) < (u32)data) {
-				FLD(data, 0xc8) += (u32)data;
-				FLD(data, 0xcc) += (u32)data;
-				FLD(data, 0xd0) += (u32)data;
-				FLD(data, 0xd4) += (u32)data;
-				FLD(data, 0xd8) += (u32)data;
-				FLD(data, 0xdc) += (u32)data;
-				FLD(data, 0xe0) += (u32)data;
-				FLD(data, 0xe4) += (u32)data;
-				FLD(data, 0xe8) += (u32)data;
-				FLD(data, 0xec) += (u32)data;
-				FLD(data, 0xf0) += (u32)data;
-				FLD(data, 0xf4) += (u32)data;
-				FLD(data, 0xf8) += (u32)data;
-				FLD(data, 0xfc) += (u32)data;
-				FLD(data, 0x100) += (u32)data;
-				FLD(data, 0x104) += (u32)data;
-				FLD(data, 0x108) += (u32)data;
-				FLD(data, 0x10c) += (u32)data;
-				FLD(data, 0x110) += (u32)data;
-				FLD(data, 0x114) += (u32)data;
-				FLD(data, 0x118) += (u32)data;
-				FLD(data, 0x11c) += (u32)data;
-				FLD(data, 0x120) += (u32)data;
+			if (FT8(data)->ptrs[0] < (u32)data) {
+				FT8(data)->ptrs[0] += (u32)data;
+				FT8(data)->ptrs[1] += (u32)data;
+				FT8(data)->ptrs[2] += (u32)data;
+				FT8(data)->ptrs[3] += (u32)data;
+				FT8(data)->ptrs[4] += (u32)data;
+				FT8(data)->ptrs[5] += (u32)data;
+				FT8(data)->ptrs[6] += (u32)data;
+				FT8(data)->ptrs[7] += (u32)data;
+				FT8(data)->ptrs[8] += (u32)data;
+				FT8(data)->ptrs[9] += (u32)data;
+				FT8(data)->ptrs[10] += (u32)data;
+				FT8(data)->ptrs[11] += (u32)data;
+				FT8(data)->ptrs[12] += (u32)data;
+				FT8(data)->ptrs[13] += (u32)data;
+				FT8(data)->ptrs[14] += (u32)data;
+				FT8(data)->ptrs[15] += (u32)data;
+				FT8(data)->ptrs[16] += (u32)data;
+				FT8(data)->ptrs[17] += (u32)data;
+				FT8(data)->ptrs[18] += (u32)data;
+				FT8(data)->ptrs[19] += (u32)data;
+				FT8(data)->ptrs[20] += (u32)data;
+				FT8(data)->ptrs[21] += (u32)data;
+				FT8(data)->ptrs[22] += (u32)data;
 			}
 			break;
 		case 9:
-			if (FLD(data, 0x58) < (u32)data) {
-				FLD(data, 0x58) += (u32)data;
-				FLD(data, 0x5c) += (u32)data;
-				FLD(data, 0x60) += (u32)data;
-				FLD(data, 0x64) += (u32)data;
+			if (FT9(data)->ptrs[0] < (u32)data) {
+				FT9(data)->ptrs[0] += (u32)data;
+				FT9(data)->ptrs[1] += (u32)data;
+				FT9(data)->ptrs[2] += (u32)data;
+				FT9(data)->ptrs[3] += (u32)data;
 			}
 			break;
 		case 10:
-			if (FLD(data, 0x48) < (u32)data) {
-				FLD(data, 0x48) += (u32)data;
+			if (FT48(data)->ptrs[0] < (u32)data) {
+				FT48(data)->ptrs[0] += (u32)data;
 			}
 			break;
 		case 0:

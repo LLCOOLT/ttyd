@@ -29,7 +29,6 @@ static inline BOOL lowHP(void) {
 	return r;
 }
 
-#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 
 void marioVoiceGlareOn(void) {
 	MarioWork* mario = marioGetPtr();
@@ -209,7 +208,7 @@ void mot_stay(void) {
 	}
 #ifdef VERSION_G8ME01
 	if (marioGetHammerLevel() < 2) {
-		if (mario->buttonBuffer & 0x200) {
+		if (mario->buttonTrg & 0x200) {
 			return;
 		}
 	} else if (mario->buttonHold & 0x200) {

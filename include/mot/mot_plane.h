@@ -17,7 +17,7 @@ typedef struct MotPlaneWork {
 	s32 stallTimer;               // 0x20: frames below stall speed with the stick held back; >= limit -> sub-motion 60
 	f32 pitchMin;                 // 0x24: lowest pitch allowed (-22 in a dive), eases to planeData[4]
 	s32 sfxId;                    // 0x28: glide loop (0x17F), -1 when off
-	u8 field_0x2C[0x30 - 0x2C];   // 0x2C
+	u8 pad_2C[0x30 - 0x2C];   // 0x2C
 	Vec frontPos;                 // 0x30: front collision probe start
 	Vec tipPos;                   // 0x3C: nose tip; probe runs frontPos -> tipPos
 } MotPlaneWork;                   // size 0x48

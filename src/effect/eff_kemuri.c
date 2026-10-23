@@ -11,50 +11,6 @@
 double sin(double);
 double cos(double);
 
-typedef struct effKemuriData {
-	s32 type; //0x0, type
-	f32 x; //0x4
-	f32 y; //0x8
-	f32 z; //0xC
-	u8 field_0x10[0x40 - 0x10]; //0x10
-	s32 frame; //0x40, frames since start
-	f32 scaleX; //0x44, touchdown_scale[frame][0] / 128
-	f32 scaleY; //0x48, touchdown_scale[frame][1] / 128
-	f32 velX; //0x4C, sideways drift (+-3, decays by 0.85)
-	u8 field_0x50[0x58 - 0x50]; //0x50
-	f32 offsetX; //0x58, accumulated drift
-	f32 field_0x5C; //0x5C
-	u8 field_0x60[0x74 - 0x60]; //0x60
-	f32 scale; //0x74, uniform scale
-	u8 field_0x78[0x80 - 0x78]; //0x78
-	s32 texFrame0; //0x80, current texture frame (0..15)
-	s32 texFrame1; //0x84, next texture frame, clamped to 15
-	s32 lifetime; //0x88, frames (32 or 64)
-} effKemuriData;
-
-typedef struct effKemuri2Data {
-	s32 field_0x0; //0x0
-	f32 x; //0x4
-	f32 y; //0x8
-	f32 z; //0xC
-	f32 speed; //0x10
-	u8 field_0x14[0x20 - 0x14]; //0x14
-	f32 vy; //0x20
-	u8 field_0x24[0x30 - 0x24]; //0x24
-	f32 dirX; //0x30
-	f32 dirZ; //0x34
-	u8 field_0x38[0x3C - 0x38]; //0x38
-	s32 timer; //0x3C
-	u8 field_0x40[0x64 - 0x40]; //0x40
-	f32 rotVel; //0x64
-	f32 rot; //0x68
-	s32 alpha; //0x6C
-	f32 scale; //0x70
-	f32 scale2; //0x74
-	f32 angle; //0x78
-	u8 field_0x7C[0x8C - 0x7C]; //0x7C
-} effKemuri2Data;
-
 void effKemuriDisp(CameraId camId, void* param);
 static void effKemuri2Main(EffectEntry* entry);
 static void effKemuri2Disp(CameraId camId, void* param);
@@ -120,7 +76,7 @@ EffectEntry* effKemuriEntry(s32 int2, f32 float3, f32 float4, f32 float5) {
 		d->scale = 1.0f;
 
 		d->offsetX = 0.0f;
-		d->field_0x5C = 0.0f;
+		d->reserved_5C = 0.0f;
 
 		d->frame = 0;
 		d->texFrame0 = 0;

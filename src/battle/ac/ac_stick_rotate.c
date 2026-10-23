@@ -39,7 +39,8 @@ typedef struct StickRotateWork {
 } StickRotateWork;
 
 #define AC_PARAMS(work) ((StickRotateParams*)&(work)->actionCommands)
-#define AC_WORK(work) ((StickRotateWork*)((u8*)&(work)->actionCommands + 0x2BC))
+// FAKE: the no-op (BattleActions*) casts here and on disp below keep the address add early (the plain field reschedules the disp functions)
+#define AC_WORK(bw) ((StickRotateWork*)((BattleActions*)&(bw)->actionCommands)->work)
 #define AC_DISP(w) ((BattleACDispParams*)&(w)->actionCommands.disp)
 
 #define PAD(m) (((s32(*)(s32))BattlePadCheckNow)(m))
@@ -75,7 +76,7 @@ s32 _GetInputDir(void) {
 }
 
 s32 _CalcRollDir(void) {
-    StickRotateWork* w = AC_WORK(_battleWorkPointer);
+    StickRotateWork* w = (StickRotateWork*)_battleWorkPointer->actionCommands.work;
     s8 cur = w->dir;
     s8 prev = w->prevDir;
     s32 d;
@@ -114,7 +115,7 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
     BattleACDispParams* disp;
     BattleActions* ac = &work->actionCommands;
     BOOL restart;
-    sw = (StickRotateWork*)((u8*)ac + 0x2BC);
+    sw = ((StickRotateWork*)ac->work);
     disp = AC_DISP(work);
 
     do {
@@ -125,7 +126,7 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                 memset(disp, 0, sizeof(BattleACDispParams));
                 disp->iconX = -300.0f;
                 disp->iconY = 0.0f;
-                disp->unk20 = 20;
+                disp->slideTimer = 20;
                 sw->iconA = 0;
                 sw->iconB = 0;
                 sw->iconDir = 0;
@@ -308,7 +309,7 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                 break;
             case 1004:
                 sw->endTimer = 60;
-                disp->unk20 = 60;
+                disp->slideTimer = 60;
                 ac->mAcState = 1005;
             case 1005:
                 sw->endTimer--;
@@ -332,7 +333,7 @@ s32 battleAcResult_StickRotate(BattleWork* work) {
 }
 
 void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)&((BattleWork*)param)->actionCommands + 0x290);
+    BattleACDispParams* disp = &((BattleActions*)&((BattleWork*)param)->actionCommands)->disp;
     void (*fn)(f32, f32);
 #define work ((BattleWork*)param)
 
@@ -343,10 +344,10 @@ void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
     }
     switch (work->actionCommands.mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
             fn(disp->iconX, disp->iconY);
-            if (disp->unk20 > 0) {
-                disp->unk20--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 100:
@@ -360,11 +361,11 @@ void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
         case 1004:
         case 1005:
         case 1006:
-            if (disp->unk20 > 0) {
-                disp->unk20--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
-            if (disp->unk20 <= 40) {
-                disp->iconX = intplGetValue(4, disp->unk20, 40, -300.0f, 30.0f);
+            if (disp->slideTimer <= 40) {
+                disp->iconX = intplGetValue(4, disp->slideTimer, 40, -300.0f, 30.0f);
             } else {
                 disp->iconX = 30.0f;
             }

@@ -163,7 +163,7 @@ void statusWinMain(void) {
                         statusWinClose();
                     }
                 }
-                if (mario->buttonBuffer & 0x10) {
+                if (mario->buttonTrg & 0x10) {
                     if (!statusWinCheck()) {
                         statusWinOpen();
                         wp->forceTimer = gp->framerate * 10;

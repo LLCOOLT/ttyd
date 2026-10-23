@@ -229,13 +229,13 @@ USER_FUNC(mario_hosei_all) {
     PartyEntry* party2 = partyGetPtr(1);
 
     if (mario != NULL && hitIsGroup(mario->hitobjStandOn, hit)) {
-        mario->unk174.x = value;
+        mario->floorMove.x = value;
     }
-    if (party != NULL && hitIsGroup(party->field_138, hit)) {
-        party->field_AC = value;
+    if (party != NULL && hitIsGroup(party->hitobjStandOn, hit)) {
+        party->floorMoveX = value;
     }
-    if (party2 != NULL && hitIsGroup(party2->field_138, hit)) {
-        party2->field_AC = value;
+    if (party2 != NULL && hitIsGroup(party2->hitobjStandOn, hit)) {
+        party2->floorMoveX = value;
     }
     return EVT_RETURN_DONE;
 }
@@ -262,7 +262,7 @@ USER_FUNC(geso_set_checkpose) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
 
-    npc->field_10C = (const char*)geso_checkpose;
+    npc->checkPose = (const char*)geso_checkpose;
     return EVT_RETURN_DONE;
 }
 

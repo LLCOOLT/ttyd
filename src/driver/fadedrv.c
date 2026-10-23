@@ -62,7 +62,7 @@ void fadeInit(void) {
 		entry->fadeSpotY = 0.0f;
 		entry->animOffsetX = 0.0f;
 		entry->animOffsetY = 0.0f;
-		entry->field_0x90 = 1.0f;
+		entry->scale = 1.0f;
 		entry->delayFrames = 0;
 	}
 
@@ -175,21 +175,21 @@ void fadeEntry(s32 type, s32 duration, GXColor color) {
 	entry->flags = 0;
 	entry->flags |= 1;
 	entry->type = type;
-	*(s64*)&entry->field_0x10 = duration;
+	*(s64*)&entry->durationHi = duration;
 	entry->color = color;
 	entry->progress = 0.0f;
-	entry->field_0x28 = 0.0f;
+	entry->rotation = 0.0f;
 	entry->elapsed = 0.0f;
 	entry->state = 0;
 	entry->animOffsetX = 0.0f;
 	entry->animOffsetY = 0.0f;
-	entry->field_0x90 = 1.0f;
+	entry->scale = 1.0f;
 	if (type != 0x32 && type != 0x35) {
 		entry->callback = NULL;
 	}
 	wp->lastEntryId = id;
 	if (type == 0x22 || type == 0x28) {
-		entry->field_0x90 = 3.0f;
+		entry->scale = 3.0f;
 	}
 	switch (type) {
 		case 0x2B:
@@ -426,8 +426,7 @@ static inline void fadeCapture(const char* name, const char* off, s32 mode) {
 	evt_img_alloc_capture(&evt, TRUE);
 }
 
-#define FADE_DURATION(e) (*(s64*)&(e)->field_0x10)
-#define IMG_TIME(img) (*(OSTime*)((u8*)(img) + 0x110))
+#define FADE_DURATION(e) (*(s64*)&(e)->durationHi)
 #define SFX_ON(id) ((s32 (*)(s32))psndSFXOn)(id)
 
 void fadeMain(void) {
@@ -452,7 +451,7 @@ void fadeMain(void) {
 							}
 							entry->progress = entry->elapsed / FADE_DURATION(entry);
 							entry->progress = 1.0f - entry->progress;
-							entry->field_0x28 += 10.0f;
+							entry->rotation += 10.0f;
 							if (entry->progress < 0.0f) {
 								entry->progress = 0.0f;
 								entry->flags |= 2;
@@ -473,7 +472,7 @@ void fadeMain(void) {
 						if (FADE_DURATION(entry) != 0) {
 							entry->elapsed += VERSION_PICK(16.666666f, 1000.0f / gp->framerate);
 							entry->progress = entry->elapsed / FADE_DURATION(entry);
-							entry->field_0x28 -= 10.0f;
+							entry->rotation -= 10.0f;
 							if (entry->progress > 1.0f) {
 								entry->progress = 1.0f;
 								entry->flags |= 2;
@@ -514,28 +513,28 @@ void fadeMain(void) {
 						fadeCapture("fImg_dokan", NULL, 0);
 						switch (entry->type) {
 							case 0x2D:
-								entry->field_0x98 = SFX_ON(0x403AB);
+								entry->sfxId = SFX_ON(0x403AB);
 								break;
 							case 0x2F:
-								entry->field_0x98 = SFX_ON(0x403AC);
+								entry->sfxId = SFX_ON(0x403AC);
 								break;
 							case 0x29:
-								entry->field_0x98 = SFX_ON(0x403AD);
+								entry->sfxId = SFX_ON(0x403AD);
 								break;
 							case 0x2B:
-								entry->field_0x98 = SFX_ON(0x403AE);
+								entry->sfxId = SFX_ON(0x403AE);
 								break;
 							case 0x2E:
-								entry->field_0x98 = SFX_ON(0x403AF);
+								entry->sfxId = SFX_ON(0x403AF);
 								break;
 							case 0x30:
-								entry->field_0x98 = SFX_ON(0x403B0);
+								entry->sfxId = SFX_ON(0x403B0);
 								break;
 							case 0x2A:
-								entry->field_0x98 = SFX_ON(0x403B1);
+								entry->sfxId = SFX_ON(0x403B1);
 								break;
 							case 0x2C:
-								entry->field_0x98 = SFX_ON(0x403B2);
+								entry->sfxId = SFX_ON(0x403B2);
 								break;
 						}
 						entry->state++;
@@ -722,16 +721,16 @@ void fadeMain(void) {
 						}
 						switch (entry->type) {
 							case 0x18: case 0x1B: case 0x3F:
-								entry->field_0x98 = SFX_ON(0x40325);
+								entry->sfxId = SFX_ON(0x40325);
 								break;
 							case 0x19: case 0x1C: case 0x40:
-								entry->field_0x98 = SFX_ON(0x40326);
+								entry->sfxId = SFX_ON(0x40326);
 								break;
 							case 0x1D: case 0x23:
-								entry->field_0x98 = SFX_ON(0x40321);
+								entry->sfxId = SFX_ON(0x40321);
 								break;
 							case 0x1E: case 0x24:
-								entry->field_0x98 = SFX_ON(0x40322);
+								entry->sfxId = SFX_ON(0x40322);
 								break;
 						}
 						if (entry->poseId >= 0) {
@@ -742,33 +741,33 @@ void fadeMain(void) {
 						animPoseSetAnim(entry->poseId, entry->animName, TRUE);
 						entry->state++;
 						if (entry->type == 0x22 || entry->type == 0x28) {
-							entry->field_0x90 = 3.0f;
-							entry->field_0x94 = 0;
+							entry->scale = 3.0f;
+							entry->scaleTimer = 0;
 						}
 					case 1:
 						animPoseMain(entry->poseId);
 						if (entry->type == 0x22 || entry->type == 0x28) {
 							if (!(entry->flags & 8)) {
-								if (entry->field_0x94 < FPS_FRAMES(180)) {
-									entry->field_0x90 = intplGetValue(12, ++entry->field_0x94, FPS_FRAMES(180), 3.0f, 1.0f);
+								if (entry->scaleTimer < FPS_FRAMES(180)) {
+									entry->scale = intplGetValue(12, ++entry->scaleTimer, FPS_FRAMES(180), 3.0f, 1.0f);
 								}
 							}
 							else {
-								if (entry->field_0x94 < FPS_FRAMES(90)) {
-									entry->field_0x90 = intplGetValue(12, ++entry->field_0x94, FPS_FRAMES(90), 1.5f, 1.0f);
+								if (entry->scaleTimer < FPS_FRAMES(90)) {
+									entry->scale = intplGetValue(12, ++entry->scaleTimer, FPS_FRAMES(90), 1.5f, 1.0f);
 								}
 							}
 						}
 						if (animPoseGetLoopTimes(entry->poseId) >= 1.0f) {
 							if (entry->type == 0x22 || entry->type == 0x28) {
 								if (!(entry->flags & 8)) {
-									if (entry->field_0x94 == FPS_FRAMES(180)) {
+									if (entry->scaleTimer == FPS_FRAMES(180)) {
 										entry->flags |= 2;
 										entry->state++;
 									}
 								}
 								else {
-									if (entry->field_0x94 == FPS_FRAMES(90)) {
+									if (entry->scaleTimer == FPS_FRAMES(90)) {
 										entry->flags |= 2;
 										entry->state++;
 									}
@@ -777,7 +776,7 @@ void fadeMain(void) {
 							else {
 								entry->flags |= 2;
 								entry->state++;
-								psndSFXOff(entry->field_0x98);
+								psndSFXOff(entry->sfxId);
 								if (entry->type == 0x19 || entry->type == 0x1C || entry->type == 0x40) {
 									animPoseRelease(entry->poseId);
 									entry->poseId = -1;
@@ -795,13 +794,13 @@ void fadeMain(void) {
 			case 0x21: case 0x27:
 				switch (entry->state) {
 					case 0:
-						entry->field_0x90 = 1.0f;
-						entry->field_0x94 = 0;
+						entry->scale = 1.0f;
+						entry->scaleTimer = 0;
 						entry->state++;
 					case 1:
 						animPoseMain(entry->poseId);
-						if (entry->field_0x94 < FPS_FRAMES(120)) {
-							entry->field_0x90 = intplGetValue(12, ++entry->field_0x94, FPS_FRAMES(120), 1.0f, 3.0f);
+						if (entry->scaleTimer < FPS_FRAMES(120)) {
+							entry->scale = intplGetValue(12, ++entry->scaleTimer, FPS_FRAMES(120), 1.0f, 3.0f);
 						}
 						else {
 							entry->flags |= 2;
@@ -934,7 +933,7 @@ void disp_texture(CameraId camId, void* param) {
 				scale = p * (p * (p * (100.0f * p * p)));
 				PSMTXTrans(mtx1, 0.5f, 0.5f, 0.0f);
 				PSMTXScale(mtx3, scale, scale, 1.0f);
-				PSMTXRotRad(mtx4, 'z', 0.017453292f * work->entries[0].field_0x28);
+				PSMTXRotRad(mtx4, 'z', 0.017453292f * work->entries[0].rotation);
 				PSMTXTrans(mtx2, -0.5f - work->entries[0].fadeSpotX / gp->fbWidth,
 					-0.5f + work->entries[0].fadeSpotY / gp->efbHeight, 0.0f);
 				PSMTXConcat(mtx1, mtx3, mtx3);
@@ -1111,7 +1110,7 @@ void disp_maku(CameraId camId, void* param) {
 		GXSetZScaleOffset(z(), 0.0f);
 	}
 	else {
-		scale = entry->field_0x90;
+		scale = entry->scale;
 		depth = 0.0f;
 		zFill();
 	}
@@ -1281,7 +1280,7 @@ void fadeReset(s32 id) { //TODO: better param name?
 	entry->fadeSpotY = 0.0f;
 	entry->animOffsetX = 0.0f;
 	entry->animOffsetY = 0.0f;
-	entry->field_0x90 = 1.0f;
+	entry->scale = 1.0f;
 }
 
 TEXPalette* fadeGetTpl(void) {

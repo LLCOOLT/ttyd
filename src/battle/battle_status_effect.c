@@ -11,31 +11,13 @@
 #include <string.h>
 #include "driver/icondrv.h"
 
-typedef struct StChgMsg {
-	s8 type; // 0x0
-	u8 flags; // 0x1
-	s8 field_0x2; // 0x2
-	u8 pad_3; // 0x3
-	s32 unitId; // 0x4
-	s32 field_0x8; // 0x8
-} StChgMsg;
 
-#define ST_CHG_MSG(i) (((StChgMsg*)((u8*)_battleWorkPointer + BWOFF(0x18D88))) + (i))
-#define ST_CHG_TEXT ((const char*)((u8*)_battleWorkPointer + BWOFF(0x18ED8)))
+#define ST_CHG_MSG(i) ((StChgMsg*)_battleWorkPointer->announce.stChg.msg + (i)) /* cast keeps the 0x18D88 displacement folded into each access */
 
 BOOL BattleStatusChangeAnnouceMain_Unit(BattleUnit* unit);
 void BattleStatusChangeMsgSetAnnouce(s32* data, s32 index, s32 arg2);
 void BattleStatusChangeInfoWorkInit(BattleUnit* unit);
 void _st_chg_msg_disp(void);
-
-typedef struct StChgInfo {
-	s8 type;
-	s8 field_0x1;
-	u8 field_0x2;
-	u8 field_0x3;
-	s32 field_0x4;
-	s32 field_0x8;
-} StChgInfo;
 
 typedef struct StChgMsgData {
 	s8 type;
@@ -222,7 +204,6 @@ EffectEntry* effFireEntry(s32, s32, f32, f32, f32, f32);
 EffectEntry* effIceEntry(s32, s32, f32, f32, f32, f32);
 #define EFF_FIRE(u) ((u)->fireEff)
 #define EFF_ICE(u) ((u)->iceEff)
-#define KIND_F(u, o) (*(f32*)((u8*)(u)->mKindParams + (o)))
 
 #pragma optimize_for_size on
 void BSE_Fire(BattleUnit* unit) {
@@ -239,9 +220,9 @@ void BSE_Fire(BattleUnit* unit) {
 		}
 		wk = (f32*)EFF_FIRE(unit)->userdata;
 		BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &x, &y, &z);
-		x += unit->mSizeMultiplier * (KIND_F(unit, 0x48) * (unit->faceDirection >= 0 ? 1.0f : -1.0f));
-		y += KIND_F(unit, 0x4C) * unit->mSizeMultiplier;
-		z += KIND_F(unit, 0x50) * unit->mSizeMultiplier;
+		x += unit->mSizeMultiplier * (unit->mKindParams->burnFlameOffset.x * (unit->faceDirection >= 0 ? 1.0f : -1.0f));
+		y += unit->mKindParams->burnFlameOffset.y * unit->mSizeMultiplier;
+		z += unit->mKindParams->burnFlameOffset.z * unit->mSizeMultiplier;
 		wk[1] = x;
 		wk[2] = y;
 		wk[3] = z + 5.0f;
@@ -299,7 +280,6 @@ void BSE_FreezeDelete(BattleUnit* unit) {
 
 #pragma optimize_for_size reset
 
-#define KAGE_ICON(u) ((u)->kageIcon)
 
 void BSE_Kagegakure(BattleUnit* unit) {
 	char name[0x10];
@@ -310,17 +290,17 @@ void BSE_Kagegakure(BattleUnit* unit) {
 		on = TRUE;
 	}
 	if (on) {
-		if (KAGE_ICON(unit) == NULL) {
+		if (unit->kageIcon == NULL) {
 			sprintf(name, "_biK_%02x\0\0", *(s32*)unit);
 #ifdef VERSION_G8ME01
 			iconEntry(name, 0xA1);
 #else
 			iconEntry(name, 0x99);
 #endif
-			KAGE_ICON(unit) = (u8*)iconNameToPtr(name);
+			unit->kageIcon = iconNameToPtr(name);
 		}
 		BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &x, &y, &z);
-		iconSetPos((char*)KAGE_ICON(unit) + 0x18, x, y, z + 5.0f);
+		iconSetPos(unit->kageIcon->name, x, y, z + 5.0f);
 	}
 	else {
 		BSE_KagegakureDelete(unit);
@@ -328,9 +308,9 @@ void BSE_Kagegakure(BattleUnit* unit) {
 }
 
 void BSE_KagegakureDelete(BattleUnit* unit) {
-	if (KAGE_ICON(unit) != NULL) {
-		iconDelete((char*)KAGE_ICON(unit) + 0x18);
-		KAGE_ICON(unit) = NULL;
+	if (unit->kageIcon != NULL) {
+		iconDelete(unit->kageIcon->name);
+		unit->kageIcon = NULL;
 	}
 }
 
@@ -402,15 +382,15 @@ BOOL BSE_TurnFirstProcessEffectMain(BattleUnit* unit) {
 #pragma optimize_for_size on
 void BattleStatusChangeInfoWorkInit(BattleUnit* unit) {
 	s32 i;
-	StChgInfo* e = (StChgInfo*)((u8*)unit + BUOFF(0xAE4));
+	StChgInfo* e = &unit->statusChangeInfo[0];
 
 	for (i = 0; i < 6; i++) {
 		StChgInfo* p = &e[i];
 		p->type = -1;
-		p->field_0x1 = 0;
-		p->field_0x2 = 0;
-		p->field_0x3 = 0;
-		p->field_0x4 = 0;
+		p->strength = 0;
+		p->stagger = 0;
+		p->stackOffset = 0;
+		p->reserved_04 = 0;
 	}
 }
 #pragma optimize_for_size reset
@@ -434,7 +414,7 @@ s32 _get_pri(s8 type) {
 
 #pragma optimize_for_size on
 void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 arg2, s32 arg3) {
-	StChgInfo* e = (StChgInfo*)((u8*)unit + BUOFF(0xAE4));
+	StChgInfo* e = &unit->statusChangeInfo[0];
 	StChgInfo tmp, swap;
 	s8 pri = _get_pri(type);
 	s32 i, j, n;
@@ -447,8 +427,8 @@ void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 arg2, s32 
 	}
 	if (i >= 6) return;
 	tmp.type = type;
-	tmp.field_0x1 = arg2;
-	tmp.field_0x8 = arg3;
+	tmp.strength = arg2;
+	tmp.changed = arg3;
 	if (type == e[i].type) {
 		e[i] = tmp;
 	}
@@ -464,8 +444,8 @@ void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 arg2, s32 
 	t = 0;
 	for (i = 0; i < 6; i++) {
 		if (e[i].type == -1) break;
-		e[i].field_0x2 = t;
-		e[i].field_0x4 = j;
+		e[i].stagger = t;
+		e[i].reserved_04 = j;
 		t += 10;
 		n++;
 	}
@@ -477,7 +457,7 @@ L3:
 Ld:;
 	for (j = n; j >= 0; j--) {
 		if (e[j].type != -1) {
-			e[j].field_0x3 = u;
+			e[j].stackOffset = u;
 			u += 10;
 		}
 	}
@@ -525,8 +505,8 @@ void BattleStatusChangeMsgSetAnnouce(s32* data, s32 index, s32 arg2) {
 
 	msg->unitId = data[0];
 	msg->type = index;
-	msg->field_0x2 = 0;
-	msg->field_0x8 = arg2;
+	msg->timer = 0;
+	msg->changed = arg2;
 	id = data[2];
 	if (id == 0xDE) {
 		msg->flags |= 1;
@@ -539,12 +519,11 @@ void BattleStatusChangeMsgSetAnnouce(s32* data, s32 index, s32 arg2) {
 	}
 }
 
-typedef struct StChgWorkLocal { StChgMsg msg[28]; char text[0x100]; s64 mask; } StChgWorkLocal;
 #pragma dont_inline on
 #pragma optimize_for_size on
 void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 	s32 t;
-	StChgWorkLocal* base;
+	StChgWork* base;
 	s8 i;
 	StChgMsg* msg;
 	s32 j;
@@ -552,7 +531,7 @@ void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 	s32 n, found, k;
 	StChgInfo* e;
 
-	base = (StChgWorkLocal*)((u8*)wp + BWOFF(0x18D88));
+	base = &wp->announce.stChg;
 
 	for (i = 0; i < 28; i++) {
 		t = i;
@@ -562,7 +541,7 @@ void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 		for (j = 0; j < 64; j++) {
 			unit = BattleGetUnitPtr(wp, j);
 			if (unit && !BtlUnit_CheckStatus(unit, 0x1B)) {
-				e = (StChgInfo*)((u8*)unit + BUOFF(0xAE4));
+				e = &unit->statusChangeInfo[0];
 				found = 0;
 				k = 0;
 				for (n = 0; n < 6; n++) {
@@ -573,7 +552,7 @@ void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 					k++;
 				}
 				if (found) {
-					BattleStatusChangeMsgSetAnnouce((s32*)unit, t, e[k].field_0x8);
+					BattleStatusChangeMsgSetAnnouce((s32*)unit, t, e[k].changed);
 				}
 			}
 		}
@@ -581,7 +560,7 @@ void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 			msg->unitId = -1;
 			msg->type = -1;
 		}
-		else if (base->mask & (s64)(1 << t)) {
+		else if (*(s64*)&base->maskHi & (s64)(1 << t)) {
 			msg->unitId = -1;
 			msg->type = -1;
 		}
@@ -589,7 +568,7 @@ void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 }
 
 BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
-	StChgWorkLocal* base = (StChgWorkLocal*)((u8*)wp + BWOFF(0x18D88));
+	StChgWork* base = &wp->announce.stChg;
 	StChgMsg* msg;
 	s8* p;
 	BOOL ret = FALSE;
@@ -600,12 +579,12 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 		if (msg->type == -1) continue;
 		ret = TRUE;
 		BattleGetUnitPtr(wp, msg->unitId);
-		if (*(u8*)&msg->field_0x2) {
-			msg->field_0x2--;
+		if (*(u8*)&msg->timer) {
+			msg->timer--;
 			if (BattlePadCheckTrigger(0x300)) {
-				msg->field_0x2 = 0;
+				msg->timer = 0;
 			}
-			if (!*(u8*)&msg->field_0x2) {
+			if (!*(u8*)&msg->timer) {
 				msg->type = -1;
 			}
 		}
@@ -613,7 +592,7 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 			sprintf(base->text, "");
 			for (i = 0; i < 28; i++) {
 				if (msg->type == _st_chg_msg_data[i].type || _st_chg_msg_data[i].type == -1) {
-					if (msg->field_0x8) {
+					if (msg->changed) {
 						sprintf(base->text, msgSearch(_st_chg_msg_data[i].msg1));
 					}
 					else {
@@ -622,7 +601,7 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 					break;
 				}
 			}
-			msg->field_0x2 = 90;
+			msg->timer = 90;
 		}
 		dispEntry(8, 900.0f, 1, (DispCallback)_st_chg_msg_disp, 0);
 		break;
@@ -642,17 +621,17 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 typedef void (*WakuColByRefFunc)(u16, GXColor*, f32, f32, f32, f32, f32);
 
 void _st_chg_msg_disp(void) {
-	u8* wp = (u8*)_battleWorkPointer + 0x20000;
+	StChgWork* st = &_battleWorkPointer->announce.stChg;
 	f32 y; f32 x; u16 width; u16 lines;
 	GXColor col0;
-	width = FontGetMessageWidthLine((const char*)(wp - VERSION_PICK(0x7128, 0x7110)), &lines);
+	width = FontGetMessageWidthLine((const char*)st->text, &lines);
 	lines++;
 	col0 = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	y = 0.0f; x = y - (width / 2); y = -120.0f;
 	// the color is passed by address here (same ABI as by-value GXColor)
 	((WakuColByRefFunc)windowDispGX_Waku_col)(0, &col0, x - 20.0f, ((lines - 1) * 29) + -117.0f, (f32)(width + 40), (f32)(lines * 29 + 1), 10.0f);
 	FontDrawStart();
-	FontDrawMessage(x, (s32)y + (lines - 1) * 29, (const char*)(wp - VERSION_PICK(0x7128, 0x7110)));
+	FontDrawMessage(x, (s32)y + (lines - 1) * 29, (const char*)st->text);
 }
 
 #pragma force_active on

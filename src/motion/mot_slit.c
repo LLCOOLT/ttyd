@@ -10,7 +10,6 @@
 #ifdef VERSION_G8ME01
 void U_allPartySlitOffReq(void);
 #endif
-#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 
 s32 pouchCheckItem(s32 itemId);
 BOOL marioChkKey(void);
@@ -441,7 +440,7 @@ void marioForceSlitAnime(void) {
 
 static inline void slitInit(void) {
 	MarioWork* m = marioGetPtr();
-	m->mot.slit.unk0 = 0.0f;
+	m->mot.slit.reserved_0 = 0.0f;
 	m->mot.slit.counter = 0;
 	m->mot.slit.count = 0;
 	m->mot.slit.timer = 0;
@@ -536,8 +535,8 @@ static inline f32 slitWalkSpeed(void) {
 #define CAMFIX(m) \
 	{ \
 		MarioWork* p = marioGetPtr(); \
-		MW(p, 0x148, f32) = 0.0f; \
-		MW(p, 0x158, f32) = 0.004f; \
+		p->camShiftTargetZ = 0.0f; \
+		p->camShiftRate.z = 0.004f; \
 	}
 
 #ifdef VERSION_G8ME01
@@ -802,12 +801,12 @@ void mot_slit(void) {
 					f32 sn, cs;
 					d = revise360(m->controlStickAngle - m->targetYaw);
 					if (d > 90.0f && d < 270.0f) {
-						m->wCamVal1 = 180.0f;
+						m->mot.slit.pushDir = 180.0f;
 					} else {
-						m->wCamVal1 = 0.0f;
+						m->mot.slit.pushDir = 0.0f;
 					}
 					if (++m->mot.slit.counter >= sysMsec2Frame(50)) {
-						qp = &q; m->directionView = revise360(m->wCamVal1 + m->targetYaw);
+						qp = &q; m->directionView = revise360(m->mot.slit.pushDir + m->targetYaw);
 						m->mot.slit.counter = 0;
 						sincosf(&sn, &cs, m->directionView);
 						{ Vec tmp = {0, 0, 0};
@@ -859,7 +858,7 @@ void mot_slit(void) {
 		camGetPtr(8)->flags |= 0x200;
 		CAMFIX(m)
 		m->flags |= 0x10000000;
-		if (0.0f == m->wCamVal1) {
+		if (0.0f == m->mot.slit.pushDir) {
 			marioChgPaper("PM_S_1F");
 		} else {
 			marioChgPaper("PM_S_1G");

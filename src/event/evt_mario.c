@@ -16,7 +16,6 @@
 #include <string.h>
 #include "evt/evt_mario.h"
 
-#define FLD(p, T, off) (*(T*)((u8*)(p) + (off)))
 
 void mario_plane_cancel(void);
 s32 marioGetPlaneStatus(void);
@@ -345,7 +344,7 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
                 party->dispOfs = (Vec){0.0f, 0.0f, 0.0f};
                 party->rot = (Vec){0.0f, 0.0f, 0.0f};
                 party->rotOfs = (Vec){0.0f, 0.0f, 0.0f};
-                party->field_8C = mp->field_0xB4;
+                party->rotOfsY = mp->rotOfs.y;
                 party->dispOfs.y = mp->dispOfs.y;
                 party->dispOfs.z = mp->dispOfs.z;
             }
@@ -356,7 +355,7 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
                 party->dispOfs = (Vec){0.0f, 0.0f, 0.0f};
                 party->rot = (Vec){0.0f, 0.0f, 0.0f};
                 party->rotOfs = (Vec){0.0f, 0.0f, 0.0f};
-                party->field_8C = mp->field_0xB4;
+                party->rotOfsY = mp->rotOfs.y;
                 party->dispOfs.y = mp->dispOfs.y;
                 party->dispOfs.z = mp->dispOfs.z;
             }
@@ -559,9 +558,9 @@ USER_FUNC(evt_mario_set_pos) {
 USER_FUNC(evt_mario_set_hosei_xyz) {
     MarioWork* mp = marioGetPtr();
     s32* args = event->args;
-    mp->unk174.x = evtGetFloat(event, args[0]);
-    mp->unk174.y = evtGetFloat(event, args[1]);
-    mp->unk174.z = evtGetFloat(event, args[2]);
+    mp->floorMove.x = evtGetFloat(event, args[0]);
+    mp->floorMove.y = evtGetFloat(event, args[1]);
+    mp->floorMove.z = evtGetFloat(event, args[2]);
     return EVT_RETURN_DONE;
 }
 
@@ -742,11 +741,11 @@ USER_FUNC(evt_mario_normalize) {
 #else
         party = partyGetPtr(marioGetPartyId());
         if (party) {
-            party->field_37 = 0;
+            party->slitOn = 0;
         }
         party = partyGetPtr(marioGetExtraPartyId());
         if (party) {
-            party->field_37 = 0;
+            party->slitOn = 0;
         }
 #endif
         mp->trigFlags |= 0x80000000;
@@ -803,7 +802,7 @@ USER_FUNC(evt_mario_normalize) {
         case 1:
             ret = 0;
             if (mp->currMotionId == 0x16) {
-                if (mp->field_0x8 == 0) {
+                if (mp->rollFlags == 0) {
                     event->userdata[0] = 2;
                 }
             } else if (mp->currMotionId == 0x15) {
@@ -924,7 +923,7 @@ USER_FUNC(evt_mario_set_force_dir) {
     MarioWork* mp = marioGetPtr();
     if (mp->airTimer > 0) {
         mp->flags |= 0x40;
-        mp->unk1A4 = evtGetValue(event, args[0]);
+        mp->forceDir = evtGetValue(event, args[0]);
     }
     return EVT_RETURN_DONE;
 }
@@ -979,11 +978,11 @@ USER_FUNC(evt_mario_mov_pos2) {
 USER_FUNC(N_evt_mario_party_door_halve_hitbox) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party) {
-        party->field_8 |= 0x40000;
+        party->trigFlags |= 0x40000;
     }
     party = partyGetPtr(marioGetExtraPartyId());
     if (party) {
-        party->field_8 |= 0x40000;
+        party->trigFlags |= 0x40000;
     }
     return EVT_RETURN_DONE;
 }
@@ -1015,10 +1014,10 @@ USER_FUNC(evt_mario_party_door_move) {
             if (mp->position.y > party->position.y) {
                 party->position = mp->position;
             }
-            party->field_8 |= 0x40000;
+            party->trigFlags |= 0x40000;
             N_partyFollowCloseOn(party);
             party->flags |= 0x1000000;
-            party->field_8 |= 0x200000;
+            party->trigFlags |= 0x200000;
         }
         party = partyGetPtr(marioGetExtraPartyId());
         if (party) {
@@ -1029,10 +1028,10 @@ USER_FUNC(evt_mario_party_door_move) {
             if (mp->position.y > party->position.y) {
                 party->position = mp->position;
             }
-            party->field_8 |= 0x40000;
+            party->trigFlags |= 0x40000;
             N_partyFollowCloseOn(party);
             party->flags |= 0x1000000;
-            party->field_8 |= 0x200000;
+            party->trigFlags |= 0x200000;
         }
         event->userdata[0] = 0;
         event->userdata[2] = 0;
@@ -1098,7 +1097,7 @@ USER_FUNC(evt_mario_party_door_move) {
                 }
                 N_partyFollowCloseOff(party);
                 party->flags &= ~0x1000000;
-                party->field_8 &= ~0x40000;
+                party->trigFlags &= ~0x40000;
             }
             party = partyGetPtr(marioGetExtraPartyId());
             if (party) {
@@ -1110,7 +1109,7 @@ USER_FUNC(evt_mario_party_door_move) {
                 }
                 N_partyFollowCloseOff(party);
                 party->flags &= ~0x1000000;
-                party->field_8 &= ~0x40000;
+                party->trigFlags &= ~0x40000;
             }
 #ifdef VERSION_G8ME01
             event->userdata[0] = 8;
@@ -1150,7 +1149,7 @@ USER_FUNC(evt_mario_party_bero_move) {
             }
             N_partyFollowCloseOn(party);
             party->flags |= 0x1000000;
-            party->field_8 |= 0x200000;
+            party->trigFlags |= 0x200000;
         }
         party = partyGetPtr(marioGetExtraPartyId());
         if (party) {
@@ -1163,7 +1162,7 @@ USER_FUNC(evt_mario_party_bero_move) {
             }
             N_partyFollowCloseOn(party);
             party->flags |= 0x1000000;
-            party->field_8 |= 0x200000;
+            party->trigFlags |= 0x200000;
         }
         event->userdata[0] = 0;
         event->userdata[2] = 0;
@@ -1229,7 +1228,7 @@ USER_FUNC(evt_mario_party_bero_move) {
             if (party) {
                 N_partyFollowCloseOff(party);
                 party->flags &= ~0x1000000;
-                party->field_8 &= ~0x200000;
+                party->trigFlags &= ~0x200000;
                 if (party->moveKind == 1) {
                     partySetDispDirToMario(party);
                     party->flags2 &= ~0x10;
@@ -1239,7 +1238,7 @@ USER_FUNC(evt_mario_party_bero_move) {
             if (party) {
                 N_partyFollowCloseOff(party);
                 party->flags &= ~0x1000000;
-                party->field_8 &= ~0x200000;
+                party->trigFlags &= ~0x200000;
                 if (party->moveKind == 1) {
                     partySetDispDirToMario(party);
                     party->flags2 &= ~0x10;

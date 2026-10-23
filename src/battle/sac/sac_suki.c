@@ -1,4 +1,6 @@
 #pragma optimize_for_size on
+#include "eff/n64/eff_crystal_n64.h"
+#include "eff/eff_starstone.h"
 #include "battle/battle.h"
 #include "battle/battle_audience.h"
 #include "battle/battle_event_cmd.h"
@@ -157,18 +159,18 @@ void N__disp_2D(s32 side, s32 idx);
 static BattleWeapon weapon = {
     "btl_wn_sac_sukkari_sukkiri", // name
     ICON_199, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_sukkari_sukkiri", // description
     100, // baseAccuracy
     0, // baseFpCost
     2, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -177,7 +179,7 @@ static BattleWeapon weapon = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_7", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -188,9 +190,9 @@ static BattleWeapon weapon = {
     100, // ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Suki, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(nice_event)
@@ -501,7 +503,7 @@ static void main_star(void) {
 
 USER_FUNC(end_suki) {
     SukiWork* w = get_ptr();
-    effDelete(*(EffectEntry**)((u8*)w->eff->userdata + 0x34));
+    effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
     effDelete(w->eff);
     return 2;
 }
@@ -627,7 +629,7 @@ static void disp_3D_alpha(CameraId cam, void* param) {
 
 #pragma dont_inline on
 static SukiWork* get_ptr(void) {
-    return (SukiWork*)((u8*)_battleWorkPointer + 0x1F4C);
+    return (SukiWork*)_battleWorkPointer->actionCommands.work;
 }
 #pragma dont_inline reset
 
@@ -747,7 +749,7 @@ USER_FUNC(eff_crystal) {
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     EffectEntry* e = effCrystalN64Entry(6, 60, x, y, 30.0f, 1.0f);
-    *(s32*)((u8*)e->userdata + 0x38) = 7;
+    ((EffCrystalN64Work*)e->userdata)->camera = 7;
     return 2;
 }
 

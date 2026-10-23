@@ -37,8 +37,8 @@ BattleUnitKind unit_object_switch = {
     {0.0f, 0.0f, 0.0f},     // talkTogeBaseOffset
     {0.0f, 0.0f, 0.0f},     // heldItemBaseOffset
     {0.0f, 0.0f, 0.0f},     // burnFlameOffset
-    0.0f,                   // field_0x54
-    0.0f,                   // field_0x58
+    0.0f,                   // vivianOffsetX
+    0.0f,                   // vivianOffsetZ
     {12.0f, 0.0f, 0.0f},    // bintaHitOffset
     {12.0f, 15.6f, 0.0f},   // kissHitOffset
     {0.0f, 0.0f, 0.0f},     // cutBaseOffset
@@ -82,8 +82,8 @@ static BattleUnitKindPart parts[] = {
         {0.0f, 0.0f, 0.0f},   // positionOffset
         {0.0f, 25.0f, 0.0f},  // hitBaseOffset
         {0.0f, 30.0f, 0.0f},  // hitCursorBaseOffset
-        20,                   // field_0x30
-        30,                   // field_0x32
+        20,                   // shadowSize
+        30,                   // reserved_32
         255,                  // baseAlpha
         &defence,             // defense
         &defence_attr,        // defenseAttr

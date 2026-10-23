@@ -70,7 +70,7 @@ void BattleActionCommandDeclareACResult(BattleWork* work, BattleWeapon* weapon, 
 	default:
 		info->mWeapon = weapon;
 		info->mSpAcSuccessMultiplier = 0.25f * (f32)result + 0.5f;
-		info->field_0x9 = weapon->field_0x19;
+		info->reserved_09 = weapon->reserved_19;
 		info->mBingoSlotChance = weapon->mBingoSlotChance;
 		BattleAudience_Case_ActionCommandGood(weapon);
 		break;
@@ -91,7 +91,7 @@ void BattleActionCommandSetup(BattleWork* work, s32 id, BattleUnit* unit, s32 a4
 	work->actionCommands.resultcb = NULL;
 	work->actionCommands.deletecb = NULL;
 	work->actionCommands.setupParam = a5;
-	work->actionCommands.field_0x30 = 0;
+	work->actionCommands.doneFlags = 0;
 	for (; entry->id; entry++) {
 		if (entry->id == id) {
 			work->actionCommands.maincb = entry->main;
@@ -344,7 +344,7 @@ static inline void gaugeQuad(CameraEntry* cam, f32 x0, f32 y0, f32 x1, f32 y1, u
 void BattleAcDrawGauge(s32 x, s32 y, s32 width, f32 ratio, s32 level, s32 a, s32 b, s32 c, s32 flags) {
 	BattleWork* wp = _battleWorkPointer;
 	s32 max = 100;
-	u8* mod = (u8*)wp + 0x1F2C;
+	u8* mod = (u8*)&wp->actionCommands.disp.color;
 	Vec pos;
 	GXColor color = {0x00, 0xE4, 0x86, 0xFF};
 	CameraEntry* cam;

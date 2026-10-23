@@ -112,7 +112,7 @@ void npcReleaseFieldNpc(void) {
                     field->mFlags = pose->flags;
                     field->wCurrentRenderRotationMinus90Y = pose->peraRotY;
                     field->wRotationY = pose->rotationY;
-                    field->wScaleZ_flip = pose->field_0x78;
+                    field->wScaleZ_flip = pose->scaleZFlip;
                     field->wInitToZero4 = pose->peraTargetRotY;
                     strcpy(field->mModelName, animPoseGetAnimBaseDataPtr(entry->poseId)->fileName);
                     strcpy(field->mAnimName, animPoseGetCurrentAnim(entry->poseId)->name);
@@ -144,7 +144,7 @@ void npcRecoveryFieldNpc(void) {
                 pose->flags = field->mFlags;
                 pose->peraRotY = field->wCurrentRenderRotationMinus90Y;
                 pose->rotationY = field->wRotationY;
-                pose->field_0x78 = field->wScaleZ_flip;
+                pose->scaleZFlip = field->wScaleZ_flip;
                 pose->peraTargetRotY = field->wInitToZero4;
 
                 if (pose->flags & 0x40) {
@@ -521,17 +521,17 @@ s32 npcEntry(const char* a1, const char* animName) {
     entry->height = animPoseGetRadius(entry->poseId);
     entry->scale = (Vec){1.0f, 1.0f, 1.0f};
     entry->shadowScale = 1.0f;
-    entry->field_108 = 0;
-    entry->field_10C = "M_I_2";
-    entry->field_198 = gp->renderTime;
-    entry->field_188 = 0;
+    entry->moveAnimState = 0;
+    entry->checkPose = "M_I_2";
+    entry->lastUpdateTicks = gp->renderTime;
+    entry->moveTicks = 0;
     entry->jumpGravity = 1.0f;
-    entry->field_1D0 = 0.0f;
+    entry->maxFallSpeed = 0.0f;
     entry->jumpYScale = 1.0f;
     entry->offscreenId = -1;
     entry->color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
     entry->cameraId = CAMERA_3D;
-    entry->field_2F8 = 0;
+    entry->attackMode = 0;
     entry->balloonType = 1;
     if (animPoseGetVivianType(entry->poseId)) {
         entry->flags |= 0x4000000;
@@ -656,7 +656,7 @@ static inline void npcMoveSide(NpcEntry* entry, f32 mx, f32 mz) {
 void npcMain(void) {
     const char* kpaSfx;
     NpcWork* npcwork;
-    u8* fbat;
+    FieldBattleData* fbat;
     NpcEntry* entry;
     int i;
     int total;
@@ -693,24 +693,24 @@ void npcMain(void) {
             }
 
             if (entry->jumpFlags & 0x10) {
-                entry->field_190 = gp->renderTime - entry->field_198;
-                if (OSTicksToMilliseconds(entry->field_190) > 500) {
-                    entry->field_190 = OSMillisecondsToTicks(16);
+                entry->dtTicks = gp->renderTime - entry->lastUpdateTicks;
+                if (OSTicksToMilliseconds(entry->dtTicks) > 500) {
+                    entry->dtTicks = OSMillisecondsToTicks(16);
                 }
                 if (entry->flags & 0x20000) {
-                    entry->field_178 += entry->field_190;
+                    entry->jumpTicks += entry->dtTicks;
                 } else {
-                    entry->field_178 = 0;
+                    entry->jumpTicks = 0;
                 }
-                entry->field_188 += entry->field_190;
-                entry->field_198 = gp->renderTime;
-                entry->field_1A0 = (f32)(OSTicksToMicroseconds(entry->field_188)) / 1000000.0f;
-                entry->field_180 = (f32)(OSTicksToMicroseconds(entry->field_178)) / 1000000.0f;
-                entry->moveDt = (f32)(OSTicksToMicroseconds(entry->field_190)) / 1000000.0f;
-                entry->field_1A8 = (f32)(OSTicksToMicroseconds(entry->field_198)) / 1000000.0f;
+                entry->moveTicks += entry->dtTicks;
+                entry->lastUpdateTicks = gp->renderTime;
+                entry->moveElapsed = (f32)(OSTicksToMicroseconds(entry->moveTicks)) / 1000000.0f;
+                entry->jumpElapsed = (f32)(OSTicksToMicroseconds(entry->jumpTicks)) / 1000000.0f;
+                entry->moveDt = (f32)(OSTicksToMicroseconds(entry->dtTicks)) / 1000000.0f;
+                entry->lastUpdateTime = (f32)(OSTicksToMicroseconds(entry->lastUpdateTicks)) / 1000000.0f;
 
             } else {
-                entry->field_198 = gp->renderTime;
+                entry->lastUpdateTicks = gp->renderTime;
             }
 
             if (entry->flags & 2) {
@@ -729,13 +729,13 @@ void npcMain(void) {
                         }
                     }
                     if (entry->jumpFlags & 0x100000 && !(entry->jumpFlags & 0x10000000)) {
-                        entry->field_1D0 = 100.0f;
+                        entry->maxFallSpeed = 100.0f;
                         f30v = 0.5f;
                     } else {
                         f30v = 1.0f;
                     }
                     if (entry->jumpFlags & 0x100000) {
-                        entry->field_31E |= 1;
+                        entry->hazardFlags |= 1;
                     }
                     if (entry->jumpFlags & 0x10) {
                         if (entry->moveDt > 0.0f) {
@@ -772,19 +772,19 @@ void npcMain(void) {
                             if (entry->flags & 0x400 && entry->moveDt > 0.0f) {
                                 f32 spd = npc_sqrtf(dv.x * dv.x + dv.z * dv.z) / entry->moveDt;
                                 if (spd < 0.1f) {
-                                    if (entry->field_108 != 1) {
+                                    if (entry->moveAnimState != 1) {
                                         animPoseSetAnim(entry->poseId, entry->tribe->stayAnim, TRUE);
-                                        entry->field_108 = 1;
+                                        entry->moveAnimState = 1;
                                     }
                                 } else if (spd < entry->tribe->runStartSpeed * f30v) {
-                                    if (entry->field_108 != 2) {
+                                    if (entry->moveAnimState != 2) {
                                         animPoseSetAnim(entry->poseId, entry->tribe->walkAnimation, TRUE);
-                                        entry->field_108 = 2;
+                                        entry->moveAnimState = 2;
                                     }
                                 } else {
-                                    if (entry->field_108 != 3) {
+                                    if (entry->moveAnimState != 3) {
                                         animPoseSetAnim(entry->poseId, entry->tribe->runAnimation, TRUE);
-                                        entry->field_108 = 3;
+                                        entry->moveAnimState = 3;
                                     }
                                 }
                             }
@@ -963,9 +963,9 @@ interrupt:
                     CameraEntry* cam;
 
                     cam = camGetPtr((CameraId)4);
-                    PSMTXMultVec((void*)((u8*)cam + 0x11C), &entry->position, &dv);
+                    PSMTXMultVec(cam->view, &entry->position, &dv);
                     cam = camGetPtr((CameraId)4);
-                    PSMTX44MultVec((void*)((u8*)cam + 0x15C), &dv, &dv);
+                    PSMTX44MultVec(cam->projection, &dv, &dv);
                     if ((dv.z > -1.0f && dv.z < 0.0f && dv.x >= -2.0f && dv.x <= 2.0f && dv.y >= -2.0f && dv.y <= 2.0f) ||
                         (entry->flags & 0x40)) {
                         if (entry->color.r != 0xFF || entry->color.g != 0xFF || entry->color.b != 0xFF ||
@@ -1053,39 +1053,39 @@ interrupt:
         }
     }
 
-    fbat = *(u8**)((u8*)gp + 0x168);
+    fbat = gp->fbatData;
     {
-        u8* ann = fbat + 0x550;
-        if (*(s32*)ann) {
-            switch (*(s32*)(ann + 8)) {
+        FirstStrikeInfo* ann = &fbat->firstStrike;
+        if (ann->enabled) {
+            switch (ann->type) {
             case 2:
-                (*(s32*)(ann + 0xc))++;
-                if (*(s32*)(ann + 0xc) < 20) {
-                    *(f32*)(ann + 0x10) = intplGetValue(5, *(s32*)(ann + 0xc), 20, -600.0f, 0.0f);
-                } else if (*(s32*)(ann + 0xc) < 80) {
-                    *(f32*)(ann + 0x10) = 0.0f;
-                } else if (*(s32*)(ann + 0xc) < 100) {
-                    *(f32*)(ann + 0x10) = intplGetValue(1, *(s32*)(ann + 0xc) - 80, 20, 0.0f, 600.0f);
+                (ann->timer)++;
+                if (ann->timer < 20) {
+                    ann->x = intplGetValue(5, ann->timer, 20, -600.0f, 0.0f);
+                } else if (ann->timer < 80) {
+                    ann->x = 0.0f;
+                } else if (ann->timer < 100) {
+                    ann->x = intplGetValue(1, ann->timer - 80, 20, 0.0f, 600.0f);
                 } else {
-                    *(s32*)(ann + 4) = 0;
+                    ann->hitKind = 0;
                     break;
                 }
-                *(f32*)(ann + 0x14) = 0.0f;
+                ann->y = 0.0f;
                 dispEntry((CameraId)9, 0.0f, 2, _fbatFirstAttackAnnouceDisp, ann);
                 break;
             case 1:
-                (*(s32*)(ann + 0xc))++;
-                if (*(s32*)(ann + 0xc) > 60) {
-                    *(s32*)(ann + 4) = 0;
+                (ann->timer)++;
+                if (ann->timer > 60) {
+                    ann->hitKind = 0;
                     break;
                 }
-                *(f32*)(ann + 0x10) = 0.0f;
-                *(f32*)(ann + 0x14) = 0.0f;
+                ann->x = 0.0f;
+                ann->y = 0.0f;
                 dispEntry((CameraId)9, 0.0f, 2, _fbatFirstAttackAnnouceDisp, ann);
                 break;
             }
         }
-        switch (*(s16*)fbat) {
+        switch (fbat->mode) {
         case 1:
             npcKoopaModeMain();
             break;
@@ -1099,7 +1099,7 @@ interrupt:
         case 6:
             break;
         }
-        *(fbat + 0x54d) = 0;
+        fbat->sandersBombTrigger = 0;
     }
 }
 
@@ -1283,7 +1283,7 @@ void npcMoveG(NpcEntry* npc) {
     }
     vel = 0.0f;
     if (npc->flags & 0x20000) {
-        t = npc->field_180;
+        t = npc->jumpElapsed;
         dt = npc->moveDt;
         tp = t - dt;
         if (!(npc->jumpFlags & 0x100000) || npc->jumpFlags & 0x10000000) {
@@ -1292,11 +1292,11 @@ void npcMoveG(NpcEntry* npc) {
             vel = 0.4f * (npc->jumpVelY * dt) + (0.15f * (-980.0f * npc->jumpGravity)) * (t * t - tp * tp);
         }
         vel *= npc->jumpYScale;
-        if (npc->field_1D0 > 0.0f) {
+        if (npc->maxFallSpeed > 0.0f) {
             if (npc->jumpFlags & 0x100000) {
-                limit = 0.5f * (-npc->field_1D0 * dt);
+                limit = 0.5f * (-npc->maxFallSpeed * dt);
             } else {
-                limit = -npc->field_1D0 * dt;
+                limit = -npc->maxFallSpeed * dt;
             }
             if (vel < limit) {
                 vel = limit;
@@ -1319,30 +1319,30 @@ void npcMoveG(NpcEntry* npc) {
             dist = hh + (f32)ad;
 #ifdef VERSION_G8ME01
             // US: also probe the floor at both side edges of the NPC
-            if ((npc->field_0x300 = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &dist, &hitNX, &hitNY, &hitNZ,
+            if ((npc->groundHit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &dist, &hitNX, &hitNY, &hitNZ,
                                               npc->position.x, npc->position.y + hh, npc->position.z, 0.0f,
                                               -1.0f, 0.0f)) != NULL) {
                 npc->jumpFlags &= ~1;
                 npc->position.y = hitY;
-                npc->field_178 = 0;
-            } else if ((npc->field_0x300 = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &dist, &hitNX, &hitNY, &hitNZ,
+                npc->jumpTicks = 0;
+            } else if ((npc->groundHit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &dist, &hitNX, &hitNY, &hitNZ,
                                               npc->position.x + 0.5f * npc->width, npc->position.y + hh,
                                               npc->position.z, 0.0f, -1.0f, 0.0f)) != NULL) {
                 npc->jumpFlags &= ~1;
                 npc->position.y = hitY;
-                npc->field_178 = 0;
-            } else if ((npc->field_0x300 = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &dist, &hitNX, &hitNY, &hitNZ,
+                npc->jumpTicks = 0;
+            } else if ((npc->groundHit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &dist, &hitNX, &hitNY, &hitNZ,
                                               npc->position.x - 0.5f * npc->width, npc->position.y + hh,
                                               npc->position.z, 0.0f, -1.0f, 0.0f)) != NULL) {
                 npc->jumpFlags &= ~1;
                 npc->position.y = hitY;
-                npc->field_178 = 0;
+                npc->jumpTicks = 0;
             } else {
                 npc->jumpFlags |= 1;
                 npc->position.y += dy;
             }
 #else
-            if ((npc->field_0x300 = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &dist, &hitNX, &hitNY, &hitNZ,
+            if ((npc->groundHit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &dist, &hitNX, &hitNY, &hitNZ,
                                               npc->position.x, npc->position.y + hh, npc->position.z, 0.0f,
                                               -1.0f, 0.0f)) == NULL) {
                 npc->jumpFlags |= 1;
@@ -1350,7 +1350,7 @@ void npcMoveG(NpcEntry* npc) {
             } else {
                 npc->jumpFlags &= ~1;
                 npc->position.y = hitY;
-                npc->field_178 = 0;
+                npc->jumpTicks = 0;
             }
 #endif
         }
@@ -1487,9 +1487,9 @@ void fbatSetAttackAnnounce(s32 a1) {
     FirstStrikeInfo* firstStrike = &gp->fbatData->firstStrike;
 
     firstStrike->enabled = FALSE;
-    firstStrike->field_0x4 = a1;
-    firstStrike->field_0xC = 0;
-    switch (firstStrike->field_0x4) {
+    firstStrike->hitKind = a1;
+    firstStrike->timer = 0;
+    switch (firstStrike->hitKind) {
         case 0x20000:
         case 0x40000:
         case 0x80000:
@@ -1541,8 +1541,8 @@ void _fbatFirstAttackAnnouceDisp(CameraId camId, void* param) {
 
     // US: the announcement may span up to four lines
     message = msgSearch(firstStrike->msg_tag);
-    x = firstStrike->field_0x10;
-    y = firstStrike->field_0x14;
+    x = firstStrike->x;
+    y = firstStrike->y;
     width = FontGetMessageWidthLine(message, &lines);
     lines++;
     height = lines * 29 + 3;
@@ -1585,8 +1585,8 @@ void _fbatFirstAttackAnnouceDisp(CameraId camId, void* param) {
     f32 shakeY;
 
     message = msgSearch(firstStrike->msg_tag);
-    x = firstStrike->field_0x10;
-    y = firstStrike->field_0x14;
+    x = firstStrike->x;
+    y = firstStrike->y;
     width = FontGetMessageWidth(message);
     shakeX = x + (f32)(irand(10000) % 5);
     shakeY = y + (f32)(irand(10000) % 5);
@@ -1601,9 +1601,6 @@ void _fbatFirstAttackAnnouceDisp(CameraId camId, void* param) {
 
 #endif
 
-#define FBAT_SUB(d) (((u8*)(d))[2])
-#define FBAT_NPC(d) (*(NpcEntry**)((u8*)(d) + 4))
-#define FBAT_EVTID(d) (*(s32*)((u8*)(d) + 0xC))
 
 void partyKeyOn(void);
 void partyKeyOff(void);
@@ -1638,8 +1635,8 @@ static inline BOOL fbat_setHit(NpcEntry* npc) {
         return FALSE;
     }
     d->mode = 5;
-    FBAT_SUB(d) = 0;
-    FBAT_NPC(d) = npc;
+    d->subState = 0;
+    d->npc = npc;
     d->target = npc;
     return TRUE;
 }
@@ -1675,7 +1672,7 @@ void fbatEncountCheck(void)
     return;
   }
   data = gp->fbatData;
-  kind = (u32 *) (((u8 *) data) + 0x10);
+  kind = (u32*)&data->hitKind;
   npc = fbatHitCheck(0x13f1, kind);
   if (npc && (data->mode == 1))
   {
@@ -1951,7 +1948,7 @@ void fbatEncountCheck(void)
       }
     }
 
-    *((NpcEntry **) (((u8 *) mario) + MWOFF(0x1D4))) = talk;
+    mario->touchNpc = talk;
     if (wp->talkTarget && (keyGetButtonTrg(0) & 0x100))
     {
       npc = wp->talkTarget;
@@ -1962,15 +1959,15 @@ void fbatEncountCheck(void)
       }
       data->mode = 2;
       ((u8 *) data)[2] = 0;
-      *((NpcEntry **) (((u8 *) data) + 4)) = npc;
-      *((u32 *) npc->field_318) = 0;
+      data->npc = npc;
+      *((u32 *) npc->fbatHitKind) = 0;
       return;
     }
   }
   data = gp->fbatData;
   if (data->mode == 1)
   {
-    u32 *kind = (u32 *) (((u8 *) data) + 0x10);
+    u32 *kind = (u32*)&data->hitKind;
     npc = fbatHitCheck(0x2361, kind);
     if (npc && (data->mode == 1))
     {
@@ -1980,8 +1977,8 @@ void fbatEncountCheck(void)
       {
         d->mode = 3;
         ((u8 *) d)[2] = 0;
-        *((NpcEntry **) (((u8 *) d) + 4)) = npc;
-        *((u32 *) npc->field_318) = k;
+        d->npc = npc;
+        *((u32 *) npc->fbatHitKind) = k;
       }
       switch (*kind)
       {
@@ -2004,13 +2001,13 @@ void fbatEncountCheck(void)
 
 void fbatTalkMode(void) {
     FieldBattleData* data = gp->fbatData;
-    NpcEntry* npc = FBAT_NPC(data);
+    NpcEntry* npc = data->npc;
     MarioWork* mario = marioGetPtr();
     EventEntry* evt;
 
-    switch (FBAT_SUB(data)) {
+    switch (data->subState) {
         case 0:
-            evtStopID(FBAT_NPC(data)->regularEvtId);
+            evtStopID(data->npc->regularEvtId);
             if (!(npc->flags & 0x01000000)) {
                 npc->direction = reviseAngle(angleABf(npc->position.x, npc->position.z,
                                                       mario->position.x, mario->position.z));
@@ -2029,17 +2026,17 @@ void fbatTalkMode(void) {
                     break;
             }
             evt->ownerNPC = npc;
-            FBAT_EVTID(data) = evt->eventId;
-            FBAT_SUB(data)++;
+            data->evtId = evt->eventId;
+            data->subState++;
             break;
         case 1:
-            if (!evtCheckID(FBAT_EVTID(data))) {
+            if (!evtCheckID(data->evtId)) {
                 if (!(npc->jumpFlags & 0x20000000)) {
-                    evtStartID(FBAT_NPC(data)->regularEvtId);
+                    evtStartID(data->npc->regularEvtId);
                     npc->direction = npc->savedDirection;
                 }
                 if (npc->flags & 0x400) {
-                    npc->field_108 = 0;
+                    npc->moveAnimState = 0;
                 }
                 if (npc->flags & 0x200) {
                     animPoseSetAnim(npc->poseId, npc->currentAnim, 1);
@@ -2054,7 +2051,6 @@ void fbatTalkMode(void) {
     }
 }
 
-#define FBAT_U32(d, off) (*(u32*)((u8*)(d) + (off)))
 #define NPC_ENEMY_LEVEL(npc) (*(u8*)((u8*)*(void**)(npc)->battleInfo.groupSetup->enemyData + 0xE))
 
 void BattleMajinaiDone(void);
@@ -2117,7 +2113,7 @@ void fbatBattleMode(void) {
     if (num != 0) {
         mario = NULL;
     }
-    switch (FBAT_SUB(data)) {
+    switch (data->subState) {
         case 0:
             if (dbg_battleskip == 1) {
                 data->mode = 1;
@@ -2144,7 +2140,7 @@ void fbatBattleMode(void) {
                     win = TRUE;
                     goto decided;
                 }
-                if (pouchEquipCheckBadge(0x141) && (FBAT_U32(data, 0x10) & 0x01FE0000) &&
+                if (pouchEquipCheckBadge(0x141) && ((u32)data->hitKind & 0x01FE0000) &&
                     NPC_ENEMY_LEVEL(cur) < pouch->level) {
                     skip = TRUE;
                     win = TRUE;
@@ -2165,33 +2161,33 @@ void fbatBattleMode(void) {
                 }
                 marioFBattlePrepare();
                 seqSetSeq(4, NULL, NULL);
-                if (FBAT_U32(data, 0x10) == 0x10000000) {
+                if ((u32)data->hitKind == 0x10000000) {
                     marioChgDamagePose();
                 }
-                FBAT_SUB(data) = 1;
+                data->subState = 1;
             } else {
                 if (win) {
                     BattleInformationSetResult(info, 2);
                 } else {
                     BattleInformationSetResult(info, 5);
                 }
-                FBAT_SUB(data) = 4;
+                data->subState = 4;
             }
             break;
         case 1:
             if (gp->inBattle) {
-                FBAT_SUB(data)++;
+                data->subState++;
             }
             break;
         case 2:
             if (!gp->inBattle) {
-                data->field_54C = 0;
+                data->merleeCoinBonus = 0;
                 result = BattleInformationGetResult(&data->info);
                 if (pouch->mMerleeNextCurseType == 4 && result == 1) {
-                    FBAT_SUB(data) = 3;
-                    data->field_54C = 1;
+                    data->subState = 3;
+                    data->merleeCoinBonus = 1;
                     evt = evtEntry(_evt_majinai_coin_up_effect, 0, 0);
-                    FBAT_U32(data, 0x48) = evt->eventId;
+                    data->merleeEvtId = evt->eventId;
                     BattleMajinaiDone();
                     marioKeyOff();
                     wp = npcGetWorkPtrInline();
@@ -2205,16 +2201,16 @@ void fbatBattleMode(void) {
                     }
                 } else {
                     marioFBattlePost();
-                    FBAT_SUB(data) = 4;
+                    data->subState = 4;
                 }
             }
             break;
         case 3:
-            if (!evtCheckID(FBAT_U32(data, 0x48))) {
+            if (!evtCheckID(data->merleeEvtId)) {
                 marioKeyOn();
                 marioFBattlePost();
-                FBAT_U32(data, 0x48) = 0;
-                FBAT_SUB(data) = 4;
+                data->merleeEvtId = 0;
+                data->subState = 4;
                 wp = npcGetWorkPtrInline();
                 num = wp->total;
                 for (result = 0, cur = wp->entries; result < num; result++, cur++) {
@@ -2269,7 +2265,7 @@ void fbatBattleMode(void) {
                         mult = 0;
                         goto apply;
                     }
-                    if (data->field_54C) {
+                    if (data->merleeCoinBonus) {
                         mult = 3;
                     }
                     if (pouchEquipCheckBadge(0x139)) {
@@ -2285,7 +2281,7 @@ void fbatBattleMode(void) {
                         break;
                     }
                     if (cur->flags & 0x400) {
-                        cur->field_108 = 0;
+                        cur->moveAnimState = 0;
                     }
                     cur->wFbatHitCheckRelated = 90;
                     cur->interruptFlags &= ~0x100;
@@ -2296,7 +2292,7 @@ void fbatBattleMode(void) {
                     fbatRecoverItems(cur);
                 } else if (res == 4) {
                     if (cur->flags & 0x400) {
-                        cur->field_108 = 0;
+                        cur->moveAnimState = 0;
                     }
                     cur->interruptFlags |= 0x10000000;
                     marioSetMutekiTime(3000);
@@ -2355,7 +2351,7 @@ void fbatHitCheckAll(void) {
     fbatHitCheck(0x13f1, NULL);
 }
 
-#define FH(p, off, T) (*(T*)((u8*)(p) + (off)))
+// FAKE: fbatHitCheck reads its NpcEntry/MarioWork/GlobalWork/CameraEntry/FieldBattleData fields as (*(T*)&((S*)p)->field): the plain field forms lower the function's inline cost, and the deferred inliner then pulls _npcHitCheckSphere/_npcHitCheckHammerAllMotion into it
 
 typedef struct FbatHitResult {
     u32 kind;   // 0x0
@@ -2376,12 +2372,12 @@ static inline BOOL fbat_canHit(NpcEntry* npc) {
     NpcWork* wp = npcGetWorkPtrInline();
     if (m->flags & 0x82000000) return FALSE;
     if (!(wp->flags & 1) && (m->flags & 0xA)) return FALSE;
-    if (FH(gp, 0x164, s32)) return FALSE;
+    if ((*(s32*)&((GlobalWork*)gp)->mapEventId)) return FALSE;
     if (seqGetSeq() != 2) return FALSE;
-    if (FH(m, 0x2E, u16) == 0x19) return FALSE;
+    if ((*(u16*)&((MarioWork*)m)->currMotionId) == 0x19) return FALSE;
     if (vivianGetStatus()) return FALSE;
-    if (FH(m, 0x2E, u16) == 0x1F || FH(m, 0x2E, u16) == 0x20) return FALSE;
-    if (FH(npc, 0x320, u16)) return FALSE;
+    if ((*(u16*)&((MarioWork*)m)->currMotionId) == 0x1F || (*(u16*)&((MarioWork*)m)->currMotionId) == 0x20) return FALSE;
+    if ((*(u16*)&((NpcEntry*)npc)->wFbatHitCheckRelated)) return FALSE;
     return TRUE;
 }
 
@@ -2389,13 +2385,13 @@ static inline BOOL fbat_canHit(NpcEntry* npc) {
     if (npc == NULL) continue;                                                       \
     if (!(npc->flags & 2)) continue;                                                 \
     if (f1000) { if (!(npc->flags & 8)) continue; } else { if (npc->flags & 8) continue; } \
-    if (soft && !(FH(npc, 0x4, u32) & (bit))) continue;                              \
+    if (soft && !((*(u32*)&((NpcEntry*)npc)->reactionFlags) & (bit))) continue;                              \
     if (npc->flags & 0x20000000) continue;                                           \
     if (npc->flags & 0x20) continue;                                                 \
-    if (FH(npc, 0x1D4, u32) & 4) continue;                                           \
+    if ((*(u32*)&((NpcEntry*)npc)->jumpFlags) & 4) continue;                                           \
     if (npc->flags & 0x08000000) continue;
 
-#define FH_NPC_FILTER2(f1000, bit)                                                        if (npc == NULL) continue;                                                           if (!(npc->flags & 2)) continue;                                                     if (f1000) { if (!(npc->flags & 8)) continue; } else { if (npc->flags & 8) continue; }     if (soft && !(FH(npc, 0x4, u32) & (bit))) continue;                                  if (npc->flags & 0x20000000) continue;                                               if (npc->flags & 0x20) continue;                                                     if (npc->flags & 0x08000000) continue;                                               if (FH(npc, 0x1D4, u32) & 4) continue;
+#define FH_NPC_FILTER2(f1000, bit)                                                        if (npc == NULL) continue;                                                           if (!(npc->flags & 2)) continue;                                                     if (f1000) { if (!(npc->flags & 8)) continue; } else { if (npc->flags & 8) continue; }     if (soft && !((*(u32*)&((NpcEntry*)npc)->reactionFlags) & (bit))) continue;                                  if (npc->flags & 0x20000000) continue;                                               if (npc->flags & 0x20) continue;                                                     if (npc->flags & 0x08000000) continue;                                               if ((*(u32*)&((NpcEntry*)npc)->jumpFlags) & 4) continue;
 
 typedef struct { s32 v[11]; } SinTbl;
 static const SinTbl sSinTbl = {{0, 0, 0, 0, 45, 60, 90, 100, 101, 101, 101}};
@@ -2429,7 +2425,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
         noJump = flags & 0x10;
         total = wp->total;
         npc = wp->entries;
-        if (!noJump || mario->unk4C <= 0) {
+        if (!noJump || mario->mutekiTimer <= 0) {
             if (fbat_canHit(npc)) {
                 f1000a = flags & 0x1000;
                 f20 = flags & 0x20;
@@ -2442,20 +2438,20 @@ void* fbatHitCheck(u32 flags, void* a1) {
                     } else {
                         if (npc->flags & 8) continue;
                     }
-                    if (soft && !(FH(npc, 0x4, u32) & 1)) continue;
+                    if (soft && !(npc->reactionFlags & 1)) continue;
                     if (npc->flags & 0x20) continue;
-                    if (FH(npc, 0x1D4, u32) & 4) continue;
+                    if (npc->jumpFlags & 4) continue;
                     if (npc->flags & 0x08000000) continue;
-                    if (mario->position.y >= FH(npc, 0x90, f32) + FH(npc, 0x150, f32)) continue;
-                    if (mario->position.y + mario->wPlayerCollisionBox.y <= FH(npc, 0x90, f32)) continue;
-                    dz = mario->position.z - FH(npc, 0x94, f32);
-                    dx = mario->position.x - FH(npc, 0x8C, f32);
+                    if (mario->position.y >= (*(f32*)&((NpcEntry*)npc)->position.y) + (*(f32*)&((NpcEntry*)npc)->height)) continue;
+                    if (mario->position.y + mario->wPlayerCollisionBox.y <= (*(f32*)&((NpcEntry*)npc)->position.y)) continue;
+                    dz = mario->position.z - npc->position.z;
+                    dx = mario->position.x - (*(f32*)&((NpcEntry*)npc)->position.x);
                     dist = npc_sqrtf(dx * dx + dz * dz);
-                    if (dist > 0.5f * (mario->wPlayerCollisionBox.x + FH(npc, 0x14C, f32))) continue;
+                    if (dist > 0.5f * (mario->wPlayerCollisionBox.x + (*(f32*)&((NpcEntry*)npc)->width))) continue;
                     if (dist >= res.dist) continue;
-                    if (noJump && !(FH(npc, 0x1D4, u32) & 0x10000) && mario->unk4C <= 0) {
-                        if (FH(npc, 0x2F8, s32) == 0 ||
-                            (evtGetPtrID(FH(npc, 0x11C, s32)) ? evtGetPtrID(FH(npc, 0x11C, s32))->wNpcEventType == 5 : 0)) {
+                    if (noJump && !((*(u32*)&((NpcEntry*)npc)->jumpFlags) & 0x10000) && mario->mutekiTimer <= 0) {
+                        if ((*(s32*)&((NpcEntry*)npc)->attackMode) == 0 ||
+                            (evtGetPtrID((*(s32*)&((NpcEntry*)npc)->regularEvtId)) ? evtGetPtrID((*(s32*)&((NpcEntry*)npc)->regularEvtId))->wNpcEventType == 5 : 0)) {
                             if (npc->flags & 0x20000000) continue;
                             res.kind = 0x10000;
                             hit = npc;
@@ -2473,7 +2469,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
                             if (!soft) {
                                 fbatSetAttackAnnounce(0x10000000);
                             }
-                            res.evtId = FH(npc, 0x2F8, s32);
+                            res.evtId = (*(s32*)&((NpcEntry*)npc)->attackMode);
                         }
                     }
                     if (!f20) continue;
@@ -2504,7 +2500,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
 
     if (flags & 0x40) {
         while (hit == NULL) {
-            if ((flags & 0x10) && mario->unk4C > 0) break;
+            if ((flags & 0x10) && mario->mutekiTimer > 0) break;
             if (!fbat_canHit(npc)) break;
             if (flags & 1) {
                 MarioWork* m;
@@ -2515,7 +2511,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
                 f32 r, angle;
                 if (mario->currMotionId != 0x12) break;
                 r = 1.5f * mario->wPlayerCollisionBox.x;
-                angle = reviseAngle(mario->displayDirection - 90.0f + FH(camGetPtr(CAMERA_3D), 0x114, f32));
+                angle = reviseAngle(mario->displayDirection - 90.0f + (*(f32*)&((CameraEntry*)camGetPtr(CAMERA_3D))->viewYaw));
                 m = marioGetPtr();
                 animPoseGetAnimPosePtr(m->paperAnimGroupId[marioAnimeId()]);
                 v = (s32)m->multiTimer;
@@ -2545,7 +2541,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
                 }
             } else {
                 r = 1.5f * mario->wPlayerCollisionBox.x;
-                angle = reviseAngle(mario->displayDirection - 90.0f + FH(camGetPtr(CAMERA_3D), 0x114, f32));
+                angle = reviseAngle(mario->displayDirection - 90.0f + (*(f32*)&((CameraEntry*)camGetPtr(CAMERA_3D))->viewYaw));
                 npc = wp->entries;
                 for (i = 0; i < total; i++, npc++) {
                     FH_NPC_FILTER(flags & 0x1000, 2)
@@ -2564,7 +2560,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
 
     if (flags & 0x80) {
         while (hit == NULL) {
-            if ((flags & 0x10) && mario->unk4C > 0) break;
+            if ((flags & 0x10) && mario->mutekiTimer > 0) break;
             if (!fbat_canHit(npc)) break;
             if (flags & 1) {
                 f32 angle, r;
@@ -2592,7 +2588,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
                 }
             } else {
                 r2 = 1.5f * mario->wPlayerCollisionBox.x;
-                angle2 = reviseAngle(mario->displayDirection - 90.0f + FH(camGetPtr(CAMERA_3D), 0x114, f32));
+                angle2 = reviseAngle(mario->displayDirection - 90.0f + (*(f32*)&((CameraEntry*)camGetPtr(CAMERA_3D))->viewYaw));
                 npc = wp->entries;
                 for (i = 0; i < total; i++, npc++) {
                     FH_NPC_FILTER(flags & 0x1000, 2)
@@ -2614,7 +2610,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
         while (hit == NULL) {
             u32 b;
             f32 x, y, z, r;
-            if ((flags & 0x10) && mario->unk4C > 0) break;
+            if ((flags & 0x10) && mario->mutekiTimer > 0) break;
             if (!fbat_canHit(npc)) break;
             b = flags & 1;
             if (b) {
@@ -2648,12 +2644,12 @@ void* fbatHitCheck(u32 flags, void* a1) {
     if (flags & 0x200) {
         party = partyGetPtr(marioGetPartyId());
         while (hit == NULL) {
-            if ((flags & 0x10) && mario->unk4C > 0) break;
+            if ((flags & 0x10) && mario->mutekiTimer > 0) break;
             if (!fbat_canHit(npc)) break;
             if (!(flags & 1)) break;
             if (party == NULL) break;
             if (party->memberKind != 3) break;
-            if (!FH(gp->fbatData, 0x54D, u8)) break;
+            if (!(*(u8*)&((FieldBattleData*)gp->fbatData)->sandersBombTrigger)) break;
             npc = wp->entries;
             flags &= 0x1000;
             for (i = 0; i < total; i++, npc++) {
@@ -2775,7 +2771,7 @@ BOOL npcCheckInterrupt(NpcEntry* npc) {
             npc->regularEvtId = evt->eventId;
             npc->interruptFlags &= 0xF00;
             npc->jumpFlags &= ~0x1000;
-            npc->field_188 = 0;
+            npc->moveTicks = 0;
             npc->moveSpeed = 0.0f;
             return TRUE;
         }
@@ -2788,7 +2784,7 @@ BOOL npcCheckInterrupt(NpcEntry* npc) {
 static inline void npcRandField(NpcBattleInfo* info, NpcSetupBattleInfo* setup) {
     s32 i;
     for (i = 0; i < 16; i++) {
-        info->field_B0[i] = (u8)setup->field_20[i][0] + irand(setup->field_20[i][1] - setup->field_20[i][0] + 1);
+        info->random.values[i] = (u8)setup->randomRanges[i][0] + irand(setup->randomRanges[i][1] - setup->randomRanges[i][0] + 1);
     }
 }
 
@@ -2806,8 +2802,8 @@ void npcSetupBattleInfo(NpcEntry* npc, NpcSetupBattleInfo* setup) {
     memset(info, 0, sizeof(NpcBattleInfo));
     memset(info->recoveredItems, 0, sizeof(info->recoveredItems));
     if (setup && setup->name) {
-        info->field_AC = setup->field_1C;
-        switch (info->field_AC) {
+        info->random.mode = setup->randomMode;
+        switch (info->random.mode) {
             case 0:
             default:
                 npcRandField(info, setup);
@@ -2821,7 +2817,7 @@ void npcSetupBattleInfo(NpcEntry* npc, NpcSetupBattleInfo* setup) {
         info->itemDropped = 0;
         info->heartsDropped = 0;
         info->flowersDropped = 0;
-        info->field_C0 = (s32)setup->bgmName;
+        info->bgmName = (s32)setup->bgmName;
         if (setup->swFlag >= -EVTDAT_GSWF_BASE && setup->swFlag <= EVTDAT_GSWF_MAX) {
             if (swGet(setup->swFlag + EVTDAT_GSWF_BASE)) {
                 select = setup->altSelect;
@@ -3207,12 +3203,12 @@ void npcKoopaModeMain(void) {
     s32 fire;
     MarioWork* mario;
     fbatEncountCheck();
-    fb2 = *(u8**)((u8*)gp + 0x168);
+    fb2 = (u8*)gp->fbatData;
     mario = marioGetPtr();
     jump = 0;
     fire = jump;
-    if (*((s8*)mario + 0x3c) == 2) jump = kpaJumpChk();
-    if (*((s8*)mario + 0x3c) == 2) fire = kpaFireAttackCheck();
+    if (mario->characterId == 2) jump = kpaJumpChk();
+    if (mario->characterId == 2) fire = kpaFireAttackCheck();
     if (jump) {
         if (*(s32*)(fb2 + 0x57c) > 0 && *(s32*)(fb2 + 0x578) >= 2) {
             Vec pos = mario->position;
@@ -3245,17 +3241,17 @@ void npcKoopaModeEncountCheck(void) {
                 switch (kpaEnemyHitChk(entry->position.x, entry->position.y, entry->position.z, entry->height,
                                        entry->width)) {
                     case 1:
-                        if (!(entry->field_31E & 1)) {
+                        if (!(entry->hazardFlags & 1)) {
                             npcGroupDead(entry, 1);
                         }
                         break;
                     case 2:
-                        if (!(entry->field_31E & 2)) {
+                        if (!(entry->hazardFlags & 2)) {
                             npcGroupDead(entry, 2);
                         }
                         break;
                     case 3:
-                        if (!(entry->field_31E & 4)) {
+                        if (!(entry->hazardFlags & 4)) {
                             npcGroupDead(entry, 4);
                         }
                         break;
@@ -3263,8 +3259,8 @@ void npcKoopaModeEncountCheck(void) {
                         kpaPowDown();
                         break;
                     default:
-                        if (!(entry->field_31E & 0x10) && entry->field_0x300 &&
-                            !strcmp(hitGetName(entry->field_0x300), "a_magu")) {
+                        if (!(entry->hazardFlags & 0x10) && entry->groundHit &&
+                            !strcmp(hitGetName(entry->groundHit), "a_magu")) {
                             npcGroupDead(entry, 0x10);
                         }
                         break;
@@ -3291,7 +3287,7 @@ s32 npcKoopaModeMobjBoundDeadCheck(HitEntry* hit) {
     entry = wp->entries;
     for (i = 0; i < total; i++, entry++) {
         if (entry && entry->flags & 1 && entry->flags & 0x8000000 && !(entry->jumpFlags & 4) &&
-            !(entry->field_31E & 8) && entry->field_0x300 == hit) {
+            !(entry->hazardFlags & 8) && entry->groundHit == hit) {
             npcGroupDead(entry, 8);
             count++;
         }
@@ -3319,12 +3315,12 @@ s32 npcCalcScore(NpcEntry* npc) {
             score += 100;
         }
         if (npc->koopaEncounterType == 2) {
-            data->field_574++;
-            score *= data->field_574;
+            data->kpaComboCount++;
+            score *= data->kpaComboCount;
         }
         if (npc->koopaEncounterType == 1) {
-            data->field_578++;
-            data->field_57C += score;
+            data->kpaJumpKills++;
+            data->kpaJumpScore += score;
         }
         if (score > 9999) {
             score = 10000;

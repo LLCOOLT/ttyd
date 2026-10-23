@@ -2464,16 +2464,16 @@ static EVT_BEGIN(door_1_close)
 EVT_END()
 
 static DoorParam door_1 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     2, // se
     "S_usu01_ie1_door", // mapobj
     "A_door46", // hitIn
     "A_door45", // hitOut
-    "S_usu01_ie1", // mapIn
-    NULL, // hitInIn
-    "S_usu01_ie1_naka", // mapOut
-    NULL, // hitOutOut
+    "S_usu01_ie1", // outside
+    NULL, // outsideHit
+    "S_usu01_ie1_naka", // inside
+    NULL, // insideHit
     evt_door_1_1, // evtIn
     evt_door_1_2, // evtOut
     evt_wall_1, // evtWall
@@ -2594,16 +2594,16 @@ EVT_BEGIN(door_2_1_open)
 EVT_END()
 
 DoorParam door_2_1 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     2, // se
     "S_usu01_ie2_door1", // mapobj
     "A_usu01_ie2_door2_u", // hitIn
     "A_usu01_ie2_door2", // hitOut
-    "S_usu01_ie2", // mapIn
-    NULL, // hitInIn
-    "S_usu01_ie2_naka", // mapOut
-    NULL, // hitOutOut
+    "S_usu01_ie2", // outside
+    NULL, // outsideHit
+    "S_usu01_ie2_naka", // inside
+    NULL, // insideHit
     evt_door_2_1_1, // evtIn
     NULL, // evtOut
     evt_wall_2_1, // evtWall
@@ -2963,16 +2963,16 @@ static EVT_BEGIN(door_3_close)
 EVT_END()
 
 static DoorParam door_3 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     2, // se
     "S_usu01_ie3_door", // mapobj
     "A_usu01_ie3_doaa_u", // hitIn
     "A_usu01_ie3_doaa", // hitOut
-    "S_usu01_ie3", // mapIn
-    NULL, // hitInIn
-    "S_usu01_ie3_naka", // mapOut
-    NULL, // hitOutOut
+    "S_usu01_ie3", // outside
+    NULL, // outsideHit
+    "S_usu01_ie3_naka", // inside
+    NULL, // insideHit
     evt_door_3_1, // evtIn
     evt_door_3_2, // evtOut
     evt_wall_3, // evtWall

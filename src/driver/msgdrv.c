@@ -49,70 +49,11 @@ const char str_802C4F00[8] = "\120\115\137\103\137\062\102";
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
 #pragma force_active on
 
-#define WIN_STATE(w) (*(u16*)(w)->field_0x0)
+#define WIN_STATE(w) (*(u16*)(w)->state)
 
-typedef struct MsgChar {
-	u32 value; //0x0
-	u16 glyph; //0x4
-	s16 x; //0x6 (page-break entries: page number)
-	s16 y; //0x8 (page-scroll entries: scroll amount)
-	u8 field_0xA[0xC - 0xA]; //0xA
-	u32 time; //0xC
-	u8 field_0x10[0x18 - 0x10]; //0x10
-} MsgChar;
-
-typedef struct MsgWinData {
-	const char* tag; //0x0
-	u32 flags; //0x4
-	u16 curPage; //0x8, page being shown (page-break entries carry their page number)
-	u16 pageState; //0xA, 1: waiting for the key, 2: advance to the next page
-	u16 pageAdvanced; //0xC
-	u8 field_0xE[0x10 - 0xE]; //0xE
-	s32 nextEntry; //0x10, index into entries
-	u8 field_0x14[0x18 - 0x14]; //0x14
-	OSTime time18; //0x18
-	s32 playTime; //0x20, playback clock (ms) compared with entries[].time
-	s32 scrollTarget; //0x24
-	s32 scrollPos; //0x28, eases toward scrollTarget
-	u8 field_0x2C[0x30 - 0x2C]; //0x2C
-	OSTime time30; //0x30
-	s32 count; //0x38
-#ifdef VERSION_G8ME01
-	MsgChar entries[0xA00]; //0x3C (US: twice as many, so every field below moves by 0x7800)
-#else
-	MsgChar entries[0x500]; //0x3C
-#endif
-	s32 page; //0x783C
-	s32 pageCount; //0x7840, number of pageY entries
-	s32 pageY[(0x79FC - 0x7844) / 4]; //0x7844
-	s32 callback; //0x79FC, void (*)(s32 event, smartEntry*), see MSG_CB
-	u8 field_0x7A00[0x7A04 - 0x7A00]; //0x7A00
-	char stayPose[0x20]; //0x7A04
-	s32 unitId; //0x7A24
-	s32 field_0x7A28; //0x7A28
-	u8 sfxVolume; //0x7A2C, default 0x7F
-	u8 field_0x7A2D[0x7A30 - 0x7A2D]; //0x7A2D
-	s32 parseTime; //0x7A30, msgAnalize state
-	s16 parseX; //0x7A34
-	s16 parseY; //0x7A36
-	s16 field_0x7A38; //0x7A38
-	s16 field_0x7A3A; //0x7A3A
-	s32 parseSpeed; //0x7A3C, text speed (default 25)
-	s8 numSel; //0x7A40
-	s8 defSel; //0x7A41
-	s8 cancel; //0x7A42
-	s8 sel; //0x7A43
-	s16 selWidth; //0x7A44
-	s16 selY; //0x7A46
-	f32 cursorY; //0x7A48
-	WindowEntry* window; //0x7A4C
-	s32 talkTimer; //0x7A50, frames until the talk pose is set
-	s32 talkPoseSet; //0x7A54
-} MsgWinData;
 
 #define MSG_CB(d) (*(void (**)(s32, smartEntry*))&(d)->callback)
 #define WIN_DATA(w) ((MsgWinData*)(w)->userdata->address)
-#define WIN_TIME(w) (*(OSTime*)((u8*)(w) + 0x20))
 void msgWindow_Disp(CameraId camId, void* param);
 void msgWindow_Main(WindowEntry* window);
 void msgWindow_Clear_Main(WindowEntry* window);
@@ -211,24 +152,24 @@ void msgInit(void) {
 void msgLoad(const char* filename, s32 index) {
 #ifdef VERSION_G8ME01
 	MessageEntry* entry;
-	u32 r30;
+	const char* str;
 	MsgLookupEntry* lookup;
-	u32 msgptr;
+	const char* msgptr;
 	int i;
 	s32 msgcount;
 	DVDEntry* dvd;
 	s32 max;
 	s32 len;
-	u32 r27;
+	u32 ofs;
 #else
 	MessageEntry* entry;
-	u32 r30;
+	const char* str;
 	MsgLookupEntry* lookup;
-	u32 msgptr;
+	const char* msgptr;
 	int i;
 	DVDEntry* dvd;
 	s32 msgcount;
-	u32 r27;
+	u32 ofs;
 #endif
 	char filepath[64];
 	char dvdpath[128]; //TODO: double check size
@@ -303,10 +244,10 @@ void msgLoad(const char* filename, s32 index) {
 		entry->count = 0;
 	}
 	else {
-		msgptr = (u32)entry->address;
+		msgptr = entry->address;
 		msgcount = 0;
 		while (*(s8*)msgptr) {
-			msgptr += strlen((const char*)msgptr) + 1;
+			msgptr += strlen(msgptr) + 1;
 			msgcount++;
 		}
 		entry->count = (u32)(msgcount / 2); //tag, message
@@ -319,17 +260,17 @@ void msgLoad(const char* filename, s32 index) {
 		entry->lookup = NULL;
 	}
 	else {
-		r27 = 0;
+		ofs = 0;
 		entry->lookup = smartAlloc(entry->count * sizeof(MsgLookupEntry), 0);
-		r30 = (u32)entry->address;
+		str = entry->address;
 		lookup = entry->lookup->address;
 		for (i = 0; i < (s32)entry->count; i++, lookup++) {
-			lookup->startaddr = r27;
-			r27 += strlen((const char*)r30) + 1;
-			r30 += strlen((const char*)r30) + 1;
-			lookup->endaddr = r27;
-			r27 += strlen((const char*)r30) + 1;
-			r30 += strlen((const char*)r30) + 1;
+			lookup->startaddr = ofs;
+			ofs += strlen(str) + 1;
+			str += strlen(str) + 1;
+			lookup->endaddr = ofs;
+			ofs += strlen(str) + 1;
+			str += strlen(str) + 1;
 		}
 		msgSortDvdData = entry->address;
 		qsort(entry->lookup->address, entry->count, sizeof(MsgLookupEntry), msg_compare);
@@ -362,7 +303,7 @@ static inline void msgCheckSkip(smartEntry* smart, MsgWinData* data) {
 static inline void msgVoiceSE(smartEntry* smart) {
 	MsgWinData* d = smart->address;
 	if (d->window->type != 1 && !msgSEflag) {
-		psndSFXOnVol((const char*)0x20044, d->sfxVolume);
+		psndSFXOnVol((const char*)0x20044, d->talkVolume);
 		msgSEflag = 1;
 	}
 }
@@ -383,15 +324,15 @@ s32 msgMain(smartEntry* smart) {
 		msgAddPage(smart, 0);
 	}
 	if (data->scrollTarget > data->scrollPos) {
-		data->scrollPos += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
+		data->scrollPos += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->lastUpdateTime);
 		msgCheckSkip(smart, data);
 		if (!(data->flags & 0x10) && (data->flags & 4)) {
-			data->scrollPos += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
+			data->scrollPos += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->lastUpdateTime);
 		}
 		if (data->scrollTarget < data->scrollPos) {
 			data->scrollPos = data->scrollTarget;
 		}
-		data->time30 = gp->renderTime;
+		data->lastUpdateTime = gp->renderTime;
 		return 3;
 	}
 	switch (data->pageState) {
@@ -408,7 +349,7 @@ s32 msgMain(smartEntry* smart) {
 		}
 		break;
 	default:
-		ms = OSTicksToMilliseconds(gp->renderTime - data->time30);
+		ms = OSTicksToMilliseconds(gp->renderTime - data->lastUpdateTime);
 		msgCheckSkip(smart, data);
 		if (!(data->flags & 0x10) && (data->flags & 4)) {
 			ms *= 100;
@@ -416,7 +357,7 @@ s32 msgMain(smartEntry* smart) {
 		data->playTime += ms;
 		break;
 	}
-	data->time30 = gp->renderTime;
+	data->lastUpdateTime = gp->renderTime;
 	entry = &data->entries[data->nextEntry];
 	for (i = data->nextEntry; i < VERSION_PICK(0x500, 0xA00); i++, entry++) {
 		if (entry->time > data->playTime) {
@@ -455,10 +396,10 @@ s32 msgMain(smartEntry* smart) {
 			}
 			break;
 		case 0xFFFA:
-			data->field_0x7A28 = entry->value;
+			data->talkSfxGroup = entry->value;
 			break;
 		case 0xFFF9:
-			data->sfxVolume = entry->value;
+			data->talkVolume = entry->value;
 			break;
 		case 0xFFF5:
 			if (entry->value) {
@@ -473,7 +414,7 @@ s32 msgMain(smartEntry* smart) {
 		case 0xFFF3:
 			npc = (NpcEntry*)entry->value;
 			if (!npc) {
-				npc = npcNameToPtr(data->stayPose);
+				npc = npcNameToPtr(data->speakerName);
 			}
 			animPoseSetPaperAnimGroup(npc->poseId, "p_b_st", 1);
 			animPosePaperPeraOn(npc->poseId);
@@ -486,7 +427,7 @@ s32 msgMain(smartEntry* smart) {
 				break;
 			}
 			if (!npc) {
-				npc = npcNameToPtr(data->stayPose);
+				npc = npcNameToPtr(data->speakerName);
 			}
 			animPoseSetPaperAnimGroup(npc->poseId, NULL, 1);
 			break;
@@ -753,13 +694,13 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 				}
 				else if (c->value & 4) {
 #ifdef VERSION_G8ME01
-					t = 0.01f * OSTicksToMilliseconds(gp->renderTime - data->time18) - 0.02f * sx;
+					t = 0.01f * OSTicksToMilliseconds(gp->renderTime - data->openTime) - 0.02f * sx;
 					sx += 3.2f * (f32)cos(t);
 					sy -= 3.2f * (f32)sin(t);
 					MSG_DRAW_SCALE(c);
 					FontDrawCode(sx, sy, c->glyph);
 #else
-					t = 0.01f * OSTicksToMilliseconds(gp->renderTime - data->time18) - 0.02f * sx;
+					t = 0.01f * OSTicksToMilliseconds(gp->renderTime - data->openTime) - 0.02f * sx;
 					hx = cos(t);
 					hy = sin(t);
 					FontDrawScale(c->scale);
@@ -768,7 +709,7 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 				}
 				else if (c->value & (0x100 << data->sel)) {
 					f32 hx2;
-					t = EXT_LIT(float_0p01_8041a694, 0.01f) * OSTicksToMilliseconds(gp->renderTime - data->time18) - 0.02f * sx;
+					t = EXT_LIT(float_0p01_8041a694, 0.01f) * OSTicksToMilliseconds(gp->renderTime - data->openTime) - 0.02f * sx;
 #ifdef VERSION_G8ME01
 					hx2 = sx + 3.2f * (f32)cos(t);
 					sy -= 3.2f * (f32)sin(t);
@@ -930,7 +871,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 
 	data = smart->address;
 	window = data->window;
-	entry = (MsgAChar*)(&data->entries[data->count]);
+	entry = (MsgAChar*)(&data->entries[data->charCount]);
 	flags = 0;
 	maxScale = EXT_LIT(float_0_8041a514, 0.0f);
 #ifdef VERSION_G8ME01
@@ -947,9 +888,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	}
 	time = data->parseTime;
 	s234 = 0;
-	s232 = data->field_0x7A38;
+	s232 = data->parsePage;
 	x = data->parseX;
-	s230 = data->field_0x7A3A;
+	s230 = data->parseScroll;
 	y = data->parseY;
 	step = data->parseSpeed;
 	switch (window->type) {
@@ -970,7 +911,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 		entry->glyph = 0xFFF7;
 		entry->time = time;
 		entry++;
-		data->count++;
+		data->charCount++;
 		break;
 	default:
 		break;
@@ -1020,7 +961,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			msg += 2;
 			time += step;
 			entry++;
-			data->count++;
+			data->charCount++;
 			continue;
 		}
 		switch ((s8)check) {
@@ -1038,8 +979,8 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			data->parseTime = time;
 			data->parseX = x;
 			data->parseY = y;
-			data->field_0x7A38 = s232;
-			data->field_0x7A3A = s230;
+			data->parsePage = s232;
+			data->parseScroll = s230;
 			return;
 		case '\n':
 #ifdef VERSION_G8ME01
@@ -1069,7 +1010,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			msg++;
 			entry++;
 			time += step;
-			data->count++;
+			data->charCount++;
 			maxScale = EXT_LIT(float_0_8041a514, 0.0f);
 			if (data->flags & 0x20) {
 				flags &= ~0xFF00;
@@ -1104,7 +1045,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->time = time;
 				time += 100;
 				entry++;
-				data->count++;
+				data->charCount++;
 				s232++;
 			} else if (strcmp(tag, "keyxon") == 0) {
 				data->flags |= 0x100;
@@ -1118,14 +1059,14 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					time += 0x32;
 					entry++;
 					s230 = 0;
-					data->count++;
+					data->charCount++;
 				}
 			} else if (( strcmp(tag, "o") == 0 ) || ( strcmp(tag, "once_stop") == 0) ) {
 				entry->glyph = 0xFFFC;
 				entry->time = time;
 				time += 0x32;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "pos") == 0) {
 				sscanf(args, "%d%d", &v48, &v44);
 				x = v48;
@@ -1183,36 +1124,36 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->glyph = 0xFFF7;
 				entry->time = time;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "/col") == 0) {
 				entry->value = 0xFF;
 				entry->glyph = 0xFFF7;
 				entry->time = time;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "noise") == 0) {
 				entry->value = 1;
 				entry->glyph = 0xFFF6;
 				entry->time = time;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "/noise") == 0) {
 				entry->value = 0;
 				entry->glyph = 0xFFF6;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "dkey") == 0) {
 				entry->value = 1;
 				entry->glyph = 0xFFF5;
 				entry->time = time;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "/dkey") == 0) {
 				entry->value = 0;
 				entry->glyph = 0xFFF5;
 				entry->time = time;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "plate") == 0) {
 				window->type = 2;
 				step = 0;
@@ -1224,7 +1165,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->glyph = 0xFFF7;
 				entry->time = time;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "tec") == 0) {
 				static const GXColor c = {0x00, 0xD9, 0x14, 0xFF};
 				window->type = 8;
@@ -1232,7 +1173,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->glyph = 0xFFF7;
 				entry->time = time;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "majo") == 0) {
 				window->type = 9;
 			} else if (strcmp(tag, "diary") == 0) {
@@ -1270,12 +1211,12 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				sscanf(args, "%d", &entry->value);
 				entry->glyph = 0xFFFA;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "vol") == 0) {
 				sscanf(args, "%d", &entry->value);
 				entry->glyph = 0xFFF9;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "nowinse") == 0) {
 				window->flags |= 8;
 			} else if (strcmp(tag, "icon") == 0) {
@@ -1310,7 +1251,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					x += i30 + 0x28;
 #endif
 					time += step;
-					data->count++;
+					data->charCount++;
 				} else {
 #ifdef VERSION_G8ME01
 					if ((u32)gp->language == 0) {
@@ -1350,7 +1291,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					entry++;
 					x += iw;
 					time += step;
-					data->count++;
+					data->charCount++;
 				}
 			} else if (strcmp(tag, "anim") == 0) {
 				sscanf(args, "%s%s%d%d%f%d", anim1, anim2, &i28, &i24, &f1c, &i20);
@@ -1369,20 +1310,20 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->dyn = (i20 == 0) ? ( EXT_LIT(float_0_8041a514, 0.0f) ) : ( EXT_LIT(float_180_8041a568, 180.0f)) ;
 				entry++;
 				time += step;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "paper") == 0) {
 				sscanf(args, "%s%d", paper, &i18);
 				entry->value = (strcmp(paper, "me") != 0) ? (( u32)npcNameToPtr(paper) ) : ( 0) ;
 				entry->glyph = 0xFFF3;
 				entry->time = i18;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "/paper") == 0) {
 				sscanf(args, "%s", paper2);
 				entry->value = (strcmp(paper2, "me") != 0) ? (( u32)npcNameToPtr(paper2) ) : ( 0) ;
 				entry->glyph = 0xFFF2;
 				entry++;
-				data->count++;
+				data->charCount++;
 			} else if (strcmp(tag, "r") == 0) {
 				data2 = data;
 				if (data2->window->type != 1) {
@@ -1456,7 +1397,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					entry->time = 0;
 					rubyX += wwR;
 					entry++;
-					data->count++;
+					data->charCount++;
 					nn[0] += 2;
 				}
 				continue;
@@ -1505,7 +1446,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			msg++;
 			time += step;
 			entry++;
-			data->count++;  // correctness: data2 is only set on one branch (NULL read-modify-write of +0x38)
+			data->charCount++;  // correctness: data2 is only set on one branch (NULL read-modify-write of +0x38)
 			continue;
 		}
 	}
@@ -1648,15 +1589,15 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 	data->window = window;
 	data->flags = 3;
 	data->callback = field_0x79FC;
-	data->time30 = gp->renderTime;
-	data->time18 = gp->renderTime;
-	data->field_0x7A28 = 0;
-	data->sfxVolume = 0x7F;
+	data->lastUpdateTime = gp->renderTime;
+	data->openTime = gp->renderTime;
+	data->talkSfxGroup = 0;
+	data->talkVolume = 0x7F;
 	data->parseTime = 0;
 	data->parseX = 0;
 	data->parseY = 0;
-	data->field_0x7A38 = 0;
-	data->field_0x7A3A = 0;
+	data->parsePage = 0;
+	data->parseScroll = 0;
 	data->parseSpeed = 25;
 	data->pageCount = 0;
 	msgAnalize(smart, copy);
@@ -1698,9 +1639,9 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 		break;
 	case 1:
 #ifdef VERSION_G8ME01
-		window->field_0x4 = priority + 10;
+		window->priority = priority + 10;
 #else
-		window->field_0x4 = 10;
+		window->priority = 10;
 #endif
 		window->height = VERSION_PICK(0.7f, 0.9f) * GXGetTexObjWidth(getWakuTexObj(3));
 		window->width = VERSION_PICK(0.7f, 0.9f) * GXGetTexObjHeight(getWakuTexObj(3));
@@ -1716,7 +1657,7 @@ void msgWindow_Delete(WindowEntry* window) {
 
 	if (window->userdata) {
 		data = window->userdata->address;
-		for (i = 0; i < data->count; i++) {
+		for (i = 0; i < data->charCount; i++) {
 		}
 		smartFree(window->userdata);
 		window->userdata = NULL;
@@ -1729,7 +1670,7 @@ void msgWindow_Add(char* msg, s32 id) {
 	WindowEntry* window = windowGetPointer(id);
 	smartEntry* smart = window->userdata;
 
-	((MsgWinData*)smart->address)->time30 = gp->renderTime;
+	((MsgWinData*)smart->address)->lastUpdateTime = gp->renderTime;
 	msgAnalize(smart, msg);
 	WIN_STATE(window) = 1;
 	window->flags |= 2;
@@ -1742,7 +1683,7 @@ void msgWindow_Continue(s32 id) {
 	WIN_STATE(window) = 1;
 	window->flags |= 2;
 	data = window->userdata->address;
-	data->time30 = gp->renderTime;
+	data->lastUpdateTime = gp->renderTime;
 }
 
 void msgWindow_Repeat(s32 id) {
@@ -1752,8 +1693,8 @@ void msgWindow_Repeat(s32 id) {
 	WIN_STATE(window) = 1;
 	window->flags |= 2;
 	data = window->userdata->address;
-	data->time30 = gp->renderTime;
-	data->time18 = gp->renderTime;
+	data->lastUpdateTime = gp->renderTime;
+	data->openTime = gp->renderTime;
 	data->playTime = 0;
 	data->scrollTarget = 0;
 	data->scrollPos = 0;
@@ -1776,7 +1717,7 @@ void msgWindow_ForceClose(const char* name) {
 				BtlUnit_ChangeStayAnim(data->unitId);
 			}
 			else {
-				npcSetStayPose(data->stayPose);
+				npcSetStayPose(data->speakerName);
 			}
 		}
 	}
@@ -1816,7 +1757,7 @@ void msgWindow_Main(WindowEntry* window) {
 				BtlUnit_ChangeTalkAnim(data->unitId);
 			}
 			else {
-				npcSetTalkPose(data->stayPose);
+				npcSetTalkPose(data->speakerName);
 			}
 			data->talkPoseSet = 1;
 		}
@@ -1827,7 +1768,7 @@ void msgWindow_Main(WindowEntry* window) {
 				BtlUnit_ChangeStayAnim(d2->unitId);
 			}
 			else {
-				npcSetStayPose(d2->stayPose);
+				npcSetStayPose(d2->speakerName);
 			}
 			data->talkPoseSet = 0;
 		}
@@ -1841,16 +1782,16 @@ void msgWindow_Main(WindowEntry* window) {
 				psndSFXOn((const char*)(se | 0x20000));
 			}
 		}
-		window->unk20 = gp->renderTime;
+		window->timestamp = gp->renderTime;
 		WIN_STATE(window) = 6;
 	case 6:
 		window->flags |= 2;
-		window->alpha = OSTicksToMilliseconds(gp->renderTime - window->unk20) * 255 / 200;
+		window->alpha = OSTicksToMilliseconds(gp->renderTime - window->timestamp) * 255 / 200;
 		if (window->alpha > 255) {
 			window->alpha = 255;
 			WIN_STATE(window) = 1;
-			data->time18 = gp->renderTime;
-			data->time30 = gp->renderTime;
+			data->openTime = gp->renderTime;
+			data->lastUpdateTime = gp->renderTime;
 		}
 		break;
 	case 7:
@@ -1860,14 +1801,14 @@ void msgWindow_Main(WindowEntry* window) {
 				psndSFXOn((const char*)(se | 0x20000));
 			}
 		}
-		window->unk20 = gp->renderTime;
+		window->timestamp = gp->renderTime;
 		WIN_STATE(window) = 8;
 	case 8:
 		if (window->alpha == 0) {
 			windowDelete(window);
 			return;
 		}
-		window->alpha = 255 - OSTicksToMilliseconds(gp->renderTime - window->unk20) * 255 / 200;
+		window->alpha = 255 - OSTicksToMilliseconds(gp->renderTime - window->timestamp) * 255 / 200;
 		if (window->alpha <= 0) {
 			window->alpha = 0;
 		}
@@ -1880,7 +1821,7 @@ void msgWindow_Main(WindowEntry* window) {
 				BtlUnit_ChangeStayAnim(WIN_DATA(window)->unitId);
 			}
 			else {
-				npcSetStayPose(WIN_DATA(window)->stayPose);
+				npcSetStayPose(WIN_DATA(window)->speakerName);
 			}
 			break;
 		case 1:
@@ -1890,7 +1831,7 @@ void msgWindow_Main(WindowEntry* window) {
 				BtlUnit_ChangeStayAnim(WIN_DATA(window)->unitId);
 			}
 			else {
-				npcSetStayPose(WIN_DATA(window)->stayPose);
+				npcSetStayPose(WIN_DATA(window)->speakerName);
 			}
 			break;
 		case 2:
@@ -1922,7 +1863,7 @@ void msgWindow_Main(WindowEntry* window) {
 			data->page = data->pageCount - 1;
 			if (msgWinPrevPage(window) != 0U) {
 				WIN_STATE(window) = 9;
-				window->unk20 = gp->renderTime;
+				window->timestamp = gp->renderTime;
 				psndSFXOn((const char*)0x20041);
 				data->flags |= 0x40;
 			}
@@ -1931,8 +1872,8 @@ void msgWindow_Main(WindowEntry* window) {
 	case 9:
 		target = data->pageY[data->page];
 		if (data->scrollPos >= target) {
-			data->scrollPos = data->scrollPos - 0.6f * OSTicksToMilliseconds(gp->renderTime - window->unk20);
-			window->unk20 = gp->renderTime;
+			data->scrollPos = data->scrollPos - 0.6f * OSTicksToMilliseconds(gp->renderTime - window->timestamp);
+			window->timestamp = gp->renderTime;
 			if (data->scrollPos <= target) {
 				data->scrollPos = target;
 				WIN_STATE(window) = 11;
@@ -1942,8 +1883,8 @@ void msgWindow_Main(WindowEntry* window) {
 	case 10:
 		target = data->pageY[data->page];
 		if (data->scrollPos <= target) {
-			data->scrollPos = data->scrollPos + 0.6f * OSTicksToMilliseconds(gp->renderTime - window->unk20);
-			window->unk20 = gp->renderTime;
+			data->scrollPos = data->scrollPos + 0.6f * OSTicksToMilliseconds(gp->renderTime - window->timestamp);
+			window->timestamp = gp->renderTime;
 			if (data->scrollPos >= target) {
 				data->scrollPos = target;
 				if (data->page == data->pageCount - 1) {
@@ -1964,7 +1905,7 @@ void msgWindow_Main(WindowEntry* window) {
 		trg = keyGetButtonTrg(0);
 		if (trg & target) {
 			WIN_STATE(window) = 10;
-			window->unk20 = gp->renderTime;
+			window->timestamp = gp->renderTime;
 			msgWinNextPage(window);
 			psndSFXOn((const char*)0x20041);
 		}
@@ -1973,7 +1914,7 @@ void msgWindow_Main(WindowEntry* window) {
 #endif
 		if (keyGetButtonTrg(0) & 0x200) {
 			WIN_STATE(window) = 10;
-			window->unk20 = gp->renderTime;
+			window->timestamp = gp->renderTime;
 			data->page = data->pageCount - 1;
 			psndSFXOn((const char*)0x20041);
 		}
@@ -1982,14 +1923,14 @@ void msgWindow_Main(WindowEntry* window) {
 #endif
 		if (keyGetButtonTrg(0) & 0x10) {
 			WIN_STATE(window) = 9;
-			window->unk20 = gp->renderTime;
+			window->timestamp = gp->renderTime;
 			if (msgWinPrevPage(window) != 0U) {
 				psndSFXOn((const char*)0x20041);
 			}
 		}
 		break;
 	}
-	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->field_0x4, 0, msgWindow_Disp, window);
+	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->priority, 0, msgWindow_Disp, window);
 }
 
 #pragma opt_common_subs reset
@@ -1999,14 +1940,14 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 	switch (WIN_STATE(window)) {
 	case 5:
 		WIN_STATE(window) = 1;
-		window->unk20 = gp->renderTime;
-		data->time18 = gp->renderTime;
-		data->time30 = gp->renderTime;
+		window->timestamp = gp->renderTime;
+		data->openTime = gp->renderTime;
+		data->lastUpdateTime = gp->renderTime;
 	case 1:
 	case 6:
 		window->flags |= 2;
 		if (window->alpha < 255) {
-			window->alpha = OSTicksToMilliseconds(gp->renderTime - window->unk20) * 255 / 200;
+			window->alpha = OSTicksToMilliseconds(gp->renderTime - window->timestamp) * 255 / 200;
 			if (window->alpha > 255) {
 				window->alpha = 255;
 			}
@@ -2015,12 +1956,12 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 			switch (msgMain(window->userdata)) {
 			case 0:
 				WIN_STATE(window) = 7;
-				window->unk20 = gp->renderTime;
+				window->timestamp = gp->renderTime;
 				if (WIN_DATA(window)->flags & 8) {
 					BtlUnit_ChangeStayAnim(WIN_DATA(window)->unitId);
 				}
 				else {
-					npcSetStayPose(WIN_DATA(window)->stayPose);
+					npcSetStayPose(WIN_DATA(window)->speakerName);
 				}
 				break;
 			case 1:
@@ -2030,7 +1971,7 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 					BtlUnit_ChangeStayAnim(WIN_DATA(window)->unitId);
 				}
 				else {
-					npcSetStayPose(WIN_DATA(window)->stayPose);
+					npcSetStayPose(WIN_DATA(window)->speakerName);
 				}
 				break;
 			case 2:
@@ -2046,13 +1987,13 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 			windowDelete(window);
 			return;
 		}
-		window->alpha = 255 - OSTicksToMilliseconds(gp->renderTime - window->unk20) * 255 / 200;
+		window->alpha = 255 - OSTicksToMilliseconds(gp->renderTime - window->timestamp) * 255 / 200;
 		if (window->alpha <= 0) {
 			window->alpha = 0;
 		}
 		break;
 	}
-	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->field_0x4, 0, msgWindow_Disp, window);
+	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->priority, 0, msgWindow_Disp, window);
 }
 
 void msgWindow_Disp(CameraId camId, void* param) {
@@ -2073,11 +2014,11 @@ void msgWindow_Disp(CameraId camId, void* param) {
 	case 6:
 	case 8:
 	case 9:
-		if (window->field_0x2C != 0) {
-			if (window->field_0x2C & 0x10) {
-				pos = *(( Vec*)( ((u8*)window ) + 0x30) );
+		if (window->tailMode != 0) {
+			if (window->tailMode & 0x10) {
+				pos = window->speakerPos;
 			} else {
-				getScreenPoint((Vec*)((( u8*)window ) + 0x30), &pos);
+				getScreenPoint(&window->speakerPos, &pos);
 			}
 			switch (window->type) {
 			case 0:
@@ -2088,7 +2029,7 @@ void msgWindow_Disp(CameraId camId, void* param) {
 				ey = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(pos.y, window->y - ( window->width / EXT_LIT(float_2_8041a524, 2.0f) ), 0, window->alpha, 255);
 				w = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(EXT_LIT(float_10_8041a538, 10.0f), window->height, 0, window->alpha, 255);
 				h = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(EXT_LIT(float_10_8041a538, 10.0f), window->width, 0, window->alpha, 255);
-				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ex - ( w / EXT_LIT(float_2_8041a524, 2.0f) ), ey + ( h / EXT_LIT(float_2_8041a524, 2.0f) ), w, h, pos.x, pos.y);
+				windowDispGX_Message(window->type, window->tailMode, window->alpha, ex - ( w / EXT_LIT(float_2_8041a524, 2.0f) ), ey + ( h / EXT_LIT(float_2_8041a524, 2.0f) ), w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f), camera->scissor[2], 100);
 					ret = msgDisp(window->userdata, window->alpha, EXT_LIT(float_62_8041a544, 62.0f) + window->x, window->y - 36.0f);
@@ -2096,7 +2037,7 @@ void msgWindow_Disp(CameraId camId, void* param) {
 				break;
 			case 1:
 				window->x = pos.x - ( window->height / EXT_LIT(float_2_8041a524, 2.0f)) ;
-				if (window->field_0x2C & 8) {
+				if (window->tailMode & 8) {
 					window->y = pos.y - 80.0f;
 				} else {
 					window->y = 60.0f + pos.y;
@@ -2105,7 +2046,7 @@ void msgWindow_Disp(CameraId camId, void* param) {
 				ey = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(pos.y, window->y - ( window->width / EXT_LIT(float_2_8041a524, 2.0f) ), 0, window->alpha, 255);
 				w = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(EXT_LIT(float_10_8041a538, 10.0f), window->height, 0, window->alpha, 255);
 				h = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(EXT_LIT(float_10_8041a538, 10.0f), window->width, 0, window->alpha, 255);
-				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ex - ( w / EXT_LIT(float_2_8041a524, 2.0f) ), ey + ( h / EXT_LIT(float_2_8041a524, 2.0f) ), w, h, pos.x, pos.y);
+				windowDispGX_Message(window->type, window->tailMode, window->alpha, ex - ( w / EXT_LIT(float_2_8041a524, 2.0f) ), ey + ( h / EXT_LIT(float_2_8041a524, 2.0f) ), w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					sy = 240 - ((( s32)window->y ) - 10);
 					if (sy < 0) { sy = 0;
@@ -2232,7 +2173,7 @@ void selectWindow_Main(WindowEntry* window) {
 	case 4:
 		return;
 	}
-	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->field_0x4, 0, selectWindow_Disp, window);
+	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->priority, 0, selectWindow_Disp, window);
 }
 
 void selectWindow_Disp(CameraId camId, void* param) {

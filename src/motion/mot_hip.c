@@ -18,8 +18,6 @@ void marioChgMotSub(s32 a, s32 b);
 void set_damage_root_ypos(f32 y);
 void kpa_hip(void);
 
-#define MF(o) (*(f32*)((u8*)mario + (o)))
-#define MI(o) (*(s32*)((u8*)mario + (o)))
 #ifdef VERSION_G8ME01
 #define SND1 (mario->soundId[3])
 #define SND2 (mario->soundId[4])
@@ -27,7 +25,6 @@ void kpa_hip(void);
 #define SND1 (mario->mot.hip.sfxId[0])
 #define SND2 (mario->mot.hip.sfxId[1])
 #endif
-#define MH(o) (*(s16*)((u8*)mario + (o)))
 
 static EVT_BEGIN(quake_evt)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 110)
@@ -53,7 +50,7 @@ BOOL marioChkHipAttack(void) {
 
     ret = FALSE;
     mario = marioGetPtr();
-    if (mario->jumpPeakAirTime >= 10 && (mario->buttonBuffer & 0x100) && pouchGetJumpLv() >= 2) {
+    if (mario->jumpPeakAirTime >= 10 && (mario->buttonTrg & 0x100) && pouchGetJumpLv() >= 2) {
         ret = TRUE;
     }
     return ret;
@@ -178,7 +175,7 @@ void mot_hip(void) {
             mario->dispOfs2.y += mario->jumpVelocityY;
         }
         if (360.0f == mario->mot.hip.angle && mario->jumpVelocityY <= 0.0f) {
-            MI(0x48) = 5;
+            mario->multiTimer = 5;
             mario->currSubMotionId = 2;
             mario->jumpVelocityY = 2.0f;
         }
@@ -198,7 +195,7 @@ void mot_hip(void) {
                 mario->dispOfs2.y += mario->jumpVelocityY;
             }
         }
-        if (--MI(0x48) <= 0) {
+        if (--mario->multiTimer <= 0) {
             mario->currSubMotionId = 10;
         }
         switch (U_chkground()) {
@@ -232,10 +229,10 @@ void mot_hip(void) {
         }
         break;
     case 20:
-        MI(0x48) = sysMsec2Frame(200);
+        mario->multiTimer = sysMsec2Frame(200);
         mario->currSubMotionId = 21;
     case 21:
-        if (--MI(0x48) > 0) {
+        if (--mario->multiTimer > 0) {
             break;
         }
         fall = marioGetFallSpd();
@@ -250,9 +247,9 @@ void mot_hip(void) {
         if (hit != NULL) {
             mario->currMotionId = MARIO_MOTION_HIP_2;
             mario->currSubMotionId = 22;
-            MI(0x48) = 20;
-            MI(MWOFF(0x1E4)) = (s32)hit;
-            MI(MWOFF(0x1E8)) = 0;
+            mario->multiTimer = 20;
+            mario->hitobjStandOn = hit;
+            mario->hitobjJumpFrom = NULL;
             mario->position.y = y;
             mario->mot.hip.angle = 0.0f;
             mario->rotOfs.y = 0.0f;
@@ -294,7 +291,7 @@ void mot_hip(void) {
         if (U_chkground() == 1) {
             return;
         }
-        if (--MI(0x48) <= 0) {
+        if (--mario->multiTimer <= 0) {
             mario->dispFlags &= ~0x08000000;
             if (!marioBgmodeChk()) {
                 camFollowYOn();
@@ -316,9 +313,9 @@ void mot_hip(void) {
     }
     mario->rot.z = mario->mot.hip.angle;
     if (mario->airTimer != 0) {
-        mario->unk174.x = 0.0f;
-        mario->unk174.z = 0.0f;
-        mario->unk174.y = 0.0f;
+        mario->floorMove.x = 0.0f;
+        mario->floorMove.z = 0.0f;
+        mario->floorMove.y = 0.0f;
     }
 }
 
@@ -333,8 +330,8 @@ s32 U_chkground(void) {
     mario = marioGetPtr();
     hit = marioChkLandon(&y, 1.0f);
     if (hit != NULL) {
-        MI(MWOFF(0x1E4)) = (s32)hit;
-        MI(MWOFF(0x1E8)) = 0;
+        mario->hitobjStandOn = hit;
+        mario->hitobjJumpFrom = NULL;
         mario->position.y = y;
         mario->mot.hip.angle = 0.0f;
         mario->rotOfs.y = 0.0f;

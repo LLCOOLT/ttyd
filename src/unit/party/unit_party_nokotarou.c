@@ -75,7 +75,7 @@ static USER_FUNC(_check_guard_koura);
 USER_FUNC(_tsuranuki_effect_control);
 USER_FUNC(_color_lv_set);
 USER_FUNC(_check_mario_move_count);
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
+static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
 __declspec(section ".data") f32 unit_party_nokotarou_negone_one_a[2];
 __declspec(section ".data") f32 nokotarou_negone_one_374[2];
@@ -373,15 +373,15 @@ BattleWeapon partyWeapon_NokotarouFirstAttack = {
 #else
     336, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {2, 2, 3, 3, 5, 5, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -391,7 +391,7 @@ BattleWeapon partyWeapon_NokotarouFirstAttack = {
     0, // element
     8, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x2008F, // special
     0x7FF, // counterResistFlags
@@ -402,9 +402,9 @@ BattleWeapon partyWeapon_NokotarouFirstAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyNokotarouAttack_FirstAttack, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_NokotarouKouraAttack = {
@@ -414,16 +414,16 @@ BattleWeapon partyWeapon_NokotarouKouraAttack = {
 #else
     336, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pnk_normal_attack", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {1, 2, 2, 3, 3, 5, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -433,7 +433,7 @@ BattleWeapon partyWeapon_NokotarouKouraAttack = {
     0, // element
     8, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x30087, // special
     0x5FF, // counterResistFlags
@@ -444,12 +444,12 @@ BattleWeapon partyWeapon_NokotarouKouraAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyNokotarouAttack_NormalAttack, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 4, 2, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 4, 2, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 2, 2, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 2, 2, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -460,21 +460,21 @@ BattleWeapon partyWeapon_NokotarouSyubibinKoura = {
 #else
     337, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pnk_syubibin_koura", // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
 #ifdef VERSION_G8ME01
     1, // mStylishCommandMultiplier
 #else
     2, // mStylishCommandMultiplier
 #endif
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {1, 2, 2, 3, 3, 5, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -484,7 +484,7 @@ BattleWeapon partyWeapon_NokotarouSyubibinKoura = {
     0, // element
     8, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_koura_shubibin", // acHelpMsg
     0x20087, // special
     0x5FF, // counterResistFlags
@@ -495,12 +495,12 @@ BattleWeapon partyWeapon_NokotarouSyubibinKoura = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyNokotarouAttack_SyubibinKoura, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -511,17 +511,17 @@ BattleWeapon partyWeapon_NokotarouKouraGuard = {
 #else
     338, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pnk_koura_no_mamori", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0, 2, 2, 3, 3, 4, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -530,7 +530,7 @@ BattleWeapon partyWeapon_NokotarouKouraGuard = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_koura_no_mamori", // acHelpMsg
     0x20000, // special
     0x7FF, // counterResistFlags
@@ -541,9 +541,9 @@ BattleWeapon partyWeapon_NokotarouKouraGuard = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyNokotarouAttack_KouraGuard, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_NokotarouTsuranukiKoura = {
@@ -553,21 +553,21 @@ BattleWeapon partyWeapon_NokotarouTsuranukiKoura = {
 #else
     339, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pnk_koura_tsuranuki", // description
     100, // baseAccuracy
     6, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
 #ifdef VERSION_G8ME01
     1, // mStylishCommandMultiplier
 #else
     3, // mStylishCommandMultiplier
 #endif
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetACOutputParam, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -576,7 +576,7 @@ BattleWeapon partyWeapon_NokotarouTsuranukiKoura = {
     0x20004004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_tsuranuki_koura", // acHelpMsg
     0x200C7, // special
     0x5FF, // counterResistFlags
@@ -587,12 +587,12 @@ BattleWeapon partyWeapon_NokotarouTsuranukiKoura = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyNokotarouAttack_TsuranukiKoura, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -2567,44 +2567,44 @@ BattleUnitSetup entry_koura = {
     NULL, // itemDropTable
 };
 
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count) {
+static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
     techLv = partyGetTechLv(BattleTransPartyId(BattleGetPartyPtr(_battleWorkPointer)->currentKind));
 
-    command->mWeaponTable[*count].mIndex = -1;
-    command->mWeaponTable[*count].mItem = 0;
-    command->mWeaponTable[*count].mWeaponParams = &partyWeapon_NokotarouKouraAttack;
-    command->mWeaponTable[*count].field_0x4 = 0;
-    command->mWeaponTable[*count].mIcon = ICON_150;
-    command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+    command->weapon[*count].index = -1;
+    command->weapon[*count].itemId = 0;
+    command->weapon[*count].weapon = &partyWeapon_NokotarouKouraAttack;
+    command->weapon[*count].enabled = 0;
+    command->weapon[*count].icon = ICON_150;
+    command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
     (*count)++;
 
     if (techLv >= 0) {
-        command->mWeaponTable[*count].mIndex = -1;
-        command->mWeaponTable[*count].mItem = 0;
-        command->mWeaponTable[*count].mWeaponParams = &partyWeapon_NokotarouSyubibinKoura;
-        command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = ICON_151;
-        command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+        command->weapon[*count].index = -1;
+        command->weapon[*count].itemId = 0;
+        command->weapon[*count].weapon = &partyWeapon_NokotarouSyubibinKoura;
+        command->weapon[*count].enabled = 0;
+        command->weapon[*count].icon = ICON_151;
+        command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
         (*count)++;
     }
     if (techLv >= 1) {
-        command->mWeaponTable[*count].mIndex = -1;
-        command->mWeaponTable[*count].mItem = 0;
-        command->mWeaponTable[*count].mWeaponParams = &partyWeapon_NokotarouKouraGuard;
-        command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-        command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+        command->weapon[*count].index = -1;
+        command->weapon[*count].itemId = 0;
+        command->weapon[*count].weapon = &partyWeapon_NokotarouKouraGuard;
+        command->weapon[*count].enabled = 0;
+        command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+        command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
         (*count)++;
     }
     if (techLv >= 2) {
-        command->mWeaponTable[*count].mIndex = -1;
-        command->mWeaponTable[*count].mItem = 0;
-        command->mWeaponTable[*count].mWeaponParams = &partyWeapon_NokotarouTsuranukiKoura;
-        command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-        command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+        command->weapon[*count].index = -1;
+        command->weapon[*count].itemId = 0;
+        command->weapon[*count].weapon = &partyWeapon_NokotarouTsuranukiKoura;
+        command->weapon[*count].enabled = 0;
+        command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+        command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
         (*count)++;
     }
 }

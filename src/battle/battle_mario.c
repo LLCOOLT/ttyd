@@ -197,16 +197,16 @@ s32 marioAttackEvent_MajinaiExpUp[27];
 BattleWeapon marioDefaultWeapon_Jump = {
     "btl_wn_mario_normal_jump", // name
     167, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_normal_jump", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -215,7 +215,7 @@ BattleWeapon marioDefaultWeapon_Jump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x35807, // special
     0xC, // counterResistFlags
@@ -226,24 +226,24 @@ BattleWeapon marioDefaultWeapon_Jump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_NormalJump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 4, 2, 1, 1, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 4, 2, 1, 1, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioDefaultWeapon_Jump = {
     "btl_wn_mario_normal_jump", // name
     159, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_normal_jump", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -252,7 +252,7 @@ BattleWeapon marioDefaultWeapon_Jump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x35807, // special
     0xC, // counterResistFlags
@@ -263,9 +263,9 @@ BattleWeapon marioDefaultWeapon_Jump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_NormalJump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 2, 2, 1, 1, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 2, 2, 1, 1, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -273,17 +273,17 @@ BattleWeapon marioDefaultWeapon_Jump = {
 BattleWeapon marioWeapon_KururinJump = {
     "btl_wn_mario_kururin_jump", // name
     169, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_kururin_jump", // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -292,7 +292,7 @@ BattleWeapon marioWeapon_KururinJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_k_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -303,25 +303,25 @@ BattleWeapon marioWeapon_KururinJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_KururinJump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 4, 5, 1, 1, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 4, 5, 1, 1, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_KururinJump = {
     "btl_wn_mario_kururin_jump", // name
     161, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_kururin_jump", // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -330,7 +330,7 @@ BattleWeapon marioWeapon_KururinJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_k_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -341,9 +341,9 @@ BattleWeapon marioWeapon_KururinJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_KururinJump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 2, 5, 1, 1, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 2, 5, 1, 1, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -352,16 +352,16 @@ BattleWeapon marioWeapon_KururinJump = {
 BattleWeapon marioWeapon_KururinJump2 = {
     "btl_wn_mario_kururin_jump", // name
     169, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_kururin_jump", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 2, 3, 4, 5, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -370,7 +370,7 @@ BattleWeapon marioWeapon_KururinJump2 = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_k_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -381,24 +381,24 @@ BattleWeapon marioWeapon_KururinJump2 = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_KururinJump, // mAttackEvtScript
-    {0, 5, 5, 100, 0, 20, 10, 5, 5, 5, 0, 0}, // field_B4
+    {0, 5, 5, 100, 0, 20, 10, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_KururinJump2 = {
     "btl_wn_mario_kururin_jump", // name
     161, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_kururin_jump", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -407,7 +407,7 @@ BattleWeapon marioWeapon_KururinJump2 = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_k_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -418,9 +418,9 @@ BattleWeapon marioWeapon_KururinJump2 = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_KururinJump, // mAttackEvtScript
-    {0, 5, 5, 100, 0, 10, 10, 5, 5, 5, 0, 0}, // field_B4
+    {0, 5, 5, 100, 0, 10, 10, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -428,17 +428,17 @@ BattleWeapon marioWeapon_KururinJump2 = {
 BattleWeapon marioWeapon_JyabaraJump = {
     "btl_wn_mario_jyabara_jump", // name
     168, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_jyabara_jump", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 2, 2, 4, 5, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -447,7 +447,7 @@ BattleWeapon marioWeapon_JyabaraJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_j_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -458,25 +458,25 @@ BattleWeapon marioWeapon_JyabaraJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_JyabaraJump, // mAttackEvtScript
-    {0, 5, 5, 100, 0, 20, 10, 5, 5, 5, 0, 0}, // field_B4
+    {0, 5, 5, 100, 0, 20, 10, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_JyabaraJump = {
     "btl_wn_mario_jyabara_jump", // name
     160, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_jyabara_jump", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     2, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -485,7 +485,7 @@ BattleWeapon marioWeapon_JyabaraJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_j_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -496,9 +496,9 @@ BattleWeapon marioWeapon_JyabaraJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_JyabaraJump, // mAttackEvtScript
-    {0, 5, 5, 100, 0, 10, 10, 5, 5, 5, 0, 0}, // field_B4
+    {0, 5, 5, 100, 0, 10, 10, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -506,17 +506,17 @@ BattleWeapon marioWeapon_JyabaraJump = {
 BattleWeapon marioWeapon_JyabaraJumpFailed = {
     "btl_wn_mario_jyabara_jump", // name
     168, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_jyabara_jump", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     1, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -525,7 +525,7 @@ BattleWeapon marioWeapon_JyabaraJumpFailed = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -536,25 +536,25 @@ BattleWeapon marioWeapon_JyabaraJumpFailed = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_JyabaraJump, // mAttackEvtScript
-    {0, 50, 50, 100, 0, 0, 0, 50, 0, 0, 0, 0}, // field_B4
+    {0, 50, 50, 100, 0, 0, 0, 50, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_JyabaraJumpFailed = {
     "btl_wn_mario_jyabara_jump", // name
     160, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_jyabara_jump", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     2, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     1, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -563,7 +563,7 @@ BattleWeapon marioWeapon_JyabaraJumpFailed = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -574,23 +574,23 @@ BattleWeapon marioWeapon_JyabaraJumpFailed = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_JyabaraJump, // mAttackEvtScript
-    {0, 50, 50, 100, 0, 0, 0, 50, 0, 0, 0, 0}, // field_B4
+    {0, 50, 50, 100, 0, 0, 0, 50, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
 BattleWeapon marioDefaultWeapon_FirstAttackKaitenHammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -600,7 +600,7 @@ BattleWeapon marioDefaultWeapon_FirstAttackKaitenHammer = {
     0, // element
     14, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20887, // special
     0x7FF, // counterResistFlags
@@ -611,22 +611,22 @@ BattleWeapon marioDefaultWeapon_FirstAttackKaitenHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_FirstAttackKaitenHammer, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon marioDefaultWeapon_FirstAttackUltraHammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -636,7 +636,7 @@ BattleWeapon marioDefaultWeapon_FirstAttackUltraHammer = {
     0, // element
     16, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20887, // special
     0x7FF, // counterResistFlags
@@ -647,25 +647,25 @@ BattleWeapon marioDefaultWeapon_FirstAttackUltraHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_FirstAttackKaitenHammer, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 #ifdef VERSION_G8ME01
 BattleWeapon marioDefaultWeapon_Hammer = {
     "btl_wn_mario_normal_hammer", // name
     164, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_normal_hammer", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -674,7 +674,7 @@ BattleWeapon marioDefaultWeapon_Hammer = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x30887, // special
     0x7FB, // counterResistFlags
@@ -685,24 +685,24 @@ BattleWeapon marioDefaultWeapon_Hammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_NormalHammer, // mAttackEvtScript
-    {0, 3, 3, 100, 3, 6, 2, 3, 3, 0, 0, 0}, // field_B4
+    {0, 3, 3, 100, 3, 6, 2, 3, 3, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioDefaultWeapon_Hammer = {
     "btl_wn_mario_normal_hammer", // name
     156, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_normal_hammer", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -711,7 +711,7 @@ BattleWeapon marioDefaultWeapon_Hammer = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x30887, // special
     0x7FB, // counterResistFlags
@@ -722,9 +722,9 @@ BattleWeapon marioDefaultWeapon_Hammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_NormalHammer, // mAttackEvtScript
-    {0, 3, 3, 100, 3, 3, 2, 3, 3, 0, 0, 0}, // field_B4
+    {0, 3, 3, 100, 3, 3, 2, 3, 3, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -732,17 +732,17 @@ BattleWeapon marioDefaultWeapon_Hammer = {
 BattleWeapon marioWeapon_KaitenHammer = {
     "btl_wn_mario_kaiten_hammer", // name
     165, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_kaiten_hammer", // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -752,7 +752,7 @@ BattleWeapon marioWeapon_KaitenHammer = {
     0, // element
     14, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_kaiten_hammer", // acHelpMsg
     0x20887, // special
     0x7FB, // counterResistFlags
@@ -763,25 +763,25 @@ BattleWeapon marioWeapon_KaitenHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_KaitenHammer, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 6, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 6, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_KaitenHammer = {
     "btl_wn_mario_kaiten_hammer", // name
     157, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_kaiten_hammer", // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -791,7 +791,7 @@ BattleWeapon marioWeapon_KaitenHammer = {
     0, // element
     14, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_kaiten_hammer", // acHelpMsg
     0x20887, // special
     0x7FB, // counterResistFlags
@@ -802,18 +802,18 @@ BattleWeapon marioWeapon_KaitenHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_KaitenHammer, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 3, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 3, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
 BattleWeapon marioWeapon_KaitenHammerInvolved = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
-    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -823,7 +823,7 @@ BattleWeapon marioWeapon_KaitenHammerInvolved = {
     0, // element
     15, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20040, // special
     0x7FF, // counterResistFlags
@@ -833,26 +833,26 @@ BattleWeapon marioWeapon_KaitenHammerInvolved = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 #ifdef VERSION_G8ME01
 BattleWeapon marioWeapon_UltraHammer = {
     "btl_wn_mario_ultra_hammer", // name
     166, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_ultra_hammer", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -862,7 +862,7 @@ BattleWeapon marioWeapon_UltraHammer = {
     0, // element
     16, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_ultra_hammer", // acHelpMsg
     0x20807, // special
     0x7FB, // counterResistFlags
@@ -873,25 +873,25 @@ BattleWeapon marioWeapon_UltraHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_KaitenHammer, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 6, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 6, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_UltraHammer = {
     "btl_wn_mario_ultra_hammer", // name
     158, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_ultra_hammer", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     2, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -901,7 +901,7 @@ BattleWeapon marioWeapon_UltraHammer = {
     0, // element
     16, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_ultra_hammer", // acHelpMsg
     0x20807, // special
     0x7FB, // counterResistFlags
@@ -912,18 +912,18 @@ BattleWeapon marioWeapon_UltraHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_KaitenHammer, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 3, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 3, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
 BattleWeapon marioWeapon_UltraHammerInvolved = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
-    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -933,7 +933,7 @@ BattleWeapon marioWeapon_UltraHammerInvolved = {
     0, // element
     17, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20040, // special
     0x7FF, // counterResistFlags
@@ -943,25 +943,25 @@ BattleWeapon marioWeapon_UltraHammerInvolved = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 #ifdef VERSION_G8ME01
 BattleWeapon marioWeapon_UltraHammerFinish = {
     "btl_wn_mario_ultra_hammer", // name
     166, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_ultra_hammer", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -971,7 +971,7 @@ BattleWeapon marioWeapon_UltraHammerFinish = {
     0, // element
     19, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x2088F, // special
     0x7FF, // counterResistFlags
@@ -982,24 +982,24 @@ BattleWeapon marioWeapon_UltraHammerFinish = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_KaitenHammer, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 5, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 5, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_UltraHammerFinish = {
     "btl_wn_mario_ultra_hammer", // name
     158, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_ultra_hammer", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     2, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1009,7 +1009,7 @@ BattleWeapon marioWeapon_UltraHammerFinish = {
     0, // element
     19, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x2088F, // special
     0x7FF, // counterResistFlags
@@ -1020,26 +1020,26 @@ BattleWeapon marioWeapon_UltraHammerFinish = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_KaitenHammer, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 5, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 5, 0, 0}, // stageEffectRates
 };
 #endif
 
 #ifdef VERSION_G8ME01
 BattleWeapon badgeWeapon_TugitugiJump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     241, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapJump1, // hpDamageFn
     {0, 0, 1, 1, 2, 2, 241, 1}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1048,7 +1048,7 @@ BattleWeapon badgeWeapon_TugitugiJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -1059,24 +1059,24 @@ BattleWeapon badgeWeapon_TugitugiJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_TugiTugiJump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 10, 5, 2, 2, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 2, 2, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_TugitugiJump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     241, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapJump1, // hpDamageFn
     {0, 0, 1, 1, 2, 2, 241, 1}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1085,7 +1085,7 @@ BattleWeapon badgeWeapon_TugitugiJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -1096,25 +1096,25 @@ BattleWeapon badgeWeapon_TugitugiJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_TugiTugiJump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 2, 2, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 2, 2, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
 BattleWeapon badgeWeapon_GatsunJump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     240, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapJump1, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 240, 2}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1123,7 +1123,7 @@ BattleWeapon badgeWeapon_GatsunJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -1134,24 +1134,24 @@ BattleWeapon badgeWeapon_GatsunJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_GatsunJump, // mAttackEvtScript
-    {0, 25, 25, 100, 25, 25, 25, 5, 25, 5, 0, 0}, // field_B4
+    {0, 25, 25, 100, 25, 25, 25, 5, 25, 5, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon badgeWeapon_DokanJump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     332, // itemId
     NULL, // description
     100, // baseAccuracy
     6, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapJump1, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 332, 4}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1160,7 +1160,7 @@ BattleWeapon badgeWeapon_DokanJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -1171,25 +1171,25 @@ BattleWeapon badgeWeapon_DokanJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_DokanJump, // mAttackEvtScript
-    {0, 25, 25, 100, 25, 5, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 25, 25, 100, 25, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 
 #ifdef VERSION_G8ME01
 BattleWeapon badgeWeapon_RenzokuJump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     242, // itemId
     NULL, // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapJump1, // hpDamageFn
     {0, 0, 1, 1, 2, 2, 242, 1}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1198,7 +1198,7 @@ BattleWeapon badgeWeapon_RenzokuJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x25817, // special
     0xC, // counterResistFlags
@@ -1209,24 +1209,24 @@ BattleWeapon badgeWeapon_RenzokuJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_RenzokuJump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 10, 5, 2, 2, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 2, 2, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_RenzokuJump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     242, // itemId
     NULL, // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapJump1, // hpDamageFn
     {0, 0, 1, 1, 2, 2, 242, 1}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1235,7 +1235,7 @@ BattleWeapon badgeWeapon_RenzokuJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x25817, // special
     0xC, // counterResistFlags
@@ -1246,26 +1246,26 @@ BattleWeapon badgeWeapon_RenzokuJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_RenzokuJump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 2, 2, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 2, 2, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
 #ifdef VERSION_G8ME01
 BattleWeapon badgeWeapon_TatsumakiJump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     243, // itemId
     NULL, // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapJump1, // hpDamageFn
     {0, 1, 1, 3, 2, 5, 243, 1}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1274,7 +1274,7 @@ BattleWeapon badgeWeapon_TatsumakiJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_tatsumaki_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -1285,24 +1285,24 @@ BattleWeapon badgeWeapon_TatsumakiJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_TatsumakiJump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_TatsumakiJump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     243, // itemId
     NULL, // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     3, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapJump1, // hpDamageFn
     {0, 1, 1, 3, 2, 5, 243, 1}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1311,7 +1311,7 @@ BattleWeapon badgeWeapon_TatsumakiJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_tatsumaki_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -1322,18 +1322,18 @@ BattleWeapon badgeWeapon_TatsumakiJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_TatsumakiJump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
 BattleWeapon badgeWeapon_TatsumakiJumpInvolved = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
-    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..reserved_1B
     weaponGetPowerTatsumaki, // hpDamageFn
     {0, 2, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1342,7 +1342,7 @@ BattleWeapon badgeWeapon_TatsumakiJumpInvolved = {
     0x20000010, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20040, // special
     0x7FF, // counterResistFlags
@@ -1352,25 +1352,25 @@ BattleWeapon badgeWeapon_TatsumakiJumpInvolved = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 #ifdef VERSION_G8ME01
 BattleWeapon badgeWeapon_MiniminiFumi = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     244, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1379,7 +1379,7 @@ BattleWeapon badgeWeapon_MiniminiFumi = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -1393,24 +1393,24 @@ BattleWeapon badgeWeapon_MiniminiFumi = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_MiniminiFumi, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 6, 5, 1, 1, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 6, 5, 1, 1, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_MiniminiFumi = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     244, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1419,7 +1419,7 @@ BattleWeapon badgeWeapon_MiniminiFumi = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -1433,26 +1433,26 @@ BattleWeapon badgeWeapon_MiniminiFumi = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_MiniminiFumi, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 3, 5, 1, 1, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 3, 5, 1, 1, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
 #ifdef VERSION_G8ME01
 BattleWeapon badgeWeapon_NemuraseFumi = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     245, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1461,7 +1461,7 @@ BattleWeapon badgeWeapon_NemuraseFumi = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -1474,24 +1474,24 @@ BattleWeapon badgeWeapon_NemuraseFumi = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeTime..fastTime
     0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_NemuraseFumi, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 6, 5, 1, 1, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 6, 5, 1, 1, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_NemuraseFumi = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     245, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1500,7 +1500,7 @@ BattleWeapon badgeWeapon_NemuraseFumi = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -1513,26 +1513,26 @@ BattleWeapon badgeWeapon_NemuraseFumi = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeTime..fastTime
     0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_NemuraseFumi, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 3, 5, 1, 1, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 3, 5, 1, 1, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
 #ifdef VERSION_G8ME01
 BattleWeapon badgeWeapon_FunyafunyaJump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     246, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1541,7 +1541,7 @@ BattleWeapon badgeWeapon_FunyafunyaJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -1556,24 +1556,24 @@ BattleWeapon badgeWeapon_FunyafunyaJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_FunyafunyaJump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 6, 5, 1, 1, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 6, 5, 1, 1, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_FunyafunyaJump = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     246, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1582,7 +1582,7 @@ BattleWeapon badgeWeapon_FunyafunyaJump = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jump", // acHelpMsg
     0x25807, // special
     0xC, // counterResistFlags
@@ -1597,25 +1597,25 @@ BattleWeapon badgeWeapon_FunyafunyaJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_FunyafunyaJump, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 3, 5, 1, 1, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 3, 5, 1, 1, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
 BattleWeapon badgeWeapon_GatsunHammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     247, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapHammer1, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 247, 2}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1624,7 +1624,7 @@ BattleWeapon badgeWeapon_GatsunHammer = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x20887, // special
     0x7FB, // counterResistFlags
@@ -1635,24 +1635,24 @@ BattleWeapon badgeWeapon_GatsunHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_GatsunHammer, // mAttackEvtScript
-    {0, 25, 25, 100, 25, 25, 25, 5, 25, 5, 0, 0}, // field_B4
+    {0, 25, 25, 100, 25, 25, 25, 5, 25, 5, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon badgeWeapon_DokanHammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     333, // itemId
     NULL, // description
     100, // baseAccuracy
     6, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapHammer1, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 333, 4}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1661,7 +1661,7 @@ BattleWeapon badgeWeapon_DokanHammer = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x20887, // special
     0x7FB, // counterResistFlags
@@ -1672,25 +1672,25 @@ BattleWeapon badgeWeapon_DokanHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_GatsunHammer, // mAttackEvtScript
-    {0, 25, 25, 100, 25, 5, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 25, 25, 100, 25, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 
 #ifdef VERSION_G8ME01
 BattleWeapon badgeWeapon_JishinHammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     248, // itemId
     NULL, // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapHammer1, // hpDamageFn
     {0xFFFFFFFF, 0, 0xFFFFFFFF, 0, 0xFFFFFFFF, 0, 248, 2}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1699,7 +1699,7 @@ BattleWeapon badgeWeapon_JishinHammer = {
     0x20000008, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x238C7, // special
     0x7FF, // counterResistFlags
@@ -1710,24 +1710,24 @@ BattleWeapon badgeWeapon_JishinHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_JishinHammer, // mAttackEvtScript
-    {0, 50, 50, 100, 50, 25, 25, 5, 25, 5, 0, 0}, // field_B4
+    {0, 50, 50, 100, 50, 25, 25, 5, 25, 5, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_JishinHammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     248, // itemId
     NULL, // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     2, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapHammer1, // hpDamageFn
     {0xFFFFFFFF, 0, 0xFFFFFFFF, 0, 0xFFFFFFFF, 0, 248, 2}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1736,7 +1736,7 @@ BattleWeapon badgeWeapon_JishinHammer = {
     0x20000008, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x238C7, // special
     0x7FF, // counterResistFlags
@@ -1747,25 +1747,25 @@ BattleWeapon badgeWeapon_JishinHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_JishinHammer, // mAttackEvtScript
-    {0, 50, 50, 100, 50, 25, 25, 5, 25, 5, 0, 0}, // field_B4
+    {0, 50, 50, 100, 50, 25, 25, 5, 25, 5, 0, 0}, // stageEffectRates
 };
 #endif
 
 BattleWeapon badgeWeapon_UltraJishinHammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     334, // itemId
     "msg_ultra_attack", // description
     100, // baseAccuracy
     7, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapHammer1, // hpDamageFn
     {3, 6, 3, 6, 3, 6, 334, 4}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1774,7 +1774,7 @@ BattleWeapon badgeWeapon_UltraJishinHammer = {
     0x20000008, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_ultra_jishin_hammer", // acHelpMsg
     0x238C7, // special
     0x7FF, // counterResistFlags
@@ -1785,24 +1785,24 @@ BattleWeapon badgeWeapon_UltraJishinHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_UltraJishinHammer, // mAttackEvtScript
-    {0, 50, 50, 100, 50, 5, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 50, 50, 100, 50, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon badgeWeapon_HammerNageru = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     249, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapHammer1, // hpDamageFn
     {0, 1, 1, 3, 2, 5, 249, 1}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1811,7 +1811,7 @@ BattleWeapon badgeWeapon_HammerNageru = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer_nageru", // acHelpMsg
     0x20887, // special
     0x7FF, // counterResistFlags
@@ -1822,25 +1822,25 @@ BattleWeapon badgeWeapon_HammerNageru = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_HammerNageru, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 #ifdef VERSION_G8ME01
 BattleWeapon badgeWeapon_TsuranukiNaguri = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     250, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1849,7 +1849,7 @@ BattleWeapon badgeWeapon_TsuranukiNaguri = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x208C7, // special
     0x7FB, // counterResistFlags
@@ -1860,24 +1860,24 @@ BattleWeapon badgeWeapon_TsuranukiNaguri = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_TsuranukiHammer, // mAttackEvtScript
-    {0, 25, 25, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 25, 25, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_TsuranukiNaguri = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     250, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1886,7 +1886,7 @@ BattleWeapon badgeWeapon_TsuranukiNaguri = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x208C7, // special
     0x7FB, // counterResistFlags
@@ -1897,26 +1897,26 @@ BattleWeapon badgeWeapon_TsuranukiNaguri = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_TsuranukiHammer, // mAttackEvtScript
-    {0, 25, 25, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 25, 25, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #endif
 
 #ifdef VERSION_G8ME01
 BattleWeapon badgeWeapon_ConfuseHammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     251, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1925,7 +1925,7 @@ BattleWeapon badgeWeapon_ConfuseHammer = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x20887, // special
     0x7FB, // counterResistFlags
@@ -1939,24 +1939,24 @@ BattleWeapon badgeWeapon_ConfuseHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_NormalHammer, // mAttackEvtScript
-    {0, 5, 5, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 5, 5, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_ConfuseHammer = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     251, // itemId
     NULL, // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1965,7 +1965,7 @@ BattleWeapon badgeWeapon_ConfuseHammer = {
     0x21002000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x20887, // special
     0x7FB, // counterResistFlags
@@ -1979,26 +1979,26 @@ BattleWeapon badgeWeapon_ConfuseHammer = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_NormalHammer, // mAttackEvtScript
-    {0, 5, 5, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 5, 5, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #endif
 
 #ifdef VERSION_G8ME01
 BattleWeapon badgeWeapon_FireNaguri = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     252, // itemId
     NULL, // description
     100, // baseAccuracy
     5, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapHammer1, // hpDamageFn
     {0xFFFFFFFF, 3, 0, 3, 1, 3, 252, 2}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2008,7 +2008,7 @@ BattleWeapon badgeWeapon_FireNaguri = {
     1, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_fire_naguri", // acHelpMsg
     0x20867, // special
     0x7FF, // counterResistFlags
@@ -2021,24 +2021,24 @@ BattleWeapon badgeWeapon_FireNaguri = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_FireNaguri, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_FireNaguri = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     252, // itemId
     NULL, // description
     100, // baseAccuracy
     5, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     2, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerOverlapHammer1, // hpDamageFn
     {0xFFFFFFFF, 3, 0, 3, 1, 3, 252, 2}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2048,7 +2048,7 @@ BattleWeapon badgeWeapon_FireNaguri = {
     1, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_fire_naguri", // acHelpMsg
     0x20867, // special
     0x7FF, // counterResistFlags
@@ -2061,26 +2061,26 @@ BattleWeapon badgeWeapon_FireNaguri = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_FireNaguri, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #endif
 
 #ifdef VERSION_G8ME01
 BattleWeapon badgeWeapon_FireNaguriFailed = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     252, // itemId
     NULL, // description
     100, // baseAccuracy
     5, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     1, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 5, 2, 5, 3, 5, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2090,7 +2090,7 @@ BattleWeapon badgeWeapon_FireNaguriFailed = {
     1, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20007, // special
     0x7FF, // counterResistFlags
@@ -2103,24 +2103,24 @@ BattleWeapon badgeWeapon_FireNaguriFailed = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_FireNaguri, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_FireNaguriFailed = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     252, // itemId
     NULL, // description
     100, // baseAccuracy
     5, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     2, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     1, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 5, 2, 5, 3, 5, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2130,7 +2130,7 @@ BattleWeapon badgeWeapon_FireNaguriFailed = {
     1, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20007, // special
     0x7FF, // counterResistFlags
@@ -2143,26 +2143,26 @@ BattleWeapon badgeWeapon_FireNaguriFailed = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_FireNaguri, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #endif
 
 #ifdef VERSION_G8ME01
 BattleWeapon badgeWeapon_IceNaguri = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     253, // itemId
     NULL, // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2172,7 +2172,7 @@ BattleWeapon badgeWeapon_IceNaguri = {
     2, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x20807, // special
     0x7FB, // counterResistFlags
@@ -2186,24 +2186,24 @@ BattleWeapon badgeWeapon_IceNaguri = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_IceNaguri, // mAttackEvtScript
-    {0, 5, 5, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 5, 5, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_IceNaguri = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     253, // itemId
     NULL, // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2213,7 +2213,7 @@ BattleWeapon badgeWeapon_IceNaguri = {
     2, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_hammer", // acHelpMsg
     0x20807, // special
     0x7FB, // counterResistFlags
@@ -2227,9 +2227,9 @@ BattleWeapon badgeWeapon_IceNaguri = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_IceNaguri, // mAttackEvtScript
-    {0, 5, 5, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 5, 5, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -2237,17 +2237,17 @@ BattleWeapon badgeWeapon_IceNaguri = {
 BattleWeapon badgeWeapon_Charge = {
     "btl_wn_mario_normal_charge", // name
     167, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     256, // itemId
     "btl_hlp_cmd_operation_charge", // description
     100, // baseAccuracy
     1, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2256,7 +2256,7 @@ BattleWeapon badgeWeapon_Charge = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20108, // special
     0x7FF, // counterResistFlags
@@ -2268,25 +2268,25 @@ BattleWeapon badgeWeapon_Charge = {
     2, // chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_NormalCharge, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_Charge = {
     "btl_wn_mario_normal_charge", // name
     159, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     256, // itemId
     "btl_hlp_cmd_operation_charge", // description
     100, // baseAccuracy
     1, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2295,7 +2295,7 @@ BattleWeapon badgeWeapon_Charge = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20108, // special
     0x7FF, // counterResistFlags
@@ -2307,9 +2307,9 @@ BattleWeapon badgeWeapon_Charge = {
     2, // chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_NormalCharge, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -2317,17 +2317,17 @@ BattleWeapon badgeWeapon_Charge = {
 BattleWeapon badgeWeapon_ChargeP = {
     "btl_wn_mario_normal_charge", // name
     167, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     257, // itemId
     "btl_hlp_cmd_operation_charge", // description
     100, // baseAccuracy
     1, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2336,7 +2336,7 @@ BattleWeapon badgeWeapon_ChargeP = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20108, // special
     0x7FF, // counterResistFlags
@@ -2348,25 +2348,25 @@ BattleWeapon badgeWeapon_ChargeP = {
     2, // chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_NormalChargeP, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_ChargeP = {
     "btl_wn_mario_normal_charge", // name
     159, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     257, // itemId
     "btl_hlp_cmd_operation_charge", // description
     100, // baseAccuracy
     1, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2375,7 +2375,7 @@ BattleWeapon badgeWeapon_ChargeP = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20108, // special
     0x7FF, // counterResistFlags
@@ -2387,9 +2387,9 @@ BattleWeapon badgeWeapon_ChargeP = {
     2, // chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_NormalChargeP, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -2397,17 +2397,17 @@ BattleWeapon badgeWeapon_ChargeP = {
 BattleWeapon badgeWeapon_SuperCharge = {
     "btl_wn_mario_super_charge", // name
     167, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     337, // itemId
     "btl_hlp_cmd_operation_super_charge", // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2416,7 +2416,7 @@ BattleWeapon badgeWeapon_SuperCharge = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20108, // special
     0x7FF, // counterResistFlags
@@ -2428,25 +2428,25 @@ BattleWeapon badgeWeapon_SuperCharge = {
     2, // chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_SuperCharge, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_SuperCharge = {
     "btl_wn_mario_super_charge", // name
     159, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     337, // itemId
     "btl_hlp_cmd_operation_super_charge", // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2455,7 +2455,7 @@ BattleWeapon badgeWeapon_SuperCharge = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20108, // special
     0x7FF, // counterResistFlags
@@ -2467,9 +2467,9 @@ BattleWeapon badgeWeapon_SuperCharge = {
     2, // chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_SuperCharge, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -2477,17 +2477,17 @@ BattleWeapon badgeWeapon_SuperCharge = {
 BattleWeapon badgeWeapon_SuperChargeP = {
     "btl_wn_mario_super_charge", // name
     167, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     338, // itemId
     "btl_hlp_cmd_operation_super_charge", // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2496,7 +2496,7 @@ BattleWeapon badgeWeapon_SuperChargeP = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20108, // special
     0x7FF, // counterResistFlags
@@ -2508,25 +2508,25 @@ BattleWeapon badgeWeapon_SuperChargeP = {
     2, // chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_SuperChargeP, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon badgeWeapon_SuperChargeP = {
     "btl_wn_mario_super_charge", // name
     159, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     338, // itemId
     "btl_hlp_cmd_operation_super_charge", // description
     100, // baseAccuracy
     2, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2535,7 +2535,7 @@ BattleWeapon badgeWeapon_SuperChargeP = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20108, // special
     0x7FF, // counterResistFlags
@@ -2547,16 +2547,16 @@ BattleWeapon badgeWeapon_SuperChargeP = {
     2, // chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_SuperChargeP, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
 BattleWeapon badgeWeapon_2KaiItem = {
     "btl_wn_2kai_item", // name
     0, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     254, // itemId
     NULL, // description
     100, // baseAccuracy
@@ -2569,7 +2569,7 @@ BattleWeapon badgeWeapon_2KaiItem = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20108, // special
     0x7FF, // counterResistFlags
@@ -2580,15 +2580,15 @@ BattleWeapon badgeWeapon_2KaiItem = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon badgeWeapon_3KaiItem = {
     "btl_wn_3kai_item", // name
     0, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     329, // itemId
     NULL, // description
     100, // baseAccuracy
@@ -2601,7 +2601,7 @@ BattleWeapon badgeWeapon_3KaiItem = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20108, // special
     0x7FF, // counterResistFlags
@@ -2612,18 +2612,18 @@ BattleWeapon badgeWeapon_3KaiItem = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon badgeWeapon_DefenceCommand = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     335, // itemId
     NULL, // description
     100, // baseAccuracy
-    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2632,7 +2632,7 @@ BattleWeapon badgeWeapon_DefenceCommand = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -2647,18 +2647,18 @@ BattleWeapon badgeWeapon_DefenceCommand = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon badgeWeapon_DefenceCommandP = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     336, // itemId
     NULL, // description
     100, // baseAccuracy
-    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2667,7 +2667,7 @@ BattleWeapon badgeWeapon_DefenceCommandP = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -2682,27 +2682,27 @@ BattleWeapon badgeWeapon_DefenceCommandP = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 #ifdef VERSION_G8ME01
 BattleWeapon marioWeapon_BakuGame = {
     "btl_wn_sac_bakugame", // name
     416, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_bakugame", // description
     100, // baseAccuracy
     0, // baseFpCost
     2, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2711,7 +2711,7 @@ BattleWeapon marioWeapon_BakuGame = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_3", // acHelpMsg
     0x20088, // special
     0x7FF, // counterResistFlags
@@ -2724,26 +2724,26 @@ BattleWeapon marioWeapon_BakuGame = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_BakuGame, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_BakuGame = {
     "btl_wn_sac_bakugame", // name
     408, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_bakugame", // description
     100, // baseAccuracy
     0, // baseFpCost
     2, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2752,7 +2752,7 @@ BattleWeapon marioWeapon_BakuGame = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_3", // acHelpMsg
     0x20088, // special
     0x7FF, // counterResistFlags
@@ -2765,9 +2765,9 @@ BattleWeapon marioWeapon_BakuGame = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_BakuGame, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -2775,18 +2775,18 @@ BattleWeapon marioWeapon_BakuGame = {
 BattleWeapon marioWeapon_Scissor = {
     "btl_wn_sac_scissor", // name
     420, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_scissor", // description
     100, // baseAccuracy
     0, // baseFpCost
     4, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPower_Scissor, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2795,7 +2795,7 @@ BattleWeapon marioWeapon_Scissor = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_5", // acHelpMsg
     0x200C8, // special
     0x7FF, // counterResistFlags
@@ -2805,26 +2805,26 @@ BattleWeapon marioWeapon_Scissor = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Scissor, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_Scissor = {
     "btl_wn_sac_scissor", // name
     412, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_scissor", // description
     100, // baseAccuracy
     0, // baseFpCost
     4, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPower_Scissor, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2833,7 +2833,7 @@ BattleWeapon marioWeapon_Scissor = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_5", // acHelpMsg
     0x200C8, // special
     0x7FF, // counterResistFlags
@@ -2843,9 +2843,9 @@ BattleWeapon marioWeapon_Scissor = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Scissor, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -2853,18 +2853,18 @@ BattleWeapon marioWeapon_Scissor = {
 BattleWeapon marioWeapon_ZubaStar = {
     "btl_wn_sac_zubastar", // name
     419, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_zubastar", // description
     100, // baseAccuracy
     0, // baseFpCost
     6, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPower_ZubaStar, // hpDamageFn
     {0, 3, 6, 9, 12, 15, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2873,7 +2873,7 @@ BattleWeapon marioWeapon_ZubaStar = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_8", // acHelpMsg
     0x200C8, // special
     0x7FF, // counterResistFlags
@@ -2883,26 +2883,26 @@ BattleWeapon marioWeapon_ZubaStar = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_ZubaStar, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_ZubaStar = {
     "btl_wn_sac_zubastar", // name
     411, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_zubastar", // description
     100, // baseAccuracy
     0, // baseFpCost
     6, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPower_ZubaStar, // hpDamageFn
     {0, 3, 6, 9, 12, 15, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2911,7 +2911,7 @@ BattleWeapon marioWeapon_ZubaStar = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_8", // acHelpMsg
     0x200C8, // special
     0x7FF, // counterResistFlags
@@ -2921,9 +2921,9 @@ BattleWeapon marioWeapon_ZubaStar = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_ZubaStar, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -2931,18 +2931,18 @@ BattleWeapon marioWeapon_ZubaStar = {
 BattleWeapon marioWeapon_Genki0 = {
     "btl_wn_sac_genki0", // name
     313, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_genkigenki", // description
     100, // baseAccuracy
     0, // baseFpCost
     1, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2951,7 +2951,7 @@ BattleWeapon marioWeapon_Genki0 = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_1", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -2961,26 +2961,26 @@ BattleWeapon marioWeapon_Genki0 = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Genki0, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_Genki0 = {
     "btl_wn_sac_genki0", // name
     305, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_genkigenki", // description
     100, // baseAccuracy
     0, // baseFpCost
     1, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2989,7 +2989,7 @@ BattleWeapon marioWeapon_Genki0 = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_1", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -2999,9 +2999,9 @@ BattleWeapon marioWeapon_Genki0 = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Genki0, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -3009,18 +3009,18 @@ BattleWeapon marioWeapon_Genki0 = {
 BattleWeapon marioWeapon_Genki1 = {
     "btl_wn_sac_genki1", // name
     421, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_super_genki", // description
     100, // baseAccuracy
     0, // baseFpCost
     5, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3029,7 +3029,7 @@ BattleWeapon marioWeapon_Genki1 = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_6", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -3039,26 +3039,26 @@ BattleWeapon marioWeapon_Genki1 = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Genki1, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_Genki1 = {
     "btl_wn_sac_genki1", // name
     413, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_super_genki", // description
     100, // baseAccuracy
     0, // baseFpCost
     5, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3067,7 +3067,7 @@ BattleWeapon marioWeapon_Genki1 = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_6", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -3077,9 +3077,9 @@ BattleWeapon marioWeapon_Genki1 = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Genki1, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -3087,18 +3087,18 @@ BattleWeapon marioWeapon_Genki1 = {
 BattleWeapon marioWeapon_Deka = {
     "btl_wn_sac_dekkaku_dokkan", // name
     415, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_dekkaku_dokkan", // description
     100, // baseAccuracy
     0, // baseFpCost
     2, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPower_Deka, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3107,7 +3107,7 @@ BattleWeapon marioWeapon_Deka = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_2", // acHelpMsg
     0x200C8, // special
     0x7FF, // counterResistFlags
@@ -3117,26 +3117,26 @@ BattleWeapon marioWeapon_Deka = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Deka, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_Deka = {
     "btl_wn_sac_dekkaku_dokkan", // name
     407, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_dekkaku_dokkan", // description
     100, // baseAccuracy
     0, // baseFpCost
     2, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPower_Deka, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3145,7 +3145,7 @@ BattleWeapon marioWeapon_Deka = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_2", // acHelpMsg
     0x200C8, // special
     0x7FF, // counterResistFlags
@@ -3155,9 +3155,9 @@ BattleWeapon marioWeapon_Deka = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Deka, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -3165,18 +3165,18 @@ BattleWeapon marioWeapon_Deka = {
 BattleWeapon marioWeapon_Muki = {
     "btl_wn_sac_mukimuki_body", // name
     418, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_mukimuki_body", // description
     100, // baseAccuracy
     0, // baseFpCost
     3, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3185,7 +3185,7 @@ BattleWeapon marioWeapon_Muki = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_4", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -3195,26 +3195,26 @@ BattleWeapon marioWeapon_Muki = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Muki, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_Muki = {
     "btl_wn_sac_mukimuki_body", // name
     410, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_mukimuki_body", // description
     100, // baseAccuracy
     0, // baseFpCost
     3, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3223,7 +3223,7 @@ BattleWeapon marioWeapon_Muki = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_4", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -3233,9 +3233,9 @@ BattleWeapon marioWeapon_Muki = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Muki, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -3243,18 +3243,18 @@ BattleWeapon marioWeapon_Muki = {
 BattleWeapon marioWeapon_Suki = {
     "btl_wn_sac_sukkari_sukkiri", // name
     417, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_sukkari_sukkiri", // description
     100, // baseAccuracy
     0, // baseFpCost
     2, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3263,7 +3263,7 @@ BattleWeapon marioWeapon_Suki = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_7", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -3274,26 +3274,26 @@ BattleWeapon marioWeapon_Suki = {
     100, // ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Suki, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #else
 BattleWeapon marioWeapon_Suki = {
     "btl_wn_sac_sukkari_sukkiri", // name
     409, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_sukkari_sukkiri", // description
     100, // baseAccuracy
     0, // baseFpCost
     2, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3302,7 +3302,7 @@ BattleWeapon marioWeapon_Suki = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_7", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -3313,9 +3313,9 @@ BattleWeapon marioWeapon_Suki = {
     100, // ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Suki, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 #endif
 
@@ -10312,7 +10312,6 @@ EVT_END()
 
 
 
-#define BW(wp, off, T) (*(T*)((u8*)(wp) + BWOFF(off)))
 
 static USER_FUNC(_get_mario_hammer_lv) {
     s32 ret = *event->args;
@@ -10381,7 +10380,7 @@ USER_FUNC(_jump_star_effect) {
 
 USER_FUNC(_bgset_iron_frame_check) {
     s32 ret = *event->args;
-    if (*((u8*)_battleWorkPointer + BWOFF(0x180DC)) & 0x20) {
+    if (_battleWorkPointer->stageObjectWork.flags & 0x20) {
         evtSetValue(event, ret, 0);
     } else {
         evtSetValue(event, ret, 1);
@@ -10459,9 +10458,9 @@ USER_FUNC(_tatsumaki_effect) {
 
 USER_FUNC(_record_renzoku_count) {
     s32 n = evtGetValue(event, *event->args);
-    u8* base = (u8*)_battleWorkPointer + 0x10000;
+    BattleActRecord* rec = &_battleWorkPointer->actRecord;
     PouchData* pouch = pouchGetPtr();
-    if (n > *(u8*)(base + BWOFF(0x16F24) - 0x10000)) {
+    if (n > rec->powerBounceCombo) {
         if (n > pouch->mPowerBounceRecord) {
             pouch->mPowerBounceRecord = n;
             BattleAudience_Case_JumpNewRecord();
@@ -10469,7 +10468,7 @@ USER_FUNC(_record_renzoku_count) {
         if (n > 100) {
             n = 100;
         }
-        *(u8*)(base + BWOFF(0x16F24) - 0x10000) = n;
+        rec->powerBounceCombo = n;
     }
     return EVT_RETURN_DONE;
 }
@@ -10486,7 +10485,7 @@ USER_FUNC(mario_get_renzoku_count_max) {
         evtSetValue(event, ret, 0);
         return EVT_RETURN_DONE;
     }
-    max = *(u16*)((u8*)unit->mKindParams + 0x14);
+    max = unit->mKindParams->pbSoftCap;
     if (count < max) {
         evtSetValue(event, ret, max);
         return EVT_RETURN_DONE;
@@ -10623,7 +10622,7 @@ USER_FUNC(_majinai_powerup_check) {
         evtSetValue(event, ret, 0);
     } else {
         evtSetValue(event, ret, 1);
-        *((u8*)wp + BWOFF(0x18FE1)) = 1;
+        wp->majinaiState = 1;
         BattleMajinaiDone();
         BattleMajinaiEndCheck();
     }

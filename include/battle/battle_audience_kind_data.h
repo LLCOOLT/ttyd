@@ -32,14 +32,14 @@ typedef struct BattleAudienceAnimTable {
 } BattleAudienceAnimTable; */
 
 typedef struct BattleAudienceKind {
-    u8 field_0x0;                      // 0x0, some flag in BattleAudienceSettingAudience
+    u8 flags;                          // 0x0, 1: counts double in the audience-type weights
     s32** animTable;                   // 0x4
     BattleAudienceItemKind* itemTable; // 0x8
-    f32 field_0xC;                     // 0xC, offsetX?
-    f32 field_0x10;                    // 0x10, offsetY?
-    f32 field_0x14;                    // 0x14, itemChance?
-    f32 field_0x18;                    // 0x18, scaleX?
-    f32 field_0x1C;                    // 0x1C, scaleY?
+    f32 itemOffsetX;                   // 0xC, thrown-item spawn offset from the member
+    f32 itemOffsetY;                   // 0x10, thrown-item spawn offset from the member
+    f32 spWeight;                      // 0x14, star power per member of this kind (summed, then sqrt)
+    f32 texScaleX;                     // 0x18, member quad scale per 64 texels
+    f32 texScaleY;                     // 0x1C, member quad scale per 64 texels
 } BattleAudienceKind;
 
 extern BattleAudienceKind audience_kind[];

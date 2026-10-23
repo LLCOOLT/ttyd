@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "driver/msgdrv.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_item.h"
 #include "evt/evt_npc.h"
@@ -1465,11 +1466,7 @@ EVT_BEGIN(tou_05_init_evt)
 EVT_END()
 
 void gans_msg_callback(s32 type, void** work) {
-#ifdef VERSION_G8ME01
-    EventEntry* evt = *(EventEntry**)((u8*)*work + 0xF200);
-#else
-    EventEntry* evt = *(EventEntry**)((u8*)*work + 0x7A00);
-#endif
+    EventEntry* evt = ((MsgWinData*)*work)->event;
     if (type == 2) {
         evtSetValue(evt, GW(10), evtGetValue(evt, GW(10)) + 1);
     }

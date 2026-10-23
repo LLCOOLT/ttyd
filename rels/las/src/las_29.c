@@ -1,3 +1,4 @@
+#include "eff/eff_starstone.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -831,7 +832,7 @@ static USER_FUNC(starstone_entry) {
         sprintf(name, "starstone%d", i);
         eff = effStarStoneEntry(i, r * c + x, y, r * s + z, 1.0f);
         effSetName(eff, name);
-        *(u16*)((u8*)eff->userdata + 4) &= ~4;
+        ((EffStarStoneWork*)eff->userdata)->flags &= ~4;
     }
     return EVT_RETURN_DONE;
 }

@@ -458,10 +458,10 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_CookingItem = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
-    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -470,7 +470,7 @@ BattleWeapon ItemWeaponData_CookingItem = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30008, // special
     0x7FF, // counterResistFlags
@@ -481,23 +481,23 @@ BattleWeapon ItemWeaponData_CookingItem = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Recovery, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Kinoko = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     148, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -506,7 +506,7 @@ BattleWeapon ItemWeaponData_Kinoko = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30148, // special
     0x7FF, // counterResistFlags
@@ -517,23 +517,23 @@ BattleWeapon ItemWeaponData_Kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Recovery, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Kinkyuu_Kinoko = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     151, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -542,7 +542,7 @@ BattleWeapon ItemWeaponData_Kinkyuu_Kinoko = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30148, // special
     0x7FF, // counterResistFlags
@@ -553,23 +553,23 @@ BattleWeapon ItemWeaponData_Kinkyuu_Kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Recovery, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Super_Kinoko = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     149, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -578,7 +578,7 @@ BattleWeapon ItemWeaponData_Super_Kinoko = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30148, // special
     0x7FF, // counterResistFlags
@@ -589,23 +589,23 @@ BattleWeapon ItemWeaponData_Super_Kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Recovery, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Ultra_Kinoko = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     150, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -614,7 +614,7 @@ BattleWeapon ItemWeaponData_Ultra_Kinoko = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30148, // special
     0x7FF, // counterResistFlags
@@ -625,23 +625,23 @@ BattleWeapon ItemWeaponData_Ultra_Kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Recovery, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Sinabita_Kinoko = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     152, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -650,7 +650,7 @@ BattleWeapon ItemWeaponData_Sinabita_Kinoko = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30148, // special
     0x7FF, // counterResistFlags
@@ -661,23 +661,23 @@ BattleWeapon ItemWeaponData_Sinabita_Kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Recovery, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Honey_Syrup = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     154, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -686,7 +686,7 @@ BattleWeapon ItemWeaponData_Honey_Syrup = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30148, // special
     0x7FF, // counterResistFlags
@@ -697,23 +697,23 @@ BattleWeapon ItemWeaponData_Honey_Syrup = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Recovery, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Maple_Syrup = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     155, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -722,7 +722,7 @@ BattleWeapon ItemWeaponData_Maple_Syrup = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30148, // special
     0x7FF, // counterResistFlags
@@ -733,23 +733,23 @@ BattleWeapon ItemWeaponData_Maple_Syrup = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Recovery, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Royal_Jelly = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     156, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -758,7 +758,7 @@ BattleWeapon ItemWeaponData_Royal_Jelly = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30148, // special
     0x7FF, // counterResistFlags
@@ -769,23 +769,23 @@ BattleWeapon ItemWeaponData_Royal_Jelly = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Recovery, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Tankobu = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     165, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -794,7 +794,7 @@ BattleWeapon ItemWeaponData_Tankobu = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30148, // special
     0x7FF, // counterResistFlags
@@ -805,9 +805,9 @@ BattleWeapon ItemWeaponData_Tankobu = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Recovery, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Pow_Block)
@@ -922,16 +922,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Pow_Block = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     139, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -940,7 +940,7 @@ BattleWeapon ItemWeaponData_Pow_Block = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x33040, // special
     0x7FF, // counterResistFlags
@@ -951,9 +951,9 @@ BattleWeapon ItemWeaponData_Pow_Block = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Pow_Block, // mAttackEvtScript
-    {0, 100, 100, 100, 75, 10, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 100, 100, 100, 75, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Fire_Flower_Core)
@@ -1031,16 +1031,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Fire_Flower = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     132, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1050,7 +1050,7 @@ BattleWeapon ItemWeaponData_Fire_Flower = {
     1, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30040, // special
     0x7FF, // counterResistFlags
@@ -1061,9 +1061,9 @@ BattleWeapon ItemWeaponData_Fire_Flower = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Fire_Flower, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Kaminari_Core)
@@ -1159,16 +1159,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Kaminari_Dokkan = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     129, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1178,7 +1178,7 @@ BattleWeapon ItemWeaponData_Kaminari_Dokkan = {
     4, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30040, // special
     0x7FF, // counterResistFlags
@@ -1189,23 +1189,23 @@ BattleWeapon ItemWeaponData_Kaminari_Dokkan = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Kaminari_Dokkan, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Kaminari_Gorogoro = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     128, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1215,7 +1215,7 @@ BattleWeapon ItemWeaponData_Kaminari_Gorogoro = {
     4, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30040, // special
     0x7FF, // counterResistFlags
@@ -1226,9 +1226,9 @@ BattleWeapon ItemWeaponData_Kaminari_Gorogoro = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Kaminari_Gorogoro, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
@@ -1384,16 +1384,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Kirakira_Otoshi = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     130, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1402,7 +1402,7 @@ BattleWeapon ItemWeaponData_Kirakira_Otoshi = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30040, // special
     0x7FF, // counterResistFlags
@@ -1413,9 +1413,9 @@ BattleWeapon ItemWeaponData_Kirakira_Otoshi = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Kirakira_Otoshi, // mAttackEvtScript
-    {0, 10, 10, 100, 10, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 10, 10, 100, 10, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Koorino_Ibuki)
@@ -1509,16 +1509,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Koorino_Ibuki = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     131, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1528,7 +1528,7 @@ BattleWeapon ItemWeaponData_Koorino_Ibuki = {
     2, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30040, // special
     0x7FF, // counterResistFlags
@@ -1542,9 +1542,9 @@ BattleWeapon ItemWeaponData_Koorino_Ibuki = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Koorino_Ibuki, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Yurayura_Jishin)
@@ -1640,16 +1640,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Yurayura_Jishin = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     133, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1658,7 +1658,7 @@ BattleWeapon ItemWeaponData_Yurayura_Jishin = {
     0x20000008, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30040, // special
     0x7FF, // counterResistFlags
@@ -1669,9 +1669,9 @@ BattleWeapon ItemWeaponData_Yurayura_Jishin = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Yurayura_Jishin, // mAttackEvtScript
-    {0, 100, 100, 100, 75, 10, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 100, 100, 100, 75, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Teresano_Fuku)
@@ -1750,16 +1750,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Teresano_Fuku = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     134, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1768,7 +1768,7 @@ BattleWeapon ItemWeaponData_Teresano_Fuku = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -1781,9 +1781,9 @@ BattleWeapon ItemWeaponData_Teresano_Fuku = {
     100, // invisibleChance
     2, // invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Teresano_Fuku, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Biribiri_Kinoko_Core)
@@ -1806,16 +1806,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Biribiri_Kinoko = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     135, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1824,7 +1824,7 @@ BattleWeapon ItemWeaponData_Biribiri_Kinoko = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -1838,9 +1838,9 @@ BattleWeapon ItemWeaponData_Biribiri_Kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicTime..frightChance
     0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
     0, // fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Biribiri_Kinoko, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Teki_Yokeeru_Core)
@@ -1863,16 +1863,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Teki_Yokeeru = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     136, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1881,7 +1881,7 @@ BattleWeapon ItemWeaponData_Teki_Yokeeru = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -1894,23 +1894,23 @@ BattleWeapon ItemWeaponData_Teki_Yokeeru = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Teki_Yokeeru, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Madowaseno_Kona = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     137, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -1919,7 +1919,7 @@ BattleWeapon ItemWeaponData_Madowaseno_Kona = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30000, // special
     0x7FF, // counterResistFlags
@@ -1933,9 +1933,9 @@ BattleWeapon ItemWeaponData_Madowaseno_Kona = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Madowaseno_Kona, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 #ifdef VERSION_G8ME01
@@ -1985,16 +1985,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Nemure_Yoikoyo = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     138, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2003,7 +2003,7 @@ BattleWeapon ItemWeaponData_Nemure_Yoikoyo = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30000, // special
     0x7FF, // counterResistFlags
@@ -2016,9 +2016,9 @@ BattleWeapon ItemWeaponData_Nemure_Yoikoyo = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeTime..fastTime
     0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Nemure_Yoikoyo, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Stop_Watch_Core)
@@ -2089,16 +2089,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Stop_Watch = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     140, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2107,7 +2107,7 @@ BattleWeapon ItemWeaponData_Stop_Watch = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30000, // special
     0x7FF, // counterResistFlags
@@ -2121,9 +2121,9 @@ BattleWeapon ItemWeaponData_Stop_Watch = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Stop_Watch, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Guruguru_Memawashi)
@@ -2146,16 +2146,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Guruguru_Memawashi = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     141, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2164,7 +2164,7 @@ BattleWeapon ItemWeaponData_Guruguru_Memawashi = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30000, // special
     0x7FF, // counterResistFlags
@@ -2177,23 +2177,23 @@ BattleWeapon ItemWeaponData_Guruguru_Memawashi = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Guruguru_Memawashi, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Dekadeka_Drink = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     142, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2202,7 +2202,7 @@ BattleWeapon ItemWeaponData_Dekadeka_Drink = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -2216,23 +2216,23 @@ BattleWeapon ItemWeaponData_Dekadeka_Drink = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Dekadeka_Drink, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Katikati_Koura = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     143, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2241,7 +2241,7 @@ BattleWeapon ItemWeaponData_Katikati_Koura = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -2256,9 +2256,9 @@ BattleWeapon ItemWeaponData_Katikati_Koura = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Katikati_Koura, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Suitooru)
@@ -2346,16 +2346,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Suitooru = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     144, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2364,7 +2364,7 @@ BattleWeapon ItemWeaponData_Suitooru = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30140, // special
     0x7FF, // counterResistFlags
@@ -2375,9 +2375,9 @@ BattleWeapon ItemWeaponData_Suitooru = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Suitooru, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Teki_Kyouka)
@@ -2451,16 +2451,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Teki_Kyouka = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     145, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2469,7 +2469,7 @@ BattleWeapon ItemWeaponData_Teki_Kyouka = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -2480,23 +2480,23 @@ BattleWeapon ItemWeaponData_Teki_Kyouka = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Teki_Kyouka, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Minimini_Kun = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     146, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2505,7 +2505,7 @@ BattleWeapon ItemWeaponData_Minimini_Kun = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30000, // special
     0x7FF, // counterResistFlags
@@ -2519,23 +2519,23 @@ BattleWeapon ItemWeaponData_Minimini_Kun = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Minimini_Kun, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Funyafunya_Kun = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     147, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2544,7 +2544,7 @@ BattleWeapon ItemWeaponData_Funyafunya_Kun = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30000, // special
     0x7FF, // counterResistFlags
@@ -2559,23 +2559,23 @@ BattleWeapon ItemWeaponData_Funyafunya_Kun = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Funyafunya_Kun, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Sukkiri_Drink = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     153, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2584,7 +2584,7 @@ BattleWeapon ItemWeaponData_Sukkiri_Drink = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -2612,9 +2612,9 @@ BattleWeapon ItemWeaponData_Sukkiri_Drink = {
     100, // slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Sukkiri_Drink, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Jiwajiwa_Kinoko_Core)
@@ -2637,16 +2637,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     157, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2655,7 +2655,7 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -2669,9 +2669,9 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko = {
     10, // hpRegenTime
     2, // hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Jiwajiwa_Kinoko, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Jiwajiwa_Syrup_Core)
@@ -2694,16 +2694,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Jiwajiwa_Syrup = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     158, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2712,7 +2712,7 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Syrup = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -2725,9 +2725,9 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Syrup = {
     0, 0, 0, 0, // invisibleChance..hpRegenStrength
     10, // fpRegenTime
     2, // fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Jiwajiwa_Syrup, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Irekaeeru)
@@ -2781,16 +2781,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Irekaeeru = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     161, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2800,7 +2800,7 @@ BattleWeapon ItemWeaponData_Irekaeeru = {
     0, // element
     27, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -2811,9 +2811,9 @@ BattleWeapon ItemWeaponData_Irekaeeru = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Irekaeeru, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Attiike_Shisshi)
@@ -2861,16 +2861,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Attiike_Shisshi = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     162, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2879,7 +2879,7 @@ BattleWeapon ItemWeaponData_Attiike_Shisshi = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30000, // special
     0x7FF, // counterResistFlags
@@ -2892,9 +2892,9 @@ BattleWeapon ItemWeaponData_Attiike_Shisshi = {
     100, // frightChance
     0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
     0, // fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Attiike_Shisshi, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Naniga_Okorukana)
@@ -2988,16 +2988,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_Naniga_Okorukana = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     163, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3006,7 +3006,7 @@ BattleWeapon ItemWeaponData_Naniga_Okorukana = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3017,9 +3017,9 @@ BattleWeapon ItemWeaponData_Naniga_Okorukana = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Naniga_Okorukana, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 s32 R_mystery_item_table[] = {
@@ -3029,16 +3029,16 @@ s32 R_mystery_item_table[] = {
 
 BattleWeapon ItemWeaponData_Shikaeshino_Kona = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     177, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3047,7 +3047,7 @@ BattleWeapon ItemWeaponData_Shikaeshino_Kona = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3059,23 +3059,23 @@ BattleWeapon ItemWeaponData_Shikaeshino_Kona = {
     0, 0, 0, 0, 0, 0, // fastChance..galeForceChance
     3, // paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Shikaeshino_Kona, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_Kameno_Noroi = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     178, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3084,7 +3084,7 @@ BattleWeapon ItemWeaponData_Kameno_Noroi = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30008, // special
     0x7FF, // counterResistFlags
@@ -3098,9 +3098,9 @@ BattleWeapon ItemWeaponData_Kameno_Noroi = {
     3, // slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Kameno_Noroi, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_RecoveryAndStatus)
@@ -3186,16 +3186,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_SpaceFood = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     198, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3204,7 +3204,7 @@ BattleWeapon ItemWeaponData_SpaceFood = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3217,23 +3217,23 @@ BattleWeapon ItemWeaponData_SpaceFood = {
     3, // allergicTime
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_IceCandy = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     199, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3242,7 +3242,7 @@ BattleWeapon ItemWeaponData_IceCandy = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3256,23 +3256,23 @@ BattleWeapon ItemWeaponData_IceCandy = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_NancyFrappe = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     200, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3281,7 +3281,7 @@ BattleWeapon ItemWeaponData_NancyFrappe = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3295,23 +3295,23 @@ BattleWeapon ItemWeaponData_NancyFrappe = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_SnowRabbit = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     201, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3320,7 +3320,7 @@ BattleWeapon ItemWeaponData_SnowRabbit = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3334,23 +3334,23 @@ BattleWeapon ItemWeaponData_SnowRabbit = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_TeaKinoko = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     212, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3359,7 +3359,7 @@ BattleWeapon ItemWeaponData_TeaKinoko = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3376,23 +3376,23 @@ BattleWeapon ItemWeaponData_TeaKinoko = {
     5, // hpRegenTime
     2, // hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_FirstLovePuddingBiribiri = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     216, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3401,7 +3401,7 @@ BattleWeapon ItemWeaponData_FirstLovePuddingBiribiri = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3415,23 +3415,23 @@ BattleWeapon ItemWeaponData_FirstLovePuddingBiribiri = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicTime..frightChance
     0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
     0, // fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_FirstLovePuddingTrans = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     216, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3440,7 +3440,7 @@ BattleWeapon ItemWeaponData_FirstLovePuddingTrans = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3453,23 +3453,23 @@ BattleWeapon ItemWeaponData_FirstLovePuddingTrans = {
     100, // invisibleChance
     2, // invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_FirstLovePuddingSleep = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     216, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3478,7 +3478,7 @@ BattleWeapon ItemWeaponData_FirstLovePuddingSleep = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3491,23 +3491,23 @@ BattleWeapon ItemWeaponData_FirstLovePuddingSleep = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeTime..fastTime
     0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_StarryDinner = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     217, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3516,7 +3516,7 @@ BattleWeapon ItemWeaponData_StarryDinner = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3530,23 +3530,23 @@ BattleWeapon ItemWeaponData_StarryDinner = {
     3, // hpRegenTime
     2, // hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_KararinaPasta = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     224, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3555,7 +3555,7 @@ BattleWeapon ItemWeaponData_KararinaPasta = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3567,23 +3567,23 @@ BattleWeapon ItemWeaponData_KararinaPasta = {
     1, // chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_MeromeroCake = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     225, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3592,7 +3592,7 @@ BattleWeapon ItemWeaponData_MeromeroCake = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3607,23 +3607,23 @@ BattleWeapon ItemWeaponData_MeromeroCake = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_PeachTaltBiribiri = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     226, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3632,7 +3632,7 @@ BattleWeapon ItemWeaponData_PeachTaltBiribiri = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3646,23 +3646,23 @@ BattleWeapon ItemWeaponData_PeachTaltBiribiri = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicTime..frightChance
     0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
     0, // fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_PeachTaltDodge = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     226, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3671,7 +3671,7 @@ BattleWeapon ItemWeaponData_PeachTaltDodge = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3684,23 +3684,23 @@ BattleWeapon ItemWeaponData_PeachTaltDodge = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_PeachTaltSleep = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     226, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3709,7 +3709,7 @@ BattleWeapon ItemWeaponData_PeachTaltSleep = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3722,23 +3722,23 @@ BattleWeapon ItemWeaponData_PeachTaltSleep = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeTime..fastTime
     0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_BiribiriCandy = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     227, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3747,7 +3747,7 @@ BattleWeapon ItemWeaponData_BiribiriCandy = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3761,23 +3761,23 @@ BattleWeapon ItemWeaponData_BiribiriCandy = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicTime..frightChance
     0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
     0, // fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_HealthySalad = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     233, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3786,7 +3786,7 @@ BattleWeapon ItemWeaponData_HealthySalad = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3814,23 +3814,23 @@ BattleWeapon ItemWeaponData_HealthySalad = {
     100, // slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_FreshJuice = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     235, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3839,7 +3839,7 @@ BattleWeapon ItemWeaponData_FreshJuice = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3867,23 +3867,23 @@ BattleWeapon ItemWeaponData_FreshJuice = {
     100, // slowChance
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_RedKararing = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     173, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3892,7 +3892,7 @@ BattleWeapon ItemWeaponData_RedKararing = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3904,23 +3904,23 @@ BattleWeapon ItemWeaponData_RedKararing = {
     1, // chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_FutarideForever = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     219, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -3929,7 +3929,7 @@ BattleWeapon ItemWeaponData_FutarideForever = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -3943,9 +3943,9 @@ BattleWeapon ItemWeaponData_FutarideForever = {
     10, // hpRegenTime
     2, // hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_RecoveryAndStatus, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_ThrowAttack)
@@ -4073,16 +4073,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_NancyDynamite = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     196, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -4092,7 +4092,7 @@ BattleWeapon ItemWeaponData_NancyDynamite = {
     3, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30040, // special
     0x7FF, // counterResistFlags
@@ -4103,23 +4103,23 @@ BattleWeapon ItemWeaponData_NancyDynamite = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_ThrowAttack, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_CoconutsBomb = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     202, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -4129,7 +4129,7 @@ BattleWeapon ItemWeaponData_CoconutsBomb = {
     3, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30040, // special
     0x7FF, // counterResistFlags
@@ -4140,23 +4140,23 @@ BattleWeapon ItemWeaponData_CoconutsBomb = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_ThrowAttack, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_KachikachiDish = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     203, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -4165,7 +4165,7 @@ BattleWeapon ItemWeaponData_KachikachiDish = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30040, // special
     0x7FF, // counterResistFlags
@@ -4176,23 +4176,23 @@ BattleWeapon ItemWeaponData_KachikachiDish = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_ThrowAttack, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon ItemWeaponData_BomberEgg = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     209, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -4202,7 +4202,7 @@ BattleWeapon ItemWeaponData_BomberEgg = {
     3, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30040, // special
     0x7FF, // counterResistFlags
@@ -4213,9 +4213,9 @@ BattleWeapon ItemWeaponData_BomberEgg = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_ThrowAttack, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Poison_Kinoko)
@@ -4248,16 +4248,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_PoisonKinoko = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     213, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerHPHalf2, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -4266,7 +4266,7 @@ BattleWeapon ItemWeaponData_PoisonKinoko = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30048, // special
     0x7FF, // counterResistFlags
@@ -4280,14 +4280,14 @@ BattleWeapon ItemWeaponData_PoisonKinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_Poison_Kinoko, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
 
-#define EVW(evt, off) (*(s32*)((u8*)(evt) + (off)))
-#define EVP(evt, off) (*(ThrowWork**)((u8*)(evt) + (off)))
+// _nancy_mirage keeps x/y/z as three s32 words from userdata3 on (over wInterpRelatedTime)
+#define EVT_XYZ(evt) ((s32*)&(evt)->userdata3)
 
 typedef struct ThrowWork {
     Vec start;    // 0x0
@@ -4425,11 +4425,11 @@ USER_FUNC(_naniga_okorukana_check) {
         effSetName((EffectEntry*)event->userdata[0], "effNaniga\0\0");
         evtSetValue(event, out, item);
         if (unit->currentKind == 0xDE) {
-            a = (u8*)wp + BWOFF(0x16F25);
-            b = (u8*)wp + BWOFF(0x16F26);
+            a = &wp->actRecord.marioAttackItems;
+            b = &wp->actRecord.marioSupportItems;
         } else if (unit->currentKind >= 0xE0 && unit->currentKind < 0xE7) {
-            a = (u8*)wp + BWOFF(0x16F27);
-            b = (u8*)wp + BWOFF(0x16F28);
+            a = &wp->actRecord.partnerAttackItems;
+            b = &wp->actRecord.partnerSupportItems;
         } else {
             goto end;
         }
@@ -4508,11 +4508,11 @@ USER_FUNC(_throw_item_icon) {
         wk->speed = distABf(wk->start.x, wk->start.z, wk->target.x, wk->target.z) / wk->frames;
         event->userdata[1] = item;
         event->userdata[2] = 0;
-        EVW(event, 0x84) = psndSFXOn_3D("SFX_ITEM_COOKING_THROW1", &v);
+        event->userdata3 = psndSFXOn_3D("SFX_ITEM_COOKING_THROW1", &v);
     }
     wk = ((ThrowWork*)event->userdatap[0]);
     if (event->userdata[2]) {
-        psndSFXOff(EVW(event, 0x84));
+        psndSFXOff(event->userdata3);
         BattleFree(wk);
         return EVT_RETURN_DONE;
     }
@@ -4546,9 +4546,9 @@ USER_FUNC(_nancy_mirage) {
         event->userdata[0] = 60;
         event->userdata[1] = animPoseEntry("c_cook", 1);
         event->userdata[2] = 0;
-        EVW(event, 0x84) = x;
-        EVW(event, 0x88) = y;
-        EVW(event, 0x8C) = z;
+        EVT_XYZ(event)[0] = x;
+        EVT_XYZ(event)[1] = y;
+        EVT_XYZ(event)[2] = z;
         animPoseSetAnim(event->userdata[1], "A_2", 1);
         animPoseSetEffectAnim(event->userdata[1], "PM_Y_1A", 1);
     }
@@ -4580,7 +4580,7 @@ void _nancy_disp(CameraId cameraId, void* param) {
         s = 4.0f;
         alpha = 128;
     }
-    PSMTXTrans(trans, EVW(event, 0x84), EVW(event, 0x88), EVW(event, 0x8C));
+    PSMTXTrans(trans, EVT_XYZ(event)[0], EVT_XYZ(event)[1], EVT_XYZ(event)[2]);
     PSMTXScale(scale, s, s, 1.0f);
     PSMTXIdentity(mtx);
     PSMTXConcat(scale, mtx, mtx);
@@ -4647,16 +4647,16 @@ EVT_END()
 
 BattleWeapon ItemWeaponData_LastDinner = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     218, // itemId
     NULL, // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -4665,7 +4665,7 @@ BattleWeapon ItemWeaponData_LastDinner = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x30108, // special
     0x7FF, // counterResistFlags
@@ -4676,9 +4676,9 @@ BattleWeapon ItemWeaponData_LastDinner = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     ItemEvent_LastDinner, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Kaminari_Dokkan)

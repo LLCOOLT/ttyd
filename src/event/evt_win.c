@@ -616,14 +616,14 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		}
 	}
 
-	if ((wp->flags & 0x100) && (lotteryGetPtr()->mFlags & 2)) {
+	if ((wp->flags & 0x100) && (lotteryGetPtr()->flags & 2)) {
 		Mtx mtx;
 		char buf[32];
 
 		windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -250.0f, -130.0f, 150.0f, 45.0f, 20.0f);
 		PSMTXTrans(mtx, -220.0f, -172.0f, 0.0f);
 		iconDispGx2(mtx, 0x10, ICON_140);
-		sprintf(buf, "%04d", *(s16*)((u8*)lotteryGetPtr() + 0x20));
+		sprintf(buf, "%04d", lotteryGetPtr()->number);
 		for (i = 0; i < 4; i++) {
 			PSMTXTrans(mtx, 20.0f * i + -126.0f - 60.0f, -168.0f, 0.0f);
 			iconNumberDispGx(mtx, ((s8*)buf)[i] - '0', 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -919,7 +919,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 					sprintf(buf, "");
 					color = (GXColor){0xA0, 0xA0, 0xA0, 0xFF};
 				} else {
-					sprintf(buf, "%3d", info->unkA);
+					sprintf(buf, "%3d", info->cost);
 					color = (GXColor){0x00, 0x00, 0x00, 0xFF};
 				}
 				FontDrawStart();
@@ -1442,24 +1442,23 @@ USER_FUNC(unitwin_getpartylank) {
 	return EVT_RETURN_DONE;
 }
 
-#define PP ((PouchPartyData*)((u8*)pouch + idx))
 USER_FUNC(unitwin_setpartylank) {
-	PouchPartyData* new_var2;
-	unsigned int idx;
+	PouchPartyData* party;
+	u32 ofs;
 	s16 v;
-	s32 new_var;
+	s32 ofs2;
 	s32* args = event->args;
 	PouchData* pouch = pouchGetPtr();
-	idx = evtGetValue(event, args[0]) * 14;
+	ofs = evtGetValue(event, args[0]) * sizeof(PouchPartyData); // byte offset of partyData[i]: the target multiplies right after the read
 	v = evtGetValue(event, args[1]);
-	new_var = idx;
-	new_var2 = (PouchPartyData*)((u8*)pouch + new_var);
-	new_var2->HPLevel = ((PouchPartyData*)((u8*)pouch + new_var))->attackLevel = ((PouchPartyData*)((u8*)pouch + new_var))->techLevel = v;
+	ofs2 = ofs; // FAKE: signed copy for the first stores, so pouch + ofs is added again after pouchRevisePartyParam as in the target
+	party = (PouchPartyData*)((u8*)pouch->partyData + ofs2);
+	party->HPLevel = party->attackLevel = party->techLevel = v;
 	pouchRevisePartyParam();
-	PP->currentHP = PP->maximumHP;
+	party = (PouchPartyData*)((u8*)pouch->partyData + ofs);
+	party->currentHP = party->maximumHP;
 	return EVT_RETURN_DONE;
 }
-#undef PP
 
 USER_FUNC(unitwin_setmariolevel) {
 	s32* args = event->args;

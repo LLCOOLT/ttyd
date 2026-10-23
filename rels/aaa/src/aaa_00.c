@@ -228,16 +228,16 @@ static EVT_BEGIN(door_1_close)
 EVT_END()
 
 static DoorParam door_1 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     4, // se
     "S_ie_door", // mapobj
     "A_ie_door", // hitIn
     "A_ie_door_u", // hitOut
-    "S_ie_soto", // mapIn
-    "A_ie_soto", // hitInIn
-    "S_naka", // mapOut
-    "A_naka1", // hitOutOut
+    "S_ie_soto", // outside
+    "A_ie_soto", // outsideHit
+    "S_naka", // inside
+    "A_naka1", // insideHit
     evt_door, // evtIn
     NULL, // evtOut
     evt_wall, // evtWall

@@ -72,7 +72,7 @@ s32 battleAcMain_MonosiriTarget(BattleWork* work) {
             memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            disp->unk20 = 20;
+            disp->slideTimer = 20;
             cw->frame = 0;
             cw->maxFrames = _getmaxcount();
             BtlUnit_GetHitPos(unit, parts, &cw->hitPos.x, &cw->hitPos.y, &cw->hitPos.z);

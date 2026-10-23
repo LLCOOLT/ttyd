@@ -627,7 +627,7 @@ static void ext_moamoa_init(void) {
         }
     }
     wp->mobj = mapGetMapObj("ressha");
-    wp->mobjY = *(f32*)((u8*)wp->mobj + 0x98);
+    wp->mobjY = wp->mobj->animMtx[1][3];
     for (i = 0; i < 600; i++) {
         ext_moamoa_main();
     }
@@ -790,11 +790,11 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
         if (dist < range) {
             angle = angleABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]);
             if (__fabsf(compAngle(angle, mario->directionView)) < 40.0f) {
-                mario->unk174.x = -((range - dist) * moa_sinx(6.2831855f * mario->directionView / 360.0f));
-                mario->unk174.z = (range - dist) * moa_cosx(6.2831855f * mario->directionView / 360.0f);
+                mario->floorMove.x = -((range - dist) * moa_sinx(6.2831855f * mario->directionView / 360.0f));
+                mario->floorMove.z = (range - dist) * moa_cosx(6.2831855f * mario->directionView / 360.0f);
             } else {
-                mario->unk174.x = pose->mtx[0][3] - range * moa_sinx(6.2831855f * angle / 360.0f) - mario->position.x;
-                mario->unk174.z = pose->mtx[2][3] + range * moa_cosx(6.2831855f * angle / 360.0f) - mario->position.z;
+                mario->floorMove.x = pose->mtx[0][3] - range * moa_sinx(6.2831855f * angle / 360.0f) - mario->position.x;
+                mario->floorMove.z = pose->mtx[2][3] + range * moa_cosx(6.2831855f * angle / 360.0f) - mario->position.z;
             }
         }
     }
@@ -1379,17 +1379,17 @@ static void ext_moamoa_main(void) {
     moamoa_pose_main();
     wp->mobjY = wp->mobj->modelWorldMtx[1][3];
     if (wp->flags & 0x10) {
-        mario->unk174.x = 0.0f;
-        mario->unk174.y = 0.0f;
-        mario->unk174.z = 0.0f;
+        mario->floorMove.x = 0.0f;
+        mario->floorMove.y = 0.0f;
+        mario->floorMove.z = 0.0f;
     } else {
-        v = (Vec){mario->unk174.x, mario->unk174.y, mario->unk174.z};
+        v = (Vec){mario->floorMove.x, mario->floorMove.y, mario->floorMove.z};
         { static const Vec zv2 = {0.0f, 0.0f, 0.0f}; } // FAKE: unreferenced 12-byte .rodata pad object, defined after the compound literal's template so the template comes first (target order)
         if (PSVECMag(&v) > 2.0f) {
             PSVECNormalize(&v, &v);
-            mario->unk174.x = 2.0f * v.x;
-            mario->unk174.y = 2.0f * v.y;
-            mario->unk174.z = 2.0f * v.z;
+            mario->floorMove.x = 2.0f * v.x;
+            mario->floorMove.y = 2.0f * v.y;
+            mario->floorMove.z = 2.0f * v.z;
         }
     }
 }

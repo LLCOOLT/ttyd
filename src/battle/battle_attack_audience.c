@@ -1,3 +1,4 @@
+#include "driver/itemdrv.h"
 #ifdef VERSION_G8ME01
 #include "mario/mariost.h"
 #include <string.h>
@@ -193,7 +194,7 @@ s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
             event->userdata[2]--;
         }
         if (event->userdata[2] <= 0) {
-            itemDelete((char*)event->userdatap[1] + 0xC);
+            itemDelete(((ItemEntry*)event->userdatap[1])->name);
             return 2;
         }
     }

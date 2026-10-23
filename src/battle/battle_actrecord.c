@@ -3,11 +3,6 @@
 
 #pragma optimize_for_size on
 #pragma dont_inline on
-#ifdef VERSION_G8ME01
-#define R(o) (hi[0x6f1c + (o)])
-#else
-#define R(o) (hi[0x6f00 + (o)])
-#endif
 s32 _check_turn_count_0_end(s32 n);
 s32 _check_turn_count_0_turn(s32 n);
 s32 _check_use(s32 n);
@@ -29,30 +24,30 @@ void BtlActRec_AddPoint(u8* point, s32 amount) {
 void BtlActRec_JudgeTurnRuleKeep(void) {
 	s32 v;
 	BattleWork* wp = _battleWorkPointer;
-	u8* rec = (u8*)wp->fbatInfo;
-	u8* hi = (u8*)wp + 0x10000;
-	switch (rec[0x18]) {
+	FieldBattleInfo* rec = wp->fbatInfo;
+	BattleActRecord* ar = &wp->actRecord;
+	switch (rec->ruleType) {
 	case 60:
 	case 61:
 	case 62:
-		if (rec[0x18] == 62) {
-			v = R(0x1c) + R(0x1d) + R(0x1e) + R(0x1f) + R(0x25) + R(0x26) + R(0x29) + R(0x33) + R(0x35) + R(0x37) + R(0x39) + R(0x3a) + R(0x27) + R(0x28) + R(0x2a) + R(0x34) + R(0x36) + R(0x38);
-		} else if (rec[0x18] == 60) {
-			v = R(0x1c) + R(0x1d) + R(0x1e) + R(0x1f) + R(0x25) + R(0x26) + R(0x29) + R(0x33) + R(0x35) + R(0x37);
+		if (rec->ruleType == 62) {
+			v = ar->marioJumpMoves + ar->marioHammerMoves + ar->marioSpecialAttacks + ar->marioSpecialSupports + ar->marioAttackItems + ar->marioSupportItems + ar->marioPartyChanges + ar->marioCharges + ar->marioSuperCharges + ar->marioEscapes + ar->partnerAttackMoves + ar->partnerSupportMoves + ar->partnerAttackItems + ar->partnerSupportItems + ar->partnerPartyChanges + ar->partnerCharges + ar->partnerSuperCharges + ar->partnerEscapes;
+		} else if (rec->ruleType == 60) {
+			v = ar->marioJumpMoves + ar->marioHammerMoves + ar->marioSpecialAttacks + ar->marioSpecialSupports + ar->marioAttackItems + ar->marioSupportItems + ar->marioPartyChanges + ar->marioCharges + ar->marioSuperCharges + ar->marioEscapes;
 		} else {
-			v = R(0x39) + R(0x3a) + R(0x27) + R(0x28) + R(0x2a) + R(0x34) + R(0x36) + R(0x38);
+			v = ar->partnerAttackMoves + ar->partnerSupportMoves + ar->partnerAttackItems + ar->partnerSupportItems + ar->partnerPartyChanges + ar->partnerCharges + ar->partnerSuperCharges + ar->partnerEscapes;
 		}
 		_check_turn_count_0_turn(v);
 		break;
 	case 63:
 	case 64:
 	case 65:
-		if (rec[0x18] == 65) {
-			v = R(0x1c) + R(0x1d) + R(0x1e) + R(0x25) + R(0x39) + R(0x27);
-		} else if (rec[0x18] == 63) {
-			v = R(0x1c) + R(0x1d) + R(0x1e) + R(0x25);
+		if (rec->ruleType == 65) {
+			v = ar->marioJumpMoves + ar->marioHammerMoves + ar->marioSpecialAttacks + ar->marioAttackItems + ar->partnerAttackMoves + ar->partnerAttackItems;
+		} else if (rec->ruleType == 63) {
+			v = ar->marioJumpMoves + ar->marioHammerMoves + ar->marioSpecialAttacks + ar->marioAttackItems;
 		} else {
-			v = R(0x39) + R(0x27);
+			v = ar->partnerAttackMoves + ar->partnerAttackItems;
 		}
 		_check_turn_count_0_turn(v);
 		break;
@@ -62,250 +57,250 @@ void BtlActRec_JudgeTurnRuleKeep(void) {
 void BtlActRec_JudgeRuleKeep(void) {
 	s32 v;
 	BattleWork* wp = _battleWorkPointer;
-	u8* hi;
-	u8* rec;
+	BattleActRecord* ar;
+	FieldBattleInfo* rec;
 	BattleUnit* mario;
-	rec = (u8*)wp->fbatInfo;
-	hi = (u8*)wp + 0x10000;
+	rec = wp->fbatInfo;
+	ar = &wp->actRecord;
 	mario = BattleGetMarioPtr(wp);
 	BattleGetPartyPtr(wp);
-	switch (rec[0x18]) {
+	switch (rec->ruleType) {
 	case 0:
-		rec[0x19] = 6;
+		rec->ruleKeepResult = 6;
 		break;
 	case 1:
-		rec[0x19] = _check_no_use(R(0x1c));
+		rec->ruleKeepResult = _check_no_use(ar->marioJumpMoves);
 		break;
 	case 2:
-		rec[0x19] = _check_use(R(0x1c));
+		rec->ruleKeepResult = _check_use(ar->marioJumpMoves);
 		break;
 	case 3:
-		rec[0x19] = _check_no_use(R(0x1d));
+		rec->ruleKeepResult = _check_no_use(ar->marioHammerMoves);
 		break;
 	case 4:
-		rec[0x19] = _check_use(R(0x1d));
+		rec->ruleKeepResult = _check_use(ar->marioHammerMoves);
 		break;
 	case 5:
-		rec[0x19] = _check_no_use(R(0x1e) + R(0x1f));
+		rec->ruleKeepResult = _check_no_use(ar->marioSpecialAttacks + ar->marioSpecialSupports);
 		break;
 	case 6:
-		rec[0x19] = _check_use(R(0x1e) + R(0x1f));
+		rec->ruleKeepResult = _check_use(ar->marioSpecialAttacks + ar->marioSpecialSupports);
 		break;
 	case 7:
-		rec[0x19] = _check_no_use(R(0x20));
+		rec->ruleKeepResult = _check_no_use(ar->marioDamageTaken);
 		break;
 	case 8:
-		rec[0x19] = _check_use(R(0x20));
+		rec->ruleKeepResult = _check_use(ar->marioDamageTaken);
 		break;
 	case 9:
-		rec[0x19] = _check_no_use(R(0x21));
+		rec->ruleKeepResult = _check_no_use(ar->partnerDamageTaken);
 		break;
 	case 10:
-		rec[0x19] = _check_use(R(0x21));
+		rec->ruleKeepResult = _check_use(ar->partnerDamageTaken);
 		break;
 	case 11:
-		rec[0x19] = _check_no_use(R(0x20) + R(0x21));
+		rec->ruleKeepResult = _check_no_use(ar->marioDamageTaken + ar->partnerDamageTaken);
 		break;
 	case 12:
-		rec[0x19] = _check_use(R(0x20) + R(0x21));
+		rec->ruleKeepResult = _check_use(ar->marioDamageTaken + ar->partnerDamageTaken);
 		break;
 	case 13:
-		rec[0x19] = _check_no_use(R(0x22));
+		rec->ruleKeepResult = _check_no_use(ar->marioHitsTaken);
 		break;
 	case 14:
-		rec[0x19] = _check_use(R(0x22));
+		rec->ruleKeepResult = _check_use(ar->marioHitsTaken);
 		break;
 	case 15:
-		rec[0x19] = _check_no_use(R(0x23));
+		rec->ruleKeepResult = _check_no_use(ar->partnerHitsTaken);
 		break;
 	case 16:
-		rec[0x19] = _check_use(R(0x23));
+		rec->ruleKeepResult = _check_use(ar->partnerHitsTaken);
 		break;
 	case 17:
-		rec[0x19] = _check_no_use(R(0x22) + R(0x23));
+		rec->ruleKeepResult = _check_no_use(ar->marioHitsTaken + ar->partnerHitsTaken);
 		break;
 	case 18:
-		rec[0x19] = _check_use(R(0x22) + R(0x23));
+		rec->ruleKeepResult = _check_use(ar->marioHitsTaken + ar->partnerHitsTaken);
 		break;
 	case 19:
 		if (mario != NULL) {
-			rec[0x19] = _check_use(mario->currentHp);
+			rec->ruleKeepResult = _check_use(mario->currentHp);
 		} else {
-			rec[0x19] = 1;
+			rec->ruleKeepResult = 1;
 		}
 		break;
 	case 20:
 		if (mario != NULL) {
-			rec[0x19] = _check_no_use(mario->currentHp);
+			rec->ruleKeepResult = _check_no_use(mario->currentHp);
 		} else {
-			rec[0x19] = 1;
+			rec->ruleKeepResult = 1;
 		}
 		break;
 	case 21:
-		rec[0x19] = _check_use(R(0x24));
+		rec->ruleKeepResult = _check_use(ar->powerBounceCombo);
 		break;
 	case 22:
-		rec[0x19] = _check_no_use(R(0x25) + R(0x26));
+		rec->ruleKeepResult = _check_no_use(ar->marioAttackItems + ar->marioSupportItems);
 		break;
 	case 23:
-		rec[0x19] = _check_use(R(0x25) + R(0x26));
+		rec->ruleKeepResult = _check_use(ar->marioAttackItems + ar->marioSupportItems);
 		break;
 	case 24:
-		rec[0x19] = _check_no_use(R(0x27) + R(0x28));
+		rec->ruleKeepResult = _check_no_use(ar->partnerAttackItems + ar->partnerSupportItems);
 		break;
 	case 25:
-		rec[0x19] = _check_use(R(0x27) + R(0x28));
+		rec->ruleKeepResult = _check_use(ar->partnerAttackItems + ar->partnerSupportItems);
 		break;
 	case 26:
-		rec[0x19] = _check_no_use(R(0x25) + R(0x26) + R(0x27) + R(0x28));
+		rec->ruleKeepResult = _check_no_use(ar->marioAttackItems + ar->marioSupportItems + ar->partnerAttackItems + ar->partnerSupportItems);
 		break;
 	case 27:
-		rec[0x19] = _check_use(R(0x25) + R(0x26) + R(0x27) + R(0x28));
+		rec->ruleKeepResult = _check_use(ar->marioAttackItems + ar->marioSupportItems + ar->partnerAttackItems + ar->partnerSupportItems);
 		break;
 	case 28:
-		rec[0x19] = _check_no_use(R(0x29));
+		rec->ruleKeepResult = _check_no_use(ar->marioPartyChanges);
 		break;
 	case 29:
-		rec[0x19] = _check_use(R(0x29));
+		rec->ruleKeepResult = _check_use(ar->marioPartyChanges);
 		break;
 	case 30:
-		rec[0x19] = _check_no_use(R(0x2a));
+		rec->ruleKeepResult = _check_no_use(ar->partnerPartyChanges);
 		break;
 	case 31:
-		rec[0x19] = _check_use(R(0x2a));
+		rec->ruleKeepResult = _check_use(ar->partnerPartyChanges);
 		break;
 	case 32:
-		rec[0x19] = _check_no_use(R(0x29) + R(0x2a));
+		rec->ruleKeepResult = _check_no_use(ar->marioPartyChanges + ar->partnerPartyChanges);
 		break;
 	case 33:
-		rec[0x19] = _check_use(R(0x29) + R(0x2a));
+		rec->ruleKeepResult = _check_use(ar->marioPartyChanges + ar->partnerPartyChanges);
 		break;
 	case 34:
-		rec[0x19] = _check_no_use(R(0x2b));
+		rec->ruleKeepResult = _check_no_use(ar->marioAudienceAttacks);
 		break;
 	case 35:
-		rec[0x19] = _check_use(R(0x2b));
+		rec->ruleKeepResult = _check_use(ar->marioAudienceAttacks);
 		break;
 	case 36:
-		rec[0x19] = _check_no_use(R(0x2c));
+		rec->ruleKeepResult = _check_no_use(ar->partnerAudienceAttacks);
 		break;
 	case 37:
-		rec[0x19] = _check_use(R(0x2c));
+		rec->ruleKeepResult = _check_use(ar->partnerAudienceAttacks);
 		break;
 	case 38:
-		rec[0x19] = _check_no_use(R(0x2d));
+		rec->ruleKeepResult = _check_no_use(ar->marioAppeals);
 		break;
 	case 39:
-		rec[0x19] = _check_use(R(0x2d));
+		rec->ruleKeepResult = _check_use(ar->marioAppeals);
 		break;
 	case 40:
-		rec[0x19] = _check_no_use(R(0x2e));
+		rec->ruleKeepResult = _check_no_use(ar->partnerAppeals);
 		break;
 	case 41:
-		rec[0x19] = _check_use(R(0x2e));
+		rec->ruleKeepResult = _check_use(ar->partnerAppeals);
 		break;
 	case 42:
-		rec[0x19] = _check_no_use(R(0x2d) + R(0x2e));
+		rec->ruleKeepResult = _check_no_use(ar->marioAppeals + ar->partnerAppeals);
 		break;
 	case 43:
-		rec[0x19] = _check_use(R(0x2d) + R(0x2e));
+		rec->ruleKeepResult = _check_use(ar->marioAppeals + ar->partnerAppeals);
 		break;
 	case 44:
-		rec[0x19] = _check_no_use(R(0x2f));
+		rec->ruleKeepResult = _check_no_use(ar->marioFpSpent);
 		break;
 	case 45:
-		rec[0x19] = _check_use(R(0x2f));
+		rec->ruleKeepResult = _check_use(ar->marioFpSpent);
 		break;
 	case 46:
-		rec[0x19] = _check_no_use(R(0x31));
+		rec->ruleKeepResult = _check_no_use(ar->partnerFpSpent);
 		break;
 	case 47:
-		rec[0x19] = _check_use(R(0x31));
+		rec->ruleKeepResult = _check_use(ar->partnerFpSpent);
 		break;
 	case 48:
-		rec[0x19] = _check_no_use(R(0x2f) + R(0x31));
+		rec->ruleKeepResult = _check_no_use(ar->marioFpSpent + ar->partnerFpSpent);
 		break;
 	case 49:
-		rec[0x19] = _check_use(R(0x2f) + R(0x31));
+		rec->ruleKeepResult = _check_use(ar->marioFpSpent + ar->partnerFpSpent);
 		break;
 	case 50:
-		rec[0x19] = _check_no_use(R(0x30));
+		rec->ruleKeepResult = _check_no_use(ar->marioFpMoves);
 		break;
 	case 51:
-		rec[0x19] = _check_use(R(0x30));
+		rec->ruleKeepResult = _check_use(ar->marioFpMoves);
 		break;
 	case 52:
-		rec[0x19] = _check_no_use(R(0x32));
+		rec->ruleKeepResult = _check_no_use(ar->partnerFpMoves);
 		break;
 	case 53:
-		rec[0x19] = _check_use(R(0x32));
+		rec->ruleKeepResult = _check_use(ar->partnerFpMoves);
 		break;
 	case 54:
-		rec[0x19] = _check_no_use(R(0x2f) + R(0x31));
+		rec->ruleKeepResult = _check_no_use(ar->marioFpSpent + ar->partnerFpSpent);
 		break;
 	case 55:
-		rec[0x19] = _check_use(R(0x2f) + R(0x31));
+		rec->ruleKeepResult = _check_use(ar->marioFpSpent + ar->partnerFpSpent);
 		break;
 	case 56:
-		rec[0x19] = _check_no_use(R(0x30) + R(0x32));
+		rec->ruleKeepResult = _check_no_use(ar->marioFpMoves + ar->partnerFpMoves);
 		break;
 	case 57:
-		rec[0x19] = _check_use(R(0x30) + R(0x32));
+		rec->ruleKeepResult = _check_use(ar->marioFpMoves + ar->partnerFpMoves);
 		break;
 	case 58:
-		if (R(0x3b) > rec[0x1a]) {
-			rec[0x19] = 6;
-		} else if (R(0x3b) > rec[0x1b]) {
-			rec[0x19] = 2;
+		if (ar->turnCount > rec->ruleParam) {
+			rec->ruleKeepResult = 6;
+		} else if (ar->turnCount > rec->ruleParam2) {
+			rec->ruleKeepResult = 2;
 		} else {
-			rec[0x19] = 1;
+			rec->ruleKeepResult = 1;
 		}
 		break;
 	case 59:
-		if (R(0x3b) <= rec[0x1a]) {
-			rec[0x19] = 6;
-		} else if (R(0x3b) <= rec[0x1b]) {
-			rec[0x19] = 2;
+		if (ar->turnCount <= rec->ruleParam) {
+			rec->ruleKeepResult = 6;
+		} else if (ar->turnCount <= rec->ruleParam2) {
+			rec->ruleKeepResult = 2;
 		} else {
-			rec[0x19] = 1;
+			rec->ruleKeepResult = 1;
 		}
 		break;
 	case 60:
 	case 61:
 	case 62:
-		if (rec[0x18] == 62) {
-			v = R(0x1c) + R(0x1d) + R(0x1e) + R(0x1f) + R(0x25) + R(0x26) + R(0x29) + R(0x33) + R(0x35) + R(0x37) + R(0x39) + R(0x3a) + R(0x27) + R(0x28) + R(0x2a) + R(0x34) + R(0x36) + R(0x38);
-		} else if (rec[0x18] == 60) {
-			v = R(0x1c) + R(0x1d) + R(0x1e) + R(0x1f) + R(0x25) + R(0x26) + R(0x29) + R(0x33) + R(0x35) + R(0x37);
+		if (rec->ruleType == 62) {
+			v = ar->marioJumpMoves + ar->marioHammerMoves + ar->marioSpecialAttacks + ar->marioSpecialSupports + ar->marioAttackItems + ar->marioSupportItems + ar->marioPartyChanges + ar->marioCharges + ar->marioSuperCharges + ar->marioEscapes + ar->partnerAttackMoves + ar->partnerSupportMoves + ar->partnerAttackItems + ar->partnerSupportItems + ar->partnerPartyChanges + ar->partnerCharges + ar->partnerSuperCharges + ar->partnerEscapes;
+		} else if (rec->ruleType == 60) {
+			v = ar->marioJumpMoves + ar->marioHammerMoves + ar->marioSpecialAttacks + ar->marioSpecialSupports + ar->marioAttackItems + ar->marioSupportItems + ar->marioPartyChanges + ar->marioCharges + ar->marioSuperCharges + ar->marioEscapes;
 		} else {
-			v = R(0x39) + R(0x3a) + R(0x27) + R(0x28) + R(0x2a) + R(0x34) + R(0x36) + R(0x38);
+			v = ar->partnerAttackMoves + ar->partnerSupportMoves + ar->partnerAttackItems + ar->partnerSupportItems + ar->partnerPartyChanges + ar->partnerCharges + ar->partnerSuperCharges + ar->partnerEscapes;
 		}
 		_check_turn_count_0_end(v);
 		break;
 	case 63:
 	case 64:
 	case 65:
-		if (rec[0x18] == 65) {
-			v = R(0x1c) + R(0x1d) + R(0x1e) + R(0x25) + R(0x39) + R(0x27);
-		} else if (rec[0x18] == 63) {
-			v = R(0x1c) + R(0x1d) + R(0x1e) + R(0x25);
+		if (rec->ruleType == 65) {
+			v = ar->marioJumpMoves + ar->marioHammerMoves + ar->marioSpecialAttacks + ar->marioAttackItems + ar->partnerAttackMoves + ar->partnerAttackItems;
+		} else if (rec->ruleType == 63) {
+			v = ar->marioJumpMoves + ar->marioHammerMoves + ar->marioSpecialAttacks + ar->marioAttackItems;
 		} else {
-			v = R(0x39) + R(0x27);
+			v = ar->partnerAttackMoves + ar->partnerAttackItems;
 		}
 		_check_turn_count_0_end(v);
 		break;
 	case 66:
-		if (R(0x1d) + R(0x1e) + R(0x1f) + R(0x25) + R(0x26) + R(0x29) + R(0x33) + R(0x35) + R(0x2d) + R(0x37) == 0) {
-			rec[0x19] = 6;
+		if (ar->marioHammerMoves + ar->marioSpecialAttacks + ar->marioSpecialSupports + ar->marioAttackItems + ar->marioSupportItems + ar->marioPartyChanges + ar->marioCharges + ar->marioSuperCharges + ar->marioAppeals + ar->marioEscapes == 0) {
+			rec->ruleKeepResult = 6;
 		} else {
-			rec[0x19] = 1;
+			rec->ruleKeepResult = 1;
 		}
 		break;
 	case 67:
-		if (R(0x1c) + R(0x1e) + R(0x1f) + R(0x25) + R(0x26) + R(0x29) + R(0x33) + R(0x35) + R(0x2d) + R(0x37) == 0) {
-			rec[0x19] = 6;
+		if (ar->marioJumpMoves + ar->marioSpecialAttacks + ar->marioSpecialSupports + ar->marioAttackItems + ar->marioSupportItems + ar->marioPartyChanges + ar->marioCharges + ar->marioSuperCharges + ar->marioAppeals + ar->marioEscapes == 0) {
+			rec->ruleKeepResult = 6;
 		} else {
-			rec[0x19] = 1;
+			rec->ruleKeepResult = 1;
 		}
 		break;
 	}
@@ -313,59 +308,59 @@ void BtlActRec_JudgeRuleKeep(void) {
 
 
 s32 _check_use(s32 n) {
-	u8* rec = (u8*)_battleWorkPointer->fbatInfo;
-	if (n >= rec[0x1a]) {
+	FieldBattleInfo* rec = _battleWorkPointer->fbatInfo;
+	if (n >= rec->ruleParam) {
 		return 6;
 	}
-	return (n >= rec[0x1b]) + 1;
+	return (n >= rec->ruleParam2) + 1;
 }
 
 s32 _check_no_use(s32 n) {
-	u8* rec = (u8*)_battleWorkPointer->fbatInfo;
-	if (n >= rec[0x1b]) {
+	FieldBattleInfo* rec = _battleWorkPointer->fbatInfo;
+	if (n >= rec->ruleParam2) {
 		return 1;
 	}
-	return n >= rec[0x1a] ? 2 : 6;
+	return n >= rec->ruleParam ? 2 : 6;
 }
 
 s32 _check_turn_count_0_turn(s32 n) {
 	BattleWork* wp = _battleWorkPointer;
-	u8* rec = (u8*)wp->fbatInfo;
-	u8* hi = (u8*)wp + 0x10000;
-	if (R(0x3b) <= rec[0x1b] || rec[0x1b] == 0xff) {
+	FieldBattleInfo* rec = wp->fbatInfo;
+	BattleActRecord* ar = &wp->actRecord;
+	if (ar->turnCount <= rec->ruleParam2 || rec->ruleParam2 == 0xff) {
 		if (n == 0) {
-			rec[0x19] = 2;
+			rec->ruleKeepResult = 2;
 		} else {
-			rec[0x19] = 1;
+			rec->ruleKeepResult = 1;
 		}
 	}
-	if (R(0x3b) <= rec[0x1a] || rec[0x1a] == 0xff) {
+	if (ar->turnCount <= rec->ruleParam || rec->ruleParam == 0xff) {
 		if (n == 0) {
-			rec[0x19] = 6;
-		} else if (!(rec[0x19] & 2)) {
-			rec[0x19] = 1;
+			rec->ruleKeepResult = 6;
+		} else if (!(rec->ruleKeepResult & 2)) {
+			rec->ruleKeepResult = 1;
 		}
 	}
-	return rec[0x19];
+	return rec->ruleKeepResult;
 }
 
 s32 _check_turn_count_0_end(s32 n) {
 	BattleWork* wp = _battleWorkPointer;
-	u8* rec = (u8*)wp->fbatInfo;
-	u8* hi = (u8*)wp + 0x10000;
-	if (R(0x3b) <= rec[0x1b] || rec[0x1b] == 0xff) {
+	FieldBattleInfo* rec = wp->fbatInfo;
+	BattleActRecord* ar = &wp->actRecord;
+	if (ar->turnCount <= rec->ruleParam2 || rec->ruleParam2 == 0xff) {
 		if (n == 0) {
-			rec[0x19] = 2;
+			rec->ruleKeepResult = 2;
 		} else {
-			rec[0x19] = 1;
+			rec->ruleKeepResult = 1;
 		}
 	}
-	if (R(0x3b) <= rec[0x1a] || rec[0x1a] == 0xff) {
+	if (ar->turnCount <= rec->ruleParam || rec->ruleParam == 0xff) {
 		if (n == 0) {
-			rec[0x19] = 6;
-		} else if (!(rec[0x19] & 2)) {
-			rec[0x19] = 1;
+			rec->ruleKeepResult = 6;
+		} else if (!(rec->ruleKeepResult & 2)) {
+			rec->ruleKeepResult = 1;
 		}
 	}
-	return rec[0x19];
+	return rec->ruleKeepResult;
 }

@@ -196,16 +196,16 @@ static USER_FUNC(mario_kirimomi) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
 
-    mario->field_0xB4 = mario->wPlayerCollisionBox.y / 2;
-    mario->field_0xC4 -= 10.0f;
-    mario->field_0xC4 = fmod(mario->field_0xC4, 360.0);
+    mario->rotOfs.y = mario->wPlayerCollisionBox.y / 2;
+    mario->rot.z -= 10.0f;
+    mario->rot.z = fmod(mario->rot.z, 360.0);
     if (party != NULL) {
         if (party->currentMemberId != 4) {
-            party->field_8C = party->height / 2;
+            party->rotOfsY = party->height / 2;
         } else {
-            party->field_8C = (party->height - 10.0f) / 2;
+            party->rotOfsY = (party->height - 10.0f) / 2;
         }
-        party->field_8C *= party->scale.y;
+        party->rotOfsY *= party->scale.y;
         party->rotation -= 10.0f;
         party->rotation = fmod(party->rotation, 360.0);
     }

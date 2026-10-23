@@ -270,8 +270,8 @@ USER_FUNC(replace_evt) {
     PSMTXIdentity(wp->mtx);
     animGetPtr()->poses[part->poseId].flags |= 0x10;
     part->dispCallback = replace_callback;
-    *(WanaWork**)((u8*)unit + BUOFF(0x310)) = wp;
-    unit->unk318 = wp->tex;
+    unit->countersetWeapon = (struct BattleWeapon*)wp; // reused as the WanaWork pointer
+    unit->screenTexBuf = wp->tex;
     wp->ready = 0;
     dispEntry(CAMERA_SHADOW, 0.0f, 0, replace_disp, wp);
     return EVT_RETURN_DONE;

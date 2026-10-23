@@ -13,7 +13,6 @@
 #include "libc_decls.h"
 #include "eff/eff_magic1_n64.h"
 
-extern MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
 
 #include "mario/mario_party.h"
 #include "mario/mario_sbr.h"
@@ -21,7 +20,6 @@ extern MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
 #include "mario/mariost.h"
 #endif
 
-#define PF(p, off) (*(f32*)((u8*)(p) + (off)))
 
 HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth);
 HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDist, f32* outAng);
@@ -175,7 +173,7 @@ void partyChkGnd(PartyEntry* party) {
                 hit = NULL;
             }
         }
-        party->field_138 = hit;
+        party->hitobjStandOn = hit;
         party->flags &= ~0x80;
         if (hit == NULL) {
             party->flags &= ~0x2;
@@ -189,11 +187,11 @@ void partyChkGnd(PartyEntry* party) {
                 party->flags &= ~0x80;
             }
         }
-        party->position.y = party->unkE4;
+        party->position.y = party->groundY;
         if (!(party->flags & 0x30)) {
             partyChkFrontStep(party, 11.0f, &a, &b, &c);
-            if (a - party->position.y >= 5.0f && party->unkE0 <= 30.0f) {
-                party->unk120 = a;
+            if (a - party->position.y >= 5.0f && party->groundSlope <= 30.0f) {
+                party->stepY = a;
                 if (party->moveSpeed) {
                     partyChgMot(party, 6);
                 }
@@ -204,8 +202,8 @@ void partyChkGnd(PartyEntry* party) {
 
 static inline f32 partyNrmSet(PartyEntry* party, Vec n) {
     party->groundRot.x = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.z, 100.0f * n.y) - 180.0f);
-    party->unkC8 = 0.0f;
-    party->unkCC = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
+    party->groundRotY = 0.0f;
+    party->groundRotZ = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
     return partyNrmTo(&n);
 }
 
@@ -226,15 +224,15 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
         Vec zero = {0.0f, 0.0f, 0.0f};
         party->groundRot = zero;
     }
-    party->unkE0 = 0.0f;
+    party->groundSlope = 0.0f;
     range = __fabsf(range); range += 0.1f;
     if (marioGetPtr()->currMotionId == 0x1A) {
         d = 5.0f;
     } else {
         d = 0.75f * partyGetHeight(party);
     }
-    party->unkE4 = party->position.y;
-    party->unkE8 = -1.0f;
+    party->groundY = party->position.y;
+    party->dropDepth = -1.0f;
     if (party->moveSpeed) {
         rad = party->targetDir;
     } else {
@@ -282,10 +280,10 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
             }
         }
         if (hit) {
-            party->unkE0 = partyNrmSet(party, outNrm);
+            party->groundSlope = partyNrmSet(party, outNrm);
             if (gy < baseY && __fabsf(gy - baseY) >= 2.0f) {
                 if (__fabsf(gy - baseY) > __fabsf(depth)) {
-                    party->unkE8 = __fabsf(baseY - gy);
+                    party->dropDepth = __fabsf(baseY - gy);
                 } else if (gy > bestY) {
                     bestY = gy;
                     best = hit;
@@ -300,8 +298,8 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
     }
     }
     if (best) {
-        party->unkE4 = bestY;
-        party->unkE8 = 0.0f;
+        party->groundY = bestY;
+        party->dropDepth = 0.0f;
         return best;
     }
     return NULL;
@@ -318,7 +316,7 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
         Vec zero = {0.0f, 0.0f, 0.0f};
         party->groundRot = zero;
     }
-    party->unkE0 = 0.0f;
+    party->groundSlope = 0.0f;
     h = partyGetHeight(party);
     *outY = party->position.y;
     *outDist = -1.0f;
@@ -352,9 +350,9 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
     if (hit) {
         Vec n = outNrm;
         party->groundRot.x = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.z, 100.0f * n.y) - 180.0f);
-        party->unkC8 = 0.0f;
-        party->unkCC = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
-        party->unkE0 = partyNrmTo(&n);
+        party->groundRotY = 0.0f;
+        party->groundRotZ = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
+        party->groundSlope = partyNrmTo(&n);
         gy = outPos.y;
         if (gy < oy && __fabsf(gy - oy) >= 2.0f) {
             *outDist = oy - gy;
@@ -638,7 +636,7 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     dir.z = cs;
     hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
     if (hit) {
-        party->unkEC = d;
+        party->frontWallDist = d;
         partyWallSlide(pos, nrm, dist, sn, cs);
         return hit;
     }
@@ -652,13 +650,13 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
     if (hit) {
         if (partyNrmTo(&nrm) >= 45.0f) {
-            party->unkEC = d;
+            party->frontWallDist = d;
             partyWallSlide(pos, nrm, dist, sn, cs);
             return hit;
         }
     }
     }
-    party->unkEC = -1.0f;
+    party->frontWallDist = -1.0f;
     pos->x += dist * sn;
     pos->z += dist * cs;
     return NULL;
@@ -683,7 +681,7 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     dir.z = cs;
     hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
     if (hit) {
-        party->unkEC = d;
+        party->frontWallDist = d;
         partyWallSlide(pos, nrm, dist, sn, cs);
         return hit;
     }
@@ -697,13 +695,13 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
     if (hit) {
         if (partyNrmTo(&nrm) >= 45.0f) {
-            party->unkEC = d;
+            party->frontWallDist = d;
             partyWallSlide(pos, nrm, dist, sn, cs);
             return hit;
         }
     }
     }
-    party->unkEC = -1.0f;
+    party->frontWallDist = -1.0f;
     pos->x += dist * sn;
     pos->z += dist * cs;
     return NULL;

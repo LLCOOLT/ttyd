@@ -20,7 +20,7 @@ void statusAPBlink(s32 time);
 BOOL BattleAudienceItemOn(s32 index, u16 itemId, s32 numItems);
 void BattleAudienceAddAudienceNum(s32 num);
 void BattleAudienceJoySACLecture(void);
-s32* BattleBreakSlotGetPtr(void);
+#include "battle/battle_break_slot.h"
 
 static USER_FUNC(_battle_set_lecture_unit_id);
 USER_FUNC(_set_actend_event);
@@ -234,18 +234,18 @@ static USER_FUNC(_battle_set_lecture_unit_id) {
     s32 value;
 
     value = evtGetValue(event, *args++);
-    wp->field_424 = value;
+    wp->lectureUnitId = value;
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(lecture_init) {
-    s32* slot = BattleBreakSlotGetPtr();
+    BreakSlotWork* slot = BattleBreakSlotGetPtr();
     BattleAudience* aud = BattleAudienceBaseGetPtr();
     s32 seats[11] = {5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 48};
     s32 seat;
     s32 i;
 
-    *slot |= 1;
+    slot->flags |= 1;
     aud->flags |= 0x40000;
     for (i = 0; i < 200; i++) {
         BattleAudience_Delete(i);
@@ -262,12 +262,12 @@ static USER_FUNC(lecture_init) {
 }
 
 USER_FUNC(get_actkind) {
-    evtSetValue(event, event->args[0], _battleWorkPointer->commandMenu.unk540);
+    evtSetValue(event, event->args[0], _battleWorkPointer->commandMenu.actType);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(get_ac_result) {
-    evtSetValue(event, event->args[0], _battleWorkPointer->field_19064[0]);
+    evtSetValue(event, event->args[0], _battleWorkPointer->lastAcSuccess);
     return EVT_RETURN_DONE;
 }
 
@@ -302,13 +302,13 @@ USER_FUNC(hammer_on) {
 USER_FUNC(aud_attack_init) {
     BattleWork* wp = _battleWorkPointer;
 
-    *(u32*)&wp->field_19064[0x1C] |= 1;
-    *(s32*)&wp->field_19064[0x20] = event->printWindowId;
+    wp->lectureFlags |= 1;
+    wp->lectureWindowId = event->printWindowId;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(aud_attack_end) {
-    *(u32*)&_battleWorkPointer->field_19064[0x1C] |= 1;
+    _battleWorkPointer->lectureFlags |= 1;
     return EVT_RETURN_DONE;
 }
 

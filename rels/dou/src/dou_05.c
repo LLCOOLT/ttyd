@@ -3,6 +3,7 @@
 
 #pragma force_active on
 #include "memory.h"
+#include "cam_road.h"
 #include "driver/mapdrv.h"
 #include "dolphin/gx.h"
 #include "evt/evt_bero.h"
@@ -83,7 +84,6 @@ s32 ride_waterfall[5];
 s32 nonride_waterfall[19];
 s32 dou_05_init_evt[136];
 
-void* camRoadGetWorkPtr(void);
 
 static void alpha_tev(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
@@ -110,9 +110,9 @@ static USER_FUNC(alpha_set_func) {
 }
 
 USER_FUNC(cam_displacement) {
-    u8* work = camRoadGetWorkPtr();
+    CamRoadWork* work = camRoadGetWorkPtr();
 
-    *(f32*)(work + 0x1C4) = 1.7f;
+    work->f_19c[10] = 1.7f;
     return EVT_RETURN_DONE;
 }
 

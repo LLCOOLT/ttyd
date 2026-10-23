@@ -11,7 +11,7 @@ BOOL marioPriCheckJabara(void);
 #include "mario/mario_motion.h"
 #include "mot/mot_slit.h"
 #include "pmario_sound.h"
-#include <string.h>
+#include <string.h>
 #include "driver/mobjdrv.h"
 
 #ifdef VERSION_G8ME01
@@ -34,14 +34,8 @@ f32 revise360(f32);
 f32 distABf(f32, f32, f32, f32);
 void sincosf(f32* s, f32* c, f32 deg);
 s32 irand(s32);
-void* mobjHitObjPtrToPtr(void* hit);
 void marioPreJump(void);
 
-#define MF(o) (*(f32*)((u8*)mario + MWOFF(o)))
-#define MFUS(o) (*(f32*)((u8*)mario + (o)))
-#define MI(o) (*(s32*)((u8*)mario + MWOFF(o)))
-#define MH(o) (*(s16*)((u8*)mario + (o)))
-#define MO(p, o) (*(f32*)((u8*)(p) + (o)))
 
 static f32 marioJumpStandData[] = {1.52f, -0.188f, 2.925f, -0.847f, -0.1f, -0.4f, 0.024f, -0.004f, 0.125f, 0.7f};
 f32 marioJumpSwData[] = {2.5f, -0.1f, 0.02f, -0.01f, -0.08f, -0.4f, 0.0f, -0.002f};
@@ -90,7 +84,7 @@ void mot_jumpStand(void) {
 	}
 	switch (mario->currSubMotionId) {
 	case 0:
-		if (++MI(0x48) >= 3) {
+		if (++mario->multiTimer >= 3) {
 			mario->currSubMotionId = 4;
 			mario->jumpVelocityY = marioJumpStandData[0];
 			mario->jumpAccelerationY = marioJumpStandData[1];
@@ -151,7 +145,7 @@ void mot_jumpStand(void) {
 		mario->position.y += mario->jumpVelocityY;
 		break;
 	case 20:
-		if (--MI(0x48) <= 0) {
+		if (--mario->multiTimer <= 0) {
 			mario->baseSpeed = 0.0f;
 			mario->currSubMotionId = 30;
 		}
@@ -177,7 +171,7 @@ void mot_jumpSw(void) {
 		marioPreJump();
 		chgPoseB(mario);
 		if (mario->hitobjJumpFrom != NULL) {
-			if (hitGetAttr((HitEntry*)MI(0x1E8)) & 0x80000000) {
+			if (hitGetAttr((HitEntry*)mario->hitobjJumpFrom) & 0x80000000) {
 				mobj = mobjHitObjPtrToPtr(mario->hitobjJumpFrom);
 				mario->mot.jump.standSpeed = ((MapObjectEntry*)mobj)->position.x;
 				mario->mot.jump.standHeight = ((MapObjectEntry*)mobj)->position.z;
@@ -232,7 +226,7 @@ void mot_jumpSw(void) {
 		mario->position.y += mario->jumpVelocityY;
 		break;
 	case 10:
-		if (--MI(0x48) <= 0) {
+		if (--mario->multiTimer <= 0) {
 			mario->baseSpeed = 0.0f;
 			mario->currSubMotionId = 20;
 		}
@@ -272,7 +266,7 @@ void mot_jumpNpc(void) {
 		}
 		chgPoseB(mario);
 		if (mario->hitobjJumpFrom != NULL) {
-			if (hitGetAttr((HitEntry*)MI(0x1E8)) & 0x80000000) {
+			if (hitGetAttr((HitEntry*)mario->hitobjJumpFrom) & 0x80000000) {
 				mobj = mobjHitObjPtrToPtr(mario->hitobjJumpFrom);
 				mario->mot.jump.standSpeed = ((MapObjectEntry*)mobj)->position.x;
 				mario->mot.jump.standHeight = ((MapObjectEntry*)mobj)->position.z;
@@ -329,7 +323,7 @@ void mot_jumpNpc(void) {
 		mario->position.y += mario->jumpVelocityY;
 		break;
 	case 20:
-		if (--MI(0x48) <= 0) {
+		if (--mario->multiTimer <= 0) {
 			mario->baseSpeed = 0.0f;
 			mario->currSubMotionId = 30;
 		}
@@ -393,7 +387,7 @@ void mot_jump(void) {
 	}
 	switch ((s32)mario->currSubMotionId) {
 	case 0:
-		if (--MI(0x48) <= 0) {
+		if (--mario->multiTimer <= 0) {
 			chgPoseB(mario);
 			mario->currSubMotionId = 10;
 		}
@@ -430,7 +424,7 @@ void mot_jumpSmall(void) {
 	}
 	switch ((s32)mario->currSubMotionId) {
 	case 0:
-		if (--MI(0x48) <= 0) {
+		if (--mario->multiTimer <= 0) {
 			chgPoseB(mario);
 			mario->currSubMotionId = 10;
 		}
@@ -453,7 +447,7 @@ void mot_upstairs(void) {
 	switch ((s32)mario->currSubMotionId) {
 	case 0:
 		mario->position.y = mario->position.y + mario->jumpVelocityY;
-		if (--MI(0x48) <= 0) {
+		if (--mario->multiTimer <= 0) {
 			mario->flags &= ~0x80;
 			mario->flags &= ~0x40;
 			mario->flags &= ~0x40000;
@@ -566,12 +560,12 @@ void mot_land(void) {
 		marioChgMot(0);
 		break;
 	case 1:
-		if (--MI(0x48) <= 0) {
+		if (--mario->multiTimer <= 0) {
 			marioChgMot(0);
 		}
 		break;
 	case 10:
-		if (--MI(0x48) <= 0) {
+		if (--mario->multiTimer <= 0) {
 			marioChgMot(0);
 		}
 		break;

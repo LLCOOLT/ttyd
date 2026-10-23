@@ -52,7 +52,6 @@ typedef struct PGLv2Ac {
     PGLv2Work w;
 } PGLv2Ac;
 
-#define AC_S32(ac, off) (*(s32*)((u8*)(ac) + (off)))
 #define AC_DISP(ac) ((PGLv2Disp*)&(ac)->disp)
 #define AC_WORK(ac) ((PGLv2Work*)(ac)->work)
 
@@ -69,7 +68,7 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
     s32 flag = 0;
     s32 pressed;
     s32 i;
-    if (*((u8*)ac->mAcUnit + BUOFF(0x303))) {
+    if (ac->mAcUnit->badgesEquipped.AutoCommand) {
         flag = 1;
     }
     switch (ac->mAcState) {
@@ -192,7 +191,7 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
         case 1002:
             ac->mAcState = 1003;
         case 1003:
-            ac->field_0x30 |= 1;
+            ac->doneFlags |= 1;
             BattleAcGaugeSeDelete();
             g->endTimer = 60;
             ac->mAcState = 1004;
@@ -247,7 +246,7 @@ void battleAcDisp_PowerGaugeLv2(CameraId cameraId, void* param) {
 }
 
 void battleAcDelete_PowerGaugeLv2(BattleWork* work) {
-    if (!(work->actionCommands.field_0x30 & 1)) {
+    if (!(work->actionCommands.doneFlags & 1)) {
         work->actionCommands.mAcState = 1003;
     }
 }

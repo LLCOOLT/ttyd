@@ -1,3 +1,4 @@
+#include "eff/eff_starstone.h"
 #include "icon_ids.h"
 #pragma optimize_for_size on
 #include "battle/battle.h"
@@ -22,7 +23,6 @@
 #include "evt/evt_paper.h"
 #include "party/party_motion.h"
 
-#define SW(t, o) (*(t*)((u8*)w + (o)))
 double sqrt(double);
 double fabs(double);
 double __fabs(double);
@@ -40,20 +40,23 @@ typedef struct ScissorWork {
     /* 0x058 */ s32 power[16];
     /* 0x098 */ u8 unk_98;
     /* 0x099 */ u8 pad99[3];
-    /* 0x09C */ s32 count;
-    /* 0x0A0 */ s32 unkA0;
-    /* 0x0A4 */ f32 unkA4;
-    /* 0x0A8 */ f32 unkA8;
-    /* 0x0AC */ f32 unkAC;
-    /* 0x0B0 */ f32 unkB0;
-    /* 0x0B4 */ f32 unk_b4;
-    /* 0x0B8 */ f32 unk_b8;
-    /* 0x0BC */ f32 unkBC;
-    /* 0x0C0 */ f32 unkC0;
-    /* 0x0C4 */ u8 padC4[0xD4 - 0xC4];
-    /* 0x0D4 */ f32 unkD4;
-    /* 0x0D8 */ f32 unkD8;
-    /* 0x0DC */ u8 padDC[0xFC - 0xDC];
+    /* 0x09C */ struct ScissorStars {
+        /* 0x09C */ s32 count;
+        /* 0x0A0 */ s32 unkA0;
+        /* 0x0A4 */ f32 unkA4;
+        /* 0x0A8 */ f32 unkA8;
+        /* 0x0AC */ f32 unkAC;
+        /* 0x0B0 */ f32 unkB0;
+        /* 0x0B4 */ f32 unk_b4;
+        /* 0x0B8 */ f32 unk_b8;
+        /* 0x0BC */ f32 unkBC;
+        /* 0x0C0 */ f32 unkC0;
+        /* 0x0C4 */ u8 padC4[0xD4 - 0xC4];
+        /* 0x0D4 */ f32 unkD4;
+        /* 0x0D8 */ f32 unkD8;
+        /* 0x0DC */ f32 starX[4];  // other stars (idx 1..4), x
+        /* 0x0EC */ f32 starY[4];  // other stars (idx 1..4), y
+    } stars;
     /* 0x0FC */ s32 state;
     /* 0x100 */ s32 step;
     /* 0x104 */ s32 timer;
@@ -111,18 +114,18 @@ s32 marioAttackEvent_Scissor[300];
 BattleWeapon weapon_scissor = {
     "btl_wn_sac_scissor", // name
     ICON_19C, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_scissor", // description
     100, // baseAccuracy
     0, // baseFpCost
     4, // baseSpCost
     0, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPower_Scissor, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -131,7 +134,7 @@ BattleWeapon weapon_scissor = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_sac_5", // acHelpMsg
     0x200C8, // special
     0x7FF, // counterResistFlags
@@ -141,23 +144,23 @@ BattleWeapon weapon_scissor = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     marioAttackEvent_Scissor, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon weapon_scissor_finish = {
     "btl_wn_sac_scissor", // name
     0, // icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -167,7 +170,7 @@ BattleWeapon weapon_scissor_finish = {
     0, // element
     27, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x20088, // special
     0x7FF, // counterResistFlags
@@ -177,15 +180,15 @@ BattleWeapon weapon_scissor_finish = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 
 #pragma dont_inline on
 ScissorWork* GetScissorPtr(void) {
-    return (ScissorWork*)((u8*)_battleWorkPointer + 0x1F4C);
+    return (ScissorWork*)_battleWorkPointer->actionCommands.work;
 }
 #pragma dont_inline reset
 
@@ -541,10 +544,10 @@ s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n) {
 
 s32 scissor_tess(void) {
     ScissorWork* w = GetScissorPtr();
-    void* p = BattleAlloc(w->count * 8);
-    memcpy(p, w->buf114, w->count * 8);
+    void* p = BattleAlloc(w->stars.count * 8);
+    memcpy(p, w->buf114, w->stars.count * 8);
     w->unk_14 = 0;
-    tess(p, w->count);
+    tess(p, w->stars.count);
     DCFlushRange(w->buf118, 0x3000);
     return 2;
 }
@@ -604,7 +607,7 @@ s32 weaponGetPower_Scissor(void* a, void* b, BattleUnit* unit) {
     if (unit == NULL) {
         return 0;
     }
-    if ((s32)*(u8*)((u8*)unit + 0xC) == 1) {
+    if ((s32)(u8)unit->mAlliance == 1) {
         for (i = 0; i < 16; i++) {
             if (w->unitIds[i] == BtlUnit_GetUnitId(unit)) {
                 return w->power[i];
@@ -637,7 +640,7 @@ void star_disp2D(CameraId camera, void* param);
 
 s32 star_control(EventEntry* evt, BOOL first) {
     ScissorWork* w = GetScissorPtr();
-    StarTrail* t = (StarTrail*)&w->count;
+    StarTrail* t = (StarTrail*)&w->stars.count;
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
     s32 i;
 
@@ -761,7 +764,7 @@ void star_disp2D_sub(s32 idx, s32 alpha) {
     Mtx rotY;
     Mtx rotZ;
     Mtx scaleMtx;
-    u8* p = (u8*)w + 0x9C;
+    struct ScissorStars* s = &w->stars;
     f32 x, y, z;
     GXColor col;
     if (w->phase >= 6) {
@@ -774,13 +777,13 @@ void star_disp2D_sub(s32 idx, s32 alpha) {
     col = (GXColor){0xFF, 0xFF, 0xFF, 0x00};
     col.a = alpha;
     if (idx == 0) {
-        x = *(f32*)(p + 0x18);
-        y = *(f32*)(p + 0x1C);
+        x = s->unk_b4;
+        y = s->unk_b8;
         z = 0.0f;
     } else {
         z = 0.0f;
-        x = *(f32*)(p + idx * 4 + 0x3C);
-        y = *(f32*)(p + idx * 4 + 0x4C);
+        x = s->starX[idx - 1];
+        y = s->starY[idx - 1];
     }
     PSMTXTrans(transMtx, x, y - 20.0f, z);
     PSMTXScale(scaleMtx, w->scale.x, w->scale.y, w->scale.z);
@@ -860,65 +863,65 @@ s32 scissor_control(EventEntry* evt, BOOL first) {
     f32 ox, oy;
     s32 i, k;
     if (first) {
-        w->count = 0;
-        w->unkA8 = 0.0f;
-        w->unkA4 = 0.0f;
-        w->unkB0 = 0.0f;
-        w->unkAC = 0.0f;
-        w->unkA0 = 0;
-        w->unkD4 = 0.0f;
-        w->unkD8 = 0.0f;
+        w->stars.count = 0;
+        w->stars.unkA8 = 0.0f;
+        w->stars.unkA4 = 0.0f;
+        w->stars.unkB0 = 0.0f;
+        w->stars.unkAC = 0.0f;
+        w->stars.unkA0 = 0;
+        w->stars.unkD4 = 0.0f;
+        w->stars.unkD8 = 0.0f;
         memset(buf, 0, 0x1000);
         w->flags &= ~1;
     }
-    w->unkA4 = w->unkAC;
-    w->unkA8 = w->unkB0;
-    w->unkAC = (f32)keyGetStickX(0);
-    w->unkB0 = (f32)keyGetStickY(0);
-    sqrt(w->unkA4 * w->unkA4 + w->unkA8 * w->unkA8);
-    if ((f32)sqrt(w->unkAC * w->unkAC + w->unkB0 * w->unkB0) > 42.0f) {
-        w->unkD4 += w->unkAC / 50.0f;
-        w->unkD8 += w->unkB0 / 50.0f;
+    w->stars.unkA4 = w->stars.unkAC;
+    w->stars.unkA8 = w->stars.unkB0;
+    w->stars.unkAC = (f32)keyGetStickX(0);
+    w->stars.unkB0 = (f32)keyGetStickY(0);
+    sqrt(w->stars.unkA4 * w->stars.unkA4 + w->stars.unkA8 * w->stars.unkA8);
+    if ((f32)sqrt(w->stars.unkAC * w->stars.unkAC + w->stars.unkB0 * w->stars.unkB0) > 42.0f) {
+        w->stars.unkD4 += w->stars.unkAC / 50.0f;
+        w->stars.unkD8 += w->stars.unkB0 / 50.0f;
     }
-    w->unkD4 *= 0.86f;
-    w->unkD8 *= 0.86f;
-    w->unk_b4 += w->unkD4;
-    w->unk_b8 += w->unkD8;
-    if (w->unk_b4 < -300.0f) {
-        w->unk_b4 = -300.0f;
+    w->stars.unkD4 *= 0.86f;
+    w->stars.unkD8 *= 0.86f;
+    w->stars.unk_b4 += w->stars.unkD4;
+    w->stars.unk_b8 += w->stars.unkD8;
+    if (w->stars.unk_b4 < -300.0f) {
+        w->stars.unk_b4 = -300.0f;
     }
-    if (w->unk_b4 > 300.0f) {
-        w->unk_b4 = 300.0f;
+    if (w->stars.unk_b4 > 300.0f) {
+        w->stars.unk_b4 = 300.0f;
     }
-    if (w->unk_b8 < -200.0f) {
-        w->unk_b8 = -200.0f;
+    if (w->stars.unk_b8 < -200.0f) {
+        w->stars.unk_b8 = -200.0f;
     }
-    if (w->unk_b8 > 200.0f) {
-        w->unk_b8 = 200.0f;
+    if (w->stars.unk_b8 > 200.0f) {
+        w->stars.unk_b8 = 200.0f;
     }
     if (w->timer <= 59) {
         w->phase = 6;
         return 2;
     }
-    if (gp->retraceCount % 6 == 0 && w->count < 0x200) {
-        if (w->unkBC != w->unk_b4 || w->unkC0 != w->unk_b8) {
-            if (__fabs(w->unk_b4 - w->unkBC) >= 5.0 || __fabs(w->unk_b8 - w->unkC0) >= 5.0) {
+    if (gp->retraceCount % 6 == 0 && w->stars.count < 0x200) {
+        if (w->stars.unkBC != w->stars.unk_b4 || w->stars.unkC0 != w->stars.unk_b8) {
+            if (__fabs(w->stars.unk_b4 - w->stars.unkBC) >= 5.0 || __fabs(w->stars.unk_b8 - w->stars.unkC0) >= 5.0) {
                 psndSFXOn("SFX_BTL_SAC_KAKONDEPON1");
             }
-            buf[w->count].x = w->unk_b4;
-            buf[w->count].y = w->unk_b8;
-            w->unkBC = w->unk_b4;
-            w->unkC0 = w->unk_b8;
-            w->count++;
+            buf[w->stars.count].x = w->stars.unk_b4;
+            buf[w->stars.count].y = w->stars.unk_b8;
+            w->stars.unkBC = w->stars.unk_b4;
+            w->stars.unkC0 = w->stars.unk_b8;
+            w->stars.count++;
         }
     }
-    if (w->count > 3) {
-        for (i = 0; i < w->count - 3; i++) {
+    if (w->stars.count > 3) {
+        for (i = 0; i < w->stars.count - 3; i++) {
             p = &buf[i];
-            if (scissor_intersection(p[0].x, p[0].y, p[1].x, p[1].y, buf[w->count - 2].x, buf[w->count - 2].y,
-                                     buf[w->count - 1].x, buf[w->count - 1].y, &ox, &oy)) {
-                buf[i].x = buf[w->count - 1].x = ox;
-                buf[i].y = buf[w->count - 1].y = oy;
+            if (scissor_intersection(p[0].x, p[0].y, p[1].x, p[1].y, buf[w->stars.count - 2].x, buf[w->stars.count - 2].y,
+                                     buf[w->stars.count - 1].x, buf[w->stars.count - 1].y, &ox, &oy)) {
+                buf[i].x = buf[w->stars.count - 1].x = ox;
+                buf[i].y = buf[w->stars.count - 1].y = oy;
                 for (k = 0; k < i; k++) {
                     buf[k] = *p;
                 }
@@ -1139,7 +1142,7 @@ void scissor_disp_control(CameraId camera, void* param) {
     GXLoadPosMtxImm(camGetPtr(camera)->view, 0);
     GXSetCurrentMtx(0);
     GXSetLineWidth(16, 0);
-    for (i = 0; i < w->count - 1; i++) {
+    for (i = 0; i < w->stars.count - 1; i++) {
         GXColor hsv = {0x00, 0xFF, 0xFF, 0xFF};
         hsv.r = (gp->retraceCount + i * 2) % 127 * 2;
         GXSetChanMatColor(4, HSV2RGB(hsv));
@@ -1213,8 +1216,8 @@ s32 scissor_init(void) {
     w->timer = 0x3BF;
     w->buf114 = BattleAlloc(0x1000);
     w->buf118 = BattleAlloc(0x3000);
-    w->unk_b4 = 0.0f;
-    w->unk_b8 = 0.0f;
+    w->stars.unk_b4 = 0.0f;
+    w->stars.unk_b8 = 0.0f;
     w->unk_0c = 0;
     w->unk_98 = 0;
     return 2;
@@ -1222,7 +1225,7 @@ s32 scissor_init(void) {
 
 s32 scissor_end(void) {
     ScissorWork* w = GetScissorPtr();
-    effDelete(*(EffectEntry**)((u8*)w->eff->userdata + 0x34));
+    effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
     effDelete(w->eff);
     if (w->smart != NULL) {
         smartFree(w->smart);

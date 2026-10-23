@@ -175,7 +175,7 @@ EffectEntry* effNiceEntry(s32 type, f32 x, f32 y, f32 z) {
 	userdata->scaleX = 1.0f;
 	userdata->scaleY = 1.0f;
 	userdata->scaleZ = 1.0f;
-	userdata->field_0x1C = 1.0f;
+	userdata->overallScale = 1.0f;
 	userdata->poseId = -1;
 	switch (type) {
 	case 7:
@@ -244,7 +244,7 @@ void effNiceMain(EffectEntry* effect) {
 		case 4:
 		case 5:
 		case 6:
-			len = *(f32*)((u8*)(void*)data->unk24 + 8);
+			len = data->loopInfo[2];
 			{
 			f32 tbl[7][6] = {
 				{ 32.0f, 34.0f, 34.0f, 34.0f, 34.0f, 36.0f },
@@ -269,7 +269,7 @@ void effNiceMain(EffectEntry* effect) {
 		switch (type) {
 		case 0:
 		case 1: {
-			len = *(f32*)((u8*)(void*)data->unk24 + 8);
+			len = data->loopInfo[2];
 			start = ((u32)gp->language == 0) ? 32.0f : 34.0f;
 			if (pose->localFrame > start) {
 				t = 1.0f - (pose->localFrame - start) / (len - start);
@@ -280,7 +280,7 @@ void effNiceMain(EffectEntry* effect) {
 			break;
 		}
 		case 2: {
-			len = *(f32*)((u8*)(void*)data->unk24 + 8);
+			len = data->loopInfo[2];
 			start = ((u32)gp->language == 0) ? 35.0f : 37.0f;
 			if (pose->localFrame > start) {
 				t = 1.0f - (pose->localFrame - start) / (len - start);
@@ -291,7 +291,7 @@ void effNiceMain(EffectEntry* effect) {
 			break;
 		}
 		case 3: {
-			len = *(f32*)((u8*)(void*)data->unk24 + 8);
+			len = data->loopInfo[2];
 			start = ((u32)gp->language == 0) ? 45.0f : 40.0f;
 			if (pose->localFrame > start) {
 				t = 1.0f - (pose->localFrame - start) / (len - start);
@@ -302,7 +302,7 @@ void effNiceMain(EffectEntry* effect) {
 			break;
 		}
 		case 4: {
-			len = *(f32*)((u8*)(void*)data->unk24 + 8);
+			len = data->loopInfo[2];
 			start = ((u32)gp->language == 0) ? 48.0f : 40.0f;
 			if (pose->localFrame > start) {
 				t = 1.0f - (pose->localFrame - start) / (len - start);
@@ -336,7 +336,7 @@ void effNiceDisp(CameraId cameraId, void* param) {
 
 	PSMTXTrans(trans, wp->position.x, wp->position.y, wp->position.z);
 	PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(cameraId)->viewYaw);
-	PSMTXScale(scale, wp->field_0x1C, wp->field_0x1C, wp->field_0x1C);
+	PSMTXScale(scale, wp->overallScale, wp->overallScale, wp->overallScale);
 	PSMTXConcat(trans, rot, mtx);
 	PSMTXConcat(mtx, scale, mtx);
 	PSMTXScale(scale, 8.0f, 8.0f, 8.0f);
@@ -471,7 +471,7 @@ void effAcrobatDisp(CameraId cameraId, void* param) {
 #endif
 
 	PSMTXTrans(trans, wp->position.x, wp->position.y, wp->position.z);
-	PSMTXScale(scale, wp->field_0x1C, wp->field_0x1C, wp->field_0x1C);
+	PSMTXScale(scale, wp->overallScale, wp->overallScale, wp->overallScale);
 	PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(cameraId)->viewYaw);
 	PSMTXConcat(trans, rot, mtx);
 	PSMTXConcat(mtx, scale, mtx);

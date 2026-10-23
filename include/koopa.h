@@ -4,7 +4,7 @@
 
 s32 kpaGetLevel(void);
 
-u8* getKoopaFireEfp(void);
+struct EffectEntry* getKoopaFireEfp(void);
 void kpaAttackStart(void);
 void kpaAttackStart2(void);
 void kpaCancelAttackMode(void);
@@ -34,32 +34,32 @@ typedef enum KpaWorkFlags {
 } KpaWorkFlags;
 
 typedef struct KpaWork {
-    u32 flags;              // 0x000, KpaWorkFlags
-    s32 level;              // 0x004, kpaGetLevel/kpaSetLevel (0..3)
-    u8 field_0x8[0x10 - 0x8]; // 0x008
-    f32 field_0x10;         // 0x010, koopa_motion: 0.02
-    f32 field_0x14;         // 0x014, koopa_motion: -0.02
-    struct HitEntry* flameHit;     // 0x018, kpaFlameHitCheck result (kpaFireEntry2)
-    struct HitEntry* objHit;       // 0x01C, kpaGetHitobj
-    struct HitEntry* headHit[10];  // 0x020, kpaSearchHead
-    s32 field_0x48;         // 0x048
-    struct HitEntry* rideHit[10];  // 0x04C, kpaSearchGround / kpaChkHitobjRide
-    s32 field_0x74;         // 0x074
-    f32 headDist[10];       // 0x078, 1000.0f when clear
-    s32 field_0xA0;         // 0x0A0
-    f32 rideDist[10];       // 0x0A4, 1000.0f when clear
-    s32 field_0xCC;         // 0x0CC
-    s32 walkRate;           // 0x0D0, _rateTbl[level] (init 1)
-    s32 field_0xD4;         // 0x0D4
-    s32 fireRate;           // 0x0D8, 12 at level 0 else 8 (init 1)
-    s32 field_0xDC;         // 0x0DC
-    s32 fireCount;          // 0x0E0
-    u8 field_0xE4[0x138 - 0xE4]; // 0x0E4
-    s32 mutekiTimer;        // 0x138, kpaMSetMutekiTimer: 12 s
-    s32 attackState;        // 0x13C, kpaAttackStart (1), fire states 20-24 / 40-44, 30
-    s32 attackTimer;        // 0x140
-    s32 fireHold;           // 0x144, evt_koopa_fire keeps the flame going while set
-    s32 field_0x148;        // 0x148
-    s32 fireSfxId;          // 0x14C, kpaFireSEOn/Off, -1 when off
-    s32 swimSplashTimer;    // 0x150, kpa_swim_splash
+    u32 flags;                    // 0x000, KpaWorkFlags
+    s32 level;                    // 0x004, kpaGetLevel/kpaSetLevel (0..3)
+    u8 pad_08[0x10 - 0x8];        // 0x008, never accessed
+    f32 standParamA;              // 0x010, koopa_motion stand init writes 0.02, never read
+    f32 standParamB;              // 0x014, koopa_motion stand init writes -0.02, never read
+    struct HitEntry* flameHit;    // 0x018, kpaFlameHitCheck result (kpaFireEntry2)
+    struct HitEntry* objHit;      // 0x01C, kpaGetHitobj
+    struct HitEntry* headHit[10]; // 0x020, kpaSearchHead
+    s32 pad_48;                   // 0x048, never accessed (slot after headHit[10])
+    struct HitEntry* rideHit[10]; // 0x04C, kpaSearchGround / kpaChkHitobjRide
+    s32 pad_74;                   // 0x074, never accessed (slot after rideHit[10])
+    f32 headDist[10];             // 0x078, 1000.0f when clear
+    s32 pad_A0;                   // 0x0A0, never accessed (slot after headDist[10])
+    f32 rideDist[10];             // 0x0A4, 1000.0f when clear
+    s32 pad_CC;                   // 0x0CC, never accessed (slot after rideDist[10])
+    s32 walkRate;                 // 0x0D0, _rateTbl[level] (init 1)
+    s32 pad_D4;                   // 0x0D4, never accessed
+    s32 fireRate;                 // 0x0D8, 12 at level 0 else 8 (init 1)
+    s32 pad_DC;                   // 0x0DC, never accessed
+    s32 fireCount;                // 0x0E0
+    u8 pad_E4[0x138 - 0xE4];      // 0x0E4, never accessed
+    s32 mutekiTimer;              // 0x138, kpaMSetMutekiTimer: 12 s
+    s32 attackState;              // 0x13C, kpaAttackStart (1), fire states 20-24 / 40-44, 30
+    s32 attackTimer;              // 0x140
+    s32 fireHold;                 // 0x144, evt_koopa_fire keeps the flame going while set
+    s32 pad_148;                  // 0x148, never accessed
+    s32 fireSfxId;                // 0x14C, kpaFireSEOn/Off, -1 when off
+    s32 swimSplashTimer;          // 0x150, kpa_swim_splash
 } KpaWork;                  // size 0x154

@@ -658,7 +658,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     animPoseGetAnimPosePtr(w->poseId);
     anim = animPoseGetAnimDataPtr(w->poseId);
     if (w->f18C == 0) {
-        animPoseSetLocalTime(w->poseId, (f32)(gp->retraceCount % (s32)(*(f32*)((u8*)anim->unk24 + 8))));
+        animPoseSetLocalTime(w->poseId, (f32)(gp->retraceCount % (s32)anim->loopInfo[2]));
     }
     animPoseMain(w->poseId);
     winKageGX(w, (GXColor){0x00, 0x00, 0x00, 0x80}, x - 150.0f, y, 0.0f, 1.0f);
@@ -867,7 +867,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     animPoseGetAnimPosePtr(w->poseId);
     anim = animPoseGetAnimDataPtr(w->poseId);
     if (w->f18C == 0) {
-        animPoseSetLocalTime(w->poseId, (f32)(gp->retraceCount % (s32)(*(f32*)((u8*)anim->unk24 + 8))));
+        animPoseSetLocalTime(w->poseId, (f32)(gp->retraceCount % (s32)anim->loopInfo[2]));
     }
     animPoseMain(w->poseId);
     winKageGX(w, (GXColor){0x00, 0x00, 0x00, 0x80}, x - 150.0f, y, 0.0f, 1.0f);

@@ -114,8 +114,8 @@ BOOL parseGet1Next(s32 type, void* data) {
 	switch (type) {
 	case 3:
 		result *= parseGet1Next(2, data);
-		result *= parseGet1Next(2, (void*)((u32)data + 4));
-		result *= parseGet1Next(2, (void*)((u32)data + 8));
+		result *= parseGet1Next(2, (f32*)data + 1);
+		result *= parseGet1Next(2, (f32*)data + 2);
 		return result;
 	}
 

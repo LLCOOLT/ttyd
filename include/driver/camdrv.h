@@ -76,19 +76,19 @@ struct CameraEntry {
     u8 align_1E6[0x1E8 - 0x1E6]; // 0x1E6
     CameraId letterBoxCamId;     // 0x1E8
     CameraCallback callback;     // 0x1EC
-    Vec field_1F0;               // 0x1F0
-    u32 field_1FC;               // 0x1FC
-    Vec field_200;               // 0x200
-    Vec field_20C;               // 0x20C
-    u16 field_218;               // 0x218
-    u16 field_21A;               // 0x21A
-    u16 field_21C;               // 0x21C
-    u16 field_21E;               // 0x21E
-    u32 field_220;               // 0x220
-    Vec field_224;               // 0x224
-    Vec field_230;               // 0x230
-    Vec field_23C;               // 0x23C
-    Vec field_248;               // 0x248
+    Vec reserved_1F0;               // 0x1F0, camInit sets (0, 8, 400), never read
+    u32 pad_1FC;               // 0x1FC, never accessed
+    Vec reserved_200;               // 0x200, camInit zeroes, never read
+    Vec reserved_20C;               // 0x20C, camInit zeroes, never read
+    u16 reserved_218;               // 0x218, camInit zeroes, never read
+    u16 reserved_21A;               // 0x21A, camInit zeroes, never read
+    u16 reserved_21C;               // 0x21C, camInit zeroes, never read
+    u16 reserved_21E;               // 0x21E, camInit zeroes, never read
+    u32 pad_220;               // 0x220, never accessed
+    Vec reserved_224;               // 0x224, camInit zeroes, never read
+    Vec reserved_230;               // 0x230, camInit sets (10, 10, 10), never read
+    Vec reserved_23C;               // 0x23C, camInit zeroes, never read
+    Vec reserved_248;               // 0x248, camInit zeroes, never read
     char name[0xC];              // 0x254
 };
 

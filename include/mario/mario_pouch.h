@@ -398,9 +398,9 @@ typedef struct PouchData {
     s16 coins;                         // 0x78
     s16 currentSP;                     // 0x7A
     s16 maximumSP;                     // 0x7C
-    s16 field_0x7E;                    // 0x7E
-    s16 field_0x80;                    // 0x80
-    s16 field_0x82;                    // 0x82
+    s16 reserved_7E;                    // 0x7E, pouchInit zeroes, never read
+    s16 reserved_80;                    // 0x80, pouchInit zeroes, never read
+    s16 pad_82;                    // 0x82, never accessed
     f32 audienceCount;                 // 0x84
     s16 rank;                          // 0x88
     s16 level;                         // 0x8A
@@ -421,12 +421,12 @@ typedef struct PouchData {
     s16 badges[MAX_BADGES];            // 0x1FA
     s16 equippedBadges[MAX_BADGES];    // 0x38A
     u8 mEmailIds[100];                 // 0x51A
-    u8 field_0x57E[2];                 // 0x57E, alignment?
+    u8 pad_57E[2];                 // 0x57E, never accessed
     u32 mEmailReceivedFlags[4];        // 0x580
     u32 mEmailReadFlags[4];            // 0x590
-    u8 field_0x5A0[0x10];              // 0x5A0
+    u8 pad_5A0[0x10];              // 0x5A0, never accessed
     u16 mShopPoints;                   // 0x5B0
-    u8 field_0x5B2[2];                 // 0x5B2
+    u8 pad_5B2[2];                 // 0x5B2, never accessed
     u32 shopPointRewardFlags; //0x5B4, bit i = shop point reward i claimed (evt_shop.c)
     u8 mMerleeCurseUsesRemaining;      // 0x5B8
     s8 mTurnsUntilMerleeActivation;    // 0x5B9
@@ -434,7 +434,7 @@ typedef struct PouchData {
     u8 mSuperBowserCoins;              // 0x5BB
     u32 mSuperBowserScore;             // 0x5BC
     char yoshiName[16];                // 0x5C0
-    u8 field_0x5D0[4];                 // 0x5D0
+    u8 pad_5D0[4];                 // 0x5D0, never accessed
 } PouchData;
 
 PouchData* pouchGetPtr(void);

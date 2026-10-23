@@ -87,7 +87,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            disp->unk20 = 20;
+            disp->slideTimer = 20;
             cw->frame = 0;
             cw->angle = 0.0f;
             cw->cur = PC_PARAMS(work)->period;
@@ -184,7 +184,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             }
             break;
         case 1002:
-            ac->field_0x30 |= 1;
+            ac->doneFlags |= 1;
             cw->endTimer = 60;
             if (cw->sfxId != 0xFFFFFFFF) {
                 psndSFXOff(cw->sfxId);
@@ -252,7 +252,7 @@ void battleAcDisp_PendulumCraneTiming(CameraId cameraId, void* param) {
 }
 
 void battleAcDelete_PendulumCraneTiming(BattleWork* work) {
-    if ((u32)work->actionCommands.field_0x30 & 1) {
+    if ((u32)work->actionCommands.doneFlags & 1) {
         return;
     }
     work->actionCommands.mAcState = 1002;
@@ -287,7 +287,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
     {
         Vec pos2 = {0.0f, 0.0f, 0.0f};
-        pos2.x = (-288.0f + x) + (f32)(*(s32*)((u8*)work + 0x1F8C) * 176) / 100.0f;
+        pos2.x = (-288.0f + x) + (f32)(((PendulumWork*)work->actionCommands.work)->rate * 176) / 100.0f;
         pos2.y = 45.0f + y;
         iconDispGx(&pos2, 0x10, ICON_096, 1.0f);
     }

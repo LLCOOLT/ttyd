@@ -12,7 +12,7 @@ typedef struct EffNokotarouWork {
     f32 scale;      // 0x20, eases in and out
     s32 alpha;      // 0x24
     s32 timer;      // 0x28, counts down while fading out
-    s32 field_0x2C; // 0x2C
+    s32 pad_2C; // 0x2C, never accessed
     s32 poseId;     // 0x30
     s32 poseId2;    // 0x34, stretched between start and position
 } EffNokotarouWork;

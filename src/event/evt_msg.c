@@ -7,12 +7,10 @@
 #include <string.h>
 #include <stdio.h>
 
-// US message work is larger: its event/name fields move from 0x7A00 to 0xF200
+// US message buffer is twice as large
 #ifdef VERSION_G8ME01
-#define MSGW_BASE 0xF200
 #define MSG_BUF_SIZE 0xA00
 #else
-#define MSGW_BASE 0x7A00
 #define MSG_BUF_SIZE 0x500
 #endif
 
@@ -35,19 +33,12 @@ s32 msgWindow_Entry(const char* msg, s32 a2, s32 a3);
 s32 BattleTransID(EventEntry* event, s32 type);
 void BtlUnit_GetTalkTogePos(s32 unit, f32* x, f32* y, f32* z);
 
-typedef struct MsgWinWork {
-	u8 pad0[0x8];
-	s32 type; //0x8
-	u8 padC[0x28 - 0xC];
-	u8** msg; //0x28
-	s16 toge; //0x2C
-	u8 pad2E[2];
-	Vec pos; //0x30
-} MsgWinWork;
+// the message window's MsgWinData lives in its userdata block
+#define MSGW(w) ((MsgWinData*)(w)->userdata->address)
 
 s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, s32 msg, s32 a3, s32 name) {
 	NpcEntry* npc = NULL;
-	MsgWinWork* win;
+	WindowEntry* win;
 	const char* m;
 	if (isFirstCall) {
 		if (!(flags & 1)) {
@@ -58,9 +49,9 @@ s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, s32 msg, s32 
 		}
 		event->printWindowId = msgWindow_Entry(m, a3, (s16)event->msgPriority);
 		event->msgPriority = 0;
-		win = (MsgWinWork*)windowGetPointer(event->printWindowId);
-		*(s32*)*win->msg = msg;
-		*(EventEntry**)(*win->msg + MSGW_BASE) = event;
+		win = windowGetPointer(event->printWindowId);
+		MSGW(win)->tag = (const char*)msg;
+		MSGW(win)->event = event;
 		if (!(flags & 2)) {
 			if (event->wNpcEventType == 6) {
 				npc = event->ownerNPC;
@@ -70,90 +61,90 @@ s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, s32 msg, s32 
 			}
 			if (npc == (NpcEntry*)-1) {
 				if (!(event->printWindowFlags & 0x1EFFFFFF)) {
-					u8* p = (u8*)partyGetPtr(marioGetPartyId());
+					PartyEntry* p = partyGetPtr(marioGetPartyId());
 					if (!p) {
-						win->pos = marioGetPtr()->position;
-						win->pos.y += marioGetPtr()->wPlayerCollisionBox.y;
+						win->speakerPos = marioGetPtr()->position;
+						win->speakerPos.y += marioGetPtr()->wPlayerCollisionBox.y;
 					} else {
-						win->pos = *(Vec*)(p + 0x58);
-						win->pos.y += *(f32*)(p + 0xF0);
+						win->speakerPos = p->position;
+						win->speakerPos.y += p->height;
 					}
 				}
-				strcpy((char*)*win->msg + MSGW_BASE + 0x4, (const char*)name);
+				strcpy(MSGW(win)->speakerName, (const char*)name);
 			} else if (npc == (NpcEntry*)-2) {
 				if (!(event->printWindowFlags & 0x1EFFFFFF)) {
-					u8* p = (u8*)partyGetPtr(marioGetExtraPartyId());
+					PartyEntry* p = partyGetPtr(marioGetExtraPartyId());
 					if (!p) {
-						win->pos = marioGetPtr()->position;
-						win->pos.y += marioGetPtr()->wPlayerCollisionBox.y;
+						win->speakerPos = marioGetPtr()->position;
+						win->speakerPos.y += marioGetPtr()->wPlayerCollisionBox.y;
 					} else {
-						win->pos = *(Vec*)(p + 0x58);
-						win->pos.y += *(f32*)(p + 0xF0);
+						win->speakerPos = p->position;
+						win->speakerPos.y += p->height;
 					}
 				}
-				strcpy((char*)*win->msg + MSGW_BASE + 0x4, (const char*)name);
+				strcpy(MSGW(win)->speakerName, (const char*)name);
 			} else if (npc == (NpcEntry*)-3) {
 				if (!(event->printWindowFlags & 0x1EFFFFFF)) {
-					win->pos = marioGetPtr()->position;
-					win->pos.y += marioGetPtr()->wPlayerCollisionBox.y;
+					win->speakerPos = marioGetPtr()->position;
+					win->speakerPos.y += marioGetPtr()->wPlayerCollisionBox.y;
 				}
-				strcpy((char*)*win->msg + MSGW_BASE + 0x4, (const char*)name);
+				strcpy(MSGW(win)->speakerName, (const char*)name);
 			} else if (npc) {
 				if (!(event->printWindowFlags & 0x1EFFFFFF)) {
-					win->pos = npc->position;
-					win->pos.y += npc->height;
+					win->speakerPos = npc->position;
+					win->speakerPos.y += npc->height;
 				}
-				strcpy((char*)*win->msg + MSGW_BASE + 0x4, npc->description);
+				strcpy(MSGW(win)->speakerName, npc->description);
 			}
 		} else {
-			*(u32*)(*win->msg + 4) |= 8;
-			*(s32*)(*win->msg + MSGW_BASE + 0x24) = BattleTransID(event, name);
-			BtlUnit_GetTalkTogePos(*(s32*)(*win->msg + MSGW_BASE + 0x24), &win->pos.x, &win->pos.y, &win->pos.z);
-			win->toge = 3;
+			MSGW(win)->flags |= 8;
+			MSGW(win)->unitId = BattleTransID(event, name);
+			BtlUnit_GetTalkTogePos(MSGW(win)->unitId, &win->speakerPos.x, &win->speakerPos.y, &win->speakerPos.z);
+			win->tailMode = 3;
 		}
 		switch (event->printWindowFlags & 0x1EFFFFFF) {
 			case 0:
 				if (npc) {
 					Vec scr, mscr;
 					marioGetPtr();
-					getScreenPoint(&win->pos, &scr);
+					getScreenPoint(&win->speakerPos, &scr);
 					if (win->type == 1) {
-						win->toge = 7;
+						win->tailMode = 7;
 					} else if (__fabsf(scr.x) >= 300.0f) {
-						win->toge = 2;
+						win->tailMode = 2;
 					} else {
 						getScreenPoint(&marioGetPtr()->position, &mscr);
 						if (scr.x < mscr.x) {
-							win->toge = 3;
+							win->tailMode = 3;
 						} else {
-							win->toge = 7;
+							win->tailMode = 7;
 						}
 					}
 				}
 				break;
 			case 1:
-				win->toge = 0;
+				win->tailMode = 0;
 				break;
 			case 2:
-				win->toge = 7;
-				win->pos = *(Vec*)&event->msgPos;
+				win->tailMode = 7;
+				win->speakerPos = *(Vec*)&event->msgPos;
 				break;
 			case 3:
-				win->toge = 2;
-				win->pos = *(Vec*)&event->msgPos;
+				win->tailMode = 2;
+				win->speakerPos = *(Vec*)&event->msgPos;
 				break;
 		}
 		if (event->printWindowFlags & 0x80000000) {
-			win->toge = 3;
+			win->tailMode = 3;
 			if (event->printWindowFlags & 0x40000000) {
-				win->toge |= 4;
+				win->tailMode |= 4;
 			}
 			if (event->printWindowFlags & 0x20000000) {
-				win->toge |= 8;
+				win->tailMode |= 8;
 			}
 		}
 		if (event->printWindowFlags & 0x01000000) {
-			win->toge |= 0x10;
+			win->tailMode |= 0x10;
 		}
 		event->printWindowFlags = 0;
 	}
@@ -454,12 +445,12 @@ USER_FUNC(evt_msg_select) {
 			msg = "DIRECT\0";
 		}
 		event->selectWindowId = msgWindow_Entry(m, 0, 0x14);
-		***(const char****)((u8*)windowGetPointer(event->selectWindowId) + 0x28) = msg;
+		MSGW(windowGetPointer(event->selectWindowId))->tag = msg;
 	}
 	if (windowCheckID(event->selectWindowId)) {
 		return EVT_RETURN_BLOCK;
 	}
-	event->lwData[0] = *(s8*)(*(u8**)windowGetPointer(event->selectWindowId)->userdata + MSGW_BASE + 0x43);
+	event->lwData[0] = MSGW(windowGetPointer(event->selectWindowId))->sel;
 	windowDeleteID(event->selectWindowId);
 	return EVT_RETURN_DONE;
 }
@@ -501,7 +492,7 @@ USER_FUNC(evt_msg_pri) {
 
 USER_FUNC(evt_msg_npc) {
 	const char* name = (const char*)evtGetValue(event, *event->args);
-	strcpy(*(char**)windowGetPointer(event->printWindowId)->userdata + MSGW_BASE + 0x4, name);
+	strcpy(MSGW(windowGetPointer(event->printWindowId))->speakerName, name);
 	return EVT_RETURN_DONE;
 }
 

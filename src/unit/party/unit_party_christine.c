@@ -54,7 +54,7 @@ USER_FUNC(_monosiri_flag_on);
 USER_FUNC(btlevtcmd_get_monosiri_msg_no);
 #ifdef VERSION_G8ME01
 #endif
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
+static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 static USER_FUNC(krb_get_dir);
 
 __declspec(section ".data") f32 unit_party_christine_negone_one_a[2];
@@ -278,16 +278,16 @@ BattleWeapon partyWeapon_ChristineNormalAttack = {
 #else
     336, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pkr_normal_jump", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -296,7 +296,7 @@ BattleWeapon partyWeapon_ChristineNormalAttack = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_zutsuki", // acHelpMsg
     0x35007, // special
     0xC, // counterResistFlags
@@ -307,12 +307,12 @@ BattleWeapon partyWeapon_ChristineNormalAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyChristineAttack_NormalAttack, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 4, 2, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 4, 2, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 2, 2, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 2, 2, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -323,16 +323,16 @@ BattleWeapon partyWeapon_ChristineMonosiri = {
 #else
     337, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pkr_monosiri", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -341,7 +341,7 @@ BattleWeapon partyWeapon_ChristineMonosiri = {
     0x20000001, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_monoshiri", // acHelpMsg
     0x20008, // special
     0x7FF, // counterResistFlags
@@ -352,9 +352,9 @@ BattleWeapon partyWeapon_ChristineMonosiri = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyChristineAttack_Monosiri, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_ChristineRenzokuAttack = {
@@ -364,21 +364,21 @@ BattleWeapon partyWeapon_ChristineRenzokuAttack = {
 #else
     338, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pkr_renzoku_zutsuki", // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
 #ifdef VERSION_G8ME01
     1, // mStylishCommandMultiplier
 #else
     2, // mStylishCommandMultiplier
 #endif
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -387,7 +387,7 @@ BattleWeapon partyWeapon_ChristineRenzokuAttack = {
     0x20001004, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_zutsuki", // acHelpMsg
     0x25017, // special
     0xC, // counterResistFlags
@@ -398,12 +398,12 @@ BattleWeapon partyWeapon_ChristineRenzokuAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyChristineAttack_RenzokuAttack, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 10, 5, 0, 0, 5, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 0, 0, 5, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 5, 5, 0, 0, 5, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 0, 0, 5, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -414,17 +414,17 @@ BattleWeapon partyWeapon_ChristineKiss = {
 #else
     339, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pkr_nage_kiss", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -433,7 +433,7 @@ BattleWeapon partyWeapon_ChristineKiss = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_kiss", // acHelpMsg
     0x20108, // special
     0x7FF, // counterResistFlags
@@ -446,12 +446,12 @@ BattleWeapon partyWeapon_ChristineKiss = {
     2, // fastTime
     0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partyChristineAttack_Kiss, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 10, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #else
-    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 5, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -2323,44 +2323,44 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count) {
+static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
     techLv = partyGetTechLv(BattleTransPartyId(BattleGetPartyPtr(_battleWorkPointer)->currentKind));
 
-    command->mWeaponTable[*count].mIndex = -1;
-    command->mWeaponTable[*count].mItem = 0;
-    command->mWeaponTable[*count].mWeaponParams = &partyWeapon_ChristineNormalAttack;
-    command->mWeaponTable[*count].field_0x4 = 0;
-    command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-    command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+    command->weapon[*count].index = -1;
+    command->weapon[*count].itemId = 0;
+    command->weapon[*count].weapon = &partyWeapon_ChristineNormalAttack;
+    command->weapon[*count].enabled = 0;
+    command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+    command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
     (*count)++;
 
     if (techLv >= 0) {
-        command->mWeaponTable[*count].mIndex = -1;
-        command->mWeaponTable[*count].mItem = 0;
-        command->mWeaponTable[*count].mWeaponParams = &partyWeapon_ChristineMonosiri;
-        command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-        command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+        command->weapon[*count].index = -1;
+        command->weapon[*count].itemId = 0;
+        command->weapon[*count].weapon = &partyWeapon_ChristineMonosiri;
+        command->weapon[*count].enabled = 0;
+        command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+        command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
         (*count)++;
     }
     if (techLv >= 1) {
-        command->mWeaponTable[*count].mIndex = -1;
-        command->mWeaponTable[*count].mItem = 0;
-        command->mWeaponTable[*count].mWeaponParams = &partyWeapon_ChristineRenzokuAttack;
-        command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-        command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+        command->weapon[*count].index = -1;
+        command->weapon[*count].itemId = 0;
+        command->weapon[*count].weapon = &partyWeapon_ChristineRenzokuAttack;
+        command->weapon[*count].enabled = 0;
+        command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+        command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
         (*count)++;
     }
     if (techLv >= 2) {
-        command->mWeaponTable[*count].mIndex = -1;
-        command->mWeaponTable[*count].mItem = 0;
-        command->mWeaponTable[*count].mWeaponParams = &partyWeapon_ChristineKiss;
-        command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-        command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+        command->weapon[*count].index = -1;
+        command->weapon[*count].itemId = 0;
+        command->weapon[*count].weapon = &partyWeapon_ChristineKiss;
+        command->weapon[*count].enabled = 0;
+        command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+        command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
         (*count)++;
     }
 }

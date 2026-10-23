@@ -24,9 +24,7 @@
 #include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 
-extern MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
 
-#define MF(w, off, T) (*(T*)((u8*)(w) + MWOFF(off)))
 
 static const Vec zv0 = {0.0f, 0.0f, 0.0f};
 static const Vec zv1 = {0.0f, 0.0f, 0.0f};
@@ -1756,7 +1754,7 @@ void marioSearchFrontWall_staying(f32 dz) {
     if (w->hitobjFront) {
         w->frontWallDist = h;
     }
-    if (w->buttonBuffer & 0x100) {
+    if (w->buttonTrg & 0x100) {
         w->hitobjFrontA = NULL;
         pos = w->position;
         if (searchFrontWall(&pos, &h, r, w->directionView, w->wPlayerCollisionBox.z)) {

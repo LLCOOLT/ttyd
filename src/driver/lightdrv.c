@@ -156,7 +156,7 @@ s32 lightEntry(const char* name, s32 type, Vec* position, Vec* rotation, GXColor
 	strcpy(entry->name, name);
 	entry->position = *position;
 	entry->rotation = *rotation;
-	entry->field_0x3C = *position;
+	entry->basePosition = *position;
 	entry->color = color;
 	entry->spotAngle = spotAngle;
 	entry->attenAngle = attenAngle;

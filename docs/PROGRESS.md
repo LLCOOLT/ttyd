@@ -1,6 +1,8 @@
 # Progress history
 
-One row per commit window (at most 3 per day). Figures come from a fresh objdiff-cli report on that window's final tree.
+## Matching
+
+One row per commit window, at most 3 per day. Figures come from an objdiff-cli report on each window's final tree. Rows from 2026-10-10 to 2026-10-22 are the Japanese release (G8MJ01); the last row is the US release (G8ME01).
 
 | Window | Code matched | Fully linked | Data matched | Functions | Files matched | Linked this window |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -29,6 +31,32 @@ One row per commit window (at most 3 per day). Figures come from a fresh objdiff
 | 2026-10-17 16:00-24:00 | 89.92% | 71.28% | 91.60% | 9602 / 9768 | 1166 / 1233 | 5 |
 | 2026-10-18 00:00-08:00 | 89.94% | 71.35% | 91.60% | 9603 / 9768 | 1167 / 1233 | 1 |
 | 2026-10-18 08:00-16:00 | 90.20% | 71.54% | 91.60% | 9609 / 9768 | 1169 / 1233 | 76 |
-| 2026-10-18 16:00-24:00 | 100.00% | 100.00% | 91.93% | 9768 / 9768 | 1233 / 1233 | 65 |
-| 2026-10-19 00:00-08:00 | 100.00% | 100.00% | 91.86% | 9768 / 9768 | 1233 / 1233 | 0 |
-| 2026-10-19 08:00-16:00 | 100.00% | 100.00% | 91.86% | 9768 / 9768 | 1233 / 1233 | 0 |
+| 2026-10-18 16:00-24:00 ¹ | 100.00% (C: 78.14%) | 100.00% | 91.93% | 9768 / 9768 | 1233 / 1233 | 65 |
+| 2026-10-19 00:00-08:00 ¹ | 100.00% (C: 82.02%) | 100.00% | 91.86% | 9768 / 9768 | 1233 / 1233 | 0 |
+| 2026-10-19 08:00-16:00 ¹ | 100.00% (C: 82.07%) | 100.00% | 91.86% | 9768 / 9768 | 1233 / 1233 | 0 |
+| 2026-10-22 00:00-08:00 ² | 92.95% | 76.29% | 99.19% | not recorded | 1179 / 1234 | - |
+| 2026-10-22 08:00-16:00 | 96.18% | 85.85% | 99.97% | not recorded | 1203 / 1234 | 24 |
+| 2026-10-22 16:00-24:00 | **100.00%** | **100.00%** | **100.00%** | **9768 / 9768** | **1234 / 1234** | 31 |
+| 2026-10-23, US (G8ME01) ³ | **100.00%** | **100.00%** | **100.00%** | **9748 / 9748** | **1226 / 1226** | - |
+
+¹ For these windows the report counted original assembly carried in as a stand-in as "matched", so 100% meant the build was complete and byte-identical, not that it was all C. The C share is in brackets. The data figure was objdiff's name-paired measure; the linked bytes were already identical.
+
+² There were no progress commits from 2026-10-19 16:00 to 2026-10-21. On 2026-10-21 the asm stand-ins were removed, so from this row on every figure counts C only.
+
+³ The US release was ported from the finished Japanese decomp and reached 100% in one step. The Japanese figures stayed at 100%; on 2026-10-23 one data word was briefly mis-typed and then fixed.
+
+## Code-quality cleanup (since 2026-10-23)
+
+The cleanup keeps both builds byte-identical; every change is gated on JP (32 files OK) and US (30 files OK). These figures are measured on the us-decomp branch:
+
+| What | Start | Now |
+| --- | --- | --- |
+| `extern` declarations moved from `.c` files into headers | ~15,500 in `.c` files | done: 14,948 moved, the rest kept with a reason |
+| Typed data: raw int tables become structs, `f32`, strings, enums or event macros | ~12,000 raw tables | done |
+| Raw pointer math (`*(T*)((u8*)p + N)`) becomes struct fields | 4,644 | 0 (52 look-alikes such as script float encodings and sine-table indexes checked and kept) |
+| Offset-hiding macros (`#define X(p) *(T*)((u8*)p + N)`) | 157 | 6 |
+| Placeholder struct fields (`unk*`, `field_*`) get names | 789 | 0 |
+| `__declspec(section ...)` data placements | 26,648 | 434 (all needed or faithful to the original) |
+| Decompiler-generated local names (`var_r31`, `temp_r3`) | 483 | 0 |
+
+Placements that stay are needed or kept on purpose: SDK startup sections, padding fillers, and small main-executable data that the original source most likely placed by hand too. Behaviour-identical fakes stay as well, and each is listed in [FAKES.md](FAKES.md).

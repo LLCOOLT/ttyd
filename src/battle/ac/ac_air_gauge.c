@@ -15,7 +15,14 @@ void BattleAcGaugeSeInit(void);
 void BattleAcGaugeSeUpdate(f32 value);
 void BattleAcGaugeSeDelete(void);
 
-#define ACW(ac, T, off) (*(T*)((u8*)(ac) + (off)))
+typedef struct AirGaugeWork {
+    s32 frame;      // 0x0, frames since input started
+    f32 gauge;      // 0x4, 0..100, drained by _GetGaugeDecValue
+    u32 presses;    // 0x8, A presses (1 = success when auto)
+    s32 holdFrames; // 0xC, frames A held since the last press
+    s32 unk10;      // 0x10
+    s32 endWait;    // 0x14, frames before the result
+} AirGaugeWork;
 
 // static data from inlined header functions
 __declspec(section ".data") f32 air_lbl_0[] = {-1.0f, 1.0f};
@@ -60,7 +67,7 @@ f32 _GetGaugeDecValue(void);
 
 s32 battleAcMain_AirGauge(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
-    u8* pw = ac->work;
+    AirGaugeWork* pw = (AirGaugeWork*)ac->work;
     BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
 
     switch (ac->mAcState) {
@@ -68,19 +75,19 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
             memset(disp, 0, 0x2C);
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            disp->unk20 = 20;
-            disp->unk28 = 0.0f;
-            disp->unkC = (GXColor){255, 255, 255, 255};
-            ACW(pw, s32, 0) = 0;
+            disp->slideTimer = 20;
+            disp->gaugeRatio = 0.0f;
+            disp->color = (GXColor){255, 255, 255, 255};
+            pw->frame = 0;
             ac->outputParams[0] = 0;
             ac->outputParams[2] = 0;
             ac->outputParams[1] = 0;
             ac->mAcState = 99;
             ac->result = 1;
-            ACW(pw, f32, 4) = 0.0f;
-            ACW(pw, s32, 8) = 0;
-            ACW(pw, s32, 0xC) = 0;
-            ACW(pw, s32, 0x10) = 0;
+            pw->gauge = 0.0f;
+            pw->presses = 0;
+            pw->holdFrames = 0;
+            pw->unk10 = 0;
             break;
         case 99:
             break;
@@ -116,36 +123,36 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
             BattleAcGaugeSeInit();
             ac->mAcState = 1000;
         case 1000:
-            ACW(pw, s32, 0)++;
+            pw->frame++;
             if (((s32(*)(s32))BattlePadCheckNow)(0x100)) {
                 ac->outputParams[1] = 1;
                 if (((s32(*)(s32))BattlePadCheckTrigger)(0x100)) {
-                    ACW(pw, s32, 8)++;
-                    ACW(pw, s32, 0xC) = 0;
+                    pw->presses++;
+                    pw->holdFrames = 0;
                 }
-                ACW(pw, s32, 0xC)++;
+                pw->holdFrames++;
             } else {
                 ac->outputParams[1] = 0;
-                ACW(pw, s32, 0xC) = 0;
+                pw->holdFrames = 0;
             }
-            ACW(pw, f32, 4) -= _GetGaugeDecValue();
+            pw->gauge -= _GetGaugeDecValue();
             if (ac->mAcUnit->badgesEquipped.AutoCommand) {
-                ACW(pw, s32, 8) = 1;
-                ACW(pw, f32, 4) = 100.0f;
+                pw->presses = 1;
+                pw->gauge = 100.0f;
             }
-            if (ACW(pw, f32, 4) < 0.0f) {
-                ACW(pw, f32, 4) = 0.0f;
+            if (pw->gauge < 0.0f) {
+                pw->gauge = 0.0f;
             }
-            if (ACW(pw, f32, 4) > 100.0f) {
-                ACW(pw, f32, 4) = 100.0f;
+            if (pw->gauge > 100.0f) {
+                pw->gauge = 100.0f;
             }
-            BattleAcGaugeSeUpdate(ACW(pw, f32, 4));
-            if (ACW(pw, s32, 0) >= ac->params[1]) {
+            BattleAcGaugeSeUpdate(pw->gauge);
+            if (pw->frame >= ac->params[1]) {
                 if (ac->mAcUnit->badgesEquipped.AutoCommand) {
-                    ACW(pw, s32, 8) = 1;
-                    ACW(pw, f32, 4) = 100.0f;
+                    pw->presses = 1;
+                    pw->gauge = 100.0f;
                 }
-                if (!ACW(pw, u32, 8)) {
+                if (!pw->presses) {
                     ac->outputParams[0] = 0;
                     ac->outputParams[2] = 0;
                     ac->result = 0;
@@ -154,24 +161,24 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
                 }
                 ac->result = 2;
                 ac->mResultCount++;
-                if (ACW(pw, f32, 4) < (f32)ac->params[3]) {
+                if (pw->gauge < (f32)ac->params[3]) {
                     ac->outputParams[0] = 1;
                 } else if (ac->params[2] <= 2) {
                     ac->outputParams[0] = 2;
-                } else if (ACW(pw, f32, 4) < (f32)ac->params[4]) {
+                } else if (pw->gauge < (f32)ac->params[4]) {
                     ac->outputParams[0] = 2;
                 } else if (ac->params[2] <= 3) {
                     ac->outputParams[0] = 3;
-                } else if (ACW(pw, f32, 4) < (f32)ac->params[5]) {
+                } else if (pw->gauge < (f32)ac->params[5]) {
                     ac->outputParams[0] = 3;
                 } else if (ac->params[2] <= 4) {
                     ac->outputParams[0] = 4;
-                } else if (ACW(pw, f32, 4) < (f32)ac->params[6]) {
+                } else if (pw->gauge < (f32)ac->params[6]) {
                     ac->outputParams[0] = 4;
                 } else {
                     ac->outputParams[0] = 5;
                 }
-                ac->outputParams[2] = (s32)ACW(pw, f32, 4);
+                ac->outputParams[2] = (s32)pw->gauge;
                 ac->mAcState = 1002;
             }
             break;
@@ -189,11 +196,11 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
             break;
         case 1002:
             BattleAcGaugeSeDelete();
-            ACW(pw, s32, 0x14) = 60;
+            pw->endWait = 60;
             ac->mAcState = 1003;
         case 1003:
-            ACW(pw, s32, 0x14)--;
-            if (ACW(pw, s32, 0x14) <= 0) {
+            pw->endWait--;
+            if (pw->endWait <= 0) {
                 ac->mAcState = 1004;
             }
             break;
@@ -251,25 +258,25 @@ void battleAcDisp_AirGauge(CameraId cameraId, void* param) {
     s32 i;
     switch (work->actionCommands.mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
         case 100:
             i = 4;
         case 1000:
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[i] > 0) {
-                (*(s32*)&disp->field_0x1C[i])--;
+            if (*(s32*)&disp->slideTimerBase[i] > 0) {
+                (*(s32*)&disp->slideTimerBase[i])--;
             }
             break;
         case 1002:
         case 1003:
-            if (disp->unk20 >= 40) {
-                disp->iconX = intplGetValue(4, disp->unk20 - 40, 20, 30.0f, -300.0f);
+            if (disp->slideTimer >= 40) {
+                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->unk20 < 60) {
-                disp->unk20++;
+            if (disp->slideTimer < 60) {
+                disp->slideTimer++;
             }
             break;
     }

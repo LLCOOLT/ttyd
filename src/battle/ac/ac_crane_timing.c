@@ -53,7 +53,7 @@ s32 battleAcMain_CraneTiming(BattleWork* work) {
             memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            disp->unk20 = 20;
+            disp->slideTimer = 20;
             cw->frame = 0;
             cw->delay = AC_PARAMS(work)->startDelay;
             cw->range = irand(AC_PARAMS(work)->randomRange);

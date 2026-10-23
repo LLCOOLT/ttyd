@@ -861,12 +861,12 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
         if (dist < range) {
             angle = angleABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]);
             if (__fabsf(compAngle(angle, mario->directionView)) < 40.0f) {
-                mario->unk174.x = -((range - dist) * moa_sin(6.2831855f * mario->directionView / 360.0f));
-                mario->unk174.z = (range - dist) * moa_cos(6.2831855f * mario->directionView / 360.0f);
+                mario->floorMove.x = -((range - dist) * moa_sin(6.2831855f * mario->directionView / 360.0f));
+                mario->floorMove.z = (range - dist) * moa_cos(6.2831855f * mario->directionView / 360.0f);
             } else {
                 rad = 6.2831855f * angle / 360.0f;
-                mario->unk174.x = pose->mtx[0][3] - range * moa_sin(rad) - mario->position.x;
-                mario->unk174.z = pose->mtx[2][3] + range * moa_cos(rad) - mario->position.z;
+                mario->floorMove.x = pose->mtx[0][3] - range * moa_sin(rad) - mario->position.x;
+                mario->floorMove.z = pose->mtx[2][3] + range * moa_cos(rad) - mario->position.z;
             }
         }
     }
@@ -1335,11 +1335,11 @@ static void ext_moamoa_main(void) {
         m->lastZ = pose->mtx[2][3];
     }
     moamoa_pose_main();
-    mario->unk174.x = 0.0f;
-    mario->unk174.y = 0.0f;
-    mario->unk174.z = 0.0f;
+    mario->floorMove.x = 0.0f;
+    mario->floorMove.y = 0.0f;
+    mario->floorMove.z = 0.0f;
     if (!(wp->flags & 0x18)) {
-        mario->unk174.x = ( -cnt ) / 20.0f;
+        mario->floorMove.x = ( -cnt ) / 20.0f;
     }
 }
 #pragma opt_propagation reset

@@ -710,11 +710,11 @@ USER_FUNC(uranai_init_func) {
     for (i = 0; i < 9; i++) {
         sprintf(name, "card_omote_%d", i + 1);
         if (mapGetMapObj(name) != NULL) {
-            mapGetMapObj(name)->field_0x4[1] = 5;
+            mapGetMapObj(name)->cameraId = 5;
         }
         sprintf(name, "card_ura_%d", i + 1);
         if (mapGetMapObj(name) != NULL) {
-            mapGetMapObj(name)->field_0x4[1] = 5;
+            mapGetMapObj(name)->cameraId = 5;
         }
     }
     uranai_wp->capEvent = evtEntry(evt_uranai_cap, 0, 0);
@@ -1994,16 +1994,16 @@ EVT_BEGIN(evt_close_01)
 EVT_END()
 
 static DoorParam door_data_01 = {
-    2, // field_0x0
+    2, // flags
     3, // type
     1, // se
     "ie_1_door", // mapobj
     "a_door_1_N", // hitIn
     "a_door_1", // hitOut
-    "ie_1_soto", // mapIn
-    NULL, // hitInIn
-    "ie_1_naka", // mapOut
-    NULL, // hitOutOut
+    "ie_1_soto", // outside
+    NULL, // outsideHit
+    "ie_1_naka", // inside
+    NULL, // insideHit
     evt_door_01_00, // evtIn
     NULL, // evtOut
     evt_wall_01, // evtWall
@@ -2157,16 +2157,16 @@ EVT_BEGIN(evt_close_02)
 EVT_END()
 
 static DoorParam door_data_02 = {
-    2, // field_0x0
+    2, // flags
     3, // type
     1, // se
     "ie_2_door", // mapobj
     "a_door_2_N", // hitIn
     "a_door_2", // hitOut
-    "ie_2_soto", // mapIn
-    NULL, // hitInIn
-    "ie_2_naka", // mapOut
-    NULL, // hitOutOut
+    "ie_2_soto", // outside
+    NULL, // outsideHit
+    "ie_2_naka", // inside
+    NULL, // insideHit
     evt_door_02_00, // evtIn
     NULL, // evtOut
     evt_wall_02, // evtWall
@@ -2328,16 +2328,16 @@ static const char* door_data_03_mobj[] = {
 };
 
 static DoorParam door_data_03 = {
-    2, // field_0x0
+    2, // flags
     3, // type
     1, // se
     "ie_3_door", // mapobj
     "a_door_3_N", // hitIn
     "a_door_3", // hitOut
-    "ie_3_soto", // mapIn
-    NULL, // hitInIn
-    "ie_3_naka", // mapOut
-    NULL, // hitOutOut
+    "ie_3_soto", // outside
+    NULL, // outsideHit
+    "ie_3_naka", // inside
+    NULL, // insideHit
     evt_door_03_00, // evtIn
     NULL, // evtOut
     evt_wall_03, // evtWall
@@ -2447,16 +2447,16 @@ static EVT_BEGIN(evt_door_04_close)
 EVT_END()
 
 static DoorParam door_data_04 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "ie_4door", // mapobj
     "a_door_4_N", // hitIn
     "a_door_4", // hitOut
-    "ie_4_soto", // mapIn
-    NULL, // hitInIn
-    "ie_4_naka", // mapOut
-    NULL, // hitOutOut
+    "ie_4_soto", // outside
+    NULL, // outsideHit
+    "ie_4_naka", // inside
+    NULL, // insideHit
     evt_door_04_00, // evtIn
     evt_door_04_01, // evtOut
     evt_wall_04, // evtWall
@@ -2651,7 +2651,7 @@ USER_FUNC(card_camid) {
     s32 camId = evtGetValue(event, args[1]);
 
     if (mapGetMapObj(name) != NULL) {
-        mapGetMapObj(name)->field_0x4[1] = camId;
+        mapGetMapObj(name)->cameraId = camId;
     }
     return EVT_RETURN_DONE;
 }
@@ -2659,7 +2659,7 @@ USER_FUNC(card_camid) {
 USER_FUNC(supotto_blendmode) {
     MapObject* obj = mapGetMapObj("supotto");
 
-    obj->field_0x4[0] = 10;
+    obj->blendMode = 10;
     return EVT_RETURN_DONE;
 }
 

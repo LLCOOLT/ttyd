@@ -1,3 +1,5 @@
+#include "eff/eff_magic1_n64.h"
+#include "eff/eff_fire.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_npc.h"
 #include "driver/camdrv.h"
@@ -22,7 +24,6 @@ double cos(double);
 double __fabs(double);
 #define fabs(x) __fabs(x)
 
-EffectEntry* effFireEntry(f32 x, f32 y, f32 z, f32 scale, s32 type, s32 life);
 EffectEntry* effMagic1N64Entry(s32 a, s32 b, f32 x, f32 y, f32 z, f32 w, f32 v, f32 u);
 s32 kpaGetLevel(void);
 BOOL npcCheckBlow(NpcEntry* npc);
@@ -96,9 +97,9 @@ USER_FUNC(_2d_dead_jump) {
     if (isFirstCall) {
         npc->flags |= 0x20000;
         npc->flags &= ~0x40000010;
-        npc->field_188 = 0;
-        npc->field_178 = 0;
-        npc->field_108 = 0;
+        npc->moveTicks = 0;
+        npc->jumpTicks = 0;
+        npc->moveAnimState = 0;
         npc->jumpTargetPos.x = tx;
         npc->jumpTargetPos.y = ty;
         npc->jumpTargetPos.z = tz;
@@ -588,8 +589,6 @@ EVT_BEGIN(enemy_common_dead_event)
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
 EVT_END()
-
-// TODO: USER_FUNC(gesso_ground_check) { }
 
 EVT_BEGIN(enemy_event_dead_event_sub)
     CALL(evt_npc_set_damage_anim, LW(10))
@@ -1690,8 +1689,6 @@ EVT_BEGIN(twinkling_pansy_return_event)
     RETURN
 EVT_END()
 
-// TODO: USER_FUNC(set_bottle_flag_init) { }
-
 EVT_BEGIN(karon_init_event)
     CALL_CHILD(PTR(enemy_common_flag_init_event))
     CALL(mahoon_get_groupname, LW(10))
@@ -1758,34 +1755,6 @@ EVT_BEGIN(karon_find_event)
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
 EVT_END()
-
-// TODO: USER_FUNC(npc_fire_eff_fadeout) { }
-
-// TODO: USER_FUNC(zakoEntryFall) { }
-
-// TODO: USER_FUNC(dokanCheck) { }
-
-// TODO: USER_FUNC(zakoEntryDokan) { }
-
-// TODO: USER_FUNC(limitSpd) { }
-
-// TODO: USER_FUNC(getSpdRun) { }
-
-// TODO: USER_FUNC(getSpdWalk) { }
-
-// TODO: USER_FUNC(upperCheck) { }
-
-// TODO: USER_FUNC(cliffCheck) { }
-
-// TODO: USER_FUNC(camGetPos) { }
-
-// TODO: static USER_FUNC(chain_main) { }
-
-// TODO: USER_FUNC(kamec_fire_magic_delete) { }
-
-// TODO: USER_FUNC(kamec_fire_magic) { }
-
-// TODO: USER_FUNC(piders_draw_yawn) { }
 
 EVT_BEGIN(karon_lost_event)
     CALL(evt_npc_set_stay_anim, STRING("me"))
@@ -2493,29 +2462,11 @@ USER_FUNC(kamec_fire_magic) {
 USER_FUNC(kamec_fire_magic_delete) {
     EffectEntry* eff = effNameToPtr(evtNpcNameToPtr(event, "me")->description);
     if (eff) {
-        *(s32*)((u8*)eff->userdata + 0x30) = 1;
+        ((EffMagic1N64Work*)eff->userdata)->life = 1;
     }
     return EVT_RETURN_DONE;
 }
 
-
-// TODO: static USER_FUNC(piders_draw_yarn_sub) { }
-
-// TODO: USER_FUNC(piders_get_height) { }
-
-// TODO: USER_FUNC(killer_make_name) { }
-
-// TODO: USER_FUNC(_2d_get_dead_jump_offset) { }
-
-// TODO: USER_FUNC(_2d_dead_jump) { }
-
-// TODO: USER_FUNC(pressCheck) { }
-
-// TODO: USER_FUNC(_wait_blow_end) { }
-
-// TODO: USER_FUNC(npc_check_wall_stop) { }
-
-// TODO: USER_FUNC(mahoon_get_groupname) { }
 
 EVT_BEGIN(barriern_lost_event)
     CALL(evt_npc_set_anim, STRING("me"), STRING("S_3"))
@@ -4057,7 +4008,7 @@ USER_FUNC(getSpdRun) {
 
 USER_FUNC(limitSpd) {
     f32 v = evtGetFloat(event, event->args[0]);
-    evtNpcNameToPtr(event, "me")->field_1D0 = v;
+    evtNpcNameToPtr(event, "me")->maxFallSpeed = v;
     return EVT_RETURN_DONE;
 }
 
@@ -4512,16 +4463,16 @@ USER_FUNC(npc_fire_eff_fadeout) {
     z = evtGetFloat(event, args[2]);
     eff = (EffectEntry*)evtGetValue(event, args[3]);
     if (isFirstCall) {
-        npc->unitWork[0] = effFireEntry(x, y, z, 1.0f, 5, 1000);
+        npc->unitWork[0] = effFireEntry(5, 1000, x, y, z, 1.0f);
         npc->unitWork[1] = (void*)eff;
     }
     eff = npc->unitWork[0];
     npc->unitWork[1] = (void*)((s32)npc->unitWork[1] - 1);
     if ((s32)npc->unitWork[1] <= 30) {
         f32 sc = intplGetValue(1, 30 - (s32)npc->unitWork[1], 30, 1.0f, 0.0f);
-        *(f32*)((u8*)eff->userdata + 0x78) = sc;
-        *(f32*)((u8*)eff->userdata + 0x7c) = sc;
-        ((u8*)eff->userdata)[0x10] = (u8)intplGetValue(0, 30 - (s32)npc->unitWork[1], 30, 255.0f, 0.0f);
+        ((EffFireWork*)eff->userdata)->scaleX = sc;
+        ((EffFireWork*)eff->userdata)->scaleY = sc;
+        ((EffFireWork*)eff->userdata)->alpha = (u8)intplGetValue(0, 30 - (s32)npc->unitWork[1], 30, 255.0f, 0.0f);
     }
     if ((s32)npc->unitWork[1] <= 0) {
         effDelete(eff);
@@ -4534,7 +4485,7 @@ USER_FUNC(npc_fire_eff_fadeout) {
 USER_FUNC(set_bottle_flag_init) {
     NpcEntry* npc = evtNpcNameToPtr(event, "slave_0");
     npc->flags |= 0x28020020;
-    npc->field_31E |= 0x1f;
+    npc->hazardFlags |= 0x1f;
     return EVT_RETURN_DONE;
 }
 

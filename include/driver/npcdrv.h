@@ -34,14 +34,14 @@ typedef struct PointDropData {
 } PointDropData;
 
 typedef struct BattleGroupSetup {
-    s32 numEnemies;              // 0x0
-    BattleUnitSetup* enemyData;  // 0x4
-    s32 heldItemWeight;          // 0x8
-    s32 randomItemWeight;        // 0xC
-    s32 noItemWeight;            // 0x10
-    PointDropData* hpDropTable;  // 0x14
-    PointDropData* fpDropTable;  // 0x18
-    s32 field_1C;                // 0x1C, never read
+    s32 numEnemies;             // 0x0
+    BattleUnitSetup* enemyData; // 0x4
+    s32 heldItemWeight;         // 0x8
+    s32 randomItemWeight;       // 0xC
+    s32 noItemWeight;           // 0x10
+    PointDropData* hpDropTable; // 0x14
+    PointDropData* fpDropTable; // 0x18
+    s32 reserved_1C;            // 0x1C, never read
 } BattleGroupSetup;
 
 typedef struct NpcBattleSelect {
@@ -51,41 +51,46 @@ typedef struct NpcBattleSelect {
 } NpcBattleSelect;
 
 typedef struct NpcSetupBattleInfo {
-    const char* name;            // 0x0
-    const char* mapName;         // 0x4, never read; map the battle is set on
-    ItemType fixedItem;          // 0x8
-    s32 swFlag;                  // 0xC
-    NpcBattleSelect* altSelect;  // 0x10, used when swFlag is set
-    NpcBattleSelect* select;     // 0x14
-    s32 battleFlags;             // 0x18, -> NpcBattleInfo.battleFlags
-    s32 field_1C;                // 0x1C
-    s8 field_20[16][2];          // 0x20, {min, max}
-    const char* bgmName;         // 0x40, -> NpcBattleInfo.field_C0, played by seq_battle
+    const char* name;           // 0x0
+    const char* mapName;        // 0x4, never read; map the battle is set on
+    ItemType fixedItem;         // 0x8
+    s32 swFlag;                 // 0xC
+    NpcBattleSelect* altSelect; // 0x10, used when swFlag is set
+    NpcBattleSelect* select;    // 0x14
+    s32 battleFlags;            // 0x18, -> NpcBattleInfo.battleFlags
+    s32 randomMode;             // 0x1C, -> NpcBattleInfo.randomMode; 0 rolls randomValues from randomRanges
+    s8 randomRanges[16][2];     // 0x20, {min, max} per NpcBattleInfo.randomValues byte
+    const char* bgmName;        // 0x40, -> NpcBattleInfo.bgmName, played by seq_battle
 } NpcSetupBattleInfo;
+
+// audience/reward rolls made when the battle is set up (npcSetupBattleInfo), read by BattleAudience
+typedef struct NpcBattleRandom {
+    s32 mode;        // 0x0, from NpcSetupBattleInfo.randomMode
+    s8 values[16];   // 0x4, rolled from NpcSetupBattleInfo.randomRanges (read as s8 weights)
+} NpcBattleRandom;
 
 typedef struct NpcBattleInfo {
     struct BattleStageData* stageData; // 0x0
-    s32 battleFlags;                // 0x4, 0x10/0x40/0x20000000 checked by the battle end sequence
-    ItemType fixedItem;             // 0x8
-    ItemType itemDropped;           // 0xC
-    s32 heartsDropped;              // 0x10
-    s32 flowersDropped;             // 0x14
-    BattleGroupSetup* groupSetup;   // 0x18
-    ItemType heldItems[8];          // 0x1C
-    ItemDropData* itemDropLists[8]; // 0x3C
-    ItemType stolenItems[8];        // 0x5C
-    ItemType recoveredItems[8];     // 0x7C
+    s32 battleFlags;                   // 0x4, 0x10/0x40/0x20000000 checked by the battle end sequence
+    ItemType fixedItem;                // 0x8
+    ItemType itemDropped;              // 0xC
+    s32 heartsDropped;                 // 0x10
+    s32 flowersDropped;                // 0x14
+    BattleGroupSetup* groupSetup;      // 0x18
+    ItemType heldItems[8];             // 0x1C
+    ItemDropData* itemDropLists[8];    // 0x3C
+    ItemType stolenItems[8];           // 0x5C
+    ItemType recoveredItems[8];        // 0x7C
     union {
-        s32 btlSetupWork[10];       // 0x9C
+        s32 btlSetupWork[10];          // 0x9C
         struct {
-            s32 field_9C[4];        // 0x9C
-            s32 field_AC;           // 0xAC
-            u8 field_B0[16];        // 0xB0
-            s32 field_C0;           // 0xC0
+            s32 scriptWork[4];         // 0x9C, btlSetupWork[0..3] (npcGet/SetBtlSetupWork)
+            NpcBattleRandom random;    // 0xAC, btlSetupWork[4..8]
+            s32 bgmName;               // 0xC0, btlSetupWork[9], const char* battle BGM played by seq_battle
         };
     };
-    u8 battleRule[3];               // 0xC4
-    u8 field_C7;                    // 0xC7
+    u8 battleRule[3];                  // 0xC4
+    u8 pad_C7;                         // 0xC7, never accessed
 } NpcBattleInfo;
 
 typedef struct NpcTribeInfo {
@@ -127,8 +132,8 @@ typedef struct NpcEntry {
     Vec rotation;                   // 0xEC
     Vec rotationOffset;             // 0xF8
     s32 poseId;                     // 0x104
-    s32 field_108;                  // 0x108
-    const char* field_10C;          // 0x10C
+    s32 moveAnimState;              // 0x108, 1 stay, 2 walk, 3 run anim currently set by npcMain
+    const char* checkPose;          // 0x10C, anim name, "M_I_2" by default (tik_02 geso_set_checkpose sets "M_S_1")
     s32 offscreenId;                // 0x110
     GXColor color;                  // 0x114
     s32 initEvtId;                  // 0x118
@@ -149,16 +154,16 @@ typedef struct NpcEntry {
     f32 shadowScale;                // 0x154
     Vec jumpStartPos;               // 0x158
     Vec jumpTargetPos;              // 0x164
-    u8 field_170[0x178 - 0x170];    // 0x170
-    OSTime field_178;               // 0x178
-    f32 field_180;                  // 0x180
-    u8 field_184[0x188 - 0x184];    // 0x184
-    OSTime field_188;               // 0x188
-    OSTime field_190;               // 0x190
-    OSTime field_198;               // 0x198
-    f32 field_1A0;                  // 0x1A0
+    u8 pad_170[0x178 - 0x170];      // 0x170
+    OSTime jumpTicks;               // 0x178, OSTime accumulated while jumping/falling, 0 on landing
+    f32 jumpElapsed;                   // 0x180, jumpTicks in seconds
+    u8 pad_184[0x188 - 0x184];      // 0x184
+    OSTime moveTicks;               // 0x188, OSTime accumulated since the current evt move started
+    OSTime dtTicks;                 // 0x190, frame delta (capped to 16 ms after a >500 ms gap)
+    OSTime lastUpdateTicks;         // 0x198, gp->renderTime of the last update
+    f32 moveElapsed;                // 0x1A0, moveTicks in seconds (compared with moveTime)
     f32 moveDt;                     // 0x1A4
-    f32 field_1A8;                  // 0x1A8
+    f32 lastUpdateTime;             // 0x1A8, lastUpdateTicks in seconds
     f32 moveDir;                    // 0x1AC
     f32 moveSpeed;                  // 0x1B0
     Vec moveOffset;                 // 0x1B4
@@ -166,7 +171,7 @@ typedef struct NpcEntry {
     f32 jumpVelY;                   // 0x1C4
     f32 jumpYScale;                 // 0x1C8
     f32 jumpGravity;                // 0x1CC
-    f32 field_1D0;                  // 0x1D0
+    f32 maxFallSpeed;               // 0x1D0, fall speed limit, 100 in kpa_03 lava
     u32 jumpFlags;                  // 0x1D4, TODO verify
     s16 footstepToggle;             // 0x1D8
     f32 footstepAccum;              // 0x1DC
@@ -185,17 +190,17 @@ typedef struct NpcEntry {
     f32 homingRange;                // 0x228, verified
     f32 homingAngle;                // 0x22C, verified
     NpcBattleInfo battleInfo;       // 0x230
-    s32 field_2F8;                  // 0x2F8
+    s32 attackMode;                 // 0x2F8, evt_npc_set_attack_mode
     u32 wallHit;                    // 0x2FC, npcHitCheckSide result (HitEntry*)
-    struct HitEntry* field_0x300;   // 0x300, hit object
+    struct HitEntry* groundHit;     // 0x300, hit object found by the fall/landing checks
     void* unitWork[4];              // 0x304
     u8 setupIndex;                  // 0x314, slot in the setup list (dead-mask bit)
     u8 btlCoinDropCount;            // 0x315
     u8 baseCoinCount;               // 0x316
     u8 balloonType;                 // 0x317
-    u8 field_318[0x31C - 0x318];    // 0x318
+    u8 fbatHitKind[0x31C - 0x318];  // 0x318, u32 kind from fbatHitCheck when this NPC triggered the battle
     u16 koopaEncounterType;         // 0x31C
-    u16 field_31E;                  // 0x31E
+    u16 hazardFlags;                // 0x31E, 1 lava (kpa_03), 2/4/8/0x10 hazard deaths already handled
     s16 wFbatHitCheckRelated;       // 0x320
     u8 pad_322[2];                  // 0x322
     struct NpcEntry* prev;          // 0x324
@@ -224,11 +229,11 @@ typedef struct NpcWork {
 
 typedef struct FirstStrikeInfo {
     BOOL enabled;        // 0x0
-    u32 field_0x4;       // 0x4
+    u32 hitKind;            // 0x4, fbatSetAttackAnnounce kind (0x20000.. first-strike types), 0 when done
     u32 type;            // 0x8
-    u32 field_0xC;       // 0xC
-    f32 field_0x10;      // 0x10
-    f32 field_0x14;      // 0x14
+    s32 timer;           // 0xC, frames into the announce slide (0..100)
+    f32 x;               // 0x10, announce x, slides -600 -> 0 -> 600
+    f32 y;               // 0x14, announce y
     const char* msg_tag; // 0x18
     GXColor color;       // 0x1C
 } FirstStrikeInfo;
@@ -240,35 +245,37 @@ typedef struct FieldBattleInfo {
 	NpcBattleInfo* setup; //0xC
 	u32 result; //0x10
 	u32 coins; //0x14, BattleStoreCoin
-	u8 field_0x18; //0x18
+	u8 ruleType; //0x18, NpcBattleInfo.battleRule[0], index into the _rule_msg tables
 	u8 ruleKeepResult; //0x19
-	u8 field_0x1A; //0x1A
-	u8 field_0x1B; //0x1B
+	u8 ruleParam; //0x1A, battleRule[1], printed in the rule message
+	u8 ruleParam2; //0x1B, battleRule[2], never read
 } FieldBattleInfo;
 
 typedef struct FieldBattleData {
     s16 mode;                    // 0x0
-    u8 field_2[0x8 - 0x2];       // 0x2
+    u8 subState;                 // 0x2
+    u8 pad_03;                   // 0x3, never accessed
+    NpcEntry* npc;               // 0x4, encounter npc
     NpcEntry* target;            // 0x8
-    u8 field_C[0x10 - 0xC];      // 0xC
-    s32 unk10;                   // 0x10
-    s32 unk14;                   // 0x14
-    u8 field_18[0x1C - 0x18];    // 0x18
-    u32 unk1C;                   // 0x1C
+    s32 evtId;                   // 0xC
+    s32 hitKind;                 // 0x10, fbatHitCheck kind (0x10000000 = forced first attack, tou_03)
+    s32 firstAttackParam;        // 0x14, set to 0x10 by tou_03 _firstattack_setting, not read in C
+    u8 pad_18[0x1C - 0x18];      // 0x18, never accessed
+    u32 firstAttackFlags;        // 0x1C, bit 1 cleared by tou_03 _firstattack_setting, not read in C
     FieldBattleInfo info;        // 0x20
     void* postBattleEvent;       // 0x3C, evt run after a won battle (battle_seq_end)
     s32 postBattleEventId;       // 0x40
-    s32 unk44;                   // 0x44
-    u8 field_48[0x4C - 0x48];    // 0x48
+    s32 postBattleMode;          // 0x44, nonzero: battle_seq_end skips to sequence 3 / 0x3000001
+    u32 merleeEvtId;             // 0x48, _evt_majinai_coin_up_effect id
     NpcDeadInfo deadInfo[64];    // 0x4C
-    u8 field_54C;                // 0x54C
+    u8 merleeCoinBonus;          // 0x54C, Merlee coin curse fired: coin drops x3
     u8 sandersBombTrigger;       // 0x54D
-    u8 field_54E[0x550 - 0x54E]; // 0x54E
+    u8 pad_54E[0x550 - 0x54E];   // 0x54E, never accessed
     FirstStrikeInfo firstStrike; // 0x550
-    u8 field_570[0x574 - 0x570]; // 0x570
-    s32 field_574;               // 0x574
-    s32 field_578;               // 0x578
-    s32 field_57C;               // 0x57C
+    u8 pad_570[0x574 - 0x570];   // 0x570, never accessed
+    s32 kpaComboCount;           // 0x574, Bowser stomp combo, score multiplier
+    s32 kpaJumpKills;            // 0x578, Bowser kills during one jump
+    s32 kpaJumpScore;            // 0x57C, score banked during one jump, shown on landing
 } FieldBattleData;
 
 NpcWork* npcGetWorkPtr(void);

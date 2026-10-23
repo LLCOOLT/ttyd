@@ -463,16 +463,16 @@ static const char* mise_npc[] = {
 };
 
 static DoorParam door_1 = {
-    1, // field_0x0
+    1, // flags
     2, // type
     4, // se
     "door_2", // mapobj
     "a_door_1_N", // hitIn
     "a_door_1", // hitOut
-    "mise_soto", // mapIn
-    NULL, // hitInIn
-    "mise_naka", // mapOut
-    "a_mise_naka", // hitOutOut
+    "mise_soto", // outside
+    NULL, // outsideHit
+    "mise_naka", // inside
+    "a_mise_naka", // insideHit
     evt_door, // evtIn
     evt_door2, // evtOut
     evt_wall, // evtWall
@@ -599,16 +599,16 @@ EVT_BEGIN(evt_door_2_close)
 EVT_END()
 
 static DoorParam door_2 = {
-    3, // field_0x0
+    3, // flags
     2, // type
     4, // se
     "door_3", // mapobj
     "a_door_2_N", // hitIn
     "a_door_2", // hitOut
-    "sakaba_soto", // mapIn
-    NULL, // hitInIn
-    "sakaba_naka", // mapOut
-    "a_sakaba_naka", // hitOutOut
+    "sakaba_soto", // outside
+    NULL, // outsideHit
+    "sakaba_naka", // inside
+    "a_sakaba_naka", // insideHit
     evt_door_2, // evtIn
     evt_door2_2, // evtOut
     evt_wall2, // evtWall

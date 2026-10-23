@@ -17,14 +17,11 @@ double cos(double x);
 Vec cloud_at;
 
 
-#define CLD_F(p, off) (*(f32*)((u8*)(p) + (off)))
 #ifdef VERSION_G8ME01
 #define MW_US 4 // US MarioWork has 4 more bytes before these raw offsets
 #else
 #define MW_US 0
 #endif
-#define CLD_S(p, off) (*(s32*)((u8*)(p) + (off)))
-#define CLD_B(p, off) (*(u8*)((u8*)(p) + (off)))
 void partyMoveFlyInit(PartyEntry* party, s32 arg);
 void partyFlyMain(PartyEntry* party);
 
@@ -40,9 +37,6 @@ s32 partyChgPoseId(PartyEntry* party, s32 id);
 void partyChgPose(PartyEntry* party, s32 pose);
 void partyChgMot(PartyEntry* party, s32 mot);
 
-#define CLD_P(p, off) (*(void**)((u8*)(p) + (off)))
-#define CLD_H(p, off) (*(u16*)((u8*)(p) + (off)))
-#define CLD_U(p, off) (*(u32*)((u8*)(p) + (off)))
 
 #define CW(p) ((PartyCloud*)(p)->useStruct)
 #define KUMO(p) ((EffKumokumoN64Particle*)(p)->work.cloud.breathEffect->userdata)
@@ -266,8 +260,8 @@ void cloud_hover_main(PartyEntry* party) {
 void cloud_move(PartyEntry* party) {
     f32 a;
 
-    if (party->field_8 & 8) {
-        party->field_8 &= ~8;
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
         partyMoveFlyInit(party, 1);
         party->work.cloud.hoverAngle = 0.0f;
         party->work.cloud.hoverSpeed = 4.25f;
@@ -277,22 +271,22 @@ void cloud_move(PartyEntry* party) {
         party->work.cloud.hoverAngle = revise360(party->work.cloud.hoverAngle - party->work.cloud.hoverSpeed);
         a = sin((3.1415927f * party->work.cloud.hoverAngle) / 180.0f);
         party->dispOfs.y = 3.0f + 3.0f * a;
-        if (party->field_3B != 2) {
-            party->field_8 &= ~0x40000;
+        if (party->moveMode != 2) {
+            party->trigFlags &= ~0x40000;
         }
     }
 }
 #else
 void cloud_move(PartyEntry* party) {
-    if (party->field_8 & 8) {
-        party->field_8 &= ~8;
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
         partyMoveFlyInit(party, 1);
         cloud_hover_init(party);
     }
     partyFlyMain(party);
     cloud_hover_main(party);
-    if (party->field_3B != 2) {
-        party->field_8 &= ~0x40000;
+    if (party->moveMode != 2) {
+        party->trigFlags &= ~0x40000;
     }
 }
 #endif
@@ -302,7 +296,7 @@ void cloud_init(PartyEntry* party) {
     party->moveKind = 1;
     party->height = 38.0f;
     party->width = 24.0f;
-    party->work.cloud.unk174 = 0;
+    party->work.cloud.reserved_174 = 0;
     party->work.cloud.breathEffect = NULL;
     party->work.cloud.hoverAngleBits = 0;
     party->work.cloud.hoverSpeedBits = 0;
@@ -360,15 +354,15 @@ void N__cloud_use(PartyEntry* party) {
     f32 dir;
     PartyCloud* cl;
 
-    if (party->field_8 & 8) {
-        party->field_8 &= ~8;
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
         party->work.cloud.hoverAngleBits = 0;
         party->work.cloud.hoverSpeedBits = 0;
         marioAdjustMoveDir();
         party->useMotionId = 0;
         party->useStruct = __memAlloc(HEAP_DEFAULT, sizeof(PartyCloud));
         memset(party->useStruct, 0, sizeof(PartyCloud));
-        CW(party)->unk0 = 100.0f;
+        CW(party)->reserved_0 = 100.0f;
         CW(party)->breathDistMax = 120.0f;
         CW(party)->sweep[0].angle = 0.0f;
         CW(party)->sweep[0].reverse = 0;
@@ -379,7 +373,7 @@ void N__cloud_use(PartyEntry* party) {
             CW(party)->sfxId = -1;
         }
         if (party->flags & 0x80000000) {
-            CW(party)->autoTimer = sysMsec2Frame(party->unk16C);
+            CW(party)->autoTimer = sysMsec2Frame(party->actionTime);
         }
     }
 
@@ -539,13 +533,13 @@ void N__cloud_use(PartyEntry* party) {
             mario->dispFlags &= ~0x100;
             mario->dispFlags &= ~4;
             marioAdjustMoveDir();
-            party->field_8 |= 0x40000;
+            party->trigFlags |= 0x40000;
             mario->dispFlags &= ~0x100;
             marioChgMot(0);
         }
         party->flags2 |= 0x10;
         partyChgRunMode(party, 2);
-        party->field_3D = 0;
+        party->moveArg = 0;
         partyChgMoveMode(party, 2);
         partyChgMot(party, 1);
         if (!(party->flags & 0x80000000)) {

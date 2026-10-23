@@ -66,7 +66,7 @@ void countDownStart(u32 limit, u32 restart) {
     wp->restart = restart;
     wp->prevTime = gp->renderTime;
     wp->elapsed = 0;
-    wp->unk30 = 0;
+    wp->state = 0;
     wp->counter = 0;
     wp->offX = 0.0f;
     wp->offY = 0.0f;
@@ -87,13 +87,13 @@ void countDownSetRestartTime(u32 restart) {
 
 void countDownMain(void) {
     if ((wp->flags & 1) != 0) {
-        switch (wp->unk30) {
+        switch (wp->state) {
         case 0:
             if (++wp->counter < 30) {
                 wp->offX = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(300.0f, 0.0f, 11, wp->counter, 30);
             } else {
                 wp->counter = 0;
-                wp->unk30++;
+                wp->state++;
             }
             break;
         case 1:
@@ -107,7 +107,7 @@ void countDownMain(void) {
                 wp->offX = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 300.0f, 11, wp->counter, 30);
             } else {
                 wp->counter = 0;
-                wp->unk30++;
+                wp->state++;
                 wp->flags &= ~1;
                 psndSFXOff(wp->sfxId);
             }
@@ -188,7 +188,7 @@ s32 countDownGetStatus(void) {
 
 void countDownEnd(void) {
     if ((wp->flags & 1) != 0) {
-        wp->unk30 = 2;
+        wp->state = 2;
     }
 }
 

@@ -14,73 +14,10 @@
 #include <string.h>
 #include "libc_decls.h"
 
-typedef struct StageLight {
-	u32 flags;              // 0x0
-	char name[0x20];        // 0x4
-	GXColor color;          // 0x24
-	GXColor colorStart;     // 0x28
-	GXColor colorTarget;    // 0x2C
-	s32 colorTime;          // 0x30
-	s32 colorMax;           // 0x34
-	u8 colorMode;           // 0x38
-	f32 width;              // 0x3C
-	f32 widthStart;         // 0x40
-	f32 widthTarget;        // 0x44
-	s32 widthTime;          // 0x48
-	s32 widthMax;           // 0x4C
-	u8 widthMode;           // 0x50
-	Vec pos;                // 0x54
-	Vec posStart;           // 0x60
-	Vec posTarget;          // 0x6C
-	s32 posTime;            // 0x78
-	s32 posMax;             // 0x7C
-	u8 posMode;             // 0x80
-	Vec target;             // 0x84
-	Vec targetStart;        // 0x90
-	Vec targetTarget;       // 0x9C
-	s32 targetTime;         // 0xA8
-	s32 targetMax;          // 0xAC
-	u8 targetMode;          // 0xB0
-	Vec up;                 // 0xB4
-	Vec upStart;            // 0xC0
-	Vec upTarget;           // 0xCC
-	s32 upTime;             // 0xD8
-	s32 upMax;              // 0xDC
-	u8 upMode;              // 0xE0
-	void* data;             // 0xE4
-} StageLight;
 
-typedef struct StageDark {
-	s32 flags;      // 0x0
-	u8 cur;         // 0x4
-	u8 base;        // 0x5
-	u8 start;       // 0x6
-	u8 baseStart;   // 0x7
-	u8 target;      // 0x8
-	u8 baseTarget;  // 0x9
-	u8 pad_a[2];    // 0xA
-	s32 time;       // 0xC
-	s32 baseTime;   // 0x10
-	s32 max;        // 0x14
-	s32 baseMax;    // 0x18
-	u8 mode;        // 0x1C
-	u8 baseMode;    // 0x1D
-} StageDark;
 
-typedef struct StageWork {
-	s32 field_0;            // 0x0
-	StageLight lights[12];  // 0x4
-	StageDark stgDark;      // 0xAE4
-	StageDark audDark;      // 0xB04
-	f32 stageSizeX;          // 0xB24
-	f32 stageSizeY;          // 0xB28
-	f32 stageSizeZ;          // 0xB2C
-	f32 audienceSizeX;          // 0xB30
-	f32 audienceSizeY;          // 0xB34
-	f32 audienceSizeZ;          // 0xB38
-} StageWork;
 
-#define STG ((StageWork*)BattleStageGetPtr())
+#define STG ((BattleStage*)BattleStageGetPtr()) // FAKE: no-op cast; without it US BattleStageEnd swaps the registers of s and i (r28/r29) around the batSpotEnd call
 
 typedef struct ScreenWork {
 	void* tex;      // 0x0
@@ -148,11 +85,11 @@ BattleStage* BattleStageGetPtr(void) {
 }
 
 void BattleStageInit(void) {
-	StageWork* s = STG;
+	BattleStage* s = STG;
 	s32 i;
 
-	memset(s, 0, sizeof(StageWork));
-	s->field_0 = 0;
+	memset(s, 0, sizeof(BattleStage));
+	s->reserved_00 = 0;
 	for (i = 0; i < 12; i++) {
 		StageLight* l = &s->lights[i];
 		l->flags = 0;
@@ -192,7 +129,7 @@ void BattleStageMain(void) {
 	StageLight* l;
 	s32 i;
 	LightSpline* sp;
-	StageWork* s = STG;
+	BattleStage* s = STG;
 
 	batSpotMain();
 	for (i = 0; i < 12; i++) {
@@ -276,7 +213,7 @@ void BattleStageMain(void) {
 
 void BattleStageEnd(void) {
 	s32 i;
-	StageWork* s = STG;
+	BattleStage* s = STG;
 
 #ifdef VERSION_G8ME01
 	batSpotEnd();
@@ -314,7 +251,7 @@ void DarkBySquare(f32 x0, f32 y0, f32 x1, f32 y1, f32 z, u8 alpha) {
 #pragma dont_inline reset
 
 void BattleStageDispDark(CameraId camId, void* param) {
-	StageWork* s = STG;
+	BattleStage* s = STG;
 	CameraEntry* cam = camGetPtr(CAMERA_3D);
 	StageDark* aud;
 
@@ -354,7 +291,7 @@ void BattleStageDispDark(CameraId camId, void* param) {
 void BattleStageDispLight(CameraId camId, void* param) {
 	s32 i, j;
 	f32 width;
-	StageWork* s = (StageWork*)&_battleWorkPointer->stage;
+	BattleStage* s = &_battleWorkPointer->stage;
 	CameraEntry* cam = camGetPtr(CAMERA_3D);
 	f32 two;
 
@@ -442,7 +379,7 @@ void BattleStageOffLightEnemyInCommand(void) {
 }
 
 s32 BattleStageGetLightNumberByName(const char* name) {
-	StageWork* s = STG;
+	BattleStage* s = STG;
 	s32 i;
 
 	for (i = 0; i < 12; i++) {
@@ -455,7 +392,7 @@ s32 BattleStageGetLightNumberByName(const char* name) {
 }
 
 s32 BattleStageSysLightEntry(const char* name) {
-	StageWork* s = STG;
+	BattleStage* s = STG;
 	s32 i;
 
 	for (i = 0; i <= 6; i++) {
@@ -478,7 +415,7 @@ void BattleStageLightRelease(s32 idx, s32 time, u8 mode) {
 	// FAKE: l first holds the stage pointer (two defs), so with propagation on the stage base and idx * 232 + 4 stay separate adds as in the target; this replaces the old opt_propagation off pragma, under which the {0,0,0} template also left a dead stack store
 	StageLight* l = (StageLight*)STG;
 
-	l = ((StageWork*)l)->lights + idx;
+	l = ((BattleStage*)l)->lights + idx;
 
 	if (l->flags & 1) {
 		if (time == 0) {
@@ -676,10 +613,10 @@ void batSpotInit(void) {
 
 	for (i = 0; i < 5; i++) {
 		entry = batSpotEntry();
-		entry->field_4 = (Vec){50.0f * i + -100.0f, 0.0f, -50.0f};
-		entry->field_10 = (Vec){0.0f, 0.0f, 0.0f};
-		entry->field_1C = (Vec){20.0f, 20.0f, 150.0f};
-		*(GXColor*)&entry->field_28 = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
+		entry->pos = (Vec){50.0f * i + -100.0f, 0.0f, -50.0f};
+		entry->rot = (Vec){0.0f, 0.0f, 0.0f};
+		entry->scale = (Vec){20.0f, 20.0f, 150.0f};
+		*(GXColor*)&entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	}
 }
 #pragma dont_inline reset
@@ -746,7 +683,7 @@ void batSpotDisp(CameraId camId, void* param) {
 			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 			GXSetBlendMode(GX_BM_BLEND, GX_BL_DSTALPHA, GX_BL_INVDSTALPHA, GX_LO_CLEAR);
 			GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_CLAMP, GX_AF_NONE);
-			GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&e->field_28);
+			GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&e->color);
 			drawCone(camId, e);
 		}
 	}
@@ -760,11 +697,11 @@ void drawCone(CameraId camId, BattleSpotEntry* e) {
 	f32 a, s, c;
 
 	cam = camGetPtr(camId);
-	PSMTXTrans(trans, e->field_4.x, e->field_4.y, e->field_4.z);
-	PSMTXScale(scale, e->field_1C.x, e->field_1C.y, e->field_1C.z);
-	PSMTXRotRad(rx, 'x', 0.017453292f * e->field_10.x);
-	PSMTXRotRad(ry, 'y', 0.017453292f * e->field_10.y);
-	PSMTXRotRad(rz, 'z', 0.017453292f * e->field_10.z);
+	PSMTXTrans(trans, e->pos.x, e->pos.y, e->pos.z);
+	PSMTXScale(scale, e->scale.x, e->scale.y, e->scale.z);
+	PSMTXRotRad(rx, 'x', 0.017453292f * e->rot.x);
+	PSMTXRotRad(ry, 'y', 0.017453292f * e->rot.y);
+	PSMTXRotRad(rz, 'z', 0.017453292f * e->rot.z);
 	PSMTXConcat(rz, ry, ry);
 	PSMTXConcat(ry, rx, m);
 	PSMTXConcat(cam->view, trans, trans);
@@ -774,7 +711,7 @@ void drawCone(CameraId camId, BattleSpotEntry* e) {
 	GXSetCurrentMtx(GX_PNMTX0);
 	GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, 32);
 	GXPosition3f32(0.0f, 0.0f, 0.0f);
-	GXColor4u8(0, 0, 0, ((GXColor*)&e->field_28)->a);
+	GXColor4u8(0, 0, 0, ((GXColor*)&e->color)->a);
 	for (i = 0; i < 31; i++) {
 		if (i == 30) {
 			a = 0.0f;
@@ -784,12 +721,11 @@ void drawCone(CameraId camId, BattleSpotEntry* e) {
 		s = (f32)sin(a);
 		c = (f32)cos(a);
 		GXPosition3f32(c, s, -1.0f);
-		GXColor4u8(0, 0, 0, ((GXColor*)&e->field_28)->a / 3);
+		GXColor4u8(0, 0, 0, ((GXColor*)&e->color)->a / 3);
 	}
 }
 #pragma dont_inline reset
 
-// TODO: get this to not inline into batSpotInit
 #pragma dont_inline on
 BattleSpotEntry* batSpotEntry(void) {
 	int i;
@@ -801,10 +737,10 @@ BattleSpotEntry* batSpotEntry(void) {
 		}
 	}
 
-	entry->field_4 = (Vec){0.0, 0.0, 0.0};
-	entry->field_1C = (Vec){1.0, 1.0, 1.0};
-	entry->field_10 = (Vec){0.0, 0.0, 0.0};
-	*(GXColor*)&entry->field_28 = (GXColor){0, 0, 0, 0};
+	entry->pos = (Vec){0.0, 0.0, 0.0};
+	entry->scale = (Vec){1.0, 1.0, 1.0};
+	entry->rot = (Vec){0.0, 0.0, 0.0};
+	*(GXColor*)&entry->color = (GXColor){0, 0, 0, 0};
 	entry->flags |= 1;
 
 	return entry;

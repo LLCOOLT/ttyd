@@ -8,16 +8,11 @@ typedef struct DepthShadowWork {
     s32 flags; //0x0, bit0 = drawn this frame
     s32 drawCount; //0x4
     s32 configIdx; //0x8, index into shadowConfig
-    union {
-        u8 unkC[0xFC - 0xC]; //0xC
-        struct {
-            Mtx view; //0xC
-            Mtx44 proj; //0x3C
-            Mtx texMtx; //0x7C
-            Mtx depthMtx; //0xAC
-            GXTexObj texObj; //0xDC
-        };
-    };
+    Mtx view; //0xC
+    Mtx44 proj; //0x3C
+    Mtx texMtx; //0x7C
+    Mtx depthMtx; //0xAC
+    GXTexObj texObj; //0xDC
     smartEntry* texBuffer; //0xFC, shadow texture memory
     GXColor color; //0x100
 } DepthShadowWork;
@@ -26,16 +21,11 @@ typedef struct ProjShadowWork {
     s32 flags; //0x0, bit0 = drawn this frame
     s32 drawCount; //0x4
     s32 configIdx; //0x8, index into shadowConfig
-    union {
-        u8 unkC[0xFC - 0xC]; //0xC
-        struct {
-            Mtx view; //0xC
-            Mtx44 proj; //0x3C
-            Mtx texMtx; //0x7C
-            Mtx depthMtx; //0xAC
-            GXTexObj texObj; //0xDC
-        };
-    };
+    Mtx view; //0xC
+    Mtx44 proj; //0x3C
+    Mtx texMtx; //0x7C
+    Mtx depthMtx; //0xAC
+    GXTexObj texObj; //0xDC
     smartEntry* texBuffer; //0xFC, shadow texture memory
     GXColor color; //0x100
 } ProjShadowWork;
@@ -61,16 +51,11 @@ typedef struct CharShadowWork {
     s32 flags; //0x0, bit0 = drawn this frame
     s32 drawCount; //0x4
     s32 configIdx; //0x8, index into shadowConfig
-    union {
-        u8 field_0xC[0xFC - 0xC]; //0xC
-        struct {
-            Mtx view; //0xC
-            Mtx44 proj; //0x3C
-            Mtx texMtx; //0x7C
-            Mtx depthMtx; //0xAC
-            GXTexObj texObj; //0xDC
-        };
-    };
+    Mtx view; //0xC
+    Mtx44 proj; //0x3C
+    Mtx texMtx; //0x7C
+    Mtx depthMtx; //0xAC
+    GXTexObj texObj; //0xDC
     smartEntry* texBuffer; //0xFC, shadow texture memory
     GXColor color; //0x100
     s32 numEntries; //0x104, ShadowEntry count this frame
@@ -78,7 +63,7 @@ typedef struct CharShadowWork {
     s32 projection; //0x10C, shadowGetCharShadowProjection
     s32 defaultMode; //0x110, mode given to new entries
     f32 defaultSizeY; //0x114, sizeY given to new entries
-    s32 unk118; //0x118
+    s32 defaultEnabled; //0x118, 1 at init: new shadow entries start with flag 1
 } CharShadowWork;
 
 typedef struct ShadowConfig {

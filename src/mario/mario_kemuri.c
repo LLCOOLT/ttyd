@@ -25,11 +25,6 @@ void kemuri_mugi(void);
 void mario_kemuri_landon(void);
 
 #define kemuriEntry ((EffectEntry * (*)(s32, f32, f32, f32, f32))effKemuriEntry)
-#define MF(p, off) (*(f32*)((u8*)(p) + (off)))
-#define MU8(p, off) (*(u8*)((u8*)(p) + (off)))
-#define MS8(p, off) (*(s8*)((u8*)(p) + (off)))
-#define MS16(p, off) (*(s16*)((u8*)(p) + (off)))
-#define MPTR(p, off) (*(void**)((u8*)(p) + (off)))
 
 void mario_kemuri_80130474(void) {
     static s32 ct = 8;
@@ -92,7 +87,7 @@ void mario_simple_kemuri(void) {
     EffectEntry* eff = kemuriEntry(0, mario->position.x, mario->position.y, mario->position.z, 0.0f);
 
     if (mario->flags & 0x02000000) {
-        MF(eff->userdata, 0x74) = 0.6f;
+        ((effKemuriData*)eff->userdata)->scale = 0.6f;
     }
 }
 
@@ -117,7 +112,7 @@ void mario_land_kemuri(void) {
             else {
                 eff = kemuriEntry(0, mario->position.x, mario->position.y, mario->position.z, 0.0f);
                 if (mario->flags & 0x02000000) {
-                    MF(eff->userdata, 0x74) = 0.6f;
+                    ((effKemuriData*)eff->userdata)->scale = 0.6f;
                 }
             }
         }
@@ -224,7 +219,7 @@ void kemuri(void) {
             z = mario->position.z;
             if (mario->characterId == 2) {
                 eff = kemuriEntry(0, x, y, 10.0f + z, 0.0f);
-                MF(eff->userdata, 0x74) = kpaGetBaseScale(kpaGetLevel());
+                ((effKemuriData*)eff->userdata)->scale = kpaGetBaseScale(kpaGetLevel());
             }
             else {
                 kemuriEntry(0, x, y, z, dir);
@@ -245,7 +240,7 @@ void kemuri(void) {
             eff = effKemuri2Entry(0, x, y, z, s, c);
             }
             if (mario->flags & 0x02000000) {
-                MF(eff->userdata, 0x74) = 0.6f;
+                ((effKemuri2Data*)eff->userdata)->scale2 = 0.6f;
             }
         }
     }
@@ -279,7 +274,7 @@ void kemuri(void) {
         y = 1.5f + mario->position.y;
         z = mario->position.z + dist * c;
         eff = effKemuri2Entry(0, x, y, z, s, c);
-        MF(eff->userdata, 0x74) = scale;
+        ((effKemuri2Data*)eff->userdata)->scale2 = scale;
     }
 }
 
@@ -290,15 +285,15 @@ void party_kemuri(PartyEntry* party) {
         if (party->runMode != 10) {
             if (party->moveKind != 1) {
                 if (party->runMode == 3 && party->currentMemberId == 4) {
-                    if ((void*)party->field_138 != NULL) {
-                        if (!(hitGetAttr((void*)party->field_138) & 0x100)) {
+                    if ((void*)party->hitobjStandOn != NULL) {
+                        if (!(hitGetAttr((void*)party->hitobjStandOn) & 0x100)) {
                             if (party->moveSpeed < 2.0f) {
                             }
-                            else if (party->unk2C++ > 6) {
+                            else if (party->kemuriTimer++ > 6) {
                                 {
                                     f32 x, y, z;
                                     f32 c, s;
-                                    party->unk2C = 0;
+                                    party->kemuriTimer = 0;
                                     sincosf(&s, &c, 6.2831855f * reviseAngle(-party->targetDir) / 360.0f);
                                     effKemuri2Entry(0, party->position.x + 0.2f * (party->width * s), 1.5f + party->position.y, party->position.z + 0.2f * (party->width * c), s, c);
                                 }
@@ -306,19 +301,19 @@ void party_kemuri(PartyEntry* party) {
                         }
                     }
                     else {
-                        party->unk2C = 4;
+                        party->kemuriTimer = 4;
                     }
                 }
-                else if (party->field_36 == 1) {
-                    if ((void*)party->field_138 != NULL) {
-                        if (!(hitGetAttr((void*)party->field_138) & 0x100)) {
+                else if (party->motionId == 1) {
+                    if ((void*)party->hitobjStandOn != NULL) {
+                        if (!(hitGetAttr((void*)party->hitobjStandOn) & 0x100)) {
                             if (party->moveSpeed < 2.0f) {
                             }
-                            else if (party->unk2C++ > 6) {
+                            else if (party->kemuriTimer++ > 6) {
                                 {
                                     f32 x, y, z;
                                     f32 c, s;
-                                    party->unk2C = 0;
+                                    party->kemuriTimer = 0;
                                     sincosf(&s, &c, 6.2831855f * reviseAngle(-party->targetDir) / 360.0f);
                                     effKemuri2Entry(0, party->position.x + 0.2f * (party->width * s), 1.5f + party->position.y, party->position.z + 0.2f * (party->width * c), s, c);
                                 }
@@ -326,7 +321,7 @@ void party_kemuri(PartyEntry* party) {
                         }
                     }
                     else {
-                        party->unk2C = 4;
+                        party->kemuriTimer = 4;
                     }
                 }
             }
@@ -338,37 +333,37 @@ void party_kemuri(PartyEntry* party) {
 
     if (party->moveKind != 1) {
         if (party->runMode == 3 && party->currentMemberId == 4) {
-            if ((void*)party->field_138 != NULL) {
+            if ((void*)party->hitobjStandOn != NULL) {
                 if (party->moveSpeed < 2.0f) {
-                    party->unk2C = 7;
+                    party->kemuriTimer = 7;
                 }
-                else if (party->unk2C++ > 6) {
+                else if (party->kemuriTimer++ > 6) {
                     f32 c, s;
                     f32 x, y, z;
-                    party->unk2C = 0;
+                    party->kemuriTimer = 0;
                     sincosf(&s, &c, 6.2831855f * reviseAngle(-party->targetDir) / 360.0f);
                     effKemuri2Entry(0, party->position.x + 0.2f * (party->width * s), 1.5f + party->position.y, party->position.z + 0.2f * (party->width * c), s, c);
                 }
             }
             else {
-                party->unk2C = 4;
+                party->kemuriTimer = 4;
             }
         }
-        else if (party->field_36 == 1) {
-            if ((void*)party->field_138 != NULL) {
+        else if (party->motionId == 1) {
+            if ((void*)party->hitobjStandOn != NULL) {
                 if (party->moveSpeed < 2.0f) {
-                    party->unk2C = 7;
+                    party->kemuriTimer = 7;
                 }
-                else if (party->unk2C++ > 6) {
+                else if (party->kemuriTimer++ > 6) {
                     f32 c, s;
                     f32 x, y, z;
-                    party->unk2C = 0;
+                    party->kemuriTimer = 0;
                     sincosf(&s, &c, 6.2831855f * reviseAngle(-party->targetDir) / 360.0f);
                     effKemuri2Entry(0, party->position.x + 0.2f * (party->width * s), 1.5f + party->position.y, party->position.z + 0.2f * (party->width * c), s, c);
                 }
             }
             else {
-                party->unk2C = 4;
+                party->kemuriTimer = 4;
             }
         }
     }

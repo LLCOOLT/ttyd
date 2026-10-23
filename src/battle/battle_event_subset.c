@@ -12,8 +12,6 @@
 #include "evt/evt_snd.h"
 #include "unit/party/unit_party_yoshi.h"
 
-#define BTL_WORK_1C70(wp) (*(s32*)((u8*)(wp) + 0x1C70))
-#define BTL_WORK_1C74(wp) (*(u8*)((u8*)(wp) + 0x1C74))
 
 typedef struct WhirlwindN64Work {
     u8 field_0x0[0x8 - 0x0]; // 0x0
@@ -2176,8 +2174,8 @@ EVT_END()
 
 USER_FUNC(_disable_restore_command_cursor) {
     BattleWork* wp = _battleWorkPointer;
-    BTL_WORK_1C70(wp) = 0;
-    BTL_WORK_1C74(wp) = 0;
+    wp->commandMenu.recCommand = 0;
+    wp->commandMenu.attackAudience = 0;
     return EVT_RETURN_DONE;
 }
 
@@ -2233,7 +2231,7 @@ USER_FUNC(_set_hp_gauge_fade_flag) {
     id = evtGetValue(event, event->args[0]);
     unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
     if (unit) {
-        unit->hpGauge.field_0x2 |= 1;
+        unit->hpGauge.flags |= 1;
     }
     return EVT_RETURN_DONE;
 }

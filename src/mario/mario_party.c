@@ -37,12 +37,12 @@ s32 marioUseParty(void) {
     PartyEntry* party;
 
     if (N_marioChkUseParty()) {
-        wp->field_0x3B = 0;
+        wp->partyUseDelay = 0;
         wp->trigFlags &= ~2;
         return 0;
     }
     if ((wp->trigFlags & 2) && marioKeyOffChk()) {
-        wp->field_0x3B = 0;
+        wp->partyUseDelay = 0;
         wp->trigFlags &= ~2;
         return 0;
     }
@@ -58,12 +58,12 @@ s32 marioUseParty(void) {
         return 0;
     }
     if (N_fbatPreventMarioEventChk()) {
-        wp->field_0x3B = 0;
+        wp->partyUseDelay = 0;
         wp->trigFlags &= ~2;
         return 0;
     }
     if ((wp->flags & 0x30000) || wp->airTimer != 0) {
-        wp->field_0x3B = 0;
+        wp->partyUseDelay = 0;
         wp->trigFlags &= ~2;
         return 0;
     }
@@ -71,7 +71,7 @@ s32 marioUseParty(void) {
         wp->trigFlags &= ~2;
         return 0;
     }
-    if ((wp->dispFlags & 0x1000000) || party->field_37 == 1) {
+    if ((wp->dispFlags & 0x1000000) || party->slitOn == 1) {
         return 0;
     }
     if (partyGetPtr(marioGetPartyId())->flags & 0x100) {
@@ -87,9 +87,9 @@ s32 marioUseParty(void) {
     if (party->currentMemberId == 4 && yoshiGetStatus()) {
         return 0;
     }
-    if (!(wp->trigFlags & 2) && (wp->buttonBuffer & 0x400)) {
+    if (!(wp->trigFlags & 2) && (wp->buttonTrg & 0x400)) {
         wp->trigFlags |= 2;
-        wp->field_0x3B = 5;
+        wp->partyUseDelay = 5;
     }
     return 0;
 }
@@ -99,12 +99,12 @@ s32 marioUsePartyMain(void) {
 
     if (wp->trigFlags & 2) {
         if (marioKeyOffChk()) {
-            wp->field_0x3B = 0;
+            wp->partyUseDelay = 0;
             wp->trigFlags &= ~2;
             return 0;
         }
-        if (--wp->field_0x3B <= 0) {
-            wp->field_0x3B = 0;
+        if (--wp->partyUseDelay <= 0) {
+            wp->partyUseDelay = 0;
             wp->trigFlags &= ~2;
             return partyDoWork();
         }

@@ -90,11 +90,11 @@ USER_FUNC(evt_img_alloc_capture) {
         sh->x = 0;
         sh->y = 0;
         if (shadowId == 2) {
-            sh->field_0x14 = 39;
-            sh->field_0x18 = 1;
+            sh->copyFmt = 39;
+            sh->texFmt = 1;
         } else {
-            sh->field_0x14 = 6;
-            sh->field_0x18 = 6;
+            sh->copyFmt = 6;
+            sh->texFmt = 6;
         }
         img->flags |= 4;
     } else {
@@ -107,16 +107,16 @@ USER_FUNC(evt_img_alloc_capture) {
         sh->x = x;
         sh->y = y;
         if (shadowId == 2) {
-            sh->field_0x14 = 39;
-            sh->field_0x18 = 1;
+            sh->copyFmt = 39;
+            sh->texFmt = 1;
         } else {
-            sh->field_0x14 = 6;
-            sh->field_0x18 = 6;
+            sh->copyFmt = 6;
+            sh->texFmt = 6;
         }
     }
-    sh->field_0x10 = offId;
+    sh->offscreenId = offId;
     sh->flags = 0x14;
-    sh->field_0x40 = unk;
+    sh->allocMode = unk;
     if (unk != 0) {
         sh->flags |= 0x100;
     }

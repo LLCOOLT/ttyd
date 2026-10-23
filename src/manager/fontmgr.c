@@ -320,7 +320,7 @@ void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg) {
 		else {
 			switch (c = *msg) {
 				case '<':
-					msg = (const s8*)msgGetCommand((char*)msg + 1, cmd, arg);
+					msg = (const s8*)msgGetCommand((char*)(msg + 1), cmd, arg);
 					break;
 				default:
 					msg++;
@@ -443,7 +443,7 @@ void FontDrawStringMtx(Mtx mtx, const char* msg) {
 					y -= 28.0f;
 					break;
 				case '<':
-					msg = msgGetCommand((char*)msg + 1, (char*)tag, (char*)value);
+					msg = msgGetCommand((char*)(msg + 1), (char*)tag, (char*)value);
 					if (tag[0] == 'R' || (tag[0] == '/' && tag[0] == (u32)'/r')) {
 						break;
 					}
@@ -584,7 +584,7 @@ void FontDrawMessage(s32 x, s32 y, const char* msg) {
 					msg++;
 					break;
 				case '<':
-					msg = msgGetCommand((char*)msg + 1, (char*)tag, (char*)value);
+					msg = msgGetCommand((char*)(msg + 1), (char*)tag, (char*)value);
 					if (!strcmp((char*)tag, "red")) {
 						FontDrawColor((GXColor){0xE0, 0x00, 0x00, 0xFF});
 					}
@@ -673,7 +673,7 @@ void FontDrawMessageMtx(Mtx mtx, const char* msg) {
 					msg++;
 					break;
 				case '<':
-					msg = msgGetCommand((char*)msg + 1, (char*)tag, (char*)value);
+					msg = msgGetCommand((char*)(msg + 1), (char*)tag, (char*)value);
 					if (!strcmp((char*)tag, "red")) {
 						FontDrawColor((GXColor){0xE0, 0x00, 0x00, 0xFF});
 					}
@@ -768,7 +768,7 @@ u16 FontGetMessageWidthLine(const char* msg, u16* lines) {
 					msg++;
 					break;
 				case '<':
-					msg = msgGetCommand((char*)msg + 1, (char*)tag, (char*)value);
+					msg = msgGetCommand((char*)(msg + 1), (char*)tag, (char*)value);
 					if (!strcmp((char*)tag, "icon")) {
 						camGetCurPtr();
 						if (value[0] >= '0' && value[0] <= '9') {

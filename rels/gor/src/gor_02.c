@@ -6,6 +6,7 @@
 #include "driver/camdrv.h"
 #include "string.h"
 #include "memory.h"
+#include "cam_road.h"
 #include "battle/battle_monosiri.h"
 #include "driver/msgdrv.h"
 #include "driver/swdrv.h"
@@ -31,8 +32,6 @@
 
 
 f32 reviseAngle(f32 angle);
-typedef struct CamRoadWork { u8 field_0x0[0xD8]; s32 field_0xD8; u8 field_0xDC[0xFC - 0xDC]; char* curveName; } CamRoadWork;
-CamRoadWork* camRoadGetWorkPtr(void);
 typedef struct MonosiriFollow { s32 seq; s32* list; s32 count; } MonosiriFollow;
 #define FOLLOW (follow)
 void winLectureOn(void);
@@ -3099,16 +3098,16 @@ static EVT_BEGIN(evt_door_01_close)
 EVT_END()
 
 static DoorParam door_data_01 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_01_doa", // mapobj
     "A_i01_doa02", // hitIn
     "A_i01_doa01", // hitOut
-    "S_ie_01_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_01_naka", // mapOut
-    "A_ie_01C", // hitOutOut
+    "S_ie_01_soto", // outside
+    NULL, // outsideHit
+    "S_ie_01_naka", // inside
+    "A_ie_01C", // insideHit
     evt_door_01_00, // evtIn
     evt_door_01_01, // evtOut
     evt_wall_01, // evtWall
@@ -3221,16 +3220,16 @@ EVT_BEGIN(evt_door_02_close)
 EVT_END()
 
 static DoorParam door_data_02 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_i02_doa", // mapobj
     "A_ie_02_doa02", // hitIn
     "A_ie_02_doa01", // hitOut
-    "S_ie_02_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_02_naka", // mapOut
-    "A_ie_02C", // hitOutOut
+    "S_ie_02_soto", // outside
+    NULL, // outsideHit
+    "S_ie_02_naka", // inside
+    "A_ie_02C", // insideHit
     evt_door_02_00, // evtIn
     evt_door_02_01, // evtOut
     evt_wall_02, // evtWall
@@ -3347,16 +3346,16 @@ static EVT_BEGIN(evt_door_03_open)
 EVT_END()
 
 static DoorParam door_data_03 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_03_doam", // mapobj
     "A_ie_03_doa_03", // hitIn
     "A_ie_03_doa_01", // hitOut
-    "S_ie_03_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_03_naka", // mapOut
-    "A_ie_03C", // hitOutOut
+    "S_ie_03_soto", // outside
+    NULL, // outsideHit
+    "S_ie_03_naka", // inside
+    "A_ie_03C", // insideHit
     evt_door_03_00, // evtIn
     evt_door_03_01, // evtOut
     evt_wall_03, // evtWall
@@ -3493,16 +3492,16 @@ EVT_BEGIN(evt_wall_03_roll)
 EVT_END()
 
 static DoorParam door_data_03_roll = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_03_doam", // mapobj
     NULL, // hitIn
     "A_i03_rol", // hitOut
-    "S_ie_03_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_03_naka", // mapOut
-    "A_ie_03C", // hitOutOut
+    "S_ie_03_soto", // outside
+    NULL, // outsideHit
+    "S_ie_03_naka", // inside
+    "A_ie_03C", // insideHit
     evt_door_03_00, // evtIn
     evt_door_03_01, // evtOut
     evt_wall_03_roll, // evtWall
@@ -3580,16 +3579,16 @@ static const char* door_data_04_item[] = {
 };
 
 static DoorParam door_data_04 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_04_doa", // mapobj
     "A_ie_04_doa02", // hitIn
     "A_ie_04_doa01", // hitOut
-    "S_ie_04_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_04_naka", // mapOut
-    "A_ie_04C", // hitOutOut
+    "S_ie_04_soto", // outside
+    NULL, // outsideHit
+    "S_ie_04_naka", // inside
+    "A_ie_04C", // insideHit
     evt_door_04_00, // evtIn
     evt_door_04_01, // evtOut
     evt_wall_04, // evtWall
@@ -3629,16 +3628,16 @@ EVT_BEGIN(evt_wall_04_ura)
 EVT_END()
 
 DoorParam door_data_04_ura = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_04_doa_02", // mapobj
     "A_ie_04_doa_02_01", // hitIn
     "A_ie_04_doa_02_02", // hitOut
-    "S_ie_04_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_04_naka", // mapOut
-    "A_ie_04C", // hitOutOut
+    "S_ie_04_soto", // outside
+    NULL, // outsideHit
+    "S_ie_04_naka", // inside
+    "A_ie_04C", // insideHit
     evt_door_04_00_ura, // evtIn
     evt_door_04_01_ura, // evtOut
     evt_wall_04_ura, // evtWall
@@ -3697,16 +3696,16 @@ EVT_BEGIN(evt_door_05_close)
 EVT_END()
 
 DoorParam door_data_05 = {
-    0, // field_0x0
+    0, // flags
     3, // type
     1, // se
     "S_ie_05_doa", // mapobj
     "A_ie_05_doa02", // hitIn
     "A_ie_05_doa01", // hitOut
-    "S_ie_05_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_05_naka", // mapOut
-    "A_ie_05C", // hitOutOut
+    "S_ie_05_soto", // outside
+    NULL, // outsideHit
+    "S_ie_05_naka", // inside
+    "A_ie_05C", // insideHit
     evt_door_05_00, // evtIn
     NULL, // evtOut
     evt_wall_05, // evtWall
@@ -3833,16 +3832,16 @@ EVT_BEGIN(evt_door_06_close)
 EVT_END()
 
 DoorParam door_data_06 = {
-    2, // field_0x0
+    2, // flags
     3, // type
     1, // se
     "S_ie_06_doa", // mapobj
     "A_ie_06_doa02", // hitIn
     "A_ie_06_doa01", // hitOut
-    "S_ie_06_soto", // mapIn
-    NULL, // hitInIn
-    "S_ie_06_naka", // mapOut
-    "A_ie_06C", // hitOutOut
+    "S_ie_06_soto", // outside
+    NULL, // outsideHit
+    "S_ie_06_naka", // inside
+    "A_ie_06C", // insideHit
     evt_door_06_00, // evtIn
     NULL, // evtOut
     evt_wall_06, // evtWall
@@ -4171,11 +4170,11 @@ USER_FUNC(get_camcurve) {
     CamRoadWork* road = camRoadGetWorkPtr();
     s32 ret = 0;
 
-    if (road->field_0xD8 != 0 && road->curveName != NULL) {
-        if (!strcmp(road->curveName, "|MarioSt_CameraRoad|C_ground_ok") && !strcmp(camstring, "|MarioSt_CameraRoad|C_ue")) {
+    if (road->prev.on != 0 && road->prev.cam != NULL) {
+        if (!strcmp(road->prev.cam->name, "|MarioSt_CameraRoad|C_ground_ok") && !strcmp(camstring, "|MarioSt_CameraRoad|C_ue")) {
             ret = 1;
         }
-        strcpy(camstring, road->curveName);
+        strcpy(camstring, road->prev.cam->name);
     }
     evtSetValue(event, args[0], ret);
     return EVT_RETURN_DONE;

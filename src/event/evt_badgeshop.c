@@ -319,7 +319,7 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 	bdsw->bargainBadges[3] = count;
 	bdsw->bargainBadges[4] = count;
 	bdsw->bargainNum = count;
-	bdsw->field_0x110 = count;
+	bdsw->reserved_110 = count;
 
 	for (; i < 99; i++) {
 		value = 0;
@@ -339,7 +339,7 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 		count3 = count2;
 	}
 	irand(0x100); //unused
-	while (bdsw->bargainNum + bdsw->field_0x110 < count3) {
+	while (bdsw->bargainNum + bdsw->reserved_110 < count3) {
 		v28 = bdsw->bargainNum;
 		if (v28 < 3 || !v7) {
 			stopcount = irand(count);
@@ -378,7 +378,7 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 }
 
 #pragma dont_inline on
-s16 badgeShop_set(u8* table, s16 id, s16 val) { //TODO: regalloc, otherwise 1:1
+s16 badgeShop_set(u8* table, s16 id, s16 val) {
 	s32 bound;
 	s16 index;
 	u8 mask;
@@ -632,7 +632,7 @@ USER_FUNC(evt_badgeShop_bteresa_get_kind_cnt) {
 
 	for (count = 0, i = 0; i < BADGE_MAX - 1; i++) {
 		badge = badgeShop_get(bdsw->bteresa_table, (s16)(i + KEY_ITEM_MIN));
-		if (badge > 0) { //TODO: wonky cntlzw
+		if (badge > 0) {
 			count++;
 		}
 	}

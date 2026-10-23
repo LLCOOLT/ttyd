@@ -58,7 +58,7 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                 memset(disp, 0, sizeof(BattleACDispParams));
                 disp->iconX = -300.0f;
                 disp->iconY = 0.0f;
-                disp->unk20 = 20;
+                disp->slideTimer = 20;
                 ac->mAcState = 99;
                 break;
             case 99:
@@ -152,7 +152,7 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                         ac->mAcState = 1003;
                         break;
                     }
-                    lw->timer = *(s32*)((u8*)ac + 0x38 + lw->count * 4);
+                    lw->timer = ac->params[lw->count];
                     break;
                 }
                 if (!(lw->held0 != 0 && lw->held1 != 0) && !autoCmd) {

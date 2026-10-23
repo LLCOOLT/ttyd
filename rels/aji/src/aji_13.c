@@ -505,7 +505,7 @@ static USER_FUNC(mario_chk) {
     for (i = 0; i < 13; i++) {
         HitEntry* hit = hitNameToPtr((const char*)name_tbl[i]);
         if (hit != NULL && hit->mapObj != NULL) {
-            Vec pos = (Vec){hit->mapObj->unkAC[0][3], hit->mapObj->unkAC[1][3], hit->mapObj->unkAC[2][3]};
+            Vec pos = (Vec){hit->mapObj->transformMtx[0][3], hit->mapObj->transformMtx[1][3], hit->mapObj->transformMtx[2][3]};
             PSVECSubtract(&pos, &work[i].pos, &work[i].delta);
             work[i].pos = pos;
         }
@@ -514,17 +514,17 @@ static USER_FUNC(mario_chk) {
         HitEntry* hit = hitNameToPtr((const char*)name_tbl[i]);
         MarioWork* mario = marioGetPtr();
         if (hit != NULL && mario != NULL && mario->hitobjStandOn != NULL && hitIsGroup(mario->hitobjStandOn, hit)) {
-            mario->unk174.x = 10.0f * work[i].delta.x;
-            mario->unk174.z = 10.0f * work[i].delta.z;
+            mario->floorMove.x = 10.0f * work[i].delta.x;
+            mario->floorMove.z = 10.0f * work[i].delta.z;
             break;
         }
     }
     for (i = 0; i < 13; i++) {
         HitEntry* hit = hitNameToPtr((const char*)name_tbl[i]);
         PartyEntry* party = partyGetPtr(0);
-        if (hit != NULL && party != NULL && party->field_138 != NULL && hitIsGroup(party->field_138, hit)) {
-            party->field_AC = 10.0f * work[i].delta.x;
-            party->field_B4 = 10.0f * work[i].delta.z;
+        if (hit != NULL && party != NULL && party->hitobjStandOn != NULL && hitIsGroup(party->hitobjStandOn, hit)) {
+            party->floorMoveX = 10.0f * work[i].delta.x;
+            party->floorMoveZ = 10.0f * work[i].delta.z;
             break;
         }
     }
@@ -532,10 +532,10 @@ static USER_FUNC(mario_chk) {
         MarioWork* mario = marioGetPtr();
         PartyEntry* party = partyGetPtr(0);
         if (mario != NULL && mario->hitobjStandOn != NULL && hitIsGroup(mario->hitobjStandOn, hitNameToPtr("A_bel"))) {
-            mario->unk174.x = 0.6f;
+            mario->floorMove.x = 0.6f;
         }
-        if (party != NULL && party->field_144 != NULL && hitIsGroup(party->field_138, hitNameToPtr("A_bel"))) {
-            party->field_AC = 0.6f;
+        if (party != NULL && party->hitobjUnder != NULL && hitIsGroup(party->hitobjStandOn, hitNameToPtr("A_bel"))) {
+            party->floorMoveX = 0.6f;
         }
     }
     for (i = 0; i < 6; i++) {
@@ -552,7 +552,7 @@ static USER_FUNC(mario_chk) {
         if (hitIsGroup(mario->hitobjStandOn, hit)) {
             Vec v = (Vec){0.0f, 1.0f, 0.0f};
             Mtx m;
-            mtxGetRotationElement(hit->mapObj->unkAC, m, 'x', 'y');
+            mtxGetRotationElement(hit->mapObj->transformMtx, m, 'x', 'y');
             PSMTXMultVec(m, &v, &v);
             angle = angleABf(0.0f, 0.0f, v.x, v.y);
             delta = angle - *(f32*)&event->userdata[1];
@@ -561,8 +561,8 @@ static USER_FUNC(mario_chk) {
             rot = angleABf(v.x, v.y, mario->position.x, mario->position.y);
             if ((HitEntry*)event->userdata[2] != NULL && strcmp(hit->joint->name, ((HitEntry*)event->userdata[2])->joint->name) == 0) {
                 rot = 6.2831855f * (rot + delta) / 360.0f;
-                mario->unk174.x = (v.x + dist * (f32)sin(rot)) - mario->position.x;
-                mario->unk174.y = (v.y - dist * (f32)cos(rot)) - mario->position.y;
+                mario->floorMove.x = (v.x + dist * (f32)sin(rot)) - mario->position.x;
+                mario->floorMove.y = (v.y - dist * (f32)cos(rot)) - mario->position.y;
             }
             *(f32*)&event->userdata[1] = angle;
             event->userdata[2] = (s32)hit;

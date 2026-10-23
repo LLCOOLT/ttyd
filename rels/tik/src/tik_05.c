@@ -1,4 +1,5 @@
 #pragma dollar_identifiers on
+#include "eff/eff_starstone.h"
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -464,7 +465,7 @@ USER_FUNC(starstone_circle_link_func) {
 }
 
 USER_FUNC(eff_starstone_sound_off) {
-    *(u16*)((u8*)effNameToPtr((const char*)evtGetValue(event, event->args[0]))->userdata + 4) &= ~4;
+    ((EffStarStoneWork*)effNameToPtr((const char*)evtGetValue(event, event->args[0]))->userdata)->flags &= ~4;
     return EVT_RETURN_DONE;
 }
 
@@ -1377,7 +1378,7 @@ USER_FUNC(starstone_setting) {
     EffectEntry* eff = effNameToPtr(name);
     EffectEntry* mahojin = effNameToPtr("mahojin");
 
-    *(u16*)((u8*)eff->userdata + 4) |= 0x20;
+    ((EffStarStoneWork*)eff->userdata)->flags |= 0x20;
     ((MahojinWork*)mahojin->userdata)->stones[idx].eff = eff;
     ((MahojinWork*)mahojin->userdata)->stones[idx].draw = effStarStoneDraw;
     return EVT_RETURN_DONE;

@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "driver/msgdrv.h"
 
 #pragma force_active on
 #include "mario/mario.h"
@@ -900,11 +901,7 @@ EVT_BEGIN(evt_1day_end)
 EVT_END()
 
 void yuurei_callback(s32 type, void* param) {
-#ifdef VERSION_G8ME01
-    EventEntry* ev = *(EventEntry**)(*(u8**)param + 0xF200);
-#else
-    EventEntry* ev = *(EventEntry**)(*(u8**)param + 0x7A00);
-#endif
+    EventEntry* ev = (*(MsgWinData**)param)->event;
 
     if (ev->lwData[13] != 0 && type == 3) {
         ev->lwData[14]++;
@@ -918,14 +915,10 @@ void yuurei_callback(s32 type, void* param) {
 }
 
 void powan_callback(s32 type, void* param) {
-    u8* work = *(u8**)param;
+    MsgWinData* work = *(MsgWinData**)param;
 
     if (type == 3) {
-#ifdef VERSION_G8ME01
-        EventEntry* ev = *(EventEntry**)(work + 0xF200);
-#else
-        EventEntry* ev = *(EventEntry**)(work + 0x7A00);
-#endif
+        EventEntry* ev = work->event;
         s32 count = evtGetValue(ev, LW(10));
 
         switch (count) {

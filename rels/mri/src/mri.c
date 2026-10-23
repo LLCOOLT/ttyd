@@ -14,6 +14,7 @@
 #include "pmario_sound.h"
 #include "stdlib.h"
 #include "mri.h"
+#include "mri_puni.h"
 
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
@@ -22,13 +23,11 @@ void mapObjTranslate(const char* name, f32 x, f32 y, f32 z);
 void mapGrpSetColor(const char* name, GXColor color);
 typedef struct HSV { u8 h; u8 s; u8 v; u8 a; } HSV;
 GXColor HSV2RGB(HSV hsv);
-typedef struct MriPuni { u8 field_0x0[0x4]; u32 flags; u32 flags2; u16 anim; u8 field_0xE[0x114 - 0xE]; u16 mode; s16 groupInit; s16 group; s16 order; s16 moveFlag; u8 field_0x11E[0x124 - 0x11E]; s32 field_0x124; u8 field_0x128[0x12C - 0x128]; Vec pos; u8 field_0x138[0x148 - 0x138]; f32 field_0x148; u8 field_0x14C[0x15C - 0x14C]; Vec vel; u8 field_0x168[0x174 - 0x168]; f32 field_0x174; u8 field_0x178[0x184 - 0x178]; f32 field_0x184; f32 field_0x188; u8 field_0x18C[0x190 - 0x18C]; f32 radius; u8 field_0x194[0x1A8 - 0x194]; f32 dist; u8 field_0x1AC[0x1C8 - 0x1AC]; OSTime time; struct MriPuni* parent; struct MriPuni* child; u8 field_0x1D8[0x1E4 - 0x1D8]; s32 field_0x1E4; u8 field_0x1E8[0x1EC - 0x1E8]; f32 baseY; f32 vy; f32 field_0x1F4; Vec field_0x1F8; u8 field_0x204[0x56C - 0x204]; void* modeFunc; void* moveFunc; s16 field_0x574; s16 field_0x576; u8 field_0x578[0x5A8 - 0x578]; } MriPuni;
-MriPuni* puniGetPunidat(void);
-void puniMoveDecel(MriPuni* puni);
-typedef struct MriPuniWork { u8 field_0x0[0x43C]; s32 field_0x43C; u8 field_0x440[0x47C - 0x440]; s32 field_0x47C; f32 field_0x480; f32 field_0x484; f32 field_0x488; f32 field_0x48C; f32 field_0x490; f32 field_0x494; u8 field_0x498[0x4B0 - 0x498]; f32 field_0x4B0; f32 field_0x4B4; } MriPuniWork;
-MriPuniWork* puniGetPunigp(void);
-void PuniDokuritsu(MriPuni* puni);
-void puniModeWinjump(MriPuni* puni);
+PuniData* puniGetPunidat(void);
+void puniMoveDecel(PuniData* puni);
+PuniWork* puniGetPunigp(void);
+void PuniDokuritsu(PuniData* puni);
+void puniModeWinjump(PuniData* puni);
 
 USER_FUNC(evt_bero_exec_get);
 USER_FUNC(evt_bero_exec_onoff);
@@ -83,10 +82,10 @@ void _epilog(void);
 void _unresolved(void);
 USER_FUNC(evt_mri_get16bitdata);
 USER_FUNC(mri_npc_buruburu);
-BOOL toge_searchParent(MriPuni* self, s16 group);
-void togeModeParent(MriPuni* puni);
-void togeMoveParent(MriPuni* puni);
-void puniModeWinjump(MriPuni* puni);
+BOOL toge_searchParent(PuniData* self, s16 group);
+void togeModeParent(PuniData* puni);
+void togeMoveParent(PuniData* puni);
+void puniModeWinjump(PuniData* puni);
 void togeMakeRetsu(Vec* pos, s16 leader, s16 start, s16 end);
 USER_FUNC(evt_mri_toge_make_retsu);
 USER_FUNC(evt_mri_toge_retsu_stop);
@@ -709,74 +708,74 @@ EVT_BEGIN(mri_puni_jump_se)
     RETURN
 EVT_END()
 
-BOOL toge_searchParent(MriPuni* self, s16 group) {
+BOOL toge_searchParent(PuniData* self, s16 group) {
     s32 i;
     s32 order = 10000;
-    MriPuni* parent;
+    PuniData* parent;
 
     for (i = 110; i <= 209; i++) {
-        MriPuni* p = &puniGetPunidat()[i];
-        if ((p->flags & 0x400) && (p->flags & 0x80000) && p->group == group && p->child == NULL && p != self &&
-            (s16)order > p->order) {
+        PuniData* p = &puniGetPunidat()[i];
+        if ((p->flags & 0x400) && (p->flags & 0x80000) && p->groupId == group && p->child1 == NULL && p != self &&
+            (s16)order > p->depth) {
             parent = p;
-            order = p->order + 1;
+            order = p->depth + 1;
         }
     }
     if ((s16)order == 10000) {
         return FALSE;
     }
     self->parent = parent;
-    self->order = order;
-    self->group = parent->group;
-    parent->child = self;
+    self->depth = order;
+    self->groupId = parent->groupId;
+    parent->child1 = self;
     return TRUE;
 }
 
-void togeModeParent(MriPuni* puni) {
+void togeModeParent(PuniData* puni) {
     Vec dir;
 
     PSVECSubtract(&puni->parent->pos, &puni->pos, &dir);
-    puni->dist = PSVECMag(&dir);
-    if (puni->dist > 3.0f + (2.0f + (puni->radius + puni->parent->radius))) {
+    puni->parentDist = PSVECMag(&dir);
+    if (puni->parentDist > 3.0f + (2.0f + (puni->radius.x + puni->parent->radius.x))) {
         PSVECNormalize(&dir, &dir);
         dir.y = 0.0f;
         PSVECScale(&dir, &dir, 1.0f);
         PSVECAdd(&puni->vel, &dir, &puni->vel);
-        puni->field_0x174 = 3.0f;
+        puni->maxSpeed = 3.0f;
     }
 }
 
-void togeMoveParent(MriPuni* puni) {
+void togeMoveParent(PuniData* puni) {
     puniMoveDecel(puni);
 }
 
-void puniModeWinjump(MriPuni* puni) {
+void puniModeWinjump(PuniData* puni) {
     s32 elapsed;
     f32 t;
 
-    switch (puni->mode) {
+    switch (puni->modeStep) {
         case 0:
-            puni->time = gp->renderTime;
-            puni->field_0x1E4 = 0;
-            puni->baseY = puni->pos.y;
-            puni->vy = -72.0f;
-            puni->field_0x1F4 = -puni->vy;
-            puni->mode = 1;
+            puni->startTime = gp->renderTime;
+            puni->modeVar1 = 0;
+            puni->modeF0 = puni->pos.y;
+            puni->modeF1 = -72.0f;
+            puni->modeF2 = -puni->modeF1;
+            puni->modeStep = 1;
             psndSFXOn_3D("SFX_STG2_PUNI_JUMP1", &puni->pos);
         case 1:
-            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)puni->time);
-            if (elapsed > 100 && puni->field_0x1E4 == 0) {
-                puni->field_0x1E4 = 1;
-                puni->field_0x124 = 0;
+            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)puni->startTime);
+            if (elapsed > 100 && puni->modeVar1 == 0) {
+                puni->modeVar1 = 1;
+                puni->animTime = 0;
             }
             if (elapsed < 200) {
                 t = elapsed / 200.0f;
-                puni->pos.y = puni->baseY + t * (puni->vy * t + puni->field_0x1F4);
+                puni->pos.y = puni->modeF0 + t * (puni->modeF1 * t + puni->modeF2);
             } else {
-                puni->pos.y = puni->baseY;
-                puni->anim = 0x1B;
-                puni->moveFlag = 1;
-                puni->mode = 0;
+                puni->pos.y = puni->modeF0;
+                puni->mode = 0x1B;
+                puni->anim = 1;
+                puni->modeStep = 0;
             }
             break;
     }
@@ -784,15 +783,15 @@ void puniModeWinjump(MriPuni* puni) {
 
 void togeMakeRetsu(Vec* pos, s16 leader, s16 start, s16 end) {
     s32 i;
-    MriPuni* puni = &puniGetPunidat()[leader];
+    PuniData* puni = &puniGetPunidat()[leader];
 
     puni->pos.x = pos->x;
     puni->pos.y = pos->y;
     puni->pos.z = pos->z;
     puni->modeFunc = NULL;
     puni->moveFunc = NULL;
-    puni->group = puni->groupInit;
-    puni->moveFlag = 1;
+    puni->groupId = puni->index;
+    puni->anim = 1;
     puni->flags |= 0x80000;
     for (i = start; i <= end; i++) {
         puni = &puniGetPunidat()[i];
@@ -801,7 +800,7 @@ void togeMakeRetsu(Vec* pos, s16 leader, s16 start, s16 end) {
         puni->pos.x = pos->x;
         puni->pos.y = pos->y;
         puni->pos.z = pos->z;
-        puni->moveFlag = 1;
+        puni->anim = 1;
         puni->flags |= 0x80000;
         toge_searchParent(puni, leader);
     }
@@ -830,17 +829,17 @@ USER_FUNC(evt_mri_toge_retsu_stop) {
     s16 start = evtGetValue(event, args[1]);
     s16 end = evtGetValue(event, args[2]);
     s32 i;
-    MriPuni* puni = &puniGetPunidat()[leader];
+    PuniData* puni = &puniGetPunidat()[leader];
 
     puni->modeFunc = NULL;
     puni->moveFunc = NULL;
-    puni->moveFlag = 0;
+    puni->anim = 0;
     puni->flags &= ~0x80000;
     for (i = start; i <= end; i++) {
         puni = &puniGetPunidat()[i];
         puni->modeFunc = NULL;
         puni->moveFunc = NULL;
-        puni->moveFlag = 0;
+        puni->anim = 0;
         puni->flags &= ~0x80000;
     }
     return EVT_RETURN_DONE;
@@ -850,13 +849,13 @@ USER_FUNC(evt_mri_toge_enter_init) {
     s32 i;
 
     for (i = 110; i <= 209; i++) {
-        MriPuni* puni = &puniGetPunidat()[i];
+        PuniData* puni = &puniGetPunidat()[i];
         if (puni->flags & 0x400) {
             puni->pos.x = 0.0f;
             puni->pos.y = -1000.0f;
             puni->pos.z = 0.0f;
-            puni->anim = 0x1D;
-            puni->moveFlag = 0;
+            puni->mode = 0x1D;
+            puni->anim = 0;
             puni->flags &= ~0x100000;
         }
     }
@@ -867,12 +866,12 @@ USER_FUNC(evt_mri_puni_win_init) {
     s32 i;
 
     for (i = 1; i <= 102; i++) {
-        MriPuni* puni = &puniGetPunidat()[i];
+        PuniData* puni = &puniGetPunidat()[i];
         if (puni->flags & 0x400) {
-            puni->field_0x574 = puni->field_0x576;
-            puni->field_0x188 = 0.0f;
-            puni->field_0x184 = 0.0f;
-            puni->field_0x148 = 0.0f;
+            puni->hp = puni->maxHp;
+            puni->rotOffsetY = 0.0f;
+            puni->spin = 0.0f;
+            puni->dispOfs.y = 0.0f;
             puni->flags2 &= ~1;
         }
     }
@@ -887,31 +886,31 @@ USER_FUNC(evt_mri_puni_win_attack) {
     f32 x1 = evtGetValue(event, args[3]);
     f32 y1 = evtGetValue(event, args[4]);
     f32 z1 = evtGetValue(event, args[5]);
-    MriPuniWork* wp = puniGetPunigp();
+    PuniWork* wp = puniGetPunigp();
     s32 i;
 
-    wp->field_0x47C = 2;
-    wp->field_0x480 = x0;
-    wp->field_0x484 = y0;
-    wp->field_0x488 = z0;
-    wp->field_0x4B0 = 100.0f;
-    wp->field_0x48C = x1;
-    wp->field_0x490 = y1;
-    wp->field_0x494 = z1;
-    wp->field_0x4B4 = 100.0f;
+    wp->beroMode = 2;
+    wp->beroStart.x = x0;
+    wp->beroStart.y = y0;
+    wp->beroStart.z = z0;
+    wp->beroStartRange = 100.0f;
+    wp->beroEnd.x = x1;
+    wp->beroEnd.y = y1;
+    wp->beroEnd.z = z1;
+    wp->beroEndRange = 100.0f;
     for (i = 1; i <= 102; i++) {
-        MriPuni* puni = &puniGetPunidat()[i];
+        PuniData* puni = &puniGetPunidat()[i];
         if (puni->flags & 0x400) {
             PuniDokuritsu(puni);
-            puni->moveFlag = 1;
-            puni->mode = 0;
+            puni->anim = 1;
+            puni->modeStep = 0;
             if (puni->flags & 0x4000) {
                 puni->flags &= ~0x4000;
-                puni->anim = 0x1D;
+                puni->mode = 0x1D;
                 puni->modeFunc = puniModeWinjump;
                 puni->moveFunc = puniMoveDecel;
             } else {
-                puni->anim = 0x1B;
+                puni->mode = 0x1B;
             }
         }
     }
@@ -926,12 +925,12 @@ USER_FUNC(evt_mri_puni_win_end) {
     f32 x1 = evtGetValue(event, args[3]);
     f32 y1 = evtGetValue(event, args[4]);
     f32 z1 = evtGetValue(event, args[5]);
-    MriPuniWork* wp = puniGetPunigp();
+    PuniWork* wp = puniGetPunigp();
     s32 i;
 
-    wp->field_0x43C = 0;
+    wp->allMode = 0;
     for (i = 1; i <= 102; i++) {
-        MriPuni* puni = &puniGetPunidat()[i];
+        PuniData* puni = &puniGetPunidat()[i];
         if (puni->flags & 0x400) {
             f32 rx;
             f32 rz;
@@ -941,11 +940,11 @@ USER_FUNC(evt_mri_puni_win_end) {
             puni->pos.x = x0 + rx - 10.0f;
             puni->pos.y = y0;
             puni->pos.z = z0 + rz - 10.0f;
-            puni->field_0x1F8.x = x1 + rx - 10.0f;
-            puni->field_0x1F8.y = y1;
-            puni->field_0x1F8.z = z1 + rz - 10.0f;
-            puni->anim = 0x19;
-            puni->mode = 0;
+            puni->moveStart.x = x1 + rx - 10.0f;
+            puni->moveStart.y = y1;
+            puni->moveStart.z = z1 + rz - 10.0f;
+            puni->mode = 0x19;
+            puni->modeStep = 0;
         }
     }
     return EVT_RETURN_DONE;

@@ -20,7 +20,6 @@ typedef struct TimingWideWork {
 } TimingWideWork;
 
 #define TW_WORK(ac) ((TimingWideWork*)(ac)->work)
-#define AC_S32(ac, off) (*(s32*)((u8*)(ac) + (off)))
 
 static void actionCommandDisp(f32 x, f32 y);
 
@@ -40,10 +39,10 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
             memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            *(s32*)&disp->field_0x1C[4] = 20;
+            *(s32*)&disp->slideTimerBase[4] = 20;
             tw->state = 0;
             tw->frame = 0;
-            switch (AC_S32(ac, 0x38)) {
+            switch (ac->params[0]) {
                 case 5:
                     tw->button = 0x100;
                     tw->mode = 1;
@@ -79,11 +78,11 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
             if ((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
                 if (irand(100) >= 0) {
                     ac->setupParam = 0;
-                    if (AC_S32(ac, 0x40) > 0) {
-                        ac->setupParam = irand(AC_S32(ac, 0x40));
+                    if (ac->params[2] > 0) {
+                        ac->setupParam = irand(ac->params[2]);
                     }
                     if (ac->setupParam <= 0) {
-                        ac->setupParam = AC_S32(ac, 0x3C) + 2;
+                        ac->setupParam = ac->params[1] + 2;
                     }
                 } else {
                     ac->setupParam = ac->params[2] + irand(ac->params[3] - ac->params[2]);
@@ -91,7 +90,7 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
                 ac->mAcState = 0x3EA;
                 tw->state = 2;
             } else {
-                if (AC_S32(ac, 0x38) == 4) {
+                if (ac->params[0] == 4) {
                     ac->mAcState = 0x3E8;
                 } else {
                     ac->mAcState = 0x3E9;
@@ -107,11 +106,11 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
             break;
         case 0x3E9:
             tw->frame++;
-            if (tw->frame > AC_S32(ac, 0x3C)) {
+            if (tw->frame > ac->params[1]) {
                 ac->result = 0;
                 ac->mAcState = 0x3EC;
                 tw->state = 4;
-                if (AC_S32(ac, 0x34) & 8) {
+                if ((s32)ac->acFlags & 8) {
                     ac->mAcState = 0x3EB;
                     tw->state = 3;
                 }
@@ -135,20 +134,20 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
                         }
                         break;
                 }
-                if (tw->frame >= AC_S32(ac, 0x40) && tw->frame < AC_S32(ac, 0x44)) {
+                if (tw->frame >= ac->params[2] && tw->frame < ac->params[3]) {
                     ac->outputParams[2] = 1;
                 } else {
                     ac->outputParams[2] = 0;
                 }
                 if (autoCmd) {
-                    if (AC_S32(ac, 0x60)) {
+                    if (*(s32*)&ac->outputParams[2]) {
                         pressed = 1;
                     } else {
                         pressed = 0;
                     }
                 }
                 if (pressed) {
-                    if (AC_S32(ac, 0x60)) {
+                    if (*(s32*)&ac->outputParams[2]) {
                         ac->result = 2;
                         ac->mResultCount++;
                         ac->outputParams[0] = 1;
@@ -158,7 +157,7 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
                     }
                     ac->mAcState = 0x3EC;
                     tw->state = 4;
-                    if (AC_S32(ac, 0x34) & 8) {
+                    if ((s32)ac->acFlags & 8) {
                         ac->mAcState = 0x3EB;
                         tw->state = 3;
                     }
@@ -168,12 +167,12 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
         case 0x3EA:
             tw->frame++;
             ac->setupParam--;
-            if (tw->frame > AC_S32(ac, 0x3C)) {
+            if (tw->frame > ac->params[1]) {
                 ac->result = 0;
                 return 0;
             }
             if (ac->setupParam < 0) {
-                if (tw->frame >= AC_S32(ac, 0x40) && tw->frame < AC_S32(ac, 0x44)) {
+                if (tw->frame >= ac->params[2] && tw->frame < ac->params[3]) {
                     ac->result = 2;
                     ac->mResultCount++;
                     ac->outputParams[0] = 1;
@@ -223,11 +222,11 @@ void battleAcDisp_TimingWide(CameraId cameraId, void* param) {
             if ((s32)ac->acFlags & 1) {
                 disp->iconX = 30.0f;
             } else {
-                disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
+                disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->unk20 > 0) {
-                disp->unk20--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 3:
@@ -242,9 +241,9 @@ void battleAcDisp_TimingWide(CameraId cameraId, void* param) {
             if (((s32)ac->acFlags & 4) && !(ac->result & 2)) {
                 show = 0;
             }
-            if (disp->unk20 >= 40) {
+            if (disp->slideTimer >= 40) {
                 if (show) {
-                    disp->iconX = intplGetValue(4, disp->unk20 - 40, 20, 30.0f, -300.0f);
+                    disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
                 } else {
                     disp->iconX = 30.0f;
                 }
@@ -252,8 +251,8 @@ void battleAcDisp_TimingWide(CameraId cameraId, void* param) {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->unk20 < 60) {
-                disp->unk20++;
+            if (disp->slideTimer < 60) {
+                disp->slideTimer++;
             }
             break;
     }

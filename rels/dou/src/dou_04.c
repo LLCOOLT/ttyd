@@ -801,9 +801,9 @@ USER_FUNC(evt_mapgrp_translate2) {
     z = 10.0f * (z / 10.0f);
     hit = marioGetPtr()->hitobjStandOn;
     if (hit != NULL && strcmp(hitName, hitGetName(hit)) == 0) {
-        mario->unk174.x = x - prev[0];
-        mario->unk174.y = y - prev[1];
-        mario->unk174.z = z - prev[2];
+        mario->floorMove.x = x - prev[0];
+        mario->floorMove.y = y - prev[1];
+        mario->floorMove.z = z - prev[2];
     }
     prev[0] = 10.0f * (x / 10.0f);
     prev[1] = 10.0f * (y / 10.0f);

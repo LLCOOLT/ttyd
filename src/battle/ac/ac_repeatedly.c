@@ -53,9 +53,6 @@ typedef struct RepeatWork {
 
 #pragma optimize_for_size on
 
-#define RW(w) ((RepeatWork*)((u8*)&(w)->actionCommands + 0x2BC))
-#define RD(w) ((RepeatDisp*)((u8*)&(w)->actionCommands + 0x290))
-#define ACP(w, off, T) (*(T*)((u8*)&(w)->actionCommands + (off)))
 
 static void actionCommandDisp(f32 x, f32 y);
 void battleAcDelete_Repeatedly(BattleWork* work);
@@ -68,9 +65,9 @@ static void _init_param(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     RepeatWork* r = (RepeatWork*)ac->work;
     RepeatDisp* d = (RepeatDisp*)&ac->disp;
-    ACP(work, 0x2E8, u8) = 0;
-    ACP(work, 0x2C8, u32) = 0;
-    switch (ACP(work, 0x38, s32)) {
+    ((RepeatWork*)work->actionCommands.work)->resetFlag = 0;
+    ((RepeatWork*)work->actionCommands.work)->holdMask = 0;
+    switch (work->actionCommands.params[0]) {
         case 10:
             work->flags |= 0x20000000;
             break;
@@ -108,17 +105,17 @@ static void _init_param(BattleWork* work) {
             r->btn0 = r->btn1 = r->btn2 = 0x100;
             break;
     }
-    r->field_0x26 = r->grace = ACP(work, 0x3C, s32);
-    r->pos = ACP(work, 0x40, s32);
-    r->vel = ACP(work, 0x44, s32) / 10.0f;
+    r->field_0x26 = r->grace = work->actionCommands.params[1];
+    r->pos = work->actionCommands.params[2];
+    r->vel = work->actionCommands.params[3] / 10.0f;
     if (r->vel) {
         r->pos = irand(100);
     }
-    r->gauge = ACP(work, 0x54, s32);
+    r->gauge = work->actionCommands.params[7];
     d->gauge = 0.01f * r->gauge;
     r->count = 0;
-    r->power = ACP(work, 0x4C, s32);
-    r->decay = 0.01f * ACP(work, 0x50, s32);
+    r->power = work->actionCommands.params[5];
+    r->decay = 0.01f * work->actionCommands.params[6];
     r->iconParam = 0xB2;
     if (work->actionCommands.countdown > 0) {
         work->actionCommands.countdown--;
@@ -126,7 +123,7 @@ static void _init_param(BattleWork* work) {
     } else {
         r->done = 0;
     }
-    ACP(work, 0x58, s32) = 0;
+    work->actionCommands.outputParams[0] = 0;
 }
 
 s32 battleAcMain_Repeatedly(BattleWork* work) {
@@ -170,9 +167,9 @@ s32 battleAcMain_Repeatedly(BattleWork* work) {
             }
             BattleAcGaugeSeInit();
             work->actionCommands.mAcState = 1000;
-            ACP(work, 0x58, s32) = 1;
+            work->actionCommands.outputParams[0] = 1;
         case 1000:
-            switch (ACP(work, 0x38, s32)) {
+            switch (work->actionCommands.params[0]) {
                 case 10:
                     if (r->resetFlag) {
                         if (!OSGetResetButtonState()) {
@@ -309,22 +306,22 @@ void battleAcDisp_Repeatedly(CameraId cameraId, BattleWork* work) {
         case 100:
         case 1000:
         case 1001:
-            disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->unk20 > 0) {
-                disp->unk20--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 1002:
         case 1003:
-            if (disp->unk20 >= 40) {
-                disp->iconX = intplGetValue(4, disp->unk20 - 40, 20, 30.0f, -300.0f);
+            if (disp->slideTimer >= 40) {
+                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->unk20 < 60) {
-                disp->unk20++;
+            if (disp->slideTimer < 60) {
+                disp->slideTimer++;
             }
             break;
     }
@@ -332,7 +329,7 @@ void battleAcDisp_Repeatedly(CameraId cameraId, BattleWork* work) {
 
 #pragma dont_inline on
 void battleAcDelete_Repeatedly(BattleWork* work) {
-    switch (ACP(work, 0x38, s32)) {
+    switch (work->actionCommands.params[0]) {
         case 10:
             work->flags &= ~0x20000000;
             break;
@@ -350,8 +347,9 @@ static void actionCommandDisp(f32 x, f32 y) {
     u16 icon1, icon2;
     s32 flags;
     f32 target;
-    r = RW(_battleWorkPointer);
-    d = RD(_battleWorkPointer);
+    BattleActions* acw = &_battleWorkPointer->actionCommands;
+    r = (RepeatWork*)acw->work;
+    d = (RepeatDisp*)acw->dispData;
     camGetPtr(8);
     if (*(s32*)((u8*)r - 0x2BC + 0x38) != 16) {
         switch (r->btn0) {

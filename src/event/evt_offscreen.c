@@ -77,7 +77,7 @@ USER_FUNC(evt_offscreen_set_texture_fmt) {
     format = evtGetValue(event, args[1]);
     param = evtGetValue(event, args[2]);
     entry = offscreenNameToPtr(name);
-    entry->unk3C = format;
-    entry->unk40 = param;
+    entry->copyFmt = format;
+    entry->texFmt = param;
     return EVT_RETURN_DONE;
 }

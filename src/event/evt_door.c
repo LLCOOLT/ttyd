@@ -1,3 +1,4 @@
+#include "data_tables.h"
 #include "evt/evt_door.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr.h"
@@ -17,27 +18,6 @@
 
 double atan(double);
 double cos(double);
-
-typedef struct DoorData {
-    s32 field_0x0;          // 0x0
-    s32 type;               // 0x4
-    s32 se;                 // 0x8
-    const char* mapobj;     // 0xC
-    const char* hitIn;      // 0x10
-    const char* hitOut;     // 0x14
-    s32 field_0x18;         // 0x18
-    s32 field_0x1C;         // 0x1C
-    s32 field_0x20;         // 0x20
-    s32 field_0x24;         // 0x24
-    s32 field_0x28;         // 0x28
-    s32 field_0x2C;         // 0x2C
-    s32 field_0x30;         // 0x30
-    const char** npcs;      // 0x34
-    const char** mobjs;     // 0x38
-    const char** items;     // 0x3C
-    s32 field_0x40;         // 0x40
-    s32 field_0x44;         // 0x44
-} DoorData;
 
 typedef struct HouseData {
     s32 type;               // 0x0
@@ -253,8 +233,6 @@ EVT_BEGIN(house_open_se)
     RETURN
 EVT_END()
 
-// TODO: USER_FUNC(evt_door_end_wait) { }
-
 USER_FUNC(snd_door_in) {
 	psndSetFlag(0x100);
 	return EVT_RETURN_DONE;
@@ -309,16 +287,6 @@ USER_FUNC(door_entry) {
     evtSetValue(event, args[1], (s32)w);
     return EVT_RETURN_DONE;
 }
-
-// TODO: USER_FUNC(evt_door_set_param) { }
-
-// TODO: USER_FUNC(evt_door_data_copy) { }
-
-// TODO: USER_FUNC(npc_hide_onoff) { }
-
-// TODO: USER_FUNC(evt_door_load_mapflag) { }
-
-// TODO: USER_FUNC(evt_door_save_mapflag) { }
 
 EVT_BEGIN(evt_dark)
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, 300)
@@ -1389,43 +1357,6 @@ EVT_BEGIN(evt_door_entry)
     RETURN
 EVT_END()
 
-// TODO: USER_FUNC(evt_door_param) { }
-
-// TODO: USER_FUNC(door_dark_flag) { }
-
-// TODO: USER_FUNC(door_dark_flag_sub) { }
-
-// TODO: USER_FUNC(door_position_sub) { }
-
-// TODO: USER_FUNC(get_noclip_map) { }
-
-// TODO: USER_FUNC(npc_light) { }
-
-// TODO: USER_FUNC(npc_dark) { }
-
-// TODO: USER_FUNC(animation) { }
-
-// TODO: USER_FUNC(init_inside_group) { }
-
-// TODO: USER_FUNC(inside_group) { }
-
-// TODO: USER_FUNC(door_group) { }
-
-// TODO: USER_FUNC(outside_group) { }
-
-// TODO: USER_FUNC(in_pos) { }
-
-// TODO: USER_FUNC(out_pos) { }
-
-// TODO: USER_FUNC(inout_hit) { }
-
-// TODO: USER_FUNC(door_entry) { }
-
-// TODO: USER_FUNC(snd_door_out) { }
-
-// TODO: USER_FUNC(snd_door_in) { }
-
-
 USER_FUNC(inout_hit) {
     s32* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
@@ -1589,7 +1520,7 @@ void door_position_sub(s32 type, const char* map, const char* hitIn, const char*
         b = a;
     }
     if (obj) {
-        PSMTXInverse(obj->unkAC, inv);
+        PSMTXInverse(obj->transformMtx, inv);
         PSMTXConcat(obj->modelWorldMtx, inv, m);
         PSMTXMultVec(m, &obj->joints->bboxMin, &min);
         PSMTXMultVec(m, &obj->joints->bboxMax, &max);
@@ -1708,7 +1639,7 @@ void door_dark_flag_sub(BOOL on, const char** npcs, const char** mobjs, const ch
 
 USER_FUNC(door_dark_flag) {
     s32* args = event->args;
-    DoorData* d = (DoorData*)evtGetValue(event, args[0]);
+    DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
     BOOL on = evtGetValue(event, args[1]);
     door_dark_flag_sub(on, d->npcs, d->mobjs, d->items);
     return EVT_RETURN_DONE;
@@ -1722,7 +1653,7 @@ USER_FUNC(door_dark_flag) {
 
 USER_FUNC(evt_door_param) {
     s32* args = event->args;
-    DoorData* d = (DoorData*)evtGetValue(event, args[0]);
+    DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
     s32 kind = evtGetValue(event, args[1]);
     Vec in = {0.0f, 0.0f, 0.0f};
     Vec out = {0.0f, 0.0f, 0.0f};
@@ -1737,12 +1668,12 @@ USER_FUNC(evt_door_param) {
             evtSetValue(event, args[4], (s32)d->hitOut);
             break;
         case 2:
-            evtSetValue(event, args[2], d->field_0x18);
-            evtSetValue(event, args[3], d->field_0x1C);
+            evtSetValue(event, args[2], (s32)d->outside);
+            evtSetValue(event, args[3], (s32)d->outsideHit);
             break;
         case 3:
-            evtSetValue(event, args[2], d->field_0x20);
-            evtSetValue(event, args[3], d->field_0x24);
+            evtSetValue(event, args[2], (s32)d->inside);
+            evtSetValue(event, args[3], (s32)d->insideHit);
             break;
         case 4:
             DOOR_PARAM_POS(in, FALSE)
@@ -1751,19 +1682,19 @@ USER_FUNC(evt_door_param) {
             DOOR_PARAM_POS(out, FALSE)
             break;
         case 6:
-            evtSetValue(event, args[2], d->field_0x28);
-            evtSetValue(event, args[3], d->field_0x2C);
-            evtSetValue(event, args[4], d->field_0x30);
+            evtSetValue(event, args[2], (s32)d->evtIn);
+            evtSetValue(event, args[3], (s32)d->evtOut);
+            evtSetValue(event, args[4], (s32)d->evtWall);
             break;
         case 7:
-            evtSetValue(event, args[2], d->field_0x40);
-            evtSetValue(event, args[3], d->field_0x44);
+            evtSetValue(event, args[2], (s32)d->evtOpen);
+            evtSetValue(event, args[3], (s32)d->evtClose);
             break;
         case 8:
             evtSetValue(event, args[2], d->se);
             break;
         case 9:
-            evtSetValue(event, args[2], d->field_0x0);
+            evtSetValue(event, args[2], d->flags);
             break;
         case 10:
             DOOR_PARAM_POS(in, TRUE)
@@ -1799,7 +1730,7 @@ USER_FUNC(evt_door_load_mapflag) {
 
 USER_FUNC(npc_hide_onoff) {
     s32* args = event->args;
-    DoorData* d = (DoorData*)evtGetValue(event, args[0]);
+    DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
     BOOL on = evtGetValue(event, args[1]);
     const char** list = d->npcs;
     s32 i;
@@ -1819,8 +1750,8 @@ USER_FUNC(npc_hide_onoff) {
 
 USER_FUNC(evt_door_data_copy) {
     s32* args = event->args;
-    DoorData* src = (DoorData*)evtGetValue(event, args[0]);
-    DoorData* dst = _mapAlloc(sizeof(DoorData));
+    DoorParam* src = (DoorParam*)evtGetValue(event, args[0]);
+    DoorParam* dst = _mapAlloc(sizeof(DoorParam));
     *dst = *src;
     evtSetValue(event, args[1], (s32)dst);
     return EVT_RETURN_DONE;
@@ -1828,7 +1759,7 @@ USER_FUNC(evt_door_data_copy) {
 
 USER_FUNC(evt_door_set_param) {
     s32* args = event->args;
-    DoorData* d = (DoorData*)evtGetValue(event, args[0]);
+    DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
     s32 kind = evtGetValue(event, args[1]);
     s32 val = evtGetValue(event, args[2]);
     switch (kind) {

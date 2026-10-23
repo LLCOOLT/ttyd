@@ -14,9 +14,6 @@
 #include "party/party_vivian.h"
 #include "mario/mario_sbr.h"
 
-#define PF(p, off) (*(f32*)((u8*)(p) + (off)))
-#define PS(p, off) (*(s32*)((u8*)(p) + (off)))
-#define PU(p, off) (*(u32*)((u8*)(p) + (off)))
 #define GETPARTY(args) partyGetPtr((args)[0] == 0 ? partyCtrlNo : 1)
 #define PARTY_ID(args) ((args)[0] == 0 ? partyCtrlNo : 1)
 
@@ -84,9 +81,9 @@ USER_FUNC(evt_party_trigflg_onoff) {
 	}
 	mask = args[1];
 	if (evtGetValue(event, args[2])) {
-		p->field_8 |= mask;
+		p->trigFlags |= mask;
 	} else {
-		p->field_8 &= ~mask;
+		p->trigFlags &= ~mask;
 	}
 	return EVT_RETURN_DONE;
 }
@@ -200,9 +197,9 @@ USER_FUNC(evt_party_set_hosei_xyz) {
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
 	}
-	p->field_AC = evtGetFloat(event, args[1]);
-	p->unkB0 = evtGetFloat(event, args[2]);
-	p->field_B4 = evtGetFloat(event, args[3]);
+	p->floorMoveX = evtGetFloat(event, args[1]);
+	p->floorMoveY = evtGetFloat(event, args[2]);
+	p->floorMoveZ = evtGetFloat(event, args[3]);
 	return EVT_RETURN_DONE;
 }
 
@@ -418,7 +415,7 @@ USER_FUNC(evt_party_move_pos2) {
 		p->targetDir = angleABf(p->position.x, p->position.z, x, z);
 		dist = gp->framerate * (dist / spd); spd = spd / gp->framerate; partySetForceMove(p, dist, p->targetDir, spd);
 	}
-	if (p->field_28 == 0) {
+	if (p->forceMoveFrames == 0) {
 		return EVT_RETURN_DONE;
 	}
 	return EVT_RETURN_BLOCK;
@@ -470,8 +467,8 @@ USER_FUNC(evt_party_jump_pos) {
 	dy = 1.0f;
 	switch (event->userdata3) {
 	case 0:
-		PU(p, 0x13C) = PU(p, 0x138);
-		PU(p, 0x138) = 0;
+		p->hitobjJumpFrom = p->hitobjStandOn;
+		p->hitobjStandOn = NULL;
 		p->moveSpeed = distABf(p->position.x, p->position.z, x, z) / ff;
 		p->targetDir = angleABf(p->position.x, p->position.z, x, z);
 		if (mode == 0) {
@@ -513,10 +510,10 @@ USER_FUNC(evt_party_jump_pos) {
 		ff = p->velY;
 		{
 			void* hit = partySearchGround(p, __fabsf(ff), __fabsf(ff));
-			if (hit != NULL && p->position.y + ff <= p->unkE4) {
-				PU(p, 0x138) = (u32)hit;
+			if (hit != NULL && p->position.y + ff <= p->groundY) {
+				p->hitobjStandOn = (HitEntry*)hit;
 				mode = 1;
-				p->position.y = p->unkE4;
+				p->position.y = p->groundY;
 				p->flags &= ~0x70;
 			}
 		}
@@ -571,7 +568,7 @@ USER_FUNC(evt_party_set_homing_dist) {
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
 	}
-	p->unk40 = evtGetValue(event, args[1]);
+	p->homingDist = evtGetValue(event, args[1]);
 	return EVT_RETURN_DONE;
 }
 
@@ -664,8 +661,8 @@ USER_FUNC(evt_party_get_name_hitobj_head) {
 		return EVT_RETURN_DONE;
 	}
 	dst = args[1];
-	if (PU(p, 0x140) != 0) {
-		name = hitGetName((HitEntry*)PU(p, 0x140));
+	if (p->hitobjHead != NULL) {
+		name = hitGetName(p->hitobjHead);
 	}
 	evtSetValue(event, dst, (s32)name);
 	return EVT_RETURN_DONE;
@@ -682,8 +679,8 @@ USER_FUNC(evt_party_get_name_hitobj_ride) {
 		return EVT_RETURN_DONE;
 	}
 	dst = args[1];
-	if (PU(p, 0x138) != 0) {
-		name = hitGetName((HitEntry*)PU(p, 0x138));
+	if (p->hitobjStandOn != NULL) {
+		name = hitGetName(p->hitobjStandOn);
 	}
 	evtSetValue(event, dst, (s32)name);
 	return EVT_RETURN_DONE;
@@ -832,7 +829,7 @@ USER_FUNC(evt_party_nokotaro_kick) {
 		if (p->flags & 0x100) {
 			return EVT_RETURN_DONE;
 		}
-		p->unk16C = 0;
+		p->actionTime = 0;
 		p->flags |= 0x80000000;
 		p->flags |= 0x100;
 		partyChgRunMode(p, 3);
@@ -858,7 +855,7 @@ USER_FUNC(evt_party_nokotaro_kick_hold) {
 		if (p->flags & 0x100) {
 			return EVT_RETURN_DONE;
 		}
-		p->unk16C = 5000;
+		p->actionTime = 5000;
 		p->flags |= 0x80000000;
 		p->flags |= 0x100;
 		partyChgRunMode(p, 3);
@@ -938,7 +935,7 @@ USER_FUNC(evt_party_cloud_breathout) {
 		if (p->flags & 0x100) {
 			return EVT_RETURN_DONE;
 		}
-		p->unk16C = args[1];
+		p->actionTime = args[1];
 		p->flags |= 0x80000000;
 		p->flags |= 0x100;
 		partyChgRunMode(p, 3);

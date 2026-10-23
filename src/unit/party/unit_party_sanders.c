@@ -86,7 +86,7 @@ USER_FUNC(evt_snd_sfxoff);
 USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(_make_counterset_weapon);
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
+static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
 __declspec(section ".data") f32 unit_party_sanders_negone_one_a[2];
 __declspec(section ".data") f32 sanders_negone_one_374[2];
@@ -360,15 +360,15 @@ BattleWeapon partyWeapon_SandersFirstAttack = {
 #else
     336, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {4, 4, 5, 5, 6, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -378,7 +378,7 @@ BattleWeapon partyWeapon_SandersFirstAttack = {
     3, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x26087, // special
     0x7FB, // counterResistFlags
@@ -389,9 +389,9 @@ BattleWeapon partyWeapon_SandersFirstAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partySandersAttack_FirstAttack, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_SandersNormalAttack = {
@@ -401,16 +401,16 @@ BattleWeapon partyWeapon_SandersNormalAttack = {
 #else
     336, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pbm_bakuhatsu", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetPowerFromPartyAttackLv, // hpDamageFn
     {1, 4, 2, 5, 3, 6, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -420,7 +420,7 @@ BattleWeapon partyWeapon_SandersNormalAttack = {
     3, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_bakuhatsu", // acHelpMsg
     0x36087, // special
     0x7FB, // counterResistFlags
@@ -431,9 +431,9 @@ BattleWeapon partyWeapon_SandersNormalAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partySandersAttack_NormalAttack, // mAttackEvtScript
-    {0, 10, 10, 100, 10, 10, 10, 5, 10, 0, 0, 0}, // field_B4
+    {0, 10, 10, 100, 10, 10, 10, 5, 10, 0, 0, 0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_SandersTimeBombSet = {
@@ -443,17 +443,17 @@ BattleWeapon partyWeapon_SandersTimeBombSet = {
 #else
     337, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pbm_jigen_bakudan", // description
     100, // baseAccuracy
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -462,7 +462,7 @@ BattleWeapon partyWeapon_SandersTimeBombSet = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_jigen_bakudan", // acHelpMsg
     0x20000, // special
     0x7FF, // counterResistFlags
@@ -473,9 +473,9 @@ BattleWeapon partyWeapon_SandersTimeBombSet = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partySandersAttack_TimeBombSet, // mAttackEvtScript
-    {0}, // field_B4
+    {0}, // stageEffectRates
 };
 
 BattleWeapon partyWeapon_SandersCounterSet = {
@@ -485,17 +485,17 @@ BattleWeapon partyWeapon_SandersCounterSet = {
 #else
     338, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pbm_counter", // description
     100, // baseAccuracy
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -504,7 +504,7 @@ BattleWeapon partyWeapon_SandersCounterSet = {
     0x10000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_bom_counter", // acHelpMsg
     0x20108, // special
     0x7FF, // counterResistFlags
@@ -515,12 +515,12 @@ BattleWeapon partyWeapon_SandersCounterSet = {
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     1, // holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partySandersAttack_CounterSet, // mAttackEvtScript
 #ifdef VERSION_G8ME01
-    {0, 5, 5, 100, 20, 10, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 5, 5, 100, 20, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 #else
-    {0, 5, 5, 100, 20, 5, 5, 5, 5, 5, 0, 0}, // field_B4
+    {0, 5, 5, 100, 20, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 #endif
 };
 
@@ -531,21 +531,21 @@ BattleWeapon partyWeapon_SandersSuperBombAttack = {
 #else
     339, // icon
 #endif
-    {0}, // field_0x6
+    {0}, // pad_06
     0, // itemId
     "msg_pbm_sungoi_bakuhatsu", // description
     100, // baseAccuracy
     9, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
 #ifdef VERSION_G8ME01
     1, // mStylishCommandMultiplier
 #else
     2, // mStylishCommandMultiplier
 #endif
-    5, // field_0x19
+    5, // reserved_19
     100, // mBingoSlotChance
-    50, // field_0x1B
+    50, // reserved_1B
     weaponGetACOutputParam, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -555,7 +555,7 @@ BattleWeapon partyWeapon_SandersSuperBombAttack = {
     3, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     "msg_ac_super_bakuhatsu", // acHelpMsg
     0x26087, // special
     0x7FF, // counterResistFlags
@@ -566,9 +566,9 @@ BattleWeapon partyWeapon_SandersSuperBombAttack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     partySandersAttack_SuperBombAttack, // mAttackEvtScript
-    {0, 50, 50, 100, 20, 25, 25, 10, 10, 5, 0, 0}, // field_B4
+    {0, 50, 50, 100, 20, 25, 25, 10, 10, 5, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(partySandersAttack_FirstAttack)
@@ -2390,44 +2390,44 @@ USER_FUNC(_sanders_make_extra_work_area) {
     return EVT_RETURN_DONE;
 }
 
-static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count) {
+static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
     techLv = partyGetTechLv(BattleTransPartyId(BattleGetPartyPtr(_battleWorkPointer)->currentKind));
 
-    command->mWeaponTable[*count].mIndex = -1;
-    command->mWeaponTable[*count].mItem = 0;
-    command->mWeaponTable[*count].mWeaponParams = &partyWeapon_SandersNormalAttack;
-    command->mWeaponTable[*count].field_0x4 = 0;
-    command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-    command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+    command->weapon[*count].index = -1;
+    command->weapon[*count].itemId = 0;
+    command->weapon[*count].weapon = &partyWeapon_SandersNormalAttack;
+    command->weapon[*count].enabled = 0;
+    command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+    command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
     (*count)++;
 
     if (techLv >= 0) {
-        command->mWeaponTable[*count].mIndex = -1;
-        command->mWeaponTable[*count].mItem = 0;
-        command->mWeaponTable[*count].mWeaponParams = &partyWeapon_SandersTimeBombSet;
-        command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-        command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+        command->weapon[*count].index = -1;
+        command->weapon[*count].itemId = 0;
+        command->weapon[*count].weapon = &partyWeapon_SandersTimeBombSet;
+        command->weapon[*count].enabled = 0;
+        command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+        command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
         (*count)++;
     }
     if (techLv >= 1) {
-        command->mWeaponTable[*count].mIndex = -1;
-        command->mWeaponTable[*count].mItem = 0;
-        command->mWeaponTable[*count].mWeaponParams = &partyWeapon_SandersCounterSet;
-        command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-        command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+        command->weapon[*count].index = -1;
+        command->weapon[*count].itemId = 0;
+        command->weapon[*count].weapon = &partyWeapon_SandersCounterSet;
+        command->weapon[*count].enabled = 0;
+        command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+        command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
         (*count)++;
     }
     if (techLv >= 2) {
-        command->mWeaponTable[*count].mIndex = -1;
-        command->mWeaponTable[*count].mItem = 0;
-        command->mWeaponTable[*count].mWeaponParams = &partyWeapon_SandersSuperBombAttack;
-        command->mWeaponTable[*count].field_0x4 = 0;
-        command->mWeaponTable[*count].mIcon = command->mWeaponTable[*count].mWeaponParams->icon;
-        command->mWeaponTable[*count].mName = (char*)msgSearch(command->mWeaponTable[*count].mWeaponParams->name);
+        command->weapon[*count].index = -1;
+        command->weapon[*count].itemId = 0;
+        command->weapon[*count].weapon = &partyWeapon_SandersSuperBombAttack;
+        command->weapon[*count].enabled = 0;
+        command->weapon[*count].icon = command->weapon[*count].weapon->icon;
+        command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name);
         (*count)++;
     }
 }

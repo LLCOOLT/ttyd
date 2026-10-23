@@ -10,7 +10,7 @@ typedef struct PiantaParlorWork {
 	u32 dispTokens; //0x10, token count currently shown (counts toward tokens)
 	// four minigames x five ranks (+1 spare slot); defaults set in yuugijou_init
 #ifdef VERSION_G8ME01
-	// US keeps eight record rows (0x258 bytes in all): recordScore 0xD4, recordParam 0x194, field_0x134 at 0x254
+	// US keeps eight record rows (0x258 bytes in all): recordScore 0xD4, recordParam 0x194, pad_134 at 0x254
 	u32 recordOn[8][6]; //0x14
 	u32 recordScore[8][6]; //0xD4
 	u32 recordParam[8][6]; //0x194
@@ -19,7 +19,7 @@ typedef struct PiantaParlorWork {
 	u32 recordScore[4][6]; //0x74, default record values (game 1 ascending: times)
 	u32 recordParam[4][6]; //0xD4, per-rank value derived from recordScore (game 0: constants)
 #endif
-	u32 field_0x134; //0x134 (US 0x254)
+	u32 pad_134; //0x134, never accessed
 } PiantaParlorWork;
 
 // Record arrays are [minigame][rank]; ranks 0-4 hold the defaults set in yuugijou_init, rank 5 is unused there.

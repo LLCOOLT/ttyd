@@ -11,7 +11,7 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
-#include "mario/mariost.h"
+#include "mario/mariost.h"
 #include "manager/evtmgr.h"
 #ifdef VERSION_G8ME01
 void marioChkWallAround(Vec* pos, s32 a1, f32 a2, f32 angle, f32 radius, f32 height);
@@ -37,7 +37,6 @@ void marioSetFallPara(void);
 void marioPreJump(void);
 void marioChkOverhead(void);
 
-#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 #define SFX3D(id, pos) ((s32 (*)(s32, Vec*))psndSFXOn_3D)(id, pos)
 
 BOOL chkCollision(f32* outY);
@@ -67,8 +66,8 @@ static inline void planeSetSpd(f32 a, f32 b, f32 c) {
 	MarioWork* m = marioGetPtr();
 	m->camShiftTargetZ = a;
 	m->camShiftRate.z = b;
-	m->field_68 = c;
-	m->field_6C = (Vec){0.0f, 40.0f, 0.0f};
+	m->camZoom = c;
+	m->camZoomOfs = (Vec){0.0f, 40.0f, 0.0f};
 }
 
 const char* paper_plane[4] = {"p_hikohki", "p_hikohki_g", "p_hikohki_y", "p_hikohki_v"};
@@ -506,8 +505,8 @@ double sin(double);
 void marioSearchUnder(void);
 
 #define PI 3.1415927f
-#define SPD MW(mp, 0x180, f32)
-#define STICK MW(mp, 0x24e, s8)
+#define SPD (mp->baseSpeed)
+#define STICK (mp->wStickDir1)
 
 static inline BOOL planeChkUnder(void) {
 	BOOL ret = FALSE;
@@ -552,12 +551,12 @@ static void flyMain(void) {
 	if ((s32)mp->currSubMotionId != 15) {
 		return;
 	}
-	if (mp->buttonBuffer & 0x100) {
+	if (mp->buttonTrg & 0x100) {
 		mp->currSubMotionId = 51;
 		mp->mot.plane.groundY = mp->position.y;
 		return;
 	}
-	if (mp->buttonBuffer & 0x200) {
+	if (mp->buttonTrg & 0x200) {
 		mp->currSubMotionId = 51;
 		mp->mot.plane.groundY = mp->position.y;
 		return;

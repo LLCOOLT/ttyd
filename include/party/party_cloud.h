@@ -12,7 +12,7 @@ typedef struct PartyCloudSweep {
 
 /* Flurrie's Gale Force work: PartyEntry.useStruct, __memAlloc(HEAP_DEFAULT, 0x48) + memset in N__cloud_use */
 typedef struct PartyCloud {
-    f32 unk0;                      // 0x0, 100.0f at use start, never read
+    f32 reserved_0;                      // 0x0, 100.0f at use start, never read
     f32 breathDir;                 // 0x4, Gale Force breath direction (toMovedir)
     f32 breathDist;                // 0x8, Gale Force breath reach, += 2 per frame
     f32 breathDistMax;             // 0xC, 120.0f; breathDist clamps here

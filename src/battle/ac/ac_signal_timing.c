@@ -38,7 +38,7 @@ typedef struct SignalTimingWork {
     s32 endTimer;   // 0x54
 } SignalTimingWork;
 
-#define ST_FIELD30(w) ((w)->actionCommands.field_0x30)
+#define ST_FIELD30(w) ((w)->actionCommands.doneFlags)
 #define ST_FLAGS(w) ((w)->actionCommands.acFlags)
 #define ST_COUNT(w) ((w)->actionCommands.params[0])    /* number of signals */
 #define ST_MODE(w) ((w)->actionCommands.params[1])     /* 1: use the wider ok-frame table */
@@ -111,7 +111,7 @@ s32 battleAcMain_SignalTiming(BattleWork *work)
         memset(disp, 0, sizeof(BattleACDispParams));
         disp->iconX = -300.0f;
         disp->iconY = 0.0f;
-        *(&disp->unk20) = 20;
+        *(&disp->slideTimer) = 20;
         w->hits = 0;
         w->misses = 0;
         w->frame = 0;
@@ -416,10 +416,10 @@ void battleAcDisp_SignalTiming(CameraId cameraId, BattleWork* work) {
     switch (ac->mAcState) {
         case 99:
         case 100:
-            disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(-300.0f, 30.0f, 4, 20 - disp->unk20, 20);
+            disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(-300.0f, 30.0f, 4, 20 - disp->slideTimer, 20);
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->unk20 > 0) {
-                disp->unk20--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 1000:
@@ -430,14 +430,14 @@ void battleAcDisp_SignalTiming(CameraId cameraId, BattleWork* work) {
             break;
         case 1004:
         case 1005:
-            if (disp->unk20 >= 40) {
-                disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(30.0f, -300.0f, 4, disp->unk20 - 40, 20);
+            if (disp->slideTimer >= 40) {
+                disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(30.0f, -300.0f, 4, disp->slideTimer - 40, 20);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->unk20 < 60) {
-                disp->unk20++;
+            if (disp->slideTimer < 60) {
+                disp->slideTimer++;
             }
             break;
     }

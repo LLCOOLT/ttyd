@@ -4,7 +4,7 @@
 #include "driver/effdrv.h"
 
 typedef struct EffUltraHammerData {
-    BOOL unk0; //0x0, doesn't actually get read
+    BOOL mode; //0x0, effUltraHammerEntry arg0
     Vec position; //0x4
     f32 scale; //0x10
     f32 offsetX; //0x14

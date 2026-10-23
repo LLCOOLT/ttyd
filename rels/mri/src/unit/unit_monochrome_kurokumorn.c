@@ -114,7 +114,7 @@ static BattleUnitKind unit_monochrome_kurokumorn = {
     {0}, // talkTogeBaseOffset
     {18.0f, 0.0f, -10.0f}, // heldItemBaseOffset
     {0}, // burnFlameOffset
-    0.0f, 0.0f, // field_0x54..field_0x58
+    0.0f, 0.0f, // vivianOffsetX..vivianOffsetZ
     {17.5f, 0.0f, 0.0f}, // bintaHitOffset
     {17.5f, 19.5f, 0.0f}, // kissHitOffset
     {0.0f, 15.0f, 0.0f}, // cutBaseOffset
@@ -151,8 +151,8 @@ static BattleUnitKindPart parts[] = {
         {0}, // positionOffset
         {0.0f, 25.0f, 0.0f}, // hitBaseOffset
         {0.0f, 30.0f, 0.0f}, // hitCursorBaseOffset
-        30, // field_0x30
-        30, // field_0x32
+        30, // shadowSize
+        30, // reserved_32
         255, // baseAlpha
         &defence, // defense
         &defence_attr, // defenseAttr
@@ -164,16 +164,16 @@ static BattleUnitKindPart parts[] = {
 
 static BattleWeapon weapon_kurokumorn_attack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -182,7 +182,7 @@ static BattleWeapon weapon_kurokumorn_attack = {
     0x20000000, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x5087, // special
     1, // counterResistFlags
@@ -193,14 +193,14 @@ static BattleWeapon weapon_kurokumorn_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static BattleWeapon weapon_kurokumorn_thunder_attack = {
     NULL, 0, // name..icon
-    {0}, // field_0x6
+    {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
@@ -209,11 +209,11 @@ static BattleWeapon weapon_kurokumorn_thunder_attack = {
 #else
     0, // superguardsAllowed
 #endif
-    1.0f, // field_0x14
+    1.0f, // reserved_14
     1, // mStylishCommandMultiplier
-    1, // field_0x19
+    1, // reserved_19
     1, // mBingoSlotChance
-    1, // field_0x1B
+    1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -223,7 +223,7 @@ static BattleWeapon weapon_kurokumorn_thunder_attack = {
     4, // element
     0, // damagePattern
     3, // acLevel
-    2, // field_0x6F
+    2, // reserved_6F
     NULL, // acHelpMsg
     0x47, // special
     0x7FF, // counterResistFlags
@@ -236,9 +236,9 @@ static BattleWeapon weapon_kurokumorn_thunder_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // allergicTime..frightChance
     0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
     0, // fpRegenStrength
-    {0}, // field_AE
+    {0}, // pad_AE
     NULL, // mAttackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(attack_event)

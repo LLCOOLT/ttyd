@@ -6,6 +6,7 @@
 #include <string.h>
 #include "driver/hitdrv.h"
 #include "mario/mario_pouch.h"
+#include "driver/mobjdrv.h"
 
 #ifdef VERSION_G8ME01
 // US has no local duplicate: this is the global kuribo_init
@@ -19,7 +20,6 @@
 #define MW_US 0
 #endif
 
-void* mobjHitObjPtrToPtr(void* hit);
 s32 mobjCheckItemboxOpen(void* mobj);
 void partyChgPoseId(PartyEntry* party, s32 id);
 
@@ -59,7 +59,7 @@ USER_FUNC(pre_kurio_use) {
         return EVT_RETURN_DONE;
     }
     {
-        struct { u8 pad[0x15]; char n[0x20]; }* mobj;
+        MapObjectEntry* mobj;
         hit = ((MarioWork*)mario)->hitobjPush;
         if (!hit || !(hitGetAttr(hit) & 0x80000000)) {
             hit = ((MarioWork*)mario)->hitobjFront;
@@ -72,7 +72,7 @@ USER_FUNC(pre_kurio_use) {
             }
         }
         mobj = mobjHitObjPtrToPtr(hit);
-#define name (mobj->n)
+#define name (mobj->animName)
         if (!strcmp(name, "MOBJ_Lv1Block")) {
             if (pouchGetHammerLv() < 1) msg = "obj_hlp_block_y_0"; else msg = "obj_hlp_block_y_1";
         } else if (!strcmp(name, "MOBJ_Lv1BigBlock")) {
@@ -227,8 +227,8 @@ void kuribo_use(PartyEntry* party) {
     Vec pos;
     EventEntry* evt;
 
-    if (party->field_8 & 8) {
-        party->field_8 &= ~8;
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
         if (PSVECDistance(&player->position, &party->position) > 125.0f) {
             party->useMotionId = 0;
         } else {
@@ -308,8 +308,8 @@ void kuribo_use(PartyEntry* party) {
 }
 
 void kuribo_bye(PartyEntry* party) {
-    if (party->field_8 & 8) {
-        party->field_8 &= ~8;
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
         partyGoodbyeInit(party);
     }
     if (partyGoodbyeMain(party)) {

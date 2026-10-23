@@ -20,8 +20,6 @@
 
 extern char* strcat(char* dest, const char* src);
 
-// TODO: need to figure out better flags, since I've had to use dont_inline in a couple places, this
-// might just be -inline deferred? No auto
 #pragma optimize_for_size on
 #pragma pool_data on
 
@@ -264,7 +262,6 @@ USER_FUNC(evt_npc_setup) {
     }
 }
 
-// TODO: double check _savefpr_29/_restfpr_29 were generated
 // const char* lookupName, f32 x, f32 y, f32 z
 USER_FUNC(evt_npc_set_position) {
     s32* args = event->args;
@@ -506,8 +503,8 @@ USER_FUNC(evt_npc_move_position) {
     }
 
     if (isFirstCall) {
-        npc->field_188 = 0;
-        npc->field_108 = 0;
+        npc->moveTicks = 0;
+        npc->moveAnimState = 0;
 
         npc->jumpTargetPos.x = targetX;
         npc->jumpTargetPos.y = npc->position.y;
@@ -549,8 +546,8 @@ USER_FUNC(evt_npc_move_position) {
     step = (20.0f * npc->moveSpeed) / 1000.0f;
 
     if (npc->moveTime) {
-        // timed move: field_0x1a0 is elapsed/progress, advanced externally
-        if (npc->moveTime <= npc->field_1A0) {
+        // timed move: moveElapsed is the progress, advanced externally
+        if (npc->moveTime <= npc->moveElapsed) {
             npc->moveSpeed = 0.0f;
             return EVT_RETURN_DONE;
         }
@@ -641,9 +638,9 @@ USER_FUNC(evt_npc_jump_position) {
     npc->jumpFlags |= 0x1000;
 
     if (isFirstCall) {
-        npc->field_188 = 0;
-        npc->field_178 = 0;
-        npc->field_108 = 0;
+        npc->moveTicks = 0;
+        npc->jumpTicks = 0;
+        npc->moveAnimState = 0;
 
         npc->jumpTargetPos.x = targetX;
         npc->jumpTargetPos.y = targetY;
@@ -775,7 +772,7 @@ USER_FUNC(evt_npc_jump_position) {
             sfxFlag = 0x10000;
         }
     }
-    if (npc->landSfx != 0) { // 0x1f0
+    if (npc->landSfx != 0) {
         psndSFXOnEx_3D(sfxFlag | searchPSSFXList(npc->landSfx), &npc->position, 0xff, 0xff, 0, 8);
     }
     return EVT_RETURN_YIELD;
@@ -836,7 +833,7 @@ USER_FUNC(evt_npc_jump_position_nohit) {
             sfxFlag = 0x10000;
         }
     }
-    if (npc->landSfx != 0) { // 0x1f0
+    if (npc->landSfx != 0) {
         psndSFXOnEx_3D(sfxFlag | searchPSSFXList(npc->landSfx), &npc->position, 0xff, 0xff, 0, 8);
     }
 
@@ -872,8 +869,8 @@ USER_FUNC(evt_npc_glide_position) {
     }
 
     if (isFirstCall) {
-        npc->field_188 = 0;
-        npc->field_108 = 0;
+        npc->moveTicks = 0;
+        npc->moveAnimState = 0;
 
         npc->jumpTargetPos.x = targetX;
         npc->jumpTargetPos.y = targetY;
@@ -908,7 +905,7 @@ USER_FUNC(evt_npc_glide_position) {
         return EVT_RETURN_DONE;
     }
 
-    elapsed = npc->field_1A0;
+    elapsed = npc->moveElapsed;
     finished = FALSE;
     total = npc->moveTime;
     dt = npc->moveDt;
@@ -1015,8 +1012,8 @@ USER_FUNC(evt_npc_homing_target) {
     npc->jumpFlags |= 0x10;
 
     if (isFirstCall) {
-        npc->field_188 = 0;
-        npc->field_108 = 0;
+        npc->moveTicks = 0;
+        npc->moveAnimState = 0;
 
         if (strcmp(targetName, "mario") == 0) {
             MarioWork* mario;
@@ -1102,7 +1099,7 @@ USER_FUNC(evt_npc_homing_target) {
     PSVECSubtract(&npc->jumpTargetPos, &npc->position, &diff);
     sqrtf((diff.x * diff.x) + (diff.z * diff.z));
 
-    if (npc->moveTime && npc->moveTime <= npc->field_1A0) {
+    if (npc->moveTime && npc->moveTime <= npc->moveElapsed) {
         finished = TRUE;
     }
     else if (stopDistance > 0.0f && dist < stopDistance) {
@@ -1905,7 +1902,7 @@ USER_FUNC(evt_npc_set_attack_mode) {
 
     name = (const char*)evtGetValue(event, args[0]);
     mode = evtGetValue(event, args[1]);
-    evtNpcNameToPtr(event, name)->field_2F8 = mode;
+    evtNpcNameToPtr(event, name)->attackMode = mode;
     return EVT_RETURN_DONE;
 }
 
@@ -2495,7 +2492,7 @@ void _kamek_houki_kemuri(NpcEntry* npc, s32 arg1) {
         effect = effKemuri10N64Entry(0, a2, (18.0f * npc->scale.x) + npc->position.y, npc->position.z, a5, 0.0f, 0.0f,
                                      npc->scale.x);
         if (!strcmp(gp->currentMapName, "kpa_01")) {
-            *(u32*)((u32)effect->userdata + 0x6C) = 7;
+            ((EffKemuri10N64Work*)effect->userdata)->camera = 7;
         }
     }
 }
@@ -2528,8 +2525,8 @@ USER_FUNC(evt_npc_kamek_move_position) {
     }
 
     if (isFirstCall) {
-        npc->field_188 = 0;
-        npc->field_108 = 0;
+        npc->moveTicks = 0;
+        npc->moveAnimState = 0;
 
         npc->jumpTargetPos.x = targetX;
         npc->jumpTargetPos.y = npc->position.y;
@@ -2567,8 +2564,8 @@ USER_FUNC(evt_npc_kamek_move_position) {
     step = (20.0f * npc->moveSpeed) / 1000.0f;
 
     if (npc->moveTime) {
-        // timed move: field_0x1a0 is elapsed/progress, advanced externally
-        if (npc->moveTime <= npc->field_1A0) {
+        // timed move: moveElapsed is the progress, advanced externally
+        if (npc->moveTime <= npc->moveElapsed) {
             npc->prevPosition = npc->jumpTargetPos;
             npc->position = npc->prevPosition;
             npc->moveSpeed = 0.0f;
@@ -2612,7 +2609,7 @@ USER_FUNC(evt_npc_kamek_move_position) {
     }
 
     if ((moveFlags & 8) == 0) {
-        _kamek_houki_kemuri(npc, npc->field_108);
+        _kamek_houki_kemuri(npc, npc->moveAnimState);
     }
 
     return EVT_RETURN_BLOCK;
@@ -2627,15 +2624,15 @@ USER_FUNC(evt_npc_kamek_kemuri1) {
     }
 
     if (npc->moveTime) {
-        if (npc->moveTime > npc->field_1A0) {
-            _kamek_houki_kemuri(npc, npc->field_108);
+        if (npc->moveTime > npc->moveElapsed) {
+            _kamek_houki_kemuri(npc, npc->moveAnimState);
             return EVT_RETURN_BLOCK;
         }
         goto block_7; // TODO: ???
     }
 
     if (npc->moveSpeed > 0.0f) {
-        _kamek_houki_kemuri(npc, npc->field_108);
+        _kamek_houki_kemuri(npc, npc->moveAnimState);
         return EVT_RETURN_BLOCK;
     }
 block_7:
@@ -2655,12 +2652,12 @@ USER_FUNC(evt_npc_kamek_kemuri2) {
             return EVT_RETURN_DONE;
         }
 
-        npc->field_188 = 0;
+        npc->moveTicks = 0;
         npc->moveTime = moveTime;
         return EVT_RETURN_BLOCK;
     }
 
-    if (npc->moveTime <= npc->field_1A0) {
+    if (npc->moveTime <= npc->moveElapsed) {
         return EVT_RETURN_DONE;
     }
 

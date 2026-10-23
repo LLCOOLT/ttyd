@@ -12,6 +12,7 @@
 #include "eff/eff_ultra_hammer.h"
 #include "system.h"
 #include <string.h>
+#include "driver/mobjdrv.h"
 
 double cos(float);
 void sincosf(f32* s, f32* c, f32 deg);
@@ -21,17 +22,12 @@ void marioVoiceGlareOff(void);
 s32 psndSFXOn_3D(s32 id, Vec* pos);
 f32 toMovedir(f32 angle);
 f32 toMovedir2(f32 angle, f32 off);
-void* mobjHitObjPtrToPtr(HitEntry* hit);
 USER_FUNC(evt_cam_shake);
 HitEntry* hitEstimate(s32* out);
 static HitEntry* hammerHitWall(f32 ang, f32* s, f32* co, f32* len, f32* hx, f32* hy, f32* hz, f32* nx, f32* ny, f32* nz);
 void marioChgMotSub(s32 a, s32 b);
 s32 marioGetRub(s32 mask, s32* a, s32* b, f32* c);
 
-#define MF(o) (*(f32*)((u8*)mario + MWOFF(o)))
-#define MI(o) (*(s32*)((u8*)mario + MWOFF(o)))
-#define MB(o) (*(s8*)((u8*)mario + MWOFF(o)))
-#define MH(o) (*(u16*)((u8*)mario + MWOFF(o)))
 
 
 s32 se_data[] = {315, 357, 316, 359, 317, 358, 318, 360, 319, 361};
@@ -59,7 +55,7 @@ inline BOOL chkRevDir(f32 angle) {
 	return ret;
 }
 
-#define HAM_DIR(mario, dst)                                         	{                                                               		f32 a = MF(0x1A8);                                          		MarioWork* p = marioGetPtr(); f32 r;                         		f32 off = 0.0f;                                             		if (p->dispFlags & 0x80000000) {                            			off = chkRevDir(p->displayDirection) ? 30.0f : -30.0f;            		} if (a >= 90.0f && a <= 270.0f) { r = revise360(180.0f + off); } else { r = revise360(off); } dst = r;                                                           	}
+#define HAM_DIR(mario, dst)                                         	{                                                               		f32 a = mario->displayDirection;                                          		MarioWork* p = marioGetPtr(); f32 r;                         		f32 off = 0.0f;                                             		if (p->dispFlags & 0x80000000) {                            			off = chkRevDir(p->displayDirection) ? 30.0f : -30.0f;            		} if (a >= 90.0f && a <= 270.0f) { r = revise360(180.0f + off); } else { r = revise360(off); } dst = r;                                                           	}
 
 static inline s32 hamLv(void) {
 	return pouchGetHammerLv();
@@ -375,15 +371,14 @@ s32 marioChkHammer2(void) {
 }
 
 
-#define MS(o) (*(s16*)((u8*)mario + MWOFF(o)))
 
 
 static inline void mot_ham(f32 a148, f32 a68) {
 	MarioWork* m = marioGetPtr();
 	m->camShiftTargetZ = a148;
 	m->camShiftRate.z = 0.005f;
-	m->field_68 = a68;
-	m->field_6C = (Vec){0.0f, 40.0f, 0.0f};
+	m->camZoom = a68;
+	m->camZoomOfs = (Vec){0.0f, 40.0f, 0.0f};
 }
 
 #define H2_LV(lvl, a148, a68) { mot_ham(a148, a68); mario->mot.hammer2.flags |= 0x1000; }
@@ -395,7 +390,7 @@ static inline void mot_ham(f32 a148, f32 a68) {
 		if (mario->mot.hammer2.animTime >= maxv) {                                    \
 			mario->mot.hammer2.animTime = maxv;                                       \
 			mario->mot.hammer2.flags |= 1;                                         \
-			MB(0x42) = lvl;                                         \
+			mario->hammerChargeLv = lvl;                                       \
 			H2_LV(lvl, a148, a68)                                   \
 		}                                                           \
 	} else if (!(mario->mot.hammer2.flags & 0x10)) {                               \
@@ -709,7 +704,7 @@ HitEntry *hitEstimate(s32 *out)
     }
   }
   sincosf(&s, &c, a);
-  h = *((f32 *) (((u8 *) mario) + MWOFF(0x1B8)));
+  h = mario->wPlayerCollisionBox.y;
   cy = (f32) cos(3.14159265f);
   pos = mario->position;
   {

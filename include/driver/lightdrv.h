@@ -23,7 +23,7 @@ typedef struct LightEntry {
 	u8 align_22[2]; //0x22
 	Vec position; //0x24
 	Vec rotation; //0x30
-	Vec field_0x3C; //0x3C, some other positional
+	Vec basePosition; //0x3C, position at lightEntry; evt_light offsets from it when following a map object
 	GXColor color; //0x48
 	f32 spotAngle; //0x4C
 	f32 attenAngle; //0x50

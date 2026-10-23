@@ -54,7 +54,9 @@ typedef struct SeqEndObj {
     u16 value;                  // 0x24
     u16 nextValue;              // 0x26
     u8 paramDisp;               // 0x28
-    u8 field_0x29[0x30 - 0x29]; // 0x29
+    u8 blinkTimer;              // 0x29, level-up object blink countdown (8 frames)
+    u8 pad_2A[0x2C - 0x2A];     // 0x2A
+    s32 blinkOn;                // 0x2C, drawn while nonzero
     GXColor color;              // 0x30
 } SeqEndObj;
 
@@ -97,7 +99,7 @@ typedef struct SeqEndGroup {
 
 typedef struct SeqEndSpot {
     u16 flags;               // 0x0
-    u8 field_0x2[0x4 - 0x2]; // 0x2
+    u8 pad_02[0x4 - 0x2]; // 0x2
     Vec pos;                 // 0x4
     Vec rot;                 // 0x10
     Vec scale;               // 0x1C
@@ -338,7 +340,7 @@ void btlseqEnd(BattleWork* wp) {
         SeqEndWork* nw;
         if (evtCheckID(fb->postBattleEventId)) break;
         if (!BattleWaitAllActiveEvtEnd(wp)) break;
-        if (fb->unk44) {
+        if (fb->postBattleMode) {
             BattleSetSeq(wp, (BattleSequence)3, 0x3000001);
             BattleSetSeq(wp, (BattleSequence)0, 2);
             return;
@@ -1626,7 +1628,7 @@ USER_FUNC(_disable_enemy_unit_disp) {
     }
     obj = BattleSearchObjectPtr("if_body");
     if (obj) {
-        wp->field_180DC |= 0x20;
+        wp->stageObjectWork.flags |= 0x20;
         obj->mFlags |= 1;
         mapGrpFlagOn("if_body", 1);
         mapGrpFlagOn("if_wire", 1);
@@ -1997,10 +1999,8 @@ s32 _keta_get(s32 n) {
 #endif
 void btlDispTexPlane(u32 id, GXColor color, f32 tX, f32 tY, f32 tZ, f32 sX, f32 sY);
 void btlDispTexPlane2(Mtx mtx, u32 id, GXColor color);
-#define LVOBJ_TIMER(o) ((o)->field_0x29[0])
-#define LVOBJ_DISP(o) (*(s32*)&(o)->field_0x29[3])
 #define LVOBJ_PLANE(o, n, tbl)                                                            \
-    if (LVOBJ_DISP(o)) {                                                               \
+    if ((o)->blinkOn) {                                                             \
         PSMTXIdentity(m);                                                              \
         PSMTXTrans(trans, (o)->pos.x, (o)->pos.y, (o)->pos.z);                         \
         PSMTXScale(scale, (o)->scale.x, (o)->scale.y, (o)->scale.z);                   \
@@ -2031,20 +2031,20 @@ void _lvup_select_object_disp(CameraId camId, void* param) {
         switch (obj->paramDisp) {
         case 4:
             obj->paramDisp = 5;
-            LVOBJ_TIMER(obj) = 1;
+            obj->blinkTimer = 1;
         case 5:
-            LVOBJ_TIMER(obj)--;
-            if (LVOBJ_TIMER(obj) == 0) {
-                LVOBJ_TIMER(obj) = 8;
-                if (LVOBJ_DISP(obj)) {
-                    LVOBJ_DISP(obj) = 0;
+            obj->blinkTimer--;
+            if (obj->blinkTimer == 0) {
+                obj->blinkTimer = 8;
+                if (obj->blinkOn) {
+                    obj->blinkOn = 0;
                 } else {
-                    LVOBJ_DISP(obj) = 1;
+                    obj->blinkOn = 1;
                 }
             }
             break;
         default:
-            LVOBJ_DISP(obj) = 1;
+            obj->blinkOn = 1;
             break;
         }
     }
@@ -2054,7 +2054,7 @@ void _lvup_select_object_disp(CameraId camId, void* param) {
 
     for (i = 0; i < 3; i++) {
         obj = &work->objs[i];
-        if (LVOBJ_DISP(obj)) {
+        if (obj->blinkOn) {
             if (obj->paramDisp == 1) {
                 if (obj->value != obj->nextValue) {
                     pos = obj->pos;

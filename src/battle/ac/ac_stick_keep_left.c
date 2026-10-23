@@ -41,7 +41,6 @@ typedef struct SklDisp {
 #define SKL_P(work) ((SklParams*)&(work)->actionCommands)
 #define SKL_W(w) ((SklWork*)(w)->actionCommands.work)
 #define SKL_D(w) ((SklDisp*)&(w)->actionCommands.disp)
-#define SKL_S16(work) (*(s16*)((u8*)&(work)->actionCommands + 0x88))
 
 s32 psndSFXOn(const char* name);
 
@@ -302,7 +301,7 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
     s32 m;
     f32 spacing;
     f32 yy;
-    f32 sp2;
+    f32 stepX;
     char n1[8] = "_AcSkl1";
     char n2[8] = "_AcSkl2";
     char n3[8] = "_AcSkl3";
@@ -381,39 +380,39 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
         p.y = yy;
         iconDispGx(&p, 0x10, ICON_090, 1.0f);
     }
-    sp2 = 33.0f;
+    stepX = 33.0f;
     if (ac->flags & 1) {
-        sp2 = 24.75f;
+        stepX = 24.75f;
     }
     m = count - 1;
     for (j = 0; j < m; j++) {
         if (j < idx) {
             if (j < 3) {
                 Vec p = {0.0f, 0.0f, 0.0f};
-                p.x = x + (sp2 * (f32)j + -258.0f);
+                p.x = x + (stepX * (f32)j + -258.0f);
                 p.y = yy;
                 iconDispGx(&p, 0x10, (u16)(ICON_092 + j), 1.0f);
             } else {
                 Vec p = {0.0f, 0.0f, 0.0f};
-                p.x = x + (sp2 * (f32)j + -258.0f);
+                p.x = x + (stepX * (f32)j + -258.0f);
                 p.y = yy;
                 iconDispGx(&p, 0x10, ICON_094, 1.0f);
             }
         } else {
             Vec p = {0.0f, 0.0f, 0.0f};
-            p.x = x + (sp2 * (f32)j + -258.0f);
+            p.x = x + (stepX * (f32)j + -258.0f);
             p.y = yy;
             iconDispGx(&p, 0x10, ICON_091, 0.5f);
         }
     }
     if (idx < count) {
         Vec p = {0.0f, 0.0f, 0.0f};
-        p.x = x + (sp2 * (f32)m + -250.0f);
+        p.x = x + (stepX * (f32)m + -250.0f);
         p.y = yy;
         iconDispGx(&p, 0x10, ICON_091, 1.0f);
     } else {
         Vec p = {0.0f, 0.0f, 0.0f};
-        p.x = x + (sp2 * (f32)m + -250.0f);
+        p.x = x + (stepX * (f32)m + -250.0f);
         p.y = yy;
         iconDispGx(&p, 0x10, ICON_095, 1.0f);
     }

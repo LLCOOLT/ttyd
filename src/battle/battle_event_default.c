@@ -1,3 +1,4 @@
+#include "eff/eff_fire.h"
 #include "battle/battle_event_default.h"
 #include "battle/battle.h"
 #include "battle/battle_ac_help.h"
@@ -14,7 +15,6 @@
 #include "evt/evt_batstage.h"
 #include "evt/evt_sub.h"
 
-#define BTL_UNIT_280(unit) (*(s32*)((u8*)(unit) + 0x280))
 
 f32 sinfd(f32 degrees);
 EffectEntry* effFireEntry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
@@ -1001,6 +1001,7 @@ USER_FUNC(_backfire) {
     f32 x, y, z;
     s32 self;
     EffectEntry* eff;
+    EffFireWork* fire;
 
     id = evtGetValue(event, event->args[0]);
     id = BattleTransID(event, id);
@@ -1014,7 +1015,7 @@ USER_FUNC(_backfire) {
         event->userdata[1] = 0;
     }
     eff = event->userdatap[0];
-    isFirstCall = (BOOL)eff->userdata;
+    fire = (EffFireWork*)eff->userdata;
     event->userdata[1]++;
     if (event->userdata[1] >= 60) {
         effDelete(event->userdatap[0]);
@@ -1025,17 +1026,17 @@ USER_FUNC(_backfire) {
         }
         return EVT_RETURN_FINISH;
     }
-    *(f32*)((u8*)isFirstCall + 0x24) = 1.6f * sinfd(event->userdata[1] * 3) + 0.4f;
+    fire->scale = 1.6f * sinfd(event->userdata[1] * 3) + 0.4f;
     return EVT_RETURN_BLOCK;
 }
 
 static USER_FUNC(_anime_load) {
-    BattlePartyAnimeLoad(_battleWorkPointer->commandMenu.unk54C);
+    BattlePartyAnimeLoad(_battleWorkPointer->commandMenu.partyKind);
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(_anime_load_wait) {
-    return BattlePartyAnimeLoad(_battleWorkPointer->commandMenu.unk54C) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
+    return BattlePartyAnimeLoad(_battleWorkPointer->commandMenu.partyKind) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
 USER_FUNC(_check_pose_stay) {

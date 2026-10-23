@@ -17,10 +17,7 @@ typedef struct BDWork {
     s32 endTimer;
 } BDWork;
 
-#define NN (*(s32*)((u8*)work + 0x1cd0))
 #define OUT (*(s32*)&ac->outputParams[0])
-#define BTN(i) (*(u32*)((u8*)p + 8 + (i) * 4))
-#define PRS(i) (*(s32*)((u8*)p + 0x3c + (i) * 4))
 
 static u32 _button_table[7] = {PAD_BUTTON_A, PAD_BUTTON_B, PAD_BUTTON_X, PAD_BUTTON_Y, PAD_TRIGGER_L, PAD_TRIGGER_R, PAD_TRIGGER_Z};
 
@@ -33,14 +30,14 @@ void *memset(void *dest, int ch, size_t count);
 s32 battleAcMain_ButtonDown(BattleWork *work)
 {
   BattleActions *ac = &work->actionCommands;
-  BDWork *p = (BDWork *) (((u8 *) work) + 0x1f4c);
-  u8 *disp = ((u8 *) work) + 0x1f20;
+  BDWork *p = (BDWork *) work->actionCommands.work;
+  u8 *disp = work->actionCommands.dispData;
   s32 allDone;
   s32 i;
   s32 done;
   s32 flag = 0;
   const char *sfx;
-  if (*(((u8 *) ac->mAcUnit) + BUOFF(0x303)))
+  if (ac->mAcUnit->badgesEquipped.AutoCommand)
   {
     flag = 1;
   }
@@ -59,9 +56,9 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
         ((s32 *) disp)[8] = 20;
         memset(p->button, 0, 0x34);
         memset(p->pressed, 1, 0x34);
-        for (i = 0; i < (*((s32 *) (((u8 *) work) + 0x1cd0))); i++)
+        for (i = 0; i < (work->actionCommands.params[2]); i++)
         {
-          switch (*((s32 *) (((u8 *) work) + 0x1cd4)))
+          switch (work->actionCommands.params[3])
           {
             case -2:
               p->button[(u32)i] = (irand(100) < 50) ? (0x100) : (0x200);
@@ -74,7 +71,7 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
               break;
 
             case -3:
-              if ((*((u32 *) (((u8 *) work) + 0x1cc4))) & 4)
+              if ((work->actionCommands.acFlags) & 4)
             {
               p->button[(u32)i] = _button_table[irand(4)];
               p->pressed[(u32)i] = 0;
@@ -151,10 +148,10 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
       case 100:
         ac->mAcState = 1000;
         p->sndCount = 0;
-        p->timer = *((s32 *) (((u8 *) work) + 0x1cc8));
+        p->timer = work->actionCommands.params[0];
 
       case 1000:
-        if ((ac->setupFlags & 1) && ((*((u32 *) (((u8 *) ac->mAcUnit) + BUOFF(0x278)))) & 0x10))
+        if ((ac->setupFlags & 1) && (((u32)ac->mAcUnit->mTokenFlags) & 0x10))
       {
         if (ac->setupFlags & 2)
         {
@@ -175,9 +172,9 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
         }
         return 0;
       }
-        if ((*((s16 *) (((u8 *) work) + 0x1d18))) > 0)
+        if ((work->actionCommands.countdown) > 0)
       {
-        (*((s16 *) (((u8 *) work) + 0x1d18)))--;
+        (work->actionCommands.countdown)--;
         ac->result = 2;
         allDone = 1;
         ac->mAcState = 1001;
@@ -185,7 +182,7 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
       }
         *((s32 *) (&ac->outputParams[0])) = 0;
         done = 1;
-        for (i = 0; i < (*((s32 *) (((u8 *) work) + 0x1cd0))); i++)
+        for (i = 0; i < (work->actionCommands.params[2]); i++)
       {
         if (p->button[(u32)i])
         {
@@ -198,9 +195,9 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
           {
             p->pressed[(u32)i] = 1;
             (*((s32 *) (&ac->outputParams[0])))++;
-            if ((*((s32 *) (((u8 *) work) + 0x1ccc))) == 1)
+            if ((work->actionCommands.params[1]) == 1)
             {
-              if ((i + 1) < (*((s32 *) (((u8 *) work) + 0x1cd0))))
+              if ((i + 1) < (work->actionCommands.params[2]))
               {
                 done = 0;
               }
@@ -212,7 +209,7 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
           {
             ac->result = 0;
             ac->mAcState = 1001;
-            if (((*((u32 *) (((u8 *) work) + 0x1cc4))) & 2) && ((*((s32 *) (&ac->outputParams[0]))) > 0))
+            if (((work->actionCommands.acFlags) & 2) && ((*((s32 *) (&ac->outputParams[0]))) > 0))
             {
               allDone = 1;
               ac->result |= 2;
@@ -225,7 +222,7 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
           else
           {
             done = 0;
-            if ((*((s32 *) (((u8 *) work) + 0x1ccc))) == 1)
+            if ((work->actionCommands.params[1]) == 1)
             {
               break;
             }
@@ -252,7 +249,7 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
         ac->result = 0;
         allDone = 1;
         ac->mAcState = 1001;
-        if (((*((u32 *) (((u8 *) work) + 0x1cc4))) & 2) && ((*((s32 *) (&ac->outputParams[0]))) > 0))
+        if (((work->actionCommands.acFlags) & 2) && ((*((s32 *) (&ac->outputParams[0]))) > 0))
         {
           ac->result |= 2;
           ac->result &= ~1;
@@ -327,9 +324,9 @@ void battleAcDelete_ButtonDown(BattleWork* work) {
 static void actionCommandDisp(s32 unused, f32 x, f32 y)
 {
   BattleWork *work = _battleWorkPointer;
-  BDWork *p = (BDWork *) (((u8 *) work) + 0x1f4c);
+  BDWork *p = (BDWork *) work->actionCommands.work;
   s32 k;
-  s32 end = ((*((s32 *) (((u8 *) work) + 0x1cd0))) * 3) + 2;
+  s32 end = ((work->actionCommands.params[2]) * 3) + 2;
   int size;
   s32 i;
   s32 count;
@@ -360,9 +357,9 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y)
     pos3.y = by;
     iconDispGx(&pos3, 16, ICON_090, 1.0f);
   }
-  if ((*((u32 *) (((u8 *) work) + 0x1cc4))) & 1)
+  if ((work->actionCommands.acFlags) & 1)
   {
-    for (count = 0, j = 0; count < (*((s32 *) (((u8 *) work) + 0x1cd0))); count++, j += 4)
+    for (count = 0, j = 0; count < (work->actionCommands.params[2]); count++, j += 4)
     {
       if (!p->pressed[j >> 2])
       {
@@ -370,14 +367,14 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y)
       }
     }
 
-    if (count < (*((s32 *) (((u8 *) work) + 0x1cd0))))
+    if (count < (work->actionCommands.params[2]))
     {
       count++;
     }
   }
   else
   {
-    count = *((s32 *) (((u8 *) work) + 0x1cd0));
+    count = work->actionCommands.params[2];
   }
   for (i = 0, off = 0, j = 0; i < count; i++, off += 0x30, j += 4)
   {

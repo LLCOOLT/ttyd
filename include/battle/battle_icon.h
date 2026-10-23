@@ -21,9 +21,9 @@ typedef struct BattleWorkIcon {
 	f32 jumpVelY; //0x50
 	f32 jumpAngle; //0x54
 	f32 jumpDist; //0x58
-	u8 field_0x5C[4]; //0x5C
+	u8 pad_5C[4]; //0x5C, never accessed
 	s8 jumpDir; //0x60
-	u8 field_0x61[0x9C - 0x61]; //0x61
+	u8 pad_61[0x9C - 0x61]; //0x61, never accessed
 } BattleIcon;
 
 void BattleIconInit(void);

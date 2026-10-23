@@ -6,8 +6,8 @@
 #include "mario/mariost.h"
 #include "system.h"
 #include <string.h>
+#include "driver/mobjdrv.h"
 
-void* mobjHitObjPtrToPtr(HitEntry* hit);
 void effGetTexObjN64(u32 id, GXTexObj* obj);
 
 void shadowCharShadowDisp_Collision(CameraId cameraId, void* param);
@@ -210,7 +210,7 @@ void shadowInit(void) {
     cswp->projection = 1;
     cswp->defaultMode = 2;
     cswp->defaultSizeY = 20.0f;
-    cswp->unk118 = 1;
+    cswp->defaultEnabled = 1;
     cswp->numEntries = 0;
     cswp->entries = __memAlloc(HEAP_DEFAULT, sizeof(ShadowEntry) * 64);
     memset(cswp->entries, 0, sizeof(ShadowEntry) * 64);
@@ -291,7 +291,7 @@ static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
     Vec pos;
 
     GXInvalidateTexAll();
-    size = ShadowSizeTbl[*(s32*)((u8*)shadowConfig + wp->configIdx * sizeof(ShadowConfig) + 0x40)];
+    size = ShadowSizeTbl[((ShadowConfig*)((u8*)shadowConfig + wp->configIdx * sizeof(ShadowConfig)))->sizeIdx];
     if (depth) {
         GXSetColorUpdate(GX_FALSE);
     }
@@ -308,7 +308,7 @@ static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
     } else {
         C_MTXOrtho(proj, cfg->top, -cfg->top, cfg->left, -cfg->left, cfg->near, cfg->far);
     }
-    GXSetProjection(wp->proj, *(s32*)((u8*)shadowConfig + wp->configIdx * sizeof(ShadowConfig) + 0x38));
+    GXSetProjection(wp->proj, ((ShadowConfig*)((u8*)shadowConfig + wp->configIdx * sizeof(ShadowConfig)))->projType);
     PSMTXCopy(camGetCurPtr()->view, tmp_view);
     PSMTXCopy(wp->view, camGetCurPtr()->view);
 }
@@ -760,7 +760,7 @@ s32 shadowEntry(f32 x, f32 y, f32 z, f32 size) {
     ShadowEntry* entry = &cswp->entries[id];
 
     entry->flags = 0;
-    if (cswp->unk118) {
+    if (cswp->defaultEnabled) {
         entry->flags |= 1;
     }
     entry->pos = (Vec){x, y, z};
@@ -785,7 +785,7 @@ s32 shadowEntryMode(s32 mode, f32 x, f32 y, f32 z, f32 size) {
     ShadowEntry* entry = &cswp->entries[id];
 
     entry->flags = 0;
-    if (cswp->unk118) {
+    if (cswp->defaultEnabled) {
         entry->flags |= 1;
     }
     entry->pos = (Vec){x, y, z};
@@ -806,11 +806,13 @@ s32 shadowEntryMode(s32 mode, f32 x, f32 y, f32 z, f32 size) {
 const Vec vec3_802c1af0 = {0.0f, 0.0f, 0.0f};
 
 void shadowSetType(s32 id, u8 type) {
-    ((u8*)((u8*)cswp->entries + id * sizeof(ShadowEntry) + 0x3))[0] = type;
+    ShadowEntry* entry = &cswp->entries[id];
+    entry->type = type;
 }
 
 void U_shadowSetMode(s32 id, u8 alpha) {
-    ((u8*)((u8*)cswp->entries + id * sizeof(ShadowEntry) + 0x28))[0] = alpha;
+    ShadowEntry* entry = &cswp->entries[id];
+    entry->alpha = alpha;
 }
 
 void shadowSetVolumeDecay(s32 id, f32 volume, f32 decay, f32 decay2) {
@@ -821,11 +823,13 @@ void shadowSetVolumeDecay(s32 id, f32 volume, f32 decay, f32 decay2) {
 }
 
 void shadowSetSize(s32 id, f32 size) {
-    ((f32*)((u8*)cswp->entries + id * sizeof(ShadowEntry) + 0x10))[0] = size;
+    ShadowEntry* entry = &cswp->entries[id];
+    entry->size = size;
 }
 
 void shadowSetCamId(s32 id, s16 camId) {
-    ((s16*)((u8*)cswp->entries + id * sizeof(ShadowEntry) + 0x1A))[0] = camId;
+    ShadowEntry* entry = &cswp->entries[id];
+    entry->camId = camId;
 }
 
 void shadowSetCollision(s32 id, BOOL enable) {

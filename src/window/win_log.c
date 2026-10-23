@@ -1308,7 +1308,7 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
                 scale = 3.0f;
             }
             PSMTXTrans(m, mx + tubuDt[w->mapIdx].x, my + tubuDt[w->mapIdx].y, 0.0f);
-            animPoseSetLocalTime(w->pose, gp->retraceCount % (s32)(data->unk24)[2]);
+            animPoseSetLocalTime(w->pose, gp->retraceCount % (s32)(data->loopInfo)[2]);
             animPoseMain(w->pose);
             animPoseDrawMtx(w->pose, m, 1, 0.0f, scale);
             animPoseDrawMtx(w->pose, m, 2, 0.0f, scale);
@@ -1668,7 +1668,7 @@ void capture(CameraId camera, void* param) {
     animPoseDrawMtx(m->pose1, t, 3, 0.0f, 1.0f);
     animPosePeraOn(m->pose1);
     if (m->id == 0x6B) {
-        gpos = **(Vec***)((u8*)animPoseGetAnimPosePtr(m->pose1) + 0x15C);
+        gpos = *animPoseGetAnimPosePtr(m->pose1)->worldPositions;
         cnt = smartAlloc(g_moamoa_chain_num * 4, 3)->address;
         idx = smartAlloc(2000, 3)->address;
         memset(cnt, 0, g_moamoa_chain_num * 4);

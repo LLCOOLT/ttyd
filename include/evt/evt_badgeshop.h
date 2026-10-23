@@ -12,12 +12,12 @@ typedef struct BadgeShopWork {
 	u8 align[3];
 	s32 bargainBadges[5]; //0xF8
 	s32 bargainNum; //0x10C
-	s32 field_0x110; //0x110
+	s32 reserved_110; //0x110, cleared and added to bargainNum in the restock loop, never set nonzero
 	u16 restockFlags; //0x114, bit0: regenerate bargain/bottakuru stock on next entry to gor_01
-	u16 field_0x116; //0x116
-	u32 field_0x118; //0x118
-	u32 field_0x11C; //0x11C
-	u32 field_0x120; //0x120
+	u16 pad_116; //0x116, never accessed
+	u32 pad_118; //0x118, never accessed
+	u32 pad_11C; //0x11C, never accessed
+	u32 pad_120; //0x120, never accessed
 } BadgeShopWork;
 
 s32 getBadgeBottakuru100TableMaxCount(void); //Charlieton Pit of 100 Trials

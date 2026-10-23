@@ -599,8 +599,8 @@ void effDamageStarDisp(CameraId cameraId, EffectEntry* effect) {
     }
     PSMTXTrans(numTrans, 10.0f, -1.5f, 0.0f);
     PSMTXConcat(numMtx, numTrans, numMtx);
-    PSMTXConcat(numMtx, (void*)((u8*)work->anim + 0x14), numMtx);
-    PSMTXConcat(numMtx, (void*)((u8*)work->anim + 0x48), numMtx);
+    PSMTXConcat(numMtx, work->anim->joints[0].mtx, numMtx);
+    PSMTXConcat(numMtx, work->anim->joints[1].mtx, numMtx);
     GXSetCurrentMtx(GX_PNMTX0);
     PSMTXTransApply(numMtx, finalMtx, 2.5f, -2.5f, 0.0f);
     PSMTXConcat(cam->view, finalMtx, finalMtx);
