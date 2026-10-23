@@ -1109,7 +1109,7 @@ static void insert(s32* arr, s32 n, s32 from, s32 to) {
     }
 }
 
-USER_FUNC(unk_tou2_00004b50) {
+USER_FUNC(tou2_rankingReset) {
     s32 i;
 
     rankingExit();

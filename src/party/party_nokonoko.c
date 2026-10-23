@@ -6,7 +6,7 @@
 #include "system.h"
 #include <dolphin/mtx.h>
 
-extern void unk_800c92c4(PartyEntry* party);
+extern void partyUpdMoveSpd(PartyEntry* party);
 extern void partyRecordFootmark(PartyEntry* party);
 extern void partyWalkInit(PartyEntry* party, s32 mode);
 extern void party_move_mode_stay(PartyEntry* party);
@@ -143,7 +143,7 @@ void nokonoko_move(PartyEntry* party) {
         party->field_8 &= ~8;
         partyWalkInit(party, 1);
     }
-    unk_800c92c4(party);
+    partyUpdMoveSpd(party);
     partyRecordFootmark(party);
     switch (PB(party, 0x3b)) {
     case 0:
@@ -163,7 +163,7 @@ void nokonoko_move(PartyEntry* party) {
     }
 }
 
-void unk_800cd9a0(void) {
+void nokonoko_use_cancel(void) {
     PartyEntry* party;
     marioGetPtr();
     party = partyGetPtr(marioGetPartyId());

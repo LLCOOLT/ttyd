@@ -249,7 +249,7 @@ static USER_FUNC(setmertn);
 USER_FUNC(teresa_badge_item_list_init);
 USER_FUNC(unitwincoin_disp_onoff);
 USER_FUNC(unitwincoin_wait);
-USER_FUNC(unk_8017524c);
+USER_FUNC(unitwin_lottery_disp_onoff);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 static USER_FUNC(viewport);
@@ -4631,14 +4631,14 @@ EVT_END()
 
 EVT_BEGIN(kuzi_keiziban_entry)
     CALL(evt_unitwin_alloc, 0)
-    CALL(unk_8017524c, 1)
+    CALL(unitwin_lottery_disp_onoff, 1)
     CALL(evt_lottery, 1, LW(0), LW(1))
     IF_BITS_SET(LW(0), 4)
         CALL_CHILD(PTR(kuzi_keiziban_husei))
         ELSE
         CALL_CHILD(PTR(kuzi_keiziban_normal))
     END_IF
-    CALL(unk_8017524c, 0)
+    CALL(unitwin_lottery_disp_onoff, 0)
     CALL(evt_unitwin_free)
     RETURN
 EVT_END()

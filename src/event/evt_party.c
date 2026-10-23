@@ -33,7 +33,7 @@ extern void partyClearFootmark(void);
 extern void* partySearchGround();
 extern void* partyHitCheck();
 extern void* searchUnder2();
-extern void unk_800ba2dc(PartyEntry* party);
+extern void partyRestoreRunMode(PartyEntry* party);
 extern s32 nokonokoGetStatus();
 extern void nokotaro_hold_cancel(PartyEntry* party);
 extern s32 yoshiGetStatus();
@@ -82,7 +82,7 @@ USER_FUNC(evt_party_dispflg_onoff) {
 	return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_800e71bc) {
+USER_FUNC(evt_party_trigflg_onoff) {
 	PartyEntry* p;
 	int mask;
 	s32* args = event->args;
@@ -538,7 +538,7 @@ USER_FUNC(evt_party_jump_pos) {
 			p->gravity = 0.0f;
 			PF(p, 0x174) = 0.0f;
 			p->moveSpeed = 0.0f;
-			unk_800ba2dc(p);
+			partyRestoreRunMode(p);
 			return EVT_RETURN_YIELD;
 		}
 		break;

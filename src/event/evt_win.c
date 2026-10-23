@@ -86,18 +86,18 @@ s32 unk_804189fc;
 static UnitWinWork* _wp;
 
 USER_FUNC(evt_unitwin_main_func);
-USER_FUNC(unk_80174e98);
+USER_FUNC(evt_unitwin_select_func);
 void evt_unitwin_disp_func(CameraId cameraId, void* param);
 
-void unk_8017597c(WinMgrEntry* entry);
-void unk_801758fc(WinMgrEntry* entry);
-void unk_80175710(WinMgrEntry* entry);
-void unk_8017599c(WinMgrEntry* entry);
+void unitwin_help_main(WinMgrEntry* entry);
+void unitwin_help_disp(WinMgrEntry* entry);
+void unitwin_point_disp(WinMgrEntry* entry);
+void unitwin_name_disp(WinMgrEntry* entry);
 
 WinMgrDesc unk_80375478[3] = {
-	{0, 0, 8, -150, 120, 300, 50, {0x2B, 0xA4, 0xFF, 0xFF}, NULL, unk_8017599c},
-	{0, 0, 8, -240, -130, 500, 80, {0xF0, 0xF0, 0xF0, 0xFF}, unk_8017597c, unk_801758fc},
-	{2, 0, 8, -250, -130, 150, 45, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, unk_80175710},
+	{0, 0, 8, -150, 120, 300, 50, {0x2B, 0xA4, 0xFF, 0xFF}, NULL, unitwin_name_disp},
+	{0, 0, 8, -240, -130, 500, 80, {0xF0, 0xF0, 0xF0, 0xFF}, unitwin_help_main, unitwin_help_disp},
+	{2, 0, 8, -250, -130, 150, 45, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, unitwin_point_disp},
 };
 
 static s32 party_id_table[8] = {1, 2, 5, 4, 6, 3, 7, 0};
@@ -114,11 +114,11 @@ static EVT_BEGIN(main_evt)
 EVT_END()
 
 EVT_BEGIN(select_evt)
-	CALL(unk_80174e98)
+	CALL(evt_unitwin_select_func)
 	RETURN
 EVT_END()
 
-void unk_8017599c(WinMgrEntry* entry) {
+void unitwin_name_disp(WinMgrEntry* entry) {
 	UnitWinWork* wp = _wp;
 	const char* msg = msgSearch(itemDataTable[wp->goods[wp->goodsIdx]].name);
 	s32 i;
@@ -150,11 +150,11 @@ void unk_8017599c(WinMgrEntry* entry) {
 #define UNITWIN_UNUSED_INLINE(fn) static void fn(char* buf, const char* name, s32 n) { sprintf(buf, ("%s_%04d"), name, n); }
 UNITWIN_UNUSED_INLINE(unitwin_fmt)
 
-void unk_8017597c(WinMgrEntry* entry) {
+void unitwin_help_main(WinMgrEntry* entry) {
 	winMgrHelpMain(entry);
 }
 
-void unk_801758fc(WinMgrEntry* entry) {
+void unitwin_help_disp(WinMgrEntry* entry) {
 	UnitWinWork* wp = _wp;
 	s32 idx = wp->goodsIdx * 4;
 	s32* goods = wp->goods;
@@ -164,7 +164,7 @@ void unk_801758fc(WinMgrEntry* entry) {
 	}
 }
 
-void unk_80175710(WinMgrEntry* entry) {
+void unitwin_point_disp(WinMgrEntry* entry) {
 	UnitWinWork* wp = _wp;
 	PouchData* pouch = pouchGetPtr();
 	s32 mode;
@@ -308,7 +308,7 @@ USER_FUNC(unitwincoin_wait) {
 	return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_8017524c) {
+USER_FUNC(unitwin_lottery_disp_onoff) {
 	s32 on = evtGetValue(event, event->args[0]);
 	UnitWinWork* wp = _wp;
 	if (on) {
@@ -319,7 +319,7 @@ USER_FUNC(unk_8017524c) {
 	return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_801751f8) {
+USER_FUNC(unitwin_set_bought) {
 	s32* args = event->args;
 	UnitWinWork* wp = (UnitWinWork*)evtGetValue(event, args[0]);
 	wp->bought = evtGetValue(event, args[1]);
@@ -333,7 +333,7 @@ USER_FUNC(unk_801751f8) {
 		winMgrClose((wp)->winId[1]);     \
 	}
 
-USER_FUNC(unk_80174e98) {
+USER_FUNC(evt_unitwin_select_func) {
 	UnitWinWork* wp = (UnitWinWork*)event->lwData[0];
 	s32 found = FALSE;
 	MarioWork* mario = marioGetPtr();

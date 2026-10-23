@@ -34,7 +34,7 @@ typedef enum WakuTexId {
 static const GXColor fog_color = {0xFF, 0xFF, 0xFF, 0xFF};
 
 //local prototypes
-void unk_8007f204(s32 error, DVDFileInfo* info);
+void windowTexSetup_callback(s32 error, DVDFileInfo* info);
 void _windowDispGX_Message(s32 type, s32 a2, u8 alpha, BOOL dark, f32 x, f32 y, f32 height, f32 width, f32 a9, f32 a10);
 static inline void fogOff(void) { GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fog_color); }
 
@@ -61,7 +61,7 @@ void windowInit(void) {
 }
 
 //new in retail
-void unk_8007f204(s32 error, DVDFileInfo* info) {
+void windowTexSetup_callback(s32 error, DVDFileInfo* info) {
 	DVDEntry* entry = info->cb.userData;
 	s32 i;
 
@@ -90,7 +90,7 @@ void windowTexSetup(void) {
 		size = OSRoundUp32B(DVDMgrGetLength(entry));
 		winTpl = __memAlloc(HEAP_DEFAULT, size);
 		entry->info.cb.userData = entry;
-		DVDMgrReadAsync(entry, winTpl, size, 0, unk_8007f204);
+		DVDMgrReadAsync(entry, winTpl, size, 0, windowTexSetup_callback);
 	}
 	else {
 		UnpackTexPalette(winTpl);

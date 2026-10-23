@@ -5491,7 +5491,7 @@ BOOL psndBGMOn(u32 r3, char* bgm_name) {
 	return psndBGMOn_f_d(r3, bgm_name, 1000, 750, 0);
 }
 
-BOOL unk_800d7270(u32 r3, char* bgm_name, u32 fadetime, s32 r6) {
+BOOL psndBGMOn_f(u32 r3, char* bgm_name, u32 fadetime, s32 r6) {
 	return psndBGMOn_f_d(r3, bgm_name, fadetime, 750, r6);
 }
 

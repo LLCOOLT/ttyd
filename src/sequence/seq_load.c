@@ -82,7 +82,7 @@ void winTexInit_x2(TEXPalette* texture);
 void winTexSet_x2(u32 id1, u32 id2, Vec translate, Vec scale, GXColor color);
 void winTexSetRot(u32 id, Vec translate, Vec scale, GXColor color, f32 rot);
 void nameMaskGX(f32 alpha);
-const char* unk_8016af5c(s32 num, s32 digits);
+const char* winZenkakuStrPad(s32 num, s32 digits);
 void FontDrawScale(f32 scale);
 void FontDrawString(f32 x, f32 y, const char* str);
 void FontDrawEdge(void);
@@ -137,7 +137,7 @@ extern s32 stone_id[];
 static s32 evt_shake[12];
 extern s32 evt_continue[];
 
-s32 unk_800f2398(EventEntry* evt, BOOL isFirstCall) {
+s32 evt_seq_load_keep_msg_window(EventEntry* evt, BOOL isFirstCall) {
     fadeReset(4);
     wp->unk48 = evt->printWindowId;
     return 2;
@@ -959,13 +959,13 @@ void loadDraw(CameraId camera, void* param) {
             sprintf(buf2, "\203\214\203x\203\213\201@%s", winZenkakuStr(level));
             FontDrawString(win1->x - FontGetMessageWidth(buf2) / EXT_LIT(float_2_8041be70, 2.0f), EXT_LIT(float_30_8041be3c, 30.0f) + win1->y, buf2);
             strcpy(buf2, "\203v\203\214\203C\202\266\202\251\202\361\201@");
-            strcat(buf2, unk_8016af5c(hours, 2));
+            strcat(buf2, winZenkakuStrPad(hours, 2));
             strcat(buf2, " ");
-            strcat(buf2, unk_8016af5c(mins, 2));
+            strcat(buf2, winZenkakuStrPad(mins, 2));
             w = FontGetMessageWidth(buf2);
             FontDrawString(win1->x - w / EXT_LIT(float_2_8041be70, 2.0f), win1->y, buf2);
             strcpy(buf2, "\203v\203\214\203C\202\266\202\251\202\361\201@");
-            strcat(buf2, unk_8016af5c(hours, 2));
+            strcat(buf2, winZenkakuStrPad(hours, 2));
             x = FontGetMessageWidth(buf2);
             PSMTXTrans(m, EXT_LIT(float_8_8041be44, 8.0f) + (x + (win1->x - w / EXT_LIT(float_2_8041be70, 2.0f))), EXT_LIT(float_1_8041bde8, 1.0f) + (win1->y - 22.0f), EXT_LIT(float_0_8041bde4, 0.0f));
             PSMTXScale(s, EXT_LIT(float_1p5_8041be4c, 1.5f), EXT_LIT(float_1p5_8041be4c, 1.5f), EXT_LIT(float_1p5_8041be4c, 1.5f));

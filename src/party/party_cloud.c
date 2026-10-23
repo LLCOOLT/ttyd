@@ -231,12 +231,12 @@ f32 cloudGetBreathDist() {
     return breathDist;
 }
 
-void unk_801820d0(PartyEntry* party) {
+void cloud_hover_init(PartyEntry* party) {
     CLD_F(party, 0x17C) = 0.0f;
     CLD_F(party, 0x180) = 4.25f;
 }
 
-void unk_8018206c(PartyEntry* party) {
+void cloud_hover_main(PartyEntry* party) {
     f32 a;
     CLD_F(party, 0x17C) = revise360(CLD_F(party, 0x17C) - CLD_F(party, 0x180));
     a = sin((3.1415927f * CLD_F(party, 0x17C)) / 180.0f);
@@ -247,10 +247,10 @@ void cloud_move(PartyEntry* party) {
     if (party->field_8 & 8) {
         party->field_8 &= ~8;
         partyMoveFlyInit(party, 1);
-        unk_801820d0(party);
+        cloud_hover_init(party);
     }
     partyFlyMain(party);
-    unk_8018206c(party);
+    cloud_hover_main(party);
     if (CLD_B(party, 0x3B) != 2) {
         party->field_8 &= ~0x40000;
     }

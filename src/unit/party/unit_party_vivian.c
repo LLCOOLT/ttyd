@@ -77,7 +77,7 @@ USER_FUNC(_disp_heart_entry_stop);
 void _disp_heart(CameraId camera, void* param);
 USER_FUNC(_disp_heart_entry);
 USER_FUNC(_make_kagenuke_weapon);
-USER_FUNC(unk_8017d03c);
+USER_FUNC(_get_vivian_attack_position);
 USER_FUNC(_get_move_frame);
 static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
 USER_FUNC(battle_evt_majo_disp_off);
@@ -582,7 +582,7 @@ s32 partyVivianAttack_NormalAttack[] = {
     0, 131163, (s32)btlevtcmd_AcSetFlag, 23, 327771, (s32)btlevtcmd_SetupAC, -2, 18,
     1, 0, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_VIVIAN_ATTACK1", 0, 327771, (s32)battle_evt_majo_disp_off,
     -2, 1, 0, 0, 131163, (s32)btlevtcmd_StartAC, 1, 393307,
-    (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998, 327771, (s32)unk_8017d03c,
+    (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998, 327771, (s32)_get_vivian_attack_position,
     -29999997, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_GetPos, -2, -250000000,
     -29999999, -250000000, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999, -29999998,
     50, 0, 5, 0, -1, 262235, (s32)btlevtcmd_SetUnitWork, -2,
@@ -591,8 +591,8 @@ s32 partyVivianAttack_NormalAttack[] = {
     -2, 1, -30000000, -29999999, -29999998, 0, 327771, (s32)btlevtcmd_SetPos,
     -2, -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996,
     -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999994,
-    -29999993, -29999992, 327771, (s32)unk_8017d03c, -29999997, -30000000, -29999999, -29999998,
-    327771, (s32)unk_8017d03c, -29999997, -29999994, -29999993, -29999992, 262235, (s32)btlevtcmd_TransStageFloorPosition,
+    -29999993, -29999992, 327771, (s32)_get_vivian_attack_position, -29999997, -30000000, -29999999, -29999998,
+    327771, (s32)_get_vivian_attack_position, -29999997, -29999994, -29999993, -29999992, 262235, (s32)btlevtcmd_TransStageFloorPosition,
     -29999994, -29999993, -29999992, 196699, (s32)btlevtcmd_GetFaceDirection, -29999997, -29999985, 131127,
     -29999985, -1, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 327771, (s32)btlevtcmd_GetPos,
     -2, -29999994, -29999993, -29999992, 589915, (s32)_get_move_frame, -30000000, -29999999,
@@ -1063,7 +1063,7 @@ USER_FUNC(_get_move_frame) {
 
 f32 BattleGetFloorHeight(BattleWork* wp, f32 x, f32 y, f32 z);
 
-USER_FUNC(unk_8017d03c) {
+USER_FUNC(_get_vivian_attack_position) {
     BattleWork* wp = _battleWorkPointer;
     s32* args = event->args;
     BattleUnit* self;

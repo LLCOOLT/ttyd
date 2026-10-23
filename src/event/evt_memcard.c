@@ -5,9 +5,9 @@
 #include "mario/mariost.h"
 
 // cardmgr.c helpers (named cardE80/cardEAC/cardED0 in cardmgr.h)
-BOOL unk_800b0e80(void);
-void unk_800b0eac(void);
-void unk_800b0ed0(void);
+BOOL cardInsertChanged(void);
+void cardInsertWatchEnd(void);
+void cardInsertWatchStart(void);
 
 USER_FUNC(evt_fade_end_wait);
 USER_FUNC(evt_msg_continue);
@@ -16,7 +16,7 @@ USER_FUNC(evt_msg_print_add);
 USER_FUNC(evt_msg_print_add_insert);
 USER_FUNC(evt_msg_print_insert);
 USER_FUNC(evt_msg_select);
-USER_FUNC(unk_800f2398);
+USER_FUNC(evt_seq_load_keep_msg_window);
 
 // Functions are emitted in reverse source order (deferred inlining)
 USER_FUNC(memcard_code) {
@@ -30,20 +30,20 @@ USER_FUNC(memcard_code) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_802564b4) {
+USER_FUNC(memcard_buf_reset) {
     cardBufReset();
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_80256490) {
-    unk_800b0ed0();
+USER_FUNC(memcard_watch_start) {
+    cardInsertWatchStart();
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_80256428) {
+USER_FUNC(memcard_watch_chk) {
     s32* args = event->args;
 
-    if (unk_800b0e80()) {
+    if (cardInsertChanged()) {
         evtSetValue(event, args[0], 1);
     } else {
         evtSetValue(event, args[0], 0);
@@ -51,8 +51,8 @@ USER_FUNC(unk_80256428) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_80256404) {
-    unk_800b0eac();
+USER_FUNC(memcard_watch_end) {
+    cardInsertWatchEnd();
     return EVT_RETURN_DONE;
 }
 
@@ -178,7 +178,7 @@ EVT_BEGIN(evt_memcard_check)
         END_IF
         CALL(memcard_code, LW(0))
         IF_INT_EQUAL(LW(10), 1)
-            CALL(unk_802564b4)
+            CALL(memcard_buf_reset)
         END_IF
         SWITCH(LW(0))
             CASE_EQUAL(0)
@@ -192,7 +192,7 @@ EVT_BEGIN(evt_memcard_check)
             CALL_CHILD(PTR(evt_memcard_nosave))
             CASE_OR_EQUAL(-13)
             CASE_OR_EQUAL(-6)
-            CALL(unk_80256490)
+            CALL(memcard_watch_start)
             CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_format"))
             CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
@@ -200,7 +200,7 @@ EVT_BEGIN(evt_memcard_check)
                 CALL(evt_msg_print_add, 0, STRING("msg_mcard_format_alldelete"))
                 CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
                 IF_INT_EQUAL(LW(0), 0)
-                    CALL(unk_80256428, LW(0))
+                    CALL(memcard_watch_chk, LW(0))
                     IF_INT_EQUAL(LW(0), 1)
                         CALL(evt_msg_print_add, 0, STRING("msg_out_mcard_warnning"))
                         CALL_CHILD(PTR(evt_memcard_nosave))
@@ -217,7 +217,7 @@ EVT_BEGIN(evt_memcard_check)
                         CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data"))
                         CALL(evt_msg_select, 0, STRING("msg_mcard_yesno"))
                         IF_INT_EQUAL(LW(0), 0)
-                            CALL(unk_80256428, LW(0))
+                            CALL(memcard_watch_chk, LW(0))
                             IF_INT_EQUAL(LW(0), 1)
                                 CALL(evt_msg_print_add, 0, STRING("msg_out_mcard_warnning"))
                                 CALL_CHILD(PTR(evt_memcard_nosave))
@@ -246,11 +246,11 @@ EVT_BEGIN(evt_memcard_check)
             END_IF
             CASE_END
             CASE_EQUAL(-4)
-            CALL(unk_80256490)
+            CALL(memcard_watch_start)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data"))
             CALL(evt_msg_select, 0, STRING("msg_mcard_yesno"))
             IF_INT_EQUAL(LW(0), 0)
-                CALL(unk_80256428, LW(0))
+                CALL(memcard_watch_chk, LW(0))
                 IF_INT_EQUAL(LW(0), 1)
                     CALL(evt_msg_print_add, 0, STRING("msg_out_mcard_warnning"))
                     CALL_CHILD(PTR(evt_memcard_nosave))
@@ -289,7 +289,7 @@ EVT_BEGIN(evt_memcard_check)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_damage"))
             CALL_CHILD(PTR(evt_memcard_nosave))
         END_SWITCH
-        CALL(unk_80256404, LW(0))
+        CALL(memcard_watch_end, LW(0))
         IF_INT_EQUAL(LF(10), 1)
             SET_VALUE(LF(10), 0)
             SET_VALUE(LW(10), 1)
@@ -339,7 +339,7 @@ EVT_BEGIN(evt_memcard_delete)
     CALL(evt_fade_entry, 26, 0, 0, 0, 0)
     CALL(evt_fade_end_wait)
     CALL(evt_msg_continue)
-    CALL(unk_800f2398)
+    CALL(evt_seq_load_keep_msg_window)
     SET_VALUE(GF(0), 1)
     RETURN
 EVT_END()
@@ -384,7 +384,7 @@ EVT_BEGIN(evt_memcard_copy)
     CALL(evt_fade_entry, 26, 0, 0, 0, 0)
     CALL(evt_fade_end_wait)
     CALL(evt_msg_continue)
-    CALL(unk_800f2398)
+    CALL(evt_seq_load_keep_msg_window)
     SET_VALUE(GF(0), 1)
     RETURN
 EVT_END()
@@ -442,7 +442,7 @@ EVT_BEGIN(evt_memcard_save)
         CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
         CASE_OR_EQUAL(-13)
         CASE_OR_EQUAL(-6)
-        CALL(unk_80256490)
+        CALL(memcard_watch_start)
         CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
         CALL(evt_msg_print_add, 0, STRING("msg_mcard_format"))
         CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
@@ -450,7 +450,7 @@ EVT_BEGIN(evt_memcard_save)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_format_alldelete"))
             CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
             IF_INT_EQUAL(LW(0), 0)
-                CALL(unk_80256428, LW(0))
+                CALL(memcard_watch_chk, LW(0))
                 IF_INT_EQUAL(LW(0), 1)
                     CALL(evt_msg_print_add, 0, STRING("msg_out_mcard_warnning"))
                     BREAK_SWITCH
@@ -467,7 +467,7 @@ EVT_BEGIN(evt_memcard_save)
                     CALL(evt_msg_select, 0, STRING("msg_mcard_yesno"))
                     IF_INT_EQUAL(LW(0), 0)
                         CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_warning"))
-                        CALL(unk_80256428, LW(0))
+                        CALL(memcard_watch_chk, LW(0))
                         IF_INT_EQUAL(LW(0), 1)
                             CALL(evt_msg_print_add, 0, STRING("msg_out_mcard_warnning"))
                             BREAK_SWITCH
@@ -501,12 +501,12 @@ EVT_BEGIN(evt_memcard_save)
         END_IF
         CASE_END
         CASE_EQUAL(-4)
-        CALL(unk_80256490)
+        CALL(memcard_watch_start)
         CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data"))
         CALL(evt_msg_select, 0, STRING("msg_mcard_yesno"))
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_warning"))
-            CALL(unk_80256428, LW(0))
+            CALL(memcard_watch_chk, LW(0))
             IF_INT_EQUAL(LW(0), 1)
                 CALL(evt_msg_print_add, 0, STRING("msg_out_mcard_warnning"))
                 BREAK_SWITCH
@@ -562,7 +562,7 @@ EVT_BEGIN(evt_memcard_save)
         CALL(evt_msg_print_add, 0, STRING("msg_mcard_damage"))
         CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
     END_SWITCH
-    CALL(unk_80256404)
+    CALL(memcard_watch_end)
     IF_INT_EQUAL(LF(11), 1)
         GOTO(4)
     END_IF

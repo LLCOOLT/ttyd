@@ -85,7 +85,7 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_random);
 USER_FUNC(pose_check_evt_run);
 USER_FUNC(pose_check_evt_stop);
-USER_FUNC(unk_las_0000d538);
+USER_FUNC(_hp_gauge_flag_on);
 USER_FUNC(battenSatelliteToOutside);
 USER_FUNC(battenSatelliteToInside);
 u8 battenSatelliteTo_Main(BattleUnit* unit, s32 n);
@@ -1391,7 +1391,7 @@ EVT_END()
 EVT_BEGIN(damage_sub_event)
     CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(unk_las_0000d538, LW(10))
+        CALL(_hp_gauge_flag_on, LW(10))
     END_IF
     CALL(btlevtcmd_GetDamage, LW(10), LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -2216,7 +2216,7 @@ void _light_point_callback(BattleUnitPart* part, s32 group) {
             break;
     }
 }
-USER_FUNC(unk_las_0000d538) {
+USER_FUNC(_hp_gauge_flag_on) {
     BattleWork* wp = _battleWorkPointer;
     s32* args = event->args;
     s32 id = evtGetValue(event, *args++);

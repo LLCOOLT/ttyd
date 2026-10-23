@@ -137,7 +137,7 @@ static USER_FUNC(proj_off);
 static USER_FUNC(proj_on);
 USER_FUNC(shake);
 USER_FUNC(shake_reset);
-USER_FUNC(unk_hei_000002a8);
+USER_FUNC(hei_00_mario_keyoff_check);
 USER_FUNC(cam_test2);
 void make_gonbaba_projection(CameraId camera, void* param);
 extern s32 bero_case_switch_off[];
@@ -798,7 +798,7 @@ USER_FUNC(dist_check) {
 }
 
 EVT_BEGIN(moji_msg)
-    CALL(unk_hei_000002a8, LW(0))
+    CALL(hei_00_mario_keyoff_check, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
     END_IF
@@ -998,7 +998,7 @@ static EVT_BEGIN(dokan_evt)
     RETURN
 EVT_END()
 
-USER_FUNC(unk_hei_000002a8) {
+USER_FUNC(hei_00_mario_keyoff_check) {
     s32* args = event->args;
 
     if (marioKeyOffChk() || marioCtrlOffChk()) {

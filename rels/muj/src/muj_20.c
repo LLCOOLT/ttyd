@@ -110,7 +110,7 @@ USER_FUNC(mist_func);
 USER_FUNC(muj_npc_buruburu);
 USER_FUNC(muj_npc_fuwafuwa);
 USER_FUNC(splash_eff);
-USER_FUNC(unk_muj_00004328);
+USER_FUNC(fune_curve_pos);
 USER_FUNC(urouro_func);
 USER_FUNC(urouro_fuwafuwa_func);
 static void draw(CameraId camera, void* param);
@@ -1678,7 +1678,7 @@ static USER_FUNC(fune_eff) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(unk_muj_00004328) {
+USER_FUNC(fune_curve_pos) {
     f32 x = evtGetFloat(event, GW(0));
     f32 y = evtGetFloat(event, GW(1));
     f32 z = evtGetFloat(event, GW(2));
@@ -1713,7 +1713,7 @@ EVT_BEGIN(anm_yure)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
             DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
-            CALL(unk_muj_00004328)
+            CALL(fune_curve_pos)
             CALL(evt_mapobj_trans, 1, STRING("S_fune_m"), LW(7), LW(8), LW(9))
             CALL(evt_mapobj_rotate, 1, STRING("S_fune_m"), 0, 180, LW(0))
             CALL(evt_snd_sfx_pos, GW(4), LW(7), LW(8), LW(9))
@@ -1727,7 +1727,7 @@ EVT_BEGIN(anm_yure)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
             DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
-            CALL(unk_muj_00004328)
+            CALL(fune_curve_pos)
             CALL(evt_mapobj_trans, 1, STRING("S_fune_m"), LW(7), LW(8), LW(9))
             CALL(evt_mapobj_rotate, 1, STRING("S_fune_m"), 0, 180, LW(0))
             CALL(evt_snd_sfx_pos, GW(4), LW(7), LW(8), LW(9))
@@ -1798,7 +1798,7 @@ static void pressStartGX(LogoWork* wp, s32 alpha, f32 x, f32 y) {
     GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 }
 
-extern void unk_80177008(u32 textureId, Vec translate, Vec scale, GXColor color);
+extern void winTexSetNearest(u32 textureId, Vec translate, Vec scale, GXColor color);
 static void draw(CameraId camera, void* param) {
     LogoWork* wp = param;
     CameraEntry saved;
@@ -1814,7 +1814,7 @@ static void draw(CameraId camera, void* param) {
     cam = camGetPtr(CAMERA_2D);
     *camGetCurPtr() = *cam;
     winTexInit(*(TEXPalette**)wp->tpl->data);
-    unk_80177008(5, (Vec){0.0f, 100.0f + wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
+    winTexSetNearest(5, (Vec){0.0f, 100.0f + wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
     *camGetCurPtr() = saved;
     GXSetViewport(viewport[0], viewport[1], viewport[2], viewport[3], viewport[4], viewport[5]);
     GXSetProjectionv(projection);

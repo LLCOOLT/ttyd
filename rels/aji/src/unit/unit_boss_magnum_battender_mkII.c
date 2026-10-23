@@ -105,7 +105,7 @@ USER_FUNC(aud_fire_no_hit);
 USER_FUNC(aud_fire_hit);
 void aud_fire_eff(f32 x, f32 y, f32 z);
 void aud_get_pod_pos(BattleUnit* unit, f32* x, f32* y, f32* z);
-USER_FUNC(unk_aji_00007668);
+USER_FUNC(aud_scream_fadeout);
 USER_FUNC(aud_suikomi);
 USER_FUNC(aud_jet_end);
 USER_FUNC(aud_jet);
@@ -669,7 +669,7 @@ USER_FUNC(aud_suikomi) {
     return done < 20 ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_aji_00007668) {
+USER_FUNC(aud_scream_fadeout) {
     if (isFirstCall) {
         unk_aji_bss00000168 = 120;
         unk_aji_bss00000165 = psndSFX_get_vol(screamId);
@@ -1260,7 +1260,7 @@ s32 aud_attack_event[] = {
     0, -30000000, 131096, -30000000, 0, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
     1, (s32)"MGN_A2_3", 32, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"MGN_A5_3",
     33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MBTN_INHALE1", -250000000, 0, -29999985,
-    131163, (s32)aud_suikomi, -2, 110, 65627, (s32)unk_aji_00007668, 112, 131163,
+    131163, (s32)aud_suikomi, -2, 110, 65627, (s32)aud_scream_fadeout, 112, 131163,
     (s32)evt_snd_sfxoff, -29999985, 262235, (s32)btlevtcmd_GetUnitWork, -2, 0, -30000000, 131096,
     -30000000, 0, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"MGN_A2_7", 32,
     262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"MGN_A5_7", 33, 65546, 300,

@@ -196,8 +196,8 @@ USER_FUNC(make_monitor);
 USER_FUNC(octo_start);
 USER_FUNC(octo_stop);
 USER_FUNC(onoff);
-USER_FUNC(unk_tou_000005d0);
-USER_FUNC(unk_tou_0000063c);
+USER_FUNC(tou_mario_keyoff_check);
+USER_FUNC(tou_mario_free_wait);
 static USER_FUNC(tou_champion_belt_onoff);
 USER_FUNC(tou_champion_belt_27_text_34);
 static f32 camGetRy(void);
@@ -211,7 +211,7 @@ static USER_FUNC(evt_tou_get_fighter_battle_msg);
 static USER_FUNC(evt_tou_get_fighter_name2);
 static void rankingControll(void);
 static void insert(s32* list, s32 num, s32 from, s32 to);
-USER_FUNC(unk_tou_00002e24);
+USER_FUNC(evt_rankingReset);
 static void rankingExit(void);
 static void rankingInit(void);
 void _unresolved(void);
@@ -400,7 +400,7 @@ static USER_FUNC(evt_rankingReInit) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_tou_00002e24) {
+USER_FUNC(evt_rankingReset) {
     s32 i;
 
     rankingExit();
@@ -1621,7 +1621,7 @@ static EVT_BEGIN(evt_gardman)
     IF_STR_EQUAL(LW(0), STRING("tou_07"))
         SET_VALUE(LF(2), 1)
     END_IF
-    CALL(unk_tou_0000063c)
+    CALL(tou_mario_free_wait)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_wait_landon)
     WAIT_FRAMES(1)
@@ -1846,7 +1846,7 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
 EVT_END()
 
 EVT_BEGIN(evt_tou_match_make_default)
-    CALL(unk_tou_000005d0, LW(0))
+    CALL(tou_mario_keyoff_check, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
     END_IF
@@ -2420,7 +2420,7 @@ USER_FUNC(chk) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_tou_0000063c) {
+USER_FUNC(tou_mario_free_wait) {
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {
@@ -2436,7 +2436,7 @@ USER_FUNC(unk_tou_0000063c) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(unk_tou_000005d0) {
+USER_FUNC(tou_mario_keyoff_check) {
     s32* args = event->args;
 
     if (marioKeyOffChk() || marioCtrlOffChk()) {

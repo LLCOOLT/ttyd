@@ -74,8 +74,8 @@ static USER_FUNC(setmertn);
 USER_FUNC(unitwin_getpartylank);
 USER_FUNC(unitwin_setmariolevel);
 USER_FUNC(unitwin_setpartylank);
-USER_FUNC(unk_800e23e0);
-USER_FUNC(unk_802399f8);
+USER_FUNC(evt_mario_set_dir_pos);
+USER_FUNC(evt_win_party_lankdown_chk);
 static USER_FUNC(wariai_enzan_1f);
 static USER_FUNC(enzan_set_f_i);
 static USER_FUNC(enzan_set_i_f);
@@ -324,7 +324,7 @@ __declspec(section ".data") s32 fd_tik_11_one_364[] = {
 EVT_BEGIN(unk_evt_tik_00021280)
     LOOP(0)
         CALL(evt_party_set_dir_pos, 0, -9, 0)
-        CALL(unk_800e23e0, -9, 0)
+        CALL(evt_mario_set_dir_pos, -9, 0)
         WAIT_FRAMES(1)
     END_LOOP
     RETURN
@@ -524,7 +524,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
         CALL(evt_msg_print_add, 0, STRING("powerdown_04"))
         RETURN
     END_IF
-    CALL(unk_802399f8, LW(0))
+    CALL(evt_win_party_lankdown_chk, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_print_add, 0, STRING("powerdown_07"))
         RETURN

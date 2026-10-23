@@ -28,7 +28,7 @@ static LectButton lbtn[2];
 static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) { camera->presetPos = camera->cameraPos; camera->presetAt = camera->cameraAt; PSVECAdd(&camera->cameraPos, &ofs, &camera->storedPos); PSVECAdd(&camera->cameraAt, &ofs, &camera->storedAt); camera->startTimeA = gp->renderTime; camera->durationA = 0; camera->stateA = 3; camera->curveA = 11; }
 void hitGrpFlagOn(const char* name, u32 flags);
 static Vec daiv;
-void unk_8009f9c8(void);
+void marioRollTryCancel(void);
 void motSlitCancel3(void);
 BOOL marioRollKeyDisable(void);
 
@@ -688,7 +688,7 @@ static USER_FUNC(evt_nomal_cange) {
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {
-        unk_8009f9c8();
+        marioRollTryCancel();
         if (mario->flags & 0x100000) {
             motSlitCancel3();
         }

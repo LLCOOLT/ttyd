@@ -34,7 +34,7 @@ extern s32 partyCtrlNo;
 EffectEntry* effMarioBalloonEntry(s32 type, NpcEntry* npc);
 static EffectEntry* eff;
 static Vec daiv;
-void unk_8009f9c8(void);
+void marioRollTryCancel(void);
 void motSlitCancel3(void);
 BOOL marioRollKeyDisable(void);
 
@@ -676,7 +676,7 @@ static USER_FUNC(evt_nomal_cange) {
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {
-        unk_8009f9c8();
+        marioRollTryCancel();
         if (mario->flags & 0x100000) {
             motSlitCancel3();
         }

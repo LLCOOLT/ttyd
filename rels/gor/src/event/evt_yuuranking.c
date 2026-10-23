@@ -32,7 +32,7 @@ USER_FUNC(evt_yuuranking_free_10_text_A3F8);
 USER_FUNC(evt_yuuranking_alloc_10_text_A47C);
 static s32 yuu_kesan(s32 type, s32 score, s32 bonus, s32 mul, s32 max);
 static void evt_yuuranking_disp_func(CameraId camera, void* param);
-void unk_gor_0000dfc4(f32 x, f32 y, f32 scale, const char* msg, s32 width);
+void gor_yuuranking_draw_msg_fit(f32 x, f32 y, f32 scale, const char* msg, s32 width);
 static s32 fontlenpitch(const char* str, s32 pitch);
 
 __declspec(section ".data") u64 fd_evt_yuuranking_negone_one_374;
@@ -70,7 +70,7 @@ static s32 fontlenpitch(const char* str, s32 pitch) {
     return FontGetMessageWidth(str);
 }
 
-void unk_gor_0000dfc4(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
+void gor_yuuranking_draw_msg_fit(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
     Mtx trans;
     Mtx scl;
     Mtx mtx;
@@ -185,7 +185,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                 FontDrawStart();
                 FontDrawScale(1.0f);
                 FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
-                unk_gor_0000dfc4(-150.4f + wp->x, 56.0f + wp->y, 1.0f, msgSearch("menu_subtitle1_minigame1"), 165);
+                gor_yuuranking_draw_msg_fit(-150.4f + wp->x, 56.0f + wp->y, 1.0f, msgSearch("menu_subtitle1_minigame1"), 165);
                 if (wp->dispScore >= 0) {
                     sprintf(buf, "%3d%s%02d", wp->dispScore / 1000, msgSearch("menu_decimal_point"), (wp->dispScore % 1000) / 10);
                     FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 56.0f + wp->y, 18.0f, buf);
@@ -193,7 +193,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                         FontDrawStart();
                         FontDrawScale(1.0f);
                         FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
-                        unk_gor_0000dfc4(-150.4f + wp->x, 32.0f + wp->y, 1.0f, msgSearch("menu_subtitle4_getmonte"), 165);
+                        gor_yuuranking_draw_msg_fit(-150.4f + wp->x, 32.0f + wp->y, 1.0f, msgSearch("menu_subtitle4_getmonte"), 165);
                         sprintf(buf, "%4d", wp->bonus);
                         FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 32.0f + wp->y, 18.0f, buf);
                     }
@@ -202,7 +202,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                         FontDrawScale(1.0f);
                         FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
                         if (wp->mul > 1) {
-                            unk_gor_0000dfc4(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle2_minigame1"), 165);
+                            gor_yuuranking_draw_msg_fit(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle2_minigame1"), 165);
                             if (wp->mul < 0x100) {
                                 sprintf(buf, msgSearch("menu_subtitle4_minigame1"), wp->mul);
                             } else {
@@ -210,7 +210,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                             }
                             FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 8.0f + wp->y, 18.0f, buf);
                         } else if (wp->mul < 0) {
-                            unk_gor_0000dfc4(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle5_minigame1"), 165);
+                            gor_yuuranking_draw_msg_fit(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle5_minigame1"), 165);
                             sprintf(buf, msgSearch("menu_subtitle6_minigame1"), -wp->mul);
                             FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 8.0f + wp->y, 18.0f, buf);
                         }
@@ -233,7 +233,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                         str = msgSearch("menu_subtitle1_minigame3");
                         break;
                 }
-                unk_gor_0000dfc4(-150.4f + wp->x, 56.0f + wp->y, 1.0f, str, 165);
+                gor_yuuranking_draw_msg_fit(-150.4f + wp->x, 56.0f + wp->y, 1.0f, str, 165);
                 FontDrawScale(1.0f);
                 score = wp->dispScore;
                 if (score >= 0) {
@@ -253,7 +253,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                                 str = msgSearch("menu_subtitle4_getmonte");
                                 break;
                         }
-                        unk_gor_0000dfc4(-150.4f + wp->x, 32.0f + wp->y, 1.0f, str, 165);
+                        gor_yuuranking_draw_msg_fit(-150.4f + wp->x, 32.0f + wp->y, 1.0f, str, 165);
                         FontDrawScale(1.0f);
                         sprintf(buf, "%4d", wp->bonus);
                         FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 32.0f + wp->y, 18.0f, buf);
@@ -270,7 +270,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                                     str = msgSearch("menu_subtitle2_minigame3");
                                     break;
                             }
-                            unk_gor_0000dfc4(-150.4f + wp->x, 8.0f + wp->y, 1.0f, str, 165);
+                            gor_yuuranking_draw_msg_fit(-150.4f + wp->x, 8.0f + wp->y, 1.0f, str, 165);
                             FontDrawScale(1.0f);
                             if (wp->mul < 0x100) {
                                 sprintf(buf, msgSearch("menu_subtitle4_minigame1"), wp->mul);
@@ -279,7 +279,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                             }
                             FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 8.0f + wp->y, 18.0f, buf);
                         } else if (wp->mul < 0) {
-                            unk_gor_0000dfc4(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle5_minigame1"), 165);
+                            gor_yuuranking_draw_msg_fit(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle5_minigame1"), 165);
                             FontDrawScale(1.0f);
                             sprintf(buf, msgSearch("menu_subtitle6_minigame1"), -wp->mul);
                             FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 8.0f + wp->y, 18.0f, buf);
@@ -299,7 +299,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                 FontDrawStart();
                 FontDrawScale(1.0f);
                 FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
-                unk_gor_0000dfc4(-150.4f + wp->x, 56.0f + wp->y, 1.0f, msgSearch("menu_subtitle1_minigame4"), 165);
+                gor_yuuranking_draw_msg_fit(-150.4f + wp->x, 56.0f + wp->y, 1.0f, msgSearch("menu_subtitle1_minigame4"), 165);
                 if (wp->dispScore < wp->max) {
                     sprintf(buf, "%4d", wp->dispScore + 1);
                     FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 56.0f + wp->y, 18.0f, buf);
@@ -308,7 +308,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                         FontDrawScale(1.0f);
                         FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
                         if (wp->mul > 1) {
-                            unk_gor_0000dfc4(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle2_minigame4"), 165);
+                            gor_yuuranking_draw_msg_fit(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle2_minigame4"), 165);
                             if (wp->mul < 0x100) {
                                 sprintf(buf, msgSearch("menu_subtitle4_minigame1"), wp->mul);
                             } else {
@@ -316,7 +316,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                             }
                             FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 8.0f + wp->y, 18.0f, buf);
                         } else if (wp->mul < 0) {
-                            unk_gor_0000dfc4(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle5_minigame1"), 165);
+                            gor_yuuranking_draw_msg_fit(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle5_minigame1"), 165);
                             sprintf(buf, msgSearch("menu_subtitle6_minigame1"), -wp->mul);
                             FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 8.0f + wp->y, 18.0f, buf);
                         }
@@ -331,7 +331,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
         FontDrawStart();
         FontDrawScale(1.0f);
         FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
-        unk_gor_0000dfc4(-150.4f + wp->x, -40.0f + wp->y, 1.0f, msgSearch("menu_subtitle3_totalmonte"), 165);
+        gor_yuuranking_draw_msg_fit(-150.4f + wp->x, -40.0f + wp->y, 1.0f, msgSearch("menu_subtitle3_totalmonte"), 165);
         ix = 70.0f + (10.399994f + wp->x);
         iy = (-40.0f + wp->y) - 24.0f;
         PSMTXTrans(mtx, ix - 10, iy + 2, 0.0f);

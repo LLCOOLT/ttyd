@@ -188,7 +188,7 @@ static inline void jabaraLand(f32 y_, void* h_) {
 	allPartyRideOff(); \
 	JAB_TAIL(MOTSUB_)
 
-void unk_80130374(void);
+void mario_land_kemuri(void);
 void mot_slit_post(void);
 void L_allPartyRideOn(void);
 f32 marioChkOverheadJabara(s32* a, s32* b);
@@ -357,7 +357,7 @@ void mot_jabara(void) {
 			M(0x88, f32) = -0.015f;
 		}
 		if (M(0x42, s8) == 3) {
-			unk_80130374();
+			mario_land_kemuri();
 		}
 		M(0x1e8, s32) = M(0x1e4, s32);
 		M(0x1e4, s32) = 0;

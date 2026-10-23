@@ -18,7 +18,7 @@ extern USER_FUNC(evt_msg_print);
 extern USER_FUNC(evt_msg_select);
 extern USER_FUNC(evt_msg_continue);
 
-USER_FUNC(unk_802243a4);
+USER_FUNC(yuuminigame_get_window_evt);
 USER_FUNC(yuuminigame_end);
 USER_FUNC(yuuminigame_window_end);
 
@@ -49,7 +49,7 @@ s32 window_open[] = {
 	0x0004005B, (s32)evt_mario_set_pos, 0xFE363C81, 0xFE363C82, 0xFE363C83,
 	0x00000006,
 	0x00000070,
-	0x0002005B, (s32)unk_802243a4, 0xFE363C80,
+	0x0002005B, (s32)yuuminigame_get_window_evt, 0xFE363C80,
 	0x0001005E, 0xFE363C80,
 	0x0005005B, (s32)evt_msg_print, 0x00000000, (s32)"sysyuu_all_01", 0x00000000, 0x00000000,
 	0x0003005B, (s32)evt_msg_select, 0x00000000, (s32)"sysyuu_all_02",
@@ -305,12 +305,12 @@ USER_FUNC(yuuminigame_end) {
 	return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_802243a4) {
+USER_FUNC(yuuminigame_get_window_evt) {
 	evtSetValue(event, event->args[0], unk_80418b54);
 	return EVT_RETURN_DONE;
 }
 
-void unk_8022439c(s32 value) {
+void evtYuuSetWindowEvt(s32 value) {
 	unk_80418b54 = value;
 }
 

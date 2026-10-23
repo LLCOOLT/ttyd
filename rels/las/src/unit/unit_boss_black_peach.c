@@ -168,7 +168,7 @@ USER_FUNC(queen_kankyaku_delete_evt);
 USER_FUNC(queen_thunder);
 USER_FUNC(shadow_queen_connect);
 USER_FUNC(slot_init);
-USER_FUNC(unk_las_0000af38);
+USER_FUNC(queen_break_slot_flag2_on);
 USER_FUNC(queen_hand_small_drag_4_evt);
 USER_FUNC(peach_shock_evt);
 USER_FUNC(change_pose);
@@ -1089,7 +1089,7 @@ EVT_BEGIN(peach_entry_event)
     WAIT_MS(300)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(unk_las_0000af38)
+    CALL(queen_break_slot_flag2_on)
     RETURN
 EVT_END()
 
@@ -4286,7 +4286,7 @@ USER_FUNC(eff_queen_set_alpha_evt) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_las_0000af38) {
+USER_FUNC(queen_break_slot_flag2_on) {
     *BattleBreakSlotGetPtr() |= 2;
     return EVT_RETURN_DONE;
 }

@@ -59,7 +59,7 @@ USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(_check_through_pos);
-USER_FUNC(unk_8010ee30);
+USER_FUNC(_set_hp_gauge_fade_flag);
 USER_FUNC(_add_star_point_disp_offset);
 USER_FUNC(_check_at_dm_event_wait);
 USER_FUNC(_disable_restore_command_cursor);
@@ -389,7 +389,7 @@ s32 subsetevt_damage[] = {
     -29999989, -29999986, 65546, 1000, 131097, -29999985, -1, 262235,
     (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, -29999985, 65545, 30, 33, 33,
     33, 2, 32, 262235, (s32)btlevtcmd_CheckDamageCode, -29999990, 256, -30000000,
-    131097, -30000000, 0, 131163, (s32)unk_8010ee30, -29999990, 33, 196699,
+    131097, -30000000, 0, 131163, (s32)_set_hp_gauge_fade_flag, -29999990, 33, 196699,
     (s32)btlevtcmd_GetDamageCode, -29999990, -30000000, 65570, -30000000, 65572, 23, 262235,
     (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, -29999986, 65546, 1000, 131097, -29999985,
     -1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, -29999985, 65545, 30,
@@ -983,7 +983,7 @@ USER_FUNC(_add_star_point_disp_offset) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_8010ee30) {
+USER_FUNC(_set_hp_gauge_fade_flag) {
     BattleWork* wp = _battleWorkPointer;
     s32 id;
     BattleUnit* unit;

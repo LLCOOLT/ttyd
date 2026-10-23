@@ -48,8 +48,8 @@ USER_FUNC(evt_msg_print);
 USER_FUNC(evt_msg_print_battle_party);
 USER_FUNC(evt_snd_sfxon);
 USER_FUNC(init_ceil);
-USER_FUNC(unk_tou2_00002770);
-USER_FUNC(unk_tou2_000027b8);
+USER_FUNC(eff_fall_hit_wait);
+USER_FUNC(eff_fall_entry);
 static USER_FUNC(down_ceil);
 USER_FUNC(ceil_exist);
 extern s32 btldefaultevt_Confuse[];
@@ -1018,7 +1018,7 @@ USER_FUNC(check_ceil) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_tou2_000027b8) {
+USER_FUNC(eff_fall_entry) {
     s32* args = event->args;
     s32 var = args[0];
     s32 type = evtGetValue(event, args[1]);
@@ -1036,7 +1036,7 @@ USER_FUNC(unk_tou2_000027b8) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_tou2_00002770) {
+USER_FUNC(eff_fall_hit_wait) {
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, event->args[0]);
 
     if (eff != NULL && !effFallCheckHit(eff)) {
@@ -1069,18 +1069,18 @@ s32 roof_shake_attack_event[] = {
     -30000000, -29999999, -29999998, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996,
     -29999991, 0, -29999995, 131097, -29999995, 1, 131122, -29999992,
     0, 33, 196699, (s32)evt_sub_random, 2, -29999994, 65570, -29999994,
-    65572, 0, 720987, (s32)unk_tou2_000027b8, -29999986, 4, -30000000, -29999999,
+    65572, 0, 720987, (s32)eff_fall_entry, -29999986, 4, -30000000, -29999999,
     -29999998, 20, -29999992, 0, 1, 60, 65572, 1,
-    720987, (s32)unk_tou2_000027b8, -29999986, 5, -30000000, -29999999, -29999998, 20,
-    -29999992, 0, 1, 60, 65572, 2, 720987, (s32)unk_tou2_000027b8,
+    720987, (s32)eff_fall_entry, -29999986, 5, -30000000, -29999999, -29999998, 20,
+    -29999992, 0, 1, 60, 65572, 2, 720987, (s32)eff_fall_entry,
     -29999986, 8, -30000000, -29999999, -29999998, 20, -29999992, 0,
     1, 60, 49, 65644, -29999985, 65570, -29999995, 65572,
-    1, 131163, (s32)unk_tou2_00002770, -29999986, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999991,
+    1, 131163, (s32)eff_fall_hit_wait, -29999986, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999991,
     458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991, 0, -29999995,
-    65572, 3, 131163, (s32)unk_tou2_00002770, -29999986, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
+    65572, 3, 131163, (s32)eff_fall_hit_wait, -29999986, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
     38, 65572, 6, 65545, 10, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    39, 65572, 2, 131163, (s32)unk_tou2_00002770, -29999986, 196699, (s32)btlevtcmd_StartAvoid,
-    -29999997, 40, 42, 131163, (s32)unk_tou2_00002770, -29999986, 49, 109,
+    39, 65572, 2, 131163, (s32)eff_fall_hit_wait, -29999986, 196699, (s32)btlevtcmd_StartAvoid,
+    -29999997, 40, 42, 131163, (s32)eff_fall_hit_wait, -29999986, 49, 109,
     131122, -30000000, 0, 131125, -30000000, -29999987, 327771, (s32)btlevtcmd_SetPartsWork,
     -2, 1, -30000000, -29999985, 65545, 4, 65539, 90,
     131125, -29999987, 1, 6, 65545, 10, 65539, 92,

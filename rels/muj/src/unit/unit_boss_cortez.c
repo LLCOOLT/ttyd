@@ -72,7 +72,7 @@ static USER_FUNC(_check_zenei_kouei);
 USER_FUNC(_cortez_recovery_audience);
 USER_FUNC(_cortez_drain_energy);
 USER_FUNC(_cortez_collect_energy);
-USER_FUNC(unk_muj_0000652c);
+USER_FUNC(_cortez_get_sfx_vol);
 extern s32 btldefaultevt_Confuse[];
 extern s32 btldefaultevt_Damage[];
 extern s32 btlevtcmd_AnimeChangeGroup[];
@@ -1131,7 +1131,7 @@ static s32 attack_audience_event[] = {
     (s32)evt_msg_print, 2, (s32)"stg5_dou_24_bt02", 0, -2, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
     1, (s32)"KRT_A2_1", 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -2, 1, 393307, (s32)btlevtcmd_snd_se,
     -2, (s32)"SFX_BOSS_KOR_INHALE2", -250000000, 0, -250000000, 110, 196699, (s32)evt_snd_sfxon,
-    (s32)"SFX_AUDIENCE_PANIC_SCREAM1", -29999985, 65545, 120, 196699, (s32)unk_muj_0000652c, -29999985, -29999986,
+    (s32)"SFX_AUDIENCE_PANIC_SCREAM1", -29999985, 65545, 120, 196699, (s32)_cortez_get_sfx_vol, -29999985, -29999986,
     131122, -29999987, 120, 65541, 120, 65545, 1, 131099,
     -29999987, 0, 131126, -29999987, 1, 33, 131122, -30000000,
     -29999986, 131127, -30000000, -29999987, 131128, -30000000, 120, 196699,
@@ -1856,7 +1856,7 @@ USER_FUNC(_cortez_check_drain_audience) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_muj_0000652c) {
+USER_FUNC(_cortez_get_sfx_vol) {
     s32* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 out = args[1];

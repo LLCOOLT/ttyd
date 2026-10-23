@@ -296,7 +296,7 @@ void marioRollFixOn(void) {
     }
 }
 
-s32 unk_8009fcbc(void) {
+s32 marioRollCancelDisable(void) {
     MarioWork* mario = marioGetPtr();
     if (MI(0x2a4) & 0x200) {
         return 1;
@@ -372,7 +372,7 @@ void marioForceRollAnime(void) {
     mario->dispFlags |= 0x100;
 }
 
-s32 unk_8009f9c8(void) {
+s32 marioRollTryCancel(void) {
     s32 ret = 0;
     MarioWork* mario = marioGetPtr();
     if (!(mario->flags & 0x1000000)) {
@@ -1289,12 +1289,12 @@ void marioSetRollDispDir(void);
 void marioRollForceCancel(void);
 void mot_roll_post(void);
 s32 marioRollCancel(void);
-s32 unk_8009f9c8(void);
+s32 marioRollTryCancel(void);
 void marioForceRollAnime(void);
 void marioResetRollSpd(void);
 s32 getRollEvtFlag(void);
 void clrRollEvtFlag(void);
 void setRollEvtFlag(void);
 s32 marioRollKeyDisable(void);
-s32 unk_8009fcbc(void);
+s32 marioRollCancelDisable(void);
 void marioRollFixOn(void);

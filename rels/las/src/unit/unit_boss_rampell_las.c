@@ -88,7 +88,7 @@ USER_FUNC(evt_msg_print);
 USER_FUNC(evt_snd_sfxoff);
 USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_sub_random);
-USER_FUNC(unk_las_0000855c);
+USER_FUNC(mario_shadow_guard_check);
 USER_FUNC(yoshi_original_color_anim_set);
 static USER_FUNC(_krb_get_dir);
 static USER_FUNC(vivian_comeback);
@@ -705,7 +705,7 @@ static EVT_BEGIN(phase_event)
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_GetUnitWork, -2, 13, LW(0))
             IF_INT_NOT_EQUAL(LW(0), 0)
-                CALL(unk_las_0000855c, LW(0))
+                CALL(mario_shadow_guard_check, LW(0))
                 IF_INT_EQUAL(LW(0), 0)
                     CALL(btlevtcmd_GetUnitWork, -2, 12, LW(0))
                     IF_INT_EQUAL(LW(0), 0)
@@ -2459,7 +2459,7 @@ static USER_FUNC(eff_scanning) {
 }
 BOOL BtlUnit_CheckShadowGuard(BattleUnit* unit);
 
-USER_FUNC(unk_las_0000855c) {
+USER_FUNC(mario_shadow_guard_check) {
     s32* args = event->args;
 
     if (BtlUnit_CheckShadowGuard(BattleGetMarioPtr(_battleWorkPointer)) == 1) {

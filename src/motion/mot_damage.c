@@ -21,7 +21,7 @@ f32 marioGetFallSpd(void);
 void marioClearSlitFloor(void);
 void marioSlitForceCancel(void);
 void marioYoshiForceCancel(void);
-void unk_800cd9a0(void);
+void nokonoko_use_cancel(void);
 void bomhei_use_cancel2(void);
 void mario_simple_kemuri(void);
 void marioSetFallPara(void);
@@ -359,7 +359,7 @@ void mot_damageToge(void) {
         marioAdjustMoveDir();
         marioSlitForceCancel();
         marioYoshiForceCancel();
-        unk_800cd9a0();
+        nokonoko_use_cancel();
         marioNoUpdateCamPos();
         bomhei_use_cancel2();
         mario->currSubMotionId = 0;

@@ -94,30 +94,30 @@ USER_FUNC(evt_snd_bgmoff_f);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(unk_end_000000c4);
-USER_FUNC(unk_end_0000012c);
-USER_FUNC(unk_end_00000938);
-USER_FUNC(unk_end_000009cc);
-USER_FUNC(unk_end_00000a6c);
-USER_FUNC(unk_end_00000bc8);
-USER_FUNC(unk_end_000011f0);
-USER_FUNC(unk_end_0000122c);
-USER_FUNC(unk_end_00001268);
-USER_FUNC(unk_end_000012a4);
-USER_FUNC(unk_end_000012e0);
-USER_FUNC(unk_end_00001d90);
-USER_FUNC(unk_end_000022e8);
-void unk_end_0000035c(void);
-void unk_end_0000039c(CameraId cameraId, void* param);
-void unk_end_00000440(void);
-void unk_end_000006f8(void);
-f32 unk_end_000008bc(f32 min, f32 max);
-USER_FUNC(unk_end_000009a4);
-void unk_end_00000a14(void);
-void unk_end_00001324(CameraId cameraId, void* param);
-void unk_end_000023ac(CameraId cameraId, void* param);
-void unk_end_00002494(s32 wXluStage);
-void unk_end_00002508(MapTevCallbackInfo* info);
+USER_FUNC(evt_end_moamoa_exit);
+USER_FUNC(evt_end_moamoa_init);
+USER_FUNC(evt_end_npc_silhouette_on);
+USER_FUNC(evt_end_font_restore);
+USER_FUNC(evt_end_staff_roll_init);
+USER_FUNC(evt_end_staff_roll_msg_main);
+USER_FUNC(evt_end_image_set_blend);
+USER_FUNC(evt_end_image_set_mode);
+USER_FUNC(evt_end_image_set_overlay_alpha);
+USER_FUNC(evt_end_image_set_alpha);
+USER_FUNC(evt_end_image_disp_entry);
+USER_FUNC(evt_end_credit_npc_main);
+USER_FUNC(evt_end_credit_npc_get_wait_type);
+void end_ext_moamoa_dispent(void);
+void end_ext_disp(CameraId cameraId, void* param);
+void end_ext_moamoa_main(void);
+void end_ext_moamoa_init(void);
+f32 end_randf(f32 min, f32 max);
+USER_FUNC(end_bgm_wait_stop);
+void end_staff_roll_exit(void);
+void end_image_disp(CameraId cameraId, void* param);
+void end_credit_npc_disp(CameraId cameraId, void* param);
+void end_silhouette_rendermode(s32 wXluStage);
+void end_silhouette_tev(MapTevCallbackInfo* info);
 void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
@@ -170,17 +170,17 @@ void _epilog(void) {
     for (dtor = _dtors; *dtor != NULL; dtor++) {
         (*dtor)();
     }
-    unk_end_00000a14();
+    end_staff_roll_exit();
 }
 
 void _unresolved(void) {
 }
 
-void unk_end_00002508(MapTevCallbackInfo* info) {
+void end_silhouette_tev(MapTevCallbackInfo* info) {
     GXSetTevColorIn(info->tevStage - 1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ONE);
 }
 
-void unk_end_00002494(s32 wXluStage) {
+void end_silhouette_rendermode(s32 wXluStage) {
     animGetPtr()->currDispMode = wXluStage;
     GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
     GXSetZCompLoc(GX_FALSE);
@@ -188,13 +188,13 @@ void unk_end_00002494(s32 wXluStage) {
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 }
 
-void unk_end_000023ac(CameraId cameraId, void* param) {
+void end_credit_npc_disp(CameraId cameraId, void* param) {
     CreditActor* actor = param;
 
     if (evtGetValue(NULL, GF(10)) == 0) {
-        mapSetTevCallback(1, unk_end_00002508);
+        mapSetTevCallback(1, end_silhouette_tev);
         animPoseSetMaterialFlagOn(actor->poseId, 0x1000000);
-        animPoseSetGXFunc(actor->poseId, unk_end_00002494, 0);
+        animPoseSetGXFunc(actor->poseId, end_silhouette_rendermode, 0);
         animPoseDrawMtx(actor->poseId, actor->mtx, 1, 0.0f, 2.0f);
         animPoseDrawMtx(actor->poseId, actor->mtx, 2, 0.0f, 2.0f);
         animPoseDrawMtx(actor->poseId, actor->mtx, 3, 0.0f, 2.0f);
@@ -202,7 +202,7 @@ void unk_end_000023ac(CameraId cameraId, void* param) {
     }
 }
 
-USER_FUNC(unk_end_000022e8) {
+USER_FUNC(evt_end_credit_npc_get_wait_type) {
     s32* args = event->args;
     u32 id = evtGetValue(event, args[0]);
 
@@ -342,7 +342,7 @@ CreditNpc R_credits_npc_info[] = {
     "GAZ_A_1", 0, "a_mario", "M_W_1", 0, "c_peach", "P_W_1", 0,
 };
 
-USER_FUNC(unk_end_00001d90) {
+USER_FUNC(evt_end_credit_npc_main) {
     s32 id = evtGetValue(event, event->args[0]);
     BOOL inBattle;
     CreditActor* actor;
@@ -458,16 +458,16 @@ USER_FUNC(unk_end_00001d90) {
         animPoseSetAnim(actor->poseId, "GAZ_A_1", 1);
     }
     animPoseMain(actor->poseId);
-    dispEntry(CAMERA_3D, 0.0f, 1, unk_end_000023ac, actor);
+    dispEntry(CAMERA_3D, 0.0f, 1, end_credit_npc_disp, actor);
     return 0;
 }
 
 EVT_BEGIN(unk_evt_end_00004044)
     SET_VALUE(LW(0), 0)
     LOOP(0)
-        CALL(unk_end_000022e8, LW(0), LW(1))
+        CALL(evt_end_credit_npc_get_wait_type, LW(0), LW(1))
         BEGIN_INLINE_EVENT
-            CALL(unk_end_00001d90, LW(0))
+            CALL(evt_end_credit_npc_main, LW(0))
         END_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 1)
             WAIT_MS(1920)
@@ -489,50 +489,50 @@ EVT_END()
 
 EVT_BEGIN(unk_end_0000410c)
     LOOP(0)
-        CALL(unk_end_0000122c, 1)
-        CALL(unk_end_000011f0, 0)
+        CALL(evt_end_image_set_mode, 1)
+        CALL(evt_end_image_set_blend, 0)
         WAIT_MS(18000)
         CALL(evt_sub_intpl_msec_init, 11, 0, 255, 4000)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL(unk_end_000011f0, LW(0))
+            CALL(evt_end_image_set_blend, LW(0))
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
         END_LOOP
-        CALL(unk_end_000011f0, 255)
+        CALL(evt_end_image_set_blend, 255)
         WAIT_MS(4000)
-        CALL(unk_end_0000122c, 2)
-        CALL(unk_end_000011f0, 0)
+        CALL(evt_end_image_set_mode, 2)
+        CALL(evt_end_image_set_blend, 0)
         WAIT_MS(4000)
         CALL(evt_sub_intpl_msec_init, 11, 0, 255, 4000)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL(unk_end_000011f0, LW(0))
+            CALL(evt_end_image_set_blend, LW(0))
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
         END_LOOP
-        CALL(unk_end_000011f0, 255)
+        CALL(evt_end_image_set_blend, 255)
         WAIT_MS(18000)
         CALL(evt_sub_intpl_msec_init, 11, 255, 0, 4000)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL(unk_end_000011f0, LW(0))
+            CALL(evt_end_image_set_blend, LW(0))
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
         END_LOOP
-        CALL(unk_end_000011f0, 0)
+        CALL(evt_end_image_set_blend, 0)
         WAIT_MS(4000)
-        CALL(unk_end_0000122c, 1)
+        CALL(evt_end_image_set_mode, 1)
         CALL(evt_sub_intpl_msec_init, 11, 255, 0, 4000)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL(unk_end_000011f0, LW(0))
+            CALL(evt_end_image_set_blend, LW(0))
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
@@ -542,7 +542,7 @@ EVT_BEGIN(unk_end_0000410c)
     RETURN
 EVT_END()
 
-void unk_end_00001324(CameraId cameraId, void* param) {
+void end_image_disp(CameraId cameraId, void* param) {
     s32 i;
     f32 w;
     f32 h;
@@ -713,12 +713,12 @@ EVT_BEGIN(unk_evt_end_000042e0)
             WAIT_FRAMES(1)
         END_LOOP
         BEGIN_INLINE_EVENT_GET_ID(LW(9))
-            CALL(unk_end_000012e0)
+            CALL(evt_end_image_disp_entry)
         END_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 11, 0, 255, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL(unk_end_000012a4, LW(0))
+            CALL(evt_end_image_set_alpha, LW(0))
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
@@ -735,7 +735,7 @@ EVT_BEGIN(unk_evt_end_000042e0)
             CALL(evt_sub_intpl_msec_init, 11, 0, 255, 500)
             LOOP(0)
                 CALL(evt_sub_intpl_msec_get_value)
-                CALL(unk_end_00001268, LW(0))
+                CALL(evt_end_image_set_overlay_alpha, LW(0))
                 WAIT_FRAMES(1)
                 IF_INT_EQUAL(LW(1), 0)
                     BREAK_LOOP
@@ -763,9 +763,9 @@ EVT_BEGIN(unk_evt_end_000042e0)
             DELETE_EVENT(LW(10))
             CALL(evt_fade_entry, 10, 500, 0, 0, 0)
             CALL(evt_fade_end_wait)
-            CALL(unk_end_0000122c, 0)
-            CALL(unk_end_000012a4, LW(0))
-            CALL(unk_end_00001268, LW(0))
+            CALL(evt_end_image_set_mode, 0)
+            CALL(evt_end_image_set_alpha, LW(0))
+            CALL(evt_end_image_set_overlay_alpha, LW(0))
             CALL(evt_fade_entry, 9, 0, 0, 0, 0)
             CALL(evt_fade_end_wait)
             SET_VALUE(GW(10), 0)
@@ -775,7 +775,7 @@ EVT_BEGIN(unk_evt_end_000042e0)
         CALL(evt_sub_intpl_msec_init, 11, 255, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL(unk_end_000012a4, LW(0))
+            CALL(evt_end_image_set_alpha, LW(0))
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
@@ -792,7 +792,7 @@ EVT_BEGIN(unk_evt_end_000045cc)
     CALL(evt_fade_end_wait)
     WAIT_MS(1500)
     SET_VALUE(GF(10), 1)
-    CALL(unk_end_000009cc)
+    CALL(evt_end_font_restore)
     SET_VALUE(GSW(0), 404)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 21)
@@ -814,10 +814,10 @@ EVT_BEGIN(unk_evt_end_00004690)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("pPlane1"), 1)
     CALL(evt_bg_set_color, 0, 0, 0, 255)
     SET_VALUE(GF(10), 0)
-    CALL(unk_end_00000a6c)
+    CALL(evt_end_staff_roll_init)
     SPAWN_EVENT(PTR(unk_evt_end_00004044))
     BEGIN_INLINE_EVENT
-        CALL(unk_end_00000bc8)
+        CALL(evt_end_staff_roll_msg_main)
     END_INLINE_EVENT
     CALL(evt_snd_bgmon, 512, STRING("BGM_STAFF_ROLL1"))
     SET_VALUE(GSW(0), 404)
@@ -828,7 +828,7 @@ EVT_BEGIN(unk_evt_end_0000478c)
     CALL(evt_npc_entry, STRING("gesso"), STRING("c_gesso"))
     CALL(evt_npc_set_anim, STRING("gesso"), STRING("GSO_S2_1"))
     CALL(evt_npc_flag_onoff, 1, STRING("gesso"), 64)
-    CALL(unk_end_00000938, STRING("gesso"))
+    CALL(evt_end_npc_silhouette_on, STRING("gesso"))
     CALL(evt_sub_intpl_msec_init, 11, -4000, 4000, 5000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -847,7 +847,7 @@ EVT_BEGIN(unk_evt_end_0000484c)
     CALL(evt_npc_entry, STRING("gonbaba"), STRING("c_gonbaba"))
     CALL(evt_npc_set_anim, STRING("gonbaba"), STRING("GNB_S_3"))
     CALL(evt_npc_flag_onoff, 1, STRING("gonbaba"), 64)
-    CALL(unk_end_00000938, STRING("gonbaba"))
+    CALL(evt_end_npc_silhouette_on, STRING("gonbaba"))
     CALL(evt_npc_set_scale, STRING("gonbaba"), FLOAT(0.5f), FLOAT(0.5f), FLOAT(0.5f))
     CALL(evt_npc_set_rotate, STRING("gonbaba"), 0, 180, 0)
     CALL(evt_sub_intpl_msec_init, 11, -10000, -1300, 2000)
@@ -879,7 +879,7 @@ EVT_BEGIN(unk_evt_end_000049b0)
     CALL(evt_npc_entry, STRING("batten2"), STRING("c_mb_robo_2a"))
     CALL(evt_npc_set_anim, STRING("batten2"), STRING("J_2"))
     CALL(evt_npc_flag_onoff, 1, STRING("batten2"), 64)
-    CALL(unk_end_00000938, STRING("batten2"))
+    CALL(evt_end_npc_silhouette_on, STRING("batten2"))
     CALL(evt_npc_set_rotate, STRING("batten2"), 180, 0, 0)
     CALL(evt_sub_intpl_msec_init, 11, 4000, -4000, 4000)
     LOOP(0)
@@ -899,7 +899,7 @@ EVT_BEGIN(unk_evt_end_00004a88)
     CALL(evt_npc_entry, STRING("atomic"), STRING("c_atmic_trs"))
     CALL(evt_npc_set_anim, STRING("atomic"), STRING("W_1"))
     CALL(evt_npc_flag_onoff, 1, STRING("atomic"), 32832)
-    CALL(unk_end_00000938, STRING("atomic"))
+    CALL(evt_end_npc_silhouette_on, STRING("atomic"))
     CALL(evt_npc_set_rotate, STRING("atomic"), 0, 180, 0)
     CALL(evt_npc_set_scale, STRING("atomic"), FLOAT(0.7998047f), FLOAT(0.7998047f), FLOAT(0.7998047f))
     CALL(evt_sub_intpl_msec_init, 11, -5000, 5000, 6000)
@@ -921,7 +921,7 @@ EVT_BEGIN(unk_evt_end_00004b78)
     CALL(evt_npc_set_anim, STRING("korutesu"), STRING("KRT_S_1"))
     CALL(evt_npc_flag_onoff, 1, STRING("korutesu"), 32832)
     CALL(evt_npc_set_ry, STRING("korutesu"), 90)
-    CALL(unk_end_00000938, STRING("korutesu"))
+    CALL(evt_end_npc_silhouette_on, STRING("korutesu"))
     CALL(evt_sub_intpl_msec_init, 11, -10000, -2000, 2000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -952,7 +952,7 @@ EVT_BEGIN(unk_evt_end_00004cbc)
     CALL(evt_npc_entry, STRING("para"), STRING("c_bom_sen"))
     CALL(evt_npc_set_anim, STRING("para"), STRING("S_2"))
     CALL(evt_npc_flag_onoff, 1, STRING("para"), 32832)
-    CALL(unk_end_00000938, STRING("para"))
+    CALL(evt_end_npc_silhouette_on, STRING("para"))
     CALL(evt_sub_intpl_msec_init, 11, 3000, -3000, 6000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -971,7 +971,7 @@ EVT_BEGIN(unk_evt_end_00004d84)
     CALL(evt_npc_entry, STRING("batten"), STRING("c_mb_robo_1a"))
     CALL(evt_npc_set_anim, STRING("batten"), STRING("W_1"))
     CALL(evt_npc_flag_onoff, 1, STRING("batten"), 64)
-    CALL(unk_end_00000938, STRING("batten"))
+    CALL(evt_end_npc_silhouette_on, STRING("batten"))
     CALL(evt_npc_set_scale, STRING("batten"), FLOAT(0.5996094f), FLOAT(0.5996094f), FLOAT(0.5996094f))
     CALL(evt_sub_intpl_msec_init, 11, 10000, 500, 2000)
     LOOP(0)
@@ -1003,7 +1003,7 @@ EVT_BEGIN(unk_evt_end_00004ed0)
     CALL(evt_npc_entry, STRING("queen"), STRING("c_q_kage_m"))
     CALL(evt_npc_set_anim, STRING("queen"), STRING("KRT_Z_1"))
     CALL(evt_npc_flag_onoff, 1, STRING("queen"), 64)
-    CALL(unk_end_00000938, STRING("queen"))
+    CALL(evt_end_npc_silhouette_on, STRING("queen"))
     CALL(evt_npc_set_scale, STRING("queen"), FLOAT(0.5f), FLOAT(0.5f), FLOAT(0.5f))
     CALL(evt_npc_set_ry, STRING("queen"), 90)
     CALL(evt_sub_intpl_msec_init, 11, -10000, -1000, 2000)
@@ -1035,32 +1035,32 @@ __declspec(section ".data") const char* dat_ptr_end_00005034 = "c_n_moa_a";
 
 __declspec(section ".data") const char* dat_ptr_end_00005038 = "S_1";
 
-USER_FUNC(unk_end_000012e0) {
-    dispEntry(CAMERA_3D, 0.0f, 7, unk_end_00001324, NULL);
+USER_FUNC(evt_end_image_disp_entry) {
+    dispEntry(CAMERA_3D, 0.0f, 7, end_image_disp, NULL);
     return 0;
 }
 
-USER_FUNC(unk_end_000012a4) {
+USER_FUNC(evt_end_image_set_alpha) {
     dat_ptr_end_00003218->alpha = evtGetValue(event, event->args[0]);
     return 2;
 }
 
-USER_FUNC(unk_end_00001268) {
+USER_FUNC(evt_end_image_set_overlay_alpha) {
     dat_ptr_end_00003218->alpha2 = evtGetValue(event, event->args[0]);
     return 2;
 }
 
-USER_FUNC(unk_end_0000122c) {
+USER_FUNC(evt_end_image_set_mode) {
     dat_ptr_end_00003218->mode = evtGetValue(event, event->args[0]);
     return 2;
 }
 
-USER_FUNC(unk_end_000011f0) {
+USER_FUNC(evt_end_image_set_blend) {
     dat_ptr_end_00003218->tevAlpha = evtGetValue(event, event->args[0]);
     return 2;
 }
 
-USER_FUNC(unk_end_00000bc8) {
+USER_FUNC(evt_end_staff_roll_msg_main) {
     s32 state = event->userdata[0];
     s32 idx = event->userdata[1];
     s32 i;
@@ -1208,7 +1208,7 @@ USER_FUNC(unk_end_00000bc8) {
     return 0;
 }
 
-USER_FUNC(unk_end_00000a6c) {
+USER_FUNC(evt_end_staff_roll_init) {
     BOOL inBattle = gp->inBattle ? TRUE : FALSE;
     s32 i;
 
@@ -1239,7 +1239,7 @@ USER_FUNC(unk_end_00000a6c) {
 }
 
 #pragma dont_inline on
-void unk_end_00000a14(void) {
+void end_staff_roll_exit(void) {
     fileFree(dat_ptr_end_00003218->tpl);
     psndClearFlag(4);
     gp->language = 0;
@@ -1248,7 +1248,7 @@ void unk_end_00000a14(void) {
 }
 #pragma dont_inline reset
 
-USER_FUNC(unk_end_000009cc) {
+USER_FUNC(evt_end_font_restore) {
     gp->language = 0;
     JUTFont_Free();
     JUTFontSetup(0);
@@ -1256,27 +1256,27 @@ USER_FUNC(unk_end_000009cc) {
     return 2;
 }
 
-USER_FUNC(unk_end_000009a4) {
+USER_FUNC(end_bgm_wait_stop) {
     psndSetFlag(0x1000);
     return 2;
 }
 
-USER_FUNC(unk_end_00000938) {
+USER_FUNC(evt_end_npc_silhouette_on) {
     NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
-    mapSetTevCallback(1, unk_end_00002508);
+    mapSetTevCallback(1, end_silhouette_tev);
     animPoseSetMaterialFlagOn(npc->poseId, 0x1000000);
-    animPoseSetGXFunc(npc->poseId, unk_end_00002494, 0);
+    animPoseSetGXFunc(npc->poseId, end_silhouette_rendermode, 0);
     return 2;
 }
 
-f32 unk_end_000008bc(f32 min, f32 max) {
+f32 end_randf(f32 min, f32 max) {
     f32 r = rand() / 32767.0f;
 
     return r * (max - min) + min;
 }
 
-void unk_end_000006f8(void) {
+void end_ext_moamoa_init(void) {
     ExtPose* pose = extGetPosePtr();
     EndMoa* elem = unk_end_bss00000000;
     s32 i;
@@ -1286,16 +1286,16 @@ void unk_end_000006f8(void) {
         pose->flags |= 5;
         PSMTXIdentity(pose->mtx);
         v = (Vec){0.0f, 0.0f, 0.0f};
-        v.x = unk_end_000008bc(-10.0f, 10.0f);
-        v.y = unk_end_000008bc(-10.0f, 10.0f);
-        v.z = unk_end_000008bc(-10.0f, 10.0f);
+        v.x = end_randf(-10.0f, 10.0f);
+        v.y = end_randf(-10.0f, 10.0f);
+        v.z = end_randf(-10.0f, 10.0f);
         elem->pos = v;
         elem->chain = i % dat_80419a28;
         elem->idx = unk_end_bss00000008[elem->chain]++;
     }
 }
 
-void unk_end_00000440(void) {
+void end_ext_moamoa_main(void) {
     NpcEntry* npc = npcNameToPtr("\203\202\203A\203\202\203A");
     Vec* wpos = *animPoseGetAnimPosePtr(npc->poseId)->worldPositions;
     s32 i;
@@ -1348,22 +1348,22 @@ void unk_end_00000440(void) {
     }
 }
 
-void unk_end_0000039c(CameraId cameraId, void* param) {
+void end_ext_disp(CameraId cameraId, void* param) {
     extLoadRenderMode();
     extLoadVertex();
     extLoadTexture();
     extLoadTev();
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ONE);
-    unk_end_00002494(0);
+    end_silhouette_rendermode(0);
     extDraw();
     extLoadTextureExit();
 }
 
-void unk_end_0000035c(void) {
-    dispEntry(CAMERA_3D, 0.0f, 1, unk_end_0000039c, NULL);
+void end_ext_moamoa_dispent(void) {
+    dispEntry(CAMERA_3D, 0.0f, 1, end_ext_disp, NULL);
 }
 
-USER_FUNC(unk_end_0000012c) {
+USER_FUNC(evt_end_moamoa_init) {
     NpcEntry* npc = npcNameToPtr("\203\202\203A\203\202\203A");
     AnimationPose* ap;
     Vec* p;
@@ -1398,7 +1398,7 @@ USER_FUNC(unk_end_0000012c) {
     return 2;
 }
 
-USER_FUNC(unk_end_000000c4) {
+USER_FUNC(evt_end_moamoa_exit) {
     NpcEntry* npc = npcNameToPtr("\203\202\203A\203\202\203A");
 
     L_animPoseWorldPositionEvalOff(npc->poseId);
@@ -1413,13 +1413,13 @@ USER_FUNC(unk_end_000000c4) {
 EVT_BEGIN(unk_evt_end_0000503c)
     CALL(evt_npc_entry, STRING("モアモアダミー"), STRING("c_n_moa_a"))
     CALL(evt_npc_set_position, STRING("モアモアダミー"), 0, -1000, 0)
-    CALL(unk_end_00000938, STRING("モアモアダミー"))
+    CALL(evt_end_npc_silhouette_on, STRING("モアモアダミー"))
     CALL(evt_npc_entry, STRING("モアモア"), STRING("c_g_moamoa"))
     CALL(evt_npc_set_anim, STRING("モアモア"), STRING("S_3"))
     CALL(evt_npc_set_position, STRING("モアモア"), 0, -1000, 0)
     CALL(evt_npc_set_scale, STRING("モアモア"), FLOAT(0.5f), FLOAT(0.5f), FLOAT(0.5f))
-    CALL(unk_end_0000012c)
-    CALL(evt_ext_entry, 300, LW(10), PTR(unk_end_000006f8), PTR(unk_end_00000440), PTR(unk_end_0000035c))
+    CALL(evt_end_moamoa_init)
+    CALL(evt_ext_entry, 300, LW(10), PTR(end_ext_moamoa_init), PTR(end_ext_moamoa_main), PTR(end_ext_moamoa_dispent))
     CALL(evt_sub_intpl_msec_init, 11, -10000, -1000, 2000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -1441,7 +1441,7 @@ EVT_BEGIN(unk_evt_end_0000503c)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(unk_end_000000c4)
+    CALL(evt_end_moamoa_exit)
     CALL(evt_npc_delete, STRING("モアモアダミー"))
     CALL(evt_npc_delete, STRING("モアモア"))
     RETURN

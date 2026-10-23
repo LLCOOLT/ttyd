@@ -375,7 +375,7 @@ BOOL marioCaseEventValidChk(void) {
 	}
 }
 
-BOOL unk_8005bb80(void) {
+BOOL marioFrontActionValidChk(void) {
 	if (mp->currMotionId == MARIO_MOTION_ROLL || mp->flags & 0x100000) {
 		return FALSE;
 	}
@@ -1516,7 +1516,7 @@ s32 marioAnimeId(void) {
 	return id;
 }
 
-void unk_80058374(void) {
+void marioChgDamagePose(void) {
 	MarioWork* wp = mp;
 	MarioMotion mot = wp->currMotionId;
 

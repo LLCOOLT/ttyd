@@ -68,7 +68,7 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 static void callback(s32 type, void** work);
-void unk_aji_00000ed0(s32 type, void** work);
+void kuti_callback(s32 type, void** work);
 extern s32 evt_bero_info_run[];
 extern s32 evt_emergency[];
 
@@ -467,7 +467,7 @@ EVT_BEGIN(kuizu_sekizou)
     SET_VALUE(LW(8), 0)
     CALL(evt_msg_toge, 2, 95, 65, 0)
     SPAWN_EVENT(PTR(sekizou_talk))
-    CALL(evt_msg_print, 0, STRING("stg7_aji_01"), PTR(unk_aji_00000ed0), 0)
+    CALL(evt_msg_print, 0, STRING("stg7_aji_01"), PTR(kuti_callback), 0)
     CALL(evt_msg_select, 0, STRING("stg7_aji_02"))
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(0), 360)
@@ -580,7 +580,7 @@ EVT_BEGIN(kuizu_sekizou)
                 SPAWN_EVENT(PTR(sekizou_kaiten2))
                 WAIT_MS(500)
                 SPAWN_EVENT(PTR(sekizou_talk))
-                CALL(evt_msg_print, 0, STRING("stg7_aji_22"), PTR(unk_aji_00000ed0), 0)
+                CALL(evt_msg_print, 0, STRING("stg7_aji_22"), PTR(kuti_callback), 0)
                 CASE_EQUAL(4)
                 SET_VALUE(LW(0), 360)
                 SET_VALUE(LW(1), 500)
@@ -588,7 +588,7 @@ EVT_BEGIN(kuizu_sekizou)
                 SPAWN_EVENT(PTR(sekizou_kaiten2))
                 WAIT_MS(500)
                 SPAWN_EVENT(PTR(sekizou_talk))
-                CALL(evt_msg_print, 0, STRING("stg7_aji_23"), PTR(unk_aji_00000ed0), 0)
+                CALL(evt_msg_print, 0, STRING("stg7_aji_23"), PTR(kuti_callback), 0)
                 SET_VALUE(LF(1), 1)
                 CASE_EQUAL(5)
                 SET_VALUE(LW(0), 1080)
@@ -597,13 +597,13 @@ EVT_BEGIN(kuizu_sekizou)
                 SPAWN_EVENT(PTR(sekizou_kaiten))
                 WAIT_MS(1000)
                 SPAWN_EVENT(PTR(sekizou_talk))
-                CALL(evt_msg_print, 0, STRING("stg7_aji_24"), PTR(unk_aji_00000ed0), 0)
+                CALL(evt_msg_print, 0, STRING("stg7_aji_24"), PTR(kuti_callback), 0)
                 CALL_CHILD(PTR(offscreen_to_normal))
                 CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN2"))
                 CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI1"))
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(PTR(sekizou_talk))
-                CALL(evt_msg_print, 0, STRING("stg7_aji_25"), PTR(unk_aji_00000ed0), 0)
+                CALL(evt_msg_print, 0, STRING("stg7_aji_25"), PTR(kuti_callback), 0)
                 BREAK_LOOP
             END_SWITCH
             CALL_CHILD(PTR(quiz_ok))
@@ -624,14 +624,14 @@ EVT_BEGIN(kuizu_sekizou)
             SWITCH(LW(15))
                 CASE_EQUAL(1)
                 SPAWN_EVENT(PTR(sekizou_talk))
-                CALL(evt_msg_print, 0, STRING("stg7_aji_26"), PTR(unk_aji_00000ed0), 0)
+                CALL(evt_msg_print, 0, STRING("stg7_aji_26"), PTR(kuti_callback), 0)
                 CASE_EQUAL(2)
                 SPAWN_EVENT(PTR(sekizou_talk))
-                CALL(evt_msg_print, 0, STRING("stg7_aji_27"), PTR(unk_aji_00000ed0), 0)
+                CALL(evt_msg_print, 0, STRING("stg7_aji_27"), PTR(kuti_callback), 0)
                 SET_VALUE(LF(1), 1)
                 CASE_EQUAL(3)
                 SPAWN_EVENT(PTR(sekizou_talk))
-                CALL(evt_msg_print, 0, STRING("stg7_aji_28"), PTR(unk_aji_00000ed0), 0)
+                CALL(evt_msg_print, 0, STRING("stg7_aji_28"), PTR(kuti_callback), 0)
                 CALL(evt_snd_bgmoff_f, 512, 2000)
                 CALL_CHILD(PTR(offscreen_to_normal))
                 SET_VALUE(LW(0), 360)
@@ -641,7 +641,7 @@ EVT_BEGIN(kuizu_sekizou)
                 WAIT_MS(250)
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(PTR(sekizou_talk))
-                CALL(evt_msg_print, 0, STRING("stg7_aji_29"), PTR(unk_aji_00000ed0), 0)
+                CALL(evt_msg_print, 0, STRING("stg7_aji_29"), PTR(kuti_callback), 0)
                 CALL(evt_npc_set_position, STRING("バリアーン１"), 50, 250, -50)
                 CALL(evt_npc_set_position, STRING("バリアーン２"), 50, 250, 50)
                 BEGIN_INLINE_EVENT
@@ -657,7 +657,7 @@ EVT_BEGIN(kuizu_sekizou)
                 WAIT_MS(500)
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(PTR(sekizou_talk))
-                CALL(evt_msg_print, 0, STRING("stg7_aji_30"), PTR(unk_aji_00000ed0), 0)
+                CALL(evt_msg_print, 0, STRING("stg7_aji_30"), PTR(kuti_callback), 0)
                 CALL(evt_cam3d_evt_off, 500, 11)
                 CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
                 BEGIN_INLINE_EVENT
@@ -690,7 +690,7 @@ EVT_BEGIN(kuizu_sekizou)
                 CALL_CHILD(PTR(sekizou_kaiten))
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(PTR(sekizou_talk))
-                CALL(evt_msg_print, 0, STRING("stg7_aji_31"), PTR(unk_aji_00000ed0), 0)
+                CALL(evt_msg_print, 0, STRING("stg7_aji_31"), PTR(kuti_callback), 0)
                 BREAK_LOOP
             END_SWITCH
             CALL_CHILD(PTR(UNK_0x00022be8))
@@ -709,7 +709,7 @@ EVT_BEGIN(kuizu_sekizou)
     CALL(evt_item_entry, STRING("dummy"), 28, 50, 100, 0, 13, -1, PTR(evt_item))
     CALL(evt_msg_toge, 2, 95, 65, 0)
     SPAWN_EVENT(PTR(sekizou_talk))
-    CALL(evt_msg_print, 0, STRING("stg7_aji_32"), PTR(unk_aji_00000ed0), 0)
+    CALL(evt_msg_print, 0, STRING("stg7_aji_32"), PTR(kuti_callback), 0)
     SET_VALUE(LW(0), 360)
     SET_VALUE(LW(1), 500)
     SET_VALUE(LW(2), STRING("DOSN"))
@@ -762,7 +762,7 @@ static void callback(s32 type, void** work) {
     }
 }
 
-void unk_aji_00000ed0(s32 type, void** work) {
+void kuti_callback(s32 type, void** work) {
     EventEntry* evt = *(EventEntry**)((u8*)*work + 0x7A00);
 
     if (((EventEntry*)evt->lwData[8] == NULL || !evtCheckID(((EventEntry*)evt->lwData[8])->eventId)) && type == 5) {

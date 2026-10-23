@@ -79,7 +79,7 @@ f32 ofs_PYS_F_1[10] = {0.0f, 0.0f, 0.433f, 0.557f, 0.512f, 0.0f, 0.0f, 0.433f, 0
     P_F32(mario, 0x94) = (party)->position.z;                       \
     P_F32(mario, 0x1A8) = (party)->displayDirection;                       \
     P_F32(mario, 0x1AC) = (party)->displayDirectionTarget;
-void unk_800b474c(PartyEntry* party);
+void yoshi_damageToge(PartyEntry* party);
 
 #define P_S8(p, off) (*(s8*)((u8*)(p) + (off)))
 #define P_PTR(p, off) (*(void**)((u8*)(p) + (off)))
@@ -293,7 +293,7 @@ void yoshi_jumpStand(void) {
         }
 }
 
-void unk_800b474c(PartyEntry* party) {
+void yoshi_damageToge(PartyEntry* party) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* extra;
 
@@ -311,7 +311,7 @@ void unk_800b474c(PartyEntry* party) {
     }
 }
 
-void unk_800b45e0(PartyEntry* party) {
+void yoshi_animTimeMain(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
 
     if (!strcmp(party->animName, "PYS_S_2")) {
@@ -697,7 +697,7 @@ void yoshi_use(PartyEntry* party) {
                     }
                 } else if (attr & 0xC00) {
                     if (party->position.y <= P_F32(party, 0xE4)) {
-                        unk_800b474c(party);
+                        yoshi_damageToge(party);
                         return;
                     }
                 }
@@ -764,7 +764,7 @@ void yoshi_use(PartyEntry* party) {
             break;
     }
 
-    unk_800b45e0(party);
+    yoshi_animTimeMain(party);
     if (party->useMotionId == 13 || yoshiGetStatus() == 3 || yoshiGetStatus() == 4 || yoshiGetStatus() == 2) {
         ox = 0.0f;
         oz = 0.0f;
@@ -1115,7 +1115,7 @@ void searchGround(PartyEntry* party) {
             return;
         }
         if (attr & 0xC00) {
-            unk_800b474c(party);
+            yoshi_damageToge(party);
             partyChgRunMode(party, 0xd);
             {
                 PartyEntry* extra = partyGetPtr(marioGetExtraPartyId());
@@ -1195,7 +1195,7 @@ void searchGround2(PartyEntry* party) {
         return;
     }
     if (attr & 0x800) {
-        unk_800b474c(party);
+        yoshi_damageToge(party);
     }
     party->flags |= 2;
     party->velY = 0.0f;
@@ -1237,7 +1237,7 @@ void checkWall(PartyEntry* party, f32 spd, f32 dir) {
             }
         }
         if (hitGetAttr(hit) & 0x800) {
-            unk_800b474c(party);
+            yoshi_damageToge(party);
         }
         attr = hitGetAttr(hit);
         if ((attr & 0x800004) && !(attr & 0x80080)) {
@@ -1270,12 +1270,12 @@ void checkWall(PartyEntry* party, f32 spd, f32 dir) {
         }
         hit = dou10_yoko_yari2(&work1);
         if (hit && (hitGetAttr(hit) & 0x800)) {
-            unk_800b474c(party);
+            yoshi_damageToge(party);
         }
     } else {
         hit = dou10_yoko_yari2(&work2);
         if (hit && (hitGetAttr(hit) & 0x800)) {
-            unk_800b474c(party);
+            yoshi_damageToge(party);
         }
     }
     marioChkWallAround(&pos, 1, spd, dir, party->width, mario->wPlayerCollisionBox.y);

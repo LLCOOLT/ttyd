@@ -781,7 +781,7 @@ void partyInit(void) {
 
 void partyClearFootmark(void);
 void chuchu_reinit(PartyEntry* party);
-void unk_8014c47c(void);
+void partyResetTouchWallCt(void);
 
 static inline void partyReInitClear(PartyEntry* party) {
     s32 poseId;
@@ -886,7 +886,7 @@ void partyReInit(void) {
         if (party->currentMemberId == 7) {
             chuchu_reinit(party);
         }
-        unk_8014c47c();
+        partyResetTouchWallCt();
     }
 }
 void partyUsePost(PartyEntry* party) {
@@ -974,7 +974,7 @@ void N_partyForceChgRunMode(PartyEntry* party, s32 mode, s32 sub) {
 #pragma dont_inline reset
 
 /* @@MID1@@ */
-void unk_800ba2dc(PartyEntry* party) {
+void partyRestoreRunMode(PartyEntry* party) {
     if (party->runMode == party->prevRunMode) {
         return;
     }
@@ -1033,7 +1033,7 @@ void partyMain(void) {
 
     marioGetPtr();
     if (partyCountActive()) {
-        unk_8013be14();
+        marioUsePartyMain();
         for (i = 0; i < 2; i++) {
             party = partyPtrTbl[i];
             if (party && (party->flags & 1) && marioBgmodeChk() != 1) {
@@ -1047,7 +1047,7 @@ void partyMain(void) {
 void party_kemuri(PartyEntry* party);
 void vivianShadow(PartyEntry* party);
 s32 vivianGetStatus(void);
-void unk_800c7c98(PartyEntry* party);
+void party_move_mode_wait(PartyEntry* party);
 void partyForceWalk(PartyEntry* party);
 void L_partyForceSlitOff(PartyEntry* party);
 void partyPreDisp(PartyEntry* party);
@@ -1105,7 +1105,7 @@ void driveParty(PartyEntry* party) {
         break;
     case 1:
         if ((party->flags & 0x20000000) && !(party->flags & 0x10000000)) break;
-        unk_800c7c98(party);
+        party_move_mode_wait(party);
         break;
     case 2:
         if ((party->flags & 0x20000000) && !(party->flags & 0x10000000)) break;
@@ -2808,7 +2808,7 @@ void partyHello(PartyEntry* party);
 BOOL partyDoWork(void);
 void driveParty(PartyEntry* party);
 void partyMain(void);
-void unk_800ba2dc(PartyEntry* party);
+void partyRestoreRunMode(PartyEntry* party);
 void N_partyForceChgRunMode(PartyEntry* party, s32 mode, s32 sub);
 void partyChgRunMode(PartyEntry* party, s32 mode);
 void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode);

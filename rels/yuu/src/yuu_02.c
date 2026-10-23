@@ -40,7 +40,7 @@ void marioRollFixOn(void);
 extern MonteTable montetable[];
 static void monte_disp(CameraId camera, void* param);
 static BOOL get_monte_check(Vec* a, Vec* b);
-void unk_yuu_00001054(CameraId camera, void* param);
+void yuu_02_icon_monte_disp(CameraId camera, void* param);
 void camShiftReset(void);
 
 USER_FUNC(eff_call_minigame);
@@ -86,8 +86,8 @@ USER_FUNC(evt_yuutitle_alloc);
 USER_FUNC(evt_yuutitle_free);
 static USER_FUNC(fall_rtn);
 static USER_FUNC(re_fall_rtn);
-USER_FUNC(unk_yuu_00000f1c);
-USER_FUNC(unk_yuu_00001210);
+USER_FUNC(yuu_02_icon_monte_entry);
+USER_FUNC(yuu_02_cam_shift_reset);
 USER_FUNC(yuu_atai_init);
 USER_FUNC(yuu_atai_pop);
 USER_FUNC(yuu_atai_push);
@@ -111,10 +111,10 @@ void yuuminigame_main_3roll(EventEntry* event, BOOL isFirstCall);
 void yuuminigame_init_3roll(EventEntry* event, BOOL isFirstCall);
 static void monte_disp(CameraId camera, void* param);
 static BOOL get_monte_check(Vec* a, Vec* b);
-void unk_yuu_00001054(CameraId camera, void* param);
-USER_FUNC(unk_yuu_00001160);
-void unk_yuu_000011e0(s32 idx);
-void fn_31_112C(s32 idx);
+void yuu_02_icon_monte_disp(CameraId camera, void* param);
+USER_FUNC(yuu_02_icon_monte_onoff);
+void yuu_02_icon_monte_off(s32 idx);
+void yuu_02_icon_monte_on(s32 idx);
 extern s32 evt_map_playanim[];
 extern s32 evt_yuunpc_minigame3[];
 extern s32 moving_floor[];
@@ -225,7 +225,7 @@ Vec fukkipoint[] = {
 };
 
 __declspec(section ".data") EVT_BEGIN(unk_evt_yuu_000152bc)
-    CALL(unk_yuu_00000f1c)
+    CALL(yuu_02_icon_monte_entry)
     RETURN
 EVT_END()
 
@@ -248,20 +248,20 @@ static __declspec(section ".data") EVT_BEGIN(minigame_view_monte)
     RETURN
 EVT_END()
 
-USER_FUNC(unk_yuu_00001210) {
+USER_FUNC(yuu_02_cam_shift_reset) {
     camShiftReset();
     return EVT_RETURN_DONE;
 }
 
-void fn_31_112C(s32 idx) {
+void yuu_02_icon_monte_on(s32 idx) {
     icon_monte_p[idx].hidden = 0;
 }
 
-void unk_yuu_000011e0(s32 idx) {
+void yuu_02_icon_monte_off(s32 idx) {
     icon_monte_p[idx].hidden = 1;
 }
 
-USER_FUNC(unk_yuu_00001160) {
+USER_FUNC(yuu_02_icon_monte_onoff) {
     s32* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 idx = evtGetValue(event, args[1]);
@@ -276,7 +276,7 @@ USER_FUNC(unk_yuu_00001160) {
     return EVT_RETURN_DONE;
 }
 
-void unk_yuu_00001054(CameraId camera, void* param) {
+void yuu_02_icon_monte_disp(CameraId camera, void* param) {
     Monte* monte = param;
     MarioWork* mario = marioGetPtr();
     s32 i;
@@ -301,7 +301,7 @@ void unk_yuu_00001054(CameraId camera, void* param) {
     }
 }
 
-USER_FUNC(unk_yuu_00000f1c) {
+USER_FUNC(yuu_02_icon_monte_entry) {
     BOOL exists = FALSE;
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
     MarioWork* mario = marioGetPtr();
@@ -331,7 +331,7 @@ USER_FUNC(unk_yuu_00000f1c) {
     for (i = 0; i < icon_monte_p->num; i++) {
     }
     if (!exists) {
-        dispEntry(CAMERA_2D, 0.0f, 0, unk_yuu_00001054, icon_monte_p);
+        dispEntry(CAMERA_2D, 0.0f, 0, yuu_02_icon_monte_disp, icon_monte_p);
     }
     return EVT_RETURN_BLOCK;
 }
@@ -895,7 +895,7 @@ EVT_BEGIN(minigame03_end)
     CALL(re_fall_rtn)
     SET_VALUE(GF(0), 0)
     CALL_CHILD(PTR(yuu_02_kaijo_init2))
-    CALL(unk_yuu_00001210)
+    CALL(yuu_02_cam_shift_reset)
     WAIT_MS(500)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_GAME_AUDIENCE1"), GW(10))
     CALL(evt_fade_in, 1000)

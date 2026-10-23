@@ -42,7 +42,7 @@ int __abs(int);
 
 
 
-void unk_800a4e40(void) {
+void marioSlitReenter(void) {
 	MarioWork* mario = marioGetPtr();
 	marioChgMot2(MARIO_MOTION_SLIT);
 	MW(mario, 0x2d8, s16) = 10;

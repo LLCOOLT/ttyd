@@ -117,7 +117,7 @@ static USER_FUNC(senkaronFlagOffMesPushing);
 static USER_FUNC(senkaronFlagOnMesPushing);
 static USER_FUNC(senkaronGetMarioPushedFlag);
 static USER_FUNC(senkaronToEscape);
-USER_FUNC(unk_gon_00000374);
+USER_FUNC(leader_touch_check);
 void nokotaro_callback(s32 type);
 static f32 randf(f32 min, f32 max);
 static void senkaron_ext_init(void);
@@ -496,7 +496,7 @@ static EVT_BEGIN(senkaron_event)
         END_SIBLING_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
-            CALL(unk_gon_00000374)
+            CALL(leader_touch_check)
             IF_INT_GREATER_OR_EQUAL(LW(0), 1)
                 BREAK_LOOP
             END_IF
@@ -739,7 +739,7 @@ void nokotaro_callback(s32 type) {
     }
 }
 
-USER_FUNC(unk_gon_00000374) {
+USER_FUNC(leader_touch_check) {
     NpcEntry* npc = marioGetTouchNpcPtr();
     BOOL off = FALSE;
 

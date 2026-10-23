@@ -164,9 +164,9 @@ USER_FUNC(johoya_keti_oldspeak_setreadflag);
 static USER_FUNC(scale_func);
 static USER_FUNC(setmertn);
 static USER_FUNC(ss_set);
-USER_FUNC(unk_tik_00000598);
-USER_FUNC(unk_tik_000005c0);
-USER_FUNC(unk_tik_000005e8);
+USER_FUNC(tik_snd_on);
+USER_FUNC(tik_snd_off);
+USER_FUNC(supotto_blendmode);
 USER_FUNC(uranai_bbox);
 USER_FUNC(uranai_cap_evt);
 USER_FUNC(uranai_exit_func);
@@ -710,7 +710,7 @@ EVT_BEGIN(uranai_init)
     CALL(uranai_init_func)
     SET_VALUE(GW(15), LW(0))
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("supotto"), 1)
-    CALL(unk_tik_000005e8)
+    CALL(supotto_blendmode)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("uranai_mae"), 6144)
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, 1000)
     SET_VALUE(LW(0), 0)
@@ -1103,7 +1103,7 @@ EVT_BEGIN(starmaniac_talk)
         CALL(evt_msg_print, 0, STRING("starmaniac_02"), 0, STRING("me"))
         RETURN
     END_IF
-    CALL(unk_tik_000005c0)
+    CALL(tik_snd_off)
     IF_INT_EQUAL(GSWF(1325), 0)
         CALL(evt_msg_print, 0, STRING("starmaniac_00"), 0, STRING("me"))
         SET_VALUE(GSWF(1325), 1)
@@ -1113,13 +1113,13 @@ EVT_BEGIN(starmaniac_talk)
     CALL(evt_msg_select, 0, STRING("starmaniac_03"))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_msg_print_add, 0, STRING("starmaniac_05"))
-        CALL(unk_tik_00000598)
+        CALL(tik_snd_on)
         RETURN
     END_IF
     CALL(evt_pouch_get_starpiece, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 0)
         CALL(evt_msg_print_add, 0, STRING("starmaniac_06"))
-        CALL(unk_tik_00000598)
+        CALL(tik_snd_on)
         RETURN
     END_IF
     CALL(evt_msg_print_add, 0, STRING("starmaniac_07"))
@@ -1129,7 +1129,7 @@ EVT_BEGIN(starmaniac_talk)
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_win_coin_off, LW(12))
         CALL(evt_msg_print, 0, STRING("starmaniac_08"), 0, STRING("me"))
-        CALL(unk_tik_00000598)
+        CALL(tik_snd_on)
         RETURN
     END_IF
     CALL(evt_sub_get_language, LW(0))
@@ -1148,7 +1148,7 @@ EVT_BEGIN(starmaniac_talk)
     IF_INT_EQUAL(LW(0), -1)
         CALL(evt_win_coin_off, LW(12))
         CALL(evt_msg_print_add, 0, STRING("starmaniac_15"))
-        CALL(unk_tik_00000598)
+        CALL(tik_snd_on)
         RETURN
     END_IF
     CALL(evt_badgeShop_starmaniac_dec, LW(1))
@@ -1160,25 +1160,25 @@ EVT_BEGIN(starmaniac_talk)
     CALL(evt_badgeShop_starmaniac_get_kind_cnt, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_print_add, 0, STRING("starmaniac_12"))
-        CALL(unk_tik_00000598)
+        CALL(tik_snd_on)
         RETURN
     END_IF
     CALL(evt_pouch_get_starpiece, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_print_add, 0, STRING("starmaniac_12"))
-        CALL(unk_tik_00000598)
+        CALL(tik_snd_on)
         RETURN
     END_IF
     CALL(evt_msg_print_add, 0, STRING("starmaniac_13"))
     CALL(evt_msg_select, 0, STRING("starmaniac_10"))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_msg_print_add, 0, STRING("starmaniac_14"))
-        CALL(unk_tik_00000598)
+        CALL(tik_snd_on)
         RETURN
     END_IF
     CALL(evt_msg_continue)
     GOTO(0)
-    CALL(unk_tik_00000598)
+    CALL(tik_snd_on)
     RETURN
 EVT_END()
 
@@ -2197,19 +2197,19 @@ USER_FUNC(card_camid) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_tik_000005e8) {
+USER_FUNC(supotto_blendmode) {
     MapObject* obj = mapGetMapObj("supotto");
 
     obj->field_0x4[0] = 10;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_tik_000005c0) {
+USER_FUNC(tik_snd_off) {
     psndSetFlag(0x80);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_tik_00000598) {
+USER_FUNC(tik_snd_on) {
     psndClearFlag(0x80);
     return EVT_RETURN_DONE;
 }

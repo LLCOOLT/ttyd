@@ -63,7 +63,7 @@ USER_FUNC(evt_sub_random);
 USER_FUNC(kemuri_move);
 static USER_FUNC(kpa_hikousen_yure);
 USER_FUNC(time_shift);
-USER_FUNC(unk_8014cc24);
+USER_FUNC(evt_snd_bgmon_f_d);
 static USER_FUNC(npc_set_pos);
 
 __declspec(section ".data") u64 fd_tou_00_negone_one_374;
@@ -243,7 +243,7 @@ EVT_END()
 EVT_BEGIN(evt_to_tou)
     CALL(evt_cam3d_evt_set, -2000, 241, 534, -2000, 145, -8, 0, 11)
     WAIT_FRAMES(1)
-    CALL(unk_8014cc24, 768, STRING("BGM_STG3_URN1"), 18000, 18000)
+    CALL(evt_snd_bgmon_f_d, 768, STRING("BGM_STG3_URN1"), 18000, 18000)
     CALL(evt_snd_bgmoff, 26624)
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_mario_key_onoff, 0)

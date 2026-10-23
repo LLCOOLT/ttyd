@@ -17,5 +17,5 @@ void marioPartyKill(void);
 BOOL marioPartyGoodbye(void);
 s32 marioPartyHello(PartyId id);
 s32 marioPartyEntry(PartyId id);
-s32 unk_8013be14(void);
+s32 marioUsePartyMain(void);
 s32 marioUseParty(void);

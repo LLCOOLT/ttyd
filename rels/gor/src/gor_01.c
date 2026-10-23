@@ -252,8 +252,8 @@ static USER_FUNC(starstone_entry);
 static USER_FUNC(starstone_set_pos);
 static USER_FUNC(starstone_set_ry);
 USER_FUNC(unitwin_get_work_ptr);
-USER_FUNC(unk_801751f8);
-USER_FUNC(unk_gor_00004db4);
+USER_FUNC(unitwin_set_bought);
+USER_FUNC(badgeshop_special_cnt);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 USER_FUNC(wait_mahojin);
@@ -479,7 +479,7 @@ s32 cooking_evt_sub[284];
 __declspec(section ".data") s32 iri_18_item_tbl[2];
 s32 cooking_evt[852];
 
-USER_FUNC(unk_gor_00004db4) {
+USER_FUNC(badgeshop_special_cnt) {
     s32* args = event->args;
 
     evtSetValue(event, args[0], U_badgeShop_SpecialCheck());
@@ -682,7 +682,7 @@ EVT_END()
 EVT_BEGIN(zaiko_buy_evt)
     CALL(evt_badgeShop_throw_get_kind_cnt, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(unk_gor_00004db4, LW(0))
+        CALL(badgeshop_special_cnt, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_msg_print_add, 0, STRING("badgeshop_37"))
             ELSE
@@ -750,7 +750,7 @@ static EVT_BEGIN(buy_evt)
     CALL(evt_msg_select, 0, STRING("badgeshop_35"))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(unk_gor_00004db4, LW(0))
+        CALL(badgeshop_special_cnt, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_badgeShop_throw_get_kind_cnt, LW(0))
             IF_INT_EQUAL(LW(0), 0)
@@ -2563,7 +2563,7 @@ EVT_BEGIN(evt_badge_dummy)
     END_IF
     CALL(set_new_goods_list, LW(10), 0)
     CALL(evt_badgeShop_special_dec, LW(12))
-    CALL(unk_801751f8, LW(10), LW(12))
+    CALL(unitwin_set_bought, LW(10), LW(12))
     MULTIPLY(LW(13), -1)
     CALL(evt_pouch_add_coin, LW(13))
     CALL(evt_win_coin_wait, LW(8))

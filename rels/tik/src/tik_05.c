@@ -177,7 +177,7 @@ static USER_FUNC(starstone_set_ry);
 USER_FUNC(starstone_setting);
 USER_FUNC(tiz_broken);
 USER_FUNC(tiz_stone);
-USER_FUNC(unk_tik_0000247c);
+USER_FUNC(map_disp_onoff);
 void tiz_broken_draw(CameraId cameraId, void* param);
 static void alpha_tev(MapTevCallbackInfo* info);
 USER_FUNC(starstone_set_scale);
@@ -1202,7 +1202,7 @@ static USER_FUNC(evtflash) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_tik_0000247c) {
+USER_FUNC(map_disp_onoff) {
     if (evtGetValue(event, event->args[0])) {
         N_mapDispOn();
     } else {
@@ -1532,7 +1532,7 @@ EVT_BEGIN(evt_mapwrite)
     WAIT_MS(200)
     CALL(evt_fade_entry, 21, 3200, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    CALL(unk_tik_0000247c, 0)
+    CALL(map_disp_onoff, 0)
     WAIT_FRAMES(1)
     CALL(evt_paper_entry, STRING("OFF_d_tizu_tex"))
     CALL(evt_img_entry, STRING("img"))
@@ -1686,7 +1686,7 @@ EVT_BEGIN(evt_mapwrite)
         CALL(evt_snd_sfxon, STRING("SFX_EVT_MAP_KAKAGERU1_2"), 0)
         CASE_END
     END_SWITCH
-    CALL(unk_tik_0000247c, 1)
+    CALL(map_disp_onoff, 1)
     WAIT_FRAMES(1)
     CALL(evt_fade_entry, 20, 1000, 0, 0, 0)
     CALL(evt_fade_end_wait)

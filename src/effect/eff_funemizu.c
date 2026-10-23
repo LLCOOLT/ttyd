@@ -115,7 +115,7 @@ static u8 gor_fune_dl_0_size_tbl[] = { 0x02, 0x02, 0x00, 0x00 };
 static u8* gor_fune_dl_1_tbl[] = { gor_fune_dl_1_0, gor_fune_dl_1_1 };
 static u8 gor_fune_dl_1_size_tbl[] = { 0x02, 0x02, 0x00, 0x00 };
 
-GXColor unk_80224298(void) {
+GXColor effFunemizuGetMapColor(void) {
     ColorEntry* e;
     for (e = funemizu_color_tbl.e; e != NULL; e++) {
         if (e->name == NULL) {
@@ -294,7 +294,7 @@ void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
 
     cam = camGetPtr(cameraId);
     type = work->type;
-    color = unk_80224298();
+    color = effFunemizuGetMapColor();
     if (type == 0) {
         funemizu_color0_tbl[0] = color.r;
         funemizu_color0_tbl[1] = color.g;

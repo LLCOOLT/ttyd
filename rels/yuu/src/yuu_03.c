@@ -20,12 +20,12 @@ typedef struct MiniGameWork { EventEntry* event; EventEntry* subEvent; u16 flags
 typedef struct SlitWork { u32 flags; s32 phase; s32 coins; s32 result; s32 state; s32 timer; f32 rot1; f32 rot2; s32 monteCount; EventEntry* viewEvent; } SlitWork;
 typedef struct MonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } MonteSub;
 typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
-void unk_yuu_0000365c(CameraId camera, void* param);
+void yuu_03_icon_monte_disp(CameraId camera, void* param);
 extern s32 unk_evt_yuu_00015fe0[];
 void marioSlitForceCancel(void);
 void ext_yuunpc_minigame4_init_sub(void);
 void yuunpc_wp_flag_off(s32 flag);
-void unk_8009f9c8(void);
+void marioRollTryCancel(void);
 void motSlitCancel3(void);
 BOOL marioRollKeyDisable(void);
 typedef struct RyushiWork { s32 flag; s32 mode; Vec base; Vec pos; s32 alpha; s32 count; f32 scale; s32 r; s32 g; s32 b; s32 r2; s32 g2; s32 b2; } RyushiWork;
@@ -91,8 +91,8 @@ USER_FUNC(evt_yuuranking_free_31_text_5274);
 USER_FUNC(evt_yuutitle_alloc);
 USER_FUNC(evt_yuutitle_free);
 USER_FUNC(re_init_yuunpc);
-USER_FUNC(unk_yuu_000034bc);
-USER_FUNC(unk_yuu_0000371c);
+USER_FUNC(yuu_03_icon_monte_entry);
+USER_FUNC(yuu_03_cam_shift_reset);
 USER_FUNC(yuugijou_add_montemedal);
 USER_FUNC(yuugijou_get_montemedal);
 USER_FUNC(yuugijou_montemedal_disp_onoff);
@@ -115,8 +115,8 @@ void ryushi_disp(CameraId camera, void* param);
 static void polygon(f32 x, f32 y, f32 w, f32 h, f32 u, f32 v);
 static USER_FUNC(evt_nomal_cange);
 USER_FUNC(evt_slit_cancel);
-USER_FUNC(unk_yuu_0000341c);
-void unk_yuu_0000365c(CameraId camera, void* param);
+USER_FUNC(yuu_03_icon_monte_restart);
+void yuu_03_icon_monte_disp(CameraId camera, void* param);
 extern s32 evt_yuunpc_minigame4[];
 
 __declspec(section ".data") u64 fd_yuu_03_negone_one_374;
@@ -144,12 +144,12 @@ s32 minigame04_start[91];
 s32 minigame04_end[256];
 s32 yuu_03_init_evt[26];
 
-USER_FUNC(unk_yuu_0000371c) {
+USER_FUNC(yuu_03_cam_shift_reset) {
     camShiftReset();
     return EVT_RETURN_DONE;
 }
 
-void unk_yuu_0000365c(CameraId camera, void* param) {
+void yuu_03_icon_monte_disp(CameraId camera, void* param) {
     Monte* monte = param;
     s32 i;
     Vec pos;
@@ -167,7 +167,7 @@ void unk_yuu_0000365c(CameraId camera, void* param) {
     }
 }
 
-USER_FUNC(unk_yuu_000034bc) {
+USER_FUNC(yuu_03_icon_monte_entry) {
     BOOL exists = FALSE;
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
     MarioWork* mario = marioGetPtr();
@@ -207,12 +207,12 @@ USER_FUNC(unk_yuu_000034bc) {
         }
     }
     if (!exists) {
-        dispEntry(CAMERA_3D, 0.0f, 1, unk_yuu_0000365c, unk_yuu_bss00000010);
+        dispEntry(CAMERA_3D, 0.0f, 1, yuu_03_icon_monte_disp, unk_yuu_bss00000010);
     }
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(unk_yuu_0000341c) {
+USER_FUNC(yuu_03_icon_monte_restart) {
     SlitWork* data;
 
     if (unk_yuu_bss00000010 != NULL) {
@@ -260,7 +260,7 @@ static USER_FUNC(evt_nomal_cange) {
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {
-        unk_8009f9c8();
+        marioRollTryCancel();
         if (mario->flags & 0x100000) {
             motSlitCancel3();
         }
@@ -602,7 +602,7 @@ __declspec(section ".data") s32 fd_yuu_03_one_364[] = {
 };
 
 __declspec(section ".data") EVT_BEGIN(unk_evt_yuu_00015fe0)
-    CALL(unk_yuu_000034bc)
+    CALL(yuu_03_icon_monte_entry)
     RETURN
 EVT_END()
 
@@ -796,7 +796,7 @@ EVT_BEGIN(minigame04_end)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL_CHILD(PTR(yuu_03_kaijo_init2))
     CALL(evt_cam_road_reset)
-    CALL(unk_yuu_0000371c)
+    CALL(yuu_03_cam_shift_reset)
     WAIT_MS(500)
     CALL(re_init_yuunpc)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_GAME_AUDIENCE1"), GW(10))

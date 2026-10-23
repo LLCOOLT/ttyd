@@ -59,9 +59,9 @@ void select_disp3_party(WinMgrEntry* entry);
 void select_disp3_mario(WinMgrEntry* entry);
 void winMgrDisp(CameraId camId, void* param);
 void winMgrSeq(WinMgrEntry* entry);
-int unk_802379e4(void* a, void* b);
-int unk_80237a2c(void* a, void* b);
-s32 unk_80237448(WinMgrSelect* sel);
+int select_comp_type(void* a, void* b);
+int select_comp_starpiece(void* a, void* b);
+s32 winMgrSelectGetCursor(WinMgrSelect* sel);
 
 //.data
 
@@ -175,7 +175,7 @@ static inline const char* select_party_name(u16 id) /* */ {
     return name;
 }
 
-USER_FUNC(unk_80239b2c) {
+USER_FUNC(evt_win_party_lankup_chk) {
     PouchData* pouch;
     u16* p;
     s32* args = event->args;
@@ -200,7 +200,7 @@ USER_FUNC(unk_80239b2c) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_802399f8) {
+USER_FUNC(evt_win_party_lankdown_chk) {
     PouchData* pouch;
     u16* p;
     s32* args = event->args;
@@ -782,7 +782,7 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
                     sel->items[sel->numItems++].id = i + 240;
                 }
             }
-            qqsort(sel->items, sel->numItems, 4, unk_802379e4);
+            qqsort(sel->items, sel->numItems, 4, select_comp_type);
             break;
         case 13:
             m = getBadgeStarmaniacTableMaxCount();
@@ -799,7 +799,7 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
                     sel->numItems++;
                 }
             }
-            qqsort(sel->items, sel->numItems, 4, unk_80237a2c);
+            qqsort(sel->items, sel->numItems, 4, select_comp_starpiece);
             break;
         case 14:
             sel->items = __memAlloc(HEAP_DEFAULT, 0x10);
@@ -876,7 +876,7 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
     return sel;
 }
 
-int unk_80237a2c(void* a, void* b) {
+int select_comp_starpiece(void* a, void* b) {
     u16 x = itemDataTable[((WinMgrSelectItem*)a)->id].star_piece_price;
     u16 y = itemDataTable[((WinMgrSelectItem*)b)->id].star_piece_price;
     if (x > y) {
@@ -885,7 +885,7 @@ int unk_80237a2c(void* a, void* b) {
     return -(x < y);
 }
 
-int unk_802379e4(void* a, void* b) {
+int select_comp_type(void* a, void* b) {
     s16 x = itemDataTable[((WinMgrSelectItem*)a)->id].type_sort_order;
     s16 y = itemDataTable[((WinMgrSelectItem*)b)->id].type_sort_order;
     if (x > y) {
@@ -1077,7 +1077,7 @@ void winMgrSelectDelete(WinMgrSelect* sel) {
     __memFree(heap, sel3);
 }
 
-s32 unk_80237448(WinMgrSelect* sel) {
+s32 winMgrSelectGetCursor(WinMgrSelect* sel) {
     return sel->cursor;
 }
 

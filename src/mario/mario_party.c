@@ -94,7 +94,7 @@ s32 marioUseParty(void) {
     return 0;
 }
 
-s32 unk_8013be14(void) {
+s32 marioUsePartyMain(void) {
     MarioWork* wp = marioGetPtr();
 
     if (wp->trigFlags & 2) {

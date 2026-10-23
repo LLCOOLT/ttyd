@@ -50,15 +50,15 @@ USER_FUNC(evt_win_other_select);
 USER_FUNC(johoya_data_alloc);
 USER_FUNC(johoya_data_free);
 USER_FUNC(johoya_luigi_newjoho_setreadflag);
-USER_FUNC(unk_gor_000000cc);
-USER_FUNC(unk_gor_00000104);
+USER_FUNC(evt_gor_inemuri_snd_off);
+USER_FUNC(evt_gor_inemuri_snd_set);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 USER_FUNC(evt_goki_sub_intpl_get_value);
 USER_FUNC(evt_goki_sub_intpl_init);
 USER_FUNC(evt_gor_villager_urouro_check_func);
-USER_FUNC(unk_gor_0000041c);
-USER_FUNC(unk_gor_0000050c);
+USER_FUNC(evt_gor_msg_cat_alloc);
+USER_FUNC(evt_gor_msg_cat_free);
 void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
@@ -115,7 +115,7 @@ void _epilog(void) {
 void _unresolved(void) {
 }
 
-USER_FUNC(unk_gor_0000050c) {
+USER_FUNC(evt_gor_msg_cat_free) {
     if (unk_gor_bss00000000 == NULL) {
         return EVT_RETURN_DONE;
     }
@@ -124,7 +124,7 @@ USER_FUNC(unk_gor_0000050c) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_gor_0000041c) {
+USER_FUNC(evt_gor_msg_cat_alloc) {
     s32* args = event->args;
     const char* head = (const char*)evtGetValue(event, args[0]);
     const char* msg = msgSearch((const char*)evtGetValue(event, args[1]));
@@ -186,12 +186,12 @@ USER_FUNC(evt_goki_sub_intpl_get_value) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_gor_00000104) {
+USER_FUNC(evt_gor_inemuri_snd_set) {
     unk_gor_bss00000004 = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_gor_000000cc) {
+USER_FUNC(evt_gor_inemuri_snd_off) {
     if (unk_gor_bss00000004 != -1) {
         psndSFXOff(unk_gor_bss00000004);
     }
@@ -262,11 +262,11 @@ EVT_BEGIN(gor_villager_urouro)
 EVT_END()
 
 EVT_BEGIN(inemuri_snd)
-    CALL(unk_gor_00000104, -1)
+    CALL(evt_gor_inemuri_snd_set, -1)
     LABEL(0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_SLEEP1"), LW(0), LW(1), LW(2), LW(3))
-    CALL(unk_gor_00000104, LW(3))
+    CALL(evt_gor_inemuri_snd_set, LW(3))
     WAIT_FRAMES(140)
     GOTO(0)
     RETURN
@@ -332,7 +332,7 @@ EVT_BEGIN(mario_and_party_sleep)
     END_LOOP
     IF_INT_NOT_EQUAL(LW(15), -1)
         DELETE_EVENT(LW(15))
-        CALL(unk_gor_000000cc)
+        CALL(evt_gor_inemuri_snd_off)
     END_IF
     IF_INT_LESS_OR_EQUAL(LW(2), 0)
         CALL(evt_mario_get_party, LW(0))

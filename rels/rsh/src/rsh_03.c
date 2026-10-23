@@ -98,7 +98,7 @@ USER_FUNC(iri_22_make_item_tbl);
 static USER_FUNC(mario_flag);
 USER_FUNC(omiseFukki);
 USER_FUNC(omiseHozon);
-USER_FUNC(unk_rsh_00002634);
+USER_FUNC(npc_alpha_except_tenin);
 extern s32 evt_bero_info_run[];
 extern s32 evt_rsh_03_rnd_npc_entry[];
 extern s32 evt_rsh_moamoa_on_window[];
@@ -1059,7 +1059,7 @@ EVT_BEGIN(shop_door_close)
     RETURN
 EVT_END()
 
-USER_FUNC(unk_rsh_00002634) {
+USER_FUNC(npc_alpha_except_tenin) {
     s32 alpha = evtGetValue(event, event->args[0]);
     NpcWork* wp = npcGetWorkPtr();
     s32 i;
@@ -1118,7 +1118,7 @@ EVT_BEGIN(evt_shop_open)
         CALL(evt_sub_intpl_msec_init, 11, 255, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL(unk_rsh_00002634, LW(0))
+            CALL(npc_alpha_except_tenin, LW(0))
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
@@ -1164,7 +1164,7 @@ EVT_BEGIN(evt_shop_close)
         CALL(evt_sub_intpl_msec_init, 11, 0, 255, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL(unk_rsh_00002634, LW(0))
+            CALL(npc_alpha_except_tenin, LW(0))
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP

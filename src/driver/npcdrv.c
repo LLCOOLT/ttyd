@@ -2009,7 +2009,7 @@ void fbatBattleMode(void) {
                 marioFBattlePrepare();
                 seqSetSeq(4, NULL, NULL);
                 if (FBAT_U32(data, 0x10) == 0x10000000) {
-                    unk_80058374();
+                    marioChgDamagePose();
                 }
                 FBAT_SUB(data) = 1;
             } else {

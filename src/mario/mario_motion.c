@@ -119,7 +119,7 @@ void kpaCamFollow(void);
 void set_damage_root_ypos(f32 y);
 void effKemuriEntry(s32 type, f32 x, f32 y, f32 z, f32 w);
 void yoshi_jumpStand(void);
-void unk_800a4e40(void);
+void marioSlitReenter(void);
 BOOL marioChkSlitEnd(void);
 void motSlitCancel(void);
 s32 kpaFireAttackCheck(void);
@@ -751,7 +751,7 @@ void marioLandOn(void) {
 			return;
 		}
 		if (mario->flags & 0x100000) {
-			unk_800a4e40();
+			marioSlitReenter();
 			return;
 		}
 		if ((mario->dispFlags & 0x1000000) && !marioChkSlitEnd()) {
@@ -795,7 +795,7 @@ void marioLandOn(void) {
 		return;
 	}
 	if (flags & 0x100000) {
-		unk_800a4e40();
+		marioSlitReenter();
 		return;
 	}
 	if ((mario->dispFlags & 0x1000000) && !marioChkSlitEnd()) {

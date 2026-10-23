@@ -7,7 +7,7 @@
 #include "driver/npcdrv.h"
 #include "pmario_sound.h"
 
-s32 unk_8009fcbc(void);
+s32 marioRollCancelDisable(void);
 s32 U_marioSlitContinueChk(void);
 NpcEntry* fbatHitCheckAll(void);
 
@@ -99,7 +99,7 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(toron_check);
-USER_FUNC(unk_rsh_00002384);
+USER_FUNC(mario_normalize_wait);
 void yuurei_callback(s32 type, void* param);
 void powan_callback(s32 type, void* param);
 extern s32 bero_case_entry[];
@@ -168,8 +168,8 @@ s32 rsh_02_b_init_evt_nidome[213];
 s32 rsh_02_c_init_evt_nidome[136];
 s32 evt_nidome_bed[126];
 
-USER_FUNC(unk_rsh_00002384) {
-    if (!unk_8009fcbc() && !U_marioSlitContinueChk()) {
+USER_FUNC(mario_normalize_wait) {
+    if (!marioRollCancelDisable() && !U_marioSlitContinueChk()) {
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;
@@ -911,7 +911,7 @@ EVT_BEGIN(evt_toron_catch)
         IF_INT_EQUAL(LW(10), 1)
             CALL(evt_mario_key_onoff, 0)
             BEGIN_INLINE_EVENT
-                CALL(unk_rsh_00002384)
+                CALL(mario_normalize_wait)
                 CALL(evt_mario_normalize)
                 CALL(evt_party_yoshi_ride, 0, 0)
             END_INLINE_EVENT

@@ -141,7 +141,7 @@ extern WinPartyDt winPartyDt[7];
 void psndSFXOn(s32 id);
 void winSortEntry(ItemWork* w, s32 a, f32 x, f32 y);
 s32 winSortWait(ItemWork* w);
-s32 unk_8009fcbc(void);
+s32 marioRollCancelDisable(void);
 BOOL U_marioSlitContinueChk(void);
 BOOL pouchRemoveItemIndex(s32 id, s32 index);
 
@@ -644,7 +644,7 @@ s32 winItemMain(ItemWork* w) {
             if (mp->currMotionId == 0x19 || mp->currMotionId == 0x18) {
                 ok = 1;
             }
-            if (unk_8009fcbc() || U_marioSlitContinueChk()) {
+            if (marioRollCancelDisable() || U_marioSlitContinueChk()) {
                 ok = 1;
             }
             if (w->sel > 0 && marioBgmodeChk()) {

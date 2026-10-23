@@ -70,7 +70,7 @@ USER_FUNC(evt_yuutitle_alloc);
 USER_FUNC(evt_yuutitle_free);
 static USER_FUNC(fall_rtn);
 static USER_FUNC(re_fall_rtn);
-USER_FUNC(unk_yuu_00004250);
+USER_FUNC(yuu_00_cam_shift_reset);
 USER_FUNC(yuu_atai_init);
 USER_FUNC(yuu_atai_pop);
 USER_FUNC(yuu_atai_push);
@@ -588,7 +588,7 @@ EVT_BEGIN(minigame01_end)
     CALL(re_fall_rtn)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL_CHILD(PTR(yuu_00_kaijo_init2))
-    CALL(unk_yuu_00004250)
+    CALL(yuu_00_cam_shift_reset)
     WAIT_MS(500)
     CALL_CHILD(PTR(light_sub_event))
     CALL(evt_snd_sfxon, STRING("SFX_EVT_GAME_AUDIENCE1"), GW(10))
@@ -603,7 +603,7 @@ __declspec(section ".data") EVT_BEGIN(yuu_00_init_evt)
     RETURN
 EVT_END()
 
-USER_FUNC(unk_yuu_00004250) {
+USER_FUNC(yuu_00_cam_shift_reset) {
     camShiftReset();
     return EVT_RETURN_DONE;
 }

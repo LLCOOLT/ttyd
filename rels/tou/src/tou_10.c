@@ -108,8 +108,8 @@ USER_FUNC(evt_win_nameent_wait);
 static USER_FUNC(getYoshiColor);
 USER_FUNC(name_check);
 USER_FUNC(setYoshiColor);
-USER_FUNC(unk_tou_00006e5c);
-USER_FUNC(unk_tou_00006ec8);
+USER_FUNC(tou_10_mario_keyoff_check);
+USER_FUNC(tou_10_mario_free_wait);
 extern s32 all_party_lecture_27_data_2DF64[];
 extern s32 bero_case_switch_off[];
 extern s32 bero_close_door_play_se[];
@@ -178,7 +178,7 @@ s32 first_tamago[52];
 static __declspec(section ".data") s32 evt_block[5];
 s32 tou_10_init_evt[254];
 
-USER_FUNC(unk_tou_00006e5c) {
+USER_FUNC(tou_10_mario_keyoff_check) {
     s32* args = event->args;
 
     if (marioKeyOffChk() || marioCtrlOffChk()) {
@@ -189,7 +189,7 @@ USER_FUNC(unk_tou_00006e5c) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_tou_00006ec8) {
+USER_FUNC(tou_10_mario_free_wait) {
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {
@@ -1317,7 +1317,7 @@ EVT_BEGIN(evt_rec)
 EVT_END()
 
 static EVT_BEGIN(evt_gardman)
-    CALL(unk_tou_00006ec8)
+    CALL(tou_10_mario_free_wait)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_wait_landon)
     WAIT_FRAMES(1)
@@ -1426,7 +1426,7 @@ EVT_BEGIN(evt_match_make_sub)
 EVT_END()
 
 EVT_BEGIN(evt_match_make)
-    CALL(unk_tou_00006e5c, LW(0))
+    CALL(tou_10_mario_keyoff_check, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
     END_IF

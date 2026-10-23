@@ -809,7 +809,7 @@ s32 kpaGetAttackMode(void) {
     return *(s32*)(KPW(marioGetPtr()) + 0x13C) != 0;
 }
 
-void unk_801f8cd0(void) {
+void kpaFireDelete(void) {
     if (fireefp) {
         MarioWork* mp;
         effSoftDelete((void*)fireefp);

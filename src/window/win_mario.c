@@ -317,7 +317,7 @@ const char* winZenkakuStr(s32 n) {
 
 char unk_803dfbf8[0x100];
 
-char* unk_8016af5c(s32 n, s32 digits) {
+char* winZenkakuStrPad(s32 n, s32 digits) {
     const char* tbl[10] = {"\x82\x4f", "\x82\x50", "\x82\x51", "\x82\x52", "\x82\x53",
                            "\x82\x54", "\x82\x55", "\x82\x56", "\x82\x57", "\x82\x58"};
     char buf[0x100];
@@ -574,8 +574,8 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         hour = (u64)secs / 3600;
         min = (u64)secs % 3600 / 60;
     }
-    winFontSetR((Vec){2.0f + (2.0f + ((8.0f + (172.0f + x)) - 16.0f)), rowA, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", unk_8016af5c(hour, 2));
-    winFontSetR((Vec){numX, rowA, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", unk_8016af5c(min, 2));
+    winFontSetR((Vec){2.0f + (2.0f + ((8.0f + (172.0f + x)) - 16.0f)), rowA, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStrPad(hour, 2));
+    winFontSetR((Vec){numX, rowA, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStrPad(min, 2));
 
     winTexInit(*w->file->data);
     cx = 10.0f + (190.0f + x);

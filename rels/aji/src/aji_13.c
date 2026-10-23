@@ -73,7 +73,7 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(evt_win_item_select);
 static USER_FUNC(mario_chk);
-USER_FUNC(unk_aji_000035a0);
+USER_FUNC(hit_group_chk);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 extern s32 bero_case_switch_off[];
@@ -439,7 +439,7 @@ EVT_BEGIN(move_up_down)
         BEGIN_SIBLING_EVENT
             LOOP(0)
                 CALL(evt_mario_get_name_hitobj_head, LW(10))
-                CALL(unk_aji_000035a0, LW(10), LW(5), LW(10))
+                CALL(hit_group_chk, LW(10), LW(5), LW(10))
                 IF_INT_NOT_EQUAL(LW(10), 0)
                     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
                     IF_FLOAT_GREATER(LW(1), FLOAT(0.099609375f))
@@ -839,7 +839,7 @@ EVT_BEGIN(aji_13_init_evt)
 EVT_END()
 
 
-USER_FUNC(unk_aji_000035a0) {
+USER_FUNC(hit_group_chk) {
     s32* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
     const char* name2 = (const char*)evtGetValue(event, args[1]);

@@ -61,7 +61,7 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_win_item_select);
 static USER_FUNC(mario_flag);
-USER_FUNC(unk_800e71bc);
+USER_FUNC(evt_party_trigflg_onoff);
 extern s32 bero_case_entry[];
 extern s32 bero_case_switch_off[];
 extern s32 bero_case_switch_on[];
@@ -1223,7 +1223,7 @@ EVT_BEGIN(rsh_04_b_init_evt)
         CALL(evt_mario_set_pos, 220, 0, -20)
         CALL(evt_party_set_pos, 0, 200, 0, -20)
         DEBUG_PUT_MSG(STRING("パーティドア移動フラグクリア"))
-        CALL(unk_800e71bc, 0, 3538944, 0)
+        CALL(evt_party_trigflg_onoff, 0, 3538944, 0)
     END_IF
     CALL_CHILD(PTR(rsh_04_init_evt))
     RETURN
@@ -1246,7 +1246,7 @@ EVT_BEGIN(rsh_04_c_init_evt)
         CALL(evt_mario_set_pos, -200, 0, -30)
         CALL(evt_party_set_pos, 0, -230, 0, -30)
         DEBUG_PUT_MSG(STRING("パーティドア移動フラグクリア"))
-        CALL(unk_800e71bc, 0, 3538944, 0)
+        CALL(evt_party_trigflg_onoff, 0, 3538944, 0)
     END_IF
     CALL_CHILD(PTR(rsh_04_init_evt))
     CALL(evt_map_playanim, STRING("ranpu"), 1, 0)

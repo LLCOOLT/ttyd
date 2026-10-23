@@ -20,7 +20,7 @@ const char* nameEntGetName(void);
 BOOL nameEntWait(void);
 BOOL nameEntPrepare(void);
 void nameEntOn(s32 type);
-s32 unk_80237448(WinMgrSelect* sel);
+s32 winMgrSelectGetCursor(WinMgrSelect* sel);
 
 #define RAW_GET(fn) ((s32(*)(void))(fn))
 
@@ -65,7 +65,7 @@ USER_FUNC(evt_win_item_select) {
 	if (result == 0) {
 		return EVT_RETURN_BLOCK;
 	}
-	extra = unk_80237448(sel);
+	extra = winMgrSelectGetCursor(sel);
 	winMgrSelectDelete(sel);
 	marioKeyOn();
 	evtSetValue(event, args[2], result);

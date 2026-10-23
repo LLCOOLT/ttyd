@@ -18,7 +18,7 @@ extern int strcmp(const char* a, const char* b);
 extern char* strncpy(char* dst, const char* src, unsigned long n);
 extern ItemData itemDataTable[];
 void qqsort(void* base, u32 n, u32 size, s32 (*compare)(const void*, const void*));
-void unk_800d06b4(const char* msg, char* out);
+void pouchHiraToKata(const char* msg, char* out);
 
 typedef struct WinSortEnt {
     u8 kind; // 0x0
@@ -216,8 +216,8 @@ void winPartyExit();
 void winItemExit();
 void winBadgeExit();
 void winLogExit();
-void unk_8014d338();
-void unk_8014d5dc();
+void winRootBgDrawDisp();
+void winRootBgCaptureDisp();
 double sin(double);
 double fabs(double);
 
@@ -425,7 +425,7 @@ s32 winRootMain(WinRootWork* w) {
         }
         w->texBuf = smartAlloc(GXGetTexBufferSize(gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_FALSE, 0), 1);
         w->texBufValid = 0;
-        dispEntry(CAMERA_2D, 1000.0f, 0, (DispCallback)unk_8014d5dc, w);
+        dispEntry(CAMERA_2D, 1000.0f, 0, (DispCallback)winRootBgCaptureDisp, w);
         break;
     case 10:
         if (w->buttonTrg & 0x1200) {
@@ -594,7 +594,7 @@ s32 winRootMain(WinRootWork* w) {
     w->helpX += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
     w->sortPosX += (w->sortTgtX - w->sortPosX) / 4.0f;
     w->sortPosY += (w->sortTgtY - w->sortPosY) / 4.0f;
-    dispEntry(CAMERA_2D, 1000.0f, 0, (DispCallback)unk_8014d338, w);
+    dispEntry(CAMERA_2D, 1000.0f, 0, (DispCallback)winRootBgDrawDisp, w);
     return 0;
 }
 
@@ -1810,8 +1810,8 @@ s32 N_compare_func4_1(const void* a, const void* b) {
     s16 ia = ((WinBadgeEnt*)a)->id;
     s16 ib = ((WinBadgeEnt*)b)->id;
 
-    unk_800d06b4(msgSearch(itemDataTable[ia].name), buf1);
-    unk_800d06b4(msgSearch(itemDataTable[ib].name), buf2);
+    pouchHiraToKata(msgSearch(itemDataTable[ia].name), buf1);
+    pouchHiraToKata(msgSearch(itemDataTable[ib].name), buf2);
     return strcmp(buf1, buf2);
 }
 
@@ -1821,8 +1821,8 @@ s32 N_compare_func4_1_r(const void* a, const void* b) {
     s16 ia = ((WinBadgeEnt*)a)->id;
     s16 ib = ((WinBadgeEnt*)b)->id;
 
-    unk_800d06b4(msgSearch(itemDataTable[ia].name), buf1);
-    unk_800d06b4(msgSearch(itemDataTable[ib].name), buf2);
+    pouchHiraToKata(msgSearch(itemDataTable[ia].name), buf1);
+    pouchHiraToKata(msgSearch(itemDataTable[ib].name), buf2);
     return strcmp(buf2, buf1);
 }
 
@@ -1934,8 +1934,8 @@ s32 compare_func5_1(const void* a, const void* b) {
     s16 ia = *(s16*)a + 0xF0;
     s16 ib = *(s16*)b + 0xF0;
 
-    unk_800d06b4(msgSearch(itemDataTable[ia].name), buf1);
-    unk_800d06b4(msgSearch(itemDataTable[ib].name), buf2);
+    pouchHiraToKata(msgSearch(itemDataTable[ia].name), buf1);
+    pouchHiraToKata(msgSearch(itemDataTable[ib].name), buf2);
     return strcmp(buf1, buf2);
 }
 
@@ -1945,8 +1945,8 @@ s32 compare_func5_1_r(const void* a, const void* b) {
     s16 ia = *(s16*)a + 0xF0;
     s16 ib = *(s16*)b + 0xF0;
 
-    unk_800d06b4(msgSearch(itemDataTable[ia].name), buf1);
-    unk_800d06b4(msgSearch(itemDataTable[ib].name), buf2);
+    pouchHiraToKata(msgSearch(itemDataTable[ia].name), buf1);
+    pouchHiraToKata(msgSearch(itemDataTable[ib].name), buf2);
     return strcmp(buf2, buf1);
 }
 
@@ -2068,8 +2068,8 @@ s32 compare_func6_1(const void* a, const void* b) {
     s16 ia = *(s16*)a + 0xB3;
     s16 ib = *(s16*)b + 0xB3;
 
-    unk_800d06b4(msgSearch(itemDataTable[ia].name), buf1);
-    unk_800d06b4(msgSearch(itemDataTable[ib].name), buf2);
+    pouchHiraToKata(msgSearch(itemDataTable[ia].name), buf1);
+    pouchHiraToKata(msgSearch(itemDataTable[ib].name), buf2);
     return strcmp(buf1, buf2);
 }
 
@@ -2079,8 +2079,8 @@ s32 compare_func6_1_r(const void* a, const void* b) {
     s16 ia = *(s16*)a + 0xB3;
     s16 ib = *(s16*)b + 0xB3;
 
-    unk_800d06b4(msgSearch(itemDataTable[ia].name), buf1);
-    unk_800d06b4(msgSearch(itemDataTable[ib].name), buf2);
+    pouchHiraToKata(msgSearch(itemDataTable[ia].name), buf1);
+    pouchHiraToKata(msgSearch(itemDataTable[ib].name), buf2);
     return strcmp(buf2, buf1);
 }
 
@@ -2226,20 +2226,20 @@ s32 compare_func3(const void* a, const void* b) {
     TattleEntry* ta = battleGetUnitMonosiriPtr(((WinSortEnt*)a)->id);
     TattleEntry* tb = battleGetUnitMonosiriPtr(((WinSortEnt*)b)->id);
 
-    unk_800d06b4(msgSearch(ta->enemyTag), buf1);
-    unk_800d06b4(msgSearch(tb->enemyTag), buf2);
+    pouchHiraToKata(msgSearch(ta->enemyTag), buf1);
+    pouchHiraToKata(msgSearch(tb->enemyTag), buf2);
     if (((WinSortEnt*)a)->id == 0x4D || ((WinSortEnt*)a)->id == 0x87) {
         if (evtGetValue(NULL, GSW(0)) < 210) {
-            unk_800d06b4(msgSearch("btl_un_hatena"), buf1);
+            pouchHiraToKata(msgSearch("btl_un_hatena"), buf1);
         } else {
-            unk_800d06b4(msgSearch("btl_un_rampell"), buf1);
+            pouchHiraToKata(msgSearch("btl_un_rampell"), buf1);
         }
     }
     if (((WinSortEnt*)b)->id == 0x4D || ((WinSortEnt*)b)->id == 0x87) {
         if (evtGetValue(NULL, GSW(0)) < 210) {
-            unk_800d06b4(msgSearch("btl_un_hatena"), buf2);
+            pouchHiraToKata(msgSearch("btl_un_hatena"), buf2);
         } else {
-            unk_800d06b4(msgSearch("btl_un_rampell"), buf2);
+            pouchHiraToKata(msgSearch("btl_un_rampell"), buf2);
         }
     }
     return strcmp(buf1, buf2);
@@ -2251,20 +2251,20 @@ s32 compare_func3_r(const void* a, const void* b) {
     TattleEntry* ta = battleGetUnitMonosiriPtr(((WinSortEnt*)a)->id);
     TattleEntry* tb = battleGetUnitMonosiriPtr(((WinSortEnt*)b)->id);
 
-    unk_800d06b4(msgSearch(ta->enemyTag), buf1);
-    unk_800d06b4(msgSearch(tb->enemyTag), buf2);
+    pouchHiraToKata(msgSearch(ta->enemyTag), buf1);
+    pouchHiraToKata(msgSearch(tb->enemyTag), buf2);
     if (((WinSortEnt*)a)->id == 0x4D || ((WinSortEnt*)a)->id == 0x87) {
         if (evtGetValue(NULL, GSW(0)) < 210) {
-            unk_800d06b4(msgSearch("btl_un_hatena"), buf1);
+            pouchHiraToKata(msgSearch("btl_un_hatena"), buf1);
         } else {
-            unk_800d06b4(msgSearch("btl_un_rampell"), buf1);
+            pouchHiraToKata(msgSearch("btl_un_rampell"), buf1);
         }
     }
     if (((WinSortEnt*)b)->id == 0x4D || ((WinSortEnt*)b)->id == 0x87) {
         if (evtGetValue(NULL, GSW(0)) < 210) {
-            unk_800d06b4(msgSearch("btl_un_hatena"), buf2);
+            pouchHiraToKata(msgSearch("btl_un_hatena"), buf2);
         } else {
-            unk_800d06b4(msgSearch("btl_un_rampell"), buf2);
+            pouchHiraToKata(msgSearch("btl_un_rampell"), buf2);
         }
     }
     return strcmp(buf2, buf1);
@@ -2713,7 +2713,7 @@ typedef struct WinBgWork {
     s32 copied; // 0x38
 } WinBgWork;
 
-void unk_8014d5dc(s32 unused, WinBgWork* bg) {
+void winRootBgCaptureDisp(s32 unused, WinBgWork* bg) {
     GXSetTexCopySrc(0, 0, gp->fbWidth, gp->efbHeight);
     GXSetTexCopyDst(gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_FALSE);
     GXCopyTex(*bg->tex, GX_FALSE);
@@ -2723,7 +2723,7 @@ void unk_8014d5dc(s32 unused, WinBgWork* bg) {
     camDispOff((CameraId)4);
 }
 
-void unk_8014d338(s32 unused, WinBgWork* bg) {
+void winRootBgDrawDisp(s32 unused, WinBgWork* bg) {
     GXTexObj obj;
     f32 w;
     f32 h;

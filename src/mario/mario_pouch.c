@@ -491,7 +491,7 @@ BOOL pouchRemoveItemIndex(ItemType type, s32 index) {
 	return FALSE;
 }
 
-void unk_800d06b4(const char* src, char* dst) {
+void pouchHiraToKata(const char* src, char* dst) {
 	u16 c;
 	s32 len = strlen(src) / 2;
 	u16* s = (u16*)src;
@@ -1166,7 +1166,7 @@ s32 comp_kind_r(s16* a, s16* b);
 s32 comp_aiueo_r(const void* a, const void* b);
 s32 comp_kind(s16* a, s16* b);
 s32 comp_aiueo(const void* a, const void* b);
-void unk_800d06b4(const char* src, char* dst);
+void pouchHiraToKata(const char* src, char* dst);
 BOOL pouchRemoveItemIndex(ItemType type, s32 index);
 BOOL pouchRemoveItem(ItemType type);
 u32 pouchCheckItem(u32 itemId);

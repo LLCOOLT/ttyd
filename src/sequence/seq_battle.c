@@ -60,7 +60,7 @@ BOOL bmapLoad(const char* a, const char* b);
 void bmapUnLoad(void);
 LightView* lightGetPaperCraft(void);
 BattleUnitType BattleTransPartyIdToUnitKind(s32 id);
-void unk_800d7270(u32 a, u32 b, u32 c, u32 d);
+void psndBGMOn_f(u32 a, u32 b, u32 c, u32 d);
 BOOL psndBGMOff(u32 flags);
 BOOL psndENVOn(u32 a, char* b);
 typedef struct PartyView {
@@ -380,7 +380,7 @@ void battle_exit(void) {
     PSMTXScale(mtx, 3.0f, 3.0f, 3.0f);
     PSMTXMultVec(mtx, &light->pos, &light->pos);
     if (evtGetValue(NULL, GSW0) >= 109 && evtGetValue(NULL, GSW0) < 111) {
-        unk_800d7270(0x120, 0, 0x2EE, 1);
+        psndBGMOn_f(0x120, 0, 0x2EE, 1);
     } else if (evtGetValue(NULL, GSW0) != 402 && seqGetNextSeq() != 5) {
         psndBGMOn(0x120, NULL);
         psndENVOn(0x120, NULL);

@@ -26,7 +26,7 @@ void iconDispGx(f32 scale, Vec* position, s16 flags, u16 iconId);
 #define NUMERIC_ID ((u16*)numeric_id)
 s32 kpaMutekiCheck(void);
 f32 kpaGetWidth(s32 type);
-void unk_801f8cd0(void);
+void kpaFireDelete(void);
 void kpaAddCoinPos(s32 num, Vec* pos);
 void mobjKoopaOn(void);
 typedef void (*voidfunctionptr)(void);
@@ -111,7 +111,7 @@ USER_FUNC(kpa_set_time);
 USER_FUNC(kpa_status_get_stage);
 USER_FUNC(kpa_status_main);
 USER_FUNC(kpa_time_countdown);
-USER_FUNC(unk_kpa_00000a08);
+USER_FUNC(kpa_fire_off);
 USER_FUNC(kpa_get_cam_pt);
 USER_FUNC(kpa_stageclear_disp_entry);
 void kpa_stageclear_disp(CameraId camera, void* param);
@@ -381,7 +381,7 @@ EVT_BEGIN(kpa_dead)
     SET_VALUE(LSWF(3), 1)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_cam_letter_box_onoff, 0, 0)
-    CALL(unk_kpa_00000a08)
+    CALL(kpa_fire_off)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_mario_adjust_dir)
@@ -469,8 +469,8 @@ USER_FUNC(kpa_nohitenemy_ct_clear) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_kpa_00000a08) {
-    unk_801f8cd0();
+USER_FUNC(kpa_fire_off) {
+    kpaFireDelete();
     return EVT_RETURN_DONE;
 }
 

@@ -49,7 +49,7 @@ void marioBalloonOn(s32 type);
 void marioBalloonOff(void);
 void marioSetCamId(s32 id);
 void marioChgTalkMotion(void);
-void unk_8009f9c8(void);
+void marioRollTryCancel(void);
 void marioSetForceMove(s32 frames, f32 dir, f32 spd);
 f32 toMovedirSimple(f32 dir);
 void marioSlitForceCancel(void);
@@ -184,7 +184,7 @@ void* effKemuriEntry(s32 type, f32 x, f32 y, f32 z, f32 w);
 void N_partyFollowCloseOn(PartyEntry* party);
 void N_partyFollowCloseOff(PartyEntry* party);
 void partyMoveBehindMario3(PartyEntry* party, s32 a, f32 dir);
-void unk_800c8e74(PartyEntry* party);
+void partySetDispDirToMario(PartyEntry* party);
 
 USER_FUNC(evt_mario_dokan_prepare) {
     s32* args = event->args;
@@ -652,7 +652,7 @@ USER_FUNC(evt_mario_set_dir_npc) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_800e23e0) {
+USER_FUNC(evt_mario_set_dir_pos) {
     s32* args = event->args;
     MarioWork* mp = marioGetPtr();
     f32 x = evtGetValue(event, args[0]);
@@ -874,7 +874,7 @@ USER_FUNC(evt_mario_set_talk_motion) {
 
 USER_FUNC(evt_mario_cancel_roll_motion) {
     if (isFirstCall) {
-        unk_8009f9c8();
+        marioRollTryCancel();
     }
     if (marioGetPtr()->flags & 0x1000000) {
         return EVT_RETURN_BLOCK;
@@ -1191,7 +1191,7 @@ USER_FUNC(evt_mario_party_bero_move) {
                 party->flags &= ~0x1000000;
                 party->field_8 &= ~0x200000;
                 if (party->field_32[0] == 1) {
-                    unk_800c8e74(party);
+                    partySetDispDirToMario(party);
                     party->flags2 &= ~0x10;
                 }
             }
@@ -1201,7 +1201,7 @@ USER_FUNC(evt_mario_party_bero_move) {
                 party->flags &= ~0x1000000;
                 party->field_8 &= ~0x200000;
                 if (party->field_32[0] == 1) {
-                    unk_800c8e74(party);
+                    partySetDispDirToMario(party);
                     party->flags2 &= ~0x10;
                 }
             }

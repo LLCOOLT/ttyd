@@ -89,7 +89,7 @@ USER_FUNC(evt_tou_get_ranking_27_text_1ED4);
 static USER_FUNC(get_yoshi_color);
 USER_FUNC(icon_off);
 USER_FUNC(tou_champion_belt_27_text_34);
-USER_FUNC(unk_tou_00006e08);
+USER_FUNC(tou_08_belt_camid);
 extern s32 bero_close_door_play_se[];
 extern s32 bero_open_door_play_se[];
 extern s32 evt_bero_info_run[];
@@ -902,7 +902,7 @@ EVT_BEGIN(evt_champion_win)
     ADD(LW(1), 4)
     ADD(LW(2), 15)
     CALL(evt_eff, STRING("belt"), STRING("starstone"), 9, LW(0), LW(1), LW(2), FLOAT(0.75f), 0, 0, 0, 0, 0, 0, 0)
-    CALL(unk_tou_00006e08)
+    CALL(tou_08_belt_camid)
     CALL(evt_item_entry, STRING("belt"), 65, 0, -1000, 0, 17, -1, 0)
     CALL(icon_off)
     CALL(evt_item_get_item, STRING("belt"))
@@ -939,7 +939,7 @@ EVT_BEGIN(evt_champion_win)
     RETURN
 EVT_END()
 
-USER_FUNC(unk_tou_00006e08) {
+USER_FUNC(tou_08_belt_camid) {
     EffectEntry* eff = effNameToPtr("belt");
     // ベルト
     NpcEntry* npc = npcNameToPtr("\x83\x78\x83\x8B\x83\x67");

@@ -59,7 +59,7 @@ extern void partyChkGnd(PartyEntry* party);
 extern void partyChgRunMode(PartyEntry* party, s32 mode);
 extern void partyWalkInit(PartyEntry* party, s32 mode);
 extern void partyWalkMain(PartyEntry* party);
-extern void unk_800c92c4(PartyEntry* party);
+extern void partyUpdMoveSpd(PartyEntry* party);
 extern f32 partyToMovedir(PartyEntry* party, f32 angle);
 extern void* effFukidashiEntry(s32 a, s32 b, s32 c, f32 d, f32 e, f32 f, f32 g, f32 h, s32 frames);
 extern void* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range);
@@ -372,7 +372,7 @@ void chuchu_move(PartyEntry* party) {
         party->flags &= ~0x100;
         partyWalkInit(party, 1);
     }
-    unk_800c92c4(party);
+    partyUpdMoveSpd(party);
     partyWalkMain(party);
 }
 

@@ -17,8 +17,8 @@ USER_FUNC(evt_eff);
 USER_FUNC(evt_eff_softdelete);
 USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(unk_las_0000775c);
-USER_FUNC(unk_las_00007774);
+USER_FUNC(hi_fire_end);
+USER_FUNC(hi_fire_main);
 extern s32 battle_flower_drop_param_default[];
 extern s32 battle_flower_drop_param_default3[];
 extern s32 battle_heart_drop_param_default[];
@@ -253,7 +253,7 @@ __declspec(section ".data") s32 stg_08_1_init_event[4];
 s32 stg_08_6_init_sub_event[46];
 __declspec(section ".data") s32 stg_08_6_init_event[4];
 
-USER_FUNC(unk_las_0000775c) {
+USER_FUNC(hi_fire_end) {
     unk_las_bss00000098[0] = 1;
     return EVT_RETURN_DONE;
 }
@@ -1530,7 +1530,7 @@ EVT_END()
 
 EVT_BEGIN(stg_08_6_init_sub_event)
     BEGIN_SIBLING_EVENT
-        CALL(unk_las_00007774)
+        CALL(hi_fire_main)
     END_SIBLING_EVENT
     CALL(evt_mapobj_flag_onoff, 0, 1, STRING("hi1"), 1)
     CALL(evt_mapobj_flag_onoff, 0, 1, STRING("hi2"), 1)
@@ -1539,11 +1539,11 @@ EVT_BEGIN(stg_08_6_init_sub_event)
     CALL(evt_mapobj_flag_onoff, 0, 1, STRING("hi5"), 1)
     CALL(evt_mapobj_flag_onoff, 0, 1, STRING("hi6"), 1)
     CALL(check_battle_end)
-    CALL(unk_las_0000775c)
+    CALL(hi_fire_end)
     RETURN
 EVT_END()
 
-USER_FUNC(unk_las_00007774) {
+USER_FUNC(hi_fire_main) {
     const char* names[6] = {"hi1", "hi2", "hi3", "hi4", "hi5", "hi6"};
     Vec pos;
     s32 i;

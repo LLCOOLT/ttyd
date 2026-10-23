@@ -752,7 +752,7 @@ void mobjMain(void) {
                     hit = 1;
                     goto hitDone;
                 }
-                if (unk_8005bb80() && (entry->flags & 0x40000) && mario->hitobjFront == hitPtr &&
+                if (marioFrontActionValidChk() && (entry->flags & 0x40000) && mario->hitobjFront == hitPtr &&
                     (mario->buttonBuffer & 0x100) && !partyFlag) {
                     entry->hitFlag = 0x40000;
                     hit = 1;

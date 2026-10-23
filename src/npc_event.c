@@ -290,7 +290,7 @@ USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 USER_FUNC(gesso_ground_check);
 USER_FUNC(set_bottle_flag_init);
-USER_FUNC(unk_800ece0c);
+USER_FUNC(npc_fire_eff_fadeout);
 USER_FUNC(zakoEntryFall);
 USER_FUNC(dokanCheck);
 USER_FUNC(zakoEntryDokan);
@@ -1722,7 +1722,7 @@ EVT_BEGIN(karon_find_event)
     RETURN
 EVT_END()
 
-// TODO: USER_FUNC(unk_800ece0c) { }
+// TODO: USER_FUNC(npc_fire_eff_fadeout) { }
 
 // TODO: USER_FUNC(zakoEntryFall) { }
 
@@ -3959,7 +3959,7 @@ USER_FUNC(zakoEntryFall) {
 }
 
 
-USER_FUNC(unk_800ece0c) {
+USER_FUNC(npc_fire_eff_fadeout) {
     s32* args;
     NpcEntry* npc;
     f32 x, y, z;
@@ -4167,7 +4167,7 @@ s32 zakoM2D_find_event[] = {
     0, 0, 0, 0, 0, 0, 65541, 12,
     983131, (s32)evt_eff64, (s32)"", (s32)"glass_n64", 0, -30000000, -29999999, -29999998,
     -229998976, 30, 0, 0, 0, 0, 0, 0,
-    6, 107, 327771, (s32)unk_800ece0c, -30000000, -29999999, -29999998, 60,
+    6, 107, 327771, (s32)npc_fire_eff_fadeout, -30000000, -29999999, -29999998, 60,
     109, 196699, (s32)evt_npc_set_anim, (s32)"slave_0", (s32)"B_2", 65545, 10, 262235,
     (s32)evt_npc_flag_onoff, 1, (s32)"slave_0", 128, 65545, 60, 327771, (s32)evt_npc_set_position,
     (s32)"slave_0", 0, -1000, 0, 262235, (s32)evt_npc_flag_onoff, 1, (s32)"slave_0",

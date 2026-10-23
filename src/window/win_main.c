@@ -62,9 +62,9 @@ USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(unk_80175e98);
-USER_FUNC(unk_80175eb0);
-USER_FUNC(unk_80177cf8);
+USER_FUNC(lecture_key_mask_off);
+USER_FUNC(lecture_step_wait);
+USER_FUNC(all_party_slit_off);
 USER_FUNC(party_color);
 USER_FUNC(famicom_check);
 USER_FUNC(itemUseFunc2);
@@ -583,7 +583,7 @@ EVT_END()
 EVT_BEGIN(evt_item_use)
     SET_TYPE(0)
     CALL(evt_mario_normalize)
-    CALL(unk_80177cf8)
+    CALL(all_party_slit_off)
     WAIT_FRAMES(1)
     CALL(evt_mario_adjust_dir)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
@@ -734,31 +734,31 @@ EVT_END()
 EVT_BEGIN(evt_lecture_msg)
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("lecture_badge_00"), 0, 0)
-    CALL(unk_80175eb0, 1)
+    CALL(lecture_step_wait, 1)
     CALL(evt_msg_continue)
     CALL(evt_msg_print, 0, STRING("lecture_badge_01"), 0, 0)
-    CALL(unk_80175eb0, 2)
+    CALL(lecture_step_wait, 2)
     CALL(evt_msg_continue)
     CALL(evt_msg_print, 0, STRING("lecture_badge_02"), 0, 0)
-    CALL(unk_80175eb0, 5)
+    CALL(lecture_step_wait, 5)
     CALL(evt_msg_continue)
     CALL(evt_msg_print, 0, STRING("lecture_badge_03"), 0, 0)
-    CALL(unk_80175eb0, 6)
+    CALL(lecture_step_wait, 6)
     CALL(evt_msg_continue)
     CALL(evt_msg_print, 0, STRING("lecture_badge_04"), 0, 0)
-    CALL(unk_80175eb0, 7)
+    CALL(lecture_step_wait, 7)
     CALL(evt_msg_continue)
     CALL(evt_msg_print, 0, STRING("lecture_badge_05"), 0, 0)
-    CALL(unk_80175eb0, 8)
+    CALL(lecture_step_wait, 8)
     CALL(evt_msg_continue)
     CALL(evt_msg_print, 0, STRING("lecture_badge_06"), 0, 0)
-    CALL(unk_80175eb0, 9)
+    CALL(lecture_step_wait, 9)
     CALL(evt_msg_continue)
     CALL(evt_msg_print, 0, STRING("lecture_badge_07"), 0, 0)
-    CALL(unk_80175eb0, 10)
+    CALL(lecture_step_wait, 10)
     CALL(evt_msg_continue)
     WAIT_MS(500)
-    CALL(unk_80175e98)
+    CALL(lecture_key_mask_off)
     RETURN
 EVT_END()
 
@@ -875,7 +875,7 @@ USER_FUNC(party_color) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_80177cf8) {
+USER_FUNC(all_party_slit_off) {
     allPartyForceSlitOff();
     return EVT_RETURN_DONE;
 }
@@ -1044,7 +1044,7 @@ void winTexSet(u32 textureId, Vec translate, Vec scale, GXColor color) {
     GXTexCoord2f32(0.0f, 0.0f);
 }
 
-void unk_80177008(u32 textureId, Vec translate, Vec scale, GXColor color) {
+void winTexSetNearest(u32 textureId, Vec translate, Vec scale, GXColor color) {
     Mtx trans;
     Mtx scl;
     Mtx m;
@@ -1259,7 +1259,7 @@ void winIconSet(s32 iconId, Vec translate, Vec scale, GXColor color) {
     GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
 }
 
-USER_FUNC(unk_80175eb0) {
+USER_FUNC(lecture_step_wait) {
     s32 n = evtGetValue(event, event->args[0]);
 
     if (isFirstCall) {
@@ -1272,7 +1272,7 @@ USER_FUNC(unk_80175eb0) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_80175e98) {
+USER_FUNC(lecture_key_mask_off) {
     wp->flags &= ~0x800;
     return EVT_RETURN_DONE;
 }

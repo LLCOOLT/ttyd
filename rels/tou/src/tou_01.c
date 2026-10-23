@@ -173,7 +173,7 @@ static USER_FUNC(starstone_set_pos);
 static USER_FUNC(starstone_set_ry);
 USER_FUNC(unitwincoin_disp_onoff);
 USER_FUNC(unitwincoin_wait);
-USER_FUNC(unk_tou_00002e24);
+USER_FUNC(evt_rankingReset);
 USER_FUNC(yami_oowareru_check);
 static USER_FUNC(yami_view);
 void make_shadow_disp(CameraId camera, void* param);
@@ -2443,7 +2443,7 @@ EVT_BEGIN(evt_gondora2)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 172)
         IF_INT_EQUAL(GSWF(2496), 0)
             SET_VALUE(GSWF(2496), 1)
-            CALL(unk_tou_00002e24)
+            CALL(evt_rankingReset)
         END_IF
     END_IF
     BEGIN_INLINE_EVENT

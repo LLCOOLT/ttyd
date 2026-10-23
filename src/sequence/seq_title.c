@@ -36,7 +36,7 @@ extern double sin(double);
 void FontDrawEdge(void);
 void FontDrawScale(f32 scale);
 void FontDrawString(f32 x, f32 y, const char* msg);
-void unk_80177008(u32 textureId, Vec translate, Vec scale, GXColor color);
+void winTexSetNearest(u32 textureId, Vec translate, Vec scale, GXColor color);
 
 TitleWork work2;
 TitleWork* wp2 = &work2;
@@ -341,7 +341,7 @@ void disp2(CameraId cameraId, void* param) {
 	GXSetViewport(cam->viewport[0], cam->viewport[1], cam->viewport[2],
 				  cam->viewport[3], cam->viewport[4], cam->viewport[5]);
 	winTexInit(*wp2->texture->data);
-	unk_80177008(5, (Vec){wp2->topPosX, wp2->topPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	winTexSetNearest(5, (Vec){wp2->topPosX, wp2->topPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 	winTexSet(6, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 	wp2->frame++;
 	s = (f32)sin(6.2831855f * (f32)wp2->frame / 120.0f);

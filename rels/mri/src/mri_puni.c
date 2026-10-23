@@ -1331,7 +1331,7 @@ static const Vec puni_fall_dir;
    pointer args to f1-f6 and r3-r10 independently, so the registers and the call are identical; the reorder makes
    the start loads code-generate before the pointer args, so they read r4 directly (scheduling). */
 typedef void* (*PuniHitCheckStartFirst)(f32, f32, f32, void*, f32*, f32*, f32*, f32*, f32*, f32*, f32*, f32, f32, f32);
-void unk_mri_000095f0(PuniData* p, Vec start, Vec dir, f32 dist) {
+void puniMoveHitLimited(PuniData* p, Vec start, Vec dir, f32 dist) {
     Vec pa;
     Vec hit;
     Vec diff;
@@ -1368,7 +1368,7 @@ void unk_mri_000095f0(PuniData* p, Vec start, Vec dir, f32 dist) {
 }
 
 static const Vec puni_fall_dir;
-void unk_mri_0000980c(PuniData* p, Vec start, Vec dir, f32 dist) {
+void puniMoveHit(PuniData* p, Vec start, Vec dir, f32 dist) {
     Vec pa;
     Vec hit;
     Vec diff;
@@ -4132,7 +4132,7 @@ void puniModeFall(PuniData* p);
 void puniModeUpdraft(PuniData* p);
 
 
-void unk_mri_00012d58(PuniData* p);
+void puniModeMain(PuniData* p);
 static const Vec puni_fall_dir;
 static inline void puniModeCheckPos(PuniData* p) {
     switch (p->unk114) {
@@ -4154,7 +4154,7 @@ static inline void puniModeCheckPos(PuniData* p) {
     }
 }
 
-void unk_mri_00012d58(PuniData* p) {
+void puniModeMain(PuniData* p) {
     switch (p->unkC) {
         case 0:
             p->unk4 &= ~0x8000;
@@ -4301,7 +4301,7 @@ void unk_mri_00012d58(PuniData* p) {
 }
 
 
-void fn_19_13A90(PuniData* p);
+void puniMoveMain(PuniData* p);
 static const Vec puni_fall_dir;
 static inline void puniMoveHitInl(PuniData* p, Vec* s2, Vec* d2, f32 dist) {
     Vec pa;
@@ -4380,7 +4380,7 @@ static inline void puniMoveHitLimitedInl(PuniData* p, Vec* s2, Vec* d2, f32 dist
     }
 }
 
-void fn_19_13A90(PuniData* p) {
+void puniMoveMain(PuniData* p) {
     switch (p->unkC) {
         case 0:
         case 1:
@@ -4614,7 +4614,7 @@ void puniOption(void) {
     }
 }
 
-void unk_mri_00014ad4(void) {
+void puniCollideAll(void) {
     PuniData* p;
     PuniData* q;
     PuniData* start;
@@ -4966,7 +4966,7 @@ void puni_puni_main(void) {
                         }
                     }
                 }
-                unk_mri_00012d58(p);
+                puniModeMain(p);
             }
         }
         puniOption();
@@ -5013,10 +5013,10 @@ void puni_puni_main(void) {
                         }
                     }
                 }
-                unk_mri_00012d58(p);
+                puniModeMain(p);
             }
         }
-        unk_mri_00014ad4();
+        puniCollideAll();
     }
     if (Punigp->unk324 & 0x20) {
         s32 ii; PuniData* q; PunidrvPose* ps; 
@@ -5026,7 +5026,7 @@ void puni_puni_main(void) {
             if (q->unk4 & 0x400) {
                 if (!(q->unk4 & 0x200)) {
                     q->unk138 = q->pos;
-                    fn_19_13A90(q);
+                    puniMoveMain(q);
                 }
                 puniAnimation(q, (PuniAnimTarget*)ps);
             }
@@ -5039,7 +5039,7 @@ void puni_puni_main(void) {
             if (q->unk4 & 0x400) {
                 if (!(q->unk4 & 0x200)) {
                     q->unk138 = q->pos;
-                    fn_19_13A90(q);
+                    puniMoveMain(q);
                 }
                 puniAnimation(q, (PuniAnimTarget*)ps);
             }

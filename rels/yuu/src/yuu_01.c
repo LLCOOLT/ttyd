@@ -75,7 +75,7 @@ USER_FUNC(evt_yuutitle_alloc);
 USER_FUNC(evt_yuutitle_free);
 static USER_FUNC(fall_rtn);
 static USER_FUNC(re_fall_rtn);
-USER_FUNC(unk_yuu_00005268);
+USER_FUNC(yuu_01_cam_shift_reset);
 USER_FUNC(yuugijou_add_montemedal);
 USER_FUNC(yuugijou_get_montemedal);
 USER_FUNC(yuugijou_montemedal_disp_onoff);
@@ -355,7 +355,7 @@ EVT_BEGIN(minigame02_end)
     CALL(evt_fade_out, 1000)
     CALL(re_fall_rtn)
     CALL_CHILD(PTR(yuu_01_kaijo_init2))
-    CALL(unk_yuu_00005268)
+    CALL(yuu_01_cam_shift_reset)
     WAIT_MS(500)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_GAME_AUDIENCE1"), GW(10))
     CALL(evt_snd_sfxon, STRING("SFX_EVT_GAME_BOAT_WATER1"), GW(11))
@@ -1064,7 +1064,7 @@ static BOOL get_monte_check(Vec* a, Vec* b) {
     return FALSE;
 }
 
-USER_FUNC(unk_yuu_00005268) {
+USER_FUNC(yuu_01_cam_shift_reset) {
     camShiftReset();
     return EVT_RETURN_DONE;
 }

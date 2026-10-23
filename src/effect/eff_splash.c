@@ -10,7 +10,7 @@
 
 extern double sin(double);
 extern double cos(double);
-extern GXColor unk_80224298(void);
+extern GXColor effFunemizuGetMapColor(void);
 extern EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 extern EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 void effSplashMain(EffectEntry* effect);
@@ -315,7 +315,7 @@ void effSplashGetCol(CameraId cameraId, EffectEntry* effect) {
         work->color.a = 255;
     }
     work->hasColor = 1;
-    c = unk_80224298();
+    c = effFunemizuGetMapColor();
     work->color.r = c.r;
     work->color.g = c.g;
     work->color.b = c.b;

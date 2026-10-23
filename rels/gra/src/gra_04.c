@@ -37,7 +37,7 @@ USER_FUNC(evt_party_stop);
 USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
-USER_FUNC(unk_gra_00000530);
+USER_FUNC(roll_release_check);
 extern s32 evt_bero_info_run[];
 extern s32 evt_usu_kagemario_party_kill_11_data_4F98[];
 
@@ -118,7 +118,7 @@ EVT_END()
 
 static EVT_BEGIN(out_evt)
     CALL(evt_mario_key_onoff, 0)
-    CALL(unk_gra_00000530, LW(0))
+    CALL(roll_release_check, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         DEBUG_PUT_MSG(STRING("ロール解除できません"))
         CALL(evt_mario_wait_landon)
@@ -173,7 +173,7 @@ EVT_END()
 
 static EVT_BEGIN(out_evt2)
     CALL(evt_mario_key_onoff, 0)
-    CALL(unk_gra_00000530, LW(0))
+    CALL(roll_release_check, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_mario_normalize)
         ELSE
@@ -267,10 +267,10 @@ EVT_BEGIN(gra_04_init_evt)
     RETURN
 EVT_END()
 
-s32 unk_8009fcbc(void);
+s32 marioRollCancelDisable(void);
 
-USER_FUNC(unk_gra_00000530) {
+USER_FUNC(roll_release_check) {
     s32* args = event->args;
-    evtSetValue(event, args[0], unk_8009fcbc() == 0);
+    evtSetValue(event, args[0], marioRollCancelDisable() == 0);
     return EVT_RETURN_DONE;
 }

@@ -97,7 +97,7 @@ void mario_simple_kemuri(void) {
     }
 }
 
-void unk_80130374(void) {
+void mario_land_kemuri(void) {
     MarioWork* mario = marioGetPtr();
     HitEntry* hit = mario->hitobjStandOn;
     u32 attr;

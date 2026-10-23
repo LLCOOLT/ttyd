@@ -254,7 +254,7 @@ USER_FUNC(suifu100taikikan_away);
 USER_FUNC(suifu100taikikan_init);
 USER_FUNC(unitwincoin_disp_onoff);
 USER_FUNC(unitwincoin_wait);
-USER_FUNC(unk_gor_000006d8);
+USER_FUNC(npc_all_delete);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 void gor_stg4_018_cb(s32 type, GorCbInfo** param);
@@ -4785,7 +4785,7 @@ static USER_FUNC(get_yoshi_color) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_gor_000006d8) {
+USER_FUNC(npc_all_delete) {
     NpcWork* wp = npcGetWorkPtr();
     s32 i;
     s32 total = wp->total;
@@ -4979,7 +4979,7 @@ static EVT_BEGIN(mobj_box00)
 EVT_END()
 
 static EVT_BEGIN(epilogue_npc_entry)
-    CALL(unk_gor_000006d8)
+    CALL(npc_all_delete)
     CALL(evt_npc_entry, STRING("ピーチ姫"), STRING("c_peach"))
     CALL(evt_npc_set_tribe, STRING("ピーチ姫"), STRING("ピーチ姫"))
     CALL(evt_npc_set_position, STRING("ピーチ姫"), 125, 15, 235)

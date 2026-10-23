@@ -131,18 +131,18 @@ void cardInit(void) {
 	CARDInit();
 }
 
-void unk_800b0ed0(void) {
+void cardInsertWatchStart(void) {
 	wp->prevInserted = wp->chan;
 	wp->busyFrames = 10;
 	wp->flags |= 0x8000;
 }
 
-void unk_800b0eac(void) {
+void cardInsertWatchEnd(void) {
 	wp->flags &= ~0x8000;
 	wp->flags &= ~0xC000;
 }
 
-BOOL unk_800b0e80(void) {
+BOOL cardInsertChanged(void) {
     if (wp->flags & 0x8000 && wp->flags & 0x4000) {
         return TRUE;
     }

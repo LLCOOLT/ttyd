@@ -259,9 +259,9 @@ USER_FUNC(status_gauge_force_off);
 USER_FUNC(stonechangertn);
 USER_FUNC(unitwin_getpartylank);
 USER_FUNC(unitwin_setpartylank);
-USER_FUNC(unk_800e23e0);
-USER_FUNC(unk_80239b2c);
-USER_FUNC(unk_gor_0000574c);
+USER_FUNC(evt_mario_set_dir_pos);
+USER_FUNC(evt_win_party_lankup_chk);
+USER_FUNC(get_mario_dir_target);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 void kuragarisan_msgcb(s32 type, void* param);
@@ -811,7 +811,7 @@ EVT_BEGIN(powerupya_party_lank_rtn)
     BEGIN_SIBLING_EVENT
         LOOP(0)
             CALL(evt_party_set_dir_pos, 0, -362, -200)
-            CALL(unk_800e23e0, -362, -200)
+            CALL(evt_mario_set_dir_pos, -362, -200)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
@@ -1079,7 +1079,7 @@ EVT_BEGIN(powerupya_party_rtn)
                 CALL(evt_msg_print, 0, STRING("powerup_13"), 0, STRING("me"))
                 BREAK_LOOP
             END_IF
-            CALL(unk_80239b2c, LW(0))
+            CALL(evt_win_party_lankup_chk, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 CALL(evt_msg_print, 0, STRING("powerup_13"), 0, STRING("me"))
                 BREAK_LOOP
@@ -1104,7 +1104,7 @@ EVT_BEGIN(powerupya_table_talk)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
-    CALL(unk_80239b2c, LW(0))
+    CALL(evt_win_party_lankup_chk, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_print, 0, STRING("powerup_16"), 0, STRING("me"))
         GOTO(0)
@@ -1212,7 +1212,7 @@ EVT_BEGIN(unk_evt_gor_0003e7a0)
     CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
     ADD(LW(4), 20)
     ADD(LW(5), 10)
-    CALL(unk_gor_0000574c, LW(6))
+    CALL(get_mario_dir_target, LW(6))
     IF_FLOAT_EQUAL(LW(6), FLOAT(0.0f))
         ADD(LW(3), -20)
         ELSE
@@ -3629,7 +3629,7 @@ USER_FUNC(stonechangertn) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unk_gor_0000574c) {
+USER_FUNC(get_mario_dir_target) {
     s32* args = event->args;
 
     evtSetFloat(event, args[0], marioGetPtr()->displayDirectionTarget);
