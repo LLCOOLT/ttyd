@@ -8,7 +8,7 @@ Paper Mario: The Thousand-Year Door
 [Data Progress]: https://img.shields.io/badge/Data-100.00%25-blue
 [Linked Progress]: https://img.shields.io/badge/Linked-100.00%25-blue
 
-A work-in-progress decompilation of Paper Mario: The Thousand-Year Door.
+A matching decompilation of Paper Mario: The Thousand-Year Door. The Japanese release (G8MJ01) is complete: every function is matched from C and the build reproduces the original game byte for byte.
 
 ## Origins and credit
 
