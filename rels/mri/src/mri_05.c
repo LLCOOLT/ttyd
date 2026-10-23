@@ -9,6 +9,8 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
 #include "mri.h"
+#include "evt/evt_npc.h"
+#include "data_tables.h"
 
 EffectEntry* effPuniBalloonEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 EffectEntry* marioeff;
@@ -60,32 +62,32 @@ USER_FUNC(mario_shabon_effdel);
 USER_FUNC(mario_shabon_effpos);
 USER_FUNC(mario_shabon_init);
 
-__declspec(section ".data") u64 fd_mri_05_negone_one_374;
-__declspec(section ".data") s32 fd_mri_05_neg_one_382[1];
-__declspec(section ".data") s32 fd_mri_05___local_PI_383[1];
-__declspec(section ".data") s32 fd_mri_05___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_mri_05_one_negone_373;
-__declspec(section ".data") s32 fd_mri_05___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_mri_05_one_381[1];
-__declspec(section ".data") u64 fd_mri_05_negone_one_360;
-__declspec(section ".data") s32 fd_mri_05_neg_one_365[1];
-__declspec(section ".data") s32 fd_mri_05___local_PI_366[1];
-__declspec(section ".data") s32 fd_mri_05___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_mri_05_one_negone_359;
-__declspec(section ".data") s32 fd_mri_05___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_mri_05_one_364[1];
+__declspec(section ".data") f32 fd_mri_05_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_05_neg_one_382;
+__declspec(section ".data") f32 fd_mri_05___local_PI_383;
+__declspec(section ".data") f32 fd_mri_05___local_3PIO2_385;
+__declspec(section ".data") f32 fd_mri_05_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_05___local_PIO2_384;
+__declspec(section ".data") f32 fd_mri_05_one_381;
+__declspec(section ".data") f32 fd_mri_05_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_05_neg_one_365;
+__declspec(section ".data") f32 fd_mri_05___local_PI_366;
+__declspec(section ".data") f32 fd_mri_05___local_3PIO2_368;
+__declspec(section ".data") f32 fd_mri_05_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_05___local_PIO2_367;
+__declspec(section ".data") f32 fd_mri_05_one_364;
 s32 puni_4_init[17];
 s32 puni_4_talk[20];
 s32 puni_5_init[17];
 s32 puni_5_talk[20];
-static s32 npcEnt[69];
+static NpcSetupInfo npcEnt[3];
 static __declspec(section ".data") s32 bero_s_doa_close[10];
 static __declspec(section ".data") s32 bero_s_doa_open[10];
-static s32 bero_entry_data[90];
+static BeroEntry bero_entry_data[6];
 static s32 door_switch_init[17];
 static s32 door_switch[59];
 static s32 evt_ueki_04[20];
-static s32 ueki_access_data[24];
+static KusaAccess ueki_access_data[6];
 static s32 punipuni_ball00_init[41];
 static s32 punipuni_ball00[51];
 s32 punipuni_ball01_init[41];
@@ -105,53 +107,33 @@ USER_FUNC(mario_shabon_init) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_mri_05_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mri_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mri_05_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_mri_05_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_mri_05___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_mri_05___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_mri_05___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_mri_05___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_mri_05_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_mri_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_mri_05___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_mri_05___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_mri_05_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_mri_05_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_mri_05_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mri_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mri_05_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_mri_05_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_mri_05___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_mri_05___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_mri_05___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_mri_05___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_mri_05_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_mri_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_mri_05___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_mri_05___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_mri_05_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_mri_05_one_364 = 1.0f;
 
 EVT_BEGIN(puni_4_init)
     SWITCH(GSW(0))
@@ -193,16 +175,32 @@ EVT_BEGIN(puni_5_talk)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"プニ族４"*/"\x83\x76\x83\x6A\x91\xB0\x82\x53", 1536, 0, (s32)puni_4_init, 0, (s32)puni_4_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"プニ族５"*/"\x83\x76\x83\x6A\x91\xB0\x82\x54",
-    1536, 0, (s32)puni_5_init, 0, (s32)puni_5_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"プニ族４"*/"\x83\x76\x83\x6A\x91\xB0\x82\x53", // name
+        0x600, // flags
+        0, // reactionFlags
+        puni_4_init, // initEvent
+        NULL, // regularEvent
+        puni_4_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"プニ族５"*/"\x83\x76\x83\x6A\x91\xB0\x82\x54", // name
+        0x600, // flags
+        0, // reactionFlags
+        puni_5_init, // initEvent
+        NULL, // regularEvent
+        puni_5_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static __declspec(section ".data") EVT_BEGIN(bero_s_doa_close)
@@ -219,19 +217,92 @@ static __declspec(section ".data") EVT_BEGIN(bero_s_doa_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65536, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"mri_01", (s32)"e_bero", 262148, (s32)bero_s_doa_close, (s32)bero_s_doa_open, (s32)"dokan1",
-    131072, 9, 100000, 0, 0, -1, 0, 6,
-    0, 0, (s32)"dokan2", 65537, 0, 0, (s32)"dokan2", 131072,
-    6, 100000, 0, 0, -1, 0, 10, 0,
-    0, (s32)"dokan1", 65537, 0, 0, (s32)"dokan3", 131072, 2,
-    100000, 0, 0, -1, 0, 10, 0, (s32)"mri_02",
-    (s32)"dokan2", 65537, 0, 0, (s32)"dokan4", 131072, 9, 100000,
-    0, 0, -1, 0, 6, 0, (s32)"mri_19", (s32)"dokan1",
-    65537, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        0, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"mri_01", // nextMapName
+        "e_bero", // nextBeroName
+        4, // enterAnimeType
+        4, // exitAnimeType
+        (s32)bero_s_doa_close, // enterAnimeArg
+        (s32)bero_s_doa_open, // exitAnimeArg
+    },
+    {
+        "dokan1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan2", // hitName
+        2, // type
+        0, // sfxId
+        6, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        10, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan3", // hitName
+        2, // type
+        0, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        10, // caseType
+        NULL, // exitEvent
+        (s32)"mri_02", // nextMapName
+        "dokan2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan4", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, // exitEvent
+        (s32)"mri_19", // nextMapName
+        "dokan1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(door_switch_init)
@@ -272,10 +343,13 @@ static EVT_BEGIN(evt_ueki_04)
     RETURN
 EVT_END()
 
-static s32 ueki_access_data[] = {
-    1, (s32)"A_ueki01", (s32)"S_ueki01", 0, 1, (s32)"A_ueki02", (s32)"S_ueki02", 0,
-    1, (s32)"A_ueki03", (s32)"S_ueki03", 0, 1, (s32)"A_ueki04", (s32)"S_ueki04", (s32)evt_ueki_04,
-    1, (s32)"A_ueki05", (s32)"S_ueki05", 0, 4, 0, 0, 0,
+static KusaAccess ueki_access_data[] = {
+    {1, "A_ueki01", "S_ueki01", NULL},
+    {1, "A_ueki02", "S_ueki02", NULL},
+    {1, "A_ueki03", "S_ueki03", NULL},
+    {1, "A_ueki04", "S_ueki04", evt_ueki_04},
+    {1, "A_ueki05", "S_ueki05", NULL},
+    {4, NULL, NULL, NULL},
 };
 
 static EVT_BEGIN(punipuni_ball00_init)

@@ -1,5 +1,6 @@
 #pragma optimize_for_size on
 #include "battle/battle.h"
+#include <dolphin/pad.h>
 #include "battle/battle_ac.h"
 #include "battle/battle_pad.h"
 #include "battle/battle_unit.h"
@@ -53,7 +54,7 @@ typedef struct SignalTimingWork {
 #define ST_CONF(work) ((work->actionCommands.setupFlags & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction))
 
 u32 _button_table_4dir[4] = {0x10000, 0x20000, 0x40000, 0x80000};
-u32 _button_table_abxy[4] = {0x100, 0x200, 0x400, 0x800};
+u32 _button_table_abxy[4] = {PAD_BUTTON_A, PAD_BUTTON_B, PAD_BUTTON_X, PAD_BUTTON_Y};
 s32 ac_signaltiming_ok_frame_range[7] = {20, 16, 12, 10, 6, 4, 2};
 s32 ac_signaltiming_ok_frame_range_2[7] = {30, 30, 30, 30, 25, 20, 15};
 
@@ -83,8 +84,8 @@ s32 battleAcMain_SignalTiming(BattleWork *work)
   s32 k;
   BOOL unique;
   BattleActions *ac = &work->actionCommands;
-  SignalTimingWork *w = (SignalTimingWork *) (((u8 *) ac) + 0x2BC);
-  BattleACDispParams *disp = (BattleACDispParams *) (((u8 *) ac) + 0x290);
+  SignalTimingWork *w = (SignalTimingWork *)ac->work;
+  BattleACDispParams *disp = (BattleACDispParams *)&ac->disp;
   BOOL loop;
   BOOL autoCommand = 0;
   BOOL got;
@@ -110,7 +111,7 @@ s32 battleAcMain_SignalTiming(BattleWork *work)
         memset(disp, 0, sizeof(BattleACDispParams));
         disp->iconX = -300.0f;
         disp->iconY = 0.0f;
-        *((s32 *) (&disp->field_0x1C[4])) = 20;
+        *(&disp->unk20) = 20;
         w->hits = 0;
         w->misses = 0;
         w->frame = 0;
@@ -410,15 +411,15 @@ s32 battleAcResult_SignalTiming(BattleWork* work) {
 
 void battleAcDisp_SignalTiming(CameraId cameraId, BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
 
     switch (ac->mAcState) {
         case 99:
         case 100:
-            disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(-300.0f, 30.0f, 4, 20 - *(s32*)&disp->field_0x1C[4], 20);
+            disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(-300.0f, 30.0f, 4, 20 - disp->unk20, 20);
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] > 0) {
-                (*(s32*)&disp->field_0x1C[4])--;
+            if (disp->unk20 > 0) {
+                disp->unk20--;
             }
             break;
         case 1000:
@@ -429,14 +430,14 @@ void battleAcDisp_SignalTiming(CameraId cameraId, BattleWork* work) {
             break;
         case 1004:
         case 1005:
-            if (*(s32*)&disp->field_0x1C[4] >= 40) {
-                disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(30.0f, -300.0f, 4, *(s32*)&disp->field_0x1C[4] - 40, 20);
+            if (disp->unk20 >= 40) {
+                disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(30.0f, -300.0f, 4, disp->unk20 - 40, 20);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] < 60) {
-                (*(s32*)&disp->field_0x1C[4])++;
+            if (disp->unk20 < 60) {
+                disp->unk20++;
             }
             break;
     }
@@ -467,7 +468,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     Mtx mScale;
 
     camGetPtr(8);
-    w = (SignalTimingWork*)((u8*)ac + 0x2BC);
+    w = (SignalTimingWork*)ac->work;
     count = ST_COUNT(work);
     next = w->next;
     if (!(ST_FLAGS(work) & 1)) {

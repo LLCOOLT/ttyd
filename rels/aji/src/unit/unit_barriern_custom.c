@@ -13,15 +13,16 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "party/party_motion.h"
+#include "battle/battle_database_common.h"
 
 s32 irand(s32 scalar);
 EffectEntry* effGlassN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
-static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, s32* table);
+static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table);
 static u8 barriernSatelliteTo_Main(BattleUnit* unit, s32 n);
 f32 intplGetValue(f32 start, f32 end, s32 mode, s32 cur, s32 steps);
-typedef struct BarriernSpline { s32 n; s32* table; f32 a[5]; f32 b[15]; s32 count; } BarriernSpline;
-void spline_maketable(s32 n, s32* table, f32* a, f32* b);
-void spline_getvalue(f32 t, Vec* out, s32 n, s32* table, f32* a, f32* b);
+typedef struct BarriernSpline { s32 n; Vec* table; f32 a[5]; f32 b[15]; s32 count; } BarriernSpline;
+void spline_maketable(s32 n, Vec* table, f32* a, f32* b);
+void spline_getvalue(f32 t, Vec* out, s32 n, Vec* table, f32* a, f32* b);
 static s32 zanzou_count[5];
 void BtlUnit_SetAnim(BattleUnitPart* part, const char* anim);
 static s32 barriern_satellite_zanzou_sub(BOOL isFirstCall, BattleUnit* unit, f32* scales, s32 n, s32 type);
@@ -82,62 +83,62 @@ static USER_FUNC(outSplineTableSet);
 static void barriern_wawawa_get_next_target(s32* unitIdx, s32* partIdx);
 static void barriern_wawawa_get_target(s32* unitIdx, s32* partIdx);
 static USER_FUNC(barriern_wawawa_set_target);
-static void outSplineTableSet_Sub(BattleUnit* unit, s32 n, s32* table);
+static void outSplineTableSet_Sub(BattleUnit* unit, s32 n, Vec* table);
 static USER_FUNC(barriernSatelliteToOutside);
 static USER_FUNC(barriernSatelliteToInside);
 static u8 barriernSatelliteTo_Main(BattleUnit* unit, s32 n);
-static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, s32* table);
+static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table);
 static s32 barriern_satellite_zanzou_sub(BOOL isFirstCall, BattleUnit* unit, f32* scales, s32 n, s32 type);
 static s32 barriern_zanzou_sub(BOOL isFirstCall, BattleUnit* unit, f32* scales, s32 type);
 static USER_FUNC(barriern_zanzou3);
 static USER_FUNC(barriern_zanzou2);
 static USER_FUNC(barriern_zanzou);
-extern s32 unit_barriern_custom_satellite[];
+extern BattleUnitKind unit_barriern_custom_satellite;
 
-__declspec(section ".data") u64 fd_barriern_custom_negone_one_374;
-__declspec(section ".data") s32 fd_barriern_custom_neg_one_382[1];
-__declspec(section ".data") s32 fd_barriern_custom___local_PI_383[1];
-__declspec(section ".data") s32 fd_barriern_custom___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_barriern_custom_one_negone_373;
-__declspec(section ".data") s32 fd_barriern_custom___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_barriern_custom_one_381[1];
-__declspec(section ".data") u64 fd_barriern_custom_negone_one_360;
-__declspec(section ".data") s32 fd_barriern_custom_neg_one_365[1];
-__declspec(section ".data") s32 fd_barriern_custom___local_PI_366[1];
-__declspec(section ".data") s32 fd_barriern_custom___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_barriern_custom_one_negone_359;
-__declspec(section ".data") s32 fd_barriern_custom___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_barriern_custom_one_364[1];
+__declspec(section ".data") f32 fd_barriern_custom_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_barriern_custom_neg_one_382;
+__declspec(section ".data") f32 fd_barriern_custom___local_PI_383;
+__declspec(section ".data") f32 fd_barriern_custom___local_3PIO2_385;
+__declspec(section ".data") f32 fd_barriern_custom_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_barriern_custom___local_PIO2_384;
+__declspec(section ".data") f32 fd_barriern_custom_one_381;
+__declspec(section ".data") f32 fd_barriern_custom_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_barriern_custom_neg_one_365;
+__declspec(section ".data") f32 fd_barriern_custom___local_PI_366;
+__declspec(section ".data") f32 fd_barriern_custom___local_3PIO2_368;
+__declspec(section ".data") f32 fd_barriern_custom_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_barriern_custom___local_PIO2_367;
+__declspec(section ".data") f32 fd_barriern_custom_one_364;
 BattleUnitKind unit_barriern_custom;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static BattleUnitKindPart parts[11];
 static __declspec(section ".data") StatusVulnerability regist;
-static s32 weapon_wakka_attack[48];
-static s32 weapon_wawawa_attack[48];
-static __declspec(section ".data") s32 entry_barriern_satellite[12];
+static BattleWeapon weapon_wakka_attack;
+static BattleWeapon weapon_wawawa_attack;
+static __declspec(section ".data") BattleUnitSetup entry_barriern_satellite;
 static PoseTableEntry pose_table[18];
 static __declspec(section ".data") BattleDataEntry data_table[2];
-static s32 splineTableIn1_1[15];
-static s32 splineTableIn2_1[15];
-static s32 splineTableIn2_2[15];
-static s32 splineTableIn3_1[15];
-static s32 splineTableIn3_2[15];
-static s32 splineTableIn3_3[15];
-static s32 splineTableIn4_1[15];
-static s32 splineTableIn4_2[15];
-static s32 splineTableIn4_3[15];
-static s32 splineTableIn4_4[15];
-static s32 splineTableOut1_1[15];
-static s32 splineTableOut2_1[15];
-static s32 splineTableOut2_2[15];
-static s32 splineTableOut3_1[15];
-static s32 splineTableOut3_2[15];
-static s32 splineTableOut3_3[15];
-static s32 splineTableOut4_1[15];
-static s32 splineTableOut4_2[15];
-static s32 splineTableOut4_3[15];
-static s32 splineTableOut4_4[15];
+static Vec splineTableIn1_1[5];
+static Vec splineTableIn2_1[5];
+static Vec splineTableIn2_2[5];
+static Vec splineTableIn3_1[5];
+static Vec splineTableIn3_2[5];
+static Vec splineTableIn3_3[5];
+static Vec splineTableIn4_1[5];
+static Vec splineTableIn4_2[5];
+static Vec splineTableIn4_3[5];
+static Vec splineTableIn4_4[5];
+static Vec splineTableOut1_1[5];
+static Vec splineTableOut2_1[5];
+static Vec splineTableOut2_2[5];
+static Vec splineTableOut3_1[5];
+static Vec splineTableOut3_2[5];
+static Vec splineTableOut3_3[5];
+static Vec splineTableOut4_1[5];
+static Vec splineTableOut4_2[5];
+static Vec splineTableOut4_3[5];
+static Vec splineTableOut4_4[5];
 static s32 init_event[143];
 static s32 damage_event[17];
 static s32 barriern_dmg_first_attack_pos[19];
@@ -158,53 +159,33 @@ static __declspec(section ".data") s32 wawawa_attack_event_sub_no_last[10];
 static s32 wawawa_attack_event_sub_last[93];
 static s32 wait_event[116];
 
-__declspec(section ".data") u64 fd_barriern_custom_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_barriern_custom_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_barriern_custom_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_barriern_custom_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_barriern_custom___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_barriern_custom___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_barriern_custom___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_barriern_custom___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_barriern_custom_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_barriern_custom_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_barriern_custom___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_barriern_custom___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_barriern_custom_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_barriern_custom_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_barriern_custom_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_barriern_custom_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_barriern_custom_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_barriern_custom_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_barriern_custom___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_barriern_custom___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_barriern_custom___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_barriern_custom___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_barriern_custom_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_barriern_custom_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_barriern_custom___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_barriern_custom___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_barriern_custom_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_barriern_custom_one_364 = 1.0f;
 
 BattleUnitKind unit_barriern_custom = {
     117,
@@ -292,27 +273,93 @@ static BattleUnitKindPart parts[] = {
 
 static __declspec(section ".data") StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 100, 0, 100, 0, 0, 0, 0, 100, 0, 100, 100, 10};
 
-static s32 weapon_wakka_attack[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 199, 2047, 8196,
-    20483, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_wakka_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0xC7, // special
+    0x7FF, // counterResistFlags
+    0x2004, // targetWeightFlags
+    0, 0, // sleepChance..sleepTime
+    80, // stopChance
+    3, // stopTime
+    0, 0, 0, 0, 0, 0, 0, 0, // dizzyChance..electricChance
+    0, 0, 0, 0, 0, 0, 0, 0, // electricTime..sizeChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeTime..defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_wawawa_attack[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 199, 2047, -2147475456,
-    20483, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_wawawa_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0xC7, // special
+    0x7FF, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, // sleepChance..sleepTime
+    80, // stopChance
+    3, // stopTime
+    0, 0, 0, 0, 0, 0, 0, 0, // dizzyChance..electricChance
+    0, 0, 0, 0, 0, 0, 0, 0, // electricTime..sizeChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeTime..defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") s32 entry_barriern_satellite[] = {
-    (s32)unit_barriern_custom_satellite, 16777216, 67108868, 1148846080, 0, 1148846080, 0, 0,
-    0, 0, 0, 0,
+static __declspec(section ".data") BattleUnitSetup entry_barriern_satellite = {
+    &unit_barriern_custom_satellite, // mUnitKindParams
+    1, // alliance
+    {0}, // pad_05
+    0x4000004, // attackPhase
+    {1000.0f, 0.0f, 1000.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
 static PoseTableEntry pose_table[] = {
@@ -341,104 +388,164 @@ static __declspec(section ".data") BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
-static s32 splineTableIn1_1[] = {
-    1103626240, 0, 0, 1101004800, -1041235968, -1082130432, 1095237632, -1038090240,
-    -1082130432, 1084227584, -1041235968, -1082130432, 0, 0, -1082130432,
+static Vec splineTableIn1_1[] = {
+    {25.0f, 0.0f, 0.0f},
+    {20.0f, -30.0f, -1.0f},
+    {12.5f, -40.0f, -1.0f},
+    {5.0f, -30.0f, -1.0f},
+    {0.0f, 0.0f, -1.0f},
 };
 
-static s32 splineTableIn2_1[] = {
-    1103626240, 0, 0, 1101004800, -1041235968, -1082130432, 1095237632, -1038090240,
-    -1082130432, 1084227584, -1041235968, -1082130432, 0, 0, -1082130432,
+static Vec splineTableIn2_1[] = {
+    {25.0f, 0.0f, 0.0f},
+    {20.0f, -30.0f, -1.0f},
+    {12.5f, -40.0f, -1.0f},
+    {5.0f, -30.0f, -1.0f},
+    {0.0f, 0.0f, -1.0f},
 };
 
-static s32 splineTableIn2_2[] = {
-    -1043857408, 0, 0, -1046478848, 1106247680, -1082130432, -1052246016, 1106247680,
-    -1082130432, -1063256064, 1106247680, -1082130432, 0, 0, -1082130432,
+static Vec splineTableIn2_2[] = {
+    {-25.0f, 0.0f, 0.0f},
+    {-20.0f, 30.0f, -1.0f},
+    {-12.5f, 30.0f, -1.0f},
+    {-5.0f, 30.0f, -1.0f},
+    {0.0f, 0.0f, -1.0f},
 };
 
-static s32 splineTableIn3_1[] = {
-    0, 1103626240, 0, 0, 1110704128, -1082130432, 0, 1112014848,
-    -1082130432, 0, 1103626240, -1082130432, 0, 0, -1082130432,
+static Vec splineTableIn3_1[] = {
+    {0.0f, 25.0f, 0.0f},
+    {0.0f, 45.0f, -1.0f},
+    {0.0f, 50.0f, -1.0f},
+    {0.0f, 25.0f, -1.0f},
+    {0.0f, 0.0f, -1.0f},
 };
 
-static s32 splineTableIn3_2[] = {
-    1103626240, -1043857408, 0, 1109393408, -1038090240, -1082130432, 1106247680, -1039400960,
-    -1082130432, 1101004800, -1043857408, -1082130432, 0, 0, -1082130432,
+static Vec splineTableIn3_2[] = {
+    {25.0f, -25.0f, 0.0f},
+    {40.0f, -40.0f, -1.0f},
+    {30.0f, -35.0f, -1.0f},
+    {20.0f, -25.0f, -1.0f},
+    {0.0f, 0.0f, -1.0f},
 };
 
-static s32 splineTableIn3_3[] = {
-    -1043857408, -1043857408, 0, -1038090240, -1038090240, -1082130432, -1041235968, -1039400960,
-    -1082130432, -1046478848, -1043857408, -1082130432, -2147483648, 0, -1082130432,
+static Vec splineTableIn3_3[] = {
+    {-25.0f, -25.0f, 0.0f},
+    {-40.0f, -40.0f, -1.0f},
+    {-30.0f, -35.0f, -1.0f},
+    {-20.0f, -25.0f, -1.0f},
+    {-0.0f, 0.0f, -1.0f},
 };
 
-static s32 splineTableIn4_1[] = {
-    1103626240, 1103626240, 0, 1106247680, 1108082688, -1082130432, 1109393408, 1110704128,
-    -1082130432, 1101004800, 1103626240, -1082130432, 0, 0, -1082130432,
+static Vec splineTableIn4_1[] = {
+    {25.0f, 25.0f, 0.0f},
+    {30.0f, 35.0f, -1.0f},
+    {40.0f, 45.0f, -1.0f},
+    {20.0f, 25.0f, -1.0f},
+    {0.0f, 0.0f, -1.0f},
 };
 
-static s32 splineTableIn4_2[] = {
-    -1043857408, 1103626240, 0, -1041235968, 1108082688, -1082130432, -1038090240, 1110704128,
-    -1082130432, -1046478848, 1103626240, -1082130432, 0, 0, -1082130432,
+static Vec splineTableIn4_2[] = {
+    {-25.0f, 25.0f, 0.0f},
+    {-30.0f, 35.0f, -1.0f},
+    {-40.0f, 45.0f, -1.0f},
+    {-20.0f, 25.0f, -1.0f},
+    {0.0f, 0.0f, -1.0f},
 };
 
-static s32 splineTableIn4_3[] = {
-    1103626240, -1043857408, 0, 1106247680, -1039400960, -1082130432, 1109393408, -1036779520,
-    -1082130432, 1101004800, -1043857408, -1082130432, 0, 0, -1082130432,
+static Vec splineTableIn4_3[] = {
+    {25.0f, -25.0f, 0.0f},
+    {30.0f, -35.0f, -1.0f},
+    {40.0f, -45.0f, -1.0f},
+    {20.0f, -25.0f, -1.0f},
+    {0.0f, 0.0f, -1.0f},
 };
 
-static s32 splineTableIn4_4[] = {
-    -1043857408, -1043857408, 0, -1041235968, -1039400960, -1082130432, -1038090240, -1036779520,
-    -1082130432, -1046478848, -1043857408, -1082130432, -2147483648, 0, -1082130432,
+static Vec splineTableIn4_4[] = {
+    {-25.0f, -25.0f, 0.0f},
+    {-30.0f, -35.0f, -1.0f},
+    {-40.0f, -45.0f, -1.0f},
+    {-20.0f, -25.0f, -1.0f},
+    {-0.0f, 0.0f, -1.0f},
 };
 
-static s32 splineTableOut1_1[] = {
-    0, 0, -1082130432, -1039400960, -1039400960, -1082130432, -1038090240, 0,
-    -1082130432, 1106247680, 1109393408, -1082130432, 1103626240, 0, 0,
+static Vec splineTableOut1_1[] = {
+    {0.0f, 0.0f, -1.0f},
+    {-35.0f, -35.0f, -1.0f},
+    {-40.0f, 0.0f, -1.0f},
+    {30.0f, 40.0f, -1.0f},
+    {25.0f, 0.0f, 0.0f},
 };
 
-static s32 splineTableOut2_1[] = {
-    0, 0, -1082130432, 1084227584, 1106247680, -1082130432, 1095237632, 1109393408,
-    -1082130432, 1101004800, 1106247680, -1082130432, 1103626240, 0, 0,
+static Vec splineTableOut2_1[] = {
+    {0.0f, 0.0f, -1.0f},
+    {5.0f, 30.0f, -1.0f},
+    {12.5f, 40.0f, -1.0f},
+    {20.0f, 30.0f, -1.0f},
+    {25.0f, 0.0f, 0.0f},
 };
 
-static s32 splineTableOut2_2[] = {
-    0, 0, -1082130432, -1063256064, -1041235968, -1082130432, -1052246016, -1038090240,
-    -1082130432, -1046478848, -1041235968, -1082130432, -1043857408, 0, 0,
+static Vec splineTableOut2_2[] = {
+    {0.0f, 0.0f, -1.0f},
+    {-5.0f, -30.0f, -1.0f},
+    {-12.5f, -40.0f, -1.0f},
+    {-20.0f, -30.0f, -1.0f},
+    {-25.0f, 0.0f, 0.0f},
 };
 
-static s32 splineTableOut3_1[] = {
-    0, 0, -1082130432, 0, 1103626240, -1082130432, 0, 1112014848,
-    -1082130432, 0, 1110704128, -1082130432, 0, 1103626240, 0,
+static Vec splineTableOut3_1[] = {
+    {0.0f, 0.0f, -1.0f},
+    {0.0f, 25.0f, -1.0f},
+    {0.0f, 50.0f, -1.0f},
+    {0.0f, 45.0f, -1.0f},
+    {0.0f, 25.0f, 0.0f},
 };
 
-static s32 splineTableOut3_2[] = {
-    0, 0, -1082130432, 1103626240, -1046478848, -1082130432, 1110704128, -1041235968,
-    -1082130432, 1106247680, -1043857408, -1082130432, 1103626240, -1043857408, 0,
+static Vec splineTableOut3_2[] = {
+    {0.0f, 0.0f, -1.0f},
+    {25.0f, -20.0f, -1.0f},
+    {45.0f, -30.0f, -1.0f},
+    {30.0f, -25.0f, -1.0f},
+    {25.0f, -25.0f, 0.0f},
 };
 
-static s32 splineTableOut3_3[] = {
-    0, 0, -1082130432, -1043857408, -1046478848, -1082130432, -1036779520, -1041235968,
-    -1082130432, -1041235968, -1043857408, -1082130432, -1043857408, -1043857408, 0,
+static Vec splineTableOut3_3[] = {
+    {0.0f, 0.0f, -1.0f},
+    {-25.0f, -20.0f, -1.0f},
+    {-45.0f, -30.0f, -1.0f},
+    {-30.0f, -25.0f, -1.0f},
+    {-25.0f, -25.0f, 0.0f},
 };
 
-static s32 splineTableOut4_1[] = {
-    0, 0, -1082130432, 1103626240, 1101004800, -1082130432, 1110704128, 1106247680,
-    -1082130432, 1106247680, 1103626240, -1082130432, 1103626240, 1103626240, 0,
+static Vec splineTableOut4_1[] = {
+    {0.0f, 0.0f, -1.0f},
+    {25.0f, 20.0f, -1.0f},
+    {45.0f, 30.0f, -1.0f},
+    {30.0f, 25.0f, -1.0f},
+    {25.0f, 25.0f, 0.0f},
 };
 
-static s32 splineTableOut4_2[] = {
-    0, 0, -1082130432, -1043857408, 1101004800, -1082130432, -1036779520, 1106247680,
-    -1082130432, -1041235968, 1103626240, -1082130432, -1043857408, 1103626240, 0,
+static Vec splineTableOut4_2[] = {
+    {0.0f, 0.0f, -1.0f},
+    {-25.0f, 20.0f, -1.0f},
+    {-45.0f, 30.0f, -1.0f},
+    {-30.0f, 25.0f, -1.0f},
+    {-25.0f, 25.0f, 0.0f},
 };
 
-static s32 splineTableOut4_3[] = {
-    0, 0, -1082130432, 1103626240, -1046478848, -1082130432, 1110704128, -1041235968,
-    -1082130432, 1106247680, -1043857408, -1082130432, 1103626240, -1043857408, 0,
+static Vec splineTableOut4_3[] = {
+    {0.0f, 0.0f, -1.0f},
+    {25.0f, -20.0f, -1.0f},
+    {45.0f, -30.0f, -1.0f},
+    {30.0f, -25.0f, -1.0f},
+    {25.0f, -25.0f, 0.0f},
 };
 
-static s32 splineTableOut4_4[] = {
-    0, 0, -1082130432, -1043857408, -1046478848, -1082130432, -1036779520, -1041235968,
-    -1082130432, -1041235968, -1043857408, -1082130432, -1043857408, -1043857408, 0,
+static Vec splineTableOut4_4[] = {
+    {0.0f, 0.0f, -1.0f},
+    {-25.0f, -20.0f, -1.0f},
+    {-45.0f, -30.0f, -1.0f},
+    {-30.0f, -25.0f, -1.0f},
+    {-25.0f, -25.0f, 0.0f},
 };
 
 static EVT_BEGIN(init_event)
@@ -461,7 +568,7 @@ static EVT_BEGIN(init_event)
         CALL(btlevtcmd_GetUnitId, -2, LW(5))
         SET_VALUE(LW(8), LW(6))
         ADD(LW(8), 4)
-        CALL(btlevtcmd_SpawnUnit, LW(3), PTR(entry_barriern_satellite), 0)
+        CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_barriern_satellite), 0)
         CALL(btlevtcmd_SetUnitWork, -2, LW(8), LW(3))
         CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(5))
         CALL(btlevtcmd_SetUnitWork, LW(3), 1, 1)
@@ -744,32 +851,72 @@ static s32 barriern_satellite_zanzou_sub(BOOL isFirstCall, BattleUnit* unit, f32
     return EVT_RETURN_BLOCK;
 }
 
-static s32 unison_phase_event[] = {
-    131163, (s32)btlevtcmd_StopWaitEvent, -2, 196699, (s32)btlevtcmd_CheckPhase, -30000000, 67108865, 131096,
-    -30000000, 0, 65540, 99, 33, 131163, (s32)btlevtcmd_get_turn, -30000000,
-    131100, -30000000, 1, 65540, 99, 33, 196699, (s32)btlevtcmd_CheckActStatus,
-    -2, -30000000, 131096, -30000000, 0, 65540, 99, 33,
-    196699, (s32)evt_sub_random, 10, -30000000, 65545, -30000000, 131122, -30000000,
-    0, 131122, -29999999, 4, 65541, 4, 262235, (s32)btlevtcmd_GetUnitWork,
-    -2, -29999999, -29999997, 131097, -29999997, -1, 131125, -30000000,
-    1, 33, 131125, -29999999, 1, 6, 131101, -30000000,
-    4, 65540, 99, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BARRI_ATTACK9",
-    -250000000, 0, -250000000, 131163, (s32)barriern_zanzou3, -2, 65630, (s32)satellite_blur_on,
-    262235, (s32)btlevtcmd_GetUnitWork, -2, 0, -29999999, 131101, -29999999, 1,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BARRI_SPLIT1", -250000000, 0, -250000000, 33,
-    196699, (s32)barriernSatelliteToInside, -2, -29999999, 65630, (s32)satellite_blur_off, 196699, (s32)btlevtcmd_GetUnitId,
-    -2, -29999996, 131122, -29999999, 4, 131122, -29999995, 0,
-    65541, 4, 262235, (s32)btlevtcmd_GetUnitWork, -2, -29999999, -29999998, 131096,
-    -29999998, -1, 262235, (s32)btlevtcmd_SpawnUnit, -29999997, (s32)entry_barriern_satellite, 0, 327771,
-    (s32)btlevtcmd_AddPos, -29999997, 0, 0, -1, 262235, (s32)btlevtcmd_SetUnitWork, -2,
-    -29999999, -29999997, 262235, (s32)btlevtcmd_SetUnitWork, -29999997, 0, -29999996, 131125,
-    -30000000, 1, 131125, -29999995, 1, 131101, -29999995, 2,
-    7, 33, 33, 131125, -29999999, 1, 6, 65545,
-    5, 65630, (s32)satellite_blur_on, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BARRI_SPLIT2", -250000000,
-    0, -250000000, 196699, (s32)barriernSatelliteToOutside, -2, -30000000, 65545, 60,
-    65630, (s32)satellite_blur_off, 262235, (s32)btlevtcmd_SetUnitWork, -2, 0, -30000000, 65539,
-    99, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+static EVT_BEGIN(unison_phase_event)
+    CALL(btlevtcmd_StopWaitEvent, -2)
+    CALL(btlevtcmd_CheckPhase, LW(0), 67108865)
+    IF_INT_EQUAL(LW(0), 0)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_get_turn, LW(0))
+    IF_INT_LESS_OR_EQUAL(LW(0), 1)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        GOTO(99)
+    END_IF
+    CALL(evt_sub_random, 10, LW(0))
+    WAIT_FRAMES(LW(0))
+    SET_VALUE(LW(0), 0)
+    SET_VALUE(LW(1), 4)
+    LOOP(4)
+        CALL(btlevtcmd_GetUnitWork, -2, LW(1), LW(3))
+        IF_INT_NOT_EQUAL(LW(3), -1)
+            ADD(LW(0), 1)
+        END_IF
+        ADD(LW(1), 1)
+    END_LOOP
+    IF_INT_GREATER_OR_EQUAL(LW(0), 4)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_ATTACK9"), -250000000, 0, -250000000)
+    CALL(barriern_zanzou3, -2)
+    CALL_CHILD(satellite_blur_on)
+    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(1))
+    IF_INT_GREATER_OR_EQUAL(LW(1), 1)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_SPLIT1"), -250000000, 0, -250000000)
+    END_IF
+    CALL(barriernSatelliteToInside, -2, LW(1))
+    CALL_CHILD(satellite_blur_off)
+    CALL(btlevtcmd_GetUnitId, -2, LW(4))
+    SET_VALUE(LW(1), 4)
+    SET_VALUE(LW(5), 0)
+    LOOP(4)
+        CALL(btlevtcmd_GetUnitWork, -2, LW(1), LW(2))
+        IF_INT_EQUAL(LW(2), -1)
+            CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_barriern_satellite), 0)
+            CALL(btlevtcmd_AddPos, LW(3), 0, 0, -1)
+            CALL(btlevtcmd_SetUnitWork, -2, LW(1), LW(3))
+            CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
+            ADD(LW(0), 1)
+            ADD(LW(5), 1)
+            IF_INT_GREATER_OR_EQUAL(LW(5), 2)
+                BREAK_LOOP
+            END_IF
+        END_IF
+        ADD(LW(1), 1)
+    END_LOOP
+    WAIT_FRAMES(5)
+    CALL_CHILD(satellite_blur_on)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_SPLIT2"), -250000000, 0, -250000000)
+    CALL(barriernSatelliteToOutside, -2, LW(0))
+    WAIT_FRAMES(60)
+    CALL_CHILD(satellite_blur_off)
+    CALL(btlevtcmd_SetUnitWork, -2, 0, LW(0))
+    LABEL(99)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetRGB, -2, 1, 255, 255, 255)
@@ -847,47 +994,93 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
-static s32 wakka_attack_common_event_no_hit[] = {
-    262235, (s32)btlevtcmd_GetUnitWork, -2, 1, -29999994, 131096, -29999994, 0,
-    262235, (s32)btlevtcmd_OffPartsAttribute, -2, -29999985, 67108864, 32, 786523, (s32)btlevtcmd_SetPartsBlur,
-    -2, -29999985, 255, 255, 255, 255, 255, 255,
-    255, 100, 0, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, -29999985, 67108864,
-    33, 262235, (s32)btlevtcmd_AnimeChangePose, -2, -29999985, (s32)"Z_3", 327771, (s32)btlevtcmd_GetPos,
-    -29999988, -29999994, -29999993, -29999992, 131125, -29999992, 1, 393307,
-    (s32)btlevtcmd_SetPartsPos, -2, -29999985, -29999994, -29999993, -29999992, 327771, (s32)btlevtcmd_CheckPartsAttribute,
-    -2, -29999985, 16777216, -30000000, 131097, -30000000, 0, 262235,
-    (s32)btlevtcmd_OffPartsAttribute, -2, -29999985, 16777216, 33, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    1, (s32)"A_5", 110, 65541, 0, 196699, (s32)btlevtcmd_GetFaceDirection, -2,
-    -30000000, 131096, -30000000, -1, 393307, (s32)btlevtcmd_GetPartsPos, -2, -29999985,
-    -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999994,
-    -29999993, -29999992, 131100, -30000000, -29999994, 65630, (s32)start_avoid, 7,
-    33, 32, 393307, (s32)btlevtcmd_GetPartsPos, -2, -29999985, -30000000, -29999999,
-    -29999998, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999994, -29999993, -29999992,
-    131101, -30000000, -29999994, 65630, (s32)start_avoid, 7, 33, 33,
-    65545, 1, 6, 112, 262235, (s32)btlevtcmd_GetUnitWork, -2, 1,
-    -29999994, 131096, -29999994, 0, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996,
-    -29999994, -29999993, -29999992, 262235, (s32)btlevtcmd_GetStageSize, -29999994, -250000000, -250000000,
-    131127, -29999994, 1, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -30000000, 131127,
-    -29999994, -30000000, 131126, -29999993, 5, 393307, (s32)btlevtcmd_SetPartsScale, -2,
-    -29999985, 1, 0, 1, 110, 65541, 0, 65541,
-    10, 393307, (s32)btlevtcmd_AddPartsScale, -2, -29999985, 0, -229999872, 0,
-    65545, 1, 6, 65541, 10, 393307, (s32)btlevtcmd_AddPartsScale, -2,
-    -29999985, 0, -230000128, 0, 65545, 1, 6, 6,
-    112, 393307, (s32)btlevtcmd_JumpPartsSetting, -2, -29999985, 0, 4, 0,
-    524379, (s32)btlevtcmd_JumpPartsPosition, -2, -29999985, -29999994, -29999993, -29999992, 0,
-    -1, 32, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999994, -29999993,
-    -29999992, 262235, (s32)btlevtcmd_GetStageSize, -29999994, -250000000, -250000000, 131127, -29999994,
-    1, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -30000000, 131127, -29999994, -30000000,
-    131126, -29999993, 5, 393307, (s32)btlevtcmd_SetPartsScale, -2, -29999985, 1,
-    0, 1, 110, 65541, 0, 65541, 5, 393307,
-    (s32)btlevtcmd_AddPartsScale, -2, -29999985, 0, -229999744, 0, 65545, 1,
-    6, 65541, 5, 393307, (s32)btlevtcmd_AddPartsScale, -2, -29999985, 0,
-    -230000256, 0, 65545, 1, 6, 6, 112, 393307,
-    (s32)btlevtcmd_JumpPartsSetting, -2, -29999985, 0, 7, 0, 524379, (s32)btlevtcmd_JumpPartsPosition,
-    -2, -29999985, -29999994, -29999993, -29999992, 0, -1, 393307,
-    (s32)btlevtcmd_SetPartsPos, -2, -29999985, 0, -1000, 0, 33, 2,
-    1,
-};
+static EVT_BEGIN(wakka_attack_common_event_no_hit)
+    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(6))
+    IF_INT_EQUAL(LW(6), 0)
+        CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 67108864)
+    ELSE
+        CALL(btlevtcmd_SetPartsBlur, -2, LW(15), 255, 255, 255, 255, 255, 255, 255, 100, 0)
+        CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 67108864)
+    END_IF
+    CALL(btlevtcmd_AnimeChangePose, -2, LW(15), STRING("Z_3"))
+    CALL(btlevtcmd_GetPos, LW(12), LW(6), LW(7), LW(8))
+    ADD(LW(8), 1)
+    CALL(btlevtcmd_SetPartsPos, -2, LW(15), LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_CheckPartsAttribute, -2, LW(15), 16777216, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 16777216)
+    END_IF
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_5"))
+    BEGIN_SIBLING_EVENT
+        LOOP(0)
+            CALL(btlevtcmd_GetFaceDirection, -2, LW(0))
+            IF_INT_EQUAL(LW(0), -1)
+                CALL(btlevtcmd_GetPartsPos, -2, LW(15), LW(0), LW(1), LW(2))
+                CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+                IF_INT_LESS_OR_EQUAL(LW(0), LW(6))
+                    CALL_CHILD(start_avoid)
+                    BREAK_LOOP
+                END_IF
+            ELSE
+                CALL(btlevtcmd_GetPartsPos, -2, LW(15), LW(0), LW(1), LW(2))
+                CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+                IF_INT_GREATER_OR_EQUAL(LW(0), LW(6))
+                    CALL_CHILD(start_avoid)
+                    BREAK_LOOP
+                END_IF
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(6))
+    IF_INT_EQUAL(LW(6), 0)
+        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+        CALL(btlevtcmd_GetStageSize, LW(6), -250000000, -250000000)
+        MULTIPLY(LW(6), 1)
+        CALL(btlevtcmd_GetFaceDirection, -2, LW(0))
+        MULTIPLY(LW(6), LW(0))
+        SUBTRACT(LW(7), 5)
+        CALL(btlevtcmd_SetPartsScale, -2, LW(15), 1, 0, 1)
+        BEGIN_SIBLING_EVENT
+            LOOP(0)
+                LOOP(10)
+                    CALL(btlevtcmd_AddPartsScale, -2, LW(15), 0, FLOAT(0.125f), 0)
+                    WAIT_FRAMES(1)
+                END_LOOP
+                LOOP(10)
+                    CALL(btlevtcmd_AddPartsScale, -2, LW(15), 0, FLOAT(-0.125f), 0)
+                    WAIT_FRAMES(1)
+                END_LOOP
+            END_LOOP
+        END_SIBLING_EVENT
+        CALL(btlevtcmd_JumpPartsSetting, -2, LW(15), 0, 4, 0)
+        CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(6), LW(7), LW(8), 0, -1)
+    ELSE
+        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+        CALL(btlevtcmd_GetStageSize, LW(6), -250000000, -250000000)
+        MULTIPLY(LW(6), 1)
+        CALL(btlevtcmd_GetFaceDirection, -2, LW(0))
+        MULTIPLY(LW(6), LW(0))
+        SUBTRACT(LW(7), 5)
+        CALL(btlevtcmd_SetPartsScale, -2, LW(15), 1, 0, 1)
+        BEGIN_SIBLING_EVENT
+            LOOP(0)
+                LOOP(5)
+                    CALL(btlevtcmd_AddPartsScale, -2, LW(15), 0, FLOAT(0.25f), 0)
+                    WAIT_FRAMES(1)
+                END_LOOP
+                LOOP(5)
+                    CALL(btlevtcmd_AddPartsScale, -2, LW(15), 0, FLOAT(-0.25f), 0)
+                    WAIT_FRAMES(1)
+                END_LOOP
+            END_LOOP
+        END_SIBLING_EVENT
+        CALL(btlevtcmd_JumpPartsSetting, -2, LW(15), 0, 7, 0)
+        CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(6), LW(7), LW(8), 0, -1)
+        CALL(btlevtcmd_SetPartsPos, -2, LW(15), 0, -1000, 0)
+    END_IF
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(wakka_attack_common_event_hit)
     CALL(btlevtcmd_GetUnitWork, -2, 1, LW(6))
@@ -998,40 +1191,75 @@ static EVT_BEGIN(damage_check_event_sub)
     RETURN
 EVT_END()
 
-static s32 wakka_attack_event[] = {
-    196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000,
-    (s32)weapon_wakka_attack, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_wakka_attack, -29999997, -29999996, 131096, -29999997,
-    -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16, -30000000, 131097, -30000000,
-    0, 65630, (s32)subsetevt_confuse_flustered, 2, 33, 65540, 99, 33,
-    262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 0, 327771, (s32)btlevtcmd_SetPartsWork, -2,
-    1, 0, -29999997, 327771, (s32)btlevtcmd_SetPartsWork, -2, 1, 5,
-    -29999996, 131122, -29999991, (s32)weapon_wakka_attack, 131122, -29999990, 1, 131122,
-    -29999988, -2, 131122, -29999985, 7, 196699, (s32)evt_btl_camera_set_mode, 0,
-    7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2, -1, 196699, (s32)evt_btl_camera_set_zoom,
-    0, 250, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 131163, (s32)btlevtcmd_WeaponAftereffect,
-    (s32)weapon_wakka_attack, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996, 65627, (s32)btlevtcmd_WaitGuardMove,
-    196699, (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_wakka_attack, 458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1,
-    -29999997, -29999996, 16, -29999986, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999986,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"S_1", 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_ENM_BARRI_ATTACK2", -250000000, 0, -250000000, 131163, (s32)barriern_zanzou, -2, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BARRI_ATTACK9", -250000000, 0, -250000000, 131163, (s32)barriern_zanzou2,
-    -2, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0, 131122,
-    -30000000, 6, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -29999986, 131127, -30000000,
-    -29999986, 65541, 10, 65545, 1, 327771, (s32)btlevtcmd_AddRotate, -2,
-    0, -30000000, 0, 6, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BARRI_ATTACK1",
-    -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1",
-    65545, 30, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_2", 65545,
-    30, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_3", 196699, (s32)evt_btl_camera_set_mode,
-    0, 0, 65545, 10, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"A_4", 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BARRI_ATTACK3", -250000000, 0, -250000000,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BARRI_ATTACK7", -250000000, 0, -30000000, 327771,
-    (s32)btlevtcmd_SetPartsWork, -2, 7, 15, -30000000, 65630, (s32)damage_check_event_sub, 327771,
-    (s32)btlevtcmd_GetPartsWork, -2, 7, 15, -30000000, 131163, (s32)evt_snd_sfxoff, -30000000,
-    131122, -30000000, -6, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -29999986, 131127,
-    -30000000, -29999986, 65541, 10, 65545, 1, 327771, (s32)btlevtcmd_AddRotate,
-    -2, 0, -30000000, 0, 6, 65539, 99, 131163,
-    (s32)btlevtcmd_ResetFaceDirection, -2, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+static EVT_BEGIN(wakka_attack_event)
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_wakka_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_wakka_attack), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 0, LW(3))
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 5, LW(4))
+    SET_VALUE(LW(9), PTR(&weapon_wakka_attack))
+    SET_VALUE(LW(10), 1)
+    SET_VALUE(LW(12), -2)
+    SET_VALUE(LW(15), 7)
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_zoom, 0, 250)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_wakka_attack))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_wakka_attack))
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(14))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(14))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_ATTACK2"), -250000000, 0, -250000000)
+    CALL(barriern_zanzou, -2)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_ATTACK9"), -250000000, 0, -250000000)
+    CALL(barriern_zanzou2, -2)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+    SET_VALUE(LW(0), 6)
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(14))
+    MULTIPLY(LW(0), LW(14))
+    LOOP(10)
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_AddRotate, -2, 0, LW(0), 0)
+    END_LOOP
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_ATTACK1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1"))
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2"))
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_3"))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_FRAMES(10)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_4"))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_ATTACK3"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_ATTACK7"), -250000000, 0, LW(0))
+    CALL(btlevtcmd_SetPartsWork, -2, 7, 15, LW(0))
+    CALL_CHILD(damage_check_event_sub)
+    CALL(btlevtcmd_GetPartsWork, -2, 7, 15, LW(0))
+    CALL(evt_snd_sfxoff, LW(0))
+    SET_VALUE(LW(0), -6)
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(14))
+    MULTIPLY(LW(0), LW(14))
+    LOOP(10)
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_AddRotate, -2, 0, LW(0), 0)
+    END_LOOP
+    LABEL(99)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(wawawa_attack_event_satellite_blur)
     CALL(barriern_satellite_zanzou, -2, LW(0))
@@ -1039,94 +1267,200 @@ static __declspec(section ".data") EVT_BEGIN(wawawa_attack_event_satellite_blur)
     RETURN
 EVT_END()
 
-static s32 wawawa_attack_event[] = {
-    196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000,
-    (s32)weapon_wawawa_attack, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_wawawa_attack, -29999997, -29999996, 131096, -29999997,
-    -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16, -30000000, 131097, -30000000,
-    0, 65630, (s32)subsetevt_confuse_flustered, 2, 33, 65540, 99, 33,
-    262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 1, 262235, (s32)btlevtcmd_SetUnitWork, -2,
-    2, 0, 720987, (s32)barriern_wawawa_set_target, -30000000, -29999999, -29999998, -29999997,
-    -29999996, -29999995, -29999994, -29999993, -29999992, -29999991, 327771, (s32)btlevtcmd_SetPartsWork,
-    -2, 1, 0, -30000000, 327771, (s32)btlevtcmd_SetPartsWork, -2, 1,
-    1, -29999998, 327771, (s32)btlevtcmd_SetPartsWork, -2, 1, 2, -29999996,
-    327771, (s32)btlevtcmd_SetPartsWork, -2, 1, 3, -29999994, 327771, (s32)btlevtcmd_SetPartsWork,
-    -2, 1, 4, -29999992, 327771, (s32)btlevtcmd_SetPartsWork, -2, 1,
-    5, -29999999, 327771, (s32)btlevtcmd_SetPartsWork, -2, 1, 6, -29999997,
-    327771, (s32)btlevtcmd_SetPartsWork, -2, 1, 7, -29999995, 327771, (s32)btlevtcmd_SetPartsWork,
-    -2, 1, 8, -29999993, 327771, (s32)btlevtcmd_SetPartsWork, -2, 1,
-    9, -29999991, 327771, (s32)btlevtcmd_SetPartsWork, -2, 1, 10, 0,
-    327771, (s32)btlevtcmd_SetPartsWork, -2, 1, 11, 0, 327771, (s32)btlevtcmd_SetPartsWork,
-    -2, 1, 12, 0, 327771, (s32)btlevtcmd_SetPartsWork, -2, 1,
-    13, 0, 327771, (s32)btlevtcmd_SetPartsWork, -2, 1, 14, 0,
-    196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2,
-    -1, 196699, (s32)evt_btl_camera_set_zoom, 0, 250, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0,
-    1, 131163, (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_wawawa_attack, 131163, (s32)btlevtcmd_AttackDeclareAll, -2, 65627,
-    (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_wawawa_attack, 327771, (s32)btlevtcmd_GetPartsWork, -2,
-    1, 0, -29999997, 327771, (s32)btlevtcmd_GetPartsWork, -2, 1, 5,
-    -29999996, 458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996, 16,
-    -29999985, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_ENM_BARRI_ATTACK5", -250000000, 0, -250000000, 131122, -30000000, 0, 65541,
-    4, 65628, (s32)wawawa_attack_event_satellite_blur, 131125, -30000000, 1, 65545, 10,
-    6, 131163, (s32)barriern_zanzou, -2, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BARRI_ATTACK10",
-    -250000000, 0, -250000000, 131163, (s32)barriern_zanzou2, -2, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_BARRI_ATTACK6", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    1, (s32)"F_1", 65545, 20, 131122, -29999989, 4, 65541,
-    0, 131101, -29999989, 8, 7, 33, 262235, (s32)btlevtcmd_GetUnitWork,
-    -2, -29999989, -29999988, 196699, (s32)btlevtcmd_GetBodyId, -29999988, -29999987, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -29999988, -29999987, (s32)"F_2", 131125, -29999989, 1, 6,
-    65545, 20, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0,
-    131122, -29999989, 4, 65541, 0, 131101, -29999989, 8,
-    7, 33, 262235, (s32)btlevtcmd_GetUnitWork, -2, -29999989, -29999988, 327771,
-    (s32)btlevtcmd_SetRotate, -29999988, 0, 0, 0, 131125, -29999989, 1,
-    6, 131122, -30000000, 6, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -29999986,
-    131127, -30000000, -29999986, 65541, 10, 65545, 1, 327771,
-    (s32)btlevtcmd_AddRotate, -2, 0, -30000000, 0, 131122, -29999989, 4,
-    65541, 0, 131101, -29999989, 8, 7, 33, 262235,
-    (s32)btlevtcmd_GetUnitWork, -2, -29999989, -29999988, 327771, (s32)btlevtcmd_AddRotate, -29999988, 0,
-    -30000000, 0, 131125, -29999989, 1, 6, 6, 131122,
-    -29999989, 4, 65541, 0, 131101, -29999989, 8, 7,
-    33, 262235, (s32)btlevtcmd_GetUnitWork, -2, -29999989, -29999988, 196699, (s32)btlevtcmd_GetBodyId,
-    -29999988, -29999987, 262235, (s32)btlevtcmd_AnimeChangePose, -29999988, -29999987, (s32)"S_2", 131125,
-    -29999989, 1, 6, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BARRI_ATTACK1", -250000000,
-    0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1", 65545,
-    30, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_2", 65545, 30,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_3", 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 65545, 10, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_4",
-    131122, -29999988, -2, 131122, -29999987, 0, 131122, -29999986,
-    5, 131122, -29999985, 7, 65628, (s32)wawawa_attack_event_sub, 65545, 30,
-    131122, -29999989, 4, 131125, -29999987, 1, 131125, -29999986,
-    1, 131125, -29999985, 1, 65541, 0, 131101, -29999989,
-    8, 7, 33, 262235, (s32)btlevtcmd_GetUnitWork, -2, -29999989, -29999988,
-    65628, (s32)wawawa_attack_event_sub, 65545, 20, 131125, -29999989, 1, 131125,
-    -29999987, 1, 131125, -29999986, 1, 131125, -29999985, 1,
-    6, 65541, 0, 262235, (s32)btlevtcmd_GetUnitWork, -2, 2, -30000000,
-    131101, -30000000, 5, 7, 33, 65545, 1, 6,
-    65545, 10, 65627, (s32)_check_satellite, 131122, -30000000, -6, 196699,
-    (s32)btlevtcmd_GetFaceDirection, -2, -29999986, 131127, -30000000, -29999986, 65541, 10,
-    65545, 1, 327771, (s32)btlevtcmd_AddRotate, -2, 0, -30000000, 0,
-    131122, -29999989, 4, 65541, 0, 131101, -29999989, 8,
-    7, 33, 262235, (s32)btlevtcmd_GetUnitWork, -2, -29999989, -29999988, 327771,
-    (s32)btlevtcmd_AddRotate, -29999988, 0, -30000000, 0, 131125, -29999989, 1,
-    6, 6, 65539, 99, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 131163,
-    (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+static EVT_BEGIN(wawawa_attack_event)
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_wawawa_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_wawawa_attack), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
+    CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
+    CALL(barriern_wawawa_set_target, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 0, LW(0))
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 1, LW(2))
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 2, LW(4))
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 3, LW(6))
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 4, LW(8))
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 5, LW(1))
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 6, LW(3))
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 7, LW(5))
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 8, LW(7))
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 9, LW(9))
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 10, 0)
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 11, 0)
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 12, 0)
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 13, 0)
+    CALL(btlevtcmd_SetPartsWork, -2, 1, 14, 0)
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_zoom, 0, 250)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_wawawa_attack))
+    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_wawawa_attack))
+    CALL(btlevtcmd_GetPartsWork, -2, 1, 0, LW(3))
+    CALL(btlevtcmd_GetPartsWork, -2, 1, 5, LW(4))
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_ATTACK5"), -250000000, 0, -250000000)
+    SET_VALUE(LW(0), 0)
+    LOOP(4)
+        SPAWN_EVENT(wawawa_attack_event_satellite_blur)
+        ADD(LW(0), 1)
+        WAIT_FRAMES(10)
+    END_LOOP
+    CALL(barriern_zanzou, -2)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_ATTACK10"), -250000000, 0, -250000000)
+    CALL(barriern_zanzou2, -2)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_ATTACK6"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("F_1"))
+    WAIT_FRAMES(20)
+    SET_VALUE(LW(11), 4)
+    LOOP(0)
+        IF_INT_GREATER_OR_EQUAL(LW(11), 8)
+            BREAK_LOOP
+        END_IF
+        CALL(btlevtcmd_GetUnitWork, -2, LW(11), LW(12))
+        CALL(btlevtcmd_GetBodyId, LW(12), LW(13))
+        CALL(btlevtcmd_AnimeChangePose, LW(12), LW(13), STRING("F_2"))
+        ADD(LW(11), 1)
+    END_LOOP
+    WAIT_FRAMES(20)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+    SET_VALUE(LW(11), 4)
+    LOOP(0)
+        IF_INT_GREATER_OR_EQUAL(LW(11), 8)
+            BREAK_LOOP
+        END_IF
+        CALL(btlevtcmd_GetUnitWork, -2, LW(11), LW(12))
+        CALL(btlevtcmd_SetRotate, LW(12), 0, 0, 0)
+        ADD(LW(11), 1)
+    END_LOOP
+    SET_VALUE(LW(0), 6)
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(14))
+    MULTIPLY(LW(0), LW(14))
+    LOOP(10)
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_AddRotate, -2, 0, LW(0), 0)
+        SET_VALUE(LW(11), 4)
+        LOOP(0)
+            IF_INT_GREATER_OR_EQUAL(LW(11), 8)
+                BREAK_LOOP
+            END_IF
+            CALL(btlevtcmd_GetUnitWork, -2, LW(11), LW(12))
+            CALL(btlevtcmd_AddRotate, LW(12), 0, LW(0), 0)
+            ADD(LW(11), 1)
+        END_LOOP
+    END_LOOP
+    SET_VALUE(LW(11), 4)
+    LOOP(0)
+        IF_INT_GREATER_OR_EQUAL(LW(11), 8)
+            BREAK_LOOP
+        END_IF
+        CALL(btlevtcmd_GetUnitWork, -2, LW(11), LW(12))
+        CALL(btlevtcmd_GetBodyId, LW(12), LW(13))
+        CALL(btlevtcmd_AnimeChangePose, LW(12), LW(13), STRING("S_2"))
+        ADD(LW(11), 1)
+    END_LOOP
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_ATTACK1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1"))
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2"))
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_3"))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_FRAMES(10)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_4"))
+    SET_VALUE(LW(12), -2)
+    SET_VALUE(LW(13), 0)
+    SET_VALUE(LW(14), 5)
+    SET_VALUE(LW(15), 7)
+    SPAWN_EVENT(wawawa_attack_event_sub)
+    WAIT_FRAMES(30)
+    SET_VALUE(LW(11), 4)
+    ADD(LW(13), 1)
+    ADD(LW(14), 1)
+    ADD(LW(15), 1)
+    LOOP(0)
+        IF_INT_GREATER_OR_EQUAL(LW(11), 8)
+            BREAK_LOOP
+        END_IF
+        CALL(btlevtcmd_GetUnitWork, -2, LW(11), LW(12))
+        SPAWN_EVENT(wawawa_attack_event_sub)
+        WAIT_FRAMES(20)
+        ADD(LW(11), 1)
+        ADD(LW(13), 1)
+        ADD(LW(14), 1)
+        ADD(LW(15), 1)
+    END_LOOP
+    LOOP(0)
+        CALL(btlevtcmd_GetUnitWork, -2, 2, LW(0))
+        IF_INT_GREATER_OR_EQUAL(LW(0), 5)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_FRAMES(10)
+    CALL(_check_satellite)
+    SET_VALUE(LW(0), -6)
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(14))
+    MULTIPLY(LW(0), LW(14))
+    LOOP(10)
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_AddRotate, -2, 0, LW(0), 0)
+        SET_VALUE(LW(11), 4)
+        LOOP(0)
+            IF_INT_GREATER_OR_EQUAL(LW(11), 8)
+                BREAK_LOOP
+            END_IF
+            CALL(btlevtcmd_GetUnitWork, -2, LW(11), LW(12))
+            CALL(btlevtcmd_AddRotate, LW(12), 0, LW(0), 0)
+            ADD(LW(11), 1)
+        END_LOOP
+    END_LOOP
+    LABEL(99)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
-static s32 wawawa_attack_event_sub[] = {
-    327771, (s32)btlevtcmd_GetPartsWork, -2, 1, -29999987, -29999997, 327771, (s32)btlevtcmd_GetPartsWork,
-    -2, 1, -29999986, -29999996, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BARRI_ATTACK4",
-    -250000000, 0, -250000000, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BARRI_ATTACK8", -250000000,
-    0, -30000000, 327771, (s32)btlevtcmd_SetPartsWork, -2, -29999985, 15, -30000000,
-    65541, 0, 131101, -29999987, 3, 65630, (s32)wawawa_attack_event_sub_last, 7,
-    33, 131125, -29999987, 1, 131125, -29999986, 1, 327771,
-    (s32)btlevtcmd_GetPartsWork, -2, 1, -29999987, -29999995, 327771, (s32)btlevtcmd_GetPartsWork, -2,
-    1, -29999986, -29999994, 131096, -29999997, -29999995, 131096, -29999996,
-    -29999994, 65630, (s32)wawawa_attack_event_sub_no_last, 7, 33, 33, 6, 262235,
-    (s32)btlevtcmd_AddUnitWork, -2, 2, 1, 327771, (s32)btlevtcmd_GetPartsWork, -2, -29999985,
-    15, -30000000, 131163, (s32)evt_snd_sfxoff, -30000000, 2, 1,
-};
+static EVT_BEGIN(wawawa_attack_event_sub)
+    CALL(btlevtcmd_GetPartsWork, -2, 1, LW(13), LW(3))
+    CALL(btlevtcmd_GetPartsWork, -2, 1, LW(14), LW(4))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_ATTACK4"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BARRI_ATTACK8"), -250000000, 0, LW(0))
+    CALL(btlevtcmd_SetPartsWork, -2, LW(15), 15, LW(0))
+    LOOP(0)
+        IF_INT_GREATER_OR_EQUAL(LW(13), 3)
+            CALL_CHILD(wawawa_attack_event_sub_last)
+            BREAK_LOOP
+        END_IF
+        ADD(LW(13), 1)
+        ADD(LW(14), 1)
+        CALL(btlevtcmd_GetPartsWork, -2, 1, LW(13), LW(5))
+        CALL(btlevtcmd_GetPartsWork, -2, 1, LW(14), LW(6))
+        IF_INT_EQUAL(LW(3), LW(5))
+            IF_INT_EQUAL(LW(4), LW(6))
+                CALL_CHILD(wawawa_attack_event_sub_no_last)
+                BREAK_LOOP
+            END_IF
+        END_IF
+    END_LOOP
+    CALL(btlevtcmd_AddUnitWork, -2, 2, 1)
+    CALL(btlevtcmd_GetPartsWork, -2, LW(15), 15, LW(0))
+    CALL(evt_snd_sfxoff, LW(0))
+    RETURN
+EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(wawawa_attack_event_sub_no_last)
-    SET_VALUE(LW(9), PTR(weapon_wawawa_attack))
+    SET_VALUE(LW(9), PTR(&weapon_wawawa_attack))
     SET_VALUE(LW(10), 0)
     CALL_CHILD(PTR(damage_check_event_sub))
     RETURN
@@ -1150,14 +1484,14 @@ static EVT_BEGIN(wawawa_attack_event_sub_last)
     END_LOOP
     IF_INT_EQUAL(LW(0), 1)
         CALL_CHILD(PTR(wakka_attack_common_event_hit))
-        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_wawawa_attack))
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_wawawa_attack), 256, LW(5))
+        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_wawawa_attack))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_wawawa_attack), 256, LW(5))
         CALL(btlevtcmd_SetPartsPos, -2, LW(15), 0, -1000, 0)
         WAIT_FRAMES(20)
         CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 67108864)
         CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 16777216)
         ELSE
-        SET_VALUE(LW(9), PTR(weapon_wawawa_attack))
+        SET_VALUE(LW(9), PTR(&weapon_wawawa_attack))
         SET_VALUE(LW(10), 1)
         CALL_CHILD(PTR(damage_check_event_sub))
     END_IF
@@ -1209,7 +1543,7 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
-static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, s32* table) {
+static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table) {
     BarriernSpline* sp;
 
     if (unit->work[4 + n] == -1) {
@@ -1456,7 +1790,7 @@ static USER_FUNC(outSplineTableSet) {
     return EVT_RETURN_DONE;
 }
 
-static void outSplineTableSet_Sub(BattleUnit* unit, s32 n, s32* table) {
+static void outSplineTableSet_Sub(BattleUnit* unit, s32 n, Vec* table) {
     BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4 + n]), 1)->work[2] = (s32)table;
 }
 

@@ -2,6 +2,7 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "aji.h"
+#include "evt/evt_npc.h"
 
 #pragma force_active on
 
@@ -42,87 +43,63 @@ USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_telop_entry);
 
-__declspec(section ".data") u64 fd_aji_00_negone_one_374;
-__declspec(section ".data") s32 fd_aji_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_aji_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_aji_00___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_aji_00_one_negone_373;
-__declspec(section ".data") s32 fd_aji_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_aji_00_one_381[1];
-__declspec(section ".data") u64 fd_aji_00_negone_one_360;
-__declspec(section ".data") s32 fd_aji_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_aji_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_aji_00___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_aji_00_one_negone_359;
-__declspec(section ".data") s32 fd_aji_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_aji_00_one_364[1];
-__declspec(section ".data") s32 fd_aji_00__three_localstatic4_sqrtf[2];
-__declspec(section ".data") s32 fd_aji_00__half_localstatic3_sqrtf[2];
+__declspec(section ".data") f32 fd_aji_00_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_00_neg_one_382;
+__declspec(section ".data") f32 fd_aji_00___local_PI_383;
+__declspec(section ".data") f32 fd_aji_00___local_3PIO2_385;
+__declspec(section ".data") f32 fd_aji_00_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_00___local_PIO2_384;
+__declspec(section ".data") f32 fd_aji_00_one_381;
+__declspec(section ".data") f32 fd_aji_00_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_00_neg_one_365;
+__declspec(section ".data") f32 fd_aji_00___local_PI_366;
+__declspec(section ".data") f32 fd_aji_00___local_3PIO2_368;
+__declspec(section ".data") f32 fd_aji_00_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_00___local_PIO2_367;
+__declspec(section ".data") f32 fd_aji_00_one_364;
+__declspec(section ".data") f64 fd_aji_00__three_localstatic4_sqrtf;
+__declspec(section ".data") f64 fd_aji_00__half_localstatic3_sqrtf;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static s32 e_door_close[22];
 static s32 e_door_open[22];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 static s32 first_evt[333];
 static s32 evt_door_msg[14];
-static s32 npcEnt[69];
+static NpcSetupInfo npcEnt[3];
 s32 aji_00_init_evt[91];
 
-__declspec(section ".data") u64 fd_aji_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_00_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_00___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_00___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_00_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_00___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_00_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_00_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_aji_00_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_00_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_00___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_00___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_00_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_00___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_00_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_00_one_364 = 1.0f;
 
-__declspec(section ".data") s32 fd_aji_00__three_localstatic4_sqrtf[] = {
-    1074266112, 0,
-};
+__declspec(section ".data") f64 fd_aji_00__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") s32 fd_aji_00__half_localstatic3_sqrtf[] = {
-    1071644672, 0,
-};
+__declspec(section ".data") f64 fd_aji_00__half_localstatic3_sqrtf = 0.5;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -156,13 +133,44 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"aji_19", (s32)"e_bero", 327685, (s32)w_door_close, (s32)w_door_open, (s32)"e_bero",
-    65546, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"aji_01", (s32)"w_bero_1", 327685, (s32)e_door_close, (s32)e_door_open, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_19", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_01", // nextMapName
+        "w_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(first_evt)
@@ -247,16 +255,26 @@ static EVT_BEGIN(evt_door_msg)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"手下１"*/"\x8E\xE8\x89\xBA\x82\x50", 1073743360, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"手下２"*/"\x8E\xE8\x89\xBA\x82\x51",
-    1073743360, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"手下１"*/"\x8E\xE8\x89\xBA\x82\x50", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"手下２"*/"\x8E\xE8\x89\xBA\x82\x51", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(aji_00_init_evt)

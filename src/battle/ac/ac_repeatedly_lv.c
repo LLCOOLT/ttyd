@@ -52,15 +52,14 @@ typedef struct RepeatedlyLvWork {
 #define RL_PadNow ((s32(*)(s32))BattlePadCheckNow)
 #define RL_PadUp ((s32(*)(s32))BattlePadCheckUp)
 #define RL_IconDisp ((void (*)(Vec*, s16, s32, f32))iconDispGx)
-#define RL_AC(ac, off, T) (*(T*)((u8*)(ac) + (off)))
 
 static void _init_param(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
-    RepeatedlyLvWork* p = (RepeatedlyLvWork*)((u8*)ac + 0x2BC);
+    RepeatedlyLvWork* p = (RepeatedlyLvWork*)ac->work;
     s32 v;
     p->maxMask = 0;
     p->u27 = 1;
-    switch (RL_AC(ac, 0x38, s32)) {
+    switch (ac->params[0]) {
         case 2:
             p->mask = p->maskA = p->maskB = 0x200;
             break;
@@ -105,32 +104,32 @@ static void _init_param(BattleWork* work) {
             break;
     }
     p->s22 = 0;
-    p->s1e = p->s20 = RL_AC(ac, 0x3C, s32);
+    p->s1e = p->s20 = ac->params[1];
     p->s18 = 0;
     p->gauge = 0.0f;
     p->s1c = 0;
-    p->u24 = RL_AC(ac, 0x40, s32);
-    p->s1a = RL_AC(ac, 0x44, s32);
-    p->rate = 0.01f * (f32)RL_AC(ac, 0x48, s32);
-    p->u26 = RL_AC(ac, 0x4C, s32);
-    v = *(s16*)((u8*)work + 0x1D18);
+    p->u24 = ac->params[2];
+    p->s1a = ac->params[3];
+    p->rate = 0.01f * (f32)ac->params[4];
+    p->u26 = ac->params[5];
+    v = work->actionCommands.countdown;
     if (v > 0) {
-        *(s16*)((u8*)work + 0x1D18) = v - 1;
+        work->actionCommands.countdown = v - 1;
         p->state = 1;
     } else {
         p->state = 0;
     }
-    RL_AC(ac, 0x60, s32) = 0;
-    RL_AC(ac, 0x58, s32) = 0;
-    RL_AC(ac, 0x5C, s32) = 0;
+    ac->outputParams[2] = 0;
+    ac->outputParams[0] = 0;
+    ac->outputParams[1] = 0;
 }
 
 void battleAcDelete_RepeatedlyLv(BattleWork* work);
 
 s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
-    RepeatedlyLvWork* p = (RepeatedlyLvWork*)((u8*)ac + 0x2BC);
-    RepeatedlyLvDisp* disp = (RepeatedlyLvDisp*)((u8*)ac + 0x290);
+    RepeatedlyLvWork* p = (RepeatedlyLvWork*)ac->work;
+    RepeatedlyLvDisp* disp = (RepeatedlyLvDisp*)&ac->disp;
     s32 hit = 0;
     s32 autoCmd = 0;
     s32 r;
@@ -164,7 +163,7 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
                     if (p->s22 < 150) {
                         break;
                     }
-                    RL_AC(ac, 0x60, s32) = 0;
+                    ac->outputParams[2] = 0;
                     ac->result &= ~1;
                     ac->result |= 2;
                     ac->mAcState = 1002;
@@ -172,7 +171,7 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
                 }
             }
             BattleAcGaugeSeInit();
-            RL_AC(ac, 0x58, s32) = 1;
+            ac->outputParams[0] = 1;
             ac->mAcState = 1000;
         case 1000:
             if ((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
@@ -193,12 +192,12 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
                     }
                     p->s18++;
                 }
-                RL_AC(ac, 0x60, s32) = p->s18;
+                ac->outputParams[2] = p->s18;
                 ac->mResultCount++;
                 battleAcDelete_RepeatedlyLv(work);
                 return 0;
             }
-            switch (RL_AC(ac, 0x38, s32)) {
+            switch (ac->params[0]) {
                 case 11:
                 case 12:
                 case 13:
@@ -256,7 +255,7 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
                     p->state = 0;
                 }
             }
-            RL_AC(ac, 0x5C, s32) = (s32)p->gauge;
+            ac->outputParams[1] = (s32)p->gauge;
             g = (s32)p->gauge;
             if (p->u26 == 0) {
                 p->u26 = 100;
@@ -275,7 +274,7 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
             if (p->state && !(ac->acFlags & 1)) {
                 p->s18++;
             }
-            RL_AC(ac, 0x60, s32) = p->s18;
+            ac->outputParams[2] = p->s18;
             if (p->maxMask != 0 && !RL_PadNow(p->maxMask)) {
                 p->s20 = 0;
             }
@@ -285,7 +284,7 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
                 break;
             }
             ac->result &= ~1;
-            if (p->gauge >= (f32)RL_AC(ac, 0x50, s32)) {
+            if (p->gauge >= (f32)ac->params[6]) {
                 ac->result |= 2;
             } else {
                 ac->result &= ~2;
@@ -321,28 +320,28 @@ static void actionCommandDisp(f32 x, f32 y);
 
 void battleAcDisp_RepeatedlyLv(CameraId cameraId, BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
     switch (ac->mAcState) {
         case 99:
         case 100:
         case 1000:
         case 1001:
-            disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[4], 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] > 0) {
-                (*(s32*)&disp->field_0x1C[4])--;
+            if (disp->unk20 > 0) {
+                disp->unk20--;
             }
             break;
         case 1002:
         case 1003:
-            if (*(s32*)&disp->field_0x1C[4] >= 40) {
-                disp->iconX = intplGetValue(4, *(s32*)&disp->field_0x1C[4] - 40, 20, 30.0f, -300.0f);
+            if (disp->unk20 >= 40) {
+                disp->iconX = intplGetValue(4, disp->unk20 - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] < 60) {
-                (*(s32*)&disp->field_0x1C[4])++;
+            if (disp->unk20 < 60) {
+                disp->unk20++;
             }
             break;
     }
@@ -357,8 +356,8 @@ void battleAcDelete_RepeatedlyLv(BattleWork* work) {
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
-    RepeatedlyLvWork* p = (RepeatedlyLvWork*)((u8*)ac + 0x2BC);
-    RepeatedlyLvDisp* disp = (RepeatedlyLvDisp*)((u8*)ac + 0x290);
+    RepeatedlyLvWork* p = (RepeatedlyLvWork*)ac->work;
+    RepeatedlyLvDisp* disp = (RepeatedlyLvDisp*)&ac->disp;
     s32 arr[4];
     s32 i, count, flags, phase;
     f32 target;
@@ -370,12 +369,12 @@ static void actionCommandDisp(f32 x, f32 y) {
     idleB = 0;
     pressedB = 0;
     numIcons = 1;
-    RL_AC(ac, 0x290, s32)++;
+    (*(s32*)&ac->disp)++;
     off1 = 0;
     off0 = 0;
     pressedA = BattleACGetButtonIcon(p->mask, 1);
     idleA = BattleACGetButtonIcon(p->mask, 0);
-    switch (RL_AC(ac, 0x38, s32)) {
+    switch (ac->params[0]) {
         case 15:
             off0 = -10;
             off1 = 10;
@@ -396,7 +395,7 @@ static void actionCommandDisp(f32 x, f32 y) {
             idleA = ICON_07A;
             break;
     }
-    phase = RL_AC(ac, 0x290, s32) / 7;
+    phase = (*(s32*)&ac->disp) / 7;
     if (numIcons == 1) {
         if ((phase & 1) == 1) {
             Vec pos = {0.0f, 0.0f, 0.0f};
@@ -489,13 +488,13 @@ static void actionCommandDisp(f32 x, f32 y) {
     BattleAcDrawGauge(disp->gaugeAnim, (s32)x, (s32)y, p->u24, count, arr[0], arr[1], arr[2], flags);
     if (ac->acFlags & 2) {
         Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -288.0f + x + (f32)(RL_AC(ac, 0x50, s32) * 0xB0) / 100.0f;
+        pos.x = -288.0f + x + (f32)(ac->params[6] * 0xB0) / 100.0f;
         pos.y = 45.0f + y;
         RL_IconDisp(&pos, 0x10, ICON_096, 1.0f);
     }
     if (ac->acFlags & 4) {
         Mtx m3, m1, m2;
-        s32 number = RL_AC(ac, 0x60, s32) + RL_AC(ac, 0x54, s32);
+        s32 number = (s32)ac->outputParams[2] + ac->params[7];
         { f32 w = 108.0f; PSMTXTrans(m1, -200.0f + x + w, 25.0f + y, 0.0f); }
         PSMTXScale(m2, 1.0f, 1.0f, 1.0f);
         PSMTXConcat(m1, m2, m3);

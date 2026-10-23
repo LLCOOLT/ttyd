@@ -115,20 +115,20 @@ static USER_FUNC(starstone_fall);
 static USER_FUNC(stone_bg);
 static USER_FUNC(npc_set_pos);
 
-__declspec(section ".data") u64 fd_pik_02_negone_one_374;
-__declspec(section ".data") s32 fd_pik_02_neg_one_382[1];
-__declspec(section ".data") s32 fd_pik_02___local_PI_383[1];
-__declspec(section ".data") s32 fd_pik_02___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_pik_02_one_negone_373;
-__declspec(section ".data") s32 fd_pik_02___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_pik_02_one_381[1];
-__declspec(section ".data") u64 fd_pik_02_negone_one_360;
-__declspec(section ".data") s32 fd_pik_02_neg_one_365[1];
-__declspec(section ".data") s32 fd_pik_02___local_PI_366[1];
-__declspec(section ".data") s32 fd_pik_02___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_pik_02_one_negone_359;
-__declspec(section ".data") s32 fd_pik_02___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_pik_02_one_364[1];
+__declspec(section ".data") f32 fd_pik_02_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_pik_02_neg_one_382;
+__declspec(section ".data") f32 fd_pik_02___local_PI_383;
+__declspec(section ".data") f32 fd_pik_02___local_3PIO2_385;
+__declspec(section ".data") f32 fd_pik_02_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_pik_02___local_PIO2_384;
+__declspec(section ".data") f32 fd_pik_02_one_381;
+__declspec(section ".data") f32 fd_pik_02_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_pik_02_neg_one_365;
+__declspec(section ".data") f32 fd_pik_02___local_PI_366;
+__declspec(section ".data") f32 fd_pik_02___local_3PIO2_368;
+__declspec(section ".data") f32 fd_pik_02_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_pik_02___local_PIO2_367;
+__declspec(section ".data") f32 fd_pik_02_one_364;
 s32 haikei_on[24];
 s32 haikei_off[28];
 s32 evt_return_sub[99];
@@ -136,9 +136,9 @@ s32 evt_return[13];
 __declspec(section ".data") s32 evt_go[7];
 static s32 s_door_open[22];
 static s32 s_door_close[22];
-static s32 bero_data[75];
+static BeroEntry bero_data[5];
 __declspec(section ".data") s32 out_room[12];
-s32 s_bero_peach[15];
+BeroEntry s_bero_peach[1];
 static s32 init_powan[30];
 static s32 talk_powan[53];
 s32 init_majo[17];
@@ -146,7 +146,7 @@ s32 init_mari[17];
 s32 init_ramp[17];
 __declspec(section ".data") s32 patakuri_init[7];
 static __declspec(section ".data") s32 baba_init[7];
-static s32 npc_data[161];
+static NpcSetupInfo npc_data[7];
 s32 evt_garnet[562];
 static s32 evt_sw[89];
 s32 evt_kaiga[14];
@@ -159,53 +159,33 @@ s32 pik_02_init_evt[172];
 s32 pik_02_init_evt[166];
 #endif
 
-__declspec(section ".data") u64 fd_pik_02_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_pik_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_pik_02_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_pik_02_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_pik_02___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_pik_02___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_pik_02___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_pik_02___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_pik_02_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_pik_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_pik_02___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_pik_02___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_pik_02_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_pik_02_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_pik_02_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_pik_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_pik_02_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_pik_02_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_pik_02___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_pik_02___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_pik_02___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_pik_02___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_pik_02_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_pik_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_pik_02___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_pik_02___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_pik_02_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_pik_02_one_364 = 1.0f;
 
 EVT_BEGIN(haikei_on)
     CALL(evt_hitobj_onoff, STRING("a_E_yuka"), 1, 1)
@@ -291,21 +271,78 @@ static EVT_BEGIN(s_door_close)
     RETURN
 EVT_END()
 
-static s32 bero_data[] = {
+static BeroEntry bero_data[] = {
+    {
+        "s_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
 #ifdef VERSION_G8ME01
-    (s32)"s_bero", 65542, 20000, 100000, 0, 0, 80, (s32)haikei_off,
+        80, // length
 #else
-    (s32)"s_bero", 65542, 20000, 100000, 0, 0, -1, (s32)haikei_off,
+        -1, // length
 #endif
-    -1, 0, (s32)"pik_01", (s32)"n_bero", 327685, (s32)s_door_close, (s32)s_door_open, (s32)"dokan",
-    131072, 9, 100000, 0, 0, -1, (s32)evt_return, 6,
-    (s32)evt_go, 0, (s32)"h_dokan", 65537, 0, 0, (s32)"h_dokan", 268566528,
-    9, 100000, 0, 0, -1, 0, 6, 0,
-    0, (s32)"dokan", 65537, 0, 0, (s32)"h_bero", 268435456, 2,
-    100000, 0, 0, -1, 0, 0, 0, (s32)"pik_03",
-    (s32)"s_bero", 65537, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+        haikei_off, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"pik_01", // nextMapName
+        "n_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s_door_close, // enterAnimeArg
+        (s32)s_door_open, // exitAnimeArg
+    },
+    {
+        "dokan", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        evt_return, // enterEvent
+        6, // caseType
+        evt_go, // exitEvent
+        0, // nextMapName
+        "h_dokan", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "h_dokan", // hitName
+        4098, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "h_bero", // hitName
+        4096, // type
+        0, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, 0, NULL, // enterEvent..exitEvent
+        (s32)"pik_03", // nextMapName
+        "s_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 __declspec(section ".data") EVT_BEGIN(out_room)
@@ -315,9 +352,25 @@ __declspec(section ".data") EVT_BEGIN(out_room)
     RETURN
 EVT_END()
 
-s32 s_bero_peach[] = {
-    (s32)"s_bero", 65542, 20000, 100000, 0, 0, 80, (s32)haikei_off,
-    -1, (s32)out_room, (s32)"aji_10", 0, 327685, (s32)s_door_close, (s32)s_door_open,
+BeroEntry s_bero_peach[] = {
+    {
+        "s_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        80, // length
+        (s32*)haikei_off, // enterEvent
+        -1, // caseType
+        (s32*)out_room, // exitEvent
+        (s32)"aji_10", // nextMapName
+        NULL, // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s_door_close, // enterAnimeArg
+        (s32)s_door_open, // exitAnimeArg
+    },
 };
 
 static EVT_BEGIN(init_powan)
@@ -389,28 +442,70 @@ static __declspec(section ".data") EVT_BEGIN(baba_init)
     RETURN
 EVT_END()
 
-static s32 npc_data[] = {
-    (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 1073743360, 0, (s32)init_powan, 0, (s32)talk_powan, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93",
-    1073743360, 0, (s32)init_majo, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", 1073743360,
-    0, (s32)init_mari, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", 1073743360, 0,
-    (s32)init_ramp, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"パタクリ"*/"\x83\x70\x83\x5E\x83\x4E\x83\x8A", 1073743360, 0, (s32)patakuri_init,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 1073743360, 0, (s32)baba_init, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0,
+static NpcSetupInfo npc_data[] = {
+    {
+        /*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_powan, // initEvent
+        NULL, // regularEvent
+        talk_powan, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_majo, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_mari, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_ramp, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"パタクリ"*/"\x83\x70\x83\x5E\x83\x4E\x83\x8A", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        patakuri_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ババ"*/"\x83\x6F\x83\x6F", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        baba_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static USER_FUNC(npc_set_pos) {

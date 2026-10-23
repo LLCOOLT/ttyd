@@ -19,6 +19,8 @@
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
+#include "battle/battle_database_common.h"
+#include "data_tables.h"
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct MoamoaGroup { char anim[16]; char pose[8]; f32 speed; s32 start; s32 num; } MoamoaGroup;
@@ -84,53 +86,53 @@ void moamoa_mainUnitIdClear(void);
 static f32 randf(f32 min, f32 max);
 USER_FUNC(evt_moamoa_mainUnitIdClear);
 USER_FUNC(boss_moamoa_check_zenei_kouei);
-extern s32 unit_boss_moamoa_mouth[];
-extern s32 unit_boss_moamoa_tentacle_a[];
-extern s32 unit_boss_moamoa_tentacle_b[];
-extern s32 unit_boss_moamoa_tentacle_c[];
+extern BattleUnitKind unit_boss_moamoa_mouth;
+extern BattleUnitKind unit_boss_moamoa_tentacle_a;
+extern BattleUnitKind unit_boss_moamoa_tentacle_b;
+extern BattleUnitKind unit_boss_moamoa_tentacle_c;
 
-__declspec(section ".data") u64 fd_boss_moamoa_negone_one_374;
-__declspec(section ".data") s32 fd_boss_moamoa_neg_one_382[1];
-__declspec(section ".data") s32 fd_boss_moamoa___local_PI_383[1];
-__declspec(section ".data") s32 fd_boss_moamoa___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_boss_moamoa_one_negone_373;
-__declspec(section ".data") s32 fd_boss_moamoa___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_boss_moamoa_one_381[1];
-__declspec(section ".data") u64 fd_boss_moamoa_negone_one_360;
-__declspec(section ".data") s32 fd_boss_moamoa_neg_one_365[1];
-__declspec(section ".data") s32 fd_boss_moamoa___local_PI_366[1];
-__declspec(section ".data") s32 fd_boss_moamoa___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_boss_moamoa_one_negone_359;
-__declspec(section ".data") s32 fd_boss_moamoa___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_boss_moamoa_one_364[1];
+__declspec(section ".data") f32 fd_boss_moamoa_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_moamoa_neg_one_382;
+__declspec(section ".data") f32 fd_boss_moamoa___local_PI_383;
+__declspec(section ".data") f32 fd_boss_moamoa___local_3PIO2_385;
+__declspec(section ".data") f32 fd_boss_moamoa_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_moamoa___local_PIO2_384;
+__declspec(section ".data") f32 fd_boss_moamoa_one_381;
+__declspec(section ".data") f32 fd_boss_moamoa_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_moamoa_neg_one_365;
+__declspec(section ".data") f32 fd_boss_moamoa___local_PI_366;
+__declspec(section ".data") f32 fd_boss_moamoa___local_3PIO2_368;
+__declspec(section ".data") f32 fd_boss_moamoa_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_moamoa___local_PIO2_367;
+__declspec(section ".data") f32 fd_boss_moamoa_one_364;
 BattleUnitKind unit_boss_moamoa;
 __declspec(section ".data") BattleUnitDefense moamoa_defence;
 __declspec(section ".data") s32 moamoa_defence_no_parts[2];
-__declspec(section ".data") s32 moamoa2_defence[2];
+__declspec(section ".data") BattleUnitDefense moamoa2_defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
 __declspec(section ".data") PoseTableEntry moamoa1_pose_table[4];
-__declspec(section ".data") s32 moamoa1_weakness_pose_table[8];
+__declspec(section ".data") PoseTableEntry moamoa1_weakness_pose_table[4];
 static __declspec(section ".data") BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
-__declspec(section ".data") s32 entry_boss_moamoa_tentacle_a[12];
-__declspec(section ".data") s32 entry_boss_moamoa_tentacle_b[12];
-__declspec(section ".data") s32 entry_boss_moamoa_tentacle_c[12];
-__declspec(section ".data") s32 entry_boss_moamoa_mouth[12];
-s32 weapon_moamoa_tsunami_attack[48];
+__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_a;
+__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_b;
+__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_c;
+__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_mouth;
+BattleWeapon weapon_moamoa_tsunami_attack;
 s32 moamoa_zoom[34];
 static s32 mario_party_zoom[34];
 static s32 init_event[159];
 static __declspec(section ".data") s32 damage_event[10];
-__declspec(section ".data") s32 MOAMOA_TAIJOU[4];
+__declspec(section ".data") const char* MOAMOA_TAIJOU[4];
 static s32 dead_event[349];
-__declspec(section ".data") s32 moamoa2_change_tbl[7];
+__declspec(section ".data") const char* moamoa2_change_tbl[7];
 s32 moamoa_tentacl_on[208];
 s32 moamoa_mouth_on[132];
 static s32 phase_event[159];
 static s32 attack_event[19];
 static __declspec(section ".data") s32 wait_event[6];
-static s32 ext_moamoa_data[267];
+static ExtTexInfo ext_moamoa_data[89];
 static s32 evt_moamoa[151];
 __declspec(section ".data") s32 MOAMOA_SET_BODYSCALE[4];
 
@@ -166,53 +168,33 @@ void moamoa_mainUnitIdClear(void) {
     wp->unitId = -1;
 }
 
-__declspec(section ".data") u64 fd_boss_moamoa_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_moamoa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_moamoa_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_moamoa_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_moamoa___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_moamoa___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_moamoa___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_moamoa___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_moamoa_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_moamoa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_moamoa___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_moamoa___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_moamoa_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_moamoa_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_boss_moamoa_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_moamoa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_moamoa_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_moamoa_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_moamoa___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_moamoa___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_moamoa___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_moamoa___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_moamoa_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_moamoa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_moamoa___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_moamoa___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_moamoa_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_moamoa_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_moamoa = {
     107,
@@ -286,9 +268,7 @@ __declspec(section ".data") s32 moamoa_defence_no_parts[] = {
     0, 0,
 };
 
-__declspec(section ".data") s32 moamoa2_defence[] = {
-    16843009, 16777216,
-};
+__declspec(section ".data") BattleUnitDefense moamoa2_defence = {{1, 1, 1, 1, 1}};
 
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
@@ -301,8 +281,11 @@ __declspec(section ".data") PoseTableEntry moamoa1_pose_table[] = {
     {69, "S_1_1"},
 };
 
-__declspec(section ".data") s32 moamoa1_weakness_pose_table[] = {
-    28, (s32)"S_1_3", 31, (s32)"D_1_3", 39, (s32)"D_1_3", 69, (s32)"S_1_3",
+__declspec(section ".data") PoseTableEntry moamoa1_weakness_pose_table[] = {
+    {28, "S_1_3"},
+    {31, "D_1_3"},
+    {39, "D_1_3"},
+    {69, "S_1_3"},
 };
 
 static __declspec(section ".data") BattleDataEntry data_table[] = {
@@ -314,33 +297,87 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_moamoa", "c_g_moamoa_b", 0.0f, 0.0f, 0.0f, -2.0f, 53.0f, 20.0f, -4.0f, 63.0f, 20.0f, 20, 30, 255, &moamoa_defence, &defence_attr, 0x20000001, 0, moamoa1_pose_table},
 };
 
-__declspec(section ".data") s32 entry_boss_moamoa_tentacle_a[] = {
-    (s32)unit_boss_moamoa_tentacle_a, 16777216, 67108868, 0, -998637568, 0, 0, 0,
-    0, 0, 0, 0,
+__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_a = {
+    &unit_boss_moamoa_tentacle_a, // mUnitKindParams
+    1, // alliance
+    {0}, // pad_05
+    0x4000004, // attackPhase
+    {0.0f, -1000.0f, 0.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
-__declspec(section ".data") s32 entry_boss_moamoa_tentacle_b[] = {
-    (s32)unit_boss_moamoa_tentacle_b, 16777216, 67108868, 0, -998637568, 0, 0, 0,
-    0, 0, 0, 0,
+__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_b = {
+    &unit_boss_moamoa_tentacle_b, // mUnitKindParams
+    1, // alliance
+    {0}, // pad_05
+    0x4000004, // attackPhase
+    {0.0f, -1000.0f, 0.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
-__declspec(section ".data") s32 entry_boss_moamoa_tentacle_c[] = {
-    (s32)unit_boss_moamoa_tentacle_c, 16777216, 67108868, 0, -998637568, 0, 0, 0,
-    0, 0, 0, 0,
+__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_c = {
+    &unit_boss_moamoa_tentacle_c, // mUnitKindParams
+    1, // alliance
+    {0}, // pad_05
+    0x4000004, // attackPhase
+    {0.0f, -1000.0f, 0.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
-__declspec(section ".data") s32 entry_boss_moamoa_mouth[] = {
-    (s32)unit_boss_moamoa_mouth, 16777216, 67108868, 0, -998637568, 0, 0, 0,
-    0, 0, 0, 0,
+__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_mouth = {
+    &unit_boss_moamoa_mouth, // mUnitKindParams
+    1, // alliance
+    {0}, // pad_05
+    0x4000004, // attackPhase
+    {0.0f, -1000.0f, 0.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
-s32 weapon_moamoa_tsunami_attack[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 135, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_moamoa_tsunami_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(moamoa_zoom)
@@ -380,21 +417,21 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetUnitWork, -2, 1, 2)
     CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
     CALL(btlevtcmd_GetUnitId, -2, LW(4))
-    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(entry_boss_moamoa_tentacle_c), 0)
+    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_tentacle_c), 0)
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     SET_VALUE(LW(5), 3)
     CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
-    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(entry_boss_moamoa_tentacle_b), 0)
+    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_tentacle_b), 0)
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     SET_VALUE(LW(5), 4)
     CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
-    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(entry_boss_moamoa_tentacle_a), 0)
+    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_tentacle_a), 0)
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
@@ -416,109 +453,213 @@ static __declspec(section ".data") EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 MOAMOA_TAIJOU[] = {
-    (s32)"S_1_2", 0, (s32)"L_1_4", 0,
+__declspec(section ".data") const char* MOAMOA_TAIJOU[] = {
+    "S_1_2",
+    NULL,
+    "L_1_4",
+    NULL,
 };
 
-static s32 dead_event[] = {
-    65627, (s32)btlevtcmd_WaitAttackEnd, 262235, (s32)btlevtcmd_GetUnitWork, -2, 2, -30000000, 131097,
-    -30000000, 1, 131122, -30000000, 5, 262235, (s32)btlevtcmd_GetUnitWork, -2,
-    -30000000, -29999999, 131097, -29999999, -1, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_BOSS_MOA_G_ARM_DOWN1", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -29999999, 1,
-    (s32)"R_1A", 65545, 1, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -29999999, 1, 196699,
-    (s32)btlevtcmd_KillUnit, -29999999, 1, 262235, (s32)btlevtcmd_SetUnitWork, -2, -30000000, -1,
-    33, 131122, -30000000, 4, 262235, (s32)btlevtcmd_GetUnitWork, -2, -30000000,
-    -29999999, 131097, -29999999, -1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MOA_G_ARM_DOWN1",
-    -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -29999999, 1, (s32)"R_1B",
-    65545, 1, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -29999999, 1, 196699, (s32)btlevtcmd_KillUnit,
-    -29999999, 1, 262235, (s32)btlevtcmd_SetUnitWork, -2, -30000000, -1, 33,
-    131122, -30000000, 3, 262235, (s32)btlevtcmd_GetUnitWork, -2, -30000000, -29999999,
-    131097, -29999999, -1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MOA_G_ARM_DOWN1", -250000000,
-    0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -29999999, 1, (s32)"R_1C", 65545,
-    1, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -29999999, 1, 196699, (s32)btlevtcmd_KillUnit, -29999999,
-    1, 262235, (s32)btlevtcmd_SetUnitWork, -2, -30000000, -1, 33, 32,
-    131122, -30000000, 6, 262235, (s32)btlevtcmd_GetUnitWork, -2, -30000000, -29999999,
-    131097, -29999999, -1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MOA_G_ARM_DOWN2", -250000000,
-    0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -29999999, 1, (s32)"L_2_6", 65545,
-    1, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -29999999, 1, 196699, (s32)btlevtcmd_KillUnit, -29999999,
-    1, 262235, (s32)btlevtcmd_SetUnitWork, -2, -30000000, -1, 33, 33,
-    65598, (s32)MOAMOA_TAIJOU, 65541, 0, 65599, -29999998, 131096, -29999998,
-    0, 7, 33, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, -29999998,
-    65545, 1, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -2, 1, 6, 65546,
-    1000, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MOA_G_LUMP1", -250000000, 0, -250000000,
-    65541, 0, 65599, -29999998, 131096, -29999998, 0, 7,
-    33, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, -29999998, 65545, 1,
-    196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -2, 1, 6, 65627, (s32)moamoa_guruguru, 65546,
-    500, 131122, -29999990, -2, 393307, (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_BTL_ENEMY_DIE1_2",
-    -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999,
-    -29999998, 131125, -29999998, 10, 983131, (s32)evt_eff, 0, (s32)"kemuri_test",
-    4, -30000000, -29999999, -29999998, -229999181, 0, 0, 0,
-    0, 0, 0, 0, 196699, (s32)btlevtcmd_GetCoin, -29999990, -30000000,
-    131163, (s32)btlevtcmd_StoreCoin, -30000000, 196699, (s32)btlevtcmd_GetExp, -29999990, -30000000, 131163,
-    (s32)btlevtcmd_StoreExp, -30000000, 327771, (s32)btlevtcmd_GetPos, -29999990, -29999997, -29999999, -29999998,
-    131125, -29999998, 10, 131125, -29999999, 30, 327771, (s32)_add_star_point_disp_offset,
-    -29999990, -29999997, -29999999, -29999998, 983131, (s32)evt_eff, (s32)"", (s32)"star_point",
-    0, -29999997, -29999999, -29999998, -30000000, 0, 0, 0,
-    0, 0, 0, 0, 131101, -30000000, 1, 65541,
-    -30000000, 6, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MOA_G_EXPLOSION1", -250000000,
-    0, -250000000, 65627, (s32)moamoa_bomb, 65627, (s32)evt_moamoa_mainUnitIdClear, 131163, (s32)btlevtcmd_GetBackItem,
-    -29999990, 262235, (s32)btlevtcmd_CheckDamageCode, -29999990, 1024, -30000000, 131097, -30000000,
-    0, 196699, (s32)btlevtcmd_KillUnit, -29999990, 0, 32, 196699, (s32)btlevtcmd_KillUnit,
-    -29999990, 2, 33, 2, 1,
+static EVT_BEGIN(dead_event)
+    CALL(btlevtcmd_WaitAttackEnd)
+    CALL(btlevtcmd_GetUnitWork, -2, 2, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 1)
+        SET_VALUE(LW(0), 5)
+        CALL(btlevtcmd_GetUnitWork, -2, LW(0), LW(1))
+        IF_INT_NOT_EQUAL(LW(1), -1)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_DOWN1"), -250000000, 0, -250000000)
+            CALL(btlevtcmd_AnimeChangePose, LW(1), 1, STRING("R_1A"))
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_AnimeWaitPlayComplete, LW(1), 1)
+            CALL(btlevtcmd_KillUnit, LW(1), 1)
+            CALL(btlevtcmd_SetUnitWork, -2, LW(0), -1)
+        END_IF
+        SET_VALUE(LW(0), 4)
+        CALL(btlevtcmd_GetUnitWork, -2, LW(0), LW(1))
+        IF_INT_NOT_EQUAL(LW(1), -1)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_DOWN1"), -250000000, 0, -250000000)
+            CALL(btlevtcmd_AnimeChangePose, LW(1), 1, STRING("R_1B"))
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_AnimeWaitPlayComplete, LW(1), 1)
+            CALL(btlevtcmd_KillUnit, LW(1), 1)
+            CALL(btlevtcmd_SetUnitWork, -2, LW(0), -1)
+        END_IF
+        SET_VALUE(LW(0), 3)
+        CALL(btlevtcmd_GetUnitWork, -2, LW(0), LW(1))
+        IF_INT_NOT_EQUAL(LW(1), -1)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_DOWN1"), -250000000, 0, -250000000)
+            CALL(btlevtcmd_AnimeChangePose, LW(1), 1, STRING("R_1C"))
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_AnimeWaitPlayComplete, LW(1), 1)
+            CALL(btlevtcmd_KillUnit, LW(1), 1)
+            CALL(btlevtcmd_SetUnitWork, -2, LW(0), -1)
+        END_IF
+    ELSE
+        SET_VALUE(LW(0), 6)
+        CALL(btlevtcmd_GetUnitWork, -2, LW(0), LW(1))
+        IF_INT_NOT_EQUAL(LW(1), -1)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_DOWN2"), -250000000, 0, -250000000)
+            CALL(btlevtcmd_AnimeChangePose, LW(1), 1, STRING("L_2_6"))
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_AnimeWaitPlayComplete, LW(1), 1)
+            CALL(btlevtcmd_KillUnit, LW(1), 1)
+            CALL(btlevtcmd_SetUnitWork, -2, LW(0), -1)
+        END_IF
+    END_IF
+    SET_INT_READ_ADDR(PTR(&MOAMOA_TAIJOU))
+    LOOP(0)
+        READ_INT(LW(2))
+        IF_INT_EQUAL(LW(2), 0)
+            BREAK_LOOP
+        END_IF
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(2))
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+    END_LOOP
+    WAIT_MS(1000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_LUMP1"), -250000000, 0, -250000000)
+    LOOP(0)
+        READ_INT(LW(2))
+        IF_INT_EQUAL(LW(2), 0)
+            BREAK_LOOP
+        END_IF
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(2))
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+    END_LOOP
+    CALL(moamoa_guruguru)
+    WAIT_MS(500)
+    SET_VALUE(LW(10), -2)
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+    ADD(LW(2), 10)
+    CALL(evt_eff, 0, STRING("kemuri_test"), 4, LW(0), LW(1), LW(2), FLOAT(0.7998047f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_GetCoin, LW(10), LW(0))
+    CALL(btlevtcmd_StoreCoin, LW(0))
+    CALL(btlevtcmd_GetExp, LW(10), LW(0))
+    CALL(btlevtcmd_StoreExp, LW(0))
+    CALL(btlevtcmd_GetPos, LW(10), LW(3), LW(1), LW(2))
+    ADD(LW(2), 10)
+    ADD(LW(1), 30)
+    CALL(_add_star_point_disp_offset, LW(10), LW(3), LW(1), LW(2))
+    CALL(evt_eff, STRING(""), STRING("star_point"), 0, LW(3), LW(1), LW(2), LW(0), 0, 0, 0, 0, 0, 0, 0)
+    IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+        LOOP(LW(0))
+        END_LOOP
+    END_IF
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_EXPLOSION1"), -250000000, 0, -250000000)
+    CALL(moamoa_bomb)
+    CALL(evt_moamoa_mainUnitIdClear)
+    CALL(btlevtcmd_GetBackItem, LW(10))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), 1024, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_KillUnit, LW(10), 0)
+    ELSE
+        CALL(btlevtcmd_KillUnit, LW(10), 2)
+    END_IF
+    RETURN
+EVT_END()
+
+__declspec(section ".data") const char* moamoa2_change_tbl[] = {
+    "L_2_1",
+    "L_2_3",
+    NULL,
+    "L_2_4",
+    "L_2_5",
+    "S_2",
+    NULL,
 };
 
-__declspec(section ".data") s32 moamoa2_change_tbl[] = {
-    (s32)"L_2_1", (s32)"L_2_3", 0, (s32)"L_2_4", (s32)"L_2_5", (s32)"S_2", 0,
-};
+EVT_BEGIN(moamoa_tentacl_on)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_RESTORE1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("V_2"))
+    WAIT_FRAMES(1)
+    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+    CALL(btlevtcmd_GetUnitId, -2, LW(4))
+    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_tentacle_c), 0)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
+    SET_VALUE(LW(5), 3)
+    CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
+    CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
+    SET_VALUE(LW(6), LW(3))
+    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_tentacle_b), 0)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
+    SET_VALUE(LW(5), 4)
+    CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
+    CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
+    SET_VALUE(LW(7), LW(3))
+    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_tentacle_a), 0)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
+    SET_VALUE(LW(5), 5)
+    CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
+    CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
+    CALL(moamoa1_on)
+    CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&moamoa_defence))
+    CALL(btlevtcmd_OnPartsAttribute, -2, 1, 536870912)
+    CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(moamoa1_pose_table))
+    CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, LW(7), 1, 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, LW(6), 1, 16777216)
+    WAIT_FRAMES(3)
+    CALL(btlevtcmd_OffPartsAttribute, LW(3), 1, 16777216)
+    CALL(btlevtcmd_OffPartsAttribute, LW(7), 1, 16777216)
+    CALL(btlevtcmd_OffPartsAttribute, LW(6), 1, 16777216)
+    CALL(btlevtcmd_AnimeChangePose, LW(3), 1, STRING("B_1A"))
+    CALL(btlevtcmd_AnimeChangePose, LW(7), 1, STRING("B_1B"))
+    CALL(btlevtcmd_AnimeChangePose, LW(6), 1, STRING("B_1C"))
+    WAIT_FRAMES(1)
+    CALL(btlevtcmd_AnimeWaitPlayComplete, LW(6), 1)
+    RETURN
+EVT_END()
 
-s32 moamoa_tentacl_on[] = {
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MOA_G_ARM_RESTORE1", -250000000, 0, -250000000, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"V_2", 65545, 1, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete,
-    -2, 1, 196699, (s32)btlevtcmd_GetUnitId, -2, -29999996, 262235, (s32)btlevtcmd_SpawnUnit,
-    -29999997, (s32)entry_boss_moamoa_tentacle_c, 0, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999,
-    -29999998, 327771, (s32)btlevtcmd_SetPos, -29999997, -30000000, -29999999, -29999998, 327771,
-    (s32)btlevtcmd_SetHomePos, -29999997, -30000000, -29999999, -29999998, 131122, -29999995, 3,
-    262235, (s32)btlevtcmd_SetUnitWork, -2, -29999995, -29999997, 262235, (s32)btlevtcmd_SetUnitWork, -29999997,
-    0, -29999996, 131122, -29999994, -29999997, 262235, (s32)btlevtcmd_SpawnUnit, -29999997,
-    (s32)entry_boss_moamoa_tentacle_b, 0, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    327771, (s32)btlevtcmd_SetPos, -29999997, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_SetHomePos,
-    -29999997, -30000000, -29999999, -29999998, 131122, -29999995, 4, 262235,
-    (s32)btlevtcmd_SetUnitWork, -2, -29999995, -29999997, 262235, (s32)btlevtcmd_SetUnitWork, -29999997, 0,
-    -29999996, 131122, -29999993, -29999997, 262235, (s32)btlevtcmd_SpawnUnit, -29999997, (s32)entry_boss_moamoa_tentacle_a,
-    0, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 327771,
-    (s32)btlevtcmd_SetPos, -29999997, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_SetHomePos, -29999997,
-    -30000000, -29999999, -29999998, 131122, -29999995, 5, 262235, (s32)btlevtcmd_SetUnitWork,
-    -2, -29999995, -29999997, 262235, (s32)btlevtcmd_SetUnitWork, -29999997, 0, -29999996,
-    65627, (s32)moamoa1_on, 262235, (s32)btlevtcmd_SetPartsDefenceTable, -2, 1, (s32)&moamoa_defence, 262235,
-    (s32)btlevtcmd_OnPartsAttribute, -2, 1, 536870912, 262235, (s32)btlevtcmd_AnimeSetPoseTable, -2, 1,
-    (s32)moamoa1_pose_table, 262235, (s32)btlevtcmd_OnPartsAttribute, -29999997, 1, 16777216, 262235, (s32)btlevtcmd_OnPartsAttribute,
-    -29999993, 1, 16777216, 262235, (s32)btlevtcmd_OnPartsAttribute, -29999994, 1, 16777216,
-    65545, 3, 262235, (s32)btlevtcmd_OffPartsAttribute, -29999997, 1, 16777216, 262235,
-    (s32)btlevtcmd_OffPartsAttribute, -29999993, 1, 16777216, 262235, (s32)btlevtcmd_OffPartsAttribute, -29999994, 1,
-    16777216, 262235, (s32)btlevtcmd_AnimeChangePose, -29999997, 1, (s32)"B_1A", 262235, (s32)btlevtcmd_AnimeChangePose,
-    -29999993, 1, (s32)"B_1B", 262235, (s32)btlevtcmd_AnimeChangePose, -29999994, 1, (s32)"B_1C",
-    65545, 1, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -29999994, 1, 2, 1,
-};
-
-s32 moamoa_mouth_on[] = {
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MOA_G_ARM_RESTORE2", -250000000, 0, -250000000, 65545,
-    40, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"V_2", 65545, 1,
-    196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -2, 1, 196699, (s32)btlevtcmd_GetUnitId, -2, -29999996,
-    262235, (s32)btlevtcmd_SpawnUnit, -29999997, (s32)entry_boss_moamoa_mouth, 0, 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_SetPos, -29999997, -30000000, -29999999,
-    -29999998, 327771, (s32)btlevtcmd_SetHomePos, -29999997, -30000000, -29999999, -29999998, 131122,
-    -29999995, 6, 262235, (s32)btlevtcmd_SetUnitWork, -2, -29999995, -29999997, 262235,
-    (s32)btlevtcmd_SetUnitWork, -29999997, 0, -29999996, 65627, (s32)moamoa2_on, 262235, (s32)btlevtcmd_SetPartsDefenceTable,
-    -2, 1, (s32)moamoa2_defence, 262235, (s32)btlevtcmd_AnimeSetPoseTable, -2, 1, (s32)moamoa1_pose_table,
-    65598, (s32)moamoa2_change_tbl, 262235, (s32)btlevtcmd_OnPartsAttribute, -29999997, 1, 16777216, 65545,
-    3, 262235, (s32)btlevtcmd_OffPartsAttribute, -29999997, 1, 16777216, 65541, 0,
-    65599, -29999998, 131096, -29999998, 0, 7, 33, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -29999997, 1, -29999998, 65545, 1, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete,
-    -29999997, 1, 6, 65546, 1000, 65541, 0, 65599,
-    -29999998, 131096, -29999998, 0, 7, 33, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -29999997, 1, -29999998, 65545, 1, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -29999997,
-    1, 6, 2, 1,
-};
+EVT_BEGIN(moamoa_mouth_on)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_RESTORE2"), -250000000, 0, -250000000)
+    WAIT_FRAMES(40)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("V_2"))
+    WAIT_FRAMES(1)
+    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+    CALL(btlevtcmd_GetUnitId, -2, LW(4))
+    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_mouth), 0)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
+    SET_VALUE(LW(5), 6)
+    CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
+    CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
+    CALL(moamoa2_on)
+    CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&moamoa2_defence))
+    CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(moamoa1_pose_table))
+    SET_INT_READ_ADDR(PTR(&moamoa2_change_tbl))
+    CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, 16777216)
+    WAIT_FRAMES(3)
+    CALL(btlevtcmd_OffPartsAttribute, LW(3), 1, 16777216)
+    LOOP(0)
+        READ_INT(LW(2))
+        IF_INT_EQUAL(LW(2), 0)
+            BREAK_LOOP
+        END_IF
+        CALL(btlevtcmd_AnimeChangePose, LW(3), 1, LW(2))
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_AnimeWaitPlayComplete, LW(3), 1)
+    END_LOOP
+    WAIT_MS(1000)
+    LOOP(0)
+        READ_INT(LW(2))
+        IF_INT_EQUAL(LW(2), 0)
+            BREAK_LOOP
+        END_IF
+        CALL(btlevtcmd_AnimeChangePose, LW(3), 1, LW(2))
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_AnimeWaitPlayComplete, LW(3), 1)
+    END_LOOP
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
@@ -591,41 +732,96 @@ static __declspec(section ".data") EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
-static s32 ext_moamoa_data[] = {
-    (s32)"c_n_moa_a", (s32)"S_1", 0, (s32)"c_n_moa_a", (s32)"S_1", 1073741824, (s32)"c_n_moa_a", (s32)"S_1",
-    1082130432, (s32)"c_n_moa_a", (s32)"S_1", 1086324736, (s32)"c_n_moa_a", (s32)"S_1", 1090519040, (s32)"c_n_moa_a",
-    (s32)"S_1", 1092616192, (s32)"c_n_moa_a", (s32)"S_1", 1094713344, (s32)"c_n_moa_a", (s32)"S_1", 1096810496,
-    (s32)"c_n_moa_a", (s32)"S_1", 1098907648, (s32)"c_n_moa_a", (s32)"S_1", 1099956224, (s32)"c_n_moa_a", (s32)"S_1",
-    1101004800, (s32)"c_n_moa_a", (s32)"S_1", 1102053376, (s32)"c_n_moa_a", (s32)"S_1", 1103101952, (s32)"c_n_moa_a",
-    (s32)"S_1", 1104150528, (s32)"c_n_moa_a", (s32)"S_1", 1105199104, (s32)"c_n_moa_a", (s32)"S_1", 1106247680,
-    (s32)"c_n_moa_a", (s32)"S_1", 1107296256, (s32)"c_n_moa_a", (s32)"S_1", 1107820544, (s32)"c_n_moa_a", (s32)"S_1",
-    1108344832, (s32)"c_n_moa_a", (s32)"S_1", 1108869120, (s32)"c_n_moa_a", (s32)"D_1", 0, (s32)"c_n_moa_a",
-    (s32)"D_1", 1073741824, (s32)"c_n_moa_a", (s32)"D_1", 1082130432, (s32)"c_n_moa_a", (s32)"D_1", 1086324736,
-    (s32)"c_n_moa_a", (s32)"D_1", 1090519040, (s32)"c_n_moa_a", (s32)"D_1", 1092616192, (s32)"c_n_moa_a", (s32)"S_2",
-    0, (s32)"c_n_moa_a", (s32)"S_2", 1073741824, (s32)"c_n_moa_a", (s32)"S_2", 1082130432, (s32)"c_n_moa_a",
-    (s32)"S_2", 1086324736, (s32)"c_n_moa_a", (s32)"S_2", 1090519040, (s32)"c_n_moa_a", (s32)"S_2", 1092616192,
-    (s32)"c_n_moa_a", (s32)"S_2", 1094713344, (s32)"c_n_moa_a", (s32)"S_2", 1096810496, (s32)"c_n_moa_a", (s32)"S_2",
-    1098907648, (s32)"c_n_moa_a", (s32)"S_2", 1099956224, (s32)"c_n_moa_a", (s32)"S_2", 1101004800, (s32)"c_n_moa_a",
-    (s32)"S_2", 1102053376, (s32)"c_n_moa_a", (s32)"S_2", 1103101952, (s32)"c_n_moa_a", (s32)"S_2", 1104150528,
-    (s32)"c_n_moa_a", (s32)"S_2", 1105199104, (s32)"c_n_moa_a", (s32)"S_2", 1106247680, (s32)"c_n_moa_a", (s32)"S_2",
-    1107296256, (s32)"c_n_moa_a", (s32)"S_2", 1107820544, (s32)"c_n_moa_a", (s32)"S_2", 1108344832, (s32)"c_n_moa_a",
-    (s32)"S_2", 1108869120, (s32)"c_n_moa_b", (s32)"S_1", 0, (s32)"c_n_moa_b", (s32)"S_1", 1073741824,
-    (s32)"c_n_moa_b", (s32)"S_1", 1082130432, (s32)"c_n_moa_b", (s32)"S_1", 1086324736, (s32)"c_n_moa_b", (s32)"S_1",
-    1090519040, (s32)"c_n_moa_b", (s32)"S_1", 1092616192, (s32)"c_n_moa_b", (s32)"S_1", 1094713344, (s32)"c_n_moa_b",
-    (s32)"S_1", 1096810496, (s32)"c_n_moa_b", (s32)"S_1", 1098907648, (s32)"c_n_moa_b", (s32)"S_1", 1099956224,
-    (s32)"c_n_moa_b", (s32)"S_1", 1101004800, (s32)"c_n_moa_b", (s32)"S_1", 1102053376, (s32)"c_n_moa_b", (s32)"S_1",
-    1103101952, (s32)"c_n_moa_b", (s32)"S_1", 1104150528, (s32)"c_n_moa_b", (s32)"S_1", 1105199104, (s32)"c_n_moa_b",
-    (s32)"S_1", 1106247680, (s32)"c_n_moa_b", (s32)"S_1", 1107296256, (s32)"c_n_moa_b", (s32)"S_1", 1107820544,
-    (s32)"c_n_moa_b", (s32)"S_1", 1108344832, (s32)"c_n_moa_b", (s32)"S_1", 1108869120, (s32)"c_n_moa_b", (s32)"D_1",
-    0, (s32)"c_n_moa_b", (s32)"D_1", 1073741824, (s32)"c_n_moa_b", (s32)"D_1", 1082130432, (s32)"c_n_moa_b",
-    (s32)"D_1", 1086324736, (s32)"c_n_moa_b", (s32)"D_1", 1090519040, (s32)"c_n_moa_b", (s32)"D_1", 1092616192,
-    (s32)"c_kinodebu", (s32)"G_1", 1077936128, (s32)"c_kinodebu", (s32)"G_1", 1093664768, (s32)"c_puku_c", (s32)"U_1",
-    1065353216, (s32)"c_puku_c", (s32)"U_1", 1086324736, (s32)"c_powan", (s32)"R_2", 1077936128, (s32)"c_powan",
-    (s32)"R_2", 1086324736, (s32)"c_smoko", (s32)"G_1", 1073741824, (s32)"c_smoko", (s32)"G_1", 1086324736,
-    (s32)"c_rose", (s32)"G_1", 1082130432, (s32)"c_rose", (s32)"G_1", 1090519040, (s32)"c_papab", (s32)"G_1",
-    1065353216, (s32)"c_papab", (s32)"G_1", 1084227584, (s32)"c_mamab", (s32)"G_1", 1065353216, (s32)"c_mamab",
-    (s32)"G_1", 1084227584, (s32)"c_konari", (s32)"G_1", 1065353216, (s32)"c_konari", (s32)"G_1", 1084227584,
-    0, 0, 0,
+static ExtTexInfo ext_moamoa_data[] = {
+    {"c_n_moa_a", "S_1", 0.0f},
+    {"c_n_moa_a", "S_1", 2.0f},
+    {"c_n_moa_a", "S_1", 4.0f},
+    {"c_n_moa_a", "S_1", 6.0f},
+    {"c_n_moa_a", "S_1", 8.0f},
+    {"c_n_moa_a", "S_1", 10.0f},
+    {"c_n_moa_a", "S_1", 12.0f},
+    {"c_n_moa_a", "S_1", 14.0f},
+    {"c_n_moa_a", "S_1", 16.0f},
+    {"c_n_moa_a", "S_1", 18.0f},
+    {"c_n_moa_a", "S_1", 20.0f},
+    {"c_n_moa_a", "S_1", 22.0f},
+    {"c_n_moa_a", "S_1", 24.0f},
+    {"c_n_moa_a", "S_1", 26.0f},
+    {"c_n_moa_a", "S_1", 28.0f},
+    {"c_n_moa_a", "S_1", 30.0f},
+    {"c_n_moa_a", "S_1", 32.0f},
+    {"c_n_moa_a", "S_1", 34.0f},
+    {"c_n_moa_a", "S_1", 36.0f},
+    {"c_n_moa_a", "S_1", 38.0f},
+    {"c_n_moa_a", "D_1", 0.0f},
+    {"c_n_moa_a", "D_1", 2.0f},
+    {"c_n_moa_a", "D_1", 4.0f},
+    {"c_n_moa_a", "D_1", 6.0f},
+    {"c_n_moa_a", "D_1", 8.0f},
+    {"c_n_moa_a", "D_1", 10.0f},
+    {"c_n_moa_a", "S_2", 0.0f},
+    {"c_n_moa_a", "S_2", 2.0f},
+    {"c_n_moa_a", "S_2", 4.0f},
+    {"c_n_moa_a", "S_2", 6.0f},
+    {"c_n_moa_a", "S_2", 8.0f},
+    {"c_n_moa_a", "S_2", 10.0f},
+    {"c_n_moa_a", "S_2", 12.0f},
+    {"c_n_moa_a", "S_2", 14.0f},
+    {"c_n_moa_a", "S_2", 16.0f},
+    {"c_n_moa_a", "S_2", 18.0f},
+    {"c_n_moa_a", "S_2", 20.0f},
+    {"c_n_moa_a", "S_2", 22.0f},
+    {"c_n_moa_a", "S_2", 24.0f},
+    {"c_n_moa_a", "S_2", 26.0f},
+    {"c_n_moa_a", "S_2", 28.0f},
+    {"c_n_moa_a", "S_2", 30.0f},
+    {"c_n_moa_a", "S_2", 32.0f},
+    {"c_n_moa_a", "S_2", 34.0f},
+    {"c_n_moa_a", "S_2", 36.0f},
+    {"c_n_moa_a", "S_2", 38.0f},
+    {"c_n_moa_b", "S_1", 0.0f},
+    {"c_n_moa_b", "S_1", 2.0f},
+    {"c_n_moa_b", "S_1", 4.0f},
+    {"c_n_moa_b", "S_1", 6.0f},
+    {"c_n_moa_b", "S_1", 8.0f},
+    {"c_n_moa_b", "S_1", 10.0f},
+    {"c_n_moa_b", "S_1", 12.0f},
+    {"c_n_moa_b", "S_1", 14.0f},
+    {"c_n_moa_b", "S_1", 16.0f},
+    {"c_n_moa_b", "S_1", 18.0f},
+    {"c_n_moa_b", "S_1", 20.0f},
+    {"c_n_moa_b", "S_1", 22.0f},
+    {"c_n_moa_b", "S_1", 24.0f},
+    {"c_n_moa_b", "S_1", 26.0f},
+    {"c_n_moa_b", "S_1", 28.0f},
+    {"c_n_moa_b", "S_1", 30.0f},
+    {"c_n_moa_b", "S_1", 32.0f},
+    {"c_n_moa_b", "S_1", 34.0f},
+    {"c_n_moa_b", "S_1", 36.0f},
+    {"c_n_moa_b", "S_1", 38.0f},
+    {"c_n_moa_b", "D_1", 0.0f},
+    {"c_n_moa_b", "D_1", 2.0f},
+    {"c_n_moa_b", "D_1", 4.0f},
+    {"c_n_moa_b", "D_1", 6.0f},
+    {"c_n_moa_b", "D_1", 8.0f},
+    {"c_n_moa_b", "D_1", 10.0f},
+    {"c_kinodebu", "G_1", 3.0f},
+    {"c_kinodebu", "G_1", 11.0f},
+    {"c_puku_c", "U_1", 1.0f},
+    {"c_puku_c", "U_1", 6.0f},
+    {"c_powan", "R_2", 3.0f},
+    {"c_powan", "R_2", 6.0f},
+    {"c_smoko", "G_1", 2.0f},
+    {"c_smoko", "G_1", 6.0f},
+    {"c_rose", "G_1", 4.0f},
+    {"c_rose", "G_1", 8.0f},
+    {"c_papab", "G_1", 1.0f},
+    {"c_papab", "G_1", 5.0f},
+    {"c_mamab", "G_1", 1.0f},
+    {"c_mamab", "G_1", 5.0f},
+    {"c_konari", "G_1", 1.0f},
+    {"c_konari", "G_1", 5.0f},
+    {0},
 };
 
 USER_FUNC(moamoa_guruguru) {

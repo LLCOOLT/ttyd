@@ -1,5 +1,6 @@
 #pragma once
 
+#include "manager/winmgr.h"
 #include "evt/evt_cmd.h"
 #include "dolphin/types.h"
 
@@ -29,7 +30,7 @@ extern s32 evt_sub_starstone[];
 extern s32 evt_sub_stopwatch[];
 extern s32 evt_sub_tree_access_entry[];
 
-extern s32 coinget_window_desc[10];
+extern WinMgrDesc coinget_window_desc[1];
 extern s32 kusa_evt[43];
 extern s32 mail_evt[80];
 extern s32 mail_evt_bom_01[65];

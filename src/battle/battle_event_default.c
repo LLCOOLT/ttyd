@@ -15,7 +15,6 @@
 #include "evt/evt_sub.h"
 
 #define BTL_UNIT_280(unit) (*(s32*)((u8*)(unit) + 0x280))
-#define BTL_WORK_1C68(wp) (*(s32*)((u8*)(wp) + 0x1C68))
 
 f32 sinfd(f32 degrees);
 EffectEntry* effFireEntry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
@@ -660,41 +659,74 @@ EVT_BEGIN(btldefaultevt_guard_return)
     RETURN
 EVT_END()
 
-s32 btldefaultevt_Appeal[] = {
-    196699, (s32)btlevtcmd_GetBodyId, -2, -30000000, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -30000000,
-    43, 262235, (s32)btlevtcmd_CheckStatus, -2, 10, -30000000, 131096, -30000000,
-    0, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 131122,
-    -29999997, -29999999, 131125, -29999999, 53, 131125, -29999997, 35,
-    131122, -29999996, -29999998, 131125, -29999998, 250, 32, 327771,
-    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 131122, -29999997, -29999999,
-    131125, -29999999, 150, 131125, -29999997, 80, 131122, -29999996,
-    -29999998, 131125, -29999998, 400, 33, 196699, (s32)evt_btl_camera_set_mode, 0,
-    3, 655451, (s32)evt_btl_camera_set_moveto, 0, -30000000, -29999999, -29999998, -30000000,
-    -29999997, -29999996, 30, 11, 131163, (s32)evt_batstage_light_set_player_on, 0, 65545,
-    30, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -2, -30000000, 5, 131097, -30000000,
-    0, 196699, (s32)btlevtcmd_RunDataEventChild, -2, 5, 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 65627, (s32)evt_batstage_light_set_player_off, 65545,
-    60, 2, 33, 196699, (s32)btlevtcmd_GetBodyId, -2, -30000000, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -2, -30000000, 66, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_MARIO_APPEAL1",
-    -250000000, 0, -250000000, 65545, 60, 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 131163, (s32)btlevtcmd_AudienceAppeal, -2,
-    65627, (s32)evt_batstage_light_set_player_off, 65545, 60, 131163, (s32)btlevtcmd_StartWaitEvent, -29999990, 2,
-    1,
-};
+EVT_BEGIN(btldefaultevt_Appeal)
+    CALL(btlevtcmd_GetBodyId, -2, LW(0))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(0), 43)
+    CALL(btlevtcmd_CheckStatus, -2, 10, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        SET_VALUE(LW(3), LW(1))
+        ADD(LW(1), 53)
+        ADD(LW(3), 35)
+        SET_VALUE(LW(4), LW(2))
+        ADD(LW(2), 250)
+    ELSE
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        SET_VALUE(LW(3), LW(1))
+        ADD(LW(1), 150)
+        ADD(LW(3), 80)
+        SET_VALUE(LW(4), LW(2))
+        ADD(LW(2), 400)
+    END_IF
+    CALL(evt_btl_camera_set_mode, 0, 3)
+    CALL(evt_btl_camera_set_moveto, 0, LW(0), LW(1), LW(2), LW(0), LW(3), LW(4), 30, 11)
+    CALL(evt_batstage_light_set_player_on, 0)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_CheckDataOfDataTable, -2, LW(0), 5)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_RunDataEventChild, -2, 5)
+        CALL(evt_btl_camera_set_mode, 0, 0)
+        CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+        CALL(evt_batstage_light_set_player_off)
+        WAIT_FRAMES(60)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_GetBodyId, -2, LW(0))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(0), 66)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_MARIO_APPEAL1"), -250000000, 0, -250000000)
+    WAIT_FRAMES(60)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(btlevtcmd_AudienceAppeal, -2)
+    CALL(evt_batstage_light_set_player_off)
+    WAIT_FRAMES(60)
+    CALL(btlevtcmd_StartWaitEvent, LW(10))
+    RETURN
+EVT_END()
 
-s32 _Defence_core[] = {
-    196699, (s32)btlevtcmd_GetUnitId, -2, -29999997, 196699, (s32)btlevtcmd_GetBodyId, -2, -29999996,
-    131096, -29999997, -1, 65540, 99, 33, 196699, (s32)btlevtcmd_PayWeaponCost,
-    -2, -29999988, 196699, (s32)btlevtcmd_RunDataEventChild, -2, 7, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_BTL_MARIO_DEFENCE1", -250000000, 0, -250000000, 65541, 20, 327771,
-    (s32)btlevtcmd_AddRotate, -2, 0, 36, 0, 65545, 1, 6,
-    327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0, 131163, (s32)btlevtcmd_WeaponAftereffect,
-    -29999988, 196699, (s32)btlevtcmd_OnStatusFlag, -2, 16777216, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2,
-    -29999996, 45, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_MARIO_DEFENCE2", -250000000, 0,
-    -250000000, 196699, (s32)btlevtcmd_ftof, 60, -30000000, 393307, (s32)btlevtcmd_AnnounceMessage, 0,
-    0, 0, (s32)"btl_msg_defend_command_exec", -30000000, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2,
-    1,
-};
+EVT_BEGIN(_Defence_core)
+    CALL(btlevtcmd_GetUnitId, -2, LW(3))
+    CALL(btlevtcmd_GetBodyId, -2, LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(12))
+    CALL(btlevtcmd_RunDataEventChild, -2, 7)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_MARIO_DEFENCE1"), -250000000, 0, -250000000)
+    LOOP(20)
+        CALL(btlevtcmd_AddRotate, -2, 0, 36, 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+    CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    CALL(btlevtcmd_OnStatusFlag, -2, 16777216)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(4), 45)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_MARIO_DEFENCE2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_ftof, 60, LW(0))
+    CALL(btlevtcmd_AnnounceMessage, 0, 0, 0, STRING("btl_msg_defend_command_exec"), LW(0))
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(btldefaultevt_Escape)
     CALL(evt_btl_camera_set_mode, 0, 20)
@@ -916,13 +948,19 @@ EVT_BEGIN(btldefaultevt_SuitoruBadgeEffect)
     RETURN
 EVT_END()
 
-s32 btldefaultevt_avoid_counter_event[] = {
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, 49, 65647, -30000000, 327771,
-    (s32)evt_sub_intpl_init, 5, 0, 1800, 40, 65541, 40, 196699,
-    (s32)evt_sub_intpl_get_value_para, -29999999, -29999998, 327771, (s32)btlevtcmd_SetRotate, -29999990, -250000000, -29999999,
-    -250000000, 65545, 1, 6, 112, 131163, (s32)btlevtcmd_WaitEventEnd, -30000000,
-    2, 1,
-};
+EVT_BEGIN(btldefaultevt_avoid_counter_event)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 49)
+    BEGIN_SIBLING_EVENT_GET_ID(LW(0))
+        CALL(evt_sub_intpl_init, 5, 0, 1800, 40)
+        LOOP(40)
+            CALL(evt_sub_intpl_get_value_para, LW(1), LW(2))
+            CALL(btlevtcmd_SetRotate, LW(10), -250000000, LW(1), -250000000)
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_WaitEventEnd, LW(0))
+    RETURN
+EVT_END()
 
 EVT_BEGIN(btldefaultevt_ProtectPartner)
     CALL(btlevtcmd_GetPartnerId, -2, LW(3))
@@ -945,13 +983,13 @@ EVT_BEGIN(btldefaultevt_LectureEnd)
 EVT_END()
 
 EVT_BEGIN(btldefaultevt_Defend)
-    SET_VALUE(LW(12), PTR(badgeWeapon_DefenceCommand))
+    SET_VALUE(LW(12), PTR(&badgeWeapon_DefenceCommand))
     CALL_CHILD(PTR(_Defence_core))
     RETURN
 EVT_END()
 
 EVT_BEGIN(btldefaultevt_DefendParty)
-    SET_VALUE(LW(12), PTR(badgeWeapon_DefenceCommandP))
+    SET_VALUE(LW(12), PTR(&badgeWeapon_DefenceCommandP))
     CALL_CHILD(PTR(_Defence_core))
     RETURN
 EVT_END()
@@ -992,12 +1030,12 @@ USER_FUNC(_backfire) {
 }
 
 static USER_FUNC(_anime_load) {
-    BattlePartyAnimeLoad(BTL_WORK_1C68(_battleWorkPointer));
+    BattlePartyAnimeLoad(_battleWorkPointer->commandMenu.unk54C);
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(_anime_load_wait) {
-    return BattlePartyAnimeLoad(BTL_WORK_1C68(_battleWorkPointer)) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
+    return BattlePartyAnimeLoad(_battleWorkPointer->commandMenu.unk54C) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
 USER_FUNC(_check_pose_stay) {

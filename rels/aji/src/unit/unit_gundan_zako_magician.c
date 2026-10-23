@@ -9,6 +9,7 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
+#include "battle/battle_database_common.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_CheckStatus);
@@ -27,20 +28,20 @@ USER_FUNC(btlevtcmd_check_battleflag);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(kanbu_get_id);
 
-__declspec(section ".data") u64 fd_gundan_zako_magician_negone_one_374;
-__declspec(section ".data") s32 fd_gundan_zako_magician_neg_one_382[1];
-__declspec(section ".data") s32 fd_gundan_zako_magician___local_PI_383[1];
-__declspec(section ".data") s32 fd_gundan_zako_magician___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gundan_zako_magician_one_negone_373;
-__declspec(section ".data") s32 fd_gundan_zako_magician___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gundan_zako_magician_one_381[1];
-__declspec(section ".data") u64 fd_gundan_zako_magician_negone_one_360;
-__declspec(section ".data") s32 fd_gundan_zako_magician_neg_one_365[1];
-__declspec(section ".data") s32 fd_gundan_zako_magician___local_PI_366[1];
-__declspec(section ".data") s32 fd_gundan_zako_magician___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gundan_zako_magician_one_negone_359;
-__declspec(section ".data") s32 fd_gundan_zako_magician___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gundan_zako_magician_one_364[1];
+__declspec(section ".data") f32 fd_gundan_zako_magician_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gundan_zako_magician_neg_one_382;
+__declspec(section ".data") f32 fd_gundan_zako_magician___local_PI_383;
+__declspec(section ".data") f32 fd_gundan_zako_magician___local_3PIO2_385;
+__declspec(section ".data") f32 fd_gundan_zako_magician_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gundan_zako_magician___local_PIO2_384;
+__declspec(section ".data") f32 fd_gundan_zako_magician_one_381;
+__declspec(section ".data") f32 fd_gundan_zako_magician_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gundan_zako_magician_neg_one_365;
+__declspec(section ".data") f32 fd_gundan_zako_magician___local_PI_366;
+__declspec(section ".data") f32 fd_gundan_zako_magician___local_3PIO2_368;
+__declspec(section ".data") f32 fd_gundan_zako_magician_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gundan_zako_magician___local_PIO2_367;
+__declspec(section ".data") f32 fd_gundan_zako_magician_one_364;
 BattleUnitKind unit_gundan_zako_magician;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -48,13 +49,13 @@ static __declspec(section ".data") StatusVulnerability regist;
 static PoseTableEntry pose_table[16];
 static __declspec(section ".data") BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[2];
-static s32 weapon_gundan_zako_magician_fire_bottle[48];
-static s32 weapon_gundan_zako_magician_hunyahunya_bottle[48];
-static s32 weapon_gundan_zako_magician_yokeyoke_bottle[48];
-static s32 weapon_gundan_zako_magician_minimini_bottle[48];
-static s32 weapon_gundan_zako_magician_one_recover[48];
-static s32 weapon_gundan_zako_magician_all_recover[48];
-static s32 weapon_gundan_zako_magician_ziwaziwa_bottle[48];
+static BattleWeapon weapon_gundan_zako_magician_fire_bottle;
+static BattleWeapon weapon_gundan_zako_magician_hunyahunya_bottle;
+static BattleWeapon weapon_gundan_zako_magician_yokeyoke_bottle;
+static BattleWeapon weapon_gundan_zako_magician_minimini_bottle;
+static BattleWeapon weapon_gundan_zako_magician_one_recover;
+static BattleWeapon weapon_gundan_zako_magician_all_recover;
+static BattleWeapon weapon_gundan_zako_magician_ziwaziwa_bottle;
 static s32 init_event[21];
 static __declspec(section ".data") s32 damage_event[10];
 static s32 attack_event[235];
@@ -94,53 +95,33 @@ static USER_FUNC(kanbu_get_id) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_gundan_zako_magician_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gundan_zako_magician_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gundan_zako_magician_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gundan_zako_magician_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_gundan_zako_magician___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gundan_zako_magician___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gundan_zako_magician___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gundan_zako_magician___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gundan_zako_magician_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gundan_zako_magician_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gundan_zako_magician___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gundan_zako_magician___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gundan_zako_magician_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gundan_zako_magician_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_gundan_zako_magician_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gundan_zako_magician_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gundan_zako_magician_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gundan_zako_magician_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_gundan_zako_magician___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gundan_zako_magician___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gundan_zako_magician___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gundan_zako_magician___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gundan_zako_magician_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gundan_zako_magician_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gundan_zako_magician___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gundan_zako_magician___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gundan_zako_magician_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gundan_zako_magician_one_364 = 1.0f;
 
 BattleUnitKind unit_gundan_zako_magician = {
     119,
@@ -242,71 +223,267 @@ static BattleUnitKindPart parts[] = {
     {2, "btl_un_gundan_zako_magician", "c_zako_m", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13018000, 0, pose_table},
 };
 
-static s32 weapon_gundan_zako_magician_fire_bottle[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536875008, 16777986, 0, 135, 2047, -2147475456,
-    0, 0, 0, 75, 50331648, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_gundan_zako_magician_fire_bottle = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20001000, // targetPropertyFlags
+    1, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
+    75, // burnChance
+    3, // burnTime
+    0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
+    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
+    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_gundan_zako_magician_hunyahunya_bottle[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536875008, 770, 0, 135, 2047, -2147475456,
-    0, 0, 0, 0, 0, 0, 4916221, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_gundan_zako_magician_hunyahunya_bottle = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20001000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, // atkChangeStrength
+    75, // defChangeChance
+    3, // defChangeTime
+    -3, // defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_gundan_zako_magician_yokeyoke_bottle[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 16793632, 536870912, 770, 0, 264, 2047, 0,
-    0, 0, 0, 6554368, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_gundan_zako_magician_yokeyoke_bottle = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1004020, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x108, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, // poisonTime..electricTime
+    100, // dodgyChance
+    3, // dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_gundan_zako_magician_minimini_bottle[] = {
+static BattleWeapon weapon_gundan_zako_magician_minimini_bottle = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
 #ifdef VERSION_G8ME01
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    2, // superguardsAllowed
 #else
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
+    0, // superguardsAllowed
 #endif
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 7, 2047, -2147483648,
-    0, 0, 0, 0, 75, 66977792, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    7, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, // burnTime..freezeTime
+    75, // sizeChangeChance
+    3, // sizeChangeTime
+    -2, // sizeChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
+    0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
+    0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_gundan_zako_magician_one_recover[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 536870912, 770, 0, 0, 2047, -2147478272,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_gundan_zako_magician_one_recover = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, 0, // acHelpMsg..special
+    0x7FF, // counterResistFlags
+    0x80001500, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_gundan_zako_magician_all_recover[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34603360, 536870912, 770, 0, 0, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_gundan_zako_magician_all_recover = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2100160, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, 0, // acHelpMsg..special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_gundan_zako_magician_ziwaziwa_bottle[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 536870912, 770, 0, 8, 2047, -2147478272,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1282, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_gundan_zako_magician_ziwaziwa_bottle = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    8, // special
+    0x7FF, // counterResistFlags
+    0x80001500, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, // invisibleChance..invisibleTime
+    5, // hpRegenTime
+    2, // hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static EVT_BEGIN(init_event)
@@ -423,109 +600,218 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static s32 attack_common_event1[] = {
-    131163, (s32)btlevtcmd_WeaponAftereffect, -29999991, 131163, (s32)btlevtcmd_AttackDeclareAll, -2, 65627, (s32)btlevtcmd_WaitGuardMove,
-    196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991, 131096, -29999991, (s32)weapon_gundan_zako_magician_minimini_bottle, 196699,
-    (s32)btlevtcmd_GetEnemyBelong, -29999997, -29999990, 131096, -29999990, 0, 131122, -29999990,
-    125, 32, 131122, -29999990, -125, 33, 458843, (s32)btlevtcmd_CalculateFaceDirection,
-    -2, -1, -29999990, 0, 1, -29999986, 196699, (s32)btlevtcmd_ChangeFaceDirection,
-    -2, -29999986, 32, 458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997,
-    -29999996, 16, -29999986, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999986, 33,
-    110, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_ATTACK1", -250000000, 0, -250000000,
-    65545, 40, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_ATTACK2", -250000000, 0,
-    -250000000, 112, 131096, -29999991, (s32)weapon_gundan_zako_magician_fire_bottle, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    1, (s32)"A_1A", 33, 131096, -29999991, (s32)weapon_gundan_zako_magician_hunyahunya_bottle, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"A_2A", 33, 131096, -29999991, (s32)weapon_gundan_zako_magician_minimini_bottle, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_3A", 33, 131096, -29999991, (s32)weapon_gundan_zako_magician_yokeyoke_bottle,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_5A", 33, 131096, -29999991,
-    (s32)weapon_gundan_zako_magician_one_recover, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_4A", 33, 131096,
-    -29999991, (s32)weapon_gundan_zako_magician_all_recover, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_4A", 33,
-    131096, -29999991, (s32)weapon_gundan_zako_magician_ziwaziwa_bottle, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_4A",
-    33, 65545, 80, 2, 1,
-};
+static EVT_BEGIN(attack_common_event1)
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_minimini_bottle))
+        CALL(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
+        IF_INT_EQUAL(LW(10), 0)
+            SET_VALUE(LW(10), 125)
+        ELSE
+            SET_VALUE(LW(10), -125)
+        END_IF
+        CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(10), 0, 1, LW(14))
+        CALL(btlevtcmd_ChangeFaceDirection, -2, LW(14))
+    ELSE
+        CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(14))
+        CALL(btlevtcmd_ChangeFaceDirection, -2, LW(14))
+    END_IF
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_ATTACK1"), -250000000, 0, -250000000)
+        WAIT_FRAMES(40)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_ATTACK2"), -250000000, 0, -250000000)
+    END_SIBLING_EVENT
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_fire_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A"))
+    END_IF
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_hunyahunya_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2A"))
+    END_IF
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_minimini_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_3A"))
+    END_IF
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_yokeyoke_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_5A"))
+    END_IF
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_one_recover))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_4A"))
+    END_IF
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_all_recover))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_4A"))
+    END_IF
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_ziwaziwa_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_4A"))
+    END_IF
+    WAIT_FRAMES(80)
+    RETURN
+EVT_END()
 
-static s32 attack_common_event2[] = {
-    131096, -29999991, (s32)weapon_gundan_zako_magician_fire_bottle, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"B_1A",
-    33, 131096, -29999991, (s32)weapon_gundan_zako_magician_hunyahunya_bottle, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2,
-    (s32)"B_1B", 33, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 10, 131125, -29999999, 20,
-    393307, (s32)btlevtcmd_SetPartsPos, -2, 2, -30000000, -29999999, -29999998, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_ATTACK3", -250000000, 0, -250000000, 131096, -29999991,
-    (s32)weapon_gundan_zako_magician_fire_bottle, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1B", 33, 131096,
-    -29999991, (s32)weapon_gundan_zako_magician_hunyahunya_bottle, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_2B", 33,
-    65545, 24, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_ATTACK4", -250000000, 0,
-    -250000000, 110, 65545, 24, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"S_1", 112, 262235, (s32)btlevtcmd_OffPartsAttribute, -2, 2, 16777216, 262235,
-    (s32)btlevtcmd_OffPartsAttribute, -2, 2, 33554432, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996,
-    -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_JumpPartsSetting, -2, 2, 0,
-    -229993856, -229999693, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, 2, -30000000, -29999999,
-    -29999998, 0, -1, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996,
-    -29999991, 0, -29999995, 65570, -29999995, 65579, 4, 65540,
-    90, 46, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38,
-    65540, 90, 46, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    39, 65540, 90, 65572, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    40, 65540, 90, 65572, 1, 65540, 91, 46,
-    42, 65540, 98, 46, 65539, 90, 196699, (s32)btlevtcmd_JumpPartsContinue,
-    -2, 2, 393307, (s32)btlevtcmd_GetPartsPos, -2, 2, -30000000, -29999999,
-    -29999998, 65541, 12, 983131, (s32)evt_eff64, (s32)"", (s32)"glass_n64", 0,
-    -30000000, -29999999, -29999998, -229998976, 30, 0, 0, 0,
-    0, 0, 0, 6, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_CRASH1",
-    -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"B_2",
-    65545, 8, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, 2, 16777216, 262235,
-    (s32)btlevtcmd_OnPartsAttribute, -2, 2, 33554432, 65540, 98, 65539, 91,
-    131096, -29999991, (s32)weapon_gundan_zako_magician_fire_bottle, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000,
-    -29999999, -29999998, 983131, (s32)evt_eff, (s32)"", (s32)"kemuri_test", 16, -30000000,
-    -29999999, -29999998, -229998976, 0, 0, 0, 0, 0,
-    0, 0, 33, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000,
-    -29999999, -29999998, 65541, 12, 983131, (s32)evt_eff64, (s32)"", (s32)"glass_n64",
-    0, -30000000, -29999999, -29999998, -229998976, 30, 0, 0,
-    0, 0, 0, 0, 6, 196699, (s32)btlevtcmd_ResultACDefence, -29999997,
-    -29999991, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991, 256,
-    -29999995, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_CRASH1", -250000000, 0, -250000000,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"B_2", 65545, 8, 262235,
-    (s32)btlevtcmd_OnPartsAttribute, -2, 2, 16777216, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, 2,
-    33554432, 65540, 98, 65539, 98, 65545, 10, 196699,
-    (s32)evt_btl_camera_set_mode, 0, 0, 65545, 30, 65539, 99, 131163,
-    (s32)btlevtcmd_ResetFaceDirection, -2, 2, 1,
-};
+static EVT_BEGIN(attack_common_event2)
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_fire_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("B_1A"))
+    END_IF
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_hunyahunya_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("B_1B"))
+    END_IF
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 10)
+    ADD(LW(1), 20)
+    CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_ATTACK3"), -250000000, 0, -250000000)
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_fire_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1B"))
+    END_IF
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_hunyahunya_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2B"))
+    END_IF
+    WAIT_FRAMES(24)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_ATTACK4"), -250000000, 0, -250000000)
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(24)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
+    CALL(btlevtcmd_OffPartsAttribute, -2, 2, 33554432)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPartsSetting, -2, 2, 0, FLOAT(6.0f), FLOAT(0.2998047f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, 2, LW(0), LW(1), LW(2), 0, -1)
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 0, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+        LABEL(90)
+        CALL(btlevtcmd_JumpPartsContinue, -2, 2)
+        CALL(btlevtcmd_GetPartsPos, -2, 2, LW(0), LW(1), LW(2))
+        LOOP(12)
+            CALL(evt_eff64, STRING(""), STRING("glass_n64"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 30, 0, 0, 0, 0, 0, 0)
+        END_LOOP
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_CRASH1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("B_2"))
+        WAIT_FRAMES(8)
+        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 33554432)
+        GOTO(98)
+        LABEL(91)
+        IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_fire_bottle))
+            CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+            CALL(evt_eff, STRING(""), STRING("kemuri_test"), 16, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+        END_IF
+        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+        LOOP(12)
+            CALL(evt_eff64, STRING(""), STRING("glass_n64"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 30, 0, 0, 0, 0, 0, 0)
+        END_LOOP
+        CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_CRASH1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("B_2"))
+        WAIT_FRAMES(8)
+        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 33554432)
+        GOTO(98)
+        LABEL(98)
+        WAIT_FRAMES(10)
+        CALL(evt_btl_camera_set_mode, 0, 0)
+        WAIT_FRAMES(30)
+        LABEL(99)
+        CALL(btlevtcmd_ResetFaceDirection, -2)
+        RETURN
+EVT_END()
 
-static s32 attack_common_event3[] = {
-    131096, -29999991, (s32)weapon_gundan_zako_magician_yokeyoke_bottle, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"B_1D",
-    33, 131096, -29999991, (s32)weapon_gundan_zako_magician_ziwaziwa_bottle, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2,
-    (s32)"B_1C", 33, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 10, 131125, -29999999, 20,
-    393307, (s32)btlevtcmd_SetPartsPos, -2, 2, -30000000, -29999999, -29999998, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_ATTACK3", -250000000, 0, -250000000, 131096, -29999991,
-    (s32)weapon_gundan_zako_magician_yokeyoke_bottle, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_5C", 33, 131096,
-    -29999991, (s32)weapon_gundan_zako_magician_ziwaziwa_bottle, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_4C", 33,
-    65545, 24, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_ATTACK4", -250000000, 0,
-    -250000000, 110, 65545, 24, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"S_1", 112, 262235, (s32)btlevtcmd_OffPartsAttribute, -2, 2, 16777216, 262235,
-    (s32)btlevtcmd_OffPartsAttribute, -2, 2, 33554432, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996,
-    -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_JumpPartsSetting, -2, 2, 0,
-    -229998976, -229999488, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, 2, -30000000, 0,
-    -29999998, 0, -1, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000,
-    -29999999, -29999998, 65541, 12, 983131, (s32)evt_eff64, (s32)"", (s32)"glass_n64",
-    0, -30000000, 0, -29999998, -229998976, 30, 0, 0,
-    0, 0, 0, 0, 6, 458843, (s32)btlevtcmd_PreCheckDamage, -2,
-    -29999997, -29999996, -29999991, 0, -29999995, 65570, -29999995, 65579,
-    4, 65540, 90, 46, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid,
-    -29999997, 38, 65540, 90, 46, 65572, 6, 196699,
-    (s32)btlevtcmd_StartAvoid, -29999997, 39, 65540, 90, 65572, 2, 196699,
-    (s32)btlevtcmd_StartAvoid, -29999997, 40, 65540, 90, 65572, 1, 65540,
-    91, 46, 42, 65540, 98, 46, 65539, 90,
-    65540, 98, 65539, 91, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999991,
-    458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991, 256, -29999995,
-    65540, 98, 65539, 98, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_CRASH1",
-    -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"B_2",
-    65545, 8, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, 2, 16777216, 262235,
-    (s32)btlevtcmd_OnPartsAttribute, -2, 2, 33554432, 65545, 10, 196699, (s32)evt_btl_camera_set_mode,
-    0, 0, 65545, 30, 65539, 99, 131163, (s32)btlevtcmd_ResetFaceDirection,
-    -2, 2, 1,
-};
+static EVT_BEGIN(attack_common_event3)
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_yokeyoke_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("B_1D"))
+    END_IF
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_ziwaziwa_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("B_1C"))
+    END_IF
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 10)
+    ADD(LW(1), 20)
+    CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_ATTACK3"), -250000000, 0, -250000000)
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_yokeyoke_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_5C"))
+    END_IF
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_ziwaziwa_bottle))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_4C"))
+    END_IF
+    WAIT_FRAMES(24)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_ATTACK4"), -250000000, 0, -250000000)
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(24)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
+    CALL(btlevtcmd_OffPartsAttribute, -2, 2, 33554432)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPartsSetting, -2, 2, 0, FLOAT(1.0f), FLOAT(0.5f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, 2, LW(0), 0, LW(2), 0, -1)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    LOOP(12)
+        CALL(evt_eff64, STRING(""), STRING("glass_n64"), 0, LW(0), 0, LW(2), FLOAT(1.0f), 30, 0, 0, 0, 0, 0, 0)
+    END_LOOP
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 0, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+        LABEL(90)
+        GOTO(98)
+        LABEL(91)
+        CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        GOTO(98)
+        LABEL(98)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_CRASH1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("B_2"))
+        WAIT_FRAMES(8)
+        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 33554432)
+        WAIT_FRAMES(10)
+        CALL(evt_btl_camera_set_mode, 0, 0)
+        WAIT_FRAMES(30)
+        LABEL(99)
+        CALL(btlevtcmd_ResetFaceDirection, -2)
+        RETURN
+EVT_END()
 
 static EVT_BEGIN(fire_bottle_event)
-    SET_VALUE(LW(9), PTR(weapon_gundan_zako_magician_fire_bottle))
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_fire_bottle))
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -549,7 +835,7 @@ static EVT_BEGIN(fire_bottle_event)
 EVT_END()
 
 static EVT_BEGIN(hunyahunya_bottle_event)
-    SET_VALUE(LW(9), PTR(weapon_gundan_zako_magician_hunyahunya_bottle))
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_hunyahunya_bottle))
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
     CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
@@ -567,106 +853,217 @@ static EVT_BEGIN(hunyahunya_bottle_event)
     RETURN
 EVT_END()
 
-static s32 yokeyoke_bottle_event[] = {
-    131122, -29999997, -2, 131122, -29999996, 1, 131122, -29999991,
-    (s32)weapon_gundan_zako_magician_yokeyoke_bottle, 65630, (s32)attack_common_event1, 110, 65545, 10, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_3RD2_BOTTLE3", -250000000, 0, -250000000, 65545, 30, 65541,
-    3, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_BOTTLE4", -250000000, 0, -250000000,
-    65545, 20, 6, 112, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"A_5B", 65545, 120, 107, 65545, 5, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_3RD2_BOTTLE5", -250000000, 0, -250000000, 65545, 55, 196699,
-    (s32)evt_btl_camera_set_mode, 0, 0, 109, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999991,
-    458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991, 256, -29999995,
-    2, 1,
-};
+static EVT_BEGIN(yokeyoke_bottle_event)
+    SET_VALUE(LW(3), -2)
+    SET_VALUE(LW(4), 1)
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_yokeyoke_bottle))
+    CALL_CHILD(attack_common_event1)
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(10)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_BOTTLE3"), -250000000, 0, -250000000)
+        WAIT_FRAMES(30)
+        LOOP(3)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_BOTTLE4"), -250000000, 0, -250000000)
+            WAIT_FRAMES(20)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_5B"))
+    WAIT_FRAMES(120)
+    BEGIN_INLINE_EVENT
+        WAIT_FRAMES(5)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_BOTTLE5"), -250000000, 0, -250000000)
+        WAIT_FRAMES(55)
+        CALL(evt_btl_camera_set_mode, 0, 0)
+    END_INLINE_EVENT
+    CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    RETURN
+EVT_END()
 
-static s32 minimini_bottle_event[] = {
-    131122, -29999991, (s32)weapon_gundan_zako_magician_minimini_bottle, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235,
-    (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999991, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991, -29999997,
-    -29999996, 131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16,
-    -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered, 2, 33,
-    65540, 99, 33, 65630, (s32)attack_common_event1, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    2, (s32)"B_1E", 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 10, 131125, -29999999, 20,
-    393307, (s32)btlevtcmd_SetPartsPos, -2, 2, -30000000, -29999999, -29999998, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_ATTACK3", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"A_3C", 65545, 24, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_ENM_3RD2_ATTACK4", -250000000, 0, -250000000, 110, 65545, 24, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"S_1", 112, 262235, (s32)btlevtcmd_OffPartsAttribute, -2,
-    2, 16777216, 262235, (s32)btlevtcmd_OffPartsAttribute, -2, 2, 33554432, 196699,
-    (s32)btlevtcmd_GetEnemyBelong, -29999997, -29999990, 131096, -29999990, 0, 131122, -29999990,
-    125, 32, 131122, -29999990, -125, 33, 393307, (s32)btlevtcmd_GetHitPos,
-    -29999997, -29999996, -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_JumpPartsSetting, -2,
-    2, 0, -229993856, -229999693, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, 2,
-    -29999990, 0, 0, 0, -1, 983131, (s32)evt_eff, (s32)"",
-    (s32)"kemuri_test", 20, -29999990, 50, 0, -229997543, 0, 0,
-    0, 0, 0, 0, 0, 65541, 12, 983131,
-    (s32)evt_eff64, (s32)"", (s32)"glass_n64", 0, -29999990, 0, 0, -229998976,
-    30, 0, 0, 0, 0, 0, 0, 6,
-    107, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_CRASH1", -250000000, 0, -250000000,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"B_2", 65545, 8, 262235,
-    (s32)btlevtcmd_OnPartsAttribute, -2, 2, 16777216, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, 2,
-    33554432, 109, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131122, -29999990,
-    0, 65539, 0, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996,
-    -29999991, 0, -29999995, 65570, -29999995, 65579, 4, 65540,
-    90, 46, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38,
-    65540, 90, 46, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    39, 65540, 90, 65572, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    40, 65540, 90, 65572, 1, 65540, 91, 46,
-    42, 65540, 98, 46, 65539, 90, 65540, 97,
-    65539, 91, 131096, -29999990, 0, 196699, (s32)btlevtcmd_ResultACDefence, -29999997,
-    -29999991, 33, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991,
-    256, -29999995, 65540, 97, 65539, 97, 196699, (s32)btlevtcmd_GetSelectNextEnemy,
-    -29999997, -29999996, 131097, -29999997, -1, 131125, -29999990, 1,
-    65540, 0, 33, 65539, 98, 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 65545, 60, 65539, 99, 131163, (s32)btlevtcmd_ResetFaceDirection, -2,
-    2, 1,
-};
+static EVT_BEGIN(minimini_bottle_event)
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_minimini_bottle))
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL_CHILD(attack_common_event1)
+    CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("B_1E"))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 10)
+    ADD(LW(1), 20)
+    CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_ATTACK3"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_3C"))
+    WAIT_FRAMES(24)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_ATTACK4"), -250000000, 0, -250000000)
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(24)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
+    CALL(btlevtcmd_OffPartsAttribute, -2, 2, 33554432)
+    CALL(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
+    IF_INT_EQUAL(LW(10), 0)
+        SET_VALUE(LW(10), 125)
+    ELSE
+        SET_VALUE(LW(10), -125)
+    END_IF
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPartsSetting, -2, 2, 0, FLOAT(6.0f), FLOAT(0.2998047f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, 2, LW(10), 0, 0, 0, -1)
+    CALL(evt_eff, STRING(""), STRING("kemuri_test"), 20, LW(10), 50, 0, FLOAT(2.399414f), 0, 0, 0, 0, 0, 0, 0)
+    LOOP(12)
+        CALL(evt_eff64, STRING(""), STRING("glass_n64"), 0, LW(10), 0, 0, FLOAT(1.0f), 30, 0, 0, 0, 0, 0, 0)
+    END_LOOP
+    BEGIN_INLINE_EVENT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_CRASH1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("B_2"))
+        WAIT_FRAMES(8)
+        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 33554432)
+    END_INLINE_EVENT
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    SET_VALUE(LW(10), 0)
+    LABEL(0)
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 0, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+        LABEL(90)
+        GOTO(97)
+        LABEL(91)
+        IF_INT_EQUAL(LW(10), 0)
+            CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+        END_IF
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        GOTO(97)
+        LABEL(97)
+        CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+        IF_INT_NOT_EQUAL(LW(3), -1)
+            ADD(LW(10), 1)
+            GOTO(0)
+        END_IF
+        LABEL(98)
+        CALL(evt_btl_camera_set_mode, 0, 0)
+        WAIT_FRAMES(60)
+        LABEL(99)
+        CALL(btlevtcmd_ResetFaceDirection, -2)
+        RETURN
+EVT_END()
 
-static s32 one_recover_event[] = {
-    131122, -29999991, (s32)weapon_gundan_zako_magician_one_recover, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235,
-    (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999991, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991, -29999997,
-    -29999996, 131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16,
-    -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered, 2, 33,
-    65540, 99, 33, 65630, (s32)attack_common_event1, 110, 65545, 10,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_SHAKE1", -250000000, 0, -250000000, 65545,
-    30, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_SHAKE1", -250000000, 0, -250000000,
-    65545, 30, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_SHAKE1", -250000000, 0,
-    -250000000, 112, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_4B", 65545,
-    80, 262235, (s32)btlevtcmd_RecoverHp, -29999997, -29999996, 10, 393307, (s32)btlevtcmd_GetPartsPos,
-    -29999997, -29999996, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_GetHeight, -29999997,
-    -29999995, 196699, (s32)btlevtcmd_GetStatusMg, -29999997, -29999994, 131132, -29999995, -29999994,
-    131125, -29999999, -29999995, 983131, (s32)evt_eff, (s32)"", (s32)"recovery\0\0\0", 0,
-    -30000000, -29999999, -29999998, 10, 0, 0, 0, 0,
-    0, 0, 0, 65545, 30, 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 65545, 60, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 2, 1,
-};
+static EVT_BEGIN(one_recover_event)
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_one_recover))
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL_CHILD(attack_common_event1)
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(10)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_SHAKE1"), -250000000, 0, -250000000)
+        WAIT_FRAMES(30)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_SHAKE1"), -250000000, 0, -250000000)
+        WAIT_FRAMES(30)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_SHAKE1"), -250000000, 0, -250000000)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_4B"))
+    WAIT_FRAMES(80)
+    CALL(btlevtcmd_RecoverHp, LW(3), LW(4), 10)
+    CALL(btlevtcmd_GetPartsPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHeight, LW(3), LW(5))
+    CALL(btlevtcmd_GetStatusMg, LW(3), LW(6))
+    MULTIPLY_FLOAT(LW(5), LW(6))
+    ADD(LW(1), LW(5))
+    CALL(evt_eff, STRING(""), STRING("recovery\0\0\0"), 0, LW(0), LW(1), LW(2), 10, 0, 0, 0, 0, 0, 0, 0)
+    WAIT_FRAMES(30)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_FRAMES(60)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    RETURN
+EVT_END()
 
-static s32 all_recover_event[] = {
-    131122, -29999991, (s32)weapon_gundan_zako_magician_all_recover, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235,
-    (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999991, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991, -29999997,
-    -29999996, 131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16,
-    -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered, 2, 33,
-    65540, 99, 33, 65630, (s32)attack_common_event1, 110, 65545, 10,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_SHAKE1", -250000000, 0, -250000000, 65545,
-    30, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_SHAKE1", -250000000, 0, -250000000,
-    65545, 30, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD2_SHAKE1", -250000000, 0,
-    -250000000, 112, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_4B", 65545,
-    80, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 65539, 0, 110,
-    196699, (s32)evt_sub_random, 10, -29999990, 131125, -29999990, 5, 65545,
-    -29999990, 262235, (s32)btlevtcmd_RecoverHp, -29999997, -29999996, 5, 393307, (s32)btlevtcmd_GetPartsPos,
-    -29999997, -29999996, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_GetHeight, -29999997,
-    -29999995, 196699, (s32)btlevtcmd_GetStatusMg, -29999997, -29999994, 131132, -29999995, -29999994,
-    131125, -29999999, -29999995, 983131, (s32)evt_eff, (s32)"", (s32)"recovery\0\0\0", 0,
-    -30000000, -29999999, -29999998, 5, 0, 0, 0, 0,
-    0, 0, 0, 112, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996,
-    131097, -29999997, -1, 65540, 0, 33, 65545, 90,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 65545, 60, 131163, (s32)btlevtcmd_ResetFaceDirection,
-    -2, 2, 1,
-};
+static EVT_BEGIN(all_recover_event)
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_all_recover))
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL_CHILD(attack_common_event1)
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(10)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_SHAKE1"), -250000000, 0, -250000000)
+        WAIT_FRAMES(30)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_SHAKE1"), -250000000, 0, -250000000)
+        WAIT_FRAMES(30)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD2_SHAKE1"), -250000000, 0, -250000000)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_4B"))
+    WAIT_FRAMES(80)
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    LABEL(0)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_sub_random, 10, LW(10))
+        ADD(LW(10), 5)
+        WAIT_FRAMES(LW(10))
+        CALL(btlevtcmd_RecoverHp, LW(3), LW(4), 5)
+        CALL(btlevtcmd_GetPartsPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetHeight, LW(3), LW(5))
+        CALL(btlevtcmd_GetStatusMg, LW(3), LW(6))
+        MULTIPLY_FLOAT(LW(5), LW(6))
+        ADD(LW(1), LW(5))
+        CALL(evt_eff, STRING(""), STRING("recovery\0\0\0"), 0, LW(0), LW(1), LW(2), 5, 0, 0, 0, 0, 0, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    IF_INT_NOT_EQUAL(LW(3), -1)
+        GOTO(0)
+    END_IF
+    WAIT_FRAMES(90)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_FRAMES(60)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(yokeyoke_bottle_event_with_kanbu)
-    SET_VALUE(LW(9), PTR(weapon_gundan_zako_magician_yokeyoke_bottle))
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_yokeyoke_bottle))
     CALL(kanbu_get_id, LW(3), LW(4))
     CALL_CHILD(PTR(attack_common_event1))
     CALL_CHILD(PTR(attack_common_event3))
@@ -675,7 +1072,7 @@ static EVT_BEGIN(yokeyoke_bottle_event_with_kanbu)
 EVT_END()
 
 static EVT_BEGIN(ziwaziwa_bottle_event)
-    SET_VALUE(LW(9), PTR(weapon_gundan_zako_magician_ziwaziwa_bottle))
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_ziwaziwa_bottle))
     CALL(kanbu_get_id, LW(3), LW(4))
     CALL_CHILD(PTR(attack_common_event1))
     CALL_CHILD(PTR(attack_common_event3))

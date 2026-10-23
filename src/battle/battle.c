@@ -27,8 +27,8 @@ BattleWork* _battleWorkPointer;
 #endif
 
 f32 BattleGetFloorHeight(f32 x, f32 y, f32 z);
-BattleUnitSetup entryunit_mario = { &unitdata_Mario, { 0,0,0,0, 4,0,0,2, 0xC2,0xC8,0,0, 0,0,0,0, 0xC0,0xA0,0,0 } };
-BattleUnitSetup entryunit_system = { &unit_system, { 0,0,0,0, 4,0,0,2 } };
+BattleUnitSetup entryunit_mario = { &unitdata_Mario, 0, {0}, 0x04000002, {-100.0f, 0.0f, -5.0f} };
+BattleUnitSetup entryunit_system = { &unit_system, 0, {0}, 0x04000002 };
 
 // forward declarations
 BOOL BattleMain(void);
@@ -434,7 +434,7 @@ void statusWinOpen(void);
 void statusWinClose(void);
 
 BattleUnit* BattleChangeParty(BattleWork* wp) {
-    s32 kind = *(s32*)((u8*)wp + 0x1C68);
+    s32 kind = wp->commandMenu.unk54C;
     BattleUnit* party = BattleGetPartyPtr(wp);
     s32 oldId = *(s32*)party;
     BattleUnit* unit;
@@ -807,7 +807,7 @@ void BattleCheckUnitBroken(BattleWork* wp) {
 }
 
 void BattleAfterReactionQueueInit(void) {
-    s32* base = (s32*)((u8*)_battleWorkPointer + BWOFF(0x16F40));
+    s32* base = &_battleWorkPointer->unk16F40;
     s32 i;
     for (i = 0; i < 64; i++) {
         base[i * 2] = -1;
@@ -816,7 +816,7 @@ void BattleAfterReactionQueueInit(void) {
 }
 
 void BattleAfterReactionEntry(s32 a, s32 b) {
-    s32* base = (s32*)((u8*)_battleWorkPointer + BWOFF(0x16F40));
+    s32* base = &_battleWorkPointer->unk16F40;
     s32 i;
     for (i = 0; i < 64; i++) {
         if (base[i * 2] != -1 && a == base[i * 2]) {
@@ -837,7 +837,7 @@ void BattleAfterReactionEntry(s32 a, s32 b) {
 void BattleAfterReactionRelease(s32 a, s32 b) {
     s32 i;
     s32 j;
-    s32* base = (s32*)((u8*)_battleWorkPointer + BWOFF(0x16F40));
+    s32* base = &_battleWorkPointer->unk16F40;
     for (i = 0; i < 64; i++) {
         if (base[i * 2] != -1 && a == base[i * 2] && b == base[i * 2 + 1]) {
             for (j = i; j < 63; j++) {
@@ -857,7 +857,7 @@ void BattleConsumeReserveItem(void);
 BOOL BattleAfterReactionMain(void) {
     s32 id;
     BattleWork* wp = _battleWorkPointer;
-    s32* base = (s32*)((u8*)wp + BWOFF(0x16F40));
+    s32* base = &wp->unk16F40;
     s32 i;
     for (i = 0; i < 64; i++) {
         id = base[i * 2];
@@ -919,7 +919,7 @@ u8 BattleMajinaiCheck(void) {
         return 0;
     }
     pouch->mTurnsUntilMerleeActivation = 0;
-    if (*(u32*)(*(u8**)(*(u8**)((u8*)wp + 0x2738) + 0xC) + 4) & 0x20) {
+    if ((u32)wp->fbatInfo->setup->battleFlags & 0x20) {
         r = irand(100);
         if (r < 45) pouch->mMerleeNextCurseType = 1;
         else if (r < 90) pouch->mMerleeNextCurseType = 2;

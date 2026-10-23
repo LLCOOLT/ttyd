@@ -114,101 +114,101 @@ s32 ItemEvent_GetTarget[68];
 s32 ItemEvent_Support_Sub_Effect[71];
 s32 ItemEvent_Support_NoEffect[20];
 s32 ItemEvent_Support_RefreshEffect[101];
-s32 ItemWeaponData_CookingItem[48];
-s32 ItemWeaponData_Kinoko[48];
-s32 ItemWeaponData_Kinkyuu_Kinoko[48];
-s32 ItemWeaponData_Super_Kinoko[48];
-s32 ItemWeaponData_Ultra_Kinoko[48];
-s32 ItemWeaponData_Sinabita_Kinoko[48];
-s32 ItemWeaponData_Honey_Syrup[48];
-s32 ItemWeaponData_Maple_Syrup[48];
-s32 ItemWeaponData_Royal_Jelly[48];
-s32 ItemWeaponData_Tankobu[48];
+BattleWeapon ItemWeaponData_CookingItem;
+BattleWeapon ItemWeaponData_Kinoko;
+BattleWeapon ItemWeaponData_Kinkyuu_Kinoko;
+BattleWeapon ItemWeaponData_Super_Kinoko;
+BattleWeapon ItemWeaponData_Ultra_Kinoko;
+BattleWeapon ItemWeaponData_Sinabita_Kinoko;
+BattleWeapon ItemWeaponData_Honey_Syrup;
+BattleWeapon ItemWeaponData_Maple_Syrup;
+BattleWeapon ItemWeaponData_Royal_Jelly;
+BattleWeapon ItemWeaponData_Tankobu;
 s32 ItemEvent_Pow_Block[418];
-s32 ItemWeaponData_Pow_Block[48];
+BattleWeapon ItemWeaponData_Pow_Block;
 s32 ItemEvent_Fire_Flower_Core[192];
 s32 ItemEvent_Fire_Flower[31];
-s32 ItemWeaponData_Fire_Flower[48];
+BattleWeapon ItemWeaponData_Fire_Flower;
 s32 ItemEvent_Kaminari_Core[220];
 s32 ItemEvent_Kaminari[83];
-s32 ItemWeaponData_Kaminari_Dokkan[48];
-s32 ItemWeaponData_Kaminari_Gorogoro[48];
+BattleWeapon ItemWeaponData_Kaminari_Dokkan;
+BattleWeapon ItemWeaponData_Kaminari_Gorogoro;
 s32 ItemEvent_Kirakira_Otoshi_Core[451];
 s32 ItemEvent_Kirakira_Otoshi[29];
-s32 ItemWeaponData_Kirakira_Otoshi[48];
+BattleWeapon ItemWeaponData_Kirakira_Otoshi;
 s32 ItemEvent_Koorino_Ibuki[310];
-s32 ItemWeaponData_Koorino_Ibuki[48];
+BattleWeapon ItemWeaponData_Koorino_Ibuki;
 s32 ItemEvent_Yurayura_Jishin[342];
-s32 ItemWeaponData_Yurayura_Jishin[48];
+BattleWeapon ItemWeaponData_Yurayura_Jishin;
 s32 ItemEvent_Teresano_Fuku[236];
-s32 ItemWeaponData_Teresano_Fuku[48];
+BattleWeapon ItemWeaponData_Teresano_Fuku;
 s32 ItemEvent_Biribiri_Kinoko_Core[13];
 s32 ItemEvent_Biribiri_Kinoko[14];
-s32 ItemWeaponData_Biribiri_Kinoko[48];
+BattleWeapon ItemWeaponData_Biribiri_Kinoko;
 s32 ItemEvent_Teki_Yokeeru_Core[13];
 s32 ItemEvent_Teki_Yokeeru[14];
-s32 ItemWeaponData_Teki_Yokeeru[48];
-s32 ItemWeaponData_Madowaseno_Kona[48];
+BattleWeapon ItemWeaponData_Teki_Yokeeru;
+BattleWeapon ItemWeaponData_Madowaseno_Kona;
 s32 ItemEvent_Nemure_Yoikoyo[VERSION_PICK(57, 91)];
-s32 ItemWeaponData_Nemure_Yoikoyo[48];
+BattleWeapon ItemWeaponData_Nemure_Yoikoyo;
 s32 ItemEvent_Stop_Watch_Core[143];
 s32 ItemEvent_Stop_Watch[86];
-s32 ItemWeaponData_Stop_Watch[48];
+BattleWeapon ItemWeaponData_Stop_Watch;
 s32 ItemEvent_Guruguru_Memawashi[35];
-s32 ItemWeaponData_Guruguru_Memawashi[48];
-s32 ItemWeaponData_Dekadeka_Drink[48];
-s32 ItemWeaponData_Katikati_Koura[48];
+BattleWeapon ItemWeaponData_Guruguru_Memawashi;
+BattleWeapon ItemWeaponData_Dekadeka_Drink;
+BattleWeapon ItemWeaponData_Katikati_Koura;
 s32 ItemEvent_Suitooru[281];
-s32 ItemWeaponData_Suitooru[48];
+BattleWeapon ItemWeaponData_Suitooru;
 s32 ItemEvent_Teki_Kyouka[236];
-s32 ItemWeaponData_Teki_Kyouka[48];
-s32 ItemWeaponData_Minimini_Kun[48];
-s32 ItemWeaponData_Funyafunya_Kun[48];
-s32 ItemWeaponData_Sukkiri_Drink[48];
+BattleWeapon ItemWeaponData_Teki_Kyouka;
+BattleWeapon ItemWeaponData_Minimini_Kun;
+BattleWeapon ItemWeaponData_Funyafunya_Kun;
+BattleWeapon ItemWeaponData_Sukkiri_Drink;
 s32 ItemEvent_Jiwajiwa_Kinoko_Core[13];
 s32 ItemEvent_Jiwajiwa_Kinoko[14];
-s32 ItemWeaponData_Jiwajiwa_Kinoko[48];
+BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko;
 s32 ItemEvent_Jiwajiwa_Syrup_Core[13];
 s32 ItemEvent_Jiwajiwa_Syrup[14];
-s32 ItemWeaponData_Jiwajiwa_Syrup[48];
+BattleWeapon ItemWeaponData_Jiwajiwa_Syrup;
 s32 ItemEvent_Irekaeeru[157];
-s32 ItemWeaponData_Irekaeeru[48];
+BattleWeapon ItemWeaponData_Irekaeeru;
 s32 ItemEvent_Attiike_Shisshi[167];
-s32 ItemWeaponData_Attiike_Shisshi[48];
+BattleWeapon ItemWeaponData_Attiike_Shisshi;
 s32 ItemEvent_Naniga_Okorukana[207];
-s32 ItemWeaponData_Naniga_Okorukana[48];
+BattleWeapon ItemWeaponData_Naniga_Okorukana;
 s32 R_mystery_item_table[14];
-s32 ItemWeaponData_Shikaeshino_Kona[48];
-s32 ItemWeaponData_Kameno_Noroi[48];
+BattleWeapon ItemWeaponData_Shikaeshino_Kona;
+BattleWeapon ItemWeaponData_Kameno_Noroi;
 s32 ItemEvent_RecoveryAndStatus[246];
-s32 ItemWeaponData_SpaceFood[48];
-s32 ItemWeaponData_IceCandy[48];
-s32 ItemWeaponData_NancyFrappe[48];
-s32 ItemWeaponData_SnowRabbit[48];
-s32 ItemWeaponData_TeaKinoko[48];
-s32 ItemWeaponData_FirstLovePuddingBiribiri[48];
-s32 ItemWeaponData_FirstLovePuddingTrans[48];
-s32 ItemWeaponData_FirstLovePuddingSleep[48];
-s32 ItemWeaponData_StarryDinner[48];
-s32 ItemWeaponData_KararinaPasta[48];
-s32 ItemWeaponData_MeromeroCake[48];
-s32 ItemWeaponData_PeachTaltBiribiri[48];
-s32 ItemWeaponData_PeachTaltDodge[48];
-s32 ItemWeaponData_PeachTaltSleep[48];
-s32 ItemWeaponData_BiribiriCandy[48];
-s32 ItemWeaponData_HealthySalad[48];
-s32 ItemWeaponData_FreshJuice[48];
-s32 ItemWeaponData_RedKararing[48];
-s32 ItemWeaponData_FutarideForever[48];
+BattleWeapon ItemWeaponData_SpaceFood;
+BattleWeapon ItemWeaponData_IceCandy;
+BattleWeapon ItemWeaponData_NancyFrappe;
+BattleWeapon ItemWeaponData_SnowRabbit;
+BattleWeapon ItemWeaponData_TeaKinoko;
+BattleWeapon ItemWeaponData_FirstLovePuddingBiribiri;
+BattleWeapon ItemWeaponData_FirstLovePuddingTrans;
+BattleWeapon ItemWeaponData_FirstLovePuddingSleep;
+BattleWeapon ItemWeaponData_StarryDinner;
+BattleWeapon ItemWeaponData_KararinaPasta;
+BattleWeapon ItemWeaponData_MeromeroCake;
+BattleWeapon ItemWeaponData_PeachTaltBiribiri;
+BattleWeapon ItemWeaponData_PeachTaltDodge;
+BattleWeapon ItemWeaponData_PeachTaltSleep;
+BattleWeapon ItemWeaponData_BiribiriCandy;
+BattleWeapon ItemWeaponData_HealthySalad;
+BattleWeapon ItemWeaponData_FreshJuice;
+BattleWeapon ItemWeaponData_RedKararing;
+BattleWeapon ItemWeaponData_FutarideForever;
 s32 ItemEvent_ThrowAttack[432];
-s32 ItemWeaponData_NancyDynamite[48];
-s32 ItemWeaponData_CoconutsBomb[48];
-s32 ItemWeaponData_KachikachiDish[48];
-s32 ItemWeaponData_BomberEgg[48];
+BattleWeapon ItemWeaponData_NancyDynamite;
+BattleWeapon ItemWeaponData_CoconutsBomb;
+BattleWeapon ItemWeaponData_KachikachiDish;
+BattleWeapon ItemWeaponData_BomberEgg;
 s32 ItemEvent_Poison_Kinoko[86];
-s32 ItemWeaponData_PoisonKinoko[48];
+BattleWeapon ItemWeaponData_PoisonKinoko;
 s32 ItemEvent_LastDinner[228];
-s32 ItemWeaponData_LastDinner[48];
+BattleWeapon ItemWeaponData_LastDinner;
 s32 ItemEvent_Kaminari_Dokkan[7];
 s32 ItemEvent_Kaminari_Gorogoro[7];
 s32 ItemEvent_Madowaseno_Kona[7];
@@ -456,159 +456,504 @@ EVT_BEGIN(ItemEvent_Support_RefreshEffect)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_CookingItem[] = {
-    0, 0, 0, 0, 1677721600, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196616, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Recovery, 100, 0, 0,
+BattleWeapon ItemWeaponData_CookingItem = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30008, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Recovery, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Kinoko[] = {
-    0, 0, 148, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196936, 2047, 4368,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Recovery, 100, 0, 0,
+BattleWeapon ItemWeaponData_Kinoko = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    148, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30148, // special
+    0x7FF, // counterResistFlags
+    0x1110, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Recovery, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Kinkyuu_Kinoko[] = {
-    0, 0, 151, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196936, 2047, 4368,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Recovery, 100, 0, 0,
+BattleWeapon ItemWeaponData_Kinkyuu_Kinoko = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    151, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30148, // special
+    0x7FF, // counterResistFlags
+    0x1110, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Recovery, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Super_Kinoko[] = {
-    0, 0, 149, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196936, 2047, 4368,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Recovery, 100, 0, 0,
+BattleWeapon ItemWeaponData_Super_Kinoko = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    149, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30148, // special
+    0x7FF, // counterResistFlags
+    0x1110, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Recovery, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Ultra_Kinoko[] = {
-    0, 0, 150, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196936, 2047, 4368,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Recovery, 100, 0, 0,
+BattleWeapon ItemWeaponData_Ultra_Kinoko = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    150, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30148, // special
+    0x7FF, // counterResistFlags
+    0x1110, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Recovery, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Sinabita_Kinoko[] = {
-    0, 0, 152, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196936, 2047, 4368,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Recovery, 100, 0, 0,
+BattleWeapon ItemWeaponData_Sinabita_Kinoko = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    152, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30148, // special
+    0x7FF, // counterResistFlags
+    0x1110, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Recovery, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Honey_Syrup[] = {
-    0, 0, 154, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196936, 2047, -2147483646,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Recovery, 100, 0, 0,
+BattleWeapon ItemWeaponData_Honey_Syrup = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    154, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30148, // special
+    0x7FF, // counterResistFlags
+    0x80000002, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Recovery, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Maple_Syrup[] = {
-    0, 0, 155, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196936, 2047, -2147483646,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Recovery, 100, 0, 0,
+BattleWeapon ItemWeaponData_Maple_Syrup = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    155, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30148, // special
+    0x7FF, // counterResistFlags
+    0x80000002, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Recovery, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Royal_Jelly[] = {
-    0, 0, 156, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196936, 2047, -2147483646,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Recovery, 100, 0, 0,
+BattleWeapon ItemWeaponData_Royal_Jelly = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    156, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30148, // special
+    0x7FF, // counterResistFlags
+    0x80000002, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Recovery, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Tankobu[] = {
-    0, 0, 165, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196936, 2047, -2147483646,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Recovery, 100, 0, 0,
+BattleWeapon ItemWeaponData_Tankobu = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    165, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30148, // special
+    0x7FF, // counterResistFlags
+    0x80000002, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Recovery, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemEvent_Pow_Block[] = {
-    196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2,
-    -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 196699, (s32)evt_btl_camera_set_zoom, 0,
-    200, 65546, 1000, 196699, (s32)btlevtcmd_GetFriendBelong, -2, -30000000, 131096,
-    -30000000, 0, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    196699, (s32)btlevtcmd_GetBodyId, -2, -29999991, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991,
-    40, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229996928, 524379, (s32)btlevtcmd_MovePosition, -2,
-    -60, -29999999, -29999998, 0, -1, 0, 33, 196699,
-    (s32)btlevtcmd_GetBodyId, -2, -29999991, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991, 52,
-    196699, (s32)btlevtcmd_CommandFlyItem, -2, 40, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991,
-    69, 131163, (s32)btlevtcmd_ConsumeItem, -2, 196699, (s32)btlevtcmd_CheckCommandUnit, -2, -30000000,
-    131097, -30000000, 0, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999,
-    -29999998, 196699, (s32)btlevtcmd_GetHeight, -2, -29999995, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2,
-    -30000000, 30, 131125, -29999999, 16, 131125, -29999999, -29999995,
-    32, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 196699,
-    (s32)btlevtcmd_GetHeight, -2, -29999995, 131125, -29999999, 16, 131125, -29999999,
-    -29999995, 33, 110, 65546, 100, 196699, (s32)evt_mobj_entry, (s32)"_BtCIPw",
-    (s32)"MOBJ_PowerBlock", 327771, (s32)evt_mobj_set_position, (s32)"_BtCIPw", -30000000, -29999999, -29999998, 393307,
-    (s32)evt_snd_sfxon_3d, (s32)"SFX_ITEM_POW_APPEAR1", -30000000, -29999999, -29999998, 0, 112, 131125,
-    -29999999, 10, 131125, -29999998, 25, 983131, (s32)evt_eff, (s32)"",
-    (s32)"kemuri_test", 2, -30000000, -29999999, -29999998, -229998976, 0, 0,
-    0, 0, 0, 0, 0, 107, 65546, 2050,
-    983131, (s32)evt_eff, (s32)"", (s32)"kemuri_test", 2, -30000000, -29999999, -29999998,
-    -229998976, 0, 0, 0, 0, 0, 0, 0,
-    109, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991, 69, 65545, 5,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1,
-    65545, 30, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991, 42, 196699,
-    (s32)btlevtcmd_SetMoveSpeed, -2, -229996928, 327771, (s32)btlevtcmd_GetPos, -2, -250000000, -29999999,
-    -250000000, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0,
-    -1, 0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991, 43, 65545,
-    30, 110, 327771, (s32)btlevtcmd_JumpSetting, -2, 20, -230000000, -229999181,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991, 44, 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999,
-    -29999998, 14, -1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991, 43,
-    65545, 60, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991, 42, 327771,
-    (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetMoveSpeed, -2,
-    -229996928, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0,
-    -1, 0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991, 43, 112,
-    107, 65545, 5, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999,
-    -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_MOBJ_POW_BLOCK1", -30000000, -29999999, -29999998, 0,
-    196699, (s32)evt_mobj_set_anim, (s32)"_BtCIPw", (s32)"A_1", 65545, 3, 393307, (s32)evt_btl_camera_shake_h,
-    0, 8, 0, 10, 13, 65545, 50, 131163,
-    (s32)evt_mobj_delete, (s32)"_BtCIPw", 109, 131163, (s32)evt_audience_reflesh_natural_all, 100, 65545, 7,
-    196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000,
-    (s32)ItemWeaponData_Pow_Block, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999990, -29999989, 65539, 10, 131096,
-    -29999990, -1, 65540, 90, 33, 458843, (s32)btlevtcmd_PreCheckDamage, -2,
-    -29999990, -29999989, (s32)ItemWeaponData_Pow_Block, 256, -29999995, 65570, -29999995, 65572,
-    3, 196699, (s32)btlevtcmd_StartAvoid, -29999990, 38, 65572, 6, 196699,
-    (s32)btlevtcmd_StartAvoid, -29999990, 39, 65572, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999990,
-    40, 65572, 1, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999990, -29999989,
-    (s32)ItemWeaponData_Pow_Block, 256, -29999995, 49, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999990, -29999989,
-    65540, 10, 65539, 90, 65627, (s32)evt_audience_ap_recovery, 131163, (s32)btlevtcmd_WeaponAftereffect,
-    (s32)ItemWeaponData_Pow_Block, 65545, 150, 65630, (s32)_return_home_event, 131163, (s32)btlevtcmd_StartWaitEvent, -2,
-    2, 1,
-};
+EVT_BEGIN(ItemEvent_Pow_Block)
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(evt_btl_camera_set_zoom, 0, 200)
+    WAIT_MS(1000)
+    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, -2, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+    END_IF
+    CALL(btlevtcmd_GetBodyId, -2, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, -2, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetHeight, -2, LW(5))
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 30)
+        ADD(LW(1), 16)
+        ADD(LW(1), LW(5))
+    ELSE
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetHeight, -2, LW(5))
+        ADD(LW(1), 16)
+        ADD(LW(1), LW(5))
+    END_IF
+    BEGIN_SIBLING_EVENT
+        WAIT_MS(100)
+        CALL(evt_mobj_entry, STRING("_BtCIPw"), STRING("MOBJ_PowerBlock"))
+        CALL(evt_mobj_set_position, STRING("_BtCIPw"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_POW_APPEAR1"), LW(0), LW(1), LW(2), 0)
+    END_SIBLING_EVENT
+    ADD(LW(1), 10)
+    ADD(LW(2), 25)
+    CALL(evt_eff, STRING(""), STRING("kemuri_test"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(2050)
+        CALL(evt_eff, STRING(""), STRING("kemuri_test"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    END_INLINE_EVENT
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    WAIT_FRAMES(5)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 42)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
+    CALL(btlevtcmd_GetPos, -2, -250000000, LW(1), -250000000)
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 43)
+    WAIT_FRAMES(30)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0f), FLOAT(0.7998047f))
+        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 44)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 14, -1)
+        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 43)
+        WAIT_FRAMES(60)
+        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 42)
+        CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 43)
+    END_SIBLING_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_FRAMES(5)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_POW_BLOCK1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_mobj_set_anim, STRING("_BtCIPw"), STRING("A_1"))
+        WAIT_FRAMES(3)
+        CALL(evt_btl_camera_shake_h, 0, 8, 0, 10, 13)
+        WAIT_FRAMES(50)
+        CALL(evt_mobj_delete, STRING("_BtCIPw"))
+    END_INLINE_EVENT
+    CALL(evt_audience_reflesh_natural_all, 100)
+    WAIT_FRAMES(7)
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&ItemWeaponData_Pow_Block))
+    CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
+    LABEL(10)
+    IF_INT_EQUAL(LW(10), -1)
+        GOTO(90)
+    END_IF
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), PTR(&ItemWeaponData_Pow_Block), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(10), 38)
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(10), 39)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(10), 40)
+        CASE_EQUAL(1)
+        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), PTR(&ItemWeaponData_Pow_Block), 256, LW(5))
+    END_SWITCH
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
+    GOTO(10)
+    LABEL(90)
+    CALL(evt_audience_ap_recovery)
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&ItemWeaponData_Pow_Block))
+    WAIT_FRAMES(150)
+    CALL_CHILD(_return_home_event)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
-s32 ItemWeaponData_Pow_Block[] = {
-    0, 0, 139, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 208960, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Pow_Block, 6579300, 1258947845, 84213760,
+BattleWeapon ItemWeaponData_Pow_Block = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    139, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x33040, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Pow_Block, // mAttackEvtScript
+    {0, 100, 100, 100, 75, 10, 5, 5, 5, 5, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Fire_Flower_Core)
@@ -643,13 +988,13 @@ EVT_BEGIN(ItemEvent_Fire_Flower_Core)
     END_IF
     WAIT_MS(2800)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(ItemWeaponData_Fire_Flower))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&ItemWeaponData_Fire_Flower))
     CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
     LABEL(10)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), PTR(ItemWeaponData_Fire_Flower), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), PTR(&ItemWeaponData_Fire_Flower), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -658,7 +1003,7 @@ EVT_BEGIN(ItemEvent_Fire_Flower_Core)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), PTR(ItemWeaponData_Fire_Flower), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), PTR(&ItemWeaponData_Fire_Flower), 256, LW(5))
     END_SWITCH
     CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
     WAIT_MS(80)
@@ -676,7 +1021,7 @@ EVT_BEGIN(ItemEvent_Fire_Flower)
     CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Fire_Flower))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Fire_Flower))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
@@ -684,13 +1029,41 @@ EVT_BEGIN(ItemEvent_Fire_Flower)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Fire_Flower[] = {
-    0, 0, 132, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 16777986, 0, 196672, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Fire_Flower, 100, 0, 0,
+BattleWeapon ItemWeaponData_Fire_Flower = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    132, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    1, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30040, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Fire_Flower, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Kaminari_Core)
@@ -784,86 +1157,221 @@ EVT_BEGIN(ItemEvent_Kaminari)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Kaminari_Dokkan[] = {
-    0, 0, 129, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    5, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 67109634, 0, 196672, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Kaminari_Dokkan, 100, 328965, 83886080,
+BattleWeapon ItemWeaponData_Kaminari_Dokkan = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    129, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    4, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30040, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Kaminari_Dokkan, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Kaminari_Gorogoro[] = {
-    0, 0, 128, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    5, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 67109634, 0, 196672, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Kaminari_Gorogoro, 100, 328965, 83886080,
+BattleWeapon ItemWeaponData_Kaminari_Gorogoro = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    128, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    4, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30040, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Kaminari_Gorogoro, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
 };
 
-s32 ItemEvent_Kirakira_Otoshi_Core[] = {
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1,
-    65545, 30, 196699, (s32)btlevtcmd_CheckCommandUnit, -2, -30000000, 131097, -30000000,
-    0, 131122, -29999985, 0, 196699, (s32)btlevtcmd_CheckWeaponPluralTarget, -29999988, -30000000,
-    131097, -30000000, 0, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235,
-    (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999988, 131122, -29999985, 1, 33,
-    196699, (s32)btlevtcmd_GetSelectEnemy, -29999990, -29999989, 32, 196699, (s32)btlevtcmd_CheckWeaponPluralTarget, -29999988,
-    -30000000, 131097, -30000000, 0, 131122, -29999985, 1, 196699,
-    (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999988,
-    196699, (s32)btlevtcmd_GetSelectEnemy, -29999990, -29999989, 32, 131122, -29999985, 0,
-    196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000,
-    -29999988, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999988, -29999990, -29999989, 33, 33,
-    196699, (s32)evt_snd_sfxon, (s32)"SFX_ITEM_KIRAKIRA_FALL1", 0, 131096, -29999985, 0, 327771,
-    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_GetStageSize, -250000000,
-    -29999999, -250000000, 393307, (s32)btlevtcmd_GetHitPos, -29999990, -29999989, -29999997, -29999996,
-    -29999995, 983131, (s32)evt_eff64, (s32)"", (s32)"sstar_n64", 2, -30000000, -29999999,
-    -29999998, -29999997, -29999996, -29999995, -229989760, 0, 0, 0,
-    0, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_ITEM_KIRAKIRA_FALL1", -30000000, -29999999, -29999998, 0,
-    65545, 50, 32, 110, 65546, 500, 65541, 5,
-    393307, (s32)evt_btl_camera_shake_h, 0, 5, 0, 20, 12, 65546,
-    400, 65546, 200, 6, 112, 65647, -29999985, 65541,
-    5, 196699, (s32)evt_sub_random, 6, -30000000, 131125, -30000000, 27,
-    65545, -30000000, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 327771, (s32)_sampling_random_target,
-    -29999988, -29999990, -29999989, -30000000, 131097, -29999990, -1, 393307,
-    (s32)btlevtcmd_GetHitPos, -29999990, -29999989, -30000000, -29999999, -29999998, 983131, (s32)evt_eff,
-    0, (s32)"hit", 0, -30000000, -29999999, -29999998, -229998976, 3,
-    0, 0, 0, 0, 0, 0, 33, 6,
-    112, 110, 65541, 7, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_ITEM_KIRAKIRA_FALL1", -30000000,
-    -29999999, -29999998, 0, 65546, 500, 6, 112, 65541,
-    60, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 262235,
-    (s32)btlevtcmd_GetStageSize, -250000000, -29999999, -250000000, 196699, (s32)evt_sub_random, 200, -30000000,
-    196699, (s32)evt_sub_random, 320, -29999997, 196699, (s32)btlevtcmd_GetFriendBelong, -29999990, -29999994,
-    131096, -29999994, 0, 131127, -29999997, -1, 131122, -29999996,
-    0, 32, 131127, -30000000, -1, 131122, -29999996, 0,
-    33, 196699, (s32)btlevtcmd_check_battleflag, -29999992, 256, 131096, -29999992, 0,
-    131122, -29999998, 0, 131122, -29999995, 0, 32, 131122,
-    -29999998, 200, 131122, -29999995, 200, 33, 196699, (s32)evt_sub_random,
-    120, -29999992, 131126, -29999992, 60, 131125, -29999995, -29999992,
-    196699, (s32)evt_sub_random, 120, -29999992, 131126, -29999992, 60, 131125,
-    -29999998, -29999992, 262235, (s32)btlevtcmd_TransStageFloorPosition, -29999997, -29999996, -29999995, 983131,
-    (s32)evt_eff64, (s32)"", (s32)"sstar_n64", 2, -30000000, -29999999, -29999998, -29999997,
-    -29999996, -29999995, -229991808, 0, 0, 0, 0, 65545,
-    3, 6, 65545, 50, 131163, (s32)btlevtcmd_WaitEventEnd, -29999985, 196699,
-    (s32)btlevtcmd_CheckCommandUnit, -2, -30000000, 131097, -30000000, 0, 196699, (s32)btlevtcmd_GetEnemyBelong,
-    -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999988, 196699,
-    (s32)btlevtcmd_GetSelectEnemy, -29999990, -29999989, 32, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000,
-    262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999988, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999990,
-    -29999989, 33, 33, 65539, 10, 131096, -29999990, -1,
-    65540, 90, 33, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999990, -29999989,
-    -29999988, 256, -29999995, 65570, -29999995, 65572, 3, 196699,
-    (s32)btlevtcmd_StartAvoid, -29999990, 38, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999990,
-    39, 65572, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999990, 40, 65572,
-    1, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999990, -29999989, -29999988, 256,
-    -29999995, 49, 196699, (s32)btlevtcmd_CheckWeaponPluralTarget, -29999988, -30000000, 131097, -30000000,
-    0, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999990, -29999989, 32, 131122, -29999990,
-    -1, 33, 65546, 80, 65540, 10, 65539, 90,
-    65627, (s32)evt_audience_ap_recovery, 65545, 150, 65630, (s32)_return_home_event, 131163, (s32)btlevtcmd_StartWaitEvent,
-    -2, 2, 1,
-};
+EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        SET_VALUE(LW(15), 0)
+        CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            SET_VALUE(LW(15), 1)
+        END_IF
+        CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
+    ELSE
+        CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            SET_VALUE(LW(15), 1)
+            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
+        ELSE
+            SET_VALUE(LW(15), 0)
+            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
+        END_IF
+    END_IF
+    CALL(evt_snd_sfxon, STRING("SFX_ITEM_KIRAKIRA_FALL1"), 0)
+    IF_INT_EQUAL(LW(15), 0)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetStageSize, -250000000, LW(1), -250000000)
+        CALL(btlevtcmd_GetHitPos, LW(10), LW(11), LW(3), LW(4), LW(5))
+        CALL(evt_eff64, STRING(""), STRING("sstar_n64"), 2, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), FLOAT(10.0f), 0, 0, 0, 0)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_KIRAKIRA_FALL1"), LW(0), LW(1), LW(2), 0)
+        WAIT_FRAMES(50)
+    ELSE
+        BEGIN_SIBLING_EVENT
+            WAIT_MS(500)
+            LOOP(5)
+                CALL(evt_btl_camera_shake_h, 0, 5, 0, 20, 12)
+                WAIT_MS(400)
+                WAIT_MS(200)
+            END_LOOP
+        END_SIBLING_EVENT
+        BEGIN_SIBLING_EVENT_GET_ID(LW(15))
+            LOOP(5)
+                CALL(evt_sub_random, 6, LW(0))
+                ADD(LW(0), 27)
+                WAIT_FRAMES(LW(0))
+                CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+                CALL(_sampling_random_target, LW(12), LW(10), LW(11), LW(0))
+                IF_INT_NOT_EQUAL(LW(10), -1)
+                    CALL(btlevtcmd_GetHitPos, LW(10), LW(11), LW(0), LW(1), LW(2))
+                    CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
+                END_IF
+            END_LOOP
+        END_SIBLING_EVENT
+        BEGIN_SIBLING_EVENT
+            LOOP(7)
+                CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_KIRAKIRA_FALL1"), LW(0), LW(1), LW(2), 0)
+                WAIT_MS(500)
+            END_LOOP
+        END_SIBLING_EVENT
+        LOOP(60)
+            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_GetStageSize, -250000000, LW(1), -250000000)
+            CALL(evt_sub_random, 200, LW(0))
+            CALL(evt_sub_random, 320, LW(3))
+            CALL(btlevtcmd_GetFriendBelong, LW(10), LW(6))
+            IF_INT_EQUAL(LW(6), 0)
+                MULTIPLY(LW(3), -1)
+                SET_VALUE(LW(4), 0)
+            ELSE
+                MULTIPLY(LW(0), -1)
+                SET_VALUE(LW(4), 0)
+            END_IF
+            CALL(btlevtcmd_check_battleflag, LW(8), 256)
+            IF_INT_EQUAL(LW(8), 0)
+                SET_VALUE(LW(2), 0)
+                SET_VALUE(LW(5), 0)
+            ELSE
+                SET_VALUE(LW(2), 200)
+                SET_VALUE(LW(5), 200)
+            END_IF
+            CALL(evt_sub_random, 120, LW(8))
+            SUBTRACT(LW(8), 60)
+            ADD(LW(5), LW(8))
+            CALL(evt_sub_random, 120, LW(8))
+            SUBTRACT(LW(8), 60)
+            ADD(LW(2), LW(8))
+            CALL(btlevtcmd_TransStageFloorPosition, LW(3), LW(4), LW(5))
+            CALL(evt_eff64, STRING(""), STRING("sstar_n64"), 2, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), FLOAT(8.0f), 0, 0, 0, 0)
+            WAIT_FRAMES(3)
+        END_LOOP
+        WAIT_FRAMES(50)
+        CALL(btlevtcmd_WaitEventEnd, LW(15))
+        CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
+        ELSE
+            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
+        END_IF
+    END_IF
+    LABEL(10)
+    IF_INT_EQUAL(LW(10), -1)
+        GOTO(90)
+    END_IF
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(10), 38)
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(10), 39)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(10), 40)
+        CASE_EQUAL(1)
+        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    END_SWITCH
+    CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
+    ELSE
+        SET_VALUE(LW(10), -1)
+    END_IF
+    WAIT_MS(80)
+    GOTO(10)
+    LABEL(90)
+    CALL(evt_audience_ap_recovery)
+    WAIT_FRAMES(150)
+    CALL_CHILD(_return_home_event)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(ItemEvent_Kirakira_Otoshi)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Kirakira_Otoshi))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Kirakira_Otoshi))
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -874,17 +1382,44 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Kirakira_Otoshi[] = {
-    0, 0, 130, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    6, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 196672, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Kirakira_Otoshi, 658020, 167772160, 0,
+BattleWeapon ItemWeaponData_Kirakira_Otoshi = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    130, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30040, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Kirakira_Otoshi, // mAttackEvtScript
+    {0, 10, 10, 100, 10, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Koorino_Ibuki)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Koorino_Ibuki))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Koorino_Ibuki))
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -972,17 +1507,48 @@ EVT_BEGIN(ItemEvent_Koorino_Ibuki)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Koorino_Ibuki[] = {
-    0, 0, 131, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 33555202, 0, 196672, 2047, -2147483648,
-    0, 0, 0, 0, 6226432, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Koorino_Ibuki, 100, 0, 0,
+BattleWeapon ItemWeaponData_Koorino_Ibuki = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    131, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    2, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30040, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, // burnTime
+    95, // freezeChance
+    2, // freezeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
+    0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
+    0, 0, 0, // hpRegenStrength..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Koorino_Ibuki, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Yurayura_Jishin)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Yurayura_Jishin))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Yurayura_Jishin))
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -1072,17 +1638,44 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Yurayura_Jishin[] = {
-    0, 0, 133, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    5, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870920, 770, 0, 196672, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Yurayura_Jishin, 6579300, 1258947845, 84213760,
+BattleWeapon ItemWeaponData_Yurayura_Jishin = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    133, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000008, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30040, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Yurayura_Jishin, // mAttackEvtScript
+    {0, 100, 100, 100, 75, 10, 5, 5, 5, 5, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Teresano_Fuku)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Teresano_Fuku))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Teresano_Fuku))
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -1155,13 +1748,42 @@ EVT_BEGIN(ItemEvent_Teresano_Fuku)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Teresano_Fuku[] = {
-    0, 0, 134, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1677852672, 0, (s32)ItemEvent_Teresano_Fuku, 100, 0, 0,
+BattleWeapon ItemWeaponData_Teresano_Fuku = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    134, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    100, // invisibleChance
+    2, // invisibleTime
+    0, 0, 0, 0, // hpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Teresano_Fuku, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Biribiri_Kinoko_Core)
@@ -1174,7 +1796,7 @@ EVT_BEGIN(ItemEvent_Biribiri_Kinoko_Core)
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Biribiri_Kinoko)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Biribiri_Kinoko))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Biribiri_Kinoko))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
@@ -1182,13 +1804,43 @@ EVT_BEGIN(ItemEvent_Biribiri_Kinoko)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Biribiri_Kinoko[] = {
-    0, 0, 135, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 100, 83886080, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Biribiri_Kinoko, 100, 0, 0,
+BattleWeapon ItemWeaponData_Biribiri_Kinoko = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    135, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, // poisonStrength..confuseTime
+    100, // electricChance
+    5, // electricTime
+    0, 0, 0, 0, 0, 0, 0, 0, // dodgyChance..sizeChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeStrength..allergicChance
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicTime..frightChance
+    0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
+    0, // fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Biribiri_Kinoko, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Teki_Yokeeru_Core)
@@ -1201,7 +1853,7 @@ EVT_BEGIN(ItemEvent_Teki_Yokeeru_Core)
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Teki_Yokeeru)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Teki_Yokeeru))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Teki_Yokeeru))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
@@ -1209,27 +1861,86 @@ EVT_BEGIN(ItemEvent_Teki_Yokeeru)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Teki_Yokeeru[] = {
-    0, 0, 136, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 6554624, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Teki_Yokeeru, 100, 0, 0,
+BattleWeapon ItemWeaponData_Teki_Yokeeru = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    136, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, // poisonStrength..electricTime
+    100, // dodgyChance
+    4, // dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Teki_Yokeeru, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Madowaseno_Kona[] = {
-    0, 0, 137, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 196608, 2047, -2147483648,
-    0, 0, 6554368, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Madowaseno_Kona, 100, 0, 0,
+BattleWeapon ItemWeaponData_Madowaseno_Kona = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    137, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30000, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, // poisonStrength
+    100, // confuseChance
+    3, // confuseTime
+    0, 0, 0, 0, 0, 0, 0, 0, // electricChance..freezeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
+    0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
+    0, 0, 0, // hpRegenStrength..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Madowaseno_Kona, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 #ifdef VERSION_G8ME01
 EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Nemure_Yoikoyo))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Nemure_Yoikoyo))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
@@ -1254,7 +1965,7 @@ EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
 EVT_END()
 #else
 EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Nemure_Yoikoyo))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Nemure_Yoikoyo))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
@@ -1272,13 +1983,42 @@ EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
 EVT_END()
 #endif
 
-s32 ItemWeaponData_Nemure_Yoikoyo[] = {
-    0, 0, 138, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 196608, 2047, -2147483648,
-    1594163200, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Nemure_Yoikoyo, 100, 0, 0,
+BattleWeapon ItemWeaponData_Nemure_Yoikoyo = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    138, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30000, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    95, // sleepChance
+    5, // sleepTime
+    0, 0, 0, 0, 0, 0, 0, 0, // stopChance..confuseChance
+    0, 0, 0, 0, 0, 0, 0, 0, // confuseTime..freezeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // freezeTime..defChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeTime..fastTime
+    0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
+    0, 0, 0, 0, // hpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Nemure_Yoikoyo, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Stop_Watch_Core)
@@ -1323,7 +2063,7 @@ EVT_BEGIN(ItemEvent_Stop_Watch_Core)
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Stop_Watch)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Stop_Watch))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Stop_Watch))
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -1347,17 +2087,47 @@ EVT_BEGIN(ItemEvent_Stop_Watch)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Stop_Watch[] = {
-    0, 0, 140, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 196608, 2047, -2147483648,
-    24323, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Stop_Watch, 100, 0, 0,
+BattleWeapon ItemWeaponData_Stop_Watch = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    140, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30000, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, // sleepChance..sleepTime
+    95, // stopChance
+    3, // stopTime
+    0, 0, 0, 0, 0, 0, 0, 0, // dizzyChance..electricChance
+    0, 0, 0, 0, 0, 0, 0, 0, // electricTime..sizeChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeTime..defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Stop_Watch, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Guruguru_Memawashi)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Guruguru_Memawashi))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Guruguru_Memawashi))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
@@ -1374,35 +2144,125 @@ EVT_BEGIN(ItemEvent_Guruguru_Memawashi)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Guruguru_Memawashi[] = {
-    0, 0, 141, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 196608, 2047, -2147483648,
-    0, 1677918208, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Guruguru_Memawashi, 100, 0, 0,
+BattleWeapon ItemWeaponData_Guruguru_Memawashi = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    141, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30000, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, // sleepChance..stopTime
+    100, // dizzyChance
+    3, // dizzyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonChance..dodgyChance
+    0, 0, 0, 0, 0, 0, 0, 0, // dodgyTime..sizeChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
+    0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
+    0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Guruguru_Memawashi, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Dekadeka_Drink[] = {
-    0, 0, 142, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 100, 50462720, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Dekadeka_Drink, 100, 0, 0,
+BattleWeapon ItemWeaponData_Dekadeka_Drink = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    142, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, // burnTime..freezeTime
+    100, // sizeChangeChance
+    3, // sizeChangeTime
+    2, // sizeChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
+    0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
+    0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Dekadeka_Drink, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Katikati_Koura[] = {
-    0, 0, 143, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 6554371, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Katikati_Koura, 100, 0, 0,
+BattleWeapon ItemWeaponData_Katikati_Koura = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    143, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, // atkChangeStrength
+    100, // defChangeChance
+    3, // defChangeTime
+    3, // defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Katikati_Koura, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Suitooru)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Suitooru))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Suitooru))
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -1484,82 +2344,277 @@ EVT_BEGIN(ItemEvent_Suitooru)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Suitooru[] = {
-    0, 0, 144, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    5, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 196928, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Suitooru, 100, 0, 0,
+BattleWeapon ItemWeaponData_Suitooru = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    144, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30140, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Suitooru, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemEvent_Teki_Kyouka[] = {
-    131122, -29999988, (s32)ItemWeaponData_Teki_Kyouka, 196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235,
-    (s32)evt_btl_camera_set_homing_unit, 0, -2, -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1,
-    196699, (s32)evt_btl_camera_set_zoom, 0, 200, 65546, 1000, 196699, (s32)btlevtcmd_GetFriendBelong,
-    -2, -30000000, 131096, -30000000, 0, 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_GetBodyId, -2, -29999991, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991, 40, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229996928,
-    524379, (s32)btlevtcmd_MovePosition, -2, -60, -29999999, -29999998, 0, -1,
-    0, 33, 131163, (s32)btlevtcmd_WeaponAftereffect, -29999988, 196699, (s32)btlevtcmd_GetBodyId, -2,
-    -29999991, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991, 52, 196699, (s32)btlevtcmd_CommandFlyItem,
-    -2, 40, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999991, 69, 131163,
-    (s32)btlevtcmd_ConsumeItem, -2, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv,
-    0, 1, 65545, 30, 196699, (s32)btlevtcmd_CheckCommandUnit, -2, -30000000,
-    131097, -30000000, 0, 196699, (s32)btlevtcmd_CheckWeaponPluralTarget, -29999988, -30000000, 131097,
-    -30000000, 0, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy,
-    -2, -30000000, -29999988, 33, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999990, -29999989,
-    32, 196699, (s32)btlevtcmd_CheckWeaponPluralTarget, -29999988, -30000000, 131097, -30000000, 0,
-    196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000,
-    -29999988, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999990, -29999989, 32, 196699, (s32)btlevtcmd_GetEnemyBelong,
-    -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999988, 262235,
-    (s32)btlevtcmd_ChoiceSamplingEnemy, -29999988, -29999990, -29999989, 33, 33, 65539, 10,
-    131096, -29999990, -1, 65540, 90, 33, 393307, (s32)btlevtcmd_snd_se,
-    -29999990, (s32)"SFX_ITEM_RANK_UP_ENEMY1", -250000000, 0, -250000000, 393307, (s32)btlevtcmd_GetHitPos, -29999990,
-    -29999989, -30000000, -29999999, -29999998, 131125, -29999999, 20, 131125,
-    -29999998, 5, 983131, (s32)evt_eff, (s32)"", (s32)"rankup", 0, -30000000,
-    -29999999, -29999998, 0, 0, 0, 0, 0, 0,
-    0, 0, 131163, (s32)_rank_up, -29999990, 196699, (s32)btlevtcmd_CheckWeaponPluralTarget, -29999988,
-    -30000000, 131097, -30000000, 0, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999990, -29999989,
-    32, 131122, -29999990, -1, 33, 65540, 10, 65539,
-    90, 65627, (s32)evt_audience_ap_recovery, 65545, 150, 65630, (s32)_return_home_event, 131163,
-    (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
+EVT_BEGIN(ItemEvent_Teki_Kyouka)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Teki_Kyouka))
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(evt_btl_camera_set_zoom, 0, 200)
+    WAIT_MS(1000)
+    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, -2, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    CALL(btlevtcmd_GetBodyId, -2, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, -2, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        END_IF
+        CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
+    ELSE
+        CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
+        ELSE
+            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
+        END_IF
+    END_IF
+    LABEL(10)
+    IF_INT_EQUAL(LW(10), -1)
+        GOTO(90)
+    END_IF
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_ITEM_RANK_UP_ENEMY1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetHitPos, LW(10), LW(11), LW(0), LW(1), LW(2))
+    ADD(LW(1), 20)
+    ADD(LW(2), 5)
+    CALL(evt_eff, STRING(""), STRING("rankup"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(_rank_up, LW(10))
+    CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
+    ELSE
+        SET_VALUE(LW(10), -1)
+    END_IF
+    GOTO(10)
+    LABEL(90)
+    CALL(evt_audience_ap_recovery)
+    WAIT_FRAMES(150)
+    CALL_CHILD(_return_home_event)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+BattleWeapon ItemWeaponData_Teki_Kyouka = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    145, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Teki_Kyouka, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Teki_Kyouka[] = {
-    0, 0, 145, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Teki_Kyouka, 100, 0, 0,
+BattleWeapon ItemWeaponData_Minimini_Kun = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    146, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30000, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, // burnTime..freezeTime
+    100, // sizeChangeChance
+    3, // sizeChangeTime
+    -2, // sizeChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
+    0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
+    0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Minimini_Kun, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Minimini_Kun[] = {
-    0, 0, 146, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 196608, 2047, -2147483648,
-    0, 0, 0, 0, 100, 66977792, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Minimini_Kun, 100, 0, 0,
+BattleWeapon ItemWeaponData_Funyafunya_Kun = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    147, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30000, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, // atkChangeStrength
+    100, // defChangeChance
+    3, // defChangeTime
+    -3, // defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Funyafunya_Kun, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Funyafunya_Kun[] = {
-    0, 0, 147, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 196608, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 6554621, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Funyafunya_Kun, 100, 0, 0,
-};
-
-s32 ItemWeaponData_Sukkiri_Drink[] = {
-    0, 0, 153, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    1677747200, 1677747200, 6553600, 100, 6553700, 0, 6553600, 1677721600,
-    25600, 0, 0, 0, (s32)ItemEvent_Sukkiri_Drink, 100, 0, 0,
+BattleWeapon ItemWeaponData_Sukkiri_Drink = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    153, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    100, // sleepChance
+    0, // sleepTime
+    100, // stopChance
+    0, // stopTime
+    100, // dizzyChance
+    0, // dizzyTime
+    100, // poisonChance
+    0, 0, // poisonTime..poisonStrength
+    100, // confuseChance
+    0, 0, 0, 0, 0, // confuseTime..dodgyTime
+    100, // burnChance
+    0, // burnTime
+    100, // freezeChance
+    0, // freezeTime
+    100, // sizeChangeChance
+    0, 0, 0, 0, 0, // sizeChangeTime..atkChangeStrength
+    100, // defChangeChance
+    0, 0, // defChangeTime..defChangeStrength
+    100, // allergicChance
+    0, 0, 0, 0, 0, // allergicTime..fastTime
+    100, // slowChance
+    0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
+    0, 0, 0, // hpRegenStrength..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Sukkiri_Drink, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Jiwajiwa_Kinoko_Core)
@@ -1572,7 +2627,7 @@ EVT_BEGIN(ItemEvent_Jiwajiwa_Kinoko_Core)
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Jiwajiwa_Kinoko)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Jiwajiwa_Kinoko))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Jiwajiwa_Kinoko))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
@@ -1580,13 +2635,43 @@ EVT_BEGIN(ItemEvent_Jiwajiwa_Kinoko)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Jiwajiwa_Kinoko[] = {
-    0, 0, 157, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, 4368,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 2562, 0, (s32)ItemEvent_Jiwajiwa_Kinoko, 100, 0, 0,
+BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    157, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x1110, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, // invisibleChance..invisibleTime
+    10, // hpRegenTime
+    2, // hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Jiwajiwa_Kinoko, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Jiwajiwa_Syrup_Core)
@@ -1599,7 +2684,7 @@ EVT_BEGIN(ItemEvent_Jiwajiwa_Syrup_Core)
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Jiwajiwa_Syrup)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Jiwajiwa_Syrup))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Jiwajiwa_Syrup))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
@@ -1607,158 +2692,289 @@ EVT_BEGIN(ItemEvent_Jiwajiwa_Syrup)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Jiwajiwa_Syrup[] = {
-    0, 0, 158, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 167903232, (s32)ItemEvent_Jiwajiwa_Syrup, 100, 0, 0,
+BattleWeapon ItemWeaponData_Jiwajiwa_Syrup = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    158, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, // invisibleChance..hpRegenStrength
+    10, // fpRegenTime
+    2, // fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Jiwajiwa_Syrup, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemEvent_Irekaeeru[] = {
-    131122, -29999988, (s32)ItemWeaponData_Irekaeeru, 65630, (s32)ItemEvent_GetTarget, 131163, (s32)btlevtcmd_WeaponAftereffect, -29999988,
-    65630, (s32)ItemEvent_Support_Sub_UseDeclere, 65545, 30, 131163, (s32)_hpfp_change_declare_1, -29999990, 393307,
-    (s32)btlevtcmd_GetHitPos, -29999990, -29999989, -30000000, -29999999, -29999998, 131125, -29999999,
-    20, 131125, -29999998, 5, 983131, (s32)evt_eff, (s32)"", (s32)"irekae",
-    0, -30000000, -29999999, -29999998, 0, 0, 0, 0,
-    0, 0, 0, 0, 393307, (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_ITEM_HP_FP_CHANGE1",
-    -250000000, 0, -250000000, 65545, 120, 262235, (s32)btlevtcmd_CheckAttribute, -29999990,
-    1048576, -30000000, 131096, -30000000, 0, 196699, (s32)btlevtcmd_GetMaxHp, -29999990,
-    -29999995, 196699, (s32)btlevtcmd_GetHp, -29999990, -29999994, 196699, (s32)btlevtcmd_GetMaxFp, -29999990,
-    -29999993, 196699, (s32)btlevtcmd_GetFp, -29999990, -29999992, 131099, -29999992, -29999995,
-    131122, -29999992, -29999995, 33, 196699, (s32)btlevtcmd_SetHp, -29999990, -29999992,
-    131099, -29999994, -29999993, 131122, -29999994, -29999993, 33, 196699,
-    (s32)btlevtcmd_SetFp, -29999990, -29999994, 131163, (s32)_hpfp_change_declare_2, -29999990, 131096, -29999992,
-    0, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999990, -29999989, -29999988, 256,
-    -29999995, 65570, -29999995, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999990,
-    38, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999990, 39, 65572,
-    2, 196699, (s32)btlevtcmd_StartAvoid, -29999990, 40, 65572, 1, 458843,
-    (s32)btlevtcmd_CheckDamage, -2, -29999990, -29999989, -29999988, 256, -29999995, 49,
-    33, 33, 65627, (s32)evt_audience_ap_recovery, 65545, 30, 65630, (s32)_return_home_event,
-    131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
+EVT_BEGIN(ItemEvent_Irekaeeru)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Irekaeeru))
+    CALL_CHILD(ItemEvent_GetTarget)
+    CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
+    WAIT_FRAMES(30)
+    CALL(_hpfp_change_declare_1, LW(10))
+    CALL(btlevtcmd_GetHitPos, LW(10), LW(11), LW(0), LW(1), LW(2))
+    ADD(LW(1), 20)
+    ADD(LW(2), 5)
+    CALL(evt_eff, STRING(""), STRING("irekae"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_ITEM_HP_FP_CHANGE1"), -250000000, 0, -250000000)
+    WAIT_FRAMES(120)
+    CALL(btlevtcmd_CheckAttribute, LW(10), 1048576, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_GetMaxHp, LW(10), LW(5))
+        CALL(btlevtcmd_GetHp, LW(10), LW(6))
+        CALL(btlevtcmd_GetMaxFp, LW(10), LW(7))
+        CALL(btlevtcmd_GetFp, LW(10), LW(8))
+        IF_INT_GREATER(LW(8), LW(5))
+            SET_VALUE(LW(8), LW(5))
+        END_IF
+        CALL(btlevtcmd_SetHp, LW(10), LW(8))
+        IF_INT_GREATER(LW(6), LW(7))
+            SET_VALUE(LW(6), LW(7))
+        END_IF
+        CALL(btlevtcmd_SetFp, LW(10), LW(6))
+        CALL(_hpfp_change_declare_2, LW(10))
+        IF_INT_EQUAL(LW(8), 0)
+            CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+            SWITCH(LW(5))
+                CASE_EQUAL(3)
+                CALL(btlevtcmd_StartAvoid, LW(10), 38)
+                CASE_EQUAL(6)
+                CALL(btlevtcmd_StartAvoid, LW(10), 39)
+                CASE_EQUAL(2)
+                CALL(btlevtcmd_StartAvoid, LW(10), 40)
+                CASE_EQUAL(1)
+                CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+            END_SWITCH
+        END_IF
+    END_IF
+    CALL(evt_audience_ap_recovery)
+    WAIT_FRAMES(30)
+    CALL_CHILD(_return_home_event)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+BattleWeapon ItemWeaponData_Irekaeeru = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    161, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, // element
+    27, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Irekaeeru, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Irekaeeru[] = {
-    0, 0, 161, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 1770242, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Irekaeeru, 100, 0, 0,
-};
+EVT_BEGIN(ItemEvent_Attiike_Shisshi)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Attiike_Shisshi))
+    CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ITEM_HORROR1"), -250000000, 0, -250000000)
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(60)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ITEM_HORROR2"), -250000000, 0, -250000000)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(evt_eff64, 0, STRING("holography_n64"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 120, 0, 0, 0, 0, 0, 0)
+    BEGIN_SIBLING_EVENT
+        WAIT_MS(400)
+        CALL(evt_env_blur_on, 0, 1600)
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        WAIT_MS(400)
+        CALL(evt_btl_camera_set_mode, 0, 3)
+        CALL(evt_btl_camera_set_moveto, 0, 0, 90, 450, 0, 60, 0, 30, 11)
+        WAIT_MS(250)
+        CALL(evt_btl_camera_set_moveto, 0, 0, 110, 750, 0, 60, 0, 30, 11)
+        WAIT_MS(250)
+        CALL(evt_btl_camera_set_moveto, 0, 0, 90, 450, 0, 60, 0, 30, 11)
+        WAIT_MS(250)
+        CALL(evt_btl_camera_set_moveto, 0, 0, 110, 750, 0, 60, 0, 30, 11)
+        WAIT_MS(250)
+        CALL(evt_btl_camera_set_moveto, 0, 0, 90, 450, 0, 60, 0, 30, 11)
+        WAIT_MS(250)
+        CALL(evt_btl_camera_set_moveto, 0, 0, 110, 750, 0, 60, 0, 30, 11)
+        WAIT_MS(250)
+        CALL(evt_btl_camera_set_mode, 0, 0)
+        CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    END_SIBLING_EVENT
+    WAIT_MS(2000)
+    CALL_CHILD(ItemEvent_Support_Sub_Effect)
+    CALL(evt_audience_ap_recovery)
+    WAIT_MS(2500)
+    CALL_CHILD(_return_home_event)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
-s32 ItemEvent_Attiike_Shisshi[] = {
-    131122, -29999988, (s32)ItemWeaponData_Attiike_Shisshi, 131163, (s32)btlevtcmd_WeaponAftereffect, -29999988, 65630, (s32)ItemEvent_Support_Sub_UseDeclere,
-    65545, 30, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ITEM_HORROR1", -250000000, 0,
-    -250000000, 110, 65545, 60, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ITEM_HORROR2",
-    -250000000, 0, -250000000, 112, 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
-    -29999999, -29999998, 983131, (s32)evt_eff64, 0, (s32)"holography_n64", 0, -30000000,
-    -29999999, -29999998, -229998976, 120, 0, 0, 0, 0,
-    0, 0, 110, 65546, 400, 196699, (s32)evt_env_blur_on, 0,
-    1600, 112, 110, 65546, 400, 196699, (s32)evt_btl_camera_set_mode, 0,
-    3, 655451, (s32)evt_btl_camera_set_moveto, 0, 0, 90, 450, 0,
-    60, 0, 30, 11, 65546, 250, 655451, (s32)evt_btl_camera_set_moveto,
-    0, 0, 110, 750, 0, 60, 0, 30,
-    11, 65546, 250, 655451, (s32)evt_btl_camera_set_moveto, 0, 0, 90,
-    450, 0, 60, 0, 30, 11, 65546, 250,
-    655451, (s32)evt_btl_camera_set_moveto, 0, 0, 110, 750, 0, 60,
-    0, 30, 11, 65546, 250, 655451, (s32)evt_btl_camera_set_moveto, 0,
-    0, 90, 450, 0, 60, 0, 30, 11,
-    65546, 250, 655451, (s32)evt_btl_camera_set_moveto, 0, 0, 110, 750,
-    0, 60, 0, 30, 11, 65546, 250, 196699,
-    (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 112,
-    65546, 2000, 65630, (s32)ItemEvent_Support_Sub_Effect, 65627, (s32)evt_audience_ap_recovery, 65546, 2500,
-    65630, (s32)_return_home_event, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
-
-s32 ItemWeaponData_Attiike_Shisshi[] = {
-    0, 0, 162, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 196608, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 1677721600, 0, 0, (s32)ItemEvent_Attiike_Shisshi, 100, 0, 0,
+BattleWeapon ItemWeaponData_Attiike_Shisshi = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    162, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30000, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, // fastChance..slowTime
+    100, // frightChance
+    0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
+    0, // fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Attiike_Shisshi, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Naniga_Okorukana)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Naniga_Okorukana))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Naniga_Okorukana))
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
     CALL(_naniga_okorukana_check, -2, LW(13))
     SWITCH(LW(13))
         CASE_EQUAL(148)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Kinoko))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Kinoko))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         SET_VALUE(LW(9), 148)
         CALL_CHILD(PTR(ItemEvent_Recovery_Core))
         CASE_EQUAL(150)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Ultra_Kinoko))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Ultra_Kinoko))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         SET_VALUE(LW(9), 150)
         CALL_CHILD(PTR(ItemEvent_Recovery_Core))
         CASE_EQUAL(152)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Sinabita_Kinoko))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Sinabita_Kinoko))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         SET_VALUE(LW(9), 152)
         CALL_CHILD(PTR(ItemEvent_Recovery_Core))
         CASE_EQUAL(154)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Honey_Syrup))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Honey_Syrup))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         SET_VALUE(LW(9), 154)
         CALL_CHILD(PTR(ItemEvent_Recovery_Core))
         CASE_EQUAL(156)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Royal_Jelly))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Royal_Jelly))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         SET_VALUE(LW(9), 156)
         CALL_CHILD(PTR(ItemEvent_Recovery_Core))
         CASE_EQUAL(135)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Biribiri_Kinoko))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Biribiri_Kinoko))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         CALL_CHILD(PTR(ItemEvent_Biribiri_Kinoko_Core))
         CASE_EQUAL(136)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Teki_Yokeeru))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Teki_Yokeeru))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         CALL_CHILD(PTR(ItemEvent_Teki_Yokeeru_Core))
         CASE_EQUAL(157)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Jiwajiwa_Kinoko))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Jiwajiwa_Kinoko))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         CALL_CHILD(PTR(ItemEvent_Jiwajiwa_Kinoko_Core))
         CASE_EQUAL(158)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Jiwajiwa_Syrup))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Jiwajiwa_Syrup))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         CALL_CHILD(PTR(ItemEvent_Jiwajiwa_Syrup_Core))
         CASE_EQUAL(128)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Kaminari_Gorogoro))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Gorogoro))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         CALL_CHILD(PTR(ItemEvent_Kaminari_Core))
         CASE_EQUAL(129)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Kaminari_Dokkan))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Dokkan))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         CALL_CHILD(PTR(ItemEvent_Kaminari_Core))
         CASE_EQUAL(132)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Fire_Flower))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Fire_Flower))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         CALL_CHILD(PTR(ItemEvent_Fire_Flower_Core))
         CASE_EQUAL(130)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Kirakira_Otoshi))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Kirakira_Otoshi))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         CALL_CHILD(PTR(ItemEvent_Kirakira_Otoshi_Core))
         CASE_EQUAL(140)
-        SET_VALUE(LW(12), PTR(ItemWeaponData_Stop_Watch))
+        SET_VALUE(LW(12), PTR(&ItemWeaponData_Stop_Watch))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         CALL_CHILD(PTR(ItemEvent_Stop_Watch_Core))
@@ -1770,13 +2986,40 @@ EVT_BEGIN(ItemEvent_Naniga_Okorukana)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_Naniga_Okorukana[] = {
-    0, 0, 163, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34603104, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Naniga_Okorukana, 100, 0, 0,
+BattleWeapon ItemWeaponData_Naniga_Okorukana = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    163, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2100060, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Naniga_Okorukana, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 s32 R_mystery_item_table[] = {
@@ -1784,22 +3027,80 @@ s32 R_mystery_item_table[] = {
     152, 129, 132, 130, 140, 0,
 };
 
-s32 ItemWeaponData_Shikaeshino_Kona[] = {
-    0, 0, 177, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 768, 0, 0, (s32)ItemEvent_Shikaeshino_Kona, 100, 0, 0,
+BattleWeapon ItemWeaponData_Shikaeshino_Kona = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    177, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, // fastChance..galeForceChance
+    3, // paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Shikaeshino_Kona, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_Kameno_Noroi[] = {
-    0, 0, 178, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 196616, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    25603, 0, 0, 0, (s32)ItemEvent_Kameno_Noroi, 100, 0, 0,
+BattleWeapon ItemWeaponData_Kameno_Noroi = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    178, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30008, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, // fastChance..fastTime
+    100, // slowChance
+    3, // slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Kameno_Noroi, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_RecoveryAndStatus)
@@ -1840,23 +3141,23 @@ EVT_BEGIN(ItemEvent_RecoveryAndStatus)
         CASE_EQUAL(216)
         CALL(evt_sub_random, 100, LW(0))
         IF_INT_LESS(LW(0), 40)
-            SET_VALUE(LW(8), PTR(ItemWeaponData_FirstLovePuddingBiribiri))
+            SET_VALUE(LW(8), PTR(&ItemWeaponData_FirstLovePuddingBiribiri))
             ELSE
             IF_INT_LESS(LW(0), 80)
-                SET_VALUE(LW(8), PTR(ItemWeaponData_FirstLovePuddingTrans))
+                SET_VALUE(LW(8), PTR(&ItemWeaponData_FirstLovePuddingTrans))
                 ELSE
-                SET_VALUE(LW(8), PTR(ItemWeaponData_FirstLovePuddingSleep))
+                SET_VALUE(LW(8), PTR(&ItemWeaponData_FirstLovePuddingSleep))
             END_IF
         END_IF
         CASE_EQUAL(226)
         CALL(evt_sub_random, 100, LW(0))
         IF_INT_LESS(LW(0), 40)
-            SET_VALUE(LW(8), PTR(ItemWeaponData_PeachTaltBiribiri))
+            SET_VALUE(LW(8), PTR(&ItemWeaponData_PeachTaltBiribiri))
             ELSE
             IF_INT_LESS(LW(0), 80)
-                SET_VALUE(LW(8), PTR(ItemWeaponData_PeachTaltDodge))
+                SET_VALUE(LW(8), PTR(&ItemWeaponData_PeachTaltDodge))
                 ELSE
-                SET_VALUE(LW(8), PTR(ItemWeaponData_PeachTaltSleep))
+                SET_VALUE(LW(8), PTR(&ItemWeaponData_PeachTaltSleep))
             END_IF
         END_IF
         CASE_OR_EQUAL(233)
@@ -1883,175 +3184,768 @@ EVT_BEGIN(ItemEvent_RecoveryAndStatus)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_SpaceFood[] = {
-    0, 0, 198, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 839057408,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_SpaceFood = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    198, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, // atkChangeStrength..defChangeStrength
+    50, // allergicChance
+    3, // allergicTime
+    0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
+    0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_IceCandy[] = {
-    0, 0, 199, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 1311232, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_IceCandy = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    199, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, // burnTime
+    20, // freezeChance
+    2, // freezeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
+    0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
+    0, 0, 0, // hpRegenStrength..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_NancyFrappe[] = {
-    0, 0, 200, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 1311232, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_NancyFrappe = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    200, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, // burnTime
+    20, // freezeChance
+    2, // freezeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
+    0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
+    0, 0, 0, // hpRegenStrength..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_SnowRabbit[] = {
-    0, 0, 201, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 3277568, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_SnowRabbit = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    201, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, // burnTime
+    50, // freezeChance
+    3, // freezeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
+    0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
+    0, 0, 0, // hpRegenStrength..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_TeaKinoko[] = {
-    0, 0, 212, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 6554623, 0,
-    0, 0, 1282, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_TeaKinoko = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    212, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, // atkChangeStrength
+    100, // defChangeChance
+    3, // defChangeTime
+    -1, // defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, // frightChance..invisibleTime
+    5, // hpRegenTime
+    2, // hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_FirstLovePuddingBiribiri[] = {
-    0, 0, 216, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 100, 33554432, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_FirstLovePuddingBiribiri = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    216, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, // poisonStrength..confuseTime
+    100, // electricChance
+    2, // electricTime
+    0, 0, 0, 0, 0, 0, 0, 0, // dodgyChance..sizeChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeStrength..allergicChance
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicTime..frightChance
+    0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
+    0, // fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_FirstLovePuddingTrans[] = {
-    0, 0, 216, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1677852672, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_FirstLovePuddingTrans = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    216, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    100, // invisibleChance
+    2, // invisibleTime
+    0, 0, 0, 0, // hpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_FirstLovePuddingSleep[] = {
-    0, 0, 216, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    1677852672, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_FirstLovePuddingSleep = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    216, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    100, // sleepChance
+    2, // sleepTime
+    0, 0, 0, 0, 0, 0, 0, 0, // stopChance..confuseChance
+    0, 0, 0, 0, 0, 0, 0, 0, // confuseTime..freezeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // freezeTime..defChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeTime..fastTime
+    0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
+    0, 0, 0, 0, // hpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_StarryDinner[] = {
-    0, 0, 217, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 770, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_StarryDinner = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    217, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, // invisibleChance..invisibleTime
+    3, // hpRegenTime
+    2, // hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_KararinaPasta[] = {
-    0, 0, 224, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 1,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_KararinaPasta = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    224, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..ohkoChance
+    1, // chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_MeromeroCake[] = {
-    0, 0, 225, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 6554623, 0,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_MeromeroCake = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    225, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, // atkChangeStrength
+    100, // defChangeChance
+    3, // defChangeTime
+    -1, // defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_PeachTaltBiribiri[] = {
-    0, 0, 226, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 100, 33554432, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_PeachTaltBiribiri = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    226, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, // poisonStrength..confuseTime
+    100, // electricChance
+    2, // electricTime
+    0, 0, 0, 0, 0, 0, 0, 0, // dodgyChance..sizeChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeStrength..allergicChance
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicTime..frightChance
+    0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
+    0, // fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_PeachTaltDodge[] = {
-    0, 0, 226, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 6554112, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_PeachTaltDodge = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    226, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, // poisonStrength..electricTime
+    100, // dodgyChance
+    2, // dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_PeachTaltSleep[] = {
-    0, 0, 226, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    1677852672, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_PeachTaltSleep = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    226, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    100, // sleepChance
+    2, // sleepTime
+    0, 0, 0, 0, 0, 0, 0, 0, // stopChance..confuseChance
+    0, 0, 0, 0, 0, 0, 0, 0, // confuseTime..freezeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // freezeTime..defChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeTime..fastTime
+    0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
+    0, 0, 0, 0, // hpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_BiribiriCandy[] = {
-    0, 0, 227, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 100, 67108864, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_BiribiriCandy = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    227, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, // poisonStrength..confuseTime
+    100, // electricChance
+    4, // electricTime
+    0, 0, 0, 0, 0, 0, 0, 0, // dodgyChance..sizeChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeStrength..allergicChance
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicTime..frightChance
+    0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
+    0, // fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_HealthySalad[] = {
-    0, 0, 233, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    1677747200, 1677747200, 6553600, 100, 6553700, 0, 6553600, 1677721600,
-    25600, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_HealthySalad = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    233, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    100, // sleepChance
+    0, // sleepTime
+    100, // stopChance
+    0, // stopTime
+    100, // dizzyChance
+    0, // dizzyTime
+    100, // poisonChance
+    0, 0, // poisonTime..poisonStrength
+    100, // confuseChance
+    0, 0, 0, 0, 0, // confuseTime..dodgyTime
+    100, // burnChance
+    0, // burnTime
+    100, // freezeChance
+    0, // freezeTime
+    100, // sizeChangeChance
+    0, 0, 0, 0, 0, // sizeChangeTime..atkChangeStrength
+    100, // defChangeChance
+    0, 0, // defChangeTime..defChangeStrength
+    100, // allergicChance
+    0, 0, 0, 0, 0, // allergicTime..fastTime
+    100, // slowChance
+    0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
+    0, 0, 0, // hpRegenStrength..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_FreshJuice[] = {
-    0, 0, 235, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    1677747200, 1677747200, 6553600, 100, 6553700, 0, 6553600, 1677721600,
-    25600, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_FreshJuice = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    235, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    100, // sleepChance
+    0, // sleepTime
+    100, // stopChance
+    0, // stopTime
+    100, // dizzyChance
+    0, // dizzyTime
+    100, // poisonChance
+    0, 0, // poisonTime..poisonStrength
+    100, // confuseChance
+    0, 0, 0, 0, 0, // confuseTime..dodgyTime
+    100, // burnChance
+    0, // burnTime
+    100, // freezeChance
+    0, // freezeTime
+    100, // sizeChangeChance
+    0, 0, 0, 0, 0, // sizeChangeTime..atkChangeStrength
+    100, // defChangeChance
+    0, 0, // defChangeTime..defChangeStrength
+    100, // allergicChance
+    0, 0, 0, 0, 0, // allergicTime..fastTime
+    100, // slowChance
+    0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
+    0, 0, 0, // hpRegenStrength..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_RedKararing[] = {
-    0, 0, 173, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 1,
-    0, 0, 0, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_RedKararing = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    173, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..ohkoChance
+    1, // chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_FutarideForever[] = {
-    0, 0, 219, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830240, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 2562, 0, (s32)ItemEvent_RecoveryAndStatus, 100, 0, 0,
+BattleWeapon ItemWeaponData_FutarideForever = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    219, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, // invisibleChance..invisibleTime
+    10, // hpRegenTime
+    2, // hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_ThrowAttack)
@@ -2177,44 +4071,155 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_NancyDynamite[] = {
-    0, 0, 196, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    7, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 50332418, 0, 196672, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_ThrowAttack, 100, 328965, 83886080,
+BattleWeapon ItemWeaponData_NancyDynamite = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    196, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    3, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30040, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_ThrowAttack, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_CoconutsBomb[] = {
-    0, 0, 202, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    7, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 50332418, 0, 196672, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_ThrowAttack, 100, 328965, 83886080,
+BattleWeapon ItemWeaponData_CoconutsBomb = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    202, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    3, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30040, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_ThrowAttack, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_KachikachiDish[] = {
-    0, 0, 203, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 196672, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_ThrowAttack, 100, 328965, 83886080,
+BattleWeapon ItemWeaponData_KachikachiDish = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    203, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30040, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_ThrowAttack, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
 };
 
-s32 ItemWeaponData_BomberEgg[] = {
-    0, 0, 209, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    6, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 50332418, 0, 196672, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_ThrowAttack, 100, 328965, 83886080,
+BattleWeapon ItemWeaponData_BomberEgg = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    209, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    3, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30040, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_ThrowAttack, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Poison_Kinoko)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_PoisonKinoko))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_PoisonKinoko))
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
@@ -2241,13 +4246,43 @@ CALL(btlevtcmd_StartWaitEvent, -2)
 RETURN
 EVT_END()
 
-s32 ItemWeaponData_PoisonKinoko[] = {
-    0, 0, 213, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerHPHalf2,
-    7, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196680, 2047, -2147483648,
-    0, 25603, 16777216, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_Poison_Kinoko, 100, 328965, 83886080,
+BattleWeapon ItemWeaponData_PoisonKinoko = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    213, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerHPHalf2, // hpDamageFn
+    {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30048, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, // sleepChance..dizzyTime
+    100, // poisonChance
+    3, // poisonTime
+    1, // poisonStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // confuseChance..burnTime
+    0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
+    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
+    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_Poison_Kinoko, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // field_B4
 };
 
 
@@ -2569,7 +4604,7 @@ USER_FUNC(_full_ap_recover) {
 }
 
 EVT_BEGIN(ItemEvent_LastDinner)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_PoisonKinoko))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_PoisonKinoko))
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
@@ -2610,71 +4645,98 @@ EVT_BEGIN(ItemEvent_LastDinner)
     RETURN
 EVT_END()
 
-s32 ItemWeaponData_LastDinner[] = {
-    0, 0, 218, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_LastDinner, 100, 0, 0,
+BattleWeapon ItemWeaponData_LastDinner = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    218, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x30108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    ItemEvent_LastDinner, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(ItemEvent_Kaminari_Dokkan)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Kaminari_Dokkan))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Dokkan))
     CALL_CHILD(PTR(ItemEvent_Kaminari))
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Kaminari_Gorogoro)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Kaminari_Gorogoro))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Gorogoro))
     CALL_CHILD(PTR(ItemEvent_Kaminari))
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Madowaseno_Kona)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Madowaseno_Kona))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Madowaseno_Kona))
     CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Dekadeka_Drink)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Dekadeka_Drink))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Dekadeka_Drink))
     CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Katikati_Koura)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Katikati_Koura))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Katikati_Koura))
     CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Minimini_Kun)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Minimini_Kun))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Minimini_Kun))
     CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Funyafunya_Kun)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Funyafunya_Kun))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Funyafunya_Kun))
     CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Sukkiri_Drink)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Sukkiri_Drink))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Sukkiri_Drink))
     CALL_CHILD(PTR(ItemEvent_Support_RefreshEffect))
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Shikaeshino_Kona)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Shikaeshino_Kona))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Shikaeshino_Kona))
     CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Kameno_Noroi)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Kameno_Noroi))
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Kameno_Noroi))
     CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
     RETURN
 EVT_END()

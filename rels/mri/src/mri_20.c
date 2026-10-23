@@ -3,6 +3,7 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
 #include "mri.h"
+#include "data_tables.h"
 
 #pragma force_active on
 
@@ -18,90 +19,142 @@ USER_FUNC(evt_puni_set_yuka);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 
-__declspec(section ".data") u64 fd_mri_20_negone_one_374;
-__declspec(section ".data") s32 fd_mri_20_neg_one_382[1];
-__declspec(section ".data") s32 fd_mri_20___local_PI_383[1];
-__declspec(section ".data") s32 fd_mri_20___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_mri_20_one_negone_373;
-__declspec(section ".data") s32 fd_mri_20___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_mri_20_one_381[1];
-__declspec(section ".data") u64 fd_mri_20_negone_one_360;
-__declspec(section ".data") s32 fd_mri_20_neg_one_365[1];
-__declspec(section ".data") s32 fd_mri_20___local_PI_366[1];
-__declspec(section ".data") s32 fd_mri_20___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_mri_20_one_negone_359;
-__declspec(section ".data") s32 fd_mri_20___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_mri_20_one_364[1];
-s32 bero_black_shadow[15];
-static s32 bero_entry_data[75];
+__declspec(section ".data") f32 fd_mri_20_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_20_neg_one_382;
+__declspec(section ".data") f32 fd_mri_20___local_PI_383;
+__declspec(section ".data") f32 fd_mri_20___local_3PIO2_385;
+__declspec(section ".data") f32 fd_mri_20_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_20___local_PIO2_384;
+__declspec(section ".data") f32 fd_mri_20_one_381;
+__declspec(section ".data") f32 fd_mri_20_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_20_neg_one_365;
+__declspec(section ".data") f32 fd_mri_20___local_PI_366;
+__declspec(section ".data") f32 fd_mri_20___local_3PIO2_368;
+__declspec(section ".data") f32 fd_mri_20_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_20___local_PIO2_367;
+__declspec(section ".data") f32 fd_mri_20_one_364;
+BeroEntry bero_black_shadow[1];
+static BeroEntry bero_entry_data[5];
 static s32 evt_ueki_08[20];
-static s32 ueki_access_data[28];
+static KusaAccess ueki_access_data[7];
 s32 mri_20_init_evt[123];
 
-__declspec(section ".data") u64 fd_mri_20_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mri_20_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mri_20_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_mri_20_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_mri_20___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_mri_20___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_mri_20_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_mri_20___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_mri_20_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_mri_20_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_mri_20_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_mri_20___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_mri_20___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_mri_20_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_mri_20___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_mri_20_one_364 = 1.0f;
+
+BeroEntry bero_black_shadow[] = {
+    {
+        "dokan1", // hitName
+        2, // type
+        0, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        10, // caseType
+        NULL, // exitEvent
+        (s32)"mri_04", // nextMapName
+        "", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
 };
 
-__declspec(section ".data") s32 fd_mri_20___local_PI_383[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_mri_20___local_3PIO2_385[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_mri_20_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_mri_20___local_PIO2_384[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_mri_20_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_mri_20_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_mri_20_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_mri_20___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_mri_20___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_mri_20_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_mri_20___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_mri_20_one_364[] = {
-    1065353216,
-};
-
-s32 bero_black_shadow[] = {
-    (s32)"dokan1", 131072, 2, 100000, 0, 0, -1, 0,
-    10, 0, (s32)"mri_04", (s32)"", 65537, 0, 0,
-};
-
-static s32 bero_entry_data[] = {
-    (s32)"dokan1", 131072, 2, 100000, 0, 0, -1, 0,
-    10, 0, (s32)"mri_03", (s32)"dokan", 65537, 0, 0, (s32)"dokan2",
-    131072, 9, 100000, 0, 0, -1, 0, 6,
-    0, (s32)"mri_02", (s32)"dokan3", 65537, 0, 0, (s32)"dokan3", 131072,
-    9, 100000, 0, 0, -1, 0, 6, 0,
-    0, (s32)"dokan4", 65537, 0, 0, (s32)"dokan4", 131072, 6,
-    100000, 0, 0, -1, 0, 10, 0, 0,
-    (s32)"dokan3", 65537, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "dokan1", // hitName
+        2, // type
+        0, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        10, // caseType
+        NULL, // exitEvent
+        (s32)"mri_03", // nextMapName
+        "dokan", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan2", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, // exitEvent
+        (s32)"mri_02", // nextMapName
+        "dokan3", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan3", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan4", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan4", // hitName
+        2, // type
+        0, // sfxId
+        6, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        10, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan3", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(evt_ueki_08)
@@ -112,11 +165,14 @@ static EVT_BEGIN(evt_ueki_08)
     RETURN
 EVT_END()
 
-static s32 ueki_access_data[] = {
-    1, (s32)"A_ueki01", (s32)"S_ueki01", 0, 1, (s32)"A_ueki02", (s32)"S_ueki02", 0,
-    1, (s32)"A_ueki03", (s32)"S_ueki03", 0, 1, (s32)"A_ueki04", (s32)"S_ueki04", 0,
-    1, (s32)"A_ueki05", (s32)"S_ueki05", 0, 1, (s32)"A_ueki08", (s32)"S_ueki08", (s32)evt_ueki_08,
-    4, 0, 0, 0,
+static KusaAccess ueki_access_data[] = {
+    {1, "A_ueki01", "S_ueki01", NULL},
+    {1, "A_ueki02", "S_ueki02", NULL},
+    {1, "A_ueki03", "S_ueki03", NULL},
+    {1, "A_ueki04", "S_ueki04", NULL},
+    {1, "A_ueki05", "S_ueki05", NULL},
+    {1, "A_ueki08", "S_ueki08", evt_ueki_08},
+    {4, NULL, NULL, NULL},
 };
 
 EVT_BEGIN(mri_20_init_evt)

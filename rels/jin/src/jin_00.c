@@ -25,6 +25,8 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_party.h"
 #include "jin.h"
+#include "data_tables.h"
+#include "mario/mario_pouch.h"
 
 int rand(void);
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
@@ -153,20 +155,20 @@ f32 computeAngle(ExtPose* pose, MarioWork* mp);
 static f32 randf(f32 min, f32 max);
 s32 randn(s32 min, s32 max);
 
-__declspec(section ".data") u64 fd_jin_00_negone_one_374;
-__declspec(section ".data") s32 fd_jin_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_jin_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_jin_00___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_jin_00_one_negone_373;
-__declspec(section ".data") s32 fd_jin_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_jin_00_one_381[1];
-__declspec(section ".data") u64 fd_jin_00_negone_one_360;
-__declspec(section ".data") s32 fd_jin_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_jin_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_jin_00___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_jin_00_one_negone_359;
-__declspec(section ".data") s32 fd_jin_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_jin_00_one_364[1];
+__declspec(section ".data") f32 fd_jin_00_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_00_neg_one_382;
+__declspec(section ".data") f32 fd_jin_00___local_PI_383;
+__declspec(section ".data") f32 fd_jin_00___local_3PIO2_385;
+__declspec(section ".data") f32 fd_jin_00_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_00___local_PIO2_384;
+__declspec(section ".data") f32 fd_jin_00_one_381;
+__declspec(section ".data") f32 fd_jin_00_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_00_neg_one_365;
+__declspec(section ".data") f32 fd_jin_00___local_PI_366;
+__declspec(section ".data") f32 fd_jin_00___local_3PIO2_368;
+__declspec(section ".data") f32 fd_jin_00_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_00___local_PIO2_367;
+__declspec(section ".data") f32 fd_jin_00_one_364;
 static s32 w_open[22];
 static s32 w_close[22];
 __declspec(section ".data") s32 n3_open[12];
@@ -191,8 +193,8 @@ s32 door_teresa_n[90];
 s32 teresa_s_fadein[48];
 s32 teresa_s_fadeout[35];
 s32 door_teresa_s[90];
-s32 bero_stg4majo3nin[15];
-static s32 bero_entry_data[150];
+BeroEntry bero_stg4majo3nin[1];
+static BeroEntry bero_entry_data[10];
 s32 first_jin00[69];
 static s32 push_evt[297];
 __declspec(section ".data") s32 nopush_evt[5];
@@ -207,8 +209,8 @@ s32 tyuou_teresa_talk[391];
 s32 oku_teresa_init[21];
 s32 temae_teresa_init[21];
 __declspec(section ".data") s32 atomic_teresa_init[2];
-static s32 npcEnt[276];
-static s32 senteresa_ext_entry_data[141];
+static NpcSetupInfo npcEnt[12];
+static ExtTexInfo senteresa_ext_entry_data[47];
 s32 senteresa_evt[1248];
 s32 jin_00_init_evt[221];
 
@@ -342,53 +344,33 @@ static void senteresa_ext_init(void) {
     g_vecRotCenter.z = mp->position.z;
 }
 
-__declspec(section ".data") u64 fd_jin_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_jin_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_jin_00_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_jin_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_jin_00___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_jin_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_jin_00___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_jin_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_jin_00_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_jin_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_jin_00___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_jin_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_jin_00_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_jin_00_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_jin_00_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_jin_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_jin_00_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_jin_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_jin_00___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_jin_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_jin_00___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_jin_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_jin_00_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_jin_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_jin_00___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_jin_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_jin_00_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_jin_00_one_364 = 1.0f;
 
 static EVT_BEGIN(w_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -661,31 +643,188 @@ EVT_BEGIN(door_teresa_s)
     RETURN
 EVT_END()
 
-s32 bero_stg4majo3nin[] = {
-    (s32)"w_bero", 65542, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"usu_00", (s32)"evt_majo3", 327685, (s32)w_close, (s32)w_open,
+BeroEntry bero_stg4majo3nin[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"usu_00", // nextMapName
+        "evt_majo3", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_close, // enterAnimeArg
+        (s32)w_open, // exitAnimeArg
+    },
 };
 
-static s32 bero_entry_data[] = {
-    (s32)"n_bero_1", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)check_roll, (s32)"jin_05", (s32)"s_bero", 65537, 0, 0, (s32)"ana",
-    251658240, 20000, 100000, 0, 0, -1, (s32)jin_00_dai_in, 0,
-    (s32)jin_00_dai, (s32)"jin_06", 0, 262148, 0, 0, (s32)"w_bero", 65542,
-    20000, 100000, 0, 0, 120, 0, -1, 0,
-    (s32)"gra_06", (s32)"n_bero", 327685, (s32)w_close, (s32)w_open, (s32)"n_bero_3", 65538, 20000,
-    100000, 0, 0, -1, 0, -1, (s32)door_teresa_n, (s32)"jin_01",
-    (s32)"s_bero_1", 327685, (s32)n3_close, (s32)n3_open, (s32)"s_bero", 65538, 20000, 100000,
-    0, 0, -1, 0, -1, (s32)door_teresa_s, (s32)"jin_02", (s32)"n_bero_1",
-    327685, (s32)s_close, (s32)s_open, (s32)"n_bero_2", 65538, 20000, 100000, 0,
-    0, -1, 0, -1, 0, (s32)"jin_04", (s32)"s_bero", 327685,
-    (s32)n2_close, (s32)n2_open, (s32)"e_bero_3", 65538, 20000, 100000, 0, 0,
-    -1, 0, -1, 0, (s32)"jin_03", (s32)"w_bero3", 327685, (s32)e3_close,
-    (s32)e3_open, (s32)"e_bero_1", 65538, 20000, 100000, 0, 0, -1,
-    0, -1, 0, (s32)"jin_03", (s32)"w_bero1", 327685, (s32)e1_close, (s32)e1_open,
-    (s32)"e_bero_2", 65538, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"jin_03", (s32)"w_bero2", 327685, (s32)e2_close, (s32)e2_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "n_bero_1", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)check_roll, // exitEvent
+        (s32)"jin_05", // nextMapName
+        "s_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "ana", // hitName
+        3840, // type
+        0, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)jin_00_dai_in, // enterEvent
+        0, // caseType
+        (s32*)jin_00_dai, // exitEvent
+        (s32)"jin_06", // nextMapName
+        NULL, // nextBeroName
+        4, // enterAnimeType
+        4, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "w_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        120, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gra_06", // nextMapName
+        "n_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_close, // enterAnimeArg
+        (s32)w_open, // exitAnimeArg
+    },
+    {
+        "n_bero_3", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)door_teresa_n, // exitEvent
+        (s32)"jin_01", // nextMapName
+        "s_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n3_close, // enterAnimeArg
+        (s32)n3_open, // exitAnimeArg
+    },
+    {
+        "s_bero", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)door_teresa_s, // exitEvent
+        (s32)"jin_02", // nextMapName
+        "n_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s_close, // enterAnimeArg
+        (s32)s_open, // exitAnimeArg
+    },
+    {
+        "n_bero_2", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"jin_04", // nextMapName
+        "s_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n2_close, // enterAnimeArg
+        (s32)n2_open, // exitAnimeArg
+    },
+    {
+        "e_bero_3", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"jin_03", // nextMapName
+        "w_bero3", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e3_close, // enterAnimeArg
+        (s32)e3_open, // exitAnimeArg
+    },
+    {
+        "e_bero_1", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"jin_03", // nextMapName
+        "w_bero1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e1_close, // enterAnimeArg
+        (s32)e1_open, // exitAnimeArg
+    },
+    {
+        "e_bero_2", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"jin_03", // nextMapName
+        "w_bero2", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e2_close, // enterAnimeArg
+        (s32)e2_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(first_jin00)
@@ -804,7 +943,7 @@ static __declspec(section ".data") EVT_BEGIN(evt_key)
 EVT_END()
 
 static __declspec(section ".data") s32 lock_tbl[] = {
-    22, -1,
+    ITEM_STEEPLE_KEY_0x16, -1,
 };
 
 static EVT_BEGIN(lock_item_check)
@@ -863,57 +1002,120 @@ EVT_BEGIN(tyuou_teresa_init)
     RETURN
 EVT_END()
 
-s32 tyuou_teresa_talk[] = {
-    327771, (s32)evt_msg_print, 0, (s32)"stg4_jin_54", 0, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 196699, (s32)evt_msg_select,
-    0, (s32)"stg4_jin_54_yn", 131096, -30000000, 0, 196699, (s32)evt_msg_print_add, 0,
-    (s32)"stg4_jin_55", 2, 32, 65627, (s32)evt_msg_continue, 33, 589915, (s32)evt_cam3d_evt_set,
-    70, 165, 472, 70, 72, -45, 1000, 11,
-    196699, (s32)evt_npc_set_anim, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", (s32)"A_1", 65546, 1000, 107, 131163,
-    (s32)evt_mario_set_pose, (s32)"M_I_O", 196699, (s32)evt_mario_dispflag_onoff, 1, 2, 196699, (s32)evt_mario_dispflag_onoff,
-    1, 256, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998,
-    393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_VOICE_MARIO_SURPRISED1", -30000000, -29999999, -29999998, 0, 327771,
-    (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 327771, (s32)evt_npc_get_position, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54",
-    -29999997, -29999996, -29999995, 131098, -30000000, -29999997, 196699, (s32)evt_npc_set_ry,
-    (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 270, 131126, -30000000, 40, 32, 196699, (s32)evt_npc_set_ry,
-    (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 90, 131125, -30000000, 40, 33, 458843, (s32)evt_mario_jump_pos,
-    -30000000, -29999999, -29999998, 300, 0, -1000, 65546, 300,
-    196699, (s32)evt_mario_dispflag_onoff, 0, 256, 196699, (s32)evt_mario_dispflag_onoff, 0, 2,
-    109, 131163, (s32)evt_party_stop, 0, 107, 262235, (s32)evt_party_dispflg_onoff, 0,
-    16, 1, 327771, (s32)evt_party_get_pos, 0, -30000000, -29999999, -29999998,
-    327771, (s32)evt_npc_get_position, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -29999997, -29999996, -29999995, 131098, -30000000,
-    -29999997, 131126, -30000000, 40, 32, 131125, -30000000, 40,
-    33, 524379, (s32)evt_party_jump_pos, 0, -30000000, -29999999, -29999998, 300,
-    0, -1000, 65546, 300, 262235, (s32)evt_party_dispflg_onoff, 0, 16,
-    0, 109, 131122, -90000000, 0, 107, 65541, 0,
-    589915, (s32)evt_cam3d_evt_set, 70, 193, 689, 70, 72, 0,
-    60, 11, 65546, 60, 131096, -90000000, 1, 7,
-    33, 589915, (s32)evt_cam3d_evt_set, 70, 165, 472, 70, 72,
-    -45, 60, 11, 65546, 60, 6, 109, 107,
-    327771, (s32)evt_sub_intpl_msec_init, 11, 100, 400, 100, 65539, 1,
-    65627, (s32)evt_sub_intpl_msec_get_value, 131133, -30000000, -229897600, 327771, (s32)evt_npc_set_scale, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54",
-    -30000000, -30000000, -30000000, 65545, 1, 131096, -29999999, 1,
-    65540, 1, 33, 109, 327771, (s32)evt_npc_get_position, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -30000000,
-    -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG4_TELESA_SURPRISED1", -30000000, -29999999, -29999998,
-    0, 196699, (s32)evt_npc_set_anim, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", (s32)"S_1", 327771, (s32)evt_msg_toge, 1,
-    0, 0, 0, 327771, (s32)evt_msg_print, 0, (s32)"stg4_jin_56", 0,
-    (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 131163, (s32)evt_mario_set_pose, (s32)"M_S_1", 131122, -90000000, 1, 65545,
-    1, 589915, (s32)evt_cam3d_evt_set, 70, 165, 472, 70, 72,
-    -45, 500, 11, 327771, (s32)evt_sub_intpl_msec_init, 11, 400, 100,
-    500, 65539, 2, 65627, (s32)evt_sub_intpl_msec_get_value, 131133, -30000000, -229897600,
-    327771, (s32)evt_npc_set_scale, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -30000000, -30000000, -30000000, 65545, 1,
-    131096, -29999999, 1, 65540, 2, 33, 65546, 300,
-    327771, (s32)evt_msg_print, 0, (s32)"stg4_jin_57", 0, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 589915, (s32)evt_cam3d_evt_set,
-    70, 400, 1125, 70, 200, -13, 1000, 11,
-    65546, 1000, 107, 65546, 1000, 327771, (s32)evt_sub_intpl_msec_init, 11,
-    255, 0, 500, 65539, 3, 65627, (s32)evt_sub_intpl_msec_get_value, 393307,
-    (s32)evt_npc_set_color, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 255, 255, 255, -30000000, 65545, 1,
-    131096, -29999999, 1, 65540, 3, 33, 393307, (s32)evt_npc_set_color,
-    (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 255, 255, 255, 0, 109, 262235, (s32)evt_npc_flag_onoff,
-    1, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 32, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -2147483648,
-    262235, (s32)evt_npc_change_interrupt, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 6, 0, 65628, (s32)senteresa_evt, 65627,
-    (s32)senteresa_wait_end_seq, 65546, 3500, 196699, (s32)evt_cam3d_evt_off, 500, 11, 131163,
-    (s32)evt_party_run, 0, 131122, -170000000, 197, 2, 1,
-};
+EVT_BEGIN(tyuou_teresa_talk)
+    CALL(evt_msg_print, 0, STRING("stg4_jin_54"), 0, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"))
+    CALL(evt_msg_select, 0, STRING("stg4_jin_54_yn"))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("stg4_jin_55"))
+        RETURN
+    ELSE
+        CALL(evt_msg_continue)
+    END_IF
+    CALL(evt_cam3d_evt_set, 70, 165, 472, 70, 72, -45, 1000, 11)
+    CALL(evt_npc_set_anim, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), STRING("A_1"))
+    WAIT_MS(1000)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_set_pose, STRING("M_I_O"))
+        CALL(evt_mario_dispflag_onoff, 1, 2)
+        CALL(evt_mario_dispflag_onoff, 1, 256)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_SURPRISED1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(3), LW(4), LW(5))
+        IF_INT_LESS(LW(0), LW(3))
+            CALL(evt_npc_set_ry, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), 270)
+            SUBTRACT(LW(0), 40)
+        ELSE
+            CALL(evt_npc_set_ry, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), 90)
+            ADD(LW(0), 40)
+        END_IF
+        CALL(evt_mario_jump_pos, LW(0), LW(1), LW(2), 300, 0, -1000)
+        WAIT_MS(300)
+        CALL(evt_mario_dispflag_onoff, 0, 256)
+        CALL(evt_mario_dispflag_onoff, 0, 2)
+    END_INLINE_EVENT
+    CALL(evt_party_stop, 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_party_dispflg_onoff, 0, 16, 1)
+        CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(3), LW(4), LW(5))
+        IF_INT_LESS(LW(0), LW(3))
+            SUBTRACT(LW(0), 40)
+        ELSE
+            ADD(LW(0), 40)
+        END_IF
+        CALL(evt_party_jump_pos, 0, LW(0), LW(1), LW(2), 300, 0, -1000)
+        WAIT_MS(300)
+        CALL(evt_party_dispflg_onoff, 0, 16, 0)
+    END_INLINE_EVENT
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        LOOP(0)
+            CALL(evt_cam3d_evt_set, 70, 193, 689, 70, 72, 0, 60, 11)
+            WAIT_MS(60)
+            IF_INT_EQUAL(GF(0), 1)
+                BREAK_LOOP
+            END_IF
+            CALL(evt_cam3d_evt_set, 70, 165, 472, 70, 72, -45, 60, 11)
+            WAIT_MS(60)
+        END_LOOP
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_sub_intpl_msec_init, 11, 100, 400, 100)
+        LABEL(1)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
+        CALL(evt_npc_set_scale, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(0), LW(0), LW(0))
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 1)
+            GOTO(1)
+        END_IF
+    END_INLINE_EVENT
+    CALL(evt_npc_get_position, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG4_TELESA_SURPRISED1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_npc_set_anim, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), STRING("S_1"))
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg4_jin_56"), 0, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"))
+    CALL(evt_mario_set_pose, STRING("M_S_1"))
+    SET_VALUE(GF(0), 1)
+    WAIT_FRAMES(1)
+    CALL(evt_cam3d_evt_set, 70, 165, 472, 70, 72, -45, 500, 11)
+    CALL(evt_sub_intpl_msec_init, 11, 400, 100, 500)
+    LABEL(2)
+    CALL(evt_sub_intpl_msec_get_value)
+    DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
+    CALL(evt_npc_set_scale, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(0), LW(0), LW(0))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(2)
+    END_IF
+    WAIT_MS(300)
+    CALL(evt_msg_print, 0, STRING("stg4_jin_57"), 0, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"))
+    CALL(evt_cam3d_evt_set, 70, 400, 1125, 70, 200, -13, 1000, 11)
+    WAIT_MS(1000)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(1000)
+        CALL(evt_sub_intpl_msec_init, 11, 255, 0, 500)
+        LABEL(3)
+        CALL(evt_sub_intpl_msec_get_value)
+        CALL(evt_npc_set_color, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), 255, 255, 255, LW(0))
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 1)
+            GOTO(3)
+        END_IF
+        CALL(evt_npc_set_color, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), 255, 255, 255, 0)
+    END_INLINE_EVENT
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), -2147483648)
+    CALL(evt_npc_change_interrupt, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), 6, 0)
+    SPAWN_EVENT(senteresa_evt)
+    CALL(senteresa_wait_end_seq)
+    WAIT_MS(3500)
+    CALL(evt_cam3d_evt_off, 500, 11)
+    CALL(evt_party_run, 0)
+    SET_VALUE(GSW(0), 197)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(oku_teresa_init)
     SPAWN_EVENT(PTR(npc_init_evt))
@@ -937,63 +1139,163 @@ __declspec(section ".data") EVT_BEGIN(atomic_teresa_init)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"テレサ"*/"\x83\x65\x83\x8C\x83\x54", 1073743360, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54",
-    1073743360, 0, (s32)tyuou_teresa_init, 0, (s32)tyuou_teresa_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"奥扉テレサ"*/"\x89\x9C\x94\xE0\x83\x65\x83\x8C\x83\x54", 1073743392,
-    0, (s32)oku_teresa_init, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"手前扉テレサ"*/"\x8E\xE8\x91\x4F\x94\xE0\x83\x65\x83\x8C\x83\x54", 1073743392, 0,
-    (s32)temae_teresa_init, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", 262304, 0, (s32)atomic_teresa_init,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"1001テレサ"*/"\x31\x30\x30\x31\x83\x65\x83\x8C\x83\x54", 262304, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"1002テレサ"*/"\x31\x30\x30\x32\x83\x65\x83\x8C\x83\x54", 262304, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"1003テレサ"*/"\x31\x30\x30\x33\x83\x65\x83\x8C\x83\x54", 262304, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)/*"1004テレサ"*/"\x31\x30\x30\x34\x83\x65\x83\x8C\x83\x54", 262304, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"1005テレサ"*/"\x31\x30\x30\x35\x83\x65\x83\x8C\x83\x54",
-    262304, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"1006テレサ"*/"\x31\x30\x30\x36\x83\x65\x83\x8C\x83\x54", 262304,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"テレサ"*/"\x83\x65\x83\x8C\x83\x54", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        tyuou_teresa_init, // initEvent
+        NULL, // regularEvent
+        tyuou_teresa_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"奥扉テレサ"*/"\x89\x9C\x94\xE0\x83\x65\x83\x8C\x83\x54", // name
+        0x40000620, // flags
+        0, // reactionFlags
+        oku_teresa_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"手前扉テレサ"*/"\x8E\xE8\x91\x4F\x94\xE0\x83\x65\x83\x8C\x83\x54", // name
+        0x40000620, // flags
+        0, // reactionFlags
+        temae_teresa_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", // name
+        0x400A0, // flags
+        0, // reactionFlags
+        atomic_teresa_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"1001テレサ"*/"\x31\x30\x30\x31\x83\x65\x83\x8C\x83\x54", // name
+        0x400A0, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"1002テレサ"*/"\x31\x30\x30\x32\x83\x65\x83\x8C\x83\x54", // name
+        0x400A0, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"1003テレサ"*/"\x31\x30\x30\x33\x83\x65\x83\x8C\x83\x54", // name
+        0x400A0, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"1004テレサ"*/"\x31\x30\x30\x34\x83\x65\x83\x8C\x83\x54", // name
+        0x400A0, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"1005テレサ"*/"\x31\x30\x30\x35\x83\x65\x83\x8C\x83\x54", // name
+        0x400A0, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"1006テレサ"*/"\x31\x30\x30\x36\x83\x65\x83\x8C\x83\x54", // name
+        0x400A0, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
-static s32 senteresa_ext_entry_data[] = {
-    (s32)"c_teresa", (s32)"S_1", 0, (s32)"c_teresa", (s32)"S_1", 1084227584, (s32)"c_teresa", (s32)"S_1",
-    1092616192, (s32)"c_teresa", (s32)"S_1", 1097859072, (s32)"c_teresa", (s32)"S_1", 1101004800, (s32)"c_teresa",
-    (s32)"S_1", 1103626240, (s32)"c_teresa", (s32)"S_1", 1106247680, (s32)"c_teresa", (s32)"S_1", 1108082688,
-    (s32)"c_teresa", (s32)"S_1", 1109393408, (s32)"c_teresa", (s32)"S_1", 1110704128, (s32)"c_teresa", (s32)"S_1",
-    1112014848, (s32)"c_teresa", (s32)"S_1", 1113325568, (s32)"c_teresa", (s32)"S_1", 1114636288, (s32)"c_teresa",
-    (s32)"S_1", 1115815936, (s32)"c_teresa", (s32)"S_1", 1116471296, (s32)"c_teresa", (s32)"S_1", 1117126656,
-    (s32)"c_teresa", (s32)"W_1", 0, (s32)"c_teresa", (s32)"W_1", 1065353216, (s32)"c_teresa", (s32)"W_1",
-    1073741824, (s32)"c_teresa", (s32)"W_1", 1077936128, (s32)"c_teresa", (s32)"W_1", 1082130432, (s32)"c_teresa",
-    (s32)"W_1", 1084227584, (s32)"c_teresa", (s32)"W_1", 1086324736, (s32)"c_teresa", (s32)"W_1", 1088421888,
-    (s32)"c_teresa", (s32)"W_1", 1090519040, (s32)"c_teresa", (s32)"W_1", 1091567616, (s32)"c_teresa", (s32)"D_1",
-    0, (s32)"c_teresa", (s32)"D_1", 1065353216, (s32)"c_teresa", (s32)"D_1", 1073741824, (s32)"c_teresa",
-    (s32)"D_1", 1077936128, (s32)"c_teresa", (s32)"D_1", 1082130432, (s32)"c_teresa", (s32)"D_1", 1084227584,
-    (s32)"c_teresa", (s32)"D_1", 1086324736, (s32)"c_teresa", (s32)"D_1", 1088421888, (s32)"c_teresa", (s32)"A_2",
-    0, (s32)"c_teresa", (s32)"A_2", 1065353216, (s32)"c_teresa", (s32)"A_2", 1073741824, (s32)"c_teresa",
-    (s32)"A_2", 1077936128, (s32)"c_teresa", (s32)"A_2", 1082130432, (s32)"c_teresa", (s32)"A_2", 1084227584,
-    (s32)"c_teresa", (s32)"A_2", 1086324736, (s32)"c_teresa", (s32)"A_2", 1088421888, (s32)"c_teresa", (s32)"A_2",
-    1090519040, (s32)"c_teresa", (s32)"A_2", 1091567616, (s32)"c_teresa", (s32)"A_2", 1092616192, (s32)"c_teresa",
-    (s32)"A_2", 1093664768, 0, 0, 0,
+static ExtTexInfo senteresa_ext_entry_data[] = {
+    {"c_teresa", "S_1", 0.0f},
+    {"c_teresa", "S_1", 5.0f},
+    {"c_teresa", "S_1", 10.0f},
+    {"c_teresa", "S_1", 15.0f},
+    {"c_teresa", "S_1", 20.0f},
+    {"c_teresa", "S_1", 25.0f},
+    {"c_teresa", "S_1", 30.0f},
+    {"c_teresa", "S_1", 35.0f},
+    {"c_teresa", "S_1", 40.0f},
+    {"c_teresa", "S_1", 45.0f},
+    {"c_teresa", "S_1", 50.0f},
+    {"c_teresa", "S_1", 55.0f},
+    {"c_teresa", "S_1", 60.0f},
+    {"c_teresa", "S_1", 65.0f},
+    {"c_teresa", "S_1", 70.0f},
+    {"c_teresa", "S_1", 75.0f},
+    {"c_teresa", "W_1", 0.0f},
+    {"c_teresa", "W_1", 1.0f},
+    {"c_teresa", "W_1", 2.0f},
+    {"c_teresa", "W_1", 3.0f},
+    {"c_teresa", "W_1", 4.0f},
+    {"c_teresa", "W_1", 5.0f},
+    {"c_teresa", "W_1", 6.0f},
+    {"c_teresa", "W_1", 7.0f},
+    {"c_teresa", "W_1", 8.0f},
+    {"c_teresa", "W_1", 9.0f},
+    {"c_teresa", "D_1", 0.0f},
+    {"c_teresa", "D_1", 1.0f},
+    {"c_teresa", "D_1", 2.0f},
+    {"c_teresa", "D_1", 3.0f},
+    {"c_teresa", "D_1", 4.0f},
+    {"c_teresa", "D_1", 5.0f},
+    {"c_teresa", "D_1", 6.0f},
+    {"c_teresa", "D_1", 7.0f},
+    {"c_teresa", "A_2", 0.0f},
+    {"c_teresa", "A_2", 1.0f},
+    {"c_teresa", "A_2", 2.0f},
+    {"c_teresa", "A_2", 3.0f},
+    {"c_teresa", "A_2", 4.0f},
+    {"c_teresa", "A_2", 5.0f},
+    {"c_teresa", "A_2", 6.0f},
+    {"c_teresa", "A_2", 7.0f},
+    {"c_teresa", "A_2", 8.0f},
+    {"c_teresa", "A_2", 9.0f},
+    {"c_teresa", "A_2", 10.0f},
+    {"c_teresa", "A_2", 11.0f},
+    {0},
 };
 
 static void senteresa_ext_main(void) {
@@ -1551,164 +1853,378 @@ USER_FUNC(senteresa_huttobu) {
     return EVT_RETURN_DONE;
 }
 
-s32 senteresa_evt[] = {
-    393307, (s32)evt_ext_entry, 200, (s32)senteresa_ext_entry_data, (s32)senteresa_ext_init, (s32)senteresa_ext_main, (s32)senteresa_ext_dispent, 65541,
-    0, 196699, (s32)senteresa_get_seq, 199, -30000000, 131101, -30000000, 4,
-    7, 33, 65545, 1, 6, 131122, -50000000, 0,
-    107, 65546, 600, 65541, 0, 327771, (s32)evt_mario_get_pos, 0,
-    -30000000, -29999999, -29999998, 327771, (s32)evt_cam3d_get_shift, -30000000, -29999999, -29999998,
-    -29999992, 262235, (s32)senteresa_get_rot_center, -30000000, -29999999, -29999998, 131122, -29999997,
-    -30000000, 131125, -29999997, -29999992, 131125, -29999997, 65, 196699,
-    (s32)evt_sub_random, 65, -29999996, 131125, -29999997, -29999996, 131122, -29999995,
-    -29999999, 131125, -29999995, 5, 196699, (s32)evt_sub_random, 40, -29999994,
-    131125, -29999995, -29999994, 131122, -29999993, -29999998, 131126, -29999993,
-    90, 327771, (s32)evt_msg_toge, 3, -29999997, -29999995, -29999993, 327771,
-    (s32)evt_msg_print, 0, (s32)"stg4_jin_58", 0, 0, 196699, (s32)evt_sub_random, 200,
-    -30000000, 131125, -30000000, 100, 65546, -30000000, 131096, -50000000,
-    1, 7, 33, 6, 109, 107, 65546, 600,
-    65541, 0, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998,
-    327771, (s32)evt_cam3d_get_shift, -30000000, -29999999, -29999998, -29999992, 262235, (s32)senteresa_get_rot_center,
-    -30000000, -29999999, -29999998, 131122, -29999997, -30000000, 131125, -29999997,
-    -29999992, 131126, -29999997, 32, 196699, (s32)evt_sub_random, 65, -29999996,
-    131125, -29999997, -29999996, 131122, -29999995, -29999999, 131125, -29999995,
-    5, 196699, (s32)evt_sub_random, 70, -29999994, 131125, -29999995, -29999994,
-    131122, -29999993, -29999998, 131126, -29999993, 90, 327771, (s32)evt_msg_toge,
-    3, -29999997, -29999995, -29999993, 327771, (s32)evt_msg_print, 0, (s32)"stg4_jin_59",
-    0, 0, 196699, (s32)evt_sub_random, 200, -30000000, 131125, -30000000,
-    100, 65546, -30000000, 131096, -50000000, 1, 7, 33,
-    6, 109, 107, 65546, 900, 65541, 0, 327771,
-    (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 327771, (s32)evt_cam3d_get_shift, -30000000,
-    -29999999, -29999998, -29999992, 262235, (s32)senteresa_get_rot_center, -30000000, -29999999, -29999998,
-    131122, -29999997, -30000000, 131125, -29999997, -29999992, 131126, -29999997,
-    110, 196699, (s32)evt_sub_random, 45, -29999996, 131125, -29999997, -29999996,
-    131122, -29999995, -29999999, 131125, -29999995, 45, 196699, (s32)evt_sub_random,
-    30, -29999994, 131125, -29999995, -29999994, 131122, -29999993, -29999998,
-    131126, -29999993, 90, 327771, (s32)evt_msg_toge, 3, -29999997, -29999995,
-    -29999993, 327771, (s32)evt_msg_print, 0, (s32)"stg4_jin_60", 0, 0, 196699,
-    (s32)evt_sub_random, 300, -30000000, 131125, -30000000, 100, 65546, -30000000,
-    131096, -50000000, 1, 7, 33, 6, 109, 107,
-    65546, 750, 65541, 0, 327771, (s32)evt_mario_get_pos, 0, -30000000,
-    -29999999, -29999998, 327771, (s32)evt_cam3d_get_shift, -30000000, -29999999, -29999998, -29999992,
-    262235, (s32)senteresa_get_rot_center, -30000000, -29999999, -29999998, 131122, -29999997, -30000000,
-    131125, -29999997, -29999992, 131125, -29999997, 55, 196699, (s32)evt_sub_random,
-    75, -29999996, 131125, -29999997, -29999996, 131122, -29999995, -29999999,
-    131126, -29999995, 80, 196699, (s32)evt_sub_random, 30, -29999994, 131126,
-    -29999995, -29999994, 131122, -29999993, -29999998, 131126, -29999993, 90,
-    327771, (s32)evt_msg_toge, 3, -29999997, -29999995, -29999993, 327771, (s32)evt_msg_print,
-    0, (s32)"stg4_jin_59", 0, 0, 196699, (s32)evt_sub_random, 200, -30000000,
-    131125, -30000000, 100, 65546, -30000000, 131096, -50000000, 1,
-    7, 33, 6, 109, 107, 65546, 900, 65541,
-    0, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 327771,
-    (s32)evt_cam3d_get_shift, -30000000, -29999999, -29999998, -29999992, 262235, (s32)senteresa_get_rot_center, -30000000,
-    -29999999, -29999998, 131122, -29999997, -30000000, 131125, -29999997, -29999992,
-    131126, -29999997, 110, 196699, (s32)evt_sub_random, 75, -29999996, 131125,
-    -29999997, -29999996, 131122, -29999995, -29999999, 131126, -29999995, 80,
-    196699, (s32)evt_sub_random, 30, -29999994, 131126, -29999995, -29999994, 131122,
-    -29999993, -29999998, 131126, -29999993, 90, 327771, (s32)evt_msg_toge, 3,
-    -29999997, -29999995, -29999993, 327771, (s32)evt_msg_print, 0, (s32)"stg4_jin_58", 0,
-    0, 196699, (s32)evt_sub_random, 300, -30000000, 131125, -30000000, 100,
-    65546, -30000000, 131096, -50000000, 1, 7, 33, 6,
-    109, 65541, 0, 131157, -30000000, (s32)g_nNumHuttobasu, 131101, -30000000,
-    20, 131122, -50000000, 1, 7, 33, 65627, (s32)senteresa_mario_spd,
-    65545, 1, 131157, -30000000, (s32)g_nNumHarituku, 131101, -30000000, 20,
-    131163, (s32)evt_mario_key_onoff, 0, 65627, (s32)evt_mario_normalize, 131163, (s32)evt_mario_cont_onoff, 0,
-    196699, (s32)evt_party_cont_onoff, 0, 0, 327771, (s32)evt_mario_get_pos, 0, -30000000,
-    -29999999, -29999998, 327771, (s32)evt_cam3d_get_shift, -30000000, -29999999, -29999998, -29999997,
-    720987, (s32)evt_cam3d_event_from_road, -30000000, -29999999, -29999998, -29999997, -29999996, -29999995,
-    -29999994, -29999993, -29999992, -29999991, 589915, (s32)evt_cam3d_evt_set, -29999996, -29999995,
-    -29999994, -29999993, -29999992, -29999991, 0, 11, 131163, (s32)evt_mario_set_pose,
-    (s32)"M_I_O", 65627, (s32)evt_mario_cam_y_off, 65627, (s32)senteresa_turiageru, 327771, (s32)evt_mario_get_pos, 0,
-    -30000000, -29999999, -29999998, 327771, (s32)evt_party_set_pos, 0, -30000000, -29999999,
-    -29999998, 65541, 150, 131130, -29999999, -229998976, 262235, (s32)evt_mario_set_pos,
-    -30000000, -29999999, -29999998, 327771, (s32)evt_party_set_pos, 0, -30000000, -29999999,
-    -29999998, 65545, 1, 6, 131122, -129997773, 1, 65627,
-    (s32)evt_mario_normalize, 131096, -170000000, 201, 196699, (s32)evt_bero_mapchange, (s32)"usu_00", (s32)"evt_majo3",
-    32, 196699, (s32)evt_bero_mapchange, (s32)"gra_06", (s32)"n_bero", 33, 33, 65545,
-    1, 6, 65627, (s32)senteresa_tikaduku_stop, 131163, (s32)evt_mario_key_onoff, 0, 65546,
-    2500, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 131125,
-    -29999999, 60, 327771, (s32)evt_npc_set_position, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -30000000, -29999999, -29999998,
-    327771, (s32)evt_npc_set_scale, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 1, 1, 1, 262235, (s32)evt_npc_flag_onoff,
-    1, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -2147483648, 107, 65546, 300, 327771, (s32)evt_npc_get_position,
-    (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -30000000, -29999999, -29999998, 131126, -29999999, 20, 720987,
-    (s32)evt_cam3d_event_from_road, -30000000, -29999999, -29999998, 0, -29999996, -29999995, -29999994,
-    -29999993, -29999992, -29999991, 589915, (s32)evt_cam3d_evt_set, -29999996, -29999995, -29999994,
-    -29999993, -29999992, -29999991, 1000, 11, 109, 131122, -30000000,
-    0, 65541, 25, 131125, -30000000, 10, 393307, (s32)evt_npc_set_color,
-    (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 255, 255, 255, -30000000, 65545, 1, 6,
-    393307, (s32)evt_npc_set_color, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 255, 255, 255, 255, 65546,
-    800, 327771, (s32)evt_msg_print, 0, (s32)"stg4_jin_61", 0, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 65546,
-    500, 327771, (s32)evt_npc_get_position, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -30000000, -29999999, -29999998, 131126,
-    -29999999, 20, 720987, (s32)evt_cam3d_event_from_road, -30000000, -29999999, -29999998, 0,
-    -29999996, -29999995, -29999994, -29999993, -29999992, -29999991, 131125, -29999995,
-    160, 131125, -29999992, 160, 107, 589915, (s32)evt_cam3d_evt_set, -29999996,
-    -29999995, -29999994, -29999993, -29999992, -29999991, 2000, 11, 65546,
-    1000, 109, 327771, (s32)evt_npc_get_position, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -29999998, -29999997, -29999996,
-    131122, -29999995, -29999997, 131125, -29999995, 200, 327771, (s32)evt_sub_intpl_msec_init,
-    11, -29999997, -29999995, 2000, 65539, 0, 65627, (s32)evt_sub_intpl_msec_get_value,
-    327771, (s32)evt_npc_set_position, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -29999998, -30000000, -29999996, 65545, 1,
-    131096, -29999999, 1, 65540, 0, 33, 327771, (s32)evt_npc_get_position,
-    (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -30000000, -29999999, -29999998, 196699, (s32)evt_npc_get_dir, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -29999997,
-    327771, (s32)evt_npc_set_position, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", -30000000, -29999999, -29999998, 196699, (s32)evt_npc_set_ry,
-    (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", -29999997, 65627, (s32)senteresa_syugo, 65541, 0, 131157, -30000000,
-    (s32)g_nNumEndProc, 131096, -30000000, 200, 7, 33, 65545, 1,
-    6, 327771, (s32)evt_npc_get_position, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -30000000, -29999999, -29999998, 262235,
-    (s32)teresa_eff, -30000000, -29999999, -29999998, 65546, 500, 65627, (s32)senteresa_dispoff,
-    327771, (s32)evt_npc_get_position, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", -30000000, -29999999, -29999998, 131126, -29999999,
-    25, 327771, (s32)evt_npc_set_position, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", -30000000, -29999999, -29999998, 262235,
-    (s32)evt_npc_flag_onoff, 1, (s32)/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54", 128, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54",
-    128, 327771, (s32)evt_msg_toge, 1, 0, 0, 0, 327771,
-    (s32)evt_msg_print, 0, (s32)"stg4_jin_62", 0, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", 196699, (s32)evt_cam3d_evt_off, 400,
-    11, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 393307,
-    (s32)evt_snd_sfxon_3d, (s32)"SFX_VOICE_MARIO_SURPRISED1_2", -30000000, -29999999, -29999998, 0, 131163, (s32)evt_mario_set_pose,
-    (s32)"M_I_O", 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 131125,
-    -29999999, 30, 131125, -29999998, 3, 655451, (s32)evt_npc_glide_position, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54",
-    -30000000, -29999999, -29999998, 0, -229539200, 1, 11, 0,
-    327771, (s32)evt_cam_shake, 4, -229999990, -230000000, 1000, 131163, (s32)evt_mario_set_pose,
-    (s32)"M_S_1", 107, 65541, 100, 327771, (s32)evt_npc_get_position, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", -30000000,
-    -29999999, -29999998, 131126, -29999999, 4, 327771, (s32)evt_npc_set_position, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54",
-    -30000000, -29999999, -29999998, 65546, 10, 327771, (s32)evt_npc_get_position, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54",
-    -30000000, -29999999, -29999998, 131125, -29999999, 4, 327771, (s32)evt_npc_set_position,
-    (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", -30000000, -29999999, -29999998, 65546, 10, 6, 109,
-    107, 65541, 50, 327771, (s32)evt_npc_get_position, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", -30000000, -29999999,
-    -29999998, 131126, -30000000, 4, 327771, (s32)evt_npc_set_position, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", -30000000,
-    -29999999, -29999998, 65546, 20, 327771, (s32)evt_npc_get_position, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", -30000000,
-    -29999999, -29999998, 131125, -30000000, 4, 327771, (s32)evt_npc_set_position, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54",
-    -30000000, -29999999, -29999998, 65546, 20, 6, 109, 65546,
-    300, 131122, -50000000, 0, 107, 65546, 100, 327771,
-    (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 131125, -30000000, 110,
-    131125, -29999999, 70, 131126, -29999998, 90, 327771, (s32)evt_msg_toge,
-    3, -30000000, -29999999, -29999998, 327771, (s32)evt_msg_print, 0, (s32)"stg4_jin_63",
-    0, 0, 65546, 750, 109, 107, 65546, 100,
-    327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 131125, -30000000,
-    70, 131126, -29999999, 90, 131126, -29999998, 90, 327771,
-    (s32)evt_msg_toge, 3, -30000000, -29999999, -29999998, 327771, (s32)evt_msg_print, 0,
-    (s32)"stg4_jin_64", 0, 0, 65546, 750, 109, 107, 65546,
-    250, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 131125,
-    -30000000, 30, 131125, -29999999, 30, 131126, -29999998, 90,
-    327771, (s32)evt_msg_toge, 3, -30000000, -29999999, -29999998, 327771, (s32)evt_msg_print,
-    0, (s32)"stg4_jin_65", 0, 0, 65546, 750, 109, 107,
-    65546, 200, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998,
-    131126, -30000000, 40, 131126, -29999999, 20, 131126, -29999998,
-    90, 327771, (s32)evt_msg_toge, 3, -30000000, -29999999, -29999998, 327771,
-    (s32)evt_msg_print, 0, (s32)"stg4_jin_64", 0, 0, 65546, 750, 109,
-    107, 65546, 300, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999,
-    -29999998, 131126, -30000000, 80, 131126, -29999999, 100, 131126,
-    -29999998, 90, 327771, (s32)evt_msg_toge, 3, -30000000, -29999999, -29999998,
-    327771, (s32)evt_msg_print, 0, (s32)"stg4_jin_65", 0, 0, 65546, 750,
-    109, 107, 65546, 150, 327771, (s32)evt_mario_get_pos, 0, -30000000,
-    -29999999, -29999998, 131126, -30000000, 105, 131125, -29999999, 75,
-    131126, -29999998, 90, 327771, (s32)evt_msg_toge, 3, -30000000, -29999999,
-    -29999998, 327771, (s32)evt_msg_print, 0, (s32)"stg4_jin_63", 0, 0, 65546,
-    750, 109, 327771, (s32)evt_npc_get_position, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", -30000000, -29999999, -29999998,
-    196699, (s32)evt_npc_set_battle_info, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", 7, 131163, (s32)evt_npc_battle_start, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", 65627,
-    (s32)evt_npc_wait_battle_end, 131125, -29999999, 50, 589915, (s32)evt_item_entry, (s32)"item_99", 326,
-    -30000000, -29999999, -29999998, 4, -129997758, 0, 196699, (s32)evt_item_flag_on,
-    (s32)"item_99", 256, 131122, -129997758, 1, 65627, (s32)senteresa_huttobu, 262235,
-    (s32)evt_npc_flag_onoff, 1, (s32)/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", 128, 65541, 0, 131157, -30000000,
-    (s32)g_nNumEndProc, 131096, -30000000, 200, 131122, -50000000, 1, 7,
-    33, 65545, 1, 6, 65546, 300, 65627, (s32)senteresa_end,
-    131163, (s32)evt_mario_key_onoff, 1, 131122, -129997774, 1, 2, 1,
-};
+EVT_BEGIN(senteresa_evt)
+    CALL(evt_ext_entry, 200, PTR(senteresa_ext_entry_data), PTR(senteresa_ext_init), PTR(senteresa_ext_main), PTR(senteresa_ext_dispent))
+    LOOP(0)
+        CALL(senteresa_get_seq, 199, LW(0))
+        IF_INT_GREATER_OR_EQUAL(LW(0), 4)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    SET_VALUE(GW(0), 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(600)
+        LOOP(0)
+            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            CALL(evt_cam3d_get_shift, LW(0), LW(1), LW(2), LW(8))
+            CALL(senteresa_get_rot_center, LW(0), LW(1), LW(2))
+            SET_VALUE(LW(3), LW(0))
+            ADD(LW(3), LW(8))
+            ADD(LW(3), 65)
+            CALL(evt_sub_random, 65, LW(4))
+            ADD(LW(3), LW(4))
+            SET_VALUE(LW(5), LW(1))
+            ADD(LW(5), 5)
+            CALL(evt_sub_random, 40, LW(6))
+            ADD(LW(5), LW(6))
+            SET_VALUE(LW(7), LW(2))
+            SUBTRACT(LW(7), 90)
+            CALL(evt_msg_toge, 3, LW(3), LW(5), LW(7))
+            CALL(evt_msg_print, 0, STRING("stg4_jin_58"), 0, 0)
+            CALL(evt_sub_random, 200, LW(0))
+            ADD(LW(0), 100)
+            WAIT_MS(LW(0))
+            IF_INT_EQUAL(GW(0), 1)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(600)
+        LOOP(0)
+            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            CALL(evt_cam3d_get_shift, LW(0), LW(1), LW(2), LW(8))
+            CALL(senteresa_get_rot_center, LW(0), LW(1), LW(2))
+            SET_VALUE(LW(3), LW(0))
+            ADD(LW(3), LW(8))
+            SUBTRACT(LW(3), 32)
+            CALL(evt_sub_random, 65, LW(4))
+            ADD(LW(3), LW(4))
+            SET_VALUE(LW(5), LW(1))
+            ADD(LW(5), 5)
+            CALL(evt_sub_random, 70, LW(6))
+            ADD(LW(5), LW(6))
+            SET_VALUE(LW(7), LW(2))
+            SUBTRACT(LW(7), 90)
+            CALL(evt_msg_toge, 3, LW(3), LW(5), LW(7))
+            CALL(evt_msg_print, 0, STRING("stg4_jin_59"), 0, 0)
+            CALL(evt_sub_random, 200, LW(0))
+            ADD(LW(0), 100)
+            WAIT_MS(LW(0))
+            IF_INT_EQUAL(GW(0), 1)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(900)
+        LOOP(0)
+            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            CALL(evt_cam3d_get_shift, LW(0), LW(1), LW(2), LW(8))
+            CALL(senteresa_get_rot_center, LW(0), LW(1), LW(2))
+            SET_VALUE(LW(3), LW(0))
+            ADD(LW(3), LW(8))
+            SUBTRACT(LW(3), 110)
+            CALL(evt_sub_random, 45, LW(4))
+            ADD(LW(3), LW(4))
+            SET_VALUE(LW(5), LW(1))
+            ADD(LW(5), 45)
+            CALL(evt_sub_random, 30, LW(6))
+            ADD(LW(5), LW(6))
+            SET_VALUE(LW(7), LW(2))
+            SUBTRACT(LW(7), 90)
+            CALL(evt_msg_toge, 3, LW(3), LW(5), LW(7))
+            CALL(evt_msg_print, 0, STRING("stg4_jin_60"), 0, 0)
+            CALL(evt_sub_random, 300, LW(0))
+            ADD(LW(0), 100)
+            WAIT_MS(LW(0))
+            IF_INT_EQUAL(GW(0), 1)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(750)
+        LOOP(0)
+            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            CALL(evt_cam3d_get_shift, LW(0), LW(1), LW(2), LW(8))
+            CALL(senteresa_get_rot_center, LW(0), LW(1), LW(2))
+            SET_VALUE(LW(3), LW(0))
+            ADD(LW(3), LW(8))
+            ADD(LW(3), 55)
+            CALL(evt_sub_random, 75, LW(4))
+            ADD(LW(3), LW(4))
+            SET_VALUE(LW(5), LW(1))
+            SUBTRACT(LW(5), 80)
+            CALL(evt_sub_random, 30, LW(6))
+            SUBTRACT(LW(5), LW(6))
+            SET_VALUE(LW(7), LW(2))
+            SUBTRACT(LW(7), 90)
+            CALL(evt_msg_toge, 3, LW(3), LW(5), LW(7))
+            CALL(evt_msg_print, 0, STRING("stg4_jin_59"), 0, 0)
+            CALL(evt_sub_random, 200, LW(0))
+            ADD(LW(0), 100)
+            WAIT_MS(LW(0))
+            IF_INT_EQUAL(GW(0), 1)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(900)
+        LOOP(0)
+            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            CALL(evt_cam3d_get_shift, LW(0), LW(1), LW(2), LW(8))
+            CALL(senteresa_get_rot_center, LW(0), LW(1), LW(2))
+            SET_VALUE(LW(3), LW(0))
+            ADD(LW(3), LW(8))
+            SUBTRACT(LW(3), 110)
+            CALL(evt_sub_random, 75, LW(4))
+            ADD(LW(3), LW(4))
+            SET_VALUE(LW(5), LW(1))
+            SUBTRACT(LW(5), 80)
+            CALL(evt_sub_random, 30, LW(6))
+            SUBTRACT(LW(5), LW(6))
+            SET_VALUE(LW(7), LW(2))
+            SUBTRACT(LW(7), 90)
+            CALL(evt_msg_toge, 3, LW(3), LW(5), LW(7))
+            CALL(evt_msg_print, 0, STRING("stg4_jin_58"), 0, 0)
+            CALL(evt_sub_random, 300, LW(0))
+            ADD(LW(0), 100)
+            WAIT_MS(LW(0))
+            IF_INT_EQUAL(GW(0), 1)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+    END_INLINE_EVENT
+    LOOP(0)
+        PEEK_INT(LW(0), PTR(g_nNumHuttobasu))
+        IF_INT_GREATER_OR_EQUAL(LW(0), 20)
+            SET_VALUE(GW(0), 1)
+            BREAK_LOOP
+        END_IF
+        CALL(senteresa_mario_spd)
+        WAIT_FRAMES(1)
+        PEEK_INT(LW(0), PTR(g_nNumHarituku))
+        IF_INT_GREATER_OR_EQUAL(LW(0), 20)
+            CALL(evt_mario_key_onoff, 0)
+            CALL(evt_mario_normalize)
+            CALL(evt_mario_cont_onoff, 0)
+            CALL(evt_party_cont_onoff, 0, 0)
+            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            CALL(evt_cam3d_get_shift, LW(0), LW(1), LW(2), LW(3))
+            CALL(evt_cam3d_event_from_road, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
+            CALL(evt_cam3d_evt_set, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9), 0, 11)
+            CALL(evt_mario_set_pose, STRING("M_I_O"))
+            CALL(evt_mario_cam_y_off)
+            CALL(senteresa_turiageru)
+            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
+            LOOP(150)
+                ADD_FLOAT(LW(1), FLOAT(1.0f))
+                CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
+                CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
+                WAIT_FRAMES(1)
+            END_LOOP
+            SET_VALUE(GSWF(2227), 1)
+            CALL(evt_mario_normalize)
+            IF_INT_EQUAL(GSW(0), 201)
+                CALL(evt_bero_mapchange, STRING("usu_00"), STRING("evt_majo3"))
+            ELSE
+                CALL(evt_bero_mapchange, STRING("gra_06"), STRING("n_bero"))
+            END_IF
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(senteresa_tikaduku_stop)
+    CALL(evt_mario_key_onoff, 0)
+    WAIT_MS(2500)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    ADD(LW(1), 60)
+    CALL(evt_npc_set_position, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_set_scale, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), 1, 1, 1)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), -2147483648)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(300)
+        CALL(evt_npc_get_position, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+        SUBTRACT(LW(1), 20)
+        CALL(evt_cam3d_event_from_road, LW(0), LW(1), LW(2), 0, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
+        CALL(evt_cam3d_evt_set, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9), 1000, 11)
+    END_INLINE_EVENT
+    SET_VALUE(LW(0), 0)
+    LOOP(25)
+        ADD(LW(0), 10)
+        CALL(evt_npc_set_color, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), 255, 255, 255, LW(0))
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_npc_set_color, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), 255, 255, 255, 255)
+    WAIT_MS(800)
+    CALL(evt_msg_print, 0, STRING("stg4_jin_61"), 0, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"))
+    WAIT_MS(500)
+    CALL(evt_npc_get_position, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+    SUBTRACT(LW(1), 20)
+    CALL(evt_cam3d_event_from_road, LW(0), LW(1), LW(2), 0, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
+    ADD(LW(5), 160)
+    ADD(LW(8), 160)
+    BEGIN_INLINE_EVENT
+        CALL(evt_cam3d_evt_set, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9), 2000, 11)
+        WAIT_MS(1000)
+    END_INLINE_EVENT
+    CALL(evt_npc_get_position, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(2), LW(3), LW(4))
+    SET_VALUE(LW(5), LW(3))
+    ADD(LW(5), 200)
+    CALL(evt_sub_intpl_msec_init, 11, LW(3), LW(5), 2000)
+    LABEL(0)
+    CALL(evt_sub_intpl_msec_get_value)
+    CALL(evt_npc_set_position, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(2), LW(0), LW(4))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(0)
+    END_IF
+    CALL(evt_npc_get_position, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_dir, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(3))
+    CALL(evt_npc_set_position, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_set_ry, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(3))
+    CALL(senteresa_syugo)
+    LOOP(0)
+        PEEK_INT(LW(0), PTR(g_nNumEndProc))
+        IF_INT_EQUAL(LW(0), 200)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_npc_get_position, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+    CALL(teresa_eff, LW(0), LW(1), LW(2))
+    WAIT_MS(500)
+    CALL(senteresa_dispoff)
+    CALL(evt_npc_get_position, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+    SUBTRACT(LW(1), 25)
+    CALL(evt_npc_set_position, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"中央テレサ"*/"\x92\x86\x89\x9B\x83\x65\x83\x8C\x83\x54"), 128)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), 128)
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg4_jin_62"), 0, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"))
+    CALL(evt_cam3d_evt_off, 400, 11)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_SURPRISED1_2"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mario_set_pose, STRING("M_I_O"))
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    ADD(LW(1), 30)
+    ADD(LW(2), 3)
+    CALL(evt_npc_glide_position, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2), 0, FLOAT(450.0f), 1, 11, 0)
+    CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 1000)
+    CALL(evt_mario_set_pose, STRING("M_S_1"))
+    BEGIN_INLINE_EVENT
+        LOOP(100)
+            CALL(evt_npc_get_position, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+            SUBTRACT(LW(1), 4)
+            CALL(evt_npc_set_position, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+            WAIT_MS(10)
+            CALL(evt_npc_get_position, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+            ADD(LW(1), 4)
+            CALL(evt_npc_set_position, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+            WAIT_MS(10)
+        END_LOOP
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        LOOP(50)
+            CALL(evt_npc_get_position, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+            SUBTRACT(LW(0), 4)
+            CALL(evt_npc_set_position, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+            WAIT_MS(20)
+            CALL(evt_npc_get_position, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+            ADD(LW(0), 4)
+            CALL(evt_npc_set_position, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+            WAIT_MS(20)
+        END_LOOP
+    END_INLINE_EVENT
+    WAIT_MS(300)
+    SET_VALUE(GW(0), 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(100)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        ADD(LW(0), 110)
+        ADD(LW(1), 70)
+        SUBTRACT(LW(2), 90)
+        CALL(evt_msg_toge, 3, LW(0), LW(1), LW(2))
+        CALL(evt_msg_print, 0, STRING("stg4_jin_63"), 0, 0)
+        WAIT_MS(750)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(100)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        ADD(LW(0), 70)
+        SUBTRACT(LW(1), 90)
+        SUBTRACT(LW(2), 90)
+        CALL(evt_msg_toge, 3, LW(0), LW(1), LW(2))
+        CALL(evt_msg_print, 0, STRING("stg4_jin_64"), 0, 0)
+        WAIT_MS(750)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(250)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        ADD(LW(0), 30)
+        ADD(LW(1), 30)
+        SUBTRACT(LW(2), 90)
+        CALL(evt_msg_toge, 3, LW(0), LW(1), LW(2))
+        CALL(evt_msg_print, 0, STRING("stg4_jin_65"), 0, 0)
+        WAIT_MS(750)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(200)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        SUBTRACT(LW(0), 40)
+        SUBTRACT(LW(1), 20)
+        SUBTRACT(LW(2), 90)
+        CALL(evt_msg_toge, 3, LW(0), LW(1), LW(2))
+        CALL(evt_msg_print, 0, STRING("stg4_jin_64"), 0, 0)
+        WAIT_MS(750)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(300)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        SUBTRACT(LW(0), 80)
+        SUBTRACT(LW(1), 100)
+        SUBTRACT(LW(2), 90)
+        CALL(evt_msg_toge, 3, LW(0), LW(1), LW(2))
+        CALL(evt_msg_print, 0, STRING("stg4_jin_65"), 0, 0)
+        WAIT_MS(750)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(150)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        SUBTRACT(LW(0), 105)
+        ADD(LW(1), 75)
+        SUBTRACT(LW(2), 90)
+        CALL(evt_msg_toge, 3, LW(0), LW(1), LW(2))
+        CALL(evt_msg_print, 0, STRING("stg4_jin_63"), 0, 0)
+        WAIT_MS(750)
+    END_INLINE_EVENT
+    CALL(evt_npc_get_position, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_set_battle_info, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), 7)
+    CALL(evt_npc_battle_start, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"))
+    CALL(evt_npc_wait_battle_end)
+    ADD(LW(1), 50)
+    CALL(evt_item_entry, STRING("item_99"), 326, LW(0), LW(1), LW(2), 4, GSWF(2242), 0)
+    CALL(evt_item_flag_on, STRING("item_99"), 256)
+    SET_VALUE(GSWF(2242), 1)
+    CALL(senteresa_huttobu)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"アトミックテレサ"*/"\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54"), 128)
+    LOOP(0)
+        PEEK_INT(LW(0), PTR(g_nNumEndProc))
+        IF_INT_EQUAL(LW(0), 200)
+            SET_VALUE(GW(0), 1)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_MS(300)
+    CALL(senteresa_end)
+    CALL(evt_mario_key_onoff, 1)
+    SET_VALUE(GSWF(2226), 1)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(jin_00_init_evt)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))

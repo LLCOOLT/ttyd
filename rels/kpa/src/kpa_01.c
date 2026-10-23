@@ -84,20 +84,20 @@ void kpa_stg1_014_2_cb(s32 type, KpaCbInfo** param);
 void kpa_stg1_036_cb(s32 type, KpaCbInfo** param);
 void kpa_stg1_034_cb(s32 type, KpaCbInfo** param);
 
-__declspec(section ".data") u64 fd_kpa_01_negone_one_374;
-__declspec(section ".data") s32 fd_kpa_01_neg_one_382[1];
-__declspec(section ".data") s32 fd_kpa_01___local_PI_383[1];
-__declspec(section ".data") s32 fd_kpa_01___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_kpa_01_one_negone_373;
-__declspec(section ".data") s32 fd_kpa_01___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_kpa_01_one_381[1];
-__declspec(section ".data") u64 fd_kpa_01_negone_one_360;
-__declspec(section ".data") s32 fd_kpa_01_neg_one_365[1];
-__declspec(section ".data") s32 fd_kpa_01___local_PI_366[1];
-__declspec(section ".data") s32 fd_kpa_01___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_kpa_01_one_negone_359;
-__declspec(section ".data") s32 fd_kpa_01___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_kpa_01_one_364[1];
+__declspec(section ".data") f32 fd_kpa_01_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_01_neg_one_382;
+__declspec(section ".data") f32 fd_kpa_01___local_PI_383;
+__declspec(section ".data") f32 fd_kpa_01___local_3PIO2_385;
+__declspec(section ".data") f32 fd_kpa_01_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_01___local_PIO2_384;
+__declspec(section ".data") f32 fd_kpa_01_one_381;
+__declspec(section ".data") f32 fd_kpa_01_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_01_neg_one_365;
+__declspec(section ".data") f32 fd_kpa_01___local_PI_366;
+__declspec(section ".data") f32 fd_kpa_01___local_3PIO2_368;
+__declspec(section ".data") f32 fd_kpa_01_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_01___local_PIO2_367;
+__declspec(section ".data") f32 fd_kpa_01_one_364;
 s32 kpa_01_door_open[219];
 s32 kpa_01_door_close[237];
 s32 kpa_01_touzyo_evt[217];
@@ -118,57 +118,37 @@ __declspec(section ".data") s32 hammer_E_talk_evt[8];
 s32 baba_init_evt[13];
 __declspec(section ".data") s32 kamek_init_evt[9];
 __declspec(section ".data") s32 hkoopa_init_evt[9];
-static s32 npcEnt[299];
+static NpcSetupInfo npcEnt[13];
 static s32 shan_init[46];
 s32 kpa_01_init_evt[88];
 
-__declspec(section ".data") u64 fd_kpa_01_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_kpa_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_kpa_01_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_kpa_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_kpa_01___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_kpa_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_kpa_01___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_kpa_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_kpa_01_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_kpa_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_kpa_01___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_kpa_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_kpa_01_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_kpa_01_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_kpa_01_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_kpa_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_kpa_01_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_kpa_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_kpa_01___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_kpa_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_kpa_01___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_kpa_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_kpa_01_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_kpa_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_kpa_01___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_kpa_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_kpa_01_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_kpa_01_one_364 = 1.0f;
 
 EVT_BEGIN(kpa_01_door_open)
     BEGIN_INLINE_EVENT
@@ -1039,45 +1019,131 @@ __declspec(section ".data") EVT_BEGIN(hkoopa_init_evt)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"トゲノコＡ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x82\x60", 0, 0, (s32)npc_init_evt, 0, (s32)togenoko_A_talk_evt, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"トゲノコＢ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x82\x61",
-    0, 0, (s32)npc_init_evt, 0, (s32)togenoko_B_talk_evt, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"トゲノコＣ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x82\x62", 0,
-    0, (s32)npc_init_evt, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"トゲノコＤ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x82\x63", 0, 0,
-    (s32)npc_init_evt, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"ハンマーＡ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x60", 0, 0, (s32)hammer_AB_init_evt,
-    0, (s32)hammer_AB_talk_evt, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"ハンマーＢ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x61", 0, 0, (s32)hammer_AB_init_evt, 0,
-    (s32)hammer_AB_talk_evt, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"ハンマーＣ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x62", 0, 0, (s32)npc_init_evt, 0, (s32)hammer_C_talk_evt,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"ハンマーＤ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x63", 0, 0, (s32)npc_init_evt, 0, (s32)hammer_D_talk_evt, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)/*"ハンマーＥ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x64", 0, 0, (s32)hammer_E_init_evt, 0, (s32)hammer_E_talk_evt, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ババ"*/"\x83\x6F\x83\x6F",
-    0, 0, (s32)baba_init_evt, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"カメック"*/"\x83\x4A\x83\x81\x83\x62\x83\x4E", 0,
-    0, (s32)kamek_init_evt, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", 32, 0,
-    (s32)hkoopa_init_evt, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"トゲノコＡ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x82\x60", // name
+        0, 0, // flags..reactionFlags
+        npc_init_evt, // initEvent
+        NULL, // regularEvent
+        togenoko_A_talk_evt, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"トゲノコＢ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x82\x61", // name
+        0, 0, // flags..reactionFlags
+        npc_init_evt, // initEvent
+        NULL, // regularEvent
+        togenoko_B_talk_evt, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"トゲノコＣ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x82\x62", // name
+        0, 0, // flags..reactionFlags
+        npc_init_evt, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"トゲノコＤ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x82\x63", // name
+        0, 0, // flags..reactionFlags
+        npc_init_evt, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ハンマーＡ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x60", // name
+        0, 0, // flags..reactionFlags
+        hammer_AB_init_evt, // initEvent
+        NULL, // regularEvent
+        hammer_AB_talk_evt, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ハンマーＢ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x61", // name
+        0, 0, // flags..reactionFlags
+        hammer_AB_init_evt, // initEvent
+        NULL, // regularEvent
+        hammer_AB_talk_evt, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ハンマーＣ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x62", // name
+        0, 0, // flags..reactionFlags
+        npc_init_evt, // initEvent
+        NULL, // regularEvent
+        hammer_C_talk_evt, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ハンマーＤ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x63", // name
+        0, 0, // flags..reactionFlags
+        npc_init_evt, // initEvent
+        NULL, // regularEvent
+        hammer_D_talk_evt, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ハンマーＥ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x64", // name
+        0, 0, // flags..reactionFlags
+        hammer_E_init_evt, // initEvent
+        NULL, // regularEvent
+        hammer_E_talk_evt, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ババ"*/"\x83\x6F\x83\x6F", // name
+        0, 0, // flags..reactionFlags
+        baba_init_evt, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"カメック"*/"\x83\x4A\x83\x81\x83\x62\x83\x4E", // name
+        0, 0, // flags..reactionFlags
+        kamek_init_evt, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", // name
+        0x20, // flags
+        0, // reactionFlags
+        hkoopa_init_evt, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static EVT_BEGIN(shan_init)
@@ -1093,19 +1159,36 @@ static EVT_BEGIN(shan_init)
     RETURN
 EVT_END()
 
-s32 kpa_01_init_evt[] = {
-    131163, (s32)evt_mario_set_mode, 2, 131163, (s32)evt_npc_setup, (s32)npcEnt, 458843, (s32)evt_run_case_evt,
-    9, 1, (s32)"a_zou_1", 0, (s32)douzou_1_touch_evt, 0, 458843, (s32)evt_run_case_evt,
-    9, 1, (s32)"a_zou_2", 0, (s32)douzou_2_touch_evt, 0, 458843, (s32)evt_run_case_evt,
-    9, 1, (s32)"a_zou_3", 0, (s32)douzou_3_touch_evt, 0, 65630, (s32)shan_init,
-    65570, -170000000, 65572, 59, 65628, (s32)kpa_01_touzyo_evt, 65628, (s32)kpa_01_pos_check,
-    65572, 60, 131163, (s32)evt_snd_bgmoff, 30720, 131163, (s32)evt_bero_get_entername, -30000000,
-    131084, -30000000, (s32)"player", 262235, (s32)evt_mario_set_pos, -700, 0, 0,
-    262235, (s32)evt_mario_set_dir, 90, 0, 0, 65628, (s32)kpa_01_pos_check, 32,
-    262235, (s32)evt_mario_set_pos, 625, 30, 0, 262235, (s32)evt_mario_set_dir, 90,
-    0, 0, 107, 131163, (s32)evt_seq_wait, 2, 65546, 300,
-    65628, (s32)kpa_01_syuppatu_evt, 109, 33, 49, 2, 1, 0,
-};
+EVT_BEGIN(kpa_01_init_evt)
+    CALL(evt_mario_set_mode, 2)
+    CALL(evt_npc_setup, PTR(npcEnt))
+    CALL(evt_run_case_evt, 9, 1, STRING("a_zou_1"), 0, PTR(douzou_1_touch_evt), 0)
+    CALL(evt_run_case_evt, 9, 1, STRING("a_zou_2"), 0, PTR(douzou_2_touch_evt), 0)
+    CALL(evt_run_case_evt, 9, 1, STRING("a_zou_3"), 0, PTR(douzou_3_touch_evt), 0)
+    CALL_CHILD(shan_init)
+    SWITCH(GSW(0))
+        CASE_EQUAL(59)
+        SPAWN_EVENT(kpa_01_touzyo_evt)
+        SPAWN_EVENT(kpa_01_pos_check)
+        CASE_EQUAL(60)
+        CALL(evt_snd_bgmoff, 30720)
+        CALL(evt_bero_get_entername, LW(0))
+        IF_STR_EQUAL(LW(0), STRING("player"))
+            CALL(evt_mario_set_pos, -700, 0, 0)
+            CALL(evt_mario_set_dir, 90, 0, 0)
+            SPAWN_EVENT(kpa_01_pos_check)
+        ELSE
+            CALL(evt_mario_set_pos, 625, 30, 0)
+            CALL(evt_mario_set_dir, 90, 0, 0)
+            BEGIN_INLINE_EVENT
+                CALL(evt_seq_wait, 2)
+                WAIT_MS(300)
+                SPAWN_EVENT(kpa_01_syuppatu_evt)
+            END_INLINE_EVENT
+        END_IF
+    END_SWITCH
+    RETURN
+EVT_END_PAD()
 
 static USER_FUNC(make_name) {
     s32* args = event->args;

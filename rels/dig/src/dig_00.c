@@ -16,9 +16,9 @@
 void FontDrawString(f32 x, f32 y, const char* str);
 void movie_draw(CameraId camera, void* param);
 typedef struct DigAnim { const char* name; u32 mask; s32 anim; } DigAnim;
-#define ANIM_TBL ((DigAnim*)anim_tbl)
+#define ANIM_TBL (anim_tbl)
 static s32 work[1];
-#define DIG_WP ((s32*)wp[0])
+#define DIG_WP (wp[0])
 s32 EXIGetType(s32 chan, u32 dev, u32* type);
 double tan(double x);
 
@@ -60,22 +60,22 @@ void movie_draw(CameraId camera, void* param);
 void dig_thpStop(void);
 void dig_thpInit(void);
 
-__declspec(section ".data") u64 fd_dig_00_negone_one_374;
-__declspec(section ".data") s32 fd_dig_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_dig_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_dig_00___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_dig_00_one_negone_373;
-__declspec(section ".data") s32 fd_dig_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_dig_00_one_381[1];
-__declspec(section ".data") u64 fd_dig_00_negone_one_360;
-__declspec(section ".data") s32 fd_dig_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_dig_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_dig_00___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_dig_00_one_negone_359;
-__declspec(section ".data") s32 fd_dig_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_dig_00_one_364[1];
-static __declspec(section ".data") s32 wp[1];
-static s32 anim_tbl[144];
+__declspec(section ".data") f32 fd_dig_00_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dig_00_neg_one_382;
+__declspec(section ".data") f32 fd_dig_00___local_PI_383;
+__declspec(section ".data") f32 fd_dig_00___local_3PIO2_385;
+__declspec(section ".data") f32 fd_dig_00_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dig_00___local_PIO2_384;
+__declspec(section ".data") f32 fd_dig_00_one_381;
+__declspec(section ".data") f32 fd_dig_00_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dig_00_neg_one_365;
+__declspec(section ".data") f32 fd_dig_00___local_PI_366;
+__declspec(section ".data") f32 fd_dig_00___local_3PIO2_368;
+__declspec(section ".data") f32 fd_dig_00_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dig_00___local_PIO2_367;
+__declspec(section ".data") f32 fd_dig_00_one_364;
+static __declspec(section ".data") s32* wp[1];
+static DigAnim anim_tbl[48];
 s32 evt_action_1_2[154];
 __declspec(section ".data") s32 evt_action_1[7];
 __declspec(section ".data") s32 evt_action_2[7];
@@ -209,7 +209,7 @@ USER_FUNC(evt_action_sub) {
         evtSetValue(event, *args++, (s32)"\202\311\202\271\203}\203\212\203I\202Q");
     }
     evtSetValue(event, *args++, bit);
-    evtSetValue(event, *args++, anim_tbl[idx * 3 + 2]);
+    evtSetValue(event, *args++, ANIM_TBL[idx].anim);
     return EVT_RETURN_DONE;
 }
 
@@ -220,77 +220,87 @@ static USER_FUNC(z) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_dig_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_dig_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_dig_00_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_dig_00_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_dig_00___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_dig_00___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_dig_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_dig_00___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_dig_00_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_dig_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_dig_00_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_dig_00___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_dig_00___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_dig_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_dig_00___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_dig_00_one_364 = 1.0f;
+
+static __declspec(section ".data") s32* wp[] = {
+    work,
 };
 
-__declspec(section ".data") s32 fd_dig_00___local_PI_383[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_dig_00___local_3PIO2_385[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_dig_00_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_dig_00___local_PIO2_384[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_dig_00_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_dig_00_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_dig_00_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_dig_00___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_dig_00___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_dig_00_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_dig_00___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_dig_00_one_364[] = {
-    1065353216,
-};
-
-static __declspec(section ".data") s32 wp[] = {
-    (s32)work,
-};
-
-static s32 anim_tbl[] = {
-    (s32)/*"ダイジェストマリオ"*/"\x83\x5F\x83\x43\x83\x57\x83\x46\x83\x58\x83\x67\x83\x7D\x83\x8A\x83\x49", 7, 0, (s32)/*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", 7, 0, (s32)/*"ダイジェストピーチ"*/"\x83\x5F\x83\x43\x83\x57\x83\x46\x83\x58\x83\x67\x83\x73\x81\x5B\x83\x60", 3,
-    0, (s32)/*"ダイジェストピーチ２"*/"\x83\x5F\x83\x43\x83\x57\x83\x46\x83\x58\x83\x67\x83\x73\x81\x5B\x83\x60\x82\x51", 3, 0, (s32)/*"クッパ"*/"\x83\x4E\x83\x62\x83\x70", 11, 0, (s32)/*"カメックババ"*/"\x83\x4A\x83\x81\x83\x62\x83\x4E\x83\x6F\x83\x6F",
-    3, 0, (s32)/*"第三勢力総統"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x91\x8D\x93\x9D", 3, 0, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", 3, 0,
-    (s32)/*"軍団ザコ敵"*/"\x8C\x52\x92\x63\x83\x55\x83\x52\x93\x47", 3, 0, (s32)/*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", 3, 0, (s32)/*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", 3,
-    0, (s32)/*"クリスチーヌ"*/"\x83\x4E\x83\x8A\x83\x58\x83\x60\x81\x5B\x83\x6B", 7, 0, (s32)/*"ノコタロウ"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45", 3, 0, (s32)/*"クラウダ"*/"\x83\x4E\x83\x89\x83\x45\x83\x5F",
-    3, 0, (s32)/*"ヨッシー"*/"\x83\x88\x83\x62\x83\x56\x81\x5B", 3, 0, (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 3, 0,
-    (s32)/*"チュチュリーナ"*/"\x83\x60\x83\x85\x83\x60\x83\x85\x83\x8A\x81\x5B\x83\x69", 3, 0, (s32)/*"キノじい"*/"\x83\x4C\x83\x6D\x82\xB6\x82\xA2", 3, 0, (s32)/*"クリハカセ"*/"\x83\x4E\x83\x8A\x83\x6E\x83\x4A\x83\x5A", 3,
-    0, (s32)/*"パラシュートボム"*/"\x83\x70\x83\x89\x83\x56\x83\x85\x81\x5B\x83\x67\x83\x7B\x83\x80", 8, 0, (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", 3, 0, (s32)/*"クリボー"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B",
-    3, 0, (s32)/*"パワーアップ屋"*/"\x83\x70\x83\x8F\x81\x5B\x83\x41\x83\x62\x83\x76\x89\xAE", 3, 0, (s32)/*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", 3, 0,
-    (s32)/*"ノコリン"*/"\x83\x6D\x83\x52\x83\x8A\x83\x93", 3, 0, (s32)/*"プニ族"*/"\x83\x76\x83\x6A\x91\xB0", 32, 0, (s32)/*"トゲ族"*/"\x83\x67\x83\x51\x91\xB0", 32,
-    0, (s32)/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F", 3, 0, (s32)/*"美女"*/"\x94\xFC\x8F\x97", 3, 0, (s32)/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58",
-    3, 0, (s32)/*"ブレッドハート"*/"\x83\x75\x83\x8C\x83\x62\x83\x68\x83\x6E\x81\x5B\x83\x67", 3, 0, (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", 3, 0,
-    (s32)/*"パンジーさん"*/"\x83\x70\x83\x93\x83\x57\x81\x5B\x82\xB3\x82\xF1", 19, 0, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 3, 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 3,
-    0, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 3, 0, (s32)/*"グルメキノピオ"*/"\x83\x4F\x83\x8B\x83\x81\x83\x4C\x83\x6D\x83\x73\x83\x49", 3, 0, (s32)/*"ホワイト将軍"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67\x8F\xAB\x8C\x52",
-    3, 0, (s32)/*"モニー"*/"\x83\x82\x83\x6A\x81\x5B", 3, 0, (s32)/*"ボッタクール"*/"\x83\x7B\x83\x62\x83\x5E\x83\x4E\x81\x5B\x83\x8B", 3, 0,
-    (s32)/*"フラワーさん"*/"\x83\x74\x83\x89\x83\x8F\x81\x5B\x82\xB3\x82\xF1", 3, 0, (s32)/*"星マニア"*/"\x90\xAF\x83\x7D\x83\x6A\x83\x41", 3, 0, (s32)/*"バニーテレサ"*/"\x83\x6F\x83\x6A\x81\x5B\x83\x65\x83\x8C\x83\x54", 17,
-    0, (s32)/*"キザ野郎"*/"\x83\x4C\x83\x55\x96\xEC\x98\x59", 3, 0, (s32)/*"ウスグラ店おじさん"*/"\x83\x45\x83\x58\x83\x4F\x83\x89\x93\x58\x82\xA8\x82\xB6\x82\xB3\x82\xF1", 3, 0, (s32)/*"ハンマーブロス"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x83\x75\x83\x8D\x83\x58",
-    35, 0, (s32)/*"ホネノコ"*/"\x83\x7A\x83\x6C\x83\x6D\x83\x52", 3, 0, (s32)/*"チョロボン"*/"\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93", 3, 0,
+static DigAnim anim_tbl[] = {
+    {/*"ダイジェストマリオ"*/"\x83\x5F\x83\x43\x83\x57\x83\x46\x83\x58\x83\x67\x83\x7D\x83\x8A\x83\x49", 7, 0},
+    {/*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", 7, 0},
+    {/*"ダイジェストピーチ"*/"\x83\x5F\x83\x43\x83\x57\x83\x46\x83\x58\x83\x67\x83\x73\x81\x5B\x83\x60", 3, 0},
+    {/*"ダイジェストピーチ２"*/"\x83\x5F\x83\x43\x83\x57\x83\x46\x83\x58\x83\x67\x83\x73\x81\x5B\x83\x60\x82\x51", 3, 0},
+    {/*"クッパ"*/"\x83\x4E\x83\x62\x83\x70", 11, 0},
+    {/*"カメックババ"*/"\x83\x4A\x83\x81\x83\x62\x83\x4E\x83\x6F\x83\x6F", 3, 0},
+    {/*"第三勢力総統"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x91\x8D\x93\x9D", 3, 0},
+    {/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", 3, 0},
+    {/*"軍団ザコ敵"*/"\x8C\x52\x92\x63\x83\x55\x83\x52\x93\x47", 3, 0},
+    {/*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", 3, 0},
+    {/*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", 3, 0},
+    {/*"クリスチーヌ"*/"\x83\x4E\x83\x8A\x83\x58\x83\x60\x81\x5B\x83\x6B", 7, 0},
+    {/*"ノコタロウ"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45", 3, 0},
+    {/*"クラウダ"*/"\x83\x4E\x83\x89\x83\x45\x83\x5F", 3, 0},
+    {/*"ヨッシー"*/"\x83\x88\x83\x62\x83\x56\x81\x5B", 3, 0},
+    {/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 3, 0},
+    {/*"チュチュリーナ"*/"\x83\x60\x83\x85\x83\x60\x83\x85\x83\x8A\x81\x5B\x83\x69", 3, 0},
+    {/*"キノじい"*/"\x83\x4C\x83\x6D\x82\xB6\x82\xA2", 3, 0},
+    {/*"クリハカセ"*/"\x83\x4E\x83\x8A\x83\x6E\x83\x4A\x83\x5A", 3, 0},
+    {/*"パラシュートボム"*/"\x83\x70\x83\x89\x83\x56\x83\x85\x81\x5B\x83\x67\x83\x7B\x83\x80", 8, 0},
+    {/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", 3, 0},
+    {/*"クリボー"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B", 3, 0},
+    {/*"パワーアップ屋"*/"\x83\x70\x83\x8F\x81\x5B\x83\x41\x83\x62\x83\x76\x89\xAE", 3, 0},
+    {/*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", 3, 0},
+    {/*"ノコリン"*/"\x83\x6D\x83\x52\x83\x8A\x83\x93", 3, 0},
+    {/*"プニ族"*/"\x83\x76\x83\x6A\x91\xB0", 32, 0},
+    {/*"トゲ族"*/"\x83\x67\x83\x51\x91\xB0", 32, 0},
+    {/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F", 3, 0},
+    {/*"美女"*/"\x94\xFC\x8F\x97", 3, 0},
+    {/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58", 3, 0},
+    {/*"ブレッドハート"*/"\x83\x75\x83\x8C\x83\x62\x83\x68\x83\x6E\x81\x5B\x83\x67", 3, 0},
+    {/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", 3, 0},
+    {/*"パンジーさん"*/"\x83\x70\x83\x93\x83\x57\x81\x5B\x82\xB3\x82\xF1", 19, 0},
+    {/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 3, 0},
+    {/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 3, 0},
+    {/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 3, 0},
+    {/*"グルメキノピオ"*/"\x83\x4F\x83\x8B\x83\x81\x83\x4C\x83\x6D\x83\x73\x83\x49", 3, 0},
+    {/*"ホワイト将軍"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67\x8F\xAB\x8C\x52", 3, 0},
+    {/*"モニー"*/"\x83\x82\x83\x6A\x81\x5B", 3, 0},
+    {/*"ボッタクール"*/"\x83\x7B\x83\x62\x83\x5E\x83\x4E\x81\x5B\x83\x8B", 3, 0},
+    {/*"フラワーさん"*/"\x83\x74\x83\x89\x83\x8F\x81\x5B\x82\xB3\x82\xF1", 3, 0},
+    {/*"星マニア"*/"\x90\xAF\x83\x7D\x83\x6A\x83\x41", 3, 0},
+    {/*"バニーテレサ"*/"\x83\x6F\x83\x6A\x81\x5B\x83\x65\x83\x8C\x83\x54", 17, 0},
+    {/*"キザ野郎"*/"\x83\x4C\x83\x55\x96\xEC\x98\x59", 3, 0},
+    {/*"ウスグラ店おじさん"*/"\x83\x45\x83\x58\x83\x4F\x83\x89\x93\x58\x82\xA8\x82\xB6\x82\xB3\x82\xF1", 3, 0},
+    {/*"ハンマーブロス"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x83\x75\x83\x8D\x83\x58", 35, 0},
+    {/*"ホネノコ"*/"\x83\x7A\x83\x6C\x83\x6D\x83\x52", 3, 0},
+    {/*"チョロボン"*/"\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93", 3, 0},
 };
 
 EVT_BEGIN(evt_action_1_2)

@@ -47,27 +47,38 @@ typedef struct EffRadiationN64Work {
 void effRadiationMain(EffectEntry* effect);
 void effRadiationDisp(CameraId cameraId, EffectEntry* effect);
 
-u32 size150x20_tex32x32[] = {
-    0x0000000A, 0x00000000, 0x0000FFFF, 0xFFFF0000, 0xFFF60000, 0x04000000, 0xFFFFFFFF,
-    0x0096FFF6, 0x00000400, 0x0400FFFF, 0xFFFF0096, 0x000A0000, 0x00000400, 0xFFFFFFFF,
+effN64Vtx size150x20_tex32x32[] = {
+    {0, 10, 0, 0, 0, 255, 255, 255, 255},
+    {0, -10, 0, 1024, 0, 255, 255, 255, 255},
+    {150, -10, 0, 1024, 1024, 255, 255, 255, 255},
+    {150, 10, 0, 0, 1024, 255, 255, 255, 255},
 };
 
 s32 r_data[] = {
-    0x00000000, 0xFFFFFFEC, 0x00000000, 0x00000001, 0x00000012, 0xFFFFFFF6, 0xFFFFFFC4, 0x0000002D,
-    0xFFFFFFFF, 0x00000004, 0xFFFFFFEC, 0xFFFFFFEC, 0x0000005A, 0x00000001, 0x00000001, 0xFFFFFFF6,
-    0xFFFFFFC4, 0x00000087, 0x00000001, 0xFFFFFFFC, 0x00000000, 0xFFFFFFEC, 0x000000B4, 0xFFFFFFF8,
-    0x00000001, 0xFFFFFFF6, 0xFFFFFFC4, 0x000000E1, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFEC, 0xFFFFFFEC,
-    0x0000010E, 0x00000001, 0xFFFFFFF7, 0xFFFFFFF6, 0xFFFFFFC4, 0x0000013B, 0x00000004, 0x00000004,
-    0x00000000, 0x0000000A, 0x00000016, 0x00000004, 0x00000001, 0xFFFFFFF6, 0x00000014, 0x00000043,
-    0x00000001, 0xFFFFFFFF, 0xFFFFFFEC, 0x0000000A, 0x00000070, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFF6,
-    0x00000014, 0x0000009D, 0xFFFFFFF8, 0x00000001, 0x00000000, 0x0000000A, 0x000000CA, 0x00000001,
-    0xFFFFFFFC, 0xFFFFFFF6, 0x00000014, 0x000000F7, 0x00000001, 0xFFFFFFEE, 0xFFFFFFEC, 0x0000000A,
-    0x00000124, 0xFFFFFFFF, 0x00000009, 0xFFFFFFF6, 0x00000014, 0x00000151, 0x00000001, 0x00000001,
+    0, -20, 0, 1, 18,
+    -10, -60, 45, -1, 4,
+    -20, -20, 90, 1, 1,
+    -10, -60, 135, 1, -4,
+    0, -20, 180, -8, 1,
+    -10, -60, 225, -1, -1,
+    -20, -20, 270, 1, -9,
+    -10, -60, 315, 4, 4,
+    0, 10, 22, 4, 1,
+    -10, 20, 67, 1, -1,
+    -20, 10, 112, -1, -1,
+    -10, 20, 157, -8, 1,
+    0, 10, 202, 1, -4,
+    -10, 20, 247, 1, -18,
+    -20, 10, 292, -1, 9,
+    -10, 20, 337, 1, 1,
 };
 
-__declspec(section ".sdata") u32 size300x40_tex32x32[] = {
-    0x00000000, 0x00000010, 0x0000FFFF, 0xFFFF012C, 0x00140000, 0x00000400,
-    0xEBFFF500, 0x012CFFEC, 0x00000400, 0x0400EBFF, 0xF5000000,
+/* 0x2C bytes in the original: not a whole number of 14-byte effN64Vtx records, so kept as halfwords */
+__declspec(section ".sdata") s16 size300x40_tex32x32[] = {
+    0, 0, 0, 16, 0, -1, -1,
+    300, 20, 0, 0, 1024, -5121, -2816,
+    300, -20, 0, 1024, 1024, -5121, -2816,
+    0,
 };
 
 
@@ -323,7 +334,7 @@ void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx tmp;
     Mtx trans;
-    u32* vtx;
+    effN64Vtx* vtx;
     s32 i;
     s32 k;
     s32 lf;
@@ -421,10 +432,10 @@ void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
             vtx = size150x20_tex32x32;
             break;
         default:
-            vtx = size300x40_tex32x32;
+            vtx = (effN64Vtx*)size300x40_tex32x32;
             break;
         }
-        effSetVtxDescN64((effN64Vtx*)vtx);
+        effSetVtxDescN64(vtx);
         switch (type) {
         case 0:
         case 1:

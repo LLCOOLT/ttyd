@@ -27,6 +27,8 @@
 #include "evt/evt_door.h"
 #include "evt/evt_sub.h"
 #include "bom.h"
+#include "data_tables.h"
+#include "evt/evt_npc.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_msg_pri);
 #endif
@@ -35,53 +37,33 @@ USER_FUNC(evt_msg_pri);
 #pragma force_active on
 
 // math-inline function-local statics (negone_one$374 ...) the target keeps at the start of .data
-__declspec(section ".data") u64 fd_bom_01_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_bom_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_bom_01_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_bom_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_bom_01___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_bom_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_bom_01___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_bom_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_bom_01_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_bom_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_bom_01___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_bom_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_bom_01_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_bom_01_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_bom_01_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_bom_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_bom_01_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_bom_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_bom_01___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_bom_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_bom_01___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_bom_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_bom_01_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_bom_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_bom_01___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_bom_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_bom_01_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_bom_01_one_364 = 1.0f;
 
 
 typedef struct SightWork { FileEntry* tpl; s32 level[5]; f32 rot; s32 dir; s32 count1; s32 count2; } SightWork;
@@ -107,7 +89,7 @@ ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
 static void pose_change(s32 i, const char* name);
 static void pose_change(s32 i, const char* name);
-static s32 ext_data[93];
+static ExtTexInfo ext_data[31];
 static inline f32 chb_sin(f32 x) { f32 y; f32 x2; f32 r; f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; r = a; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; r = a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; r = a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; r = a; } return r; }
 static inline f32 chb_cos(f32 x) { f32 y; f32 x2; f32 r; f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; r = a; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; r = a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; r = a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; r = a; } return r; }
 static void pose_init(void);
@@ -277,14 +259,14 @@ void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot);
 __declspec(section ".data") s32 evt_door_1[12];
 __declspec(section ".data") static s32 evt_door_2[12];
 __declspec(section ".data") static s32 evt_wall[12];
-__declspec(section ".data") s32 door_npc[4];
+__declspec(section ".data") const char* door_npc[4];
 __declspec(section ".data") static s32 door_open[9];
 __declspec(section ".data") static s32 door_close[10];
-s32 door[18];
-static s32 bero_entry_data[45];
+DoorParam door;
+static BeroEntry bero_entry_data[3];
 static s32 first_evt[148];
 s32 evt_bom_01_karakara[123];
-static s32 ext_data[93];
+static ExtTexInfo ext_data[31];
 s32 evt_bom1000[15];
 __declspec(section ".data") s32 gamen_shake[8];
 s32 gamen_shake2[26];
@@ -299,8 +281,8 @@ s32 cam_inside2[52];
 static s32 party_damage_pose[52];
 s32 effect_1[84];
 s32 open_hatch[83];
-__declspec(section ".data") static s32 spline_dt[9];
-__declspec(section ".data") s32 oh_data[8];
+__declspec(section ".data") static f32 spline_dt[9];
+__declspec(section ".data") const char* oh_data[8];
 static s32 evt_taihou[2446];
 static s32 init_soncho[13];
 static s32 talk_soncho[24];
@@ -328,7 +310,7 @@ static s32 musume_talk[64];
 static s32 musume_a_entry[26];
 static s32 musume_b_entry[26];
 static s32 musume_c_entry[26];
-static s32 npcEnt[161];
+static NpcSetupInfo npcEnt[7];
 s32 bom1000_minnnanokoe[21];
 static s32 minnnanokoe_evt[VERSION_PICK(450, 466)];
 static s32 evt_door[14];
@@ -666,8 +648,11 @@ __declspec(section ".data") static EVT_BEGIN(evt_wall)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 door_npc[] = {
-    (s32)/*"ホワイト"*/"\203z\203\217\203C\203g", (s32)/*"ペントリット"*/"\203y\203\223\203g\203\212\203b\203g", (s32)/*"スラリー"*/"\203X\203\211\203\212\201[", 0,
+__declspec(section ".data") const char* door_npc[] = {
+    /*"ホワイト"*/"\203z\203\217\203C\203g",
+    /*"ペントリット"*/"\203y\203\223\203g\203\212\203b\203g",
+    /*"スラリー"*/"\203X\203\211\203\212\201[",
+    NULL,
 };
 
 __declspec(section ".data") static EVT_BEGIN(door_open)
@@ -682,19 +667,61 @@ __declspec(section ".data") static EVT_BEGIN(door_close)
     RETURN
 EVT_END()
 
-s32 door[] = {
-    0, 3, 1, (s32)("s_ie_door"), (s32)("A_ie_door_u"), (s32)("A_ie_door"), (s32)("s_ie_kai"), 0,
-    (s32)("S_ie_naka"), 0, (s32)evt_door_1, (s32)evt_door_2, (s32)evt_wall, (s32)door_npc, 0, 0,
-    (s32)door_open, (s32)door_close,
+DoorParam door = {
+    0, // field_0x0
+    3, // type
+    1, // se
+    "s_ie_door", // mapobj
+    "A_ie_door_u", // hitIn
+    "A_ie_door", // hitOut
+    "s_ie_kai", // mapIn
+    NULL, // hitInIn
+    "S_ie_naka", // mapOut
+    NULL, // hitOutOut
+    evt_door_1, // evtIn
+    evt_door_2, // evtOut
+    evt_wall, // evtWall
+    door_npc, // npcs
+    NULL, // mobjs
+    NULL, // items
+    door_open, // evtOpen
+    door_close, // evtClose
 };
 
-static s32 bero_entry_data[] = {
-    (s32)("w_bero"), 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)("bom_04"), (s32)("e_bero4"), 65537, 0, 0, (s32)("e_bero"),
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)("bom_02"), (s32)("w_bero"), 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        ("w_bero"), // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)("bom_04"), // nextMapName
+        ("e_bero4"), // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        ("e_bero"), // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)("bom_02"), // nextMapName
+        ("w_bero"), // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(first_evt)
@@ -974,19 +1001,38 @@ static void ext_dispent(void) {
     }
 }
 
-static s32 ext_data[] = {
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static ExtTexInfo ext_data[] = {
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
+    {0},
 };
 
 EVT_BEGIN(evt_bom1000)
@@ -1182,13 +1228,16 @@ EVT_BEGIN(open_hatch)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static s32 spline_dt[] = {
-    -1018691584, 0, 1143111680, 1142128640, 1128792064, -989437952, 1152155648, 1120403456,
-    -979718144,
+__declspec(section ".data") static f32 spline_dt[] = {
+    -200.0f, 0.0f, 650.0f, 590.0f, 200.0f, -2150.0f, 1380.0f, 100.0f,
+    -4950.0f,
 };
 
-__declspec(section ".data") s32 oh_data[] = {
-    (s32)/*("\203j\203g\203\215")*/("\203j\203g\203\215"), (s32)("stg7_bom_65_a"), (s32)/*("\203y\203\223\203g\203\212\203b\203g")*/("\203y\203\223\203g\203\212\203b\203g"), (s32)("stg7_bom_65_b"), (s32)/*("\203X\203\211\203\212\201[")*/("\203X\203\211\203\212\201["), (s32)("stg7_bom_65_c"), (s32)/*("\203{\203\200\203w\203CD")*/("\203{\203\200\203w\203CD"), (s32)("stg7_bom_65_d"),
+__declspec(section ".data") const char* oh_data[] = {
+    /*"\203j\203g\203\215"*/"\203j\203g\203\215", "stg7_bom_65_a",
+    /*"\203y\203\223\203g\203\212\203b\203g"*/"\203y\203\223\203g\203\212\203b\203g", "stg7_bom_65_b",
+    /*"\203X\203\211\203\212\201["*/"\203X\203\211\203\212\201[", "stg7_bom_65_c",
+    /*"\203{\203\200\203w\203CD"*/"\203{\203\200\203w\203CD", "stg7_bom_65_d",
 };
 
 static EVT_BEGIN(evt_taihou)
@@ -1278,7 +1327,7 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_npc_set_ry, STRING(("me")), 90)
     CALL(evt_msg_print, 0, STRING(("stg7_bom_64")), 0, STRING(("me")))
     CALL(evt_msg_print, 0, STRING(("stg7_bom_64_01")), 0, STRING(("\203z\203\217\203C\203g")))
-    SET_INT_READ_ADDR(PTR(oh_data))
+    SET_INT_READ_ADDR(PTR(&oh_data))
     LOOP(4)
         READ_INT2(LW(0), LW(1))
         BEGIN_INLINE_EVENT
@@ -1378,7 +1427,7 @@ static EVT_BEGIN(evt_taihou)
         CALL(evt_npc_move_position, STRING(("\203X\203\211\203\212\201[")), -70, -180, 0, FLOAT(80.0f), 1)
     END_INLINE_EVENT
     SET_VALUE(GF(0), 0)
-    SET_VALUE(LW(0), PTR(door))
+    SET_VALUE(LW(0), PTR(&door))
     SPAWN_EVENT(PTR(evt_door_open_bom_01))
     LOOP(0)
         IF_INT_EQUAL(GF(0), 1)
@@ -2096,28 +2145,80 @@ static EVT_BEGIN(musume_c_entry)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"村長"*/"\221\272\222\267", 1073743360, 0, (s32)init_soncho, 0, (s32)talk_soncho, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ニトロ"*/"\203j\203g\203\215",
-    1073743360, 0, (s32)init_nitoro, 0, (s32)talk_nitoro, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"ペントリット"*/("\203y\203\223\203g\203\212\203b\203g"), 1073743360,
-    0, (s32)init_pentrit, 0, (s32)talk_pentrit, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"スラリー"*/("\203X\203\211\203\212\201["), 1073743360, 0,
-    (s32)init_surary, 0, (s32)talk_surary, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"ボムヘイD"*/"\203{\203\200\203w\203CD", 1073743360, 0, (s32)init_murabito_d,
-    0, (s32)talk_murabito_d, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"ホワイト"*/("\203z\203\217\203C\203g"), 1073743360, 0, (s32)init_white, 0,
-    (s32)talk_white, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"村長"*/"\221\272\222\267", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_soncho, // initEvent
+        NULL, // regularEvent
+        talk_soncho, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ニトロ"*/"\203j\203g\203\215", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_nitoro, // initEvent
+        NULL, // regularEvent
+        talk_nitoro, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ペントリット"*/("\203y\203\223\203g\203\212\203b\203g"), // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_pentrit, // initEvent
+        NULL, // regularEvent
+        talk_pentrit, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"スラリー"*/("\203X\203\211\203\212\201["), // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_surary, // initEvent
+        NULL, // regularEvent
+        talk_surary, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ボムヘイD"*/"\203{\203\200\203w\203CD", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_murabito_d, // initEvent
+        NULL, // regularEvent
+        talk_murabito_d, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ホワイト"*/("\203z\203\217\203C\203g"), // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_white, // initEvent
+        NULL, // regularEvent
+        talk_white, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 s32 taihou_r(EventEntry* event, BOOL isFirstCall) {

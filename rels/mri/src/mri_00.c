@@ -22,6 +22,7 @@
 #include "driver/fadedrv.h"
 #include "evt/evt_bero.h"
 #include "mri.h"
+#include "evt/evt_npc.h"
 
 USER_FUNC(evt_img_alloc_capture);
 typedef struct CloudWork { s32 used; s32 state; char animName[0x20]; char imgName[0x20]; char offscreenName[0x20]; char groupNames[8][0x20]; char hitName[0x20]; s32 limit; s32 counter; EventEntry* evt; void* endEvt; s32 timer; s32 x; s32 y; s32 w; s32 h; f32 lastFrame; } CloudWork;
@@ -143,23 +144,23 @@ static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
 extern s32 envSetYami[];
 
-__declspec(section ".data") u64 fd_mri_00_negone_one_374;
-__declspec(section ".data") s32 fd_mri_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_mri_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_mri_00___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_mri_00_one_negone_373;
-__declspec(section ".data") s32 fd_mri_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_mri_00_one_381[1];
-__declspec(section ".data") u64 fd_mri_00_negone_one_360;
-__declspec(section ".data") s32 fd_mri_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_mri_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_mri_00___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_mri_00_one_negone_359;
-__declspec(section ".data") s32 fd_mri_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_mri_00_one_364[1];
-static s32 puni_rand_position[98];
+__declspec(section ".data") f32 fd_mri_00_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_00_neg_one_382;
+__declspec(section ".data") f32 fd_mri_00___local_PI_383;
+__declspec(section ".data") f32 fd_mri_00___local_3PIO2_385;
+__declspec(section ".data") f32 fd_mri_00_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_00___local_PIO2_384;
+__declspec(section ".data") f32 fd_mri_00_one_381;
+__declspec(section ".data") f32 fd_mri_00_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_00_neg_one_365;
+__declspec(section ".data") f32 fd_mri_00___local_PI_366;
+__declspec(section ".data") f32 fd_mri_00___local_3PIO2_368;
+__declspec(section ".data") f32 fd_mri_00_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_00___local_PIO2_367;
+__declspec(section ".data") f32 fd_mri_00_one_364;
+static s16 puni_rand_position[196];
 s32 mario_see_you_init[54];
-static s32 spline_dt[24];
+static f32 spline_dt[24];
 s32 seal_bigtree[213];
 s32 seal_bigtree2[143];
 static s32 guide_init[72];
@@ -180,19 +181,19 @@ static s32 odoriko_2_talk[20];
 static s32 odoriko_2_init[33];
 static s32 odoriko_3_talk[20];
 static s32 odoriko_3_init[33];
-static s32 npcEnt[161];
+static NpcSetupInfo npcEnt[7];
 static __declspec(section ".data") s32 bero_01_doa_close[7];
 static __declspec(section ".data") s32 bero_01_doa_open[7];
 static s32 first_time_w_bero[18];
 s32 out_ne_bero[44];
 static __declspec(section ".data") s32 out_w_bero[12];
 s32 out_dokan_1[30];
-s32 bero_lostitem[15];
-static s32 bero_entry_data[60];
+BeroEntry bero_lostitem[1];
+static BeroEntry bero_entry_data[4];
 s32 first_bigtree[99];
-static __declspec(section ".data") s32 capturemap[4];
+static __declspec(section ".data") const char* capturemap[4];
 static __declspec(section ".data") s32 evt_cloud_main_evt[4];
-s32 guide_move_data[15];
+f32 guide_move_data[15];
 s32 open_bigtree[446];
 s32 mario_see_you[210];
 s32 puni_set[59];
@@ -264,68 +265,60 @@ static void _mapclsofs_all(CloudWork* wp) {
     }
 }
 
-__declspec(section ".data") u64 fd_mri_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mri_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mri_00_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_mri_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_mri_00___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_mri_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_mri_00___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_mri_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_mri_00_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_mri_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_mri_00___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_mri_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_mri_00_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_mri_00_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_mri_00_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mri_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mri_00_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_mri_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_mri_00___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_mri_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_mri_00___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_mri_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_mri_00_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_mri_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_mri_00___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_mri_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_mri_00_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_mri_00_one_364 = 1.0f;
 
-static s32 puni_rand_position[] = {
-    5439498, 2162719, 11534454, -6422479, 9699475, 10485819, 12779662, 14614573,
-    720884, -4521981, -3211277, 7471130, 11403338, -3997634, 12779610, 14221378,
-    -524299, 14221419, 9175098, -458706, 10289280, -5308356, 10289172, -3997672,
-    11862071, -3080144, 7602260, 13435061, 1703987, 7340016, 3670079, -7864305,
-    -4390869, 7864383, 4587546, 5111775, -65514, -7667673, 11272342, 12845071,
-    -1310691, -6750183, -5570526, 5701677, 11534434, -5636102, 14090326, 8388650,
-    13369395, 6094829, -3211257, -4456464, -5636082, -7536581, 7077935, 6750213,
-    9568259, 917511, 10158160, 11993259, 10682552, -1769422, 10289318, 8585206,
-    6357056, 8847437, 6160410, -8912849, 13762590, 4980800, 11862017, 10223716,
-    3014702, -6422457, 8650849, 4390958, 13959294, 3276822, 852004, 11010088,
-    12648645, 7995400, 8978454, 9699367, 12779590, 2162698, -2686949, 458811,
-    10747897, 11469007, -1835018, 9240691, 11534357, 12451876, -6815740, 2424901,
-    12910702, 13893794,
+static s16 puni_rand_position[] = {
+    83, 10, 33, 31, 176, 118, -98, 49,
+    148, 147, 160, 59, 195, 142, 223, 45,
+    10, -12, -69, 3, -50, -13, 114, 26,
+    174, 74, -61, 62, 195, 90, 217, 66,
+    -9, -11, 217, 107, 140, 58, -7, 46,
+    157, 128, -81, 60, 157, 20, -61, 24,
+    181, 55, -47, 48, 116, 84, 205, 181,
+    26, 51, 111, -16, 56, 63, -120, 15,
+    -67, 43, 120, 63, 70, 26, 77, -33,
+    -1, 22, -117, 39, 172, 150, 196, 15,
+    -20, 29, -103, 25, -85, 34, 87, 45,
+    176, 98, -87, -6, 215, 86, 128, 42,
+    204, 51, 92, -19, -49, 7, -69, -16,
+    -86, 14, -115, 59, 108, 47, 103, 5,
+    146, 3, 14, 7, 155, 80, 183, 171,
+    163, 184, -27, 50, 157, 166, 130, -10,
+    97, 64, 135, 77, 94, 26, -136, 47,
+    210, 30, 76, 64, 181, 1, 156, 100,
+    46, 46, -98, 71, 132, 97, 67, 46,
+    213, 126, 50, 22, 13, 36, 168, 40,
+    193, 197, 122, 8, 137, 22, 148, 39,
+    195, 70, 33, 10, -41, 27, 7, 59,
+    163, -7, 175, 207, -29, -10, 141, 115,
+    176, 21, 190, 36, -104, 4, 37, 69,
+    197, 110, 212, 162,
 };
 
 EVT_BEGIN(mario_see_you_init)
@@ -348,10 +341,10 @@ EVT_BEGIN(mario_see_you_init)
     RETURN
 EVT_END()
 
-static s32 spline_dt[] = {
-    1124859904, 0, -1022623744, -1048252934, 0, 1097379609, -1020593074, 0,
-    1095498068, -1014983504, 0, -1037884139, -1019166454, 1109209906, -1023325300, -1023350088,
-    1117074227, -1020841838, -1035616036, 1125118769, -1018363904, 1092616192, 1125842944, -1017380864,
+static f32 spline_dt[] = {
+    140.0f, 0.0f, -140.0f, -16.6162f, 0.0f, 14.542748f, -170.98557f, 0.0f,
+    12.748371f, -257.16162f, 0.0f, -40.786213f, -192.75406f, 39.299995f, -129.2951f, -128.91687f,
+    74.6f, -167.18973f, -49.43834f, 143.94997f, -205.0f, 10.0f, 155.0f, -220.0f,
 };
 
 EVT_BEGIN(seal_bigtree)
@@ -639,28 +632,80 @@ static EVT_BEGIN(odoriko_3_init)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"ガイド"*/"\x83\x4B\x83\x43\x83\x68", 525824, 0, (s32)guide_init, 0, (s32)guide_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ライバル"*/"\x83\x89\x83\x43\x83\x6F\x83\x8B",
-    525824, 0, (s32)rival_init, 0, (s32)rival_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"ちびトゲ"*/"\x82\xBF\x82\xD1\x83\x67\x83\x51", 525824,
-    0, (s32)chibitoge_init, 0, (s32)chibitoge_talk, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"ガイド妹"*/"\x83\x4B\x83\x43\x83\x68\x96\x85", 525824, 0,
-    (s32)sister_init, 0, (s32)sister_talk, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", 525824, 0, (s32)elder_init,
-    0, (s32)elder_talk, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"ファビオ"*/"\x83\x74\x83\x40\x83\x72\x83\x49", 525824, 0, (s32)fabio_init, 0,
-    (s32)fabio_talk, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"ガイド"*/"\x83\x4B\x83\x43\x83\x68", // name
+        0x80600, // flags
+        0, // reactionFlags
+        guide_init, // initEvent
+        NULL, // regularEvent
+        guide_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ライバル"*/"\x83\x89\x83\x43\x83\x6F\x83\x8B", // name
+        0x80600, // flags
+        0, // reactionFlags
+        rival_init, // initEvent
+        NULL, // regularEvent
+        rival_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ちびトゲ"*/"\x82\xBF\x82\xD1\x83\x67\x83\x51", // name
+        0x80600, // flags
+        0, // reactionFlags
+        chibitoge_init, // initEvent
+        NULL, // regularEvent
+        chibitoge_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガイド妹"*/"\x83\x4B\x83\x43\x83\x68\x96\x85", // name
+        0x80600, // flags
+        0, // reactionFlags
+        sister_init, // initEvent
+        NULL, // regularEvent
+        sister_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", // name
+        0x80600, // flags
+        0, // reactionFlags
+        elder_init, // initEvent
+        NULL, // regularEvent
+        elder_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ファビオ"*/"\x83\x74\x83\x40\x83\x72\x83\x49", // name
+        0x80600, // flags
+        0, // reactionFlags
+        fabio_init, // initEvent
+        NULL, // regularEvent
+        fabio_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static __declspec(section ".data") EVT_BEGIN(bero_01_doa_close)
@@ -724,20 +769,78 @@ EVT_BEGIN(out_dokan_1)
     RETURN
 EVT_END()
 
-s32 bero_lostitem[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)out_w_bero, (s32)"win_03", (s32)"", 65537, 0, 0,
+BeroEntry bero_lostitem[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)out_w_bero, // exitEvent
+        (s32)"win_03", // nextMapName
+        "", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
 };
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, (s32)first_time_w_bero,
-    -1, 0, (s32)"win_01", (s32)"n_bero", 65537, 0, 0, (s32)"ne_bero",
-    65536, 20000, 100000, 0, 0, -1, 0, -1,
-    (s32)out_ne_bero, (s32)"mri_01", (s32)"w_bero", 262148, (s32)bero_01_doa_close, (s32)bero_01_doa_open, (s32)"dokan_1", 131072,
-    9, 100000, 0, 0, -1, 0, 6, (s32)out_dokan_1,
-    (s32)"tik_16", (s32)"dokan_1", 65537, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)first_time_w_bero, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"win_01", // nextMapName
+        "n_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "ne_bero", // hitName
+        1, // type
+        0, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)out_ne_bero, // exitEvent
+        (s32)"mri_01", // nextMapName
+        "w_bero", // nextBeroName
+        4, // enterAnimeType
+        4, // exitAnimeType
+        (s32)bero_01_doa_close, // enterAnimeArg
+        (s32)bero_01_doa_open, // exitAnimeArg
+    },
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)out_dokan_1, // exitEvent
+        (s32)"tik_16", // nextMapName
+        "dokan_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(first_bigtree)
@@ -768,8 +871,11 @@ EVT_BEGIN(first_bigtree)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 capturemap[] = {
-    (s32)"S_non", (s32)"S_ha_10_07", (s32)"S_kesu", (s32)"\0",
+static __declspec(section ".data") const char* capturemap[] = {
+    "S_non",
+    "S_ha_10_07",
+    "S_kesu",
+    "\0",
 };
 
 static USER_FUNC(evt_cloud_main) {
@@ -826,7 +932,7 @@ static USER_FUNC(evt_cloud_main) {
             imgEntry(wp->imgName, group);
             img = imgNameToPtr(wp->imgName, group);
             img->poseId = animPaperPoseGetId(wp->animName, group);
-            *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+            img->animTime = animTimeGetTime(group);
             imgClearVirtualPoint(img);
             imgSetShadow(img, 2);
             img->flags |= 2;
@@ -846,7 +952,7 @@ static USER_FUNC(evt_cloud_main) {
         case 3:
             img = imgNameToPtr(wp->imgName, group);
             img->animName = (s32)"A_1";
-            *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+            img->animTime = animTimeGetTime(group);
             img->flags &= ~2;
             wp->timer = 30;
             wp->lastFrame = 0.0f;
@@ -888,7 +994,7 @@ static USER_FUNC(evt_cloud_main) {
             }
             img = imgNameToPtr(wp->imgName, group);
             img->animName = (s32)"A_2";
-            *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+            img->animTime = animTimeGetTime(group);
             wp->timer = 60;
             wp->state++;
             break;
@@ -979,9 +1085,9 @@ static __declspec(section ".data") EVT_BEGIN(evt_cloud_main_evt)
     RETURN
 EVT_END()
 
-s32 guide_move_data[] = {
-    1110980175, 1125220367, -1022250443, 1118326594, 1125220367, -1020873519, 1120358549, 1125056512,
-    -1019456035, 1124252517, 1125885544, -1019628141, 1126181305, 1126527813, -1019712539,
+f32 guide_move_data[] = {
+    46.053036f, 145.50023f, -145.69612f, 84.1548f, 145.50023f, -166.70631f, 99.65739f, 143.0f,
+    -188.3354f, 130.73201f, 155.65002f, -185.70927f, 160.16298f, 165.45027f, -184.42146f,
 };
 
 EVT_BEGIN(open_bigtree)
@@ -1674,7 +1780,7 @@ EVT_BEGIN(mri_00_init_evt)
     IF_INT_LESS_OR_EQUAL(GSW(0), 87)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_non"), 1)
         CALL(evt_mri_cloud_init)
-        CALL(evt_mri_cloud_ent, PTR(capturemap), STRING("A_kaze\0"), PTR(open_bigtree))
+        CALL(evt_mri_cloud_ent, PTR(&capturemap), STRING("A_kaze\0"), PTR(open_bigtree))
         SET_VALUE(LW(0), STRING("ne_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         ELSE

@@ -1,9 +1,10 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "driver/npcdrv.h"
 
-extern s32 btl_tik_setup_no_tbl[];
-extern s32 btlsetup_tik_tbl[];
+extern NpcTerritoryInfo btl_tik_setup_no_tbl[];
+extern NpcSetupBattleInfo btlsetup_tik_tbl[];
 extern s32 plane_majin_lecture[];
 extern s32 plane_majin_lecture_init[];
 extern s32 tik_00_init_evt[];
@@ -29,17 +30,17 @@ extern s32 tik_19_init_evt[];
 extern s32 tik_20_init_evt[];
 extern s32 tik_21_init_evt[];
 extern s32 tik_villager_urouro[];
-extern s32 unit_hammer_bros[];
-extern s32 unit_hannya[];
-extern s32 unit_hennya[];
-extern s32 unit_hinnya[];
-extern s32 unit_kamec[];
-extern s32 unit_kuriboo[];
-extern s32 unit_lecture_frankli_kuriboo[];
-extern s32 unit_nokonoko[];
-extern s32 unit_patakuri[];
-extern s32 unit_patapata[];
-extern s32 unit_togekuri[];
-extern s32 unit_togenoko[];
+extern BattleUnitKind unit_hammer_bros;
+extern BattleUnitKind unit_hannya;
+extern BattleUnitKind unit_hennya;
+extern BattleUnitKind unit_hinnya;
+extern BattleUnitKind unit_kamec;
+extern BattleUnitKind unit_kuriboo;
+extern BattleUnitKind unit_lecture_frankli_kuriboo;
+extern BattleUnitKind unit_nokonoko;
+extern BattleUnitKind unit_patakuri;
+extern BattleUnitKind unit_patapata;
+extern BattleUnitKind unit_togekuri;
+extern BattleUnitKind unit_togenoko;
 
 extern s32 evt_uranai_cap[];

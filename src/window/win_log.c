@@ -272,7 +272,7 @@ TubuDt tubuDt[] = {
     {-33, -74, 1, 0, 382, "las"},
 };
 
-s32 stone_tbl[] = {0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78};
+s32 stone_tbl[] = {ITEM_DIAMOND_STAR, ITEM_EMERALD_STAR, ITEM_GOLD_STAR, ITEM_RUBY_STAR, ITEM_SAPPHIRE_STAR, ITEM_GARNET_STAR, ITEM_CRYSTAL_STAR};
 
 static inline void winLogAddMenu(WinLogWork* w, s32 id) {
     static const char* msg_help[] = {
@@ -1308,7 +1308,7 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
                 scale = 3.0f;
             }
             PSMTXTrans(m, mx + tubuDt[w->mapIdx].x, my + tubuDt[w->mapIdx].y, 0.0f);
-            animPoseSetLocalTime(w->pose, gp->retraceCount % (s32)(*(f32**)((u8*)data + 0x24))[2]);
+            animPoseSetLocalTime(w->pose, gp->retraceCount % (s32)(data->unk24)[2]);
             animPoseMain(w->pose);
             animPoseDrawMtx(w->pose, m, 1, 0.0f, scale);
             animPoseDrawMtx(w->pose, m, 2, 0.0f, scale);

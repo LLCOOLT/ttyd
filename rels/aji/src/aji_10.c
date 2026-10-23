@@ -92,27 +92,27 @@ static USER_FUNC(viewport);
 void monitor_cap_tev(MapTevCallbackInfo* info);
 void monitor_cap_capture(CameraId cameraId, void* param);
 
-__declspec(section ".data") u64 fd_aji_10_negone_one_374;
-__declspec(section ".data") s32 fd_aji_10_neg_one_382[1];
-__declspec(section ".data") s32 fd_aji_10___local_PI_383[1];
-__declspec(section ".data") s32 fd_aji_10___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_aji_10_one_negone_373;
-__declspec(section ".data") s32 fd_aji_10___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_aji_10_one_381[1];
-__declspec(section ".data") u64 fd_aji_10_negone_one_360;
-__declspec(section ".data") s32 fd_aji_10_neg_one_365[1];
-__declspec(section ".data") s32 fd_aji_10___local_PI_366[1];
-__declspec(section ".data") s32 fd_aji_10___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_aji_10_one_negone_359;
-__declspec(section ".data") s32 fd_aji_10___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_aji_10_one_364[1];
+__declspec(section ".data") f32 fd_aji_10_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_10_neg_one_382;
+__declspec(section ".data") f32 fd_aji_10___local_PI_383;
+__declspec(section ".data") f32 fd_aji_10___local_3PIO2_385;
+__declspec(section ".data") f32 fd_aji_10_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_10___local_PIO2_384;
+__declspec(section ".data") f32 fd_aji_10_one_381;
+__declspec(section ".data") f32 fd_aji_10_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_10_neg_one_365;
+__declspec(section ".data") f32 fd_aji_10___local_PI_366;
+__declspec(section ".data") f32 fd_aji_10___local_3PIO2_368;
+__declspec(section ".data") f32 fd_aji_10_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_10___local_PIO2_367;
+__declspec(section ".data") f32 fd_aji_10_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static s32 e_door_close[22];
 static s32 e_door_open[22];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 static s32 bero_peach_evt[30];
-static s32 bero_peach_data[30];
+static BeroEntry bero_peach_data[2];
 s32 monitor_on[33];
 s32 monitor_off[37];
 s32 monitor_init[41];
@@ -130,56 +130,36 @@ static __declspec(section ".data") s32 teshita2_init[9];
 static __declspec(section ".data") s32 teshita3_init[9];
 __declspec(section ".data") s32 kanbu_init[9];
 static s32 syuryo_init[24];
-static s32 npcEnt[207];
+static NpcSetupInfo npcEnt[9];
 s32 aji_10_init_evt[279];
 
-__declspec(section ".data") u64 fd_aji_10_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_10_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_10_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_10___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_10___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_10___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_10___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_10_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_10___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_10___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_10_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_10_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_aji_10_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_10_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_10_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_10___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_10___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_10___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_10___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_10_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_10___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_10___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_10_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_10_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -213,13 +193,44 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"aji_01", (s32)"e_bero3", 327685, (s32)w_door_close, (s32)w_door_open, (s32)"e_bero",
-    65546, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"aji_11", (s32)"w_bero", 327685, (s32)e_door_close, (s32)e_door_open, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_01", // nextMapName
+        "e_bero3", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_11", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(bero_peach_evt)
@@ -234,11 +245,26 @@ static EVT_BEGIN(bero_peach_evt)
     RETURN
 EVT_END()
 
-static s32 bero_peach_data[] = {
-    (s32)"e_bero", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)bero_peach_evt, (s32)"aji_11", (s32)"w_bero", 327685, (s32)e_door_close, (s32)e_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_peach_data[] = {
+    {
+        "e_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)bero_peach_evt, // exitEvent
+        (s32)"aji_11", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 USER_FUNC(monitor_cap_init) {
@@ -1256,33 +1282,84 @@ static EVT_BEGIN(syuryo_init)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"手下１"*/"\x8E\xE8\x89\xBA\x82\x50", 0, 0, (s32)teshita1_init, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"手下２"*/"\x8E\xE8\x89\xBA\x82\x51",
-    32, 0, (s32)teshita2_init, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"手下３"*/"\x8E\xE8\x89\xBA\x82\x52", 32,
-    0, (s32)teshita3_init, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"カンブー"*/"\x83\x4A\x83\x93\x83\x75\x81\x5B", 32, 0,
-    (s32)kanbu_init, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"シュリョー"*/"\x83\x56\x83\x85\x83\x8A\x83\x87\x81\x5B", 32, 0, (s32)syuryo_init,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", 0, 0, (s32)npc_init_evt, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", 0, 0, (s32)npc_init_evt, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"ビビアン"*/"\x83\x72\x83\x72\x83\x41\x83\x93", 0, 0, (s32)npc_init_evt, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"手下１"*/"\x8E\xE8\x89\xBA\x82\x50", // name
+        0, 0, // flags..reactionFlags
+        teshita1_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"手下２"*/"\x8E\xE8\x89\xBA\x82\x51", // name
+        0x20, // flags
+        0, // reactionFlags
+        teshita2_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"手下３"*/"\x8E\xE8\x89\xBA\x82\x52", // name
+        0x20, // flags
+        0, // reactionFlags
+        teshita3_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"カンブー"*/"\x83\x4A\x83\x93\x83\x75\x81\x5B", // name
+        0x20, // flags
+        0, // reactionFlags
+        kanbu_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"シュリョー"*/"\x83\x56\x83\x85\x83\x8A\x83\x87\x81\x5B", // name
+        0x20, // flags
+        0, // reactionFlags
+        syuryo_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", // name
+        0, 0, // flags..reactionFlags
+        npc_init_evt, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", // name
+        0, 0, // flags..reactionFlags
+        npc_init_evt, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ビビアン"*/"\x83\x72\x83\x72\x83\x41\x83\x93", // name
+        0, 0, // flags..reactionFlags
+        npc_init_evt, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(aji_10_init_evt)

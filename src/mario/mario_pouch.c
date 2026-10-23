@@ -1170,7 +1170,7 @@ void pouchAddKpaScore(u32 score) {
 }
 
 void pouchGetStarStone(u32 id) {
-	u16* sp = (u16*)&mpp->mStarPowersObtained;
+	u16* sp = &mpp->mStarPowersObtained;
 	if (!*sp) {
 		mpp->audienceCount = 2.0f;
 	}

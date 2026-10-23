@@ -17,6 +17,7 @@
 #include "driver/dispdrv.h"
 #include "pmario_sound.h"
 #include "yuu.h"
+#include "data_tables.h"
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct YuuNpcPose { char name[16]; char anim[8]; u16 field_0x18; f32 frames; f32 jump; s32 start; s32 count; u16 flags; f32 field_0x30; } YuuNpcPose;
@@ -83,24 +84,24 @@ s32 yuunpc_pose_check(const char* name, const char* anim);
 void yuunpc_pose_init(YuuNpcData* data);
 void yuunpc_maphit_init(void);
 
-__declspec(section ".data") u64 fd_evt_yuunpc_negone_one_374;
-__declspec(section ".data") s32 fd_evt_yuunpc_neg_one_382[1];
-__declspec(section ".data") s32 fd_evt_yuunpc___local_PI_383[1];
-__declspec(section ".data") s32 fd_evt_yuunpc___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_evt_yuunpc_one_negone_373;
-__declspec(section ".data") s32 fd_evt_yuunpc___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_evt_yuunpc_one_381[1];
-__declspec(section ".data") u64 fd_evt_yuunpc_negone_one_360;
-__declspec(section ".data") s32 fd_evt_yuunpc_neg_one_365[1];
-__declspec(section ".data") s32 fd_evt_yuunpc___local_PI_366[1];
-__declspec(section ".data") s32 fd_evt_yuunpc___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_evt_yuunpc_one_negone_359;
-__declspec(section ".data") s32 fd_evt_yuunpc___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_evt_yuunpc_one_364[1];
-s32 ext_yuunpc_minigame1_data[18];
-s32 ext_yuunpc_minigame2_data[18];
-s32 ext_yuunpc_minigame3_data[18];
-s32 ext_yuunpc_minigame4_data[234];
+__declspec(section ".data") f32 fd_evt_yuunpc_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_yuunpc_neg_one_382;
+__declspec(section ".data") f32 fd_evt_yuunpc___local_PI_383;
+__declspec(section ".data") f32 fd_evt_yuunpc___local_3PIO2_385;
+__declspec(section ".data") f32 fd_evt_yuunpc_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_yuunpc___local_PIO2_384;
+__declspec(section ".data") f32 fd_evt_yuunpc_one_381;
+__declspec(section ".data") f32 fd_evt_yuunpc_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_yuunpc_neg_one_365;
+__declspec(section ".data") f32 fd_evt_yuunpc___local_PI_366;
+__declspec(section ".data") f32 fd_evt_yuunpc___local_3PIO2_368;
+__declspec(section ".data") f32 fd_evt_yuunpc_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_yuunpc___local_PIO2_367;
+__declspec(section ".data") f32 fd_evt_yuunpc_one_364;
+ExtTexInfo ext_yuunpc_minigame1_data[6];
+ExtTexInfo ext_yuunpc_minigame2_data[6];
+ExtTexInfo ext_yuunpc_minigame3_data[6];
+ExtTexInfo ext_yuunpc_minigame4_data[78];
 s32 chusan_mov_tbl[28];
 __declspec(section ".data") s32 chusan_act_tbl[8];
 s32 evt_yuunpc_minigame1[69];
@@ -108,53 +109,33 @@ s32 evt_yuunpc_minigame2[69];
 s32 evt_yuunpc_minigame3[69];
 s32 evt_yuunpc_minigame4[167];
 
-__declspec(section ".data") u64 fd_evt_yuunpc_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_evt_yuunpc_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_evt_yuunpc_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_evt_yuunpc_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_evt_yuunpc___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_evt_yuunpc___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_evt_yuunpc___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_evt_yuunpc___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_evt_yuunpc_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_evt_yuunpc_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_evt_yuunpc___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_evt_yuunpc___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_evt_yuunpc_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_evt_yuunpc_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_evt_yuunpc_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_evt_yuunpc_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_evt_yuunpc_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_evt_yuunpc_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_evt_yuunpc___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_evt_yuunpc___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_evt_yuunpc___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_evt_yuunpc___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_evt_yuunpc_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_evt_yuunpc_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_evt_yuunpc___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_evt_yuunpc___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_evt_yuunpc_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_evt_yuunpc_one_364 = 1.0f;
 
 f32 yuusintbl[] = {
     0.0f, 0.0174519997f, 0.0348990001f, 0.0523359999f, 0.0697560012f, 0.0871559978f, 0.104528002f, 0.121868998f,
@@ -218,55 +199,112 @@ f32 yuusintbl[] = {
 
 signed char hitdata[] = "000000000000000000000000001617181911121314151122231102030405060607080910000000000000000000242526272828282828000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000747474747474744949242400000000000000000000000000000000000000000000000000\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\241\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\241\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\241\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\241\201\240\201\240\201\240\201\240\201\241\201\241\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\241\201\240\201\240\201\241\201\240\201\240\201\240\201\240\201\241\201\241\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\241\201\241\201\241\201\241\201\241\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\241\201\240\201\240\201\241\201\240\201\240\201\240\201\240\201\241\201\241\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\241\201\241\201\241\201\241\201\241\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\241\201\240\201\240\201\240\201\240\201\241\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\241\201\241\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\241\201\240\201\240\201\240\201\240\201\241\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\201\240\000\000\000";
 
-s32 ext_yuunpc_minigame1_data[] = {
-    (s32)"c_kinopiko", (s32)"KNF_S_1", 0, (s32)"c_roten", (s32)"S_1", 0, (s32)"c_jugemu", (s32)"JGM_S_1",
-    0, (s32)"c_kinopio", (s32)"KNP_S_1", 0, 0, 0, 0, 0,
-    0, 0,
+ExtTexInfo ext_yuunpc_minigame1_data[] = {
+    {"c_kinopiko", "KNF_S_1", 0.0f},
+    {"c_roten", "S_1", 0.0f},
+    {"c_jugemu", "JGM_S_1", 0.0f},
+    {"c_kinopio", "KNP_S_1", 0.0f},
+    {0},
+    {0},
 };
 
-s32 ext_yuunpc_minigame2_data[] = {
-    (s32)"c_kinopiko", (s32)"KNF_S_1", 0, (s32)"c_roten", (s32)"S_1", 0, (s32)"c_jugemu", (s32)"JGM_S_1",
-    0, (s32)"c_kinopio", (s32)"KNP_S_1", 0, 0, 0, 0, 0,
-    0, 0,
+ExtTexInfo ext_yuunpc_minigame2_data[] = {
+    {"c_kinopiko", "KNF_S_1", 0.0f},
+    {"c_roten", "S_1", 0.0f},
+    {"c_jugemu", "JGM_S_1", 0.0f},
+    {"c_kinopio", "KNP_S_1", 0.0f},
+    {0},
+    {0},
 };
 
-s32 ext_yuunpc_minigame3_data[] = {
-    (s32)"c_kinopiko", (s32)"KNF_S_1", 0, (s32)"c_roten", (s32)"S_1", 0, (s32)"c_jugemu", (s32)"JGM_S_1",
-    0, (s32)"c_kinopio", (s32)"KNP_S_1", 0, 0, 0, 0, 0,
-    0, 0,
+ExtTexInfo ext_yuunpc_minigame3_data[] = {
+    {"c_kinopiko", "KNF_S_1", 0.0f},
+    {"c_roten", "S_1", 0.0f},
+    {"c_jugemu", "JGM_S_1", 0.0f},
+    {"c_kinopio", "KNP_S_1", 0.0f},
+    {0},
+    {0},
 };
 
-s32 ext_yuunpc_minigame4_data[] = {
-    (s32)"c_kinopiko", (s32)"KNF_S_1", 0, (s32)"c_roten", (s32)"S_1", 0, (s32)"c_jugemu", (s32)"JGM_S_1",
-    0, (s32)"c_kinopio", (s32)"KNP_S_1", 0, (s32)"c_kinopio", (s32)"KNP_R_1", 0, (s32)"c_kinopio",
-    (s32)"KNP_R_1", 1065353216, (s32)"c_kinopio", (s32)"KNP_R_1", 1073741824, (s32)"c_kinopio", (s32)"KNP_R_1", 1077936128,
-    (s32)"c_kinopio", (s32)"KNP_R_1", 1082130432, (s32)"c_kinopio", (s32)"KNP_R_1", 1084227584, (s32)"c_kinopio", (s32)"KNP_R_1",
-    1086324736, (s32)"c_kinopio", (s32)"KNP_R_1", 1088421888, (s32)"c_kinopio", (s32)"KNP_R_1", 1090519040, (s32)"c_kinopio",
-    (s32)"KNP_R_1", 1091567616, (s32)"c_kinopio", (s32)"KNP_R_1", 1092616192, (s32)"c_kinopio", (s32)"KNP_R_1", 1093664768,
-    (s32)"c_kinopio", (s32)"KNP_R_1", 1094713344, (s32)"c_kinopio", (s32)"KNP_R_1", 1095761920, (s32)"c_kinopio", (s32)"KNP_R_1",
-    1096810496, (s32)"c_kinopio", (s32)"KNP_R_1", 1097859072, (s32)"c_kinopio", (s32)"KNP_R_1", 1098907648, (s32)"c_kinopio",
-    (s32)"KNP_R_1", 1099431936, (s32)"c_kinopio", (s32)"KNP_R_1", 1099956224, (s32)"c_kinopio", (s32)"KNP_R_1", 1100480512,
-    (s32)"c_kinopio", (s32)"KNP_R_1", 1101004800, (s32)"c_kinopio", (s32)"KNP_R_1", 1101529088, (s32)"c_kinopio", (s32)"KNP_R_1",
-    1102053376, (s32)"c_kinopio", (s32)"KNP_R_1", 1102577664, (s32)"c_bom_n", (s32)"S_1", 0, (s32)"c_bom_n",
-    (s32)"R_1", 0, (s32)"c_bom_n", (s32)"R_1", 1065353216, (s32)"c_bom_n", (s32)"R_1", 1073741824,
-    (s32)"c_bom_n", (s32)"R_1", 1077936128, (s32)"c_bom_n", (s32)"R_1", 1082130432, (s32)"c_bom_n", (s32)"R_1",
-    1084227584, (s32)"c_bom_n", (s32)"R_1", 1086324736, (s32)"c_bom_n", (s32)"R_1", 1088421888, (s32)"c_bom_n",
-    (s32)"R_1", 1090519040, (s32)"c_bom_n", (s32)"R_1", 1091567616, (s32)"c_bom_n", (s32)"R_1", 1092616192,
-    (s32)"c_bom_n", (s32)"R_1", 1093664768, (s32)"c_bom_n", (s32)"R_1", 1094713344, (s32)"c_bom_n", (s32)"R_1",
-    1095761920, (s32)"c_bom_n", (s32)"R_1", 1096810496, (s32)"c_bom_n", (s32)"R_1", 1097859072, (s32)"c_bom_n",
-    (s32)"R_1", 1098907648, (s32)"c_bom_n", (s32)"R_1", 1099431936, (s32)"c_bom_n", (s32)"R_1", 1099956224,
-    (s32)"c_bom_n", (s32)"R_1", 1100480512, (s32)"c_tyusan", (s32)"CHU_S_1", 0, (s32)"c_tyusan", (s32)"CHU_S_1",
-    1124270080, (s32)"c_tyusan", (s32)"CHU_S_1", 1124335616, (s32)"c_tyusan", (s32)"CHU_S_1", 1124401152, (s32)"c_tyusan",
-    (s32)"CHU_R_1", 0, (s32)"c_tyusan", (s32)"CHU_R_1", 1065353216, (s32)"c_tyusan", (s32)"CHU_R_1", 1073741824,
-    (s32)"c_tyusan", (s32)"CHU_R_1", 1077936128, (s32)"c_tyusan", (s32)"CHU_R_1", 1082130432, (s32)"c_tyusan", (s32)"CHU_R_1",
-    1084227584, (s32)"c_tyusan", (s32)"CHU_R_1", 1086324736, (s32)"c_tyusan", (s32)"CHU_R_1", 1088421888, (s32)"c_tyusan",
-    (s32)"CHU_R_1", 1090519040, (s32)"c_tyusan", (s32)"CHU_R_1", 1091567616, (s32)"c_tyusan", (s32)"CHU_R_1", 1092616192,
-    (s32)"c_tyusan", (s32)"CHU_R_1", 1093664768, (s32)"c_tyusan", (s32)"CHU_R_1", 1094713344, (s32)"c_tyusan", (s32)"CHU_R_1",
-    1095761920, 0, 0, 0, (s32)"c_luigi", (s32)"S_1", 1109393408, (s32)"c_luigi",
-    (s32)"W_1", 1109393408, (s32)"c_luigi", (s32)"R_1", 1101004800, (s32)"c_nokorin", (s32)"S_1", 1109393408,
-    (s32)"c_nokorin", (s32)"W_1", 1109393408, (s32)"c_nokorin", (s32)"R_1", 1101004800, (s32)"c_joho_a", (s32)"S_1",
-    1114636288, (s32)"c_joho_a", (s32)"W_1", 1111490560, (s32)"c_joho_a", (s32)"R_1", 1103101952, 0,
-    0, 0,
+ExtTexInfo ext_yuunpc_minigame4_data[] = {
+    {"c_kinopiko", "KNF_S_1", 0.0f},
+    {"c_roten", "S_1", 0.0f},
+    {"c_jugemu", "JGM_S_1", 0.0f},
+    {"c_kinopio", "KNP_S_1", 0.0f},
+    {"c_kinopio", "KNP_R_1", 0.0f},
+    {"c_kinopio", "KNP_R_1", 1.0f},
+    {"c_kinopio", "KNP_R_1", 2.0f},
+    {"c_kinopio", "KNP_R_1", 3.0f},
+    {"c_kinopio", "KNP_R_1", 4.0f},
+    {"c_kinopio", "KNP_R_1", 5.0f},
+    {"c_kinopio", "KNP_R_1", 6.0f},
+    {"c_kinopio", "KNP_R_1", 7.0f},
+    {"c_kinopio", "KNP_R_1", 8.0f},
+    {"c_kinopio", "KNP_R_1", 9.0f},
+    {"c_kinopio", "KNP_R_1", 10.0f},
+    {"c_kinopio", "KNP_R_1", 11.0f},
+    {"c_kinopio", "KNP_R_1", 12.0f},
+    {"c_kinopio", "KNP_R_1", 13.0f},
+    {"c_kinopio", "KNP_R_1", 14.0f},
+    {"c_kinopio", "KNP_R_1", 15.0f},
+    {"c_kinopio", "KNP_R_1", 16.0f},
+    {"c_kinopio", "KNP_R_1", 17.0f},
+    {"c_kinopio", "KNP_R_1", 18.0f},
+    {"c_kinopio", "KNP_R_1", 19.0f},
+    {"c_kinopio", "KNP_R_1", 20.0f},
+    {"c_kinopio", "KNP_R_1", 21.0f},
+    {"c_kinopio", "KNP_R_1", 22.0f},
+    {"c_kinopio", "KNP_R_1", 23.0f},
+    {"c_bom_n", "S_1", 0.0f},
+    {"c_bom_n", "R_1", 0.0f},
+    {"c_bom_n", "R_1", 1.0f},
+    {"c_bom_n", "R_1", 2.0f},
+    {"c_bom_n", "R_1", 3.0f},
+    {"c_bom_n", "R_1", 4.0f},
+    {"c_bom_n", "R_1", 5.0f},
+    {"c_bom_n", "R_1", 6.0f},
+    {"c_bom_n", "R_1", 7.0f},
+    {"c_bom_n", "R_1", 8.0f},
+    {"c_bom_n", "R_1", 9.0f},
+    {"c_bom_n", "R_1", 10.0f},
+    {"c_bom_n", "R_1", 11.0f},
+    {"c_bom_n", "R_1", 12.0f},
+    {"c_bom_n", "R_1", 13.0f},
+    {"c_bom_n", "R_1", 14.0f},
+    {"c_bom_n", "R_1", 15.0f},
+    {"c_bom_n", "R_1", 16.0f},
+    {"c_bom_n", "R_1", 17.0f},
+    {"c_bom_n", "R_1", 18.0f},
+    {"c_bom_n", "R_1", 19.0f},
+    {"c_tyusan", "CHU_S_1", 0.0f},
+    {"c_tyusan", "CHU_S_1", 131.0f},
+    {"c_tyusan", "CHU_S_1", 132.0f},
+    {"c_tyusan", "CHU_S_1", 133.0f},
+    {"c_tyusan", "CHU_R_1", 0.0f},
+    {"c_tyusan", "CHU_R_1", 1.0f},
+    {"c_tyusan", "CHU_R_1", 2.0f},
+    {"c_tyusan", "CHU_R_1", 3.0f},
+    {"c_tyusan", "CHU_R_1", 4.0f},
+    {"c_tyusan", "CHU_R_1", 5.0f},
+    {"c_tyusan", "CHU_R_1", 6.0f},
+    {"c_tyusan", "CHU_R_1", 7.0f},
+    {"c_tyusan", "CHU_R_1", 8.0f},
+    {"c_tyusan", "CHU_R_1", 9.0f},
+    {"c_tyusan", "CHU_R_1", 10.0f},
+    {"c_tyusan", "CHU_R_1", 11.0f},
+    {"c_tyusan", "CHU_R_1", 12.0f},
+    {"c_tyusan", "CHU_R_1", 13.0f},
+    {0},
+    {"c_luigi", "S_1", 40.0f},
+    {"c_luigi", "W_1", 40.0f},
+    {"c_luigi", "R_1", 20.0f},
+    {"c_nokorin", "S_1", 40.0f},
+    {"c_nokorin", "W_1", 40.0f},
+    {"c_nokorin", "R_1", 20.0f},
+    {"c_joho_a", "S_1", 60.0f},
+    {"c_joho_a", "W_1", 48.0f},
+    {"c_joho_a", "R_1", 24.0f},
+    {0},
 };
 
 s32 chusan_mov_tbl[] = {

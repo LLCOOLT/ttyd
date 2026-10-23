@@ -38,77 +38,57 @@ static USER_FUNC(ride_chk);
 static USER_FUNC(thunder_main);
 static USER_FUNC(loop_onoff);
 
-__declspec(section ".data") u64 fd_aji_05_negone_one_374;
-__declspec(section ".data") s32 fd_aji_05_neg_one_382[1];
-__declspec(section ".data") s32 fd_aji_05___local_PI_383[1];
-__declspec(section ".data") s32 fd_aji_05___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_aji_05_one_negone_373;
-__declspec(section ".data") s32 fd_aji_05___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_aji_05_one_381[1];
-__declspec(section ".data") u64 fd_aji_05_negone_one_360;
-__declspec(section ".data") s32 fd_aji_05_neg_one_365[1];
-__declspec(section ".data") s32 fd_aji_05___local_PI_366[1];
-__declspec(section ".data") s32 fd_aji_05___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_aji_05_one_negone_359;
-__declspec(section ".data") s32 fd_aji_05___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_aji_05_one_364[1];
+__declspec(section ".data") f32 fd_aji_05_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_05_neg_one_382;
+__declspec(section ".data") f32 fd_aji_05___local_PI_383;
+__declspec(section ".data") f32 fd_aji_05___local_3PIO2_385;
+__declspec(section ".data") f32 fd_aji_05_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_05___local_PIO2_384;
+__declspec(section ".data") f32 fd_aji_05_one_381;
+__declspec(section ".data") f32 fd_aji_05_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_05_neg_one_365;
+__declspec(section ".data") f32 fd_aji_05___local_PI_366;
+__declspec(section ".data") f32 fd_aji_05___local_3PIO2_368;
+__declspec(section ".data") f32 fd_aji_05_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_05___local_PIO2_367;
+__declspec(section ".data") f32 fd_aji_05_one_364;
 static s32 e_door_close[22];
 static s32 e_door_open[22];
-static s32 bero_entry_data[30];
+static BeroEntry bero_entry_data[2];
 static s32 evt_box[95];
 static __declspec(section ".data") s32 hikaru_on[4];
 static __declspec(section ".data") s32 hikaru_off[4];
-static __declspec(section ".data") s32 dmgReturnPt[8];
+static __declspec(section ".data") HitDamageReturn dmgReturnPt[2];
 static s32 hikaru_yuka_init[48];
 s32 aji_05_init_evt[77];
 
-__declspec(section ".data") u64 fd_aji_05_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_05_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_05_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_05___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_05___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_05___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_05___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_05_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_05___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_05___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_05_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_05_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_aji_05_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_05_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_05_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_05___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_05___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_05___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_05___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_05_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_05___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_05___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_05_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_05_one_364 = 1.0f;
 
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
@@ -126,11 +106,26 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"e_bero", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"aji_01", (s32)"w_bero_3", 327685, (s32)e_door_close, (s32)e_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "e_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_01", // nextMapName
+        "w_bero_3", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(evt_box)
@@ -171,17 +166,27 @@ static __declspec(section ".data") EVT_BEGIN(hikaru_off)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 dmgReturnPt[] = {
-    (s32)"mod_01", 0, -998637568, 0, 0, 0, 0, 0,
+static __declspec(section ".data") HitDamageReturn dmgReturnPt[] = {
+    {"mod_01", {0.0f, -1000.0f, 0.0f}},
+    {0},
 };
 
 static s32 hikaru_yuka_init[] = {
-    65630, (s32)hikaru_off, 327771, (s32)evt_hitobj_attr_onoff, 1, 1, (s32)"A_no1", 2048,
-    589915, (s32)evt_mobj_itembox, (s32)"box", -255, 10, -10, 2, 0,
-    (s32)evt_box, -129995822, 131163, (s32)evt_hit_damage_return_set, (s32)dmgReturnPt, 107, 65627, (s32)ride_chk,
-    109, 107, 65627, (s32)thunder_main, 109, 327771, (s32)evt_mapobj_flag_onoff, 1,
-    0, (s32)"yukayu1", 1, 327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"yukayu2",
-    1, 262235, (s32)evt_map_playanim, (s32)"denyuka", 1, 0, 1, 2,
+    CALL_CHILD(hikaru_off)
+    CALL(evt_hitobj_attr_onoff, 1, 1, STRING("A_no1"), 2048)
+    CALL(evt_mobj_itembox, STRING("box"), -255, 10, -10, 2, 0, PTR(evt_box), GSWF(4178))
+    CALL(evt_hit_damage_return_set, PTR(dmgReturnPt))
+    BEGIN_INLINE_EVENT
+        CALL(ride_chk)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(thunder_main)
+    END_INLINE_EVENT
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yukayu1"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yukayu2"), 1)
+    CALL(evt_map_playanim, STRING("denyuka"), 1, 0)
+    OPCODE_END_SCRIPT,
+    RETURN
 };
 
 EVT_BEGIN(aji_05_init_evt)

@@ -22,14 +22,14 @@ BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIc
 BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
 
 #ifdef VERSION_G8ME01
-__declspec(section ".data") u32 fd_bsi_0[2] = {0xBF800000, 0x3F800000}; // MWCC trig-pool pair (+-1.0f)
-__declspec(section ".data") u32 fd_bsi_1[2] = {0xBF800000, 0x3F800000}; // MWCC trig-pool pair (+-1.0f)
-__declspec(section ".data") u32 fd_bsi_2[2] = {0x3F800000, 0xBF800000}; // MWCC trig-pool pair (+-1.0f)
-__declspec(section ".data") u32 fd_bsi_3[2] = {0x3F800000, 0xBF800000}; // MWCC trig-pool pair (+-1.0f)
-__declspec(section ".data") u32 fd_bsi_4[2] = {0xBF800000, 0x3F800000}; // MWCC trig-pool pair (+-1.0f)
-__declspec(section ".data") u32 fd_bsi_5[2] = {0xBF800000, 0x3F800000}; // MWCC trig-pool pair (+-1.0f)
-__declspec(section ".data") u32 fd_bsi_6[2] = {0x3F800000, 0xBF800000}; // MWCC trig-pool pair (+-1.0f)
-__declspec(section ".data") u32 fd_bsi_7[2] = {0x3F800000, 0xBF800000}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") f32 fd_bsi_0[2] = {-1.0f, 1.0f}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") f32 fd_bsi_1[2] = {-1.0f, 1.0f}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") f32 fd_bsi_2[2] = {1.0f, -1.0f}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") f32 fd_bsi_3[2] = {1.0f, -1.0f}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") f32 fd_bsi_4[2] = {-1.0f, 1.0f}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") f32 fd_bsi_5[2] = {-1.0f, 1.0f}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") f32 fd_bsi_6[2] = {1.0f, -1.0f}; // MWCC trig-pool pair (+-1.0f)
+__declspec(section ".data") f32 fd_bsi_7[2] = {1.0f, -1.0f}; // MWCC trig-pool pair (+-1.0f)
 IconDispTableEntry _disp_table[0x17] = {
 		{1, _bsi_default_turn, 22, 1},
 		{4, _bsi_default_turn, 20, 1},
@@ -337,9 +337,9 @@ BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkSta
 	s32 type = disp->id;
 	s8 turns, strength;
 	s32 kind;
-	if (*(u32*)((u8*)_battleWorkPointer + 0xef4) & 0x10000) {
+	if (_battleWorkPointer->flags & 0x10000) {
 		if (type != 1 && !((BOOL(*)(BattleUnit*, s8))BtlUnit_CheckStatus)(unit, disp->id)) return FALSE;
-		kind = *(s32*)((u8*)unit + 8);
+		kind = (s32)unit->currentKind;
 		if (!((kind >= 1 && kind < 0xd8) || (kind >= 0xde && kind < 0xe0) || (kind >= 0xe0 && kind < 0xe7))) return FALSE;
 	} else if (!((BOOL(*)(BattleUnit*, s8))BtlUnit_CheckStatus)(unit, disp->id)) {
 		return FALSE;

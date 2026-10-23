@@ -2,6 +2,7 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
+#include "driver/hitdrv.h"
 
 #pragma force_active on
 
@@ -19,84 +20,121 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 
-__declspec(section ".data") u64 fd_tik_18_negone_one_374;
-__declspec(section ".data") s32 fd_tik_18_neg_one_382[1];
-__declspec(section ".data") s32 fd_tik_18___local_PI_383[1];
-__declspec(section ".data") s32 fd_tik_18___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_tik_18_one_negone_373;
-__declspec(section ".data") s32 fd_tik_18___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_tik_18_one_381[1];
-__declspec(section ".data") u64 fd_tik_18_negone_one_360;
-__declspec(section ".data") s32 fd_tik_18_neg_one_365[1];
-__declspec(section ".data") s32 fd_tik_18___local_PI_366[1];
-__declspec(section ".data") s32 fd_tik_18___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_tik_18_one_negone_359;
-__declspec(section ".data") s32 fd_tik_18___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_tik_18_one_364[1];
-static s32 bero_entry_data[75];
+__declspec(section ".data") f32 fd_tik_18_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tik_18_neg_one_382;
+__declspec(section ".data") f32 fd_tik_18___local_PI_383;
+__declspec(section ".data") f32 fd_tik_18___local_3PIO2_385;
+__declspec(section ".data") f32 fd_tik_18_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tik_18___local_PIO2_384;
+__declspec(section ".data") f32 fd_tik_18_one_381;
+__declspec(section ".data") f32 fd_tik_18_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tik_18_neg_one_365;
+__declspec(section ".data") f32 fd_tik_18___local_PI_366;
+__declspec(section ".data") f32 fd_tik_18___local_3PIO2_368;
+__declspec(section ".data") f32 fd_tik_18_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tik_18___local_PIO2_367;
+__declspec(section ".data") f32 fd_tik_18_one_364;
+static BeroEntry bero_entry_data[5];
 __declspec(section ".data") s32 tik_18_cloud_evt[5];
-static s32 hitDmgRetPoints[52];
+static HitDamageReturn hitDmgRetPoints[13];
 s32 tik_18_init_evt[96];
 
-__declspec(section ".data") u64 fd_tik_18_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tik_18_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tik_18_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tik_18_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_tik_18___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tik_18___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tik_18___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tik_18___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tik_18_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tik_18_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tik_18___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tik_18___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tik_18_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tik_18_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_tik_18_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tik_18_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tik_18_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tik_18_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_tik_18___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tik_18___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tik_18___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tik_18___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tik_18_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tik_18_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tik_18___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tik_18___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tik_18_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tik_18_one_364 = 1.0f;
 
-static s32 bero_entry_data[] = {
-    (s32)"dokan_1", 131072, 9, 100000, 0, 0, -1, 0,
-    6, 0, (s32)"tik_06", (s32)"dokan_2", 65537, 0, 0, (s32)"dokan_2",
-    131072, 2, 100000, 0, 0, -1, 0, 10,
-    0, (s32)"tik_07", (s32)"dokan_2", 65537, 0, 0, (s32)"e_bero_1", 0,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"tik_17", (s32)"w_bero_1", 65537, 0, 0, (s32)"e_bero_2", 0, 20000,
-    100000, 0, 0, -1, 0, -1, 0, (s32)"tik_17",
-    (s32)"w_bero_2", 65537, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, // exitEvent
+        (s32)"tik_06", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_2", // hitName
+        2, // type
+        0, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        10, // caseType
+        NULL, // exitEvent
+        (s32)"tik_07", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero_1", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tik_17", // nextMapName
+        "w_bero_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero_2", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tik_17", // nextMapName
+        "w_bero_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 __declspec(section ".data") EVT_BEGIN(tik_18_cloud_evt)
@@ -104,14 +142,20 @@ __declspec(section ".data") EVT_BEGIN(tik_18_cloud_evt)
     RETURN
 EVT_END()
 
-static s32 hitDmgRetPoints[] = {
-    (s32)"mod_1", 0, -998637568, 0, (s32)"mod_2", 0, -998637568, 0,
-    (s32)"mod_3", 0, -998637568, 0, (s32)"mod_4", 0, -998637568, 0,
-    (s32)"mod_5", 0, -998637568, 0, (s32)"mod_6", 0, -998637568, 0,
-    (s32)"mod_7", 0, -998637568, 0, (s32)"mod_8", 0, -998637568, 0,
-    (s32)"mod_9", 0, -998637568, 0, (s32)"mod_10", 0, -998637568, 0,
-    (s32)"mod_11", 0, -998637568, 0, (s32)"mod_12", 0, -998637568, 0,
-    0, 0, 0, 0,
+static HitDamageReturn hitDmgRetPoints[] = {
+    {"mod_1", {0.0f, -1000.0f, 0.0f}},
+    {"mod_2", {0.0f, -1000.0f, 0.0f}},
+    {"mod_3", {0.0f, -1000.0f, 0.0f}},
+    {"mod_4", {0.0f, -1000.0f, 0.0f}},
+    {"mod_5", {0.0f, -1000.0f, 0.0f}},
+    {"mod_6", {0.0f, -1000.0f, 0.0f}},
+    {"mod_7", {0.0f, -1000.0f, 0.0f}},
+    {"mod_8", {0.0f, -1000.0f, 0.0f}},
+    {"mod_9", {0.0f, -1000.0f, 0.0f}},
+    {"mod_10", {0.0f, -1000.0f, 0.0f}},
+    {"mod_11", {0.0f, -1000.0f, 0.0f}},
+    {"mod_12", {0.0f, -1000.0f, 0.0f}},
+    {0},
 };
 
 EVT_BEGIN(tik_18_init_evt)

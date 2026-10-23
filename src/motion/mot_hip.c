@@ -9,6 +9,7 @@
 #include "manager/evtmgr.h"
 #include "system.h"
 #include "evt/evt_cam.h"
+#include "evt/evt_cmd.h"
 
 HitEntry* marioChkLandon(f32* outY, f32 y);
 HitEntry* marioSearchGround(f32* a, f32* b, f32* c, f32 d, f32 e);
@@ -20,37 +21,23 @@ void kpa_hip(void);
 #define MF(o) (*(f32*)((u8*)mario + (o)))
 #define MI(o) (*(s32*)((u8*)mario + (o)))
 #ifdef VERSION_G8ME01
-typedef struct HipExt {
-    u8 pad[0x288];
-    s32 snd1;
-    s32 snd2;
-    u8 pad2[0x2B8 - 0x290];
-    f32 ang;
-} HipExt;
-#define EX ((HipExt*)mario)
-#define SND1 (EX->snd1)
-#define SND2 (EX->snd2)
+#define SND1 (mario->soundId[3])
+#define SND2 (mario->soundId[4])
 #else
-typedef struct HipExt {
-    u8 pad[0x2A0];
-    f32 ang;
-    s32 snd1;
-    s32 snd2;
-} HipExt;
-
-#define EX ((HipExt*)mario)
-#define SND1 (EX->snd1)
-#define SND2 (EX->snd2)
+#define SND1 (mario->mot.hip.sfxId[0])
+#define SND2 (mario->mot.hip.sfxId[1])
 #endif
 #define MH(o) (*(s16*)((u8*)mario + (o)))
 
-static s32 quake_evt[] = {
-    0x0005005B, (s32)evt_cam_shake, 4, -230000000, -229999980, 110, 2, 1,
-};
+static EVT_BEGIN(quake_evt)
+    CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 110)
+    RETURN
+EVT_END()
 
-static s32 quake_bgmode_evt[] = {
-    0x0005005B, (s32)evt_cam_shake, 4, -230000000, -229999990, 110, 2, 1,
-};
+static EVT_BEGIN(quake_bgmode_evt)
+    CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 110)
+    RETURN
+EVT_END()
 
 s32 U_chkground(void);
 void mot_hip_post(void);
@@ -179,18 +166,18 @@ void mot_hip(void) {
         SND1 = psndSFXOn_3D((char*)0x158, &mario->position);
         SND2 = psndSFXOn_3D((char*)0xDB, &mario->position);
 #endif
-        EX->ang = 0.0f;
+        mario->mot.hip.angle = 0.0f;
         mario->baseSpeed = 0.0f;
         mario->currSubMotionId = 1;
     case 1:
-        if ((EX->ang += 20.0f) >= 360.0f) {
-            EX->ang = 360.0f;
+        if ((mario->mot.hip.angle += 20.0f) >= 360.0f) {
+            mario->mot.hip.angle = 360.0f;
         }
         mario->jumpVelocityY -= 0.42f;
         if (mario->hitobjHead == NULL) {
             mario->dispOfs2.y += mario->jumpVelocityY;
         }
-        if (360.0f == EX->ang && mario->jumpVelocityY <= 0.0f) {
+        if (360.0f == mario->mot.hip.angle && mario->jumpVelocityY <= 0.0f) {
             MI(0x48) = 5;
             mario->currSubMotionId = 2;
             mario->jumpVelocityY = 2.0f;
@@ -225,10 +212,10 @@ void mot_hip(void) {
         break;
     case 10:
         marioChkLandon(&y, 0.0f);
-        if ((EX->ang += 22.5f) >= 360.0f) {
+        if ((mario->mot.hip.angle += 22.5f) >= 360.0f) {
             mario->flags &= ~0x10000;
             mario->flags |= 0x20000;
-            EX->ang = 0.0f;
+            mario->mot.hip.angle = 0.0f;
             mario->currSubMotionId = 20;
             mario->jumpAccelerationY = -3.4744f;
             mario->jumpJerkY = 0.4704f;
@@ -267,7 +254,7 @@ void mot_hip(void) {
             MI(MWOFF(0x1E4)) = (s32)hit;
             MI(MWOFF(0x1E8)) = 0;
             mario->position.y = y;
-            EX->ang = 0.0f;
+            mario->mot.hip.angle = 0.0f;
             mario->rotOfs.y = 0.0f;
             mario->airTimer = 0;
             mario->jumpPeakAirTime = 0;
@@ -324,10 +311,10 @@ void mot_hip(void) {
         mario->jumpAccelerationY = 0.0f;
         mario->jumpJerkY = 0.0f;
         mario->jumpSnapY = 0.0f;
-        EX->ang += (f32)keyGetSubStickY(2) / 10.0f;
+        mario->mot.hip.angle += (f32)keyGetSubStickY(2) / 10.0f;
         break;
     }
-    mario->rot.z = EX->ang;
+    mario->rot.z = mario->mot.hip.angle;
     if (mario->airTimer != 0) {
         mario->unk174.x = 0.0f;
         mario->unk174.z = 0.0f;
@@ -349,7 +336,7 @@ s32 U_chkground(void) {
         MI(MWOFF(0x1E4)) = (s32)hit;
         MI(MWOFF(0x1E8)) = 0;
         mario->position.y = y;
-        EX->ang = 0.0f;
+        mario->mot.hip.angle = 0.0f;
         mario->rotOfs.y = 0.0f;
         mario->dispOfs2.y = 0.0f;
         mario->airTimer = 0;

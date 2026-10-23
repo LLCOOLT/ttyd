@@ -218,7 +218,7 @@ void peachPreInit(void) {}
 s32 peachMain(void) {
     MarioWork* mp = marioGetPtr();
     if (mp->currMotionId == 8) {
-        *(Vec*)((u8*)mp + 0x110) = mp->position;
+        mp->basePos = mp->position;
         mp->unk174.x = 0.0f;
         mp->unk174.y = 0.0f;
         mp->unk174.z = 0.0f;
@@ -228,7 +228,7 @@ s32 peachMain(void) {
         mario_kemuri_80130474();
         partyMain();
         marioCamMain();
-        (*(s32*)((u8*)mp + 0x34))++;
+        mp->frameCounter++;
         return 1;
     }
     if (mp->flags & 0x40000) {
@@ -267,8 +267,8 @@ s32 peachMain(void) {
     mario_kemuri_80130474();
     partyMain();
     marioCamMain();
-    (*(s32*)((u8*)mp + 0x34))++;
-    *(Vec*)((u8*)mp + 0x110) = mp->position;
+    mp->frameCounter++;
+    mp->basePos = mp->position;
     mp->unk174.x = 0.0f;
     mp->unk174.y = 0.0f;
     mp->unk174.z = 0.0f;
@@ -317,12 +317,12 @@ void peach_stay(void) {
                 marioChgPose("P_N_1");
                 MT = 0;
                 mp->currSubMotionId = 20;
-                *(s32*)((u8*)mp + MWOFF(0x2b4)) = 0;
+                mp->mot.peach.sleepTimer = 0;
             }
             break;
         case 20:
-            if (++*(s32*)((u8*)mp + MWOFF(0x2b4)) >= sysMsec2Frame(10000)) {
-                *(s32*)((u8*)mp + MWOFF(0x2b4)) = sysMsec2Frame(10000);
+            if (++mp->mot.peach.sleepTimer >= sysMsec2Frame(10000)) {
+                mp->mot.peach.sleepTimer = sysMsec2Frame(10000);
             }
             if (++MT >= 100) {
                 MT = 0;

@@ -6,6 +6,8 @@
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
+#include "evt/evt_npc.h"
+#include "driver/hitdrv.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 static USER_FUNC(eff_guruguru);
@@ -104,28 +106,28 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
 
-__declspec(section ".data") u64 fd_las_09_negone_one_374;
-__declspec(section ".data") s32 fd_las_09_neg_one_382[1];
-__declspec(section ".data") s32 fd_las_09___local_PI_383[1];
-__declspec(section ".data") s32 fd_las_09___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_las_09_one_negone_373;
-__declspec(section ".data") s32 fd_las_09___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_las_09_one_381[1];
-__declspec(section ".data") u64 fd_las_09_negone_one_360;
-__declspec(section ".data") s32 fd_las_09_neg_one_365[1];
-__declspec(section ".data") s32 fd_las_09___local_PI_366[1];
-__declspec(section ".data") s32 fd_las_09___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_las_09_one_negone_359;
-__declspec(section ".data") s32 fd_las_09___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_las_09_one_364[1];
+__declspec(section ".data") f32 fd_las_09_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_09_neg_one_382;
+__declspec(section ".data") f32 fd_las_09___local_PI_383;
+__declspec(section ".data") f32 fd_las_09___local_3PIO2_385;
+__declspec(section ".data") f32 fd_las_09_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_09___local_PIO2_384;
+__declspec(section ".data") f32 fd_las_09_one_381;
+__declspec(section ".data") f32 fd_las_09_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_09_neg_one_365;
+__declspec(section ".data") f32 fd_las_09___local_PI_366;
+__declspec(section ".data") f32 fd_las_09___local_3PIO2_368;
+__declspec(section ".data") f32 fd_las_09_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_09___local_PIO2_367;
+__declspec(section ".data") f32 fd_las_09_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static s32 e_door_close[22];
 static s32 e_door_open[22];
 static s32 n_door_close[22];
 static s32 n_door_open[22];
-static s32 bero_entry_data[120];
-static s32 dmgRetPoint[232];
+static BeroEntry bero_entry_data[8];
+static HitDamageReturn dmgRetPoint[58];
 static s32 first_evt[210];
 s32 bomb_wanwan[149];
 s32 bomb_wanwan1_evt[27];
@@ -136,59 +138,39 @@ s32 goikkou_talk[31];
 __declspec(section ".data") s32 majyorin_init[12];
 static __declspec(section ".data") s32 maririn_init[12];
 __declspec(section ".data") s32 ranpel_init[12];
-static s32 npcEnt[92];
+static NpcSetupInfo npcEnt[4];
 s32 majyorin_evt_npc_entry[26];
 s32 majyorin_evt_main[652];
 s32 majyorin_evt[55];
 s32 las_09_init_evt[257];
 
-__declspec(section ".data") u64 fd_las_09_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_09_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_09_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_09___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_09___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_09___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_09___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_09_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_09___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_09___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_09_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_09_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_las_09_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_09_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_09_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_09___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_09___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_09___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_09___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_09_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_09___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_09___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_09_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_09_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -238,54 +220,187 @@ static EVT_BEGIN(n_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65542, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"las_08", (s32)"e_bero_1", 327685, (s32)w_door_close, (s32)w_door_open, (s32)"e_bero",
-    65542, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"las_19", (s32)"w_bero", 327685, (s32)e_door_close, (s32)e_door_open, (s32)"n_bero", 65542,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"las_10", (s32)"s_bero", 327685, (s32)n_door_close, (s32)n_door_open, (s32)"dokan_1", 131072, 9,
-    100000, 0, 0, -1, 0, 6, 0, 0,
-    (s32)"dokan_5", 65537, 0, 0, (s32)"dokan_2", 131072, 9, 100000,
-    0, 0, -1, 0, 6, 0, 0, (s32)"dokan_4",
-    65537, 0, 0, (s32)"dokan_5", 268566528, 9, 100000, 0,
-    0, -1, 0, 6, 0, 0, (s32)"dokan_1", 65537,
-    0, 0, (s32)"dokan_4", 268566528, 9, 100000, 0, 0,
-    -1, 0, 6, 0, 0, (s32)"dokan_2", 65537, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_08", // nextMapName
+        "e_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_19", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {
+        "n_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_10", // nextMapName
+        "s_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n_door_close, // enterAnimeArg
+        (s32)n_door_open, // exitAnimeArg
+    },
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_5", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_2", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_4", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_5", // hitName
+        4098, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_4", // hitName
+        4098, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-static s32 dmgRetPoint[] = {
-    (s32)"mod_00", 0, -998637568, 0, (s32)"mod_01", 0, -998637568, 0,
-    (s32)"mod_02", 0, -998637568, 0, (s32)"mod_03", 0, -998637568, 0,
-    (s32)"mod_05", 0, -998637568, 0, (s32)"mod_06", 0, -998637568, 0,
-    (s32)"mod_07", 0, -998637568, 0, (s32)"mod_08", 0, -998637568, 0,
-    (s32)"mod_09", 0, -998637568, 0, (s32)"mod_10", 0, -998637568, 0,
-    (s32)"mod_11", 0, -998637568, 0, (s32)"mod_12", 0, -998637568, 0,
-    (s32)"mod_13", 0, -998637568, 0, (s32)"mod_14", 0, -998637568, 0,
-    (s32)"mod_15", 0, -998637568, 0, (s32)"mod_16", 0, -998637568, 0,
-    (s32)"mod_17", 0, -998637568, 0, (s32)"mod_18", 0, -998637568, 0,
-    (s32)"mod_20", 0, -998637568, 0, (s32)"mod_21", 0, -998637568, 0,
-    (s32)"mod_22", 0, -998637568, 0, (s32)"mod_23", 0, -998637568, 0,
-    (s32)"mod_24", 0, -998637568, 0, (s32)"mod_25", 0, -998637568, 0,
-    (s32)"mod_26", 0, -998637568, 0, (s32)"mod_27", 0, -998637568, 0,
-    (s32)"mod_28", 0, -998637568, 0, (s32)"mod_29", 0, -998637568, 0,
-    (s32)"mod_30", 0, -998637568, 0, (s32)"mod_31", 0, -998637568, 0,
-    (s32)"mod_32", 0, -998637568, 0, (s32)"mod_33", 0, -998637568, 0,
-    (s32)"mod_34", 0, -998637568, 0, (s32)"mod_35", 0, -998637568, 0,
-    (s32)"mod_36", 0, -998637568, 0, (s32)"mod_37", 0, -998637568, 0,
-    (s32)"mod_38", 0, -998637568, 0, (s32)"mod_39", 0, -998637568, 0,
-    (s32)"mod_40", 0, -998637568, 0, (s32)"mod_41", 0, -998637568, 0,
-    (s32)"mod_42", 0, -998637568, 0, (s32)"mod_43", 0, -998637568, 0,
-    (s32)"mod_44", 0, -998637568, 0, (s32)"mod_45", 0, -998637568, 0,
-    (s32)"mod_46", 0, -998637568, 0, (s32)"mod_47", 0, -998637568, 0,
-    (s32)"mod_48", 0, -998637568, 0, (s32)"mod_49", 0, -998637568, 0,
-    (s32)"mod_50", 0, -998637568, 0, (s32)"mod_51", 0, -998637568, 0,
-    (s32)"mod_52", 0, -998637568, 0, (s32)"mod_53", 0, -998637568, 0,
-    (s32)"mod_54", 0, -998637568, 0, (s32)"mod_55", 0, -998637568, 0,
-    (s32)"mod_56", 0, -998637568, 0, (s32)"mod_57", 0, -998637568, 0,
-    (s32)"mod_58", 0, -998637568, 0, 0, 0, 0, 0,
+static HitDamageReturn dmgRetPoint[] = {
+    {"mod_00", {0.0f, -1000.0f, 0.0f}},
+    {"mod_01", {0.0f, -1000.0f, 0.0f}},
+    {"mod_02", {0.0f, -1000.0f, 0.0f}},
+    {"mod_03", {0.0f, -1000.0f, 0.0f}},
+    {"mod_05", {0.0f, -1000.0f, 0.0f}},
+    {"mod_06", {0.0f, -1000.0f, 0.0f}},
+    {"mod_07", {0.0f, -1000.0f, 0.0f}},
+    {"mod_08", {0.0f, -1000.0f, 0.0f}},
+    {"mod_09", {0.0f, -1000.0f, 0.0f}},
+    {"mod_10", {0.0f, -1000.0f, 0.0f}},
+    {"mod_11", {0.0f, -1000.0f, 0.0f}},
+    {"mod_12", {0.0f, -1000.0f, 0.0f}},
+    {"mod_13", {0.0f, -1000.0f, 0.0f}},
+    {"mod_14", {0.0f, -1000.0f, 0.0f}},
+    {"mod_15", {0.0f, -1000.0f, 0.0f}},
+    {"mod_16", {0.0f, -1000.0f, 0.0f}},
+    {"mod_17", {0.0f, -1000.0f, 0.0f}},
+    {"mod_18", {0.0f, -1000.0f, 0.0f}},
+    {"mod_20", {0.0f, -1000.0f, 0.0f}},
+    {"mod_21", {0.0f, -1000.0f, 0.0f}},
+    {"mod_22", {0.0f, -1000.0f, 0.0f}},
+    {"mod_23", {0.0f, -1000.0f, 0.0f}},
+    {"mod_24", {0.0f, -1000.0f, 0.0f}},
+    {"mod_25", {0.0f, -1000.0f, 0.0f}},
+    {"mod_26", {0.0f, -1000.0f, 0.0f}},
+    {"mod_27", {0.0f, -1000.0f, 0.0f}},
+    {"mod_28", {0.0f, -1000.0f, 0.0f}},
+    {"mod_29", {0.0f, -1000.0f, 0.0f}},
+    {"mod_30", {0.0f, -1000.0f, 0.0f}},
+    {"mod_31", {0.0f, -1000.0f, 0.0f}},
+    {"mod_32", {0.0f, -1000.0f, 0.0f}},
+    {"mod_33", {0.0f, -1000.0f, 0.0f}},
+    {"mod_34", {0.0f, -1000.0f, 0.0f}},
+    {"mod_35", {0.0f, -1000.0f, 0.0f}},
+    {"mod_36", {0.0f, -1000.0f, 0.0f}},
+    {"mod_37", {0.0f, -1000.0f, 0.0f}},
+    {"mod_38", {0.0f, -1000.0f, 0.0f}},
+    {"mod_39", {0.0f, -1000.0f, 0.0f}},
+    {"mod_40", {0.0f, -1000.0f, 0.0f}},
+    {"mod_41", {0.0f, -1000.0f, 0.0f}},
+    {"mod_42", {0.0f, -1000.0f, 0.0f}},
+    {"mod_43", {0.0f, -1000.0f, 0.0f}},
+    {"mod_44", {0.0f, -1000.0f, 0.0f}},
+    {"mod_45", {0.0f, -1000.0f, 0.0f}},
+    {"mod_46", {0.0f, -1000.0f, 0.0f}},
+    {"mod_47", {0.0f, -1000.0f, 0.0f}},
+    {"mod_48", {0.0f, -1000.0f, 0.0f}},
+    {"mod_49", {0.0f, -1000.0f, 0.0f}},
+    {"mod_50", {0.0f, -1000.0f, 0.0f}},
+    {"mod_51", {0.0f, -1000.0f, 0.0f}},
+    {"mod_52", {0.0f, -1000.0f, 0.0f}},
+    {"mod_53", {0.0f, -1000.0f, 0.0f}},
+    {"mod_54", {0.0f, -1000.0f, 0.0f}},
+    {"mod_55", {0.0f, -1000.0f, 0.0f}},
+    {"mod_56", {0.0f, -1000.0f, 0.0f}},
+    {"mod_57", {0.0f, -1000.0f, 0.0f}},
+    {"mod_58", {0.0f, -1000.0f, 0.0f}},
+    {0},
 };
 
 static EVT_BEGIN(first_evt)
@@ -654,19 +769,38 @@ __declspec(section ".data") EVT_BEGIN(ranpel_init)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", 1536, 0, (s32)majyorin_init, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93",
-    1536, 0, (s32)maririn_init, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", 1536,
-    0, (s32)ranpel_init, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", // name
+        0x600, // flags
+        0, // reactionFlags
+        majyorin_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", // name
+        0x600, // flags
+        0, // reactionFlags
+        maririn_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", // name
+        0x600, // flags
+        0, // reactionFlags
+        ranpel_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(majyorin_evt_npc_entry)

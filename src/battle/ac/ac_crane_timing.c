@@ -40,8 +40,8 @@ s32 battleAcMain_CraneTiming(BattleWork* work) {
 
     ac = &work->actionCommands;
     autoCommand = FALSE;
-    cw = (CraneTimingWork*)((u8*)ac + 0x2BC);
-    disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    cw = (CraneTimingWork*)ac->work;
+    disp = (BattleACDispParams*)&ac->disp;
     if (work->actionCommands.mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
     }
@@ -53,7 +53,7 @@ s32 battleAcMain_CraneTiming(BattleWork* work) {
             memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            *(s32*)&disp->field_0x1C[4] = 20;
+            disp->unk20 = 20;
             cw->frame = 0;
             cw->delay = AC_PARAMS(work)->startDelay;
             cw->range = irand(AC_PARAMS(work)->randomRange);

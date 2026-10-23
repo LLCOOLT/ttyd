@@ -18,8 +18,8 @@ typedef struct PowerGaugeWork {
     s32 timer;     // 0x10
 } PowerGaugeWork;
 
-#define PG_WORK(ac) ((PowerGaugeWork*)((u8*)(ac) + 0x2BC))
-#define PG_DISP(ac) ((u8*)(ac) + 0x290)
+#define PG_WORK(ac) ((PowerGaugeWork*)(ac)->work)
+#define PG_DISP(ac) ((u8*)&(ac)->disp)
 #define PG_F32(p, off) (*(f32*)((u8*)(p) + (off)))
 #define PG_S32(p, off) (*(s32*)((u8*)(p) + (off)))
 #define PG_THR(ac, i) (*(s32*)((u8*)(ac) + 0x40 + (i)*4))
@@ -54,7 +54,7 @@ s32 battleAcMain_PowerGaugeLv(BattleWork* work) {
                     work->actionCommands.setupParam = 30;
                     work->actionCommands.outputParams[0] = 0;
                 } else {
-                    work->actionCommands.outputParams[0] = irand(PG_S32(ac, 0x3C) - 1) + 1;
+                    work->actionCommands.outputParams[0] = irand(ac->params[1] - 1) + 1;
                     work->actionCommands.setupParam = 30;
                 }
                 work->actionCommands.mAcState = 1001;
@@ -71,25 +71,25 @@ s32 battleAcMain_PowerGaugeLv(BattleWork* work) {
             }
             tw->gauge = intplGetValue(2, tw->counter, tw->limit, 0.0f, 100.0f);
             if (BattlePadGetNow() == 0x60) {
-                if (tw->gauge < (f32)PG_THR(ac, 0)) {
+                if (tw->gauge < (f32)ac->params[2]) {
                     work->actionCommands.result = 0;
                     work->actionCommands.result &= ~2;
                 } else {
                     work->actionCommands.result = 2;
                     work->actionCommands.mResultCount++;
-                    if (PG_S32(ac, 0x3C) <= 1) {
+                    if (ac->params[1] <= 1) {
                         work->actionCommands.outputParams[0] = 1;
-                    } else if (tw->gauge < (f32)PG_THR(ac, 1)) {
+                    } else if (tw->gauge < (f32)ac->params[3]) {
                         work->actionCommands.outputParams[0] = 1;
-                    } else if (PG_S32(ac, 0x3C) <= 2) {
+                    } else if (ac->params[1] <= 2) {
                         work->actionCommands.outputParams[0] = 2;
-                    } else if (tw->gauge < (f32)PG_THR(ac, 2)) {
+                    } else if (tw->gauge < (f32)ac->params[4]) {
                         work->actionCommands.outputParams[0] = 2;
-                    } else if (PG_S32(ac, 0x3C) <= 3) {
+                    } else if (ac->params[1] <= 3) {
                         work->actionCommands.outputParams[0] = 3;
-                    } else if (tw->gauge < (f32)PG_THR(ac, 3)) {
+                    } else if (tw->gauge < (f32)ac->params[5]) {
                         work->actionCommands.outputParams[0] = 3;
-                    } else if (PG_S32(ac, 0x3C) <= 4) {
+                    } else if (ac->params[1] <= 4) {
                         work->actionCommands.outputParams[0] = 4;
                     } else {
                         work->actionCommands.outputParams[0] = 5;
@@ -142,7 +142,7 @@ static void actionCommandDisp(f32 x, f32 y);
 #pragma opt_propagation off
 void battleAcDisp_PowerGaugeLv(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)&work->actionCommands + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&work->actionCommands.disp;
     s32 i = 4;
     switch (work->actionCommands.mAcState) {
         case 99:

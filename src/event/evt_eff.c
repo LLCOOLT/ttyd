@@ -135,7 +135,8 @@
 #include "eff/eff_gonbaba_breath.h"
 #include "eff/eff_majinai.h"
 #include "mario/mario_party.h"
-#include "manager/evtmgr_cmd.h"
+#include "manager/evtmgr_cmd.h"
+#include "party.h"
 
 extern EffectEntry* effFlowerN64Entry(s32, s32, f32, f32, f32);
 extern EffectEntry* effFallLeafN64Entry(s32, s32, f32, f32, f32);
@@ -909,7 +910,6 @@ USER_FUNC(evt_eff_delete_ptr) {
 	return EVT_RETURN_DONE;
 }
 
-extern void* partyGetPtr(s32 id);
 extern EffectEntry* effFukidashiEntry(s32 a, s32 b, s32 c, s32 d, f32 x, f32 y, f32 z, f32 w, f32 e);
 
 #pragma push
@@ -934,7 +934,7 @@ USER_FUNC(evt_eff_fukidashi) {
 
 	switch (mode) {
 		case 0:
-			h = *(f32*)((u8*)marioGetPtr() + MWOFF(0x1b8));
+			h = marioGetPtr()->wPlayerCollisionBox.y;
 			{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, -1, d, 0.0f, yy, 0.0f, ww, e); }
 			break;
 		case 1:
@@ -949,9 +949,9 @@ USER_FUNC(evt_eff_fukidashi) {
 			if (p) {
 #ifdef VERSION_G8ME01
 				// US: the Flurrie bubble sits at a fixed height
-				{ f32 yy = 2.0f * *(f32*)((u8*)p + 0xf0) / 3.0f; f32 ww; if (*(s8*)((u8*)p + 0x31) == 5) yy = 30.0f; ww = *(f32*)((u8*)p + 0xf0) / 3.0f; entry = effFukidashiEntry(a, b, -2, d, 0.0f, yy, 0.0f, ww, e); }
+				{ f32 yy = 2.0f * ((PartyEntry*)p)->height / 3.0f; f32 ww; if (((PartyEntry*)p)->currentMemberId == 5) yy = 30.0f; ww = ((PartyEntry*)p)->height / 3.0f; entry = effFukidashiEntry(a, b, -2, d, 0.0f, yy, 0.0f, ww, e); }
 #else
-				h = *(f32*)((u8*)p + 0xf0);
+				h = ((PartyEntry*)p)->height;
 				{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, -2, d, 0.0f, yy, 0.0f, ww, e); }
 #endif
 			}
@@ -959,7 +959,7 @@ USER_FUNC(evt_eff_fukidashi) {
 		case 4:
 			p = partyGetPtr(marioGetExtraPartyId());
 			if (p) {
-				h = *(f32*)((u8*)p + 0xf0);
+				h = ((PartyEntry*)p)->height;
 				{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, -3, d, 0.0f, yy, 0.0f, ww, e); }
 			}
 			break;

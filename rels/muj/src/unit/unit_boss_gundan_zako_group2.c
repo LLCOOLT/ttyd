@@ -12,6 +12,7 @@
 f32 intplGetValue(f32 start, f32 end, s32 mode, s32 cur, s32 steps);
 s32 irand(s32 scalar);
 #include "dolphin/mtx.h"
+#include "battle/battle_database_common.h"
 
 typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; u8 field_0x58[0x64 - 0x58]; Vec rot; } ZakoGun;
 #ifdef VERSION_G8ME01
@@ -81,20 +82,20 @@ USER_FUNC(zakogun_ext_init2);
 USER_FUNC(up_ceil);
 USER_FUNC(down_ceil);
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group2_negone_one_374;
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2_neg_one_382[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2___local_PI_383[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_boss_gundan_zako_group2_one_negone_373;
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2_one_381[1];
-__declspec(section ".data") u64 fd_boss_gundan_zako_group2_negone_one_360;
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2_neg_one_365[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2___local_PI_366[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_boss_gundan_zako_group2_one_negone_359;
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2_one_364[1];
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_neg_one_382;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2___local_PI_383;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2___local_3PIO2_385;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2___local_PIO2_384;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_one_381;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_neg_one_365;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2___local_PI_366;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2___local_3PIO2_368;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2___local_PIO2_367;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_one_364;
 BattleUnitKind unit_boss_gundan_zako_group2;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -102,8 +103,8 @@ static __declspec(section ".data") StatusVulnerability regist;
 static __declspec(section ".data") PoseTableEntry pose_table[4];
 static __declspec(section ".data") BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[1];
-s32 weapon_gundan_zako_group2_attack[48];
-s32 weapon_gundan_zako_group2_yusuri_attack[48];
+BattleWeapon weapon_gundan_zako_group2_attack;
+BattleWeapon weapon_gundan_zako_group2_yusuri_attack;
 static s32 init_event[21];
 static s32 damage_event[129];
 static s32 dead_event[136];
@@ -115,53 +116,33 @@ __declspec(section ".data") s32 hit_check_event2[7];
 s32 hit_check_event_sub[123];
 static __declspec(section ".data") s32 wait_event[6];
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group2_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group2_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group2_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group2_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group2_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group2_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_gundan_zako_group2 = {
     101,
@@ -252,27 +233,84 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_gundan_zako_group2", "c_zako_n", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3600009, 0, pose_table},
 };
 
+BattleWeapon weapon_gundan_zako_group2_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
 #ifdef VERSION_G8ME01
-#define ZAKO_WEAPON_W4 1677721602 // US: low byte 2
+    2, // superguardsAllowed
 #else
-#define ZAKO_WEAPON_W4 1677721600
+    0, // superguardsAllowed
 #endif
-s32 weapon_gundan_zako_group2_attack[] = {
-    0, 0, 0, 0, ZAKO_WEAPON_W4, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536875008, 770, 0, 135, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20001000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_gundan_zako_group2_yusuri_attack[] = {
-    0, 0, 0, 0, ZAKO_WEAPON_W4, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 135, 2047, 4,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gundan_zako_group2_yusuri_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    4, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static EVT_BEGIN(init_event)
@@ -325,25 +363,45 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-static s32 dead_event[] = {
-    262235, (s32)btlevtcmd_SetUnitWork, -2, 2, 1, 107, 65627, (s32)up_ceil,
-    109, 65627, (s32)zakogun_dead2, 65545, 50, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_BTL_ENEMY_DIE1_1", -250000000, 0, -250000000, 65545, 48, 110, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_ENEMY_DIE1_2", -250000000, 0, -250000000, 65541, 20,
-    196699, (s32)evt_sub_random, 500, -29999997, 131126, -29999997, 250, 131122,
-    -30000000, 0, 131125, -30000000, -29999997, 196699, (s32)evt_sub_random, 30,
-    -29999997, 131122, -29999999, 0, 131125, -29999999, -29999997, 131122,
-    -29999998, 75, 983131, (s32)evt_eff, 0, (s32)"kemuri_test", 4, -30000000,
-    -29999999, -29999998, -229999181, 0, 0, 0, 0, 0,
-    0, 0, 65545, 1, 6, 112, 196699, (s32)btlevtcmd_GetCoin,
-    -2, -30000000, 131163, (s32)btlevtcmd_StoreCoin, -30000000, 196699, (s32)btlevtcmd_GetExp, -2,
-    -30000000, 131163, (s32)btlevtcmd_StoreExp, -30000000, 327771, (s32)_add_star_point_disp_offset, -2, 0,
-    0, 0, 983131, (s32)evt_eff, (s32)"", (s32)"star_point", 0, 0,
-    0, 0, -30000000, 0, 0, 0, 0, 0,
-    0, 0, 65545, 60, 262235, (s32)btlevtcmd_CheckDamageCode, -2, 1024,
-    -30000000, 131097, -30000000, 0, 196699, (s32)btlevtcmd_KillUnit, -2, 0,
-    32, 196699, (s32)btlevtcmd_KillUnit, -2, 2, 33, 2, 1,
-};
+static EVT_BEGIN(dead_event)
+    CALL(btlevtcmd_SetUnitWork, -2, 2, 1)
+    BEGIN_INLINE_EVENT
+        CALL(up_ceil)
+    END_INLINE_EVENT
+    CALL(zakogun_dead2)
+    WAIT_FRAMES(50)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_ENEMY_DIE1_1"), -250000000, 0, -250000000)
+    WAIT_FRAMES(48)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_ENEMY_DIE1_2"), -250000000, 0, -250000000)
+        LOOP(20)
+            CALL(evt_sub_random, 500, LW(3))
+            SUBTRACT(LW(3), 250)
+            SET_VALUE(LW(0), 0)
+            ADD(LW(0), LW(3))
+            CALL(evt_sub_random, 30, LW(3))
+            SET_VALUE(LW(1), 0)
+            ADD(LW(1), LW(3))
+            SET_VALUE(LW(2), 75)
+            CALL(evt_eff, 0, STRING("kemuri_test"), 4, LW(0), LW(1), LW(2), FLOAT(0.7998047f), 0, 0, 0, 0, 0, 0, 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetCoin, -2, LW(0))
+    CALL(btlevtcmd_StoreCoin, LW(0))
+    CALL(btlevtcmd_GetExp, -2, LW(0))
+    CALL(btlevtcmd_StoreExp, LW(0))
+    CALL(_add_star_point_disp_offset, -2, 0, 0, 0)
+    CALL(evt_eff, STRING(""), STRING("star_point"), 0, 0, 0, 0, LW(0), 0, 0, 0, 0, 0, 0, 0)
+    WAIT_FRAMES(60)
+    CALL(btlevtcmd_CheckDamageCode, -2, 1024, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_KillUnit, -2, 0)
+    ELSE
+        CALL(btlevtcmd_KillUnit, -2, 2)
+    END_IF
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(attack_event)
     SET_VALUE(LW(0), 50)
@@ -364,7 +422,7 @@ EVT_END()
 EVT_BEGIN(fall_attack_event)
     CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
     CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
-    SET_VALUE(LW(9), PTR(weapon_gundan_zako_group2_attack))
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_group2_attack))
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
     CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
@@ -396,7 +454,7 @@ EVT_END()
 
 static EVT_BEGIN(shake_attack_event)
     CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
-    SET_VALUE(LW(9), PTR(weapon_gundan_zako_group2_yusuri_attack))
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_group2_yusuri_attack))
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
     CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
@@ -917,7 +975,7 @@ __declspec(section ".data") EVT_BEGIN(hit_check_event2)
 EVT_END()
 
 EVT_BEGIN(hit_check_event_sub)
-    IF_INT_EQUAL(LW(9), PTR(weapon_gundan_zako_group2_attack))
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_group2_attack))
         IF_INT_EQUAL(LW(15), 1)
             CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
             IF_INT_EQUAL(LW(0), 1)
@@ -958,7 +1016,7 @@ EVT_BEGIN(hit_check_event_sub)
         ELSE
         CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 0, LW(5))
     END_IF
-    IF_INT_EQUAL(LW(9), PTR(weapon_gundan_zako_group2_attack))
+    IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_group2_attack))
         CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
     END_IF
     GOTO(98)

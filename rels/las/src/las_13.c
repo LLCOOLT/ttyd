@@ -30,23 +30,23 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 static USER_FUNC(small_star);
 
-__declspec(section ".data") u64 fd_las_13_negone_one_374;
-__declspec(section ".data") s32 fd_las_13_neg_one_382[1];
-__declspec(section ".data") s32 fd_las_13___local_PI_383[1];
-__declspec(section ".data") s32 fd_las_13___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_las_13_one_negone_373;
-__declspec(section ".data") s32 fd_las_13___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_las_13_one_381[1];
-__declspec(section ".data") u64 fd_las_13_negone_one_360;
-__declspec(section ".data") s32 fd_las_13_neg_one_365[1];
-__declspec(section ".data") s32 fd_las_13___local_PI_366[1];
-__declspec(section ".data") s32 fd_las_13___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_las_13_one_negone_359;
-__declspec(section ".data") s32 fd_las_13___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_las_13_one_364[1];
+__declspec(section ".data") f32 fd_las_13_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_13_neg_one_382;
+__declspec(section ".data") f32 fd_las_13___local_PI_383;
+__declspec(section ".data") f32 fd_las_13___local_3PIO2_385;
+__declspec(section ".data") f32 fd_las_13_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_13___local_PIO2_384;
+__declspec(section ".data") f32 fd_las_13_one_381;
+__declspec(section ".data") f32 fd_las_13_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_13_neg_one_365;
+__declspec(section ".data") f32 fd_las_13___local_PI_366;
+__declspec(section ".data") f32 fd_las_13___local_3PIO2_368;
+__declspec(section ".data") f32 fd_las_13_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_13___local_PIO2_367;
+__declspec(section ".data") f32 fd_las_13_one_364;
 static __declspec(section ".data") s32 e_door_close[12];
 static __declspec(section ".data") s32 e_door_open[12];
-static s32 bero_entry_data[30];
+static BeroEntry bero_entry_data[2];
 static s32 box_evt[30];
 s32 switch_check[114];
 static __declspec(section ".data") s32 switch1_evt[11];
@@ -54,53 +54,33 @@ static s32 switch2_evt[15];
 static s32 hint_plate[14];
 s32 las_13_init_evt[79];
 
-__declspec(section ".data") u64 fd_las_13_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_13_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_13_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_13_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_13___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_13___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_13___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_13___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_13_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_13_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_13___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_13___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_13_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_13_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_las_13_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_13_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_13_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_13_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_13___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_13___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_13___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_13___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_13_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_13_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_13___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_13___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_13_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_13_one_364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -114,11 +94,26 @@ static __declspec(section ".data") EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"e_bero_1", 65537, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"las_10", (s32)"sw_bero_1", 327685, (s32)e_door_close, (s32)e_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "e_bero_1", // hitName
+        1, // type
+        1, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_10", // nextMapName
+        "sw_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(box_evt)

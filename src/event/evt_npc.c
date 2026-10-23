@@ -2089,7 +2089,7 @@ USER_FUNC(evt_npc_get_drop_item) {
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     s32 index = *args++;
 
-    if (npc->battleInfo.field_4 & 8) {
+    if (npc->battleInfo.battleFlags & 8) {
         evtSetValue(event, index, 0);
     } else {
         evtSetValue(event, index, npc->battleInfo.itemDropped);
@@ -2103,7 +2103,7 @@ USER_FUNC(evt_npc_get_drop_heart) {
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     s32 index = *args++;
 
-    if (npc->battleInfo.field_4 & 2) {
+    if (npc->battleInfo.battleFlags & 2) {
         evtSetValue(event, index, 0);
     } else {
         s32 count = pouchEquipCheckBadge(ITEM_HEART_FINDER);
@@ -2128,7 +2128,7 @@ USER_FUNC(evt_npc_get_drop_flower) {
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     s32 index = *args++;
 
-    if (npc->battleInfo.field_4 & 4) {
+    if (npc->battleInfo.battleFlags & 4) {
         evtSetValue(event, index, 0);
     } else {
         s32 count = pouchEquipCheckBadge(ITEM_FLOWER_FINDER);
@@ -2175,7 +2175,7 @@ USER_FUNC(evt_npc_get_drop_coin) {
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     s32 index = *args++;
     s32 value = 0;
-    if (npc->battleInfo.field_4 & 1) {
+    if (npc->battleInfo.battleFlags & 1) {
         evtSetValue(event, index, 0);
         return EVT_RETURN_DONE;
     } else {

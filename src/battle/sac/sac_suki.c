@@ -20,6 +20,7 @@
 #include "icon_ids.h"
 #include "battle/sac/sac_common.h"
 #include "battle/sac/sac_suki.h"
+#include "battle/battle_database_common.h"
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 size);
 EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 size);
@@ -153,13 +154,43 @@ static void main_base(void);
 void main_button(s32 idx);
 void N__disp_2D(s32 side, s32 idx);
 
-static s32 weapon[] = {
-    (s32)"btl_wn_sac_sukkari_sukkiri", ICON_199 << 16, 0, (s32)"msg_sukkari_sukkiri", 1677722112, 1065353216, 17130546, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, (s32)"msg_sac_7", 131080, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 25600,
-    0, 0, 0, 0, (s32)marioAttackEvent_Suki, 100, 0, 0,
+static BattleWeapon weapon = {
+    "btl_wn_sac_sukkari_sukkiri", // name
+    ICON_199, // icon
+    {0}, // field_0x6
+    0, // itemId
+    "msg_sukkari_sukkiri", // description
+    100, // baseAccuracy
+    0, // baseFpCost
+    2, // baseSpCost
+    0, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    5, // field_0x19
+    100, // mBingoSlotChance
+    50, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    "msg_sac_7", // acHelpMsg
+    0x20008, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, // atkChangeTime..allergicTime
+    100, // ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    marioAttackEvent_Suki, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static EVT_BEGIN(nice_event)
@@ -666,7 +697,7 @@ static USER_FUNC(set_weapon) {
     s32 idx = evtGetValue(event, args[0]);
     SukiWork* w = get_ptr();
     OhkoRateTbl tbl = N_ohko_rate_tbl;
-    memcpy(w->weapon, weapon, 0xC0);
+    memcpy(w->weapon, &weapon, 0xC0);
     w->weapon[0x9E] = tbl.rate[idx - 1];
     evtSetValue(event, args[1], (s32)w->weapon);
     return 2;
@@ -743,63 +774,151 @@ void set_tev(MapTevCallbackInfo* info) {
 }
 
 
-s32 marioAttackEvent_Suki[] = {
-    196699, (s32)btlevtcmd_GetUnitId, -4, -29999986, 196699, (s32)btlevtcmd_GetBodyId, -29999986, -29999985,
-    262235, (s32)btlevtcmd_CheckStatus, -29999986, 27, -30000000, 131097, -30000000, 0,
-    131122, -29999986, -1, 33, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon, -29999997,
-    -29999996, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096, -29999997, -1,
-    65540, 99, 33, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996,
-    65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost, -2, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2,
-    -30000000, 131163, (s32)btlevtcmd_WeaponAftereffect, -30000000, 65627, (s32)btlevtcmd_reset_move_color_lv_all, 110, 131163,
-    (s32)main_suki, -29999986, 112, 65630, (s32)sac_start_camera_evt, 65546, 500, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START1", -250000000, 0, -250000000, 65630, (s32)sac_mario_item_on_evt,
-    65546, 500, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START2", -250000000, 0,
-    -29999989, 65627, (s32)star_stone_appear, 110, 65630, (s32)sac_start_stardust, 112, 65545,
-    100, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START3", -250000000, 0, -250000000,
-    131163, (s32)evt_snd_sfxoff, -29999989, 65545, 40, 65630, (s32)sac_mario_item_on_end_evt, 65630,
-    (s32)sac_mario_back_home, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_I_Y", 65627, (s32)wait_star_stone_up_end,
-    65546, 100, 110, 131163, (s32)sac_cheer, 0, 112, 65627,
-    (s32)sac_ac_help_on, 65627, (s32)start_game, 131163, (s32)wait_game_end, -30000000, 65627, (s32)sac_ac_help_off,
-    65627, (s32)sac_cheer_end, 196699, (s32)set_weapon, -30000000, -29999991, 65546, 500,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2,
-    65546, 1000, 131122, -29999990, 0, 131122, -29999989, -30000000,
-    131163, (s32)evt_paper_entry, (s32)"OFF_d_yabu_small", 65541, -29999989, 327771, (s32)star_stone_get_attack_point, -29999990,
-    -29999999, -29999998, -29999997, 196699, (s32)get_img_name, -29999990, -29999987, 131163,
-    (s32)evt_img_entry, -29999987, 196699, (s32)evt_img_set_paper, -29999987, (s32)"OFF_d_yabu_small", 393307, (s32)get_screen_point,
-    -29999999, -29999998, -29999997, -29999996, -29999995, 131125, -29999996, 256,
-    131127, -29999995, -1, 131125, -29999995, 204, 589915, (s32)evt_img_alloc_capture,
-    -29999987, 0, 0, 0, -29999996, -29999995, 96, 72,
-    131163, (s32)evt_img_clear_virtual_point, -29999987, 196699, (s32)evt_img_onoff, -29999987, 1, 196699,
-    (s32)evt_img_set_paper_anim, -29999987, (s32)"A_1", 110, 131163, (s32)star_stone_attack, -29999990, 393307,
-    (s32)evt_btl_camera_shake_h, 0, 8, 0, 10, 0, 112, 196699,
-    (s32)eff_crystal, -29999999, -29999998, 983131, (s32)evt_eff, (s32)"", (s32)"indirect", 0,
-    -29999999, -29999998, 30, 60, 0, 0, 0, 0,
-    0, 0, 0, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_SAC_SUKKIRI4", 0, 196699,
-    (s32)evt_snd_sfxon, (s32)"SFX_BTL_SAC_SUKKIRI4_2", 0, 131096, -29999990, 0, 196699, (s32)btlevtcmd_GetEnemyBelong,
-    -2, -29999999, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -29999999, (s32)weapon, 262235,
-    (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon, -29999997, -29999996, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996,
-    65539, 5, 131096, -29999997, -1, 65540, 8, 33,
-    327771, (s32)btlevtcmd_CheckPartsAttribute, -29999997, -29999996, 536870912, -29999999, 131096, -29999999,
-    0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999997, -29999996, 39, 33, 196699,
-    (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 65540, 5, 33, 65539, 8,
-    65545, 30, 65627, (s32)wait_star_stone_attack_end, 131125, -29999990, 1, 6,
-    131163, (s32)evt_paper_delete, (s32)"OFF_d_yabu_small", 131122, -29999990, 0, 131122, -29999989,
-    -30000000, 65541, -29999989, 196699, (s32)get_img_name, -29999990, -29999987, 131163,
-    (s32)evt_img_release, -29999987, 131125, -29999990, 1, 6, 65630, (s32)flash_evt,
-    131122, -29999990, 3, 65541, 4, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_SAC_SUKKIRI5",
-    0, 65541, 4, 131125, -29999990, 63, 131163, (s32)flash_update,
-    -29999990, 65630, (s32)flash_main_evt, 65545, 1, 6, 65541, 4,
-    131126, -29999990, 63, 131163, (s32)flash_update, -29999990, 65630, (s32)flash_main_evt,
-    65545, 1, 6, 6, 65630, (s32)flash_cancel_evt, 196699, (s32)btlevtcmd_GetEnemyBelong,
-    -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, (s32)weapon, 262235,
-    (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon, -29999997, -29999996, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996,
-    65539, 10, 131096, -29999997, -1, 65540, 20, 33,
-    327771, (s32)btlevtcmd_CheckPartsAttribute, -29999997, -29999996, 16384, -30000000, 131096, -30000000,
-    0, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991, 256,
-    -29999995, 33, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 65540, 10,
-    65539, 20, 65545, 30, 196699, (s32)evt_btl_camera_set_mode, 0, 0,
-    65627, (s32)end_suki, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+EVT_BEGIN(marioAttackEvent_Suki)
+    CALL(btlevtcmd_GetUnitId, -4, LW(14))
+    CALL(btlevtcmd_GetBodyId, LW(14), LW(15))
+    CALL(btlevtcmd_CheckStatus, LW(14), 27, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        SET_VALUE(LW(14), -1)
+    END_IF
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_CommandPayWeaponCost, -2)
+    CALL(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+    CALL(btlevtcmd_WeaponAftereffect, LW(0))
+    CALL(btlevtcmd_reset_move_color_lv_all)
+    BEGIN_SIBLING_EVENT
+        CALL(main_suki, LW(14))
+    END_SIBLING_EVENT
+    CALL_CHILD(sac_start_camera_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START1"), -250000000, 0, -250000000)
+    CALL_CHILD(sac_mario_item_on_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START2"), -250000000, 0, LW(11))
+    CALL(star_stone_appear)
+    BEGIN_SIBLING_EVENT
+        CALL_CHILD(sac_start_stardust)
+    END_SIBLING_EVENT
+    WAIT_FRAMES(100)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START3"), -250000000, 0, -250000000)
+    CALL(evt_snd_sfxoff, LW(11))
+    WAIT_FRAMES(40)
+    CALL_CHILD(sac_mario_item_on_end_evt)
+    CALL_CHILD(sac_mario_back_home)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_I_Y"))
+    CALL(wait_star_stone_up_end)
+    WAIT_MS(100)
+    BEGIN_SIBLING_EVENT
+        CALL(sac_cheer, 0)
+    END_SIBLING_EVENT
+    CALL(sac_ac_help_on)
+    CALL(start_game)
+    CALL(wait_game_end, LW(0))
+    CALL(sac_ac_help_off)
+    CALL(sac_cheer_end)
+    CALL(set_weapon, LW(0), LW(9))
+    WAIT_MS(500)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    WAIT_MS(1000)
+    SET_VALUE(LW(10), 0)
+    SET_VALUE(LW(11), LW(0))
+    CALL(evt_paper_entry, STRING("OFF_d_yabu_small"))
+    LOOP(LW(11))
+        CALL(star_stone_get_attack_point, LW(10), LW(1), LW(2), LW(3))
+        CALL(get_img_name, LW(10), LW(13))
+        CALL(evt_img_entry, LW(13))
+        CALL(evt_img_set_paper, LW(13), STRING("OFF_d_yabu_small"))
+        CALL(get_screen_point, LW(1), LW(2), LW(3), LW(4), LW(5))
+        ADD(LW(4), 256)
+        MULTIPLY(LW(5), -1)
+        ADD(LW(5), 204)
+        CALL(evt_img_alloc_capture, LW(13), 0, 0, 0, LW(4), LW(5), 96, 72)
+        CALL(evt_img_clear_virtual_point, LW(13))
+        CALL(evt_img_onoff, LW(13), 1)
+        CALL(evt_img_set_paper_anim, LW(13), STRING("A_1"))
+        BEGIN_SIBLING_EVENT
+            CALL(star_stone_attack, LW(10))
+            CALL(evt_btl_camera_shake_h, 0, 8, 0, 10, 0)
+        END_SIBLING_EVENT
+        CALL(eff_crystal, LW(1), LW(2))
+        CALL(evt_eff, STRING(""), STRING("indirect"), 0, LW(1), LW(2), 30, 60, 0, 0, 0, 0, 0, 0, 0)
+        CALL(evt_snd_sfxon, STRING("SFX_BTL_SAC_SUKKIRI4"), 0)
+        CALL(evt_snd_sfxon, STRING("SFX_BTL_SAC_SUKKIRI4_2"), 0)
+        IF_INT_EQUAL(LW(10), 0)
+            CALL(btlevtcmd_GetEnemyBelong, -2, LW(1))
+            CALL(btlevtcmd_SamplingEnemy, -2, LW(1), PTR(&weapon))
+            CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
+            CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+            LABEL(5)
+            IF_INT_EQUAL(LW(3), -1)
+                GOTO(8)
+            END_IF
+            CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), 536870912, LW(1))
+            IF_INT_EQUAL(LW(1), 0)
+                CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+            END_IF
+            CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+            GOTO(5)
+        END_IF
+        LABEL(8)
+        WAIT_FRAMES(30)
+        CALL(wait_star_stone_attack_end)
+        ADD(LW(10), 1)
+    END_LOOP
+    CALL(evt_paper_delete, STRING("OFF_d_yabu_small"))
+    SET_VALUE(LW(10), 0)
+    SET_VALUE(LW(11), LW(0))
+    LOOP(LW(11))
+        CALL(get_img_name, LW(10), LW(13))
+        CALL(evt_img_release, LW(13))
+        ADD(LW(10), 1)
+    END_LOOP
+    CALL_CHILD(flash_evt)
+    SET_VALUE(LW(10), 3)
+    LOOP(4)
+        CALL(evt_snd_sfxon, STRING("SFX_BTL_SAC_SUKKIRI5"), 0)
+        LOOP(4)
+            ADD(LW(10), 63)
+            CALL(flash_update, LW(10))
+            CALL_CHILD(flash_main_evt)
+            WAIT_FRAMES(1)
+        END_LOOP
+        LOOP(4)
+            SUBTRACT(LW(10), 63)
+            CALL(flash_update, LW(10))
+            CALL_CHILD(flash_main_evt)
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_LOOP
+    CALL_CHILD(flash_cancel_evt)
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    LABEL(10)
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(20)
+    END_IF
+    CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), 16384, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    END_IF
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    GOTO(10)
+    LABEL(20)
+    WAIT_FRAMES(30)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(end_suki)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(flash_evt)
     CALL(evt_map_set_tevcallback, 1, PTR(set_tev))
@@ -833,8 +952,8 @@ EVT_BEGIN(flash_evt)
         CALL(btlevtcmd_OnPartsAttribute, LW(14), LW(15), 33554432)
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     LABEL(5)
     IF_INT_EQUAL(LW(3), -1)
@@ -855,8 +974,8 @@ EVT_BEGIN(flash_main_evt)
     SUBTRACT(LW(11), LW(10))
     CALL(flash_update, LW(10))
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     LABEL(5)
     IF_INT_EQUAL(LW(3), -1)
@@ -905,8 +1024,8 @@ EVT_BEGIN(flash_cancel_evt)
         CALL(btlevtcmd_OffPartsAttribute, LW(14), LW(15), 33554432)
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     LABEL(5)
     IF_INT_EQUAL(LW(3), -1)

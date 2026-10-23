@@ -14,6 +14,7 @@
 #include "battle/battle_event_subset.h"
 #include "evt/evt_eff.h"
 #include "party/party_motion.h"
+#include "data_tables.h"
 
 USER_FUNC(_get_local_frame);
 static USER_FUNC(_mario_makkuro_set);
@@ -71,7 +72,7 @@ s32 mario_appeal_event[30];
 static s32 attack_audience_event[15];
 s32 btlataudevtMarioJump[237];
 s32 btlataudevtMarioHammer[356];
-static s32 pose_sound_timing_table[10];
+static PoseSoundTiming pose_sound_timing_table[2];
 static s32 damage_event[10];
 static s32 attack_event[2];
 static s32 wait_event[6];
@@ -428,43 +429,59 @@ USER_FUNC(evt_btl_camera_nomove_y_onoff);
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_btl_camera_set_posoffset);
 #endif
-s32 mario_dead_event[] = {
-    131163, (s32)evt_btl_camera_set_prilimit, 1,
+EVT_BEGIN(mario_dead_event)
+    CALL(evt_btl_camera_set_prilimit, 1)
 #ifdef VERSION_G8ME01
-    196699, (s32)evt_btl_camera_nomove_y_onoff, 1, 0,
+    CALL(evt_btl_camera_nomove_y_onoff, 1, 0)
 #endif
-    196699, (s32)evt_btl_camera_set_mode, 1, 7, 262235,
-    (s32)evt_btl_camera_set_homing_unit, 1, -29999990, -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 1, 2,
+    CALL(evt_btl_camera_set_mode, 1, 7)
+    CALL(evt_btl_camera_set_homing_unit, 1, LW(10), -1)
+    CALL(evt_btl_camera_set_moveSpeedLv, 1, 2)
 #ifdef VERSION_G8ME01
-    327771, (s32)evt_btl_camera_set_posoffset, 1, 0, 0, 0,
+    CALL(evt_btl_camera_set_posoffset, 1, 0, 0, 0)
 #endif
-    196699, (s32)evt_btl_camera_set_zoom, 1, 500, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_VOICE_MARIO_DOWN1",
-    -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -29999990, -29999989, (s32)"M_I_S",
-    65546, 2066, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_CONDITION_DOWN1", -250000000, 0,
-    -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -29999990, -29999989, (s32)"M_D_2", 65546, 2000,
-    196699, (s32)btlevtcmd_KillUnit, -29999990, 1, 131163, (s32)evt_btl_camera_set_prilimit, 0, 2,
-    1,
-};
+    CALL(evt_btl_camera_set_zoom, 1, 500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_VOICE_MARIO_DOWN1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("M_I_S"))
+    WAIT_MS(2066)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_CONDITION_DOWN1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("M_D_2"))
+    WAIT_MS(2000)
+    CALL(btlevtcmd_KillUnit, LW(10), 1)
+    CALL(evt_btl_camera_set_prilimit, 0)
+    RETURN
+EVT_END()
 
-s32 mario_emergency_revival_event[] = {
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_VOICE_MARIO_DOWN1", -250000000, 0, -250000000, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -29999990, -29999989, (s32)"M_I_S", 65546, 2066, 131163, (s32)btlevtcmd_ClearAllStatus,
-    -29999990, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_CONDITION_DOWN1", -250000000, 0, -250000000,
-    262235, (s32)btlevtcmd_AnimeChangePose, -29999990, -29999989, (s32)"M_D_2", 65546, 1000, 196699,
-    (s32)btlevtcmd_ConsumeItemReserve, -29999990, 151, 65546, 1000, 110, 327771, (s32)btlevtcmd_GetPos,
-    -29999990, -30000000, -29999999, -29999998, 131125, -29999999, 40, 393307,
-    (s32)btlevtcmd_DispItemIcon, -30000000, -29999999, -29999998, 151, 120, 112, 65545,
-    120, 393307, (s32)btlevtcmd_OnOffStatus, -29999990, 27, 0, 0, 0,
-    196699, (s32)btlevtcmd_SetHp, -29999990, 0, 262235, (s32)btlevtcmd_RecoverHp, -29999990, -29999989,
-    10, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999, -29999998, 131125,
-    -29999999, 30, 983131, (s32)evt_eff, 0, (s32)"recovery", 0, -30000000,
-    -29999999, -29999998, 10, 0, 0, 0, 0, 0,
-    0, 0, 65546, 2000, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989,
-    44, 327771, (s32)btlevtcmd_JumpSetting, -29999990, 0, -230000000, -229999284, 327771,
-    (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999, -29999998, 458843, (s32)btlevtcmd_JumpPosition, -2,
-    -30000000, -29999999, -29999998, 20, -1, 131163, (s32)btlevtcmd_StartWaitEvent, -2,
-    2, 1,
-};
+EVT_BEGIN(mario_emergency_revival_event)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_VOICE_MARIO_DOWN1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("M_I_S"))
+    WAIT_MS(2066)
+    CALL(btlevtcmd_ClearAllStatus, LW(10))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_CONDITION_DOWN1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("M_D_2"))
+    WAIT_MS(1000)
+    CALL(btlevtcmd_ConsumeItemReserve, LW(10), 151)
+    WAIT_MS(1000)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+        ADD(LW(1), 40)
+        CALL(btlevtcmd_DispItemIcon, LW(0), LW(1), LW(2), 151, 120)
+    END_SIBLING_EVENT
+    WAIT_FRAMES(120)
+    CALL(btlevtcmd_OnOffStatus, LW(10), 27, 0, 0, 0)
+    CALL(btlevtcmd_SetHp, LW(10), 0)
+    CALL(btlevtcmd_RecoverHp, LW(10), LW(11), 10)
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+    ADD(LW(1), 30)
+    CALL(evt_eff, 0, STRING("recovery"), 0, LW(0), LW(1), LW(2), 10, 0, 0, 0, 0, 0, 0, 0)
+    WAIT_MS(2000)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 44)
+    CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(0.0f), FLOAT(0.69921875f))
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 20, -1)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(mario_appeal_event)
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 66)
@@ -487,90 +504,165 @@ static EVT_BEGIN(attack_audience_event)
     RETURN
 EVT_END()
 
-s32 btlataudevtMarioJump[] = {
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_J_1B", 327771, (s32)_get_attack_aud_no, -29999997,
-    -30000000, -29999999, -29999998, 110, 65545, 15, 196699, (s32)evt_btl_camera_set_mode,
-    0, 13, 327771, (s32)evt_btl_camera_set_homing_unit_audience, 0, -2, 1, -29999997,
-    196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0, 200,
-    112, 131122, -29999995, -29999999, 131125, -29999999, 28, 262235,
-    (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 5, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229993856,
-    196699, (s32)btlevtcmd_SetFallAccel, -2, -229999386, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_VOICE_MARIO_BATTLE_JUMP1",
-    -250000000, 0, -250000000, 131122, -29999994, 36, 393307, (s32)btlevtcmd_MarioJumpParam,
-    -2, -30000000, -29999999, -29999998, -29999994, 524379, (s32)btlevtcmd_MarioJumpPosition, -2,
-    -30000000, -29999999, -29999998, -29999994, 0, -1, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"M_J_1D", 65545, 3, 196699, (s32)_attack_aud, -29999997,
-    0, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_J_1B", 196699, (s32)btlevtcmd_SetFallAccel,
-    -2, -229999386, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229993856, 262235, (s32)btlevtcmd_FaceDirectionSub,
-    -2, -30000000, 40, 131122, -29999999, -29999995, 131125, -29999998,
-    5, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 20,
-    -1, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 20, 458843, (s32)btlevtcmd_JumpPosition,
-    -2, -30000000, -29999999, -29999998, 10, -1, 262235, (s32)btlevtcmd_FaceDirectionSub,
-    -2, -30000000, 10, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999,
-    -29999998, 6, -1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42,
-    65647, -29999985, 65546, 500, 196699, (s32)evt_btl_camera_set_mode, 0, 0,
-    65546, 1000, 112, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229991808, 131122,
-    -30000000, 0, 262235, (s32)btlevtcmd_GetStageAudienceAreaSize, -29999996, -250000000, -250000000, 262235,
-    (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, -29999996, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000,
-    -29999999, -29999998, 0, -1, 0, 327771, (s32)btlevtcmd_GetHomePos, -2,
-    -30000000, -29999999, -29999998, 131122, -30000000, 0, 262235, (s32)btlevtcmd_GetStageSize,
-    -29999996, -250000000, -250000000, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, -29999996,
-    327771, (s32)btlevtcmd_SetPos, -2, -30000000, -29999999, -29999998, 131163, (s32)btlevtcmd_WaitEventEnd,
-    -29999985, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 524379,
-    (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, -1, 0,
-    131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+EVT_BEGIN(btlataudevtMarioJump)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_J_1B"))
+    CALL(_get_attack_aud_no, LW(3), LW(0), LW(1), LW(2))
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(15)
+        CALL(evt_btl_camera_set_mode, 0, 13)
+        CALL(evt_btl_camera_set_homing_unit_audience, 0, -2, 1, LW(3))
+        CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+        CALL(evt_btl_camera_set_zoom, 0, 200)
+    END_SIBLING_EVENT
+    SET_VALUE(LW(5), LW(1))
+    ADD(LW(1), 28)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 5)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(6.0f))
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.5996094f))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_VOICE_MARIO_BATTLE_JUMP1"), -250000000, 0, -250000000)
+    SET_VALUE(LW(6), 36)
+    CALL(btlevtcmd_MarioJumpParam, -2, LW(0), LW(1), LW(2), LW(6))
+    CALL(btlevtcmd_MarioJumpPosition, -2, LW(0), LW(1), LW(2), LW(6), 0, -1)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_J_1D"))
+    WAIT_FRAMES(3)
+    CALL(_attack_aud, LW(3), 0)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_J_1B"))
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.5996094f))
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(6.0f))
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 40)
+    SET_VALUE(LW(1), LW(5))
+    ADD(LW(2), 5)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 20, -1)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 20)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 10, -1)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 10)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 6, -1)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    BEGIN_SIBLING_EVENT_GET_ID(LW(15))
+        WAIT_MS(500)
+        CALL(evt_btl_camera_set_mode, 0, 0)
+        WAIT_MS(1000)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(8.0f))
+    SET_VALUE(LW(0), 0)
+    CALL(btlevtcmd_GetStageAudienceAreaSize, LW(4), -250000000, -250000000)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), LW(4))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    SET_VALUE(LW(0), 0)
+    CALL(btlevtcmd_GetStageSize, LW(4), -250000000, -250000000)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), LW(4))
+    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_WaitEventEnd, LW(15))
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
-s32 btlataudevtMarioHammer[] = {
-    327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_GetStageSize,
-    -29999997, -250000000, -250000000, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -29999996, 131122,
-    -29999992, -29999997, 131127, -29999992, -29999996, 131127, -29999992, -1,
-    196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229993856, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1,
-    42, 524379, (s32)btlevtcmd_MovePosition, -2, -29999992, -29999999, -29999998, 0,
-    -1, 0, 65545, 20, 327771, (s32)_get_attack_aud_no, -29999997, -30000000,
-    -29999999, -29999998, 262235, (s32)btlevtcmd_GetStageAudienceAreaSize, -29999996, -250000000, -250000000, 196699,
-    (s32)btlevtcmd_GetFaceDirection, -2, -29999995, 131122, -29999994, -29999996, 131127, -29999994,
-    -29999995, 131127, -29999994, -1, 327771, (s32)btlevtcmd_SetPos, -2, -29999994,
-    -29999999, -29999998, 196699, (s32)evt_btl_camera_set_mode, 0, 13, 327771, (s32)evt_btl_camera_set_homing_unit_audience,
-    0, -2, 1, -29999997, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2,
-    196699, (s32)evt_btl_camera_set_zoom, 0, 100, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000,
-    20, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0,
-    -1, 0, 196699, (s32)evt_btl_camera_set_zoom, 0, 200, 131163, (s32)_get_mario_hammer_lv,
-    -30000000, 65570, -30000000, 65572, 2, 131122, -30000000, (s32)"M_H_5A",
-    131122, -29999999, (s32)"M_H_5B", 131122, -29999998, (s32)"M_H_14", 65572, 3,
-    131122, -30000000, (s32)"M_H_9A", 131122, -29999999, (s32)"M_H_9B", 131122, -29999998,
-    (s32)"M_H_15", 42, 131122, -30000000, (s32)"M_H_1A", 131122, -29999999, (s32)"M_H_1B",
-    131122, -29999998, (s32)"M_H_13", 49, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    -30000000, 131163, (s32)_get_mario_hammer_lv, -30000000, 65570, -30000000, 65572, 2,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_MARIO_HAMMER_HOLD2", -250000000, 0, -250000000, 65572,
-    1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_MARIO_HAMMER_HOLD1", -250000000, 0, -250000000,
-    42, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_MARIO_HAMMER_HOLD3", -250000000, 0, -250000000,
-    49, 65546, 500, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, -29999999,
-    65545, 1, 131163, (s32)_get_mario_hammer_lv, -30000000, 65570, -30000000, 65572,
-    2, 196699, (s32)evt_snd_sfxon, (s32)"SFX_MARIO_HAMMER_SWING2", 0, 65572, 1, 196699,
-    (s32)evt_snd_sfxon, (s32)"SFX_MARIO_HAMMER_SWING1", 0, 42, 196699, (s32)evt_snd_sfxon, (s32)"SFX_MARIO_HAMMER_SWING3", 0,
-    49, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, -29999998, 65545, 7,
-    131163, (s32)_get_mario_hammer_lv, -30000000, 65570, -30000000, 65572, 2, 196699,
-    (s32)evt_snd_sfxon, (s32)"SFX_MARIO_HAMMER_HIT_GROUND3", 0, 65572, 1, 196699, (s32)evt_snd_sfxon, (s32)"SFX_MARIO_HAMMER_HIT_GROUND2",
-    0, 42, 196699, (s32)evt_snd_sfxon, (s32)"SFX_MARIO_HAMMER_HIT_GROUND1", 0, 49, 196699,
-    (s32)_attack_aud, -29999997, 0, 196699, (s32)evt_btl_camera_set_mode, 0, 3, 393307,
-    (s32)evt_btl_camera_shake_h, 0, 2, 0, 10, 13, 65647, -29999985,
-    65546, 1500, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 65546, 1000,
-    112, 65546, 500, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_H_16",
-    196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -2, 1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1,
-    42, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 196699,
-    (s32)btlevtcmd_SetMoveSpeed, -2, -229991808, 131122, -30000000, 0, 262235, (s32)btlevtcmd_GetStageAudienceAreaSize,
-    -29999996, -250000000, -250000000, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, -29999996,
-    524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, -1,
-    0, 131163, (s32)btlevtcmd_WaitEventEnd, -29999985, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000,
-    -29999999, -29999998, 327771, (s32)btlevtcmd_SetPos, -2, -29999992, -29999999, -29999998,
-    327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition,
-    -2, -30000000, -29999999, -29999998, 0, -1, 0, 131163,
-    (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+EVT_BEGIN(btlataudevtMarioHammer)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStageSize, LW(3), -250000000, -250000000)
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(4))
+    SET_VALUE(LW(8), LW(3))
+    MULTIPLY(LW(8), LW(4))
+    MULTIPLY(LW(8), -1)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(6.0f))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_MovePosition, -2, LW(8), LW(1), LW(2), 0, -1, 0)
+    WAIT_FRAMES(20)
+    CALL(_get_attack_aud_no, LW(3), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStageAudienceAreaSize, LW(4), -250000000, -250000000)
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+    SET_VALUE(LW(6), LW(4))
+    MULTIPLY(LW(6), LW(5))
+    MULTIPLY(LW(6), -1)
+    CALL(btlevtcmd_SetPos, -2, LW(6), LW(1), LW(2))
+    CALL(evt_btl_camera_set_mode, 0, 13)
+    CALL(evt_btl_camera_set_homing_unit_audience, 0, -2, 1, LW(3))
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 100)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 20)
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(evt_btl_camera_set_zoom, 0, 200)
+    CALL(_get_mario_hammer_lv, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(2)
+        SET_VALUE(LW(0), STRING("M_H_5A"))
+        SET_VALUE(LW(1), STRING("M_H_5B"))
+        SET_VALUE(LW(2), STRING("M_H_14"))
+        CASE_EQUAL(3)
+        SET_VALUE(LW(0), STRING("M_H_9A"))
+        SET_VALUE(LW(1), STRING("M_H_9B"))
+        SET_VALUE(LW(2), STRING("M_H_15"))
+        CASE_DEFAULT
+        SET_VALUE(LW(0), STRING("M_H_1A"))
+        SET_VALUE(LW(1), STRING("M_H_1B"))
+        SET_VALUE(LW(2), STRING("M_H_13"))
+    END_SWITCH
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(0))
+    CALL(_get_mario_hammer_lv, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_MARIO_HAMMER_HOLD2"), -250000000, 0, -250000000)
+        CASE_EQUAL(1)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_MARIO_HAMMER_HOLD1"), -250000000, 0, -250000000)
+        CASE_DEFAULT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_MARIO_HAMMER_HOLD3"), -250000000, 0, -250000000)
+    END_SWITCH
+    WAIT_MS(500)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(1))
+    WAIT_FRAMES(1)
+    CALL(_get_mario_hammer_lv, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(2)
+        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING2"), 0)
+        CASE_EQUAL(1)
+        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING1"), 0)
+        CASE_DEFAULT
+        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING3"), 0)
+    END_SWITCH
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(2))
+    WAIT_FRAMES(7)
+    CALL(_get_mario_hammer_lv, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(2)
+        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_HIT_GROUND3"), 0)
+        CASE_EQUAL(1)
+        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_HIT_GROUND2"), 0)
+        CASE_DEFAULT
+        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_HIT_GROUND1"), 0)
+    END_SWITCH
+    CALL(_attack_aud, LW(3), 0)
+    CALL(evt_btl_camera_set_mode, 0, 3)
+    CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
+    BEGIN_SIBLING_EVENT_GET_ID(LW(15))
+        WAIT_MS(1500)
+        CALL(evt_btl_camera_set_mode, 0, 0)
+        WAIT_MS(1000)
+    END_SIBLING_EVENT
+    WAIT_MS(500)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_H_16"))
+    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(8.0f))
+    SET_VALUE(LW(0), 0)
+    CALL(btlevtcmd_GetStageAudienceAreaSize, LW(4), -250000000, -250000000)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), LW(4))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_WaitEventEnd, LW(15))
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, -2, LW(8), LW(1), LW(2))
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
-static s32 pose_sound_timing_table[] = {
-    (s32)"M_S_3", 1048576000, (s32)mario_pinch_pose_sound_callback, 0, 1, 0, 0, 0,
-    0, 1,
+static PoseSoundTiming pose_sound_timing_table[] = {
+    {"M_S_3", 0.25f, mario_pinch_pose_sound_callback, NULL, 0, 1},
+    {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
 static EVT_BEGIN(damage_event)

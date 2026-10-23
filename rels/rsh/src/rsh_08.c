@@ -11,92 +11,117 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envoff);
 USER_FUNC(evt_snd_envon);
 
-__declspec(section ".data") u64 fd_rsh_08_negone_one_374;
-__declspec(section ".data") s32 fd_rsh_08_neg_one_382[1];
-__declspec(section ".data") s32 fd_rsh_08___local_PI_383[1];
-__declspec(section ".data") s32 fd_rsh_08___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_rsh_08_one_negone_373;
-__declspec(section ".data") s32 fd_rsh_08___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_rsh_08_one_381[1];
-__declspec(section ".data") u64 fd_rsh_08_negone_one_360;
-__declspec(section ".data") s32 fd_rsh_08_neg_one_365[1];
-__declspec(section ".data") s32 fd_rsh_08___local_PI_366[1];
-__declspec(section ".data") s32 fd_rsh_08___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_rsh_08_one_negone_359;
-__declspec(section ".data") s32 fd_rsh_08___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_rsh_08_one_364[1];
-s32 bero_data_a_nidome[30];
-s32 bero_data_b_nidome[30];
-s32 bero_data_c_nidome[30];
+__declspec(section ".data") f32 fd_rsh_08_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_08_neg_one_382;
+__declspec(section ".data") f32 fd_rsh_08___local_PI_383;
+__declspec(section ".data") f32 fd_rsh_08___local_3PIO2_385;
+__declspec(section ".data") f32 fd_rsh_08_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_08___local_PIO2_384;
+__declspec(section ".data") f32 fd_rsh_08_one_381;
+__declspec(section ".data") f32 fd_rsh_08_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_08_neg_one_365;
+__declspec(section ".data") f32 fd_rsh_08___local_PI_366;
+__declspec(section ".data") f32 fd_rsh_08___local_3PIO2_368;
+__declspec(section ".data") f32 fd_rsh_08_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_08___local_PIO2_367;
+__declspec(section ".data") f32 fd_rsh_08_one_364;
+BeroEntry bero_data_a_nidome[2];
+BeroEntry bero_data_b_nidome[2];
+BeroEntry bero_data_c_nidome[2];
 s32 rsh_08_a_init_evt[72];
 
-__declspec(section ".data") u64 fd_rsh_08_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_rsh_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_rsh_08_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_rsh_08_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_rsh_08___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_rsh_08___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_rsh_08_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_rsh_08___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_rsh_08_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_rsh_08_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_rsh_08_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_rsh_08___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_rsh_08___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_rsh_08_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_rsh_08___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_rsh_08_one_364 = 1.0f;
+
+BeroEntry bero_data_a_nidome[] = {
+    {
+        "e_bero", // hitName
+        1, // type
+        8, // sfxId
+        6, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_01_a", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"e_door_close", // enterAnimeArg
+        (s32)"e_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
-__declspec(section ".data") s32 fd_rsh_08___local_PI_383[] = {
-    1078530011,
+BeroEntry bero_data_b_nidome[] = {
+    {
+        "e_bero", // hitName
+        1, // type
+        8, // sfxId
+        6, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_01_b", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"e_door_close", // enterAnimeArg
+        (s32)"e_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
-__declspec(section ".data") s32 fd_rsh_08___local_3PIO2_385[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_rsh_08_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_rsh_08___local_PIO2_384[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_rsh_08_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_rsh_08_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_rsh_08_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_rsh_08___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_rsh_08___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_rsh_08_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_rsh_08___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_rsh_08_one_364[] = {
-    1065353216,
-};
-
-s32 bero_data_a_nidome[] = {
-    (s32)"e_bero", 65544, 6, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_01_a", (s32)"e_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
-};
-
-s32 bero_data_b_nidome[] = {
-    (s32)"e_bero", 65544, 6, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_01_b", (s32)"e_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
-};
-
-s32 bero_data_c_nidome[] = {
-    (s32)"e_bero", 65544, 6, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_01_c", (s32)"e_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+BeroEntry bero_data_c_nidome[] = {
+    {
+        "e_bero", // hitName
+        1, // type
+        8, // sfxId
+        6, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_01_c", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"e_door_close", // enterAnimeArg
+        (s32)"e_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(rsh_08_a_init_evt)

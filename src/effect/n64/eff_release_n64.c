@@ -115,45 +115,71 @@ AnimeEntry anime_data_2[30] = {
     {0x0064, 0x00FF},
 };
 
-static u32 size16x16_tex64x64_vtx[] = {
-    0xFFF8FFF8, 0x00000000, 0x00000000, 0x00FF0008, 0xFFF80000, 0x08000000, 0x000000FF,
-    0x00080008, 0x00000800, 0x08000000, 0x00FFFFF8, 0x00080000, 0x00000800, 0x000000FF,
+static effN64Vtx size16x16_tex64x64_vtx[] = {
+    {-8, -8, 0, 0, 0, 0, 0, 0, 255},
+    {8, -8, 0, 2048, 0, 0, 0, 0, 255},
+    {8, 8, 0, 2048, 2048, 0, 0, 0, 255},
+    {-8, 8, 0, 0, 2048, 0, 0, 0, 255},
 };
 
-u32 size16x16_tex256x32_vtx[] = {
-    0xFFF8FFF8, 0x00000000, 0x00000000, 0x00FF0008, 0xFFF80000, 0x20000000, 0x000000FF,
-    0x0008FFFA, 0x00002000, 0x04000000, 0x00FFFFF8, 0xFFFA0000, 0x00000400, 0x000000FF,
-    0xFFF8FFFA, 0x00000000, 0x00000000, 0x00FF0008, 0xFFFA0000, 0x20000000, 0x000000FF,
-    0x0008FFFC, 0x00002000, 0x04000000, 0x00FFFFF8, 0xFFFC0000, 0x00000400, 0x000000FF,
-    0xFFF8FFFC, 0x00000000, 0x00000000, 0x00FF0008, 0xFFFC0000, 0x20000000, 0x000000FF,
-    0x0008FFFE, 0x00002000, 0x04000000, 0x00FFFFF8, 0xFFFE0000, 0x00000400, 0x000000FF,
-    0xFFF8FFFE, 0x00000000, 0x00000000, 0x00FF0008, 0xFFFE0000, 0x20000000, 0x000000FF,
-    0x00080000, 0x00002000, 0x04000000, 0x00FFFFF8, 0x00000000, 0x00000400, 0x000000FF,
-    0xFFF80000, 0x00002000, 0x04000000, 0x00FF0008, 0x00000000, 0x00000400, 0x000000FF,
-    0x00080002, 0x00000000, 0x00000000, 0x00FFFFF8, 0x00020000, 0x20000000, 0x000000FF,
-    0xFFF80002, 0x00002000, 0x04000000, 0x00FF0008, 0x00020000, 0x00000400, 0x000000FF,
-    0x00080004, 0x00000000, 0x00000000, 0x00FFFFF8, 0x00040000, 0x20000000, 0x000000FF,
-    0xFFF80004, 0x00002000, 0x04000000, 0x00FF0008, 0x00040000, 0x00000400, 0x000000FF,
-    0x00080006, 0x00000000, 0x00000000, 0x00FFFFF8, 0x00060000, 0x20000000, 0x000000FF,
-    0xFFF80006, 0x00002000, 0x04000000, 0x00FF0008, 0x00060000, 0x00000400, 0x000000FF,
-    0x00080008, 0x00000000, 0x00000000, 0x00FFFFF8, 0x00080000, 0x20000000, 0x000000FF,
+effN64Vtx size16x16_tex256x32_vtx[] = {
+    {-8, -8, 0, 0, 0, 0, 0, 0, 255},
+    {8, -8, 0, 8192, 0, 0, 0, 0, 255},
+    {8, -6, 0, 8192, 1024, 0, 0, 0, 255},
+    {-8, -6, 0, 0, 1024, 0, 0, 0, 255},
+    {-8, -6, 0, 0, 0, 0, 0, 0, 255},
+    {8, -6, 0, 8192, 0, 0, 0, 0, 255},
+    {8, -4, 0, 8192, 1024, 0, 0, 0, 255},
+    {-8, -4, 0, 0, 1024, 0, 0, 0, 255},
+    {-8, -4, 0, 0, 0, 0, 0, 0, 255},
+    {8, -4, 0, 8192, 0, 0, 0, 0, 255},
+    {8, -2, 0, 8192, 1024, 0, 0, 0, 255},
+    {-8, -2, 0, 0, 1024, 0, 0, 0, 255},
+    {-8, -2, 0, 0, 0, 0, 0, 0, 255},
+    {8, -2, 0, 8192, 0, 0, 0, 0, 255},
+    {8, 0, 0, 8192, 1024, 0, 0, 0, 255},
+    {-8, 0, 0, 0, 1024, 0, 0, 0, 255},
+    {-8, 0, 0, 8192, 1024, 0, 0, 0, 255},
+    {8, 0, 0, 0, 1024, 0, 0, 0, 255},
+    {8, 2, 0, 0, 0, 0, 0, 0, 255},
+    {-8, 2, 0, 8192, 0, 0, 0, 0, 255},
+    {-8, 2, 0, 8192, 1024, 0, 0, 0, 255},
+    {8, 2, 0, 0, 1024, 0, 0, 0, 255},
+    {8, 4, 0, 0, 0, 0, 0, 0, 255},
+    {-8, 4, 0, 8192, 0, 0, 0, 0, 255},
+    {-8, 4, 0, 8192, 1024, 0, 0, 0, 255},
+    {8, 4, 0, 0, 1024, 0, 0, 0, 255},
+    {8, 6, 0, 0, 0, 0, 0, 0, 255},
+    {-8, 6, 0, 8192, 0, 0, 0, 0, 255},
+    {-8, 6, 0, 8192, 1024, 0, 0, 0, 255},
+    {8, 6, 0, 0, 1024, 0, 0, 0, 255},
+    {8, 8, 0, 0, 0, 0, 0, 0, 255},
+    {-8, 8, 0, 8192, 0, 0, 0, 0, 255},
 };
 
-u32 size16x16_tex128x128_vtx[] = {
-    0xFFF80000, 0xFFF80000, 0x00000000, 0x00FF0008, 0x0000FFF8, 0x10000000, 0x000000FF,
-    0x00080000, 0x00081000, 0x10000000, 0x00FFFFF8, 0x00000008, 0x00001000, 0x000000FF,
+effN64Vtx size16x16_tex128x128_vtx[] = {
+    {-8, 0, -8, 0, 0, 0, 0, 0, 255},
+    {8, 0, -8, 4096, 0, 0, 0, 0, 255},
+    {8, 0, 8, 4096, 4096, 0, 0, 0, 255},
+    {-8, 0, 8, 0, 4096, 0, 0, 0, 255},
 };
 
-u32 size16x16_tex64x64_0_vtx[] = {
-    0xFFF8FFF8, 0x00000000, 0x00000000, 0x00FF0008, 0xFFF80000, 0x08000000, 0x000000FF,
-    0x00080000, 0x00000800, 0x04000000, 0x00FFFFF8, 0x00000000, 0x00000400, 0x000000FF,
-    0xFFF80000, 0x00000800, 0x04000000, 0x00FF0008, 0x00000000, 0x00000400, 0x000000FF,
-    0x00080008, 0x00000000, 0x00000000, 0x00FFFFF8, 0x00080000, 0x08000000, 0x000000FF,
+effN64Vtx size16x16_tex64x64_0_vtx[] = {
+    {-8, -8, 0, 0, 0, 0, 0, 0, 255},
+    {8, -8, 0, 2048, 0, 0, 0, 0, 255},
+    {8, 0, 0, 2048, 1024, 0, 0, 0, 255},
+    {-8, 0, 0, 0, 1024, 0, 0, 0, 255},
+    {-8, 0, 0, 2048, 1024, 0, 0, 0, 255},
+    {8, 0, 0, 0, 1024, 0, 0, 0, 255},
+    {8, 8, 0, 0, 0, 0, 0, 0, 255},
+    {-8, 8, 0, 2048, 0, 0, 0, 0, 255},
 };
 
-u32 rectangle_vtx[] = {
-    0x00000000, 0x00000800, 0x04000000, 0x00FF0280, 0x00000000, 0x00000400, 0x000000FF,
-    0x028001E0, 0x00000000, 0x00000000, 0x00FF0000, 0x01E00000, 0x08000000, 0x000000FF,
+effN64Vtx rectangle_vtx[] = {
+    {0, 0, 0, 2048, 1024, 0, 0, 0, 255},
+    {640, 0, 0, 0, 1024, 0, 0, 0, 255},
+    {640, 480, 0, 0, 0, 0, 0, 0, 255},
+    {0, 480, 0, 2048, 0, 0, 0, 0, 255},
 };
 
 EffectEntry* effReleaseN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
@@ -441,14 +467,14 @@ void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
             GXLoadTexObj(&texObj, GX_TEXMAP0);
             PSMTXScale(scale, 0.03125f, 0.03125f, 0.0f);
             GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-            effSetVtxDescN64((effN64Vtx*)size16x16_tex64x64_vtx);
+            effSetVtxDescN64(size16x16_tex64x64_vtx);
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
             tri2(0, 1, 2, 0, 0, 2, 3, 0);
             break;
         case 1:
             effGetTexObjN64(0x45, &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            effSetVtxDescN64((effN64Vtx*)size16x16_tex256x32_vtx);
+            effSetVtxDescN64(size16x16_tex256x32_vtx);
             PSMTXScale(scale, 0.00390625f, 0.00390625f, 0.0f);
             PSMTXTrans(mtx, 0.0f, 0.0f, 0.0f);
             PSMTXConcat(scale, mtx, scale);
@@ -483,7 +509,7 @@ void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
             GXLoadTexObj(&texObj, GX_TEXMAP0);
             PSMTXScale(scale, 0.015625f, 0.015625f, 0.0f);
             GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-            effSetVtxDescN64((effN64Vtx*)size16x16_tex128x128_vtx);
+            effSetVtxDescN64(size16x16_tex128x128_vtx);
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
             tri2(0, 1, 2, 0, 0, 2, 3, 0);
         case 3:
@@ -491,7 +517,7 @@ void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
             GXLoadTexObj(&texObj, GX_TEXMAP0);
             PSMTXScale(scale, 0.015625f, 0.03125f, 0.0f);
             GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-            effSetVtxDescN64((effN64Vtx*)size16x16_tex64x64_0_vtx);
+            effSetVtxDescN64(size16x16_tex64x64_0_vtx);
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
             tri2(0, 1, 2, 0, 0, 2, 3, 0);
             tri2(4, 5, 6, 4, 4, 6, 7, 4);
@@ -530,7 +556,7 @@ void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXIdentity(mtx);
             GXLoadPosMtxImm(mtx, GX_PNMTX0);
             GXSetCurrentMtx(0);
-            effSetVtxDescN64((effN64Vtx*)rectangle_vtx);
+            effSetVtxDescN64(rectangle_vtx);
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
             tri2(0, 1, 2, 0, 0, 2, 3, 0);
             GXSetProjectionv(projv);

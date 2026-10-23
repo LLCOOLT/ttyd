@@ -5,6 +5,7 @@
 #include "driver/effdrv.h"
 #include "mario/mariost.h"
 #include "muj.h"
+#include "evt/evt_npc.h"
 
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_cam3d_evt_set);
@@ -45,73 +46,53 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(fune_eff);
 
-__declspec(section ".data") u64 fd_muj_21_negone_one_374;
-__declspec(section ".data") s32 fd_muj_21_neg_one_382[1];
-__declspec(section ".data") s32 fd_muj_21___local_PI_383[1];
-__declspec(section ".data") s32 fd_muj_21___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_muj_21_one_negone_373;
-__declspec(section ".data") s32 fd_muj_21___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_muj_21_one_381[1];
-__declspec(section ".data") u64 fd_muj_21_negone_one_360;
-__declspec(section ".data") s32 fd_muj_21_neg_one_365[1];
-__declspec(section ".data") s32 fd_muj_21___local_PI_366[1];
-__declspec(section ".data") s32 fd_muj_21___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_muj_21_one_negone_359;
-__declspec(section ".data") s32 fd_muj_21___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_muj_21_one_364[1];
+__declspec(section ".data") f32 fd_muj_21_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_21_neg_one_382;
+__declspec(section ".data") f32 fd_muj_21___local_PI_383;
+__declspec(section ".data") f32 fd_muj_21___local_3PIO2_385;
+__declspec(section ".data") f32 fd_muj_21_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_21___local_PIO2_384;
+__declspec(section ".data") f32 fd_muj_21_one_381;
+__declspec(section ".data") f32 fd_muj_21_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_21_neg_one_365;
+__declspec(section ".data") f32 fd_muj_21___local_PI_366;
+__declspec(section ".data") f32 fd_muj_21___local_3PIO2_368;
+__declspec(section ".data") f32 fd_muj_21_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_21___local_PIO2_367;
+__declspec(section ".data") f32 fd_muj_21_one_364;
 __declspec(section ".data") s32 peach_init[12];
-static s32 npcEnt[46];
+static NpcSetupInfo npcEnt[2];
 s32 fune_yure[42];
 static s32 epilogue_evt[344];
 s32 muj_21_init_evt[58];
 
-__declspec(section ".data") u64 fd_muj_21_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_21_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_21_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_21_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj_21___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj_21___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj_21___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj_21___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_21_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_21_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj_21___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj_21___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_21_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_21_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_muj_21_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_21_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_21_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_21_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj_21___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj_21___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj_21___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj_21___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_21_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_21_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj_21___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj_21___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_21_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_21_one_364 = 1.0f;
 
 __declspec(section ".data") EVT_BEGIN(peach_init)
     CALL(evt_npc_set_position, STRING("me"), 62, 28, 44)
@@ -119,13 +100,18 @@ __declspec(section ".data") EVT_BEGIN(peach_init)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"ピーチ姫"*/"\x83\x73\x81\x5B\x83\x60\x95\x50", 525824, 0, (s32)peach_init, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"ピーチ姫"*/"\x83\x73\x81\x5B\x83\x60\x95\x50", // name
+        0x80600, // flags
+        0, // reactionFlags
+        peach_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(fune_yure)

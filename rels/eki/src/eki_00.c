@@ -25,6 +25,8 @@
 #include "driver/dispdrv.h"
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_bero.h"
+#include "data_tables.h"
+#include "mario/mario_pouch.h"
 #undef EXT_LIT
 #define EXT_LIT(sym, val) (val)
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
@@ -215,26 +217,26 @@ s32 evt_win_item_select(EventEntry* event, BOOL isFirstCall);
 s32 img_set_color(EventEntry* event, BOOL isFirstCall);
 s32 img_set_color(EventEntry* event, BOOL isFirstCall);
 
-__declspec(section ".data") u64 fd_eki_00_negone_one_374;
-__declspec(section ".data") s32 fd_eki_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_eki_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_eki_00___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_eki_00_one_negone_373;
-__declspec(section ".data") s32 fd_eki_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_eki_00_one_381[1];
-__declspec(section ".data") u64 fd_eki_00_negone_one_360;
-__declspec(section ".data") s32 fd_eki_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_eki_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_eki_00___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_eki_00_one_negone_359;
-__declspec(section ".data") s32 fd_eki_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_eki_00_one_364[1];
-static s32 ext_moamoa_data[141];
+__declspec(section ".data") f32 fd_eki_00_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_eki_00_neg_one_382;
+__declspec(section ".data") f32 fd_eki_00___local_PI_383;
+__declspec(section ".data") f32 fd_eki_00___local_3PIO2_385;
+__declspec(section ".data") f32 fd_eki_00_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_eki_00___local_PIO2_384;
+__declspec(section ".data") f32 fd_eki_00_one_381;
+__declspec(section ".data") f32 fd_eki_00_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_eki_00_neg_one_365;
+__declspec(section ".data") f32 fd_eki_00___local_PI_366;
+__declspec(section ".data") f32 fd_eki_00___local_3PIO2_368;
+__declspec(section ".data") f32 fd_eki_00_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_eki_00___local_PIO2_367;
+__declspec(section ".data") f32 fd_eki_00_one_364;
+static ExtTexInfo ext_moamoa_data[47];
 __declspec(section ".data") static s32 e_door_close[12];
 __declspec(section ".data") static s32 e_door_open[12];
 static s32 s_door_close[22];
 static s32 s_door_open[22];
-static s32 bero_data[45];
+static BeroEntry bero_data[3];
 s32 evt_bridge[14];
 s32 evt_bridge2[118];
 static s32 evt_origami[198];
@@ -252,73 +254,82 @@ static s32 evt_head[42];
 static s32 evt_kanban[14];
 s32 eki_00_init_evt[99];
 
-__declspec(section ".data") u64 fd_eki_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_eki_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_eki_00_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_eki_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_eki_00___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_eki_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_eki_00___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_eki_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_eki_00_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_eki_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_eki_00___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_eki_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_eki_00_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_eki_00_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_eki_00_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_eki_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_eki_00_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_eki_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_eki_00___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_eki_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_eki_00___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_eki_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_eki_00_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_eki_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_eki_00___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_eki_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_eki_00_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_eki_00_one_364 = 1.0f;
 
-static s32 ext_moamoa_data[] = {
-    (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 0, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1073741824, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"),
-    1082130432, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1086324736, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1090519040, (s32)((char*)"c_n_moa_a"),
-    (s32)((char*)"S_1"), 1092616192, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1094713344, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1096810496,
-    (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1098907648, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1099956224, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"),
-    1101004800, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1102053376, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1103101952, (s32)((char*)"c_n_moa_a"),
-    (s32)((char*)"S_1"), 1104150528, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1105199104, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1106247680,
-    (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1107296256, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1107820544, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"),
-    1108344832, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1108869120, (s32)((char*)"c_n_moa_a"), (s32)((char*)"D_1"), 0, (s32)((char*)"c_n_moa_a"),
-    (s32)((char*)"D_1"), 1082130432, (s32)((char*)"c_n_moa_a"), (s32)((char*)"D_1"), 1090519040, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 0,
-    (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1073741824, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1082130432, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"),
-    1086324736, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1090519040, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1092616192, (s32)((char*)"c_n_moa_b"),
-    (s32)((char*)"S_1"), 1094713344, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1096810496, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1098907648,
-    (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1099956224, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1101004800, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"),
-    1102053376, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1103101952, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1104150528, (s32)((char*)"c_n_moa_b"),
-    (s32)((char*)"S_1"), 1105199104, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1106247680, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1107296256,
-    (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1107820544, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1108344832, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"),
-    1108869120, (s32)((char*)"c_n_moa_b"), (s32)((char*)"D_1"), 0, (s32)((char*)"c_n_moa_b"), (s32)((char*)"D_1"), 1082130432, (s32)((char*)"c_n_moa_b"),
-    (s32)((char*)"D_1"), 1090519040, 0, 0, 0,
+static ExtTexInfo ext_moamoa_data[] = {
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 0.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 2.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 4.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 6.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 8.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 10.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 12.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 14.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 16.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 18.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 20.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 22.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 24.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 26.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 28.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 30.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 32.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 34.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 36.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 38.0f},
+    {((char*)"c_n_moa_a"), ((char*)"D_1"), 0.0f},
+    {((char*)"c_n_moa_a"), ((char*)"D_1"), 4.0f},
+    {((char*)"c_n_moa_a"), ((char*)"D_1"), 8.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 0.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 2.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 4.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 6.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 8.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 10.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 12.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 14.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 16.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 18.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 20.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 22.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 24.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 26.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 28.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 30.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 32.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 34.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 36.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 38.0f},
+    {((char*)"c_n_moa_b"), ((char*)"D_1"), 0.0f},
+    {((char*)"c_n_moa_b"), ((char*)"D_1"), 4.0f},
+    {((char*)"c_n_moa_b"), ((char*)"D_1"), 8.0f},
+    {0},
 };
 
 int rand(void);
@@ -1429,13 +1440,44 @@ static EVT_BEGIN(s_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_data[] = {
-    (s32)((char*)"e_bero"), 65539, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)((char*)"eki_01"), (s32)((char*)"w_dero"), 327685, (s32)e_door_close, (s32)e_door_open, (s32)((char*)"s_bero"),
-    65542, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)((char*)"hom_00"), (s32)((char*)"n_bero_2"), 327685, (s32)s_door_close, (s32)s_door_open, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_data[] = {
+    {
+        ((char*)"e_bero"), // hitName
+        1, // type
+        3, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)((char*)"eki_01"), // nextMapName
+        ((char*)"w_dero"), // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {
+        ((char*)"s_bero"), // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)((char*)"hom_00"), // nextMapName
+        ((char*)"n_bero_2"), // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s_door_close, // enterAnimeArg
+        (s32)s_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_bridge)
@@ -1949,7 +1991,7 @@ EVT_BEGIN(evt_elv_up)
 EVT_END()
 
 __declspec(section ".data") static s32 item_tbl[] = {
-    26, -1,
+    ITEM_ELEVATOR_KEY_0x1A, -1,
 };
 
 EVT_BEGIN(evt_elv)

@@ -14,6 +14,7 @@
 #include "evt/evt_msg.h"
 #include "party/party_motion.h"
 #include "unit/party/unit_party_christine.h"
+#include "battle/battle_database_common.h"
 
 static USER_FUNC(_battle_set_lecture_unit_id);
 USER_FUNC(_set_lecture_mode);
@@ -47,37 +48,37 @@ USER_FUNC(evt_msg_print);
 USER_FUNC(_get_defence_ac_result);
 USER_FUNC(_config_key_record);
 static USER_FUNC(_krb_get_dir);
-extern s32 unit_lecture_frankli[];
+extern BattleUnitKind unit_lecture_frankli;
 
-__declspec(section ".data") u64 fd_lecture_christine_negone_one_374;
-__declspec(section ".data") s32 fd_lecture_christine_neg_one_382[1];
-__declspec(section ".data") s32 fd_lecture_christine___local_PI_383[1];
-__declspec(section ".data") s32 fd_lecture_christine___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_lecture_christine_one_negone_373;
-__declspec(section ".data") s32 fd_lecture_christine___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_lecture_christine_one_381[1];
-__declspec(section ".data") u64 fd_lecture_christine_negone_one_360;
-__declspec(section ".data") s32 fd_lecture_christine_neg_one_365[1];
-__declspec(section ".data") s32 fd_lecture_christine___local_PI_366[1];
-__declspec(section ".data") s32 fd_lecture_christine___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_lecture_christine_one_negone_359;
-__declspec(section ".data") s32 fd_lecture_christine___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_lecture_christine_one_364[1];
+__declspec(section ".data") f32 fd_lecture_christine_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_lecture_christine_neg_one_382;
+__declspec(section ".data") f32 fd_lecture_christine___local_PI_383;
+__declspec(section ".data") f32 fd_lecture_christine___local_3PIO2_385;
+__declspec(section ".data") f32 fd_lecture_christine_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_lecture_christine___local_PIO2_384;
+__declspec(section ".data") f32 fd_lecture_christine_one_381;
+__declspec(section ".data") f32 fd_lecture_christine_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_lecture_christine_neg_one_365;
+__declspec(section ".data") f32 fd_lecture_christine___local_PI_366;
+__declspec(section ".data") f32 fd_lecture_christine___local_3PIO2_368;
+__declspec(section ".data") f32 fd_lecture_christine_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_lecture_christine___local_PIO2_367;
+__declspec(section ".data") f32 fd_lecture_christine_one_364;
 BattleUnitKind unit_lecture_christine;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
 static __declspec(section ".data") BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
-__declspec(section ".data") s32 entry_lecture_frankli[12];
+__declspec(section ".data") BattleUnitSetup entry_lecture_frankli;
 static s32 init_event[78];
 static __declspec(section ".data") s32 damage_event[10];
 s32 lecture_christine_ac_counter_damage_event[117];
 static __declspec(section ".data") s32 phase_event[2];
 static __declspec(section ".data") s32 wait_event[6];
 static s32 attack_event[19];
-s32 lec_weapon_zutsuki_1[48];
-s32 lec_weapon_zutsuki_2[48];
+BattleWeapon lec_weapon_zutsuki_1;
+BattleWeapon lec_weapon_zutsuki_2;
 s32 lecture_zutsuki_attack_event[570];
 
 USER_FUNC(_get_defence_ac_result) {
@@ -115,53 +116,33 @@ USER_FUNC(_config_key_record) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_lecture_christine_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_lecture_christine_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_lecture_christine_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_lecture_christine_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_lecture_christine___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_lecture_christine___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_lecture_christine___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_lecture_christine___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_lecture_christine_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_lecture_christine_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_lecture_christine___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_lecture_christine___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_lecture_christine_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_lecture_christine_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_lecture_christine_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_lecture_christine_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_lecture_christine_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_lecture_christine_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_lecture_christine___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_lecture_christine___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_lecture_christine___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_lecture_christine___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_lecture_christine_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_lecture_christine_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_lecture_christine___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_lecture_christine___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_lecture_christine_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_lecture_christine_one_364 = 1.0f;
 
 BattleUnitKind unit_lecture_christine = {
     177,
@@ -244,9 +225,15 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_christine", "c_pkr", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x880009, 0, pose_table_christine_stay},
 };
 
-__declspec(section ".data") s32 entry_lecture_frankli[] = {
-    (s32)unit_lecture_frankli, 33554432, 67108865, 0, 0, -1036779520, 0, 0,
-    0, 0, 0, 0,
+__declspec(section ".data") BattleUnitSetup entry_lecture_frankli = {
+    &unit_lecture_frankli, // mUnitKindParams
+    2, // alliance
+    {0}, // pad_05
+    0x4000001, // attackPhase
+    {0.0f, 0.0f, -45.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
 static EVT_BEGIN(init_event)
@@ -259,7 +246,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetRunSound, -2, STRING("SFX_PARTY_BATTLE_MOVE1L"), STRING("SFX_PARTY_BATTLE_MOVE1R"), 0, 9, 3)
     CALL(btlevtcmd_SetJumpSound, -2, STRING("SFX_PARTY_BATTLE_JUMP1"), STRING("SFX_PARTY_BATTLE_LANDING1"))
     CALL(_set_lecture_mode)
-    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(entry_lecture_frankli), 0)
+    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_lecture_frankli), 0)
     CALL(btlevtcmd_SetUnitWork, -2, 0, LW(3))
     CALL(_battle_set_lecture_unit_id, LW(3))
     CALL(btlevtcmd_ChangeFaceDirection, LW(3), -1)
@@ -324,98 +311,239 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-s32 lec_weapon_zutsuki_1[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    1, 1, 1, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 16781920, 536875012, 770, 0, 86023, 12, -2147475456,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon lec_weapon_zutsuki_1 = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 1, 1, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1001260, // targetClassFlags
+    0x20001004, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x15007, // special
+    0xC, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 lec_weapon_zutsuki_2[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    1, 1, 1, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 16781920, 536875012, 770, 0, 86023, 12, -2147475456,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon lec_weapon_zutsuki_2 = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 1, 1, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1001260, // targetClassFlags
+    0x20001004, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x15007, // special
+    0xC, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 lecture_zutsuki_attack_event[] = {
-    262235, (s32)btlevtcmd_GetUnitWork, -6, 1, -30000000, 131096, -30000000, 3,
-    131122, -29999988, (s32)lec_weapon_zutsuki_1, 32, 131122, -29999988, (s32)lec_weapon_zutsuki_2, 33,
-    327771, (s32)btlevtcmd_JumpSetting, -2, 20, -230000000, -229999284, 196699, (s32)btlevtcmd_GetEnemyBelong,
-    -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999988, 262235,
-    (s32)btlevtcmd_ChoiceSamplingEnemy, -29999988, -29999997, -29999996, 131096, -29999997, -1, 65540,
-    99, 33, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996, 65627,
-    (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999988, 196699, (s32)btlevtcmd_RunDataEventChild, -2,
-    7, 196699, (s32)evt_btl_camera_set_mode, 0, 11, 393307, (s32)evt_btl_camera_set_homing_unitparts, 0,
-    -2, 1, -29999997, -29999996, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2,
-    196699, (s32)evt_btl_camera_set_zoom, 0, 200, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1,
-    42, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229996928, 458843, (s32)btlevtcmd_GetTakeoffPosition, -2,
-    -29999997, -29999996, -30000000, -29999999, -29999998, 458843, (s32)btlevtcmd_CalculateFaceDirection, -2,
-    -1, -30000000, -29999998, 1, -29999985, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2,
-    -29999985, 458843, (s32)btlevtcmd_GetMoveFrame, -2, -30000000, -29999999, -29999998, 0,
-    -29999986, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, -29999986,
-    -1, 0, 458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996,
-    16, -29999985, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 131122, -29999990,
-    0, 65539, 10, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PKR_A_2B",
-    65545, 20, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PKR_J_1A", 107,
-    65545, 15, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_KURI_ATTACK1", 0, 109, 327771,
-    (s32)btlevtcmd_JumpSetting, -2, 20, -230000000, -229999284, 327771, (s32)btlevtcmd_SetRotateOffset, -2,
-    0, 14, 0, 110, 327771, (s32)btlevtcmd_GetPosFloat, -2, -29999995,
-    -29999994, -29999993, 131122, -29999992, 0, 65541, 36, 327771,
-    (s32)btlevtcmd_GetPosFloat, -2, -29999988, -29999987, -29999986, 393307, (s32)_krb_get_dir, -29999995,
-    -29999994, -29999988, -29999987, -29999992, 327771, (s32)btlevtcmd_GetRotate, -2, -30000000,
-    -29999999, -29999998, 327771, (s32)btlevtcmd_SetRotate, -2, -30000000, -29999999, -29999992,
-    131124, -29999995, -29999988, 131124, -29999994, -29999987, 65545, 1,
-    6, 112, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999,
-    -29999998, 131125, -29999998, 5, 524379, (s32)btlevtcmd_MarioJumpPosition, -2, -30000000,
-    -29999999, -29999998, 36, 0, -1, 262235, (s32)btlevtcmd_GetUnitWork, -6,
-    1, -30000000, 65570, -30000000, 65572, 3, 196699, (s32)btlevtcmd_SetTalkPose,
-    -6, (s32)"T_1", 196699, (s32)btlevtcmd_SetStayPose, -6, (s32)"S_1", 327771, (s32)evt_msg_print,
-    2, (s32)"mac_0_b_t2_006", 0, -6, 65545, 1, 65539, 11,
-    262235, (s32)btlevtcmd_PadCheckTrigger, 0, 256, -30000000, 131096, -30000000, 0,
-    65545, 1, 65540, 11, 33, 65546, 50, 107,
-    65546, 100, 65627, (s32)evt_msg_continue, 109, 65546, 100, 65572,
-    7, 196699, (s32)btlevtcmd_SetTalkPose, -6, (s32)"T_1", 196699, (s32)btlevtcmd_SetStayPose, -6,
-    (s32)"S_1", 327771, (s32)evt_msg_print, 2, (s32)"mac_0_b_t2_014", 0, -6, 65545,
-    1, 65539, 12, 262235, (s32)btlevtcmd_PadCheckTrigger, 0, 512, -30000000,
-    131096, -30000000, 0, 65545, 1, 65540, 12, 33,
-    65546, 50, 107, 65546, 100, 65627, (s32)evt_msg_continue, 109,
-    65546, 100, 49, 107, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 0,
-    196699, (s32)evt_btl_camera_set_zoom, 0, -229833600, 65545, 10, 196699, (s32)evt_btl_camera_set_moveSpeedLv,
-    0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0, 200, 109, 262235,
-    (s32)btlevtcmd_GetUnitWork, -6, 1, -30000000, 65570, -30000000, 65572, 3,
-    131163, (s32)_config_key_record, 256, 65572, 7, 131163, (s32)_config_key_record, 512,
-    49, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999988, 458843, (s32)btlevtcmd_CheckDamage, -2,
-    -29999997, -29999996, -29999988, 256, -29999995, 131163, (s32)_get_defence_ac_result, -30000000,
-    65570, -30000000, 65572, 0, 65572, 1, 262235, (s32)btlevtcmd_SetUnitWork,
-    -6, 3, 4, 65572, 2, 262235, (s32)btlevtcmd_SetUnitWork, -6,
-    3, 5, 65572, 3, 262235, (s32)btlevtcmd_SetUnitWork, -6, 3,
-    6, 49, 131125, -29999990, 1, 110, 327771, (s32)btlevtcmd_GetRotate,
-    -2, -250000000, -250000000, -29999994, 131098, -29999994, 0, 131127,
-    -29999994, -1, 33, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -30000000, 131127,
-    -29999994, -30000000, 131128, -29999994, 15, 131122, -29999993, 15,
-    65539, 20, 327771, (s32)btlevtcmd_AddRotate, -2, 0, 0, -29999994,
-    131126, -29999993, 1, 65545, 1, 131101, -29999993, 1,
-    65540, 20, 33, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0,
-    0, 112, 196699, (s32)btlevtcmd_SetFallAccel, -2, -229999284, 327771, (s32)btlevtcmd_GetPos,
-    -2, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_GetHomePos, -2, -250000000,
-    -29999999, -250000000, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 60, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 30, -1, 196699,
-    (s32)btlevtcmd_SetFallAccel, -2, -229999386, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 20,
-    458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 12, -1,
-    262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 8, 458843, (s32)btlevtcmd_JumpPosition, -2,
-    -30000000, -29999999, -29999998, 8, -1, 65539, 95, 196699,
-    (s32)evt_btl_camera_set_mode, 0, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 196699,
-    (s32)btlevtcmd_SetMoveSpeed, -2, -229993856, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 40,
-    327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition,
-    -2, -30000000, -29999999, -29999998, 0, -1, 0, 65539,
-    99, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2,
-    1, 0,
-};
+EVT_BEGIN(lecture_zutsuki_attack_event)
+    CALL(btlevtcmd_GetUnitWork, -6, 1, LW(0))
+    IF_INT_EQUAL(LW(0), 3)
+        SET_VALUE(LW(12), PTR(&lec_weapon_zutsuki_1))
+    ELSE
+        SET_VALUE(LW(12), PTR(&lec_weapon_zutsuki_2))
+    END_IF
+    CALL(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0f), FLOAT(0.69921875f))
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(12))
+    CALL(btlevtcmd_RunDataEventChild, -2, 7)
+    CALL(evt_btl_camera_set_mode, 0, 11)
+    CALL(evt_btl_camera_set_homing_unitparts, 0, -2, 1, LW(3), LW(4))
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 200)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
+    CALL(btlevtcmd_GetTakeoffPosition, -2, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(0), LW(2), 1, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_GetMoveFrame, -2, LW(0), LW(1), LW(2), 0, LW(14))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), LW(14), -1, 0)
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    SET_VALUE(LW(10), 0)
+    LABEL(10)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PKR_A_2B"))
+    WAIT_FRAMES(20)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PKR_J_1A"))
+    BEGIN_INLINE_EVENT
+        WAIT_FRAMES(15)
+        CALL(evt_snd_sfxon, STRING("SFX_BTL_KURI_ATTACK1"), 0)
+    END_INLINE_EVENT
+    CALL(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0f), FLOAT(0.69921875f))
+    CALL(btlevtcmd_SetRotateOffset, -2, 0, 14, 0)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_GetPosFloat, -2, LW(5), LW(6), LW(7))
+        SET_VALUE(LW(8), 0)
+        LOOP(36)
+            CALL(btlevtcmd_GetPosFloat, -2, LW(12), LW(13), LW(14))
+            CALL(_krb_get_dir, LW(5), LW(6), LW(12), LW(13), LW(8))
+            CALL(btlevtcmd_GetRotate, -2, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_SetRotate, -2, LW(0), LW(1), LW(8))
+            SET_FLOAT_VALUE(LW(5), LW(12))
+            SET_FLOAT_VALUE(LW(6), LW(13))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    ADD(LW(2), 5)
+    CALL(btlevtcmd_MarioJumpPosition, -2, LW(0), LW(1), LW(2), 36, 0, -1)
+    CALL(btlevtcmd_GetUnitWork, -6, 1, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_SetTalkPose, -6, STRING("T_1"))
+        CALL(btlevtcmd_SetStayPose, -6, STRING("S_1"))
+        CALL(evt_msg_print, 2, STRING("mac_0_b_t2_006"), 0, -6)
+        WAIT_FRAMES(1)
+        LABEL(11)
+        CALL(btlevtcmd_PadCheckTrigger, 0, 256, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            WAIT_FRAMES(1)
+            GOTO(11)
+        END_IF
+        WAIT_MS(50)
+        BEGIN_INLINE_EVENT
+            WAIT_MS(100)
+            CALL(evt_msg_continue)
+        END_INLINE_EVENT
+        WAIT_MS(100)
+        CASE_EQUAL(7)
+        CALL(btlevtcmd_SetTalkPose, -6, STRING("T_1"))
+        CALL(btlevtcmd_SetStayPose, -6, STRING("S_1"))
+        CALL(evt_msg_print, 2, STRING("mac_0_b_t2_014"), 0, -6)
+        WAIT_FRAMES(1)
+        LABEL(12)
+        CALL(btlevtcmd_PadCheckTrigger, 0, 512, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            WAIT_FRAMES(1)
+            GOTO(12)
+        END_IF
+        WAIT_MS(50)
+        BEGIN_INLINE_EVENT
+            WAIT_MS(100)
+            CALL(evt_msg_continue)
+        END_INLINE_EVENT
+        WAIT_MS(100)
+    END_SWITCH
+    BEGIN_INLINE_EVENT
+        CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
+        CALL(evt_btl_camera_set_zoom, 0, FLOAT(162.5f))
+        WAIT_FRAMES(10)
+        CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+        CALL(evt_btl_camera_set_zoom, 0, 200)
+    END_INLINE_EVENT
+    CALL(btlevtcmd_GetUnitWork, -6, 1, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(3)
+        CALL(_config_key_record, 256)
+        CASE_EQUAL(7)
+        CALL(_config_key_record, 512)
+    END_SWITCH
+    CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(_get_defence_ac_result, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CASE_EQUAL(1)
+        CALL(btlevtcmd_SetUnitWork, -6, 3, 4)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_SetUnitWork, -6, 3, 5)
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_SetUnitWork, -6, 3, 6)
+    END_SWITCH
+    ADD(LW(10), 1)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_GetRotate, -2, -250000000, -250000000, LW(6))
+        IF_INT_LESS(LW(6), 0)
+            MULTIPLY(LW(6), -1)
+        END_IF
+        CALL(btlevtcmd_GetFaceDirection, -2, LW(0))
+        MULTIPLY(LW(6), LW(0))
+        DIVIDE(LW(6), 15)
+        SET_VALUE(LW(7), 15)
+        LABEL(20)
+        CALL(btlevtcmd_AddRotate, -2, 0, 0, LW(6))
+        SUBTRACT(LW(7), 1)
+        WAIT_FRAMES(1)
+        IF_INT_GREATER_OR_EQUAL(LW(7), 1)
+            GOTO(20)
+        END_IF
+        CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.69921875f))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHomePos, -2, -250000000, LW(1), -250000000)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 60)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 30, -1)
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.5996094f))
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 20)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 12, -1)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 8)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 8, -1)
+    LABEL(95)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(6.0f))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    LABEL(99)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END_PAD()
 
 static USER_FUNC(_krb_get_dir) {
     s32* args = event->args;

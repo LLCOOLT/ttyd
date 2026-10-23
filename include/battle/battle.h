@@ -228,11 +228,18 @@ struct BattleWork {
     u8 field_16F3B;                     // 0x16F3B
     u8 marioAcSuccess;                  // 0x16F3C
     u8 marioAcFailed;                   // 0x16F3D
-    u8 field_16F3E[0x17140 - 0x16F3E];  // 0x16F3E
+    u8 field_16F3E[0x16F40 - 0x16F3E];  // 0x16F3E (US 0x16F5A)
+    s32 unk16F40;                       // 0x16F40 (US 0x16F5C)
+    u8 field_16F44[0x17140 - 0x16F44];  // 0x16F44 (US 0x16F60)
     BattleStageObject stageObjects[32]; // 0x17140
     u8 field_180C0[0x180DC - 0x180C0];  // 0x180C0
     u8 field_180DC;                     // 0x180DC, 0x20: stage has a ceiling
-    u8 field_180DD[0x182B0 - 0x180DD];  // 0x180DD
+    u8 field_180DD[0x18298 - 0x180DD];  // 0x180DD (US 0x180F9)
+    s32 unk18298;                       // 0x18298 (US 0x182B4)
+    u8 field_1829C[0x182A0 - 0x1829C];  // 0x1829C (US 0x182B8)
+    u32 unk182A0;                       // 0x182A0 (US 0x182BC)
+    s32 unk182A4;                       // 0x182A4 (US 0x182C0)
+    u8 field_182A8[0x182B0 - 0x182A8];  // 0x182A8 (US 0x182C4)
     BattleIcon icons[16];               // 0x182B0
     BattleAnnounce announce;            // 0x18C70
     s8 alertTick;                       // 0x18FE0
@@ -250,7 +257,11 @@ struct BattleWork {
     s32 luckEventId;                    // 0x1904C
     u32 reserveItems[4];                // 0x19050
     s32 field_19060;                    // 0x19060
-    u8 field_19064[0x19088 - 0x19064];  // 0x19064
+    u8 field_19064[0x19068 - 0x19064];  // 0x19064 (US 0x19074)
+    s32 unk19068;                       // 0x19068 (US 0x19078)
+    u8 field_1906C[0x19080 - 0x1906C];  // 0x1906C (US 0x1907C)
+    s32 unk19080;                       // 0x19080 (US 0x19090)
+    s32 unk19084;                       // 0x19084 (US 0x19094)
 };
 extern BattleWork* _battleWorkPointer;
 

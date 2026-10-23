@@ -165,7 +165,7 @@ void seq_loadMain(SequenceWork* seq) {
             wp->evt = evtEntryType(evt_memcard_check, 0, 0, 0);
             if (wp->flags & 0x80) {
                 wp->flags &= ~0x80;
-                *(s32*)((u8*)wp->evt + 0xC4) = 1;
+                wp->evt->lwData[10] = 1;
                 wp->evt->printWindowId = wp->unk48;
             }
             seq->state++;
@@ -1068,19 +1068,19 @@ void loadDraw(CameraId camera, void* param) {
 
 __declspec(section ".sdata") s32 stone_id[7] = {0x197 + 8, 0x198 + 8, 0x19A + 8, 0x19C + 8, 0x19D + 8, 0x199 + 8, 0x19B + 8};
 
-__declspec(section ".sdata") static s32 evt_shake[] = {
-    0x0003005B, (s32)evt_sub_rumble_onoff, 0, 0,
-    0x0001000A, 150,
-    0x0003005B, (s32)evt_sub_rumble_onoff, 1, 0,
-    0x00000002, 0x00000001,
-};
+__declspec(section ".sdata") static EVT_BEGIN(evt_shake)
+    CALL(evt_sub_rumble_onoff, 0, 0)
+    WAIT_MS(150)
+    CALL(evt_sub_rumble_onoff, 1, 0)
+    RETURN
+EVT_END()
 
-__declspec(section ".sdata") s32 evt_continue[] = {
-    0x0002005B, (s32)evt_sub_animgroup_async, (s32)"OFF_f_in_out_mario",
-    0x0002005B, (s32)evt_sub_animgroup_async, (s32)"OFF_f_in_out_kuppa",
-    0x0002005B, (s32)evt_sub_animgroup_async, (s32)"OFF_f_in_out_peach",
-    0x00000002, 0x00000001,
-};
+__declspec(section ".sdata") EVT_BEGIN(evt_continue)
+    CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_mario"))
+    CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_kuppa"))
+    CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_peach"))
+    RETURN
+EVT_END()
 void continueGame(void) {
     cardCopy2Main(wp->slot);
     gp->saveSlot = wp->slot;
@@ -1262,6 +1262,7 @@ void continueGame(void) {
 #include "driver/icondrv.h"
 #include "win/win_main.h"
 #include "sdk/texPalette.h"
+#include "evt/evt_cmd.h"
 #define EXT_LIT(sym, val) (val)
 
 typedef struct LoadWork {
@@ -1454,7 +1455,7 @@ void seq_loadMain(SequenceWork* seq) {
             wp->evt = evtEntryType(evt_memcard_check, 0, 0, 0);
             if (wp->flags & 0x80) {
                 wp->flags &= ~0x80;
-                *(s32*)((u8*)wp->evt + 0xC4) = 1;
+                wp->evt->lwData[10] = 1;
                 wp->evt->printWindowId = wp->unk48;
             }
             seq->state++;
@@ -2311,19 +2312,19 @@ void loadDraw(CameraId camera, void* param) {
 
 __declspec(section ".sdata") s32 stone_id[7] = {0x197, 0x198, 0x19A, 0x19C, 0x19D, 0x199, 0x19B};
 
-__declspec(section ".sdata") static s32 evt_shake[] = {
-    0x0003005B, (s32)evt_sub_rumble_onoff, 0, 0,
-    0x0001000A, 150,
-    0x0003005B, (s32)evt_sub_rumble_onoff, 1, 0,
-    0x00000002, 0x00000001,
-};
+__declspec(section ".sdata") static EVT_BEGIN(evt_shake)
+    CALL(evt_sub_rumble_onoff, 0, 0)
+    WAIT_MS(150)
+    CALL(evt_sub_rumble_onoff, 1, 0)
+    RETURN
+EVT_END()
 
-__declspec(section ".sdata") s32 evt_continue[] = {
-    0x0002005B, (s32)evt_sub_animgroup_async, (s32)"OFF_f_in_out_mario",
-    0x0002005B, (s32)evt_sub_animgroup_async, (s32)"OFF_f_in_out_kuppa",
-    0x0002005B, (s32)evt_sub_animgroup_async, (s32)"OFF_f_in_out_peach",
-    0x00000002, 0x00000001,
-};
+__declspec(section ".sdata") EVT_BEGIN(evt_continue)
+    CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_mario"))
+    CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_kuppa"))
+    CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_peach"))
+    RETURN
+EVT_END()
 #pragma force_active on
 #pragma force_active on
 #pragma defer_codegen off

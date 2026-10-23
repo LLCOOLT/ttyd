@@ -18,6 +18,7 @@
 #include "manager/evtmgr_cmd.h"
 #include "driver/animdrv.h"
 #include "evt/evt_bero.h"
+#include "data_tables.h"
 void PSMTXIdentity(Mtx m);
 f32 PSVECDistance(const Vec* a, const Vec* b);
 #ifndef VERSION_G8ME01
@@ -103,22 +104,22 @@ static void ext_init(void);
 static f32 randf(f32 min, f32 max);
 extern s32 hei_test_water_tev[];
 
-__declspec(section ".data") u64 fd_hei_10_negone_one_374;
-__declspec(section ".data") s32 fd_hei_10_neg_one_382[1];
-__declspec(section ".data") s32 fd_hei_10___local_PI_383[1];
-__declspec(section ".data") s32 fd_hei_10___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_hei_10_one_negone_373;
-__declspec(section ".data") s32 fd_hei_10___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_hei_10_one_381[1];
-__declspec(section ".data") u64 fd_hei_10_negone_one_360;
-__declspec(section ".data") s32 fd_hei_10_neg_one_365[1];
-__declspec(section ".data") s32 fd_hei_10___local_PI_366[1];
-__declspec(section ".data") s32 fd_hei_10___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_hei_10_one_negone_359;
-__declspec(section ".data") s32 fd_hei_10___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_hei_10_one_364[1];
-static s32 bero_entry_data[60];
-static s32 ext_data[63];
+__declspec(section ".data") f32 fd_hei_10_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_10_neg_one_382;
+__declspec(section ".data") f32 fd_hei_10___local_PI_383;
+__declspec(section ".data") f32 fd_hei_10___local_3PIO2_385;
+__declspec(section ".data") f32 fd_hei_10_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_10___local_PIO2_384;
+__declspec(section ".data") f32 fd_hei_10_one_381;
+__declspec(section ".data") f32 fd_hei_10_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_10_neg_one_365;
+__declspec(section ".data") f32 fd_hei_10___local_PI_366;
+__declspec(section ".data") f32 fd_hei_10___local_3PIO2_368;
+__declspec(section ".data") f32 fd_hei_10_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_10___local_PIO2_367;
+__declspec(section ".data") f32 fd_hei_10_one_364;
+static BeroEntry bero_entry_data[4];
+static ExtTexInfo ext_data[21];
 s32 golden_se[55];
 s32 evt_golden[319];
 s32 hei_10_init_evt[80];
@@ -172,74 +173,109 @@ static void ext_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
-__declspec(section ".data") u64 fd_hei_10_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hei_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hei_10_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_hei_10_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_hei_10___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_hei_10___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_hei_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_hei_10___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_hei_10_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_hei_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_hei_10_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_hei_10___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_hei_10___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_hei_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_hei_10___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_hei_10_one_364 = 1.0f;
+
+static BeroEntry bero_entry_data[] = {
+    {
+        ("w_bero"), // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)("hei_09"), // nextMapName
+        ("e_bero"), // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        ("e_bero"), // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)("hei_11"), // nextMapName
+        ("w_bero"), // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        ("dokan"), // hitName
+        2, // type
+        0, // sfxId
+        6, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        10, // caseType
+        NULL, // exitEvent
+        (s32)("hei_07"), // nextMapName
+        ("dokan"), // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-__declspec(section ".data") s32 fd_hei_10___local_PI_383[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_hei_10___local_3PIO2_385[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_hei_10_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_hei_10___local_PIO2_384[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_hei_10_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_hei_10_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_hei_10_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_hei_10___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_hei_10___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_hei_10_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_hei_10___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_hei_10_one_364[] = {
-    1065353216,
-};
-
-static s32 bero_entry_data[] = {
-    (s32)("w_bero"), 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)("hei_09"), (s32)("e_bero"), 65537, 0, 0, (s32)("e_bero"),
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)("hei_11"), (s32)("w_bero"), 65537, 0, 0, (s32)("dokan"), 131072,
-    6, 100000, 0, 0, -1, 0, 10, 0,
-    (s32)("hei_07"), (s32)("dokan"), 65537, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
-};
-
-static s32 ext_data[] = {
-    (s32)("c_chorobon"), (s32)("CBN_W_1"), 0, (s32)("c_chorobon"), (s32)("CBN_W_1"), 1073741824, (s32)("c_chorobon"), (s32)("CBN_W_1"),
-    1082130432, (s32)("c_chorobon"), (s32)("CBN_W_1"), 1086324736, (s32)("c_chorobon"), (s32)("CBN_W_1"), 1090519040, (s32)("c_chorobon"),
-    (s32)("CBN_W_1"), 1092616192, (s32)("c_chorobon"), (s32)("CBN_W_1"), 1094713344, (s32)("c_chorobon"), (s32)("CBN_W_1"), 1096810496,
-    (s32)("c_chorobon"), (s32)("CBN_W_1"), 1098907648, (s32)("c_chorobon"), (s32)("CBN_W_1"), 1099956224, (s32)("c_chorobon"), (s32)("CBN_W_1"),
-    1101004800, (s32)("c_chorobon"), (s32)("CBN_W_1"), 1102053376, (s32)("c_chorobon"), (s32)("CBN_W_1"), 1103101952, (s32)("c_chorobon"),
-    (s32)("CBN_W_1"), 1104150528, (s32)("c_chorobon"), (s32)("CBN_W_1"), 1105199104, (s32)("c_chorobon"), (s32)("CBN_W_1"), 1106247680,
-    (s32)("c_chorobon"), (s32)("CBN_W_1"), 1107296256, (s32)("c_chorobon"), (s32)("CBN_W_1"), 1107820544, (s32)("c_chorobon"), (s32)("CBN_W_1"),
-    1108344832, (s32)("c_chorobon"), (s32)("CBN_W_1"), 1108869120, 0, 0, 0,
+static ExtTexInfo ext_data[] = {
+    {("c_chorobon"), ("CBN_W_1"), 0.0f},
+    {("c_chorobon"), ("CBN_W_1"), 2.0f},
+    {("c_chorobon"), ("CBN_W_1"), 4.0f},
+    {("c_chorobon"), ("CBN_W_1"), 6.0f},
+    {("c_chorobon"), ("CBN_W_1"), 8.0f},
+    {("c_chorobon"), ("CBN_W_1"), 10.0f},
+    {("c_chorobon"), ("CBN_W_1"), 12.0f},
+    {("c_chorobon"), ("CBN_W_1"), 14.0f},
+    {("c_chorobon"), ("CBN_W_1"), 16.0f},
+    {("c_chorobon"), ("CBN_W_1"), 18.0f},
+    {("c_chorobon"), ("CBN_W_1"), 20.0f},
+    {("c_chorobon"), ("CBN_W_1"), 22.0f},
+    {("c_chorobon"), ("CBN_W_1"), 24.0f},
+    {("c_chorobon"), ("CBN_W_1"), 26.0f},
+    {("c_chorobon"), ("CBN_W_1"), 28.0f},
+    {("c_chorobon"), ("CBN_W_1"), 30.0f},
+    {("c_chorobon"), ("CBN_W_1"), 32.0f},
+    {("c_chorobon"), ("CBN_W_1"), 34.0f},
+    {("c_chorobon"), ("CBN_W_1"), 36.0f},
+    {("c_chorobon"), ("CBN_W_1"), 38.0f},
+    {0},
 };
 
 static void ext_shadow_disp(CameraId camera, void* param) {

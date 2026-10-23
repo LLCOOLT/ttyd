@@ -18,14 +18,14 @@ void BattleAcGaugeSeDelete(void);
 #define ACW(ac, T, off) (*(T*)((u8*)(ac) + (off)))
 
 // static data from inlined header functions
-__declspec(section ".data") s32 air_lbl_0[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 air_negone_one_374[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 air_lbl_1[] = {1065353216, -1082130432};
-__declspec(section ".data") s32 air_one_negone_373[] = {1065353216, -1082130432};
-__declspec(section ".data") s32 air_lbl_2[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 air_negone_one_360[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 air_lbl_3[] = {1065353216, -1082130432};
-__declspec(section ".data") s32 air_one_negone_359[] = {1065353216, -1082130432};
+__declspec(section ".data") f32 air_lbl_0[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 air_negone_one_374[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 air_lbl_1[] = {1.0f, -1.0f};
+__declspec(section ".data") f32 air_one_negone_373[] = {1.0f, -1.0f};
+__declspec(section ".data") f32 air_lbl_2[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 air_negone_one_360[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 air_lbl_3[] = {1.0f, -1.0f};
+__declspec(section ".data") f32 air_one_negone_359[] = {1.0f, -1.0f};
 
 typedef struct GaugeKey {
     s32 frame;
@@ -60,17 +60,17 @@ f32 _GetGaugeDecValue(void);
 
 s32 battleAcMain_AirGauge(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
-    u8* pw = (u8*)ac + 0x2BC;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    u8* pw = ac->work;
+    BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
 
     switch (ac->mAcState) {
         case 0:
             memset(disp, 0, 0x2C);
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            *(s32*)&disp->field_0x1C[4] = 20;
-            ACW(disp, f32, 0x28) = 0.0f;
-            *(GXColor*)&disp->field_0x0[0xC] = (GXColor){255, 255, 255, 255};
+            disp->unk20 = 20;
+            disp->unk28 = 0.0f;
+            disp->unkC = (GXColor){255, 255, 255, 255};
             ACW(pw, s32, 0) = 0;
             ac->outputParams[0] = 0;
             ac->outputParams[2] = 0;
@@ -87,25 +87,25 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
         case 100:
             if ((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & 0x10)) {
                 if (irand(100) >= 0) {
-                    ac->setupParam = ACW(ac, s32, 0x44) / 2;
+                    ac->setupParam = ac->params[3] / 2;
                     ac->outputParams[0] = 0;
                     ac->outputParams[2] = 0;
                 } else {
-                    s32 v = irand(ACW(ac, s32, 0x40) - 1) + 1;
+                    s32 v = irand(ac->params[2] - 1) + 1;
                     ac->outputParams[0] = v;
                     switch (v) {
                         case 1:
-                            ac->setupParam = ACW(ac, s32, 0x44) - 1;
+                            ac->setupParam = ac->params[3] - 1;
                             break;
                         case 2:
-                            ac->setupParam = ACW(ac, s32, 0x48) - 1;
+                            ac->setupParam = ac->params[4] - 1;
                             break;
                         case 3:
-                            ac->setupParam = ACW(ac, s32, 0x4C) - 1;
+                            ac->setupParam = ac->params[5] - 1;
                             break;
                         case 4:
                         default:
-                            ac->setupParam = ACW(ac, s32, 0x4C) + 1;
+                            ac->setupParam = ac->params[5] + 1;
                             break;
                     }
                     ac->outputParams[2] = 100;
@@ -140,7 +140,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
                 ACW(pw, f32, 4) = 100.0f;
             }
             BattleAcGaugeSeUpdate(ACW(pw, f32, 4));
-            if (ACW(pw, s32, 0) >= ACW(ac, s32, 0x3C)) {
+            if (ACW(pw, s32, 0) >= ac->params[1]) {
                 if (ac->mAcUnit->badgesEquipped.AutoCommand) {
                     ACW(pw, s32, 8) = 1;
                     ACW(pw, f32, 4) = 100.0f;
@@ -154,19 +154,19 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
                 }
                 ac->result = 2;
                 ac->mResultCount++;
-                if (ACW(pw, f32, 4) < (f32)ACW(ac, s32, 0x44)) {
+                if (ACW(pw, f32, 4) < (f32)ac->params[3]) {
                     ac->outputParams[0] = 1;
-                } else if (ACW(ac, s32, 0x40) <= 2) {
+                } else if (ac->params[2] <= 2) {
                     ac->outputParams[0] = 2;
-                } else if (ACW(pw, f32, 4) < (f32)ACW(ac, s32, 0x48)) {
+                } else if (ACW(pw, f32, 4) < (f32)ac->params[4]) {
                     ac->outputParams[0] = 2;
-                } else if (ACW(ac, s32, 0x40) <= 3) {
+                } else if (ac->params[2] <= 3) {
                     ac->outputParams[0] = 3;
-                } else if (ACW(pw, f32, 4) < (f32)ACW(ac, s32, 0x4C)) {
+                } else if (ACW(pw, f32, 4) < (f32)ac->params[5]) {
                     ac->outputParams[0] = 3;
-                } else if (ACW(ac, s32, 0x40) <= 4) {
+                } else if (ac->params[2] <= 4) {
                     ac->outputParams[0] = 4;
-                } else if (ACW(pw, f32, 4) < (f32)ACW(ac, s32, 0x50)) {
+                } else if (ACW(pw, f32, 4) < (f32)ac->params[6]) {
                     ac->outputParams[0] = 4;
                 } else {
                     ac->outputParams[0] = 5;
@@ -210,12 +210,12 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
 f32 _GetGaugeDecValue(void) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
-    AirPw* pw = (AirPw*)((u8*)ac + 0x2BC);
+    AirPw* pw = (AirPw*)ac->work;
     GaugeKey* t;
     f32 base;
     u32 frame;
 
-    switch (ACW(ac, u32, 0x54)) {
+    switch ((u32)ac->params[7]) {
         case 0: base = 0.3f; t = _table_0; break;
         case 1: base = 0.33f; t = _table_1; break;
         case 2: base = 0.36f; t = _table_2; break;
@@ -247,11 +247,11 @@ s32 battleAcResult_AirGauge(BattleWork* work) {
 
 void battleAcDisp_AirGauge(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)&work->actionCommands + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&work->actionCommands.disp;
     s32 i;
     switch (work->actionCommands.mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[4], 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
         case 100:
             i = 4;
         case 1000:
@@ -262,14 +262,14 @@ void battleAcDisp_AirGauge(CameraId cameraId, void* param) {
             break;
         case 1002:
         case 1003:
-            if (*(s32*)&disp->field_0x1C[4] >= 40) {
-                disp->iconX = intplGetValue(4, *(s32*)&disp->field_0x1C[4] - 40, 20, 30.0f, -300.0f);
+            if (disp->unk20 >= 40) {
+                disp->iconX = intplGetValue(4, disp->unk20 - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] < 60) {
-                (*(s32*)&disp->field_0x1C[4])++;
+            if (disp->unk20 < 60) {
+                disp->unk20++;
             }
             break;
     }
@@ -283,13 +283,13 @@ void battleAcDelete_AirGauge(BattleWork* work) {
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
-    AirDisp* disp = (AirDisp*)((u8*)ac + 0x290);
+    AirDisp* disp = (AirDisp*)&ac->disp;
     AirPw* pw;
     f32 ratio;
     f32 cur;
 
     camGetPtr(8);
-    pw = (AirPw*)((u8*)ac + 0x2BC);
+    pw = (AirPw*)ac->work;
     ratio = pw->gauge / 100.0f;
     if (disp->ratio <= ratio) {
         disp->ratio += 0.01f;
@@ -302,8 +302,8 @@ static void actionCommandDisp(f32 x, f32 y) {
             disp->ratio = ratio;
         }
     }
-    BattleAcDrawGauge((s32)x, (s32)y, 0xB2, disp->ratio, ACW(ac, s32, 0x40), ACW(ac, s32, 0x44), ACW(ac, s32, 0x48),
-                      ACW(ac, s32, 0x4C), 0);
+    BattleAcDrawGauge((s32)x, (s32)y, 0xB2, disp->ratio, ac->params[2], ac->params[3], ac->params[4],
+                      ac->params[5], 0);
     if (pw->flag) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -200.0f + x;

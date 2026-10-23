@@ -3,6 +3,8 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
 #include "mri.h"
+#include "evt/evt_npc.h"
+#include "data_tables.h"
 
 #pragma force_active on
 
@@ -79,20 +81,20 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 
-__declspec(section ".data") u64 fd_mri_11_negone_one_374;
-__declspec(section ".data") s32 fd_mri_11_neg_one_382[1];
-__declspec(section ".data") s32 fd_mri_11___local_PI_383[1];
-__declspec(section ".data") s32 fd_mri_11___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_mri_11_one_negone_373;
-__declspec(section ".data") s32 fd_mri_11___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_mri_11_one_381[1];
-__declspec(section ".data") u64 fd_mri_11_negone_one_360;
-__declspec(section ".data") s32 fd_mri_11_neg_one_365[1];
-__declspec(section ".data") s32 fd_mri_11___local_PI_366[1];
-__declspec(section ".data") s32 fd_mri_11___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_mri_11_one_negone_359;
-__declspec(section ".data") s32 fd_mri_11___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_mri_11_one_364[1];
+__declspec(section ".data") f32 fd_mri_11_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_11_neg_one_382;
+__declspec(section ".data") f32 fd_mri_11___local_PI_383;
+__declspec(section ".data") f32 fd_mri_11___local_3PIO2_385;
+__declspec(section ".data") f32 fd_mri_11_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_11___local_PIO2_384;
+__declspec(section ".data") f32 fd_mri_11_one_381;
+__declspec(section ".data") f32 fd_mri_11_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_11_neg_one_365;
+__declspec(section ".data") f32 fd_mri_11___local_PI_366;
+__declspec(section ".data") f32 fd_mri_11___local_3PIO2_368;
+__declspec(section ".data") f32 fd_mri_11_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_11___local_PIO2_367;
+__declspec(section ".data") f32 fd_mri_11_one_364;
 s32 toge_7_init[17];
 s32 toge_7_talk[44];
 s32 toge_8_init[17];
@@ -105,9 +107,9 @@ s32 toge_10_talk[44];
 s32 toge_11_init[17];
 s32 toge_11_regl[19];
 s32 toge_11_talk[44];
-static s32 npcEnt[138];
+static NpcSetupInfo npcEnt[6];
 static s32 patolight_sound_off[15];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 static s32 puni_win_offscreen[104];
 static s32 puni_win[219];
 static s32 puni_lose[86];
@@ -117,56 +119,36 @@ static s32 toge_enter[50];
 static s32 puni_vs_toge_battlewait[36];
 static s32 puni_vs_toge_init[86];
 static s32 puni_vs_toge[136];
-static s32 ueki_access_data[16];
+static KusaAccess ueki_access_data[4];
 s32 mri_11_init_evt[192];
 
-__declspec(section ".data") u64 fd_mri_11_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mri_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mri_11_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_mri_11_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_mri_11___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_mri_11___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_mri_11___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_mri_11___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_mri_11_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_mri_11_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_mri_11___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_mri_11___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_mri_11_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_mri_11_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_mri_11_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mri_11_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mri_11_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_mri_11_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_mri_11___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_mri_11___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_mri_11___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_mri_11___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_mri_11_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_mri_11_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_mri_11___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_mri_11___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_mri_11_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_mri_11_one_364 = 1.0f;
 
 EVT_BEGIN(toge_7_init)
     SWITCH(GSW(0))
@@ -302,25 +284,68 @@ EVT_BEGIN(toge_11_talk)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"トゲ族７"*/"\x83\x67\x83\x51\x91\xB0\x82\x56", 1536, 0, (s32)toge_7_init, 0, (s32)toge_7_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"トゲ族８"*/"\x83\x67\x83\x51\x91\xB0\x82\x57",
-    1536, 0, (s32)toge_8_init, 0, (s32)toge_8_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"トゲ族９"*/"\x83\x67\x83\x51\x91\xB0\x82\x58", 1536,
-    0, (s32)toge_9_init, 0, (s32)toge_9_talk, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"トゲ族１０"*/"\x83\x67\x83\x51\x91\xB0\x82\x50\x82\x4F", 1536, 0,
-    (s32)toge_10_init, (s32)toge_10_regl, (s32)toge_10_talk, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"トゲ族１１"*/"\x83\x67\x83\x51\x91\xB0\x82\x50\x82\x50", 1536, 0, (s32)toge_11_init,
-    (s32)toge_11_regl, (s32)toge_11_talk, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"トゲ族７"*/"\x83\x67\x83\x51\x91\xB0\x82\x56", // name
+        0x600, // flags
+        0, // reactionFlags
+        toge_7_init, // initEvent
+        NULL, // regularEvent
+        toge_7_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"トゲ族８"*/"\x83\x67\x83\x51\x91\xB0\x82\x57", // name
+        0x600, // flags
+        0, // reactionFlags
+        toge_8_init, // initEvent
+        NULL, // regularEvent
+        toge_8_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"トゲ族９"*/"\x83\x67\x83\x51\x91\xB0\x82\x58", // name
+        0x600, // flags
+        0, // reactionFlags
+        toge_9_init, // initEvent
+        NULL, // regularEvent
+        toge_9_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"トゲ族１０"*/"\x83\x67\x83\x51\x91\xB0\x82\x50\x82\x4F", // name
+        0x600, // flags
+        0, // reactionFlags
+        toge_10_init, // initEvent
+        toge_10_regl, // regularEvent
+        toge_10_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"トゲ族１１"*/"\x83\x67\x83\x51\x91\xB0\x82\x50\x82\x50", // name
+        0x600, // flags
+        0, // reactionFlags
+        toge_11_init, // initEvent
+        toge_11_regl, // regularEvent
+        toge_11_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static EVT_BEGIN(patolight_sound_off)
@@ -332,13 +357,40 @@ static EVT_BEGIN(patolight_sound_off)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)patolight_sound_off, (s32)"mri_12", (s32)"e_bero", 65537, 0, 0, (s32)"e_bero",
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    (s32)patolight_sound_off, (s32)"mri_06", (s32)"w_bero02", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)patolight_sound_off, // exitEvent
+        (s32)"mri_12", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)patolight_sound_off, // exitEvent
+        (s32)"mri_06", // nextMapName
+        "w_bero02", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(puni_win_offscreen)
@@ -603,9 +655,11 @@ static EVT_BEGIN(puni_vs_toge)
     RETURN
 EVT_END()
 
-static s32 ueki_access_data[] = {
-    1, (s32)"A_ueki03", (s32)"S_ueki_03", 0, 1, (s32)"A_ueki04", (s32)"S_ueki_04", 0,
-    1, (s32)"A_ueki05", (s32)"S_ueki_05", 0, 4, 0, 0, 0,
+static KusaAccess ueki_access_data[] = {
+    {1, "A_ueki03", "S_ueki_03", NULL},
+    {1, "A_ueki04", "S_ueki_04", NULL},
+    {1, "A_ueki05", "S_ueki_05", NULL},
+    {4, NULL, NULL, NULL},
 };
 
 EVT_BEGIN(mri_11_init_evt)

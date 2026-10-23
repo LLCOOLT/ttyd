@@ -7,6 +7,8 @@
 #include "evt/evt_bero.h"
 #include "npc_event.h"
 #include "dou.h"
+#include "evt/evt_npc.h"
+#include "mario/mario_pouch.h"
 
 static USER_FUNC(bgm_start_wait);
 USER_FUNC(evt_bero_get_info);
@@ -73,81 +75,61 @@ USER_FUNC(lect_cam_load);
 USER_FUNC(lect_cam_save);
 static void majin_callback(s32 type);
 
-__declspec(section ".data") u64 fd_dou_07_negone_one_374;
-__declspec(section ".data") s32 fd_dou_07_neg_one_382[1];
-__declspec(section ".data") s32 fd_dou_07___local_PI_383[1];
-__declspec(section ".data") s32 fd_dou_07___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_dou_07_one_negone_373;
-__declspec(section ".data") s32 fd_dou_07___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_dou_07_one_381[1];
-__declspec(section ".data") u64 fd_dou_07_negone_one_360;
-__declspec(section ".data") s32 fd_dou_07_neg_one_365[1];
-__declspec(section ".data") s32 fd_dou_07___local_PI_366[1];
-__declspec(section ".data") s32 fd_dou_07___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_dou_07_one_negone_359;
-__declspec(section ".data") s32 fd_dou_07___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_dou_07_one_364[1];
+__declspec(section ".data") f32 fd_dou_07_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_07_neg_one_382;
+__declspec(section ".data") f32 fd_dou_07___local_PI_383;
+__declspec(section ".data") f32 fd_dou_07___local_3PIO2_385;
+__declspec(section ".data") f32 fd_dou_07_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_07___local_PIO2_384;
+__declspec(section ".data") f32 fd_dou_07_one_381;
+__declspec(section ".data") f32 fd_dou_07_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_07_neg_one_365;
+__declspec(section ".data") f32 fd_dou_07___local_PI_366;
+__declspec(section ".data") f32 fd_dou_07___local_3PIO2_368;
+__declspec(section ".data") f32 fd_dou_07_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_07___local_PIO2_367;
+__declspec(section ".data") f32 fd_dou_07_one_364;
 static __declspec(section ".data") s32 erumosu_regl[2];
 #ifdef VERSION_G8ME01
 s32 erumosu_dead[28];
 #else
 s32 erumosu_dead[25];
 #endif
-static s32 npcEnt[46];
-static s32 bero_entry_data[30];
+static NpcSetupInfo npcEnt[2];
+static BeroEntry bero_entry_data[2];
 static __declspec(section ".data") s32 key_tbl[2];
 s32 apper_elmos[43];
 s32 peramajin_before[396];
 s32 peramajin_after[297];
 s32 dou_07_init_evt[89];
 
-__declspec(section ".data") u64 fd_dou_07_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_dou_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_dou_07_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_dou_07_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_dou_07___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_dou_07___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_dou_07___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_dou_07___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_dou_07_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_dou_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_dou_07___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_dou_07___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_dou_07_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_dou_07_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_dou_07_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_dou_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_dou_07_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_dou_07_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_dou_07___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_dou_07___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_dou_07___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_dou_07___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_dou_07_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_dou_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_dou_07___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_dou_07___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_dou_07_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_dou_07_one_364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(erumosu_regl)
     RETURN
@@ -168,24 +150,52 @@ EVT_BEGIN(erumosu_dead)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"エルモス"*/"\x83\x47\x83\x8B\x83\x82\x83\x58", 1544, 0, (s32)bubble_init_event, (s32)bubble_move_event, 0, (s32)erumosu_dead, (s32)bubble_find_event,
-    (s32)bubble_lost_event, (s32)bubble_return_event, 0, 0, 1120403456, -1061158912, -1038876672, 1112014848,
-    1112014848, 1112014848, 1128792064, 1133903872, 1148846080, 1135869952, 15, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"エルモス"*/"\x83\x47\x83\x8B\x83\x82\x83\x58", // name
+        0x608, // flags
+        0, // reactionFlags
+        bubble_init_event, // initEvent
+        bubble_move_event, // regularEvent
+        NULL, // talkEvent
+        erumosu_dead, // deadEvent
+        bubble_find_event, // findEvent
+        bubble_lost_event, // lostEvent
+        bubble_return_event, // returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {100.0f, -6.0f, -37.0f}, // territoryBase
+        {50.0f, 50.0f, 50.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        15, // battleInfoId
+    },
+    {0},
 };
 
-static s32 bero_entry_data[] = {
-    (s32)"s_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"dou_08", (s32)"n_bero", 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "s_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_08", // nextMapName
+        "n_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static __declspec(section ".data") s32 key_tbl[] = {
-    36, -1,
+    ITEM_BLACK_KEY_0x24, -1,
 };
 
 EVT_BEGIN(apper_elmos)

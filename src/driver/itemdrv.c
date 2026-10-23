@@ -211,7 +211,7 @@ BOOL itemGetCheck(ItemEntry* entry) {
 	if (!entry) return FALSE;
 	if (entry->flags2 & 0x100000) return FALSE;
 	if (mario->characterId == 2) {
-		if (!(*(s32*)mario->field_0x14 & 1)) {
+		if (!(mario->stageFlags & 1)) {
 			if (marioStGetSystemLevel() != 0U) return FALSE;
 			if (mario->flags & 0xA) return FALSE;
 		}
@@ -1016,7 +1016,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 			mario->unk174.x = 0.0f;
 			mario->unk174.z = 0.0f;
 			mario->baseSpeed = 0.0f;
-			*(f32*)mario->unk18C = 0.0f;
+			mario->moveDist = 0.0f;
 			if (entry->itemId == 7 || entry->itemId == 8 || entry->itemId == 10 || entry->itemId == 11) {
 				entry->flags2 |= 0x2000;
 			}

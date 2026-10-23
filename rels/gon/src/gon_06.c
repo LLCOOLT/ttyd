@@ -6,6 +6,7 @@
 #include "driver/animdrv.h"
 #include "evt/evt_bero.h"
 #include "gon.h"
+#include "mario/mario_pouch.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 static USER_FUNC(bgm_start_wait);
@@ -89,25 +90,25 @@ USER_FUNC(lect_cam_load);
 USER_FUNC(lect_cam_save);
 static void majin_callback(s32 type);
 
-__declspec(section ".data") u64 fd_gon_06_negone_one_374;
-__declspec(section ".data") s32 fd_gon_06_neg_one_382[1];
-__declspec(section ".data") s32 fd_gon_06___local_PI_383[1];
-__declspec(section ".data") s32 fd_gon_06___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gon_06_one_negone_373;
-__declspec(section ".data") s32 fd_gon_06___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gon_06_one_381[1];
-__declspec(section ".data") u64 fd_gon_06_negone_one_360;
-__declspec(section ".data") s32 fd_gon_06_neg_one_365[1];
-__declspec(section ".data") s32 fd_gon_06___local_PI_366[1];
-__declspec(section ".data") s32 fd_gon_06___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gon_06_one_negone_359;
-__declspec(section ".data") s32 fd_gon_06___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gon_06_one_364[1];
+__declspec(section ".data") f32 fd_gon_06_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_06_neg_one_382;
+__declspec(section ".data") f32 fd_gon_06___local_PI_383;
+__declspec(section ".data") f32 fd_gon_06___local_3PIO2_385;
+__declspec(section ".data") f32 fd_gon_06_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_06___local_PIO2_384;
+__declspec(section ".data") f32 fd_gon_06_one_381;
+__declspec(section ".data") f32 fd_gon_06_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_06_neg_one_365;
+__declspec(section ".data") f32 fd_gon_06___local_PI_366;
+__declspec(section ".data") f32 fd_gon_06___local_3PIO2_368;
+__declspec(section ".data") f32 fd_gon_06_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_06___local_PIO2_367;
+__declspec(section ".data") f32 fd_gon_06_one_364;
 static __declspec(section ".data") s32 door01_close[12];
 static __declspec(section ".data") s32 door01_open[12];
 static __declspec(section ".data") s32 door02_close[12];
 static __declspec(section ".data") s32 door02_open[12];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 s32 evt_ori_open[130];
 s32 tsuritenjo_event[143];
 static __declspec(section ".data") s32 key_tbl[2];
@@ -115,53 +116,33 @@ static s32 evt_majin[409];
 static s32 evt_majin2[241];
 s32 gon_06_init_evt[340];
 
-__declspec(section ".data") u64 fd_gon_06_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gon_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gon_06_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gon_06_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_gon_06___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gon_06___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gon_06___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gon_06___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gon_06_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gon_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gon_06___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gon_06___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gon_06_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gon_06_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_gon_06_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gon_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gon_06_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gon_06_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_gon_06___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gon_06___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gon_06___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gon_06___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gon_06_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gon_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gon_06___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gon_06___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gon_06_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gon_06_one_364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -187,13 +168,44 @@ static __declspec(section ".data") EVT_BEGIN(door02_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65548, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"gon_05", (s32)"e_bero", 327685, (s32)door01_close, (s32)door01_open, (s32)"e_bero",
-    65548, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"gon_07", (s32)"w_bero", 327685, (s32)door02_close, (s32)door02_open, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        12, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gon_05", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)door01_close, // enterAnimeArg
+        (s32)door01_open, // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        12, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gon_07", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)door02_close, // enterAnimeArg
+        (s32)door02_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_ori_open)
@@ -308,7 +320,7 @@ static USER_FUNC(bgm_start_wait) {
 }
 
 static __declspec(section ".data") s32 key_tbl[] = {
-    34, -1,
+    ITEM_BLACK_KEY_0x22, -1,
 };
 
 static EVT_BEGIN(evt_majin)

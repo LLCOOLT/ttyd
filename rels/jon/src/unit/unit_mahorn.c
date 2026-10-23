@@ -14,6 +14,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
 
 EffectEntry* effMahorn2Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b, f32 c, f32 scale, f32 speed);
 double __fabs(double x);
@@ -71,35 +72,35 @@ static USER_FUNC(eff_magic_get_posX);
 static USER_FUNC(eff_magic);
 static USER_FUNC(hand_end);
 
-__declspec(section ".data") u64 fd_mahorn_negone_one_374;
-__declspec(section ".data") s32 fd_mahorn_neg_one_382[1];
-__declspec(section ".data") s32 fd_mahorn___local_PI_383[1];
-__declspec(section ".data") s32 fd_mahorn___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_mahorn_one_negone_373;
-__declspec(section ".data") s32 fd_mahorn___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_mahorn_one_381[1];
-__declspec(section ".data") u64 fd_mahorn_negone_one_360;
-__declspec(section ".data") s32 fd_mahorn_neg_one_365[1];
-__declspec(section ".data") s32 fd_mahorn___local_PI_366[1];
-__declspec(section ".data") s32 fd_mahorn___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_mahorn_one_negone_359;
-__declspec(section ".data") s32 fd_mahorn___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_mahorn_one_364[1];
+__declspec(section ".data") f32 fd_mahorn_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mahorn_neg_one_382;
+__declspec(section ".data") f32 fd_mahorn___local_PI_383;
+__declspec(section ".data") f32 fd_mahorn___local_3PIO2_385;
+__declspec(section ".data") f32 fd_mahorn_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mahorn___local_PIO2_384;
+__declspec(section ".data") f32 fd_mahorn_one_381;
+__declspec(section ".data") f32 fd_mahorn_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mahorn_neg_one_365;
+__declspec(section ".data") f32 fd_mahorn___local_PI_366;
+__declspec(section ".data") f32 fd_mahorn___local_3PIO2_368;
+__declspec(section ".data") f32 fd_mahorn_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mahorn___local_PIO2_367;
+__declspec(section ".data") f32 fd_mahorn_one_364;
 BattleUnitKind unit_mahorn;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
 static BattleUnitKindPart parts[5];
-static s32 weapon_mahorn_attack_magic[48];
-static s32 weapon_mahorn_all_attack_magic[48];
-static s32 weapon_mahorn_dekadeka_magic[48];
-static s32 weapon_mahorn_katikati_magic[48];
-s32 weapon_mahorn_confuse_magic[48];
-static s32 weapon_mahorn_recover_magic[48];
+static BattleWeapon weapon_mahorn_attack_magic;
+static BattleWeapon weapon_mahorn_all_attack_magic;
+static BattleWeapon weapon_mahorn_dekadeka_magic;
+static BattleWeapon weapon_mahorn_katikati_magic;
+BattleWeapon weapon_mahorn_confuse_magic;
+static BattleWeapon weapon_mahorn_recover_magic;
 static s32 attack_event[152];
 static PoseTableEntry pose_table[17];
 static __declspec(section ".data") BattleDataEntry data_table[3];
-static __declspec(section ".data") s32 data_table_bunsin[6];
+static __declspec(section ".data") BattleDataEntry data_table_bunsin[3];
 static s32 init_event[88];
 static s32 alpha_down_event[98];
 static s32 alpha_up_event[118];
@@ -125,53 +126,33 @@ static s32 yokeyoke_magic_event[75];
 static s32 recover_magic_event[96];
 static s32 wait_event[386];
 
-__declspec(section ".data") u64 fd_mahorn_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mahorn_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mahorn_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_mahorn_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_mahorn___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_mahorn___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_mahorn___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_mahorn___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_mahorn_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_mahorn_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_mahorn___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_mahorn___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_mahorn_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_mahorn_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_mahorn_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mahorn_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mahorn_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_mahorn_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_mahorn___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_mahorn___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_mahorn___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_mahorn___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_mahorn_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_mahorn_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_mahorn___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_mahorn___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_mahorn_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_mahorn_one_364 = 1.0f;
 
 BattleUnitKind unit_mahorn = {
     161,
@@ -253,64 +234,237 @@ static BattleUnitKindPart parts[] = {
     {5, "btl_un_mahorn", "c_maho", 0.0f, 0.0f, 0.0f, 5.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2010009, 0, pose_table},
 };
 
-static s32 weapon_mahorn_attack_magic[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    6, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 199, 2047, -2147475456,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_mahorn_attack_magic = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0xC7, // special
+    0x7FF, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_mahorn_all_attack_magic[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    6, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 67109634, 0, 7, 2047, -2147475456,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_mahorn_all_attack_magic = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    4, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    7, // special
+    0x7FF, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_mahorn_dekadeka_magic[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 536870912, 770, 0, 264, 2047, -2147483648,
-    0, 0, 0, 0, 100, 50462720, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_mahorn_dekadeka_magic = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, // burnTime..freezeTime
+    100, // sizeChangeChance
+    3, // sizeChangeTime
+    2, // sizeChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
+    0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
+    0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_mahorn_katikati_magic[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 536870912, 770, 0, 264, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 6554371, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_mahorn_katikati_magic = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, // atkChangeStrength
+    100, // defChangeChance
+    3, // defChangeTime
+    3, // defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_mahorn_confuse_magic[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 135, 2047, -2147475456,
-    0, 0, 3277568, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_mahorn_confuse_magic = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, // poisonStrength
+    50, // confuseChance
+    3, // confuseTime
+    0, 0, 0, 0, 0, 0, 0, 0, // electricChance..freezeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
+    0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
+    0, 0, 0, // hpRegenStrength..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_mahorn_recover_magic[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 536870912, 770, 0, 0, 2047, 5376,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_mahorn_recover_magic = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, 0, // acHelpMsg..special
+    0x7FF, // counterResistFlags
+    0x1500, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        SET_VALUE(LW(9), PTR(weapon_mahorn_attack_magic))
+        SET_VALUE(LW(9), PTR(&weapon_mahorn_attack_magic))
         CALL_CHILD(PTR(attack_magic_event))
         GOTO(99)
     END_IF
@@ -332,37 +486,37 @@ static EVT_BEGIN(attack_event)
     CALL(evt_sub_random, LW(0), LW(1))
     SET_VALUE(LW(0), 50)
     IF_INT_LESS(LW(1), LW(0))
-        SET_VALUE(LW(9), PTR(weapon_mahorn_attack_magic))
+        SET_VALUE(LW(9), PTR(&weapon_mahorn_attack_magic))
         CALL_CHILD(PTR(attack_magic_event))
         GOTO(99)
     END_IF
     ADD(LW(0), 30)
     IF_INT_LESS(LW(1), LW(0))
-        SET_VALUE(LW(9), PTR(weapon_mahorn_all_attack_magic))
+        SET_VALUE(LW(9), PTR(&weapon_mahorn_all_attack_magic))
         CALL_CHILD(PTR(all_attack_magic_event))
         GOTO(99)
     END_IF
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
-        SET_VALUE(LW(9), PTR(weapon_mahorn_dekadeka_magic))
+        SET_VALUE(LW(9), PTR(&weapon_mahorn_dekadeka_magic))
         CALL_CHILD(PTR(dekadeka_magic_event))
         GOTO(99)
     END_IF
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
-        SET_VALUE(LW(9), PTR(weapon_mahorn_katikati_magic))
+        SET_VALUE(LW(9), PTR(&weapon_mahorn_katikati_magic))
         CALL_CHILD(PTR(katikati_magic_event))
         GOTO(99)
     END_IF
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
-        SET_VALUE(LW(9), PTR(weapon_mahorn_confuse_magic))
+        SET_VALUE(LW(9), PTR(&weapon_mahorn_confuse_magic))
         CALL_CHILD(PTR(confuse_magic_event))
         GOTO(99)
     END_IF
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
-        SET_VALUE(LW(9), PTR(weapon_mahorn_recover_magic))
+        SET_VALUE(LW(9), PTR(&weapon_mahorn_recover_magic))
         CALL_CHILD(PTR(recover_magic_event))
         GOTO(99)
     END_IF
@@ -398,8 +552,10 @@ static __declspec(section ".data") BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
-static __declspec(section ".data") s32 data_table_bunsin[] = {
-    46, (s32)avoid_miss_event, 48, (s32)btldefaultevt_Dummy, 0, 0,
+static __declspec(section ".data") BattleDataEntry data_table_bunsin[] = {
+    {46, avoid_miss_event},
+    {48, btldefaultevt_Dummy},
+    {0},
 };
 
 static EVT_BEGIN(init_event)
@@ -507,62 +663,126 @@ static __declspec(section ".data") EVT_BEGIN(avoid_miss_event)
     RETURN
 EVT_END()
 
-static s32 attack_punch_event[] = {
-    196699, (s32)btlevtcmd_check_battleflag, -30000000, 2, 131097, -30000000, 0, 196699,
-    (s32)btlevtcmd_GetFirstAttackTarget, -29999997, -29999996, 32, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000,
-    262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999991, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991,
-    -29999997, -29999996, 33, 131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken,
-    -2, 16, -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered,
-    2, 33, 65540, 99, 33, 131163, (s32)btlevtcmd_WeaponAftereffect, -29999991,
-    262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996, 65627, (s32)btlevtcmd_WaitGuardMove, 196699,
-    (s32)btlevtcmd_PayWeaponCost, -2, -29999991, 458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997,
-    -29999996, 16, -29999985, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 196699,
-    (s32)evt_btl_camera_set_mode, 0, 8, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2, -29999997,
-    196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 196699, (s32)evt_btl_camera_set_zoom, 0, 250,
-    393307, (s32)set_hand_dest, -2, 2, -230016384, -229970304, -230005120, 393307,
-    (s32)set_hand_dest, -2, 3, -229983616, -229970304, -229994880, 393307, (s32)set_hand_dest,
-    -2, 4, -230016384, -229988736, -230005120, 393307, (s32)set_hand_dest, -2,
-    5, -229983616, -229988736, -229994880, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_ATTACK1",
-    -250000000, 0, -250000000, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000,
-    -29999999, -29999998, 131096, -29999985, -1, 131125, -30000000, 35,
-    32, 131126, -30000000, 35, 33, 327771, (s32)btlevtcmd_JumpSetting, -2,
-    0, 4, -229999999, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, 20,
-    -29999998, 0, -1, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"MAH_S_1",
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"MAH_Z_2", 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    3, (s32)"MAH_Z_2", 262235, (s32)btlevtcmd_AnimeChangePose, -2, 4, (s32)"MAH_Z_2", 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 5, (s32)"MAH_Z_2", 131122, -29999990, 2, 65541,
-    4, 786523, (s32)btlevtcmd_SetPartsBlur, -2, -29999990, 255, 255, 255,
-    255, 255, 255, 255, 100, 0, 262235, (s32)btlevtcmd_OnPartsAttribute,
-    -2, -29999990, 67108864, 131125, -29999990, 1, 6, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_ATTACK2", -250000000, 0, -250000000, 65541, 25,
-    131122, -29999990, 2, 65541, 4, 393307, (s32)btlevtcmd_GetPartsPos, -2,
-    -29999990, -30000000, -29999999, -29999998, 131096, -29999985, -1, 196699,
-    (s32)evt_sub_random, 120, -29999989, 131125, -29999989, -90, 32, 196699,
-    (s32)evt_sub_random, 120, -29999989, 131127, -29999989, -1, 131125, -29999989,
-    90, 33, 196699, (s32)evt_sub_random, 60, -29999988, 131125, -29999988,
-    -20, 393307, (s32)set_hand_dest, -2, -29999990, -29999989, -29999988, -29999998,
-    131125, -29999990, 1, 6, 65545, 2, 6, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"MAH_S_1", 393307, (s32)set_hand_dest, -2, 2,
-    -230016384, -229970304, -230005120, 393307, (s32)set_hand_dest, -2, 3, -229983616,
-    -229970304, -229994880, 393307, (s32)set_hand_dest, -2, 4, -230016384, -229988736,
-    -230005120, 393307, (s32)set_hand_dest, -2, 5, -229983616, -229988736, -229994880,
-    131122, -29999990, 2, 65541, 4, 262235, (s32)btlevtcmd_OffPartsAttribute, -2,
-    -29999990, 67108864, 131125, -29999990, 1, 6, 458843, (s32)btlevtcmd_PreCheckDamage,
-    -2, -29999997, -29999996, -29999991, 0, -29999995, 65570, -29999995,
-    65579, 4, 65540, 90, 46, 65572, 3, 196699,
-    (s32)btlevtcmd_StartAvoid, -29999997, 38, 65540, 90, 46, 65572, 6,
-    196699, (s32)btlevtcmd_StartAvoid, -29999997, 39, 65540, 90, 65572, 2,
-    196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 65540, 90, 65572, 1,
-    65540, 91, 46, 42, 65540, 98, 46, 65539,
-    90, 65545, 30, 65540, 98, 65539, 91, 196699,
-    (s32)btlevtcmd_ResultACDefence, -29999997, -29999991, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996,
-    -29999991, 256, -29999995, 65545, 30, 65540, 98, 65539,
-    98, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_ATTACK1_2", -250000000, 0, -250000000,
-    327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_JumpSetting,
-    -2, 0, 6, -229999999, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000,
-    -29999999, -29999998, 0, -1, 65545, 45, 65539, 99,
-    131163, (s32)btlevtcmd_ResetFaceDirection, -2, 2, 1,
-};
+static EVT_BEGIN(attack_punch_event)
+    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
+    ELSE
+        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+        CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    END_IF
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(evt_btl_camera_set_mode, 0, 8)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(evt_btl_camera_set_zoom, 0, 250)
+    CALL(set_hand_dest, -2, 2, FLOAT(-16.0f), FLOAT(29.0f), FLOAT(-5.0f))
+    CALL(set_hand_dest, -2, 3, FLOAT(16.0f), FLOAT(29.0f), FLOAT(5.0f))
+    CALL(set_hand_dest, -2, 4, FLOAT(-16.0f), FLOAT(11.0f), FLOAT(-5.0f))
+    CALL(set_hand_dest, -2, 5, FLOAT(16.0f), FLOAT(11.0f), FLOAT(5.0f))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_ATTACK1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    IF_INT_EQUAL(LW(15), -1)
+        ADD(LW(0), 35)
+    ELSE
+        SUBTRACT(LW(0), 35)
+    END_IF
+    CALL(btlevtcmd_JumpSetting, -2, 0, 4, FLOAT(0.0009765625f))
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), 20, LW(2), 0, -1)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MAH_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("MAH_Z_2"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("MAH_Z_2"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 4, STRING("MAH_Z_2"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 5, STRING("MAH_Z_2"))
+    SET_VALUE(LW(10), 2)
+    LOOP(4)
+        CALL(btlevtcmd_SetPartsBlur, -2, LW(10), 255, 255, 255, 255, 255, 255, 255, 100, 0)
+        CALL(btlevtcmd_OnPartsAttribute, -2, LW(10), 67108864)
+        ADD(LW(10), 1)
+    END_LOOP
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_ATTACK2"), -250000000, 0, -250000000)
+    LOOP(25)
+        SET_VALUE(LW(10), 2)
+        LOOP(4)
+            CALL(btlevtcmd_GetPartsPos, -2, LW(10), LW(0), LW(1), LW(2))
+            IF_INT_EQUAL(LW(15), -1)
+                CALL(evt_sub_random, 120, LW(11))
+                ADD(LW(11), -90)
+            ELSE
+                CALL(evt_sub_random, 120, LW(11))
+                MULTIPLY(LW(11), -1)
+                ADD(LW(11), 90)
+            END_IF
+            CALL(evt_sub_random, 60, LW(12))
+            ADD(LW(12), -20)
+            CALL(set_hand_dest, -2, LW(10), LW(11), LW(12), LW(2))
+            ADD(LW(10), 1)
+        END_LOOP
+        WAIT_FRAMES(2)
+    END_LOOP
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MAH_S_1"))
+    CALL(set_hand_dest, -2, 2, FLOAT(-16.0f), FLOAT(29.0f), FLOAT(-5.0f))
+    CALL(set_hand_dest, -2, 3, FLOAT(16.0f), FLOAT(29.0f), FLOAT(5.0f))
+    CALL(set_hand_dest, -2, 4, FLOAT(-16.0f), FLOAT(11.0f), FLOAT(-5.0f))
+    CALL(set_hand_dest, -2, 5, FLOAT(16.0f), FLOAT(11.0f), FLOAT(5.0f))
+    SET_VALUE(LW(10), 2)
+    LOOP(4)
+        CALL(btlevtcmd_OffPartsAttribute, -2, LW(10), 67108864)
+        ADD(LW(10), 1)
+    END_LOOP
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 0, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+        LABEL(90)
+        WAIT_FRAMES(30)
+        GOTO(98)
+        LABEL(91)
+        CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        WAIT_FRAMES(30)
+        GOTO(98)
+        LABEL(98)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_ATTACK1_2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpSetting, -2, 0, 6, FLOAT(0.0009765625f))
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
+        WAIT_FRAMES(45)
+        LABEL(99)
+        CALL(btlevtcmd_ResetFaceDirection, -2)
+        RETURN
+EVT_END()
 
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
@@ -577,73 +797,178 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
-static s32 attack_enemy_common_event[] = {
-    131163, (s32)btlevtcmd_WeaponAftereffect, -29999991, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996,
-    65627, (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991, 458843, (s32)btlevtcmd_CalculateFaceDirection,
-    -2, -1, -29999997, -29999996, 16, -29999985, 196699, (s32)btlevtcmd_ChangeFaceDirection,
-    -2, -29999985, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_CHARGE1", -250000000, 0,
-    -250000000, 393307, (s32)mahorn_get_bunsin, -29999989, -29999988, -29999987, -29999986, -30000000,
-    131122, -29999985, -29999989, 65628, (s32)attack_enemy_common_event_sub1, 131122, -29999985, -29999988,
-    65628, (s32)attack_enemy_common_event_sub1, 131122, -29999985, -29999987, 65628, (s32)attack_enemy_common_event_sub1, 131122,
-    -29999985, -29999986, 65628, (s32)attack_enemy_common_event_sub1, 131122, -29999985, -2, 65630,
-    (s32)attack_enemy_common_event_sub1, 110, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_MAGIC2", -250000000, 0,
-    -250000000, 65545, 25, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_MAGIC2", -250000000,
-    0, -250000000, 112, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996,
-    -29999991, 0, -29999995, 65570, -29999995, 65579, 4, 65540,
-    90, 46, 65572, 3, 65540, 90, 46, 65572,
-    6, 65540, 90, 65572, 2, 65540, 90, 65572,
-    1, 65540, 91, 46, 42, 65540, 98, 46,
-    65539, 90, 110, 65545, 60, 65541, 0, 196699,
-    (s32)btlevtcmd_GetFaceDirection, -2, -30000000, 131096, -30000000, -1, 196699, (s32)eff_magic_get_posX,
-    -2, -30000000, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999994, -29999993,
-    -29999992, 131100, -30000000, -29999994, 65630, (s32)start_avoid, 7, 33,
-    32, 196699, (s32)eff_magic_get_posX, -2, -30000000, 393307, (s32)btlevtcmd_GetHitPos, -29999997,
-    -29999996, -29999994, -29999993, -29999992, 131101, -30000000, -29999994, 65630,
-    (s32)start_avoid, 7, 33, 33, 65545, 1, 6, 112,
-    393307, (s32)mahorn_get_bunsin, -29999989, -29999988, -29999987, -29999986, -30000000, 131122,
-    -29999985, -29999989, 65628, (s32)attack_enemy_common_event_sub_no_hit, 131122, -29999985, -29999988, 65628,
-    (s32)attack_enemy_common_event_sub_no_hit, 131122, -29999985, -29999987, 65628, (s32)attack_enemy_common_event_sub_no_hit, 131122, -29999985,
-    -29999986, 65628, (s32)attack_enemy_common_event_sub_no_hit, 131122, -29999985, -2, 65630, (s32)attack_enemy_common_event_sub_no_hit,
-    65540, 98, 65539, 91, 393307, (s32)mahorn_get_bunsin, -29999989, -29999988,
-    -29999987, -29999986, -30000000, 131122, -29999985, -29999989, 65628, (s32)attack_enemy_common_event_sub_hit,
-    131122, -29999985, -29999988, 65628, (s32)attack_enemy_common_event_sub_hit, 131122, -29999985, -29999987,
-    65628, (s32)attack_enemy_common_event_sub_hit, 131122, -29999985, -29999986, 65628, (s32)attack_enemy_common_event_sub_hit, 131122,
-    -29999985, -2, 65630, (s32)attack_enemy_common_event_sub_hit, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999991,
-    458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991, 256, -29999995,
-    65540, 98, 65539, 98, 393307, (s32)mahorn_get_bunsin, -29999989, -29999988,
-    -29999987, -29999986, -30000000, 131097, -29999989, -1, 131163, (s32)btlevtcmd_StartWaitEvent,
-    -29999989, 33, 131097, -29999988, -1, 131163, (s32)btlevtcmd_StartWaitEvent, -29999988,
-    33, 131097, -29999987, -1, 131163, (s32)btlevtcmd_StartWaitEvent, -29999987, 33,
-    131097, -29999986, -1, 131163, (s32)btlevtcmd_StartWaitEvent, -29999986, 33, 65545,
-    30, 2, 1,
-};
+static EVT_BEGIN(attack_enemy_common_event)
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_CHARGE1"), -250000000, 0, -250000000)
+    CALL(mahorn_get_bunsin, LW(11), LW(12), LW(13), LW(14), LW(0))
+    SET_VALUE(LW(15), LW(11))
+    SPAWN_EVENT(attack_enemy_common_event_sub1)
+    SET_VALUE(LW(15), LW(12))
+    SPAWN_EVENT(attack_enemy_common_event_sub1)
+    SET_VALUE(LW(15), LW(13))
+    SPAWN_EVENT(attack_enemy_common_event_sub1)
+    SET_VALUE(LW(15), LW(14))
+    SPAWN_EVENT(attack_enemy_common_event_sub1)
+    SET_VALUE(LW(15), -2)
+    CALL_CHILD(attack_enemy_common_event_sub1)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_MAGIC2"), -250000000, 0, -250000000)
+        WAIT_FRAMES(25)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_MAGIC2"), -250000000, 0, -250000000)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 0, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        GOTO(90)
+        CASE_EQUAL(2)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+        LABEL(90)
+        BEGIN_SIBLING_EVENT
+            WAIT_FRAMES(60)
+            LOOP(0)
+                CALL(btlevtcmd_GetFaceDirection, -2, LW(0))
+                IF_INT_EQUAL(LW(0), -1)
+                    CALL(eff_magic_get_posX, -2, LW(0))
+                    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+                    IF_INT_LESS_OR_EQUAL(LW(0), LW(6))
+                        CALL_CHILD(start_avoid)
+                        BREAK_LOOP
+                    END_IF
+                ELSE
+                    CALL(eff_magic_get_posX, -2, LW(0))
+                    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+                    IF_INT_GREATER_OR_EQUAL(LW(0), LW(6))
+                        CALL_CHILD(start_avoid)
+                        BREAK_LOOP
+                    END_IF
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+        END_SIBLING_EVENT
+        CALL(mahorn_get_bunsin, LW(11), LW(12), LW(13), LW(14), LW(0))
+        SET_VALUE(LW(15), LW(11))
+        SPAWN_EVENT(attack_enemy_common_event_sub_no_hit)
+        SET_VALUE(LW(15), LW(12))
+        SPAWN_EVENT(attack_enemy_common_event_sub_no_hit)
+        SET_VALUE(LW(15), LW(13))
+        SPAWN_EVENT(attack_enemy_common_event_sub_no_hit)
+        SET_VALUE(LW(15), LW(14))
+        SPAWN_EVENT(attack_enemy_common_event_sub_no_hit)
+        SET_VALUE(LW(15), -2)
+        CALL_CHILD(attack_enemy_common_event_sub_no_hit)
+        GOTO(98)
+        LABEL(91)
+        CALL(mahorn_get_bunsin, LW(11), LW(12), LW(13), LW(14), LW(0))
+        SET_VALUE(LW(15), LW(11))
+        SPAWN_EVENT(attack_enemy_common_event_sub_hit)
+        SET_VALUE(LW(15), LW(12))
+        SPAWN_EVENT(attack_enemy_common_event_sub_hit)
+        SET_VALUE(LW(15), LW(13))
+        SPAWN_EVENT(attack_enemy_common_event_sub_hit)
+        SET_VALUE(LW(15), LW(14))
+        SPAWN_EVENT(attack_enemy_common_event_sub_hit)
+        SET_VALUE(LW(15), -2)
+        CALL_CHILD(attack_enemy_common_event_sub_hit)
+        CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        GOTO(98)
+        LABEL(98)
+        CALL(mahorn_get_bunsin, LW(11), LW(12), LW(13), LW(14), LW(0))
+        IF_INT_NOT_EQUAL(LW(11), -1)
+            CALL(btlevtcmd_StartWaitEvent, LW(11))
+        END_IF
+        IF_INT_NOT_EQUAL(LW(12), -1)
+            CALL(btlevtcmd_StartWaitEvent, LW(12))
+        END_IF
+        IF_INT_NOT_EQUAL(LW(13), -1)
+            CALL(btlevtcmd_StartWaitEvent, LW(13))
+        END_IF
+        IF_INT_NOT_EQUAL(LW(14), -1)
+            CALL(btlevtcmd_StartWaitEvent, LW(14))
+        END_IF
+        WAIT_FRAMES(30)
+        RETURN
+EVT_END()
 
-static s32 attack_enemy_all_common_event[] = {
-    131163, (s32)btlevtcmd_WeaponAftereffect, -29999991, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996,
-    65627, (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991, 458843, (s32)btlevtcmd_CalculateFaceDirection,
-    -2, -1, -29999997, -29999996, 16, -29999985, 196699, (s32)btlevtcmd_ChangeFaceDirection,
-    -2, -29999985, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_CHARGE1", -250000000, 0,
-    -250000000, 131122, -29999985, -2, 65630, (s32)attack_enemy_common_event_sub1, 110, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_MAGIC2", -250000000, 0, -250000000, 65545, 25,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_MAGIC2", -250000000, 0, -250000000, 112,
-    131122, -29999985, -2, 65630, (s32)attack_enemy_common_event_sub2, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997,
-    -29999996, 131122, -29999994, 0, 65539, 10, 458843, (s32)btlevtcmd_PreCheckDamage,
-    -2, -29999997, -29999996, -29999991, 0, -29999995, 393307, (s32)btlevtcmd_GetHitPos,
-    -29999997, -29999996, -30000000, -29999999, -29999998, 983131, (s32)evt_eff64, (s32)"",
-    (s32)"thunder_n64", 4, -30000000, -29999999, -29999998, 0, 0, 0,
-    0, 0, 0, 0, 0, 65570, -29999995, 65579,
-    4, 65540, 90, 46, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid,
-    -29999997, 38, 65540, 90, 46, 65572, 6, 196699,
-    (s32)btlevtcmd_StartAvoid, -29999997, 39, 65540, 90, 65572, 2, 196699,
-    (s32)btlevtcmd_StartAvoid, -29999997, 40, 65540, 90, 65572, 1, 65540,
-    91, 46, 42, 65540, 98, 46, 65539, 90,
-    65540, 97, 65539, 91, 131096, -29999994, 0, 196699,
-    (s32)btlevtcmd_ResultACDefence, -29999997, -29999991, 131122, -29999994, 1, 33, 458843,
-    (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991, 256, -29999995, 65540,
-    97, 65539, 97, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 131096,
-    -29999997, -1, 65540, 98, 33, 65540, 10, 65539,
-    98, 65545, 30, 2, 1,
-};
+static EVT_BEGIN(attack_enemy_all_common_event)
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_CHARGE1"), -250000000, 0, -250000000)
+    SET_VALUE(LW(15), -2)
+    CALL_CHILD(attack_enemy_common_event_sub1)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_MAGIC2"), -250000000, 0, -250000000)
+        WAIT_FRAMES(25)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_MAGIC2"), -250000000, 0, -250000000)
+    END_SIBLING_EVENT
+    SET_VALUE(LW(15), -2)
+    CALL_CHILD(attack_enemy_common_event_sub2)
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    SET_VALUE(LW(6), 0)
+    LABEL(10)
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 0, LW(5))
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(evt_eff64, STRING(""), STRING("thunder_n64"), 4, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+        LABEL(90)
+        GOTO(97)
+        LABEL(91)
+        IF_INT_EQUAL(LW(6), 0)
+            CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+            SET_VALUE(LW(6), 1)
+        END_IF
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        GOTO(97)
+        LABEL(97)
+        CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+        IF_INT_EQUAL(LW(3), -1)
+            GOTO(98)
+        END_IF
+        GOTO(10)
+        LABEL(98)
+        WAIT_FRAMES(30)
+        RETURN
+EVT_END()
 
 static EVT_BEGIN(attack_enemy_common_event_sub1)
     IF_INT_EQUAL(LW(15), -1)
@@ -743,27 +1068,41 @@ static EVT_BEGIN(attack_enemy_common_event_sub2)
     RETURN
 EVT_END()
 
-static s32 attack_enemy_common_event_sub_no_hit[] = {
-    131096, -29999985, -1, 2, 33, 327771, (s32)btlevtcmd_GetPos, -29999985,
-    -30000000, -29999999, -29999998, 131125, -29999999, 10, 393307, (s32)btlevtcmd_GetHitPos,
-    -29999997, -29999996, -29999990, -29999989, -29999988, 262235, (s32)btlevtcmd_GetStageSize, -29999990,
-    -250000000, -250000000, 196699, (s32)btlevtcmd_GetFaceDirection, -29999985, -29999987, 131127, -29999990,
-    -29999987, 131126, -29999989, 5, 393307, (s32)eff_magic, -29999985, -29999990,
-    -29999989, -29999988, 40, 65630, (s32)attack_enemy_common_event_sub2, 65545, 5, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_MAGIC1", -250000000, 0, -250000000, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_MAHO_MAGIC3", -250000000, 0, -250000000, 65545, 40, 2,
-    1,
-};
+static EVT_BEGIN(attack_enemy_common_event_sub_no_hit)
+    IF_INT_EQUAL(LW(15), -1)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_GetPos, LW(15), LW(0), LW(1), LW(2))
+    ADD(LW(1), 10)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
+    CALL(btlevtcmd_GetStageSize, LW(10), -250000000, -250000000)
+    CALL(btlevtcmd_GetFaceDirection, LW(15), LW(13))
+    MULTIPLY(LW(10), LW(13))
+    SUBTRACT(LW(11), 5)
+    CALL(eff_magic, LW(15), LW(10), LW(11), LW(12), 40)
+    CALL_CHILD(attack_enemy_common_event_sub2)
+    WAIT_FRAMES(5)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_MAGIC1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_MAGIC3"), -250000000, 0, -250000000)
+    WAIT_FRAMES(40)
+    RETURN
+EVT_END()
 
-static s32 attack_enemy_common_event_sub_hit[] = {
-    131096, -29999985, -1, 2, 33, 327771, (s32)btlevtcmd_GetPos, -29999985,
-    -30000000, -29999999, -29999998, 131125, -29999999, 10, 393307, (s32)btlevtcmd_GetHitPos,
-    -29999997, -29999996, -29999990, -29999989, -29999988, 393307, (s32)eff_magic, -29999985,
-    -29999990, -29999989, -29999988, 20, 65630, (s32)attack_enemy_common_event_sub2, 65545, 5,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_MAGIC1", -250000000, 0, -250000000, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_MAGIC3", -250000000, 0, -250000000, 65545, 20,
-    2, 1,
-};
+static EVT_BEGIN(attack_enemy_common_event_sub_hit)
+    IF_INT_EQUAL(LW(15), -1)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_GetPos, LW(15), LW(0), LW(1), LW(2))
+    ADD(LW(1), 10)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
+    CALL(eff_magic, LW(15), LW(10), LW(11), LW(12), 20)
+    CALL_CHILD(attack_enemy_common_event_sub2)
+    WAIT_FRAMES(5)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_MAGIC1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_MAGIC3"), -250000000, 0, -250000000)
+    WAIT_FRAMES(20)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(attack_magic_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
@@ -824,37 +1163,45 @@ static EVT_BEGIN(all_attack_magic_event)
     RETURN
 EVT_END()
 
-static s32 support_friend_common_event[] = {
-    458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996, 16, -29999985,
-    196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_CHARGE1",
-    -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999,
-    -29999998, 131125, -29999999, 40, 983131, (s32)evt_eff64, (s32)"", (s32)"akari_charge_n64",
-    0, -30000000, -29999999, -29999998, -229998976, 70, 0, 0,
-    0, 0, 0, 0, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"MAH_A_4", 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"MAH_S_5A", 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 3, (s32)"MAH_S_5A", 262235, (s32)btlevtcmd_AnimeChangePose, -2, 4, (s32)"MAH_S_5A",
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 5, (s32)"MAH_S_5A", 393307, (s32)set_hand_dest, -2,
-    2, -230016384, -229970304, -230005120, 393307, (s32)set_hand_dest, -2, 3,
-    -229983616, -229970304, -229994880, 393307, (s32)set_hand_dest, -2, 4, -230016384,
-    -229988736, -230005120, 393307, (s32)set_hand_dest, -2, 5, -229983616, -229988736,
-    -229994880, 65545, 50, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"MAH_A_2A",
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"MAH_S_4A", 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    3, (s32)"MAH_S_4A", 262235, (s32)btlevtcmd_AnimeChangePose, -2, 4, (s32)"MAH_S_4A", 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 5, (s32)"MAH_S_4A", 393307, (s32)set_hand_dest, -2, 2,
-    -230020480, -229959040, -230015360, 393307, (s32)set_hand_dest, -2, 3, -229979520,
-    -229959040, -229984640, 393307, (s32)set_hand_dest, -2, 4, -230020480, -230000000,
-    -230015360, 393307, (s32)set_hand_dest, -2, 5, -229979520, -230000000, -229984640,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_MAGIC4", -250000000, 0, -250000000, 327771,
-    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 131125, -29999999, 15,
-    983131, (s32)evt_eff, (s32)"", (s32)"mahorn", 0, -30000000, -29999999, -29999998,
-    -229998567, 2, 30, 0, 0, 0, 0, 0,
-    65545, 30, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MAHO_MAGIC4", -250000000, 0,
-    -250000000, 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000, -29999999, -29999998, 131125,
-    -29999999, 15, 983131, (s32)evt_eff, (s32)"", (s32)"mahorn", 0, -30000000,
-    -29999999, -29999998, -229998567, 2, 30, 0, 0, 0,
-    0, 0, 65545, 30, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"MAH_A_2C", 2, 1,
-};
+static EVT_BEGIN(support_friend_common_event)
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_CHARGE1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    ADD(LW(1), 40)
+    CALL(evt_eff64, STRING(""), STRING("akari_charge_n64"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 70, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MAH_A_4"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("MAH_S_5A"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("MAH_S_5A"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 4, STRING("MAH_S_5A"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 5, STRING("MAH_S_5A"))
+    CALL(set_hand_dest, -2, 2, FLOAT(-16.0f), FLOAT(29.0f), FLOAT(-5.0f))
+    CALL(set_hand_dest, -2, 3, FLOAT(16.0f), FLOAT(29.0f), FLOAT(5.0f))
+    CALL(set_hand_dest, -2, 4, FLOAT(-16.0f), FLOAT(11.0f), FLOAT(-5.0f))
+    CALL(set_hand_dest, -2, 5, FLOAT(16.0f), FLOAT(11.0f), FLOAT(5.0f))
+    WAIT_FRAMES(50)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MAH_A_2A"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("MAH_S_4A"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("MAH_S_4A"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 4, STRING("MAH_S_4A"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 5, STRING("MAH_S_4A"))
+    CALL(set_hand_dest, -2, 2, FLOAT(-20.0f), FLOAT(40.0f), FLOAT(-15.0f))
+    CALL(set_hand_dest, -2, 3, FLOAT(20.0f), FLOAT(40.0f), FLOAT(15.0f))
+    CALL(set_hand_dest, -2, 4, FLOAT(-20.0f), FLOAT(0.0f), FLOAT(-15.0f))
+    CALL(set_hand_dest, -2, 5, FLOAT(20.0f), FLOAT(0.0f), FLOAT(15.0f))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_MAGIC4"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    ADD(LW(1), 15)
+    CALL(evt_eff, STRING(""), STRING("mahorn"), 0, LW(0), LW(1), LW(2), FLOAT(1.3994141f), 2, 30, 0, 0, 0, 0, 0)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MAHO_MAGIC4"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+    ADD(LW(1), 15)
+    CALL(evt_eff, STRING(""), STRING("mahorn"), 0, LW(0), LW(1), LW(2), FLOAT(1.3994141f), 2, 30, 0, 0, 0, 0, 0)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MAH_A_2C"))
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(dekadeka_magic_event)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))

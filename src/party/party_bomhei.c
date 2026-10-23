@@ -17,6 +17,7 @@
 #include "party/party_move.h"
 #include "eff/eff_sandars.h"
 #include "driver/npcdrv.h"
+#include "evt/evt_cmd.h"
 
 #ifdef VERSION_G8ME01
 // US has no local duplicate: this is the global bomhei_init
@@ -42,13 +43,15 @@ extern s32 evt_cam_shake(void* evt, BOOL isFirstCall);
 
 s32 m_w_7_sync[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9, 8, 7, 5, 3, 1, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 9, 8, 6, 4, 3, 2, 1, 0, 0, 0, 0, 0};
 
-s32 longQuake_evt[] = {
-    0x0005005B, (s32)evt_cam_shake, 4, (s32)0xF24A7A8F, (s32)0xF24A7A8F, 600, 2, 1,
-};
+EVT_BEGIN(longQuake_evt)
+    CALL(evt_cam_shake, 4, PTR(0xF24A7A8F), PTR(0xF24A7A8F), 600)
+    RETURN
+EVT_END()
 
-static s32 quake_evt[] = {
-    0x0005005B, (s32)evt_cam_shake, 4, (s32)0xF24A7A8F, (s32)0xF24A7A8F, 200, 2, 1,
-};
+static EVT_BEGIN(quake_evt)
+    CALL(evt_cam_shake, 4, PTR(0xF24A7A8F), PTR(0xF24A7A8F), 200)
+    RETURN
+EVT_END()
 
 static inline BOOL isBombRock(HitEntry* hit) {
     u8* c;
@@ -109,14 +112,14 @@ void bomhei_bye(PartyEntry* party) {
 #pragma explicit_zero_data reset
 
 void bomhei_init_800BFBB0(PartyEntry* party) {
-    PF(party, 0x33, u8) = 3;
-    PF(party, 0x32, u8) = 0;
+    party->memberKind = 3;
+    party->moveKind = 0;
     party->height = 28.0f;
     party->width = 28.0f;
-    PF(party, 0x17A, u8) = 100;
-    PF(party, 0x17C, s32) = -1;
-    PF(party, 0x180, s32) = -1;
-    PF(party, 0x184, s32) = -1;
+    party->work.bomhei.state = 100;
+    party->work.bomhei.unk17C = -1;
+    party->work.bomhei.sfxId = -1;
+    party->work.bomhei.sfxId2 = -1;
 }
 
 u8 bomheiGetStatus() {
@@ -141,7 +144,7 @@ void bomhei_exit(PartyEntry* party) {
         p->playerPtr->flags &= ~(1 << 13);
         if (p->runMode != 9) {
             partyChgRunMode(p, 2);
-            p->field_3A[1] = 0;
+            p->field_3B = 0;
         }
         BOMHEI_CLEAN_FLAGS(p);
         BOMHEI_CLEAN_SFX(p);
@@ -155,7 +158,7 @@ void bomhei_use_cancel() {
         p->playerPtr->flags &= ~(1 << 13);
         if (p->runMode != 9) {
             partyChgRunMode(p, 2);
-            p->field_3A[1] = 0;
+            p->field_3B = 0;
         }
         BOMHEI_CLEAN_FLAGS(p);
         BOMHEI_CLEAN_SFX(p);
@@ -170,7 +173,7 @@ void bomhei_use_cancel2() {
         marioChgPose("M_S_1");
         if (p->runMode != 9) {
             partyChgRunMode(p, 2);
-            p->field_3A[1] = 0;
+            p->field_3B = 0;
         }
         BOMHEI_CLEAN_FLAGS(p);
         BOMHEI_CLEAN_SFX(p);
@@ -186,9 +189,9 @@ void bomhei_use_post(PartyEntry* party) {
     }
     if (player->flags & (1 << 13)) {
         player->flags &= ~(1 << 13);
-        if (PF(player, 0x2E, u16) == 1) {
+        if (player->currMotionId == 1) {
             name = "M_W_1";
-        } else if (PF(player, 0x2E, u16) == 2) {
+        } else if (player->currMotionId == 2) {
             name = "M_R_1";
         } else if (player->flags & (1 << 16)) {
             name = "M_J_1B\0";
@@ -199,7 +202,7 @@ void bomhei_use_post(PartyEntry* party) {
     }
     BOMHEI_CLEAN_FLAGS(party);
     if (party->runMode != 9) {
-        party->field_3A[1] = 0;
+        party->field_3B = 0;
         party->field_8 |= 8;
     }
     party->playerPtr->flags &= ~(1 << 13);
@@ -235,9 +238,9 @@ void bomhei_use(PartyEntry* party) {
                 party->moveDir = party->targetDir;
             }
         }
-        if (PF(party, 0x17A, u8) != 0x66) {
+        if (party->work.bomhei.state != 0x66) {
             if (mario->currMotionId == 0x1F || mario->currMotionId == 0x20) {
-                PF(party, 0x17A, u8) = 0x66;
+                party->work.bomhei.state = 0x66;
                 return;
             }
             mario_controll(party);
@@ -293,12 +296,12 @@ static inline BOOL bomheiChkHitAttr(PartyEntry* party) {
     HitEntry* hit;
     u32 attr;
 
-    hit = PF(party, 0x12C, HitEntry*);
+    hit = party->hitobjFront;
     if (hit != NULL && (hitGetAttr(hit) & 0xC00)) {
         party->useMotionId = 60;
         return TRUE;
     }
-    hit = PF(party, 0x140, HitEntry*);
+    hit = party->hitobjHead;
     if (hit != NULL && (hitGetAttr(hit) & 0xC00)) {
         party->useMotionId = 60;
         return TRUE;
@@ -323,7 +326,7 @@ static inline void bomheiSetHoldPos(PartyEntry* party) {
     f32 height = 36.0f;
 
     if (strcmp(mario->animName, "M_W_7") == 0) {
-        height += m_w_7_sync[PF(party, 0x17B, u8)] / 4.0f;
+        height += m_w_7_sync[party->work.bomhei.syncFrame] / 4.0f;
     }
     party->position.x = mario->position.x;
     party->position.y = mario->position.y + height;
@@ -353,8 +356,8 @@ void bomhei_use_main(PartyEntry* party) {
     switch (party->useMotionId) {
     case 0:
         party->useMotionId = 1;
-        PF(party, 0x17A, u8) = 100;
-        PF(party, 0x178, s16) = 0;
+        party->work.bomhei.state = 100;
+        party->work.bomhei.timer = 0;
         BTIMER(party) = 4;
         BWORK(party)->timer = 0;
         BWORK(party)->flags = 0;
@@ -380,7 +383,7 @@ void bomhei_use_main(PartyEntry* party) {
         BGRAV(party) = -tmp;
         partyChgPose(party, "J_1A");
         party->useMotionId = 2;
-        PF(party, 0x17A, u8) = 10;
+        party->work.bomhei.state = 10;
         break;
     case 2:
         party->position.y += BVY(party);
@@ -392,7 +395,7 @@ void bomhei_use_main(PartyEntry* party) {
         partyChgPose(party, "L_1");
         BWORK(party)->timer = (s16)sysMsec2Frame(3000);
         party->useMotionId = 10;
-        PF(party, 0x17A, u8) = 20;
+        party->work.bomhei.state = 20;
         break;
     case 10:
         if (BWORK(party)->flags & 2) {
@@ -401,7 +404,7 @@ void bomhei_use_main(PartyEntry* party) {
         bomheiSetHoldPos(party);
         bomheiChkHitAttr(party);
         if ((party->flags & 0x80000000) ||
-            (mario->hitobjStandOn != NULL && mario->airTimer == 0 && !(PF(mario, 0x246 + MW_US, u16) & 0x400))) {
+            (mario->hitobjStandOn != NULL && mario->airTimer == 0 && !(mario->buttonHold & 0x400))) {
             party->useMotionId = 20;
         }
         break;
@@ -410,7 +413,7 @@ void bomhei_use_main(PartyEntry* party) {
     switch (party->useMotionId) {
     case 20:
         psndSFXOn_3D((const char*)0x939, &party->playerPtr->position);
-        PF(party, 0x17A, u8) = 30;
+        party->work.bomhei.state = 30;
         party->useMotionId = 21;
         x = party->position.x;
         z = party->position.z;
@@ -455,7 +458,7 @@ void bomhei_use_main(PartyEntry* party) {
         BTIMER(party) = sysMsec2Frame(200);
         party->useMotionId = 31;
     case 31:
-        if (!(party->flags & 0x80000000) && (PF(gp, 0x1338, u32) & 0x400)) {
+        if (!(party->flags & 0x80000000) && (gp->buttonNew[0] & 0x400)) {
             BWORK(party)->timer = (s16)(sysMsec2Frame(500) + 1);
             party->useMotionId = 50;
         }
@@ -466,7 +469,7 @@ void bomhei_use_main(PartyEntry* party) {
         }
         party->useMotionId = 32;
     case 32:
-        if (!(party->flags & 0x80000000) && (PF(gp, 0x1338, u32) & 0x400)) {
+        if (!(party->flags & 0x80000000) && (gp->buttonNew[0] & 0x400)) {
             BWORK(party)->timer = (s16)(sysMsec2Frame(500) + 1);
         }
         partyChgPose(party, !(BWORK(party)->flags & 2) ? "W_1" : "W_2");
@@ -483,13 +486,13 @@ void bomhei_use_main(PartyEntry* party) {
         BWORK(party)->timer--;
         if (BWORK(party)->timer == (s16)sysMsec2Frame(2500)) {
             BWORK(party)->flags |= 2;
-            if ((u32)PF(party, 0x184, s32) == 0xFFFFFFFFU) {
-                PF(party, 0x180, s32) = psndSFXOn_3D((const char*)0x93C, &party->playerPtr->position);
+            if ((u32)party->work.bomhei.sfxId2 == 0xFFFFFFFFU) {
+                party->work.bomhei.sfxId = psndSFXOn_3D((const char*)0x93C, &party->playerPtr->position);
             }
         } else if (BWORK(party)->timer == (s16)sysMsec2Frame(500)) {
             party->useMotionId = 50;
             if (mario->flags & 0x2000) {
-                PF(party, 0x17A, u8) = 40;
+                party->work.bomhei.state = 40;
             } else {
                 party->useMotionId = 50;
             }
@@ -498,9 +501,9 @@ void bomhei_use_main(PartyEntry* party) {
 
     switch (party->useMotionId) {
     case 40:
-        if ((u32)PF(party, 0x180, s32) != 0xFFFFFFFFU) {
-            psndSFXOff(PF(party, 0x180, s32));
-            PF(party, 0x180, s32) = -1;
+        if ((u32)party->work.bomhei.sfxId != 0xFFFFFFFFU) {
+            psndSFXOff(party->work.bomhei.sfxId);
+            party->work.bomhei.sfxId = -1;
         }
         marioSetSplash(0, party->position);
         BWORK(party)->flags |= 8;
@@ -529,12 +532,12 @@ void bomhei_use_main(PartyEntry* party) {
 
     switch (party->useMotionId) {
     case 50:
-        if ((u32)PF(party, 0x180, s32) != 0xFFFFFFFFU) {
-            psndSFXOff(PF(party, 0x180, s32));
-            PF(party, 0x180, s32) = -1;
+        if ((u32)party->work.bomhei.sfxId != 0xFFFFFFFFU) {
+            psndSFXOff(party->work.bomhei.sfxId);
+            party->work.bomhei.sfxId = -1;
         }
-        if ((u32)PF(party, 0x184, s32) == 0xFFFFFFFFU) {
-            PF(party, 0x184, s32) = psndSFXOn_3D((const char*)0x93D, &party->playerPtr->position);
+        if ((u32)party->work.bomhei.sfxId2 == 0xFFFFFFFFU) {
+            party->work.bomhei.sfxId2 = psndSFXOn_3D((const char*)0x93D, &party->playerPtr->position);
         }
         partyChgPose(party, "A_3");
         party->useMotionId = 51;
@@ -552,12 +555,12 @@ void bomhei_use_main(PartyEntry* party) {
             bomheiChkHitAttr(party);
             break;
         }
-        if ((u32)PF(party, 0x184, s32) != 0xFFFFFFFFU) {
-            psndSFXOff(PF(party, 0x184, s32));
-            PF(party, 0x184, s32) = -1;
+        if ((u32)party->work.bomhei.sfxId2 != 0xFFFFFFFFU) {
+            psndSFXOff(party->work.bomhei.sfxId2);
+            party->work.bomhei.sfxId2 = -1;
         }
         BWORK(party)->flags &= ~2;
-        PF(party, 0x130, HitEntry*) = check_front(party);
+        party->hitobjAction = check_front(party);
         if (mario->flags & 0x2000) {
             mario->flags &= ~0x2000;
         }
@@ -575,14 +578,14 @@ void bomhei_use_main(PartyEntry* party) {
         BWORK(party)->timer = 0;
         party->moveSpeed = 0.0f;
         partyMove(party);
-        if (isBombRock(PF(party, 0x130, HitEntry*))) {
+        if (isBombRock(party->hitobjAction)) {
             evtEntryType(longQuake_evt, 0, 0, 0);
         } else {
             evtEntryType(quake_evt, 0, 0, 0);
         }
         eff = effSandarsEntry(pouchGetPartyAttackLv((PartyId)3), party->position.x,
                               party->position.y + party->height, party->position.z, 0.0f);
-        PF(PF(eff, 0xC, void*), 0x40, s32) = party->camId;
+        PF(eff->userdata, 0x40, s32) = party->camId;
         fbatSandersBombTriggerOn();
         party->useMotionId = 70;
         break;
@@ -664,7 +667,7 @@ void bomhei_use_main(PartyEntry* party) {
         break;
     case 100:
         partyChgRunMode(party, 2);
-        party->field_3A[1] = 0;
+        party->field_3B = 0;
         party->flags2 &= ~0x10;
         party->flags &= ~0x80000000;
         party->flags &= ~0x100;
@@ -680,7 +683,7 @@ s32 mario_bomhei_keychk() {
     if (p == NULL) return 1;
     if (p->currentMemberId != PARTY_MEMBER_BOBBERY) return 1;
     if ((p->flags & PARTY_FLAG_IS_BEING_USED) == 0) return 1;
-    m = PF(p, 0x17A, u8);
+    m = p->work.bomhei.state;
     if (m == 10 || (m >= 20 && m <= 21) || m == 101 || (m >= 40 && m <= 41) || (m >= 30 && m <= 36)) return 0;
     m = p->useMotionId;
     if ((m >= 50 && m <= 51) || m == 60 || (m >= 70 && m <= 71)) return 0;
@@ -694,7 +697,7 @@ s32 mario_bomhei_keychk2() {
     if (p == NULL) return 1;
     if (p->currentMemberId != PARTY_MEMBER_BOBBERY) return 1;
     if ((p->flags & PARTY_FLAG_IS_BEING_USED) == 0) return 1;
-    m = PF(p, 0x17A, u8);
+    m = p->work.bomhei.state;
     if (m == 10 || m == 101 || (m >= 30 && m <= 36)) return 0;
     return 1;
 }
@@ -703,61 +706,61 @@ void mario_controll(PartyEntry* party) {
     MarioWork* player = party->playerPtr;
     s32 cnt;
 
-    switch (PF(party, 0x17A, u8)) {
+    switch (party->work.bomhei.state) {
     case 10:
         marioAdjustMoveDir();
         marioChgPose("M_U_2");
         player->flags |= 0x2000;
-        PF(party, 0x17A, u8) = 101;
+        party->work.bomhei.state = 101;
         break;
     case 20:
         player->flags |= 0x2000;
-        PF(party, 0x17A, u8) = 21;
+        party->work.bomhei.state = 21;
         break;
     case 21:
         if (strcmp(player->animName, "M_W_7") == 0) {
-            animPoseSetLocalTime(player->paperAnimGroupId[marioAnimeId()], PF(party, 0x17B, u8));
-            cnt = PF(party, 0x17B, u8) + 1;
-            PF(party, 0x17B, u8) = cnt;
+            animPoseSetLocalTime(player->paperAnimGroupId[marioAnimeId()], party->work.bomhei.syncFrame);
+            cnt = party->work.bomhei.syncFrame + 1;
+            party->work.bomhei.syncFrame = cnt;
             if ((u8)cnt >= 40) {
-                PF(party, 0x17B, u8) = 0;
+                party->work.bomhei.syncFrame = 0;
             }
         } else {
-            PF(party, 0x17B, u8) = 0;
+            party->work.bomhei.syncFrame = 0;
         }
         break;
     case 40:
         marioChgMot(0);
-        PF(party, 0x17A, u8) = 41;
-        PF(party, 0x178, s16) = 40;
+        party->work.bomhei.state = 41;
+        party->work.bomhei.timer = 40;
         break;
     case 41:
-        if (--PF(party, 0x178, s16) <= 0) {
+        if (--party->work.bomhei.timer <= 0) {
             marioChgMot(0);
-            PF(party, 0x17A, u8) = 100;
+            party->work.bomhei.state = 100;
         }
         break;
     case 30:
         marioChgMot(0);
-        PF(party, 0x17A, u8) = 31;
+        party->work.bomhei.state = 31;
         break;
     case 31:
         marioChgPose("M_C_1");
         player->flags &= ~0x2000;
-        PF(party, 0x178, s16) = 50;
-        PF(party, 0x17A, u8) = 32;
+        party->work.bomhei.timer = 50;
+        party->work.bomhei.state = 32;
         break;
     case 32:
-        if (--PF(party, 0x178, s16) <= 0) {
-            PF(party, 0x17A, u8) = 36;
-            PF(party, 0x178, s16) = 10;
+        if (--party->work.bomhei.timer <= 0) {
+            party->work.bomhei.state = 36;
+            party->work.bomhei.timer = 10;
         }
         break;
     case 36:
-        animPoseSetLocalTime(player->paperAnimGroupId[marioAnimeId()], PF(party, 0x178, s16));
-        if (--PF(party, 0x178, s16) < 0) {
+        animPoseSetLocalTime(player->paperAnimGroupId[marioAnimeId()], party->work.bomhei.timer);
+        if (--party->work.bomhei.timer < 0) {
             marioChgMot(0);
-            PF(party, 0x17A, u8) = 100;
+            party->work.bomhei.state = 100;
         }
         break;
     }

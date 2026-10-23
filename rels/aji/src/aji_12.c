@@ -38,76 +38,56 @@ static USER_FUNC(hikaru_off);
 static USER_FUNC(mario_chk);
 static USER_FUNC(thunder_main);
 
-__declspec(section ".data") u64 fd_aji_12_negone_one_374;
-__declspec(section ".data") s32 fd_aji_12_neg_one_382[1];
-__declspec(section ".data") s32 fd_aji_12___local_PI_383[1];
-__declspec(section ".data") s32 fd_aji_12___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_aji_12_one_negone_373;
-__declspec(section ".data") s32 fd_aji_12___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_aji_12_one_381[1];
-__declspec(section ".data") u64 fd_aji_12_negone_one_360;
-__declspec(section ".data") s32 fd_aji_12_neg_one_365[1];
-__declspec(section ".data") s32 fd_aji_12___local_PI_366[1];
-__declspec(section ".data") s32 fd_aji_12___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_aji_12_one_negone_359;
-__declspec(section ".data") s32 fd_aji_12___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_aji_12_one_364[1];
+__declspec(section ".data") f32 fd_aji_12_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_12_neg_one_382;
+__declspec(section ".data") f32 fd_aji_12___local_PI_383;
+__declspec(section ".data") f32 fd_aji_12___local_3PIO2_385;
+__declspec(section ".data") f32 fd_aji_12_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_12___local_PIO2_384;
+__declspec(section ".data") f32 fd_aji_12_one_381;
+__declspec(section ".data") f32 fd_aji_12_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_12_neg_one_365;
+__declspec(section ".data") f32 fd_aji_12___local_PI_366;
+__declspec(section ".data") f32 fd_aji_12___local_3PIO2_368;
+__declspec(section ".data") f32 fd_aji_12_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_12___local_PIO2_367;
+__declspec(section ".data") f32 fd_aji_12_one_364;
 static s32 e_door_close[22];
 static s32 e_door_open[22];
-static s32 bero_entry_data[30];
-s32 hit_list[50];
+static BeroEntry bero_entry_data[2];
+const char* hit_list[50];
 static s32 evt_box[89];
-static __declspec(section ".data") s32 dmgReturnPt[8];
+static __declspec(section ".data") HitDamageReturn dmgReturnPt[2];
 static s32 hikaru_yuka_init[40];
 s32 aji_12_init_evt[71];
 
-__declspec(section ".data") u64 fd_aji_12_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_12_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_12_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_12___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_12___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_12___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_12___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_12_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_12_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_12___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_12___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_12_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_12_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_aji_12_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_12_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_12_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_12_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_12___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_12___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_12___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_12___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_12_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_12_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_12___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_12___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_12_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_12_one_364 = 1.0f;
 
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
@@ -125,21 +105,79 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"e_bero", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"aji_01", (s32)"w_bero_4", 327685, (s32)e_door_close, (s32)e_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "e_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_01", // nextMapName
+        "w_bero_4", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
-s32 hit_list[] = {
-    (s32)"A_hikaru_01", (s32)"A_hikaru_02", (s32)"A_hikaru_03", (s32)"A_hikaru_04", (s32)"A_hikaru_05", (s32)"A_hikaru_06", (s32)"A_hikaru_07", (s32)"A_hikaru_08",
-    (s32)"A_hikaru_09", (s32)"A_hikaru_10", (s32)"A_hikaru_11", (s32)"A_hikaru_12", (s32)"A_hikaru_13", (s32)"A_hikaru_14", (s32)"A_hikaru_15", (s32)"A_hikaru_16",
-    (s32)"A_hikaru_17", (s32)"A_hikaru_18", (s32)"A_hikaru_19", (s32)"A_hikaru_20", (s32)"A_hikaru_21", (s32)"A_hikaru_22", (s32)"A_hikaru_23", (s32)"A_hikaru_24",
-    (s32)"A_hikaru_25", (s32)"A_hikaru_26", (s32)"A_hikaru_27", (s32)"A_hikaru_08", (s32)"A_hikaru_28", (s32)"A_hikaru_29", (s32)"A_hikaru_30", (s32)"A_hikaru_31",
-    (s32)"A_hikaru_32", (s32)"A_hikaru_12", (s32)"A_hikaru_13", (s32)"A_hikaru_33", (s32)"A_hikaru_15", (s32)"A_hikaru_34", (s32)"A_hikaru_35", (s32)"A_hikaru_36",
-    (s32)"A_hikaru_37", (s32)"A_hikaru_38", (s32)"A_hikaru_39", (s32)"A_hikaru_40", (s32)"A_hikaru_41", (s32)"A_hikaru_42", (s32)"A_hikaru_41", (s32)"A_hikaru_40",
-    (s32)"A_hikaru_43", (s32)"A_hikaru_44",
+const char* hit_list[] = {
+    "A_hikaru_01",
+    "A_hikaru_02",
+    "A_hikaru_03",
+    "A_hikaru_04",
+    "A_hikaru_05",
+    "A_hikaru_06",
+    "A_hikaru_07",
+    "A_hikaru_08",
+    "A_hikaru_09",
+    "A_hikaru_10",
+    "A_hikaru_11",
+    "A_hikaru_12",
+    "A_hikaru_13",
+    "A_hikaru_14",
+    "A_hikaru_15",
+    "A_hikaru_16",
+    "A_hikaru_17",
+    "A_hikaru_18",
+    "A_hikaru_19",
+    "A_hikaru_20",
+    "A_hikaru_21",
+    "A_hikaru_22",
+    "A_hikaru_23",
+    "A_hikaru_24",
+    "A_hikaru_25",
+    "A_hikaru_26",
+    "A_hikaru_27",
+    "A_hikaru_08",
+    "A_hikaru_28",
+    "A_hikaru_29",
+    "A_hikaru_30",
+    "A_hikaru_31",
+    "A_hikaru_32",
+    "A_hikaru_12",
+    "A_hikaru_13",
+    "A_hikaru_33",
+    "A_hikaru_15",
+    "A_hikaru_34",
+    "A_hikaru_35",
+    "A_hikaru_36",
+    "A_hikaru_37",
+    "A_hikaru_38",
+    "A_hikaru_39",
+    "A_hikaru_40",
+    "A_hikaru_41",
+    "A_hikaru_42",
+    "A_hikaru_41",
+    "A_hikaru_40",
+    "A_hikaru_43",
+    "A_hikaru_44",
 };
 
 static EVT_BEGIN(evt_box)
@@ -169,8 +207,9 @@ static EVT_BEGIN(evt_box)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 dmgReturnPt[] = {
-    (s32)"mod_01", 0, -998637568, 0, 0, 0, 0, 0,
+static __declspec(section ".data") HitDamageReturn dmgReturnPt[] = {
+    {"mod_01", {0.0f, -1000.0f, 0.0f}},
+    {0},
 };
 
 static EVT_BEGIN(hikaru_yuka_init)

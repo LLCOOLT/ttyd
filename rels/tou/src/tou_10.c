@@ -10,6 +10,7 @@
 #include "string.h"
 #include "evt/evt_bero.h"
 #include "tou.h"
+#include "evt/evt_npc.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
@@ -117,24 +118,24 @@ USER_FUNC(evt_sub_get_language);
 USER_FUNC(evt_msg_fmt_int);
 #endif
 
-__declspec(section ".data") u64 fd_tou_10_negone_one_374;
-__declspec(section ".data") s32 fd_tou_10_neg_one_382[1];
-__declspec(section ".data") s32 fd_tou_10___local_PI_383[1];
-__declspec(section ".data") s32 fd_tou_10___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_tou_10_one_negone_373;
-__declspec(section ".data") s32 fd_tou_10___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_tou_10_one_381[1];
-__declspec(section ".data") u64 fd_tou_10_negone_one_360;
-__declspec(section ".data") s32 fd_tou_10_neg_one_365[1];
-__declspec(section ".data") s32 fd_tou_10___local_PI_366[1];
-__declspec(section ".data") s32 fd_tou_10___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_tou_10_one_negone_359;
-__declspec(section ".data") s32 fd_tou_10___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_tou_10_one_364[1];
+__declspec(section ".data") f32 fd_tou_10_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_10_neg_one_382;
+__declspec(section ".data") f32 fd_tou_10___local_PI_383;
+__declspec(section ".data") f32 fd_tou_10___local_3PIO2_385;
+__declspec(section ".data") f32 fd_tou_10_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_10___local_PIO2_384;
+__declspec(section ".data") f32 fd_tou_10_one_381;
+__declspec(section ".data") f32 fd_tou_10_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_10_neg_one_365;
+__declspec(section ".data") f32 fd_tou_10___local_PI_366;
+__declspec(section ".data") f32 fd_tou_10___local_3PIO2_368;
+__declspec(section ".data") f32 fd_tou_10_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_10___local_PIO2_367;
+__declspec(section ".data") f32 fd_tou_10_one_364;
 __declspec(section ".data") s32 room_out[8];
 static __declspec(section ".data") s32 n_door_open[12];
 static __declspec(section ".data") s32 n_door_close[12];
-static s32 bero_data[30];
+static BeroEntry bero_data[2];
 s32 init_kino[13];
 s32 talk_kino[24];
 __declspec(section ".data") s32 init_gard[2];
@@ -153,7 +154,7 @@ s32 init_iron[45];
 s32 talk_iron[30];
 s32 init_iron2[45];
 s32 talk_iron2[30];
-static s32 npcEnt[253];
+static NpcSetupInfo npcEnt[11];
 #ifdef VERSION_G8ME01
 s32 evt_saisyo_after[733];
 #else
@@ -259,53 +260,33 @@ USER_FUNC(setYoshiColor) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_tou_10_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tou_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tou_10_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tou_10_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_tou_10___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tou_10___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tou_10___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tou_10___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tou_10_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tou_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tou_10___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tou_10___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tou_10_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tou_10_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_tou_10_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tou_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tou_10_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tou_10_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_tou_10___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tou_10___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tou_10___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tou_10___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tou_10_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tou_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tou_10___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tou_10___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tou_10_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tou_10_one_364 = 1.0f;
 
 __declspec(section ".data") EVT_BEGIN(room_out)
     SET_VALUE(GSWF(2390), 1)
@@ -325,11 +306,26 @@ static __declspec(section ".data") EVT_BEGIN(n_door_close)
     RETURN
 EVT_END()
 
-static s32 bero_data[] = {
-    (s32)"n_bero", 65540, 20000, 100000, 0, 0, -1, (s32)room_out,
-    -1, 0, (s32)"tou_04", (s32)"s_bero_7", 327685, (s32)n_door_close, (s32)n_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_data[] = {
+    {
+        "n_bero", // hitName
+        1, // type
+        4, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)room_out, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_04", // nextMapName
+        "s_bero_7", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n_door_close, // enterAnimeArg
+        (s32)n_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(init_kino)
@@ -670,39 +666,122 @@ EVT_BEGIN(talk_iron2)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F", 1073743360, 0, (s32)init_kino, 0, (s32)talk_kino, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ガードマン"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93",
-    1073743360, 0, (s32)init_gard, 0, (s32)talk_gard, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58", 1073743360,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"ヨッシー"*/"\x83\x88\x83\x62\x83\x56\x81\x5B", 1073743360, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"マイケル"*/"\x83\x7D\x83\x43\x83\x50\x83\x8B", 1073743360, 0, (s32)init_michel,
-    0, (s32)talk_michel, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"ブロッツ"*/"\x83\x75\x83\x8D\x83\x62\x83\x63", 1073743360, 0, (s32)init_brots, 0,
-    (s32)talk_brots, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"ガンガン"*/"\x83\x4B\x83\x93\x83\x4B\x83\x93", 1073743360, 0, (s32)init_gangan, 0, (s32)talk_gangan,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"ポグ"*/"\x83\x7C\x83\x4F", 1073743360, 0, (s32)init_poku, 0, (s32)talk_poku, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)/*"アイアン"*/"\x83\x41\x83\x43\x83\x41\x83\x93", 1073743360, 0, (s32)init_iron, 0, (s32)talk_iron, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"アイアン２"*/"\x83\x41\x83\x43\x83\x41\x83\x93\x82\x51",
-    1073743360, 0, (s32)init_iron2, 0, (s32)talk_iron2, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_kino, // initEvent
+        NULL, // regularEvent
+        talk_kino, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_gard, // initEvent
+        NULL, // regularEvent
+        talk_gard, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガンス"*/"\x83\x4B\x83\x93\x83\x58", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ヨッシー"*/"\x83\x88\x83\x62\x83\x56\x81\x5B", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"マイケル"*/"\x83\x7D\x83\x43\x83\x50\x83\x8B", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_michel, // initEvent
+        NULL, // regularEvent
+        talk_michel, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ブロッツ"*/"\x83\x75\x83\x8D\x83\x62\x83\x63", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_brots, // initEvent
+        NULL, // regularEvent
+        talk_brots, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガンガン"*/"\x83\x4B\x83\x93\x83\x4B\x83\x93", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_gangan, // initEvent
+        NULL, // regularEvent
+        talk_gangan, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ポグ"*/"\x83\x7C\x83\x4F", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_poku, // initEvent
+        NULL, // regularEvent
+        talk_poku, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"アイアン"*/"\x83\x41\x83\x43\x83\x41\x83\x93", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_iron, // initEvent
+        NULL, // regularEvent
+        talk_iron, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"アイアン２"*/"\x83\x41\x83\x43\x83\x41\x83\x93\x82\x51", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_iron2, // initEvent
+        NULL, // regularEvent
+        talk_iron2, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_saisyo_after)

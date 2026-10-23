@@ -55,26 +55,26 @@ static void _mapsetofs_all(CloudWork* wp);
 static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
 static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
 
-__declspec(section ".data") u64 fd_las_14_negone_one_374;
-__declspec(section ".data") s32 fd_las_14_neg_one_382[1];
-__declspec(section ".data") s32 fd_las_14___local_PI_383[1];
-__declspec(section ".data") s32 fd_las_14___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_las_14_one_negone_373;
-__declspec(section ".data") s32 fd_las_14___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_las_14_one_381[1];
-__declspec(section ".data") u64 fd_las_14_negone_one_360;
-__declspec(section ".data") s32 fd_las_14_neg_one_365[1];
-__declspec(section ".data") s32 fd_las_14___local_PI_366[1];
-__declspec(section ".data") s32 fd_las_14___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_las_14_one_negone_359;
-__declspec(section ".data") s32 fd_las_14___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_las_14_one_364[1];
+__declspec(section ".data") f32 fd_las_14_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_14_neg_one_382;
+__declspec(section ".data") f32 fd_las_14___local_PI_383;
+__declspec(section ".data") f32 fd_las_14___local_3PIO2_385;
+__declspec(section ".data") f32 fd_las_14_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_14___local_PIO2_384;
+__declspec(section ".data") f32 fd_las_14_one_381;
+__declspec(section ".data") f32 fd_las_14_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_14_neg_one_365;
+__declspec(section ".data") f32 fd_las_14___local_PI_366;
+__declspec(section ".data") f32 fd_las_14___local_3PIO2_368;
+__declspec(section ".data") f32 fd_las_14_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_14___local_PIO2_367;
+__declspec(section ".data") f32 fd_las_14_one_364;
 static __declspec(section ".data") s32 w_door_close[12];
 static __declspec(section ".data") s32 w_door_open[12];
-static s32 bero_entry_data[30];
+static BeroEntry bero_entry_data[2];
 static s32 box_evt[30];
-static __declspec(section ".data") s32 capturemap[3];
-static s32 v_list[24];
+static __declspec(section ".data") const char* capturemap[3];
+static Vec v_list[8];
 static __declspec(section ".data") s32 evt_cloud_main_evt[4];
 static s32 cloud_evt[35];
 __declspec(section ".data") s32 touch_evt[2];
@@ -106,7 +106,7 @@ static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h) {
     s32 maxY;
 
     hitObjGetPos(name, &pos);
-    PSVECAdd(&pos, &((Vec*)v_list)[0], &screen);
+    PSVECAdd(&pos, &v_list[0], &screen);
     getScreenPoint(&screen, &screen);
     {
         s32 sx = screen.x;
@@ -121,7 +121,7 @@ static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h) {
         s32 i;
 
         for (i = 1; i < 8; i++) {
-            PSVECAdd(&pos, &((Vec*)v_list)[i], &screen);
+            PSVECAdd(&pos, &v_list[i], &screen);
             getScreenPoint(&screen, &screen);
             if (screen.x < minX) {
                 minX = screen.x;
@@ -184,53 +184,33 @@ static void _mapclsofs_all(CloudWork* wp) {
     }
 }
 
-__declspec(section ".data") u64 fd_las_14_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_14_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_14_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_14_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_14___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_14___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_14___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_14___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_14_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_14_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_14___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_14___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_14_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_14_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_las_14_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_14_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_14_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_14_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_14___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_14___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_14___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_14___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_14_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_14_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_14___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_14___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_14_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_14_one_364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -244,11 +224,26 @@ static __declspec(section ".data") EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero_1", 65537, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"las_10", (s32)"se_bero_1", 327685, (s32)w_door_close, (s32)w_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero_1", // hitName
+        1, // type
+        1, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_10", // nextMapName
+        "se_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(box_evt)
@@ -261,14 +256,21 @@ static EVT_BEGIN(box_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 capturemap[] = {
-    (s32)"S_kabe1", (s32)"S_ten", (s32)"",
+static __declspec(section ".data") const char* capturemap[] = {
+    "S_kabe1",
+    "S_ten",
+    "",
 };
 
-static s32 v_list[] = {
-    -1035468800, 1120403456, 1112014848, 1112014848, 1120403456, 1112014848, 1112014848, 0,
-    1112014848, -1035468800, 0, 1112014848, -1035468800, 1120403456, -1035468800, 1112014848,
-    1120403456, -1035468800, 1112014848, 0, -1035468800, -1035468800, 0, -1035468800,
+static Vec v_list[] = {
+    {-50.0f, 100.0f, 50.0f},
+    {50.0f, 100.0f, 50.0f},
+    {50.0f, 0.0f, 50.0f},
+    {-50.0f, 0.0f, 50.0f},
+    {-50.0f, 100.0f, -50.0f},
+    {50.0f, 100.0f, -50.0f},
+    {50.0f, 0.0f, -50.0f},
+    {-50.0f, 0.0f, -50.0f},
 };
 
 static __declspec(section ".data") EVT_BEGIN(evt_cloud_main_evt)
@@ -310,7 +312,7 @@ EVT_BEGIN(las_14_init_evt)
     CALL(evt_hitobj_onoff, STRING("A_taka"), 1, 0)
     IF_INT_EQUAL(GSWF(4344), 0)
         CALL(evt_las_cloud_init)
-        CALL(evt_las_cloud_ent, PTR(capturemap), STRING("A_kura"), PTR(cloud_evt))
+        CALL(evt_las_cloud_ent, PTR(&capturemap), STRING("A_kura"), PTR(cloud_evt))
         CALL(evt_run_case_evt, 9, 1, STRING("A_kura"), 0, PTR(touch_evt), 0)
         ELSE
         CALL(evt_hitobj_onoff, STRING("A_kura"), 1, 0)
@@ -379,7 +381,7 @@ static USER_FUNC(evt_cloud_main) {
             imgEntry(wp->imgName, group);
             img = imgNameToPtr(wp->imgName, group);
             img->poseId = animPaperPoseGetId(wp->animName, group);
-            *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+            img->animTime = animTimeGetTime(group);
             imgClearVirtualPoint(img);
             imgSetShadow(img, 2);
             img->flags |= 2;
@@ -399,7 +401,7 @@ static USER_FUNC(evt_cloud_main) {
         case 3:
             img = imgNameToPtr(wp->imgName, group);
             img->animName = (s32)"A_1";
-            *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+            img->animTime = animTimeGetTime(group);
             img->flags &= ~2;
             wp->timer = 30;
             wp->lastFrame = 0.0f;
@@ -441,7 +443,7 @@ static USER_FUNC(evt_cloud_main) {
             }
             img = imgNameToPtr(wp->imgName, group);
             img->animName = (s32)"A_2";
-            *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+            img->animTime = animTimeGetTime(group);
             wp->timer = 60;
             wp->state++;
             break;

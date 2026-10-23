@@ -1,9 +1,10 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "driver/npcdrv.h"
 
-extern s32 btl_rsh_setup_no_tbl[];
-extern s32 btlsetup_rsh_tbl[];
+extern NpcTerritoryInfo btl_rsh_setup_no_tbl[];
+extern NpcSetupBattleInfo btlsetup_rsh_tbl[];
 extern s32 evt_rsh_01_rnd_npc_entry[];
 extern s32 evt_rsh_03_rnd_npc_entry[];
 extern s32 evt_rsh_04_rnd_npc_entry[];

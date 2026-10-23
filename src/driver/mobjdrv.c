@@ -22,57 +22,69 @@
 
 
 
-u32 cubeMSJ[5] = {
-    0x00010000, 0x00000000, 0x80000000, 0x00000000, 0x00000000
-};
+/* static map-file joint data for the mobj cube models (same layout as a loaded map file) */
+typedef struct CubeDrawMode { MapJointDrawMode mode; u32 field_0x10; } CubeDrawMode;
+typedef struct CubeMesh {
+    u8 unk0;              // 0x0
+    u8 padding[2];        // 0x1
+    u8 isPackedDisplay;   // 0x3
+    s32 displayListCount; // 0x4
+    u32 elementMask;      // 0x8
+    void* vcdTable;       // 0xC, cubeDDT
+    u32* lists[15];       // 0x10, display lists in cubeDN
+} CubeMesh;
+typedef struct CubeJoint { MapFileJoint joint; MapFileJointPart part; } CubeJoint;
 
-u32 front2MSJ[5] = {
-    0x00010000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
-};
+CubeDrawMode cubeMSJ = {{{0}, 1, {0}, (s32)0x80000000}, 0};
+
+CubeDrawMode front2MSJ = {{{0}, 1, {0}, 0}, 0};
 
 // static data from inlined header functions
-__declspec(section ".data") s32 fd_mobjdrv_negone_one_374[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 mobjdrv_negone_one_a[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 fd_mobjdrv_one_negone_373[] = {1065353216, -1082130432};
-__declspec(section ".data") s32 mobjdrv_one_negone_a[] = {1065353216, -1082130432};
-__declspec(section ".data") s32 fd_mobjdrv_negone_one_360[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 mobjdrv_negone_one_b[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 fd_mobjdrv_one_negone_359[] = {1065353216, -1082130432};
-__declspec(section ".data") s32 mobjdrv_one_negone_b[] = {1065353216, -1082130432};
+__declspec(section ".data") f32 fd_mobjdrv_negone_one_374[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 mobjdrv_negone_one_a[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 fd_mobjdrv_one_negone_373[] = {1.0f, -1.0f};
+__declspec(section ".data") f32 mobjdrv_one_negone_a[] = {1.0f, -1.0f};
+__declspec(section ".data") f32 fd_mobjdrv_negone_one_360[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 mobjdrv_negone_one_b[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 fd_mobjdrv_one_negone_359[] = {1.0f, -1.0f};
+__declspec(section ".data") f32 mobjdrv_one_negone_b[] = {1.0f, -1.0f};
 
-u32 cubeDVP[103] = {
-    0x00000008, 0xBF000000, 0x00000000, 0x3F000000, 0x3F000000, 0x00000000, 0x3F000000, 0xBF000000,
-    0x3F800000, 0x3F000000, 0x3F000000, 0x3F800000, 0x3F000000, 0xBF000000, 0x3F800000, 0xBF000000,
-    0x3F000000, 0x3F800000, 0xBF000000, 0xBF000000, 0x00000000, 0xBF000000, 0x3F000000, 0x00000000,
-    0xBF000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
+typedef struct CubeVtxData34 { s32 count; Vec v[34]; } CubeVtxData34;
+typedef struct CubeVtxData18 { s32 count; Vec v[18]; } CubeVtxData18;
+CubeVtxData34 cubeDVP = {
+    8,
+    {
+        {-0.5f, 0.0f, 0.5f},
+        {0.5f, 0.0f, 0.5f},
+        {-0.5f, 1.0f, 0.5f},
+        {0.5f, 1.0f, 0.5f},
+        {-0.5f, 1.0f, -0.5f},
+        {0.5f, 1.0f, -0.5f},
+        {-0.5f, 0.0f, -0.5f},
+        {0.5f, 0.0f, -0.5f},
+    },
 };
 
-u32 cubeDVN[55] = {
-    0x00000006, 0x00000000, 0x00000000, 0x3F800000, 0x00000000, 0x3F800000, 0x00000000, 0x00000000,
-    0x00000000, 0xBF800000, 0x00000000, 0xBF800000, 0x00000000, 0x3F800000, 0x00000000, 0x00000000,
-    0xBF800000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
+CubeVtxData18 cubeDVN = {
+    6,
+    {
+        {0.0f, 0.0f, 1.0f},
+        {0.0f, 1.0f, 0.0f},
+        {0.0f, 0.0f, -1.0f},
+        {0.0f, -1.0f, 0.0f},
+        {1.0f, 0.0f, 0.0f},
+        {-1.0f, 0.0f, 0.0f},
+    },
 };
 
 void* cubeDDT[26] = {
-    cubeDVP, cubeDVN, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
+    &cubeDVP, &cubeDVN, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
     (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
     (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
     (void*)0x00000000, (void*)0x00000000
 };
 
+/* GX display list data: six unpacked index lists of 205 words (count, then one index record per vertex) */
 u32 cubeDN[1230] = {
     0x00000004, 0x00000005, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00060005,
     0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00020005, 0xFFFFFFFF, 0xFFFFFFFF,
@@ -230,56 +242,36 @@ u32 cubeDN[1230] = {
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
 };
 
-void* cubeDP[19] = {
-    (void*)0x00000000, (void*)0x00000006, (void*)0x00000000, cubeDDT, cubeDN, (void*)&cubeDN[205], (void*)&cubeDN[410], (void*)&cubeDN[615],
-    (void*)&cubeDN[820], (void*)&cubeDN[1025], (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
-    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000
+CubeMesh cubeDP = {0, {0}, 0, 6, 0, cubeDDT, {cubeDN, &cubeDN[205], &cubeDN[410], &cubeDN[615], &cubeDN[820], &cubeDN[1025]}};
+
+CubeJoint cubeDJ = {
+    {NULL, NULL, NULL, NULL, NULL, NULL, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f},
+     {-0.5f, 0.0f, -0.5f}, {0.5f, 1.0f, 0.5f}, {0}, &cubeMSJ.mode, 1},
+    {NULL, (MapFileMesh*)&cubeDP},
 };
 
-void* cubeDJ[26] = {
-    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x3F800000, (void*)0x3F800000,
-    (void*)0x3F800000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0xBF000000,
-    (void*)0x00000000, (void*)0xBF000000, (void*)0x3F000000, (void*)0x3F800000, (void*)0x3F000000, (void*)0x00000000, cubeMSJ, (void*)0x00000001,
-    (void*)0x00000000, cubeDP
+CubeMesh headDP = {0, {0}, 0, 1, 0, cubeDDT, {&cubeDN[410]}};
+
+CubeJoint headDJ = {
+    {NULL, NULL, NULL, NULL, NULL, NULL, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f},
+     {-0.5f, 0.0f, -0.5f}, {0.5f, 0.0f, 0.5f}, {0}, &cubeMSJ.mode, 1},
+    {NULL, (MapFileMesh*)&headDP},
 };
 
-void* headDP[19] = {
-    (void*)0x00000000, (void*)0x00000001, (void*)0x00000000, cubeDDT, (void*)&cubeDN[410], (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
-    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
-    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000
+CubeMesh frontDP = {0, {0}, 0, 1, 0, cubeDDT, {&cubeDN[1025]}};
+
+CubeJoint frontDJ = {
+    {NULL, NULL, NULL, NULL, NULL, NULL, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f},
+     {-0.5f, 0.0f, -0.5f}, {0.5f, 1.0f, 0.5f}, {0}, &cubeMSJ.mode, 1},
+    {NULL, (MapFileMesh*)&frontDP},
 };
 
-void* headDJ[26] = {
-    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x3F800000, (void*)0x3F800000,
-    (void*)0x3F800000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0xBF000000,
-    (void*)0x00000000, (void*)0xBF000000, (void*)0x3F000000, (void*)0x00000000, (void*)0x3F000000, (void*)0x00000000, cubeMSJ, (void*)0x00000001,
-    (void*)0x00000000, headDP
-};
+CubeMesh front2DP = {0, {0}, 0, 5, 0, cubeDDT, {cubeDN, &cubeDN[205], &cubeDN[410], &cubeDN[615], &cubeDN[820]}};
 
-void* frontDP[19] = {
-    (void*)0x00000000, (void*)0x00000001, (void*)0x00000000, cubeDDT, (void*)&cubeDN[1025], (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
-    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
-    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000
-};
-
-void* frontDJ[26] = {
-    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x3F800000, (void*)0x3F800000,
-    (void*)0x3F800000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0xBF000000,
-    (void*)0x00000000, (void*)0xBF000000, (void*)0x3F000000, (void*)0x3F800000, (void*)0x3F000000, (void*)0x00000000, cubeMSJ, (void*)0x00000001,
-    (void*)0x00000000, frontDP
-};
-
-void* front2DP[19] = {
-    (void*)0x00000000, (void*)0x00000005, (void*)0x00000000, cubeDDT, cubeDN, (void*)&cubeDN[205], (void*)&cubeDN[410], (void*)&cubeDN[615],
-    (void*)&cubeDN[820], (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
-    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000
-};
-
-void* front2DJ[26] = {
-    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x3F800000, (void*)0x3F800000,
-    (void*)0x3F800000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0xBF000000,
-    (void*)0x00000000, (void*)0xBF000000, (void*)0x3F000000, (void*)0x3F800000, (void*)0x3F000000, (void*)0x00000000, front2MSJ, (void*)0x00000001,
-    (void*)0x00000000, front2DP
+CubeJoint front2DJ = {
+    {NULL, NULL, NULL, NULL, NULL, NULL, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f},
+     {-0.5f, 0.0f, -0.5f}, {0.5f, 1.0f, 0.5f}, {0}, &front2MSJ.mode, 1},
+    {NULL, (MapFileMesh*)&front2DP},
 };
 
 
@@ -457,12 +449,12 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
                 MTXConcat(trans, xrot, trans);
                 MTXConcat(trans, scale, mtx);
             }
-            memcpy(entry->hitObj[0].unk4 + 8, cubeDJ, 0x68);
+            memcpy(entry->hitObj[0].unk4 + 8, &cubeDJ, sizeof(CubeJoint));
             strcpy(entry->hitObj[0].name, "MOBJ_");
             strcat(entry->hitObj[0].name, entry->name);
             *(char**)(entry->hitObj[0].unk4 + 8) = entry->hitObj[0].name;
             entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].unk4 + 8), mtx);
-            *(MapObjectEntry**)((u8*)entry->hitObj[0].hitObject + 0xD0) = entry;
+            entry->hitObj[0].hitObject->mobj = entry;
             break;
         case 1:
             PSVECAdd(&entry->position, &entry->translation, &position);
@@ -478,12 +470,12 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
                 MTXConcat(trans, xrot, trans);
                 MTXConcat(trans, scale, mtx);
             }
-            memcpy(entry->hitObj[0].unk4 + 8, headDJ, 0x68);
+            memcpy(entry->hitObj[0].unk4 + 8, &headDJ, sizeof(CubeJoint));
             strcpy(entry->hitObj[0].name, "MOBJ_");
             strcat(entry->hitObj[0].name, entry->name);
             *(char**)(entry->hitObj[0].unk4 + 8) = entry->hitObj[0].name;
             entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].unk4 + 8), mtx);
-            *(MapObjectEntry**)((u8*)entry->hitObj[0].hitObject + 0xD0) = entry;
+            entry->hitObj[0].hitObject->mobj = entry;
             break;
         case 2:
             PSVECAdd(&entry->position, &entry->translation, &position);
@@ -499,18 +491,18 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
                 MTXConcat(trans, xrot, trans);
                 MTXConcat(trans, scale, mtx);
             }
-            memcpy(entry->hitObj[0].unk4 + 8, frontDJ, 0x68);
+            memcpy(entry->hitObj[0].unk4 + 8, &frontDJ, sizeof(CubeJoint));
             strcpy(entry->hitObj[0].name, "MOBJ_");
             strcat(entry->hitObj[0].name, entry->name);
             *(char**)(entry->hitObj[0].unk4 + 8) = entry->hitObj[0].name;
             entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].unk4 + 8), mtx);
-            *(MapObjectEntry**)((u8*)entry->hitObj[0].hitObject + 0xD0) = entry;
-            memcpy(entry->hitObj[1].unk4 + 8, front2DJ, 0x68);
+            entry->hitObj[0].hitObject->mobj = entry;
+            memcpy(entry->hitObj[1].unk4 + 8, &front2DJ, sizeof(CubeJoint));
             strcpy(entry->hitObj[1].name, "MOBJ~");
             strcat(entry->hitObj[1].name, entry->name);
             *(char**)(entry->hitObj[1].unk4 + 8) = entry->hitObj[1].name;
             entry->hitObj[1].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[1].unk4 + 8), mtx);
-            *(MapObjectEntry**)((u8*)entry->hitObj[1].hitObject + 0xD0) = entry;
+            entry->hitObj[1].hitObject->mobj = entry;
             break;
     }
 }
@@ -649,9 +641,9 @@ void mobjMain(void) {
     }
 
     if (gp->inBattle == 0) {
-        if (((HitEntry*)mario->field_0x1FC) != NULL) {
-            if (WH(0) == NULL || strcmp(hitGetName(WH(0)), hitGetName(((HitEntry*)mario->field_0x1FC))) != 0) {
-                WH(0) = ((HitEntry*)mario->field_0x1FC);
+        if (((HitEntry*)mario->hitobjHammer) != NULL) {
+            if (WH(0) == NULL || strcmp(hitGetName(WH(0)), hitGetName(((HitEntry*)mario->hitobjHammer))) != 0) {
+                WH(0) = ((HitEntry*)mario->hitobjHammer);
             }
         } else {
             WH(0) = NULL;
@@ -677,9 +669,9 @@ void mobjMain(void) {
         } else {
             WH(3) = NULL;
         }
-        if (party != NULL && MB(party, 0x130, HitEntry*) != NULL) {
-            if (WH(4) == NULL || strcmp(hitGetName(WH(4)), hitGetName(MB(party, 0x130, HitEntry*))) != 0) {
-                WH(4) = MB(party, 0x130, HitEntry*);
+        if (party != NULL && party->hitobjAction != NULL) {
+            if (WH(4) == NULL || strcmp(hitGetName(WH(4)), hitGetName(party->hitobjAction)) != 0) {
+                WH(4) = party->hitobjAction;
             }
         } else {
             WH(4) = NULL;
@@ -728,9 +720,9 @@ void mobjMain(void) {
         if (!(entry->flags & 8)) {
             hit = 0;
             hitPtr = entry->hitObj[0].hitObject;
-            if ((s32)MB(mario, 0x3c, u8) != 2) {
-                if ((entry->flags & 0x10000) && mario->field_0x1FC == hitPtr) {
-                    if (MB(marioGetPtr(), 0x90, f32) <= 5.0f + entry->position.y) {
+            if ((s32)(u8)mario->characterId != 2) {
+                if ((entry->flags & 0x10000) && mario->hitobjHammer == hitPtr) {
+                    if (marioGetPtr()->position.y <= 5.0f + entry->position.y) {
                         entry->hitFlag = 0x10000;
                         hit = 1;
                         goto hitDone;
@@ -758,13 +750,13 @@ void mobjMain(void) {
                     goto hitDone;
                 }
                 if ((entry->flags & 0x800000) && party != NULL) {
-                    if (MB(party, 0x130, HitEntry*) == hitPtr) {
+                    if (party->hitobjAction == hitPtr) {
                         entry->hitFlag = 0x800000;
                         hit = 1;
                         goto hitDone;
-                    } else if (MB(party, 0x130, HitEntry*) != NULL && (s32)MB(party, 0x31, u8) == 3) {
+                    } else if (party->hitobjAction != NULL && (s32)MB(party, 0x31, u8) == 3) {
                         if (PSVECDistance(&party->position, &entry->position) <
-                            MB(entry->hitObj[0].hitObject, 0xcc, f32) + party->width) {
+                            entry->hitObj[0].hitObject->radius + party->width) {
                             entry->hitFlag = 0x800000;
                             hit = 1;
                             goto hitDone;
@@ -772,13 +764,13 @@ void mobjMain(void) {
                     }
                 }
                 if ((entry->flags & 0x2000000) && party != NULL && (s32)MB(party, 0x31, u8) == 3) {
-                    if (MB(party, 0x130, HitEntry*) == hitPtr) {
+                    if (party->hitobjAction == hitPtr) {
                         entry->hitFlag = 0x2000000;
                         hit = 1;
                         goto hitDone;
-                    } else if (MB(party, 0x130, HitEntry*) != NULL) {
+                    } else if (party->hitobjAction != NULL) {
                         if (PSVECDistance(&party->position, &entry->position) <
-                            MB(entry->hitObj[0].hitObject, 0xcc, f32) + party->width) {
+                            entry->hitObj[0].hitObject->radius + party->width) {
                             entry->hitFlag = 0x800000;
                             hit = 1;
                             goto hitDone;
@@ -836,7 +828,7 @@ void mobjMain(void) {
             entry->flags &= ~8;
         }
         {
-            u16 motion = MB(marioGetPtr(), 0x2e, u16);
+            MarioMotion motion = marioGetPtr()->currMotionId;
             if (motion == 0x1f || motion == 0x20) {
                 entry->flags &= ~8;
             }
@@ -855,8 +847,8 @@ void mobjMain(void) {
             s32 shadowId;
             mapGetBlend(&blend1);
             mapGetBlend2(&blend2);
-            if ((MB(mw, 4, u16) & 2) && !(animPoseGetMaterialFlag(entry->poseId) & 0x800) && blend1.a != 0xff) {
-            } else if ((MB(mw, 4, u16) & 4) && !(animPoseGetMaterialFlag(entry->poseId) & 0x1000) &&
+            if ((mw->entries[0].flags & 2) && !(animPoseGetMaterialFlag(entry->poseId) & 0x800) && blend1.a != 0xff) {
+            } else if ((mw->entries[0].flags & 4) && !(animPoseGetMaterialFlag(entry->poseId) & 0x1000) &&
                        blend2.a != 0xff) {
             } else {
                 shadowId = shadowEntry(entry->position.x, entry->position.y, entry->position.z,
@@ -873,8 +865,8 @@ void mobjMain(void) {
             continue;
         }
         if (!(entry->flags & 0x80)) {
-            PSMTXMultVec((void*)((u8*)camGetPtr(CAMERA_3D) + 0x11c), &entry->position, &camPos);
-            PSMTX44MultVec((void*)((u8*)camGetPtr(CAMERA_3D) + 0x15c), &camPos, &camPos);
+            PSMTXMultVec(camGetPtr(CAMERA_3D)->view, &entry->position, &camPos);
+            PSMTX44MultVec(camGetPtr(CAMERA_3D)->projection, &camPos, &camPos);
             if (__fabs(camPos.x) > 1.5 || __fabs(camPos.y) > 1.5 || __fabs(camPos.z) > 1.0) {
                 continue;
             }

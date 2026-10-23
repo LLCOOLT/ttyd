@@ -26,7 +26,7 @@ typedef struct LstRcDisp {
     s32 count;
 } LstRcDisp;
 
-#define LR_WORK(ac) ((LstRcWork*)((u8*)(ac) + 0x2BC))
+#define LR_WORK(ac) ((LstRcWork*)(ac)->work)
 
 s32 ac_lstrckeep_ok_frame[] = {0x50, 0x46, 0x3C, 0x28, 0x14, 0x0A, 0x05};
 const char* ac_lstrckeep_iconname[] = {"_AcSkl1", "_AcSkl2", "_AcSkl3", "_AcSkl4"};
@@ -36,7 +36,7 @@ static void actionCommandDisp(f32 x, f32 y, s32 n);
 s32 battleAcMain_LstRcKeep(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     LstRcWork* lw = LR_WORK(ac);
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
     const char** p;
     s32 loop;
     s32 off;
@@ -58,7 +58,7 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                 memset(disp, 0, sizeof(BattleACDispParams));
                 disp->iconX = -300.0f;
                 disp->iconY = 0.0f;
-                *(s32*)&disp->field_0x1C[4] = 20;
+                disp->unk20 = 20;
                 ac->mAcState = 99;
                 break;
             case 99:
@@ -104,9 +104,9 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                         lw->held1 = 0;
                     }
                 }
-                if ((lw->held0 != 0 && lw->held1 != 0) || *(s16*)((u8*)ac + 0x88) > 0 || autoCmd) {
+                if ((lw->held0 != 0 && lw->held1 != 0) || ac->countdown > 0 || autoCmd) {
                     ac->mAcState = 1001;
-                    lw->timer = *(s32*)((u8*)ac + 0x38);
+                    lw->timer = ac->params[0];
                     lw->held1 = (lw->held0 = (lw->count = 0));
                     break;
                 }
@@ -118,8 +118,8 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                 }
                 break;
             case 1001:
-                if (*(s16*)((u8*)ac + 0x88) > 0) {
-                    (*(s16*)((u8*)ac + 0x88))--;
+                if (ac->countdown > 0) {
+                    ac->countdown--;
                     ac->result = 2;
                     loop = 1;
                     ac->mAcState = 1003;
@@ -160,7 +160,7 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                 }
                 ok = 0;
                 if (lw->count == 4) {
-                    d = *(s32*)((u8*)ac + 0x48) - tm;
+                    d = ac->params[4] - tm;
                     if (d <= ac_lstrckeep_ok_frame[((s32(*)(BattleWork*))BattleActionCommandGetDifficulty)(work)]) {
                         ok = 1;
                     }
@@ -220,8 +220,8 @@ s32 battleAcResult_LstRcKeep(BattleWork* work) {
 void battleAcDisp_LstRcKeep(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
     BattleActions* ac = &work->actionCommands;
-    LstRcDisp* disp = (LstRcDisp*)((u8*)ac + 0x290);
-    LstRcWork* lw = (LstRcWork*)((u8*)ac + 0x2BC);
+    LstRcDisp* disp = (LstRcDisp*)&ac->disp;
+    LstRcWork* lw = (LstRcWork*)ac->work;
     switch (ac->mAcState) {
         case 99:
         case 100:

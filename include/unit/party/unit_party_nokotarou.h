@@ -4,7 +4,7 @@
 #include "battle/battle_database_common.h"
 #include "battle/battle_unit.h"
 
-extern s32 partyWeapon_NokotarouFirstAttack[];
+extern BattleWeapon partyWeapon_NokotarouFirstAttack;
 extern BattleWeapon partyWeapon_NokotarouKouraAttack;
 extern BattleWeapon partyWeapon_NokotarouKouraGuard;
 extern BattleWeapon partyWeapon_NokotarouSyubibinKoura;

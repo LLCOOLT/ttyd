@@ -16,6 +16,7 @@
 #include "evt/evt_telop.h"
 #include "party/party_motion.h"
 #include "hom.h"
+#include "mario/mario_pouch.h"
 
 double sin(double x);
 static smartEntry* ind_lp;
@@ -85,24 +86,24 @@ static USER_FUNC(test_glare);
 USER_FUNC(tokei);
 static void sun_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") u64 fd_hom_00_negone_one_374;
-__declspec(section ".data") s32 fd_hom_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_hom_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_hom_00___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_hom_00_one_negone_373;
-__declspec(section ".data") s32 fd_hom_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_hom_00_one_381[1];
-__declspec(section ".data") u64 fd_hom_00_negone_one_360;
-__declspec(section ".data") s32 fd_hom_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_hom_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_hom_00___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_hom_00_one_negone_359;
-__declspec(section ".data") s32 fd_hom_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_hom_00_one_364[1];
+__declspec(section ".data") f32 fd_hom_00_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hom_00_neg_one_382;
+__declspec(section ".data") f32 fd_hom_00___local_PI_383;
+__declspec(section ".data") f32 fd_hom_00___local_3PIO2_385;
+__declspec(section ".data") f32 fd_hom_00_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hom_00___local_PIO2_384;
+__declspec(section ".data") f32 fd_hom_00_one_381;
+__declspec(section ".data") f32 fd_hom_00_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hom_00_neg_one_365;
+__declspec(section ".data") f32 fd_hom_00___local_PI_366;
+__declspec(section ".data") f32 fd_hom_00___local_3PIO2_368;
+__declspec(section ".data") f32 fd_hom_00_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hom_00___local_PIO2_367;
+__declspec(section ".data") f32 fd_hom_00_one_364;
 static s32 n_2_door_open[22];
 static s32 n_2_door_close[22];
-static s32 bero_data[45];
-s32 bero_data_nidome[30];
+static BeroEntry bero_data[3];
+BeroEntry bero_data_nidome[2];
 s32 evt_carry_up_bridge[92];
 s32 init_powan_toron_konari_papa_gurume[23];
 static __declspec(section ".data") s32 talk_powan[8];
@@ -114,7 +115,7 @@ __declspec(section ".data") s32 init_ekiin1[2];
 s32 talk_ekiin1[32];
 s32 init_ekiin2[13];
 s32 talk_ekiin2[28];
-static s32 npc_data[207];
+static NpcSetupInfo npc_data[9];
 s32 evt_bridge_down[144];
 static __declspec(section ".data") s32 key_tbl[2];
 static s32 evt_chk[23];
@@ -130,53 +131,33 @@ s32 hom_00_init_evt[259];
 s32 hom_00_init_evt[247];
 #endif
 
-__declspec(section ".data") u64 fd_hom_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hom_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hom_00_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_hom_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_hom_00___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_hom_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_hom_00___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_hom_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_hom_00_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_hom_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_hom_00___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_hom_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_hom_00_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_hom_00_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_hom_00_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hom_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hom_00_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_hom_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_hom_00___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_hom_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_hom_00___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_hom_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_hom_00_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_hom_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_hom_00___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_hom_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_hom_00_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_hom_00_one_364 = 1.0f;
 
 static EVT_BEGIN(n_2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -194,20 +175,66 @@ static EVT_BEGIN(n_2_door_close)
     RETURN
 EVT_END()
 
-static s32 bero_data[] = {
-    (s32)"n_bero_1", 65544, 20000, 100000, 0, 0, 45, 0,
-    -1, (s32)evt_train_door, (s32)"rsh_01_b", (s32)"s_bero", 65537, (s32)"n_1_door_close", (s32)"n_1_door_open", (s32)"n_bero_2",
-    65542, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"eki_00", (s32)"s_bero", 327685, (s32)n_2_door_close, (s32)n_2_door_open, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_data[] = {
+    {
+        "n_bero_1", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        45, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)evt_train_door, // exitEvent
+        (s32)"rsh_01_b", // nextMapName
+        "s_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"n_1_door_close", // enterAnimeArg
+        (s32)"n_1_door_open", // exitAnimeArg
+    },
+    {
+        "n_bero_2", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"eki_00", // nextMapName
+        "s_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n_2_door_close, // enterAnimeArg
+        (s32)n_2_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
-s32 bero_data_nidome[] = {
-    (s32)"n_bero_1", 65544, 20000, 100000, 0, 0, 45, 0,
-    -1, (s32)evt_train_nidome, (s32)"rsh_01_b", (s32)"s_bero", 65537, (s32)"n_1_door_close", (s32)"n_1_door_open", 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+BeroEntry bero_data_nidome[] = {
+    {
+        "n_bero_1", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        45, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)evt_train_nidome, // exitEvent
+        (s32)"rsh_01_b", // nextMapName
+        "s_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"n_1_door_close", // enterAnimeArg
+        (s32)"n_1_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_carry_up_bridge)
@@ -312,33 +339,101 @@ EVT_BEGIN(talk_ekiin2)
     RETURN
 EVT_END()
 
-static s32 npc_data[] = {
-    (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 1073743360, 0, (s32)init_powan_toron_konari_papa_gurume, 0, (s32)talk_powan, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93",
-    1073743360, 0, (s32)init_powan_toron_konari_papa_gurume, 0, (s32)talk_toron, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"グルメキノピオ"*/"\x83\x4F\x83\x8B\x83\x81\x83\x4C\x83\x6D\x83\x73\x83\x49", 1073743360,
-    0, (s32)init_powan_toron_konari_papa_gurume, 0, (s32)talk_gurume, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70", 1073743360, 0,
-    (s32)init_powan_toron_konari_papa_gurume, 0, (s32)talk_papa, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"コナリキン"*/"\x83\x52\x83\x69\x83\x8A\x83\x4C\x83\x93", 1073743360, 0, (s32)init_powan_toron_konari_papa_gurume,
-    0, (s32)talk_konari, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"駅員1"*/"\x89\x77\x88\xF5\x31", 1073743360, 0, (s32)init_ekiin1, 0,
-    (s32)talk_ekiin1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"駅員2"*/"\x89\x77\x88\xF5\x32", 1073743360, 0, (s32)init_ekiin2, 0, (s32)talk_ekiin2,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", 1073743360, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npc_data[] = {
+    {
+        /*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_powan_toron_konari_papa_gurume, // initEvent
+        NULL, // regularEvent
+        talk_powan, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"トロン"*/"\x83\x67\x83\x8D\x83\x93", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_powan_toron_konari_papa_gurume, // initEvent
+        NULL, // regularEvent
+        talk_toron, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"グルメキノピオ"*/"\x83\x4F\x83\x8B\x83\x81\x83\x4C\x83\x6D\x83\x73\x83\x49", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_powan_toron_konari_papa_gurume, // initEvent
+        NULL, // regularEvent
+        talk_gurume, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_powan_toron_konari_papa_gurume, // initEvent
+        NULL, // regularEvent
+        talk_papa, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"コナリキン"*/"\x83\x52\x83\x69\x83\x8A\x83\x4C\x83\x93", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_powan_toron_konari_papa_gurume, // initEvent
+        NULL, // regularEvent
+        talk_konari, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"駅員1"*/"\x89\x77\x88\xF5\x31", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_ekiin1, // initEvent
+        NULL, // regularEvent
+        talk_ekiin1, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"駅員2"*/"\x89\x77\x88\xF5\x32", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_ekiin2, // initEvent
+        NULL, // regularEvent
+        talk_ekiin2, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_bridge_down)
@@ -380,7 +475,7 @@ EVT_BEGIN(evt_bridge_down)
 EVT_END()
 
 static __declspec(section ".data") s32 key_tbl[] = {
-    24, -1,
+    ITEM_STEEPLE_KEY_0x18, -1,
 };
 
 static EVT_BEGIN(evt_chk)
@@ -564,66 +659,120 @@ EVT_BEGIN(evt_train_nidome)
     RETURN
 EVT_END()
 
-s32 evt_hom_touchaku[] = {
-    196699, (s32)evt_snd_bgm_scope, 0, 1, 131163, (s32)evt_mario_cont_onoff, 0, 196699,
-    (s32)evt_party_cont_onoff, 0, 0, 262235, (s32)evt_mario_set_pos, 0, -1000, 0,
-    327771, (s32)evt_party_set_pos, 0, 0, -1000, 0, 589915, (s32)evt_cam3d_evt_set,
-    275, 260, 1400, 275, 210, 0, 0, 11,
-    327771, (s32)evt_npc_set_position, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 0, -1000, 0, 327771, (s32)evt_npc_set_position,
-    (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", 0, -1000, 0, 327771, (s32)evt_npc_set_position, (s32)/*"グルメキノピオ"*/"\x83\x4F\x83\x8B\x83\x81\x83\x4C\x83\x6D\x83\x73\x83\x49", 0,
-    -1000, 0, 327771, (s32)evt_npc_set_position, (s32)/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70", 0, -1000, 0,
-    327771, (s32)evt_npc_set_position, (s32)/*"コナリキン"*/"\x83\x52\x83\x69\x83\x8A\x83\x4C\x83\x93", 0, -1000, 0, 196699, (s32)evt_npc_set_ry,
-    (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", 90, 196699, (s32)evt_npc_set_ry, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 90, 327771, (s32)evt_npc_set_position,
-    (s32)/*"駅員2"*/"\x89\x77\x88\xF5\x32", -750, 80, 100, 131163, (s32)evt_seq_wait, 2, 107,
-    65546, 3000, 131163, (s32)evt_telop_entry, 11, 109, 65630, (s32)hom_10_evt_resha_stop,
-    65546, 2500, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"train_4", 1,
-    589915, (s32)evt_cam3d_evt_set, 458, 97, 366, 78, 110, 189,
-    3000, 11, 65541, 0, 131096, -50000000, 0, 7,
-    33, 65545, 1, 6, 65546, 1000, 327771, (s32)evt_mapobj_flag_onoff,
-    1, 1, (s32)"train_4", 1, 589915, (s32)evt_cam3d_evt_set, -810, 232,
-    628, -810, 137, 87, 0, 11, 65546, 2000,
-    262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 32768, 262235, (s32)evt_npc_flag_onoff, 1,
-    (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", 32768, 327771, (s32)evt_npc_set_position, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", -815, 80, 15,
-    327771, (s32)evt_npc_set_position, (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", -800, 80, 20, 196699, (s32)evt_set_dir_to_target,
-    (s32)/*"駅員2"*/"\x89\x77\x88\xF5\x32", (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 131122, -29999999, 0, 65628, (s32)bero_open_door_play_se, 327771,
-    (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_DOOR_OPEN_SLIDE1_3",
-    -30000000, -29999999, -29999998, 0, 327771, (s32)evt_sub_intpl_msec_init, 11, 0,
-    -40, 500, 65539, 0, 65627, (s32)evt_sub_intpl_msec_get_value, 393307, (s32)evt_mapobj_trans,
-    1, (s32)"tobira", -30000000, 0, 0, 65545, 1, 131096,
-    -29999999, 1, 65540, 0, 33, 262235, (s32)evt_npc_flag_onoff, 0,
-    (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 32768, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", 32768, 262235,
-    (s32)evt_npc_status_onoff, 1, (s32)/*"駅員2"*/"\x89\x77\x88\xF5\x32", 2, 458843, (s32)evt_npc_move_position, (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", -800,
-    100, 0, -229938560, 1, 107, 458843, (s32)evt_npc_move_position, (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93",
-    -780, 100, 0, -229938560, 1, 109, 458843, (s32)evt_npc_move_position,
-    (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", -815, 100, 0, -229938560, 1, 196699, (s32)evt_set_dir_to_target,
-    (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", 131122, -29999999, 0, 65628, (s32)bero_close_door_play_se, 327771,
-    (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_DOOR_SHUT_SLIDE1_3",
-    -30000000, -29999999, -29999998, 0, 327771, (s32)evt_sub_intpl_msec_init, 11, -40,
-    0, 500, 65539, 1, 65627, (s32)evt_sub_intpl_msec_get_value, 393307, (s32)evt_mapobj_trans,
-    1, (s32)"tobira", -30000000, 0, 0, 65545, 1, 131096,
-    -29999999, 1, 65540, 1, 33, 65541, 3, 131163,
-    (s32)evt_npc_reverse_ry, (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", 65546, 500, 6, 327771, (s32)evt_msg_print, 0,
-    (s32)"stg6_hom_01_01", 0, (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", 196699, (s32)evt_npc_set_anim, (s32)/*"駅員2"*/"\x89\x77\x88\xF5\x32", (s32)"G_1", 196699,
-    (s32)evt_npc_set_anim, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", (s32)"O_1", 327771, (s32)evt_npc_get_position, (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", -30000000, -29999999,
-    -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG6_LANPEL_CHANGE1", -30000000, -29999999, -29999998, 0,
-    107, 65546, 200, 327771, (s32)evt_npc_set_position, (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", 0, -1000,
-    0, 327771, (s32)evt_npc_set_position, (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", -30000000, -29999999, -29999998, 109,
-    131125, -29999998, 20, 65541, 3, 983131, (s32)evt_eff, 0,
-    (s32)"kemuri_test", 7, -30000000, -29999999, -29999998, -229998464, 0, 0,
-    0, 0, 0, 0, 0, 65546, 200, 6,
-    65546, 300, 589915, (s32)evt_cam3d_evt_set, -780, 194, 481, -780,
-    125, 87, 500, 11, 65546, 500, 327771, (s32)evt_msg_print,
-    0, (s32)"stg6_hom_01_02", 0, (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", 65546, 300, 589915, (s32)evt_cam3d_evt_set,
-    -780, 259, 776, -780, 137, 87, 500, 11,
-    458843, (s32)evt_npc_sound_data_set, (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", -250000000, -250000000, -250000000, (s32)"SFX_STG6_LANPEL_JUMP1", -250000000,
-    262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", 32, 262235, (s32)evt_npc_status_onoff, 1,
-    (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", 2, 196699, (s32)evt_npc_set_ry, (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", 90, 65541, 0,
-    327771, (s32)evt_npc_get_position, (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", -30000000, -29999999, -29999998, 131125, -30000000,
-    60, 458843, (s32)evt_npc_jump_position_nohit, (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", -30000000, -29999999, -29999998, 400,
-    40, 131099, -30000000, -500, 7, 33, 6, 196699,
-    (s32)evt_snd_bgm_scope, 0, 0, 131122, -170000000, 310, 196699, (s32)evt_bero_mapchange,
-    (s32)"rsh_02_b", (s32)"hom_touchaku", 2, 1,
-};
+EVT_BEGIN(evt_hom_touchaku)
+    CALL(evt_snd_bgm_scope, 0, 1)
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(evt_party_cont_onoff, 0, 0)
+    CALL(evt_mario_set_pos, 0, -1000, 0)
+    CALL(evt_party_set_pos, 0, 0, -1000, 0)
+    CALL(evt_cam3d_evt_set, 275, 260, 1400, 275, 210, 0, 0, 11)
+    CALL(evt_npc_set_position, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(/*"グルメキノピオ"*/"\x83\x4F\x83\x8B\x83\x81\x83\x4C\x83\x6D\x83\x73\x83\x49"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(/*"コナリキン"*/"\x83\x52\x83\x69\x83\x8A\x83\x4C\x83\x93"), 0, -1000, 0)
+    CALL(evt_npc_set_ry, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), 90)
+    CALL(evt_npc_set_ry, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), 90)
+    CALL(evt_npc_set_position, STRING(/*"駅員2"*/"\x89\x77\x88\xF5\x32"), -750, 80, 100)
+    CALL(evt_seq_wait, 2)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(3000)
+        CALL(evt_telop_entry, 11)
+    END_INLINE_EVENT
+    CALL_CHILD(hom_10_evt_resha_stop)
+    WAIT_MS(2500)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("train_4"), 1)
+    CALL(evt_cam3d_evt_set, 458, 97, 366, 78, 110, 189, 3000, 11)
+    LOOP(0)
+        IF_INT_EQUAL(GW(0), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_MS(1000)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_4"), 1)
+    CALL(evt_cam3d_evt_set, -810, 232, 628, -810, 137, 87, 0, 11)
+    WAIT_MS(2000)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), 32768)
+    CALL(evt_npc_set_position, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), -815, 80, 15)
+    CALL(evt_npc_set_position, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), -800, 80, 20)
+    CALL(evt_set_dir_to_target, STRING(/*"駅員2"*/"\x89\x77\x88\xF5\x32"), STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"))
+    SET_VALUE(LW(1), 0)
+    SPAWN_EVENT(bero_open_door_play_se)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_SLIDE1_3"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_sub_intpl_msec_init, 11, 0, -40, 500)
+    LABEL(0)
+    CALL(evt_sub_intpl_msec_get_value)
+    CALL(evt_mapobj_trans, 1, STRING("tobira"), LW(0), 0, 0)
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(0)
+    END_IF
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), 32768)
+    CALL(evt_npc_status_onoff, 1, STRING(/*"駅員2"*/"\x89\x77\x88\xF5\x32"), 2)
+    CALL(evt_npc_move_position, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), -800, 100, 0, FLOAT(60.0f), 1)
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_move_position, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), -780, 100, 0, FLOAT(60.0f), 1)
+    END_INLINE_EVENT
+    CALL(evt_npc_move_position, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), -815, 100, 0, FLOAT(60.0f), 1)
+    CALL(evt_set_dir_to_target, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"))
+    SET_VALUE(LW(1), 0)
+    SPAWN_EVENT(bero_close_door_play_se)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_SLIDE1_3"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_sub_intpl_msec_init, 11, -40, 0, 500)
+    LABEL(1)
+    CALL(evt_sub_intpl_msec_get_value)
+    CALL(evt_mapobj_trans, 1, STRING("tobira"), LW(0), 0, 0)
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(1)
+    END_IF
+    LOOP(3)
+        CALL(evt_npc_reverse_ry, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"))
+        WAIT_MS(500)
+    END_LOOP
+    CALL(evt_msg_print, 0, STRING("stg6_hom_01_01"), 0, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"))
+    CALL(evt_npc_set_anim, STRING(/*"駅員2"*/"\x89\x77\x88\xF5\x32"), STRING("G_1"))
+    CALL(evt_npc_set_anim, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), STRING("O_1"))
+    CALL(evt_npc_get_position, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_LANPEL_CHANGE1"), LW(0), LW(1), LW(2), 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(200)
+        CALL(evt_npc_set_position, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), 0, -1000, 0)
+        CALL(evt_npc_set_position, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), LW(0), LW(1), LW(2))
+    END_INLINE_EVENT
+    ADD(LW(2), 20)
+    LOOP(3)
+        CALL(evt_eff, 0, STRING("kemuri_test"), 7, LW(0), LW(1), LW(2), FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
+        WAIT_MS(200)
+    END_LOOP
+    WAIT_MS(300)
+    CALL(evt_cam3d_evt_set, -780, 194, 481, -780, 125, 87, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg6_hom_01_02"), 0, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"))
+    WAIT_MS(300)
+    CALL(evt_cam3d_evt_set, -780, 259, 776, -780, 137, 87, 500, 11)
+    CALL(evt_npc_sound_data_set, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), -250000000, -250000000, -250000000, STRING("SFX_STG6_LANPEL_JUMP1"), -250000000)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), 32)
+    CALL(evt_npc_status_onoff, 1, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), 2)
+    CALL(evt_npc_set_ry, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), 90)
+    LOOP(0)
+        CALL(evt_npc_get_position, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), LW(0), LW(1), LW(2))
+        ADD(LW(0), 60)
+        CALL(evt_npc_jump_position_nohit, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), LW(0), LW(1), LW(2), 400, 40)
+        IF_INT_GREATER(LW(0), -500)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_snd_bgm_scope, 0, 0)
+    SET_VALUE(GSW(0), 310)
+    CALL(evt_bero_mapchange, STRING("rsh_02_b"), STRING("hom_touchaku"))
+    RETURN
+EVT_END()
 
 EVT_BEGIN(evt_hom_touchaku_nidome)
     CALL(evt_mario_cont_onoff, 0)

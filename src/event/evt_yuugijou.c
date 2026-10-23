@@ -31,38 +31,37 @@ s32 gap_08_80418B5C_sbss;
 PiantaParlorWork* yuwp;
 s32 yuu_window_evt;
 
-s32 minigame_end[] = {
-	0x00020032, 0xFD050F80, 0x00000002,
-	0x00020032, 0xF840604D, 0x00000001,
-	0x0005005B, (s32)evt_mario_set_prev_party_pos, 0x00000000, 0x00000000, 0xFFFFFC18, 0x00000000,
-	0x0005005B, (s32)evt_mario_set_prev_party_pos, 0x00000001, 0x00000000, 0xFFFFFC18, 0x00000000,
-	0x0002005B, (s32)evt_mario_set_enable_key, 0x00000000,
-	0x0003005B, (s32)evt_bero_mapchange, (s32)"gor_03", (s32)"A_dokan_02",
-	0x00000002, 0x00000001
-};
+EVT_BEGIN(minigame_end)
+    SET_VALUE(4244967296, 2)
+    SET_VALUE(4164968525, 1)
+    CALL(evt_mario_set_prev_party_pos, 0, 0, 4294966296, 0)
+    CALL(evt_mario_set_prev_party_pos, 1, 0, 4294966296, 0)
+    CALL(evt_mario_set_enable_key, 0)
+    CALL(evt_bero_mapchange, STRING("gor_03"), STRING("A_dokan_02"))
+    RETURN
+EVT_END()
 
-s32 window_open[] = {
-	0x0002005B, (s32)evt_mario_cont_onoff, 0x00000000,
-	0x0000006E,
-	0x0005005B, (s32)evt_mario_get_pos, 0x00000000, 0xFE363C81, 0xFE363C82, 0xFE363C83,
-	0x00010005, 0x00000000,
-	0x00010009, 0x00000001,
-	0x0004005B, (s32)evt_mario_set_pos, 0xFE363C81, 0xFE363C82, 0xFE363C83,
-	0x00000006,
-	0x00000070,
-	0x0002005B, (s32)yuuminigame_get_window_evt, 0xFE363C80,
-	0x0001005E, 0xFE363C80,
-	0x0005005B, (s32)evt_msg_print, 0x00000000, (s32)"sysyuu_all_01", 0x00000000, 0x00000000,
-	0x0003005B, (s32)evt_msg_select, 0x00000000, (s32)"sysyuu_all_02",
-	0x0001005B, (s32)evt_msg_continue,
-	0x00020018, 0xFE363C80, 0x00000000,
-	0x0001005B, (s32)yuuminigame_end,
-	0x00000021,
-	0x0001005B, (s32)yuuminigame_window_end,
-	0x0002005B, (s32)evt_mario_cont_onoff, 0x00000001,
-	0x00000002,
-	0x00000001
-};
+EVT_BEGIN(window_open)
+    CALL(evt_mario_cont_onoff, 0)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_mario_get_pos, 0, 4264967297, 4264967298, 4264967299)
+        LOOP(0)
+            WAIT_FRAMES(1)
+            CALL(evt_mario_set_pos, 4264967297, 4264967298, 4264967299)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(yuuminigame_get_window_evt, 4264967296)
+    CALL_CHILD(4264967296)
+    CALL(evt_msg_print, 0, STRING("sysyuu_all_01"), 0, 0)
+    CALL(evt_msg_select, 0, STRING("sysyuu_all_02"))
+    CALL(evt_msg_continue)
+    IF_INT_EQUAL(4264967296, 0)
+        CALL(yuuminigame_end)
+    END_IF
+    CALL(yuuminigame_window_end)
+    CALL(evt_mario_cont_onoff, 1)
+    RETURN
+EVT_END()
 
 static inline s32 MAX0(s32 x) {
 	return x >= 0 ? x : 0;

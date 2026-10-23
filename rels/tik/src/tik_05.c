@@ -23,6 +23,7 @@
 #include "mario/mario.h"
 #include "evt/evt_bero.h"
 #include "libc_decls.h"
+#include "evt/evt_npc.h"
 
 double sin(double);
 double cos(double);
@@ -184,28 +185,28 @@ void tiz_broken_draw(CameraId cameraId, void* param);
 static void alpha_tev(MapTevCallbackInfo* info);
 USER_FUNC(starstone_set_scale);
 
-__declspec(section ".data") u64 negone_one$374;
-__declspec(section ".data") s32 neg_one$382[1];
-__declspec(section ".data") s32 __local_PI$383[1];
-__declspec(section ".data") s32 __local_3PIO2$385[1];
+__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 neg_one$382;
+__declspec(section ".data") f32 __local_PI$383;
+__declspec(section ".data") f32 __local_3PIO2$385;
 __declspec(section ".data") u32 gap_04_0000B154_data[1];
-__declspec(section ".data") u64 one_negone$373;
-__declspec(section ".data") s32 __local_PIO2$384[1];
-__declspec(section ".data") s32 one$381[1];
-__declspec(section ".data") u64 negone_one$360;
-__declspec(section ".data") s32 neg_one$365[1];
-__declspec(section ".data") s32 __local_PI$366[1];
-__declspec(section ".data") s32 __local_3PIO2$368[1];
+__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 __local_PIO2$384;
+__declspec(section ".data") f32 one$381;
+__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 neg_one$365;
+__declspec(section ".data") f32 __local_PI$366;
+__declspec(section ".data") f32 __local_3PIO2$368;
 __declspec(section ".data") u32 gap_04_0000B17C_data[1];
-__declspec(section ".data") u64 one_negone$359;
-__declspec(section ".data") s32 __local_PIO2$367[1];
-__declspec(section ".data") s32 one$364[1];
+__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 __local_PIO2$367;
+__declspec(section ".data") f32 one$364;
 static s32 n_door_close[22];
 static s32 n_door_open[22];
-static s32 bero_entry_data[60];
+static BeroEntry bero_entry_data[4];
 static s32 kurihakase_init[27];
 static s32 kurihakase_talk[23];
-static s32 npcEnt[46];
+static NpcSetupInfo npcEnt[2];
 s32 mahojin_alpha[70];
 __declspec(section ".data") s32 mahojin_alpha_up[5];
 __declspec(section ".data") s32 mahojin_alpha_down[5];
@@ -224,7 +225,7 @@ s32 disp_treasure_map[21];
 __declspec(section ".data") BrokenWork* broken_wp;
 __declspec(section ".data") f32 param_tbl[5];
 __declspec(section ".data") f32 add_tbl[5];
-static __declspec(section ".data") s32 name_tbl[5];
+static __declspec(section ".data") const char* name_tbl[5];
 s32 evt_mapwrite[1351];
 s32 fake_fade[30];
 s32 evt_starstone_up[127];
@@ -243,57 +244,37 @@ s32 lastdungeon[103];
 s32 mahojin_event7[VERSION_PICK(2537, 2541)];
 s32 tik_05_init_evt[VERSION_PICK(289, 287)];
 
-__declspec(section ".data") u64 negone_one$374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 neg_one$382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 neg_one$382 = -1.0f;
 
-__declspec(section ".data") s32 __local_PI$383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 __local_PI$383 = 3.1415927f;
 
-__declspec(section ".data") s32 __local_3PIO2$385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 __local_3PIO2$385 = 4.712389f;
 
 __declspec(section ".data") u32 gap_04_0000B154_data[1] = {0};
 
-__declspec(section ".data") u64 one_negone$373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 __local_PIO2$384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 __local_PIO2$384 = 1.5707964f;
 
-__declspec(section ".data") s32 one$381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 one$381 = 1.0f;
 
-__declspec(section ".data") u64 negone_one$360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 neg_one$365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 neg_one$365 = -1.0f;
 
-__declspec(section ".data") s32 __local_PI$366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 __local_PI$366 = 3.1415927f;
 
-__declspec(section ".data") s32 __local_3PIO2$368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 __local_3PIO2$368 = 4.712389f;
 
 __declspec(section ".data") u32 gap_04_0000B17C_data[1] = {0};
 
-__declspec(section ".data") u64 one_negone$359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 __local_PIO2$367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 __local_PIO2$367 = 1.5707964f;
 
-__declspec(section ".data") s32 one$364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 one$364 = 1.0f;
 
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -311,15 +292,58 @@ static EVT_BEGIN(n_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"tik_06", (s32)"e_bero", 65537, 0, 0, (s32)"e_bero",
-    0, 20000, 100000, 0, 0, -1, (s32)look_large_door, -1,
-    0, (s32)"tik_04", (s32)"w_bero", 65537, 0, 0, (s32)"n_bero", 65536,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"las_00", (s32)"w_bero", 327685, (s32)n_door_close, (s32)n_door_open, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tik_06", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)look_large_door, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tik_04", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "n_bero", // hitName
+        1, // type
+        0, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_00", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n_door_close, // enterAnimeArg
+        (s32)n_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(kurihakase_init)
@@ -343,13 +367,20 @@ static EVT_BEGIN(kurihakase_talk)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"クリハカセ"*/"\x83\x4E\x83\x8A\x83\x6E\x83\x4A\x83\x5A", 1536, 0, (s32)kurihakase_init, 0, (s32)kurihakase_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"クリハカセ"*/"\x83\x4E\x83\x8A\x83\x6E\x83\x4A\x83\x5A", // name
+        0x600, // flags
+        0, // reactionFlags
+        kurihakase_init, // initEvent
+        NULL, // regularEvent
+        kurihakase_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 USER_FUNC(starstone_set_position) {
@@ -1191,8 +1222,12 @@ __declspec(section ".data") f32 add_tbl[] = {
     1.0f, 0.1f, 0.01f, 0.1f, 1.0f,
 };
 
-static __declspec(section ".data") s32 name_tbl[] = {
-    (s32)"delay", (s32)"v0", (s32)"vscale", (s32)"pow", (s32)"vr",
+static __declspec(section ".data") const char* name_tbl[] = {
+    "delay",
+    "v0",
+    "vscale",
+    "pow",
+    "vr",
 };
 
 static USER_FUNC(evtflash) {

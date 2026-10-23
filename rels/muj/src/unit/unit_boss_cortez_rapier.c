@@ -5,6 +5,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_sub.h"
 #include "party/party_motion.h"
+#include "battle/battle_database_common.h"
 
 #pragma force_active on
 
@@ -33,25 +34,25 @@ extern s32 cortez_weapon_dead_event[];
 extern s32 cortez_weapon_phase_event[];
 extern s32 cortez_weapon_unison_phase_event[];
 
-__declspec(section ".data") u64 fd_boss_cortez_rapier_negone_one_374;
-__declspec(section ".data") s32 fd_boss_cortez_rapier_neg_one_382[1];
-__declspec(section ".data") s32 fd_boss_cortez_rapier___local_PI_383[1];
-__declspec(section ".data") s32 fd_boss_cortez_rapier___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_boss_cortez_rapier_one_negone_373;
-__declspec(section ".data") s32 fd_boss_cortez_rapier___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_boss_cortez_rapier_one_381[1];
-__declspec(section ".data") u64 fd_boss_cortez_rapier_negone_one_360;
-__declspec(section ".data") s32 fd_boss_cortez_rapier_neg_one_365[1];
-__declspec(section ".data") s32 fd_boss_cortez_rapier___local_PI_366[1];
-__declspec(section ".data") s32 fd_boss_cortez_rapier___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_boss_cortez_rapier_one_negone_359;
-__declspec(section ".data") s32 fd_boss_cortez_rapier___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_boss_cortez_rapier_one_364[1];
+__declspec(section ".data") f32 fd_boss_cortez_rapier_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_cortez_rapier_neg_one_382;
+__declspec(section ".data") f32 fd_boss_cortez_rapier___local_PI_383;
+__declspec(section ".data") f32 fd_boss_cortez_rapier___local_3PIO2_385;
+__declspec(section ".data") f32 fd_boss_cortez_rapier_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_cortez_rapier___local_PIO2_384;
+__declspec(section ".data") f32 fd_boss_cortez_rapier_one_381;
+__declspec(section ".data") f32 fd_boss_cortez_rapier_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_cortez_rapier_neg_one_365;
+__declspec(section ".data") f32 fd_boss_cortez_rapier___local_PI_366;
+__declspec(section ".data") f32 fd_boss_cortez_rapier___local_3PIO2_368;
+__declspec(section ".data") f32 fd_boss_cortez_rapier_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_cortez_rapier___local_PIO2_367;
+__declspec(section ".data") f32 fd_boss_cortez_rapier_one_364;
 BattleUnitKind unit_boss_cortez_rapier;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
-s32 weapon_cortez_rapier_float_attack[48];
+BattleWeapon weapon_cortez_rapier_float_attack;
 static __declspec(section ".data") PoseTableEntry pose_table[6];
 static BattleDataEntry data_table[21];
 static BattleUnitKindPart parts[1];
@@ -63,53 +64,33 @@ static s32 attack_event[545];
 static __declspec(section ".data") s32 wait_event[10];
 static s32 cortez_damage_sub_event[25];
 
-__declspec(section ".data") u64 fd_boss_cortez_rapier_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_cortez_rapier_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_cortez_rapier_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_cortez_rapier_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_cortez_rapier___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_cortez_rapier___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_cortez_rapier___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_cortez_rapier___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_cortez_rapier_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_cortez_rapier_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_cortez_rapier___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_cortez_rapier___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_cortez_rapier_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_cortez_rapier_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_boss_cortez_rapier_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_cortez_rapier_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_cortez_rapier_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_cortez_rapier_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_cortez_rapier___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_cortez_rapier___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_cortez_rapier___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_cortez_rapier___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_cortez_rapier_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_cortez_rapier_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_cortez_rapier___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_cortez_rapier___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_cortez_rapier_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_cortez_rapier_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_cortez_rapier = {
     96,
@@ -183,13 +164,40 @@ static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 
 
 static __declspec(section ".data") StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 85, 0, 0, 100, 0, 100, 90, 50, 0, 90, 100, 50, 0, 0, 0};
 
-s32 weapon_cortez_rapier_float_attack[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 199, 2047, 4,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_cortez_rapier_float_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0xC7, // special
+    0x7FF, // counterResistFlags
+    4, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static __declspec(section ".data") PoseTableEntry pose_table[] = {
@@ -263,77 +271,169 @@ static __declspec(section ".data") EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
-static s32 attack_event[] = {
-    262235, (s32)btlevtcmd_GetUnitWork, -2, 1, -30000000, 131097, -30000000, 0,
-    131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 33, 131122, -29999988, (s32)weapon_cortez_rapier_float_attack,
-    196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000,
-    -29999988, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096, -29999997, -1,
-    65540, 99, 33, 131163, (s32)btlevtcmd_WeaponAftereffect, -29999988, 131163, (s32)btlevtcmd_AttackDeclareAll,
-    -2, 65627, (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999988, 196699,
-    (s32)btlevtcmd_AnimeWaitPlayLoopTiming, -2, 1, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"KRT_Z_1",
-    110, 327771, (s32)btlevtcmd_SetRotateOffset, -2, 0, 13, 0, 327771,
-    (s32)evt_sub_intpl_init, 0, 0, -2160, 60, 65541, 60, 65627,
-    (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_SetRotate, -2, -30000000, 0, 0, 65545,
-    1, 6, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0,
-    112, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 393307,
-    (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -250000000, -250000000, -29999998, 262235, (s32)btlevtcmd_TransStageFloorPosition,
-    -30000000, -29999999, -29999998, 131122, -29999999, 20, 655451, (s32)btlevtcmd_DivePosition,
-    -2, -30000000, -29999999, -29999998, 60, 0, 4, 0,
-    -1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KOR_SWORD_DANCE2\0\0", -250000000, 0, -29999991,
-    65647, -29999987, 131122, -29999995, 5, 65541, -29999995, 327771,
-    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 327771, (s32)evt_snd_sfx_pos, -29999991,
-    -30000000, -29999999, -29999998, 65545, 1, 131122, -29999995, 5,
-    6, 112, 65647, -29999986, 327771, (s32)btlevtcmd_SetRotateOffset, -2, 0,
-    13, 0, 131122, -30000000, 0, 131122, -29999995, 5,
-    65541, -29999995, 131098, -30000000, 118, 131125, -30000000, 1,
-    33, 131122, -29999999, -30000000, 131128, -29999999, 2, 327771,
-    (s32)btlevtcmd_AddRotate, -2, -29999999, 0, 0, 131122, -29999995, 5,
-    65545, 1, 6, 112, 65647, -29999985, 131122, -30000000,
-    0, 262235, (s32)btlevtcmd_GetStageSize, -29999995, -250000000, -250000000, 262235, (s32)btlevtcmd_FaceDirectionSub,
-    -29999997, -30000000, -29999995, 458843, (s32)btlevtcmd_GetMoveFrame, -2, -30000000, -29999999,
-    -29999998, -229992832, -29999986, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999,
-    -29999998, -29999986, 0, 1, 0, 0, 112, 131122,
-    -29999990, 0, 65539, 10, 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
-    -250000000, -250000000, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999999, -250000000,
-    -250000000, 262235, (s32)btlevtcmd_FaceDirectionAdd, -29999997, -29999999, 40, 458843, (s32)btlevtcmd_CalculateFaceDirection,
-    -2, -1, -29999997, -29999996, 16, -29999998, 131101, -29999998,
-    0, 131098, -30000000, -29999999, 65545, 1, 65540, 10,
-    33, 32, 131099, -30000000, -29999999, 65545, 1, 65540,
-    10, 33, 33, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996,
-    -29999988, 256, -29999995, 65570, -29999995, 65579, 4, 65540,
-    90, 46, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38,
-    65540, 90, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 39,
-    65540, 90, 65572, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 40,
-    65540, 90, 65572, 1, 65540, 91, 42, 65540,
-    97, 49, 65539, 90, 65540, 97, 65539, 91,
-    131096, -29999990, 0, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999988, 33,
-    458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999988, 256, -29999995,
-    131096, -29999995, 21, 65631, -29999987, 131163, (s32)evt_snd_sfxoff, -29999991,
-    65631, -29999986, 65631, -29999985, 327771, (s32)btlevtcmd_SetRotate, -2, 0,
-    0, 0, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 50, 131125, -29999999, 15,
-    110, 327771, (s32)evt_sub_intpl_init, 5, 0, -30, 20, 65627,
-    (s32)evt_sub_intpl_get_value, 65541, 21, 65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_SetRotate, -2,
-    -250000000, -250000000, -30000000, 65545, 1, 6, 112, 655451,
-    (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999, -29999998, 21, 0, 5,
-    0, -1, 110, 327771, (s32)evt_sub_intpl_init, 4, -30, 0,
-    20, 65627, (s32)evt_sub_intpl_get_value, 65541, 21, 65627, (s32)evt_sub_intpl_get_value, 327771,
-    (s32)btlevtcmd_SetRotate, -2, -250000000, -250000000, -30000000, 65545, 1, 6,
-    112, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 655451,
-    (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999, -29999998, 40, 0, 4,
-    0, -1, 2, 33, 65539, 97, 196699, (s32)btlevtcmd_GetSelectNextEnemy,
-    -29999997, -29999996, 131097, -29999997, -1, 131125, -29999990, 1,
-    65540, 10, 33, 131163, (s32)btlevtcmd_WaitEventEnd, -29999985, 65631, -29999986,
-    327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0, 327771, (s32)btlevtcmd_GetHomePos,
-    -2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_GetStageSize, -30000000, -250000000,
-    -250000000, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, -30000000, 327771, (s32)btlevtcmd_SetPos,
-    -2, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000,
-    -29999999, -29999998, 458843, (s32)btlevtcmd_GetMoveFrame, -2, -30000000, -29999999, -29999998,
-    -229993856, -29999986, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999, -29999998,
-    -29999986, 0, 5, 0, -1, 65631, -29999987, 131163,
-    (s32)evt_snd_sfxoff, -29999991, 65539, 99, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2,
-    1,
-};
+static EVT_BEGIN(attack_event)
+    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_StartWaitEvent, -2)
+        RETURN
+    END_IF
+    SET_VALUE(LW(12), PTR(&weapon_cortez_rapier_float_attack))
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(12))
+    CALL(btlevtcmd_AnimeWaitPlayLoopTiming, -2, 1)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_Z_1"))
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_SetRotateOffset, -2, 0, 13, 0)
+        CALL(evt_sub_intpl_init, 0, 0, -2160, 60)
+        LOOP(60)
+            CALL(evt_sub_intpl_get_value)
+            CALL(btlevtcmd_SetRotate, -2, LW(0), 0, 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), -250000000, -250000000, LW(2))
+    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    SET_VALUE(LW(1), 20)
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 60, 0, 4, 0, -1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KOR_SWORD_DANCE2\0\0"), -250000000, 0, LW(9))
+    BEGIN_SIBLING_EVENT_GET_ID(LW(13))
+        SET_VALUE(LW(5), 5)
+        LOOP(LW(5))
+            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            CALL(evt_snd_sfx_pos, LW(9), LW(0), LW(1), LW(2))
+            WAIT_FRAMES(1)
+            SET_VALUE(LW(5), 5)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT_GET_ID(LW(14))
+        CALL(btlevtcmd_SetRotateOffset, -2, 0, 13, 0)
+        SET_VALUE(LW(0), 0)
+        SET_VALUE(LW(5), 5)
+        LOOP(LW(5))
+            IF_INT_LESS(LW(0), 118)
+                ADD(LW(0), 1)
+            END_IF
+            SET_VALUE(LW(1), LW(0))
+            DIVIDE(LW(1), 2)
+            CALL(btlevtcmd_AddRotate, -2, LW(1), 0, 0)
+            SET_VALUE(LW(5), 5)
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT_GET_ID(LW(15))
+        SET_VALUE(LW(0), 0)
+        CALL(btlevtcmd_GetStageSize, LW(5), -250000000, -250000000)
+        CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), LW(5))
+        CALL(btlevtcmd_GetMoveFrame, -2, LW(0), LW(1), LW(2), FLOAT(7.0f), LW(14))
+        CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), LW(14), 0, 1, 0, 0)
+    END_SIBLING_EVENT
+    SET_VALUE(LW(10), 0)
+    LABEL(10)
+    CALL(btlevtcmd_GetPos, -2, LW(0), -250000000, -250000000)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(1), -250000000, -250000000)
+    CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(1), 40)
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(2))
+    IF_INT_GREATER_OR_EQUAL(LW(2), 0)
+        IF_INT_LESS(LW(0), LW(1))
+            WAIT_FRAMES(1)
+            GOTO(10)
+        END_IF
+    ELSE
+        IF_INT_GREATER(LW(0), LW(1))
+            WAIT_FRAMES(1)
+            GOTO(10)
+        END_IF
+    END_IF
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_DEFAULT
+        GOTO(97)
+    END_SWITCH
+    LABEL(90)
+    GOTO(97)
+    LABEL(91)
+    IF_INT_EQUAL(LW(10), 0)
+        CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
+    END_IF
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
+    IF_INT_EQUAL(LW(5), 21)
+        DELETE_EVENT(LW(13))
+        CALL(evt_snd_sfxoff, LW(9))
+        DELETE_EVENT(LW(14))
+        DELETE_EVENT(LW(15))
+        CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 50)
+        ADD(LW(1), 15)
+        BEGIN_SIBLING_EVENT
+            CALL(evt_sub_intpl_init, 5, 0, -30, 20)
+            CALL(evt_sub_intpl_get_value)
+            LOOP(21)
+                CALL(evt_sub_intpl_get_value)
+                CALL(btlevtcmd_SetRotate, -2, -250000000, -250000000, LW(0))
+                WAIT_FRAMES(1)
+            END_LOOP
+        END_SIBLING_EVENT
+        CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 21, 0, 5, 0, -1)
+        BEGIN_SIBLING_EVENT
+            CALL(evt_sub_intpl_init, 4, -30, 0, 20)
+            CALL(evt_sub_intpl_get_value)
+            LOOP(21)
+                CALL(evt_sub_intpl_get_value)
+                CALL(btlevtcmd_SetRotate, -2, -250000000, -250000000, LW(0))
+                WAIT_FRAMES(1)
+            END_LOOP
+        END_SIBLING_EVENT
+        CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 40, 0, 4, 0, -1)
+        RETURN
+    END_IF
+    LABEL(97)
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    IF_INT_NOT_EQUAL(LW(3), -1)
+        ADD(LW(10), 1)
+        GOTO(10)
+    END_IF
+    CALL(btlevtcmd_WaitEventEnd, LW(15))
+    DELETE_EVENT(LW(14))
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStageSize, LW(0), -250000000, -250000000)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), LW(0))
+    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetMoveFrame, -2, LW(0), LW(1), LW(2), FLOAT(6.0f), LW(14))
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), LW(14), 0, 5, 0, -1)
+    DELETE_EVENT(LW(13))
+    CALL(evt_snd_sfxoff, LW(9))
+    LABEL(99)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeWaitPlayLoopTiming, -2, 1)

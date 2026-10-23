@@ -15,6 +15,8 @@
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_bero.h"
 #include "rsh.h"
+#include "evt/evt_npc.h"
+#include "data_tables.h"
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
@@ -97,124 +99,154 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
 static void moamoa_pose_main(void);
 static void moamoa_pose_init(void);
 
-__declspec(section ".data") u64 fd_rsh_00_negone_one_374;
-__declspec(section ".data") s32 fd_rsh_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_rsh_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_rsh_00___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_rsh_00_one_negone_373;
-__declspec(section ".data") s32 fd_rsh_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_rsh_00_one_381[1];
-__declspec(section ".data") u64 fd_rsh_00_negone_one_360;
-__declspec(section ".data") s32 fd_rsh_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_rsh_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_rsh_00___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_rsh_00_one_negone_359;
-__declspec(section ".data") s32 fd_rsh_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_rsh_00_one_364[1];
-s32 moamoa_data[243];
+__declspec(section ".data") f32 fd_rsh_00_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_00_neg_one_382;
+__declspec(section ".data") f32 fd_rsh_00___local_PI_383;
+__declspec(section ".data") f32 fd_rsh_00___local_3PIO2_385;
+__declspec(section ".data") f32 fd_rsh_00_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_00___local_PIO2_384;
+__declspec(section ".data") f32 fd_rsh_00_one_381;
+__declspec(section ".data") f32 fd_rsh_00_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_00_neg_one_365;
+__declspec(section ".data") f32 fd_rsh_00___local_PI_366;
+__declspec(section ".data") f32 fd_rsh_00___local_3PIO2_368;
+__declspec(section ".data") f32 fd_rsh_00_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_00___local_PIO2_367;
+__declspec(section ".data") f32 fd_rsh_00_one_364;
+ExtTexInfo moamoa_data[81];
 static s32 evt_moamoa[324];
 s32 evt_rsh_moamoa_on_window[46];
-static s32 bero_data_a[30];
-static s32 bero_data_b[30];
-static s32 bero_data_c[30];
+static BeroEntry bero_data_a[2];
+static BeroEntry bero_data_b[2];
+static BeroEntry bero_data_c[2];
 s32 evt_handle[107];
 s32 regu_unten[210];
 static s32 init_unten[17];
 static s32 talk_unten[236];
-static s32 npc_data[46];
-static __declspec(section ".data") s32 access_tbl[5];
+static NpcSetupInfo npc_data[2];
+static __declspec(section ".data") const char* access_tbl[5];
 static s32 evt_access[14];
 static s32 evt_access_entry[23];
 s32 rsh_00_init_evt[194];
 s32 rsh_00_a_init_evt[51];
 __declspec(section ".data") s32 rsh_00_b_init_evt[11];
-static __declspec(section ".data") s32 window_tbl[5];
+static __declspec(section ".data") const char* window_tbl[5];
 s32 rsh_00_c_init_evt[16];
 s32 rsh_00_init_evt_nidome[164];
 __declspec(section ".data") s32 rsh_00_a_init_evt_nidome[11];
 __declspec(section ".data") s32 rsh_00_b_init_evt_nidome[11];
 s32 rsh_00_c_init_evt_nidome[16];
 
-__declspec(section ".data") u64 fd_rsh_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_rsh_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_rsh_00_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_rsh_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_rsh_00___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_rsh_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_rsh_00___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_rsh_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_rsh_00_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_rsh_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_rsh_00___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_rsh_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_rsh_00_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_rsh_00_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_rsh_00_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_rsh_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_rsh_00_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_rsh_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_rsh_00___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_rsh_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_rsh_00___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_rsh_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_rsh_00_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_rsh_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_rsh_00___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_rsh_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_rsh_00_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_rsh_00_one_364 = 1.0f;
 
-s32 moamoa_data[] = {
-    (s32)"c_n_moa_a", (s32)"S_1", 0, (s32)"c_n_moa_a", (s32)"S_1", 1065353216, (s32)"c_n_moa_a", (s32)"S_1",
-    1073741824, (s32)"c_n_moa_a", (s32)"S_1", 1077936128, (s32)"c_n_moa_a", (s32)"S_1", 1082130432, (s32)"c_n_moa_a",
-    (s32)"S_1", 1084227584, (s32)"c_n_moa_a", (s32)"S_1", 1086324736, (s32)"c_n_moa_a", (s32)"S_1", 1088421888,
-    (s32)"c_n_moa_a", (s32)"S_1", 1090519040, (s32)"c_n_moa_a", (s32)"S_1", 1091567616, (s32)"c_n_moa_a", (s32)"S_1",
-    1092616192, (s32)"c_n_moa_a", (s32)"S_1", 1093664768, (s32)"c_n_moa_a", (s32)"S_1", 1094713344, (s32)"c_n_moa_a",
-    (s32)"S_1", 1095761920, (s32)"c_n_moa_a", (s32)"S_1", 1096810496, (s32)"c_n_moa_a", (s32)"S_1", 1097859072,
-    (s32)"c_n_moa_a", (s32)"S_1", 1098907648, (s32)"c_n_moa_a", (s32)"S_1", 1099431936, (s32)"c_n_moa_a", (s32)"S_1",
-    1099956224, (s32)"c_n_moa_a", (s32)"S_1", 1100480512, (s32)"c_n_moa_a", (s32)"S_1", 1101004800, (s32)"c_n_moa_a",
-    (s32)"S_1", 1101529088, (s32)"c_n_moa_a", (s32)"S_1", 1102053376, (s32)"c_n_moa_a", (s32)"S_1", 1102577664,
-    (s32)"c_n_moa_a", (s32)"S_1", 1103101952, (s32)"c_n_moa_a", (s32)"S_1", 1103626240, (s32)"c_n_moa_a", (s32)"S_1",
-    1104150528, (s32)"c_n_moa_a", (s32)"S_1", 1104674816, (s32)"c_n_moa_a", (s32)"S_1", 1105199104, (s32)"c_n_moa_a",
-    (s32)"S_1", 1105723392, (s32)"c_n_moa_a", (s32)"S_1", 1106247680, (s32)"c_n_moa_a", (s32)"S_1", 1106771968,
-    (s32)"c_n_moa_a", (s32)"S_1", 1107296256, (s32)"c_n_moa_a", (s32)"S_1", 1107558400, (s32)"c_n_moa_a", (s32)"S_1",
-    1107820544, (s32)"c_n_moa_a", (s32)"S_1", 1108082688, (s32)"c_n_moa_a", (s32)"S_1", 1108344832, (s32)"c_n_moa_a",
-    (s32)"S_1", 1108606976, (s32)"c_n_moa_a", (s32)"S_1", 1108869120, (s32)"c_n_moa_a", (s32)"S_1", 1109131264,
-    (s32)"c_n_moa_b", (s32)"S_1", 0, (s32)"c_n_moa_b", (s32)"S_1", 1065353216, (s32)"c_n_moa_b", (s32)"S_1",
-    1073741824, (s32)"c_n_moa_b", (s32)"S_1", 1077936128, (s32)"c_n_moa_b", (s32)"S_1", 1082130432, (s32)"c_n_moa_b",
-    (s32)"S_1", 1084227584, (s32)"c_n_moa_b", (s32)"S_1", 1086324736, (s32)"c_n_moa_b", (s32)"S_1", 1088421888,
-    (s32)"c_n_moa_b", (s32)"S_1", 1090519040, (s32)"c_n_moa_b", (s32)"S_1", 1091567616, (s32)"c_n_moa_b", (s32)"S_1",
-    1092616192, (s32)"c_n_moa_b", (s32)"S_1", 1093664768, (s32)"c_n_moa_b", (s32)"S_1", 1094713344, (s32)"c_n_moa_b",
-    (s32)"S_1", 1095761920, (s32)"c_n_moa_b", (s32)"S_1", 1096810496, (s32)"c_n_moa_b", (s32)"S_1", 1097859072,
-    (s32)"c_n_moa_b", (s32)"S_1", 1098907648, (s32)"c_n_moa_b", (s32)"S_1", 1099431936, (s32)"c_n_moa_b", (s32)"S_1",
-    1099956224, (s32)"c_n_moa_b", (s32)"S_1", 1100480512, (s32)"c_n_moa_b", (s32)"S_1", 1101004800, (s32)"c_n_moa_b",
-    (s32)"S_1", 1101529088, (s32)"c_n_moa_b", (s32)"S_1", 1102053376, (s32)"c_n_moa_b", (s32)"S_1", 1102577664,
-    (s32)"c_n_moa_b", (s32)"S_1", 1103101952, (s32)"c_n_moa_b", (s32)"S_1", 1103626240, (s32)"c_n_moa_b", (s32)"S_1",
-    1104150528, (s32)"c_n_moa_b", (s32)"S_1", 1104674816, (s32)"c_n_moa_b", (s32)"S_1", 1105199104, (s32)"c_n_moa_b",
-    (s32)"S_1", 1105723392, (s32)"c_n_moa_b", (s32)"S_1", 1106247680, (s32)"c_n_moa_b", (s32)"S_1", 1106771968,
-    (s32)"c_n_moa_b", (s32)"S_1", 1107296256, (s32)"c_n_moa_b", (s32)"S_1", 1107558400, (s32)"c_n_moa_b", (s32)"S_1",
-    1107820544, (s32)"c_n_moa_b", (s32)"S_1", 1108082688, (s32)"c_n_moa_b", (s32)"S_1", 1108344832, (s32)"c_n_moa_b",
-    (s32)"S_1", 1108606976, (s32)"c_n_moa_b", (s32)"S_1", 1108869120, (s32)"c_n_moa_b", (s32)"S_1", 1109131264,
-    0, 0, 0,
+ExtTexInfo moamoa_data[] = {
+    {"c_n_moa_a", "S_1", 0.0f},
+    {"c_n_moa_a", "S_1", 1.0f},
+    {"c_n_moa_a", "S_1", 2.0f},
+    {"c_n_moa_a", "S_1", 3.0f},
+    {"c_n_moa_a", "S_1", 4.0f},
+    {"c_n_moa_a", "S_1", 5.0f},
+    {"c_n_moa_a", "S_1", 6.0f},
+    {"c_n_moa_a", "S_1", 7.0f},
+    {"c_n_moa_a", "S_1", 8.0f},
+    {"c_n_moa_a", "S_1", 9.0f},
+    {"c_n_moa_a", "S_1", 10.0f},
+    {"c_n_moa_a", "S_1", 11.0f},
+    {"c_n_moa_a", "S_1", 12.0f},
+    {"c_n_moa_a", "S_1", 13.0f},
+    {"c_n_moa_a", "S_1", 14.0f},
+    {"c_n_moa_a", "S_1", 15.0f},
+    {"c_n_moa_a", "S_1", 16.0f},
+    {"c_n_moa_a", "S_1", 17.0f},
+    {"c_n_moa_a", "S_1", 18.0f},
+    {"c_n_moa_a", "S_1", 19.0f},
+    {"c_n_moa_a", "S_1", 20.0f},
+    {"c_n_moa_a", "S_1", 21.0f},
+    {"c_n_moa_a", "S_1", 22.0f},
+    {"c_n_moa_a", "S_1", 23.0f},
+    {"c_n_moa_a", "S_1", 24.0f},
+    {"c_n_moa_a", "S_1", 25.0f},
+    {"c_n_moa_a", "S_1", 26.0f},
+    {"c_n_moa_a", "S_1", 27.0f},
+    {"c_n_moa_a", "S_1", 28.0f},
+    {"c_n_moa_a", "S_1", 29.0f},
+    {"c_n_moa_a", "S_1", 30.0f},
+    {"c_n_moa_a", "S_1", 31.0f},
+    {"c_n_moa_a", "S_1", 32.0f},
+    {"c_n_moa_a", "S_1", 33.0f},
+    {"c_n_moa_a", "S_1", 34.0f},
+    {"c_n_moa_a", "S_1", 35.0f},
+    {"c_n_moa_a", "S_1", 36.0f},
+    {"c_n_moa_a", "S_1", 37.0f},
+    {"c_n_moa_a", "S_1", 38.0f},
+    {"c_n_moa_a", "S_1", 39.0f},
+    {"c_n_moa_b", "S_1", 0.0f},
+    {"c_n_moa_b", "S_1", 1.0f},
+    {"c_n_moa_b", "S_1", 2.0f},
+    {"c_n_moa_b", "S_1", 3.0f},
+    {"c_n_moa_b", "S_1", 4.0f},
+    {"c_n_moa_b", "S_1", 5.0f},
+    {"c_n_moa_b", "S_1", 6.0f},
+    {"c_n_moa_b", "S_1", 7.0f},
+    {"c_n_moa_b", "S_1", 8.0f},
+    {"c_n_moa_b", "S_1", 9.0f},
+    {"c_n_moa_b", "S_1", 10.0f},
+    {"c_n_moa_b", "S_1", 11.0f},
+    {"c_n_moa_b", "S_1", 12.0f},
+    {"c_n_moa_b", "S_1", 13.0f},
+    {"c_n_moa_b", "S_1", 14.0f},
+    {"c_n_moa_b", "S_1", 15.0f},
+    {"c_n_moa_b", "S_1", 16.0f},
+    {"c_n_moa_b", "S_1", 17.0f},
+    {"c_n_moa_b", "S_1", 18.0f},
+    {"c_n_moa_b", "S_1", 19.0f},
+    {"c_n_moa_b", "S_1", 20.0f},
+    {"c_n_moa_b", "S_1", 21.0f},
+    {"c_n_moa_b", "S_1", 22.0f},
+    {"c_n_moa_b", "S_1", 23.0f},
+    {"c_n_moa_b", "S_1", 24.0f},
+    {"c_n_moa_b", "S_1", 25.0f},
+    {"c_n_moa_b", "S_1", 26.0f},
+    {"c_n_moa_b", "S_1", 27.0f},
+    {"c_n_moa_b", "S_1", 28.0f},
+    {"c_n_moa_b", "S_1", 29.0f},
+    {"c_n_moa_b", "S_1", 30.0f},
+    {"c_n_moa_b", "S_1", 31.0f},
+    {"c_n_moa_b", "S_1", 32.0f},
+    {"c_n_moa_b", "S_1", 33.0f},
+    {"c_n_moa_b", "S_1", 34.0f},
+    {"c_n_moa_b", "S_1", 35.0f},
+    {"c_n_moa_b", "S_1", 36.0f},
+    {"c_n_moa_b", "S_1", 37.0f},
+    {"c_n_moa_b", "S_1", 38.0f},
+    {"c_n_moa_b", "S_1", 39.0f},
+    {0},
 };
 
 #pragma dont_inline on
@@ -593,25 +625,70 @@ EVT_BEGIN(evt_rsh_moamoa_on_window)
     RETURN
 EVT_END()
 
-static s32 bero_data_a[] = {
-    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_01_a", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_data_a[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_01_a", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"w_door_close", // enterAnimeArg
+        (s32)"w_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
-static s32 bero_data_b[] = {
-    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_01_b", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_data_b[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_01_b", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"w_door_close", // enterAnimeArg
+        (s32)"w_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
-static s32 bero_data_c[] = {
-    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_01_c", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_data_c[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_01_c", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"w_door_close", // enterAnimeArg
+        (s32)"w_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_handle)
@@ -823,17 +900,28 @@ static EVT_BEGIN(talk_unten)
     RETURN
 EVT_END()
 
-static s32 npc_data[] = {
-    (s32)/*"運転手"*/"\x89\x5E\x93\x5D\x8E\xE8", 1073874448, 0, (s32)init_unten, (s32)regu_unten, (s32)talk_unten, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npc_data[] = {
+    {
+        /*"運転手"*/"\x89\x5E\x93\x5D\x8E\xE8", // name
+        0x40020610, // flags
+        0, // reactionFlags
+        init_unten, // initEvent
+        regu_unten, // regularEvent
+        talk_unten, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
-static __declspec(section ".data") s32 access_tbl[] = {
-    (s32)"nittei", (s32)"stg6_rsh_259", (s32)"soujyuu", (s32)"stg6_rsh_260", 0,
+static __declspec(section ".data") const char* access_tbl[] = {
+    "nittei",
+    "stg6_rsh_259",
+    "soujyuu",
+    "stg6_rsh_260",
+    NULL,
 };
 
 static EVT_BEGIN(evt_access)
@@ -844,7 +932,7 @@ static EVT_BEGIN(evt_access)
 EVT_END()
 
 static EVT_BEGIN(evt_access_entry)
-    SET_INT_READ_ADDR(PTR(access_tbl))
+    SET_INT_READ_ADDR(PTR(&access_tbl))
     LOOP(0)
         READ_INT2(LW(0), LW(1))
         IF_INT_EQUAL(LW(0), 0)
@@ -943,8 +1031,12 @@ __declspec(section ".data") EVT_BEGIN(rsh_00_b_init_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 window_tbl[] = {
-    (s32)"mado_uturi_1", (s32)"mado_uturi_2", (s32)"mado_uturi_3", (s32)"mado_uturi_4", 0,
+static __declspec(section ".data") const char* window_tbl[] = {
+    "mado_uturi_1",
+    "mado_uturi_2",
+    "mado_uturi_3",
+    "mado_uturi_4",
+    NULL,
 };
 
 EVT_BEGIN(rsh_00_c_init_evt)
@@ -952,7 +1044,7 @@ EVT_BEGIN(rsh_00_c_init_evt)
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL_CHILD(PTR(rsh_00_init_evt))
-    SET_VALUE(LW(0), PTR(window_tbl))
+    SET_VALUE(LW(0), PTR(&window_tbl))
     CALL_CHILD(PTR(evt_rsh_window))
     RETURN
 EVT_END()
@@ -1032,7 +1124,7 @@ EVT_BEGIN(rsh_00_c_init_evt_nidome)
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL_CHILD(PTR(rsh_00_init_evt_nidome))
-    SET_VALUE(LW(0), PTR(window_tbl))
+    SET_VALUE(LW(0), PTR(&window_tbl))
     CALL_CHILD(PTR(evt_rsh_window))
     RETURN
 EVT_END()

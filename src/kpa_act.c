@@ -17,7 +17,13 @@ typedef struct KpaScore {
 
 KpaScore* ksdp;
 USER_FUNC(kpa_score_disp_main);
-s32 kpa_score_disp_evt[] = {0x00010005, 0, 0x0001005B, (s32)kpa_score_disp_main, 0x00010009, 1, 6, 2, 1};
+EVT_BEGIN(kpa_score_disp_evt)
+    LOOP(0)
+        CALL(kpa_score_disp_main)
+        WAIT_FRAMES(1)
+    END_LOOP
+    RETURN
+EVT_END()
 
 void kpaScoreDisp(void);
 

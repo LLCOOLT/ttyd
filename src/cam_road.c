@@ -71,7 +71,8 @@ typedef struct CamRoadWork {
     f32 f_19c[11];         // 0x19c
     OSTime time;           // 0x1c8
     u32 state;             // 0x1d0
-    u8 pad5[0x1ec - 0x1d4];
+    f32 unk1D4; // 0x1D4
+    u8 pad1D8[0x1EC - 0x1D8]; // 0x1D8
     f32 in[6];             // 0x1ec
     s32 f_204;
     s32 f_208;

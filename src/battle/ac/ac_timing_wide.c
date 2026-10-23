@@ -19,7 +19,7 @@ typedef struct TimingWideWork {
     s32 endTimer; // 0x10
 } TimingWideWork;
 
-#define TW_WORK(ac) ((TimingWideWork*)((u8*)(ac) + 0x2BC))
+#define TW_WORK(ac) ((TimingWideWork*)(ac)->work)
 #define AC_S32(ac, off) (*(s32*)((u8*)(ac) + (off)))
 
 static void actionCommandDisp(f32 x, f32 y);
@@ -27,7 +27,7 @@ static void actionCommandDisp(f32 x, f32 y);
 s32 battleAcMain_TimingWide(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     TimingWideWork* tw = TW_WORK(ac);
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
     s32 autoCmd = 0;
     s32 pressed;
 
@@ -214,20 +214,20 @@ s32 battleAcResult_TimingWide(BattleWork* work) {
 void battleAcDisp_TimingWide(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
     BattleActions* ac = &work->actionCommands;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
     s32 show;
     switch (TW_WORK(ac)->state) {
         case 0:
         case 1:
         case 2:
-            if (AC_S32(ac, 0x34) & 1) {
+            if ((s32)ac->acFlags & 1) {
                 disp->iconX = 30.0f;
             } else {
-                disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[4], 20, -300.0f, 30.0f);
+                disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] > 0) {
-                (*(s32*)&disp->field_0x1C[4])--;
+            if (disp->unk20 > 0) {
+                disp->unk20--;
             }
             break;
         case 3:
@@ -236,15 +236,15 @@ void battleAcDisp_TimingWide(CameraId cameraId, void* param) {
         case 4:
         case 5:
             show = 1;
-            if ((AC_S32(ac, 0x34) & 2) && (ac->result & 2)) {
+            if (((s32)ac->acFlags & 2) && (ac->result & 2)) {
                 show = 0;
             }
-            if ((AC_S32(ac, 0x34) & 4) && !(ac->result & 2)) {
+            if (((s32)ac->acFlags & 4) && !(ac->result & 2)) {
                 show = 0;
             }
-            if (*(s32*)&disp->field_0x1C[4] >= 40) {
+            if (disp->unk20 >= 40) {
                 if (show) {
-                    disp->iconX = intplGetValue(4, *(s32*)&disp->field_0x1C[4] - 40, 20, 30.0f, -300.0f);
+                    disp->iconX = intplGetValue(4, disp->unk20 - 40, 20, 30.0f, -300.0f);
                 } else {
                     disp->iconX = 30.0f;
                 }
@@ -252,8 +252,8 @@ void battleAcDisp_TimingWide(CameraId cameraId, void* param) {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] < 60) {
-                (*(s32*)&disp->field_0x1C[4])++;
+            if (disp->unk20 < 60) {
+                disp->unk20++;
             }
             break;
     }
@@ -274,7 +274,7 @@ void battleAcDelete_TimingWide(BattleWork* work) {
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
-    s32* frame = (s32*)((u8*)ac + 0x290);
+    s32* frame = (s32*)&ac->disp;
     TimingWideWork* tw;
     u16 a;
     u16 b;
@@ -298,7 +298,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         case 4:
         case 5:
         case 6:
-            if (!(AC_S32(ac, 0x34) & 0x10)) {
+            if (!((s32)ac->acFlags & 0x10)) {
                 if (tw->mode > 0) ICON(a) else ICON(b)
             } else {
                 if (tw->mode > 0) ICON(b) else ICON(a)
@@ -306,13 +306,13 @@ static void actionCommandDisp(f32 x, f32 y) {
             break;
         case 1:
             if (tw->mode != -1) {
-                if (tw->frame >= AC_S32(ac, 0x40) && tw->frame < AC_S32(ac, 0x44)) {
+                if (tw->frame >= ac->params[2] && tw->frame < ac->params[3]) {
                     if (tw->mode > 0) ICON(b) else ICON(a)
                 } else {
                     if (tw->mode > 0) ICON(a) else ICON(b)
                 }
             } else {
-                if (tw->frame >= AC_S32(ac, 0x40)) {
+                if (tw->frame >= ac->params[2]) {
                     ICON(a)
                 } else {
                     ICON(b)

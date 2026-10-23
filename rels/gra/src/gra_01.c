@@ -3,6 +3,7 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
 #include "gra.h"
+#include "data_tables.h"
 
 #pragma force_active on
 
@@ -25,80 +26,87 @@ USER_FUNC(evt_seq_wait);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 
-__declspec(section ".data") u64 fd_gra_01_negone_one_374;
-__declspec(section ".data") s32 fd_gra_01_neg_one_382[1];
-__declspec(section ".data") s32 fd_gra_01___local_PI_383[1];
-__declspec(section ".data") s32 fd_gra_01___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gra_01_one_negone_373;
-__declspec(section ".data") s32 fd_gra_01___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gra_01_one_381[1];
-__declspec(section ".data") u64 fd_gra_01_negone_one_360;
-__declspec(section ".data") s32 fd_gra_01_neg_one_365[1];
-__declspec(section ".data") s32 fd_gra_01___local_PI_366[1];
-__declspec(section ".data") s32 fd_gra_01___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gra_01_one_negone_359;
-__declspec(section ".data") s32 fd_gra_01___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gra_01_one_364[1];
-static s32 bero_entry_data[45];
+__declspec(section ".data") f32 fd_gra_01_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gra_01_neg_one_382;
+__declspec(section ".data") f32 fd_gra_01___local_PI_383;
+__declspec(section ".data") f32 fd_gra_01___local_3PIO2_385;
+__declspec(section ".data") f32 fd_gra_01_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gra_01___local_PIO2_384;
+__declspec(section ".data") f32 fd_gra_01_one_381;
+__declspec(section ".data") f32 fd_gra_01_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gra_01_neg_one_365;
+__declspec(section ".data") f32 fd_gra_01___local_PI_366;
+__declspec(section ".data") f32 fd_gra_01___local_3PIO2_368;
+__declspec(section ".data") f32 fd_gra_01_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gra_01___local_PIO2_367;
+__declspec(section ".data") f32 fd_gra_01_one_364;
+static BeroEntry bero_entry_data[3];
 s32 gra_01_after_ranpel2[94];
-static s32 tree_tbl[24];
+static TreeAccess tree_tbl[4];
 s32 gra_01_init_evt[107];
 
-__declspec(section ".data") u64 fd_gra_01_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gra_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gra_01_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gra_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_gra_01___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gra_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gra_01___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gra_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gra_01_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gra_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gra_01___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gra_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gra_01_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gra_01_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_gra_01_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gra_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gra_01_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gra_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_gra_01___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gra_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gra_01___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gra_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gra_01_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gra_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gra_01___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gra_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gra_01_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gra_01_one_364 = 1.0f;
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero1", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"gra_00", (s32)"e_bero", 65537, 0, 0, (s32)"e_bero1",
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"gra_02", (s32)"w_bero_1", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero1", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gra_00", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero1", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gra_02", // nextMapName
+        "w_bero_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(gra_01_after_ranpel2)
@@ -130,10 +138,11 @@ EVT_BEGIN(gra_01_after_ranpel2)
     RETURN
 EVT_END()
 
-static s32 tree_tbl[] = {
-    2, (s32)"A_ki_1", (s32)"S_gra01_ki01", 0, 0, 0, 2, (s32)"A_ki_2",
-    (s32)"S_gra01_ki02", 0, 0, 0, 2, (s32)"A_ki_3", (s32)"S_gra01_ki03", 0,
-    0, 0, 7, 0, 0, 0, 0, 0,
+static TreeAccess tree_tbl[] = {
+    {2, "A_ki_1", "S_gra01_ki01", NULL, 0, NULL},
+    {2, "A_ki_2", "S_gra01_ki02", NULL, 0, NULL},
+    {2, "A_ki_3", "S_gra01_ki03", NULL, 0, NULL},
+    {7, NULL, NULL, NULL, 0, NULL},
 };
 
 EVT_BEGIN(gra_01_init_evt)

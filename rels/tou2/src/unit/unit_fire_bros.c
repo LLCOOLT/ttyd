@@ -8,6 +8,7 @@
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
 
 USER_FUNC(btlevtcmd_AddUnitWork);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -47,20 +48,20 @@ USER_FUNC(fire_bros_nagemakuri_set_target);
 void fire_bros_get_next_target(s32* unitIdx, s32* partIdx);
 void fire_bros_get_target(s32* unitIdx, s32* partIdx);
 
-__declspec(section ".data") u64 fd_fire_bros_negone_one_374;
-__declspec(section ".data") s32 fd_fire_bros_neg_one_382[1];
-__declspec(section ".data") s32 fd_fire_bros___local_PI_383[1];
-__declspec(section ".data") s32 fd_fire_bros___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_fire_bros_one_negone_373;
-__declspec(section ".data") s32 fd_fire_bros___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_fire_bros_one_381[1];
-__declspec(section ".data") u64 fd_fire_bros_negone_one_360;
-__declspec(section ".data") s32 fd_fire_bros_neg_one_365[1];
-__declspec(section ".data") s32 fd_fire_bros___local_PI_366[1];
-__declspec(section ".data") s32 fd_fire_bros___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_fire_bros_one_negone_359;
-__declspec(section ".data") s32 fd_fire_bros___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_fire_bros_one_364[1];
+__declspec(section ".data") f32 fd_fire_bros_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_fire_bros_neg_one_382;
+__declspec(section ".data") f32 fd_fire_bros___local_PI_383;
+__declspec(section ".data") f32 fd_fire_bros___local_3PIO2_385;
+__declspec(section ".data") f32 fd_fire_bros_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_fire_bros___local_PIO2_384;
+__declspec(section ".data") f32 fd_fire_bros_one_381;
+__declspec(section ".data") f32 fd_fire_bros_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_fire_bros_neg_one_365;
+__declspec(section ".data") f32 fd_fire_bros___local_PI_366;
+__declspec(section ".data") f32 fd_fire_bros___local_3PIO2_368;
+__declspec(section ".data") f32 fd_fire_bros_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_fire_bros___local_PIO2_367;
+__declspec(section ".data") f32 fd_fire_bros_one_364;
 BattleUnitKind unit_fire_bros;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -68,9 +69,9 @@ static __declspec(section ".data") StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
 static __declspec(section ".data") BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[7];
-s32 weapon_fire_bros_attack[48];
-s32 weapon_fire_bros_renzoku_attack[48];
-s32 weapon_fire_bros_nagemakuri_attack[48];
+BattleWeapon weapon_fire_bros_attack;
+BattleWeapon weapon_fire_bros_renzoku_attack;
+BattleWeapon weapon_fire_bros_nagemakuri_attack;
 static s32 init_event[21];
 static __declspec(section ".data") s32 damage_event[10];
 static s32 attack_event[92];
@@ -136,53 +137,33 @@ USER_FUNC(fire_bros_nagemakuri_set_target) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_fire_bros_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_fire_bros_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_fire_bros_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_fire_bros_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_fire_bros___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_fire_bros___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_fire_bros___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_fire_bros___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_fire_bros_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_fire_bros_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_fire_bros___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_fire_bros___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_fire_bros_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_fire_bros_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_fire_bros_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_fire_bros_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_fire_bros_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_fire_bros_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_fire_bros___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_fire_bros___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_fire_bros___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_fire_bros___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_fire_bros_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_fire_bros_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_fire_bros___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_fire_bros___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_fire_bros_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_fire_bros_one_364 = 1.0f;
 
 BattleUnitKind unit_fire_bros = {
     58,
@@ -291,31 +272,121 @@ static BattleUnitKindPart parts[] = {
     {7, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
-s32 weapon_fire_bros_attack[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 16777986, 0, 7, 2047, -2147475456,
-    0, 0, 0, 30, 50331648, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_fire_bros_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    1, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    7, // special
+    0x7FF, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
+    30, // burnChance
+    3, // burnTime
+    0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
+    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
+    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_fire_bros_renzoku_attack[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 16777986, 0, 7, 2047, -2147475456,
-    0, 0, 0, 30, 50331648, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_fire_bros_renzoku_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    1, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    7, // special
+    0x7FF, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
+    30, // burnChance
+    3, // burnTime
+    0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
+    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
+    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_fire_bros_nagemakuri_attack[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 16777986, 0, 7, 2047, -2147483648,
-    0, 0, 0, 30, 50331648, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_fire_bros_nagemakuri_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    1, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    7, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
+    30, // burnChance
+    3, // burnTime
+    0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
+    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
+    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static EVT_BEGIN(init_event)
@@ -403,7 +474,7 @@ static EVT_BEGIN(damage_check_sub)
     GOTO(99)
     LABEL(91)
     SET_VALUE(LW(0), 1)
-    IF_INT_EQUAL(LW(6), PTR(weapon_fire_bros_renzoku_attack))
+    IF_INT_EQUAL(LW(6), PTR(&weapon_fire_bros_renzoku_attack))
         CALL(btlevtcmd_SetPartsWork, -2, 2, 10, 1)
     END_IF
     IF_INT_EQUAL(LW(8), 1)
@@ -448,7 +519,7 @@ static __declspec(section ".data") EVT_BEGIN(damage_check_no_last)
 EVT_END()
 
 static EVT_BEGIN(damage_check_last)
-    IF_INT_EQUAL(LW(6), PTR(weapon_fire_bros_renzoku_attack))
+    IF_INT_EQUAL(LW(6), PTR(&weapon_fire_bros_renzoku_attack))
         CALL(btlevtcmd_GetPartsWork, -2, 2, 10, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             SET_VALUE(LW(0), 1)
@@ -492,84 +563,163 @@ static EVT_BEGIN(damage_check_last)
     RETURN
 EVT_END()
 
-s32 fire_move_event[] = {
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_FIREB_ATTACK1", -250000000, 0, -250000000, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, -29999985, (s32)"BRO_A_1B", 327771, (s32)btlevtcmd_SetPartsWork, -2, -29999985,
-    15, 0, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    131125, -29999999, 15, 393307, (s32)btlevtcmd_SetPartsPos, -2, -29999985, -30000000,
-    -29999999, -29999998, 393307, (s32)btlevtcmd_SetPartsRotate, -2, -29999985, 0, 0,
-    -180, 393307, (s32)btlevtcmd_SetPartsRotateOffset, -2, -29999985, 0, 0, 0,
-    262235, (s32)btlevtcmd_OffPartsAttribute, -2, -29999985, 16777216, 262235, (s32)btlevtcmd_OffPartsAttribute, -2,
-    -29999985, 33554432, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999991, -29999990,
-    -29999989, 131126, -29999991, -30000000, 131122, -29999990, 0, 110,
-    65541, 0, 65545, 1, 393307, (s32)btlevtcmd_GetPartsPos, -2, -29999985,
-    -30000000, -29999988, -29999987, 65570, -29999990, 65572, 0, 393307,
-    (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999989, -29999988, -29999987, 131101, -29999991,
-    0, 131100, -30000000, -29999989, 48, 33, 32, 131101,
-    -30000000, -29999989, 48, 33, 33, 131096, -29999986, 0,
-    65630, (s32)damage_check_no_last, 32, 65630, (s32)damage_check_last, 33, 131096, -30000000,
-    1, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, -29999985, 16777216, 262235, (s32)btlevtcmd_OnPartsAttribute,
-    -2, -29999985, 33554432, 131122, -29999990, 2, 32, 131122,
-    -29999990, 1, 33, 46, 65572, 1, 393307, (s32)btlevtcmd_GetPartsPos,
-    -2, -29999985, -29999989, -29999988, -29999987, 131101, -29999989, 250,
-    262235, (s32)btlevtcmd_OnPartsAttribute, -2, -29999985, 16777216, 262235, (s32)btlevtcmd_OnPartsAttribute, -2,
-    -29999985, 33554432, 131122, -29999990, 2, 33, 131100, -29999989,
-    -250, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, -29999985, 16777216, 262235, (s32)btlevtcmd_OnPartsAttribute,
-    -2, -29999985, 33554432, 131122, -29999990, 2, 33, 46,
-    65572, 2, 327771, (s32)btlevtcmd_SetPartsWork, -2, -29999985, 15, 1,
-    7, 46, 49, 6, 112, 110, 65541, 0,
-    65545, 1, 393307, (s32)btlevtcmd_AddPartsRotate, -2, -29999985, 0, 0,
-    16, 6, 112, 196699, (s32)evt_sub_random, 1, -29999989, 131096,
-    -29999989, 0, 393307, (s32)btlevtcmd_GetPartsPos, -2, -29999985, -30000000, -29999999,
-    -29999998, 393307, (s32)btlevtcmd_JumpPartsSetting, -2, -29999985, 0, 6, -229999386,
-    262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 100, 524379, (s32)btlevtcmd_JumpPartsPosition, -2,
-    -29999985, -30000000, 0, -29999998, 0, -1, 327771, (s32)btlevtcmd_GetPartsWork,
-    -2, -29999985, 15, -29999990, 131096, -29999990, 1, 65540,
-    99, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_FIREB_ATTACK2", -250000000, 0,
-    -250000000, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 100, 524379, (s32)btlevtcmd_JumpPartsPosition,
-    -2, -29999985, -30000000, 0, -29999998, 0, -1, 327771,
-    (s32)btlevtcmd_GetPartsWork, -2, -29999985, 15, -29999990, 131096, -29999990, 1,
-    65540, 99, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_FIREB_ATTACK2", -250000000,
-    0, -250000000, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 100, 524379,
-    (s32)btlevtcmd_JumpPartsPosition, -2, -29999985, -30000000, 0, -29999998, 0, -1,
-    327771, (s32)btlevtcmd_GetPartsWork, -2, -29999985, 15, -29999990, 131096, -29999990,
-    1, 65540, 99, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_FIREB_ATTACK2",
-    -250000000, 0, -250000000, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 100,
-    524379, (s32)btlevtcmd_JumpPartsPosition, -2, -29999985, -30000000, 0, -29999998, 0,
-    -1, 327771, (s32)btlevtcmd_GetPartsWork, -2, -29999985, 15, -29999990, 131096,
-    -29999990, 1, 65540, 99, 33, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_ENM_FIREB_ATTACK2", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000,
-    100, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, -29999985, -30000000, 0, -29999998,
-    0, -1, 327771, (s32)btlevtcmd_GetPartsWork, -2, -29999985, 15, -29999990,
-    131096, -29999990, 1, 65540, 99, 33, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_FIREB_ATTACK2", -250000000, 0, -250000000, 32, 393307, (s32)btlevtcmd_GetPartsPos,
-    -2, -29999985, -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_JumpPartsSetting, -2,
-    -29999985, 0, 5, -229999386, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000,
-    100, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, -29999985, -30000000, 0, -29999998,
-    0, -1, 327771, (s32)btlevtcmd_GetPartsWork, -2, -29999985, 15, -29999990,
-    131096, -29999990, 1, 65540, 99, 33, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_FIREB_ATTACK2", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2,
-    -30000000, 100, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, -29999985, -30000000, 0,
-    -29999998, 0, -1, 327771, (s32)btlevtcmd_GetPartsWork, -2, -29999985, 15,
-    -29999990, 131096, -29999990, 1, 65540, 99, 33, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_FIREB_ATTACK2", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_FaceDirectionAdd,
-    -2, -30000000, 100, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, -29999985, -30000000,
-    0, -29999998, 0, -1, 327771, (s32)btlevtcmd_GetPartsWork, -2, -29999985,
-    15, -29999990, 131096, -29999990, 1, 65540, 99, 33,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_FIREB_ATTACK2", -250000000, 0, -250000000, 131096,
-    -29999990, 2, 65540, 99, 33, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2,
-    -30000000, 100, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, -29999985, -30000000, 0,
-    -29999998, 0, -1, 327771, (s32)btlevtcmd_GetPartsWork, -2, -29999985, 15,
-    -29999990, 131096, -29999990, 1, 65540, 99, 33, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_FIREB_ATTACK2", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_FaceDirectionAdd,
-    -2, -30000000, 100, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, -29999985, -30000000,
-    0, -29999998, 0, -1, 327771, (s32)btlevtcmd_GetPartsWork, -2, -29999985,
-    15, -29999990, 131096, -29999990, 1, 65540, 99, 33,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_FIREB_ATTACK2", -250000000, 0, -250000000, 33,
-    65539, 99, 65545, 6, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, -29999985,
-    16777216, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, -29999985, 33554432, 262235, (s32)btlevtcmd_AddUnitWork,
-    -2, 1, 1, 2, 1,
-};
+EVT_BEGIN(fire_move_event)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_FIREB_ATTACK1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, LW(15), STRING("BRO_A_1B"))
+    CALL(btlevtcmd_SetPartsWork, -2, LW(15), 15, 0)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    ADD(LW(1), 15)
+    CALL(btlevtcmd_SetPartsPos, -2, LW(15), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPartsRotate, -2, LW(15), 0, 0, -180)
+    CALL(btlevtcmd_SetPartsRotateOffset, -2, LW(15), 0, 0, 0)
+    CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 16777216)
+    CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 33554432)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(9), LW(10), LW(11))
+    SUBTRACT(LW(9), LW(0))
+    SET_VALUE(LW(10), 0)
+    BEGIN_SIBLING_EVENT
+        LOOP(0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_GetPartsPos, -2, LW(15), LW(0), LW(12), LW(13))
+            SWITCH(LW(10))
+                CASE_EQUAL(0)
+                CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(11), LW(12), LW(13))
+                IF_INT_GREATER_OR_EQUAL(LW(9), 0)
+                    IF_INT_LESS_OR_EQUAL(LW(0), LW(11))
+                        BREAK_SWITCH
+                    END_IF
+                ELSE
+                    IF_INT_GREATER_OR_EQUAL(LW(0), LW(11))
+                        BREAK_SWITCH
+                    END_IF
+                END_IF
+                IF_INT_EQUAL(LW(14), 0)
+                    CALL_CHILD(damage_check_no_last)
+                ELSE
+                    CALL_CHILD(damage_check_last)
+                END_IF
+                IF_INT_EQUAL(LW(0), 1)
+                    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 16777216)
+                    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 33554432)
+                    SET_VALUE(LW(10), 2)
+                ELSE
+                    SET_VALUE(LW(10), 1)
+                END_IF
+                CASE_END
+                CASE_EQUAL(1)
+                CALL(btlevtcmd_GetPartsPos, -2, LW(15), LW(11), LW(12), LW(13))
+                IF_INT_GREATER_OR_EQUAL(LW(11), 250)
+                    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 16777216)
+                    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 33554432)
+                    SET_VALUE(LW(10), 2)
+                END_IF
+                IF_INT_LESS_OR_EQUAL(LW(11), -250)
+                    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 16777216)
+                    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 33554432)
+                    SET_VALUE(LW(10), 2)
+                END_IF
+                CASE_END
+                CASE_EQUAL(2)
+                CALL(btlevtcmd_SetPartsWork, -2, LW(15), 15, 1)
+                BREAK_LOOP
+                CASE_END
+            END_SWITCH
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        LOOP(0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_AddPartsRotate, -2, LW(15), 0, 0, 16)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(evt_sub_random, 1, LW(11))
+    IF_INT_EQUAL(LW(11), 0)
+        CALL(btlevtcmd_GetPartsPos, -2, LW(15), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPartsSetting, -2, LW(15), 0, 6, FLOAT(0.5996094f))
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 100)
+        CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(0), 0, LW(2), 0, -1)
+        CALL(btlevtcmd_GetPartsWork, -2, LW(15), 15, LW(10))
+        IF_INT_EQUAL(LW(10), 1)
+            GOTO(99)
+        END_IF
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_FIREB_ATTACK2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 100)
+        CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(0), 0, LW(2), 0, -1)
+        CALL(btlevtcmd_GetPartsWork, -2, LW(15), 15, LW(10))
+        IF_INT_EQUAL(LW(10), 1)
+            GOTO(99)
+        END_IF
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_FIREB_ATTACK2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 100)
+        CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(0), 0, LW(2), 0, -1)
+        CALL(btlevtcmd_GetPartsWork, -2, LW(15), 15, LW(10))
+        IF_INT_EQUAL(LW(10), 1)
+            GOTO(99)
+        END_IF
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_FIREB_ATTACK2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 100)
+        CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(0), 0, LW(2), 0, -1)
+        CALL(btlevtcmd_GetPartsWork, -2, LW(15), 15, LW(10))
+        IF_INT_EQUAL(LW(10), 1)
+            GOTO(99)
+        END_IF
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_FIREB_ATTACK2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 100)
+        CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(0), 0, LW(2), 0, -1)
+        CALL(btlevtcmd_GetPartsWork, -2, LW(15), 15, LW(10))
+        IF_INT_EQUAL(LW(10), 1)
+            GOTO(99)
+        END_IF
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_FIREB_ATTACK2"), -250000000, 0, -250000000)
+    ELSE
+        CALL(btlevtcmd_GetPartsPos, -2, LW(15), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPartsSetting, -2, LW(15), 0, 5, FLOAT(0.5996094f))
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 100)
+        CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(0), 0, LW(2), 0, -1)
+        CALL(btlevtcmd_GetPartsWork, -2, LW(15), 15, LW(10))
+        IF_INT_EQUAL(LW(10), 1)
+            GOTO(99)
+        END_IF
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_FIREB_ATTACK2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 100)
+        CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(0), 0, LW(2), 0, -1)
+        CALL(btlevtcmd_GetPartsWork, -2, LW(15), 15, LW(10))
+        IF_INT_EQUAL(LW(10), 1)
+            GOTO(99)
+        END_IF
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_FIREB_ATTACK2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 100)
+        CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(0), 0, LW(2), 0, -1)
+        CALL(btlevtcmd_GetPartsWork, -2, LW(15), 15, LW(10))
+        IF_INT_EQUAL(LW(10), 1)
+            GOTO(99)
+        END_IF
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_FIREB_ATTACK2"), -250000000, 0, -250000000)
+        IF_INT_EQUAL(LW(10), 2)
+            GOTO(99)
+        END_IF
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 100)
+        CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(0), 0, LW(2), 0, -1)
+        CALL(btlevtcmd_GetPartsWork, -2, LW(15), 15, LW(10))
+        IF_INT_EQUAL(LW(10), 1)
+            GOTO(99)
+        END_IF
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_FIREB_ATTACK2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 100)
+        CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(0), 0, LW(2), 0, -1)
+        CALL(btlevtcmd_GetPartsWork, -2, LW(15), 15, LW(10))
+        IF_INT_EQUAL(LW(10), 1)
+            GOTO(99)
+        END_IF
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_FIREB_ATTACK2"), -250000000, 0, -250000000)
+    END_IF
+    LABEL(99)
+    WAIT_FRAMES(6)
+    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 33554432)
+    CALL(btlevtcmd_AddUnitWork, -2, 1, 1)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
@@ -577,8 +727,8 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
         ELSE
         CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_fire_bros_attack))
-        CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_fire_bros_attack), LW(3), LW(4))
+        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_fire_bros_attack))
+        CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_fire_bros_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
@@ -589,10 +739,10 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(99)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_fire_bros_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_fire_bros_attack))
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_fire_bros_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_fire_bros_attack))
     CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
     CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
@@ -600,7 +750,7 @@ static EVT_BEGIN(normal_attack_event)
     WAIT_FRAMES(40)
     SET_VALUE(LW(15), 2)
     SET_VALUE(LW(14), 1)
-    SET_VALUE(LW(6), PTR(weapon_fire_bros_attack))
+    SET_VALUE(LW(6), PTR(&weapon_fire_bros_attack))
     SET_VALUE(LW(8), 0)
     SPAWN_EVENT(PTR(fire_move_event))
     LOOP(0)
@@ -618,8 +768,8 @@ EVT_END()
 
 static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_fire_bros_renzoku_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_fire_bros_renzoku_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_fire_bros_renzoku_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_fire_bros_renzoku_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
@@ -629,10 +779,10 @@ static EVT_BEGIN(renzoku_attack_event)
         GOTO(99)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_fire_bros_renzoku_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_fire_bros_renzoku_attack))
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_fire_bros_renzoku_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_fire_bros_renzoku_attack))
     CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
     CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
@@ -641,7 +791,7 @@ static EVT_BEGIN(renzoku_attack_event)
     WAIT_FRAMES(20)
     SET_VALUE(LW(15), 2)
     SET_VALUE(LW(14), 0)
-    SET_VALUE(LW(6), PTR(weapon_fire_bros_renzoku_attack))
+    SET_VALUE(LW(6), PTR(&weapon_fire_bros_renzoku_attack))
     SET_VALUE(LW(8), 0)
     SPAWN_EVENT(PTR(fire_move_event))
     WAIT_FRAMES(12)
@@ -649,7 +799,7 @@ static EVT_BEGIN(renzoku_attack_event)
     WAIT_FRAMES(20)
     SET_VALUE(LW(15), 3)
     SET_VALUE(LW(14), 1)
-    SET_VALUE(LW(6), PTR(weapon_fire_bros_renzoku_attack))
+    SET_VALUE(LW(6), PTR(&weapon_fire_bros_renzoku_attack))
     SET_VALUE(LW(8), 0)
     SPAWN_EVENT(PTR(fire_move_event))
     LOOP(0)
@@ -667,8 +817,8 @@ EVT_END()
 
 static EVT_BEGIN(nagemakuri_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_fire_bros_nagemakuri_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_fire_bros_nagemakuri_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_fire_bros_nagemakuri_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_fire_bros_nagemakuri_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
@@ -678,10 +828,10 @@ static EVT_BEGIN(nagemakuri_attack_event)
         GOTO(99)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_fire_bros_nagemakuri_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_fire_bros_nagemakuri_attack))
     CALL(btlevtcmd_AttackDeclareAll, -2)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_fire_bros_nagemakuri_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_fire_bros_nagemakuri_attack))
     SET_VALUE(LW(10), 2)
     LOOP(0)
         IF_INT_GREATER(LW(10), 7)
@@ -733,7 +883,7 @@ static EVT_BEGIN(nagemakuri_attack_event)
             CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(14))
             CALL(btlevtcmd_ChangeFaceDirection, -2, LW(14))
             CALL_CHILD(PTR(nagemakuri_judge_last_attack_event))
-            SET_VALUE(LW(6), PTR(weapon_fire_bros_nagemakuri_attack))
+            SET_VALUE(LW(6), PTR(&weapon_fire_bros_nagemakuri_attack))
             SET_VALUE(LW(8), 1)
             SPAWN_EVENT(PTR(fire_move_event))
             CALL(btlevtcmd_AddUnitWork, -2, 0, 1)

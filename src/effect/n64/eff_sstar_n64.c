@@ -269,7 +269,7 @@ void effSstarMain(EffectEntry* effect) {
         }
     }
     if (gp->inBattle == 0) {
-        if (*(f32*)((u8*)mario + 0x90) - w->position.y > 300.0f) {
+        if (mario->position.y - w->position.y > 300.0f) {
             w->life = -1;
         }
     } else if (w->position.y < -300.0f) {

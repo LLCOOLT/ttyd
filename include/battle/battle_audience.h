@@ -48,7 +48,8 @@ typedef struct BattleAudienceMember {
     s16 itemId;                    // 0x1C, -1 is invalid
     u8 field_0x1E[0x20 - 0x1E];    // 0x1E
     s32** animTable;               // 0x20, set in BattleAudience_Entry_Sub
-    u8 field_0x24[0x30 - 0x24];    // 0x24
+    s32 unk24;                     // 0x24
+    u8 field_0x28[0x30 - 0x28];    // 0x28
     s32 field_0x30;                // 0x30
     u8 field_0x34[0x41 - 0x34];    // 0x34
     u8 colorR;                     // 0x41, draw colour (read with G/B/A in the member draw)
@@ -61,14 +62,28 @@ typedef struct BattleAudienceMember {
     Vec baseScale;                 // 0x60
     Vec dispOffset;                // 0x6C, added to position for the drawn quad
     Vec field_0x78;                // 0x78
-    u8 field_0x84[0x90 - 0x84];    // 0x84
+    u8 field_0x84[0x88 - 0x84];    // 0x84
+    f32 unk88;                     // 0x88
+    f32 unk8C;                     // 0x8C
     Vec facingDir;                 // 0x90, (0,0,-1) rotated by the member matrix; dot-product facing test
     Vec mRotation;                 // 0x9C
     Vec mRotationOffset;           // 0xA8
     Vec mHomePosition;             // 0xB4
-    u8 field_0xC0[0xE8 - 0xC0];    // 0xC0
+    f32 unkC0;                     // 0xC0
+    f32 unkC4;                     // 0xC4
+    f32 unkC8;                     // 0xC8
+    f32 unkCC;                     // 0xCC
+    f32 unkD0;                     // 0xD0
+    f32 unkD4;                     // 0xD4
+    u8 field_0xD8[0xDC - 0xD8];    // 0xD8
+    f32 unkDC;                     // 0xDC
+    u8 field_0xE0[0xE4 - 0xE0];    // 0xE0
+    f32 unkE4;                     // 0xE4
     f32 angle;                     // 0xE8, init 270, wrapped to 0..360
-    u8 field_0xEC[0xF8 - 0xEC];    // 0xEC
+    s32 unkEC;                     // 0xEC
+    s16 unkF0;                     // 0xF0
+    u8 field_0xF2[0xF4 - 0xF2];    // 0xF2
+    s32 unkF4;                     // 0xF4
     s32 interpFramesLeft;          // 0xF8
     s32 interpFramesTotal;         // 0xFC
     f32 startPosX;                 // 0x100
@@ -81,13 +96,14 @@ typedef struct BattleAudienceMember {
     f32 interpGravity;             // 0x124
     s32 interpType;                // 0x128
     s32 statusTimer;               // 0x12C, set to 5 and counted down while status == 18
-    u8 field_0x130[0x134 - 0x130]; // 0x130
+    f32 unk130;                    // 0x130
 } BattleAudienceMember;
 
 typedef struct BattleAudienceItem {
     u32 flags;                  // 0x0
     s32 state;                  // 0x4
-    u8 field_0x8[0x10 - 0x8];   // 0x8
+    u8 field_0x8[0xC - 0x8];    // 0x8
+    s32 unkC;                   // 0xC
     ItemType mItemType;         // 0x10
     u8 field_0x14[0x48 - 0x14]; // 0x14
 } BattleAudienceItem;
@@ -112,7 +128,10 @@ typedef struct BattleAudienceSound {
 
 typedef struct BattleAudienceWindow {
     u8 mActive;               // 0x0, TODO "bool"?
-    u8 field_0x1[0x18 - 0x1]; // 0x1
+    u8 field_0x1[0x8 - 0x1];  // 0x1
+    f32 unk8;                 // 0x8
+    f32 unkC;                 // 0xC
+    u8 field_0x10[0x18 - 0x10]; // 0x10
     f32 count;                // 0x18, number to display for audience count
 } BattleAudienceWindow;
 
@@ -183,7 +202,10 @@ typedef struct BattleAudience {
     s32 presentItemNo;                 // 0x137E4
     s32 presentItemType;               // 0x137E8
     s32 presentTargetUnitId;           // 0x137EC
-    u8 field_137F0[0x138BC - 0x137F0]; // 0x137F0
+    s32 itemThrowCount;                // 0x137F0, audience item throws this battle
+    s32 itemThrowMax;                  // 0x137F4, throw limit rolled at battle start (0-3; 10000 when forced)
+    s32 unk137F8;                      // 0x137F8
+    u8 field_137FC[0x138BC - 0x137FC]; // 0x137FC
     s32 mItemOnMemberId;               // 0x138BC, TODO better name
     Vec mItemOnMemberPos;              // 0x138C0, TODO better name?
     u8 field_138CC[0x13908 - 0x138CC]; // 0x138CC

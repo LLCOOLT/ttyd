@@ -14,6 +14,8 @@
 #include "driver/dispdrv.h"
 #include "driver/camdrv.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_npc.h"
+#include "data_tables.h"
 
 extern s32 partyCtrlNo;
 void partyChgPose(PartyEntry* party, const char* pose);
@@ -127,27 +129,27 @@ static void senkaron_ext_dispent(void);
 static void senkaron_ext_disp(CameraId camera, void* param);
 static void senkaron_ext_shadow_disp(CameraId camera, void* param);
 
-__declspec(section ".data") u64 fd_gon_03_negone_one_374;
-__declspec(section ".data") s32 fd_gon_03_neg_one_382[1];
-__declspec(section ".data") s32 fd_gon_03___local_PI_383[1];
-__declspec(section ".data") s32 fd_gon_03___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gon_03_one_negone_373;
-__declspec(section ".data") s32 fd_gon_03___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gon_03_one_381[1];
-__declspec(section ".data") u64 fd_gon_03_negone_one_360;
-__declspec(section ".data") s32 fd_gon_03_neg_one_365[1];
-__declspec(section ".data") s32 fd_gon_03___local_PI_366[1];
-__declspec(section ".data") s32 fd_gon_03___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gon_03_one_negone_359;
-__declspec(section ".data") s32 fd_gon_03___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gon_03_one_364[1];
-static s32 npcEnt[92];
+__declspec(section ".data") f32 fd_gon_03_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_03_neg_one_382;
+__declspec(section ".data") f32 fd_gon_03___local_PI_383;
+__declspec(section ".data") f32 fd_gon_03___local_3PIO2_385;
+__declspec(section ".data") f32 fd_gon_03_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_03___local_PIO2_384;
+__declspec(section ".data") f32 fd_gon_03_one_381;
+__declspec(section ".data") f32 fd_gon_03_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_03_neg_one_365;
+__declspec(section ".data") f32 fd_gon_03___local_PI_366;
+__declspec(section ".data") f32 fd_gon_03___local_3PIO2_368;
+__declspec(section ".data") f32 fd_gon_03_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_03___local_PIO2_367;
+__declspec(section ".data") f32 fd_gon_03_one_364;
+static NpcSetupInfo npcEnt[4];
 static __declspec(section ".data") s32 door01_close[12];
 static __declspec(section ".data") s32 door01_open[12];
 static __declspec(section ".data") s32 door02_close[12];
 static __declspec(section ".data") s32 door02_open[12];
-static s32 bero_entry_data[45];
-__declspec(section ".data") s32 nokotaro_pose[2];
+static BeroEntry bero_entry_data[3];
+__declspec(section ".data") const char* nokotaro_pose[2];
 s32 tegami_event[305];
 static s32 senkaron_event[579];
 static __declspec(section ".data") s32 key_get[5];
@@ -157,74 +159,76 @@ __declspec(section ".data") s32 richard_regl_event[2];
 s32 richard_talk_event[53];
 s32 leaderkaron_init_event[44];
 s32 leaderkaron_talk_event[40];
-static s32 senkaron_ext_entry_data[78];
+static ExtTexInfo senkaron_ext_entry_data[26];
 __declspec(section ".data") s32 senkarondummy_init_event[8];
 __declspec(section ".data") s32 senkarondummy_regl_event[2];
 __declspec(section ".data") s32 senkarondummy_talk_event[2];
 __declspec(section ".data") s32 senkaron_entry_event[9];
 __declspec(section ".data") s32 senkaron_escape_event[4];
 
-__declspec(section ".data") u64 fd_gon_03_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gon_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gon_03_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gon_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_gon_03___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gon_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gon_03___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gon_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gon_03_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gon_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gon_03___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gon_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gon_03_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gon_03_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_gon_03_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gon_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gon_03_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gon_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_gon_03___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gon_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gon_03___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gon_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gon_03_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gon_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gon_03___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gon_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gon_03_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gon_03_one_364 = 1.0f;
 
-static s32 npcEnt[] = {
-    (s32)/*"カロン1"*/"\x83\x4A\x83\x8D\x83\x93\x31", 0, 0, (s32)senkarondummy_init_event, (s32)senkarondummy_regl_event, (s32)senkarondummy_talk_event, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"リチャード"*/"\x83\x8A\x83\x60\x83\x83\x81\x5B\x83\x68",
-    0, 0, (s32)richard_init_event, (s32)richard_regl_event, (s32)richard_talk_event, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"リーダー"*/"\x83\x8A\x81\x5B\x83\x5F\x81\x5B", 0,
-    0, (s32)leaderkaron_init_event, 0, (s32)leaderkaron_talk_event, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"カロン1"*/"\x83\x4A\x83\x8D\x83\x93\x31", // name
+        0, 0, // flags..reactionFlags
+        senkarondummy_init_event, // initEvent
+        senkarondummy_regl_event, // regularEvent
+        senkarondummy_talk_event, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"リチャード"*/"\x83\x8A\x83\x60\x83\x83\x81\x5B\x83\x68", // name
+        0, 0, // flags..reactionFlags
+        richard_init_event, // initEvent
+        richard_regl_event, // regularEvent
+        richard_talk_event, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"リーダー"*/"\x83\x8A\x81\x5B\x83\x5F\x81\x5B", // name
+        0, 0, // flags..reactionFlags
+        leaderkaron_init_event, // initEvent
+        NULL, // regularEvent
+        leaderkaron_talk_event, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static __declspec(section ".data") EVT_BEGIN(door01_close)
@@ -254,17 +258,49 @@ static __declspec(section ".data") EVT_BEGIN(door02_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65548, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"gon_02", (s32)"e_bero", 327685, (s32)door01_close, (s32)door01_open, (s32)"e_bero",
-    65548, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"gon_04", (s32)"w_bero_1", 327685, (s32)door02_close, (s32)door02_open, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        12, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gon_02", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)door01_close, // enterAnimeArg
+        (s32)door01_open, // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        12, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gon_04", // nextMapName
+        "w_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)door02_close, // enterAnimeArg
+        (s32)door02_open, // exitAnimeArg
+    },
+    {0},
 };
 
-__declspec(section ".data") s32 nokotaro_pose[] = {
-    (s32)"PNK_L_1", (s32)"PNK_L_2",
+__declspec(section ".data") const char* nokotaro_pose[] = {
+    "PNK_L_1",
+    "PNK_L_2",
 };
 
 EVT_BEGIN(tegami_event)
@@ -674,25 +710,50 @@ EVT_BEGIN(leaderkaron_init_event)
     RETURN
 EVT_END()
 
-s32 leaderkaron_talk_event[] = {
-    107, 65541, 10, 327771, (s32)evt_npc_get_position, (s32)"me", -30000000, -29999999,
-    -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG1_HONE_ACCESS1", -30000000, -29999999, -29999998, 0,
-    65546, 200, 6, 109, 262235, (s32)evt_npc_flag_onoff, 1, (s32)"me",
-    -2147483648, 131096, -50000000, 0, 196699, (s32)evt_npc_set_width, (s32)/*"リーダー"*/"\x83\x8A\x81\x5B\x83\x5F\x81\x5B", -229979520,
-    65628, (s32)senkaron_event, 131122, -50000000, 1, 33, 2, 1,
-};
+EVT_BEGIN(leaderkaron_talk_event)
+    BEGIN_INLINE_EVENT
+        LOOP(10)
+            CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
+            CALL(evt_snd_sfxon_3d, STRING("SFX_STG1_HONE_ACCESS1"), LW(0), LW(1), LW(2), 0)
+            WAIT_MS(200)
+        END_LOOP
+    END_INLINE_EVENT
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), -2147483648)
+    IF_INT_EQUAL(GW(0), 0)
+        CALL(evt_npc_set_width, STRING(/*"リーダー"*/"\x83\x8A\x81\x5B\x83\x5F\x81\x5B"), FLOAT(20.0f))
+        SPAWN_EVENT(senkaron_event)
+        SET_VALUE(GW(0), 1)
+    END_IF
+    RETURN
+EVT_END()
 
-static s32 senkaron_ext_entry_data[] = {
-    (s32)"c_karon_g_h", (s32)"KRN_R_1", 0, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1065353216, (s32)"c_karon_g_h", (s32)"KRN_R_1",
-    1073741824, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1077936128, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1082130432, (s32)"c_karon_g_h",
-    (s32)"KRN_R_1", 1084227584, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1086324736, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1088421888,
-    (s32)"c_karon_g_h", (s32)"KRN_R_1", 1090519040, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1091567616, (s32)"c_karon_g_h", (s32)"KRN_R_1",
-    1092616192, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1093664768, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1094713344, (s32)"c_karon_g_h",
-    (s32)"KRN_R_1", 1095761920, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1096810496, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1097859072,
-    (s32)"c_karon_g_h", (s32)"KRN_R_1", 1098907648, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1099431936, (s32)"c_karon_g_h", (s32)"KRN_R_1",
-    1099956224, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1100480512, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1101004800, (s32)"c_karon_g_h",
-    (s32)"KRN_R_1", 1101529088, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1102053376, (s32)"c_karon_g_h", (s32)"KRN_R_1", 1102577664,
-    (s32)"c_karon_g_h", (s32)"KRN_D_1", 0, 0, 0, 0,
+static ExtTexInfo senkaron_ext_entry_data[] = {
+    {"c_karon_g_h", "KRN_R_1", 0.0f},
+    {"c_karon_g_h", "KRN_R_1", 1.0f},
+    {"c_karon_g_h", "KRN_R_1", 2.0f},
+    {"c_karon_g_h", "KRN_R_1", 3.0f},
+    {"c_karon_g_h", "KRN_R_1", 4.0f},
+    {"c_karon_g_h", "KRN_R_1", 5.0f},
+    {"c_karon_g_h", "KRN_R_1", 6.0f},
+    {"c_karon_g_h", "KRN_R_1", 7.0f},
+    {"c_karon_g_h", "KRN_R_1", 8.0f},
+    {"c_karon_g_h", "KRN_R_1", 9.0f},
+    {"c_karon_g_h", "KRN_R_1", 10.0f},
+    {"c_karon_g_h", "KRN_R_1", 11.0f},
+    {"c_karon_g_h", "KRN_R_1", 12.0f},
+    {"c_karon_g_h", "KRN_R_1", 13.0f},
+    {"c_karon_g_h", "KRN_R_1", 14.0f},
+    {"c_karon_g_h", "KRN_R_1", 15.0f},
+    {"c_karon_g_h", "KRN_R_1", 16.0f},
+    {"c_karon_g_h", "KRN_R_1", 17.0f},
+    {"c_karon_g_h", "KRN_R_1", 18.0f},
+    {"c_karon_g_h", "KRN_R_1", 19.0f},
+    {"c_karon_g_h", "KRN_R_1", 20.0f},
+    {"c_karon_g_h", "KRN_R_1", 21.0f},
+    {"c_karon_g_h", "KRN_R_1", 22.0f},
+    {"c_karon_g_h", "KRN_R_1", 23.0f},
+    {"c_karon_g_h", "KRN_D_1", 0.0f},
+    {0},
 };
 
 __declspec(section ".data") EVT_BEGIN(senkarondummy_init_event)

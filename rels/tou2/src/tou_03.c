@@ -28,6 +28,7 @@
 #include "evt/evt_party.h"
 #include "evt/evt_sub.h"
 #include "tou2.h"
+#include "data_tables.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_mario_balloon_off);
 USER_FUNC(evt_mario_balloon_tenten);
@@ -253,23 +254,23 @@ static void pose_change(Kyaku* kyaku, const char* name, const char* anim);
 static void pose_main(void);
 static void pose_init(void);
 
-__declspec(section ".data") u64 fd_tou_03_negone_one_374;
-__declspec(section ".data") s32 fd_tou_03_neg_one_382[1];
-__declspec(section ".data") s32 fd_tou_03___local_PI_383[1];
-__declspec(section ".data") s32 fd_tou_03___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_tou_03_one_negone_373;
-__declspec(section ".data") s32 fd_tou_03___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_tou_03_one_381[1];
-__declspec(section ".data") u64 fd_tou_03_negone_one_360;
-__declspec(section ".data") s32 fd_tou_03_neg_one_365[1];
-__declspec(section ".data") s32 fd_tou_03___local_PI_366[1];
-__declspec(section ".data") s32 fd_tou_03___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_tou_03_one_negone_359;
-__declspec(section ".data") s32 fd_tou_03___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_tou_03_one_364[1];
-__declspec(section ".data") s32 fd_tou_03__three_localstatic4_sqrtf[2];
-__declspec(section ".data") s32 fd_tou_03__half_localstatic3_sqrtf[2];
-s32 ext_kyaku_data[153];
+__declspec(section ".data") f32 fd_tou_03_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_03_neg_one_382;
+__declspec(section ".data") f32 fd_tou_03___local_PI_383;
+__declspec(section ".data") f32 fd_tou_03___local_3PIO2_385;
+__declspec(section ".data") f32 fd_tou_03_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_03___local_PIO2_384;
+__declspec(section ".data") f32 fd_tou_03_one_381;
+__declspec(section ".data") f32 fd_tou_03_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_03_neg_one_365;
+__declspec(section ".data") f32 fd_tou_03___local_PI_366;
+__declspec(section ".data") f32 fd_tou_03___local_3PIO2_368;
+__declspec(section ".data") f32 fd_tou_03_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_03___local_PIO2_367;
+__declspec(section ".data") f32 fd_tou_03_one_364;
+__declspec(section ".data") f64 fd_tou_03__three_localstatic4_sqrtf;
+__declspec(section ".data") f64 fd_tou_03__half_localstatic3_sqrtf;
+ExtTexInfo ext_kyaku_data[51];
 __declspec(section ".data") s32 x[1];
 s32 evt_kyaku[138];
 __declspec(section ".data") static s32 inta_tex[8];
@@ -293,10 +294,10 @@ s32 s2_door_close[22];
 s32 s2_door_open2[19];
 static s32 s2_open[18];
 static s32 s2_close[17];
-static s32 bero_data[75];
+static BeroEntry bero_data[5];
 s32 evt_tougi[777];
 s32 init_kinosikowa[13];
-static s32 npcEnt[115];
+static NpcSetupInfo npcEnt[5];
 s32 evt_damage_pose[63];
 static s32 evt_kime_pose[56];
 s32 npc_entry[623];
@@ -322,7 +323,7 @@ s32 evt_default_win[201];
 s32 evt_default_lose[VERSION_PICK(137, 138)];
 static s32 evt_champion[VERSION_PICK(365, 376)];
 s32 evt_champion2[VERSION_PICK(178, 189)];
-__declspec(section ".data") s32 block_data[9];
+__declspec(section ".data") const char* block_data[9];
 static s32 evt_shake[39];
 s32 evt_boss_stone[63];
 static s32 evt_boss[VERSION_PICK(1916, 1919)];
@@ -341,84 +342,91 @@ s32 evt_kyaku_check[105];
 s32 tou_03_init_evt[VERSION_PICK(370, 372)];
 
 #pragma force_active on
-__declspec(section ".data") u64 fd_tou_03_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tou_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tou_03_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tou_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_tou_03___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tou_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tou_03___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tou_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tou_03_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tou_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tou_03___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tou_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tou_03_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tou_03_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_tou_03_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tou_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tou_03_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tou_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_tou_03___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tou_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tou_03___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tou_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tou_03_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tou_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tou_03___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tou_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tou_03_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tou_03_one_364 = 1.0f;
 
-__declspec(section ".data") s32 fd_tou_03__three_localstatic4_sqrtf[] = {
-    1074266112, 0,
-};
+__declspec(section ".data") f64 fd_tou_03__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") s32 fd_tou_03__half_localstatic3_sqrtf[] = {
-    1071644672, 0,
-};
+__declspec(section ".data") f64 fd_tou_03__half_localstatic3_sqrtf = 0.5;
 #pragma force_active reset
 
-s32 ext_kyaku_data[] = {
-    (s32)("c_kinopio"), (s32)("KNP_S_1"), 0, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1092616192, (s32)("c_kinopio"), (s32)("KNP_S_1"),
-    1101004800, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1106247680, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1109393408, (s32)("c_kinopio"),
-    (s32)("KNP_S_1"), 1112014848, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1114636288, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1116471296,
-    (s32)("c_kinopio"), (s32)("KNP_S_1"), 1117782016, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1119092736, (s32)("c_kinopio"), (s32)("KNP_S_1"),
-    1120403456, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1121714176, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1123024896, (s32)("c_kinopio"),
-    (s32)("KNP_S_1"), 1124204544, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1124859904, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1125515264,
-    (s32)("c_kinopio"), (s32)("KNP_S_1"), 1126170624, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1126825984, (s32)("c_kinopio"), (s32)("KNP_S_1"),
-    1127481344, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1128136704, (s32)("c_kinopiko"), (s32)("KNF_S_1"), 0, (s32)("c_kinopiko"),
-    (s32)("KNF_S_1"), 1092616192, (s32)("c_kinopiko"), (s32)("KNF_S_1"), 1101004800, (s32)("c_kinopiko"), (s32)("KNF_S_1"), 1106247680,
-    (s32)("c_kinopiko"), (s32)("KNF_S_1"), 1109393408, (s32)("c_kinopiko"), (s32)("KNF_S_1"), 1112014848, (s32)("c_kinopiko"), (s32)("KNF_S_1"),
-    1114636288, (s32)("c_kinopiko"), (s32)("KNF_S_1"), 1116471296, (s32)("c_kinopiko"), (s32)("KNF_S_1"), 1117782016, (s32)("c_kinopiko"),
-    (s32)("KNF_S_1"), 1119092736, (s32)("c_kinopiko"), (s32)("KNF_S_1"), 1120403456, (s32)("c_kinopiko"), (s32)("KNF_S_1"), 1121714176,
-    (s32)("c_kinopiko"), (s32)("KNF_S_1"), 1123024896, (s32)("c_kinopiko"), (s32)("KNF_S_1"), 1124204544, (s32)("c_kinopiko"), (s32)("KNF_S_1"),
-    1124859904, (s32)("c_kinopiko"), (s32)("KNF_S_1"), 1125515264, (s32)("c_kinopiko"), (s32)("KNF_S_1"), 1126170624, (s32)("c_roten"),
-    (s32)("S_1"), 0, (s32)("c_roten"), (s32)("S_1"), 1092616192, (s32)("c_roten"), (s32)("S_1"), 1101004800,
-    (s32)("c_roten"), (s32)("S_1"), 1106247680, (s32)("c_roten"), (s32)("S_1"), 1109393408, (s32)("c_roten"), (s32)("S_1"),
-    1112014848, (s32)("c_jugemu"), (s32)("JGM_S_1"), 0, (s32)("c_jugemu"), (s32)("JGM_S_1"), 1092616192, (s32)("c_jugemu"),
-    (s32)("JGM_S_1"), 1101004800, (s32)("c_jugemu"), (s32)("JGM_S_1"), 1106247680, (s32)("c_jugemu"), (s32)("JGM_S_1"), 1109393408,
-    (s32)("c_jugemu"), (s32)("JGM_S_1"), 1112014848, (s32)("c_jugemu"), (s32)("JGM_S_1"), 1114636288, 0, 0,
-    0,
+ExtTexInfo ext_kyaku_data[] = {
+    {("c_kinopio"), ("KNP_S_1"), 0.0f},
+    {("c_kinopio"), ("KNP_S_1"), 10.0f},
+    {("c_kinopio"), ("KNP_S_1"), 20.0f},
+    {("c_kinopio"), ("KNP_S_1"), 30.0f},
+    {("c_kinopio"), ("KNP_S_1"), 40.0f},
+    {("c_kinopio"), ("KNP_S_1"), 50.0f},
+    {("c_kinopio"), ("KNP_S_1"), 60.0f},
+    {("c_kinopio"), ("KNP_S_1"), 70.0f},
+    {("c_kinopio"), ("KNP_S_1"), 80.0f},
+    {("c_kinopio"), ("KNP_S_1"), 90.0f},
+    {("c_kinopio"), ("KNP_S_1"), 100.0f},
+    {("c_kinopio"), ("KNP_S_1"), 110.0f},
+    {("c_kinopio"), ("KNP_S_1"), 120.0f},
+    {("c_kinopio"), ("KNP_S_1"), 130.0f},
+    {("c_kinopio"), ("KNP_S_1"), 140.0f},
+    {("c_kinopio"), ("KNP_S_1"), 150.0f},
+    {("c_kinopio"), ("KNP_S_1"), 160.0f},
+    {("c_kinopio"), ("KNP_S_1"), 170.0f},
+    {("c_kinopio"), ("KNP_S_1"), 180.0f},
+    {("c_kinopio"), ("KNP_S_1"), 190.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 0.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 10.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 20.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 30.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 40.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 50.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 60.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 70.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 80.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 90.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 100.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 110.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 120.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 130.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 140.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 150.0f},
+    {("c_kinopiko"), ("KNF_S_1"), 160.0f},
+    {("c_roten"), ("S_1"), 0.0f},
+    {("c_roten"), ("S_1"), 10.0f},
+    {("c_roten"), ("S_1"), 20.0f},
+    {("c_roten"), ("S_1"), 30.0f},
+    {("c_roten"), ("S_1"), 40.0f},
+    {("c_roten"), ("S_1"), 50.0f},
+    {("c_jugemu"), ("JGM_S_1"), 0.0f},
+    {("c_jugemu"), ("JGM_S_1"), 10.0f},
+    {("c_jugemu"), ("JGM_S_1"), 20.0f},
+    {("c_jugemu"), ("JGM_S_1"), 30.0f},
+    {("c_jugemu"), ("JGM_S_1"), 40.0f},
+    {("c_jugemu"), ("JGM_S_1"), 50.0f},
+    {("c_jugemu"), ("JGM_S_1"), 60.0f},
+    {0},
 };
 
 __declspec(section ".data") EVT_BEGIN(x)
@@ -427,9 +435,9 @@ EVT_END()
 s32 _firstattack_setting(EventEntry* event, BOOL isFirstCall) {
     FieldBattleData* fbat = fbatGetPointer();
 
-    *(s32*)&fbat->field_C[4] = 0x10000000;
-    *(s32*)&fbat->field_C[8] = 0x10;
-    *(u32*)&fbat->field_C[0x10] &= ~1;
+    fbat->unk10 = 0x10000000;
+    fbat->unk14 = 0x10;
+    fbat->unk1C &= ~1;
     fbatSetAttackAnnounce(0x10000000);
     fbatSetAttackAnnounceEnable();
     return EVT_RETURN_DONE;
@@ -835,119 +843,284 @@ static EVT_BEGIN(s2_close)
     RETURN
 EVT_END()
 
-static s32 bero_data[] = {
-    (s32)("w_bero"), 65542, 20000, 100000, 0, 0, -1, (s32)w_open,
-    -1, (s32)w_close, (s32)("tou_04"), (s32)("n_bero_2"), 327685, (s32)w_door_close, (s32)w_door_open, (s32)("e_bero"),
-    65542, 20000, 100000, 0, 0, -1, (s32)e_open, -1,
-    (s32)e_close, (s32)("tou_04"), (s32)("n_bero_1"), 327685, (s32)e_door_close, (s32)e_door_open, (s32)("s_bero_1"), 65542,
-    20000, 100000, 0, 0, -1, (s32)s1_open, -1, (s32)s1_close,
-    (s32)("tou_02"), (s32)("n_bero_1"), 327685, (s32)s1_door_close, (s32)s1_door_open, (s32)("s_bero_2"), 65542, 20000,
-    100000, 0, 0, -1, (s32)s2_open, -1, (s32)s2_close, (s32)("tou_02"),
-    (s32)("n_bero_2"), 327685, (s32)s2_door_close, (s32)s2_door_open, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static BeroEntry bero_data[] = {
+    {
+        ("w_bero"), // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)w_open, // enterEvent
+        -1, // caseType
+        (s32*)w_close, // exitEvent
+        (s32)("tou_04"), // nextMapName
+        ("n_bero_2"), // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {
+        ("e_bero"), // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)e_open, // enterEvent
+        -1, // caseType
+        (s32*)e_close, // exitEvent
+        (s32)("tou_04"), // nextMapName
+        ("n_bero_1"), // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {
+        ("s_bero_1"), // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)s1_open, // enterEvent
+        -1, // caseType
+        (s32*)s1_close, // exitEvent
+        (s32)("tou_02"), // nextMapName
+        ("n_bero_1"), // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s1_door_close, // enterAnimeArg
+        (s32)s1_door_open, // exitAnimeArg
+    },
+    {
+        ("s_bero_2"), // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)s2_open, // enterEvent
+        -1, // caseType
+        (s32*)s2_close, // exitEvent
+        (s32)("tou_02"), // nextMapName
+        ("n_bero_2"), // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s2_door_close, // enterAnimeArg
+        (s32)s2_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
-s32 evt_tougi[] = {
-    131163, (s32)evt_mario_key_onoff, 0, 131163, (s32)evt_party_stop, 0, 131122, -70000000,
-    0, 131163, (s32)evt_bero_get_entername, -30000000, 131084, -30000000, (s32)("s_bero_2"), 131122,
-    -70000000, 1, 33, 131096, -70000000, 0, 262235, (s32)evt_mario_set_pos,
-    -25, 0, 635, 327771, (s32)evt_party_set_pos, 0, 25, 0,
-    635, 262235, (s32)evt_mario_set_dir, 90, 0, 0, 262235, (s32)evt_party_set_dir,
-    0, 270, 0, 32, 262235, (s32)evt_mario_set_pos, -25, 120,
-    980, 327771, (s32)evt_party_set_pos, 0, 25, 120, 980, 262235,
-    (s32)evt_mario_set_dir, 90, 0, 0, 262235, (s32)evt_party_set_dir, 0, 270,
-    0, 33, 131163, (s32)evt_mario_set_dir_npc, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", 196699, (s32)evt_party_set_dir_npc, 0,
-    (s32)/*"相手"*/"\221\212\216\350", 196699, (s32)evt_set_dir_to_target, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", (s32)/*"相手"*/"\221\212\216\350", 589915, (s32)evt_cam3d_evt_set, 0,
-    563, 962, 0, 554, 412, 0, 11, 65545,
-    1, 458843, (s32)evt_npc_sound_data_set, (s32)/*"相手"*/"\221\212\216\350", -250000000, -250000000, -250000000, -250000000,
-    (s32)("SFX_STG3_TOGENOKO_DOWN1"), 131124, -30000000, -230184320, 131096, -70000000, 0, 65630,
-    (s32)s1_door_open, 32, 65630, (s32)s2_door_open, 33, 131163, (s32)evt_seq_wait, 2,
-    589915, (s32)evt_cam3d_evt_set, 0, 258, 962, 0, 215, 412,
-    5000, 0, 65546, 5000, 65546, 2000, 131096, -70000000,
-    0, 589915, (s32)evt_cam3d_evt_set, 0, 130, 840, 0, 50,
-    397, 1500, 11, 32, 589915, (s32)evt_cam3d_evt_set, 0, 240,
-    1187, 0, 170, 742, 1500, 11, 33, 107,
-    327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 131126, -29999998,
-    230, 262235, (s32)evt_mario_mov_pos2, -30000000, -29999998, -229918080, 109, 327771,
-    (s32)evt_party_get_pos, 0, -30000000, -29999999, -29999998, 131126, -29999998, 230,
-    327771, (s32)evt_party_move_pos2, 0, -30000000, -29999998, -229918080, 131122, -29999999,
-    2, 65628, (s32)bero_close_door_play_se, 327771, (s32)evt_sub_intpl_msec_init, 11, 180, 0,
-    500, 65539, 1, 65627, (s32)evt_sub_intpl_msec_get_value, 131096, -70000000, 0,
-    65630, (s32)s1_door_close, 32, 65630, (s32)s2_door_close, 33, 131096, -29999999,
-    1, 65540, 1, 33, 327771, (s32)evt_sub_intpl_msec_init, 2, 0,
-    180, 500, 65539, 2, 65627, (s32)evt_sub_intpl_msec_get_value, 131096, -70000000,
-    0, 65630, (s32)s1_door_open2, 32, 65630, (s32)s2_door_open2, 33, 131096,
-    -29999999, 1, 65540, 2, 33, 107, 262235, (s32)evt_mario_set_dir,
-    90, 300, 0, 109, 262235, (s32)evt_party_set_dir, 0, 270,
-    -1, 65546, 500, 131163, (s32)evt_msg_print_party, (s32)("stg3_tou_25"), 65546, 300,
-    131163, (s32)evt_mario_set_dir_npc, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", 65546, 1000, 589915, (s32)evt_cam3d_evt_set, 85,
-    172, 326, 85, 96, -104, 0, 11, 65545,
-    1, 327771, (s32)evt_msg_print, 0, (s32)("stg3_tou_26"), 0, (s32)/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223"), 65546,
-    300, 589915, (s32)evt_cam3d_evt_set, -85, 172, 326, -85, 96,
-    -104, 1000, 11, 327771, (s32)evt_npc_get_position, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", -29999990, -29999989,
-    -29999988, 262235, (s32)evt_npc_status_onoff, 1, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", 2, 327771, (s32)evt_npc_get_position,
-    (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", -30000000, -29999999, -29999998, 131126, -30000000, 50, 458843,
-    (s32)evt_npc_move_position, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", -30000000, -29999998, 0, -229897600, 1, 327771,
-    (s32)evt_npc_set_rotate, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", 0, 0, -30, 327771, (s32)evt_npc_get_position, (s32)/*"相手"*/"\221\212\216\350",
-    -30000000, -29999999, -29999998, 131125, -29999999, 20, 458843, (s32)evt_npc_jump_position_nohit,
-    (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", -30000000, -29999999, -29999998, 700, -229959040, 393307, (s32)evt_snd_sfxon_3d,
-    (s32)("SFX_STG3_BLED_ATTACK1"), -30000000, -29999999, -29999998, 0, 983131, (s32)evt_eff, 0,
-    (s32)("hit"), 0, -30000000, -29999999, -29999998, -229996928, 10, 0,
-    0, 0, 0, 0, 0, 107, 327771, (s32)evt_cam_shake,
-    4, -229999990, -230000000, 300, 109, 107, 131122, -30000000,
-    -30, 65541, 10, 327771, (s32)evt_npc_set_rotate, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", 0, 0,
-    -30000000, 131125, -30000000, 3, 65545, 1, 6, 327771,
-    (s32)evt_npc_set_rotate, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", 0, 0, 0, 109, 107, 458843,
-    (s32)evt_npc_sound_data_set, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", -250000000, -250000000, -250000000, 0, 0, 131125,
-    -30000000, 30, 131126, -29999999, 20, 458843, (s32)evt_npc_jump_position_nohit, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223",
-    -30000000, -29999999, -29999998, 300, -229979520, 131125, -30000000, 30,
-    458843, (s32)evt_npc_jump_position_nohit, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", -30000000, -29999999, -29999998, 300, -229989760,
-    458843, (s32)evt_npc_jump_position_nohit, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", -29999990, -29999989, -29999988, 300, -229989760,
-    131163, (s32)evt_npc_sound_data_reset, (s32)/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223"), 109, 196699, (s32)evt_npc_set_anim, (s32)/*("\221\212\216\350")*/("\221\212\216\350"), (s32)("K_2"),
-    107, 327771, (s32)evt_npc_get_position, (s32)/*"相手"*/"\221\212\216\350", -30000000, -29999999, -29999998, 131126,
-    -30000000, 30, 458843, (s32)evt_npc_jump_position_nohit, (s32)/*"相手"*/"\221\212\216\350", -30000000, -29999999, -29999998,
-    300, -229979520, 131126, -30000000, 30, 458843, (s32)evt_npc_jump_position_nohit, (s32)/*"相手"*/"\221\212\216\350",
-    -30000000, -29999999, -29999998, 300, -229989760, 109, 327771, (s32)evt_msg_print,
-    0, (s32)("stg3_tou_27"), 0, (s32)/*("\221\212\216\350")*/("\221\212\216\350"), 589915, (s32)evt_cam3d_evt_set, 65, 172,
-    326, 65, 96, -104, 1000, 11, 131122, -90000000,
-    0, 107, 262235, (s32)evt_npc_status_onoff, 1, (s32)/*"ガンス"*/"\203K\203\223\203X", 2, 327771,
-    (s32)evt_npc_set_position, (s32)/*"ガンス"*/"\203K\203\223\203X", 160, 60, -65, 458843, (s32)evt_npc_move_position, (s32)/*"ガンス"*/"\203K\203\223\203X",
-    45, -65, 0, -229948800, 1, 458843, (s32)evt_npc_move_position, (s32)/*"ガンス"*/"\203K\203\223\203X",
-    20, 0, 0, -229948800, 1, 196699, (s32)evt_set_dir_to_target, (s32)/*"ガンス"*/"\203K\203\223\203X",
-    (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", 131122, -90000000, 1, 109, 65546, 1200, 196699,
-    (s32)evt_npc_set_anim, (s32)/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223"), (s32)("S_4"), 262235, (s32)evt_npc_set_autotalkpose, (s32)/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223"), (s32)("S_4"), (s32)("T_4"),
-    327771, (s32)evt_msg_print, 0, (s32)("stg3_tou_28"), 0, (s32)/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223"), 65546, 300,
-    65541, 0, 131096, -90000000, 1, 7, 33, 65545,
-    1, 6, 327771, (s32)evt_msg_print, 0, (s32)("stg3_tou_29"), 0, (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"),
-    65546, 300, 196699, (s32)evt_npc_set_anim, (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"), (s32)("M_5"), 65546, 300,
-    196699, (s32)evt_npc_set_anim, (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"), (s32)("M_6"), 327771, (s32)evt_msg_print, 0, (s32)("stg3_tou_30"),
-    0, (s32)/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223"), 196699, (s32)evt_npc_set_anim, (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"), (s32)("M_7"), 65546, 300,
-    196699, (s32)evt_npc_set_anim, (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"), (s32)("S_2"), 196699, (s32)evt_npc_set_anim, (s32)/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223"), (s32)("H_1"),
-    262235, (s32)evt_npc_set_autotalkpose, (s32)/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223"), (s32)("S_2"), (s32)("T_2"), 65627, (s32)evt_msg_continue, 65546,
-    1500, 196699, (s32)evt_npc_set_anim, (s32)/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223"), (s32)("H_2"), 65546, 200, 196699,
-    (s32)evt_npc_set_anim, (s32)/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223"), (s32)("S_3"), 196699, (s32)evt_npc_entry, (s32)/*("\203x\203\213\203g")*/("\203x\203\213\203g"), (s32)("c_bred_h"), 327771,
-    (s32)evt_npc_get_position, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", -30000000, -29999999, -29999998, 131126, -30000000, 5,
-    131125, -29999999, 65, 327771, (s32)evt_npc_set_position, (s32)/*"ベルト"*/"\203x\203\213\203g", -30000000, -29999999,
-    -29999998, 196699, (s32)evt_npc_set_anim, (s32)/*("\203x\203\213\203g")*/("\203x\203\213\203g"), (s32)("C_1"), 131125, -29999998, 10,
-    983131, (s32)evt_eff, 0, (s32)("starstone"), 9, -30000000, -29999999, -29999998,
-    -229999232, 0, 0, 0, 0, 0, 0, 0,
-    393307, (s32)evt_snd_sfxon_3d, (s32)("SFX_STG3_WIN_AUDIENCE2"), -30000000, -29999999, -29999998, 0, 65546,
-    2000, 131096, -70000000, 0, 589915, (s32)evt_cam3d_evt_set, 0, 95,
-    692, 0, 43, 397, 0, 11, 32, 589915,
-    (s32)evt_cam3d_evt_set, 0, 218, 1037, 0, 165, 742, 0,
-    11, 33, 65545, 1, 131163, (s32)evt_mario_set_dir_npc, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", 196699,
-    (s32)evt_party_set_dir_npc, 0, (s32)/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223"), 786523, (s32)evt_eff_fukidashi, 3, (s32)("eff"), 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    65546, 1000, 131163, (s32)evt_msg_print_party, (s32)("stg3_tou_31"), 65546, 300, 589915,
-    (s32)evt_cam3d_evt_set, 80, 67, 225, 80, 172, -161, 0,
-    11, 65545, 1, 65546, 1000, 327771, (s32)evt_msg_toge, 1,
-    0, 0, 0, 131163, (s32)evt_msg_print_party, (s32)("stg3_tou_32"), 65546, 300,
-    393307, (s32)evt_fade_set_mapchange_type, 0, 2, 500, 1, 500, 131122,
-    -129997626, 1, 131096, -70000000, 0, 196699, (s32)evt_bero_mapchange, (s32)("tou_02"),
-    (s32)("n_bero_1"), 32, 196699, (s32)evt_bero_mapchange, (s32)("tou_02"), (s32)("n_bero_2"), 33, 2,
-    1,
-};
+EVT_BEGIN(evt_tougi)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_party_stop, 0)
+    SET_VALUE(LF(0), 0)
+    CALL(evt_bero_get_entername, LW(0))
+    IF_STR_EQUAL(LW(0), PTR("s_bero_2"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_INT_EQUAL(LF(0), 0)
+        CALL(evt_mario_set_pos, -25, 0, 635)
+        CALL(evt_party_set_pos, 0, 25, 0, 635)
+        CALL(evt_mario_set_dir, 90, 0, 0)
+        CALL(evt_party_set_dir, 0, 270, 0)
+    ELSE
+        CALL(evt_mario_set_pos, -25, 120, 980)
+        CALL(evt_party_set_pos, 0, 25, 120, 980)
+        CALL(evt_mario_set_dir, 90, 0, 0)
+        CALL(evt_party_set_dir, 0, 270, 0)
+    END_IF
+    CALL(evt_mario_set_dir_npc, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"))
+    CALL(evt_party_set_dir_npc, 0, STRING(/*"相手"*/"\221\212\216\350"))
+    CALL(evt_set_dir_to_target, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), STRING(/*"相手"*/"\221\212\216\350"))
+    CALL(evt_cam3d_evt_set, 0, 563, 962, 0, 554, 412, 0, 11)
+    WAIT_FRAMES(1)
+    CALL(evt_npc_sound_data_set, STRING(/*"相手"*/"\221\212\216\350"), -250000000, -250000000, -250000000, -250000000, PTR("SFX_STG3_TOGENOKO_DOWN1"))
+    SET_FLOAT_VALUE(LW(0), FLOAT(-180.0f))
+    IF_INT_EQUAL(LF(0), 0)
+        CALL_CHILD(s1_door_open)
+    ELSE
+        CALL_CHILD(s2_door_open)
+    END_IF
+    CALL(evt_seq_wait, 2)
+    CALL(evt_cam3d_evt_set, 0, 258, 962, 0, 215, 412, 5000, 0)
+    WAIT_MS(5000)
+    WAIT_MS(2000)
+    IF_INT_EQUAL(LF(0), 0)
+        CALL(evt_cam3d_evt_set, 0, 130, 840, 0, 50, 397, 1500, 11)
+    ELSE
+        CALL(evt_cam3d_evt_set, 0, 240, 1187, 0, 170, 742, 1500, 11)
+    END_IF
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        SUBTRACT(LW(2), 230)
+        CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(80.0f))
+    END_INLINE_EVENT
+    CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
+    SUBTRACT(LW(2), 230)
+    CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
+    SET_VALUE(LW(1), 2)
+    SPAWN_EVENT(bero_close_door_play_se)
+    CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
+    LABEL(1)
+    CALL(evt_sub_intpl_msec_get_value)
+    IF_INT_EQUAL(LF(0), 0)
+        CALL_CHILD(s1_door_close)
+    ELSE
+        CALL_CHILD(s2_door_close)
+    END_IF
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(1)
+    END_IF
+    CALL(evt_sub_intpl_msec_init, 2, 0, 180, 500)
+    LABEL(2)
+    CALL(evt_sub_intpl_msec_get_value)
+    IF_INT_EQUAL(LF(0), 0)
+        CALL_CHILD(s1_door_open2)
+    ELSE
+        CALL_CHILD(s2_door_open2)
+    END_IF
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(2)
+    END_IF
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_set_dir, 90, 300, 0)
+    END_INLINE_EVENT
+    CALL(evt_party_set_dir, 0, 270, -1)
+    WAIT_MS(500)
+    CALL(evt_msg_print_party, PTR("stg3_tou_25"))
+    WAIT_MS(300)
+    CALL(evt_mario_set_dir_npc, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"))
+    WAIT_MS(1000)
+    CALL(evt_cam3d_evt_set, 85, 172, 326, 85, 96, -104, 0, 11)
+    WAIT_FRAMES(1)
+    CALL(evt_msg_print, 0, PTR("stg3_tou_26"), 0, PTR(/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223")))
+    WAIT_MS(300)
+    CALL(evt_cam3d_evt_set, -85, 172, 326, -85, 96, -104, 1000, 11)
+    CALL(evt_npc_get_position, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), LW(10), LW(11), LW(12))
+    CALL(evt_npc_status_onoff, 1, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), 2)
+    CALL(evt_npc_get_position, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), LW(0), LW(1), LW(2))
+    SUBTRACT(LW(0), 50)
+    CALL(evt_npc_move_position, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), LW(0), LW(2), 0, FLOAT(100.0f), 1)
+    CALL(evt_npc_set_rotate, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), 0, 0, -30)
+    CALL(evt_npc_get_position, STRING(/*"相手"*/"\221\212\216\350"), LW(0), LW(1), LW(2))
+    ADD(LW(1), 20)
+    CALL(evt_npc_jump_position_nohit, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), LW(0), LW(1), LW(2), 700, FLOAT(40.0f))
+    CALL(evt_snd_sfxon_3d, PTR("SFX_STG3_BLED_ATTACK1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_eff, 0, PTR("hit"), 0, LW(0), LW(1), LW(2), FLOAT(3.0f), 10, 0, 0, 0, 0, 0, 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        SET_VALUE(LW(0), -30)
+        LOOP(10)
+            CALL(evt_npc_set_rotate, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), 0, 0, LW(0))
+            ADD(LW(0), 3)
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(evt_npc_set_rotate, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), 0, 0, 0)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_sound_data_set, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), -250000000, -250000000, -250000000, 0, 0)
+        ADD(LW(0), 30)
+        SUBTRACT(LW(1), 20)
+        CALL(evt_npc_jump_position_nohit, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), LW(0), LW(1), LW(2), 300, FLOAT(20.0f))
+        ADD(LW(0), 30)
+        CALL(evt_npc_jump_position_nohit, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), LW(0), LW(1), LW(2), 300, FLOAT(10.0f))
+        CALL(evt_npc_jump_position_nohit, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), LW(10), LW(11), LW(12), 300, FLOAT(10.0f))
+        CALL(evt_npc_sound_data_reset, PTR(/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223")))
+    END_INLINE_EVENT
+    CALL(evt_npc_set_anim, PTR(/*("\221\212\216\350")*/("\221\212\216\350")), PTR("K_2"))
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_get_position, STRING(/*"相手"*/"\221\212\216\350"), LW(0), LW(1), LW(2))
+        SUBTRACT(LW(0), 30)
+        CALL(evt_npc_jump_position_nohit, STRING(/*"相手"*/"\221\212\216\350"), LW(0), LW(1), LW(2), 300, FLOAT(20.0f))
+        SUBTRACT(LW(0), 30)
+        CALL(evt_npc_jump_position_nohit, STRING(/*"相手"*/"\221\212\216\350"), LW(0), LW(1), LW(2), 300, FLOAT(10.0f))
+    END_INLINE_EVENT
+    CALL(evt_msg_print, 0, PTR("stg3_tou_27"), 0, PTR(/*("\221\212\216\350")*/("\221\212\216\350")))
+    CALL(evt_cam3d_evt_set, 65, 172, 326, 65, 96, -104, 1000, 11)
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_status_onoff, 1, STRING(/*"ガンス"*/"\203K\203\223\203X"), 2)
+        CALL(evt_npc_set_position, STRING(/*"ガンス"*/"\203K\203\223\203X"), 160, 60, -65)
+        CALL(evt_npc_move_position, STRING(/*"ガンス"*/"\203K\203\223\203X"), 45, -65, 0, FLOAT(50.0f), 1)
+        CALL(evt_npc_move_position, STRING(/*"ガンス"*/"\203K\203\223\203X"), 20, 0, 0, FLOAT(50.0f), 1)
+        CALL(evt_set_dir_to_target, STRING(/*"ガンス"*/"\203K\203\223\203X"), STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"))
+        SET_VALUE(GF(0), 1)
+    END_INLINE_EVENT
+    WAIT_MS(1200)
+    CALL(evt_npc_set_anim, PTR(/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223")), PTR("S_4"))
+    CALL(evt_npc_set_autotalkpose, PTR(/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223")), PTR("S_4"), PTR("T_4"))
+    CALL(evt_msg_print, 0, PTR("stg3_tou_28"), 0, PTR(/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223")))
+    WAIT_MS(300)
+    LOOP(0)
+        IF_INT_EQUAL(GF(0), 1)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_msg_print, 0, PTR("stg3_tou_29"), 0, PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")))
+    WAIT_MS(300)
+    CALL(evt_npc_set_anim, PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")), PTR("M_5"))
+    WAIT_MS(300)
+    CALL(evt_npc_set_anim, PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")), PTR("M_6"))
+    CALL(evt_msg_print, 0, PTR("stg3_tou_30"), 0, PTR(/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223")))
+    CALL(evt_npc_set_anim, PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")), PTR("M_7"))
+    WAIT_MS(300)
+    CALL(evt_npc_set_anim, PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")), PTR("S_2"))
+    CALL(evt_npc_set_anim, PTR(/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223")), PTR("H_1"))
+    CALL(evt_npc_set_autotalkpose, PTR(/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223")), PTR("S_2"), PTR("T_2"))
+    CALL(evt_msg_continue)
+    WAIT_MS(1500)
+    CALL(evt_npc_set_anim, PTR(/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223")), PTR("H_2"))
+    WAIT_MS(200)
+    CALL(evt_npc_set_anim, PTR(/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223")), PTR("S_3"))
+    CALL(evt_npc_entry, PTR(/*("\203x\203\213\203g")*/("\203x\203\213\203g")), PTR("c_bred_h"))
+    CALL(evt_npc_get_position, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), LW(0), LW(1), LW(2))
+    SUBTRACT(LW(0), 5)
+    ADD(LW(1), 65)
+    CALL(evt_npc_set_position, STRING(/*"ベルト"*/"\203x\203\213\203g"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_set_anim, PTR(/*("\203x\203\213\203g")*/("\203x\203\213\203g")), PTR("C_1"))
+    ADD(LW(2), 10)
+    CALL(evt_eff, 0, PTR("starstone"), 9, LW(0), LW(1), LW(2), FLOAT(0.75f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, PTR("SFX_STG3_WIN_AUDIENCE2"), LW(0), LW(1), LW(2), 0)
+    WAIT_MS(2000)
+    IF_INT_EQUAL(LF(0), 0)
+        CALL(evt_cam3d_evt_set, 0, 95, 692, 0, 43, 397, 0, 11)
+    ELSE
+        CALL(evt_cam3d_evt_set, 0, 218, 1037, 0, 165, 742, 0, 11)
+    END_IF
+    WAIT_FRAMES(1)
+    CALL(evt_mario_set_dir_npc, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"))
+    CALL(evt_party_set_dir_npc, 0, PTR(/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223")))
+    CALL(evt_eff_fukidashi, 3, PTR("eff"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    WAIT_MS(1000)
+    CALL(evt_msg_print_party, PTR("stg3_tou_31"))
+    WAIT_MS(300)
+    CALL(evt_cam3d_evt_set, 80, 67, 225, 80, 172, -161, 0, 11)
+    WAIT_FRAMES(1)
+    WAIT_MS(1000)
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print_party, PTR("stg3_tou_32"))
+    WAIT_MS(300)
+    CALL(evt_fade_set_mapchange_type, 0, 2, 500, 1, 500)
+    SET_VALUE(GSWF(2374), 1)
+    IF_INT_EQUAL(LF(0), 0)
+        CALL(evt_bero_mapchange, PTR("tou_02"), PTR("n_bero_1"))
+    ELSE
+        CALL(evt_bero_mapchange, PTR("tou_02"), PTR("n_bero_2"))
+    END_IF
+    RETURN
+EVT_END()
 
 EVT_BEGIN(init_kinosikowa)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 172)
@@ -957,22 +1130,45 @@ EVT_BEGIN(init_kinosikowa)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"ガンス"*/"\203K\203\223\203X", 1073743360, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"キノシコワ"*/"\203L\203m\203V\203R\203\217",
-    1073743360, 0, (s32)init_kinosikowa, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"マッチョガンス"*/"\203}\203b\203`\203\207\203K\203\223\203X", 1073743360,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"キノシチョフ"*/"\203L\203m\203V\203`\203\207\203t", 1073743360, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"ガンス"*/"\203K\203\223\203X", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"キノシコワ"*/"\203L\203m\203V\203R\203\217", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_kinosikowa, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"マッチョガンス"*/"\203}\203b\203`\203\207\203K\203\223\203X", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"キノシチョフ"*/"\203L\203m\203V\203`\203\207\203t", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_damage_pose)
@@ -1023,86 +1219,222 @@ static EVT_BEGIN(evt_kime_pose)
     RETURN
 EVT_END()
 
-s32 npc_entry[] = {
-    131098, -170000000, 128, 196699, (s32)evt_npc_entry, (s32)/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223"), (s32)("c_bred_h"), 327771,
-    (s32)evt_npc_set_position, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", 80, 60, 0, 196699, (s32)evt_npc_entry, (s32)/*"相手"*/"\221\212\216\350",
-    (s32)("c_togenoko_b"), 327771, (s32)evt_npc_set_position, (s32)/*("\221\212\216\350")*/("\221\212\216\350"), -80, 60, 0, 196699,
-    (s32)evt_npc_set_tribe, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", (s32)/*"ブレッドハート"*/"\203u\203\214\203b\203h\203n\201[\203g", 196699, (s32)evt_npc_set_tribe, (s32)/*"相手"*/"\221\212\216\350", (s32)/*"トゲノコエース"*/"\203g\203Q\203m\203R\203G\201[\203X", 262235,
-    (s32)evt_npc_flag_onoff, 1, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", 1073743360, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"相手"*/"\221\212\216\350",
-    1073741824, 196699, (s32)evt_npc_set_ry, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", 270, 196699, (s32)evt_npc_set_ry, (s32)/*"相手"*/"\221\212\216\350",
-    90, 2, 33, 131122, -70000000, 0, 65570, -170000000,
-    131119, 128, 162, 131122, -70000000, 1, 65574, 164,
-    42, 131122, -70000000, 1, 49, 131096, -70000000, 1,
-    131096, -129997612, 0, 196699, (s32)evt_sub_random, 10000, -29999990, 131098,
-    -29999990, 5000, 65541, 0, 196699, (s32)evt_sub_random, 3000, -29999990,
-    65570, -29999990, 65574, 1000, 131122, -30000000, (s32)("c_bomhey"), 131122,
-    -29999999, (s32)/*("\203{\203\200\225\272")*/("\203{\203\200\225\272"), 65574, 2000, 131122, -30000000, (s32)("c_kuribo"), 131122,
-    -29999999, (s32)/*("\203N\203\212\203{\201[")*/("\203N\203\212\203{\201["), 42, 131122, -30000000, (s32)("c_kmoon_wb"), 131122, -29999999,
-    (s32)/*"モノクロクロクモーン"*/"\203\202\203m\203N\203\215\203N\203\215\203N\203\202\201[\203\223", 49, 196699, (s32)evt_sub_random, 3000, -29999990, 65570, -29999990,
-    65574, 1000, 131122, -29999998, (s32)("c_bomhey"), 131122, -29999997, (s32)/*("\203{\203\200\225\272")*/("\203{\203\200\225\272"),
-    65574, 2000, 131122, -29999998, (s32)("c_kuribo"), 131122, -29999997, (s32)/*("\203N\203\212\203{\201[")*/("\203N\203\212\203{\201["),
-    42, 131122, -29999998, (s32)("c_kmoon_wb"), 131122, -29999997, (s32)/*("\203\202\203m\203N\203\215\203N\203\215\203N\203\202\201[\203\223")*/("\203\202\203m\203N\203\215\203N\203\215\203N\203\202\201[\203\223"), 49,
-    131085, -30000000, -29999998, 7, 33, 6, 32, 65541,
-    0, 196699, (s32)evt_sub_random, 4000, -29999990, 65570, -29999990, 65574,
-    1000, 131122, -30000000, (s32)("c_chorobon"), 131122, -29999999, (s32)/*("\203`\203\207\203\215\203{\203\223")*/("\203`\203\207\203\215\203{\203\223"), 65574,
-    2000, 131122, -30000000, (s32)("c_monban_t"), 131122, -29999999, (s32)/*("\203_\201[\203N\203L\201[\203p\201[")*/("\203_\201[\203N\203L\201[\203p\201["), 65574,
-    3000, 131122, -30000000, (s32)("c_togedaruma"), 131122, -29999999, (s32)/*("\203g\203Q\203_\203\213\203}\201[")*/("\203g\203Q\203_\203\213\203}\201["), 42,
-    131122, -30000000, (s32)("c_wanwan_a"), 131122, -29999999, (s32)/*("\203o\201[\203X\203g\203\217\203\223\203\217\203\223")*/("\203o\201[\203X\203g\203\217\203\223\203\217\203\223"), 49, 196699,
-    (s32)evt_sub_random, 4000, -29999990, 65570, -29999990, 65574, 1000, 131122,
-    -29999998, (s32)("c_chorobon"), 131122, -29999997, (s32)/*("\203`\203\207\203\215\203{\203\223")*/("\203`\203\207\203\215\203{\203\223"), 65574, 2000, 131122,
-    -29999998, (s32)("c_monban_t"), 131122, -29999997, (s32)/*("\203_\201[\203N\203L\201[\203p\201[")*/("\203_\201[\203N\203L\201[\203p\201["), 65574, 3000, 131122,
-    -29999998, (s32)("c_togedaruma"), 131122, -29999997, (s32)/*("\203g\203Q\203_\203\213\203}\201[")*/("\203g\203Q\203_\203\213\203}\201["), 42, 131122, -29999998,
-    (s32)("c_wanwan_a"), 131122, -29999997, (s32)/*("\203o\201[\203X\203g\203\217\203\223\203\217\203\223")*/("\203o\201[\203X\203g\203\217\203\223\203\217\203\223"), 49, 131085, -30000000, -29999998,
-    7, 33, 6, 33, 196699, (s32)evt_npc_entry, (s32)/*"選手1"*/"\221I\216\3501", -30000000,
-    327771, (s32)evt_npc_set_position, (s32)/*"選手1"*/"\221I\216\3501", -80, 60, 0, 196699, (s32)evt_npc_entry,
-    (s32)/*"選手2"*/"\221I\216\3502", -29999998, 327771, (s32)evt_npc_set_position, (s32)/*"選手2"*/"\221I\216\3502", 80, 60, 0,
-    196699, (s32)evt_npc_set_tribe, (s32)/*"選手1"*/"\221I\216\3501", -29999999, 196699, (s32)evt_npc_set_tribe, (s32)/*"選手2"*/"\221I\216\3502", -29999997,
-    262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"選手1"*/"\221I\216\3501", 1073743392, 262235, (s32)evt_npc_flag_onoff, 1,
-    (s32)/*"選手2"*/"\221I\216\3502", 1073743392, 196699, (s32)evt_npc_set_ry, (s32)/*"選手1"*/"\221I\216\3501", 90, 196699, (s32)evt_npc_set_ry,
-    (s32)/*"選手2"*/"\221I\216\3502", 270, 131084, -29999999, (s32)/*"バーストワンワン"*/"\203o\201[\203X\203g\203\217\203\223\203\217\203\223", 196699, (s32)evt_npc_set_anim, (s32)/*"選手1"*/"\221I\216\3501",
-    (s32)("WAN_A_1"), 131122, -30000000, 6, 65628, (s32)burst_chain_entry, 33, 131084,
-    -29999997, (s32)/*("\203o\201[\203X\203g\203\217\203\223\203\217\203\223")*/("\203o\201[\203X\203g\203\217\203\223\203\217\203\223"), 196699, (s32)evt_npc_set_anim, (s32)/*("\221I\216\3501")*/("\221I\216\3501"), (s32)("WAN_A_1"), 131122, -30000000,
-    7, 65628, (s32)burst_chain_entry, 33, 2, 33, 33, 131096,
-    -129997612, 1, 196699, (s32)evt_tou_get_fighter_num, -169999499, -30000000, 131122, -29999999,
-    0, 65541, 0, 131096, -30000000, -29999999, 7, 33,
-    131096, -169999499, 11, 65570, -29999999, 65572, 0, 131122,
-    -29999998, (s32)/*"敵３"*/"\223G\202R", 65572, 1, 131122, -29999998, (s32)/*"敵４"*/"\223G\202S", 65572,
-    2, 131122, -29999998, (s32)/*"敵１"*/"\223G\202P", 65572, 3, 131122, -29999998,
-    (s32)/*"敵２"*/"\223G\202Q", 65572, 4, 131122, -29999998, (s32)/*"敵５"*/"\223G\202T", 42, 65649,
-    (s32)/*"おかしい"*/"\202\250\202\251\202\265\202\242", 7, 49, 32, 65570, -29999999, 65572, 0,
-    131122, -29999998, (s32)/*"敵１"*/"\223G\202P", 65572, 1, 131122, -29999998, (s32)/*"敵２"*/"\223G\202Q",
-    65572, 2, 131122, -29999998, (s32)/*"敵３"*/"\223G\202R", 65572, 3, 131122,
-    -29999998, (s32)/*"敵４"*/"\223G\202S", 65572, 4, 131122, -29999998, (s32)/*"敵５"*/"\223G\202T", 42,
-    65649, (s32)/*"おかしい"*/"\202\250\202\251\202\265\202\242", 7, 49, 33, 327771, (s32)evt_tou_get_fighter_tribe, -169999499,
-    -29999999, -29999997, -29999996, 196699, (s32)evt_npc_entry, -29999998, -29999997, 196699,
-    (s32)evt_npc_set_tribe, -29999998, -29999996, 327771, (s32)evt_npc_set_position, -29999998, 0, -1000,
-    0, 262235, (s32)evt_npc_flag_onoff, 1, -29999998, 1073743360, 196699, (s32)evt_npc_set_ry,
-    -29999998, 270, 107, 196699, (s32)evt_npc_get_height, -29999998, -30000000, 131099,
-    -30000000, 50, 196699, (s32)evt_npc_set_height, -29999998, 50, 33, 109,
-    107, 131096, -169999499, 2, 65570, -29999999, 65572, 0,
-    131122, -30000000, 0, 65628, (s32)burst_chain_entry, 65572, 1, 131122,
-    -30000000, 1, 65628, (s32)burst_chain_entry, 49, 33, 109, 131125,
-    -29999999, 1, 6, 262235, (s32)evt_tou_get_fighter_info, -169999499, -30000000, -29999999,
-    131096, -29999999, 10, 327771, (s32)evt_npc_set_scale, (s32)/*"敵１"*/"\223G\202P", -229998464, -229998464,
-    -229998976, 327771, (s32)evt_npc_set_scale, (s32)/*"敵２"*/"\223G\202Q", -229998464, -229998464, -229998976, 458843,
-    (s32)evt_npc_sound_data_set, (s32)/*("\223G\202P")*/("\223G\202P"), (s32)("SFX_STG3_ISIN_MOVE1L"), (s32)("SFX_STG3_ISIN_MOVE1R"), -250000000, -250000000, -250000000, 458843,
-    (s32)evt_npc_sound_data_set, (s32)/*("\223G\202Q")*/("\223G\202Q"), (s32)("SFX_STG3_ISIN_MOVE1L"), (s32)("SFX_STG3_ISIN_MOVE1R"), -250000000, -250000000, -250000000, 33,
-    131122, -70000000, 0, 131163, (s32)evt_tou_get_ranking, -30000000, 131096, -30000000,
-    6, 196699, (s32)evt_npc_entry, (s32)/*("\227\220")*/("\227\220"), (s32)("c_koopa"), 327771, (s32)evt_npc_set_position, (s32)/*("\227\220")*/("\227\220"),
-    0, -1000, 0, 196699, (s32)evt_npc_set_tribe, (s32)/*"乱"*/"\227\220", (s32)/*"クッパ"*/"\203N\203b\203p", 262235,
-    (s32)evt_npc_flag_onoff, 1, (s32)/*"乱"*/"\227\220", 1073743360, 196699, (s32)evt_npc_set_ry, (s32)/*"乱"*/"\227\220", 270,
-    458843, (s32)evt_npc_sound_data_set, (s32)/*("\227\220")*/("\227\220"), (s32)("SFX_STG3_KOOPA_MOVE1L"), (s32)("SFX_STG3_KOOPA_MOVE1R"), 12000, (s32)("SFX_STG3_KOOPA_JUMP1"), -250000000,
-    32, 196699, (s32)evt_npc_entry, (s32)/*("\227\220")*/("\227\220"), (s32)("c_sinemon_a"), 327771, (s32)evt_npc_set_position, (s32)/*("\227\220")*/("\227\220"),
-    0, -1000, 0, 196699, (s32)evt_npc_set_tribe, (s32)/*"乱"*/"\227\220", (s32)/*"アイアンシンエモン"*/"\203A\203C\203A\203\223\203V\203\223\203G\203\202\203\223", 262235,
-    (s32)evt_npc_flag_onoff, 1, (s32)/*"乱"*/"\227\220", 1073743360, 196699, (s32)evt_npc_set_ry, (s32)/*"乱"*/"\227\220", 270,
-    327771, (s32)evt_npc_set_scale, (s32)/*"乱"*/"\227\220", -229998464, -229998464, -229998976, 458843, (s32)evt_npc_sound_data_set,
-    (s32)/*("\227\220")*/("\227\220"), (s32)("SFX_STG3_ISIN_MOVE1L"), (s32)("SFX_STG3_ISIN_MOVE1R"), -250000000, -250000000, -250000000, 196699, (s32)evt_npc_entry,
-    (s32)/*("\227\220\202Q")*/("\227\220\202Q"), (s32)("c_sinemon_m"), 327771, (s32)evt_npc_set_position, (s32)/*("\227\220\202Q")*/("\227\220\202Q"), 0, -1000, 0,
-    196699, (s32)evt_npc_set_tribe, (s32)/*"乱２"*/"\227\220\202Q", (s32)/*"アイアンシンエモン2"*/"\203A\203C\203A\203\223\203V\203\223\203G\203\202\203\2232", 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"乱２"*/"\227\220\202Q",
-    1073743360, 196699, (s32)evt_npc_set_ry, (s32)/*"乱２"*/"\227\220\202Q", 270, 327771, (s32)evt_npc_set_scale, (s32)/*"乱２"*/"\227\220\202Q",
-    -229998464, -229998464, -229998976, 458843, (s32)evt_npc_sound_data_set, (s32)/*("\227\220\202Q")*/("\227\220\202Q"), (s32)("SFX_STG3_ISIN_MOVE1L"), (s32)("SFX_STG3_ISIN_MOVE1R"),
-    -250000000, -250000000, -250000000, 33, 33, 2, 1,
-};
+EVT_BEGIN(npc_entry)
+    IF_INT_LESS(GSW(0), 128)
+        CALL(evt_npc_entry, PTR(/*("\203`\203\203\203\223\203s\203\207\203\223")*/("\203`\203\203\203\223\203s\203\207\203\223")), PTR("c_bred_h"))
+        CALL(evt_npc_set_position, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), 80, 60, 0)
+        CALL(evt_npc_entry, STRING(/*"相手"*/"\221\212\216\350"), PTR("c_togenoko_b"))
+        CALL(evt_npc_set_position, PTR(/*("\221\212\216\350")*/("\221\212\216\350")), -80, 60, 0)
+        CALL(evt_npc_set_tribe, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), STRING(/*"ブレッドハート"*/"\203u\203\214\203b\203h\203n\201[\203g"))
+        CALL(evt_npc_set_tribe, STRING(/*"相手"*/"\221\212\216\350"), STRING(/*"トゲノコエース"*/"\203g\203Q\203m\203R\203G\201[\203X"))
+        CALL(evt_npc_flag_onoff, 1, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), 1073743360)
+        CALL(evt_npc_flag_onoff, 1, STRING(/*"相手"*/"\221\212\216\350"), 1073741824)
+        CALL(evt_npc_set_ry, STRING(/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223"), 270)
+        CALL(evt_npc_set_ry, STRING(/*"相手"*/"\221\212\216\350"), 90)
+        RETURN
+    END_IF
+    SET_VALUE(LF(0), 0)
+    SWITCH(GSW(0))
+        CASE_BETWEEN(128, 162)
+        SET_VALUE(LF(0), 1)
+        CASE_LESS(164)
+        CASE_DEFAULT
+        SET_VALUE(LF(0), 1)
+    END_SWITCH
+    IF_INT_EQUAL(LF(0), 1)
+        IF_INT_EQUAL(GSWF(2388), 0)
+            CALL(evt_sub_random, 10000, LW(10))
+            IF_INT_LESS(LW(10), 5000)
+                LOOP(0)
+                    CALL(evt_sub_random, 3000, LW(10))
+                    SWITCH(LW(10))
+                        CASE_LESS(1000)
+                        SET_VALUE(LW(0), PTR("c_bomhey"))
+                        SET_VALUE(LW(1), PTR(/*("\203{\203\200\225\272")*/("\203{\203\200\225\272")))
+                        CASE_LESS(2000)
+                        SET_VALUE(LW(0), PTR("c_kuribo"))
+                        SET_VALUE(LW(1), PTR(/*("\203N\203\212\203{\201[")*/("\203N\203\212\203{\201[")))
+                        CASE_DEFAULT
+                        SET_VALUE(LW(0), PTR("c_kmoon_wb"))
+                        SET_VALUE(LW(1), STRING(/*"モノクロクロクモーン"*/"\203\202\203m\203N\203\215\203N\203\215\203N\203\202\201[\203\223"))
+                    END_SWITCH
+                    CALL(evt_sub_random, 3000, LW(10))
+                    SWITCH(LW(10))
+                        CASE_LESS(1000)
+                        SET_VALUE(LW(2), PTR("c_bomhey"))
+                        SET_VALUE(LW(3), PTR(/*("\203{\203\200\225\272")*/("\203{\203\200\225\272")))
+                        CASE_LESS(2000)
+                        SET_VALUE(LW(2), PTR("c_kuribo"))
+                        SET_VALUE(LW(3), PTR(/*("\203N\203\212\203{\201[")*/("\203N\203\212\203{\201[")))
+                        CASE_DEFAULT
+                        SET_VALUE(LW(2), PTR("c_kmoon_wb"))
+                        SET_VALUE(LW(3), PTR(/*("\203\202\203m\203N\203\215\203N\203\215\203N\203\202\201[\203\223")*/("\203\202\203m\203N\203\215\203N\203\215\203N\203\202\201[\203\223")))
+                    END_SWITCH
+                    IF_STR_NOT_EQUAL(LW(0), LW(2))
+                        BREAK_LOOP
+                    END_IF
+                END_LOOP
+            ELSE
+                LOOP(0)
+                    CALL(evt_sub_random, 4000, LW(10))
+                    SWITCH(LW(10))
+                        CASE_LESS(1000)
+                        SET_VALUE(LW(0), PTR("c_chorobon"))
+                        SET_VALUE(LW(1), PTR(/*("\203`\203\207\203\215\203{\203\223")*/("\203`\203\207\203\215\203{\203\223")))
+                        CASE_LESS(2000)
+                        SET_VALUE(LW(0), PTR("c_monban_t"))
+                        SET_VALUE(LW(1), PTR(/*("\203_\201[\203N\203L\201[\203p\201[")*/("\203_\201[\203N\203L\201[\203p\201[")))
+                        CASE_LESS(3000)
+                        SET_VALUE(LW(0), PTR("c_togedaruma"))
+                        SET_VALUE(LW(1), PTR(/*("\203g\203Q\203_\203\213\203}\201[")*/("\203g\203Q\203_\203\213\203}\201[")))
+                        CASE_DEFAULT
+                        SET_VALUE(LW(0), PTR("c_wanwan_a"))
+                        SET_VALUE(LW(1), PTR(/*("\203o\201[\203X\203g\203\217\203\223\203\217\203\223")*/("\203o\201[\203X\203g\203\217\203\223\203\217\203\223")))
+                    END_SWITCH
+                    CALL(evt_sub_random, 4000, LW(10))
+                    SWITCH(LW(10))
+                        CASE_LESS(1000)
+                        SET_VALUE(LW(2), PTR("c_chorobon"))
+                        SET_VALUE(LW(3), PTR(/*("\203`\203\207\203\215\203{\203\223")*/("\203`\203\207\203\215\203{\203\223")))
+                        CASE_LESS(2000)
+                        SET_VALUE(LW(2), PTR("c_monban_t"))
+                        SET_VALUE(LW(3), PTR(/*("\203_\201[\203N\203L\201[\203p\201[")*/("\203_\201[\203N\203L\201[\203p\201[")))
+                        CASE_LESS(3000)
+                        SET_VALUE(LW(2), PTR("c_togedaruma"))
+                        SET_VALUE(LW(3), PTR(/*("\203g\203Q\203_\203\213\203}\201[")*/("\203g\203Q\203_\203\213\203}\201[")))
+                        CASE_DEFAULT
+                        SET_VALUE(LW(2), PTR("c_wanwan_a"))
+                        SET_VALUE(LW(3), PTR(/*("\203o\201[\203X\203g\203\217\203\223\203\217\203\223")*/("\203o\201[\203X\203g\203\217\203\223\203\217\203\223")))
+                    END_SWITCH
+                    IF_STR_NOT_EQUAL(LW(0), LW(2))
+                        BREAK_LOOP
+                    END_IF
+                END_LOOP
+            END_IF
+            CALL(evt_npc_entry, STRING(/*"選手1"*/"\221I\216\3501"), LW(0))
+            CALL(evt_npc_set_position, STRING(/*"選手1"*/"\221I\216\3501"), -80, 60, 0)
+            CALL(evt_npc_entry, STRING(/*"選手2"*/"\221I\216\3502"), LW(2))
+            CALL(evt_npc_set_position, STRING(/*"選手2"*/"\221I\216\3502"), 80, 60, 0)
+            CALL(evt_npc_set_tribe, STRING(/*"選手1"*/"\221I\216\3501"), LW(1))
+            CALL(evt_npc_set_tribe, STRING(/*"選手2"*/"\221I\216\3502"), LW(3))
+            CALL(evt_npc_flag_onoff, 1, STRING(/*"選手1"*/"\221I\216\3501"), 1073743392)
+            CALL(evt_npc_flag_onoff, 1, STRING(/*"選手2"*/"\221I\216\3502"), 1073743392)
+            CALL(evt_npc_set_ry, STRING(/*"選手1"*/"\221I\216\3501"), 90)
+            CALL(evt_npc_set_ry, STRING(/*"選手2"*/"\221I\216\3502"), 270)
+            IF_STR_EQUAL(LW(1), STRING(/*"バーストワンワン"*/"\203o\201[\203X\203g\203\217\203\223\203\217\203\223"))
+                CALL(evt_npc_set_anim, STRING(/*"選手1"*/"\221I\216\3501"), PTR("WAN_A_1"))
+                SET_VALUE(LW(0), 6)
+                SPAWN_EVENT(burst_chain_entry)
+            END_IF
+            IF_STR_EQUAL(LW(3), PTR(/*("\203o\201[\203X\203g\203\217\203\223\203\217\203\223")*/("\203o\201[\203X\203g\203\217\203\223\203\217\203\223")))
+                CALL(evt_npc_set_anim, PTR(/*("\221I\216\3501")*/("\221I\216\3501")), PTR("WAN_A_1"))
+                SET_VALUE(LW(0), 7)
+                SPAWN_EVENT(burst_chain_entry)
+            END_IF
+            RETURN
+        END_IF
+    END_IF
+    IF_INT_EQUAL(GSWF(2388), 1)
+        CALL(evt_tou_get_fighter_num, GSW(501), LW(0))
+        SET_VALUE(LW(1), 0)
+        LOOP(0)
+            IF_INT_EQUAL(LW(0), LW(1))
+                BREAK_LOOP
+            END_IF
+            IF_INT_EQUAL(GSW(501), 11)
+                SWITCH(LW(1))
+                    CASE_EQUAL(0)
+                    SET_VALUE(LW(2), STRING(/*"敵３"*/"\223G\202R"))
+                    CASE_EQUAL(1)
+                    SET_VALUE(LW(2), STRING(/*"敵４"*/"\223G\202S"))
+                    CASE_EQUAL(2)
+                    SET_VALUE(LW(2), STRING(/*"敵１"*/"\223G\202P"))
+                    CASE_EQUAL(3)
+                    SET_VALUE(LW(2), STRING(/*"敵２"*/"\223G\202Q"))
+                    CASE_EQUAL(4)
+                    SET_VALUE(LW(2), STRING(/*"敵５"*/"\223G\202T"))
+                    CASE_DEFAULT
+                    DEBUG_PUT_MSG(STRING(/*"おかしい"*/"\202\250\202\251\202\265\202\242"))
+                    BREAK_LOOP
+                END_SWITCH
+            ELSE
+                SWITCH(LW(1))
+                    CASE_EQUAL(0)
+                    SET_VALUE(LW(2), STRING(/*"敵１"*/"\223G\202P"))
+                    CASE_EQUAL(1)
+                    SET_VALUE(LW(2), STRING(/*"敵２"*/"\223G\202Q"))
+                    CASE_EQUAL(2)
+                    SET_VALUE(LW(2), STRING(/*"敵３"*/"\223G\202R"))
+                    CASE_EQUAL(3)
+                    SET_VALUE(LW(2), STRING(/*"敵４"*/"\223G\202S"))
+                    CASE_EQUAL(4)
+                    SET_VALUE(LW(2), STRING(/*"敵５"*/"\223G\202T"))
+                    CASE_DEFAULT
+                    DEBUG_PUT_MSG(STRING(/*"おかしい"*/"\202\250\202\251\202\265\202\242"))
+                    BREAK_LOOP
+                END_SWITCH
+            END_IF
+            CALL(evt_tou_get_fighter_tribe, GSW(501), LW(1), LW(3), LW(4))
+            CALL(evt_npc_entry, LW(2), LW(3))
+            CALL(evt_npc_set_tribe, LW(2), LW(4))
+            CALL(evt_npc_set_position, LW(2), 0, -1000, 0)
+            CALL(evt_npc_flag_onoff, 1, LW(2), 1073743360)
+            CALL(evt_npc_set_ry, LW(2), 270)
+            BEGIN_INLINE_EVENT
+                CALL(evt_npc_get_height, LW(2), LW(0))
+                IF_INT_GREATER(LW(0), 50)
+                    CALL(evt_npc_set_height, LW(2), 50)
+                END_IF
+            END_INLINE_EVENT
+            BEGIN_INLINE_EVENT
+                IF_INT_EQUAL(GSW(501), 2)
+                    SWITCH(LW(1))
+                        CASE_EQUAL(0)
+                        SET_VALUE(LW(0), 0)
+                        SPAWN_EVENT(burst_chain_entry)
+                        CASE_EQUAL(1)
+                        SET_VALUE(LW(0), 1)
+                        SPAWN_EVENT(burst_chain_entry)
+                    END_SWITCH
+                END_IF
+            END_INLINE_EVENT
+            ADD(LW(1), 1)
+        END_LOOP
+        CALL(evt_tou_get_fighter_info, GSW(501), LW(0), LW(1))
+        IF_INT_EQUAL(LW(1), 10)
+            CALL(evt_npc_set_scale, STRING(/*"敵１"*/"\223G\202P"), FLOAT(1.5f), FLOAT(1.5f), FLOAT(1.0f))
+            CALL(evt_npc_set_scale, STRING(/*"敵２"*/"\223G\202Q"), FLOAT(1.5f), FLOAT(1.5f), FLOAT(1.0f))
+            CALL(evt_npc_sound_data_set, PTR(/*("\223G\202P")*/("\223G\202P")), PTR("SFX_STG3_ISIN_MOVE1L"), PTR("SFX_STG3_ISIN_MOVE1R"), -250000000, -250000000, -250000000)
+            CALL(evt_npc_sound_data_set, PTR(/*("\223G\202Q")*/("\223G\202Q")), PTR("SFX_STG3_ISIN_MOVE1L"), PTR("SFX_STG3_ISIN_MOVE1R"), -250000000, -250000000, -250000000)
+        END_IF
+        SET_VALUE(LF(0), 0)
+        CALL(evt_tou_get_ranking, LW(0))
+        IF_INT_EQUAL(LW(0), 6)
+            CALL(evt_npc_entry, PTR(/*("\227\220")*/("\227\220")), PTR("c_koopa"))
+            CALL(evt_npc_set_position, PTR(/*("\227\220")*/("\227\220")), 0, -1000, 0)
+            CALL(evt_npc_set_tribe, STRING(/*"乱"*/"\227\220"), STRING(/*"クッパ"*/"\203N\203b\203p"))
+            CALL(evt_npc_flag_onoff, 1, STRING(/*"乱"*/"\227\220"), 1073743360)
+            CALL(evt_npc_set_ry, STRING(/*"乱"*/"\227\220"), 270)
+            CALL(evt_npc_sound_data_set, PTR(/*("\227\220")*/("\227\220")), PTR("SFX_STG3_KOOPA_MOVE1L"), PTR("SFX_STG3_KOOPA_MOVE1R"), 12000, PTR("SFX_STG3_KOOPA_JUMP1"), -250000000)
+        ELSE
+            CALL(evt_npc_entry, PTR(/*("\227\220")*/("\227\220")), PTR("c_sinemon_a"))
+            CALL(evt_npc_set_position, PTR(/*("\227\220")*/("\227\220")), 0, -1000, 0)
+            CALL(evt_npc_set_tribe, STRING(/*"乱"*/"\227\220"), STRING(/*"アイアンシンエモン"*/"\203A\203C\203A\203\223\203V\203\223\203G\203\202\203\223"))
+            CALL(evt_npc_flag_onoff, 1, STRING(/*"乱"*/"\227\220"), 1073743360)
+            CALL(evt_npc_set_ry, STRING(/*"乱"*/"\227\220"), 270)
+            CALL(evt_npc_set_scale, STRING(/*"乱"*/"\227\220"), FLOAT(1.5f), FLOAT(1.5f), FLOAT(1.0f))
+            CALL(evt_npc_sound_data_set, PTR(/*("\227\220")*/("\227\220")), PTR("SFX_STG3_ISIN_MOVE1L"), PTR("SFX_STG3_ISIN_MOVE1R"), -250000000, -250000000, -250000000)
+            CALL(evt_npc_entry, PTR(/*("\227\220\202Q")*/("\227\220\202Q")), PTR("c_sinemon_m"))
+            CALL(evt_npc_set_position, PTR(/*("\227\220\202Q")*/("\227\220\202Q")), 0, -1000, 0)
+            CALL(evt_npc_set_tribe, STRING(/*"乱２"*/"\227\220\202Q"), STRING(/*"アイアンシンエモン2"*/"\203A\203C\203A\203\223\203V\203\223\203G\203\202\203\2232"))
+            CALL(evt_npc_flag_onoff, 1, STRING(/*"乱２"*/"\227\220\202Q"), 1073743360)
+            CALL(evt_npc_set_ry, STRING(/*"乱２"*/"\227\220\202Q"), 270)
+            CALL(evt_npc_set_scale, STRING(/*"乱２"*/"\227\220\202Q"), FLOAT(1.5f), FLOAT(1.5f), FLOAT(1.0f))
+            CALL(evt_npc_sound_data_set, PTR(/*("\227\220\202Q")*/("\227\220\202Q")), PTR("SFX_STG3_ISIN_MOVE1L"), PTR("SFX_STG3_ISIN_MOVE1R"), -250000000, -250000000, -250000000)
+        END_IF
+    END_IF
+    RETURN
+EVT_END()
 
 #ifdef VERSION_G8ME01
 EVT_BEGIN(evt_random_battle)
@@ -1488,31 +1820,54 @@ EVT_BEGIN(evt_teki_nyuujyou)
     RETURN
 EVT_END()
 
-s32 evt_teki_nyuujyou_default[] = {
-    65570, -29999999, 65572, 0, 131096, -29999998, 1, 131122,
-    -29999997, 70, 131122, -29999996, 0, 32, 131122, -29999997,
-    50, 131122, -29999996, 0, 33, 65572, 1, 131122,
-    -29999997, 90, 131122, -29999996, 25, 65572, 2, 131122,
-    -29999997, 70, 131122, -29999996, -25, 65572, 3, 131122,
-    -29999997, 110, 131122, -29999996, 0, 65572, 4, 131122,
-    -29999997, 130, 131122, -29999996, -25, 49, 262235, (s32)tribe_chk,
-    -30000000, (s32)/*"カメック緑空"*/"\203J\203\201\203b\203N\227\316\213\363", -29999995, 131096, -29999995, 1, 327771, (s32)evt_npc_get_position,
-    -30000000, -29999994, -29999993, -29999992, 131125, -29999993, 25, 327771,
-    (s32)evt_npc_set_position, -30000000, -29999994, -29999993, -29999992, 458843, (s32)evt_npc_move_position, -30000000,
-    280, -29999996, 0, -229938560, 1, 458843, (s32)evt_npc_jump_position_nohit, -30000000,
-    250, 45, -29999996, 500, 30, 458843, (s32)evt_npc_jump_position_nohit, -30000000,
-    215, 65, -29999996, 500, 30, 458843, (s32)evt_npc_jump_position_nohit, -30000000,
-    185, 85, -29999996, 500, 30, 458843, (s32)evt_npc_move_position, -30000000,
-    -29999997, -29999996, 0, -229938560, 1, 32, 458843, (s32)evt_npc_move_position,
-    -30000000, 280, -29999996, 0, -229938560, 1, 458843, (s32)evt_npc_jump_position_nohit,
-    -30000000, 250, 20, -29999996, 500, 30, 458843, (s32)evt_npc_jump_position_nohit,
-    -30000000, 215, 40, -29999996, 500, 30, 458843, (s32)evt_npc_jump_position_nohit,
-    -30000000, 185, 60, -29999996, 500, 30, 458843, (s32)evt_npc_sound_data_set,
-    -30000000, 0, 0, -250000000, -250000000, -250000000, 458843, (s32)evt_npc_move_position,
-    -30000000, -29999997, -29999996, 0, -229938560, 1, 131163, (s32)evt_npc_sound_data_reset,
-    -30000000, 262235, (s32)tribe_chk, -30000000, (s32)/*"バーストワンワン"*/"\203o\201[\203X\203g\203\217\203\223\203\217\203\223", -29999995, 131096, -29999995,
-    1, 65628, (s32)burst_wangwang, 33, 33, 2, 1,
-};
+EVT_BEGIN(evt_teki_nyuujyou_default)
+    SWITCH(LW(1))
+        CASE_EQUAL(0)
+        IF_INT_EQUAL(LW(2), 1)
+            SET_VALUE(LW(3), 70)
+            SET_VALUE(LW(4), 0)
+        ELSE
+            SET_VALUE(LW(3), 50)
+            SET_VALUE(LW(4), 0)
+        END_IF
+        CASE_EQUAL(1)
+        SET_VALUE(LW(3), 90)
+        SET_VALUE(LW(4), 25)
+        CASE_EQUAL(2)
+        SET_VALUE(LW(3), 70)
+        SET_VALUE(LW(4), -25)
+        CASE_EQUAL(3)
+        SET_VALUE(LW(3), 110)
+        SET_VALUE(LW(4), 0)
+        CASE_EQUAL(4)
+        SET_VALUE(LW(3), 130)
+        SET_VALUE(LW(4), -25)
+    END_SWITCH
+    CALL(tribe_chk, LW(0), STRING(/*"カメック緑空"*/"\203J\203\201\203b\203N\227\316\213\363"), LW(5))
+    IF_INT_EQUAL(LW(5), 1)
+        CALL(evt_npc_get_position, LW(0), LW(6), LW(7), LW(8))
+        ADD(LW(7), 25)
+        CALL(evt_npc_set_position, LW(0), LW(6), LW(7), LW(8))
+        CALL(evt_npc_move_position, LW(0), 280, LW(4), 0, FLOAT(60.0f), 1)
+        CALL(evt_npc_jump_position_nohit, LW(0), 250, 45, LW(4), 500, 30)
+        CALL(evt_npc_jump_position_nohit, LW(0), 215, 65, LW(4), 500, 30)
+        CALL(evt_npc_jump_position_nohit, LW(0), 185, 85, LW(4), 500, 30)
+        CALL(evt_npc_move_position, LW(0), LW(3), LW(4), 0, FLOAT(60.0f), 1)
+    ELSE
+        CALL(evt_npc_move_position, LW(0), 280, LW(4), 0, FLOAT(60.0f), 1)
+        CALL(evt_npc_jump_position_nohit, LW(0), 250, 20, LW(4), 500, 30)
+        CALL(evt_npc_jump_position_nohit, LW(0), 215, 40, LW(4), 500, 30)
+        CALL(evt_npc_jump_position_nohit, LW(0), 185, 60, LW(4), 500, 30)
+        CALL(evt_npc_sound_data_set, LW(0), 0, 0, -250000000, -250000000, -250000000)
+        CALL(evt_npc_move_position, LW(0), LW(3), LW(4), 0, FLOAT(60.0f), 1)
+        CALL(evt_npc_sound_data_reset, LW(0))
+        CALL(tribe_chk, LW(0), STRING(/*"バーストワンワン"*/"\203o\201[\203X\203g\203\217\203\223\203\217\203\223"), LW(5))
+        IF_INT_EQUAL(LW(5), 1)
+            SPAWN_EVENT(burst_wangwang)
+        END_IF
+    END_IF
+    RETURN
+EVT_END()
 
 EVT_BEGIN(burst_chain_entry)
     SWITCH(LW(0))
@@ -1931,64 +2286,107 @@ EVT_BEGIN(evt_match)
 EVT_END()
 #endif
 
-s32 evt_kurikuri_opening[] = {
-    131163, (s32)evt_mario_key_onoff, 0, 262235, (s32)evt_npc_status_onoff, 1, (s32)/*"ガンス"*/"\203K\203\223\203X", 2,
-    327771, (s32)evt_npc_set_position, (s32)/*"ガンス"*/"\203K\203\223\203X", 0, 60, -130, 327771, (s32)evt_npc_set_position,
-    (s32)/*"敵１"*/"\223G\202P", 50, 60, 0, 327771, (s32)evt_npc_set_position, (s32)/*"敵２"*/"\223G\202Q", 90,
-    60, 25, 327771, (s32)evt_npc_set_position, (s32)/*"敵３"*/"\223G\202R", 70, 60, -25,
-    327771, (s32)evt_npc_set_position, (s32)/*"敵４"*/"\223G\202S", 110, 60, 0, 327771, (s32)evt_npc_set_position,
-    (s32)/*"敵５"*/"\223G\202T", 130, 60, -25, 589915, (s32)evt_cam3d_evt_set, 1075, 547,
-    998, 0, 287, -8, 0, 11, 131163, (s32)evt_seq_wait,
-    2, 196699, (s32)evt_snd_bgmon, 512, (s32)("BGM_FF_ENV_TOU1"), 589915, (s32)evt_cam3d_evt_set, -1024,
-    547, 1050, 0, 287, -8, 6000, 0, 65546,
-    6000, 589915, (s32)evt_cam3d_evt_set, 0, 127, 105, 0, 95,
-    -145, 0, 0, 327771, (s32)evt_msg_print, 0, (s32)("stg3_tou_77"), 0,
-    (s32)/*"ガンス"*/"\203K\203\223\203X", 589915, (s32)evt_cam3d_evt_set, 70, 137, 260, 70, 96,
-    -70, 2000, 0, 458843, (s32)evt_npc_move_position, (s32)/*"ガンス"*/"\203K\203\223\203X", 10, -20,
-    0, -229938560, 1, 327771, (s32)evt_msg_print, 0, (s32)("stg3_tou_78"), 0,
-    (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"), 196699, (s32)evt_npc_set_anim, (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"), (s32)("M_5"), 65546, 300, 196699,
-    (s32)evt_npc_set_anim, (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"), (s32)("M_6"), 327771, (s32)evt_msg_print, 0, (s32)("stg3_tou_79"), 0,
-    (s32)/*("\223G\202Q")*/("\223G\202Q"), 786523, (s32)evt_eff_fukidashi, 1, (s32)("eff"), (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"), 0, 0,
-    0, 0, 0, 0, 0, 0, 196699, (s32)evt_npc_set_anim,
-    (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"), (s32)("M_7"), 65546, 300, 196699, (s32)evt_npc_set_anim, (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"), (s32)("S_2"),
-    196699, (s32)evt_set_dir_to_target, (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"), (s32)("mario"), 262235, (s32)evt_mario_set_pos, -550, 0,
-    0, 327771, (s32)evt_party_set_pos, 0, -560, 0, -10, 131124,
-    -30000000, -230184320, 65630, (s32)w_door_open, 196699, (s32)evt_cam3d_evt_off, 1000, 11,
-    65546, 1000, 107, 65546, 1000, 393307, (s32)evt_snd_sfxon_3d, (s32)("SFX_DOOR_SHUT_IRON2"),
-    -565, 0, 0, 0, 327771, (s32)evt_sub_intpl_init, 11, -180,
-    0, 20, 65541, 21, 65627, (s32)evt_sub_intpl_get_value, 65630, (s32)w_door_open,
-    6, 109, 131122, -90000000, 0, 107, 65546, 1000,
-    327771, (s32)evt_msg_print, 0, (s32)("stg3_tou_80"), 0, 0, 131122, -90000000,
-    1, 109, 262235, (s32)evt_mario_mov_pos2, -450, 0, -229877120, 65546,
-    1000, 107, 65546, 300, 327771, (s32)evt_party_move_pos2, 0, -280,
-    25, -229877120, 65545, 1, 524379, (s32)evt_party_jump_pos, 0, -250,
-    20, 25, 400, 1, -1000, 65545, 1, 524379,
-    (s32)evt_party_jump_pos, 0, -215, 40, 25, 400, 1, -1000,
-    65545, 1, 524379, (s32)evt_party_jump_pos, 0, -185, 60, 25,
-    400, 1, -1000, 65545, 1, 327771, (s32)evt_party_move_pos2, 0,
-    -90, -25, -229877120, 109, 262235, (s32)evt_mario_mov_pos2, -280, 0,
-    -229877120, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 393307,
-    (s32)evt_snd_sfxon_3d, (s32)("SFX_VOICE_MARIO_FLD_JUMP3"), -30000000, -29999999, -29999998, 0, 458843, (s32)evt_mario_jump_pos,
-    -250, 20, 0, 400, 1, -1000, 327771, (s32)evt_mario_get_pos,
-    0, -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)("SFX_VOICE_MARIO_FLD_JUMP1"), -30000000,
-    -29999999, -29999998, 0, 458843, (s32)evt_mario_jump_pos, -215, 40, 0,
-    400, 1, -1000, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999,
-    -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)("SFX_VOICE_MARIO_FLD_JUMP5"), -30000000, -29999999, -29999998, 0,
-    458843, (s32)evt_mario_jump_pos, -185, 60, 0, 400, 1, -1000,
-    262235, (s32)evt_mario_mov_pos2, -55, 0, -229877120, 65541, 0, 131096,
-    -90000000, 1, 7, 33, 65545, 1, 6, 458843,
-    (s32)evt_npc_move_position, (s32)/*"ガンス"*/"\203K\203\223\203X", -20, -20, 0, -229938560, 1, 327771,
-    (s32)evt_msg_print, 0, (s32)("stg3_tou_81"), 0, (s32)/*("\203K\203\223\203X")*/("\203K\203\223\203X"), 107, 327771, (s32)evt_msg_print,
-    0, (s32)("stg3_tou_82"), 0, (s32)/*("\223G\202P")*/("\223G\202P"), 109, 458843, (s32)evt_npc_move_position, (s32)/*("\223G\202P")*/("\223G\202P"),
-    0, 0, 0, -229897600, 1, 327771, (s32)evt_mario_get_pos, 0,
-    -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)("SFX_VOICE_MARIO_SURPRISED1"), -30000000, -29999999,
-    -29999998, 0, 131163, (s32)evt_mario_set_pose, (s32)("M_N_7"), 107, 131124, -30000000,
-    -230000000, 65541, 10, 131130, -30000000, -229986176, 327771, (s32)evt_npc_set_rotate,
-    (s32)/*"敵１"*/"\223G\202P", 0, 0, -30000000, 65545, 1, 6, 109,
-    458843, (s32)evt_npc_sound_data_set, (s32)/*("\223G\202P")*/("\223G\202P"), -250000000, -250000000, -250000000, (s32)("SFX_STG3_KURI_ATTACK1"), -250000000,
-    458843, (s32)evt_npc_jump_position_nohit, (s32)/*"敵１"*/"\223G\202P", -30, 100, 0, 800, 100,
-    2, 1,
-};
+EVT_BEGIN(evt_kurikuri_opening)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_npc_status_onoff, 1, STRING(/*"ガンス"*/"\203K\203\223\203X"), 2)
+    CALL(evt_npc_set_position, STRING(/*"ガンス"*/"\203K\203\223\203X"), 0, 60, -130)
+    CALL(evt_npc_set_position, STRING(/*"敵１"*/"\223G\202P"), 50, 60, 0)
+    CALL(evt_npc_set_position, STRING(/*"敵２"*/"\223G\202Q"), 90, 60, 25)
+    CALL(evt_npc_set_position, STRING(/*"敵３"*/"\223G\202R"), 70, 60, -25)
+    CALL(evt_npc_set_position, STRING(/*"敵４"*/"\223G\202S"), 110, 60, 0)
+    CALL(evt_npc_set_position, STRING(/*"敵５"*/"\223G\202T"), 130, 60, -25)
+    CALL(evt_cam3d_evt_set, 1075, 547, 998, 0, 287, -8, 0, 11)
+    CALL(evt_seq_wait, 2)
+    CALL(evt_snd_bgmon, 512, PTR("BGM_FF_ENV_TOU1"))
+    CALL(evt_cam3d_evt_set, -1024, 547, 1050, 0, 287, -8, 6000, 0)
+    WAIT_MS(6000)
+    CALL(evt_cam3d_evt_set, 0, 127, 105, 0, 95, -145, 0, 0)
+    CALL(evt_msg_print, 0, PTR("stg3_tou_77"), 0, STRING(/*"ガンス"*/"\203K\203\223\203X"))
+    CALL(evt_cam3d_evt_set, 70, 137, 260, 70, 96, -70, 2000, 0)
+    CALL(evt_npc_move_position, STRING(/*"ガンス"*/"\203K\203\223\203X"), 10, -20, 0, FLOAT(60.0f), 1)
+    CALL(evt_msg_print, 0, PTR("stg3_tou_78"), 0, PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")))
+    CALL(evt_npc_set_anim, PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")), PTR("M_5"))
+    WAIT_MS(300)
+    CALL(evt_npc_set_anim, PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")), PTR("M_6"))
+    CALL(evt_msg_print, 0, PTR("stg3_tou_79"), 0, PTR(/*("\223G\202Q")*/("\223G\202Q")))
+    CALL(evt_eff_fukidashi, 1, PTR("eff"), PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")), 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_npc_set_anim, PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")), PTR("M_7"))
+    WAIT_MS(300)
+    CALL(evt_npc_set_anim, PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")), PTR("S_2"))
+    CALL(evt_set_dir_to_target, PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")), PTR("mario"))
+    CALL(evt_mario_set_pos, -550, 0, 0)
+    CALL(evt_party_set_pos, 0, -560, 0, -10)
+    SET_FLOAT_VALUE(LW(0), FLOAT(-180.0f))
+    CALL_CHILD(w_door_open)
+    CALL(evt_cam3d_evt_off, 1000, 11)
+    WAIT_MS(1000)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(1000)
+        CALL(evt_snd_sfxon_3d, PTR("SFX_DOOR_SHUT_IRON2"), -565, 0, 0, 0)
+        CALL(evt_sub_intpl_init, 11, -180, 0, 20)
+        LOOP(21)
+            CALL(evt_sub_intpl_get_value)
+            CALL_CHILD(w_door_open)
+        END_LOOP
+    END_INLINE_EVENT
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(1000)
+        CALL(evt_msg_print, 0, PTR("stg3_tou_80"), 0, 0)
+        SET_VALUE(GF(0), 1)
+    END_INLINE_EVENT
+    CALL(evt_mario_mov_pos2, -450, 0, FLOAT(120.0f))
+    WAIT_MS(1000)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(300)
+        CALL(evt_party_move_pos2, 0, -280, 25, FLOAT(120.0f))
+        WAIT_FRAMES(1)
+        CALL(evt_party_jump_pos, 0, -250, 20, 25, 400, 1, -1000)
+        WAIT_FRAMES(1)
+        CALL(evt_party_jump_pos, 0, -215, 40, 25, 400, 1, -1000)
+        WAIT_FRAMES(1)
+        CALL(evt_party_jump_pos, 0, -185, 60, 25, 400, 1, -1000)
+        WAIT_FRAMES(1)
+        CALL(evt_party_move_pos2, 0, -90, -25, FLOAT(120.0f))
+    END_INLINE_EVENT
+    CALL(evt_mario_mov_pos2, -280, 0, FLOAT(120.0f))
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_FLD_JUMP3"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mario_jump_pos, -250, 20, 0, 400, 1, -1000)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_FLD_JUMP1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mario_jump_pos, -215, 40, 0, 400, 1, -1000)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_FLD_JUMP5"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mario_jump_pos, -185, 60, 0, 400, 1, -1000)
+    CALL(evt_mario_mov_pos2, -55, 0, FLOAT(120.0f))
+    LOOP(0)
+        IF_INT_EQUAL(GF(0), 1)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_npc_move_position, STRING(/*"ガンス"*/"\203K\203\223\203X"), -20, -20, 0, FLOAT(60.0f), 1)
+    CALL(evt_msg_print, 0, PTR("stg3_tou_81"), 0, PTR(/*("\203K\203\223\203X")*/("\203K\203\223\203X")))
+    BEGIN_INLINE_EVENT
+        CALL(evt_msg_print, 0, PTR("stg3_tou_82"), 0, PTR(/*("\223G\202P")*/("\223G\202P")))
+    END_INLINE_EVENT
+    CALL(evt_npc_move_position, PTR(/*("\223G\202P")*/("\223G\202P")), 0, 0, 0, FLOAT(100.0f), 1)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_SURPRISED1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mario_set_pose, PTR("M_N_7"))
+    BEGIN_INLINE_EVENT
+        SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
+        LOOP(10)
+            ADD_FLOAT(LW(0), FLOAT(13.5f))
+            CALL(evt_npc_set_rotate, STRING(/*"敵１"*/"\223G\202P"), 0, 0, LW(0))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_INLINE_EVENT
+    CALL(evt_npc_sound_data_set, PTR(/*("\223G\202P")*/("\223G\202P")), -250000000, -250000000, -250000000, PTR("SFX_STG3_KURI_ATTACK1"), -250000000)
+    CALL(evt_npc_jump_position_nohit, STRING(/*"敵１"*/"\223G\202P"), -30, 100, 0, 800, 100)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(evt_kurikuri_win)
     CALL(evt_cam3d_evt_set, 70, 138, 263, 70, 90, -8, 0, 11)
@@ -3844,9 +4242,9 @@ s32 item_jump(EventEntry* event, BOOL isFirstCall) {
     return item_jump_sub(event, isFirstCall, 1.0f, 0.5f);
 }
 
-__declspec(section ".data") s32 block_data[] = {
-    (s32)("block_1"), (s32)("block_2"), (s32)("block_3"), (s32)("block_4"), (s32)("block_5"), (s32)("block_6"), (s32)("block_7"), (s32)("block_8"),
-    (s32)("block_9"),
+__declspec(section ".data") const char* block_data[] = {
+    "block_1", "block_2", "block_3", "block_4", "block_5", "block_6", "block_7", "block_8",
+    "block_9",
 };
 
 static EVT_BEGIN(evt_shake)
@@ -4083,7 +4481,7 @@ static EVT_BEGIN(evt_boss)
         CALL(evt_snd_sfxoff, LW(10))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_ABSORB_DEVICE_UP_STOP1"), 0, 60, 0, 0)
     END_INLINE_EVENT
-    SET_INT_READ_ADDR(PTR(block_data))
+    SET_INT_READ_ADDR(PTR(&block_data))
     LOOP(9)
         READ_INT(LW(5))
         BEGIN_INLINE_EVENT
@@ -4590,7 +4988,7 @@ static EVT_BEGIN(evt_boss)
         CALL(evt_snd_sfxoff, LW(10))
         CALL(evt_snd_sfxon_3d, STRING(("SFX_STG3_ABSORB_DEVICE_UP_STOP1")), 0, 60, 0, 0)
     END_INLINE_EVENT
-    SET_INT_READ_ADDR(PTR(block_data))
+    SET_INT_READ_ADDR(PTR(&block_data))
     LOOP(9)
         READ_INT(LW(5))
         BEGIN_INLINE_EVENT

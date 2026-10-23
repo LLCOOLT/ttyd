@@ -115,9 +115,9 @@ static const GXColor shop_list_unit_color = {0x00, 0x00, 0x00, 0xFF};
 static const GXColor shop_list_item_got_color = {0xF0, 0x00, 0x00, 0xFF};
 static const GXColor shop_list_item_color = {0x00, 0x00, 0x00, 0xFF};
 
-static s32 window_desc[30];
+static WinMgrDesc window_desc[3];
 ShopPoint shopPointList[11];
-s32 list_desc[30];
+WinMgrDesc list_desc[3];
 static s32 buy_evt[VERSION_PICK(326, 366)];
 s32 shopper_talk_evt[VERSION_PICK(352, 396)];
 s32 first_shopping_evt[86];
@@ -128,11 +128,10 @@ s32 point_evt[VERSION_PICK(15, 35)];
 s32 evt_shoplist[10];
 static s32 main_evt[4];
 
-static s32 window_desc[] = {
-    0, 0, 8, -150, 120, 300, 50, 732233727,
-    0, (s32)name_disp, 0, 0, 8, -240, -130, 500,
-    80, -252645121, (s32)help_main, (s32)help_disp, 2, 0, 8, -250,
-    -130, 150, 45, -252645121, 0, (s32)point_disp,
+static WinMgrDesc window_desc[] = {
+    {0, 0, 8, -150, 120, 300, 50, {0x2B, 0xA4, 0xFF, 0xFF}, NULL, name_disp},
+    {0, 0, 8, -240, -130, 500, 80, {0xF0, 0xF0, 0xF0, 0xFF}, help_main, help_disp},
+    {2, 0, 8, -250, -130, 150, 45, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, point_disp},
 };
 
 ShopPoint shopPointList[] = {
@@ -141,11 +140,10 @@ ShopPoint shopPointList[] = {
     250, 156, 300, 127, -1, -1,
 };
 
-s32 list_desc[] = {
-    0, 0, 8, -280, 160, 210, 80, 732233727,
-    0, (s32)title_disp, 0, 3, 8, -60, 160, 340,
-    300, -252645121, 0, (s32)list_disp, 2, 0, 8, -250,
-    -130, 150, 45, -252645121, 0, (s32)point_disp,
+WinMgrDesc list_desc[] = {
+    {0, 0, 8, -280, 160, 210, 80, {0x2B, 0xA4, 0xFF, 0xFF}, NULL, title_disp},
+    {0, 3, 8, -60, 160, 340, 300, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, list_disp},
+    {2, 0, 8, -250, -130, 150, 45, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, point_disp},
 };
 
 #ifdef VERSION_G8ME01
@@ -1323,9 +1321,9 @@ void list_disp(WinMgrEntry* entry) {
 
 USER_FUNC(disp_list) {
 	if (isFirstCall) {
-		event->userdata[0] = winMgrEntry(&((WinMgrDesc*)list_desc)[0]);
-		event->userdata[1] = winMgrEntry(&((WinMgrDesc*)list_desc)[1]);
-		event->userdata[2] = winMgrEntry(&((WinMgrDesc*)list_desc)[2]);
+		event->userdata[0] = winMgrEntry(&list_desc[0]);
+		event->userdata[1] = winMgrEntry(&list_desc[1]);
+		event->userdata[2] = winMgrEntry(&list_desc[2]);
 		winMgrOpen(event->userdata[0]);
 		winMgrOpen(event->userdata[1]);
 		winMgrOpen(event->userdata[2]);
@@ -1392,7 +1390,7 @@ USER_FUNC(evt_shop_setup) {
 	wp->mainEvt = evtEntryType(main_evt, 0, 0x20, 0);
 	wp->mainEvt->lwData[0] = (s32)wp;
 	for (i = 0; i < 3; i++) {
-		wp->win[i] = winMgrEntry(&((WinMgrDesc*)window_desc)[i]);
+		wp->win[i] = winMgrEntry(&window_desc[i]);
 	}
 	wp->sel = -1;
 	evtRunCaseEntry(9, TRUE, "a_shop_keihin", 0, evt_shoplist, 0);

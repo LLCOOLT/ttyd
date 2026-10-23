@@ -1,9 +1,10 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "driver/npcdrv.h"
 
-extern s32 btl_gon_setup_no_tbl[];
-extern s32 btlsetup_gon_tbl[];
+extern NpcTerritoryInfo btl_gon_setup_no_tbl[];
+extern NpcSetupBattleInfo btlsetup_gon_tbl[];
 extern s32 gon_00_init_evt[];
 extern s32 gon_01_init_evt[];
 extern s32 gon_02_init_evt[];
@@ -21,11 +22,11 @@ extern s32 gon_13_init_evt[];
 extern s32 gon_bt00_init_evt[];
 extern s32 slit_majin_lecture[];
 extern s32 slit_majin_lecture_init[];
-extern s32 unit_boss_gonbaba[];
-extern s32 unit_honenoko[];
-extern s32 unit_nokonoko[];
-extern s32 unit_patakuri[];
-extern s32 unit_patapata[];
-extern s32 unit_togekuri[];
+extern BattleUnitKind unit_boss_gonbaba;
+extern BattleUnitKind unit_honenoko;
+extern BattleUnitKind unit_nokonoko;
+extern BattleUnitKind unit_patakuri;
+extern BattleUnitKind unit_patapata;
+extern BattleUnitKind unit_togekuri;
 
 extern s32 evt_cloud_main_evt[];

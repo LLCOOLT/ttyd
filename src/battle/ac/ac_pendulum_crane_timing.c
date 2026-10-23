@@ -74,8 +74,8 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
 
     ac = &work->actionCommands;
     autoCommand = FALSE;
-    cw = (PendulumWork*)((u8*)ac + 0x2BC);
-    disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    cw = (PendulumWork*)ac->work;
+    disp = (BattleACDispParams*)&ac->disp;
     if (work->actionCommands.mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
     }
@@ -87,7 +87,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            *(s32*)&disp->field_0x1C[4] = 20;
+            disp->unk20 = 20;
             cw->frame = 0;
             cw->angle = 0.0f;
             cw->cur = PC_PARAMS(work)->period;
@@ -121,7 +121,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             stick = (u8*)_battleWorkPointer;
             accel = 0.0f;
             CALC_DIR(dir)
-            if (*(u32*)((u8*)ac + 0x34) & 1) {
+            if (ac->acFlags & 1) {
                 if (stick[0xF33] > 10 && stick[0xF32] < 10) {
                     if (dir < 0.0f) {
                         mag = stick[0xF33] / 128.0f;
@@ -184,7 +184,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             }
             break;
         case 1002:
-            *(u32*)((u8*)ac + 0x30) |= 1;
+            ac->field_0x30 |= 1;
             cw->endTimer = 60;
             if (cw->sfxId != 0xFFFFFFFF) {
                 psndSFXOff(cw->sfxId);
@@ -225,7 +225,7 @@ void battleAcDisp_PendulumCraneTiming(CameraId cameraId, void* param) {
     PCDisp* disp;
     BattleWork* w = _battleWorkPointer;
     BattleActions* ac = &w->actionCommands;
-    disp = (PCDisp*)((u8*)ac + 0x290);
+    disp = (PCDisp*)&ac->disp;
     switch (ac->mAcState) {
         case 99:
             disp->iconX = intplGetValue(4, 20 - disp->timer, 20, -300.0f, 30.0f);
@@ -252,7 +252,7 @@ void battleAcDisp_PendulumCraneTiming(CameraId cameraId, void* param) {
 }
 
 void battleAcDelete_PendulumCraneTiming(BattleWork* work) {
-    if (*(u32*)((u8*)&work->actionCommands + 0x30) & 1) {
+    if ((u32)work->actionCommands.field_0x30 & 1) {
         return;
     }
     work->actionCommands.mAcState = 1002;

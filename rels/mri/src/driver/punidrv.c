@@ -46,20 +46,20 @@ static u8 shadow_dl[32];
 static f32 shadow_vtx[56];
 static PunidrvWork* work;
 
-__declspec(section ".data") u64 fd_punidrv_negone_one_374;
-__declspec(section ".data") s32 fd_punidrv_neg_one_382[1];
-__declspec(section ".data") s32 fd_punidrv___local_PI_383[1];
-__declspec(section ".data") s32 fd_punidrv___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_punidrv_one_negone_373;
-__declspec(section ".data") s32 fd_punidrv___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_punidrv_one_381[1];
-__declspec(section ".data") u64 fd_punidrv_negone_one_360;
-__declspec(section ".data") s32 fd_punidrv_neg_one_365[1];
-__declspec(section ".data") s32 fd_punidrv___local_PI_366[1];
-__declspec(section ".data") s32 fd_punidrv___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_punidrv_one_negone_359;
-__declspec(section ".data") s32 fd_punidrv___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_punidrv_one_364[1];
+__declspec(section ".data") f32 fd_punidrv_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_punidrv_neg_one_382;
+__declspec(section ".data") f32 fd_punidrv___local_PI_383;
+__declspec(section ".data") f32 fd_punidrv___local_3PIO2_385;
+__declspec(section ".data") f32 fd_punidrv_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_punidrv___local_PIO2_384;
+__declspec(section ".data") f32 fd_punidrv_one_381;
+__declspec(section ".data") f32 fd_punidrv_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_punidrv_neg_one_365;
+__declspec(section ".data") f32 fd_punidrv___local_PI_366;
+__declspec(section ".data") f32 fd_punidrv___local_3PIO2_368;
+__declspec(section ".data") f32 fd_punidrv_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_punidrv___local_PIO2_367;
+__declspec(section ".data") f32 fd_punidrv_one_364;
 
 void puniSinCosRet(u32 deg, f32* x, f32* z, f32 rx, f32 rz) {
     deg %= 360;
@@ -76,53 +76,33 @@ void puniInit(void) {
     wp->useFade = TRUE;
 }
 
-__declspec(section ".data") u64 fd_punidrv_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_punidrv_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_punidrv_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_punidrv_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_punidrv___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_punidrv___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_punidrv___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_punidrv___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_punidrv_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_punidrv_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_punidrv___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_punidrv___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_punidrv_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_punidrv_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_punidrv_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_punidrv_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_punidrv_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_punidrv_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_punidrv___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_punidrv___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_punidrv___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_punidrv___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_punidrv_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_punidrv_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_punidrv___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_punidrv___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_punidrv_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_punidrv_one_364 = 1.0f;
 
 static f32 sintbl[450] = {
     0.0f, 0.017452f, 0.034899f, 0.052336f, 0.069756f, 0.087156f, 0.104528f, 0.121869f,

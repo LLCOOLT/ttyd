@@ -12,6 +12,7 @@
 #include "evt/evt_case.h"
 #include "evt/evt_sub.h"
 #include "party/party_motion.h"
+#include "data_tables.h"
 
 USER_FUNC(camera_action);
 USER_FUNC(evt_bero_mapchange);
@@ -43,80 +44,60 @@ USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_sfxon_3d);
 
-__declspec(section ".data") u64 fd_win_03_negone_one_374;
-__declspec(section ".data") s32 fd_win_03_neg_one_382[1];
-__declspec(section ".data") s32 fd_win_03___local_PI_383[1];
-__declspec(section ".data") s32 fd_win_03___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_win_03_one_negone_373;
-__declspec(section ".data") s32 fd_win_03___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_win_03_one_381[1];
-__declspec(section ".data") u64 fd_win_03_negone_one_360;
-__declspec(section ".data") s32 fd_win_03_neg_one_365[1];
-__declspec(section ".data") s32 fd_win_03___local_PI_366[1];
-__declspec(section ".data") s32 fd_win_03___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_win_03_one_negone_359;
-__declspec(section ".data") s32 fd_win_03___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_win_03_one_364[1];
+__declspec(section ".data") f32 fd_win_03_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_win_03_neg_one_382;
+__declspec(section ".data") f32 fd_win_03___local_PI_383;
+__declspec(section ".data") f32 fd_win_03___local_3PIO2_385;
+__declspec(section ".data") f32 fd_win_03_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_win_03___local_PIO2_384;
+__declspec(section ".data") f32 fd_win_03_one_381;
+__declspec(section ".data") f32 fd_win_03_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_win_03_neg_one_365;
+__declspec(section ".data") f32 fd_win_03___local_PI_366;
+__declspec(section ".data") f32 fd_win_03___local_3PIO2_368;
+__declspec(section ".data") f32 fd_win_03_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_win_03___local_PIO2_367;
+__declspec(section ".data") f32 fd_win_03_one_364;
 __declspec(section ".data") s32 clouda_house_in[12];
 s32 clouda_house_out[19];
 __declspec(section ".data") s32 cloud_out[12];
 __declspec(section ".data") s32 cloud_in[12];
-static s32 bero_entry_data[75];
+static BeroEntry bero_entry_data[5];
 s32 lookat_house[45];
 static s32 cloud_toujou[76];
 s32 cloud_lostitem[215];
 s32 tree_evt_01[20];
-static s32 tree_access_data[30];
+static TreeAccess tree_access_data[5];
 __declspec(section ".data") s32 dummy_event[4];
 s32 win_03_init_evt[108];
 
-__declspec(section ".data") u64 fd_win_03_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_win_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_win_03_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_win_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_win_03___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_win_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_win_03___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_win_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_win_03_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_win_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_win_03___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_win_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_win_03_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_win_03_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_win_03_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_win_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_win_03_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_win_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_win_03___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_win_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_win_03___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_win_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_win_03_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_win_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_win_03___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_win_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_win_03_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_win_03_one_364 = 1.0f;
 
 __declspec(section ".data") EVT_BEGIN(clouda_house_in)
     CALL(evt_mario_key_onoff, 0)
@@ -147,17 +128,73 @@ __declspec(section ".data") EVT_BEGIN(cloud_in)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"win_02", (s32)"e_bero", 65537, 0, 0, (s32)"dokan_1",
-    131072, 9, 100000, 0, 0, -1, 0, 6,
-    0, 0, (s32)"dokan_2", 65537, 0, 0, (s32)"dokan_2", 268566528,
-    9, 100000, 0, 0, -1, 0, 6, 0,
-    0, (s32)"dokan_1", 65537, 0, 0, (s32)"n_bero", 268632064, 2,
-    100000, 0, 0, -1, (s32)cloud_out, 5, (s32)cloud_in, (s32)"win_04",
-    (s32)"w_bero", 65537, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"win_02", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_2", // hitName
+        4098, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "n_bero", // hitName
+        4099, // type
+        0, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)cloud_out, // enterEvent
+        5, // caseType
+        (s32*)cloud_in, // exitEvent
+        (s32)"win_04", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(lookat_house)
@@ -314,11 +351,12 @@ EVT_BEGIN(tree_evt_01)
     RETURN
 EVT_END()
 
-static s32 tree_access_data[] = {
-    4, (s32)"A_tree_01", (s32)"S_tree_mki_01", (s32)"S_tree_ha01", 0, 0, 4, (s32)"A_tree_02",
-    (s32)"S_tree_mki_02", (s32)"S_tree_ha03", 0, (s32)tree_evt_01, 4, (s32)"A_tree_03", (s32)"S_tree_mki_03", (s32)"S_tree_ha02",
-    0, 0, 4, (s32)"A_tree_04", (s32)"S_tree_mki_04", (s32)"S_tree_ha04", 0, 0,
-    7, 0, 0, 0, 0, 0,
+static TreeAccess tree_access_data[] = {
+    {4, "A_tree_01", "S_tree_mki_01", "S_tree_ha01", 0, NULL},
+    {4, "A_tree_02", "S_tree_mki_02", "S_tree_ha03", 0, tree_evt_01},
+    {4, "A_tree_03", "S_tree_mki_03", "S_tree_ha02", 0, NULL},
+    {4, "A_tree_04", "S_tree_mki_04", "S_tree_ha04", 0, NULL},
+    {7, NULL, NULL, NULL, 0, NULL},
 };
 
 __declspec(section ".data") EVT_BEGIN(dummy_event)
@@ -326,20 +364,33 @@ __declspec(section ".data") EVT_BEGIN(dummy_event)
     RETURN
 EVT_END()
 
-s32 win_03_init_evt[] = {
-    131122, -30000000, (s32)bero_entry_data, 65627, (s32)evt_bero_get_info, 65630, (s32)evt_bero_info_run, 458843,
-    (s32)evt_run_case_evt, 5, 1, (s32)"n_bero", 0, (s32)dummy_event, 0, 196699,
-    (s32)evt_snd_bgmon, 512, (s32)"BGM_STG2_WIN1", 196699, (s32)evt_snd_envon, 272, (s32)"ENV_STG2_WIN1", 196699,
-    (s32)evt_snd_bgmon, 160, 0, 131122, -30000000, (s32)tree_access_data, 65630, (s32)evt_sub_tree_access_entry,
-    524379, (s32)evt_mobj_recovery_blk, (s32)"mobj_recover", 7, 425, 60, 75, 0,
-    0, 589915, (s32)evt_item_entry, (s32)"i", 135, 475, 0, -60,
-    16, -129997321, 0, 589915, (s32)evt_item_entry, (s32)"item_00", 125, -150,
-    0, -30, 16, -129994390, 0, 327771, (s32)evt_mapobj_flag_onoff, 1,
-    1, (s32)"S_ana", 1, 327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"S_siro_asu",
-    1, 262235, (s32)evt_hitobj_onoff, (s32)"A_siro_asu", 1, 0, 131096, -170000000,
-    79, 65628, (s32)lookat_house, 33, 131096, -170000000, 76, 131163,
-    (s32)evt_npc_check_delete, (s32)/*"パックン1"*/"\x83\x70\x83\x62\x83\x4E\x83\x93\x31", 65628, (s32)cloud_toujou, 33, 131096, -170000000, 77,
-    131163, (s32)evt_npc_check_delete, (s32)/*"パックン1"*/"\x83\x70\x83\x62\x83\x4E\x83\x93\x31", 65628, (s32)cloud_lostitem, 33, 2, 1,
-    0, 0, 0, 0,
-};
+EVT_BEGIN(win_03_init_evt)
+    SET_VALUE(LW(0), PTR(bero_entry_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(evt_bero_info_run)
+    CALL(evt_run_case_evt, 5, 1, STRING("n_bero"), 0, PTR(dummy_event), 0)
+    CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_WIN1"))
+    CALL(evt_snd_envon, 272, STRING("ENV_STG2_WIN1"))
+    CALL(evt_snd_bgmon, 160, 0)
+    SET_VALUE(LW(0), PTR(tree_access_data))
+    CALL_CHILD(evt_sub_tree_access_entry)
+    CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 7, 425, 60, 75, 0, 0)
+    CALL(evt_item_entry, STRING("i"), 135, 475, 0, -60, 16, GSWF(2679), 0)
+    CALL(evt_item_entry, STRING("item_00"), 125, -150, 0, -30, 16, GSWF(5610), 0)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_siro_asu"), 1)
+    CALL(evt_hitobj_onoff, STRING("A_siro_asu"), 1, 0)
+    IF_INT_EQUAL(GSW(0), 79)
+        SPAWN_EVENT(lookat_house)
+    END_IF
+    IF_INT_EQUAL(GSW(0), 76)
+        CALL(evt_npc_check_delete, STRING(/*"パックン1"*/"\x83\x70\x83\x62\x83\x4E\x83\x93\x31"))
+        SPAWN_EVENT(cloud_toujou)
+    END_IF
+    IF_INT_EQUAL(GSW(0), 77)
+        CALL(evt_npc_check_delete, STRING(/*"パックン1"*/"\x83\x70\x83\x62\x83\x4E\x83\x93\x31"))
+        SPAWN_EVENT(cloud_lostitem)
+    END_IF
+    RETURN
+EVT_END_PAD4()
 

@@ -48,7 +48,7 @@ int __abs(int);
 void marioSlitReenter(void) {
 	MarioWork* mario = marioGetPtr();
 	marioChgMot2(MARIO_MOTION_SLIT);
-	MW(mario, 0x2d8, s16) = 10;
+	mario->slitState = 10;
 	mario->flags &= ~0xF0000;
 }
 
@@ -84,14 +84,14 @@ s32 marioSlitButton(void) {
 		return 0;
 	}
 	if (!(mario->dispFlags & 0x1000000)) {
-		if (MW(mario, 0x246, u16) & 0x20) {
+		if (mario->buttonHold & 0x20) {
 			return 1;
 		}
 	} else {
-		if (MW(mario, 0x246, u16) & 0x20) {
+		if (mario->buttonHold & 0x20) {
 			return 2;
 		}
-		if (MW(mario, 0x253, u8) >= 50) {
+		if (mario->triggerR >= 50) {
 			return 2;
 		}
 	}
@@ -104,7 +104,7 @@ BOOL marioSlitKeyDisable(void) {
 	if (!(mario->flags & 0x100000)) {
 		return TRUE;
 	}
-	st = MW(mario, 0x2d8, s16);
+	st = mario->slitState;
 	if (st >= 0x50 && st <= 0x52) {
 		return FALSE;
 	}
@@ -233,13 +233,13 @@ BOOL marioCreviceWallChk(const Vec* p) {
 
 void marioClearSlitFloor(void) {
 	MarioWork* mario = marioGetPtr();
-	MW(mario, 0x268, s32) = 0;
+	mario->slitPosSet = 0;
 }
 
 BOOL marioGetSlitFloorPos(Vec* out) {
 	MarioWork* mario = marioGetPtr();
-	if (MW(mario, 0x268, s32)) {
-		*out = MW(mario, 0x26c, Vec);
+	if (mario->slitPosSet) {
+		*out = mario->slitPos;
 		return TRUE;
 	}
 	return FALSE;
@@ -251,7 +251,7 @@ BOOL marioChkSlitThrouh(void) {
 	if (mario->currMotionId != MARIO_MOTION_SLIT) {
 		return FALSE;
 	}
-	st = MW(mario, 0x2d8, s16);
+	st = mario->slitState;
 	if (st >= 0x50 && st <= 0x5e) {
 		return TRUE;
 	}
@@ -264,7 +264,7 @@ BOOL marioChkSlitThrouhEnd(void) {
 	if (mario->currMotionId != MARIO_MOTION_SLIT) {
 		return FALSE;
 	}
-	st = MW(mario, 0x2d8, s16);
+	st = mario->slitState;
 	if (st == 0x52 || st == 0x5e) {
 		return TRUE;
 	}
@@ -275,7 +275,7 @@ void motSlitContinue(void) {
 	s16 v;
 	v = 0x14;
 	marioChgMot2(MARIO_MOTION_SLIT);
-	MW(marioGetPtr(), 0x2d8, s16) = v;
+	marioGetPtr()->slitState = v;
 }
 
 BOOL marioChkSlitEnd(void) {
@@ -283,13 +283,13 @@ BOOL marioChkSlitEnd(void) {
 	if (mario->currMotionId != MARIO_MOTION_SLIT) {
 		return FALSE;
 	}
-	return MW(mario, 0x2d8, s16) >= 0x64;
+	return mario->slitState >= 0x64;
 }
 
 void motSlitCancel(void) {
 	MarioWork* mario = marioGetPtr();
 	if (mario->flags & 0x100000) {
-		MW(mario, 0x2d8, s16) = 0x64;
+		mario->slitState = 0x64;
 	}
 }
 
@@ -297,14 +297,14 @@ void motSlitCancel2(void) {
 	MarioWork* mario = marioGetPtr();
 	if (mario->flags & 0x100000) {
 		allPartyForceSlitOff();
-		MW(mario, 0x2d8, s16) = 0x6e;
+		mario->slitState = 0x6e;
 	}
 }
 
 void motSlitCancel3(void) {
 	MarioWork* mario = marioGetPtr();
 	if (mario->flags & 0x100000) {
-		MW(mario, 0x2d8, s16) = 0x78;
+		mario->slitState = 0x78;
 	}
 }
 
@@ -313,7 +313,7 @@ BOOL marioGetMotSlitCancel3(void) {
 	BOOL r = FALSE;
 	MarioWork* mario = marioGetPtr();
 	if (mario->currMotionId == MARIO_MOTION_SLIT) {
-		st = MW(mario, 0x2d8, s16);
+		st = mario->slitState;
 		if ((st >= 0x78 && st <= 0x7a) || (st >= 0x6e && st <= 0x70)) {
 			r = TRUE;
 		}
@@ -369,7 +369,7 @@ void mot_slit_post(void) {
 #ifdef VERSION_G8ME01
 	MarioWork* m = marioGetPtr();
 	u16 id;
-	if (MW(m, 0x2D8, s16) >= 10) {
+	if (m->slitState >= 10) {
 		id = m->currMotionId;
 		if (id == 0x15 || (u16)(id - 0xb) <= 1 || m->currMotionId <= 7 || m->currMotionId == 8) {
 			return;
@@ -441,11 +441,11 @@ void marioForceSlitAnime(void) {
 
 static inline void slitInit(void) {
 	MarioWork* m = marioGetPtr();
-	MW(m, 0x2a0, f32) = 0.0f;
-	MW(m, 0x2a4, s32) = 0;
-	MW(m, 0x2b6, s16) = 0;
-	MW(m, 0x2b4, s16) = 0;
-	MW(m, 0x2ba, s16) = 0;
+	m->mot.slit.unk0 = 0.0f;
+	m->mot.slit.counter = 0;
+	m->mot.slit.count = 0;
+	m->mot.slit.timer = 0;
+	m->mot.slit.side = 0;
 	m->trigFlags &= ~1;
 	m->flags &= ~0xF0000;
 	m->dispFlags |= 4;
@@ -467,13 +467,13 @@ void marioReInit_slit(void) {
 	slitInit();
 	m->trigFlags &= ~1;
 	m->currMotionId = MARIO_MOTION_SLIT;
-	MW(m, 0x2d8, s16) = 10;
+	m->slitState = 10;
 	m->displayDirection = 270.0f;
 	m->displayDirectionTarget = m->displayDirection;
 	marioChgPose("M_S_1");
 	marioChgPaper("PM_S_1B");
-	MW(m, 0x2d8, s16) = 10;
-	MW(m, 0x2b6, s16) = 0;
+	m->slitState = 10;
+	m->mot.slit.count = 0;
 	m->wPlayerCollisionBox.x = 6.0f;
 	m->flags |= 0x100000;
 	m->dispFlags |= 0x1000000;
@@ -509,15 +509,15 @@ static inline BOOL slitContinueChk(void) {
 		if (!((m)->trigFlags & 0x8000)) { \
 			marioChgPose("M_R_1"); \
 		} \
-		MW(m, 0x2b8, s16) |= 1; \
+		m->mot.slit.flags |= 1; \
 	}
 
 static inline f32 slitWalkSpeed(void) {
 	MarioWork* p = marioGetPtr();
 	f32 spd = p->mBaseWalkSpeed;
 	if (p->flags & 0x100000) {
-		if (MW(p, 0x2b4, s16) != 0) return spd; {
-			int a = MW(p, 0x24e, s8); int b = MW(p, 0x24f, s8);
+		if (p->mot.slit.timer != 0) return spd; {
+			int a = p->wStickDir1; int b = p->wStickDir2;
 			if (a * a + b * b <= 0xbd1) {
 				spd *= 0.5f;
 			}
@@ -531,7 +531,7 @@ static inline f32 slitWalkSpeed(void) {
 
 #define SLITDIR(m) 	(m)->displayDirection = (revise360((m)->directionView - (m)->targetYaw) <= 180.0f) ? 260.0f : 280.0f;
 
-#define SLITDIR2(m) 	if (revise360((m)->directionView - (m)->targetYaw) <= 180.0f) { 		MW(m, 0x2ba, s16) = 1; 		(m)->displayDirection = 260.0f; 	} else { 		MW(m, 0x2ba, s16) = 2; 		(m)->displayDirection = 280.0f; 	}
+#define SLITDIR2(m) 	if (revise360((m)->directionView - (m)->targetYaw) <= 180.0f) { 		m->mot.slit.side = 1; 		(m)->displayDirection = 260.0f; 	} else { 		m->mot.slit.side = 2; 		(m)->displayDirection = 280.0f; 	}
 
 #define CAMFIX(m) \
 	{ \
@@ -544,18 +544,18 @@ static inline f32 slitWalkSpeed(void) {
 #define SLITSTOP(m) \
 	if (!marioChkKey()) { \
 		(m)->baseSpeed = 0.0f; \
-		MW(m, 0x2d8, s16) = 10; \
-		MW(m, 0x2b6, s16) = 0; \
+		m->slitState = 10; \
+		m->mot.slit.count = 0; \
 		marioChgPose("M_S_1"); \
 		marioChgPaper("PM_S_1B"); \
 		break; \
 	}
 #define SLITSTOP2(m) \
 	if (!marioChkKey()) { \
-		MW(m, 0x2b4, s16) = 0; \
+		m->mot.slit.timer = 0; \
 		(m)->baseSpeed = 0.0f; \
-		MW(m, 0x2d8, s16) = 10; \
-		MW(m, 0x2b6, s16) = 0; \
+		m->slitState = 10; \
+		m->mot.slit.count = 0; \
 		marioChgPose("M_S_1"); \
 		marioChgPaper("PM_S_1B"); \
 		break; \
@@ -574,7 +574,7 @@ void mot_slit(void) {
 	}
 	if (m->trigFlags & 1) {
 		slitInit();
-		MW(m, 0x2d8, s16) = 0;
+		m->slitState = 0;
 		m->airTimer = 0;
 	}
 	if (marioRollChgChk()) {
@@ -592,12 +592,12 @@ void mot_slit(void) {
 		m->flags &= ~0x100000;
 		return;
 	}
-	switch (MW(m, 0x2d8, s16)) {
+	switch (m->slitState) {
 	case 0:
-		MW(m, 0x2dc, s32) = 30;
-		MW(m, 0x2a4, s32) = 0;
-		MW(m, 0x2d8, s16) = 2;
-		MW(m, 0x2ac, f32) = m->position.y;
+		m->slitTimer = 30;
+		m->mot.slit.counter = 0;
+		m->slitState = 2;
+		m->mot.slit.lastY = m->position.y;
 		SPEEDCHK_US(m)
 		marioGetPtr();
 		psndSFXOn_3D((char*)0x177, &m->position);
@@ -611,19 +611,19 @@ void mot_slit(void) {
 			SPEEDCHK_US(m)
 			m->directionView = m->controlStickAngle;
 		}
-		if (--MW(m, 0x2dc, s32) <= 0) {
+		if (--m->slitTimer <= 0) {
 #else
 		if (!m->controlStickSensitivity) {
 			m->baseSpeed = 0.0f;
 			marioChgPose("M_S_1");
 		}
-		if (--MW(m, 0x2dc, s32) <= 0) {
+		if (--m->slitTimer <= 0) {
 #endif
 			m->flags |= 0x100000;
-			MW(m, 0x2d8, s16) = 4;
+			m->slitState = 4;
 			m->wPlayerCollisionBox.x = 6.0f;
 		}
-		if (MW(m, 0x2dc, s32) == 0x14) {
+		if (m->slitTimer == 0x14) {
 			allPartySlitOn();
 		}
 		break;
@@ -642,23 +642,23 @@ void mot_slit(void) {
 			marioChgPose("M_S_1");
 		}
 		marioChgPaper("PM_S_1B");
-		MW(m, 0x2d8, s16) = 10;
-		MW(m, 0x2b6, s16) = 0;
+		m->slitState = 10;
+		m->mot.slit.count = 0;
 	case 10:
-		if (m->position.y != MW(m, 0x2ac, f32)) {
+		if (m->position.y != m->mot.slit.lastY) {
 			CAMFIX(m)
 		}
-		MW(m, 0x2ac, f32) = m->position.y;
+		m->mot.slit.lastY = m->position.y;
 		if (m->forceMoveTimer != 0) {
 			if (!(m->trigFlags & 0x8000)) {
 				marioChgPose("M_W_1");
 			}
 			marioChgPaper("PM_S_1D");
 			if (revise360(m->directionView - m->targetYaw) <= 180.0f) {
-				MW(m, 0x2ba, s16) = 1;
+				m->mot.slit.side = 1;
 				m->displayDirection = 260.0f;
 			} else {
-				MW(m, 0x2ba, s16) = 2;
+				m->mot.slit.side = 2;
 				m->displayDirection = 280.0f;
 			}
 			break;
@@ -667,7 +667,7 @@ void mot_slit(void) {
 		if (marioChkKey()) {
 			if (slitContinueChk() != TRUE) {
 				m->directionView = m->controlStickAngle;
-				MW(m, 0x2d8, s16) = 0x64;
+				m->slitState = 0x64;
 				break;
 			}
 		}
@@ -676,7 +676,7 @@ void mot_slit(void) {
 		}
 		if (!m->controlStickSensitivity) {
 			m->baseSpeed = 0.0f;
-			if (!MW(m, 0x2a4, s32)) {
+			if (!m->mot.slit.counter) {
 				marioChgPose("M_S_1");
 				marioChgPaper("PM_S_1B");
 			}
@@ -685,10 +685,10 @@ void mot_slit(void) {
 		if (strcmp(m->animName, "M_I_Y") == 0) {
 			marioChgPose("M_W_1");
 		}
-		if (!(MW(m, 0x2b8, s16) & 1)) {
+		if (!(m->mot.slit.flags & 1)) {
 			CAMFIX(m)
 		} else {
-			MW(m, 0x2b8, s16) &= ~1;
+			m->mot.slit.flags &= ~1;
 			CAMFIX(m)
 		}
 		m->baseSpeed = slitWalkSpeed();
@@ -703,20 +703,20 @@ void mot_slit(void) {
 			marioChgPaper("PM_S_1D");
 			SLITDIR2(m)
 		}
-		MW(m, 0x2d8, s16) = 0x14;
+		m->slitState = 0x14;
 		break;
 	}
-	switch (MW(m, 0x2d8, s16)) {
+	switch (m->slitState) {
 	case 0x14:
-		if (MW(m, 0x2b4, s16) > 0) {
-			MW(m, 0x2b4, s16) = 0;
+		if (m->mot.slit.timer > 0) {
+			m->mot.slit.timer = 0;
 			marioChgPaper("PM_S_1D");
 			SLITDIR(m)
 			SLITSTOP(m)
 		}
 		if (marioChkKey()) {
 			if (slitContinueChk() != TRUE) {
-				MW(m, 0x2d8, s16) = 0x64;
+				m->slitState = 0x64;
 			}
 		}
 		if (!(m->flags & 0x30000)) {
@@ -725,18 +725,18 @@ void mot_slit(void) {
 		if (marioChkKey()) {
 			if (!m->controlStickSensitivity) {
 				m->baseSpeed = 0.0f;
-				if (++MW(m, 0x2b6, s16) < 6) {
+				if (++m->mot.slit.count < 6) {
 					if (slitContinueChk() != TRUE) {
-						MW(m, 0x2d8, s16) = 0x64;
+						m->slitState = 0x64;
 					}
 					break;
 				} else {
-					MW(m, 0x2d8, s16) = 4;
+					m->slitState = 4;
 					break;
 				}
 			} else {
 				s32 sum;
-				MW(m, 0x2b6, s16) = 0;
+				m->mot.slit.count = 0;
 				sum = abs((s8)m->wStickDir1) + abs((s8)m->wStickDir2);
 				if (!(m->trigFlags & 0x8000)) {
 					marioChgPose((sum < 0x44) ? "M_W_1" : "M_R_1");
@@ -750,32 +750,32 @@ void mot_slit(void) {
 		d = revise360(m->controlStickAngle - m->targetYaw);
 		if (d >= 315.0f || d <= 45.0f || (d >= 135.0f && d <= 225.0f)) {
 			marioChgPaper("PM_S_1E");
-			MW(m, 0x2b6, s16) = 6;
-			MW(m, 0x2ba, s16) = 0;
+			m->mot.slit.count = 6;
+			m->mot.slit.side = 0;
 			SLITDIR(m)
 			break;
 		} else {
 			marioChgPaper("PM_S_1D");
 			d = revise360(m->directionView - m->targetYaw);
-			if (MW(m, 0x2ba, s16) == 0) {
-				MW(m, 0x2ba, s16) = (d >= 180.0f) ? 2 : 1;
+			if (m->mot.slit.side == 0) {
+				m->mot.slit.side = (d >= 180.0f) ? 2 : 1;
 			}
-			if (MW(m, 0x2ba, s16) == 1) {
+			if (m->mot.slit.side == 1) {
 				if (d >= 180.0f) {
 					marioChgPaper("PM_S_2");
-					MW(m, 0x2b4, s16) = 6;
-					MW(m, 0x2d8, s16) = 0x15;
-					MW(m, 0x2ba, s16) = 2;
+					m->mot.slit.timer = 6;
+					m->slitState = 0x15;
+					m->mot.slit.side = 2;
 					m->baseSpeed = slitWalkSpeed();
 					m->displayDirection = 260.0f;
 					SLITSTOP2(m)
 				}
-			} else if (MW(m, 0x2ba, s16) == 2) {
+			} else if (m->mot.slit.side == 2) {
 				if (d <= 180.0f) {
 					marioChgPaper("PM_S_2");
-					MW(m, 0x2b4, s16) = 6;
-					MW(m, 0x2d8, s16) = 0x15;
-					MW(m, 0x2ba, s16) = 1;
+					m->mot.slit.timer = 6;
+					m->slitState = 0x15;
+					m->mot.slit.side = 1;
 					m->baseSpeed = slitWalkSpeed();
 					m->displayDirection = 280.0f;
 					SLITSTOP2(m)
@@ -784,13 +784,13 @@ void mot_slit(void) {
 		}
 		break;
 	case 0x15:
-		if (--MW(m, 0x2b4, s16) > 0) {
+		if (--m->mot.slit.timer > 0) {
 			SLITSTOP2(m)
 			break;
 		}
 		marioChgPaper("PM_S_1D");
-		MW(m, 0x2d8, s16) = 0x14;
-		m->displayDirection = (MW(m, 0x2ba, s16) == 1) ? 260.0f : 280.0f;
+		m->slitState = 0x14;
+		m->displayDirection = (m->mot.slit.side == 1) ? 260.0f : 280.0f;
 		break;
 	}
 	if (m->flags & 0x100000) {
@@ -806,9 +806,9 @@ void mot_slit(void) {
 					} else {
 						m->wCamVal1 = 0.0f;
 					}
-					if (++MW(m, 0x2a4, s32) >= sysMsec2Frame(50)) {
+					if (++m->mot.slit.counter >= sysMsec2Frame(50)) {
 						qp = &q; m->directionView = revise360(m->wCamVal1 + m->targetYaw);
-						MW(m, 0x2a4, s32) = 0;
+						m->mot.slit.counter = 0;
 						sincosf(&sn, &cs, m->directionView);
 						{ Vec tmp = {0, 0, 0};
 						q.targetPos.x = m->position.x;
@@ -829,32 +829,32 @@ void mot_slit(void) {
 								q.targetDistance = 20.0f;
 								movePos(&qp->targetPos.x, &qp->targetPos.z, 1.0f, reviseAngle(m->moveDirection - 90.0f));
 								if (hitCheckVecHitObjXZ(qp, m->hitobjPush)) {
-									MW(m, 0x2d8, s16) = 0x50;
+									m->slitState = 0x50;
 								}
 							}
 						}
 					}
 				} else {
-					MW(m, 0x2a4, s32) = 0;
+					m->mot.slit.counter = 0;
 				}
 			}
 		} else {
-			st = MW(m, 0x2d8, s16);
+			st = m->slitState;
 			if (!(st >= 0x5a && st <= 0x5e) && m->hitobjStandOn != NULL && (hitGetAttr(m->hitobjStandOn) & 0x2000)) {
-				MW(m, 0x2a4, s32) += 3;
+				m->mot.slit.counter += 3;
 				marioChgPaper("PM_S_1H");
-				if (MW(m, 0x2a4, s32) >= 0xf && m->currMotionId == 0x15) {
-					MW(m, 0x2d8, s16) = 0x5a;
+				if (m->mot.slit.counter >= 0xf && m->currMotionId == 0x15) {
+					m->slitState = 0x5a;
 				}
 			} else {
-				MW(m, 0x2a4, s32)--;
-				if (MW(m, 0x2a4, s32) < 0) {
-					MW(m, 0x2a4, s32) = 0;
+				m->mot.slit.counter--;
+				if (m->mot.slit.counter < 0) {
+					m->mot.slit.counter = 0;
 				}
 			}
 		}
 	}
-	switch (MW(m, 0x2d8, s16)) {
+	switch (m->slitState) {
 	case 0x50:
 		camGetPtr(8)->flags |= 0x200;
 		CAMFIX(m)
@@ -865,51 +865,51 @@ void mot_slit(void) {
 			marioChgPaper("PM_S_1G");
 		}
 		m->flags |= 0x400;
-		MW(m, 0x2dc, s32) = 20;
-		m->baseSpeed = (2.0f * m->wPlayerCollisionBox.x) / (f32)MW(m, 0x2dc, s32);
-		MW(m, 0x2d8, s16) = 0x51;
+		m->slitTimer = 20;
+		m->baseSpeed = (2.0f * m->wPlayerCollisionBox.x) / (f32)m->slitTimer;
+		m->slitState = 0x51;
 		m->flags |= 0x200000;
 		break;
 	case 0x51:
-		if (--MW(m, 0x2dc, s32) <= 0) {
-			MW(m, 0x2d8, s16) = 0x52;
+		if (--m->slitTimer <= 0) {
+			m->slitState = 0x52;
 		}
 		break;
 	case 0x52:
 		camGetPtr(8)->flags &= ~0x200;
 		m->flags &= ~0x400;
-		MW(m, 0x2d8, s16) = 0x14;
+		m->slitState = 0x14;
 		m->flags &= ~0x10000000;
 		break;
 	}
-	switch (MW(m, 0x2d8, s16)) {
+	switch (m->slitState) {
 	case 0x5a:
 		camGetPtr(8)->flags |= 0x200;
 		CAMFIX(m)
 		m->flags |= 0x10000000;
 		marioChgPaper("PM_S_1H");
-		MW(m, 0x2dc, s32) = sysMsec2Frame(500);
+		m->slitTimer = sysMsec2Frame(500);
 		m->baseSpeed = 0.0f;
-		MW(m, 0x2d8, s16) = 0x5b;
+		m->slitState = 0x5b;
 		{
 			MarioWork* p = marioGetPtr();
-			MW(p, 0x268, s32) = 1;
+			p->slitPosSet = 1;
 			// copy
-			MW(p, 0x26c, Vec) = MW(p, 0x8c, Vec);
+			p->slitPos = p->position;
 		}
 	case 0x5b:
-		MW(m, 0x2dc, s32) = 15;
-		MW(m, 0x2d8, s16) = 0x5c;
+		m->slitTimer = 15;
+		m->slitState = 0x5c;
 		m->flags |= 0x100;
 		marioSetFallPara();
 		m->flags &= ~0x10000;
 		m->flags |= 0xA0000;
 	case 0x5c:
 		SLITDIR(m)
-		if (--MW(m, 0x2dc, s32) > 0) {
+		if (--m->slitTimer > 0) {
 			break;
 		}
-		MW(m, 0x2d8, s16) = 0x5d;
+		m->slitState = 0x5d;
 		m->flags &= ~0x100;
 		m->flags &= ~0x10000000;
 	case 0x5d:
@@ -917,16 +917,16 @@ void mot_slit(void) {
 			break;
 		}
 		m->flags &= ~0xF0000;
-		MW(m, 0x2d8, s16) = 0x5e;
+		m->slitState = 0x5e;
 	case 0x5e:
 		camGetPtr(8)->flags &= ~0x200;
-		MW(m, 0x2d8, s16) = 0x14;
+		m->slitState = 0x14;
 		break;
 	}
-	switch (MW(m, 0x2d8, s16)) {
+	switch (m->slitState) {
 	case 0x64:
 		m->flags &= ~0x200000;
-		MW(m, 0x2da, s16) = 0;
+		m->slitTimer2 = 0;
 		m->flags &= ~0x100000;
 		m->wPlayerCollisionBox.x = 20.0f;
 #ifdef VERSION_G8ME01
@@ -936,8 +936,8 @@ void mot_slit(void) {
 			marioChgPose("M_S_1");
 		}
 		marioChgPaper("PM_S_1C");
-		MW(m, 0x2da, s16) = 30;
-		MW(m, 0x2d8, s16) = 0x65;
+		m->slitTimer2 = 30;
+		m->slitState = 0x65;
 		if (revise360(m->directionView - m->targetYaw) >= 180.0f) {
 			m->displayDirection = 0.0f;
 			m->displayDirectionTarget = m->displayDirection;
@@ -967,10 +967,10 @@ void mot_slit(void) {
 			marioChgPose("M_S_1");
 		}
 #endif
-		if (--MW(m, 0x2da, s16) > 0) {
+		if (--m->slitTimer2 > 0) {
 			break;
 		}
-		MW(m, 0x2d8, s16) = 0x66;
+		m->slitState = 0x66;
 		break;
 	case 0x66:
 #ifdef VERSION_G8ME01
@@ -1002,15 +1002,15 @@ void mot_slit(void) {
 		m->flags &= ~0x200000;
 		m->flags &= ~0x10000000;
 		m->flags &= ~0x400;
-		MW(m, 0x2da, s16) = 0;
+		m->slitTimer2 = 0;
 		m->flags &= ~0x100000;
 		m->wPlayerCollisionBox.x = 20.0f;
 		if (!m->controlStickSensitivity) {
 			marioChgPose("M_S_1");
 		}
 		marioChgPaper("PM_S_1C");
-		MW(m, 0x2da, s16) = 30;
-		MW(m, 0x2d8, s16) = 0x6f;
+		m->slitTimer2 = 30;
+		m->slitState = 0x6f;
 		m->baseSpeed = 0.0f;
 		if (revise360(m->directionView - m->targetYaw) >= 180.0f) {
 			m->displayDirection = 0.0f;
@@ -1023,10 +1023,10 @@ void mot_slit(void) {
 		}
 		psndSFXOn_3D((char*)0x178, &m->position);
 	case 0x6f:
-		if (--MW(m, 0x2da, s16) > 0) {
+		if (--m->slitTimer2 > 0) {
 			break;
 		}
-		MW(m, 0x2d8, s16) = 0x70;
+		m->slitState = 0x70;
 		break;
 	case 0x70:
 		m->flags &= ~0x400000; m->flags &= ~0x200000; m->dispFlags &= CLR_DISP;
@@ -1039,15 +1039,15 @@ void mot_slit(void) {
 		marioChgMot(0);
 		break;
 	case 0x78:
-		MW(m, 0x2da, s16) = 0;
+		m->slitTimer2 = 0;
 		m->flags &= ~0x100000;
 		m->wPlayerCollisionBox.x = 20.0f;
 		if (!m->controlStickSensitivity) {
 			marioChgPose("M_S_1");
 		}
 		marioChgPaper("PM_S_1C");
-		MW(m, 0x2da, s16) = 30;
-		MW(m, 0x2d8, s16) = 0x79;
+		m->slitTimer2 = 30;
+		m->slitState = 0x79;
 		m->baseSpeed = 0.0f;
 		if (revise360(m->directionView - m->targetYaw) >= 180.0f) {
 			m->displayDirection = 0.0f;
@@ -1060,10 +1060,10 @@ void mot_slit(void) {
 		}
 		psndSFXOn_3D((char*)0x178, &m->position);
 	case 0x79:
-		if (--MW(m, 0x2da, s16) > 0) {
+		if (--m->slitTimer2 > 0) {
 			break;
 		}
-		MW(m, 0x2d8, s16) = 0x7a;
+		m->slitState = 0x7a;
 		break;
 	case 0x7a:
 		m->flags &= ~0x400000;

@@ -3,6 +3,8 @@
 #include "battle/battle_event_default.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
+#include "data_tables.h"
 
 #pragma force_active on
 
@@ -62,31 +64,31 @@ USER_FUNC(evt_btl_camera_set_moveSpeedLv);
 USER_FUNC(evt_btl_camera_set_zoom);
 USER_FUNC(evt_btl_camera_shake_h);
 
-__declspec(section ".data") u64 fd_basabasa_negone_one_374;
-__declspec(section ".data") s32 fd_basabasa_neg_one_382[1];
-__declspec(section ".data") s32 fd_basabasa___local_PI_383[1];
-__declspec(section ".data") s32 fd_basabasa___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_basabasa_one_negone_373;
-__declspec(section ".data") s32 fd_basabasa___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_basabasa_one_381[1];
-__declspec(section ".data") u64 fd_basabasa_negone_one_360;
-__declspec(section ".data") s32 fd_basabasa_neg_one_365[1];
-__declspec(section ".data") s32 fd_basabasa___local_PI_366[1];
-__declspec(section ".data") s32 fd_basabasa___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_basabasa_one_negone_359;
-__declspec(section ".data") s32 fd_basabasa___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_basabasa_one_364[1];
+__declspec(section ".data") f32 fd_basabasa_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_basabasa_neg_one_382;
+__declspec(section ".data") f32 fd_basabasa___local_PI_383;
+__declspec(section ".data") f32 fd_basabasa___local_3PIO2_385;
+__declspec(section ".data") f32 fd_basabasa_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_basabasa___local_PIO2_384;
+__declspec(section ".data") f32 fd_basabasa_one_381;
+__declspec(section ".data") f32 fd_basabasa_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_basabasa_neg_one_365;
+__declspec(section ".data") f32 fd_basabasa___local_PI_366;
+__declspec(section ".data") f32 fd_basabasa___local_3PIO2_368;
+__declspec(section ".data") f32 fd_basabasa_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_basabasa___local_PIO2_367;
+__declspec(section ".data") f32 fd_basabasa_one_364;
 BattleUnitKind unit_basabasa;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static s32 weapon_basabasa_drain_attack_biribiri_counterd[48];
+static BattleWeapon weapon_basabasa_drain_attack_biribiri_counterd;
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_ceil[18];
 static BattleDataEntry data_table[14];
 static BattleUnitKindPart parts[1];
 static __declspec(section ".data") StatusVulnerability regist;
-static s32 weapon_basabasa_attack[48];
-static s32 pose_sound_timing_table[45];
+static BattleWeapon weapon_basabasa_attack;
+static PoseSoundTiming pose_sound_timing_table[9];
 static s32 ceil_sky_event[98];
 static s32 init_event[78];
 static __declspec(section ".data") s32 dmg_first_attack_pos[12];
@@ -97,53 +99,33 @@ static s32 ceil_fall_ready_event[23];
 static s32 attack_event[448];
 static __declspec(section ".data") s32 wait_event[6];
 
-__declspec(section ".data") u64 fd_basabasa_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_basabasa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_basabasa_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_basabasa_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_basabasa___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_basabasa___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_basabasa___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_basabasa___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_basabasa_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_basabasa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_basabasa___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_basabasa___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_basabasa_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_basabasa_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_basabasa_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_basabasa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_basabasa_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_basabasa_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_basabasa___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_basabasa___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_basabasa___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_basabasa___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_basabasa_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_basabasa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_basabasa___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_basabasa___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_basabasa_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_basabasa_one_364 = 1.0f;
 
 BattleUnitKind unit_basabasa = {
     74,
@@ -215,13 +197,37 @@ static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}}
 
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static s32 weapon_basabasa_drain_attack_biribiri_counterd[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 0, 0, 8192,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_basabasa_drain_attack_biribiri_counterd = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, 0, 0, // acHelpMsg..counterResistFlags
+    0x2000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static PoseTableEntry pose_table[] = {
@@ -289,22 +295,52 @@ static BattleUnitKindPart parts[] = {
 
 static __declspec(section ".data") StatusVulnerability regist = {80, 85, 105, 100, 80, 100, 100, 80, 100, 90, 100, 90, 100, 95, 80, 80, 95, 100, 80, 100, 100, 95};
 
-static s32 weapon_basabasa_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 20615, 0, -2147475456,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_basabasa_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x5087, // special
+    0, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 pose_sound_timing_table[] = {
-    (s32)"BSA_S_1", 1008981770, 0, (s32)"SFX_ENM_BASA_WAIT1", 1, (s32)"BSA_W_1", 1008981770, 0,
-    (s32)"SFX_ENM_BASA_MOVE1\0", 1, (s32)"BSA_R_1", 1008981770, 0, (s32)"SFX_ENM_BASA_MOVE1\0", 1, (s32)"BSA_T_1",
-    1008981770, 0, (s32)"SFX_ENM_BASA_WAIT1", 1, (s32)"BSA_A_1", 1008981770, 0, (s32)"SFX_ENM_BASA_WAIT1",
-    1, (s32)"BSA_N_1", 1008981770, 0, (s32)"SFX_ENM_BASA_WAIT1", 1, (s32)"BSA_K_1", 1008981770,
-    0, (s32)"SFX_ENM_BASA_WAIT1", 1, (s32)"BSA_X_1", 1008981770, 0, (s32)"SFX_ENM_BASA_WAIT1", 1,
-    0, 0, 0, 0, 1,
+static PoseSoundTiming pose_sound_timing_table[] = {
+    {"BSA_S_1", 0.01f, NULL, "SFX_ENM_BASA_WAIT1", 0, 1},
+    {"BSA_W_1", 0.01f, NULL, "SFX_ENM_BASA_MOVE1\0", 0, 1},
+    {"BSA_R_1", 0.01f, NULL, "SFX_ENM_BASA_MOVE1\0", 0, 1},
+    {"BSA_T_1", 0.01f, NULL, "SFX_ENM_BASA_WAIT1", 0, 1},
+    {"BSA_A_1", 0.01f, NULL, "SFX_ENM_BASA_WAIT1", 0, 1},
+    {"BSA_N_1", 0.01f, NULL, "SFX_ENM_BASA_WAIT1", 0, 1},
+    {"BSA_K_1", 0.01f, NULL, "SFX_ENM_BASA_WAIT1", 0, 1},
+    {"BSA_X_1", 0.01f, NULL, "SFX_ENM_BASA_WAIT1", 0, 1},
+    {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
 static EVT_BEGIN(ceil_sky_event)
@@ -413,8 +449,8 @@ static EVT_BEGIN(attack_event)
         RETURN
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_basabasa_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_basabasa_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_basabasa_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_basabasa_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
@@ -423,10 +459,10 @@ static EVT_BEGIN(attack_event)
         END_IF
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_basabasa_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_basabasa_attack))
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_basabasa_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_basabasa_attack))
     CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
     CALL(evt_btl_camera_set_mode, 0, 8)
@@ -458,7 +494,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     SUBTRACT(LW(1), 10)
     CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 0, -16, 0, 0, -1)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_basabasa_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_basabasa_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -492,8 +528,8 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_basabasa_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_basabasa_attack), 256, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_basabasa_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_basabasa_attack), 256, LW(5))
     CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.5f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 50)

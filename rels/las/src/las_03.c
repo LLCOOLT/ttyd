@@ -2,6 +2,7 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
+#include "driver/hitdrv.h"
 
 #pragma force_active on
 
@@ -30,78 +31,58 @@ USER_FUNC(get_toge_name);
 USER_FUNC(toge_check_flag);
 USER_FUNC(toge_flag_onoff);
 
-__declspec(section ".data") u64 fd_las_03_negone_one_374;
-__declspec(section ".data") s32 fd_las_03_neg_one_382[1];
-__declspec(section ".data") s32 fd_las_03___local_PI_383[1];
-__declspec(section ".data") s32 fd_las_03___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_las_03_one_negone_373;
-__declspec(section ".data") s32 fd_las_03___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_las_03_one_381[1];
-__declspec(section ".data") u64 fd_las_03_negone_one_360;
-__declspec(section ".data") s32 fd_las_03_neg_one_365[1];
-__declspec(section ".data") s32 fd_las_03___local_PI_366[1];
-__declspec(section ".data") s32 fd_las_03___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_las_03_one_negone_359;
-__declspec(section ".data") s32 fd_las_03___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_las_03_one_364[1];
+__declspec(section ".data") f32 fd_las_03_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_03_neg_one_382;
+__declspec(section ".data") f32 fd_las_03___local_PI_383;
+__declspec(section ".data") f32 fd_las_03___local_3PIO2_385;
+__declspec(section ".data") f32 fd_las_03_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_03___local_PIO2_384;
+__declspec(section ".data") f32 fd_las_03_one_381;
+__declspec(section ".data") f32 fd_las_03_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_03_neg_one_365;
+__declspec(section ".data") f32 fd_las_03___local_PI_366;
+__declspec(section ".data") f32 fd_las_03___local_3PIO2_368;
+__declspec(section ".data") f32 fd_las_03_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_03___local_PIO2_367;
+__declspec(section ".data") f32 fd_las_03_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static s32 e_door_close[22];
 static s32 e_door_open[22];
-static s32 bero_entry_data[45];
-static __declspec(section ".data") s32 dmgRetPoint[12];
-s32 toge_data[18];
+static BeroEntry bero_entry_data[3];
+static __declspec(section ".data") HitDamageReturn dmgRetPoint[3];
+const char* toge_data[18];
 s32 toge_evt_sub[121];
 s32 toge_evt[86];
 s32 las_03_init_evt[32];
 
-__declspec(section ".data") u64 fd_las_03_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_03_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_03___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_03___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_03_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_03___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_03_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_03_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_las_03_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_03_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_03___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_03___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_03_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_03___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_03_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_03_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -135,24 +116,71 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65542, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"las_02", (s32)"e_bero", 327685, (s32)w_door_close, (s32)w_door_open, (s32)"e_bero_1",
-    65542, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"las_04", (s32)"w_bero", 327685, (s32)e_door_close, (s32)e_door_open, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_02", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero_1", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_04", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
-static __declspec(section ".data") s32 dmgRetPoint[] = {
-    (s32)"A_yuka_02", 0, -998637568, 0, (s32)"A_yuka_03", 0, -998637568, 0,
-    0, 0, 0, 0,
+static __declspec(section ".data") HitDamageReturn dmgRetPoint[] = {
+    {"A_yuka_02", {0.0f, -1000.0f, 0.0f}},
+    {"A_yuka_03", {0.0f, -1000.0f, 0.0f}},
+    {0},
 };
 
-s32 toge_data[] = {
-    (s32)"S_toge_01", (s32)"A_toge_01", (s32)"S_toge_02", (s32)"A_toge_02", (s32)"S_toge_03", (s32)"A_toge_03", (s32)"S_toge_04", (s32)"A_toge_04",
-    (s32)"S_toge_05", (s32)"A_toge_05", (s32)"S_toge_06", (s32)"A_toge_06", (s32)"S_toge_07", (s32)"A_toge_07", (s32)"S_toge_08", (s32)"A_toge_08",
-    (s32)"S_toge_09", (s32)"A_toge_09",
+const char* toge_data[] = {
+    "S_toge_01",
+    "A_toge_01",
+    "S_toge_02",
+    "A_toge_02",
+    "S_toge_03",
+    "A_toge_03",
+    "S_toge_04",
+    "A_toge_04",
+    "S_toge_05",
+    "A_toge_05",
+    "S_toge_06",
+    "A_toge_06",
+    "S_toge_07",
+    "A_toge_07",
+    "S_toge_08",
+    "A_toge_08",
+    "S_toge_09",
+    "A_toge_09",
 };
 
 EVT_BEGIN(toge_evt_sub)
@@ -195,7 +223,7 @@ EVT_END()
 EVT_BEGIN(toge_evt)
     CALL(evt_hit_damage_return_set, PTR(dmgRetPoint))
     CALL_CHILD(PTR(evt_gazigazi_entry))
-    SET_INT_READ_ADDR(PTR(toge_data))
+    SET_INT_READ_ADDR(PTR(&toge_data))
     LOOP(9)
         READ_INT2(LW(0), LW(1))
         CALL(evt_hit_bind_mapobj, LW(1), LW(0))

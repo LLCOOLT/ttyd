@@ -2,6 +2,7 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "data_tables.h"
 
 #pragma force_active on
 
@@ -16,82 +17,89 @@ USER_FUNC(evt_npc_change_fbat_mode);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 
-__declspec(section ".data") u64 fd_hei_02_negone_one_374;
-__declspec(section ".data") s32 fd_hei_02_neg_one_382[1];
-__declspec(section ".data") s32 fd_hei_02___local_PI_383[1];
-__declspec(section ".data") s32 fd_hei_02___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_hei_02_one_negone_373;
-__declspec(section ".data") s32 fd_hei_02___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_hei_02_one_381[1];
-__declspec(section ".data") u64 fd_hei_02_negone_one_360;
-__declspec(section ".data") s32 fd_hei_02_neg_one_365[1];
-__declspec(section ".data") s32 fd_hei_02___local_PI_366[1];
-__declspec(section ".data") s32 fd_hei_02___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_hei_02_one_negone_359;
-__declspec(section ".data") s32 fd_hei_02___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_hei_02_one_364[1];
-static s32 bero_entry_data[45];
+__declspec(section ".data") f32 fd_hei_02_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_02_neg_one_382;
+__declspec(section ".data") f32 fd_hei_02___local_PI_383;
+__declspec(section ".data") f32 fd_hei_02___local_3PIO2_385;
+__declspec(section ".data") f32 fd_hei_02_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_02___local_PIO2_384;
+__declspec(section ".data") f32 fd_hei_02_one_381;
+__declspec(section ".data") f32 fd_hei_02_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_02_neg_one_365;
+__declspec(section ".data") f32 fd_hei_02___local_PI_366;
+__declspec(section ".data") f32 fd_hei_02___local_3PIO2_368;
+__declspec(section ".data") f32 fd_hei_02_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_02___local_PIO2_367;
+__declspec(section ".data") f32 fd_hei_02_one_364;
+static BeroEntry bero_entry_data[3];
 s32 evt_ki_6[20];
-static s32 ki_data[48];
+static TreeAccess ki_data[8];
 static s32 evt_kusa_1[20];
-static s32 kusa_data[64];
+static KusaAccess kusa_data[16];
 s32 hei_02_init_evt[129];
 
-__declspec(section ".data") u64 fd_hei_02_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hei_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hei_02_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_hei_02_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_hei_02___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_hei_02___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_hei_02___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_hei_02___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_hei_02_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_hei_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_hei_02___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_hei_02___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_hei_02_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_hei_02_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_hei_02_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hei_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hei_02_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_hei_02_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_hei_02___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_hei_02___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_hei_02___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_hei_02___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_hei_02_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_hei_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_hei_02___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_hei_02___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_hei_02_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_hei_02_one_364 = 1.0f;
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"nok_01", (s32)"e_bero", 65537, 0, 0, (s32)"e_bero",
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"hei_03", (s32)"w_bero", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"nok_01", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"hei_03", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_ki_6)
@@ -102,13 +110,15 @@ EVT_BEGIN(evt_ki_6)
     RETURN
 EVT_END()
 
-static s32 ki_data[] = {
-    0, (s32)"a_ki_1", (s32)"miki_1", (s32)"ha_temae_1", (s32)"ha_usiro_1", 0, 0, (s32)"a_ki_2",
-    (s32)"miki_2", (s32)"ha_temae_2", (s32)"ha_usiro_2", 0, 0, (s32)"a_ki_3", (s32)"miki_3", (s32)"ha_temae_3",
-    (s32)"ha_usiro_3", 0, 0, (s32)"a_ki_4", (s32)"miki_4", (s32)"ha_temae_4", (s32)"ha_usiro_4", 0,
-    0, (s32)"a_ki_5", (s32)"miki_5", (s32)"ha_temae_5", (s32)"ha_usiro_5", (s32)evt_ki_6, 0, (s32)"a_ki_6",
-    (s32)"miki_6", (s32)"ha_temae_6", (s32)"ha_usiro_6", 0, 0, (s32)"a_ki_7", (s32)"miki_7", (s32)"ha_temae_7",
-    (s32)"ha_usiro_7", 0, 7, 0, 0, 0, 0, 0,
+static TreeAccess ki_data[] = {
+    {0, "a_ki_1", "miki_1", "ha_temae_1", (s32)"ha_usiro_1", NULL},
+    {0, "a_ki_2", "miki_2", "ha_temae_2", (s32)"ha_usiro_2", NULL},
+    {0, "a_ki_3", "miki_3", "ha_temae_3", (s32)"ha_usiro_3", NULL},
+    {0, "a_ki_4", "miki_4", "ha_temae_4", (s32)"ha_usiro_4", NULL},
+    {0, "a_ki_5", "miki_5", "ha_temae_5", (s32)"ha_usiro_5", evt_ki_6},
+    {0, "a_ki_6", "miki_6", "ha_temae_6", (s32)"ha_usiro_6", NULL},
+    {0, "a_ki_7", "miki_7", "ha_temae_7", (s32)"ha_usiro_7", NULL},
+    {7, NULL, NULL, NULL, 0, NULL},
 };
 
 static EVT_BEGIN(evt_kusa_1)
@@ -119,15 +129,23 @@ static EVT_BEGIN(evt_kusa_1)
     RETURN
 EVT_END()
 
-static s32 kusa_data[] = {
-    0, (s32)"a_kusa_1", (s32)"kusa_1", (s32)evt_kusa_1, 0, (s32)"a_kusa_2", (s32)"kusa_2", 0,
-    0, (s32)"a_kusa_3", (s32)"kusa_3", 0, 0, (s32)"a_kusa_4", (s32)"kusa_4", 0,
-    0, (s32)"a_kusa_5", (s32)"kusa_5", 0, 0, (s32)"a_kusa_6", (s32)"kusa_6", 0,
-    0, (s32)"a_kusa_7", (s32)"kusa_7", 0, 0, (s32)"a_kusa_8", (s32)"kusa_8", 0,
-    0, (s32)"a_kusa_9", (s32)"kusa_9", 0, 0, (s32)"a_kusa_10", (s32)"kusa_10", 0,
-    0, (s32)"a_kusa_11", (s32)"kusa_11", 0, 0, (s32)"a_kusa_12", (s32)"kusa_12", 0,
-    0, (s32)"a_kusa_13", (s32)"kusa_13", 0, 0, (s32)"a_kusa_14", (s32)"kusa_14", 0,
-    0, (s32)"a_ku_15", (s32)"kusa_15", 0, 4, 0, 0, 0,
+static KusaAccess kusa_data[] = {
+    {0, "a_kusa_1", "kusa_1", evt_kusa_1},
+    {0, "a_kusa_2", "kusa_2", NULL},
+    {0, "a_kusa_3", "kusa_3", NULL},
+    {0, "a_kusa_4", "kusa_4", NULL},
+    {0, "a_kusa_5", "kusa_5", NULL},
+    {0, "a_kusa_6", "kusa_6", NULL},
+    {0, "a_kusa_7", "kusa_7", NULL},
+    {0, "a_kusa_8", "kusa_8", NULL},
+    {0, "a_kusa_9", "kusa_9", NULL},
+    {0, "a_kusa_10", "kusa_10", NULL},
+    {0, "a_kusa_11", "kusa_11", NULL},
+    {0, "a_kusa_12", "kusa_12", NULL},
+    {0, "a_kusa_13", "kusa_13", NULL},
+    {0, "a_kusa_14", "kusa_14", NULL},
+    {0, "a_ku_15", "kusa_15", NULL},
+    {4, NULL, NULL, NULL},
 };
 
 EVT_BEGIN(hei_02_init_evt)

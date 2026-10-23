@@ -41,7 +41,7 @@ typedef struct BattleGroupSetup {
     s32 noItemWeight;            // 0x10
     PointDropData* hpDropTable;  // 0x14
     PointDropData* fpDropTable;  // 0x18
-    u8 field_1C[0x20 - 0x1C];    // 0x1C
+    s32 field_1C;                // 0x1C, never read
 } BattleGroupSetup;
 
 typedef struct NpcBattleSelect {
@@ -52,20 +52,20 @@ typedef struct NpcBattleSelect {
 
 typedef struct NpcSetupBattleInfo {
     const char* name;            // 0x0
-    s32 field_4;                 // 0x4
+    const char* mapName;         // 0x4, never read; map the battle is set on
     ItemType fixedItem;          // 0x8
     s32 swFlag;                  // 0xC
     NpcBattleSelect* altSelect;  // 0x10, used when swFlag is set
     NpcBattleSelect* select;     // 0x14
-    s32 field_18;                // 0x18
+    s32 battleFlags;             // 0x18, -> NpcBattleInfo.battleFlags
     s32 field_1C;                // 0x1C
     s8 field_20[16][2];          // 0x20, {min, max}
-    s32 field_40;                // 0x40
+    const char* bgmName;         // 0x40, -> NpcBattleInfo.field_C0, played by seq_battle
 } NpcSetupBattleInfo;
 
 typedef struct NpcBattleInfo {
     struct BattleStageData* stageData; // 0x0
-    s32 field_4;                    // 0x4
+    s32 battleFlags;                // 0x4, 0x10/0x40/0x20000000 checked by the battle end sequence
     ItemType fixedItem;             // 0x8
     ItemType itemDropped;           // 0xC
     s32 heartsDropped;              // 0x10
@@ -250,9 +250,16 @@ typedef struct FieldBattleData {
     s16 mode;                    // 0x0
     u8 field_2[0x8 - 0x2];       // 0x2
     NpcEntry* target;            // 0x8
-    u8 field_C[0x20 - 0xC];      // 0xC
+    u8 field_C[0x10 - 0xC];      // 0xC
+    s32 unk10;                   // 0x10
+    s32 unk14;                   // 0x14
+    u8 field_18[0x1C - 0x18];    // 0x18
+    u32 unk1C;                   // 0x1C
     FieldBattleInfo info;        // 0x20
-    u8 field_3C[0x4C - 0x3C];    // 0x3C
+    void* postBattleEvent;       // 0x3C, evt run after a won battle (battle_seq_end)
+    s32 postBattleEventId;       // 0x40
+    s32 unk44;                   // 0x44
+    u8 field_48[0x4C - 0x48];    // 0x48
     NpcDeadInfo deadInfo[64];    // 0x4C
     u8 field_54C;                // 0x54C
     u8 sandersBombTrigger;       // 0x54D

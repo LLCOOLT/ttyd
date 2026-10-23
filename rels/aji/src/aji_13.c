@@ -13,6 +13,7 @@
 #include "driver/camdrv.h"
 #include "evt/evt_bero.h"
 #include "aji.h"
+#include "mario/mario_pouch.h"
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 BOOL hitIsGroup(HitEntry* target, HitEntry* group);
@@ -84,35 +85,40 @@ USER_FUNC(hit_group_chk);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 
-__declspec(section ".data") u64 fd_aji_13_negone_one_374;
-__declspec(section ".data") s32 fd_aji_13_neg_one_382[1];
-__declspec(section ".data") s32 fd_aji_13___local_PI_383[1];
-__declspec(section ".data") s32 fd_aji_13___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_aji_13_one_negone_373;
-__declspec(section ".data") s32 fd_aji_13___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_aji_13_one_381[1];
-__declspec(section ".data") u64 fd_aji_13_negone_one_360;
-__declspec(section ".data") s32 fd_aji_13_neg_one_365[1];
-__declspec(section ".data") s32 fd_aji_13___local_PI_366[1];
-__declspec(section ".data") s32 fd_aji_13___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_aji_13_one_negone_359;
-__declspec(section ".data") s32 fd_aji_13___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_aji_13_one_364[1];
+__declspec(section ".data") f32 fd_aji_13_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_13_neg_one_382;
+__declspec(section ".data") f32 fd_aji_13___local_PI_383;
+__declspec(section ".data") f32 fd_aji_13___local_3PIO2_385;
+__declspec(section ".data") f32 fd_aji_13_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_13___local_PIO2_384;
+__declspec(section ".data") f32 fd_aji_13_one_381;
+__declspec(section ".data") f32 fd_aji_13_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_13_neg_one_365;
+__declspec(section ".data") f32 fd_aji_13___local_PI_366;
+__declspec(section ".data") f32 fd_aji_13___local_3PIO2_368;
+__declspec(section ".data") f32 fd_aji_13_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_13___local_PIO2_367;
+__declspec(section ".data") f32 fd_aji_13_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static s32 e_door_close[22];
 static s32 e_door_open[22];
 __declspec(section ".data") s32 evt_snd_stop[12];
 static s32 evt_haikei_in[16];
-static s32 bero_entry_data[225];
-static s32 name_tbl[13];
-__declspec(section ".data") s32 name_tbl2[6];
+static BeroEntry bero_entry_data[15];
+static const char* name_tbl[13];
+__declspec(section ".data") const char* name_tbl2[6];
 s32 move_left_right[128];
 s32 move_up_down[226];
 s32 move_r[84];
-s32 left_right_tbl[37];
-s32 up_down_tbl[32];
-s32 r_tbl[77];
+/* moving-floor gimmick read by shikake_init: hit, mapobj, two motion params, time; a NULL mapobj ends the table */
+typedef struct ShikakeMove { const char* hit; const char* mapobj; s32 param0; s32 param1; s32 time; } ShikakeMove;
+typedef struct ShikakeMoveTbl7 { ShikakeMove rows[7]; const char* end[2]; } ShikakeMoveTbl7;
+ShikakeMoveTbl7 left_right_tbl;
+typedef struct ShikakeMoveTbl6 { ShikakeMove rows[6]; const char* end[2]; } ShikakeMoveTbl6;
+ShikakeMoveTbl6 up_down_tbl;
+typedef struct ShikakeMoveTbl15 { ShikakeMove rows[15]; const char* end[2]; } ShikakeMoveTbl15;
+ShikakeMoveTbl15 r_tbl;
 s32 shikake_init[66];
 static s32 evt_sw[134];
 static s32 evt_hari[70];
@@ -141,53 +147,33 @@ static BOOL hitIsGroup(HitEntry* target, HitEntry* group) {
     return _hitIsGroupSub(target, group, FALSE);
 }
 
-__declspec(section ".data") u64 fd_aji_13_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_13_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_13_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_13_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_13___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_13___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_13___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_13___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_13_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_13_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_13___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_13___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_13_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_13_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_aji_13_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_13_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_13_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_13_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_13___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_13___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_13___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_13___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_13_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_13_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_13___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_13___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_13_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_13_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -240,45 +226,261 @@ static EVT_BEGIN(evt_haikei_in)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)evt_snd_stop, (s32)"aji_18", (s32)"e_bero", 327685, (s32)w_door_close, (s32)w_door_open, (s32)"e_bero",
-    65546, 20000, 100000, 0, 0, -1, 0, -1,
-    (s32)evt_snd_stop, (s32)"aji_14", (s32)"w_bero", 327685, (s32)e_door_close, (s32)e_door_open, (s32)"dokan_1", 131072,
-    9, 100000, 0, 0, -1, 0, 6, 0,
-    0, (s32)"dokan_6", 65537, 0, 0, (s32)"dokan_2", 131072, 9,
-    100000, 0, 0, -1, 0, 6, 0, 0,
-    (s32)"dokan_7", 65537, 0, 0, (s32)"dokan_3", 131072, 9, 100000,
-    0, 0, -1, 0, 6, 0, 0, (s32)"dokan_8",
-    65537, 0, 0, (s32)"dokan_4", 131072, 9, 100000, 0,
-    0, -1, 0, 6, 0, 0, (s32)"dokan_9", 65537,
-    0, 0, (s32)"dokan_5", 131072, 9, 100000, 0, 0,
-    -1, 0, 6, 0, 0, (s32)"dokan_10", 65537, 0,
-    0, (s32)"dokan_6", 268566528, 9, 100000, 0, 0, -1,
-    (s32)evt_haikei_in, 6, 0, 0, (s32)"dokan_1", 65537, 0, 0,
-    (s32)"dokan_7", 268566528, 9, 100000, 0, 0, -1, (s32)evt_haikei_in,
-    6, 0, 0, (s32)"dokan_2", 65537, 0, 0, (s32)"dokan_8",
-    268566528, 9, 100000, 0, 0, -1, (s32)evt_haikei_in, 6,
-    0, 0, (s32)"dokan_3", 65537, 0, 0, (s32)"dokan_9", 268566528,
-    9, 100000, 0, 0, -1, (s32)evt_haikei_in, 6, 0,
-    0, (s32)"dokan_4", 65537, 0, 0, (s32)"dokan_10", 268566528, 9,
-    100000, 0, 0, -1, (s32)evt_haikei_in, 6, 0, 0,
-    (s32)"dokan_5", 65537, 0, 0, (s32)"dokan_c", 131072, 9, 100000,
-    0, 0, -1, 0, 6, 0, 0, (s32)"dokan_d",
-    65537, 0, 0, (s32)"dokan_d", 131072, 9, 100000, 0,
-    0, -1, 0, 6, 0, 0, (s32)"dokan_c", 65537,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)evt_snd_stop, // exitEvent
+        (s32)"aji_18", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)evt_snd_stop, // exitEvent
+        (s32)"aji_14", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_6", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_2", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_7", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_3", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_8", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_4", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_9", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_5", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_10", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_6", // hitName
+        4098, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)evt_haikei_in, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_7", // hitName
+        4098, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)evt_haikei_in, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_8", // hitName
+        4098, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)evt_haikei_in, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_3", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_9", // hitName
+        4098, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)evt_haikei_in, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_4", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_10", // hitName
+        4098, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)evt_haikei_in, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_5", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_c", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_d", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_d", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_c", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-static s32 name_tbl[] = {
-    (s32)"A_ugoku_1", (s32)"A_ugoku_2", (s32)"A_ugoku_3", (s32)"A_ugoku_4", (s32)"A_ugoku_h_1", (s32)"A_ugoku_h_2", (s32)"A_ugoku_h_3", (s32)"A_ugoku_h_4",
-    (s32)"A_ugoku_h_5", (s32)"A_ugoku_h_6", (s32)"A_ugoku_h_7", (s32)"A_ugoku_h_8", (s32)"A_ugoku_h_9",
+static const char* name_tbl[] = {
+    "A_ugoku_1",
+    "A_ugoku_2",
+    "A_ugoku_3",
+    "A_ugoku_4",
+    "A_ugoku_h_1",
+    "A_ugoku_h_2",
+    "A_ugoku_h_3",
+    "A_ugoku_h_4",
+    "A_ugoku_h_5",
+    "A_ugoku_h_6",
+    "A_ugoku_h_7",
+    "A_ugoku_h_8",
+    "A_ugoku_h_9",
 };
 
-__declspec(section ".data") s32 name_tbl2[] = {
-    (s32)"A_zenmai1", (s32)"A_zenmai2", (s32)"A_zenmai3", (s32)"A__zenmai4", (s32)"A_zenmai5", (s32)"A_zenmai6",
+__declspec(section ".data") const char* name_tbl2[] = {
+    "A_zenmai1",
+    "A_zenmai2",
+    "A_zenmai3",
+    "A__zenmai4",
+    "A_zenmai5",
+    "A_zenmai6",
 };
 
 static USER_FUNC(mario_chk) {
@@ -660,37 +862,55 @@ EVT_BEGIN(move_r)
     RETURN
 EVT_END()
 
-s32 left_right_tbl[] = {
-    (s32)"A_ugoku_1", (s32)"S_ugoku_1", 0, -150, 3000, (s32)"A_ugoku_3", (s32)"S_ugoku_3", 0,
-    100, 1500, (s32)"A_ugoku_4", (s32)"S_ugoku_4", 0, -100, 1500, (s32)"A_ugoku_h_1",
-    (s32)"S_ugoku_h_1", -30, 200, 3000, (s32)"A_ugoku_h_2", (s32)"S_ugoku_h_2", -50, 50,
-    3000, (s32)"A_ugoku_h_3", (s32)"S_ugoku_h_3", 50, -50, 3000, (s32)"A_ugoku_h_7", (s32)"S_ugoku_h_7",
-    -50, 80, 4500, 0, 0,
+ShikakeMoveTbl7 left_right_tbl = {
+    {
+        {"A_ugoku_1", "S_ugoku_1", 0, -150, 3000},
+        {"A_ugoku_3", "S_ugoku_3", 0, 100, 1500},
+        {"A_ugoku_4", "S_ugoku_4", 0, -100, 1500},
+        {"A_ugoku_h_1", "S_ugoku_h_1", -30, 200, 3000},
+        {"A_ugoku_h_2", "S_ugoku_h_2", -50, 50, 3000},
+        {"A_ugoku_h_3", "S_ugoku_h_3", 50, -50, 3000},
+        {"A_ugoku_h_7", "S_ugoku_h_7", -50, 80, 4500},
+    },
+    {NULL, NULL},
 };
 
-s32 up_down_tbl[] = {
-    (s32)"A_ugoku_2", (s32)"S_ugoku_2", 0, -150, 2800, (s32)"A_ugoku_h_4", (s32)"S_ugoku_h_4", 0,
-    100, 3000, (s32)"A_ugoku_h_5", (s32)"S_ugoku_h_5", 0, -200, 4000, (s32)"A_ugoku_h_6",
-    (s32)"S_ugoku_h_6", 40, -150, 3000, (s32)"A_ugoku_h_8", (s32)"S_ugoku_h_8", 20, -100,
-    2000, (s32)"A_ugoku_h_9", (s32)"S_ugoku_h_9", -100, 20, 2000, 0, 0,
+ShikakeMoveTbl6 up_down_tbl = {
+    {
+        {"A_ugoku_2", "S_ugoku_2", 0, -150, 2800},
+        {"A_ugoku_h_4", "S_ugoku_h_4", 0, 100, 3000},
+        {"A_ugoku_h_5", "S_ugoku_h_5", 0, -200, 4000},
+        {"A_ugoku_h_6", "S_ugoku_h_6", 40, -150, 3000},
+        {"A_ugoku_h_8", "S_ugoku_h_8", 20, -100, 2000},
+        {"A_ugoku_h_9", "S_ugoku_h_9", -100, 20, 2000},
+    },
+    {NULL, NULL},
 };
 
-s32 r_tbl[] = {
-    (s32)"A_zenmai1", (s32)"S_zenmai1", 0, 360, 6000, (s32)"A_zenmai2", (s32)"S_zenmai2", 0,
-    -360, 6000, (s32)"A_zenmai3", (s32)"S_zenmai3", 0, 360, 3000, (s32)"A__zenmai4",
-    (s32)"S_zenmai4", 0, 360, 9000, (s32)"A_zenmai5", (s32)"S_zenmai5", 0, -360,
-    6000, (s32)"A_zenmai6", (s32)"S_zenmai6", 0, -360, 3000, 0, (s32)"S_zen1",
-    0, 360, 6000, 0, (s32)"S_zen2", 0, -360, 3000,
-    0, (s32)"S_zen3", 0, -360, 6000, 0, (s32)"S_zen4", 0,
-    360, 6000, 0, (s32)"S_zen5", 0, 360, 6000, 0,
-    (s32)"S_zen6", 0, -360, 3000, 0, (s32)"S_zen7", 0, 360,
-    6000, 0, (s32)"S_zen8", 0, -360, 6000, 0, (s32)"S_zen9",
-    0, 360, 3000, 0, 0,
+ShikakeMoveTbl15 r_tbl = {
+    {
+        {"A_zenmai1", "S_zenmai1", 0, 360, 6000},
+        {"A_zenmai2", "S_zenmai2", 0, -360, 6000},
+        {"A_zenmai3", "S_zenmai3", 0, 360, 3000},
+        {"A__zenmai4", "S_zenmai4", 0, 360, 9000},
+        {"A_zenmai5", "S_zenmai5", 0, -360, 6000},
+        {"A_zenmai6", "S_zenmai6", 0, -360, 3000},
+        {NULL, "S_zen1", 0, 360, 6000},
+        {NULL, "S_zen2", 0, -360, 3000},
+        {NULL, "S_zen3", 0, -360, 6000},
+        {NULL, "S_zen4", 0, 360, 6000},
+        {NULL, "S_zen5", 0, 360, 6000},
+        {NULL, "S_zen6", 0, -360, 3000},
+        {NULL, "S_zen7", 0, 360, 6000},
+        {NULL, "S_zen8", 0, -360, 6000},
+        {NULL, "S_zen9", 0, 360, 3000},
+    },
+    {NULL, NULL},
 };
 
 EVT_BEGIN(shikake_init)
     SET_VALUE(GF(0), 0)
-    SET_INT_READ_ADDR(PTR(left_right_tbl))
+    SET_INT_READ_ADDR(PTR(&left_right_tbl))
     LOOP(0)
         READ_INT2(LW(0), LW(1))
         READ_INT3(LW(2), LW(3), LW(4))
@@ -699,7 +919,7 @@ EVT_BEGIN(shikake_init)
         END_IF
         SPAWN_EVENT(PTR(move_left_right))
     END_LOOP
-    SET_INT_READ_ADDR(PTR(up_down_tbl))
+    SET_INT_READ_ADDR(PTR(&up_down_tbl))
     LOOP(0)
         READ_INT2(LW(0), LW(1))
         READ_INT3(LW(2), LW(3), LW(4))
@@ -708,7 +928,7 @@ EVT_BEGIN(shikake_init)
         END_IF
         SPAWN_EVENT(PTR(move_up_down))
     END_LOOP
-    SET_INT_READ_ADDR(PTR(r_tbl))
+    SET_INT_READ_ADDR(PTR(&r_tbl))
     LOOP(0)
         READ_INT2(LW(0), LW(1))
         READ_INT3(LW(2), LW(3), LW(4))
@@ -844,7 +1064,7 @@ __declspec(section ".data") EVT_BEGIN(evt_key_get)
 EVT_END()
 
 static __declspec(section ".data") s32 key_tbl[] = {
-    32, -1,
+    ITEM_CARD_KEY_0x20, -1,
 };
 
 static EVT_BEGIN(evt_door_msg)

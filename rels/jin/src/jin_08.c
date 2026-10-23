@@ -2,6 +2,8 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "jin.h"
+#include "evt/evt_npc.h"
+#include "mario/mario_pouch.h"
 
 #pragma force_active on
 
@@ -46,24 +48,24 @@ USER_FUNC(evt_win_item_select);
 USER_FUNC(mainwindow_opendisable);
 USER_FUNC(mainwindow_openenable);
 
-__declspec(section ".data") u64 fd_jin_08_negone_one_374;
-__declspec(section ".data") s32 fd_jin_08_neg_one_382[1];
-__declspec(section ".data") s32 fd_jin_08___local_PI_383[1];
-__declspec(section ".data") s32 fd_jin_08___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_jin_08_one_negone_373;
-__declspec(section ".data") s32 fd_jin_08___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_jin_08_one_381[1];
-__declspec(section ".data") u64 fd_jin_08_negone_one_360;
-__declspec(section ".data") s32 fd_jin_08_neg_one_365[1];
-__declspec(section ".data") s32 fd_jin_08___local_PI_366[1];
-__declspec(section ".data") s32 fd_jin_08___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_jin_08_one_negone_359;
-__declspec(section ".data") s32 fd_jin_08___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_jin_08_one_364[1];
+__declspec(section ".data") f32 fd_jin_08_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_08_neg_one_382;
+__declspec(section ".data") f32 fd_jin_08___local_PI_383;
+__declspec(section ".data") f32 fd_jin_08___local_3PIO2_385;
+__declspec(section ".data") f32 fd_jin_08_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_08___local_PIO2_384;
+__declspec(section ".data") f32 fd_jin_08_one_381;
+__declspec(section ".data") f32 fd_jin_08_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_08_neg_one_365;
+__declspec(section ".data") f32 fd_jin_08___local_PI_366;
+__declspec(section ".data") f32 fd_jin_08___local_3PIO2_368;
+__declspec(section ".data") f32 fd_jin_08_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_08___local_PIO2_367;
+__declspec(section ".data") f32 fd_jin_08_one_364;
 static __declspec(section ".data") s32 e_close[12];
 static __declspec(section ".data") s32 e_open[12];
 s32 evt_roll_in[41];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 static s32 evt_open[73];
 s32 evt_open_kagi[73];
 static __declspec(section ".data") s32 evt_unlock[11];
@@ -71,60 +73,40 @@ __declspec(section ".data") s32 oumu_init[2];
 s32 oumu_talk[61];
 s32 oumu_juyo_talk[37];
 s32 oumu_check[176];
-static s32 npcEnt[46];
+static NpcSetupInfo npcEnt[2];
 static __declspec(section ".data") s32 lock_tbl[2];
 static s32 lock_item_check[23];
 static s32 mobj_box01[34];
 static s32 mobj_box02[34];
 s32 jin_08_init_evt[138];
 
-__declspec(section ".data") u64 fd_jin_08_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_jin_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_jin_08_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_jin_08_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_jin_08___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_jin_08___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_jin_08___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_jin_08___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_jin_08_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_jin_08_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_jin_08___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_jin_08___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_jin_08_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_jin_08_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_jin_08_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_jin_08_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_jin_08_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_jin_08_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_jin_08___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_jin_08___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_jin_08___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_jin_08___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_jin_08_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_jin_08_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_jin_08___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_jin_08___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_jin_08_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_jin_08_one_364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -152,13 +134,43 @@ EVT_BEGIN(evt_roll_in)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"e_bero_1", 65538, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"jin_07", (s32)"w_bero_1", 327685, (s32)e_close, (s32)e_open, (s32)"e_bero_2",
-    0, 2, 200, 75, -50, 120, 0, -1,
-    0, (s32)"jin_07", (s32)"w_bero_2", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "e_bero_1", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"jin_07", // nextMapName
+        "w_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_close, // enterAnimeArg
+        (s32)e_open, // exitAnimeArg
+    },
+    {
+        "e_bero_2", // hitName
+        0, 0, // type..sfxId
+        2, // directionId
+        200, // centerPosition
+        75, // centerPositionY
+        -50, // centerPositionZ
+        120, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"jin_07", // nextMapName
+        "w_bero_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(evt_open)
@@ -326,17 +338,24 @@ EVT_BEGIN(oumu_check)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"オウム"*/"\x83\x49\x83\x45\x83\x80", 1073743360, 0, (s32)oumu_init, 0, (s32)oumu_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"オウム"*/"\x83\x49\x83\x45\x83\x80", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        oumu_init, // initEvent
+        NULL, // regularEvent
+        oumu_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static __declspec(section ".data") s32 lock_tbl[] = {
-    23, -1,
+    ITEM_STEEPLE_KEY_0x17, -1,
 };
 
 static EVT_BEGIN(lock_item_check)

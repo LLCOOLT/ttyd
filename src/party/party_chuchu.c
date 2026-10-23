@@ -90,16 +90,15 @@ USER_FUNC(set_msg);
 USER_FUNC(search_result);
 USER_FUNC(post_msg);
 
-s32 msg_evt[] = {
-    0x0001005B, (s32)set_msg,
-    0x0001005B, (s32)search_result,
-    0x00020019, 0xFE363C80, 0x00000000,
-    0x0005005B, (s32)evt_msg_print, 0x00000000, 0xFE363C80, 0x00000000, (s32)"party",
-    0x00000021,
-    0x0001005B, (s32)post_msg,
-    0x00000002,
-    0x00000001,
-};
+EVT_BEGIN(msg_evt)
+    CALL(set_msg)
+    CALL(search_result)
+    IF_INT_NOT_EQUAL(4264967296, 0)
+        CALL(evt_msg_print, 0, 4264967296, 0, STRING("party"))
+    END_IF
+    CALL(post_msg)
+    RETURN
+EVT_END()
 
 ChuchuTreasure chuchu_treasure_tbl[] = {
     {"hei_00", 0xF840715E, -468, 139, -127},

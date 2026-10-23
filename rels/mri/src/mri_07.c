@@ -2,6 +2,10 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "mri.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_shop.h"
+#include "data_tables.h"
+#include "mario/mario_pouch.h"
 
 #pragma force_active on
 
@@ -37,24 +41,24 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxoff);
 USER_FUNC(evt_snd_sfxon_3d);
 
-__declspec(section ".data") u64 fd_mri_07_negone_one_374;
-__declspec(section ".data") s32 fd_mri_07_neg_one_382[1];
-__declspec(section ".data") s32 fd_mri_07___local_PI_383[1];
-__declspec(section ".data") s32 fd_mri_07___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_mri_07_one_negone_373;
-__declspec(section ".data") s32 fd_mri_07___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_mri_07_one_381[1];
-__declspec(section ".data") u64 fd_mri_07_negone_one_360;
-__declspec(section ".data") s32 fd_mri_07_neg_one_365[1];
-__declspec(section ".data") s32 fd_mri_07___local_PI_366[1];
-__declspec(section ".data") s32 fd_mri_07___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_mri_07_one_negone_359;
-__declspec(section ".data") s32 fd_mri_07___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_mri_07_one_364[1];
-static __declspec(section ".data") s32 obj_list[12];
-static __declspec(section ".data") s32 goods_list[12];
-static s32 trade_list[24];
-static s32 shopper_data[38];
+__declspec(section ".data") f32 fd_mri_07_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_07_neg_one_382;
+__declspec(section ".data") f32 fd_mri_07___local_PI_383;
+__declspec(section ".data") f32 fd_mri_07___local_3PIO2_385;
+__declspec(section ".data") f32 fd_mri_07_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_07___local_PIO2_384;
+__declspec(section ".data") f32 fd_mri_07_one_381;
+__declspec(section ".data") f32 fd_mri_07_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_07_neg_one_365;
+__declspec(section ".data") f32 fd_mri_07___local_PI_366;
+__declspec(section ".data") f32 fd_mri_07___local_3PIO2_368;
+__declspec(section ".data") f32 fd_mri_07_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_07___local_PIO2_367;
+__declspec(section ".data") f32 fd_mri_07_one_364;
+static __declspec(section ".data") ShopObj obj_list[6];
+static __declspec(section ".data") ShopItem goods_list[6];
+static ShopDb trade_list[12];
+static ShopperData35 shopper_data;
 s32 chibitoge_nakama[287];
 static s32 chibitoge_init[29];
 static __declspec(section ".data") s32 chibitoge_talk[4];
@@ -62,80 +66,75 @@ __declspec(section ".data") s32 punishop_init[12];
 __declspec(section ".data") s32 punishop_talk[2];
 __declspec(section ".data") s32 puniinfo_init[12];
 s32 puniinfo_talk[118];
-static s32 npcEnt[92];
-static s32 bero_entry_data[30];
+static NpcSetupInfo npcEnt[4];
+static BeroEntry bero_entry_data[2];
 s32 mri_07_init_evt[108];
 
-__declspec(section ".data") u64 fd_mri_07_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mri_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mri_07_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_mri_07_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_mri_07___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_mri_07___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_mri_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_mri_07___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_mri_07_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_mri_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_mri_07_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_mri_07___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_mri_07___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_mri_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_mri_07___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_mri_07_one_364 = 1.0f;
+
+static __declspec(section ".data") ShopObj obj_list[] = {
+    {"S_item_01", "A_item_01"},
+    {"S_item_02", "A_item_02"},
+    {"S_item_03", "A_item_03"},
+    {"S_item_04", "A_item_04"},
+    {"S_item_05", "A_item_05"},
+    {"S_item_06", "A_item_06"},
 };
 
-__declspec(section ".data") s32 fd_mri_07___local_PI_383[] = {
-    1078530011,
+static __declspec(section ".data") ShopItem goods_list[] = {
+    {ITEM_HP_DRAIN_ITEM, 10},
+    {ITEM_ICE_STORM, 15},
+    {ITEM_MYSTERY, 3},
+    {ITEM_MINI_MR_MINI, 8},
+    {ITEM_HONEY_SYRUP, 5},
+    {ITEM_MUSHROOM, 3},
 };
 
-__declspec(section ".data") s32 fd_mri_07___local_3PIO2_385[] = {
-    1083624420,
+static ShopDb trade_list[] = {
+    {ITEM_HP_DRAIN_ITEM, 5, 0},
+    {ITEM_ICE_STORM, 7, 0},
+    {ITEM_MYSTERY, 1, 0},
+    {ITEM_MINI_MR_MINI, 4, 0},
+    {ITEM_HONEY_SYRUP, 2, 0},
+    {ITEM_MUSHROOM, 1, 0},
+    {ITEM_SUPER_SHROOM, 14, 0},
+    {ITEM_ULTRA_SHROOM, 75, 0},
+    {ITEM_LIFE_SHROOM, 43, 0},
+    {ITEM_FRIGHT_MASK, 4, 0},
+    {ITEM_POWER_PUNCH, 17, 0},
+    {0},
 };
 
-__declspec(section ".data") u64 fd_mri_07_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_mri_07___local_PIO2_384[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_mri_07_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_mri_07_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_mri_07_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_mri_07___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_mri_07___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_mri_07_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_mri_07___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_mri_07_one_364[] = {
-    1065353216,
-};
-
-static __declspec(section ".data") s32 obj_list[] = {
-    (s32)"S_item_01", (s32)"A_item_01", (s32)"S_item_02", (s32)"A_item_02", (s32)"S_item_03", (s32)"A_item_03", (s32)"S_item_04", (s32)"A_item_04",
-    (s32)"S_item_05", (s32)"A_item_05", (s32)"S_item_06", (s32)"A_item_06",
-};
-
-static __declspec(section ".data") s32 goods_list[] = {
-    144, 10, 131, 15, 163, 3, 146, 8,
-    154, 5, 148, 3,
-};
-
-static s32 trade_list[] = {
-    144, 327680, 131, 458752, 163, 65536, 146, 262144,
-    154, 131072, 148, 65536, 149, 917504, 150, 4915200,
-    151, 2818048, 162, 262144, 142, 1114112, 0, 0,
-};
-
-static s32 shopper_data[] = {
-    (s32)/*"プニ店員"*/"\x83\x76\x83\x6A\x93\x58\x88\xF5", 0, 0, (s32)"stg2_shop_00", (s32)"stg2_shop_01", (s32)"stg2_shop_02", (s32)"stg2_shop_03", (s32)"stg2_shop_04",
-    (s32)"stg2_shop_05", (s32)"stg2_shop_06", (s32)"stg2_shop_07", (s32)"stg2_shop_08", (s32)"stg2_shop_09", (s32)"stg2_shop_10", (s32)"stg2_shop_11", (s32)"stg2_shop_12",
-    (s32)"stg2_shop_13", (s32)"stg2_shop_14", (s32)"stg2_shop_15", (s32)"stg2_shop_16", (s32)"stg2_shop_17", (s32)"stg2_shop_18", (s32)"stg2_shop_19", (s32)"stg2_shop_20",
-    (s32)"stg2_shop_21", (s32)"stg2_shop_22", (s32)"stg2_shop_23", (s32)"stg2_shop_24", (s32)"stg2_shop_25", (s32)"stg2_shop_26", (s32)"stg2_shop_27", (s32)"stg2_shop_28",
-    (s32)"stg2_shop_29", (s32)"stg2_shop_30", (s32)"stg2_shop_31", (s32)"stg2_shop_32", (s32)"stg2_shop_33", (s32)"stg2_shop_34",
+static ShopperData35 shopper_data = {
+    /*"プニ店員"*/"\x83\x76\x83\x6A\x93\x58\x88\xF5", // name
+    NULL, NULL, // fook_evt..buy_evt
+    {"stg2_shop_00", "stg2_shop_01", "stg2_shop_02", "stg2_shop_03", "stg2_shop_04", "stg2_shop_05", "stg2_shop_06", "stg2_shop_07", "stg2_shop_08", "stg2_shop_09", "stg2_shop_10", "stg2_shop_11", "stg2_shop_12", "stg2_shop_13", "stg2_shop_14", "stg2_shop_15", "stg2_shop_16", "stg2_shop_17", "stg2_shop_18", "stg2_shop_19", "stg2_shop_20", "stg2_shop_21", "stg2_shop_22", "stg2_shop_23", "stg2_shop_24", "stg2_shop_25", "stg2_shop_26", "stg2_shop_27", "stg2_shop_28", "stg2_shop_29", "stg2_shop_30", "stg2_shop_31", "stg2_shop_32", "stg2_shop_33", "stg2_shop_34"}, // msgs
 };
 
 EVT_BEGIN(chibitoge_nakama)
@@ -278,26 +277,64 @@ EVT_BEGIN(puniinfo_talk)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"ちびトゲ"*/"\x82\xBF\x82\xD1\x83\x67\x83\x51", 1536, 0, (s32)chibitoge_init, 0, (s32)chibitoge_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"プニ店員"*/"\x83\x76\x83\x6A\x93\x58\x88\xF5",
-    1536, 0, (s32)punishop_init, 0, (s32)punishop_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"プニ情報屋"*/"\x83\x76\x83\x6A\x8F\xEE\x95\xF1\x89\xAE", 1536,
-    0, (s32)puniinfo_init, 0, (s32)puniinfo_talk, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"ちびトゲ"*/"\x82\xBF\x82\xD1\x83\x67\x83\x51", // name
+        0x600, // flags
+        0, // reactionFlags
+        chibitoge_init, // initEvent
+        NULL, // regularEvent
+        chibitoge_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"プニ店員"*/"\x83\x76\x83\x6A\x93\x58\x88\xF5", // name
+        0x600, // flags
+        0, // reactionFlags
+        punishop_init, // initEvent
+        NULL, // regularEvent
+        punishop_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"プニ情報屋"*/"\x83\x76\x83\x6A\x8F\xEE\x95\xF1\x89\xAE", // name
+        0x600, // flags
+        0, // reactionFlags
+        puniinfo_init, // initEvent
+        NULL, // regularEvent
+        puniinfo_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
-static s32 bero_entry_data[] = {
-    (s32)"e_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"mri_06", (s32)"w_bero", 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "e_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"mri_06", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(mri_07_init_evt)
@@ -328,7 +365,7 @@ EVT_BEGIN(mri_07_init_evt)
     END_SWITCH
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover\0\0\0"), 8, 290, 82, 120, 0, 0)
     CALL(evt_npc_setup, PTR(npcEnt))
-    CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(shopper_data), PTR(trade_list))
+    CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(&shopper_data), PTR(trade_list))
     RETURN
 EVT_END()
 

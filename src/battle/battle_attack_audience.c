@@ -237,10 +237,12 @@ s32* btlataudGetMoveEventPtr(void) {
 #ifndef VERSION_G8ME01
 __declspec(section ".data") static s32 btlataudevtDummyPad[1] = {0};
 #endif
-s32 btlataudevtDummy[] = {
-    327771, (s32)_get_attack_aud_no, -29999997, -30000000, -29999999, -29999998, 196699,
-    (s32)_attack_aud, -29999997, 0, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+EVT_BEGIN(btlataudevtDummy)
+    CALL(_get_attack_aud_no, LW(3), LW(0), LW(1), LW(2))
+    CALL(_attack_aud, LW(3), 0)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 s32* btlataudGetAttackEventPtr(s32 unitId) {
     s32* p = BtlUnit_GetData(BattleGetUnitPtr(_battleWorkPointer, unitId), 6);
     if (p == NULL) {
@@ -258,13 +260,23 @@ EVT_BEGIN(btlataudevtPresentItem_Damage)
     RETURN
 EVT_END()
 
-s32 btlataudevtPresentItem_Get[] = {
-    131163, (s32)_get_present_target_id, -29999997, 131163, (s32)btlevtcmd_StopWaitEvent, -2, 196699, (s32)btlevtcmd_GetUnitId,
-    -2, -30000000, 131097, -30000000, -29999997, 131163, (s32)btlevtcmd_StopWaitEvent, -29999997,
-    33, 65627, (s32)_get_present_item, 196699, (s32)btlevtcmd_GetBodyId, -29999997, -29999996, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -29999997, -29999996, 52, 65627, (s32)_get_item_announce, 131163, (s32)_delete_present_item,
-    -250000000, 196699, (s32)btlevtcmd_GetUnitId, -2, -30000000, 131097, -30000000, -29999997,
-    131163, (s32)btlevtcmd_StartWaitEvent, -29999997, 33, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2,
-    1,
-};
+EVT_BEGIN(btlataudevtPresentItem_Get)
+    CALL(_get_present_target_id, LW(3))
+    CALL(btlevtcmd_StopWaitEvent, -2)
+    CALL(btlevtcmd_GetUnitId, -2, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), LW(3))
+        CALL(btlevtcmd_StopWaitEvent, LW(3))
+    END_IF
+    CALL(_get_present_item)
+    CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+    CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 52)
+    CALL(_get_item_announce)
+    CALL(_delete_present_item, -250000000)
+    CALL(btlevtcmd_GetUnitId, -2, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), LW(3))
+        CALL(btlevtcmd_StartWaitEvent, LW(3))
+    END_IF
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 

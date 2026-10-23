@@ -2,6 +2,7 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
+#include "driver/hitdrv.h"
 
 #pragma force_active on
 
@@ -45,75 +46,55 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_telop_entry);
 
-__declspec(section ".data") u64 fd_gon_01_negone_one_374;
-__declspec(section ".data") s32 fd_gon_01_neg_one_382[1];
-__declspec(section ".data") s32 fd_gon_01___local_PI_383[1];
-__declspec(section ".data") s32 fd_gon_01___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gon_01_one_negone_373;
-__declspec(section ".data") s32 fd_gon_01___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gon_01_one_381[1];
-__declspec(section ".data") u64 fd_gon_01_negone_one_360;
-__declspec(section ".data") s32 fd_gon_01_neg_one_365[1];
-__declspec(section ".data") s32 fd_gon_01___local_PI_366[1];
-__declspec(section ".data") s32 fd_gon_01___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gon_01_one_negone_359;
-__declspec(section ".data") s32 fd_gon_01___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gon_01_one_364[1];
+__declspec(section ".data") f32 fd_gon_01_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_01_neg_one_382;
+__declspec(section ".data") f32 fd_gon_01___local_PI_383;
+__declspec(section ".data") f32 fd_gon_01___local_3PIO2_385;
+__declspec(section ".data") f32 fd_gon_01_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_01___local_PIO2_384;
+__declspec(section ".data") f32 fd_gon_01_one_381;
+__declspec(section ".data") f32 fd_gon_01_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_01_neg_one_365;
+__declspec(section ".data") f32 fd_gon_01___local_PI_366;
+__declspec(section ".data") f32 fd_gon_01___local_3PIO2_368;
+__declspec(section ".data") f32 fd_gon_01_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_01___local_PIO2_367;
+__declspec(section ".data") f32 fd_gon_01_one_364;
 static s32 door01_close[22];
 static s32 door01_open[22];
-static s32 bero_entry_data[75];
+static BeroEntry bero_entry_data[5];
 s32 honenoko_oidasare_evt[466];
 s32 gon_01_GATEEVENT_evt[151];
-static s32 hitDmgRetPoints[68];
+static HitDamageReturn hitDmgRetPoints[17];
 s32 gon_01_init_evt[102];
 
-__declspec(section ".data") u64 fd_gon_01_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gon_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gon_01_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gon_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_gon_01___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gon_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gon_01___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gon_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gon_01_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gon_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gon_01___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gon_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gon_01_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gon_01_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_gon_01_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gon_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gon_01_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gon_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_gon_01___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gon_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gon_01___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gon_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gon_01_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gon_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gon_01___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gon_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gon_01_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gon_01_one_364 = 1.0f;
 
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -131,17 +112,74 @@ static EVT_BEGIN(door01_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero_1", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"gon_00", (s32)"e_bero_1", 65537, 0, 0, (s32)"w_bero_2",
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"gon_00", (s32)"e_bero_3", 65537, 0, 0, (s32)"e_bero", 65548,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"gon_02", (s32)"w_bero", 327685, (s32)door01_close, (s32)door01_open, (s32)"e_bero_2", 0, 20000,
-    100000, 0, 0, -1, 0, -1, 0, (s32)"gon_02",
-    (s32)"w_bero2", 65537, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero_1", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gon_00", // nextMapName
+        "e_bero_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "w_bero_2", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gon_00", // nextMapName
+        "e_bero_3", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        12, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gon_02", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)door01_close, // enterAnimeArg
+        (s32)door01_open, // exitAnimeArg
+    },
+    {
+        "e_bero_2", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gon_02", // nextMapName
+        "w_bero2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(honenoko_oidasare_evt)
@@ -372,16 +410,24 @@ EVT_BEGIN(gon_01_GATEEVENT_evt)
     RETURN
 EVT_END()
 
-static s32 hitDmgRetPoints[] = {
-    (s32)"mod_00", 0, -998637568, 0, (s32)"mod_01", 0, -998637568, 0,
-    (s32)"mod_02", 0, -998637568, 0, (s32)"mod_03", 0, -998637568, 0,
-    (s32)"mod_04", 0, -998637568, 0, (s32)"mod_05", 0, -998637568, 0,
-    (s32)"mod_06", 0, -998637568, 0, (s32)"mod_07", 0, -998637568, 0,
-    (s32)"mod_08", 0, -998637568, 0, (s32)"a_hi", 0, -998637568, 0,
-    (s32)"a_hi1", 0, -998637568, 0, (s32)"kabe_r_010", 1136689152, 0, 0,
-    (s32)"polySurface810_q00097", 1134821376, 1129775104, 0, (s32)"polySurface810_q00098", -1016135680, 1129775104, 0,
-    (s32)"mod_09", 0, -998637568, 0, (s32)"mod_10", 0, -998637568, 0,
-    0, 0, 0, 0,
+static HitDamageReturn hitDmgRetPoints[] = {
+    {"mod_00", {0.0f, -1000.0f, 0.0f}},
+    {"mod_01", {0.0f, -1000.0f, 0.0f}},
+    {"mod_02", {0.0f, -1000.0f, 0.0f}},
+    {"mod_03", {0.0f, -1000.0f, 0.0f}},
+    {"mod_04", {0.0f, -1000.0f, 0.0f}},
+    {"mod_05", {0.0f, -1000.0f, 0.0f}},
+    {"mod_06", {0.0f, -1000.0f, 0.0f}},
+    {"mod_07", {0.0f, -1000.0f, 0.0f}},
+    {"mod_08", {0.0f, -1000.0f, 0.0f}},
+    {"a_hi", {0.0f, -1000.0f, 0.0f}},
+    {"a_hi1", {0.0f, -1000.0f, 0.0f}},
+    {"kabe_r_010", {385.0f, 0.0f, 0.0f}},
+    {"polySurface810_q00097", {328.0f, 215.0f, 0.0f}},
+    {"polySurface810_q00098", {-239.0f, 215.0f, 0.0f}},
+    {"mod_09", {0.0f, -1000.0f, 0.0f}},
+    {"mod_10", {0.0f, -1000.0f, 0.0f}},
+    {0},
 };
 
 EVT_BEGIN(gon_01_init_evt)

@@ -6,138 +6,151 @@
 #include "battle/battle.h"
 #include "battle/battle_weapon_power.h"
 #include "battle/battle_database_common.h"
+#include "battle/battle_stage.h"
+#include "driver/npcdrv.h"
 
 USER_FUNC(_set_destroy_flag);
 USER_FUNC(_set_offset);
-extern s32 unit_boss_moamoa[];
+extern BattleUnitKind unit_boss_moamoa;
 
-__declspec(section ".data") u64 fd_battle_database_rsh_negone_one_374;
-__declspec(section ".data") s32 fd_battle_database_rsh_neg_one_382[1];
-__declspec(section ".data") s32 fd_battle_database_rsh___local_PI_383[1];
-__declspec(section ".data") s32 fd_battle_database_rsh___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_battle_database_rsh_one_negone_373;
-__declspec(section ".data") s32 fd_battle_database_rsh___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_battle_database_rsh_one_381[1];
-__declspec(section ".data") u64 fd_battle_database_rsh_negone_one_360;
-__declspec(section ".data") s32 fd_battle_database_rsh_neg_one_365[1];
-__declspec(section ".data") s32 fd_battle_database_rsh___local_PI_366[1];
-__declspec(section ".data") s32 fd_battle_database_rsh___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_battle_database_rsh_one_negone_359;
-__declspec(section ".data") s32 fd_battle_database_rsh___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_battle_database_rsh_one_364[1];
-s32 rsh_btlobject_data[42];
-s32 rsh_btlstage_data[109];
-__declspec(section ".data") s32 btlparty_rsh_rsh_06_01_off_1[12];
-__declspec(section ".data") s32 btlgrp_rsh_rsh_06_01_off_1[8];
-__declspec(section ".data") s32 btlgrpsel_rsh_btlno_rsh_test1_off[6];
-__declspec(section ".data") s32 btlgrpsel_rsh_btlno_rsh_06_01_off[6];
-s32 btlsetup_rsh_tbl[51];
-__declspec(section ".data") s32 btl_rsh_setup_no_tbl[6];
+__declspec(section ".data") f32 fd_battle_database_rsh_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_battle_database_rsh_neg_one_382;
+__declspec(section ".data") f32 fd_battle_database_rsh___local_PI_383;
+__declspec(section ".data") f32 fd_battle_database_rsh___local_3PIO2_385;
+__declspec(section ".data") f32 fd_battle_database_rsh_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_battle_database_rsh___local_PIO2_384;
+__declspec(section ".data") f32 fd_battle_database_rsh_one_381;
+__declspec(section ".data") f32 fd_battle_database_rsh_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_battle_database_rsh_neg_one_365;
+__declspec(section ".data") f32 fd_battle_database_rsh___local_PI_366;
+__declspec(section ".data") f32 fd_battle_database_rsh___local_3PIO2_368;
+__declspec(section ".data") f32 fd_battle_database_rsh_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_battle_database_rsh___local_PIO2_367;
+__declspec(section ".data") f32 fd_battle_database_rsh_one_364;
+BattleStageObjectData rsh_btlobject_data[7];
+BattleStageData rsh_btlstage_data[1];
+__declspec(section ".data") BattleUnitSetup btlparty_rsh_rsh_06_01_off_1[1];
+__declspec(section ".data") BattleGroupSetup btlgrp_rsh_rsh_06_01_off_1;
+__declspec(section ".data") NpcBattleSelect btlgrpsel_rsh_btlno_rsh_test1_off[2];
+__declspec(section ".data") NpcBattleSelect btlgrpsel_rsh_btlno_rsh_06_01_off[2];
+NpcSetupBattleInfo btlsetup_rsh_tbl[3];
+__declspec(section ".data") NpcTerritoryInfo btl_rsh_setup_no_tbl[3];
 s32 bgset_rsh_bg_event[30];
 
-__declspec(section ".data") u64 fd_battle_database_rsh_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_battle_database_rsh_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_battle_database_rsh_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_battle_database_rsh_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_battle_database_rsh___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_battle_database_rsh___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_battle_database_rsh_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_battle_database_rsh___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_battle_database_rsh_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_battle_database_rsh_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_battle_database_rsh_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_battle_database_rsh___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_battle_database_rsh___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_battle_database_rsh_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_battle_database_rsh___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_battle_database_rsh_one_364 = 1.0f;
+
+BattleStageObjectData rsh_btlobject_data[] = {
+    {"r_mae", 2, 1, {170.0f, 0.0f, -50.0f}, 0, 60, {0}},
+    {"r_oku", 2, 1, {170.0f, -1000.0f, -50.0f}, 10, 50, {0}},
+    {"l_mae", 2, 1, {-170.0f, 0.0f, -50.0f}, 20, 40, {0}},
+    {"l_oku", 2, 1, {-170.0f, -1000.0f, -50.0f}, 30, 30, {0}},
+    {"iwayama_1", 2, 2, {0}, 0, 60, {0}},
+    {"iwayama_2", 2, 2, {0}, 0, 60, {0}},
+    {"C", 2, 3, {0}, 0, 60, {0}},
 };
 
-__declspec(section ".data") s32 fd_battle_database_rsh___local_PI_383[] = {
-    1078530011,
+BattleStageData rsh_btlstage_data[] = {
+    {
+        "bti_01", // mGlobalStageDataDir
+        "stg_06_0", // mSpecificStageDataDir
+        7, // mNumObjects
+        rsh_btlobject_data, // mObjects
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
+        NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgA2Evt
+        bgset_rsh_bg_event, // bgBEvt
+        NULL, 0, 0, 0, 0, // bgCEvt..disableBgBDestroy
+    },
 };
 
-__declspec(section ".data") s32 fd_battle_database_rsh___local_3PIO2_385[] = {
-    1083624420,
+__declspec(section ".data") BattleUnitSetup btlparty_rsh_rsh_06_01_off_1[] = {
+    {
+        &unit_boss_moamoa, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, -20.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_moamoa, // itemDropTable
+    },
 };
 
-__declspec(section ".data") u64 fd_battle_database_rsh_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_battle_database_rsh___local_PIO2_384[] = {
-    1070141403,
+__declspec(section ".data") BattleGroupSetup btlgrp_rsh_rsh_06_01_off_1 = {
+    1, // numEnemies
+    btlparty_rsh_rsh_06_01_off_1, // enemyData
+    0, 0, // heldItemWeight..randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // field_1C
 };
 
-__declspec(section ".data") s32 fd_battle_database_rsh_one_381[] = {
-    1065353216,
+__declspec(section ".data") NpcBattleSelect btlgrpsel_rsh_btlno_rsh_test1_off[] = {
+    {50, &btlgrp_rsh_rsh_06_01_off_1, rsh_btlstage_data},
+    {0},
 };
 
-__declspec(section ".data") u64 fd_battle_database_rsh_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_battle_database_rsh_neg_one_365[] = {
-    -1082130432,
+__declspec(section ".data") NpcBattleSelect btlgrpsel_rsh_btlno_rsh_06_01_off[] = {
+    {50, &btlgrp_rsh_rsh_06_01_off_1, rsh_btlstage_data},
+    {0},
 };
 
-__declspec(section ".data") s32 fd_battle_database_rsh___local_PI_366[] = {
-    1078530011,
+NpcSetupBattleInfo btlsetup_rsh_tbl[] = {
+    {
+        /*"マップstg_06_0"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x36\x5F\x30", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_rsh_btlno_rsh_test1_off, // select
+        0, 0, // battleFlags..field_1C
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"rsh_06 もあもあ"*/"\x72\x73\x68\x5F\x30\x36\x20\x82\xE0\x82\xA0\x82\xE0\x82\xA0", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_rsh_btlno_rsh_06_01_off, // select
+        0x20000010, // battleFlags
+        6, // field_1C
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        "BGM_BOSS_STG6_GREAT_MOAMOA1", // bgmName
+    },
+    {0},
 };
 
-__declspec(section ".data") s32 fd_battle_database_rsh___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_battle_database_rsh_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_battle_database_rsh___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_battle_database_rsh_one_364[] = {
-    1065353216,
-};
-
-s32 rsh_btlobject_data[] = {
-    (s32)"r_mae", 131073, 1126825984, 0, -1035468800, 3932160, (s32)"r_oku", 131073,
-    1126825984, -998637568, -1035468800, 171048960, (s32)"l_mae", 131073, -1020657664, 0,
-    -1035468800, 338165760, (s32)"l_oku", 131073, -1020657664, -998637568, -1035468800, 505282560,
-    (s32)"iwayama_1", 131074, 0, 0, 0, 3932160, (s32)"iwayama_2", 131074,
-    0, 0, 0, 3932160, (s32)"C", 131075, 0, 0,
-    0, 3932160,
-};
-
-s32 rsh_btlstage_data[] = {
-    (s32)"bti_01", (s32)"stg_06_0", 7, (s32)rsh_btlobject_data, 0, 0, 0, 0,
-    1677721602, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 34603104, 536870912, 1704706,
-    0, 0, 2047, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 100, 0, 0, 0, 0, 0, 0,
-    1677721602, 0, 0, (s32)weaponGetPowerDefault, 1, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 34603104, 536870912, 1704706,
-    0, 0, 2047, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 100, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)bgset_rsh_bg_event, 0, 0,
-};
-
-__declspec(section ".data") s32 btlparty_rsh_rsh_06_01_off_1[] = {
-    (s32)unit_boss_moamoa, 16777216, 67108868, 1116471296, -1046478848, 0, 0, 0,
-    0, 0, 0, (s32)battle_item_moamoa,
-};
-
-__declspec(section ".data") s32 btlgrp_rsh_rsh_06_01_off_1[] = {
-    1, (s32)btlparty_rsh_rsh_06_01_off_1, 0, 0, 100, (s32)battle_heart_drop_param_default, (s32)battle_heart_drop_param_default, 5,
-};
-
-__declspec(section ".data") s32 btlgrpsel_rsh_btlno_rsh_test1_off[] = {
-    50, (s32)btlgrp_rsh_rsh_06_01_off_1, (s32)rsh_btlstage_data, 0, 0, 0,
-};
-
-__declspec(section ".data") s32 btlgrpsel_rsh_btlno_rsh_06_01_off[] = {
-    50, (s32)btlgrp_rsh_rsh_06_01_off_1, (s32)rsh_btlstage_data, 0, 0, 0,
-};
-
-s32 btlsetup_rsh_tbl[] = {
-    (s32)/*"マップstg_06_0"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x36\x5F\x30", 0, 0, -1, 0, (s32)btlgrpsel_rsh_btlno_rsh_test1_off, 0, 0,
-    50529027, 50529027, 50529027, 50529027, 50529027, 50529027, 16843009, 16843009,
-    (s32)"BGM_ZAKO_BATTLE1", (s32)/*"rsh_06 もあもあ"*/"\x72\x73\x68\x5F\x30\x36\x20\x82\xE0\x82\xA0\x82\xE0\x82\xA0", 0, 0, -1, 0, (s32)btlgrpsel_rsh_btlno_rsh_06_01_off, 536870928,
-    6, 50529027, 50529027, 50529027, 50529027, 50529027, 50529027, 16843009,
-    16843009, (s32)"BGM_BOSS_STG6_GREAT_MOAMOA1", 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
-};
-
-__declspec(section ".data") s32 btl_rsh_setup_no_tbl[] = {
-    (s32)"BTLNO_RSH_TEST1", 0, (s32)"BTLNO_RSH_06_01", 1, 0, 0,
+__declspec(section ".data") NpcTerritoryInfo btl_rsh_setup_no_tbl[] = {
+    {"BTLNO_RSH_TEST1", 0},
+    {"BTLNO_RSH_06_01", 1},
+    {0},
 };
 
 EVT_BEGIN(bgset_rsh_bg_event)

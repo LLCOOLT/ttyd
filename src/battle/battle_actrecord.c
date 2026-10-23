@@ -29,7 +29,7 @@ void BtlActRec_AddPoint(u8* point, s32 amount) {
 void BtlActRec_JudgeTurnRuleKeep(void) {
 	s32 v;
 	BattleWork* wp = _battleWorkPointer;
-	u8* rec = *(u8**)((u8*)wp + 0x2738);
+	u8* rec = (u8*)wp->fbatInfo;
 	u8* hi = (u8*)wp + 0x10000;
 	switch (rec[0x18]) {
 	case 60:
@@ -64,8 +64,8 @@ void BtlActRec_JudgeRuleKeep(void) {
 	BattleWork* wp = _battleWorkPointer;
 	u8* hi;
 	u8* rec;
-	void* mario;
-	rec = *(u8**)((u8*)wp + 0x2738);
+	BattleUnit* mario;
+	rec = (u8*)wp->fbatInfo;
 	hi = (u8*)wp + 0x10000;
 	mario = BattleGetMarioPtr(wp);
 	BattleGetPartyPtr(wp);
@@ -129,14 +129,14 @@ void BtlActRec_JudgeRuleKeep(void) {
 		break;
 	case 19:
 		if (mario != NULL) {
-			rec[0x19] = _check_use(*(s16*)((u8*)mario + 0x10c));
+			rec[0x19] = _check_use(mario->currentHp);
 		} else {
 			rec[0x19] = 1;
 		}
 		break;
 	case 20:
 		if (mario != NULL) {
-			rec[0x19] = _check_no_use(*(s16*)((u8*)mario + 0x10c));
+			rec[0x19] = _check_no_use(mario->currentHp);
 		} else {
 			rec[0x19] = 1;
 		}
@@ -313,7 +313,7 @@ void BtlActRec_JudgeRuleKeep(void) {
 
 
 s32 _check_use(s32 n) {
-	u8* rec = *(u8**)((u8*)_battleWorkPointer + 0x2738);
+	u8* rec = (u8*)_battleWorkPointer->fbatInfo;
 	if (n >= rec[0x1a]) {
 		return 6;
 	}
@@ -321,7 +321,7 @@ s32 _check_use(s32 n) {
 }
 
 s32 _check_no_use(s32 n) {
-	u8* rec = *(u8**)((u8*)_battleWorkPointer + 0x2738);
+	u8* rec = (u8*)_battleWorkPointer->fbatInfo;
 	if (n >= rec[0x1b]) {
 		return 1;
 	}
@@ -330,7 +330,7 @@ s32 _check_no_use(s32 n) {
 
 s32 _check_turn_count_0_turn(s32 n) {
 	BattleWork* wp = _battleWorkPointer;
-	u8* rec = *(u8**)((u8*)wp + 0x2738);
+	u8* rec = (u8*)wp->fbatInfo;
 	u8* hi = (u8*)wp + 0x10000;
 	if (R(0x3b) <= rec[0x1b] || rec[0x1b] == 0xff) {
 		if (n == 0) {
@@ -351,7 +351,7 @@ s32 _check_turn_count_0_turn(s32 n) {
 
 s32 _check_turn_count_0_end(s32 n) {
 	BattleWork* wp = _battleWorkPointer;
-	u8* rec = *(u8**)((u8*)wp + 0x2738);
+	u8* rec = (u8*)wp->fbatInfo;
 	u8* hi = (u8*)wp + 0x10000;
 	if (R(0x3b) <= rec[0x1b] || rec[0x1b] == 0xff) {
 		if (n == 0) {

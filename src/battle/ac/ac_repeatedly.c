@@ -66,8 +66,8 @@ static s32 _power_table[] = {55, 50, 45, 40, 35, 30, 25};
 
 static void _init_param(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
-    RepeatWork* r = (RepeatWork*)((u8*)ac + 0x2BC);
-    RepeatDisp* d = (RepeatDisp*)((u8*)ac + 0x290);
+    RepeatWork* r = (RepeatWork*)ac->work;
+    RepeatDisp* d = (RepeatDisp*)&ac->disp;
     ACP(work, 0x2E8, u8) = 0;
     ACP(work, 0x2C8, u32) = 0;
     switch (ACP(work, 0x38, s32)) {
@@ -120,8 +120,8 @@ static void _init_param(BattleWork* work) {
     r->power = ACP(work, 0x4C, s32);
     r->decay = 0.01f * ACP(work, 0x50, s32);
     r->iconParam = 0xB2;
-    if (*(s16*)((u8*)work + 0x1D18) > 0) {
-        (*(s16*)((u8*)work + 0x1D18))--;
+    if (work->actionCommands.countdown > 0) {
+        work->actionCommands.countdown--;
         r->done = 1;
     } else {
         r->done = 0;
@@ -131,8 +131,8 @@ static void _init_param(BattleWork* work) {
 
 s32 battleAcMain_Repeatedly(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
-    RepeatWork* r = (RepeatWork*)((u8*)ac + 0x2BC);
-    RepeatDisp* d = (RepeatDisp*)((u8*)ac + 0x290);
+    RepeatWork* r = (RepeatWork*)ac->work;
+    RepeatDisp* d = (RepeatDisp*)&ac->disp;
     s32 diff = ((s32(*)(BattleWork*))BattleActionCommandGetDifficulty)(work);
     s32 pressed;
     BOOL autoCmd = FALSE;
@@ -303,28 +303,28 @@ s32 battleAcResult_Repeatedly(BattleWork* work) {
 
 void battleAcDisp_Repeatedly(CameraId cameraId, BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
     switch (ac->mAcState) {
         case 99:
         case 100:
         case 1000:
         case 1001:
-            disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[4], 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] > 0) {
-                (*(s32*)&disp->field_0x1C[4])--;
+            if (disp->unk20 > 0) {
+                disp->unk20--;
             }
             break;
         case 1002:
         case 1003:
-            if (*(s32*)&disp->field_0x1C[4] >= 40) {
-                disp->iconX = intplGetValue(4, *(s32*)&disp->field_0x1C[4] - 40, 20, 30.0f, -300.0f);
+            if (disp->unk20 >= 40) {
+                disp->iconX = intplGetValue(4, disp->unk20 - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] < 60) {
-                (*(s32*)&disp->field_0x1C[4])++;
+            if (disp->unk20 < 60) {
+                disp->unk20++;
             }
             break;
     }

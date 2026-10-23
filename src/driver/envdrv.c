@@ -17,14 +17,14 @@
 //.data
 // static data from an inlined header function
 #pragma force_active on // FAKE: keep asm-only-referenced data from being dead-stripped
-__declspec(section ".data") s32 envdrv_negone_one_a[] = {-1082130432, 1065353216};
-__declspec(section ".data") static s32 negone_one$374[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 envdrv_one_negone_a[] = {1065353216, -1082130432};
-__declspec(section ".data") static s32 one_negone$373[] = {1065353216, -1082130432};
-__declspec(section ".data") s32 envdrv_negone_one_b[] = {-1082130432, 1065353216};
-__declspec(section ".data") static s32 negone_one$360[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 envdrv_one_negone_b[] = {1065353216, -1082130432};
-__declspec(section ".data") static s32 one_negone$359[] = {1065353216, -1082130432};
+__declspec(section ".data") f32 envdrv_negone_one_a[] = {-1.0f, 1.0f};
+__declspec(section ".data") static f32 negone_one$374[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 envdrv_one_negone_a[] = {1.0f, -1.0f};
+__declspec(section ".data") static f32 one_negone$373[] = {1.0f, -1.0f};
+__declspec(section ".data") f32 envdrv_negone_one_b[] = {-1.0f, 1.0f};
+__declspec(section ".data") static f32 negone_one$360[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 envdrv_one_negone_b[] = {1.0f, -1.0f};
+__declspec(section ".data") static f32 one_negone$359[] = {1.0f, -1.0f};
 
 EnvironmentGlare envGlare0 = {
     GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, (GXTevKColorSel)1, (GXTevKColorSel)0, 5.25f, 16,

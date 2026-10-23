@@ -166,20 +166,20 @@ static USER_FUNC(x_flag_wait);
 static USER_FUNC(x_flag_add);
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start);
 
-__declspec(section ".data") u64 fd_evt_lect_tou_negone_one_374;
-__declspec(section ".data") s32 fd_evt_lect_tou_neg_one_382[1];
-__declspec(section ".data") s32 fd_evt_lect_tou___local_PI_383[1];
-__declspec(section ".data") s32 fd_evt_lect_tou___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_evt_lect_tou_one_negone_373;
-__declspec(section ".data") s32 fd_evt_lect_tou___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_evt_lect_tou_one_381[1];
-__declspec(section ".data") u64 fd_evt_lect_tou_negone_one_360;
-__declspec(section ".data") s32 fd_evt_lect_tou_neg_one_365[1];
-__declspec(section ".data") s32 fd_evt_lect_tou___local_PI_366[1];
-__declspec(section ".data") s32 fd_evt_lect_tou___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_evt_lect_tou_one_negone_359;
-__declspec(section ".data") s32 fd_evt_lect_tou___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_evt_lect_tou_one_364[1];
+__declspec(section ".data") f32 fd_evt_lect_tou_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_lect_tou_neg_one_382;
+__declspec(section ".data") f32 fd_evt_lect_tou___local_PI_383;
+__declspec(section ".data") f32 fd_evt_lect_tou___local_3PIO2_385;
+__declspec(section ".data") f32 fd_evt_lect_tou_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_lect_tou___local_PIO2_384;
+__declspec(section ".data") f32 fd_evt_lect_tou_one_381;
+__declspec(section ".data") f32 fd_evt_lect_tou_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_lect_tou_neg_one_365;
+__declspec(section ".data") f32 fd_evt_lect_tou___local_PI_366;
+__declspec(section ".data") f32 fd_evt_lect_tou___local_3PIO2_368;
+__declspec(section ".data") f32 fd_evt_lect_tou_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_lect_tou___local_PIO2_367;
+__declspec(section ".data") f32 fd_evt_lect_tou_one_364;
 s32 yoshi_party_lecture_init[43];
 s32 yoshi_party_lecture[271];
 static __declspec(section ".data") s32 all_party_lecture_otosub[11];
@@ -496,53 +496,33 @@ static USER_FUNC(effitemget_busaiku) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_evt_lect_tou_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_evt_lect_tou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_evt_lect_tou_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_evt_lect_tou_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_evt_lect_tou___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_evt_lect_tou___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_evt_lect_tou___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_evt_lect_tou___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_evt_lect_tou_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_evt_lect_tou_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_evt_lect_tou___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_evt_lect_tou___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_evt_lect_tou_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_evt_lect_tou_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_evt_lect_tou_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_evt_lect_tou_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_evt_lect_tou_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_evt_lect_tou_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_evt_lect_tou___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_evt_lect_tou___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_evt_lect_tou___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_evt_lect_tou___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_evt_lect_tou_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_evt_lect_tou_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_evt_lect_tou___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_evt_lect_tou___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_evt_lect_tou_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_evt_lect_tou_one_364 = 1.0f;
 
 EVT_BEGIN(yoshi_party_lecture_init)
     CALL(evt_mario_set_dir, 90, 0, 0)
@@ -1055,40 +1035,84 @@ EVT_BEGIN(hammer_lv2_juyoitem_lecture)
     RETURN
 EVT_END()
 
-s32 all_juyoitem_lecture_rel[] = {
-    65627, (s32)evt_mario_normalize, 131163, (s32)juyoitem_get_no, -29999990, 131163, (s32)evt_mario_set_camid, 7,
-    131163, (s32)effitemget_open_ptr, -29999991, 65627, (s32)juyoitem_gogo, 327771, (s32)evt_mario_get_pos, 0,
-    -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_OFF_PARTY_LECTURE1_1", -30000000, -29999999,
-    -29999998, 0, 65627, (s32)evt_npc_stop_for_event, 131163, (s32)evt_npc_start_for_one_event, (s32)/*"キノピコ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x52", 131163,
-    (s32)evt_party_stop, 0, 65546, 1000, 131163, (s32)evt_snd_bgmoff, 1024, 196699,
-    (s32)evt_snd_bgmon, 1, (s32)"BGM_EVT_LECTURE1", 131163, (s32)evt_snd_envoff, 1024, 65627, (s32)bgm_start_wait,
-    65627, (s32)lect_cam_save, 131163, (s32)effitemget_busaiku, 1, 65545, 1, 131163,
-    (s32)evt_mario_cont_onoff, 0, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998,
-    131122, -29999997, -29999999, 131130, -29999997, -227935616, 262235, (s32)evt_mario_set_pos,
-    -30000000, -29999997, -29999998, 196699, (s32)effitemgetchange_cam_ptr, -29999991, 4, 131163,
-    (s32)evt_paper_entry, (s32)"OFF_d_seal_upper_right", 131163, (s32)evt_img_entry, (s32)"img", 196699, (s32)evt_img_set_paper, (s32)"img",
-    (s32)"OFF_d_seal_upper_right", 196699, (s32)evt_img_free_capture, (s32)"img", 0, 589915, (s32)evt_img_alloc_capture, (s32)"img",
-    0, 0, 1, 0, 0, 608, 480, 131163,
-    (s32)evt_img_clear_virtual_point, (s32)"img", 196699, (s32)evt_img_set_paper_anim, (s32)"img", (s32)"Z_1", 196699, (s32)evt_img_onoff,
-    (s32)"img", 1, 65545, 1, 131163, (s32)effitemget_busaiku, 0, 131163,
-    (s32)evt_eff_softdelete_ptr, -29999991, 65545, 1, 262235, (s32)evt_mario_set_pos, -30000000, -29999999,
-    -29999998, 131163, (s32)evt_mario_cont_onoff, 1, 65627, (s32)lect_test_systemlevel, 458843, (s32)evt_npc_sound_data_set,
-    (s32)/*"キノピコ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x52", (s32)"SFX_FLD_NPC_KINOPIO_MOVE1L", (s32)"SFX_FLD_NPC_KINOPIO_MOVE1R", -250000000, -250000000, -250000000, 65570, -29999990,
-    65572, 10, 65630, (s32)hammer_lv2_juyoitem_lecture_init, 49, 65570, -29999990, 65572,
-    10, 65630, (s32)hammer_lv2_juyoitem_lecture, 49, 65541, 6, 196699, (s32)evt_mario_dispflag_onoff,
-    1, 1, 65546, 100, 327771, (s32)evt_mario_get_pos, 0, -30000000,
-    -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_EVT_LECTUREN_BLINKING1", -30000000, -29999999, -29999998,
-    0, 196699, (s32)evt_mario_dispflag_onoff, 0, 1, 65546, 100, 6,
-    196699, (s32)evt_mario_dispflag_onoff, 1, 1, 65627, (s32)evt_mario_init_camid, 131163, (s32)lect_cam_load,
-    0, 196699, (s32)evt_cam3d_evt_off, 0, 11, 65627, (s32)evt_cam_road_reset, 196699,
-    (s32)evt_mario_dispflag_onoff, 0, 1, 131163, (s32)evt_snd_bgmoff, 513, 196699, (s32)evt_snd_bgmon,
-    288, 0, 131163, (s32)evt_snd_envoff, 513, 196699, (s32)evt_snd_envon, 288,
-    0, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 393307,
-    (s32)evt_snd_sfxon_3d, (s32)"SFX_OFF_PARTY_LECTURE1", -30000000, -29999999, -29999998, 0, 196699, (s32)evt_img_set_paper_anim,
-    (s32)"img", (s32)"A_1", 131163, (s32)evt_img_wait_animend, (s32)"img", 65627, (s32)juyoitem_goato, 131163,
-    (s32)evt_img_release, (s32)"img", 131163, (s32)evt_paper_delete, (s32)"OFF_d_seal_upper_right", 65627, (s32)evt_npc_start_for_event, 131163,
-    (s32)evt_party_run, 0, 2, 1,
-};
+EVT_BEGIN(all_juyoitem_lecture_rel)
+    CALL(evt_mario_normalize)
+    CALL(juyoitem_get_no, LW(10))
+    CALL(evt_mario_set_camid, 7)
+    CALL(effitemget_open_ptr, LW(9))
+    CALL(juyoitem_gogo)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_PARTY_LECTURE1_1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_npc_stop_for_event)
+    CALL(evt_npc_start_for_one_event, STRING(/*"キノピコ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x52"))
+    CALL(evt_party_stop, 0)
+    WAIT_MS(1000)
+    CALL(evt_snd_bgmoff, 1024)
+    CALL(evt_snd_bgmon, 1, STRING("BGM_EVT_LECTURE1"))
+    CALL(evt_snd_envoff, 1024)
+    CALL(bgm_start_wait)
+    CALL(lect_cam_save)
+    CALL(effitemget_busaiku, 1)
+    WAIT_FRAMES(1)
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    SET_VALUE(LW(3), LW(1))
+    ADD_FLOAT(LW(3), FLOAT(2016.0f))
+    CALL(evt_mario_set_pos, LW(0), LW(3), LW(2))
+    CALL(effitemgetchange_cam_ptr, LW(9), 4)
+    CALL(evt_paper_entry, STRING("OFF_d_seal_upper_right"))
+    CALL(evt_img_entry, STRING("img"))
+    CALL(evt_img_set_paper, STRING("img"), STRING("OFF_d_seal_upper_right"))
+    CALL(evt_img_free_capture, STRING("img"), 0)
+    CALL(evt_img_alloc_capture, STRING("img"), 0, 0, 1, 0, 0, 608, 480)
+    CALL(evt_img_clear_virtual_point, STRING("img"))
+    CALL(evt_img_set_paper_anim, STRING("img"), STRING("Z_1"))
+    CALL(evt_img_onoff, STRING("img"), 1)
+    WAIT_FRAMES(1)
+    CALL(effitemget_busaiku, 0)
+    CALL(evt_eff_softdelete_ptr, LW(9))
+    WAIT_FRAMES(1)
+    CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
+    CALL(evt_mario_cont_onoff, 1)
+    CALL(lect_test_systemlevel)
+    CALL(evt_npc_sound_data_set, STRING(/*"キノピコ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x52"), STRING("SFX_FLD_NPC_KINOPIO_MOVE1L"), STRING("SFX_FLD_NPC_KINOPIO_MOVE1R"), -250000000, -250000000, -250000000)
+    SWITCH(LW(10))
+        CASE_EQUAL(10)
+        CALL_CHILD(hammer_lv2_juyoitem_lecture_init)
+    END_SWITCH
+    SWITCH(LW(10))
+        CASE_EQUAL(10)
+        CALL_CHILD(hammer_lv2_juyoitem_lecture)
+    END_SWITCH
+    LOOP(6)
+        CALL(evt_mario_dispflag_onoff, 1, 1)
+        WAIT_MS(100)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_LECTUREN_BLINKING1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_mario_dispflag_onoff, 0, 1)
+        WAIT_MS(100)
+    END_LOOP
+    CALL(evt_mario_dispflag_onoff, 1, 1)
+    CALL(evt_mario_init_camid)
+    CALL(lect_cam_load, 0)
+    CALL(evt_cam3d_evt_off, 0, 11)
+    CALL(evt_cam_road_reset)
+    CALL(evt_mario_dispflag_onoff, 0, 1)
+    CALL(evt_snd_bgmoff, 513)
+    CALL(evt_snd_bgmon, 288, 0)
+    CALL(evt_snd_envoff, 513)
+    CALL(evt_snd_envon, 288, 0)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_PARTY_LECTURE1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_1"))
+    CALL(evt_img_wait_animend, STRING("img"))
+    CALL(juyoitem_goato)
+    CALL(evt_img_release, STRING("img"))
+    CALL(evt_paper_delete, STRING("OFF_d_seal_upper_right"))
+    CALL(evt_npc_start_for_event)
+    CALL(evt_party_run, 0)
+    RETURN
+EVT_END()
 
 static USER_FUNC(lect_mobj_hit_nasi) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);

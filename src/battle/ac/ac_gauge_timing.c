@@ -83,8 +83,8 @@ s32 battleAcMain_GaugeTiming(BattleWork* work) {
 
     ac = &work->actionCommands;
     autoCommand = FALSE;
-    cw = (GaugeWork*)((u8*)ac + 0x2BC);
-    disp = (GaugeDisp*)((u8*)ac + 0x290);
+    cw = (GaugeWork*)ac->work;
+    disp = (GaugeDisp*)&ac->disp;
     if (work->actionCommands.mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
     }
@@ -140,7 +140,7 @@ s32 battleAcMain_GaugeTiming(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if ((GAC(work)->field_0x4 & 1) && (*(u32*)((u8*)work->actionCommands.mAcUnit + BUOFF(0x278)) & 0x10)) {
+            if ((GAC(work)->field_0x4 & 1) && ((u32)work->actionCommands.mAcUnit->mTokenFlags & 0x10)) {
                 if (irand(100) >= 0) {
                     GAC(work)->field_0x8 = 30;
                     cw->passed = 0;
@@ -336,7 +336,7 @@ s32 battleAcResult_GaugeTiming(BattleWork* work) {
 
 void battleAcDisp_GaugeTiming(CameraId cameraId, void* param) {
     BattleActions* ac = &((BattleWork*)param)->actionCommands;
-    GaugeDisp* disp = (GaugeDisp*)((u8*)ac + 0x290);
+    GaugeDisp* disp = (GaugeDisp*)&ac->disp;
 
     switch (ac->mAcState) {
         case 99:
@@ -374,7 +374,7 @@ void battleAcDelete_GaugeTiming(BattleWork* work) {
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
-    GaugeDisp* disp = (GaugeDisp*)((u8*)ac + 0x290);
+    GaugeDisp* disp = (GaugeDisp*)&ac->disp;
     GaugeAC* g;
     GaugeWork* cw;
     f32 rx;
@@ -393,7 +393,7 @@ static void actionCommandDisp(f32 x, f32 y) {
 
     camGetPtr(8);
     g = (GaugeAC*)ac;
-    cw = (GaugeWork*)((u8*)ac + 0x2BC);
+    cw = (GaugeWork*)ac->work;
     ratio = cw->gauge / 100.0f;
     if (ratio > 1.0f) {
         ratio = 1.0f;

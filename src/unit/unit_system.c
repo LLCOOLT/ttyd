@@ -107,15 +107,15 @@ static BattleDataEntry data_table[] = {
 
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-static s32 damage_event[] = {
-    2, 1,
-};
+static EVT_BEGIN(damage_event)
+    RETURN
+EVT_END()
 
-static s32 attack_event[] = {
-    2, 1,
-};
+static EVT_BEGIN(attack_event)
+    RETURN
+EVT_END()
 
-static s32 wait_event[] = {
-    2, 1,
-};
+static EVT_BEGIN(wait_event)
+    RETURN
+EVT_END()
 

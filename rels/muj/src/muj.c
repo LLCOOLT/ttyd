@@ -38,87 +38,63 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-__declspec(section ".data") u64 fd_muj_negone_one_374;
-__declspec(section ".data") s32 fd_muj_neg_one_382[1];
-__declspec(section ".data") s32 fd_muj___local_PI_383[1];
-__declspec(section ".data") s32 fd_muj___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_muj_one_negone_373;
-__declspec(section ".data") s32 fd_muj___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_muj_one_381[1];
-__declspec(section ".data") u64 fd_muj_negone_one_360;
-__declspec(section ".data") s32 fd_muj_neg_one_365[1];
-__declspec(section ".data") s32 fd_muj___local_PI_366[1];
-__declspec(section ".data") s32 fd_muj___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_muj_one_negone_359;
-__declspec(section ".data") s32 fd_muj___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_muj_one_364[1];
-__declspec(section ".data") s32 fd_muj__three_localstatic4_sqrtf[2];
-__declspec(section ".data") s32 fd_muj__half_localstatic3_sqrtf[2];
-s32 muj_ship_puka_data[16];
+__declspec(section ".data") f32 fd_muj_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_neg_one_382;
+__declspec(section ".data") f32 fd_muj___local_PI_383;
+__declspec(section ".data") f32 fd_muj___local_3PIO2_385;
+__declspec(section ".data") f32 fd_muj_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj___local_PIO2_384;
+__declspec(section ".data") f32 fd_muj_one_381;
+__declspec(section ".data") f32 fd_muj_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_neg_one_365;
+__declspec(section ".data") f32 fd_muj___local_PI_366;
+__declspec(section ".data") f32 fd_muj___local_3PIO2_368;
+__declspec(section ".data") f32 fd_muj_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj___local_PIO2_367;
+__declspec(section ".data") f32 fd_muj_one_364;
+__declspec(section ".data") f64 fd_muj__three_localstatic4_sqrtf;
+__declspec(section ".data") f64 fd_muj__half_localstatic3_sqrtf;
+f32 muj_ship_puka_data[16];
 s32 muj_ship_puka[21];
 s32 korutesu_apper[234];
 s32 korutesu_vanish[227];
 __declspec(section ".data") s32 muj_mario_pos_osreport[4];
 
-__declspec(section ".data") u64 fd_muj_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_muj_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_one_364 = 1.0f;
 
-__declspec(section ".data") s32 fd_muj__three_localstatic4_sqrtf[] = {
-    1074266112, 0,
-};
+__declspec(section ".data") f64 fd_muj__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") s32 fd_muj__half_localstatic3_sqrtf[] = {
-    1071644672, 0,
-};
+__declspec(section ".data") f64 fd_muj__half_localstatic3_sqrtf = 0.5;
 
-s32 muj_ship_puka_data[] = {
-    -2147483648, -1090519040, -1082130432, -1077936128, -1073741824, -1072902963, -1071644672, -1070805811,
-    -1070805811, -1070805811, -1071644672, -1072902963, -1073741824, -1077936128, -1082130432, -1090519040,
+f32 muj_ship_puka_data[] = {
+    -0.0f, -0.5f, -1.0f, -1.5f, -2.0f, -2.2f, -2.5f, -2.7f,
+    -2.7f, -2.7f, -2.5f, -2.2f, -2.0f, -1.5f, -1.0f, -0.5f,
 };
 
 EVT_BEGIN(muj_ship_puka)
@@ -168,7 +144,7 @@ USER_FUNC(muj_ship_puka_func) {
     s32 index = evtGetValue(event, args[0]);
     f32 value = evtGetFloat(event, args[1]);
 
-    evtSetFloat(event, args[2], value * ((f32*)muj_ship_puka_data)[index & 0xF]);
+    evtSetFloat(event, args[2], value * muj_ship_puka_data[index & 0xF]);
     return EVT_RETURN_DONE;
 }
 

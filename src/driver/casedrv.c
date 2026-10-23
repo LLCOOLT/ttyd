@@ -100,7 +100,7 @@ void caseMain(void) {
 	jumpFrom = mario->hitobjJumpFrom;
 	h1e0 = mario->hitobjFront;
 	push = mario->hitobjPush;
-	h1fc = mario->field_0x1FC;
+	h1fc = mario->hitobjHammer;
 	h1f4 = mario->hitobjHead;
 	btn = mario->buttonBuffer;
 	if ((u32)marioStGetSystemLevel() == 0 && !winCheck() && gp->inBattle == 0 &&
@@ -191,7 +191,7 @@ void caseMain(void) {
 			case 15:
 				party = partyGetPtr(marioGetPartyId());
 				if (party != NULL && party->currentMemberId == 3) {
-					HitEntry* ph = *(HitEntry**)((u8*)party + 0x130);
+					HitEntry* ph = party->hitobjAction;
 					if (ph != NULL && !strcmp(hitGetName(ph), entry->hitObjName)) SET_HIT(entry);
 				}
 				break;

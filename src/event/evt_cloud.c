@@ -151,7 +151,7 @@ static USER_FUNC(evt_cloud_main) {
             img = imgNameToPtr(wp->imgName, group);
             img->flags |= 2;
             img->poseId = animPaperPoseGetId(wp->animName, group);
-            *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+            img->animTime = animTimeGetTime(group);
             evt.args = args;
             args[0] = (s32)wp->imgName;
             args[1] = 0;
@@ -171,7 +171,7 @@ static USER_FUNC(evt_cloud_main) {
             img = imgNameToPtr(wp->imgName, group);
             img->flags &= ~2;
             img->animName = (s32)"A_1";
-            *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+            img->animTime = animTimeGetTime(group);
             mapGrpFlagOn(wp->groupName, 1);
             wp->timer = 30;
             wp->state++;
@@ -214,7 +214,7 @@ static USER_FUNC(evt_cloud_main) {
             }
             img = imgNameToPtr(wp->imgName, group);
             img->animName = (s32)"A_2";
-            *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+            img->animTime = animTimeGetTime(group);
             hitObjFlagOn(wp->hitName, 1);
             wp->timer = 60;
             wp->state++;

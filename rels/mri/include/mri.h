@@ -1,10 +1,11 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "driver/npcdrv.h"
 
 extern s32 all_juyoitem_lecture_rel[];
-extern s32 btl_mri_setup_no_tbl[];
-extern s32 btlsetup_mri_tbl[];
+extern NpcTerritoryInfo btl_mri_setup_no_tbl[];
+extern NpcSetupBattleInfo btlsetup_mri_tbl[];
 extern s32 evt_mri_door_close[];
 extern s32 evt_mri_door_close_pure[];
 extern s32 evt_mri_door_naname_close[];
@@ -51,10 +52,10 @@ extern s32 mri_punipuni_setup[];
 extern s32 mri_waterfall_effect[];
 extern s32 puni_disp_info[];
 extern s32 puni_piders_check[];
-extern s32 unit_boss_magnum_battender[];
-extern s32 unit_gundan_zako[];
-extern s32 unit_monochrome_pakkun[];
-extern s32 unit_piders[];
+extern BattleUnitKind unit_boss_magnum_battender;
+extern BattleUnitKind unit_gundan_zako;
+extern BattleUnitKind unit_monochrome_pakkun;
+extern BattleUnitKind unit_piders;
 
 extern s32 JailAwayTable_New[];
 extern s32 evt_cloud_main_evt[];

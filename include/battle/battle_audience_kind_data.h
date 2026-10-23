@@ -42,4 +42,4 @@ typedef struct BattleAudienceKind {
     f32 field_0x1C;                    // 0x1C, scaleY?
 } BattleAudienceKind;
 
-extern s32 audience_kind[];
+extern BattleAudienceKind audience_kind[];

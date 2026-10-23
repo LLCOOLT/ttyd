@@ -37,7 +37,7 @@ typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteS
 typedef struct MonteTable { f32 x0; f32 x1; f32 y0; f32 y1; s32 num; } MonteTable;
 static void* yuunpc_wp;
 static Monte* monte_p;
-#define MONTETABLE ((MonteTable*)montetable)
+#define MONTETABLE (montetable)
 static void monte_disp(CameraId camera, void* param);
 static inline BOOL monte_check_inl(Vec* a, Vec* b) { if (PSVECDistance(a, b) < 20.0f && __fabs(a->y - b->y) < 20.0) { return TRUE; } return FALSE; }
 static inline f32 randRange(f32 d) { return irand(100.0f * d) / 100.0f; }
@@ -96,26 +96,26 @@ void yuuminigame_init_2fune(EventEntry* event, BOOL isFirstCall);
 static void monte_disp(CameraId camera, void* param);
 static BOOL get_monte_check(Vec* a, Vec* b);
 
-__declspec(section ".data") u64 fd_yuu_01_negone_one_374;
-__declspec(section ".data") s32 fd_yuu_01_neg_one_382[1];
-__declspec(section ".data") s32 fd_yuu_01___local_PI_383[1];
-__declspec(section ".data") s32 fd_yuu_01___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_yuu_01_one_negone_373;
-__declspec(section ".data") s32 fd_yuu_01___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_yuu_01_one_381[1];
-__declspec(section ".data") u64 fd_yuu_01_negone_one_360;
-__declspec(section ".data") s32 fd_yuu_01_neg_one_365[1];
-__declspec(section ".data") s32 fd_yuu_01___local_PI_366[1];
-__declspec(section ".data") s32 fd_yuu_01___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_yuu_01_one_negone_359;
-__declspec(section ".data") s32 fd_yuu_01___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_yuu_01_one_364[1];
-s32 s_nametbl[21];
-s32 a2_nametbl[21];
-s32 a_nametbl[21];
+__declspec(section ".data") f32 fd_yuu_01_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_yuu_01_neg_one_382;
+__declspec(section ".data") f32 fd_yuu_01___local_PI_383;
+__declspec(section ".data") f32 fd_yuu_01___local_3PIO2_385;
+__declspec(section ".data") f32 fd_yuu_01_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_yuu_01___local_PIO2_384;
+__declspec(section ".data") f32 fd_yuu_01_one_381;
+__declspec(section ".data") f32 fd_yuu_01_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_yuu_01_neg_one_365;
+__declspec(section ".data") f32 fd_yuu_01___local_PI_366;
+__declspec(section ".data") f32 fd_yuu_01___local_3PIO2_368;
+__declspec(section ".data") f32 fd_yuu_01_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_yuu_01___local_PIO2_367;
+__declspec(section ".data") f32 fd_yuu_01_one_364;
+const char* s_nametbl[21];
+const char* a2_nametbl[21];
+const char* a_nametbl[21];
 s32 turn_tbl[22];
 s32 hoko_tbl[22];
-static s32 montetable[30];
+static MonteTable montetable[6];
 static __declspec(section ".data") s32 minigame_view_monte[4];
 __declspec(section ".data") s32 yuu_01_kaijo_init[12];
 __declspec(section ".data") s32 yuu_01_kaijo_init2[12];
@@ -126,70 +126,68 @@ s32 minigame02_start[101];
 s32 minigame02_end[172];
 s32 yuu_01_init_evt[VERSION_PICK(1076, 1166)];
 
-__declspec(section ".data") u64 fd_yuu_01_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_yuu_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_yuu_01_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_yuu_01_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_yuu_01___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_yuu_01___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_yuu_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_yuu_01___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_yuu_01_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_yuu_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_yuu_01_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_yuu_01___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_yuu_01___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_yuu_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_yuu_01___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_yuu_01_one_364 = 1.0f;
+
+const char* s_nametbl[] = {
+    NULL, "S_dai_uzu1", "S_dai_uzu2", "S_dai_uzu3", "S_dai_uzu4", "S_uzu1", "S_uzu2", "S_uzu3", "S_uzu4", "S_uzu5",
+    "S_uzu6", "S_uzu7", "S_uzu8", "S_taru01", "S_taru02", "S_taru03", "S_taru04", "S_taru05", "S_taru06",
+    "S_taru07", "S_taru08",
 };
 
-__declspec(section ".data") s32 fd_yuu_01___local_PI_383[] = {
-    1078530011,
+const char* a2_nametbl[] = {
+    NULL,
+    "polySurface439_q00000",
+    "polySurface439_q00001",
+    "polySurface439_q00002",
+    "polySurface439_q00003",
+    "polySurface439_q00008",
+    "polySurface439_q00010",
+    "polySurface439_q00012",
+    "polySurface439_q00014",
+    "polySurface439_q00016",
+    "polySurface439_q00018",
+    "polySurface439_q00020",
+    "polySurface439_q00022",
+    "A_taru01",
+    "A_taru02",
+    "A_taru03",
+    "A_taru04",
+    "A_taru05",
+    "A_taru06",
+    "A_taru07",
+    "A_taru08",
 };
 
-__declspec(section ".data") s32 fd_yuu_01___local_3PIO2_385[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_yuu_01_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_yuu_01___local_PIO2_384[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_yuu_01_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_yuu_01_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_yuu_01_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_yuu_01___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_yuu_01___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_yuu_01_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_yuu_01___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_yuu_01_one_364[] = {
-    1065353216,
-};
-
-s32 s_nametbl[] = {
-    0, (s32)"S_dai_uzu1", (s32)"S_dai_uzu2", (s32)"S_dai_uzu3", (s32)"S_dai_uzu4", (s32)"S_uzu1", (s32)"S_uzu2", (s32)"S_uzu3",
-    (s32)"S_uzu4", (s32)"S_uzu5", (s32)"S_uzu6", (s32)"S_uzu7", (s32)"S_uzu8", (s32)"S_taru01", (s32)"S_taru02", (s32)"S_taru03",
-    (s32)"S_taru04", (s32)"S_taru05", (s32)"S_taru06", (s32)"S_taru07", (s32)"S_taru08",
-};
-
-s32 a2_nametbl[] = {
-    0, (s32)"polySurface439_q00000", (s32)"polySurface439_q00001", (s32)"polySurface439_q00002", (s32)"polySurface439_q00003", (s32)"polySurface439_q00008", (s32)"polySurface439_q00010", (s32)"polySurface439_q00012",
-    (s32)"polySurface439_q00014", (s32)"polySurface439_q00016", (s32)"polySurface439_q00018", (s32)"polySurface439_q00020", (s32)"polySurface439_q00022", (s32)"A_taru01", (s32)"A_taru02", (s32)"A_taru03",
-    (s32)"A_taru04", (s32)"A_taru05", (s32)"A_taru06", (s32)"A_taru07", (s32)"A_taru08",
-};
-
-s32 a_nametbl[] = {
-    0, (s32)"A_dai_uzu1", (s32)"A_dai_uzu2", (s32)"A_dai_uzu3", (s32)"A_dai_uzu4", (s32)"A_uzu1", (s32)"A_uzu2", (s32)"A_uzu3",
-    (s32)"A_uzu4", (s32)"A_uzu5", (s32)"A_uzu6", (s32)"A_uzu7", (s32)"A_uzu8", (s32)"A_taru01", (s32)"A_taru02", (s32)"A_taru03",
-    (s32)"A_taru04", (s32)"A_taru05", (s32)"A_taru06", (s32)"A_taru07", (s32)"A_taru08",
+const char* a_nametbl[] = {
+    NULL, "A_dai_uzu1", "A_dai_uzu2", "A_dai_uzu3", "A_dai_uzu4", "A_uzu1", "A_uzu2", "A_uzu3", "A_uzu4", "A_uzu5",
+    "A_uzu6", "A_uzu7", "A_uzu8", "A_taru01", "A_taru02", "A_taru03", "A_taru04", "A_taru05", "A_taru06",
+    "A_taru07", "A_taru08",
 };
 
 s32 turn_tbl[] = {
@@ -204,11 +202,13 @@ s32 hoko_tbl[] = {
     0, 0, 0, 0, 0, 0,
 };
 
-static s32 montetable[] = {
-    0, 0, 1112014848, 1135214592, 1, 1132068864, 1132068864, 1112014848,
-    1135214592, 1, 1138819072, 1144422400, -1012596736, 1112014848, 1, -1021640704,
-    -1021640704, -1012596736, -1032847360, 1, 1125515264, -1021640704, -1012596736, -1032847360,
-    1, 0, 0, 0, 0, 0,
+static MonteTable montetable[] = {
+    {0.0f, 0.0f, 50.0f, 340.0f, 1},
+    {250.0f, 250.0f, 50.0f, 340.0f, 1},
+    {450.0f, 730.0f, -330.0f, 50.0f, 1},
+    {-155.0f, -155.0f, -330.0f, -60.0f, 1},
+    {150.0f, -155.0f, -330.0f, -60.0f, 1},
+    {0},
 };
 
 static __declspec(section ".data") EVT_BEGIN(minigame_view_monte)
@@ -1077,7 +1077,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
     box[2].x += 12.5f;
     while (data->index < 1 || data->index >= 5) {
         for (i = 1; i < 5; i++) {
-            mapObjGetPos((const char*)s_nametbl[i], &pos);
+            mapObjGetPos(s_nametbl[i], &pos);
             pos.y = mario->position.y;
             for (j = 0; j < 3; j++) {
                 if (PSVECSquareDistance(&box[j], &pos) <= 3306.25f) {
@@ -1112,7 +1112,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
         }
         {
             for (i = 5; i < 13; i++) {
-                mapObjGetPos((const char*)s_nametbl[i], &pos);
+                mapObjGetPos(s_nametbl[i], &pos);
                 pos.y = mario->position.y;
                 for (j = 0; j < 3; j++) {
                     if (PSVECSquareDistance(&box[j], &pos) <= 225.0f) {
@@ -1157,7 +1157,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                 data->dir.y = 0.0f;
                 PSVECNormalize(&data->dir, &data->dir);
                 PSVECScale(&data->dir, &ofs, data->timer >= 30 ? data->dist * ((data->timer - 30) / 90.0f) : 0.0f);
-                mapObjGetPos((const char*)s_nametbl[data->index], &pos);
+                mapObjGetPos(s_nametbl[data->index], &pos);
                 PSVECAdd(&ofs, &pos, &ofs);
                 mario->position.x = ofs.x;
                 mario->position.z = ofs.z;
@@ -1279,8 +1279,8 @@ USER_FUNC(yuuminigame2_get_name) {
     s32* args = event->args;
     s32 i = evtGetValue(event, args[0]);
 
-    evtSetValue(event, args[1], s_nametbl[i]);
-    evtSetValue(event, args[2], a_nametbl[i]);
+    evtSetValue(event, args[1], (s32)s_nametbl[i]);
+    evtSetValue(event, args[2], (s32)a_nametbl[i]);
     evtSetValue(event, args[3], turn_tbl[i]);
     return EVT_RETURN_DONE;
 }

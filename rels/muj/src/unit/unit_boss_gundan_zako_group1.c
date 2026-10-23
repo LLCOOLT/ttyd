@@ -16,6 +16,8 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
+#include "battle/battle_database_common.h"
+#include "data_tables.h"
 
 typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; Vec ofs; Vec rot; } ZakoGun;
 typedef struct ZakoGunWork { s32 flag; s32 targetId;
@@ -91,20 +93,20 @@ void zakogun_ext_init(void);
 BattleUnit* zakogun_get_ptr(void);
 void zakogun_set_pose(ZakoGun* zako, s32 base, s32 num, s32 div);
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group1_negone_one_374;
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1_neg_one_382[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1___local_PI_383[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_boss_gundan_zako_group1_one_negone_373;
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1_one_381[1];
-__declspec(section ".data") u64 fd_boss_gundan_zako_group1_negone_one_360;
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1_neg_one_365[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1___local_PI_366[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_boss_gundan_zako_group1_one_negone_359;
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1_one_364[1];
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_neg_one_382;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1___local_PI_383;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1___local_3PIO2_385;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1___local_PIO2_384;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_one_381;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_neg_one_365;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1___local_PI_366;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1___local_3PIO2_368;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1___local_PIO2_367;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_one_364;
 BattleUnitKind unit_boss_gundan_zako_group1;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -112,7 +114,7 @@ static __declspec(section ".data") StatusVulnerability regist;
 static __declspec(section ".data") PoseTableEntry pose_table[4];
 static __declspec(section ".data") BattleDataEntry data_table[4];
 static BattleUnitKindPart parts[1];
-s32 weapon_gundan_zako_group1_attack[48];
+BattleWeapon weapon_gundan_zako_group1_attack;
 static s32 init_event[44];
 static s32 damage_event[134];
 s32 damage_event_kaiten_hammer[30];
@@ -120,7 +122,7 @@ static s32 dead_event[138];
 static s32 attack_event[85];
 static s32 hit_check_event[95];
 static __declspec(section ".data") s32 wait_event[6];
-s32 zakogun_ext_entry_data[147];
+ExtTexInfo zakogun_ext_entry_data[49];
 s32 zakogun_entry[19];
 
 USER_FUNC(zakogun_set_target_id) {
@@ -197,53 +199,33 @@ BattleUnit* zakogun_get_ptr(void) {
     return NULL;
 }
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group1_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group1_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group1_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group1_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group1_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_gundan_zako_group1_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_gundan_zako_group1 = {
     100,
@@ -335,13 +317,44 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_gundan_zako_group1", "c_zako_n", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3000009, 0, pose_table},
 };
 
-s32 weapon_gundan_zako_group1_attack[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    5, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 553656320, 770, 0, 4231, 2047, 4,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gundan_zako_group1_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x21002000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x1087, // special
+    0x7FF, // counterResistFlags
+    4, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static EVT_BEGIN(init_event)
@@ -416,30 +429,46 @@ EVT_BEGIN(damage_event_kaiten_hammer)
     RETURN
 EVT_END()
 
-static s32 dead_event[] = {
-    262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 1, 65627, (s32)zakogun_dead1, 65545,
-    36, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_ENEMY_DIE1_1", -250000000, 0, -250000000,
-    65545, 48, 110, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_ENEMY_DIE1_2", -250000000,
-    0, -250000000, 65541, 10, 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
-    -29999999, -29999998, 196699, (s32)evt_sub_random, 100, -29999997, 131126, -29999997,
-    50, 131125, -30000000, -29999997, 196699, (s32)evt_sub_random, 30, -29999997,
-    131125, -29999999, -29999997, 131122, -29999998, 75, 983131, (s32)evt_eff,
-    0, (s32)"kemuri_test", 4, -30000000, -29999999, -29999998, -229999181, 0,
-    0, 0, 0, 0, 0, 0, 65545, 1,
-    6, 112, 196699, (s32)btlevtcmd_GetCoin, -2, -30000000, 131163, (s32)btlevtcmd_StoreCoin,
-    -30000000, 196699, (s32)btlevtcmd_GetExp, -2, -30000000, 131163, (s32)btlevtcmd_StoreExp, -30000000,
-    327771, (s32)btlevtcmd_GetPos, -2, -29999997, -29999999, -29999998, 327771, (s32)_add_star_point_disp_offset,
-    -2, -29999997, -29999999, -29999998, 983131, (s32)evt_eff, (s32)"", (s32)"star_point",
-    0, -29999997, -29999999, -29999998, -30000000, 0, 0, 0,
-    0, 0, 0, 0, 65545, 20, 262235, (s32)btlevtcmd_CheckDamageCode,
-    -2, 1024, -30000000, 131097, -30000000, 0, 196699, (s32)btlevtcmd_KillUnit,
-    -2, 0, 32, 196699, (s32)btlevtcmd_KillUnit, -2, 2, 33,
-    2, 1,
-};
+static EVT_BEGIN(dead_event)
+    CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
+    CALL(zakogun_dead1)
+    WAIT_FRAMES(36)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_ENEMY_DIE1_1"), -250000000, 0, -250000000)
+    WAIT_FRAMES(48)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_ENEMY_DIE1_2"), -250000000, 0, -250000000)
+        LOOP(10)
+            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            CALL(evt_sub_random, 100, LW(3))
+            SUBTRACT(LW(3), 50)
+            ADD(LW(0), LW(3))
+            CALL(evt_sub_random, 30, LW(3))
+            ADD(LW(1), LW(3))
+            SET_VALUE(LW(2), 75)
+            CALL(evt_eff, 0, STRING("kemuri_test"), 4, LW(0), LW(1), LW(2), FLOAT(0.7998047f), 0, 0, 0, 0, 0, 0, 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetCoin, -2, LW(0))
+    CALL(btlevtcmd_StoreCoin, LW(0))
+    CALL(btlevtcmd_GetExp, -2, LW(0))
+    CALL(btlevtcmd_StoreExp, LW(0))
+    CALL(btlevtcmd_GetPos, -2, LW(3), LW(1), LW(2))
+    CALL(_add_star_point_disp_offset, -2, LW(3), LW(1), LW(2))
+    CALL(evt_eff, STRING(""), STRING("star_point"), 0, LW(3), LW(1), LW(2), LW(0), 0, 0, 0, 0, 0, 0, 0)
+    WAIT_FRAMES(20)
+    CALL(btlevtcmd_CheckDamageCode, -2, 1024, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_KillUnit, -2, 0)
+    ELSE
+        CALL(btlevtcmd_KillUnit, -2, 2)
+    END_IF
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
-    SET_VALUE(LW(9), PTR(weapon_gundan_zako_group1_attack))
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_group1_attack))
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
     CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
@@ -515,26 +544,56 @@ static __declspec(section ".data") EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
-s32 zakogun_ext_entry_data[] = {
-    (s32)"c_zako_n", (s32)"S_1", 0, (s32)"c_zako_n", (s32)"S_1", 1073741824, (s32)"c_zako_n", (s32)"S_1",
-    1082130432, (s32)"c_zako_n", (s32)"S_1", 1086324736, (s32)"c_zako_n", (s32)"S_1", 1090519040, (s32)"c_zako_n",
-    (s32)"S_1", 1092616192, (s32)"c_zako_n", (s32)"S_1", 1094713344, (s32)"c_zako_n", (s32)"S_1", 1096810496,
-    (s32)"c_zako_n", (s32)"S_1", 1098907648, (s32)"c_zako_n", (s32)"S_1", 1099956224, (s32)"c_zako_n", (s32)"S_1",
-    1101004800, (s32)"c_zako_n", (s32)"S_1", 1102053376, (s32)"c_zako_n", (s32)"S_1", 1103101952, (s32)"c_zako_n",
-    (s32)"S_1", 1104150528, (s32)"c_zako_n", (s32)"S_1", 1105199104, (s32)"c_zako_n", (s32)"S_1", 1106247680,
-    (s32)"c_zako_n", (s32)"S_1", 1107296256, (s32)"c_zako_n", (s32)"S_1", 1107820544, (s32)"c_zako_n", (s32)"S_1",
-    1108344832, (s32)"c_zako_n", (s32)"S_1", 1108869120, (s32)"c_zako_n", (s32)"Z_2", 0, (s32)"c_zako_n",
-    (s32)"Z_3", 0, (s32)"c_zako_n", (s32)"R_1", 0, (s32)"c_zako_n", (s32)"R_1", 1065353216,
-    (s32)"c_zako_n", (s32)"R_1", 1073741824, (s32)"c_zako_n", (s32)"R_1", 1077936128, (s32)"c_zako_n", (s32)"R_1",
-    1082130432, (s32)"c_zako_n", (s32)"R_1", 1084227584, (s32)"c_zako_n", (s32)"R_1", 1086324736, (s32)"c_zako_n",
-    (s32)"R_1", 1088421888, (s32)"c_zako_n", (s32)"R_1", 1090519040, (s32)"c_zako_n", (s32)"R_1", 1091567616,
-    (s32)"c_zako_n", (s32)"A_3", 0, (s32)"c_zako_n", (s32)"D_1", 0, (s32)"c_zako_n", (s32)"D_1",
-    1077936128, (s32)"c_zako_n", (s32)"D_1", 1086324736, (s32)"c_zako_n", (s32)"J_1A", 0, (s32)"c_zako_n",
-    (s32)"S_2", 0, (s32)"c_zako_n", (s32)"S_2", 1092616192, (s32)"c_zako_n", (s32)"S_2", 1101004800,
-    (s32)"c_zako_n", (s32)"S_2", 1106247680, (s32)"c_zako_n", (s32)"A_5", 0, (s32)"c_zako_n", (s32)"A_5",
-    1090519040, (s32)"c_zako_n", (s32)"A_5", 1094713344, (s32)"c_zako_n", (s32)"A_2", 0, (s32)"c_zako_n",
-    (s32)"D_5", 0, (s32)"c_zako_n", (s32)"D_5", 1073741824, (s32)"c_zako_n", (s32)"D_5", 1082130432,
-    0, 0, 0,
+ExtTexInfo zakogun_ext_entry_data[] = {
+    {"c_zako_n", "S_1", 0.0f},
+    {"c_zako_n", "S_1", 2.0f},
+    {"c_zako_n", "S_1", 4.0f},
+    {"c_zako_n", "S_1", 6.0f},
+    {"c_zako_n", "S_1", 8.0f},
+    {"c_zako_n", "S_1", 10.0f},
+    {"c_zako_n", "S_1", 12.0f},
+    {"c_zako_n", "S_1", 14.0f},
+    {"c_zako_n", "S_1", 16.0f},
+    {"c_zako_n", "S_1", 18.0f},
+    {"c_zako_n", "S_1", 20.0f},
+    {"c_zako_n", "S_1", 22.0f},
+    {"c_zako_n", "S_1", 24.0f},
+    {"c_zako_n", "S_1", 26.0f},
+    {"c_zako_n", "S_1", 28.0f},
+    {"c_zako_n", "S_1", 30.0f},
+    {"c_zako_n", "S_1", 32.0f},
+    {"c_zako_n", "S_1", 34.0f},
+    {"c_zako_n", "S_1", 36.0f},
+    {"c_zako_n", "S_1", 38.0f},
+    {"c_zako_n", "Z_2", 0.0f},
+    {"c_zako_n", "Z_3", 0.0f},
+    {"c_zako_n", "R_1", 0.0f},
+    {"c_zako_n", "R_1", 1.0f},
+    {"c_zako_n", "R_1", 2.0f},
+    {"c_zako_n", "R_1", 3.0f},
+    {"c_zako_n", "R_1", 4.0f},
+    {"c_zako_n", "R_1", 5.0f},
+    {"c_zako_n", "R_1", 6.0f},
+    {"c_zako_n", "R_1", 7.0f},
+    {"c_zako_n", "R_1", 8.0f},
+    {"c_zako_n", "R_1", 9.0f},
+    {"c_zako_n", "A_3", 0.0f},
+    {"c_zako_n", "D_1", 0.0f},
+    {"c_zako_n", "D_1", 3.0f},
+    {"c_zako_n", "D_1", 6.0f},
+    {"c_zako_n", "J_1A", 0.0f},
+    {"c_zako_n", "S_2", 0.0f},
+    {"c_zako_n", "S_2", 10.0f},
+    {"c_zako_n", "S_2", 20.0f},
+    {"c_zako_n", "S_2", 30.0f},
+    {"c_zako_n", "A_5", 0.0f},
+    {"c_zako_n", "A_5", 8.0f},
+    {"c_zako_n", "A_5", 12.0f},
+    {"c_zako_n", "A_2", 0.0f},
+    {"c_zako_n", "D_5", 0.0f},
+    {"c_zako_n", "D_5", 2.0f},
+    {"c_zako_n", "D_5", 4.0f},
+    {0},
 };
 
 EVT_BEGIN(zakogun_entry)

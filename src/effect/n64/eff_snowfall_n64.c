@@ -257,7 +257,7 @@ void effSnowfallDisp(CameraId cameraId, EffectEntry* effect) {
     DCFlushRange((void*)dataA, GXGetTexBufferSize(64, 64, 0, 1, 3));
     GXInitTexObjLOD(&texA, GX_LIN_MIP_LIN, GX_LINEAR, 0.0f, 2.0f, 0.0f, GX_TRUE, GX_TRUE, GX_ANISO_1);
     GXLoadTexObj(&texA, GX_TEXMAP0);
-    if (*(u16*)((u8*)mapGetWork() + 4) & 2) {
+    if (mapGetWork()->entries[0].flags & 2) {
         mapGetBlend(&blend);
         GXSetTevColor(GX_TEVREG0, (GXColor){blend.r * 0xFF, blend.g * 0xFF, blend.b * 0xFF, alpha * blend.a});
     } else {

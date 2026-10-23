@@ -66,8 +66,8 @@ typedef struct ShotParams {
     s32 e;            // 0x50
 } ShotParams;
 
-#define SH_DISP(ac) ((ShotDisp*)((u8*)(ac) + 0x290))
-#define SH_WORK(ac) ((ShotWork*)((u8*)(ac) + 0x2BC))
+#define SH_DISP(ac) ((ShotDisp*)&(ac)->disp)
+#define SH_WORK(ac) ((ShotWork*)(ac)->work)
 #define SH_PARAMS(ac) ((ShotParams*)((u8*)(ac) + 0x38))
 #define SH_FLAGS(ac) (*(u32*)((u8*)(ac) + 0x34))
 #define SH_OUT(ac) ((s32*)((u8*)(ac) + 0x58))

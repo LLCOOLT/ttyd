@@ -1,4 +1,5 @@
 #include "battle/battle.h"
+#include <dolphin/pad.h>
 #include "battle/battle_ac.h"
 #include "battle/battle_pad.h"
 #include "battle/battle_unit.h"
@@ -21,7 +22,7 @@ typedef struct BDWork {
 #define BTN(i) (*(u32*)((u8*)p + 8 + (i) * 4))
 #define PRS(i) (*(s32*)((u8*)p + 0x3c + (i) * 4))
 
-static u32 _button_table[7] = {0x100, 0x200, 0x400, 0x800, 0x40, 0x20, 0x10};
+static u32 _button_table[7] = {PAD_BUTTON_A, PAD_BUTTON_B, PAD_BUTTON_X, PAD_BUTTON_Y, PAD_TRIGGER_L, PAD_TRIGGER_R, PAD_TRIGGER_Z};
 
 static void actionCommandDisp(s32 unused, f32 x, f32 y);
 
@@ -302,7 +303,7 @@ void battleAcDisp_ButtonDown(CameraId cameraId, void* param) {
     BattleActions* ac = &work->actionCommands;
     s32* disp;
     f32 x, y;
-    disp = (s32*)((u8*)ac + 0x290);
+    disp = (s32*)&ac->disp;
     switch (ac->mAcState) {
         case 99:
         case 0:

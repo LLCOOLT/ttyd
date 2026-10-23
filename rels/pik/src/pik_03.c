@@ -32,73 +32,53 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 
-__declspec(section ".data") u64 fd_pik_03_negone_one_374;
-__declspec(section ".data") s32 fd_pik_03_neg_one_382[1];
-__declspec(section ".data") s32 fd_pik_03___local_PI_383[1];
-__declspec(section ".data") s32 fd_pik_03___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_pik_03_one_negone_373;
-__declspec(section ".data") s32 fd_pik_03___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_pik_03_one_381[1];
-__declspec(section ".data") u64 fd_pik_03_negone_one_360;
-__declspec(section ".data") s32 fd_pik_03_neg_one_365[1];
-__declspec(section ".data") s32 fd_pik_03___local_PI_366[1];
-__declspec(section ".data") s32 fd_pik_03___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_pik_03_one_negone_359;
-__declspec(section ".data") s32 fd_pik_03___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_pik_03_one_364[1];
+__declspec(section ".data") f32 fd_pik_03_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_pik_03_neg_one_382;
+__declspec(section ".data") f32 fd_pik_03___local_PI_383;
+__declspec(section ".data") f32 fd_pik_03___local_3PIO2_385;
+__declspec(section ".data") f32 fd_pik_03_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_pik_03___local_PIO2_384;
+__declspec(section ".data") f32 fd_pik_03_one_381;
+__declspec(section ".data") f32 fd_pik_03_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_pik_03_neg_one_365;
+__declspec(section ".data") f32 fd_pik_03___local_PI_366;
+__declspec(section ".data") f32 fd_pik_03___local_3PIO2_368;
+__declspec(section ".data") f32 fd_pik_03_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_pik_03___local_PIO2_367;
+__declspec(section ".data") f32 fd_pik_03_one_364;
 s32 bero_in[45];
 s32 bero_out[53];
-static s32 bero_data[30];
+static BeroEntry bero_data[2];
 static s32 evt_daiza[28];
 s32 pik_03_init_evt[113];
 
-__declspec(section ".data") u64 fd_pik_03_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_pik_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_pik_03_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_pik_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_pik_03___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_pik_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_pik_03___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_pik_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_pik_03_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_pik_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_pik_03___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_pik_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_pik_03_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_pik_03_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_pik_03_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_pik_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_pik_03_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_pik_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_pik_03___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_pik_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_pik_03___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_pik_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_pik_03_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_pik_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_pik_03___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_pik_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_pik_03_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_pik_03_one_364 = 1.0f;
 
 EVT_BEGIN(bero_in)
     CALL(evt_cam_letter_box_disable, 1)
@@ -137,11 +117,25 @@ EVT_BEGIN(bero_out)
     RETURN
 EVT_END()
 
-static s32 bero_data[] = {
-    (s32)"s_bero", 65536, 20000, 100000, 0, 0, -1, (s32)bero_in,
-    8, (s32)bero_out, (s32)"pik_02", (s32)"h_bero", 262148, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_data[] = {
+    {
+        "s_bero", // hitName
+        1, // type
+        0, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)bero_in, // enterEvent
+        8, // caseType
+        (s32*)bero_out, // exitEvent
+        (s32)"pik_02", // nextMapName
+        "h_bero", // nextBeroName
+        4, // enterAnimeType
+        4, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(evt_daiza)

@@ -13,6 +13,8 @@
 #include "evt/evt_door.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_npc.h"
+#include "data_tables.h"
 
 static void draw(CameraId camera, void* param);
 typedef struct AaaWork { FileEntry* tpl; s32 alpha; } AaaWork;
@@ -87,28 +89,28 @@ USER_FUNC(mapdraw);
 void mapdelete(void);
 static void draw(CameraId camera, void* param);
 
-__declspec(section ".data") u64 fd_aaa_00_negone_one_374;
-__declspec(section ".data") s32 fd_aaa_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_aaa_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_aaa_00___local_3PIO2_385[2];
-__declspec(section ".data") u64 fd_aaa_00_one_negone_373;
-__declspec(section ".data") s32 fd_aaa_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_aaa_00_one_381[1];
-__declspec(section ".data") u64 fd_aaa_00_negone_one_360;
-__declspec(section ".data") s32 fd_aaa_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_aaa_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_aaa_00___local_3PIO2_368[2];
-__declspec(section ".data") u64 fd_aaa_00_one_negone_359;
-__declspec(section ".data") s32 fd_aaa_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_aaa_00_one_364[1];
-static s32 npcEnt[69];
+__declspec(section ".data") f32 fd_aaa_00_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aaa_00_neg_one_382;
+__declspec(section ".data") f32 fd_aaa_00___local_PI_383;
+__declspec(section ".data") f32 fd_aaa_00___local_3PIO2_385[2];
+__declspec(section ".data") f32 fd_aaa_00_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aaa_00___local_PIO2_384;
+__declspec(section ".data") f32 fd_aaa_00_one_381;
+__declspec(section ".data") f32 fd_aaa_00_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aaa_00_neg_one_365;
+__declspec(section ".data") f32 fd_aaa_00___local_PI_366;
+__declspec(section ".data") f32 fd_aaa_00___local_3PIO2_368[2];
+__declspec(section ".data") f32 fd_aaa_00_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aaa_00___local_PIO2_367;
+__declspec(section ".data") f32 fd_aaa_00_one_364;
+static NpcSetupInfo npcEnt[3];
 static s32 evt_door[15];
 static __declspec(section ".data") s32 evt_door2[12];
 static s32 evt_wall[22];
-static __declspec(section ".data") s32 ie_npc[2];
+static __declspec(section ".data") const char* ie_npc[2];
 static __declspec(section ".data") s32 door_1_open[12];
 static s32 door_1_close[14];
-static s32 door_1[18];
+static DoorParam door_1;
 static s32 evt_prologue[713];
 #ifdef VERSION_G8ME01
 s32 evt_prologue2[196];
@@ -126,69 +128,63 @@ static s32 epilogue_evt2[500];
 #else
 static s32 epilogue_evt2[495];
 #endif
-static __declspec(section ".data") s32 ki_data[12];
-static s32 kusa_data[44];
-static s32 bero_entry_data[30];
+static __declspec(section ".data") TreeAccess ki_data[2];
+static KusaAccess kusa_data[11];
+static BeroEntry bero_entry_data[2];
 s32 aaa_00_init_evt[81];
 
-__declspec(section ".data") u64 fd_aaa_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aaa_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aaa_00_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_aaa_00_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_aaa_00___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_aaa_00___local_3PIO2_385[] = {
+    4.712389f, 0.0f,
 };
 
-__declspec(section ".data") s32 fd_aaa_00___local_PI_383[] = {
-    1078530011,
+__declspec(section ".data") f32 fd_aaa_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_aaa_00___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_aaa_00_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_aaa_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_aaa_00_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_aaa_00___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_aaa_00___local_3PIO2_368[] = {
+    4.712389f, 0.0f,
 };
 
-__declspec(section ".data") s32 fd_aaa_00___local_3PIO2_385[] = {
-    1083624420, 0,
-};
+__declspec(section ".data") f32 fd_aaa_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") u64 fd_aaa_00_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aaa_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aaa_00___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aaa_00_one_364 = 1.0f;
 
-__declspec(section ".data") s32 fd_aaa_00_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_aaa_00_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_aaa_00_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_aaa_00___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_aaa_00___local_3PIO2_368[] = {
-    1083624420, 0,
-};
-
-__declspec(section ".data") u64 fd_aaa_00_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_aaa_00___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_aaa_00_one_364[] = {
-    1065353216,
-};
-
-static s32 npcEnt[] = {
-    (s32)/*"パレッタ"*/"\x83\x70\x83\x8C\x83\x62\x83\x5E", 1073743360, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57",
-    1073743360, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"パレッタ"*/"\x83\x70\x83\x8C\x83\x62\x83\x5E", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static EVT_BEGIN(evt_door)
@@ -212,8 +208,9 @@ static EVT_BEGIN(evt_wall)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 ie_npc[] = {
-    (s32)/*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", 0,
+static __declspec(section ".data") const char* ie_npc[] = {
+    /*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57",
+    NULL,
 };
 
 static __declspec(section ".data") EVT_BEGIN(door_1_open)
@@ -230,10 +227,24 @@ static EVT_BEGIN(door_1_close)
     RETURN
 EVT_END()
 
-static s32 door_1[] = {
-    0, 3, 4, (s32)"S_ie_door", (s32)"A_ie_door", (s32)"A_ie_door_u", (s32)"S_ie_soto", (s32)"A_ie_soto",
-    (s32)"S_naka", (s32)"A_naka1", (s32)evt_door, 0, (s32)evt_wall, (s32)ie_npc, 0, 0,
-    (s32)door_1_open, (s32)door_1_close,
+static DoorParam door_1 = {
+    0, // field_0x0
+    3, // type
+    4, // se
+    "S_ie_door", // mapobj
+    "A_ie_door", // hitIn
+    "A_ie_door_u", // hitOut
+    "S_ie_soto", // mapIn
+    "A_ie_soto", // hitInIn
+    "S_naka", // mapOut
+    "A_naka1", // hitOutOut
+    evt_door, // evtIn
+    NULL, // evtOut
+    evt_wall, // evtWall
+    ie_npc, // npcs
+    NULL, NULL, // mobjs..items
+    door_1_open, // evtOpen
+    door_1_close, // evtClose
 };
 
 static EVT_BEGIN(evt_prologue)
@@ -523,7 +534,7 @@ static EVT_BEGIN(epilogue_evt)
     WAIT_MS(500)
     CALL(evt_fade_entry, 10, 1, 0, 0, 0)
     WAIT_FRAMES(1)
-    SET_VALUE(LW(0), PTR(door_1))
+    SET_VALUE(LW(0), PTR(&door_1))
     CALL_CHILD(PTR(evt_door_open_quick))
     CALL(evt_cam3d_evt_set, -360, 154, 80, -46, 81, -232, 0, 11)
     CALL(evt_fade_in, 1000)
@@ -620,7 +631,7 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_npc_flag_onoff, 1, STRING("ルイージ"), 32768)
     CALL(evt_seq_wait, 2)
     CALL(evt_mario_set_pose, STRING("M_N_10"))
-    SET_VALUE(LW(0), PTR(door_1))
+    SET_VALUE(LW(0), PTR(&door_1))
     CALL_CHILD(PTR(evt_door_open_quick))
     CALL(evt_cam3d_evt_set, -307, 117, 9, -58, 58, -244, 0, 11)
     WAIT_FRAMES(1)
@@ -660,7 +671,7 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_cam3d_evt_set, -345, 154, 96, -31, 81, -217, 600, 11)
     WAIT_MS(900)
     CALL(evt_msg_print, 0, STRING("ep_50"), 0, STRING("キノじい"))
-    SET_VALUE(LW(0), PTR(door_1))
+    SET_VALUE(LW(0), PTR(&door_1))
     SPAWN_EVENT(PTR(door_open_se))
     CALL(evt_sub_intpl_msec_init, 5, 0, 180, 500)
     LOOP(0)
@@ -733,25 +744,43 @@ static EVT_BEGIN(epilogue_evt2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 ki_data[] = {
-    6, (s32)"A_ki_1", (s32)"S_ki_1", (s32)"S_ha_1", 0, 0, 7, 0,
-    0, 0, 0, 0,
+static __declspec(section ".data") TreeAccess ki_data[] = {
+    {6, "A_ki_1", "S_ki_1", "S_ha_1", 0, NULL},
+    {7, NULL, NULL, NULL, 0, NULL},
 };
 
-static s32 kusa_data[] = {
-    0, (s32)"A_kusa_01", (s32)"S_kusa_01", 0, 0, (s32)"A_kusa_02", (s32)"S_kusa_02", 0,
-    0, (s32)"A_kusa_03", (s32)"S_kusa_03", 0, 0, (s32)"A_kusa_04", (s32)"S_kusa_04", 0,
-    0, (s32)"A_kusa_05", (s32)"S_kusa_05", 0, 0, (s32)"A_kusa_06", (s32)"S_kusa_06", 0,
-    0, (s32)"A_kusa_07", (s32)"S_kusa_07", 0, 0, (s32)"A_kusa_08", (s32)"S_kusa_08", 0,
-    0, (s32)"A_kusa_09", (s32)"S_kusa_09", 0, 0, (s32)"A_kusa_10", (s32)"S_kusa_10", 0,
-    4, 0, 0, 0,
+static KusaAccess kusa_data[] = {
+    {0, "A_kusa_01", "S_kusa_01", NULL},
+    {0, "A_kusa_02", "S_kusa_02", NULL},
+    {0, "A_kusa_03", "S_kusa_03", NULL},
+    {0, "A_kusa_04", "S_kusa_04", NULL},
+    {0, "A_kusa_05", "S_kusa_05", NULL},
+    {0, "A_kusa_06", "S_kusa_06", NULL},
+    {0, "A_kusa_07", "S_kusa_07", NULL},
+    {0, "A_kusa_08", "S_kusa_08", NULL},
+    {0, "A_kusa_09", "S_kusa_09", NULL},
+    {0, "A_kusa_10", "S_kusa_10", NULL},
+    {4, NULL, NULL, NULL},
 };
 
-static s32 bero_entry_data[] = {
-    (s32)"dokan_1", 131072, 9, 100000, 0, 0, -1, 0,
-    6, 0, 0, (s32)"dokan_1", 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(aaa_00_init_evt)
@@ -759,7 +788,7 @@ EVT_BEGIN(aaa_00_init_evt)
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL(evt_npc_setup, PTR(npcEnt))
-    SET_VALUE(LW(0), PTR(door_1))
+    SET_VALUE(LW(0), PTR(&door_1))
     CALL_CHILD(PTR(evt_door_entry))
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("sai_ki1"), 2)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("sai_ki2"), 2)

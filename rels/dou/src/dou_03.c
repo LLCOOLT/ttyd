@@ -2,6 +2,8 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
+#include "driver/hitdrv.h"
+#include "mario/mario_pouch.h"
 
 #pragma force_active on
 
@@ -44,22 +46,22 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(evt_win_item_select);
 
-__declspec(section ".data") u64 fd_dou_03_negone_one_374;
-__declspec(section ".data") s32 fd_dou_03_neg_one_382[1];
-__declspec(section ".data") s32 fd_dou_03___local_PI_383[1];
-__declspec(section ".data") s32 fd_dou_03___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_dou_03_one_negone_373;
-__declspec(section ".data") s32 fd_dou_03___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_dou_03_one_381[1];
-__declspec(section ".data") u64 fd_dou_03_negone_one_360;
-__declspec(section ".data") s32 fd_dou_03_neg_one_365[1];
-__declspec(section ".data") s32 fd_dou_03___local_PI_366[1];
-__declspec(section ".data") s32 fd_dou_03___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_dou_03_one_negone_359;
-__declspec(section ".data") s32 fd_dou_03___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_dou_03_one_364[1];
+__declspec(section ".data") f32 fd_dou_03_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_03_neg_one_382;
+__declspec(section ".data") f32 fd_dou_03___local_PI_383;
+__declspec(section ".data") f32 fd_dou_03___local_3PIO2_385;
+__declspec(section ".data") f32 fd_dou_03_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_03___local_PIO2_384;
+__declspec(section ".data") f32 fd_dou_03_one_381;
+__declspec(section ".data") f32 fd_dou_03_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_03_neg_one_365;
+__declspec(section ".data") f32 fd_dou_03___local_PI_366;
+__declspec(section ".data") f32 fd_dou_03___local_3PIO2_368;
+__declspec(section ".data") f32 fd_dou_03_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_03___local_PIO2_367;
+__declspec(section ".data") f32 fd_dou_03_one_364;
 __declspec(section ".data") s32 dou_03_custom[10];
-static s32 bero_entry_data[120];
+static BeroEntry bero_entry_data[8];
 s32 watergate_handle_init[34];
 static __declspec(section ".data") s32 itemsel_table[2];
 s32 watergate_lever[20];
@@ -72,56 +74,36 @@ s32 watergate_handle[251];
 static s32 dou_puka_event_main0[60];
 static s32 dou_puka_event_main1[60];
 static s32 dou_puka_event_main2[60];
-static s32 hitDmgRetPoints[72];
+static HitDamageReturn hitDmgRetPoints[18];
 s32 dou_03_init_evt[130];
 
-__declspec(section ".data") u64 fd_dou_03_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_dou_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_dou_03_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_dou_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_dou_03___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_dou_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_dou_03___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_dou_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_dou_03_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_dou_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_dou_03___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_dou_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_dou_03_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_dou_03_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_dou_03_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_dou_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_dou_03_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_dou_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_dou_03___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_dou_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_dou_03___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_dou_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_dou_03_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_dou_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_dou_03___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_dou_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_dou_03_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_dou_03_one_364 = 1.0f;
 
 __declspec(section ".data") EVT_BEGIN(dou_03_custom)
     CALL(evt_hitobj_onoff, STRING("on_off"), 1, 0)
@@ -129,22 +111,120 @@ __declspec(section ".data") EVT_BEGIN(dou_03_custom)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero_1", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"dou_12", (s32)"e_bero_1", 65537, 0, 0, (s32)"w_bero_2",
-    0, 20000, 100000, 0, 0, -1, (s32)dou_03_custom, -1,
-    0, (s32)"dou_12", (s32)"e_bero_2", 65537, 0, 0, (s32)"w_bero_3", 0,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"dou_04", (s32)"e_bero", 65537, 0, 0, (s32)"e_bero_1", 0, 20000,
-    100000, 0, 0, -1, (s32)dou_03_custom, -1, 0, (s32)"dou_05",
-    (s32)"w_bero_1", 65537, 0, 0, (s32)"e_bero_2", 0, 20000, 100000,
-    0, 0, -1, 0, -1, 0, (s32)"dou_05", (s32)"w_bero_2",
-    65537, 0, 0, (s32)"e_bero_3", 0, 20000, 100000, 0,
-    0, -1, 0, -1, 0, (s32)"dou_05", (s32)"w_bero_3", 65537,
-    0, 0, (s32)"s_bero", 0, 20000, 100000, 0, 0,
-    -1, 0, -1, 0, (s32)"dou_09", (s32)"n_bero", 65537, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero_1", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_12", // nextMapName
+        "e_bero_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "w_bero_2", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)dou_03_custom, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_12", // nextMapName
+        "e_bero_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "w_bero_3", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_04", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero_1", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)dou_03_custom, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_05", // nextMapName
+        "w_bero_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero_2", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_05", // nextMapName
+        "w_bero_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero_3", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_05", // nextMapName
+        "w_bero_3", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "s_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_09", // nextMapName
+        "n_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(watergate_handle_init)
@@ -161,7 +241,7 @@ EVT_BEGIN(watergate_handle_init)
 EVT_END()
 
 static __declspec(section ".data") s32 itemsel_table[] = {
-    72, -1,
+    ITEM_GATE_HANDLE, -1,
 };
 
 EVT_BEGIN(watergate_lever)
@@ -385,16 +465,25 @@ static EVT_BEGIN(dou_puka_event_main2)
     RETURN
 EVT_END()
 
-static s32 hitDmgRetPoints[] = {
-    (s32)"mod_01", 0, -998637568, 0, (s32)"mod_02", 0, -998637568, 0,
-    (s32)"mod_03", 0, -998637568, 0, (s32)"mod_04", 0, -998637568, 0,
-    (s32)"mod_05", 0, -998637568, 0, (s32)"mod_06", 1130758144, 1112014848, 1112014848,
-    (s32)"mod_07", 0, -998637568, 0, (s32)"mod_09", 0, -998637568, 0,
-    (s32)"mod_10", 0, -998637568, 0, (s32)"mod_11", 0, -998637568, 0,
-    (s32)"mod_12", 0, -998637568, 0, (s32)"mod_13", 0, -998637568, 0,
-    (s32)"mod_14", 0, -998637568, 0, (s32)"mod_15", 0, -998637568, 0,
-    (s32)"mod_16", 0, -998637568, 0, (s32)"mod_17", 1138327552, 1103626240, 1092616192,
-    (s32)"Ship_Change", 0, -998637568, 0, 0, 0, 0, 0,
+static HitDamageReturn hitDmgRetPoints[] = {
+    {"mod_01", {0.0f, -1000.0f, 0.0f}},
+    {"mod_02", {0.0f, -1000.0f, 0.0f}},
+    {"mod_03", {0.0f, -1000.0f, 0.0f}},
+    {"mod_04", {0.0f, -1000.0f, 0.0f}},
+    {"mod_05", {0.0f, -1000.0f, 0.0f}},
+    {"mod_06", {230.0f, 50.0f, 50.0f}},
+    {"mod_07", {0.0f, -1000.0f, 0.0f}},
+    {"mod_09", {0.0f, -1000.0f, 0.0f}},
+    {"mod_10", {0.0f, -1000.0f, 0.0f}},
+    {"mod_11", {0.0f, -1000.0f, 0.0f}},
+    {"mod_12", {0.0f, -1000.0f, 0.0f}},
+    {"mod_13", {0.0f, -1000.0f, 0.0f}},
+    {"mod_14", {0.0f, -1000.0f, 0.0f}},
+    {"mod_15", {0.0f, -1000.0f, 0.0f}},
+    {"mod_16", {0.0f, -1000.0f, 0.0f}},
+    {"mod_17", {435.0f, 25.0f, 10.0f}},
+    {"Ship_Change", {0.0f, -1000.0f, 0.0f}},
+    {0},
 };
 
 EVT_BEGIN(dou_03_init_evt)

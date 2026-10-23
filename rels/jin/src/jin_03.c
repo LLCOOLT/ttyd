@@ -15,20 +15,20 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 
-__declspec(section ".data") u64 fd_jin_03_negone_one_374;
-__declspec(section ".data") s32 fd_jin_03_neg_one_382[1];
-__declspec(section ".data") s32 fd_jin_03___local_PI_383[1];
-__declspec(section ".data") s32 fd_jin_03___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_jin_03_one_negone_373;
-__declspec(section ".data") s32 fd_jin_03___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_jin_03_one_381[1];
-__declspec(section ".data") u64 fd_jin_03_negone_one_360;
-__declspec(section ".data") s32 fd_jin_03_neg_one_365[1];
-__declspec(section ".data") s32 fd_jin_03___local_PI_366[1];
-__declspec(section ".data") s32 fd_jin_03___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_jin_03_one_negone_359;
-__declspec(section ".data") s32 fd_jin_03___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_jin_03_one_364[1];
+__declspec(section ".data") f32 fd_jin_03_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_03_neg_one_382;
+__declspec(section ".data") f32 fd_jin_03___local_PI_383;
+__declspec(section ".data") f32 fd_jin_03___local_3PIO2_385;
+__declspec(section ".data") f32 fd_jin_03_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_03___local_PIO2_384;
+__declspec(section ".data") f32 fd_jin_03_one_381;
+__declspec(section ".data") f32 fd_jin_03_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_03_neg_one_365;
+__declspec(section ".data") f32 fd_jin_03___local_PI_366;
+__declspec(section ".data") f32 fd_jin_03___local_3PIO2_368;
+__declspec(section ".data") f32 fd_jin_03_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_03___local_PIO2_367;
+__declspec(section ".data") f32 fd_jin_03_one_364;
 static __declspec(section ".data") s32 n_close[12];
 static __declspec(section ".data") s32 n_open[12];
 static __declspec(section ".data") s32 s_close[12];
@@ -39,59 +39,39 @@ static __declspec(section ".data") s32 w2_close[12];
 static __declspec(section ".data") s32 w2_open[12];
 __declspec(section ".data") s32 w3_close[12];
 __declspec(section ".data") s32 w3_open[12];
-static s32 bero_entry_data[90];
+static BeroEntry bero_entry_data[6];
 s32 jin_03_kaidan_temae_kesu[13];
 s32 jin_03_kaidan_naka_kesu[13];
 s32 jin_03_kaidan_oku_kesu[13];
 s32 jin_03_init_evt[55];
 
-__declspec(section ".data") u64 fd_jin_03_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_jin_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_jin_03_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_jin_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_jin_03___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_jin_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_jin_03___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_jin_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_jin_03_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_jin_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_jin_03___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_jin_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_jin_03_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_jin_03_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_jin_03_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_jin_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_jin_03_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_jin_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_jin_03___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_jin_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_jin_03___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_jin_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_jin_03_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_jin_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_jin_03___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_jin_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_jin_03_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_jin_03_one_364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(n_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -153,19 +133,98 @@ __declspec(section ".data") EVT_BEGIN(w3_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"n_bero", 65538, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"jin_01", (s32)"s_bero_2", 327685, (s32)n_close, (s32)n_open, (s32)"s_bero",
-    65538, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"jin_02", (s32)"n_bero_2", 327685, (s32)s_close, (s32)s_open, (s32)"w_bero3", 65538,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"jin_00", (s32)"e_bero_3", 327685, (s32)w1_close, (s32)w1_open, (s32)"w_bero1", 65538, 20000,
-    100000, 0, 0, -1, 0, -1, 0, (s32)"jin_00",
-    (s32)"e_bero_1", 327685, (s32)w3_close, (s32)w3_open, (s32)"w_bero2", 65538, 20000, 100000,
-    0, 0, -1, 0, -1, 0, (s32)"jin_00", (s32)"e_bero_2",
-    327685, (s32)w2_close, (s32)w2_open, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "n_bero", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"jin_01", // nextMapName
+        "s_bero_2", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n_close, // enterAnimeArg
+        (s32)n_open, // exitAnimeArg
+    },
+    {
+        "s_bero", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"jin_02", // nextMapName
+        "n_bero_2", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s_close, // enterAnimeArg
+        (s32)s_open, // exitAnimeArg
+    },
+    {
+        "w_bero3", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"jin_00", // nextMapName
+        "e_bero_3", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w1_close, // enterAnimeArg
+        (s32)w1_open, // exitAnimeArg
+    },
+    {
+        "w_bero1", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"jin_00", // nextMapName
+        "e_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w3_close, // enterAnimeArg
+        (s32)w3_open, // exitAnimeArg
+    },
+    {
+        "w_bero2", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"jin_00", // nextMapName
+        "e_bero_2", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w2_close, // enterAnimeArg
+        (s32)w2_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(jin_03_kaidan_temae_kesu)

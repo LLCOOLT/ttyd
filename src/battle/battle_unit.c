@@ -102,9 +102,12 @@ typedef struct BtlHpGauge {
 
 
 s32 _enemy_can_use_item_table[] = {
-    0x80, 0x84, 0x8B, 0x81, 0x82, 0x83, 0x85, 0x90, 0x8A, 0x8C, 0x8D,
-    0x92, 0x93, 0x89, 0x8E, 0x8F, 0x86, 0x87, 0x88, 0x94, 0x95, 0x96,
-    0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0x00
+    ITEM_THUNDER_BOLT, ITEM_FIRE_FLOWER, ITEM_POW_BLOCK, ITEM_THUNDER_RAGE, ITEM_SHOOTING_STAR, ITEM_ICE_STORM,
+    ITEM_EARTH_QUAKE, ITEM_HP_DRAIN_ITEM, ITEM_SLEEPY_SHEEP, ITEM_STOPWATCH, ITEM_DIZZY_DIAL, ITEM_MINI_MR_MINI,
+    ITEM_MR_SOFTENER, ITEM_RUIN_POWDER, ITEM_POWER_PUNCH, ITEM_COURAGE_SHELL, ITEM_BOOS_SHEET, ITEM_VOLT_SHROOM,
+    ITEM_REPEL_CAPE, ITEM_MUSHROOM, ITEM_SUPER_SHROOM, ITEM_ULTRA_SHROOM, ITEM_LIFE_SHROOM, ITEM_DRIED_SHROOM,
+    ITEM_TASTY_TONIC, ITEM_HONEY_SYRUP, ITEM_MAPLE_SYRUP, ITEM_JAMMIN_JELLY, ITEM_SLOW_SHROOM, ITEM_GRADUAL_SYRUP,
+    ITEM_HOT_DOG, ITEM_CAKE, 0,
 };
 
 s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s16 pitch, Vec* pos);
@@ -124,9 +127,6 @@ BOOL BtlUnit_Init(void) { //TODO: force stmw/lmw, otherwise 1:1
     return TRUE;
 }
 
-#define SETUP_U8(s, o) (*(u8*)((u8*)(s) + (o)))
-#define SETUP_S32(s, o) (*(s32*)((u8*)(s) + (o)))
-#define SETUP_F32(s, o) (*(f32*)((u8*)(s) + (o)))
 #define UNIT_FIELD(u, T, o) (*(T*)((u8*)(u) + (o)))
 
 void BtlUnit_HpGaugeInit(BattleUnit* unit);
@@ -162,22 +162,22 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
     BattleStatusIconInit(unit);
     BattleStatusChangeInfoWorkInit(unit);
     unit->groupSetupId = -1;
-    unit->mAlliance = SETUP_U8(setup, 0x4);
+    unit->mAlliance = setup->alliance;
     unit->mLevel = unit->mKindParams->mLevel;
     if (unit->currentKind == 0xDE || (unit->currentKind >= 0xE0 && unit->currentKind < 0xE7)) {
         unit->mLevel = pouchGetPtr()->level;
     }
-    unit->attackPhase = SETUP_S32(setup, 0x8);
+    unit->attackPhase = setup->attackPhase;
     unit->unisonPhaseEventCode = NULL;
     unit->phaseEventCode = NULL;
     unit->phaseEventId = 0;
     unit->waitEventCode = NULL;
     unit->waitEventId = 0;
-    UNIT_FIELD(unit, s32, BUOFF(0x29C)) = 0;
+    unit->attackEventCode = NULL;
     unit->attackEventId = 0;
-    BtlUnit_SetPos(unit, SETUP_F32(setup, 0xC), SETUP_F32(setup, 0x10), SETUP_F32(setup, 0x14));
-    BtlUnit_SetOffsetPos(unit, SETUP_F32(setup, 0xC), SETUP_F32(setup, 0x10), SETUP_F32(setup, 0x14));
-    BtlUnit_SetHomePos(unit, SETUP_F32(setup, 0xC), SETUP_F32(setup, 0x10), SETUP_F32(setup, 0x14));
+    BtlUnit_SetPos(unit, setup->position.x, setup->position.y, setup->position.z);
+    BtlUnit_SetOffsetPos(unit, setup->position.x, setup->position.y, setup->position.z);
+    BtlUnit_SetHomePos(unit, setup->position.x, setup->position.y, setup->position.z);
     BtlUnit_SetBaseRotate(unit, 0.0f, 0.0f, 0.0f);
     BtlUnit_SetRotate(unit, 0.0f, 0.0f, 0.0f);
     BtlUnit_SetRotateOffset(unit, 0.0f, 0.0f, 0.0f);
@@ -216,10 +216,10 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
     unit->movesRemaining = 1;
     unit->moveDirection = 0;
     unit->faceDirection = wp->alliances[unit->mAlliance].attackDirection;
-    unit->work[0] = SETUP_S32(setup, 0x1C);
-    unit->work[1] = SETUP_S32(setup, 0x20);
-    unit->work[2] = SETUP_S32(setup, 0x24);
-    unit->work[3] = SETUP_S32(setup, 0x28);
+    unit->work[0] = setup->unitWork[0];
+    unit->work[1] = setup->unitWork[1];
+    unit->work[2] = setup->unitWork[2];
+    unit->work[3] = setup->unitWork[3];
 
     n = (u8)unit->mKindParams->numParts;
     part = (BattleUnitPart*)BattleAlloc(n * sizeof(BattleUnitPart));
@@ -232,7 +232,7 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
         part->attributes = part->mKindPartParams->attributes;
         part->counterAttributes = part->mKindPartParams->counterAttributes;
         if (part->attributes & 1) {
-            UNIT_TALK_PART(unit) = part->mKindPartParams->partNum;
+            unit->unk2D0 = part->mKindPartParams->partNum;
         }
         part->defense = part->mKindPartParams->defense;
         part->defenseAttr = part->mKindPartParams->defenseAttr;
@@ -263,7 +263,7 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
         part->mHitCursorOffset.y = 0.0f;
         part->mHitCursorOffset.z = 0.0f;
         part->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
-        part->hitOffsetX = SETUP_S32(setup, 0x18);
+        part->hitOffsetX = setup->hitOffsetX;
         part->poseTable = kpart->poseTable;
         part->poseId = -1;
         part->poseName[0] = 0;
@@ -352,9 +352,9 @@ BOOL BtlUnit_Delete(BattleUnit* unit) {
             BattleFree(unit->countersetWeapon);
         }
     }
-    if (UNIT_FIELD(unit, void*, BUOFF(0x318))) {
-        smartFree(UNIT_FIELD(unit, smartEntry*, BUOFF(0x318)));
-        UNIT_FIELD(unit, void*, BUOFF(0x318)) = NULL;
+    if ((void*)unit->unk318) {
+        smartFree(unit->unk318);
+        unit->unk318 = NULL;
     }
     for (part = unit->mParts; part; part = part->mNextPart) {
         if (part->field_0x4E8 != -1) {
@@ -1539,12 +1539,12 @@ void BtlUnit_SetBodyAnim(BattleUnit* unit, const char* name) {
 
 void BtlUnit_ChangeTalkAnim(s32 unitId) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, unitId);
-    btlDispChangeAnime(BtlUnit_GetPartsPtr(unit, UNIT_TALK_PART(unit)), UNIT_TALK_ANIM(unit), 0);
+    btlDispChangeAnime(BtlUnit_GetPartsPtr(unit, unit->unk2D0), UNIT_TALK_ANIM(unit), 0);
 }
 
 void BtlUnit_ChangeStayAnim(s32 unitId) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, unitId);
-    btlDispChangeAnime(BtlUnit_GetPartsPtr(unit, UNIT_TALK_PART(unit)), UNIT_STAY_ANIM(unit), 0);
+    btlDispChangeAnime(BtlUnit_GetPartsPtr(unit, unit->unk2D0), UNIT_STAY_ANIM(unit), 0);
 }
 
 void BtlUnit_GetTalkTogePos(s32 unitId, f32* x, f32* y, f32* z) {
@@ -2110,24 +2110,24 @@ void BtlUnit_ControlPoseSoundMain(BattleUnitPart* part) {
     if (!pose) {
         return;
     }
-    time = POSE_TIME(pose) / 60.0f;
-    if (state->loopCount > (u32)POSE_LOOP(pose)) {
+    time = pose->localFrame / 60.0f;
+    if (state->loopCount > (u32)pose->loopTime) {
         state->time = time;
         state->prevTime = -1.0f;
-        state->loopCount = (s32)POSE_LOOP(pose);
+        state->loopCount = (s32)pose->loopTime;
         state->count = 0;
         if (BattleGetSeq(wp, 4) == 0x4000002 || BattleGetSeq(wp, 4) == 0x4000004) {
             state->flag = 1;
         }
     }
-    else if (state->loopCount == (u32)POSE_LOOP(pose) && state->time > time) {
+    else if (state->loopCount == (u32)pose->loopTime && state->time > time) {
         state->time = time;
         state->prevTime = -1.0f;
     }
-    else if (state->loopCount < (u32)POSE_LOOP(pose)) {
+    else if (state->loopCount < (u32)pose->loopTime) {
         state->time = time;
         state->prevTime = -1.0f;
-        state->loopCount = (s32)POSE_LOOP(pose);
+        state->loopCount = (s32)pose->loopTime;
     }
     else {
         state->prevTime = state->time;

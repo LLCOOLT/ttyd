@@ -23,6 +23,7 @@
 #include "battle/sac/sac_common.h"
 #include "party/party_motion.h"
 #include "battle/sac/sac_bakugame.h"
+#include "battle/battle_database_common.h"
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 size);
 EffectEntry* effSandarsEntry(s32 type, f32 x, f32 y, f32 z, f32 w);
@@ -186,13 +187,45 @@ void bakuGameDisp2D(CameraId cam, void* param);
 void bakuGameDisp3D(CameraId cam, void* param);
 void bakuGameDispStar(CameraId cam, void* param);
 
-static s32 weapon[] = {
-    (s32)"btl_wn_sac_bakugame", ICON_198 << 16, 0, (s32)"msg_bakugame", 1677722112, 1065353216, 17130546, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34603104, 536870912, 770, (s32)"msg_sac_3", 131208, 2047, 0,
-    25601, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)marioAttackEvent_BakuGame, 100, 0, 0,
+static BattleWeapon weapon = {
+    "btl_wn_sac_bakugame", // name
+    ICON_198, // icon
+    {0}, // field_0x6
+    0, // itemId
+    "msg_bakugame", // description
+    100, // baseAccuracy
+    0, // baseFpCost
+    2, // baseSpCost
+    0, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    5, // field_0x19
+    100, // mBingoSlotChance
+    50, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2100060, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    "msg_sac_3", // acHelpMsg
+    0x20088, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, // targetWeightFlags..sleepTime
+    100, // stopChance
+    1, // stopTime
+    0, 0, 0, 0, 0, 0, 0, 0, // dizzyChance..electricChance
+    0, 0, 0, 0, 0, 0, 0, 0, // electricTime..sizeChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeTime..defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    marioAttackEvent_BakuGame, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 BakuWork* GetBakuGamePtr(void) {
@@ -294,7 +327,7 @@ s32 bakuGameDecideWeapon(EventEntry *event, BOOL isFirstCall)
 
   wp = (BattleWeapon *) w->weapon;
   q = &wp->sleepChance;
-  memcpy(w->weapon, weapon, 0xC0);
+  memcpy(w->weapon, &weapon, 0xC0);
 
   q[2] = 100;
   if (v != (-1))
@@ -365,7 +398,7 @@ USER_FUNC(bakuGameMain) {
             b->hp = 100.0f;
             b->scale = 0.0f;
         }
-        memcpy(w->weapon, weapon, 0xC0);
+        memcpy(w->weapon, &weapon, 0xC0);
         flag = 1;
         for (i = 0; i < 64; i++) {
             u = BattleGetUnitPtr(bw, i);
@@ -1415,23 +1448,58 @@ void bakuGameDisp3D(CameraId cam, void* param) {
 void bakuGameDispStar(CameraId cam, void* param) {
 }
 
-s32 marioAttackEvent_BakuGame[] = {
-    65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost, -2, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2,
-    -30000000, 131163, (s32)btlevtcmd_WeaponAftereffect, -30000000, 65627, (s32)btlevtcmd_reset_move_color_lv_all, 65627, (s32)init_bakugame,
-    110, 65627, (s32)main_star, 112, 65630, (s32)sac_start_camera_evt, 65546, 500,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START1", -250000000, 0, -250000000, 65630,
-    (s32)sac_mario_item_on_evt, 65546, 500, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START2", -250000000,
-    0, -29999989, 65627, (s32)star_stone_appear, 110, 65630, (s32)sac_start_stardust, 112,
-    65545, 100, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START3", -250000000, 0,
-    -250000000, 131163, (s32)evt_snd_sfxoff, -29999989, 196699, (s32)evt_btl_camera_set_mode, 0, 0,
-    65545, 40, 65630, (s32)sac_mario_item_on_end_evt, 65630, (s32)sac_mario_back_home, 65627, (s32)bakuGameBombEntry,
-    65627, (s32)sac_ac_help_on, 262235, (s32)bakuGameMain, -30000000, -29999999, -29999998, 65627,
-    (s32)sac_ac_help_off, 65627, (s32)end_bakugame, 107, 65627, (s32)bakuGameHeihoReturn, 109, 262235,
-    (s32)bakuGameDecideWeapon, -29999999, -29999998, -29999991, 65545, 5, 65570, -30000000,
-    65572, 0, 65630, (s32)hitCheck_MarioTeam, 46, 65572, 1, 65630,
-    (s32)hitCheck_EnemyTeam, 46, 65572, 2, 65630, (s32)hitCheck_AudienceTeam, 46, 49,
-    65539, 99, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+EVT_BEGIN(marioAttackEvent_BakuGame)
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_CommandPayWeaponCost, -2)
+    CALL(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+    CALL(btlevtcmd_WeaponAftereffect, LW(0))
+    CALL(btlevtcmd_reset_move_color_lv_all)
+    CALL(init_bakugame)
+    BEGIN_SIBLING_EVENT
+        CALL(main_star)
+    END_SIBLING_EVENT
+    CALL_CHILD(sac_start_camera_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START1"), -250000000, 0, -250000000)
+    CALL_CHILD(sac_mario_item_on_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START2"), -250000000, 0, LW(11))
+    CALL(star_stone_appear)
+    BEGIN_SIBLING_EVENT
+        CALL_CHILD(sac_start_stardust)
+    END_SIBLING_EVENT
+    WAIT_FRAMES(100)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START3"), -250000000, 0, -250000000)
+    CALL(evt_snd_sfxoff, LW(11))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_FRAMES(40)
+    CALL_CHILD(sac_mario_item_on_end_evt)
+    CALL_CHILD(sac_mario_back_home)
+    CALL(bakuGameBombEntry)
+    CALL(sac_ac_help_on)
+    CALL(bakuGameMain, LW(0), LW(1), LW(2))
+    CALL(sac_ac_help_off)
+    CALL(end_bakugame)
+    BEGIN_INLINE_EVENT
+        CALL(bakuGameHeihoReturn)
+    END_INLINE_EVENT
+    CALL(bakuGameDecideWeapon, LW(1), LW(2), LW(9))
+    WAIT_FRAMES(5)
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CALL_CHILD(hitCheck_MarioTeam)
+        CASE_END
+        CASE_EQUAL(1)
+        CALL_CHILD(hitCheck_EnemyTeam)
+        CASE_END
+        CASE_EQUAL(2)
+        CALL_CHILD(hitCheck_AudienceTeam)
+        CASE_END
+    END_SWITCH
+    LABEL(99)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(hitCheck_MarioTeam)
     CALL(btlevtcmd_GetUnitId, -4, LW(3))

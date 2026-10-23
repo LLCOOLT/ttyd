@@ -9,6 +9,7 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_npc.h"
 #include "rsh.h"
+#include "mario/mario_pouch.h"
 
 USER_FUNC(evt_bero_get_entername);
 USER_FUNC(evt_bero_get_info);
@@ -72,26 +73,26 @@ USER_FUNC(evt_mario_adjust_dir);
 USER_FUNC(evt_mario_get_dispdir);
 #endif
 
-__declspec(section ".data") u64 fd_rsh_04_negone_one_374;
-__declspec(section ".data") s32 fd_rsh_04_neg_one_382[1];
-__declspec(section ".data") s32 fd_rsh_04___local_PI_383[1];
-__declspec(section ".data") s32 fd_rsh_04___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_rsh_04_one_negone_373;
-__declspec(section ".data") s32 fd_rsh_04___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_rsh_04_one_381[1];
-__declspec(section ".data") u64 fd_rsh_04_negone_one_360;
-__declspec(section ".data") s32 fd_rsh_04_neg_one_365[1];
-__declspec(section ".data") s32 fd_rsh_04___local_PI_366[1];
-__declspec(section ".data") s32 fd_rsh_04___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_rsh_04_one_negone_359;
-__declspec(section ".data") s32 fd_rsh_04___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_rsh_04_one_364[1];
-static s32 bero_data_a[45];
-static s32 bero_data_b[45];
-static s32 bero_data_c[45];
-static __declspec(section ".data") s32 door_3[7];
-static __declspec(section ".data") s32 door_4[7];
-static __declspec(section ".data") s32 door_5[7];
+__declspec(section ".data") f32 fd_rsh_04_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_04_neg_one_382;
+__declspec(section ".data") f32 fd_rsh_04___local_PI_383;
+__declspec(section ".data") f32 fd_rsh_04___local_3PIO2_385;
+__declspec(section ".data") f32 fd_rsh_04_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_04___local_PIO2_384;
+__declspec(section ".data") f32 fd_rsh_04_one_381;
+__declspec(section ".data") f32 fd_rsh_04_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_04_neg_one_365;
+__declspec(section ".data") f32 fd_rsh_04___local_PI_366;
+__declspec(section ".data") f32 fd_rsh_04___local_3PIO2_368;
+__declspec(section ".data") f32 fd_rsh_04_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_04___local_PIO2_367;
+__declspec(section ".data") f32 fd_rsh_04_one_364;
+static BeroEntry bero_data_a[3];
+static BeroEntry bero_data_b[3];
+static BeroEntry bero_data_c[3];
+static __declspec(section ".data") const char* door_3[7];
+static __declspec(section ".data") const char* door_4[7];
+static __declspec(section ".data") const char* door_5[7];
 #ifdef VERSION_G8ME01
 s32 evt_rsh_konarikin_irai_party_talk[89];
 #else
@@ -139,9 +140,12 @@ static s32 talk_konari[219];
 s32 talk_powan_repeat[43];
 static s32 init_powan[64];
 static s32 talk_powan[204];
-static s32 npc_data[161];
+static NpcSetupInfo npc_data[7];
 s32 evt_tana_5[50];
-static s32 access_tbl[13];
+/* shelf access table read by READ_INT4: hit, msg, event, second msg; a NULL hit ends it */
+typedef struct ShelfAccess { const char* hit; const char* msg; s32* evt; const char* msg2; } ShelfAccess;
+typedef struct ShelfAccessTbl3 { ShelfAccess rows[3]; const char* end[1]; } ShelfAccessTbl3;
+static ShelfAccessTbl3 access_tbl;
 static s32 evt_access[32];
 static s32 evt_access_entry[25];
 static s32 evt_door_msg[102];
@@ -154,101 +158,192 @@ s32 rsh_04_init_evt[201];
 #endif
 s32 rsh_04_a_init_evt[96];
 s32 rsh_04_b_init_evt[44];
-static __declspec(section ".data") s32 window_tbl[4];
+static __declspec(section ".data") const char* window_tbl[4];
 s32 rsh_04_c_init_evt[67];
-static s32 bero_data_a_return[45];
-static s32 bero_data_b_return[45];
-static s32 bero_data_c_return[45];
+static BeroEntry bero_data_a_return[3];
+static BeroEntry bero_data_b_return[3];
+static BeroEntry bero_data_c_return[3];
 s32 rsh_04_init_evt_nidome[149];
 s32 rsh_04_a_init_evt_nidome[28];
 s32 rsh_04_b_init_evt_nidome[28];
 s32 rsh_04_c_init_evt_nidome[38];
 
-__declspec(section ".data") u64 fd_rsh_04_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_rsh_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_rsh_04_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_rsh_04_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_rsh_04___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_rsh_04___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_rsh_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_rsh_04___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_rsh_04_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_rsh_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_rsh_04_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_rsh_04___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_rsh_04___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_rsh_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_rsh_04___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_rsh_04_one_364 = 1.0f;
+
+static BeroEntry bero_data_a[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_05_a", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"w_door_close", // enterAnimeArg
+        (s32)"w_door_open", // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_03_a", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"e_door_close", // enterAnimeArg
+        (s32)"e_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
-__declspec(section ".data") s32 fd_rsh_04___local_PI_383[] = {
-    1078530011,
+static BeroEntry bero_data_b[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_05_a", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"w_door_close", // enterAnimeArg
+        (s32)"w_door_open", // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_03_b", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"e_door_close", // enterAnimeArg
+        (s32)"e_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
-__declspec(section ".data") s32 fd_rsh_04___local_3PIO2_385[] = {
-    1083624420,
+static BeroEntry bero_data_c[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_05_a", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"w_door_close", // enterAnimeArg
+        (s32)"w_door_open", // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_03_c", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"e_door_close", // enterAnimeArg
+        (s32)"e_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
-__declspec(section ".data") u64 fd_rsh_04_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_rsh_04___local_PIO2_384[] = {
-    1070141403,
+static __declspec(section ".data") const char* door_3[] = {
+    "heya_3",
+    "haikei_3",
+    "tobira_3",
+    "a_tobira_3",
+    "3_door_open",
+    "a_tobira_3_heya",
+    "3_door_close",
 };
 
-__declspec(section ".data") s32 fd_rsh_04_one_381[] = {
-    1065353216,
+static __declspec(section ".data") const char* door_4[] = {
+    "heya_4",
+    "haikei_4",
+    "tobira_4",
+    "a_tobira_4",
+    "4_door_open",
+    "a_tobira_4_heya",
+    "4_door_close",
 };
 
-__declspec(section ".data") u64 fd_rsh_04_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_rsh_04_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_rsh_04___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_rsh_04___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_rsh_04_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_rsh_04___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_rsh_04_one_364[] = {
-    1065353216,
-};
-
-static s32 bero_data_a[] = {
-    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_05_a", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", (s32)"e_bero",
-    65544, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"rsh_03_a", (s32)"w_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
-};
-
-static s32 bero_data_b[] = {
-    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_05_a", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", (s32)"e_bero",
-    65544, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"rsh_03_b", (s32)"w_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
-};
-
-static s32 bero_data_c[] = {
-    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_05_a", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", (s32)"e_bero",
-    65544, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"rsh_03_c", (s32)"w_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
-};
-
-static __declspec(section ".data") s32 door_3[] = {
-    (s32)"heya_3", (s32)"haikei_3", (s32)"tobira_3", (s32)"a_tobira_3", (s32)"3_door_open", (s32)"a_tobira_3_heya", (s32)"3_door_close",
-};
-
-static __declspec(section ".data") s32 door_4[] = {
-    (s32)"heya_4", (s32)"haikei_4", (s32)"tobira_4", (s32)"a_tobira_4", (s32)"4_door_open", (s32)"a_tobira_4_heya", (s32)"4_door_close",
-};
-
-static __declspec(section ".data") s32 door_5[] = {
-    (s32)"heya_5", (s32)"haikei_5", (s32)"tobira_5", (s32)"a_tobira_5", (s32)"5_door_open", (s32)"a_tobira_5_heya", (s32)"5_door_close",
+static __declspec(section ".data") const char* door_5[] = {
+    "heya_5",
+    "haikei_5",
+    "tobira_5",
+    "a_tobira_5",
+    "5_door_open",
+    "a_tobira_5_heya",
+    "5_door_close",
 };
 
 EVT_BEGIN(evt_rsh_konarikin_irai_party_talk)
@@ -434,56 +529,108 @@ EVT_BEGIN(evt_shorui_funshitu)
     RETURN
 EVT_END()
 #else
-s32 evt_shorui_funshitu[] = {
-    196699, (s32)evt_snd_bgmon, 512, (s32)"BGM_EVT_POWAN1", 589915, (s32)evt_cam3d_evt_set, 220, 130,
-    250, 220, 55, -180, 500, 11, 107, 131163,
-    (s32)evt_mario_get_party, -30000000, 131097, -30000000, 0, 327771, (s32)evt_party_move_pos, 0,
-    255, -150, 500, 196699, (s32)evt_party_set_dir_npc, 0, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 33,
-    109, 262235, (s32)evt_mario_mov_pos, 260, -135, 500, 131163, (s32)evt_mario_set_dir_npc,
-    (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 196699, (s32)evt_set_dir_to_target, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", (s32)"mario", 196699, (s32)evt_set_dir_to_target, (s32)"me",
-    (s32)"mario", 262235, (s32)evt_npc_status_onoff, 1, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 2, 327771, (s32)evt_msg_print,
-    0, (s32)"stg6_rsh_167", 0, (s32)"me", 196699, (s32)evt_set_dir_to_target, (s32)"me", (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93",
-    65546, 500, 131163, (s32)evt_mario_set_dir_npc, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", 327771, (s32)evt_msg_print, 0,
-    (s32)"stg6_rsh_168", 0, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", 65546, 500, 327771, (s32)evt_msg_print, 0,
-    (s32)"stg6_rsh_168_01", 0, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 65546, 500, 327771, (s32)evt_msg_print, 0,
-    (s32)"stg6_rsh_168_02", 0, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", 65546, 500, 131165, (s32)evt_mario_chuumoku, -29999990,
-    131165, (s32)evt_party_chuumoku, -29999989, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 32,
-    131122, -90000000, 0, 107, 65546, 2000, 262235, (s32)evt_npc_flag_onoff,
-    0, (s32)"me", 512, 327771, (s32)evt_msg_print, 0, (s32)"stg6_rsh_169_00", 0,
-    0, 262235, (s32)evt_npc_flag_onoff, 1, (s32)"me", 512, 131122, -90000000,
-    1, 109, 458843, (s32)evt_npc_move_position, (s32)"me", 220, -125, 0,
-    -229969280, 0, 458843, (s32)evt_npc_move_position, (s32)"me", 210, -115, 0,
-    -229969280, 0, 458843, (s32)evt_npc_move_position, (s32)"me", 180, -110, 0,
-    -229969280, 0, 65541, 0, 131096, -90000000, 1, 7,
-    33, 65545, 1, 6, 65546, 500, 131122, -90000000,
-    0, 107, 65546, 2000, 262235, (s32)evt_npc_flag_onoff, 0, (s32)"me",
-    512, 327771, (s32)evt_msg_print, 0, (s32)"stg6_rsh_169_01", 0, 0, 262235,
-    (s32)evt_npc_flag_onoff, 1, (s32)"me", 512, 131122, -90000000, 1, 109,
-    458843, (s32)evt_npc_move_position, (s32)"me", 270, -100, 0, -229969280, 0,
-    65541, 0, 131096, -90000000, 1, 7, 33, 65545,
-    1, 6, 131122, -90000000, 0, 107, 65546, 2000,
-    262235, (s32)evt_npc_flag_onoff, 0, (s32)"me", 512, 327771, (s32)evt_msg_print, 0,
-    (s32)"stg6_rsh_169_02", 0, 0, 262235, (s32)evt_npc_flag_onoff, 1, (s32)"me", 512,
-    131122, -90000000, 1, 109, 458843, (s32)evt_npc_move_position, (s32)"me", 290,
-    -140, 0, -229969280, 0, 458843, (s32)evt_npc_move_position, (s32)"me", 280,
-    -170, 0, -229969280, 0, 458843, (s32)evt_npc_move_position, (s32)"me", 250,
-    -200, 0, -229969280, 0, 65541, 0, 131096, -90000000,
-    1, 7, 33, 65545, 1, 6, 458843, (s32)evt_npc_move_position,
-    (s32)"me", 230, -180, 0, -229969280, 0, 65546, 2000,
-    589915, (s32)evt_cam3d_evt_set, 225, 71, 17, 225, 35, -180,
-    200, 11, 107, 196699, (s32)evt_env_blur_on, 0, 500, 109,
-    327771, (s32)evt_msg_print, 0, (s32)"stg6_rsh_169_03", 0, 0, 589915, (s32)evt_cam3d_evt_set,
-    225, 93, 115, 225, 40, -180, 500, 11,
-    196699, (s32)evt_set_dir_to_target, (s32)"me", (s32)"mario", 65546, 500, 327771, (s32)evt_msg_print,
-    0, (s32)"stg6_rsh_169_04", 0, 0, 196699, (s32)evt_cam3d_evt_off, 500, 11,
-    65631, -29999990, 65631, -29999989, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3",
-    32, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", -2147483648, 262235, (s32)evt_npc_flag_onoff,
-    0, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", -2147483648, 131122, -170000000, 304, 2, 1,
-};
+EVT_BEGIN(evt_shorui_funshitu)
+    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_POWAN1"))
+    CALL(evt_cam3d_evt_set, 220, 130, 250, 220, 55, -180, 500, 11)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_get_party, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(evt_party_move_pos, 0, 255, -150, 500)
+            CALL(evt_party_set_dir_npc, 0, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"))
+        END_IF
+    END_INLINE_EVENT
+    CALL(evt_mario_mov_pos, 260, -135, 500)
+    CALL(evt_mario_set_dir_npc, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"))
+    CALL(evt_set_dir_to_target, STRING(/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93"), STRING("mario"))
+    CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
+    CALL(evt_npc_status_onoff, 1, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), 2)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_167"), 0, STRING("me"))
+    CALL(evt_set_dir_to_target, STRING("me"), STRING(/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93"))
+    WAIT_MS(500)
+    CALL(evt_mario_set_dir_npc, STRING(/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_168"), 0, STRING(/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93"))
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_168_01"), 0, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"))
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_168_02"), 0, STRING(/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93"))
+    WAIT_MS(500)
+    SPAWN_EVENT_GET_ID(PTR(evt_mario_chuumoku), LW(10))
+    SPAWN_EVENT_GET_ID(PTR(evt_party_chuumoku), LW(11))
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), 32)
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(2000)
+        CALL(evt_npc_flag_onoff, 0, STRING("me"), 512)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_169_00"), 0, 0)
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), 512)
+        SET_VALUE(GF(0), 1)
+    END_INLINE_EVENT
+    CALL(evt_npc_move_position, STRING("me"), 220, -125, 0, FLOAT(30.0f), 0)
+    CALL(evt_npc_move_position, STRING("me"), 210, -115, 0, FLOAT(30.0f), 0)
+    CALL(evt_npc_move_position, STRING("me"), 180, -110, 0, FLOAT(30.0f), 0)
+    LOOP(0)
+        IF_INT_EQUAL(GF(0), 1)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_MS(500)
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(2000)
+        CALL(evt_npc_flag_onoff, 0, STRING("me"), 512)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_169_01"), 0, 0)
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), 512)
+        SET_VALUE(GF(0), 1)
+    END_INLINE_EVENT
+    CALL(evt_npc_move_position, STRING("me"), 270, -100, 0, FLOAT(30.0f), 0)
+    LOOP(0)
+        IF_INT_EQUAL(GF(0), 1)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(2000)
+        CALL(evt_npc_flag_onoff, 0, STRING("me"), 512)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_169_02"), 0, 0)
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), 512)
+        SET_VALUE(GF(0), 1)
+    END_INLINE_EVENT
+    CALL(evt_npc_move_position, STRING("me"), 290, -140, 0, FLOAT(30.0f), 0)
+    CALL(evt_npc_move_position, STRING("me"), 280, -170, 0, FLOAT(30.0f), 0)
+    CALL(evt_npc_move_position, STRING("me"), 250, -200, 0, FLOAT(30.0f), 0)
+    LOOP(0)
+        IF_INT_EQUAL(GF(0), 1)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_npc_move_position, STRING("me"), 230, -180, 0, FLOAT(30.0f), 0)
+    WAIT_MS(2000)
+    CALL(evt_cam3d_evt_set, 225, 71, 17, 225, 35, -180, 200, 11)
+    BEGIN_INLINE_EVENT
+        CALL(evt_env_blur_on, 0, 500)
+    END_INLINE_EVENT
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_169_03"), 0, 0)
+    CALL(evt_cam3d_evt_set, 225, 93, 115, 225, 40, -180, 500, 11)
+    CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_169_04"), 0, 0)
+    CALL(evt_cam3d_evt_off, 500, 11)
+    DELETE_EVENT(LW(10))
+    DELETE_EVENT(LW(11))
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), 32)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), -2147483648)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93"), -2147483648)
+    SET_VALUE(GSW(0), 304)
+    RETURN
+EVT_END()
 #endif
 
 static __declspec(section ".data") s32 item_tbl[] = {
-    80, -1,
+    ITEM_VITAL_PAPER, -1,
 };
 
 EVT_BEGIN(evt_daijisouna_kami)
@@ -578,7 +725,7 @@ static EVT_BEGIN(init_syashou)
 EVT_END()
 
 static __declspec(section ".data") s32 item_tbl2[] = {
-    79, -1,
+    ITEM_BLANKET, -1,
 };
 
 static EVT_BEGIN(talk_syashou)
@@ -727,14 +874,20 @@ EVT_BEGIN(talk_sarary_repeat)
     RETURN
 EVT_END()
 #else
-s32 talk_sarary_repeat[] = {
-    262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", -2147483648, 327771, (s32)evt_npc_get_position, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93",
-    -30000000, -29999999, -29999998, 196699, (s32)evt_npc_get_height, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", -29999997, 131125,
-    -30000000, -5, 131125, -29999999, -29999997, 131125, -29999999, 10,
-    327771, (s32)evt_msg_toge, 2, -30000000, -29999999, -29999998, 327771, (s32)evt_msg_print,
-    0, (s32)"stg6_rsh_165_01", 0, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", 65541, 0, 65627, (s32)evt_msg_repeat,
-    6, 2, 1,
-};
+EVT_BEGIN(talk_sarary_repeat)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93"), -2147483648)
+    CALL(evt_npc_get_position, STRING(/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_height, STRING(/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93"), LW(3))
+    ADD(LW(0), -5)
+    ADD(LW(1), LW(3))
+    ADD(LW(1), 10)
+    CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_165_01"), 0, STRING(/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93"))
+    LOOP(0)
+        CALL(evt_msg_repeat)
+    END_LOOP
+    RETURN
+EVT_END()
 #endif
 
 static EVT_BEGIN(init_sarary)
@@ -843,13 +996,19 @@ EVT_BEGIN(talk_papa_repeat)
     RETURN
 EVT_END()
 #else
-s32 talk_papa_repeat[] = {
-    262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70", -2147483648, 327771, (s32)evt_npc_get_position, (s32)/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70",
-    -30000000, -29999999, -29999998, 196699, (s32)evt_npc_get_height, (s32)/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70", -29999997, 131125,
-    -29999999, -29999997, 131125, -29999999, 15, 327771, (s32)evt_msg_toge, 2,
-    -30000000, -29999999, -29999998, 327771, (s32)evt_msg_print, 0, (s32)"stg6_rsh_85_01", 0,
-    (s32)/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70", 65541, 0, 65627, (s32)evt_msg_repeat, 6, 2, 1,
-};
+EVT_BEGIN(talk_papa_repeat)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70"), -2147483648)
+    CALL(evt_npc_get_position, STRING(/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_height, STRING(/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70"), LW(3))
+    ADD(LW(1), LW(3))
+    ADD(LW(1), 15)
+    CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_85_01"), 0, STRING(/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70"))
+    LOOP(0)
+        CALL(evt_msg_repeat)
+    END_LOOP
+    RETURN
+EVT_END()
 #endif
 
 static EVT_BEGIN(init_papa)
@@ -901,13 +1060,19 @@ EVT_BEGIN(talk_mama_repeat)
     RETURN
 EVT_END()
 #else
-s32 talk_mama_repeat[] = {
-    262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D", -2147483648, 327771, (s32)evt_npc_get_position, (s32)/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D",
-    -30000000, -29999999, -29999998, 196699, (s32)evt_npc_get_height, (s32)/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D", -29999997, 131125,
-    -29999999, -29999997, 131125, -29999999, 10, 327771, (s32)evt_msg_toge, 2,
-    -30000000, -29999999, -29999998, 327771, (s32)evt_msg_print, 0, (s32)"stg6_rsh_85_02", 0,
-    (s32)/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D", 65541, 0, 65627, (s32)evt_msg_repeat, 6, 2, 1,
-};
+EVT_BEGIN(talk_mama_repeat)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D"), -2147483648)
+    CALL(evt_npc_get_position, STRING(/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_height, STRING(/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D"), LW(3))
+    ADD(LW(1), LW(3))
+    ADD(LW(1), 10)
+    CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_85_02"), 0, STRING(/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D"))
+    LOOP(0)
+        CALL(evt_msg_repeat)
+    END_LOOP
+    RETURN
+EVT_END()
 #endif
 
 static EVT_BEGIN(init_mama)
@@ -961,7 +1126,7 @@ static EVT_BEGIN(init_konari)
 EVT_END()
 
 __declspec(section ".data") s32 item_tbl3[] = {
-    77, -1,
+    ITEM_AUTOGRAPH, -1,
 };
 
 static EVT_BEGIN(talk_konari)
@@ -1065,14 +1230,20 @@ EVT_BEGIN(talk_powan_repeat)
     RETURN
 EVT_END()
 #else
-s32 talk_powan_repeat[] = {
-    262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", -2147483648, 327771, (s32)evt_npc_get_position, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3",
-    -30000000, -29999999, -29999998, 196699, (s32)evt_npc_get_height, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", -29999997, 131125,
-    -30000000, 15, 131125, -29999999, -29999997, 131126, -29999999, 4,
-    327771, (s32)evt_msg_toge, 2, -30000000, -29999999, -29999998, 327771, (s32)evt_msg_print,
-    0, (s32)"stg6_rsh_165_02", 0, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 65541, 0, 65627, (s32)evt_msg_repeat,
-    6, 2, 1,
-};
+EVT_BEGIN(talk_powan_repeat)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), -2147483648)
+    CALL(evt_npc_get_position, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_height, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), LW(3))
+    ADD(LW(0), 15)
+    ADD(LW(1), LW(3))
+    SUBTRACT(LW(1), 4)
+    CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_165_02"), 0, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"))
+    LOOP(0)
+        CALL(evt_msg_repeat)
+    END_LOOP
+    RETURN
+EVT_END()
 #endif
 
 static EVT_BEGIN(init_powan)
@@ -1152,28 +1323,80 @@ static EVT_BEGIN(talk_powan)
     RETURN
 EVT_END()
 
-static s32 npc_data[] = {
-    (s32)/*"車掌"*/"\x8E\xD4\x8F\xB6", 1073874448, 0, (s32)init_syashou, 0, (s32)talk_syashou, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93",
-    1073874448, 0, (s32)init_sarary, 0, (s32)talk_sarary, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70", 1073874448,
-    0, (s32)init_papa, 0, (s32)talk_papa, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D", 1073874448, 0,
-    (s32)init_mama, 0, (s32)talk_mama, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"コナリキン"*/"\x83\x52\x83\x69\x83\x8A\x83\x4C\x83\x93", 1073874448, 0, (s32)init_konari,
-    0, (s32)talk_konari, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 1073874448, 0, (s32)init_powan, 0,
-    (s32)talk_powan, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0,
+static NpcSetupInfo npc_data[] = {
+    {
+        /*"車掌"*/"\x8E\xD4\x8F\xB6", // name
+        0x40020610, // flags
+        0, // reactionFlags
+        init_syashou, // initEvent
+        NULL, // regularEvent
+        talk_syashou, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", // name
+        0x40020610, // flags
+        0, // reactionFlags
+        init_sarary, // initEvent
+        NULL, // regularEvent
+        talk_sarary, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70", // name
+        0x40020610, // flags
+        0, // reactionFlags
+        init_papa, // initEvent
+        NULL, // regularEvent
+        talk_papa, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ナリキンママ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x7D\x83\x7D", // name
+        0x40020610, // flags
+        0, // reactionFlags
+        init_mama, // initEvent
+        NULL, // regularEvent
+        talk_mama, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"コナリキン"*/"\x83\x52\x83\x69\x83\x8A\x83\x4C\x83\x93", // name
+        0x40020610, // flags
+        0, // reactionFlags
+        init_konari, // initEvent
+        NULL, // regularEvent
+        talk_konari, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", // name
+        0x40020610, // flags
+        0, // reactionFlags
+        init_powan, // initEvent
+        NULL, // regularEvent
+        talk_powan, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_tana_5)
@@ -1194,9 +1417,13 @@ EVT_BEGIN(evt_tana_5)
     RETURN
 EVT_END()
 
-static s32 access_tbl[] = {
-    (s32)"tana_3", (s32)"stg6_rsh_272", 0, (s32)"stg6_rsh_267", (s32)"tana_4", (s32)"stg6_rsh_273", 0, (s32)"stg6_rsh_267",
-    (s32)"tana_5", (s32)"stg6_rsh_274", (s32)evt_tana_5, (s32)"stg6_rsh_267", 0,
+static ShelfAccessTbl3 access_tbl = {
+    {
+        {"tana_3", "stg6_rsh_272", NULL, "stg6_rsh_267"},
+        {"tana_4", "stg6_rsh_273", NULL, "stg6_rsh_267"},
+        {"tana_5", "stg6_rsh_274", evt_tana_5, "stg6_rsh_267"},
+    },
+    {NULL},
 };
 
 static EVT_BEGIN(evt_access)
@@ -1215,7 +1442,7 @@ static EVT_BEGIN(evt_access)
 EVT_END()
 
 static EVT_BEGIN(evt_access_entry)
-    SET_INT_READ_ADDR(PTR(access_tbl))
+    SET_INT_READ_ADDR(PTR(&access_tbl))
     LOOP(0)
         READ_INT4(LW(0), LW(1), LW(2), LW(3))
         IF_INT_EQUAL(LW(0), 0)
@@ -1358,11 +1585,11 @@ EVT_BEGIN(rsh_04_init_evt)
         CALL(evt_map_playanim, STRING("hai_saboten"), 1, 0)
     END_SWITCH
     CALL_CHILD(PTR(evt_rsh_door_init))
-    SET_VALUE(LW(0), PTR(door_3))
+    SET_VALUE(LW(0), PTR(&door_3))
     CALL_CHILD(PTR(evt_rsh_door_entry))
-    SET_VALUE(LW(0), PTR(door_4))
+    SET_VALUE(LW(0), PTR(&door_4))
     CALL_CHILD(PTR(evt_rsh_door_entry))
-    SET_VALUE(LW(0), PTR(door_5))
+    SET_VALUE(LW(0), PTR(&door_5))
     CALL_CHILD(PTR(evt_rsh_door_entry))
     CALL(evt_npc_setup, PTR(npc_data))
     IF_INT_LESS(GSW(0), 298)
@@ -1475,8 +1702,11 @@ EVT_BEGIN(rsh_04_b_init_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 window_tbl[] = {
-    (s32)"mado_uturi_1", (s32)"mado_uturi_2", (s32)"mado_uturi_3", 0,
+static __declspec(section ".data") const char* window_tbl[] = {
+    "mado_uturi_1",
+    "mado_uturi_2",
+    "mado_uturi_3",
+    NULL,
 };
 
 EVT_BEGIN(rsh_04_c_init_evt)
@@ -1496,7 +1726,7 @@ EVT_BEGIN(rsh_04_c_init_evt)
     END_IF
     CALL_CHILD(PTR(rsh_04_init_evt))
     CALL(evt_map_playanim, STRING("ranpu"), 1, 0)
-    SET_VALUE(LW(0), PTR(window_tbl))
+    SET_VALUE(LW(0), PTR(&window_tbl))
     CALL_CHILD(PTR(evt_rsh_window))
     IF_INT_EQUAL(GSW(0), 299)
         CALL(evt_bero_get_entername, LW(0))
@@ -1507,31 +1737,124 @@ EVT_BEGIN(rsh_04_c_init_evt)
     RETURN
 EVT_END()
 
-static s32 bero_data_a_return[] = {
-    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_07_a", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", (s32)"e_bero",
-    65544, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"rsh_03_a", (s32)"w_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_data_a_return[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_07_a", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"w_door_close", // enterAnimeArg
+        (s32)"w_door_open", // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_03_a", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"e_door_close", // enterAnimeArg
+        (s32)"e_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
-static s32 bero_data_b_return[] = {
-    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_07_b", (s32)"w_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", (s32)"e_bero",
-    65544, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"rsh_03_b", (s32)"w_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_data_b_return[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_07_b", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"w_door_close", // enterAnimeArg
+        (s32)"w_door_open", // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_03_b", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"e_door_close", // enterAnimeArg
+        (s32)"e_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
-static s32 bero_data_c_return[] = {
-    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_07_c", (s32)"w_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", (s32)"e_bero",
-    65544, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"rsh_03_c", (s32)"w_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_data_c_return[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_07_c", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"w_door_close", // enterAnimeArg
+        (s32)"w_door_open", // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_03_c", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"e_door_close", // enterAnimeArg
+        (s32)"e_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(rsh_04_init_evt_nidome)
@@ -1554,11 +1877,11 @@ EVT_BEGIN(rsh_04_init_evt_nidome)
         END_IF
     END_IF
     CALL_CHILD(PTR(evt_rsh_door_init))
-    SET_VALUE(LW(0), PTR(door_3))
+    SET_VALUE(LW(0), PTR(&door_3))
     CALL_CHILD(PTR(evt_rsh_door_entry))
-    SET_VALUE(LW(0), PTR(door_4))
+    SET_VALUE(LW(0), PTR(&door_4))
     CALL_CHILD(PTR(evt_rsh_door_entry))
-    SET_VALUE(LW(0), PTR(door_5))
+    SET_VALUE(LW(0), PTR(&door_5))
     CALL_CHILD(PTR(evt_rsh_door_entry))
     CALL_CHILD(PTR(evt_access_entry))
     CALL(evt_npc_setup, PTR(npc_data))
@@ -1629,7 +1952,7 @@ EVT_BEGIN(rsh_04_c_init_evt_nidome)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL_CHILD(PTR(rsh_04_init_evt_nidome))
     CALL(evt_map_playanim, STRING("ranpu"), 1, 0)
-    SET_VALUE(LW(0), PTR(window_tbl))
+    SET_VALUE(LW(0), PTR(&window_tbl))
     CALL_CHILD(PTR(evt_rsh_window))
     SET_VALUE(GSWF(3453), 0)
     SET_VALUE(GSWF(3454), 0)

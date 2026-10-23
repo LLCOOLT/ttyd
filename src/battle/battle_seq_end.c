@@ -60,26 +60,28 @@ typedef struct SeqEndObj {
 
 typedef struct SeqEndWork {
     s32 state;                     // 0x0
-    u8 field_0x4[0xA - 0x4];       // 0x4
-    s16 expDisp;                   // 0xA
-    u8 field_0xC[0x10 - 0xC];      // 0xC
+    s32 timer;                     // 0x4
+    s16 exp;                       // 0x8, star points won (doubled by the badge)
+    s16 expDisp;                   // 0xA, counts down while exp is added to the pouch
+    s32 levelUp;                   // 0xC, set when the pouch exp reaches 100
     s32 selected;                  // 0x10
-    u8 field_0x14[0x18 - 0x14];    // 0x14
+    s32 unk14;                     // 0x14
     s32 objCount;                  // 0x18
     u8 field_0x1C[0x24 - 0x1C];    // 0x1C
     s32 cursor;                    // 0x24
-    u8 field_0x28[0x30 - 0x28];    // 0x28
+    s32 unk28;                     // 0x28
+    s32 cursorCount;               // 0x2C, number of level-up choices
     u32 flags;                     // 0x30
     IconEntry* icons[19];          // 0x34
     s32 alpha[19];                 // 0x80
     s32 counter[19];               // 0xCC
     Vec iconPos[19];               // 0x118
-    u8 field_0x1FC[0x200 - 0x1FC]; // 0x1FC
+    s32 evtId;                     // 0x1FC, running _jump_event / level-up event
     SeqEndObj objs[3];             // 0x200
-    u8 field_0x29C[0x2A0 - 0x29C]; // 0x29C
+    EffectEntry* expEffect;        // 0x29C, star point counter effect
     s32 whistleTimer;              // 0x2A0
     s32 confettiEvtId;             // 0x2A4
-    u8 field_0x2A8[0x2AC - 0x2A8]; // 0x2A8
+    s32 rankUpEvtId;               // 0x2A8
 } SeqEndWork;
 void _GetExpIcon_Init(SeqEndWork* work);
 
@@ -173,21 +175,21 @@ USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_intpl_init_float);
 
-__declspec(section ".data") u64 battle_seq_end_negone_one_a = 0xBF8000003F800000;
+__declspec(section ".data") f32 battle_seq_end_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") u64 fd_battle_seq_end_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_battle_seq_end_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") u64 battle_seq_end_one_negone_a = 0x3F800000BF800000;
+__declspec(section ".data") f32 battle_seq_end_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") u64 fd_battle_seq_end_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_battle_seq_end_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") u64 battle_seq_end_negone_one_b = 0xBF8000003F800000;
+__declspec(section ".data") f32 battle_seq_end_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") u64 fd_battle_seq_end_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_battle_seq_end_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") u64 battle_seq_end_one_negone_b = 0x3F800000BF800000;
+__declspec(section ".data") f32 battle_seq_end_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") u64 fd_battle_seq_end_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_battle_seq_end_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 
 RankUpData _rank_up_data[] = {
@@ -259,7 +261,6 @@ void btlseqEnd_DispMain(CameraId camId, void* param);
 typedef struct { s32 a; s32 b; } P2;
 typedef struct { u16 a; s8 b; s32 c; } AllS;
 typedef struct { s32 pad[3]; P2 arr[3]; } W3;
-#define BP(T, p, off) (*(T*)((u8*)(p) + (off)))
 #define SS(v) BattleSetSeq(wp, (BattleSequence)7, (v))
 void _GetExpIcon_End(SeqEndWork* work);
 void btl_camera_set_posoffset(s32 pri, f32 x, f32 y, f32 z);
@@ -268,7 +269,7 @@ EffectEntry* effPointGetEntry(s32 a, s32 exp, f32 x, f32 y, f32 z, s32 c);
 extern PoseTableEntry pose_table_nokotarou_stay[];
 
 void btlseqEnd(BattleWork* wp) {
-    SeqEndWork* work = *(SeqEndWork**)((u8*)wp + 0xF28);
+    SeqEndWork* work = (SeqEndWork*)wp->seqEndWork;
     FieldBattleInfo* info = wp->fbatInfo;
     PouchData* pouch = pouchGetPtr();
 
@@ -298,7 +299,7 @@ void btlseqEnd(BattleWork* wp) {
         }
         switch (BattleInformationGetResult(info)) {
         case 1:
-            if (BP(u32, fbatGetPointer(), 0x3C)) {
+            if ((u32)fbatGetPointer()->postBattleEvent) {
                 SS(0x7000003);
                 return;
             }
@@ -317,27 +318,27 @@ void btlseqEnd(BattleWork* wp) {
             break;
         }
         nw = BattleAlloc(0x2AC);
-        *(SeqEndWork**)((u8*)wp + 0xF28) = nw;
+        wp->seqEndWork = (BattleSeqEndWork*)nw;
         btlseqEnd_DispInit(wp);
-        BP(s32, nw, 0) = 0;
-        BP(s32, nw, 0x29C) = 0;
-        BP(s32, nw, 0x2A0) = irand(120) + 60;
-        BP(s32, nw, 0x2A4) = 0;
+        nw->state = 0;
+        nw->expEffect = NULL;
+        nw->whistleTimer = irand(120) + 60;
+        nw->confettiEvtId = 0;
         break;
     }
     case 0x7000003: {
         FieldBattleData* fb = fbatGetPointer();
-        EventEntry* e = evtEntry(BP(void*, fb, 0x3C), 10, 0);
-        BP(s32, fb, 0x40) = BP(s32, e, 0x15C);
+        EventEntry* e = evtEntry(fb->postBattleEvent, 10, 0);
+        fb->postBattleEventId = e->eventId;
         SS(0x7000004);
         return;
     }
     case 0x7000004: {
         FieldBattleData* fb = fbatGetPointer();
         SeqEndWork* nw;
-        if (evtCheckID(BP(s32, fb, 0x40))) break;
+        if (evtCheckID(fb->postBattleEventId)) break;
         if (!BattleWaitAllActiveEvtEnd(wp)) break;
-        if (BP(s32, fb, 0x44)) {
+        if (fb->unk44) {
             BattleSetSeq(wp, (BattleSequence)3, 0x3000001);
             BattleSetSeq(wp, (BattleSequence)0, 2);
             return;
@@ -345,9 +346,9 @@ void btlseqEnd(BattleWork* wp) {
         SS(0x7000005);
         _BattleMarioKouraDelete();
         nw = BattleAlloc(0x2AC);
-        *(SeqEndWork**)((u8*)wp + 0xF28) = nw;
+        wp->seqEndWork = (BattleSeqEndWork*)nw;
         btlseqEnd_DispInit(wp);
-        BP(s32, nw, 0) = 0;
+        nw->state = 0;
         return;
     }
     case 0x7000001: {
@@ -362,7 +363,7 @@ void btlseqEnd(BattleWork* wp) {
     }
     case 0x7000002:
         if (!fadeIsFinish()) break;
-        if (!(BP(u32, BP(void*, wp->fbatInfo, 0xC), 4) & 0x40)) {
+        if (!((u32)wp->fbatInfo->setup->battleFlags & 0x40)) {
             seqSetSeq(SEQ_GAME_OVER, (const char*)1, NULL);
             break;
         }
@@ -373,9 +374,9 @@ void btlseqEnd(BattleWork* wp) {
         BattleUnit* party = BattleGetPartyPtr(wp);
         s32 i;
         if (party && BtlUnit_CheckStatusFlag(party, 1)) {
-            BP(u8, party, 0x12B) = 0;
+            party->flippedTurns = 0;
             BtlUnit_OffStatusFlag(party, 1);
-            BP(void*, BtlUnit_GetPartsPtr(party, BtlUnit_GetBodyPartsId(party)), 0x1BC) = pose_table_nokotarou_stay;
+            BtlUnit_GetPartsPtr(party, BtlUnit_GetBodyPartsId(party))->poseTable = pose_table_nokotarou_stay;
         }
         BattleConsumeReserveItem();
         for (i = 0; (s8)i < 0x1C; i++) {
@@ -384,13 +385,13 @@ void btlseqEnd(BattleWork* wp) {
                 BtlUnit_SetStatus(mario, i, 0, 0);
             }
         }
-        if (BP(u32, mario, 0x104) & 0x10) {
+        if ((u32)mario->mAttributeFlags & 0x10) {
             BattleUnit* p2 = BattleGetPartyPtr(wp);
             EventEntry* e;
             if (!p2) break;
             e = evtEntry(BtlUnit_GetData(p2, 3), 10, 0);
-            BP(s32, e, 0x160) = p2->unitId;
-            p2->attackEventId = BP(s32, e, 0x15C);
+            e->unitId = p2->unitId;
+            p2->attackEventId = e->eventId;
             break;
         }
         SS(0x7000006);
@@ -404,14 +405,14 @@ void btlseqEnd(BattleWork* wp) {
         BattleInformationSetDropMaterial(info);
         pp = pouchGetPtr();
         mario = BattleGetMarioPtr(wp);
-        if (BP(u8, pp, 0x5BA) == 3) {
+        if (pp->mMerleeNextCurseType == 3) {
             EventEntry* e;
             wp->majinaiState = 3;
             BattleMajinaiDone();
             BattleMajinaiEndCheck();
             e = evtEntry(marioAttackEvent_MajinaiExpUp, 10, 0);
-            BP(s32, e, 0x160) = mario->unitId;
-            mario->attackEventId = BP(s32, e, 0x15C);
+            e->unitId = mario->unitId;
+            mario->attackEventId = e->eventId;
             SS(0x7000007);
             break;
         }
@@ -425,23 +426,23 @@ void btlseqEnd(BattleWork* wp) {
     case 0x7000008: {
         s32 flag;
         BattleFogForceStop();
-        BP(s32, work, 0xC) = 0;
-        BP(s16, work, 0x8) = BattleGetStockExp(wp);
+        work->levelUp = 0;
+        work->exp = BattleGetStockExp(wp);
         if (wp->majinaiState == 3) {
-            BP(s16, work, 0x8) = BP(s16, work, 0x8) * 2;
+            work->exp = work->exp * 2;
         }
-        if (BP(s16, pouch, 0x8A) >= 99) {
-            BP(s16, work, 0x8) = 0;
+        if (pouch->level >= 99) {
+            work->exp = 0;
         }
-        if (BP(s16, work, 0x8) > 100) {
-            BP(s16, work, 0x8) = 100;
+        if (work->exp > 100) {
+            work->exp = 100;
         }
-        BP(s16, work, 0xA) = BP(s16, work, 0x8);
-        BP(u32, wp, 0xEF8) &= ~2;
-        if (BP(s16, work, 0x8) > 0) {
+        work->expDisp = work->exp;
+        wp->dispFlags &= ~2;
+        if (work->exp > 0) {
             _GetExpIcon_Init(work);
         }
-        BP(s32, work, 4) = 0x78;
+        work->timer = 0x78;
         btl_camera_set_moveSpeedLv(0, 2);
         if (!(wp->flags & 0x100)) {
             btl_camera_set_mode(0, 0x11);
@@ -469,28 +470,28 @@ void btlseqEnd(BattleWork* wp) {
         }
     }
     case 0x7000009:
-        BP(s32, work, 4) = BP(s32, work, 4) - 1;
-        if (BP(s32, work, 4) > 0) break;
+        work->timer = work->timer - 1;
+        if (work->timer > 0) break;
         SS(0x700000A);
         break;
     case 0x700000A:
-        if (BP(s16, work, 0x8) > 0) {
+        if (work->exp > 0) {
             BattleUnit* mario = BattleGetMarioPtr(wp);
             BattleUnit* party = BattleGetPartyPtr(wp);
             EventEntry* e = evtEntry(BtlUnit_GetData(mario, 0x40), 10, 0);
             if (e) {
-                BP(s32, e, 0x160) = mario->unitId;
-                mario->attackEventId = BP(s32, e, 0x15C);
+                e->unitId = mario->unitId;
+                mario->attackEventId = e->eventId;
             }
             if (party) {
                 e = evtEntry(BtlUnit_GetData(party, 0x40), 10, 0);
                 if (e) {
-                    BP(s32, e, 0x160) = party->unitId;
-                    party->attackEventId = BP(s32, e, 0x15C);
+                    e->unitId = party->unitId;
+                    party->attackEventId = e->eventId;
                 }
             }
-            if (!BP(EffectEntry*, work, 0x29C)) {
-                BP(EffectEntry*, work, 0x29C) = ((EffectEntry* (*)(f32, f32, f32, s32, s32, s32))effPointGetEntry)(0.0f, 90.0f, 0.0f, 0, BP(s16, work, 0x8), 0);
+            if (!work->expEffect) {
+                work->expEffect = ((EffectEntry* (*)(f32, f32, f32, s32, s32, s32))effPointGetEntry)(0.0f, 90.0f, 0.0f, 0, work->exp, 0);
             }
             SS(0x700000B);
             break;
@@ -502,61 +503,61 @@ void btlseqEnd(BattleWork* wp) {
         SS(0x700000E);
         break;
     case 0x700000B:
-        if (BP(s16, work, 0xA) > 0) {
-            BP(s32, work, 4) = BP(s32, work, 4) + 1;
+        if (work->expDisp > 0) {
+            work->timer = work->timer + 1;
             if ((s32)(s32)BattlePadCheckNow(0x300) != 0) {
-                if (BP(s32, work, 4) < 1000) {
-                    BP(s32, work, 4) = BP(s32, work, 4) + 1000;
+                if (work->timer < 1000) {
+                    work->timer = work->timer + 1000;
                 }
             }
-            if ((BP(s32, work, 4) & 3) == 0 || BP(s32, work, 4) >= 1000) {
-                BP(s16, work, 0xA) = BP(s16, work, 0xA) - 1;
-                BP(s16, pouch, 0x96) = BP(s16, pouch, 0x96) + 1;
-                if ((BP(s32, work, 4) & 7) == 0) {
+            if ((work->timer & 3) == 0 || work->timer >= 1000) {
+                work->expDisp = work->expDisp - 1;
+                pouch->mStarPoints = pouch->mStarPoints + 1;
+                if ((work->timer & 7) == 0) {
                     psndSFXOn("SFX_STAR_POINT_GET1");
                 }
             }
-            if (BP(s16, pouch, 0x96) < 100) break;
-            BP(s16, pouch, 0x96) = 0;
-            BP(s32, work, 0xC) = 1;
-            if (BP(s16, pouch, 0x8A) + 1 < 99) break;
-            BP(s16, work, 0xA) = 0;
+            if (pouch->mStarPoints < 100) break;
+            pouch->mStarPoints = 0;
+            work->levelUp = 1;
+            if (pouch->level + 1 < 99) break;
+            work->expDisp = 0;
             break;
         }
-        if (BP(s32, work, 4) >= 1000) {
-            BP(s32, work, 4) = 10;
-        } else if (BP(s32, work, 4) < 0x78) {
-            BP(s32, work, 4) = 0x8C - BP(s32, work, 4);
+        if (work->timer >= 1000) {
+            work->timer = 10;
+        } else if (work->timer < 0x78) {
+            work->timer = 0x8C - work->timer;
         } else {
-            BP(s32, work, 4) = 0x14;
+            work->timer = 0x14;
         }
         SS(0x700000C);
         break;
     case 0x700000C:
-        BP(s32, work, 4) = BP(s32, work, 4) - 1;
-        if (BP(s32, work, 4) > 0) break;
-        BP(s32, work, 4) = 0x3C;
+        work->timer = work->timer - 1;
+        if (work->timer > 0) break;
+        work->timer = 0x3C;
         _GetExpIcon_End(work);
         SS(0x700000D);
-        effSoftDelete(BP(EffectEntry*, work, 0x29C));
-        if (BP(s32, work, 0xC)) {
-            BP(s32, work, 4) = 0x3C;
+        effSoftDelete(work->expEffect);
+        if (work->levelUp) {
+            work->timer = 0x3C;
             break;
         }
-        BP(s32, work, 4) = 5;
+        work->timer = 5;
         break;
     case 0x700000D:
-        BP(s32, work, 4) = BP(s32, work, 4) - 1;
-        if (BP(s32, work, 4) > 0) break;
-        BP(s32, work, 0x29C) = 0;
+        work->timer = work->timer - 1;
+        if (work->timer > 0) break;
+        work->expEffect = NULL;
         SS(0x700000E);
         break;
     case 0x700000E:
         if (wp->flags & 0x400000) {
             BattleUnit* mario = BattleGetMarioPtr(wp);
             EventEntry* e = evtEntry(_event_MajinaiEnd, 10, 0);
-            BP(s32, e, 0x160) = mario->unitId;
-            mario->attackEventId = BP(s32, e, 0x15C);
+            e->unitId = mario->unitId;
+            mario->attackEventId = e->eventId;
             SS(0x700000F);
             break;
         }
@@ -564,19 +565,19 @@ void btlseqEnd(BattleWork* wp) {
         break;
     case 0x700000F:
         if (!BattleWaitAllActiveEvtEnd(wp)) break;
-        if (BP(s16, work, 0x8) > 0) {
+        if (work->exp > 0) {
             SS(0x7000010);
             break;
         }
         SS(0x7000019);
         break;
     case 0x7000010:
-        BP(u32, work, 0x30) &= ~1;
-        if (BP(s32, work, 0xC)) {
-            BP(s32, work, 0x10) = 1;
-            BP(s32, work, 0x14) = 0;
-            BP(s32, work, 0x18) = 3;
-            BP(s32, work, 4) = 0;
+        work->flags &= ~1;
+        if (work->levelUp) {
+            work->selected = 1;
+            work->unk14 = 0;
+            work->objCount = 3;
+            work->timer = 0;
             BattleAudience_WinSetActive(0);
             BattleBreakSlot_HideReel();
             SS(0x7000011);
@@ -585,40 +586,40 @@ void btlseqEnd(BattleWork* wp) {
         SS(0x7000019);
         break;
     case 0x7000011:
-        if (BP(s32, work, 4) == 0) {
+        if (work->timer == 0) {
             EventEntry* e = evtEntry(_curtain_close_event, 10, 0);
-            BP(s32, work, 0x1FC) = BP(s32, e, 0x15C);
+            work->evtId = e->eventId;
             BattleStatusWindowSystemOff();
             psndBGMOff(0x400);
             psndBGMOn(1, "BGM_BATTLE_WIN3");
         }
-        BP(s32, work, 4) = BP(s32, work, 4) + 1;
-        if (evtCheckID(BP(s32, work, 0x1FC))) break;
-        BP(s32, work, 0x1FC) = 0;
+        work->timer = work->timer + 1;
+        if (evtCheckID(work->evtId)) break;
+        work->evtId = 0;
         BattleStatusWindowSystemOn();
         BattleStatusWindowEventOn();
         SS(0x7000012);
         break;
     case 0x7000012: {
-        s32 sel = BP(s32, work, 0x10);
+        s32 sel = work->selected;
         EventEntry* e;
-        if (BP(s32, work, 0x1FC)) {
-            if (evtCheckID(BP(s32, work, 0x1FC))) break;
-            BP(s32, work, 0x1FC) = 0;
+        if (work->evtId) {
+            if (evtCheckID(work->evtId)) break;
+            work->evtId = 0;
         }
         if (BattlePadCheckTrigger(0x80000)) {
-            if (BP(s32, work, 0x10) < BP(s32, work, 0x18) - 1) {
-                BP(s32, work, 0x10) = BP(s32, work, 0x10) + 1;
+            if (work->selected < work->objCount - 1) {
+                work->selected = work->selected + 1;
             }
         }
         if (BattlePadCheckTrigger(0x40000)) {
-            if (BP(s32, work, 0x10) > 0) {
-                BP(s32, work, 0x10) = BP(s32, work, 0x10) - 1;
+            if (work->selected > 0) {
+                work->selected = work->selected - 1;
             }
         }
-        if (BP(s32, work, 0x10) != sel) {
+        if (work->selected != sel) {
             e = NULL;
-            switch (BP(s32, work, 0x10)) {
+            switch (work->selected) {
             case 0:
                 e = evtEntry(_move_to_heart_event, 10, 0);
                 break;
@@ -630,115 +631,115 @@ void btlseqEnd(BattleWork* wp) {
                 break;
             }
 #ifdef VERSION_G8ME01
-            BP(u32, work, 0x30) &= ~0x20;
+            work->flags &= ~0x20;
 #endif
             if (e) {
-                BP(s32, work, 0x1FC) = BP(s32, e, 0x15C);
+                work->evtId = e->eventId;
                 break;
             }
         }
         if (BattlePadCheckTrigger(0x100)) {
             s32 ok = 0;
-            switch (BP(s32, work, 0x10)) {
+            switch (work->selected) {
             case 0:
-                if (BP(s16, pouch, 0x8E) < 200) ok = 1;
+                if (pouch->baseMaxHP < 200) ok = 1;
                 break;
             case 1:
-                if (BP(s16, pouch, 0x90) < 200) ok = 1;
+                if (pouch->baseMaxFP < 200) ok = 1;
                 break;
             case 2:
-                if (BP(s16, pouch, 0x94) < 99) ok = 1;
+                if (pouch->maximumBP < 99) ok = 1;
                 break;
             }
             if (ok) {
-                BP(s32, work, 0x24) = 0;
-                BP(s32, work, 0x28) = 0;
-                BP(s32, work, 0x2C) = 2;
-                BP(u32, work, 0x30) &= ~0x20;
+                work->cursor = 0;
+                work->unk28 = 0;
+                work->cursorCount = 2;
+                work->flags &= ~0x20;
                 SS(0x7000014);
                 e = evtEntry(_jump_event, 10, 0);
-                BP(s32, work, 0x1FC) = BP(s32, e, 0x15C);
+                work->evtId = e->eventId;
             }
         }
         break;
     }
     case 0x7000013:
         if (BattlePadCheckTrigger(0x20000)) {
-            BP(s32, work, 0x24) = BP(s32, work, 0x24) + 1;
-            if (BP(s32, work, 0x24) >= BP(s32, work, 0x2C)) {
-                BP(s32, work, 0x24) = 0;
+            work->cursor = work->cursor + 1;
+            if (work->cursor >= work->cursorCount) {
+                work->cursor = 0;
             }
         }
         if (BattlePadCheckTrigger(0x10000)) {
-            BP(s32, work, 0x24) = BP(s32, work, 0x24) - 1;
-            if (BP(s32, work, 0x24) < 0) {
-                BP(s32, work, 0x24) = BP(s32, work, 0x2C) - 1;
+            work->cursor = work->cursor - 1;
+            if (work->cursor < 0) {
+                work->cursor = work->cursorCount - 1;
             }
         }
         if (BattlePadCheckTrigger(0x200)) {
-            BP(u32, work, 0x30) &= ~0x10;
+            work->flags &= ~0x10;
             SS(0x7000012);
         }
         if (BattlePadCheckTrigger(0x100)) {
-            if (BP(s32, work, 0x24) == 0) {
-                BP(u32, work, 0x30) &= ~0x18;
+            if (work->cursor == 0) {
+                work->flags &= ~0x18;
                 SS(0x7000015);
                 break;
             }
-            BP(u32, work, 0x30) &= ~0x10;
+            work->flags &= ~0x10;
             SS(0x7000012);
         }
         break;
     case 0x7000014:
-        if (evtCheckID(BP(s32, work, 0x1FC))) break;
-        BP(s32, work, 0x1FC) = 0;
+        if (evtCheckID(work->evtId)) break;
+        work->evtId = 0;
         SS(0x7000015);
         break;
     case 0x7000015: {
         BattleUnit* party;
         BattleUnit* party2;
         s32 ok;
-        void* fd;
+        NpcBattleInfo* fd;
         BattleUnit* mario;
-        BP(s16, pouch, 0x8A) = BP(s16, pouch, 0x8A) + 1;
-        switch (BP(s32, work, 0x10)) {
+        pouch->level = pouch->level + 1;
+        switch (work->selected) {
         case 0:
-            BP(s16, pouch, 0x8E) = BP(s16, pouch, 0x8E) + 5;
+            pouch->baseMaxHP = pouch->baseMaxHP + 5;
             break;
         case 1:
-            BP(s16, pouch, 0x90) = BP(s16, pouch, 0x90) + 5;
+            pouch->baseMaxFP = pouch->baseMaxFP + 5;
             break;
         case 2:
-            BP(s16, pouch, 0x94) = BP(s16, pouch, 0x94) + 3;
+            pouch->maximumBP = pouch->maximumBP + 3;
             break;
         }
         pouchReviseMarioParam();
-        BP(s16, pouch, 0x70) = BP(s16, pouch, 0x72);
-        BP(s16, pouch, 0x74) = BP(s16, pouch, 0x76);
+        pouch->currentHP = pouch->maximumHP;
+        pouch->currentFP = pouch->maximumFP;
         BtlUnit_SetParamFromPouch(BattleGetMarioPtr(wp));
         party = BattleGetPartyPtr(wp);
         if (party) {
-            s32 id = BattleTransPartyId(BP(s32, party, 8));
+            s32 id = BattleTransPartyId((s32)party->currentKind);
             if (id != 0 && id < 8) {
-                void* pe = (u8*)pouch + id * 0xE;
-                BP(s16, pe, 6) = BP(s16, pe, 2);
+                PouchPartyData* pe = &pouch->partyData[id];
+                pe->currentHP = pe->maximumHP;
                 party->currentHp = party->maxHp;
             }
         }
-        fd = BP(void*, wp->fbatInfo, 0xC);
+        fd = wp->fbatInfo->setup;
         ok = 1;
         mario = BattleGetMarioPtr(wp);
         party2 = BattleGetPartyPtr(wp);
-        if ((BP(u32, mario, 0x138) & 0x10000000) || (BP(u32, mario, 0x138) & 0x20000000)) {
+        if (((u32)mario->mStatusFlags & 0x10000000) || ((u32)mario->mStatusFlags & 0x20000000)) {
             ok = 0;
         } else if (party2) {
-            if ((BP(u32, mario, 0x138) & 0x10000000) || (BP(u32, mario, 0x138) & 0x20000000) ||
+            if (((u32)mario->mStatusFlags & 0x10000000) || ((u32)mario->mStatusFlags & 0x20000000) ||
                 BtlUnit_CheckStatus(party2, (StatusEffectType)0x1B)) {
                 ok = 0;
             }
         }
         if (ok) {
-            if (BP(u32, fd, 4) & 0x20000000) {
+            if ((u32)fd->battleFlags & 0x20000000) {
                 BtlUnit_snd_se(mario, "SFX_VOICE_MARIO_PAUSE3", -250000000, 0);
             } else {
                 BtlUnit_snd_se(mario, "SFX_VOICE_MARIO_PAUSE1", -250000000, 0);
@@ -746,7 +747,7 @@ void btlseqEnd(BattleWork* wp) {
         }
         BtlUnit_SetBodyAnim(BattleGetMarioPtr(wp), "M_V_2");
         BattleAudienceSoundCheer(0xB4, 0x28);
-        BP(s32, work, 4) = 0xB4;
+        work->timer = 0xB4;
         SS(0x7000016);
         mario = BattleGetMarioPtr(wp);
         party = BattleGetPartyPtr(wp);
@@ -759,63 +760,63 @@ void btlseqEnd(BattleWork* wp) {
         break;
     }
     case 0x7000016:
-        BP(s32, work, 4) = BP(s32, work, 4) - 1;
-        if (BP(s32, work, 4) == 0x78) {
+        work->timer = work->timer - 1;
+        if (work->timer == 0x78) {
             BattleUnit* mario = BattleGetMarioPtr(wp);
             if (mario) {
                 effRecoveryEntry(5, 0, mario->mPosition.x, 40.0f + mario->mPosition.y, mario->mPosition.z);
             }
         }
-        if (BP(s32, work, 4) > 0) break;
-        if (BP(s32, work, 0x2A4)) evtDeleteID(BP(s32, work, 0x2A4));
+        if (work->timer > 0) break;
+        if (work->confettiEvtId) evtDeleteID(work->confettiEvtId);
         SS(0x7000017);
         break;
     case 0x7000017: {
         EventEntry* e;
-        if (!_get_rank_data(BP(s16, pouch, 0x8A))) {
+        if (!_get_rank_data(pouch->level)) {
             SS(0x700001C);
             break;
         }
-        BP(s16, pouch, 0x88) = BP(s16, _get_rank_data(BP(s16, pouch, 0x8A)), 2);
+        pouch->rank = _get_rank_data(pouch->level)->rankId;
         e = evtEntry(_rank_up_event, 10, 0);
-        BP(s32, work, 0x2A8) = BP(s32, e, 0x15C);
+        work->rankUpEvtId = e->eventId;
         SS(0x7000018);
     }
     case 0x7000018:
-        if (evtCheckID(BP(s32, work, 0x2A8))) break;
+        if (evtCheckID(work->rankUpEvtId)) break;
         SS(0x700001C);
         break;
     case 0x7000019: {
         s32 ok = 1;
-        void* fd = BP(void*, wp->fbatInfo, 0xC);
+        NpcBattleInfo* fd = wp->fbatInfo->setup;
         BattleUnit* mario = BattleGetMarioPtr(wp);
         BattleUnit* party = BattleGetPartyPtr(wp);
-        if ((BP(u32, mario, 0x138) & 0x10000000) || (BP(u32, mario, 0x138) & 0x20000000)) {
+        if (((u32)mario->mStatusFlags & 0x10000000) || ((u32)mario->mStatusFlags & 0x20000000)) {
             ok = 0;
         } else if (party) {
-            if ((BP(u32, mario, 0x138) & 0x10000000) || (BP(u32, mario, 0x138) & 0x20000000) ||
+            if (((u32)mario->mStatusFlags & 0x10000000) || ((u32)mario->mStatusFlags & 0x20000000) ||
                 BtlUnit_CheckStatus(party, (StatusEffectType)0x1B)) {
                 ok = 0;
             }
         }
         if (!ok) {
-            if (BP(u32, fd, 4) & 0x20000000) {
+            if ((u32)fd->battleFlags & 0x20000000) {
                 BtlUnit_snd_se(mario, "SFX_VOICE_MARIO_RELIEF1", -250000000, 0);
             } else {
                 BtlUnit_snd_se(mario, "SFX_VOICE_MARIO_RELIEF2", -250000000, 0);
             }
         }
         BtlUnit_SetBodyAnim(BattleGetMarioPtr(wp), "M_V_1");
-        BP(s32, work, 4) = 0x3C;
+        work->timer = 0x3C;
         SS(0x700001A);
         break;
     }
     case 0x700001A:
-        if (--BP(s32, work, 4) > 0) break;
+        if (--work->timer > 0) break;
         BtlUnit_SetBodyAnimType(BattleGetMarioPtr(wp), 0x2A);
         if (BattleGetPartyPtr(wp)) {
             BattleUnit* party = BattleGetPartyPtr(wp);
-            if (BP(s32, party, 8) != 0xE1 || party->flippedTurns < 1) {
+            if ((s32)party->currentKind != 0xE1 || party->flippedTurns < 1) {
                 BtlUnit_SetBodyAnimType(BattleGetPartyPtr(wp), 0x2A);
             }
         }
@@ -826,12 +827,12 @@ void btlseqEnd(BattleWork* wp) {
         break;
     case 0x700001C: {
         FieldBattleData* fb;
-        void* p;
+        NpcEntry* p;
         SS(0x700001D);
         BattleAudienceSoundSetVolAll(0, 30);
         fb = fbatGetPointer();
-        p = BP(void*, fb, 8);
-        if (p) BP(u32, p, 0x140) |= 0x100;
+        p = fb->target;
+        if (p) p->interruptFlags |= 0x100;
         break;
     }
     case 0x700001D: {
@@ -847,26 +848,26 @@ void btlseqEnd(BattleWork* wp) {
         BattleUnit* party = BattleGetPartyPtr(wp);
         s32 kind;
         s32 id;
-        void* fd;
+        NpcBattleInfo* fd;
         BattleUnit* mario;
-        void* mw;
+        MarioWork* mw;
         void* pe;
-        if (party) kind = BP(s32, party, 8); else kind = 0;
+        if (party) kind = (s32)party->currentKind; else kind = 0;
         id = BattleTransPartyId(kind);
-        fd = BP(void*, wp->fbatInfo, 0xC);
+        fd = wp->fbatInfo->setup;
         mario = BattleGetMarioPtr(wp);
-        if (BP(u32, fd, 4) & 0x40) {
+        if ((u32)fd->battleFlags & 0x40) {
             if (mario->currentHp <= 0) mario->currentHp = 1;
         }
         BattleSetMarioParamToFieldBattle(wp);
         BattleFree(wp->seqEndWork);
-        BP(s32, wp, 0xF28) = 0;
+        wp->seqEndWork = NULL;
         BattleSetSeq(wp, (BattleSequence)0, 4);
         mw = marioGetPtr();
-        BP(u32, mw, 4) &= ~1;
+        mw->dispFlags &= ~1;
         if (kind) marioPartyEntry((PartyId)id); else marioPartyKill();
         pe = partyGetPtr(marioGetPartyId());
-        if (pe) BP(u32, pe, 4) &= ~1;
+        if (pe) ((PartyEntry*)pe)->flags2 &= ~1;
         BtlActRec_JudgeRuleKeep();
         BattleAudienceSoundStop(1);
         break;
@@ -1105,168 +1106,346 @@ USER_FUNC(btlevtcmd_PadCheckTrigger);
 USER_FUNC(N__display_select_one_to_upgrade_text);
 USER_FUNC(N__set_initial_upgrade_cursor_position);
 
-s32 _curtain_close_event[] = {
-    110, 262235, (s32)evt_batstage_set_stg_dark, 80, 30, 0, 262235, (s32)evt_batstage_set_stg_dark_base,
-    80, 30, 0, 112, 110, 393307, (s32)evt_fade_entry, 24,
-    1000, 0, 0, 0, 196699, (s32)evt_fade_set_anim_ofs_pos, 0, 130,
-    262235, (s32)evt_fade_set_anim_virtual_pos, 0, 0, 80, 65627, (s32)evt_fade_end_wait, 112,
-    196699, (s32)btlevtcmd_check_battleflag, -30000000, 256, 131097, -30000000, 0, 110,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -3, 1, 42, 327771, (s32)btlevtcmd_GetPos, -3,
-    -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition, -3, -300, -29999999,
-    -29999998, 120, -1, 0, 112, 196699, (s32)btlevtcmd_GetUnitId, -4,
-    -29999997, 131097, -29999997, -1, 110, 196699, (s32)btlevtcmd_GetBodyId, -29999997,
-    -29999996, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999997, -29999996, 42, 327771, (s32)btlevtcmd_GetPos,
-    -29999997, -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition, -29999997, -330,
-    -29999999, -29999998, 120, -1, 0, 112, 33, 33,
-    110, 327771, (s32)evt_sub_intpl_init_float, 0, 0, -230040960, 29, 65541,
-    30, 196699, (s32)evt_sub_intpl_get_float, -30000000, -250000000, 196699, (s32)_nozzle_set_offset, (s32)"nozzle_l",
-    -30000000, 65545, 1, 6, 112, 110, 327771, (s32)evt_sub_intpl_init_float,
-    0, 0, -230040960, 29, 65541, 30, 196699, (s32)evt_sub_intpl_get_float,
-    -30000000, -250000000, 196699, (s32)_nozzle_set_offset, (s32)"nozzle_c", -30000000, 65545, 1,
-    6, 112, 110, 327771, (s32)evt_sub_intpl_init_float, 0, 0, -230040960,
-    29, 65541, 30, 196699, (s32)evt_sub_intpl_get_float, -30000000, -250000000, 196699,
-    (s32)_nozzle_set_offset, (s32)"nozzle_r", -30000000, 65545, 1, 6, 112, 196699,
-    (s32)btlevtcmd_onoff_battleflag, 0, 256, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699,
-    (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 65546, 1500, 110, 65541, 6,
-    983131, (s32)evt_eff, (s32)"", (s32)"confetti", 13, 0, 300, 95,
-    180, 0, 0, 0, 0, 0, 0, 0,
-    65545, 20, 6, 112, 131165, (s32)_confetti_control_event, -30000000, 131163,
-    (s32)_set_confetti_control_evtid, -30000000, 983131, (s32)evt_eff, (s32)"", (s32)"levelup", 0, 0,
-    50, 100, 60, 0, 0, 0, 0, 0,
-    0, 0, 65545, 48, 65627, (s32)_lvup_ap_recover_full, 65546, 1000,
-    65647, -29999985, 65545, 2, 131163, (s32)_lvup_spot_on, 0, 131163,
-    (s32)_lvup_spot_move, 0, 112, 65627, (s32)_disable_enemy_unit_disp, 110, 196699, (s32)btlevtcmd_GetUnitId,
-    -4, -29999997, 131097, -29999997, -1, 327771, (s32)btlevtcmd_SetPos, -29999997,
-    -230, 0, 90, 131163, (s32)btlevtcmd_ClearAllStatus, -29999997, 196699, (s32)btlevtcmd_GetBodyId,
-    -29999997, -29999996, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999997, -29999996, 40, 131122,
-    -30000000, -155, 131122, -29999999, 0, 131122, -29999998, 90,
-    131122, -29999994, 28, 196699, (s32)btlevtcmd_GetUnitKind, -29999997, -29999995, 65570,
-    -29999995, 65579, 224, 65579, 225, 589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997,
-    (s32)"SFX_PARTY_BATTLE_SUBMOVE1L", (s32)"SFX_PARTY_BATTLE_SUBMOVE1R", 6, 12, 16, 0, 0, 524379,
-    (s32)btlevtcmd_MovePosition, -29999997, -30000000, -29999999, -29999998, -29999994, -2, 1,
-    46, 65572, 226, 589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997, (s32)"SFX_PARTY_BATTLE_SUBMOVE1L", (s32)"SFX_PARTY_BATTLE_SUBMOVE1R",
-    0, 6, 6, 0, 0, 524379, (s32)btlevtcmd_MovePosition, -29999997,
-    -30000000, -29999999, -29999998, -29999994, -2, 1, 65572, 227,
-    589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997, (s32)"SFX_PARTY_BATTLE_SUBHANG1", (s32)"SFX_PARTY_BATTLE_SUBHANG1", 6, 12, 16,
-    0, 0, 524379, (s32)btlevtcmd_MovePosition, -29999997, -30000000, -29999999, -29999998,
-    -29999994, -2, 1, 65572, 228, 589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997,
-    (s32)"SFX_PARTY_BATTLE_SUBHANG1", (s32)"SFX_PARTY_BATTLE_SUBHANG1", 0, 15, 13, 0, 0, 524379,
-    (s32)btlevtcmd_MovePosition, -29999997, -30000000, -29999999, -29999998, -29999994, -2, 1,
-    65572, 229, 589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997, (s32)"SFX_PARTY_BATTLE_SUBMOVE1L", (s32)"SFX_PARTY_BATTLE_SUBMOVE1R", 0,
-    18, 18, 0, 0, 524379, (s32)btlevtcmd_MovePosition, -29999997, -30000000,
-    -29999999, -29999998, -29999994, -2, 1, 65572, 230, 589915,
-    (s32)btlevtcmd_SetMoveSoundDataWork, -29999997, (s32)"SFX_PARTY_BATTLE_SUBMOVE1L", (s32)"SFX_PARTY_BATTLE_SUBMOVE1R", 0, 15, 13, 0,
-    0, 524379, (s32)btlevtcmd_MovePosition, -29999997, -30000000, -29999999, -29999998, -29999994,
-    -2, 1, 49, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999997, -29999996, 43,
-    33, 112, 327771, (s32)btlevtcmd_SetPos, -3, -200, 0, 90,
-    131163, (s32)btlevtcmd_ClearAllStatus, -3, 262235, (s32)btlevtcmd_AnimeChangePoseType, -3, 1, 40,
-    524379, (s32)btlevtcmd_MovePosition, -3, 0, 0, 90, 75, -1,
-    0, 393307, (s32)btlevtcmd_snd_se, -3, (s32)"SFX_VOICE_MARIO_PAUSE2", -250000000, 0, -250000000,
-    262235, (s32)btlevtcmd_AnimeChangePose, -3, 1, (s32)"M_V_2", 196699, (s32)evt_audience_sound_cheer, 180,
-    40, 65546, 1000, 65627, (s32)_lvup_select_object_init, 110, 131163, (s32)_lvup_spot_off,
-    30, 112, 65644, -29999990, 262235, (s32)evt_batstage_set_stg_dark, 0, 30,
-    0, 262235, (s32)evt_batstage_set_stg_dark_base, 0, 30, 0, 393307, (s32)_lvup_obj_set_color,
-    0, 100, 128, 128, 255, 393307, (s32)_lvup_obj_set_color, 1,
-    100, 128, 128, 255, 393307, (s32)_lvup_obj_set_color, 2, 100,
-    128, 128, 255, 262235, (s32)evt_batstage_set_aud_dark, 0, 60, 0,
-    393307, (s32)evt_fade_entry, 25, 1000, 0, 0, 0, 196699,
-    (s32)evt_fade_set_anim_ofs_pos, 0, 130, 262235, (s32)evt_fade_set_anim_virtual_pos, 0, 0, 80,
-    65627, (s32)evt_fade_end_wait, 109, 131163, (s32)btlevtcmd_WaitEventEnd, -29999990, 65647, -29999990,
-    131122, -29999995, 5, 65541, -29999995, 65627, (s32)N__display_select_one_to_upgrade_text, 65545,
-    1, 131122, -29999995, 5, 6, 112, 65539, 60,
-    262235, (s32)btlevtcmd_PadCheckTrigger, 0, 262144, -30000000, 131097, -30000000, 0,
-    65647, -30000000, 131163, (s32)N__set_initial_upgrade_cursor_position, 2, 327771, (s32)btlevtcmd_BtlStageObjSetRotate, (s32)"spotlight",
-    0, 0, 70, 262235, (s32)btlevtcmd_BtlStageObjFlagOnOff, (s32)"spotlight", 1, 0,
-    327771, (s32)evt_sub_intpl_init, 5, 70, 30, 10, 65541, 11,
-    65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_BtlStageObjSetRotate, (s32)"spotlight", 0, 0, -30000000,
-    65545, 1, 6, 393307, (s32)_lvup_obj_set_color, 2, 255, 255,
-    255, 255, 196699, (s32)_lvup_disp_flag_onoff, 2, 32, 65627, (s32)_lvup_select_obj_disp_on,
-    112, 131163, (s32)btlevtcmd_WaitEventEnd, -30000000, 65540, 69, 33, 65539,
-    61, 262235, (s32)btlevtcmd_PadCheckTrigger, 0, 524288, -30000000, 131097, -30000000,
-    0, 65647, -30000000, 131163, (s32)N__set_initial_upgrade_cursor_position, 0, 327771, (s32)btlevtcmd_BtlStageObjSetRotate,
-    (s32)"spotlight", 0, 0, -70, 262235, (s32)btlevtcmd_BtlStageObjFlagOnOff, (s32)"spotlight", 1,
-    0, 327771, (s32)evt_sub_intpl_init, 5, -70, -30, 10, 65541,
-    11, 65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_BtlStageObjSetRotate, (s32)"spotlight", 0, 0,
-    -30000000, 65545, 1, 6, 393307, (s32)_lvup_obj_set_color, 0, 255,
-    255, 255, 255, 196699, (s32)_lvup_disp_flag_onoff, 0, 32, 65627,
-    (s32)_lvup_select_obj_disp_on, 112, 131163, (s32)btlevtcmd_WaitEventEnd, -30000000, 65540, 69, 33,
-    65545, 1, 65540, 60, 65539, 69, 65631, -29999990,
-    262235, (s32)btlevtcmd_BtlStageObjFlagOnOff, (s32)"spotlight", 1, 0, 65627, (s32)_lvup_select_obj_lvup_param_disp, 196699,
-    (s32)_lvup_disp_flag_onoff, 1, 32, 2, 1,
-
-};
+EVT_BEGIN(_curtain_close_event)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_batstage_set_stg_dark, 80, 30, 0)
+        CALL(evt_batstage_set_stg_dark_base, 80, 30, 0)
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        CALL(evt_fade_entry, 24, 1000, 0, 0, 0)
+        CALL(evt_fade_set_anim_ofs_pos, 0, 130)
+        CALL(evt_fade_set_anim_virtual_pos, 0, 0, 80)
+        CALL(evt_fade_end_wait)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_check_battleflag, LW(0), 256)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        BEGIN_SIBLING_EVENT
+            CALL(btlevtcmd_AnimeChangePoseType, -3, 1, 42)
+            CALL(btlevtcmd_GetPos, -3, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_MovePosition, -3, -300, LW(1), LW(2), 120, -1, 0)
+        END_SIBLING_EVENT
+        CALL(btlevtcmd_GetUnitId, -4, LW(3))
+        IF_INT_NOT_EQUAL(LW(3), -1)
+            BEGIN_SIBLING_EVENT
+                CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+                CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 42)
+                CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+                CALL(btlevtcmd_MovePosition, LW(3), -330, LW(1), LW(2), 120, -1, 0)
+            END_SIBLING_EVENT
+        END_IF
+    END_IF
+    BEGIN_SIBLING_EVENT
+        CALL(evt_sub_intpl_init_float, 0, 0, FLOAT(-40.0f), 29)
+        LOOP(30)
+            CALL(evt_sub_intpl_get_float, LW(0), -250000000)
+            CALL(_nozzle_set_offset, STRING("nozzle_l"), LW(0))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        CALL(evt_sub_intpl_init_float, 0, 0, FLOAT(-40.0f), 29)
+        LOOP(30)
+            CALL(evt_sub_intpl_get_float, LW(0), -250000000)
+            CALL(_nozzle_set_offset, STRING("nozzle_c"), LW(0))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        CALL(evt_sub_intpl_init_float, 0, 0, FLOAT(-40.0f), 29)
+        LOOP(30)
+            CALL(evt_sub_intpl_get_float, LW(0), -250000000)
+            CALL(_nozzle_set_offset, STRING("nozzle_r"), LW(0))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_onoff_battleflag, 0, 256)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    WAIT_MS(1500)
+    BEGIN_SIBLING_EVENT
+        LOOP(6)
+            CALL(evt_eff, STRING(""), STRING("confetti"), 13, 0, 300, 95, 180, 0, 0, 0, 0, 0, 0, 0)
+            WAIT_FRAMES(20)
+        END_LOOP
+    END_SIBLING_EVENT
+    SPAWN_EVENT_GET_ID(PTR(_confetti_control_event), LW(0))
+    CALL(_set_confetti_control_evtid, LW(0))
+    CALL(evt_eff, STRING(""), STRING("levelup"), 0, 0, 50, 100, 60, 0, 0, 0, 0, 0, 0, 0)
+    WAIT_FRAMES(48)
+    CALL(_lvup_ap_recover_full)
+    WAIT_MS(1000)
+    BEGIN_SIBLING_EVENT_GET_ID(LW(15))
+        WAIT_FRAMES(2)
+        CALL(_lvup_spot_on, 0)
+        CALL(_lvup_spot_move, 0)
+    END_SIBLING_EVENT
+    CALL(_disable_enemy_unit_disp)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_GetUnitId, -4, LW(3))
+        IF_INT_NOT_EQUAL(LW(3), -1)
+            CALL(btlevtcmd_SetPos, LW(3), -230, 0, 90)
+            CALL(btlevtcmd_ClearAllStatus, LW(3))
+            CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+            CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 40)
+            SET_VALUE(LW(0), -155)
+            SET_VALUE(LW(1), 0)
+            SET_VALUE(LW(2), 90)
+            SET_VALUE(LW(6), 28)
+            CALL(btlevtcmd_GetUnitKind, LW(3), LW(5))
+            SWITCH(LW(5))
+                CASE_OR_EQUAL(224)
+                CASE_OR_EQUAL(225)
+                CALL(btlevtcmd_SetMoveSoundDataWork, LW(3), STRING("SFX_PARTY_BATTLE_SUBMOVE1L"), STRING("SFX_PARTY_BATTLE_SUBMOVE1R"), 6, 12, 16, 0, 0)
+                CALL(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), LW(6), -2, 1)
+                CASE_END
+                CASE_EQUAL(226)
+                CALL(btlevtcmd_SetMoveSoundDataWork, LW(3), STRING("SFX_PARTY_BATTLE_SUBMOVE1L"), STRING("SFX_PARTY_BATTLE_SUBMOVE1R"), 0, 6, 6, 0, 0)
+                CALL(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), LW(6), -2, 1)
+                CASE_EQUAL(227)
+                CALL(btlevtcmd_SetMoveSoundDataWork, LW(3), STRING("SFX_PARTY_BATTLE_SUBHANG1"), STRING("SFX_PARTY_BATTLE_SUBHANG1"), 6, 12, 16, 0, 0)
+                CALL(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), LW(6), -2, 1)
+                CASE_EQUAL(228)
+                CALL(btlevtcmd_SetMoveSoundDataWork, LW(3), STRING("SFX_PARTY_BATTLE_SUBHANG1"), STRING("SFX_PARTY_BATTLE_SUBHANG1"), 0, 15, 13, 0, 0)
+                CALL(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), LW(6), -2, 1)
+                CASE_EQUAL(229)
+                CALL(btlevtcmd_SetMoveSoundDataWork, LW(3), STRING("SFX_PARTY_BATTLE_SUBMOVE1L"), STRING("SFX_PARTY_BATTLE_SUBMOVE1R"), 0, 18, 18, 0, 0)
+                CALL(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), LW(6), -2, 1)
+                CASE_EQUAL(230)
+                CALL(btlevtcmd_SetMoveSoundDataWork, LW(3), STRING("SFX_PARTY_BATTLE_SUBMOVE1L"), STRING("SFX_PARTY_BATTLE_SUBMOVE1R"), 0, 15, 13, 0, 0)
+                CALL(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), LW(6), -2, 1)
+            END_SWITCH
+            CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 43)
+        END_IF
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_SetPos, -3, -200, 0, 90)
+    CALL(btlevtcmd_ClearAllStatus, -3)
+    CALL(btlevtcmd_AnimeChangePoseType, -3, 1, 40)
+    CALL(btlevtcmd_MovePosition, -3, 0, 0, 90, 75, -1, 0)
+    CALL(btlevtcmd_snd_se, -3, STRING("SFX_VOICE_MARIO_PAUSE2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -3, 1, STRING("M_V_2"))
+    CALL(evt_audience_sound_cheer, 180, 40)
+    WAIT_MS(1000)
+    CALL(_lvup_select_object_init)
+    BEGIN_SIBLING_EVENT
+        CALL(_lvup_spot_off, 30)
+    END_SIBLING_EVENT
+    BEGIN_INLINE_EVENT_GET_ID(LW(10))
+        CALL(evt_batstage_set_stg_dark, 0, 30, 0)
+        CALL(evt_batstage_set_stg_dark_base, 0, 30, 0)
+        CALL(_lvup_obj_set_color, 0, 100, 128, 128, 255)
+        CALL(_lvup_obj_set_color, 1, 100, 128, 128, 255)
+        CALL(_lvup_obj_set_color, 2, 100, 128, 128, 255)
+        CALL(evt_batstage_set_aud_dark, 0, 60, 0)
+        CALL(evt_fade_entry, 25, 1000, 0, 0, 0)
+        CALL(evt_fade_set_anim_ofs_pos, 0, 130)
+        CALL(evt_fade_set_anim_virtual_pos, 0, 0, 80)
+        CALL(evt_fade_end_wait)
+    END_INLINE_EVENT
+    CALL(btlevtcmd_WaitEventEnd, LW(10))
+    BEGIN_SIBLING_EVENT_GET_ID(LW(10))
+        SET_VALUE(LW(5), 5)
+        LOOP(LW(5))
+            CALL(N__display_select_one_to_upgrade_text)
+            WAIT_FRAMES(1)
+            SET_VALUE(LW(5), 5)
+        END_LOOP
+    END_SIBLING_EVENT
+    LABEL(60)
+    CALL(btlevtcmd_PadCheckTrigger, 0, 262144, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        BEGIN_SIBLING_EVENT_GET_ID(LW(0))
+            CALL(N__set_initial_upgrade_cursor_position, 2)
+            CALL(btlevtcmd_BtlStageObjSetRotate, STRING("spotlight"), 0, 0, 70)
+            CALL(btlevtcmd_BtlStageObjFlagOnOff, STRING("spotlight"), 1, 0)
+            CALL(evt_sub_intpl_init, 5, 70, 30, 10)
+            LOOP(11)
+                CALL(evt_sub_intpl_get_value)
+                CALL(btlevtcmd_BtlStageObjSetRotate, STRING("spotlight"), 0, 0, LW(0))
+                WAIT_FRAMES(1)
+            END_LOOP
+            CALL(_lvup_obj_set_color, 2, 255, 255, 255, 255)
+            CALL(_lvup_disp_flag_onoff, 2, 32)
+            CALL(_lvup_select_obj_disp_on)
+        END_SIBLING_EVENT
+        CALL(btlevtcmd_WaitEventEnd, LW(0))
+        GOTO(69)
+    END_IF
+    LABEL(61)
+    CALL(btlevtcmd_PadCheckTrigger, 0, 524288, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        BEGIN_SIBLING_EVENT_GET_ID(LW(0))
+            CALL(N__set_initial_upgrade_cursor_position, 0)
+            CALL(btlevtcmd_BtlStageObjSetRotate, STRING("spotlight"), 0, 0, -70)
+            CALL(btlevtcmd_BtlStageObjFlagOnOff, STRING("spotlight"), 1, 0)
+            CALL(evt_sub_intpl_init, 5, -70, -30, 10)
+            LOOP(11)
+                CALL(evt_sub_intpl_get_value)
+                CALL(btlevtcmd_BtlStageObjSetRotate, STRING("spotlight"), 0, 0, LW(0))
+                WAIT_FRAMES(1)
+            END_LOOP
+            CALL(_lvup_obj_set_color, 0, 255, 255, 255, 255)
+            CALL(_lvup_disp_flag_onoff, 0, 32)
+            CALL(_lvup_select_obj_disp_on)
+        END_SIBLING_EVENT
+        CALL(btlevtcmd_WaitEventEnd, LW(0))
+        GOTO(69)
+    END_IF
+    WAIT_FRAMES(1)
+    GOTO(60)
+    LABEL(69)
+    DELETE_EVENT(LW(10))
+    CALL(btlevtcmd_BtlStageObjFlagOnOff, STRING("spotlight"), 1, 0)
+    CALL(_lvup_select_obj_lvup_param_disp)
+    CALL(_lvup_disp_flag_onoff, 1, 32)
+    RETURN
+EVT_END()
 #else
-s32 _curtain_close_event[] = {
-    110, 262235, (s32)evt_batstage_set_stg_dark, 80, 30, 0, 262235, (s32)evt_batstage_set_stg_dark_base,
-    80, 30, 0, 112, 110, 393307, (s32)evt_fade_entry, 24,
-    1000, 0, 0, 0, 196699, (s32)evt_fade_set_anim_ofs_pos, 0, 130,
-    262235, (s32)evt_fade_set_anim_virtual_pos, 0, 0, 80, 65627, (s32)evt_fade_end_wait, 112,
-    196699, (s32)btlevtcmd_check_battleflag, -30000000, 256, 131097, -30000000, 0, 110,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -3, 1, 42, 327771, (s32)btlevtcmd_GetPos, -3,
-    -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition, -3, -300, -29999999,
-    -29999998, 120, -1, 0, 112, 196699, (s32)btlevtcmd_GetUnitId, -4,
-    -29999997, 131097, -29999997, -1, 110, 196699, (s32)btlevtcmd_GetBodyId, -29999997,
-    -29999996, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999997, -29999996, 42, 327771, (s32)btlevtcmd_GetPos,
-    -29999997, -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition, -29999997, -330,
-    -29999999, -29999998, 120, -1, 0, 112, 33, 33,
-    110, 327771, (s32)evt_sub_intpl_init_float, 0, 0, -230040960, 29, 65541,
-    30, 196699, (s32)evt_sub_intpl_get_float, -30000000, -250000000, 196699, (s32)_nozzle_set_offset, (s32)"nozzle_l",
-    -30000000, 65545, 1, 6, 112, 110, 327771, (s32)evt_sub_intpl_init_float,
-    0, 0, -230040960, 29, 65541, 30, 196699, (s32)evt_sub_intpl_get_float,
-    -30000000, -250000000, 196699, (s32)_nozzle_set_offset, (s32)"nozzle_c", -30000000, 65545, 1,
-    6, 112, 110, 327771, (s32)evt_sub_intpl_init_float, 0, 0, -230040960,
-    29, 65541, 30, 196699, (s32)evt_sub_intpl_get_float, -30000000, -250000000, 196699,
-    (s32)_nozzle_set_offset, (s32)"nozzle_r", -30000000, 65545, 1, 6, 112, 196699,
-    (s32)btlevtcmd_onoff_battleflag, 0, 256, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699,
-    (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 65546, 1500, 110, 65541, 6,
-    983131, (s32)evt_eff, (s32)"", (s32)"confetti", 13, 0, 300, 95,
-    180, 0, 0, 0, 0, 0, 0, 0,
-    65545, 20, 6, 112, 131165, (s32)_confetti_control_event, -30000000, 131163,
-    (s32)_set_confetti_control_evtid, -30000000, 983131, (s32)evt_eff, (s32)"", (s32)"levelup", 0, 0,
-    50, 100, 60, 0, 0, 0, 0, 0,
-    0, 0, 65545, 48, 65627, (s32)_lvup_ap_recover_full, 65546, 1000,
-    65647, -29999985, 65545, 2, 131163, (s32)_lvup_spot_on, 0, 131163,
-    (s32)_lvup_spot_move, 0, 112, 65627, (s32)_disable_enemy_unit_disp, 110, 196699, (s32)btlevtcmd_GetUnitId,
-    -4, -29999997, 131097, -29999997, -1, 327771, (s32)btlevtcmd_SetPos, -29999997,
-    -230, 0, 90, 131163, (s32)btlevtcmd_ClearAllStatus, -29999997, 196699, (s32)btlevtcmd_GetBodyId,
-    -29999997, -29999996, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999997, -29999996, 40, 131122,
-    -30000000, -155, 131122, -29999999, 0, 131122, -29999998, 90,
-    131122, -29999994, 28, 196699, (s32)btlevtcmd_GetUnitKind, -29999997, -29999995, 65570,
-    -29999995, 65579, 224, 65579, 225, 589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997,
-    (s32)"SFX_PARTY_BATTLE_SUBMOVE1L", (s32)"SFX_PARTY_BATTLE_SUBMOVE1R", 6, 12, 16, 0, 0, 524379,
-    (s32)btlevtcmd_MovePosition, -29999997, -30000000, -29999999, -29999998, -29999994, -2, 1,
-    46, 65572, 226, 589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997, (s32)"SFX_PARTY_BATTLE_SUBMOVE1L", (s32)"SFX_PARTY_BATTLE_SUBMOVE1R",
-    0, 6, 6, 0, 0, 524379, (s32)btlevtcmd_MovePosition, -29999997,
-    -30000000, -29999999, -29999998, -29999994, -2, 1, 65572, 227,
-    589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997, (s32)"SFX_PARTY_BATTLE_SUBHANG1", (s32)"SFX_PARTY_BATTLE_SUBHANG1", 6, 12, 16,
-    0, 0, 524379, (s32)btlevtcmd_MovePosition, -29999997, -30000000, -29999999, -29999998,
-    -29999994, -2, 1, 65572, 228, 589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997,
-    (s32)"SFX_PARTY_BATTLE_SUBHANG1", (s32)"SFX_PARTY_BATTLE_SUBHANG1", 0, 15, 13, 0, 0, 524379,
-    (s32)btlevtcmd_MovePosition, -29999997, -30000000, -29999999, -29999998, -29999994, -2, 1,
-    65572, 229, 589915, (s32)btlevtcmd_SetMoveSoundDataWork, -29999997, (s32)"SFX_PARTY_BATTLE_SUBMOVE1L", (s32)"SFX_PARTY_BATTLE_SUBMOVE1R", 0,
-    18, 18, 0, 0, 524379, (s32)btlevtcmd_MovePosition, -29999997, -30000000,
-    -29999999, -29999998, -29999994, -2, 1, 65572, 230, 589915,
-    (s32)btlevtcmd_SetMoveSoundDataWork, -29999997, (s32)"SFX_PARTY_BATTLE_SUBMOVE1L", (s32)"SFX_PARTY_BATTLE_SUBMOVE1R", 0, 15, 13, 0,
-    0, 524379, (s32)btlevtcmd_MovePosition, -29999997, -30000000, -29999999, -29999998, -29999994,
-    -2, 1, 49, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999997, -29999996, 43,
-    33, 112, 327771, (s32)btlevtcmd_SetPos, -3, -200, 0, 90,
-    131163, (s32)btlevtcmd_ClearAllStatus, -3, 262235, (s32)btlevtcmd_AnimeChangePoseType, -3, 1, 40,
-    524379, (s32)btlevtcmd_MovePosition, -3, 0, 0, 90, 75, -1,
-    0, 393307, (s32)btlevtcmd_snd_se, -3, (s32)"SFX_VOICE_MARIO_PAUSE2", -250000000, 0, -250000000,
-    262235, (s32)btlevtcmd_AnimeChangePose, -3, 1, (s32)"M_V_2", 196699, (s32)evt_audience_sound_cheer, 180,
-    40, 65546, 1000, 65627, (s32)_lvup_select_object_init, 110, 131163, (s32)_lvup_spot_off,
-    30, 112, 110, 262235, (s32)evt_batstage_set_stg_dark, 0, 30, 0,
-    262235, (s32)evt_batstage_set_stg_dark_base, 0, 30, 0, 262235, (s32)btlevtcmd_BtlStageObjFlagOnOff, (s32)"spotlight",
-    1, 0, 393307, (s32)_lvup_obj_set_color, 0, 100, 128, 128,
-    255, 393307, (s32)_lvup_obj_set_color, 1, 100, 128, 128, 255,
-    393307, (s32)_lvup_obj_set_color, 2, 100, 128, 128, 255, 262235,
-    (s32)evt_batstage_set_aud_dark, 0, 60, 0, 393307, (s32)evt_fade_entry, 25, 1000,
-    0, 0, 0, 196699, (s32)evt_fade_set_anim_ofs_pos, 0, 130, 262235,
-    (s32)evt_fade_set_anim_virtual_pos, 0, 0, 80, 65627, (s32)evt_fade_end_wait, 112, 65546,
-    1000, 65647, -30000000, 393307, (s32)_lvup_obj_set_color, 1, 255, 255,
-    255, 255, 196699, (s32)_lvup_disp_flag_onoff, 1, 32, 65627, (s32)_lvup_select_obj_disp_on,
-    112, 131163, (s32)btlevtcmd_WaitEventEnd, -30000000, 65627, (s32)_lvup_select_obj_lvup_param_disp, 2, 1,
-};
+EVT_BEGIN(_curtain_close_event)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_batstage_set_stg_dark, 80, 30, 0)
+        CALL(evt_batstage_set_stg_dark_base, 80, 30, 0)
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        CALL(evt_fade_entry, 24, 1000, 0, 0, 0)
+        CALL(evt_fade_set_anim_ofs_pos, 0, 130)
+        CALL(evt_fade_set_anim_virtual_pos, 0, 0, 80)
+        CALL(evt_fade_end_wait)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_check_battleflag, LW(0), 256)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        BEGIN_SIBLING_EVENT
+            CALL(btlevtcmd_AnimeChangePoseType, -3, 1, 42)
+            CALL(btlevtcmd_GetPos, -3, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_MovePosition, -3, -300, LW(1), LW(2), 120, -1, 0)
+        END_SIBLING_EVENT
+        CALL(btlevtcmd_GetUnitId, -4, LW(3))
+        IF_INT_NOT_EQUAL(LW(3), -1)
+            BEGIN_SIBLING_EVENT
+                CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+                CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 42)
+                CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+                CALL(btlevtcmd_MovePosition, LW(3), -330, LW(1), LW(2), 120, -1, 0)
+            END_SIBLING_EVENT
+        END_IF
+    END_IF
+    BEGIN_SIBLING_EVENT
+        CALL(evt_sub_intpl_init_float, 0, 0, FLOAT(-40.0f), 29)
+        LOOP(30)
+            CALL(evt_sub_intpl_get_float, LW(0), -250000000)
+            CALL(_nozzle_set_offset, STRING("nozzle_l"), LW(0))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        CALL(evt_sub_intpl_init_float, 0, 0, FLOAT(-40.0f), 29)
+        LOOP(30)
+            CALL(evt_sub_intpl_get_float, LW(0), -250000000)
+            CALL(_nozzle_set_offset, STRING("nozzle_c"), LW(0))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        CALL(evt_sub_intpl_init_float, 0, 0, FLOAT(-40.0f), 29)
+        LOOP(30)
+            CALL(evt_sub_intpl_get_float, LW(0), -250000000)
+            CALL(_nozzle_set_offset, STRING("nozzle_r"), LW(0))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_onoff_battleflag, 0, 256)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    WAIT_MS(1500)
+    BEGIN_SIBLING_EVENT
+        LOOP(6)
+            CALL(evt_eff, STRING(""), STRING("confetti"), 13, 0, 300, 95, 180, 0, 0, 0, 0, 0, 0, 0)
+            WAIT_FRAMES(20)
+        END_LOOP
+    END_SIBLING_EVENT
+    SPAWN_EVENT_GET_ID(PTR(_confetti_control_event), LW(0))
+    CALL(_set_confetti_control_evtid, LW(0))
+    CALL(evt_eff, STRING(""), STRING("levelup"), 0, 0, 50, 100, 60, 0, 0, 0, 0, 0, 0, 0)
+    WAIT_FRAMES(48)
+    CALL(_lvup_ap_recover_full)
+    WAIT_MS(1000)
+    BEGIN_SIBLING_EVENT_GET_ID(LW(15))
+        WAIT_FRAMES(2)
+        CALL(_lvup_spot_on, 0)
+        CALL(_lvup_spot_move, 0)
+    END_SIBLING_EVENT
+    CALL(_disable_enemy_unit_disp)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_GetUnitId, -4, LW(3))
+        IF_INT_NOT_EQUAL(LW(3), -1)
+            CALL(btlevtcmd_SetPos, LW(3), -230, 0, 90)
+            CALL(btlevtcmd_ClearAllStatus, LW(3))
+            CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+            CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 40)
+            SET_VALUE(LW(0), -155)
+            SET_VALUE(LW(1), 0)
+            SET_VALUE(LW(2), 90)
+            SET_VALUE(LW(6), 28)
+            CALL(btlevtcmd_GetUnitKind, LW(3), LW(5))
+            SWITCH(LW(5))
+                CASE_OR_EQUAL(224)
+                CASE_OR_EQUAL(225)
+                CALL(btlevtcmd_SetMoveSoundDataWork, LW(3), STRING("SFX_PARTY_BATTLE_SUBMOVE1L"), STRING("SFX_PARTY_BATTLE_SUBMOVE1R"), 6, 12, 16, 0, 0)
+                CALL(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), LW(6), -2, 1)
+                CASE_END
+                CASE_EQUAL(226)
+                CALL(btlevtcmd_SetMoveSoundDataWork, LW(3), STRING("SFX_PARTY_BATTLE_SUBMOVE1L"), STRING("SFX_PARTY_BATTLE_SUBMOVE1R"), 0, 6, 6, 0, 0)
+                CALL(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), LW(6), -2, 1)
+                CASE_EQUAL(227)
+                CALL(btlevtcmd_SetMoveSoundDataWork, LW(3), STRING("SFX_PARTY_BATTLE_SUBHANG1"), STRING("SFX_PARTY_BATTLE_SUBHANG1"), 6, 12, 16, 0, 0)
+                CALL(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), LW(6), -2, 1)
+                CASE_EQUAL(228)
+                CALL(btlevtcmd_SetMoveSoundDataWork, LW(3), STRING("SFX_PARTY_BATTLE_SUBHANG1"), STRING("SFX_PARTY_BATTLE_SUBHANG1"), 0, 15, 13, 0, 0)
+                CALL(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), LW(6), -2, 1)
+                CASE_EQUAL(229)
+                CALL(btlevtcmd_SetMoveSoundDataWork, LW(3), STRING("SFX_PARTY_BATTLE_SUBMOVE1L"), STRING("SFX_PARTY_BATTLE_SUBMOVE1R"), 0, 18, 18, 0, 0)
+                CALL(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), LW(6), -2, 1)
+                CASE_EQUAL(230)
+                CALL(btlevtcmd_SetMoveSoundDataWork, LW(3), STRING("SFX_PARTY_BATTLE_SUBMOVE1L"), STRING("SFX_PARTY_BATTLE_SUBMOVE1R"), 0, 15, 13, 0, 0)
+                CALL(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), LW(6), -2, 1)
+            END_SWITCH
+            CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 43)
+        END_IF
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_SetPos, -3, -200, 0, 90)
+    CALL(btlevtcmd_ClearAllStatus, -3)
+    CALL(btlevtcmd_AnimeChangePoseType, -3, 1, 40)
+    CALL(btlevtcmd_MovePosition, -3, 0, 0, 90, 75, -1, 0)
+    CALL(btlevtcmd_snd_se, -3, STRING("SFX_VOICE_MARIO_PAUSE2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -3, 1, STRING("M_V_2"))
+    CALL(evt_audience_sound_cheer, 180, 40)
+    WAIT_MS(1000)
+    CALL(_lvup_select_object_init)
+    BEGIN_SIBLING_EVENT
+        CALL(_lvup_spot_off, 30)
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        CALL(evt_batstage_set_stg_dark, 0, 30, 0)
+        CALL(evt_batstage_set_stg_dark_base, 0, 30, 0)
+        CALL(btlevtcmd_BtlStageObjFlagOnOff, STRING("spotlight"), 1, 0)
+        CALL(_lvup_obj_set_color, 0, 100, 128, 128, 255)
+        CALL(_lvup_obj_set_color, 1, 100, 128, 128, 255)
+        CALL(_lvup_obj_set_color, 2, 100, 128, 128, 255)
+        CALL(evt_batstage_set_aud_dark, 0, 60, 0)
+        CALL(evt_fade_entry, 25, 1000, 0, 0, 0)
+        CALL(evt_fade_set_anim_ofs_pos, 0, 130)
+        CALL(evt_fade_set_anim_virtual_pos, 0, 0, 80)
+        CALL(evt_fade_end_wait)
+    END_SIBLING_EVENT
+    WAIT_MS(1000)
+    BEGIN_SIBLING_EVENT_GET_ID(LW(0))
+        CALL(_lvup_obj_set_color, 1, 255, 255, 255, 255)
+        CALL(_lvup_disp_flag_onoff, 1, 32)
+        CALL(_lvup_select_obj_disp_on)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_WaitEventEnd, LW(0))
+    CALL(_lvup_select_obj_lvup_param_disp)
+    RETURN
+EVT_END()
 #endif
 
 EVT_BEGIN(_confetti_control_event)
@@ -1284,18 +1463,27 @@ EVT_BEGIN(_confetti_control_event)
     RETURN
 EVT_END()
 
-s32 _jump_event[] = {
-    110, 65627, (s32)_lvup_object_noselect_delete, 112, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_BTL_LVUP_BLOCK_MOVE1", 0,
-    125, 0, 0, 65627, (s32)_lvup_object_select_move, 327771, (s32)btlevtcmd_GetPos, -3,
-    -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_AnimeChangePoseType, -3, 1, 44,
-    107, 65545, 10, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_BTL_LVUP_BLOCK_HIT1", 0, 125,
-    0, 0, 393307, (s32)evt_btl_camera_shake_h, 0, 6, 0, 20,
-    13, 65627, (s32)_lvup_object_decide_bound, 109, 196699, (s32)btlevtcmd_SetFallAccel, -3, -229999591,
-    458843, (s32)btlevtcmd_JumpPosition, -3, -30000000, -29999999, -29999998, 30, -1,
-    393307, (s32)btlevtcmd_snd_se, -3, (s32)"SFX_VOICE_MARIO_PAUSE2", -250000000, 0, -250000000, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -3, 1, (s32)"M_V_2", 196699, (s32)evt_audience_sound_cheer, 180, 40,
-    2, 1,
-};
+EVT_BEGIN(_jump_event)
+    BEGIN_SIBLING_EVENT
+        CALL(_lvup_object_noselect_delete)
+    END_SIBLING_EVENT
+    CALL(evt_snd_sfxon_3d, STRING("SFX_BTL_LVUP_BLOCK_MOVE1"), 0, 125, 0, 0)
+    CALL(_lvup_object_select_move)
+    CALL(btlevtcmd_GetPos, -3, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePoseType, -3, 1, 44)
+    BEGIN_INLINE_EVENT
+        WAIT_FRAMES(10)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_BTL_LVUP_BLOCK_HIT1"), 0, 125, 0, 0)
+        CALL(evt_btl_camera_shake_h, 0, 6, 0, 20, 13)
+        CALL(_lvup_object_decide_bound)
+    END_INLINE_EVENT
+    CALL(btlevtcmd_SetFallAccel, -3, FLOAT(0.39941406f))
+    CALL(btlevtcmd_JumpPosition, -3, LW(0), LW(1), LW(2), 30, -1)
+    CALL(btlevtcmd_snd_se, -3, STRING("SFX_VOICE_MARIO_PAUSE2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -3, 1, STRING("M_V_2"))
+    CALL(evt_audience_sound_cheer, 180, 40)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(_move_to_heart_event)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BTL_LVUP_CURSOR1"), 0, 125, 0, 0)
@@ -1315,18 +1503,24 @@ EVT_BEGIN(_move_to_heart_event)
     RETURN
 EVT_END()
 
-s32 _move_to_flower_event[] = {
-    393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_BTL_LVUP_CURSOR1", 0, 125, 0, 0, 393307,
-    (s32)_lvup_obj_set_color, 0, 100, 128, 128, 255, 393307, (s32)_lvup_obj_set_color,
-    1, 100, 128, 128, 255, 393307, (s32)_lvup_obj_set_color, 2,
-    100, 128, 128, 255, 196699, (s32)_lvup_disp_flag_onoff, 0, 32,
-    327771, (s32)btlevtcmd_BtlStageObjGetRotate, (s32)"spotlight", -250000000, -250000000, -29999995, 327771, (s32)evt_sub_intpl_init,
-    5, -29999995, 0, 10, 65541, 11, 65627, (s32)evt_sub_intpl_get_value,
-    327771, (s32)btlevtcmd_BtlStageObjSetRotate, (s32)"spotlight", 0, 0, -30000000, 65545, 1,
-    6, 327771, (s32)btlevtcmd_BtlStageObjSetRotate, (s32)"spotlight", 0, 0, 0, 393307,
-    (s32)_lvup_obj_set_color, 1, 255, 255, 255, 255, 196699, (s32)_lvup_disp_flag_onoff,
-    1, 32, 2, 1,
-};
+EVT_BEGIN(_move_to_flower_event)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_BTL_LVUP_CURSOR1"), 0, 125, 0, 0)
+    CALL(_lvup_obj_set_color, 0, 100, 128, 128, 255)
+    CALL(_lvup_obj_set_color, 1, 100, 128, 128, 255)
+    CALL(_lvup_obj_set_color, 2, 100, 128, 128, 255)
+    CALL(_lvup_disp_flag_onoff, 0, 32)
+    CALL(btlevtcmd_BtlStageObjGetRotate, STRING("spotlight"), -250000000, -250000000, LW(5))
+    CALL(evt_sub_intpl_init, 5, LW(5), 0, 10)
+    LOOP(11)
+        CALL(evt_sub_intpl_get_value)
+        CALL(btlevtcmd_BtlStageObjSetRotate, STRING("spotlight"), 0, 0, LW(0))
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(btlevtcmd_BtlStageObjSetRotate, STRING("spotlight"), 0, 0, 0)
+    CALL(_lvup_obj_set_color, 1, 255, 255, 255, 255)
+    CALL(_lvup_disp_flag_onoff, 1, 32)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(_move_to_badge_point_event)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BTL_LVUP_CURSOR1"), 0, 125, 0, 0)
@@ -1566,7 +1760,7 @@ USER_FUNC(_lvup_spot_move) {
     case 1:
         switch (n) {
         case 0:
-            e->pos.x = 0.5f * *(f32*)((u8*)BattleGetMarioPtr(_battleWorkPointer) + 0x3C);
+            e->pos.x = 0.5f * BattleGetMarioPtr(_battleWorkPointer)->mPosition.x;
             e->pos.y = -20.0f;
             break;
         case 1:
@@ -1905,7 +2099,7 @@ void _lvup_select_object_disp(CameraId camId, void* param) {
 #pragma dont_inline on
 void _check_audience_battle_end_exec(void) {
     BattleWork* wp = _battleWorkPointer;
-    SeqEndGroup* group = *(SeqEndGroup**)((u8*)wp->fbatInfo->setup + 0x18);
+    SeqEndGroup* group = (SeqEndGroup*)wp->fbatInfo->setup->groupSetup;
     s32 level = group->units[0].kind[0xE];
     s32 turn;
     s32 sum;

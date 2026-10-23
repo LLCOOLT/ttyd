@@ -9,6 +9,7 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "party/party_motion.h"
+#include "battle/battle_database_common.h"
 
 s32 bts_x_flag_data;
 f32 intplGetValue(s32 mode, s32 currStep, f32 start, f32 end, s32 steps);
@@ -32,21 +33,21 @@ static USER_FUNC(bts_wariai_enzan_1f_intpl);
 static USER_FUNC(bts_wariai_enzan_1f);
 static USER_FUNC(bts_wariai_enzan_1);
 
-__declspec(section ".data") u64 fd_boss_batten_satellite_negone_one_374;
-__declspec(section ".data") s32 fd_boss_batten_satellite_neg_one_382[1];
-__declspec(section ".data") s32 fd_boss_batten_satellite___local_PI_383[1];
-__declspec(section ".data") s32 fd_boss_batten_satellite___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_boss_batten_satellite_one_negone_373;
-__declspec(section ".data") s32 fd_boss_batten_satellite___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_boss_batten_satellite_one_381[1];
-__declspec(section ".data") u64 fd_boss_batten_satellite_negone_one_360;
-__declspec(section ".data") s32 fd_boss_batten_satellite_neg_one_365[1];
-__declspec(section ".data") s32 fd_boss_batten_satellite___local_PI_366[1];
-__declspec(section ".data") s32 fd_boss_batten_satellite___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_boss_batten_satellite_one_negone_359;
-__declspec(section ".data") s32 fd_boss_batten_satellite___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_boss_batten_satellite_one_364[1];
-s32 weapon_batten_satellite_attack[48];
+__declspec(section ".data") f32 fd_boss_batten_satellite_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_batten_satellite_neg_one_382;
+__declspec(section ".data") f32 fd_boss_batten_satellite___local_PI_383;
+__declspec(section ".data") f32 fd_boss_batten_satellite___local_3PIO2_385;
+__declspec(section ".data") f32 fd_boss_batten_satellite_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_batten_satellite___local_PIO2_384;
+__declspec(section ".data") f32 fd_boss_batten_satellite_one_381;
+__declspec(section ".data") f32 fd_boss_batten_satellite_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_batten_satellite_neg_one_365;
+__declspec(section ".data") f32 fd_boss_batten_satellite___local_PI_366;
+__declspec(section ".data") f32 fd_boss_batten_satellite___local_3PIO2_368;
+__declspec(section ".data") f32 fd_boss_batten_satellite_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_batten_satellite___local_PIO2_367;
+__declspec(section ".data") f32 fd_boss_batten_satellite_one_364;
+BattleWeapon weapon_batten_satellite_attack;
 BattleUnitKind unit_boss_batten_satellite;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -64,61 +65,68 @@ static __declspec(section ".data") s32 attack_event[10];
 s32 batten_satellite_attack_attack_event[304];
 static __declspec(section ".data") s32 wait_event[6];
 
-__declspec(section ".data") u64 fd_boss_batten_satellite_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_batten_satellite_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_batten_satellite_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_batten_satellite_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_batten_satellite___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_batten_satellite___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_batten_satellite___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_batten_satellite___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_batten_satellite_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_batten_satellite_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_batten_satellite___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_batten_satellite___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_batten_satellite_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_batten_satellite_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_boss_batten_satellite_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_batten_satellite_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_batten_satellite_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_batten_satellite_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_batten_satellite___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_batten_satellite___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_batten_satellite___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_batten_satellite___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_batten_satellite_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_batten_satellite_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_batten_satellite___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_batten_satellite___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_batten_satellite_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_batten_satellite_one_364 = 1.0f;
 
-s32 weapon_batten_satellite_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 135, 2, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_batten_satellite_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    2, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 BattleUnitKind unit_boss_batten_satellite = {
@@ -232,27 +240,52 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
-s32 dmg_counter_event[] = {
-    196699, (s32)btlevtcmd_OnUnitFlag, -29999990, 1, 65570, -30000000, 65572, 43,
-    196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_ATTACK_MISS3", 0, 131122, -29999986, 36, 65579,
-    46, 65579, 49, 65579, 50, 65579, 54, 131122,
-    -29999986, 29, 46, 42, 131122, -29999986, 39, 49,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, -29999986, 110, 196699, (s32)btlevtcmd_RunDataEventChild,
-    -29999990, 10, 112, 196699, (s32)btlevtcmd_SetFallAccel, -29999990, -229998976, 327771,
-    (s32)btlevtcmd_GetPos, -29999990, -29999998, -29999997, -29999996, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999990,
-    -29999998, 25, 131125, -29999997, 25, 655451, (s32)btlevtcmd_DivePosition, -29999990,
-    -29999998, -29999997, -29999996, 10, 0, 0, 0, -1,
-    65546, 500, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 262235, (s32)btlevtcmd_CheckDamageCode,
-    -29999990, 512, -30000000, 131097, -30000000, 0, 262235, (s32)btlevtcmd_CheckDamageCode,
-    -29999990, 2048, -30000000, 131096, -30000000, 0, 2, 33,
-    33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_SATELLITE_ATTACK2", -250000000, 0, -250000000,
-    327771, (s32)btlevtcmd_GetHomePos, -29999990, -29999995, -29999994, -29999993, 65546, 80,
-    131122, -29999992, 42, 65541, -29999992, 393307, (s32)bts_wariai_enzan_1, -29999992,
-    42, -29999998, -29999995, -29999988, 393307, (s32)bts_wariai_enzan_1, -29999992, 42,
-    -29999997, -29999994, -29999987, 393307, (s32)bts_wariai_enzan_1, -29999992, 42, -29999996,
-    -29999993, -29999986, 327771, (s32)btlevtcmd_SetPos, -2, -29999988, -29999987, -29999986,
-    65545, 1, 6, 2, 1,
-};
+EVT_BEGIN(dmg_counter_event)
+    CALL(btlevtcmd_OnUnitFlag, LW(10), 1)
+    SWITCH(LW(0))
+        CASE_EQUAL(43)
+        CALL(evt_snd_sfxon, STRING("SFX_BTL_ATTACK_MISS3"), 0)
+        SET_VALUE(LW(14), 36)
+        CASE_OR_EQUAL(46)
+        CASE_OR_EQUAL(49)
+        CASE_OR_EQUAL(50)
+        CASE_OR_EQUAL(54)
+        SET_VALUE(LW(14), 29)
+        CASE_END
+        CASE_DEFAULT
+        SET_VALUE(LW(14), 39)
+    END_SWITCH
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_RunDataEventChild, LW(10), 10)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_SetFallAccel, LW(10), FLOAT(1.0f))
+    CALL(btlevtcmd_GetPos, LW(10), LW(2), LW(3), LW(4))
+    CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(2), 25)
+    ADD(LW(3), 25)
+    CALL(btlevtcmd_DivePosition, LW(10), LW(2), LW(3), LW(4), 10, 0, 0, 0, -1)
+    WAIT_MS(500)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(btlevtcmd_CheckDamageCode, LW(10), 512, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDamageCode, LW(10), 2048, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SATELLITE_ATTACK2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetHomePos, LW(10), LW(5), LW(6), LW(7))
+    WAIT_MS(80)
+    SET_VALUE(LW(8), 42)
+    LOOP(LW(8))
+        CALL(bts_wariai_enzan_1, LW(8), 42, LW(2), LW(5), LW(12))
+        CALL(bts_wariai_enzan_1, LW(8), 42, LW(3), LW(6), LW(13))
+        CALL(bts_wariai_enzan_1, LW(8), 42, LW(4), LW(7), LW(14))
+        CALL(btlevtcmd_SetPos, -2, LW(12), LW(13), LW(14))
+        WAIT_FRAMES(1)
+    END_LOOP
+    RETURN
+EVT_END()
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_batten_satellite", "c_shuryo_p", 0.0f, 0.0f, 0.0f, -4.0f, -2.0f, 0.0f, -6.0f, 1.0f, 0.0f, 14, 14, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
@@ -289,52 +322,102 @@ static __declspec(section ".data") EVT_BEGIN(dead_event)
 EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(attack_event)
-    SET_VALUE(LW(9), PTR(weapon_batten_satellite_attack))
+    SET_VALUE(LW(9), PTR(&weapon_batten_satellite_attack))
     CALL_CHILD(PTR(batten_satellite_attack_attack_event))
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
 
-s32 batten_satellite_attack_attack_event[] = {
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"F_1", 65546, 400, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 69, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000,
-    262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999991, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991,
-    -29999997, -29999996, 131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken, -2,
-    16, -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered, 33,
-    2, 33, 131163, (s32)btlevtcmd_WeaponAftereffect, -29999991, 262235, (s32)btlevtcmd_AttackDeclare, -2,
-    -29999997, -29999996, 65627, (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_SATELLITE_ATTACK1", -250000000, 0, -250000000, 327771,
-    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_GetHitPos, -29999997,
-    -29999996, -29999987, -29999994, -29999993, 131122, -29999992, 9, 65541,
-    -29999992, 393307, (s32)bts_wariai_enzan_1, -29999992, 9, -30000000, -29999987, -29999990,
-    393307, (s32)bts_wariai_enzan_1, -29999992, 9, -29999999, -29999994, -29999989, 393307,
-    (s32)bts_wariai_enzan_1, -29999992, 9, -29999998, -29999993, -29999988, 327771, (s32)btlevtcmd_SetPos,
-    -2, -29999990, -29999989, -29999988, 65545, 1, 6, 131126,
-    -29999987, -30000000, 131128, -29999987, 2, 131126, -29999994, -29999999,
-    131128, -29999994, 2, 131126, -29999993, -29999998, 131128, -29999993,
-    2, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998,
-    131125, -29999987, -30000000, 131125, -29999994, -29999999, 131125, -29999993,
-    -29999998, 110, 131122, -29999992, 4, 65541, -29999992, 393307,
-    (s32)bts_wariai_enzan_1, -29999992, 4, -30000000, -29999987, -29999990, 393307, (s32)bts_wariai_enzan_1,
-    -29999992, 4, -29999999, -29999994, -29999989, 393307, (s32)bts_wariai_enzan_1, -29999992,
-    4, -29999998, -29999993, -29999988, 327771, (s32)btlevtcmd_SetPos, -2, -29999990,
-    -29999989, -29999988, 65545, 1, 6, 112, 458843, (s32)btlevtcmd_PreCheckDamage,
-    -2, -29999997, -29999996, -29999991, 256, -29999995, 65570, -29999995,
-    65579, 4, 65540, 90, 46, 65572, 3, 196699,
-    (s32)btlevtcmd_StartAvoid, -29999997, 38, 65540, 90, 46, 65572, 6,
-    196699, (s32)btlevtcmd_StartAvoid, -29999997, 39, 65540, 90, 65572, 2,
-    196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 65540, 90, 65572, 1,
-    65540, 91, 46, 42, 65540, 98, 46, 49,
-    65539, 90, 65540, 98, 65539, 91, 196699, (s32)btlevtcmd_ResultACDefence,
-    -29999997, -29999991, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991,
-    256, -29999995, 65539, 98, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_SATELLITE_ATTACK2",
-    -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999,
-    -29999998, 65546, 80, 131122, -29999992, 42, 65541, -29999992,
-    393307, (s32)bts_wariai_enzan_1, -29999992, 42, -29999987, -30000000, -29999990, 393307,
-    (s32)bts_wariai_enzan_1, -29999992, 42, -29999994, -29999999, -29999989, 393307, (s32)bts_wariai_enzan_1,
-    -29999992, 42, -29999993, -29999998, -29999988, 327771, (s32)btlevtcmd_SetPos, -2,
-    -29999990, -29999989, -29999988, 65545, 1, 6, 2, 1,
-};
+EVT_BEGIN(batten_satellite_attack_attack_event)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("F_1"))
+    WAIT_MS(400)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+        END_IF
+        RETURN
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SATELLITE_ATTACK1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(13), LW(6), LW(7))
+    SET_VALUE(LW(8), 9)
+    LOOP(LW(8))
+        CALL(bts_wariai_enzan_1, LW(8), 9, LW(0), LW(13), LW(10))
+        CALL(bts_wariai_enzan_1, LW(8), 9, LW(1), LW(6), LW(11))
+        CALL(bts_wariai_enzan_1, LW(8), 9, LW(2), LW(7), LW(12))
+        CALL(btlevtcmd_SetPos, -2, LW(10), LW(11), LW(12))
+        WAIT_FRAMES(1)
+    END_LOOP
+    SUBTRACT(LW(13), LW(0))
+    DIVIDE(LW(13), 2)
+    SUBTRACT(LW(6), LW(1))
+    DIVIDE(LW(6), 2)
+    SUBTRACT(LW(7), LW(2))
+    DIVIDE(LW(7), 2)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    ADD(LW(13), LW(0))
+    ADD(LW(6), LW(1))
+    ADD(LW(7), LW(2))
+    BEGIN_SIBLING_EVENT
+        SET_VALUE(LW(8), 4)
+        LOOP(LW(8))
+            CALL(bts_wariai_enzan_1, LW(8), 4, LW(0), LW(13), LW(10))
+            CALL(bts_wariai_enzan_1, LW(8), 4, LW(1), LW(6), LW(11))
+            CALL(bts_wariai_enzan_1, LW(8), 4, LW(2), LW(7), LW(12))
+            CALL(btlevtcmd_SetPos, -2, LW(10), LW(11), LW(12))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+    END_SWITCH
+    LABEL(90)
+    GOTO(98)
+    LABEL(91)
+    CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    LABEL(98)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SATELLITE_ATTACK2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    WAIT_MS(80)
+    SET_VALUE(LW(8), 42)
+    LOOP(LW(8))
+        CALL(bts_wariai_enzan_1, LW(8), 42, LW(13), LW(0), LW(10))
+        CALL(bts_wariai_enzan_1, LW(8), 42, LW(6), LW(1), LW(11))
+        CALL(bts_wariai_enzan_1, LW(8), 42, LW(7), LW(2), LW(12))
+        CALL(btlevtcmd_SetPos, -2, LW(10), LW(11), LW(12))
+        WAIT_FRAMES(1)
+    END_LOOP
+    RETURN
+EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)

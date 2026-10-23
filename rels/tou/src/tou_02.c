@@ -21,6 +21,8 @@
 #include "party.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "data_tables.h"
+#include "evt/evt_npc.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(N_evt_sub_status_gauge_force_update);
 USER_FUNC(evt_sub_get_language);
@@ -156,22 +158,22 @@ static void pose_change(Fan* fan, const char* name, const char* anim);
 static void pose_main(void);
 static void pose_init(void);
 
-__declspec(section ".data") static u64 negone_one$374;
-__declspec(section ".data") static s32 neg_one$382[1];
-__declspec(section ".data") static s32 __local_PI$383[1];
-__declspec(section ".data") static s32 __local_3PIO2$385[1];
+__declspec(section ".data") static f32 negone_one$374[2] __attribute__((aligned(8)));
+__declspec(section ".data") static f32 neg_one$382;
+__declspec(section ".data") static f32 __local_PI$383;
+__declspec(section ".data") static f32 __local_3PIO2$385;
 __declspec(section ".data") u32 gap_04_0001116C_data[1];
-__declspec(section ".data") static u64 one_negone$373;
-__declspec(section ".data") static s32 __local_PIO2$384[1];
-__declspec(section ".data") static s32 one$381[1];
-__declspec(section ".data") static u64 negone_one$360;
-__declspec(section ".data") static s32 neg_one$365[1];
-__declspec(section ".data") static s32 __local_PI$366[1];
-__declspec(section ".data") static s32 __local_3PIO2$368[1];
+__declspec(section ".data") static f32 one_negone$373[2] __attribute__((aligned(8)));
+__declspec(section ".data") static f32 __local_PIO2$384;
+__declspec(section ".data") static f32 one$381;
+__declspec(section ".data") static f32 negone_one$360[2] __attribute__((aligned(8)));
+__declspec(section ".data") static f32 neg_one$365;
+__declspec(section ".data") static f32 __local_PI$366;
+__declspec(section ".data") static f32 __local_3PIO2$368;
 __declspec(section ".data") u32 gap_04_00011194_data[1];
-__declspec(section ".data") static u64 one_negone$359;
-__declspec(section ".data") static s32 __local_PIO2$367[1];
-__declspec(section ".data") static s32 one$364[1];
+__declspec(section ".data") static f32 one_negone$359[2] __attribute__((aligned(8)));
+__declspec(section ".data") static f32 __local_PIO2$367;
+__declspec(section ".data") static f32 one$364;
 static s32 s_door_open[58];
 static s32 s_door_close[58];
 s32 n_1_door_open[22];
@@ -182,7 +184,7 @@ __declspec(section ".data") s32 n_3_door_open[12];
 __declspec(section ".data") s32 n_3_door_close[12];
 __declspec(section ".data") s32 n_4_door_open[12];
 __declspec(section ".data") s32 n_4_door_close[12];
-static s32 bero_data[90];
+static BeroEntry bero_data[6];
 s32 evt_move_g[63];
 s32 init_gard1[39];
 s32 talk_gard1[70];
@@ -221,9 +223,9 @@ s32 init_ironB[38];
 s32 talk_ironB[13];
 s32 init_borodo[32];
 s32 talk_borodo[13];
-static s32 npcEnt[391];
+static NpcSetupInfo npcEnt[17];
 s32 evt_tougi2[285];
-s32 ext_fan_data[84];
+ExtTexInfo ext_fan_data[28];
 s32 mario_momikucha_msg[111];
 s32 evt_momikucha[105];
 static s32 evt_key[173];
@@ -329,57 +331,37 @@ static f32 randf(f32 min, f32 max) {
     return r * (max - min) + min;
 }
 
-__declspec(section ".data") static u64 negone_one$374 = 0xBF8000003F800000;
+__declspec(section ".data") static f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") static s32 neg_one$382[] = {
-    -1082130432,
-};
+__declspec(section ".data") static f32 neg_one$382 = -1.0f;
 
-__declspec(section ".data") static s32 __local_PI$383[] = {
-    1078530011,
-};
+__declspec(section ".data") static f32 __local_PI$383 = 3.1415927f;
 
-__declspec(section ".data") static s32 __local_3PIO2$385[] = {
-    1083624420,
-};
+__declspec(section ".data") static f32 __local_3PIO2$385 = 4.712389f;
 
 __declspec(section ".data") u32 gap_04_0001116C_data[1] = {0};
 
-__declspec(section ".data") static u64 one_negone$373 = 0x3F800000BF800000;
+__declspec(section ".data") static f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") static s32 __local_PIO2$384[] = {
-    1070141403,
-};
+__declspec(section ".data") static f32 __local_PIO2$384 = 1.5707964f;
 
-__declspec(section ".data") static s32 one$381[] = {
-    1065353216,
-};
+__declspec(section ".data") static f32 one$381 = 1.0f;
 
-__declspec(section ".data") static u64 negone_one$360 = 0xBF8000003F800000;
+__declspec(section ".data") static f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") static s32 neg_one$365[] = {
-    -1082130432,
-};
+__declspec(section ".data") static f32 neg_one$365 = -1.0f;
 
-__declspec(section ".data") static s32 __local_PI$366[] = {
-    1078530011,
-};
+__declspec(section ".data") static f32 __local_PI$366 = 3.1415927f;
 
-__declspec(section ".data") static s32 __local_3PIO2$368[] = {
-    1083624420,
-};
+__declspec(section ".data") static f32 __local_3PIO2$368 = 4.712389f;
 
 __declspec(section ".data") u32 gap_04_00011194_data[1] = {0};
 
-__declspec(section ".data") static u64 one_negone$359 = 0x3F800000BF800000;
+__declspec(section ".data") static f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") static s32 __local_PIO2$367[] = {
-    1070141403,
-};
+__declspec(section ".data") static f32 __local_PIO2$367 = 1.5707964f;
 
-__declspec(section ".data") static s32 one$364[] = {
-    1065353216,
-};
+__declspec(section ".data") static f32 one$364 = 1.0f;
 
 static EVT_BEGIN(s_door_open)
     IF_FLOAT_EQUAL(LW(0), FLOAT((0.0f)))
@@ -479,19 +461,98 @@ __declspec(section ".data") EVT_BEGIN(n_4_door_close)
     RETURN
 EVT_END()
 
-static s32 bero_data[] = {
-    (s32)("s_bero"), 65536, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)("tou_01"), (s32)("a_door_mon"), 327685, (s32)s_door_close, (s32)s_door_open, (s32)("n_bero_1"),
-    65542, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)("tou_03"), (s32)("s_bero_1"), 327685, (s32)n_1_door_close, (s32)n_1_door_open, (s32)("n_bero_2"), 65542,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)("tou_03"), (s32)("s_bero_2"), 327685, (s32)n_2_door_close, (s32)n_2_door_open, (s32)("n_bero_3"), 65540, 20000,
-    100000, 0, 0, -1, 0, -1, 0, (s32)("tou_04"),
-    (s32)("e_bero"), 327685, (s32)n_3_door_close, (s32)n_3_door_open, (s32)("n_bero_4"), 65540, 20000, 100000,
-    0, 0, -1, 0, -1, 0, (s32)("tou_04"), (s32)("w_bero"),
-    327685, (s32)n_4_door_close, (s32)n_4_door_open, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0,
+static BeroEntry bero_data[] = {
+    {
+        ("s_bero"), // hitName
+        1, // type
+        0, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)("tou_01"), // nextMapName
+        ("a_door_mon"), // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s_door_close, // enterAnimeArg
+        (s32)s_door_open, // exitAnimeArg
+    },
+    {
+        ("n_bero_1"), // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)("tou_03"), // nextMapName
+        ("s_bero_1"), // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n_1_door_close, // enterAnimeArg
+        (s32)n_1_door_open, // exitAnimeArg
+    },
+    {
+        ("n_bero_2"), // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)("tou_03"), // nextMapName
+        ("s_bero_2"), // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n_2_door_close, // enterAnimeArg
+        (s32)n_2_door_open, // exitAnimeArg
+    },
+    {
+        ("n_bero_3"), // hitName
+        1, // type
+        4, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)("tou_04"), // nextMapName
+        ("e_bero"), // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n_3_door_close, // enterAnimeArg
+        (s32)n_3_door_open, // exitAnimeArg
+    },
+    {
+        ("n_bero_4"), // hitName
+        1, // type
+        4, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)("tou_04"), // nextMapName
+        ("w_bero"), // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n_4_door_close, // enterAnimeArg
+        (s32)n_4_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_move_g)
@@ -1254,56 +1315,200 @@ EVT_BEGIN(talk_borodo)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"ガードマン１"*/"\203K\201[\203h\203}\203\223\202P", 1074267648, 0, (s32)init_gard1, 0, (s32)talk_gard1, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ガードマン２"*/"\203K\201[\203h\203}\203\223\202Q",
-    1074267648, 0, (s32)init_gard2, 0, (s32)talk_gard2, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"マダム"*/"\203}\203_\203\200", 1074267648,
-    0, (s32)init_madam, 0, (s32)talk_madam, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"レポーター"*/"\203\214\203|\201[\203^\201[", 1074267648, 0,
-    (s32)init_repo, 0, (s32)talk_repo, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"カメラマン１"*/"\203J\203\201\203\211\203}\203\223\202P", 1074267648, 0, (s32)init_cam1,
-    0, (s32)talk_cam1, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"カメラマン２"*/"\203J\203\201\203\211\203}\203\223\202Q", 1074267648, 0, (s32)init_cam2, 0,
-    (s32)talk_cam2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"キノピオ４"*/"\203L\203m\203s\203I\202S", 1074267648, 0, (s32)init_kino4, (s32)reg_kino4, (s32)talk_kino4,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"キノピオ５"*/"\203L\203m\203s\203I\202T", 1074267648, 0, (s32)init_kino5, 0, (s32)talk_kino5, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)/*"キノピコ"*/"\203L\203m\203s\203R", 1074267648, 0, (s32)init_kinopiko, 0, (s32)talk_kinopiko, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"バッジ屋"*/"\203o\203b\203W\211\256",
-    1074267648, 0, (s32)init_chu, 0, (s32)talk_chu, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", 1074267648,
-    0, (s32)init_champ, 0, (s32)talk_champ, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"キノシコワ"*/"\203L\203m\203V\203R\203\217", 1074267648, 0,
-    (s32)init_shikowa, 0, (s32)talk_shikowa, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"ウラノコ"*/"\203E\203\211\203m\203R", 1074267648, 0, (s32)init_uranoko,
-    0, (s32)talk_uranoko, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"アイアンＡ"*/"\203A\203C\203A\203\223\202`", 1074267648, 0, (s32)init_ironA, 0,
-    (s32)talk_ironA, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"アイアンＢ"*/"\203A\203C\203A\203\223\202a", 1074267648, 0, (s32)init_ironB, 0, (s32)talk_ironB,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"ボロドー"*/"\203{\203\215\203h\201[", 1074267648, 0, (s32)init_borodo, 0, (s32)talk_borodo, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"ガードマン１"*/"\203K\201[\203h\203}\203\223\202P", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_gard1, // initEvent
+        NULL, // regularEvent
+        talk_gard1, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン２"*/"\203K\201[\203h\203}\203\223\202Q", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_gard2, // initEvent
+        NULL, // regularEvent
+        talk_gard2, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"マダム"*/"\203}\203_\203\200", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_madam, // initEvent
+        NULL, // regularEvent
+        talk_madam, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"レポーター"*/"\203\214\203|\201[\203^\201[", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_repo, // initEvent
+        NULL, // regularEvent
+        talk_repo, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"カメラマン１"*/"\203J\203\201\203\211\203}\203\223\202P", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_cam1, // initEvent
+        NULL, // regularEvent
+        talk_cam1, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"カメラマン２"*/"\203J\203\201\203\211\203}\203\223\202Q", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_cam2, // initEvent
+        NULL, // regularEvent
+        talk_cam2, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"キノピオ４"*/"\203L\203m\203s\203I\202S", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_kino4, // initEvent
+        reg_kino4, // regularEvent
+        talk_kino4, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"キノピオ５"*/"\203L\203m\203s\203I\202T", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_kino5, // initEvent
+        NULL, // regularEvent
+        talk_kino5, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"キノピコ"*/"\203L\203m\203s\203R", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_kinopiko, // initEvent
+        NULL, // regularEvent
+        talk_kinopiko, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"バッジ屋"*/"\203o\203b\203W\211\256", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_chu, // initEvent
+        NULL, // regularEvent
+        talk_chu, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_champ, // initEvent
+        NULL, // regularEvent
+        talk_champ, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"キノシコワ"*/"\203L\203m\203V\203R\203\217", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_shikowa, // initEvent
+        NULL, // regularEvent
+        talk_shikowa, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ウラノコ"*/"\203E\203\211\203m\203R", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_uranoko, // initEvent
+        NULL, // regularEvent
+        talk_uranoko, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"アイアンＡ"*/"\203A\203C\203A\203\223\202`", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_ironA, // initEvent
+        NULL, // regularEvent
+        talk_ironA, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"アイアンＢ"*/"\203A\203C\203A\203\223\202a", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_ironB, // initEvent
+        NULL, // regularEvent
+        talk_ironB, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ボロドー"*/"\203{\203\215\203h\201[", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        init_borodo, // initEvent
+        NULL, // regularEvent
+        talk_borodo, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_tougi2)
@@ -1407,18 +1612,35 @@ EVT_BEGIN(evt_tougi2)
     RETURN
 EVT_END()
 
-s32 ext_fan_data[] = {
-    (s32)("c_kinopio"), (s32)("KNP_W_1"), 1073741824, (s32)("c_kinopio"), (s32)("KNP_W_1"), 1086324736, (s32)("c_kinopio"), (s32)("KNP_W_1"),
-    1092616192, (s32)("c_kinopio"), (s32)("KNP_W_1"), 1096810496, (s32)("c_kinopio"), (s32)("KNP_W_1"), 1099956224, (s32)("c_kinopio"),
-    (s32)("KNP_W_1"), 1102053376, (s32)("c_kinopio"), (s32)("KNP_W_1"), 1104150528, (s32)("c_kinopio"), (s32)("KNP_W_1"), 1106247680,
-    (s32)("c_kinopio"), (s32)("KNP_W_1"), 1107820544, (s32)("c_kinopiko"), (s32)("KNF_W_1"), 1073741824, (s32)("c_kinopiko"), (s32)("KNF_W_1"),
-    1086324736, (s32)("c_kinopiko"), (s32)("KNF_W_1"), 1092616192, (s32)("c_kinopiko"), (s32)("KNF_W_1"), 1096810496, (s32)("c_kinopiko"),
-    (s32)("KNF_W_1"), 1099956224, (s32)("c_kinopiko"), (s32)("KNF_W_1"), 1102053376, (s32)("c_kinopiko"), (s32)("KNF_W_1"), 1104150528,
-    (s32)("c_kinopiko"), (s32)("KNF_W_1"), 1106247680, (s32)("c_kinopiko"), (s32)("KNF_W_1"), 1107820544, (s32)("c_kinopiko"), (s32)("KNF_W_1"),
-    1108869120, (s32)("c_jugemu"), (s32)("JGM_W_1"), 0, (s32)("c_jugemu"), (s32)("JGM_W_1"), 1082130432, (s32)("c_jugemu"),
-    (s32)("JGM_W_1"), 1090519040, (s32)("c_jugemu"), (s32)("JGM_W_1"), 1094713344, (s32)("c_jugemu"), (s32)("JGM_W_1"), 1098907648,
-    (s32)("c_jugemu"), (s32)("JGM_W_1"), 1101004800, (s32)("c_jugemu"), (s32)("JGM_W_1"), 1103101952, (s32)("c_jugemu"), (s32)("JGM_W_1"),
-    1105199104, 0, 0, 0,
+ExtTexInfo ext_fan_data[] = {
+    {("c_kinopio"), ("KNP_W_1"), 2.0f},
+    {("c_kinopio"), ("KNP_W_1"), 6.0f},
+    {("c_kinopio"), ("KNP_W_1"), 10.0f},
+    {("c_kinopio"), ("KNP_W_1"), 14.0f},
+    {("c_kinopio"), ("KNP_W_1"), 18.0f},
+    {("c_kinopio"), ("KNP_W_1"), 22.0f},
+    {("c_kinopio"), ("KNP_W_1"), 26.0f},
+    {("c_kinopio"), ("KNP_W_1"), 30.0f},
+    {("c_kinopio"), ("KNP_W_1"), 34.0f},
+    {("c_kinopiko"), ("KNF_W_1"), 2.0f},
+    {("c_kinopiko"), ("KNF_W_1"), 6.0f},
+    {("c_kinopiko"), ("KNF_W_1"), 10.0f},
+    {("c_kinopiko"), ("KNF_W_1"), 14.0f},
+    {("c_kinopiko"), ("KNF_W_1"), 18.0f},
+    {("c_kinopiko"), ("KNF_W_1"), 22.0f},
+    {("c_kinopiko"), ("KNF_W_1"), 26.0f},
+    {("c_kinopiko"), ("KNF_W_1"), 30.0f},
+    {("c_kinopiko"), ("KNF_W_1"), 34.0f},
+    {("c_kinopiko"), ("KNF_W_1"), 38.0f},
+    {("c_jugemu"), ("JGM_W_1"), 0.0f},
+    {("c_jugemu"), ("JGM_W_1"), 4.0f},
+    {("c_jugemu"), ("JGM_W_1"), 8.0f},
+    {("c_jugemu"), ("JGM_W_1"), 12.0f},
+    {("c_jugemu"), ("JGM_W_1"), 16.0f},
+    {("c_jugemu"), ("JGM_W_1"), 20.0f},
+    {("c_jugemu"), ("JGM_W_1"), 24.0f},
+    {("c_jugemu"), ("JGM_W_1"), 28.0f},
+    {0},
 };
 
 void ext_fan_init(void) {

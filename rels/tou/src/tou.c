@@ -46,10 +46,10 @@ typedef struct DispWork { f32 y; f32 targetY; s32 page; } DispWork;
 typedef struct FighterData { u16 flags; const char* name; const char* name2; s32 info; s32 msg1; s32 msg2; s16 score; } FighterData;
 typedef struct RuleData { s32 name; const char* msg; s32 id; s32 a; s32 b; } RuleData;
 static __declspec(section ".data") DispWork* dwp;
-static s32 fighterDt_raw[161];
-#define fighterDt ((FighterData*)fighterDt_raw)
-static s32 fighterDt_re_raw[147];
-#define fighterDt_re ((FighterData*)fighterDt_re_raw)
+static FighterData fighterDt_raw[23];
+#define fighterDt (fighterDt_raw)
+static FighterData fighterDt_re_raw[21];
+#define fighterDt_re (fighterDt_re_raw)
 static void rankingControll(void);
 #define GET_RANK(rank, i) rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } rank++; } }
 static void insert(s32* list, s32 num, s32 from, s32 to);
@@ -58,12 +58,12 @@ static void insert(s32* list, s32 num, s32 from, s32 to);
 #define FIND_FLAG(k, list, n, flag) for (k = 0; k < n; k++) { if (fighterDt[rank_wp->entries[list[k]].id].flags & flag) { break; } }
 #define MOVE_FLAG(list, n, flag, pos) FIND_FLAG(k, list, n, flag); if (k < n) { insert(list, n, k, pos); }
 static void printRanking(void);
-static s32 ruleDt_2bu_raw[50];
-#define ruleDt_2bu ((RuleData*)ruleDt_2bu_raw)
-static s32 ruleDt_1bu_raw[70];
-#define ruleDt_1bu ((RuleData*)ruleDt_1bu_raw)
-static s32 ruleDt_re_raw[70];
-#define ruleDt_re ((RuleData*)ruleDt_re_raw)
+static RuleData ruleDt_2bu_raw[10];
+#define ruleDt_2bu (ruleDt_2bu_raw)
+static RuleData ruleDt_1bu_raw[14];
+#define ruleDt_1bu (ruleDt_1bu_raw)
+static RuleData ruleDt_re_raw[14];
+#define ruleDt_re (ruleDt_re_raw)
 static s32 tou_bss_1C;
 static RankWork rank_work;
 static DispWork disp_work;
@@ -215,23 +215,23 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-__declspec(section ".data") u64 fd_tou_negone_one_374;
-__declspec(section ".data") s32 fd_tou_neg_one_382[1];
-__declspec(section ".data") s32 fd_tou___local_PI_383[1];
-__declspec(section ".data") s32 fd_tou___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_tou_one_negone_373;
-__declspec(section ".data") s32 fd_tou___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_tou_one_381[1];
-__declspec(section ".data") u64 fd_tou_negone_one_360;
-__declspec(section ".data") s32 fd_tou_neg_one_365[1];
-__declspec(section ".data") s32 fd_tou___local_PI_366[1];
-__declspec(section ".data") s32 fd_tou___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_tou_one_negone_359;
-__declspec(section ".data") s32 fd_tou___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_tou_one_364[1];
-__declspec(section ".data") s32 fd_tou__three_localstatic4_sqrtf[2];
-__declspec(section ".data") s32 fd_tou__half_localstatic3_sqrtf[2];
-s32 lockerDt[46];
+__declspec(section ".data") f32 fd_tou_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_neg_one_382;
+__declspec(section ".data") f32 fd_tou___local_PI_383;
+__declspec(section ".data") f32 fd_tou___local_3PIO2_385;
+__declspec(section ".data") f32 fd_tou_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou___local_PIO2_384;
+__declspec(section ".data") f32 fd_tou_one_381;
+__declspec(section ".data") f32 fd_tou_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_neg_one_365;
+__declspec(section ".data") f32 fd_tou___local_PI_366;
+__declspec(section ".data") f32 fd_tou___local_3PIO2_368;
+__declspec(section ".data") f32 fd_tou_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou___local_PIO2_367;
+__declspec(section ".data") f32 fd_tou_one_364;
+__declspec(section ".data") f64 fd_tou__three_localstatic4_sqrtf;
+__declspec(section ".data") f64 fd_tou__half_localstatic3_sqrtf;
+const char* lockerDt[46];
 s32 evt_close[188];
 static s32 evt_open[VERSION_PICK(165, 173)];
 s32 evt_tou_locker_init[109];
@@ -773,140 +773,133 @@ static void printRanking(void) {
     }
 }
 
-__declspec(section ".data") u64 fd_tou_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tou_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_tou_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_tou___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_tou___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_tou_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_tou___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_tou_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_tou_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_tou_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_tou___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_tou___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_tou_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_tou___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_tou_one_364 = 1.0f;
+
+__declspec(section ".data") f64 fd_tou__three_localstatic4_sqrtf = 3.0;
+
+__declspec(section ".data") f64 fd_tou__half_localstatic3_sqrtf = 0.5;
+
+static FighterData fighterDt_raw[] = {
+    {4, "stg3_tou_sensyu_00", "stg3_tou_sensyu2_00", 22, (s32)"stg3_tou_400_02", (s32)"stg3_tou_400_03", 250},
+    {4097, "stg3_tou_sensyu_01", "stg3_tou_sensyu2_01", 19, (s32)"stg3_tou_118_00", (s32)"stg3_tou_118_01", 200},
+    {1, "stg3_tou_sensyu_02", "stg3_tou_sensyu2_02", 18, (s32)"stg3_tou_118_02", (s32)"stg3_tou_118_03", 180},
+    {1, "stg3_tou_sensyu_03", "stg3_tou_sensyu2_03", 17, (s32)"stg3_tou_118_04", (s32)"stg3_tou_118_05", 170},
+    {1, "stg3_tou_sensyu_04", "stg3_tou_sensyu2_04", 16, (s32)"stg3_tou_118_06", (s32)"stg3_tou_118_07", 160},
+    {1, "stg3_tou_sensyu_05", "stg3_tou_sensyu2_05", 15, (s32)"stg3_tou_118_08", (s32)"stg3_tou_118_09", 150},
+    {1, "stg3_tou_sensyu_06", "stg3_tou_sensyu2_06", 14, (s32)"stg3_tou_118_10", (s32)"stg3_tou_118_11", 140},
+    {1, "stg3_tou_sensyu_07", "stg3_tou_sensyu2_07", 13, (s32)"stg3_tou_118_12", (s32)"stg3_tou_118_13", 130},
+    {1, "stg3_tou_sensyu_08", "stg3_tou_sensyu2_08", 12, (s32)"stg3_tou_118_14", (s32)"stg3_tou_118_15", 120},
+    {1, "stg3_tou_sensyu_09", "stg3_tou_sensyu2_09", 11, (s32)"stg3_tou_118_16", (s32)"stg3_tou_118_17", 110},
+    {2049, "stg3_tou_sensyu_10", "stg3_tou_sensyu2_10", 10, (s32)"stg3_tou_118_18", (s32)"stg3_tou_118_19", 100},
+    {258, "stg3_tou_sensyu_11", "stg3_tou_sensyu2_11", 9, (s32)"stg3_tou_118_20", (s32)"stg3_tou_118_21", 90},
+    {2, "stg3_tou_sensyu_12", "stg3_tou_sensyu2_12", 8, (s32)"stg3_tou_118_22", (s32)"stg3_tou_118_23", 80},
+    {2, "stg3_tou_sensyu_13", "stg3_tou_sensyu2_13", 7, (s32)"stg3_tou_118_24", (s32)"stg3_tou_118_25", 70},
+    {2, "stg3_tou_sensyu_14", "stg3_tou_sensyu2_14", 6, (s32)"stg3_tou_118_26", (s32)"stg3_tou_118_27", 60},
+    {2, "stg3_tou_sensyu_15", "stg3_tou_sensyu2_15", 5, (s32)"stg3_tou_118_28", (s32)"stg3_tou_118_29", 50},
+    {2, "stg3_tou_sensyu_16", "stg3_tou_sensyu2_16", 4, (s32)"stg3_tou_118_30", (s32)"stg3_tou_118_31", 40},
+    {2, "stg3_tou_sensyu_17", "stg3_tou_sensyu2_17", 3, (s32)"stg3_tou_118_32", (s32)"stg3_tou_118_33", 30},
+    {514, "stg3_tou_sensyu_18", "stg3_tou_sensyu2_18", 2, (s32)"stg3_tou_118_34", (s32)"stg3_tou_118_35", 20},
+    {1026, "stg3_tou_sensyu_19", "stg3_tou_sensyu2_19", 1, (s32)"stg3_tou_118_36", (s32)"stg3_tou_118_36_01", 10},
+    {8, "stg3_tou_sensyu_20", "stg3_tou_sensyu2_20", 1, 0, 0, 0},
+    {2, "stg3_tou_sensyu_21", "stg3_tou_sensyu2_21", 20, (s32)"stg3_tou_118_36_02", (s32)"stg3_tou_118_36_03", 5},
+    {2, "stg3_tou_sensyu_22", "stg3_tou_sensyu2_22", 21, (s32)"stg3_tou_118_36_04", (s32)"stg3_tou_118_36_05", 0},
 };
 
-__declspec(section ".data") s32 fd_tou___local_PI_383[] = {
-    1078530011,
+static FighterData fighterDt_re_raw[] = {
+    {4, "stg3_tou_re_315", "stg3_tou_re_338", 22, (s32)"stg3_tou_re_289", (s32)"stg3_tou_re_290", 250},
+    {4097, "stg3_tou_re_316", "stg3_tou_re_339", 19, (s32)"stg3_tou_re_179", (s32)"stg3_tou_re_180", 200},
+    {1, "stg3_tou_re_317", "stg3_tou_re_340", 18, (s32)"stg3_tou_re_181", (s32)"stg3_tou_re_182", 180},
+    {1, "stg3_tou_re_318", "stg3_tou_re_341", 17, (s32)"stg3_tou_re_183", (s32)"stg3_tou_re_184", 170},
+    {1, "stg3_tou_re_319", "stg3_tou_re_342", 16, (s32)"stg3_tou_re_185", (s32)"stg3_tou_re_186", 160},
+    {1, "stg3_tou_re_320", "stg3_tou_re_343", 15, (s32)"stg3_tou_re_187", (s32)"stg3_tou_re_188", 150},
+    {1, "stg3_tou_re_321", "stg3_tou_re_344", 14, (s32)"stg3_tou_re_189", (s32)"stg3_tou_re_190", 140},
+    {1, "stg3_tou_re_322", "stg3_tou_re_345", 13, (s32)"stg3_tou_re_191", (s32)"stg3_tou_re_192", 130},
+    {1, "stg3_tou_re_323", "stg3_tou_re_346", 12, (s32)"stg3_tou_re_193", (s32)"stg3_tou_re_194", 120},
+    {1, "stg3_tou_re_324", "stg3_tou_re_347", 11, (s32)"stg3_tou_re_195", (s32)"stg3_tou_re_196", 110},
+    {2049, "stg3_tou_re_325", "stg3_tou_re_348", 10, (s32)"stg3_tou_re_197", (s32)"stg3_tou_re_198", 100},
+    {258, "stg3_tou_re_326", "stg3_tou_re_349", 9, (s32)"stg3_tou_re_199", (s32)"stg3_tou_re_200", 90},
+    {2, "stg3_tou_re_327", "stg3_tou_re_350", 8, (s32)"stg3_tou_re_201", (s32)"stg3_tou_re_202", 80},
+    {2, "stg3_tou_re_328", "stg3_tou_re_351", 7, (s32)"stg3_tou_re_203", (s32)"stg3_tou_re_204", 70},
+    {2, "stg3_tou_re_329", "stg3_tou_re_352", 6, (s32)"stg3_tou_re_205", (s32)"stg3_tou_re_206", 60},
+    {2, "stg3_tou_re_330", "stg3_tou_re_353", 5, (s32)"stg3_tou_re_207", (s32)"stg3_tou_re_208", 50},
+    {2, "stg3_tou_re_331", "stg3_tou_re_354", 4, (s32)"stg3_tou_re_209", (s32)"stg3_tou_re_210", 40},
+    {2, "stg3_tou_re_332", "stg3_tou_re_355", 3, (s32)"stg3_tou_re_211", (s32)"stg3_tou_re_212", 30},
+    {514, "stg3_tou_re_333", "stg3_tou_re_356", 2, (s32)"stg3_tou_re_213", (s32)"stg3_tou_re_214", 20},
+    {1026, "stg3_tou_re_334", "stg3_tou_re_357", 1, (s32)"stg3_tou_re_215", (s32)"stg3_tou_re_216", 10},
+    {8, "stg3_tou_re_335", "stg3_tou_re_358", 1, 0, 0, 0},
 };
 
-__declspec(section ".data") s32 fd_tou___local_3PIO2_385[] = {
-    1083624420,
+static RuleData ruleDt_2bu_raw[] = {
+    {(s32)"stg3_tou_107_01", "stg3_tou_cp_000", 18, 3, 3},
+    {(s32)"stg3_tou_107_02", "stg3_tou_cp_001", 1, 1, 1},
+    {(s32)"stg3_tou_107_03", "stg3_tou_cp_002", 3, 1, 1},
+    {(s32)"stg3_tou_107_04", "stg3_tou_cp_003", 48, 1, 1},
+    {(s32)"stg3_tou_107_05", "stg3_tou_cp_004", 5, 1, 1},
+    {(s32)"stg3_tou_107_06", "stg3_tou_cp_005", 26, 1, 1},
+    {(s32)"stg3_tou_107_07", "stg3_tou_cp_006", 32, 1, 1},
+    {(s32)"stg3_tou_107_08", "stg3_tou_cp_007", 59, 5, 5},
+    {(s32)"stg3_tou_107_12", "stg3_tou_cp_008", 6, 1, 1},
+    {(s32)"stg3_tou_107_16", "stg3_tou_cp_009", 43, 1, 1},
 };
 
-__declspec(section ".data") u64 fd_tou_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_tou___local_PIO2_384[] = {
-    1070141403,
+static RuleData ruleDt_1bu_raw[] = {
+    {(s32)"stg3_tou_107_01", "stg3_tou_cp_010", 18, 5, 5},
+    {(s32)"stg3_tou_107_02", "stg3_tou_cp_011", 1, 1, 1},
+    {(s32)"stg3_tou_107_03", "stg3_tou_cp_012", 3, 1, 1},
+    {(s32)"stg3_tou_107_04", "stg3_tou_cp_013", 48, 1, 1},
+    {(s32)"stg3_tou_107_05", "stg3_tou_cp_014", 5, 1, 1},
+    {(s32)"stg3_tou_107_06", "stg3_tou_cp_015", 26, 1, 1},
+    {(s32)"stg3_tou_107_07", "stg3_tou_cp_016", 32, 1, 1},
+    {(s32)"stg3_tou_107_08", "stg3_tou_cp_017", 59, 5, 5},
+    {(s32)"stg3_tou_107_12", "stg3_tou_cp_019", 6, 1, 1},
+    {(s32)"stg3_tou_107_13", "stg3_tou_cp_020", 11, 20, 20},
+    {(s32)"stg3_tou_107_16", "stg3_tou_cp_021", 43, 3, 3},
+    {(s32)"stg3_tou_107_17", "stg3_tou_cp_022", 65, 3, 3},
+    {(s32)"stg3_tou_107_19", "stg3_tou_cp_023", 64, 255, 255},
+    {(s32)"stg3_tou_107_20", "stg3_tou_cp_024", 63, 255, 255},
 };
 
-__declspec(section ".data") s32 fd_tou_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_tou_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_tou_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_tou___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_tou___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_tou_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_tou___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_tou_one_364[] = {
-    1065353216,
-};
-
-__declspec(section ".data") s32 fd_tou__three_localstatic4_sqrtf[] = {
-    1074266112, 0,
-};
-
-__declspec(section ".data") s32 fd_tou__half_localstatic3_sqrtf[] = {
-    1071644672, 0,
-};
-
-static s32 fighterDt_raw[] = {
-    262144, (s32)"stg3_tou_sensyu_00", (s32)"stg3_tou_sensyu2_00", 22, (s32)"stg3_tou_400_02", (s32)"stg3_tou_400_03", 16384000, 268500992,
-    (s32)"stg3_tou_sensyu_01", (s32)"stg3_tou_sensyu2_01", 19, (s32)"stg3_tou_118_00", (s32)"stg3_tou_118_01", 13107200, 65536, (s32)"stg3_tou_sensyu_02",
-    (s32)"stg3_tou_sensyu2_02", 18, (s32)"stg3_tou_118_02", (s32)"stg3_tou_118_03", 11796480, 65536, (s32)"stg3_tou_sensyu_03", (s32)"stg3_tou_sensyu2_03",
-    17, (s32)"stg3_tou_118_04", (s32)"stg3_tou_118_05", 11141120, 65536, (s32)"stg3_tou_sensyu_04", (s32)"stg3_tou_sensyu2_04", 16,
-    (s32)"stg3_tou_118_06", (s32)"stg3_tou_118_07", 10485760, 65536, (s32)"stg3_tou_sensyu_05", (s32)"stg3_tou_sensyu2_05", 15, (s32)"stg3_tou_118_08",
-    (s32)"stg3_tou_118_09", 9830400, 65536, (s32)"stg3_tou_sensyu_06", (s32)"stg3_tou_sensyu2_06", 14, (s32)"stg3_tou_118_10", (s32)"stg3_tou_118_11",
-    9175040, 65536, (s32)"stg3_tou_sensyu_07", (s32)"stg3_tou_sensyu2_07", 13, (s32)"stg3_tou_118_12", (s32)"stg3_tou_118_13", 8519680,
-    65536, (s32)"stg3_tou_sensyu_08", (s32)"stg3_tou_sensyu2_08", 12, (s32)"stg3_tou_118_14", (s32)"stg3_tou_118_15", 7864320, 65536,
-    (s32)"stg3_tou_sensyu_09", (s32)"stg3_tou_sensyu2_09", 11, (s32)"stg3_tou_118_16", (s32)"stg3_tou_118_17", 7208960, 134283264, (s32)"stg3_tou_sensyu_10",
-    (s32)"stg3_tou_sensyu2_10", 10, (s32)"stg3_tou_118_18", (s32)"stg3_tou_118_19", 6553600, 16908288, (s32)"stg3_tou_sensyu_11", (s32)"stg3_tou_sensyu2_11",
-    9, (s32)"stg3_tou_118_20", (s32)"stg3_tou_118_21", 5898240, 131072, (s32)"stg3_tou_sensyu_12", (s32)"stg3_tou_sensyu2_12", 8,
-    (s32)"stg3_tou_118_22", (s32)"stg3_tou_118_23", 5242880, 131072, (s32)"stg3_tou_sensyu_13", (s32)"stg3_tou_sensyu2_13", 7, (s32)"stg3_tou_118_24",
-    (s32)"stg3_tou_118_25", 4587520, 131072, (s32)"stg3_tou_sensyu_14", (s32)"stg3_tou_sensyu2_14", 6, (s32)"stg3_tou_118_26", (s32)"stg3_tou_118_27",
-    3932160, 131072, (s32)"stg3_tou_sensyu_15", (s32)"stg3_tou_sensyu2_15", 5, (s32)"stg3_tou_118_28", (s32)"stg3_tou_118_29", 3276800,
-    131072, (s32)"stg3_tou_sensyu_16", (s32)"stg3_tou_sensyu2_16", 4, (s32)"stg3_tou_118_30", (s32)"stg3_tou_118_31", 2621440, 131072,
-    (s32)"stg3_tou_sensyu_17", (s32)"stg3_tou_sensyu2_17", 3, (s32)"stg3_tou_118_32", (s32)"stg3_tou_118_33", 1966080, 33685504, (s32)"stg3_tou_sensyu_18",
-    (s32)"stg3_tou_sensyu2_18", 2, (s32)"stg3_tou_118_34", (s32)"stg3_tou_118_35", 1310720, 67239936, (s32)"stg3_tou_sensyu_19", (s32)"stg3_tou_sensyu2_19",
-    1, (s32)"stg3_tou_118_36", (s32)"stg3_tou_118_36_01", 655360, 524288, (s32)"stg3_tou_sensyu_20", (s32)"stg3_tou_sensyu2_20", 1,
-    0, 0, 0, 131072, (s32)"stg3_tou_sensyu_21", (s32)"stg3_tou_sensyu2_21", 20, (s32)"stg3_tou_118_36_02",
-    (s32)"stg3_tou_118_36_03", 327680, 131072, (s32)"stg3_tou_sensyu_22", (s32)"stg3_tou_sensyu2_22", 21, (s32)"stg3_tou_118_36_04", (s32)"stg3_tou_118_36_05",
-    0,
-};
-
-static s32 fighterDt_re_raw[] = {
-    262144, (s32)"stg3_tou_re_315", (s32)"stg3_tou_re_338", 22, (s32)"stg3_tou_re_289", (s32)"stg3_tou_re_290", 16384000, 268500992,
-    (s32)"stg3_tou_re_316", (s32)"stg3_tou_re_339", 19, (s32)"stg3_tou_re_179", (s32)"stg3_tou_re_180", 13107200, 65536, (s32)"stg3_tou_re_317",
-    (s32)"stg3_tou_re_340", 18, (s32)"stg3_tou_re_181", (s32)"stg3_tou_re_182", 11796480, 65536, (s32)"stg3_tou_re_318", (s32)"stg3_tou_re_341",
-    17, (s32)"stg3_tou_re_183", (s32)"stg3_tou_re_184", 11141120, 65536, (s32)"stg3_tou_re_319", (s32)"stg3_tou_re_342", 16,
-    (s32)"stg3_tou_re_185", (s32)"stg3_tou_re_186", 10485760, 65536, (s32)"stg3_tou_re_320", (s32)"stg3_tou_re_343", 15, (s32)"stg3_tou_re_187",
-    (s32)"stg3_tou_re_188", 9830400, 65536, (s32)"stg3_tou_re_321", (s32)"stg3_tou_re_344", 14, (s32)"stg3_tou_re_189", (s32)"stg3_tou_re_190",
-    9175040, 65536, (s32)"stg3_tou_re_322", (s32)"stg3_tou_re_345", 13, (s32)"stg3_tou_re_191", (s32)"stg3_tou_re_192", 8519680,
-    65536, (s32)"stg3_tou_re_323", (s32)"stg3_tou_re_346", 12, (s32)"stg3_tou_re_193", (s32)"stg3_tou_re_194", 7864320, 65536,
-    (s32)"stg3_tou_re_324", (s32)"stg3_tou_re_347", 11, (s32)"stg3_tou_re_195", (s32)"stg3_tou_re_196", 7208960, 134283264, (s32)"stg3_tou_re_325",
-    (s32)"stg3_tou_re_348", 10, (s32)"stg3_tou_re_197", (s32)"stg3_tou_re_198", 6553600, 16908288, (s32)"stg3_tou_re_326", (s32)"stg3_tou_re_349",
-    9, (s32)"stg3_tou_re_199", (s32)"stg3_tou_re_200", 5898240, 131072, (s32)"stg3_tou_re_327", (s32)"stg3_tou_re_350", 8,
-    (s32)"stg3_tou_re_201", (s32)"stg3_tou_re_202", 5242880, 131072, (s32)"stg3_tou_re_328", (s32)"stg3_tou_re_351", 7, (s32)"stg3_tou_re_203",
-    (s32)"stg3_tou_re_204", 4587520, 131072, (s32)"stg3_tou_re_329", (s32)"stg3_tou_re_352", 6, (s32)"stg3_tou_re_205", (s32)"stg3_tou_re_206",
-    3932160, 131072, (s32)"stg3_tou_re_330", (s32)"stg3_tou_re_353", 5, (s32)"stg3_tou_re_207", (s32)"stg3_tou_re_208", 3276800,
-    131072, (s32)"stg3_tou_re_331", (s32)"stg3_tou_re_354", 4, (s32)"stg3_tou_re_209", (s32)"stg3_tou_re_210", 2621440, 131072,
-    (s32)"stg3_tou_re_332", (s32)"stg3_tou_re_355", 3, (s32)"stg3_tou_re_211", (s32)"stg3_tou_re_212", 1966080, 33685504, (s32)"stg3_tou_re_333",
-    (s32)"stg3_tou_re_356", 2, (s32)"stg3_tou_re_213", (s32)"stg3_tou_re_214", 1310720, 67239936, (s32)"stg3_tou_re_334", (s32)"stg3_tou_re_357",
-    1, (s32)"stg3_tou_re_215", (s32)"stg3_tou_re_216", 655360, 524288, (s32)"stg3_tou_re_335", (s32)"stg3_tou_re_358", 1,
-    0, 0, 0,
-};
-
-static s32 ruleDt_2bu_raw[] = {
-    (s32)"stg3_tou_107_01", (s32)"stg3_tou_cp_000", 18, 3, 3, (s32)"stg3_tou_107_02", (s32)"stg3_tou_cp_001", 1,
-    1, 1, (s32)"stg3_tou_107_03", (s32)"stg3_tou_cp_002", 3, 1, 1, (s32)"stg3_tou_107_04",
-    (s32)"stg3_tou_cp_003", 48, 1, 1, (s32)"stg3_tou_107_05", (s32)"stg3_tou_cp_004", 5, 1,
-    1, (s32)"stg3_tou_107_06", (s32)"stg3_tou_cp_005", 26, 1, 1, (s32)"stg3_tou_107_07", (s32)"stg3_tou_cp_006",
-    32, 1, 1, (s32)"stg3_tou_107_08", (s32)"stg3_tou_cp_007", 59, 5, 5,
-    (s32)"stg3_tou_107_12", (s32)"stg3_tou_cp_008", 6, 1, 1, (s32)"stg3_tou_107_16", (s32)"stg3_tou_cp_009", 43,
-    1, 1,
-};
-
-static s32 ruleDt_1bu_raw[] = {
-    (s32)"stg3_tou_107_01", (s32)"stg3_tou_cp_010", 18, 5, 5, (s32)"stg3_tou_107_02", (s32)"stg3_tou_cp_011", 1,
-    1, 1, (s32)"stg3_tou_107_03", (s32)"stg3_tou_cp_012", 3, 1, 1, (s32)"stg3_tou_107_04",
-    (s32)"stg3_tou_cp_013", 48, 1, 1, (s32)"stg3_tou_107_05", (s32)"stg3_tou_cp_014", 5, 1,
-    1, (s32)"stg3_tou_107_06", (s32)"stg3_tou_cp_015", 26, 1, 1, (s32)"stg3_tou_107_07", (s32)"stg3_tou_cp_016",
-    32, 1, 1, (s32)"stg3_tou_107_08", (s32)"stg3_tou_cp_017", 59, 5, 5,
-    (s32)"stg3_tou_107_12", (s32)"stg3_tou_cp_019", 6, 1, 1, (s32)"stg3_tou_107_13", (s32)"stg3_tou_cp_020", 11,
-    20, 20, (s32)"stg3_tou_107_16", (s32)"stg3_tou_cp_021", 43, 3, 3, (s32)"stg3_tou_107_17",
-    (s32)"stg3_tou_cp_022", 65, 3, 3, (s32)"stg3_tou_107_19", (s32)"stg3_tou_cp_023", 64, 255,
-    255, (s32)"stg3_tou_107_20", (s32)"stg3_tou_cp_024", 63, 255, 255,
-};
-
-static s32 ruleDt_re_raw[] = {
-    (s32)"stg3_tou_re_362", (s32)"stg3_tou_cp_040", 18, 5, 5, (s32)"stg3_tou_re_363", (s32)"stg3_tou_cp_041", 1,
-    1, 1, (s32)"stg3_tou_re_364", (s32)"stg3_tou_cp_042", 3, 1, 1, (s32)"stg3_tou_re_365",
-    (s32)"stg3_tou_cp_043", 48, 1, 1, (s32)"stg3_tou_re_366", (s32)"stg3_tou_cp_044", 5, 1,
-    1, (s32)"stg3_tou_re_367", (s32)"stg3_tou_cp_045", 26, 1, 1, (s32)"stg3_tou_re_368", (s32)"stg3_tou_cp_046",
-    32, 1, 1, (s32)"stg3_tou_re_369", (s32)"stg3_tou_cp_047", 59, 5, 5,
-    (s32)"stg3_tou_re_371", (s32)"stg3_tou_cp_049", 6, 1, 1, (s32)"stg3_tou_re_372", (s32)"stg3_tou_cp_050", 11,
-    20, 20, (s32)"stg3_tou_re_373", (s32)"stg3_tou_cp_051", 43, 3, 3, (s32)"stg3_tou_re_374",
-    (s32)"stg3_tou_cp_052", 65, 3, 3, (s32)"stg3_tou_re_375", (s32)"stg3_tou_cp_053", 64, 255,
-    255, (s32)"stg3_tou_re_376", (s32)"stg3_tou_cp_054", 63, 255, 255,
+static RuleData ruleDt_re_raw[] = {
+    {(s32)"stg3_tou_re_362", "stg3_tou_cp_040", 18, 5, 5},
+    {(s32)"stg3_tou_re_363", "stg3_tou_cp_041", 1, 1, 1},
+    {(s32)"stg3_tou_re_364", "stg3_tou_cp_042", 3, 1, 1},
+    {(s32)"stg3_tou_re_365", "stg3_tou_cp_043", 48, 1, 1},
+    {(s32)"stg3_tou_re_366", "stg3_tou_cp_044", 5, 1, 1},
+    {(s32)"stg3_tou_re_367", "stg3_tou_cp_045", 26, 1, 1},
+    {(s32)"stg3_tou_re_368", "stg3_tou_cp_046", 32, 1, 1},
+    {(s32)"stg3_tou_re_369", "stg3_tou_cp_047", 59, 5, 5},
+    {(s32)"stg3_tou_re_371", "stg3_tou_cp_049", 6, 1, 1},
+    {(s32)"stg3_tou_re_372", "stg3_tou_cp_050", 11, 20, 20},
+    {(s32)"stg3_tou_re_373", "stg3_tou_cp_051", 43, 3, 3},
+    {(s32)"stg3_tou_re_374", "stg3_tou_cp_052", 65, 3, 3},
+    {(s32)"stg3_tou_re_375", "stg3_tou_cp_053", 64, 255, 255},
+    {(s32)"stg3_tou_re_376", "stg3_tou_cp_054", 63, 255, 255},
 };
 
 static __declspec(section ".data") RankWork* rank_wp = &rank_work;
@@ -1079,13 +1072,53 @@ static void disp_proc(CameraId cameraId, void* param) {
     }
 }
 
-s32 lockerDt[] = {
-    (s32)"R_door_1", (s32)"a_door_1", (s32)"a_door_1_omote", (s32)"a_door_1_ura", (s32)"a_R_1_asi", (s32)"R_door_2", (s32)"a_door_2", (s32)"a_door_2_omote",
-    (s32)"a_door_2_ura", (s32)"a_R_2_asi", (s32)"R_door_3", (s32)"a_door_3", (s32)"a_door_3_omote", (s32)"a_door_3_ura", (s32)"a_R_3_asi", (s32)"R_door_5",
-    (s32)"a_door_5", (s32)"a_door_5_omote", (s32)"a_door_5_ura", (s32)"a_R_5_asi", (s32)"R_door_6", (s32)"a_door_6", (s32)"a_door_6_omote", (s32)"a_door_6_ura",
-    (s32)"a_R_6_asi", (s32)"R_door_7", (s32)"a_door_7", (s32)"a_door_7_omote", (s32)"a_door_7_ura", (s32)"a_R_7_asi", (s32)"R_door_8", (s32)"a_door_8",
-    (s32)"a_door_8_omote", (s32)"a_door_8_ura", (s32)"a_R_8_asi", (s32)"R_door_9", (s32)"a_door_9", (s32)"a_door_9_omote", (s32)"a_door_9_ura", (s32)"a_R_9_asi",
-    (s32)"R_door_10", (s32)"a_door_10", (s32)"a_door_10_omote", (s32)"a_door_10_ura", (s32)"a_R_10_asi", 0,
+const char* lockerDt[] = {
+    "R_door_1",
+    "a_door_1",
+    "a_door_1_omote",
+    "a_door_1_ura",
+    "a_R_1_asi",
+    "R_door_2",
+    "a_door_2",
+    "a_door_2_omote",
+    "a_door_2_ura",
+    "a_R_2_asi",
+    "R_door_3",
+    "a_door_3",
+    "a_door_3_omote",
+    "a_door_3_ura",
+    "a_R_3_asi",
+    "R_door_5",
+    "a_door_5",
+    "a_door_5_omote",
+    "a_door_5_ura",
+    "a_R_5_asi",
+    "R_door_6",
+    "a_door_6",
+    "a_door_6_omote",
+    "a_door_6_ura",
+    "a_R_6_asi",
+    "R_door_7",
+    "a_door_7",
+    "a_door_7_omote",
+    "a_door_7_ura",
+    "a_R_7_asi",
+    "R_door_8",
+    "a_door_8",
+    "a_door_8_omote",
+    "a_door_8_ura",
+    "a_R_8_asi",
+    "R_door_9",
+    "a_door_9",
+    "a_door_9_omote",
+    "a_door_9_ura",
+    "a_R_9_asi",
+    "R_door_10",
+    "a_door_10",
+    "a_door_10_omote",
+    "a_door_10_ura",
+    "a_R_10_asi",
+    NULL,
 };
 
 EVT_BEGIN(evt_close)
@@ -1206,7 +1239,7 @@ static EVT_BEGIN(evt_open)
 EVT_END()
 
 EVT_BEGIN(evt_tou_locker_init)
-    SET_INT_READ_ADDR(PTR(lockerDt))
+    SET_INT_READ_ADDR(PTR(&lockerDt))
     LOOP(0)
         READ_INT3(LW(0), LW(1), LW(2))
         READ_INT2(LW(3), LW(4))

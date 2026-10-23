@@ -40,7 +40,7 @@ typedef struct StickRotateWork {
 
 #define AC_PARAMS(work) ((StickRotateParams*)&(work)->actionCommands)
 #define AC_WORK(work) ((StickRotateWork*)((u8*)&(work)->actionCommands + 0x2BC))
-#define AC_DISP(work) ((BattleACDispParams*)((u8*)&(work)->actionCommands + 0x290))
+#define AC_DISP(w) ((BattleACDispParams*)&(w)->actionCommands.disp)
 
 #define PAD(m) (((s32(*)(s32))BattlePadCheckNow)(m))
 
@@ -125,7 +125,7 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                 memset(disp, 0, sizeof(BattleACDispParams));
                 disp->iconX = -300.0f;
                 disp->iconY = 0.0f;
-                *(s32*)&disp->field_0x1C[4] = 20;
+                disp->unk20 = 20;
                 sw->iconA = 0;
                 sw->iconB = 0;
                 sw->iconDir = 0;
@@ -308,7 +308,7 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                 break;
             case 1004:
                 sw->endTimer = 60;
-                *(s32*)&disp->field_0x1C[4] = 60;
+                disp->unk20 = 60;
                 ac->mAcState = 1005;
             case 1005:
                 sw->endTimer--;
@@ -332,7 +332,7 @@ s32 battleAcResult_StickRotate(BattleWork* work) {
 }
 
 void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
-    BattleACDispParams* disp = AC_DISP((BattleWork*)param);
+    BattleACDispParams* disp = (BattleACDispParams*)((u8*)&((BattleWork*)param)->actionCommands + 0x290);
     void (*fn)(f32, f32);
 #define work ((BattleWork*)param)
 
@@ -343,10 +343,10 @@ void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
     }
     switch (work->actionCommands.mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[4], 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
             fn(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] > 0) {
-                (*(s32*)&disp->field_0x1C[4])--;
+            if (disp->unk20 > 0) {
+                disp->unk20--;
             }
             break;
         case 100:
@@ -360,11 +360,11 @@ void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
         case 1004:
         case 1005:
         case 1006:
-            if (*(s32*)&disp->field_0x1C[4] > 0) {
-                (*(s32*)&disp->field_0x1C[4])--;
+            if (disp->unk20 > 0) {
+                disp->unk20--;
             }
-            if (*(s32*)&disp->field_0x1C[4] <= 40) {
-                disp->iconX = intplGetValue(4, *(s32*)&disp->field_0x1C[4], 40, -300.0f, 30.0f);
+            if (disp->unk20 <= 40) {
+                disp->iconX = intplGetValue(4, disp->unk20, 40, -300.0f, 30.0f);
             } else {
                 disp->iconX = 30.0f;
             }

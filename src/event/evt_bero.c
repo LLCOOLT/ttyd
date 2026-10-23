@@ -117,26 +117,43 @@ USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_entername);
 extern s32 bero_set_disp_position_pipe();
 
-s32 bero_null[] = {
-    0, 251658240, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, 0, 0, 65537, 0, 0,
+BeroEntry bero_null[] = {
+    {
+        NULL, // hitName
+        3840, // type
+        0, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, 0, NULL, // exitEvent..nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
 };
 
-s32 default_entevt[] = {
-    131122, -30000000, 0, 2, 1,
-};
+EVT_BEGIN(default_entevt)
+    SET_VALUE(LW(0), 0)
+    RETURN
+EVT_END()
 
-s32 default_outevt[] = {
-    131122, -30000000, 0, 2, 1,
-};
+EVT_BEGIN(default_outevt)
+    SET_VALUE(LW(0), 0)
+    RETURN
+EVT_END()
 
-s32 evt_bero_info_run_none[] = {
-    131163, (s32)evt_mario_key_onoff, 1, 2, 1,
-};
+EVT_BEGIN(evt_bero_info_run_none)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
 
-s32 evt_bero_info_run_gate[] = {
-    131163, (s32)evt_mario_key_onoff, 1, 2, 1,
-};
+EVT_BEGIN(evt_bero_info_run_gate)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
 
 //new in retail, f32* x, f32* y, f32* z
 //new in retail, no args
@@ -464,7 +481,7 @@ USER_FUNC(evt_bero_get_into_info) {
 		bero = BeroINFOARR[i];
 		if (!bero || !strcmp(gp->beroEnterName, "")) {
 			i = 0;
-			bero = (BeroEntry*)bero_null;
+			bero = bero_null;
 			break;
 		}
 		if (!strcmp(bero->hitName, gp->beroEnterName)) break;
@@ -1261,7 +1278,7 @@ USER_FUNC(evt_camera_change_event_from_road) {
 	f32 bank;
 	BeroCamRoadOut out;
 	camShiftMain(cam, mario, &bank);
-	camRoadMain(&out, mario->position.x, *(f32*)((u8*)cam + 0x98), mario->position.z, mario->position.x, *(f32*)((u8*)cam + 0x98), mario->position.z, bank);
+	camRoadMain(&out, mario->position.x, cam->marioPos.y, mario->position.z, mario->position.x, cam->marioPos.y, mario->position.z, bank);
 	{
 	Vec pt = {0.0f, 0.0f, 0.0f};
 	pt.x = out.pos.x; pt.y = out.pos.y; pt.z = out.pos.z;

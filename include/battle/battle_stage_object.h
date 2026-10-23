@@ -2,6 +2,7 @@
 
 #include <dolphin/mtx.h>
 #include "evt/evt_cmd.h"
+#include "battle/battle_unit.h"
 
 typedef struct BattleStageObjectData {
 	char* name; //0x0
@@ -50,8 +51,8 @@ USER_FUNC(_set_mobj_shake_init);
 void BattleStageObjectInit(void);
 
 extern s32 _close_wall_event[];
-extern s32 _entry_switch_data[];
-extern s32 _entry_tree_data[];
+extern BattleUnitSetup _entry_switch_data;
+extern BattleUnitSetup _entry_tree_data;
 extern s32 _fall_frame_event[];
 extern s32 _nozzle_turn_event[];
 extern s32 _nozzle_work_event_0[];

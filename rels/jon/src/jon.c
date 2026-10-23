@@ -182,66 +182,66 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-__declspec(section ".data") u64 fd_jon_negone_one_374;
-__declspec(section ".data") s32 fd_jon_neg_one_382[1];
-__declspec(section ".data") s32 fd_jon___local_PI_383[1];
-__declspec(section ".data") s32 fd_jon___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_jon_one_negone_373;
-__declspec(section ".data") s32 fd_jon___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_jon_one_381[1];
-__declspec(section ".data") u64 fd_jon_negone_one_360;
-__declspec(section ".data") s32 fd_jon_neg_one_365[1];
-__declspec(section ".data") s32 fd_jon___local_PI_366[1];
-__declspec(section ".data") s32 fd_jon___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_jon_one_negone_359;
-__declspec(section ".data") s32 fd_jon___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_jon_one_364[1];
+__declspec(section ".data") f32 fd_jon_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jon_neg_one_382;
+__declspec(section ".data") f32 fd_jon___local_PI_383;
+__declspec(section ".data") f32 fd_jon___local_3PIO2_385;
+__declspec(section ".data") f32 fd_jon_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jon___local_PIO2_384;
+__declspec(section ".data") f32 fd_jon_one_381;
+__declspec(section ".data") f32 fd_jon_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jon_neg_one_365;
+__declspec(section ".data") f32 fd_jon___local_PI_366;
+__declspec(section ".data") f32 fd_jon___local_3PIO2_368;
+__declspec(section ".data") f32 fd_jon_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jon___local_PIO2_367;
+__declspec(section ".data") f32 fd_jon_one_364;
 #ifdef VERSION_G8ME01
 s32 jon_init_evt[400];
 #else
 s32 jon_init_evt[391];
 #endif
 s32 enemy_100[25];
-s32 npcEnt_kuriboo[46];
-s32 npcEnt_patakuri[46];
-s32 npcEnt_hannya[46];
-s32 npcEnt_chorobon[46];
-s32 npcEnt_sinnosuke[46];
-s32 npcEnt_sinemon[46];
-s32 npcEnt_nokonoko[46];
-s32 npcEnt_patapata[46];
-s32 npcEnt_met[46];
-s32 npcEnt_patamet[46];
-s32 npcEnt_sambo[46];
-s32 npcEnt_honenoko[46];
-s32 npcEnt_karon[46];
-s32 npcEnt_dokugassun[46];
-s32 npcEnt_piders[46];
-s32 npcEnt_teresa[46];
-s32 npcEnt_hbom[46];
-s32 npcEnt_bubble[46];
-s32 npcEnt_wanwan[46];
-s32 npcEnt_mahoon[46];
-s32 npcEnt_pakkun[46];
-s32 npcEnt_togenoko[46];
-s32 npcEnt_basabasa2[46];
-s32 npcEnt_togedaruma[46];
-s32 npcEnt_pansy[46];
-s32 npcEnt_zonbaba[46];
+NpcSetupInfo npcEnt_kuriboo[2];
+NpcSetupInfo npcEnt_patakuri[2];
+NpcSetupInfo npcEnt_hannya[2];
+NpcSetupInfo npcEnt_chorobon[2];
+NpcSetupInfo npcEnt_sinnosuke[2];
+NpcSetupInfo npcEnt_sinemon[2];
+NpcSetupInfo npcEnt_nokonoko[2];
+NpcSetupInfo npcEnt_patapata[2];
+NpcSetupInfo npcEnt_met[2];
+NpcSetupInfo npcEnt_patamet[2];
+NpcSetupInfo npcEnt_sambo[2];
+NpcSetupInfo npcEnt_honenoko[2];
+NpcSetupInfo npcEnt_karon[2];
+NpcSetupInfo npcEnt_dokugassun[2];
+NpcSetupInfo npcEnt_piders[2];
+NpcSetupInfo npcEnt_teresa[2];
+NpcSetupInfo npcEnt_hbom[2];
+NpcSetupInfo npcEnt_bubble[2];
+NpcSetupInfo npcEnt_wanwan[2];
+NpcSetupInfo npcEnt_mahoon[2];
+NpcSetupInfo npcEnt_pakkun[2];
+NpcSetupInfo npcEnt_togenoko[2];
+NpcSetupInfo npcEnt_basabasa2[2];
+NpcSetupInfo npcEnt_togedaruma[2];
+NpcSetupInfo npcEnt_pansy[2];
+NpcSetupInfo npcEnt_zonbaba[2];
 s32 enemy_setup[1055];
 __declspec(section ".data") s32 treasure_tbl[10];
 s32 evt_open_box[46];
 static s32 move_event[55];
 s32 get_map_name[111];
 s32 talk_idouya[141];
-s32 npcEnt_idouya[46];
+NpcSetupInfo npcEnt_idouya[2];
 s32 idouya_setup[38];
 #ifdef VERSION_G8ME01
 s32 talk_gyousyou[219];
 #else
 s32 talk_gyousyou[207];
 #endif
-s32 npcEnt_gyousyou[46];
+NpcSetupInfo npcEnt_gyousyou[2];
 s32 gyousyou_setup[47];
 s32 shikake_setup[117];
 s32 dokan_open[74];
@@ -250,20 +250,20 @@ static s32 evt_kanban[25];
 static s32 evt_kanban2[20];
 __declspec(section ".data") s32 floor_inc[10];
 __declspec(section ".data") s32 floor_clear[8];
-s32 bero_boss[45];
+BeroEntry bero_boss[3];
 __declspec(section ".data") s32 setup_boss[9];
-s32 bero_return[60];
-s32 bero_return2[30];
-s32 bero_return3[30];
+BeroEntry bero_return[4];
+BeroEntry bero_return2[2];
+BeroEntry bero_return3[2];
 s32 setup_return[190];
-s32 bero_prev_return[45];
-s32 bero_prev_return2[30];
-s32 bero_prev_return3[30];
-s32 bero_prev_return4[30];
+BeroEntry bero_prev_return[3];
+BeroEntry bero_prev_return2[2];
+BeroEntry bero_prev_return3[2];
+BeroEntry bero_prev_return4[2];
 s32 setup_prev_return[69];
-s32 bero_normal[45];
-s32 bero_normal2[30];
-s32 bero_normal3[30];
+BeroEntry bero_normal[3];
+BeroEntry bero_normal2[2];
+BeroEntry bero_normal3[2];
 s32 setup_normal[53];
 s32 iri_12_dokan_in_sub[202];
 s32 iri_12_dokan_in[16];
@@ -288,53 +288,33 @@ static s32 gonbaba_fog_change[87];
 static s32 gonbaba_down_shake[83];
 s32 zonbaba_first_event[677];
 
-__declspec(section ".data") u64 fd_jon_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_jon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_jon_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_jon_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_jon___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_jon___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_jon___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_jon___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_jon_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_jon_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_jon___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_jon___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_jon_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_jon_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_jon_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_jon_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_jon_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_jon_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_jon___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_jon___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_jon___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_jon___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_jon_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_jon_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_jon___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_jon___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_jon_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_jon_one_364 = 1.0f;
 
 EVT_BEGIN(jon_init_evt)
     CALL(evt_sub_get_system_flag, LW(0))
@@ -484,238 +464,646 @@ s32 enemy_100[] = {
     808529459,
 };
 
-s32 npcEnt_kuriboo[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)kuriboo_init_event, (s32)kuriboo_move_event, 0, (s32)enemy_common_dead_event, (s32)kuriboo_find_event,
-    (s32)kuriboo_lost_event, (s32)kuriboo_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_kuriboo[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        kuriboo_init_event, // initEvent
+        kuriboo_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        kuriboo_find_event, // findEvent
+        kuriboo_lost_event, // lostEvent
+        kuriboo_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_patakuri[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)patakuri_init_event, (s32)patakuri_move_event, 0, (s32)enemy_common_dead_event, (s32)patakuri_find_event,
-    (s32)patakuri_lost_event, (s32)patakuri_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_patakuri[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        patakuri_init_event, // initEvent
+        patakuri_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        patakuri_find_event, // findEvent
+        patakuri_lost_event, // lostEvent
+        patakuri_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_hannya[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)hannya_init_event, (s32)hannya_move_event, 0, (s32)enemy_common_dead_event, (s32)hannya_find_event,
-    (s32)hannya_lost_event, (s32)hannya_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_hannya[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        hannya_init_event, // initEvent
+        hannya_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        hannya_find_event, // findEvent
+        hannya_lost_event, // lostEvent
+        hannya_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_chorobon[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)chorobon_init_event, (s32)chorobon_move_event, 0, (s32)enemy_common_dead_event, (s32)chorobon_find_event,
-    (s32)chorobon_lost_event, (s32)chorobon_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_chorobon[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        chorobon_init_event, // initEvent
+        chorobon_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        chorobon_find_event, // findEvent
+        chorobon_lost_event, // lostEvent
+        chorobon_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_sinnosuke[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)sinnosuke_init_event, (s32)sinnosuke_move_event, 0, (s32)enemy_common_dead_event, (s32)sinnosuke_find_event,
-    (s32)sinnosuke_lost_event, (s32)sinnosuke_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_sinnosuke[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        sinnosuke_init_event, // initEvent
+        sinnosuke_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        sinnosuke_find_event, // findEvent
+        sinnosuke_lost_event, // lostEvent
+        sinnosuke_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_sinemon[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)sinemon_init_event, (s32)sinemon_move_event, 0, (s32)enemy_common_dead_event, (s32)sinemon_find_event,
-    (s32)sinemon_lost_event, (s32)sinemon_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_sinemon[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        sinemon_init_event, // initEvent
+        sinemon_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        sinemon_find_event, // findEvent
+        sinemon_lost_event, // lostEvent
+        sinemon_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_nokonoko[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)nokonoko_init_event, (s32)nokonoko_move_event, 0, (s32)enemy_common_dead_event, (s32)nokonoko_find_event,
-    (s32)nokonoko_lost_event, (s32)nokonoko_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_nokonoko[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        nokonoko_init_event, // initEvent
+        nokonoko_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        nokonoko_find_event, // findEvent
+        nokonoko_lost_event, // lostEvent
+        nokonoko_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_patapata[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)patapata_init_event, (s32)patapata_move_event, 0, (s32)enemy_common_dead_event, (s32)patapata_find_event,
-    (s32)patapata_lost_event, (s32)patapata_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_patapata[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        patapata_init_event, // initEvent
+        patapata_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        patapata_find_event, // findEvent
+        patapata_lost_event, // lostEvent
+        patapata_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_met[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)met_init_event, (s32)met_move_event, 0, (s32)enemy_common_dead_event, (s32)met_find_event,
-    (s32)met_lost_event, (s32)met_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_met[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        met_init_event, // initEvent
+        met_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        met_find_event, // findEvent
+        met_lost_event, // lostEvent
+        met_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_patamet[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)patamet_init_event, (s32)patamet_move_event, 0, (s32)enemy_common_dead_event, (s32)patamet_find_event,
-    (s32)patamet_lost_event, (s32)patamet_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_patamet[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        patamet_init_event, // initEvent
+        patamet_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        patamet_find_event, // findEvent
+        patamet_lost_event, // lostEvent
+        patamet_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_sambo[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)sambo_init_event, (s32)sambo_move_event, 0, (s32)enemy_common_dead_event, (s32)sambo_find_event,
-    (s32)sambo_lost_event, (s32)sambo_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_sambo[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        sambo_init_event, // initEvent
+        sambo_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        sambo_find_event, // findEvent
+        sambo_lost_event, // lostEvent
+        sambo_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_honenoko[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)honenoko2_init_event, (s32)honenoko2_move_event, 0, (s32)enemy_common_dead_event, (s32)honenoko2_find_event,
-    (s32)honenoko2_lost_event, (s32)honenoko2_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_honenoko[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        honenoko2_init_event, // initEvent
+        honenoko2_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        honenoko2_find_event, // findEvent
+        honenoko2_lost_event, // lostEvent
+        honenoko2_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_karon[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)karon_init_event, (s32)karon_move_event, 0, (s32)karon_dead_event, (s32)karon_find_event,
-    (s32)karon_lost_event, (s32)karon_return_event, (s32)karon_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_karon[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        karon_init_event, // initEvent
+        karon_move_event, // regularEvent
+        NULL, // talkEvent
+        karon_dead_event, // deadEvent
+        karon_find_event, // findEvent
+        karon_lost_event, // lostEvent
+        karon_return_event, // returnEvent
+        karon_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_dokugassun[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)dokugassun_init_event, (s32)dokugassun_move_event, 0, (s32)enemy_common_dead_event, (s32)dokugassun_find_event,
-    (s32)dokugassun_lost_event, (s32)dokugassun_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_dokugassun[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        dokugassun_init_event, // initEvent
+        dokugassun_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        dokugassun_find_event, // findEvent
+        dokugassun_lost_event, // lostEvent
+        dokugassun_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_piders[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)piders_init_event, (s32)piders_move_event, 0, (s32)enemy_common_dead_event, (s32)piders_find_event,
-    0, 0, (s32)piders_blow_event, 2, 0, 1124859904, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_piders[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        piders_init_event, // initEvent
+        piders_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        piders_find_event, // findEvent
+        NULL, NULL, // lostEvent..returnEvent
+        piders_blow_event, // blowEvent
+        2, // territoryType
+        {0.0f, 140.0f, 0.0f}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_teresa[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)teresa_init_event, (s32)teresa_move_event, 0, (s32)enemy_common_dead_event, (s32)teresa_find_event,
-    (s32)teresa_lost_event, (s32)teresa_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_teresa[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        teresa_init_event, // initEvent
+        teresa_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        teresa_find_event, // findEvent
+        teresa_lost_event, // lostEvent
+        teresa_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_hbom[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)hbom_init_event, (s32)hbom_move_event, 0, (s32)enemy_common_dead_event, (s32)hbom_find_event,
-    (s32)hbom_lost_event, (s32)hbom_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_hbom[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        hbom_init_event, // initEvent
+        hbom_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        hbom_find_event, // findEvent
+        hbom_lost_event, // lostEvent
+        hbom_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_bubble[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)bubble_init_event, (s32)bubble_move_event, 0, (s32)enemy_common_dead_event, (s32)bubble_find_event,
-    (s32)bubble_lost_event, (s32)bubble_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_bubble[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        bubble_init_event, // initEvent
+        bubble_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        bubble_find_event, // findEvent
+        bubble_lost_event, // lostEvent
+        bubble_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_wanwan[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)wanwan_init_event, (s32)wanwan_move_event, 0, (s32)enemy_common_dead_event, (s32)wanwan_find_event,
-    0, 0, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_wanwan[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        wanwan_init_event, // initEvent
+        wanwan_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        wanwan_find_event, // findEvent
+        NULL, NULL, // lostEvent..returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_mahoon[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)mahoon_init_event, (s32)mahoon_move_event, 0, (s32)mahoon_dead_event, (s32)mahoon_find_event,
-    (s32)mahoon_lost_event, (s32)mahoon_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_mahoon[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        mahoon_init_event, // initEvent
+        mahoon_move_event, // regularEvent
+        NULL, // talkEvent
+        mahoon_dead_event, // deadEvent
+        mahoon_find_event, // findEvent
+        mahoon_lost_event, // lostEvent
+        mahoon_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_pakkun[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)pakkun_init_event, (s32)pakkun_move_event, 0, (s32)enemy_common_dead_event, (s32)pakkun_find_event,
-    0, (s32)pakkun_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_pakkun[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        pakkun_init_event, // initEvent
+        pakkun_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        pakkun_find_event, // findEvent
+        NULL, // lostEvent
+        pakkun_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_togenoko[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)togenoko_init_event, (s32)togenoko_move_event, 0, (s32)enemy_common_dead_event, (s32)togenoko_find_event,
-    (s32)togenoko_lost_event, (s32)togenoko_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_togenoko[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        togenoko_init_event, // initEvent
+        togenoko_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        togenoko_find_event, // findEvent
+        togenoko_lost_event, // lostEvent
+        togenoko_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_basabasa2[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)basabasa2_init_event, (s32)basabasa2_move_event, 0, (s32)basabasa2_dead_event, (s32)basabasa2_find_event,
-    (s32)basabasa2_lost_event, (s32)basabasa2_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_basabasa2[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        basabasa2_init_event, // initEvent
+        basabasa2_move_event, // regularEvent
+        NULL, // talkEvent
+        basabasa2_dead_event, // deadEvent
+        basabasa2_find_event, // findEvent
+        basabasa2_lost_event, // lostEvent
+        basabasa2_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_togedaruma[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)togedaruma_init_event, (s32)togedaruma_move_event, 0, (s32)enemy_common_dead_event, (s32)togedaruma_find_event,
-    (s32)togedaruma_lost_event, (s32)togedaruma_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_togedaruma[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        togedaruma_init_event, // initEvent
+        togedaruma_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        togedaruma_find_event, // findEvent
+        togedaruma_lost_event, // lostEvent
+        togedaruma_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_pansy[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, (s32)pansy_init_event, (s32)pansy_move_event, 0, (s32)enemy_common_dead_event, (s32)pansy_find_event,
-    (s32)pansy_lost_event, (s32)pansy_return_event, (s32)enemy_common_blow_event, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_pansy[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, // reactionFlags
+        pansy_init_event, // initEvent
+        pansy_move_event, // regularEvent
+        NULL, // talkEvent
+        enemy_common_dead_event, // deadEvent
+        pansy_find_event, // findEvent
+        pansy_lost_event, // lostEvent
+        pansy_return_event, // returnEvent
+        enemy_common_blow_event, // blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_zonbaba[] = {
-    (s32)/*"敵"*/"\x93\x47", 268435466, 0, 0, 0, 0, (s32)enemy_common_dead_event, 0,
-    0, 0, 0, 2, 0, 0, 0, 1125515264,
-    1120403456, 1120403456, 1128792064, 1133903872, 1148846080, 1135869952, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_zonbaba[] = {
+    {
+        /*"敵"*/"\x93\x47", // name
+        0x1000000A, // flags
+        0, NULL, NULL, NULL, // reactionFlags..talkEvent
+        enemy_common_dead_event, // deadEvent
+        NULL, NULL, NULL, NULL, // findEvent..blowEvent
+        2, // territoryType
+        {0}, // territoryBase
+        {150.0f, 100.0f, 100.0f}, // territoryLoiter
+        200.0f, // searchRange
+        300.0f, // searchAngle
+        1000.0f, // homingRange
+        360.0f, // homingAngle
+        1, // battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(enemy_setup)
@@ -1194,13 +1582,19 @@ EVT_BEGIN(talk_idouya)
     RETURN
 EVT_END()
 
-s32 npcEnt_idouya[] = {
-    (s32)/*"移動屋"*/"\x88\xDA\x93\xAE\x89\xAE", 268436992, 0, 0, (s32)move_event, (s32)talk_idouya, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_idouya[] = {
+    {
+        /*"移動屋"*/"\x88\xDA\x93\xAE\x89\xAE", // name
+        0x10000600, // flags
+        0, NULL, // reactionFlags..initEvent
+        move_event, // regularEvent
+        talk_idouya, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(idouya_setup)
@@ -1319,13 +1713,19 @@ EVT_BEGIN(talk_gyousyou)
     RETURN
 EVT_END()
 
-s32 npcEnt_gyousyou[] = {
-    (s32)/*"行商人"*/"\x8D\x73\x8F\xA4\x90\x6C", 268436992, 0, 0, (s32)move_event, (s32)talk_gyousyou, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_gyousyou[] = {
+    {
+        /*"行商人"*/"\x8D\x73\x8F\xA4\x90\x6C", // name
+        0x10000600, // flags
+        0, NULL, // reactionFlags..initEvent
+        move_event, // regularEvent
+        talk_gyousyou, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(gyousyou_setup)
@@ -1480,13 +1880,40 @@ __declspec(section ".data") EVT_BEGIN(floor_clear)
     RETURN
 EVT_END()
 
-s32 bero_boss[] = {
-    (s32)"dokan_2", 131072, 8, 100000, 0, 0, -1, 0,
-    6, 0, 0, 0, 65537, 0, 0, (s32)"dokan_1",
-    131072, 2, 100000, 0, 0, -1, 0, 10,
-    (s32)floor_clear, (s32)"tik_06", (s32)"dokan_3", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+BeroEntry bero_boss[] = {
+    {
+        "dokan_2", // hitName
+        2, // type
+        0, // sfxId
+        8, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, NULL, // exitEvent..nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        10, // caseType
+        (s32*)floor_clear, // exitEvent
+        (s32)"tik_06", // nextMapName
+        "dokan_3", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 __declspec(section ".data") EVT_BEGIN(setup_boss)
@@ -1496,29 +1923,99 @@ __declspec(section ".data") EVT_BEGIN(setup_boss)
     RETURN
 EVT_END()
 
-s32 bero_return[] = {
-    (s32)"dokan_2", 131072, 8, 100000, 0, 0, -1, 0,
-    6, 0, 0, 0, 65537, 0, 0, (s32)"dokan_1",
-    131072, 2, 100000, 0, 0, -1, 0, 10,
-    (s32)floor_clear, (s32)"tik_06", (s32)"dokan_3", 65537, 0, 0, (s32)"dokan_3", 131072,
-    9, 100000, 0, 0, -1, 0, 6, (s32)floor_inc,
-    (s32)"jon_00", (s32)"dokan_2", 65537, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+BeroEntry bero_return[] = {
+    {
+        "dokan_2", // hitName
+        2, // type
+        0, // sfxId
+        8, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, NULL, // exitEvent..nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        10, // caseType
+        (s32*)floor_clear, // exitEvent
+        (s32)"tik_06", // nextMapName
+        "dokan_3", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_3", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)floor_inc, // exitEvent
+        (s32)"jon_00", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-s32 bero_return2[] = {
-    (s32)"dokan_3", 131072, 9, 100000, 0, 0, -1, 0,
-    6, (s32)floor_inc, (s32)"jon_01", (s32)"dokan_2", 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+BeroEntry bero_return2[] = {
+    {
+        "dokan_3", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)floor_inc, // exitEvent
+        (s32)"jon_01", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-s32 bero_return3[] = {
-    (s32)"dokan_3", 131072, 9, 100000, 0, 0, -1, 0,
-    6, (s32)floor_inc, (s32)"jon_02", (s32)"dokan_2", 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+BeroEntry bero_return3[] = {
+    {
+        "dokan_3", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)floor_inc, // exitEvent
+        (s32)"jon_02", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(setup_return)
@@ -1570,34 +2067,103 @@ EVT_BEGIN(setup_return)
     RETURN
 EVT_END()
 
-s32 bero_prev_return[] = {
-    (s32)"dokan_2", 131072, 8, 100000, 0, 0, -1, 0,
-    6, 0, 0, 0, 65537, 0, 0, (s32)"dokan_1",
-    131072, 9, 100000, 0, 0, -1, 0, 6,
-    (s32)floor_inc, (s32)"jon_03", (s32)"dokan_2", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+BeroEntry bero_prev_return[] = {
+    {
+        "dokan_2", // hitName
+        2, // type
+        0, // sfxId
+        8, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, NULL, // exitEvent..nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)floor_inc, // exitEvent
+        (s32)"jon_03", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-s32 bero_prev_return2[] = {
-    (s32)"dokan_1", 131072, 9, 100000, 0, 0, -1, 0,
-    6, (s32)floor_inc, (s32)"jon_04", (s32)"dokan_2", 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+BeroEntry bero_prev_return2[] = {
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)floor_inc, // exitEvent
+        (s32)"jon_04", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-s32 bero_prev_return3[] = {
-    (s32)"dokan_1", 131072, 9, 100000, 0, 0, -1, 0,
-    6, (s32)floor_inc, (s32)"jon_05", (s32)"dokan_2", 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+BeroEntry bero_prev_return3[] = {
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)floor_inc, // exitEvent
+        (s32)"jon_05", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-s32 bero_prev_return4[] = {
-    (s32)"dokan_1", 131072, 9, 100000, 0, 0, -1, 0,
-    6, (s32)floor_inc, (s32)"jon_06", (s32)"dokan_2", 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+BeroEntry bero_prev_return4[] = {
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)floor_inc, // exitEvent
+        (s32)"jon_06", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(setup_prev_return)
@@ -1630,27 +2196,82 @@ EVT_BEGIN(setup_prev_return)
     RETURN
 EVT_END()
 
-s32 bero_normal[] = {
-    (s32)"dokan_2", 131072, 8, 100000, 0, 0, -1, 0,
-    6, 0, 0, 0, 65537, 0, 0, (s32)"dokan_1",
-    131072, 9, 100000, 0, 0, -1, 0, 6,
-    (s32)floor_inc, (s32)"jon_00", (s32)"dokan_2", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+BeroEntry bero_normal[] = {
+    {
+        "dokan_2", // hitName
+        2, // type
+        0, // sfxId
+        8, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, NULL, // exitEvent..nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)floor_inc, // exitEvent
+        (s32)"jon_00", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-s32 bero_normal2[] = {
-    (s32)"dokan_1", 131072, 9, 100000, 0, 0, -1, 0,
-    6, (s32)floor_inc, (s32)"jon_01", (s32)"dokan_2", 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+BeroEntry bero_normal2[] = {
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)floor_inc, // exitEvent
+        (s32)"jon_01", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-s32 bero_normal3[] = {
-    (s32)"dokan_1", 131072, 9, 100000, 0, 0, -1, 0,
-    6, (s32)floor_inc, (s32)"jon_02", (s32)"dokan_2", 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+BeroEntry bero_normal3[] = {
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)floor_inc, // exitEvent
+        (s32)"jon_02", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(setup_normal)
@@ -2403,16 +3024,16 @@ USER_FUNC(shikakeFlag) {
 
     switch (type) {
         case 0:
-            npc->battleInfo.field_4 |= 0x4000000;
+            npc->battleInfo.battleFlags |= 0x4000000;
             break;
         case 1:
-            npc->battleInfo.field_4 |= 0x2000000;
+            npc->battleInfo.battleFlags |= 0x2000000;
             break;
         case 2:
-            npc->battleInfo.field_4 |= 0x1000000;
+            npc->battleInfo.battleFlags |= 0x1000000;
             break;
         case 3:
-            npc->battleInfo.field_4 |= 0x100;
+            npc->battleInfo.battleFlags |= 0x100;
             break;
     }
     return EVT_RETURN_DONE;
@@ -2424,9 +3045,9 @@ USER_FUNC(wanwan_set_home_pos) {
     s32 y = evtGetValue(event, args[1]);
     s32 z = evtGetValue(event, args[2]);
 
-    ((f32*)npcEnt_wanwan)[12] = x;
-    ((f32*)npcEnt_wanwan)[13] = y;
-    ((f32*)npcEnt_wanwan)[14] = z;
+    npcEnt_wanwan[0].territoryBase.x = x;
+    npcEnt_wanwan[0].territoryBase.y = y;
+    npcEnt_wanwan[0].territoryBase.z = z;
     return EVT_RETURN_DONE;
 }
 
@@ -2440,7 +3061,7 @@ USER_FUNC(setup_npc_ex_para) {
 }
 
 USER_FUNC(yattukeFlag) {
-    npcNameToPtr("\223G")->battleInfo.field_4 |= 0x10000000;
+    npcNameToPtr("\223G")->battleInfo.battleFlags |= 0x10000000;
     return EVT_RETURN_DONE;
 }
 

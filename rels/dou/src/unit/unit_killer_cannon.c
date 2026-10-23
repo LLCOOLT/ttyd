@@ -32,28 +32,28 @@ USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(killer_get_angle);
 static USER_FUNC(killer_copy_status);
-extern s32 unit_killer[];
+extern BattleUnitKind unit_killer;
 
-__declspec(section ".data") u64 fd_killer_cannon_negone_one_374;
-__declspec(section ".data") s32 fd_killer_cannon_neg_one_382[1];
-__declspec(section ".data") s32 fd_killer_cannon___local_PI_383[1];
-__declspec(section ".data") s32 fd_killer_cannon___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_killer_cannon_one_negone_373;
-__declspec(section ".data") s32 fd_killer_cannon___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_killer_cannon_one_381[1];
-__declspec(section ".data") u64 fd_killer_cannon_negone_one_360;
-__declspec(section ".data") s32 fd_killer_cannon_neg_one_365[1];
-__declspec(section ".data") s32 fd_killer_cannon___local_PI_366[1];
-__declspec(section ".data") s32 fd_killer_cannon___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_killer_cannon_one_negone_359;
-__declspec(section ".data") s32 fd_killer_cannon___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_killer_cannon_one_364[1];
+__declspec(section ".data") f32 fd_killer_cannon_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_killer_cannon_neg_one_382;
+__declspec(section ".data") f32 fd_killer_cannon___local_PI_383;
+__declspec(section ".data") f32 fd_killer_cannon___local_3PIO2_385;
+__declspec(section ".data") f32 fd_killer_cannon_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_killer_cannon___local_PIO2_384;
+__declspec(section ".data") f32 fd_killer_cannon_one_381;
+__declspec(section ".data") f32 fd_killer_cannon_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_killer_cannon_neg_one_365;
+__declspec(section ".data") f32 fd_killer_cannon___local_PI_366;
+__declspec(section ".data") f32 fd_killer_cannon___local_3PIO2_368;
+__declspec(section ".data") f32 fd_killer_cannon_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_killer_cannon___local_PIO2_367;
+__declspec(section ".data") f32 fd_killer_cannon_one_364;
 BattleUnitKind unit_killer_cannon;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
 static BattleUnitKindPart parts[3];
-static __declspec(section ".data") s32 entry_killer[12];
+static __declspec(section ".data") BattleUnitSetup entry_killer;
 static PoseTableEntry pose_table[16];
 static __declspec(section ".data") BattleDataEntry data_table[1];
 static s32 init_event[63];
@@ -76,53 +76,33 @@ static USER_FUNC(killer_copy_status) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_killer_cannon_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_killer_cannon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_killer_cannon_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_killer_cannon_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_killer_cannon___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_killer_cannon___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_killer_cannon___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_killer_cannon___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_killer_cannon_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_killer_cannon_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_killer_cannon___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_killer_cannon___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_killer_cannon_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_killer_cannon_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_killer_cannon_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_killer_cannon_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_killer_cannon_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_killer_cannon_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_killer_cannon___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_killer_cannon___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_killer_cannon___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_killer_cannon___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_killer_cannon_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_killer_cannon_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_killer_cannon___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_killer_cannon___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_killer_cannon_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_killer_cannon_one_364 = 1.0f;
 
 BattleUnitKind unit_killer_cannon = {
     90,
@@ -202,9 +182,15 @@ static BattleUnitKindPart parts[] = {
     {3, "btl_un_killer_cannon", "c_killtai", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0, 255, &defence, &defence_attr, 0x10000, 0, pose_table},
 };
 
-static __declspec(section ".data") s32 entry_killer[] = {
-    (s32)unit_killer, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
-    0, 0, 0, 0,
+static __declspec(section ".data") BattleUnitSetup entry_killer = {
+    &unit_killer, // mUnitKindParams
+    1, // alliance
+    {0}, // pad_05
+    0x4000004, // attackPhase
+    {-1000.0f, -1000.0f, -1000.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
 static PoseTableEntry pose_table[] = {
@@ -494,82 +480,136 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static s32 friend_event[] = {
-    131096, -29999988, 1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_KILLER_CANNON_CHARGE1", -250000000,
-    0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"KTA_A_2A", 65545,
-    10, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"KTA_Z_1", 65545, 10,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"KTA_A_2A", 65545, 10, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"KTA_Z_1", 65545, 10, 33, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"KTA_A_1", 65545, 40, 131096, -29999988,
-    1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_KILLER_CANNON3", -250000000, 0, -250000000,
-    32, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_KILLER_CANNON1", -250000000, 0, -250000000,
-    33, 262235, (s32)btlevtcmd_CheckStatus, -2, 10, -29999995, 131097, -29999995,
-    0, 327771, (s32)btlevtcmd_GetPos, -2, -29999993, -29999992, -29999991, 262235,
-    (s32)btlevtcmd_FaceDirectionAdd, -2, -29999993, 70, 131125, -29999991, 10, 983131,
-    (s32)evt_eff, (s32)"", (s32)"kemuri_test", 18, -29999993, 50, -29999991, -229998464,
-    0, 0, 0, 0, 0, 0, 0, 65540,
-    10, 33, 262235, (s32)btlevtcmd_CheckStatus, -2, 11, -29999995, 131097,
-    -29999995, 0, 327771, (s32)btlevtcmd_GetPos, -2, -29999993, -29999992, -29999991,
-    262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -29999993, 28, 131125, -29999991, 10,
-    983131, (s32)evt_eff, (s32)"", (s32)"kemuri_test", 18, -29999993, 15, -29999991,
-    -229999488, 0, 0, 0, 0, 0, 0, 0,
-    65540, 10, 33, 327771, (s32)btlevtcmd_GetPos, -2, -29999993, -29999992,
-    -29999991, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -29999993, 40, 131125, -29999991,
-    10, 983131, (s32)evt_eff, (s32)"", (s32)"kemuri_test", 18, -29999993, 30,
-    -29999991, -229998976, 0, 0, 0, 0, 0, 0,
-    0, 65540, 10, 65539, 10, 393307, (s32)evt_btl_camera_shake_w, 0,
-    5, 0, 20, 0, 327771, (s32)btlevtcmd_GetPos, -2, -29999993,
-    -29999992, -29999991, 262235, (s32)btlevtcmd_SpawnUnit, -29999997, (s32)entry_killer, 0, 196699,
-    (s32)killer_copy_status, -2, -29999997, 327771, (s32)btlevtcmd_SetPos, -29999997, -29999993, 10,
-    -29999998, 196699, (s32)btlevtcmd_SetFallAccel, -29999997, 0, 196699, (s32)btlevtcmd_SetJumpSpeed, -29999997,
-    0, 458843, (s32)btlevtcmd_JumpPosition, -29999997, -30000000, 10, -29999998, -229992832,
-    -1, 327771, (s32)btlevtcmd_SetHomePos, -29999997, -30000000, 10, -29999998, 131096,
-    -29999988, 1, 393307, (s32)btlevtcmd_OnOffStatus, -29999997, 16, 1, 1,
-    1, 33, 2, 1,
-};
+static EVT_BEGIN(friend_event)
+    IF_INT_EQUAL(LW(12), 1)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KILLER_CANNON_CHARGE1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KTA_A_2A"))
+        WAIT_FRAMES(10)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KTA_Z_1"))
+        WAIT_FRAMES(10)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KTA_A_2A"))
+        WAIT_FRAMES(10)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KTA_Z_1"))
+        WAIT_FRAMES(10)
+    END_IF
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KTA_A_1"))
+    WAIT_FRAMES(40)
+    IF_INT_EQUAL(LW(12), 1)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KILLER_CANNON3"), -250000000, 0, -250000000)
+    ELSE
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KILLER_CANNON1"), -250000000, 0, -250000000)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, -2, 10, LW(5))
+    IF_INT_NOT_EQUAL(LW(5), 0)
+        CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(7), 70)
+        ADD(LW(9), 10)
+        CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 50, LW(9), FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
+        GOTO(10)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, -2, 11, LW(5))
+    IF_INT_NOT_EQUAL(LW(5), 0)
+        CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(7), 28)
+        ADD(LW(9), 10)
+        CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 15, LW(9), FLOAT(0.5f), 0, 0, 0, 0, 0, 0, 0)
+        GOTO(10)
+    END_IF
+    CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
+    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(7), 40)
+    ADD(LW(9), 10)
+    CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 30, LW(9), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    GOTO(10)
+    LABEL(10)
+    CALL(evt_btl_camera_shake_w, 0, 5, 0, 20, 0)
+    CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
+    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_killer), 0)
+    CALL(killer_copy_status, -2, LW(3))
+    CALL(btlevtcmd_SetPos, LW(3), LW(7), 10, LW(2))
+    CALL(btlevtcmd_SetFallAccel, LW(3), 0)
+    CALL(btlevtcmd_SetJumpSpeed, LW(3), 0)
+    CALL(btlevtcmd_JumpPosition, LW(3), LW(0), 10, LW(2), FLOAT(7.0f), -1)
+    CALL(btlevtcmd_SetHomePos, LW(3), LW(0), 10, LW(2))
+    IF_INT_EQUAL(LW(12), 1)
+        CALL(btlevtcmd_OnOffStatus, LW(3), 16, 1, 1, 1)
+    END_IF
+    RETURN
+EVT_END()
 
-static s32 friend_event_sky[] = {
-    327771, (s32)btlevtcmd_GetPos, -2, -29999993, -29999992, -29999991, 393307, (s32)evt_sub_get_dir,
-    -29999993, -29999992, -30000000, 40, -29999990, 393307, (s32)killer_get_angle, -29999993,
-    -29999992, -30000000, 40, -29999990, 393307, (s32)btlevtcmd_GetPartsRotate, -2, 2,
-    -29999995, -29999994, -29999989, 65541, 0, 131099, -29999989, 0,
-    7, 33, 131100, -29999989, -29999990, 7, 33, 131126,
-    -29999989, 2, 393307, (s32)btlevtcmd_SetPartsRotate, -2, 2, 0, 0,
-    -29999989, 65545, 1, 6, 131096, -29999988, 1, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_KILLER_CANNON_CHARGE1", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 2, (s32)"KTA_A_3A", 65545, 10, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    2, (s32)"KTA_Z_3", 65545, 10, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2,
-    (s32)"KTA_A_3A", 65545, 10, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"KTA_Z_3",
-    65545, 10, 33, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"KTA_A_3",
-    65545, 40, 131096, -29999988, 1, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_ENM_KILLER_CANNON4", -250000000, 0, -250000000, 32, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_ENM_KILLER_CANNON2", -250000000, 0, -250000000, 33, 262235, (s32)btlevtcmd_CheckStatus, -2,
-    10, -29999995, 131097, -29999995, 0, 327771, (s32)btlevtcmd_GetPos, -2,
-    -29999993, -29999992, -29999991, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -29999993, 60,
-    131125, -29999991, 10, 983131, (s32)evt_eff, (s32)"", (s32)"kemuri_test", 18,
-    -29999993, 75, -29999991, -229998464, 0, 0, 0, 0,
-    0, 0, 0, 65540, 10, 33, 262235, (s32)btlevtcmd_CheckStatus,
-    -2, 11, -29999995, 131097, -29999995, 0, 327771, (s32)btlevtcmd_GetPos,
-    -2, -29999993, -29999992, -29999991, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -29999993,
-    28, 131125, -29999991, 10, 983131, (s32)evt_eff, (s32)"", (s32)"kemuri_test",
-    18, -29999993, 20, -29999991, -229999488, 0, 0, 0,
-    0, 0, 0, 0, 65540, 10, 33, 327771,
-    (s32)btlevtcmd_GetPos, -2, -29999993, -29999992, -29999991, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2,
-    -29999993, 40, 131125, -29999991, 10, 983131, (s32)evt_eff, (s32)"",
-    (s32)"kemuri_test", 18, -29999993, 38, -29999991, -229998976, 0, 0,
-    0, 0, 0, 0, 0, 65540, 10, 65539,
-    10, 393307, (s32)evt_btl_camera_shake_w, 0, 5, 0, 20, 0,
-    262235, (s32)btlevtcmd_SpawnUnit, -29999997, (s32)entry_killer, 0, 196699, (s32)killer_copy_status, -2,
-    -29999997, 196699, (s32)btlevtcmd_GetBodyId, -29999997, -29999996, 327771, (s32)btlevtcmd_SetPos, -29999997,
-    -29999993, 10, -29999998, 393307, (s32)btlevtcmd_SetPartsRotate, -29999997, -29999996, 0,
-    0, -29999990, 196699, (s32)btlevtcmd_SetFallAccel, -29999997, 0, 196699, (s32)btlevtcmd_SetJumpSpeed,
-    -29999997, 0, 458843, (s32)btlevtcmd_JumpPosition, -29999997, -30000000, 40, -29999998,
-    -229992832, -1, 393307, (s32)btlevtcmd_SetPartsRotate, -29999997, -29999996, 0, 0,
-    0, 327771, (s32)btlevtcmd_SetHomePos, -29999997, -30000000, 40, -29999998, 131096,
-    -29999988, 1, 393307, (s32)btlevtcmd_OnOffStatus, -29999997, 16, 1, 1,
-    1, 33, 262235, (s32)btlevtcmd_OnPartsAttribute, -29999997, -29999996, 4194304, 262235,
-    (s32)btlevtcmd_OnPartsAttribute, -29999997, -29999996, 2097152, 2, 1,
-};
+static EVT_BEGIN(friend_event_sky)
+    CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
+    CALL(evt_sub_get_dir, LW(7), LW(8), LW(0), 40, LW(10))
+    CALL(killer_get_angle, LW(7), LW(8), LW(0), 40, LW(10))
+    CALL(btlevtcmd_GetPartsRotate, -2, 2, LW(5), LW(6), LW(11))
+    LOOP(0)
+        IF_INT_GREATER(LW(11), 0)
+            BREAK_LOOP
+        END_IF
+        IF_INT_LESS_OR_EQUAL(LW(11), LW(10))
+            BREAK_LOOP
+        END_IF
+        SUBTRACT(LW(11), 2)
+        CALL(btlevtcmd_SetPartsRotate, -2, 2, 0, 0, LW(11))
+        WAIT_FRAMES(1)
+    END_LOOP
+    IF_INT_EQUAL(LW(12), 1)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KILLER_CANNON_CHARGE1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KTA_A_3A"))
+        WAIT_FRAMES(10)
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KTA_Z_3"))
+        WAIT_FRAMES(10)
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KTA_A_3A"))
+        WAIT_FRAMES(10)
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KTA_Z_3"))
+        WAIT_FRAMES(10)
+    END_IF
+    CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KTA_A_3"))
+    WAIT_FRAMES(40)
+    IF_INT_EQUAL(LW(12), 1)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KILLER_CANNON4"), -250000000, 0, -250000000)
+    ELSE
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KILLER_CANNON2"), -250000000, 0, -250000000)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, -2, 10, LW(5))
+    IF_INT_NOT_EQUAL(LW(5), 0)
+        CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(7), 60)
+        ADD(LW(9), 10)
+        CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 75, LW(9), FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
+        GOTO(10)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, -2, 11, LW(5))
+    IF_INT_NOT_EQUAL(LW(5), 0)
+        CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(7), 28)
+        ADD(LW(9), 10)
+        CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 20, LW(9), FLOAT(0.5f), 0, 0, 0, 0, 0, 0, 0)
+        GOTO(10)
+    END_IF
+    CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
+    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(7), 40)
+    ADD(LW(9), 10)
+    CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 38, LW(9), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    GOTO(10)
+    LABEL(10)
+    CALL(evt_btl_camera_shake_w, 0, 5, 0, 20, 0)
+    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_killer), 0)
+    CALL(killer_copy_status, -2, LW(3))
+    CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+    CALL(btlevtcmd_SetPos, LW(3), LW(7), 10, LW(2))
+    CALL(btlevtcmd_SetPartsRotate, LW(3), LW(4), 0, 0, LW(10))
+    CALL(btlevtcmd_SetFallAccel, LW(3), 0)
+    CALL(btlevtcmd_SetJumpSpeed, LW(3), 0)
+    CALL(btlevtcmd_JumpPosition, LW(3), LW(0), 40, LW(2), FLOAT(7.0f), -1)
+    CALL(btlevtcmd_SetPartsRotate, LW(3), LW(4), 0, 0, 0)
+    CALL(btlevtcmd_SetHomePos, LW(3), LW(0), 40, LW(2))
+    IF_INT_EQUAL(LW(12), 1)
+        CALL(btlevtcmd_OnOffStatus, LW(3), 16, 1, 1, 1)
+    END_IF
+    CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), 4194304)
+    CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), 2097152)
+    RETURN
+EVT_END()
 
 double atan(double x);
 

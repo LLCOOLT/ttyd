@@ -101,22 +101,22 @@ void demo_cap(void);
 void demo_exit(void);
 USER_FUNC(demo_init);
 
-__declspec(section ".data") u64 fd_dmo_00_negone_one_374;
-__declspec(section ".data") s32 fd_dmo_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_dmo_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_dmo_00___local_3PIO2_385[2];
-__declspec(section ".data") u64 fd_dmo_00_one_negone_373;
-__declspec(section ".data") s32 fd_dmo_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_dmo_00_one_381[1];
-__declspec(section ".data") u64 fd_dmo_00_negone_one_360;
-__declspec(section ".data") s32 fd_dmo_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_dmo_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_dmo_00___local_3PIO2_368[2];
-__declspec(section ".data") u64 fd_dmo_00_one_negone_359;
-__declspec(section ".data") s32 fd_dmo_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_dmo_00_one_364[1];
-__declspec(section ".data") s32 fd_dmo_00__three_localstatic4_sqrtf[2];
-__declspec(section ".data") s32 fd_dmo_00__half_localstatic3_sqrtf[2];
+__declspec(section ".data") f32 fd_dmo_00_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dmo_00_neg_one_382;
+__declspec(section ".data") f32 fd_dmo_00___local_PI_383;
+__declspec(section ".data") f32 fd_dmo_00___local_3PIO2_385[2];
+__declspec(section ".data") f32 fd_dmo_00_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dmo_00___local_PIO2_384;
+__declspec(section ".data") f32 fd_dmo_00_one_381;
+__declspec(section ".data") f32 fd_dmo_00_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dmo_00_neg_one_365;
+__declspec(section ".data") f32 fd_dmo_00___local_PI_366;
+__declspec(section ".data") f32 fd_dmo_00___local_3PIO2_368[2];
+__declspec(section ".data") f32 fd_dmo_00_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dmo_00___local_PIO2_367;
+__declspec(section ".data") f32 fd_dmo_00_one_364;
+__declspec(section ".data") f64 fd_dmo_00__three_localstatic4_sqrtf;
+__declspec(section ".data") f64 fd_dmo_00__half_localstatic3_sqrtf;
 s32 buttonCheck[32];
 s32 demo_evt[1489];
 static s32 koushukei_dai[63];
@@ -581,61 +581,41 @@ USER_FUNC(make_msg) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_dmo_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_dmo_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_dmo_00_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_dmo_00_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_dmo_00___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_dmo_00___local_3PIO2_385[] = {
+    4.712389f, 0.0f,
 };
 
-__declspec(section ".data") s32 fd_dmo_00___local_PI_383[] = {
-    1078530011,
+__declspec(section ".data") f32 fd_dmo_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_dmo_00___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_dmo_00_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_dmo_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_dmo_00_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_dmo_00___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_dmo_00___local_3PIO2_368[] = {
+    4.712389f, 0.0f,
 };
 
-__declspec(section ".data") s32 fd_dmo_00___local_3PIO2_385[] = {
-    1083624420, 0,
-};
+__declspec(section ".data") f32 fd_dmo_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") u64 fd_dmo_00_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_dmo_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_dmo_00___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_dmo_00_one_364 = 1.0f;
 
-__declspec(section ".data") s32 fd_dmo_00_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f64 fd_dmo_00__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") u64 fd_dmo_00_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_dmo_00_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_dmo_00___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_dmo_00___local_3PIO2_368[] = {
-    1083624420, 0,
-};
-
-__declspec(section ".data") u64 fd_dmo_00_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_dmo_00___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_dmo_00_one_364[] = {
-    1065353216,
-};
-
-__declspec(section ".data") s32 fd_dmo_00__three_localstatic4_sqrtf[] = {
-    1074266112, 0,
-};
-
-__declspec(section ".data") s32 fd_dmo_00__half_localstatic3_sqrtf[] = {
-    1071644672, 0,
-};
+__declspec(section ".data") f64 fd_dmo_00__half_localstatic3_sqrtf = 0.5;
 
 static DemoWork* wp = &work;
 
@@ -1165,40 +1145,68 @@ EVT_BEGIN(dmo_00_init_evt)
     RETURN
 EVT_END()
 #else
-s32 dmo_00_init_evt[] = {
-    65627, (s32)demo_init, 196699, (s32)evt_npc_entry, (s32)"peach", (s32)"c_peach", 196699, (s32)evt_npc_set_tribe,
-    (s32)"peach", (s32)/*"デモピーチ標準2"*/"\x83\x66\x83\x82\x83\x73\x81\x5B\x83\x60\x95\x57\x8F\x80\x32", 196699, (s32)evt_npc_set_ry, (s32)"peach", 90, 327771, (s32)evt_npc_set_position,
-    (s32)"peach", -2, 0, 550, 262235, (s32)evt_npc_status_onoff, 1, (s32)"peach",
-    2, 262235, (s32)evt_npc_flag_onoff, 1, (s32)"peach", 1074267648, 196699, (s32)evt_npc_entry,
-    (s32)"nazo", (s32)"c_nazo", 196699, (s32)evt_npc_set_tribe, (s32)"nazo", (s32)/*"謎の人"*/"\x93\xE4\x82\xCC\x90\x6C", 196699, (s32)evt_npc_set_ry,
-    (s32)"nazo", 90, 327771, (s32)evt_npc_set_position, (s32)"nazo", -145, 0, 450,
-    262235, (s32)evt_npc_status_onoff, 1, (s32)"nazo", 2, 262235, (s32)evt_npc_flag_onoff, 1,
-    (s32)"nazo", 1074266112, 196699, (s32)evt_npc_set_height, (s32)"nazo", 40, 196699, (s32)evt_npc_entry,
-    (s32)"hako", (s32)"MOBJ_GoldenTreasureBox", 196699, (s32)evt_npc_set_anim, (s32)"hako", (s32)"S_1", 327771, (s32)evt_npc_set_position,
-    (s32)"hako", -125, 0, 450, 262235, (s32)evt_npc_flag_onoff, 1, (s32)"hako",
-    1073741824, 196699, (s32)evt_npc_pera_onoff, (s32)"hako", 0, 589915, (s32)evt_mobj_itembox, (s32)"hako",
-    340, 110, -20, 1, 0, 0, 0, 262235,
-    (s32)evt_mobj_flag_onoff, 1, (s32)"hako", 16384, 196699, (s32)evt_npc_entry, (s32)/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50", (s32)"c_roten",
-    196699, (s32)evt_npc_set_tribe, (s32)/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50", (s32)/*"ロテン"*/"\x83\x8D\x83\x65\x83\x93", 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50",
-    1074267648, 262235, (s32)evt_npc_status_onoff, 1, (s32)/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50", 2, 262235, (s32)evt_npc_change_interrupt,
-    (s32)/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50", 1, (s32)roten_move, 196699, (s32)evt_npc_entry, (s32)/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50", (s32)"c_kuribo_n", 196699,
-    (s32)evt_npc_set_tribe, (s32)/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50", (s32)/*"NPCクリボー"*/"\x4E\x50\x43\x83\x4E\x83\x8A\x83\x7B\x81\x5B", 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50", 1074267648,
-    262235, (s32)evt_npc_status_onoff, 1, (s32)/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50", 2, 262235, (s32)evt_npc_change_interrupt, (s32)/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50",
-    1, (s32)kuribo_move, 196699, (s32)evt_npc_entry, (s32)/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50", (s32)"c_tyusan", 196699, (s32)evt_npc_set_tribe,
-    (s32)/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50", (s32)/*"チューさん"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1", 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50", 1074267648, 262235,
-    (s32)evt_npc_status_onoff, 1, (s32)/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50", 2, 262235, (s32)evt_npc_change_interrupt, (s32)/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50", 1,
-    (s32)chusan_move, 131163, (s32)evt_mario_cont_onoff, 0, 196699, (s32)evt_party_cont_onoff, 0, 0,
-    262235, (s32)evt_mario_set_pos, 0, -1000, 0, 327771, (s32)evt_party_set_pos, 0,
-    0, -1000, 0, 131163, (s32)evt_paper_entry, (s32)"OFF_d_meku_right", 589915, (s32)evt_cam3d_evt_set,
-    0, 385, 1473, 0, 100, 0, 0, 11,
-    196699, (s32)evt_cam_letter_box_onoff, 1, 1, 327771, (s32)evt_mapobj_flag_onoff, 1, 1,
-    (s32)"S", 1, 131163, (s32)evt_bg_disp_onoff, 0, 262235, (s32)evt_npc_flag_onoff, 1,
-    (s32)"peach", 128, 262235, (s32)evt_npc_flag_onoff, 1, (s32)"nazo", 128, 262235,
-    (s32)evt_npc_flag_onoff, 1, (s32)"hako", 128, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50",
-    128, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50", 128, 262235, (s32)evt_npc_flag_onoff,
-    1, (s32)/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50", 128, 65644, -50000000, 65635, 0, 65627,
-    (s32)demo_draw, 109, 65628, (s32)demo_evt, 65628, (s32)koushukei_dai, 107, 131163,
-    (s32)evt_sub_animgroup_async, (s32)"OFF_d_maku_center", 109, 2, 1, 0,
-};
+EVT_BEGIN(dmo_00_init_evt)
+    CALL(demo_init)
+    CALL(evt_npc_entry, STRING("peach"), STRING("c_peach"))
+    CALL(evt_npc_set_tribe, STRING("peach"), STRING(/*"デモピーチ標準2"*/"\x83\x66\x83\x82\x83\x73\x81\x5B\x83\x60\x95\x57\x8F\x80\x32"))
+    CALL(evt_npc_set_ry, STRING("peach"), 90)
+    CALL(evt_npc_set_position, STRING("peach"), -2, 0, 550)
+    CALL(evt_npc_status_onoff, 1, STRING("peach"), 2)
+    CALL(evt_npc_flag_onoff, 1, STRING("peach"), 1074267648)
+    CALL(evt_npc_entry, STRING("nazo"), STRING("c_nazo"))
+    CALL(evt_npc_set_tribe, STRING("nazo"), STRING(/*"謎の人"*/"\x93\xE4\x82\xCC\x90\x6C"))
+    CALL(evt_npc_set_ry, STRING("nazo"), 90)
+    CALL(evt_npc_set_position, STRING("nazo"), -145, 0, 450)
+    CALL(evt_npc_status_onoff, 1, STRING("nazo"), 2)
+    CALL(evt_npc_flag_onoff, 1, STRING("nazo"), 1074266112)
+    CALL(evt_npc_set_height, STRING("nazo"), 40)
+    CALL(evt_npc_entry, STRING("hako"), STRING("MOBJ_GoldenTreasureBox"))
+    CALL(evt_npc_set_anim, STRING("hako"), STRING("S_1"))
+    CALL(evt_npc_set_position, STRING("hako"), -125, 0, 450)
+    CALL(evt_npc_flag_onoff, 1, STRING("hako"), 1073741824)
+    CALL(evt_npc_pera_onoff, STRING("hako"), 0)
+    CALL(evt_mobj_itembox, STRING("hako"), 340, 110, -20, 1, 0, 0, 0)
+    CALL(evt_mobj_flag_onoff, 1, STRING("hako"), 16384)
+    CALL(evt_npc_entry, STRING(/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50"), STRING("c_roten"))
+    CALL(evt_npc_set_tribe, STRING(/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50"), STRING(/*"ロテン"*/"\x83\x8D\x83\x65\x83\x93"))
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50"), 1074267648)
+    CALL(evt_npc_status_onoff, 1, STRING(/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50"), 2)
+    CALL(evt_npc_change_interrupt, STRING(/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50"), 1, PTR(roten_move))
+    CALL(evt_npc_entry, STRING(/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50"), STRING("c_kuribo_n"))
+    CALL(evt_npc_set_tribe, STRING(/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50"), STRING(/*"NPCクリボー"*/"\x4E\x50\x43\x83\x4E\x83\x8A\x83\x7B\x81\x5B"))
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50"), 1074267648)
+    CALL(evt_npc_status_onoff, 1, STRING(/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50"), 2)
+    CALL(evt_npc_change_interrupt, STRING(/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50"), 1, PTR(kuribo_move))
+    CALL(evt_npc_entry, STRING(/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50"), STRING("c_tyusan"))
+    CALL(evt_npc_set_tribe, STRING(/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50"), STRING(/*"チューさん"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1"))
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50"), 1074267648)
+    CALL(evt_npc_status_onoff, 1, STRING(/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50"), 2)
+    CALL(evt_npc_change_interrupt, STRING(/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50"), 1, PTR(chusan_move))
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(evt_party_cont_onoff, 0, 0)
+    CALL(evt_mario_set_pos, 0, -1000, 0)
+    CALL(evt_party_set_pos, 0, 0, -1000, 0)
+    CALL(evt_paper_entry, STRING("OFF_d_meku_right"))
+    CALL(evt_cam3d_evt_set, 0, 385, 1473, 0, 100, 0, 0, 11)
+    CALL(evt_cam_letter_box_onoff, 1, 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S"), 1)
+    CALL(evt_bg_disp_onoff, 0)
+    CALL(evt_npc_flag_onoff, 1, STRING("peach"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("nazo"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("hako"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50"), 128)
+    BEGIN_INLINE_EVENT_GET_ID(GW(0))
+        SET_TYPE(0)
+        CALL(demo_draw)
+    END_INLINE_EVENT
+    SPAWN_EVENT(demo_evt)
+    SPAWN_EVENT(koushukei_dai)
+    BEGIN_INLINE_EVENT
+        CALL(evt_sub_animgroup_async, STRING("OFF_d_maku_center"))
+    END_INLINE_EVENT
+    RETURN
+EVT_END_PAD()
 #endif
 

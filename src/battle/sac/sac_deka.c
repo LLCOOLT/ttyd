@@ -979,58 +979,137 @@ void yuka_capture(CameraId cam, void* param) {
     memcpy(camGetPtr(cam), &save, sizeof(CameraEntry));
 }
 
-s32 marioAttackEvent_Deka[] = {
-    196699, (s32)btlevtcmd_GetUnitId, -4, -29999986, 196699, (s32)btlevtcmd_GetBodyId, -29999986, -29999985,
-    196699, (s32)btlevtcmd_CheckActStatus, -29999986, -30000000, 131096, -30000000, 0, 131122,
-    -29999986, -1, 33, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131096,
-    -29999997, -1, 65540, 99, 33, 262235, (s32)btlevtcmd_AttackDeclare, -2,
-    -29999997, -29999996, 65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost, -2, 196699,
-    (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000, 131163, (s32)btlevtcmd_WeaponAftereffect, -30000000, 65627, (s32)btlevtcmd_reset_move_color_lv_all,
-    110, 131163, (s32)main_deka, -29999986, 112, 65630, (s32)sac_start_camera_evt, 65546,
-    500, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START1", -250000000, 0, -250000000,
-    65630, (s32)sac_mario_item_on_evt, 65546, 500, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START2",
-    -250000000, 0, -29999989, 65627, (s32)star_stone_appear, 110, 65630, (s32)sac_start_stardust,
-    112, 65545, 100, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START3", -250000000,
-    0, -250000000, 131163, (s32)evt_snd_sfxoff, -29999989, 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 65545, 40, 65630, (s32)sac_mario_item_on_end_evt, 131163, (s32)btlevtcmd_SacBgsetMove, 0,
-    65630, (s32)sac_mario_back_home, 65627, (s32)wait_star_stone_take_on, 110, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2,
-    1, 44, 327771, (s32)get_ride_pos, 0, -30000000, -29999999, -29999998,
-    327771, (s32)btlevtcmd_JumpSetting, -2, 30, 0, -229999591, 458843, (s32)btlevtcmd_JumpPosition,
-    -2, -30000000, -29999999, -29999998, 30, -1, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"M_I_Y", 112, 110, 131097, -29999986, -1,
-    196699, (s32)btlevtcmd_GetUnitKind, -4, -30000000, 131096, -30000000, 228, 65541,
-    0, 262235, (s32)btlevtcmd_SetUnitWork, -29999986, 3, 1, 327771, (s32)btlevtcmd_GetPos,
-    -29999986, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_SetUnitWork, -29999986, 0,
-    -30000000, 262235, (s32)btlevtcmd_SetUnitWork, -29999986, 1, -29999999, 262235, (s32)btlevtcmd_SetUnitWork,
-    -29999986, 2, -29999998, 65545, 1, 6, 33, 33,
-    112, 110, 131097, -29999986, -1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999986,
-    -29999985, 44, 327771, (s32)get_ride_pos, 1, -30000000, -29999999, -29999998,
-    327771, (s32)btlevtcmd_JumpSetting, -29999986, 30, 0, -229999591, 458843, (s32)btlevtcmd_JumpPosition,
-    -29999986, -30000000, -29999999, -29999998, 30, -1, 262235, (s32)btlevtcmd_AnimeChangePoseType,
-    -29999986, -29999985, 43, 33, 112, 65545, 30, 65647,
-    -29999987, 65541, 0, 65545, 1, 327771, (s32)get_ride_pos, 0,
-    -30000000, -29999999, -29999998, 131125, -29999998, -229994880, 327771, (s32)btlevtcmd_SetPos,
-    -2, -30000000, -29999999, -29999998, 131097, -29999986, -1, 327771,
-    (s32)get_ride_pos, 1, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_SetPos, -29999986,
-    -30000000, -29999999, -29999998, 33, 6, 112, 110, 131163,
-    (s32)sac_cheer, 0, 112, 65627, (s32)sac_ac_help_on, 65627, (s32)start_game, 65627,
-    (s32)wait_game_end, 65627, (s32)sac_ac_help_off, 65627, (s32)sac_cheer_end, 65546, 1000, 65627,
-    (s32)star_stone_attack, 65539, 90, 65631, -29999987, 107, 65546, 1000,
-    65630, (s32)dmg_evt, 109, 65546, 500, 110, 262235, (s32)btlevtcmd_AnimeChangePoseType,
-    -2, 1, 44, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999,
-    -29999998, 327771, (s32)btlevtcmd_JumpSetting, -2, 30, 0, -229999591, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 30, -1, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 43, 112, 110, 131097, -29999986,
-    -1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999986, -29999985, 44, 327771, (s32)btlevtcmd_GetHomePos,
-    -29999986, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_JumpSetting, -29999986, 30,
-    0, -229999591, 458843, (s32)btlevtcmd_JumpPosition, -29999986, -30000000, -29999999, -29999998,
-    30, -1, 131163, (s32)btlevtcmd_StartWaitEvent, -29999986, 33, 112, 65545,
-    30, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 131163, (s32)btlevtcmd_SacBgsetMove, 1,
-    131097, -29999986, -1, 196699, (s32)btlevtcmd_GetUnitKind, -4, -30000000, 131096,
-    -30000000, 228, 262235, (s32)btlevtcmd_SetUnitWork, -29999986, 3, 0, 33,
-    33, 65627, (s32)yuka_end, 65627, (s32)end_deka, 65539, 99, 131163,
-    (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+EVT_BEGIN(marioAttackEvent_Deka)
+    CALL(btlevtcmd_GetUnitId, -4, LW(14))
+    CALL(btlevtcmd_GetBodyId, LW(14), LW(15))
+    CALL(btlevtcmd_CheckActStatus, LW(14), LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        SET_VALUE(LW(14), -1)
+    END_IF
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_CommandPayWeaponCost, -2)
+    CALL(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+    CALL(btlevtcmd_WeaponAftereffect, LW(0))
+    CALL(btlevtcmd_reset_move_color_lv_all)
+    BEGIN_SIBLING_EVENT
+        CALL(main_deka, LW(14))
+    END_SIBLING_EVENT
+    CALL_CHILD(sac_start_camera_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START1"), -250000000, 0, -250000000)
+    CALL_CHILD(sac_mario_item_on_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START2"), -250000000, 0, LW(11))
+    CALL(star_stone_appear)
+    BEGIN_SIBLING_EVENT
+        CALL_CHILD(sac_start_stardust)
+    END_SIBLING_EVENT
+    WAIT_FRAMES(100)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START3"), -250000000, 0, -250000000)
+    CALL(evt_snd_sfxoff, LW(11))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_FRAMES(40)
+    CALL_CHILD(sac_mario_item_on_end_evt)
+    CALL(btlevtcmd_SacBgsetMove, 0)
+    CALL_CHILD(sac_mario_back_home)
+    CALL(wait_star_stone_take_on)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 44)
+        CALL(get_ride_pos, 0, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpSetting, -2, 30, 0, FLOAT(0.39941406f))
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 30, -1)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_I_Y"))
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        IF_INT_NOT_EQUAL(LW(14), -1)
+            CALL(btlevtcmd_GetUnitKind, -4, LW(0))
+            IF_INT_EQUAL(LW(0), 228)
+                LOOP(0)
+                    CALL(btlevtcmd_SetUnitWork, LW(14), 3, 1)
+                    CALL(btlevtcmd_GetPos, LW(14), LW(0), LW(1), LW(2))
+                    CALL(btlevtcmd_SetUnitWork, LW(14), 0, LW(0))
+                    CALL(btlevtcmd_SetUnitWork, LW(14), 1, LW(1))
+                    CALL(btlevtcmd_SetUnitWork, LW(14), 2, LW(2))
+                    WAIT_FRAMES(1)
+                END_LOOP
+            END_IF
+        END_IF
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        IF_INT_NOT_EQUAL(LW(14), -1)
+            CALL(btlevtcmd_AnimeChangePoseType, LW(14), LW(15), 44)
+            CALL(get_ride_pos, 1, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_JumpSetting, LW(14), 30, 0, FLOAT(0.39941406f))
+            CALL(btlevtcmd_JumpPosition, LW(14), LW(0), LW(1), LW(2), 30, -1)
+            CALL(btlevtcmd_AnimeChangePoseType, LW(14), LW(15), 43)
+        END_IF
+    END_SIBLING_EVENT
+    WAIT_FRAMES(30)
+    BEGIN_SIBLING_EVENT_GET_ID(LW(13))
+        LOOP(0)
+            WAIT_FRAMES(1)
+            CALL(get_ride_pos, 0, LW(0), LW(1), LW(2))
+            ADD(LW(2), FLOAT(5.0f))
+            CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+            IF_INT_NOT_EQUAL(LW(14), -1)
+                CALL(get_ride_pos, 1, LW(0), LW(1), LW(2))
+                CALL(btlevtcmd_SetPos, LW(14), LW(0), LW(1), LW(2))
+            END_IF
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        CALL(sac_cheer, 0)
+    END_SIBLING_EVENT
+    CALL(sac_ac_help_on)
+    CALL(start_game)
+    CALL(wait_game_end)
+    CALL(sac_ac_help_off)
+    CALL(sac_cheer_end)
+    WAIT_MS(1000)
+    CALL(star_stone_attack)
+    LABEL(90)
+    DELETE_EVENT(LW(13))
+    BEGIN_INLINE_EVENT
+        WAIT_MS(1000)
+        CALL_CHILD(dmg_evt)
+    END_INLINE_EVENT
+    WAIT_MS(500)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 44)
+        CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpSetting, -2, 30, 0, FLOAT(0.39941406f))
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 30, -1)
+        CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 43)
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        IF_INT_NOT_EQUAL(LW(14), -1)
+            CALL(btlevtcmd_AnimeChangePoseType, LW(14), LW(15), 44)
+            CALL(btlevtcmd_GetHomePos, LW(14), LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_JumpSetting, LW(14), 30, 0, FLOAT(0.39941406f))
+            CALL(btlevtcmd_JumpPosition, LW(14), LW(0), LW(1), LW(2), 30, -1)
+            CALL(btlevtcmd_StartWaitEvent, LW(14))
+        END_IF
+    END_SIBLING_EVENT
+    WAIT_FRAMES(30)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(btlevtcmd_SacBgsetMove, 1)
+    IF_INT_NOT_EQUAL(LW(14), -1)
+        CALL(btlevtcmd_GetUnitKind, -4, LW(0))
+        IF_INT_EQUAL(LW(0), 228)
+            CALL(btlevtcmd_SetUnitWork, LW(14), 3, 0)
+        END_IF
+    END_IF
+    CALL(yuka_end)
+    CALL(end_deka)
+    LABEL(99)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(dmg_evt)
     CALL(get_result, LW(10))

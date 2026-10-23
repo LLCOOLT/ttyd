@@ -68,30 +68,30 @@ USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(peach_set_pose);
 
-__declspec(section ".data") u64 fd_aji_09_negone_one_374;
-__declspec(section ".data") s32 fd_aji_09_neg_one_382[1];
-__declspec(section ".data") s32 fd_aji_09___local_PI_383[1];
-__declspec(section ".data") s32 fd_aji_09___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_aji_09_one_negone_373;
-__declspec(section ".data") s32 fd_aji_09___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_aji_09_one_381[1];
-__declspec(section ".data") u64 fd_aji_09_negone_one_360;
-__declspec(section ".data") s32 fd_aji_09_neg_one_365[1];
-__declspec(section ".data") s32 fd_aji_09___local_PI_366[1];
-__declspec(section ".data") s32 fd_aji_09___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_aji_09_one_negone_359;
-__declspec(section ".data") s32 fd_aji_09___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_aji_09_one_364[1];
+__declspec(section ".data") f32 fd_aji_09_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_09_neg_one_382;
+__declspec(section ".data") f32 fd_aji_09___local_PI_383;
+__declspec(section ".data") f32 fd_aji_09___local_3PIO2_385;
+__declspec(section ".data") f32 fd_aji_09_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_09___local_PIO2_384;
+__declspec(section ".data") f32 fd_aji_09_one_381;
+__declspec(section ".data") f32 fd_aji_09_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_09_neg_one_365;
+__declspec(section ".data") f32 fd_aji_09___local_PI_366;
+__declspec(section ".data") f32 fd_aji_09___local_3PIO2_368;
+__declspec(section ".data") f32 fd_aji_09_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_09___local_PIO2_367;
+__declspec(section ".data") f32 fd_aji_09_one_364;
 static s32 s_door_open[22];
 static s32 s_door_close[22];
-static s32 bero_entry_data[30];
+static BeroEntry bero_entry_data[2];
 s32 peach_evt_bero_out1[25];
-s32 bero_data_peach1[30];
+BeroEntry bero_data_peach1[2];
 s32 peach_evt_bero_out2[25];
-s32 bero_data_peach2[30];
+BeroEntry bero_data_peach2[2];
 s32 evt_kou1[115];
 s32 evt_kou2[155];
-s32 rokka_data[21];
+const char* rokka_data[21];
 s32 evt_rokka_open[127];
 s32 evt_rokka_close[165];
 s32 evt_rokka_init[34];
@@ -110,53 +110,33 @@ static s32 evt_memo1[21];
 static s32 evt_memo2[14];
 s32 aji_09_init_evt[226];
 
-__declspec(section ".data") u64 fd_aji_09_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_09_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_09_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_09___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_09___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_09___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_09___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_09_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_09___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_09___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_09_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_09_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_aji_09_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_09_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_09_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_09___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_09___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_09___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_09___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_09_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_09___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_09___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_09_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_09_one_364 = 1.0f;
 
 static EVT_BEGIN(s_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.16601563f))
@@ -174,11 +154,26 @@ static EVT_BEGIN(s_door_close)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"s_bero", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"aji_01", (s32)"n_bero_4", 327685, (s32)s_door_close, (s32)s_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "s_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_01", // nextMapName
+        "n_bero_4", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s_door_close, // enterAnimeArg
+        (s32)s_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(peach_evt_bero_out1)
@@ -193,11 +188,26 @@ EVT_BEGIN(peach_evt_bero_out1)
     RETURN
 EVT_END()
 
-s32 bero_data_peach1[] = {
-    (s32)"s_bero", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)peach_evt_bero_out1, (s32)"aji_01", (s32)"n_bero_4", 327685, (s32)s_door_close, (s32)s_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+BeroEntry bero_data_peach1[] = {
+    {
+        "s_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)peach_evt_bero_out1, // exitEvent
+        (s32)"aji_01", // nextMapName
+        "n_bero_4", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s_door_close, // enterAnimeArg
+        (s32)s_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(peach_evt_bero_out2)
@@ -212,11 +222,26 @@ EVT_BEGIN(peach_evt_bero_out2)
     RETURN
 EVT_END()
 
-s32 bero_data_peach2[] = {
-    (s32)"s_bero", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)peach_evt_bero_out2, (s32)"aji_17", (s32)"w_bero", 327685, (s32)s_door_close, (s32)s_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+BeroEntry bero_data_peach2[] = {
+    {
+        "s_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)peach_evt_bero_out2, // exitEvent
+        (s32)"aji_17", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s_door_close, // enterAnimeArg
+        (s32)s_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_kou1)
@@ -309,10 +334,28 @@ EVT_BEGIN(evt_kou2)
     RETURN
 EVT_END()
 
-s32 rokka_data[] = {
-    (s32)"R_door_1", (s32)"a_door_1", (s32)"a_door_1_omote", (s32)"a_door_1_ura", (s32)"a_R_1_asi", (s32)"R_door_2", (s32)"a_door_2", (s32)"a_door_2_omote",
-    (s32)"a_door_2_ura", (s32)"a_R_2_asi", (s32)"R_door_3", (s32)"a_door_3", (s32)"a_door_3_omote", (s32)"a_door_3_ura", (s32)"a_R_3_asi", (s32)"R_door_4",
-    (s32)"a_door_4", (s32)"a_door_4_omote", (s32)"a_door_4_ura", (s32)"a_R_4_asi", 0,
+const char* rokka_data[] = {
+    "R_door_1",
+    "a_door_1",
+    "a_door_1_omote",
+    "a_door_1_ura",
+    "a_R_1_asi",
+    "R_door_2",
+    "a_door_2",
+    "a_door_2_omote",
+    "a_door_2_ura",
+    "a_R_2_asi",
+    "R_door_3",
+    "a_door_3",
+    "a_door_3_omote",
+    "a_door_3_ura",
+    "a_R_3_asi",
+    "R_door_4",
+    "a_door_4",
+    "a_door_4_omote",
+    "a_door_4_ura",
+    "a_R_4_asi",
+    NULL,
 };
 
 EVT_BEGIN(evt_rokka_open)
@@ -403,7 +446,7 @@ EVT_BEGIN(evt_rokka_close)
 EVT_END()
 
 EVT_BEGIN(evt_rokka_init)
-    SET_INT_READ_ADDR(PTR(rokka_data))
+    SET_INT_READ_ADDR(PTR(&rokka_data))
     LOOP(0)
         READ_INT3(LW(0), LW(1), LW(2))
         READ_INT2(LW(3), LW(4))

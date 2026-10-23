@@ -3,6 +3,7 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
 #include "bom.h"
+#include "data_tables.h"
 
 #pragma force_active on
 
@@ -13,77 +14,58 @@ USER_FUNC(evt_mobj_badgeblk);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 
-__declspec(section ".data") u64 fd_bom_04_negone_one_374;
-__declspec(section ".data") s32 fd_bom_04_neg_one_382[1];
-__declspec(section ".data") s32 fd_bom_04___local_PI_383[1];
-__declspec(section ".data") s32 fd_bom_04___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_bom_04_one_negone_373;
-__declspec(section ".data") s32 fd_bom_04___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_bom_04_one_381[1];
-__declspec(section ".data") u64 fd_bom_04_negone_one_360;
-__declspec(section ".data") s32 fd_bom_04_neg_one_365[1];
-__declspec(section ".data") s32 fd_bom_04___local_PI_366[1];
-__declspec(section ".data") s32 fd_bom_04___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_bom_04_one_negone_359;
-__declspec(section ".data") s32 fd_bom_04___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_bom_04_one_364[1];
-static s32 tree_tbl[24];
+__declspec(section ".data") f32 fd_bom_04_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_bom_04_neg_one_382;
+__declspec(section ".data") f32 fd_bom_04___local_PI_383;
+__declspec(section ".data") f32 fd_bom_04___local_3PIO2_385;
+__declspec(section ".data") f32 fd_bom_04_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_bom_04___local_PIO2_384;
+__declspec(section ".data") f32 fd_bom_04_one_381;
+__declspec(section ".data") f32 fd_bom_04_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_bom_04_neg_one_365;
+__declspec(section ".data") f32 fd_bom_04___local_PI_366;
+__declspec(section ".data") f32 fd_bom_04___local_3PIO2_368;
+__declspec(section ".data") f32 fd_bom_04_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_bom_04___local_PIO2_367;
+__declspec(section ".data") f32 fd_bom_04_one_364;
+static TreeAccess tree_tbl[4];
 static __declspec(section ".data") s32 evt_tree[7];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 s32 bom_04_init_evt[47];
 
-__declspec(section ".data") u64 fd_bom_04_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_bom_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_bom_04_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_bom_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_bom_04___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_bom_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_bom_04___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_bom_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_bom_04_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_bom_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_bom_04___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_bom_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_bom_04_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_bom_04_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_bom_04_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_bom_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_bom_04_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_bom_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_bom_04___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_bom_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_bom_04___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_bom_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_bom_04_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_bom_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_bom_04___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_bom_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_bom_04_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_bom_04_one_364 = 1.0f;
 
-static s32 tree_tbl[] = {
-    3, (s32)"A_ki1", (s32)"S_ki_1", (s32)"S_ha_1", 0, 0, 3, (s32)"A_ki2",
-    (s32)"S_ki_2", (s32)"S_ha_2", 0, 0, 3, (s32)"A_ki3", (s32)"S_ki_3", (s32)"S_ha_3",
-    0, 0, 7, 0, 0, 0, 0, 0,
+static TreeAccess tree_tbl[] = {
+    {3, "A_ki1", "S_ki_1", "S_ha_1", 0, NULL},
+    {3, "A_ki2", "S_ki_2", "S_ha_2", 0, NULL},
+    {3, "A_ki3", "S_ki_3", "S_ha_3", 0, NULL},
+    {7, NULL, NULL, NULL, 0, NULL},
 };
 
 static __declspec(section ".data") EVT_BEGIN(evt_tree)
@@ -92,13 +74,40 @@ static __declspec(section ".data") EVT_BEGIN(evt_tree)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero4", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"bom_03", (s32)"e_bero", 65537, 0, 0, (s32)"e_bero4",
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"bom_01", (s32)"w_bero", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero4", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"bom_03", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero4", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"bom_01", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(bom_04_init_evt)

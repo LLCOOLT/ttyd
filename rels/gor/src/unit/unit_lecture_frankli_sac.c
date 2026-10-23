@@ -62,20 +62,20 @@ void spot_square_disp(CameraId cameraId, void* param);
 void Quads2D(f32 x0, f32 y0, f32 x1, f32 y1);
 void Quads2D(f32 x0, f32 y0, f32 x1, f32 y1);
 
-__declspec(section ".data") u64 fd_lecture_frankli_sac_negone_one_374;
-__declspec(section ".data") s32 fd_lecture_frankli_sac_neg_one_382[1];
-__declspec(section ".data") s32 fd_lecture_frankli_sac___local_PI_383[1];
-__declspec(section ".data") s32 fd_lecture_frankli_sac___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_lecture_frankli_sac_one_negone_373;
-__declspec(section ".data") s32 fd_lecture_frankli_sac___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_lecture_frankli_sac_one_381[1];
-__declspec(section ".data") u64 fd_lecture_frankli_sac_negone_one_360;
-__declspec(section ".data") s32 fd_lecture_frankli_sac_neg_one_365[1];
-__declspec(section ".data") s32 fd_lecture_frankli_sac___local_PI_366[1];
-__declspec(section ".data") s32 fd_lecture_frankli_sac___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_lecture_frankli_sac_one_negone_359;
-__declspec(section ".data") s32 fd_lecture_frankli_sac___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_lecture_frankli_sac_one_364[1];
+__declspec(section ".data") f32 fd_lecture_frankli_sac_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_lecture_frankli_sac_neg_one_382;
+__declspec(section ".data") f32 fd_lecture_frankli_sac___local_PI_383;
+__declspec(section ".data") f32 fd_lecture_frankli_sac___local_3PIO2_385;
+__declspec(section ".data") f32 fd_lecture_frankli_sac_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_lecture_frankli_sac___local_PIO2_384;
+__declspec(section ".data") f32 fd_lecture_frankli_sac_one_381;
+__declspec(section ".data") f32 fd_lecture_frankli_sac_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_lecture_frankli_sac_neg_one_365;
+__declspec(section ".data") f32 fd_lecture_frankli_sac___local_PI_366;
+__declspec(section ".data") f32 fd_lecture_frankli_sac___local_3PIO2_368;
+__declspec(section ".data") f32 fd_lecture_frankli_sac_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_lecture_frankli_sac___local_PIO2_367;
+__declspec(section ".data") f32 fd_lecture_frankli_sac_one_364;
 BattleUnitKind unit_lecture_frankli_sac;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -91,53 +91,33 @@ s32 actend_event[538];
 static s32 damage_event[75];
 static __declspec(section ".data") s32 wait_event[6];
 
-__declspec(section ".data") u64 fd_lecture_frankli_sac_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_lecture_frankli_sac_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_lecture_frankli_sac_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_lecture_frankli_sac_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_lecture_frankli_sac___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_lecture_frankli_sac___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_lecture_frankli_sac___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_lecture_frankli_sac___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_lecture_frankli_sac_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_lecture_frankli_sac_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_lecture_frankli_sac___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_lecture_frankli_sac___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_lecture_frankli_sac_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_lecture_frankli_sac_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_lecture_frankli_sac_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_lecture_frankli_sac_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_lecture_frankli_sac_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_lecture_frankli_sac_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_lecture_frankli_sac___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_lecture_frankli_sac___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_lecture_frankli_sac___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_lecture_frankli_sac___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_lecture_frankli_sac_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_lecture_frankli_sac_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_lecture_frankli_sac___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_lecture_frankli_sac___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_lecture_frankli_sac_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_lecture_frankli_sac_one_364 = 1.0f;
 
 BattleUnitKind unit_lecture_frankli_sac = {
     179,
@@ -244,7 +224,7 @@ USER_FUNC(_set_actend_event) {
 
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
-    *(s32*)&unit->field_0x2B4[0x2C4 - 0x2B4] = evt;
+    unit->actEndEvent = (void*)evt;
     return EVT_RETURN_DONE;
 }
 
@@ -282,7 +262,7 @@ static USER_FUNC(lecture_init) {
 }
 
 USER_FUNC(get_actkind) {
-    evtSetValue(event, event->args[0], *(s32*)&_battleWorkPointer->commandMenu.unk540[0]);
+    evtSetValue(event, event->args[0], _battleWorkPointer->commandMenu.unk540);
     return EVT_RETURN_DONE;
 }
 

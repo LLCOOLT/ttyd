@@ -39,27 +39,27 @@ USER_FUNC(evt_mobj_blk);
 static USER_FUNC(test_glare);
 static void sun_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") u64 negone_one$374;
-__declspec(section ".data") s32 neg_one$382[1];
-__declspec(section ".data") s32 __local_PI$383[1];
-__declspec(section ".data") s32 __local_3PIO2$385[1];
+__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 neg_one$382;
+__declspec(section ".data") f32 __local_PI$383;
+__declspec(section ".data") f32 __local_3PIO2$385;
 __declspec(section ".data") u32 gap_04_0000301C_data[1];
-__declspec(section ".data") u64 one_negone$373;
-__declspec(section ".data") s32 __local_PIO2$384[1];
-__declspec(section ".data") s32 one$381[1];
-__declspec(section ".data") u64 negone_one$360;
-__declspec(section ".data") s32 neg_one$365[1];
-__declspec(section ".data") s32 __local_PI$366[1];
-__declspec(section ".data") s32 __local_3PIO2$368[1];
+__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 __local_PIO2$384;
+__declspec(section ".data") f32 one$381;
+__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 neg_one$365;
+__declspec(section ".data") f32 __local_PI$366;
+__declspec(section ".data") f32 __local_3PIO2$368;
 __declspec(section ".data") u32 gap_04_00003044_data[1];
-__declspec(section ".data") u64 one_negone$359;
-__declspec(section ".data") s32 __local_PIO2$367[1];
-__declspec(section ".data") s32 one$364[1];
+__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 __local_PIO2$367;
+__declspec(section ".data") f32 one$364;
 static __declspec(section ".data") s32 w1_close[12];
 static __declspec(section ".data") s32 w1_open[12];
 static __declspec(section ".data") s32 w2_close[12];
 static __declspec(section ".data") s32 w2_open[12];
-static s32 bero_data[45];
+static BeroEntry bero_data[3];
 __declspec(section ".data") s32 evt_poster[10];
 static s32 evt_chk[74];
 static __declspec(section ".data") s32 evt_poster_1[7];
@@ -83,57 +83,37 @@ s32 eki_03_init_evt[470];
 s32 eki_03_init_evt[471];
 #endif
 
-__declspec(section ".data") u64 negone_one$374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 neg_one$382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 neg_one$382 = -1.0f;
 
-__declspec(section ".data") s32 __local_PI$383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 __local_PI$383 = 3.1415927f;
 
-__declspec(section ".data") s32 __local_3PIO2$385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 __local_3PIO2$385 = 4.712389f;
 
 __declspec(section ".data") u32 gap_04_0000301C_data[1] = {0};
 
-__declspec(section ".data") u64 one_negone$373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 __local_PIO2$384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 __local_PIO2$384 = 1.5707964f;
 
-__declspec(section ".data") s32 one$381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 one$381 = 1.0f;
 
-__declspec(section ".data") u64 negone_one$360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 neg_one$365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 neg_one$365 = -1.0f;
 
-__declspec(section ".data") s32 __local_PI$366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 __local_PI$366 = 3.1415927f;
 
-__declspec(section ".data") s32 __local_3PIO2$368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 __local_3PIO2$368 = 4.712389f;
 
 __declspec(section ".data") u32 gap_04_00003044_data[1] = {0};
 
-__declspec(section ".data") u64 one_negone$359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 __local_PIO2$367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 __local_PIO2$367 = 1.5707964f;
 
-__declspec(section ".data") s32 one$364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 one$364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(w1_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -159,13 +139,44 @@ static __declspec(section ".data") EVT_BEGIN(w2_open)
     RETURN
 EVT_END()
 
-static s32 bero_data[] = {
-    (s32)"w_bero_1", 65539, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"eki_01", (s32)"e_bero", 327685, (s32)w1_close, (s32)w1_open, (s32)"w_bero_2",
-    65539, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"eki_04", (s32)"e_bero", 327685, (s32)w2_close, (s32)w2_open, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_data[] = {
+    {
+        "w_bero_1", // hitName
+        1, // type
+        3, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"eki_01", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w1_close, // enterAnimeArg
+        (s32)w1_open, // exitAnimeArg
+    },
+    {
+        "w_bero_2", // hitName
+        1, // type
+        3, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"eki_04", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w2_close, // enterAnimeArg
+        (s32)w2_open, // exitAnimeArg
+    },
+    {0},
 };
 
 __declspec(section ".data") EVT_BEGIN(evt_poster)

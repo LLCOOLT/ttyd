@@ -38,14 +38,14 @@ void nameEntDisp(CameraId cameraId, void* param);
 
 #ifdef VERSION_G8ME01
 /* US: eight unreferenced {+-1.0f, -+1.0f} pairs open nameent .data (r31 anchors here) */
-__declspec(section ".data") u64 nameent_unused_pm1_0 = 0xBF8000003F800000;
-__declspec(section ".data") u64 nameent_unused_pm1_1 = 0xBF8000003F800000;
-__declspec(section ".data") u64 nameent_unused_pm1_2 = 0x3F800000BF800000;
-__declspec(section ".data") u64 nameent_unused_pm1_3 = 0x3F800000BF800000;
-__declspec(section ".data") u64 nameent_unused_pm1_4 = 0xBF8000003F800000;
-__declspec(section ".data") u64 nameent_unused_pm1_5 = 0xBF8000003F800000;
-__declspec(section ".data") u64 nameent_unused_pm1_6 = 0x3F800000BF800000;
-__declspec(section ".data") u64 nameent_unused_pm1_7 = 0x3F800000BF800000;
+__declspec(section ".data") f32 nameent_unused_pm1_0[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 nameent_unused_pm1_1[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 nameent_unused_pm1_2[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 nameent_unused_pm1_3[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 nameent_unused_pm1_4[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 nameent_unused_pm1_5[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 nameent_unused_pm1_6[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 nameent_unused_pm1_7[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 #endif
 const char* hiragana_tbl[] = {
 	"\x82\xA0", "\x82\xA2", "\x82\xA4", "\x82\xA6", "\x82\xA8", "\x82\xED",

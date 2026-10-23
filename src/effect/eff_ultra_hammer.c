@@ -42,14 +42,14 @@ u8 wakka_color0_tbl[];
 s16 wakka_texcoord0_tbl[];
 
 #ifdef __MWERKS__
-__declspec(section ".data") u64 eff_ultra_hammer_negone_one_a = 0xBF8000003F800000;
-static __declspec(section ".data") u64 negone_one$374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 eff_ultra_hammer_one_negone_a = 0x3F800000BF800000;
-static __declspec(section ".data") u64 one_negone$373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 eff_ultra_hammer_negone_one_b = 0xBF8000003F800000;
-static __declspec(section ".data") u64 negone_one$360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 eff_ultra_hammer_one_negone_b = 0x3F800000BF800000;
-static __declspec(section ".data") u64 one_negone$359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 eff_ultra_hammer_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+static __declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 eff_ultra_hammer_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+static __declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 eff_ultra_hammer_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+static __declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 eff_ultra_hammer_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+static __declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 s16 wakka_vertex_tbl[] ATTRIBUTE_ALIGN(32) = {
 	24347, 0, -8825, // 0

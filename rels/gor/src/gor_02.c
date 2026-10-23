@@ -26,13 +26,15 @@
 #include "evt/evt_sub.h"
 #include "evt/evt_npc.h"
 #include "gor.h"
+#include "driver/hitdrv.h"
+#include "data_tables.h"
 
 
 f32 reviseAngle(f32 angle);
 typedef struct CamRoadWork { u8 field_0x0[0xD8]; s32 field_0xD8; u8 field_0xDC[0xFC - 0xDC]; char* curveName; } CamRoadWork;
 CamRoadWork* camRoadGetWorkPtr(void);
 typedef struct MonosiriFollow { s32 seq; s32* list; s32 count; } MonosiriFollow;
-#define FOLLOW ((MonosiriFollow*)follow)
+#define FOLLOW (follow)
 void winLectureOn(void);
 BOOL winLectureCheck(void);
 void statusWinForceOff(void);
@@ -364,25 +366,25 @@ static void alpha_tev(MapTevCallbackInfo* info) {
     info->tevStage++;
 }
 
-__declspec(section ".data") u64 fd_gor_02_negone_one_374;
-__declspec(section ".data") s32 fd_gor_02_neg_one_382[1];
-__declspec(section ".data") s32 fd_gor_02___local_PI_383[1];
-__declspec(section ".data") s32 fd_gor_02___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gor_02_one_negone_373;
-__declspec(section ".data") s32 fd_gor_02___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gor_02_one_381[1];
-__declspec(section ".data") u64 fd_gor_02_negone_one_360;
-__declspec(section ".data") s32 fd_gor_02_neg_one_365[1];
-__declspec(section ".data") s32 fd_gor_02___local_PI_366[1];
-__declspec(section ".data") s32 fd_gor_02___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gor_02_one_negone_359;
-__declspec(section ".data") s32 fd_gor_02___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gor_02_one_364[1];
+__declspec(section ".data") f32 fd_gor_02_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gor_02_neg_one_382;
+__declspec(section ".data") f32 fd_gor_02___local_PI_383;
+__declspec(section ".data") f32 fd_gor_02___local_3PIO2_385;
+__declspec(section ".data") f32 fd_gor_02_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gor_02___local_PIO2_384;
+__declspec(section ".data") f32 fd_gor_02_one_381;
+__declspec(section ".data") f32 fd_gor_02_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gor_02_neg_one_365;
+__declspec(section ".data") f32 fd_gor_02___local_PI_366;
+__declspec(section ".data") f32 fd_gor_02___local_3PIO2_368;
+__declspec(section ".data") f32 fd_gor_02_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gor_02___local_PIO2_367;
+__declspec(section ".data") f32 fd_gor_02_one_364;
 s32 gor_02_hitobj_off[27];
 s32 gor_02_hitobj_on[54];
 s32 gor_02_event_00[18];
 s32 gor_02_event_01[30];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 s32 powerupya_party_lank_rtn[786];
 #ifdef VERSION_G8ME01
 s32 powerupya_party_rtn[170];
@@ -443,30 +445,30 @@ s32 kuragarisan_write_name[435];
 s32 kuragarisan_talk[108];
 static s32 luigi_init[18];
 static __declspec(section ".data") s32 luigi_talk[4];
-static s32 npcEnt[368];
+static NpcSetupInfo npcEnt[16];
 static __declspec(section ".data") s32 evt_door_01_00[12];
 static __declspec(section ".data") s32 evt_door_01_01[12];
 static s32 evt_wall_01[15];
-static __declspec(section ".data") s32 door_data_01_npc[2];
+static __declspec(section ".data") const char* door_data_01_npc[2];
 static s32 evt_door_01_open[88];
 static s32 evt_door_01_close[85];
-static s32 door_data_01[18];
+static DoorParam door_data_01;
 static __declspec(section ".data") s32 evt_door_02_00[12];
 __declspec(section ".data") s32 evt_door_02_01[12];
 static s32 evt_wall_02[15];
-static __declspec(section ".data") s32 door_data_02_npc[2];
+static __declspec(section ".data") const char* door_data_02_npc[2];
 s32 evt_door_02_open[127];
 s32 evt_door_02_close[76];
-static s32 door_data_02[18];
+static DoorParam door_data_02;
 s32 evt_door_02_entry[64];
 static __declspec(section ".data") s32 evt_door_03_00[12];
 __declspec(section ".data") s32 evt_door_03_01[12];
 static s32 evt_wall_03[15];
-static __declspec(section ".data") s32 door_data_03_npc[2];
-static __declspec(section ".data") s32 door_data_03_mobj[2];
+static __declspec(section ".data") const char* door_data_03_npc[2];
+static __declspec(section ".data") const char* door_data_03_mobj[2];
 static s32 evt_door_03_close[166];
 static s32 evt_door_03_open[14];
-static s32 door_data_03[18];
+static DoorParam door_data_03;
 s32 evt_door_sanders_open[27];
 s32 evt_door_sanders_close[27];
 static s32 evt_door_03_entry[64];
@@ -474,7 +476,7 @@ static s32 evt_door_03_caseopen[51];
 s32 evt_door_03_roll_open[163];
 __declspec(section ".data") s32 evt_door_03_roll_close[12];
 s32 evt_wall_03_roll[15];
-static s32 door_data_03_roll[18];
+static DoorParam door_data_03_roll;
 s32 evt_door_03_roll_entry[20];
 static __declspec(section ".data") s32 evt_door_04_00[12];
 static __declspec(section ".data") s32 evt_door_04_01[12];
@@ -489,31 +491,31 @@ static s32 evt_door_04_close[21];
 #else
 static s32 evt_door_04_close[16];
 #endif
-static __declspec(section ".data") s32 door_data_04_npc[2];
-static __declspec(section ".data") s32 door_data_04_item[4];
-static s32 door_data_04[18];
+static __declspec(section ".data") const char* door_data_04_npc[2];
+static __declspec(section ".data") const char* door_data_04_item[4];
+static DoorParam door_data_04;
 s32 evt_door_04_junbi[20];
 __declspec(section ".data") s32 evt_door_04_00_ura[12];
 __declspec(section ".data") s32 evt_door_04_01_ura[12];
 s32 evt_wall_04_ura[21];
-s32 door_data_04_ura[18];
+DoorParam door_data_04_ura;
 __declspec(section ".data") s32 evt_door_05_00[12];
 s32 evt_wall_05[28];
-__declspec(section ".data") s32 door_data_05_npc[4];
-__declspec(section ".data") s32 door_data_05_npc_01[3];
+__declspec(section ".data") const char* door_data_05_npc[4];
+__declspec(section ".data") const char* door_data_05_npc_01[3];
 s32 evt_door_05_open[14];
 s32 evt_door_05_close[23];
-s32 door_data_05[18];
+DoorParam door_data_05;
 __declspec(section ".data") s32 evt_door_06_00[12];
 s32 evt_wall_06_00[62];
 s32 evt_wall_06_01[59];
 s32 evt_wall_06_02[62];
 __declspec(section ".data") s32 evt_wall_06[12];
-__declspec(section ".data") s32 door_data_06_npc[2];
-__declspec(section ".data") s32 door_data_06_npc_01[1];
+__declspec(section ".data") const char* door_data_06_npc[2];
+__declspec(section ".data") const char* door_data_06_npc_01[1];
 s32 evt_door_06_open[14];
 s32 evt_door_06_close[16];
-s32 door_data_06[18];
+DoorParam door_data_06;
 s32 evt_gor_door_open_sanders[80];
 s32 evt_gor_door_open_sub[44];
 s32 evt_gor_door_dark_sub[200];
@@ -571,7 +573,7 @@ s32 epigraphy_map_after_stage5[218];
 #endif
 s32 epigraphy_map_after_stage6[245];
 s32 kurihakase_after3minutes[177];
-static s32 hitDmgRetPoints[52];
+static HitDamageReturn hitDmgRetPoints[13];
 static s32 gor_goki1_urouro[116];
 static s32 gor_goki2_urouro[109];
 static s32 mobj_box01[34];
@@ -583,7 +585,7 @@ __declspec(section ".data") s32 stg5_list[2];
 __declspec(section ".data") s32 stg6_list[1];
 __declspec(section ".data") s32 stg7_list[6];
 __declspec(section ".data") s32 stg8_list[10];
-s32 follow[24];
+MonosiriFollow follow[8];
 s32 evt_monosiri[39];
 s32 evt_monosiri_follow[18];
 __declspec(section ".data") s32 evt_cloud[10];
@@ -596,53 +598,33 @@ s32 front_wall_keshi[27];
 s32 tobiori_check[48];
 s32 gor_02_init_evt[543];
 
-__declspec(section ".data") u64 fd_gor_02_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gor_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gor_02_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gor_02_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_gor_02___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gor_02___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gor_02___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gor_02___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gor_02_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gor_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gor_02___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gor_02___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gor_02_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gor_02_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_gor_02_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gor_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gor_02_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gor_02_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_gor_02___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gor_02___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gor_02___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gor_02___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gor_02_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gor_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gor_02___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gor_02___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gor_02_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gor_02_one_364 = 1.0f;
 
 EVT_BEGIN(gor_02_hitobj_off)
     CALL(evt_hitobj_onoff, STRING("A_kabe"), 1, 0)
@@ -695,13 +677,41 @@ EVT_BEGIN(gor_02_event_01)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, (s32)gor_02_event_00,
-    -1, 0, (s32)"gor_01", (s32)"e_bero", 65537, 0, 0, (s32)"dokan",
-    131072, 9, 100000, 0, 0, -1, 0, 6,
-    (s32)gor_02_event_01, (s32)"tik_01", (s32)"dokan_2", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)gor_02_event_00, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gor_01", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)gor_02_event_01, // exitEvent
+        (s32)"tik_01", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static USER_FUNC(alpha_init_func) {
@@ -1428,7 +1438,7 @@ EVT_BEGIN(powerupya_talk)
             END_LOOP
             CALL(evt_cam3d_evt_off, 500, 11)
             WAIT_MS(500)
-            SET_VALUE(LW(0), PTR(door_data_01))
+            SET_VALUE(LW(0), PTR(&door_data_01))
             CALL_CHILD(PTR(evt_door_entry))
             SET_VALUE(GSWF(1204), 1)
             ELSE
@@ -1462,7 +1472,7 @@ EVT_BEGIN(powerupya_init)
     IF_INT_EQUAL(GSWF(1203), 1)
         IF_INT_EQUAL(GSWF(1204), 0)
             CALL(evt_npc_set_position, STRING("パワーアップ屋"), -320, 0, -10)
-            SET_VALUE(LW(0), PTR(door_data_01))
+            SET_VALUE(LW(0), PTR(&door_data_01))
             CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
             IF_INT_NOT_EQUAL(LW(1), 0)
                 CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
@@ -1473,7 +1483,7 @@ EVT_BEGIN(powerupya_init)
             RETURN
         END_IF
     END_IF
-    SET_VALUE(LW(0), PTR(door_data_01))
+    SET_VALUE(LW(0), PTR(&door_data_01))
     CALL_CHILD(PTR(evt_door_entry))
     RETURN
 EVT_END()
@@ -1931,7 +1941,7 @@ EVT_BEGIN(tozokudan2_init)
 EVT_END()
 
 static __declspec(section ".data") s32 key_tbl[] = {
-    49, -1,
+    ITEM_HOUSE_KEY, -1,
 };
 
 static EVT_BEGIN(evt_chk)
@@ -1949,7 +1959,7 @@ EVT_BEGIN(tozokudan2_house_door)
     SET_VALUE(GF(0), 1)
     SET_VALUE(GF(1), 1)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ie_06_naka"), 1)
-    SET_VALUE(LW(0), PTR(door_data_06))
+    SET_VALUE(LW(0), PTR(&door_data_06))
     SPAWN_EVENT(PTR(door_open_se))
     CALL(evt_door_param, LW(0), 6, LW(7), LW(8), LW(9))
     IF_INT_NOT_EQUAL(LW(7), 0)
@@ -2054,7 +2064,7 @@ EVT_BEGIN(evt_unlock_mario)
     CALL(evt_npc_move_position, STRING("盗賊団２"), 445, -85, 0, FLOAT(60.0f), 0)
     SET_VALUE(GSW(1420), 0)
     SET_VALUE(GSWF(5375), 1)
-    SET_VALUE(LW(0), PTR(door_data_06))
+    SET_VALUE(LW(0), PTR(&door_data_06))
     CALL_CHILD(PTR(evt_door_entry))
     CALL(evt_npc_flag_onoff, 0, STRING("盗賊団２"), 1073741856)
     CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
@@ -2089,7 +2099,7 @@ EVT_BEGIN(evt_unlock_npc)
     CALL(evt_npc_move_position, STRING("盗賊団２"), 445, -85, 0, FLOAT(60.0f), 0)
     SET_VALUE(GSW(1420), 0)
     SET_VALUE(GSWF(5375), 1)
-    SET_VALUE(LW(0), PTR(door_data_06))
+    SET_VALUE(LW(0), PTR(&door_data_06))
     CALL_CHILD(PTR(evt_door_entry))
     CALL(evt_npc_flag_onoff, 0, STRING("盗賊団２"), 1073741856)
     CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
@@ -2350,7 +2360,7 @@ EVT_BEGIN(kuribo4_regl)
 EVT_END()
 
 static __declspec(section ".data") s32 item_tbl[] = {
-    95, -1,
+    ITEM_BOX, -1,
 };
 
 EVT_BEGIN(kuribo4_talk)
@@ -2826,53 +2836,188 @@ static __declspec(section ".data") EVT_BEGIN(luigi_talk)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"パワーアップ屋"*/"\x83\x70\x83\x8F\x81\x5B\x83\x41\x83\x62\x83\x76\x89\xAE", 525824, 0, (s32)powerupya_init, 0, (s32)powerupya_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"クリハカセ"*/"\x83\x4E\x83\x8A\x83\x6E\x83\x4A\x83\x5A",
-    525824, 0, (s32)kurihakase_init, 0, (s32)kurihakase_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"情報屋完璧"*/"\x8F\xEE\x95\xF1\x89\xAE\x8A\xAE\xE0\xF8", 525824,
-    0, (s32)npc_init_evt, 0, (s32)johoyaperfect_talk, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"盗賊団親分"*/"\x93\x90\x91\xAF\x92\x63\x90\x65\x95\xAA", 525824, 0,
-    (s32)oyabun_init, 0, (s32)oyabun_talk, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"盗賊団１"*/"\x93\x90\x91\xAF\x92\x63\x82\x50", 525824, 0, (s32)tozokudan1_init,
-    0, (s32)tozokudan1_talk, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"盗賊団２"*/"\x93\x90\x91\xAF\x92\x63\x82\x51", 525824, 0, (s32)tozokudan2_init, 0,
-    (s32)tozokudan2_talk, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"盗賊団３"*/"\x93\x90\x91\xAF\x92\x63\x82\x52", 525824, 0, (s32)tozokudan3_init, 0, (s32)tozokudan3_talk,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 525824, 0, (s32)sanders_init, 0, (s32)sanders_talk, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)/*"クリボー４"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x53", 525824, 0, (s32)kuribo4_init, (s32)kuribo4_regl, (s32)kuribo4_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"チューさん３"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x52",
-    525824, 0, (s32)chusan3_init, 0, (s32)chusan3_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"ロテン３"*/"\x83\x8D\x83\x65\x83\x93\x82\x52", 525824,
-    0, (s32)roten3_init, 0, (s32)roten3_talk, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"ボロドー１"*/"\x83\x7B\x83\x8D\x83\x68\x81\x5B\x82\x50", 525824, 0,
-    (s32)borodo1_init, (s32)borodo1_regl, (s32)borodo1_talk, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"ボロドー２"*/"\x83\x7B\x83\x8D\x83\x68\x81\x5B\x82\x51", 525824, 0, (s32)borodo2_init,
-    0, (s32)borodo2_talk, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"クラガリさん"*/"\x83\x4E\x83\x89\x83\x4B\x83\x8A\x82\xB3\x82\xF1", 525824, 0, (s32)kuragarisan_init, 0,
-    (s32)kuragarisan_talk, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", 525824, 0, (s32)luigi_init, 0, (s32)luigi_talk,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"パワーアップ屋"*/"\x83\x70\x83\x8F\x81\x5B\x83\x41\x83\x62\x83\x76\x89\xAE", // name
+        0x80600, // flags
+        0, // reactionFlags
+        powerupya_init, // initEvent
+        NULL, // regularEvent
+        powerupya_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"クリハカセ"*/"\x83\x4E\x83\x8A\x83\x6E\x83\x4A\x83\x5A", // name
+        0x80600, // flags
+        0, // reactionFlags
+        kurihakase_init, // initEvent
+        NULL, // regularEvent
+        kurihakase_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"情報屋完璧"*/"\x8F\xEE\x95\xF1\x89\xAE\x8A\xAE\xE0\xF8", // name
+        0x80600, // flags
+        0, // reactionFlags
+        npc_init_evt, // initEvent
+        NULL, // regularEvent
+        johoyaperfect_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"盗賊団親分"*/"\x93\x90\x91\xAF\x92\x63\x90\x65\x95\xAA", // name
+        0x80600, // flags
+        0, // reactionFlags
+        oyabun_init, // initEvent
+        NULL, // regularEvent
+        oyabun_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"盗賊団１"*/"\x93\x90\x91\xAF\x92\x63\x82\x50", // name
+        0x80600, // flags
+        0, // reactionFlags
+        tozokudan1_init, // initEvent
+        NULL, // regularEvent
+        tozokudan1_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"盗賊団２"*/"\x93\x90\x91\xAF\x92\x63\x82\x51", // name
+        0x80600, // flags
+        0, // reactionFlags
+        tozokudan2_init, // initEvent
+        NULL, // regularEvent
+        tozokudan2_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"盗賊団３"*/"\x93\x90\x91\xAF\x92\x63\x82\x52", // name
+        0x80600, // flags
+        0, // reactionFlags
+        tozokudan3_init, // initEvent
+        NULL, // regularEvent
+        tozokudan3_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", // name
+        0x80600, // flags
+        0, // reactionFlags
+        sanders_init, // initEvent
+        NULL, // regularEvent
+        sanders_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"クリボー４"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x53", // name
+        0x80600, // flags
+        0, // reactionFlags
+        kuribo4_init, // initEvent
+        kuribo4_regl, // regularEvent
+        kuribo4_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"チューさん３"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x52", // name
+        0x80600, // flags
+        0, // reactionFlags
+        chusan3_init, // initEvent
+        NULL, // regularEvent
+        chusan3_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ロテン３"*/"\x83\x8D\x83\x65\x83\x93\x82\x52", // name
+        0x80600, // flags
+        0, // reactionFlags
+        roten3_init, // initEvent
+        NULL, // regularEvent
+        roten3_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ボロドー１"*/"\x83\x7B\x83\x8D\x83\x68\x81\x5B\x82\x50", // name
+        0x80600, // flags
+        0, // reactionFlags
+        borodo1_init, // initEvent
+        borodo1_regl, // regularEvent
+        borodo1_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ボロドー２"*/"\x83\x7B\x83\x8D\x83\x68\x81\x5B\x82\x51", // name
+        0x80600, // flags
+        0, // reactionFlags
+        borodo2_init, // initEvent
+        NULL, // regularEvent
+        borodo2_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"クラガリさん"*/"\x83\x4E\x83\x89\x83\x4B\x83\x8A\x82\xB3\x82\xF1", // name
+        0x80600, // flags
+        0, // reactionFlags
+        kuragarisan_init, // initEvent
+        NULL, // regularEvent
+        kuragarisan_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", // name
+        0x80600, // flags
+        0, // reactionFlags
+        luigi_init, // initEvent
+        NULL, // regularEvent
+        luigi_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static __declspec(section ".data") EVT_BEGIN(evt_door_01_00)
@@ -2894,8 +3039,9 @@ static EVT_BEGIN(evt_wall_01)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 door_data_01_npc[] = {
-    (s32)/*"パワーアップ屋"*/"\x83\x70\x83\x8F\x81\x5B\x83\x41\x83\x62\x83\x76\x89\xAE", 0,
+static __declspec(section ".data") const char* door_data_01_npc[] = {
+    /*"パワーアップ屋"*/"\x83\x70\x83\x8F\x81\x5B\x83\x41\x83\x62\x83\x76\x89\xAE",
+    NULL,
 };
 
 static EVT_BEGIN(evt_door_01_open)
@@ -2952,10 +3098,24 @@ static EVT_BEGIN(evt_door_01_close)
     RETURN
 EVT_END()
 
-static s32 door_data_01[] = {
-    0, 3, 1, (s32)"S_ie_01_doa", (s32)"A_i01_doa02", (s32)"A_i01_doa01", (s32)"S_ie_01_soto", 0,
-    (s32)"S_ie_01_naka", (s32)"A_ie_01C", (s32)evt_door_01_00, (s32)evt_door_01_01, (s32)evt_wall_01, (s32)door_data_01_npc, 0, 0,
-    (s32)evt_door_01_open, (s32)evt_door_01_close,
+static DoorParam door_data_01 = {
+    0, // field_0x0
+    3, // type
+    1, // se
+    "S_ie_01_doa", // mapobj
+    "A_i01_doa02", // hitIn
+    "A_i01_doa01", // hitOut
+    "S_ie_01_soto", // mapIn
+    NULL, // hitInIn
+    "S_ie_01_naka", // mapOut
+    "A_ie_01C", // hitOutOut
+    evt_door_01_00, // evtIn
+    evt_door_01_01, // evtOut
+    evt_wall_01, // evtWall
+    door_data_01_npc, // npcs
+    NULL, NULL, // mobjs..items
+    evt_door_01_open, // evtOpen
+    evt_door_01_close, // evtClose
 };
 
 static __declspec(section ".data") EVT_BEGIN(evt_door_02_00)
@@ -2977,8 +3137,9 @@ static EVT_BEGIN(evt_wall_02)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 door_data_02_npc[] = {
-    (s32)/*"クリハカセ"*/"\x83\x4E\x83\x8A\x83\x6E\x83\x4A\x83\x5A", 0,
+static __declspec(section ".data") const char* door_data_02_npc[] = {
+    /*"クリハカセ"*/"\x83\x4E\x83\x8A\x83\x6E\x83\x4A\x83\x5A",
+    NULL,
 };
 
 EVT_BEGIN(evt_door_02_open)
@@ -3059,10 +3220,24 @@ EVT_BEGIN(evt_door_02_close)
     RETURN
 EVT_END()
 
-static s32 door_data_02[] = {
-    0, 3, 1, (s32)"S_i02_doa", (s32)"A_ie_02_doa02", (s32)"A_ie_02_doa01", (s32)"S_ie_02_soto", 0,
-    (s32)"S_ie_02_naka", (s32)"A_ie_02C", (s32)evt_door_02_00, (s32)evt_door_02_01, (s32)evt_wall_02, (s32)door_data_02_npc, 0, 0,
-    (s32)evt_door_02_open, (s32)evt_door_02_close,
+static DoorParam door_data_02 = {
+    0, // field_0x0
+    3, // type
+    1, // se
+    "S_i02_doa", // mapobj
+    "A_ie_02_doa02", // hitIn
+    "A_ie_02_doa01", // hitOut
+    "S_ie_02_soto", // mapIn
+    NULL, // hitInIn
+    "S_ie_02_naka", // mapOut
+    "A_ie_02C", // hitOutOut
+    evt_door_02_00, // evtIn
+    evt_door_02_01, // evtOut
+    evt_wall_02, // evtWall
+    door_data_02_npc, // npcs
+    NULL, NULL, // mobjs..items
+    evt_door_02_open, // evtOpen
+    evt_door_02_close, // evtClose
 };
 
 EVT_BEGIN(evt_door_02_entry)
@@ -3104,12 +3279,14 @@ static EVT_BEGIN(evt_wall_03)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 door_data_03_npc[] = {
-    (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 0,
+static __declspec(section ".data") const char* door_data_03_npc[] = {
+    /*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58",
+    NULL,
 };
 
-static __declspec(section ".data") s32 door_data_03_mobj[] = {
-    (s32)"pblk2", 0,
+static __declspec(section ".data") const char* door_data_03_mobj[] = {
+    "pblk2",
+    NULL,
 };
 
 static EVT_BEGIN(evt_door_03_close)
@@ -3169,10 +3346,25 @@ static EVT_BEGIN(evt_door_03_open)
     RETURN
 EVT_END()
 
-static s32 door_data_03[] = {
-    0, 3, 1, (s32)"S_ie_03_doam", (s32)"A_ie_03_doa_03", (s32)"A_ie_03_doa_01", (s32)"S_ie_03_soto", 0,
-    (s32)"S_ie_03_naka", (s32)"A_ie_03C", (s32)evt_door_03_00, (s32)evt_door_03_01, (s32)evt_wall_03, (s32)door_data_03_npc, (s32)door_data_03_mobj, 0,
-    (s32)evt_door_03_open, (s32)evt_door_03_close,
+static DoorParam door_data_03 = {
+    0, // field_0x0
+    3, // type
+    1, // se
+    "S_ie_03_doam", // mapobj
+    "A_ie_03_doa_03", // hitIn
+    "A_ie_03_doa_01", // hitOut
+    "S_ie_03_soto", // mapIn
+    NULL, // hitInIn
+    "S_ie_03_naka", // mapOut
+    "A_ie_03C", // hitOutOut
+    evt_door_03_00, // evtIn
+    evt_door_03_01, // evtOut
+    evt_wall_03, // evtWall
+    door_data_03_npc, // npcs
+    door_data_03_mobj, // mobjs
+    NULL, // items
+    evt_door_03_open, // evtOpen
+    evt_door_03_close, // evtClose
 };
 
 EVT_BEGIN(evt_door_sanders_open)
@@ -3300,10 +3492,25 @@ EVT_BEGIN(evt_wall_03_roll)
     RETURN
 EVT_END()
 
-static s32 door_data_03_roll[] = {
-    0, 3, 1, (s32)"S_ie_03_doam", 0, (s32)"A_i03_rol", (s32)"S_ie_03_soto", 0,
-    (s32)"S_ie_03_naka", (s32)"A_ie_03C", (s32)evt_door_03_00, (s32)evt_door_03_01, (s32)evt_wall_03_roll, (s32)door_data_03_npc, (s32)door_data_03_mobj, 0,
-    (s32)evt_door_03_roll_open, (s32)evt_door_03_roll_close,
+static DoorParam door_data_03_roll = {
+    0, // field_0x0
+    3, // type
+    1, // se
+    "S_ie_03_doam", // mapobj
+    NULL, // hitIn
+    "A_i03_rol", // hitOut
+    "S_ie_03_soto", // mapIn
+    NULL, // hitInIn
+    "S_ie_03_naka", // mapOut
+    "A_ie_03C", // hitOutOut
+    evt_door_03_00, // evtIn
+    evt_door_03_01, // evtOut
+    evt_wall_03_roll, // evtWall
+    door_data_03_npc, // npcs
+    door_data_03_mobj, // mobjs
+    NULL, // items
+    evt_door_03_roll_open, // evtOpen
+    evt_door_03_roll_close, // evtClose
 };
 
 EVT_BEGIN(evt_door_03_roll_entry)
@@ -3360,18 +3567,36 @@ static EVT_BEGIN(evt_door_04_close)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 door_data_04_npc[] = {
-    (s32)/*"盗賊団３"*/"\x93\x90\x91\xAF\x92\x63\x82\x52", 0,
+static __declspec(section ".data") const char* door_data_04_npc[] = {
+    /*"盗賊団３"*/"\x93\x90\x91\xAF\x92\x63\x82\x52",
+    NULL,
 };
 
-static __declspec(section ".data") s32 door_data_04_item[] = {
-    (s32)"item_star4", (s32)"item_star5", (s32)"item_star6", 0,
+static __declspec(section ".data") const char* door_data_04_item[] = {
+    "item_star4",
+    "item_star5",
+    "item_star6",
+    NULL,
 };
 
-static s32 door_data_04[] = {
-    0, 3, 1, (s32)"S_ie_04_doa", (s32)"A_ie_04_doa02", (s32)"A_ie_04_doa01", (s32)"S_ie_04_soto", 0,
-    (s32)"S_ie_04_naka", (s32)"A_ie_04C", (s32)evt_door_04_00, (s32)evt_door_04_01, (s32)evt_wall_04, (s32)door_data_04_npc, 0, 0,
-    (s32)evt_door_04_open, (s32)evt_door_04_close,
+static DoorParam door_data_04 = {
+    0, // field_0x0
+    3, // type
+    1, // se
+    "S_ie_04_doa", // mapobj
+    "A_ie_04_doa02", // hitIn
+    "A_ie_04_doa01", // hitOut
+    "S_ie_04_soto", // mapIn
+    NULL, // hitInIn
+    "S_ie_04_naka", // mapOut
+    "A_ie_04C", // hitOutOut
+    evt_door_04_00, // evtIn
+    evt_door_04_01, // evtOut
+    evt_wall_04, // evtWall
+    door_data_04_npc, // npcs
+    NULL, NULL, // mobjs..items
+    evt_door_04_open, // evtOpen
+    evt_door_04_close, // evtClose
 };
 
 EVT_BEGIN(evt_door_04_junbi)
@@ -3403,10 +3628,25 @@ EVT_BEGIN(evt_wall_04_ura)
     RETURN
 EVT_END()
 
-s32 door_data_04_ura[] = {
-    0, 3, 1, (s32)"S_ie_04_doa_02", (s32)"A_ie_04_doa_02_01", (s32)"A_ie_04_doa_02_02", (s32)"S_ie_04_soto", 0,
-    (s32)"S_ie_04_naka", (s32)"A_ie_04C", (s32)evt_door_04_00_ura, (s32)evt_door_04_01_ura, (s32)evt_wall_04_ura, (s32)door_data_04_npc, 0, (s32)door_data_04_item,
-    (s32)evt_door_04_open, (s32)evt_door_04_close,
+DoorParam door_data_04_ura = {
+    0, // field_0x0
+    3, // type
+    1, // se
+    "S_ie_04_doa_02", // mapobj
+    "A_ie_04_doa_02_01", // hitIn
+    "A_ie_04_doa_02_02", // hitOut
+    "S_ie_04_soto", // mapIn
+    NULL, // hitInIn
+    "S_ie_04_naka", // mapOut
+    "A_ie_04C", // hitOutOut
+    evt_door_04_00_ura, // evtIn
+    evt_door_04_01_ura, // evtOut
+    evt_wall_04_ura, // evtWall
+    door_data_04_npc, // npcs
+    NULL, // mobjs
+    door_data_04_item, // items
+    evt_door_04_open, // evtOpen
+    evt_door_04_close, // evtClose
 };
 
 __declspec(section ".data") EVT_BEGIN(evt_door_05_00)
@@ -3425,12 +3665,17 @@ EVT_BEGIN(evt_wall_05)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 door_data_05_npc[] = {
-    (s32)/*"盗賊団親分"*/"\x93\x90\x91\xAF\x92\x63\x90\x65\x95\xAA", (s32)/*"盗賊団１"*/"\x93\x90\x91\xAF\x92\x63\x82\x50", (s32)/*"盗賊団２"*/"\x93\x90\x91\xAF\x92\x63\x82\x51", 0,
+__declspec(section ".data") const char* door_data_05_npc[] = {
+    /*"盗賊団親分"*/"\x93\x90\x91\xAF\x92\x63\x90\x65\x95\xAA",
+    /*"盗賊団１"*/"\x93\x90\x91\xAF\x92\x63\x82\x50",
+    /*"盗賊団２"*/"\x93\x90\x91\xAF\x92\x63\x82\x51",
+    NULL,
 };
 
-__declspec(section ".data") s32 door_data_05_npc_01[] = {
-    (s32)/*"盗賊団親分"*/"\x93\x90\x91\xAF\x92\x63\x90\x65\x95\xAA", (s32)/*"盗賊団１"*/"\x93\x90\x91\xAF\x92\x63\x82\x50", 0,
+__declspec(section ".data") const char* door_data_05_npc_01[] = {
+    /*"盗賊団親分"*/"\x93\x90\x91\xAF\x92\x63\x90\x65\x95\xAA",
+    /*"盗賊団１"*/"\x93\x90\x91\xAF\x92\x63\x82\x50",
+    NULL,
 };
 
 EVT_BEGIN(evt_door_05_open)
@@ -3451,10 +3696,24 @@ EVT_BEGIN(evt_door_05_close)
     RETURN
 EVT_END()
 
-s32 door_data_05[] = {
-    0, 3, 1, (s32)"S_ie_05_doa", (s32)"A_ie_05_doa02", (s32)"A_ie_05_doa01", (s32)"S_ie_05_soto", 0,
-    (s32)"S_ie_05_naka", (s32)"A_ie_05C", (s32)evt_door_05_00, 0, (s32)evt_wall_05, (s32)door_data_05_npc, 0, 0,
-    (s32)evt_door_05_open, (s32)evt_door_05_close,
+DoorParam door_data_05 = {
+    0, // field_0x0
+    3, // type
+    1, // se
+    "S_ie_05_doa", // mapobj
+    "A_ie_05_doa02", // hitIn
+    "A_ie_05_doa01", // hitOut
+    "S_ie_05_soto", // mapIn
+    NULL, // hitInIn
+    "S_ie_05_naka", // mapOut
+    "A_ie_05C", // hitOutOut
+    evt_door_05_00, // evtIn
+    NULL, // evtOut
+    evt_wall_05, // evtWall
+    (const char**)door_data_05_npc, // npcs
+    NULL, NULL, // mobjs..items
+    evt_door_05_open, // evtOpen
+    evt_door_05_close, // evtClose
 };
 
 __declspec(section ".data") EVT_BEGIN(evt_door_06_00)
@@ -3548,12 +3807,13 @@ __declspec(section ".data") EVT_BEGIN(evt_wall_06)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 door_data_06_npc[] = {
-    (s32)/*"盗賊団２"*/"\x93\x90\x91\xAF\x92\x63\x82\x51", 0,
+__declspec(section ".data") const char* door_data_06_npc[] = {
+    /*"盗賊団２"*/"\x93\x90\x91\xAF\x92\x63\x82\x51",
+    NULL,
 };
 
-__declspec(section ".data") s32 door_data_06_npc_01[] = {
-    0,
+__declspec(section ".data") const char* door_data_06_npc_01[] = {
+    NULL,
 };
 
 EVT_BEGIN(evt_door_06_open)
@@ -3572,10 +3832,24 @@ EVT_BEGIN(evt_door_06_close)
     RETURN
 EVT_END()
 
-s32 door_data_06[] = {
-    2, 3, 1, (s32)"S_ie_06_doa", (s32)"A_ie_06_doa02", (s32)"A_ie_06_doa01", (s32)"S_ie_06_soto", 0,
-    (s32)"S_ie_06_naka", (s32)"A_ie_06C", (s32)evt_door_06_00, 0, (s32)evt_wall_06, (s32)door_data_06_npc, 0, 0,
-    (s32)evt_door_06_open, (s32)evt_door_06_close,
+DoorParam door_data_06 = {
+    2, // field_0x0
+    3, // type
+    1, // se
+    "S_ie_06_doa", // mapobj
+    "A_ie_06_doa02", // hitIn
+    "A_ie_06_doa01", // hitOut
+    "S_ie_06_soto", // mapIn
+    NULL, // hitInIn
+    "S_ie_06_naka", // mapOut
+    "A_ie_06C", // hitOutOut
+    evt_door_06_00, // evtIn
+    NULL, // evtOut
+    evt_wall_06, // evtWall
+    (const char**)door_data_06_npc, // npcs
+    NULL, NULL, // mobjs..items
+    evt_door_06_open, // evtOpen
+    evt_door_06_close, // evtClose
 };
 
 EVT_BEGIN(evt_gor_door_open_sanders)
@@ -4800,7 +5074,7 @@ EVT_BEGIN(epigraphy_map)
     WAIT_MS(2000)
     CALL(evt_fade_entry, 2, 500, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    SET_VALUE(LW(0), PTR(door_data_02))
+    SET_VALUE(LW(0), PTR(&door_data_02))
     SPAWN_EVENT(PTR(evt_door_open_quick))
     CALL(evt_cam3d_evt_set, -185, 90, 78, -185, 40, -218, 0, 11)
     WAIT_MS(1000)
@@ -4958,7 +5232,7 @@ EVT_BEGIN(epigraphy_map_after_stage1)
     CALL(evt_msg_print, 0, STRING("mac_1_004"), 0, 0)
     CALL(evt_fade_entry, 2, 500, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    SET_VALUE(LW(0), PTR(door_data_02))
+    SET_VALUE(LW(0), PTR(&door_data_02))
     SPAWN_EVENT(PTR(evt_door_open_quick))
     WAIT_FRAMES(1)
     CALL(evt_mapobj_trans, 1, STRING("S_open_book"), -15, 0, 0)
@@ -5023,7 +5297,7 @@ EVT_BEGIN(epigraphy_map_after_stage2)
     CALL(evt_msg_print, 0, STRING("mac_2_002_01"), 0, 0)
     CALL(evt_fade_entry, 2, 500, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    SET_VALUE(LW(0), PTR(door_data_02))
+    SET_VALUE(LW(0), PTR(&door_data_02))
     SPAWN_EVENT(PTR(evt_door_open_quick))
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, -185, 90, 78, -185, 40, -218, 0, 11)
@@ -5118,7 +5392,7 @@ EVT_BEGIN(epigraphy_map_after_stage3)
     CALL(evt_msg_print, 0, STRING("mac_3_001_01"), 0, 0)
     CALL(evt_fade_entry, 2, 500, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    SET_VALUE(LW(0), PTR(door_data_02))
+    SET_VALUE(LW(0), PTR(&door_data_02))
     CALL_CHILD(PTR(evt_door_open_quick))
     WAIT_FRAMES(1)
     CALL_CHILD(PTR(book_center_init))
@@ -5207,7 +5481,7 @@ EVT_BEGIN(epigraphy_map_after_stage4)
     CALL(evt_msg_print, 0, STRING("mac_4_001_01"), 0, 0)
     CALL(evt_fade_entry, 2, 500, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    SET_VALUE(LW(0), PTR(door_data_02))
+    SET_VALUE(LW(0), PTR(&door_data_02))
     SPAWN_EVENT(PTR(evt_door_open_quick))
     CALL(evt_cam3d_evt_set, -185, 90, 78, -185, 40, -218, 0, 11)
     WAIT_MS(1000)
@@ -5276,7 +5550,7 @@ EVT_BEGIN(epigraphy_map_after_stage5)
     CALL(evt_msg_print, 0, STRING("mac_5_002"), 0, STRING("クリハカセ"))
     CALL(evt_fade_entry, 2, 500, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    SET_VALUE(LW(0), PTR(door_data_02))
+    SET_VALUE(LW(0), PTR(&door_data_02))
     SPAWN_EVENT(PTR(evt_door_open_quick))
     CALL(evt_cam3d_evt_set, -185, 90, 78, -185, 40, -218, 0, 11)
     WAIT_MS(1000)
@@ -5335,7 +5609,7 @@ EVT_BEGIN(epigraphy_map_after_stage6)
     CALL(evt_msg_print, 0, STRING("mac_6_002_00"), 0, STRING("クリハカセ"))
     CALL(evt_fade_entry, 2, 500, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    SET_VALUE(LW(0), PTR(door_data_02))
+    SET_VALUE(LW(0), PTR(&door_data_02))
     CALL_CHILD(PTR(evt_door_open_quick))
     WAIT_FRAMES(1)
     CALL_CHILD(PTR(book_center_init))
@@ -5437,14 +5711,20 @@ EVT_BEGIN(kurihakase_after3minutes)
     RETURN
 EVT_END()
 
-static s32 hitDmgRetPoints[] = {
-    (s32)"A_ground_01", 1132822528, 0, 1125449728, (s32)"dokan", -1014759424, 0, 1134755840,
-    (s32)"A_ground_03", -1014759424, 0, 1134755840, (s32)"Ship_Change01", 0, -998637568, 0,
-    (s32)"Ship_Change02", 0, -998637568, 0, (s32)"A_ground_06", 1132822528, 0, 1125449728,
-    (s32)"A_ground_07", 1132822528, 0, 1125449728, (s32)"A_ground_08", 1132822528, 0, 1125449728,
-    (s32)"A_ground_02", 1132199936, -1033109504, -1013678080, (s32)"A_ground_09", 1132199936, -1033109504, -1013678080,
-    (s32)"A_ground_10", 1132199936, -1033109504, -1013678080, (s32)"S_i04_kabe_01A1", 0, -998637568, 0,
-    0, 0, 0, 0,
+static HitDamageReturn hitDmgRetPoints[] = {
+    {"A_ground_01", {267.0f, 0.0f, 149.0f}},
+    {"dokan", {-264.0f, 0.0f, 326.0f}},
+    {"A_ground_03", {-264.0f, 0.0f, 326.0f}},
+    {"Ship_Change01", {0.0f, -1000.0f, 0.0f}},
+    {"Ship_Change02", {0.0f, -1000.0f, 0.0f}},
+    {"A_ground_06", {267.0f, 0.0f, 149.0f}},
+    {"A_ground_07", {267.0f, 0.0f, 149.0f}},
+    {"A_ground_08", {267.0f, 0.0f, 149.0f}},
+    {"A_ground_02", {252.0f, -59.0f, -297.0f}},
+    {"A_ground_09", {252.0f, -59.0f, -297.0f}},
+    {"A_ground_10", {252.0f, -59.0f, -297.0f}},
+    {"S_i04_kabe_01A1", {0.0f, -1000.0f, 0.0f}},
+    {0},
 };
 
 static EVT_BEGIN(gor_goki1_urouro)
@@ -5562,10 +5842,15 @@ __declspec(section ".data") s32 stg8_list[] = {
     147, 150,
 };
 
-s32 follow[] = {
-    23, (s32)stg0_list, 1, 56, (s32)stg1_list, 4, 112, (s32)stg2_list,
-    4, 164, (s32)stg3_list, 1, 261, (s32)stg5_list, 2, 339,
-    (s32)stg6_list, 1, 373, (s32)stg7_list, 6, 401, (s32)stg8_list, 10,
+MonosiriFollow follow[] = {
+    {23, stg0_list, 1},
+    {56, stg1_list, 4},
+    {112, stg2_list, 4},
+    {164, stg3_list, 1},
+    {261, stg5_list, 2},
+    {339, stg6_list, 1},
+    {373, stg7_list, 6},
+    {401, stg8_list, 10},
 };
 
 EVT_BEGIN(evt_monosiri)
@@ -5592,7 +5877,7 @@ EVT_END()
 
 __declspec(section ".data") EVT_BEGIN(evt_cloud)
     SET_VALUE(GSWF(1221), 1)
-    SET_VALUE(LW(0), PTR(door_data_04_ura))
+    SET_VALUE(LW(0), PTR(&door_data_04_ura))
     CALL_CHILD(PTR(evt_door_entry))
     RETURN
 EVT_END()
@@ -5654,7 +5939,7 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_npc_flag_onoff, 1, STRING("クリハカセ"), 32768)
     CALL(evt_npc_set_ry, STRING("クリハカセ"), 90)
     CALL(evt_seq_wait, 2)
-    SET_VALUE(LW(0), PTR(door_data_02))
+    SET_VALUE(LW(0), PTR(&door_data_02))
     CALL_CHILD(PTR(evt_door_open_quick))
     CALL(evt_cam3d_evt_set, -185, 90, 78, -185, 40, -218, 0, 11)
     CALL(evt_npc_flag_onoff, 0, STRING("クリハカセ"), 32768)
@@ -5760,27 +6045,27 @@ EVT_BEGIN(gor_02_init_evt)
     CALL(evt_item_entry, STRING("item_star1"), 125, -3, 40, -325, 16, GSWF(5575), 0)
     CALL(evt_item_entry, STRING("item_star2"), 125, 65, 150, -165, 16, GSWF(5576), 0)
     CALL(evt_item_entry, STRING("item_star3"), 125, 50, 0, -390, 16, GSWF(5577), 0)
-    SET_VALUE(LW(0), PTR(door_data_02))
+    SET_VALUE(LW(0), PTR(&door_data_02))
     CALL_CHILD(PTR(evt_door_02_entry))
-    SET_VALUE(LW(0), PTR(door_data_03))
+    SET_VALUE(LW(0), PTR(&door_data_03))
     CALL_CHILD(PTR(evt_door_03_entry))
-    SET_VALUE(LW(0), PTR(door_data_03_roll))
+    SET_VALUE(LW(0), PTR(&door_data_03_roll))
     CALL_CHILD(PTR(evt_door_03_roll_entry))
     IF_INT_LESS(GSW(0), 23)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ie_04_naka"), 1)
         CALL(evt_hitobj_onoff, STRING("A_ie_04C"), 1, 0)
         CALL(evt_run_case_evt, 9, 1, STRING("A_ie_04_doa01"), 0, PTR(evt_door_04_junbi), 0)
         ELSE
-        SET_VALUE(LW(0), PTR(door_data_04))
+        SET_VALUE(LW(0), PTR(&door_data_04))
         CALL_CHILD(PTR(evt_door_entry))
     END_IF
-    SET_VALUE(LW(0), PTR(door_data_05))
+    SET_VALUE(LW(0), PTR(&door_data_05))
     CALL(evt_door_data_copy, LW(0), GW(11))
     SET_VALUE(LW(0), GW(11))
     IF_INT_NOT_EQUAL(GSW(1420), 1)
-        CALL(evt_door_set_param, GW(11), 0, PTR(door_data_05_npc))
+        CALL(evt_door_set_param, GW(11), 0, PTR(&door_data_05_npc))
         ELSE
-        CALL(evt_door_set_param, GW(11), 0, PTR(door_data_05_npc_01))
+        CALL(evt_door_set_param, GW(11), 0, PTR(&door_data_05_npc_01))
     END_IF
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -5801,13 +6086,13 @@ EVT_BEGIN(gor_02_init_evt)
     IF_INT_EQUAL(GSWF(1219), 0)
         CALL(evt_mobj_lock, STRING("mobj_lock00"), 49, 446, 18, 50, 0, PTR(evt_chk), PTR(evt_unlock), GSWF(1219))
         ELSE
-        SET_VALUE(LW(0), PTR(door_data_06))
+        SET_VALUE(LW(0), PTR(&door_data_06))
         CALL(evt_door_data_copy, LW(0), LW(1))
         SET_VALUE(LW(0), LW(1))
         IF_INT_EQUAL(GSWF(5375), 0)
-            CALL(evt_door_set_param, LW(0), 0, PTR(door_data_06_npc))
+            CALL(evt_door_set_param, LW(0), 0, PTR(&door_data_06_npc))
             ELSE
-            CALL(evt_door_set_param, LW(0), 0, PTR(door_data_06_npc_01))
+            CALL(evt_door_set_param, LW(0), 0, PTR(&door_data_06_npc_01))
         END_IF
         CALL_CHILD(PTR(evt_door_entry))
     END_IF
@@ -5866,7 +6151,7 @@ EVT_BEGIN(gor_02_init_evt)
             END_LOOP
         END_INLINE_EVENT
         ELSE
-        SET_VALUE(LW(0), PTR(door_data_04_ura))
+        SET_VALUE(LW(0), PTR(&door_data_04_ura))
         CALL_CHILD(PTR(evt_door_entry))
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_i04_kabe_msk"), 1)
         CALL(evt_hitobj_onoff, STRING("A_i04_kabe_msk"), 1, 0)

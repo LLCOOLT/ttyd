@@ -5,6 +5,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
+#include "battle/battle_database_common.h"
 
 USER_FUNC(btlevtcmd_AfterReactionEntry);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -33,7 +34,7 @@ static PoseTableEntry pose_table_3[4];
 static PoseTableEntry pose_table_2[4];
 static PoseTableEntry pose_table_1[4];
 BattleUnitKind unit_bomzou;
-s32 weapon_bomzou_explosion[48];
+BattleWeapon weapon_bomzou_explosion;
 static BattleUnitKindPart parts[1];
 static s32 init_event[70];
 static s32 phase_event[67];
@@ -138,13 +139,35 @@ BattleUnitKind unit_bomzou = {
     data_table,
 };
 
-s32 weapon_bomzou_explosion[] = {
-    0, 0, 0, 0, 1677721600, 0, 0, (s32)weaponGetPowerDefault,
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 35651616, 536870912, 50332418, 0, 131200, 2047, 4,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 658020, 503645445, 83886080,
+BattleWeapon weapon_bomzou_explosion = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2200020, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    3, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x20080, // special
+    0x7FF, // counterResistFlags
+    4, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 10, 10, 100, 30, 5, 5, 5, 5, 0, 0, 0}, // field_B4
 };
 
 static BattleUnitKindPart parts[] = {
@@ -226,30 +249,54 @@ EVT_BEGIN(end_battle_evt)
     RETURN
 EVT_END()
 
-static s32 explosion_event[] = {
-    262235, (s32)btlevtcmd_GetUnitWork, -2, 1, -30000000, 131097, -30000000, 0,
-    131163, (s32)evt_snd_sfxoff, -30000000, 262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 0,
-    33, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 983131,
-    (s32)evt_eff, (s32)"", (s32)"hibashira", 2, -30000000, -29999999, -29999998, -30000000,
-    -29999999, -29999998, 1, -229998976, 60, 0, 0, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_THUNDERS_BOMB2\0", -250000000, 0, -250000000, 65627, (s32)btlevtcmd_StageDispellFog,
-    196699, (s32)btlevtcmd_OnAttribute, -2, 16777216, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, 1,
-    50331648, 393307, (s32)evt_btl_camera_shake_h, 0, 10, 0, 60, 4,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"B_2", 262235, (s32)btlevtcmd_SamplingEnemy, -2,
-    1, (s32)weapon_bomzou_explosion, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_bomzou_explosion, -29999997, -29999996, 131096,
-    -29999997, -1, 65540, 99, 33, 131122, -29999990, 0,
-    65539, 10, 196699, (s32)btlevtcmd_GetUnitId, -2, -30000000, 131096, -30000000,
-    -29999997, 65540, 80, 33, 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
-    -250000000, -250000000, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999999, -250000000,
-    -250000000, 131126, -30000000, -29999999, 131100, -30000000, -1, 131127,
-    -30000000, -1, 33, 131099, -30000000, 50, 65540, 80,
-    33, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996, (s32)weapon_bomzou_explosion, 256,
-    -29999995, 131096, -29999995, 1, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997,
-    -29999996, (s32)weapon_bomzou_explosion, 256, -29999995, 33, 65539, 80, 196699,
-    (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 131097, -29999997, -1, 131125, -29999990,
-    1, 65540, 10, 33, 65539, 99, 196699, (s32)btlevtcmd_KillUnit,
-    -2, 0, 2, 1, 0,
-};
+static EVT_BEGIN(explosion_event)
+    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(evt_snd_sfxoff, LW(0))
+        CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
+    END_IF
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(evt_eff, STRING(""), STRING("hibashira"), 2, LW(0), LW(1), LW(2), LW(0), LW(1), LW(2), 1, FLOAT(1.0f), 60, 0, 0)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_THUNDERS_BOMB2\0"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_StageDispellFog)
+    CALL(btlevtcmd_OnAttribute, -2, 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, -2, 1, 50331648)
+    CALL(evt_btl_camera_shake_h, 0, 10, 0, 60, 4)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("B_2"))
+    CALL(btlevtcmd_SamplingEnemy, -2, 1, PTR(&weapon_bomzou_explosion))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_bomzou_explosion), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF
+    SET_VALUE(LW(10), 0)
+    LABEL(10)
+    CALL(btlevtcmd_GetUnitId, -2, LW(0))
+    IF_INT_EQUAL(LW(0), LW(3))
+        GOTO(80)
+    END_IF
+    CALL(btlevtcmd_GetPos, -2, LW(0), -250000000, -250000000)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(1), -250000000, -250000000)
+    SUBTRACT(LW(0), LW(1))
+    IF_INT_LESS_OR_EQUAL(LW(0), -1)
+        MULTIPLY(LW(0), -1)
+    END_IF
+    IF_INT_GREATER(LW(0), 50)
+        GOTO(80)
+    END_IF
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_bomzou_explosion), 256, LW(5))
+    IF_INT_EQUAL(LW(5), 1)
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_bomzou_explosion), 256, LW(5))
+    END_IF
+    LABEL(80)
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    IF_INT_NOT_EQUAL(LW(3), -1)
+        ADD(LW(10), 1)
+        GOTO(10)
+    END_IF
+    LABEL(99)
+    CALL(btlevtcmd_KillUnit, -2, 0)
+    RETURN
+EVT_END_PAD()
 
 static BattleDataEntry data_table[] = {
     {49, dead_event},

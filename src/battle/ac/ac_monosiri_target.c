@@ -59,8 +59,8 @@ s32 battleAcMain_MonosiriTarget(BattleWork* work) {
 
     ac = &work->actionCommands;
     autoCommand = FALSE;
-    cw = (MonosiriTargetWork*)((u8*)ac + 0x2BC);
-    disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    cw = (MonosiriTargetWork*)ac->work;
+    disp = (BattleACDispParams*)&ac->disp;
     if (work->actionCommands.mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
     }
@@ -72,7 +72,7 @@ s32 battleAcMain_MonosiriTarget(BattleWork* work) {
             memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            *(s32*)&disp->field_0x1C[4] = 20;
+            disp->unk20 = 20;
             cw->frame = 0;
             cw->maxFrames = _getmaxcount();
             BtlUnit_GetHitPos(unit, parts, &cw->hitPos.x, &cw->hitPos.y, &cw->hitPos.z);
@@ -162,7 +162,7 @@ void battleAcDelete_MonosiriTarget(BattleWork* work) {
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
-    MonosiriTargetWork* cw = (MonosiriTargetWork*)((u8*)ac + 0x2BC);
+    MonosiriTargetWork* cw = (MonosiriTargetWork*)ac->work;
     f32 alpha = 0.0f;
     Vec screen;
     Vec screen2;

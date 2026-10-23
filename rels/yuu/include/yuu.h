@@ -14,7 +14,7 @@ extern s32 yuu_03_init_evt[];
 extern void* yuunpc_yuuminigame4_ptr;
 extern f32 yuusintbl[];
 
-extern s32 a_nametbl[];
+extern const char* a_nametbl[];
 extern Vec fukkipoint[];
 extern signed char hitdata[];
 extern s32 hoko_tbl[];
@@ -28,7 +28,7 @@ extern s32 minigame04_end[];
 extern s32 minigame04_start[];
 extern s32 minigame_view_monte[];
 extern s32 ryushi_event[];
-extern s32 s_nametbl[];
+extern const char* s_nametbl[];
 extern s32 turn_tbl[];
 extern s32 yuu_02_icon_monte_entry_evt[];
 extern s32 yuu_02_jumpret[];

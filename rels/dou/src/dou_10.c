@@ -10,6 +10,7 @@
 #include "string.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
+#include "driver/hitdrv.h"
 
 void marioShipForceStop(void);
 static inline f32 addf(f32 a, f32 b) { return a + b; }
@@ -66,22 +67,22 @@ USER_FUNC(namiyoke_fail_stop);
 USER_FUNC(namiyoke_se_check);
 USER_FUNC(namiyoke_set_mapobj);
 
-__declspec(section ".data") u64 fd_dou_10_negone_one_374;
-__declspec(section ".data") s32 fd_dou_10_neg_one_382[1];
-__declspec(section ".data") s32 fd_dou_10___local_PI_383[1];
-__declspec(section ".data") s32 fd_dou_10___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_dou_10_one_negone_373;
-__declspec(section ".data") s32 fd_dou_10___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_dou_10_one_381[1];
-__declspec(section ".data") u64 fd_dou_10_negone_one_360;
-__declspec(section ".data") s32 fd_dou_10_neg_one_365[1];
-__declspec(section ".data") s32 fd_dou_10___local_PI_366[1];
-__declspec(section ".data") s32 fd_dou_10___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_dou_10_one_negone_359;
-__declspec(section ".data") s32 fd_dou_10___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_dou_10_one_364[1];
-static s32 bero_entry_data[75];
-s32 namiyoke_mapobj[15];
+__declspec(section ".data") f32 fd_dou_10_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_10_neg_one_382;
+__declspec(section ".data") f32 fd_dou_10___local_PI_383;
+__declspec(section ".data") f32 fd_dou_10___local_3PIO2_385;
+__declspec(section ".data") f32 fd_dou_10_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_10___local_PIO2_384;
+__declspec(section ".data") f32 fd_dou_10_one_381;
+__declspec(section ".data") f32 fd_dou_10_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_10_neg_one_365;
+__declspec(section ".data") f32 fd_dou_10___local_PI_366;
+__declspec(section ".data") f32 fd_dou_10___local_3PIO2_368;
+__declspec(section ".data") f32 fd_dou_10_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_10___local_PIO2_367;
+__declspec(section ".data") f32 fd_dou_10_one_364;
+static BeroEntry bero_entry_data[5];
+const char* namiyoke_mapobj[15];
 s32 nami_running[72];
 s32 namiyoke_fail_kaiten[34];
 s32 namiyoke_fail_shizumu[49];
@@ -95,73 +96,121 @@ s32 namiyoke_check[34];
 static s32 yari_trap_sub[107];
 static __declspec(section ".data") s32 yari_trap[11];
 static s32 dou_puka_event_main0[60];
-static s32 hitDmgRetPoints[16];
+static HitDamageReturn hitDmgRetPoints[4];
 s32 dou_10_init_evt[64];
 
-__declspec(section ".data") u64 fd_dou_10_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_dou_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_dou_10_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_dou_10_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_dou_10___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_dou_10___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_dou_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_dou_10___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_dou_10_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_dou_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_dou_10_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_dou_10___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_dou_10___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_dou_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_dou_10___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_dou_10_one_364 = 1.0f;
+
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero_1", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_09", // nextMapName
+        "e_bero_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "w_bero_2", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_09", // nextMapName
+        "e_bero_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "n_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_06", // nextMapName
+        "s_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_11", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-__declspec(section ".data") s32 fd_dou_10___local_PI_383[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_dou_10___local_3PIO2_385[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_dou_10_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_dou_10___local_PIO2_384[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_dou_10_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_dou_10_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_dou_10_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_dou_10___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_dou_10___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_dou_10_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_dou_10___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_dou_10_one_364[] = {
-    1065353216,
-};
-
-static s32 bero_entry_data[] = {
-    (s32)"w_bero_1", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"dou_09", (s32)"e_bero_1", 65537, 0, 0, (s32)"w_bero_2",
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"dou_09", (s32)"e_bero_2", 65537, 0, 0, (s32)"n_bero", 0,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"dou_06", (s32)"s_bero", 65537, 0, 0, (s32)"e_bero", 0, 20000,
-    100000, 0, 0, -1, 0, -1, 0, (s32)"dou_11",
-    (s32)"w_bero", 65537, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
-};
-
-s32 namiyoke_mapobj[] = {
-    (s32)"S_nami1", (s32)"S_nami2", (s32)"S_nami3", (s32)"S_nami4", (s32)"S_nami5", (s32)"S_nami6", (s32)"S_nami7", (s32)"S_nami8",
-    (s32)"S_nami9", (s32)"S_nami10", (s32)"S_nami11", (s32)"S_nami12", (s32)"S_nami13", (s32)"S_nami14", (s32)"S_nami15",
+const char* namiyoke_mapobj[] = {
+    "S_nami1",
+    "S_nami2",
+    "S_nami3",
+    "S_nami4",
+    "S_nami5",
+    "S_nami6",
+    "S_nami7",
+    "S_nami8",
+    "S_nami9",
+    "S_nami10",
+    "S_nami11",
+    "S_nami12",
+    "S_nami13",
+    "S_nami14",
+    "S_nami15",
 };
 
 EVT_BEGIN(nami_running)
@@ -553,9 +602,11 @@ static EVT_BEGIN(dou_puka_event_main0)
     RETURN
 EVT_END()
 
-static s32 hitDmgRetPoints[] = {
-    (s32)"mod_01", -1003552768, 1112014848, -1028390912, (s32)"mod_03", -1023279104, 1112014848, -1028390912,
-    (s32)"mod_04", 0, -998637568, 0, 0, 0, 0, 0,
+static HitDamageReturn hitDmgRetPoints[] = {
+    {"mod_01", {-700.0f, 50.0f, -90.0f}},
+    {"mod_03", {-130.0f, 50.0f, -90.0f}},
+    {"mod_04", {0.0f, -1000.0f, 0.0f}},
+    {0},
 };
 
 EVT_BEGIN(dou_10_init_evt)

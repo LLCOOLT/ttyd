@@ -508,7 +508,7 @@ void fadeMain(void) {
 						imgEntry("fImg_dokan", entry->imageType);
 						entry->image = imgNameToPtr("fImg_dokan", entry->imageType);
 						entry->image->poseId = animPaperPoseGetId(entry->animFile, entry->imageType);
-						IMG_TIME(entry->image) = animTimeGetTime(entry->imageType);
+						entry->image->animTime = animTimeGetTime(entry->imageType);
 						entry->image->animName = (s32)entry->animName;
 						imgClearVirtualPoint(entry->image);
 						fadeCapture("fImg_dokan", NULL, 0);
@@ -573,7 +573,7 @@ void fadeMain(void) {
 						imgEntry("fImg_peron", entry->imageType);
 						entry->image = imgNameToPtr("fImg_peron", entry->imageType);
 						entry->image->poseId = animPaperPoseGetId(entry->animFile, entry->imageType);
-						IMG_TIME(entry->image) = animTimeGetTime(entry->imageType);
+						entry->image->animTime = animTimeGetTime(entry->imageType);
 						entry->image->animName = (s32)entry->animName;
 						imgClearVirtualPoint(entry->image);
 						switch (entry->type) {
@@ -602,7 +602,7 @@ void fadeMain(void) {
 						if (entry->image->loopTimes >= 1.0f) {
 							switch (entry->type) {
 								case 0x37: case 0x39: case 0x3B: case 0x3C: case 0x3D: case 0x3E:
-									IMG_TIME(entry->image) = animTimeGetTime(entry->imageType);
+									entry->image->animTime = animTimeGetTime(entry->imageType);
 									*(const char**)&entry->image->animName = "A_2";
 									break;
 								default:
@@ -625,7 +625,7 @@ void fadeMain(void) {
 					case 0:
 						entry->image = imgNameToPtr("fImg_peron", entry->imageType);
 						entry->image->poseId = animPaperPoseGetId(entry->animFile, entry->imageType);
-						IMG_TIME(entry->image) = animTimeGetTime(entry->imageType);
+						entry->image->animTime = animTimeGetTime(entry->imageType);
 						entry->image->animName = (s32)entry->animName;
 						imgClearVirtualPoint(entry->image);
 						switch (entry->type) {

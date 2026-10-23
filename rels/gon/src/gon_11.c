@@ -114,30 +114,30 @@ static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
 static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
 
-__declspec(section ".data") u64 fd_gon_11_negone_one_374;
-__declspec(section ".data") s32 fd_gon_11_neg_one_382[1];
-__declspec(section ".data") s32 fd_gon_11___local_PI_383[1];
-__declspec(section ".data") s32 fd_gon_11___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gon_11_one_negone_373;
-__declspec(section ".data") s32 fd_gon_11___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gon_11_one_381[1];
-__declspec(section ".data") u64 fd_gon_11_negone_one_360;
-__declspec(section ".data") s32 fd_gon_11_neg_one_365[1];
-__declspec(section ".data") s32 fd_gon_11___local_PI_366[1];
-__declspec(section ".data") s32 fd_gon_11___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gon_11_one_negone_359;
-__declspec(section ".data") s32 fd_gon_11___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gon_11_one_364[1];
+__declspec(section ".data") f32 fd_gon_11_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_11_neg_one_382;
+__declspec(section ".data") f32 fd_gon_11___local_PI_383;
+__declspec(section ".data") f32 fd_gon_11___local_3PIO2_385;
+__declspec(section ".data") f32 fd_gon_11_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_11___local_PIO2_384;
+__declspec(section ".data") f32 fd_gon_11_one_381;
+__declspec(section ".data") f32 fd_gon_11_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_11_neg_one_365;
+__declspec(section ".data") f32 fd_gon_11___local_PI_366;
+__declspec(section ".data") f32 fd_gon_11___local_3PIO2_368;
+__declspec(section ".data") f32 fd_gon_11_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gon_11___local_PIO2_367;
+__declspec(section ".data") f32 fd_gon_11_one_364;
 __declspec(section ".data") s32 evt_sound[8];
 static s32 door01_close[22];
 static s32 door01_open[22];
-static s32 bero_entry_data[30];
+static BeroEntry bero_entry_data[2];
 static s32 gonbaba_standup_shake[23];
 static s32 gonbaba_fog_change[87];
 static s32 gonbaba_down_shake[83];
 s32 gonbaba_event[1410];
-static __declspec(section ".data") s32 capturemap[2];
-static s32 v_list[24];
+static __declspec(section ".data") const char* capturemap[2];
+static Vec v_list[8];
 static __declspec(section ".data") s32 evt_cloud_main_evt[4];
 s32 iri_16_box_evt[33];
 s32 iri_16_cloud_evt[36];
@@ -145,53 +145,33 @@ __declspec(section ".data") s32 iri_16_touch_evt[2];
 static s32 iri_16_init[57];
 s32 gon_11_init_evt[101];
 
-__declspec(section ".data") u64 fd_gon_11_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gon_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gon_11_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gon_11_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_gon_11___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gon_11___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gon_11___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gon_11___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gon_11_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gon_11_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gon_11___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gon_11___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gon_11_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gon_11_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_gon_11_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gon_11_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gon_11_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gon_11_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_gon_11___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gon_11___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gon_11___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gon_11___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gon_11_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gon_11_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gon_11___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gon_11___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gon_11_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gon_11_one_364 = 1.0f;
 
 __declspec(section ".data") EVT_BEGIN(evt_sound)
     CALL(evt_snd_bgmoff, 513)
@@ -215,11 +195,26 @@ static EVT_BEGIN(door01_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65549, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)evt_sound, (s32)"gon_10", (s32)"w_bero", 327685, (s32)door01_close, (s32)door01_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        13, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)evt_sound, // exitEvent
+        (s32)"gon_10", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)door01_close, // enterAnimeArg
+        (s32)door01_open, // exitAnimeArg
+    },
+    {0},
 };
 
 static USER_FUNC(gonbaba_wait_landon) {
@@ -659,14 +654,20 @@ EVT_BEGIN(gonbaba_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 capturemap[] = {
-    (s32)"gon_11_S", (s32)"\0",
+static __declspec(section ".data") const char* capturemap[] = {
+    "gon_11_S",
+    "\0",
 };
 
-static s32 v_list[] = {
-    -1035468800, 1120403456, 1112014848, 1112014848, 1120403456, 1112014848, 1112014848, 0,
-    1112014848, -1035468800, 0, 1112014848, -1035468800, 1120403456, -1035468800, 1112014848,
-    1120403456, -1035468800, 1112014848, 0, -1035468800, -1035468800, 0, -1035468800,
+static Vec v_list[] = {
+    {-50.0f, 100.0f, 50.0f},
+    {50.0f, 100.0f, 50.0f},
+    {50.0f, 0.0f, 50.0f},
+    {-50.0f, 0.0f, 50.0f},
+    {-50.0f, 100.0f, -50.0f},
+    {50.0f, 100.0f, -50.0f},
+    {50.0f, 0.0f, -50.0f},
+    {-50.0f, 0.0f, -50.0f},
 };
 
 static __declspec(section ".data") EVT_BEGIN(evt_cloud_main_evt)
@@ -699,7 +700,7 @@ static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h) {
     s32 maxY;
 
     hitObjGetPos(name, &pos);
-    PSVECAdd(&pos, &((Vec*)v_list)[0], &screen);
+    PSVECAdd(&pos, &v_list[0], &screen);
     getScreenPoint(&screen, &screen);
     {
         s32 sx = screen.x;
@@ -714,7 +715,7 @@ static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h) {
         s32 i;
 
         for (i = 1; i < 8; i++) {
-            PSVECAdd(&pos, &((Vec*)v_list)[i], &screen);
+            PSVECAdd(&pos, &v_list[i], &screen);
             getScreenPoint(&screen, &screen);
             if (screen.x < minX) {
                 minX = screen.x;
@@ -843,7 +844,7 @@ static s32 evt_cloud_main(EventEntry *event, BOOL isFirstCall)
       imgEntry(wp->imgName, inBattle);
       img = imgNameToPtr(wp->imgName, inBattle);
       img->poseId = animPaperPoseGetId(wp->animName, inBattle);
-      *((OSTime *) (&img->field_0x10C[4])) = animTimeGetTime(inBattle);
+      *(&img->animTime) = animTimeGetTime(inBattle);
       imgClearVirtualPoint(img);
       imgSetShadow(img, 2);
       img->flags |= 2;
@@ -867,7 +868,7 @@ static s32 evt_cloud_main(EventEntry *event, BOOL isFirstCall)
     case 3:
       img = imgNameToPtr(wp->imgName, inBattle);
       img->animName = (s32) "A_1";
-      *((OSTime *) (&img->field_0x10C[4])) = animTimeGetTime(inBattle);
+      *(&img->animTime) = animTimeGetTime(inBattle);
       img->flags &= ~2;
       wp->timer = 30;
       wp->lastFrame = 0.0f;
@@ -924,7 +925,7 @@ static s32 evt_cloud_main(EventEntry *event, BOOL isFirstCall)
     }
       img = imgNameToPtr(wp->imgName, inBattle);
       img->animName = (s32) "A_2";
-      *((OSTime *) (&img->field_0x10C[4])) = animTimeGetTime(inBattle);
+      *(&img->animTime) = animTimeGetTime(inBattle);
       wp->timer = 60;
       wp->state++;
       break;
@@ -1050,7 +1051,7 @@ static EVT_BEGIN(iri_16_init)
         CALL(evt_hitobj_onoff, STRING("A_taka"), 1, 0)
         IF_INT_EQUAL(GSWF(5406), 0)
             CALL(evt_iri_16_cloud_init)
-            CALL(evt_iri_16_cloud_ent, PTR(capturemap), STRING("A_kura"), PTR(iri_16_cloud_evt))
+            CALL(evt_iri_16_cloud_ent, PTR(&capturemap), STRING("A_kura"), PTR(iri_16_cloud_evt))
             CALL(evt_run_case_evt, 9, 1, STRING("A_kura"), 0, PTR(iri_16_touch_evt), 0)
             ELSE
             CALL(evt_hitobj_onoff, STRING("A_kura"), 1, 0)

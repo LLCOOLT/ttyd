@@ -196,7 +196,7 @@ USER_FUNC(evt_map_blend_set_flag) {
     u32 flags = evtGetValue(event, args[2]);
     if (strcmp(name, "mario") == 0) {
         MarioWork* mp = marioGetPtr();
-        s32* poses = (s32*)((u8*)mp + MWOFF(0x228));
+        s32* poses = &mp->paperAnimGroupId[0];
         if (on == 1) {
             if (poses[0] != -1) animPoseSetMaterialFlagOn(poses[0], flags);
             if (poses[1] != -1) animPoseSetMaterialFlagOn(poses[1], flags);
@@ -498,7 +498,7 @@ USER_FUNC(evt_map_replace_mapobj) {
         break;
     case 1: {
         EffectEntry* eff = effFireEntry(5, 0, pos.x, pos.y, pos.z, 0.4f);
-        *(s32*)(*(u8**)((u8*)eff + 0xC) + 0x88) = 1;
+        *(s32*)((u8*)eff->userdata + 0x88) = 1;
         break;
     }
     }

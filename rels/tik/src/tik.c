@@ -25,22 +25,22 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-__declspec(section ".data") u64 fd_tik_negone_one_374;
-__declspec(section ".data") s32 fd_tik_neg_one_382[1];
-__declspec(section ".data") s32 fd_tik___local_PI_383[1];
-__declspec(section ".data") s32 fd_tik___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_tik_one_negone_373;
-__declspec(section ".data") s32 fd_tik___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_tik_one_381[1];
-__declspec(section ".data") u64 fd_tik_negone_one_360;
-__declspec(section ".data") s32 fd_tik_neg_one_365[1];
-__declspec(section ".data") s32 fd_tik___local_PI_366[1];
-__declspec(section ".data") s32 fd_tik___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_tik_one_negone_359;
-__declspec(section ".data") s32 fd_tik___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_tik_one_364[1];
-__declspec(section ".data") s32 fd_tik__three_localstatic4_sqrtf[2];
-__declspec(section ".data") s32 fd_tik__half_localstatic3_sqrtf[2];
+__declspec(section ".data") f32 fd_tik_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tik_neg_one_382;
+__declspec(section ".data") f32 fd_tik___local_PI_383;
+__declspec(section ".data") f32 fd_tik___local_3PIO2_385;
+__declspec(section ".data") f32 fd_tik_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tik___local_PIO2_384;
+__declspec(section ".data") f32 fd_tik_one_381;
+__declspec(section ".data") f32 fd_tik_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tik_neg_one_365;
+__declspec(section ".data") f32 fd_tik___local_PI_366;
+__declspec(section ".data") f32 fd_tik___local_3PIO2_368;
+__declspec(section ".data") f32 fd_tik_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tik___local_PIO2_367;
+__declspec(section ".data") f32 fd_tik_one_364;
+__declspec(section ".data") f64 fd_tik__three_localstatic4_sqrtf;
+__declspec(section ".data") f64 fd_tik__half_localstatic3_sqrtf;
 s32 tik_villager_urouro[101];
 
 void _prolog(void) {
@@ -107,61 +107,37 @@ USER_FUNC(evt_tik_villager_urouro_check_func) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_tik_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tik_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tik_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tik_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_tik___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tik___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tik___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tik___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tik_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tik_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tik___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tik___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tik_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tik_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_tik_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tik_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tik_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tik_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_tik___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tik___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tik___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tik___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tik_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tik_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tik___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tik___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tik_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tik_one_364 = 1.0f;
 
-__declspec(section ".data") s32 fd_tik__three_localstatic4_sqrtf[] = {
-    1074266112, 0,
-};
+__declspec(section ".data") f64 fd_tik__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") s32 fd_tik__half_localstatic3_sqrtf[] = {
-    1071644672, 0,
-};
+__declspec(section ".data") f64 fd_tik__half_localstatic3_sqrtf = 0.5;
 
 EVT_BEGIN(tik_villager_urouro)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)

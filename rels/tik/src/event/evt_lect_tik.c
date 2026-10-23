@@ -80,20 +80,20 @@ static USER_FUNC(lect_status_off);
 static USER_FUNC(lect_mario_ido_sum);
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start);
 
-__declspec(section ".data") u64 fd_evt_lect_tik_negone_one_374;
-__declspec(section ".data") s32 fd_evt_lect_tik_neg_one_382[1];
-__declspec(section ".data") s32 fd_evt_lect_tik___local_PI_383[1];
-__declspec(section ".data") s32 fd_evt_lect_tik___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_evt_lect_tik_one_negone_373;
-__declspec(section ".data") s32 fd_evt_lect_tik___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_evt_lect_tik_one_381[1];
-__declspec(section ".data") u64 fd_evt_lect_tik_negone_one_360;
-__declspec(section ".data") s32 fd_evt_lect_tik_neg_one_365[1];
-__declspec(section ".data") s32 fd_evt_lect_tik___local_PI_366[1];
-__declspec(section ".data") s32 fd_evt_lect_tik___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_evt_lect_tik_one_negone_359;
-__declspec(section ".data") s32 fd_evt_lect_tik___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_evt_lect_tik_one_364[1];
+__declspec(section ".data") f32 fd_evt_lect_tik_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_lect_tik_neg_one_382;
+__declspec(section ".data") f32 fd_evt_lect_tik___local_PI_383;
+__declspec(section ".data") f32 fd_evt_lect_tik___local_3PIO2_385;
+__declspec(section ".data") f32 fd_evt_lect_tik_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_lect_tik___local_PIO2_384;
+__declspec(section ".data") f32 fd_evt_lect_tik_one_381;
+__declspec(section ".data") f32 fd_evt_lect_tik_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_lect_tik_neg_one_365;
+__declspec(section ".data") f32 fd_evt_lect_tik___local_PI_366;
+__declspec(section ".data") f32 fd_evt_lect_tik___local_3PIO2_368;
+__declspec(section ".data") f32 fd_evt_lect_tik_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_lect_tik___local_PIO2_367;
+__declspec(section ".data") f32 fd_evt_lect_tik_one_364;
 s32 plane_majin_lecture_init[73];
 s32 plane_majin_lecture[715];
 
@@ -499,53 +499,33 @@ static USER_FUNC(evtflash) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_evt_lect_tik_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_evt_lect_tik_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_evt_lect_tik_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_evt_lect_tik_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_evt_lect_tik___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_evt_lect_tik___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_evt_lect_tik___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_evt_lect_tik___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_evt_lect_tik_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_evt_lect_tik_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_evt_lect_tik___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_evt_lect_tik___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_evt_lect_tik_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_evt_lect_tik_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_evt_lect_tik_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_evt_lect_tik_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_evt_lect_tik_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_evt_lect_tik_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_evt_lect_tik___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_evt_lect_tik___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_evt_lect_tik___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_evt_lect_tik___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_evt_lect_tik_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_evt_lect_tik_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_evt_lect_tik___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_evt_lect_tik___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_evt_lect_tik_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_evt_lect_tik_one_364 = 1.0f;
 
 EVT_BEGIN(plane_majin_lecture_init)
     CALL(lect_set_systemlevel, 0)
@@ -565,98 +545,243 @@ EVT_BEGIN(plane_majin_lecture_init)
     RETURN
 EVT_END()
 
-s32 plane_majin_lecture[] = {
-    110, 65627, (s32)lecture_button_rtn, 112, 65545, 1, 327771, (s32)lecture_button_set_pos,
-    0, -230204800, -230025600, -230000000, 107, 131122, -30000000, (s32)"hikou",
-    131122, -29999999, (s32)"a_asiba", 131122, -29999995, (s32)"a_hikou", 196699, (s32)evt_hit_bind_mapobj,
-    -29999999, -30000000, 196699, (s32)evt_hit_bind_mapobj, -29999995, -30000000, 262235, (s32)dai_moveti_set,
-    -230000000, -230000000, -230000000, 65541, 0, 262235, (s32)dai_moveti_get, -29999998,
-    -29999997, -29999996, 393307, (s32)evt_mapobj_trans, 1, -30000000, -29999998, -29999997,
-    -29999996, 131163, (s32)evt_hit_bind_update, -29999999, 131163, (s32)evt_hit_bind_update, -29999995, 65545,
-    1, 6, 109, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C", 1536,
-    262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C", 1073741856, 196699, (s32)evt_npc_set_camid, (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C",
-    7, 65545, 1, 110, 65541, 0, 327771, (s32)evt_cam_get_at,
-    4, -30000000, -29999999, -29999998, 131126, -29999999, 25, 327771,
-    (s32)evt_npc_set_position, (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C", -30000000, -29999999, -29999998, 65545, 1, 6,
-    112, 196699, (s32)evt_npc_set_anim, (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C", (s32)"P_1", 65546, 200, 327771,
-    (s32)evt_msg_toge, 1, 0, 0, 0, 327771, (s32)evt_msg_print, 0,
-    (s32)"mac_majin_13", 0, (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C", 131163, (s32)evt_mario_set_pose, (s32)"M_N_H", 65541, 4,
-    327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d,
-    (s32)"SFX_EVT_PERAMAJIN_LIGHT1", -30000000, -29999999, -29999998, 0, 65627, (s32)evtflash, 6,
-    131163, (s32)evt_mario_set_pose, (s32)"M_S_1", 327771, (s32)evt_msg_toge, 1, 0, 0,
-    0, 327771, (s32)evt_msg_print, 0, (s32)"mac_majin_14", 0, (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C", 589915,
-    (s32)evt_cam3d_evt_set_rel, -230000000, -229899648, -229428608, -229918080, -229956992, -230104243, 1000,
-    11, 131124, -29999999, -229997270, 262235, (s32)dai_moveti_get, -30000000, -29999998,
-    -29999997, 65541, 0, 131131, -30000000, -29999999, 131100, -30000000,
-    -230225280, 131124, -30000000, -230225280, 262235, (s32)dai_moveti_set, -30000000, -29999998,
-    -29999997, 7, 32, 262235, (s32)dai_moveti_set, -30000000, -29999998, -29999997,
-    33, 65545, 1, 6, 327771, (s32)evt_msg_toge, 1, 0,
-    0, 0, 327771, (s32)evt_msg_print, 0, (s32)"mac_majin_15", 0, (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C",
-    65541, 0, 196699, (s32)x_flag_set, 0, 1, 107, 131122,
-    -30000000, (s32)"hikou", 131122, -29999999, (s32)"a_hikou_ue", 65541, 0, 131165,
-    (s32)evt_ride_airport, -29999998, 65545, 2, 131178, -29999998, -29999997, 131096,
-    -29999997, 1, 7, 33, 6, 196699, (s32)x_flag_wait, 0,
-    2, 131178, -29999998, -29999997, 131096, -29999997, 1, 65631,
-    -29999998, 33, 65541, 0, 131165, (s32)evt_nonride_airport, -29999998, 65545,
-    2, 131178, -29999998, -29999997, 131096, -29999997, 1, 7,
-    33, 6, 131178, -29999998, -29999997, 131096, -29999997, 1,
-    65631, -29999998, 33, 109, 196699, (s32)x_flag_set, 1, 1,
-    110, 65541, 0, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999,
-    -29999998, 131101, -30000000, -220, 7, 33, 65545, 1,
-    6, 65541, 0, 196699, (s32)x_flag_get, 1, -30000000, 131097,
-    -30000000, 3, 589915, (s32)evt_cam3d_evt_set_rel, -230000000, -229899648, -229428608, -230000000,
-    -229956992, -230104243, 0, 11, 33, 131096, -30000000, 2,
-    7, 33, 65545, 1, 6, 112, 262235, (s32)evt_mario_mov_pos2,
-    -230204800, -230000000, -229918080, 196699, (s32)evt_msg_print_add, 0, (s32)"mac_majin_15_1", 327771,
-    (s32)lecture_button_set_pos, 0, -230204800, -230025600, -230000000, 262235, (s32)lecture_button_flag_on_off, 0,
-    2, 1, 196699, (s32)lecture_button_set_icon_id, 0, ICON_06A, 196699, (s32)lecture_button_set_seq,
-    0, 2, 196699, (s32)lecture_button_seq_wait, 0, 1, 196699, (s32)x_flag_set,
-    0, 1, 107, 65541, 0, 196699, (s32)lecture_button_set_icon_id, 0,
-    ICON_06B, 65546, 300, 196699, (s32)x_flag_get, 0, -30000000, 131096,
-    -30000000, 2, 7, 33, 196699, (s32)lecture_button_set_icon_id, 0, ICON_06A,
-    65546, 300, 196699, (s32)x_flag_get, 0, -30000000, 131096, -30000000,
-    2, 7, 33, 6, 109, 65541, 0, 196699,
-    (s32)evt_key_get_buttontrg, 0, -30000000, 131102, -30000000, 2048, 7, 33,
-    65545, 1, 6, 65627, (s32)evt_msg_continue, 131163, (s32)evt_mario_paper_plane, 1,
-    196699, (s32)x_flag_set, 0, 2, 196699, (s32)lecture_button_set_seq, 0, 3,
-    107, 196699, (s32)x_flag_set, 0, 1, 65541, 0, 327771,
-    (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 131100, -29999999, -750,
-    7, 33, 65545, 1, 6, 196699, (s32)x_flag_set, 1,
-    3, 65545, 1, 262235, (s32)evt_mario_set_pos, -30000000, -29999999, -29999998,
-    65545, 1, 262235, (s32)evt_mario_set_pos, -30000000, -29999999, -29999998, 262235,
-    (s32)dai_moveti_set, -226928000, -230000000, -230000000, 327771, (s32)evt_mario_get_pos, 0, -29999997,
-    -29999996, -29999995, 131122, -30000000, -300, 131122, -29999999, -490,
-    131122, -29999998, 0, 262235, (s32)evt_mario_set_pos, -30000000, -29999999, -29999998,
-    589915, (s32)evt_cam3d_evt_set, -230304128, -230359424, -229532032, -230304128, -230459776, -230104243,
-    1000, 0, 131163, (s32)evt_mario_cont_onoff, 0, 131163, (s32)lect_mario_ido_sum, 1000,
-    131163, (s32)evt_mario_cont_onoff, 1, 262235, (s32)dai_moveti_set, -230000000, -230000000, -230000000,
-    196699, (s32)x_flag_set, 1, 1, 65541, 0, 262235, (s32)evt_mario_set_pos,
-    -30000000, -29999999, -29999998, 196699, (s32)x_flag_get, 0, -29999997, 131097,
-    -29999997, 1, 7, 33, 65545, 1, 6, 109,
-    196699, (s32)lecture_button_seq_wait, 0, 1, 262235, (s32)lecture_button_flag_on_off, 0, 2,
-    0, 65546, 300, 327771, (s32)evt_msg_toge, 1, 0, 0,
-    0, 327771, (s32)evt_msg_print, 0, (s32)"mac_majin_16", 0, (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C", 196699,
-    (s32)evt_msg_select, 0, (s32)"mac_majin_17", 131122, -29999997, -30000000, 65541, 0,
-    327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 131101, -29999999,
-    -550, 7, 33, 65545, 1, 6, 131096, -29999997,
-    0, 196699, (s32)x_flag_set, 1, 2, 65545, 2, 589915,
-    (s32)evt_cam3d_evt_set, -230307200, -230471040, -229532032, -230307200, -230571392, -230104243, 1200,
-    0, 196699, (s32)x_flag_set, 0, 2, 131163, (s32)evt_mario_paper_plane, 0,
-    65627, (s32)evt_mario_wait_landon, 589915, (s32)evt_cam3d_evt_set_rel, -230000000, -229899648, -229428608, -229918080,
-    -229956992, -230104243, 1000, 11, 131124, -29999999, -229997270, 262235,
-    (s32)dai_moveti_get, -30000000, -29999998, -29999997, 65541, 0, 131131, -30000000,
-    -29999999, 131100, -30000000, -230225280, 131124, -30000000, -230225280, 262235,
-    (s32)dai_moveti_set, -30000000, -29999998, -29999997, 7, 32, 262235, (s32)dai_moveti_set,
-    -30000000, -29999998, -29999997, 33, 65545, 1, 6, 196699,
-    (s32)evt_msg_print_add, 0, (s32)"mac_majin_18", 32, 7, 33, 6, 196699,
-    (s32)evt_msg_print_add, 0, (s32)"mac_majin_18_1", 196699, (s32)x_flag_set, 1, 2, 65545,
-    2, 589915, (s32)evt_cam3d_evt_set, -230307200, -230471040, -229532032, -230307200, -230571392,
-    -230104243, 1200, 0, 196699, (s32)x_flag_set, 0, 2, 131163,
-    (s32)evt_mario_paper_plane, 0, 65627, (s32)evt_mario_wait_landon, 196699, (s32)evt_msg_print_add, 0, (s32)"mac_majin_19",
-    196699, (s32)evt_npc_set_anim, (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C", (s32)"P_2", 65546, 200, 196699, (s32)evt_npc_set_camid,
-    (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C", 4, 327771, (s32)evt_npc_set_position, (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C", 0, -1000, 0,
-    2, 1, 0,
-};
+EVT_BEGIN(plane_majin_lecture)
+    BEGIN_SIBLING_EVENT
+        CALL(lecture_button_rtn)
+    END_SIBLING_EVENT
+    WAIT_FRAMES(1)
+    CALL(lecture_button_set_pos, 0, FLOAT(-200.0f), FLOAT(-25.0f), FLOAT(0.0f))
+    BEGIN_INLINE_EVENT
+        SET_VALUE(LW(0), STRING("hikou"))
+        SET_VALUE(LW(1), STRING("a_asiba"))
+        SET_VALUE(LW(5), STRING("a_hikou"))
+        CALL(evt_hit_bind_mapobj, LW(1), LW(0))
+        CALL(evt_hit_bind_mapobj, LW(5), LW(0))
+        CALL(dai_moveti_set, FLOAT(0.0f), FLOAT(0.0f), FLOAT(0.0f))
+        LOOP(0)
+            CALL(dai_moveti_get, LW(2), LW(3), LW(4))
+            CALL(evt_mapobj_trans, 1, LW(0), LW(2), LW(3), LW(4))
+            CALL(evt_hit_bind_update, LW(1))
+            CALL(evt_hit_bind_update, LW(5))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_INLINE_EVENT
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), 1073741856)
+    CALL(evt_npc_set_camid, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), 7)
+    WAIT_FRAMES(1)
+    BEGIN_SIBLING_EVENT
+        LOOP(0)
+            CALL(evt_cam_get_at, 4, LW(0), LW(1), LW(2))
+            SUBTRACT(LW(1), 25)
+            CALL(evt_npc_set_position, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), LW(0), LW(1), LW(2))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(evt_npc_set_anim, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), STRING("P_1"))
+    WAIT_MS(200)
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("mac_majin_13"), 0, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"))
+    CALL(evt_mario_set_pose, STRING("M_N_H"))
+    LOOP(4)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_PERAMAJIN_LIGHT1"), LW(0), LW(1), LW(2), 0)
+        CALL(evtflash)
+    END_LOOP
+    CALL(evt_mario_set_pose, STRING("M_S_1"))
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("mac_majin_14"), 0, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"))
+    CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(98.0f), FLOAT(558.0f), FLOAT(80.0f), FLOAT(42.0f), FLOAT(-101.799805f), 1000, 11)
+    SET_FLOAT_VALUE(LW(1), FLOAT(2.6660156f))
+    CALL(dai_moveti_get, LW(0), LW(2), LW(3))
+    LOOP(0)
+        SUBTRACT_FLOAT(LW(0), LW(1))
+        IF_INT_LESS_OR_EQUAL(LW(0), FLOAT(-220.0f))
+            SET_FLOAT_VALUE(LW(0), FLOAT(-220.0f))
+            CALL(dai_moveti_set, LW(0), LW(2), LW(3))
+            BREAK_LOOP
+        ELSE
+            CALL(dai_moveti_set, LW(0), LW(2), LW(3))
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("mac_majin_15"), 0, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"))
+    LOOP(0)
+        CALL(x_flag_set, 0, 1)
+        BEGIN_INLINE_EVENT
+            SET_VALUE(LW(0), STRING("hikou"))
+            SET_VALUE(LW(1), STRING("a_hikou_ue"))
+            LOOP(0)
+                SPAWN_EVENT_GET_ID(PTR(evt_ride_airport), LW(2))
+                WAIT_FRAMES(2)
+                IS_EVENT_RUNNING(LW(2), LW(3))
+                IF_INT_EQUAL(LW(3), 1)
+                    BREAK_LOOP
+                END_IF
+            END_LOOP
+            CALL(x_flag_wait, 0, 2)
+            IS_EVENT_RUNNING(LW(2), LW(3))
+            IF_INT_EQUAL(LW(3), 1)
+                DELETE_EVENT(LW(2))
+            END_IF
+            LOOP(0)
+                SPAWN_EVENT_GET_ID(PTR(evt_nonride_airport), LW(2))
+                WAIT_FRAMES(2)
+                IS_EVENT_RUNNING(LW(2), LW(3))
+                IF_INT_EQUAL(LW(3), 1)
+                    BREAK_LOOP
+                END_IF
+            END_LOOP
+            IS_EVENT_RUNNING(LW(2), LW(3))
+            IF_INT_EQUAL(LW(3), 1)
+                DELETE_EVENT(LW(2))
+            END_IF
+        END_INLINE_EVENT
+        CALL(x_flag_set, 1, 1)
+        BEGIN_SIBLING_EVENT
+            LOOP(0)
+                CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+                IF_INT_GREATER_OR_EQUAL(LW(0), -220)
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+            LOOP(0)
+                CALL(x_flag_get, 1, LW(0))
+                IF_INT_NOT_EQUAL(LW(0), 3)
+                    CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(98.0f), FLOAT(558.0f), FLOAT(0.0f), FLOAT(42.0f), FLOAT(-101.799805f), 0, 11)
+                END_IF
+                IF_INT_EQUAL(LW(0), 2)
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+        END_SIBLING_EVENT
+        CALL(evt_mario_mov_pos2, FLOAT(-200.0f), FLOAT(0.0f), FLOAT(80.0f))
+        CALL(evt_msg_print_add, 0, STRING("mac_majin_15_1"))
+        CALL(lecture_button_set_pos, 0, FLOAT(-200.0f), FLOAT(-25.0f), FLOAT(0.0f))
+        CALL(lecture_button_flag_on_off, 0, 2, 1)
+        CALL(lecture_button_set_icon_id, 0, ICON_06A)
+        CALL(lecture_button_set_seq, 0, 2)
+        CALL(lecture_button_seq_wait, 0, 1)
+        CALL(x_flag_set, 0, 1)
+        BEGIN_INLINE_EVENT
+            LOOP(0)
+                CALL(lecture_button_set_icon_id, 0, ICON_06B)
+                WAIT_MS(300)
+                CALL(x_flag_get, 0, LW(0))
+                IF_INT_EQUAL(LW(0), 2)
+                    BREAK_LOOP
+                END_IF
+                CALL(lecture_button_set_icon_id, 0, ICON_06A)
+                WAIT_MS(300)
+                CALL(x_flag_get, 0, LW(0))
+                IF_INT_EQUAL(LW(0), 2)
+                    BREAK_LOOP
+                END_IF
+            END_LOOP
+        END_INLINE_EVENT
+        LOOP(0)
+            CALL(evt_key_get_buttontrg, 0, LW(0))
+            IF_BITS_SET(LW(0), 2048)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(evt_msg_continue)
+        CALL(evt_mario_paper_plane, 1)
+        CALL(x_flag_set, 0, 2)
+        CALL(lecture_button_set_seq, 0, 3)
+        BEGIN_INLINE_EVENT
+            CALL(x_flag_set, 0, 1)
+            LOOP(0)
+                CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+                IF_INT_LESS_OR_EQUAL(LW(1), -750)
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+            CALL(x_flag_set, 1, 3)
+            WAIT_FRAMES(1)
+            CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
+            WAIT_FRAMES(1)
+            CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
+            CALL(dai_moveti_set, FLOAT(3000.0f), FLOAT(0.0f), FLOAT(0.0f))
+            CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
+            SET_VALUE(LW(0), -300)
+            SET_VALUE(LW(1), -490)
+            SET_VALUE(LW(2), 0)
+            CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
+            CALL(evt_cam3d_evt_set, FLOAT(-297.0f), FLOAT(-351.0f), FLOAT(457.0f), FLOAT(-297.0f), FLOAT(-449.0f), FLOAT(-101.799805f), 1000, 0)
+            CALL(evt_mario_cont_onoff, 0)
+            CALL(lect_mario_ido_sum, 1000)
+            CALL(evt_mario_cont_onoff, 1)
+            CALL(dai_moveti_set, FLOAT(0.0f), FLOAT(0.0f), FLOAT(0.0f))
+            CALL(x_flag_set, 1, 1)
+            LOOP(0)
+                CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
+                CALL(x_flag_get, 0, LW(3))
+                IF_INT_NOT_EQUAL(LW(3), 1)
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+        END_INLINE_EVENT
+        CALL(lecture_button_seq_wait, 0, 1)
+        CALL(lecture_button_flag_on_off, 0, 2, 0)
+        WAIT_MS(300)
+        CALL(evt_msg_toge, 1, 0, 0, 0)
+        CALL(evt_msg_print, 0, STRING("mac_majin_16"), 0, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"))
+        CALL(evt_msg_select, 0, STRING("mac_majin_17"))
+        SET_VALUE(LW(3), LW(0))
+        LOOP(0)
+            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            IF_INT_GREATER_OR_EQUAL(LW(1), -550)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        IF_INT_EQUAL(LW(3), 0)
+            CALL(x_flag_set, 1, 2)
+            WAIT_FRAMES(2)
+            CALL(evt_cam3d_evt_set, FLOAT(-300.0f), FLOAT(-460.0f), FLOAT(457.0f), FLOAT(-300.0f), FLOAT(-558.0f), FLOAT(-101.799805f), 1200, 0)
+            CALL(x_flag_set, 0, 2)
+            CALL(evt_mario_paper_plane, 0)
+            CALL(evt_mario_wait_landon)
+            CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(98.0f), FLOAT(558.0f), FLOAT(80.0f), FLOAT(42.0f), FLOAT(-101.799805f), 1000, 11)
+            SET_FLOAT_VALUE(LW(1), FLOAT(2.6660156f))
+            CALL(dai_moveti_get, LW(0), LW(2), LW(3))
+            LOOP(0)
+                SUBTRACT_FLOAT(LW(0), LW(1))
+                IF_INT_LESS_OR_EQUAL(LW(0), FLOAT(-220.0f))
+                    SET_FLOAT_VALUE(LW(0), FLOAT(-220.0f))
+                    CALL(dai_moveti_set, LW(0), LW(2), LW(3))
+                    BREAK_LOOP
+                ELSE
+                    CALL(dai_moveti_set, LW(0), LW(2), LW(3))
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+            CALL(evt_msg_print_add, 0, STRING("mac_majin_18"))
+        ELSE
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_msg_print_add, 0, STRING("mac_majin_18_1"))
+    CALL(x_flag_set, 1, 2)
+    WAIT_FRAMES(2)
+    CALL(evt_cam3d_evt_set, FLOAT(-300.0f), FLOAT(-460.0f), FLOAT(457.0f), FLOAT(-300.0f), FLOAT(-558.0f), FLOAT(-101.799805f), 1200, 0)
+    CALL(x_flag_set, 0, 2)
+    CALL(evt_mario_paper_plane, 0)
+    CALL(evt_mario_wait_landon)
+    CALL(evt_msg_print_add, 0, STRING("mac_majin_19"))
+    CALL(evt_npc_set_anim, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), STRING("P_2"))
+    WAIT_MS(200)
+    CALL(evt_npc_set_camid, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), 4)
+    CALL(evt_npc_set_position, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), 0, -1000, 0)
+    RETURN
+EVT_END_PAD()
 
 
 static USER_FUNC(lect_push_r_check) {

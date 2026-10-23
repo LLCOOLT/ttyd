@@ -54,25 +54,25 @@ void irai_window_disp(CameraId camera, void* param);
 void irai_flag_disp(void);
 void irai_flag_clear(void);
 
-__declspec(section ".data") u64 fd_gor_irai_negone_one_374;
-__declspec(section ".data") s32 fd_gor_irai_neg_one_382[1];
-__declspec(section ".data") s32 fd_gor_irai___local_PI_383[1];
-__declspec(section ".data") s32 fd_gor_irai___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gor_irai_one_negone_373;
-__declspec(section ".data") s32 fd_gor_irai___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gor_irai_one_381[1];
-__declspec(section ".data") u64 fd_gor_irai_negone_one_360;
-__declspec(section ".data") s32 fd_gor_irai_neg_one_365[1];
-__declspec(section ".data") s32 fd_gor_irai___local_PI_366[1];
-__declspec(section ".data") s32 fd_gor_irai___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gor_irai_one_negone_359;
-__declspec(section ".data") s32 fd_gor_irai___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gor_irai_one_364[1];
-s32 irai_msg_client[30];
-s32 irai_msg_contents[30];
-s32 irai_msg_exposition[30];
-s32 irai_msg_kakunin[30];
-s32 irai_msg_hikiukechu[30];
+__declspec(section ".data") f32 fd_gor_irai_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gor_irai_neg_one_382;
+__declspec(section ".data") f32 fd_gor_irai___local_PI_383;
+__declspec(section ".data") f32 fd_gor_irai___local_3PIO2_385;
+__declspec(section ".data") f32 fd_gor_irai_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gor_irai___local_PIO2_384;
+__declspec(section ".data") f32 fd_gor_irai_one_381;
+__declspec(section ".data") f32 fd_gor_irai_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gor_irai_neg_one_365;
+__declspec(section ".data") f32 fd_gor_irai___local_PI_366;
+__declspec(section ".data") f32 fd_gor_irai___local_3PIO2_368;
+__declspec(section ".data") f32 fd_gor_irai_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gor_irai___local_PIO2_367;
+__declspec(section ".data") f32 fd_gor_irai_one_364;
+const char* irai_msg_client[30];
+const char* irai_msg_contents[30];
+const char* irai_msg_exposition[30];
+const char* irai_msg_kakunin[30];
+const char* irai_msg_hikiukechu[30];
 __declspec(section ".data") s32 irai_item_data01[2];
 __declspec(section ".data") s32 irai_item_data02[2];
 __declspec(section ".data") s32 irai_item_data13[2];
@@ -83,151 +83,186 @@ __declspec(section ".data") s32 irai_item_data23[2];
 __declspec(section ".data") s32 irai_item_data25[2];
 __declspec(section ".data") s32 irai_item_data29[2];
 __declspec(section ".data") s32 irai_item_null[1];
-s32 irai_item_table[30];
+s32* irai_item_table[30];
 __declspec(section ".data") s32 irai_start_event_null[2];
 s32 irai_start_event01[13];
 __declspec(section ".data") s32 irai_start_event04[8];
-s32 irai_start_event[30];
+s32* irai_start_event[30];
 __declspec(section ".data") s32 irai_end_event_null[2];
 s32 irai_end_event01[13];
 __declspec(section ".data") s32 irai_end_event04[8];
 #ifdef VERSION_G8ME01
 s32 irai_end_event19[15];
 #endif
-s32 irai_end_event[30];
+s32* irai_end_event[30];
 s32 gor_irai_init[18];
 s32 gor_irai_lecture[40];
 s32 gor_irai_main[VERSION_PICK(105, 126)];
 s32 gor_irai_tenshu_main[VERSION_PICK(258, 261)];
 
-__declspec(section ".data") u64 fd_gor_irai_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gor_irai_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gor_irai_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_gor_irai_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_gor_irai___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_gor_irai___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_gor_irai_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_gor_irai___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_gor_irai_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_gor_irai_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_gor_irai_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_gor_irai___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_gor_irai___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_gor_irai_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_gor_irai___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_gor_irai_one_364 = 1.0f;
+
+const char* irai_msg_client[] = {
+    "irai_client_01", "irai_client_02", "irai_client_03", "irai_client_04", "irai_client_05", "irai_client_06",
+    "irai_client_07", "irai_client_08", "irai_client_09", "irai_client_10", "irai_client_11", "irai_client_12",
+    "irai_client_13", "irai_client_14", "irai_client_15", "irai_client_16", "irai_client_17", "irai_client_18",
+    "irai_client_19", "irai_client_20", "irai_client_21", "irai_client_22", "irai_client_23", "irai_client_24",
+    "irai_client_25", "irai_client_26", "irai_client_27", "irai_client_28", "irai_client_29", "irai_client_30",
 };
 
-__declspec(section ".data") s32 fd_gor_irai___local_PI_383[] = {
-    1078530011,
+const char* irai_msg_contents[] = {
+    "irai_contents_01", "irai_contents_02", "irai_contents_03", "irai_contents_04", "irai_contents_05",
+    "irai_contents_06", "irai_contents_07", "irai_contents_08", "irai_contents_09", "irai_contents_10",
+    "irai_contents_11", "irai_contents_12", "irai_contents_13", "irai_contents_14", "irai_contents_15",
+    "irai_contents_16", "irai_contents_17", "irai_contents_18", "irai_contents_19", "irai_contents_20",
+    "irai_contents_21", "irai_contents_22", "irai_contents_23", "irai_contents_24", "irai_contents_25",
+    "irai_contents_26", "irai_contents_27", "irai_contents_28", "irai_contents_29", "irai_contents_30",
 };
 
-__declspec(section ".data") s32 fd_gor_irai___local_3PIO2_385[] = {
-    1083624420,
+const char* irai_msg_exposition[] = {
+    "irai_help_01",
+    "irai_help_02",
+    "irai_help_03",
+    "irai_help_04",
+    "irai_help_05",
+    "irai_help_06",
+    "irai_help_07",
+    "irai_help_08",
+    "irai_help_09",
+    "irai_help_10",
+    "irai_help_11",
+    "irai_help_12",
+    "irai_help_13",
+    "irai_help_14",
+    "irai_help_15",
+    "irai_help_16",
+    "irai_help_17",
+    "irai_help_18",
+    "irai_help_19",
+    "irai_help_20",
+    "irai_help_21",
+    "irai_help_22",
+    "irai_help_23",
+    "irai_help_24",
+    "irai_help_25",
+    "irai_help_26",
+    "irai_help_27",
+    "irai_help_28",
+    "irai_help_29",
+    "irai_help_30",
 };
 
-__declspec(section ".data") u64 fd_gor_irai_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_gor_irai___local_PIO2_384[] = {
-    1070141403,
+const char* irai_msg_kakunin[] = {
+    "irai_43", "irai_44", "irai_45", "irai_46", "irai_47", "irai_48", "irai_49", "irai_50", "irai_51", "irai_52",
+    "irai_53", "irai_54", "irai_55", "irai_56", "irai_57", "irai_58", "irai_59", "irai_60", "irai_61", "irai_62",
+    "irai_63", "irai_64", "irai_65", "irai_66", "irai_67", "irai_68", "irai_69", "irai_70", "irai_71", "irai_72",
 };
 
-__declspec(section ".data") s32 fd_gor_irai_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_gor_irai_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_gor_irai_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_gor_irai___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_gor_irai___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_gor_irai_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_gor_irai___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_gor_irai_one_364[] = {
-    1065353216,
-};
-
-s32 irai_msg_client[] = {
-    (s32)"irai_client_01", (s32)"irai_client_02", (s32)"irai_client_03", (s32)"irai_client_04", (s32)"irai_client_05", (s32)"irai_client_06", (s32)"irai_client_07", (s32)"irai_client_08",
-    (s32)"irai_client_09", (s32)"irai_client_10", (s32)"irai_client_11", (s32)"irai_client_12", (s32)"irai_client_13", (s32)"irai_client_14", (s32)"irai_client_15", (s32)"irai_client_16",
-    (s32)"irai_client_17", (s32)"irai_client_18", (s32)"irai_client_19", (s32)"irai_client_20", (s32)"irai_client_21", (s32)"irai_client_22", (s32)"irai_client_23", (s32)"irai_client_24",
-    (s32)"irai_client_25", (s32)"irai_client_26", (s32)"irai_client_27", (s32)"irai_client_28", (s32)"irai_client_29", (s32)"irai_client_30",
-};
-
-s32 irai_msg_contents[] = {
-    (s32)"irai_contents_01", (s32)"irai_contents_02", (s32)"irai_contents_03", (s32)"irai_contents_04", (s32)"irai_contents_05", (s32)"irai_contents_06", (s32)"irai_contents_07", (s32)"irai_contents_08",
-    (s32)"irai_contents_09", (s32)"irai_contents_10", (s32)"irai_contents_11", (s32)"irai_contents_12", (s32)"irai_contents_13", (s32)"irai_contents_14", (s32)"irai_contents_15", (s32)"irai_contents_16",
-    (s32)"irai_contents_17", (s32)"irai_contents_18", (s32)"irai_contents_19", (s32)"irai_contents_20", (s32)"irai_contents_21", (s32)"irai_contents_22", (s32)"irai_contents_23", (s32)"irai_contents_24",
-    (s32)"irai_contents_25", (s32)"irai_contents_26", (s32)"irai_contents_27", (s32)"irai_contents_28", (s32)"irai_contents_29", (s32)"irai_contents_30",
-};
-
-s32 irai_msg_exposition[] = {
-    (s32)"irai_help_01", (s32)"irai_help_02", (s32)"irai_help_03", (s32)"irai_help_04", (s32)"irai_help_05", (s32)"irai_help_06", (s32)"irai_help_07", (s32)"irai_help_08",
-    (s32)"irai_help_09", (s32)"irai_help_10", (s32)"irai_help_11", (s32)"irai_help_12", (s32)"irai_help_13", (s32)"irai_help_14", (s32)"irai_help_15", (s32)"irai_help_16",
-    (s32)"irai_help_17", (s32)"irai_help_18", (s32)"irai_help_19", (s32)"irai_help_20", (s32)"irai_help_21", (s32)"irai_help_22", (s32)"irai_help_23", (s32)"irai_help_24",
-    (s32)"irai_help_25", (s32)"irai_help_26", (s32)"irai_help_27", (s32)"irai_help_28", (s32)"irai_help_29", (s32)"irai_help_30",
-};
-
-s32 irai_msg_kakunin[] = {
-    (s32)"irai_43", (s32)"irai_44", (s32)"irai_45", (s32)"irai_46", (s32)"irai_47", (s32)"irai_48", (s32)"irai_49", (s32)"irai_50",
-    (s32)"irai_51", (s32)"irai_52", (s32)"irai_53", (s32)"irai_54", (s32)"irai_55", (s32)"irai_56", (s32)"irai_57", (s32)"irai_58",
-    (s32)"irai_59", (s32)"irai_60", (s32)"irai_61", (s32)"irai_62", (s32)"irai_63", (s32)"irai_64", (s32)"irai_65", (s32)"irai_66",
-    (s32)"irai_67", (s32)"irai_68", (s32)"irai_69", (s32)"irai_70", (s32)"irai_71", (s32)"irai_72",
-};
-
-s32 irai_msg_hikiukechu[] = {
-    (s32)"irai_13", (s32)"irai_14", (s32)"irai_15", (s32)"irai_16", (s32)"irai_17", (s32)"irai_18", (s32)"irai_19", (s32)"irai_20",
-    (s32)"irai_21", (s32)"irai_22", (s32)"irai_23", (s32)"irai_24", (s32)"irai_25", (s32)"irai_26", (s32)"irai_27", (s32)"irai_28",
-    (s32)"irai_29", (s32)"irai_30", (s32)"irai_31", (s32)"irai_32", (s32)"irai_33", (s32)"irai_34", (s32)"irai_35", (s32)"irai_36",
-    (s32)"irai_37", (s32)"irai_38", (s32)"irai_39", (s32)"irai_40", (s32)"irai_41", (s32)"irai_42",
+const char* irai_msg_hikiukechu[] = {
+    "irai_13",
+    "irai_14",
+    "irai_15",
+    "irai_16",
+    "irai_17",
+    "irai_18",
+    "irai_19",
+    "irai_20",
+    "irai_21",
+    "irai_22",
+    "irai_23",
+    "irai_24",
+    "irai_25",
+    "irai_26",
+    "irai_27",
+    "irai_28",
+    "irai_29",
+    "irai_30",
+    "irai_31",
+    "irai_32",
+    "irai_33",
+    "irai_34",
+    "irai_35",
+    "irai_36",
+    "irai_37",
+    "irai_38",
+    "irai_39",
+    "irai_40",
+    "irai_41",
+    "irai_42",
 };
 
 __declspec(section ".data") s32 irai_item_data01[] = {
-    49, -1,
+    ITEM_HOUSE_KEY, -1,
 };
 
 __declspec(section ".data") s32 irai_item_data02[] = {
-    95, -1,
+    ITEM_BOX, -1,
 };
 
 __declspec(section ".data") s32 irai_item_data13[] = {
-    107, -1,
+    ITEM_BATTLE_TRUNKS, -1,
 };
 
 __declspec(section ".data") s32 irai_item_data16[] = {
-    110, -1,
+    ITEM_ATTACK_FX_B_KEY_ITEM, -1,
 };
 
 __declspec(section ".data") s32 irai_item_data17[] = {
-    98, -1,
+    ITEM_ROUTING_SLIP, -1,
 };
 
 __declspec(section ".data") s32 irai_item_data19[] = {
-    73, -1,
+    ITEM_WEDDING_RING, -1,
 };
 
 __declspec(section ".data") s32 irai_item_data23[] = {
-    99, -1,
+    ITEM_WRESTLING_MAG, -1,
 };
 
 __declspec(section ".data") s32 irai_item_data25[] = {
-    109, -1,
+    ITEM_PACKAGE, -1,
 };
 
 __declspec(section ".data") s32 irai_item_data29[] = {
-    100, -1,
+    ITEM_PRESENT, -1,
 };
 
 __declspec(section ".data") s32 irai_item_null[] = {
     -1,
 };
 
-s32 irai_item_table[] = {
-    (s32)irai_item_data01, (s32)irai_item_data02, (s32)irai_item_null, (s32)irai_item_null, (s32)irai_item_null, (s32)irai_item_null, (s32)irai_item_null, (s32)irai_item_null,
-    (s32)irai_item_null, (s32)irai_item_null, (s32)irai_item_null, (s32)irai_item_null, (s32)irai_item_data13, (s32)irai_item_null, (s32)irai_item_null, (s32)irai_item_data16,
-    (s32)irai_item_data17, (s32)irai_item_null, (s32)irai_item_data19, (s32)irai_item_null, (s32)irai_item_null, (s32)irai_item_null, (s32)irai_item_data23, (s32)irai_item_null,
-    (s32)irai_item_data25, (s32)irai_item_null, (s32)irai_item_null, (s32)irai_item_null, (s32)irai_item_data29, (s32)irai_item_null,
+s32* irai_item_table[] = {
+    irai_item_data01, irai_item_data02, irai_item_null, irai_item_null, irai_item_null, irai_item_null,
+    irai_item_null, irai_item_null, irai_item_null, irai_item_null, irai_item_null, irai_item_null,
+    irai_item_data13, irai_item_null, irai_item_null, irai_item_data16, irai_item_data17, irai_item_null,
+    irai_item_data19, irai_item_null, irai_item_null, irai_item_null, irai_item_data23, irai_item_null,
+    irai_item_data25, irai_item_null, irai_item_null, irai_item_null, irai_item_data29, irai_item_null,
 };
 
 __declspec(section ".data") EVT_BEGIN(irai_start_event_null)
@@ -236,7 +271,7 @@ EVT_END()
 
 EVT_BEGIN(irai_start_event01)
     CALL(evt_npc_set_position, STRING("盗賊団２"), 445, 0, 120)
-    CALL(evt_door_set_param, GW(11), 0, PTR(door_data_05_npc_01))
+    CALL(evt_door_set_param, GW(11), 0, PTR(&door_data_05_npc_01))
     RETURN
 EVT_END()
 
@@ -245,11 +280,15 @@ __declspec(section ".data") EVT_BEGIN(irai_start_event04)
     RETURN
 EVT_END()
 
-s32 irai_start_event[] = {
-    (s32)irai_start_event01, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event04, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null,
-    (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null,
-    (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null,
-    (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null, (s32)irai_start_event_null,
+s32* irai_start_event[] = {
+    irai_start_event01, irai_start_event_null, irai_start_event_null, irai_start_event04, irai_start_event_null,
+    irai_start_event_null, irai_start_event_null, irai_start_event_null, irai_start_event_null,
+    irai_start_event_null, irai_start_event_null, irai_start_event_null, irai_start_event_null,
+    irai_start_event_null, irai_start_event_null, irai_start_event_null, irai_start_event_null,
+    irai_start_event_null, irai_start_event_null, irai_start_event_null, irai_start_event_null,
+    irai_start_event_null, irai_start_event_null, irai_start_event_null, irai_start_event_null,
+    irai_start_event_null, irai_start_event_null, irai_start_event_null, irai_start_event_null,
+    irai_start_event_null,
 };
 
 __declspec(section ".data") EVT_BEGIN(irai_end_event_null)
@@ -258,7 +297,7 @@ EVT_END()
 
 EVT_BEGIN(irai_end_event01)
     CALL(evt_npc_set_position, STRING("盗賊団２"), 10, 0, -460)
-    CALL(evt_door_set_param, GW(11), 0, PTR(door_data_05_npc))
+    CALL(evt_door_set_param, GW(11), 0, PTR(&door_data_05_npc))
     RETURN
 EVT_END()
 
@@ -278,15 +317,15 @@ EVT_BEGIN(irai_end_event19)
 EVT_END()
 #endif
 
-s32 irai_end_event[] = {
-    (s32)irai_end_event01, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event04, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null,
-    (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null,
+s32* irai_end_event[] = {
+    irai_end_event01, irai_end_event_null, irai_end_event_null, irai_end_event04, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
+    irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
 #ifdef VERSION_G8ME01
-    (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event19, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null,
+    irai_end_event_null, irai_end_event_null, irai_end_event19, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
 #else
-    (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null,
+    irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
 #endif
-    (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null, (s32)irai_end_event_null,
+    irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
 };
 
 EVT_BEGIN(gor_irai_init)
@@ -333,7 +372,7 @@ EVT_BEGIN(gor_irai_main)
     IF_INT_EQUAL(LW(0), -1)
         GOTO(100)
     END_IF
-    SET_INT_READ_ADDR(PTR(irai_msg_exposition))
+    SET_INT_READ_ADDR(PTR(&irai_msg_exposition))
     SET_VALUE(LW(0), LW(11))
     ADD(LW(0), -1)
     READ_INT_INDEXED(LW(1), LW(0))
@@ -375,7 +414,7 @@ EVT_BEGIN(gor_irai_main)
     IF_INT_EQUAL(LW(0), -1)
         GOTO(100)
     END_IF
-    SET_INT_READ_ADDR(PTR(irai_msg_exposition))
+    SET_INT_READ_ADDR(PTR(&irai_msg_exposition))
     SET_VALUE(LW(0), LW(11))
     ADD(LW(0), -1)
     READ_INT_INDEXED(LW(1), LW(0))
@@ -461,7 +500,7 @@ EVT_BEGIN(gor_irai_tenshu_main)
         END_IF
         IF_INT_EQUAL(LW(0), 0)
             SET_VALUE(LW(10), GSW(1420))
-            SET_INT_READ_ADDR(PTR(irai_msg_hikiukechu))
+            SET_INT_READ_ADDR(PTR(&irai_msg_hikiukechu))
             ADD(LW(10), -1)
             READ_INT_INDEXED(LW(11), LW(10))
             CALL(evt_msg_print_add, 0, LW(11))
@@ -535,7 +574,7 @@ USER_FUNC(irai_cancel_func) {
     ItemType item;
 
     irai_flag_clear();
-    items = (s32*)irai_item_table[no];
+    items = irai_item_table[no];
     while (TRUE) {
         item = *items;
         if (item == -1) {
@@ -622,9 +661,9 @@ USER_FUNC(irai_init_func) {
     for (i = 0; i < 30; i++) {
     }
     for (i = 0; i < 30; i++) {
-        msg = msgSearch((const char*)irai_msg_client[i]);
+        msg = msgSearch(irai_msg_client[i]);
         strcpy(wp->client[i], msg);
-        msg = msgSearch((const char*)irai_msg_contents[i]);
+        msg = msgSearch(irai_msg_contents[i]);
         strcpy(wp->contents[i], msg);
     }
     wp->cursor = 0;
@@ -787,7 +826,7 @@ USER_FUNC(irai_main_func) {
 
 USER_FUNC(irai_check_func) {
     if (event->lwData[0] != -1) {
-        event->lwData[12] = irai_msg_kakunin[event->lwData[0] - 1];
+        event->lwData[12] = (s32)irai_msg_kakunin[event->lwData[0] - 1];
         event->lwData[11] = event->lwData[0];
     } else {
         event->lwData[12] = 0;

@@ -1203,135 +1203,260 @@ static USER_FUNC(start_game);
 
 
 static GenkiWork* get_ptr(void);
-s32 marioAttackEvent_Genki0[] = {
-    131122, -29999985, 0, 65630, (s32)genki_evt_common, 2, 1,
-};
+EVT_BEGIN(marioAttackEvent_Genki0)
+    SET_VALUE(LW(15), 0)
+    CALL_CHILD(genki_evt_common)
+    RETURN
+EVT_END()
 
-s32 marioAttackEvent_Genki1[] = {
-    131122, -29999985, 1, 65630, (s32)genki_evt_common, 2, 1,
-};
+EVT_BEGIN(marioAttackEvent_Genki1)
+    SET_VALUE(LW(15), 1)
+    CALL_CHILD(genki_evt_common)
+    RETURN
+EVT_END()
 
 #ifdef VERSION_G8ME01
-s32 genki_evt_common[] = {
-    196699, (s32)btlevtcmd_GetUnitId, -4, -29999987, 196699, (s32)btlevtcmd_GetBodyId, -29999987, -29999986,
-    262235, (s32)btlevtcmd_CheckStatus, -29999987, 27, -30000000, 131097, -30000000, 0,
-    131122, -29999987, -1, 33, 65627, (s32)btlevtcmd_reset_move_color_lv_all, 131163, (s32)btlevtcmd_CommandPayWeaponCost,
-    -2, 110, 196699, (s32)main_genki, -29999987, -29999985, 112, 65630,
-    (s32)sac_start_camera_evt, 65546, 500, 65627, (s32)sac_enemy_slide_go, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_BTL_SAC_START1", -250000000, 0, -250000000, 65630, (s32)sac_mario_item_on_evt, 65546, 500,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START2", -250000000, 0, -29999989, 131096,
-    -29999985, 0, 65627, (s32)star_appear, 32, 65627, (s32)star_stone_appear, 33,
-    110, 65630, (s32)sac_start_stardust, 112, 65545, 100, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_BTL_SAC_HEART_SHOOT1", -250000000, 0, -29999990, 131163, (s32)evt_snd_sfxoff, -29999989,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 65545, 40, 65630, (s32)sac_mario_item_on_end_evt,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42, 196699, (s32)btlevtcmd_SetMoveSpeed, -2,
-    -229996928, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 524379,
-    (s32)btlevtcmd_MovePosition, -2, -75, -29999999, -29999998, 0, -1, 0,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_I_Y", 65545, 40, 131163,
-    (s32)evt_snd_sfxoff, -29999990, 65627, (s32)sac_ac_help_on, 65627, (s32)start_game, 65627, (s32)wait_game_end,
-    65627, (s32)sac_ac_help_off, 262235, (s32)get_score, -29999990, -29999989, -29999988, 65545,
-    70, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42, 327771, (s32)btlevtcmd_GetHomePos,
-    -2, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229996928,
-    524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, -1,
-    0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 43, 65627, (s32)status_on,
-    196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2,
-    -1, 196699, (s32)evt_btl_camera_set_zoom, 0, 200, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0,
-    2, 196699, (s32)evt_btl_camera_set_zoomSpeedLv, 0, 2, 131122, -29999985, -29999990,
-    131125, -29999985, -29999989, 131125, -29999985, -29999988, 131101, -29999985,
-    1, 65627, (s32)sac_wao, 33, 131097, -29999987, -1, 196699,
-    (s32)evt_snd_sfxon, (s32)"SFX_HP_RECOVER_SHINE2", 0, 131122, -29999991, -2, 65630, (s32)status_recover_evt,
-    262235, (s32)btlevtcmd_RecoverHp, -2, 1, -29999990, 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 983131, (s32)evt_eff, (s32)"", (s32)"stardust", 2,
-    -30000000, -29999999, -29999998, 50, 50, 50, 100, 0,
-    0, 0, 0, 131122, -29999991, -29999987, 65630, (s32)status_recover_evt,
-    131163, (s32)btlevtcmd_StartWaitEvent, -29999987, 262235, (s32)btlevtcmd_RecoverHp, -29999987, -29999986, -29999989,
-    327771, (s32)btlevtcmd_GetPos, -29999987, -30000000, -29999999, -29999998, 983131, (s32)evt_eff,
-    (s32)"", (s32)"stardust", 2, -30000000, -29999999, -29999998, 50, 50,
-    50, 100, 0, 0, 0, 0, 262235, (s32)btlevtcmd_RecoverFp,
-    -2, 1, -29999988, 32, 196699, (s32)evt_snd_sfxon, (s32)"SFX_HP_RECOVER_SHINE2", 0,
-    131122, -29999991, -2, 65630, (s32)status_recover_evt, 262235, (s32)btlevtcmd_RecoverHp, -2,
-    1, -29999990, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    983131, (s32)evt_eff, (s32)"", (s32)"stardust", 2, -30000000, -29999999, -29999998,
-    50, 50, 50, 100, 0, 0, 0, 0,
-    262235, (s32)btlevtcmd_RecoverFp, -2, 1, -29999988, 33, 65546, 1000,
-    65627, (s32)sac_enemy_slide_return, 65546, 1000, 196699, (s32)evt_btl_camera_set_mode, 0, 0,
-    65546, 1000, 65627, (s32)end_genki, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2,
-    1,
-};
+EVT_BEGIN(genki_evt_common)
+    CALL(btlevtcmd_GetUnitId, -4, LW(13))
+    CALL(btlevtcmd_GetBodyId, LW(13), LW(14))
+    CALL(btlevtcmd_CheckStatus, LW(13), 27, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        SET_VALUE(LW(13), -1)
+    END_IF
+    CALL(btlevtcmd_reset_move_color_lv_all)
+    CALL(btlevtcmd_CommandPayWeaponCost, -2)
+    BEGIN_SIBLING_EVENT
+        CALL(main_genki, LW(13), LW(15))
+    END_SIBLING_EVENT
+    CALL_CHILD(sac_start_camera_evt)
+    WAIT_MS(500)
+    CALL(sac_enemy_slide_go)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START1"), -250000000, 0, -250000000)
+    CALL_CHILD(sac_mario_item_on_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START2"), -250000000, 0, LW(11))
+    IF_INT_EQUAL(LW(15), 0)
+        CALL(star_appear)
+    ELSE
+        CALL(star_stone_appear)
+    END_IF
+    BEGIN_SIBLING_EVENT
+        CALL_CHILD(sac_start_stardust)
+    END_SIBLING_EVENT
+    WAIT_FRAMES(100)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_HEART_SHOOT1"), -250000000, 0, LW(10))
+    CALL(evt_snd_sfxoff, LW(11))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_FRAMES(40)
+    CALL_CHILD(sac_mario_item_on_end_evt)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, -2, -75, LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_I_Y"))
+    WAIT_FRAMES(40)
+    CALL(evt_snd_sfxoff, LW(10))
+    CALL(sac_ac_help_on)
+    CALL(start_game)
+    CALL(wait_game_end)
+    CALL(sac_ac_help_off)
+    CALL(get_score, LW(10), LW(11), LW(12))
+    WAIT_FRAMES(70)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 43)
+    CALL(status_on)
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_zoom, 0, 200)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoomSpeedLv, 0, 2)
+    SET_VALUE(LW(15), LW(10))
+    ADD(LW(15), LW(11))
+    ADD(LW(15), LW(12))
+    IF_INT_GREATER_OR_EQUAL(LW(15), 1)
+        CALL(sac_wao)
+    END_IF
+    IF_INT_NOT_EQUAL(LW(13), -1)
+        CALL(evt_snd_sfxon, STRING("SFX_HP_RECOVER_SHINE2"), 0)
+        SET_VALUE(LW(9), -2)
+        CALL_CHILD(status_recover_evt)
+        CALL(btlevtcmd_RecoverHp, -2, 1, LW(10))
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(evt_eff, STRING(""), STRING("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
+        SET_VALUE(LW(9), LW(13))
+        CALL_CHILD(status_recover_evt)
+        CALL(btlevtcmd_StartWaitEvent, LW(13))
+        CALL(btlevtcmd_RecoverHp, LW(13), LW(14), LW(11))
+        CALL(btlevtcmd_GetPos, LW(13), LW(0), LW(1), LW(2))
+        CALL(evt_eff, STRING(""), STRING("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
+        CALL(btlevtcmd_RecoverFp, -2, 1, LW(12))
+    ELSE
+        CALL(evt_snd_sfxon, STRING("SFX_HP_RECOVER_SHINE2"), 0)
+        SET_VALUE(LW(9), -2)
+        CALL_CHILD(status_recover_evt)
+        CALL(btlevtcmd_RecoverHp, -2, 1, LW(10))
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(evt_eff, STRING(""), STRING("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
+        CALL(btlevtcmd_RecoverFp, -2, 1, LW(12))
+    END_IF
+    WAIT_MS(1000)
+    CALL(sac_enemy_slide_return)
+    WAIT_MS(1000)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_MS(1000)
+    CALL(end_genki)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 #else
-s32 genki_evt_common[] = {
-    196699, (s32)btlevtcmd_GetUnitId, -4, -29999987, 196699, (s32)btlevtcmd_GetBodyId, -29999987, -29999986,
-    262235, (s32)btlevtcmd_CheckStatus, -29999987, 27, -30000000, 131097, -30000000, 0,
-    131122, -29999987, -1, 33, 65627, (s32)btlevtcmd_reset_move_color_lv_all, 131163, (s32)btlevtcmd_CommandPayWeaponCost,
-    -2, 110, 196699, (s32)main_genki, -29999987, -29999985, 112, 65630,
-    (s32)sac_start_camera_evt, 65546, 500, 65627, (s32)sac_enemy_slide_go, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_BTL_SAC_START1", -250000000, 0, -250000000, 65630, (s32)sac_mario_item_on_evt, 65546, 500,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START2", -250000000, 0, -29999989, 131096,
-    -29999985, 0, 65627, (s32)star_appear, 32, 65627, (s32)star_stone_appear, 33,
-    110, 65630, (s32)sac_start_stardust, 112, 65545, 100, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_BTL_SAC_HEART_SHOOT1", -250000000, 0, -29999990, 131163, (s32)evt_snd_sfxoff, -29999989,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 65545, 40, 65630, (s32)sac_mario_item_on_end_evt,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42, 196699, (s32)btlevtcmd_SetMoveSpeed, -2,
-    -229996928, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 524379,
-    (s32)btlevtcmd_MovePosition, -2, -75, -29999999, -29999998, 0, -1, 0,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_I_Y", 65545, 40, 131163,
-    (s32)evt_snd_sfxoff, -29999990, 65627, (s32)sac_ac_help_on, 65627, (s32)start_game, 65627, (s32)wait_game_end,
-    65627, (s32)sac_ac_help_off, 262235, (s32)get_score, -29999990, -29999989, -29999988, 65545,
-    70, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42, 327771, (s32)btlevtcmd_GetHomePos,
-    -2, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229996928,
-    524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, -1,
-    0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 40, 65627, (s32)status_on,
-    196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2,
-    -1, 196699, (s32)evt_btl_camera_set_zoom, 0, 200, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0,
-    2, 196699, (s32)evt_btl_camera_set_zoomSpeedLv, 0, 2, 131122, -29999985, -29999990,
-    131125, -29999985, -29999989, 131125, -29999985, -29999988, 131101, -29999985,
-    1, 65627, (s32)sac_wao, 33, 131097, -29999987, -1, 196699,
-    (s32)evt_snd_sfxon, (s32)"SFX_HP_RECOVER_SHINE2", 0, 131122, -29999991, -2, 65630, (s32)status_recover_evt,
-    262235, (s32)btlevtcmd_RecoverHp, -2, 1, -29999990, 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 983131, (s32)evt_eff, (s32)"", (s32)"stardust", 2,
-    -30000000, -29999999, -29999998, 50, 50, 50, 100, 0,
-    0, 0, 0, 131122, -29999991, -29999987, 65630, (s32)status_recover_evt,
-    131163, (s32)btlevtcmd_StartWaitEvent, -29999987, 262235, (s32)btlevtcmd_RecoverHp, -29999987, -29999986, -29999989,
-    327771, (s32)btlevtcmd_GetPos, -29999987, -30000000, -29999999, -29999998, 983131, (s32)evt_eff,
-    (s32)"", (s32)"stardust", 2, -30000000, -29999999, -29999998, 50, 50,
-    50, 100, 0, 0, 0, 0, 262235, (s32)btlevtcmd_RecoverFp,
-    -2, 1, -29999988, 32, 196699, (s32)evt_snd_sfxon, (s32)"SFX_HP_RECOVER_SHINE2", 0,
-    131122, -29999991, -2, 65630, (s32)status_recover_evt, 262235, (s32)btlevtcmd_RecoverHp, -2,
-    1, -29999990, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    983131, (s32)evt_eff, (s32)"", (s32)"stardust", 2, -30000000, -29999999, -29999998,
-    50, 50, 50, 100, 0, 0, 0, 0,
-    262235, (s32)btlevtcmd_RecoverFp, -2, 1, -29999988, 33, 65546, 1000,
-    65627, (s32)sac_enemy_slide_return, 65546, 1000, 196699, (s32)evt_btl_camera_set_mode, 0, 0,
-    65546, 1000, 65627, (s32)end_genki, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2,
-    1,
-};
+EVT_BEGIN(genki_evt_common)
+    CALL(btlevtcmd_GetUnitId, -4, LW(13))
+    CALL(btlevtcmd_GetBodyId, LW(13), LW(14))
+    CALL(btlevtcmd_CheckStatus, LW(13), 27, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        SET_VALUE(LW(13), -1)
+    END_IF
+    CALL(btlevtcmd_reset_move_color_lv_all)
+    CALL(btlevtcmd_CommandPayWeaponCost, -2)
+    BEGIN_SIBLING_EVENT
+        CALL(main_genki, LW(13), LW(15))
+    END_SIBLING_EVENT
+    CALL_CHILD(sac_start_camera_evt)
+    WAIT_MS(500)
+    CALL(sac_enemy_slide_go)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START1"), -250000000, 0, -250000000)
+    CALL_CHILD(sac_mario_item_on_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START2"), -250000000, 0, LW(11))
+    IF_INT_EQUAL(LW(15), 0)
+        CALL(star_appear)
+    ELSE
+        CALL(star_stone_appear)
+    END_IF
+    BEGIN_SIBLING_EVENT
+        CALL_CHILD(sac_start_stardust)
+    END_SIBLING_EVENT
+    WAIT_FRAMES(100)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_HEART_SHOOT1"), -250000000, 0, LW(10))
+    CALL(evt_snd_sfxoff, LW(11))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_FRAMES(40)
+    CALL_CHILD(sac_mario_item_on_end_evt)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, -2, -75, LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_I_Y"))
+    WAIT_FRAMES(40)
+    CALL(evt_snd_sfxoff, LW(10))
+    CALL(sac_ac_help_on)
+    CALL(start_game)
+    CALL(wait_game_end)
+    CALL(sac_ac_help_off)
+    CALL(get_score, LW(10), LW(11), LW(12))
+    WAIT_FRAMES(70)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+    CALL(status_on)
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_zoom, 0, 200)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoomSpeedLv, 0, 2)
+    SET_VALUE(LW(15), LW(10))
+    ADD(LW(15), LW(11))
+    ADD(LW(15), LW(12))
+    IF_INT_GREATER_OR_EQUAL(LW(15), 1)
+        CALL(sac_wao)
+    END_IF
+    IF_INT_NOT_EQUAL(LW(13), -1)
+        CALL(evt_snd_sfxon, STRING("SFX_HP_RECOVER_SHINE2"), 0)
+        SET_VALUE(LW(9), -2)
+        CALL_CHILD(status_recover_evt)
+        CALL(btlevtcmd_RecoverHp, -2, 1, LW(10))
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(evt_eff, STRING(""), STRING("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
+        SET_VALUE(LW(9), LW(13))
+        CALL_CHILD(status_recover_evt)
+        CALL(btlevtcmd_StartWaitEvent, LW(13))
+        CALL(btlevtcmd_RecoverHp, LW(13), LW(14), LW(11))
+        CALL(btlevtcmd_GetPos, LW(13), LW(0), LW(1), LW(2))
+        CALL(evt_eff, STRING(""), STRING("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
+        CALL(btlevtcmd_RecoverFp, -2, 1, LW(12))
+    ELSE
+        CALL(evt_snd_sfxon, STRING("SFX_HP_RECOVER_SHINE2"), 0)
+        SET_VALUE(LW(9), -2)
+        CALL_CHILD(status_recover_evt)
+        CALL(btlevtcmd_RecoverHp, -2, 1, LW(10))
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(evt_eff, STRING(""), STRING("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
+        CALL(btlevtcmd_RecoverFp, -2, 1, LW(12))
+    END_IF
+    WAIT_MS(1000)
+    CALL(sac_enemy_slide_return)
+    WAIT_MS(1000)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_MS(1000)
+    CALL(end_genki)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 #endif
 
-s32 status_recover_evt[] = {
-    262235, (s32)btlevtcmd_CheckStatus, -29999991, 1, -30000000, 131097, -30000000, 0,
-    393307, (s32)btlevtcmd_OnOffStatus, -29999991, 1, 0, 0, 0, 33,
-    262235, (s32)btlevtcmd_CheckStatus, -29999991, 2, -30000000, 131097, -30000000, 0,
-    393307, (s32)btlevtcmd_OnOffStatus, -29999991, 2, 0, 0, 0, 33,
-    262235, (s32)btlevtcmd_CheckStatus, -29999991, 3, -30000000, 131097, -30000000, 0,
-    393307, (s32)btlevtcmd_OnOffStatus, -29999991, 3, 0, 0, 0, 33,
-    262235, (s32)btlevtcmd_CheckStatus, -29999991, 4, -30000000, 131097, -30000000, 0,
-    393307, (s32)btlevtcmd_OnOffStatus, -29999991, 4, 0, 0, 0, 33,
-    262235, (s32)btlevtcmd_CheckStatus, -29999991, 5, -30000000, 131097, -30000000, 0,
-    393307, (s32)btlevtcmd_OnOffStatus, -29999991, 5, 0, 0, 0, 33,
-    262235, (s32)btlevtcmd_CheckStatus, -29999991, 8, -30000000, 131097, -30000000, 0,
-    393307, (s32)btlevtcmd_OnOffStatus, -29999991, 8, 0, 0, 0, 33,
-    262235, (s32)btlevtcmd_CheckStatus, -29999991, 9, -30000000, 131097, -30000000, 0,
-    393307, (s32)btlevtcmd_OnOffStatus, -29999991, 9, 0, 0, 0, 33,
-    262235, (s32)btlevtcmd_CheckStatus, -29999991, 13, -30000000, 131097, -30000000, 0,
-    393307, (s32)btlevtcmd_OnOffStatus, -29999991, 13, 0, 0, 0, 33,
-    262235, (s32)btlevtcmd_CheckStatus, -29999991, 11, -30000000, 131097, -30000000, 0,
-    393307, (s32)btlevtcmd_OnOffStatus, -29999991, 11, 0, 0, 0, 33,
-    262235, (s32)btlevtcmd_CheckStatus, -29999991, 15, -30000000, 131097, -30000000, 0,
-    393307, (s32)btlevtcmd_OnOffStatus, -29999991, 15, 0, 0, 0, 33,
-    262235, (s32)btlevtcmd_CheckStatus, -29999991, 20, -30000000, 131097, -30000000, 0,
-    393307, (s32)btlevtcmd_OnOffStatus, -29999991, 20, 0, 0, 0, 33,
-    65627, (s32)recover_cmd_disable, 2, 1,
-};
+EVT_BEGIN(status_recover_evt)
+    CALL(btlevtcmd_CheckStatus, LW(9), 1, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), 1, 0, 0, 0)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, LW(9), 2, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), 2, 0, 0, 0)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, LW(9), 3, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), 3, 0, 0, 0)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, LW(9), 4, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), 4, 0, 0, 0)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, LW(9), 5, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), 5, 0, 0, 0)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, LW(9), 8, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), 8, 0, 0, 0)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, LW(9), 9, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), 9, 0, 0, 0)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, LW(9), 13, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), 13, 0, 0, 0)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, LW(9), 11, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), 11, 0, 0, 0)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, LW(9), 15, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), 15, 0, 0, 0)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, LW(9), 20, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), 20, 0, 0, 0)
+    END_IF
+    CALL(recover_cmd_disable)
+    RETURN
+EVT_END()
 
 
 #pragma dont_inline on

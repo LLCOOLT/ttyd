@@ -33,6 +33,7 @@ typedef struct MapObjectEntry {
         s32 typeData[4];
         u32 typeDataU[4];
         void* typeDataP[4];
+        f32 typeDataF[4];
     };
     s32 unk1B0;                  // 0x1B0
     s32 unk1B4;                  // 0x1B4
@@ -46,7 +47,7 @@ typedef struct MapObjectEntry {
     s32 hitFlag;                  // 0x1E0
     s32 flagVar;                  // 0x1E4
     GXTexObj paperTexObj;        // 0x1E8
-    void* paperTexData;                // 0x208, texture data for paperTexObj
+    struct smartEntry* paperTexData;   // 0x208, texture data for paperTexObj
     Mtx paperTexMtx;             // 0x20C
 } MapObjectEntry;
 

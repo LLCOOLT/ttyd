@@ -18,6 +18,7 @@
 #include "evt/evt_damage.h"
 #include "las.h"
 #include "libc_decls.h"
+#include "driver/hitdrv.h"
 
 typedef struct FirebarBall { s32 pose; Vec pos; } FirebarBall;
 typedef struct FirebarSetup { u8 type; u8 count; u8 field_0x2[2]; Vec pos; f32 spacing; f32 field_0x14; f32 speed; void* callback; f32 field_0x20; f32 radius; } FirebarSetup;
@@ -61,78 +62,58 @@ void _firebar_rot(FirebarWork* wp);
 s32 _firebar_hitCheck2(FirebarWork* wp);
 s32 _firebar_hitCheck(FirebarWork* wp, FirebarBall* ball);
 
-__declspec(section ".data") u64 fd_las_04_negone_one_374;
-__declspec(section ".data") s32 fd_las_04_neg_one_382[1];
-__declspec(section ".data") s32 fd_las_04___local_PI_383[1];
-__declspec(section ".data") s32 fd_las_04___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_las_04_one_negone_373;
-__declspec(section ".data") s32 fd_las_04___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_las_04_one_381[1];
-__declspec(section ".data") u64 fd_las_04_negone_one_360;
-__declspec(section ".data") s32 fd_las_04_neg_one_365[1];
-__declspec(section ".data") s32 fd_las_04___local_PI_366[1];
-__declspec(section ".data") s32 fd_las_04___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_las_04_one_negone_359;
-__declspec(section ".data") s32 fd_las_04___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_las_04_one_364[1];
+__declspec(section ".data") f32 fd_las_04_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_04_neg_one_382;
+__declspec(section ".data") f32 fd_las_04___local_PI_383;
+__declspec(section ".data") f32 fd_las_04___local_3PIO2_385;
+__declspec(section ".data") f32 fd_las_04_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_04___local_PIO2_384;
+__declspec(section ".data") f32 fd_las_04_one_381;
+__declspec(section ".data") f32 fd_las_04_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_04_neg_one_365;
+__declspec(section ".data") f32 fd_las_04___local_PI_366;
+__declspec(section ".data") f32 fd_las_04___local_3PIO2_368;
+__declspec(section ".data") f32 fd_las_04_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_04___local_PIO2_367;
+__declspec(section ".data") f32 fd_las_04_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static s32 e_door_close[22];
 static s32 e_door_open[22];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 s32 firebar_coin[68];
-s32 firebardesc[70];
+FirebarSetup firebardesc[7];
 s32 firebar_evt[102];
-static s32 dmgRetPoint[16];
+static HitDamageReturn dmgRetPoint[4];
 s32 las_04_init_evt[55];
 
-__declspec(section ".data") u64 fd_las_04_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_04_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_04___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_04___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_04_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_04___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_04_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_04_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_las_04_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_04_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_04___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_04___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_04_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_04___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_04_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_04_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -166,13 +147,44 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65542, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"las_03", (s32)"e_bero_1", 327685, (s32)w_door_close, (s32)w_door_open, (s32)"e_bero",
-    65542, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"las_05", (s32)"w_bero", 327685, (s32)e_door_close, (s32)e_door_open, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_03", // nextMapName
+        "e_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_05", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(firebar_coin)
@@ -203,16 +215,88 @@ EVT_BEGIN(firebar_coin)
     RETURN
 EVT_END()
 
-s32 firebardesc[] = {
-    327680, -1003552768, 1117782016, -1034158080, 1103626240, 1103626240, 1025758986, (s32)firebar_cb,
-    0, 0, 327680, -1007026176, 1117782016, 1113325568, 1103626240, 1103626240,
-    -1121724662, (s32)firebar_cb, 0, 0, 327680, -1013579776, 1117782016, -1034158080,
-    1103626240, 1103626240, 1025758986, (s32)firebar_cb, 0, 0, 262144, 0,
-    1117782016, 0, 1103626240, 1103626240, 1022739087, (s32)firebar_cb, 0, 1106247680,
-    262144, 0, 1117782016, 0, 1103626240, 1103626240, 1022739087, (s32)firebar_cb,
-    1078530011, 1106247680, 17104896, 1145569280, -1054867456, -1035468800, 1103626240, 1103626240,
-    1069547520, (s32)firebar_cb, 1130430464, 0, 17104896, 1145569280, 1097859072, -1035468800,
-    1103626240, 1103626240, 1069547520, (s32)firebar_cb, 1130430464, 0,
+FirebarSetup firebardesc[] = {
+    {
+        0, // type
+        5, // count
+        {0}, // field_0x2
+        {-700.0f, 80.0f, -55.0f}, // pos
+        25.0f, // spacing
+        25.0f, // field_0x14
+        0.04f, // speed
+        firebar_cb, // callback
+        0.0f, 0.0f, // field_0x20..radius
+    },
+    {
+        0, // type
+        5, // count
+        {0}, // field_0x2
+        {-500.0f, 80.0f, 55.0f}, // pos
+        25.0f, // spacing
+        25.0f, // field_0x14
+        -0.04f, // speed
+        firebar_cb, // callback
+        0.0f, 0.0f, // field_0x20..radius
+    },
+    {
+        0, // type
+        5, // count
+        {0}, // field_0x2
+        {-300.0f, 80.0f, -55.0f}, // pos
+        25.0f, // spacing
+        25.0f, // field_0x14
+        0.04f, // speed
+        firebar_cb, // callback
+        0.0f, 0.0f, // field_0x20..radius
+    },
+    {
+        0, // type
+        4, // count
+        {0}, // field_0x2
+        {0.0f, 80.0f, 0.0f}, // pos
+        25.0f, // spacing
+        25.0f, // field_0x14
+        0.03f, // speed
+        firebar_cb, // callback
+        0.0f, // field_0x20
+        30.0f, // radius
+    },
+    {
+        0, // type
+        4, // count
+        {0}, // field_0x2
+        {0.0f, 80.0f, 0.0f}, // pos
+        25.0f, // spacing
+        25.0f, // field_0x14
+        0.03f, // speed
+        firebar_cb, // callback
+        3.1415927f, // field_0x20
+        30.0f, // radius
+    },
+    {
+        1, // type
+        5, // count
+        {0}, // field_0x2
+        {800.0f, -10.0f, -50.0f}, // pos
+        25.0f, // spacing
+        25.0f, // field_0x14
+        1.5f, // speed
+        firebar_cb, // callback
+        225.0f, // field_0x20
+        0.0f, // radius
+    },
+    {
+        1, // type
+        5, // count
+        {0}, // field_0x2
+        {800.0f, 15.0f, -50.0f}, // pos
+        25.0f, // spacing
+        25.0f, // field_0x14
+        1.5f, // speed
+        firebar_cb, // callback
+        225.0f, // field_0x20
+        0.0f, // radius
+    },
 };
 
 EVT_BEGIN(firebar_evt)
@@ -641,12 +725,12 @@ USER_FUNC(coin_entry) {
     ItemEntry* item = itemEntry(NULL, 121, 3, -1, NULL, x, y, z);
 
     itemStatusOn(item, 0x10);
-    *(f32*)((u8*)item + 0x80) = 0.8f;
-    *(f32*)((u8*)item + 0x84) = 1.0f;
-    *(s32*)((u8*)item + 0x88) = 5;
-    *(f32*)((u8*)item + 0x58) = 550.0f;
-    *(f32*)((u8*)item + 0x50) = 70.0f;
-    *(s32*)((u8*)item + 0x54) = w;
+    item->bounceFactor = 0.8f;
+    item->gravityScale = 1.0f;
+    item->maxBounces = 5;
+    item->velocityY = 550.0f;
+    item->speed = 70.0f;
+    item->direction = w;
     return EVT_RETURN_DONE;
 }
 
@@ -671,9 +755,11 @@ void firebar_cb(FirebarWork* wp, s32 type) {
     }
 }
 
-static s32 dmgRetPoint[] = {
-    (s32)"A_oti_01", 0, -998637568, 0, (s32)"A_oti_02", 0, -998637568, 0,
-    (s32)"A_oti_03", 0, -998637568, 0, 0, 0, 0, 0,
+static HitDamageReturn dmgRetPoint[] = {
+    {"A_oti_01", {0.0f, -1000.0f, 0.0f}},
+    {"A_oti_02", {0.0f, -1000.0f, 0.0f}},
+    {"A_oti_03", {0.0f, -1000.0f, 0.0f}},
+    {0},
 };
 
 EVT_BEGIN(las_04_init_evt)

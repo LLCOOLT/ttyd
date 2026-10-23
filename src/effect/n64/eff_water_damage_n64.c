@@ -30,22 +30,34 @@ typedef struct EffWaterDamageN64Work {
 } EffWaterDamageN64Work;
 
 #ifdef __MWERKS__
-static __declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 eff_water_damage_n64_negone_one_a = 0xBF8000003F800000;
-static __declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 eff_water_damage_n64_one_negone_a = 0x3F800000BF800000;
-static __declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 eff_water_damage_n64_negone_one_b = 0xBF8000003F800000;
-static __declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
-__declspec(section ".data") u64 eff_water_damage_n64_one_negone_b = 0x3F800000BF800000;
+static __declspec(section ".data") f32 negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 eff_water_damage_n64_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+static __declspec(section ".data") f32 one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 eff_water_damage_n64_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+static __declspec(section ".data") f32 negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 eff_water_damage_n64_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+static __declspec(section ".data") f32 one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 eff_water_damage_n64_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 #endif
 
-u32 size8x8_tex16x16_0_vtx[14] = { 0xFFFCFFFC, 0x00000000, 0x00000000, 0x00FF0004, 0xFFFC0000, 0x02000000, 0x000000FF,
-                                   0x00040004, 0x00000200, 0x02000000, 0x00FFFFFC, 0x00040000, 0x00000200, 0x000000FF };
-u32 size8x8_tex16x16_1_vtx[14] = { 0xFFFBFFFD, 0x00000000, 0x00000000, 0x00FF0005, 0xFFFD0000, 0x02000000, 0x000000FF,
-                                   0x00050003, 0x00000200, 0x02000000, 0x00FFFFFB, 0x00030000, 0x00000200, 0x000000FF };
-u32 size8x8_tex16x16_2_vtx[14] = { 0xFFFDFFFB, 0x00000000, 0x00000000, 0x00FF0003, 0xFFFB0000, 0x02000000, 0x000000FF,
-                                   0x00030005, 0x00000200, 0x02000000, 0x00FFFFFD, 0x00050000, 0x00000200, 0x000000FF };
+effN64Vtx size8x8_tex16x16_0_vtx[] = {
+    {-4, -4, 0, 0, 0, 0, 0, 0, 255},
+    {4, -4, 0, 512, 0, 0, 0, 0, 255},
+    {4, 4, 0, 512, 512, 0, 0, 0, 255},
+    {-4, 4, 0, 0, 512, 0, 0, 0, 255},
+};
+effN64Vtx size8x8_tex16x16_1_vtx[] = {
+    {-5, -3, 0, 0, 0, 0, 0, 0, 255},
+    {5, -3, 0, 512, 0, 0, 0, 0, 255},
+    {5, 3, 0, 512, 512, 0, 0, 0, 255},
+    {-5, 3, 0, 0, 512, 0, 0, 0, 255},
+};
+effN64Vtx size8x8_tex16x16_2_vtx[] = {
+    {-3, -5, 0, 0, 0, 0, 0, 0, 255},
+    {3, -5, 0, 512, 0, 0, 0, 0, 255},
+    {3, 5, 0, 512, 512, 0, 0, 0, 255},
+    {-3, 5, 0, 0, 512, 0, 0, 0, 255},
+};
 
 u32 water_damage_tex[32] __attribute__((aligned(32))) = {
     0x78A31427, 0x572B0B52, 0x5167133A, 0x7FDF7F2F, 0x653E32A7, 0xF5FFFF8B, 0x32670486, 0x8BFFD55E,
@@ -306,13 +318,13 @@ void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect) {
         switch (i + (gp->retraceCount >> 1) & 3) {
         case 0:
         case 2:
-            effSetVtxDescN64((effN64Vtx*)size8x8_tex16x16_0_vtx);
+            effSetVtxDescN64(size8x8_tex16x16_0_vtx);
             break;
         case 1:
-            effSetVtxDescN64((effN64Vtx*)size8x8_tex16x16_1_vtx);
+            effSetVtxDescN64(size8x8_tex16x16_1_vtx);
             break;
         case 3:
-            effSetVtxDescN64((effN64Vtx*)size8x8_tex16x16_2_vtx);
+            effSetVtxDescN64(size8x8_tex16x16_2_vtx);
             break;
         }
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
@@ -375,13 +387,13 @@ void effWaterDamageDisp2(CameraId cameraId, EffectEntry* effect) {
         switch (i + (gp->retraceCount >> 1) & 3) {
         case 0:
         case 2:
-            effSetVtxDescN64((effN64Vtx*)size8x8_tex16x16_0_vtx);
+            effSetVtxDescN64(size8x8_tex16x16_0_vtx);
             break;
         case 1:
-            effSetVtxDescN64((effN64Vtx*)size8x8_tex16x16_1_vtx);
+            effSetVtxDescN64(size8x8_tex16x16_1_vtx);
             break;
         case 3:
-            effSetVtxDescN64((effN64Vtx*)size8x8_tex16x16_2_vtx);
+            effSetVtxDescN64(size8x8_tex16x16_2_vtx);
             break;
         }
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);

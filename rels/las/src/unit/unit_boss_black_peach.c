@@ -21,6 +21,7 @@
 #include "battle/battle_event_default.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(btlevtcmd_WaitEventEnd);
 #endif
@@ -185,20 +186,20 @@ static void hand_init(void);
 static void pose_main(void);
 static void pose_init(void);
 
-__declspec(section ".data") u64 fd_boss_black_peach_negone_one_374;
-__declspec(section ".data") s32 fd_boss_black_peach_neg_one_382[1];
-__declspec(section ".data") s32 fd_boss_black_peach___local_PI_383[1];
-__declspec(section ".data") s32 fd_boss_black_peach___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_boss_black_peach_one_negone_373;
-__declspec(section ".data") s32 fd_boss_black_peach___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_boss_black_peach_one_381[1];
-__declspec(section ".data") u64 fd_boss_black_peach_negone_one_360;
-__declspec(section ".data") s32 fd_boss_black_peach_neg_one_365[1];
-__declspec(section ".data") s32 fd_boss_black_peach___local_PI_366[1];
-__declspec(section ".data") s32 fd_boss_black_peach___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_boss_black_peach_one_negone_359;
-__declspec(section ".data") s32 fd_boss_black_peach___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_boss_black_peach_one_364[1];
+__declspec(section ".data") f32 fd_boss_black_peach_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_black_peach_neg_one_382;
+__declspec(section ".data") f32 fd_boss_black_peach___local_PI_383;
+__declspec(section ".data") f32 fd_boss_black_peach___local_3PIO2_385;
+__declspec(section ".data") f32 fd_boss_black_peach_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_black_peach___local_PIO2_384;
+__declspec(section ".data") f32 fd_boss_black_peach_one_381;
+__declspec(section ".data") f32 fd_boss_black_peach_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_black_peach_neg_one_365;
+__declspec(section ".data") f32 fd_boss_black_peach___local_PI_366;
+__declspec(section ".data") f32 fd_boss_black_peach___local_3PIO2_368;
+__declspec(section ".data") f32 fd_boss_black_peach_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_black_peach___local_PIO2_367;
+__declspec(section ".data") f32 fd_boss_black_peach_one_364;
 BattleUnitKind unit_boss_black_peach;
 __declspec(section ".data") BattleUnitDefense peach_defence;
 __declspec(section ".data") BattleUnitDefenseAttr peach_defence_attr;
@@ -206,30 +207,30 @@ __declspec(section ".data") StatusVulnerability peach_regist;
 PoseTableEntry peach_pose_table[18];
 __declspec(section ".data") BattleDataEntry peach_data_table[2];
 BattleUnitKindPart peach_parts[7];
-s32 weapon_peach_black_thunder_attack[48];
-s32 weapon_peach_black_energy_attack[48];
-s32 weapon_peach_drain_attack[48];
-s32 weapon_peach_dark_drag_attack[48];
-s32 weapon_peach_dark_drag_last_attack[48];
-s32 weapon_peach_dark_charge_attack[48];
-s32 weapon_peach_black_wave_attack[48];
-s32 weapon_peach_black_sigh_attack[48];
-s32 weapon_peach_black_temptation_attack[48];
-s32 weapon_peach_black_poison_attack[48];
-s32 weapon_peach_black_press_attack[48];
-s32 weapon_peach_black_1000hand_attack[48];
+BattleWeapon weapon_peach_black_thunder_attack;
+BattleWeapon weapon_peach_black_energy_attack;
+BattleWeapon weapon_peach_drain_attack;
+BattleWeapon weapon_peach_dark_drag_attack;
+BattleWeapon weapon_peach_dark_drag_last_attack;
+BattleWeapon weapon_peach_dark_charge_attack;
+BattleWeapon weapon_peach_black_wave_attack;
+BattleWeapon weapon_peach_black_sigh_attack;
+BattleWeapon weapon_peach_black_temptation_attack;
+BattleWeapon weapon_peach_black_poison_attack;
+BattleWeapon weapon_peach_black_press_attack;
+BattleWeapon weapon_peach_black_1000hand_attack;
 BattleUnitKind unit_boss_shadow_queen;
 __declspec(section ".data") BattleUnitDefense queen_defence;
 __declspec(section ".data") BattleUnitDefenseAttr queen_defence_attr;
 __declspec(section ".data") StatusVulnerability queen_regist;
-__declspec(section ".data") s32 queen_muteki_defence[2];
-__declspec(section ".data") s32 queen_muteki_defence_attr[2];
-__declspec(section ".data") s32 queen_muteki_regist[6];
+__declspec(section ".data") BattleUnitDefense queen_muteki_defence;
+__declspec(section ".data") BattleUnitDefenseAttr queen_muteki_defence_attr;
+__declspec(section ".data") StatusVulnerability queen_muteki_regist;
 PoseTableEntry queen_pose_table[18];
-__declspec(section ".data") s32 queen_hand_pose_table[8];
+__declspec(section ".data") PoseTableEntry queen_hand_pose_table[4];
 __declspec(section ".data") BattleDataEntry queen_data_table[2];
 BattleUnitKindPart queen_parts[5];
-s32 hair_offset[36];
+f32 hair_offset[36];
 s32 shadow_queen_1000[25];
 BattleUnitKind unit_boss_shadow_hand_1;
 __declspec(section ".data") BattleUnitDefense queen_hand_1_defence;
@@ -252,10 +253,10 @@ __declspec(section ".data") StatusVulnerability queen_hand_small_regist;
 PoseTableEntry queen_hand_small_pose_table[8];
 __declspec(section ".data") BattleDataEntry queen_hand_small_data_table[2];
 BattleUnitKindPart queen_hand_small_parts[1];
-__declspec(section ".data") s32 entry_shadow_queen[12];
-__declspec(section ".data") s32 entry_shadow_hand_1[12];
-__declspec(section ".data") s32 entry_shadow_hand_2[12];
-__declspec(section ".data") s32 entry_shadow_hand_small[12];
+__declspec(section ".data") BattleUnitSetup entry_shadow_queen;
+__declspec(section ".data") BattleUnitSetup entry_shadow_hand_1;
+__declspec(section ".data") BattleUnitSetup entry_shadow_hand_2;
+__declspec(section ".data") BattleUnitSetup entry_shadow_hand_small;
 s32 peach_init_event[170];
 s32 peach_entry_event[62];
 s32 peach_damage_event[17];
@@ -315,53 +316,33 @@ s32 queen_hand_small_damage_event[48];
 s32 queen_hand_small_dead_event[32];
 __declspec(section ".data") s32 queen_hand_small_wait_event[6];
 
-__declspec(section ".data") u64 fd_boss_black_peach_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_black_peach_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_black_peach_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_black_peach_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_black_peach___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_black_peach___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_black_peach___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_black_peach___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_black_peach_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_black_peach_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_black_peach___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_black_peach___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_black_peach_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_black_peach_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_boss_black_peach_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_black_peach_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_black_peach_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_black_peach_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_black_peach___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_black_peach___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_black_peach___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_black_peach___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_black_peach_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_black_peach_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_black_peach___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_black_peach___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_black_peach_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_black_peach_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_black_peach = {
     148,
@@ -471,112 +452,501 @@ BattleUnitKindPart peach_parts[] = {
     {7, "btl_un_shadow_hand_big_2", "c_b_hand", 160.0f, 0.0f, 50.0f, 0.0f, 38.0f, 5.0f, 0.0f, 38.0f, 5.0f, 41, 61, 255, &peach_defence, &peach_defence_attr, 0x13018000, 0, peach_pose_table},
 };
 
-s32 weapon_peach_black_thunder_attack[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    7, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 67109634, 0, 71, 2047, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_peach_black_thunder_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    4, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x47, // special
+    0x7FF, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_peach_black_energy_attack[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 16793632, 268435456, 770, 0, 20615, 0, -2147475452,
-    0, 0, 0, 0, 0, 25603, 56886019, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_peach_black_energy_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1004020, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x5087, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, // burnTime..sizeChangeStrength
+    100, // atkChangeChance
+    3, // atkChangeTime
+    3, // atkChangeStrength
+    100, // defChangeChance
+    3, // defChangeTime
+    3, // defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_peach_drain_attack[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    7, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 71, 2047, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_peach_drain_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x47, // special
+    0x7FF, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_peach_dark_drag_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 71, 2047, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_peach_dark_drag_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x47, // special
+    0x7FF, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_peach_dark_drag_last_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 1770242, 0, 131151, 2047, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_peach_dark_drag_last_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, // element
+    27, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x2004F, // special
+    0x7FF, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_peach_dark_charge_attack[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 16793632, 536870912, 770, 0, 264, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 7,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_peach_dark_charge_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1004020, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x108, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    7, // chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_peach_black_wave_attack[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    7, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 71, 2047, 8196,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_peach_black_wave_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x47, // special
+    0x7FF, // counterResistFlags
+    0x2004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_peach_black_sigh_attack[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 71, 2047, 8196,
-    0, 0, 0, 0, 0, 0, 0, VERSION_PICK(1006829568, 1510146048),
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_peach_black_sigh_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x47, // special
+    0x7FF, // counterResistFlags
+    0x2004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, // atkChangeStrength..defChangeStrength
+#ifdef VERSION_G8ME01
+    90, // allergicChance
+#else
+    60, // allergicChance
+#endif
+    3, // allergicTime
+    0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
+    0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_peach_black_temptation_attack[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 71, 2047, 8196,
-    0, 0, VERSION_PICK(3277568, 4915968), 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_peach_black_temptation_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x47, // special
+    0x7FF, // counterResistFlags
+    0x2004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, // poisonStrength
+#ifdef VERSION_G8ME01
+    75, // confuseChance
+#else
+    50, // confuseChance
+#endif
+    3, // confuseTime
+    0, 0, 0, 0, 0, 0, 0, 0, // electricChance..freezeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
+    0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
+    0, 0, 0, // hpRegenStrength..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_peach_black_poison_attack[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 71, 2047, 8196,
-    0, VERSION_PICK(12810, 19210), 16777216, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_peach_black_poison_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x47, // special
+    0x7FF, // counterResistFlags
+    0x2004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, // sleepChance..dizzyTime
+#ifdef VERSION_G8ME01
+    75, // poisonChance
+#else
+    50, // poisonChance
+#endif
+    10, // poisonTime
+    1, // poisonStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // confuseChance..burnTime
+    0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
+    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
+    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_peach_black_press_attack[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    7, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 7, 2047, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_peach_black_press_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    7, // special
+    0x7FF, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_peach_black_1000hand_attack[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 553656320, 770, 0, VERSION_PICK(7, 71), 2047, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_peach_black_1000hand_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x21002000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+#ifdef VERSION_G8ME01
+    0x47, // special
+#else
+    7, // special
+#endif
+    0x7FF, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 BattleUnitKind unit_boss_shadow_queen = {
@@ -651,17 +1021,11 @@ __declspec(section ".data") BattleUnitDefenseAttr queen_defence_attr = {{0, 0, 0
 
 __declspec(section ".data") StatusVulnerability queen_regist = {30, 30, 30, 100, 30, 100, 100, 0, 100, 0, 100, 0, 100, 60, 30, 0, 0, 100, 30, 0, 0, 0};
 
-__declspec(section ".data") s32 queen_muteki_defence[] = {
-    1667457891, 1660944384,
-};
+__declspec(section ".data") BattleUnitDefense queen_muteki_defence = {{99, 99, 99, 99, 99}};
 
-__declspec(section ".data") s32 queen_muteki_defence_attr[] = {
-    33686018, 33554432,
-};
+__declspec(section ".data") BattleUnitDefenseAttr queen_muteki_defence_attr = {{2, 2, 2, 2, 2}};
 
-__declspec(section ".data") s32 queen_muteki_regist[] = {
-    0, 0, 0, 0, 0, 0,
-};
+__declspec(section ".data") StatusVulnerability queen_muteki_regist = {0};
 
 PoseTableEntry queen_pose_table[] = {
     {1, "KRT_S_1"},
@@ -684,8 +1048,11 @@ PoseTableEntry queen_pose_table[] = {
     {69, "KRT_S_1"},
 };
 
-__declspec(section ".data") s32 queen_hand_pose_table[] = {
-    28, (s32)"KRT_S_1", 31, (s32)"KRT_S_1", 39, (s32)"KRT_S_1", 69, (s32)"KRT_S_1",
+__declspec(section ".data") PoseTableEntry queen_hand_pose_table[] = {
+    {28, "KRT_S_1"},
+    {31, "KRT_S_1"},
+    {39, "KRT_S_1"},
+    {69, "KRT_S_1"},
 };
 
 __declspec(section ".data") BattleDataEntry queen_data_table[] = {
@@ -701,12 +1068,12 @@ BattleUnitKindPart queen_parts[] = {
     {5, "btl_un_shadow_queen", "c_q_kage_f", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 41, 61, 255, &queen_defence, &queen_defence_attr, 0x13018000, 0, queen_pose_table},
 };
 
-s32 hair_offset[] = {
-    -1051721728, 1115422720, 1084227584, 1113849856, -1044381696, -1038090240, -1054867456, 1114898432,
-    -1059061760, 1103101952, 1099431936, -1048576000, -1054867456, 1114636288, -1055916032, -1042808832,
-    1105723392, 1088421888, -1065353216, 1115422720, -1063256064, 1101529088, -1069547520, 1096810496,
-    -1061158912, 1115422720, 1065353216, 1102053376, -1047527424, -1047527424, -1059061760, 1114898432,
-    0, 1095761920, 0, -1045954560,
+f32 hair_offset[] = {
+    -13.0f, 63.0f, 5.0f, 57.0f, -24.0f, -40.0f, -10.0f, 61.0f,
+    -7.0f, 24.0f, 17.0f, -16.0f, -10.0f, 60.0f, -9.0f, -27.0f,
+    29.0f, 7.0f, -4.0f, 63.0f, -5.0f, 21.0f, -3.0f, 14.0f,
+    -6.0f, 63.0f, 1.0f, 22.0f, -18.0f, -18.0f, -7.0f, 61.0f,
+    0.0f, 13.0f, 0.0f, -21.0f,
 };
 
 // inline helper for pose_init: defined here so its Vec template lands at this .rodata position
@@ -1004,24 +1371,48 @@ BattleUnitKindPart queen_hand_small_parts[] = {
     {1, "btl_un_shadow_hand_small", "c_b_hand", 0.0f, 0.0f, 0.0f, 70.0f, 18.0f, 0.0f, 70.0f, 18.0f, 0.0f, 188, 40, 255, &queen_hand_small_defence, &queen_hand_small_defence_attr, 0x3008009, 0, queen_hand_small_pose_table},
 };
 
-__declspec(section ".data") s32 entry_shadow_queen[] = {
-    (s32)&unit_boss_shadow_queen, 16777216, 67108868, 1117126656, 0, 0, 0, 0,
-    0, 0, 0, 0,
+__declspec(section ".data") BattleUnitSetup entry_shadow_queen = {
+    &unit_boss_shadow_queen, // mUnitKindParams
+    1, // alliance
+    {0}, // pad_05
+    0x4000004, // attackPhase
+    {75.0f, 0.0f, 0.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
-__declspec(section ".data") s32 entry_shadow_hand_1[] = {
-    (s32)&unit_boss_shadow_hand_1, 16777216, 67108868, 1097859072, 0, -1035468800, 0, 0,
-    0, 0, 0, 0,
+__declspec(section ".data") BattleUnitSetup entry_shadow_hand_1 = {
+    &unit_boss_shadow_hand_1, // mUnitKindParams
+    1, // alliance
+    {0}, // pad_05
+    0x4000004, // attackPhase
+    {15.0f, 0.0f, -50.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
-__declspec(section ".data") s32 entry_shadow_hand_2[] = {
-    (s32)&unit_boss_shadow_hand_2, 16777216, 67108868, 1126170624, 0, 1112014848, 0, 0,
-    0, 0, 0, 0,
+__declspec(section ".data") BattleUnitSetup entry_shadow_hand_2 = {
+    &unit_boss_shadow_hand_2, // mUnitKindParams
+    1, // alliance
+    {0}, // pad_05
+    0x4000004, // attackPhase
+    {160.0f, 0.0f, 50.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
-__declspec(section ".data") s32 entry_shadow_hand_small[] = {
-    (s32)&unit_boss_shadow_hand_small, 16777216, 67108868, 1119748096, 0, 0, 0, 0,
-    0, 0, 0, 0,
+__declspec(section ".data") BattleUnitSetup entry_shadow_hand_small = {
+    &unit_boss_shadow_hand_small, // mUnitKindParams
+    1, // alliance
+    {0}, // pad_05
+    0x4000004, // attackPhase
+    {95.0f, 0.0f, 0.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
 EVT_BEGIN(peach_init_event)
@@ -1033,7 +1424,7 @@ EVT_BEGIN(peach_init_event)
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
         ELSE
-        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_queen), 0)
+        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_queen), 0)
         CALL(btlevtcmd_SetPos, -2, 0, -1000, 0)
         CALL(btlevtcmd_OnPartsAttribute, -2, 1, 50397184)
         CALL(btlevtcmd_OnAttribute, -2, 301989888)
@@ -1165,9 +1556,9 @@ EVT_BEGIN(peach_change_evt)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(2000)
-        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_1), 0)
+        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_1), 0)
         SET_VALUE(GW(8), LW(0))
-        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_2), 0)
+        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_2), 0)
         SET_VALUE(GW(9), LW(0))
     END_INLINE_EVENT
     CALL(evt_snd_bgmoff_f, 513, 2000)
@@ -1199,15 +1590,15 @@ EVT_BEGIN(peach_change_evt)
     CALL(btlevtcmd_SetPartsHomePos, -2, 2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(queen_muteki_defence))
-    CALL(btlevtcmd_SetPartsDefenceTable, GW(8), 1, PTR(queen_muteki_defence))
-    CALL(btlevtcmd_SetPartsDefenceTable, GW(9), 1, PTR(queen_muteki_defence))
-    CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(queen_muteki_defence_attr))
-    CALL(btlevtcmd_SetPartsDefenceAttrTable, GW(8), 1, PTR(queen_muteki_defence_attr))
-    CALL(btlevtcmd_SetPartsDefenceAttrTable, GW(9), 1, PTR(queen_muteki_defence_attr))
-    CALL(btlevtcmd_SetRegistStatus, -2, PTR(queen_muteki_regist))
-    CALL(btlevtcmd_SetRegistStatus, GW(8), PTR(queen_muteki_regist))
-    CALL(btlevtcmd_SetRegistStatus, GW(9), PTR(queen_muteki_regist))
+    CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&queen_muteki_defence))
+    CALL(btlevtcmd_SetPartsDefenceTable, GW(8), 1, PTR(&queen_muteki_defence))
+    CALL(btlevtcmd_SetPartsDefenceTable, GW(9), 1, PTR(&queen_muteki_defence))
+    CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(&queen_muteki_defence_attr))
+    CALL(btlevtcmd_SetPartsDefenceAttrTable, GW(8), 1, PTR(&queen_muteki_defence_attr))
+    CALL(btlevtcmd_SetPartsDefenceAttrTable, GW(9), 1, PTR(&queen_muteki_defence_attr))
+    CALL(btlevtcmd_SetRegistStatus, -2, PTR(&queen_muteki_regist))
+    CALL(btlevtcmd_SetRegistStatus, GW(8), PTR(&queen_muteki_regist))
+    CALL(btlevtcmd_SetRegistStatus, GW(9), PTR(&queen_muteki_regist))
     CALL(btlevtcmd_OffPartsAttribute, GW(8), 1, 65536)
     CALL(btlevtcmd_OffPartsAttribute, GW(9), 1, 65536)
     CALL(btlevtcmd_OffAttribute, GW(8), 33554432)
@@ -1295,9 +1686,9 @@ EVT_BEGIN(peach_change_evt)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(2000)
-        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_1), 0)
+        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_1), 0)
         SET_VALUE(GW(8), LW(0))
-        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_2), 0)
+        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_2), 0)
         SET_VALUE(GW(9), LW(0))
     END_INLINE_EVENT
     CALL(evt_snd_bgmoff_f, 513, 2000)
@@ -1329,15 +1720,15 @@ EVT_BEGIN(peach_change_evt)
     CALL(btlevtcmd_SetPartsHomePos, -2, 2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(queen_muteki_defence))
-    CALL(btlevtcmd_SetPartsDefenceTable, GW(8), 1, PTR(queen_muteki_defence))
-    CALL(btlevtcmd_SetPartsDefenceTable, GW(9), 1, PTR(queen_muteki_defence))
-    CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(queen_muteki_defence_attr))
-    CALL(btlevtcmd_SetPartsDefenceAttrTable, GW(8), 1, PTR(queen_muteki_defence_attr))
-    CALL(btlevtcmd_SetPartsDefenceAttrTable, GW(9), 1, PTR(queen_muteki_defence_attr))
-    CALL(btlevtcmd_SetRegistStatus, -2, PTR(queen_muteki_regist))
-    CALL(btlevtcmd_SetRegistStatus, GW(8), PTR(queen_muteki_regist))
-    CALL(btlevtcmd_SetRegistStatus, GW(9), PTR(queen_muteki_regist))
+    CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&queen_muteki_defence))
+    CALL(btlevtcmd_SetPartsDefenceTable, GW(8), 1, PTR(&queen_muteki_defence))
+    CALL(btlevtcmd_SetPartsDefenceTable, GW(9), 1, PTR(&queen_muteki_defence))
+    CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(&queen_muteki_defence_attr))
+    CALL(btlevtcmd_SetPartsDefenceAttrTable, GW(8), 1, PTR(&queen_muteki_defence_attr))
+    CALL(btlevtcmd_SetPartsDefenceAttrTable, GW(9), 1, PTR(&queen_muteki_defence_attr))
+    CALL(btlevtcmd_SetRegistStatus, -2, PTR(&queen_muteki_regist))
+    CALL(btlevtcmd_SetRegistStatus, GW(8), PTR(&queen_muteki_regist))
+    CALL(btlevtcmd_SetRegistStatus, GW(9), PTR(&queen_muteki_regist))
     CALL(btlevtcmd_OffPartsAttribute, GW(8), 1, 65536)
     CALL(btlevtcmd_OffPartsAttribute, GW(9), 1, 65536)
     CALL(btlevtcmd_OffAttribute, GW(8), 33554432)
@@ -1423,8 +1814,8 @@ EVT_END()
 
 EVT_BEGIN(peack_attack_black_thunder)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_black_thunder_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_black_thunder_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_thunder_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_thunder_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
@@ -1432,14 +1823,14 @@ EVT_BEGIN(peack_attack_black_thunder)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_black_thunder_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_thunder_attack))
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_1"))
     WAIT_MS(500)
     WAIT_MS(700)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(queen_thunder, LW(0), LW(1), LW(2))
     WAIT_MS(80)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_thunder_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_thunder_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1464,10 +1855,10 @@ EVT_BEGIN(peack_attack_black_thunder)
     LABEL(90)
     GOTO(95)
     LABEL(91)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_black_thunder_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_thunder_attack))
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_thunder_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_thunder_attack), 256, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_thunder_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_thunder_attack), 256, LW(5))
     LABEL(95)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -1503,15 +1894,15 @@ EVT_BEGIN(peack_attack_black_energy)
     CALL(evt_eff, STRING(""), STRING("charge"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 60, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_DARK_POWER1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(1000)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_black_energy_attack))
-    CALL(btlevtcmd_CheckDamage, -2, -2, 1, PTR(weapon_peach_black_energy_attack), 256, LW(5))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_energy_attack))
+    CALL(btlevtcmd_CheckDamage, -2, -2, 1, PTR(&weapon_peach_black_energy_attack), 256, LW(5))
     RETURN
 EVT_END()
 
 EVT_BEGIN(peack_attack_dark_drag)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_dark_drag_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_dark_drag_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
@@ -1519,7 +1910,7 @@ EVT_BEGIN(peack_attack_dark_drag)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_dark_drag_attack))
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
     WAIT_MS(200)
     BEGIN_INLINE_EVENT
@@ -1567,7 +1958,7 @@ EVT_BEGIN(peack_attack_dark_drag)
     CALL(evt_eff, STRING("m_h_s2"), STRING("mist2"), 0, -100, 15, 0, 100, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_eff, STRING("m_h_s3"), STRING("mist2"), 0, -100, 15, 0, 100, 0, -1, 0, 0, 0, 0, 0)
     WAIT_MS(1250)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_dark_drag_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1596,19 +1987,19 @@ EVT_BEGIN(peack_attack_dark_drag)
     CALL(evt_eff_softdelete, STRING("m_h_s3"))
     GOTO(95)
     LABEL(91)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_dark_drag_attack))
     CALL(battle_evt_majo_disp_off, LW(3), LW(4), 0, 0)
     CALL(btlevtcmd_SetScale, LW(3), 0, 0, 0)
     CALL(btlevtcmd_GetHomePos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_dark_drag_attack), 0, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
     WAIT_MS(750)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_dark_drag_attack), 0, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
     WAIT_MS(750)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_dark_drag_attack), 0, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
     WAIT_MS(750)
     CALL(evt_eff_softdelete, STRING("m_h_s1"))
     CALL(evt_eff_softdelete, STRING("m_h_s2"))
@@ -1617,8 +2008,8 @@ EVT_BEGIN(peack_attack_dark_drag)
     CALL(btlevtcmd_SetScale, LW(3), 1, 1, 1)
     CALL(battle_evt_majo_disp_on, LW(3), LW(4), LW(0), LW(1), LW(2), 0)
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_dark_drag_last_attack), 256, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_last_attack), 256, LW(5))
     WAIT_MS(750)
     LABEL(95)
     LABEL(98)
@@ -1646,8 +2037,8 @@ EVT_END()
 
 EVT_BEGIN(peack_attack_drain)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_drain_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_drain_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_drain_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_drain_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
@@ -1655,7 +2046,7 @@ EVT_BEGIN(peack_attack_drain)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_drain_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_drain_attack))
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
     WAIT_MS(200)
     BEGIN_INLINE_EVENT
@@ -1724,7 +2115,7 @@ EVT_BEGIN(peack_attack_drain)
         WAIT_MS(600)
     END_INLINE_EVENT
     WAIT_MS(2000)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_drain_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_drain_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1749,9 +2140,9 @@ EVT_BEGIN(peack_attack_drain)
     LABEL(90)
     GOTO(95)
     LABEL(91)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_drain_attack))
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_drain_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_drain_attack), 256, LW(5))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_drain_attack))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_drain_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_drain_attack), 256, LW(5))
     CALL(btlevtcmd_GetHpDamage, LW(3), LW(0))
     CALL(btlevtcmd_RecoverHp, -2, 1, LW(0))
     CALL(btlevtcmd_GetPos, -2, LW(5), LW(6), LW(7))
@@ -1848,9 +2239,9 @@ EVT_BEGIN(queen_init_event)
     SET_VALUE(GW(12), 300)
     SET_VALUE(GW(18), 0)
     CALL(queen_kankyaku_delete_evt)
-    CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_1), 0)
+    CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_1), 0)
     SET_VALUE(GW(8), LW(0))
-    CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_2), 0)
+    CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_2), 0)
     SET_VALUE(GW(9), LW(0))
     CALL(btlevtcmd_GetUnitId, -2, LW(0))
     SET_VALUE(GW(13), LW(0))
@@ -1968,7 +2359,7 @@ EVT_BEGIN(queen_change_hand_small_evt)
     END_INLINE_EVENT
     WAIT_MS(300)
     SET_VALUE(GF(0), 0)
-    CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_small), 0)
+    CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_small), 0)
     SET_VALUE(GW(10), LW(0))
     LOOP(0)
         IF_INT_EQUAL(GF(0), 1)
@@ -2001,9 +2392,9 @@ EVT_BEGIN(queen_change_hand_big_evt)
     END_INLINE_EVENT
     WAIT_MS(300)
     SET_VALUE(GF(0), 0)
-    CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_1), 0)
+    CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_1), 0)
     SET_VALUE(GW(8), LW(0))
-    CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_2), 0)
+    CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_2), 0)
     SET_VALUE(GW(9), LW(0))
     CALL(btlevtcmd_OffPartsAttribute, GW(8), 1, 65536)
     CALL(btlevtcmd_OffPartsAttribute, GW(9), 1, 65536)
@@ -2034,14 +2425,14 @@ EVT_BEGIN(queen_hand_big_life_check_evt)
     SET_VALUE(GF(0), 1)
     IF_INT_EQUAL(GW(8), -1)
         SET_VALUE(GF(0), 0)
-        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_1), 0)
+        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_1), 0)
         SET_VALUE(GW(8), LW(0))
         CALL(btlevtcmd_OffPartsAttribute, GW(8), 1, 65536)
         CALL(btlevtcmd_OffAttribute, GW(8), 33554432)
     END_IF
     IF_INT_EQUAL(GW(9), -1)
         SET_VALUE(GF(0), 0)
-        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_2), 0)
+        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_2), 0)
         SET_VALUE(GW(9), LW(0))
         CALL(btlevtcmd_OffPartsAttribute, GW(9), 1, 65536)
         CALL(btlevtcmd_OffAttribute, GW(9), 33554432)
@@ -2065,7 +2456,7 @@ EVT_BEGIN(queen_hand_small_life_check_evt)
         RETURN
     END_IF
     SET_VALUE(GF(0), 0)
-    CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_small), 0)
+    CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_small), 0)
     SET_VALUE(GW(10), LW(0))
     LOOP(0)
         IF_INT_EQUAL(GF(0), 1)
@@ -2096,7 +2487,7 @@ EVT_BEGIN(queen_hp_drain_evt)
         END_IF
     END_INLINE_EVENT
     IF_INT_EQUAL(GW(10), -1)
-        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_small), 0)
+        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_small), 0)
         SET_VALUE(GW(10), LW(0))
         WAIT_MS(1000)
     END_IF
@@ -2344,8 +2735,8 @@ EVT_END()
 
 EVT_BEGIN(queen_attack_black_thunder)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_black_thunder_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_black_thunder_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_thunder_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_thunder_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
@@ -2353,7 +2744,7 @@ EVT_BEGIN(queen_attack_black_thunder)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_black_thunder_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_thunder_attack))
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_1"))
     CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_1"))
     WAIT_MS(500)
@@ -2368,7 +2759,7 @@ EVT_BEGIN(queen_attack_black_thunder)
     CALL(queen_thunder, LW(0), LW(1), LW(2))
     WAIT_MS(80)
     CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_thunder_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_thunder_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -2393,10 +2784,10 @@ EVT_BEGIN(queen_attack_black_thunder)
     LABEL(90)
     GOTO(95)
     LABEL(91)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_black_thunder_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_thunder_attack))
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_thunder_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_thunder_attack), 256, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_thunder_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_thunder_attack), 256, LW(5))
     LABEL(95)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -2410,7 +2801,7 @@ EVT_BEGIN(queen_attack_charge)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_dark_charge_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_dark_charge_attack))
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -2445,15 +2836,15 @@ EVT_BEGIN(queen_attack_charge)
     IF_INT_NOT_EQUAL(GW(9), -1)
         CALL(btlevtcmd_AnimeChangePose, GW(9), 1, STRING("KRT_S_1"))
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, -2, 1, PTR(weapon_peach_dark_charge_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, -2, -2, 1, PTR(&weapon_peach_dark_charge_attack), 256, LW(5))
     LABEL(99)
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_attack_black_wave)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_black_wave_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_black_wave_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_wave_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_wave_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
@@ -2461,16 +2852,16 @@ EVT_BEGIN(queen_attack_black_wave)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_black_wave_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_wave_attack))
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     IF_INT_NOT_EQUAL(GW(10), -1)
         CALL_CHILD(PTR(queen_hand_small_dead_event))
-        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_1), 0)
+        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_1), 0)
         SET_VALUE(GW(8), LW(0))
-        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(entry_shadow_hand_2), 0)
+        CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_2), 0)
         SET_VALUE(GW(9), LW(0))
         WAIT_MS(1500)
     END_IF
@@ -2534,10 +2925,10 @@ EVT_BEGIN(queen_attack_black_wave)
     IF_INT_NOT_EQUAL(GW(9), -1)
         CALL(btlevtcmd_AnimeChangePose, GW(9), 1, STRING("KRT_S_1"))
     END_IF
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_black_wave_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_wave_attack))
     SET_VALUE(LF(0), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_wave_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_wave_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -2564,10 +2955,10 @@ EVT_BEGIN(queen_attack_black_wave)
     LABEL(91)
     CALL(evt_btl_camera_set_mode, 0, 0)
     IF_INT_EQUAL(LF(0), 0)
-        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_wave_attack))
+        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_wave_attack))
         SET_VALUE(LF(0), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_wave_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_wave_attack), 256, LW(5))
     LABEL(95)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -2623,15 +3014,15 @@ EVT_BEGIN(queen_attack_black_energy)
     CALL(evt_eff, STRING(""), STRING("charge"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 60, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_DARK_POWER1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(1000)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_black_energy_attack))
-    CALL(btlevtcmd_CheckDamage, -2, -2, 1, PTR(weapon_peach_black_energy_attack), 256, LW(5))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_energy_attack))
+    CALL(btlevtcmd_CheckDamage, -2, -2, 1, PTR(&weapon_peach_black_energy_attack), 256, LW(5))
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_attack_bress1)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_black_sigh_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_black_sigh_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_sigh_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_sigh_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
@@ -2639,7 +3030,7 @@ EVT_BEGIN(queen_attack_bress1)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_black_sigh_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_sigh_attack))
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_1"))
     CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_1"))
     WAIT_MS(500)
@@ -2662,10 +3053,10 @@ EVT_BEGIN(queen_attack_bress1)
     CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A2_3"))
     WAIT_MS(80)
     CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_black_sigh_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_sigh_attack))
     SET_VALUE(LF(0), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_sigh_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_sigh_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -2692,10 +3083,10 @@ EVT_BEGIN(queen_attack_bress1)
     LABEL(91)
     CALL(evt_btl_camera_set_mode, 0, 0)
     IF_INT_EQUAL(LF(0), 0)
-        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_sigh_attack))
+        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_sigh_attack))
         SET_VALUE(LF(0), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_sigh_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_sigh_attack), 256, LW(5))
     LABEL(95)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -2710,8 +3101,8 @@ EVT_END()
 
 EVT_BEGIN(queen_attack_bress2)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_black_temptation_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_black_temptation_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_temptation_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_temptation_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
@@ -2719,7 +3110,7 @@ EVT_BEGIN(queen_attack_bress2)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_black_temptation_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_temptation_attack))
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_1"))
     CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_1"))
     WAIT_MS(500)
@@ -2742,10 +3133,10 @@ EVT_BEGIN(queen_attack_bress2)
     CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A2_3"))
     WAIT_MS(80)
     CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_black_temptation_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_temptation_attack))
     SET_VALUE(LF(0), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_temptation_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_temptation_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -2772,10 +3163,10 @@ EVT_BEGIN(queen_attack_bress2)
     LABEL(91)
     CALL(evt_btl_camera_set_mode, 0, 0)
     IF_INT_EQUAL(LF(0), 0)
-        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_temptation_attack))
+        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_temptation_attack))
         SET_VALUE(LF(0), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_temptation_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_temptation_attack), 256, LW(5))
     LABEL(95)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -2790,8 +3181,8 @@ EVT_END()
 
 EVT_BEGIN(queen_attack_bress3)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_black_poison_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_black_poison_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_poison_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_poison_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
@@ -2799,7 +3190,7 @@ EVT_BEGIN(queen_attack_bress3)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_black_poison_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_poison_attack))
     WAIT_MS(200)
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_1"))
     CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_1"))
@@ -2823,10 +3214,10 @@ EVT_BEGIN(queen_attack_bress3)
     CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A2_3"))
     WAIT_MS(80)
     CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_black_poison_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_poison_attack))
     SET_VALUE(LF(0), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_poison_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_poison_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -2853,10 +3244,10 @@ EVT_BEGIN(queen_attack_bress3)
     LABEL(91)
     CALL(evt_btl_camera_set_mode, 0, 0)
     IF_INT_EQUAL(LF(0), 0)
-        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_poison_attack))
+        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_poison_attack))
         SET_VALUE(LF(0), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_poison_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_poison_attack), 256, LW(5))
     LABEL(95)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -3171,9 +3562,9 @@ EVT_BEGIN(queen_hand_1_init_event)
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING("m_h_1"), STRING("mist2"), 0, LW(0), 15, LW(2), 50, 0, -1, 0, 0, 0, 0, 0)
     IF_INT_EQUAL(GW(11), 0)
-        CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(queen_muteki_defence))
-        CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(queen_muteki_defence_attr))
-        CALL(btlevtcmd_SetRegistStatus, -2, PTR(queen_muteki_regist))
+        CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&queen_muteki_defence))
+        CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(&queen_muteki_defence_attr))
+        CALL(btlevtcmd_SetRegistStatus, -2, PTR(&queen_muteki_regist))
     END_IF
     CALL(btlevtcmd_OffPartsAttribute, -2, 1, 65536)
     CALL(btlevtcmd_OffAttribute, -2, 33554432)
@@ -3184,8 +3575,8 @@ EVT_END()
 
 EVT_BEGIN(queen_hand_1_press_attack)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_black_press_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_black_press_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_press_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_press_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
@@ -3193,7 +3584,7 @@ EVT_BEGIN(queen_hand_1_press_attack)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_black_press_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_press_attack))
     CALL(evt_eff_softdelete, LW(10))
     SET_VALUE(LW(0), 255)
     LOOP(15)
@@ -3226,7 +3617,7 @@ EVT_BEGIN(queen_hand_1_press_attack)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_HAND_UP1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(1100)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 15, 0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_press_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_press_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -3251,10 +3642,10 @@ EVT_BEGIN(queen_hand_1_press_attack)
     LABEL(90)
     GOTO(95)
     LABEL(91)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_black_press_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_press_attack))
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_press_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_press_attack), 256, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_press_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_press_attack), 256, LW(5))
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     LABEL(98)
@@ -3284,8 +3675,8 @@ EVT_END()
 
 EVT_BEGIN(queen_hand_1_drain_attack)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_drain_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_drain_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_drain_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_drain_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
@@ -3293,7 +3684,7 @@ EVT_BEGIN(queen_hand_1_drain_attack)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_drain_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_drain_attack))
     CALL(evt_eff_softdelete, LW(10))
     SET_VALUE(LW(0), 255)
     LOOP(15)
@@ -3335,7 +3726,7 @@ EVT_BEGIN(queen_hand_1_drain_attack)
         WAIT_MS(600)
     END_INLINE_EVENT
     WAIT_MS(2000)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_drain_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_drain_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -3360,10 +3751,10 @@ EVT_BEGIN(queen_hand_1_drain_attack)
     LABEL(90)
     GOTO(95)
     LABEL(91)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_drain_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_drain_attack))
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_drain_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_drain_attack), 256, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_drain_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_drain_attack), 256, LW(5))
     CALL(btlevtcmd_GetHpDamage, LW(3), LW(0))
     CALL(btlevtcmd_RecoverHp, GW(13), 1, LW(0))
     CALL(btlevtcmd_GetPos, GW(13), LW(5), LW(6), LW(7))
@@ -3492,9 +3883,9 @@ EVT_BEGIN(queen_hand_2_init_event)
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING("m_h_2"), STRING("mist2"), 0, LW(0), 15, LW(2), 50, 0, -1, 0, 0, 0, 0, 0)
     IF_INT_EQUAL(GW(11), 0)
-        CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(queen_muteki_defence))
-        CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(queen_muteki_defence_attr))
-        CALL(btlevtcmd_SetRegistStatus, -2, PTR(queen_muteki_regist))
+        CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&queen_muteki_defence))
+        CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(&queen_muteki_defence_attr))
+        CALL(btlevtcmd_SetRegistStatus, -2, PTR(&queen_muteki_regist))
     END_IF
     CALL(btlevtcmd_OffPartsAttribute, -2, 1, 65536)
     CALL(btlevtcmd_OffAttribute, -2, 33554432)
@@ -3588,9 +3979,9 @@ EVT_BEGIN(queen_hand_small_init_event)
     CALL(evt_snd_sfxon, STRING("SFX_BOSS_QWEN_HAND_APPEAR1_2"), 0)
     CALL(queen_hand_small_entry_evt)
     IF_INT_EQUAL(GW(11), 0)
-        CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(queen_muteki_defence))
-        CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(queen_muteki_defence_attr))
-        CALL(btlevtcmd_SetRegistStatus, -2, PTR(queen_muteki_regist))
+        CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&queen_muteki_defence))
+        CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(&queen_muteki_defence_attr))
+        CALL(btlevtcmd_SetRegistStatus, -2, PTR(&queen_muteki_regist))
     END_IF
     CALL(btlevtcmd_StartWaitEvent, -2)
     SET_VALUE(GF(0), 1)
@@ -3599,8 +3990,8 @@ EVT_END()
 
 EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_dark_drag_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_dark_drag_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
@@ -3608,7 +3999,7 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_dark_drag_attack))
     CALL(evt_eff_softdelete, STRING("m_h_s1"))
     CALL(evt_eff_softdelete, STRING("m_h_s2"))
     CALL(evt_eff_softdelete, STRING("m_h_s3"))
@@ -3627,7 +4018,7 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(evt_eff, STRING("m_h_s2_"), STRING("mist2"), 0, -100, 15, 0, 100, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_eff, STRING("m_h_s3_"), STRING("mist2"), 0, -100, 15, 0, 100, 0, -1, 0, 0, 0, 0, 0)
     WAIT_MS(1250)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_dark_drag_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -3656,19 +4047,19 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(evt_eff_softdelete, STRING("m_h_s3_"))
     GOTO(95)
     LABEL(91)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_dark_drag_attack))
     CALL(battle_evt_majo_disp_off, LW(3), LW(4), 0, 0)
     CALL(btlevtcmd_SetScale, LW(3), 0, 0, 0)
     CALL(btlevtcmd_GetHomePos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_dark_drag_attack), 0, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
     WAIT_MS(750)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_dark_drag_attack), 0, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
     WAIT_MS(750)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_dark_drag_attack), 0, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
     WAIT_MS(750)
     CALL(evt_eff_softdelete, STRING("m_h_s1_"))
     CALL(evt_eff_softdelete, STRING("m_h_s2_"))
@@ -3677,8 +4068,8 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(btlevtcmd_SetScale, LW(3), 1, 1, 1)
     CALL(battle_evt_majo_disp_on, LW(3), LW(4), LW(0), LW(1), LW(2), 0)
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_dark_drag_last_attack), 256, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_last_attack), 256, LW(5))
     WAIT_MS(750)
     LABEL(95)
     LABEL(98)
@@ -3694,8 +4085,8 @@ EVT_END()
 #ifdef VERSION_G8ME01
 EVT_BEGIN(queen_hand_small_1000hand_attack)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_black_1000hand_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_1000hand_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(subsetevt_confuse_flustered)
@@ -3703,7 +4094,7 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_1000hand_attack))
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 180, 0)
     CALL(evt_eff_softdelete, STRING("m_h_s1"))
     CALL(evt_eff_softdelete, STRING("m_h_s2"))
@@ -3713,7 +4104,7 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
         CALL(queen_hand_small_1000hand_1_evt)
     END_INLINE_EVENT
     WAIT_MS(400)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_dark_drag_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -3750,18 +4141,18 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
     WAIT_MS(1000)
     GOTO(95)
     LABEL(91)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_1000hand_attack), 0, LW(5))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
     WAIT_MS(500)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_1000hand_attack), 0, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
     WAIT_MS(500)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_1000hand_attack), 0, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
     WAIT_MS(500)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_1000hand_attack), 256, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 256, LW(5))
     WAIT_MS(500)
     WAIT_MS(1000)
     GOTO(98)
@@ -3781,8 +4172,8 @@ EVT_END()
 #else
 EVT_BEGIN(queen_hand_small_1000hand_attack)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_peach_black_1000hand_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_1000hand_attack), LW(3), LW(4))
     CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
@@ -3790,7 +4181,7 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
     END_IF
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_1000hand_attack))
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 180, 0)
     CALL(evt_eff_softdelete, STRING("m_h_s1"))
     CALL(evt_eff_softdelete, STRING("m_h_s2"))
@@ -3800,7 +4191,7 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
         CALL(queen_hand_small_1000hand_1_evt)
     END_INLINE_EVENT
     WAIT_MS(400)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_dark_drag_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -3837,18 +4228,18 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
     WAIT_MS(1000)
     GOTO(95)
     LABEL(91)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_1000hand_attack), 0, LW(5))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
     WAIT_MS(500)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_1000hand_attack), 0, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
     WAIT_MS(500)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_1000hand_attack), 0, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
     WAIT_MS(500)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_peach_black_1000hand_attack), 256, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 256, LW(5))
     WAIT_MS(500)
     WAIT_MS(1000)
     GOTO(98)
@@ -4876,7 +5267,7 @@ USER_FUNC(make_pattern) {
     animPoseSetAnim(npc->poseId, "KRT_S_1", TRUE);
     animPoseGetAnimPosePtr(npc->poseId);
     data = animPoseGetAnimDataPtr(npc->poseId);
-    for (i = 0; i < (s32)(*(f32**)((u8*)data + 0x24))[2]; i += 3, d++) {
+    for (i = 0; i < (s32)(data->unk24)[2]; i += 3, d++) {
         d->name = "c_s_hand";
         d->anim = "KRT_S_1";
         d->rate = 3.0f * i;

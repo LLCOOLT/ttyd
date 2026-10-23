@@ -155,7 +155,7 @@ USER_FUNC(evt_party_force_reset_outofscreen) {
 		if (marioChkInScreen((s32)sx, (s32)sy)) {
 			break;
 		}
-		ang = angleABf(p->position.x, p->position.z, PF(mw, 0x8C), PF(mw, 0x94));
+		ang = angleABf(p->position.x, p->position.z, ((MarioWork*)mw)->position.x, ((MarioWork*)mw)->position.z);
 		movePos(&p->position.x, &p->position.z, 1.0f, ang);
 		h = 100.0f;
 		from = p->position;
@@ -163,7 +163,7 @@ USER_FUNC(evt_party_force_reset_outofscreen) {
 		if (partyHitCheck(p, &from, &dir, &out1, &out2, &h) != NULL) {
 			p->position.y = out1.y;
 		} else {
-			p->position.y = PF(mw, 0x90);
+			p->position.y = ((MarioWork*)mw)->position.y;
 		}
 	}
 	return EVT_RETURN_DONE;
@@ -201,7 +201,7 @@ USER_FUNC(evt_party_set_hosei_xyz) {
 		return EVT_RETURN_DONE;
 	}
 	p->field_AC = evtGetFloat(event, args[1]);
-	PF(p, 0xB0) = evtGetFloat(event, args[2]);
+	p->unkB0 = evtGetFloat(event, args[2]);
 	p->field_B4 = evtGetFloat(event, args[3]);
 	return EVT_RETURN_DONE;
 }
@@ -291,9 +291,9 @@ USER_FUNC(evt_party_set_dir_npc) {
 		if (npc == NULL) {
 			return EVT_RETURN_DONE;
 		}
-		x = PF(npc, 0x8C);
-		z = PF(npc, 0x94);
-		camYaw = PF(camGetPtr(4), 0x114);
+		x = npc->position.x;
+		z = npc->position.z;
+		camYaw = camGetPtr(4)->viewYaw;
 		a = revise360(angleABf(p->position.x, p->position.z, x, z) - camYaw);
 		p->displayDirectionTarget = (a < 180.0f) ? 180.0f : 0.0f;
 		p->targetDir = a;
@@ -310,7 +310,7 @@ USER_FUNC(evt_party_set_dir_pos) {
 	}
 	x = evtGetValue(event, args[1]);
 	z = evtGetValue(event, args[2]);
-	camYaw = PF(camGetPtr(4), 0x114);
+	camYaw = camGetPtr(4)->viewYaw;
 	a = revise360(angleABf(p->position.x, p->position.z, x, z) - camYaw);
 	p->displayDirectionTarget = (a < 180.0f) ? 180.0f : 0.0f;
 	p->targetDir = a;
@@ -489,34 +489,34 @@ USER_FUNC(evt_party_jump_pos) {
 		}
 		g = (dy + dy) / (half * half - half);
 		p->velY = g * half;
-		PF(p, 0x174) = -g;
+		p->work.common.accelY = -g;
 		event->userdata[2] = (s32)(0.5f + half);
 		event->userdata3 = 1;
 	case 1:
-		movePos((f32*)((u8*)p + 0x58), (f32*)((u8*)p + 0x60), p->moveSpeed, p->targetDir);
+		movePos(&p->position.x, &p->position.z, p->moveSpeed, p->targetDir);
 		p->position.y += p->velY;
-		p->velY += PF(p, 0x174);
+		p->velY += p->work.common.accelY;
 		if (--event->userdata[2] <= 0) {
 			half = 0.5f * ff;
 			dy = y - p->position.y;
 			p->velY = 0.0f;
-			PF(p, 0x174) = (dy + dy) / (half * half - half);
+			p->work.common.accelY = (dy + dy) / (half * half - half);
 			p->gravity = 0.0f;
 			event->userdata[2] = (s32)(0.5f + half);
 			event->userdata3 = 2;
 		}
 		break;
 	case 2:
-		movePos((f32*)((u8*)p + 0x58), (f32*)((u8*)p + 0x60), p->moveSpeed, p->targetDir);
-		p->velY += PF(p, 0x174);
+		movePos(&p->position.x, &p->position.z, p->moveSpeed, p->targetDir);
+		p->velY += p->work.common.accelY;
 		mode = 0;
 		ff = p->velY;
 		{
 			void* hit = partySearchGround(p, __fabsf(ff), __fabsf(ff));
-			if (hit != NULL && p->position.y + ff <= PF(p, 0xE4)) {
+			if (hit != NULL && p->position.y + ff <= p->unkE4) {
 				PU(p, 0x138) = (u32)hit;
 				mode = 1;
-				p->position.y = PF(p, 0xE4);
+				p->position.y = p->unkE4;
 				p->flags &= ~0x70;
 			}
 		}
@@ -528,7 +528,7 @@ USER_FUNC(evt_party_jump_pos) {
 		if (--event->userdata[2] <= 0) {
 			partyChgPoseId(p, 1);
 			p->gravity = 0.0f;
-			PF(p, 0x174) = 0.0f;
+			p->work.common.accelY = 0.0f;
 			p->moveSpeed = 0.0f;
 			partyRestoreRunMode(p);
 			return EVT_RETURN_YIELD;
@@ -571,7 +571,7 @@ USER_FUNC(evt_party_set_homing_dist) {
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
 	}
-	PF(p, 0x40) = evtGetValue(event, args[1]);
+	p->unk40 = evtGetValue(event, args[1]);
 	return EVT_RETURN_DONE;
 }
 

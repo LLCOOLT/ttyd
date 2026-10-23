@@ -244,7 +244,7 @@ void effNiceMain(EffectEntry* effect) {
 		case 4:
 		case 5:
 		case 6:
-			len = *(f32*)((u8*)*(void**)((u8*)data + 0x24) + 8);
+			len = *(f32*)((u8*)(void*)data->unk24 + 8);
 			{
 			f32 tbl[7][6] = {
 				{ 32.0f, 34.0f, 34.0f, 34.0f, 34.0f, 36.0f },
@@ -269,7 +269,7 @@ void effNiceMain(EffectEntry* effect) {
 		switch (type) {
 		case 0:
 		case 1: {
-			len = *(f32*)((u8*)*(void**)((u8*)data + 0x24) + 8);
+			len = *(f32*)((u8*)(void*)data->unk24 + 8);
 			start = ((u32)gp->language == 0) ? 32.0f : 34.0f;
 			if (pose->localFrame > start) {
 				t = 1.0f - (pose->localFrame - start) / (len - start);
@@ -280,7 +280,7 @@ void effNiceMain(EffectEntry* effect) {
 			break;
 		}
 		case 2: {
-			len = *(f32*)((u8*)*(void**)((u8*)data + 0x24) + 8);
+			len = *(f32*)((u8*)(void*)data->unk24 + 8);
 			start = ((u32)gp->language == 0) ? 35.0f : 37.0f;
 			if (pose->localFrame > start) {
 				t = 1.0f - (pose->localFrame - start) / (len - start);
@@ -291,7 +291,7 @@ void effNiceMain(EffectEntry* effect) {
 			break;
 		}
 		case 3: {
-			len = *(f32*)((u8*)*(void**)((u8*)data + 0x24) + 8);
+			len = *(f32*)((u8*)(void*)data->unk24 + 8);
 			start = ((u32)gp->language == 0) ? 45.0f : 40.0f;
 			if (pose->localFrame > start) {
 				t = 1.0f - (pose->localFrame - start) / (len - start);
@@ -302,7 +302,7 @@ void effNiceMain(EffectEntry* effect) {
 			break;
 		}
 		case 4: {
-			len = *(f32*)((u8*)*(void**)((u8*)data + 0x24) + 8);
+			len = *(f32*)((u8*)(void*)data->unk24 + 8);
 			start = ((u32)gp->language == 0) ? 48.0f : 40.0f;
 			if (pose->localFrame > start) {
 				t = 1.0f - (pose->localFrame - start) / (len - start);

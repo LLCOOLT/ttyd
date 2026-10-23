@@ -10,6 +10,8 @@
 #include "evt/evt_sub.h"
 #include "party/party_motion.h"
 #include "muj.h"
+#include "data_tables.h"
+#include "mario/mario_pouch.h"
 
 s32* command_work;
 
@@ -117,20 +119,20 @@ USER_FUNC(evt_sub_random);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(muj_npc_guruguru);
 
-__declspec(section ".data") u64 fd_muj_05_negone_one_374;
-__declspec(section ".data") s32 fd_muj_05_neg_one_382[1];
-__declspec(section ".data") s32 fd_muj_05___local_PI_383[1];
-__declspec(section ".data") s32 fd_muj_05___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_muj_05_one_negone_373;
-__declspec(section ".data") s32 fd_muj_05___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_muj_05_one_381[1];
-__declspec(section ".data") u64 fd_muj_05_negone_one_360;
-__declspec(section ".data") s32 fd_muj_05_neg_one_365[1];
-__declspec(section ".data") s32 fd_muj_05___local_PI_366[1];
-__declspec(section ".data") s32 fd_muj_05___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_muj_05_one_negone_359;
-__declspec(section ".data") s32 fd_muj_05___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_muj_05_one_364[1];
+__declspec(section ".data") f32 fd_muj_05_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_05_neg_one_382;
+__declspec(section ".data") f32 fd_muj_05___local_PI_383;
+__declspec(section ".data") f32 fd_muj_05___local_3PIO2_385;
+__declspec(section ".data") f32 fd_muj_05_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_05___local_PIO2_384;
+__declspec(section ".data") f32 fd_muj_05_one_381;
+__declspec(section ".data") f32 fd_muj_05_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_05_neg_one_365;
+__declspec(section ".data") f32 fd_muj_05___local_PI_366;
+__declspec(section ".data") f32 fd_muj_05___local_3PIO2_368;
+__declspec(section ".data") f32 fd_muj_05_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_05___local_PIO2_367;
+__declspec(section ".data") f32 fd_muj_05_one_364;
 s32 sanders_rotate[28];
 s32 sanders_nakama_sub[13];
 s32 sanders_nakama[173];
@@ -143,9 +145,9 @@ static s32 marco_talk[146];
 static __declspec(section ".data") s32 erumosu_regl[4];
 s32 erumosu_a_dead[23];
 __declspec(section ".data") s32 erumosu_b_dead[12];
-static s32 npcEnt[115];
-s32 npcEnt_after[69];
-static s32 bero_entry_data[45];
+static NpcSetupInfo npcEnt[5];
+NpcSetupInfo npcEnt_after[3];
+static BeroEntry bero_entry_data[3];
 s32 hammer_sub[27];
 __declspec(section ".data") s32 hammer_event[10];
 s32 sanders_kyushutsu_sub[250];
@@ -179,8 +181,8 @@ s32 muj_05_first[26];
 s32 yure_yashi_ha1[180];
 s32 yure_yashi[88];
 static s32 evt_kusa_1[20];
-static s32 tree_tbl[36];
-static s32 kusa_tbl[32];
+static TreeAccess tree_tbl[6];
+static KusaAccess kusa_tbl[8];
 s32 muj_05_init_evt[146];
 
 USER_FUNC(evt_dokuroiwa_command_check) {
@@ -227,53 +229,33 @@ USER_FUNC(evt_dokuroiwa_command_init) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_muj_05_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_05_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_05_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj_05___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj_05___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj_05___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj_05___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_05_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj_05___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj_05___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_05_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_05_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_muj_05_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_05_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_05_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj_05___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj_05___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj_05___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj_05___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_05_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj_05___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj_05___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_05_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_05_one_364 = 1.0f;
 
 EVT_BEGIN(sanders_rotate)
     CALL(evt_sub_intpl_msec_init, 0, LW(1), LW(2), LW(3))
@@ -367,7 +349,7 @@ static EVT_BEGIN(sanders_init)
 EVT_END()
 
 static __declspec(section ".data") s32 itemsel_table01[] = {
-    70, -1,
+    ITEM_CHUCKOLA_COLA, -1,
 };
 
 EVT_BEGIN(sanders_talk_sub)
@@ -526,43 +508,130 @@ __declspec(section ".data") EVT_BEGIN(erumosu_b_dead)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 1536, 0, (s32)sanders_init, 0, (s32)sanders_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52",
-    1536, 0, (s32)marco_init, 0, (s32)marco_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"エルモス１"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x82\x50", 1544,
-    0, (s32)npc_init_evt, (s32)erumosu_regl, 0, (s32)erumosu_a_dead, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    1065353216, 1065353216, 1065353216, 1065353216, 7, (s32)/*"エルモス２"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x82\x51", 1544, 0,
-    (s32)npc_init_evt, (s32)erumosu_regl, 0, (s32)erumosu_b_dead, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 1065353216,
-    1065353216, 1065353216, 1065353216, 7, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", // name
+        0x600, // flags
+        0, // reactionFlags
+        sanders_init, // initEvent
+        NULL, // regularEvent
+        sanders_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", // name
+        0x600, // flags
+        0, // reactionFlags
+        marco_init, // initEvent
+        NULL, // regularEvent
+        marco_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"エルモス１"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x82\x50", // name
+        0x608, // flags
+        0, // reactionFlags
+        npc_init_evt, // initEvent
+        erumosu_regl, // regularEvent
+        NULL, // talkEvent
+        erumosu_a_dead, // deadEvent
+        NULL, NULL, NULL, NULL, 0, // findEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        1.0f, // searchRange
+        1.0f, // searchAngle
+        1.0f, // homingRange
+        1.0f, // homingAngle
+        7, // battleInfoId
+    },
+    {
+        /*"エルモス２"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x82\x51", // name
+        0x608, // flags
+        0, // reactionFlags
+        npc_init_evt, // initEvent
+        erumosu_regl, // regularEvent
+        NULL, // talkEvent
+        erumosu_b_dead, // deadEvent
+        NULL, NULL, NULL, NULL, 0, // findEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        1.0f, // searchRange
+        1.0f, // searchAngle
+        1.0f, // homingRange
+        1.0f, // homingAngle
+        7, // battleInfoId
+    },
+    {0},
 };
 
-s32 npcEnt_after[] = {
-    (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 1536, 0, (s32)sanders_init, 0, (s32)sanders_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52",
-    1536, 0, (s32)marco_init, 0, (s32)marco_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+NpcSetupInfo npcEnt_after[] = {
+    {
+        /*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", // name
+        0x600, // flags
+        0, // reactionFlags
+        sanders_init, // initEvent
+        NULL, // regularEvent
+        sanders_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", // name
+        0x600, // flags
+        0, // reactionFlags
+        marco_init, // initEvent
+        NULL, // regularEvent
+        marco_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"muj_04", (s32)"e_bero", 65537, 0, 0, (s32)"e_bero",
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"dou_00", (s32)"w_bero", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"muj_04", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_00", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(hammer_sub)
@@ -773,7 +842,7 @@ __declspec(section ".data") s32 command_seikai[] = {
 };
 
 static __declspec(section ".data") s32 itemsel_table[] = {
-    71, -1,
+    ITEM_SKULL_GEM, -1,
 };
 
 EVT_BEGIN(dokuroiwa_touch)
@@ -1328,40 +1397,70 @@ static EVT_BEGIN(evt_kusa_1)
     RETURN
 EVT_END()
 
-static s32 tree_tbl[] = {
-    5, (s32)"A_treeA_01", (s32)"treeA_01_m", (s32)"treeA_01_ha", 0, 0, 5, (s32)"A_treeA_02",
-    (s32)"treeA_02_m", (s32)"treeA_02_ha", 0, 0, 5, (s32)"A_treeA_03", (s32)"treeA_03_m", (s32)"treeA_03_ha",
-    0, 0, 5, (s32)"A_treeA_04", (s32)"treeA_04_m", (s32)"treeA_04_ha", 0, 0,
-    5, (s32)"A_treeB_03", (s32)"treeB_03_m", (s32)"treeB_03_ha", 0, 0, 7, 0,
-    0, 0, 0, 0,
+static TreeAccess tree_tbl[] = {
+    {5, "A_treeA_01", "treeA_01_m", "treeA_01_ha", 0, NULL},
+    {5, "A_treeA_02", "treeA_02_m", "treeA_02_ha", 0, NULL},
+    {5, "A_treeA_03", "treeA_03_m", "treeA_03_ha", 0, NULL},
+    {5, "A_treeA_04", "treeA_04_m", "treeA_04_ha", 0, NULL},
+    {5, "A_treeB_03", "treeB_03_m", "treeB_03_ha", 0, NULL},
+    {7, NULL, NULL, NULL, 0, NULL},
 };
 
-static s32 kusa_tbl[] = {
-    1, (s32)"A_kuwa_move_01", (s32)"S_kuwa_move_01", (s32)evt_kusa_1, 1, (s32)"A_kuwa_move_02", (s32)"S_kuwa_move_02", 0,
-    1, (s32)"A_kuwa_move_03", (s32)"S_kuwa_move_03", 0, 1, (s32)"A_kuwa_move_04", (s32)"S_kuwa_move_04", 0,
-    1, (s32)"A_kuwa_move_05", (s32)"S_kuwa_move_05", 0, 1, (s32)"A_kuwa_move_06", (s32)"S_kuwa_move_06", 0,
-    1, (s32)"A_kuwa_move_07", (s32)"S_kuwa_move_07", 0, 4, 0, 0, 0,
+static KusaAccess kusa_tbl[] = {
+    {1, "A_kuwa_move_01", "S_kuwa_move_01", evt_kusa_1},
+    {1, "A_kuwa_move_02", "S_kuwa_move_02", NULL},
+    {1, "A_kuwa_move_03", "S_kuwa_move_03", NULL},
+    {1, "A_kuwa_move_04", "S_kuwa_move_04", NULL},
+    {1, "A_kuwa_move_05", "S_kuwa_move_05", NULL},
+    {1, "A_kuwa_move_06", "S_kuwa_move_06", NULL},
+    {1, "A_kuwa_move_07", "S_kuwa_move_07", NULL},
+    {4, NULL, NULL, NULL},
 };
 
-s32 muj_05_init_evt[] = {
-    65570, -170000000, 65572, 234, 196699, (s32)evt_snd_bgmon, 512, (s32)"BGM_EVT_DANGER4",
-    196699, (s32)evt_snd_envon, 272, (s32)"ENV_STG5_MUJ7", 65572, 238, 131163, (s32)evt_snd_bgmoff,
-    512, 196699, (s32)evt_snd_envon, 272, (s32)"ENV_STG5_MUJ7", 42, 196699, (s32)evt_snd_bgmon,
-    512, (s32)"BGM_STG5_MUJ1", 196699, (s32)evt_snd_envon, 272, (s32)"ENV_STG5_MUJ7", 49, 131122,
-    -30000000, (s32)bero_entry_data, 65627, (s32)evt_bero_get_info, 65630, (s32)evt_bero_info_run, 131096, -129996863,
-    0, 131163, (s32)evt_npc_setup, (s32)npcEnt, 32, 131163, (s32)evt_npc_setup, (s32)npcEnt_after,
-    33, 458843, (s32)evt_npc_sound_data_set, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", (s32)"SFX_STG5_MARCO_MOVE1L", (s32)"SFX_STG5_MARCO_MOVE1R", -250000000, -250000000,
-    -250000000, 262235, (s32)evt_map_playanim, (s32)"S_mizu", 1, 0, 65628, (s32)hammer_event,
-    65570, -170000000, 65572, 234, 131096, -129996864, 0, 65628,
-    (s32)muj_05_first, 33, 65628, (s32)sanders_kyushutsu, 65628, (s32)yure_yashi, 65572, 240,
-    65628, (s32)marco_and_jewel, 49, 65628, (s32)dokuroiwa_init, 131101, -170000000, 274,
-    589915, (s32)evt_item_entry, (s32)"item00", 73, -250, 0, -110, 0,
-    -129996857, 0, 33, 983131, (s32)evt_eff64, (s32)"sunlight", (s32)"sunlight_n64", 1,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 524379, (s32)evt_mobj_recovery_blk, (s32)"mobj_recover", 12, 125,
-    60, -90, 0, 0, 589915, (s32)evt_item_entry, (s32)"item_01", 125,
-    395, -15, 120, 16, -129994357, 0, 131122, -30000000,
-    (s32)tree_tbl, 65630, (s32)evt_sub_tree_access_entry, 131122, -30000000, (s32)kusa_tbl, 65630, (s32)evt_sub_kusa_access_entry,
-    2, 1,
-};
+EVT_BEGIN(muj_05_init_evt)
+    SWITCH(GSW(0))
+        CASE_EQUAL(234)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG5_MUJ7"))
+        CASE_EQUAL(238)
+        CALL(evt_snd_bgmoff, 512)
+        CALL(evt_snd_envon, 272, STRING("ENV_STG5_MUJ7"))
+        CASE_DEFAULT
+        CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_MUJ1"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG5_MUJ7"))
+    END_SWITCH
+    SET_VALUE(LW(0), PTR(bero_entry_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(evt_bero_info_run)
+    IF_INT_EQUAL(GSWF(3137), 0)
+        CALL(evt_npc_setup, PTR(npcEnt))
+    ELSE
+        CALL(evt_npc_setup, PTR(npcEnt_after))
+    END_IF
+    CALL(evt_npc_sound_data_set, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("SFX_STG5_MARCO_MOVE1L"), STRING("SFX_STG5_MARCO_MOVE1R"), -250000000, -250000000, -250000000)
+    CALL(evt_map_playanim, STRING("S_mizu"), 1, 0)
+    SPAWN_EVENT(hammer_event)
+    SWITCH(GSW(0))
+        CASE_EQUAL(234)
+        IF_INT_EQUAL(GSWF(3136), 0)
+            SPAWN_EVENT(muj_05_first)
+        END_IF
+        SPAWN_EVENT(sanders_kyushutsu)
+        SPAWN_EVENT(yure_yashi)
+        CASE_EQUAL(240)
+        SPAWN_EVENT(marco_and_jewel)
+    END_SWITCH
+    SPAWN_EVENT(dokuroiwa_init)
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 274)
+        CALL(evt_item_entry, STRING("item00"), 73, -250, 0, -110, 0, GSWF(3143), 0)
+    END_IF
+    CALL(evt_eff64, STRING("sunlight"), STRING("sunlight_n64"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 12, 125, 60, -90, 0, 0)
+    CALL(evt_item_entry, STRING("item_01"), 125, 395, -15, 120, 16, GSWF(5643), 0)
+    SET_VALUE(LW(0), PTR(tree_tbl))
+    CALL_CHILD(evt_sub_tree_access_entry)
+    SET_VALUE(LW(0), PTR(kusa_tbl))
+    CALL_CHILD(evt_sub_kusa_access_entry)
+    RETURN
+EVT_END()
 

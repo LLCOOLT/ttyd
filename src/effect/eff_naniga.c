@@ -14,6 +14,7 @@
 #include <dolphin/mtx.h>
 #include "icon_ids.h"
 #include "evt/evt_snd.h"
+#include "evt/evt_cmd.h"
 
 extern ItemData itemDataTable[];
 void effKemuTestDrawCam(EffectEntry* effect, s32 camera);
@@ -44,11 +45,14 @@ void effNanigaDisp(CameraId cameraId, EffectEntry* effect);
 void effNanigaDisp2(CameraId cameraId, EffectEntry* effect);
 void effNanigaDisp3(CameraId cameraId, EffectEntry* effect);
 
-static s32 sound_evt[] = {
-    0x0006005B, (s32)evt_snd_sfxon_3d, (s32)"SFX_ITEM_WHAT3", 0xFE363C80, 0xFE363C81, 0xFE363C82, 0x00000000, 0x0001000A, 0x00000341,
-    0x0006005B, (s32)evt_snd_sfxon_3d, (s32)"SFX_ITEM_WHAT4", 0xFE363C80, 0xFE363C81, 0xFE363C82, 0x00000000, 0x0001000A, 0x00000341,
-    0x0006005B, (s32)evt_snd_sfxon_3d, (s32)"SFX_ITEM_WHAT5", 0xFE363C80, 0xFE363C81, 0xFE363C82, 0x00000000, 0x00000002, 0x00000001,
-};
+static EVT_BEGIN(sound_evt)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_WHAT3"), 4264967296, 4264967297, 4264967298, 0)
+    WAIT_MS(833)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_WHAT4"), 4264967296, 4264967297, 4264967298, 0)
+    WAIT_MS(833)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_WHAT5"), 4264967296, 4264967297, 4264967298, 0)
+    RETURN
+EVT_END()
 
 EffectEntry* effNanigaEntry(s32 type, f32 x, f32 y, f32 z, s32* list, s32 item) {
     EffectEntry* effect;

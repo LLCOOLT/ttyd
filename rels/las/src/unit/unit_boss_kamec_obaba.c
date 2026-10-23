@@ -12,6 +12,7 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_sub.h"
+#include "battle/battle_database_common.h"
 
 EffectEntry* effStardustEntry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 width, f32 height, s32 time);
 EffectEntry* effMagic1N64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5, f32 arg6, f32 arg7);
@@ -69,26 +70,26 @@ static USER_FUNC(eff_magic_get_posX);
 static USER_FUNC(eff_magic);
 static USER_FUNC(eff_staff);
 
-__declspec(section ".data") u64 fd_boss_kamec_obaba_negone_one_374;
-__declspec(section ".data") s32 fd_boss_kamec_obaba_neg_one_382[1];
-__declspec(section ".data") s32 fd_boss_kamec_obaba___local_PI_383[1];
-__declspec(section ".data") s32 fd_boss_kamec_obaba___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_boss_kamec_obaba_one_negone_373;
-__declspec(section ".data") s32 fd_boss_kamec_obaba___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_boss_kamec_obaba_one_381[1];
-__declspec(section ".data") u64 fd_boss_kamec_obaba_negone_one_360;
-__declspec(section ".data") s32 fd_boss_kamec_obaba_neg_one_365[1];
-__declspec(section ".data") s32 fd_boss_kamec_obaba___local_PI_366[1];
-__declspec(section ".data") s32 fd_boss_kamec_obaba___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_boss_kamec_obaba_one_negone_359;
-__declspec(section ".data") s32 fd_boss_kamec_obaba___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_boss_kamec_obaba_one_364[1];
-s32 weapon_kamec_obaba_attack_magic[48];
-s32 weapon_kamec_obaba_dekadeka_magic[48];
-s32 weapon_kamec_obaba_biribiri_magic[48];
-s32 weapon_kamec_obaba_katikati_magic[48];
-s32 weapon_kamec_obaba_trans_magic[48];
-s32 weapon_kamec_obaba_recover_magic[48];
+__declspec(section ".data") f32 fd_boss_kamec_obaba_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_kamec_obaba_neg_one_382;
+__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PI_383;
+__declspec(section ".data") f32 fd_boss_kamec_obaba___local_3PIO2_385;
+__declspec(section ".data") f32 fd_boss_kamec_obaba_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PIO2_384;
+__declspec(section ".data") f32 fd_boss_kamec_obaba_one_381;
+__declspec(section ".data") f32 fd_boss_kamec_obaba_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_kamec_obaba_neg_one_365;
+__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PI_366;
+__declspec(section ".data") f32 fd_boss_kamec_obaba___local_3PIO2_368;
+__declspec(section ".data") f32 fd_boss_kamec_obaba_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PIO2_367;
+__declspec(section ".data") f32 fd_boss_kamec_obaba_one_364;
+BattleWeapon weapon_kamec_obaba_attack_magic;
+BattleWeapon weapon_kamec_obaba_dekadeka_magic;
+BattleWeapon weapon_kamec_obaba_biribiri_magic;
+BattleWeapon weapon_kamec_obaba_katikati_magic;
+BattleWeapon weapon_kamec_obaba_trans_magic;
+BattleWeapon weapon_kamec_obaba_recover_magic;
 BattleUnitKind unit_boss_kamec_obaba;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -121,106 +122,255 @@ static __declspec(section ".data") s32 trans_magic_event[4];
 static s32 recover_magic_event[90];
 static __declspec(section ".data") s32 wait_event[6];
 
-__declspec(section ".data") u64 fd_boss_kamec_obaba_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_kamec_obaba_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_kamec_obaba_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_boss_kamec_obaba_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_boss_kamec_obaba___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_boss_kamec_obaba_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_boss_kamec_obaba_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_boss_kamec_obaba_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_boss_kamec_obaba_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_boss_kamec_obaba___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_boss_kamec_obaba_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_boss_kamec_obaba_one_364 = 1.0f;
+
+BattleWeapon weapon_kamec_obaba_attack_magic = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x47, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-__declspec(section ".data") s32 fd_boss_kamec_obaba___local_PI_383[] = {
-    1078530011,
+BattleWeapon weapon_kamec_obaba_dekadeka_magic = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    8, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, // burnTime..freezeTime
+    100, // sizeChangeChance
+    3, // sizeChangeTime
+    2, // sizeChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
+    0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
+    0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-__declspec(section ".data") s32 fd_boss_kamec_obaba___local_3PIO2_385[] = {
-    1083624420,
+BattleWeapon weapon_kamec_obaba_biribiri_magic = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    8, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, // poisonStrength..confuseTime
+    100, // electricChance
+    3, // electricTime
+    0, 0, 0, 0, 0, 0, 0, 0, // dodgyChance..sizeChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeStrength..allergicChance
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicTime..frightChance
+    0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
+    0, // fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-__declspec(section ".data") u64 fd_boss_kamec_obaba_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_boss_kamec_obaba___local_PIO2_384[] = {
-    1070141403,
+BattleWeapon weapon_kamec_obaba_katikati_magic = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    8, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, // atkChangeStrength
+    100, // defChangeChance
+    3, // defChangeTime
+    3, // defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-__declspec(section ".data") s32 fd_boss_kamec_obaba_one_381[] = {
-    1065353216,
+BattleWeapon weapon_kamec_obaba_trans_magic = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    8, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    100, // invisibleChance
+    3, // invisibleTime
+    0, 0, 0, 0, // hpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-__declspec(section ".data") u64 fd_boss_kamec_obaba_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_boss_kamec_obaba_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_boss_kamec_obaba___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_boss_kamec_obaba___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_boss_kamec_obaba_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_boss_kamec_obaba___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_boss_kamec_obaba_one_364[] = {
-    1065353216,
-};
-
-s32 weapon_kamec_obaba_attack_magic[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    5, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 71, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
-};
-
-s32 weapon_kamec_obaba_dekadeka_magic[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 8, 2047, -2147483648,
-    0, 0, 0, 0, 100, 50462720, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
-};
-
-s32 weapon_kamec_obaba_biribiri_magic[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 8, 2047, -2147483648,
-    0, 0, 100, 50331648, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
-};
-
-s32 weapon_kamec_obaba_katikati_magic[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 8, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 6554371, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
-};
-
-s32 weapon_kamec_obaba_trans_magic[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 8, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1677918208, 0, 0, 100, 0, 0,
-};
-
-s32 weapon_kamec_obaba_recover_magic[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 8, 2047, 5376,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_kamec_obaba_recover_magic = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    8, // special
+    0x7FF, // counterResistFlags
+    0x1500, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 BattleUnitKind unit_boss_kamec_obaba = {
@@ -407,27 +557,43 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-static s32 dmg_fall_event[] = {
-    131122, -29999990, -2, 131122, -29999989, 1, 196699, (s32)btlevtcmd_OffAttribute,
-    -2, 4, 262235, (s32)btlevtcmd_OffPartsAttribute, -2, 1, 2097152, 262235,
-    (s32)btlevtcmd_OffPartsAttribute, -2, 1, 4194304, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"D_2", 65546, 500, 262235, (s32)btlevtcmd_AnimeSetPoseTable, -2, 1, (s32)pose_table,
-    196699, (s32)btlevtcmd_SetTalkPoseType, -2, 65, 196699, (s32)btlevtcmd_SetStayPoseType, -2, 43,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 39, 107, 327771, (s32)btlevtcmd_GetPos,
-    -2, -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_SetPartsPos, -2, 2,
-    -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"H_1",
-    262235, (s32)btlevtcmd_SetAlpha, -2, 2, 255, 262235, (s32)btlevtcmd_OffPartsAttribute, -2,
-    2, 16777216, 65545, 80, 327771, (s32)evt_sub_intpl_init, 0, 255,
-    0, 30, 65541, 30, 196699, (s32)evt_sub_intpl_get_value_para, -29999999, -29999998,
-    262235, (s32)btlevtcmd_SetAlpha, -2, 2, -29999999, 65545, 1, 6,
-    262235, (s32)btlevtcmd_OnPartsAttribute, -2, 2, 16777216, 109, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_FALL1", -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetFallAccel, -2, -229998976, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, 0, -29999998, 10, -1, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_DOWN1", -250000000, 0, -250000000, 327771, (s32)btlevtcmd_SetHomePos,
-    -2, -30000000, 0, -29999998, 65546, 500, 262235, (s32)btlevtcmd_SetUnitWork,
-    -2, 0, 0, 2, 1,
-};
+static EVT_BEGIN(dmg_fall_event)
+    SET_VALUE(LW(10), -2)
+    SET_VALUE(LW(11), 1)
+    CALL(btlevtcmd_OffAttribute, -2, 4)
+    CALL(btlevtcmd_OffPartsAttribute, -2, 1, 2097152)
+    CALL(btlevtcmd_OffPartsAttribute, -2, 1, 4194304)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("D_2"))
+    WAIT_MS(500)
+    CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table))
+    CALL(btlevtcmd_SetTalkPoseType, -2, 65)
+    CALL(btlevtcmd_SetStayPoseType, -2, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 39)
+    BEGIN_INLINE_EVENT
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("H_1"))
+        CALL(btlevtcmd_SetAlpha, -2, 2, 255)
+        CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
+        WAIT_FRAMES(80)
+        CALL(evt_sub_intpl_init, 0, 255, 0, 30)
+        LOOP(30)
+            CALL(evt_sub_intpl_get_value_para, LW(1), LW(2))
+            CALL(btlevtcmd_SetAlpha, -2, 2, LW(1))
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 16777216)
+    END_INLINE_EVENT
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_FALL1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(1.0f))
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), 10, -1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_DOWN1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_SetHomePos, -2, LW(0), 0, LW(2))
+    WAIT_MS(500)
+    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(dead_event)
     DEBUG_PUT_MSG(STRING("カメックオババ　死亡"))
@@ -486,35 +652,68 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
-static s32 phase_event[] = {
-    196699, (s32)btlevtcmd_CheckPhase, -30000000, 67108865, 131096, -30000000, 0, 65540,
-    99, 33, 131163, (s32)btlevtcmd_get_turn, -30000000, 131096, -30000000, 1,
-    65540, 99, 33, 262235, (s32)btlevtcmd_CheckStatus, -2, 27, -30000000,
-    131096, -30000000, 1, 65540, 99, 33, 196699, (s32)btlevtcmd_CheckActStatus,
-    -2, -30000000, 131096, -30000000, 0, 65540, 99, 33,
-    262235, (s32)btlevtcmd_GetUnitWork, -2, 0, -30000000, 131096, -30000000, 1,
-    65540, 99, 33, 262235, (s32)btlevtcmd_AddUnitWork, -2, 2, 1,
-    262235, (s32)btlevtcmd_GetUnitWork, -2, 2, -30000000, 131098, -30000000, 3,
-    65540, 99, 33, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2, 1, 327771,
-    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetMoveSpeed, -2,
-    -229994880, 524379, (s32)btlevtcmd_MovePosition, -2, 300, -29999999, -29999998, 0,
-    -1, 0, 65545, 60, 196699, (s32)btlevtcmd_OnAttribute, -2, 4,
-    262235, (s32)btlevtcmd_OnPartsAttribute, -2, 1, 2097152, 262235, (s32)btlevtcmd_OnPartsAttribute, -2,
-    1, 4194304, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 40, 65546,
-    500, 262235, (s32)btlevtcmd_AnimeSetPoseTable, -2, 1, (s32)pose_table_sky, 196699, (s32)btlevtcmd_SetTalkPoseType,
-    -2, 65, 196699, (s32)btlevtcmd_SetStayPoseType, -2, 43, 262235, (s32)btlevtcmd_AnimeChangePoseType,
-    -2, 1, 40, 65647, -29999985, 65541, 0, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_MOVE2", -250000000, 0, -250000000, 65546, 166,
-    6, 112, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -1, 327771, (s32)btlevtcmd_GetPos,
-    -2, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_SetPos, -2, -30000000,
-    40, -29999998, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998,
-    655451, (s32)btlevtcmd_DivePosition, -2, -30000000, 40, -29999998, 60, 0,
-    4, 0, -1, 327771, (s32)btlevtcmd_SetHomePos, -2, -30000000, 40,
-    -29999998, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 69, 65631, -29999985,
-    65546, 500, 262235, (s32)btlevtcmd_SetUnitWork, -2, 0, 1, 262235,
-    (s32)btlevtcmd_SetUnitWork, -2, 1, 0, 262235, (s32)btlevtcmd_SetUnitWork, -2, 2,
-    0, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 65539, 99, 2, 1,
-};
+static EVT_BEGIN(phase_event)
+    CALL(btlevtcmd_CheckPhase, LW(0), 67108865)
+    IF_INT_EQUAL(LW(0), 0)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_get_turn, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, -2, 27, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_AddUnitWork, -2, 2, 1)
+    CALL(btlevtcmd_GetUnitWork, -2, 2, LW(0))
+    IF_INT_LESS(LW(0), 3)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_ChangeFaceDirection, -2, 1)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(5.0f))
+    CALL(btlevtcmd_MovePosition, -2, 300, LW(1), LW(2), 0, -1, 0)
+    WAIT_FRAMES(60)
+    CALL(btlevtcmd_OnAttribute, -2, 4)
+    CALL(btlevtcmd_OnPartsAttribute, -2, 1, 2097152)
+    CALL(btlevtcmd_OnPartsAttribute, -2, 1, 4194304)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+    WAIT_MS(500)
+    CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_sky))
+    CALL(btlevtcmd_SetTalkPoseType, -2, 65)
+    CALL(btlevtcmd_SetStayPoseType, -2, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+    BEGIN_SIBLING_EVENT_GET_ID(LW(15))
+        LOOP(0)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MOVE2"), -250000000, 0, -250000000)
+            WAIT_MS(166)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_ChangeFaceDirection, -2, -1)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, -2, LW(0), 40, LW(2))
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_DivePosition, -2, LW(0), 40, LW(2), 60, 0, 4, 0, -1)
+    CALL(btlevtcmd_SetHomePos, -2, LW(0), 40, LW(2))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+    DELETE_EVENT(LW(15))
+    WAIT_MS(500)
+    CALL(btlevtcmd_SetUnitWork, -2, 0, 1)
+    CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    LABEL(99)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
@@ -526,7 +725,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_get_turn, LW(0))
     DEBUG_PUT_REG(LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        SET_VALUE(LW(9), PTR(weapon_kamec_obaba_attack_magic))
+        SET_VALUE(LW(9), PTR(&weapon_kamec_obaba_attack_magic))
         CALL_CHILD(PTR(attack_magic_event))
         GOTO(99)
     END_IF
@@ -562,7 +761,7 @@ static EVT_BEGIN(attack_event)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(10), 0)
     SET_VALUE(LW(11), 0)
-    SET_VALUE(LW(9), PTR(weapon_kamec_obaba_dekadeka_magic))
+    SET_VALUE(LW(9), PTR(&weapon_kamec_obaba_dekadeka_magic))
     CALL_CHILD(PTR(magic_select_pri_obaba))
     IF_INT_NOT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckStatus, LW(3), 6, LW(0))
@@ -597,7 +796,7 @@ static EVT_BEGIN(attack_event)
     SET_VALUE(LW(1), LW(5))
     ADD(LW(1), LW(6))
     IF_INT_LESS(LW(0), LW(1))
-        SET_VALUE(LW(9), PTR(weapon_kamec_obaba_recover_magic))
+        SET_VALUE(LW(9), PTR(&weapon_kamec_obaba_recover_magic))
         CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
         CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
@@ -619,13 +818,13 @@ static EVT_BEGIN(attack_event)
     END_IF
     ADD(LW(1), LW(7))
     IF_INT_LESS(LW(0), LW(1))
-        SET_VALUE(LW(9), PTR(weapon_kamec_obaba_katikati_magic))
+        SET_VALUE(LW(9), PTR(&weapon_kamec_obaba_katikati_magic))
         CALL_CHILD(PTR(katikati_magic_event))
         GOTO(99)
     END_IF
     ADD(LW(1), LW(8))
     IF_INT_LESS(LW(0), LW(1))
-        SET_VALUE(LW(9), PTR(weapon_kamec_obaba_biribiri_magic))
+        SET_VALUE(LW(9), PTR(&weapon_kamec_obaba_biribiri_magic))
         SET_VALUE(LW(3), LW(13))
         SET_VALUE(LW(4), LW(14))
         CALL_CHILD(PTR(biribiri_magic_event))
@@ -633,7 +832,7 @@ static EVT_BEGIN(attack_event)
     END_IF
     ADD(LW(1), LW(10))
     IF_INT_LESS(LW(0), LW(1))
-        SET_VALUE(LW(9), PTR(weapon_kamec_obaba_trans_magic))
+        SET_VALUE(LW(9), PTR(&weapon_kamec_obaba_trans_magic))
         SET_VALUE(LW(3), LW(13))
         SET_VALUE(LW(4), LW(14))
         CALL_CHILD(PTR(trans_magic_event))
@@ -641,11 +840,11 @@ static EVT_BEGIN(attack_event)
     END_IF
     ADD(LW(1), LW(11))
     IF_INT_LESS(LW(0), LW(1))
-        SET_VALUE(LW(9), PTR(weapon_kamec_obaba_dekadeka_magic))
+        SET_VALUE(LW(9), PTR(&weapon_kamec_obaba_dekadeka_magic))
         CALL_CHILD(PTR(dekadeka_magic_event))
         GOTO(99)
         ELSE
-        SET_VALUE(LW(9), PTR(weapon_kamec_obaba_attack_magic))
+        SET_VALUE(LW(9), PTR(&weapon_kamec_obaba_attack_magic))
         CALL_CHILD(PTR(attack_magic_event))
         GOTO(99)
     END_IF
@@ -654,45 +853,88 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static s32 ground_magic_common_event1[] = {
-    110, 65541, 2, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC1", -250000000,
-    0, -250000000, 65545, 40, 6, 112, 110, 131163,
-    (s32)eff_staff, -2, 112, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1A",
-    65545, 60, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC4", -250000000, 0,
-    -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1B", 65545, 20,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1C", 65545, 30, 110,
-    65545, 10, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC8", -250000000, 0,
-    -250000000, 112, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1D", 65545,
-    20, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1E", 131097, -29999991,
-    (s32)weapon_kamec_obaba_attack_magic, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC2", -250000000, 0, -250000000,
-    196699, (s32)eff_magic_support, -2, 0, 33, 2, 1,
-};
+static EVT_BEGIN(ground_magic_common_event1)
+    BEGIN_SIBLING_EVENT
+        LOOP(2)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC1"), -250000000, 0, -250000000)
+            WAIT_FRAMES(40)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        CALL(eff_staff, -2)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A"))
+    WAIT_FRAMES(60)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC4"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1B"))
+    WAIT_FRAMES(20)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1C"))
+    WAIT_FRAMES(30)
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(10)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC8"), -250000000, 0, -250000000)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1D"))
+    WAIT_FRAMES(20)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1E"))
+    IF_INT_NOT_EQUAL(LW(9), PTR(&weapon_kamec_obaba_attack_magic))
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC2"), -250000000, 0, -250000000)
+        CALL(eff_magic_support, -2, 0)
+    END_IF
+    RETURN
+EVT_END()
 
-static s32 ground_magic_common_event2[] = {
-    110, 65541, 2, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC1", -250000000,
-    0, -250000000, 65545, 40, 6, 112, 110, 131163,
-    (s32)eff_staff, -2, 112, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1A",
-    65545, 60, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC6", -250000000, 0,
-    -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_2A", 65545, 40,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC7", -250000000, 0, -250000000, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_2B", 65545, 20, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"A_2C", 131097, -29999991, (s32)weapon_kamec_obaba_attack_magic, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC2", -250000000, 0, -250000000, 196699, (s32)eff_magic_support, -2,
-    1, 33, 2, 1,
-};
+static EVT_BEGIN(ground_magic_common_event2)
+    BEGIN_SIBLING_EVENT
+        LOOP(2)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC1"), -250000000, 0, -250000000)
+            WAIT_FRAMES(40)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        CALL(eff_staff, -2)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A"))
+    WAIT_FRAMES(60)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC6"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2A"))
+    WAIT_FRAMES(40)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC7"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2B"))
+    WAIT_FRAMES(20)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2C"))
+    IF_INT_NOT_EQUAL(LW(9), PTR(&weapon_kamec_obaba_attack_magic))
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC2"), -250000000, 0, -250000000)
+        CALL(eff_magic_support, -2, 1)
+    END_IF
+    RETURN
+EVT_END()
 
-static s32 sky_magic_common_event[] = {
-    110, 65541, 2, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC1", -250000000,
-    0, -250000000, 65545, 40, 6, 112, 110, 131163,
-    (s32)eff_staff, -2, 112, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_3A",
-    65545, 60, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC8", -250000000, 0,
-    -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_3B", 65545, 35,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC7", -250000000, 0, -250000000, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_3C", 65545, 15, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"A_3D", 131097, -29999991, (s32)weapon_kamec_obaba_attack_magic, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC2", -250000000, 0, -250000000, 196699, (s32)eff_magic_support, -2,
-    1, 33, 2, 1,
-};
+static EVT_BEGIN(sky_magic_common_event)
+    BEGIN_SIBLING_EVENT
+        LOOP(2)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC1"), -250000000, 0, -250000000)
+            WAIT_FRAMES(40)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        CALL(eff_staff, -2)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_3A"))
+    WAIT_FRAMES(60)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC8"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_3B"))
+    WAIT_FRAMES(35)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC7"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_3C"))
+    WAIT_FRAMES(15)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_3D"))
+    IF_INT_NOT_EQUAL(LW(9), PTR(&weapon_kamec_obaba_attack_magic))
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC2"), -250000000, 0, -250000000)
+        CALL(eff_magic_support, -2, 1)
+    END_IF
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(magic_common_event1)
     CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
@@ -732,42 +974,96 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
-static s32 attack_magic_event[] = {
-    196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000,
-    -29999991, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991, -29999997, -29999996, 131096, -29999997,
-    -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16, -30000000, 131097, -30000000,
-    0, 65630, (s32)subsetevt_confuse_flustered, 2, 33, 65540, 99, 33,
-    131163, (s32)btlevtcmd_WeaponAftereffect, -29999991, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996,
-    65627, (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991, 458843, (s32)btlevtcmd_CalculateFaceDirection,
-    -2, -1, -29999997, -29999996, 16, -29999985, 196699, (s32)btlevtcmd_ChangeFaceDirection,
-    -2, -29999985, 65630, (s32)magic_common_event1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_KAMEBABA_MAGIC3_2",
-    -250000000, 0, -250000000, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 458843,
-    (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996, -29999991, 256, -29999995, 65570,
-    -29999995, 65579, 4, 65540, 90, 46, 65572, 3,
-    65540, 90, 46, 65572, 6, 65540, 90, 65572,
-    2, 65540, 90, 65572, 1, 65540, 91, 46,
-    42, 65540, 98, 46, 65539, 90, 110, 65545,
-    1, 65541, 0, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -30000000, 131096,
-    -30000000, -1, 196699, (s32)eff_magic_get_posX, -2, -30000000, 393307, (s32)btlevtcmd_GetHitPos,
-    -29999997, -29999996, -29999994, -29999993, -29999992, 131100, -30000000, -29999994,
-    65630, (s32)start_avoid, 7, 33, 32, 196699, (s32)eff_magic_get_posX, -2,
-    -30000000, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999994, -29999993, -29999992,
-    131101, -30000000, -29999994, 65630, (s32)start_avoid, 7, 33, 33,
-    65545, 1, 6, 112, 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
-    -29999999, -29999998, 131125, -30000000, -57, 131125, -29999999, 10,
-    393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999990, -29999989, -29999988, 262235,
-    (s32)btlevtcmd_GetStageSize, -29999990, -250000000, -250000000, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -30000000,
-    131127, -29999990, -30000000, 131126, -29999989, 5, 393307, (s32)eff_magic,
-    -2, -29999990, -29999989, -29999988, 60, 65545, 60, 65540,
-    98, 65539, 91, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999,
-    -29999998, 131125, -30000000, -57, 131125, -29999999, 10, 393307,
-    (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999990, -29999989, -29999988, 393307, (s32)eff_magic,
-    -2, -29999990, -29999989, -29999988, 45, 65545, 45, 196699,
-    (s32)btlevtcmd_ResultACDefence, -29999997, -29999991, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996,
-    -29999991, 256, -29999995, 65540, 98, 65539, 98, 65545,
-    30, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 43, 65539, 99,
-    131163, (s32)btlevtcmd_ResetFaceDirection, -2, 2, 1,
-};
+static EVT_BEGIN(attack_magic_event)
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL_CHILD(magic_common_event1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KAMEBABA_MAGIC3_2"), -250000000, 0, -250000000)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        GOTO(90)
+        CASE_EQUAL(2)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+        LABEL(90)
+        BEGIN_SIBLING_EVENT
+            WAIT_FRAMES(1)
+            LOOP(0)
+                CALL(btlevtcmd_GetFaceDirection, -2, LW(0))
+                IF_INT_EQUAL(LW(0), -1)
+                    CALL(eff_magic_get_posX, -2, LW(0))
+                    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+                    IF_INT_LESS_OR_EQUAL(LW(0), LW(6))
+                        CALL_CHILD(start_avoid)
+                        BREAK_LOOP
+                    END_IF
+                ELSE
+                    CALL(eff_magic_get_posX, -2, LW(0))
+                    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+                    IF_INT_GREATER_OR_EQUAL(LW(0), LW(6))
+                        CALL_CHILD(start_avoid)
+                        BREAK_LOOP
+                    END_IF
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+        END_SIBLING_EVENT
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        ADD(LW(0), -57)
+        ADD(LW(1), 10)
+        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
+        CALL(btlevtcmd_GetStageSize, LW(10), -250000000, -250000000)
+        CALL(btlevtcmd_GetFaceDirection, -2, LW(0))
+        MULTIPLY(LW(10), LW(0))
+        SUBTRACT(LW(11), 5)
+        CALL(eff_magic, -2, LW(10), LW(11), LW(12), 60)
+        WAIT_FRAMES(60)
+        GOTO(98)
+        LABEL(91)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        ADD(LW(0), -57)
+        ADD(LW(1), 10)
+        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
+        CALL(eff_magic, -2, LW(10), LW(11), LW(12), 45)
+        WAIT_FRAMES(45)
+        CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        GOTO(98)
+        LABEL(98)
+        WAIT_FRAMES(30)
+        CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 43)
+        LABEL(99)
+        CALL(btlevtcmd_ResetFaceDirection, -2)
+        RETURN
+EVT_END()
 
 EVT_BEGIN(magic_select_pri_obaba)
     SET_VALUE(LW(5), 0)

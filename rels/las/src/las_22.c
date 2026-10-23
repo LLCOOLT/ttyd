@@ -2,6 +2,7 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "las.h"
+#include "mario/mario_pouch.h"
 
 #pragma force_active on
 
@@ -41,30 +42,30 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_get_sincos);
 USER_FUNC(evt_win_item_select);
 
-__declspec(section ".data") u64 fd_las_22_negone_one_374;
-__declspec(section ".data") s32 fd_las_22_neg_one_382[1];
-__declspec(section ".data") s32 fd_las_22___local_PI_383[1];
-__declspec(section ".data") s32 fd_las_22___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_las_22_one_negone_373;
-__declspec(section ".data") s32 fd_las_22___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_las_22_one_381[1];
-__declspec(section ".data") u64 fd_las_22_negone_one_360;
-__declspec(section ".data") s32 fd_las_22_neg_one_365[1];
-__declspec(section ".data") s32 fd_las_22___local_PI_366[1];
-__declspec(section ".data") s32 fd_las_22___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_las_22_one_negone_359;
-__declspec(section ".data") s32 fd_las_22___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_las_22_one_364[1];
+__declspec(section ".data") f32 fd_las_22_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_22_neg_one_382;
+__declspec(section ".data") f32 fd_las_22___local_PI_383;
+__declspec(section ".data") f32 fd_las_22___local_3PIO2_385;
+__declspec(section ".data") f32 fd_las_22_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_22___local_PIO2_384;
+__declspec(section ".data") f32 fd_las_22_one_381;
+__declspec(section ".data") f32 fd_las_22_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_22_neg_one_365;
+__declspec(section ".data") f32 fd_las_22___local_PI_366;
+__declspec(section ".data") f32 fd_las_22___local_3PIO2_368;
+__declspec(section ".data") f32 fd_las_22_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_22___local_PIO2_367;
+__declspec(section ".data") f32 fd_las_22_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static s32 e_door_close[22];
 static s32 e_door_open[22];
 __declspec(section ".data") s32 door_dummy[2];
-static s32 bero_entry_data[60];
-static s32 haguruma_hontai[13];
-static __declspec(section ".data") s32 haguruma_hontai2[7];
-static __declspec(section ".data") s32 haguruma_kage[11];
-static __declspec(section ".data") s32 haguruma_kage2[6];
+static BeroEntry bero_entry_data[4];
+static const char* haguruma_hontai[13];
+static __declspec(section ".data") const char* haguruma_hontai2[7];
+static __declspec(section ".data") const char* haguruma_kage[11];
+static __declspec(section ".data") const char* haguruma_kage2[6];
 static s32 haguruma_evt[194];
 s32 kaitendai_evt[312];
 static s32 dai_evt[13];
@@ -75,53 +76,33 @@ static __declspec(section ".data") s32 unlock_evt[10];
 static s32 mobj_box00[34];
 s32 las_22_init_evt[150];
 
-__declspec(section ".data") u64 fd_las_22_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_22_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_22_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_22_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_22___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_22___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_22___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_22___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_22_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_22_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_22___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_22___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_22_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_22_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_las_22_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_22_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_22_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_22_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_22___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_22___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_22___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_22___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_22_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_22_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_22___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_22___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_22_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_22_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -159,33 +140,109 @@ __declspec(section ".data") EVT_BEGIN(door_dummy)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65542, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"las_20", (s32)"e_bero", 327685, (s32)w_door_close, (s32)w_door_open, (s32)"e_bero",
-    65542, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"las_24", (s32)"w_bero", 327685, (s32)e_door_close, (s32)e_door_open, (s32)"s_bero", 0,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"las_23", (s32)"n_bero_1", 65537, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_20", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_24", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {
+        "s_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_23", // nextMapName
+        "n_bero_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-static s32 haguruma_hontai[] = {
-    (s32)"S_hgm_01a", (s32)"S_hgm_02a", (s32)"S_hgm_03a", (s32)"S_hgm_04a", (s32)"S_hgm_06a", (s32)"S_hgm_07a", (s32)"S_hgm_08a", (s32)"S_hgm_10a",
-    (s32)"S_hgm_12a", (s32)"S_hgm_14a", (s32)"S_hgm_16a", (s32)"S_hgm_19a", (s32)"S_hgm_20a",
+static const char* haguruma_hontai[] = {
+    "S_hgm_01a",
+    "S_hgm_02a",
+    "S_hgm_03a",
+    "S_hgm_04a",
+    "S_hgm_06a",
+    "S_hgm_07a",
+    "S_hgm_08a",
+    "S_hgm_10a",
+    "S_hgm_12a",
+    "S_hgm_14a",
+    "S_hgm_16a",
+    "S_hgm_19a",
+    "S_hgm_20a",
 };
 
-static __declspec(section ".data") s32 haguruma_hontai2[] = {
-    (s32)"S_hgm_05a", (s32)"S_hgm_09a", (s32)"S_hgm_11a", (s32)"S_hgm_13a", (s32)"S_hgm_15a", (s32)"S_hgm_17a", (s32)"S_hgm_18a",
+static __declspec(section ".data") const char* haguruma_hontai2[] = {
+    "S_hgm_05a",
+    "S_hgm_09a",
+    "S_hgm_11a",
+    "S_hgm_13a",
+    "S_hgm_15a",
+    "S_hgm_17a",
+    "S_hgm_18a",
 };
 
-static __declspec(section ".data") s32 haguruma_kage[] = {
-    (s32)"S_hgm_01b", (s32)"S_hgm_02b", (s32)"S_hgm_03b", (s32)"S_hgm_04b", (s32)"S_hgm_06b", (s32)"S_hgm_07b", (s32)"S_hgm_08b", (s32)"S_hgm_10b",
-    (s32)"S_hgm_12b", (s32)"S_hgm_14b", (s32)"S_hgm_16b",
+static __declspec(section ".data") const char* haguruma_kage[] = {
+    "S_hgm_01b",
+    "S_hgm_02b",
+    "S_hgm_03b",
+    "S_hgm_04b",
+    "S_hgm_06b",
+    "S_hgm_07b",
+    "S_hgm_08b",
+    "S_hgm_10b",
+    "S_hgm_12b",
+    "S_hgm_14b",
+    "S_hgm_16b",
 };
 
-static __declspec(section ".data") s32 haguruma_kage2[] = {
-    (s32)"S_hgm_05b", (s32)"S_hgm_09b", (s32)"S_hgm_11b", (s32)"S_hgm_13b", (s32)"S_hgm_15b", (s32)"S_hgm_17b",
+static __declspec(section ".data") const char* haguruma_kage2[] = {
+    "S_hgm_05b",
+    "S_hgm_09b",
+    "S_hgm_11b",
+    "S_hgm_13b",
+    "S_hgm_15b",
+    "S_hgm_17b",
 };
 
 static EVT_BEGIN(haguruma_evt)
@@ -195,22 +252,22 @@ static EVT_BEGIN(haguruma_evt)
     SET_FLOAT_VALUE(LW(3), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(4), FLOAT(0.0f))
     LOOP(0)
-        SET_INT_READ_ADDR(PTR(haguruma_hontai))
+        SET_INT_READ_ADDR(PTR(&haguruma_hontai))
         LOOP(13)
             READ_INT(LW(5))
             CALL(evt_mapobj_rotate, 0, LW(5), 0, 0, LW(0))
         END_LOOP
-        SET_INT_READ_ADDR(PTR(haguruma_kage))
+        SET_INT_READ_ADDR(PTR(&haguruma_kage))
         LOOP(11)
             READ_INT(LW(5))
             CALL(evt_mapobj_rotate, 0, LW(5), 0, 0, LW(0))
         END_LOOP
-        SET_INT_READ_ADDR(PTR(haguruma_hontai2))
+        SET_INT_READ_ADDR(PTR(&haguruma_hontai2))
         LOOP(7)
             READ_INT(LW(5))
             CALL(evt_mapobj_rotate, 0, LW(5), 0, 0, LW(1))
         END_LOOP
-        SET_INT_READ_ADDR(PTR(haguruma_kage2))
+        SET_INT_READ_ADDR(PTR(&haguruma_kage2))
         LOOP(6)
             READ_INT(LW(5))
             CALL(evt_mapobj_rotate, 0, LW(5), 0, 0, LW(1))
@@ -353,7 +410,7 @@ static EVT_BEGIN(dai_evt)
 EVT_END()
 
 static __declspec(section ".data") s32 key_tbl[] = {
-    47, -1,
+    ITEM_PALACE_KEY_0x2F, -1,
 };
 
 static __declspec(section ".data") EVT_BEGIN(key_evt)

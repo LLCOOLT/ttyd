@@ -13,6 +13,9 @@
 #include "evt/evt_sub.h"
 #include "party/party_motion.h"
 #include "gor.h"
+#include "data_tables.h"
+typedef struct SharinData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat speed; } SharinData;
+typedef struct ClankData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat x; EvtFloat y; } ClankData;
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_get_entername);
@@ -123,24 +126,24 @@ static USER_FUNC(ramp_r);
 static USER_FUNC(kpa_hikousen_yure);
 static void resha_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") u64 fd_gor_04_negone_one_374;
-__declspec(section ".data") s32 fd_gor_04_neg_one_382[1];
-__declspec(section ".data") s32 fd_gor_04___local_PI_383[1];
-__declspec(section ".data") s32 fd_gor_04___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gor_04_one_negone_373;
-__declspec(section ".data") s32 fd_gor_04___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gor_04_one_381[1];
-__declspec(section ".data") u64 fd_gor_04_negone_one_360;
-__declspec(section ".data") s32 fd_gor_04_neg_one_365[1];
-__declspec(section ".data") s32 fd_gor_04___local_PI_366[1];
-__declspec(section ".data") s32 fd_gor_04___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gor_04_one_negone_359;
-__declspec(section ".data") s32 fd_gor_04___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gor_04_one_364[1];
-static s32 sharinDt[116];
+__declspec(section ".data") f32 fd_gor_04_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gor_04_neg_one_382;
+__declspec(section ".data") f32 fd_gor_04___local_PI_383;
+__declspec(section ".data") f32 fd_gor_04___local_3PIO2_385;
+__declspec(section ".data") f32 fd_gor_04_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gor_04___local_PIO2_384;
+__declspec(section ".data") f32 fd_gor_04_one_381;
+__declspec(section ".data") f32 fd_gor_04_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gor_04_neg_one_365;
+__declspec(section ".data") f32 fd_gor_04___local_PI_366;
+__declspec(section ".data") f32 fd_gor_04___local_3PIO2_368;
+__declspec(section ".data") f32 fd_gor_04_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gor_04___local_PIO2_367;
+__declspec(section ".data") f32 fd_gor_04_one_364;
+static SharinData sharinDt[29];
 static s32 evt_sharin_main[87];
 static s32 evt_sharin[19];
-static s32 clankDt[45];
+static ClankData clankDt[9];
 static s32 evt_clank_main[104];
 static s32 evt_clank[21];
 static s32 evt_bg[81];
@@ -153,8 +156,8 @@ static s32 stop_1[90];
 static s32 stop_2[90];
 static s32 hom_10_evt_resha_stop[36];
 static s32 evt_ramp[33];
-static s32 pika_tbl[15];
-static __declspec(section ".data") s32 pika_tbl_rsh_06[10];
+static const char* pika_tbl[15];
+static __declspec(section ".data") const char* pika_tbl_rsh_06[10];
 static s32 hom_10_evt_resha_sub[102];
 static s32 hom_10_evt_resha_right[35];
 static s32 hom_10_evt_resha_left[28];
@@ -162,7 +165,7 @@ static s32 hom_10_init_evt[140];
 static s32 evt_train[284];
 s32 evt_train2[287];
 static s32 peach_mail[235];
-static s32 bero_entry_data[75];
+static BeroEntry bero_entry_data[5];
 __declspec(section ".data") s32 hikosenkakari_init[5];
 s32 hikosenkakari_init_ship[16];
 s32 hikosenkakari_talk[211];
@@ -176,12 +179,12 @@ static __declspec(section ".data") s32 baba_init[7];
 static __declspec(section ".data") s32 hkoopa_init[7];
 static s32 luigi_init[18];
 static __declspec(section ".data") s32 luigi_talk[4];
-static s32 luigiEnt[46];
+static NpcSetupInfo luigiEnt[2];
 static s32 luigi_npcEnt[30];
 __declspec(section ".data") s32 scream_init[12];
 __declspec(section ".data") s32 scream_talk[8];
-s32 screamEnt[46];
-static s32 npcEnt[161];
+NpcSetupInfo screamEnt[2];
+static NpcSetupInfo npcEnt[7];
 s32 evt_hikousen[224];
 static s32 evt_wing[97];
 s32 evt_hikousen_return[490];
@@ -192,70 +195,64 @@ s32 gor_04_init_evt[255];
 s32 gor_04_init_evt[253];
 #endif
 
-__declspec(section ".data") u64 fd_gor_04_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gor_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gor_04_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gor_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_gor_04___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gor_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gor_04___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gor_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gor_04_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gor_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gor_04___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gor_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gor_04_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gor_04_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_gor_04_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gor_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gor_04_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gor_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_gor_04___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gor_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gor_04___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gor_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gor_04_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gor_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gor_04___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gor_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gor_04_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gor_04_one_364 = 1.0f;
 
-static s32 sharinDt[] = {
-    (s32)"sha_1_1", 0, 0, -229998976, (s32)"sha_1_2", 0, 0, -229998976,
-    (s32)"sha_1_3", 2, 0, -229998976, (s32)"sha_1_4", 1, 1, -229998976,
-    (s32)"sha_1_5", 1, 1, -229998976, (s32)"sha_2_1", 0, 0, -229998976,
-    (s32)"sha_2_2", 0, 0, -229998976, (s32)"sha_2_3", 0, 0, -229998976,
-    (s32)"sha_3_1", 0, 0, -229998976, (s32)"sha_3_2", 0, 0, -229998976,
-    (s32)"sha_3_3", 0, 0, -229998976, (s32)"sha_4_1", 0, 0, -229998976,
-    (s32)"sha_4_2", 0, 0, -229998976, (s32)"sha_4_3", 0, 0, -229998976,
-    (s32)"sha_5_1", 0, 0, -229998976, (s32)"sha_5_2", 0, 0, -229998976,
-    (s32)"sha_5_3", 0, 0, -229998976, (s32)"sha_6_1", 0, 0, -229998976,
-    (s32)"sha_6_2", 0, 0, -229998976, (s32)"sha_6_3", 0, 0, -229998976,
-    (s32)"sha_1_1_c", 0, 0, -230001024, (s32)"sha_1_2_c", 0, 0, -230001024,
-    (s32)"sha_1_3_c", 2, 0, -230001024, (s32)"sha_1_4_c", 1, 1, -230001024,
-    (s32)"sha_1_5_c", 1, 1, -230001024, (s32)"sha_6_1_c", 0, 0, -229998976,
-    (s32)"sha_6_2_c", 0, 0, -229998976, (s32)"sha_6_3_c", 0, 0, -229998976,
-    0, 0, 0, 0,
+static SharinData sharinDt[] = {
+    {"sha_1_1", 0, 0, FLOAT(1.0f)},
+    {"sha_1_2", 0, 0, FLOAT(1.0f)},
+    {"sha_1_3", 2, 0, FLOAT(1.0f)},
+    {"sha_1_4", 1, 1, FLOAT(1.0f)},
+    {"sha_1_5", 1, 1, FLOAT(1.0f)},
+    {"sha_2_1", 0, 0, FLOAT(1.0f)},
+    {"sha_2_2", 0, 0, FLOAT(1.0f)},
+    {"sha_2_3", 0, 0, FLOAT(1.0f)},
+    {"sha_3_1", 0, 0, FLOAT(1.0f)},
+    {"sha_3_2", 0, 0, FLOAT(1.0f)},
+    {"sha_3_3", 0, 0, FLOAT(1.0f)},
+    {"sha_4_1", 0, 0, FLOAT(1.0f)},
+    {"sha_4_2", 0, 0, FLOAT(1.0f)},
+    {"sha_4_3", 0, 0, FLOAT(1.0f)},
+    {"sha_5_1", 0, 0, FLOAT(1.0f)},
+    {"sha_5_2", 0, 0, FLOAT(1.0f)},
+    {"sha_5_3", 0, 0, FLOAT(1.0f)},
+    {"sha_6_1", 0, 0, FLOAT(1.0f)},
+    {"sha_6_2", 0, 0, FLOAT(1.0f)},
+    {"sha_6_3", 0, 0, FLOAT(1.0f)},
+    {"sha_1_1_c", 0, 0, FLOAT(-1.0f)},
+    {"sha_1_2_c", 0, 0, FLOAT(-1.0f)},
+    {"sha_1_3_c", 2, 0, FLOAT(-1.0f)},
+    {"sha_1_4_c", 1, 1, FLOAT(-1.0f)},
+    {"sha_1_5_c", 1, 1, FLOAT(-1.0f)},
+    {"sha_6_1_c", 0, 0, FLOAT(1.0f)},
+    {"sha_6_2_c", 0, 0, FLOAT(1.0f)},
+    {"sha_6_3_c", 0, 0, FLOAT(1.0f)},
+    {0},
 };
 
 static EVT_BEGIN(evt_sharin_main)
@@ -310,13 +307,16 @@ static EVT_BEGIN(evt_sharin)
     RETURN
 EVT_END()
 
-static s32 clankDt[] = {
-    (s32)"bou_1", 0, 0, -229979520, -229998976, (s32)"bou_2", 1, 1,
-    -229983104, -229998976, (s32)"bou_3", 0, 0, -229979520, -229998976, (s32)"bou_4",
-    1, 1, -229983104, -229998976, (s32)"bou_1_c", 0, 0, -229979520,
-    -230001024, (s32)"bou_2_c", 1, 1, -229983104, -230001024, (s32)"bou_3_c", 0,
-    0, -229979520, -230001024, (s32)"bou_4_c", 1, 1, -229983104, -230001024,
-    0, 0, 0, 0, 0,
+static ClankData clankDt[] = {
+    {"bou_1", 0, 0, FLOAT(20.0f), FLOAT(1.0f)},
+    {"bou_2", 1, 1, FLOAT(16.5f), FLOAT(1.0f)},
+    {"bou_3", 0, 0, FLOAT(20.0f), FLOAT(1.0f)},
+    {"bou_4", 1, 1, FLOAT(16.5f), FLOAT(1.0f)},
+    {"bou_1_c", 0, 0, FLOAT(20.0f), FLOAT(-1.0f)},
+    {"bou_2_c", 1, 1, FLOAT(16.5f), FLOAT(-1.0f)},
+    {"bou_3_c", 0, 0, FLOAT(20.0f), FLOAT(-1.0f)},
+    {"bou_4_c", 1, 1, FLOAT(16.5f), FLOAT(-1.0f)},
+    {0},
 };
 
 static EVT_BEGIN(evt_clank_main)
@@ -760,14 +760,35 @@ static EVT_BEGIN(evt_ramp)
     RETURN
 EVT_END()
 
-static s32 pika_tbl[] = {
-    (s32)"pika_1_1", (s32)"pika_1_2", (s32)"pika_1_3", (s32)"pika_1_4", (s32)"pika_2", (s32)"pika_3", (s32)"pika_4", (s32)"pika_5",
-    (s32)"pika_6", (s32)"pika_1_1_c", (s32)"pika_1_2_c", (s32)"pika_1_3_c", (s32)"pika_1_4_c", (s32)"pika_6_c", 0,
+static const char* pika_tbl[] = {
+    "pika_1_1",
+    "pika_1_2",
+    "pika_1_3",
+    "pika_1_4",
+    "pika_2",
+    "pika_3",
+    "pika_4",
+    "pika_5",
+    "pika_6",
+    "pika_1_1_c",
+    "pika_1_2_c",
+    "pika_1_3_c",
+    "pika_1_4_c",
+    "pika_6_c",
+    NULL,
 };
 
-static __declspec(section ".data") s32 pika_tbl_rsh_06[] = {
-    (s32)"pika_1_1", (s32)"pika_1_2", (s32)"pika_1_3", (s32)"pika_1_4", (s32)"pika_2", (s32)"pika_3", (s32)"pika_4", (s32)"pika_5",
-    (s32)"pika_6", 0,
+static __declspec(section ".data") const char* pika_tbl_rsh_06[] = {
+    "pika_1_1",
+    "pika_1_2",
+    "pika_1_3",
+    "pika_1_4",
+    "pika_2",
+    "pika_3",
+    "pika_4",
+    "pika_5",
+    "pika_6",
+    NULL,
 };
 
 static EVT_BEGIN(hom_10_evt_resha_sub)
@@ -796,10 +817,10 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
     SPAWN_EVENT(PTR(evt_hoshi))
     SPAWN_EVENT(PTR(evt_ramp))
     CALL(evt_map_set_tevcallback, 1, PTR(resha_tev))
-    SET_INT_READ_ADDR(PTR(pika_tbl))
+    SET_INT_READ_ADDR(PTR(&pika_tbl))
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("rsh_06_a"))
-        SET_INT_READ_ADDR(PTR(pika_tbl_rsh_06))
+        SET_INT_READ_ADDR(PTR(&pika_tbl_rsh_06))
     END_IF
     LOOP(0)
         READ_INT(LW(0))
@@ -1111,17 +1132,74 @@ static EVT_BEGIN(peach_mail)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"s_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"gor_03", (s32)"n_bero", 65537, 0, 0, (s32)"dokan_1",
-    131072, 9, 100000, 0, 0, -1, 0, 6,
-    0, 0, (s32)"A_dokan_h00", 65537, 0, 0, (s32)"A_dokan_h00", 268566528,
-    9, 100000, 0, 0, -1, 0, 6, 0,
-    0, (s32)"dokan_1", 65537, 0, 0, (s32)"n_bero", 65544, 20000,
-    100000, 0, 0, -1, 0, -1, 0, (s32)"rsh_01_a",
-    (s32)"s_bero", 65537, (s32)"n_1_door_close", (s32)"n_1_door_open", 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "s_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gor_03", // nextMapName
+        "n_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "A_dokan_h00", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "A_dokan_h00", // hitName
+        4098, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "n_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_01_a", // nextMapName
+        "s_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"n_1_door_close", // enterAnimeArg
+        (s32)"n_1_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
 __declspec(section ".data") EVT_BEGIN(hikosenkakari_init)
@@ -1352,13 +1430,20 @@ static __declspec(section ".data") EVT_BEGIN(luigi_talk)
     RETURN
 EVT_END()
 
-static s32 luigiEnt[] = {
-    (s32)/*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", 525824, 0, (s32)luigi_init, 0, (s32)luigi_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo luigiEnt[] = {
+    {
+        /*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", // name
+        0x80600, // flags
+        0, // reactionFlags
+        luigi_init, // initEvent
+        NULL, // regularEvent
+        luigi_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static EVT_BEGIN(luigi_npcEnt)
@@ -1385,37 +1470,92 @@ __declspec(section ".data") EVT_BEGIN(scream_talk)
     RETURN
 EVT_END()
 
-s32 screamEnt[] = {
-    (s32)/*"ス・クリーミ"*/"\x83\x58\x81\x45\x83\x4E\x83\x8A\x81\x5B\x83\x7E", 525824, 0, (s32)scream_init, 0, (s32)scream_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo screamEnt[] = {
+    {
+        /*"ス・クリーミ"*/"\x83\x58\x81\x45\x83\x4E\x83\x8A\x81\x5B\x83\x7E", // name
+        0x80600, // flags
+        0, // reactionFlags
+        scream_init, // initEvent
+        NULL, // regularEvent
+        scream_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
-static s32 npcEnt[] = {
-    (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5", 525824, 0, (s32)hikosenkakari_init, 0, (s32)hikosenkakari_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"駅員"*/"\x89\x77\x88\xF5",
-    525824, 0, (s32)ekiin_init, 0, (s32)ekiin_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"ジュゲムＡ"*/"\x83\x57\x83\x85\x83\x51\x83\x80\x82\x60", 525824,
-    0, (s32)jugemu_a_init, 0, (s32)jugemu_a_talk, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"キノピオ女Ｂ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x82\x61", 525824, 0,
-    (s32)kinopiko_b_init, 0, (s32)kinopiko_b_talk, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 1536, 0, (s32)baba_init,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", 1536, 0, (s32)hkoopa_init, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5", // name
+        0x80600, // flags
+        0, // reactionFlags
+        hikosenkakari_init, // initEvent
+        NULL, // regularEvent
+        hikosenkakari_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"駅員"*/"\x89\x77\x88\xF5", // name
+        0x80600, // flags
+        0, // reactionFlags
+        ekiin_init, // initEvent
+        NULL, // regularEvent
+        ekiin_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ジュゲムＡ"*/"\x83\x57\x83\x85\x83\x51\x83\x80\x82\x60", // name
+        0x80600, // flags
+        0, // reactionFlags
+        jugemu_a_init, // initEvent
+        NULL, // regularEvent
+        jugemu_a_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"キノピオ女Ｂ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x82\x61", // name
+        0x80600, // flags
+        0, // reactionFlags
+        kinopiko_b_init, // initEvent
+        NULL, // regularEvent
+        kinopiko_b_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ババ"*/"\x83\x6F\x83\x6F", // name
+        0x600, // flags
+        0, // reactionFlags
+        baba_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", // name
+        0x600, // flags
+        0, // reactionFlags
+        hkoopa_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_hikousen)
@@ -1673,149 +1813,322 @@ EVT_BEGIN(evt_hikousen_return)
     RETURN
 EVT_END()
 
-s32 gor_04_koopa_evt[] = {
-    131163, (s32)evt_mario_key_onoff, 0, 589915, (s32)evt_cam3d_evt_set, 425, 250, 340,
-    425, 214, 112, 0, 11, 262235, (s32)evt_mario_set_pos, 75,
-    0, 154, 327771, (s32)evt_npc_set_position, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 170, 25, 154,
-    262235, (s32)evt_mario_set_dir, 90, 0, 0, 196699, (s32)evt_npc_set_ry, (s32)/*"ババ"*/"\x83\x6F\x83\x6F",
-    270, 131163, (s32)evt_seq_wait, 2, 65627, (s32)evt_fade_end_wait, 65546, 1000,
-    589915, (s32)evt_cam3d_evt_set, 128, 163, 666, 128, 71, 113,
-    2000, 11, 65546, 2000, 327771, (s32)evt_msg_print, 0, (s32)"kpa_stg4_000",
-    0, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 131122, -90000000, 0, 107, 65541, 0,
-    131097, -90000000, 0, 7, 33, 327771, (s32)evt_npc_get_position, (s32)/*"ババ"*/"\x83\x6F\x83\x6F",
-    -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_KUPPA_KAMEBABA_FLY1", -30000000, -29999999,
-    -29999998, 0, 65545, 10, 6, 109, 589915, (s32)evt_cam3d_evt_set,
-    280, 153, 657, 280, 57, 116, 1600, 11,
-    524379, (s32)evt_npc_kamek_move_position, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 251, 128, 5, 1600, 0,
-    0, 131122, -90000000, 1, 327771, (s32)evt_cam3d_evt_zoom_in, 20, 800,
-    0, 11, 65546, 800, 327771, (s32)evt_msg_print, 0, (s32)"kpa_stg4_001",
-    0, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 327771, (s32)evt_msg_print, 0, (s32)"kpa_stg4_002", 0, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5",
-    327771, (s32)evt_npc_get_position, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5", -30000000, -29999999, -29999998, 131122, -29999997,
-    -30000000, 131125, -29999997, 1, 65541, 10, 327771, (s32)evt_npc_set_position,
-    (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5", -29999997, -29999999, -29999998, 131126, -29999997, 2, 65546,
-    50, 327771, (s32)evt_npc_set_position, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5", -29999997, -29999999, -29999998, 131125,
-    -29999997, 2, 65546, 50, 6, 327771, (s32)evt_npc_set_position, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5",
-    -30000000, -29999999, -29999998, 589915, (s32)evt_cam3d_evt_set, 337, 134, 549,
-    337, 58, 116, 500, 11, 458843, (s32)evt_npc_sound_data_set, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5",
-    (s32)"SFX_FLD_NPC_PUKUPUKUI_MOVE1", (s32)"SFX_FLD_NPC_PUKUPUKUI_MOVE1", 12000, -250000000, -250000000, 327771, (s32)evt_npc_get_position, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5",
-    -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_KUPPA_PUKU_ESCAPE1", -30000000, -29999999,
-    -29999998, 0, 262235, (s32)evt_npc_status_onoff, 1, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5", 2, 262235,
-    (s32)evt_npc_flag_onoff, 1, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5", 1073741824, 458843, (s32)evt_npc_move_position, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5", 395,
-    130, 0, -229877120, 0, 458843, (s32)evt_npc_move_position, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5", 405,
-    110, 0, -229877120, 0, 458843, (s32)evt_npc_jump_position_nohit, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5", 415,
-    15, 38, 400, 40, 458843, (s32)evt_npc_move_position, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5", 550,
-    38, 0, -229877120, 0, 262235, (s32)evt_npc_status_onoff, 0, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5",
-    2, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5", 1073741824, 589915, (s32)evt_cam3d_evt_set,
-    273, 134, 549, 273, 58, 116, 500, 11,
-    65546, 500, 327771, (s32)evt_msg_print, 0, (s32)"kpa_stg4_003", 0, (s32)/*"ババ"*/"\x83\x6F\x83\x6F",
-    196699, (s32)evt_npc_set_ry, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 270, 262235, (s32)evt_mario_set_pos, -222, 80,
-    137, 131122, -90000000, 0, 107, 65541, 0, 131097,
-    -90000000, 0, 7, 33, 327771, (s32)evt_npc_get_position, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", -30000000,
-    -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_KUPPA_KAMEBABA_FLY1", -30000000, -29999999, -29999998,
-    0, 65545, 10, 6, 109, 589915, (s32)evt_cam3d_evt_set, 102,
-    163, 666, 102, 71, 113, 2000, 11, 524379,
-    (s32)evt_npc_kamek_move_position, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 155, 154, 5, 2000, 0, 0,
-    131122, -90000000, 1, 786523, (s32)evt_eff_fukidashi, 1, (s32)"", (s32)/*"ババ"*/"\x83\x6F\x83\x6F",
-    1, 0, 0, 0, 0, 0, 0, 60,
-    65546, 1000, 327771, (s32)evt_msg_print, 0, (s32)"kpa_stg4_004", 0, (s32)/*"ババ"*/"\x83\x6F\x83\x6F",
-    131122, -90000000, 0, 107, 65541, 0, 131097, -90000000,
-    0, 7, 33, 327771, (s32)evt_npc_get_position, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", -30000000, -29999999,
-    -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_KUPPA_KAMEBABA_FLY1", -30000000, -29999999, -29999998, 0,
-    65545, 10, 6, 109, 524379, (s32)evt_npc_kamek_move_position, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 105,
-    154, 5, 0, -229969280, 0, 131122, -90000000, 1,
-    65545, 1, 196699, (s32)evt_npc_set_ry, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 90, 65545, 1,
-    131163, (s32)evt_npc_wait_pera, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 65546, 100, 196699, (s32)evt_npc_set_ry, (s32)/*"ババ"*/"\x83\x6F\x83\x6F",
-    270, 65545, 1, 131163, (s32)evt_npc_wait_pera, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 65546, 100,
-    196699, (s32)evt_npc_set_ry, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 90, 65545, 1, 131163, (s32)evt_npc_wait_pera,
-    (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 65546, 100, 196699, (s32)evt_npc_set_ry, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 270, 65545,
-    1, 131163, (s32)evt_npc_wait_pera, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 65546, 100, 393307, (s32)evt_snd_sfxon_3d,
-    (s32)"SFX_KUPPA_AIRSHIP_MOVE1", 200, 50, 100, -29999985, 65546, 1000, 786523,
-    (s32)evt_eff_fukidashi, 1, (s32)"", (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 0, 0, 0, 0,
-    0, 0, 0, 60, 65546, 1000, 327771, (s32)evt_npc_set_position,
-    (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", 200, 115, 500, 131122, -89999999, 0, 107,
-    131124, -30000000, -230000000, 131124, -29999999, -230000000, 65541, 0,
-    131097, -89999999, 0, 7, 33, 262235, (s32)evt_sub_get_sincos, -30000000,
-    -29999998, -29999997, 131132, -29999998, -229996928, 131124, -29999997, -29999998,
-    131131, -29999997, -29999999, 131163, (s32)kpa_hikousen_yure, -29999997, 65545, 1,
-    131130, -30000000, -229997952, 131124, -29999999, -29999998, 6, 109,
-    107, 196699, (s32)evt_npc_set_ry, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 90, 65546, 500, 196699,
-    (s32)evt_npc_set_ry, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 270, 109, 131122, -90000000, 0, 107,
-    65541, 0, 131097, -90000000, 0, 7, 33, 327771,
-    (s32)evt_npc_get_position, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", -30000000, -29999999, -29999998, 327771, (s32)evt_snd_sfx_pos, -29999985,
-    -30000000, 50, 100, 65545, 1, 6, 131163, (s32)evt_snd_sfxoff,
-    -29999985, 109, 107, 327771, (s32)evt_npc_get_position, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", -30000000, -29999999,
-    -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_VOICE_KOOPA_LAUGH2_2", -30000000, -29999999, -29999998, -29999985,
-    65541, 0, 131097, -90000000, 0, 7, 33, 196699,
-    (s32)evt_snd_sfxchk, -29999985, -30000000, 131096, -30000000, -1, 7, 33,
-    327771, (s32)evt_npc_get_position, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", -30000000, -29999999, -29999998, 327771, (s32)evt_snd_sfx_pos,
-    -29999985, -30000000, -29999999, -29999998, 65545, 1, 6, 131163,
-    (s32)evt_snd_sfxoff, -29999985, 109, 458843, (s32)evt_npc_move_position, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", -80, 550,
-    0, -229877120, 0, 65546, 1000, 327771, (s32)evt_npc_set_position, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70",
-    -80, 50, 154, 196699, (s32)evt_npc_set_ry, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", 90, 65546,
-    500, 458843, (s32)evt_npc_move_position, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", 45, 154, 0, -229877120,
-    0, 131122, -90000000, 1, 65546, 300, 589915, (s32)evt_cam3d_evt_set,
-    65, 214, 670, 65, 125, 115, 500, 11,
-    65546, 500, 327771, (s32)evt_msg_print, 0, (s32)"kpa_stg4_005", 0, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70",
-    131122, -89999999, 1, 327771, (s32)evt_npc_get_position, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", -29999998, -29999997,
-    -29999996, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_KUPPA_AIRSHIP_MOVE1", -29999998, -29999997, -29999996, -29999991,
-    327771, (s32)evt_sub_intpl_msec_init, 11, 0, 1000, 1000, 65539, 0,
-    65627, (s32)evt_sub_intpl_msec_get_value, 131133, -30000000, -228976000, 131124, -29999995, -230051200,
-    131132, -29999995, -30000000, 131124, -29999994, -229897600, 131132, -29999994,
-    -30000000, 131124, -29999993, -230102400, 131132, -29999993, -30000000, 131130,
-    -29999995, -29999998, 131130, -29999994, -29999997, 131130, -29999993, -29999996,
-    327771, (s32)evt_npc_set_position, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", -29999995, -29999994, -29999993, 327771, (s32)evt_snd_sfx_pos,
-    -29999991, -29999995, -29999994, -29999993, 65545, 1, 131096, -29999999,
-    1, 65540, 0, 33, 131163, (s32)evt_snd_sfxoff, -29999991, 131122,
-    -90000000, 0, 107, 65546, 500, 196699, (s32)evt_npc_pera_onoff, (s32)/*"ババ"*/"\x83\x6F\x83\x6F",
-    0, 131124, -30000000, -230018432, 131124, -29999999, -229998976, 196699,
-    (s32)evt_npc_get_dir, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", -29999997, 327771, (s32)evt_npc_get_position, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", -29999996, -29999995,
-    -29999994, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_KUPPA_KAMEBABA_ROUND1", -29999996, -29999995, -29999994, -29999993,
-    65541, 3, 65541, 60, 131130, -29999997, -30000000, 196699,
-    (s32)evt_npc_set_ry, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", -29999997, 65545, 1, 6, 131130, -30000000,
-    -29999999, 6, 131129, -29999997, 360, 131125, -29999997, 360,
-    131122, -29999996, 0, 65541, 0, 131130, -29999997, -30000000,
-    196699, (s32)evt_npc_set_ry, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", -29999997, 131100, -29999997, -29999996, 7,
-    33, 65545, 1, 6, 196699, (s32)evt_npc_set_ry, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 270,
-    196699, (s32)evt_npc_pera_onoff, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 1, 131163, (s32)evt_snd_sfxoff, -29999993, 131122,
-    -90000000, 1, 109, 327771, (s32)evt_npc_get_position, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", -29999998, -29999997,
-    -29999996, 262235, (s32)evt_sub_get_sincos, 90, -30000000, -50000000, 107, 327771,
-    (s32)evt_sub_intpl_msec_init, 11, 90, 300, 900, 65539, 3, 65627,
-    (s32)evt_sub_intpl_msec_get_value, 262235, (s32)evt_sub_get_sincos, -30000000, -29999998, -50000000, 65545, 1,
-    131096, -29999999, 1, 65540, 3, 33, 109, 327771,
-    (s32)evt_npc_get_position, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", -29999998, -29999997, -29999996, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_KUPPA_AIRSHIP_MOVE1",
-    -29999998, -29999997, -29999996, -29999991, 327771, (s32)evt_sub_intpl_msec_init, 11, 0,
-    1000, 1000, 65539, 1, 65627, (s32)evt_sub_intpl_msec_get_value, 131133, -30000000,
-    -228976000, 131124, -29999995, -229744000, 131132, -29999995, -30000000, 131124,
-    -29999994, -50000000, 131132, -29999994, -229877120, 131124, -29999993, -229488000,
-    131132, -29999993, -30000000, 131130, -29999995, -29999998, 131130, -29999994,
-    -29999997, 131130, -29999993, -29999996, 327771, (s32)evt_npc_set_position, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", -29999995,
-    -29999994, -29999993, 327771, (s32)evt_snd_sfx_pos, -29999991, -29999995, -29999994, -29999993,
-    65545, 1, 131096, -29999999, 1, 65540, 1, 33,
-    131163, (s32)evt_snd_sfxoff, -29999991, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", 128,
-    589915, (s32)evt_cam3d_evt_set, 102, 163, 666, 102, 71, 113,
-    500, 11, 65541, 0, 131097, -90000000, 0, 7,
-    33, 65545, 1, 6, 327771, (s32)evt_npc_get_position, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", -30000000,
-    -29999999, -29999998, 196699, (s32)evt_npc_get_dir, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", -29999997, 131125, -29999998,
-    5, 327771, (s32)evt_npc_set_position, (s32)"houki", -30000000, -29999999, -29999998, 196699,
-    (s32)evt_npc_set_ry, (s32)"houki", -29999997, 196699, (s32)evt_npc_set_anim, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", (s32)"D_1", 131122,
-    -30000000, 100, 65541, 6, 65546, -30000000, 262235, (s32)evt_npc_flag_onoff,
-    1, (s32)"houki", 128, 65546, -30000000, 262235, (s32)evt_npc_flag_onoff, 0,
-    (s32)"houki", 128, 131128, -30000000, 2, 6, 327771, (s32)evt_npc_set_position,
-    (s32)"houki", 0, -1000, 0, 196699, (s32)evt_npc_set_anim, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", (s32)"D_1",
-    65546, 500, 327771, (s32)evt_npc_get_position, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", -29999998, -29999997, -29999996,
-    393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_KUPPA_KAMEBABA_FALL1", -29999998, -29999997, -29999996, 0, 327771,
-    (s32)evt_sub_intpl_msec_init, 1, -29999997, 0, 200, 65539, 2, 65627,
-    (s32)evt_sub_intpl_msec_get_value, 327771, (s32)evt_npc_set_position, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", -29999998, -30000000, -29999996, 65545,
-    1, 131096, -29999999, 1, 65540, 2, 33, 327771,
-    (s32)evt_npc_get_position, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_KUPPA_KAMEBABA_DOWN1",
-    -30000000, -29999999, -29999998, 0, 65546, 50, 196699, (s32)evt_npc_set_anim,
-    (s32)/*"ババ"*/"\x83\x6F\x83\x6F", (s32)"D_2", 65546, 500, 196699, (s32)evt_npc_set_anim, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", (s32)"P_1",
-    65545, 1, 196699, (s32)evt_npc_set_ry, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 90, 65546, 300,
-    262235, (s32)evt_npc_set_autotalkpose, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", (s32)"P_1", (s32)"T_6", 327771, (s32)evt_msg_print, 0,
-    (s32)"kpa_stg4_006", 0, (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 393307, (s32)evt_fade_set_mapchange_type, 1, 10, 300,
-    9, 300, 196699, (s32)evt_bero_mapchange, (s32)"tou_00", (s32)"", 131163, (s32)evt_mario_key_onoff,
-    1, 2, 1,
-};
+EVT_BEGIN(gor_04_koopa_evt)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_cam3d_evt_set, 425, 250, 340, 425, 214, 112, 0, 11)
+    CALL(evt_mario_set_pos, 75, 0, 154)
+    CALL(evt_npc_set_position, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 170, 25, 154)
+    CALL(evt_mario_set_dir, 90, 0, 0)
+    CALL(evt_npc_set_ry, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 270)
+    CALL(evt_seq_wait, 2)
+    CALL(evt_fade_end_wait)
+    WAIT_MS(1000)
+    CALL(evt_cam3d_evt_set, 128, 163, 666, 128, 71, 113, 2000, 11)
+    WAIT_MS(2000)
+    CALL(evt_msg_print, 0, STRING("kpa_stg4_000"), 0, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"))
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        LOOP(0)
+            IF_INT_NOT_EQUAL(GF(0), 0)
+                BREAK_LOOP
+            END_IF
+            CALL(evt_npc_get_position, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), LW(0), LW(1), LW(2))
+            CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_KAMEBABA_FLY1"), LW(0), LW(1), LW(2), 0)
+            WAIT_FRAMES(10)
+        END_LOOP
+    END_INLINE_EVENT
+    CALL(evt_cam3d_evt_set, 280, 153, 657, 280, 57, 116, 1600, 11)
+    CALL(evt_npc_kamek_move_position, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 251, 128, 5, 1600, 0, 0)
+    SET_VALUE(GF(0), 1)
+    CALL(evt_cam3d_evt_zoom_in, 20, 800, 0, 11)
+    WAIT_MS(800)
+    CALL(evt_msg_print, 0, STRING("kpa_stg4_001"), 0, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"))
+    CALL(evt_msg_print, 0, STRING("kpa_stg4_002"), 0, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"))
+    CALL(evt_npc_get_position, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), LW(0), LW(1), LW(2))
+    SET_VALUE(LW(3), LW(0))
+    ADD(LW(3), 1)
+    LOOP(10)
+        CALL(evt_npc_set_position, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), LW(3), LW(1), LW(2))
+        SUBTRACT(LW(3), 2)
+        WAIT_MS(50)
+        CALL(evt_npc_set_position, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), LW(3), LW(1), LW(2))
+        ADD(LW(3), 2)
+        WAIT_MS(50)
+    END_LOOP
+    CALL(evt_npc_set_position, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), LW(0), LW(1), LW(2))
+    CALL(evt_cam3d_evt_set, 337, 134, 549, 337, 58, 116, 500, 11)
+    CALL(evt_npc_sound_data_set, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), STRING("SFX_FLD_NPC_PUKUPUKUI_MOVE1"), STRING("SFX_FLD_NPC_PUKUPUKUI_MOVE1"), 12000, -250000000, -250000000)
+    CALL(evt_npc_get_position, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_PUKU_ESCAPE1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_npc_status_onoff, 1, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), 2)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), 1073741824)
+    CALL(evt_npc_move_position, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), 395, 130, 0, FLOAT(120.0f), 0)
+    CALL(evt_npc_move_position, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), 405, 110, 0, FLOAT(120.0f), 0)
+    CALL(evt_npc_jump_position_nohit, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), 415, 15, 38, 400, 40)
+    CALL(evt_npc_move_position, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), 550, 38, 0, FLOAT(120.0f), 0)
+    CALL(evt_npc_status_onoff, 0, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), 2)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"飛行船係員"*/"\x94\xF2\x8D\x73\x91\x44\x8C\x57\x88\xF5"), 1073741824)
+    CALL(evt_cam3d_evt_set, 273, 134, 549, 273, 58, 116, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("kpa_stg4_003"), 0, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"))
+    CALL(evt_npc_set_ry, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 270)
+    CALL(evt_mario_set_pos, -222, 80, 137)
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        LOOP(0)
+            IF_INT_NOT_EQUAL(GF(0), 0)
+                BREAK_LOOP
+            END_IF
+            CALL(evt_npc_get_position, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), LW(0), LW(1), LW(2))
+            CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_KAMEBABA_FLY1"), LW(0), LW(1), LW(2), 0)
+            WAIT_FRAMES(10)
+        END_LOOP
+    END_INLINE_EVENT
+    CALL(evt_cam3d_evt_set, 102, 163, 666, 102, 71, 113, 2000, 11)
+    CALL(evt_npc_kamek_move_position, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 155, 154, 5, 2000, 0, 0)
+    SET_VALUE(GF(0), 1)
+    CALL(evt_eff_fukidashi, 1, STRING(""), STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 1, 0, 0, 0, 0, 0, 0, 60)
+    WAIT_MS(1000)
+    CALL(evt_msg_print, 0, STRING("kpa_stg4_004"), 0, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"))
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        LOOP(0)
+            IF_INT_NOT_EQUAL(GF(0), 0)
+                BREAK_LOOP
+            END_IF
+            CALL(evt_npc_get_position, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), LW(0), LW(1), LW(2))
+            CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_KAMEBABA_FLY1"), LW(0), LW(1), LW(2), 0)
+            WAIT_FRAMES(10)
+        END_LOOP
+    END_INLINE_EVENT
+    CALL(evt_npc_kamek_move_position, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 105, 154, 5, 0, FLOAT(30.0f), 0)
+    SET_VALUE(GF(0), 1)
+    WAIT_FRAMES(1)
+    CALL(evt_npc_set_ry, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 90)
+    WAIT_FRAMES(1)
+    CALL(evt_npc_wait_pera, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"))
+    WAIT_MS(100)
+    CALL(evt_npc_set_ry, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 270)
+    WAIT_FRAMES(1)
+    CALL(evt_npc_wait_pera, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"))
+    WAIT_MS(100)
+    CALL(evt_npc_set_ry, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 90)
+    WAIT_FRAMES(1)
+    CALL(evt_npc_wait_pera, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"))
+    WAIT_MS(100)
+    CALL(evt_npc_set_ry, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 270)
+    WAIT_FRAMES(1)
+    CALL(evt_npc_wait_pera, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"))
+    WAIT_MS(100)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_AIRSHIP_MOVE1"), 200, 50, 100, LW(15))
+    WAIT_MS(1000)
+    CALL(evt_eff_fukidashi, 1, STRING(""), STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 0, 0, 0, 0, 0, 0, 0, 60)
+    WAIT_MS(1000)
+    CALL(evt_npc_set_position, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), 200, 115, 500)
+    SET_VALUE(GF(1), 0)
+    BEGIN_INLINE_EVENT
+        SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
+        SET_FLOAT_VALUE(LW(1), FLOAT(0.0f))
+        LOOP(0)
+            IF_INT_NOT_EQUAL(GF(1), 0)
+                BREAK_LOOP
+            END_IF
+            CALL(evt_sub_get_sincos, LW(0), LW(2), LW(3))
+            MULTIPLY_FLOAT(LW(2), FLOAT(3.0f))
+            SET_FLOAT_VALUE(LW(3), LW(2))
+            SUBTRACT_FLOAT(LW(3), LW(1))
+            CALL(kpa_hikousen_yure, LW(3))
+            WAIT_FRAMES(1)
+            ADD_FLOAT(LW(0), FLOAT(2.0f))
+            SET_FLOAT_VALUE(LW(1), LW(2))
+        END_LOOP
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_set_ry, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 90)
+        WAIT_MS(500)
+        CALL(evt_npc_set_ry, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 270)
+    END_INLINE_EVENT
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        LOOP(0)
+            IF_INT_NOT_EQUAL(GF(0), 0)
+                BREAK_LOOP
+            END_IF
+            CALL(evt_npc_get_position, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), LW(0), LW(1), LW(2))
+            CALL(evt_snd_sfx_pos, LW(15), LW(0), 50, 100)
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(evt_snd_sfxoff, LW(15))
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_get_position, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_KOOPA_LAUGH2_2"), LW(0), LW(1), LW(2), LW(15))
+        LOOP(0)
+            IF_INT_NOT_EQUAL(GF(0), 0)
+                BREAK_LOOP
+            END_IF
+            CALL(evt_snd_sfxchk, LW(15), LW(0))
+            IF_INT_EQUAL(LW(0), -1)
+                BREAK_LOOP
+            END_IF
+            CALL(evt_npc_get_position, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), LW(0), LW(1), LW(2))
+            CALL(evt_snd_sfx_pos, LW(15), LW(0), LW(1), LW(2))
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(evt_snd_sfxoff, LW(15))
+    END_INLINE_EVENT
+    CALL(evt_npc_move_position, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), -80, 550, 0, FLOAT(120.0f), 0)
+    WAIT_MS(1000)
+    CALL(evt_npc_set_position, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), -80, 50, 154)
+    CALL(evt_npc_set_ry, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), 90)
+    WAIT_MS(500)
+    CALL(evt_npc_move_position, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), 45, 154, 0, FLOAT(120.0f), 0)
+    SET_VALUE(GF(0), 1)
+    WAIT_MS(300)
+    CALL(evt_cam3d_evt_set, 65, 214, 670, 65, 125, 115, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("kpa_stg4_005"), 0, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"))
+    SET_VALUE(GF(1), 1)
+    CALL(evt_npc_get_position, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), LW(2), LW(3), LW(4))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_AIRSHIP_MOVE1"), LW(2), LW(3), LW(4), LW(9))
+    CALL(evt_sub_intpl_msec_init, 11, 0, 1000, 1000)
+    LABEL(0)
+    CALL(evt_sub_intpl_msec_get_value)
+    DIVIDE_FLOAT(LW(0), FLOAT(1000.0f))
+    SET_FLOAT_VALUE(LW(5), FLOAT(-50.0f))
+    MULTIPLY_FLOAT(LW(5), LW(0))
+    SET_FLOAT_VALUE(LW(6), FLOAT(100.0f))
+    MULTIPLY_FLOAT(LW(6), LW(0))
+    SET_FLOAT_VALUE(LW(7), FLOAT(-100.0f))
+    MULTIPLY_FLOAT(LW(7), LW(0))
+    ADD_FLOAT(LW(5), LW(2))
+    ADD_FLOAT(LW(6), LW(3))
+    ADD_FLOAT(LW(7), LW(4))
+    CALL(evt_npc_set_position, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), LW(5), LW(6), LW(7))
+    CALL(evt_snd_sfx_pos, LW(9), LW(5), LW(6), LW(7))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(0)
+    END_IF
+    CALL(evt_snd_sfxoff, LW(9))
+    SET_VALUE(GF(0), 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(500)
+        CALL(evt_npc_pera_onoff, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 0)
+        SET_FLOAT_VALUE(LW(0), FLOAT(-18.0f))
+        SET_FLOAT_VALUE(LW(1), FLOAT(1.0f))
+        CALL(evt_npc_get_dir, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), LW(3))
+        CALL(evt_npc_get_position, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), LW(4), LW(5), LW(6))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_KAMEBABA_ROUND1"), LW(4), LW(5), LW(6), LW(7))
+        LOOP(3)
+            LOOP(60)
+                ADD_FLOAT(LW(3), LW(0))
+                CALL(evt_npc_set_ry, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), LW(3))
+                WAIT_FRAMES(1)
+            END_LOOP
+            ADD_FLOAT(LW(0), LW(1))
+        END_LOOP
+        MODULO(LW(3), 360)
+        ADD(LW(3), 360)
+        SET_VALUE(LW(4), 0)
+        LOOP(0)
+            ADD_FLOAT(LW(3), LW(0))
+            CALL(evt_npc_set_ry, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), LW(3))
+            IF_INT_LESS_OR_EQUAL(LW(3), LW(4))
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(evt_npc_set_ry, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 270)
+        CALL(evt_npc_pera_onoff, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 1)
+        CALL(evt_snd_sfxoff, LW(7))
+        SET_VALUE(GF(0), 1)
+    END_INLINE_EVENT
+    CALL(evt_npc_get_position, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), LW(2), LW(3), LW(4))
+    CALL(evt_sub_get_sincos, 90, LW(0), GW(0))
+    BEGIN_INLINE_EVENT
+        CALL(evt_sub_intpl_msec_init, 11, 90, 300, 900)
+        LABEL(3)
+        CALL(evt_sub_intpl_msec_get_value)
+        CALL(evt_sub_get_sincos, LW(0), LW(2), GW(0))
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 1)
+            GOTO(3)
+        END_IF
+    END_INLINE_EVENT
+    CALL(evt_npc_get_position, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), LW(2), LW(3), LW(4))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_AIRSHIP_MOVE1"), LW(2), LW(3), LW(4), LW(9))
+    CALL(evt_sub_intpl_msec_init, 11, 0, 1000, 1000)
+    LABEL(1)
+    CALL(evt_sub_intpl_msec_get_value)
+    DIVIDE_FLOAT(LW(0), FLOAT(1000.0f))
+    SET_FLOAT_VALUE(LW(5), FLOAT(250.0f))
+    MULTIPLY_FLOAT(LW(5), LW(0))
+    SET_FLOAT_VALUE(LW(6), GW(0))
+    MULTIPLY_FLOAT(LW(6), FLOAT(120.0f))
+    SET_FLOAT_VALUE(LW(7), FLOAT(500.0f))
+    MULTIPLY_FLOAT(LW(7), LW(0))
+    ADD_FLOAT(LW(5), LW(2))
+    ADD_FLOAT(LW(6), LW(3))
+    ADD_FLOAT(LW(7), LW(4))
+    CALL(evt_npc_set_position, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), LW(5), LW(6), LW(7))
+    CALL(evt_snd_sfx_pos, LW(9), LW(5), LW(6), LW(7))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(1)
+    END_IF
+    CALL(evt_snd_sfxoff, LW(9))
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70"), 128)
+    CALL(evt_cam3d_evt_set, 102, 163, 666, 102, 71, 113, 500, 11)
+    LOOP(0)
+        IF_INT_NOT_EQUAL(GF(0), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_npc_get_position, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_dir, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), LW(3))
+    ADD(LW(2), 5)
+    CALL(evt_npc_set_position, STRING("houki"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_set_ry, STRING("houki"), LW(3))
+    CALL(evt_npc_set_anim, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), STRING("D_1"))
+    SET_VALUE(LW(0), 100)
+    LOOP(6)
+        WAIT_MS(LW(0))
+        CALL(evt_npc_flag_onoff, 1, STRING("houki"), 128)
+        WAIT_MS(LW(0))
+        CALL(evt_npc_flag_onoff, 0, STRING("houki"), 128)
+        DIVIDE(LW(0), 2)
+    END_LOOP
+    CALL(evt_npc_set_position, STRING("houki"), 0, -1000, 0)
+    CALL(evt_npc_set_anim, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), STRING("D_1"))
+    WAIT_MS(500)
+    CALL(evt_npc_get_position, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), LW(2), LW(3), LW(4))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_KAMEBABA_FALL1"), LW(2), LW(3), LW(4), 0)
+    CALL(evt_sub_intpl_msec_init, 1, LW(3), 0, 200)
+    LABEL(2)
+    CALL(evt_sub_intpl_msec_get_value)
+    CALL(evt_npc_set_position, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), LW(2), LW(0), LW(4))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(2)
+    END_IF
+    CALL(evt_npc_get_position, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_KAMEBABA_DOWN1"), LW(0), LW(1), LW(2), 0)
+    WAIT_MS(50)
+    CALL(evt_npc_set_anim, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), STRING("D_2"))
+    WAIT_MS(500)
+    CALL(evt_npc_set_anim, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), STRING("P_1"))
+    WAIT_FRAMES(1)
+    CALL(evt_npc_set_ry, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), 90)
+    WAIT_MS(300)
+    CALL(evt_npc_set_autotalkpose, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"), STRING("P_1"), STRING("T_6"))
+    CALL(evt_msg_print, 0, STRING("kpa_stg4_006"), 0, STRING(/*"ババ"*/"\x83\x6F\x83\x6F"))
+    CALL(evt_fade_set_mapchange_type, 1, 10, 300, 9, 300)
+    CALL(evt_bero_mapchange, STRING("tou_00"), STRING(""))
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(gor_04_init_evt)
     IF_INT_EQUAL(GSW(0), 215)

@@ -55,8 +55,8 @@ typedef struct GT2Work {
 } GT2Work;
 
 #define GT_PARAMS(work) ((GT2Params*)&(work)->actionCommands)
-#define GT_DISP(work) ((GT2Disp*)((u8*)&(work)->actionCommands + 0x290))
-#define GT_WORK(work) ((GT2Work*)((u8*)&(work)->actionCommands + 0x2BC))
+#define GT_DISP(w) ((GT2Disp*)&(w)->actionCommands.disp)
+#define GT_WORK(w) ((GT2Work*)(w)->actionCommands.work)
 #define ICON ((void (*)(Vec*, s16, s32, f32))iconDispGx)
 #define TEXPLANE ((void (*)(u32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)
 
@@ -71,9 +71,9 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
   BOOL found;
   s32 i3;
   s32 i4;
-  GT2Work *gw = (GT2Work *) (((u8 *) (&work->actionCommands)) + 0x2BC);
+  GT2Work *gw = (GT2Work *)work->actionCommands.work;
   BOOL autoCommand = 0;
-  GT2Disp *disp = (GT2Disp *) (((u8 *) (&work->actionCommands)) + 0x290);
+  GT2Disp *disp = (GT2Disp *)&work->actionCommands.disp;
   s32 i;
   BOOL doAuto;
   const char *sfxOk;
@@ -312,7 +312,7 @@ s32 battleAcResult_GaugeTiming2(BattleWork* work) {
 #pragma opt_propagation off
 void battleAcDisp_GaugeTiming2(CameraId cameraId, BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
-    GT2Disp* disp = (GT2Disp*)((u8*)ac + 0x290);
+    GT2Disp* disp = (GT2Disp*)&ac->disp;
     switch (ac->mAcState) {
         case 99:
             disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(-300.0f, 30.0f, 4, 20 - disp->timer, 20);
@@ -350,7 +350,7 @@ void battleAcDelete_GaugeTiming2(BattleWork* work) {
 #pragma opt_loop_invariants off
 static void actionCommandDisp(f32 x, f32 y) {
     BattleActions* ac = &_battleWorkPointer->actionCommands;
-    GT2Disp* disp = (GT2Disp*)((u8*)ac + 0x290);
+    GT2Disp* disp = (GT2Disp*)&ac->disp;
     GT2Work* gw;
     CameraEntry* cam;
     f32 x0; f32 y0; f32 y1; f32 x1; f32 y2; f32 y3; f32 ratio; f32 t;
@@ -360,7 +360,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     Vec d0; Vec d1;
 
     camGetPtr(8);
-    gw = (GT2Work*)((u8*)ac + 0x2BC);
+    gw = (GT2Work*)ac->work;
     cam = camGetPtr(8);
     v = gw->width - 16;
     x0 = (-288.0f) + x;
@@ -400,7 +400,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
 
     y3 = 23.0f + y;
-    cnt = *(s32*)((u8*)ac + 0x40);
+    cnt = ac->params[2];
     for (i = 0; i < cnt; i++) {
         f32 target = gw->targets[i];
         if (target <= gw->cursor || __fabs(gw->cursor - target) <= 6.0) {

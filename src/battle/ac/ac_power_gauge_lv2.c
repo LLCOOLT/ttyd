@@ -53,8 +53,8 @@ typedef struct PGLv2Ac {
 } PGLv2Ac;
 
 #define AC_S32(ac, off) (*(s32*)((u8*)(ac) + (off)))
-#define AC_DISP(ac) ((PGLv2Disp*)((u8*)(ac) + 0x290))
-#define AC_WORK(ac) ((PGLv2Work*)((u8*)(ac) + 0x2BC))
+#define AC_DISP(ac) ((PGLv2Disp*)&(ac)->disp)
+#define AC_WORK(ac) ((PGLv2Work*)(ac)->work)
 
 static s32 _power_table[] = {300, 200, 150, 100, 80, 60, 40};
 s32 _power_table2[] = {100, 100, 100, 100, 110, 120, 130};
@@ -85,13 +85,13 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
             disp->delta[2] = -16;
             disp->delta[3] = 0;
             g->timer = 0;
-            AC_S32(ac, 0x58) = 0;
+            ac->outputParams[0] = 0;
             ac->mAcState = 99;
             ac->result = 1;
             g->maxFrames = sysMsec2Frame(7000);
             g->gauge = 0.0f;
-            g->rate = 0.01f * AC_S32(ac, 0x3C);
-            g->dec = 0.01f * AC_S32(ac, 0x40);
+            g->rate = 0.01f * ac->params[1];
+            g->dec = 0.01f * ac->params[2];
             g->full = 0;
             g->inZone = 0;
             g->button = 0x100;
@@ -103,12 +103,12 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if ((ac->setupFlags & 1) && (*(u32*)((u8*)ac->mAcUnit + BUOFF(0x278)) & 0x10)) {
+            if ((ac->setupFlags & 1) && ((u32)ac->mAcUnit->mTokenFlags & 0x10)) {
                 if (irand(100) >= 0) {
                     ac->setupParam = 30;
-                    AC_S32(ac, 0x58) = 0;
+                    ac->outputParams[0] = 0;
                 } else {
-                    AC_S32(ac, 0x58) = irand(AC_S32(ac, 0x44) - 1) + 1;
+                    ac->outputParams[0] = irand(ac->params[3] - 1) + 1;
                     ac->setupParam = 30;
                 }
                 ac->mAcState = 1001;
@@ -119,7 +119,7 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
         case 1000:
             g->timer++;
             if (g->timer > g->maxFrames) {
-                if (AC_S32(ac, 0x58) < AC_S32(ac, 0x48)) {
+                if ((s32)ac->outputParams[0] < ac->params[4]) {
                     ac->result = 0;
                     ac->result &= ~2;
                 } else {
@@ -167,20 +167,20 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
                 }
             }
             BattleAcGaugeSeUpdate(g->gauge);
-            AC_S32(ac, 0x58) = (s32)(g->gauge * (f32)AC_S32(ac, 0x44) / 100.0f);
-            if (AC_S32(ac, 0x58) >= AC_S32(ac, 0x44)) {
-                AC_S32(ac, 0x58) = AC_S32(ac, 0x44) - 1;
+            ac->outputParams[0] = (s32)(g->gauge * (f32)ac->params[3] / 100.0f);
+            if ((s32)ac->outputParams[0] >= ac->params[3]) {
+                ac->outputParams[0] = ac->params[3] - 1;
             }
-            if (!(AC_S32(ac, 0x34) & 1)) {
+            if (!((s32)ac->acFlags & 1)) {
                 if (g->gauge >= 100.0f) {
-                    AC_S32(ac, 0x58)++;
+                    ac->outputParams[0]++;
                 }
             }
             break;
         case 1001:
             ac->setupParam--;
             if (ac->setupParam < 0) {
-                if (AC_S32(ac, 0x58) >= AC_S32(ac, 0x48)) {
+                if ((s32)ac->outputParams[0] >= ac->params[4]) {
                     ac->result = 2;
                     ac->mResultCount++;
                 } else {

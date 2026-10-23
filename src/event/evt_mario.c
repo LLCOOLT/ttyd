@@ -4,6 +4,7 @@
 #include "driver/hitdrv.h"
 #include "manager/evtmgr_cmd.h"
 #include "mario/mario.h"
+#include "koopa.h"
 #include "mario/mario_cam.h"
 #include "mario/mario_motion.h"
 #include "mario/mario_party.h"
@@ -220,11 +221,6 @@ USER_FUNC(evt_mario_dokan_prepare) {
 }
 
 
-#ifdef VERSION_G8ME01
-#define DOKAN_ROT 0x2b8
-#else
-#define DOKAN_ROT 0x2a0
-#endif
 
 USER_FUNC(evt_mario_paper_pose_dokan) {
     s32* args = event->args;
@@ -292,7 +288,7 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
             mp->dispFlags |= 8;
             mp->dispFlags |= 0x100;
             mp->displayDirection = mp->displayDirectionTarget;
-            FLD(mp, f32, DOKAN_ROT) = 0.0f;
+            mp->mot.dokan.rotSpeed = 0.0f;
             mp->dispOfs = (Vec){0.0f, 0.0f, (mp->flags & 0x2000000) ? -16.0f : 0.0f};
             event->userdata[0] = 0;
             marioNoUpdateCamPos();
@@ -317,7 +313,7 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
             mp->dispFlags |= 0x100;
             ret = 2;
             mp->scale = (Vec){1.0f, 1.0f, 1.0f};
-            FLD(mp, f32, DOKAN_ROT) = 30.0f;
+            mp->mot.dokan.rotSpeed = 30.0f;
             event->userdata[0] = 8;
             event->userdata[1] = 3;
             break;
@@ -346,41 +342,41 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
             if (party) {
                 party->position = mp->position;
                 party->scale = mp->scale;
-                FLD(party, Vec, 0x7c) = (Vec){0.0f, 0.0f, 0.0f};
-                FLD(party, Vec, 0x64) = (Vec){0.0f, 0.0f, 0.0f};
-                FLD(party, Vec, 0x88) = (Vec){0.0f, 0.0f, 0.0f};
+                party->dispOfs = (Vec){0.0f, 0.0f, 0.0f};
+                party->rot = (Vec){0.0f, 0.0f, 0.0f};
+                party->rotOfs = (Vec){0.0f, 0.0f, 0.0f};
                 party->field_8C = mp->field_0xB4;
-                FLD(party, f32, 0x80) = mp->dispOfs.y;
-                FLD(party, f32, 0x84) = mp->dispOfs.z;
+                party->dispOfs.y = mp->dispOfs.y;
+                party->dispOfs.z = mp->dispOfs.z;
             }
             party = partyGetPtr(marioGetExtraPartyId());
             if (party) {
                 party->position = mp->position;
                 party->scale = mp->scale;
-                FLD(party, Vec, 0x7c) = (Vec){0.0f, 0.0f, 0.0f};
-                FLD(party, Vec, 0x64) = (Vec){0.0f, 0.0f, 0.0f};
-                FLD(party, Vec, 0x88) = (Vec){0.0f, 0.0f, 0.0f};
+                party->dispOfs = (Vec){0.0f, 0.0f, 0.0f};
+                party->rot = (Vec){0.0f, 0.0f, 0.0f};
+                party->rotOfs = (Vec){0.0f, 0.0f, 0.0f};
                 party->field_8C = mp->field_0xB4;
-                FLD(party, f32, 0x80) = mp->dispOfs.y;
-                FLD(party, f32, 0x84) = mp->dispOfs.z;
+                party->dispOfs.y = mp->dispOfs.y;
+                party->dispOfs.z = mp->dispOfs.z;
             }
             ret = 2;
             break;
         case 10:
 #ifdef VERSION_G8ME01
-            FLD(mp, f32, DOKAN_ROT) = 30.0f;
+            mp->mot.dokan.rotSpeed = 30.0f;
 #else
-            FLD(mp, f32, DOKAN_ROT) += 1.0f;
-            if (FLD(mp, f32, DOKAN_ROT) > 30.0f) {
-                FLD(mp, f32, DOKAN_ROT) = 30.0f;
+            mp->mot.dokan.rotSpeed += 1.0f;
+            if (mp->mot.dokan.rotSpeed > 30.0f) {
+                mp->mot.dokan.rotSpeed = 30.0f;
             }
 #endif
             event->userdata[0]++;
             if (event->userdata[0] > 10) {
-                mp->displayDirection += FLD(mp, f32, DOKAN_ROT);
-                FLD(mp, f32, DOKAN_ROT) += 0.1f;
-                if (FLD(mp, f32, DOKAN_ROT) > 30.0f) {
-                    FLD(mp, f32, DOKAN_ROT) = 30.0f;
+                mp->displayDirection += mp->mot.dokan.rotSpeed;
+                mp->mot.dokan.rotSpeed += 0.1f;
+                if (mp->mot.dokan.rotSpeed > 30.0f) {
+                    mp->mot.dokan.rotSpeed = 30.0f;
                 }
             }
             if (event->userdata[0] < sysMsec2Frame(300)) {
@@ -393,7 +389,7 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
             break;
     }
     if (ret == 2) {
-        FLD(mp, s8, 0x3e) = type;
+        mp->dokanType = type;
         marioChgMot(0x1d);
     }
     return ret;
@@ -482,7 +478,7 @@ USER_FUNC(evt_mario_key_onoff) {
 
 USER_FUNC(evt_mario_set_enable_key) {
     s32 key = evtGetValue(event, event->args[0]);
-    FLD(marioGetPtr(), s32, MWOFF(0x284)) = key;
+    marioGetPtr()->enableKeyMask = key;
     return EVT_RETURN_DONE;
 }
 
@@ -1072,7 +1068,7 @@ USER_FUNC(evt_mario_party_door_move) {
                     !strcmp(gp->currentMapName, "pik_00") ? (party->position.x > 0.0f ? 270.0f : 90.0f)
                     : !strcmp(gp->currentMapName, "muj_01") ? 330.0f
                     : doorAngle(cam));
-                if (party->field_32[0] == 1) {
+                if (party->moveKind == 1) {
                     party->flags2 |= 0x10;
                 }
             }
@@ -1081,7 +1077,7 @@ USER_FUNC(evt_mario_party_door_move) {
                 partyMoveBehindMario3(party, 0,
                     !strcmp(gp->currentMapName, "pik_00") ? (party->position.x > 0.0f ? 270.0f : 90.0f)
                     : !strcmp(gp->currentMapName, "muj_01") ? 30.0f : 270.0f);
-                if (party->field_32[0] == 1) {
+                if (party->moveKind == 1) {
                     party->flags2 |= 0x10;
                 }
             }
@@ -1097,7 +1093,7 @@ USER_FUNC(evt_mario_party_door_move) {
                     !strcmp(gp->currentMapName, "pik_00") ? (party->position.x > 0.0f ? 270.0f : 90.0f)
                     : !strcmp(gp->currentMapName, "muj_01") ? 330.0f
                     : doorAngle(cam));
-                if (party->field_32[0] == 1) {
+                if (party->moveKind == 1) {
                     party->flags2 |= 0x10;
                 }
                 N_partyFollowCloseOff(party);
@@ -1109,7 +1105,7 @@ USER_FUNC(evt_mario_party_door_move) {
                 partyMoveBehindMario3(party, 0,
                     !strcmp(gp->currentMapName, "pik_00") ? (party->position.x > 0.0f ? 270.0f : 90.0f)
                     : !strcmp(gp->currentMapName, "muj_01") ? 30.0f : 270.0f);
-                if (party->field_32[0] == 1) {
+                if (party->moveKind == 1) {
                     party->flags2 |= 0x10;
                 }
                 N_partyFollowCloseOff(party);
@@ -1197,20 +1193,20 @@ USER_FUNC(evt_mario_party_bero_move) {
             party = partyGetPtr(marioGetPartyId());
             if (party) {
                 partyMoveBehindMario3(party, 0,
-                    party->field_32[0] == 0
+                    party->moveKind == 0
                         ? revise360(mp->targetYaw + ((mp->displayDirectionTarget >= 90.0f && mp->displayDirectionTarget <= 270.0f) ? 220.0f : 140.0f))
                         : revise360(mp->targetYaw + ((mp->displayDirectionTarget >= 90.0f && mp->displayDirectionTarget <= 270.0f) ? 225.0f : 135.0f)));
-                if (party->field_32[0] == 1) {
+                if (party->moveKind == 1) {
                     party->flags2 |= 0x10;
                 }
             }
             party = partyGetPtr(marioGetExtraPartyId());
             if (party) {
                 partyMoveBehindMario3(party, 0,
-                    party->field_32[0] == 0
+                    party->moveKind == 0
                         ? revise360(mp->targetYaw + ((mp->displayDirectionTarget >= 90.0f && mp->displayDirectionTarget <= 270.0f) ? 220.0f : 140.0f))
                         : revise360(mp->targetYaw + ((mp->displayDirectionTarget >= 90.0f && mp->displayDirectionTarget <= 270.0f) ? 225.0f : 135.0f)));
-                if (party->field_32[0] == 1) {
+                if (party->moveKind == 1) {
                     party->flags2 |= 0x10;
                 }
             }
@@ -1234,7 +1230,7 @@ USER_FUNC(evt_mario_party_bero_move) {
                 N_partyFollowCloseOff(party);
                 party->flags &= ~0x1000000;
                 party->field_8 &= ~0x200000;
-                if (party->field_32[0] == 1) {
+                if (party->moveKind == 1) {
                     partySetDispDirToMario(party);
                     party->flags2 &= ~0x10;
                 }
@@ -1244,7 +1240,7 @@ USER_FUNC(evt_mario_party_bero_move) {
                 N_partyFollowCloseOff(party);
                 party->flags &= ~0x1000000;
                 party->field_8 &= ~0x200000;
-                if (party->field_32[0] == 1) {
+                if (party->moveKind == 1) {
                     partySetDispDirToMario(party);
                     party->flags2 &= ~0x10;
                 }
@@ -1396,9 +1392,9 @@ USER_FUNC(evt_mario_jump_jumpstand) {
         event->userdata[3] = 0;
         if (mode == 3) {
             event->userdata[3] = 2;
-        } else if (FLD(mp, f32, 0xd8) < mp->position.y) {
+        } else if (mp->fallStartPos.y < mp->position.y) {
             event->userdata[3] = 2;
-        } else if (FLD(mp, f32, 0xd8) <= 1.5f * mp->wPlayerCollisionBox.y + h) {
+        } else if (mp->fallStartPos.y <= 1.5f * mp->wPlayerCollisionBox.y + h) {
             event->userdata[3] = 2;
         } else {
             event->userdata[3] = 1;
@@ -1417,7 +1413,7 @@ USER_FUNC(evt_mario_jump_jumpstand) {
 
     switch (event->userdata[0]) {
         case 0:
-            FLD(mp, u32, 0x4) |= 4;
+            mp->dispFlags |= 4;
             if (marioChkSts(0x10)) {
                 effKemuriEntry(0, mp->position.x, mp->position.y, mp->position.z, 0.0f);
             }
@@ -1555,7 +1551,7 @@ USER_FUNC(evt_mario_jump_jumpstand) {
         mp->baseSpeed = 0.0f;
         mp->baseSpeed = 0.0f;
         marioChgMot(0);
-        FLD(mp, u32, 0x4) &= ~4;
+        mp->dispFlags &= ~4;
         marioAdjustMoveDir();
         camFollowYOn();
         gp->systemLevelFlags &= ~0x10;
@@ -1674,18 +1670,18 @@ USER_FUNC(evt_koopa_fire) {
     switch (event->userdata[0]) {
         case 0:
             if (--event->userdata[2] != 0) {
-                FLD(FLD(mp, void*, MWOFF(0x28c)), s32, 0x144) = 1;
+                mp->kpaWork->fireHold = 1;
                 return EVT_RETURN_BLOCK;
             }
     }
-    FLD(FLD(mp, void*, MWOFF(0x28c)), s32, 0x144) = 0;
+    mp->kpaWork->fireHold = 0;
     return EVT_RETURN_YIELD;
 }
 
 USER_FUNC(evt_koopa_chk_dead) {
     s32* args = event->args;
     MarioWork* mp = marioGetPtr();
-    evtSetValue(event, args[0], (FLD(FLD(mp, void*, MWOFF(0x28c)), u32, 0) >> 28) & 1);
+    evtSetValue(event, args[0], (mp->kpaWork->flags >> 28) & 1);
     return EVT_RETURN_DONE;
 }
 
@@ -1693,9 +1689,9 @@ USER_FUNC(evt_koopa_weary) {
     s32* args = event->args;
     MarioWork* mp = marioGetPtr();
     if (args[0]) {
-        FLD(FLD(mp, void*, MWOFF(0x28c)), u32, 0) |= 0x1000000;
+        mp->kpaWork->flags |= 0x1000000;
     } else {
-        FLD(FLD(mp, void*, MWOFF(0x28c)), u32, 0) &= ~0x1000000;
+        mp->kpaWork->flags &= ~0x1000000;
     }
     return EVT_RETURN_DONE;
 }

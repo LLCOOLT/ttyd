@@ -3,6 +3,7 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
 #include "mri.h"
+#include "data_tables.h"
 
 #pragma force_active on
 
@@ -35,80 +36,60 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
 
-__declspec(section ".data") u64 fd_mri_15_negone_one_374;
-__declspec(section ".data") s32 fd_mri_15_neg_one_382[1];
-__declspec(section ".data") s32 fd_mri_15___local_PI_383[1];
-__declspec(section ".data") s32 fd_mri_15___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_mri_15_one_negone_373;
-__declspec(section ".data") s32 fd_mri_15___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_mri_15_one_381[1];
-__declspec(section ".data") u64 fd_mri_15_negone_one_360;
-__declspec(section ".data") s32 fd_mri_15_neg_one_365[1];
-__declspec(section ".data") s32 fd_mri_15___local_PI_366[1];
-__declspec(section ".data") s32 fd_mri_15___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_mri_15_one_negone_359;
-__declspec(section ".data") s32 fd_mri_15___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_mri_15_one_364[1];
+__declspec(section ".data") f32 fd_mri_15_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_15_neg_one_382;
+__declspec(section ".data") f32 fd_mri_15___local_PI_383;
+__declspec(section ".data") f32 fd_mri_15___local_3PIO2_385;
+__declspec(section ".data") f32 fd_mri_15_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_15___local_PIO2_384;
+__declspec(section ".data") f32 fd_mri_15_one_381;
+__declspec(section ".data") f32 fd_mri_15_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_15_neg_one_365;
+__declspec(section ".data") f32 fd_mri_15___local_PI_366;
+__declspec(section ".data") f32 fd_mri_15___local_3PIO2_368;
+__declspec(section ".data") f32 fd_mri_15_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_15___local_PIO2_367;
+__declspec(section ".data") f32 fd_mri_15_one_364;
 static __declspec(section ".data") s32 bero_s_doa_close[10];
 static __declspec(section ".data") s32 bero_s_doa_open[10];
 __declspec(section ".data") s32 evt_dokan[12];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 static s32 door_switch_init[17];
 static s32 door_switch[59];
 s32 dai3_escape[32];
 s32 dai3_battle_init[66];
 s32 dai3_battle[140];
 s32 ueki_evt_01[20];
-static s32 ueki_access_data[28];
+static KusaAccess ueki_access_data[7];
 s32 mri_15_init_evt[156];
 
-__declspec(section ".data") u64 fd_mri_15_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mri_15_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mri_15_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_mri_15_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_mri_15___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_mri_15___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_mri_15___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_mri_15___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_mri_15_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_mri_15_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_mri_15___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_mri_15___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_mri_15_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_mri_15_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_mri_15_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mri_15_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mri_15_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_mri_15_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_mri_15___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_mri_15___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_mri_15___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_mri_15___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_mri_15_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_mri_15_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_mri_15___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_mri_15___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_mri_15_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_mri_15_one_364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(bero_s_doa_close)
     SET_VALUE(LW(9), 0)
@@ -132,13 +113,43 @@ __declspec(section ".data") EVT_BEGIN(evt_dokan)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65536, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"mri_06", (s32)"e_bero", 262148, (s32)bero_s_doa_close, (s32)bero_s_doa_open, (s32)"dokan",
-    131072, 9, 100000, 0, 0, -1, 0, 6,
-    (s32)evt_dokan, (s32)"mri_14", (s32)"dokan", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        0, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"mri_06", // nextMapName
+        "e_bero", // nextBeroName
+        4, // enterAnimeType
+        4, // exitAnimeType
+        (s32)bero_s_doa_close, // enterAnimeArg
+        (s32)bero_s_doa_open, // exitAnimeArg
+    },
+    {
+        "dokan", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        (s32*)evt_dokan, // exitEvent
+        (s32)"mri_14", // nextMapName
+        "dokan", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(door_switch_init)
@@ -262,11 +273,14 @@ EVT_BEGIN(ueki_evt_01)
     RETURN
 EVT_END()
 
-static s32 ueki_access_data[] = {
-    1, (s32)"A_ueki01", (s32)"S_ueki01", (s32)ueki_evt_01, 1, (s32)"A_ueki02", (s32)"S_ueki02", 0,
-    1, (s32)"A_ueki03", (s32)"S_ueki03", 0, 1, (s32)"A_ueki04", (s32)"S_ueki04", 0,
-    1, (s32)"A_ueki05", (s32)"S_ueki05", 0, 1, (s32)"A_ueki06", (s32)"S_ueki06", 0,
-    4, 0, 0, 0,
+static KusaAccess ueki_access_data[] = {
+    {1, "A_ueki01", "S_ueki01", ueki_evt_01},
+    {1, "A_ueki02", "S_ueki02", NULL},
+    {1, "A_ueki03", "S_ueki03", NULL},
+    {1, "A_ueki04", "S_ueki04", NULL},
+    {1, "A_ueki05", "S_ueki05", NULL},
+    {1, "A_ueki06", "S_ueki06", NULL},
+    {4, NULL, NULL, NULL},
 };
 
 EVT_BEGIN(mri_15_init_evt)

@@ -49,7 +49,10 @@ struct HitEntry {
     u8 unkB4[0xC0 - 0xB4];          // 0xB4
     Vec centerWorld;                // 0xC0
     f32 radius;                     // 0xCC
-    MapObject* mapObj;              // 0xD0
+    union {                         // 0xD0, owner: map object, or the mobj for mobj hit objects
+        MapObject* mapObj;
+        struct MapObjectEntry* mobj;
+    };
     struct HitEntry* parent;        // 0xD4
     struct HitEntry* child;         // 0xD8
     struct HitEntry* sibling;       // 0xDC

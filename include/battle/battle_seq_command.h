@@ -71,7 +71,17 @@ typedef struct BattleCommand {
     BattleCommandParty party[8];             // 0x390
     BattleCommandMultiItem multiItem[3];     // 0x450
     BattleCursor cursor[14];                 // 0x498
-    u8 unk540[0x55C - 0x540];                // 0x540
+    s32 unk540;                              // 0x540
+    u8 unk544[0x548 - 0x544];                // 0x544
+    s32 unk548;                              // 0x548
+    s32 unk54C;                              // 0x54C
+    u8 unk550;                               // 0x550
+    u8 unk551;                               // 0x551
+    u8 unk552[0x558 - 0x552];                // 0x552
+    u8 unk558;                               // 0x558
+    u8 unk559[0x55C - 0x559];                // 0x559
     void* field_55C;                         // 0x55C
-    u8 unk560[0x574 - 0x560];                // 0x560
+    s32 unk560_;                             // 0x560
+    s32 unk564;                              // 0x564
+    u8 unk568[0x574 - 0x568];                // 0x568
 } BattleCommand;

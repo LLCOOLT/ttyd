@@ -27,6 +27,7 @@
 #include "evt/evt_nannpc.h"
 #include "party/party_motion.h"
 #include "muj.h"
+#include "data_tables.h"
 
 NpcEntry* evtNpcNameToPtr(EventEntry* event, const char* name);
 typedef struct MarcoShip { f32 angle; f32 speed; f32 max; s32 stopped; s32 state; s32 field_0x14; OSTime time; } MarcoShip;
@@ -136,20 +137,20 @@ USER_FUNC(marcoship_stop_func);
 extern s32 evt_npc_set_run_anim[];
 extern s32 evt_npc_set_stay_anim[];
 
-__declspec(section ".data") u64 fd_muj_20_negone_one_374;
-__declspec(section ".data") s32 fd_muj_20_neg_one_382[1];
-__declspec(section ".data") s32 fd_muj_20___local_PI_383[1];
-__declspec(section ".data") s32 fd_muj_20___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_muj_20_one_negone_373;
-__declspec(section ".data") s32 fd_muj_20___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_muj_20_one_381[1];
-__declspec(section ".data") u64 fd_muj_20_negone_one_360;
-__declspec(section ".data") s32 fd_muj_20_neg_one_365[1];
-__declspec(section ".data") s32 fd_muj_20___local_PI_366[1];
-__declspec(section ".data") s32 fd_muj_20___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_muj_20_one_negone_359;
-__declspec(section ".data") s32 fd_muj_20___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_muj_20_one_364[1];
+__declspec(section ".data") f32 fd_muj_20_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_20_neg_one_382;
+__declspec(section ".data") f32 fd_muj_20___local_PI_383;
+__declspec(section ".data") f32 fd_muj_20___local_3PIO2_385;
+__declspec(section ".data") f32 fd_muj_20_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_20___local_PIO2_384;
+__declspec(section ".data") f32 fd_muj_20_one_381;
+__declspec(section ".data") f32 fd_muj_20_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_20_neg_one_365;
+__declspec(section ".data") f32 fd_muj_20___local_PI_366;
+__declspec(section ".data") f32 fd_muj_20___local_3PIO2_368;
+__declspec(section ".data") f32 fd_muj_20_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_20___local_PIO2_367;
+__declspec(section ".data") f32 fd_muj_20_one_364;
 s32 hiru_yoru_event[46];
 s32 yoru_hiru_event[46];
 s32 urouro[61];
@@ -170,8 +171,8 @@ s32 _kakushuku[32];
 s32 elmos_a_kakushuku[63];
 s32 elmos_a_kaku[13];
 s32 elmos_a_shuku[13];
-static s32 ext_entry_data[63];
-static __declspec(section ".data") s32 elmos_animtbl[11];
+static ExtTexInfo ext_entry_data[21];
+static __declspec(section ".data") s16 elmos_animtbl[22];
 static s32 nannpc_mode_setup[35];
 s32 mist_pos[91];
 s32 mist_setup[45];
@@ -193,53 +194,33 @@ static s32 epilogue_evt[97];
 s32 muj_20_init_evt[362];
 
 
-__declspec(section ".data") u64 fd_muj_20_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_20_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_20_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_20_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj_20___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj_20___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj_20___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj_20___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_20_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_20_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj_20___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj_20___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_20_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_20_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_muj_20_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_20_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_20_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_20_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj_20___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj_20___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj_20___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj_20___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_20_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_20_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj_20___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj_20___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_20_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_20_one_364 = 1.0f;
 
 EVT_BEGIN(hiru_yoru_event)
     CALL(evt_map_playanim, STRING("hiru_yoru"), 0, 0)
@@ -961,20 +942,34 @@ EVT_BEGIN(elmos_a_shuku)
     RETURN
 EVT_END()
 
-static s32 ext_entry_data[] = {
-    (s32)"c_elmos", (s32)"S_1", 0, (s32)"c_elmos", (s32)"S_1", 1065353216, (s32)"c_elmos", (s32)"S_1",
-    1073741824, (s32)"c_elmos", (s32)"S_1", 1077936128, (s32)"c_elmos", (s32)"S_1", 1082130432, (s32)"c_elmos",
-    (s32)"S_1", 1084227584, (s32)"c_elmos", (s32)"S_1", 1086324736, (s32)"c_elmos", (s32)"S_1", 1088421888,
-    (s32)"c_elmos", (s32)"S_1", 1090519040, (s32)"c_elmos", (s32)"S_1", 1091567616, (s32)"c_elmos", (s32)"S_1",
-    1092616192, (s32)"c_elmos", (s32)"S_1", 1093664768, (s32)"c_elmos", (s32)"S_1", 1094713344, (s32)"c_elmos",
-    (s32)"S_1", 1095761920, (s32)"c_elmos", (s32)"S_1", 1096810496, (s32)"c_elmos", (s32)"S_1", 1097859072,
-    (s32)"c_elmos", (s32)"S_1", 1098907648, (s32)"c_elmos", (s32)"S_1", 1099431936, (s32)"c_elmos", (s32)"S_1",
-    1099956224, (s32)"c_elmos", (s32)"S_1", 1100480512, 0, 0, 0,
+static ExtTexInfo ext_entry_data[] = {
+    {"c_elmos", "S_1", 0.0f},
+    {"c_elmos", "S_1", 1.0f},
+    {"c_elmos", "S_1", 2.0f},
+    {"c_elmos", "S_1", 3.0f},
+    {"c_elmos", "S_1", 4.0f},
+    {"c_elmos", "S_1", 5.0f},
+    {"c_elmos", "S_1", 6.0f},
+    {"c_elmos", "S_1", 7.0f},
+    {"c_elmos", "S_1", 8.0f},
+    {"c_elmos", "S_1", 9.0f},
+    {"c_elmos", "S_1", 10.0f},
+    {"c_elmos", "S_1", 11.0f},
+    {"c_elmos", "S_1", 12.0f},
+    {"c_elmos", "S_1", 13.0f},
+    {"c_elmos", "S_1", 14.0f},
+    {"c_elmos", "S_1", 15.0f},
+    {"c_elmos", "S_1", 16.0f},
+    {"c_elmos", "S_1", 17.0f},
+    {"c_elmos", "S_1", 18.0f},
+    {"c_elmos", "S_1", 19.0f},
+    {0},
 };
 
-static __declspec(section ".data") s32 elmos_animtbl[] = {
-    1, 131075, 262149, 393223, 524297, 655371, 786445, 917519,
-    1048593, 1179667, -65536,
+static __declspec(section ".data") s16 elmos_animtbl[] = {
+    0, 1, 2, 3, 4, 5, 6, 7,
+    8, 9, 10, 11, 12, 13, 14, 15,
+    16, 17, 18, 19, -1, 0,
 };
 
 static EVT_BEGIN(nannpc_mode_setup)
@@ -1071,300 +1066,549 @@ EVT_BEGIN(marcoship_shizumu)
     RETURN
 EVT_END()
 
-s32 onryo_event[] = {
-    107, 65627, (s32)evt_map_anim_rate, 109, 65628, (s32)marco_ship_yure, 65628, (s32)nannpc_mode_setup,
-    327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"S_b", 1, 262235, (s32)evt_hitobj_onoff,
-    (s32)"A_b", 1, 0, 131096, -170000000, 230, 131163, (s32)evt_mario_key_onoff,
-    0, 131163, (s32)evt_mario_cont_onoff, 0, 196699, (s32)evt_party_cont_onoff, 0, 0,
-    262235, (s32)evt_mario_set_pos, 5, 90, -100, 327771, (s32)evt_party_set_pos, 0,
-    0, -1000, 0, 65540, 100, 33, 131163, (s32)evt_mario_key_onoff,
-    0, 131163, (s32)evt_mario_cont_onoff, 0, 262235, (s32)evt_mario_set_pos, 0, -1000,
-    0,
+EVT_BEGIN(onryo_event)
+    BEGIN_INLINE_EVENT
+        CALL(evt_map_anim_rate)
+    END_INLINE_EVENT
+    SPAWN_EVENT(marco_ship_yure)
+    SPAWN_EVENT(nannpc_mode_setup)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_b"), 1)
+    CALL(evt_hitobj_onoff, STRING("A_b"), 1, 0)
+    IF_INT_EQUAL(GSW(0), 230)
+        CALL(evt_mario_key_onoff, 0)
+        CALL(evt_mario_cont_onoff, 0)
+        CALL(evt_party_cont_onoff, 0, 0)
+        CALL(evt_mario_set_pos, 5, 90, -100)
+        CALL(evt_party_set_pos, 0, 0, -1000, 0)
+        GOTO(100)
+    END_IF
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(evt_mario_set_pos, 0, -1000, 0)
 #ifdef VERSION_G8ME01
-    196699, (s32)evt_party_cont_onoff, 0, 0, 327771, (s32)evt_party_set_pos, 0, 0, -1000, 0,
+    CALL(evt_party_cont_onoff, 0, 0)
+    CALL(evt_party_set_pos, 0, 0, -1000, 0)
 #endif
-    589915, (s32)evt_cam3d_evt_set, 0, 600, 2155, 0, 350,
-    -108, 0, 11, 262235, (s32)evt_map_playanim, (s32)"yoru_hiru", 2, 0,
-    131163, (s32)evt_seq_wait, 2, 65546, 4000, 327771, (s32)evt_msg_toge, 1,
-    0, 0, 0, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_00", 0,
-    0, 65630, (s32)hiru_yoru_event, 65546, 3000, 65630, (s32)yoru_hiru_event, 65546,
-    1000, 327771, (s32)evt_msg_toge, 1, 0, 0, 0, 327771,
-    (s32)evt_msg_print, 0, (s32)"stg5_sea_28", 0, 0, 65630, (s32)hiru_yoru_event, 65546,
-    3000, 65630, (s32)yoru_hiru_event, 65546, 1000, 327771, (s32)evt_msg_toge, 1,
-    0, 0, 0, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_29", 0,
-    0, 65630, (s32)hiru_yoru_event, 65546, 1000, 131122, -170000000, 230,
-    65539, 100, 131163, (s32)evt_mario_cont_onoff, 1,
-#ifndef VERSION_G8ME01
-    196699, (s32)evt_party_cont_onoff, 0, 0,
+    CALL(evt_cam3d_evt_set, 0, 600, 2155, 0, 350, -108, 0, 11)
+    CALL(evt_map_playanim, STRING("yoru_hiru"), 2, 0)
+    CALL(evt_seq_wait, 2)
+    WAIT_MS(4000)
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_00"), 0, 0)
+    CALL_CHILD(hiru_yoru_event)
+    WAIT_MS(3000)
+    CALL_CHILD(yoru_hiru_event)
+    WAIT_MS(1000)
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_28"), 0, 0)
+    CALL_CHILD(hiru_yoru_event)
+    WAIT_MS(3000)
+    CALL_CHILD(yoru_hiru_event)
+    WAIT_MS(1000)
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_29"), 0, 0)
+    CALL_CHILD(hiru_yoru_event)
+    WAIT_MS(1000)
+    SET_VALUE(GSW(0), 230)
+    LABEL(100)
+    CALL(evt_mario_cont_onoff, 1)
+#ifdef VERSION_G8ME01
+#else
+    CALL(evt_party_cont_onoff, 0, 0)
 #endif
-    262235, (s32)evt_mario_set_pos, 5, 90, -100, 262235, (s32)evt_mario_set_dir,
-    90, 0, 0,
-#ifndef VERSION_G8ME01
-    327771, (s32)evt_party_set_pos, 0, 0, -1000, 0,
+    CALL(evt_mario_set_pos, 5, 90, -100)
+    CALL(evt_mario_set_dir, 90, 0, 0)
+#ifdef VERSION_G8ME01
+#else
+    CALL(evt_party_set_pos, 0, 0, -1000, 0)
 #endif
-    327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"S_a1", 2, 327771,
-    (s32)evt_npc_set_position, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 116, 116, -100, 196699, (s32)evt_npc_set_ry, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52",
-    90, 327771, (s32)evt_npc_set_position, (s32)/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76", 25, 90, -163, 196699,
-    (s32)evt_npc_set_ry, (s32)/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76", 90, 327771, (s32)evt_npc_set_position, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 21, 90,
-    -55, 196699, (s32)evt_npc_set_ry, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 90, 327771, (s32)evt_npc_set_position, (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58",
-    -11, 90, -163, 196699, (s32)evt_npc_set_ry, (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 90, 327771,
-    (s32)evt_npc_set_position, (s32)/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76", -15, 90, -40, 196699, (s32)evt_npc_set_ry, (s32)/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76",
-    90, 327771, (s32)evt_npc_set_position, (s32)/*"水夫A"*/"\x90\x85\x95\x76\x41", -65, 114, -145, 196699,
-    (s32)evt_npc_set_ry, (s32)/*"水夫A"*/"\x90\x85\x95\x76\x41", 90, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"水夫A"*/"\x90\x85\x95\x76\x41", 1024,
-    131163, (s32)evt_npc_set_stay_anim, (s32)/*"水夫A"*/"\x90\x85\x95\x76\x41", 327771, (s32)evt_npc_set_position, (s32)/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA", -65, 114,
-    -44, 196699, (s32)evt_npc_set_ry, (s32)/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA", 90, 262235, (s32)evt_npc_flag_onoff, 0,
-    (s32)/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA", 1024, 131163, (s32)evt_npc_set_stay_anim, (s32)/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA", 327771, (s32)evt_npc_set_position, (s32)/*"店員"*/"\x93\x58\x88\xF5",
-    -115, 163, -153, 196699, (s32)evt_npc_set_ry, (s32)/*"店員"*/"\x93\x58\x88\xF5", 90, 262235,
-    (s32)evt_npc_flag_onoff, 0, (s32)/*"店員"*/"\x93\x58\x88\xF5", 1024, 131163, (s32)evt_npc_set_stay_anim, (s32)/*"店員"*/"\x93\x58\x88\xF5", 327771,
-    (s32)evt_npc_set_position, (s32)/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5", -119, 163, -62, 196699, (s32)evt_npc_set_ry, (s32)/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5",
-    90, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5", 1024, 131163, (s32)evt_npc_set_stay_anim,
-    (s32)/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5", 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 1073741856, 262235, (s32)evt_npc_flag_onoff,
-    1, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 1073743392, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 32768,
-    262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76", 32768, 262235, (s32)evt_npc_flag_onoff, 1,
-    (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 32768, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 32768, 262235,
-    (s32)evt_npc_flag_onoff, 1, (s32)/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76", 32768, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"水夫A"*/"\x90\x85\x95\x76\x41",
-    32768, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA", 32768, 262235, (s32)evt_npc_flag_onoff,
-    1, (s32)/*"店員"*/"\x93\x58\x88\xF5", 32768, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5", 32768,
-    458843, (s32)evt_npc_sound_data_set, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", (s32)"SFX_STG5_MARCO_MOVE1L", (s32)"SFX_STG5_MARCO_MOVE1R", -250000000, -250000000, -250000000,
-    589915, (s32)evt_cam3d_evt_set, -10, 340, 558, -11, 131, -108,
-    0, 11, 65546, 1000, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52",
-    32768, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76", 32768, 262235, (s32)evt_npc_flag_onoff,
-    0, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 32768, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 32768,
-    262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76", 32768, 262235, (s32)evt_npc_flag_onoff, 0,
-    (s32)/*"水夫A"*/"\x90\x85\x95\x76\x41", 32768, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA", 32768, 262235,
-    (s32)evt_npc_flag_onoff, 0, (s32)/*"店員"*/"\x93\x58\x88\xF5", 32768, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5",
-    32768, 65546, 1000, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_01", 0,
-    (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 65546, 500, 589915, (s32)evt_cam3d_evt_set, 480, 352, 214,
-    58, 150, -96, 0, 11, 65546, 1500, 196699,
-    (s32)evt_npc_set_ry, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 270, 65546, 500, 458843, (s32)evt_npc_move_position, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52",
-    107, -100, 0, -229938560, 0, 65546, 500, 327771,
-    (s32)evt_msg_print, 0, (s32)"stg5_sea_02", 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 589915, (s32)evt_cam3d_evt_set, 0,
-    300, 985, 0, 175, -108, 0, 11, 131163,
-    (s32)evt_snd_bgmoff, 26624, 131122, -50000000, 0, 262235, (s32)evt_npc_flag_onoff, 0,
-    (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 512, 196699, (s32)evt_npc_set_anim, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", (s32)"S_2", 107, 327771,
-    (s32)evt_msg_print, 0, (s32)"small_01", 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 65541, 0, 131096,
-    -50000000, 1, 7, 33, 65627, (s32)evt_msg_repeat, 6, 109,
-    131163, (s32)evt_set_fune_anim_rate, -229999284, 131163, (s32)evt_set_nami_anim_rate, -229999284, 65546, 1000,
-    65546, 1500, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_03", 0, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76",
-    65546, 500, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_04", 0, (s32)/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76",
-    65627, (s32)marcoship_stop_func, 107, 196699, (s32)evt_snd_bgmoff_f, 512, 2000, 65546,
-    2000, 262235, (s32)evt_snd_bgmon_f, 768, (s32)"BGM_EVT_STG5_GHOST1", 2000, 131163, (s32)evt_snd_envoff,
-    18432, 109, 131163, (s32)evt_set_fune_anim_rate, -229999591, 131163, (s32)evt_set_nami_anim_rate, -229999591,
-    196699, (s32)evt_msg_print_add, 0, (s32)"stg5_sea_04_01", 589915, (s32)evt_cam3d_evt_set, 0, 295,
-    370, 0, 145, -108, 0, 11, 65628, (s32)nami_alpha,
-    131163, (s32)evt_set_fune_anim_rate, -230000000, 131163, (s32)evt_set_nami_anim_rate, -229999898, 327771, (s32)evt_mapobj_flag_onoff,
-    0, 1, (s32)"S_fne_nami", 1, 65546, 500, 327771, (s32)evt_msg_print,
-    0, (s32)"stg5_sea_05", 0, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 65546, 1000, 131122, -50000000,
-    1, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 512, 131163, (s32)evt_msg_close,
-    (s32)"small_01", 196699, (s32)evt_npc_set_anim, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", (s32)"T_1", 65546, 2000, 196699,
-    (s32)evt_npc_set_anim, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", (s32)"S_1", 65627, (s32)marcoship_stop_wait_func, 65546, 500, 458843,
-    (s32)evt_npc_move_position, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 68, -71, 0, -229877120, 0, 65546,
-    500, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_06", 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 65546,
-    500, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_07", 0, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 589915,
-    (s32)evt_cam3d_evt_set, -50, 470, 588, -50, 390, -107, 500,
-    11, 65546, 500, 196699, (s32)evt_npc_set_anim, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", (s32)"R_1", 327771,
-    (s32)evt_npc_set_position, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", -12, 90, -80, 196699, (s32)evt_npc_set_ry, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76",
-    270, 655451, (s32)evt_npc_glide_position, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", -52, 315, -75, 0,
-    -229877120, 0, 0, 0, 196699, (s32)evt_npc_set_anim, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", (s32)"S_1",
-    65546, 500, 196699, (s32)evt_npc_set_ry, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 270, 196699, (s32)evt_npc_set_anim,
-    (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", (s32)"R_1", 655451, (s32)evt_npc_glide_position, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", -78, 315, -79,
-    0, -229877120, 0, 0, 0, 196699, (s32)evt_npc_set_anim, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76",
-    (s32)"S_1", 65546, 1500, 327771, (s32)evt_npc_set_position, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", -23, 315,
-    -79, 327771, (s32)evt_npc_set_rotate, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 0, 180, 0, 65546,
-    1200, 327771, (s32)evt_npc_set_position, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", -78, 315, -79, 327771,
-    (s32)evt_npc_set_rotate, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 0, 0, 0, 65546, 1800, 327771,
-    (s32)evt_npc_set_position, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", -23, 315, -79, 327771, (s32)evt_npc_set_rotate, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76",
-    0, 180, 0, 65546, 1000, 327771, (s32)evt_npc_set_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41",
-    -45, 336, -73, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG5_ELMOS_APPEAR1_2", -45, 336,
-    -73, 0, 196699, (s32)evt_npc_set_ry, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", 90, 65546, 1000,
-    327771, (s32)evt_npc_get_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", -29999990, -29999989, -29999988, 131122, -29999987,
-    -29999990, 131122, -29999986, -29999989, 131122, -29999985, -29999988, 131125,
-    -29999987, 5, 131125, -29999986, -5, 131125, -29999985, 0,
-    393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG5_ELMOS_MOVE1", -29999990, -29999989, -29999988, 0, 655451,
-    (s32)evt_npc_glide_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", -29999987, -29999986, -29999985, 0, -229877120, 0,
-    0, 0, 655451, (s32)evt_npc_glide_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", -29999990, -29999989, -29999988,
-    0, -229877120, 0, 0, 0, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG5_ELMOS_MOVE1",
-    -29999990, -29999989, -29999988, 0, 655451, (s32)evt_npc_glide_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", -29999987,
-    -29999986, -29999985, 0, -229877120, 0, 0, 0, 655451,
-    (s32)evt_npc_glide_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", -29999990, -29999989, -29999988, 0, -229877120, 0,
-    0, 0, 65546, 500, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_08",
-    0, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 327771, (s32)evt_npc_set_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", 0, -1000, 0,
-    107, 327771, (s32)evt_sub_intpl_msec_init, 0, 180, 0, 200, 65541,
-    0, 196699, (s32)evt_sub_intpl_msec_get_value_para, -30000000, -29999999, 327771, (s32)evt_npc_set_rotate, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76",
-    0, -30000000, 0, 131096, -29999999, 0, 7, 33,
-    65545, 1, 6, 109, 65546, 200, 65628, (s32)moya_effect,
-    65546, 1500, 107, 327771, (s32)evt_npc_get_position, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", -30000000, -29999999,
-    -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_EVT_NPC_QUESTION_MARK1", -30000000, -29999999, -29999998, 0,
-    786523, (s32)evt_eff_fukidashi, 2, (s32)"", 0, 1, 0, -30000000,
-    -29999999, -29999998, 30, 0, 90, 109, 65546, 1000,
-    196699, (s32)evt_npc_set_ry, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 90, 65546, 500, 327771, (s32)evt_npc_set_position,
-    (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", -29999990, -29999989, -29999988, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG5_ELMOS_APPEAR1_2", -29999990,
-    -29999989, -29999988, 0, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG5_ELMOS_MOVE1", -29999990, -29999989,
-    -29999988, 0, 655451, (s32)evt_npc_glide_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", -29999987, -29999986, -29999985,
-    0, -229877120, 0, 0, 0, 655451, (s32)evt_npc_glide_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41",
-    -29999990, -29999989, -29999988, 0, -229877120, 0, 0, 0,
-    393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG5_ELMOS_MOVE1", -29999990, -29999989, -29999988, 0, 655451,
-    (s32)evt_npc_glide_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", -29999987, -29999986, -29999985, 0, -229877120, 0,
-    0, 0, 655451, (s32)evt_npc_glide_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", -29999990, -29999989, -29999988,
-    0, -229877120, 0, 0, 0, 65546, 500, 327771,
-    (s32)evt_msg_print, 0, (s32)"stg5_sea_09", 0, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 65546, 1000, 196699,
-    (s32)evt_npc_set_ry, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 270, 65546, 1000, 589915, (s32)evt_cam3d_evt_set, -50,
-    412, 340, -50, 360, -108, 100, 11, 107,
-    327771, (s32)evt_npc_get_position, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d,
-    (s32)"SFX_EVT_NPC_BIKKURI_MARK1", -30000000, -29999999, -29999998, 0, 786523, (s32)evt_eff_fukidashi, 2,
-    (s32)"", 0, 0, 0, -30000000, -29999999, -29999998, 30,
-    0, 60, 109, 65546, 1000, 107, 196699, (s32)evt_snd_bgmon,
-    512, (s32)"BGM_EVT_DANGER2", 109, 131122, -90000000, 1, 107, 65541,
-    5, 589915, (s32)evt_cam3d_evt_set, -50, 412, 340, -50, 360,
-    -108, 100, 11, 65546, 100, 589915, (s32)evt_cam3d_evt_set, -50,
-    423, 438, -50, 360, -108, 100, 11, 65546,
-    100, 6, 589915, (s32)evt_cam3d_evt_set, -50, 412, 340, -50,
-    360, -108, 100, 11, 65546, 100, 131122, -90000000,
-    0, 109, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_11", 0, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76",
-    65547, -90000000, 196699, (s32)evt_npc_set_anim, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", (s32)"R_1", 458843, (s32)muj_npc_guruguru,
-    (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", -52, -90, 0, -230012288, 3000, 131122, -90000000,
-    1, 107, 196699, (s32)evt_npc_set_ry, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 270, 655451, (s32)evt_npc_glide_position,
-    (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", -52, 315, -70, 0, -229815680, 0, 0,
-    0, 196699, (s32)evt_npc_set_ry, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 90, 655451, (s32)evt_npc_glide_position, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76",
-    -43, 90, -72, 0, -229815680, 0, 0, 0,
-    196699, (s32)evt_npc_set_ry, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 90, 655451, (s32)evt_npc_glide_position, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 20,
-    90, -55, 0, -229815680, 0, 0, 0, 458843,
-    (s32)evt_npc_jump_position_nohit, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 20, 90, -55, 100, 30, 131122,
-    -90000000, 0, 109, 65546, 500, 589915, (s32)evt_cam3d_evt_set, -10,
-    340, 558, -11, 131, -108, 1000, 11, 65547,
-    -90000000, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_12", 0, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 65546,
-    500, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_13", 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 65546,
-    500, 65628, (s32)mist_setup, 327771, (s32)evt_npc_set_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", 168, 160,
-    -84, 327771, (s32)evt_npc_set_position, (s32)/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42", 105, 100, -200, 327771,
-    (s32)evt_npc_set_position, (s32)/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43", 10, 110, -200, 327771, (s32)evt_npc_set_position, (s32)/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44",
-    -70, 105, -200, 327771, (s32)evt_npc_set_position, (s32)/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45", 125, 105,
-    0, 327771, (s32)evt_npc_set_position, (s32)/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46", 10, 100, 0, 327771,
-    (s32)evt_npc_set_position, (s32)/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47", -80, 110, 0, 196699, (s32)evt_npc_set_ry, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41",
-    270, 196699, (s32)evt_npc_set_ry, (s32)/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42", 270, 196699, (s32)evt_npc_set_ry, (s32)/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43",
-    270, 196699, (s32)evt_npc_set_ry, (s32)/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44", 90, 196699, (s32)evt_npc_set_ry, (s32)/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45",
-    270, 196699, (s32)evt_npc_set_ry, (s32)/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46", 270, 196699, (s32)evt_npc_set_ry, (s32)/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47",
-    90, 393307, (s32)evt_npc_set_color, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", 255, 255, 255, 0,
-    393307, (s32)evt_npc_set_color, (s32)/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42", 255, 255, 255, 0, 393307,
-    (s32)evt_npc_set_color, (s32)/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43", 255, 255, 255, 0, 393307, (s32)evt_npc_set_color,
-    (s32)/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44", 255, 255, 255, 0, 393307, (s32)evt_npc_set_color, (s32)/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45",
-    255, 255, 255, 0, 393307, (s32)evt_npc_set_color, (s32)/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46", 255,
-    255, 255, 0, 393307, (s32)evt_npc_set_color, (s32)/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47", 255, 255,
-    255, 0, 196699, (s32)evt_snd_sfxon, (s32)"SFX_STG5_ELMOS_APPEAR1_2", 0, 327771, (s32)evt_sub_intpl_msec_init,
-    11, 0, 255, 1000, 65541, 0, 65627, (s32)evt_sub_intpl_msec_get_value,
-    393307, (s32)evt_npc_set_color, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", 255, 255, 255, -30000000, 393307,
-    (s32)evt_npc_set_color, (s32)/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42", 255, 255, 255, -30000000, 393307, (s32)evt_npc_set_color,
-    (s32)/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43", 255, 255, 255, -30000000, 393307, (s32)evt_npc_set_color, (s32)/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44",
-    255, 255, 255, -30000000, 393307, (s32)evt_npc_set_color, (s32)/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45", 255,
-    255, 255, -30000000, 393307, (s32)evt_npc_set_color, (s32)/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46", 255, 255,
-    255, -30000000, 393307, (s32)evt_npc_set_color, (s32)/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47", 255, 255, 255,
-    -30000000, 131096, -29999999, 0, 7, 33, 65545, 1,
-    6, 65546, 500, 131122, -30000000, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", 131165, (s32)fuwafuwa,
-    -49999999, 131122, -30000000, (s32)/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42", 327771, (s32)evt_npc_get_position, -30000000, -29999999,
-    -29999998, -29999997, 131125, -29999999, -20, 131122, -29999996, 1,
-    131122, -29999995, 850, 65628, (s32)urouro_fuwafuwa, 131122, -30000000, (s32)/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43",
-    327771, (s32)evt_npc_get_position, -30000000, -29999999, -29999998, -29999997, 131125, -29999999,
-    -25, 131122, -29999996, 1, 131122, -29999995, 1000, 65628,
-    (s32)urouro_fuwafuwa, 131122, -30000000, (s32)/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44", 327771, (s32)evt_npc_get_position, -30000000, -29999999,
-    -29999998, -29999997, 131125, -29999999, -22, 131122, -29999996, 1,
-    131122, -29999995, 900, 65628, (s32)urouro_fuwafuwa, 131122, -30000000, (s32)/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45",
-    327771, (s32)evt_npc_get_position, -30000000, -29999999, -29999998, -29999997, 131125, -29999999,
-    -30, 131122, -29999996, 1, 131122, -29999995, 1050, 65628,
-    (s32)urouro_fuwafuwa, 131122, -30000000, (s32)/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46", 327771, (s32)evt_npc_get_position, -30000000, -29999999,
-    -29999998, -29999997, 131125, -29999999, -20, 131122, -29999996, 1,
-    131122, -29999995, 950, 65628, (s32)urouro_fuwafuwa, 131122, -30000000, (s32)/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47",
-    327771, (s32)evt_npc_get_position, -30000000, -29999999, -29999998, -29999997, 131125, -29999999,
-    -24, 131122, -29999996, 1, 131122, -29999995, 900, 65628,
-    (s32)urouro_fuwafuwa, 589915, (s32)evt_cam3d_evt_set, 2, 700, 1614, -1, 261,
-    -108, 0, 11, 327771, (s32)evt_npc_set_position, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 116, 116,
-    -100, 65546, 500, 196699, (s32)evt_snd_sfxon, (s32)"SFX_STG5_ELMOS_VOICE1", 0, 196699,
-    (s32)evt_snd_sfxon, (s32)"SFX_STG5_KORTESS_VOICE1", 0, 327771, (s32)evt_msg_toge, 1, 0, 0,
-    0, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_14", 0, 0, 65546,
-    500, 589915, (s32)evt_cam3d_evt_set, 0, 358, 572, -1, 145,
-    -108, 0, 11, 65546, 1000, 327771, (s32)evt_msg_toge, 1,
-    0, 0, 0, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_15", 0,
-    0, 65546, 500, 131122, -30000000, (s32)/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76", 196699, (s32)evt_npc_set_anim,
-    -30000000, (s32)"R_2", 262235, (s32)evt_npc_flag_onoff, 0, -30000000, 1024, 327771,
-    (s32)evt_npc_get_position, -30000000, -29999999, -29999998, -29999997, 131125, -29999999, -20,
-    131122, -29999996, 0, 131122, -29999995, 300, 65628, (s32)urouro,
-    131122, -30000000, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 131163, (s32)evt_npc_set_run_anim, -30000000, 262235, (s32)evt_npc_flag_onoff,
-    0, -30000000, 1024, 327771, (s32)evt_npc_get_position, -30000000, -29999999, -29999998,
-    -29999997, 131125, -29999999, -25, 131122, -29999996, 0, 131122,
-    -29999995, 330, 65628, (s32)urouro, 131122, -30000000, (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 131163,
-    (s32)evt_npc_set_run_anim, -30000000, 262235, (s32)evt_npc_flag_onoff, 0, -30000000, 1024, 327771,
-    (s32)evt_npc_get_position, -30000000, -29999999, -29999998, -29999997, 131125, -29999999, -30,
-    131122, -29999996, 0, 131122, -29999995, 350, 131165, (s32)urouro,
-    -49999998, 131122, -30000000, (s32)/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76", 131163, (s32)evt_npc_set_run_anim, -30000000, 262235,
-    (s32)evt_npc_flag_onoff, 0, -30000000, 1024, 327771, (s32)evt_npc_get_position, -30000000, -29999999,
-    -29999998, -29999997, 131125, -29999999, -22, 131122, -29999996, 0,
-    131122, -29999995, 340, 131165, (s32)urouro, -49999997, 131122, -30000000,
-    (s32)/*"店員"*/"\x93\x58\x88\xF5", 131163, (s32)evt_npc_set_run_anim, -30000000, 262235, (s32)evt_npc_flag_onoff, 0, -30000000,
-    1024, 327771, (s32)evt_npc_get_position, -30000000, -29999999, -29999998, -29999997, 131125,
-    -29999999, -22, 131122, -29999996, 0, 131122, -29999995, 300,
-    65628, (s32)urouro, 131122, -30000000, (s32)/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5", 131163, (s32)evt_npc_set_run_anim, -30000000,
-    262235, (s32)evt_npc_flag_onoff, 0, -30000000, 1024, 327771, (s32)evt_npc_get_position, -30000000,
-    -29999999, -29999998, -29999997, 131125, -29999999, -24, 131122, -29999996,
-    0, 131122, -29999995, 340, 65628, (s32)urouro, 131122, -30000000,
-    (s32)/*"水夫A"*/"\x90\x85\x95\x76\x41", 65628, (s32)buruburu, 131122, -30000000, (s32)/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA", 65628, (s32)buruburu,
-    262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 1536, 196699, (s32)evt_npc_set_anim, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52",
-    (s32)"O_1", 131163, (s32)evt_mario_set_pose, (s32)"M_I_O", 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76",
-    512, 262235, (s32)evt_npc_flag_onoff, 0, (s32)/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76", 512, 327771, (s32)evt_msg_print,
-    0, (s32)"stg5_sea_16", 0, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_17",
-    0, (s32)/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76", 589915, (s32)evt_cam3d_evt_set, 115, 300, 323, 115,
-    165, -105, 500, 11, 65546, 1000, 327771, (s32)evt_msg_print,
-    0, (s32)"stg5_sea_18", 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 65627, (s32)elmos1000tai_start, 107, 65546,
-    1000, 196699, (s32)evt_snd_sfxon, (s32)"SFX_STG5_ELMOS_APPEAR2", 0, 109, 327771, (s32)evt_msg_toge,
-    1, 0, 0, 0, 196699, (s32)evt_snd_sfxon, (s32)"SFX_STG5_KORTESS_VOICE1", 0,
-    327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_19", 0, 0, 65631, -49999999,
-    131122, -89999990, 1, 131122, -89999989, 1, 65628, (s32)elmos_a_kakushuku,
-    65546, 500, 327771, (s32)evt_npc_set_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", 80, 126, -100,
-    196699, (s32)evt_npc_set_ry, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", 90, 65546, 500, 65546, 1000,
-    107, 327771, (s32)evt_npc_get_position, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", -30000000, -29999999, -29999998, 393307,
-    (s32)evt_snd_sfxon_3d, (s32)"SFX_EVT_NPC_BIKKURI_MARK1", -30000000, -29999999, -29999998, 0, 131125, -29999999,
-    20, 786523, (s32)evt_eff_fukidashi, 2, (s32)"", 0, 0, 0,
-    -30000000, -29999999, -29999998, 30, 0, 90, 109, 65546,
-    1000, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_20", 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 196699,
-    (s32)evt_npc_set_anim, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", (s32)"B_1", 65546, 1000, 327771, (s32)evt_msg_print, 0,
-    (s32)"stg5_sea_21", 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 131122, -89999990, 0, 65547, -89999989,
-    107, 196699, (s32)evt_snd_sfxon, (s32)"SFX_STG5_SHIP_QUAKE1", -29999990, 327771, (s32)evt_cam_shake, 4,
-    -229999998, -230000000, 200, 327771, (s32)evt_cam_shake, 4, -229999996, -230000000,
-    200, 327771, (s32)evt_cam_shake, 4, -229999994, -230000000, 200, 327771,
-    (s32)evt_cam_shake, 4, -229999992, -230000000, 200, 131163, (s32)evt_snd_sfxoff, -29999990,
-    327771, (s32)evt_cam_shake, 4, -229999990, -230000000, 0, 109, 65630,
-    (s32)elmos_a_shuku, 327771, (s32)evt_npc_set_position, (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", 168, 160, -84, 393307,
-    (s32)evt_snd_sfxon_3d, (s32)"SFX_STG5_ELMOS_APPEAR1", 168, 160, -84, 0, 196699, (s32)evt_npc_set_ry,
-    (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", 270, 65546, 300, 65630, (s32)elmos_a_kaku, 131122, -30000000,
-    (s32)/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", 65628, (s32)fuwafuwa, 131122, -30000000, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 196699, (s32)evt_npc_set_anim,
-    -30000000, (s32)"R_2", 262235, (s32)evt_npc_flag_onoff, 0, -30000000, 1024, 262235,
-    (s32)evt_npc_flag_onoff, 1, -30000000, 1073741856, 327771, (s32)evt_npc_get_position, -30000000, -29999999,
-    -29999998, -29999997, 131125, -29999999, -20, 131122, -29999996, 0,
-    131122, -29999995, 340, 131165, (s32)urouro, -50000000, 589915, (s32)evt_cam3d_evt_set,
-    0, 358, 572, -1, 145, -108, 500, 11,
-    65546, 1000, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_22", 0, (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58",
-    327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_23", 0, (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 327771, (s32)evt_msg_print,
-    0, (s32)"stg5_sea_24", 0, (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 65631, -49999998, 131122, -29999990,
-    (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 65628, (s32)kirimomi, 107, 65546, 400, 327771, (s32)evt_npc_get_position,
-    (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG5_NPC_FALL1", -30000000,
-    -29999999, -29999998, 0, 109, 458843, (s32)evt_npc_jump_position_nohit, (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", -20,
-    -100, -300, 600, 100, 983131, (s32)evt_eff, 0, (s32)"splash",
-    0, -20, 30, -150, -229998464, 0, 0, 0,
-    0, 0, 0, 0, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_25",
-    0, (s32)/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76", 65631, -49999997, 131122, -29999990, (s32)/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76", 65628,
-    (s32)kirimomi, 107, 65546, 400, 327771, (s32)evt_npc_get_position, (s32)/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76", -30000000,
-    -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG5_NPC_FALL1", -30000000, -29999999, -29999998,
-    0, 109, 458843, (s32)evt_npc_jump_position_nohit, (s32)/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76", -30, -100, 100,
-    600, 100, 983131, (s32)evt_eff, 0, (s32)"splash", 0, -30,
-    30, 0, -229998464, 0, 0, 0, 0, 0,
-    0, 0, 327771, (s32)evt_msg_print, 0, (s32)"stg5_sea_26", 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52",
-    107, 65631, -50000000, 196699, (s32)evt_npc_set_ry, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 270, 458843,
-    (s32)evt_npc_jump_position_nohit, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 20, 90, -90, 500, 50, 109,
-    65546, 500, 327771, (s32)evt_mapobj_get_position, (s32)"S_a1", -30000000, -29999999, -29999998,
-    393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG5_SHIP_SINK1", -30000000, -29999999, -29999998, -29999990, 65628,
-    (s32)marcoship_shizumu, 65546, 4500, 393307, (s32)evt_fade_entry, 2, 500, 0,
-    0, 0, 65627, (s32)evt_fade_end_wait, 131163, (s32)evt_snd_sfxoff, -29999990, 131163,
-    (s32)evt_snd_bgmoff, 512, 131122, -170000000, 231, 393307, (s32)evt_fade_set_mapchange_type, 0,
-    10, 0, 9, 300, 196699, (s32)evt_bero_mapchange, (s32)"muj_00", (s32)"",
-    2, 1,
-};
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_a1"), 2)
+    CALL(evt_npc_set_position, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 116, 116, -100)
+    CALL(evt_npc_set_ry, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 90)
+    CALL(evt_npc_set_position, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 25, 90, -163)
+    CALL(evt_npc_set_ry, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 90)
+    CALL(evt_npc_set_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 21, 90, -55)
+    CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 90)
+    CALL(evt_npc_set_position, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"), -11, 90, -163)
+    CALL(evt_npc_set_ry, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"), 90)
+    CALL(evt_npc_set_position, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), -15, 90, -40)
+    CALL(evt_npc_set_ry, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), 90)
+    CALL(evt_npc_set_position, STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"), -65, 114, -145)
+    CALL(evt_npc_set_ry, STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"), 90)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"), 1024)
+    CALL(evt_npc_set_stay_anim, STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"))
+    CALL(evt_npc_set_position, STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"), -65, 114, -44)
+    CALL(evt_npc_set_ry, STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"), 90)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"), 1024)
+    CALL(evt_npc_set_stay_anim, STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"))
+    CALL(evt_npc_set_position, STRING(/*"店員"*/"\x93\x58\x88\xF5"), -115, 163, -153)
+    CALL(evt_npc_set_ry, STRING(/*"店員"*/"\x93\x58\x88\xF5"), 90)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"店員"*/"\x93\x58\x88\xF5"), 1024)
+    CALL(evt_npc_set_stay_anim, STRING(/*"店員"*/"\x93\x58\x88\xF5"))
+    CALL(evt_npc_set_position, STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"), -119, 163, -62)
+    CALL(evt_npc_set_ry, STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"), 90)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"), 1024)
+    CALL(evt_npc_set_stay_anim, STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"))
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 1073743392)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"店員"*/"\x93\x58\x88\xF5"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"), 32768)
+    CALL(evt_npc_sound_data_set, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("SFX_STG5_MARCO_MOVE1L"), STRING("SFX_STG5_MARCO_MOVE1R"), -250000000, -250000000, -250000000)
+    CALL(evt_cam3d_evt_set, -10, 340, 558, -11, 131, -108, 0, 11)
+    WAIT_MS(1000)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"店員"*/"\x93\x58\x88\xF5"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"), 32768)
+    WAIT_MS(1000)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_01"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    WAIT_MS(500)
+    CALL(evt_cam3d_evt_set, 480, 352, 214, 58, 150, -96, 0, 11)
+    WAIT_MS(1500)
+    CALL(evt_npc_set_ry, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 270)
+    WAIT_MS(500)
+    CALL(evt_npc_move_position, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 107, -100, 0, FLOAT(60.0f), 0)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_02"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    CALL(evt_cam3d_evt_set, 0, 300, 985, 0, 175, -108, 0, 11)
+    CALL(evt_snd_bgmoff, 26624)
+    SET_VALUE(GW(0), 0)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 512)
+    CALL(evt_npc_set_anim, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("S_2"))
+    BEGIN_INLINE_EVENT
+        CALL(evt_msg_print, 0, STRING("small_01"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+        LOOP(0)
+            IF_INT_EQUAL(GW(0), 1)
+                BREAK_LOOP
+            END_IF
+            CALL(evt_msg_repeat)
+        END_LOOP
+    END_INLINE_EVENT
+    CALL(evt_set_fune_anim_rate, FLOAT(0.69921875f))
+    CALL(evt_set_nami_anim_rate, FLOAT(0.69921875f))
+    WAIT_MS(1000)
+    WAIT_MS(1500)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_03"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_04"), 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"))
+    CALL(marcoship_stop_func)
+    BEGIN_INLINE_EVENT
+        CALL(evt_snd_bgmoff_f, 512, 2000)
+        WAIT_MS(2000)
+        CALL(evt_snd_bgmon_f, 768, STRING("BGM_EVT_STG5_GHOST1"), 2000)
+        CALL(evt_snd_envoff, 18432)
+    END_INLINE_EVENT
+    CALL(evt_set_fune_anim_rate, FLOAT(0.39941406f))
+    CALL(evt_set_nami_anim_rate, FLOAT(0.39941406f))
+    CALL(evt_msg_print_add, 0, STRING("stg5_sea_04_01"))
+    CALL(evt_cam3d_evt_set, 0, 295, 370, 0, 145, -108, 0, 11)
+    SPAWN_EVENT(nami_alpha)
+    CALL(evt_set_fune_anim_rate, FLOAT(0.0f))
+    CALL(evt_set_nami_anim_rate, FLOAT(0.099609375f))
+    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_fne_nami"), 1)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_05"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    WAIT_MS(1000)
+    SET_VALUE(GW(0), 1)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 512)
+    CALL(evt_msg_close, STRING("small_01"))
+    CALL(evt_npc_set_anim, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("T_1"))
+    WAIT_MS(2000)
+    CALL(evt_npc_set_anim, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("S_1"))
+    CALL(marcoship_stop_wait_func)
+    WAIT_MS(500)
+    CALL(evt_npc_move_position, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 68, -71, 0, FLOAT(120.0f), 0)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_06"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_07"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    CALL(evt_cam3d_evt_set, -50, 470, 588, -50, 390, -107, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_npc_set_anim, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), STRING("R_1"))
+    CALL(evt_npc_set_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -12, 90, -80)
+    CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 270)
+    CALL(evt_npc_glide_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -52, 315, -75, 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_set_anim, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), STRING("S_1"))
+    WAIT_MS(500)
+    CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 270)
+    CALL(evt_npc_set_anim, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), STRING("R_1"))
+    CALL(evt_npc_glide_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -78, 315, -79, 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_set_anim, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), STRING("S_1"))
+    WAIT_MS(1500)
+    CALL(evt_npc_set_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -23, 315, -79)
+    CALL(evt_npc_set_rotate, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 0, 180, 0)
+    WAIT_MS(1200)
+    CALL(evt_npc_set_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -78, 315, -79)
+    CALL(evt_npc_set_rotate, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 0, 0, 0)
+    WAIT_MS(1800)
+    CALL(evt_npc_set_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -23, 315, -79)
+    CALL(evt_npc_set_rotate, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 0, 180, 0)
+    WAIT_MS(1000)
+    CALL(evt_npc_set_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), -45, 336, -73)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_APPEAR1_2"), -45, 336, -73, 0)
+    CALL(evt_npc_set_ry, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 90)
+    WAIT_MS(1000)
+    CALL(evt_npc_get_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(10), LW(11), LW(12))
+    SET_VALUE(LW(13), LW(10))
+    SET_VALUE(LW(14), LW(11))
+    SET_VALUE(LW(15), LW(12))
+    ADD(LW(13), 5)
+    ADD(LW(14), -5)
+    ADD(LW(15), 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_MOVE1"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_MOVE1"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_08"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    CALL(evt_npc_set_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 0, -1000, 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_sub_intpl_msec_init, 0, 180, 0, 200)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+            CALL(evt_npc_set_rotate, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 0, LW(0), 0)
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_INLINE_EVENT
+    WAIT_MS(200)
+    SPAWN_EVENT(moya_effect)
+    WAIT_MS(1500)
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_get_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_NPC_QUESTION_MARK1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_eff_fukidashi, 2, STRING(""), 0, 1, 0, LW(0), LW(1), LW(2), 30, 0, 90)
+    END_INLINE_EVENT
+    WAIT_MS(1000)
+    CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 90)
+    WAIT_MS(500)
+    CALL(evt_npc_set_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(10), LW(11), LW(12))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_APPEAR1_2"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_MOVE1"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_MOVE1"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_09"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    WAIT_MS(1000)
+    CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 270)
+    WAIT_MS(1000)
+    CALL(evt_cam3d_evt_set, -50, 412, 340, -50, 360, -108, 100, 11)
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_get_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_NPC_BIKKURI_MARK1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_eff_fukidashi, 2, STRING(""), 0, 0, 0, LW(0), LW(1), LW(2), 30, 0, 60)
+    END_INLINE_EVENT
+    WAIT_MS(1000)
+    BEGIN_INLINE_EVENT
+        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER2"))
+    END_INLINE_EVENT
+    SET_VALUE(GF(0), 1)
+    BEGIN_INLINE_EVENT
+        LOOP(5)
+            CALL(evt_cam3d_evt_set, -50, 412, 340, -50, 360, -108, 100, 11)
+            WAIT_MS(100)
+            CALL(evt_cam3d_evt_set, -50, 423, 438, -50, 360, -108, 100, 11)
+            WAIT_MS(100)
+        END_LOOP
+        CALL(evt_cam3d_evt_set, -50, 412, 340, -50, 360, -108, 100, 11)
+        WAIT_MS(100)
+        SET_VALUE(GF(0), 0)
+    END_INLINE_EVENT
+    CALL(evt_msg_print, 0, STRING("stg5_sea_11"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    WAIT_WHILE(GF(0))
+    CALL(evt_npc_set_anim, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), STRING("R_1"))
+    CALL(muj_npc_guruguru, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -52, -90, 0, FLOAT(-12.0f), 3000)
+    SET_VALUE(GF(0), 1)
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 270)
+        CALL(evt_npc_glide_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -52, 315, -70, 0, FLOAT(180.0f), 0, 0, 0)
+        CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 90)
+        CALL(evt_npc_glide_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -43, 90, -72, 0, FLOAT(180.0f), 0, 0, 0)
+        CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 90)
+        CALL(evt_npc_glide_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 20, 90, -55, 0, FLOAT(180.0f), 0, 0, 0)
+        CALL(evt_npc_jump_position_nohit, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 20, 90, -55, 100, 30)
+        SET_VALUE(GF(0), 0)
+    END_INLINE_EVENT
+    WAIT_MS(500)
+    CALL(evt_cam3d_evt_set, -10, 340, 558, -11, 131, -108, 1000, 11)
+    WAIT_WHILE(GF(0))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_12"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_13"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    WAIT_MS(500)
+    SPAWN_EVENT(mist_setup)
+    CALL(evt_npc_set_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 168, 160, -84)
+    CALL(evt_npc_set_position, STRING(/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42"), 105, 100, -200)
+    CALL(evt_npc_set_position, STRING(/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43"), 10, 110, -200)
+    CALL(evt_npc_set_position, STRING(/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44"), -70, 105, -200)
+    CALL(evt_npc_set_position, STRING(/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45"), 125, 105, 0)
+    CALL(evt_npc_set_position, STRING(/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46"), 10, 100, 0)
+    CALL(evt_npc_set_position, STRING(/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47"), -80, 110, 0)
+    CALL(evt_npc_set_ry, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 270)
+    CALL(evt_npc_set_ry, STRING(/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42"), 270)
+    CALL(evt_npc_set_ry, STRING(/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43"), 270)
+    CALL(evt_npc_set_ry, STRING(/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44"), 90)
+    CALL(evt_npc_set_ry, STRING(/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45"), 270)
+    CALL(evt_npc_set_ry, STRING(/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46"), 270)
+    CALL(evt_npc_set_ry, STRING(/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47"), 90)
+    CALL(evt_npc_set_color, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING(/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42"), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING(/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43"), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING(/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44"), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING(/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45"), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING(/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46"), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING(/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47"), 255, 255, 255, 0)
+    CALL(evt_snd_sfxon, STRING("SFX_STG5_ELMOS_APPEAR1_2"), 0)
+    CALL(evt_sub_intpl_msec_init, 11, 0, 255, 1000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        CALL(evt_npc_set_color, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING(/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING(/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING(/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING(/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING(/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING(/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47"), 255, 255, 255, LW(0))
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_MS(500)
+    SET_VALUE(LW(0), STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"))
+    SPAWN_EVENT_GET_ID(PTR(fuwafuwa), GW(1))
+    SET_VALUE(LW(0), STRING(/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42"))
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -20)
+    SET_VALUE(LW(4), 1)
+    SET_VALUE(LW(5), 850)
+    SPAWN_EVENT(urouro_fuwafuwa)
+    SET_VALUE(LW(0), STRING(/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43"))
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -25)
+    SET_VALUE(LW(4), 1)
+    SET_VALUE(LW(5), 1000)
+    SPAWN_EVENT(urouro_fuwafuwa)
+    SET_VALUE(LW(0), STRING(/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44"))
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -22)
+    SET_VALUE(LW(4), 1)
+    SET_VALUE(LW(5), 900)
+    SPAWN_EVENT(urouro_fuwafuwa)
+    SET_VALUE(LW(0), STRING(/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45"))
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -30)
+    SET_VALUE(LW(4), 1)
+    SET_VALUE(LW(5), 1050)
+    SPAWN_EVENT(urouro_fuwafuwa)
+    SET_VALUE(LW(0), STRING(/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46"))
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -20)
+    SET_VALUE(LW(4), 1)
+    SET_VALUE(LW(5), 950)
+    SPAWN_EVENT(urouro_fuwafuwa)
+    SET_VALUE(LW(0), STRING(/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47"))
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -24)
+    SET_VALUE(LW(4), 1)
+    SET_VALUE(LW(5), 900)
+    SPAWN_EVENT(urouro_fuwafuwa)
+    CALL(evt_cam3d_evt_set, 2, 700, 1614, -1, 261, -108, 0, 11)
+    CALL(evt_npc_set_position, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 116, 116, -100)
+    WAIT_MS(500)
+    CALL(evt_snd_sfxon, STRING("SFX_STG5_ELMOS_VOICE1"), 0)
+    CALL(evt_snd_sfxon, STRING("SFX_STG5_KORTESS_VOICE1"), 0)
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_14"), 0, 0)
+    WAIT_MS(500)
+    CALL(evt_cam3d_evt_set, 0, 358, 572, -1, 145, -108, 0, 11)
+    WAIT_MS(1000)
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_15"), 0, 0)
+    WAIT_MS(500)
+    SET_VALUE(LW(0), STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"))
+    CALL(evt_npc_set_anim, LW(0), STRING("R_2"))
+    CALL(evt_npc_flag_onoff, 0, LW(0), 1024)
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -20)
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 300)
+    SPAWN_EVENT(urouro)
+    SET_VALUE(LW(0), STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    CALL(evt_npc_set_run_anim, LW(0))
+    CALL(evt_npc_flag_onoff, 0, LW(0), 1024)
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -25)
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 330)
+    SPAWN_EVENT(urouro)
+    SET_VALUE(LW(0), STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"))
+    CALL(evt_npc_set_run_anim, LW(0))
+    CALL(evt_npc_flag_onoff, 0, LW(0), 1024)
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -30)
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 350)
+    SPAWN_EVENT_GET_ID(PTR(urouro), GW(2))
+    SET_VALUE(LW(0), STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"))
+    CALL(evt_npc_set_run_anim, LW(0))
+    CALL(evt_npc_flag_onoff, 0, LW(0), 1024)
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -22)
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 340)
+    SPAWN_EVENT_GET_ID(PTR(urouro), GW(3))
+    SET_VALUE(LW(0), STRING(/*"店員"*/"\x93\x58\x88\xF5"))
+    CALL(evt_npc_set_run_anim, LW(0))
+    CALL(evt_npc_flag_onoff, 0, LW(0), 1024)
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -22)
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 300)
+    SPAWN_EVENT(urouro)
+    SET_VALUE(LW(0), STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"))
+    CALL(evt_npc_set_run_anim, LW(0))
+    CALL(evt_npc_flag_onoff, 0, LW(0), 1024)
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -24)
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 340)
+    SPAWN_EVENT(urouro)
+    SET_VALUE(LW(0), STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"))
+    SPAWN_EVENT(buruburu)
+    SET_VALUE(LW(0), STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"))
+    SPAWN_EVENT(buruburu)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 1536)
+    CALL(evt_npc_set_anim, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("O_1"))
+    CALL(evt_mario_set_pose, STRING("M_I_O"))
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 512)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 512)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_16"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_17"), 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"))
+    CALL(evt_cam3d_evt_set, 115, 300, 323, 115, 165, -105, 500, 11)
+    WAIT_MS(1000)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_18"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    CALL(elmos1000tai_start)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(1000)
+        CALL(evt_snd_sfxon, STRING("SFX_STG5_ELMOS_APPEAR2"), 0)
+    END_INLINE_EVENT
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_snd_sfxon, STRING("SFX_STG5_KORTESS_VOICE1"), 0)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_19"), 0, 0)
+    DELETE_EVENT(GW(1))
+    SET_VALUE(GF(10), 1)
+    SET_VALUE(GF(11), 1)
+    SPAWN_EVENT(elmos_a_kakushuku)
+    WAIT_MS(500)
+    CALL(evt_npc_set_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 80, 126, -100)
+    CALL(evt_npc_set_ry, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 90)
+    WAIT_MS(500)
+    WAIT_MS(1000)
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_get_position, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_NPC_BIKKURI_MARK1"), LW(0), LW(1), LW(2), 0)
+        ADD(LW(1), 20)
+        CALL(evt_eff_fukidashi, 2, STRING(""), 0, 0, 0, LW(0), LW(1), LW(2), 30, 0, 90)
+    END_INLINE_EVENT
+    WAIT_MS(1000)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_20"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    CALL(evt_npc_set_anim, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("B_1"))
+    WAIT_MS(1000)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_21"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    SET_VALUE(GF(10), 0)
+    WAIT_WHILE(GF(11))
+    BEGIN_INLINE_EVENT
+        CALL(evt_snd_sfxon, STRING("SFX_STG5_SHIP_QUAKE1"), LW(10))
+        CALL(evt_cam_shake, 4, FLOAT(0.001953125f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, 4, FLOAT(0.00390625f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, 4, FLOAT(0.005859375f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, 4, FLOAT(0.0078125f), FLOAT(0.0f), 200)
+        CALL(evt_snd_sfxoff, LW(10))
+        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 0)
+    END_INLINE_EVENT
+    CALL_CHILD(elmos_a_shuku)
+    CALL(evt_npc_set_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 168, 160, -84)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_APPEAR1"), 168, 160, -84, 0)
+    CALL(evt_npc_set_ry, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 270)
+    WAIT_MS(300)
+    CALL_CHILD(elmos_a_kaku)
+    SET_VALUE(LW(0), STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"))
+    SPAWN_EVENT(fuwafuwa)
+    SET_VALUE(LW(0), STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    CALL(evt_npc_set_anim, LW(0), STRING("R_2"))
+    CALL(evt_npc_flag_onoff, 0, LW(0), 1024)
+    CALL(evt_npc_flag_onoff, 1, LW(0), 1073741856)
+    CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+    ADD(LW(1), -20)
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 340)
+    SPAWN_EVENT_GET_ID(PTR(urouro), GW(0))
+    CALL(evt_cam3d_evt_set, 0, 358, 572, -1, 145, -108, 500, 11)
+    WAIT_MS(1000)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_22"), 0, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_23"), 0, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_24"), 0, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"))
+    DELETE_EVENT(GW(2))
+    SET_VALUE(LW(10), STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"))
+    SPAWN_EVENT(kirimomi)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(400)
+        CALL(evt_npc_get_position, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_NPC_FALL1"), LW(0), LW(1), LW(2), 0)
+    END_INLINE_EVENT
+    CALL(evt_npc_jump_position_nohit, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"), -20, -100, -300, 600, 100)
+    CALL(evt_eff, 0, STRING("splash"), 0, -20, 30, -150, FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_25"), 0, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"))
+    DELETE_EVENT(GW(3))
+    SET_VALUE(LW(10), STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"))
+    SPAWN_EVENT(kirimomi)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(400)
+        CALL(evt_npc_get_position, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_NPC_FALL1"), LW(0), LW(1), LW(2), 0)
+    END_INLINE_EVENT
+    CALL(evt_npc_jump_position_nohit, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), -30, -100, 100, 600, 100)
+    CALL(evt_eff, 0, STRING("splash"), 0, -30, 30, 0, FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_26"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    BEGIN_INLINE_EVENT
+        DELETE_EVENT(GW(0))
+        CALL(evt_npc_set_ry, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 270)
+        CALL(evt_npc_jump_position_nohit, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 20, 90, -90, 500, 50)
+    END_INLINE_EVENT
+    WAIT_MS(500)
+    CALL(evt_mapobj_get_position, STRING("S_a1"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_SHIP_SINK1"), LW(0), LW(1), LW(2), LW(10))
+    SPAWN_EVENT(marcoship_shizumu)
+    WAIT_MS(4500)
+    CALL(evt_fade_entry, 2, 500, 0, 0, 0)
+    CALL(evt_fade_end_wait)
+    CALL(evt_snd_sfxoff, LW(10))
+    CALL(evt_snd_bgmoff, 512)
+    SET_VALUE(GSW(0), 231)
+    CALL(evt_fade_set_mapchange_type, 0, 10, 0, 9, 300)
+    CALL(evt_bero_mapchange, STRING("muj_00"), STRING(""))
+    RETURN
+EVT_END()
 
 EVT_BEGIN(muj_20_koopa_evt)
     CALL(evt_mario_key_onoff, 0)

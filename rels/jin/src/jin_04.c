@@ -6,6 +6,7 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
 #include "jin.h"
+#include "evt/evt_npc.h"
 
 USER_FUNC(L_evt_party_dokan);
 USER_FUNC(evt_bero_get_info);
@@ -92,23 +93,23 @@ USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(getYoshiColor);
 USER_FUNC(vivian_away);
 
-__declspec(section ".data") u64 fd_jin_04_negone_one_374;
-__declspec(section ".data") s32 fd_jin_04_neg_one_382[1];
-__declspec(section ".data") s32 fd_jin_04___local_PI_383[1];
-__declspec(section ".data") s32 fd_jin_04___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_jin_04_one_negone_373;
-__declspec(section ".data") s32 fd_jin_04___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_jin_04_one_381[1];
-__declspec(section ".data") u64 fd_jin_04_negone_one_360;
-__declspec(section ".data") s32 fd_jin_04_neg_one_365[1];
-__declspec(section ".data") s32 fd_jin_04___local_PI_366[1];
-__declspec(section ".data") s32 fd_jin_04___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_jin_04_one_negone_359;
-__declspec(section ".data") s32 fd_jin_04___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_jin_04_one_364[1];
+__declspec(section ".data") f32 fd_jin_04_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_04_neg_one_382;
+__declspec(section ".data") f32 fd_jin_04___local_PI_383;
+__declspec(section ".data") f32 fd_jin_04___local_3PIO2_385;
+__declspec(section ".data") f32 fd_jin_04_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_04___local_PIO2_384;
+__declspec(section ".data") f32 fd_jin_04_one_381;
+__declspec(section ".data") f32 fd_jin_04_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_04_neg_one_365;
+__declspec(section ".data") f32 fd_jin_04___local_PI_366;
+__declspec(section ".data") f32 fd_jin_04___local_3PIO2_368;
+__declspec(section ".data") f32 fd_jin_04_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_jin_04___local_PIO2_367;
+__declspec(section ".data") f32 fd_jin_04_one_364;
 static __declspec(section ".data") s32 s_close[12];
 static __declspec(section ".data") s32 s_open[12];
-static s32 bero_entry_data[30];
+static BeroEntry bero_entry_data[2];
 s32 ranperu_toujou[338];
 s32 starstone_jump_se[15];
 s32 irekawatta_mario_init[67];
@@ -119,57 +120,37 @@ s32 hontonosugata_mario_init[125];
 s32 hontonosugata_mario[948];
 s32 ranperu_init[20];
 s32 nisemario_init[22];
-static s32 npcEnt[161];
+static NpcSetupInfo npcEnt[7];
 s32 jin_04_jumpstand[181];
 s32 jin_04_init_evt[103];
 
-__declspec(section ".data") u64 fd_jin_04_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_jin_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_jin_04_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_jin_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_jin_04___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_jin_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_jin_04___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_jin_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_jin_04_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_jin_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_jin_04___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_jin_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_jin_04_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_jin_04_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_jin_04_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_jin_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_jin_04_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_jin_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_jin_04___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_jin_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_jin_04___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_jin_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_jin_04_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_jin_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_jin_04___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_jin_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_jin_04_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_jin_04_one_364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(s_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -183,11 +164,26 @@ static __declspec(section ".data") EVT_BEGIN(s_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"s_bero", 65538, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"jin_00", (s32)"n_bero_2", 327685, (s32)s_close, (s32)s_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "s_bero", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"jin_00", // nextMapName
+        "n_bero_2", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s_close, // enterAnimeArg
+        (s32)s_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(ranperu_toujou)
@@ -858,28 +854,64 @@ EVT_BEGIN(nisemario_init)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", 1536, 0, (s32)ranperu_init, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"にせマリオ"*/"\x82\xC9\x82\xB9\x83\x7D\x83\x8A\x83\x49",
-    1536, 0, (s32)nisemario_init, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"クリスチーヌ"*/"\x83\x4E\x83\x8A\x83\x58\x83\x60\x81\x5B\x83\x6B", 1536,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"ノコタロウ"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45", 1536, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"クラウダ"*/"\x83\x4E\x83\x89\x83\x45\x83\x5F", 1536, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"ヨッシー"*/"\x83\x88\x83\x62\x83\x56\x81\x5B", 1536, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", // name
+        0x600, // flags
+        0, // reactionFlags
+        ranperu_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"にせマリオ"*/"\x82\xC9\x82\xB9\x83\x7D\x83\x8A\x83\x49", // name
+        0x600, // flags
+        0, // reactionFlags
+        nisemario_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"クリスチーヌ"*/"\x83\x4E\x83\x8A\x83\x58\x83\x60\x81\x5B\x83\x6B", // name
+        0x600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ノコタロウ"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45", // name
+        0x600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"クラウダ"*/"\x83\x4E\x83\x89\x83\x45\x83\x5F", // name
+        0x600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ヨッシー"*/"\x83\x88\x83\x62\x83\x56\x81\x5B", // name
+        0x600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(jin_04_jumpstand)

@@ -6,6 +6,8 @@
 #include "manager/evtmgr_cmd.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_npc.h"
+#include "mario/mario_pouch.h"
 
 static USER_FUNC(effect_stardust);
 USER_FUNC(evt_bero_get_info);
@@ -63,87 +65,80 @@ static USER_FUNC(setmertn);
 USER_FUNC(unitwincoin_disp_onoff);
 USER_FUNC(unitwincoin_wait);
 
-__declspec(section ".data") u64 fd_tik_12_negone_one_374;
-__declspec(section ".data") s32 fd_tik_12_neg_one_382[1];
-__declspec(section ".data") s32 fd_tik_12___local_PI_383[1];
-__declspec(section ".data") s32 fd_tik_12___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_tik_12_one_negone_373;
-__declspec(section ".data") s32 fd_tik_12___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_tik_12_one_381[1];
-__declspec(section ".data") u64 fd_tik_12_negone_one_360;
-__declspec(section ".data") s32 fd_tik_12_neg_one_365[1];
-__declspec(section ".data") s32 fd_tik_12___local_PI_366[1];
-__declspec(section ".data") s32 fd_tik_12___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_tik_12_one_negone_359;
-__declspec(section ".data") s32 fd_tik_12___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_tik_12_one_364[1];
+__declspec(section ".data") f32 fd_tik_12_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tik_12_neg_one_382;
+__declspec(section ".data") f32 fd_tik_12___local_PI_383;
+__declspec(section ".data") f32 fd_tik_12___local_3PIO2_385;
+__declspec(section ".data") f32 fd_tik_12_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tik_12___local_PIO2_384;
+__declspec(section ".data") f32 fd_tik_12_one_381;
+__declspec(section ".data") f32 fd_tik_12_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tik_12_neg_one_365;
+__declspec(section ".data") f32 fd_tik_12___local_PI_366;
+__declspec(section ".data") f32 fd_tik_12___local_3PIO2_368;
+__declspec(section ".data") f32 fd_tik_12_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tik_12___local_PIO2_367;
+__declspec(section ".data") f32 fd_tik_12_one_364;
 __declspec(section ".data") s32 majinaisi_ryokin_kaisu_tbl[6];
-static s32 bero_entry_data[30];
+static BeroEntry bero_entry_data[2];
 s32 suisyou_kirakira[30];
 s32 majinaisi_table_talk[877];
 __declspec(section ".data") s32 iri_14_item_tbl[2];
 s32 majinaisi_direct_talk[108];
 __declspec(section ".data") s32 majinaisi_init[10];
-static s32 npcEnt[46];
+static NpcSetupInfo npcEnt[2];
 s32 tik_12_init_evt[58];
 
-__declspec(section ".data") u64 fd_tik_12_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tik_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tik_12_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tik_12_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_tik_12___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tik_12___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tik_12___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tik_12___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tik_12_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tik_12_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tik_12___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tik_12___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tik_12_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tik_12_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_tik_12_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tik_12_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tik_12_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tik_12_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_tik_12___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tik_12___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tik_12___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tik_12___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tik_12_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tik_12_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tik_12___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tik_12___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tik_12_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tik_12_one_364 = 1.0f;
 
 __declspec(section ".data") s32 majinaisi_ryokin_kaisu_tbl[] = {
     50, 20, 20, 10, 5, 5,
 };
 
-static s32 bero_entry_data[] = {
-    (s32)"e_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"tik_01", (s32)"w_dero_2", 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "e_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tik_01", // nextMapName
+        "w_dero_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(suisyou_kirakira)
@@ -409,7 +404,7 @@ EVT_BEGIN(majinaisi_table_talk)
 EVT_END()
 
 __declspec(section ".data") s32 iri_14_item_tbl[] = {
-    172, -1,
+    ITEM_CAKE_MIX, -1,
 };
 
 EVT_BEGIN(majinaisi_direct_talk)
@@ -453,13 +448,20 @@ __declspec(section ".data") EVT_BEGIN(majinaisi_init)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"まじない師"*/"\x82\xDC\x82\xB6\x82\xC8\x82\xA2\x8E\x74", 1536, 0, (s32)majinaisi_init, 0, (s32)majinaisi_direct_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"まじない師"*/"\x82\xDC\x82\xB6\x82\xC8\x82\xA2\x8E\x74", // name
+        0x600, // flags
+        0, // reactionFlags
+        majinaisi_init, // initEvent
+        NULL, // regularEvent
+        majinaisi_direct_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(tik_12_init_evt)

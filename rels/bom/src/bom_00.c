@@ -2,6 +2,7 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "data_tables.h"
 
 #pragma force_active on
 
@@ -28,86 +29,67 @@ USER_FUNC(evt_snd_bgm_scope);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 
-__declspec(section ".data") u64 fd_bom_00_negone_one_374;
-__declspec(section ".data") s32 fd_bom_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_bom_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_bom_00___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_bom_00_one_negone_373;
-__declspec(section ".data") s32 fd_bom_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_bom_00_one_381[1];
-__declspec(section ".data") u64 fd_bom_00_negone_one_360;
-__declspec(section ".data") s32 fd_bom_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_bom_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_bom_00___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_bom_00_one_negone_359;
-__declspec(section ".data") s32 fd_bom_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_bom_00_one_364[1];
+__declspec(section ".data") f32 fd_bom_00_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_bom_00_neg_one_382;
+__declspec(section ".data") f32 fd_bom_00___local_PI_383;
+__declspec(section ".data") f32 fd_bom_00___local_3PIO2_385;
+__declspec(section ".data") f32 fd_bom_00_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_bom_00___local_PIO2_384;
+__declspec(section ".data") f32 fd_bom_00_one_381;
+__declspec(section ".data") f32 fd_bom_00_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_bom_00_neg_one_365;
+__declspec(section ".data") f32 fd_bom_00___local_PI_366;
+__declspec(section ".data") f32 fd_bom_00___local_3PIO2_368;
+__declspec(section ".data") f32 fd_bom_00_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_bom_00___local_PIO2_367;
+__declspec(section ".data") f32 fd_bom_00_one_364;
 s32 evt_bom_snowfall[18];
-static s32 tree_tbl[24];
+static TreeAccess tree_tbl[4];
 static __declspec(section ".data") s32 evt_tree[7];
 static s32 first_evt_dokan[36];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 static s32 first_evt[108];
 s32 first_evt2[101];
 s32 bom_00_init_evt[66];
 
-__declspec(section ".data") u64 fd_bom_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_bom_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_bom_00_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_bom_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_bom_00___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_bom_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_bom_00___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_bom_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_bom_00_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_bom_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_bom_00___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_bom_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_bom_00_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_bom_00_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_bom_00_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_bom_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_bom_00_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_bom_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_bom_00___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_bom_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_bom_00___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_bom_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_bom_00_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_bom_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_bom_00___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_bom_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_bom_00_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_bom_00_one_364 = 1.0f;
 
 EVT_BEGIN(evt_bom_snowfall)
     CALL(evt_eff64, 0, STRING("snowfall_n64"), 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     RETURN
 EVT_END()
 
-static s32 tree_tbl[] = {
-    3, (s32)"A_ki1", (s32)"S_ki_1", (s32)"S_ha_1", 0, 0, 3, (s32)"A_ki2",
-    (s32)"S_ki_2", (s32)"S_ha_2", 0, 0, 3, (s32)"A_ki3", (s32)"S_ki_3", (s32)"S_ha_3",
-    0, 0, 7, 0, 0, 0, 0, 0,
+static TreeAccess tree_tbl[] = {
+    {3, "A_ki1", "S_ki_1", "S_ha_1", 0, NULL},
+    {3, "A_ki2", "S_ki_2", "S_ha_2", 0, NULL},
+    {3, "A_ki3", "S_ki_3", "S_ha_3", 0, NULL},
+    {7, NULL, NULL, NULL, 0, NULL},
 };
 
 static __declspec(section ".data") EVT_BEGIN(evt_tree)
@@ -131,13 +113,41 @@ static EVT_BEGIN(first_evt_dokan)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"dokan", 131072, 9, 100000, 0, 0, -1, (s32)first_evt_dokan,
-    6, 0, (s32)"tik_07", (s32)"dokan__1", 65537, 0, 0, (s32)"e_bero",
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"bom_03", (s32)"w_bero", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "dokan", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)first_evt_dokan, // enterEvent
+        6, // caseType
+        NULL, // exitEvent
+        (s32)"tik_07", // nextMapName
+        "dokan__1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"bom_03", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(first_evt)

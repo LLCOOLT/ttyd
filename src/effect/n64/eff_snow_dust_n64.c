@@ -44,14 +44,14 @@ typedef struct EffSnowDustN64Work {
 void effSnowDustMain(EffectEntry* effect);
 void effSnowDustDisp(CameraId cameraId, EffectEntry* effect);
 
-__declspec(section ".data") u64 snowdust_negone_one_a = 0xBF8000003F800000;
-__declspec(section ".data") static u64 negone_one$374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 snowdust_one_negone_a = 0x3F800000BF800000;
-__declspec(section ".data") static u64 one_negone$373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 snowdust_negone_one_b = 0xBF8000003F800000;
-__declspec(section ".data") static u64 negone_one$360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 snowdust_one_negone_b = 0x3F800000BF800000;
-__declspec(section ".data") static u64 one_negone$359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 snowdust_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") static f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 snowdust_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") static f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 snowdust_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") static f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 snowdust_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") static f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 effN64Vtx size8x8_tex64x64_vtx[] = {
     {-4, -4, 0, 0, 0, 0, 0, 0, 255},

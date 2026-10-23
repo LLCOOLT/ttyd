@@ -183,12 +183,18 @@ typedef struct AudItem {
 
 typedef struct AudApSrc {
     s32 flags;         // 0x0
-    u8 pad4[0x8 - 0x4];
+    s32 unk4; // 0x4
     f32 x;             // 0x8
     f32 y;             // 0xC
-    u8 pad10[0x38 - 0x10];
+    f32 unk10; // 0x10
+    f32 unk14; // 0x14
+    f32 unk18; // 0x18
+    f32 unk1C; // 0x1C
+    Vec unk20; // 0x20
+    Vec unk2C; // 0x2C
     Vec scale;         // 0x38
-    u8 pad44[0x5C - 0x44];
+    s32 unk44; // 0x44
+    u8 pad48[0x5C - 0x48]; // 0x48
     u8 alpha;          // 0x5C
     u8 pad5d[0x60 - 0x5D];
 } AudApSrc;
@@ -230,40 +236,132 @@ __declspec(section ".data") f32 aud_uv3[2] = {-1.0f, 1.0f};
 __declspec(section ".data") f32 aud_uv4[2] = {-1.0f, 1.0f};
 __declspec(section ".data") f32 aud_uv5[2] = {1.0f, -1.0f};
 __declspec(section ".data") f32 aud_uv6[2] = {1.0f, -1.0f};
-s32 weapon_data_akikan[] = {
-    0, 0, 236, 0, 1677721602, 0, 0, (s32)weaponGetPowerDefault,
-    1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17825888, 536870912, 770, 0, 72, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_data_akikan = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    236, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    0.0f, 0, 0, 0, 0, // field_0x14..field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100060, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x48, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_data_brick[] = {
-    0, 0, 237, 0, 1677721602, 0, 0, (s32)weaponGetPowerDefault,
-    1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17825888, 536870912, 770, 0, 72, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_data_brick = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    237, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    0.0f, 0, 0, 0, 0, // field_0x14..field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100060, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x48, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_data_bone[] = {
-    0, 0, 238, 0, 1677721602, 0, 0, (s32)weaponGetPowerDefault,
-    1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17825888, 536870912, 770, 0, 72, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_data_bone = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    238, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    0.0f, 0, 0, 0, 0, // field_0x14..field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100060, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x48, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_data_hammer[] = {
-    0, 0, 239, 0, 1677721602, 0, 0, (s32)weaponGetPowerDefault,
-    2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17825888, 536870912, 770, 0, 72, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_data_hammer = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    239, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    0.0f, 0, 0, 0, 0, // field_0x14..field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100060, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x48, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 #pragma force_active reset
 s32 haiti_data[][10] = {
@@ -915,9 +1013,9 @@ BOOL BattleAudience_CheckReactionPerPhase(void) {
 			for (i = 0; i < 200; i++) {
 				member = BattleAudienceGetPtr(i);
 				if ((u8)BattleAudience_GetSysCtrl(i) == 1 && member->status == 13 &&
-						((*(s32*)((u8*)member + 0xF4))--, *(s32*)((u8*)member + 0xF4) <= 0)) {
+						(member->unkF4--, member->unkF4 <= 0)) {
 					BattleAudience_ChangeStatus(i, 3);
-					*(s32*)((u8*)member + 0xF4) = 0;
+					member->unkF4 = 0;
 				}
 			}
 			for (i = 0; i < 200; i++) {
@@ -946,7 +1044,7 @@ void BattleAudience_Disp(void) {
 		dispEntry(CAMERA_3D, 0.0f, 1, BattleAudienceDispItem, NULL);
 		dispEntry(CAMERA_2D, 499.0f, 0, BattleAudienceDispApSrc, NULL);
 	}
-	if (*(u16*)&pouchGetPtr()->mStarPowersObtained) {
+	if (pouchGetPtr()->mStarPowersObtained) {
 		dispEntry(CAMERA_2D, 499.0f, 1, BattleAudienceDispWin, NULL);
 	}
 }
@@ -970,7 +1068,7 @@ void BattleAudience_End(void) {
 		fileFree(obj);
 	}
 
-	if (*(u16*)&pouchGetPtr()->mStarPowersObtained) {
+	if (pouchGetPtr()->mStarPowersObtained) {
 		if (audience->mTargetAudienceCount < 0.0f) {
 			audience->mTargetAudienceCount = 0.0f;
 		}
@@ -1011,9 +1109,9 @@ void BattleAudienceSettingAudience(void) {
 	s32 weights[12];
 	s32 counts[13];
 	AudWArr w;
-	s32* bflags = (s32*)((u8*)_battleWorkPointer + BWOFF(0x19068));
+	s32* bflags = &_battleWorkPointer->unk19068;
 	BattleAudience* audience = BattleAudienceBaseGetPtr();
-	s8* rec = *(s8**)(*(u8**)((u8*)_battleWorkPointer + 0x2738) + 0xC) + 0xAC;
+	s8* rec = (s8*)_battleWorkPointer->fbatInfo->setup + 0xAC;
 	PouchData* pouch = pouchGetPtr();
 
 	delta = R_audience_delta_multiplier;
@@ -1023,7 +1121,7 @@ void BattleAudienceSettingAudience(void) {
 	case 2: audience->mMaxAudience = 150; break;
 	case 3: audience->mMaxAudience = 200; break;
 	}
-	if (*(u16*)&pouchGetPtr()->mStarPowersObtained == 0) {
+	if (pouchGetPtr()->mStarPowersObtained == 0) {
 		audience->mMaxAudience = 0;
 	}
 	i = pouch->level - 1;
@@ -1070,7 +1168,7 @@ void BattleAudienceSettingAudience(void) {
 		break;
 	case 6:
 		for (i = 0; i < 12; i++) {
-			if (((u8*)audience_kind)[i * 32] & 1) weights[i] = 2; else weights[i] = 1;
+			if (audience_kind[i].field_0x0 & 1) weights[i] = 2; else weights[i] = 1;
 		}
 		hasKind = 1;
 		break;
@@ -1100,7 +1198,7 @@ void BattleAudienceSettingAudience(void) {
 				weights[id] = 0;
 			} else if (rec[id + 4] != 0) {
 				weights[id] = rec[id + 4] * (irand(10) + 1);
-				if (((u8*)audience_kind)[id * 32] & 1) {
+				if (audience_kind[id].field_0x0 & 1) {
 					weights[id] *= 2;
 				}
 				k++;
@@ -1139,7 +1237,7 @@ void BattleAudienceSettingAudience(void) {
 	for (i = 0; i < 12; i++) sum += weights[i];
 	for (i = 0; i < 12; i++) {
 		counts[i] = ar * weights[i] / sum;
-		if (((u8*)audience_kind)[i * 32] & 1) {
+		if (audience_kind[i].field_0x0 & 1) {
 			counts[i] /= 2;
 			used += counts[i] * 2;
 		} else {
@@ -1161,7 +1259,7 @@ void BattleAudienceSettingAudience(void) {
 	while (used < ar) {
 		s32 id = perm[i];
 		if (weights[id] > 0) {
-			if (((u8*)audience_kind)[id * 32] & 1) {
+			if (audience_kind[id].field_0x0 & 1) {
 				if (used <= ar - 2) {
 					used += 2;
 					counts[id]++;
@@ -1288,7 +1386,7 @@ void BattleAudienceCtrlProcess(void) {
 	member = BattleAudienceGetPtr(0);
 	for (; i < 200; i++, member++) {
 		if (member->flags & 0x10) {
-			f32* f = (f32*)((u8*)member + 0xD0);
+			f32* f = &member->unkD0;
 			f[0] += f[3];
 			f[3] += f[5];
 			if (f[0] <= 0.0f) {
@@ -1316,11 +1414,11 @@ void BattleAudienceCtrlProcess(void) {
 	}
 
 	if (*bflags & 0x20000) {
-		*(s32*)&audience->field_137F0[4] = 10000;
+		audience->itemThrowMax = 10000;
 	}
 	if (wp->flags & 0x80) {
-		if (*(s32*)&audience->field_137F0[0] < *(s32*)&audience->field_137F0[4]) {
-			switch (*(s32*)&audience->field_137F0[0]) {
+		if (audience->itemThrowCount < audience->itemThrowMax) {
+			switch (audience->itemThrowCount) {
 			case 0: chance = 1800; break;
 			case 1: chance = 6000; break;
 			case 2: chance = 30000; break;
@@ -1341,7 +1439,7 @@ void BattleAudienceCtrlProcess(void) {
 				}
 				for (i = 0; i < 200; i++) {
 					if (BattleAudienceItemOn(order[i], 0, 1) == TRUE) {
-						(*(s32*)&audience->field_137F0[0])++;
+						audience->itemThrowCount++;
 						return;
 					}
 				}
@@ -1359,7 +1457,7 @@ BOOL BattleAudienceItemOn(s32 index, u16 itemId, s32 numItems) {
 	u8 ust;
 
 	if (audience->flags & 0x40000) return FALSE;
-	if (*(s32*)audience_kind[member->type * 8 + 2] == 0) return FALSE;
+	if (audience_kind[member->type].itemTable->type == 0) return FALSE;
 	if (itemId >= 0x79 && itemId < 0xEC && swGet(0xEB) == 0) return FALSE;
 	st = index % 20;
 	if (st < 4 || st > 15) return FALSE;
@@ -1381,7 +1479,7 @@ BOOL BattleAudienceItemOn(s32 index, u16 itemId, s32 numItems) {
 			if (!(item->flags & 1)) {
 				item->flags |= 1;
 				item->state = 0;
-				*(s32*)((u8*)item + 0xC) = index;
+				item->unkC = index;
 				item->mItemType = itemId;
 				BattleAudience_ChangeStatus(index, 7);
 				member->itemId = i;
@@ -1398,16 +1496,16 @@ void BattleAudienceSetThrowItemMax(void) {
 	s32 r = irand(100);
 
 	if (r < 80) {
-		AUD_S32(audience, 0x137F4) = 0;
+		audience->itemThrowMax = 0;
 	} else if (r < 90) {
-		AUD_S32(audience, 0x137F4) = 1;
+		audience->itemThrowMax = 1;
 	} else if (r < 95) {
-		AUD_S32(audience, 0x137F4) = 2;
+		audience->itemThrowMax = 2;
 	} else if (r < 100) {
-		AUD_S32(audience, 0x137F4) = 3;
+		audience->itemThrowMax = 3;
 	}
-	AUD_S32(audience, 0x137F0) = 0;
-	AUD_S32(audience, 0x137F8) = 0;
+	audience->itemThrowCount = 0;
+	audience->unk137F8 = 0;
 }
 
 //@@ BattleAudienceDetectTargetAll
@@ -1490,7 +1588,7 @@ void BattleAudienceItemCtrlProcess(void) {
 	u8* base = (u8*)BattleAudienceBaseGetPtr();
 	AudItemX* it;
 	u8* aud;
-	u8* kd;
+	BattleAudienceKind* kd;
 	s32 j;
 
 	i = 0;
@@ -1500,7 +1598,7 @@ void BattleAudienceItemCtrlProcess(void) {
 			continue;
 		}
 		aud = (u8*)BattleAudienceGetPtr(it->audId);
-		kd = (u8*)audience_kind + aud[0x1b] * 32;
+		kd = &audience_kind[aud[0x1b]];
 		if (aud[0x19] == 13 || aud[0x19] == 19 || aud[0x19] == 21 || aud[0x19] == 12 ||
 		    !(u8)BattleAudience_GetExist(it->audId)) {
 			goto kill;
@@ -1509,7 +1607,7 @@ void BattleAudienceItemCtrlProcess(void) {
 		case 0: {
 			it->flags |= 2;
 			if (it->itemType == 0) {
-				s32* tbl = *(s32**)(kd + 8);
+				s32* tbl = (s32*)kd->itemTable;
 				s32 cnt = 0;
 				s32 sum;
 				s32 acc;
@@ -1544,8 +1642,8 @@ void BattleAudienceItemCtrlProcess(void) {
 			{
 				Vec v;
 				v = (Vec){0.0f, 0.0f, 0.0f};
-				v.x = *(f32*)(aud + 0x48) + *(f32*)(kd + 0xc);
-				v.y = (*(f32*)(aud + 0x4c) + *(f32*)(kd + 0x10)) - 10.0f;
+				v.x = *(f32*)(aud + 0x48) + kd->field_0xC;
+				v.y = (*(f32*)(aud + 0x4c) + kd->field_0x10) - 10.0f;
 				v.z = 1.0f + *(f32*)(aud + 0x50);
 				it->pos = v;
 			}
@@ -1591,9 +1689,9 @@ void BattleAudienceItemCtrlProcess(void) {
 				}
 				{
 				Vec v = {0.0f, 0.0f, 0.0f};
-				v.x = *(f32*)(aud + 0xc0) + *(f32*)(kd + 0xc);
+				v.x = *(f32*)(aud + 0xc0) + kd->field_0xC;
 				ox = intplGetValue(0, k, 5, -10.0f, 0.0f);
-				{ f32 t = *(f32*)(aud + 0xc4) + *(f32*)(kd + 0x10); v.y = t + ox; }
+				{ f32 t = *(f32*)(aud + 0xc4) + kd->field_0x10; v.y = t + ox; }
 				v.z = 1.0f + *(f32*)(aud + 0xc8);
 				it->pos = v;
 				}
@@ -1601,7 +1699,7 @@ void BattleAudienceItemCtrlProcess(void) {
 			break;
 		}
 		case 2: {
-			if (!(*(u32*)((u8*)wp + 0xef4) & 0x80)) {
+			if (!(wp->flags & 0x80)) {
 				it->mode = 0;
 			}
 			if (it->timer == 20) {
@@ -1626,7 +1724,7 @@ void BattleAudienceItemCtrlProcess(void) {
 		}
 		case 3: {
 						s8 a, b;
-			if (!(*(u32*)((u8*)wp + 0xef4) & 0x80)) {
+			if (!(wp->flags & 0x80)) {
 				it->mode = 0;
 			}
 			aud = (u8*)it->target;
@@ -1931,25 +2029,25 @@ BOOL BattleAudienceApSrcEntry(void) {
 		return TRUE;
 	}
 	star->flags = 1;
-	*(s32*)((u8*)star + 4) = 0;
-	*(s32*)((u8*)star + 0x44) = 0;
+	star->unk4 = 0;
+	star->unk44 = 0;
 	star->scale = (Vec){0.75f, 0.75f, 0.75f};
 	star->alpha = 0x80;
 	m = BattleAudienceGetPtr(list[irand(count)]);
-	star->x = *(f32*)((u8*)m + 0x48);
-	star->y = 20.0f + *(f32*)((u8*)m + 0x4C);
-	*(f32*)((u8*)star + 0x10) = 1.0f + *(f32*)((u8*)m + 0x50);
+	star->x = m->position.x;
+	star->y = 20.0f + m->position.y;
+	star->unk10 = 1.0f + m->position.z;
 	cam = camGetPtr(CAMERA_3D);
-	PSMTXMultVec((void*)((u8*)cam + 0x11C), (Vec*)&star->x, (Vec*)&star->x);
-	PSMTX44MultVec((void*)((u8*)cam + 0x15C), (Vec*)&star->x, (Vec*)&star->x);
+	PSMTXMultVec(cam->view, (Vec*)&star->x, (Vec*)&star->x);
+	PSMTX44MultVec(cam->projection, (Vec*)&star->x, (Vec*)&star->x);
 	star->x *= 304.0f;
 	star->y *= 240.0f;
-	*(f32*)((u8*)star + 0x10) = 0.0f;
-	*(f32*)((u8*)star + 0x14) = 40.0f * rand() / 32767.0f - 20.0f;
-	*(f32*)((u8*)star + 0x18) = 10.0f * rand() / 32767.0f;
-	*(f32*)((u8*)star + 0x1C) = 0.0f;
-	*(Vec*)((u8*)star + 0x20) = *(Vec*)&star->x;
-	*(Vec*)((u8*)star + 0x2C) = (Vec){-96.0f, 106.0f, 0.0f};
+	star->unk10 = 0.0f;
+	star->unk14 = 40.0f * rand() / 32767.0f - 20.0f;
+	star->unk18 = 10.0f * rand() / 32767.0f;
+	star->unk1C = 0.0f;
+	star->unk20 = *(Vec*)&star->x;
+	star->unk2C = (Vec){-96.0f, 106.0f, 0.0f};
 	return TRUE;
 }
 
@@ -2154,15 +2252,15 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 		if (m->type <= 11) {
 			TEXGetGXTexObjFromPalette((TEXPalette*)*audience->normalTex->data, &tex, m->field_0x1A);
 			GXLoadTexObj(&tex, GX_TEXMAP0);
-			m->scale.x = m->baseScale.x * ((AUD_F32(audience_kind + m->type * 8, 0x18) * (f32)GXGetTexObjWidth(&tex)) / 64.0f);
-			m->scale.y = m->baseScale.y * ((AUD_F32(audience_kind + m->type * 8, 0x1C) * (f32)GXGetTexObjHeight(&tex)) / 64.0f);
+			m->scale.x = m->baseScale.x * ((audience_kind[m->type].field_0x18 * (f32)GXGetTexObjWidth(&tex)) / 64.0f);
+			m->scale.y = m->baseScale.y * ((audience_kind[m->type].field_0x1C * (f32)GXGetTexObjHeight(&tex)) / 64.0f);
 		} else {
 			for (k = 0; k < 2; k++) {
 				if (m->type == audience->guestType[k]) {
 					TEXGetGXTexObjFromPalette((TEXPalette*)*audience->guestTex[k]->data, &tex, m->field_0x1A);
 					GXLoadTexObj(&tex, GX_TEXMAP0);
-					m->scale.x = m->baseScale.x * ((AUD_F32(audience_kind + m->type * 8, 0x18) * (f32)GXGetTexObjWidth(&tex)) / 64.0f);
-					m->scale.y = m->baseScale.y * ((AUD_F32(audience_kind + m->type * 8, 0x1C) * (f32)GXGetTexObjHeight(&tex)) / 64.0f);
+					m->scale.x = m->baseScale.x * ((audience_kind[m->type].field_0x18 * (f32)GXGetTexObjWidth(&tex)) / 64.0f);
+					m->scale.y = m->baseScale.y * ((audience_kind[m->type].field_0x1C * (f32)GXGetTexObjHeight(&tex)) / 64.0f);
 					break;
 				}
 			}
@@ -2196,12 +2294,12 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 		scl[1][3] += oy;
 		scl[2][3] += oz;
 		PSMTXConcat(rot, scl, scl);
-		scl[0][3] = scl[0][3] + (AUD_F32(m, 0xCC) + (-ox + m->position.x));
-		scl[2][3] = scl[2][3] + (AUD_F32(m, 0xD4) + (-oz + m->position.z));
+		scl[0][3] = scl[0][3] + (m->unkCC + (-ox + m->position.x));
+		scl[2][3] = scl[2][3] + (m->unkD4 + (-oz + m->position.z));
 		if (m->type != 2) {
-			scl[1][3] = scl[1][3] + (AUD_F32(m, 0xD0) + (-oy + m->position.y));
+			scl[1][3] = scl[1][3] + (m->unkD0 + (-oy + m->position.y));
 		} else {
-			scl[1][3] = scl[1][3] + (AUD_F32(m, 0x130) + (AUD_F32(m, 0xD0) + (-oy + m->position.y)));
+			scl[1][3] = scl[1][3] + (m->unk130 + (m->unkD0 + (-oy + m->position.y)));
 		}
 		PSMTXConcat(cam->view, scl, fin);
 		GXLoadPosMtxImm(fin, 0);
@@ -2215,7 +2313,7 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 		off = 0;
 		front = BattleAudience_GetFront(i);
 		cr = m->colorR; cg = m->colorG; cb = m->colorB; ca = m->colorA;
-				if ((s32*)AUD_S32(m, 0x24) == m->animTable[9]) off = 8;
+				if ((s32*)m->unk24 == m->animTable[9]) off = 8;
 		t0 = m->angle;
 		if (t0 >= 360.0f) {
 			m->angle = t0 - 360.0f * (f32)(s32)(t0 / 360.0f);
@@ -2227,7 +2325,7 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 		t0 = m->angle;
 		if (t0 > 0.0f && t0 <= 180.0f) flip = 1;
 		if (t0 == 0.0f || (t0 > 180.0f && t0 < 360.0f)) flip = 0;
-		if ((u8)front == 1 && (cur = (s32*)AUD_S32(m, 0x24)) != m->animTable[9] && cur != m->animTable[8] && cur != m->animTable[7]) {
+		if ((u8)front == 1 && (cur = (s32*)m->unk24) != m->animTable[9] && cur != m->animTable[8] && cur != m->animTable[7]) {
 			flip ^= 1;
 		}
 		if (flip == 1) off += 4;
@@ -2308,15 +2406,15 @@ void BattleAudienceDispWin(CameraId camId, void* param) {
 	win = BattleAudienceWinGetPtr();
 	{
 		GXColor col = {0xFF, 0xFF, 0xFF, 0xCF};
-		windowDispGX_Waku_col(0, col, AUD_F32(win, 0x8), AUD_F32(win, 0xC), 90.0f, 40.0f, 10.0f);
+		windowDispGX_Waku_col(0, col, win->unk8, win->unkC, 90.0f, 40.0f, 10.0f);
 	}
 	{
 		Vec pos = {0.0f, 0.0f, 0.0f};
-		pos.x = 17.0f + AUD_F32(win, 0x8);
-		pos.y = AUD_F32(win, 0xC) - 40.0f;
+		pos.x = 17.0f + win->unk8;
+		pos.y = win->unkC - 40.0f;
 		iconDispGx(&pos, 0x10, ICON_209, 0.8f);
 	}
-	PSMTXTrans(mtx, 75.0f + AUD_F32(win, 0x8), AUD_F32(win, 0xC) - 40.0f, 0.0f);
+	PSMTXTrans(mtx, 75.0f + win->unk8, win->unkC - 40.0f, 0.0f);
 	{
 		GXColor numCol = {0xFF, 0xFF, 0xFF, 0xFF};
 		iconNumberDispGx(mtx, win->count, 0, numCol);
@@ -2332,7 +2430,7 @@ BOOL BattleAudience_Entry(s32 index, AudienceMemberType type, u8 status) {
 	BattleAudienceBaseGetPtr();
 	BattleStageGetPtr();
 	m = BattleAudienceGetPtr(index);
-	if (!(((u8*)audience_kind)[(type & 0xFF) * 32] & 1)) {
+	if (!(audience_kind[type & 0xFF].field_0x0 & 1)) {
 		if (m->flags & 1) {
 			return FALSE;
 		}
@@ -2380,7 +2478,7 @@ void BattleAudience_Entry_Sub(s32 index, s32 type, u8 status) {
 	m->status = status;
 	m->type = type;
 	m->itemId = -1;
-	m->animTable = (s32**)audience_kind[type * 8 + 1];
+	m->animTable = audience_kind[type].animTable;
 	m->field_0x30 = 0;
 	BattleAudience_SetAnim(index, 1, TRUE);
 	*((u8*)m + 0x40) = 0;
@@ -3040,7 +3138,7 @@ void BattleAudience_ApRecoveryBuild(StarPowerInfo* info) {
 	party = BattleGetPartyPtr(bw);
 	sum = 0.0f;
 	for (i = 0; i < 13; i++) {
-		sum += *(f32*)((u8*)audience_kind + i * 0x20 + 0x14) * (f32)BattleAudience_GetPPAudienceNumKind(i);
+		sum += audience_kind[i].field_0x14 * (f32)BattleAudience_GetPPAudienceNumKind(i);
 	}
 	root = sqrt(sum);
 	a = info->mSpAcSuccessMultiplier;
@@ -3052,17 +3150,17 @@ void BattleAudience_ApRecoveryBuild(StarPowerInfo* info) {
 	if (b > 0.0f) {
 		cnt += 1.0f;
 	}
-	if (*(u32*)((u8*)mario + 0x138) & 0x20000000) {
+	if ((u32)mario->mStatusFlags & 0x20000000) {
 		mm = 3.0f;
-	} else if (*(u32*)((u8*)mario + 0x138) & 0x10000000) {
+	} else if ((u32)mario->mStatusFlags & 0x10000000) {
 		mm = 2.0f;
 	} else {
 		mm = 1.0f;
 	}
 	if (party != NULL) {
-		if (*(u32*)((u8*)party + 0x138) & 0x20000000) {
+		if ((u32)party->mStatusFlags & 0x20000000) {
 			pm = 2.0f;
-		} else if (*(u32*)((u8*)party + 0x138) & 0x10000000) {
+		} else if ((u32)party->mStatusFlags & 0x10000000) {
 			pm = 1.5f;
 		} else {
 			pm = 1.0f;
@@ -3210,7 +3308,7 @@ s32 BattleAudienceAddAudienceNum(s32 num) {
 	audience = (AudPhaseEvt*)BattleAudienceBaseGetPtr();
 	total = 0;
 	added = 0;
-	if (*(u16*)&pouchGetPtr()->mStarPowersObtained == 0) {
+	if (pouchGetPtr()->mStarPowersObtained == 0) {
 		return 0;
 	}
 	if (num == 0) {
@@ -3290,7 +3388,7 @@ void BattleAudienceAddPuni(s32 num) {
 	s32 i;
 
 	audience = BattleAudienceBaseGetPtr();
-	if (*(u16*)&pouchGetPtr()->mStarPowersObtained != 0 && ((AudPhaseEvt*)audience)->weights[7] > 0 && num > 0 && !(wp->flags & 0x100)) {
+	if (pouchGetPtr()->mStarPowersObtained != 0 && ((AudPhaseEvt*)audience)->weights[7] > 0 && num > 0 && !(wp->flags & 0x100)) {
 		for (i = 0; i < num; i++) {
 			s32 id = BattleAudience_NoUsedFCHaitiRand();
 			if (id == -1) {

@@ -283,84 +283,182 @@ EVT_BEGIN(subsetevt_dead)
     RETURN
 EVT_END()
 #else
-s32 subsetevt_dead[] = {
-    65627, (s32)_disable_restore_command_cursor, 196699, (s32)btlevtcmd_GetUnitKind, -29999990, -30000000, 65570, -30000000,
-    65572, 222, 65540, 0, 131119, 224, 230, 65540,
-    0, 42, 65540, 1, 49, 65539, 0, 262235,
-    (s32)btlevtcmd_CheckAttribute, -29999990, 4, -30000000, 131097, -30000000, 0, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, 42, 327771, (s32)btlevtcmd_GetHomePos, -29999990, -29999998,
-    -29999997, -29999996, 196699, (s32)btlevtcmd_SetMoveSpeed, -29999990, -229995904, 655451, (s32)btlevtcmd_DivePosition,
-    -29999990, -29999998, -29999997, -29999996, 0, 0, 0, 0,
-    -1, 32, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, 40, 327771,
-    (s32)btlevtcmd_GetHomePos, -29999990, -29999998, -29999997, -29999996, 196699, (s32)btlevtcmd_SetMoveSpeed, -29999990,
-    -229995904, 524379, (s32)btlevtcmd_MovePosition, -29999990, -29999998, -29999997, -29999996, 0,
-    -1, 0, 33, 131163, (s32)btlevtcmd_ResetFaceDirection, -29999990, 65539, 1,
-    393307, (s32)btlevtcmd_OnOffStatus, -29999990, 27, 1, 1, 1, 196699,
-    (s32)btlevtcmd_GetUnitKind, -29999990, -30000000, 65570, -30000000, 65572, 222, 131163,
-    (s32)btlevtcmd_ClearAllStatus, -29999990, 262235, (s32)btlevtcmd_CheckDamageCode, -29999990, 2048, -29999999, 131097,
-    -29999999, 0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 51, 32, 196699,
-    (s32)btlevtcmd_RunDataEventChild, -29999990, 49, 33, 131119, 224, 230, 262235,
-    (s32)btlevtcmd_CheckDamageCode, -29999990, 2048, -29999999, 131097, -29999999, 0, 131163,
-    (s32)btlevtcmd_ClearAllStatus, -29999990, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 51, 131097,
-    -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 51, 32, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, 27, 110, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -29999990,
-    -29999989, 393307, (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_PARTY_BATTLE_DIE1", -250000000, 0, -250000000,
-    112, 65545, 60, 131163, (s32)btlevtcmd_ClearAllStatus, -29999990, 196699, (s32)btlevtcmd_ConsumeItemReserve,
-    -29999990, 151, 110, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999,
-    -29999998, 131125, -29999999, 40, 393307, (s32)btlevtcmd_DispItemIcon, -30000000, -29999999,
-    -29999998, 151, 90, 112, 65545, 90, 262235, (s32)btlevtcmd_CheckDataOfDataTable,
-    -29999990, -30000000, 67, 131097, -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild,
-    -29999990, 67, 33, 393307, (s32)btlevtcmd_OnOffStatus, -29999990, 27, 0,
-    0, 0, 196699, (s32)btlevtcmd_SetHp, -29999990, 0, 262235, (s32)btlevtcmd_RecoverHp,
-    -29999990, -29999989, 10, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999,
-    -29999998, 131125, -29999999, 30, 983131, (s32)evt_eff, 0, (s32)"recovery",
-    0, -30000000, -29999999, -29999998, 10, 0, 0, 0,
-    0, 0, 0, 0, 65546, 2000, 262235, (s32)btlevtcmd_AnimeChangePoseType,
-    -29999990, -29999989, 42, 327771, (s32)btlevtcmd_JumpSetting, -29999990, 0, -230000000,
-    -229999284, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999, -29999998, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 20, -1, 131163,
-    (s32)btlevtcmd_StartWaitEvent, -2, 33, 32, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000,
-    49, 131097, -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 49,
-    32, 33, 196699, (s32)btlevtcmd_KillUnit, -29999990, 1, 196699, (s32)btlevtcmd_GetBodyId,
-    -2, -29999989, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, 27, 110,
-    196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -29999990, -29999989, 393307, (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_PARTY_BATTLE_DIE1",
-    -250000000, 0, -250000000, 112, 327771, (s32)btlevtcmd_GetHomePos, -29999990, -30000000,
-    -29999999, -29999998, 196699, (s32)btlevtcmd_GetPartnerId, -29999990, -29999996, 327771, (s32)btlevtcmd_GetHomePos,
-    -29999996, -29999994, -29999993, -29999992, 131098, -30000000, 0, 131127,
-    -30000000, -1, 33, 131098, -29999994, 0, 131127, -29999994,
-    -1, 33, 131098, -30000000, -29999994, 65546, 500, 131163,
-    (s32)_check_at_dm_event_wait, -3, 196699, (s32)btlevtcmd_GetHp, -3, -30000000, 131099, -30000000,
-    0, 65630, (s32)btldefaultevt_ChangePosition, 33, 33, 33, 42, 262235,
-    (s32)btlevtcmd_CheckDamageCode, -29999990, 2048, -29999999, 131097, -29999999, 0, 262235,
-    (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 51, 131097, -30000000, 0, 131163,
-    (s32)btlevtcmd_ClearAllStatus, -29999990, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 51, 32, 196699,
-    (s32)btlevtcmd_OnUnitFlag, -29999990, 134217728, 131122, -30000000, 48, 65539, 5,
-    65545, 1, 327771, (s32)btlevtcmd_AddRotate, -29999990, 0, -15, 0,
-    131126, -30000000, 1, 131099, -30000000, 0, 65540, 5,
-    33, 327771, (s32)btlevtcmd_SetRotate, -29999990, 0, 0, 0, 327771,
-    (s32)btlevtcmd_SetRotateOffset, -29999990, 0, 0, 0, 131122, -30000000, 30,
-    65539, 6, 65545, 1, 327771, (s32)btlevtcmd_AddRotate, -29999990, 3,
-    0, 0, 131126, -30000000, 1, 131099, -30000000, 0,
-    65540, 6, 33, 131163, (s32)btlevtcmd_ClearAllStatus, -29999990, 196699, (s32)btlevtcmd_ConsumeItemReserve,
-    -29999990, 151, 110, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999,
-    -29999998, 131125, -29999999, 40, 393307, (s32)btlevtcmd_DispItemIcon, -30000000, -29999999,
-    -29999998, 151, 120, 112, 65545, 90, 131122, -30000000,
-    30, 65539, 7, 65545, 1, 327771, (s32)btlevtcmd_AddRotate, -29999990,
-    -3, 0, 0, 131126, -30000000, 1, 131099, -30000000,
-    0, 65540, 7, 33, 393307, (s32)btlevtcmd_OnOffStatus, -29999990, 27,
-    0, 0, 0, 196699, (s32)btlevtcmd_SetHp, -29999990, 0, 262235,
-    (s32)btlevtcmd_RecoverHp, -29999990, -29999989, 10, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000,
-    -29999999, -29999998, 131125, -29999999, 30, 983131, (s32)evt_eff, 0,
-    (s32)"recovery", 0, -30000000, -29999999, -29999998, 10, 0, 0,
-    0, 0, 0, 0, 0, 65546, 2000, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, 42, 327771, (s32)btlevtcmd_JumpSetting, -29999990, 0,
-    -230000000, -229999284, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999, -29999998,
-    458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 20, -1,
-    196699, (s32)btlevtcmd_OffUnitFlag, -29999990, 134217728, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 33,
-    32, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 49, 131097, -30000000,
-    0, 131163, (s32)btlevtcmd_ClearAllStatus, -29999990, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 49,
-    32, 65630, (s32)subsetevt_dead_core, 33, 33, 49, 2, 1,
-};
+EVT_BEGIN(subsetevt_dead)
+    CALL(_disable_restore_command_cursor)
+    CALL(btlevtcmd_GetUnitKind, LW(10), LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(222)
+        GOTO(0)
+        CASE_BETWEEN(224, 230)
+        GOTO(0)
+        CASE_DEFAULT
+        GOTO(1)
+    END_SWITCH
+    LABEL(0)
+    CALL(btlevtcmd_CheckAttribute, LW(10), 4, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 42)
+        CALL(btlevtcmd_GetHomePos, LW(10), LW(2), LW(3), LW(4))
+        CALL(btlevtcmd_SetMoveSpeed, LW(10), FLOAT(4.0f))
+        CALL(btlevtcmd_DivePosition, LW(10), LW(2), LW(3), LW(4), 0, 0, 0, 0, -1)
+    ELSE
+        CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 40)
+        CALL(btlevtcmd_GetHomePos, LW(10), LW(2), LW(3), LW(4))
+        CALL(btlevtcmd_SetMoveSpeed, LW(10), FLOAT(4.0f))
+        CALL(btlevtcmd_MovePosition, LW(10), LW(2), LW(3), LW(4), 0, -1, 0)
+    END_IF
+    CALL(btlevtcmd_ResetFaceDirection, LW(10))
+    LABEL(1)
+    CALL(btlevtcmd_OnOffStatus, LW(10), 27, 1, 1, 1)
+    CALL(btlevtcmd_GetUnitKind, LW(10), LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(222)
+        CALL(btlevtcmd_ClearAllStatus, LW(10))
+        CALL(btlevtcmd_CheckDamageCode, LW(10), 2048, LW(1))
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 51)
+        ELSE
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 49)
+        END_IF
+        CASE_BETWEEN(224, 230)
+        CALL(btlevtcmd_CheckDamageCode, LW(10), 2048, LW(1))
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            CALL(btlevtcmd_ClearAllStatus, LW(10))
+            CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 51)
+            IF_INT_NOT_EQUAL(LW(0), 0)
+                CALL(btlevtcmd_RunDataEventChild, LW(10), 51)
+            ELSE
+                CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 27)
+                BEGIN_SIBLING_EVENT
+                    CALL(btlevtcmd_AnimeWaitPlayComplete, LW(10), LW(11))
+                    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_PARTY_BATTLE_DIE1"), -250000000, 0, -250000000)
+                END_SIBLING_EVENT
+                WAIT_FRAMES(60)
+                CALL(btlevtcmd_ClearAllStatus, LW(10))
+                CALL(btlevtcmd_ConsumeItemReserve, LW(10), 151)
+                BEGIN_SIBLING_EVENT
+                    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+                    ADD(LW(1), 40)
+                    CALL(btlevtcmd_DispItemIcon, LW(0), LW(1), LW(2), 151, 90)
+                END_SIBLING_EVENT
+                WAIT_FRAMES(90)
+                CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 67)
+                IF_INT_NOT_EQUAL(LW(0), 0)
+                    CALL(btlevtcmd_RunDataEventChild, LW(10), 67)
+                END_IF
+                CALL(btlevtcmd_OnOffStatus, LW(10), 27, 0, 0, 0)
+                CALL(btlevtcmd_SetHp, LW(10), 0)
+                CALL(btlevtcmd_RecoverHp, LW(10), LW(11), 10)
+                CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+                ADD(LW(1), 30)
+                CALL(evt_eff, 0, STRING("recovery"), 0, LW(0), LW(1), LW(2), 10, 0, 0, 0, 0, 0, 0, 0)
+                WAIT_MS(2000)
+                CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 42)
+                CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(0.0f), FLOAT(0.69921875f))
+                CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+                CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 20, -1)
+                CALL(btlevtcmd_StartWaitEvent, -2)
+            END_IF
+        ELSE
+            CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 49)
+            IF_INT_NOT_EQUAL(LW(0), 0)
+                CALL(btlevtcmd_RunDataEventChild, LW(10), 49)
+            ELSE
+            END_IF
+            CALL(btlevtcmd_KillUnit, LW(10), 1)
+            CALL(btlevtcmd_GetBodyId, -2, LW(11))
+            CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 27)
+            BEGIN_SIBLING_EVENT
+                CALL(btlevtcmd_AnimeWaitPlayComplete, LW(10), LW(11))
+                CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_PARTY_BATTLE_DIE1"), -250000000, 0, -250000000)
+            END_SIBLING_EVENT
+            CALL(btlevtcmd_GetHomePos, LW(10), LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_GetPartnerId, LW(10), LW(4))
+            CALL(btlevtcmd_GetHomePos, LW(4), LW(6), LW(7), LW(8))
+            IF_INT_LESS(LW(0), 0)
+                MULTIPLY(LW(0), -1)
+            END_IF
+            IF_INT_LESS(LW(6), 0)
+                MULTIPLY(LW(6), -1)
+            END_IF
+            IF_INT_LESS(LW(0), LW(6))
+                WAIT_MS(500)
+                CALL(_check_at_dm_event_wait, -3)
+                CALL(btlevtcmd_GetHp, -3, LW(0))
+                IF_INT_GREATER(LW(0), 0)
+                    CALL_CHILD(btldefaultevt_ChangePosition)
+                END_IF
+            END_IF
+        END_IF
+        CASE_DEFAULT
+        CALL(btlevtcmd_CheckDamageCode, LW(10), 2048, LW(1))
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 51)
+            IF_INT_NOT_EQUAL(LW(0), 0)
+                CALL(btlevtcmd_ClearAllStatus, LW(10))
+                CALL(btlevtcmd_RunDataEventChild, LW(10), 51)
+            ELSE
+                CALL(btlevtcmd_OnUnitFlag, LW(10), 134217728)
+                SET_VALUE(LW(0), 48)
+                LABEL(5)
+                WAIT_FRAMES(1)
+                CALL(btlevtcmd_AddRotate, LW(10), 0, -15, 0)
+                SUBTRACT(LW(0), 1)
+                IF_INT_GREATER(LW(0), 0)
+                    GOTO(5)
+                END_IF
+                CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
+                CALL(btlevtcmd_SetRotateOffset, LW(10), 0, 0, 0)
+                SET_VALUE(LW(0), 30)
+                LABEL(6)
+                WAIT_FRAMES(1)
+                CALL(btlevtcmd_AddRotate, LW(10), 3, 0, 0)
+                SUBTRACT(LW(0), 1)
+                IF_INT_GREATER(LW(0), 0)
+                    GOTO(6)
+                END_IF
+                CALL(btlevtcmd_ClearAllStatus, LW(10))
+                CALL(btlevtcmd_ConsumeItemReserve, LW(10), 151)
+                BEGIN_SIBLING_EVENT
+                    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+                    ADD(LW(1), 40)
+                    CALL(btlevtcmd_DispItemIcon, LW(0), LW(1), LW(2), 151, 120)
+                END_SIBLING_EVENT
+                WAIT_FRAMES(90)
+                SET_VALUE(LW(0), 30)
+                LABEL(7)
+                WAIT_FRAMES(1)
+                CALL(btlevtcmd_AddRotate, LW(10), -3, 0, 0)
+                SUBTRACT(LW(0), 1)
+                IF_INT_GREATER(LW(0), 0)
+                    GOTO(7)
+                END_IF
+                CALL(btlevtcmd_OnOffStatus, LW(10), 27, 0, 0, 0)
+                CALL(btlevtcmd_SetHp, LW(10), 0)
+                CALL(btlevtcmd_RecoverHp, LW(10), LW(11), 10)
+                CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+                ADD(LW(1), 30)
+                CALL(evt_eff, 0, STRING("recovery"), 0, LW(0), LW(1), LW(2), 10, 0, 0, 0, 0, 0, 0, 0)
+                WAIT_MS(2000)
+                CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 42)
+                CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(0.0f), FLOAT(0.69921875f))
+                CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+                CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 20, -1)
+                CALL(btlevtcmd_OffUnitFlag, LW(10), 134217728)
+                CALL(btlevtcmd_StartWaitEvent, -2)
+            END_IF
+        ELSE
+            CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 49)
+            IF_INT_NOT_EQUAL(LW(0), 0)
+                CALL(btlevtcmd_ClearAllStatus, LW(10))
+                CALL(btlevtcmd_RunDataEventChild, LW(10), 49)
+            ELSE
+                CALL_CHILD(subsetevt_dead_core)
+            END_IF
+        END_IF
+    END_SWITCH
+    RETURN
+EVT_END()
 #endif
 
 #ifdef VERSION_G8ME01
@@ -417,33 +515,58 @@ EVT_BEGIN(subsetevt_dead_core)
     RETURN
 EVT_END()
 #else
-s32 subsetevt_dead_core[] = {
-    262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 50, 131097, -30000000, 0,
-    196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 50, 33, 131122, -30000000, 48,
-    196699, (s32)btlevtcmd_OnUnitFlag, -29999990, 134217728, 393307, (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_BTL_ENEMY_DIE1_1",
-    -250000000, 0, -250000000, 65539, 10, 65545, 1, 327771,
-    (s32)btlevtcmd_AddRotate, -29999990, 0, -15, 0, 131126, -30000000, 1,
-    131099, -30000000, 0, 65540, 10, 33, 327771, (s32)btlevtcmd_SetRotate,
-    -29999990, 0, 0, 0, 393307, (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_BTL_ENEMY_DIE1_2",
-    -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999,
-    -29999998, 131125, -29999998, 10, 983131, (s32)evt_eff, 0, (s32)"kemuri_test",
-    4, -30000000, -29999999, -29999998, -229999181, 0, 0, 0,
-    0, 0, 0, 0, 196699, (s32)btlevtcmd_GetCoin, -29999990, -30000000,
-    131163, (s32)btlevtcmd_StoreCoin, -30000000, 196699, (s32)btlevtcmd_GetExp, -29999990, -30000000, 131163,
-    (s32)btlevtcmd_StoreExp, -30000000, 327771, (s32)btlevtcmd_GetPos, -29999990, -29999997, -29999999, -29999998,
-    131125, -29999998, 10, 131125, -29999999, 30, 327771, (s32)_add_star_point_disp_offset,
-    -29999990, -29999997, -29999999, -29999998, 983131, (s32)evt_eff, (s32)"", (s32)"star_point",
-    0, -29999997, -29999999, -29999998, -30000000, 0, 0, 0,
-    0, 0, 0, 0, 131101, -30000000, 1, 65541,
-    -30000000, 6, 33, 327771, (s32)btlevtcmd_SetRotateOffset, -29999990, 0, 0,
-    0, 131122, -30000000, 30, 65539, 20, 65545, 1,
-    327771, (s32)btlevtcmd_AddRotate, -29999990, 3, 0, 0, 131126, -30000000,
-    1, 131099, -30000000, 0, 65540, 20, 33, 131163,
-    (s32)btlevtcmd_GetBackItem, -29999990, 131163, (s32)btlevtcmd_ClearAllStatus, -29999990, 262235, (s32)btlevtcmd_CheckDamageCode, -29999990,
-    1024, -30000000, 131097, -30000000, 0, 196699, (s32)btlevtcmd_KillUnit, -29999990,
-    0, 32, 196699, (s32)btlevtcmd_KillUnit, -29999990, 2, 33, 2,
-    1,
-};
+EVT_BEGIN(subsetevt_dead_core)
+    CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 50)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_RunDataEventChild, LW(10), 50)
+    END_IF
+    SET_VALUE(LW(0), 48)
+    CALL(btlevtcmd_OnUnitFlag, LW(10), 134217728)
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_1"), -250000000, 0, -250000000)
+    LABEL(10)
+    WAIT_FRAMES(1)
+    CALL(btlevtcmd_AddRotate, LW(10), 0, -15, 0)
+    SUBTRACT(LW(0), 1)
+    IF_INT_GREATER(LW(0), 0)
+        GOTO(10)
+    END_IF
+    CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+    ADD(LW(2), 10)
+    CALL(evt_eff, 0, STRING("kemuri_test"), 4, LW(0), LW(1), LW(2), FLOAT(0.7998047f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_GetCoin, LW(10), LW(0))
+    CALL(btlevtcmd_StoreCoin, LW(0))
+    CALL(btlevtcmd_GetExp, LW(10), LW(0))
+    CALL(btlevtcmd_StoreExp, LW(0))
+    CALL(btlevtcmd_GetPos, LW(10), LW(3), LW(1), LW(2))
+    ADD(LW(2), 10)
+    ADD(LW(1), 30)
+    CALL(_add_star_point_disp_offset, LW(10), LW(3), LW(1), LW(2))
+    CALL(evt_eff, STRING(""), STRING("star_point"), 0, LW(3), LW(1), LW(2), LW(0), 0, 0, 0, 0, 0, 0, 0)
+    IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+        LOOP(LW(0))
+        END_LOOP
+    END_IF
+    CALL(btlevtcmd_SetRotateOffset, LW(10), 0, 0, 0)
+    SET_VALUE(LW(0), 30)
+    LABEL(20)
+    WAIT_FRAMES(1)
+    CALL(btlevtcmd_AddRotate, LW(10), 3, 0, 0)
+    SUBTRACT(LW(0), 1)
+    IF_INT_GREATER(LW(0), 0)
+        GOTO(20)
+    END_IF
+    CALL(btlevtcmd_GetBackItem, LW(10))
+    CALL(btlevtcmd_ClearAllStatus, LW(10))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), 1024, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_KillUnit, LW(10), 0)
+    ELSE
+        CALL(btlevtcmd_KillUnit, LW(10), 2)
+    END_IF
+    RETURN
+EVT_END()
 #endif
 
 #ifdef VERSION_G8ME01
@@ -480,24 +603,38 @@ EVT_BEGIN(subsetevt_dead_core_nospin_norotate)
     RETURN
 EVT_END()
 #else
-s32 subsetevt_dead_core_nospin_norotate[] = {
-    262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 50, 131097, -30000000, 0,
-    196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 50, 33, 393307, (s32)btlevtcmd_snd_se, -29999990,
-    (s32)"SFX_BTL_ENEMY_DIE1_2", -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000,
-    -29999999, -29999998, 131125, -29999998, 10, 983131, (s32)evt_eff, 0,
-    (s32)"kemuri_test", 4, -30000000, -29999999, -29999998, -229999181, 0, 0,
-    0, 0, 0, 0, 0, 196699, (s32)btlevtcmd_GetCoin, -29999990,
-    -30000000, 131163, (s32)btlevtcmd_StoreCoin, -30000000, 196699, (s32)btlevtcmd_GetExp, -29999990, -30000000,
-    131163, (s32)btlevtcmd_StoreExp, -30000000, 327771, (s32)btlevtcmd_GetPos, -29999990, -29999997, -29999999,
-    -29999998, 131125, -29999998, 10, 131125, -29999999, 30, 327771,
-    (s32)_add_star_point_disp_offset, -29999990, -29999997, -29999999, -29999998, 983131, (s32)evt_eff, (s32)"",
-    (s32)"star_point", 0, -29999997, -29999999, -29999998, -30000000, 0, 0,
-    0, 0, 0, 0, 0, 131101, -30000000, 1,
-    65541, -30000000, 6, 33, 65545, 30, 131163, (s32)btlevtcmd_GetBackItem,
-    -29999990, 262235, (s32)btlevtcmd_CheckDamageCode, -29999990, 1024, -30000000, 131097, -30000000,
-    0, 196699, (s32)btlevtcmd_KillUnit, -29999990, 1, 32, 196699, (s32)btlevtcmd_KillUnit,
-    -29999990, 2, 33, 2, 1,
-};
+EVT_BEGIN(subsetevt_dead_core_nospin_norotate)
+    CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 50)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_RunDataEventChild, LW(10), 50)
+    END_IF
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+    ADD(LW(2), 10)
+    CALL(evt_eff, 0, STRING("kemuri_test"), 4, LW(0), LW(1), LW(2), FLOAT(0.7998047f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_GetCoin, LW(10), LW(0))
+    CALL(btlevtcmd_StoreCoin, LW(0))
+    CALL(btlevtcmd_GetExp, LW(10), LW(0))
+    CALL(btlevtcmd_StoreExp, LW(0))
+    CALL(btlevtcmd_GetPos, LW(10), LW(3), LW(1), LW(2))
+    ADD(LW(2), 10)
+    ADD(LW(1), 30)
+    CALL(_add_star_point_disp_offset, LW(10), LW(3), LW(1), LW(2))
+    CALL(evt_eff, STRING(""), STRING("star_point"), 0, LW(3), LW(1), LW(2), LW(0), 0, 0, 0, 0, 0, 0, 0)
+    IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+        LOOP(LW(0))
+        END_LOOP
+    END_IF
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_GetBackItem, LW(10))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), 1024, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_KillUnit, LW(10), 1)
+    ELSE
+        CALL(btlevtcmd_KillUnit, LW(10), 2)
+    END_IF
+    RETURN
+EVT_END()
 #endif
 
 EVT_BEGIN(btldefaultevt_avoid_guard)
@@ -856,131 +993,337 @@ EVT_BEGIN(subsetevt_damage)
     RETURN
 EVT_END()
 #else
-s32 subsetevt_damage[] = {
-    262235, (s32)btlevtcmd_CheckDamageCode, -29999990, 2097152, -30000000, 131097, -30000000, 0,
-    196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 13, 2, 33, 262235, (s32)btlevtcmd_CheckDamageCode,
-    -29999990, 4194304, -30000000, 131097, -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild,
-    -29999990, 14, 2, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 9,
-    -30000000, 131097, -30000000, 0, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000,
-    17, 131097, -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 17,
-    2, 33, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 8, -30000000,
-    131097, -30000000, 0, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 16,
-    131097, -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 16, 2,
-    33, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 14, -30000000, 131097,
-    -30000000, 0, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 18, 131097,
-    -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 18, 2, 33,
-    33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 16, -30000000, 131097, -30000000,
-    0, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 18, 131097, -30000000,
-    0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 18, 2, 33, 33,
-    262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 15, -30000000, 131097, -30000000, 0,
-    262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 19, 131097, -30000000, 0,
-    196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 19, 2, 33, 33, 262235,
-    (s32)btlevtcmd_CheckDamagePattern, -29999990, 17, -30000000, 131097, -30000000, 0, 262235,
-    (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 19, 131097, -30000000, 0, 196699,
-    (s32)btlevtcmd_RunDataEventChild, -29999990, 19, 2, 33, 33, 262235, (s32)btlevtcmd_CheckDamagePattern,
-    -29999990, 21, -30000000, 131097, -30000000, 0, 262235, (s32)btlevtcmd_CheckDataOfDataTable,
-    -29999990, -30000000, 20, 131097, -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild,
-    -29999990, 20, 2, 33, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990,
-    22, -30000000, 131097, -30000000, 0, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990,
-    -30000000, 21, 131097, -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990,
-    21, 2, 33, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 23,
-    -30000000, 131097, -30000000, 0, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000,
-    22, 131097, -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 22,
-    2, 33, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 24, -30000000,
-    131097, -30000000, 0, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 23,
-    131097, -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 23, 2,
-    33, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 25, -30000000, 131097,
-    -30000000, 0, 65630, (s32)subsetevt_blow_damage, 327771, (s32)btlevtcmd_SetRotate, -29999990, 0,
-    0, 0, 2, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 4,
-    -30000000, 131097, -30000000, 0, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000,
-    55, 131097, -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 55,
-    2, 33, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 5, -30000000,
-    131097, -30000000, 0, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 56,
-    131097, -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 56, 2,
-    33, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 6, -30000000, 131097,
-    -30000000, 0, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 57, 131097,
-    -30000000, 0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 57, 2, 33,
-    33, 262235, (s32)btlevtcmd_CheckDataOfDataTable, -29999990, -30000000, 9, 131097, -30000000,
-    0, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 9, 2, 33, 262235,
-    (s32)btlevtcmd_CheckDamagePattern, -29999990, 4, -30000000, 131097, -30000000, 0, 65630,
-    (s32)subsetevt_swallow_failed_damage, 2, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 5, -30000000,
-    131097, -30000000, 0, 65630, (s32)subsetevt_swallow_spew_damage, 2, 33, 262235,
-    (s32)btlevtcmd_CheckDamagePattern, -29999990, 6, -30000000, 131097, -30000000, 0, 65630,
-    (s32)subsetevt_swallow_shot_damage, 2, 33, 196699, (s32)btlevtcmd_GetDamage, -29999990, -30000000, 131101,
-    -30000000, 1, 262235, (s32)btlevtcmd_CheckDamageCode, -29999990, 256, -30000000, 131097,
-    -30000000, 0, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 10, -30000000, 131097,
-    -30000000, 0, 65540, 10, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990,
-    12, -30000000, 131097, -30000000, 0, 65540, 10, 33,
-    262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 11, -30000000, 131097, -30000000, 0,
-    65540, 10, 33, 65540, 11, 65539, 10, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, -29999986, 65647, -30000000, 327771, (s32)evt_sub_intpl_init_float,
-    5, -229998976, -229999847, 10, 65541, 11, 196699, (s32)evt_sub_intpl_get_float,
-    -29999995, -250000000, 327771, (s32)btlevtcmd_GetScale, -29999990, -30000000, -29999999, -29999998,
-    327771, (s32)btlevtcmd_SetScale, -29999990, -30000000, -29999995, -29999998, 65545, 1,
-    6, 112, 131163, (s32)btlevtcmd_WaitEventEnd, -30000000, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990,
-    11, -29999999, 131097, -29999999, 0, 65546, 3000, 32,
-    262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 12, -29999999, 131097, -29999999, 0,
-    65546, 2500, 32, 65546, 1500, 33, 33, 110,
-    196699, (s32)btlevtcmd_GetFriendBelong, -29999990, -30000000, 131096, -30000000, 0, 393307,
-    (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_BTL_DAMAGE_PRESS1", -250000000, 0, -250000000, 33, 112,
-    110, 327771, (s32)evt_sub_intpl_init_float, 5, -229999847, -229998720, 10, 65541,
-    10, 196699, (s32)evt_sub_intpl_get_float, -29999995, -250000000, 327771, (s32)btlevtcmd_GetScale, -29999990,
-    -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_SetScale, -29999990, -30000000, -29999995,
-    -29999998, 65545, 1, 6, 327771, (s32)evt_sub_intpl_init_float, 7, -229998720,
-    -229998976, 30, 65541, 30, 196699, (s32)evt_sub_intpl_get_float, -29999995, -250000000,
-    327771, (s32)btlevtcmd_GetScale, -29999990, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_SetScale,
-    -29999990, -30000000, -29999995, -29999998, 65545, 1, 6, 112,
-    65545, 60, 2, 65539, 11, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990,
-    14, -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_shot_damage, 2,
-    33, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 16, -30000000, 131097,
-    -30000000, 0, 65630, (s32)subsetevt_shot_damage, 2, 33, 262235, (s32)btlevtcmd_CheckDamagePattern,
-    -29999990, 21, -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_binta_damage_left,
-    2, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 22, -30000000, 131097,
-    -30000000, 0, 65630, (s32)subsetevt_binta_damage_right, 2, 33, 262235, (s32)btlevtcmd_CheckDamagePattern,
-    -29999990, 23, -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_binta_damage_left_last,
-    2, 33, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 24, -30000000, 131097,
-    -30000000, 0, 65630, (s32)subsetevt_binta_damage_right_last, 2, 33, 262235, (s32)btlevtcmd_CheckDamagePattern,
-    -29999990, 13, -30000000, 131097, -30000000, 0, 327771, (s32)btlevtcmd_AnimeFlagOnOff,
-    -29999990, -29999989, 32, 1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989,
-    -29999986, 65546, 2000, 327771, (s32)btlevtcmd_AnimeFlagOnOff, -29999990, -29999989, 32,
-    0, 32, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 26, -30000000, 131097,
-    -30000000, 0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, -29999986, 65546,
-    2000, 131097, -29999985, -1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989,
-    -29999985, 65545, 30, 33, 32, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990,
-    -29999989, -29999986, 65546, 1000, 131097, -29999985, -1, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, -29999985, 65545, 30, 33, 33,
-    33, 2, 32, 262235, (s32)btlevtcmd_CheckDamageCode, -29999990, 256, -30000000,
-    131097, -30000000, 0, 131163, (s32)_set_hp_gauge_fade_flag, -29999990, 33, 196699,
-    (s32)btlevtcmd_GetDamageCode, -29999990, -30000000, 65570, -30000000, 65572, 23, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, -29999986, 65546, 1000, 131097, -29999985,
-    -1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, -29999985, 65545, 30,
-    33, 2, 42, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_ATTACK_MISS2", 0, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -2, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -1, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, 0, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -2, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -4, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -2, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, 0, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -1, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -2, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -1, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, 0, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -1, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -3, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -1, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, 0, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -1, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -2, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -1, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, 0, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, 0, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -1, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, -1, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, 0, 0, 0, 65545, 1, 327771,
-    (s32)btlevtcmd_SetDispOffset, -29999990, 0, 0, 0, 65545, 1, 49,
-    33, 2, 1,
-};
+EVT_BEGIN(subsetevt_damage)
+    CALL(btlevtcmd_CheckDamageCode, LW(10), 2097152, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_RunDataEventChild, LW(10), 13)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_CheckDamageCode, LW(10), 4194304, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_RunDataEventChild, LW(10), 14)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 9, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 17)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 17)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 8, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 16)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 16)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 14, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 18)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 18)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 16, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 18)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 18)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 15, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 19)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 19)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 17, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 19)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 19)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 21, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 20)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 20)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 22, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 21)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 21)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 23, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 22)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 22)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 24, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 23)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 23)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 25, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL_CHILD(subsetevt_blow_damage)
+        CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 4, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 55)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 55)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 5, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 56)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 56)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 6, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 57)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_RunDataEventChild, LW(10), 57)
+            RETURN
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 9)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_RunDataEventChild, LW(10), 9)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 4, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL_CHILD(subsetevt_swallow_failed_damage)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 5, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL_CHILD(subsetevt_swallow_spew_damage)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 6, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL_CHILD(subsetevt_swallow_shot_damage)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_GetDamage, LW(10), LW(0))
+    IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+        CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_CheckDamagePattern, LW(10), 10, LW(0))
+            IF_INT_NOT_EQUAL(LW(0), 0)
+                GOTO(10)
+            END_IF
+            CALL(btlevtcmd_CheckDamagePattern, LW(10), 12, LW(0))
+            IF_INT_NOT_EQUAL(LW(0), 0)
+                GOTO(10)
+            END_IF
+            CALL(btlevtcmd_CheckDamagePattern, LW(10), 11, LW(0))
+            IF_INT_NOT_EQUAL(LW(0), 0)
+                GOTO(10)
+            END_IF
+            GOTO(11)
+            LABEL(10)
+            CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
+            BEGIN_SIBLING_EVENT_GET_ID(LW(0))
+                CALL(evt_sub_intpl_init_float, 5, FLOAT(1.0f), FLOAT(0.14941406f), 10)
+                LOOP(11)
+                    CALL(evt_sub_intpl_get_float, LW(5), -250000000)
+                    CALL(btlevtcmd_GetScale, LW(10), LW(0), LW(1), LW(2))
+                    CALL(btlevtcmd_SetScale, LW(10), LW(0), LW(5), LW(2))
+                    WAIT_FRAMES(1)
+                END_LOOP
+            END_SIBLING_EVENT
+            CALL(btlevtcmd_WaitEventEnd, LW(0))
+            CALL(btlevtcmd_CheckDamagePattern, LW(10), 11, LW(1))
+            IF_INT_NOT_EQUAL(LW(1), 0)
+                WAIT_MS(3000)
+            ELSE
+                CALL(btlevtcmd_CheckDamagePattern, LW(10), 12, LW(1))
+                IF_INT_NOT_EQUAL(LW(1), 0)
+                    WAIT_MS(2500)
+                ELSE
+                    WAIT_MS(1500)
+                END_IF
+            END_IF
+            BEGIN_SIBLING_EVENT
+                CALL(btlevtcmd_GetFriendBelong, LW(10), LW(0))
+                IF_INT_EQUAL(LW(0), 0)
+                    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_DAMAGE_PRESS1"), -250000000, 0, -250000000)
+                END_IF
+            END_SIBLING_EVENT
+            BEGIN_SIBLING_EVENT
+                CALL(evt_sub_intpl_init_float, 5, FLOAT(0.14941406f), FLOAT(1.25f), 10)
+                LOOP(10)
+                    CALL(evt_sub_intpl_get_float, LW(5), -250000000)
+                    CALL(btlevtcmd_GetScale, LW(10), LW(0), LW(1), LW(2))
+                    CALL(btlevtcmd_SetScale, LW(10), LW(0), LW(5), LW(2))
+                    WAIT_FRAMES(1)
+                END_LOOP
+                CALL(evt_sub_intpl_init_float, 7, FLOAT(1.25f), FLOAT(1.0f), 30)
+                LOOP(30)
+                    CALL(evt_sub_intpl_get_float, LW(5), -250000000)
+                    CALL(btlevtcmd_GetScale, LW(10), LW(0), LW(1), LW(2))
+                    CALL(btlevtcmd_SetScale, LW(10), LW(0), LW(5), LW(2))
+                    WAIT_FRAMES(1)
+                END_LOOP
+            END_SIBLING_EVENT
+            WAIT_FRAMES(60)
+            RETURN
+            LABEL(11)
+            CALL(btlevtcmd_CheckDamagePattern, LW(10), 14, LW(0))
+            IF_INT_NOT_EQUAL(LW(0), 0)
+                CALL_CHILD(subsetevt_shot_damage)
+                RETURN
+            END_IF
+        END_IF
+        CALL(btlevtcmd_CheckDamagePattern, LW(10), 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_shot_damage)
+            RETURN
+        END_IF
+        CALL(btlevtcmd_CheckDamagePattern, LW(10), 21, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_binta_damage_left)
+            RETURN
+        END_IF
+        CALL(btlevtcmd_CheckDamagePattern, LW(10), 22, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_binta_damage_right)
+            RETURN
+        END_IF
+        CALL(btlevtcmd_CheckDamagePattern, LW(10), 23, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_binta_damage_left_last)
+            RETURN
+        END_IF
+        CALL(btlevtcmd_CheckDamagePattern, LW(10), 24, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_binta_damage_right_last)
+            RETURN
+        END_IF
+        CALL(btlevtcmd_CheckDamagePattern, LW(10), 13, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_AnimeFlagOnOff, LW(10), LW(11), 32, 1)
+            CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
+            WAIT_MS(2000)
+            CALL(btlevtcmd_AnimeFlagOnOff, LW(10), LW(11), 32, 0)
+        ELSE
+            CALL(btlevtcmd_CheckDamagePattern, LW(10), 26, LW(0))
+            IF_INT_NOT_EQUAL(LW(0), 0)
+                CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
+                WAIT_MS(2000)
+                IF_INT_NOT_EQUAL(LW(15), -1)
+                    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(15))
+                    WAIT_FRAMES(30)
+                END_IF
+            ELSE
+                CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
+                WAIT_MS(1000)
+                IF_INT_NOT_EQUAL(LW(15), -1)
+                    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(15))
+                    WAIT_FRAMES(30)
+                END_IF
+            END_IF
+        END_IF
+        RETURN
+    ELSE
+        CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(_set_hp_gauge_fade_flag, LW(10))
+        END_IF
+        CALL(btlevtcmd_GetDamageCode, LW(10), LW(0))
+        SWITCH(LW(0))
+            CASE_EQUAL(23)
+            CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
+            WAIT_MS(1000)
+            IF_INT_NOT_EQUAL(LW(15), -1)
+                CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(15))
+                WAIT_FRAMES(30)
+            END_IF
+            RETURN
+            CASE_DEFAULT
+            CALL(evt_snd_sfxon, STRING("SFX_BTL_ATTACK_MISS2"), 0)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -2, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -1, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), 0, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -2, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -4, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -2, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), 0, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -1, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -2, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -1, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), 0, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -1, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -3, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -1, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), 0, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -1, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -2, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -1, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), 0, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), 0, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -1, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), -1, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), 0, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_SetDispOffset, LW(10), 0, 0, 0)
+            WAIT_FRAMES(1)
+        END_SWITCH
+    END_IF
+    RETURN
+EVT_END()
 #endif
 
 #ifdef VERSION_G8ME01
@@ -1039,30 +1382,60 @@ EVT_BEGIN(subsetevt_counter_damage)
     RETURN
 EVT_END()
 #else
-s32 subsetevt_counter_damage[] = {
-    196699, (s32)btlevtcmd_OnUnitFlag, -29999990, 1, 110, 65570, -30000000, 65579,
-    43, 65579, 44, 65579, 45, 196699, (s32)btlevtcmd_GetUnitKind, -29999990,
-    -29999998, 131096, -29999998, 222, 327771, (s32)btlevtcmd_GetPos, -29999990, -29999998,
-    -29999997, -29999996, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_VOICE_MARIO_DAMAGED1", -29999998, -29999997, -29999996,
-    0, 33, 46, 49, 112, 65570, -30000000, 65572,
-    43, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_ATTACK_MISS3", 0, 131122, -29999986, 36,
-    65572, 46, 196699, (s32)btlevtcmd_GetUnitKind, -29999990, -29999998, 131096, -29999998,
-    222, 393307, (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_VOICE_MARIO_DAMAGED1", -250000000, 0, -250000000,
-    33, 131122, -29999986, 29, 65579, 49, 65579, 50,
-    65579, 54, 131122, -29999986, 29, 46, 42, 131122,
-    -29999986, 39, 49, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, -29999986,
-    110, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 10, 112, 196699, (s32)btlevtcmd_SetFallAccel,
-    -29999990, -229998976, 327771, (s32)btlevtcmd_GetPos, -29999990, -29999998, -29999997, -29999996,
-    262235, (s32)btlevtcmd_FaceDirectionSub, -29999990, -29999998, 25, 131125, -29999997, 25,
-    655451, (s32)btlevtcmd_DivePosition, -29999990, -29999998, -29999997, -29999996, 10, 0,
-    0, 0, -1, 65546, 500, 196699, (s32)btlevtcmd_SetFallAccel, -29999990,
-    -229998976, 327771, (s32)btlevtcmd_GetPos, -29999990, -29999998, -29999997, -29999996, 262235,
-    (s32)btlevtcmd_TransStageFloorPosition, -29999998, -29999997, -29999996, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999990, -29999998,
-    30, 458843, (s32)btlevtcmd_JumpPosition, -29999990, -29999998, -29999997, -29999996, 20,
-    -1, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999990, -29999998, 15, 458843, (s32)btlevtcmd_JumpPosition,
-    -29999990, -29999998, -29999997, -29999996, 10, -1, 65545, 30,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 2, 1,
-};
+EVT_BEGIN(subsetevt_counter_damage)
+    CALL(btlevtcmd_OnUnitFlag, LW(10), 1)
+    BEGIN_SIBLING_EVENT
+        SWITCH(LW(0))
+            CASE_OR_EQUAL(43)
+            CASE_OR_EQUAL(44)
+            CASE_OR_EQUAL(45)
+            CALL(btlevtcmd_GetUnitKind, LW(10), LW(2))
+            IF_INT_EQUAL(LW(2), 222)
+                CALL(btlevtcmd_GetPos, LW(10), LW(2), LW(3), LW(4))
+                CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_DAMAGED1"), LW(2), LW(3), LW(4), 0)
+            END_IF
+            CASE_END
+        END_SWITCH
+    END_SIBLING_EVENT
+    SWITCH(LW(0))
+        CASE_EQUAL(43)
+        CALL(evt_snd_sfxon, STRING("SFX_BTL_ATTACK_MISS3"), 0)
+        SET_VALUE(LW(14), 36)
+        CASE_EQUAL(46)
+        CALL(btlevtcmd_GetUnitKind, LW(10), LW(2))
+        IF_INT_EQUAL(LW(2), 222)
+            CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_VOICE_MARIO_DAMAGED1"), -250000000, 0, -250000000)
+        END_IF
+        SET_VALUE(LW(14), 29)
+        CASE_OR_EQUAL(49)
+        CASE_OR_EQUAL(50)
+        CASE_OR_EQUAL(54)
+        SET_VALUE(LW(14), 29)
+        CASE_END
+        CASE_DEFAULT
+        SET_VALUE(LW(14), 39)
+    END_SWITCH
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_RunDataEventChild, LW(10), 10)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_SetFallAccel, LW(10), FLOAT(1.0f))
+    CALL(btlevtcmd_GetPos, LW(10), LW(2), LW(3), LW(4))
+    CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(2), 25)
+    ADD(LW(3), 25)
+    CALL(btlevtcmd_DivePosition, LW(10), LW(2), LW(3), LW(4), 10, 0, 0, 0, -1)
+    WAIT_MS(500)
+    CALL(btlevtcmd_SetFallAccel, LW(10), FLOAT(1.0f))
+    CALL(btlevtcmd_GetPos, LW(10), LW(2), LW(3), LW(4))
+    CALL(btlevtcmd_TransStageFloorPosition, LW(2), LW(3), LW(4))
+    CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(2), 30)
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(2), LW(3), LW(4), 20, -1)
+    CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(2), 15)
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(2), LW(3), LW(4), 10, -1)
+    WAIT_FRAMES(30)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    RETURN
+EVT_END()
 #endif
 
 EVT_BEGIN(btldefaultevt_ChangePosition)
@@ -1170,15 +1543,17 @@ EVT_BEGIN(subsetevt_terror)
     RETURN
 EVT_END()
 #else
-s32 subsetevt_terror[] = {
-    327771, (s32)btlevtcmd_JumpSetting, -2, 20, -230000000, -229999284, 327771, (s32)btlevtcmd_GetPos,
-    -2, -30000000, -29999999, -29999998, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000,
-    -29999999, -29999998, 16, -1, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229989760,
-    262235, (s32)btlevtcmd_GetStageSize, -30000000, -250000000, -250000000, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_ENM_ESCAPE1", -250000000, 0, -250000000, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000,
-    -29999999, -29999998, 0, -1, 0, 196699, (s32)btlevtcmd_KillUnit, -2,
-    0, 2, 1,
-};
+EVT_BEGIN(subsetevt_terror)
+    CALL(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0f), FLOAT(0.69921875f))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 16, -1)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0f))
+    CALL(btlevtcmd_GetStageSize, LW(0), -250000000, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_ESCAPE1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_KillUnit, -2, 0)
+    RETURN
+EVT_END()
 #endif
 
 #ifdef VERSION_G8ME01
@@ -1202,17 +1577,25 @@ EVT_BEGIN(subsetevt_blow_damage)
     RETURN
 EVT_END()
 #else
-s32 subsetevt_blow_damage[] = {
-    196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_CLAUD_BREATH3", 0, 196699, (s32)btlevtcmd_GetBodyId, -2, -30000000,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -30000000, 39, 110, 65539, 0,
-    327771, (s32)btlevtcmd_AddRotate, -2, 0, 20, 0, 65545, 1,
-    65540, 0, 112, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229997952, 327771,
-    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_GetStageSize, -30000000,
-    -250000000, -250000000, 131125, -29999999, 40, 655451, (s32)btlevtcmd_DivePosition, -2,
-    -30000000, -29999999, -29999998, 0, -10, 2, 0, -1,
-    262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_SetPos, -29999990,
-    -30000000, -29999999, -29999998, 2, 1,
-};
+EVT_BEGIN(subsetevt_blow_damage)
+    CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
+    CALL(btlevtcmd_GetBodyId, -2, LW(0))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(0), 39)
+    BEGIN_SIBLING_EVENT
+        LABEL(0)
+        CALL(btlevtcmd_AddRotate, -2, 0, 20, 0)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(2.0f))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStageSize, LW(0), -250000000, -250000000)
+    ADD(LW(1), 40)
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 0, -10, 2, 0, -1)
+    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, LW(10), LW(0), LW(1), LW(2))
+    RETURN
+EVT_END()
 #endif
 
 #ifdef VERSION_G8ME01
@@ -1239,18 +1622,28 @@ EVT_BEGIN(subsetevt_blow_dead)
     RETURN
 EVT_END()
 #else
-s32 subsetevt_blow_dead[] = {
-    196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_CLAUD_BREATH3", 0, 196699, (s32)btlevtcmd_GetBodyId, -2, -30000000,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -30000000, 39, 110, 65539, 0,
-    327771, (s32)btlevtcmd_AddRotate, -2, 0, 20, 0, 65545, 1,
-    65540, 0, 112, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229997952, 327771,
-    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_GetStageSize, -30000000,
-    -250000000, -250000000, 131125, -29999999, 40, 655451, (s32)btlevtcmd_DivePosition, -2,
-    -30000000, -29999999, -29999998, 0, -10, 2, 0, -1,
-    196699, (s32)btlevtcmd_GetCoin, -29999990, -30000000, 131163, (s32)btlevtcmd_StoreCoin, -30000000, 196699,
-    (s32)btlevtcmd_GetExp, -29999990, -30000000, 131163, (s32)btlevtcmd_StoreExp, -30000000, 196699, (s32)btlevtcmd_KillUnit,
-    -2, 0, 2, 1,
-};
+EVT_BEGIN(subsetevt_blow_dead)
+    CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
+    CALL(btlevtcmd_GetBodyId, -2, LW(0))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(0), 39)
+    BEGIN_SIBLING_EVENT
+        LABEL(0)
+        CALL(btlevtcmd_AddRotate, -2, 0, 20, 0)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(2.0f))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStageSize, LW(0), -250000000, -250000000)
+    ADD(LW(1), 40)
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 0, -10, 2, 0, -1)
+    CALL(btlevtcmd_GetCoin, LW(10), LW(0))
+    CALL(btlevtcmd_StoreCoin, LW(0))
+    CALL(btlevtcmd_GetExp, LW(10), LW(0))
+    CALL(btlevtcmd_StoreExp, LW(0))
+    CALL(btlevtcmd_KillUnit, -2, 0)
+    RETURN
+EVT_END()
 #endif
 
 EVT_BEGIN(subsetevt_shot_damage)
@@ -1258,110 +1651,230 @@ EVT_BEGIN(subsetevt_shot_damage)
     CALL(btlevtcmd_OnToken, LW(10), 32)
     CALL(btlevtcmd_CheckDamagePattern, LW(10), 14, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        SET_VALUE(LW(12), PTR(marioWeapon_KaitenHammerInvolved))
+        SET_VALUE(LW(12), PTR(&marioWeapon_KaitenHammerInvolved))
         CALL_CHILD(PTR(subsetevt_shot_damage_kaiten))
         ELSE
-        SET_VALUE(LW(12), PTR(marioWeapon_UltraHammerInvolved))
+        SET_VALUE(LW(12), PTR(&marioWeapon_UltraHammerInvolved))
         CALL_CHILD(PTR(subsetevt_shot_damage_ultra))
     END_IF
     RETURN
 EVT_END()
 
-s32 subsetevt_shot_damage_kaiten[] = {
-    65647, -29999987, 65539, 0, 327771, (s32)btlevtcmd_AddRotate, -29999990, 0,
-    30, 0, 65545, 1, 65540, 0, 112, 196699,
-    (s32)btlevtcmd_GetFriendBelong, -29999990, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -29999990, -30000000, -29999988,
-    196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 65539, 1, 131096, -29999997,
-    -1, 65540, 50, 33, 196699, (s32)btlevtcmd_GetUnitId, -29999990, -30000000,
-    131097, -30000000, -29999997, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 65540,
-    1, 33, 65539, 10, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996,
-    131096, -29999997, -1, 65540, 50, 33, 327771, (s32)btlevtcmd_JumpSetting,
-    -29999990, 0, -229994880, -229999990, 327771, (s32)btlevtcmd_GetPos, -29999990, -29999995,
-    -29999994, -29999993, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999,
-    -29999998, 131101, -29999995, -30000000, 131122, -29999992, -29999995, 131126,
-    -29999992, -30000000, 32, 131122, -29999992, -30000000, 131126, -29999992,
-    -29999995, 33, 131128, -29999992, 2, 131125, -29999992, -29999994,
-    131098, -29999992, -29999999, 131122, -29999999, -29999992, 33, 458843,
-    (s32)btlevtcmd_JumpPosition, -29999990, -30000000, -29999999, -29999998, 0, -1, 458843,
-    (s32)btlevtcmd_PreCheckDamage, -29999990, -29999997, -29999996, -29999988, 256, -29999995, 65570,
-    -29999995, 65572, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 65572,
-    3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38, 65572, 6, 196699,
-    (s32)btlevtcmd_StartAvoid, -29999997, 39, 65572, 4, 65572, 1, 458843,
-    (s32)btlevtcmd_CheckDamage, -29999990, -29999997, -29999996, -29999988, 256, -29999995, 42,
-    49, 65540, 10, 65539, 50, 262235, (s32)btlevtcmd_GetStageSize, -29999995,
-    -250000000, -250000000, 131122, -30000000, 0, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999990,
-    -30000000, -29999995, 327771, (s32)btlevtcmd_GetPos, -29999990, -250000000, -29999999, -250000000,
-    327771, (s32)btlevtcmd_JumpSetting, -29999990, 0, -229994880, -229999990, 458843, (s32)btlevtcmd_JumpPosition,
-    -29999990, -30000000, 40, -29999998, 0, -1, 65545, 30,
-    262235, (s32)btlevtcmd_CheckDamageCode, -29999990, 512, -29999994, 131097, -29999994, 0,
-    131127, -30000000, -1, 327771, (s32)btlevtcmd_SetPos, -29999990, -30000000, -29999999,
-    -29999998, 327771, (s32)btlevtcmd_GetHomePos, -29999990, -30000000, -29999999, -29999998, 262235,
-    (s32)btlevtcmd_FaceDirectionAdd, -29999990, -30000000, 40, 327771, (s32)btlevtcmd_JumpSetting, -29999990, 0,
-    -229992832, -229999898, 458843, (s32)btlevtcmd_JumpPosition, -29999990, -30000000, -29999999, -29999998,
-    0, -1, 327771, (s32)btlevtcmd_GetHomePos, -29999990, -30000000, -29999999, -29999998,
-    524379, (s32)btlevtcmd_MovePosition, -29999990, -30000000, -29999999, -29999998, 16, -1,
-    0, 65545, 30, 32, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000,
-    -29999999, -29999998, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 327771,
-    (s32)btlevtcmd_SetPos, -29999990, -30000000, -29999999, -29999998, 33, 65631, -29999987,
-    327771, (s32)btlevtcmd_SetRotate, -29999990, 0, 0, 0, 2, 1,
-};
+EVT_BEGIN(subsetevt_shot_damage_kaiten)
+    BEGIN_SIBLING_EVENT_GET_ID(LW(13))
+        LABEL(0)
+        CALL(btlevtcmd_AddRotate, LW(10), 0, 30, 0)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetFriendBelong, LW(10), LW(0))
+    CALL(btlevtcmd_SamplingEnemy, LW(10), LW(0), LW(12))
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    LABEL(1)
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(50)
+    END_IF
+    CALL(btlevtcmd_GetUnitId, LW(10), LW(0))
+    IF_INT_NOT_EQUAL(LW(0), LW(3))
+        CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+        GOTO(1)
+    END_IF
+    LABEL(10)
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(50)
+    END_IF
+    CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(5.0f), FLOAT(0.009765625f))
+    CALL(btlevtcmd_GetPos, LW(10), LW(5), LW(6), LW(7))
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    IF_INT_GREATER_OR_EQUAL(LW(5), LW(0))
+        SET_VALUE(LW(8), LW(5))
+        SUBTRACT(LW(8), LW(0))
+    ELSE
+        SET_VALUE(LW(8), LW(0))
+        SUBTRACT(LW(8), LW(5))
+    END_IF
+    DIVIDE(LW(8), 2)
+    ADD(LW(8), LW(6))
+    IF_INT_LESS(LW(8), LW(1))
+        SET_VALUE(LW(1), LW(8))
+    END_IF
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 0, -1)
+    CALL(btlevtcmd_PreCheckDamage, LW(10), LW(3), LW(4), LW(12), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        CASE_EQUAL(4)
+        CASE_EQUAL(1)
+        CALL(btlevtcmd_CheckDamage, LW(10), LW(3), LW(4), LW(12), 256, LW(5))
+        CASE_DEFAULT
+    END_SWITCH
+    GOTO(10)
+    LABEL(50)
+    CALL(btlevtcmd_GetStageSize, LW(5), -250000000, -250000000)
+    SET_VALUE(LW(0), 0)
+    CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(0), LW(5))
+    CALL(btlevtcmd_GetPos, LW(10), -250000000, LW(1), -250000000)
+    CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(5.0f), FLOAT(0.009765625f))
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(0), 40, LW(2), 0, -1)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_CheckDamageCode, LW(10), 512, LW(6))
+    IF_INT_NOT_EQUAL(LW(6), 0)
+        MULTIPLY(LW(0), -1)
+        CALL(btlevtcmd_SetPos, LW(10), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetHomePos, LW(10), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_FaceDirectionAdd, LW(10), LW(0), 40)
+        CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(7.0f), FLOAT(0.099609375f))
+        CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 0, -1)
+        CALL(btlevtcmd_GetHomePos, LW(10), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_MovePosition, LW(10), LW(0), LW(1), LW(2), 16, -1, 0)
+        WAIT_FRAMES(30)
+    ELSE
+        CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetPos, LW(10), LW(0), LW(1), LW(2))
+    END_IF
+    DELETE_EVENT(LW(13))
+    CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
+    RETURN
+EVT_END()
 
-s32 subsetevt_shot_damage_ultra[] = {
-    65647, -29999987, 131163, (s32)btlevtcmd_SetRotateOffsetFromCenterOffset, -29999990, 196699, (s32)btlevtcmd_GetFaceDirection, -29999990,
-    -30000000, 131127, -30000000, 20, 131122, -29999995, 5, 65541,
-    -29999995, 327771, (s32)btlevtcmd_AddRotate, -29999990, 0, -30000000, 0, 131122,
-    -29999995, 5, 65545, 1, 6, 112, 196699, (s32)btlevtcmd_GetFriendBelong,
-    -29999990, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -29999990, -30000000, -29999988, 196699,
-    (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 65539, 1, 131096, -29999997, -1,
-    65540, 50, 33, 196699, (s32)btlevtcmd_GetUnitId, -29999990, -30000000, 131097,
-    -30000000, -29999997, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 65540, 1,
-    33, 131122, -29999992, -1, 131122, -29999991, -1, 65539,
-    2, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999994, -29999993, 131097, -29999994, -1,
-    131122, -29999992, -29999994, 131122, -29999991, -29999993, 65540, 2,
-    33, 131096, -29999992, -1, 65540, 50, 33, 65647,
-    -29999995, 327771, (s32)btlevtcmd_JumpSetting, -29999990, 0, -229994880, -229999591, 393307,
-    (s32)btlevtcmd_GetHitPos, -29999992, -29999991, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionAdd,
-    -29999992, -30000000, 20, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998,
-    458843, (s32)btlevtcmd_JumpPosition, -29999990, -30000000, -29999999, -29999998, 0, -1,
-    112, 196699, (s32)btlevtcmd_GetFriendBelong, -29999990, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -29999990,
-    -30000000, -29999988, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 65539, 30,
-    131096, -29999997, -1, 65631, -29999995, 65540, 50, 33,
-    196699, (s32)btlevtcmd_GetUnitId, -29999990, -30000000, 131097, -30000000, -29999997, 196699,
-    (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 65540, 30, 33, 327771, (s32)btlevtcmd_GetPos,
-    -29999990, -29999999, -250000000, -250000000, 262235, (s32)btlevtcmd_FaceDirectionAdd, -29999990, -29999999,
-    20, 65539, 31, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 131096,
-    -29999997, -1, 65631, -29999995, 65540, 50, 33, 65539,
-    32, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999998, -250000000, -250000000,
-    262235, (s32)btlevtcmd_FaceDirectionAdd, -29999997, -29999998, 20, 327771, (s32)btlevtcmd_GetPos, -29999990,
-    -30000000, -250000000, -250000000, 393307, (s32)_check_through_pos, -29999990, -29999998, -30000000,
-    -29999999, -29999998, 131096, -29999998, 0, 131178, -29999995, -29999994,
-    131096, -29999994, 1, 131122, -29999999, -30000000, 65545, 1,
-    65540, 32, 33, 33, 458843, (s32)btlevtcmd_PreCheckDamage, -29999990, -29999997,
-    -29999996, -29999988, 256, -30000000, 65570, -30000000, 65572, 2,
-    196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid,
-    -29999997, 38, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 39,
-    65572, 4, 65572, 1, 458843, (s32)btlevtcmd_CheckDamage, -29999990, -29999997,
-    -29999996, -29999988, 256, -30000000, 42, 49, 65540, 31,
-    65631, -29999995, 65539, 50, 262235, (s32)btlevtcmd_GetStageSize, -29999995, -250000000,
-    -250000000, 131122, -30000000, 0, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999990, -30000000,
-    -29999995, 327771, (s32)btlevtcmd_GetPos, -29999990, -250000000, -29999999, -250000000, 327771,
-    (s32)btlevtcmd_JumpSetting, -29999990, 0, -229994880, -229999898, 458843, (s32)btlevtcmd_JumpPosition, -29999990,
-    -30000000, 80, -29999998, 0, -1, 65545, 30, 262235,
-    (s32)btlevtcmd_CheckDamagePattern, -29999990, 16, -29999995, 131097, -29999995, 0, 196699,
-    (s32)btlevtcmd_OnToken, -29999990, 64, 65539, 55, 262235, (s32)btlevtcmd_CheckToken, -29999990,
-    64, -29999995, 131097, -29999995, 0, 65545, 1, 65540,
-    55, 33, 33, 131127, -30000000, -1, 327771, (s32)btlevtcmd_SetPos,
-    -29999990, -30000000, 80, -29999998, 327771, (s32)btlevtcmd_GetHomePos, -29999990, -30000000,
-    -29999999, -29999998, 327771, (s32)btlevtcmd_JumpSetting, -29999990, 0, -229992832, -229999898,
-    458843, (s32)btlevtcmd_JumpPosition, -29999990, -30000000, -29999999, -29999998, 0, -1,
-    262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 16, -29999995, 131097, -29999995, 0,
-    196699, (s32)btlevtcmd_OnToken, -29999990, 128, 65627, (s32)btlevtcmd_WaitAttackEnd, 33, 33,
-    327771, (s32)btlevtcmd_JumpSetting, -29999990, 0, -230000000, -229999847, 458843, (s32)btlevtcmd_JumpPosition,
-    -29999990, -30000000, -29999999, -29999998, 20, -1, 65545, 30,
-    262235, (s32)btlevtcmd_CheckDamageCode, -29999990, 256, -30000000, 131096, -30000000, 0,
-    65627, (s32)btlevtcmd_WaitAttackEnd, 33, 65631, -29999987, 327771, (s32)btlevtcmd_SetRotate, -29999990,
-    0, 0, 0, 2, 1,
-};
+EVT_BEGIN(subsetevt_shot_damage_ultra)
+    BEGIN_SIBLING_EVENT_GET_ID(LW(13))
+        CALL(btlevtcmd_SetRotateOffsetFromCenterOffset, LW(10))
+        CALL(btlevtcmd_GetFaceDirection, LW(10), LW(0))
+        MULTIPLY(LW(0), 20)
+        SET_VALUE(LW(5), 5)
+        LOOP(LW(5))
+            CALL(btlevtcmd_AddRotate, LW(10), 0, LW(0), 0)
+            SET_VALUE(LW(5), 5)
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetFriendBelong, LW(10), LW(0))
+    CALL(btlevtcmd_SamplingEnemy, LW(10), LW(0), LW(12))
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    LABEL(1)
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(50)
+    END_IF
+    CALL(btlevtcmd_GetUnitId, LW(10), LW(0))
+    IF_INT_NOT_EQUAL(LW(0), LW(3))
+        CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+        GOTO(1)
+    END_IF
+    SET_VALUE(LW(8), -1)
+    SET_VALUE(LW(9), -1)
+    LABEL(2)
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(6), LW(7))
+    IF_INT_NOT_EQUAL(LW(6), -1)
+        SET_VALUE(LW(8), LW(6))
+        SET_VALUE(LW(9), LW(7))
+        GOTO(2)
+    END_IF
+    IF_INT_EQUAL(LW(8), -1)
+        GOTO(50)
+    END_IF
+    BEGIN_SIBLING_EVENT_GET_ID(LW(5))
+        CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(5.0f), FLOAT(0.39941406f))
+        CALL(btlevtcmd_GetHitPos, LW(8), LW(9), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_FaceDirectionAdd, LW(8), LW(0), 20)
+        CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 0, -1)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetFriendBelong, LW(10), LW(0))
+    CALL(btlevtcmd_SamplingEnemy, LW(10), LW(0), LW(12))
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    LABEL(30)
+    IF_INT_EQUAL(LW(3), -1)
+        DELETE_EVENT(LW(5))
+        GOTO(50)
+    END_IF
+    CALL(btlevtcmd_GetUnitId, LW(10), LW(0))
+    IF_INT_NOT_EQUAL(LW(0), LW(3))
+        CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+        GOTO(30)
+    END_IF
+    CALL(btlevtcmd_GetPos, LW(10), LW(1), -250000000, -250000000)
+    CALL(btlevtcmd_FaceDirectionAdd, LW(10), LW(1), 20)
+    LABEL(31)
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        DELETE_EVENT(LW(5))
+        GOTO(50)
+    END_IF
+    LABEL(32)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(2), -250000000, -250000000)
+    CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(2), 20)
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), -250000000, -250000000)
+    CALL(_check_through_pos, LW(10), LW(2), LW(0), LW(1), LW(2))
+    IF_INT_EQUAL(LW(2), 0)
+        IS_EVENT_RUNNING(LW(5), LW(6))
+        IF_INT_EQUAL(LW(6), 1)
+            SET_VALUE(LW(1), LW(0))
+            WAIT_FRAMES(1)
+            GOTO(32)
+        END_IF
+    END_IF
+    CALL(btlevtcmd_PreCheckDamage, LW(10), LW(3), LW(4), LW(12), 256, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        CASE_EQUAL(4)
+        CASE_EQUAL(1)
+        CALL(btlevtcmd_CheckDamage, LW(10), LW(3), LW(4), LW(12), 256, LW(0))
+        CASE_DEFAULT
+    END_SWITCH
+    GOTO(31)
+    DELETE_EVENT(LW(5))
+    LABEL(50)
+    CALL(btlevtcmd_GetStageSize, LW(5), -250000000, -250000000)
+    SET_VALUE(LW(0), 0)
+    CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(0), LW(5))
+    CALL(btlevtcmd_GetPos, LW(10), -250000000, LW(1), -250000000)
+    CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(5.0f), FLOAT(0.099609375f))
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(0), 80, LW(2), 0, -1)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 16, LW(5))
+    IF_INT_NOT_EQUAL(LW(5), 0)
+        CALL(btlevtcmd_OnToken, LW(10), 64)
+        LABEL(55)
+        CALL(btlevtcmd_CheckToken, LW(10), 64, LW(5))
+        IF_INT_NOT_EQUAL(LW(5), 0)
+            WAIT_FRAMES(1)
+            GOTO(55)
+        END_IF
+    END_IF
+    MULTIPLY(LW(0), -1)
+    CALL(btlevtcmd_SetPos, LW(10), LW(0), 80, LW(2))
+    CALL(btlevtcmd_GetHomePos, LW(10), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(7.0f), FLOAT(0.099609375f))
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 0, -1)
+    CALL(btlevtcmd_CheckDamagePattern, LW(10), 16, LW(5))
+    IF_INT_NOT_EQUAL(LW(5), 0)
+        CALL(btlevtcmd_OnToken, LW(10), 128)
+        CALL(btlevtcmd_WaitAttackEnd)
+    END_IF
+    END_IF
+    CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(0.0f), FLOAT(0.14941406f))
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 20, -1)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_WaitAttackEnd)
+    END_IF
+    DELETE_EVENT(LW(13))
+    CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(subsetevt_swallow_failed_damage)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
@@ -1391,51 +1904,100 @@ EVT_BEGIN(subsetevt_swallow_spew_damage)
     RETURN
 EVT_END()
 
-s32 subsetevt_swallow_shot_damage[] = {
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, -29999986, 131122, -29999988, (s32)partyWeapon_YoshiNomikomi_Involved,
-    196699, (s32)btlevtcmd_GetFriendBelong, -29999990, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -29999990, -30000000,
-    -29999988, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 65539, 0, 131096,
-    -29999997, -1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, 39, 327771,
-    (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetFallAccel, -29999990,
-    -229999488, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999990, -30000000, 30, 262235, (s32)btlevtcmd_TransStageFloorPosition,
-    -30000000, -29999999, -29999998, 458843, (s32)btlevtcmd_JumpPosition, -29999990, -30000000, -29999999,
-    -29999998, 20, -1, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999990, -30000000, 18,
-    262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 458843, (s32)btlevtcmd_JumpPosition, -29999990,
-    -30000000, -29999999, -29999998, 12, -1, 65545, 20, 65540,
-    99, 33, 196699, (s32)btlevtcmd_GetUnitId, -29999990, -30000000, 131097, -30000000,
-    -29999997, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 65540, 0, 33,
-    196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 65651, -29999997, 131096, -29999997,
-    -1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, 39, 327771, (s32)btlevtcmd_GetPos,
-    -29999990, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetFallAccel, -29999990, -229999488,
-    262235, (s32)btlevtcmd_FaceDirectionSub, -29999990, -30000000, 30, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000,
-    -29999999, -29999998, 458843, (s32)btlevtcmd_JumpPosition, -29999990, -30000000, -29999999, -29999998,
-    20, -1, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999990, -30000000, 18, 262235,
-    (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 458843, (s32)btlevtcmd_JumpPosition, -29999990, -30000000,
-    -29999999, -29999998, 12, -1, 65545, 20, 65540, 99,
-    33, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998,
-    327771, (s32)btlevtcmd_JumpSetting, -29999990, 0, -229994880, -229999898, 458843, (s32)btlevtcmd_JumpPosition,
-    -29999990, -30000000, -29999999, -29999998, 0, -1, 458843, (s32)btlevtcmd_PreCheckDamage,
-    -4, -29999997, -29999996, -29999988, 256, -29999995, 65570, -29999995,
-    65572, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 65572, 3,
-    196699, (s32)btlevtcmd_StartAvoid, -29999997, 38, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid,
-    -29999997, 39, 65572, 4, 65572, 1, 458843, (s32)btlevtcmd_CheckDamage,
-    -4, -29999997, -29999996, -29999988, -2147483392, -29999995, 65540, 50,
-    42, 49, 65539, 20, 65647, -29999995, 131163, (s32)btlevtcmd_JumpContinue,
-    -29999990, 112, 65539, 21, 131178, -29999995, -30000000, 131096,
-    -30000000, 0, 65540, 25, 33, 327771, (s32)btlevtcmd_GetPos, -29999990,
-    -30000000, -29999999, -29999998, 131122, -29999994, -30000000, 131098, -29999994,
-    0, 131127, -29999994, -1, 33, 131101, -29999994, 400,
-    65631, -29999995, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 327771,
-    (s32)btlevtcmd_SetPos, -29999990, -30000000, -29999999, -29999998, 65540, 99, 33,
-    65545, 1, 65540, 21, 65539, 25, 65540, 99,
-    65539, 50, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999, -29999998,
-    196699, (s32)btlevtcmd_SetFallAccel, -29999990, -229999488, 262235, (s32)btlevtcmd_FaceDirectionAdd, -29999990, -30000000,
-    30, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 458843, (s32)btlevtcmd_JumpPosition,
-    -29999990, -30000000, -29999999, -29999998, 20, -1, 262235, (s32)btlevtcmd_FaceDirectionAdd,
-    -29999990, -30000000, 18, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998,
-    458843, (s32)btlevtcmd_JumpPosition, -29999990, -30000000, -29999999, -29999998, 12, -1,
-    65545, 20, 65539, 99, 2, 1,
-};
+EVT_BEGIN(subsetevt_swallow_shot_damage)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
+    SET_VALUE(LW(12), PTR(&partyWeapon_YoshiNomikomi_Involved))
+    CALL(btlevtcmd_GetFriendBelong, LW(10), LW(0))
+    CALL(btlevtcmd_SamplingEnemy, LW(10), LW(0), LW(12))
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    LABEL(0)
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
+        CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetFallAccel, LW(10), FLOAT(0.5f))
+        CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(0), 30)
+        CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 20, -1)
+        CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(0), 18)
+        CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 12, -1)
+        WAIT_FRAMES(20)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_GetUnitId, LW(10), LW(0))
+    IF_INT_NOT_EQUAL(LW(0), LW(3))
+        CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+        GOTO(0)
+    END_IF
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    DEBUG_PUT_REG(LW(3))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
+        CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetFallAccel, LW(10), FLOAT(0.5f))
+        CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(0), 30)
+        CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 20, -1)
+        CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(0), 18)
+        CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 12, -1)
+        WAIT_FRAMES(20)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(5.0f), FLOAT(0.099609375f))
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 0, -1)
+    CALL(btlevtcmd_PreCheckDamage, -4, LW(3), LW(4), LW(12), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        CASE_EQUAL(4)
+        CASE_EQUAL(1)
+        CALL(btlevtcmd_CheckDamage, -4, LW(3), LW(4), LW(12), -2147483392, LW(5))
+        GOTO(50)
+        CASE_DEFAULT
+    END_SWITCH
+    LABEL(20)
+    BEGIN_SIBLING_EVENT_GET_ID(LW(5))
+        CALL(btlevtcmd_JumpContinue, LW(10))
+    END_SIBLING_EVENT
+    LABEL(21)
+    IS_EVENT_RUNNING(LW(5), LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        GOTO(25)
+    END_IF
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+    SET_VALUE(LW(6), LW(0))
+    IF_INT_LESS(LW(6), 0)
+        MULTIPLY(LW(6), -1)
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(LW(6), 400)
+        DELETE_EVENT(LW(5))
+        CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetPos, LW(10), LW(0), LW(1), LW(2))
+        GOTO(99)
+    END_IF
+    WAIT_FRAMES(1)
+    GOTO(21)
+    LABEL(25)
+    GOTO(99)
+    LABEL(50)
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetFallAccel, LW(10), FLOAT(0.5f))
+    CALL(btlevtcmd_FaceDirectionAdd, LW(10), LW(0), 30)
+    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 20, -1)
+    CALL(btlevtcmd_FaceDirectionAdd, LW(10), LW(0), 18)
+    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 12, -1)
+    WAIT_FRAMES(20)
+    LABEL(99)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(subset_ultra_hammer_acrobat_damage_event)
     CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)

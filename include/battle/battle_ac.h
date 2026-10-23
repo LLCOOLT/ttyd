@@ -12,10 +12,15 @@ typedef s32 (*BattleACResultCallback)(BattleWork* work);
 typedef void (*BattleACDeleteCallback)(BattleWork* work);
 
 typedef struct BattleACDispParams {
-    u8 field_0x0[0x14 - 0x0];   // 0x0
+    u8 field_0x0[0xC - 0x0];    // 0x0
+    GXColor unkC;               // 0xC
+    u8 field_0x10[0x14 - 0x10]; // 0x10
     f32 iconX;                  // 0x14, see actionCommandDisp
     f32 iconY;                  // 0x18, see actionCommandDisp
-    u8 field_0x1C[0x2C - 0x1C]; // 0x1C
+    u8 field_0x1C[0x20 - 0x1C]; // 0x1C
+    s32 unk20;                  // 0x20
+    u8 field_0x24[0x28 - 0x24]; // 0x24
+    f32 unk28;                  // 0x28
 } BattleACDispParams;
 
 typedef struct BattleActions {
@@ -43,7 +48,11 @@ typedef struct BattleActions {
     BattleWorkPad pad;               // 0x8C
     u32 seId;                        // 0x288, power gauge SFX id (battle_ac.c)
     f32 seValue;                     // 0x28C, power gauge SFX value
-    u8 field_0x290[0x30C - 0x290];   // 0x290
+    union {                          // 0x290, gauge display parameters (ac_*.c use their own views)
+        BattleACDispParams disp;
+        u8 dispData[0x2BC - 0x290];
+    };
+    u8 work[0x30C - 0x2BC];          // 0x2BC, per-command work (each ac_*.c casts it to its own struct)
 } BattleActions;
 // NB: 0x308 is as far as I can pin to this struct (0x1F98 in battleAcMain_PendulumCraneTiming, TODO?)
 

@@ -9,6 +9,7 @@
 #include "string.h"
 #include "evt/evt_bero.h"
 #include "party/party_motion.h"
+#include "mario/mario_pouch.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_entername);
@@ -79,20 +80,20 @@ USER_FUNC(kemuri_stop);
 static USER_FUNC(make_list);
 USER_FUNC(memoryRY);
 
-__declspec(section ".data") u64 fd_tou_04_negone_one_374;
-__declspec(section ".data") s32 fd_tou_04_neg_one_382[1];
-__declspec(section ".data") s32 fd_tou_04___local_PI_383[1];
-__declspec(section ".data") s32 fd_tou_04___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_tou_04_one_negone_373;
-__declspec(section ".data") s32 fd_tou_04___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_tou_04_one_381[1];
-__declspec(section ".data") u64 fd_tou_04_negone_one_360;
-__declspec(section ".data") s32 fd_tou_04_neg_one_365[1];
-__declspec(section ".data") s32 fd_tou_04___local_PI_366[1];
-__declspec(section ".data") s32 fd_tou_04___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_tou_04_one_negone_359;
-__declspec(section ".data") s32 fd_tou_04___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_tou_04_one_364[1];
+__declspec(section ".data") f32 fd_tou_04_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_04_neg_one_382;
+__declspec(section ".data") f32 fd_tou_04___local_PI_383;
+__declspec(section ".data") f32 fd_tou_04___local_3PIO2_385;
+__declspec(section ".data") f32 fd_tou_04_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_04___local_PIO2_384;
+__declspec(section ".data") f32 fd_tou_04_one_381;
+__declspec(section ".data") f32 fd_tou_04_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_04_neg_one_365;
+__declspec(section ".data") f32 fd_tou_04___local_PI_366;
+__declspec(section ".data") f32 fd_tou_04___local_3PIO2_368;
+__declspec(section ".data") f32 fd_tou_04_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_04___local_PIO2_367;
+__declspec(section ".data") f32 fd_tou_04_one_364;
 static __declspec(section ".data") s32 w_door_open[12];
 static __declspec(section ".data") s32 w_door_close[12];
 __declspec(section ".data") s32 _1_door_open[12];
@@ -115,7 +116,7 @@ static s32 n1_door_open[22];
 static s32 n1_door_close[22];
 static s32 n2_door_open[22];
 static s32 n2_door_close[22];
-static s32 bero_data[180];
+static BeroEntry bero_data[12];
 s32 move_g[233];
 s32 move_g_1_dokimasen[25];
 s32 init_g_1[59];
@@ -154,7 +155,7 @@ s32 talk_g_11[25];
 static __declspec(section ".data") s32 init_champ[2];
 static s32 init_brots[58];
 static s32 talk_brots[149];
-static s32 npcEnt[368];
+static NpcSetupInfo npcEnt[16];
 s32 evt_drop[33];
 s32 evt_gans[145];
 static s32 evt_kinoshikowa[193];
@@ -186,53 +187,33 @@ USER_FUNC(memoryRY) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_tou_04_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tou_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tou_04_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tou_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_tou_04___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tou_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tou_04___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tou_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tou_04_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tou_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tou_04___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tou_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tou_04_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tou_04_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_tou_04_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tou_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tou_04_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tou_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_tou_04___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tou_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tou_04___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tou_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tou_04_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tou_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tou_04___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tou_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tou_04_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tou_04_one_364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -374,30 +355,206 @@ static EVT_BEGIN(n2_door_close)
     RETURN
 EVT_END()
 
-static s32 bero_data[] = {
-    (s32)"w_bero", 65540, 4, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"tou_02", (s32)"n_bero_4", 327685, (s32)w_door_close, (s32)w_door_open, (s32)"s_bero_1",
-    65540, 2, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"tou_11", (s32)"n_bero", 327685, (s32)_1_door_close, (s32)_1_door_open, (s32)"s_bero_2", 65540,
-    2, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"tou_09", (s32)"n_bero", 327685, (s32)_2_door_close, (s32)_2_door_open, (s32)"s_bero_3", 65540, 0,
-    100000, 0, 0, -1, 0, -1, 0, (s32)"tou_07",
-    (s32)"n_bero", 327685, (s32)_3_door_close, (s32)_3_door_open, (s32)"s_bero_4", 65540, 0, 100000,
-    0, 0, -1, 0, -1, 0, (s32)"tou_06", (s32)"n_bero",
-    327685, (s32)_4_door_close, (s32)_4_door_open, (s32)"s_bero_5", 65540, 0, 100000, 0,
-    0, -1, 0, -1, 0, (s32)"tou_05", (s32)"n_bero", 327685,
-    (s32)_5_door_close, (s32)_5_door_open, (s32)"s_bero_6", 65540, 6, 100000, 0, 0,
-    -1, 0, -1, 0, (s32)"tou_08", (s32)"n_bero", 327685, (s32)_6_door_close,
-    (s32)_6_door_open, (s32)"s_bero_7", 65540, 6, 100000, 0, 0, -1,
-    0, -1, 0, (s32)"tou_10", (s32)"n_bero", 327685, (s32)_7_door_close, (s32)_7_door_open,
-    (s32)"e_bero", 65540, 4, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"tou_02", (s32)"n_bero_3", 327685, (s32)e_door_close, (s32)e_door_open, (s32)"n_bero_1",
-    65542, 6, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"tou_03", (s32)"e_bero", 327685, (s32)n1_door_close, (s32)n1_door_open, (s32)"n_bero_2", 65542,
-    2, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"tou_03", (s32)"w_bero", 327685, (s32)n2_door_close, (s32)n2_door_open, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static BeroEntry bero_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        4, // sfxId
+        4, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_02", // nextMapName
+        "n_bero_4", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {
+        "s_bero_1", // hitName
+        1, // type
+        4, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_11", // nextMapName
+        "n_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)_1_door_close, // enterAnimeArg
+        (s32)_1_door_open, // exitAnimeArg
+    },
+    {
+        "s_bero_2", // hitName
+        1, // type
+        4, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_09", // nextMapName
+        "n_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)_2_door_close, // enterAnimeArg
+        (s32)_2_door_open, // exitAnimeArg
+    },
+    {
+        "s_bero_3", // hitName
+        1, // type
+        4, // sfxId
+        0, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_07", // nextMapName
+        "n_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)_3_door_close, // enterAnimeArg
+        (s32)_3_door_open, // exitAnimeArg
+    },
+    {
+        "s_bero_4", // hitName
+        1, // type
+        4, // sfxId
+        0, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_06", // nextMapName
+        "n_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)_4_door_close, // enterAnimeArg
+        (s32)_4_door_open, // exitAnimeArg
+    },
+    {
+        "s_bero_5", // hitName
+        1, // type
+        4, // sfxId
+        0, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_05", // nextMapName
+        "n_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)_5_door_close, // enterAnimeArg
+        (s32)_5_door_open, // exitAnimeArg
+    },
+    {
+        "s_bero_6", // hitName
+        1, // type
+        4, // sfxId
+        6, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_08", // nextMapName
+        "n_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)_6_door_close, // enterAnimeArg
+        (s32)_6_door_open, // exitAnimeArg
+    },
+    {
+        "s_bero_7", // hitName
+        1, // type
+        4, // sfxId
+        6, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_10", // nextMapName
+        "n_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)_7_door_close, // enterAnimeArg
+        (s32)_7_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        4, // sfxId
+        4, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_02", // nextMapName
+        "n_bero_3", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_door_close, // enterAnimeArg
+        (s32)e_door_open, // exitAnimeArg
+    },
+    {
+        "n_bero_1", // hitName
+        1, // type
+        6, // sfxId
+        6, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_03", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n1_door_close, // enterAnimeArg
+        (s32)n1_door_open, // exitAnimeArg
+    },
+    {
+        "n_bero_2", // hitName
+        1, // type
+        6, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_03", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n2_door_close, // enterAnimeArg
+        (s32)n2_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(move_g)
@@ -1153,53 +1310,180 @@ static EVT_BEGIN(talk_brots)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F", 1077937696, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58",
-    1077937696, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93", 1077937696,
-    0, (s32)init_champ, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"ブロッツ"*/"\x83\x75\x83\x8D\x83\x62\x83\x63", 1077937664, 0,
-    (s32)init_brots, 0, (s32)talk_brots, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"ガードマン１"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x50", 1077937664, 0, (s32)init_g_1,
-    (s32)move_g_1, (s32)talk_g_1, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"ガードマン２"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x51", 1077937664, 0, (s32)init_g_2, (s32)move_g_2,
-    (s32)talk_g_2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"ガードマン３"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x52", 1077937664, 0, (s32)init_g_3, (s32)move_g_3, (s32)talk_g_3,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"ガードマン４"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x53", 1077937664, 0, (s32)init_g_4, (s32)move_g_4, (s32)talk_g_4, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)/*"ガードマン５"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x54", 1077937664, 0, (s32)init_g_5, (s32)move_g_5, (s32)talk_g_5, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ガードマン６"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x55",
-    1077937664, 0, (s32)init_g_6, (s32)move_g_6, (s32)talk_g_6, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"ガードマン７"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x56", 1077937664,
-    0, (s32)init_g_7, (s32)move_g_7, (s32)talk_g_7, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"ガードマン８"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x57", 1077937664, 0,
-    (s32)init_g_8, (s32)move_g_8, (s32)talk_g_8, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"ガードマン９"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x58", 1077937664, 0, (s32)init_g_9,
-    (s32)move_g_9, (s32)talk_g_9, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"ガードマン１０"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x50\x82\x4F", 1077937664, 0, (s32)init_g_10, 0,
-    (s32)talk_g_10, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"ガードマン１１"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x50\x82\x50", 1077937664, 0, (s32)init_g_11, 0, (s32)talk_g_11,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F", // name
+        0x40400620, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガンス"*/"\x83\x4B\x83\x93\x83\x58", // name
+        0x40400620, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93", // name
+        0x40400620, // flags
+        0, // reactionFlags
+        init_champ, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ブロッツ"*/"\x83\x75\x83\x8D\x83\x62\x83\x63", // name
+        0x40400600, // flags
+        0, // reactionFlags
+        init_brots, // initEvent
+        NULL, // regularEvent
+        talk_brots, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン１"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x50", // name
+        0x40400600, // flags
+        0, // reactionFlags
+        init_g_1, // initEvent
+        move_g_1, // regularEvent
+        talk_g_1, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン２"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x51", // name
+        0x40400600, // flags
+        0, // reactionFlags
+        init_g_2, // initEvent
+        move_g_2, // regularEvent
+        talk_g_2, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン３"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x52", // name
+        0x40400600, // flags
+        0, // reactionFlags
+        init_g_3, // initEvent
+        move_g_3, // regularEvent
+        talk_g_3, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン４"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x53", // name
+        0x40400600, // flags
+        0, // reactionFlags
+        init_g_4, // initEvent
+        move_g_4, // regularEvent
+        talk_g_4, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン５"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x54", // name
+        0x40400600, // flags
+        0, // reactionFlags
+        init_g_5, // initEvent
+        move_g_5, // regularEvent
+        talk_g_5, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン６"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x55", // name
+        0x40400600, // flags
+        0, // reactionFlags
+        init_g_6, // initEvent
+        move_g_6, // regularEvent
+        talk_g_6, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン７"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x56", // name
+        0x40400600, // flags
+        0, // reactionFlags
+        init_g_7, // initEvent
+        move_g_7, // regularEvent
+        talk_g_7, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン８"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x57", // name
+        0x40400600, // flags
+        0, // reactionFlags
+        init_g_8, // initEvent
+        move_g_8, // regularEvent
+        talk_g_8, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン９"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x58", // name
+        0x40400600, // flags
+        0, // reactionFlags
+        init_g_9, // initEvent
+        move_g_9, // regularEvent
+        talk_g_9, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン１０"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x50\x82\x4F", // name
+        0x40400600, // flags
+        0, // reactionFlags
+        init_g_10, // initEvent
+        NULL, // regularEvent
+        talk_g_10, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガードマン１１"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93\x82\x50\x82\x50", // name
+        0x40400600, // flags
+        0, // reactionFlags
+        init_g_11, // initEvent
+        NULL, // regularEvent
+        talk_g_11, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_drop)
@@ -1816,7 +2100,7 @@ static EVT_BEGIN(evt_toile2)
 EVT_END()
 
 static __declspec(section ".data") s32 key_tbl[] = {
-    18, -1,
+    ITEM_STORAGE_KEY_0x12, -1,
 };
 
 static EVT_BEGIN(evt_chk)
@@ -1913,23 +2197,36 @@ EVT_BEGIN(evt_souko_talk)
     RETURN
 EVT_END()
 
-s32 evt_bred_nigeru[] = {
-    131163, (s32)evt_mario_key_onoff, 0, 262235, (s32)evt_npc_status_onoff, 1, (s32)/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93", 2,
-    327771, (s32)evt_npc_set_position, (s32)/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93", -550, 0, -400, 196699, (s32)evt_set_dir_to_target,
-    (s32)/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93", (s32)"mario", 131163, (s32)evt_bero_exec_wait, 65536, 786523, (s32)evt_eff_fukidashi, 1,
-    0, (s32)/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93", 0, 0, 0, 0, 0, 0,
-    0, 0, 65546, 1500, 107, 262235, (s32)evt_party_set_dir, 0,
-    270, 200, 109, 262235, (s32)evt_mario_set_dir, 270, 200, 0,
-    196699, (s32)evt_snd_bgmoff_f, 512, 2000, 327771, (s32)evt_msg_print, 0, (s32)"stg3_tou_297_27_00",
-    0, (s32)/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93", 65546, 300, 458843, (s32)evt_npc_sound_data_set, (s32)/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93", -250000000,
-    -250000000, 20000, -250000000, -250000000, 458843, (s32)evt_npc_move_position, (s32)/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93", -550,
-    -500, 0, -229795200, 1, 107, 458843, (s32)evt_npc_move_position, (s32)/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93",
-    0, -500, 0, -229795200, 1, 327771, (s32)evt_npc_set_position, (s32)/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93",
-    0, -1000, 0, 109, 131163, (s32)evt_party_stop, 0, 65546,
-    300, 131163, (s32)evt_msg_print_party, (s32)"stg3_tou_297_27_01", 131163, (s32)evt_party_run, 0, 131163,
-    (s32)evt_mario_key_onoff, 1, 262235, (s32)evt_snd_bgmon_f, 768, (s32)"BGM_STG3_TOU1", 2000, 131122,
-    -170000000, 145, 2, 1,
-};
+EVT_BEGIN(evt_bred_nigeru)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_npc_status_onoff, 1, STRING(/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93"), 2)
+    CALL(evt_npc_set_position, STRING(/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93"), -550, 0, -400)
+    CALL(evt_set_dir_to_target, STRING(/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93"), STRING("mario"))
+    CALL(evt_bero_exec_wait, 65536)
+    CALL(evt_eff_fukidashi, 1, 0, STRING(/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93"), 0, 0, 0, 0, 0, 0, 0, 0)
+    WAIT_MS(1500)
+    BEGIN_INLINE_EVENT
+        CALL(evt_party_set_dir, 0, 270, 200)
+    END_INLINE_EVENT
+    CALL(evt_mario_set_dir, 270, 200, 0)
+    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_msg_print, 0, STRING("stg3_tou_297_27_00"), 0, STRING(/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93"))
+    WAIT_MS(300)
+    CALL(evt_npc_sound_data_set, STRING(/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93"), -250000000, -250000000, 20000, -250000000, -250000000)
+    CALL(evt_npc_move_position, STRING(/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93"), -550, -500, 0, FLOAT(200.0f), 1)
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_move_position, STRING(/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93"), 0, -500, 0, FLOAT(200.0f), 1)
+        CALL(evt_npc_set_position, STRING(/*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93"), 0, -1000, 0)
+    END_INLINE_EVENT
+    CALL(evt_party_stop, 0)
+    WAIT_MS(300)
+    CALL(evt_msg_print_party, STRING("stg3_tou_297_27_01"))
+    CALL(evt_party_run, 0)
+    CALL(evt_mario_key_onoff, 1)
+    CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG3_TOU1"), 2000)
+    SET_VALUE(GSW(0), 145)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(boss_msg)
     CALL(evt_mario_key_onoff, 0)

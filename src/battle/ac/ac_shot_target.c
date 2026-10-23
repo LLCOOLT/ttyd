@@ -56,8 +56,8 @@ typedef struct ShotTargetParams {
 } ShotTargetParams;
 
 #define ST_PARAMS(ac) ((ShotTargetParams*)(ac))
-#define ST_WORK(ac) ((ShotTargetWork*)((u8*)(ac) + 0x2BC))
-#define ST_DISP(ac) ((ShotTargetDisp*)((u8*)(ac) + 0x290))
+#define ST_WORK(ac) ((ShotTargetWork*)(ac)->work)
+#define ST_DISP(ac) ((ShotTargetDisp*)&(ac)->disp)
 
 #pragma optimize_for_size on
 #pragma dont_inline on
@@ -161,7 +161,7 @@ s32 battleAcMain_ShotTarget(BattleWork* work) {
                     cw->inRange = 0;
                 }
                 cw->frame--;
-                if ((ac->setupFlags & 1) && (*(u32*)((u8*)ac->mAcUnit + BUOFF(0x278)) & 0x10)) {
+                if ((ac->setupFlags & 1) && ((u32)ac->mAcUnit->mTokenFlags & 0x10)) {
                     if (irand(100) >= 0) {
                         ac->result = 0;
                     } else {

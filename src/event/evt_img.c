@@ -36,7 +36,7 @@ USER_FUNC(evt_img_set_paper) {
     s32 group = gp->inBattle != 0;
     ImageEntry* img = imgNameToPtr(name, group);
     img->poseId = animPaperPoseGetId(anim, group);
-    *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+    img->animTime = animTimeGetTime(group);
     animPoseSetMaterialFlagOn(img->poseId, 0x1800);
     return EVT_RETURN_DONE;
 }
@@ -48,7 +48,7 @@ USER_FUNC(evt_img_set_paper_anim) {
     s32 group = gp->inBattle != 0;
     ImageEntry* img = imgNameToPtr(name, group);
     img->animName = anim;
-    *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+    img->animTime = animTimeGetTime(group);
     return EVT_RETURN_DONE;
 }
 

@@ -8,6 +8,7 @@
 #include "driver/npcdrv.h"
 #include "manager/evtmgr_cmd.h"
 #include "driver/effdrv.h"
+#include "evt/evt_npc.h"
 
 USER_FUNC(evt_bero_get_entername);
 USER_FUNC(evt_bero_mapchange);
@@ -67,30 +68,30 @@ USER_FUNC(time_shift);
 USER_FUNC(evt_snd_bgmon_f_d);
 static USER_FUNC(npc_set_pos);
 
-__declspec(section ".data") u64 fd_tou_00_negone_one_374;
-__declspec(section ".data") s32 fd_tou_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_tou_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_tou_00___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_tou_00_one_negone_373;
-__declspec(section ".data") s32 fd_tou_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_tou_00_one_381[1];
-__declspec(section ".data") u64 fd_tou_00_negone_one_360;
-__declspec(section ".data") s32 fd_tou_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_tou_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_tou_00___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_tou_00_one_negone_359;
-__declspec(section ".data") s32 fd_tou_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_tou_00_one_364[1];
+__declspec(section ".data") f32 fd_tou_00_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_00_neg_one_382;
+__declspec(section ".data") f32 fd_tou_00___local_PI_383;
+__declspec(section ".data") f32 fd_tou_00___local_3PIO2_385;
+__declspec(section ".data") f32 fd_tou_00_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_00___local_PIO2_384;
+__declspec(section ".data") f32 fd_tou_00_one_381;
+__declspec(section ".data") f32 fd_tou_00_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_00_neg_one_365;
+__declspec(section ".data") f32 fd_tou_00___local_PI_366;
+__declspec(section ".data") f32 fd_tou_00___local_3PIO2_368;
+__declspec(section ".data") f32 fd_tou_00_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_00___local_PIO2_367;
+__declspec(section ".data") f32 fd_tou_00_one_364;
 static s32 evt_tou_balloon[85];
 static s32 evt_light[66];
 static s32 evt_wing[125];
 s32 evt_to_tou[293];
 s32 evt_pos_keep[39];
 s32 evt_to_gor[247];
-__declspec(section ".data") s32 kemuri_name[5];
+__declspec(section ".data") const char* kemuri_name[5];
 s32 tou_00_koopa_evt[678];
 static __declspec(section ".data") s32 hkoopa_init[7];
-static s32 npcEnt[46];
+static NpcSetupInfo npcEnt[2];
 s32 evt_skip[43];
 s32 tou_00_init_evt[76];
 
@@ -102,53 +103,33 @@ USER_FUNC(time_shift) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_tou_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tou_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tou_00_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tou_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_tou_00___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tou_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tou_00___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tou_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tou_00_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tou_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tou_00___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tou_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tou_00_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tou_00_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_tou_00_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tou_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tou_00_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tou_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_tou_00___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tou_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tou_00___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tou_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tou_00_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tou_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tou_00___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tou_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tou_00_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tou_00_one_364 = 1.0f;
 
 static EVT_BEGIN(evt_tou_balloon)
     CALL(evt_mapobj_get_position, STRING("tou_enkei"), LW(13), LW(14), LW(15))
@@ -483,8 +464,12 @@ static USER_FUNC(npc_set_pos) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") s32 kemuri_name[] = {
-    (s32)"kosyo01", (s32)"kosyo02", (s32)"kosyo03", (s32)"kosyo04", (s32)"kosyo05",
+__declspec(section ".data") const char* kemuri_name[] = {
+    "kosyo01",
+    "kosyo02",
+    "kosyo03",
+    "kosyo04",
+    "kosyo05",
 };
 
 static USER_FUNC(kpa_hikousen_yure) {
@@ -650,7 +635,7 @@ EVT_BEGIN(tou_00_koopa_evt)
     CALL(evt_msg_print, 0, STRING("kpa_stg4_008"), 0, STRING("飛クッパ"))
     CALL(evt_npc_get_position, STRING("飛クッパ"), LW(0), LW(1), LW(2))
     ADD(LW(2), 80)
-    SET_INT_READ_ADDR(PTR(kemuri_name))
+    SET_INT_READ_ADDR(PTR(&kemuri_name))
     LOOP(5)
         READ_INT(LW(5))
         CALL(evt_sub_random, 40, LW(3))
@@ -738,13 +723,18 @@ USER_FUNC(kemuri_move) {
     return EVT_RETURN_BLOCK;
 }
 
-static s32 npcEnt[] = {
-    (s32)/*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", 512, 0, (s32)hkoopa_init, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", // name
+        0x200, // flags
+        0, // reactionFlags
+        hkoopa_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_skip)

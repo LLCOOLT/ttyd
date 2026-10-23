@@ -27,14 +27,14 @@ typedef struct EffPokopiPchargeN64Elem {
     f32 mult;     // 0x44
 } EffPokopiPchargeN64Elem;
 
-__declspec(section ".data") u64 lbl_pcharge_0 = 0xBF8000003F800000;
-__declspec(section ".data") u64 fd_pcharge_negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_pcharge_1 = 0x3F800000BF800000;
-__declspec(section ".data") u64 fd_pcharge_one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_pcharge_2 = 0xBF8000003F800000;
-__declspec(section ".data") u64 fd_pcharge_negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_pcharge_3 = 0x3F800000BF800000;
-__declspec(section ".data") u64 fd_pcharge_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 lbl_pcharge_0[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 fd_pcharge_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 lbl_pcharge_1[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 fd_pcharge_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 lbl_pcharge_2[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 fd_pcharge_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 lbl_pcharge_3[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 fd_pcharge_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 static effN64Vtx size10x10_tex32x32_vtx[] = {
     {0, -5, 0, 0, 0, 0, 0, 0, 255},

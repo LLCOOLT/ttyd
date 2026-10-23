@@ -41,10 +41,19 @@ typedef struct ScissorWork {
     /* 0x098 */ u8 unk_98;
     /* 0x099 */ u8 pad99[3];
     /* 0x09C */ s32 count;
-    /* 0x0A0 */ u8 pada0[0xB4 - 0xA0];
+    /* 0x0A0 */ s32 unkA0;
+    /* 0x0A4 */ f32 unkA4;
+    /* 0x0A8 */ f32 unkA8;
+    /* 0x0AC */ f32 unkAC;
+    /* 0x0B0 */ f32 unkB0;
     /* 0x0B4 */ f32 unk_b4;
     /* 0x0B8 */ f32 unk_b8;
-    /* 0x0BC */ u8 padbc[0xFC - 0xBC];
+    /* 0x0BC */ f32 unkBC;
+    /* 0x0C0 */ f32 unkC0;
+    /* 0x0C4 */ u8 padC4[0xD4 - 0xC4];
+    /* 0x0D4 */ f32 unkD4;
+    /* 0x0D8 */ f32 unkD8;
+    /* 0x0DC */ u8 padDC[0xFC - 0xDC];
     /* 0x0FC */ s32 state;
     /* 0x100 */ s32 step;
     /* 0x104 */ s32 timer;
@@ -95,26 +104,82 @@ s32 scissor_timer_get();
 s32 star_control();
 s32 scissor_tess();
 
-s32 weapon_scissor[48];
-s32 weapon_scissor_finish[48];
+BattleWeapon weapon_scissor;
+BattleWeapon weapon_scissor_finish;
 s32 marioAttackEvent_Scissor[300];
 
-s32 weapon_scissor[] = {
-    (s32)"btl_wn_sac_scissor", ICON_19C << 16, 0, (s32)"msg_scissor", 1677722624, 1065353216, 17130546, (s32)weaponGetPower_Scissor,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, (s32)"msg_sac_5", 131272, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)marioAttackEvent_Scissor, 100, 0, 0,
+BattleWeapon weapon_scissor = {
+    "btl_wn_sac_scissor", // name
+    ICON_19C, // icon
+    {0}, // field_0x6
+    0, // itemId
+    "msg_scissor", // description
+    100, // baseAccuracy
+    0, // baseFpCost
+    4, // baseSpCost
+    0, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    5, // field_0x19
+    100, // mBingoSlotChance
+    50, // field_0x1B
+    weaponGetPower_Scissor, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    "msg_sac_5", // acHelpMsg
+    0x200C8, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    marioAttackEvent_Scissor, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_scissor_finish[] = {
-    (s32)"btl_wn_sac_scissor", 0, 0, 0, 1677721600, 1065353216, 17130546, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 1770242, 0, 131208, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_scissor_finish = {
+    "btl_wn_sac_scissor", // name
+    0, // icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    5, // field_0x19
+    100, // mBingoSlotChance
+    50, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, // element
+    27, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x20088, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 
@@ -718,10 +783,10 @@ void star_disp2D_sub(s32 idx, s32 alpha) {
         y = *(f32*)(p + idx * 4 + 0x4C);
     }
     PSMTXTrans(transMtx, x, y - 20.0f, z);
-    PSMTXScale(scaleMtx, SW(f32, 0x154), SW(f32, 0x158), SW(f32, 0x15C));
-    PSMTXRotRad(rotX, 0x78, 0.017453292f * SW(f32, 0x160));
-    PSMTXRotRad(rotY, 0x79, 0.017453292f * SW(f32, 0x164));
-    PSMTXRotRad(rotZ, 0x7A, 0.017453292f * SW(f32, 0x168));
+    PSMTXScale(scaleMtx, w->scale.x, w->scale.y, w->scale.z);
+    PSMTXRotRad(rotX, 0x78, 0.017453292f * w->rot.x);
+    PSMTXRotRad(rotY, 0x79, 0.017453292f * w->rot.y);
+    PSMTXRotRad(rotZ, 0x7A, 0.017453292f * w->rot.z);
     PSMTXConcat(rotZ, rotY, rotMtx);
     PSMTXConcat(rotX, rotMtx, rotMtx);
     PSMTXConcat(scaleMtx, rotMtx, rotMtx);
@@ -796,29 +861,29 @@ s32 scissor_control(EventEntry* evt, BOOL first) {
     s32 i, k;
     if (first) {
         w->count = 0;
-        SW(f32, 0xA8) = 0.0f;
-        SW(f32, 0xA4) = 0.0f;
-        SW(f32, 0xB0) = 0.0f;
-        SW(f32, 0xAC) = 0.0f;
-        SW(s32, 0xA0) = 0;
-        SW(f32, 0xD4) = 0.0f;
-        SW(f32, 0xD8) = 0.0f;
+        w->unkA8 = 0.0f;
+        w->unkA4 = 0.0f;
+        w->unkB0 = 0.0f;
+        w->unkAC = 0.0f;
+        w->unkA0 = 0;
+        w->unkD4 = 0.0f;
+        w->unkD8 = 0.0f;
         memset(buf, 0, 0x1000);
         w->flags &= ~1;
     }
-    SW(f32, 0xA4) = SW(f32, 0xAC);
-    SW(f32, 0xA8) = SW(f32, 0xB0);
-    SW(f32, 0xAC) = (f32)keyGetStickX(0);
-    SW(f32, 0xB0) = (f32)keyGetStickY(0);
-    sqrt(SW(f32, 0xA4) * SW(f32, 0xA4) + SW(f32, 0xA8) * SW(f32, 0xA8));
-    if ((f32)sqrt(SW(f32, 0xAC) * SW(f32, 0xAC) + SW(f32, 0xB0) * SW(f32, 0xB0)) > 42.0f) {
-        SW(f32, 0xD4) += SW(f32, 0xAC) / 50.0f;
-        SW(f32, 0xD8) += SW(f32, 0xB0) / 50.0f;
+    w->unkA4 = w->unkAC;
+    w->unkA8 = w->unkB0;
+    w->unkAC = (f32)keyGetStickX(0);
+    w->unkB0 = (f32)keyGetStickY(0);
+    sqrt(w->unkA4 * w->unkA4 + w->unkA8 * w->unkA8);
+    if ((f32)sqrt(w->unkAC * w->unkAC + w->unkB0 * w->unkB0) > 42.0f) {
+        w->unkD4 += w->unkAC / 50.0f;
+        w->unkD8 += w->unkB0 / 50.0f;
     }
-    SW(f32, 0xD4) *= 0.86f;
-    SW(f32, 0xD8) *= 0.86f;
-    w->unk_b4 += SW(f32, 0xD4);
-    w->unk_b8 += SW(f32, 0xD8);
+    w->unkD4 *= 0.86f;
+    w->unkD8 *= 0.86f;
+    w->unk_b4 += w->unkD4;
+    w->unk_b8 += w->unkD8;
     if (w->unk_b4 < -300.0f) {
         w->unk_b4 = -300.0f;
     }
@@ -836,14 +901,14 @@ s32 scissor_control(EventEntry* evt, BOOL first) {
         return 2;
     }
     if (gp->retraceCount % 6 == 0 && w->count < 0x200) {
-        if (SW(f32, 0xBC) != w->unk_b4 || SW(f32, 0xC0) != w->unk_b8) {
-            if (__fabs(w->unk_b4 - SW(f32, 0xBC)) >= 5.0 || __fabs(w->unk_b8 - SW(f32, 0xC0)) >= 5.0) {
+        if (w->unkBC != w->unk_b4 || w->unkC0 != w->unk_b8) {
+            if (__fabs(w->unk_b4 - w->unkBC) >= 5.0 || __fabs(w->unk_b8 - w->unkC0) >= 5.0) {
                 psndSFXOn("SFX_BTL_SAC_KAKONDEPON1");
             }
             buf[w->count].x = w->unk_b4;
             buf[w->count].y = w->unk_b8;
-            SW(f32, 0xBC) = w->unk_b4;
-            SW(f32, 0xC0) = w->unk_b8;
+            w->unkBC = w->unk_b4;
+            w->unkC0 = w->unk_b8;
             w->count++;
         }
     }
@@ -876,6 +941,8 @@ void BattleAudienceSoundCallKind(s32 kind);
 void BattleAudienceSoundHandBeat(void);
 void BattleAudienceSoundSetVol(s32 kind, s32 vol, s32 frames);
 #include "battle/battle_audience.h"
+#include "evt/evt_cmd.h"
+#include "battle/battle_database_common.h"
 
 s32 scissor_damage(EventEntry* evt, BOOL first) {
     BattleWork* wp;
@@ -917,7 +984,7 @@ s32 scissor_damage(EventEntry* evt, BOOL first) {
     for (i = 0; i < n; i++) {
         if (w->unitIds[i] != -1 && w->power[i] >= 1) {
             unit = BattleGetUnitPtr(wp, w->unitIds[i]);
-            BattleCheckDamage(mario, unit, BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), (void*)weapon_scissor, 0);
+            BattleCheckDamage(mario, unit, BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), (void*)&weapon_scissor, 0);
             hit = 1;
         }
     }
@@ -1176,43 +1243,111 @@ s32 wait_star_standby(void) {
     return GetScissorPtr()->phase == 5 ? 2 : 0;
 }
 
-s32 marioAttackEvent_Scissor[] = {
-    65627, (s32)scissor_init, 110, 65627, (s32)star_control, 112, 65630, (s32)sac_start_camera_evt,
-    65546, 500, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START1", -250000000, 0,
-    -250000000, 65630, (s32)sac_mario_item_on_evt, 65546, 500, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_BTL_SAC_START2", -250000000, 0, -29999989, 65627, (s32)star_stone_appear, 110, 65630,
-    (s32)sac_start_stardust, 112, 65545, 100, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START3",
-    -250000000, 0, -250000000, 131163, (s32)evt_snd_sfxoff, -29999989, 196699, (s32)evt_btl_camera_set_mode,
-    0, 0, 65545, 40, 65630, (s32)sac_mario_item_on_end_evt, 65630, (s32)sac_mario_back_home,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_I_Y", 110, 65545, 30,
-    196699, (s32)evt_btl_camera_set_mode, 0, 3, 655451, (s32)evt_btl_camera_set_moveto, 0, 75,
-    105, 600, 75, 55, 0, 30, 0, 112,
-    65627, (s32)wait_star_standby, 110, 65627, (s32)scissor_timer_main, 112, 110, 131163,
-    (s32)sac_cheer, 1, 112, 65627, (s32)sac_ac_help_on, 65541, 0, 131122,
-    -29999990, (s32)"OFF_d_bom", 131163, (s32)evt_paper_entry, -29999990, 131163, (s32)evt_offscreen_entry, (s32)"ofs",
-    131163, (s32)evt_img_entry, (s32)"img", 196699, (s32)evt_img_set_paper, (s32)"img", -29999990, 196699,
-    (s32)evt_img_onoff, (s32)"img", 0, 65627, (s32)scissor_control, 131163, (s32)scissor_timer_get, -30000000,
-    131100, -30000000, 59, 196699, (s32)evt_img_onoff, (s32)"img", 0, 196699,
-    (s32)evt_img_set_shadow, (s32)"img", 0, 131163, (s32)evt_img_release, (s32)"img", 131163, (s32)evt_offscreen_delete,
-    (s32)"ofs", 131163, (s32)evt_paper_delete, -29999990, 65540, 90, 33, 65545,
-    1, 65627, (s32)scissor_tess, 65545, 1, 65627, (s32)scissor_offscreen, 589915,
-    (s32)evt_img_alloc_capture, (s32)"img", 0, (s32)"ofs", 1, 0, 0, 0,
-    0, 65545, 1, 131163, (s32)scissor_ofscreen_ok, -30000000, 131097, -30000000,
-    0, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_SAC_KAKONDEPON2", 0, 196699, (s32)evt_img_onoff, (s32)"img",
-    1, 196699, (s32)evt_img_set_shadow, (s32)"img", 2, 131163, (s32)scissor_damage, -30000000,
-    131101, -30000000, 2, 327771, (s32)btlevtcmd_ACSuccessEffect, -30000000, 75, 100,
-    -100, 33, 196699, (s32)evt_img_set_paper_anim, (s32)"img", (s32)"A_1", 131163, (s32)evt_img_clear_virtual_point,
-    (s32)"img", 65545, 60, 33, 196699, (s32)evt_img_onoff, (s32)"img", 0,
-    196699, (s32)evt_img_set_shadow, (s32)"img", 0, 131163, (s32)evt_img_release, (s32)"img", 131163,
-    (s32)evt_offscreen_delete, (s32)"ofs", 131163, (s32)evt_paper_delete, -29999990, 131163, (s32)scissor_timer_get, -30000000,
-    131100, -30000000, 59, 65540, 90, 33, 6, 65539,
-    90, 65627, (s32)sac_ac_help_off, 65627, (s32)sac_cheer_end, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997,
-    -29999996, 65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost, -2, 196699, (s32)btlevtcmd_CommandGetWeaponAddress,
-    -2, -30000000, 131163, (s32)btlevtcmd_WeaponAftereffect, -30000000, 65539, 95, 131096,
-    -29999997, -1, 65540, 97, 33, 196699, (s32)btlevtcmd_GetTotalDamage, -29999997,
-    -30000000, 131101, -30000000, 1, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997,
-    -29999996, (s32)weapon_scissor_finish, 256, -29999995, 33, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997,
-    -29999996, 65540, 95, 65539, 97, 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 65546, 1000, 65627, (s32)scissor_end, 65539, 99, 131163,
-    (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+EVT_BEGIN(marioAttackEvent_Scissor)
+    CALL(scissor_init)
+    BEGIN_SIBLING_EVENT
+        CALL(star_control)
+    END_SIBLING_EVENT
+    CALL_CHILD(sac_start_camera_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START1"), -250000000, 0, -250000000)
+    CALL_CHILD(sac_mario_item_on_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START2"), -250000000, 0, LW(11))
+    CALL(star_stone_appear)
+    BEGIN_SIBLING_EVENT
+        CALL_CHILD(sac_start_stardust)
+    END_SIBLING_EVENT
+    WAIT_FRAMES(100)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START3"), -250000000, 0, -250000000)
+    CALL(evt_snd_sfxoff, LW(11))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_FRAMES(40)
+    CALL_CHILD(sac_mario_item_on_end_evt)
+    CALL_CHILD(sac_mario_back_home)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_I_Y"))
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(30)
+        CALL(evt_btl_camera_set_mode, 0, 3)
+        CALL(evt_btl_camera_set_moveto, 0, 75, 105, 600, 75, 55, 0, 30, 0)
+    END_SIBLING_EVENT
+    CALL(wait_star_standby)
+    BEGIN_SIBLING_EVENT
+        CALL(scissor_timer_main)
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        CALL(sac_cheer, 1)
+    END_SIBLING_EVENT
+    CALL(sac_ac_help_on)
+    LOOP(0)
+        SET_VALUE(LW(10), STRING("OFF_d_bom"))
+        CALL(evt_paper_entry, LW(10))
+        CALL(evt_offscreen_entry, STRING("ofs"))
+        CALL(evt_img_entry, STRING("img"))
+        CALL(evt_img_set_paper, STRING("img"), LW(10))
+        CALL(evt_img_onoff, STRING("img"), 0)
+        CALL(scissor_control)
+        CALL(scissor_timer_get, LW(0))
+        IF_INT_LESS_OR_EQUAL(LW(0), 59)
+            CALL(evt_img_onoff, STRING("img"), 0)
+            CALL(evt_img_set_shadow, STRING("img"), 0)
+            CALL(evt_img_release, STRING("img"))
+            CALL(evt_offscreen_delete, STRING("ofs"))
+            CALL(evt_paper_delete, LW(10))
+            GOTO(90)
+        END_IF
+        WAIT_FRAMES(1)
+        CALL(scissor_tess)
+        WAIT_FRAMES(1)
+        CALL(scissor_offscreen)
+        CALL(evt_img_alloc_capture, STRING("img"), 0, STRING("ofs"), 1, 0, 0, 0, 0)
+        WAIT_FRAMES(1)
+        CALL(scissor_ofscreen_ok, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(evt_snd_sfxon, STRING("SFX_BTL_SAC_KAKONDEPON2"), 0)
+            CALL(evt_img_onoff, STRING("img"), 1)
+            CALL(evt_img_set_shadow, STRING("img"), 2)
+            CALL(scissor_damage, LW(0))
+            IF_INT_GREATER_OR_EQUAL(LW(0), 2)
+                CALL(btlevtcmd_ACSuccessEffect, LW(0), 75, 100, -100)
+            END_IF
+            CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_1"))
+            CALL(evt_img_clear_virtual_point, STRING("img"))
+            WAIT_FRAMES(60)
+        END_IF
+        CALL(evt_img_onoff, STRING("img"), 0)
+        CALL(evt_img_set_shadow, STRING("img"), 0)
+        CALL(evt_img_release, STRING("img"))
+        CALL(evt_offscreen_delete, STRING("ofs"))
+        CALL(evt_paper_delete, LW(10))
+        CALL(scissor_timer_get, LW(0))
+        IF_INT_LESS_OR_EQUAL(LW(0), 59)
+            GOTO(90)
+        END_IF
+    END_LOOP
+    LABEL(90)
+    CALL(sac_ac_help_off)
+    CALL(sac_cheer_end)
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_CommandPayWeaponCost, -2)
+    CALL(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+    CALL(btlevtcmd_WeaponAftereffect, LW(0))
+    LABEL(95)
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(97)
+    END_IF
+    CALL(btlevtcmd_GetTotalDamage, LW(3), LW(0))
+    IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_scissor_finish), 256, LW(5))
+    END_IF
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    GOTO(95)
+    LABEL(97)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_MS(1000)
+    CALL(scissor_end)
+    LABEL(99)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()

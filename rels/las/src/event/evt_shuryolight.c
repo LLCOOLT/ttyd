@@ -28,24 +28,24 @@ static s32 shuryolightRunEvt(s32* code, s32 id);
 static void shuryolightSetAnim(s32 index, s32 anim);
 static void shuryolight_callback(void* param, s32 group);
 
-__declspec(section ".data") u64 fd_evt_shuryolight_negone_one_374;
-__declspec(section ".data") s32 fd_evt_shuryolight_neg_one_382[1];
-__declspec(section ".data") s32 fd_evt_shuryolight___local_PI_383[1];
-__declspec(section ".data") s32 fd_evt_shuryolight___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_evt_shuryolight_one_negone_373;
-__declspec(section ".data") s32 fd_evt_shuryolight___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_evt_shuryolight_one_381[1];
-__declspec(section ".data") u64 fd_evt_shuryolight_negone_one_360;
-__declspec(section ".data") s32 fd_evt_shuryolight_neg_one_365[1];
-__declspec(section ".data") s32 fd_evt_shuryolight___local_PI_366[1];
-__declspec(section ".data") s32 fd_evt_shuryolight___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_evt_shuryolight_one_negone_359;
-__declspec(section ".data") s32 fd_evt_shuryolight___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_evt_shuryolight_one_364[1];
-static __declspec(section ".data") s32 green_light_anim[5];
-static __declspec(section ".data") s32 yellow_light_anim[5];
-static __declspec(section ".data") s32 red_light_anim[5];
-static __declspec(section ".data") s32 orange_light_anim[5];
+__declspec(section ".data") f32 fd_evt_shuryolight_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_shuryolight_neg_one_382;
+__declspec(section ".data") f32 fd_evt_shuryolight___local_PI_383;
+__declspec(section ".data") f32 fd_evt_shuryolight___local_3PIO2_385;
+__declspec(section ".data") f32 fd_evt_shuryolight_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_shuryolight___local_PIO2_384;
+__declspec(section ".data") f32 fd_evt_shuryolight_one_381;
+__declspec(section ".data") f32 fd_evt_shuryolight_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_shuryolight_neg_one_365;
+__declspec(section ".data") f32 fd_evt_shuryolight___local_PI_366;
+__declspec(section ".data") f32 fd_evt_shuryolight___local_3PIO2_368;
+__declspec(section ".data") f32 fd_evt_shuryolight_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_evt_shuryolight___local_PIO2_367;
+__declspec(section ".data") f32 fd_evt_shuryolight_one_364;
+static __declspec(section ".data") const char* green_light_anim[5];
+static __declspec(section ".data") const char* yellow_light_anim[5];
+static __declspec(section ".data") const char* red_light_anim[5];
+static __declspec(section ".data") const char* orange_light_anim[5];
 s32 shuryolight_pow_normal[44];
 s32 shuryolight_pow_tenmetu[31];
 s32 shuryolight_head_normal[30];
@@ -53,68 +53,64 @@ s32 shuryolight_head_tenmetu[20];
 s32 shuryolight_head_off[14];
 s32 shuryolight_tue_normal[31];
 
-__declspec(section ".data") u64 fd_evt_shuryolight_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_evt_shuryolight_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_evt_shuryolight_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_evt_shuryolight_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_evt_shuryolight___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_evt_shuryolight___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_evt_shuryolight_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_evt_shuryolight___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_evt_shuryolight_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_evt_shuryolight_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_evt_shuryolight_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_evt_shuryolight___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_evt_shuryolight___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_evt_shuryolight_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_evt_shuryolight___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_evt_shuryolight_one_364 = 1.0f;
+
+static __declspec(section ".data") const char* green_light_anim[] = {
+    "L_1C",
+    "L_1B",
+    "L_1D",
+    "L_1A",
+    "L_1E",
 };
 
-__declspec(section ".data") s32 fd_evt_shuryolight___local_PI_383[] = {
-    1078530011,
+static __declspec(section ".data") const char* yellow_light_anim[] = {
+    "L_2C",
+    "L_2B",
+    "L_2D",
+    "L_2A",
+    "L_2E",
 };
 
-__declspec(section ".data") s32 fd_evt_shuryolight___local_3PIO2_385[] = {
-    1083624420,
+static __declspec(section ".data") const char* red_light_anim[] = {
+    "L_3C",
+    "L_3B",
+    "L_3D",
+    "L_3A",
+    "L_3E",
 };
 
-__declspec(section ".data") u64 fd_evt_shuryolight_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_evt_shuryolight___local_PIO2_384[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_evt_shuryolight_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_evt_shuryolight_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_evt_shuryolight_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_evt_shuryolight___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_evt_shuryolight___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_evt_shuryolight_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_evt_shuryolight___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_evt_shuryolight_one_364[] = {
-    1065353216,
-};
-
-static __declspec(section ".data") s32 green_light_anim[] = {
-    (s32)"L_1C", (s32)"L_1B", (s32)"L_1D", (s32)"L_1A", (s32)"L_1E",
-};
-
-static __declspec(section ".data") s32 yellow_light_anim[] = {
-    (s32)"L_2C", (s32)"L_2B", (s32)"L_2D", (s32)"L_2A", (s32)"L_2E",
-};
-
-static __declspec(section ".data") s32 red_light_anim[] = {
-    (s32)"L_3C", (s32)"L_3B", (s32)"L_3D", (s32)"L_3A", (s32)"L_3E",
-};
-
-static __declspec(section ".data") s32 orange_light_anim[] = {
-    (s32)"L_4C", (s32)"L_4B", (s32)"L_4D", (s32)"L_4A", (s32)"L_4E",
+static __declspec(section ".data") const char* orange_light_anim[] = {
+    "L_4C",
+    "L_4B",
+    "L_4D",
+    "L_4A",
+    "L_4E",
 };
 
 EVT_BEGIN(shuryolight_pow_normal)

@@ -288,293 +288,291 @@ USER_FUNC(N_cameraman_on) {
 }
 
 //.data
-s32 kinopio_house_talk_evt[] = {
-	0x0002005B, (s32)evt_mario_key_onoff, 0x00000000,
-	0x0002005B, (s32)get_ryoukin, 0xFE363C8A,
-	0x0002005B, (s32)get_npcname, 0xFE363C8B,
-	0x0003005B, (s32)evt_win_coin_on, 0x00000000, 0xFE363C8C,
-	0x0003005B, (s32)msg_no, 0x00000000, 0xFE363C80,
-	0x0006005B, (s32)evt_msg_print_insert, 0x00000000, 0xFE363C80, 0x00000000, 0xFE363C8B, 0xFE363C8A,
-	0x0003005B, (s32)msg_no, 0x00000006, 0xFE363C80,
-	0x0003005B, (s32)evt_msg_select, 0x00000000, 0xFE363C80,
-	0x00020018, 0xFE363C80, 0x00000001,
-	0x0003005B, (s32)msg_no, 0x00000002, 0xFE363C80,
-	0x0003005B, (s32)evt_msg_print_add, 0x00000000, 0xFE363C80,
-	0x0002005B, (s32)evt_mario_key_onoff, 0x00000001,
-	0x0002005B, (s32)evt_win_coin_off, 0xFE363C8C,
-	0x00000002,
-	0x00000021,
-	0x0002005B, (s32)power_chk, 0xFE363C80,
-	0x00020018, 0xFE363C80, 0x00000001,
-	0x0003005B, (s32)msg_no, 0x00000001, 0xFE363C80,
-	0x0003005B, (s32)evt_msg_print_add, 0x00000000, 0xFE363C80,
-	0x0003005B, (s32)msg_no, 0x00000006, 0xFE363C80,
-	0x0003005B, (s32)evt_msg_select, 0x00000000, 0xFE363C80,
-	0x00020018, 0xFE363C80, 0x00000001,
-	0x0003005B, (s32)msg_no, 0x00000002, 0xFE363C80,
-	0x0003005B, (s32)evt_msg_print_add, 0x00000000, 0xFE363C80,
-	0x0002005B, (s32)evt_mario_key_onoff, 0x00000001,
-	0x0002005B, (s32)evt_win_coin_off, 0xFE363C8C,
-	0x00000002,
-	0x00000021,
-	0x00000021,
-	0x00020032, 0xFBD3E280, 0x00000000,
-	0x0003005B, (s32)evt_pouch_check_item, 0x000000A4, 0xFE363C80,
-	0x0002001B, 0xFE363C80, 0x00000000,
-	0x0003005B, (s32)msg_no, 0x00000007, 0xFE363C80,
-	0x0003005B, (s32)evt_msg_print_add, 0x00000000, 0xFE363C80,
-	0x0003005B, (s32)msg_no, 0x00000008, 0xFE363C80,
-	0x0003005B, (s32)evt_msg_select, 0x00000000, 0xFE363C80,
-	0x00020018, 0xFE363C80, 0x00000000,
-	0x00020032, 0xFBD3E280, 0x00000001,
-	0x0003005B, (s32)evt_pouch_remove_item, 0x000000A4, 0xFE363C80,
-	0x00000021,
-	0x00000021,
-	0x00020018, 0xFBD3E280, 0x00000000,
-	0x0002005B, (s32)coin_chk, 0xFE363C80,
-	0x00020018, 0xFE363C80, 0x00000001,
-	0x0003005B, (s32)msg_no, 0x00000004, 0xFE363C80,
-	0x0003005B, (s32)evt_msg_print_add, 0x00000000, 0xFE363C80,
-	0x0002005B, (s32)evt_mario_key_onoff, 0x00000001,
-	0x0002005B, (s32)evt_win_coin_off, 0xFE363C8C,
-	0x00000002,
-	0x00000021,
-	0x0002005B, (s32)get_ryoukin, 0xFE363C8A,
-	0x00020037, 0xFE363C8A, 0xFFFFFFFF,
-	0x0002005B, (s32)evt_pouch_add_coin, 0xFE363C8A,
-	0x0001000A, 0x000003E8,
-	0x00000021,
-	0x0002005B, (s32)evt_win_coin_off, 0xFE363C8C,
-	0x0003005B, (s32)msg_no, 0x00000003, 0xFE363C80,
-	0x0003005B, (s32)evt_msg_print_add, 0x00000000, 0xFE363C80,
-	0x0002005B, (s32)get_npcname, 0xFE363C80,
-	0x0004005B, (s32)evt_npc_flag_onoff, 0x00000001, 0xFE363C80, 0x00000020,
-	0x0002005B, (s32)evt_mario_get_party, 0xFE363C8B,
-	0x0002005B, (s32)evt_mario_get_exparty, 0xFE363C8C,
-	0x0005005B, (s32)evt_mario_get_pos, 0x00000000, 0xFE363C8D, 0xFE363C8E, 0xFE363C8F,
-	0x0002005B, (s32)evt_mario_goodbye_party, 0x00000001,
-	0x0002005B, (s32)evt_mario_goodbye_party, 0x00000000,
-	0x0002005B, (s32)get_to_bed_evt, 0xFE363C80,
-	0x00020018, 0xFE363C80, 0x00000000,
-	0x0000006B,
-	0x0001000A, 0x000003E8,
-	0x0007005B, (s32)get_cam, 0xFE363C80, 0xFE363C81, 0xFE363C82, 0xFE363C83, 0xFE363C84, 0xFE363C85,
-	0x0009005B, (s32)evt_cam3d_evt_set, 0xFE363C80, 0xFE363C81, 0xFE363C82, 0xFE363C83, 0xFE363C84, 0xFE363C85, 0x00000000, 0x0000000B,
-	0x0000006D,
-	0x0004005B, (s32)get_bedside, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0004005B, (s32)evt_mario_mov_pos2, 0xFE363C80, 0xFE363C82, 0xF24BE280,
-	0x00000020,
-	0x0001006C, 0xFE363C80,
-	0x0001005E, 0xFE363C80,
-	0x0000006D,
-	0x00010005, 0x00000000,
-	0x0002006A, 0xFE363C80, 0xFE363C81,
-	0x00020018, 0xFE363C81, 0x00000000,
-	0x00000007,
-	0x00000021,
-	0x00010009, 0x00000001,
-	0x00000006,
-	0x0007005B, (s32)get_cam, 0xFE363C80, 0xFE363C81, 0xFE363C82, 0xFE363C83, 0xFE363C84, 0xFE363C85,
-	0x0009005B, (s32)evt_cam3d_evt_set, 0xFE363C80, 0xFE363C81, 0xFE363C82, 0xFE363C83, 0xFE363C84, 0xFE363C85, 0x00000000, 0x0000000B,
-	0x0001000A, 0x000001F4,
-	0x00000021,
-	0x0005005B, (s32)evt_mario_get_pos, 0x00000000, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0006005B, (s32)evt_snd_sfxon_3d, 0x0002009E, 0xFE363C80, 0xFE363C81, 0xFE363C82, 0x00000000,
-	0x0003005B, (s32)evt_mario_flag_onoff, 0x00000001, 0x00000700,
-	0x0004005B, (s32)get_bed, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0007005B, (s32)evt_mario_jump_pos, 0xFE363C80, 0xFE363C81, 0xFE363C82, 0xF250BA80, 0x00000000, 0xFFFFFC18,
-	0x0004005B, (s32)evt_mario_set_pos, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0001005B, (s32)evt_mario_adjust_dir,
-	0x0001000A, 0x000000C8,
-	0x0003005B, (s32)evt_mario_dispflag_onoff, 0x00000001, 0x00001000,
-	0x0001006C, 0xFE363C8A,
-	0x0002005B, (s32)get_beddeg, 0xFE363C80,
-	0x0002005B, (s32)paper_on, 0xFE363C80,
-	0x0000006D,
-	0x0000006B,
-	0x0005005B, (s32)evt_mario_get_pos, 0x00000000, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0006005B, (s32)evt_snd_sfxon_3d, 0x000203BA, 0xFE363C80, 0xFE363C81, 0xFE363C82, 0x00000000,
-	0x0001000A, 0x000000C8,
-	0x0006005B, (s32)evt_snd_sfxon_3d, 0x000203BB, 0xFE363C80, 0xFE363C81, 0xFE363C82, 0x00000000,
-	0x0000006D,
-	0x0001005B, (s32)snd_off,
-	0x0002005B, (s32)evt_snd_bgmoff, 0x00000400,
-	0x0003005B, (s32)evt_snd_bgmon, 0x00000001, (s32)"BGM_FF_GO_SLEEPING1",
+EVT_BEGIN(kinopio_house_talk_evt)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(get_ryoukin, 4264967306)
+    CALL(get_npcname, 4264967307)
+    CALL(evt_win_coin_on, 0, 4264967308)
+    CALL(msg_no, 0, 4264967296)
+    CALL(evt_msg_print_insert, 0, 4264967296, 0, 4264967307, 4264967306)
+    CALL(msg_no, 6, 4264967296)
+    CALL(evt_msg_select, 0, 4264967296)
+    IF_INT_EQUAL(4264967296, 1)
+        CALL(msg_no, 2, 4264967296)
+        CALL(evt_msg_print_add, 0, 4264967296)
+        CALL(evt_mario_key_onoff, 1)
+        CALL(evt_win_coin_off, 4264967308)
+        RETURN
+    END_IF
+    CALL(power_chk, 4264967296)
+    IF_INT_EQUAL(4264967296, 1)
+        CALL(msg_no, 1, 4264967296)
+        CALL(evt_msg_print_add, 0, 4264967296)
+        CALL(msg_no, 6, 4264967296)
+        CALL(evt_msg_select, 0, 4264967296)
+        IF_INT_EQUAL(4264967296, 1)
+            CALL(msg_no, 2, 4264967296)
+            CALL(evt_msg_print_add, 0, 4264967296)
+            CALL(evt_mario_key_onoff, 1)
+            CALL(evt_win_coin_off, 4264967308)
+            RETURN
+        END_IF
+    END_IF
+    SET_VALUE(4224967296, 0)
+    CALL(evt_pouch_check_item, 164, 4264967296)
+    IF_INT_GREATER(4264967296, 0)
+        CALL(msg_no, 7, 4264967296)
+        CALL(evt_msg_print_add, 0, 4264967296)
+        CALL(msg_no, 8, 4264967296)
+        CALL(evt_msg_select, 0, 4264967296)
+        IF_INT_EQUAL(4264967296, 0)
+            SET_VALUE(4224967296, 1)
+            CALL(evt_pouch_remove_item, 164, 4264967296)
+        END_IF
+    END_IF
+    IF_INT_EQUAL(4224967296, 0)
+        CALL(coin_chk, 4264967296)
+        IF_INT_EQUAL(4264967296, 1)
+            CALL(msg_no, 4, 4264967296)
+            CALL(evt_msg_print_add, 0, 4264967296)
+            CALL(evt_mario_key_onoff, 1)
+            CALL(evt_win_coin_off, 4264967308)
+            RETURN
+        END_IF
+        CALL(get_ryoukin, 4264967306)
+        MULTIPLY(4264967306, 4294967295)
+        CALL(evt_pouch_add_coin, 4264967306)
+        WAIT_MS(1000)
+    END_IF
+    CALL(evt_win_coin_off, 4264967308)
+    CALL(msg_no, 3, 4264967296)
+    CALL(evt_msg_print_add, 0, 4264967296)
+    CALL(get_npcname, 4264967296)
+    CALL(evt_npc_flag_onoff, 1, 4264967296, 32)
+    CALL(evt_mario_get_party, 4264967307)
+    CALL(evt_mario_get_exparty, 4264967308)
+    CALL(evt_mario_get_pos, 0, 4264967309, 4264967310, 4264967311)
+    CALL(evt_mario_goodbye_party, 1)
+    CALL(evt_mario_goodbye_party, 0)
+    CALL(get_to_bed_evt, 4264967296)
+    IF_INT_EQUAL(4264967296, 0)
+        BEGIN_INLINE_EVENT
+            WAIT_MS(1000)
+            CALL(get_cam, 4264967296, 4264967297, 4264967298, 4264967299, 4264967300, 4264967301)
+            CALL(evt_cam3d_evt_set, 4264967296, 4264967297, 4264967298, 4264967299, 4264967300, 4264967301, 0, 11)
+        END_INLINE_EVENT
+        CALL(get_bedside, 4264967296, 4264967297, 4264967298)
+        CALL(evt_mario_mov_pos2, 4264967296, 4264967298, 4065059456)
+    ELSE
+        BEGIN_INLINE_EVENT_GET_ID(4264967296)
+            CALL_CHILD(4264967296)
+        END_INLINE_EVENT
+        LOOP(0)
+            IS_EVENT_RUNNING(4264967296, 4264967297)
+            IF_INT_EQUAL(4264967297, 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(get_cam, 4264967296, 4264967297, 4264967298, 4264967299, 4264967300, 4264967301)
+        CALL(evt_cam3d_evt_set, 4264967296, 4264967297, 4264967298, 4264967299, 4264967300, 4264967301, 0, 11)
+        WAIT_MS(500)
+    END_IF
+    CALL(evt_mario_get_pos, 0, 4264967296, 4264967297, 4264967298)
+    CALL(evt_snd_sfxon_3d, 131230, 4264967296, 4264967297, 4264967298, 0)
+    CALL(evt_mario_flag_onoff, 1, 1792)
+    CALL(get_bed, 4264967296, 4264967297, 4264967298)
+    CALL(evt_mario_jump_pos, 4264967296, 4264967297, 4264967298, 4065376896, 0, 4294966296)
+    CALL(evt_mario_set_pos, 4264967296, 4264967297, 4264967298)
+    CALL(evt_mario_adjust_dir)
+    WAIT_MS(200)
+    CALL(evt_mario_dispflag_onoff, 1, 4096)
+    BEGIN_INLINE_EVENT_GET_ID(4264967306)
+        CALL(get_beddeg, 4264967296)
+        CALL(paper_on, 4264967296)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_get_pos, 0, 4264967296, 4264967297, 4264967298)
+        CALL(evt_snd_sfxon_3d, 132026, 4264967296, 4264967297, 4264967298, 0)
+        WAIT_MS(200)
+        CALL(evt_snd_sfxon_3d, 132027, 4264967296, 4264967297, 4264967298, 0)
+    END_INLINE_EVENT
+    CALL(snd_off)
+    CALL(evt_snd_bgmoff, 1024)
+    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_GO_SLEEPING1"))
 #ifdef VERSION_G8ME01
-	0x0006005B, (s32)evt_fade_entry, 0x00000004, 0x1770, 0x00000000, 0x00000000, 0x00000000,
+    CALL(evt_fade_entry, 4, 6000, 0, 0, 0)
 #else
-	0x0006005B, (s32)evt_fade_entry, 0x00000004, 0x00000BB8, 0x00000000, 0x00000000, 0x00000000,
+    CALL(evt_fade_entry, 4, 3000, 0, 0, 0)
 #endif
-	0x0005005B, (s32)evt_mario_get_pos, 0x00000000, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0004005B, (s32)evt_fade_set_spot_pos, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0001005B, (s32)evt_fade_end_wait,
-	0x0006005B, (s32)evt_fade_entry, 0x0000000C, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-	0x0001005B, (s32)evt_fade_end_wait,
-	0x0001005B, (s32)evt_pouch_mario_recovery,
-	0x0001005B, (s32)evt_pouch_all_party_recovery,
-	0x0001005B, (s32)breakfast,
-	0x0001000A, 0x00000BB8,
-	0x0001005F, 0xFE363C8A,
-	0x0001005B, (s32)paper_off,
-	0x0003005B, (s32)evt_mario_dispflag_onoff, 0x00000000, 0x00001000,
-	0x00020019, 0xFE363C8B, 0x00000000,
-	0x0004005B, (s32)get_bed, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0006005B, (s32)evt_mario_set_party_pos, 0x00000000, 0xFE363C8B, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x00000021,
-	0x00020019, 0xFE363C8C, 0x00000000,
-	0x0004005B, (s32)get_bed, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0004005B, (s32)offset, 0xF24AF280, 0xFE363C83, 0xFE363C84,
-	0x0002003A, 0xFE363C80, 0xFE363C83,
-	0x0002003A, 0xFE363C82, 0xFE363C84,
-	0x0006005B, (s32)evt_mario_set_party_pos, 0x00000001, 0xFE363C8C, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x00000021,
-	0x0003005B, (s32)evt_mario_flag_onoff, 0x00000000, 0x00000700,
-	0x0004005B, (s32)get_bedside, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0004005B, (s32)evt_mario_set_pos, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0002005B, (s32)get_npcname, 0xFE363C80,
-	0x0003005B, (s32)evt_set_dir_to_target, 0xFE363C80, (s32)"mario",
-	0x0002005B, (s32)evt_mario_set_dir_npc, 0xFE363C80,
-	0x0003005B, (s32)evt_party_set_dir_npc, 0x00000000, 0xFE363C80,
-	0x0003005B, (s32)evt_party_set_dir_npc, 0x00000001, 0xFE363C80,
-	0x0004005B, (s32)evt_npc_flag_onoff, 0x00000001, 0xFE363C80, 0x00008000,
-	0x0003005B, (s32)evt_cam3d_evt_off, 0x00000000, 0x0000000B,
-	0x00010009, 0x00000001,
-	0x0004005B, (s32)evt_npc_flag_onoff, 0x00000000, 0xFE363C80, 0x00008000,
-	0x0002005B, (s32)evt_snd_bgmoff, 0x00000201,
-	0x0003005B, (s32)evt_snd_bgmon, 0x00000120, 0x00000000,
-	0x0001005B, (s32)snd_on,
-	0x00020035, 0xF5DE0181, 0x00000001,
-	0x0002001B, 0xF5DE0181, 0x00000064,
-	0x00020032, 0xF5DE0181, 0x00000064,
-	0x00000021,
-	0x00020018, 0xF5DE0181, 0x00000032,
-	0x0001005E, (s32)evt_50,
-	0x0002005B, (s32)get_npcname, 0xFE363C80,
-	0x0004005B, (s32)evt_npc_flag_onoff, 0x00000000, 0xFE363C80, 0x00000020,
-	0x00000002,
-	0x00000021,
-	0x0001005B, (s32)evt_mario_adjust_dir,
-	0x0006005B, (s32)evt_fade_entry, 0x0000000B, 0x000003E8, 0x00000000, 0x00000000, 0x00000000,
-	0x0001005B, (s32)evt_fade_end_wait,
-	0x0002005B, (s32)get_from_bed_evt, 0xFE363C80,
-	0x00020019, 0xFE363C80, 0x00000000,
-	0x0001006C, 0xFE363C8A,
-	0x0001005E, 0xFE363C80,
-	0x0000006D,
-	0x00010005, 0x00000000,
-	0x0002006A, 0xFE363C8A, 0xFE363C8B,
-	0x00020018, 0xFE363C8B, 0x00000000,
-	0x00000007,
-	0x00000021,
-	0x00010009, 0x00000001,
-	0x00000006,
-	0x00000021,
-	0x0002005B, (s32)evt_party_run, 0x00000000,
-	0x0002005B, (s32)evt_party_run, 0x00000001,
-	0x0004005B, (s32)get_npctalk, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0004005B, (s32)evt_mario_mov_pos2, 0xFE363C80, 0xFE363C82, 0xF24BE280,
-	0x0001005B, (s32)evt_fade_end_wait,
-	0x0002005B, (s32)get_npcname, 0xFE363C8B,
-	0x0002005B, (s32)evt_mario_set_dir_npc, 0xFE363C8B,
-	0x0003005B, (s32)evt_party_set_dir_npc, 0x00000000, 0xFE363C8B,
-	0x0002005B, (s32)get_npcname, 0xFE363C8B,
-	0x0003005B, (s32)msg_no, 0x00000005, 0xFE363C80,
-	0x0005005B, (s32)evt_msg_print, 0x00000000, 0xFE363C80, 0x00000000, 0xFE363C8B,
-	0x0002005B, (s32)get_npcname, 0xFE363C80,
-	0x0004005B, (s32)evt_npc_flag_onoff, 0x00000000, 0xFE363C80, 0x00000020,
-	0x0002005B, (s32)evt_mario_key_onoff, 0x00000001,
-	0x00000002,
-	0x00000001,
-};
+    CALL(evt_mario_get_pos, 0, 4264967296, 4264967297, 4264967298)
+    CALL(evt_fade_set_spot_pos, 4264967296, 4264967297, 4264967298)
+    CALL(evt_fade_end_wait)
+    CALL(evt_fade_entry, 12, 0, 0, 0, 0)
+    CALL(evt_fade_end_wait)
+    CALL(evt_pouch_mario_recovery)
+    CALL(evt_pouch_all_party_recovery)
+    CALL(breakfast)
+    WAIT_MS(3000)
+    DELETE_EVENT(4264967306)
+    CALL(paper_off)
+    CALL(evt_mario_dispflag_onoff, 0, 4096)
+    IF_INT_NOT_EQUAL(4264967307, 0)
+        CALL(get_bed, 4264967296, 4264967297, 4264967298)
+        CALL(evt_mario_set_party_pos, 0, 4264967307, 4264967296, 4264967297, 4264967298)
+    END_IF
+    IF_INT_NOT_EQUAL(4264967308, 0)
+        CALL(get_bed, 4264967296, 4264967297, 4264967298)
+        CALL(offset, 4064998016, 4264967299, 4264967300)
+        ADD_FLOAT(4264967296, 4264967299)
+        ADD_FLOAT(4264967298, 4264967300)
+        CALL(evt_mario_set_party_pos, 1, 4264967308, 4264967296, 4264967297, 4264967298)
+    END_IF
+    CALL(evt_mario_flag_onoff, 0, 1792)
+    CALL(get_bedside, 4264967296, 4264967297, 4264967298)
+    CALL(evt_mario_set_pos, 4264967296, 4264967297, 4264967298)
+    CALL(get_npcname, 4264967296)
+    CALL(evt_set_dir_to_target, 4264967296, STRING("mario"))
+    CALL(evt_mario_set_dir_npc, 4264967296)
+    CALL(evt_party_set_dir_npc, 0, 4264967296)
+    CALL(evt_party_set_dir_npc, 1, 4264967296)
+    CALL(evt_npc_flag_onoff, 1, 4264967296, 32768)
+    CALL(evt_cam3d_evt_off, 0, 11)
+    WAIT_FRAMES(1)
+    CALL(evt_npc_flag_onoff, 0, 4264967296, 32768)
+    CALL(evt_snd_bgmoff, 513)
+    CALL(evt_snd_bgmon, 288, 0)
+    CALL(snd_on)
+    ADD(4124967297, 1)
+    IF_INT_GREATER(4124967297, 100)
+        SET_VALUE(4124967297, 100)
+    END_IF
+    IF_INT_EQUAL(4124967297, 50)
+        CALL_CHILD(evt_50)
+        CALL(get_npcname, 4264967296)
+        CALL(evt_npc_flag_onoff, 0, 4264967296, 32)
+        RETURN
+    END_IF
+    CALL(evt_mario_adjust_dir)
+    CALL(evt_fade_entry, 11, 1000, 0, 0, 0)
+    CALL(evt_fade_end_wait)
+    CALL(get_from_bed_evt, 4264967296)
+    IF_INT_NOT_EQUAL(4264967296, 0)
+        BEGIN_INLINE_EVENT_GET_ID(4264967306)
+            CALL_CHILD(4264967296)
+        END_INLINE_EVENT
+        LOOP(0)
+            IS_EVENT_RUNNING(4264967306, 4264967307)
+            IF_INT_EQUAL(4264967307, 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_IF
+    CALL(evt_party_run, 0)
+    CALL(evt_party_run, 1)
+    CALL(get_npctalk, 4264967296, 4264967297, 4264967298)
+    CALL(evt_mario_mov_pos2, 4264967296, 4264967298, 4065059456)
+    CALL(evt_fade_end_wait)
+    CALL(get_npcname, 4264967307)
+    CALL(evt_mario_set_dir_npc, 4264967307)
+    CALL(evt_party_set_dir_npc, 0, 4264967307)
+    CALL(get_npcname, 4264967307)
+    CALL(msg_no, 5, 4264967296)
+    CALL(evt_msg_print, 0, 4264967296, 0, 4264967307)
+    CALL(get_npcname, 4264967296)
+    CALL(evt_npc_flag_onoff, 0, 4264967296, 32)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
 
-s32 evt_50[] = {
-	0x0002005B, (s32)get_npcname, 0xFE363C8A,
-	0x0005005B, (s32)evt_npc_get_position, 0xFE363C8A, 0xFE363C8D, 0xFE363C8E, 0xFE363C8F,
-	0x0003005B, (s32)evt_npc_entry, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223", (s32)"c_jugem_c",
-	0x0003005B, (s32)evt_npc_set_tribe, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223", (s32)"\203J\203\201\203\211\203}\203\223",
-	0x0001005B, (s32)N_cameraman_on,
-	0x0004005B, (s32)evt_npc_flag_onoff, 0x00000001, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223", 0x00008000,
-	0x0002005B, (s32)evt_sub_get_mapname, 0xFE363C80,
-	0x0002000C, 0xFE363C80, (s32)"bom_02",
-	0x0005005B, (s32)evt_npc_set_position, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223", 0xFFFFFE93, 0x0000001E, 0xFFFFFF56,
-	0x00000021,
-	0x0002000C, 0xFE363C80, (s32)"gor_01",
-	0x0005005B, (s32)evt_npc_set_position, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223", 0x000000A8, 0x0000009A, 0xFFFFFF1B,
-	0x00000021,
-	0x0002000C, 0xFE363C80, (s32)"muj_01",
-	0x0005005B, (s32)evt_npc_set_position, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223", 0x0000010E, 0x00000014, 0xFFFFFF6F,
-	0x00000021,
-	0x0002000C, 0xFE363C80, (s32)"nok_00",
-	0x0005005B, (s32)evt_npc_set_position, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223", 0xFFFFFE7F, 0x00000019, 0xFFFFFF6F,
-	0x00000021,
-	0x0002000C, 0xFE363C80, (s32)"pik_04",
-	0x0005005B, (s32)evt_npc_set_position, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223", 0x00000136, 0x00000531, 0xFFFFFF9C,
-	0x0005005B, (s32)evt_npc_set_position, 0xFE363C8A, 0x00000136, 0x00000531, 0xFFFFFFBF,
-	0x00000021,
-	0x0002000C, 0xFE363C80, (s32)"usu_00",
-	0x0005005B, (s32)evt_npc_set_position, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223", 0x0000010C, 0x00000000, 0xFFFFFF2E,
-	0x00000021,
-	0x0003005B, (s32)evt_set_dir_to_target, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223", (s32)"mario",
-	0x0003005B, (s32)evt_set_dir_to_target, 0xFE363C8A, (s32)"mario",
-	0x0002005B, (s32)evt_mario_set_dir_npc, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223",
-	0x0003005B, (s32)evt_party_set_dir_npc, 0x00000000, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223",
-	0x0003005B, (s32)msg_no, 0x00000009, 0xFE363C80,
-	0x0005005B, (s32)evt_msg_print, 0x00000000, 0xFE363C80, 0x00000000, 0xFE363C8A,
-	0x0004005B, (s32)get_bed, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0004005B, (s32)evt_mario_set_pos, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x00020035, 0xFE363C82, 0x00000005,
-	0x0005005B, (s32)evt_party_set_pos, 0x00000000, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0006005B, (s32)evt_fade_entry, 0x00000009, 0x000003E8, 0x00000000, 0x00000000, 0x00000000,
-	0x0001005B, (s32)evt_fade_end_wait,
-	0x0001000A, 0x000001F4,
-	0x0005005B, (s32)evt_mario_get_pos, 0x00000000, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x00020035, 0xFE363C81, 0x00000064,
-	0x000F005B, (s32)evt_eff, 0x00000000, (s32)"confetti", 0x00000003, 0xFE363C80, 0xFE363C81, 0xFE363C82, 0x00000258, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-	0x0000006B,
-	0x0005005B, (s32)evt_mario_get_pos, 0x00000000, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0006005B, (s32)evt_snd_sfxon_3d, (s32)"SFX_VOICE_MARIO_FIND1", 0xFE363C80, 0xFE363C81, 0xFE363C82, 0x00000000,
-	0x0000006D,
-	0x000C005B, (s32)evt_eff_fukidashi, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-	0x000C005B, (s32)evt_eff_fukidashi, 0x00000003, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-	0x0001000A, 0x000003E8,
-	0x0003005B, (s32)msg_no, 0x0000000A, 0xFE363C80,
-	0x0005005B, (s32)evt_msg_print, 0x00000000, 0xFE363C80, 0x00000000, 0xFE363C8A,
-	0x0004005B, (s32)get_bedside, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0004005B, (s32)evt_mario_mov_pos2, 0xFE363C80, 0xFE363C82, 0xF24BE280,
-	0x0004005B, (s32)get_npctalk, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0004005B, (s32)evt_mario_mov_pos2, 0xFE363C80, 0xFE363C82, 0xF24BE280,
-	0x0002005B, (s32)evt_mario_set_dir_npc, 0xFE363C8A,
-	0x0003005B, (s32)msg_no, 0x0000000B, 0xFE363C80,
-	0x0005005B, (s32)evt_msg_print, 0x00000000, 0xFE363C80, 0x00000000, 0xFE363C8A,
-	0x0002005B, (s32)evt_mario_set_dir_npc, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223",
-	0x0003005B, (s32)evt_party_set_dir_npc, 0x00000000, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223",
-	0x0001000A, 0x0000012C,
-	0x0003005B, (s32)evt_snd_sfxon, (s32)"SFX_EVT_50_HOTEL_SHUTTER1", 0x00000000,
-	0x0006005B, (s32)evt_fade_entry, 0x00000008, 0x00000096, 0x000000FF, 0x000000FF, 0x000000FF,
-	0x0005005B, (s32)evt_mario_get_pos, 0x00000000, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x00020035, 0xFE363C81, 0x00000028,
-	0x0004005B, (s32)evt_fade_set_spot_pos, 0xFE363C80, 0xFE363C81, 0xFE363C82,
-	0x0001005B, (s32)evt_fade_end_wait,
-	0x0006005B, (s32)evt_fade_entry, 0x00000007, 0x00000096, 0x000000FF, 0x000000FF, 0x000000FF,
-	0x0001005B, (s32)evt_fade_end_wait,
-	0x0003005B, (s32)msg_no, 0x0000000C, 0xFE363C80,
-	0x0005005B, (s32)evt_msg_print, 0x00000000, 0xFE363C80, 0x00000000, 0xFE363C8A,
-	0x0002005B, (s32)evt_mario_set_dir_npc, 0xFE363C8A,
-	0x0003005B, (s32)evt_party_set_dir_npc, 0x00000000, 0xFE363C8A,
-	0x0001000A, 0x0000012C,
-	0x0002005B, (s32)evt_sub_get_coin, 0x000000C8,
-	0x0003005B, (s32)msg_no, 0x0000000D, 0xFE363C80,
-	0x0005005B, (s32)evt_msg_print, 0x00000000, 0xFE363C80, 0x00000000, 0xFE363C8A,
-	0x0006005B, (s32)evt_fade_entry, 0x0000000A, 0x000003E8, 0x00000000, 0x00000000, 0x00000000,
-	0x0001005B, (s32)evt_fade_end_wait,
-	0x0002005B, (s32)evt_npc_check_delete, (s32)"\217h\211\256\202\314\203J\203\201\203\211\203}\203\223",
-	0x0005005B, (s32)evt_npc_set_position, 0xFE363C8A, 0xFE363C8D, 0xFE363C8E, 0xFE363C8F,
-	0x0003005B, (s32)evt_set_dir_to_target, 0xFE363C8A, (s32)"mario",
-	0x0006005B, (s32)evt_fade_entry, 0x00000009, 0x000003E8, 0x00000000, 0x00000000, 0x00000000,
-	0x0001005B, (s32)evt_fade_end_wait,
-	0x0002005B, (s32)evt_party_run, 0x00000000,
-	0x0002005B, (s32)evt_mario_key_onoff, 0x00000001,
-	0x00000002,
-	0x00000001,
-};
+EVT_BEGIN(evt_50)
+    CALL(get_npcname, 4264967306)
+    CALL(evt_npc_get_position, 4264967306, 4264967309, 4264967310, 4264967311)
+    CALL(evt_npc_entry, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), STRING("c_jugem_c"))
+    CALL(evt_npc_set_tribe, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), STRING("\203J\203\201\203\211\203}\203\223"))
+    CALL(N_cameraman_on)
+    CALL(evt_npc_flag_onoff, 1, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 32768)
+    CALL(evt_sub_get_mapname, 4264967296)
+    IF_STR_EQUAL(4264967296, STRING("bom_02"))
+        CALL(evt_npc_set_position, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 4294966931, 30, 4294967126)
+    END_IF
+    IF_STR_EQUAL(4264967296, STRING("gor_01"))
+        CALL(evt_npc_set_position, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 168, 154, 4294967067)
+    END_IF
+    IF_STR_EQUAL(4264967296, STRING("muj_01"))
+        CALL(evt_npc_set_position, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 270, 20, 4294967151)
+    END_IF
+    IF_STR_EQUAL(4264967296, STRING("nok_00"))
+        CALL(evt_npc_set_position, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 4294966911, 25, 4294967151)
+    END_IF
+    IF_STR_EQUAL(4264967296, STRING("pik_04"))
+        CALL(evt_npc_set_position, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 310, 1329, 4294967196)
+        CALL(evt_npc_set_position, 4264967306, 310, 1329, 4294967231)
+    END_IF
+    IF_STR_EQUAL(4264967296, STRING("usu_00"))
+        CALL(evt_npc_set_position, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 268, 0, 4294967086)
+    END_IF
+    CALL(evt_set_dir_to_target, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), STRING("mario"))
+    CALL(evt_set_dir_to_target, 4264967306, STRING("mario"))
+    CALL(evt_mario_set_dir_npc, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"))
+    CALL(evt_party_set_dir_npc, 0, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"))
+    CALL(msg_no, 9, 4264967296)
+    CALL(evt_msg_print, 0, 4264967296, 0, 4264967306)
+    CALL(get_bed, 4264967296, 4264967297, 4264967298)
+    CALL(evt_mario_set_pos, 4264967296, 4264967297, 4264967298)
+    ADD(4264967298, 5)
+    CALL(evt_party_set_pos, 0, 4264967296, 4264967297, 4264967298)
+    CALL(evt_fade_entry, 9, 1000, 0, 0, 0)
+    CALL(evt_fade_end_wait)
+    WAIT_MS(500)
+    CALL(evt_mario_get_pos, 0, 4264967296, 4264967297, 4264967298)
+    ADD(4264967297, 100)
+    CALL(evt_eff, 0, STRING("confetti"), 3, 4264967296, 4264967297, 4264967298, 600, 0, 0, 0, 0, 0, 0, 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_get_pos, 0, 4264967296, 4264967297, 4264967298)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1"), 4264967296, 4264967297, 4264967298, 0)
+    END_INLINE_EVENT
+    CALL(evt_eff_fukidashi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_eff_fukidashi, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    WAIT_MS(1000)
+    CALL(msg_no, 10, 4264967296)
+    CALL(evt_msg_print, 0, 4264967296, 0, 4264967306)
+    CALL(get_bedside, 4264967296, 4264967297, 4264967298)
+    CALL(evt_mario_mov_pos2, 4264967296, 4264967298, 4065059456)
+    CALL(get_npctalk, 4264967296, 4264967297, 4264967298)
+    CALL(evt_mario_mov_pos2, 4264967296, 4264967298, 4065059456)
+    CALL(evt_mario_set_dir_npc, 4264967306)
+    CALL(msg_no, 11, 4264967296)
+    CALL(evt_msg_print, 0, 4264967296, 0, 4264967306)
+    CALL(evt_mario_set_dir_npc, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"))
+    CALL(evt_party_set_dir_npc, 0, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"))
+    WAIT_MS(300)
+    CALL(evt_snd_sfxon, STRING("SFX_EVT_50_HOTEL_SHUTTER1"), 0)
+    CALL(evt_fade_entry, 8, 150, 255, 255, 255)
+    CALL(evt_mario_get_pos, 0, 4264967296, 4264967297, 4264967298)
+    ADD(4264967297, 40)
+    CALL(evt_fade_set_spot_pos, 4264967296, 4264967297, 4264967298)
+    CALL(evt_fade_end_wait)
+    CALL(evt_fade_entry, 7, 150, 255, 255, 255)
+    CALL(evt_fade_end_wait)
+    CALL(msg_no, 12, 4264967296)
+    CALL(evt_msg_print, 0, 4264967296, 0, 4264967306)
+    CALL(evt_mario_set_dir_npc, 4264967306)
+    CALL(evt_party_set_dir_npc, 0, 4264967306)
+    WAIT_MS(300)
+    CALL(evt_sub_get_coin, 200)
+    CALL(msg_no, 13, 4264967296)
+    CALL(evt_msg_print, 0, 4264967296, 0, 4264967306)
+    CALL(evt_fade_entry, 10, 1000, 0, 0, 0)
+    CALL(evt_fade_end_wait)
+    CALL(evt_npc_check_delete, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"))
+    CALL(evt_npc_set_position, 4264967306, 4264967309, 4264967310, 4264967311)
+    CALL(evt_set_dir_to_target, 4264967306, STRING("mario"))
+    CALL(evt_fade_entry, 9, 1000, 0, 0, 0)
+    CALL(evt_fade_end_wait)
+    CALL(evt_party_run, 0)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
 

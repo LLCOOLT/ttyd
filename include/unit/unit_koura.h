@@ -2,4 +2,4 @@
 
 #include "dolphin/types.h"
 
-extern s32 unit_koura[];
+extern BattleUnitKind unit_koura;

@@ -49,7 +49,9 @@ typedef struct AnimPoseShapeDraw {
 
 // all of these fall under "AnimPoseData"
 struct AnimData {
-    u8 field_0x0[0x44 - 0]; // 0x0
+    u8 field_0x0[0x24 - 0x0]; // 0x0
+    f32* unk24;             // 0x24
+    u8 field_0x28[0x44 - 0x28]; // 0x28
 };
 
 struct AnimTableEntry {
@@ -153,10 +155,12 @@ typedef struct AnimationPose {
     s32 fileId;                         // 0x10
     s32 animId;                         // 0x14, current animation from AnimPoseData
     OSTime localTime;                   // 0x18
-    u8 field_0x20[0x24 - 0x20];         // 0x20
+    f32 unk20;                          // 0x20
     f32 localFrame;                     // 0x24
     s32 field_0x28;                     // 0x28
-    u8 field_0x2C[0x3C - 0x2C];         // 0x2C
+    s32 unk2C;                          // 0x2C
+    f32 unk30;                          // 0x30
+    u8 field_0x34[0x3C - 0x34];         // 0x34
     s32 lastFrameZero;                  // 0x3C
     f32 lastFrameTime;                  // 0x40
     f32 localTimeRate;                  // 0x44
@@ -178,7 +182,10 @@ typedef struct AnimationPose {
     f32 loopTime;                       // 0x84
     OSTime mLocalTimeInit;              // 0x88
     s32 paperId;                        // 0x90
-    u8 field_0x94[0xE0 - 0x94];         // 0x94
+    u8 field_0x94[0x98 - 0x94];         // 0x94
+    struct smartEntry* unk98;           // 0x98
+    s32 unk9C;                          // 0x9C
+    u8 field_0xA0[0xE0 - 0xA0];         // 0xA0
     void (*gxCallback)(s32 wXluStage);  // 0xE0
     BOOL disableDraw;                   // 0xE4
     s32 materialFlag;                   // 0xE8
@@ -188,7 +195,14 @@ typedef struct AnimationPose {
     f32 paperScaleXZ;                   // 0xF8, paper-mode draw scale
     f32 paperScaleY;                    // 0xFC
     f32 paperOfsY;                      // 0x100, paper-mode Y offset (doubled in battle)
-    u8 field_0x104[0x11C - 0x104];      // 0x104
+    f32 unk104;                         // 0x104
+    f32 unk108;                         // 0x108
+    f32 unk10C;                         // 0x10C
+    f32 unk110;                         // 0x110
+    s16 unk114;                         // 0x114
+    s16 unk116;                         // 0x116
+    s16 unk118;                         // 0x118
+    s16 unk11A;                         // 0x11A
     s32 vivianType;                     // 0x11C
     s32* vivianGroupNo;                 // 0x120
     Mtx matrix;                         // 0x124

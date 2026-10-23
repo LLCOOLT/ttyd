@@ -402,13 +402,38 @@ typedef struct BattleWorkUnitPart {
     Vec mMoveStartPos;                             // 0x7C
     Vec mMoveCurrentPos;                           // 0x88
     Vec mMoveTargetPos;                            // 0x94
-    u8 field_0xA0[0xA4 - 0xA0];                    // 0xA0
+    s32 unkA0;                                     // 0xA0
     f32 mMoveSpeedXZ;                              // 0xA4
     f32 mFallAccel;                                // 0xA8
-    u8 field_0xAC[0xBC - 0xAC];                    // 0xAC
+    f32 unkAC;                                     // 0xAC
+    f32 unkB0;                                     // 0xB0
+    f32 unkB4;                                     // 0xB4
+    f32 unkB8;                                     // 0xB8
     s8 moveDirection;                              // 0xBC
     s8 faceDirection;                              // 0xBD
-    u8 field_0xBE[0x130 - 0xBE];                   // 0xBE
+    u8 field_0xBE[0xC4 - 0xBE];                    // 0xBE
+    s32 unkC4;                                     // 0xC4
+    u8 field_0xC8[0xF8 - 0xC8];                    // 0xC8
+    s32 unkF8;                                     // 0xF8
+    s32 unkFC;                                     // 0xFC
+    s32 unk100;                                    // 0x100
+    s32 unk104;                                    // 0x104
+    s16 unk108;                                    // 0x108
+    s16 unk10A;                                    // 0x10A
+    s16 unk10C;                                    // 0x10C
+    u8 field_0x10E[0x110 - 0x10E];                 // 0x10E
+    s32 unk110;                                    // 0x110
+    s32 unk114;                                    // 0x114
+    s16 unk118;                                    // 0x118
+    s16 unk11A;                                    // 0x11A
+    s16 unk11C;                                    // 0x11C
+    u8 field_0x11E[0x120 - 0x11E];                 // 0x11E
+    s32 unk120;                                    // 0x120
+    s32 unk124;                                    // 0x124
+    s16 unk128;                                    // 0x128
+    s16 unk12A;                                    // 0x12A
+    s16 unk12C;                                    // 0x12C
+    u8 field_0x12E[0x130 - 0x12E];                 // 0x12E
     s32 work[16];                                  // 0x130
     Vec mHitBaseOffset;                            // 0x170, guess
     Vec mHitOffset;                                // 0x17C
@@ -510,6 +535,18 @@ typedef struct ItemDropData {
 } ItemDropData;
 
 // note to self: +4 is near mUnk_HpGauge at 0x1FC
+// movement sound loop state (BtlUnit_SetSeMode / _MoveSoundControlCore)
+typedef struct BecSndWork {
+    const char* name0; // 0x0
+    const char* name1; // 0x4
+    u8 field_0x8[0xE - 0x8];
+    s16 period0;       // 0xE
+    s16 period1;       // 0x10
+    s16 timer;         // 0x12
+    s16 count;         // 0x14
+    s32 sfxId;         // 0x18
+} BecSndWork;
+
 typedef struct BattleUnit {
     s32 unitId;                                  // 0x0
     BattleUnitType initialKind;                  // 0x4
@@ -610,22 +647,46 @@ typedef struct BattleUnit {
     u8 field_0x17C[0x184 - 0x17C];               // 0x17C
     s8 moveDirection;                            // 0x184
     s8 faceDirection;                            // 0x185
-    u8 field_0x186[0x1F8 - 0x186];               // 0x186
+    u8 field_0x186[0x188 - 0x186];               // 0x186 (US 0x18A)
+    BecSndWork moveSnd;                          // 0x188 (US 0x18C)
+    u8 field_0x1A4[0x1C0 - 0x1A4];               // 0x1A4 (US 0x1A8)
+    s32 unk1C0;                                  // 0x1C0 (US 0x1C4)
+    s32 unk1C4;                                  // 0x1C4 (US 0x1C8)
+    s32 unk1C8;                                  // 0x1C8 (US 0x1CC)
+    s32 unk1CC;                                  // 0x1CC (US 0x1D0)
+    s16 unk1D0;                                  // 0x1D0 (US 0x1D4)
+    s16 unk1D2;                                  // 0x1D2 (US 0x1D6)
+    s16 unk1D4;                                  // 0x1D4 (US 0x1D8)
+    u8 field_0x1D6[0x1D8 - 0x1D6];               // 0x1D6 (US 0x1DA)
+    s32 unk1D8;                                  // 0x1D8 (US 0x1DC)
+    s32 unk1DC;                                  // 0x1DC (US 0x1E0)
+    s16 unk1E0;                                  // 0x1E0 (US 0x1E4)
+    s16 unk1E2;                                  // 0x1E2 (US 0x1E6)
+    s16 unk1E4;                                  // 0x1E4 (US 0x1E8)
+    u8 field_0x1E6[0x1E8 - 0x1E6];               // 0x1E6 (US 0x1EA)
+    s32 unk1E8;                                  // 0x1E8 (US 0x1EC)
+    s32 unk1EC;                                  // 0x1EC (US 0x1F0)
+    s16 unk1F0;                                  // 0x1F0 (US 0x1F4)
+    s16 unk1F2;                                  // 0x1F2 (US 0x1F6)
+    s16 unk1F4;                                  // 0x1F4 (US 0x1F8)
+    u8 field_0x1F6[0x1F8 - 0x1F6];               // 0x1F6 (US 0x1FA)
     BattleWorkHpGauge hpGauge;                   // 0x1F8
     s32 work[16];                                // 0x214
     BattleUnitPart* currentTarget;           // 0x254
-    u8 field_0x258[0x25C - 0x258];               // 0x258
+    s32 unk258;                                  // 0x258 (US 0x25C)
     s16 hpDamageCount;                           // 0x25C, number of damaging moves
     u8 field_0x25E[0x260 - 0x25E];               // 0x25E
     s32 totalHpDamageTaken;                      // 0x260
-    u8 field_0x264[0x26C - 0x264];               // 0x264
+    s32 unk264;                                  // 0x264 (US 0x268)
+    s32 unk268;                                  // 0x268 (US 0x26C)
     s8 hpDamageTaken;                            // 0x26C
     s8 fpDamageTaken;                            // 0x26D
-    u8 field_0x26E[0x270 - 0x26E];               // 0x26E
+    s8 unk26E;                                   // 0x26E (US 0x272)
+    s8 unk26F;                                   // 0x26F (US 0x273)
     s32 damagePattern;                           // 0x270, TODO: rename?
     s32 damageCode;                              // 0x274
     BattleUnitToken_Flags mTokenFlags;           // 0x278
-    u8 field_0x27C[0x280 - 0x27C];               // 0x27C
+    s32 unk27C;                                  // 0x27C (US 0x280)
     s32 totalDamageDealt;                        // 0x280, damage this unit dealt as attacker
     s32 initEventId;                             // 0x284
     void* waitEventCode;                         // 0x288
@@ -639,7 +700,15 @@ typedef struct BattleUnit {
     s32 attackEventFlags;                        // 0x2A8, selects/controls the act event in battle_seq (0 by SetEventAttack)
     void* damageEventCode;                       // 0x2AC
     s32 damageEventId;                           // 0x2B0
-    u8 field_0x2B4[0x2DC - 0x2B4];               // 0x2B4
+    s32 unk2B4;                                  // 0x2B4 (US 0x2B8)
+    s32 evtId2B8;                                // 0x2B8 (US 0x2BC)
+    s32 unk2BC;                                  // 0x2BC (US 0x2C0)
+    s32 evtId2C0;                                // 0x2C0 (US 0x2C4)
+    void* actEndEvent;                           // 0x2C4 (US 0x2C8), run when the unit's action ends (battle_seq)
+    s32 evtId;                                   // 0x2C8 (US 0x2CC)
+    u8 field_0x2CC[0x2D0 - 0x2CC];               // 0x2CC (US 0x2D0)
+    s32 unk2D0;                                  // 0x2D0 (US 0x2D4)
+    u8 field_0x2D4[0x2DC - 0x2D4];               // 0x2D4 (US 0x2D8)
     BattleWorkUnitBadgesEquipped badgesEquipped; // 0x2DC
     ItemType heldItem;                           // 0x304, 4 bytes
     ItemDropData* dropTable;                     // 0x308
@@ -648,7 +717,9 @@ typedef struct BattleUnit {
     u8 moveColorLvDisp;                          // 0x30E, current move colour level, ramps toward mMoveColorLv
     u8 field_0x30F;                              // 0x30F
     struct BattleWeapon* countersetWeapon;       // 0x310
-    u8 field_0x314[0x320 - 0x314];               // 0x314
+    u8 field_0x314[0x318 - 0x314];               // 0x314 (US 0x318)
+    struct smartEntry* unk318;                   // 0x318 (US 0x31C)
+    u8 field_0x31C[0x320 - 0x31C];               // 0x31C (US 0x320)
     EffectEntry* sleepEff;                       // 0x320, BSE_Sleep
     EffectEntry* fireEff;                        // 0x324
     EffectEntry* iceEff;                         // 0x328
@@ -714,8 +785,12 @@ typedef struct BattleUnitKind {
 
 typedef struct BattleUnitSetup {
     BattleUnitKind* mUnitKindParams; // 0x0
-    u8 field_4[0x1C - 0x4];          // 0x4
-    s32 field_1C[4];                 // 0x1C, ??? "unitWork" TODO: verify
+    s8 alliance;                     // 0x4, -> BattleUnit.mAlliance (BtlUnit_Entry); 2 for stage objects
+    u8 pad_05[3];                    // 0x5, never read
+    s32 attackPhase;                 // 0x8, -> BattleUnit.attackPhase
+    Vec position;                    // 0xC, -> unit pos/offset pos/home pos
+    s32 hitOffsetX;                  // 0x18, -> every BattleUnitPart.hitOffsetX
+    s32 unitWork[4];                 // 0x1C, -> BattleUnit.work[0..3]
     ItemDropData* itemDropTable;     // 0x2C
 } BattleUnitSetup;
 

@@ -34,20 +34,20 @@ void replace_callback(BattleUnitPart* part, s32 type);
 void replace_disp(CameraId camera, void* param);
 static f32 tanf(f32 x);
 
-__declspec(section ".data") u64 fd_wanawana_negone_one_374;
-__declspec(section ".data") s32 fd_wanawana_neg_one_382[1];
-__declspec(section ".data") s32 fd_wanawana___local_PI_383[1];
-__declspec(section ".data") s32 fd_wanawana___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_wanawana_one_negone_373;
-__declspec(section ".data") s32 fd_wanawana___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_wanawana_one_381[1];
-__declspec(section ".data") u64 fd_wanawana_negone_one_360;
-__declspec(section ".data") s32 fd_wanawana_neg_one_365[1];
-__declspec(section ".data") s32 fd_wanawana___local_PI_366[1];
-__declspec(section ".data") s32 fd_wanawana___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_wanawana_one_negone_359;
-__declspec(section ".data") s32 fd_wanawana___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_wanawana_one_364[1];
+__declspec(section ".data") f32 fd_wanawana_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_wanawana_neg_one_382;
+__declspec(section ".data") f32 fd_wanawana___local_PI_383;
+__declspec(section ".data") f32 fd_wanawana___local_3PIO2_385;
+__declspec(section ".data") f32 fd_wanawana_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_wanawana___local_PIO2_384;
+__declspec(section ".data") f32 fd_wanawana_one_381;
+__declspec(section ".data") f32 fd_wanawana_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_wanawana_neg_one_365;
+__declspec(section ".data") f32 fd_wanawana___local_PI_366;
+__declspec(section ".data") f32 fd_wanawana___local_3PIO2_368;
+__declspec(section ".data") f32 fd_wanawana_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_wanawana___local_PIO2_367;
+__declspec(section ".data") f32 fd_wanawana_one_364;
 BattleUnitKind unit_wanawana;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -65,53 +65,33 @@ static f32 tanf(f32 x) {
     return tan(x);
 }
 
-__declspec(section ".data") u64 fd_wanawana_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_wanawana_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_wanawana_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_wanawana_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_wanawana___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_wanawana___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_wanawana___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_wanawana___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_wanawana_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_wanawana_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_wanawana___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_wanawana___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_wanawana_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_wanawana_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_wanawana_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_wanawana_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_wanawana_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_wanawana_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_wanawana___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_wanawana___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_wanawana___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_wanawana___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_wanawana_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_wanawana_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_wanawana___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_wanawana___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_wanawana_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_wanawana_one_364 = 1.0f;
 
 BattleUnitKind unit_wanawana = {
     199,
@@ -245,7 +225,7 @@ void replace_disp(CameraId camera, void* param) {
 }
 
 void replace_callback(BattleUnitPart* part, s32 type) {
-    WanaWork* wp = *(WanaWork**)((u8*)part->mOwner + BUOFF(0x310));
+    WanaWork* wp = (WanaWork*)part->mOwner->countersetWeapon;
 
     if (wp->ready) {
         Mtx mtx;
@@ -289,9 +269,9 @@ USER_FUNC(replace_evt) {
     GXInitTexObjLOD(&wp->obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     PSMTXIdentity(wp->mtx);
     animGetPtr()->poses[part->poseId].flags |= 0x10;
-    *(void**)((u8*)part + 0x210) = replace_callback;
+    part->dispCallback = replace_callback;
     *(WanaWork**)((u8*)unit + BUOFF(0x310)) = wp;
-    *(smartEntry**)((u8*)unit + BUOFF(0x318)) = wp->tex;
+    unit->unk318 = wp->tex;
     wp->ready = 0;
     dispEntry(CAMERA_SHADOW, 0.0f, 0, replace_disp, wp);
     return EVT_RETURN_DONE;

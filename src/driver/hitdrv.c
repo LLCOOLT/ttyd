@@ -641,7 +641,7 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                     o0 = i0 * 3;
                     o1 = (u16)(even ? i2 : i1) * 3;
                     o2 = (u16)(even ? i1 : i2) * 3;
-                    gqr = (*(s32*)(*(u8**)((u8*)&wp->entries[hit->mapIndex] + 0xA4) + 0x44) << 8) | 7;
+                    gqr = (*(s32*)((u8*)wp->entries[hit->mapIndex].vcdTable + 0x44) << 8) | 7;
                     gqr |= gqr << 16;
                     asm { mtspr GQR5, gqr }
                     a.x = hitDequant(base, o0);

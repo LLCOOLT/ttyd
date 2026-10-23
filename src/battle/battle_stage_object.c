@@ -295,14 +295,14 @@ void BattleStageObjectInit(void) {
 			mapGrpFlagOff(obj->data->name, 1);
 			switch (data->mSpawnSpecialUnitType) {
 				case 0:
-					unit = BtlUnit_Entry((BattleUnitSetup*)_entry_tree_data);
+					unit = BtlUnit_Entry(&_entry_tree_data);
 					unit->stageObjectId = obj->id;
 					obj->mBattleUnitIdx = unit->unitId;
 					BtlUnit_SetPos(unit, obj->mPosition.x, obj->mPosition.y, obj->mPosition.z);
 					BtlUnit_SetHomePos(unit, obj->mPosition.x, obj->mPosition.y, obj->mPosition.z);
 					break;
 				case 1:
-					unit = BtlUnit_Entry((BattleUnitSetup*)_entry_switch_data);
+					unit = BtlUnit_Entry(&_entry_switch_data);
 					unit->stageObjectId = obj->id;
 					obj->mBattleUnitIdx = unit->unitId;
 					BtlUnit_SetPos(unit, obj->mPosition.x, obj->mPosition.y, obj->mPosition.z);
@@ -576,14 +576,14 @@ void BattleStage_DestroyB(void) {
 	}
 }
 
-__declspec(section ".data") u64 battle_stage_object_negone_one_a = 0xBF8000003F800000;
-__declspec(section ".data") u64 fd_battle_stage_object_negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 battle_stage_object_one_negone_a = 0x3F800000BF800000;
-__declspec(section ".data") u64 fd_battle_stage_object_one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 battle_stage_object_negone_one_b = 0xBF8000003F800000;
-__declspec(section ".data") u64 fd_battle_stage_object_negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 battle_stage_object_one_negone_b = 0x3F800000BF800000;
-__declspec(section ".data") u64 fd_battle_stage_object_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 battle_stage_object_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 fd_battle_stage_object_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 battle_stage_object_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 fd_battle_stage_object_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 battle_stage_object_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 fd_battle_stage_object_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 battle_stage_object_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 fd_battle_stage_object_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 BattleWeaponData _nozzle_at_base_mario = {{
 	0, 0, 0, 0, 0x64000002, 0, 0, 0,
@@ -1300,15 +1300,9 @@ BattleStageObjectData _object_spot_light_data[] = {
 	{NULL, 6, 7, {0.0f, 0.0f, 0.0f}, 0, 0},
 };
 
-s32 _entry_tree_data[] = {
-	(s32)&unit_object_tree, 0x02000000, 0x04000005, 0xC47A0000, 0xC47A0000, 0xC47A0000, 0, 0,
-	0, 0, 0, 0,
-};
+BattleUnitSetup _entry_tree_data = {&unit_object_tree, 2, {0}, 0x04000005, {-1000.0f, -1000.0f, -1000.0f}, 0, {0, 0, 0, 0}, NULL};
 
-s32 _entry_switch_data[] = {
-	(s32)&unit_object_switch, 0x02000000, 0x04000005, 0xC47A0000, 0xC47A0000, 0xC47A0000, 0, 0,
-	0, 0, 0, 0,
-};
+BattleUnitSetup _entry_switch_data = {&unit_object_switch, 2, {0}, 0x04000005, {-1000.0f, -1000.0f, -1000.0f}, 0, {0, 0, 0, 0}, NULL};
 
 EVT_BEGIN(_object_turn_event_A1)
     SET_VALUE(LW(9), 0)
@@ -1879,17 +1873,17 @@ USER_FUNC(_fall_frame_wait_unit_ready) {
 				if (evt) {
 					evt->unitId = unit->unitId;
 				}
-				UNIT_FIELD(unit, s32, 0x2C0) = evt->eventId;
+				unit->evtId2C0 = evt->eventId;
 			}
 		}
 	}
 	for (i = 0; i < 64; i++) {
 		unit = BattleGetUnitPtr(wp, i);
 		if (unit && !(unit->flags & 0x80000000)) {
-			if (UNIT_FIELD(unit, s32, 0x2C0) && !evtCheckID(UNIT_FIELD(unit, s32, 0x2C0))) {
-				UNIT_FIELD(unit, s32, 0x2C0) = 0;
+			if (unit->evtId2C0 && !evtCheckID(unit->evtId2C0)) {
+				unit->evtId2C0 = 0;
 			}
-			if (UNIT_FIELD(unit, s32, 0x2C0)) {
+			if (unit->evtId2C0) {
 				return EVT_RETURN_BLOCK;
 			}
 		}
@@ -2558,7 +2552,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
       }
       weapon = &e->weapon.weapon;
       e->kind = 0;
-      if ((((*((u16 *) (&pouchGetPtr()->mStarPowersObtained))) && (!(BattleAudienceBaseGetPtr()->flags & 0x4000))) && (e->type != 6)) && (e->type != 7))
+      if (((pouchGetPtr()->mStarPowersObtained && (!(BattleAudienceBaseGetPtr()->flags & 0x4000))) && (e->type != 6)) && (e->type != 7))
       {
         if (((*((u32 *) (&wp->field_19064[4]))) & 2) || (irand(100) < 10))
         {

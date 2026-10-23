@@ -1,6 +1,8 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "kpa.h"
+#include "evt/evt_npc.h"
+#include "kpa_stage_data.h"
 
 #pragma force_active on
 
@@ -18,118 +20,92 @@ USER_FUNC(evt_npc_setup);
 USER_FUNC(evt_seq_wait);
 USER_FUNC(kpa_status_init);
 
-__declspec(section ".data") u64 fd_kpa_03_negone_one_374;
-__declspec(section ".data") s32 fd_kpa_03_neg_one_382[1];
-__declspec(section ".data") s32 fd_kpa_03___local_PI_383[1];
-__declspec(section ".data") s32 fd_kpa_03___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_kpa_03_one_negone_373;
-__declspec(section ".data") s32 fd_kpa_03___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_kpa_03_one_381[1];
-__declspec(section ".data") u64 fd_kpa_03_negone_one_360;
-__declspec(section ".data") s32 fd_kpa_03_neg_one_365[1];
-__declspec(section ".data") s32 fd_kpa_03___local_PI_366[1];
-__declspec(section ".data") s32 fd_kpa_03___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_kpa_03_one_negone_359;
-__declspec(section ".data") s32 fd_kpa_03___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_kpa_03_one_364[1];
+__declspec(section ".data") f32 fd_kpa_03_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_03_neg_one_382;
+__declspec(section ".data") f32 fd_kpa_03___local_PI_383;
+__declspec(section ".data") f32 fd_kpa_03___local_3PIO2_385;
+__declspec(section ".data") f32 fd_kpa_03_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_03___local_PIO2_384;
+__declspec(section ".data") f32 fd_kpa_03_one_381;
+__declspec(section ".data") f32 fd_kpa_03_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_03_neg_one_365;
+__declspec(section ".data") f32 fd_kpa_03___local_PI_366;
+__declspec(section ".data") f32 fd_kpa_03___local_3PIO2_368;
+__declspec(section ".data") f32 fd_kpa_03_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_03___local_PIO2_367;
+__declspec(section ".data") f32 fd_kpa_03_one_364;
 static s32 kpa_act_stg2_mobj[209];
 s32 kpa_act_stg2_item[85];
 static s32 kpa_fall[41];
 s32 kairyu_evt[38];
 static s32 jumpstand_evt[60];
-static s32 npcEnt[23];
+static NpcSetupInfo npcEnt[1];
 s32 kpa_03_init_evt[44];
 
-__declspec(section ".data") u64 fd_kpa_03_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_kpa_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_kpa_03_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_kpa_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_kpa_03___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_kpa_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_kpa_03___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_kpa_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_kpa_03_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_kpa_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_kpa_03___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_kpa_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_kpa_03_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_kpa_03_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_kpa_03_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_kpa_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_kpa_03_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_kpa_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_kpa_03___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_kpa_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_kpa_03___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_kpa_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_kpa_03_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_kpa_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_kpa_03___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_kpa_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_kpa_03_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_kpa_03_one_364 = 1.0f;
 
 static s32 kpa_act_stg2_mobj[] = {
-    12, -231305600, -230000000, 4, -231126400, -229795200, 12, -231126400,
-    -229744000, 4, -230947200, -230000000, 4, -230947200, -229948800, 4,
-    -230947200, -229897600, 0, -230793600, -229897600, 4, -230742400, -230000000,
-    4, -230742400, -229948800, 4, -230742400, -229897600, 4, -230486400,
-    -229974400, 4, -230435200, -229974400, 0, -230384000, -229974400, 4,
-    -230384000, -229744000, 12, -230307200, -230000000, 4, -230230400, -230000000,
-    4, -230230400, -229948800, 4, -230230400, -229744000, 4, -230230400,
-    -229692800, 4, -230230400, -229641600, 4, -230076800, -230000000, 4,
-    -230076800, -229948800, 4, -230076800, -229744000, 4, -230076800, -229692800,
-    4, -230076800, -229641600, 12, -229948800, -230000000, 4, -229872000,
-    -229974400, 0, -229820800, -229974400, 4, -229769600, -229974400, 0,
-    -229718400, -229974400, 12, -229641600, -230000000, 4, -229488000, -229974400,
-    4, -229436800, -229923200, 4, -229385600, -229923200, 4, -229334400,
-    -229923200, 4, -229283200, -229923200, 4, -229232000, -229923200, 4,
-    -229180800, -229923200, 4, -229129600, -229923200, 4, -229078400, -229974400,
-    4, -229488000, -229692800, 4, -229488000, -229641600, 4, -229436800,
-    -229744000, 4, -229385600, -229744000, 4, -229334400, -229744000, 4,
-    -229283200, -229744000, 4, -229232000, -229744000, 4, -229180800, -229744000,
-    4, -229129600, -229744000, 4, -229078400, -229692800, 4, -229078400,
-    -229641600, 12, -229001600, -230000000, 16, -228822400, -230000000, (s32)jumpstand_evt,
-    4, -228643200, -230000000, 4, -228592000, -230000000, 4, -228592000,
-    -229948800, 4, -228540800, -230000000, 4, -228540800, -229948800, 4,
-    -228540800, -229897600, 4, -228540800, -229744000, 4, -228540800, -229692800,
-    4, -228540800, -229641600, 4, -228489600, -230000000, 4, -228489600,
-    -229948800, 4, -228489600, -229897600, 11, -228464000, -229846400, 4,
-    -228489600, -229744000, 4, -228489600, -229692800, 4, -228489600, -229641600,
-    -1,
+    KPA_OBJ_SANGO(-1275.0f, 0.0f), KPA_OBJ_BRICK_2(-1100.0f, 200.0f), KPA_OBJ_SANGO(-1100.0f, 250.0f),
+    KPA_OBJ_BRICK_2(-925.0f, 0.0f), KPA_OBJ_BRICK_2(-925.0f, 50.0f), KPA_OBJ_BRICK_2(-925.0f, 100.0f),
+    KPA_OBJ_OJAMA_BLK(-775.0f, 100.0f), KPA_OBJ_BRICK_2(-725.0f, 0.0f), KPA_OBJ_BRICK_2(-725.0f, 50.0f),
+    KPA_OBJ_BRICK_2(-725.0f, 100.0f), KPA_OBJ_BRICK_2(-475.0f, 25.0f), KPA_OBJ_BRICK_2(-425.0f, 25.0f),
+    KPA_OBJ_OJAMA_BLK(-375.0f, 25.0f), KPA_OBJ_BRICK_2(-375.0f, 250.0f), KPA_OBJ_SANGO(-300.0f, 0.0f),
+    KPA_OBJ_BRICK_2(-225.0f, 0.0f), KPA_OBJ_BRICK_2(-225.0f, 50.0f), KPA_OBJ_BRICK_2(-225.0f, 250.0f),
+    KPA_OBJ_BRICK_2(-225.0f, 300.0f), KPA_OBJ_BRICK_2(-225.0f, 350.0f), KPA_OBJ_BRICK_2(-75.0f, 0.0f),
+    KPA_OBJ_BRICK_2(-75.0f, 50.0f), KPA_OBJ_BRICK_2(-75.0f, 250.0f), KPA_OBJ_BRICK_2(-75.0f, 300.0f),
+    KPA_OBJ_BRICK_2(-75.0f, 350.0f), KPA_OBJ_SANGO(50.0f, 0.0f), KPA_OBJ_BRICK_2(125.0f, 25.0f),
+    KPA_OBJ_OJAMA_BLK(175.0f, 25.0f), KPA_OBJ_BRICK_2(225.0f, 25.0f), KPA_OBJ_OJAMA_BLK(275.0f, 25.0f),
+    KPA_OBJ_SANGO(350.0f, 0.0f), KPA_OBJ_BRICK_2(500.0f, 25.0f), KPA_OBJ_BRICK_2(550.0f, 75.0f),
+    KPA_OBJ_BRICK_2(600.0f, 75.0f), KPA_OBJ_BRICK_2(650.0f, 75.0f), KPA_OBJ_BRICK_2(700.0f, 75.0f),
+    KPA_OBJ_BRICK_2(750.0f, 75.0f), KPA_OBJ_BRICK_2(800.0f, 75.0f), KPA_OBJ_BRICK_2(850.0f, 75.0f),
+    KPA_OBJ_BRICK_2(900.0f, 25.0f), KPA_OBJ_BRICK_2(500.0f, 300.0f), KPA_OBJ_BRICK_2(500.0f, 350.0f),
+    KPA_OBJ_BRICK_2(550.0f, 250.0f), KPA_OBJ_BRICK_2(600.0f, 250.0f), KPA_OBJ_BRICK_2(650.0f, 250.0f),
+    KPA_OBJ_BRICK_2(700.0f, 250.0f), KPA_OBJ_BRICK_2(750.0f, 250.0f), KPA_OBJ_BRICK_2(800.0f, 250.0f),
+    KPA_OBJ_BRICK_2(850.0f, 250.0f), KPA_OBJ_BRICK_2(900.0f, 300.0f), KPA_OBJ_BRICK_2(900.0f, 350.0f),
+    KPA_OBJ_SANGO(975.0f, 0.0f), KPA_OBJ_JUMPSTAND_RED(1150.0f, 0.0f, (s32)jumpstand_evt),
+    KPA_OBJ_BRICK_2(1325.0f, 0.0f), KPA_OBJ_BRICK_2(1375.0f, 0.0f), KPA_OBJ_BRICK_2(1375.0f, 50.0f),
+    KPA_OBJ_BRICK_2(1425.0f, 0.0f), KPA_OBJ_BRICK_2(1425.0f, 50.0f), KPA_OBJ_BRICK_2(1425.0f, 100.0f),
+    KPA_OBJ_BRICK_2(1425.0f, 250.0f), KPA_OBJ_BRICK_2(1425.0f, 300.0f), KPA_OBJ_BRICK_2(1425.0f, 350.0f),
+    KPA_OBJ_BRICK_2(1475.0f, 0.0f), KPA_OBJ_BRICK_2(1475.0f, 50.0f), KPA_OBJ_BRICK_2(1475.0f, 100.0f),
+    KPA_OBJ_DOKAN_2(1500.0f, 150.0f), KPA_OBJ_BRICK_2(1475.0f, 250.0f), KPA_OBJ_BRICK_2(1475.0f, 300.0f),
+    KPA_OBJ_BRICK_2(1475.0f, 350.0f), KPA_OBJ_END,
 };
 
 s32 kpa_act_stg2_item[] = {
-    0, -231075200, -229782400, 0, -231024000, -229782400, 0, -230896000,
-    -229987200, 0, -230896000, -229936000, 0, -230844800, -229987200, 0,
-    -230844800, -229936000, 0, -230793600, -229987200, 0, -230793600, -229936000,
-    0, -229872000, -230000000, 0, -229820800, -230000000, 0, -229769600,
-    -230000000, 0, -229718400, -230000000, 0, -229385600, -229974400, 0,
-    -229334400, -229974400, 0, -229283200, -229974400, 0, -229232000, -229974400,
-    0, -229180800, -229974400, 0, -229360000, -229846400, 0, -229360000,
-    -229795200, 0, -229308800, -229846400, 0, -229308800, -229795200, 0,
-    -229257600, -229846400, 0, -229257600, -229795200, 0, -229206400, -229846400,
-    0, -229206400, -229795200, 0, -228822400, -229680000, 0, -228822400,
-    -229641600, 0, -228822400, -229603200, -1,
+    KPA_ITEM(-1050.0f, 212.5f), KPA_ITEM(-1000.0f, 212.5f), KPA_ITEM(-875.0f, 12.5f),
+    KPA_ITEM(-875.0f, 62.5f), KPA_ITEM(-825.0f, 12.5f), KPA_ITEM(-825.0f, 62.5f), KPA_ITEM(-775.0f, 12.5f),
+    KPA_ITEM(-775.0f, 62.5f), KPA_ITEM(125.0f, 0.0f), KPA_ITEM(175.0f, 0.0f), KPA_ITEM(225.0f, 0.0f),
+    KPA_ITEM(275.0f, 0.0f), KPA_ITEM(600.0f, 25.0f), KPA_ITEM(650.0f, 25.0f), KPA_ITEM(700.0f, 25.0f),
+    KPA_ITEM(750.0f, 25.0f), KPA_ITEM(800.0f, 25.0f), KPA_ITEM(625.0f, 150.0f), KPA_ITEM(625.0f, 200.0f),
+    KPA_ITEM(675.0f, 150.0f), KPA_ITEM(675.0f, 200.0f), KPA_ITEM(725.0f, 150.0f), KPA_ITEM(725.0f, 200.0f),
+    KPA_ITEM(775.0f, 150.0f), KPA_ITEM(775.0f, 200.0f), KPA_ITEM(1150.0f, 312.5f), KPA_ITEM(1150.0f, 350.0f),
+    KPA_ITEM(1150.0f, 387.5f), KPA_ITEM_END,
 };
 
 static EVT_BEGIN(kpa_fall)
@@ -197,10 +173,8 @@ static EVT_BEGIN(jumpstand_evt)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {0},
 };
 
 EVT_BEGIN(kpa_03_init_evt)

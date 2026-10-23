@@ -16,6 +16,7 @@
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
 #include "party/party_motion.h"
+#include "battle/battle_database_common.h"
 
 typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; Vec ofs; Vec rot; } ZakoGun;
 typedef struct ZakoGunWork { s32 flag; s32 targetId;
@@ -64,22 +65,22 @@ USER_FUNC(zakogun_ext_init3);
 USER_FUNC(zakogun_kanbu_on_ball);
 extern s32 zakogun_get_kanbu_id_evtcmd[];
 
-__declspec(section ".data") u64 negone_one$374;
-__declspec(section ".data") s32 neg_one$382[1];
-__declspec(section ".data") s32 __local_PI$383[1];
-__declspec(section ".data") s32 __local_3PIO2$385[1];
+__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 neg_one$382;
+__declspec(section ".data") f32 __local_PI$383;
+__declspec(section ".data") f32 __local_3PIO2$385;
 __declspec(section ".data") u32 gap_04_000314E4_data[1];
-__declspec(section ".data") u64 one_negone$373;
-__declspec(section ".data") s32 __local_PIO2$384[1];
-__declspec(section ".data") s32 one$381[1];
-__declspec(section ".data") u64 negone_one$360;
-__declspec(section ".data") s32 neg_one$365[1];
-__declspec(section ".data") s32 __local_PI$366[1];
-__declspec(section ".data") s32 __local_3PIO2$368[1];
+__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 __local_PIO2$384;
+__declspec(section ".data") f32 one$381;
+__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 neg_one$365;
+__declspec(section ".data") f32 __local_PI$366;
+__declspec(section ".data") f32 __local_3PIO2$368;
 __declspec(section ".data") u32 gap_04_0003150C_data[1];
-__declspec(section ".data") u64 one_negone$359;
-__declspec(section ".data") s32 __local_PIO2$367[1];
-__declspec(section ".data") s32 one$364[1];
+__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 __local_PIO2$367;
+__declspec(section ".data") f32 one$364;
 BattleUnitKind unit_boss_gundan_zako_group3;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -87,7 +88,7 @@ static __declspec(section ".data") StatusVulnerability regist;
 static __declspec(section ".data") PoseTableEntry pose_table[4];
 static __declspec(section ".data") BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[1];
-s32 weapon_gundan_zako_group3_attack[48];
+BattleWeapon weapon_gundan_zako_group3_attack;
 static s32 init_event[21];
 static s32 damage_event[129];
 static s32 dead_event[136];
@@ -137,57 +138,37 @@ USER_FUNC(zakogun_ext_init3) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 negone_one$374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 neg_one$382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 neg_one$382 = -1.0f;
 
-__declspec(section ".data") s32 __local_PI$383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 __local_PI$383 = 3.1415927f;
 
-__declspec(section ".data") s32 __local_3PIO2$385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 __local_3PIO2$385 = 4.712389f;
 
 __declspec(section ".data") u32 gap_04_000314E4_data[1] = {0};
 
-__declspec(section ".data") u64 one_negone$373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 __local_PIO2$384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 __local_PIO2$384 = 1.5707964f;
 
-__declspec(section ".data") s32 one$381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 one$381 = 1.0f;
 
-__declspec(section ".data") u64 negone_one$360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 neg_one$365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 neg_one$365 = -1.0f;
 
-__declspec(section ".data") s32 __local_PI$366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 __local_PI$366 = 3.1415927f;
 
-__declspec(section ".data") s32 __local_3PIO2$368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 __local_3PIO2$368 = 4.712389f;
 
 __declspec(section ".data") u32 gap_04_0003150C_data[1] = {0};
 
-__declspec(section ".data") u64 one_negone$359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 __local_PIO2$367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 __local_PIO2$367 = 1.5707964f;
 
-__declspec(section ".data") s32 one$364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 one$364 = 1.0f;
 
 BattleUnitKind unit_boss_gundan_zako_group3 = {
     102,
@@ -278,13 +259,44 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_gundan_zako_group3", "c_zako_n", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3000009, 0, pose_table},
 };
 
-s32 weapon_gundan_zako_group3_attack[] = {
-    0, 0, 0, 0, VERSION_PICK(1677721600, 1677721602), 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    5, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536887300, 770, 0, 135, 2047, 4,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gundan_zako_group3_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+#ifdef VERSION_G8ME01
+    2, // superguardsAllowed
+#else
+    0, // superguardsAllowed
+#endif
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20004004, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    4, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static EVT_BEGIN(init_event)
@@ -337,64 +349,130 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-static s32 dead_event[] = {
-    262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 1, 65627, (s32)zakogun_dead3, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_ENEMY_DIE1_1", -250000000, 0, -250000000, 65545, 48,
-    110, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_ENEMY_DIE1_2", -250000000, 0, -250000000,
-    65541, 20, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    196699, (s32)evt_sub_random, 300, -29999997, 131126, -29999997, 150, 131125,
-    -30000000, -29999997, 196699, (s32)evt_sub_random, 30, -29999997, 131125, -29999999,
-    -29999997, 131122, -29999998, 75, 983131, (s32)evt_eff, 0, (s32)"kemuri_test",
-    4, -30000000, -29999999, -29999998, -229999181, 0, 0, 0,
-    0, 0, 0, 0, 65545, 1, 6, 112,
-    196699, (s32)btlevtcmd_GetCoin, -2, -30000000, 131163, (s32)btlevtcmd_StoreCoin, -30000000, 196699,
-    (s32)btlevtcmd_GetExp, -2, -30000000, 131163, (s32)btlevtcmd_StoreExp, -30000000, 327771, (s32)btlevtcmd_GetPos,
-    -2, -29999997, -29999999, -29999998, 327771, (s32)_add_star_point_disp_offset, -2, -29999997,
-    -29999999, -29999998, 983131, (s32)evt_eff, (s32)"", (s32)"star_point", 0, -29999997,
-    -29999999, -29999998, -30000000, 0, 0, 0, 0, 0,
-    0, 0, 65545, 20, 262235, (s32)btlevtcmd_CheckDamageCode, -2, 1024,
-    -30000000, 131097, -30000000, 0, 196699, (s32)btlevtcmd_KillUnit, -2, 0,
-    32, 196699, (s32)btlevtcmd_KillUnit, -2, 2, 33, 2, 1,
-};
+static EVT_BEGIN(dead_event)
+    CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
+    CALL(zakogun_dead3)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_ENEMY_DIE1_1"), -250000000, 0, -250000000)
+    WAIT_FRAMES(48)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_ENEMY_DIE1_2"), -250000000, 0, -250000000)
+        LOOP(20)
+            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            CALL(evt_sub_random, 300, LW(3))
+            SUBTRACT(LW(3), 150)
+            ADD(LW(0), LW(3))
+            CALL(evt_sub_random, 30, LW(3))
+            ADD(LW(1), LW(3))
+            SET_VALUE(LW(2), 75)
+            CALL(evt_eff, 0, STRING("kemuri_test"), 4, LW(0), LW(1), LW(2), FLOAT(0.7998047f), 0, 0, 0, 0, 0, 0, 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetCoin, -2, LW(0))
+    CALL(btlevtcmd_StoreCoin, LW(0))
+    CALL(btlevtcmd_GetExp, -2, LW(0))
+    CALL(btlevtcmd_StoreExp, LW(0))
+    CALL(btlevtcmd_GetPos, -2, LW(3), LW(1), LW(2))
+    CALL(_add_star_point_disp_offset, -2, LW(3), LW(1), LW(2))
+    CALL(evt_eff, STRING(""), STRING("star_point"), 0, LW(3), LW(1), LW(2), LW(0), 0, 0, 0, 0, 0, 0, 0)
+    WAIT_FRAMES(20)
+    CALL(btlevtcmd_CheckDamageCode, -2, 1024, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_KillUnit, -2, 0)
+    ELSE
+        CALL(btlevtcmd_KillUnit, -2, 2)
+    END_IF
+    RETURN
+EVT_END()
 
-static s32 attack_event[] = {
-    262235, (s32)btlevtcmd_SetUnitWork, -2, 0, 0, 131122, -29999991, (s32)weapon_gundan_zako_group3_attack,
-    196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000,
-    -29999991, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991, -29999997, -29999996, 131096, -29999997,
-    -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16, -30000000, 131097, -30000000,
-    0, 65630, (s32)subsetevt_confuse_flustered, 2, 33, 65540, 99, 33,
-    131163, (s32)btlevtcmd_WeaponAftereffect, -29999991, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996,
-    65627, (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991, 131163, (s32)zakogun_get_kanbu_id_evtcmd,
-    -29999995, 196699, (s32)btlevtcmd_CheckActStatus, -29999995, -29999988, 131097, -29999988, 0,
-    131163, (s32)zakogun_get_kanbu_id_evtcmd, -29999995, 65647, -29999985, 65545, 10, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -29999995, 1, (s32)"W_1", 327771, (s32)btlevtcmd_GetPos, -29999995, -30000000,
-    -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999995, -30000000, 50, 524379,
-    (s32)btlevtcmd_MovePosition, -29999995, -30000000, -29999999, -29999998, 60, -1, 0,
-    262235, (s32)btlevtcmd_AnimeChangePose, -29999995, 1, (s32)"S_1", 112, 33, 110,
-    65545, 32, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BOSS_TEAM_3RD_ADHERE1", 0, 112, 65627,
-    (s32)zakogun_attack3_1, 131097, -29999988, 0, 65631, -29999985, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -29999995, 1, (s32)"A_1A", 393307, (s32)btlevtcmd_snd_se, -29999995, (s32)"SFX_BOSS_KANBU_JUMP1", -250000000,
-    0, -29999987, 327771, (s32)btlevtcmd_JumpSetting, -29999995, 0, -229993856, -229999693,
-    458843, (s32)btlevtcmd_JumpPosition, -29999995, 0, 100, 0, 0, -1,
-    262235, (s32)btlevtcmd_AnimeChangePose, -29999995, 1, (s32)"S_1", 131163, (s32)evt_snd_sfxoff, -29999987,
-    33, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131163, (s32)zakogun_set_target_id, -29999997,
-    131097, -29999988, 0, 65647, -29999986, 131163, (s32)zakogun_get_kanbu_id_evtcmd, -29999995,
-    262235, (s32)btlevtcmd_AnimeChangePose, -29999995, 1, (s32)"R_2", 65541, 0, 65627,
-    (s32)zakogun_kanbu_on_ball, 65545, 1, 6, 112, 33, 110, 65630,
-    (s32)hit_check_event, 112, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BOSS_TEAM_3RD_ROUND1", -29999987, 131163, (s32)zakogun_attack3_2,
-    -29999987, 131097, -29999988, 0, 65631, -29999986, 65631, -29999985,
-    33, 131097, -29999988, 0, 107, 131163, (s32)zakogun_get_kanbu_id_evtcmd, -29999995,
-    262235, (s32)btlevtcmd_AnimeChangePose, -29999995, 1, (s32)"A_1A", 327771, (s32)btlevtcmd_GetPos, -29999995,
-    -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_JumpSetting, -29999995, 30, 0,
-    -229999693, 458843, (s32)btlevtcmd_JumpPosition, -29999995, -30000000, 0, -29999998, 30,
-    -1, 262235, (s32)btlevtcmd_AnimeChangePose, -29999995, 1, (s32)"S_1", 196699, (s32)btlevtcmd_ChangeFaceDirection,
-    -29999995, 1, 262235, (s32)btlevtcmd_AnimeChangePose, -29999995, 1, (s32)"R_1", 327771,
-    (s32)btlevtcmd_GetHomePos, -29999995, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetMoveSpeed, -29999995,
-    -229993856, 524379, (s32)btlevtcmd_MovePosition, -29999995, -30000000, -29999999, -29999998, 0,
-    -1, 0, 262235, (s32)btlevtcmd_AnimeChangePose, -29999995, 1, (s32)"S_1", 131163,
-    (s32)btlevtcmd_ResetFaceDirection, -29999995, 109, 33, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BOSS_TEAM_3RD_ADHERE2", 0,
-    65627, (s32)zakogun_attack3_3, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+static EVT_BEGIN(attack_event)
+    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_group3_attack))
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(zakogun_get_kanbu_id_evtcmd, LW(5))
+    CALL(btlevtcmd_CheckActStatus, LW(5), LW(12))
+    IF_INT_NOT_EQUAL(LW(12), 0)
+        CALL(zakogun_get_kanbu_id_evtcmd, LW(5))
+        BEGIN_SIBLING_EVENT_GET_ID(LW(15))
+            WAIT_FRAMES(10)
+            CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("W_1"))
+            CALL(btlevtcmd_GetPos, LW(5), LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_FaceDirectionSub, LW(5), LW(0), 50)
+            CALL(btlevtcmd_MovePosition, LW(5), LW(0), LW(1), LW(2), 60, -1, 0)
+            CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("S_1"))
+        END_SIBLING_EVENT
+    END_IF
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(32)
+        CALL(evt_snd_sfxon, STRING("SFX_BOSS_TEAM_3RD_ADHERE1"), 0)
+    END_SIBLING_EVENT
+    CALL(zakogun_attack3_1)
+    IF_INT_NOT_EQUAL(LW(12), 0)
+        DELETE_EVENT(LW(15))
+        CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("A_1A"))
+        CALL(btlevtcmd_snd_se, LW(5), STRING("SFX_BOSS_KANBU_JUMP1"), -250000000, 0, LW(13))
+        CALL(btlevtcmd_JumpSetting, LW(5), 0, FLOAT(6.0f), FLOAT(0.2998047f))
+        CALL(btlevtcmd_JumpPosition, LW(5), 0, 100, 0, 0, -1)
+        CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("S_1"))
+        CALL(evt_snd_sfxoff, LW(13))
+    END_IF
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    CALL(zakogun_set_target_id, LW(3))
+    IF_INT_NOT_EQUAL(LW(12), 0)
+        BEGIN_SIBLING_EVENT_GET_ID(LW(14))
+            CALL(zakogun_get_kanbu_id_evtcmd, LW(5))
+            CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("R_2"))
+            LOOP(0)
+                CALL(zakogun_kanbu_on_ball)
+                WAIT_FRAMES(1)
+            END_LOOP
+        END_SIBLING_EVENT
+    END_IF
+    BEGIN_SIBLING_EVENT
+        CALL_CHILD(hit_check_event)
+    END_SIBLING_EVENT
+    CALL(evt_snd_sfxon, STRING("SFX_BOSS_TEAM_3RD_ROUND1"), LW(13))
+    CALL(zakogun_attack3_2, LW(13))
+    IF_INT_NOT_EQUAL(LW(12), 0)
+        DELETE_EVENT(LW(14))
+        DELETE_EVENT(LW(15))
+    END_IF
+    IF_INT_NOT_EQUAL(LW(12), 0)
+        BEGIN_INLINE_EVENT
+            CALL(zakogun_get_kanbu_id_evtcmd, LW(5))
+            CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("A_1A"))
+            CALL(btlevtcmd_GetPos, LW(5), LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_JumpSetting, LW(5), 30, 0, FLOAT(0.2998047f))
+            CALL(btlevtcmd_JumpPosition, LW(5), LW(0), 0, LW(2), 30, -1)
+            CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("S_1"))
+            CALL(btlevtcmd_ChangeFaceDirection, LW(5), 1)
+            CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("R_1"))
+            CALL(btlevtcmd_GetHomePos, LW(5), LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_SetMoveSpeed, LW(5), FLOAT(6.0f))
+            CALL(btlevtcmd_MovePosition, LW(5), LW(0), LW(1), LW(2), 0, -1, 0)
+            CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("S_1"))
+            CALL(btlevtcmd_ResetFaceDirection, LW(5))
+        END_INLINE_EVENT
+    END_IF
+    CALL(evt_snd_sfxon, STRING("SFX_BOSS_TEAM_3RD_ADHERE2"), 0)
+    CALL(zakogun_attack3_3)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 void zakogun_ext_main3(void) {
     s32 i;

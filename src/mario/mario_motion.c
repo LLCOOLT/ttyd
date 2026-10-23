@@ -4,6 +4,8 @@
 #include "mario/mario_motion.h"
 #include <string.h>
 #include "mot/mot_jump.h"
+#include "party.h"
+#include "driver/npcdrv.h"
 
 #define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 #define JP0(m) MW(m, 0x7c, f32)
@@ -86,7 +88,6 @@ void mot_fall_roll(void);
 void marioSlitForceCancel(void);
 s32 marioGetPartyId(void);
 s32 marioGetExtraPartyId(void);
-void* partyGetPtr(s32 index);
 f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2);
 f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2);
 void movePos(f32* x, f32* z, f32 speed, f32 angle);
@@ -272,14 +273,14 @@ void marioChgJumpStandMotion(f32 v) {
 	MarioWork* mario = marioGetPtr();
 	camFollowYOn();
 	if (marioChkSts(0x10)) {
-		mario->unk2B8 = v;
+		mario->mot.jump.standHeight = v;
 		effKemuriEntry(0, mario->position.x, mario->position.y, mario->position.z, 0.0f);
 		marioChgMot(MARIO_MOTION_JUMP_STAND);
 	} else if (mario->currMotionId == MARIO_MOTION_YOSHI) {
-		mario->unk2B8 = v;
+		mario->mot.jump.standHeight = v;
 		yoshi_jumpStand();
 	} else {
-		mario->unk2B8 = v;
+		mario->mot.jump.standHeight = v;
 		marioChgMot(MARIO_MOTION_JUMP_STAND);
 	}
 }
@@ -317,8 +318,8 @@ BOOL marioChkItemGetMotion(void) {
 BOOL marioChkTalkable(void) {
 	MarioWork* mario = marioGetPtr();
 	BOOL ret = FALSE;
-	void* party = partyGetPtr(marioGetPartyId());
-	if (party != NULL && (s32)MW(party, 0x31, u8) == 4 && (MW(party, 0x0, u32) & 0x100)) {
+	PartyEntry* party = partyGetPtr(marioGetPartyId());
+	if (party != NULL && (s32)MW(party, 0x31, u8) == 4 && (party->flags & 0x100)) {
 		return FALSE;
 	}
 	switch (mario->currMotionId) {
@@ -369,7 +370,7 @@ void marioBoots(void) {
 
 void marioMotion(void) {
 	MarioWork* mario = marioGetPtr();
-	mario->field_0x1FC = NULL;
+	mario->hitobjHammer = NULL;
 	do {
 		marioMotTbl[mario->currMotionId].main();
 	} while (mario->trigFlags & 1);
@@ -579,7 +580,7 @@ void marioJump(void) {
 	}
 	prev = JP0(mario);
 	marioMakeJumpPara();
-	if (JP0(mario) > 0.0f && mario->airTimer >= 4 && !(MW(mario, 0x246, u16) & 0x100)) {
+	if (JP0(mario) > 0.0f && mario->airTimer >= 4 && !(mario->buttonHold & 0x100)) {
 		JP0(mario) += -0.526f;
 	}
 	if (JP0(mario) <= 0.0f) {
@@ -659,7 +660,7 @@ void marioFall(void) {
 #ifdef VERSION_G8ME01
 	if (!(mario->trigFlags & 0x200000) && (mario->trigFlags & 0x100000)) {
 		rub = marioGetRub(0x100, &a, &b, &c);
-		if (MW(mario, 0x246, u16) & 0x100) {
+		if (mario->buttonHold & 0x100) {
 			mario->trigFlags |= 0x400000;
 		}
 	}
@@ -744,7 +745,7 @@ void marioLandOn(void) {
 		mario->hitobjJumpFrom = NULL;
 		return;
 	}
-	MW(mario, 0x2b0, f32) = __fabsf(distABf(mario->position.x, mario->position.z, mario->lastGroundPos.x, mario->lastGroundPos.z));
+	mario->mot.jump.dist = __fabsf(distABf(mario->position.x, mario->position.z, mario->lastGroundPos.x, mario->lastGroundPos.z));
 	attr = hitGetAttr(mario->hitobjStandOn);
 	if (mario->currMotionId != MARIO_MOTION_DAMAGE && (attr & 0x200)) {
 		set_damage_root_ypos(mario->position.y);
@@ -800,7 +801,7 @@ void marioLandOn(void) {
 		if (!(mario->dispFlags & 0x1000000)) {
 #ifdef VERSION_G8ME01
 			if (marioPriCheckJabara()) {
-				if (MW(mario, 0x246, u16) & 0x100) {
+				if (mario->buttonHold & 0x100) {
 					marioChgMot(MARIO_MOTION_STAY);
 				} else {
 					marioChgMot(MARIO_MOTION_WALK);
@@ -864,9 +865,9 @@ void mot_talk(void) {
 		if (npc == NULL) {
 			marioAdjustMoveDir();
 		} else {
-			camYaw = MW(camGetPtr(4), 0x114, f32);
+			camYaw = camGetPtr(4)->viewYaw;
 			angle = revise360(270.0f - (s32)(10.0f * (angleABf(mario->position.x, mario->position.z,
-				MW(npc, 0x8c, f32), MW(npc, 0x94, f32)) - camYaw) + 0.5f) / 10.0f);
+				((NpcEntry*)npc)->position.x, ((NpcEntry*)npc)->position.z) - camYaw) + 0.5f) / 10.0f);
 			if (angle >= 90.0f && angle <= 270.0f) {
 				mario->moveDirection = toMovedir(90.0f);
 				mario->directionView = mario->moveDirection;
@@ -886,7 +887,7 @@ void mot_talk(void) {
 			marioChgPose(MW(fbat, 0x10c, const char*));
 		}
 		if (!strcmp(mario->animName, "M_I_2")) {
-			MW(mario, 0x48, s32) = 60;
+			mario->multiTimer = 60;
 			mario->currSubMotionId = 10;
 		}
 	}
@@ -894,7 +895,7 @@ void mot_talk(void) {
 		case 0:
 			return;
 		case 10:
-			if (--MW(mario, 0x48, s32) > 0) {
+			if (--mario->multiTimer > 0) {
 				break;
 			}
 			marioChgPose("M_S_1");
@@ -1020,7 +1021,7 @@ s32 marioRollChgChk(void) {
 	if (mario->flags & 0x80000000) {
 		return 0;
 	}
-	if (!(MW(mario, 0x246, u16) & 0x20)) {
+	if (!(mario->buttonHold & 0x20)) {
 		return 0;
 	}
 	if (marioGetRub(0x20, &a, &b, &c) != TRUE) {
@@ -1035,7 +1036,7 @@ s32 marioRollChgChk(void) {
 	if (marioSlitChkWallAround() || marioCreviceWallChk(mario->position)) {
 		return 0;
 	}
-	if (MW(mario, 0x246, u16) & 0x20) {
+	if (mario->buttonHold & 0x20) {
 		marioChgMot(MARIO_MOTION_ROLL);
 		return MARIO_MOTION_ROLL;
 	}
@@ -1066,17 +1067,17 @@ void mot_kaze(void) {
 		mario->multiTimer = 0;
 		mario->currSubMotionId = 0;
 		mario->baseSpeed = 0.0f;
-		MW(mario, 0x2a0, f32) = 0.0f;
+		mario->mot.kaze.spinSpeed = 0.0f;
 		marioChgPose("M_P_2");
 	}
 	switch ((s32)mario->currSubMotionId) {
 		case 0:
-			MW(mario, 0x2a0, f32) += 5.0f;
-			if (MW(mario, 0x2a0, f32) > 60.0f) {
-				MW(mario, 0x2a0, f32) = 60.0f;
+			mario->mot.kaze.spinSpeed += 5.0f;
+			if (mario->mot.kaze.spinSpeed > 60.0f) {
+				mario->mot.kaze.spinSpeed = 60.0f;
 			}
-			mario->displayDirection = revise360(mario->displayDirection + MW(mario, 0x2a0, f32));
-			if (MW(mario, 0x246, u16) & 0x10) {
+			mario->displayDirection = revise360(mario->displayDirection + mario->mot.kaze.spinSpeed);
+			if (mario->buttonHold & 0x10) {
 				break;
 			}
 			mario->displayDirectionTarget = marioChkBackAngle(mario->displayDirection) ? 180.0f : 0.0f;
@@ -1084,13 +1085,13 @@ void mot_kaze(void) {
 			mario->multiTimer = 10;
 			break;
 		case 100:
-			MW(mario, 0x2a0, f32) -= 6.0f;
-			if (MW(mario, 0x2a0, f32) < 0.0f) {
-				MW(mario, 0x2a0, f32) = 0.0f;
+			mario->mot.kaze.spinSpeed -= 6.0f;
+			if (mario->mot.kaze.spinSpeed < 0.0f) {
+				mario->mot.kaze.spinSpeed = 0.0f;
 				mario->dispFlags &= ~0x100;
 				marioChgMot(MARIO_MOTION_STAY);
 			}
-			mario->displayDirection = revise360(mario->displayDirection + MW(mario, 0x2a0, f32));
+			mario->displayDirection = revise360(mario->displayDirection + mario->mot.kaze.spinSpeed);
 			mario->displayDirectionTarget = marioChkBackAngle(mario->displayDirection) ? 180.0f : 0.0f;
 			break;
 	}
@@ -1144,7 +1145,7 @@ void mot_bottomless(void) {
 		mario->baseSpeed = 0.0f;
 		mario->airTimer = 0;
 		mario->currSubMotionId = 0;
-		if (MW(mario, 0xe4, f32) < -2000.0f) {
+		if (mario->returnPos.y < -2000.0f) {
 			if (!strcmp(gp->currentMapName, "win_03")) {
 				x = 250.0f;
 				y = 13.0f;
@@ -1159,9 +1160,9 @@ void mot_bottomless(void) {
 				z = mario->position.z;
 			}
 		} else {
-			x = MW(mario, 0xe0, f32);
-			y = MW(mario, 0xe4, f32);
-			z = MW(mario, 0xe8, f32);
+			x = mario->returnPos.x;
+			y = mario->returnPos.y;
+			z = mario->returnPos.z;
 		}
 		pos = (Vec){x, 300.0f + y, z};
 		step = 10.0f;
@@ -1173,16 +1174,16 @@ void mot_bottomless(void) {
 			pos.y += step;
 		}
 		mario->position.y = pos.y;
-		MW(mario, 0x2ac, f32) = 8.0f;
-		MW(mario, 0x48, s32) = (s16)(distABf(x, z, mario->position.x, mario->position.z) / MW(mario, 0x2ac, f32));
-		MW(mario, 0x2b0, f32) = angleABf(mario->position.x, mario->position.z, x, z);
+		mario->mot.bottomless.speed = 8.0f;
+		mario->multiTimer = (s16)(distABf(x, z, mario->position.x, mario->position.z) / mario->mot.bottomless.speed);
+		mario->mot.bottomless.angle = angleABf(mario->position.x, mario->position.z, x, z);
 	}
-	switch (MW(mario, 0x44, s32)) {
+	switch ((s32)mario->currSubMotionId) {
 		case 0:
-			movePos(&mario->position.x, &mario->position.z, MW(mario, 0x2ac, f32), MW(mario, 0x2b0, f32));
+			movePos(&mario->position.x, &mario->position.z, mario->mot.bottomless.speed, mario->mot.bottomless.angle);
 			mario->camTarget.x = mario->position.x;
 			mario->camTarget.z = mario->position.z;
-			if (--MW(mario, 0x48, s32) > 0) {
+			if (--mario->multiTimer > 0) {
 				break;
 			}
 			mario->currSubMotionId = 2;
@@ -1211,10 +1212,10 @@ void mot_bottomless(void) {
 				break;
 			}
 		case 10:
-			MW(mario, 0x48, s32) = 50;
+			mario->multiTimer = 50;
 			mario->currSubMotionId = 11;
 		case 11:
-			if (--MW(mario, 0x48, s32) > 0) {
+			if (--mario->multiTimer > 0) {
 				break;
 			}
 			pouchAddHP(-1);
@@ -1224,10 +1225,10 @@ void mot_bottomless(void) {
 				break;
 			}
 			marioChgPose("M_U_3");
-			MW(mario, 0x48, s32) = 12;
+			mario->multiTimer = 12;
 			mario->currSubMotionId = 12;
 		case 12:
-			if (--MW(mario, 0x48, s32) > 0) {
+			if (--mario->multiTimer > 0) {
 				break;
 			}
 			marioChgMot(MARIO_MOTION_STAY);
@@ -1238,7 +1239,7 @@ void mot_bottomless(void) {
 
 void mot_forceReset(void) {
 	MarioWork* mario = marioGetPtr();
-	void* party;
+	PartyEntry* party;
 	if (mario->trigFlags & 1) {
 		mario->trigFlags &= ~1;
 		mario->currSubMotionId = 0;
@@ -1253,11 +1254,11 @@ void mot_forceReset(void) {
 			marioReset();
 			party = partyGetPtr(marioGetPartyId());
 			if (party) {
-				MW(party, 0x58, Vec) = mario->position;
+				party->position = mario->position;
 			}
 			party = partyGetPtr(marioGetExtraPartyId());
 			if (party) {
-				MW(party, 0x58, Vec) = mario->position;
+				party->position = mario->position;
 			}
 			break;
 	}

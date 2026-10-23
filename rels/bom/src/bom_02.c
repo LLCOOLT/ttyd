@@ -11,6 +11,10 @@
 #include "evt/evt_door.h"
 #include "evt/evt_mario.h"
 #include "bom.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_shop.h"
+#include "data_tables.h"
+#include "mario/mario_pouch.h"
 
 static USER_FUNC(anim_tevcallback);
 static USER_FUNC(anim_tevcallback_mobj);
@@ -102,41 +106,41 @@ USER_FUNC(evt_win_item_select);
 static USER_FUNC(yami_view);
 extern s32 envSetYami[];
 
-__declspec(section ".data") u64 fd_bom_02_negone_one_374;
-__declspec(section ".data") s32 fd_bom_02_neg_one_382[1];
-__declspec(section ".data") s32 fd_bom_02___local_PI_383[1];
-__declspec(section ".data") s32 fd_bom_02___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_bom_02_one_negone_373;
-__declspec(section ".data") s32 fd_bom_02___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_bom_02_one_381[1];
-__declspec(section ".data") u64 fd_bom_02_negone_one_360;
-__declspec(section ".data") s32 fd_bom_02_neg_one_365[1];
-__declspec(section ".data") s32 fd_bom_02___local_PI_366[1];
-__declspec(section ".data") s32 fd_bom_02___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_bom_02_one_negone_359;
-__declspec(section ".data") s32 fd_bom_02___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_bom_02_one_364[1];
+__declspec(section ".data") f32 fd_bom_02_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_bom_02_neg_one_382;
+__declspec(section ".data") f32 fd_bom_02___local_PI_383;
+__declspec(section ".data") f32 fd_bom_02___local_3PIO2_385;
+__declspec(section ".data") f32 fd_bom_02_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_bom_02___local_PIO2_384;
+__declspec(section ".data") f32 fd_bom_02_one_381;
+__declspec(section ".data") f32 fd_bom_02_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_bom_02_neg_one_365;
+__declspec(section ".data") f32 fd_bom_02___local_PI_366;
+__declspec(section ".data") f32 fd_bom_02___local_3PIO2_368;
+__declspec(section ".data") f32 fd_bom_02_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_bom_02___local_PIO2_367;
+__declspec(section ".data") f32 fd_bom_02_one_364;
 __declspec(section ".data") s32 evt_ie1_door_1[12];
 __declspec(section ".data") s32 evt_ie1_wall[12];
-__declspec(section ".data") s32 ie1_npc[2];
+__declspec(section ".data") const char* ie1_npc[2];
 __declspec(section ".data") s32 evt_ie1_door_open[12];
 s32 evt_ie1_door_close[14];
-s32 ie1_door[18];
+DoorParam ie1_door;
 __declspec(section ".data") s32 evt_ie2_door_1[12];
 __declspec(section ".data") s32 evt_ie2_wall[12];
-__declspec(section ".data") s32 ie2_npc[2];
+__declspec(section ".data") const char* ie2_npc[2];
 __declspec(section ".data") s32 evt_ie2_door_open[12];
 s32 evt_ie2_door_close[14];
-s32 ie2_door[18];
+DoorParam ie2_door;
 __declspec(section ".data") s32 evt_ie3_door_1[12];
 __declspec(section ".data") s32 evt_ie3_door_2[12];
 __declspec(section ".data") s32 evt_ie3_wall[12];
-__declspec(section ".data") s32 ie3_npc[3];
+__declspec(section ".data") const char* ie3_npc[3];
 __declspec(section ".data") s32 evt_ie3_door_open[12];
 s32 evt_ie3_door_close[14];
-__declspec(section ".data") s32 ie3_item[2];
-s32 ie3_door[18];
-static s32 bero_entry_data[30];
+__declspec(section ".data") const char* ie3_item[2];
+DoorParam ie3_door;
+static BeroEntry bero_entry_data[2];
 static s32 evt_kime_pose[52];
 static s32 evt_taihou[190];
 s32 urotuku_white[190];
@@ -174,63 +178,43 @@ s32 iri_25_white_bed[363];
 s32 evt_white_bed[505];
 static s32 kiza_talk[28];
 static s32 kiza_entry[30];
-static s32 npcEnt[207];
-static __declspec(section ".data") s32 obj_list[12];
-static __declspec(section ".data") s32 goods_list[12];
-static s32 trade_list[26];
-static s32 shopper_data[38];
+static NpcSetupInfo npcEnt[9];
+static __declspec(section ".data") ShopObj obj_list[6];
+static __declspec(section ".data") ShopItem goods_list[6];
+static ShopDb trade_list[13];
+static ShopperData35 shopper_data;
 static s32 sekai_yami_evt[459];
 static s32 minnnanokoe_evt[183];
-static s32 kino_dt[38];
+static KinopioData kino_dt;
 s32 bom_02_init_evt[312];
 
-__declspec(section ".data") u64 fd_bom_02_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_bom_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_bom_02_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_bom_02_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_bom_02___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_bom_02___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_bom_02___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_bom_02___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_bom_02_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_bom_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_bom_02___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_bom_02___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_bom_02_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_bom_02_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_bom_02_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_bom_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_bom_02_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_bom_02_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_bom_02___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_bom_02___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_bom_02___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_bom_02___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_bom_02_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_bom_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_bom_02___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_bom_02___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_bom_02_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_bom_02_one_364 = 1.0f;
 
 __declspec(section ".data") EVT_BEGIN(evt_ie1_door_1)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -244,8 +228,9 @@ __declspec(section ".data") EVT_BEGIN(evt_ie1_wall)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 ie1_npc[] = {
-    (s32)/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5", 0,
+__declspec(section ".data") const char* ie1_npc[] = {
+    /*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5",
+    NULL,
 };
 
 __declspec(section ".data") EVT_BEGIN(evt_ie1_door_open)
@@ -262,10 +247,24 @@ EVT_BEGIN(evt_ie1_door_close)
     RETURN
 EVT_END()
 
-s32 ie1_door[] = {
-    0, 3, 1, (s32)"S_ie1_door", (s32)"A_ie1_door1", (s32)"A_ie1_door1_u", (s32)"S_ie1_soto", 0,
-    (s32)"S_ie1_naka", 0, (s32)evt_ie1_door_1, 0, (s32)evt_ie1_wall, (s32)ie1_npc, 0, 0,
-    (s32)evt_ie1_door_open, (s32)evt_ie1_door_close,
+DoorParam ie1_door = {
+    0, // field_0x0
+    3, // type
+    1, // se
+    "S_ie1_door", // mapobj
+    "A_ie1_door1", // hitIn
+    "A_ie1_door1_u", // hitOut
+    "S_ie1_soto", // mapIn
+    NULL, // hitInIn
+    "S_ie1_naka", // mapOut
+    NULL, // hitOutOut
+    evt_ie1_door_1, // evtIn
+    NULL, // evtOut
+    evt_ie1_wall, // evtWall
+    ie1_npc, // npcs
+    NULL, NULL, // mobjs..items
+    evt_ie1_door_open, // evtOpen
+    evt_ie1_door_close, // evtClose
 };
 
 __declspec(section ".data") EVT_BEGIN(evt_ie2_door_1)
@@ -280,8 +279,9 @@ __declspec(section ".data") EVT_BEGIN(evt_ie2_wall)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 ie2_npc[] = {
-    (s32)/*"店員"*/"\x93\x58\x88\xF5", 0,
+__declspec(section ".data") const char* ie2_npc[] = {
+    /*"店員"*/"\x93\x58\x88\xF5",
+    NULL,
 };
 
 __declspec(section ".data") EVT_BEGIN(evt_ie2_door_open)
@@ -298,10 +298,24 @@ EVT_BEGIN(evt_ie2_door_close)
     RETURN
 EVT_END()
 
-s32 ie2_door[] = {
-    0, 3, 1, (s32)"S_ie2_door", (s32)"A__ie2_door2", (s32)"A__ie2_door2_u", (s32)"S_ie2_soto", 0,
-    (s32)"S_ie2_naka", 0, (s32)evt_ie2_door_1, 0, (s32)evt_ie2_wall, (s32)ie2_npc, 0, 0,
-    (s32)evt_ie2_door_open, (s32)evt_ie2_door_close,
+DoorParam ie2_door = {
+    0, // field_0x0
+    3, // type
+    1, // se
+    "S_ie2_door", // mapobj
+    "A__ie2_door2", // hitIn
+    "A__ie2_door2_u", // hitOut
+    "S_ie2_soto", // mapIn
+    NULL, // hitInIn
+    "S_ie2_naka", // mapOut
+    NULL, // hitOutOut
+    evt_ie2_door_1, // evtIn
+    NULL, // evtOut
+    evt_ie2_wall, // evtWall
+    ie2_npc, // npcs
+    NULL, NULL, // mobjs..items
+    evt_ie2_door_open, // evtOpen
+    evt_ie2_door_close, // evtClose
 };
 
 __declspec(section ".data") EVT_BEGIN(evt_ie3_door_1)
@@ -322,8 +336,10 @@ __declspec(section ".data") EVT_BEGIN(evt_ie3_wall)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 ie3_npc[] = {
-    (s32)/*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67", (s32)/*"ボムヘイG"*/"\x83\x7B\x83\x80\x83\x77\x83\x43\x47", 0,
+__declspec(section ".data") const char* ie3_npc[] = {
+    /*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67",
+    /*"ボムヘイG"*/"\x83\x7B\x83\x80\x83\x77\x83\x43\x47",
+    NULL,
 };
 
 __declspec(section ".data") EVT_BEGIN(evt_ie3_door_open)
@@ -340,21 +356,50 @@ EVT_BEGIN(evt_ie3_door_close)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 ie3_item[] = {
-    (s32)"item_00", 0,
+__declspec(section ".data") const char* ie3_item[] = {
+    "item_00",
+    NULL,
 };
 
-s32 ie3_door[] = {
-    0, 3, 1, (s32)"S_ie3_door", (s32)"A_ie3_door3_u", (s32)"A_ie3_door3", (s32)"S_ie3_soto", 0,
-    (s32)"S_ie3_naka", 0, (s32)evt_ie3_door_1, (s32)evt_ie3_door_2, (s32)evt_ie3_wall, (s32)ie3_npc, 0, (s32)ie3_item,
-    (s32)evt_ie3_door_open, (s32)evt_ie3_door_close,
+DoorParam ie3_door = {
+    0, // field_0x0
+    3, // type
+    1, // se
+    "S_ie3_door", // mapobj
+    "A_ie3_door3_u", // hitIn
+    "A_ie3_door3", // hitOut
+    "S_ie3_soto", // mapIn
+    NULL, // hitInIn
+    "S_ie3_naka", // mapOut
+    NULL, // hitOutOut
+    evt_ie3_door_1, // evtIn
+    evt_ie3_door_2, // evtOut
+    evt_ie3_wall, // evtWall
+    ie3_npc, // npcs
+    NULL, // mobjs
+    ie3_item, // items
+    evt_ie3_door_open, // evtOpen
+    evt_ie3_door_close, // evtClose
 };
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"bom_01", (s32)"e_bero", 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"bom_01", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(evt_kime_pose)
@@ -798,7 +843,7 @@ static __declspec(section ".data") EVT_BEGIN(init_murabito_h)
 EVT_END()
 
 __declspec(section ".data") s32 iri_26_item_tbl[] = {
-    229, -1,
+    ITEM_HONEY_CANDY, -1,
 };
 
 static EVT_BEGIN(talk_murabito_h)
@@ -946,43 +991,57 @@ EVT_BEGIN(mario_jump)
     RETURN
 EVT_END()
 #else
+/* JP: the script continues in mario_jump_tail (separate symbol); its last CALL is split across the two */
 s32 mario_jump[] = {
-    65627, (s32)evt_mario_cam_keep_on, 327771, (s32)evt_mario_get_pos, 0, -29999990, -29999989, -29999988,
-    262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67", 32, 327771, (s32)evt_npc_get_position, (s32)/*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67",
-    -30000000, -29999999, -29999998, 131125, -29999999, 20, 393307, (s32)evt_snd_sfxon_3d,
-    (s32)"SFX_VOICE_MARIO_FLD_JUMP1", -29999990, -29999989, -29999988, 0, 458843, (s32)evt_mario_jump_pos, -30000000,
-    -29999999, -29999998, 500, 2, -1000, 107, 131126, -30000000,
-    20, 131126, -29999998, 20, 983131, (s32)evt_eff, 0, (s32)"nice",
-    0, -30000000, -29999999, -29999998, 0, 0, 0, 0,
-    0, 0, 0, 0, 109, 983131, (s32)evt_eff, 0,
-    (s32)"small_star", 3, -30000000, -29999999, -29999998, 0, -1, 0,
-    3, 0, 0, 0, 0, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG7_WHITE_DAMAGED1",
-    -30000000, -29999999, -29999998, 0, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG7_WHITE_NICE1", -30000000,
-    -29999999, -29999998, 0, 107, 327771, (s32)evt_cam_shake, 4, -230000000,
-    -229999990, 100, 109, 131125, -29999998, -10, 393307, (s32)evt_snd_sfxon_3d,
-    (s32)"SFX_VOICE_MARIO_FLD_JUMP4", -29999990, -29999989, -29999988, 0, 458843, (s32)evt_mario_jump_pos, -30000000,
-    -29999999, -29999998, 500, 2, -1000, 107, 131126, -30000000,
-    20, 131126, -29999998, 20, 983131, (s32)evt_eff, 0, (s32)"nice",
-    1, -30000000, -29999999, -29999998, 0, 0, 0, 0,
-    0, 0, 0, 0, 109, 983131, (s32)evt_eff, 0,
-    (s32)"small_star", 3, -30000000, -29999999, -29999998, 0, -1, 0,
-    3, 0, 0, 0, 0, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG7_WHITE_DAMAGED1",
-    -30000000, -29999999, -29999998, 0, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG7_WHITE_GOOD1", -30000000,
-    -29999999, -29999998, 0, 107, 327771, (s32)evt_cam_shake, 4, -230000000,
-    -229999990, 100, 109, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_VOICE_MARIO_FLD_JUMP2", -29999990, -29999989,
-    -29999988, 0, 458843, (s32)evt_mario_jump_pos, 335, 30, -130, 500,
-    2, -1000, 262235, (s32)evt_npc_flag_onoff, 0,
+    CALL(evt_mario_cam_keep_on)
+    CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67"), 32)
+    CALL(evt_npc_get_position, STRING(/*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67"), LW(0), LW(1), LW(2))
+    ADD(LW(1), 20)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP1"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_mario_jump_pos, LW(0), LW(1), LW(2), 500, 2, -1000)
+    BEGIN_INLINE_EVENT
+        SUBTRACT(LW(0), 20)
+        SUBTRACT(LW(2), 20)
+        CALL(evt_eff, 0, STRING("nice"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+    END_INLINE_EVENT
+    CALL(evt_eff, 0, STRING("small_star"), 3, LW(0), LW(1), LW(2), 0, -1, 0, 3, 0, 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_WHITE_DAMAGED1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_WHITE_NICE1"), LW(0), LW(1), LW(2), 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 100)
+    END_INLINE_EVENT
+    ADD(LW(2), -10)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP4"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_mario_jump_pos, LW(0), LW(1), LW(2), 500, 2, -1000)
+    BEGIN_INLINE_EVENT
+        SUBTRACT(LW(0), 20)
+        SUBTRACT(LW(2), 20)
+        CALL(evt_eff, 0, STRING("nice"), 1, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+    END_INLINE_EVENT
+    CALL(evt_eff, 0, STRING("small_star"), 3, LW(0), LW(1), LW(2), 0, -1, 0, 3, 0, 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_WHITE_DAMAGED1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_WHITE_GOOD1"), LW(0), LW(1), LW(2), 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 100)
+    END_INLINE_EVENT
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP2"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_mario_jump_pos, 335, 30, -130, 500, 2, -1000)
+    EVT_CMD(4, OPCODE_USER_FUNC), (s32)evt_npc_flag_onoff, 0,
 };
 #endif
 
 #ifndef VERSION_G8ME01  // US: this tail is part of mario_jump (US script above)
 __declspec(section ".data") s32 mario_jump_tail[] = {
-    (s32)/*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67", 32, 65627, (s32)evt_mario_cam_keep_off, 2, 1,
+    STRING(/*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67"), 32, /* rest of mario_jump's evt_npc_flag_onoff call */
+    CALL(evt_mario_cam_keep_off)
+    RETURN
+    OPCODE_END_SCRIPT,
 };
 #endif
 
 __declspec(section ".data") s32 iri_25_item_tbl[] = {
-    109, -1,
+    ITEM_PACKAGE, -1,
 };
 
 static EVT_BEGIN(talk_white)
@@ -1336,58 +1395,144 @@ static EVT_BEGIN(kiza_entry)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"村長"*/"\x91\xBA\x92\xB7", 1073743360, 0, (s32)init_soncho, 0, (s32)talk_soncho, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ボムヘイE"*/"\x83\x7B\x83\x80\x83\x77\x83\x43\x45",
-    1073743360, 0, (s32)init_murabito_e, 0, (s32)talk_murabito_e, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"ボムヘイF"*/"\x83\x7B\x83\x80\x83\x77\x83\x43\x46", 1073743360,
-    0, (s32)init_murabito_f, 0, (s32)talk_murabito_f, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"ボムヘイG"*/"\x83\x7B\x83\x80\x83\x77\x83\x43\x47", 1073743360, 0,
-    (s32)init_murabito_g, 0, (s32)talk_murabito_g, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"ボムヘイH"*/"\x83\x7B\x83\x80\x83\x77\x83\x43\x48", 1073743360, 0, (s32)init_murabito_h,
-    0, (s32)talk_murabito_h, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"ボムヘイI"*/"\x83\x7B\x83\x80\x83\x77\x83\x43\x49", 1073743360, 0, (s32)init_murabito_i, 0,
-    (s32)talk_murabito_i, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"店員"*/"\x93\x58\x88\xF5", 1073743360, 0, (s32)init_tenin, 0, (s32)talk_tenin,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67", 1090519040, 0, (s32)init_white, 0, (s32)talk_white, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"村長"*/"\x91\xBA\x92\xB7", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_soncho, // initEvent
+        NULL, // regularEvent
+        talk_soncho, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ボムヘイE"*/"\x83\x7B\x83\x80\x83\x77\x83\x43\x45", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_murabito_e, // initEvent
+        NULL, // regularEvent
+        talk_murabito_e, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ボムヘイF"*/"\x83\x7B\x83\x80\x83\x77\x83\x43\x46", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_murabito_f, // initEvent
+        NULL, // regularEvent
+        talk_murabito_f, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ボムヘイG"*/"\x83\x7B\x83\x80\x83\x77\x83\x43\x47", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_murabito_g, // initEvent
+        NULL, // regularEvent
+        talk_murabito_g, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ボムヘイH"*/"\x83\x7B\x83\x80\x83\x77\x83\x43\x48", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_murabito_h, // initEvent
+        NULL, // regularEvent
+        talk_murabito_h, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ボムヘイI"*/"\x83\x7B\x83\x80\x83\x77\x83\x43\x49", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_murabito_i, // initEvent
+        NULL, // regularEvent
+        talk_murabito_i, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"店員"*/"\x93\x58\x88\xF5", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        init_tenin, // initEvent
+        NULL, // regularEvent
+        talk_tenin, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ホワイト"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67", // name
+        0x41000000, // flags
+        0, // reactionFlags
+        init_white, // initEvent
+        NULL, // regularEvent
+        talk_white, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
-static __declspec(section ".data") s32 obj_list[] = {
-    (s32)"S_item_01", (s32)"A_item_01", (s32)"S_item_02", (s32)"A_item_02", (s32)"S_item_03", (s32)"A_item_03", (s32)"S_item_04", (s32)"A_item_04",
-    (s32)"S_item_05", (s32)"A_item_05", (s32)"S_item_06", (s32)"A_item_06",
+static __declspec(section ".data") ShopObj obj_list[] = {
+    {"S_item_01", "A_item_01"},
+    {"S_item_02", "A_item_02"},
+    {"S_item_03", "A_item_03"},
+    {"S_item_04", "A_item_04"},
+    {"S_item_05", "A_item_05"},
+    {"S_item_06", "A_item_06"},
 };
 
-static __declspec(section ".data") s32 goods_list[] = {
-    130, 30, 131, 6, 137, 15, 140, 12,
-    155, 20, 149, 15,
+static __declspec(section ".data") ShopItem goods_list[] = {
+    {ITEM_SHOOTING_STAR, 30},
+    {ITEM_ICE_STORM, 6},
+    {ITEM_RUIN_POWDER, 15},
+    {ITEM_STOPWATCH, 12},
+    {ITEM_MAPLE_SYRUP, 20},
+    {ITEM_SUPER_SHROOM, 15},
 };
 
-static s32 trade_list[] = {
-    130, 983040, 131, 196608, 137, 458752, 140, 393216,
-    155, 655360, 149, 458752, 132, 524288, 173, 917504,
-    224, 3932160, 192, 1310720, 220, 983040, 228, 1572864,
-    0, 0,
+static ShopDb trade_list[] = {
+    {ITEM_SHOOTING_STAR, 15, 0},
+    {ITEM_ICE_STORM, 3, 0},
+    {ITEM_RUIN_POWDER, 7, 0},
+    {ITEM_STOPWATCH, 6, 0},
+    {ITEM_MAPLE_SYRUP, 10, 0},
+    {ITEM_SUPER_SHROOM, 7, 0},
+    {ITEM_FIRE_FLOWER, 8, 0},
+    {ITEM_HOT_SAUCE, 14, 0},
+    {ITEM_SPICY_PASTA, 60, 0},
+    {ITEM_SPICY_SOUP, 20, 0},
+    {ITEM_INKY_SAUCE, 15, 0},
+    {ITEM_FIRE_POP, 24, 0},
+    {0},
 };
 
-static s32 shopper_data[] = {
-    (s32)/*"店員"*/"\x93\x58\x88\xF5", 0, 0, (s32)"shop_00", (s32)"shop_01", (s32)"shop_02", (s32)"shop_03", (s32)"shop_04",
-    (s32)"shop_05", (s32)"shop_06", (s32)"shop_07", (s32)"shop_08", (s32)"shop_09", (s32)"shop_10", (s32)"shop_11", (s32)"shop_12",
-    (s32)"shop_13", (s32)"shop_14", (s32)"shop_15", (s32)"shop_16", (s32)"shop_17", (s32)"shop_18", (s32)"shop_19", (s32)"shop_20",
-    (s32)"shop_21", (s32)"shop_22", (s32)"shop_23", (s32)"shop_24", (s32)"shop_25", (s32)"shop_26", (s32)"shop_27", (s32)"shop_28",
-    (s32)"shop_29", (s32)"shop_30", (s32)"shop_31", (s32)"shop_32", (s32)"shop_33", (s32)"shop_34",
+static ShopperData35 shopper_data = {
+    /*"店員"*/"\x93\x58\x88\xF5", // name
+    NULL, NULL, // fook_evt..buy_evt
+    {"shop_00", "shop_01", "shop_02", "shop_03", "shop_04", "shop_05", "shop_06", "shop_07", "shop_08", "shop_09", "shop_10", "shop_11", "shop_12", "shop_13", "shop_14", "shop_15", "shop_16", "shop_17", "shop_18", "shop_19", "shop_20", "shop_21", "shop_22", "shop_23", "shop_24", "shop_25", "shop_26", "shop_27", "shop_28", "shop_29", "shop_30", "shop_31", "shop_32", "shop_33", "shop_34"}, // msgs
 };
 
 void envSetYamiView(Mtx mtx);
@@ -1586,12 +1731,18 @@ static EVT_BEGIN(minnnanokoe_evt)
     RETURN
 EVT_END()
 
-static s32 kino_dt[] = {
-    198, -1009483776, 1112014848, -1018691584, 15, -1014071296, 1110966272, -1017184256,
-    -1014464512, 1106247680, -1020198912, -1008828416, 1132527616, 1118830592, -1012236288, 1119354880,
-    -1019281408, -1043857408, -1012924416, 1106247680, -1025114112, (s32)/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5", (s32)"yado_00", (s32)"yado_01",
-    (s32)"yado_02", (s32)"yado_03", (s32)"yado_04", (s32)"yado_05", (s32)"yado_06", (s32)"yado_07", (s32)"yado_08", (s32)"yado_09",
-    (s32)"yado_10", (s32)"yado_11", (s32)"yado_12", (s32)"yado_13", 0, 0,
+static KinopioData kino_dt = {
+    198, // breakfastItem
+    {-425.0f, 50.0f, -200.0f}, // breakfastPos
+    15, // ryoukin
+    {-285.0f, 46.0f, -223.0f}, // bed
+    {-273.0f, 30.0f, -177.0f}, // bedside
+    {-445.0f, 258.0f, 88.0f, -341.0f, 92.0f, -191.0f}, // cam
+    -25.0f, // bedDeg
+    {-320.0f, 30.0f, -115.0f}, // npcTalk
+    /*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5", // npcName
+    {"yado_00", "yado_01", "yado_02", "yado_03", "yado_04", "yado_05", "yado_06", "yado_07", "yado_08", "yado_09", "yado_10", "yado_11", "yado_12", "yado_13"}, // msg
+    NULL, NULL, // toBedEvt..fromBedEvt
 };
 
 EVT_BEGIN(bom_02_init_evt)
@@ -1622,13 +1773,13 @@ EVT_BEGIN(bom_02_init_evt)
         CASE_BETWEEN(352, 357)
         CALL_CHILD(PTR(kiza_entry))
     END_SWITCH
-    CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(shopper_data), PTR(trade_list))
-    CALL(evt_kinopio_setup, PTR(kino_dt))
-    SET_VALUE(LW(0), PTR(ie1_door))
+    CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(&shopper_data), PTR(trade_list))
+    CALL(evt_kinopio_setup, PTR(&kino_dt))
+    SET_VALUE(LW(0), PTR(&ie1_door))
     CALL_CHILD(PTR(evt_door_entry))
-    SET_VALUE(LW(0), PTR(ie2_door))
+    SET_VALUE(LW(0), PTR(&ie2_door))
     CALL_CHILD(PTR(evt_door_entry))
-    SET_VALUE(LW(0), PTR(ie3_door))
+    SET_VALUE(LW(0), PTR(&ie3_door))
     CALL_CHILD(PTR(evt_door_entry))
     SET_VALUE(LW(0), STRING("group3713047r"))
     SPAWN_EVENT(PTR(evt_bom_01_karakara))

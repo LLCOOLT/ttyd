@@ -213,14 +213,18 @@ void effCrystalMain(EffectEntry* effect) {
     dispEntry(work->camera, dispCalcZ(&position), 2, (DispCallback)effCrystalDisp, effect);
 }
 
-u32 size108x108_tex32x32_vtx[] = {
-    0xFFCAFFCA, 0x00010000, 0x00000000, 0x00FF0036, 0xFFCA0001, 0x04000000, 0x000000FF,
-    0x00360036, 0x00010400, 0x04000000, 0x00FFFFCA, 0x00360001, 0x00000400, 0x000000FF,
+effN64Vtx size108x108_tex32x32_vtx[] = {
+    {-54, -54, 1, 0, 0, 0, 0, 0, 255},
+    {54, -54, 1, 1024, 0, 0, 0, 0, 255},
+    {54, 54, 1, 1024, 1024, 0, 0, 0, 255},
+    {-54, 54, 1, 0, 1024, 0, 0, 0, 255},
 };
 
-u32 size100x100_tex32x32_vtx[] = {
-    0xFFCEFFCE, 0xFFFF0000, 0x00000000, 0x00FF0032, 0xFFCEFFFF, 0x04000000, 0x000000FF,
-    0x00320032, 0xFFFF0400, 0x04000000, 0x00FFFFCE, 0x0032FFFF, 0x00000400, 0x000000FF,
+effN64Vtx size100x100_tex32x32_vtx[] = {
+    {-50, -50, -1, 0, 0, 0, 0, 0, 255},
+    {50, -50, -1, 1024, 0, 0, 0, 0, 255},
+    {50, 50, -1, 1024, 1024, 0, 0, 0, 255},
+    {-50, 50, -1, 0, 1024, 0, 0, 0, 255},
 };
 
 void effCrystalDisp(CameraId cameraId, EffectEntry* effect) {
@@ -266,14 +270,14 @@ void effCrystalDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXConcat(tmp, rot, rot);
         GXLoadPosMtxImm(rot, GX_PNMTX0);
         GXSetCurrentMtx(0);
-        effSetVtxDescN64((effN64Vtx*)size108x108_tex32x32_vtx);
+        effSetVtxDescN64(size108x108_tex32x32_vtx);
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
         PSMTXRotRad(rot, 'z', 0.017453292f * (f32)(-frame * 8));
         PSMTXConcat(tmp, rot, rot);
         GXLoadPosMtxImm(rot, GX_PNMTX0);
         GXSetCurrentMtx(0);
-        effSetVtxDescN64((effN64Vtx*)size100x100_tex32x32_vtx);
+        effSetVtxDescN64(size100x100_tex32x32_vtx);
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
     } else {
@@ -292,7 +296,7 @@ void effCrystalDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadTexObj(&texObj, GX_TEXMAP0);
         GXLoadPosMtxImm(tmp, GX_PNMTX0);
         GXSetCurrentMtx(0);
-        effSetVtxDescN64((effN64Vtx*)size100x100_tex32x32_vtx);
+        effSetVtxDescN64(size100x100_tex32x32_vtx);
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
     }

@@ -96,8 +96,8 @@ void _btlcmd_UpdateSelectWeaponTable(BattleWork* wp, s32 type);
 s32 _getJumpIconId(void);
 s32 _getHammerIconId(void);
 
-s32 _jump_badge_table[8] = {0xF0, 0xF1, 0xF4, 0xF5, 0xF6, 0xF3, 0xF2, 0x14C};
-s32 _hammer_badge_table[9] = {0xF7, 0xFA, 0xF9, 0xFB, 0xFD, 0xFC, 0xF8, 0x14D, 0x14E};
+s32 _jump_badge_table[8] = {ITEM_POWER_JUMP, ITEM_MULTIBOUNCE, ITEM_SHRINK_STOMP, ITEM_SLEEPY_STOMP, ITEM_SOFT_STOMP, ITEM_TORNADO_JUMP, ITEM_POWER_BOUNCE, ITEM_MEGA_JUMP};
+s32 _hammer_badge_table[9] = {ITEM_POWER_SMASH, ITEM_PIERCING_BLOW, ITEM_HAMMER_THROW, ITEM_HEAD_RATTLE, ITEM_ICE_SMASH, ITEM_FIRE_DRIVE, ITEM_QUAKE_HAMMER, ITEM_MEGA_SMASH, ITEM_MEGA_QUAKE};
 
 EVT_BEGIN(_btl_cmd_error_msg_event)
     CALL(_get_msg, LW(0))
@@ -156,7 +156,7 @@ void _btlcmd_MakeActClassTable(BattleWork* wp) {
 			cmd->act[0].enabled = 0;
 			cmd->act[0].disableReason = 3;
 		}
-		if (info->field_4 & 0x1000000) {
+		if (info->battleFlags & 0x1000000) {
 			cmd->act[0].enabled = 0;
 			cmd->act[0].disableReason = 3;
 		}
@@ -218,7 +218,7 @@ void _btlcmd_MakeActClassTable(BattleWork* wp) {
 			cmd->act[num].enabled = 0;
 			cmd->act[num].disableReason = 3;
 		}
-		if (info->field_4 & 0x2000000) {
+		if (info->battleFlags & 0x2000000) {
 			cmd->act[num].enabled = 0;
 			cmd->act[num].disableReason = 3;
 		}
@@ -268,7 +268,7 @@ void _btlcmd_MakeActClassTable(BattleWork* wp) {
 		cmd->act[num].icon = ICON_14C;
 		num++;
 	}
-	if (unit->currentKind == UNIT_MARIO && *(u16*)&pouch->mStarPowersObtained != 0) {
+	if (unit->currentKind == UNIT_MARIO && pouch->mStarPowersObtained != 0) {
 		cmd->act[num].type = 4;
 		cmd->act[num].enabled = 1;
 		cmd->act[num].disableReason = 0;
@@ -614,7 +614,7 @@ s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
 			}
 			break;
 		case 4: {
-			u16 starPowers = *(u16*)&pouch->mStarPowersObtained;
+			u16 starPowers = pouch->mStarPowersObtained;
 			s32 j;
 			for (j = 0; j < 16; j++) {
 				if ((starPowers & (1 << j)) && superActionTable[j]) {
@@ -768,14 +768,14 @@ void _btlcmd_MakeOperationTable(BattleWork* wp) {
 			cmd->operation[0].enabled = 0;
 			cmd->operation[0].disableReason = 3;
 		}
-		if (info->field_4 & 0x4000000) {
+		if (info->battleFlags & 0x4000000) {
 			cmd->operation[0].enabled = 0;
 			cmd->operation[0].disableReason = 3;
 		}
 		cmd->operation[0].cost = 0;
 		num = 1;
 	}
-	if (*(u16*)&pouch->mStarPowersObtained != 0) {
+	if (pouch->mStarPowersObtained != 0) {
 		cmd->operation[num].type = 5;
 		cmd->operation[num].enabled = 1;
 		cmd->operation[num].name = msgSearch("btl_cmd_op_appeal");
@@ -858,7 +858,7 @@ void _btlcmd_MakeOperationTable(BattleWork* wp) {
 		cmd->operation[idx].enabled = 0;
 		cmd->operation[idx].disableReason = 3;
 	}
-	if (wp->fbatInfo->setup->field_4 & 0x10) {
+	if (wp->fbatInfo->setup->battleFlags & 0x10) {
 		cmd->operation[idx].enabled = 0;
 		cmd->operation[idx].disableReason = 3;
 	}
@@ -1144,21 +1144,21 @@ s32 BattleCommandInput(BattleWork* work) {
 	again:
 		switch (state = cmd->unk0) {
 		case 0:
-			if (CMD_U8(wp, BWOFF(0x1c74))) {
+			if (wp->commandMenu.unk558) {
 				switch (CMDX_S32(0x540)) {
 				case 11:
 				case 12:
 					CMDX_S32(0x540) = CMDX_S32(0x544);
 					break;
 				}
-				if (CMD_U8(wp, BWOFF(0x1c74)) == 2) {
-					CMD_U8(wp, BWOFF(0x1c74)) = 0;
+				if (wp->commandMenu.unk558 == 2) {
+					wp->commandMenu.unk558 = 0;
 				}
 			}
-			CMD_U8(cmd, 0x551) = 0;
+			cmd->unk551 = 0;
 			wp->dispFlags |= 1;
 			BtlUnit_SetCommandAnimPose(unit);
-			if ((s8)CMD_U8(unit, BUOFF(0x20)) >= 5 && (s8)CMD_U8(unit, BUOFF(0x20)) <= 9) {
+			if ((s8)(u8)unit->moveState >= 5 && (s8)(u8)unit->moveState <= 9) {
 				BattleStageOnLightInCommand();
 				BattleStageOffLightFriendInCommand();
 				BattleStageOffLightEnemyInCommand();
@@ -1193,8 +1193,8 @@ s32 BattleCommandInput(BattleWork* work) {
 		case 5:
 		case 6:
 			type = CMDX_S32(0x540);
-			if ((type == 0 && (CMD_S32(wp, BWOFF(0xef4)) & 0x200)) ||
-				(type == 1 && (CMD_S32(wp, BWOFF(0xef4)) & 0x400))) {
+			if ((type == 0 && ((s32)wp->flags & 0x200)) ||
+				(type == 1 && ((s32)wp->flags & 0x400))) {
 				_btlcmd_SelectWeaponDecide(wp, type, 0);
 				BattleCommandDisplay_TargetSelectMenuSetup(wp);
 				cmd->unk0 = 10;
@@ -1202,7 +1202,7 @@ s32 BattleCommandInput(BattleWork* work) {
 				break;
 			}
 			if (state == 5) {
-				if (type == 2 && (CMD_U8(unit, BUOFF(0x2ef)) || CMD_U8(unit, BUOFF(0x2f0)))) {
+				if (type == 2 && (unit->badgesEquipped.DoubleDip || unit->badgesEquipped.TripleDip)) {
 					BattleCommandDisplay_WeaponSelectMenuSetup(wp, type, 0);
 				} else {
 					BattleCommandDisplay_WeaponSelectMenuSetup(wp, type, 1);
@@ -1287,11 +1287,11 @@ s32 BattleCommandInput(BattleWork* work) {
 				psndSFXOn((const char*)0x9d9);
 				BattleCommandDisplay_TargetSelectMenuEnd(wp);
 				cmd->unk0 = 6;
-				CMD_S32(wp, BWOFF(0xef4)) &= ~4;
+				wp->flags &= ~4;
 				BattleAcHelpSetDispType(0);
 				BtlUnit_SetCommandAnimPose(unit);
-				if ((CMDX_S32(0x540) == 0 && (CMD_S32(wp, BWOFF(0xef4)) & 0x200)) ||
-					(CMDX_S32(0x540) == 1 && (CMD_S32(wp, BWOFF(0xef4)) & 0x400))) {
+				if ((CMDX_S32(0x540) == 0 && ((s32)wp->flags & 0x200)) ||
+					(CMDX_S32(0x540) == 1 && ((s32)wp->flags & 0x400))) {
 					cmd->unk0 = 1;
 					BattleStageOffLightEnemyInCommand();
 				}
@@ -1302,15 +1302,15 @@ s32 BattleCommandInput(BattleWork* work) {
 				BattleStageOffLightInCommand(1, 1);
 				cmd->unk0 = 0x1d;
 				BattleCommandDisplay_TargetSelectMenuEnd(wp);
-				CMD_S32(wp, BWOFF(0xef4)) |= 4;
-				if (wtype == 2 && (s8)CMD_U8(unit, BUOFF(0x20)) == 0) {
-					switch (CMD_U8(cmd, 0x550)) {
+				wp->flags |= 4;
+				if (wtype == 2 && (s8)(u8)unit->moveState == 0) {
+					switch (cmd->unk550) {
 					case 2:
-						CMD_U8(unit, BUOFF(0x20)) = 8;
+						unit->moveState = 8;
 						BtlUnit_PayWeaponCost(unit, &badgeWeapon_2KaiItem);
 						break;
 					case 3:
-						CMD_U8(unit, BUOFF(0x20)) = 5;
+						unit->moveState = 5;
 						BtlUnit_PayWeaponCost(unit, &badgeWeapon_3KaiItem);
 						break;
 					}
@@ -1318,7 +1318,7 @@ s32 BattleCommandInput(BattleWork* work) {
 				BattleAcHelpSetDispType(2);
 			}
 			if (BattleCommandAttackAudienceCheck()) {
-				CMD_U8(wp, BWOFF(0x1c74)) = 1;
+				wp->commandMenu.unk558 = 1;
 				BattleCommandDisplay_TargetSelectMenuEnd(wp);
 				BattleAcHelpSetDispType(0);
 			}
@@ -1406,7 +1406,7 @@ s32 BattleCommandInput(BattleWork* work) {
 			BattleStageOffLightInCommand(0, 0);
 			return 1;
 		}
-		if (CMD_U8(wp, BWOFF(0x1c74))) {
+		if (wp->commandMenu.unk558) {
 			_commandRestoreRec();
 			goto again;
 		}
@@ -1462,9 +1462,9 @@ void BattleCommandDisplay_ActMenuSetup(BattleWork* wp, u32 a) {
 	_btlcmd_MakeActClassTable(wp);
 	_btlcmd_GetCursorPtr(cmd, 14, &cursor);
 	BattleMenuDisp_ActSelect_Init(wp, cursor, cmd->act, a);
-	CMD_S32(cmd, 0x560) = 0;
+	cmd->unk560_ = 0;
 	cmd->field_4 |= 0x1000001;
-	if (!a && !CMD_U8(cmd, 0x558)) {
+	if (!a && !cmd->unk558) {
 		_cursor_init(&cmd->cursor[2]);
 		_cursor_init(&cmd->cursor[3]);
 		_cursor_init(&cmd->cursor[4]);
@@ -1512,7 +1512,7 @@ s32 BattleCommandDisplay_ActMenuMain(BattleWork* wp) {
 	if (BattlePadCheckTrigger(0x800) && BattleCommandCheckChangePositionEnable(wp)) {
 		psndSFXOn((const char*)0x9d8);
 		BattleCommandDisplay_ActMenuEnd(wp);
-		CMD_S32(cmd, 0x540) = 9;
+		cmd->unk540 = 9;
 		cmd->unk0 = 0x1d;
 		BattleMenuDisp_ActSelect_Main(wp);
 		return 1;
@@ -1540,24 +1540,24 @@ s32 BattleCommandDisplay_ActMenuMain(BattleWork* wp) {
 			}
 		}
 		if (((s32 (*)(s32))BattlePadCheckNow)(-1)) {
-			CMD_S32(cmd, 0x560) = 0;
+			cmd->unk560_ = 0;
 			btl_camera_set_mode(0, 0);
-		} else if (++CMD_S32(cmd, 0x560) >= 900) {
+		} else if (++cmd->unk560_ >= 900) {
 			btl_camera_set_mode(0, 6);
 			btl_camera_set_moveSpeedLv(0, 5);
 		}
-		if (CMD_U8(wp, BWOFF(0x1c74))) {
+		if (wp->commandMenu.unk558) {
 			type = cmd->act[cursor->field_0].type;
 			if ((type == 0 && (wp->flags & 0x200)) || (type == 1 && (wp->flags & 0x400))) {
-				CMD_U8(wp, BWOFF(0x1c74)) = 0;
+				wp->commandMenu.unk558 = 0;
 				CMD_S32(wp, BWOFF(0x1c70)) = 0;
 			}
 		}
-		if (BattlePadCheckTrigger(0x100) || CMD_U8(wp, BWOFF(0x1c74))) {
+		if (BattlePadCheckTrigger(0x100) || wp->commandMenu.unk558) {
 			if (cmd->act[cursor->field_0].enabled) {
 				psndSFXOn((const char*)0x9d8);
-				CMD_S32(cmd, 0x540) = cmd->act[cursor->field_0].type;
-				switch (CMD_S32(cmd, 0x540)) {
+				cmd->unk540 = cmd->act[cursor->field_0].type;
+				switch (cmd->unk540) {
 				case 0:
 				case 1:
 				case 4:
@@ -1570,8 +1570,8 @@ s32 BattleCommandDisplay_ActMenuMain(BattleWork* wp) {
 				case 2:
 					cmd->unk0 = 5;
 					if (!unit->moveState) {
-						CMD_U8(cmd, 0x550) = 1;
-						if (CMD_U8(unit, BUOFF(0x2ef)) || CMD_U8(unit, BUOFF(0x2f0))) {
+						cmd->unk550 = 1;
+						if (unit->badgesEquipped.DoubleDip || unit->badgesEquipped.TripleDip) {
 							cmd->unk0 = 0xe;
 							ret = 1;
 						}
@@ -1589,15 +1589,15 @@ s32 BattleCommandDisplay_ActMenuMain(BattleWork* wp) {
 				BattleCommandDisplay_ActMenuEnd(wp);
 				break;
 			}
-			if (!CMD_U8(wp, BWOFF(0x1c74))) {
+			if (!wp->commandMenu.unk558) {
 				psndSFXOn("SFX_NOT_CHOICE1");
 			}
-			CMD_U8(wp, BWOFF(0x1c74)) = 0;
+			wp->commandMenu.unk558 = 0;
 			if (cmd->act[cursor->field_0].disableReason) {
 				BattleCommandDisplay_ActMenuEnd(wp);
 				ret = 1;
 				cmd->unk0 = 3;
-				CMD_S32(cmd, 0x564) = cmd->act[cursor->field_0].disableReason;
+				cmd->unk564 = cmd->act[cursor->field_0].disableReason;
 				break;
 			}
 		}
@@ -1620,7 +1620,7 @@ s32 BattleCommandDisplay_ActMenuMain(BattleWork* wp) {
 		} else if (!BattleCommandAttackAudienceCheck() && BattlePadCheckTrigger(0x800) && BattleCommandCheckChangePositionEnable(wp)) {
 			psndSFXOn((const char*)0x9d8);
 			BattleCommandDisplay_ActMenuEnd(wp);
-			CMD_S32(cmd, 0x540) = 9;
+			cmd->unk540 = 9;
 			ret = 1;
 			cmd->unk0 = 0x1d;
 		}
@@ -1693,11 +1693,11 @@ s32 BattleCommandDisplay_WeaponSelectMenuMain(BattleWork* wp, s32 type) {
 	while (BattleMenuKeyOKInACT(wp)) {
 		_btlcmd_GetCursorPtr(cmd, type, &cursor);
 		_btlcmd_UpdateSelectWeaponTable(wp, type);
-		if (CMD_U8(wp, BWOFF(0x1c74))) {
-			CMD_U8(wp, BWOFF(0x1c74)) = 0;
+		if (wp->commandMenu.unk558) {
+			wp->commandMenu.unk558 = 0;
 			CMD_S32(wp, BWOFF(0x1c70)) = 0;
 		}
-		if (BattlePadCheckTrigger(0x100) || CMD_U8(wp, BWOFF(0x1c74))) {
+		if (BattlePadCheckTrigger(0x100) || wp->commandMenu.unk558) {
 			if (cmd->weapon[cursor->field_0].enabled) {
 				psndSFXOn((const char*)0x9d8);
 				BattleCommandDisplay_WeaponSelectMenuEnd(wp);
@@ -1715,15 +1715,15 @@ s32 BattleCommandDisplay_WeaponSelectMenuMain(BattleWork* wp, s32 type) {
 				ret = 1;
 				break;
 			}
-			if (!CMD_U8(wp, BWOFF(0x1c74))) {
+			if (!wp->commandMenu.unk558) {
 				psndSFXOn("SFX_NOT_CHOICE1");
 			}
-			CMD_U8(wp, BWOFF(0x1c74)) = 0;
+			wp->commandMenu.unk558 = 0;
 			if (cmd->weapon[cursor->field_0].disableReason) {
 				BattleCommandDisplay_WeaponSelectMenuEnd(wp);
 				ret = 1;
 				cmd->unk0 = 8;
-				CMD_S32(cmd, 0x564) = cmd->weapon[cursor->field_0].disableReason;
+				cmd->unk564 = cmd->weapon[cursor->field_0].disableReason;
 			}
 			break;
 		}
@@ -1754,7 +1754,7 @@ s32 BattleCommandDisplay_WeaponSelectMenuMain(BattleWork* wp, s32 type) {
 			}
 		}
 		if (BattlePadCheckTrigger(0x200)) {
-			if (type == 2 && (CMD_U8(unit, BUOFF(0x2ef)) || CMD_U8(unit, BUOFF(0x2f0)))) {
+			if (type == 2 && (unit->badgesEquipped.DoubleDip || unit->badgesEquipped.TripleDip)) {
 				if (!unit->moveState) {
 					psndSFXOn((const char*)0x9d9);
 					BattleCommandDisplay_WeaponSelectMenuEnd(wp);
@@ -1771,7 +1771,7 @@ s32 BattleCommandDisplay_WeaponSelectMenuMain(BattleWork* wp, s32 type) {
 			ret = 1;
 		} else if (BattleCommandAttackAudienceCheck()) {
 			BattleCommandDisplay_WeaponSelectMenuEnd(wp);
-			CMD_U8(wp, BWOFF(0x1c74)) = 1;
+			wp->commandMenu.unk558 = 1;
 		}
 		break;
 	}
@@ -1804,7 +1804,7 @@ s32 BattleCommandDisplay_WeaponMultiItemCancelCheckMain(BattleWork* wp) {
 	s32 cancel = 0;
 
 	if (BattleCommandAttackAudienceCheck()) {
-		CMD_U8(wp, BWOFF(0x1c74)) = 1;
+		wp->commandMenu.unk558 = 1;
 		return 0;
 	}
 	if (cursor->field_0 < cursor->unk8 - 1) {
@@ -1843,7 +1843,7 @@ check:
 	}
 	if (done) {
 		if (cancel) {
-			CMD_U8(wp, BWOFF(0x1c6d)) = 1;
+			wp->commandMenu.unk551 = 1;
 			cmd->unk0 = 0x1d;
 		} else {
 			cmd->unk0 = 6;
@@ -1898,17 +1898,17 @@ s32 BattleCommandDisplay_OperationMenuMain(BattleWork* wp) {
 	s32 ret = 0;
 	BattleCursor* cursor;
 
-	if (CMD_U8(wp, BWOFF(0x1c74))) {
-		CMD_U8(wp, BWOFF(0x1c74)) = 0;
+	if (wp->commandMenu.unk558) {
+		wp->commandMenu.unk558 = 0;
 		CMD_S32(wp, BWOFF(0x1c70)) = 0;
 	}
 	if (BattleMenuKeyOKInACT(wp)) {
 		_btlcmd_GetCursorPtr(cmd, 5, &cursor);
-		if (BattlePadCheckTrigger(0x100) || CMD_U8(wp, BWOFF(0x1c74))) {
+		if (BattlePadCheckTrigger(0x100) || wp->commandMenu.unk558) {
 			if (cmd->operation[cursor->field_0].enabled) {
 				psndSFXOn((const char*)0x9d8);
-				CMD_S32(cmd, 0x548) = cmd->operation[cursor->field_0].type;
-				switch (CMD_S32(cmd, 0x548)) {
+				cmd->unk548 = cmd->operation[cursor->field_0].type;
+				switch (cmd->unk548) {
 				case 1:
 				case 2:
 				case 3:
@@ -1930,15 +1930,15 @@ s32 BattleCommandDisplay_OperationMenuMain(BattleWork* wp) {
 				ret = 1;
 				goto end;
 			}
-			if (!CMD_U8(wp, BWOFF(0x1c74))) {
+			if (!wp->commandMenu.unk558) {
 				psndSFXOn("SFX_NOT_CHOICE1");
 			}
-			CMD_U8(wp, BWOFF(0x1c74)) = 0;
+			wp->commandMenu.unk558 = 0;
 			if (cmd->operation[cursor->field_0].disableReason) {
 				BattleCommandDisplay_OperationMenuEnd(wp);
 				ret = 1;
 				cmd->unk0 = 0x16;
-				CMD_S32(cmd, 0x564) = cmd->operation[cursor->field_0].disableReason;
+				cmd->unk564 = cmd->operation[cursor->field_0].disableReason;
 			}
 			goto end;
 		}
@@ -1974,7 +1974,7 @@ s32 BattleCommandDisplay_OperationMenuMain(BattleWork* wp) {
 			ret = 1;
 			cmd->unk0 = 1;
 		} else if (BattleCommandAttackAudienceCheck()) {
-			CMD_U8(wp, BWOFF(0x1c74)) = 1;
+			wp->commandMenu.unk558 = 1;
 			BattleCommandDisplay_OperationMenuEnd(wp);
 		}
 	}
@@ -2012,24 +2012,24 @@ s32 BattleCommandDisplay_MultiItemMenuMain(BattleWork* wp) {
 
 	if (BattleMenuKeyOKInACT(wp)) {
 		_btlcmd_GetCursorPtr(cmd, 3, &cursor);
-		if (BattlePadCheckTrigger(0x100) || CMD_U8(wp, BWOFF(0x1c74))) {
+		if (BattlePadCheckTrigger(0x100) || wp->commandMenu.unk558) {
 			if (cmd->multiItem[cursor->field_0].enabled) {
 				psndSFXOn((const char*)0x9d8);
-				CMD_U8(cmd, 0x550) = cmd->multiItem[cursor->field_0].padE[0];
+				cmd->unk550 = cmd->multiItem[cursor->field_0].padE[0];
 				cmd->unk0 = 5;
 				BattleCommandDisplay_MultiItemMenuEnd(wp);
 				ret = 1;
 				goto end;
 			}
-			if (!CMD_U8(wp, BWOFF(0x1c74))) {
+			if (!wp->commandMenu.unk558) {
 				psndSFXOn("SFX_NOT_CHOICE1");
 			}
-			CMD_U8(wp, BWOFF(0x1c74)) = 0;
+			wp->commandMenu.unk558 = 0;
 			if (cmd->multiItem[cursor->field_0].disableReason) {
 				BattleCommandDisplay_MultiItemMenuEnd(wp);
 				ret = 1;
 				cmd->unk0 = 0x11;
-				CMD_S32(cmd, 0x564) = cmd->multiItem[cursor->field_0].disableReason;
+				cmd->unk564 = cmd->multiItem[cursor->field_0].disableReason;
 			}
 			goto end;
 		}
@@ -2065,7 +2065,7 @@ s32 BattleCommandDisplay_MultiItemMenuMain(BattleWork* wp) {
 			ret = 1;
 			cmd->unk0 = 1;
 		} else if (BattleCommandAttackAudienceCheck()) {
-			CMD_U8(wp, BWOFF(0x1c74)) = 1;
+			wp->commandMenu.unk558 = 1;
 			BattleCommandDisplay_MultiItemMenuEnd(wp);
 		}
 	}
@@ -2103,20 +2103,20 @@ s32 BattleCommandDisplay_ChangePartySelectMenuMain(BattleWork* wp) {
 
 	if (BattleMenuKeyOKInACT(wp)) {
 		_btlcmd_GetCursorPtr(cmd, 10, &cursor);
-		if (BattlePadCheckTrigger(0x100) || CMD_U8(wp, BWOFF(0x1c74))) {
+		if (BattlePadCheckTrigger(0x100) || wp->commandMenu.unk558) {
 			if (cmd->party[cursor->field_0].enabled) {
 				psndSFXOn((const char*)0x9d8);
 				BattleStageOffLightInCommand(0, 1);
-				CMD_S32(cmd, 0x54c) = cmd->party[cursor->field_0].kind;
+				cmd->unk54C = cmd->party[cursor->field_0].kind;
 				cmd->unk0 = 0x1d;
 				BattleCommandDisplay_ChangePartySelectMenuEnd(wp);
 				ret = 1;
 				goto end;
 			}
-			if (!CMD_U8(wp, BWOFF(0x1c74))) {
+			if (!wp->commandMenu.unk558) {
 				psndSFXOn("SFX_NOT_CHOICE1");
 			}
-			CMD_U8(wp, BWOFF(0x1c74)) = 0;
+			wp->commandMenu.unk558 = 0;
 		}
 		if (cursor->field_0 < cursor->unk8 - 1) {
 			if (PADREP(0x20000)) {
@@ -2150,7 +2150,7 @@ s32 BattleCommandDisplay_ChangePartySelectMenuMain(BattleWork* wp) {
 			ret = 1;
 			cmd->unk0 = 0x14;
 		} else if (BattleCommandAttackAudienceCheck()) {
-			CMD_U8(wp, BWOFF(0x1c74)) = 1;
+			wp->commandMenu.unk558 = 1;
 			BattleCommandDisplay_ChangePartySelectMenuEnd(wp);
 		}
 	}
@@ -2202,7 +2202,7 @@ void BattleCommandDisplay_TargetSelectMenuDisp(CameraId camId, void* param) {
 	BattleUnit* unit2;
 	BattleUnitPart* part2;
 
-	_btlcmd_GetCursorPtr(cmd, CMD_S32(wp, BWOFF(0x1c5c)), &cursor);
+	_btlcmd_GetCursorPtr(cmd, wp->commandMenu.unk540, &cursor);
 	if (cmd->weapon[cursor->field_0].weapon->targetClassFlags & 0x1000000) {
 		wt = &wp->weaponTargets;
 		t = &wt->targets[wt->targetIndices[wt->currentTarget]];
@@ -2288,7 +2288,7 @@ void BattleCommandDisplay_TargetSelectMenuEnd(BattleWork* wp) {
 	BattleCommand* cmd = &wp->commandMenu;
 	BattleCursor* cursor;
 
-	_btlcmd_GetCursorPtr(cmd, CMD_S32(wp, BWOFF(0x1c5c)), &cursor);
+	_btlcmd_GetCursorPtr(cmd, wp->commandMenu.unk540, &cursor);
 	btl_camera_set_mode(0, 0);
 	cmd->field_4 &= ~0x10000;
 	cmd->field_4 &= ~0x1000000;
@@ -2352,11 +2352,11 @@ s32 _check_weapon_type_attack(BattleWeapon* weapon);
 
 void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 	BattleWork* wp = _battleWorkPointer;
-	u32 type = CMD_S32(cmd, 0x540);
+	u32 type = cmd->unk540;
 	BattleCursor* cursor;
 	BattleWeapon* weapon;
 
-	if (CMD_U8(cmd, 0x551)) {
+	if (cmd->unk551) {
 		unit->moveState = 0;
 		UEVT(unit) = btldefaultevt_Wait;
 		unit->attackEventFlags = 1;
@@ -2364,7 +2364,7 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 	}
 	switch (type) {
 	case 5:
-		switch ((u32)CMD_S32(cmd, 0x548)) {
+		switch ((u32)cmd->unk548) {
 		case 6:
 			unit->attackEventFlags = 1;
 			if (unit->currentKind == 0xde) {
@@ -2423,7 +2423,7 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 		case 0:
 			UEVT(unit) = btldefaultevt_ChangeParty;
 			unit->attackEventFlags = 1;
-			CMD_S32(cmd, 0x4a4) = 0;
+			cmd->cursor[1].field_0 = 0;
 			if (wp->badgeEquippedFlags & 1) {
 				unit->moveState = 3;
 			}
@@ -2517,8 +2517,8 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 		} else {
 			BtlActRec_AddCount(ACTREC(0x16f2c));
 		}
-		if (CMD_S32(wp, BWOFF(0x19080)) & 1) {
-			msgWindow_Continue(CMD_S32(wp, BWOFF(0x19084)));
+		if (wp->unk19080 & 1) {
+			msgWindow_Continue(wp->unk19084);
 		}
 		break;
 	case 12:
@@ -2546,7 +2546,7 @@ BattleWeapon* BattleGetSelectWeapon(BattleWork* wp) {
 	BattleCommand* cmd = &wp->commandMenu;
 	BattleCursor* cursor;
 
-	_btlcmd_GetCursorPtr(cmd, CMD_S32(wp, BWOFF(0x1c5c)), &cursor);
+	_btlcmd_GetCursorPtr(cmd, wp->commandMenu.unk540, &cursor);
 	return cmd->weapon[cursor->field_0].weapon;
 }
 
@@ -2582,13 +2582,13 @@ s32 _check_present_item(void) {
 		return 0;
 	default:
 		if (item < 0 || item >= 0x153) return 0;
-		CMD_U8(wp, BWOFF(0x1c74)) = 1;
+		wp->commandMenu.unk558 = 1;
 		if (wp->commandMenu.unk0 == 12 || wp->commandMenu.unk0 == 13) {
-			CMD_U8(wp, BWOFF(0x1c74)) = 2;
+			wp->commandMenu.unk558 = 2;
 		}
 		BattleCommandDisplay_AllEnd(wp);
-		CMD_S32(wp, BWOFF(0x1c60)) = CMD_S32(wp, BWOFF(0x1c5c));
-		CMD_S32(wp, BWOFF(0x1c5c)) = 12;
+		CMD_S32(wp, BWOFF(0x1c60)) = wp->commandMenu.unk540;
+		wp->commandMenu.unk540 = 12;
 		wp->commandMenu.unk0 = 0x1d;
 		return 1;
 	}
@@ -2693,9 +2693,9 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 		return subsetevt_confuse_flustered;
 	}
 #ifdef VERSION_G8ME01
-	if (CMD_U8(cmd, 0x550)) {
-		CMD_U8(unit, BUOFF(0x20)) = 0;
-		CMD_U8(cmd, 0x550) = 0;
+	if (cmd->unk550) {
+		unit->moveState = 0;
+		cmd->unk550 = 0;
 	}
 #endif
 	_btlcmd_MakeActClassTable(wp);
@@ -2716,11 +2716,11 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 		return subsetevt_confuse_flustered;
 	}
 	}
-	CMD_S32(cmd, 0x540) = cmd->act[cursor->field_0].type;
+	cmd->unk540 = cmd->act[cursor->field_0].type;
 	if (!cmd->act[cursor->field_0].enabled) {
 		return subsetevt_confuse_flustered;
 	}
-	switch (CMD_S32(cmd, 0x540)) {
+	switch (cmd->unk540) {
 	case 0:
 	case 1:
 	case 2:
@@ -2728,16 +2728,16 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 	case 6:
 	case 7:
 	case 8:
-		_btlcmd_MakeSelectWeaponTable(wp, CMD_S32(cmd, 0x540));
+		_btlcmd_MakeSelectWeaponTable(wp, cmd->unk540);
 		{
 		u8 cnt;
 		u8 i;
-		_btlcmd_GetCursorPtr(cmd, CMD_S32(cmd, 0x540), &cursor);
+		_btlcmd_GetCursorPtr(cmd, cmd->unk540, &cursor);
 		cnt = 0;
 		for (i = 0; i < cursor->unk8; i++) {
 			weapon = cmd->weapon[i].weapon;
-			if (cmd->weapon[i].enabled && (WPN_U32(weapon, 0x74) & 0x10000) &&
-				!(WPN_U32(weapon, 0x64) & 0x2000000) && (WPN_U32(weapon, 0x64) & 0x1000000)) {
+			if (cmd->weapon[i].enabled && ((u32)weapon->special & 0x10000) &&
+				!(weapon->targetClassFlags & 0x2000000) && (weapon->targetClassFlags & 0x1000000)) {
 				list[cnt++] = i;
 			}
 		}
@@ -2751,19 +2751,19 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 		if (!cmd->weapon[cursor->field_0].enabled) {
 			return subsetevt_confuse_flustered;
 		}
-		_btlcmd_SelectWeaponDecide(wp, CMD_S32(cmd, 0x540), cursor->field_0);
+		_btlcmd_SelectWeaponDecide(wp, cmd->unk540, cursor->field_0);
 		weapon = cmd->weapon[cursor->field_0].weapon;
-		if (!(WPN_U32(weapon, 0x74) & 0x10000)) {
+		if (!((u32)weapon->special & 0x10000)) {
 			return subsetevt_confuse_flustered;
 		}
-		if ((WPN_U32(weapon, 0x64) & 0x2000000) || !(WPN_U32(weapon, 0x64) & 0x1000000)) {
+		if ((weapon->targetClassFlags & 0x2000000) || !(weapon->targetClassFlags & 0x1000000)) {
 			return subsetevt_confuse_flustered;
 		}
 		if (wp->weaponTargets.numTargets <= 0) {
 			return subsetevt_confuse_flustered;
 		}
 		wp->weaponTargets.currentTarget = irand(wp->weaponTargets.numTargets);
-		CMD_S32(wp, BWOFF(0xef4)) |= 4;
+		wp->flags |= 4;
 		return WEVT(weapon);
 	case 5:
 		_btlcmd_MakeOperationTable(wp);
@@ -2789,8 +2789,8 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 		if (!cmd->operation[cursor->field_0].enabled) {
 			return subsetevt_confuse_flustered;
 		}
-		CMD_S32(cmd, 0x548) = cmd->operation[cursor->field_0].type;
-		switch ((u32)CMD_S32(cmd, 0x548)) {
+		cmd->unk548 = cmd->operation[cursor->field_0].type;
+		switch ((u32)cmd->unk548) {
 		case 6:
 			if (unit->currentKind == 0xde) {
 				return btldefaultevt_Defend;
@@ -2835,8 +2835,8 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 			if (!cmd->party[cursor->field_0].enabled) {
 				return subsetevt_confuse_flustered;
 			}
-			CMD_S32(cmd, 0x54c) = cmd->party[cursor->field_0].kind;
-			CMD_S32(cmd, 0x4a4) = 0;
+			cmd->unk54C = cmd->party[cursor->field_0].kind;
+			cmd->cursor[1].field_0 = 0;
 			return btldefaultevt_ChangeParty;
 		case 4:
 			return subsetevt_confuse_flustered;
@@ -2852,13 +2852,13 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 void _commandRestoreRec(void) {
 	BattleWork* wp = _battleWorkPointer;
 
-	if (!CMD_U8(wp, BWOFF(0x1c74))) {
+	if (!wp->commandMenu.unk558) {
 		CMD_S32(wp, BWOFF(0x1c70)) = wp->commandMenu.unk0;
 		return;
 	}
 	if (CMD_S32(wp, BWOFF(0x1c70)) == wp->commandMenu.unk0) {
 		CMD_S32(wp, BWOFF(0x1c70)) = 0;
-		CMD_U8(wp, BWOFF(0x1c74)) = 0;
+		wp->commandMenu.unk558 = 0;
 	}
 }
 #pragma dont_inline reset
@@ -2877,8 +2877,8 @@ BOOL BattleCommandAttackAudienceCheck(void) {
 		if (id != -1) {
 			BattleAudience_SetTarget(id);
 			BattleCommandDisplay_ActMenuEnd(wp);
-			CMD_S32(wp, BWOFF(0x1c60)) = CMD_S32(wp, BWOFF(0x1c5c));
-			CMD_S32(wp, BWOFF(0x1c5c)) = 11;
+			CMD_S32(wp, BWOFF(0x1c60)) = wp->commandMenu.unk540;
+			wp->commandMenu.unk540 = 11;
 			wp->commandMenu.unk0 = 0x1d;
 			BattleStageOffLightInCommand(0, 1);
 			wp->flags |= 4;
@@ -2894,7 +2894,7 @@ USER_FUNC(_get_msg) {
 	BattleWork* wp = _battleWorkPointer;
 	const char* msg;
 
-	switch (CMD_S32(wp, BWOFF(0x1c80))) {
+	switch (wp->commandMenu.unk564) {
 		case 1:
 			msg = "btl_msg_cmderror_no_fp";
 			if (!event->args && !event->args) {}
@@ -2923,20 +2923,20 @@ USER_FUNC(_get_msg) {
 s32 _check_weapon_type_attack(BattleWeapon* weapon) {
 	if (!weapon) return 0;
 	if (weapon->hpDamageFn) return 1;
-	if (WS8(weapon, 0x80) > 0 && WS8(weapon, 0x81) > 0) return 1;
-	if (WS8(weapon, 0x82) > 0 && WS8(weapon, 0x83) > 0) return 1;
-	if (WS8(weapon, 0x84) > 0 && WS8(weapon, 0x85) > 0) return 1;
-	if (WS8(weapon, 0x86) > 0 && WS8(weapon, 0x87) > 0) return 1;
-	if (WS8(weapon, 0x89) > 0 && WS8(weapon, 0x8a) > 0) return 1;
-	if (WS8(weapon, 0x8f) > 0 && WS8(weapon, 0x90) > 0) return 1;
-	if (WS8(weapon, 0x91) > 0 && WS8(weapon, 0x92) > 0) return 1;
-	if (WS8(weapon, 0x93) > 0 && WS8(weapon, 0x94) > 0 && WS8(weapon, 0x95) < 0) return 1;
-	if (WS8(weapon, 0x96) > 0 && WS8(weapon, 0x97) > 0 && WS8(weapon, 0x98) < 0) return 1;
-	if (WS8(weapon, 0x99) > 0 && WS8(weapon, 0x9a) > 0 && WS8(weapon, 0x9b) < 0) return 1;
-	if (WS8(weapon, 0x9e) > 0) return 1;
-	if (WS8(weapon, 0xa4) > 0) return 1;
-	if (WS8(weapon, 0xa5) > 0) return 1;
-	if (WS8(weapon, 0xa2) > 0 && WS8(weapon, 0xa3) > 0) return 1;
+	if ((s8)weapon->sleepChance > 0 && weapon->sleepTime > 0) return 1;
+	if ((s8)weapon->stopChance > 0 && weapon->stopTime > 0) return 1;
+	if ((s8)weapon->dizzyChance > 0 && weapon->dizzyTime > 0) return 1;
+	if ((s8)weapon->poisonChance > 0 && weapon->poisonTime > 0) return 1;
+	if ((s8)weapon->confuseChance > 0 && weapon->confuseTime > 0) return 1;
+	if ((s8)weapon->burnChance > 0 && weapon->burnTime > 0) return 1;
+	if ((s8)weapon->freezeChance > 0 && weapon->freezeTime > 0) return 1;
+	if ((s8)weapon->sizeChangeChance > 0 && weapon->sizeChangeTime > 0 && weapon->sizeChangeStrength < 0) return 1;
+	if ((s8)weapon->atkChangeChance > 0 && weapon->atkChangeTime > 0 && weapon->atkChangeStrength < 0) return 1;
+	if ((s8)weapon->defChangeChance > 0 && weapon->defChangeTime > 0 && weapon->defChangeStrength < 0) return 1;
+	if (weapon->ohkoChance > 0) return 1;
+	if ((s8)weapon->frightChance > 0) return 1;
+	if ((s8)weapon->galeForceChance > 0) return 1;
+	if ((s8)weapon->slowChance > 0 && weapon->slowTime > 0) return 1;
 	return 0;
 }
 

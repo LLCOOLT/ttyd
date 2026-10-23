@@ -79,7 +79,7 @@ extern s32 bero_case_exec_pipe_sub[];
 extern s32 bero_case_exec_road[];
 extern s32 bero_case_init_check[];
 void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end);
-extern s32 bero_null[];
+extern BeroEntry bero_null[];
 extern s32 bero_play_out_anime[];
 extern s32 default_entevt[];
 extern s32 default_outevt[];

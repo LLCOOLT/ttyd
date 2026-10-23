@@ -5372,7 +5372,7 @@ void psndBGMMain(void) {
 	if ((psnd.flags & 0x20) && !(psnd.flags & 0x40)) {
 		maxv = 0x41;
 	}
-	if (seqGetSeq() != 3 && ((*(u32*)((u8*)gp + 0x1c)) & 1)) {
+	if (seqGetSeq() != 3 && (gp->retraceCount & 1)) {
 		if (psnd.bgmVolume < maxv) {
 			psnd.bgmVolume++;
 		}
@@ -5421,9 +5421,9 @@ void psndBGMMain(void) {
 		{
 		PaperSoundFade* f0 = &bgm->fade;
 		if (f0->state == 0) {
-			a = *(u8*)((u8*)bgm + 0xE);
+			a = bgm->volume;
 		} else {
-			a = (u8)((*(u8*)((u8*)bgm + 0xE) * f0->timeMax) / f0->time);
+			a = (u8)((bgm->volume * f0->timeMax) / f0->time);
 		}
 		if (f0->dipState == 0) {
 			b = 0x7F;

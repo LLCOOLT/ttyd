@@ -32,9 +32,15 @@ typedef struct PuniWork {
     s32 ymode;                // 0x33C
     s32 mapKind;              // 0x340
     Vec unk344;               // 0x344
-    u8 unk350[0x360 - 0x350]; // 0x350
+    f32 unk350;               // 0x350
+    f32 unk354;               // 0x354
+    f32 unk358;               // 0x358
+    f32 unk35C;               // 0x35C
     s32 unk360;               // 0x360
-    u8 unk364[0x374 - 0x364]; // 0x364
+    struct PuniData* unk364;  // 0x364
+    struct PuniData* unk368;  // 0x368
+    struct PuniData* unk36C;  // 0x36C
+    struct PuniData* unk370;  // 0x370
     PuniTarget targets[10];   // 0x374
     s32 unk43C;               // 0x43C
     s32 unk440;               // 0x440
@@ -73,7 +79,7 @@ typedef struct PuniData {
     u16 unkE;             // 0xE
     u8 unk10[0x114 - 0x10]; // 0x10
     u16 unk114;           // 0x114
-    u8 unk116[0x118 - 0x116]; // 0x116
+    s16 unk116;               // 0x116
     s16 unk118;           // 0x118
     s16 unk11A;           // 0x11A
     u16 anim;             // 0x11C
@@ -87,7 +93,9 @@ typedef struct PuniData {
     Vec unk138;           // 0x138
     u8 unk144[0x148 - 0x144]; // 0x144
     f32 unk148;           // 0x148
-    u8 unk14C[0x15C - 0x14C]; // 0x14C
+    u8 unk14C[0x154 - 0x14C]; // 0x14C
+    f32 unk154;               // 0x154
+    f32 unk158;               // 0x158
     Vec vel;              // 0x15C
     Vec pushDir;          // 0x168
     f32 unk174;           // 0x174
@@ -98,7 +106,7 @@ typedef struct PuniData {
     f32 unk188;           // 0x188
     f32 alpha;            // 0x18C
     Vec unk190;           // 0x190
-    u8 unk19C[0x1A0 - 0x19C]; // 0x19C
+    f32 unk19C;               // 0x19C
     f32 unk1A0;           // 0x1A0
     f32 unk1A4;           // 0x1A4
     f32 unk1A8;           // 0x1A8
@@ -108,22 +116,32 @@ typedef struct PuniData {
     f32 unk1B8;           // 0x1B8
     s32 unk1BC;           // 0x1BC
     f32 unk1C0;           // 0x1C0
-    u8 unk1C4[0x1D0 - 0x1C4]; // 0x1C4
+    u8 unk1C4[0x1CC - 0x1C4]; // 0x1C4
+    s32 unk1CC;               // 0x1CC
     struct PuniData* parent; // 0x1D0
     struct PuniData* child1; // 0x1D4
     struct PuniData* child2; // 0x1D8
     s32 unk1DC;           // 0x1DC
     s32 unk1E0;           // 0x1E0
-    u8 unk1E4[0x1EC - 0x1E4]; // 0x1E4
+    s32 unk1E4;               // 0x1E4
+    s32 unk1E8;               // 0x1E8
     f32 upSpeed;          // 0x1EC
     f32 upAccel;          // 0x1F0
     f32 upMax;            // 0x1F4
     Vec unk1F8;           // 0x1F8
-    u8 unk204[0x210 - 0x204]; // 0x204
+    u8 unk204[0x208 - 0x204]; // 0x204
+    f32 unk208;               // 0x208
+    f32 unk20C;               // 0x20C
     HitEntry* hitMove;    // 0x210
     HitEntry* hitCheck;   // 0x214
     EffectEntry* effect;  // 0x218
-    u8 unk21C[0x56C - 0x21C]; // 0x21C
+    u8 unk21C[0x2AC - 0x21C]; // 0x21C
+    f32 unk2AC;               // 0x2AC
+    f32 unk2B0;               // 0x2B0
+    f32 unk2B4;               // 0x2B4
+    u8 unk2B8[0x564 - 0x2B8]; // 0x2B8
+    f32 unk564;               // 0x564
+    f32 unk568;               // 0x568
     void (*modeFunc)(struct PuniData*); // 0x56C
     void (*moveFunc)(struct PuniData*); // 0x570
     s16 hp;               // 0x574

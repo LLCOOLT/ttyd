@@ -8,6 +8,7 @@
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
 
 USER_FUNC(btlevtcmd_AddPartsRotate);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -51,20 +52,20 @@ static USER_FUNC(hammer_bros_nagemakuri_set_target);
 static void hammer_bros_get_next_target(s32* unitIdx, s32* partIdx);
 static void hammer_bros_get_target(s32* unitIdx, s32* partIdx);
 
-__declspec(section ".data") u64 fd_hammer_bros_negone_one_374;
-__declspec(section ".data") s32 fd_hammer_bros_neg_one_382[1];
-__declspec(section ".data") s32 fd_hammer_bros___local_PI_383[1];
-__declspec(section ".data") s32 fd_hammer_bros___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_hammer_bros_one_negone_373;
-__declspec(section ".data") s32 fd_hammer_bros___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_hammer_bros_one_381[1];
-__declspec(section ".data") u64 fd_hammer_bros_negone_one_360;
-__declspec(section ".data") s32 fd_hammer_bros_neg_one_365[1];
-__declspec(section ".data") s32 fd_hammer_bros___local_PI_366[1];
-__declspec(section ".data") s32 fd_hammer_bros___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_hammer_bros_one_negone_359;
-__declspec(section ".data") s32 fd_hammer_bros___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_hammer_bros_one_364[1];
+__declspec(section ".data") f32 fd_hammer_bros_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hammer_bros_neg_one_382;
+__declspec(section ".data") f32 fd_hammer_bros___local_PI_383;
+__declspec(section ".data") f32 fd_hammer_bros___local_3PIO2_385;
+__declspec(section ".data") f32 fd_hammer_bros_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hammer_bros___local_PIO2_384;
+__declspec(section ".data") f32 fd_hammer_bros_one_381;
+__declspec(section ".data") f32 fd_hammer_bros_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hammer_bros_neg_one_365;
+__declspec(section ".data") f32 fd_hammer_bros___local_PI_366;
+__declspec(section ".data") f32 fd_hammer_bros___local_3PIO2_368;
+__declspec(section ".data") f32 fd_hammer_bros_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hammer_bros___local_PIO2_367;
+__declspec(section ".data") f32 fd_hammer_bros_one_364;
 BattleUnitKind unit_hammer_bros;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -72,9 +73,9 @@ static __declspec(section ".data") StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
 static __declspec(section ".data") BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[6];
-static s32 weapon_hammer_bros_attack[48];
-static s32 weapon_hammer_bros_renzoku_attack[48];
-static s32 weapon_hammer_bros_nagemakuri_attack[48];
+static BattleWeapon weapon_hammer_bros_attack;
+static BattleWeapon weapon_hammer_bros_renzoku_attack;
+static BattleWeapon weapon_hammer_bros_nagemakuri_attack;
 static s32 init_event[21];
 static __declspec(section ".data") s32 damage_event[10];
 static s32 attack_event[96];
@@ -145,53 +146,33 @@ static USER_FUNC(hammer_bros_nagemakuri_set_target) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_hammer_bros_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hammer_bros_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hammer_bros_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_hammer_bros_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_hammer_bros___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_hammer_bros___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_hammer_bros___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_hammer_bros___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_hammer_bros_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_hammer_bros_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_hammer_bros___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_hammer_bros___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_hammer_bros_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_hammer_bros_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_hammer_bros_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hammer_bros_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hammer_bros_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_hammer_bros_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_hammer_bros___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_hammer_bros___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_hammer_bros___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_hammer_bros___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_hammer_bros_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_hammer_bros_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_hammer_bros___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_hammer_bros___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_hammer_bros_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_hammer_bros_one_364 = 1.0f;
 
 BattleUnitKind unit_hammer_bros = {
     56,
@@ -299,31 +280,112 @@ static BattleUnitKindPart parts[] = {
     {6, "btl_un_hammer_bros", "c_burosu_h", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
-static s32 weapon_hammer_bros_attack[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536875008, 770, 0, 135, 2047, -2147475456,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_hammer_bros_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20001000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_hammer_bros_renzoku_attack[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536875008, 770, 0, 135, 2047, -2147475456,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_hammer_bros_renzoku_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20001000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_hammer_bros_nagemakuri_attack[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536875008, 770, 0, 135, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_hammer_bros_nagemakuri_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20001000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static EVT_BEGIN(init_event)
@@ -393,57 +455,99 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
-static s32 hammer_bros_attack_common_event1[] = {
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_HUMMER_ATTACK1", -250000000, 0, -250000000, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, -29999985, (s32)"BRO_A_1B", 327771, (s32)btlevtcmd_GetPos, -2, -29999994,
-    -29999993, -29999992, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -30000000, 131127, -30000000,
-    10, 131125, -29999994, -30000000, 393307, (s32)btlevtcmd_SetPartsPos, -2, -29999985,
-    -29999994, -29999993, -29999992, 393307, (s32)btlevtcmd_SetPartsRotate, -2, -29999985, 0,
-    0, -135, 393307, (s32)btlevtcmd_SetPartsRotateOffset, -2, -29999985, 0, 5,
-    0, 262235, (s32)btlevtcmd_OffPartsAttribute, -2, -29999985, 16777216, 262235, (s32)btlevtcmd_OffPartsAttribute,
-    -2, -29999985, 33554432, 110, 65541, 0, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_HUMMER_ATTACK2", -250000000, 0, -250000000, 65545, 10, 6,
-    112, 110, 65541, 0, 65545, 1, 393307, (s32)btlevtcmd_AddPartsRotate,
-    -2, -29999985, 0, 0, 32, 6, 112, 110,
-    65541, 0, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -30000000, 131096, -30000000,
-    -1, 393307, (s32)btlevtcmd_GetPartsPos, -2, -29999985, -30000000, -29999999, -29999998,
-    393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999994, -29999993, -29999992, 131100,
-    -30000000, -29999994, 65630, (s32)start_avoid, 7, 33, 32, 393307,
-    (s32)btlevtcmd_GetPartsPos, -2, -29999985, -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_GetHitPos,
-    -29999997, -29999996, -29999994, -29999993, -29999992, 131101, -30000000, -29999994,
-    65630, (s32)start_avoid, 7, 33, 33, 65545, 1, 6,
-    112, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999994, -29999993, -29999992,
-    393307, (s32)btlevtcmd_JumpPartsSetting, -2, -29999985, 60, 0, -229999796, 524379,
-    (s32)btlevtcmd_JumpPartsPosition, -2, -29999985, -29999994, -29999993, -29999992, 60, -1,
-    196699, (s32)btlevtcmd_JumpPartsContinue, -2, -29999985, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_HUMMER_ATTACK3",
-    -250000000, 0, -250000000, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999994,
-    -29999993, -29999992, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999997, -29999994, 100, 393307,
-    (s32)btlevtcmd_JumpPartsSetting, -2, -29999985, 0, -229995904, -229999386, 524379, (s32)btlevtcmd_JumpPartsPosition,
-    -2, -29999985, -29999994, 0, -29999992, 0, -1, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_HUMMER_ATTACK3", -250000000, 0, -250000000, 393307, (s32)btlevtcmd_GetHitPos,
-    -29999997, -29999996, -29999994, -29999993, -29999992, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999997,
-    -29999994, 150, 393307, (s32)btlevtcmd_JumpPartsSetting, -2, -29999985, 0, -229995904,
-    -229999591, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, -29999985, -29999994, 0, -29999992,
-    0, -1, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, -29999985, 16777216, 262235,
-    (s32)btlevtcmd_OnPartsAttribute, -2, -29999985, 33554432, 2, 1,
-};
+static EVT_BEGIN(hammer_bros_attack_common_event1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_HUMMER_ATTACK1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, LW(15), STRING("BRO_A_1B"))
+    CALL(btlevtcmd_GetPos, -2, LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(0))
+    MULTIPLY(LW(0), 10)
+    ADD(LW(6), LW(0))
+    CALL(btlevtcmd_SetPartsPos, -2, LW(15), LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_SetPartsRotate, -2, LW(15), 0, 0, -135)
+    CALL(btlevtcmd_SetPartsRotateOffset, -2, LW(15), 0, 5, 0)
+    CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 16777216)
+    CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 33554432)
+    BEGIN_SIBLING_EVENT
+        LOOP(0)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_HUMMER_ATTACK2"), -250000000, 0, -250000000)
+            WAIT_FRAMES(10)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        LOOP(0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_AddPartsRotate, -2, LW(15), 0, 0, 32)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        LOOP(0)
+            CALL(btlevtcmd_GetFaceDirection, -2, LW(0))
+            IF_INT_EQUAL(LW(0), -1)
+                CALL(btlevtcmd_GetPartsPos, -2, LW(15), LW(0), LW(1), LW(2))
+                CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+                IF_INT_LESS_OR_EQUAL(LW(0), LW(6))
+                    CALL_CHILD(start_avoid)
+                    BREAK_LOOP
+                END_IF
+            ELSE
+                CALL(btlevtcmd_GetPartsPos, -2, LW(15), LW(0), LW(1), LW(2))
+                CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+                IF_INT_GREATER_OR_EQUAL(LW(0), LW(6))
+                    CALL_CHILD(start_avoid)
+                    BREAK_LOOP
+                END_IF
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_JumpPartsSetting, -2, LW(15), 60, 0, FLOAT(0.19921875f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(6), LW(7), LW(8), 60, -1)
+    CALL(btlevtcmd_JumpPartsContinue, -2, LW(15))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_HUMMER_ATTACK3"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(6), 100)
+    CALL(btlevtcmd_JumpPartsSetting, -2, LW(15), 0, FLOAT(4.0f), FLOAT(0.5996094f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(6), 0, LW(8), 0, -1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_HUMMER_ATTACK3"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(6), 150)
+    CALL(btlevtcmd_JumpPartsSetting, -2, LW(15), 0, FLOAT(4.0f), FLOAT(0.39941406f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(6), 0, LW(8), 0, -1)
+    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 33554432)
+    RETURN
+EVT_END()
 
-static s32 hammer_bros_attack_common_event2[] = {
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_HUMMER_ATTACK1", -250000000, 0, -250000000, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, -29999985, (s32)"BRO_A_1B", 327771, (s32)btlevtcmd_GetPos, -2, -29999994,
-    -29999993, -29999992, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -30000000, 131127, -30000000,
-    10, 131125, -29999994, -30000000, 393307, (s32)btlevtcmd_SetPartsPos, -2, -29999985,
-    -29999994, -29999993, -29999992, 393307, (s32)btlevtcmd_SetPartsRotate, -2, -29999985, 0,
-    0, -135, 393307, (s32)btlevtcmd_SetPartsRotateOffset, -2, -29999985, 0, 5,
-    0, 262235, (s32)btlevtcmd_OffPartsAttribute, -2, -29999985, 16777216, 262235, (s32)btlevtcmd_OffPartsAttribute,
-    -2, -29999985, 33554432, 110, 65541, 0, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_HUMMER_ATTACK2", -250000000, 0, -250000000, 65545, 10, 6,
-    112, 110, 65541, 0, 65545, 1, 393307, (s32)btlevtcmd_AddPartsRotate,
-    -2, -29999985, 0, 0, 32, 6, 112, 393307,
-    (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999994, -29999993, -29999992, 393307, (s32)btlevtcmd_JumpPartsSetting,
-    -2, -29999985, 60, 0, -229999796, 524379, (s32)btlevtcmd_JumpPartsPosition, -2,
-    -29999985, -29999994, -29999993, -29999992, 60, -1, 2, 1,
-};
+static EVT_BEGIN(hammer_bros_attack_common_event2)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_HUMMER_ATTACK1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, LW(15), STRING("BRO_A_1B"))
+    CALL(btlevtcmd_GetPos, -2, LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(0))
+    MULTIPLY(LW(0), 10)
+    ADD(LW(6), LW(0))
+    CALL(btlevtcmd_SetPartsPos, -2, LW(15), LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_SetPartsRotate, -2, LW(15), 0, 0, -135)
+    CALL(btlevtcmd_SetPartsRotateOffset, -2, LW(15), 0, 5, 0)
+    CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 16777216)
+    CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 33554432)
+    BEGIN_SIBLING_EVENT
+        LOOP(0)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_HUMMER_ATTACK2"), -250000000, 0, -250000000)
+            WAIT_FRAMES(10)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        LOOP(0)
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_AddPartsRotate, -2, LW(15), 0, 0, 32)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_JumpPartsSetting, -2, LW(15), 60, 0, FLOAT(0.19921875f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, LW(15), LW(6), LW(7), LW(8), 60, -1)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(hammer_bros_attack_common_event3)
     BEGIN_SIBLING_EVENT
@@ -487,7 +591,7 @@ static EVT_BEGIN(damage_check_event_sub)
     GOTO(99)
     LABEL(91)
     IF_INT_EQUAL(LW(11), 1)
-        IF_INT_EQUAL(LW(9), PTR(weapon_hammer_bros_renzoku_attack))
+        IF_INT_EQUAL(LW(9), PTR(&weapon_hammer_bros_renzoku_attack))
             CALL(btlevtcmd_SetUnitWork, -2, 10, 1)
             ELSE
             SET_VALUE(LW(13), 0)
@@ -527,8 +631,8 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
         ELSE
         CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_hammer_bros_attack))
-        CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_hammer_bros_attack), LW(3), LW(4))
+        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_hammer_bros_attack))
+        CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_hammer_bros_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
@@ -539,16 +643,16 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(99)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_hammer_bros_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_hammer_bros_attack))
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_hammer_bros_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_hammer_bros_attack))
     CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_1A\0\0\0"))
     WAIT_FRAMES(27)
     SET_VALUE(LW(15), 2)
-    SET_VALUE(LW(9), PTR(weapon_hammer_bros_attack))
+    SET_VALUE(LW(9), PTR(&weapon_hammer_bros_attack))
     SET_VALUE(LW(10), 1)
     SET_VALUE(LW(11), 0)
     CALL_CHILD(PTR(damage_check_event_sub))
@@ -561,8 +665,8 @@ EVT_END()
 
 static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_hammer_bros_renzoku_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_hammer_bros_renzoku_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_hammer_bros_renzoku_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_hammer_bros_renzoku_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
@@ -572,10 +676,10 @@ static EVT_BEGIN(renzoku_attack_event)
         GOTO(99)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_hammer_bros_renzoku_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_hammer_bros_renzoku_attack))
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_hammer_bros_renzoku_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_hammer_bros_renzoku_attack))
     CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
     SET_VALUE(LW(14), 0)
@@ -603,7 +707,7 @@ static EVT_BEGIN(renzoku_attack_event)
 EVT_END()
 
 static EVT_BEGIN(renzoku_attack_event_sub_no_last)
-    SET_VALUE(LW(9), PTR(weapon_hammer_bros_renzoku_attack))
+    SET_VALUE(LW(9), PTR(&weapon_hammer_bros_renzoku_attack))
     SET_VALUE(LW(10), 0)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(damage_check_event_sub))
@@ -614,11 +718,11 @@ static EVT_BEGIN(renzoku_attack_event_sub_last)
     CALL(btlevtcmd_GetUnitWork, -2, 10, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL_CHILD(PTR(hammer_bros_attack_common_event2))
-        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_hammer_bros_renzoku_attack))
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_hammer_bros_renzoku_attack), 256, LW(5))
+        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_hammer_bros_renzoku_attack))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_hammer_bros_renzoku_attack), 256, LW(5))
         CALL_CHILD(PTR(hammer_bros_attack_common_event3))
         ELSE
-        SET_VALUE(LW(9), PTR(weapon_hammer_bros_renzoku_attack))
+        SET_VALUE(LW(9), PTR(&weapon_hammer_bros_renzoku_attack))
         SET_VALUE(LW(10), 1)
         SET_VALUE(LW(11), 0)
         CALL_CHILD(PTR(damage_check_event_sub))
@@ -628,8 +732,8 @@ EVT_END()
 
 static EVT_BEGIN(nagemakuri_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_hammer_bros_nagemakuri_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_hammer_bros_nagemakuri_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_hammer_bros_nagemakuri_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_hammer_bros_nagemakuri_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
@@ -639,10 +743,10 @@ static EVT_BEGIN(nagemakuri_attack_event)
         GOTO(99)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_hammer_bros_nagemakuri_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_hammer_bros_nagemakuri_attack))
     CALL(btlevtcmd_AttackDeclareAll, -2)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_hammer_bros_nagemakuri_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_hammer_bros_nagemakuri_attack))
     CALL(hammer_bros_nagemakuri_set_target, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
     CALL(btlevtcmd_SetUnitWork, -2, 0, LW(0))
     CALL(btlevtcmd_SetUnitWork, -2, 1, LW(2))
@@ -705,7 +809,7 @@ static EVT_BEGIN(nagemakuri_attack_event_sub)
 EVT_END()
 
 static EVT_BEGIN(nagemakuri_attack_event_sub_no_last)
-    SET_VALUE(LW(9), PTR(weapon_hammer_bros_nagemakuri_attack))
+    SET_VALUE(LW(9), PTR(&weapon_hammer_bros_nagemakuri_attack))
     SET_VALUE(LW(10), 0)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(damage_check_event_sub))
@@ -730,11 +834,11 @@ static EVT_BEGIN(nagemakuri_attack_event_sub_last)
     END_LOOP
     IF_INT_EQUAL(LW(0), 1)
         CALL_CHILD(PTR(hammer_bros_attack_common_event2))
-        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_hammer_bros_nagemakuri_attack))
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_hammer_bros_nagemakuri_attack), 256, LW(5))
+        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_hammer_bros_nagemakuri_attack))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_hammer_bros_nagemakuri_attack), 256, LW(5))
         CALL_CHILD(PTR(hammer_bros_attack_common_event3))
         ELSE
-        SET_VALUE(LW(9), PTR(weapon_hammer_bros_nagemakuri_attack))
+        SET_VALUE(LW(9), PTR(&weapon_hammer_bros_nagemakuri_attack))
         SET_VALUE(LW(10), 1)
         SET_VALUE(LW(11), 0)
         CALL_CHILD(PTR(damage_check_event_sub))

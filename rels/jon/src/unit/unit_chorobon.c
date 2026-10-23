@@ -6,6 +6,8 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
+#include "battle/battle_database_common.h"
+#include "data_tables.h"
 
 #pragma force_active on
 
@@ -25,32 +27,32 @@ USER_FUNC(btlevtcmd_SetJumpSound);
 USER_FUNC(btlevtcmd_SetScale);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 
-__declspec(section ".data") u64 fd_chorobon_negone_one_374;
-__declspec(section ".data") s32 fd_chorobon_neg_one_382[1];
-__declspec(section ".data") s32 fd_chorobon___local_PI_383[1];
-__declspec(section ".data") s32 fd_chorobon___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_chorobon_one_negone_373;
-__declspec(section ".data") s32 fd_chorobon___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_chorobon_one_381[1];
-__declspec(section ".data") u64 fd_chorobon_negone_one_360;
-__declspec(section ".data") s32 fd_chorobon_neg_one_365[1];
-__declspec(section ".data") s32 fd_chorobon___local_PI_366[1];
-__declspec(section ".data") s32 fd_chorobon___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_chorobon_one_negone_359;
-__declspec(section ".data") s32 fd_chorobon___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_chorobon_one_364[1];
+__declspec(section ".data") f32 fd_chorobon_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_chorobon_neg_one_382;
+__declspec(section ".data") f32 fd_chorobon___local_PI_383;
+__declspec(section ".data") f32 fd_chorobon___local_3PIO2_385;
+__declspec(section ".data") f32 fd_chorobon_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_chorobon___local_PIO2_384;
+__declspec(section ".data") f32 fd_chorobon_one_381;
+__declspec(section ".data") f32 fd_chorobon_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_chorobon_neg_one_365;
+__declspec(section ".data") f32 fd_chorobon___local_PI_366;
+__declspec(section ".data") f32 fd_chorobon___local_3PIO2_368;
+__declspec(section ".data") f32 fd_chorobon_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_chorobon___local_PIO2_367;
+__declspec(section ".data") f32 fd_chorobon_one_364;
 BattleUnitKind unit_chorobon;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
-static s32 weapon_chorobon_drain_attack[48];
+static BattleWeapon weapon_chorobon_drain_attack;
 static s32 attack_event[21];
-static s32 weapon_chorobon_drain_attack_biribiri_counterd[48];
+static BattleWeapon weapon_chorobon_drain_attack_biribiri_counterd;
 static PoseTableEntry pose_table[18];
 static BattleDataEntry data_table[14];
 static s32 rabbit_move[123];
-static s32 pose_sound_timing_table[20];
+static PoseSoundTiming pose_sound_timing_table[4];
 static s32 init_event[31];
 static __declspec(section ".data") s32 damage_event[10];
 static s32 counter_damage_event[41];
@@ -58,53 +60,33 @@ static s32 return_event[24];
 static s32 drain_attack_event[887];
 static __declspec(section ".data") s32 wait_event[6];
 
-__declspec(section ".data") u64 fd_chorobon_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_chorobon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_chorobon_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_chorobon_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_chorobon___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_chorobon___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_chorobon___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_chorobon___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_chorobon_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_chorobon_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_chorobon___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_chorobon___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_chorobon_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_chorobon_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_chorobon_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_chorobon_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_chorobon_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_chorobon_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_chorobon___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_chorobon___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_chorobon___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_chorobon___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_chorobon_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_chorobon_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_chorobon___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_chorobon___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_chorobon_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_chorobon_one_364 = 1.0f;
 
 BattleUnitKind unit_chorobon = {
     16,
@@ -182,13 +164,40 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_chorobon", "c_chorobon", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
-static s32 weapon_chorobon_drain_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536875008, 770, 0, 71, 0, 8196,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_chorobon_drain_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20001000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x47, // special
+    0, // counterResistFlags
+    0x2004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static EVT_BEGIN(attack_event)
@@ -198,18 +207,42 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, -2)
         RETURN
     END_IF
-    SET_VALUE(LW(9), PTR(weapon_chorobon_drain_attack))
+    SET_VALUE(LW(9), PTR(&weapon_chorobon_drain_attack))
     CALL_CHILD(PTR(drain_attack_event))
     RETURN
 EVT_END()
 
-static s32 weapon_chorobon_drain_attack_biribiri_counterd[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 0, 0, 8192,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_chorobon_drain_attack_biribiri_counterd = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, 0, 0, // acHelpMsg..counterResistFlags
+    0x2000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static PoseTableEntry pose_table[] = {
@@ -250,29 +283,53 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
-static s32 rabbit_move[] = {
-    65541, 2, 327771, (s32)btlevtcmd_AddScale, -2, -229999837, -230000245, 0,
-    65545, 1, 6, 65539, 0, 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 131122, -29999989, -29999995, 131126, -29999989,
-    -30000000, 131122, -29999988, -29999989, 131098, -29999988, 0, 131127,
-    -29999988, -1, 33, 131099, -29999988, -29999992, 131101, -29999989,
-    0, 131125, -30000000, -29999992, 32, 131126, -30000000, -29999992,
-    33, 327771, (s32)btlevtcmd_SetScale, -2, -229998976, -229998976, -229998976, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999994, -29999998, 0, -1, 65541,
-    2, 327771, (s32)btlevtcmd_AddScale, -2, -229999837, -230000245, 0, 65545,
-    1, 6, 65540, 0, 32, 327771, (s32)btlevtcmd_SetScale, -2,
-    -229998976, -229998976, -229998976, 458843, (s32)btlevtcmd_JumpPosition, -2, -29999995, -29999994,
-    -29999993, 0, -1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_CHORO1_LANDING1", -250000000,
-    0, -250000000, 65541, 2, 327771, (s32)btlevtcmd_AddScale, -2, -229999837,
-    -230000245, 0, 65545, 1, 6, 33, 65541, 2,
-    327771, (s32)btlevtcmd_AddScale, -2, -230000163, -229999755, 0, 65545, 1,
-    6, 2, 1,
-};
+static EVT_BEGIN(rabbit_move)
+    LOOP(2)
+        CALL(btlevtcmd_AddScale, -2, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    LABEL(0)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    SET_VALUE(LW(11), LW(5))
+    SUBTRACT(LW(11), LW(0))
+    SET_VALUE(LW(12), LW(11))
+    IF_INT_LESS(LW(12), 0)
+        MULTIPLY(LW(12), -1)
+    END_IF
+    IF_INT_GREATER(LW(12), LW(8))
+        IF_INT_GREATER_OR_EQUAL(LW(11), 0)
+            ADD(LW(0), LW(8))
+        ELSE
+            SUBTRACT(LW(0), LW(8))
+        END_IF
+        CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(6), LW(2), 0, -1)
+        LOOP(2)
+            CALL(btlevtcmd_AddScale, -2, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+        GOTO(0)
+    ELSE
+        CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+        CALL(btlevtcmd_JumpPosition, -2, LW(5), LW(6), LW(7), 0, -1)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_CHORO1_LANDING1"), -250000000, 0, -250000000)
+        LOOP(2)
+            CALL(btlevtcmd_AddScale, -2, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_IF
+    LOOP(2)
+        CALL(btlevtcmd_AddScale, -2, FLOAT(-0.15917969f), FLOAT(0.23925781f), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    RETURN
+EVT_END()
 
-static s32 pose_sound_timing_table[] = {
-    (s32)"CBN_S_1", 1058362709, 0, (s32)"SFX_ENM_CHORO1_MOVE1", 1, (s32)"CBN_S_1", 1062557013, 0,
-    (s32)"SFX_ENM_CHORO1_WAIT2", 1, (s32)"CBN_S_1", 1070246571, 0, (s32)"SFX_ENM_CHORO1_WAIT1", 1, 0,
-    0, 0, 0, 1,
+static PoseSoundTiming pose_sound_timing_table[] = {
+    {"CBN_S_1", 0.5833333f, NULL, "SFX_ENM_CHORO1_MOVE1", 0, 1},
+    {"CBN_S_1", 0.8333333f, NULL, "SFX_ENM_CHORO1_WAIT2", 0, 1},
+    {"CBN_S_1", 1.5833334f, NULL, "SFX_ENM_CHORO1_WAIT1", 0, 1},
+    {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
 static EVT_BEGIN(init_event)
@@ -319,119 +376,244 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
-static s32 drain_attack_event[] = {
-    196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000,
-    (s32)weapon_chorobon_drain_attack, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_chorobon_drain_attack, -29999997, -29999996, 131096, -29999997,
-    -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16, -30000000, 131097, -30000000,
-    0, 65630, (s32)subsetevt_confuse_flustered, 2, 33, 65540, 99, 33,
-    131163, (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_chorobon_drain_attack, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996,
-    65627, (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_chorobon_drain_attack, 458843, (s32)btlevtcmd_CalculateFaceDirection,
-    -2, -1, -29999997, -29999996, 16, -29999985, 196699, (s32)btlevtcmd_ChangeFaceDirection,
-    -2, -29999985, 196699, (s32)evt_btl_camera_set_mode, 0, 8, 262235, (s32)evt_btl_camera_set_homing_unit,
-    0, -2, -29999997, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 196699,
-    (s32)evt_btl_camera_set_zoom, 0, 250, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 40,
-    327771, (s32)btlevtcmd_JumpSetting, -2, 0, -229995904, -229999386, 393307, (s32)btlevtcmd_GetHitPos,
-    -29999997, -29999996, -29999995, -29999994, -29999993, 131122, -29999994, 0,
-    262235, (s32)btlevtcmd_FaceDirectionAdd, -29999997, -29999995, 50, 131122, -29999992, 50,
-    65630, (s32)rabbit_move, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom,
-    0, 350, 196699, (s32)evt_btl_camera_nomove_y_onoff, 0, 1, 262235, (s32)btlevtcmd_AnimeChangePoseType,
-    -2, 1, 40, 327771, (s32)btlevtcmd_JumpSetting, -2, 60, 0,
-    -229999284, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998,
-    262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 5, 131126, -29999999, 10,
-    131126, -29999998, 2, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999,
-    -29999998, 20, -1, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996,
-    (s32)weapon_chorobon_drain_attack, 256, -29999995, 65570, -29999995, 65579, 4, 65540,
-    90, 46, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38,
-    65540, 90, 46, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    39, 65540, 90, 65572, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    40, 65540, 90, 65572, 1, 65540, 91, 46,
-    42, 65540, 98, 46, 49, 65539, 90, 327771,
-    (s32)btlevtcmd_JumpSetting, -2, 0, -229996928, -229999796, 327771, (s32)btlevtcmd_GetPos, -29999997,
-    -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999997, -30000000, 5,
-    131122, -29999999, 0, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999,
-    -29999998, 0, -1, 327771, (s32)btlevtcmd_JumpSetting, -2, 0, -229998464,
-    -229999796, 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000, -29999999, -29999998, 262235,
-    (s32)btlevtcmd_FaceDirectionSub, -29999997, -30000000, 30, 131122, -29999999, 0, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 0, -1, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_CHORO1_LANDING1", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"CBN_N_1", 65546, 1000, 65540, 98, 65539,
-    91, 131122, -70000000, 0, 458843, (s32)btlevtcmd_PreCheckCounter, -2, -29999997,
-    -29999996, (s32)weapon_chorobon_drain_attack, 256, -29999995, 131096, -29999995, 17, 131122,
-    -70000000, 1, 33, 131096, -29999995, 14, 131122, -70000000,
-    1, 33, 131096, -70000000, 1, 327771, (s32)btlevtcmd_SetRotate, -2,
-    0, 0, 0, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, (s32)weapon_chorobon_drain_attack, 131122,
-    -29999991, (s32)weapon_chorobon_drain_attack_biribiri_counterd, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991,
-    256, -29999995, 2, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_CHORO1_ATTACK1_1",
-    -250000000, 0, -250000000, 196699, (s32)btlevtcmd_GetBodyId, -29999997, -30000000, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -29999997, -30000000, 37, 107, 131122, -30000000, 89,
-    131122, -29999999, 1, 131122, -29999998, 2, 131122, -29999995,
-    -29999998, 65539, 20, 131126, -29999995, 1, 131100, -29999995,
-    0, 131122, -29999995, -29999998, 131096, -29999999, 0, 131122,
-    -29999999, 1, 32, 131122, -29999999, 0, 33, 33,
-    327771, (s32)btlevtcmd_SetDispOffset, -29999997, -29999999, 0, 0, 65545, 1,
-    131126, -30000000, 1, 131101, -30000000, 1, 65540, 20,
-    33, 327771, (s32)btlevtcmd_SetDispOffset, -29999997, 0, 0, 0, 109,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_CHORO1_ATTACK1_2", -250000000, 0, -250000000, 196699,
-    (s32)btlevtcmd_GetFaceDirection, -2, -29999985, 131122, -29999986, 20, 131096, -29999985,
-    -1, 131122, -29999986, -20, 33, 327771, (s32)btlevtcmd_SetRotate, -2,
-    0, 0, -29999986, 262235, (s32)btlevtcmd_AnimeSetMotionSpeed, -2, 1, -229998464,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"CBN_A_2", 65545, 90, 262235,
-    (s32)btlevtcmd_AnimeSetMotionSpeed, -2, 1, -229998976, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"CBN_R_2", 327771, (s32)btlevtcmd_SetScale, -2, -229998976, -229998976, -229998976, 65541,
-    4, 65545, 1, 327771, (s32)btlevtcmd_AddScale, -2, 0, -230000204,
-    0, 6, 327771, (s32)btlevtcmd_SetScale, -2, -229998976, -229999796, -229998976,
-    65541, 20, 65545, 1, 327771, (s32)btlevtcmd_AddScale, -2, -230000010,
-    -229999949, 0, 6, 65545, 1, 327771, (s32)btlevtcmd_SetScale, -2,
-    -229998976, -229998976, -229998976, 393307, (s32)evt_btl_camera_shake_h, 0, 1, 1,
-    8, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_add_zoom,
-    0, -50, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_CHORO1_ATTACK2", -250000000, 0,
-    -250000000, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0, 196699,
-    (s32)btlevtcmd_ResultACDefence, -29999997, (s32)weapon_chorobon_drain_attack, 131122, -29999991, (s32)weapon_chorobon_drain_attack, 458843, (s32)btlevtcmd_CheckDamage,
-    -2, -29999997, -29999996, -29999991, 256, -29999995, 196699, (s32)btlevtcmd_GetHpDamage,
-    -29999997, -29999990, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 40, 131101,
-    -29999990, 1, 327771, (s32)btlevtcmd_AddScale, -2, -229999488, -229999488, 0,
-    33, 65541, 4, 327771, (s32)btlevtcmd_AddScale, -2, -230000081, -229999878,
-    0, 65545, 1, 6, 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
-    -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 40, 196699,
-    (s32)btlevtcmd_SetFallAccel, -2, -229999284, 327771, (s32)btlevtcmd_AddScale, -2, -229999673, -230000491,
-    0, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, 0, -29999998, 20,
-    -1, 65541, 2, 327771, (s32)btlevtcmd_AddScale, -2, -229999837, -230000245,
-    0, 65545, 1, 6, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000,
-    20, 327771, (s32)btlevtcmd_AddScale, -2, -230000327, -229999509, 0, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, 0, -29999998, 10, -1, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_CHORO1_LANDING1", -250000000, 0, -250000000, 65541, 2,
-    327771, (s32)btlevtcmd_AddScale, -2, -229999837, -230000245, 0, 65545, 1,
-    6, 65541, 2, 327771, (s32)btlevtcmd_AddScale, -2, -230000163, -229999755,
-    0, 65545, 1, 6, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"CBN_W_1", 131101, -29999990, 1, 65541, 20, 327771, (s32)btlevtcmd_AddScale,
-    -2, -230000025, -230000025, 0, 65545, 1, 6, 196699,
-    (s32)btlevtcmd_GetBodyId, -2, -29999999, 327771, (s32)btlevtcmd_GetPos, -2, -29999995, -29999994,
-    -29999993, 131125, -29999994, 45, 131125, -29999993, 10, 131096,
-    -29999991, (s32)weapon_chorobon_drain_attack, 262235, (s32)btlevtcmd_RecoverHp, -2, -29999999, -29999990, 983131,
-    (s32)evt_eff, (s32)"", (s32)"recovery", 7, -29999995, -29999994, -29999993, -29999990,
-    0, 0, 0, 0, 0, 0, 0, 32,
-    262235, (s32)btlevtcmd_RecoverFp, -2, -29999999, -29999990, 983131, (s32)evt_eff, (s32)"",
-    (s32)"recovery", 8, -29999995, -29999994, -29999993, -29999990, 0, 0,
-    0, 0, 0, 0, 0, 33, 327771, (s32)btlevtcmd_SetScale,
-    -2, -229998976, -229998976, -229998976, 33, 65541, 2, 327771,
-    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 131125, -29999999, 30,
-    589915, (s32)btlevtcmd_SetMoveSoundDataWork, -2, (s32)"SFX_ENM_CHORO1_ATTACK3\0", 0, 0, -1, -1,
-    0, 0, 65541, 2, 327771, (s32)btlevtcmd_AddScale, -2, -229999837,
-    -230000245, 0, 65545, 1, 6, 327771, (s32)btlevtcmd_SetScale, -2,
-    -229998976, -229998976, -229998976, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999,
-    -29999998, 6, -2, 65545, 16, 65541, 2, 327771,
-    (s32)btlevtcmd_AddScale, -2, -229999837, -230000245, 0, 65545, 1, 6,
-    327771, (s32)btlevtcmd_SetScale, -2, -229998976, -229998976, -229998976, 589915, (s32)btlevtcmd_SetMoveSoundDataWork,
-    -2, 0, 0, 0, -1, -1, 0, 0,
-    458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, 0, -29999998, 6, -2,
-    6, 65541, 2, 327771, (s32)btlevtcmd_AddScale, -2, -229999837, -230000245,
-    0, 65545, 1, 6, 65541, 2, 327771, (s32)btlevtcmd_AddScale,
-    -2, -230000163, -229999755, 0, 65545, 1, 6, 65540,
-    98, 65539, 98, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699,
-    (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_nomove_y_onoff, 0, 0, 65630,
-    (s32)return_event, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 65539, 99, 131163,
-    (s32)btlevtcmd_ResetFaceDirection, -2, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+static EVT_BEGIN(drain_attack_event)
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_chorobon_drain_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_chorobon_drain_attack), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_chorobon_drain_attack))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_chorobon_drain_attack))
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(evt_btl_camera_set_mode, 0, 8)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(evt_btl_camera_set_zoom, 0, 250)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+    CALL(btlevtcmd_JumpSetting, -2, 0, FLOAT(4.0f), FLOAT(0.5996094f))
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(5), LW(6), LW(7))
+    SET_VALUE(LW(6), 0)
+    CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(5), 50)
+    SET_VALUE(LW(8), 50)
+    CALL_CHILD(rabbit_move)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 350)
+    CALL(evt_btl_camera_nomove_y_onoff, 0, 1)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+    CALL(btlevtcmd_JumpSetting, -2, 60, 0, FLOAT(0.69921875f))
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 5)
+    SUBTRACT(LW(1), 10)
+    SUBTRACT(LW(2), 2)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 20, -1)
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_chorobon_drain_attack), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+    END_SWITCH
+    LABEL(90)
+    CALL(btlevtcmd_JumpSetting, -2, 0, FLOAT(3.0f), FLOAT(0.19921875f))
+    CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 5)
+    SET_VALUE(LW(1), 0)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
+    CALL(btlevtcmd_JumpSetting, -2, 0, FLOAT(1.5f), FLOAT(0.19921875f))
+    CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 30)
+    SET_VALUE(LW(1), 0)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_CHORO1_LANDING1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("CBN_N_1"))
+    WAIT_MS(1000)
+    GOTO(98)
+    LABEL(91)
+    SET_VALUE(LF(0), 0)
+    CALL(btlevtcmd_PreCheckCounter, -2, LW(3), LW(4), PTR(&weapon_chorobon_drain_attack), 256, LW(5))
+    IF_INT_EQUAL(LW(5), 17)
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_INT_EQUAL(LW(5), 14)
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_INT_EQUAL(LF(0), 1)
+        CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_chorobon_drain_attack))
+        SET_VALUE(LW(9), PTR(&weapon_chorobon_drain_attack_biribiri_counterd))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        RETURN
+    END_IF
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_CHORO1_ATTACK1_1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetBodyId, LW(3), LW(0))
+    CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(0), 37)
+    BEGIN_INLINE_EVENT
+        SET_VALUE(LW(0), 89)
+        SET_VALUE(LW(1), 1)
+        SET_VALUE(LW(2), 2)
+        SET_VALUE(LW(5), LW(2))
+        LABEL(20)
+        SUBTRACT(LW(5), 1)
+        IF_INT_LESS_OR_EQUAL(LW(5), 0)
+            SET_VALUE(LW(5), LW(2))
+            IF_INT_EQUAL(LW(1), 0)
+                SET_VALUE(LW(1), 1)
+            ELSE
+                SET_VALUE(LW(1), 0)
+            END_IF
+        END_IF
+        CALL(btlevtcmd_SetDispOffset, LW(3), LW(1), 0, 0)
+        WAIT_FRAMES(1)
+        SUBTRACT(LW(0), 1)
+        IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+            GOTO(20)
+        END_IF
+        CALL(btlevtcmd_SetDispOffset, LW(3), 0, 0, 0)
+    END_INLINE_EVENT
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_CHORO1_ATTACK1_2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(15))
+    SET_VALUE(LW(14), 20)
+    IF_INT_EQUAL(LW(15), -1)
+        SET_VALUE(LW(14), -20)
+    END_IF
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(14))
+    CALL(btlevtcmd_AnimeSetMotionSpeed, -2, 1, FLOAT(1.5f))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("CBN_A_2"))
+    WAIT_FRAMES(90)
+    CALL(btlevtcmd_AnimeSetMotionSpeed, -2, 1, FLOAT(1.0f))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("CBN_R_2"))
+    CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+    LOOP(4)
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_AddScale, -2, 0, FLOAT(-0.19921875f), 0)
+    END_LOOP
+    CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(0.19921875f), FLOAT(1.0f))
+    LOOP(20)
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_AddScale, -2, FLOAT(-0.009765625f), FLOAT(0.049804688f), 0)
+    END_LOOP
+    WAIT_FRAMES(1)
+    CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+    CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_add_zoom, 0, -50)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_CHORO1_ATTACK2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_chorobon_drain_attack))
+    SET_VALUE(LW(9), PTR(&weapon_chorobon_drain_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_GetHpDamage, LW(3), LW(10))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+    IF_INT_GREATER_OR_EQUAL(LW(10), 1)
+        CALL(btlevtcmd_AddScale, -2, FLOAT(0.5f), FLOAT(0.5f), 0)
+    END_IF
+    LOOP(4)
+        CALL(btlevtcmd_AddScale, -2, FLOAT(-0.07910156f), FLOAT(0.119140625f), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 40)
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.69921875f))
+    CALL(btlevtcmd_AddScale, -2, FLOAT(0.31933594f), FLOAT(-0.4794922f), 0)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), 20, -1)
+    LOOP(2)
+        CALL(btlevtcmd_AddScale, -2, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 20)
+    CALL(btlevtcmd_AddScale, -2, FLOAT(-0.31933594f), FLOAT(0.4794922f), 0)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), 10, -1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_CHORO1_LANDING1"), -250000000, 0, -250000000)
+    LOOP(2)
+        CALL(btlevtcmd_AddScale, -2, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    LOOP(2)
+        CALL(btlevtcmd_AddScale, -2, FLOAT(-0.15917969f), FLOAT(0.23925781f), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("CBN_W_1"))
+    IF_INT_GREATER_OR_EQUAL(LW(10), 1)
+        LOOP(20)
+            CALL(btlevtcmd_AddScale, -2, FLOAT(-0.024414062f), FLOAT(-0.024414062f), 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(btlevtcmd_GetBodyId, -2, LW(1))
+        CALL(btlevtcmd_GetPos, -2, LW(5), LW(6), LW(7))
+        ADD(LW(6), 45)
+        ADD(LW(7), 10)
+        IF_INT_EQUAL(LW(9), PTR(&weapon_chorobon_drain_attack))
+            CALL(btlevtcmd_RecoverHp, -2, LW(1), LW(10))
+            CALL(evt_eff, STRING(""), STRING("recovery"), 7, LW(5), LW(6), LW(7), LW(10), 0, 0, 0, 0, 0, 0, 0)
+        ELSE
+            CALL(btlevtcmd_RecoverFp, -2, LW(1), LW(10))
+            CALL(evt_eff, STRING(""), STRING("recovery"), 8, LW(5), LW(6), LW(7), LW(10), 0, 0, 0, 0, 0, 0, 0)
+        END_IF
+        CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+    END_IF
+    LOOP(2)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        ADD(LW(1), 30)
+        CALL(btlevtcmd_SetMoveSoundDataWork, -2, STRING("SFX_ENM_CHORO1_ATTACK3\0"), 0, 0, -1, -1, 0, 0)
+        LOOP(2)
+            CALL(btlevtcmd_AddScale, -2, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 6, -2)
+        WAIT_FRAMES(16)
+        LOOP(2)
+            CALL(btlevtcmd_AddScale, -2, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+        CALL(btlevtcmd_SetMoveSoundDataWork, -2, 0, 0, 0, -1, -1, 0, 0)
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), 6, -2)
+    END_LOOP
+    LOOP(2)
+        CALL(btlevtcmd_AddScale, -2, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    LOOP(2)
+        CALL(btlevtcmd_AddScale, -2, FLOAT(-0.15917969f), FLOAT(0.23925781f), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    GOTO(98)
+    LABEL(98)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_nomove_y_onoff, 0, 0)
+    CALL_CHILD(return_event)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    LABEL(99)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)

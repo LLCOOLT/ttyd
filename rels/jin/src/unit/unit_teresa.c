@@ -9,6 +9,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -36,29 +37,29 @@ static USER_FUNC(teresa_check_move);
 static USER_FUNC(teresa_check_teresa);
 static USER_FUNC(teresa_check_trans);
 
-__declspec(section ".data") u64 fd_teresa_negone_one_374;
-__declspec(section ".data") s32 fd_teresa_neg_one_382[1];
-__declspec(section ".data") s32 fd_teresa___local_PI_383[1];
-__declspec(section ".data") s32 fd_teresa___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_teresa_one_negone_373;
-__declspec(section ".data") s32 fd_teresa___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_teresa_one_381[1];
-__declspec(section ".data") u64 fd_teresa_negone_one_360;
-__declspec(section ".data") s32 fd_teresa_neg_one_365[1];
-__declspec(section ".data") s32 fd_teresa___local_PI_366[1];
-__declspec(section ".data") s32 fd_teresa___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_teresa_one_negone_359;
-__declspec(section ".data") s32 fd_teresa___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_teresa_one_364[1];
+__declspec(section ".data") f32 fd_teresa_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_teresa_neg_one_382;
+__declspec(section ".data") f32 fd_teresa___local_PI_383;
+__declspec(section ".data") f32 fd_teresa___local_3PIO2_385;
+__declspec(section ".data") f32 fd_teresa_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_teresa___local_PIO2_384;
+__declspec(section ".data") f32 fd_teresa_one_381;
+__declspec(section ".data") f32 fd_teresa_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_teresa_neg_one_365;
+__declspec(section ".data") f32 fd_teresa___local_PI_366;
+__declspec(section ".data") f32 fd_teresa___local_3PIO2_368;
+__declspec(section ".data") f32 fd_teresa_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_teresa___local_PIO2_367;
+__declspec(section ".data") f32 fd_teresa_one_364;
 BattleUnitKind unit_teresa;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
-static s32 weapon_teresa_attack[48];
-static s32 weapon_teresa_trans_myself[48];
-static s32 weapon_teresa_trans[48];
-static s32 weapon_teresa_move[48];
+static BattleWeapon weapon_teresa_attack;
+static BattleWeapon weapon_teresa_trans_myself;
+static BattleWeapon weapon_teresa_trans;
+static BattleWeapon weapon_teresa_move;
 static PoseTableEntry pose_table[17];
 static __declspec(section ".data") BattleDataEntry data_table[1];
 static s32 init_event[47];
@@ -71,53 +72,33 @@ static s32 move_event[84];
 static s32 move_event_sub[103];
 static __declspec(section ".data") s32 wait_event[6];
 
-__declspec(section ".data") u64 fd_teresa_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_teresa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_teresa_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_teresa_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_teresa___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_teresa___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_teresa___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_teresa___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_teresa_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_teresa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_teresa___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_teresa___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_teresa_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_teresa_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_teresa_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_teresa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_teresa_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_teresa_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_teresa___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_teresa___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_teresa___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_teresa___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_teresa_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_teresa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_teresa___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_teresa___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_teresa_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_teresa_one_364 = 1.0f;
 
 BattleUnitKind unit_teresa = {
     75,
@@ -195,40 +176,148 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_teresa", "c_teresa", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
-static s32 weapon_teresa_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 135, 2047, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_teresa_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_teresa_trans_myself[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 264, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1677852672, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_teresa_trans_myself = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x108, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, // holdFastTime
+    100, // invisibleChance
+    2, // invisibleTime
+    0, 0, 0, 0, // hpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_teresa_trans[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830240, 536870912, 770, 0, 264, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1677852672, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_teresa_trans = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101160, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x108, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    100, // invisibleChance
+    2, // invisibleTime
+    0, 0, 0, 0, // hpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_teresa_move[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 536870912, 770, 0, 8, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_teresa_move = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    8, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static PoseTableEntry pose_table[] = {
@@ -341,126 +430,241 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static s32 normal_attack_event[] = {
-    196699, (s32)btlevtcmd_check_battleflag, -30000000, 2, 131097, -30000000, 0, 196699,
-    (s32)btlevtcmd_GetFirstAttackTarget, -29999997, -29999996, 32, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000,
-    262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, (s32)weapon_teresa_attack, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_teresa_attack,
-    -29999997, -29999996, 33, 131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken,
-    -2, 16, -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered,
-    2, 33, 65540, 99, 33, 131163, (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_teresa_attack,
-    262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996, 65627, (s32)btlevtcmd_WaitGuardMove, 196699,
-    (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_teresa_attack, 196699, (s32)evt_btl_camera_set_mode, 0, 8, 262235,
-    (s32)evt_btl_camera_set_homing_unit, 0, -2, -29999997, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1,
-    196699, (s32)evt_btl_camera_set_zoom, 0, 250, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1,
-    42, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_TELESA_MOVE3", -250000000, 0, -250000000,
-    110, 262235, (s32)btlevtcmd_SetAlpha, -2, 1, 255, 131122, -29999993,
-    256, 65541, 16, 65545, 1, 131126, -29999993, 16,
-    262235, (s32)btlevtcmd_SetAlpha, -2, 1, -29999993, 6, 65545, 20,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_TELESA_MOVE4", -250000000, 0, -250000000, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1", 262235, (s32)btlevtcmd_SetAlpha, -2, 1,
-    0, 131122, -29999993, -1, 65541, 8, 65545, 1,
-    131125, -29999993, 32, 262235, (s32)btlevtcmd_SetAlpha, -2, 1, -29999993,
-    6, 112, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999,
-    -29999998, 262235, (s32)btlevtcmd_FaceDirectionAdd, -29999997, -30000000, 15, 131125, -29999998,
-    5, 131126, -29999999, 10, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000,
-    -29999999, -29999998, 60, -5, 4, 0, -1, 458843,
-    (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996, 16, -29999985, 196699,
-    (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 262235, (s32)btlevtcmd_SetAlpha, -2, 1, 255,
-    65545, 15, 110, 65545, 9, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_ENM_TELESA_ATTACK1", -250000000, 0, -250000000, 112, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    1, (s32)"A_2", 65545, 15, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997,
-    -29999996, (s32)weapon_teresa_attack, 0, -29999995, 65570, -29999995, 65579, 4,
-    65540, 90, 46, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    38, 65540, 90, 46, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid,
-    -29999997, 39, 65540, 90, 65572, 2, 196699, (s32)btlevtcmd_StartAvoid,
-    -29999997, 40, 65540, 90, 65572, 1, 65540, 91,
-    46, 42, 65540, 98, 46, 65539, 90, 65545,
-    30, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"X_1", 65545, 60,
-    65540, 98, 65539, 91, 393307, (s32)evt_btl_camera_shake_h, 0, 1,
-    1, 8, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699,
-    (s32)evt_btl_camera_add_zoom, 0, -50, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, (s32)weapon_teresa_attack, 458843,
-    (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, (s32)weapon_teresa_attack, 256, -29999995, 65545,
-    30, 65540, 98, 65539, 98, 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42, 393307, (s32)btlevtcmd_AddPartsRotate,
-    -2, 1, 0, 180, 0, 327771, (s32)btlevtcmd_GetHomePos, -2,
-    -30000000, -29999999, -29999998, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999,
-    -29999998, 40, 0, 4, 0, -1, 393307, (s32)btlevtcmd_SetPartsRotate,
-    -2, 1, 0, 0, 0, 131163, (s32)btlevtcmd_ResetFaceDirection, -2,
-    2, 1,
-};
+static EVT_BEGIN(normal_attack_event)
+    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
+    ELSE
+        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_teresa_attack))
+        CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_teresa_attack), LW(3), LW(4))
+    END_IF
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_teresa_attack))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_teresa_attack))
+    CALL(evt_btl_camera_set_mode, 0, 8)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(evt_btl_camera_set_zoom, 0, 250)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TELESA_MOVE3"), -250000000, 0, -250000000)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_SetAlpha, -2, 1, 255)
+        SET_VALUE(LW(7), 256)
+        LOOP(16)
+            WAIT_FRAMES(1)
+            SUBTRACT(LW(7), 16)
+            CALL(btlevtcmd_SetAlpha, -2, 1, LW(7))
+        END_LOOP
+        WAIT_FRAMES(20)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TELESA_MOVE4"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1"))
+        CALL(btlevtcmd_SetAlpha, -2, 1, 0)
+        SET_VALUE(LW(7), -1)
+        LOOP(8)
+            WAIT_FRAMES(1)
+            ADD(LW(7), 32)
+            CALL(btlevtcmd_SetAlpha, -2, 1, LW(7))
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 15)
+    ADD(LW(2), 5)
+    SUBTRACT(LW(1), 10)
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 60, -5, 4, 0, -1)
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_SetAlpha, -2, 1, 255)
+    WAIT_FRAMES(15)
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(9)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TELESA_ATTACK1"), -250000000, 0, -250000000)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2"))
+    WAIT_FRAMES(15)
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_teresa_attack), 0, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+        LABEL(90)
+        WAIT_FRAMES(30)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("X_1"))
+        WAIT_FRAMES(60)
+        GOTO(98)
+        LABEL(91)
+        CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
+        CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+        CALL(evt_btl_camera_add_zoom, 0, -50)
+        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_teresa_attack))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_teresa_attack), 256, LW(5))
+        WAIT_FRAMES(30)
+        GOTO(98)
+        LABEL(98)
+        CALL(evt_btl_camera_set_mode, 0, 0)
+        CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+        CALL(btlevtcmd_AddPartsRotate, -2, 1, 0, 180, 0)
+        CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 40, 0, 4, 0, -1)
+        CALL(btlevtcmd_SetPartsRotate, -2, 1, 0, 0, 0)
+        CALL(btlevtcmd_ResetFaceDirection, -2)
+        RETURN
+EVT_END()
 
-static s32 trans_myself_event[] = {
-    131122, -29999997, -2, 131122, -29999996, 1, 262235, (s32)btlevtcmd_CheckStatus,
-    -2, 18, -29999992, 131163, (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_teresa_trans_myself, 262235, (s32)btlevtcmd_AttackDeclare,
-    -2, -29999997, -29999996, 196699, (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_teresa_trans_myself, 196699,
-    (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2, -1,
-    196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0, 300,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 40, 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 30,
-    131126, -29999999, 10, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999,
-    -29999998, 30, 10, 4, 0, -1, 65545, 30,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_TELESA_MOVE2", -250000000, 0, -250000000, 131096,
-    -29999992, 0, 262235, (s32)btlevtcmd_SetAlpha, -2, 1, 255, 131122,
-    -29999993, 256, 110, 65541, 16, 65545, 1, 131126,
-    -29999993, 8, 262235, (s32)btlevtcmd_SetAlpha, -2, 1, -29999993, 6,
-    112, 33, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1", 393307,
-    (s32)btlevtcmd_SetPartsRotate, -2, 1, 0, 180, 0, 327771, (s32)btlevtcmd_GetHomePos,
-    -2, -30000000, -29999999, -29999998, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000,
-    -29999999, -29999998, 10, 0, 5, 0, -1, 65545,
-    10, 65541, 6, 65545, 1, 393307, (s32)btlevtcmd_AddPartsRotate, -2,
-    1, 0, 15, 0, 6, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    1, (s32)"S_1", 65541, 6, 65545, 1, 393307, (s32)btlevtcmd_AddPartsRotate,
-    -2, 1, 0, 15, 0, 6, 65545, 12,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"S_1", 262235, (s32)btlevtcmd_SetAlpha, -2, 1, 255, 196699, (s32)btlevtcmd_ResultACDefence,
-    -29999997, (s32)weapon_teresa_trans_myself, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, (s32)weapon_teresa_trans_myself,
-    256, -29999995, 2, 1,
-};
+static EVT_BEGIN(trans_myself_event)
+    SET_VALUE(LW(3), -2)
+    SET_VALUE(LW(4), 1)
+    CALL(btlevtcmd_CheckStatus, -2, 18, LW(8))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_teresa_trans_myself))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_teresa_trans_myself))
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 300)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 30)
+    SUBTRACT(LW(1), 10)
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 30, 10, 4, 0, -1)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TELESA_MOVE2"), -250000000, 0, -250000000)
+    IF_INT_EQUAL(LW(8), 0)
+        CALL(btlevtcmd_SetAlpha, -2, 1, 255)
+        SET_VALUE(LW(7), 256)
+        BEGIN_SIBLING_EVENT
+            LOOP(16)
+                WAIT_FRAMES(1)
+                SUBTRACT(LW(7), 8)
+                CALL(btlevtcmd_SetAlpha, -2, 1, LW(7))
+            END_LOOP
+        END_SIBLING_EVENT
+    END_IF
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1"))
+    CALL(btlevtcmd_SetPartsRotate, -2, 1, 0, 180, 0)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 10, 0, 5, 0, -1)
+    WAIT_FRAMES(10)
+    LOOP(6)
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_AddPartsRotate, -2, 1, 0, 15, 0)
+    END_LOOP
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+    LOOP(6)
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_AddPartsRotate, -2, 1, 0, 15, 0)
+    END_LOOP
+    WAIT_FRAMES(12)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+    CALL(btlevtcmd_SetAlpha, -2, 1, 255)
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_teresa_trans_myself))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_teresa_trans_myself), 256, LW(5))
+    RETURN
+EVT_END()
 
-static s32 trans_event[] = {
-    65539, 0, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy,
-    -2, -30000000, (s32)weapon_teresa_trans, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_teresa_trans, -29999997, -29999996,
-    131096, -29999997, -1, 65540, 99, 33, 196699, (s32)teresa_check_teresa,
-    -29999997, -30000000, 131096, -30000000, 1, 262235, (s32)btlevtcmd_CheckStatus, -29999997,
-    18, -30000000, 131096, -30000000, 0, 65540, 1, 33,
-    33, 65540, 0, 65539, 1, 131163, (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_teresa_trans,
-    262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996, 196699, (s32)btlevtcmd_PayWeaponCost, -2,
-    (s32)weapon_teresa_trans, 196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0,
-    -2, -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom,
-    0, 300, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999,
-    -29999998, 327771, (s32)btlevtcmd_GetPos, -2, -29999990, -29999989, -29999988, 131100,
-    -30000000, -29999990, 393307, (s32)btlevtcmd_SetPartsRotate, -2, 1, 0, 0,
-    0, 32, 393307, (s32)btlevtcmd_SetPartsRotate, -2, 1, 0, 180,
-    0, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_TELESA_MOVE3", -250000000, 0,
-    -250000000, 262235, (s32)btlevtcmd_SetAlpha, -2, 1, 255, 131122, -29999993,
-    256, 110, 65541, 16, 65545, 1, 131126, -29999993,
-    16, 262235, (s32)btlevtcmd_SetAlpha, -2, 1, -29999993, 6, 112,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 40, 393307, (s32)btlevtcmd_GetHitPos, -29999997,
-    -29999996, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999997, -30000000,
-    40, 131126, -29999999, 10, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000,
-    -29999999, -29999998, 60, -5, 4, 0, -1, 393307,
-    (s32)btlevtcmd_SetPartsRotate, -2, 1, 0, 0, 0, 458843, (s32)btlevtcmd_CalculateFaceDirection,
-    -2, -1, -29999997, -29999996, 16, -29999985, 196699, (s32)btlevtcmd_ChangeFaceDirection,
-    -2, -29999985, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_TELESA_MOVE4", -250000000, 0,
-    -250000000, 262235, (s32)btlevtcmd_SetAlpha, -2, 1, 0, 131122, -29999993,
-    -1, 65541, 16, 65545, 1, 131125, -29999993, 16,
-    262235, (s32)btlevtcmd_SetAlpha, -2, 1, -29999993, 6, 262235, (s32)btlevtcmd_SetAlpha,
-    -2, 1, 255, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 20,
-    655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999, -29999998, 40, 0,
-    0, 0, -1, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, (s32)weapon_teresa_trans_myself, 458843,
-    (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, (s32)weapon_teresa_trans_myself, 256, -29999995, 327771,
-    (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 655451, (s32)btlevtcmd_DivePosition, -2,
-    -30000000, -29999999, -29999998, 30, -5, 4, 0, -1,
-    393307, (s32)btlevtcmd_SetPartsRotate, -2, 1, 0, 0, 0, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"S_1", 196699, (s32)evt_btl_camera_set_mode, 0, 0,
-    65545, 20, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 65539, 99, 2,
-    1,
-};
+static EVT_BEGIN(trans_event)
+    LABEL(0)
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_teresa_trans))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_teresa_trans), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF
+    CALL(teresa_check_teresa, LW(3), LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(btlevtcmd_CheckStatus, LW(3), 18, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            GOTO(1)
+        END_IF
+    END_IF
+    GOTO(0)
+    LABEL(1)
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_teresa_trans))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_teresa_trans))
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 300)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, -2, LW(10), LW(11), LW(12))
+    IF_INT_LESS_OR_EQUAL(LW(0), LW(10))
+        CALL(btlevtcmd_SetPartsRotate, -2, 1, 0, 0, 0)
+    ELSE
+        CALL(btlevtcmd_SetPartsRotate, -2, 1, 0, 180, 0)
+    END_IF
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TELESA_MOVE3"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_SetAlpha, -2, 1, 255)
+    SET_VALUE(LW(7), 256)
+    BEGIN_SIBLING_EVENT
+        LOOP(16)
+            WAIT_FRAMES(1)
+            SUBTRACT(LW(7), 16)
+            CALL(btlevtcmd_SetAlpha, -2, 1, LW(7))
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 40)
+    SUBTRACT(LW(1), 10)
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 60, -5, 4, 0, -1)
+    CALL(btlevtcmd_SetPartsRotate, -2, 1, 0, 0, 0)
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TELESA_MOVE4"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_SetAlpha, -2, 1, 0)
+    SET_VALUE(LW(7), -1)
+    LOOP(16)
+        WAIT_FRAMES(1)
+        ADD(LW(7), 16)
+        CALL(btlevtcmd_SetAlpha, -2, 1, LW(7))
+    END_LOOP
+    CALL(btlevtcmd_SetAlpha, -2, 1, 255)
+    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 20)
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 40, 0, 0, 0, -1)
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_teresa_trans_myself))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_teresa_trans_myself), 256, LW(5))
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 30, -5, 4, 0, -1)
+    CALL(btlevtcmd_SetPartsRotate, -2, 1, 0, 0, 0)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_FRAMES(20)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    LABEL(99)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(move_event)
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_teresa_move))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_teresa_move), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_teresa_move))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_teresa_move), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
@@ -490,21 +694,39 @@ static EVT_BEGIN(move_event)
     RETURN
 EVT_END()
 
-static s32 move_event_sub[] = {
-    196699, (s32)btlevtcmd_GetUnitId, -2, -29999999, 131096, -29999997, -29999999, 131122,
-    -30000000, 0, 131122, -29999999, 0, 32, 196699, (s32)evt_sub_random,
-    20, -30000000, 131125, -30000000, 60, 131122, -29999999, 12,
-    33, 65545, -30000000, 262235, (s32)btlevtcmd_SetUnitWork, -29999997, 0, 1,
-    262235, (s32)btlevtcmd_OnPartsAttribute, -29999997, 1, 6291456, 110, 65541, 60,
-    327771, (s32)btlevtcmd_AddRotate, -29999997, 0, -29999999, 0, 65545, 1,
-    6, 112, 110, 65545, 30, 196699, (s32)btlevtcmd_GetUnitId, -2,
-    -30000000, 131096, -29999997, -30000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"T_1", 33, 112, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_TELESA_MOVE1", -250000000,
-    0, -250000000, 393307, (s32)btlevtcmd_GetPartsPos, -29999997, 1, -30000000, -29999999,
-    -29999998, 131122, -29999999, 40, 655451, (s32)btlevtcmd_DivePosition, -29999997, -30000000,
-    -29999999, -29999998, 60, 10, 4, 0, -1, 327771,
-    (s32)btlevtcmd_SetHomePos, -29999997, -30000000, -29999999, -29999998, 2, 1,
-};
+static EVT_BEGIN(move_event_sub)
+    CALL(btlevtcmd_GetUnitId, -2, LW(1))
+    IF_INT_EQUAL(LW(3), LW(1))
+        SET_VALUE(LW(0), 0)
+        SET_VALUE(LW(1), 0)
+    ELSE
+        CALL(evt_sub_random, 20, LW(0))
+        ADD(LW(0), 60)
+        SET_VALUE(LW(1), 12)
+    END_IF
+    WAIT_FRAMES(LW(0))
+    CALL(btlevtcmd_SetUnitWork, LW(3), 0, 1)
+    CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, 6291456)
+    BEGIN_SIBLING_EVENT
+        LOOP(60)
+            CALL(btlevtcmd_AddRotate, LW(3), 0, LW(1), 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(30)
+        CALL(btlevtcmd_GetUnitId, -2, LW(0))
+        IF_INT_EQUAL(LW(3), LW(0))
+            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("T_1"))
+        END_IF
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TELESA_MOVE1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetPartsPos, LW(3), 1, LW(0), LW(1), LW(2))
+    SET_VALUE(LW(1), 40)
+    CALL(btlevtcmd_DivePosition, LW(3), LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
+    CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
+    RETURN
+EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)

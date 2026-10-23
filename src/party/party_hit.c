@@ -189,11 +189,11 @@ void partyChkGnd(PartyEntry* party) {
                 party->flags &= ~0x80;
             }
         }
-        party->position.y = PF(party, 0xE4);
+        party->position.y = party->unkE4;
         if (!(party->flags & 0x30)) {
             partyChkFrontStep(party, 11.0f, &a, &b, &c);
-            if (a - party->position.y >= 5.0f && PF(party, 0xE0) <= 30.0f) {
-                PF(party, 0x120) = a;
+            if (a - party->position.y >= 5.0f && party->unkE0 <= 30.0f) {
+                party->unk120 = a;
                 if (party->moveSpeed) {
                     partyChgMot(party, 6);
                 }
@@ -203,9 +203,9 @@ void partyChkGnd(PartyEntry* party) {
 }
 
 static inline f32 partyNrmSet(PartyEntry* party, Vec n) {
-    PF(party, 0xC4) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.z, 100.0f * n.y) - 180.0f);
-    PF(party, 0xC8) = 0.0f;
-    PF(party, 0xCC) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
+    party->groundRot.x = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.z, 100.0f * n.y) - 180.0f);
+    party->unkC8 = 0.0f;
+    party->unkCC = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
     return partyNrmTo(&n);
 }
 
@@ -224,17 +224,17 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
     }
     {
         Vec zero = {0.0f, 0.0f, 0.0f};
-        *(Vec*)((u8*)party + 0xC4) = zero;
+        party->groundRot = zero;
     }
-    PF(party, 0xE0) = 0.0f;
+    party->unkE0 = 0.0f;
     range = __fabsf(range); range += 0.1f;
     if (marioGetPtr()->currMotionId == 0x1A) {
         d = 5.0f;
     } else {
         d = 0.75f * partyGetHeight(party);
     }
-    PF(party, 0xE4) = party->position.y;
-    PF(party, 0xE8) = -1.0f;
+    party->unkE4 = party->position.y;
+    party->unkE8 = -1.0f;
     if (party->moveSpeed) {
         rad = party->targetDir;
     } else {
@@ -282,10 +282,10 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
             }
         }
         if (hit) {
-            PF(party, 0xE0) = partyNrmSet(party, outNrm);
+            party->unkE0 = partyNrmSet(party, outNrm);
             if (gy < baseY && __fabsf(gy - baseY) >= 2.0f) {
                 if (__fabsf(gy - baseY) > __fabsf(depth)) {
-                    PF(party, 0xE8) = __fabsf(baseY - gy);
+                    party->unkE8 = __fabsf(baseY - gy);
                 } else if (gy > bestY) {
                     bestY = gy;
                     best = hit;
@@ -300,8 +300,8 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
     }
     }
     if (best) {
-        PF(party, 0xE4) = bestY;
-        PF(party, 0xE8) = 0.0f;
+        party->unkE4 = bestY;
+        party->unkE8 = 0.0f;
         return best;
     }
     return NULL;
@@ -316,9 +316,9 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
     range += 0.01f;
     {
         Vec zero = {0.0f, 0.0f, 0.0f};
-        *(Vec*)((u8*)party + 0xC4) = zero;
+        party->groundRot = zero;
     }
-    PF(party, 0xE0) = 0.0f;
+    party->unkE0 = 0.0f;
     h = partyGetHeight(party);
     *outY = party->position.y;
     *outDist = -1.0f;
@@ -351,10 +351,10 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
     }
     if (hit) {
         Vec n = outNrm;
-        PF(party, 0xC4) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.z, 100.0f * n.y) - 180.0f);
-        PF(party, 0xC8) = 0.0f;
-        PF(party, 0xCC) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
-        PF(party, 0xE0) = partyNrmTo(&n);
+        party->groundRot.x = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.z, 100.0f * n.y) - 180.0f);
+        party->unkC8 = 0.0f;
+        party->unkCC = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
+        party->unkE0 = partyNrmTo(&n);
         gy = outPos.y;
         if (gy < oy && __fabsf(gy - oy) >= 2.0f) {
             *outDist = oy - gy;
@@ -638,7 +638,7 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     dir.z = cs;
     hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
     if (hit) {
-        PF(party, 0xEC) = d;
+        party->unkEC = d;
         partyWallSlide(pos, nrm, dist, sn, cs);
         return hit;
     }
@@ -652,13 +652,13 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
     if (hit) {
         if (partyNrmTo(&nrm) >= 45.0f) {
-            PF(party, 0xEC) = d;
+            party->unkEC = d;
             partyWallSlide(pos, nrm, dist, sn, cs);
             return hit;
         }
     }
     }
-    PF(party, 0xEC) = -1.0f;
+    party->unkEC = -1.0f;
     pos->x += dist * sn;
     pos->z += dist * cs;
     return NULL;
@@ -683,7 +683,7 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     dir.z = cs;
     hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
     if (hit) {
-        PF(party, 0xEC) = d;
+        party->unkEC = d;
         partyWallSlide(pos, nrm, dist, sn, cs);
         return hit;
     }
@@ -697,13 +697,13 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
     if (hit) {
         if (partyNrmTo(&nrm) >= 45.0f) {
-            PF(party, 0xEC) = d;
+            party->unkEC = d;
             partyWallSlide(pos, nrm, dist, sn, cs);
             return hit;
         }
     }
     }
-    PF(party, 0xEC) = -1.0f;
+    party->unkEC = -1.0f;
     pos->x += dist * sn;
     pos->z += dist * cs;
     return NULL;

@@ -72,8 +72,8 @@ s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, s32 msg, s32 
 				if (!(event->printWindowFlags & 0x1EFFFFFF)) {
 					u8* p = (u8*)partyGetPtr(marioGetPartyId());
 					if (!p) {
-						win->pos = *(Vec*)((u8*)marioGetPtr() + 0x8C);
-						win->pos.y += *(f32*)((u8*)marioGetPtr() + MWOFF(0x1B8));
+						win->pos = marioGetPtr()->position;
+						win->pos.y += marioGetPtr()->wPlayerCollisionBox.y;
 					} else {
 						win->pos = *(Vec*)(p + 0x58);
 						win->pos.y += *(f32*)(p + 0xF0);
@@ -84,8 +84,8 @@ s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, s32 msg, s32 
 				if (!(event->printWindowFlags & 0x1EFFFFFF)) {
 					u8* p = (u8*)partyGetPtr(marioGetExtraPartyId());
 					if (!p) {
-						win->pos = *(Vec*)((u8*)marioGetPtr() + 0x8C);
-						win->pos.y += *(f32*)((u8*)marioGetPtr() + MWOFF(0x1B8));
+						win->pos = marioGetPtr()->position;
+						win->pos.y += marioGetPtr()->wPlayerCollisionBox.y;
 					} else {
 						win->pos = *(Vec*)(p + 0x58);
 						win->pos.y += *(f32*)(p + 0xF0);
@@ -94,16 +94,16 @@ s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, s32 msg, s32 
 				strcpy((char*)*win->msg + MSGW_BASE + 0x4, (const char*)name);
 			} else if (npc == (NpcEntry*)-3) {
 				if (!(event->printWindowFlags & 0x1EFFFFFF)) {
-					win->pos = *(Vec*)((u8*)marioGetPtr() + 0x8C);
-					win->pos.y += *(f32*)((u8*)marioGetPtr() + MWOFF(0x1B8));
+					win->pos = marioGetPtr()->position;
+					win->pos.y += marioGetPtr()->wPlayerCollisionBox.y;
 				}
 				strcpy((char*)*win->msg + MSGW_BASE + 0x4, (const char*)name);
 			} else if (npc) {
 				if (!(event->printWindowFlags & 0x1EFFFFFF)) {
-					win->pos = *(Vec*)((u8*)npc + 0x8C);
-					win->pos.y += *(f32*)((u8*)npc + 0x150);
+					win->pos = npc->position;
+					win->pos.y += npc->height;
 				}
-				strcpy((char*)*win->msg + MSGW_BASE + 0x4, (char*)npc + 8);
+				strcpy((char*)*win->msg + MSGW_BASE + 0x4, npc->description);
 			}
 		} else {
 			*(u32*)(*win->msg + 4) |= 8;
@@ -122,7 +122,7 @@ s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, s32 msg, s32 
 					} else if (__fabsf(scr.x) >= 300.0f) {
 						win->toge = 2;
 					} else {
-						getScreenPoint((Vec*)((u8*)marioGetPtr() + 0x8C), &mscr);
+						getScreenPoint(&marioGetPtr()->position, &mscr);
 						if (scr.x < mscr.x) {
 							win->toge = 3;
 						} else {
@@ -324,7 +324,7 @@ USER_FUNC(evt_msg_print_battle_party) {
 		return EVT_RETURN_DONE;
 	}
 	strcpy(partyLabel, msg);
-	strcat(partyLabel, battlePartyMsgStr[*(s32*)((u8*)unit + 8) - 0xE0]);
+	strcat(partyLabel, battlePartyMsgStr[(s32)unit->currentKind - 0xE0]);
 	return _evt_msg_print(event, isFirstCall, 2, (s32)partyLabel, 0, -4);
 }
 
@@ -459,7 +459,7 @@ USER_FUNC(evt_msg_select) {
 	if (windowCheckID(event->selectWindowId)) {
 		return EVT_RETURN_BLOCK;
 	}
-	event->lwData[0] = *(s8*)(**(u8***)((u8*)windowGetPointer(event->selectWindowId) + 0x28) + MSGW_BASE + 0x43);
+	event->lwData[0] = *(s8*)(*(u8**)windowGetPointer(event->selectWindowId)->userdata + MSGW_BASE + 0x43);
 	windowDeleteID(event->selectWindowId);
 	return EVT_RETURN_DONE;
 }
@@ -501,7 +501,7 @@ USER_FUNC(evt_msg_pri) {
 
 USER_FUNC(evt_msg_npc) {
 	const char* name = (const char*)evtGetValue(event, *event->args);
-	strcpy(**(char***)((u8*)windowGetPointer(event->printWindowId) + 0x28) + MSGW_BASE + 0x4, name);
+	strcpy(*(char**)windowGetPointer(event->printWindowId)->userdata + MSGW_BASE + 0x4, name);
 	return EVT_RETURN_DONE;
 }
 

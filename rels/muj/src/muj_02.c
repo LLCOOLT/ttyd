@@ -11,8 +11,13 @@
 #include "evt/evt_damage.h"
 #include "evt/evt_sub.h"
 #include "muj.h"
+#include "evt/evt_npc.h"
+#include "data_tables.h"
+#include "mario/mario_pouch.h"
 #ifdef VERSION_G8ME01
 #include "mario/mariost.h"
+#include "evt/evt_npc.h"
+#include "driver/hitdrv.h"
 void FontDrawString(f32 x, f32 y, const char* str);
 #endif
 
@@ -71,21 +76,21 @@ USER_FUNC(evt_win_item_select);
 #endif
 void printCount(CameraId camera, void* param);
 
-__declspec(section ".data") u64 fd_muj_02_negone_one_374;
-__declspec(section ".data") s32 fd_muj_02_neg_one_382[1];
-__declspec(section ".data") s32 fd_muj_02___local_PI_383[1];
-__declspec(section ".data") s32 fd_muj_02___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_muj_02_one_negone_373;
-__declspec(section ".data") s32 fd_muj_02___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_muj_02_one_381[1];
-__declspec(section ".data") u64 fd_muj_02_negone_one_360;
-__declspec(section ".data") s32 fd_muj_02_neg_one_365[1];
-__declspec(section ".data") s32 fd_muj_02___local_PI_366[1];
-__declspec(section ".data") s32 fd_muj_02___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_muj_02_one_negone_359;
-__declspec(section ".data") s32 fd_muj_02___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_muj_02_one_364[1];
-static s32 bero_entry_data[60];
+__declspec(section ".data") f32 fd_muj_02_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_02_neg_one_382;
+__declspec(section ".data") f32 fd_muj_02___local_PI_383;
+__declspec(section ".data") f32 fd_muj_02___local_3PIO2_385;
+__declspec(section ".data") f32 fd_muj_02_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_02___local_PIO2_384;
+__declspec(section ".data") f32 fd_muj_02_one_381;
+__declspec(section ".data") f32 fd_muj_02_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_02_neg_one_365;
+__declspec(section ".data") f32 fd_muj_02___local_PI_366;
+__declspec(section ".data") f32 fd_muj_02___local_3PIO2_368;
+__declspec(section ".data") f32 fd_muj_02_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_02___local_PIO2_367;
+__declspec(section ".data") f32 fd_muj_02_one_364;
+static BeroEntry bero_entry_data[4];
 s32 mony_peton_setup[139];
 __declspec(section ".data") s32 lost_wedding_ring_sub[4];
 s32 lost_wedding_ring[395];
@@ -99,77 +104,99 @@ static s32 mony_talk[50];
 static s32 peton_init[19];
 s32 peton_regl[13];
 static s32 peton_talk[50];
-static s32 npcEnt[69];
-static __declspec(section ".data") s32 hitDmgRetPoints[8];
+static NpcSetupInfo npcEnt[3];
+static __declspec(section ".data") HitDamageReturn hitDmgRetPoints[2];
 static s32 evt_switch_init[17];
 s32 evt_treeb_01[20];
 static s32 evt_kusa_2[20];
 static s32 evt_kusa_6[20];
-static s32 tree_tbl[42];
-static s32 kusa_tbl[28];
+static TreeAccess tree_tbl[7];
+static KusaAccess kusa_tbl[7];
 #ifdef VERSION_G8ME01
 s32 muj_02_init_evt[115];
 #else
 s32 muj_02_init_evt[104];
 #endif
 
-__declspec(section ".data") u64 fd_muj_02_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_02_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_02_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj_02___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj_02___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj_02___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj_02___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_02_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj_02___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj_02___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_02_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_02_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_muj_02_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_02_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_02_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj_02___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj_02___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj_02___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj_02___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_02_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj_02___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj_02___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_02_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_02_one_364 = 1.0f;
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"muj_01", (s32)"e_bero1", 65537, 0, 0, (s32)"e_bero",
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"muj_03", (s32)"w_bero", 65537, 0, 0, (s32)"dokan_1", 131072,
-    9, 100000, 0, 0, -1, 0, 6, 0,
-    (s32)"tik_17", (s32)"dokan_2", 65537, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"muj_01", // nextMapName
+        "e_bero1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"muj_03", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, // exitEvent
+        (s32)"tik_17", // nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(mony_peton_setup)
@@ -321,7 +348,7 @@ EVT_BEGIN(lost_wedding_ring)
 EVT_END()
 
 static __declspec(section ".data") s32 itemsel_table00[] = {
-    73, -1,
+    ITEM_WEDDING_RING, -1,
 };
 
 EVT_BEGIN(wedding_ring_consign)
@@ -496,20 +523,37 @@ static EVT_BEGIN(peton_talk)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"モニー"*/"\x83\x82\x83\x6A\x81\x5B", 1536, 0, (s32)mony_init, (s32)mony_regl, (s32)mony_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ピートン"*/"\x83\x73\x81\x5B\x83\x67\x83\x93",
-    1536, 0, (s32)peton_init, (s32)peton_regl, (s32)peton_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"モニー"*/"\x83\x82\x83\x6A\x81\x5B", // name
+        0x600, // flags
+        0, // reactionFlags
+        mony_init, // initEvent
+        mony_regl, // regularEvent
+        mony_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ピートン"*/"\x83\x73\x81\x5B\x83\x67\x83\x93", // name
+        0x600, // flags
+        0, // reactionFlags
+        peton_init, // initEvent
+        peton_regl, // regularEvent
+        peton_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
-static __declspec(section ".data") s32 hitDmgRetPoints[] = {
-    (s32)"A_yuka_01", 0, 0, 0, 0, 0, 0, 0,
+static __declspec(section ".data") HitDamageReturn hitDmgRetPoints[] = {
+    {"A_yuka_01", {0}},
+    {0},
 };
 
 static EVT_BEGIN(evt_switch_init)
@@ -545,39 +589,45 @@ static EVT_BEGIN(evt_kusa_6)
 EVT_END()
 
 #ifdef VERSION_G8ME01
-static s32 tree_tbl[] = {
-    5, (s32)"A_treeA_01", (s32)"treeA_01_m", (s32)"treeA_01_ha", 0, 0, 5, (s32)"A_treeA_02",
-    (s32)"treeA_02_m", (s32)"treeA_02_ha", 0, 0, 5, (s32)"A_treeB_01", (s32)"treeB_01_m", (s32)"treeB_01_ha",
-    0, 0, 5, (s32)"A_treeB_02", (s32)"treeB_02_m", (s32)"treeB_02_ha", 0, 0,
-    5, (s32)"A_treeB_03", (s32)"treeB_03_m", (s32)"treeB_03_ha", 0, 0, 5, (s32)"A_treeB_04",
-    (s32)"treeB_04_m", (s32)"treeB_04_ha", 0, 0, 7, 0, 0, 0,
-    0, 0,
+static TreeAccess tree_tbl[] = {
+    {5, "A_treeA_01", "treeA_01_m", "treeA_01_ha", 0, NULL},
+    {5, "A_treeA_02", "treeA_02_m", "treeA_02_ha", 0, NULL},
+    {5, "A_treeB_01", "treeB_01_m", "treeB_01_ha", 0, NULL},
+    {5, "A_treeB_02", "treeB_02_m", "treeB_02_ha", 0, NULL},
+    {5, "A_treeB_03", "treeB_03_m", "treeB_03_ha", 0, NULL},
+    {5, "A_treeB_04", "treeB_04_m", "treeB_04_ha", 0, NULL},
+    {7, NULL, NULL, NULL, 0, NULL},
 };
 
-s32 tree_tbl_treeb_evt[] = {
-    5, (s32)"A_treeA_01", (s32)"treeA_01_m", (s32)"treeA_01_ha", 0, 0, 5, (s32)"A_treeA_02",
-    (s32)"treeA_02_m", (s32)"treeA_02_ha", 0, 0, 5, (s32)"A_treeB_01", (s32)"treeB_01_m", (s32)"treeB_01_ha",
-    0, (s32)evt_treeb_01, 5, (s32)"A_treeB_02", (s32)"treeB_02_m", (s32)"treeB_02_ha", 0, 0,
-    5, (s32)"A_treeB_03", (s32)"treeB_03_m", (s32)"treeB_03_ha", 0, 0, 5, (s32)"A_treeB_04",
-    (s32)"treeB_04_m", (s32)"treeB_04_ha", 0, 0, 7, 0, 0, 0,
-    0, 0,
+TreeAccess tree_tbl_treeb_evt[] = {
+    {5, "A_treeA_01", "treeA_01_m", "treeA_01_ha", 0, NULL},
+    {5, "A_treeA_02", "treeA_02_m", "treeA_02_ha", 0, NULL},
+    {5, "A_treeB_01", "treeB_01_m", "treeB_01_ha", 0, evt_treeb_01},
+    {5, "A_treeB_02", "treeB_02_m", "treeB_02_ha", 0, NULL},
+    {5, "A_treeB_03", "treeB_03_m", "treeB_03_ha", 0, NULL},
+    {5, "A_treeB_04", "treeB_04_m", "treeB_04_ha", 0, NULL},
+    {7, NULL, NULL, NULL, 0, NULL},
 };
 #else
-static s32 tree_tbl[] = {
-    5, (s32)"A_treeA_01", (s32)"treeA_01_m", (s32)"treeA_01_ha", 0, 0, 5, (s32)"A_treeA_02",
-    (s32)"treeA_02_m", (s32)"treeA_02_ha", 0, 0, 5, (s32)"A_treeB_01", (s32)"treeB_01_m", (s32)"treeB_01_ha",
-    0, (s32)evt_treeb_01, 5, (s32)"A_treeB_02", (s32)"treeB_02_m", (s32)"treeB_02_ha", 0, 0,
-    5, (s32)"A_treeB_03", (s32)"treeB_03_m", (s32)"treeB_03_ha", 0, 0, 5, (s32)"A_treeB_04",
-    (s32)"treeB_04_m", (s32)"treeB_04_ha", 0, 0, 7, 0, 0, 0,
-    0, 0,
+static TreeAccess tree_tbl[] = {
+    {5, "A_treeA_01", "treeA_01_m", "treeA_01_ha", 0, NULL},
+    {5, "A_treeA_02", "treeA_02_m", "treeA_02_ha", 0, NULL},
+    {5, "A_treeB_01", "treeB_01_m", "treeB_01_ha", 0, evt_treeb_01},
+    {5, "A_treeB_02", "treeB_02_m", "treeB_02_ha", 0, NULL},
+    {5, "A_treeB_03", "treeB_03_m", "treeB_03_ha", 0, NULL},
+    {5, "A_treeB_04", "treeB_04_m", "treeB_04_ha", 0, NULL},
+    {7, NULL, NULL, NULL, 0, NULL},
 };
 #endif
 
-static s32 kusa_tbl[] = {
-    1, (s32)"A_kuwa_move_01", (s32)"S_kuwa_move_01", 0, 1, (s32)"A_kuwa_move_02", (s32)"S_kuwa_move_02", (s32)evt_kusa_2,
-    1, (s32)"A_kuwa_move_03", (s32)"S_kuwa_move_03", 0, 1, (s32)"A_kuwa_move_04", (s32)"S_kuwa_move_04", 0,
-    1, (s32)"A_kuwa_move_05", (s32)"S_kuwa_move_05", 0, 1, (s32)"A_kuwa_move_06", (s32)"S_kuwa_move_06", (s32)evt_kusa_6,
-    4, 0, 0, 0,
+static KusaAccess kusa_tbl[] = {
+    {1, "A_kuwa_move_01", "S_kuwa_move_01", NULL},
+    {1, "A_kuwa_move_02", "S_kuwa_move_02", evt_kusa_2},
+    {1, "A_kuwa_move_03", "S_kuwa_move_03", NULL},
+    {1, "A_kuwa_move_04", "S_kuwa_move_04", NULL},
+    {1, "A_kuwa_move_05", "S_kuwa_move_05", NULL},
+    {1, "A_kuwa_move_06", "S_kuwa_move_06", evt_kusa_6},
+    {4, NULL, NULL, NULL},
 };
 
 EVT_BEGIN(muj_02_init_evt)

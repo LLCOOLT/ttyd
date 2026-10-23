@@ -2165,7 +2165,7 @@ void mapDisp(void) {
 	Vec center;
 	f32 z;
 	s32 mode;
-	u8* joint;
+	MapFileJoint* joint;
 	BOOL clipped;
 
 	if (disableMapDraw) {
@@ -2189,43 +2189,43 @@ void mapDisp(void) {
 				obj->screenRect[1] = 0;
 			}
 			if (obj->flags & 0x20) continue;
-			if (!(obj->flags & 0x10) && *(s32*)((u8*)obj->joints + 0x5C) < 1) continue;
+			if (!(obj->flags & 0x10) && obj->joints->partCount < 1) continue;
 			if (!(obj->flags & 0x800) && (entry->flags & 2) && entry->blend.a == 0) continue;
 			if (!(obj->flags & 0x1000) && (entry->flags & 4) && entry->blend2.a == 0) continue;
 			PSMTXConcat(camera->view, obj->modelWorldMtx, mtx);
 			if ((obj->flags & 2) && !mapClipOffFlag) {
-				joint = (u8*)obj->joints;
+				joint = obj->joints;
 				clipped = FALSE;
-				v.x = MJF(joint, 0x48); v.y = MJF(joint, 0x4C); v.z = MJF(joint, 0x50);
+				v.x = joint->bboxMax.x; v.y = joint->bboxMax.y; v.z = joint->bboxMax.z;
 				PSMTXMultVec(mtx, &v, &v);
 				PSMTX44MultVec(camera->projection, &v, &v);
 				if (MAP_CLIP_IN(v)) goto vis;
-				v.x = MJF(joint, 0x3C); v.y = MJF(joint, 0x40); v.z = MJF(joint, 0x44);
+				v.x = joint->bboxMin.x; v.y = joint->bboxMin.y; v.z = joint->bboxMin.z;
 				PSMTXMultVec(mtx, &v, &v);
 				PSMTX44MultVec(camera->projection, &v, &v);
 				if (MAP_CLIP_IN(v)) goto vis;
-				v.x = MJF(joint, 0x3C); v.y = MJF(joint, 0x4C); v.z = MJF(joint, 0x50);
+				v.x = joint->bboxMin.x; v.y = joint->bboxMax.y; v.z = joint->bboxMax.z;
 				PSMTXMultVec(mtx, &v, &v);
 				PSMTX44MultVec(camera->projection, &v, &v);
 				if (MAP_CLIP_IN(v)) goto vis;
-				v.x = MJF(joint, 0x48); v.y = MJF(joint, 0x40); v.z = MJF(joint, 0x50);
+				v.x = joint->bboxMax.x; v.y = joint->bboxMin.y; v.z = joint->bboxMax.z;
 				PSMTXMultVec(mtx, &v, &v);
 				PSMTX44MultVec(camera->projection, &v, &v);
 				if (MAP_CLIP_IN(v)) goto vis;
-				v.x = MJF(joint, 0x48); v.y = MJF(joint, 0x4C); v.z = MJF(joint, 0x44);
+				v.x = joint->bboxMax.x; v.y = joint->bboxMax.y; v.z = joint->bboxMin.z;
 				PSMTXMultVec(mtx, &v, &v);
 				PSMTXMultVec(mtx, &v, &v);
 				PSMTX44MultVec(camera->projection, &v, &v);
 				if (MAP_CLIP_IN(v)) goto vis;
-				v.x = MJF(joint, 0x3C); v.y = MJF(joint, 0x40); v.z = MJF(joint, 0x50);
+				v.x = joint->bboxMin.x; v.y = joint->bboxMin.y; v.z = joint->bboxMax.z;
 				PSMTXMultVec(mtx, &v, &v);
 				PSMTX44MultVec(camera->projection, &v, &v);
 				if (MAP_CLIP_IN(v)) goto vis;
-				v.x = MJF(joint, 0x48); v.y = MJF(joint, 0x40); v.z = MJF(joint, 0x44);
+				v.x = joint->bboxMax.x; v.y = joint->bboxMin.y; v.z = joint->bboxMin.z;
 				PSMTXMultVec(mtx, &v, &v);
 				PSMTX44MultVec(camera->projection, &v, &v);
 				if (MAP_CLIP_IN(v)) goto vis;
-				v.x = MJF(joint, 0x3C); v.y = MJF(joint, 0x4C); v.z = MJF(joint, 0x44);
+				v.x = joint->bboxMin.x; v.y = joint->bboxMax.y; v.z = joint->bboxMin.z;
 				PSMTXMultVec(mtx, &v, &v);
 				PSMTX44MultVec(camera->projection, &v, &v);
 				if (MAP_CLIP_IN(v)) goto vis;
@@ -2243,9 +2243,9 @@ void mapDisp(void) {
 			}
 			z *= -1.0f;
 			mode = obj->blendMode;
-			if (*(s32*)((u8*)obj->joints + 0x5C) > 0) {
+			if (obj->joints->partCount > 0) {
 				if (mapObjIsTranslucent(obj->flags, obj->color,
-						(*(MapMaterial**)((u8*)obj->joints + 0x60))->blendColor)) {
+						((MapMaterial*)obj->joints->parts[0].material)->blendColor)) {
 					mode = 2;
 				}
 			}
@@ -3267,7 +3267,7 @@ void mapSetMaterial(MapObject* obj, void* material) {
 	for (i = mat->samplerCount - 1; i >= 0; i--) {
 		sampler = mat->samplers[i];
 		wp = mapGetWork();
-		k = mapSearchTexName(MAPENT_FIELD(&wp->entries[obj->groupIndex], MapTexTable*, 0x94), sampler->tex->name);
+		k = mapSearchTexName((MapTexTable*)wp->entries[obj->groupIndex].textureTable, sampler->tex->name);
 		desc = TEXGet(wp->entries[obj->groupIndex].tpl, k);
 		if (desc->textureHeader->minLOD == desc->textureHeader->maxLOD) {
 			mip = GX_FALSE;

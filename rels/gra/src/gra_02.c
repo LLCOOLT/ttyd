@@ -6,6 +6,7 @@
 #include "driver/animdrv.h"
 #include "evt/evt_bero.h"
 #include "gra.h"
+#include "evt/evt_npc.h"
 
 static USER_FUNC(booboo_main);
 USER_FUNC(evt_bero_get_info);
@@ -27,78 +28,58 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 
-__declspec(section ".data") u64 fd_gra_02_negone_one_374;
-__declspec(section ".data") s32 fd_gra_02_neg_one_382[1];
-__declspec(section ".data") s32 fd_gra_02___local_PI_383[1];
-__declspec(section ".data") s32 fd_gra_02___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gra_02_one_negone_373;
-__declspec(section ".data") s32 fd_gra_02___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gra_02_one_381[1];
-__declspec(section ".data") u64 fd_gra_02_negone_one_360;
-__declspec(section ".data") s32 fd_gra_02_neg_one_365[1];
-__declspec(section ".data") s32 fd_gra_02___local_PI_366[1];
-__declspec(section ".data") s32 fd_gra_02___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gra_02_one_negone_359;
-__declspec(section ".data") s32 fd_gra_02___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gra_02_one_364[1];
+__declspec(section ".data") f32 fd_gra_02_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gra_02_neg_one_382;
+__declspec(section ".data") f32 fd_gra_02___local_PI_383;
+__declspec(section ".data") f32 fd_gra_02___local_3PIO2_385;
+__declspec(section ".data") f32 fd_gra_02_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gra_02___local_PIO2_384;
+__declspec(section ".data") f32 fd_gra_02_one_381;
+__declspec(section ".data") f32 fd_gra_02_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gra_02_neg_one_365;
+__declspec(section ".data") f32 fd_gra_02___local_PI_366;
+__declspec(section ".data") f32 fd_gra_02___local_3PIO2_368;
+__declspec(section ".data") f32 fd_gra_02_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gra_02___local_PIO2_367;
+__declspec(section ".data") f32 fd_gra_02_one_364;
 s32 shopmaster_pig_init[14];
 s32 shopmaster_talk[33];
 static s32 urouro_move[24];
-static s32 npcEnt[46];
+static NpcSetupInfo npcEnt[2];
 __declspec(section ".data") s32 w_bero_2_in[5];
-static s32 bero_entry_data[75];
+static BeroEntry bero_entry_data[5];
 __declspec(section ".data") s32 gra02_get_key[5];
 s32 gra02_straw_blow_evt[23];
-static __declspec(section ".data") s32 booboo_name[1];
+static __declspec(section ".data") const char* booboo_name[1];
 s32 gra_02_init_evt[86];
 
-__declspec(section ".data") u64 fd_gra_02_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gra_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gra_02_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gra_02_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_gra_02___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gra_02___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gra_02___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gra_02___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gra_02_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gra_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gra_02___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gra_02___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gra_02_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gra_02_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_gra_02_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gra_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gra_02_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gra_02_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_gra_02___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gra_02___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gra_02___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gra_02___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gra_02_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gra_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gra_02___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gra_02___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gra_02_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gra_02_one_364 = 1.0f;
 
 EVT_BEGIN(shopmaster_pig_init)
     SWITCH(GSW(0))
@@ -129,13 +110,20 @@ static EVT_BEGIN(urouro_move)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"ブタお店の主人"*/"\x83\x75\x83\x5E\x82\xA8\x93\x58\x82\xCC\x8E\xE5\x90\x6C", 1536, 0, (s32)shopmaster_pig_init, (s32)urouro_move, (s32)shopmaster_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"ブタお店の主人"*/"\x83\x75\x83\x5E\x82\xA8\x93\x58\x82\xCC\x8E\xE5\x90\x6C", // name
+        0x600, // flags
+        0, // reactionFlags
+        shopmaster_pig_init, // initEvent
+        urouro_move, // regularEvent
+        shopmaster_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 __declspec(section ".data") EVT_BEGIN(w_bero_2_in)
@@ -143,17 +131,73 @@ __declspec(section ".data") EVT_BEGIN(w_bero_2_in)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero_1", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"gra_01", (s32)"e_bero1", 65537, 0, 0, (s32)"w_bero_2",
-    268435456, 6, 242, 21, -450, -1, (s32)w_bero_2_in, 0,
-    0, (s32)"gra_03", (s32)"e_bero", 65537, 0, 0, (s32)"dokan_1", 131072,
-    9, 100000, 0, 0, -1, 0, 6, 0,
-    0, (s32)"dokan_2", 65537, 0, 0, (s32)"dokan_2", 268566528, 9,
-    100000, 0, 0, -1, 0, 6, 0, 0,
-    (s32)"dokan_1", 65537, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero_1", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gra_01", // nextMapName
+        "e_bero1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "w_bero_2", // hitName
+        4096, // type
+        0, // sfxId
+        6, // directionId
+        242, // centerPosition
+        21, // centerPositionY
+        -450, // centerPositionZ
+        -1, // length
+        (s32*)w_bero_2_in, // enterEvent
+        0, NULL, // caseType..exitEvent
+        (s32)"gra_03", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_1", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_2", // hitName
+        4098, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 __declspec(section ".data") EVT_BEGIN(gra02_get_key)
@@ -173,8 +217,8 @@ EVT_BEGIN(gra02_straw_blow_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 booboo_name[] = {
-    (s32)/*"ブタお店の主人"*/"\x83\x75\x83\x5E\x82\xA8\x93\x58\x82\xCC\x8E\xE5\x90\x6C",
+static __declspec(section ".data") const char* booboo_name[] = {
+    /*"ブタお店の主人"*/"\x83\x75\x83\x5E\x82\xA8\x93\x58\x82\xCC\x8E\xE5\x90\x6C",
 };
 
 EVT_BEGIN(gra_02_init_evt)

@@ -21,20 +21,20 @@ USER_FUNC(evt_sub_get_sincos);
 USER_FUNC(hi_onoff);
 USER_FUNC(mugen_kairou_get_list);
 
-__declspec(section ".data") u64 fd_las_08_negone_one_374;
-__declspec(section ".data") s32 fd_las_08_neg_one_382[1];
-__declspec(section ".data") s32 fd_las_08___local_PI_383[1];
-__declspec(section ".data") s32 fd_las_08___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_las_08_one_negone_373;
-__declspec(section ".data") s32 fd_las_08___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_las_08_one_381[1];
-__declspec(section ".data") u64 fd_las_08_negone_one_360;
-__declspec(section ".data") s32 fd_las_08_neg_one_365[1];
-__declspec(section ".data") s32 fd_las_08___local_PI_366[1];
-__declspec(section ".data") s32 fd_las_08___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_las_08_one_negone_359;
-__declspec(section ".data") s32 fd_las_08___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_las_08_one_364[1];
+__declspec(section ".data") f32 fd_las_08_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_08_neg_one_382;
+__declspec(section ".data") f32 fd_las_08___local_PI_383;
+__declspec(section ".data") f32 fd_las_08___local_3PIO2_385;
+__declspec(section ".data") f32 fd_las_08_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_08___local_PIO2_384;
+__declspec(section ".data") f32 fd_las_08_one_381;
+__declspec(section ".data") f32 fd_las_08_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_08_neg_one_365;
+__declspec(section ".data") f32 fd_las_08___local_PI_366;
+__declspec(section ".data") f32 fd_las_08___local_3PIO2_368;
+__declspec(section ".data") f32 fd_las_08_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_08___local_PIO2_367;
+__declspec(section ".data") f32 fd_las_08_one_364;
 static s32 w1_door_close[22];
 static s32 w1_door_open[22];
 static s32 w2_door_close[22];
@@ -45,64 +45,44 @@ static s32 e2_door_close[22];
 static s32 e2_door_open[22];
 static s32 door_matigai_evt[15];
 s32 door_seikai_evt[19];
-static s32 bero_entry_data[75];
-s32 e_bero_1_matigai[15];
-s32 e_bero_1_seikai[15];
-s32 e_bero_2_seikai[15];
-s32 taimatu_data[16];
+static BeroEntry bero_entry_data[5];
+BeroEntry e_bero_1_matigai[1];
+BeroEntry e_bero_1_seikai[1];
+BeroEntry e_bero_2_seikai[1];
+const char* taimatu_data[16];
 s32 hikari_anim[52];
 s32 taimatu_evt[18];
 __declspec(section ".data") s32 mugen_kairou_list[7];
 s32 mugen_kairou_init[96];
 s32 las_08_init_evt[22];
 
-__declspec(section ".data") u64 fd_las_08_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_08_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_08_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_08___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_08___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_08___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_08___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_08_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_08_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_08___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_08___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_08_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_08_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_las_08_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_08_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_08_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_08_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_08___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_08___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_08___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_08___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_08_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_08_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_08___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_08___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_08_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_08_one_364 = 1.0f;
 
 static EVT_BEGIN(w1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -188,37 +168,162 @@ EVT_BEGIN(door_seikai_evt)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero_1", 65542, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)door_matigai_evt, (s32)"las_07", (s32)"e_bero_1", 327685, (s32)w1_door_close, (s32)w1_door_open, (s32)"e_bero_1",
-    65542, 20000, 100000, 0, 0, -1, 0, -1,
-    (s32)door_seikai_evt, (s32)"las_09", (s32)"w_bero", 327685, (s32)e1_door_close, (s32)e1_door_open, (s32)"w_bero_2", 65542,
-    20000, 100000, 0, 0, -1, 0, -1, (s32)door_matigai_evt,
-    (s32)"las_07", (s32)"e_bero_2", 327685, (s32)w2_door_close, (s32)w2_door_open, (s32)"e_bero_2", 65542, 20000,
-    100000, 0, 0, -1, 0, -1, (s32)door_matigai_evt, (s32)"las_07",
-    (s32)"w_bero_2", 327685, (s32)e2_door_close, (s32)e2_door_open, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero_1", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)door_matigai_evt, // exitEvent
+        (s32)"las_07", // nextMapName
+        "e_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w1_door_close, // enterAnimeArg
+        (s32)w1_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero_1", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)door_seikai_evt, // exitEvent
+        (s32)"las_09", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e1_door_close, // enterAnimeArg
+        (s32)e1_door_open, // exitAnimeArg
+    },
+    {
+        "w_bero_2", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)door_matigai_evt, // exitEvent
+        (s32)"las_07", // nextMapName
+        "e_bero_2", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w2_door_close, // enterAnimeArg
+        (s32)w2_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero_2", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)door_matigai_evt, // exitEvent
+        (s32)"las_07", // nextMapName
+        "w_bero_2", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e2_door_close, // enterAnimeArg
+        (s32)e2_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
-s32 e_bero_1_matigai[] = {
-    (s32)"e_bero_1", 65542, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)door_matigai_evt, (s32)"las_07", (s32)"w_bero_1", 327685, (s32)e1_door_close, (s32)e1_door_open,
+BeroEntry e_bero_1_matigai[] = {
+    {
+        "e_bero_1", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)door_matigai_evt, // exitEvent
+        (s32)"las_07", // nextMapName
+        "w_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e1_door_close, // enterAnimeArg
+        (s32)e1_door_open, // exitAnimeArg
+    },
 };
 
-s32 e_bero_1_seikai[] = {
-    (s32)"e_bero_1", 65542, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)door_seikai_evt, (s32)"las_08", (s32)"w_bero_1", 327685, (s32)e1_door_close, (s32)e1_door_open,
+BeroEntry e_bero_1_seikai[] = {
+    {
+        "e_bero_1", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)door_seikai_evt, // exitEvent
+        (s32)"las_08", // nextMapName
+        "w_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e1_door_close, // enterAnimeArg
+        (s32)e1_door_open, // exitAnimeArg
+    },
 };
 
-s32 e_bero_2_seikai[] = {
-    (s32)"e_bero_2", 65542, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)door_seikai_evt, (s32)"las_08", (s32)"w_bero_2", 327685, (s32)e2_door_close, (s32)e2_door_open,
+BeroEntry e_bero_2_seikai[] = {
+    {
+        "e_bero_2", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)door_seikai_evt, // exitEvent
+        (s32)"las_08", // nextMapName
+        "w_bero_2", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e2_door_close, // enterAnimeArg
+        (s32)e2_door_open, // exitAnimeArg
+    },
 };
 
-s32 taimatu_data[] = {
-    (s32)"S_hikari_01", (s32)"A_hi_01", (s32)"S_hikari_02", (s32)"A_hi_02", (s32)"S_hikari_03", (s32)"A_hi_03", (s32)"S_hikari_04", (s32)"A_hi_04",
-    (s32)"S_hikari_05", (s32)"A_hi_05", (s32)"S_hikari_06", (s32)"A_hi_06", (s32)"S_hikari_07", (s32)"A_hi_07", (s32)"S_hikari_08", (s32)"A_hi_08",
+const char* taimatu_data[] = {
+    "S_hikari_01",
+    "A_hi_01",
+    "S_hikari_02",
+    "A_hi_02",
+    "S_hikari_03",
+    "A_hi_03",
+    "S_hikari_04",
+    "A_hi_04",
+    "S_hikari_05",
+    "A_hi_05",
+    "S_hikari_06",
+    "A_hi_06",
+    "S_hikari_07",
+    "A_hi_07",
+    "S_hikari_08",
+    "A_hi_08",
 };
 
 EVT_BEGIN(hikari_anim)
@@ -229,7 +334,7 @@ EVT_BEGIN(hikari_anim)
         CALL(evt_sub_get_sincos, LW(0), LW(1), LW(2))
         MULTIPLY_FLOAT(LW(1), FLOAT(0.19921875f))
         ADD_FLOAT(LW(1), FLOAT(0.7998047f))
-        SET_INT_READ_ADDR(PTR(taimatu_data))
+        SET_INT_READ_ADDR(PTR(&taimatu_data))
         LOOP(8)
             READ_INT2(LW(3), LW(4))
             CALL(evt_mapobj_scale, 0, LW(3), LW(1), LW(1), LW(1))
@@ -244,7 +349,7 @@ EVT_BEGIN(hikari_anim)
 EVT_END()
 
 EVT_BEGIN(taimatu_evt)
-    SET_INT_READ_ADDR(PTR(taimatu_data))
+    SET_INT_READ_ADDR(PTR(&taimatu_data))
     LOOP(8)
         READ_INT2(LW(0), LW(1))
         CALL(evt_mapobj_flag_onoff, 0, 1, LW(0), 1)

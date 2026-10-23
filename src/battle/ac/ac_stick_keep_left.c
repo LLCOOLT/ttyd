@@ -39,8 +39,8 @@ typedef struct SklDisp {
 } SklDisp;
 
 #define SKL_P(work) ((SklParams*)&(work)->actionCommands)
-#define SKL_W(work) ((SklWork*)((u8*)&(work)->actionCommands + 0x2BC))
-#define SKL_D(work) ((SklDisp*)((u8*)&(work)->actionCommands + 0x290))
+#define SKL_W(w) ((SklWork*)(w)->actionCommands.work)
+#define SKL_D(w) ((SklDisp*)&(w)->actionCommands.disp)
 #define SKL_S16(work) (*(s16*)((u8*)&(work)->actionCommands + 0x88))
 
 s32 psndSFXOn(const char* name);
@@ -121,7 +121,7 @@ s32 battleAcMain_StickKeepLeft(BattleWork* work) {
                     }
                     return 0;
                 }
-                if (!((s32(*)(s32))BattlePadCheckNow)(0x40000) && SKL_S16(work) <= 0 && autoCommand == 0) {
+                if (!((s32(*)(s32))BattlePadCheckNow)(0x40000) && (&(work)->actionCommands)->countdown <= 0 && autoCommand == 0) {
                     if (--cw->timer <= 0) {
                         work->actionCommands.result = 0;
                         loop = 1;
@@ -136,8 +136,8 @@ s32 battleAcMain_StickKeepLeft(BattleWork* work) {
                 }
                 break;
             case 1001:
-                if (SKL_S16(work) > 0) {
-                    SKL_S16(work)--;
+                if ((&(work)->actionCommands)->countdown > 0) {
+                    (&(work)->actionCommands)->countdown--;
                     loop = 1;
                     work->actionCommands.result = 2;
                     work->actionCommands.mAcState = 1003;
@@ -245,8 +245,8 @@ s32 battleAcResult_StickKeepLeft(BattleWork* work) {
 void battleAcDisp_StickKeepLeft(CameraId camId, void* param) {
     BattleWork* work = (BattleWork*)param;
     BattleActions* ac = &work->actionCommands;
-    SklWork* cw = (SklWork*)((u8*)ac + 0x2BC);
-    SklDisp* disp = (SklDisp*)((u8*)ac + 0x290);
+    SklWork* cw = (SklWork*)ac->work;
+    SklDisp* disp = (SklDisp*)&ac->disp;
 
     switch (work->actionCommands.mAcState) {
         case 0x63:
@@ -312,7 +312,7 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
     ac = SKL_P(_battleWorkPointer);
     camGetPtr(8);
     count = ac->count;
-    idx = ((SklWork*)((u8*)ac + 0x2BC))->idx - 1;
+    idx = ((SklWork*)((BattleActions*)ac)->work)->idx - 1;
     switch (((BattleActions*)ac)->mAcState) {
         case 0:
         case 0x63:
@@ -324,7 +324,7 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
             break;
         }
         case 0x3E8:
-            if (*(u32*)((u8*)gp + 0x1c) & 8) {
+            if (gp->retraceCount & 8) {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = -200.0f + x;
                 p.y = 70.0f + y;

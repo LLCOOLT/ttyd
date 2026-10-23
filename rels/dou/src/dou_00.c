@@ -28,73 +28,53 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_telop_entry);
 void water_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") u64 fd_dou_00_negone_one_374;
-__declspec(section ".data") s32 fd_dou_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_dou_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_dou_00___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_dou_00_one_negone_373;
-__declspec(section ".data") s32 fd_dou_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_dou_00_one_381[1];
-__declspec(section ".data") u64 fd_dou_00_negone_one_360;
-__declspec(section ".data") s32 fd_dou_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_dou_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_dou_00___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_dou_00_one_negone_359;
-__declspec(section ".data") s32 fd_dou_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_dou_00_one_364[1];
+__declspec(section ".data") f32 fd_dou_00_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_00_neg_one_382;
+__declspec(section ".data") f32 fd_dou_00___local_PI_383;
+__declspec(section ".data") f32 fd_dou_00___local_3PIO2_385;
+__declspec(section ".data") f32 fd_dou_00_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_00___local_PIO2_384;
+__declspec(section ".data") f32 fd_dou_00_one_381;
+__declspec(section ".data") f32 fd_dou_00_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_00_neg_one_365;
+__declspec(section ".data") f32 fd_dou_00___local_PI_366;
+__declspec(section ".data") f32 fd_dou_00___local_3PIO2_368;
+__declspec(section ".data") f32 fd_dou_00_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_dou_00___local_PIO2_367;
+__declspec(section ".data") f32 fd_dou_00_one_364;
 static __declspec(section ".data") s32 bero_in_event[11];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 static s32 back_light[35];
 s32 totsunyu_event[46];
 s32 dou_00_init_evt[61];
 
-__declspec(section ".data") u64 fd_dou_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_dou_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_dou_00_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_dou_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_dou_00___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_dou_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_dou_00___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_dou_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_dou_00_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_dou_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_dou_00___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_dou_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_dou_00_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_dou_00_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_dou_00_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_dou_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_dou_00_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_dou_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_dou_00___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_dou_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_dou_00___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_dou_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_dou_00_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_dou_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_dou_00___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_dou_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_dou_00_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_dou_00_one_364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(bero_in_event)
     IF_INT_EQUAL(GSW(0), 242)
@@ -104,13 +84,40 @@ static __declspec(section ".data") EVT_BEGIN(bero_in_event)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, (s32)bero_in_event,
-    -1, 0, (s32)"muj_05", (s32)"e_bero", 65537, 0, 0, (s32)"e_bero",
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"dou_01", (s32)"w_bero", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)bero_in_event, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"muj_05", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_01", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(back_light)

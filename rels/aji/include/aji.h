@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "driver/npcdrv.h"
 
 extern s32 aji_00_init_evt[];
 extern s32 aji_01_init_evt[];
@@ -22,16 +23,16 @@ extern s32 aji_16_init_evt[];
 extern s32 aji_17_init_evt[];
 extern s32 aji_18_init_evt[];
 extern s32 aji_19_init_evt[];
-extern s32 btl_aji_setup_no_tbl[];
-extern s32 btlsetup_aji_tbl[];
+extern NpcTerritoryInfo btl_aji_setup_no_tbl[];
+extern NpcSetupBattleInfo btlsetup_aji_tbl[];
 extern s32 evt_emergency[];
 extern s32 shuryolight_head_normal[];
 extern s32 shuryolight_pow_normal[];
 extern s32 shuryolight_tue_normal[];
-extern s32 unit_boss_magnum_battender_mkII[];
-extern s32 unit_gundan_zako[];
-extern s32 unit_gundan_zako_elite[];
-extern s32 unit_gundan_zako_magician[];
+extern BattleUnitKind unit_boss_magnum_battender_mkII;
+extern BattleUnitKind unit_gundan_zako;
+extern BattleUnitKind unit_gundan_zako_elite;
+extern BattleUnitKind unit_gundan_zako_magician;
 
 extern s32 kusuri_id[];
 extern s32 kusuri_list[];

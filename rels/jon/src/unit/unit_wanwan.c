@@ -12,6 +12,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
+#include "battle/battle_database_common.h"
 
 double sqrt(double x);
 void BtlUnit_SetAnim(BattleUnitPart* part, const char* anim);
@@ -37,20 +38,20 @@ static USER_FUNC(chain_init);
 static USER_FUNC(chain_main);
 USER_FUNC(evt_btl_camera_set_mode);
 
-__declspec(section ".data") u64 fd_wanwan_negone_one_374;
-__declspec(section ".data") s32 fd_wanwan_neg_one_382[1];
-__declspec(section ".data") s32 fd_wanwan___local_PI_383[1];
-__declspec(section ".data") s32 fd_wanwan___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_wanwan_one_negone_373;
-__declspec(section ".data") s32 fd_wanwan___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_wanwan_one_381[1];
-__declspec(section ".data") u64 fd_wanwan_negone_one_360;
-__declspec(section ".data") s32 fd_wanwan_neg_one_365[1];
-__declspec(section ".data") s32 fd_wanwan___local_PI_366[1];
-__declspec(section ".data") s32 fd_wanwan___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_wanwan_one_negone_359;
-__declspec(section ".data") s32 fd_wanwan___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_wanwan_one_364[1];
+__declspec(section ".data") f32 fd_wanwan_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_wanwan_neg_one_382;
+__declspec(section ".data") f32 fd_wanwan___local_PI_383;
+__declspec(section ".data") f32 fd_wanwan___local_3PIO2_385;
+__declspec(section ".data") f32 fd_wanwan_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_wanwan___local_PIO2_384;
+__declspec(section ".data") f32 fd_wanwan_one_381;
+__declspec(section ".data") f32 fd_wanwan_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_wanwan_neg_one_365;
+__declspec(section ".data") f32 fd_wanwan___local_PI_366;
+__declspec(section ".data") f32 fd_wanwan___local_3PIO2_368;
+__declspec(section ".data") f32 fd_wanwan_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_wanwan___local_PIO2_367;
+__declspec(section ".data") f32 fd_wanwan_one_364;
 BattleUnitKind unit_wanwan;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -58,7 +59,7 @@ static __declspec(section ".data") StatusVulnerability regist;
 static PoseTableEntry pose_table[19];
 static BattleDataEntry data_table[15];
 static BattleUnitKindPart parts[9];
-static s32 weapon_wanwan_attack[48];
+static BattleWeapon weapon_wanwan_attack;
 static s32 init_event[41];
 static s32 chain_event[23];
 static s32 damage_event[33];
@@ -70,53 +71,33 @@ static s32 sound_gensui_event[22];
 static s32 wait_sound_event1[25];
 static __declspec(section ".data") s32 wait_sound_event2[12];
 
-__declspec(section ".data") u64 fd_wanwan_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_wanwan_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_wanwan_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_wanwan_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_wanwan___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_wanwan___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_wanwan___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_wanwan___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_wanwan_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_wanwan_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_wanwan___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_wanwan___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_wanwan_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_wanwan_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_wanwan_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_wanwan_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_wanwan_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_wanwan_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_wanwan___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_wanwan___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_wanwan___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_wanwan___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_wanwan_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_wanwan_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_wanwan___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_wanwan___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_wanwan_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_wanwan_one_364 = 1.0f;
 
 BattleUnitKind unit_wanwan = {
     127,
@@ -242,13 +223,40 @@ static BattleUnitKindPart parts[] = {
     {9, "btl_un_wanwan", "c_wanwan", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x12010000, 0, pose_table},
 };
 
-static s32 weapon_wanwan_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    6, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 553656320, 770, 0, 135, 114, 8196,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_wanwan_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x21002000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x72, // counterResistFlags
+    0x2004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static EVT_BEGIN(init_event)
@@ -310,156 +318,306 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
-static s32 dead_event[] = {
-    131122, -30000000, 48, 393307, (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_BTL_ENEMY_DIE1_1", -250000000,
-    0, -250000000, 65539, 10, 65545, 1, 131122, -29999989,
-    1, 65541, 9, 393307, (s32)btlevtcmd_AddPartsRotate, -29999990, -29999989, 0,
-    -8, 0, 131125, -29999989, 1, 6, 131126, -30000000,
-    1, 131099, -30000000, 0, 65540, 10, 33, 131122,
-    -29999989, 1, 65541, 9, 393307, (s32)btlevtcmd_SetPartsRotate, -29999990, -29999989,
-    0, 0, 0, 131125, -29999989, 1, 6, 393307,
-    (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_BTL_ENEMY_DIE1_2", -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetPos,
-    -29999990, -30000000, -29999999, -29999998, 131125, -29999998, 10, 983131,
-    (s32)evt_eff, 0, (s32)"kemuri_test", 4, -30000000, -29999999, -29999998, -229999181,
-    0, 0, 0, 0, 0, 0, 0, 196699,
-    (s32)btlevtcmd_GetCoin, -29999990, -30000000, 131163, (s32)btlevtcmd_StoreCoin, -30000000, 196699, (s32)btlevtcmd_GetExp,
-    -29999990, -30000000, 131163, (s32)btlevtcmd_StoreExp, -30000000, 327771, (s32)btlevtcmd_GetPos, -29999990,
-    -29999997, -29999999, -29999998, 131125, -29999998, 10, 131125, -29999999,
-    30, 983131, (s32)evt_eff, (s32)"", (s32)"star_point", 0, -29999997, -29999999,
-    -29999998, -30000000, 0, 0, 0, 0, 0, 0,
-    0, 131122, -29999989, 1, 65541, 9, 393307, (s32)btlevtcmd_SetPartsRotateOffset,
-    -29999990, -29999989, 0, 0, 0, 131125, -29999989, 1,
-    6, 131122, -30000000, 30, 65539, 20, 65545, 1,
-    131122, -29999989, 1, 65541, 9, 393307, (s32)btlevtcmd_AddPartsRotate, -29999990,
-    -29999989, 3, 0, 0, 131125, -29999989, 1, 6,
-    131126, -30000000, 1, 131099, -30000000, 0, 65540, 20,
-    33, 131163, (s32)btlevtcmd_GetBackItem, -29999990, 262235, (s32)btlevtcmd_CheckDamageCode, -29999990, 1024,
-    -30000000, 131097, -30000000, 0, 196699, (s32)btlevtcmd_KillUnit, -29999990, 0,
-    32, 196699, (s32)btlevtcmd_KillUnit, -29999990, 2, 33, 2, 1,
-};
+static EVT_BEGIN(dead_event)
+    SET_VALUE(LW(0), 48)
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_1"), -250000000, 0, -250000000)
+    LABEL(10)
+    WAIT_FRAMES(1)
+    SET_VALUE(LW(11), 1)
+    LOOP(9)
+        CALL(btlevtcmd_AddPartsRotate, LW(10), LW(11), 0, -8, 0)
+        ADD(LW(11), 1)
+    END_LOOP
+    SUBTRACT(LW(0), 1)
+    IF_INT_GREATER(LW(0), 0)
+        GOTO(10)
+    END_IF
+    SET_VALUE(LW(11), 1)
+    LOOP(9)
+        CALL(btlevtcmd_SetPartsRotate, LW(10), LW(11), 0, 0, 0)
+        ADD(LW(11), 1)
+    END_LOOP
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+    ADD(LW(2), 10)
+    CALL(evt_eff, 0, STRING("kemuri_test"), 4, LW(0), LW(1), LW(2), FLOAT(0.7998047f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_GetCoin, LW(10), LW(0))
+    CALL(btlevtcmd_StoreCoin, LW(0))
+    CALL(btlevtcmd_GetExp, LW(10), LW(0))
+    CALL(btlevtcmd_StoreExp, LW(0))
+    CALL(btlevtcmd_GetPos, LW(10), LW(3), LW(1), LW(2))
+    ADD(LW(2), 10)
+    ADD(LW(1), 30)
+    CALL(evt_eff, STRING(""), STRING("star_point"), 0, LW(3), LW(1), LW(2), LW(0), 0, 0, 0, 0, 0, 0, 0)
+    SET_VALUE(LW(11), 1)
+    LOOP(9)
+        CALL(btlevtcmd_SetPartsRotateOffset, LW(10), LW(11), 0, 0, 0)
+        ADD(LW(11), 1)
+    END_LOOP
+    SET_VALUE(LW(0), 30)
+    LABEL(20)
+    WAIT_FRAMES(1)
+    SET_VALUE(LW(11), 1)
+    LOOP(9)
+        CALL(btlevtcmd_AddPartsRotate, LW(10), LW(11), 3, 0, 0)
+        ADD(LW(11), 1)
+    END_LOOP
+    SUBTRACT(LW(0), 1)
+    IF_INT_GREATER(LW(0), 0)
+        GOTO(20)
+    END_IF
+    CALL(btlevtcmd_GetBackItem, LW(10))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), 1024, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_KillUnit, LW(10), 0)
+    ELSE
+        CALL(btlevtcmd_KillUnit, LW(10), 2)
+    END_IF
+    RETURN
+EVT_END()
 
-static s32 attack_event[] = {
-    196699, (s32)btlevtcmd_check_battleflag, -30000000, 2, 131097, -30000000, 0, 65546,
-    750, 196699, (s32)btlevtcmd_GetFirstAttackTarget, -29999997, -29999996, 32, 196699, (s32)btlevtcmd_EnemyItemUseCheck,
-    -2, -30000000, 131097, -30000000, 0, 65630, -30000000, 131163,
-    (s32)btlevtcmd_StartWaitEvent, -2, 2, 33, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000,
-    262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, (s32)weapon_wanwan_attack, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_wanwan_attack,
-    -29999997, -29999996, 33, 131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken,
-    -2, 16, -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered,
-    2, 33, 65540, 99, 33, 262235, (s32)btlevtcmd_SetUnitWork, -2,
-    1, 127, 262235, (s32)btlevtcmd_GetUnitWork, -2, 1, -29999986, 131163,
-    (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_wanwan_attack, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996, 65627,
-    (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_wanwan_attack, 458843, (s32)btlevtcmd_CalculateFaceDirection, -2,
-    -1, -29999997, -29999996, 16, -29999985, 262235, (s32)btlevtcmd_ChangePartsFaceDirection, -2,
-    1, -29999985, 262235, (s32)btlevtcmd_SetUnitWork, -2, 0, 0, 131163,
-    (s32)btlevtcmd_StopWaitEvent, -2, 196699, (s32)evt_btl_camera_set_mode, 0, 11, 393307, (s32)evt_btl_camera_set_homing_unitparts,
-    0, -2, 1, -29999997, -29999996, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0,
-    1, 196699, (s32)evt_btl_camera_set_zoom, 0, 250, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    1, (s32)"WAN_A_1", 65541, 2, 393307, (s32)btlevtcmd_GetPartsPos, -2, 1,
-    -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_JumpPartsSetting, -2, 1, 20,
-    0, -229999284, 110, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_WAIT1", -29999986,
-    0, -250000000, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_WAIT3", -29999986, 0,
-    -250000000, 65545, 10, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_WAIT2", -29999986,
-    0, -250000000, 112, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, 1, -30000000,
-    0, -29999998, 20, -1, 6, 110, 65545, 20,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"WAN_S_1A", 112, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_WAN_ATTACK1", -29999986, 0, -250000000, 393307, (s32)btlevtcmd_GetPartsPos, -2,
-    1, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000,
-    40, 393307, (s32)btlevtcmd_JumpPartsSetting, -2, 1, 30, 0, -229999693,
-    524379, (s32)btlevtcmd_JumpPartsPosition, -2, 1, -30000000, 0, -29999998, 30,
-    -1, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"WAN_A_1", 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_WAN_ATTACK2", -29999986, 0, -250000000, 393307, (s32)btlevtcmd_GetHitPos, -29999997,
-    -29999996, -30000000, -29999999, -29999998, 131126, -29999999, 10, 131098,
-    -29999999, 0, 131122, -29999999, 0, 33, 393307, (s32)btlevtcmd_JumpPartsSetting,
-    -2, 1, 0, -229983616, -230000000, 524379, (s32)btlevtcmd_JumpPartsPosition, -2,
-    1, -30000000, -29999999, 10, 0, -1, 458843, (s32)btlevtcmd_PreCheckDamage,
-    -2, -29999997, -29999996, (s32)weapon_wanwan_attack, 0, -29999995, 65570, -29999995,
-    65579, 4, 65540, 90, 46, 65572, 3, 196699,
-    (s32)btlevtcmd_StartAvoid, -29999997, 38, 65540, 90, 46, 65572, 6,
-    196699, (s32)btlevtcmd_StartAvoid, -29999997, 39, 65540, 90, 65572, 2,
-    196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 65540, 90, 65572, 1,
-    65540, 91, 46, 42, 65540, 98, 46, 49,
-    65539, 90, 65545, 30, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_WAIT1",
-    -29999986, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"WAN_S_1A",
-    327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_JumpPartsSetting,
-    -2, 1, 0, -229991808, -230000000, 524379, (s32)btlevtcmd_JumpPartsPosition, -2,
-    1, -30000000, -29999999, -29999998, 0, -1, 65540, 98,
-    65539, 91, 393307, (s32)evt_btl_camera_shake_h, 0, 1, 1, 8,
-    0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_add_zoom, 0,
-    -50, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, (s32)weapon_wanwan_attack, 458843, (s32)btlevtcmd_CheckDamage, -2,
-    -29999997, -29999996, (s32)weapon_wanwan_attack, 256, -29999995, 65545, 30, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_WAIT1", -29999986, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"WAN_S_1A", 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999,
-    -29999998, 393307, (s32)btlevtcmd_JumpPartsSetting, -2, 1, 0, -229991808, -229999744,
-    524379, (s32)btlevtcmd_JumpPartsPosition, -2, 1, -30000000, -29999999, -29999998, 0,
-    -1, 65540, 98, 65539, 98, 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 65546, 250, 65539, 99, 262235, (s32)btlevtcmd_SetUnitWork, -2,
-    0, 1, 262235, (s32)btlevtcmd_ChangePartsFaceDirection, -2, 1, -1, 131163,
-    (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+static EVT_BEGIN(attack_event)
+    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        WAIT_MS(750)
+        CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
+    ELSE
+        CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(LW(0))
+            CALL(btlevtcmd_StartWaitEvent, -2)
+            RETURN
+        END_IF
+        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_wanwan_attack))
+        CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_wanwan_attack), LW(3), LW(4))
+    END_IF
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_SetUnitWork, -2, 1, 127)
+    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(14))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_wanwan_attack))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_wanwan_attack))
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangePartsFaceDirection, -2, 1, LW(15))
+    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
+    CALL(btlevtcmd_StopWaitEvent, -2)
+    CALL(evt_btl_camera_set_mode, 0, 11)
+    CALL(evt_btl_camera_set_homing_unitparts, 0, -2, 1, LW(3), LW(4))
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(evt_btl_camera_set_zoom, 0, 250)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("WAN_A_1"))
+    LOOP(2)
+        CALL(btlevtcmd_GetPartsPos, -2, 1, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPartsSetting, -2, 1, 20, 0, FLOAT(0.69921875f))
+        BEGIN_SIBLING_EVENT
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_WAIT1"), LW(14), 0, -250000000)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_WAIT3"), LW(14), 0, -250000000)
+            WAIT_FRAMES(10)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_WAIT2"), LW(14), 0, -250000000)
+        END_SIBLING_EVENT
+        CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), 0, LW(2), 20, -1)
+    END_LOOP
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(20)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("WAN_S_1A"))
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_ATTACK1"), LW(14), 0, -250000000)
+    CALL(btlevtcmd_GetPartsPos, -2, 1, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 40)
+    CALL(btlevtcmd_JumpPartsSetting, -2, 1, 30, 0, FLOAT(0.2998047f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), 0, LW(2), 30, -1)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("WAN_A_1"))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_ATTACK2"), LW(14), 0, -250000000)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    SUBTRACT(LW(1), 10)
+    IF_INT_LESS(LW(1), 0)
+        SET_VALUE(LW(1), 0)
+    END_IF
+    CALL(btlevtcmd_JumpPartsSetting, -2, 1, 0, FLOAT(16.0f), FLOAT(0.0f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), LW(1), 10, 0, -1)
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_wanwan_attack), 0, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+    END_SWITCH
+    LABEL(90)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_WAIT1"), LW(14), 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("WAN_S_1A"))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPartsSetting, -2, 1, 0, FLOAT(8.0f), FLOAT(0.0f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), LW(1), LW(2), 0, -1)
+    GOTO(98)
+    LABEL(91)
+    CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_add_zoom, 0, -50)
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_wanwan_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_wanwan_attack), 256, LW(5))
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_WAIT1"), LW(14), 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("WAN_S_1A"))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPartsSetting, -2, 1, 0, FLOAT(8.0f), FLOAT(0.25f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), LW(1), LW(2), 0, -1)
+    GOTO(98)
+    LABEL(98)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_MS(250)
+    LABEL(99)
+    CALL(btlevtcmd_SetUnitWork, -2, 0, 1)
+    CALL(btlevtcmd_ChangePartsFaceDirection, -2, 1, -1)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
-static s32 wait_event[] = {
-    262235, (s32)btlevtcmd_SetUnitWork, -2, 2, 0, 262235, (s32)btlevtcmd_CheckStatus, -2,
-    1, -29999985, 131097, -29999985, 0, 262235, (s32)btlevtcmd_SetUnitWork, -2,
-    2, 2, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"WAN_N_1", 393307,
-    (s32)btlevtcmd_SetPartsRotateOffset, -2, 1, 0, 10, 0, 110, 65539,
-    1, 65630, (s32)sound_gensui_event, 393307, (s32)btlevtcmd_SetPartsRotate, -2, 1, 0,
-    0, 0, 65545, 20, 65541, 10, 65545, 4,
-    393307, (s32)btlevtcmd_AddPartsRotate, -2, 1, 0, 0, 1, 6,
-    65541, 10, 65545, 4, 393307, (s32)btlevtcmd_AddPartsRotate, -2, 1,
-    0, 0, -1, 6, 65540, 1, 112, 65540,
-    98, 33, 262235, (s32)btlevtcmd_CheckStatus, -2, 2, -29999986, 262235,
-    (s32)btlevtcmd_CheckStatus, -2, 9, -29999985, 131151, -29999985, -29999986, 131097,
-    -29999985, 0, 262235, (s32)btlevtcmd_SetUnitWork, -2, 2, 2, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"WAN_Y_1", 110, 65539, 5, 65630,
-    (s32)sound_gensui_event, 196699, (s32)evt_sub_random, 20, -30000000, 65545, -30000000, 65540,
-    5, 112, 65540, 98, 33, 262235, (s32)btlevtcmd_CheckStatus, -2,
-    5, -29999987, 262235, (s32)btlevtcmd_CheckStatus, -2, 4, -29999986, 262235,
-    (s32)btlevtcmd_CheckStatus, -2, 3, -29999985, 131151, -29999985, -29999987, 131151,
-    -29999985, -29999986, 131097, -29999985, 0, 110, 65539, 3,
-    65630, (s32)sound_gensui_event, 196699, (s32)btlevtcmd_AnimeChangePoseFromTable, -2, 1, 196699, (s32)evt_sub_random,
-    20, -30000000, 65545, -30000000, 131122, -29999990, 15, 65628,
-    (s32)wait_sound_event1, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 393307,
-    (s32)btlevtcmd_JumpPartsSetting, -2, 1, 30, 0, -229999744, 524379, (s32)btlevtcmd_JumpPartsPosition,
-    -2, 1, -30000000, 0, -29999998, 30, 0, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_LANDING1", -29999989, 0, -250000000, 131122, -29999990,
-    10, 65628, (s32)wait_sound_event2, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 5,
-    393307, (s32)btlevtcmd_JumpPartsSetting, -2, 1, 20, 0, -229999796, 524379,
-    (s32)btlevtcmd_JumpPartsPosition, -2, 1, -30000000, 0, -29999998, 20, 0,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_LANDING1", -29999989, 0, -250000000, 131122,
-    -29999990, 7, 65628, (s32)wait_sound_event2, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000,
-    20, 393307, (s32)btlevtcmd_JumpPartsSetting, -2, 1, 15, 0, -229999591,
-    524379, (s32)btlevtcmd_JumpPartsPosition, -2, 1, -30000000, 0, -29999998, 15,
-    0, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_LANDING1", -29999989, 0, -250000000,
-    131122, -29999990, 7, 65628, (s32)wait_sound_event2, 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_JumpPartsSetting, -2, 1, 15,
-    0, -229999796, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, 1, -30000000, -29999999,
-    -29999998, 15, 0, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_LANDING1", -29999989,
-    0, -250000000, 65540, 3, 112, 65540, 98, 33,
-    110, 65539, 4, 65630, (s32)sound_gensui_event, 196699, (s32)evt_sub_random, 20,
-    -30000000, 65545, -30000000, 131122, -29999990, 15, 65628, (s32)wait_sound_event1,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"WAN_A_1", 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_JumpPartsSetting, -2, 1, 30,
-    0, -229999744, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, 1, -30000000, 0,
-    -29999998, 30, 0, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_LANDING1", -29999989,
-    0, -250000000, 131122, -29999990, 10, 65628, (s32)wait_sound_event2, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"WAN_S_1A", 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000,
-    5, 393307, (s32)btlevtcmd_JumpPartsSetting, -2, 1, 20, 0, -229999796,
-    524379, (s32)btlevtcmd_JumpPartsPosition, -2, 1, -30000000, 0, -29999998, 20,
-    0, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_LANDING1", -29999989, 0, -250000000,
-    131122, -29999990, 7, 65628, (s32)wait_sound_event2, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    1, (s32)"WAN_A_1", 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 20, 393307,
-    (s32)btlevtcmd_JumpPartsSetting, -2, 1, 15, 0, -229999591, 524379, (s32)btlevtcmd_JumpPartsPosition,
-    -2, 1, -30000000, 0, -29999998, 15, 0, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_LANDING1", -29999989, 0, -250000000, 131122, -29999990,
-    7, 65628, (s32)wait_sound_event2, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"WAN_S_1A",
-    327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_JumpPartsSetting,
-    -2, 1, 15, 0, -229999796, 524379, (s32)btlevtcmd_JumpPartsPosition, -2,
-    1, -30000000, -29999999, -29999998, 15, 0, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_WAN_LANDING1", -29999989, 0, -250000000, 65540, 4, 112,
-    65540, 98, 65539, 98, 65539, 99, 65545, 1,
-    65540, 99, 2, 1,
-};
+static EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
+    CALL(btlevtcmd_CheckStatus, -2, 1, LW(15))
+    IF_INT_NOT_EQUAL(LW(15), 0)
+        CALL(btlevtcmd_SetUnitWork, -2, 2, 2)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("WAN_N_1"))
+        CALL(btlevtcmd_SetPartsRotateOffset, -2, 1, 0, 10, 0)
+        BEGIN_SIBLING_EVENT
+            LABEL(1)
+            CALL_CHILD(sound_gensui_event)
+            CALL(btlevtcmd_SetPartsRotate, -2, 1, 0, 0, 0)
+            WAIT_FRAMES(20)
+            LOOP(10)
+                WAIT_FRAMES(4)
+                CALL(btlevtcmd_AddPartsRotate, -2, 1, 0, 0, 1)
+            END_LOOP
+            LOOP(10)
+                WAIT_FRAMES(4)
+                CALL(btlevtcmd_AddPartsRotate, -2, 1, 0, 0, -1)
+            END_LOOP
+            GOTO(1)
+        END_SIBLING_EVENT
+        GOTO(98)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, -2, 2, LW(14))
+    CALL(btlevtcmd_CheckStatus, -2, 9, LW(15))
+    OR(LW(15), LW(14))
+    IF_INT_NOT_EQUAL(LW(15), 0)
+        CALL(btlevtcmd_SetUnitWork, -2, 2, 2)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("WAN_Y_1"))
+        BEGIN_SIBLING_EVENT
+            LABEL(5)
+            CALL_CHILD(sound_gensui_event)
+            CALL(evt_sub_random, 20, LW(0))
+            WAIT_FRAMES(LW(0))
+            GOTO(5)
+        END_SIBLING_EVENT
+        GOTO(98)
+    END_IF
+    CALL(btlevtcmd_CheckStatus, -2, 5, LW(13))
+    CALL(btlevtcmd_CheckStatus, -2, 4, LW(14))
+    CALL(btlevtcmd_CheckStatus, -2, 3, LW(15))
+    OR(LW(15), LW(13))
+    OR(LW(15), LW(14))
+    IF_INT_NOT_EQUAL(LW(15), 0)
+        BEGIN_SIBLING_EVENT
+            LABEL(3)
+            CALL_CHILD(sound_gensui_event)
+            CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+            CALL(evt_sub_random, 20, LW(0))
+            WAIT_FRAMES(LW(0))
+            SET_VALUE(LW(10), 15)
+            SPAWN_EVENT(wait_sound_event1)
+            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_JumpPartsSetting, -2, 1, 30, 0, FLOAT(0.25f))
+            CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), 0, LW(2), 30, 0)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_LANDING1"), LW(11), 0, -250000000)
+            SET_VALUE(LW(10), 10)
+            SPAWN_EVENT(wait_sound_event2)
+            CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 5)
+            CALL(btlevtcmd_JumpPartsSetting, -2, 1, 20, 0, FLOAT(0.19921875f))
+            CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), 0, LW(2), 20, 0)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_LANDING1"), LW(11), 0, -250000000)
+            SET_VALUE(LW(10), 7)
+            SPAWN_EVENT(wait_sound_event2)
+            CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 20)
+            CALL(btlevtcmd_JumpPartsSetting, -2, 1, 15, 0, FLOAT(0.39941406f))
+            CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), 0, LW(2), 15, 0)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_LANDING1"), LW(11), 0, -250000000)
+            SET_VALUE(LW(10), 7)
+            SPAWN_EVENT(wait_sound_event2)
+            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_JumpPartsSetting, -2, 1, 15, 0, FLOAT(0.19921875f))
+            CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), LW(1), LW(2), 15, 0)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_LANDING1"), LW(11), 0, -250000000)
+            GOTO(3)
+        END_SIBLING_EVENT
+        GOTO(98)
+    END_IF
+    BEGIN_SIBLING_EVENT
+        LABEL(4)
+        CALL_CHILD(sound_gensui_event)
+        CALL(evt_sub_random, 20, LW(0))
+        WAIT_FRAMES(LW(0))
+        SET_VALUE(LW(10), 15)
+        SPAWN_EVENT(wait_sound_event1)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("WAN_A_1"))
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPartsSetting, -2, 1, 30, 0, FLOAT(0.25f))
+        CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), 0, LW(2), 30, 0)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_LANDING1"), LW(11), 0, -250000000)
+        SET_VALUE(LW(10), 10)
+        SPAWN_EVENT(wait_sound_event2)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("WAN_S_1A"))
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 5)
+        CALL(btlevtcmd_JumpPartsSetting, -2, 1, 20, 0, FLOAT(0.19921875f))
+        CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), 0, LW(2), 20, 0)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_LANDING1"), LW(11), 0, -250000000)
+        SET_VALUE(LW(10), 7)
+        SPAWN_EVENT(wait_sound_event2)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("WAN_A_1"))
+        CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 20)
+        CALL(btlevtcmd_JumpPartsSetting, -2, 1, 15, 0, FLOAT(0.39941406f))
+        CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), 0, LW(2), 15, 0)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_LANDING1"), LW(11), 0, -250000000)
+        SET_VALUE(LW(10), 7)
+        SPAWN_EVENT(wait_sound_event2)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("WAN_S_1A"))
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPartsSetting, -2, 1, 15, 0, FLOAT(0.19921875f))
+        CALL(btlevtcmd_JumpPartsPosition, -2, 1, LW(0), LW(1), LW(2), 15, 0)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_LANDING1"), LW(11), 0, -250000000)
+        GOTO(4)
+    END_SIBLING_EVENT
+    GOTO(98)
+    LABEL(98)
+    LABEL(99)
+    WAIT_FRAMES(1)
+    GOTO(99)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(sound_gensui_event)
     CALL(btlevtcmd_GetUnitWork, -2, 1, LW(11))
@@ -471,17 +629,19 @@ static EVT_BEGIN(sound_gensui_event)
     RETURN
 EVT_END()
 
-static s32 wait_sound_event1[] = {
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_WAIT1", -29999989, 0, -250000000, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_WAIT3", -29999989, 0, -250000000, 65545, -29999990,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_WAIT2", -29999989, 0, -250000000, 2,
-    1,
-};
+static EVT_BEGIN(wait_sound_event1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_WAIT1"), LW(11), 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_WAIT3"), LW(11), 0, -250000000)
+    WAIT_FRAMES(LW(10))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_WAIT2"), LW(11), 0, -250000000)
+    RETURN
+EVT_END()
 
-static __declspec(section ".data") s32 wait_sound_event2[] = {
-    65545, -29999990, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_WAN_WAIT4", -29999989, 0,
-    -250000000, 2, 1, 0,
-};
+static __declspec(section ".data") EVT_BEGIN(wait_sound_event2)
+    WAIT_FRAMES(LW(10))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_WAIT4"), LW(11), 0, -250000000)
+    RETURN
+EVT_END_PAD()
 
 static USER_FUNC(chain_main) {
     BattleWork* wp = _battleWorkPointer;

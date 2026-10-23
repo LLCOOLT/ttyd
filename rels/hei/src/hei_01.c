@@ -7,6 +7,9 @@
 #include "evt/evt_damage.h"
 #include "evt/evt_sub.h"
 #include "hei.h"
+#include "evt/evt_npc.h"
+#include "driver/hitdrv.h"
+#include "data_tables.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
@@ -103,28 +106,28 @@ USER_FUNC(evt_party_move_behind_mario);
 #endif
 static USER_FUNC(set_dir);
 
-__declspec(section ".data") u64 fd_hei_01_negone_one_374;
-__declspec(section ".data") s32 fd_hei_01_neg_one_382[1];
-__declspec(section ".data") s32 fd_hei_01___local_PI_383[1];
-__declspec(section ".data") s32 fd_hei_01___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_hei_01_one_negone_373;
-__declspec(section ".data") s32 fd_hei_01___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_hei_01_one_381[1];
-__declspec(section ".data") u64 fd_hei_01_negone_one_360;
-__declspec(section ".data") s32 fd_hei_01_neg_one_365[1];
-__declspec(section ".data") s32 fd_hei_01___local_PI_366[1];
-__declspec(section ".data") s32 fd_hei_01___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_hei_01_one_negone_359;
-__declspec(section ".data") s32 fd_hei_01___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_hei_01_one_364[1];
+__declspec(section ".data") f32 fd_hei_01_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_01_neg_one_382;
+__declspec(section ".data") f32 fd_hei_01___local_PI_383;
+__declspec(section ".data") f32 fd_hei_01___local_3PIO2_385;
+__declspec(section ".data") f32 fd_hei_01_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_01___local_PIO2_384;
+__declspec(section ".data") f32 fd_hei_01_one_381;
+__declspec(section ".data") f32 fd_hei_01_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_01_neg_one_365;
+__declspec(section ".data") f32 fd_hei_01___local_PI_366;
+__declspec(section ".data") f32 fd_hei_01___local_3PIO2_368;
+__declspec(section ".data") f32 fd_hei_01_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_01___local_PIO2_367;
+__declspec(section ".data") f32 fd_hei_01_one_364;
 __declspec(section ".data") s32 bero_out_event[5];
-static s32 bero_entry_data[75];
+static BeroEntry bero_entry_data[5];
 static s32 evt_kusa_2[20];
 static s32 evt_kusa_4[20];
 static s32 evt_kusa_7[20];
-static s32 kusa_data[28];
+static KusaAccess kusa_data[7];
 s32 kusa_dokan[59];
-static s32 name_tbl[25];
+static const char* name_tbl[25];
 s32 bridge_evt_02[192];
 s32 bridge_evt[30];
 #ifdef VERSION_G8ME01
@@ -140,76 +143,111 @@ s32 nokotarou_talk_2[34];
 static __declspec(section ".data") s32 nokotarou_talk[4];
 s32 nokorin_pose[57];
 s32 evt_nokorin[869];
-static s32 npcEnt[69];
-static __declspec(section ".data") s32 hitDmgRetPoints[12];
+static NpcSetupInfo npcEnt[3];
+static __declspec(section ".data") HitDamageReturn hitDmgRetPoints[3];
 static s32 peach_mail[287];
 s32 christine_hei_01[46];
 s32 hei_01_init_evt[148];
 
-__declspec(section ".data") u64 fd_hei_01_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hei_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hei_01_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_hei_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_hei_01___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_hei_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_hei_01___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_hei_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_hei_01_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_hei_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_hei_01___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_hei_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_hei_01_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_hei_01_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_hei_01_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hei_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hei_01_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_hei_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_hei_01___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_hei_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_hei_01___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_hei_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_hei_01_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_hei_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_hei_01___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_hei_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_hei_01_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_hei_01_one_364 = 1.0f;
 
 __declspec(section ".data") EVT_BEGIN(bero_out_event)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"hei_13", (s32)"e_bero", 65537, 0, 0, (s32)"e_bero",
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    (s32)bero_out_event, (s32)"nok_00", (s32)"w_bero", 65537, 0, 0, (s32)"dokan_h", 268566528,
-    9, 100000, 0, 0, -1, 0, 6, 0,
-    0, (s32)"dokan", 65537, 0, 0, (s32)"dokan", 131072, 9,
-    100000, 0, 0, -1, 0, 6, 0, 0,
-    (s32)"dokan_h", 65537, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"hei_13", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)bero_out_event, // exitEvent
+        (s32)"nok_00", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan_h", // hitName
+        4098, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, 0, // exitEvent..nextMapName
+        "dokan_h", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(evt_kusa_2)
@@ -236,11 +274,14 @@ static EVT_BEGIN(evt_kusa_7)
     RETURN
 EVT_END()
 
-static s32 kusa_data[] = {
-    0, (s32)"a_kusa_2", (s32)"kusa_2", (s32)evt_kusa_2, 0, (s32)"a_kusa_3", (s32)"kusa_7", 0,
-    0, (s32)"a_kusa_4", (s32)"kusa_4", (s32)evt_kusa_4, 0, (s32)"a_kusa_6", (s32)"kusa_6", 0,
-    0, (s32)"a_kusa_7", (s32)"kusa_9", (s32)evt_kusa_7, 0, (s32)"a_kusa_8", (s32)"kusa_pPlane371_q00274", 0,
-    4, 0, 0, 0,
+static KusaAccess kusa_data[] = {
+    {0, "a_kusa_2", "kusa_2", evt_kusa_2},
+    {0, "a_kusa_3", "kusa_7", NULL},
+    {0, "a_kusa_4", "kusa_4", evt_kusa_4},
+    {0, "a_kusa_6", "kusa_6", NULL},
+    {0, "a_kusa_7", "kusa_9", evt_kusa_7},
+    {0, "a_kusa_8", "kusa_pPlane371_q00274", NULL},
+    {4, NULL, NULL, NULL},
 };
 
 EVT_BEGIN(kusa_dokan)
@@ -263,11 +304,32 @@ EVT_BEGIN(kusa_dokan)
     RETURN
 EVT_END()
 
-static s32 name_tbl[] = {
-    (s32)"hasi_1", (s32)"hasi_2", (s32)"hasi_3", (s32)"hasi_4", (s32)"hasi_5", (s32)"hasi_6", (s32)"hasi_7", (s32)"hasi_8",
-    (s32)"hasi_9", (s32)"hasi_10", (s32)"hasi_11", (s32)"hasi_12", (s32)"hasi_13", (s32)"hasi_14", (s32)"hasi_15", (s32)"hasi_16",
-    (s32)"hasi_17", (s32)"hasi_18", (s32)"hasi_19", (s32)"hasi_20", (s32)"hasi_21", (s32)"hasi_22", (s32)"hasi_23", (s32)"hasi_24",
-    (s32)"hasi_25",
+static const char* name_tbl[] = {
+    "hasi_1",
+    "hasi_2",
+    "hasi_3",
+    "hasi_4",
+    "hasi_5",
+    "hasi_6",
+    "hasi_7",
+    "hasi_8",
+    "hasi_9",
+    "hasi_10",
+    "hasi_11",
+    "hasi_12",
+    "hasi_13",
+    "hasi_14",
+    "hasi_15",
+    "hasi_16",
+    "hasi_17",
+    "hasi_18",
+    "hasi_19",
+    "hasi_20",
+    "hasi_21",
+    "hasi_22",
+    "hasi_23",
+    "hasi_24",
+    "hasi_25",
 };
 
 EVT_BEGIN(bridge_evt_02)
@@ -278,7 +340,7 @@ EVT_BEGIN(bridge_evt_02)
     CALL(evt_offscreen_entry, STRING("offscreen"))
     CALL(evt_img_entry, STRING("capture_img"))
     CALL(evt_img_set_paper, STRING("capture_img"), STRING("OFF_hei_01c"))
-    SET_INT_READ_ADDR(PTR(name_tbl))
+    SET_INT_READ_ADDR(PTR(&name_tbl))
     CALL(evt_img_alloc_capture, STRING("capture_img"), 0, 0, 1, 54, 140, 500, 250)
     CALL(evt_mapobj_set_offscreen, 1, STRING("S"), STRING("offscreen"))
     CALL(evt_mapobj_clear_offscreen, 1, STRING("hasi"))
@@ -770,21 +832,38 @@ EVT_BEGIN(evt_nokorin)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"ノコタロウ"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45", 0, 0, (s32)nokotarou_init, (s32)nokotarou_reg, (s32)nokotarou_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1065353216, 1065353216, 1065353216, 1065353216, -1, (s32)/*"ノコリン"*/"\x83\x6D\x83\x52\x83\x8A\x83\x93",
-    1073743392, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"ノコタロウ"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45", // name
+        0, 0, // flags..reactionFlags
+        nokotarou_init, // initEvent
+        nokotarou_reg, // regularEvent
+        nokotarou_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        1.0f, // searchRange
+        1.0f, // searchAngle
+        1.0f, // homingRange
+        1.0f, // homingAngle
+        -1, // battleInfoId
+    },
+    {
+        /*"ノコリン"*/"\x83\x6D\x83\x52\x83\x8A\x83\x93", // name
+        0x40000620, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
-static __declspec(section ".data") s32 hitDmgRetPoints[] = {
-    (s32)"mod_00", 0, -998637568, 0, (s32)"mod_01", 0, -998637568, 0,
-    0, 0, 0, 0,
+static __declspec(section ".data") HitDamageReturn hitDmgRetPoints[] = {
+    {"mod_00", {0.0f, -1000.0f, 0.0f}},
+    {"mod_01", {0.0f, -1000.0f, 0.0f}},
+    {0},
 };
 
 static EVT_BEGIN(peach_mail)

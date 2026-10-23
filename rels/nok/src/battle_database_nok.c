@@ -2,131 +2,137 @@
 #include "evt/evt_cmd.h"
 #include "battle/battle_weapon_power.h"
 #include "battle/battle_database_common.h"
+#include "battle/battle_stage.h"
+#include "battle/battle_stage_object.h"
+#include "driver/npcdrv.h"
 
 #pragma force_active on
 
-extern s32 unit_act_mario[];
+extern BattleUnitKind unit_act_mario;
 
-__declspec(section ".data") u64 fd_battle_database_nok_negone_one_374;
-__declspec(section ".data") s32 fd_battle_database_nok_neg_one_382[1];
-__declspec(section ".data") s32 fd_battle_database_nok___local_PI_383[1];
-__declspec(section ".data") s32 fd_battle_database_nok___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_battle_database_nok_one_negone_373;
-__declspec(section ".data") s32 fd_battle_database_nok___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_battle_database_nok_one_381[1];
-__declspec(section ".data") u64 fd_battle_database_nok_negone_one_360;
-__declspec(section ".data") s32 fd_battle_database_nok_neg_one_365[1];
-__declspec(section ".data") s32 fd_battle_database_nok___local_PI_366[1];
-__declspec(section ".data") s32 fd_battle_database_nok___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_battle_database_nok_one_negone_359;
-__declspec(section ".data") s32 fd_battle_database_nok___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_battle_database_nok_one_364[1];
-s32 nok_btlobject_data[60];
-s32 nok_btlstage_data[109];
-__declspec(section ".data") s32 btlparty_nok_hei_ep[12];
-__declspec(section ".data") s32 btlgrp_nok_hei_ep[8];
-__declspec(section ".data") s32 btlgrpsel_nok_btlno_hei_test1_off[6];
-s32 btlsetup_nok_tbl[34];
-__declspec(section ".data") s32 btl_nok_setup_no_tbl[4];
+__declspec(section ".data") f32 fd_battle_database_nok_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_battle_database_nok_neg_one_382;
+__declspec(section ".data") f32 fd_battle_database_nok___local_PI_383;
+__declspec(section ".data") f32 fd_battle_database_nok___local_3PIO2_385;
+__declspec(section ".data") f32 fd_battle_database_nok_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_battle_database_nok___local_PIO2_384;
+__declspec(section ".data") f32 fd_battle_database_nok_one_381;
+__declspec(section ".data") f32 fd_battle_database_nok_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_battle_database_nok_neg_one_365;
+__declspec(section ".data") f32 fd_battle_database_nok___local_PI_366;
+__declspec(section ".data") f32 fd_battle_database_nok___local_3PIO2_368;
+__declspec(section ".data") f32 fd_battle_database_nok_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_battle_database_nok___local_PIO2_367;
+__declspec(section ".data") f32 fd_battle_database_nok_one_364;
+BattleStageObjectData nok_btlobject_data[10];
+BattleStageData nok_btlstage_data[1];
+__declspec(section ".data") BattleUnitSetup btlparty_nok_hei_ep[1];
+__declspec(section ".data") BattleGroupSetup btlgrp_nok_hei_ep;
+__declspec(section ".data") NpcBattleSelect btlgrpsel_nok_btlno_hei_test1_off[2];
+NpcSetupBattleInfo btlsetup_nok_tbl[2];
+__declspec(section ".data") NpcTerritoryInfo btl_nok_setup_no_tbl[2];
 
-__declspec(section ".data") u64 fd_battle_database_nok_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_battle_database_nok_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_battle_database_nok_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_battle_database_nok_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_battle_database_nok___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_battle_database_nok___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_battle_database_nok_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_battle_database_nok___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_battle_database_nok_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_battle_database_nok_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_battle_database_nok_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_battle_database_nok___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_battle_database_nok___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_battle_database_nok_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_battle_database_nok___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_battle_database_nok_one_364 = 1.0f;
+
+BattleStageObjectData nok_btlobject_data[] = {
+    {"ki_1", 2, 0, {-100.0f, 0.0f, -30.0f}, 0, 60, {0}},
+    {"isi_A", 2, 0, {150.0f, 0.0f, -30.0f}, 10, 50, {0}},
+    {"isi_B", 2, 0, {50.0f, 0.0f, -34.0f}, 20, 40, {0}},
+    {"isigaki", 2, 1, {2.0f, 0.0f, -23.0f}, 0, 60, {0}},
+    {"kusa_1", 2, 1, {-184.0f, 0.0f, 37.0f}, 10, 50, {0}},
+    {"kusa_2", 2, 1, {180.0f, 0.0f, 60.0f}, 20, 40, {0}},
+    {"kusa_3", 2, 1, {70.0f, 0.0f, 65.0f}, 30, 30, {0}},
+    {"kusa_4", 2, 1, {-87.0f, 0.0f, 56.0f}, 0, 60, {0}},
+    {"B", 2, 2, {0}, 0, 60, {0}},
+    {"C", 2, 3, {0}, 0, 60, {0}},
 };
 
-__declspec(section ".data") s32 fd_battle_database_nok___local_PI_383[] = {
-    1078530011,
+BattleStageData nok_btlstage_data[] = {
+    {
+        "bti_01", // mGlobalStageDataDir
+        "stg_04_0", // mSpecificStageDataDir
+        10, // mNumObjects
+        nok_btlobject_data, // mObjects
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
+        0, 0, 0, 0, // field_0x1B0..disableBgBDestroy
+    },
 };
 
-__declspec(section ".data") s32 fd_battle_database_nok___local_3PIO2_385[] = {
-    1083624420,
+__declspec(section ".data") BattleUnitSetup btlparty_nok_hei_ep[] = {
+    {
+        &unit_act_mario, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        NULL, // itemDropTable
+    },
 };
 
-__declspec(section ".data") u64 fd_battle_database_nok_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_battle_database_nok___local_PIO2_384[] = {
-    1070141403,
+__declspec(section ".data") BattleGroupSetup btlgrp_nok_hei_ep = {
+    1, // numEnemies
+    btlparty_nok_hei_ep, // enemyData
+    25, // heldItemWeight
+    25, // randomItemWeight
+    50, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // field_1C
 };
 
-__declspec(section ".data") s32 fd_battle_database_nok_one_381[] = {
-    1065353216,
+__declspec(section ".data") NpcBattleSelect btlgrpsel_nok_btlno_hei_test1_off[] = {
+    {50, &btlgrp_nok_hei_ep, nok_btlstage_data},
+    {0},
 };
 
-__declspec(section ".data") u64 fd_battle_database_nok_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_battle_database_nok_neg_one_365[] = {
-    -1082130432,
+NpcSetupBattleInfo btlsetup_nok_tbl[] = {
+    {
+        /*"マップstg_01_0"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x31\x5F\x30", // name
+        "nok_01", // mapName
+        0, // fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_nok_btlno_hei_test1_off, // select
+        0x100000, // battleFlags
+        6, // field_1C
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {0},
 };
 
-__declspec(section ".data") s32 fd_battle_database_nok___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_battle_database_nok___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_battle_database_nok_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_battle_database_nok___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_battle_database_nok_one_364[] = {
-    1065353216,
-};
-
-s32 nok_btlobject_data[] = {
-    (s32)"ki_1", 131072, -1027080192, 0, -1041235968, 3932160, (s32)"isi_A", 131072,
-    1125515264, 0, -1041235968, 171048960, (s32)"isi_B", 131072, 1112014848, 0,
-    -1039663104, 338165760, (s32)"isigaki", 131073, 1073741824, 0, -1044905984, 3932160,
-    (s32)"kusa_1", 131073, -1019740160, 0, 1108606976, 171048960, (s32)"kusa_2", 131073,
-    1127481344, 0, 1114636288, 338165760, (s32)"kusa_3", 131073, 1116471296, 0,
-    1115815936, 505282560, (s32)"kusa_4", 131073, -1028784128, 0, 1113587712, 3932160,
-    (s32)"B", 131074, 0, 0, 0, 3932160, (s32)"C", 131075,
-    0, 0, 0, 3932160,
-};
-
-s32 nok_btlstage_data[] = {
-    (s32)"bti_01", (s32)"stg_04_0", 10, (s32)nok_btlobject_data, 0, 0, 0, 0,
-    1677721602, 0, 0, (s32)weaponGetPowerDefault, 1, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 34603104, 536870912, 1704706,
-    0, 0, 2047, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 100, 0, 0, 0, 0, 0, 0,
-    1677721602, 0, 0, (s32)weaponGetPowerDefault, 1, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 34603104, 536870912, 1704706,
-    0, 0, 2047, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 100, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
-};
-
-__declspec(section ".data") s32 btlparty_nok_hei_ep[] = {
-    (s32)unit_act_mario, 16777216, 67108868, 1119092736, 0, 0, 0, 0,
-    0, 0, 0, 0,
-};
-
-__declspec(section ".data") s32 btlgrp_nok_hei_ep[] = {
-    1, (s32)btlparty_nok_hei_ep, 25, 25, 50, (s32)battle_heart_drop_param_default, (s32)battle_heart_drop_param_default, 5,
-};
-
-__declspec(section ".data") s32 btlgrpsel_nok_btlno_hei_test1_off[] = {
-    50, (s32)btlgrp_nok_hei_ep, (s32)nok_btlstage_data, 0, 0, 0,
-};
-
-s32 btlsetup_nok_tbl[] = {
-    (s32)/*"マップstg_01_0"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x31\x5F\x30", (s32)"nok_01", 0, -1, 0, (s32)btlgrpsel_nok_btlno_hei_test1_off, 1048576, 6,
-    16843009, 16843009, 16843009, 16843009, 16843009, 16843009, 16843009, 16843009,
-    (s32)"BGM_ZAKO_BATTLE1", 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0,
-};
-
-__declspec(section ".data") s32 btl_nok_setup_no_tbl[] = {
-    (s32)"BTLNO_HEI_TEST1", 0, 0, 0,
+__declspec(section ".data") NpcTerritoryInfo btl_nok_setup_no_tbl[] = {
+    {"BTLNO_HEI_TEST1", 0},
+    {0},
 };
 

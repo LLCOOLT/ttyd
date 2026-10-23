@@ -7,6 +7,8 @@
 #include "stdlib.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_npc.h"
+#include "mario/mario_pouch.h"
 
 s32* tbl;
 
@@ -98,29 +100,29 @@ static USER_FUNC(get_pos);
 USER_FUNC(iri_13_make_name);
 USER_FUNC(make_tbl);
 
-__declspec(section ".data") u64 fd_tou_06_negone_one_374;
-__declspec(section ".data") s32 fd_tou_06_neg_one_382[1];
-__declspec(section ".data") s32 fd_tou_06___local_PI_383[1];
-__declspec(section ".data") s32 fd_tou_06___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_tou_06_one_negone_373;
-__declspec(section ".data") s32 fd_tou_06___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_tou_06_one_381[1];
-__declspec(section ".data") u64 fd_tou_06_negone_one_360;
-__declspec(section ".data") s32 fd_tou_06_neg_one_365[1];
-__declspec(section ".data") s32 fd_tou_06___local_PI_366[1];
-__declspec(section ".data") s32 fd_tou_06___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_tou_06_one_negone_359;
-__declspec(section ".data") s32 fd_tou_06___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_tou_06_one_364[1];
+__declspec(section ".data") f32 fd_tou_06_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_06_neg_one_382;
+__declspec(section ".data") f32 fd_tou_06___local_PI_383;
+__declspec(section ".data") f32 fd_tou_06___local_3PIO2_385;
+__declspec(section ".data") f32 fd_tou_06_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_06___local_PIO2_384;
+__declspec(section ".data") f32 fd_tou_06_one_381;
+__declspec(section ".data") f32 fd_tou_06_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_06_neg_one_365;
+__declspec(section ".data") f32 fd_tou_06___local_PI_366;
+__declspec(section ".data") f32 fd_tou_06___local_3PIO2_368;
+__declspec(section ".data") f32 fd_tou_06_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_tou_06___local_PIO2_367;
+__declspec(section ".data") f32 fd_tou_06_one_364;
 static __declspec(section ".data") s32 n_door_open[12];
 static __declspec(section ".data") s32 n_door_close[12];
 static __declspec(section ".data") s32 w_door_open[12];
 static __declspec(section ".data") s32 w_door_close[12];
-static s32 bero_data[45];
+static BeroEntry bero_data[3];
 __declspec(section ".data") s32 evt_ana[9];
 s32 evt_kontena[21];
 s32 evt_kaidan[91];
-__declspec(section ".data") s32 cloud_kontena2_list[5];
+__declspec(section ".data") const char* cloud_kontena2_list[5];
 s32 evt_kontena2[23];
 static __declspec(section ".data") s32 evt_block_broken[5];
 static __declspec(section ".data") s32 key_tbl[2];
@@ -130,57 +132,37 @@ s32 evt_chuchu[626];
 static s32 list[75];
 __declspec(section ".data") s32 iri_13_pants_00_evt[5];
 s32 iri_13_init[124];
-static s32 npcEnt[46];
+static NpcSetupInfo npcEnt[2];
 static s32 mobj_box00[34];
 s32 tou_06_init_evt[544];
 
-__declspec(section ".data") u64 fd_tou_06_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tou_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tou_06_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tou_06_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_tou_06___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tou_06___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tou_06___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tou_06___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tou_06_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tou_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tou_06___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tou_06___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tou_06_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tou_06_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_tou_06_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_tou_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_tou_06_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_tou_06_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_tou_06___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_tou_06___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_tou_06___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_tou_06___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_tou_06_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_tou_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_tou_06___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_tou_06___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_tou_06_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_tou_06_one_364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -206,13 +188,44 @@ static __declspec(section ".data") EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
-static s32 bero_data[] = {
-    (s32)"n_bero", 65540, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"tou_04", (s32)"s_bero_4", 327685, (s32)n_door_close, (s32)n_door_open, (s32)"w_bero",
-    65540, 2, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"tou_12", (s32)"w_bero", 327685, (s32)w_door_close, (s32)w_door_open, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_data[] = {
+    {
+        "n_bero", // hitName
+        1, // type
+        4, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_04", // nextMapName
+        "s_bero_4", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n_door_close, // enterAnimeArg
+        (s32)n_door_open, // exitAnimeArg
+    },
+    {
+        "w_bero", // hitName
+        1, // type
+        4, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"tou_12", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 __declspec(section ".data") EVT_BEGIN(evt_ana)
@@ -258,8 +271,12 @@ EVT_BEGIN(evt_kaidan)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 cloud_kontena2_list[] = {
-    (s32)"kontena_2", (s32)"fuda_1", (s32)"fuda_2", (s32)"fuda_3", 0,
+__declspec(section ".data") const char* cloud_kontena2_list[] = {
+    "kontena_2",
+    "fuda_1",
+    "fuda_2",
+    "fuda_3",
+    NULL,
 };
 
 EVT_BEGIN(evt_kontena2)
@@ -276,7 +293,7 @@ static __declspec(section ".data") EVT_BEGIN(evt_block_broken)
 EVT_END()
 
 static __declspec(section ".data") s32 key_tbl[] = {
-    19, -1,
+    ITEM_STORAGE_KEY_0x13, -1,
 };
 
 static EVT_BEGIN(evt_chk)
@@ -525,13 +542,17 @@ EVT_BEGIN(iri_13_init)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"チュチュリーナ"*/"\x83\x60\x83\x85\x83\x60\x83\x85\x83\x8A\x81\x5B\x83\x69", 1073743360, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"チュチュリーナ"*/"\x83\x60\x83\x85\x83\x60\x83\x85\x83\x8A\x81\x5B\x83\x69", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static EVT_BEGIN(mobj_box00)
@@ -562,7 +583,7 @@ EVT_BEGIN(tou_06_init_evt)
         IF_INT_GREATER_OR_EQUAL(GSW(0), 149)
             CALL(evt_cloud_init)
         END_IF
-        CALL(evt_cloud_ent, 1, PTR(cloud_kontena2_list), STRING("a_kon_N"), PTR(evt_kontena2))
+        CALL(evt_cloud_ent, 1, PTR(&cloud_kontena2_list), STRING("a_kon_N"), PTR(evt_kontena2))
         ELSE
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kontena_2"), 1)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("fuda_1"), 1)

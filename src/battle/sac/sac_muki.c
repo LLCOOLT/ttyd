@@ -19,6 +19,7 @@
 #include "battle/battle_camera.h"
 #include "battle/sac/sac_common.h"
 #include "party/party_motion.h"
+#include "battle/battle_database_common.h"
 // US battle texture ids are 0x16 higher for these entries.
 #define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
 
@@ -136,17 +137,46 @@ void main_point(s32 idx);
 void main_cursor(void);
 
 
-static s32 weapon[48];
+static BattleWeapon weapon;
 s32 nice_event_pow[8];
 s32 marioAttackEvent_Muki[254];
 
-static s32 weapon[] = {
-    (s32)"btl_wn_sac_mukimuki_body", ICON_19A << 16, 0, (s32)"msg_mukimuki_body", 1677722368, 1065353216, 17130546, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34603120, 268435456, 770, (s32)"msg_sac_4", 131080, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)marioAttackEvent_Muki, 100, 0, 0,
+static BattleWeapon weapon = {
+    "btl_wn_sac_mukimuki_body", // name
+    ICON_19A, // icon
+    {0}, // field_0x6
+    0, // itemId
+    "msg_mukimuki_body", // description
+    100, // baseAccuracy
+    0, // baseFpCost
+    3, // baseSpCost
+    0, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    5, // field_0x19
+    100, // mBingoSlotChance
+    50, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2100070, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    "msg_sac_4", // acHelpMsg
+    0x20008, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    marioAttackEvent_Muki, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(nice_event_pow)
@@ -926,7 +956,7 @@ static USER_FUNC(set_weapon) {
     s32 type = evtGetValue(event, args[0]);
     s32 power = evtGetValue(event, args[1]);
     MukiWork* w = get_ptr();
-    memcpy(w->weapon, weapon, 0xc0);
+    memcpy(w->weapon, &weapon, 0xc0);
     switch (type) {
     case 0:
         w->weapon[0x96] = 100;
@@ -966,37 +996,94 @@ static USER_FUNC(star_stone_appear) {
     return 2;
 }
 
-s32 marioAttackEvent_Muki[] = {
-    196699, (s32)btlevtcmd_GetUnitId, -4, -29999986, 196699, (s32)btlevtcmd_GetBodyId, -29999986, -29999985,
-    262235, (s32)btlevtcmd_CheckStatus, -29999986, 27, -30000000, 131097, -30000000, 0,
-    131122, -29999986, -1, 33, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996,
-    131096, -29999997, -1, 65540, 99, 33, 262235, (s32)btlevtcmd_AttackDeclare,
-    -2, -29999997, -29999996, 65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost, -2,
-    196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000, 131163, (s32)btlevtcmd_WeaponAftereffect, -30000000, 65627,
-    (s32)btlevtcmd_reset_move_color_lv_all, 110, 131163, (s32)main_muki, -29999986, 112, 65630, (s32)sac_start_camera_evt,
-    65546, 500, 65627, (s32)sac_enemy_slide_go, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START1",
-    -250000000, 0, -250000000, 65630, (s32)sac_mario_item_on_evt, 65546, 500, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START2", -250000000, 0, -29999989, 65627, (s32)star_stone_appear,
-    110, 65630, (s32)sac_start_stardust, 112, 65545, 100, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_BTL_SAC_START3", -250000000, 0, -250000000, 131163, (s32)evt_snd_sfxoff, -29999989,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 65545, 40, 65630, (s32)sac_mario_item_on_end_evt,
-    65630, (s32)sac_mario_back_home, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_I_Y", 65546,
-    1000, 110, 65627, (s32)sac_handbeat, 112, 65627, (s32)sac_ac_help_on, 65627,
-    (s32)start_game, 196699, (s32)wait_game_end, -30000000, -29999999, 65627, (s32)sac_ac_help_off, 65627,
-    (s32)sac_handbeat_end, 65546, 500, 131122, -29999998, -30000000, 131125, -29999998,
-    -29999999, 131097, -29999998, 0, 196699, (s32)evt_btl_camera_set_mode, 0, 7,
-    262235, (s32)evt_btl_camera_set_homing_unit, 0, -2, -1, 196699, (s32)evt_btl_camera_set_zoom, 0,
-    200, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoomSpeedLv, 0,
-    2, 65546, 1000, 65627, (s32)sac_wao, 107, 65546, 1000,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 65627, (s32)sac_enemy_slide_return, 65627, (s32)end_muki,
-    109, 107, 65546, 400, 131097, -29999999, 0, 262235,
-    (s32)set_weapon, 1, -29999999, -29999991, 131097, -29999986, -1, 458843,
-    (s32)btlevtcmd_CheckDamage, -2, -29999986, -29999985, -29999991, 256, -29999995, 33,
-    458843, (s32)btlevtcmd_CheckDamage, -2, -2, 1, -29999991, 256, -29999995,
-    33, 109, 131097, -30000000, 0, 262235, (s32)set_weapon, 0,
-    -30000000, -29999991, 131097, -29999986, -1, 458843, (s32)btlevtcmd_CheckDamage, -2,
-    -29999986, -29999985, -29999991, 256, -29999995, 33, 458843, (s32)btlevtcmd_CheckDamage,
-    -2, -2, 1, -29999991, 256, -29999995, 2, 33,
-    33, 65627, (s32)sac_enemy_slide_return, 65546, 1000, 65627, (s32)end_muki, 65546,
-    1000, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+EVT_BEGIN(marioAttackEvent_Muki)
+    CALL(btlevtcmd_GetUnitId, -4, LW(14))
+    CALL(btlevtcmd_GetBodyId, LW(14), LW(15))
+    CALL(btlevtcmd_CheckStatus, LW(14), 27, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        SET_VALUE(LW(14), -1)
+    END_IF
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_CommandPayWeaponCost, -2)
+    CALL(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+    CALL(btlevtcmd_WeaponAftereffect, LW(0))
+    CALL(btlevtcmd_reset_move_color_lv_all)
+    BEGIN_SIBLING_EVENT
+        CALL(main_muki, LW(14))
+    END_SIBLING_EVENT
+    CALL_CHILD(sac_start_camera_evt)
+    WAIT_MS(500)
+    CALL(sac_enemy_slide_go)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START1"), -250000000, 0, -250000000)
+    CALL_CHILD(sac_mario_item_on_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START2"), -250000000, 0, LW(11))
+    CALL(star_stone_appear)
+    BEGIN_SIBLING_EVENT
+        CALL_CHILD(sac_start_stardust)
+    END_SIBLING_EVENT
+    WAIT_FRAMES(100)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START3"), -250000000, 0, -250000000)
+    CALL(evt_snd_sfxoff, LW(11))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_FRAMES(40)
+    CALL_CHILD(sac_mario_item_on_end_evt)
+    CALL_CHILD(sac_mario_back_home)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_I_Y"))
+    WAIT_MS(1000)
+    BEGIN_SIBLING_EVENT
+        CALL(sac_handbeat)
+    END_SIBLING_EVENT
+    CALL(sac_ac_help_on)
+    CALL(start_game)
+    CALL(wait_game_end, LW(0), LW(1))
+    CALL(sac_ac_help_off)
+    CALL(sac_handbeat_end)
+    WAIT_MS(500)
+    SET_VALUE(LW(2), LW(0))
+    ADD(LW(2), LW(1))
+    IF_INT_NOT_EQUAL(LW(2), 0)
+        CALL(evt_btl_camera_set_mode, 0, 7)
+        CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+        CALL(evt_btl_camera_set_zoom, 0, 200)
+        CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+        CALL(evt_btl_camera_set_zoomSpeedLv, 0, 2)
+        WAIT_MS(1000)
+        CALL(sac_wao)
+        BEGIN_INLINE_EVENT
+            WAIT_MS(1000)
+            CALL(evt_btl_camera_set_mode, 0, 0)
+            CALL(sac_enemy_slide_return)
+            CALL(end_muki)
+        END_INLINE_EVENT
+        BEGIN_INLINE_EVENT
+            WAIT_MS(400)
+            IF_INT_NOT_EQUAL(LW(1), 0)
+                CALL(set_weapon, 1, LW(1), LW(9))
+                IF_INT_NOT_EQUAL(LW(14), -1)
+                    CALL(btlevtcmd_CheckDamage, -2, LW(14), LW(15), LW(9), 256, LW(5))
+                END_IF
+                CALL(btlevtcmd_CheckDamage, -2, -2, 1, LW(9), 256, LW(5))
+            END_IF
+        END_INLINE_EVENT
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(set_weapon, 0, LW(0), LW(9))
+            IF_INT_NOT_EQUAL(LW(14), -1)
+                CALL(btlevtcmd_CheckDamage, -2, LW(14), LW(15), LW(9), 256, LW(5))
+            END_IF
+            CALL(btlevtcmd_CheckDamage, -2, -2, 1, LW(9), 256, LW(5))
+            RETURN
+        END_IF
+    END_IF
+    CALL(sac_enemy_slide_return)
+    WAIT_MS(1000)
+    CALL(end_muki)
+    WAIT_MS(1000)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()

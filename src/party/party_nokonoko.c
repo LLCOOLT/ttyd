@@ -99,7 +99,7 @@ BOOL nokonoko_holdItem(void) {
     if (party->currentMemberId != 2 || !(party->flags & 0x100)) {
         return FALSE;
     }
-    return PW(party, 0x174) != 0;
+    return party->work.nokonoko.heldItem != 0;
 }
 
 void nokonoko_bye(PartyEntry* party) {
@@ -113,8 +113,8 @@ void nokonoko_bye(PartyEntry* party) {
 }
 
 void nokonoko_init(PartyEntry* party) {
-    party->field_32 [1] = 2;
-    party->field_32 [0] = 0;
+    party->memberKind = 2;
+    party->moveKind = 0;
     party->height = EXT_LIT(float_37_8041b550, 37.0f);
     party->width = EXT_LIT(float_24_8041b5e0, 24.0f);
     nokoSe = -1;
@@ -128,7 +128,7 @@ void nokonoko_move(PartyEntry* party) {
     }
     partyUpdMoveSpd(party);
     partyRecordFootmark(party);
-    switch (PB(party, 0x3b)) {
+    switch (party->field_3B) {
     case 0:
         party_move_mode_stay(party);
         break;
@@ -164,21 +164,21 @@ void nokonoko_use_cancel(void) {
             party->flags2 &= ~0x20;
             party->flags2 &= ~0x10;
             party->height = EXT_LIT(float_37_8041b550, 37.0f);
-            PW(party, 0x178) = 0;
-            PW(party, 0x17c) = 0;
-            PW(party, 0x180) = 0;
+            party->work.nokonoko.shellSpinBits = 0;
+            party->work.nokonoko.word17C = 0;
+            party->work.nokonoko.word180 = 0;
         }
         if (party->runMode != 8 && party->runMode != 0xd) {
             partyChgRunMode(party, 2);
-            PB(party, 0x3b) = 0;
+            party->field_3B = 0;
         }
     }
 }
 
 void nokonoko_use_post(PartyEntry* party) {
-    if (PW(party, 0x174) != 0) {
-        itemNokoForceGet((ItemEntry*)PW(party, 0x174));
-        PW(party, 0x174) = 0;
+    if (party->work.nokonoko.heldItem != 0) {
+        itemNokoForceGet((ItemEntry*)party->work.nokonoko.heldItem);
+        party->work.nokonoko.heldItem = 0;
     }
     marioGetPtr();
     if ((u32)nokoSe != 0xFFFFFFFFU) {
@@ -192,9 +192,9 @@ void nokonoko_use_post(PartyEntry* party) {
     party->flags2 &= ~0x20;
     party->flags2 &= ~0x10;
     party->height = EXT_LIT(float_37_8041b550, 37.0f);
-    PW(party, 0x178) = 0;
-    PW(party, 0x17c) = 0;
-    PW(party, 0x180) = 0;
+    party->work.nokonoko.shellSpinBits = 0;
+    party->work.nokonoko.word17C = 0;
+    party->work.nokonoko.word180 = 0;
 }
 
 #define PF(p, o) (*(f32*)((u8*)(p) + (o)))
@@ -216,7 +216,7 @@ static inline void noko_se_off(void) {
 
 static inline void noko_spin(PartyEntry* party) {
     f32 dir;
-    if (revise360(party->targetDir - PF(party, 0xf8)) > EXT_LIT(float_180_8041b514, 180.0f)) {
+    if (revise360(party->targetDir - party->unkF8) > EXT_LIT(float_180_8041b514, 180.0f)) {
         dir = 1.0f;
     } else {
         dir = -1.0f;
@@ -275,16 +275,16 @@ void nokonoko_use(PartyEntry* party) {
     }
     if (party->field_8 & 8) {
         party->field_8 &= ~8;
-        PW(party, 0x174) = 0;
-        PW(party, 0x178) = 0;
-        PW(party, 0x17c) = 0;
-        PW(party, 0x180) = 0;
+        party->work.nokonoko.heldItem = 0;
+        party->work.nokonoko.shellSpinBits = 0;
+        party->work.nokonoko.word17C = 0;
+        party->work.nokonoko.word180 = 0;
         if (party->flags & 0x80000000) {
             if (party->unk16C > 0) {
-                PH(party, 0x17e) |= 1;
+                party->work.nokonoko.shellFlags |= 1;
             }
         } else {
-            PH(party, 0x17e) &= ~1;
+            party->work.nokonoko.shellFlags &= ~1;
         }
         party->useMotionId = 0;
     }
@@ -302,8 +302,8 @@ void nokonoko_use(PartyEntry* party) {
         party->height = EXT_LIT(float_18p5_8041b558, 18.5f);
         party->useMotionId = 1;
         party->moveFrames = 100;
-        PW(party, 0x174) = 0;
-        PH(party, 0x17c) = 0;
+        party->work.nokonoko.heldItem = 0;
+        party->work.nokonoko.dashed = 0;
         marioAdjustMoveDir();
         mario->baseSpeed = EXT_LIT(float_0_8041b51c, 0.0f);
         PV(party, 0x94) = mario->position;
@@ -387,16 +387,16 @@ void nokonoko_use(PartyEntry* party) {
             if (party->moveSpeed <= EXT_LIT(float_0_8041b51c, 0.0f)) {
                 party->moveSpeed = 0.0f;
                 if (!(party->flags & 0x80000000)) {
-                    if (MH(mario, MWOFF(0x246)) & 0x400) {
+                    if (mario->buttonHold & 0x400) {
                         party->useMotionId = 13;
                         party->moveFrames = 0;
                     } else {
                         party->useMotionId = 50;
                     }
-                } else if (PH(party, 0x17e) & 1) {
+                } else if (party->work.nokonoko.shellFlags & 1) {
                     party->moveFrames = 5;
                     party->useMotionId = 21;
-                    PH(party, 0x17c) = 1;
+                    party->work.nokonoko.dashed = 1;
                     if ((u32)nokoSe == 0xFFFFFFFFU) {
                         nokoSe = psndSFXOn_3D((const char*)0x92e, &party->position);
                     }
@@ -410,7 +410,7 @@ void nokonoko_use(PartyEntry* party) {
         if (++party->moveFrames >= 5) {
             party->moveFrames = 5;
             party->useMotionId = 20;
-            PH(party, 0x17c) = 1;
+            party->work.nokonoko.dashed = 1;
             if ((u32)nokoSe == 0xFFFFFFFFU) {
                 nokoSe = psndSFXOn_3D((const char*)0x92e, &party->position);
             }
@@ -436,14 +436,14 @@ void nokonoko_use(PartyEntry* party) {
                 noko_se_off();
                 break;
             }
-            if (MH(mario, MWOFF(0x246)) & 0x400) {
+            if (mario->buttonHold & 0x400) {
                 break;
             }
-            party->useMotionId = PH(party, 0x17c) != 0 ? 80 : 50;
+            party->useMotionId = party->work.nokonoko.dashed != 0 ? 80 : 50;
             noko_se_off();
             break;
         }
-        if (PH(party, 0x17e) & 1) {
+        if (party->work.nokonoko.shellFlags & 1) {
             party->useMotionId = 80;
         } else {
             party->useMotionId = 50;
@@ -469,7 +469,7 @@ void nokonoko_use(PartyEntry* party) {
         psndSFXOn_3D((const char*)0x92b, &party->position);
         break;
     case 51: {
-        f32 lim = PH(party, 0x17c) != 0 ? 20.0f : 10.0f;
+        f32 lim = party->work.nokonoko.dashed != 0 ? 20.0f : 10.0f;
         party->moveSpeed += EXT_LIT(float_0p3_8041b574, 0.3f) * (lim - party->moveSpeed);
         if (party->moveSpeed >= lim) {
             party->moveSpeed = lim;
@@ -498,7 +498,7 @@ void nokonoko_use(PartyEntry* party) {
             (*(f32*)new_var) = 0.0f;
             party->useMotionId = 53;
             party->moveSpeed += EXT_LIT(float_0p1_8041b518, 0.1f) * (EXT_LIT(float_neg1_8041b520, -1.0f) - party->moveSpeed);
-            PF(party, 0x178) = EXT_LIT(float_50_8041b56c, 50.0f);
+            party->work.yoshi.gravityAccel = EXT_LIT(float_50_8041b56c, 50.0f);
         }
         break;
     case 53:
@@ -506,12 +506,12 @@ void nokonoko_use(PartyEntry* party) {
             party->useMotionId = 70;
             return;
         }
-        PF(party, 0x178) -= EXT_LIT(float_2p2_8041b588, 2.2f);
-        if (PF(party, 0x178) <= EXT_LIT(float_0_8041b51c, 0.0f)) {
-            PF(party, 0x178) = 0.0f;
+        party->work.yoshi.gravityAccel -= EXT_LIT(float_2p2_8041b588, 2.2f);
+        if (party->work.yoshi.gravityAccel <= EXT_LIT(float_0_8041b51c, 0.0f)) {
+            party->work.yoshi.gravityAccel = 0.0f;
         }
         noko_spin(party);
-        party->moveSpeed += (EXT_LIT(float_neg2_8041b58c, -2.0f) - party->moveSpeed) * (PH(party, 0x17c) != 0 ? EXT_LIT(float_0p2_8041b590, 0.2f) : EXT_LIT(float_0p1_8041b518, 0.1f));
+        party->moveSpeed += (EXT_LIT(float_neg2_8041b58c, -2.0f) - party->moveSpeed) * (party->work.nokonoko.dashed != 0 ? EXT_LIT(float_0p2_8041b590, 0.2f) : EXT_LIT(float_0p1_8041b518, 0.1f));
         (*(f32*)new_var) -= party->moveSpeed;
         if (party->moveSpeed <= EXT_LIT(float_0_8041b51c, 0.0f)) {
             party->moveSpeed = 0.0f;
@@ -573,11 +573,11 @@ void nokonoko_use(PartyEntry* party) {
             return;
         }
         noko_spin(party);
-        PF(party, 0x178) -= EXT_LIT(float_2p2_8041b588, 2.2f);
-        if (PF(party, 0x178) <= EXT_LIT(float_0_8041b51c, 0.0f)) {
-            PF(party, 0x178) = 0.0f;
+        party->work.yoshi.gravityAccel -= EXT_LIT(float_2p2_8041b588, 2.2f);
+        if (party->work.yoshi.gravityAccel <= EXT_LIT(float_0_8041b51c, 0.0f)) {
+            party->work.yoshi.gravityAccel = 0.0f;
         }
-        party->moveSpeed += (EXT_LIT(float_neg2_8041b58c, -2.0f) - party->moveSpeed) * (PH(party, 0x17c) != 0 ? EXT_LIT(float_0p2_8041b590, 0.2f) : EXT_LIT(float_0p1_8041b518, 0.1f));
+        party->moveSpeed += (EXT_LIT(float_neg2_8041b58c, -2.0f) - party->moveSpeed) * (party->work.nokonoko.dashed != 0 ? EXT_LIT(float_0p2_8041b590, 0.2f) : EXT_LIT(float_0p1_8041b518, 0.1f));
         if (party->moveSpeed <= EXT_LIT(float_0_8041b51c, 0.0f)) {
             party->useMotionId = 70;
             party->moveSpeed = EXT_LIT(float_0_8041b51c, 0.0f);
@@ -603,9 +603,9 @@ void nokonoko_use(PartyEntry* party) {
         party->useMotionId = 71;
         break;
     case 71:
-        if (PW(party, 0x174) != 0) {
-            itemNokoForceGet((ItemEntry*)PW(party, 0x174));
-            PW(party, 0x174) = 0;
+        if (party->work.nokonoko.heldItem != 0) {
+            itemNokoForceGet((ItemEntry*)party->work.nokonoko.heldItem);
+            party->work.nokonoko.heldItem = 0;
         }
         nokonoko_finish(party);
         return;
@@ -652,7 +652,7 @@ void nokonoko_use(PartyEntry* party) {
         if ((*(f32*)new_var) <= EXT_LIT(float_0_8041b51c, 0.0f)) {
             (*(f32*)new_var) = distABf(PV(party, 0x94).x, PV(party, 0x94).z, party->position.x, party->position.z);
             party->useMotionId = 84;
-            PF(party, 0x178) = EXT_LIT(float_50_8041b56c, 50.0f);
+            party->work.yoshi.gravityAccel = EXT_LIT(float_50_8041b56c, 50.0f);
             party->targetDir = angleABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
         }
         break;
@@ -694,17 +694,17 @@ void nokonoko_use(PartyEntry* party) {
         }
         party->moveSpeed = EXT_LIT(float_0_8041b51c, 0.0f);
         party->flags2 &= ~0x10;
-        if (PW(party, 0x174) != 0) {
-            itemNokoForceGet((ItemEntry*)PW(party, 0x174));
-            PW(party, 0x174) = 0;
+        if (party->work.nokonoko.heldItem != 0) {
+            itemNokoForceGet((ItemEntry*)party->work.nokonoko.heldItem);
+            party->work.nokonoko.heldItem = 0;
         }
         if (party->field_138 == NULL) {
             party->useMotionId = 88;
             break;
         }
-        if (PW(party, 0x174) != 0) {
-            itemNokoForceGet((ItemEntry*)PW(party, 0x174));
-            PW(party, 0x174) = 0;
+        if (party->work.nokonoko.heldItem != 0) {
+            itemNokoForceGet((ItemEntry*)party->work.nokonoko.heldItem);
+            party->work.nokonoko.heldItem = 0;
         }
         nokonoko_finish(party);
         return;
@@ -747,7 +747,7 @@ void nokonoko_use(PartyEntry* party) {
         PV(party, 0x94) = out2;
         (*(f32*)new_var) = distABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
         party->targetDir = angleABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
-        PF(party, 0x178) = EXT_LIT(float_50_8041b56c, 50.0f);
+        party->work.yoshi.gravityAccel = EXT_LIT(float_50_8041b56c, 50.0f);
         break;
     case 90:
         noko_spin(party);
@@ -845,7 +845,7 @@ void nokonoko_finish(PartyEntry* party) {
         if (party->runMode != 9) {
             if (!(party->flags & 0x80000000)) {
                 partyChgRunMode(party, 2);
-                PB(party, 0x3b) = 0;
+                party->field_3B = 0;
             } else {
                 party->flags &= 0x7FFFFFFF;
                 partyChgRunMode(party, 0);
@@ -909,11 +909,11 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
                 if (mode == 0) {
                     party->position.y = hy;
                     if (__fabsf(py - hy) >= 1.0f) {
-                        PH(party, 0x17e) |= 2;
+                        party->work.nokonoko.shellFlags |= 2;
                     }
                 }
             } else {
-                if ((PH(party, 0x17e) & 2) && mode == 1) {
+                if ((party->work.nokonoko.shellFlags & 2) && mode == 1) {
                     party->position.y = hy;
                 }
                 if (__fabsf(py - hy) <= 6.0f) {
@@ -923,8 +923,8 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
         }
     }
 
-    PW(party, 0x130) = 0;
-    PW(party, 0x12c) = 0;
+    party->hitobjAction = NULL;
+    party->hitobjFront = NULL;
     yofs += 1.0f;
     x = party->position.x;
     z = party->position.z;
@@ -941,10 +941,10 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
         d = vx * nx + vz * nz;
         party->position.x += 0.5f * (vx - d * nx);
         party->position.z += 0.5f * (vz - d * nz);
-        if (PH(party, 0x17c) != 0 || mode == 0) {
-            PW(party, 0x130) = (u32)hit;
+        if (party->work.nokonoko.dashed != 0 || mode == 0) {
+            party->hitobjAction = hit;
         }
-        PW(party, 0x12c) = (u32)hit;
+        party->hitobjFront = hit;
         return hit;
     }
 
@@ -966,10 +966,10 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
         d = vx * nx + vz * nz;
         party->position.x += 0.5f * (vx - d * nx);
         party->position.z += 0.5f * (vz - d * nz);
-        if (PH(party, 0x17c) != 0 || mode == 0) {
-            PW(party, 0x130) = (u32)hit;
+        if (party->work.nokonoko.dashed != 0 || mode == 0) {
+            party->hitobjAction = hit;
         }
-        PW(party, 0x12c) = (u32)hit;
+        party->hitobjFront = hit;
         party->position.x = hx;
         return hit;
     }
@@ -993,10 +993,10 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
         d = vx * nx + vz * nz;
         party->position.x += 0.5f * (vx - d * nx);
         party->position.z += 0.5f * (vz - d * nz);
-        if (PH(party, 0x17c) != 0 || mode == 0) {
-            PW(party, 0x130) = (u32)hit;
+        if (party->work.nokonoko.dashed != 0 || mode == 0) {
+            party->hitobjAction = hit;
         }
-        PW(party, 0x12c) = (u32)hit;
+        party->hitobjFront = hit;
         party->position.x = hx;
         return hit;
     }

@@ -6,6 +6,7 @@
 #include "mario/mario.h"
 #include "evt/evt_bero.h"
 #include "aji.h"
+#include "mario/mario_pouch.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
@@ -46,25 +47,25 @@ USER_FUNC(evt_win_item_select);
 USER_FUNC(map_anim_flag_off);
 static USER_FUNC(peach_evt_toumei);
 
-__declspec(section ".data") u64 fd_aji_11_negone_one_374;
-__declspec(section ".data") s32 fd_aji_11_neg_one_382[1];
-__declspec(section ".data") s32 fd_aji_11___local_PI_383[1];
-__declspec(section ".data") s32 fd_aji_11___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_aji_11_one_negone_373;
-__declspec(section ".data") s32 fd_aji_11___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_aji_11_one_381[1];
-__declspec(section ".data") u64 fd_aji_11_negone_one_360;
-__declspec(section ".data") s32 fd_aji_11_neg_one_365[1];
-__declspec(section ".data") s32 fd_aji_11___local_PI_366[1];
-__declspec(section ".data") s32 fd_aji_11___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_aji_11_one_negone_359;
-__declspec(section ".data") s32 fd_aji_11___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_aji_11_one_364[1];
+__declspec(section ".data") f32 fd_aji_11_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_11_neg_one_382;
+__declspec(section ".data") f32 fd_aji_11___local_PI_383;
+__declspec(section ".data") f32 fd_aji_11___local_3PIO2_385;
+__declspec(section ".data") f32 fd_aji_11_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_11___local_PIO2_384;
+__declspec(section ".data") f32 fd_aji_11_one_381;
+__declspec(section ".data") f32 fd_aji_11_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_11_neg_one_365;
+__declspec(section ".data") f32 fd_aji_11___local_PI_366;
+__declspec(section ".data") f32 fd_aji_11___local_3PIO2_368;
+__declspec(section ".data") f32 fd_aji_11_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_11___local_PIO2_367;
+__declspec(section ".data") f32 fd_aji_11_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
-static s32 bero_entry_data[30];
+static BeroEntry bero_entry_data[2];
 s32 peach_evt_bero[50];
-static s32 bero_peach_data[30];
+static BeroEntry bero_peach_data[2];
 static __declspec(section ".data") s32 key_evt[5];
 s32 evt_gajigaji_anim[13];
 s32 evt_gajigaji_main[96];
@@ -76,53 +77,33 @@ s32 peach_evt_tana2[31];
 static s32 peach_evt_stg5[105];
 s32 aji_11_init_evt[111];
 
-__declspec(section ".data") u64 fd_aji_11_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_11_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_11_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_11___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_11___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_11___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_11___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_11_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_11_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_11___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_11___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_11_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_11_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_aji_11_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_11_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_11_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_11_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_11___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_11___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_11___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_11___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_11_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_11_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_11___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_11___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_11_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_11_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -140,11 +121,26 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"aji_10", (s32)"e_bero", 327685, (s32)w_door_close, (s32)w_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_10", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(peach_evt_bero)
@@ -169,11 +165,26 @@ EVT_BEGIN(peach_evt_bero)
     RETURN
 EVT_END()
 
-static s32 bero_peach_data[] = {
-    (s32)"w_bero", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)peach_evt_bero, (s32)"aji_10", (s32)"e_bero", 327685, (s32)w_door_close, (s32)w_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_peach_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)peach_evt_bero, // exitEvent
+        (s32)"aji_10", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
 static __declspec(section ".data") EVT_BEGIN(key_evt)
@@ -241,7 +252,7 @@ EVT_BEGIN(evt_gajigaji)
 EVT_END()
 
 static __declspec(section ".data") s32 item_list[] = {
-    86, -1,
+    ITEM_DATA_DISK, -1,
 };
 
 EVT_BEGIN(peach_evt_disksys)

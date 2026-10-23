@@ -19,6 +19,8 @@
 #include "evt/evt_sub.h"
 #include "party/party_motion.h"
 #include "mri.h"
+#include "data_tables.h"
+#include "mario/mario_pouch.h"
 
 void* puniGetPunigp(void);
 void* puniGetPunidat(void);
@@ -181,20 +183,20 @@ USER_FUNC(evt_countdown_stop);
 #endif
 void mri_stg3_012_cb(s32 type, void* param);
 
-__declspec(section ".data") u64 fd_mri_01_negone_one_374;
-__declspec(section ".data") s32 fd_mri_01_neg_one_382[1];
-__declspec(section ".data") s32 fd_mri_01___local_PI_383[1];
-__declspec(section ".data") s32 fd_mri_01___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_mri_01_one_negone_373;
-__declspec(section ".data") s32 fd_mri_01___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_mri_01_one_381[1];
-__declspec(section ".data") u64 fd_mri_01_negone_one_360;
-__declspec(section ".data") s32 fd_mri_01_neg_one_365[1];
-__declspec(section ".data") s32 fd_mri_01___local_PI_366[1];
-__declspec(section ".data") s32 fd_mri_01___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_mri_01_one_negone_359;
-__declspec(section ".data") s32 fd_mri_01___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_mri_01_one_364[1];
+__declspec(section ".data") f32 fd_mri_01_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_01_neg_one_382;
+__declspec(section ".data") f32 fd_mri_01___local_PI_383;
+__declspec(section ".data") f32 fd_mri_01___local_3PIO2_385;
+__declspec(section ".data") f32 fd_mri_01_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_01___local_PIO2_384;
+__declspec(section ".data") f32 fd_mri_01_one_381;
+__declspec(section ".data") f32 fd_mri_01_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_01_neg_one_365;
+__declspec(section ".data") f32 fd_mri_01___local_PI_366;
+__declspec(section ".data") f32 fd_mri_01___local_3PIO2_368;
+__declspec(section ".data") f32 fd_mri_01_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_mri_01___local_PIO2_367;
+__declspec(section ".data") f32 fd_mri_01_one_364;
 static s32 guide_init[29];
 static s32 guide_talk[20];
 static s32 rival_init[30];
@@ -216,13 +218,13 @@ static __declspec(section ".data") s32 baba_talk[8];
 static s32 sister_init[31];
 s32 sister_jump[48];
 static s32 sister_talk[230];
-static s32 npcEnt[207];
+static NpcSetupInfo npcEnt[9];
 __declspec(section ".data") s32 bero_00_doa_close[10];
 __declspec(section ".data") s32 bero_00_doa_open[10];
 static __declspec(section ".data") s32 bero_01_doa_close[10];
 static __declspec(section ".data") s32 bero_01_doa_open[10];
 __declspec(section ".data") s32 out_mri_event[5];
-static s32 bero_entry_data[60];
+static BeroEntry bero_entry_data[4];
 s32 bigtree_firstbattle[734];
 s32 meet_rival[2247];
 s32 rival_nakama[1137];
@@ -245,7 +247,7 @@ s32 evt_ueki_01[18];
 static s32 evt_ueki_02[24];
 s32 evt_ueki_03[49];
 static __declspec(section ".data") s32 evt_ueki_08[8];
-static s32 ueki_access_data[20];
+static KusaAccess ueki_access_data[5];
 s32 puni_mario_wait[49];
 s32 mri_01_koopa_first_evt[400];
 s32 mri_01_koopa_second_evt[682];
@@ -327,53 +329,33 @@ USER_FUNC(elder_talk_sub_fadeoff) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_mri_01_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mri_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mri_01_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_mri_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_mri_01___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_mri_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_mri_01___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_mri_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_mri_01_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_mri_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_mri_01___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_mri_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_mri_01_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_mri_01_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_mri_01_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_mri_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_mri_01_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_mri_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_mri_01___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_mri_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_mri_01___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_mri_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_mri_01_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_mri_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_mri_01___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_mri_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_mri_01_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_mri_01_one_364 = 1.0f;
 
 static EVT_BEGIN(guide_init)
     SWITCH(GSW(0))
@@ -614,7 +596,7 @@ __declspec(section ".data") s32 irai_item_tbl[] = {
 };
 
 static __declspec(section ".data") s32 iri_17_item_tbl[] = {
-    98, -1,
+    ITEM_ROUTING_SLIP, -1,
 };
 
 static EVT_BEGIN(elder_talk)
@@ -846,33 +828,100 @@ static EVT_BEGIN(sister_talk)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"ガイド"*/"\x83\x4B\x83\x43\x83\x68", 525824, 0, (s32)guide_init, 0, (s32)guide_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ライバル"*/"\x83\x89\x83\x43\x83\x6F\x83\x8B",
-    525824, 0, (s32)rival_init, 0, (s32)rival_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", 525824,
-    0, (s32)elder_init, 0, (s32)elder_talk, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"プニ族１"*/"\x83\x76\x83\x6A\x91\xB0\x82\x50", 525824, 0,
-    (s32)puni_1_init, 0, (s32)puni_1_talk, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"プニ族２"*/"\x83\x76\x83\x6A\x91\xB0\x82\x51", 525824, 0, (s32)puni_2_init,
-    0, (s32)puni_2_talk, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"プニ族"*/"\x83\x76\x83\x6A\x91\xB0", 525824, 0, (s32)puni_init, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"プニ族B"*/"\x83\x76\x83\x6A\x91\xB0\x42", 525824, 0, (s32)puni_init, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"ガイド妹"*/"\x83\x4B\x83\x43\x83\x68\x96\x85", 525824, 0, (s32)sister_init, 0, (s32)sister_talk, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"ガイド"*/"\x83\x4B\x83\x43\x83\x68", // name
+        0x80600, // flags
+        0, // reactionFlags
+        guide_init, // initEvent
+        NULL, // regularEvent
+        guide_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ライバル"*/"\x83\x89\x83\x43\x83\x6F\x83\x8B", // name
+        0x80600, // flags
+        0, // reactionFlags
+        rival_init, // initEvent
+        NULL, // regularEvent
+        rival_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", // name
+        0x80600, // flags
+        0, // reactionFlags
+        elder_init, // initEvent
+        NULL, // regularEvent
+        elder_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"プニ族１"*/"\x83\x76\x83\x6A\x91\xB0\x82\x50", // name
+        0x80600, // flags
+        0, // reactionFlags
+        puni_1_init, // initEvent
+        NULL, // regularEvent
+        puni_1_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"プニ族２"*/"\x83\x76\x83\x6A\x91\xB0\x82\x51", // name
+        0x80600, // flags
+        0, // reactionFlags
+        puni_2_init, // initEvent
+        NULL, // regularEvent
+        puni_2_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"プニ族"*/"\x83\x76\x83\x6A\x91\xB0", // name
+        0x80600, // flags
+        0, // reactionFlags
+        puni_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"プニ族B"*/"\x83\x76\x83\x6A\x91\xB0\x42", // name
+        0x80600, // flags
+        0, // reactionFlags
+        puni_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ガイド妹"*/"\x83\x4B\x83\x43\x83\x68\x96\x85", // name
+        0x80600, // flags
+        0, // reactionFlags
+        sister_init, // initEvent
+        NULL, // regularEvent
+        sister_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 __declspec(section ".data") EVT_BEGIN(bero_00_doa_close)
@@ -908,15 +957,61 @@ __declspec(section ".data") EVT_BEGIN(out_mri_event)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65536, 20000, 100000, 0, 0, -1, 0,
-    -1, (s32)out_mri_event, (s32)"mri_00", (s32)"ne_bero", 262148, (s32)bero_00_doa_close, (s32)bero_00_doa_open, (s32)"e_bero",
-    65536, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"mri_05", (s32)"w_bero", 262148, (s32)bero_01_doa_close, (s32)bero_01_doa_open, (s32)"dokan", 131072,
-    2, 100000, 0, 0, -1, 0, 10, 0,
-    (s32)"mri_02", (s32)"dokan1", 65537, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        0, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        (s32*)out_mri_event, // exitEvent
+        (s32)"mri_00", // nextMapName
+        "ne_bero", // nextBeroName
+        4, // enterAnimeType
+        4, // exitAnimeType
+        (s32)bero_00_doa_close, // enterAnimeArg
+        (s32)bero_00_doa_open, // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        0, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"mri_05", // nextMapName
+        "w_bero", // nextBeroName
+        4, // enterAnimeType
+        4, // exitAnimeType
+        (s32)bero_01_doa_close, // enterAnimeArg
+        (s32)bero_01_doa_open, // exitAnimeArg
+    },
+    {
+        "dokan", // hitName
+        2, // type
+        0, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        10, // caseType
+        NULL, // exitEvent
+        (s32)"mri_02", // nextMapName
+        "dokan1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(bigtree_firstbattle)
@@ -2243,161 +2338,324 @@ EVT_BEGIN(boss_robot_pera_after)
     RETURN
 EVT_END()
 
-s32 boss_battle[] = {
-    327771, (s32)evt_npc_set_position, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", -320, 0, 30, 196699, (s32)evt_npc_set_ry,
-    (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", 90, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", 1073741856, 327771,
-    (s32)evt_npc_set_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -250, 0, 30, 196699, (s32)evt_npc_set_ry, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94",
-    270, 262235, (s32)evt_npc_flag_onoff, 1, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", 1073743392, 65541, 0,
-    327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 131100, -30000000,
-    0, 7, 33, 65545, 1, 6, 131122, -29999990,
-    1, 65541, 0, 196699, (s32)evt_puni_set_mode, -29999990, 30, 131125,
-    -29999990, 1, 131096, -29999990, 103, 7, 33, 6,
-    131163, (s32)evt_mario_key_onoff, 0, 65627, (s32)evt_mario_normalize, 131163, (s32)evt_party_stop, 0,
-    131163, (s32)evt_puni_puninum_onoff, 0, 589915, (s32)evt_cam3d_evt_set, -285, 152, 548,
-    -285, 57, 7, 500, 11, 65546, 1000, 131122,
-    -29999990, 1, 65541, 0, 327771, (s32)evt_puni_set_position, -29999990, 0,
-    -100, 0, 196699, (s32)evt_puni_set_anim, -29999990, 0, 131125, -29999990,
-    1, 131096, -29999990, 103, 7, 33, 6, 327771,
-    (s32)evt_msg_print, 0, (s32)"stg2_mri_e24_00", 0, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", 327771, (s32)evt_npc_get_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94",
-    -30000000, -29999999, -29999998, 458843, (s32)evt_npc_jump_position_nohit, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999999,
-    -29999998, 225, 30, 327771, (s32)evt_npc_get_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999999,
-    -29999998, 458843, (s32)evt_npc_jump_position_nohit, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999999, -29999998, 225,
-    30, 327771, (s32)evt_msg_print, 0, (s32)"stg2_mri_e24_01", 0, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", 107,
-    65546, 300, 589915, (s32)evt_cam3d_evt_set, -230291840, -229846196, -229448781, -230291840,
-    -229941632, -229992832, 1000, 9, 65546, 900, 589915, (s32)evt_cam3d_evt_set,
-    -285, 152, 548, -285, 57, 7, 500, 11,
-    65546, 200, 109, 107, 327771, (s32)evt_npc_get_position, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", -30000000,
-    -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG2_CHOUROU_BIG1", -30000000, -29999999, -29999998,
-    0, 327771, (s32)evt_sub_intpl_msec_init, 2, -229998976, -229996928, 200, 65541,
-    0, 196699, (s32)evt_sub_intpl_msec_get_value_para, -30000000, -29999999, 327771, (s32)evt_npc_set_scale, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56",
-    -30000000, -30000000, -30000000, 131096, -29999999, 0, 7, 33,
-    65545, 1, 6, 109, 107, 327771, (s32)evt_npc_get_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94",
-    -30000000, -29999999, -29999998, 131125, -30000000, 10, 458843, (s32)evt_npc_move_position,
-    (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999998, 200, 0, 0, 109, 131122,
-    -90000000, 1, 131122, -89999999, 1, 131122, -89999998, 1,
-    107, 327771, (s32)evt_npc_get_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -29999999, -29999998, -29999997, 393307,
-    (s32)evt_snd_sfxon_3d, (s32)"SFX_STG2_KANBU_SMALL1", -29999999, -29999998, -29999997, 0, 131124, -30000000,
-    -229999181, 327771, (s32)evt_npc_set_scale, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -30000000, -30000000, 65547,
-    -90000000, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG2_KANBU_SMALL1", -29999999, -29999998, -29999997, 0,
-    131124, -30000000, -229999314, 327771, (s32)evt_npc_set_scale, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -30000000,
-    -30000000, 65547, -89999999, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG2_KANBU_SMALL1", -29999999, -29999998,
-    -29999997, 0, 131124, -30000000, -229999458, 327771, (s32)evt_npc_set_scale, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94",
-    -30000000, -30000000, -30000000, 65547, -89999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG2_KANBU_SMALL1",
-    -29999999, -29999998, -29999997, 0, 131124, -30000000, -229999591, 327771,
-    (s32)evt_npc_set_scale, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -30000000, -30000000, 109, 327771, (s32)evt_msg_print,
-    0, (s32)"stg2_mri_e24_02", 0, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", 107, 327771, (s32)evt_sub_intpl_msec_init, 5,
-    -229996928, -229998976, 200, 65541, 0, 196699, (s32)evt_sub_intpl_msec_get_value_para, -30000000,
-    -29999999, 327771, (s32)evt_npc_set_scale, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", -30000000, -30000000, -30000000, 131096,
-    -29999999, 0, 7, 33, 65545, 1, 6, 109,
-    131122, -90000000, 0, 65627, (s32)evt_msg_continue, 131122, -89999999, 0,
-    65627, (s32)evt_msg_continue, 131122, -89999998, 0, 65627, (s32)evt_msg_continue, 131124,
-    -30000000, -229998976, 327771, (s32)evt_npc_set_scale, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -30000000, -30000000,
-    589915, (s32)evt_cam3d_evt_set, -240, 86, 302, -240, 35, 7,
-    0, 11, 327771, (s32)evt_npc_get_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999999, -29999998,
-    131125, -30000000, 10, 458843, (s32)evt_npc_move_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999998,
-    200, 0, 0, 327771, (s32)evt_msg_print, 0, (s32)"stg2_mri_e24_03", 0,
-    (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", 589915, (s32)evt_cam3d_evt_set, -275, 86, 302, -275, 35,
-    7, 500, 11, 65546, 500, 327771, (s32)evt_msg_print, 0,
-    (s32)"stg2_mri_e24_04", 0, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", 107, 327771, (s32)evt_cam_shake, 4, -229999995,
-    -230000000, 50, 109, 107, 327771, (s32)evt_npc_get_position, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", -30000000,
-    -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG2_CHOUROU_WAIST1", -30000000, -29999999, -29999998,
-    0, 109, 196699, (s32)evt_npc_set_anim, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", (s32)"D_1", 327771, (s32)evt_msg_print,
-    0, (s32)"stg2_mri_e24_04_00", 0, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", 65546, 500, 262235, (s32)evt_npc_set_autotalkpose,
-    (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", (s32)"D_1", (s32)"D_1", 65545, 1, 327771, (s32)evt_msg_print, 0,
-    (s32)"stg2_mri_e24_04_01", 0, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", 65545, 1, 196699, (s32)evt_npc_set_anim, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56",
-    (s32)"S_2", 262235, (s32)evt_npc_set_autotalkpose, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", (s32)"S_1", (s32)"T_1", 65546, 333,
-    327771, (s32)evt_msg_print, 0, (s32)"stg2_mri_e24_04_02", 0, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", 65546, 250,
-    131163, (s32)evt_msg_print_party, (s32)"stg2_mri_e24_05", 786523, (s32)evt_eff_fukidashi, 1, (s32)"", (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94",
-    0, 0, 0, 0, 0, 0, 0, 60,
-    196699, (s32)evt_npc_set_ry, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", 90, 262235, (s32)evt_mario_set_pos, -100, 0,
-    30, 327771, (s32)evt_party_set_pos, 0, -70, 0, 30, 65546,
-    1000, 589915, (s32)evt_cam3d_evt_set, -180, 152, 548, -180, 57,
-    7, 1000, 11, 107, 327771, (s32)evt_party_move_pos2, 0, -120,
-    30, -229877120, 109, 107, 262235, (s32)evt_mario_mov_pos2, -150, 30,
-    -229877120, 196699, (s32)evt_mario_dispflag_onoff, 1, 2, 131163, (s32)evt_mario_set_pose, (s32)"M_I_Y",
-    109, 65546, 1000, 327771, (s32)evt_party_get_pos, 0, -30000000, -29999999,
-    -29999998, 131125, -29999999, 30, 327771, (s32)evt_msg_toge, 2, -30000000,
-    -29999999, -29999998, 131163, (s32)evt_msg_print_party, (s32)"stg2_mri_e24_05_01", 589915, (s32)evt_cam3d_evt_set, -230,
-    88, 253, -230, 45, 7, 500, 11, 65546,
-    500, 327771, (s32)evt_msg_print, 0, (s32)"stg2_mri_e24_06", 0, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", 327771,
-    (s32)evt_npc_get_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG2_BOMB_SWITCH_APPEAR1",
-    -30000000, -29999999, -29999998, 0, 196699, (s32)evt_npc_set_anim, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", (s32)"I_6",
-    65546, 1000, 327771, (s32)evt_npc_get_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999999, -29999998,
-    393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG2_BOMB_TIMER_SET1", -30000000, -29999999, -29999998, 0, 196699,
-    (s32)evt_npc_set_anim, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", (s32)"I_7", 196699, (s32)evt_sub_countdown_flag_onoff, 1, 8, 65627,
-    (s32)evt_countdown_stop, 65644, -29999990, 65541, 0, 196699, (s32)evt_sub_countdown_flag_onoff, 1,
-    4, 65546, 200, 196699, (s32)evt_sub_countdown_flag_onoff, 0, 4, 65546,
-    200, 6, 109, 107, 65546, 1500, 65627, (s32)evt_sub_countdown_end,
-    109, 65546, 1000, 327771, (s32)evt_npc_get_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999999,
-    -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG2_BOMB_SWITCH_AWAY1", -30000000, -29999999, -29999998, 0,
-    196699, (s32)evt_npc_set_anim, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", (s32)"I_8", 65546, 1000, 589915, (s32)evt_cam3d_evt_set,
-    -180, 152, 548, -180, 57, 7, 0, 11,
-    65546, 333, 327771, (s32)evt_msg_print, 0, (s32)"stg2_mri_e24_07", 0, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94",
-    327771, (s32)evt_npc_get_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d,
-    (s32)"SFX_STG2_BOMB_SWITCH_APPEAR1", -30000000, -29999999, -29999998, 0, 196699, (s32)evt_npc_set_anim, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94",
-    (s32)"I_6", 65546, 1000, 327771, (s32)evt_npc_get_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999999,
-    -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG2_BOMB_TIMER_SET1", -30000000, -29999999, -29999998, 0,
-    196699, (s32)evt_npc_set_anim, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", (s32)"I_7", 65546, 1000, 589915, (s32)evt_cam3d_evt_set,
-    150, 186, 549, 150, 90, 7, 500, 11,
-    327771, (s32)evt_npc_get_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d,
-    (s32)"SFX_STG2_BOMB_SWITCH_AWAY1", -30000000, -29999999, -29999998, 0, 196699, (s32)evt_npc_set_anim, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94",
-    (s32)"I_8", 65546, 1000, 65631, -29999990, 262235, (s32)evt_mario_set_dir, 90,
-    0, 0, 262235, (s32)evt_mario_set_pos, -120, 0, 30, 262235,
-    (s32)evt_party_set_dir, 0, 90, 0, 327771, (s32)evt_party_set_pos, 0, -150,
-    0, 30, 131122, -29999990, (s32)/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67", 196699, (s32)evt_npc_set_anim, -29999990,
-    (s32)"Z_1", 327771, (s32)evt_npc_set_position, -29999990, 150, 240, 30, 262235,
-    (s32)evt_npc_flag_onoff, 1, -29999990, 512, 262235, (s32)evt_npc_flag_onoff, 0, -29999990,
-    524288, 196699, (s32)evt_npc_set_width, -29999990, 100, 262235, (s32)evt_npc_set_autotalkpose, -29999990,
-    (s32)"S_1", (s32)"T_1", 327771, (s32)evt_npc_get_position, -29999990, -30000000, -29999999, -29999998,
-    393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_STG2_BOSS_APPEAR1", -30000000, -29999999, -29999998, -29999991, 65546,
-    1000, 458843, (s32)evt_npc_sound_data_set, -29999990, 0, 0, -250000000, -250000000,
-    -250000000, 655451, (s32)evt_npc_glide_position, -29999990, 150, 100, 30, 0,
-    -229877120, 0, 0, 0, 131163, (s32)evt_snd_sfxoff, -29999991, 327771,
-    (s32)evt_npc_set_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -100, 0, 30, 196699, (s32)evt_npc_set_ry, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94",
-    90, 458843, (s32)evt_npc_move_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", 150, 30, 0, -229815680,
-    0, 65546, 500, 327771, (s32)evt_npc_get_position, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", -30000000, -29999999,
-    -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_FLD_NPC_KANBU_JUMP1", -30000000, -29999999, -29999998, 0,
-    65630, (s32)dai3kanbu_suikomare, 65546, 200, 196699, (s32)evt_npc_set_anim, -29999990, (s32)"R_1",
-    65546, 1000, 196699, (s32)evt_npc_set_anim, -29999990, (s32)"S_1", 131163, (s32)evt_npc_sound_data_reset,
-    -29999990, 196699, (s32)evt_snd_bgmon, 512, (s32)"BGM_EVT_MAGNUM_APP1", 196699, (s32)evt_snd_bgm_scope, 0,
-    1, 196699, (s32)evt_snd_sfxon, (s32)"SFX_STG2_BOSS_APPEAR2", -29999991, 65630, (s32)boss_robot_pera, 65545,
-    1, 196699, (s32)evt_npc_set_anim, -29999990, (s32)"S_2", 262235, (s32)evt_npc_set_autotalkpose, -29999990,
-    (s32)"S_2", (s32)"T_2", 65630, (s32)boss_robot_pera_after, 131163, (s32)evt_snd_sfxoff, -29999991, 65546,
-    1000, 589915, (s32)evt_cam3d_evt_set, 150, 185, 400, 150, 115,
-    7, 500, 11, 65546, 500, 327771, (s32)evt_msg_print, 0,
-    (s32)"stg2_mri_e24_08", 0, (s32)/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67", 589915, (s32)evt_cam3d_evt_set, 145, 186, 549,
-    145, 90, 7, 500, 11, 65546, 500, 196699,
-    (s32)evt_snd_sfxon, (s32)"SFX_STG2_BOSS_LIGHT1", 0, 65627, (s32)evtflash, 107, 65546, 750,
-    196699, (s32)evt_snd_sfxon, (s32)"SFX_STG2_BOSS_SET1", 0, 65546, 933, 196699, (s32)evt_snd_sfxon,
-    (s32)"SFX_STG2_BOSS_SET1", 0, 65546, 366, 196699, (s32)evt_snd_sfxon, (s32)"SFX_STG2_BOSS_SET1", 0,
-    65546, 200, 196699, (s32)evt_snd_sfxon, (s32)"SFX_STG2_BOSS_SET2", 0, 65546, 2416,
-    196699, (s32)evt_snd_sfxon, (s32)"SFX_STG2_BOSS_LANDING1", 0, 109, 196699, (s32)evt_npc_set_anim, -29999990,
-    (s32)"C_1", 107, 65546, 3830, 327771, (s32)evt_sub_intpl_msec_init, 0, 0,
-    255, 666, 65541, 0, 65627, (s32)evt_sub_intpl_msec_get_value, 131122, -49999990,
-    -30000000, 131096, -29999999, 0, 7, 33, 65545, 1,
-    6, 109, 107, 65546, 4400, 589915, (s32)evt_cam3d_evt_set, 145,
-    167, 549, 150, 71, 7, 500, 11, 109,
-    107, 65546, 4600, 327771, (s32)evt_cam_shake, 4, -230000000, -229999970,
-    500, 109, 65546, 1500, 655451, (s32)evt_npc_glide_position, -29999990, 150,
-    150, 30, 1500, 0, 0, 0, 0, 65546,
-    2000, 327771, (s32)evt_npc_set_position, -29999990, 150, 0, 30, 196699,
-    (s32)evt_npc_set_anim, -29999990, (s32)"S_3", 65546, 1000, 589915, (s32)evt_cam3d_evt_set, -20,
-    167, 549, -20, 71, 7, 1500, 11, 262235,
-    (s32)evt_npc_flag_onoff, 1, (s32)/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67", 1024, 65644, -29999988, 458843, (s32)evt_npc_move_position,
-    -29999990, -20, 30, 1500, 0, 0, 109, 65546,
-    1300, 131163, (s32)evt_snd_bgmoff, 512, 131122, -170000000, 111, 131163,
-    (s32)evt_npc_release_fieldnpc, 1, 196699, (s32)evt_npc_set_battle_info, (s32)/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67", 20, 131163, (s32)evt_npc_battle_start,
-    (s32)/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67", 65627, (s32)evt_npc_wait_battle_end, 196699, (s32)evt_snd_envon, 272, (s32)"ENV_STG2_MRI3", 65631,
-    -29999988, 131163, (s32)evt_mario_key_onoff, 1, 196699, (s32)evt_mario_dispflag_onoff, 0, 2,
-    131163, (s32)evt_mario_key_onoff, 0, 131163, (s32)evt_mario_cont_onoff, 0, 196699, (s32)evt_party_cont_onoff,
-    0, 0, 262235, (s32)evt_mario_set_pos, 20, 0, 10, 262235,
-    (s32)evt_mario_set_dir, 90, 0, 0, 327771, (s32)evt_party_set_pos, 0, -10,
-    0, 5, 262235, (s32)evt_party_set_dir, 0, 90, 0, 196699,
-    (s32)evt_npc_set_ry, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", 90, 327771, (s32)evt_npc_set_position, (s32)/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", -100, 0,
-    30, 327771, (s32)evt_npc_set_position, (s32)/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67", 90, 0, 30, 589915,
-    (s32)evt_cam3d_evt_set, 70, 156, 549, 70, 60, 7, 0,
-    11, 131122, -30000000, 0, 65628, (s32)boss_battle_win, 2, 1,
-};
+EVT_BEGIN(boss_battle)
+    CALL(evt_npc_set_position, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), -320, 0, 30)
+    CALL(evt_npc_set_ry, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), 90)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), 1073741856)
+    CALL(evt_npc_set_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), -250, 0, 30)
+    CALL(evt_npc_set_ry, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), 270)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), 1073743392)
+    LOOP(0)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        IF_INT_LESS_OR_EQUAL(LW(0), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    SET_VALUE(LW(10), 1)
+    LOOP(0)
+        CALL(evt_puni_set_mode, LW(10), 30)
+        ADD(LW(10), 1)
+        IF_INT_EQUAL(LW(10), 103)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_normalize)
+    CALL(evt_party_stop, 0)
+    CALL(evt_puni_puninum_onoff, 0)
+    CALL(evt_cam3d_evt_set, -285, 152, 548, -285, 57, 7, 500, 11)
+    WAIT_MS(1000)
+    SET_VALUE(LW(10), 1)
+    LOOP(0)
+        CALL(evt_puni_set_position, LW(10), 0, -100, 0)
+        CALL(evt_puni_set_anim, LW(10), 0)
+        ADD(LW(10), 1)
+        IF_INT_EQUAL(LW(10), 103)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_00"), 0, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"))
+    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_jump_position_nohit, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2), 225, 30)
+    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_jump_position_nohit, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2), 225, 30)
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_01"), 0, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"))
+    BEGIN_INLINE_EVENT
+        WAIT_MS(300)
+        CALL(evt_cam3d_evt_set, FLOAT(-285.0f), FLOAT(150.19922f), FLOAT(538.2998f), FLOAT(-285.0f), FLOAT(57.0f), FLOAT(7.0f), 1000, 9)
+        WAIT_MS(900)
+        CALL(evt_cam3d_evt_set, -285, 152, 548, -285, 57, 7, 500, 11)
+        WAIT_MS(200)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_get_position, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_CHOUROU_BIG1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_sub_intpl_msec_init, 2, FLOAT(1.0f), FLOAT(3.0f), 200)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+            CALL(evt_npc_set_scale, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), LW(0), LW(0), LW(0))
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+        ADD(LW(0), 10)
+        CALL(evt_npc_move_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(2), 200, 0, 0)
+    END_INLINE_EVENT
+    SET_VALUE(GF(0), 1)
+    SET_VALUE(GF(1), 1)
+    SET_VALUE(GF(2), 1)
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(1), LW(2), LW(3))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_KANBU_SMALL1"), LW(1), LW(2), LW(3), 0)
+        SET_FLOAT_VALUE(LW(0), FLOAT(0.7998047f))
+        CALL(evt_npc_set_scale, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(0), LW(0))
+        WAIT_WHILE(GF(0))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_KANBU_SMALL1"), LW(1), LW(2), LW(3), 0)
+        SET_FLOAT_VALUE(LW(0), FLOAT(0.6699219f))
+        CALL(evt_npc_set_scale, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(0), LW(0))
+        WAIT_WHILE(GF(1))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_KANBU_SMALL1"), LW(1), LW(2), LW(3), 0)
+        SET_FLOAT_VALUE(LW(0), FLOAT(0.5292969f))
+        CALL(evt_npc_set_scale, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(0), LW(0))
+        WAIT_WHILE(GF(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_KANBU_SMALL1"), LW(1), LW(2), LW(3), 0)
+        SET_FLOAT_VALUE(LW(0), FLOAT(0.39941406f))
+        CALL(evt_npc_set_scale, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(0), LW(0))
+    END_INLINE_EVENT
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_02"), 0, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"))
+    BEGIN_INLINE_EVENT
+        CALL(evt_sub_intpl_msec_init, 5, FLOAT(3.0f), FLOAT(1.0f), 200)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+            CALL(evt_npc_set_scale, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), LW(0), LW(0), LW(0))
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_INLINE_EVENT
+    SET_VALUE(GF(0), 0)
+    CALL(evt_msg_continue)
+    SET_VALUE(GF(1), 0)
+    CALL(evt_msg_continue)
+    SET_VALUE(GF(2), 0)
+    CALL(evt_msg_continue)
+    SET_FLOAT_VALUE(LW(0), FLOAT(1.0f))
+    CALL(evt_npc_set_scale, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(0), LW(0))
+    CALL(evt_cam3d_evt_set, -240, 86, 302, -240, 35, 7, 0, 11)
+    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    ADD(LW(0), 10)
+    CALL(evt_npc_move_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(2), 200, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_03"), 0, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"))
+    CALL(evt_cam3d_evt_set, -275, 86, 302, -275, 35, 7, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_04"), 0, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"))
+    BEGIN_INLINE_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 50)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_get_position, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_CHOUROU_WAIST1"), LW(0), LW(1), LW(2), 0)
+    END_INLINE_EVENT
+    CALL(evt_npc_set_anim, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), STRING("D_1"))
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_04_00"), 0, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"))
+    WAIT_MS(500)
+    CALL(evt_npc_set_autotalkpose, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), STRING("D_1"), STRING("D_1"))
+    WAIT_FRAMES(1)
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_04_01"), 0, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"))
+    WAIT_FRAMES(1)
+    CALL(evt_npc_set_anim, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), STRING("S_2"))
+    CALL(evt_npc_set_autotalkpose, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), STRING("S_1"), STRING("T_1"))
+    WAIT_MS(333)
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_04_02"), 0, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"))
+    WAIT_MS(250)
+    CALL(evt_msg_print_party, STRING("stg2_mri_e24_05"))
+    CALL(evt_eff_fukidashi, 1, STRING(""), STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), 0, 0, 0, 0, 0, 0, 0, 60)
+    CALL(evt_npc_set_ry, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), 90)
+    CALL(evt_mario_set_pos, -100, 0, 30)
+    CALL(evt_party_set_pos, 0, -70, 0, 30)
+    WAIT_MS(1000)
+    CALL(evt_cam3d_evt_set, -180, 152, 548, -180, 57, 7, 1000, 11)
+    BEGIN_INLINE_EVENT
+        CALL(evt_party_move_pos2, 0, -120, 30, FLOAT(120.0f))
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_mov_pos2, -150, 30, FLOAT(120.0f))
+        CALL(evt_mario_dispflag_onoff, 1, 2)
+        CALL(evt_mario_set_pose, STRING("M_I_Y"))
+    END_INLINE_EVENT
+    WAIT_MS(1000)
+    CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
+    ADD(LW(1), 30)
+    CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
+    CALL(evt_msg_print_party, STRING("stg2_mri_e24_05_01"))
+    CALL(evt_cam3d_evt_set, -230, 88, 253, -230, 45, 7, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_06"), 0, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"))
+    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_SWITCH_APPEAR1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_npc_set_anim, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), STRING("I_6"))
+    WAIT_MS(1000)
+    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_TIMER_SET1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_npc_set_anim, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), STRING("I_7"))
+    CALL(evt_sub_countdown_flag_onoff, 1, 8)
+    CALL(evt_countdown_stop)
+    BEGIN_INLINE_EVENT_GET_ID(LW(10))
+        LOOP(0)
+            CALL(evt_sub_countdown_flag_onoff, 1, 4)
+            WAIT_MS(200)
+            CALL(evt_sub_countdown_flag_onoff, 0, 4)
+            WAIT_MS(200)
+        END_LOOP
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(1500)
+        CALL(evt_sub_countdown_end)
+    END_INLINE_EVENT
+    WAIT_MS(1000)
+    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_SWITCH_AWAY1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_npc_set_anim, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), STRING("I_8"))
+    WAIT_MS(1000)
+    CALL(evt_cam3d_evt_set, -180, 152, 548, -180, 57, 7, 0, 11)
+    WAIT_MS(333)
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_07"), 0, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"))
+    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_SWITCH_APPEAR1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_npc_set_anim, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), STRING("I_6"))
+    WAIT_MS(1000)
+    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_TIMER_SET1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_npc_set_anim, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), STRING("I_7"))
+    WAIT_MS(1000)
+    CALL(evt_cam3d_evt_set, 150, 186, 549, 150, 90, 7, 500, 11)
+    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_SWITCH_AWAY1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_npc_set_anim, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), STRING("I_8"))
+    WAIT_MS(1000)
+    DELETE_EVENT(LW(10))
+    CALL(evt_mario_set_dir, 90, 0, 0)
+    CALL(evt_mario_set_pos, -120, 0, 30)
+    CALL(evt_party_set_dir, 0, 90, 0)
+    CALL(evt_party_set_pos, 0, -150, 0, 30)
+    SET_VALUE(LW(10), STRING(/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67"))
+    CALL(evt_npc_set_anim, LW(10), STRING("Z_1"))
+    CALL(evt_npc_set_position, LW(10), 150, 240, 30)
+    CALL(evt_npc_flag_onoff, 1, LW(10), 512)
+    CALL(evt_npc_flag_onoff, 0, LW(10), 524288)
+    CALL(evt_npc_set_width, LW(10), 100)
+    CALL(evt_npc_set_autotalkpose, LW(10), STRING("S_1"), STRING("T_1"))
+    CALL(evt_npc_get_position, LW(10), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOSS_APPEAR1"), LW(0), LW(1), LW(2), LW(9))
+    WAIT_MS(1000)
+    CALL(evt_npc_sound_data_set, LW(10), 0, 0, -250000000, -250000000, -250000000)
+    CALL(evt_npc_glide_position, LW(10), 150, 100, 30, 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_snd_sfxoff, LW(9))
+    CALL(evt_npc_set_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), -100, 0, 30)
+    CALL(evt_npc_set_ry, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), 90)
+    CALL(evt_npc_move_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), 150, 30, 0, FLOAT(180.0f), 0)
+    WAIT_MS(500)
+    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_FLD_NPC_KANBU_JUMP1"), LW(0), LW(1), LW(2), 0)
+    CALL_CHILD(dai3kanbu_suikomare)
+    WAIT_MS(200)
+    CALL(evt_npc_set_anim, LW(10), STRING("R_1"))
+    WAIT_MS(1000)
+    CALL(evt_npc_set_anim, LW(10), STRING("S_1"))
+    CALL(evt_npc_sound_data_reset, LW(10))
+    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_MAGNUM_APP1"))
+    CALL(evt_snd_bgm_scope, 0, 1)
+    CALL(evt_snd_sfxon, STRING("SFX_STG2_BOSS_APPEAR2"), LW(9))
+    CALL_CHILD(boss_robot_pera)
+    WAIT_FRAMES(1)
+    CALL(evt_npc_set_anim, LW(10), STRING("S_2"))
+    CALL(evt_npc_set_autotalkpose, LW(10), STRING("S_2"), STRING("T_2"))
+    CALL_CHILD(boss_robot_pera_after)
+    CALL(evt_snd_sfxoff, LW(9))
+    WAIT_MS(1000)
+    CALL(evt_cam3d_evt_set, 150, 185, 400, 150, 115, 7, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_08"), 0, STRING(/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67"))
+    CALL(evt_cam3d_evt_set, 145, 186, 549, 145, 90, 7, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_snd_sfxon, STRING("SFX_STG2_BOSS_LIGHT1"), 0)
+    CALL(evtflash)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(750)
+        CALL(evt_snd_sfxon, STRING("SFX_STG2_BOSS_SET1"), 0)
+        WAIT_MS(933)
+        CALL(evt_snd_sfxon, STRING("SFX_STG2_BOSS_SET1"), 0)
+        WAIT_MS(366)
+        CALL(evt_snd_sfxon, STRING("SFX_STG2_BOSS_SET1"), 0)
+        WAIT_MS(200)
+        CALL(evt_snd_sfxon, STRING("SFX_STG2_BOSS_SET2"), 0)
+        WAIT_MS(2416)
+        CALL(evt_snd_sfxon, STRING("SFX_STG2_BOSS_LANDING1"), 0)
+    END_INLINE_EVENT
+    CALL(evt_npc_set_anim, LW(10), STRING("C_1"))
+    BEGIN_INLINE_EVENT
+        WAIT_MS(3830)
+        CALL(evt_sub_intpl_msec_init, 0, 0, 255, 666)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value)
+            SET_VALUE(GW(10), LW(0))
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(4400)
+        CALL(evt_cam3d_evt_set, 145, 167, 549, 150, 71, 7, 500, 11)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(4600)
+        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.029296875f), 500)
+    END_INLINE_EVENT
+    WAIT_MS(1500)
+    CALL(evt_npc_glide_position, LW(10), 150, 150, 30, 1500, 0, 0, 0, 0)
+    WAIT_MS(2000)
+    CALL(evt_npc_set_position, LW(10), 150, 0, 30)
+    CALL(evt_npc_set_anim, LW(10), STRING("S_3"))
+    WAIT_MS(1000)
+    CALL(evt_cam3d_evt_set, -20, 167, 549, -20, 71, 7, 1500, 11)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67"), 1024)
+    BEGIN_INLINE_EVENT_GET_ID(LW(12))
+        CALL(evt_npc_move_position, LW(10), -20, 30, 1500, 0, 0)
+    END_INLINE_EVENT
+    WAIT_MS(1300)
+    CALL(evt_snd_bgmoff, 512)
+    SET_VALUE(GSW(0), 111)
+    CALL(evt_npc_release_fieldnpc, 1)
+    CALL(evt_npc_set_battle_info, STRING(/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67"), 20)
+    CALL(evt_npc_battle_start, STRING(/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67"))
+    CALL(evt_npc_wait_battle_end)
+    CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI3"))
+    DELETE_EVENT(LW(12))
+    CALL(evt_mario_key_onoff, 1)
+    CALL(evt_mario_dispflag_onoff, 0, 2)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(evt_party_cont_onoff, 0, 0)
+    CALL(evt_mario_set_pos, 20, 0, 10)
+    CALL(evt_mario_set_dir, 90, 0, 0)
+    CALL(evt_party_set_pos, 0, -10, 0, 5)
+    CALL(evt_party_set_dir, 0, 90, 0)
+    CALL(evt_npc_set_ry, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), 90)
+    CALL(evt_npc_set_position, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), -100, 0, 30)
+    CALL(evt_npc_set_position, STRING(/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67"), 90, 0, 30)
+    CALL(evt_cam3d_evt_set, 70, 156, 549, 70, 60, 7, 0, 11)
+    SET_VALUE(LW(0), 0)
+    SPAWN_EVENT(boss_battle_win)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(starstone_item)
     LOOP(0)
@@ -2946,10 +3204,12 @@ static __declspec(section ".data") EVT_BEGIN(evt_ueki_08)
     RETURN
 EVT_END()
 
-static s32 ueki_access_data[] = {
-    1, (s32)"A_ueki01", (s32)"S_ueki01", (s32)evt_ueki_01, 1, (s32)"A_ueki02", (s32)"S_ueki02", (s32)evt_ueki_02,
-    1, (s32)"A_ueki03", (s32)"S_ueki03", (s32)evt_ueki_03, 1, (s32)"A_ueki08", (s32)"S_ueki08", (s32)evt_ueki_08,
-    4, 0, 0, 0,
+static KusaAccess ueki_access_data[] = {
+    {1, "A_ueki01", "S_ueki01", evt_ueki_01},
+    {1, "A_ueki02", "S_ueki02", evt_ueki_02},
+    {1, "A_ueki03", "S_ueki03", evt_ueki_03},
+    {1, "A_ueki08", "S_ueki08", evt_ueki_08},
+    {4, NULL, NULL, NULL},
 };
 
 EVT_BEGIN(puni_mario_wait)

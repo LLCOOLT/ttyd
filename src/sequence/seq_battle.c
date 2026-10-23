@@ -96,7 +96,7 @@ void seq_battleInit(BattleSeqWork* work) {
     if (evtGetValue(NULL, GSW0) < 109 || evtGetValue(NULL, GSW0) >= 111) {
         if (evtGetValue(NULL, GSW0) != 402) {
             psndBGMOff(0x400);
-            psndBGMOn(1, *(char**)((u8*)npc + 0x2F0));
+            psndBGMOn(1, (char*)npc->battleInfo.field_C0);
         }
     }
     psndENVOff(0x400);
@@ -235,10 +235,10 @@ void seq_battleMain(BattleSeqWork* work) {
             pos.x = 0.0f;
             pos.y = 0.0f;
             pos.z = 400.0f;
-            if (*(u32*)((u8*)_battleWorkPointer + 0xEF4) & 0x100) {
+            if (_battleWorkPointer->flags & 0x100) {
                 pos.z += 200.0f;
             }
-            psndSetPosDirListener(&pos, *(f32*)((u8*)camGetPtr(4) + 0x114));
+            psndSetPosDirListener(&pos, camGetPtr(4)->viewYaw);
             break;
         }
         case 6:

@@ -16,6 +16,9 @@
 #include "evt/evt_door.h"
 #include "evt/evt_sub.h"
 #include "usu.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_shop.h"
+#include "data_tables.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_mario_get_motion);
 #endif
@@ -170,20 +173,20 @@ USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 static void majin_callback(s32 type);
 
-__declspec(section ".data") u64 fd_usu_01_negone_one_374;
-__declspec(section ".data") s32 fd_usu_01_neg_one_382[1];
-__declspec(section ".data") s32 fd_usu_01___local_PI_383[1];
-__declspec(section ".data") s32 fd_usu_01___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_usu_01_one_negone_373;
-__declspec(section ".data") s32 fd_usu_01___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_usu_01_one_381[1];
-__declspec(section ".data") u64 fd_usu_01_negone_one_360;
-__declspec(section ".data") s32 fd_usu_01_neg_one_365[1];
-__declspec(section ".data") s32 fd_usu_01___local_PI_366[1];
-__declspec(section ".data") s32 fd_usu_01___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_usu_01_one_negone_359;
-__declspec(section ".data") s32 fd_usu_01___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_usu_01_one_364[1];
+__declspec(section ".data") f32 fd_usu_01_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_usu_01_neg_one_382;
+__declspec(section ".data") f32 fd_usu_01___local_PI_383;
+__declspec(section ".data") f32 fd_usu_01___local_3PIO2_385;
+__declspec(section ".data") f32 fd_usu_01_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_usu_01___local_PIO2_384;
+__declspec(section ".data") f32 fd_usu_01_one_381;
+__declspec(section ".data") f32 fd_usu_01_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_usu_01_neg_one_365;
+__declspec(section ".data") f32 fd_usu_01___local_PI_366;
+__declspec(section ".data") f32 fd_usu_01___local_3PIO2_368;
+__declspec(section ".data") f32 fd_usu_01_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_usu_01___local_PIO2_367;
+__declspec(section ".data") f32 fd_usu_01_one_364;
 __declspec(section ".data") s32 villagerF_init[7];
 s32 villagerF_talk[52];
 __declspec(section ".data") s32 villagerG_init[7];
@@ -238,7 +241,7 @@ static s32 musume_c_entry[15];
 s32 musume_c_pig_entry[15];
 static s32 urouro_move[24];
 s32 urouro_move_semai[24];
-static s32 npcEnt[552];
+static NpcSetupInfo npcEnt[24];
 s32 village_chief_change_pig_event[166];
 s32 evt_mon_open[112];
 static s32 cam_up[34];
@@ -247,17 +250,17 @@ s32 usu01_check_vivian[36];
 s32 usu01_crowFG_talk_event[VERSION_PICK(355, 394)];
 s32 usu01_crowHI_talk_event[VERSION_PICK(250, 289)];
 s32 usu01_crowJ_talk_event[VERSION_PICK(226, 265)];
-__declspec(section ".data") s32 minka_npc[6];
-__declspec(section ".data") s32 minka_item[2];
-__declspec(section ".data") s32 shop_npc[6];
-__declspec(section ".data") s32 shop_mobj[4];
-__declspec(section ".data") s32 shop_item[5];
+__declspec(section ".data") const char* minka_npc[6];
+__declspec(section ".data") const char* minka_item[2];
+__declspec(section ".data") const char* shop_npc[6];
+__declspec(section ".data") const char* shop_mobj[4];
+__declspec(section ".data") const char* shop_item[5];
 static __declspec(section ".data") s32 evt_door_1_1[12];
 static __declspec(section ".data") s32 evt_door_1_2[12];
 static s32 evt_wall_1[28];
 static __declspec(section ".data") s32 door_1_open[12];
 static s32 door_1_close[14];
-static s32 door_1[18];
+static DoorParam door_1;
 s32 evt_door_2_1_1[15];
 __declspec(section ".data") s32 evt_door_2_1_2[2];
 s32 evt_wall_2_1[28];
@@ -265,17 +268,17 @@ s32 loop_msg[84];
 s32 mise_kiza_msg[32];
 s32 mawari_house_delay[46];
 s32 door_2_1_open[23];
-s32 door_2_1[18];
+DoorParam door_2_1;
 s32 evt_ie2_door2_1[244];
 s32 evt_ie2_door2_2[226];
 static __declspec(section ".data") s32 evt_door_3_1[12];
 static __declspec(section ".data") s32 evt_door_3_2[12];
 static s32 evt_wall_3[30];
-__declspec(section ".data") s32 door_3_item[2];
+__declspec(section ".data") const char* door_3_item[2];
 static __declspec(section ".data") s32 door_3_open[12];
 static s32 door_3_close[14];
-static s32 door_3[18];
-static s32 bero_entry_data[45];
+static DoorParam door_3;
+static BeroEntry bero_entry_data[3];
 s32 usu01_gusun[80];
 s32 evt_monban_buta_main[34];
 s32 evt_monban_buta[18];
@@ -284,13 +287,14 @@ s32 evt_monban_look[119];
 static __declspec(section ".data") s32 lock_tbl[2];
 static s32 lock_item_check[41];
 s32 unlock[13];
-static __declspec(section ".data") s32 obj_list[12];
-static __declspec(section ".data") s32 goods_list[12];
-static s32 trade_list[24];
-static s32 shopper_data[38];
+static __declspec(section ".data") ShopObj obj_list[6];
+static __declspec(section ".data") ShopItem goods_list[6];
+static ShopDb trade_list[12];
+static ShopperData35 shopper_data;
 __declspec(section ".data") s32 shopper_talk1[11];
 __declspec(section ".data") s32 shopper_talk2[11];
-static s32 booboo_name[16];
+typedef struct BoobooName { const char* name; u8 field_0x4; u8 field_0x5; u8 pad_0x6[2]; } BoobooName; /* field_0x4/0x5 never read */
+static BoobooName booboo_name[8];
 __declspec(section ".data") s32 evt_roll_get[2];
 static __declspec(section ".data") s32 key_tbl[2];
 static s32 evt_majin[330];
@@ -299,59 +303,39 @@ s32 tree_onoff[57];
 static __declspec(section ".data") s32 evt_ki_1[12];
 static s32 evt_ki_2[20];
 static s32 evt_ki_3[20];
-static s32 tree_tbl[30];
+static TreeAccess tree_tbl[5];
 __declspec(section ".data") s32 usu_01_tree_init[7];
 static s32 mobj_box00[34];
 s32 usu_01_init_evt[350];
 
 
-__declspec(section ".data") u64 fd_usu_01_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_usu_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_usu_01_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_usu_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_usu_01___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_usu_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_usu_01___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_usu_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_usu_01_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_usu_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_usu_01___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_usu_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_usu_01_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_usu_01_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_usu_01_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_usu_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_usu_01_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_usu_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_usu_01___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_usu_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_usu_01___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_usu_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_usu_01_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_usu_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_usu_01___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_usu_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_usu_01_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_usu_01_one_364 = 1.0f;
 
 __declspec(section ".data") EVT_BEGIN(villagerF_init)
     CALL(evt_npc_flag_onoff, 1, STRING("村人Ｆ"), 1536)
@@ -836,7 +820,7 @@ EVT_END()
 
 EVT_BEGIN(iri_20_aunt_to_house)
     CALL(evt_npc_move_position, STRING("おばさん"), -390, -40, 0, 60, 0)
-    SET_VALUE(LW(0), PTR(door_1))
+    SET_VALUE(LW(0), PTR(&door_1))
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 1024)
     CALL(evt_npc_move_position, STRING("me"), -390, -20, 0, 60, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 1024)
@@ -897,7 +881,7 @@ EVT_BEGIN(aunt_talk)
             CALL(evt_mario_mov_pos2, -390, -100, 60)
             WAIT_MS(500)
             CALL(evt_npc_flag_onoff, 0, STRING("me"), 32)
-            SET_VALUE(LW(0), PTR(door_1))
+            SET_VALUE(LW(0), PTR(&door_1))
             SET_VALUE(LW(14), 0)
             SET_VALUE(LW(15), 0)
             CALL_CHILD(PTR(iri_20_out_house))
@@ -1385,76 +1369,274 @@ EVT_BEGIN(urouro_move_semai)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"村人Ｆ"*/"\x91\xBA\x90\x6C\x82\x65", 1074267648, 0, (s32)villagerF_init, 0, (s32)villagerF_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"村人Ｇ"*/"\x91\xBA\x90\x6C\x82\x66",
-    525824, 0, (s32)villagerG_init, (s32)urouro_move, (s32)villagerG_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"村人Ｈ"*/"\x91\xBA\x90\x6C\x82\x67", 1074267648,
-    0, (s32)villagerH_init, 0, (s32)villagerH_talk, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"村人Ｉ"*/"\x91\xBA\x90\x6C\x82\x68", 1074267648, 0,
-    (s32)villagerI_init, 0, (s32)villagerI_talk, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"村人Ｊ"*/"\x91\xBA\x90\x6C\x82\x69", 525824, 0, (s32)villagerJ_init,
-    (s32)urouro_move, (s32)villagerJ_talk, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"店の主人"*/"\x93\x58\x82\xCC\x8E\xE5\x90\x6C", 1074267648, 0, (s32)shop_man_init, 0,
-    (s32)shop_man_talk, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"お店の奥さん"*/"\x82\xA8\x93\x58\x82\xCC\x89\x9C\x82\xB3\x82\xF1", 1074267648, 0, (s32)shop_woman_init, 0, (s32)shop_woman_talk,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"キザ野郎"*/"\x83\x4C\x83\x55\x96\xEC\x98\x59", 1074267648, 0, (s32)kizayarou_init, 0, (s32)kizayarou_talk, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)/*"おばさん"*/"\x82\xA8\x82\xCE\x82\xB3\x82\xF1", 1074267648, 0, (s32)aunt_init, 0, (s32)aunt_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"子供Ａ"*/"\x8E\x71\x8B\x9F\x82\x60",
-    1074267648, 0, (s32)childA_init, 0, (s32)childA_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"子供Ｂ"*/"\x8E\x71\x8B\x9F\x82\x61", 1074267648,
-    0, (s32)childB_init, 0, (s32)childB_talk, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"子供Ｃ"*/"\x8E\x71\x8B\x9F\x82\x62", 1074267648, 0,
-    (s32)childC_init, 0, (s32)childC_talk, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"門番"*/"\x96\xE5\x94\xD4", 1074267648, 0, (s32)gatekeeper_init,
-    0, (s32)gatekeeper_talk, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"ブタキザ野郎"*/"\x83\x75\x83\x5E\x83\x4C\x83\x55\x96\xEC\x98\x59", 525824, 0, (s32)kizayarou_pig_init, (s32)urouro_move,
-    (s32)kizayarou_talk, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"ブタおばさん"*/"\x83\x75\x83\x5E\x82\xA8\x82\xCE\x82\xB3\x82\xF1", 525824, 0, (s32)aunt_pig_init, (s32)urouro_move, (s32)aunt_talk,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, (s32)/*"ブタ門番"*/"\x83\x75\x83\x5E\x96\xE5\x94\xD4", 525824, 0, (s32)gatekeeper_pig_init, 0, (s32)gatekeeper_talk, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)/*"ブタ村人Ｉ"*/"\x83\x75\x83\x5E\x91\xBA\x90\x6C\x82\x68", 525824, 0, (s32)villagerI_pig_init, (s32)urouro_move, (s32)villagerI_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ブタ村人Ｊ"*/"\x83\x75\x83\x5E\x91\xBA\x90\x6C\x82\x69",
-    525824, 0, (s32)villagerJ_pig_init, (s32)urouro_move, (s32)villagerJ_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"カラスＦ"*/"\x83\x4A\x83\x89\x83\x58\x82\x65", 1073743360,
-    0, (s32)crow_f_init, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"カラスＧ"*/"\x83\x4A\x83\x89\x83\x58\x82\x66", 1073743360, 0,
-    (s32)crow_g_init, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"カラスＨ"*/"\x83\x4A\x83\x89\x83\x58\x82\x67", 1073743360, 0, (s32)crow_h_init,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"カラスＩ"*/"\x83\x4A\x83\x89\x83\x58\x82\x68", 1073743360, 0, (s32)crow_i_init, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, (s32)/*"カラスＪ"*/"\x83\x4A\x83\x89\x83\x58\x82\x69", 1073743360, 0, (s32)crow_j_init, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"村人Ｆ"*/"\x91\xBA\x90\x6C\x82\x65", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        villagerF_init, // initEvent
+        NULL, // regularEvent
+        villagerF_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"村人Ｇ"*/"\x91\xBA\x90\x6C\x82\x66", // name
+        0x80600, // flags
+        0, // reactionFlags
+        villagerG_init, // initEvent
+        urouro_move, // regularEvent
+        villagerG_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"村人Ｈ"*/"\x91\xBA\x90\x6C\x82\x67", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        villagerH_init, // initEvent
+        NULL, // regularEvent
+        villagerH_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"村人Ｉ"*/"\x91\xBA\x90\x6C\x82\x68", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        villagerI_init, // initEvent
+        NULL, // regularEvent
+        villagerI_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"村人Ｊ"*/"\x91\xBA\x90\x6C\x82\x69", // name
+        0x80600, // flags
+        0, // reactionFlags
+        villagerJ_init, // initEvent
+        urouro_move, // regularEvent
+        villagerJ_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"店の主人"*/"\x93\x58\x82\xCC\x8E\xE5\x90\x6C", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        shop_man_init, // initEvent
+        NULL, // regularEvent
+        shop_man_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"お店の奥さん"*/"\x82\xA8\x93\x58\x82\xCC\x89\x9C\x82\xB3\x82\xF1", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        shop_woman_init, // initEvent
+        NULL, // regularEvent
+        shop_woman_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"キザ野郎"*/"\x83\x4C\x83\x55\x96\xEC\x98\x59", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        kizayarou_init, // initEvent
+        NULL, // regularEvent
+        kizayarou_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"おばさん"*/"\x82\xA8\x82\xCE\x82\xB3\x82\xF1", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        aunt_init, // initEvent
+        NULL, // regularEvent
+        aunt_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"子供Ａ"*/"\x8E\x71\x8B\x9F\x82\x60", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        childA_init, // initEvent
+        NULL, // regularEvent
+        childA_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"子供Ｂ"*/"\x8E\x71\x8B\x9F\x82\x61", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        childB_init, // initEvent
+        NULL, // regularEvent
+        childB_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"子供Ｃ"*/"\x8E\x71\x8B\x9F\x82\x62", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        childC_init, // initEvent
+        NULL, // regularEvent
+        childC_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"門番"*/"\x96\xE5\x94\xD4", // name
+        0x40080600, // flags
+        0, // reactionFlags
+        gatekeeper_init, // initEvent
+        NULL, // regularEvent
+        gatekeeper_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ブタキザ野郎"*/"\x83\x75\x83\x5E\x83\x4C\x83\x55\x96\xEC\x98\x59", // name
+        0x80600, // flags
+        0, // reactionFlags
+        kizayarou_pig_init, // initEvent
+        urouro_move, // regularEvent
+        kizayarou_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ブタおばさん"*/"\x83\x75\x83\x5E\x82\xA8\x82\xCE\x82\xB3\x82\xF1", // name
+        0x80600, // flags
+        0, // reactionFlags
+        aunt_pig_init, // initEvent
+        urouro_move, // regularEvent
+        aunt_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ブタ門番"*/"\x83\x75\x83\x5E\x96\xE5\x94\xD4", // name
+        0x80600, // flags
+        0, // reactionFlags
+        gatekeeper_pig_init, // initEvent
+        NULL, // regularEvent
+        gatekeeper_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ブタ村人Ｉ"*/"\x83\x75\x83\x5E\x91\xBA\x90\x6C\x82\x68", // name
+        0x80600, // flags
+        0, // reactionFlags
+        villagerI_pig_init, // initEvent
+        urouro_move, // regularEvent
+        villagerI_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ブタ村人Ｊ"*/"\x83\x75\x83\x5E\x91\xBA\x90\x6C\x82\x69", // name
+        0x80600, // flags
+        0, // reactionFlags
+        villagerJ_pig_init, // initEvent
+        urouro_move, // regularEvent
+        villagerJ_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"カラスＦ"*/"\x83\x4A\x83\x89\x83\x58\x82\x65", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        crow_f_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"カラスＧ"*/"\x83\x4A\x83\x89\x83\x58\x82\x66", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        crow_g_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"カラスＨ"*/"\x83\x4A\x83\x89\x83\x58\x82\x67", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        crow_h_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"カラスＩ"*/"\x83\x4A\x83\x89\x83\x58\x82\x68", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        crow_i_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"カラスＪ"*/"\x83\x4A\x83\x89\x83\x58\x82\x69", // name
+        0x40000600, // flags
+        0, // reactionFlags
+        crow_j_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(village_chief_change_pig_event)
@@ -2207,24 +2389,42 @@ EVT_BEGIN(usu01_crowJ_talk_event)
 EVT_END()
 #endif
 
-__declspec(section ".data") s32 minka_npc[] = {
-    (s32)/*"おばさん"*/"\x82\xA8\x82\xCE\x82\xB3\x82\xF1", (s32)/*"ブタおばさん"*/"\x83\x75\x83\x5E\x82\xA8\x82\xCE\x82\xB3\x82\xF1", (s32)/*"子供Ａ"*/"\x8E\x71\x8B\x9F\x82\x60", (s32)/*"子供Ｂ"*/"\x8E\x71\x8B\x9F\x82\x61", (s32)/*"子供Ｃ"*/"\x8E\x71\x8B\x9F\x82\x62", 0,
+__declspec(section ".data") const char* minka_npc[] = {
+    /*"おばさん"*/"\x82\xA8\x82\xCE\x82\xB3\x82\xF1",
+    /*"ブタおばさん"*/"\x83\x75\x83\x5E\x82\xA8\x82\xCE\x82\xB3\x82\xF1",
+    /*"子供Ａ"*/"\x8E\x71\x8B\x9F\x82\x60",
+    /*"子供Ｂ"*/"\x8E\x71\x8B\x9F\x82\x61",
+    /*"子供Ｃ"*/"\x8E\x71\x8B\x9F\x82\x62",
+    NULL,
 };
 
-__declspec(section ".data") s32 minka_item[] = {
-    (s32)"iri_20", 0,
+__declspec(section ".data") const char* minka_item[] = {
+    "iri_20",
+    NULL,
 };
 
-__declspec(section ".data") s32 shop_npc[] = {
-    (s32)/*"お店の奥さん"*/"\x82\xA8\x93\x58\x82\xCC\x89\x9C\x82\xB3\x82\xF1", (s32)/*"キザ野郎"*/"\x83\x4C\x83\x55\x96\xEC\x98\x59", (s32)/*"ブタキザ野郎"*/"\x83\x75\x83\x5E\x83\x4C\x83\x55\x96\xEC\x98\x59", (s32)/*"店の主人"*/"\x93\x58\x82\xCC\x8E\xE5\x90\x6C", (s32)/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C", 0,
+__declspec(section ".data") const char* shop_npc[] = {
+    /*"お店の奥さん"*/"\x82\xA8\x93\x58\x82\xCC\x89\x9C\x82\xB3\x82\xF1",
+    /*"キザ野郎"*/"\x83\x4C\x83\x55\x96\xEC\x98\x59",
+    /*"ブタキザ野郎"*/"\x83\x75\x83\x5E\x83\x4C\x83\x55\x96\xEC\x98\x59",
+    /*"店の主人"*/"\x93\x58\x82\xCC\x8E\xE5\x90\x6C",
+    /*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C",
+    NULL,
 };
 
-__declspec(section ".data") s32 shop_mobj[] = {
-    (s32)"usu_00_lock", (s32)"pera_box", (s32)"mobj_box00", 0,
+__declspec(section ".data") const char* shop_mobj[] = {
+    "usu_00_lock",
+    "pera_box",
+    "mobj_box00",
+    NULL,
 };
 
-__declspec(section ".data") s32 shop_item[] = {
-    (s32)"item_02", (s32)"item_03", (s32)"item_04", (s32)"item_05", 0,
+__declspec(section ".data") const char* shop_item[] = {
+    "item_02",
+    "item_03",
+    "item_04",
+    "item_05",
+    NULL,
 };
 
 static __declspec(section ".data") EVT_BEGIN(evt_door_1_1)
@@ -2263,10 +2463,25 @@ static EVT_BEGIN(door_1_close)
     RETURN
 EVT_END()
 
-static s32 door_1[] = {
-    0, 3, 2, (s32)"S_usu01_ie1_door", (s32)"A_door46", (s32)"A_door45", (s32)"S_usu01_ie1", 0,
-    (s32)"S_usu01_ie1_naka", 0, (s32)evt_door_1_1, (s32)evt_door_1_2, (s32)evt_wall_1, (s32)minka_npc, 0, (s32)minka_item,
-    (s32)door_1_open, (s32)door_1_close,
+static DoorParam door_1 = {
+    0, // field_0x0
+    3, // type
+    2, // se
+    "S_usu01_ie1_door", // mapobj
+    "A_door46", // hitIn
+    "A_door45", // hitOut
+    "S_usu01_ie1", // mapIn
+    NULL, // hitInIn
+    "S_usu01_ie1_naka", // mapOut
+    NULL, // hitOutOut
+    evt_door_1_1, // evtIn
+    evt_door_1_2, // evtOut
+    evt_wall_1, // evtWall
+    (const char**)minka_npc, // npcs
+    NULL, // mobjs
+    (const char**)minka_item, // items
+    door_1_open, // evtOpen
+    door_1_close, // evtClose
 };
 
 EVT_BEGIN(evt_door_2_1_1)
@@ -2378,10 +2593,25 @@ EVT_BEGIN(door_2_1_open)
     RETURN
 EVT_END()
 
-s32 door_2_1[] = {
-    0, 3, 2, (s32)"S_usu01_ie2_door1", (s32)"A_usu01_ie2_door2_u", (s32)"A_usu01_ie2_door2", (s32)"S_usu01_ie2", 0,
-    (s32)"S_usu01_ie2_naka", 0, (s32)evt_door_2_1_1, 0, (s32)evt_wall_2_1, (s32)shop_npc, (s32)shop_mobj, (s32)shop_item,
-    (s32)door_2_1_open, (s32)mawari_house_delay,
+DoorParam door_2_1 = {
+    0, // field_0x0
+    3, // type
+    2, // se
+    "S_usu01_ie2_door1", // mapobj
+    "A_usu01_ie2_door2_u", // hitIn
+    "A_usu01_ie2_door2", // hitOut
+    "S_usu01_ie2", // mapIn
+    NULL, // hitInIn
+    "S_usu01_ie2_naka", // mapOut
+    NULL, // hitOutOut
+    evt_door_2_1_1, // evtIn
+    NULL, // evtOut
+    evt_wall_2_1, // evtWall
+    (const char**)shop_npc, // npcs
+    (const char**)shop_mobj, // mobjs
+    (const char**)shop_item, // items
+    door_2_1_open, // evtOpen
+    mawari_house_delay, // evtClose
 };
 
 USER_FUNC(sleep_voice) {
@@ -2465,7 +2695,7 @@ USER_FUNC(shop_item_disp_off) {
     s32 i;
 
     for (i = 0; i < 6; i++) {
-        mapObjFlagOn((const char*)obj_list[i * 2], 1);
+        mapObjFlagOn(obj_list[i].mobj, 1);
     }
     return EVT_RETURN_DONE;
 }
@@ -2474,7 +2704,7 @@ USER_FUNC(shop_item_disp_on) {
     s32 i;
 
     for (i = 0; i < 6; i++) {
-        mapObjFlagOff((const char*)obj_list[i * 2], 1);
+        mapObjFlagOff(obj_list[i].mobj, 1);
     }
     return EVT_RETURN_DONE;
 }
@@ -2521,8 +2751,8 @@ static USER_FUNC(booboo_main) {
     u32 i;
 
     for (i = 0; i < 8; i++) {
-        if (npcNameToPtr_NoAssert((const char*)booboo_name[i * 2]) != NULL) {
-            animPoseSetMaterialLightFlagOn(npcNameToPtr((const char*)booboo_name[i * 2])->poseId, 0x10);
+        if (npcNameToPtr_NoAssert(booboo_name[i].name) != NULL) {
+            animPoseSetMaterialLightFlagOn(npcNameToPtr(booboo_name[i].name)->poseId, 0x10);
         }
     }
     return EVT_RETURN_DONE;
@@ -2713,8 +2943,9 @@ static EVT_BEGIN(evt_wall_3)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 door_3_item[] = {
-    (s32)"item01", 0,
+__declspec(section ".data") const char* door_3_item[] = {
+    "item01",
+    NULL,
 };
 
 static __declspec(section ".data") EVT_BEGIN(door_3_open)
@@ -2731,19 +2962,60 @@ static EVT_BEGIN(door_3_close)
     RETURN
 EVT_END()
 
-static s32 door_3[] = {
-    0, 3, 2, (s32)"S_usu01_ie3_door", (s32)"A_usu01_ie3_doaa_u", (s32)"A_usu01_ie3_doaa", (s32)"S_usu01_ie3", 0,
-    (s32)"S_usu01_ie3_naka", 0, (s32)evt_door_3_1, (s32)evt_door_3_2, (s32)evt_wall_3, 0, 0, (s32)door_3_item,
-    (s32)door_3_open, (s32)door_3_close,
+static DoorParam door_3 = {
+    0, // field_0x0
+    3, // type
+    2, // se
+    "S_usu01_ie3_door", // mapobj
+    "A_usu01_ie3_doaa_u", // hitIn
+    "A_usu01_ie3_doaa", // hitOut
+    "S_usu01_ie3", // mapIn
+    NULL, // hitInIn
+    "S_usu01_ie3_naka", // mapOut
+    NULL, // hitOutOut
+    evt_door_3_1, // evtIn
+    evt_door_3_2, // evtOut
+    evt_wall_3, // evtWall
+    NULL, NULL, // npcs..mobjs
+    (const char**)door_3_item, // items
+    door_3_open, // evtOpen
+    door_3_close, // evtClose
 };
 
-static s32 bero_entry_data[] = {
-    (s32)"e_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"gra_00", (s32)"w_bero", 65537, 0, 0, (s32)"w_bero",
-    0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"usu_00", (s32)"e_bero", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "e_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"gra_00", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"usu_00", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(usu01_gusun)
@@ -2848,7 +3120,7 @@ EVT_BEGIN(evt_monban_look)
 EVT_END()
 
 static __declspec(section ".data") s32 lock_tbl[] = {
-    21, -1,
+    ITEM_SHOP_KEY, -1,
 };
 
 static EVT_BEGIN(lock_item_check)
@@ -2874,28 +3146,43 @@ EVT_BEGIN(unlock)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 obj_list[] = {
-    (s32)"mi02_S_item_01", (s32)"A_item_01", (s32)"mi02_mi02_S_item_02", (s32)"A_item_02", (s32)"mi02_S_item_03", (s32)"A_item_03", (s32)"mi02_S_item_04", (s32)"A_item_04",
-    (s32)"mi02_S_item_05", (s32)"A_item_05", (s32)"mi02_S_item_06", (s32)"A_item_06",
+static __declspec(section ".data") ShopObj obj_list[] = {
+    {"mi02_S_item_01", "A_item_01"},
+    {"mi02_mi02_S_item_02", "A_item_02"},
+    {"mi02_S_item_03", "A_item_03"},
+    {"mi02_S_item_04", "A_item_04"},
+    {"mi02_S_item_05", "A_item_05"},
+    {"mi02_S_item_06", "A_item_06"},
 };
 
-static __declspec(section ".data") s32 goods_list[] = {
-    129, 20, 177, 10, 140, 30, 155, 20,
-    149, 15, 151, 40,
+static __declspec(section ".data") ShopItem goods_list[] = {
+    {ITEM_THUNDER_RAGE, 20},
+    {ITEM_SPITE_POUCH, 10},
+    {ITEM_STOPWATCH, 30},
+    {ITEM_MAPLE_SYRUP, 20},
+    {ITEM_SUPER_SHROOM, 15},
+    {ITEM_LIFE_SHROOM, 40},
 };
 
-static s32 trade_list[] = {
-    129, 655360, 177, 327680, 140, 983040, 155, 655360,
-    149, 458752, 151, 1310720, 182, 196608, 167, 917504,
-    152, 262144, 191, 13107200, 173, 786432, 0, 0,
+static ShopDb trade_list[] = {
+    {ITEM_THUNDER_RAGE, 10, 0},
+    {ITEM_SPITE_POUCH, 5, 0},
+    {ITEM_STOPWATCH, 15, 0},
+    {ITEM_MAPLE_SYRUP, 10, 0},
+    {ITEM_SUPER_SHROOM, 7, 0},
+    {ITEM_LIFE_SHROOM, 20, 0},
+    {ITEM_MISTAKE, 3, 0},
+    {ITEM_DRIED_BOUQUET, 14, 0},
+    {ITEM_DRIED_SHROOM, 4, 0},
+    {ITEM_JELLY_ULTRA, 200, 0},
+    {ITEM_HOT_SAUCE, 12, 0},
+    {0},
 };
 
-static s32 shopper_data[] = {
-    (s32)/*"お店の奥さん"*/"\x82\xA8\x93\x58\x82\xCC\x89\x9C\x82\xB3\x82\xF1", 0, 0, (s32)"usugurashop_00", (s32)"usugurashop_01", (s32)"usugurashop_02", (s32)"usugurashop_03", (s32)"usugurashop_04",
-    (s32)"usugurashop_05", (s32)"usugurashop_06", (s32)"usugurashop_07", (s32)"usugurashop_08", (s32)"usugurashop_09", (s32)"usugurashop_10", (s32)"usugurashop_11", (s32)"usugurashop_12",
-    (s32)"usugurashop_13", (s32)"usugurashop_14", (s32)"usugurashop_15", (s32)"usugurashop_16", (s32)"usugurashop_17", (s32)"usugurashop_18", (s32)"usugurashop_19", (s32)"usugurashop_20",
-    (s32)"usugurashop_21", (s32)"usugurashop_22", (s32)"usugurashop_23", (s32)"usugurashop_24", (s32)"usugurashop_25", (s32)"usugurashop_26", (s32)"usugurashop_27", (s32)"usugurashop_28",
-    (s32)"usugurashop_29", (s32)"usugurashop_30", (s32)"usugurashop_31", (s32)"usugurashop_32", (s32)"usugurashop_33", (s32)"usugurashop_34",
+static ShopperData35 shopper_data = {
+    /*"お店の奥さん"*/"\x82\xA8\x93\x58\x82\xCC\x89\x9C\x82\xB3\x82\xF1", // name
+    NULL, NULL, // fook_evt..buy_evt
+    {"usugurashop_00", "usugurashop_01", "usugurashop_02", "usugurashop_03", "usugurashop_04", "usugurashop_05", "usugurashop_06", "usugurashop_07", "usugurashop_08", "usugurashop_09", "usugurashop_10", "usugurashop_11", "usugurashop_12", "usugurashop_13", "usugurashop_14", "usugurashop_15", "usugurashop_16", "usugurashop_17", "usugurashop_18", "usugurashop_19", "usugurashop_20", "usugurashop_21", "usugurashop_22", "usugurashop_23", "usugurashop_24", "usugurashop_25", "usugurashop_26", "usugurashop_27", "usugurashop_28", "usugurashop_29", "usugurashop_30", "usugurashop_31", "usugurashop_32", "usugurashop_33", "usugurashop_34"}, // msgs
 };
 
 __declspec(section ".data") EVT_BEGIN(shopper_talk1)
@@ -2910,9 +3197,15 @@ __declspec(section ".data") EVT_BEGIN(shopper_talk2)
     RETURN
 EVT_END()
 
-static s32 booboo_name[] = {
-    (s32)/*"ブタキザ野郎"*/"\x83\x75\x83\x5E\x83\x4C\x83\x55\x96\xEC\x98\x59", 117440512, (s32)/*"ブタおばさん"*/"\x83\x75\x83\x5E\x82\xA8\x82\xCE\x82\xB3\x82\xF1", 16777216, (s32)/*"ブタ門番"*/"\x83\x75\x83\x5E\x96\xE5\x94\xD4", 50397184, (s32)/*"ブタ村人Ｉ"*/"\x83\x75\x83\x5E\x91\xBA\x90\x6C\x82\x68", 83951616,
-    (s32)/*"ブタ村人Ｊ"*/"\x83\x75\x83\x5E\x91\xBA\x90\x6C\x82\x69", 67174400, (s32)/*"ブタ３人娘Ａ"*/"\x83\x75\x83\x5E\x82\x52\x90\x6C\x96\xBA\x82\x60", 67174400, (s32)/*"ブタ３人娘Ｂ"*/"\x83\x75\x83\x5E\x82\x52\x90\x6C\x96\xBA\x82\x61", 67174400, (s32)/*"ブタ３人娘Ｃ"*/"\x83\x75\x83\x5E\x82\x52\x90\x6C\x96\xBA\x82\x62", 67174400,
+static BoobooName booboo_name[] = {
+    {/*"ブタキザ野郎"*/"\x83\x75\x83\x5E\x83\x4C\x83\x55\x96\xEC\x98\x59", 7, 0},
+    {/*"ブタおばさん"*/"\x83\x75\x83\x5E\x82\xA8\x82\xCE\x82\xB3\x82\xF1", 1, 0},
+    {/*"ブタ門番"*/"\x83\x75\x83\x5E\x96\xE5\x94\xD4", 3, 1},
+    {/*"ブタ村人Ｉ"*/"\x83\x75\x83\x5E\x91\xBA\x90\x6C\x82\x68", 5, 1},
+    {/*"ブタ村人Ｊ"*/"\x83\x75\x83\x5E\x91\xBA\x90\x6C\x82\x69", 4, 1},
+    {/*"ブタ３人娘Ａ"*/"\x83\x75\x83\x5E\x82\x52\x90\x6C\x96\xBA\x82\x60", 4, 1},
+    {/*"ブタ３人娘Ｂ"*/"\x83\x75\x83\x5E\x82\x52\x90\x6C\x96\xBA\x82\x61", 4, 1},
+    {/*"ブタ３人娘Ｃ"*/"\x83\x75\x83\x5E\x82\x52\x90\x6C\x96\xBA\x82\x62", 4, 1},
 };
 
 __declspec(section ".data") EVT_BEGIN(evt_roll_get)
@@ -2920,7 +3213,7 @@ __declspec(section ".data") EVT_BEGIN(evt_roll_get)
 EVT_END()
 
 static __declspec(section ".data") s32 key_tbl[] = {
-    35, -1,
+    ITEM_BLACK_KEY_0x23, -1,
 };
 
 static EVT_BEGIN(evt_majin)
@@ -3164,11 +3457,12 @@ static EVT_BEGIN(evt_ki_3)
     RETURN
 EVT_END()
 
-static s32 tree_tbl[] = {
-    2, (s32)"A_ki_1", (s32)"S_usu01_ki01", 0, 0, (s32)evt_ki_1, 2, (s32)"A_ki_2",
-    (s32)"S_usu01_ki02", 0, 0, (s32)evt_ki_2, 2, (s32)"A_ki_3", (s32)"S_usu01_ki03", 0,
-    0, (s32)evt_ki_3, 2, (s32)"A_ki_4", (s32)"S_usu01_ki05", 0, 0, 0,
-    7, 0, 0, 0, 0, 0,
+static TreeAccess tree_tbl[] = {
+    {2, "A_ki_1", "S_usu01_ki01", NULL, 0, evt_ki_1},
+    {2, "A_ki_2", "S_usu01_ki02", NULL, 0, evt_ki_2},
+    {2, "A_ki_3", "S_usu01_ki03", NULL, 0, evt_ki_3},
+    {2, "A_ki_4", "S_usu01_ki05", NULL, 0, NULL},
+    {7, NULL, NULL, NULL, 0, NULL},
 };
 
 __declspec(section ".data") EVT_BEGIN(usu_01_tree_init)
@@ -3212,11 +3506,11 @@ EVT_BEGIN(usu_01_init_evt)
         ELSE
         CALL(evt_run_case_evt, 9, 1, STRING("A_usu01_ie2_door3"), 0, PTR(evt_ie2_door2_1), 0)
     END_IF
-    SET_VALUE(LW(0), PTR(door_1))
+    SET_VALUE(LW(0), PTR(&door_1))
     CALL_CHILD(PTR(evt_door_entry))
-    SET_VALUE(LW(0), PTR(door_2_1))
+    SET_VALUE(LW(0), PTR(&door_2_1))
     CALL_CHILD(PTR(evt_door_entry))
-    SET_VALUE(LW(0), PTR(door_3))
+    SET_VALUE(LW(0), PTR(&door_3))
     CALL_CHILD(PTR(evt_door_entry))
     CALL(evt_run_case_evt, 9, 1, STRING("A_usu01_ie2_door3_u"), 0, PTR(evt_ie2_door2_2), 0)
     SPAWN_EVENT(PTR(evt_monban_look))
@@ -3228,13 +3522,13 @@ EVT_BEGIN(usu_01_init_evt)
     SPAWN_EVENT_GET_ID(PTR(usu01_gusun), GW(4))
     IF_INT_GREATER_OR_EQUAL(GSW(0), 185)
         IF_INT_LESS(GSW(0), 200)
-            CALL(set_fook_evt, PTR(shopper_data), PTR(shopper_talk1))
+            CALL(set_fook_evt, PTR(&shopper_data), PTR(shopper_talk1))
             ELSE
             IF_INT_LESS(GSW(0), 213)
-                CALL(set_fook_evt, PTR(shopper_data), PTR(shopper_talk2))
+                CALL(set_fook_evt, PTR(&shopper_data), PTR(shopper_talk2))
             END_IF
         END_IF
-        CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(shopper_data), PTR(trade_list))
+        CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(&shopper_data), PTR(trade_list))
     END_IF
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("mi02_S_items"), 16384)
     SET_VALUE(GW(0), 0)

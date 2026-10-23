@@ -29,7 +29,7 @@ typedef struct PowerGaugeWork {
     s32 endTimer;  // 0x18
 } PowerGaugeWork;
 
-#define PG_WORK(ac) ((PowerGaugeWork*)((u8*)(ac) + 0x2BC))
+#define PG_WORK(ac) ((PowerGaugeWork*)(ac)->work)
 #define ACW(ac, T, off) (*(T*)((u8*)(ac) + (off)))
 
 #define ICONGX ((void (*)(Vec*, s32, s32, f32))iconDispGx)
@@ -39,7 +39,7 @@ s32 battleAcMain_PowerGauge(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     PowerGaugeWork* pw = PG_WORK(ac);
     BOOL isAuto = FALSE;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
 
     if (ac->mAcUnit->badgesEquipped.AutoCommand) {
         isAuto = TRUE;
@@ -50,17 +50,17 @@ s32 battleAcMain_PowerGauge(BattleWork* work) {
             memset(disp, 0, 0x2C);
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            *(s32*)&disp->field_0x1C[4] = 20;
-            ACW(disp, f32, 0x28) = 0.0f;
-            *(GXColor*)&disp->field_0x0[0xC] = (GXColor){255, 255, 255, 255};
+            disp->unk20 = 20;
+            disp->unk28 = 0.0f;
+            disp->unkC = (GXColor){255, 255, 255, 255};
             pw->frame = 0;
             pw->frame2 = 0;
             ac->outputParams[0] = 0;
             ac->mAcState = 99;
             ac->result = 1;
-            pw->maxFrames = ACW(ac, s32, 0x3C) + ACW(ac, s32, 0x40);
+            pw->maxFrames = ac->params[1] + ac->params[2];
             pw->gauge = 0.0f;
-            switch (ACW(ac, s32, 0x38)) {
+            switch (ac->params[0]) {
                 case 0:
                     pw->mode = 1;
                     pw->button = 0x60;
@@ -166,8 +166,8 @@ s32 battleAcMain_PowerGauge(BattleWork* work) {
                 ac->mAcState = 1003;
                 break;
             }
-            if (pw->frame <= ACW(ac, s32, 0x3C)) {
-                pw->gauge = ((f32(*)(s32, f32, f32, s32, s32))intplGetValue)(ACW(ac, s32, 0x44), 0.0f, 100.0f, pw->frame2, ACW(ac, s32, 0x3C));
+            if (pw->frame <= ac->params[1]) {
+                pw->gauge = ((f32(*)(s32, f32, f32, s32, s32))intplGetValue)(ac->params[3], 0.0f, 100.0f, pw->frame2, ac->params[1]);
 #ifdef VERSION_G8ME01
                 if (pw->gauge > 100.0f) {
                     pw->gauge = 100.0f;
@@ -178,14 +178,14 @@ s32 battleAcMain_PowerGauge(BattleWork* work) {
             }
             BattleAcGaugeSeUpdate(pw->gauge);
             if (isAuto) {
-                if (pw->gauge >= (f32)ACW(ac, s32, 0x48)) {
+                if (pw->gauge >= (f32)ac->params[4]) {
                     pw->phase = 2;
                 } else {
                     pw->phase = 1;
                 }
             }
             if (pw->phase == 2) {
-                if (pw->gauge < (f32)ACW(ac, s32, 0x48)) {
+                if (pw->gauge < (f32)ac->params[4]) {
                     ac->result = 0;
                     ac->result &= ~2;
                 } else {
@@ -240,29 +240,29 @@ s32 battleAcResult_PowerGauge(BattleWork* work) {
 
 void battleAcDisp_PowerGauge(CameraId cameraId, BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
     switch (ac->mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[4], 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
         case 100:
         case 1000:
         case 1001:
         case 1003:
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] > 0) {
-                (*(s32*)&disp->field_0x1C[4])--;
+            if (disp->unk20 > 0) {
+                disp->unk20--;
             }
             break;
         case 1004:
         case 1005:
-            if (*(s32*)&disp->field_0x1C[4] >= 40) {
-                disp->iconX = intplGetValue(4, *(s32*)&disp->field_0x1C[4] - 40, 20, 30.0f, -300.0f);
+            if (disp->unk20 >= 40) {
+                disp->iconX = intplGetValue(4, disp->unk20 - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] < 60) {
-                (*(s32*)&disp->field_0x1C[4])++;
+            if (disp->unk20 < 60) {
+                disp->unk20++;
             }
             break;
     }
@@ -279,7 +279,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     BattleActions* ac = &work->actionCommands;
     PowerGaugeWork* pw;
     s32 a, b, c, d;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
     f32 ratio;
     u32 flags;
 
@@ -289,23 +289,23 @@ static void actionCommandDisp(f32 x, f32 y) {
     if (ratio > 1.0f) {
         ratio = 1.0f;
     }
-    ACW(disp, f32, 0x28) = ratio;
+    disp->unk28 = ratio;
 
     if (ac->acFlags & 2) {
         BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ratio, 1, 100, 100, 100, 0);
     } else {
-        BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ratio, 2, ACW(ac, s32, 0x48), 100, 100, 0);
+        BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ratio, 2, ac->params[4], 100, 100, 0);
     }
 
     flags = ac->acFlags;
     if (!(flags & 4)) {
         Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -288.0f + x + (f32)(ACW(ac, s32, 0x48) * 0xB0) / 100.0f;
+        pos.x = -288.0f + x + (f32)(ac->params[4] * 0xB0) / 100.0f;
         pos.y = 45.0f + y;
         ICONGX(&pos, 0x10, ICON_096, 1.0f);
     } else {
         s32 icon;
-        if (pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) {
+        if (pw->gauge >= (f32)ac->params[4] && pw->gauge <= 100.0f) {
             icon = ICON_095;
         } else {
             icon = ICON_091;
@@ -323,7 +323,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         }
     }
 
-    switch (ACW(ac, s32, 0x38)) {
+    switch (ac->params[0]) {
         case 0:
             a = ICON_07F;
             b = ICON_07E;
@@ -378,8 +378,8 @@ static void actionCommandDisp(f32 x, f32 y) {
             break;
         case 1000:
         case 1001:
-            if (ACW(pw, s8, 0x12)) {
-                if (pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) {
+            if (pw->mode) {
+                if (pw->gauge >= (f32)ac->params[4] && pw->gauge <= 100.0f) {
                     if ((u16)c) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
                         f32 px = -225.0f + x;
@@ -421,7 +421,7 @@ static void actionCommandDisp(f32 x, f32 y) {
                     }
                 }
             } else {
-                if ((pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) || (s32)ac->outputParams[0] == 0) {
+                if ((pw->gauge >= (f32)ac->params[4] && pw->gauge <= 100.0f) || (s32)ac->outputParams[0] == 0) {
                     if ((u16)c) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
                         f32 px = -225.0f + x;

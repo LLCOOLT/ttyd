@@ -1,6 +1,8 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "kpa.h"
+#include "evt/evt_npc.h"
+#include "kpa_stage_data.h"
 
 #pragma force_active on
 
@@ -17,85 +19,64 @@ USER_FUNC(evt_snd_envoff);
 USER_FUNC(evt_sub_get_system_flag);
 USER_FUNC(kpa_status_init);
 
-__declspec(section ".data") u64 fd_kpa_04_negone_one_374;
-__declspec(section ".data") s32 fd_kpa_04_neg_one_382[1];
-__declspec(section ".data") s32 fd_kpa_04___local_PI_383[1];
-__declspec(section ".data") s32 fd_kpa_04___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_kpa_04_one_negone_373;
-__declspec(section ".data") s32 fd_kpa_04___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_kpa_04_one_381[1];
-__declspec(section ".data") u64 fd_kpa_04_negone_one_360;
-__declspec(section ".data") s32 fd_kpa_04_neg_one_365[1];
-__declspec(section ".data") s32 fd_kpa_04___local_PI_366[1];
-__declspec(section ".data") s32 fd_kpa_04___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_kpa_04_one_negone_359;
-__declspec(section ".data") s32 fd_kpa_04___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_kpa_04_one_364[1];
+__declspec(section ".data") f32 fd_kpa_04_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_04_neg_one_382;
+__declspec(section ".data") f32 fd_kpa_04___local_PI_383;
+__declspec(section ".data") f32 fd_kpa_04___local_3PIO2_385;
+__declspec(section ".data") f32 fd_kpa_04_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_04___local_PIO2_384;
+__declspec(section ".data") f32 fd_kpa_04_one_381;
+__declspec(section ".data") f32 fd_kpa_04_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_04_neg_one_365;
+__declspec(section ".data") f32 fd_kpa_04___local_PI_366;
+__declspec(section ".data") f32 fd_kpa_04___local_3PIO2_368;
+__declspec(section ".data") f32 fd_kpa_04_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_04___local_PIO2_367;
+__declspec(section ".data") f32 fd_kpa_04_one_364;
 static s32 kpa_act_stg2_mobj[80];
 static s32 kpa_fall[41];
 static s32 kpa_goal[22];
-static s32 npcEnt[23];
+static NpcSetupInfo npcEnt[1];
 s32 kpa_04_init_evt[58];
 
-__declspec(section ".data") u64 fd_kpa_04_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_kpa_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_kpa_04_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_kpa_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_kpa_04___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_kpa_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_kpa_04___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_kpa_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_kpa_04_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_kpa_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_kpa_04___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_kpa_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_kpa_04_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_kpa_04_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_kpa_04_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_kpa_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_kpa_04_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_kpa_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_kpa_04___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_kpa_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_kpa_04___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_kpa_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_kpa_04_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_kpa_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_kpa_04___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_kpa_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_kpa_04_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_kpa_04_one_364 = 1.0f;
 
 static s32 kpa_act_stg2_mobj[] = {
-    9, -230230400, -230000000, 4, -230179200, -230051200, 4, -230179200,
-    -230000000, 4, -230128000, -230051200, 4, -230128000, -230000000, 4,
-    -230128000, -229948800, 4, -230076800, -230000000, 4, -230076800, -229948800,
-    4, -230076800, -229897600, 4, -230025600, -230000000, 4, -230025600,
-    -229948800, 4, -230025600, -229897600, 4, -230025600, -229846400, 4,
-    -229974400, -230051200, 4, -229974400, -230000000, 4, -229974400, -229948800,
-    4, -229974400, -229897600, 4, -229974400, -229846400, 4, -229974400,
-    -229795200, 4, -229923200, -230051200, 4, -229923200, -230000000, 4,
-    -229923200, -229948800, 4, -229923200, -229897600, 4, -229923200, -229846400,
-    4, -229923200, -229795200, 15, -229731200, -230000000, (s32)kpa_goal, -1,
+    KPA_OBJ_DOKAN_0(-225.0f, 0.0f), KPA_OBJ_BRICK_2(-175.0f, -50.0f), KPA_OBJ_BRICK_2(-175.0f, 0.0f),
+    KPA_OBJ_BRICK_2(-125.0f, -50.0f), KPA_OBJ_BRICK_2(-125.0f, 0.0f), KPA_OBJ_BRICK_2(-125.0f, 50.0f),
+    KPA_OBJ_BRICK_2(-75.0f, 0.0f), KPA_OBJ_BRICK_2(-75.0f, 50.0f), KPA_OBJ_BRICK_2(-75.0f, 100.0f),
+    KPA_OBJ_BRICK_2(-25.0f, 0.0f), KPA_OBJ_BRICK_2(-25.0f, 50.0f), KPA_OBJ_BRICK_2(-25.0f, 100.0f),
+    KPA_OBJ_BRICK_2(-25.0f, 150.0f), KPA_OBJ_BRICK_2(25.0f, -50.0f), KPA_OBJ_BRICK_2(25.0f, 0.0f),
+    KPA_OBJ_BRICK_2(25.0f, 50.0f), KPA_OBJ_BRICK_2(25.0f, 100.0f), KPA_OBJ_BRICK_2(25.0f, 150.0f),
+    KPA_OBJ_BRICK_2(25.0f, 200.0f), KPA_OBJ_BRICK_2(75.0f, -50.0f), KPA_OBJ_BRICK_2(75.0f, 0.0f),
+    KPA_OBJ_BRICK_2(75.0f, 50.0f), KPA_OBJ_BRICK_2(75.0f, 100.0f), KPA_OBJ_BRICK_2(75.0f, 150.0f),
+    KPA_OBJ_BRICK_2(75.0f, 200.0f), KPA_OBJ_POLE(262.5f, 0.0f, kpa_goal), KPA_OBJ_END,
 };
 
 static EVT_BEGIN(kpa_fall)
@@ -132,10 +113,8 @@ static EVT_BEGIN(kpa_goal)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {0},
 };
 
 EVT_BEGIN(kpa_04_init_evt)

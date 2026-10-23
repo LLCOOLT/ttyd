@@ -1,3 +1,4 @@
+#include "data_tables.h"
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -77,21 +78,21 @@ USER_FUNC(evt_sub_random);
 USER_FUNC(mario_set_dir);
 static void callback(s32 type, void** work);
 
-__declspec(section ".data") u64 fd_hei_07_negone_one_374;
-__declspec(section ".data") s32 fd_hei_07_neg_one_382[1];
-__declspec(section ".data") s32 fd_hei_07___local_PI_383[1];
-__declspec(section ".data") s32 fd_hei_07___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_hei_07_one_negone_373;
-__declspec(section ".data") s32 fd_hei_07___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_hei_07_one_381[1];
-__declspec(section ".data") u64 fd_hei_07_negone_one_360;
-__declspec(section ".data") s32 fd_hei_07_neg_one_365[1];
-__declspec(section ".data") s32 fd_hei_07___local_PI_366[1];
-__declspec(section ".data") s32 fd_hei_07___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_hei_07_one_negone_359;
-__declspec(section ".data") s32 fd_hei_07___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_hei_07_one_364[1];
-static s32 bero_entry_data[45];
+__declspec(section ".data") f32 fd_hei_07_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_07_neg_one_382;
+__declspec(section ".data") f32 fd_hei_07___local_PI_383;
+__declspec(section ".data") f32 fd_hei_07___local_3PIO2_385;
+__declspec(section ".data") f32 fd_hei_07_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_07___local_PIO2_384;
+__declspec(section ".data") f32 fd_hei_07_one_381;
+__declspec(section ".data") f32 fd_hei_07_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_07_neg_one_365;
+__declspec(section ".data") f32 fd_hei_07___local_PI_366;
+__declspec(section ".data") f32 fd_hei_07___local_3PIO2_368;
+__declspec(section ".data") f32 fd_hei_07_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hei_07___local_PIO2_367;
+__declspec(section ".data") f32 fd_hei_07_one_364;
+static BeroEntry bero_entry_data[3];
 static s32 npc_jump[53];
 __declspec(section ".data") s32 dokan_shake[8];
 s32 dokan_shake2[20];
@@ -107,65 +108,73 @@ static __declspec(section ".data") s32 evt_up_snd_[12];
 static s32 evt_up_snd__[76];
 s32 offscreen_to_quiz[101];
 static s32 offscreen_to_normal[100];
-s32 quiz_data[32];
+QuizEntry quiz_data[8];
 s32 a_sekizou_1[1018];
 s32 hei_07_init_evt[114];
 
-__declspec(section ".data") u64 fd_hei_07_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hei_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hei_07_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_hei_07_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_hei_07___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_hei_07___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_hei_07___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_hei_07___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_hei_07_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_hei_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_hei_07___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_hei_07___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_hei_07_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_hei_07_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_hei_07_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hei_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hei_07_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_hei_07_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_hei_07___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_hei_07___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_hei_07___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_hei_07___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_hei_07_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_hei_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_hei_07___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_hei_07___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_hei_07_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_hei_07_one_364 = 1.0f;
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"hei_06", (s32)"e_bero", 65537, 0, 0, (s32)"dokan",
-    131072, 9, 100000, 0, 0, -1, 0, 6,
-    0, (s32)"hei_10", (s32)"dokan", 65537, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"hei_06", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "dokan", // hitName
+        2, // type
+        0, // sfxId
+        9, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        6, // caseType
+        NULL, // exitEvent
+        (s32)"hei_10", // nextMapName
+        "dokan", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(npc_jump)
@@ -460,11 +469,15 @@ static EVT_BEGIN(offscreen_to_normal)
     RETURN
 EVT_END()
 
-s32 quiz_data[] = {
-    (s32)"anm_1mon", (s32)"stg1_hei_23", (s32)"stg1_hei_q_01", 0, (s32)"anm_2mon", (s32)"stg1_hei_24", (s32)"stg1_hei_q_02", 2,
-    (s32)"anm_3mon", (s32)"stg1_hei_25", (s32)"stg1_hei_q_03", 3, (s32)"anm_4mon", (s32)"stg1_hei_26", (s32)"stg1_hei_q_04", 1,
-    (s32)"anm_5mon", (s32)"stg1_hei_27", (s32)"stg1_hei_q_05", 2, (s32)"anm_6mon", (s32)"stg1_hei_28", (s32)"stg1_hei_q_06", 0,
-    (s32)"anm_7mon", (s32)"stg1_hei_29", (s32)"stg1_hei_q_07", 1, (s32)"anm_8mon", (s32)"stg1_hei_30", (s32)"stg1_hei_q_08", 0,
+QuizEntry quiz_data[] = {
+    {"anm_1mon", "stg1_hei_23", "stg1_hei_q_01", 0},
+    {"anm_2mon", "stg1_hei_24", "stg1_hei_q_02", 2},
+    {"anm_3mon", "stg1_hei_25", "stg1_hei_q_03", 3},
+    {"anm_4mon", "stg1_hei_26", "stg1_hei_q_04", 1},
+    {"anm_5mon", "stg1_hei_27", "stg1_hei_q_05", 2},
+    {"anm_6mon", "stg1_hei_28", "stg1_hei_q_06", 0},
+    {"anm_7mon", "stg1_hei_29", "stg1_hei_q_07", 1},
+    {"anm_8mon", "stg1_hei_30", "stg1_hei_q_08", 0},
 };
 
 EVT_BEGIN(a_sekizou_1)
@@ -556,7 +569,7 @@ EVT_BEGIN(a_sekizou_1)
         SET_VALUE(LF(1), 0)
         SET_VALUE(LW(14), 0)
         SET_VALUE(LW(15), 0)
-        SET_INT_READ_ADDR(PTR(quiz_data))
+        SET_INT_READ_ADDR(PTR(&quiz_data))
         SET_VALUE(LW(0), LW(11))
         LABEL(10)
         READ_INT4(LW(5), LW(6), LW(7), LW(8))

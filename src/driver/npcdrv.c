@@ -2138,7 +2138,7 @@ void fbatBattleMode(void) {
             data->target->interruptFlags &= 0xF00;
             evtStopID(data->target->regularEvtId);
             info = &data->info;
-            if (!(cur->battleInfo.field_4 & 0x10000000)) {
+            if (!(cur->battleInfo.battleFlags & 0x10000000)) {
                 if (pouchEquipCheckBadge(0x142) && NPC_ENEMY_LEVEL(cur) < pouch->level) {
                     skip = TRUE;
                     win = TRUE;
@@ -2275,7 +2275,7 @@ void fbatBattleMode(void) {
                     if (pouchEquipCheckBadge(0x139)) {
                         mult += pouchEquipCheckBadge(0x139);
                     }
-                    if (cur->battleInfo.field_4 & 0x100) {
+                    if (cur->battleInfo.battleFlags & 0x100) {
                         mult++;
                     }
                 apply:
@@ -2300,7 +2300,7 @@ void fbatBattleMode(void) {
                     }
                     cur->interruptFlags |= 0x10000000;
                     marioSetMutekiTime(3000);
-                    *(s16*)((u8*)mario + MWOFF(0x2C0)) = sysMsec2Frame(3000);
+                    mario->coinDropTimer = sysMsec2Frame(3000);
                     if (cur->flags & 0x200) {
                         animPoseSetAnim(cur->poseId, cur->currentAnim, 1);
                     }
@@ -2484,7 +2484,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
                         if (marioGetJabaraState() == 6) {
                             res.kind = 0x20000;
                             if (!soft) fbatSetAttackAnnounce(0x20000);
-                        } else if (FH(mario, 0x2E, u16) == 0x10) {
+                        } else if (mario->currMotionId == 0x10) {
                             res.kind = 0x40000;
                             if (!soft) fbatSetAttackAnnounce(0x40000);
                         } else {
@@ -2513,12 +2513,12 @@ void* fbatHitCheck(u32 flags, void* a1) {
                 f32 c2, s2, c1, s1;
                 f32 x, y, z;
                 f32 r, angle;
-                if (FH(mario, 0x2E, u16) != 0x12) break;
+                if (mario->currMotionId != 0x12) break;
                 r = 1.5f * mario->wPlayerCollisionBox.x;
                 angle = reviseAngle(mario->displayDirection - 90.0f + FH(camGetPtr(CAMERA_3D), 0x114, f32));
                 m = marioGetPtr();
                 animPoseGetAnimPosePtr(m->paperAnimGroupId[marioAnimeId()]);
-                v = FH(m, 0x48, s32);
+                v = (s32)m->multiTimer;
                 if (v > 20) v = 10;
                 f = v;
                 m = marioGetPtr();
@@ -2570,7 +2570,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
                 f32 angle, r;
                 MarioWork* m;
                 f32 c, s, x, y, z;
-                if (FH(mario, 0x2E, u16) != 0x13) break;
+                if (mario->currMotionId != 0x13) break;
                 angle = marioGetAngleKaitenHammer();
                 if (angle < 0.0f) break;
                 r = 1.5f * mario->wPlayerCollisionBox.x;
@@ -2620,7 +2620,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
             if (b) {
                 s32 st;
                 if (party == NULL) break;
-                if (FH(party, 0x33, u8) != 2) break;
+                if (party->memberKind != 2) break;
                 if (!(party->flags & 0x100)) break;
                 st = nokonokoGetStatus(party);
                 if (st < 2 || st > 5) break;
@@ -2652,7 +2652,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
             if (!fbat_canHit(npc)) break;
             if (!(flags & 1)) break;
             if (party == NULL) break;
-            if (FH(party, 0x33, u8) != 3) break;
+            if (party->memberKind != 3) break;
             if (!FH(gp->fbatData, 0x54D, u8)) break;
             npc = wp->entries;
             flags &= 0x1000;
@@ -2816,12 +2816,12 @@ void npcSetupBattleInfo(NpcEntry* npc, NpcSetupBattleInfo* setup) {
             case 2:
                 break;
         }
-        info->field_4 = setup->field_18;
+        info->battleFlags = setup->battleFlags;
         info->fixedItem = setup->fixedItem;
         info->itemDropped = 0;
         info->heartsDropped = 0;
         info->flowersDropped = 0;
-        info->field_C0 = setup->field_40;
+        info->field_C0 = (s32)setup->bgmName;
         if (setup->swFlag >= -EVTDAT_GSWF_BASE && setup->swFlag <= EVTDAT_GSWF_MAX) {
             if (swGet(setup->swFlag + EVTDAT_GSWF_BASE)) {
                 select = setup->altSelect;
@@ -3215,7 +3215,7 @@ void npcKoopaModeMain(void) {
     if (*((s8*)mario + 0x3c) == 2) fire = kpaFireAttackCheck();
     if (jump) {
         if (*(s32*)(fb2 + 0x57c) > 0 && *(s32*)(fb2 + 0x578) >= 2) {
-            Vec pos = *(Vec*)((u8*)mario + 0x8c);
+            Vec pos = mario->position;
             pos.y += 60.0f;
             kpaAddScorePos(*(s32*)(fb2 + 0x57c), &pos);
         }

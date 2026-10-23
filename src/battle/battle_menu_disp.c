@@ -133,7 +133,7 @@ void SelectedItemCoordinateColorUpDate(void) {
 }
 
 BOOL BattleMenuKeyOKInACT(BattleWork* wp) {
-    if (!wp->commandMenu.unk540[0x18] && !WP_SUBMENU(wp)->field_14) {
+    if (!wp->commandMenu.unk558 && !WP_SUBMENU(wp)->field_14) {
         return FALSE;
     }
     return TRUE;
@@ -155,7 +155,7 @@ void GetRingCenter(Vec* out) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit = BattleGetUnitPtr(wp, wp->activeUnitId);
 
-    btlGetScreenPoint((Vec*)((u8*)unit + 0x3C), out);
+    btlGetScreenPoint(&unit->mPosition, out);
     out->x += 22.5f;
     out->y += 105.0f;
     out->z = 0.0f;
@@ -636,14 +636,14 @@ void DrawMenuPartyChangeButton(void) {
             } else {
                 menu->field_120 = 0.0f;
             }
-            btlGetScreenPoint((Vec*)((u8*)mario + 0x3C), &p);
+            btlGetScreenPoint(&mario->mPosition, &p);
             DrawMenuPartyChangeButton_Sub(5, p.x, p.y - 20.0f, menu->field_120);
         } else {
             menu->field_120 = 90.0f;
         }
     } else {
-        btlGetScreenPoint((Vec*)((u8*)mario + 0x3C), &p);
-        btlGetScreenPoint((Vec*)((u8*)party + 0x3C), &q);
+        btlGetScreenPoint(&mario->mPosition, &p);
+        btlGetScreenPoint(&party->mPosition, &q);
         x = (p.x + q.x) / 2.0f;
         y = p.y;
         BattleAudience_GetItemOn(&id, &ix, &iy, &iz, NULL);
@@ -720,7 +720,7 @@ void N_DrawMenuMarioPinchMark(void) {
         }
         TEXGetGXTexObjFromPalette(*wp->menuTex->data, &texobj, id);
         GXLoadTexObj(&texobj, GX_TEXMAP0);
-        btlGetScreenPoint((Vec*)((u8*)unit + 0x3C), &p);
+        btlGetScreenPoint(&unit->mPosition, &p);
         if (unit->mPosition.x > -120.0f) {
             PSMTXTrans(m, p.x - 20.0f, 60.0f + p.y, 20.0f);
         } else {
@@ -776,7 +776,7 @@ void N_DrawMenuPartyPinchMark(void) {
         }
         TEXGetGXTexObjFromPalette(*wp->menuTex->data, &texobj, id);
         GXLoadTexObj(&texobj, GX_TEXMAP0);
-        btlGetScreenPoint((Vec*)((u8*)unit + 0x3C), &p);
+        btlGetScreenPoint(&unit->mPosition, &p);
         if (unit->mPosition.x > -120.0f) {
             PSMTXTrans(m, p.x - 20.0f, 60.0f + p.y, 10.0f);
         } else {
@@ -795,7 +795,7 @@ void N_DrawMenuPartyPinchMark(void) {
 void DrawMenuPinchMark(void) {
     BattleUnit* unit = BattleGetMarioPtr(_battleWorkPointer);
     btlDispGXInit2D();
-    if (((Vec*)((u8*)unit + 0x3C))->x > -120.0f) {
+    if (unit->mPosition.x > -120.0f) {
         N_DrawMenuPartyPinchMark();
         N_DrawMenuMarioPinchMark();
     } else {
@@ -845,7 +845,7 @@ void DrawMenuPinchMark(void) {
         }
         TEXGetGXTexObjFromPalette(*wp->menuTex->data, &texobj, id);
         GXLoadTexObj(&texobj, GX_TEXMAP0);
-        btlGetScreenPoint((Vec*)((u8*)unit + 0x3C), &p);
+        btlGetScreenPoint(&unit->mPosition, &p);
         PSMTXTrans(m, p.x - 20.0f, 60.0f + p.y, 0.0f);
         PSMTXConcat(cam->view, m, out);
         GXLoadPosMtxImm(out, 0);
@@ -875,7 +875,7 @@ void DrawMenuPinchMark(void) {
         }
         TEXGetGXTexObjFromPalette(*wp->menuTex->data, &texobj, id);
         GXLoadTexObj(&texobj, GX_TEXMAP0);
-        btlGetScreenPoint((Vec*)((u8*)unit + 0x3C), &q);
+        btlGetScreenPoint(&unit->mPosition, &q);
         PSMTXTrans(m, q.x - 20.0f, 60.0f + q.y, 0.0f);
         PSMTXConcat(cam->view, m, out);
         GXLoadPosMtxImm(out, 0);

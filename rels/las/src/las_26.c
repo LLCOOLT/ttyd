@@ -4,6 +4,7 @@
 #pragma force_active on
 #include "driver/npcdrv.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_npc.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(bonbaba_wait_landon);
@@ -92,78 +93,58 @@ USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
 
-__declspec(section ".data") u64 fd_las_26_negone_one_374;
-__declspec(section ".data") s32 fd_las_26_neg_one_382[1];
-__declspec(section ".data") s32 fd_las_26___local_PI_383[1];
-__declspec(section ".data") s32 fd_las_26___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_las_26_one_negone_373;
-__declspec(section ".data") s32 fd_las_26___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_las_26_one_381[1];
-__declspec(section ".data") u64 fd_las_26_negone_one_360;
-__declspec(section ".data") s32 fd_las_26_neg_one_365[1];
-__declspec(section ".data") s32 fd_las_26___local_PI_366[1];
-__declspec(section ".data") s32 fd_las_26___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_las_26_one_negone_359;
-__declspec(section ".data") s32 fd_las_26___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_las_26_one_364[1];
+__declspec(section ".data") f32 fd_las_26_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_26_neg_one_382;
+__declspec(section ".data") f32 fd_las_26___local_PI_383;
+__declspec(section ".data") f32 fd_las_26___local_3PIO2_385;
+__declspec(section ".data") f32 fd_las_26_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_26___local_PIO2_384;
+__declspec(section ".data") f32 fd_las_26_one_381;
+__declspec(section ".data") f32 fd_las_26_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_26_neg_one_365;
+__declspec(section ".data") f32 fd_las_26___local_PI_366;
+__declspec(section ".data") f32 fd_las_26___local_3PIO2_368;
+__declspec(section ".data") f32 fd_las_26_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_26___local_PIO2_367;
+__declspec(section ".data") f32 fd_las_26_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 static s32 box_evt[30];
 s32 bonbaba_evt[819];
 s32 bonbaba_init[62];
-static s32 npcEnt[46];
+static NpcSetupInfo npcEnt[2];
 static s32 sekai_yami_evt[118];
 s32 bomb_wall[155];
 s32 las_26_init_evt[194];
 
-__declspec(section ".data") u64 fd_las_26_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_26_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_26_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_26_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_26___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_26___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_26___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_26___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_26_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_26_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_26___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_26___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_26_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_26_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_las_26_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_26_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_26_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_26_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_26___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_26___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_26___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_26___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_26_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_26_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_26___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_26___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_26_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_26_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -181,13 +162,39 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65542, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"las_25", (s32)"e_bero_1", 327685, (s32)w_door_close, (s32)w_door_open, (s32)"s_bero",
-    251658240, 20000, 100000, 0, 0, -1, 0, 0,
-    0, (s32)"las_28", (s32)"from26", 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_25", // nextMapName
+        "e_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {
+        "s_bero", // hitName
+        3840, // type
+        0, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, 0, NULL, // enterEvent..exitEvent
+        (s32)"las_28", // nextMapName
+        "from26", // nextBeroName
+        0, 0, 0, 0, // enterAnimeType..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(box_evt)
@@ -432,13 +439,18 @@ USER_FUNC(bonbaba_wait_landon) {
     return npcNameToPtr("\x83\x7B\x83\x93\x83\x6F\x83\x6F")->field_0x300 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
-static s32 npcEnt[] = {
-    (s32)/*"ボンババ"*/"\x83\x7B\x83\x93\x83\x6F\x83\x6F", 33555008, 0, (s32)bonbaba_init, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"ボンババ"*/"\x83\x7B\x83\x93\x83\x6F\x83\x6F", // name
+        0x2000240, // flags
+        0, // reactionFlags
+        bonbaba_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static EVT_BEGIN(sekai_yami_evt)

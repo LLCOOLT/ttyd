@@ -1337,7 +1337,7 @@ void winBookGX(WinBookWork* w, s32 a, f32 x, f32 y) {
                         luigi_book_list[w->bookIdx][w->bookPage * 2]);
         winFontSetLabel((Vec){220.0f + lx, y - 14.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, (GXColor){0x00, 0x00, 0x00, 0xFF},
                         luigi_book_list[w->bookIdx][w->bookPage * 2 + 1]);
-        pose = *(s32*)((u8*)L_msgGetWork() + 0x20);
+        pose = ((MessageWork*)L_msgGetWork())->poseId;
         anim = animPoseGetAnimDataPtr(pose);
         if (w->bookPage < w->bookPages - 1) {
             animPoseSetAnim(pose, "HOS_C_1", 0);

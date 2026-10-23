@@ -80,22 +80,22 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-__declspec(section ".data") u64 fd_rsh_negone_one_374;
-__declspec(section ".data") s32 fd_rsh_neg_one_382[1];
-__declspec(section ".data") s32 fd_rsh___local_PI_383[1];
-__declspec(section ".data") s32 fd_rsh___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_rsh_one_negone_373;
-__declspec(section ".data") s32 fd_rsh___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_rsh_one_381[1];
-__declspec(section ".data") u64 fd_rsh_negone_one_360;
-__declspec(section ".data") s32 fd_rsh_neg_one_365[1];
-__declspec(section ".data") s32 fd_rsh___local_PI_366[1];
-__declspec(section ".data") s32 fd_rsh___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_rsh_one_negone_359;
-__declspec(section ".data") s32 fd_rsh___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_rsh_one_364[1];
-__declspec(section ".data") s32 fd_rsh__three_localstatic4_sqrtf[2];
-__declspec(section ".data") s32 fd_rsh__half_localstatic3_sqrtf[2];
+__declspec(section ".data") f32 fd_rsh_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_neg_one_382;
+__declspec(section ".data") f32 fd_rsh___local_PI_383;
+__declspec(section ".data") f32 fd_rsh___local_3PIO2_385;
+__declspec(section ".data") f32 fd_rsh_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh___local_PIO2_384;
+__declspec(section ".data") f32 fd_rsh_one_381;
+__declspec(section ".data") f32 fd_rsh_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_neg_one_365;
+__declspec(section ".data") f32 fd_rsh___local_PI_366;
+__declspec(section ".data") f32 fd_rsh___local_3PIO2_368;
+__declspec(section ".data") f32 fd_rsh_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh___local_PIO2_367;
+__declspec(section ".data") f32 fd_rsh_one_364;
+__declspec(section ".data") f64 fd_rsh__three_localstatic4_sqrtf;
+__declspec(section ".data") f64 fd_rsh__half_localstatic3_sqrtf;
 s32 simi_check[57];
 s32 simi_offscreen_check[41];
 s32 kami_check[85];
@@ -105,15 +105,15 @@ s32 evt_rsh_door_entry[46];
 s32 evt_rsh_door_open[548];
 s32 evt_rsh_door_close[404];
 s32 evt_rsh_window[30];
-s32 rsh_01_rnd_npc_1[15];
-__declspec(section ".data") s32 rsh_01_rnd_npc_2[9];
-__declspec(section ".data") s32 rsh_01_rnd_npc_3[6];
-s32 rsh_03_rnd_npc_1[39];
-s32 rsh_03_rnd_npc_2[21];
-__declspec(section ".data") s32 rsh_04_rnd_npc_1[6];
-__declspec(section ".data") s32 rsh_04_rnd_npc_2[6];
-__declspec(section ".data") s32 rsh_04_rnd_npc_3[6];
-__declspec(section ".data") s32 rsh_04_rnd_npc_4[12];
+RshRndNpc rsh_01_rnd_npc_1[5];
+__declspec(section ".data") RshRndNpc rsh_01_rnd_npc_2[3];
+__declspec(section ".data") RshRndNpc rsh_01_rnd_npc_3[2];
+RshRndNpc rsh_03_rnd_npc_1[13];
+RshRndNpc rsh_03_rnd_npc_2[7];
+__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_1[2];
+__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_2[2];
+__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_3[2];
+__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_4[4];
 __declspec(section ".data") s32 evt_rsh_rnd_npc_2_1_talk[8];
 s32 evt_rsh_rnd_npc_2_2_talk[16];
 s32 evt_rsh_rnd_npc_2_3_talk[16];
@@ -154,78 +154,54 @@ __declspec(section ".data") s32 evt_rsh_rnd_npc_5_7_talk[8];
 __declspec(section ".data") s32 evt_rsh_rnd_npc_5_8_talk[8];
 __declspec(section ".data") s32 evt_rsh_rnd_npc_5_9_talk[8];
 __declspec(section ".data") s32 evt_rsh_rnd_npc_5_10_talk[8];
-__declspec(section ".data") s32 rsh_01_rnd_npc_1_list[5];
-__declspec(section ".data") s32 rsh_01_rnd_npc_2_list[3];
-__declspec(section ".data") s32 rsh_01_rnd_npc_3_list[2];
-s32 rsh_03_rnd_npc_1_list[13];
-__declspec(section ".data") s32 rsh_03_rnd_npc_2_list[7];
-__declspec(section ".data") s32 rsh_04_rnd_npc_1_list[2];
-__declspec(section ".data") s32 rsh_04_rnd_npc_2_list[2];
-__declspec(section ".data") s32 rsh_04_rnd_npc_3_list[2];
-__declspec(section ".data") s32 rsh_04_rnd_npc_4_list[4];
+__declspec(section ".data") const char* rsh_01_rnd_npc_1_list[5];
+__declspec(section ".data") const char* rsh_01_rnd_npc_2_list[3];
+__declspec(section ".data") const char* rsh_01_rnd_npc_3_list[2];
+const char* rsh_03_rnd_npc_1_list[13];
+__declspec(section ".data") const char* rsh_03_rnd_npc_2_list[7];
+__declspec(section ".data") const char* rsh_04_rnd_npc_1_list[2];
+__declspec(section ".data") const char* rsh_04_rnd_npc_2_list[2];
+__declspec(section ".data") const char* rsh_04_rnd_npc_3_list[2];
+__declspec(section ".data") const char* rsh_04_rnd_npc_4_list[4];
 s32 debug_print_rnd_npc[61];
 s32 evt_rsh_rnd_npc_init[94];
 s32 evt_rsh_01_rnd_npc_entry[137];
-s32 rsh_03_rnd_npc_2_ent[46];
+NpcSetupInfo rsh_03_rnd_npc_2_ent[2];
 s32 evt_rsh_03_rnd_npc_entry[95];
-s32 rsh_04_rnd_npc_3_ent[46];
+NpcSetupInfo rsh_04_rnd_npc_3_ent[2];
 s32 evt_rsh_04_rnd_npc_entry[185];
 
-__declspec(section ".data") u64 fd_rsh_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_rsh_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_rsh_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_rsh_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_rsh___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_rsh___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_rsh___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_rsh___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_rsh_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_rsh_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_rsh___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_rsh___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_rsh_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_rsh_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_rsh_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_rsh_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_rsh_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_rsh_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_rsh___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_rsh___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_rsh___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_rsh___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_rsh_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_rsh_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_rsh___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_rsh___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_rsh_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_rsh_one_364 = 1.0f;
 
-__declspec(section ".data") s32 fd_rsh__three_localstatic4_sqrtf[] = {
-    1074266112, 0,
-};
+__declspec(section ".data") f64 fd_rsh__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") s32 fd_rsh__half_localstatic3_sqrtf[] = {
-    1071644672, 0,
-};
+__declspec(section ".data") f64 fd_rsh__half_localstatic3_sqrtf = 0.5;
 
 EVT_BEGIN(simi_check)
     SET_VALUE(LF(0), 0)
@@ -673,49 +649,71 @@ static const s32 rsh_texmtx_tbl[] = {
     GX_TEXMTX0, GX_TEXMTX1, GX_TEXMTX2, GX_TEXMTX3, GX_TEXMTX4, GX_TEXMTX5, GX_TEXMTX6, GX_TEXMTX7, GX_TEXMTX8, GX_TEXMTX9,
 };
 
-s32 rsh_01_rnd_npc_1[] = {
-    (s32)"c_kinopiko_v", (s32)/*"キノピオ女紫"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x8E\x87", (s32)evt_rsh_rnd_npc_2_1_talk, (s32)"c_kinopio_b", (s32)/*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", (s32)evt_rsh_rnd_npc_2_2_talk, (s32)"c_kinopio_g", (s32)/*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE",
-    (s32)evt_rsh_rnd_npc_2_3_talk, (s32)"c_nokonoko", (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", (s32)evt_rsh_rnd_npc_2_4_talk, (s32)"c_kuribo_n", (s32)/*"NPCクリボー"*/"\x4E\x50\x43\x83\x4E\x83\x8A\x83\x7B\x81\x5B", (s32)evt_rsh_rnd_npc_2_5_talk,
+RshRndNpc rsh_01_rnd_npc_1[] = {
+    {"c_kinopiko_v", /*"キノピオ女紫"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x8E\x87", evt_rsh_rnd_npc_2_1_talk},
+    {"c_kinopio_b", /*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", evt_rsh_rnd_npc_2_2_talk},
+    {"c_kinopio_g", /*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE", evt_rsh_rnd_npc_2_3_talk},
+    {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_2_4_talk},
+    {"c_kuribo_n", /*"NPCクリボー"*/"\x4E\x50\x43\x83\x4E\x83\x8A\x83\x7B\x81\x5B", evt_rsh_rnd_npc_2_5_talk},
 };
 
-__declspec(section ".data") s32 rsh_01_rnd_npc_2[] = {
-    (s32)"c_kinopiko_p", (s32)/*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", (s32)evt_rsh_rnd_npc_2_6_talk, (s32)"c_kinopio_b", (s32)/*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", (s32)evt_rsh_rnd_npc_2_8_talk, (s32)"c_kinopiko", (s32)/*"キノピオ女"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97",
-    (s32)evt_rsh_rnd_npc_2_9_talk,
+__declspec(section ".data") RshRndNpc rsh_01_rnd_npc_2[] = {
+    {"c_kinopiko_p", /*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", evt_rsh_rnd_npc_2_6_talk},
+    {"c_kinopio_b", /*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", evt_rsh_rnd_npc_2_8_talk},
+    {"c_kinopiko", /*"キノピオ女"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97", evt_rsh_rnd_npc_2_9_talk},
 };
 
-__declspec(section ".data") s32 rsh_01_rnd_npc_3[] = {
-    (s32)"c_kokinopio_y", (s32)/*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", (s32)evt_rsh_rnd_npc_2_7_talk, (s32)"c_kokinopio_b", (s32)/*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", (s32)evt_rsh_rnd_npc_2_10_talk,
+__declspec(section ".data") RshRndNpc rsh_01_rnd_npc_3[] = {
+    {"c_kokinopio_y", /*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", evt_rsh_rnd_npc_2_7_talk},
+    {"c_kokinopio_b", /*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", evt_rsh_rnd_npc_2_10_talk},
 };
 
-s32 rsh_03_rnd_npc_1[] = {
-    (s32)"c_kinopio", (s32)/*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", (s32)evt_rsh_rnd_npc_3_1_talk, (s32)"c_kinopiko_p", (s32)/*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", (s32)evt_rsh_rnd_npc_3_2_talk, (s32)"c_kinopiko_v", (s32)/*"キノピオ女紫"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x8E\x87",
-    (s32)evt_rsh_rnd_npc_3_3_talk, (s32)"c_kinopio_b", (s32)/*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", (s32)evt_rsh_rnd_npc_3_4_talk, (s32)"c_kinopiko_p", (s32)/*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", (s32)evt_rsh_rnd_npc_3_5_talk, (s32)"c_kinopiko_v",
-    (s32)/*"キノピオ女紫"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x8E\x87", (s32)evt_rsh_rnd_npc_3_7_talk, (s32)"c_nokonoko", (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", (s32)evt_rsh_rnd_npc_3_8_talk, (s32)"c_yoshi", (s32)/*"ヨッシー大"*/"\x83\x88\x83\x62\x83\x56\x81\x5B\x91\xE5", (s32)evt_rsh_rnd_npc_3_9_talk,
-    (s32)"c_nokonoko", (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", (s32)evt_rsh_rnd_npc_4_1_talk, (s32)"c_yoshi", (s32)/*"ヨッシー大"*/"\x83\x88\x83\x62\x83\x56\x81\x5B\x91\xE5", (s32)evt_rsh_rnd_npc_4_2_talk, (s32)"c_jugem_n", (s32)/*"ＮＰＣジュゲム"*/"\x82\x6D\x82\x6F\x82\x62\x83\x57\x83\x85\x83\x51\x83\x80",
-    (s32)evt_rsh_rnd_npc_4_3_talk, (s32)"c_kinopio_b", (s32)/*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", (s32)evt_rsh_rnd_npc_4_4_talk, (s32)"c_nokonoko", (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", (s32)evt_rsh_rnd_npc_4_5_talk,
+RshRndNpc rsh_03_rnd_npc_1[] = {
+    {"c_kinopio", /*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", evt_rsh_rnd_npc_3_1_talk},
+    {"c_kinopiko_p", /*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", evt_rsh_rnd_npc_3_2_talk},
+    {"c_kinopiko_v", /*"キノピオ女紫"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x8E\x87", evt_rsh_rnd_npc_3_3_talk},
+    {"c_kinopio_b", /*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", evt_rsh_rnd_npc_3_4_talk},
+    {"c_kinopiko_p", /*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", evt_rsh_rnd_npc_3_5_talk},
+    {"c_kinopiko_v", /*"キノピオ女紫"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x8E\x87", evt_rsh_rnd_npc_3_7_talk},
+    {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_3_8_talk},
+    {"c_yoshi", /*"ヨッシー大"*/"\x83\x88\x83\x62\x83\x56\x81\x5B\x91\xE5", evt_rsh_rnd_npc_3_9_talk},
+    {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_4_1_talk},
+    {"c_yoshi", /*"ヨッシー大"*/"\x83\x88\x83\x62\x83\x56\x81\x5B\x91\xE5", evt_rsh_rnd_npc_4_2_talk},
+    {"c_jugem_n", /*"ＮＰＣジュゲム"*/"\x82\x6D\x82\x6F\x82\x62\x83\x57\x83\x85\x83\x51\x83\x80", evt_rsh_rnd_npc_4_3_talk},
+    {"c_kinopio_b", /*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", evt_rsh_rnd_npc_4_4_talk},
+    {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_4_5_talk},
 };
 
-s32 rsh_03_rnd_npc_2[] = {
-    (s32)"c_kokinopio_g", (s32)/*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", (s32)evt_rsh_rnd_npc_3_6_talk, (s32)"c_kokinopio_y", (s32)/*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", (s32)evt_rsh_rnd_npc_3_10_talk, (s32)"c_kinopio", (s32)/*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49",
-    (s32)evt_rsh_rnd_npc_4_6_talk, (s32)"c_kokinopio_g", (s32)/*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", (s32)evt_rsh_rnd_npc_4_7_talk, (s32)"c_kuribo_n", (s32)/*"NPCクリボー"*/"\x4E\x50\x43\x83\x4E\x83\x8A\x83\x7B\x81\x5B", (s32)evt_rsh_rnd_npc_4_8_talk, (s32)"c_kinopio_g",
-    (s32)/*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE", (s32)evt_rsh_rnd_npc_4_9_talk, (s32)"c_nokonoko", (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", (s32)evt_rsh_rnd_npc_4_10_talk,
+RshRndNpc rsh_03_rnd_npc_2[] = {
+    {"c_kokinopio_g", /*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", evt_rsh_rnd_npc_3_6_talk},
+    {"c_kokinopio_y", /*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", evt_rsh_rnd_npc_3_10_talk},
+    {"c_kinopio", /*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", evt_rsh_rnd_npc_4_6_talk},
+    {"c_kokinopio_g", /*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", evt_rsh_rnd_npc_4_7_talk},
+    {"c_kuribo_n", /*"NPCクリボー"*/"\x4E\x50\x43\x83\x4E\x83\x8A\x83\x7B\x81\x5B", evt_rsh_rnd_npc_4_8_talk},
+    {"c_kinopio_g", /*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE", evt_rsh_rnd_npc_4_9_talk},
+    {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_4_10_talk},
 };
 
-__declspec(section ".data") s32 rsh_04_rnd_npc_1[] = {
-    (s32)"c_kinopio_g", (s32)/*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE", (s32)evt_rsh_rnd_npc_5_2_talk, (s32)"c_kinopio_b", (s32)/*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", (s32)evt_rsh_rnd_npc_5_10_talk,
+__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_1[] = {
+    {"c_kinopio_g", /*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE", evt_rsh_rnd_npc_5_2_talk},
+    {"c_kinopio_b", /*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", evt_rsh_rnd_npc_5_10_talk},
 };
 
-__declspec(section ".data") s32 rsh_04_rnd_npc_2[] = {
-    (s32)"c_nokonoko", (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", (s32)evt_rsh_rnd_npc_5_8_talk, (s32)"c_kinopio", (s32)/*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", (s32)evt_rsh_rnd_npc_5_9_talk,
+__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_2[] = {
+    {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_5_8_talk},
+    {"c_kinopio", /*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", evt_rsh_rnd_npc_5_9_talk},
 };
 
-__declspec(section ".data") s32 rsh_04_rnd_npc_3[] = {
-    (s32)"c_kokinopio_g", (s32)/*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", (s32)evt_rsh_rnd_npc_5_5_talk, (s32)"c_kokinopio", (s32)/*"キノピオ子"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71", (s32)evt_rsh_rnd_npc_5_6_talk,
+__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_3[] = {
+    {"c_kokinopio_g", /*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", evt_rsh_rnd_npc_5_5_talk},
+    {"c_kokinopio", /*"キノピオ子"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71", evt_rsh_rnd_npc_5_6_talk},
 };
 
-__declspec(section ".data") s32 rsh_04_rnd_npc_4[] = {
-    (s32)"c_kokinopio_b", (s32)/*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", (s32)evt_rsh_rnd_npc_5_1_talk, (s32)"c_kokinopio_y", (s32)/*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", (s32)evt_rsh_rnd_npc_5_3_talk, (s32)"c_kokinopio_b", (s32)/*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2",
-    (s32)evt_rsh_rnd_npc_5_4_talk, (s32)"c_kinopiko", (s32)/*"キノピオ女"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97", (s32)evt_rsh_rnd_npc_5_7_talk,
+__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_4[] = {
+    {"c_kokinopio_b", /*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", evt_rsh_rnd_npc_5_1_talk},
+    {"c_kokinopio_y", /*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", evt_rsh_rnd_npc_5_3_talk},
+    {"c_kokinopio_b", /*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", evt_rsh_rnd_npc_5_4_talk},
+    {"c_kinopiko", /*"キノピオ女"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97", evt_rsh_rnd_npc_5_7_talk},
 };
 
 __declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_1_talk)
@@ -955,41 +953,71 @@ __declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_10_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 rsh_01_rnd_npc_1_list[] = {
-    (s32)/*"２−１"*/"\x82\x51\x81\x7C\x82\x50", (s32)/*"２−２"*/"\x82\x51\x81\x7C\x82\x51", (s32)/*"２−３"*/"\x82\x51\x81\x7C\x82\x52", (s32)/*"２−４"*/"\x82\x51\x81\x7C\x82\x53", (s32)/*"２−５"*/"\x82\x51\x81\x7C\x82\x54",
+__declspec(section ".data") const char* rsh_01_rnd_npc_1_list[] = {
+    /*"２−１"*/"\x82\x51\x81\x7C\x82\x50",
+    /*"２−２"*/"\x82\x51\x81\x7C\x82\x51",
+    /*"２−３"*/"\x82\x51\x81\x7C\x82\x52",
+    /*"２−４"*/"\x82\x51\x81\x7C\x82\x53",
+    /*"２−５"*/"\x82\x51\x81\x7C\x82\x54",
 };
 
-__declspec(section ".data") s32 rsh_01_rnd_npc_2_list[] = {
-    (s32)/*"２−６"*/"\x82\x51\x81\x7C\x82\x55", (s32)/*"２−８"*/"\x82\x51\x81\x7C\x82\x57", (s32)/*"２−９"*/"\x82\x51\x81\x7C\x82\x58",
+__declspec(section ".data") const char* rsh_01_rnd_npc_2_list[] = {
+    /*"２−６"*/"\x82\x51\x81\x7C\x82\x55",
+    /*"２−８"*/"\x82\x51\x81\x7C\x82\x57",
+    /*"２−９"*/"\x82\x51\x81\x7C\x82\x58",
 };
 
-__declspec(section ".data") s32 rsh_01_rnd_npc_3_list[] = {
-    (s32)/*"２−７"*/"\x82\x51\x81\x7C\x82\x56", (s32)/*"２−１０"*/"\x82\x51\x81\x7C\x82\x50\x82\x4F",
+__declspec(section ".data") const char* rsh_01_rnd_npc_3_list[] = {
+    /*"２−７"*/"\x82\x51\x81\x7C\x82\x56",
+    /*"２−１０"*/"\x82\x51\x81\x7C\x82\x50\x82\x4F",
 };
 
-s32 rsh_03_rnd_npc_1_list[] = {
-    (s32)/*"３−１"*/"\x82\x52\x81\x7C\x82\x50", (s32)/*"３−２"*/"\x82\x52\x81\x7C\x82\x51", (s32)/*"３−３"*/"\x82\x52\x81\x7C\x82\x52", (s32)/*"３−４"*/"\x82\x52\x81\x7C\x82\x53", (s32)/*"３−５"*/"\x82\x52\x81\x7C\x82\x54", (s32)/*"３−７"*/"\x82\x52\x81\x7C\x82\x56", (s32)/*"３−８"*/"\x82\x52\x81\x7C\x82\x57", (s32)/*"３−９"*/"\x82\x52\x81\x7C\x82\x58",
-    (s32)/*"４−１"*/"\x82\x53\x81\x7C\x82\x50", (s32)/*"４−２"*/"\x82\x53\x81\x7C\x82\x51", (s32)/*"４−３"*/"\x82\x53\x81\x7C\x82\x52", (s32)/*"４−４"*/"\x82\x53\x81\x7C\x82\x53", (s32)/*"４−５"*/"\x82\x53\x81\x7C\x82\x54",
+const char* rsh_03_rnd_npc_1_list[] = {
+    /*"３−１"*/"\x82\x52\x81\x7C\x82\x50",
+    /*"３−２"*/"\x82\x52\x81\x7C\x82\x51",
+    /*"３−３"*/"\x82\x52\x81\x7C\x82\x52",
+    /*"３−４"*/"\x82\x52\x81\x7C\x82\x53",
+    /*"３−５"*/"\x82\x52\x81\x7C\x82\x54",
+    /*"３−７"*/"\x82\x52\x81\x7C\x82\x56",
+    /*"３−８"*/"\x82\x52\x81\x7C\x82\x57",
+    /*"３−９"*/"\x82\x52\x81\x7C\x82\x58",
+    /*"４−１"*/"\x82\x53\x81\x7C\x82\x50",
+    /*"４−２"*/"\x82\x53\x81\x7C\x82\x51",
+    /*"４−３"*/"\x82\x53\x81\x7C\x82\x52",
+    /*"４−４"*/"\x82\x53\x81\x7C\x82\x53",
+    /*"４−５"*/"\x82\x53\x81\x7C\x82\x54",
 };
 
-__declspec(section ".data") s32 rsh_03_rnd_npc_2_list[] = {
-    (s32)/*"３−６"*/"\x82\x52\x81\x7C\x82\x55", (s32)/*"３−１０"*/"\x82\x52\x81\x7C\x82\x50\x82\x4F", (s32)/*"４−６"*/"\x82\x53\x81\x7C\x82\x55", (s32)/*"４−７"*/"\x82\x53\x81\x7C\x82\x56", (s32)/*"４−８"*/"\x82\x53\x81\x7C\x82\x57", (s32)/*"４−９"*/"\x82\x53\x81\x7C\x82\x58", (s32)/*"４−１０"*/"\x82\x53\x81\x7C\x82\x50\x82\x4F",
+__declspec(section ".data") const char* rsh_03_rnd_npc_2_list[] = {
+    /*"３−６"*/"\x82\x52\x81\x7C\x82\x55",
+    /*"３−１０"*/"\x82\x52\x81\x7C\x82\x50\x82\x4F",
+    /*"４−６"*/"\x82\x53\x81\x7C\x82\x55",
+    /*"４−７"*/"\x82\x53\x81\x7C\x82\x56",
+    /*"４−８"*/"\x82\x53\x81\x7C\x82\x57",
+    /*"４−９"*/"\x82\x53\x81\x7C\x82\x58",
+    /*"４−１０"*/"\x82\x53\x81\x7C\x82\x50\x82\x4F",
 };
 
-__declspec(section ".data") s32 rsh_04_rnd_npc_1_list[] = {
-    (s32)/*"５−２"*/"\x82\x54\x81\x7C\x82\x51", (s32)/*"５−１０"*/"\x82\x54\x81\x7C\x82\x50\x82\x4F",
+__declspec(section ".data") const char* rsh_04_rnd_npc_1_list[] = {
+    /*"５−２"*/"\x82\x54\x81\x7C\x82\x51",
+    /*"５−１０"*/"\x82\x54\x81\x7C\x82\x50\x82\x4F",
 };
 
-__declspec(section ".data") s32 rsh_04_rnd_npc_2_list[] = {
-    (s32)/*"５−８"*/"\x82\x54\x81\x7C\x82\x57", (s32)/*"５−９"*/"\x82\x54\x81\x7C\x82\x58",
+__declspec(section ".data") const char* rsh_04_rnd_npc_2_list[] = {
+    /*"５−８"*/"\x82\x54\x81\x7C\x82\x57",
+    /*"５−９"*/"\x82\x54\x81\x7C\x82\x58",
 };
 
-__declspec(section ".data") s32 rsh_04_rnd_npc_3_list[] = {
-    (s32)/*"５−５"*/"\x82\x54\x81\x7C\x82\x54", (s32)/*"５−６"*/"\x82\x54\x81\x7C\x82\x55",
+__declspec(section ".data") const char* rsh_04_rnd_npc_3_list[] = {
+    /*"５−５"*/"\x82\x54\x81\x7C\x82\x54",
+    /*"５−６"*/"\x82\x54\x81\x7C\x82\x55",
 };
 
-__declspec(section ".data") s32 rsh_04_rnd_npc_4_list[] = {
-    (s32)/*"５−１"*/"\x82\x54\x81\x7C\x82\x50", (s32)/*"５−３"*/"\x82\x54\x81\x7C\x82\x52", (s32)/*"５−４"*/"\x82\x54\x81\x7C\x82\x53", (s32)/*"５−７"*/"\x82\x54\x81\x7C\x82\x56",
+__declspec(section ".data") const char* rsh_04_rnd_npc_4_list[] = {
+    /*"５−１"*/"\x82\x54\x81\x7C\x82\x50",
+    /*"５−３"*/"\x82\x54\x81\x7C\x82\x52",
+    /*"５−４"*/"\x82\x54\x81\x7C\x82\x53",
+    /*"５−７"*/"\x82\x54\x81\x7C\x82\x56",
 };
 
 EVT_BEGIN(debug_print_rnd_npc)
@@ -1079,13 +1107,22 @@ EVT_BEGIN(evt_rsh_01_rnd_npc_entry)
     RETURN
 EVT_END()
 
-s32 rsh_03_rnd_npc_2_ent[] = {
-    (s32)/*"乗客２"*/"\x8F\xE6\x8B\x71\x82\x51", 0, 0, (s32)npc_urouro_init_event, (s32)npc_urouro_move_event, 0, 0, 0,
-    0, (s32)npc_urouro_return_event, 0, 1, -1011613696, 0, -1054867456, 1112014848,
-    0, 0, 0, 0, 0, 0, -1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo rsh_03_rnd_npc_2_ent[] = {
+    {
+        /*"乗客２"*/"\x8F\xE6\x8B\x71\x82\x51", // name
+        0, 0, // flags..reactionFlags
+        npc_urouro_init_event, // initEvent
+        npc_urouro_move_event, // regularEvent
+        NULL, NULL, NULL, NULL, // talkEvent..lostEvent
+        npc_urouro_return_event, // returnEvent
+        NULL, // blowEvent
+        1, // territoryType
+        {-360.0f, 0.0f, -10.0f}, // territoryBase
+        {50.0f, 0.0f, 0.0f}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, // searchRange..homingAngle
+        -1, // battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_rsh_03_rnd_npc_entry)
@@ -1111,13 +1148,22 @@ EVT_BEGIN(evt_rsh_03_rnd_npc_entry)
     RETURN
 EVT_END()
 
-s32 rsh_04_rnd_npc_3_ent[] = {
-    (s32)/*"乗客３"*/"\x8F\xE6\x8B\x71\x82\x52", 0, 0, (s32)npc_urouro_init_event, (s32)npc_urouro_move_event, 0, 0, 0,
-    0, (s32)npc_urouro_return_event, 0, 1, -1020002304, 0, -1022296064, 1112014848,
-    0, 1112014848, 0, 0, 0, 0, -1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+NpcSetupInfo rsh_04_rnd_npc_3_ent[] = {
+    {
+        /*"乗客３"*/"\x8F\xE6\x8B\x71\x82\x52", // name
+        0, 0, // flags..reactionFlags
+        npc_urouro_init_event, // initEvent
+        npc_urouro_move_event, // regularEvent
+        NULL, NULL, NULL, NULL, // talkEvent..lostEvent
+        npc_urouro_return_event, // returnEvent
+        NULL, // blowEvent
+        1, // territoryType
+        {-180.0f, 0.0f, -145.0f}, // territoryBase
+        {50.0f, 0.0f, 50.0f}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, // searchRange..homingAngle
+        -1, // battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(evt_rsh_04_rnd_npc_entry)
@@ -1259,45 +1305,45 @@ RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index) {
     case 0:
         switch (group) {
         case 0:
-            data = (RshRndNpc*)rsh_01_rnd_npc_1;
+            data = rsh_01_rnd_npc_1;
             break;
         case 1:
-            data = (RshRndNpc*)rsh_01_rnd_npc_2;
+            data = rsh_01_rnd_npc_2;
             break;
         case 2:
-            data = (RshRndNpc*)rsh_01_rnd_npc_3;
+            data = rsh_01_rnd_npc_3;
             break;
         }
         break;
     case 1:
         switch (group) {
         case 0:
-            data = (RshRndNpc*)rsh_03_rnd_npc_1;
+            data = rsh_03_rnd_npc_1;
             break;
         case 1:
-            data = (RshRndNpc*)rsh_03_rnd_npc_2;
+            data = rsh_03_rnd_npc_2;
             break;
         }
         break;
     case 2:
         switch (group) {
         case 0:
-            data = (RshRndNpc*)rsh_04_rnd_npc_1;
+            data = rsh_04_rnd_npc_1;
             break;
         case 1:
-            data = (RshRndNpc*)rsh_04_rnd_npc_2;
+            data = rsh_04_rnd_npc_2;
             break;
         case 2:
-            data = (RshRndNpc*)rsh_04_rnd_npc_3;
+            data = rsh_04_rnd_npc_3;
             break;
         case 3:
-            data = (RshRndNpc*)rsh_04_rnd_npc_4;
+            data = rsh_04_rnd_npc_4;
             break;
         }
         break;
     }
     if (data == NULL) {
-        data = (RshRndNpc*)rsh_01_rnd_npc_1;
+        data = rsh_01_rnd_npc_1;
         index = 0;
     }
     return &data[index];

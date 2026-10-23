@@ -33,49 +33,57 @@ typedef struct PturnElem {
     s32 delay;  // 0x44
 } PturnElem;
 
-__declspec(section ".data") s32 eff_pturn_n64_negone_one_a[] = {
-    -1082130432, 1065353216,
+__declspec(section ".data") f32 eff_pturn_n64_negone_one_a[] = {
+    -1.0f, 1.0f,
 };
-__declspec(section ".data") s32 pturn_negone_one_374[] = {
-    -1082130432, 1065353216,
+__declspec(section ".data") f32 pturn_negone_one_374[] = {
+    -1.0f, 1.0f,
 };
-__declspec(section ".data") s32 eff_pturn_n64_one_negone_a[] = {
-    1065353216, -1082130432,
+__declspec(section ".data") f32 eff_pturn_n64_one_negone_a[] = {
+    1.0f, -1.0f,
 };
-__declspec(section ".data") s32 pturn_one_negone_373[] = {
-    1065353216, -1082130432,
+__declspec(section ".data") f32 pturn_one_negone_373[] = {
+    1.0f, -1.0f,
 };
-__declspec(section ".data") s32 eff_pturn_n64_negone_one_b[] = {
-    -1082130432, 1065353216,
+__declspec(section ".data") f32 eff_pturn_n64_negone_one_b[] = {
+    -1.0f, 1.0f,
 };
-__declspec(section ".data") s32 pturn_negone_one_360[] = {
-    -1082130432, 1065353216,
+__declspec(section ".data") f32 pturn_negone_one_360[] = {
+    -1.0f, 1.0f,
 };
-__declspec(section ".data") s32 eff_pturn_n64_one_negone_b[] = {
-    1065353216, -1082130432,
+__declspec(section ".data") f32 eff_pturn_n64_one_negone_b[] = {
+    1.0f, -1.0f,
 };
-__declspec(section ".data") s32 pturn_one_negone_359[] = {
-    1065353216, -1082130432,
-};
-
-u32 size48x48_tex32x32_pturn_vtx[] = {
-    0xFFE8FFE8, 0x0000FE00, 0x0200FFFF, 0xFFFF0018, 0xFFE80000, 0x0200FE00, 0xFFFFFFFF,
-    0x00180018, 0x00000600, 0x0200FFFF, 0xFFFFFFE8, 0x00180000, 0x02000600, 0xFFFFFFFF,
+__declspec(section ".data") f32 pturn_one_negone_359[] = {
+    1.0f, -1.0f,
 };
 
-u32 size24x24_tex32x32_pturn_vtx[] = {
-    0xFFF4FFF4, 0x00000000, 0x0000FAFA, 0x00FF000C, 0xFFF40000, 0x04000000, 0xFAFA00FF,
-    0x000C000C, 0x00000400, 0x0400FAFA, 0x00FFFFF4, 0x000C0000, 0x00000400, 0xFAFA00FF,
+effN64Vtx size48x48_tex32x32_pturn_vtx[] = {
+    {-24, -24, 0, -512, 512, 255, 255, 255, 255},
+    {24, -24, 0, 512, -512, 255, 255, 255, 255},
+    {24, 24, 0, 1536, 512, 255, 255, 255, 255},
+    {-24, 24, 0, 512, 1536, 255, 255, 255, 255},
 };
 
-u32 size16x24_tex32x32_l_pturn_vtx[] = {
-    0xFFF0FFF4, 0x00000000, 0x0000FAFA, 0x00FF0004, 0xFFF40000, 0x04000000, 0xFAFA00FF,
-    0x0004000C, 0x00000400, 0x0400FAFA, 0x00FFFFF0, 0x000C0000, 0x00000400, 0xFAFA00FF,
+effN64Vtx size24x24_tex32x32_pturn_vtx[] = {
+    {-12, -12, 0, 0, 0, 250, 250, 0, 255},
+    {12, -12, 0, 1024, 0, 250, 250, 0, 255},
+    {12, 12, 0, 1024, 1024, 250, 250, 0, 255},
+    {-12, 12, 0, 0, 1024, 250, 250, 0, 255},
 };
 
-u32 size16x24_tex32x32_r_pturn_vtx[] = {
-    0xFFFCFFF4, 0x00000000, 0x0000FAFA, 0x00FF0010, 0xFFF40000, 0x04000000, 0xFAFA00FF,
-    0x0010000C, 0x00000400, 0x0400FAFA, 0x00FFFFFC, 0x000C0000, 0x00000400, 0xFAFA00FF,
+effN64Vtx size16x24_tex32x32_l_pturn_vtx[] = {
+    {-16, -12, 0, 0, 0, 250, 250, 0, 255},
+    {4, -12, 0, 1024, 0, 250, 250, 0, 255},
+    {4, 12, 0, 1024, 1024, 250, 250, 0, 255},
+    {-16, 12, 0, 0, 1024, 250, 250, 0, 255},
+};
+
+effN64Vtx size16x24_tex32x32_r_pturn_vtx[] = {
+    {-4, -12, 0, 0, 0, 250, 250, 0, 255},
+    {16, -12, 0, 1024, 0, 250, 250, 0, 255},
+    {16, 12, 0, 1024, 1024, 250, 250, 0, 255},
+    {-4, 12, 0, 0, 1024, 250, 250, 0, 255},
 };
 
 f32 scale_dat[9] = {5.0f, 4.5f, 4.0f, 3.0f, 2.0f, 1.0f, 0.7f, 1.2f, 1.0f};
@@ -306,7 +314,7 @@ void pturn_main_dispp(CameraId cameraId, EffectEntry* effect) {
             PSMTXScale(scale, 0.03125f, 0.03125f, 0.0f);
             GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
             GXSetCullMode(GX_CULL_NONE);
-            effSetVtxDescN64((effN64Vtx*)size48x48_tex32x32_pturn_vtx);
+            effSetVtxDescN64(size48x48_tex32x32_pturn_vtx);
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
             tri2(0, 1, 2, 0, 0, 2, 3, 0);
         }
@@ -368,7 +376,7 @@ void pturn_num_dispp(CameraId cameraId, EffectEntry* effect) {
                 PSMTXTrans(mtx, 0.0f, (f32)off0, 0.0f);
                 PSMTXConcat(scale, mtx, scale);
                 GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-                effSetVtxDescN64((effN64Vtx*)size24x24_tex32x32_pturn_vtx);
+                effSetVtxDescN64(size24x24_tex32x32_pturn_vtx);
                 GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
                 tri2(0, 1, 2, 0, 0, 2, 3, 0);
             } else {
@@ -376,14 +384,14 @@ void pturn_num_dispp(CameraId cameraId, EffectEntry* effect) {
                 PSMTXTrans(mtx, 0.0f, (f32)off1, 0.0f);
                 PSMTXConcat(scale, mtx, scale);
                 GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-                effSetVtxDescN64((effN64Vtx*)size16x24_tex32x32_r_pturn_vtx);
+                effSetVtxDescN64(size16x24_tex32x32_r_pturn_vtx);
                 GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
                 tri2(0, 1, 2, 0, 0, 2, 3, 0);
                 PSMTXScale(scale, 0.03125f, 0.0026041667f, 0.0f);
                 PSMTXTrans(mtx, 0.0f, (f32)off2, 0.0f);
                 PSMTXConcat(scale, mtx, scale);
                 GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-                effSetVtxDescN64((effN64Vtx*)size16x24_tex32x32_l_pturn_vtx);
+                effSetVtxDescN64(size16x24_tex32x32_l_pturn_vtx);
                 GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
                 tri2(0, 1, 2, 0, 0, 2, 3, 0);
             }

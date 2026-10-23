@@ -6,6 +6,9 @@
 #include "mario/mariost.h"
 #include "driver/mapdrv.h"
 #include "evt/evt_sub.h"
+#include "data_tables.h"
+typedef struct SharinData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat speed; } SharinData;
+typedef struct ClankData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat x; EvtFloat y; } ClankData;
 
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_cam3d_evt_set);
@@ -32,24 +35,24 @@ USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(ramp_r);
 static void resha_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") u64 fd_hom_10_negone_one_374;
-__declspec(section ".data") s32 fd_hom_10_neg_one_382[1];
-__declspec(section ".data") s32 fd_hom_10___local_PI_383[1];
-__declspec(section ".data") s32 fd_hom_10___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_hom_10_one_negone_373;
-__declspec(section ".data") s32 fd_hom_10___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_hom_10_one_381[1];
-__declspec(section ".data") u64 fd_hom_10_negone_one_360;
-__declspec(section ".data") s32 fd_hom_10_neg_one_365[1];
-__declspec(section ".data") s32 fd_hom_10___local_PI_366[1];
-__declspec(section ".data") s32 fd_hom_10___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_hom_10_one_negone_359;
-__declspec(section ".data") s32 fd_hom_10___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_hom_10_one_364[1];
-static s32 sharinDt[116];
+__declspec(section ".data") f32 fd_hom_10_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hom_10_neg_one_382;
+__declspec(section ".data") f32 fd_hom_10___local_PI_383;
+__declspec(section ".data") f32 fd_hom_10___local_3PIO2_385;
+__declspec(section ".data") f32 fd_hom_10_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hom_10___local_PIO2_384;
+__declspec(section ".data") f32 fd_hom_10_one_381;
+__declspec(section ".data") f32 fd_hom_10_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hom_10_neg_one_365;
+__declspec(section ".data") f32 fd_hom_10___local_PI_366;
+__declspec(section ".data") f32 fd_hom_10___local_3PIO2_368;
+__declspec(section ".data") f32 fd_hom_10_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_hom_10___local_PIO2_367;
+__declspec(section ".data") f32 fd_hom_10_one_364;
+static SharinData sharinDt[29];
 static s32 evt_sharin_main[87];
 static s32 evt_sharin[19];
-static s32 clankDt[45];
+static ClankData clankDt[9];
 static s32 evt_clank_main[104];
 static s32 evt_clank[21];
 static s32 evt_bg[81];
@@ -62,77 +65,71 @@ static s32 stop_1[90];
 static s32 stop_2[90];
 s32 hom_10_evt_resha_stop[36];
 static s32 evt_ramp[33];
-static s32 pika_tbl[15];
-static __declspec(section ".data") s32 pika_tbl_rsh_06[10];
+static const char* pika_tbl[15];
+static __declspec(section ".data") const char* pika_tbl_rsh_06[10];
 static s32 hom_10_evt_resha_sub[102];
 s32 hom_10_evt_resha_right[35];
 s32 hom_10_evt_resha_left[28];
 s32 hom_10_init_evt[140];
 
-__declspec(section ".data") u64 fd_hom_10_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hom_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hom_10_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_hom_10_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_hom_10___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_hom_10___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_hom_10___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_hom_10___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_hom_10_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_hom_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_hom_10___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_hom_10___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_hom_10_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_hom_10_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_hom_10_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_hom_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_hom_10_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_hom_10_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_hom_10___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_hom_10___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_hom_10___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_hom_10___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_hom_10_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_hom_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_hom_10___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_hom_10___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_hom_10_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_hom_10_one_364 = 1.0f;
 
-static s32 sharinDt[] = {
-    (s32)"sha_1_1", 0, 0, -229998976, (s32)"sha_1_2", 0, 0, -229998976,
-    (s32)"sha_1_3", 2, 0, -229998976, (s32)"sha_1_4", 1, 1, -229998976,
-    (s32)"sha_1_5", 1, 1, -229998976, (s32)"sha_2_1", 0, 0, -229998976,
-    (s32)"sha_2_2", 0, 0, -229998976, (s32)"sha_2_3", 0, 0, -229998976,
-    (s32)"sha_3_1", 0, 0, -229998976, (s32)"sha_3_2", 0, 0, -229998976,
-    (s32)"sha_3_3", 0, 0, -229998976, (s32)"sha_4_1", 0, 0, -229998976,
-    (s32)"sha_4_2", 0, 0, -229998976, (s32)"sha_4_3", 0, 0, -229998976,
-    (s32)"sha_5_1", 0, 0, -229998976, (s32)"sha_5_2", 0, 0, -229998976,
-    (s32)"sha_5_3", 0, 0, -229998976, (s32)"sha_6_1", 0, 0, -229998976,
-    (s32)"sha_6_2", 0, 0, -229998976, (s32)"sha_6_3", 0, 0, -229998976,
-    (s32)"sha_1_1_c", 0, 0, -230001024, (s32)"sha_1_2_c", 0, 0, -230001024,
-    (s32)"sha_1_3_c", 2, 0, -230001024, (s32)"sha_1_4_c", 1, 1, -230001024,
-    (s32)"sha_1_5_c", 1, 1, -230001024, (s32)"sha_6_1_c", 0, 0, -229998976,
-    (s32)"sha_6_2_c", 0, 0, -229998976, (s32)"sha_6_3_c", 0, 0, -229998976,
-    0, 0, 0, 0,
+static SharinData sharinDt[] = {
+    {"sha_1_1", 0, 0, FLOAT(1.0f)},
+    {"sha_1_2", 0, 0, FLOAT(1.0f)},
+    {"sha_1_3", 2, 0, FLOAT(1.0f)},
+    {"sha_1_4", 1, 1, FLOAT(1.0f)},
+    {"sha_1_5", 1, 1, FLOAT(1.0f)},
+    {"sha_2_1", 0, 0, FLOAT(1.0f)},
+    {"sha_2_2", 0, 0, FLOAT(1.0f)},
+    {"sha_2_3", 0, 0, FLOAT(1.0f)},
+    {"sha_3_1", 0, 0, FLOAT(1.0f)},
+    {"sha_3_2", 0, 0, FLOAT(1.0f)},
+    {"sha_3_3", 0, 0, FLOAT(1.0f)},
+    {"sha_4_1", 0, 0, FLOAT(1.0f)},
+    {"sha_4_2", 0, 0, FLOAT(1.0f)},
+    {"sha_4_3", 0, 0, FLOAT(1.0f)},
+    {"sha_5_1", 0, 0, FLOAT(1.0f)},
+    {"sha_5_2", 0, 0, FLOAT(1.0f)},
+    {"sha_5_3", 0, 0, FLOAT(1.0f)},
+    {"sha_6_1", 0, 0, FLOAT(1.0f)},
+    {"sha_6_2", 0, 0, FLOAT(1.0f)},
+    {"sha_6_3", 0, 0, FLOAT(1.0f)},
+    {"sha_1_1_c", 0, 0, FLOAT(-1.0f)},
+    {"sha_1_2_c", 0, 0, FLOAT(-1.0f)},
+    {"sha_1_3_c", 2, 0, FLOAT(-1.0f)},
+    {"sha_1_4_c", 1, 1, FLOAT(-1.0f)},
+    {"sha_1_5_c", 1, 1, FLOAT(-1.0f)},
+    {"sha_6_1_c", 0, 0, FLOAT(1.0f)},
+    {"sha_6_2_c", 0, 0, FLOAT(1.0f)},
+    {"sha_6_3_c", 0, 0, FLOAT(1.0f)},
+    {0},
 };
 
 static EVT_BEGIN(evt_sharin_main)
@@ -187,13 +184,16 @@ static EVT_BEGIN(evt_sharin)
     RETURN
 EVT_END()
 
-static s32 clankDt[] = {
-    (s32)"bou_1", 0, 0, -229979520, -229998976, (s32)"bou_2", 1, 1,
-    -229983104, -229998976, (s32)"bou_3", 0, 0, -229979520, -229998976, (s32)"bou_4",
-    1, 1, -229983104, -229998976, (s32)"bou_1_c", 0, 0, -229979520,
-    -230001024, (s32)"bou_2_c", 1, 1, -229983104, -230001024, (s32)"bou_3_c", 0,
-    0, -229979520, -230001024, (s32)"bou_4_c", 1, 1, -229983104, -230001024,
-    0, 0, 0, 0, 0,
+static ClankData clankDt[] = {
+    {"bou_1", 0, 0, FLOAT(20.0f), FLOAT(1.0f)},
+    {"bou_2", 1, 1, FLOAT(16.5f), FLOAT(1.0f)},
+    {"bou_3", 0, 0, FLOAT(20.0f), FLOAT(1.0f)},
+    {"bou_4", 1, 1, FLOAT(16.5f), FLOAT(1.0f)},
+    {"bou_1_c", 0, 0, FLOAT(20.0f), FLOAT(-1.0f)},
+    {"bou_2_c", 1, 1, FLOAT(16.5f), FLOAT(-1.0f)},
+    {"bou_3_c", 0, 0, FLOAT(20.0f), FLOAT(-1.0f)},
+    {"bou_4_c", 1, 1, FLOAT(16.5f), FLOAT(-1.0f)},
+    {0},
 };
 
 static EVT_BEGIN(evt_clank_main)
@@ -637,14 +637,35 @@ static EVT_BEGIN(evt_ramp)
     RETURN
 EVT_END()
 
-static s32 pika_tbl[] = {
-    (s32)"pika_1_1", (s32)"pika_1_2", (s32)"pika_1_3", (s32)"pika_1_4", (s32)"pika_2", (s32)"pika_3", (s32)"pika_4", (s32)"pika_5",
-    (s32)"pika_6", (s32)"pika_1_1_c", (s32)"pika_1_2_c", (s32)"pika_1_3_c", (s32)"pika_1_4_c", (s32)"pika_6_c", 0,
+static const char* pika_tbl[] = {
+    "pika_1_1",
+    "pika_1_2",
+    "pika_1_3",
+    "pika_1_4",
+    "pika_2",
+    "pika_3",
+    "pika_4",
+    "pika_5",
+    "pika_6",
+    "pika_1_1_c",
+    "pika_1_2_c",
+    "pika_1_3_c",
+    "pika_1_4_c",
+    "pika_6_c",
+    NULL,
 };
 
-static __declspec(section ".data") s32 pika_tbl_rsh_06[] = {
-    (s32)"pika_1_1", (s32)"pika_1_2", (s32)"pika_1_3", (s32)"pika_1_4", (s32)"pika_2", (s32)"pika_3", (s32)"pika_4", (s32)"pika_5",
-    (s32)"pika_6", 0,
+static __declspec(section ".data") const char* pika_tbl_rsh_06[] = {
+    "pika_1_1",
+    "pika_1_2",
+    "pika_1_3",
+    "pika_1_4",
+    "pika_2",
+    "pika_3",
+    "pika_4",
+    "pika_5",
+    "pika_6",
+    NULL,
 };
 
 static EVT_BEGIN(hom_10_evt_resha_sub)
@@ -673,10 +694,10 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
     SPAWN_EVENT(PTR(evt_hoshi))
     SPAWN_EVENT(PTR(evt_ramp))
     CALL(evt_map_set_tevcallback, 1, PTR(resha_tev))
-    SET_INT_READ_ADDR(PTR(pika_tbl))
+    SET_INT_READ_ADDR(PTR(&pika_tbl))
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("rsh_06_a"))
-        SET_INT_READ_ADDR(PTR(pika_tbl_rsh_06))
+        SET_INT_READ_ADDR(PTR(&pika_tbl_rsh_06))
     END_IF
     LOOP(0)
         READ_INT(LW(0))

@@ -13,20 +13,20 @@ USER_FUNC(btlevtcmd_SetEventWait);
 USER_FUNC(btlevtcmd_SetMaxMoveCount);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 
-__declspec(section ".data") u64 fd_boss_honeduka_negone_one_374;
-__declspec(section ".data") s32 fd_boss_honeduka_neg_one_382[1];
-__declspec(section ".data") s32 fd_boss_honeduka___local_PI_383[1];
-__declspec(section ".data") s32 fd_boss_honeduka___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_boss_honeduka_one_negone_373;
-__declspec(section ".data") s32 fd_boss_honeduka___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_boss_honeduka_one_381[1];
-__declspec(section ".data") u64 fd_boss_honeduka_negone_one_360;
-__declspec(section ".data") s32 fd_boss_honeduka_neg_one_365[1];
-__declspec(section ".data") s32 fd_boss_honeduka___local_PI_366[1];
-__declspec(section ".data") s32 fd_boss_honeduka___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_boss_honeduka_one_negone_359;
-__declspec(section ".data") s32 fd_boss_honeduka___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_boss_honeduka_one_364[1];
+__declspec(section ".data") f32 fd_boss_honeduka_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_honeduka_neg_one_382;
+__declspec(section ".data") f32 fd_boss_honeduka___local_PI_383;
+__declspec(section ".data") f32 fd_boss_honeduka___local_3PIO2_385;
+__declspec(section ".data") f32 fd_boss_honeduka_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_honeduka___local_PIO2_384;
+__declspec(section ".data") f32 fd_boss_honeduka_one_381;
+__declspec(section ".data") f32 fd_boss_honeduka_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_honeduka_neg_one_365;
+__declspec(section ".data") f32 fd_boss_honeduka___local_PI_366;
+__declspec(section ".data") f32 fd_boss_honeduka___local_3PIO2_368;
+__declspec(section ".data") f32 fd_boss_honeduka_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_honeduka___local_PIO2_367;
+__declspec(section ".data") f32 fd_boss_honeduka_one_364;
 BattleUnitKind unit_boss_honeduka;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -39,53 +39,33 @@ static __declspec(section ".data") s32 damage_event[10];
 s32 honeduka_damage_sub_event[14];
 static __declspec(section ".data") s32 wait_event[6];
 
-__declspec(section ".data") u64 fd_boss_honeduka_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_honeduka_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_honeduka_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_honeduka_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_honeduka___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_honeduka___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_honeduka___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_honeduka___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_honeduka_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_honeduka_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_honeduka___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_honeduka___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_honeduka_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_honeduka_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_boss_honeduka_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_honeduka_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_honeduka_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_honeduka_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_honeduka___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_honeduka___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_honeduka___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_honeduka___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_honeduka_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_honeduka_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_honeduka___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_honeduka___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_honeduka_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_honeduka_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_honeduka = {
     94,

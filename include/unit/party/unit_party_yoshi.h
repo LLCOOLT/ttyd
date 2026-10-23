@@ -9,7 +9,7 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_calc_param);
 USER_FUNC(btl_yoshi_yoroyoro_jump_move);
 extern BattleWeapon partyWeapon_YoshiCallGuard;
 extern BattleWeapon partyWeapon_YoshiEggAttack_Minimini;
-extern s32 partyWeapon_YoshiNomikomi_Involved[];
+extern BattleWeapon partyWeapon_YoshiNomikomi_Involved;
 extern BattleWeapon partyWeapon_YoshiNomikomi_Shot;
 extern BattleWeapon partyWeapon_YoshiNormalAttack;
 extern s32 pose_table_yoshi_stay[];

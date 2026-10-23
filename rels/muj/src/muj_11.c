@@ -15,75 +15,55 @@ USER_FUNC(evt_snd_envoff);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon);
 
-__declspec(section ".data") u64 fd_muj_11_negone_one_374;
-__declspec(section ".data") s32 fd_muj_11_neg_one_382[1];
-__declspec(section ".data") s32 fd_muj_11___local_PI_383[1];
-__declspec(section ".data") s32 fd_muj_11___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_muj_11_one_negone_373;
-__declspec(section ".data") s32 fd_muj_11___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_muj_11_one_381[1];
-__declspec(section ".data") u64 fd_muj_11_negone_one_360;
-__declspec(section ".data") s32 fd_muj_11_neg_one_365[1];
-__declspec(section ".data") s32 fd_muj_11___local_PI_366[1];
-__declspec(section ".data") s32 fd_muj_11___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_muj_11_one_negone_359;
-__declspec(section ".data") s32 fd_muj_11___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_muj_11_one_364[1];
+__declspec(section ".data") f32 fd_muj_11_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_11_neg_one_382;
+__declspec(section ".data") f32 fd_muj_11___local_PI_383;
+__declspec(section ".data") f32 fd_muj_11___local_3PIO2_385;
+__declspec(section ".data") f32 fd_muj_11_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_11___local_PIO2_384;
+__declspec(section ".data") f32 fd_muj_11_one_381;
+__declspec(section ".data") f32 fd_muj_11_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_11_neg_one_365;
+__declspec(section ".data") f32 fd_muj_11___local_PI_366;
+__declspec(section ".data") f32 fd_muj_11___local_3PIO2_368;
+__declspec(section ".data") f32 fd_muj_11_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_11___local_PIO2_367;
+__declspec(section ".data") f32 fd_muj_11_one_364;
 static __declspec(section ".data") s32 w_close[12];
 static __declspec(section ".data") s32 w_open[12];
 static __declspec(section ".data") s32 e_close[12];
 static __declspec(section ".data") s32 e_open[12];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 s32 warning_event[38];
 s32 muj_11_init_evt[35];
 
-__declspec(section ".data") u64 fd_muj_11_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_11_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_11_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj_11___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj_11___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj_11___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj_11___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_11_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_11_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj_11___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj_11___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_11_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_11_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_muj_11_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_11_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_11_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_11_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj_11___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj_11___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj_11___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj_11___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_11_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_11_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj_11___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj_11___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_11_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_11_one_364 = 1.0f;
 
 static __declspec(section ".data") EVT_BEGIN(w_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -109,13 +89,44 @@ static __declspec(section ".data") EVT_BEGIN(e_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65538, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"muj_10", (s32)"A_b_bero03", 327685, (s32)w_close, (s32)w_open, (s32)"e_bero",
-    65538, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"muj_12", (s32)"w_bero", 327685, (s32)e_close, (s32)e_open, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"muj_10", // nextMapName
+        "A_b_bero03", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_close, // enterAnimeArg
+        (s32)w_open, // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        2, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"muj_12", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_close, // enterAnimeArg
+        (s32)e_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(warning_event)

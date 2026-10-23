@@ -13,6 +13,7 @@
 #include "evt/evt_msg.h"
 #include "party/party_motion.h"
 #include "evt/evt_snd.h"
+#include "battle/battle_database_common.h"
 
 static s32 x_flag_data[2];
 f32 intplGetValue(s32 mode, s32 currStep, f32 start, f32 end, s32 steps);
@@ -53,20 +54,20 @@ static USER_FUNC(wariai_enzan_1f_intpl);
 static USER_FUNC(wariai_enzan_1f);
 static USER_FUNC(wariai_enzan_1);
 
-__declspec(section ".data") u64 fd_boss_macho_gance_negone_one_374;
-__declspec(section ".data") s32 fd_boss_macho_gance_neg_one_382[1];
-__declspec(section ".data") s32 fd_boss_macho_gance___local_PI_383[1];
-__declspec(section ".data") s32 fd_boss_macho_gance___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_boss_macho_gance_one_negone_373;
-__declspec(section ".data") s32 fd_boss_macho_gance___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_boss_macho_gance_one_381[1];
-__declspec(section ".data") u64 fd_boss_macho_gance_negone_one_360;
-__declspec(section ".data") s32 fd_boss_macho_gance_neg_one_365[1];
-__declspec(section ".data") s32 fd_boss_macho_gance___local_PI_366[1];
-__declspec(section ".data") s32 fd_boss_macho_gance___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_boss_macho_gance_one_negone_359;
-__declspec(section ".data") s32 fd_boss_macho_gance___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_boss_macho_gance_one_364[1];
+__declspec(section ".data") f32 fd_boss_macho_gance_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_macho_gance_neg_one_382;
+__declspec(section ".data") f32 fd_boss_macho_gance___local_PI_383;
+__declspec(section ".data") f32 fd_boss_macho_gance___local_3PIO2_385;
+__declspec(section ".data") f32 fd_boss_macho_gance_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_macho_gance___local_PIO2_384;
+__declspec(section ".data") f32 fd_boss_macho_gance_one_381;
+__declspec(section ".data") f32 fd_boss_macho_gance_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_macho_gance_neg_one_365;
+__declspec(section ".data") f32 fd_boss_macho_gance___local_PI_366;
+__declspec(section ".data") f32 fd_boss_macho_gance___local_3PIO2_368;
+__declspec(section ".data") f32 fd_boss_macho_gance_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_macho_gance___local_PIO2_367;
+__declspec(section ".data") f32 fd_boss_macho_gance_one_364;
 BattleUnitKind unit_boss_macho_gance;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -75,14 +76,14 @@ static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_furafura[18];
 static BattleDataEntry data_table[15];
 static BattleUnitKindPart parts[1];
-s32 weapon_gance_macho_speed[48];
-s32 weapon_gance_build_up[48];
-s32 weapon_gance_body[48];
-s32 weapon_gance_footwork[48];
-s32 weapon_gance_attack[48];
-s32 weapon_gance_posing[48];
-s32 weapon_gance_rariat_attack[48];
-s32 weapon_gance_body_attack[48];
+BattleWeapon weapon_gance_macho_speed;
+BattleWeapon weapon_gance_build_up;
+BattleWeapon weapon_gance_body;
+BattleWeapon weapon_gance_footwork;
+BattleWeapon weapon_gance_attack;
+BattleWeapon weapon_gance_posing;
+BattleWeapon weapon_gance_rariat_attack;
+BattleWeapon weapon_gance_body_attack;
 s32 macho_gance_zoom[65];
 s32 macho_gance_blur_zoom[46];
 static s32 mario_party_zoom[34];
@@ -104,53 +105,33 @@ s32 gance_rariat_attack_attack_event[446];
 s32 gance_body_attack_attack_event[515];
 static __declspec(section ".data") s32 wait_event[6];
 
-__declspec(section ".data") u64 fd_boss_macho_gance_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_macho_gance_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_macho_gance_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_macho_gance_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_macho_gance___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_macho_gance___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_macho_gance___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_macho_gance___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_macho_gance_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_macho_gance_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_macho_gance___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_macho_gance___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_macho_gance_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_macho_gance_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_boss_macho_gance_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_macho_gance_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_macho_gance_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_macho_gance_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_macho_gance___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_macho_gance___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_macho_gance___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_macho_gance___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_macho_gance_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_macho_gance_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_macho_gance___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_macho_gance___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_macho_gance_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_macho_gance_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_macho_gance = {
     65,
@@ -288,76 +269,300 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_macho_gance", "c_m_gansu", 0.0f, 0.0f, 0.0f, 26.0f, 77.0f, 0.0f, 25.0f, 81.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
-s32 weapon_gance_macho_speed[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 16793632, 268435456, 770, 0, 135, 0, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    1677983744, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gance_macho_speed = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1004020, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    100, // fastChance
+    4, // fastTime
+    0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
+    0, 0, 0, 0, // hpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_gance_build_up[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 16793632, 268435456, 770, 0, 135, 0, -2147475452,
-    0, 0, 0, 0, 0, 25601, 50331648, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gance_build_up = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1004020, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, // burnTime..sizeChangeStrength
+    100, // atkChangeChance
+    1, // atkChangeTime
+    3, // atkChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
+    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
+    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_gance_body[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 16793632, 268435456, 770, 0, 135, 0, -2147475452,
-    0, 0, 0, 0, 0, 0, 6554115, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gance_body = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1004020, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, // atkChangeStrength
+    100, // defChangeChance
+    2, // defChangeTime
+    3, // defChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
+    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
+    0, 0, // fpRegenTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_gance_footwork[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 16793632, 268435456, 770, 0, 135, 0, -2147475452,
-    0, 0, 0, 6554112, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gance_footwork = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1004020, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, // poisonStrength..electricTime
+    100, // dodgyChance
+    2, // dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_gance_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536875008, 770, 0, 4231, 0, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gance_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20001000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x1087, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_gance_posing[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 16793632, 268435456, 770, 0, 136, 0, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 4,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gance_posing = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1004020, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x88, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..ohkoChance
+    4, // chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_gance_rariat_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, 0, 4231, 0, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gance_rariat_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x1087, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_gance_body_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536875008, 656130, 0, 4231, 0, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 1644900, 0, 0,
+BattleWeapon weapon_gance_body_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20001000, // targetPropertyFlags
+    0, // element
+    10, // damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x1087, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 25, 25, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(macho_gance_zoom)
@@ -434,16 +639,27 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static s32 entry_event[] = {
-    131163, (s32)btlevtcmd_StatusWindowOnOff, 0, 131122, -30000000, 2, 65630, (s32)macho_gance_zoom,
-    65546, 1000, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING1", -250000000, 0,
-    -29999985, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"E_1A", 65546, 1500,
-    131163, (s32)evt_snd_sfxoff, -29999985, 327771, (s32)evt_msg_print, 2, (s32)"stg3_tou_469", 0,
-    -2, 65546, 300, 131122, -30000000, 2, 65630, (s32)mario_party_zoom,
-    131163, (s32)evt_msg_print_battle_party, (s32)"stg3_tou_470", 65546, 300, 196699, (s32)btlevtcmd_GetBodyId, -4,
-    -30000000, 196699, (s32)btlevtcmd_AnimeChangePoseFromTable, -4, -30000000, 131163, (s32)btlevtcmd_StatusWindowOnOff, 1,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 2, 1,
-};
+static EVT_BEGIN(entry_event)
+    CALL(btlevtcmd_StatusWindowOnOff, 0)
+    SET_VALUE(LW(0), 2)
+    CALL_CHILD(macho_gance_zoom)
+    WAIT_MS(1000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1A"))
+    WAIT_MS(1500)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(evt_msg_print, 2, STRING("stg3_tou_469"), 0, -2)
+    WAIT_MS(300)
+    SET_VALUE(LW(0), 2)
+    CALL_CHILD(mario_party_zoom)
+    CALL(evt_msg_print_battle_party, STRING("stg3_tou_470"))
+    WAIT_MS(300)
+    CALL(btlevtcmd_GetBodyId, -4, LW(0))
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -4, LW(0))
+    CALL(btlevtcmd_StatusWindowOnOff, 1)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
@@ -514,113 +730,244 @@ EVT_BEGIN(base_size_change)
     RETURN
 EVT_END()
 
-static s32 phase_event[] = {
-    196699, (s32)btlevtcmd_CheckPhase, -30000000, 67108867, 131096, -30000000, 0, 65540,
-    0, 33, 262235, (s32)btlevtcmd_SetUnitWork, -2, 0, 0, 196699,
-    (s32)btlevtcmd_CheckActStatus, -2, -30000000, 131096, -30000000, 0, 65540, 0,
-    33, 262235, (s32)btlevtcmd_GetUnitWork, -2, 1, -30000000, 65570, -30000000,
-    65572, 0, 196699, (s32)btlevtcmd_GetMaxHp, -2, -30000000, 131127, -30000000,
-    75, 131128, -30000000, 100, 196699, (s32)btlevtcmd_GetHp, -2, -29999999,
-    131100, -29999999, -30000000, 262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 1,
-    131163, (s32)btlevtcmd_StopWaitEvent, -2, 131163, (s32)btlevtcmd_StatusWindowOnOff, 0, 131122, -30000000,
-    0, 65630, (s32)macho_gance_zoom, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING1", -250000000,
-    0, -29999985, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"E_1A", 65546,
-    1500, 131163, (s32)evt_snd_sfxoff, -29999985, 131122, -30000000, -900, 131099,
-    -30000000, 0, 65546, -30000000, 33, 327771, (s32)evt_msg_print, 2,
-    (s32)"stg3_tou_471_17", 0, -2, 65546, 300, 131163, (s32)btlevtcmd_StatusWindowOnOff, 1,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 65546, 1000, 33, 65572,
-    1, 196699, (s32)btlevtcmd_GetMaxHp, -2, -30000000, 131127, -30000000, 50,
-    131128, -30000000, 100, 196699, (s32)btlevtcmd_GetHp, -2, -29999999, 131100,
-    -29999999, -30000000, 262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 2, 131163,
-    (s32)btlevtcmd_StopWaitEvent, -2, 131163, (s32)btlevtcmd_StatusWindowOnOff, 0, 131122, -30000000, 1,
-    65630, (s32)macho_gance_zoom, 327771, (s32)evt_msg_print, 2, (s32)"stg3_tou_471_18", 0, -2,
-    65546, 300, 131122, -30000000, 0, 65630, (s32)macho_gance_blur_zoom, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_BIG3", -250000000, 0, -29999985, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"M_1", 65546, 800, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_BOSS_GANSU_BIG1", -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetRotate, -2, -30000000,
-    -29999999, -29999998, 131122, -29999995, 36, 65541, -29999995, 393307,
-    (s32)wariai_enzan_1f, -29999995, 36, -230000000, -229815680, -29999994, 393307, (s32)wariai_enzan_1f,
-    -29999995, 36, -229998976, -229998823, -29999993, 327771, (s32)btlevtcmd_SetBaseScale, -2,
-    -29999993, -29999993, 1, 131125, -29999994, -29999999, 327771, (s32)btlevtcmd_SetRotate,
-    -2, 0, -29999994, 0, 65545, 1, 6, 196699,
-    (s32)btlevtcmd_ChangeFaceDirection, -2, 1, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0,
-    0, 65546, 400, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_BIG2", -250000000,
-    0, -250000000, 327771, (s32)btlevtcmd_GetRotate, -2, -30000000, -29999999, -29999998,
-    131122, -29999995, 36, 65541, -29999995, 393307, (s32)wariai_enzan_1f, -29999995,
-    36, -230000000, -230184320, -29999994, 393307, (s32)wariai_enzan_1f, -29999995, 36,
-    -229998823, -229998669, -29999993, 327771, (s32)btlevtcmd_SetBaseScale, -2, -29999993, -29999993,
-    1, 131125, -29999994, -29999999, 327771, (s32)btlevtcmd_SetRotate, -2, 0,
-    -29999994, 0, 65545, 1, 6, 131163, (s32)btlevtcmd_ResetFaceDirection, -2,
-    327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0, 131124, -30000000,
-    -229998669, 65630, (s32)base_size_change, 65546, 400, 131163, (s32)evt_snd_sfxoff, -29999985,
-    327771, (s32)btlevtcmd_JumpSetting, -2, 20, -230000000, -229999386, 131122, -29999992,
-    2, 65541, -29999992, 110, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"J_1A", 327771, (s32)btlevtcmd_GetPosFloat, -2, -29999995, -29999994, -29999993, 65541,
-    0, 327771, (s32)btlevtcmd_GetPosFloat, -2, -29999991, -29999990, -29999989, 131131,
-    -29999994, -29999990, 131099, -29999994, -230000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    1, (s32)"J_1B", 7, 33, 131124, -29999994, -29999990, 65545,
-    1, 6, 112, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999,
-    -29999998, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_JUMP1", -250000000, 0, -250000000,
-    458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 36, -1,
-    110, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_HIPDROP1", -250000000, 0, -250000000,
-    327771, (s32)evt_cam_shake, 4, -230000000, -229999980, 800, 112, 65546,
-    200, 6, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 69, 65546,
-    400, 131163, (s32)btlevtcmd_StatusWindowOnOff, 1, 196699, (s32)evt_btl_camera_set_mode, 0, 0,
-    65546, 1000, 33, 65572, 2, 196699, (s32)btlevtcmd_GetMaxHp, -2,
-    -30000000, 131127, -30000000, 25, 131128, -30000000, 100, 196699,
-    (s32)btlevtcmd_GetHp, -2, -29999999, 131100, -29999999, -30000000, 262235, (s32)btlevtcmd_SetUnitWork,
-    -2, 1, 3, 131163, (s32)btlevtcmd_StopWaitEvent, -2, 262235, (s32)btlevtcmd_AnimeSetPoseTable,
-    -2, 1, (s32)pose_table_furafura, 131163, (s32)btlevtcmd_StatusWindowOnOff, 0, 131122, -30000000,
-    1, 65630, (s32)macho_gance_zoom, 196699, (s32)btlevtcmd_SetTalkPoseType, -2, 65, 196699,
-    (s32)btlevtcmd_SetStayPoseType, -2, 43, 327771, (s32)evt_msg_print, 2, (s32)"stg3_tou_471_19", 0,
-    -2, 65546, 300, 131163, (s32)btlevtcmd_StatusWindowOnOff, 1, 196699, (s32)evt_btl_camera_set_mode,
-    0, 0, 65546, 1000, 33, 49, 65539, 0,
-    2, 1,
-};
+static EVT_BEGIN(phase_event)
+    CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
+    IF_INT_EQUAL(LW(0), 0)
+        GOTO(0)
+    END_IF
+    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
+    CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        GOTO(0)
+    END_IF
+    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CALL(btlevtcmd_GetMaxHp, -2, LW(0))
+        MULTIPLY(LW(0), 75)
+        DIVIDE(LW(0), 100)
+        CALL(btlevtcmd_GetHp, -2, LW(1))
+        IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
+            CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
+            CALL(btlevtcmd_StopWaitEvent, -2)
+            CALL(btlevtcmd_StatusWindowOnOff, 0)
+            SET_VALUE(LW(0), 0)
+            CALL_CHILD(macho_gance_zoom)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING1"), -250000000, 0, LW(15))
+            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1A"))
+            WAIT_MS(1500)
+            CALL(evt_snd_sfxoff, LW(15))
+            SET_VALUE(LW(0), -900)
+            IF_INT_GREATER(LW(0), 0)
+                WAIT_MS(LW(0))
+            END_IF
+            CALL(evt_msg_print, 2, STRING("stg3_tou_471_17"), 0, -2)
+            WAIT_MS(300)
+            CALL(btlevtcmd_StatusWindowOnOff, 1)
+            CALL(evt_btl_camera_set_mode, 0, 0)
+            WAIT_MS(1000)
+        END_IF
+        CASE_EQUAL(1)
+        CALL(btlevtcmd_GetMaxHp, -2, LW(0))
+        MULTIPLY(LW(0), 50)
+        DIVIDE(LW(0), 100)
+        CALL(btlevtcmd_GetHp, -2, LW(1))
+        IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
+            CALL(btlevtcmd_SetUnitWork, -2, 1, 2)
+            CALL(btlevtcmd_StopWaitEvent, -2)
+            CALL(btlevtcmd_StatusWindowOnOff, 0)
+            SET_VALUE(LW(0), 1)
+            CALL_CHILD(macho_gance_zoom)
+            CALL(evt_msg_print, 2, STRING("stg3_tou_471_18"), 0, -2)
+            WAIT_MS(300)
+            SET_VALUE(LW(0), 0)
+            CALL_CHILD(macho_gance_blur_zoom)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_BIG3"), -250000000, 0, LW(15))
+            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_1"))
+            WAIT_MS(800)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_BIG1"), -250000000, 0, -250000000)
+            CALL(btlevtcmd_GetRotate, -2, LW(0), LW(1), LW(2))
+            SET_VALUE(LW(5), 36)
+            LOOP(LW(5))
+                CALL(wariai_enzan_1f, LW(5), 36, FLOAT(0.0f), FLOAT(180.0f), LW(6))
+                CALL(wariai_enzan_1f, LW(5), 36, FLOAT(1.0f), FLOAT(1.1494141f), LW(7))
+                CALL(btlevtcmd_SetBaseScale, -2, LW(7), LW(7), 1)
+                ADD(LW(6), LW(1))
+                CALL(btlevtcmd_SetRotate, -2, 0, LW(6), 0)
+                WAIT_FRAMES(1)
+            END_LOOP
+            CALL(btlevtcmd_ChangeFaceDirection, -2, 1)
+            CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+            WAIT_MS(400)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_BIG2"), -250000000, 0, -250000000)
+            CALL(btlevtcmd_GetRotate, -2, LW(0), LW(1), LW(2))
+            SET_VALUE(LW(5), 36)
+            LOOP(LW(5))
+                CALL(wariai_enzan_1f, LW(5), 36, FLOAT(0.0f), FLOAT(-180.0f), LW(6))
+                CALL(wariai_enzan_1f, LW(5), 36, FLOAT(1.1494141f), FLOAT(1.2998047f), LW(7))
+                CALL(btlevtcmd_SetBaseScale, -2, LW(7), LW(7), 1)
+                ADD(LW(6), LW(1))
+                CALL(btlevtcmd_SetRotate, -2, 0, LW(6), 0)
+                WAIT_FRAMES(1)
+            END_LOOP
+            CALL(btlevtcmd_ResetFaceDirection, -2)
+            CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+            SET_FLOAT_VALUE(LW(0), FLOAT(1.2998047f))
+            CALL_CHILD(base_size_change)
+            WAIT_MS(400)
+            CALL(evt_snd_sfxoff, LW(15))
+            CALL(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0f), FLOAT(0.5996094f))
+            SET_VALUE(LW(8), 2)
+            LOOP(LW(8))
+                BEGIN_SIBLING_EVENT
+                    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("J_1A"))
+                    CALL(btlevtcmd_GetPosFloat, -2, LW(5), LW(6), LW(7))
+                    LOOP(0)
+                        CALL(btlevtcmd_GetPosFloat, -2, LW(9), LW(10), LW(11))
+                        SUBTRACT_FLOAT(LW(6), LW(10))
+                        IF_INT_GREATER(LW(6), FLOAT(0.0f))
+                            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("J_1B"))
+                            BREAK_LOOP
+                        END_IF
+                        SET_FLOAT_VALUE(LW(6), LW(10))
+                        WAIT_FRAMES(1)
+                    END_LOOP
+                END_SIBLING_EVENT
+                CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+                CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_JUMP1"), -250000000, 0, -250000000)
+                CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 36, -1)
+                BEGIN_SIBLING_EVENT
+                    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_HIPDROP1"), -250000000, 0, -250000000)
+                    CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 800)
+                END_SIBLING_EVENT
+                WAIT_MS(200)
+            END_LOOP
+            CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+            WAIT_MS(400)
+            CALL(btlevtcmd_StatusWindowOnOff, 1)
+            CALL(evt_btl_camera_set_mode, 0, 0)
+            WAIT_MS(1000)
+        END_IF
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_GetMaxHp, -2, LW(0))
+        MULTIPLY(LW(0), 25)
+        DIVIDE(LW(0), 100)
+        CALL(btlevtcmd_GetHp, -2, LW(1))
+        IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
+            CALL(btlevtcmd_SetUnitWork, -2, 1, 3)
+            CALL(btlevtcmd_StopWaitEvent, -2)
+            CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_furafura))
+            CALL(btlevtcmd_StatusWindowOnOff, 0)
+            SET_VALUE(LW(0), 1)
+            CALL_CHILD(macho_gance_zoom)
+            CALL(btlevtcmd_SetTalkPoseType, -2, 65)
+            CALL(btlevtcmd_SetStayPoseType, -2, 43)
+            CALL(evt_msg_print, 2, STRING("stg3_tou_471_19"), 0, -2)
+            WAIT_MS(300)
+            CALL(btlevtcmd_StatusWindowOnOff, 1)
+            CALL(evt_btl_camera_set_mode, 0, 0)
+            WAIT_MS(1000)
+        END_IF
+    END_SWITCH
+    LABEL(0)
+    RETURN
+EVT_END()
 
-static s32 dead_event[] = {
-    65627, (s32)btlevtcmd_WaitAttackEnd, 131163, (s32)btlevtcmd_StatusWindowOnOff, 0, 131122, -30000000, 1,
-    65630, (s32)macho_gance_zoom, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"D_2", 65546,
-    170, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_DOWN1", -250000000, 0, -250000000,
-    327771, (s32)evt_cam_shake, 4, -229999980, -230000000, 500, 65546, 200,
-    196699, (s32)btlevtcmd_SetTalkPose, -2, (s32)"T_2", 196699, (s32)btlevtcmd_SetStayPose, -2, (s32)"S_2",
-    327771, (s32)evt_msg_print, 2, (s32)"stg3_tou_471_20", 0, -2, 65546, 300,
-    131163, (s32)btlevtcmd_StatusWindowOnOff, 1, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 65546,
-    500, 131122, -29999990, -2, 65630, (s32)subsetevt_dead_core_nospin_norotate, 2, 1,
-};
+static EVT_BEGIN(dead_event)
+    CALL(btlevtcmd_WaitAttackEnd)
+    CALL(btlevtcmd_StatusWindowOnOff, 0)
+    SET_VALUE(LW(0), 1)
+    CALL_CHILD(macho_gance_zoom)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("D_2"))
+    WAIT_MS(170)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_DOWN1"), -250000000, 0, -250000000)
+    CALL(evt_cam_shake, 4, FLOAT(0.01953125f), FLOAT(0.0f), 500)
+    WAIT_MS(200)
+    CALL(btlevtcmd_SetTalkPose, -2, STRING("T_2"))
+    CALL(btlevtcmd_SetStayPose, -2, STRING("S_2"))
+    CALL(evt_msg_print, 2, STRING("stg3_tou_471_20"), 0, -2)
+    WAIT_MS(300)
+    CALL(btlevtcmd_StatusWindowOnOff, 1)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_MS(500)
+    SET_VALUE(LW(10), -2)
+    CALL_CHILD(subsetevt_dead_core_nospin_norotate)
+    RETURN
+EVT_END()
 
-s32 macho_gance_damage_event[] = {
-    131163, (s32)btlevtcmd_ResetFaceDirection, -29999990, 196699, (s32)btlevtcmd_OnUnitFlag, -29999990, 1, 110,
-    65570, -30000000, 65579, 43, 65579, 44, 65579, 45,
-    196699, (s32)btlevtcmd_GetUnitKind, -29999990, -29999998, 131096, -29999998, 222, 327771,
-    (s32)btlevtcmd_GetPos, -29999990, -29999998, -29999997, -29999996, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_VOICE_MARIO_DAMAGED1",
-    -29999998, -29999997, -29999996, 0, 33, 46, 49, 112,
-    65570, -30000000, 65572, 43, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_ATTACK_MISS3", 0,
-    131122, -29999986, 36, 65572, 46, 196699, (s32)btlevtcmd_GetUnitKind, -29999990,
-    -29999998, 131096, -29999998, 222, 393307, (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_VOICE_MARIO_DAMAGED1",
-    -250000000, 0, -250000000, 33, 131122, -29999986, 29, 65579,
-    49, 65579, 50, 65579, 54, 131122, -29999986, 29,
-    46, 42, 131122, -29999986, 39, 49, 262235, (s32)btlevtcmd_AnimeChangePoseType,
-    -29999990, -29999989, -29999986, 110, 196699, (s32)btlevtcmd_RunDataEventChild, -29999990, 10,
-    112, 196699, (s32)btlevtcmd_SetFallAccel, -29999990, -229998976, 327771, (s32)btlevtcmd_GetPos, -29999990,
-    -29999998, -29999997, -29999996, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999990, -29999998, 25,
-    131125, -29999997, 25, 655451, (s32)btlevtcmd_DivePosition, -29999990, -29999998, -29999997,
-    -29999996, 10, 0, 0, 0, -1, 65546, 500,
-    196699, (s32)btlevtcmd_SetFallAccel, -29999990, -229998976, 327771, (s32)btlevtcmd_GetPos, -29999990, -29999998,
-    -29999997, -29999996, 327771, (s32)btlevtcmd_GetHomePos, -29999990, -29999995, -29999994, -29999993,
-    131127, -29999998, 3, 131127, -29999995, 4, 131125, -29999998,
-    -29999995, 131128, -29999998, 7, 262235, (s32)btlevtcmd_TransStageFloorPosition, -29999998, -29999997,
-    -29999996, 458843, (s32)btlevtcmd_JumpPosition, -29999990, -29999998, -29999997, -29999996, 40,
-    -1, 110, 327771, (s32)evt_cam_shake, 4, -230000000, -229999980, 250,
-    112, 327771, (s32)btlevtcmd_GetHomePos, -29999990, -29999995, -29999994, -29999993, 131127,
-    -29999995, 2, 131125, -29999998, -29999995, 131128, -29999998, 3,
-    458843, (s32)btlevtcmd_JumpPosition, -29999990, -29999998, -29999997, -29999996, 20, -1,
-    110, 327771, (s32)evt_cam_shake, 4, -230000000, -229999980, 166, 112,
-    327771, (s32)btlevtcmd_GetHomePos, -29999990, -29999998, -29999997, -29999996, 458843, (s32)btlevtcmd_JumpPosition,
-    -29999990, -29999998, -29999997, -29999996, 10, -1, 110, 327771,
-    (s32)evt_cam_shake, 4, -230000000, -229999980, 116, 112, 65545, 30,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 2, 1,
-};
+EVT_BEGIN(macho_gance_damage_event)
+    CALL(btlevtcmd_ResetFaceDirection, LW(10))
+    CALL(btlevtcmd_OnUnitFlag, LW(10), 1)
+    BEGIN_SIBLING_EVENT
+        SWITCH(LW(0))
+            CASE_OR_EQUAL(43)
+            CASE_OR_EQUAL(44)
+            CASE_OR_EQUAL(45)
+            CALL(btlevtcmd_GetUnitKind, LW(10), LW(2))
+            IF_INT_EQUAL(LW(2), 222)
+                CALL(btlevtcmd_GetPos, LW(10), LW(2), LW(3), LW(4))
+                CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_DAMAGED1"), LW(2), LW(3), LW(4), 0)
+            END_IF
+            CASE_END
+        END_SWITCH
+    END_SIBLING_EVENT
+    SWITCH(LW(0))
+        CASE_EQUAL(43)
+        CALL(evt_snd_sfxon, STRING("SFX_BTL_ATTACK_MISS3"), 0)
+        SET_VALUE(LW(14), 36)
+        CASE_EQUAL(46)
+        CALL(btlevtcmd_GetUnitKind, LW(10), LW(2))
+        IF_INT_EQUAL(LW(2), 222)
+            CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_VOICE_MARIO_DAMAGED1"), -250000000, 0, -250000000)
+        END_IF
+        SET_VALUE(LW(14), 29)
+        CASE_OR_EQUAL(49)
+        CASE_OR_EQUAL(50)
+        CASE_OR_EQUAL(54)
+        SET_VALUE(LW(14), 29)
+        CASE_END
+        CASE_DEFAULT
+        SET_VALUE(LW(14), 39)
+    END_SWITCH
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_RunDataEventChild, LW(10), 10)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_SetFallAccel, LW(10), FLOAT(1.0f))
+    CALL(btlevtcmd_GetPos, LW(10), LW(2), LW(3), LW(4))
+    CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(2), 25)
+    ADD(LW(3), 25)
+    CALL(btlevtcmd_DivePosition, LW(10), LW(2), LW(3), LW(4), 10, 0, 0, 0, -1)
+    WAIT_MS(500)
+    CALL(btlevtcmd_SetFallAccel, LW(10), FLOAT(1.0f))
+    CALL(btlevtcmd_GetPos, LW(10), LW(2), LW(3), LW(4))
+    CALL(btlevtcmd_GetHomePos, LW(10), LW(5), LW(6), LW(7))
+    MULTIPLY(LW(2), 3)
+    MULTIPLY(LW(5), 4)
+    ADD(LW(2), LW(5))
+    DIVIDE(LW(2), 7)
+    CALL(btlevtcmd_TransStageFloorPosition, LW(2), LW(3), LW(4))
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(2), LW(3), LW(4), 40, -1)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 250)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetHomePos, LW(10), LW(5), LW(6), LW(7))
+    MULTIPLY(LW(5), 2)
+    ADD(LW(2), LW(5))
+    DIVIDE(LW(2), 3)
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(2), LW(3), LW(4), 20, -1)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 166)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetHomePos, LW(10), LW(2), LW(3), LW(4))
+    CALL(btlevtcmd_JumpPosition, LW(10), LW(2), LW(3), LW(4), 10, -1)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 116)
+    END_SIBLING_EVENT
+    WAIT_FRAMES(30)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetUnitWork, -2, 0, LW(1))
@@ -628,7 +975,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetUnitWork, -2, 0, LW(1))
     CALL(btlevtcmd_CheckStatus, -2, 19, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        SET_VALUE(LW(9), PTR(weapon_gance_macho_speed))
+        SET_VALUE(LW(9), PTR(&weapon_gance_macho_speed))
         CALL_CHILD(PTR(gance_macho_speed_attack_event))
         ELSE
         CALL(btlevtcmd_GetUnitWork, -2, 1, LW(2))
@@ -637,17 +984,17 @@ static EVT_BEGIN(attack_event)
                 CALL(btlevtcmd_DrawLots, LW(0), 3, 30, 20, 10)
                 SWITCH(LW(0))
                     CASE_EQUAL(0)
-                    SET_VALUE(LW(9), PTR(weapon_gance_build_up))
+                    SET_VALUE(LW(9), PTR(&weapon_gance_build_up))
                     CALL_CHILD(PTR(gance_build_up_attack_event))
                     CASE_EQUAL(1)
-                    SET_VALUE(LW(9), PTR(weapon_gance_body))
+                    SET_VALUE(LW(9), PTR(&weapon_gance_body))
                     CALL_CHILD(PTR(gance_body_attack_event))
                     CASE_EQUAL(2)
-                    SET_VALUE(LW(9), PTR(weapon_gance_footwork))
+                    SET_VALUE(LW(9), PTR(&weapon_gance_footwork))
                     CALL_CHILD(PTR(gance_footwork_attack_event))
                 END_SWITCH
                 ELSE
-                SET_VALUE(LW(9), PTR(weapon_gance_attack))
+                SET_VALUE(LW(9), PTR(&weapon_gance_attack))
                 CALL_CHILD(PTR(gance_attack_attack_event))
             END_IF
             ELSE
@@ -655,26 +1002,26 @@ static EVT_BEGIN(attack_event)
                 CALL(btlevtcmd_DrawLots, LW(0), 4, 25, 20, 10, 10)
                 SWITCH(LW(0))
                     CASE_EQUAL(0)
-                    SET_VALUE(LW(9), PTR(weapon_gance_build_up))
+                    SET_VALUE(LW(9), PTR(&weapon_gance_build_up))
                     CALL_CHILD(PTR(gance_build_up_attack_event))
                     CASE_EQUAL(1)
-                    SET_VALUE(LW(9), PTR(weapon_gance_body))
+                    SET_VALUE(LW(9), PTR(&weapon_gance_body))
                     CALL_CHILD(PTR(gance_body_attack_event))
                     CASE_EQUAL(2)
-                    SET_VALUE(LW(9), PTR(weapon_gance_footwork))
+                    SET_VALUE(LW(9), PTR(&weapon_gance_footwork))
                     CALL_CHILD(PTR(gance_footwork_attack_event))
                     CASE_EQUAL(3)
-                    SET_VALUE(LW(9), PTR(weapon_gance_posing))
+                    SET_VALUE(LW(9), PTR(&weapon_gance_posing))
                     CALL_CHILD(PTR(gance_posing_attack_event))
                 END_SWITCH
                 ELSE
                 CALL(btlevtcmd_DrawLots, LW(0), 2, 10, 10)
                 SWITCH(LW(0))
                     CASE_EQUAL(0)
-                    SET_VALUE(LW(9), PTR(weapon_gance_rariat_attack))
+                    SET_VALUE(LW(9), PTR(&weapon_gance_rariat_attack))
                     CALL_CHILD(PTR(gance_rariat_attack_attack_event))
                     CASE_EQUAL(1)
-                    SET_VALUE(LW(9), PTR(weapon_gance_body_attack))
+                    SET_VALUE(LW(9), PTR(&weapon_gance_body_attack))
                     CALL_CHILD(PTR(gance_body_attack_attack_event))
                 END_SWITCH
             END_IF
@@ -684,296 +1031,569 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-s32 gance_macho_speed_attack_event[] = {
-    196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2,
-    -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0,
-    300, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING1", -250000000, 0, -29999985,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"E_1A", 65546, 1500, 131163,
-    (s32)evt_snd_sfxoff, -29999985, 327771, (s32)btlevtcmd_GetPosFloat, -2, -30000000, -29999999, -29999998,
-    196699, (s32)btlevtcmd_GetStatusMg, -2, -29999995, 262235, (s32)btlevtcmd_GetUnitWorkFloat, -2, 3,
-    -29999994, 131132, -29999995, -29999994, 131124, -29999994, -229938560, 131132,
-    -29999994, -29999995, 131130, -29999999, -29999994, 131131, -29999998, -229959040,
-    983131, (s32)evt_eff64, (s32)"hikari", (s32)"radiation_n64", 2, -30000000, -29999999, -29999998,
-    -229998976, 0, 0, 0, 0, 0, 0, 0,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING2", -250000000, 0, -29999985, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_3", 65546, 1000, 131163, (s32)evt_snd_sfxoff,
-    -29999985, 131163, (s32)evt_eff_delete, (s32)"hikari", 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991,
-    262235, (s32)btlevtcmd_SetUnitWork, -2, 2, 1, 458843, (s32)btlevtcmd_CheckDamage, -2,
-    -2, 1, -29999991, 256, -29999995, 2, 1,
-};
+EVT_BEGIN(gance_macho_speed_attack_event)
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 300)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1A"))
+    WAIT_MS(1500)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStatusMg, -2, LW(5))
+    CALL(btlevtcmd_GetUnitWorkFloat, -2, 3, LW(6))
+    MULTIPLY_FLOAT(LW(5), LW(6))
+    SET_FLOAT_VALUE(LW(6), FLOAT(60.0f))
+    MULTIPLY_FLOAT(LW(6), LW(5))
+    ADD_FLOAT(LW(1), LW(6))
+    SUBTRACT_FLOAT(LW(2), FLOAT(40.0f))
+    CALL(evt_eff64, STRING("hikari"), STRING("radiation_n64"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING2"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_3"))
+    WAIT_MS(1000)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(evt_eff_delete, STRING("hikari"))
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_SetUnitWork, -2, 2, 1)
+    CALL(btlevtcmd_CheckDamage, -2, -2, 1, LW(9), 256, LW(5))
+    RETURN
+EVT_END()
 
-s32 gance_build_up_attack_event[] = {
-    196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2,
-    -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0,
-    300, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING1", -250000000, 0, -29999985,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"E_1A", 65546, 1500, 131163,
-    (s32)evt_snd_sfxoff, -29999985, 327771, (s32)btlevtcmd_GetPosFloat, -2, -30000000, -29999999, -29999998,
-    196699, (s32)btlevtcmd_GetStatusMg, -2, -29999995, 262235, (s32)btlevtcmd_GetUnitWorkFloat, -2, 3,
-    -29999994, 131132, -29999995, -29999994, 131124, -29999994, -229948800, 131132,
-    -29999994, -29999995, 131130, -29999999, -29999994, 131131, -29999998, -229959040,
-    983131, (s32)evt_eff64, (s32)"hikari", (s32)"radiation_n64", 2, -30000000, -29999999, -29999998,
-    -229998976, 0, 0, 0, 0, 0, 0, 0,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING3", -250000000, 0, -29999985, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_5", 65546, 1000, 131163, (s32)evt_snd_sfxoff,
-    -29999985, 131163, (s32)evt_eff_delete, (s32)"hikari", 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991,
-    262235, (s32)btlevtcmd_SetUnitWork, -2, 2, 2, 458843, (s32)btlevtcmd_CheckDamage, -2,
-    -2, 1, -29999991, 256, -29999995, 2, 1,
-};
+EVT_BEGIN(gance_build_up_attack_event)
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 300)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1A"))
+    WAIT_MS(1500)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStatusMg, -2, LW(5))
+    CALL(btlevtcmd_GetUnitWorkFloat, -2, 3, LW(6))
+    MULTIPLY_FLOAT(LW(5), LW(6))
+    SET_FLOAT_VALUE(LW(6), FLOAT(50.0f))
+    MULTIPLY_FLOAT(LW(6), LW(5))
+    ADD_FLOAT(LW(1), LW(6))
+    SUBTRACT_FLOAT(LW(2), FLOAT(40.0f))
+    CALL(evt_eff64, STRING("hikari"), STRING("radiation_n64"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING3"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_5"))
+    WAIT_MS(1000)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(evt_eff_delete, STRING("hikari"))
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_SetUnitWork, -2, 2, 2)
+    CALL(btlevtcmd_CheckDamage, -2, -2, 1, LW(9), 256, LW(5))
+    RETURN
+EVT_END()
 
-s32 gance_body_attack_event[] = {
-    196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2,
-    -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0,
-    300, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING1", -250000000, 0, -29999985,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"E_1A", 65546, 1500, 131163,
-    (s32)evt_snd_sfxoff, -29999985, 327771, (s32)btlevtcmd_GetPosFloat, -2, -30000000, -29999999, -29999998,
-    196699, (s32)btlevtcmd_GetStatusMg, -2, -29999995, 262235, (s32)btlevtcmd_GetUnitWorkFloat, -2, 3,
-    -29999994, 131132, -29999995, -29999994, 131124, -29999994, -229948800, 131132,
-    -29999994, -29999995, 131130, -29999999, -29999994, 131131, -29999998, -229959040,
-    983131, (s32)evt_eff64, (s32)"hikari", (s32)"radiation_n64", 2, -30000000, -29999999, -29999998,
-    -229998976, 0, 0, 0, 0, 0, 0, 0,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING4", -250000000, 0, -29999985, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_4", 65546, 500, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"M_7", 65546, 500, 131163, (s32)evt_snd_sfxoff, -29999985,
-    131163, (s32)evt_eff_delete, (s32)"hikari", 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991, 262235,
-    (s32)btlevtcmd_SetUnitWork, -2, 2, 3, 458843, (s32)btlevtcmd_CheckDamage, -2, -2,
-    1, -29999991, 256, -29999995, 2, 1,
-};
+EVT_BEGIN(gance_body_attack_event)
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 300)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1A"))
+    WAIT_MS(1500)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStatusMg, -2, LW(5))
+    CALL(btlevtcmd_GetUnitWorkFloat, -2, 3, LW(6))
+    MULTIPLY_FLOAT(LW(5), LW(6))
+    SET_FLOAT_VALUE(LW(6), FLOAT(50.0f))
+    MULTIPLY_FLOAT(LW(6), LW(5))
+    ADD_FLOAT(LW(1), LW(6))
+    SUBTRACT_FLOAT(LW(2), FLOAT(40.0f))
+    CALL(evt_eff64, STRING("hikari"), STRING("radiation_n64"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING4"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_4"))
+    WAIT_MS(500)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_7"))
+    WAIT_MS(500)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(evt_eff_delete, STRING("hikari"))
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_SetUnitWork, -2, 2, 3)
+    CALL(btlevtcmd_CheckDamage, -2, -2, 1, LW(9), 256, LW(5))
+    RETURN
+EVT_END()
 
-s32 gance_footwork_attack_event[] = {
-    196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2,
-    -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0,
-    300, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING1", -250000000, 0, -29999985,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"E_1A", 65546, 1500, 131163,
-    (s32)evt_snd_sfxoff, -29999985, 327771, (s32)btlevtcmd_GetPosFloat, -2, -30000000, -29999999, -29999998,
-    196699, (s32)btlevtcmd_GetStatusMg, -2, -29999995, 262235, (s32)btlevtcmd_GetUnitWorkFloat, -2, 3,
-    -29999994, 131132, -29999995, -29999994, 131124, -29999994, -229948800, 131132,
-    -29999994, -29999995, 131130, -29999999, -29999994, 131131, -29999998, -229959040,
-    983131, (s32)evt_eff64, (s32)"hikari", (s32)"radiation_n64", 2, -30000000, -29999999, -29999998,
-    -229998976, 0, 0, 0, 0, 0, 0, 0,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING5", -250000000, 0, -29999985, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_6", 65546, 1000, 131163, (s32)evt_snd_sfxoff,
-    -29999985, 131163, (s32)evt_eff_delete, (s32)"hikari", 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991,
-    262235, (s32)btlevtcmd_SetUnitWork, -2, 2, 4, 458843, (s32)btlevtcmd_CheckDamage, -2,
-    -2, 1, -29999991, 256, -29999995, 2, 1,
-};
+EVT_BEGIN(gance_footwork_attack_event)
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 300)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1A"))
+    WAIT_MS(1500)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStatusMg, -2, LW(5))
+    CALL(btlevtcmd_GetUnitWorkFloat, -2, 3, LW(6))
+    MULTIPLY_FLOAT(LW(5), LW(6))
+    SET_FLOAT_VALUE(LW(6), FLOAT(50.0f))
+    MULTIPLY_FLOAT(LW(6), LW(5))
+    ADD_FLOAT(LW(1), LW(6))
+    SUBTRACT_FLOAT(LW(2), FLOAT(40.0f))
+    CALL(evt_eff64, STRING("hikari"), STRING("radiation_n64"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING5"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_6"))
+    WAIT_MS(1000)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(evt_eff_delete, STRING("hikari"))
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_SetUnitWork, -2, 2, 4)
+    CALL(btlevtcmd_CheckDamage, -2, -2, 1, LW(9), 256, LW(5))
+    RETURN
+EVT_END()
 
-s32 gance_attack_attack_event[] = {
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING1", -250000000, 0, -29999985, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"E_1A", 65546, 1500, 131163, (s32)evt_snd_sfxoff,
-    -29999985, 327771, (s32)btlevtcmd_GetPosFloat, -2, -30000000, -29999999, -29999998, 196699,
-    (s32)btlevtcmd_GetStatusMg, -2, -29999995, 262235, (s32)btlevtcmd_GetUnitWorkFloat, -2, 3, -29999994,
-    131132, -29999995, -29999994, 131124, -29999994, -229948800, 131132, -29999994,
-    -29999995, 131130, -29999999, -29999994, 131131, -29999998, -229959040, 983131,
-    (s32)evt_eff64, (s32)"hikari", (s32)"radiation_n64", 2, -30000000, -29999999, -29999998, -229998976,
-    0, 0, 0, 0, 0, 0, 0, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING7", -250000000, 0, -29999985, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"E_1B", 65546, 1000, 131163, (s32)evt_snd_sfxoff, -29999985,
-    131163, (s32)evt_eff_delete, (s32)"hikari", 327771, (s32)btlevtcmd_JumpSetting, -2, 20, -230000000,
-    -229999386, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2,
-    -30000000, -29999991, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991, -29999997, -29999996, 131096,
-    -29999997, -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16, -30000000, 131097,
-    -30000000, 0, 65630, (s32)subsetevt_confuse_flustered, 33, 2, 33, 131163,
-    (s32)btlevtcmd_WeaponAftereffect, -29999991, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996, 65627,
-    (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991, 327771, (s32)btlevtcmd_GetHomePos, -2,
-    -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_PartsFaceDirectionSub, -2, 1, -30000000,
-    250, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 40, 196699, (s32)x_flag_set,
-    0, 1, 110, 327771, (s32)evt_cam_shake, 4, -229999996, -230000000,
-    1166, 196699, (s32)x_flag_set, 0, 0, 112, 524379, (s32)btlevtcmd_MovePosition,
-    -2, -30000000, -29999999, -29999998, 70, -1, 1, 196699,
-    (s32)x_flag_wait, 0, 0, 65546, 500, 327771, (s32)btlevtcmd_GetHomePos, -2,
-    -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42,
-    110, 327771, (s32)evt_cam_shake, 4, -229999996, -230000000, 500, 112,
-    524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 30, -1,
-    0, 110, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"J_1A", 327771,
-    (s32)btlevtcmd_GetPosFloat, -2, -29999995, -29999994, -29999993, 65541, 0, 327771,
-    (s32)btlevtcmd_GetPosFloat, -2, -29999991, -29999990, -29999989, 131131, -29999994, -29999990,
-    131099, -29999994, -230000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"J_1B",
-    7, 33, 131124, -29999994, -29999990, 65545, 1, 6,
-    112, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_JUMP1", -250000000, 0, -250000000, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 36, -1, 196699,
-    (s32)x_flag_set, 0, 0, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996,
-    -29999991, 256, -29999995, 65570, -29999995, 65579, 4, 65540,
-    90, 46, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38,
-    65540, 90, 46, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    39, 65540, 90, 65572, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    40, 65540, 90, 65572, 1, 65540, 91, 46,
-    42, 65540, 98, 46, 49, 65539, 90, 131163,
-    (s32)btlevtcmd_JumpContinue, -2, 196699, (s32)x_flag_set, 0, 1, 110, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_HIPDROP1", -250000000, 0, -250000000, 327771, (s32)evt_cam_shake,
-    4, -230000000, -229999980, 800, 196699, (s32)x_flag_set, 0, 0,
-    112, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 262235,
-    (s32)btlevtcmd_MoveDirectionAdd, -2, -30000000, 30, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000,
-    -29999999, -29999998, 18, -1, 262235, (s32)btlevtcmd_MoveDirectionAdd, -2, -30000000,
-    18, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 9,
-    -1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 69, 65546, 300,
-    65540, 98, 65539, 91, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999991,
-    196699, (s32)x_flag_set, 0, 1, 110, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_BOSS_GANSU_HIPDROP1", -250000000, 0, -250000000, 327771, (s32)evt_cam_shake, 4, -230000000,
-    -229999980, 800, 196699, (s32)x_flag_set, 0, 0, 112, 458843,
-    (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991, 256, -29999995, 327771,
-    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 131122, -29999999, 0,
-    262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 48, 458843, (s32)btlevtcmd_JumpPosition, -2,
-    -30000000, -29999999, -29999998, 30, -1, 262235, (s32)btlevtcmd_FaceDirectionSub, -2,
-    -30000000, 24, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998,
-    12, -1, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 12, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 6, -1, 65539,
-    98, 196699, (s32)x_flag_wait, 0, 0, 196699, (s32)btlevtcmd_SetMoveSpeed, -2,
-    -229995904, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 69, 65546, 500, 262235, (s32)btlevtcmd_AnimeChangePoseType,
-    -2, 1, 42, 196699, (s32)x_flag_set, 0, 1, 110,
-    327771, (s32)evt_cam_shake, 4, -229999996, -230000000, 666, 196699, (s32)x_flag_set,
-    0, 0, 112, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999,
-    -29999998, 40, -1, 0, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 196699,
-    (s32)x_flag_wait, 0, 0, 2, 1,
-};
+EVT_BEGIN(gance_attack_attack_event)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1A"))
+    WAIT_MS(1500)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStatusMg, -2, LW(5))
+    CALL(btlevtcmd_GetUnitWorkFloat, -2, 3, LW(6))
+    MULTIPLY_FLOAT(LW(5), LW(6))
+    SET_FLOAT_VALUE(LW(6), FLOAT(50.0f))
+    MULTIPLY_FLOAT(LW(6), LW(5))
+    ADD_FLOAT(LW(1), LW(6))
+    SUBTRACT_FLOAT(LW(2), FLOAT(40.0f))
+    CALL(evt_eff64, STRING("hikari"), STRING("radiation_n64"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING7"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1B"))
+    WAIT_MS(1000)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(evt_eff_delete, STRING("hikari"))
+    CALL(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0f), FLOAT(0.5996094f))
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+        END_IF
+        RETURN
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_PartsFaceDirectionSub, -2, 1, LW(0), 250)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+    CALL(x_flag_set, 0, 1)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.00390625f), FLOAT(0.0f), 1166)
+        CALL(x_flag_set, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 70, -1, 1)
+    CALL(x_flag_wait, 0, 0)
+    WAIT_MS(500)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.00390625f), FLOAT(0.0f), 500)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 30, -1, 0)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("J_1A"))
+        CALL(btlevtcmd_GetPosFloat, -2, LW(5), LW(6), LW(7))
+        LOOP(0)
+            CALL(btlevtcmd_GetPosFloat, -2, LW(9), LW(10), LW(11))
+            SUBTRACT_FLOAT(LW(6), LW(10))
+            IF_INT_GREATER(LW(6), FLOAT(0.0f))
+                CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("J_1B"))
+                BREAK_LOOP
+            END_IF
+            SET_FLOAT_VALUE(LW(6), LW(10))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_JUMP1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 36, -1)
+    CALL(x_flag_set, 0, 0)
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+    END_SWITCH
+    LABEL(90)
+    CALL(btlevtcmd_JumpContinue, -2)
+    CALL(x_flag_set, 0, 1)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_HIPDROP1"), -250000000, 0, -250000000)
+        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 800)
+        CALL(x_flag_set, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MoveDirectionAdd, -2, LW(0), 30)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 18, -1)
+    CALL(btlevtcmd_MoveDirectionAdd, -2, LW(0), 18)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 9, -1)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+    WAIT_MS(300)
+    GOTO(98)
+    LABEL(91)
+    CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+    CALL(x_flag_set, 0, 1)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_HIPDROP1"), -250000000, 0, -250000000)
+        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 800)
+        CALL(x_flag_set, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    SET_VALUE(LW(1), 0)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 48)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 30, -1)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 24)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 12, -1)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 12)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 6, -1)
+    LABEL(98)
+    CALL(x_flag_wait, 0, 0)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+    WAIT_MS(500)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(x_flag_set, 0, 1)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.00390625f), FLOAT(0.0f), 666)
+        CALL(x_flag_set, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 40, -1, 0)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(x_flag_wait, 0, 0)
+    RETURN
+EVT_END()
 
-s32 gance_posing_attack_event[] = {
-    196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2,
-    -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 196699, (s32)evt_btl_camera_set_zoom, 0,
-    300, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING1", -250000000, 0, -29999985,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"E_1A", 65546, 1500, 131163,
-    (s32)evt_snd_sfxoff, -29999985, 327771, (s32)btlevtcmd_GetPosFloat, -2, -30000000, -29999999, -29999998,
-    196699, (s32)btlevtcmd_GetStatusMg, -2, -29999995, 262235, (s32)btlevtcmd_GetUnitWorkFloat, -2, 3,
-    -29999994, 131132, -29999995, -29999994, 131124, -29999994, -229948800, 131132,
-    -29999994, -29999995, 131130, -29999999, -29999994, 131131, -29999998, -229959040,
-    983131, (s32)evt_eff64, (s32)"hikari", (s32)"radiation_n64", 2, -30000000, -29999999, -29999998,
-    -229998976, 0, 0, 0, 0, 0, 0, 0,
-    110, 65546, 50, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_FIST1", -250000000,
-    0, -250000000, 65546, 180, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_FIST1",
-    -250000000, 0, -250000000, 112, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"M_8", 65546, 1000, 131163, (s32)evt_eff_delete, (s32)"hikari", 196699, (s32)btlevtcmd_PayWeaponCost,
-    -2, -29999991, 262235, (s32)btlevtcmd_SetUnitWork, -2, 2, 6, 458843,
-    (s32)btlevtcmd_CheckDamage, -2, -2, 1, -29999991, 256, -29999995, 2,
-    1,
-};
+EVT_BEGIN(gance_posing_attack_event)
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(evt_btl_camera_set_zoom, 0, 300)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1A"))
+    WAIT_MS(1500)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStatusMg, -2, LW(5))
+    CALL(btlevtcmd_GetUnitWorkFloat, -2, 3, LW(6))
+    MULTIPLY_FLOAT(LW(5), LW(6))
+    SET_FLOAT_VALUE(LW(6), FLOAT(50.0f))
+    MULTIPLY_FLOAT(LW(6), LW(5))
+    ADD_FLOAT(LW(1), LW(6))
+    SUBTRACT_FLOAT(LW(2), FLOAT(40.0f))
+    CALL(evt_eff64, STRING("hikari"), STRING("radiation_n64"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    BEGIN_SIBLING_EVENT
+        WAIT_MS(50)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_FIST1"), -250000000, 0, -250000000)
+        WAIT_MS(180)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_FIST1"), -250000000, 0, -250000000)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_8"))
+    WAIT_MS(1000)
+    CALL(evt_eff_delete, STRING("hikari"))
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_SetUnitWork, -2, 2, 6)
+    CALL(btlevtcmd_CheckDamage, -2, -2, 1, LW(9), 256, LW(5))
+    RETURN
+EVT_END()
 
-s32 gance_rariat_attack_attack_event[] = {
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING1", -250000000, 0, -29999985, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"E_1A", 65546, 1500, 131163, (s32)evt_snd_sfxoff,
-    -29999985, 327771, (s32)btlevtcmd_GetPosFloat, -2, -30000000, -29999999, -29999998, 196699,
-    (s32)btlevtcmd_GetStatusMg, -2, -29999995, 262235, (s32)btlevtcmd_GetUnitWorkFloat, -2, 3, -29999994,
-    131132, -29999995, -29999994, 131124, -29999994, -229907840, 131132, -29999994,
-    -29999995, 131130, -29999999, -29999994, 131124, -29999994, -229979520, 131132,
-    -29999994, -29999995, 131130, -30000000, -29999994, 131131, -29999998, -229959040,
-    983131, (s32)evt_eff64, (s32)"hikari", (s32)"radiation_n64", 2, -30000000, -29999999, -29999998,
-    -229998976, 0, 0, 0, 0, 0, 0, 0,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING8", -250000000, 0, -250000000, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_2", 65546, 1000, 131163, (s32)evt_eff_delete,
-    (s32)"hikari", 327771, (s32)btlevtcmd_JumpSetting, -2, 20, -230000000, -229999386, 196699,
-    (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999991,
-    131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16, -30000000,
-    131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered, 33, 2, 33,
-    131163, (s32)btlevtcmd_WeaponAftereffect, -29999991, 131163, (s32)btlevtcmd_AttackDeclareAll, -2, 65627, (s32)btlevtcmd_WaitGuardMove,
-    196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"A_2A", 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229991808, 110, 327771, (s32)evt_cam_shake,
-    4, -229999996, -230000000, 200, 112, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997,
-    -29999996, 131122, -29999990, 0, 131122, -29999989, 0, 196699,
-    (s32)x_flag_set, 0, 0, 196699, (s32)x_flag_set, 1, 0, 65541,
-    0, 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000, -29999999, -29999998, 196699,
-    (s32)btlevtcmd_GetStatusMg, -2, -29999993, 131132, -29999993, 35, 262235, (s32)btlevtcmd_GetUnitWorkFloat,
-    -2, 3, -29999994, 131132, -29999993, -29999994, 131130, -29999993,
-    15, 131125, -30000000, -29999993, 131125, -29999998, 6, 131096,
-    -29999989, 0, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998,
-    0, -1, 0, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_2B",
-    196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229995904, 32, 196699, (s32)x_flag_set, 1,
-    1, 110, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998,
-    0, -1, 0, 196699, (s32)x_flag_set, 1, 0, 112,
-    33, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996, -29999991, 256,
-    -29999995, 65570, -29999995, 65579, 4, 131122, -29999994, 90,
-    46, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38, 131122,
-    -29999994, 90, 46, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    39, 131122, -29999994, 90, 65572, 2, 196699, (s32)btlevtcmd_StartAvoid,
-    -29999997, 40, 131122, -29999994, 90, 65572, 1, 131122,
-    -29999994, 91, 46, 42, 131122, -29999994, 97, 46,
-    49, 65540, -29999994, 65539, 90, 65540, 97, 65539,
-    91, 131096, -29999989, 0, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999991,
-    33, 131096, -29999990, 0, 131122, -29999990, 1, 196699,
-    (s32)x_flag_set, 0, 1, 110, 327771, (s32)evt_cam_shake, 4, -229999980,
-    -230000000, 800, 196699, (s32)x_flag_set, 0, 0, 112, 33,
-    458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991, 256, -29999995,
-    65539, 97, 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000, -29999999, -29999998,
-    131125, -29999989, 1, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 131096,
-    -29999997, -1, 7, 33, 6, 196699, (s32)x_flag_wait, 1,
-    0, 131126, -30000000, -29999993, 131125, -29999998, 6, 524379,
-    (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, -1, 0,
-    65546, 500, 196699, (s32)x_flag_wait, 0, 0, 196699, (s32)btlevtcmd_SetMoveSpeed,
-    -2, -229995904, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 69, 65546, 500, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42, 196699, (s32)x_flag_set, 0, 1,
-    110, 327771, (s32)evt_cam_shake, 4, -229999996, -230000000, 666, 196699,
-    (s32)x_flag_set, 0, 0, 112, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000,
-    -29999999, -29999998, 40, -1, 0, 131163, (s32)btlevtcmd_ResetFaceDirection, -2,
-    196699, (s32)x_flag_wait, 0, 0, 2, 1,
-};
+EVT_BEGIN(gance_rariat_attack_attack_event)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1A"))
+    WAIT_MS(1500)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStatusMg, -2, LW(5))
+    CALL(btlevtcmd_GetUnitWorkFloat, -2, 3, LW(6))
+    MULTIPLY_FLOAT(LW(5), LW(6))
+    SET_FLOAT_VALUE(LW(6), FLOAT(90.0f))
+    MULTIPLY_FLOAT(LW(6), LW(5))
+    ADD_FLOAT(LW(1), LW(6))
+    SET_FLOAT_VALUE(LW(6), FLOAT(20.0f))
+    MULTIPLY_FLOAT(LW(6), LW(5))
+    ADD_FLOAT(LW(0), LW(6))
+    SUBTRACT_FLOAT(LW(2), FLOAT(40.0f))
+    CALL(evt_eff64, STRING("hikari"), STRING("radiation_n64"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING8"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_2"))
+    WAIT_MS(1000)
+    CALL(evt_eff_delete, STRING("hikari"))
+    CALL(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0f), FLOAT(0.5996094f))
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+        END_IF
+        RETURN
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2A"))
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(8.0f))
+    BEGIN_SIBLING_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.00390625f), FLOAT(0.0f), 200)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    SET_VALUE(LW(10), 0)
+    SET_VALUE(LW(11), 0)
+    CALL(x_flag_set, 0, 0)
+    CALL(x_flag_set, 1, 0)
+    LOOP(0)
+        CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetStatusMg, -2, LW(7))
+        MULTIPLY_FLOAT(LW(7), 35)
+        CALL(btlevtcmd_GetUnitWorkFloat, -2, 3, LW(6))
+        MULTIPLY_FLOAT(LW(7), LW(6))
+        ADD_FLOAT(LW(7), 15)
+        ADD(LW(0), LW(7))
+        ADD(LW(2), 6)
+        IF_INT_EQUAL(LW(11), 0)
+            CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2B"))
+            CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
+        ELSE
+            CALL(x_flag_set, 1, 1)
+            BEGIN_SIBLING_EVENT
+                CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+                CALL(x_flag_set, 1, 0)
+            END_SIBLING_EVENT
+        END_IF
+        CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        SWITCH(LW(5))
+            CASE_OR_EQUAL(4)
+            SET_VALUE(LW(6), 90)
+            CASE_END
+            CASE_EQUAL(3)
+            CALL(btlevtcmd_StartAvoid, LW(3), 38)
+            SET_VALUE(LW(6), 90)
+            CASE_END
+            CASE_EQUAL(6)
+            CALL(btlevtcmd_StartAvoid, LW(3), 39)
+            SET_VALUE(LW(6), 90)
+            CASE_EQUAL(2)
+            CALL(btlevtcmd_StartAvoid, LW(3), 40)
+            SET_VALUE(LW(6), 90)
+            CASE_EQUAL(1)
+            SET_VALUE(LW(6), 91)
+            CASE_END
+            CASE_DEFAULT
+            SET_VALUE(LW(6), 97)
+            CASE_END
+        END_SWITCH
+        GOTO(LW(6))
+        LABEL(90)
+        GOTO(97)
+        LABEL(91)
+        IF_INT_EQUAL(LW(11), 0)
+            CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+        END_IF
+        IF_INT_EQUAL(LW(10), 0)
+            SET_VALUE(LW(10), 1)
+            CALL(x_flag_set, 0, 1)
+            BEGIN_SIBLING_EVENT
+                CALL(evt_cam_shake, 4, FLOAT(0.01953125f), FLOAT(0.0f), 800)
+                CALL(x_flag_set, 0, 0)
+            END_SIBLING_EVENT
+        END_IF
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        LABEL(97)
+        CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+        ADD(LW(11), 1)
+        CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+        IF_INT_EQUAL(LW(3), -1)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(x_flag_wait, 1, 0)
+    SUBTRACT(LW(0), LW(7))
+    ADD(LW(2), 6)
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    WAIT_MS(500)
+    CALL(x_flag_wait, 0, 0)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+    WAIT_MS(500)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(x_flag_set, 0, 1)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.00390625f), FLOAT(0.0f), 666)
+        CALL(x_flag_set, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 40, -1, 0)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(x_flag_wait, 0, 0)
+    RETURN
+EVT_END()
 
-s32 gance_body_attack_attack_event[] = {
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING1", -250000000, 0, -29999985, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"E_1A", 65546, 1500, 131163, (s32)evt_snd_sfxoff,
-    -29999985, 327771, (s32)btlevtcmd_GetPosFloat, -2, -30000000, -29999999, -29999998, 196699,
-    (s32)btlevtcmd_GetStatusMg, -2, -29999995, 262235, (s32)btlevtcmd_GetUnitWorkFloat, -2, 3, -29999994,
-    131132, -29999995, -29999994, 131124, -29999994, -229948800, 131132, -29999994,
-    -29999995, 131130, -29999999, -29999994, 131131, -29999998, -229959040, 983131,
-    (s32)evt_eff64, (s32)"hikari", (s32)"radiation_n64", 2, -30000000, -29999999, -29999998, -229998976,
-    0, 0, 0, 0, 0, 0, 0, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_PAUSING9", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"M_1", 65546, 1000, 131163, (s32)evt_eff_delete, (s32)"hikari",
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 69, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_BOSS_GANSU_ATTACK1", -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetRotate, -2, -30000000,
-    -29999999, -29999998, 131122, -29999995, 12, 65541, -29999995, 393307,
-    (s32)wariai_enzan_1f, -29999995, 12, -230000000, -229815680, -29999994, 131125, -29999994,
-    -29999999, 327771, (s32)btlevtcmd_SetRotate, -2, 0, -29999994, 0, 65545,
-    1, 6, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2, 1, 327771, (s32)btlevtcmd_SetRotate,
-    -2, 0, 0, 0, 65546, 500, 327771, (s32)btlevtcmd_JumpSetting,
-    -2, 20, -230000000, -229999386, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000,
-    262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999991, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991,
-    -29999997, -29999996, 131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken, -2,
-    16, -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered, 33,
-    2, 33, 131163, (s32)btlevtcmd_WeaponAftereffect, -29999991, 262235, (s32)btlevtcmd_AttackDeclare, -2,
-    -29999997, -29999996, 65627, (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1A", 65546, 300, 110,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1B", 196699, (s32)btlevtcmd_GetStatusMg, -2,
-    -30000000, 131132, -30000000, -229928320, 262235, (s32)btlevtcmd_GetUnitWorkFloat, -2, 3,
-    -29999999, 131132, -30000000, -29999999, 327771, (s32)btlevtcmd_SetRotateOffset, -2, -230000000,
-    -30000000, -230000000, 131122, -29999995, -229970509, 65541, -29999995, 458843,
-    (s32)wariai_enzan_1f_intpl, -29999995, -229970509, -230000000, -229672320, -29999994, 5, 327771,
-    (s32)btlevtcmd_SetRotate, -2, 0, 0, -29999994, 65545, 1, 6,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1C", 65545, 1, 327771,
-    (s32)btlevtcmd_SetRotate, -2, 0, 0, 0, 327771, (s32)btlevtcmd_SetRotateOffset, -2,
-    -230000000, -230000000, -230000000, 112, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996,
-    -30000000, -29999999, -29999998, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_JUMP1", -250000000,
-    0, -250000000, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998,
-    36, -1, 196699, (s32)x_flag_set, 0, 0, 458843, (s32)btlevtcmd_PreCheckDamage,
-    -2, -29999997, -29999996, -29999991, 256, -29999995, 65570, -29999995,
-    65579, 4, 65540, 90, 46, 65572, 3, 196699,
-    (s32)btlevtcmd_StartAvoid, -29999997, 38, 65540, 90, 46, 65572, 6,
-    196699, (s32)btlevtcmd_StartAvoid, -29999997, 39, 65540, 90, 65572, 2,
-    196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 65540, 90, 65572, 1,
-    65540, 91, 46, 42, 65540, 98, 46, 49,
-    65539, 90, 131163, (s32)btlevtcmd_JumpContinue, -2, 196699, (s32)x_flag_set, 0,
-    1, 110, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_HIPDROP1", -250000000, 0,
-    -250000000, 327771, (s32)evt_cam_shake, 4, -230000000, -229999980, 800, 196699,
-    (s32)x_flag_set, 0, 0, 112, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"A_1D", 65546, 300, 65540, 98, 65539, 91, 196699,
-    (s32)btlevtcmd_ResultACDefence, -29999997, -29999991, 196699, (s32)x_flag_set, 0, 1, 110,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GANSU_HIPDROP1", -250000000, 0, -250000000, 327771,
-    (s32)evt_cam_shake, 4, -230000000, -229999980, 800, 196699, (s32)x_flag_set, 0,
-    0, 112, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999991,
-    256, -29999995, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1D", 131163,
-    (s32)btlevtcmd_JumpContinue, -2, 65539, 98, 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
-    -29999999, -29999998, 262235, (s32)btlevtcmd_MoveDirectionAdd, -2, -30000000, 30, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 18, -1, 262235,
-    (s32)btlevtcmd_MoveDirectionAdd, -2, -30000000, 18, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000,
-    -29999999, -29999998, 9, -1, 196699, (s32)x_flag_wait, 0, 0,
-    196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229995904, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000,
-    -29999999, -29999998, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2,
-    1, 69, 65546, 500, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1,
-    42, 196699, (s32)x_flag_set, 0, 1, 110, 327771, (s32)evt_cam_shake,
-    4, -229999996, -230000000, 666, 196699, (s32)x_flag_set, 0, 0,
-    112, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 40,
-    -1, 0, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 196699, (s32)x_flag_wait, 0,
-    0, 2, 1,
-};
+EVT_BEGIN(gance_body_attack_attack_event)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1A"))
+    WAIT_MS(1500)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStatusMg, -2, LW(5))
+    CALL(btlevtcmd_GetUnitWorkFloat, -2, 3, LW(6))
+    MULTIPLY_FLOAT(LW(5), LW(6))
+    SET_FLOAT_VALUE(LW(6), FLOAT(50.0f))
+    MULTIPLY_FLOAT(LW(6), LW(5))
+    ADD_FLOAT(LW(1), LW(6))
+    SUBTRACT_FLOAT(LW(2), FLOAT(40.0f))
+    CALL(evt_eff64, STRING("hikari"), STRING("radiation_n64"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_PAUSING9"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_1"))
+    WAIT_MS(1000)
+    CALL(evt_eff_delete, STRING("hikari"))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_ATTACK1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetRotate, -2, LW(0), LW(1), LW(2))
+    SET_VALUE(LW(5), 12)
+    LOOP(LW(5))
+        CALL(wariai_enzan_1f, LW(5), 12, FLOAT(0.0f), FLOAT(180.0f), LW(6))
+        ADD(LW(6), LW(1))
+        CALL(btlevtcmd_SetRotate, -2, 0, LW(6), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(btlevtcmd_ChangeFaceDirection, -2, 1)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+    WAIT_MS(500)
+    CALL(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0f), FLOAT(0.5996094f))
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+        END_IF
+        RETURN
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A"))
+    WAIT_MS(300)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1B"))
+        CALL(btlevtcmd_GetStatusMg, -2, LW(0))
+        MULTIPLY_FLOAT(LW(0), FLOAT(70.0f))
+        CALL(btlevtcmd_GetUnitWorkFloat, -2, 3, LW(1))
+        MULTIPLY_FLOAT(LW(0), LW(1))
+        CALL(btlevtcmd_SetRotateOffset, -2, FLOAT(0.0f), LW(0), FLOAT(0.0f))
+        SET_VALUE(LW(5), FLOAT(28.799805f))
+        LOOP(LW(5))
+            CALL(wariai_enzan_1f_intpl, LW(5), FLOAT(28.799805f), FLOAT(0.0f), FLOAT(320.0f), LW(6), 5)
+            CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(6))
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1C"))
+        WAIT_FRAMES(1)
+        CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+        CALL(btlevtcmd_SetRotateOffset, -2, FLOAT(0.0f), FLOAT(0.0f), FLOAT(0.0f))
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_JUMP1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 36, -1)
+    CALL(x_flag_set, 0, 0)
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+    END_SWITCH
+    LABEL(90)
+    CALL(btlevtcmd_JumpContinue, -2)
+    CALL(x_flag_set, 0, 1)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_HIPDROP1"), -250000000, 0, -250000000)
+        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 800)
+        CALL(x_flag_set, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1D"))
+    WAIT_MS(300)
+    GOTO(98)
+    LABEL(91)
+    CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+    CALL(x_flag_set, 0, 1)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GANSU_HIPDROP1"), -250000000, 0, -250000000)
+        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 800)
+        CALL(x_flag_set, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1D"))
+    CALL(btlevtcmd_JumpContinue, -2)
+    LABEL(98)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MoveDirectionAdd, -2, LW(0), 30)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 18, -1)
+    CALL(btlevtcmd_MoveDirectionAdd, -2, LW(0), 18)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 9, -1)
+    CALL(x_flag_wait, 0, 0)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+    WAIT_MS(500)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(x_flag_set, 0, 1)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.00390625f), FLOAT(0.0f), 666)
+        CALL(x_flag_set, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 40, -1, 0)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(x_flag_wait, 0, 0)
+    RETURN
+EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)

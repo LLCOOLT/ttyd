@@ -1841,11 +1841,11 @@ void msgWindow_Main(WindowEntry* window) {
 				psndSFXOn((const char*)(se | 0x20000));
 			}
 		}
-		WIN_TIME(window) = gp->renderTime;
+		window->unk20 = gp->renderTime;
 		WIN_STATE(window) = 6;
 	case 6:
 		window->flags |= 2;
-		window->alpha = OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window)) * 255 / 200;
+		window->alpha = OSTicksToMilliseconds(gp->renderTime - window->unk20) * 255 / 200;
 		if (window->alpha > 255) {
 			window->alpha = 255;
 			WIN_STATE(window) = 1;
@@ -1860,14 +1860,14 @@ void msgWindow_Main(WindowEntry* window) {
 				psndSFXOn((const char*)(se | 0x20000));
 			}
 		}
-		WIN_TIME(window) = gp->renderTime;
+		window->unk20 = gp->renderTime;
 		WIN_STATE(window) = 8;
 	case 8:
 		if (window->alpha == 0) {
 			windowDelete(window);
 			return;
 		}
-		window->alpha = 255 - OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window)) * 255 / 200;
+		window->alpha = 255 - OSTicksToMilliseconds(gp->renderTime - window->unk20) * 255 / 200;
 		if (window->alpha <= 0) {
 			window->alpha = 0;
 		}
@@ -1922,7 +1922,7 @@ void msgWindow_Main(WindowEntry* window) {
 			data->page = data->pageCount - 1;
 			if (msgWinPrevPage(window) != 0U) {
 				WIN_STATE(window) = 9;
-				WIN_TIME(window) = gp->renderTime;
+				window->unk20 = gp->renderTime;
 				psndSFXOn((const char*)0x20041);
 				data->flags |= 0x40;
 			}
@@ -1931,8 +1931,8 @@ void msgWindow_Main(WindowEntry* window) {
 	case 9:
 		target = data->pageY[data->page];
 		if (data->scrollPos >= target) {
-			data->scrollPos = data->scrollPos - 0.6f * OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window));
-			WIN_TIME(window) = gp->renderTime;
+			data->scrollPos = data->scrollPos - 0.6f * OSTicksToMilliseconds(gp->renderTime - window->unk20);
+			window->unk20 = gp->renderTime;
 			if (data->scrollPos <= target) {
 				data->scrollPos = target;
 				WIN_STATE(window) = 11;
@@ -1942,8 +1942,8 @@ void msgWindow_Main(WindowEntry* window) {
 	case 10:
 		target = data->pageY[data->page];
 		if (data->scrollPos <= target) {
-			data->scrollPos = data->scrollPos + 0.6f * OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window));
-			WIN_TIME(window) = gp->renderTime;
+			data->scrollPos = data->scrollPos + 0.6f * OSTicksToMilliseconds(gp->renderTime - window->unk20);
+			window->unk20 = gp->renderTime;
 			if (data->scrollPos >= target) {
 				data->scrollPos = target;
 				if (data->page == data->pageCount - 1) {
@@ -1964,7 +1964,7 @@ void msgWindow_Main(WindowEntry* window) {
 		trg = keyGetButtonTrg(0);
 		if (trg & target) {
 			WIN_STATE(window) = 10;
-			WIN_TIME(window) = gp->renderTime;
+			window->unk20 = gp->renderTime;
 			msgWinNextPage(window);
 			psndSFXOn((const char*)0x20041);
 		}
@@ -1973,7 +1973,7 @@ void msgWindow_Main(WindowEntry* window) {
 #endif
 		if (keyGetButtonTrg(0) & 0x200) {
 			WIN_STATE(window) = 10;
-			WIN_TIME(window) = gp->renderTime;
+			window->unk20 = gp->renderTime;
 			data->page = data->pageCount - 1;
 			psndSFXOn((const char*)0x20041);
 		}
@@ -1982,7 +1982,7 @@ void msgWindow_Main(WindowEntry* window) {
 #endif
 		if (keyGetButtonTrg(0) & 0x10) {
 			WIN_STATE(window) = 9;
-			WIN_TIME(window) = gp->renderTime;
+			window->unk20 = gp->renderTime;
 			if (msgWinPrevPage(window) != 0U) {
 				psndSFXOn((const char*)0x20041);
 			}
@@ -1999,14 +1999,14 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 	switch (WIN_STATE(window)) {
 	case 5:
 		WIN_STATE(window) = 1;
-		WIN_TIME(window) = gp->renderTime;
+		window->unk20 = gp->renderTime;
 		data->time18 = gp->renderTime;
 		data->time30 = gp->renderTime;
 	case 1:
 	case 6:
 		window->flags |= 2;
 		if (window->alpha < 255) {
-			window->alpha = OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window)) * 255 / 200;
+			window->alpha = OSTicksToMilliseconds(gp->renderTime - window->unk20) * 255 / 200;
 			if (window->alpha > 255) {
 				window->alpha = 255;
 			}
@@ -2015,7 +2015,7 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 			switch (msgMain(window->userdata)) {
 			case 0:
 				WIN_STATE(window) = 7;
-				WIN_TIME(window) = gp->renderTime;
+				window->unk20 = gp->renderTime;
 				if (WIN_DATA(window)->flags & 8) {
 					BtlUnit_ChangeStayAnim(WIN_DATA(window)->unitId);
 				}
@@ -2046,7 +2046,7 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 			windowDelete(window);
 			return;
 		}
-		window->alpha = 255 - OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window)) * 255 / 200;
+		window->alpha = 255 - OSTicksToMilliseconds(gp->renderTime - window->unk20) * 255 / 200;
 		if (window->alpha <= 0) {
 			window->alpha = 0;
 		}

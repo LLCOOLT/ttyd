@@ -10,6 +10,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "evt/evt_cam.h"
+#include "evt/evt_cmd.h"
 
 double tan(double);
 int rand(void);
@@ -37,11 +38,14 @@ static s32 tex_us[] = {0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA0, 0x9E, 0xA
 s32 tex_shadow_us[] = {0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAA, 0xA8, 0xAD, 0xAA, 0xAE, 0xAF};
 #endif
 #ifndef VERSION_G8ME01
-static s32 evt_shake[] = {
-    0x00020018, 0xFE363C81, 0x00000000, 0x0005005B, (s32)evt_cam_shake, 0x00000005, 0xF24A7A8A, 0xF24A7A8A, 0x00000032,
-    0x00000020, 0x0005005B, (s32)evt_cam_shake, 0x00000005, 0xF24A7A94, 0xF24A7A94, 0x00000064, 0x00000021, 0x00000002,
-    0x00000001,
-};
+static EVT_BEGIN(evt_shake)
+    IF_INT_EQUAL(4264967297, 0)
+        CALL(evt_cam_shake, 5, 4064967306, 4064967306, 50)
+    ELSE
+        CALL(evt_cam_shake, 5, 4064967316, 4064967316, 100)
+    END_IF
+    RETURN
+EVT_END()
 #endif
 
 #ifdef VERSION_G8ME01
@@ -59,17 +63,20 @@ static s16 tex_lang6[] = {130, 131, 132, 133, 134, 131, 135, 136};
 static s16 tex_shadow_lang6[] = {137, 138, 139, 140, 141, 138, 142, 143};
 typedef struct TexSet { s16* tex; s16* shadow; s32 count; } TexSet;
 static TexSet texid_tbl[6] = { { tex_jp, tex_shadow_jp, 8 }, { tex_us, tex_shadow_us, 14 }, { tex_lang3, tex_shadow_lang3, 12 }, { tex_lang4, tex_shadow_lang4, 16 }, { tex_lang5, tex_shadow_lang5, 12 }, { tex_lang6, tex_shadow_lang6, 8 } };
-s32 niji_tbl[] = {144, 154, 150, 156, 158, 144};
-static s32 evt_shake[] = {
-    0x00020018, 0xFE363C81, 0x00000000, 0x0005005B, (s32)evt_cam_shake, 0x00000005, 0xF24A7A8A, 0xF24A7A8A, 0x00000032,
-    0x00000020, 0x0005005B, (s32)evt_cam_shake, 0x00000005, 0xF24A7A94, 0xF24A7A94, 0x00000064, 0x00000021, 0x00000002,
-    0x00000001,
-};
+u32 niji_tbl[] = {144, 154, 150, 156, 158, 144};
+static EVT_BEGIN(evt_shake)
+    IF_INT_EQUAL(4264967297, 0)
+        CALL(evt_cam_shake, 5, 4064967306, 4064967306, 50)
+    ELSE
+        CALL(evt_cam_shake, 5, 4064967316, 4064967316, 100)
+    END_IF
+    RETURN
+EVT_END()
 #else
 static s32 tex_jp[] = {0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3};
 s32 tex_shadow_jp[] = {0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB};
 static s32* texid_tbl[] = {tex_jp, tex_shadow_jp, tex_us, tex_shadow_us};
-static s32 niji_tbl[] = {0xAC, 0xB0};
+static u32 niji_tbl[] = {0xAC, 0xB0};
 #endif
 s32 shake_dt[] = {2, 6, 2, 0, -1};
 s32 shake_dt2[] = {12, 36, 12, 0, -1};

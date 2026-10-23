@@ -12,6 +12,9 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
 #include "rsh.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_shop.h"
+#include "data_tables.h"
 
 NpcEntry* fbatNpcTalkCheck(void);
 static char tmp[32];
@@ -109,23 +112,23 @@ USER_FUNC(evt_mario_get_dispdir);
 USER_FUNC(evt_sub_get_language);
 #endif
 
-__declspec(section ".data") u64 fd_rsh_03_negone_one_374;
-__declspec(section ".data") s32 fd_rsh_03_neg_one_382[1];
-__declspec(section ".data") s32 fd_rsh_03___local_PI_383[1];
-__declspec(section ".data") s32 fd_rsh_03___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_rsh_03_one_negone_373;
-__declspec(section ".data") s32 fd_rsh_03___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_rsh_03_one_381[1];
-__declspec(section ".data") u64 fd_rsh_03_negone_one_360;
-__declspec(section ".data") s32 fd_rsh_03_neg_one_365[1];
-__declspec(section ".data") s32 fd_rsh_03___local_PI_366[1];
-__declspec(section ".data") s32 fd_rsh_03___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_rsh_03_one_negone_359;
-__declspec(section ".data") s32 fd_rsh_03___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_rsh_03_one_364[1];
-static s32 bero_data_a[45];
-static s32 bero_data_b[45];
-static s32 bero_data_c[45];
+__declspec(section ".data") f32 fd_rsh_03_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_03_neg_one_382;
+__declspec(section ".data") f32 fd_rsh_03___local_PI_383;
+__declspec(section ".data") f32 fd_rsh_03___local_3PIO2_385;
+__declspec(section ".data") f32 fd_rsh_03_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_03___local_PIO2_384;
+__declspec(section ".data") f32 fd_rsh_03_one_381;
+__declspec(section ".data") f32 fd_rsh_03_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_03_neg_one_365;
+__declspec(section ".data") f32 fd_rsh_03___local_PI_366;
+__declspec(section ".data") f32 fd_rsh_03___local_3PIO2_368;
+__declspec(section ".data") f32 fd_rsh_03_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_03___local_PIO2_367;
+__declspec(section ".data") f32 fd_rsh_03_one_364;
+static BeroEntry bero_data_a[3];
+static BeroEntry bero_data_b[3];
+static BeroEntry bero_data_c[3];
 s32 init_cook[29];
 __declspec(section ".data") s32 item_tbl_cook[2];
 s32 talk_cook_nabe_return[47];
@@ -140,24 +143,24 @@ s32 talk_waitless_pias_return[112];
 #endif
 static s32 talk_waitless[268];
 s32 move_waitless[49];
-static s32 npc_data[92];
+static NpcSetupInfo npc_data[4];
 static s32 talk_toron[20];
 static s32 talk_sarary[31];
 s32 dir_target[21];
 s32 evt_lanch_missing[761];
 static s32 talk_powan[184];
-s32 npc_data_lunch[161];
-static __declspec(section ".data") s32 msg_tbl[10];
+NpcSetupInfo npc_data_lunch[7];
+static __declspec(section ".data") const char* msg_tbl[10];
 #ifdef VERSION_G8ME01
 s32 evt_lunch_talk[113];
 #else
 s32 evt_lunch_talk[101];
 #endif
 s32 evt_shop_moamoa_talk[59];
-static __declspec(section ".data") s32 obj_list[12];
-static __declspec(section ".data") s32 goods_list[12];
-static s32 trade_list[36];
-static s32 shopper_data[38];
+static __declspec(section ".data") ShopObj obj_list[6];
+static __declspec(section ".data") ShopItem goods_list[6];
+static ShopDb trade_list[18];
+static ShopperData35 shopper_data;
 s32 shop_door_open[27];
 s32 shop_door_close[31];
 s32 evt_shop_open[267];
@@ -168,7 +171,7 @@ s32 evt_shop_close[317];
 #endif
 s32 evt_shop_door_init[36];
 static s32 evt_yuka_simi[45];
-static s32 access_tbl[16];
+static const char* access_tbl[16];
 static s32 evt_access[25];
 static s32 evt_access_entry[24];
 s32 rsh_03_init_evt[269];
@@ -182,7 +185,7 @@ __declspec(section ".data") s32 rsh_03_b_init_evt[90];
 #else
 __declspec(section ".data") s32 rsh_03_b_init_evt[11];
 #endif
-static __declspec(section ".data") s32 window_tbl[5];
+static __declspec(section ".data") const char* window_tbl[5];
 #ifdef VERSION_G8ME01
 s32 rsh_03_c_init_evt[217];
 #else
@@ -269,79 +272,152 @@ USER_FUNC(omiseFukki) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_rsh_03_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_rsh_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_rsh_03_neg_one_382[] = {
-    -1082130432,
+__declspec(section ".data") f32 fd_rsh_03_neg_one_382 = -1.0f;
+
+__declspec(section ".data") f32 fd_rsh_03___local_PI_383 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_rsh_03___local_3PIO2_385 = 4.712389f;
+
+__declspec(section ".data") f32 fd_rsh_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_rsh_03___local_PIO2_384 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_rsh_03_one_381 = 1.0f;
+
+__declspec(section ".data") f32 fd_rsh_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+
+__declspec(section ".data") f32 fd_rsh_03_neg_one_365 = -1.0f;
+
+__declspec(section ".data") f32 fd_rsh_03___local_PI_366 = 3.1415927f;
+
+__declspec(section ".data") f32 fd_rsh_03___local_3PIO2_368 = 4.712389f;
+
+__declspec(section ".data") f32 fd_rsh_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+
+__declspec(section ".data") f32 fd_rsh_03___local_PIO2_367 = 1.5707964f;
+
+__declspec(section ".data") f32 fd_rsh_03_one_364 = 1.0f;
+
+static BeroEntry bero_data_a[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_04_a", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"w_door_close", // enterAnimeArg
+        (s32)"w_door_open", // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_02_a", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"e_door_close", // enterAnimeArg
+        (s32)"e_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
-__declspec(section ".data") s32 fd_rsh_03___local_PI_383[] = {
-    1078530011,
+static BeroEntry bero_data_b[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_04_b", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"w_door_close", // enterAnimeArg
+        (s32)"w_door_open", // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_02_b", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"e_door_close", // enterAnimeArg
+        (s32)"e_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
-__declspec(section ".data") s32 fd_rsh_03___local_3PIO2_385[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_rsh_03_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_rsh_03___local_PIO2_384[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_rsh_03_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_rsh_03_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_rsh_03_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_rsh_03___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_rsh_03___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_rsh_03_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_rsh_03___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_rsh_03_one_364[] = {
-    1065353216,
-};
-
-static s32 bero_data_a[] = {
-    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_04_a", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", (s32)"e_bero",
-    65544, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"rsh_02_a", (s32)"w_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
-};
-
-static s32 bero_data_b[] = {
-    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_04_b", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", (s32)"e_bero",
-    65544, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"rsh_02_b", (s32)"w_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
-};
-
-static s32 bero_data_c[] = {
-    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_04_c", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", (s32)"e_bero",
-    65544, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"rsh_02_c", (s32)"w_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_data_c[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_04_c", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"w_door_close", // enterAnimeArg
+        (s32)"w_door_open", // exitAnimeArg
+    },
+    {
+        "e_bero", // hitName
+        1, // type
+        8, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"rsh_02_c", // nextMapName
+        "w_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        (s32)"e_door_close", // enterAnimeArg
+        (s32)"e_door_open", // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(init_cook)
@@ -357,7 +433,7 @@ EVT_BEGIN(init_cook)
 EVT_END()
 
 __declspec(section ".data") s32 item_tbl_cook[] = {
-    74, -1,
+    ITEM_GALLEY_POT, -1,
 };
 
 EVT_BEGIN(talk_cook_nabe_return)
@@ -506,7 +582,7 @@ static EVT_BEGIN(init_waitless)
 EVT_END()
 
 __declspec(section ".data") s32 item_tbl_waitless[] = {
-    76, -1,
+    ITEM_SHELL_EARRINGS, -1,
 };
 
 EVT_BEGIN(talk_waitless_pias_return)
@@ -674,19 +750,41 @@ EVT_BEGIN(move_waitless)
     RETURN
 EVT_END()
 
-static s32 npc_data[] = {
-    (s32)/*"コック"*/"\x83\x52\x83\x62\x83\x4E", 1073874448, 0, (s32)init_cook, 0, (s32)talk_cook, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ウェイトレス"*/"\x83\x45\x83\x46\x83\x43\x83\x67\x83\x8C\x83\x58",
-    1073874448, 0, (s32)init_waitless, (s32)move_waitless, (s32)talk_waitless, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"店員"*/"\x93\x58\x88\xF5", 1073874448,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static NpcSetupInfo npc_data[] = {
+    {
+        /*"コック"*/"\x83\x52\x83\x62\x83\x4E", // name
+        0x40020610, // flags
+        0, // reactionFlags
+        init_cook, // initEvent
+        NULL, // regularEvent
+        talk_cook, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ウェイトレス"*/"\x83\x45\x83\x46\x83\x43\x83\x67\x83\x8C\x83\x58", // name
+        0x40020610, // flags
+        0, // reactionFlags
+        init_waitless, // initEvent
+        move_waitless, // regularEvent
+        talk_waitless, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"店員"*/"\x93\x58\x88\xF5", // name
+        0x40020610, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static EVT_BEGIN(talk_toron)
@@ -931,7 +1029,7 @@ static EVT_BEGIN(talk_powan)
         CALL_CHILD(PTR(evt_lanch_missing))
         CASE_DEFAULT
         IF_INT_EQUAL(GSWF(3428), 0)
-            SET_INT_READ_ADDR(PTR(msg_tbl))
+            SET_INT_READ_ADDR(PTR(&msg_tbl))
             LOOP(5)
                 READ_INT2(LW(0), LW(1))
                 CALL(evt_msg_close, LW(1))
@@ -976,39 +1074,86 @@ static EVT_BEGIN(talk_powan)
     RETURN
 EVT_END()
 
-s32 npc_data_lunch[] = {
-    (s32)/*"コック"*/"\x83\x52\x83\x62\x83\x4E", 1073874448, 0, 0, 0, (s32)talk_cook, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ウェイトレス"*/"\x83\x45\x83\x46\x83\x43\x83\x67\x83\x8C\x83\x58",
-    1073874448, 0, 0, 0, (s32)talk_waitless, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"店員"*/"\x93\x58\x88\xF5", 1073874448,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", 1073874448, 0,
-    0, 0, (s32)talk_toron, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", 1073874448, 0, 0,
-    0, (s32)talk_sarary, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 1073874448, 0, 0, 0,
-    (s32)talk_powan, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0,
+NpcSetupInfo npc_data_lunch[] = {
+    {
+        /*"コック"*/"\x83\x52\x83\x62\x83\x4E", // name
+        0x40020610, // flags
+        0, NULL, NULL, // reactionFlags..regularEvent
+        talk_cook, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ウェイトレス"*/"\x83\x45\x83\x46\x83\x43\x83\x67\x83\x8C\x83\x58", // name
+        0x40020610, // flags
+        0, NULL, NULL, // reactionFlags..regularEvent
+        talk_waitless, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"店員"*/"\x93\x58\x88\xF5", // name
+        0x40020610, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"トロン"*/"\x83\x67\x83\x8D\x83\x93", // name
+        0x40020610, // flags
+        0, NULL, NULL, // reactionFlags..regularEvent
+        talk_toron, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", // name
+        0x40020610, // flags
+        0, NULL, NULL, // reactionFlags..regularEvent
+        talk_sarary, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", // name
+        0x40020610, // flags
+        0, NULL, NULL, // reactionFlags..regularEvent
+        talk_powan, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
-static __declspec(section ".data") s32 msg_tbl[] = {
-    (s32)/*"コック"*/"\x83\x52\x83\x62\x83\x4E", (s32)"stg6_rsh_18_01", (s32)/*"トロン"*/"\x83\x67\x83\x8D\x83\x93", (s32)"stg6_rsh_18_02", (s32)/*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", (s32)"stg6_rsh_18_03", (s32)/*"ウェイトレス"*/"\x83\x45\x83\x46\x83\x43\x83\x67\x83\x8C\x83\x58", (s32)"stg6_rsh_18_04",
-    (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", (s32)"stg6_rsh_18_05",
+static __declspec(section ".data") const char* msg_tbl[] = {
+    /*"コック"*/"\x83\x52\x83\x62\x83\x4E",
+    "stg6_rsh_18_01",
+    /*"トロン"*/"\x83\x67\x83\x8D\x83\x93",
+    "stg6_rsh_18_02",
+    /*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93",
+    "stg6_rsh_18_03",
+    /*"ウェイトレス"*/"\x83\x45\x83\x46\x83\x43\x83\x67\x83\x8C\x83\x58",
+    "stg6_rsh_18_04",
+    /*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3",
+    "stg6_rsh_18_05",
 };
 
 EVT_BEGIN(evt_lunch_talk)
     SET_VALUE(GF(10), 0)
     LOOP(0)
-        SET_INT_READ_ADDR(PTR(msg_tbl))
+        SET_INT_READ_ADDR(PTR(&msg_tbl))
         CALL(evt_sub_random, 4, LW(0))
         ADD(LW(0), 1)
         LOOP(LW(0))
@@ -1087,30 +1232,50 @@ EVT_BEGIN(evt_shop_moamoa_talk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 obj_list[] = {
-    (s32)"sina_1", (s32)"a_sina_1", (s32)"sina_2", (s32)"a_sina_2", (s32)"sina_3", (s32)"a_sina_3", (s32)"sina_4", (s32)"a_sina_4",
-    (s32)"sina_5", (s32)"a_sina_5", (s32)"sina_6", (s32)"a_sina_6",
+static __declspec(section ".data") ShopObj obj_list[] = {
+    {"sina_1", "a_sina_1"},
+    {"sina_2", "a_sina_2"},
+    {"sina_3", "a_sina_3"},
+    {"sina_4", "a_sina_4"},
+    {"sina_5", "a_sina_5"},
+    {"sina_6", "a_sina_6"},
 };
 
-static __declspec(section ".data") s32 goods_list[] = {
-    129, 15, 163, 3, 134, 20, 153, 3,
-    155, 15, 149, 15,
+static __declspec(section ".data") ShopItem goods_list[] = {
+    {ITEM_THUNDER_RAGE, 15},
+    {ITEM_MYSTERY, 3},
+    {ITEM_BOOS_SHEET, 20},
+    {ITEM_TASTY_TONIC, 3},
+    {ITEM_MAPLE_SYRUP, 15},
+    {ITEM_SUPER_SHROOM, 15},
 };
 
-static s32 trade_list[] = {
-    129, 458752, 163, 65536, 134, 655360, 153, 65536,
-    155, 458752, 149, 458752, 165, 6553600, 166, 262144,
-    167, 1114112, 168, 393216, 169, 458752, 170, 262144,
-    172, 524288, 173, 983040, 174, 327680, 175, 327680,
-    176, 524288, 0, 0,
+static ShopDb trade_list[] = {
+    {ITEM_THUNDER_RAGE, 7, 0},
+    {ITEM_MYSTERY, 1, 0},
+    {ITEM_BOOS_SHEET, 10, 0},
+    {ITEM_TASTY_TONIC, 1, 0},
+    {ITEM_MAPLE_SYRUP, 7, 0},
+    {ITEM_SUPER_SHROOM, 7, 0},
+    {ITEM_WHACKA_BUMP, 100, 0},
+    {ITEM_COCONUT, 4, 0},
+    {ITEM_DRIED_BOUQUET, 17, 0},
+    {ITEM_MYSTIC_EGG, 6, 0},
+    {ITEM_GOLDEN_LEAF, 7, 0},
+    {ITEM_KEEL_MANGO, 4, 0},
+    {ITEM_CAKE_MIX, 8, 0},
+    {ITEM_HOT_SAUCE, 15, 0},
+    {ITEM_TURTLEY_LEAF, 5, 0},
+    {ITEM_HORSETAIL, 5, 0},
+    {ITEM_PEACHY_PEACH, 8, 0},
+    {0},
 };
 
-static s32 shopper_data[] = {
-    (s32)/*"店員"*/"\x93\x58\x88\xF5", (s32)evt_shop_moamoa_talk, 0, (s32)"stg6_shop_00", (s32)"stg6_shop_01", (s32)"stg6_shop_02", (s32)"stg6_shop_03", (s32)"stg6_shop_04",
-    (s32)"stg6_shop_05", (s32)"stg6_shop_06", (s32)"stg6_shop_07", (s32)"stg6_shop_08", (s32)"stg6_shop_09", (s32)"stg6_shop_10", (s32)"stg6_shop_11", (s32)"stg6_shop_12",
-    (s32)"stg6_shop_13", (s32)"stg6_shop_14", (s32)"stg6_shop_15", (s32)"stg6_shop_16", (s32)"stg6_shop_17", (s32)"stg6_shop_18", (s32)"stg6_shop_19", (s32)"stg6_shop_20",
-    (s32)"stg6_shop_21", (s32)"stg6_shop_22", (s32)"stg6_shop_23", (s32)"stg6_shop_24", (s32)"stg6_shop_25", (s32)"stg6_shop_26", (s32)"stg6_shop_27", (s32)"stg6_shop_28",
-    (s32)"stg6_shop_29", (s32)"stg6_shop_30", (s32)"stg6_shop_31", (s32)"stg6_shop_32", (s32)"stg6_shop_33", (s32)"stg6_shop_34",
+static ShopperData35 shopper_data = {
+    /*"店員"*/"\x93\x58\x88\xF5", // name
+    evt_shop_moamoa_talk, // fook_evt
+    NULL, // buy_evt
+    {"stg6_shop_00", "stg6_shop_01", "stg6_shop_02", "stg6_shop_03", "stg6_shop_04", "stg6_shop_05", "stg6_shop_06", "stg6_shop_07", "stg6_shop_08", "stg6_shop_09", "stg6_shop_10", "stg6_shop_11", "stg6_shop_12", "stg6_shop_13", "stg6_shop_14", "stg6_shop_15", "stg6_shop_16", "stg6_shop_17", "stg6_shop_18", "stg6_shop_19", "stg6_shop_20", "stg6_shop_21", "stg6_shop_22", "stg6_shop_23", "stg6_shop_24", "stg6_shop_25", "stg6_shop_26", "stg6_shop_27", "stg6_shop_28", "stg6_shop_29", "stg6_shop_30", "stg6_shop_31", "stg6_shop_32", "stg6_shop_33", "stg6_shop_34"}, // msgs
 };
 
 EVT_BEGIN(shop_door_open)
@@ -1389,9 +1554,23 @@ static EVT_BEGIN(evt_yuka_simi)
     RETURN
 EVT_END()
 
-static s32 access_tbl[] = {
-    (s32)"table_1", (s32)"stg6_rsh_268", (s32)"stg6_rsh_268", (s32)"table_2", (s32)"stg6_rsh_268", (s32)"stg6_rsh_268", (s32)"oubun", (s32)"stg6_rsh_269",
-    (s32)"stg6_rsh_269", (s32)"shokki", (s32)"stg6_rsh_270", (s32)"stg6_rsh_270", (s32)"memo", (s32)"stg6_rsh_271", (s32)"stg6_rsh_271", 0,
+static const char* access_tbl[] = {
+    "table_1",
+    "stg6_rsh_268",
+    "stg6_rsh_268",
+    "table_2",
+    "stg6_rsh_268",
+    "stg6_rsh_268",
+    "oubun",
+    "stg6_rsh_269",
+    "stg6_rsh_269",
+    "shokki",
+    "stg6_rsh_270",
+    "stg6_rsh_270",
+    "memo",
+    "stg6_rsh_271",
+    "stg6_rsh_271",
+    NULL,
 };
 
 static EVT_BEGIN(evt_access)
@@ -1406,7 +1585,7 @@ static EVT_BEGIN(evt_access)
 EVT_END()
 
 static EVT_BEGIN(evt_access_entry)
-    SET_INT_READ_ADDR(PTR(access_tbl))
+    SET_INT_READ_ADDR(PTR(&access_tbl))
     LOOP(0)
         READ_INT3(LW(0), LW(1), LW(2))
         IF_INT_EQUAL(LW(0), 0)
@@ -1449,7 +1628,7 @@ EVT_BEGIN(rsh_03_init_evt)
         CALL(evt_npc_setup, PTR(npc_data))
     END_SWITCH
     CALL_CHILD(PTR(evt_shop_door_init))
-    CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(shopper_data), PTR(trade_list))
+    CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(&shopper_data), PTR(trade_list))
     BEGIN_INLINE_EVENT
         LOOP(10)
             IF_INT_GREATER_OR_EQUAL(GSW(0), 328)
@@ -1579,8 +1758,12 @@ __declspec(section ".data") EVT_BEGIN(rsh_03_b_init_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 window_tbl[] = {
-    (s32)"mado_uturi_1", (s32)"mado_uturi_2", (s32)"mado_uturi_3", (s32)"mado_uturi_4", 0,
+static __declspec(section ".data") const char* window_tbl[] = {
+    "mado_uturi_1",
+    "mado_uturi_2",
+    "mado_uturi_3",
+    "mado_uturi_4",
+    NULL,
 };
 
 EVT_BEGIN(rsh_03_c_init_evt)
@@ -1590,7 +1773,7 @@ EVT_BEGIN(rsh_03_c_init_evt)
     CALL_CHILD(PTR(rsh_03_init_evt))
     CALL(evt_map_playanim, STRING("rousoku"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi"), 1, 0)
-    SET_VALUE(LW(0), PTR(window_tbl))
+    SET_VALUE(LW(0), PTR(&window_tbl))
     CALL_CHILD(PTR(evt_rsh_window))
     CALL(fire, STRING("rousoku_1"))
     CALL(fire, STRING("rousoku_2"))
@@ -1678,7 +1861,7 @@ EVT_BEGIN(rsh_03_init_evt_nidome)
     END_IF
     CALL(evt_npc_setup, PTR(npc_data))
     CALL_CHILD(PTR(evt_shop_door_init))
-    CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(shopper_data), PTR(trade_list))
+    CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(&shopper_data), PTR(trade_list))
     IF_INT_EQUAL(GSWF(3460), 1)
         CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_PIK1"))
         CALL(evt_snd_envoff, 512)
@@ -1754,7 +1937,7 @@ EVT_BEGIN(rsh_03_c_init_evt_nidome)
     CALL_CHILD(PTR(rsh_03_init_evt_nidome))
     CALL(evt_map_playanim, STRING("rousoku"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi"), 1, 0)
-    SET_VALUE(LW(0), PTR(window_tbl))
+    SET_VALUE(LW(0), PTR(&window_tbl))
     CALL_CHILD(PTR(evt_rsh_window))
     CALL(fire, STRING("rousoku_1"))
     CALL(fire, STRING("rousoku_2"))

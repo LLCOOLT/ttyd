@@ -77,20 +77,20 @@ USER_FUNC(evt_win_item_select);
 USER_FUNC(make_kagi_tbl);
 USER_FUNC(temae_kesu);
 
-__declspec(section ".data") u64 fd_las_10_negone_one_374;
-__declspec(section ".data") s32 fd_las_10_neg_one_382[1];
-__declspec(section ".data") s32 fd_las_10___local_PI_383[1];
-__declspec(section ".data") s32 fd_las_10___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_las_10_one_negone_373;
-__declspec(section ".data") s32 fd_las_10___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_las_10_one_381[1];
-__declspec(section ".data") u64 fd_las_10_negone_one_360;
-__declspec(section ".data") s32 fd_las_10_neg_one_365[1];
-__declspec(section ".data") s32 fd_las_10___local_PI_366[1];
-__declspec(section ".data") s32 fd_las_10___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_las_10_one_negone_359;
-__declspec(section ".data") s32 fd_las_10___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_las_10_one_364[1];
+__declspec(section ".data") f32 fd_las_10_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_10_neg_one_382;
+__declspec(section ".data") f32 fd_las_10___local_PI_383;
+__declspec(section ".data") f32 fd_las_10___local_3PIO2_385;
+__declspec(section ".data") f32 fd_las_10_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_10___local_PIO2_384;
+__declspec(section ".data") f32 fd_las_10_one_381;
+__declspec(section ".data") f32 fd_las_10_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_10_neg_one_365;
+__declspec(section ".data") f32 fd_las_10___local_PI_366;
+__declspec(section ".data") f32 fd_las_10___local_3PIO2_368;
+__declspec(section ".data") f32 fd_las_10_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_10___local_PIO2_367;
+__declspec(section ".data") f32 fd_las_10_one_364;
 static s32 s_door_close[22];
 static s32 s_door_open[22];
 __declspec(section ".data") s32 nw_door_close[12];
@@ -109,10 +109,10 @@ __declspec(section ".data") s32 sw2_door_close[12];
 __declspec(section ".data") s32 sw2_door_open[12];
 __declspec(section ".data") s32 se2_door_close[12];
 __declspec(section ".data") s32 se2_door_open[12];
-static s32 bero_entry_data[150];
-__declspec(section ".data") s32 kabe_list_1[8];
-__declspec(section ".data") s32 kabe_list_2[8];
-__declspec(section ".data") s32 kabe_list_3[8];
+static BeroEntry bero_entry_data[10];
+__declspec(section ".data") const char* kabe_list_1[8];
+__declspec(section ".data") const char* kabe_list_2[8];
+__declspec(section ".data") const char* kabe_list_3[8];
 __declspec(section ".data") s32 las_10_temae_kabe[12];
 static s32 first_evt[182];
 s32 tenkyugi_evt[311];
@@ -129,7 +129,7 @@ s32 kagi7_evt[80];
 s32 kagi8_evt[80];
 s32 daiza_up[201];
 s32 kagi_8_off[48];
-s32 daiza_name[25];
+const char* daiza_name[25];
 s32 kagi_8_on[365];
 __declspec(section ".data") s32 kagi_8_init[11];
 s32 kagi_8_syutugen[19];
@@ -153,53 +153,33 @@ USER_FUNC(make_kagi_tbl) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_las_10_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_10_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_10_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_10___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_10___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_10___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_10___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_10_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_10___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_10___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_10_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_10_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_las_10_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_10_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_10_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_10___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_10___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_10___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_10___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_10_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_10___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_10___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_10_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_10_one_364 = 1.0f;
 
 static EVT_BEGIN(s_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -313,38 +293,203 @@ __declspec(section ".data") EVT_BEGIN(se2_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"s_bero", 65542, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"las_09", (s32)"n_bero", 327685, (s32)s_door_close, (s32)s_door_open, (s32)"nw_bero_1",
-    65537, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"las_11", (s32)"e_bero_1", 327685, (s32)nw_door_close, (s32)nw_door_open, (s32)"ne_bero_1", 65537,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"las_12", (s32)"w_bero_1", 327685, (s32)ne_door_close, (s32)ne_door_open, (s32)"sw_bero_1", 65537, 20000,
-    100000, 0, 0, -1, 0, -1, 0, (s32)"las_13",
-    (s32)"e_bero_1", 327685, (s32)sw_door_close, (s32)sw_door_open, (s32)"se_bero_1", 65537, 20000, 100000,
-    0, 0, -1, 0, -1, 0, (s32)"las_14", (s32)"w_bero_1",
-    327685, (s32)se_door_close, (s32)se_door_open, (s32)"nw_bero_2", 65537, 20000, 100000, 0,
-    0, -1, 0, -1, 0, (s32)"las_15", (s32)"e_bero_1", 327685,
-    (s32)nw2_door_close, (s32)nw2_door_open, (s32)"ne_bero_2", 65537, 20000, 100000, 0, 0,
-    -1, 0, -1, 0, (s32)"las_16", (s32)"w_bero_1", 327685, (s32)ne2_door_close,
-    (s32)ne2_door_open, (s32)"sw_bero_2", 65537, 20000, 100000, 0, 0, -1,
-    0, -1, 0, (s32)"las_17", (s32)"e_bero_1", 327685, (s32)sw2_door_close, (s32)sw2_door_open,
-    (s32)"se_bero_2", 65537, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"las_18", (s32)"w_bero_1", 327685, (s32)se2_door_close, (s32)se2_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "s_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_09", // nextMapName
+        "n_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)s_door_close, // enterAnimeArg
+        (s32)s_door_open, // exitAnimeArg
+    },
+    {
+        "nw_bero_1", // hitName
+        1, // type
+        1, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_11", // nextMapName
+        "e_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)nw_door_close, // enterAnimeArg
+        (s32)nw_door_open, // exitAnimeArg
+    },
+    {
+        "ne_bero_1", // hitName
+        1, // type
+        1, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_12", // nextMapName
+        "w_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)ne_door_close, // enterAnimeArg
+        (s32)ne_door_open, // exitAnimeArg
+    },
+    {
+        "sw_bero_1", // hitName
+        1, // type
+        1, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_13", // nextMapName
+        "e_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)sw_door_close, // enterAnimeArg
+        (s32)sw_door_open, // exitAnimeArg
+    },
+    {
+        "se_bero_1", // hitName
+        1, // type
+        1, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_14", // nextMapName
+        "w_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)se_door_close, // enterAnimeArg
+        (s32)se_door_open, // exitAnimeArg
+    },
+    {
+        "nw_bero_2", // hitName
+        1, // type
+        1, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_15", // nextMapName
+        "e_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)nw2_door_close, // enterAnimeArg
+        (s32)nw2_door_open, // exitAnimeArg
+    },
+    {
+        "ne_bero_2", // hitName
+        1, // type
+        1, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_16", // nextMapName
+        "w_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)ne2_door_close, // enterAnimeArg
+        (s32)ne2_door_open, // exitAnimeArg
+    },
+    {
+        "sw_bero_2", // hitName
+        1, // type
+        1, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_17", // nextMapName
+        "e_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)sw2_door_close, // enterAnimeArg
+        (s32)sw2_door_open, // exitAnimeArg
+    },
+    {
+        "se_bero_2", // hitName
+        1, // type
+        1, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_18", // nextMapName
+        "w_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)se2_door_close, // enterAnimeArg
+        (s32)se2_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
-__declspec(section ".data") s32 kabe_list_1[] = {
-    (s32)"S11_kabe4", (s32)"S11_kabe5", (s32)"S14_kabe4", (s32)"S14_kabe3", (s32)"S14_kabe2", (s32)"S11_kabe1", (s32)"S11_kabe2", (s32)"S11_kabe3",
+__declspec(section ".data") const char* kabe_list_1[] = {
+    "S11_kabe4",
+    "S11_kabe5",
+    "S14_kabe4",
+    "S14_kabe3",
+    "S14_kabe2",
+    "S11_kabe1",
+    "S11_kabe2",
+    "S11_kabe3",
 };
 
-__declspec(section ".data") s32 kabe_list_2[] = {
-    (s32)"S112_kabe4", (s32)"S112_kabe5", (s32)"S115_kabe4", (s32)"S115_kabe3", (s32)"S115_kabe2", (s32)"S12_kabe1", (s32)"S112_kabe2", (s32)"S112_kabe3",
+__declspec(section ".data") const char* kabe_list_2[] = {
+    "S112_kabe4",
+    "S112_kabe5",
+    "S115_kabe4",
+    "S115_kabe3",
+    "S115_kabe2",
+    "S12_kabe1",
+    "S112_kabe2",
+    "S112_kabe3",
 };
 
-__declspec(section ".data") s32 kabe_list_3[] = {
-    (s32)"S113_kabe4", (s32)"S113_kabe5", (s32)"S116_kabe4", (s32)"S116_kabe3", (s32)"S116_kabe2", (s32)"S113_kabe1", (s32)"S113_kabe2", (s32)"S113_kabe3",
+__declspec(section ".data") const char* kabe_list_3[] = {
+    "S113_kabe4",
+    "S113_kabe5",
+    "S116_kabe4",
+    "S116_kabe3",
+    "S116_kabe2",
+    "S113_kabe1",
+    "S113_kabe2",
+    "S113_kabe3",
 };
 
 __declspec(section ".data") EVT_BEGIN(las_10_temae_kabe)
@@ -883,11 +1028,32 @@ EVT_BEGIN(kagi_8_off)
     RETURN
 EVT_END()
 
-s32 daiza_name[] = {
-    (s32)"S_kagi1", (s32)"S113_daiza1", (s32)"eff_1", (s32)"S_kagi2", (s32)"S113_daiza2", (s32)"eff_2", (s32)"S_kagi3", (s32)"S113_daiza3",
-    (s32)"eff_3", (s32)"S_kagi4", (s32)"S113_daiza4", (s32)"eff_4", (s32)"S_kagi5", (s32)"S113_daiza5", (s32)"eff_5", (s32)"S_kagi6",
-    (s32)"S113_daiza6", (s32)"eff_6", (s32)"S_kagi7", (s32)"S113_daiza7", (s32)"eff_7", (s32)"S_kagi8", (s32)"S113_daiza8", (s32)"eff_8",
-    0,
+const char* daiza_name[] = {
+    "S_kagi1",
+    "S113_daiza1",
+    "eff_1",
+    "S_kagi2",
+    "S113_daiza2",
+    "eff_2",
+    "S_kagi3",
+    "S113_daiza3",
+    "eff_3",
+    "S_kagi4",
+    "S113_daiza4",
+    "eff_4",
+    "S_kagi5",
+    "S113_daiza5",
+    "eff_5",
+    "S_kagi6",
+    "S113_daiza6",
+    "eff_6",
+    "S_kagi7",
+    "S113_daiza7",
+    "eff_7",
+    "S_kagi8",
+    "S113_daiza8",
+    "eff_8",
+    NULL,
 };
 
 EVT_BEGIN(kagi_8_on)
@@ -906,7 +1072,7 @@ EVT_BEGIN(kagi_8_on)
         END_INLINE_EVENT
         WAIT_MS(2000)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kagi"), 1)
-        SET_INT_READ_ADDR(PTR(daiza_name))
+        SET_INT_READ_ADDR(PTR(&daiza_name))
         LOOP(0)
             READ_INT3(LW(0), LW(1), LW(2))
             IF_INT_EQUAL(LW(0), 0)
@@ -916,7 +1082,7 @@ EVT_BEGIN(kagi_8_on)
         END_LOOP
         CALL(evt_mapobj_get_position, STRING("S_daizadai"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_KEYSTAND_APPEAR1"), LW(0), LW(1), LW(2), LW(5))
-        SET_INT_READ_ADDR(PTR(daiza_name))
+        SET_INT_READ_ADDR(PTR(&daiza_name))
         LOOP(0)
             READ_INT3(LW(0), LW(1), LW(2))
             IF_INT_EQUAL(LW(0), 0)

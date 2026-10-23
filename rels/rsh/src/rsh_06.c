@@ -26,6 +26,9 @@
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "data_tables.h"
+typedef struct SharinData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat speed; } SharinData;
+typedef struct ClankData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat x; EvtFloat y; } ClankData;
 #undef EXT_LIT
 #define EXT_LIT(sym, val) (val)
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
@@ -184,25 +187,25 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
 static void moamoa_pose_main(void);
 static void moamoa_pose_init(void);
 
-__declspec(section ".data") u64 fd_rsh_06_negone_one_374;
-__declspec(section ".data") s32 fd_rsh_06_neg_one_382[1];
-__declspec(section ".data") s32 fd_rsh_06___local_PI_383[1];
-__declspec(section ".data") s32 fd_rsh_06___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_rsh_06_one_negone_373;
-__declspec(section ".data") s32 fd_rsh_06___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_rsh_06_one_381[1];
-__declspec(section ".data") u64 fd_rsh_06_negone_one_360;
-__declspec(section ".data") s32 fd_rsh_06_neg_one_365[1];
-__declspec(section ".data") s32 fd_rsh_06___local_PI_366[1];
-__declspec(section ".data") s32 fd_rsh_06___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_rsh_06_one_negone_359;
-__declspec(section ".data") s32 fd_rsh_06___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_rsh_06_one_364[1];
-static s32 ext_moamoa_data[213];
-static s32 sharinDt[116];
+__declspec(section ".data") f32 fd_rsh_06_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_06_neg_one_382;
+__declspec(section ".data") f32 fd_rsh_06___local_PI_383;
+__declspec(section ".data") f32 fd_rsh_06___local_3PIO2_385;
+__declspec(section ".data") f32 fd_rsh_06_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_06___local_PIO2_384;
+__declspec(section ".data") f32 fd_rsh_06_one_381;
+__declspec(section ".data") f32 fd_rsh_06_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_06_neg_one_365;
+__declspec(section ".data") f32 fd_rsh_06___local_PI_366;
+__declspec(section ".data") f32 fd_rsh_06___local_3PIO2_368;
+__declspec(section ".data") f32 fd_rsh_06_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_rsh_06___local_PIO2_367;
+__declspec(section ".data") f32 fd_rsh_06_one_364;
+static ExtTexInfo ext_moamoa_data[71];
+static SharinData sharinDt[29];
 static s32 evt_sharin_main[87];
 static s32 evt_sharin[19];
-static s32 clankDt[45];
+static ClankData clankDt[9];
 static s32 evt_clank_main[104];
 static s32 evt_clank[21];
 static s32 evt_bg[81];
@@ -215,99 +218,123 @@ static s32 stop_1[90];
 static s32 stop_2[90];
 static s32 hom_10_evt_resha_stop[36];
 static s32 evt_ramp[33];
-static s32 pika_tbl[15];
-__declspec(section ".data") static s32 pika_tbl_rsh_06[10];
+static const char* pika_tbl[15];
+__declspec(section ".data") static const char* pika_tbl_rsh_06[10];
 static s32 hom_10_evt_resha_sub[102];
 static s32 hom_10_evt_resha_right[35];
 static s32 hom_10_evt_resha_left[28];
 static s32 hom_10_init_evt[140];
 s32 evt_resha_init[13];
-static s32 bero_data_a[30];
+static BeroEntry bero_data_a[2];
 static s32 evt_moamoa_init[187];
 s32 evt_great_moamoa[737];
-__declspec(section ".data") s32 pose_name[8];
+__declspec(section ".data") const char* pose_name[8];
 s32 moamoa_debug[230];
 s32 rsh_06_init_evt[84];
 s32 rsh_06_a_init_evt[32];
 s32 rsh_06_init_evt_nidome[41];
 __declspec(section ".data") s32 rsh_06_a_init_evt_nidome[11];
 
-__declspec(section ".data") u64 fd_rsh_06_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_rsh_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_rsh_06_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_rsh_06_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_rsh_06___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_rsh_06___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_rsh_06___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_rsh_06___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_rsh_06_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_rsh_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_rsh_06___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_rsh_06___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_rsh_06_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_rsh_06_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_rsh_06_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_rsh_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_rsh_06_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_rsh_06_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_rsh_06___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_rsh_06___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_rsh_06___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_rsh_06___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_rsh_06_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_rsh_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_rsh_06___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_rsh_06___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_rsh_06_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_rsh_06_one_364 = 1.0f;
 
-static s32 ext_moamoa_data[] = {
-    (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 0, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1073741824, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"),
-    1082130432, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1086324736, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1090519040, (s32)((char*)"c_n_moa_a"),
-    (s32)((char*)"S_1"), 1092616192, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1094713344, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1096810496,
-    (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1098907648, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1099956224, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"),
-    1101004800, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1102053376, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1103101952, (s32)((char*)"c_n_moa_a"),
-    (s32)((char*)"S_1"), 1104150528, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1105199104, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1106247680,
-    (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1107296256, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1107820544, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"),
-    1108344832, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1108869120, (s32)((char*)"c_n_moa_a"), (s32)((char*)"D_1"), 0, (s32)((char*)"c_n_moa_a"),
-    (s32)((char*)"D_1"), 1082130432, (s32)((char*)"c_n_moa_a"), (s32)((char*)"D_1"), 1090519040, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 0,
-    (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1073741824, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1082130432, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"),
-    1086324736, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1090519040, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1092616192, (s32)((char*)"c_n_moa_b"),
-    (s32)((char*)"S_1"), 1094713344, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1096810496, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1098907648,
-    (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1099956224, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1101004800, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"),
-    1102053376, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1103101952, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1104150528, (s32)((char*)"c_n_moa_b"),
-    (s32)((char*)"S_1"), 1105199104, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1106247680, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1107296256,
-    (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1107820544, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1108344832, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"),
-    1108869120, (s32)((char*)"c_n_moa_b"), (s32)((char*)"D_1"), 0, (s32)((char*)"c_n_moa_b"), (s32)((char*)"D_1"), 1082130432, (s32)((char*)"c_n_moa_b"),
-    (s32)((char*)"D_1"), 1090519040, (s32)((char*)"c_kinodebu"), (s32)((char*)"G_1"), 0, (s32)((char*)"c_kinodebu"), (s32)((char*)"G_1"), 1082130432,
-    (s32)((char*)"c_kinodebu"), (s32)((char*)"G_1"), 1090519040, (s32)((char*)"c_puku_c"), (s32)((char*)"U_1"), 0, (s32)((char*)"c_puku_c"), (s32)((char*)"U_1"),
-    1082130432, (s32)((char*)"c_puku_c"), (s32)((char*)"U_1"), 1090519040, (s32)((char*)"c_powan"), (s32)((char*)"O_1"), 0, (s32)((char*)"c_powan"),
-    (s32)((char*)"O_1"), 1082130432, (s32)((char*)"c_powan"), (s32)((char*)"O_1"), 1090519040, (s32)((char*)"c_smoko"), (s32)((char*)"T_2"), 0,
-    (s32)((char*)"c_smoko"), (s32)((char*)"T_2"), 1082130432, (s32)((char*)"c_smoko"), (s32)((char*)"T_2"), 1090519040, (s32)((char*)"c_rose"), (s32)((char*)"G_1"),
-    0, (s32)((char*)"c_rose"), (s32)((char*)"G_1"), 1082130432, (s32)((char*)"c_rose"), (s32)((char*)"G_1"), 1090519040, (s32)((char*)"c_papab"),
-    (s32)((char*)"G_1"), 0, (s32)((char*)"c_papab"), (s32)((char*)"G_1"), 1082130432, (s32)((char*)"c_papab"), (s32)((char*)"G_1"), 1090519040,
-    (s32)((char*)"c_mamab"), (s32)((char*)"G_1"), 0, (s32)((char*)"c_mamab"), (s32)((char*)"G_1"), 1082130432, (s32)((char*)"c_mamab"), (s32)((char*)"G_1"),
-    1090519040, (s32)((char*)"c_konari"), (s32)((char*)"G_1"), 0, (s32)((char*)"c_konari"), (s32)((char*)"G_1"), 1082130432, (s32)((char*)"c_konari"),
-    (s32)((char*)"G_1"), 1090519040, 0, 0, 0,
+static ExtTexInfo ext_moamoa_data[] = {
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 0.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 2.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 4.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 6.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 8.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 10.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 12.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 14.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 16.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 18.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 20.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 22.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 24.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 26.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 28.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 30.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 32.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 34.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 36.0f},
+    {((char*)"c_n_moa_a"), ((char*)"S_1"), 38.0f},
+    {((char*)"c_n_moa_a"), ((char*)"D_1"), 0.0f},
+    {((char*)"c_n_moa_a"), ((char*)"D_1"), 4.0f},
+    {((char*)"c_n_moa_a"), ((char*)"D_1"), 8.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 0.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 2.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 4.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 6.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 8.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 10.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 12.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 14.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 16.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 18.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 20.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 22.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 24.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 26.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 28.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 30.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 32.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 34.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 36.0f},
+    {((char*)"c_n_moa_b"), ((char*)"S_1"), 38.0f},
+    {((char*)"c_n_moa_b"), ((char*)"D_1"), 0.0f},
+    {((char*)"c_n_moa_b"), ((char*)"D_1"), 4.0f},
+    {((char*)"c_n_moa_b"), ((char*)"D_1"), 8.0f},
+    {((char*)"c_kinodebu"), ((char*)"G_1"), 0.0f},
+    {((char*)"c_kinodebu"), ((char*)"G_1"), 4.0f},
+    {((char*)"c_kinodebu"), ((char*)"G_1"), 8.0f},
+    {((char*)"c_puku_c"), ((char*)"U_1"), 0.0f},
+    {((char*)"c_puku_c"), ((char*)"U_1"), 4.0f},
+    {((char*)"c_puku_c"), ((char*)"U_1"), 8.0f},
+    {((char*)"c_powan"), ((char*)"O_1"), 0.0f},
+    {((char*)"c_powan"), ((char*)"O_1"), 4.0f},
+    {((char*)"c_powan"), ((char*)"O_1"), 8.0f},
+    {((char*)"c_smoko"), ((char*)"T_2"), 0.0f},
+    {((char*)"c_smoko"), ((char*)"T_2"), 4.0f},
+    {((char*)"c_smoko"), ((char*)"T_2"), 8.0f},
+    {((char*)"c_rose"), ((char*)"G_1"), 0.0f},
+    {((char*)"c_rose"), ((char*)"G_1"), 4.0f},
+    {((char*)"c_rose"), ((char*)"G_1"), 8.0f},
+    {((char*)"c_papab"), ((char*)"G_1"), 0.0f},
+    {((char*)"c_papab"), ((char*)"G_1"), 4.0f},
+    {((char*)"c_papab"), ((char*)"G_1"), 8.0f},
+    {((char*)"c_mamab"), ((char*)"G_1"), 0.0f},
+    {((char*)"c_mamab"), ((char*)"G_1"), 4.0f},
+    {((char*)"c_mamab"), ((char*)"G_1"), 8.0f},
+    {((char*)"c_konari"), ((char*)"G_1"), 0.0f},
+    {((char*)"c_konari"), ((char*)"G_1"), 4.0f},
+    {((char*)"c_konari"), ((char*)"G_1"), 8.0f},
+    {0},
 };
 
 int rand(void);
@@ -1341,22 +1368,36 @@ void moamoa_joint_position(Moamoa* moa, Vec* out) {
     PSVECAdd(out, &tmp, out);
 }
 
-static s32 sharinDt[] = {
-    (s32)((char*)"sha_1_1"), 0, 0, -229998976, (s32)((char*)"sha_1_2"), 0, 0, -229998976,
-    (s32)((char*)"sha_1_3"), 2, 0, -229998976, (s32)((char*)"sha_1_4"), 1, 1, -229998976,
-    (s32)((char*)"sha_1_5"), 1, 1, -229998976, (s32)((char*)"sha_2_1"), 0, 0, -229998976,
-    (s32)((char*)"sha_2_2"), 0, 0, -229998976, (s32)((char*)"sha_2_3"), 0, 0, -229998976,
-    (s32)((char*)"sha_3_1"), 0, 0, -229998976, (s32)((char*)"sha_3_2"), 0, 0, -229998976,
-    (s32)((char*)"sha_3_3"), 0, 0, -229998976, (s32)((char*)"sha_4_1"), 0, 0, -229998976,
-    (s32)((char*)"sha_4_2"), 0, 0, -229998976, (s32)((char*)"sha_4_3"), 0, 0, -229998976,
-    (s32)((char*)"sha_5_1"), 0, 0, -229998976, (s32)((char*)"sha_5_2"), 0, 0, -229998976,
-    (s32)((char*)"sha_5_3"), 0, 0, -229998976, (s32)((char*)"sha_6_1"), 0, 0, -229998976,
-    (s32)((char*)"sha_6_2"), 0, 0, -229998976, (s32)((char*)"sha_6_3"), 0, 0, -229998976,
-    (s32)((char*)"sha_1_1_c"), 0, 0, -230001024, (s32)((char*)"sha_1_2_c"), 0, 0, -230001024,
-    (s32)((char*)"sha_1_3_c"), 2, 0, -230001024, (s32)((char*)"sha_1_4_c"), 1, 1, -230001024,
-    (s32)((char*)"sha_1_5_c"), 1, 1, -230001024, (s32)((char*)"sha_6_1_c"), 0, 0, -229998976,
-    (s32)((char*)"sha_6_2_c"), 0, 0, -229998976, (s32)((char*)"sha_6_3_c"), 0, 0, -229998976,
-    0, 0, 0, 0,
+static SharinData sharinDt[] = {
+    {((char*)"sha_1_1"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_1_2"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_1_3"), 2, 0, FLOAT(1.0f)},
+    {((char*)"sha_1_4"), 1, 1, FLOAT(1.0f)},
+    {((char*)"sha_1_5"), 1, 1, FLOAT(1.0f)},
+    {((char*)"sha_2_1"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_2_2"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_2_3"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_3_1"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_3_2"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_3_3"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_4_1"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_4_2"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_4_3"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_5_1"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_5_2"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_5_3"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_6_1"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_6_2"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_6_3"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_1_1_c"), 0, 0, FLOAT(-1.0f)},
+    {((char*)"sha_1_2_c"), 0, 0, FLOAT(-1.0f)},
+    {((char*)"sha_1_3_c"), 2, 0, FLOAT(-1.0f)},
+    {((char*)"sha_1_4_c"), 1, 1, FLOAT(-1.0f)},
+    {((char*)"sha_1_5_c"), 1, 1, FLOAT(-1.0f)},
+    {((char*)"sha_6_1_c"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_6_2_c"), 0, 0, FLOAT(1.0f)},
+    {((char*)"sha_6_3_c"), 0, 0, FLOAT(1.0f)},
+    {0},
 };
 
 static EVT_BEGIN(evt_sharin_main)
@@ -1411,13 +1452,16 @@ static EVT_BEGIN(evt_sharin)
     RETURN
 EVT_END()
 
-static s32 clankDt[] = {
-    (s32)((char*)"bou_1"), 0, 0, -229979520, -229998976, (s32)((char*)"bou_2"), 1, 1,
-    -229983104, -229998976, (s32)((char*)"bou_3"), 0, 0, -229979520, -229998976, (s32)((char*)"bou_4"),
-    1, 1, -229983104, -229998976, (s32)((char*)"bou_1_c"), 0, 0, -229979520,
-    -230001024, (s32)((char*)"bou_2_c"), 1, 1, -229983104, -230001024, (s32)((char*)"bou_3_c"), 0,
-    0, -229979520, -230001024, (s32)((char*)"bou_4_c"), 1, 1, -229983104, -230001024,
-    0, 0, 0, 0, 0,
+static ClankData clankDt[] = {
+    {((char*)"bou_1"), 0, 0, FLOAT(20.0f), FLOAT(1.0f)},
+    {((char*)"bou_2"), 1, 1, FLOAT(16.5f), FLOAT(1.0f)},
+    {((char*)"bou_3"), 0, 0, FLOAT(20.0f), FLOAT(1.0f)},
+    {((char*)"bou_4"), 1, 1, FLOAT(16.5f), FLOAT(1.0f)},
+    {((char*)"bou_1_c"), 0, 0, FLOAT(20.0f), FLOAT(-1.0f)},
+    {((char*)"bou_2_c"), 1, 1, FLOAT(16.5f), FLOAT(-1.0f)},
+    {((char*)"bou_3_c"), 0, 0, FLOAT(20.0f), FLOAT(-1.0f)},
+    {((char*)"bou_4_c"), 1, 1, FLOAT(16.5f), FLOAT(-1.0f)},
+    {0},
 };
 
 static EVT_BEGIN(evt_clank_main)
@@ -1896,14 +1940,15 @@ static EVT_BEGIN(evt_ramp)
     RETURN
 EVT_END()
 
-static s32 pika_tbl[] = {
-    (s32)((char*)"pika_1_1"), (s32)((char*)"pika_1_2"), (s32)((char*)"pika_1_3"), (s32)((char*)"pika_1_4"), (s32)((char*)"pika_2"), (s32)((char*)"pika_3"), (s32)((char*)"pika_4"), (s32)((char*)"pika_5"),
-    (s32)((char*)"pika_6"), (s32)((char*)"pika_1_1_c"), (s32)((char*)"pika_1_2_c"), (s32)((char*)"pika_1_3_c"), (s32)((char*)"pika_1_4_c"), (s32)((char*)"pika_6_c"), 0,
+static const char* pika_tbl[] = {
+    "pika_1_1", "pika_1_2", "pika_1_3", "pika_1_4", "pika_2",
+    "pika_3", "pika_4", "pika_5", "pika_6", "pika_1_1_c",
+    "pika_1_2_c", "pika_1_3_c", "pika_1_4_c", "pika_6_c", NULL,
 };
 
-__declspec(section ".data") static s32 pika_tbl_rsh_06[] = {
-    (s32)((char*)"pika_1_1"), (s32)((char*)"pika_1_2"), (s32)((char*)"pika_1_3"), (s32)((char*)"pika_1_4"), (s32)((char*)"pika_2"), (s32)((char*)"pika_3"), (s32)((char*)"pika_4"), (s32)((char*)"pika_5"),
-    (s32)((char*)"pika_6"), 0,
+__declspec(section ".data") static const char* pika_tbl_rsh_06[] = {
+    "pika_1_1", "pika_1_2", "pika_1_3", "pika_1_4", "pika_2",
+    "pika_3", "pika_4", "pika_5", "pika_6", NULL,
 };
 
 static EVT_BEGIN(hom_10_evt_resha_sub)
@@ -1932,10 +1977,10 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
     SPAWN_EVENT(PTR(evt_hoshi))
     SPAWN_EVENT(PTR(evt_ramp))
     CALL(evt_map_set_tevcallback, 1, PTR(resha_tev))
-    SET_INT_READ_ADDR(PTR(pika_tbl))
+    SET_INT_READ_ADDR(PTR(&pika_tbl))
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING(((char*)"rsh_06_a")))
-        SET_INT_READ_ADDR(PTR(pika_tbl_rsh_06))
+        SET_INT_READ_ADDR(PTR(&pika_tbl_rsh_06))
     END_IF
     LOOP(0)
         READ_INT(LW(0))
@@ -2016,11 +2061,25 @@ EVT_BEGIN(evt_resha_init)
     RETURN
 EVT_END()
 
-static s32 bero_data_a[] = {
-    (s32)((char*)"w_bero"), 8, 2, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)((char*)"rsh_05_a"), (s32)((char*)"w_bero"), 65537, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_data_a[] = {
+    {
+        ((char*)"w_bero"), // hitName
+        0, // type
+        8, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)((char*)"rsh_05_a"), // nextMapName
+        ((char*)"w_bero"), // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
 static EVT_BEGIN(evt_moamoa_init)
@@ -2249,8 +2308,9 @@ EVT_BEGIN(evt_great_moamoa)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 pose_name[] = {
-    (s32)((char*)"Z_1"), (s32)((char*)"H_1"), (s32)((char*)"S_1"), (s32)((char*)"U_1"), (s32)((char*)"H_2"), (s32)((char*)"S_2"), (s32)((char*)"P_1"), (s32)((char*)"S_3"),
+__declspec(section ".data") const char* pose_name[] = {
+    "Z_1", "H_1", "S_1", "U_1", "H_2", "S_2", "P_1",
+    "S_3",
 };
 
 EVT_BEGIN(moamoa_debug)
@@ -2301,7 +2361,7 @@ EVT_BEGIN(moamoa_debug)
                 MODULO(LW(0), 8)
                 SET_VALUE(LW(1), LW(0))
                 ADD(LW(1), 1)
-                SET_INT_READ_ADDR(PTR(pose_name))
+                SET_INT_READ_ADDR(PTR(&pose_name))
                 LOOP(LW(1))
                     READ_INT(LW(2))
                 END_LOOP

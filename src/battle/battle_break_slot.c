@@ -18,6 +18,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
 
 typedef struct BreakSlotReel {
 	s32 kind;        // 0x00
@@ -76,14 +77,14 @@ USER_FUNC(btlevtcmd_RecoverFp);
 USER_FUNC(btlevtcmd_RecoverHp);
 USER_FUNC(evt_eff);
 
-__declspec(section ".data") u64 battle_break_slot_negone_one_a = 0xBF8000003F800000;
-__declspec(section ".data") u64 fd_battle_break_slot_negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 battle_break_slot_one_negone_a = 0x3F800000BF800000;
-__declspec(section ".data") u64 fd_battle_break_slot_one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 battle_break_slot_negone_one_b = 0xBF8000003F800000;
-__declspec(section ".data") u64 fd_battle_break_slot_negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 battle_break_slot_one_negone_b = 0x3F800000BF800000;
-__declspec(section ".data") u64 fd_battle_break_slot_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 battle_break_slot_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 fd_battle_break_slot_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 battle_break_slot_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 fd_battle_break_slot_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 battle_break_slot_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 fd_battle_break_slot_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+__declspec(section ".data") f32 battle_break_slot_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+__declspec(section ".data") f32 fd_battle_break_slot_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 EVT_BEGIN(kinoko_effect)
     CALL(btlevtcmd_GetUnitId, -3, LW(3))
@@ -154,40 +155,80 @@ EVT_BEGIN(shine_effect)
     RETURN
 EVT_END()
 
-s32 weapon_doku_kinoko[] = {
-    0, 0, 0, 0, 1677721600, 0, 0, (s32)weaponGetPowerHPHalf,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34603360, 536870912, 770, 0, 131144, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_doku_kinoko = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    weaponGetPowerHPHalf, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2100160, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x20048, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_doku_kinoko_fp[] = {
-    0, 0, 0, 0, 1677721600, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    (s32)weaponGetFPPowerFPHalf, 0, 0, 0, 0, 0, 0, 0,
-    0, 34603360, 536870912, 770, 0, 131144, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_doku_kinoko_fp = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, 0.0f, 0, 0, 0, 0, // baseFpCost..field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    weaponGetFPPowerFPHalf, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2100160, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x20048, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 EVT_BEGIN(doku_kinoko_effect)
     CALL(btlevtcmd_GetUnitId, -3, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
-    CALL(btlevtcmd_CheckDamage, -3, LW(3), LW(4), PTR(weapon_doku_kinoko), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, -3, LW(3), LW(4), PTR(&weapon_doku_kinoko), 0, LW(5))
     CALL(btlevtcmd_GetUnitId, -4, LW(3))
     IF_INT_NOT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckStatus, LW(3), 27, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
-            CALL(btlevtcmd_CheckDamage, -3, LW(3), LW(4), PTR(weapon_doku_kinoko), 256, LW(5))
+            CALL(btlevtcmd_CheckDamage, -3, LW(3), LW(4), PTR(&weapon_doku_kinoko), 256, LW(5))
         END_IF
     END_IF
     WAIT_FRAMES(60)
     CALL(btlevtcmd_GetUnitId, -3, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
-    CALL(btlevtcmd_CheckDamage, -3, LW(3), LW(4), PTR(weapon_doku_kinoko_fp), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, -3, LW(3), LW(4), PTR(&weapon_doku_kinoko_fp), 256, LW(5))
     RETURN
 EVT_END()
 
@@ -508,13 +549,13 @@ void BattleBreakSlot_Main(void) {
 					case 0:
 					case 1:
 					case 2:
-						updown = BattleAudienceAddAudienceNum(*(s32*)((u8*)aud + 0x13790) / 2);
+						updown = BattleAudienceAddAudienceNum(aud->mMaxAudience / 2);
 						break;
 					case 3:
-						updown = BattleAudienceAddAudienceNum(*(s32*)((u8*)aud + 0x13790));
+						updown = BattleAudienceAddAudienceNum(aud->mMaxAudience);
 						break;
 					case 4:
-						updown = BattleAudienceAddAudienceNum(-*(s32*)((u8*)aud + 0x13790));
+						updown = BattleAudienceAddAudienceNum(-aud->mMaxAudience);
 						break;
 				}
 				if (_battleWorkPointer->flags & 0x100) {
@@ -525,7 +566,7 @@ void BattleBreakSlot_Main(void) {
 				BattleAudienceSoundRun(0);
 			}
 			if (slot->field_8 == 210) {
-				if (!(*(u32*)((u8*)_battleWorkPointer + 0x2754) & 2)) {
+				if (!((u32)_battleWorkPointer->cameraWork.flags & 2)) {
 					btl_camera_shake_h(0, 2.0f, 2.0f, 1000, 0);
 				}
 				for (k = 0; k < 200; k++) {
@@ -894,7 +935,7 @@ void BattleBreakSlot_PointInc(void) {
 	BreakSlotReel* reel2;
 	BreakSlotWork* slot = BattleBreakSlotGetPtr();
 
-	if (*(u16*)((u8*)pouchGetPtr() + 0x8C) == 0) {
+	if (pouchGetPtr()->mStarPowersObtained == 0) {
 		return;
 	}
 	reel = BattleBreakSlotReelGetPtr(slot->reelNo);

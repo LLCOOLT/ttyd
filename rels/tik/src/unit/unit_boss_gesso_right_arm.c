@@ -12,6 +12,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_msg.h"
 #include "evt/evt_sub.h"
+#include "battle/battle_database_common.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_AnimeChangePoseType);
@@ -34,89 +35,69 @@ static USER_FUNC(_check_zenei_kouei);
 extern s32 R_defence_attr_turn[];
 extern s32 R_defence_turn[];
 extern s32 R_regist_turn[];
-extern s32 gesso_pose_table_turn[];
+extern PoseTableEntry gesso_pose_table_turn[];
 
-__declspec(section ".data") u64 fd_boss_gesso_right_arm_negone_one_374;
-__declspec(section ".data") s32 fd_boss_gesso_right_arm_neg_one_382[1];
-__declspec(section ".data") s32 fd_boss_gesso_right_arm___local_PI_383[1];
-__declspec(section ".data") s32 fd_boss_gesso_right_arm___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_boss_gesso_right_arm_one_negone_373;
-__declspec(section ".data") s32 fd_boss_gesso_right_arm___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_boss_gesso_right_arm_one_381[1];
-__declspec(section ".data") u64 fd_boss_gesso_right_arm_negone_one_360;
-__declspec(section ".data") s32 fd_boss_gesso_right_arm_neg_one_365[1];
-__declspec(section ".data") s32 fd_boss_gesso_right_arm___local_PI_366[1];
-__declspec(section ".data") s32 fd_boss_gesso_right_arm___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_boss_gesso_right_arm_one_negone_359;
-__declspec(section ".data") s32 fd_boss_gesso_right_arm___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_boss_gesso_right_arm_one_364[1];
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_neg_one_382;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm___local_PI_383;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm___local_3PIO2_385;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_gesso_right_arm___local_PIO2_384;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_one_381;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_neg_one_365;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm___local_PI_366;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm___local_3PIO2_368;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_boss_gesso_right_arm___local_PIO2_367;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_one_364;
 BattleUnitKind unit_boss_gesso_right_arm;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
 static __declspec(section ".data") PoseTableEntry pose_table[4];
 BattleDataEntry gesso_right_arm_data_table[13];
-static __declspec(section ".data") s32 data_table[6];
+static __declspec(section ".data") BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[1];
 static s32 init_event[25];
 static s32 damage_event[31];
 s32 gesso_right_arm_damage_event[93];
 static __declspec(section ".data") s32 phase_event[2];
-s32 weapon_gesso_right_arm_front_attack[48];
-s32 weapon_gesso_right_arm_rear_attack[48];
+BattleWeapon weapon_gesso_right_arm_front_attack;
+BattleWeapon weapon_gesso_right_arm_rear_attack;
 static s32 attack_event[273];
 static __declspec(section ".data") s32 wait_event[6];
 s32 gesso_arm_dead_event[130];
 s32 gesso_fall_check[219];
 s32 gesso_arm_damage_pose_event[35];
 
-__declspec(section ".data") u64 fd_boss_gesso_right_arm_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_gesso_right_arm_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_gesso_right_arm___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_gesso_right_arm___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_gesso_right_arm___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_gesso_right_arm___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_gesso_right_arm_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_gesso_right_arm___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_gesso_right_arm___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_gesso_right_arm_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_boss_gesso_right_arm_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_boss_gesso_right_arm_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_boss_gesso_right_arm___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_boss_gesso_right_arm___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_boss_gesso_right_arm___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_boss_gesso_right_arm___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_boss_gesso_right_arm_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_boss_gesso_right_arm___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_boss_gesso_right_arm___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_boss_gesso_right_arm_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_boss_gesso_right_arm_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_gesso_right_arm = {
     10,
@@ -213,8 +194,10 @@ BattleDataEntry gesso_right_arm_data_table[] = {
     {36, gesso_right_arm_damage_event},
 };
 
-static __declspec(section ".data") s32 data_table[] = {
-    10, (s32)gesso_arm_damage_pose_event, 49, (s32)gesso_arm_dead_event, 0, 0,
+static __declspec(section ".data") BattleDataEntry data_table[] = {
+    {10, gesso_arm_damage_pose_event},
+    {49, gesso_arm_dead_event},
+    {0},
 };
 
 static BattleUnitKindPart parts[] = {
@@ -286,122 +269,278 @@ static __declspec(section ".data") EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
-s32 weapon_gesso_right_arm_front_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 135, 2047, 4,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gesso_right_arm_front_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    4, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-s32 weapon_gesso_right_arm_rear_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 135, 2047, 8,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gesso_right_arm_rear_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    8, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 attack_event[] = {
-    196699, (s32)btlevtcmd_EnemyItemUseCheck, -2, -30000000, 131097, -30000000, 0, 65630,
-    -30000000, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 33, 196699, (s32)evt_sub_random,
-    1, -30000000, 131096, -30000000, 0, 131122, -29999988, (s32)weapon_gesso_right_arm_front_attack,
-    32, 131122, -29999988, (s32)weapon_gesso_right_arm_rear_attack, 33, 196699, (s32)btlevtcmd_GetEnemyBelong, -2,
-    -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999988, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy,
-    -29999988, -29999997, -29999996, 131096, -29999997, -1, 65540, 99,
-    33, 131163, (s32)btlevtcmd_WeaponAftereffect, -29999988, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997,
-    -29999996, 65627, (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999988, 131122,
-    -29999989, 0, 196699, (s32)btlevtcmd_GetUnitKind, -29999997, -30000000, 131096, -30000000,
-    222, 262235, (s32)btlevtcmd_GetUnitWork, -2, 0, -29999991, 262235, (s32)btlevtcmd_GetUnitWork,
-    -29999991, 5, -30000000, 131096, -30000000, 0, 131122, -29999989,
-    1, 262235, (s32)btlevtcmd_SetUnitWork, -29999991, 5, 1, 33, 33,
-    131097, -29999989, 0, 131163, (s32)btlevtcmd_StatusWindowOnOff, 0, 262235, (s32)btlevtcmd_GetUnitWork,
-    -2, 0, -29999991, 327771, (s32)evt_msg_print, 2, (s32)"tik_02_gs_04_1", 0,
-    -29999991, 327771, (s32)evt_msg_print, 2, (s32)"tik_02_gs_04_2", 0, -29999991, 196699,
-    (s32)evt_msg_select, 0, (s32)"tik_02_gs_04_3", 65627, (s32)evt_msg_continue, 131096, -30000000, 0,
-    107, 327771, (s32)evt_msg_print, 2, (s32)"tik_02_gs_04_3_y", 0, -29999991, 131163,
-    (s32)btlevtcmd_StatusWindowOnOff, 1, 109, 32, 107, 327771, (s32)evt_msg_toge, 2,
-    110, 120, 30, 327771, (s32)evt_msg_print, 2, (s32)"tik_02_gs_04_3_n", 0,
-    -29999991, 131163, (s32)btlevtcmd_StatusWindowOnOff, 1, 109, 33, 33, 196699,
-    (s32)_check_zenei_kouei, -29999997, -29999987, 131096, -29999987, 0, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"GSO_A1_1", 32, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"GSO_A1_3", 33, 110, 196699, (s32)btlevtcmd_ftof, 32, -30000000, 65545,
-    -30000000, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GESSO_ARM_MOVE1", -250000000, 0, -250000000,
-    196699, (s32)btlevtcmd_ftof, 55, -30000000, 65545, -30000000, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_BOSS_GESSO_ATTACK1", -250000000, 0, -250000000, 112, 196699, (s32)btlevtcmd_ftof,
+static EVT_BEGIN(attack_event)
+    CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL_CHILD(LW(0))
+        CALL(btlevtcmd_StartWaitEvent, -2)
+        RETURN
+    END_IF
+    CALL(evt_sub_random, 1, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        SET_VALUE(LW(12), PTR(&weapon_gesso_right_arm_front_attack))
+    ELSE
+        SET_VALUE(LW(12), PTR(&weapon_gesso_right_arm_rear_attack))
+    END_IF
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(12))
+    SET_VALUE(LW(11), 0)
+    CALL(btlevtcmd_GetUnitKind, LW(3), LW(0))
+    IF_INT_EQUAL(LW(0), 222)
+        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(9))
+        CALL(btlevtcmd_GetUnitWork, LW(9), 5, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            SET_VALUE(LW(11), 1)
+            CALL(btlevtcmd_SetUnitWork, LW(9), 5, 1)
+        END_IF
+    END_IF
+    IF_INT_NOT_EQUAL(LW(11), 0)
+        CALL(btlevtcmd_StatusWindowOnOff, 0)
+        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(9))
+        CALL(evt_msg_print, 2, STRING("tik_02_gs_04_1"), 0, LW(9))
+        CALL(evt_msg_print, 2, STRING("tik_02_gs_04_2"), 0, LW(9))
+        CALL(evt_msg_select, 0, STRING("tik_02_gs_04_3"))
+        CALL(evt_msg_continue)
+        IF_INT_EQUAL(LW(0), 0)
+            BEGIN_INLINE_EVENT
+                CALL(evt_msg_print, 2, STRING("tik_02_gs_04_3_y"), 0, LW(9))
+                CALL(btlevtcmd_StatusWindowOnOff, 1)
+            END_INLINE_EVENT
+        ELSE
+            BEGIN_INLINE_EVENT
+                CALL(evt_msg_toge, 2, 110, 120, 30)
+                CALL(evt_msg_print, 2, STRING("tik_02_gs_04_3_n"), 0, LW(9))
+                CALL(btlevtcmd_StatusWindowOnOff, 1)
+            END_INLINE_EVENT
+        END_IF
+    END_IF
+    CALL(_check_zenei_kouei, LW(3), LW(13))
+    IF_INT_EQUAL(LW(13), 0)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GSO_A1_1"))
+    ELSE
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GSO_A1_3"))
+    END_IF
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_ftof, 32, LW(0))
+        WAIT_FRAMES(LW(0))
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GESSO_ARM_MOVE1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_ftof, 55, LW(0))
+        WAIT_FRAMES(LW(0))
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GESSO_ATTACK1"), -250000000, 0, -250000000)
+    END_SIBLING_EVENT
 #ifdef VERSION_G8ME01
-    97,
+    CALL(btlevtcmd_ftof, 97, LW(0))
 #else
-    94,
+    CALL(btlevtcmd_ftof, 94, LW(0))
 #endif
-    -30000000, 65545, -30000000, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997,
-    -29999996, -29999988, 256, -29999995, 131097, -29999995, 1, 65570,
-    -29999995, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38, 65572,
-    6, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 39, 65572, 2, 196699,
-    (s32)btlevtcmd_StartAvoid, -29999997, 40, 49, 32, 196699, (s32)btlevtcmd_ResultACDefence, -29999997,
-    -29999988, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999988, 256,
-    -29999995, 33, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -2, 1, 65539, 99,
-    196699, (s32)evt_btl_camera_set_mode, 0, 0, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2,
-    1,
-};
+    WAIT_FRAMES(LW(0))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
+    IF_INT_NOT_EQUAL(LW(5), 1)
+        SWITCH(LW(5))
+            CASE_EQUAL(3)
+            CALL(btlevtcmd_StartAvoid, LW(3), 38)
+            CASE_EQUAL(6)
+            CALL(btlevtcmd_StartAvoid, LW(3), 39)
+            CASE_EQUAL(2)
+            CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        END_SWITCH
+    ELSE
+        CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
+    END_IF
+    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+    LABEL(99)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
-s32 gesso_arm_dead_event[] = {
-    196699, (s32)btlevtcmd_GetUnitKind, -2, -30000000, 131096, -30000000, 10, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GESSO_ARM_GOOUT1", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"GSO_F1_1", 262235, (s32)btlevtcmd_GetUnitWork, -2, 0, -29999997,
-    131097, -29999997, -1, 262235, (s32)btlevtcmd_SetUnitWork, -29999997, 2, -1,
-    33, 65545, 50, 262235, (s32)btlevtcmd_GetUnitWork, -2, 0, -29999997,
-    131097, -29999997, -1, 262235, (s32)btlevtcmd_SetUnitWork, -29999997, 2, -1,
-    33, 32, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GESSO_ARM_GOOUT1", -250000000, 0,
-    -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"GSO_F1_1", 262235, (s32)btlevtcmd_GetUnitWork,
-    -2, 0, -29999997, 131097, -29999997, -1, 262235, (s32)btlevtcmd_SetUnitWork,
-    -29999997, 1, -1, 33, 65545, 80, 262235, (s32)btlevtcmd_GetUnitWork,
-    -2, 0, -29999997, 131097, -29999997, -1, 262235, (s32)btlevtcmd_SetUnitWork,
-    -29999997, 1, -1, 33, 33, 65539, 10, 131096,
-    -29999997, -1, 65540, 99, 33, 262235, (s32)btlevtcmd_GetUnitWork, -29999997,
-    4, -30000000, 131101, -30000000, 2, 65540, 99, 33,
-    131101, -30000000, 1, 65545, 1, 65540, 10, 33,
-    65630, (s32)gesso_fall_check, 65539, 99, 196699, (s32)btlevtcmd_KillUnit, -2, 0,
-    2, 1,
-};
+EVT_BEGIN(gesso_arm_dead_event)
+    CALL(btlevtcmd_GetUnitKind, -2, LW(0))
+    IF_INT_EQUAL(LW(0), 10)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GESSO_ARM_GOOUT1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GSO_F1_1"))
+        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+        IF_INT_NOT_EQUAL(LW(3), -1)
+            CALL(btlevtcmd_SetUnitWork, LW(3), 2, -1)
+        END_IF
+        WAIT_FRAMES(50)
+        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+        IF_INT_NOT_EQUAL(LW(3), -1)
+            CALL(btlevtcmd_SetUnitWork, LW(3), 2, -1)
+        END_IF
+    ELSE
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GESSO_ARM_GOOUT1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GSO_F1_1"))
+        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+        IF_INT_NOT_EQUAL(LW(3), -1)
+            CALL(btlevtcmd_SetUnitWork, LW(3), 1, -1)
+        END_IF
+        WAIT_FRAMES(80)
+        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+        IF_INT_NOT_EQUAL(LW(3), -1)
+            CALL(btlevtcmd_SetUnitWork, LW(3), 1, -1)
+        END_IF
+    END_IF
+    LABEL(10)
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_GetUnitWork, LW(3), 4, LW(0))
+    IF_INT_GREATER_OR_EQUAL(LW(0), 2)
+        GOTO(99)
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+        WAIT_FRAMES(1)
+        GOTO(10)
+    END_IF
+    CALL_CHILD(gesso_fall_check)
+    LABEL(99)
+    CALL(btlevtcmd_KillUnit, -2, 0)
+    RETURN
+EVT_END()
 
-s32 gesso_fall_check[] = {
-    262235, (s32)btlevtcmd_GetUnitWork, -29999997, 1, -30000000, 196699, (s32)btlevtcmd_GetUnitId, -30000000,
-    -30000000, 131097, -30000000, -1, 2, 33, 262235, (s32)btlevtcmd_GetUnitWork,
-    -29999997, 2, -30000000, 196699, (s32)btlevtcmd_GetUnitId, -30000000, -30000000, 131097,
-    -30000000, -1, 2, 33, 262235, (s32)btlevtcmd_GetUnitWork, -29999997, 4,
-    -30000000, 131096, -30000000, 2, 2, 33, 262235, (s32)btlevtcmd_GetUnitWork,
-    -29999997, 0, -30000000, 131096, -30000000, 1, 2, 33,
-    262235, (s32)btlevtcmd_SetUnitWork, -29999997, 4, 2, 262235, (s32)btlevtcmd_GetUnitWork, -29999997,
-    3, 0, 131163, (s32)btlevtcmd_StopWaitEvent, -29999997, 262235, (s32)btlevtcmd_AnimeChangePose, -29999997,
-    1, (s32)"GSO_F_1", 65545, 1, 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000,
-    -29999999, -29999998, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 327771,
-    (s32)btlevtcmd_SetHomePos, -29999997, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_SetPos, -29999997,
-    -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -29999997, 1, 393307,
-    (s32)btlevtcmd_snd_se, -29999997, (s32)"SFX_BOSS_GESSO_FALL1", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -29999997, 1, (s32)"GSO_F_2", 110, 196699, (s32)btlevtcmd_ftof, 16, -30000000,
-    65545, -30000000, 393307, (s32)btlevtcmd_snd_se, -29999997, (s32)"SFX_BOSS_GESSO_FALL1", -250000000, 0,
-    -250000000, 393307, (s32)btlevtcmd_snd_se, -29999997, (s32)"SFX_BOSS_GESSO_DOWN1", -250000000, 0, -250000000,
-    112, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -29999997, 1, 196699, (s32)btlevtcmd_OffAttribute, -29999997,
-    2, 262235, (s32)btlevtcmd_OffPartsAttribute, -29999997, 1, 6291456, 262235, (s32)btlevtcmd_AnimeSetPoseTable,
-    -29999997, 1, (s32)gesso_pose_table_turn, 262235, (s32)btlevtcmd_SetHpGaugeOffset, -29999997, 0, 0,
-    262235, (s32)btlevtcmd_SetStatusIconOffset, -29999997, 46, 118, 262235, (s32)btlevtcmd_SetPartsDefenceTable, -29999997,
-    1, (s32)R_defence_turn, 262235, (s32)btlevtcmd_SetPartsDefenceAttrTable, -29999997, 1, (s32)R_defence_attr_turn, 196699,
-    (s32)btlevtcmd_SetRegistStatus, -29999997, (s32)R_regist_turn, 393307, (s32)btlevtcmd_SetHitOffset, -29999997, 1, -15,
-    -90, 0, 262235, (s32)btlevtcmd_SetStatusIconOffset, -2, 55, 113, 393307,
-    (s32)evt_btl_camera_shake_h, 0, 6, 0, 30, 4, 262235, (s32)btlevtcmd_SetUnitWork,
-    -29999997, 0, 1, 393307, (s32)btlevtcmd_SetHitOffset, -29999997, 1, 51,
-    38, 30, 393307, (s32)btlevtcmd_SetHitCursorOffset, -29999997, 1, 51, 38,
-    30, 262235, (s32)btlevtcmd_SetUnitWork, -29999997, 4, 0, 131163, (s32)btlevtcmd_StartWaitEvent,
-    -29999997, 2, 1,
-};
+EVT_BEGIN(gesso_fall_check)
+    CALL(btlevtcmd_GetUnitWork, LW(3), 1, LW(0))
+    CALL(btlevtcmd_GetUnitId, LW(0), LW(0))
+    IF_INT_NOT_EQUAL(LW(0), -1)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_GetUnitWork, LW(3), 2, LW(0))
+    CALL(btlevtcmd_GetUnitId, LW(0), LW(0))
+    IF_INT_NOT_EQUAL(LW(0), -1)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_GetUnitWork, LW(3), 4, LW(0))
+    IF_INT_EQUAL(LW(0), 2)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_GetUnitWork, LW(3), 0, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        RETURN
+    END_IF
+    CALL(btlevtcmd_SetUnitWork, LW(3), 4, 2)
+    CALL(btlevtcmd_GetUnitWork, LW(3), 3, 0)
+    CALL(btlevtcmd_StopWaitEvent, LW(3))
+    CALL(btlevtcmd_AnimeChangePose, LW(3), 1, STRING("GSO_F_1"))
+    WAIT_FRAMES(1)
+    CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeWaitPlayComplete, LW(3), 1)
+    CALL(btlevtcmd_snd_se, LW(3), STRING("SFX_BOSS_GESSO_FALL1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, LW(3), 1, STRING("GSO_F_2"))
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_ftof, 16, LW(0))
+        WAIT_FRAMES(LW(0))
+        CALL(btlevtcmd_snd_se, LW(3), STRING("SFX_BOSS_GESSO_FALL1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, LW(3), STRING("SFX_BOSS_GESSO_DOWN1"), -250000000, 0, -250000000)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeWaitPlayComplete, LW(3), 1)
+    CALL(btlevtcmd_OffAttribute, LW(3), 2)
+    CALL(btlevtcmd_OffPartsAttribute, LW(3), 1, 6291456)
+    CALL(btlevtcmd_AnimeSetPoseTable, LW(3), 1, PTR(gesso_pose_table_turn))
+    CALL(btlevtcmd_SetHpGaugeOffset, LW(3), 0, 0)
+    CALL(btlevtcmd_SetStatusIconOffset, LW(3), 46, 118)
+    CALL(btlevtcmd_SetPartsDefenceTable, LW(3), 1, PTR(R_defence_turn))
+    CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(3), 1, PTR(R_defence_attr_turn))
+    CALL(btlevtcmd_SetRegistStatus, LW(3), PTR(R_regist_turn))
+    CALL(btlevtcmd_SetHitOffset, LW(3), 1, -15, -90, 0)
+    CALL(btlevtcmd_SetStatusIconOffset, -2, 55, 113)
+    CALL(evt_btl_camera_shake_h, 0, 6, 0, 30, 4)
+    CALL(btlevtcmd_SetUnitWork, LW(3), 0, 1)
+    CALL(btlevtcmd_SetHitOffset, LW(3), 1, 51, 38, 30)
+    CALL(btlevtcmd_SetHitCursorOffset, LW(3), 1, 51, 38, 30)
+    CALL(btlevtcmd_SetUnitWork, LW(3), 4, 0)
+    CALL(btlevtcmd_StartWaitEvent, LW(3))
+    RETURN
+EVT_END()
 
 EVT_BEGIN(gesso_arm_damage_pose_event)
     CALL(btlevtcmd_GetUnitKind, -2, LW(0))

@@ -168,7 +168,7 @@ void imgDisp(CameraId camId, void* param) {
 	if ((u32)entry->animName != 0) {
 		animPoseSetAnim(entry->poseId, (const char*)entry->animName, FALSE);
 	}
-	animPoseSetStartTime(entry->poseId, *(OSTime*)&entry->field_0x10C[4]);
+	animPoseSetStartTime(entry->poseId, entry->animTime);
 	animPoseMain(entry->poseId);
 	animPoseSetMaterialLightFlagOn(entry->poseId, 1);
 	entry->loopTimes = animPoseGetLoopTimes(entry->poseId);
@@ -181,7 +181,7 @@ void imgDisp(CameraId camId, void* param) {
 		t = 3.141592f * (camGetPtr(CAMERA_3D)->fovY / 2.0f / 180.0f);
 		d = 24.0f / (f32)tan(t);
 		PSVECSubtract(&camGetPtr(CAMERA_3D)->cameraPos, &entry->point, &v1);
-		v2 = *(Vec*)((u8*)camGetPtr(CAMERA_3D) + 0x13C);
+		v2 = *(Vec*)camGetPtr(CAMERA_3D)->view[2];
 		PSVECNormalize(&v2, &v2);
 		v1.x = v1.x * v2.x;
 		v1.y = v1.y * v2.y;
@@ -635,7 +635,7 @@ void imgShadowDisp(CameraId camId, void* param) {
 	animSetPaperTexObj(objs[0], objs[1], objs[2], datas[0], datas[1], datas[2],
 	                   entry->shadows[0].field_0x10 != -1 ? 1 : 0, entry->shadows[1].field_0x10 != -1 ? 1 : 0);
 	if ((u32)entry->animName != 0) animPoseSetAnim(entry->poseId, (const char*)entry->animName, 0);
-	animPoseSetStartTime(entry->poseId, *(OSTime*)&entry->field_0x10C[4]);
+	animPoseSetStartTime(entry->poseId, entry->animTime);
 	animPoseMain(entry->poseId);
 	animPoseSetMaterialLightFlagOn(entry->poseId, 1);
 	entry->loopTimes = animPoseGetLoopTimes(entry->poseId);

@@ -8,6 +8,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_sub.h"
 #include "party/party_motion.h"
+#include "battle/battle_database_common.h"
 
 #pragma force_active on
 
@@ -53,31 +54,31 @@ USER_FUNC(btlevtcmd_TransStageFloorPosition);
 USER_FUNC(evt_eff);
 USER_FUNC(evt_sub_random);
 
-__declspec(section ".data") u64 fd_sambo_negone_one_374;
-__declspec(section ".data") s32 fd_sambo_neg_one_382[1];
-__declspec(section ".data") s32 fd_sambo___local_PI_383[1];
-__declspec(section ".data") s32 fd_sambo___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_sambo_one_negone_373;
-__declspec(section ".data") s32 fd_sambo___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_sambo_one_381[1];
-__declspec(section ".data") u64 fd_sambo_negone_one_360;
-__declspec(section ".data") s32 fd_sambo_neg_one_365[1];
-__declspec(section ".data") s32 fd_sambo___local_PI_366[1];
-__declspec(section ".data") s32 fd_sambo___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_sambo_one_negone_359;
-__declspec(section ".data") s32 fd_sambo___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_sambo_one_364[1];
+__declspec(section ".data") f32 fd_sambo_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_sambo_neg_one_382;
+__declspec(section ".data") f32 fd_sambo___local_PI_383;
+__declspec(section ".data") f32 fd_sambo___local_3PIO2_385;
+__declspec(section ".data") f32 fd_sambo_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_sambo___local_PIO2_384;
+__declspec(section ".data") f32 fd_sambo_one_381;
+__declspec(section ".data") f32 fd_sambo_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_sambo_neg_one_365;
+__declspec(section ".data") f32 fd_sambo___local_PI_366;
+__declspec(section ".data") f32 fd_sambo___local_3PIO2_368;
+__declspec(section ".data") f32 fd_sambo_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_sambo___local_PIO2_367;
+__declspec(section ".data") f32 fd_sambo_one_364;
 BattleUnitKind unit_sambo;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
 static __declspec(section ".data") StatusVulnerability regist;
-static s32 weapon_sambo_head_attack_4[48];
-static s32 weapon_sambo_head_attack_3[48];
-static s32 weapon_sambo_head_attack_2[48];
-static s32 weapon_sambo_head_attack_1[48];
-static s32 weapon_sambo_spike_attack_4[48];
-static s32 weapon_sambo_spike_attack_3[48];
-static s32 weapon_sambo_spike_attack_2[48];
+static BattleWeapon weapon_sambo_head_attack_4;
+static BattleWeapon weapon_sambo_head_attack_3;
+static BattleWeapon weapon_sambo_head_attack_2;
+static BattleWeapon weapon_sambo_head_attack_1;
+static BattleWeapon weapon_sambo_spike_attack_4;
+static BattleWeapon weapon_sambo_spike_attack_3;
+static BattleWeapon weapon_sambo_spike_attack_2;
 static PoseTableEntry pose_table_body4[18];
 static PoseTableEntry pose_table_body3[20];
 static PoseTableEntry pose_table_body2[20];
@@ -97,58 +98,38 @@ static s32 attack_head_2_event[613];
 static s32 attack_head_1_event[587];
 static s32 attack_spike_event[824];
 static s32 call_friend_event[304];
-static __declspec(section ".data") s32 entry_sambo[12];
+static __declspec(section ".data") BattleUnitSetup entry_sambo;
 static s32 wait_event[36];
 static s32 sambo_rabbit_move[74];
 static s32 _body_param_set[49];
 
-__declspec(section ".data") u64 fd_sambo_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_sambo_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_sambo_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_sambo_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_sambo___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_sambo___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_sambo___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_sambo___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_sambo_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_sambo_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_sambo___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_sambo___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_sambo_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_sambo_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_sambo_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_sambo_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_sambo_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_sambo_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_sambo___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_sambo___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_sambo___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_sambo___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_sambo_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_sambo_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_sambo___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_sambo___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_sambo_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_sambo_one_364 = 1.0f;
 
 BattleUnitKind unit_sambo = {
     39,
@@ -222,67 +203,256 @@ static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 
 
 static __declspec(section ".data") StatusVulnerability regist = {95, 80, 80, 100, 90, 100, 100, 60, 100, 90, 100, 90, 100, 95, 90, 100, 90, 100, 90, 100, 100, 100};
 
-static s32 weapon_sambo_head_attack_4[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 553648132, 770, 0, 135, 0, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_sambo_head_attack_4 = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x21000004, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_sambo_head_attack_3[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 553648132, 770, 0, 135, 0, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_sambo_head_attack_3 = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x21000004, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_sambo_head_attack_2[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 553664516, 770, 0, 135, 0, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_sambo_head_attack_2 = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x21004004, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_sambo_head_attack_1[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    4, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 553664516, 770, 0, 4231, 0, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_sambo_head_attack_1 = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x21004004, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x1087, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_sambo_spike_attack_4[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 135, 2047, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_sambo_spike_attack_4 = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_sambo_spike_attack_3[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 135, 2047, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_sambo_spike_attack_3 = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_sambo_spike_attack_2[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    3, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 135, 2047, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_sambo_spike_attack_2 = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static PoseTableEntry pose_table_body4[] = {
@@ -563,53 +733,102 @@ static EVT_BEGIN(subset_dmg_sambo_fall)
     RETURN
 EVT_END()
 
-static s32 damage_event_bodylost_blow[] = {
-    262235, (s32)btlevtcmd_GetUnitWork, -2, 0, -30000000, 131096, -30000000, 1,
-    196699, (s32)btlevtcmd_GetDamage, -29999990, -30000000, 131101, -30000000, 1, 65630,
-    (s32)subsetevt_shot_damage, 32, 65630, (s32)subsetevt_nodamage_motion, 33, 32, 131122, -29999988,
-    -29999989, 262235, (s32)btlevtcmd_GetUnitWork, -29999990, 0, -30000000, 131126, -30000000,
-    1, 262235, (s32)btlevtcmd_SetUnitWork, -29999990, 0, -30000000, 65630, (s32)_body_param_set,
-    65570, -30000000, 65572, 1, 131122, -29999989, 4, 196699,
-    (s32)btlevtcmd_SetSwallowParam, -2, 50, 196699, (s32)btlevtcmd_SetSwallowAttribute, -2, 2, 262235,
-    (s32)btlevtcmd_SetStatusIconOffset, -2, 14, 20, 327771, (s32)btlevtcmd_SetCutBaseOffset, -2, 0,
-    10, 0, 327771, (s32)btlevtcmd_SetKissHitOffset, -2, 10, 16, 0,
-    65572, 2, 131122, -29999989, 3, 262235, (s32)btlevtcmd_SetStatusIconOffset, -2,
-    14, 40, 327771, (s32)btlevtcmd_SetCutBaseOffset, -2, 0, 20, 0,
-    327771, (s32)btlevtcmd_SetKissHitOffset, -2, 10, 26, 0, 65572, 3,
-    131122, -29999989, 2, 262235, (s32)btlevtcmd_SetStatusIconOffset, -2, 14, 60,
-    327771, (s32)btlevtcmd_SetCutBaseOffset, -2, 0, 30, 0, 327771, (s32)btlevtcmd_SetKissHitOffset,
-    -2, 10, 36, 0, 42, 131122, -29999989, 1,
-    262235, (s32)btlevtcmd_SetStatusIconOffset, -2, 14, 80, 327771, (s32)btlevtcmd_SetCutBaseOffset, -2,
-    0, 40, 0, 327771, (s32)btlevtcmd_SetKissHitOffset, -2, 10, 52,
-    0, 49, 262235, (s32)btlevtcmd_OffPartsAttribute, -29999990, -29999988, 9, 262235,
-    (s32)btlevtcmd_OnPartsAttribute, -29999990, -29999988, 50397184, 262235, (s32)btlevtcmd_OnPartsAttribute, -29999990, -29999989,
-    9, 262235, (s32)btlevtcmd_OffPartsAttribute, -29999990, -29999989, 16842752, 327771, (s32)btlevtcmd_GetPos,
-    -29999990, -30000000, -29999999, -29999998, 110, 65545, 4, 65630,
-    (s32)subset_dmg_sambo_fall, 112, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999, -29999998,
-    393307, (s32)btlevtcmd_SetPartsPos, -29999990, 5, -30000000, -29999999, -29999998, 262235,
-    (s32)btlevtcmd_OffPartsAttribute, -29999990, 5, 16777216, 262235, (s32)btlevtcmd_CheckDamagePattern, -29999990, 15,
-    -30000000, 131097, -30000000, 0, 131122, -29999987, (s32)marioWeapon_KaitenHammerInvolved, 32,
-    131122, -29999987, (s32)marioWeapon_UltraHammerInvolved, 33, 196699, (s32)btlevtcmd_GetFriendBelong, -29999990, -30000000,
-    262235, (s32)btlevtcmd_SamplingEnemy, -29999990, -30000000, -29999987, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997,
-    -29999996, 65539, 0, 131096, -29999997, -1, 65540, 50,
-    33, 196699, (s32)btlevtcmd_GetUnitId, -2, -29999990, 131097, -29999990, -29999997,
-    196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 65540, 0, 33, 65539,
-    10, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997, -29999996, 131096, -29999997, -1,
-    65540, 50, 33, 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000, -29999999,
-    -29999998, 327771, (s32)btlevtcmd_GetHomePos, -29999990, -250000000, -29999999, -250000000, 131125,
-    -29999999, 15, 393307, (s32)btlevtcmd_JumpPartsSetting, -29999990, 5, 0, -229994880,
-    -229999990, 524379, (s32)btlevtcmd_JumpPartsPosition, -29999990, 5, -30000000, -29999999, -29999998,
-    0, -1, 458843, (s32)btlevtcmd_CheckDamage, -29999990, -29999997, -29999996, -29999987,
-    256, -29999995, 65540, 10, 65539, 50, 262235, (s32)btlevtcmd_GetStageSize,
-    -29999995, -250000000, -250000000, 131122, -30000000, 0, 262235, (s32)btlevtcmd_FaceDirectionSub,
-    -29999990, -30000000, -29999995, 327771, (s32)btlevtcmd_GetPos, -29999990, -250000000, -29999999,
-    -250000000, 393307, (s32)btlevtcmd_JumpPartsSetting, -29999990, 5, 0, -229994880, -229999990,
-    524379, (s32)btlevtcmd_JumpPartsPosition, -29999990, 5, -30000000, -29999999, -29999998, 0,
-    -1, 262235, (s32)btlevtcmd_OnPartsAttribute, -29999990, 5, 16777216, 262235, (s32)btlevtcmd_CheckDamagePattern,
-    -29999990, 16, -29999995, 131097, -29999995, 0, 458843, (s32)btlevtcmd_CheckDamage,
-    -2, -29999990, -29999989, (s32)marioWeapon_UltraHammerFinish, 131328, -29999995, 33, 33,
-    2, 1,
-};
+static EVT_BEGIN(damage_event_bodylost_blow)
+    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(btlevtcmd_GetDamage, LW(10), LW(0))
+        IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+            CALL_CHILD(subsetevt_shot_damage)
+        ELSE
+            CALL_CHILD(subsetevt_nodamage_motion)
+        END_IF
+    ELSE
+        SET_VALUE(LW(12), LW(11))
+        CALL(btlevtcmd_GetUnitWork, LW(10), 0, LW(0))
+        SUBTRACT(LW(0), 1)
+        CALL(btlevtcmd_SetUnitWork, LW(10), 0, LW(0))
+        CALL_CHILD(_body_param_set)
+        SWITCH(LW(0))
+            CASE_EQUAL(1)
+            SET_VALUE(LW(11), 4)
+            CALL(btlevtcmd_SetSwallowParam, -2, 50)
+            CALL(btlevtcmd_SetSwallowAttribute, -2, 2)
+            CALL(btlevtcmd_SetStatusIconOffset, -2, 14, 20)
+            CALL(btlevtcmd_SetCutBaseOffset, -2, 0, 10, 0)
+            CALL(btlevtcmd_SetKissHitOffset, -2, 10, 16, 0)
+            CASE_EQUAL(2)
+            SET_VALUE(LW(11), 3)
+            CALL(btlevtcmd_SetStatusIconOffset, -2, 14, 40)
+            CALL(btlevtcmd_SetCutBaseOffset, -2, 0, 20, 0)
+            CALL(btlevtcmd_SetKissHitOffset, -2, 10, 26, 0)
+            CASE_EQUAL(3)
+            SET_VALUE(LW(11), 2)
+            CALL(btlevtcmd_SetStatusIconOffset, -2, 14, 60)
+            CALL(btlevtcmd_SetCutBaseOffset, -2, 0, 30, 0)
+            CALL(btlevtcmd_SetKissHitOffset, -2, 10, 36, 0)
+            CASE_DEFAULT
+            SET_VALUE(LW(11), 1)
+            CALL(btlevtcmd_SetStatusIconOffset, -2, 14, 80)
+            CALL(btlevtcmd_SetCutBaseOffset, -2, 0, 40, 0)
+            CALL(btlevtcmd_SetKissHitOffset, -2, 10, 52, 0)
+        END_SWITCH
+        CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(12), 9)
+        CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(12), 50397184)
+        CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), 9)
+        CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), 16842752)
+        CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+        BEGIN_SIBLING_EVENT
+            WAIT_FRAMES(4)
+            CALL_CHILD(subset_dmg_sambo_fall)
+        END_SIBLING_EVENT
+        CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetPartsPos, LW(10), 5, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_OffPartsAttribute, LW(10), 5, 16777216)
+        CALL(btlevtcmd_CheckDamagePattern, LW(10), 15, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            SET_VALUE(LW(13), PTR(&marioWeapon_KaitenHammerInvolved))
+        ELSE
+            SET_VALUE(LW(13), PTR(&marioWeapon_UltraHammerInvolved))
+        END_IF
+        CALL(btlevtcmd_GetFriendBelong, LW(10), LW(0))
+        CALL(btlevtcmd_SamplingEnemy, LW(10), LW(0), LW(13))
+        CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+        LABEL(0)
+        IF_INT_EQUAL(LW(3), -1)
+            GOTO(50)
+        END_IF
+        CALL(btlevtcmd_GetUnitId, -2, LW(10))
+        IF_INT_NOT_EQUAL(LW(10), LW(3))
+            CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+            GOTO(0)
+        END_IF
+        LABEL(10)
+        CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+        IF_INT_EQUAL(LW(3), -1)
+            GOTO(50)
+        END_IF
+        CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetHomePos, LW(10), -250000000, LW(1), -250000000)
+        ADD(LW(1), 15)
+        CALL(btlevtcmd_JumpPartsSetting, LW(10), 5, 0, FLOAT(5.0f), FLOAT(0.009765625f))
+        CALL(btlevtcmd_JumpPartsPosition, LW(10), 5, LW(0), LW(1), LW(2), 0, -1)
+        CALL(btlevtcmd_CheckDamage, LW(10), LW(3), LW(4), LW(13), 256, LW(5))
+        GOTO(10)
+        LABEL(50)
+        CALL(btlevtcmd_GetStageSize, LW(5), -250000000, -250000000)
+        SET_VALUE(LW(0), 0)
+        CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(0), LW(5))
+        CALL(btlevtcmd_GetPos, LW(10), -250000000, LW(1), -250000000)
+        CALL(btlevtcmd_JumpPartsSetting, LW(10), 5, 0, FLOAT(5.0f), FLOAT(0.009765625f))
+        CALL(btlevtcmd_JumpPartsPosition, LW(10), 5, LW(0), LW(1), LW(2), 0, -1)
+        CALL(btlevtcmd_OnPartsAttribute, LW(10), 5, 16777216)
+        CALL(btlevtcmd_CheckDamagePattern, LW(10), 16, LW(5))
+        IF_INT_NOT_EQUAL(LW(5), 0)
+            CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), PTR(marioWeapon_UltraHammerFinish), 131328, LW(5))
+        END_IF
+    END_IF
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(damage_swallow_body)
     SET_VALUE(LW(14), 39)
@@ -725,16 +944,16 @@ static EVT_BEGIN(attack_event)
             SWITCH(LW(10))
                 CASE_EQUAL(4)
                 CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-                CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_sambo_head_attack_4))
-                CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_sambo_head_attack_4), LW(3), LW(4))
+                CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_sambo_head_attack_4))
+                CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_head_attack_4), LW(3), LW(4))
                 CASE_EQUAL(3)
                 CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-                CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_sambo_head_attack_3))
-                CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_sambo_head_attack_3), LW(3), LW(4))
+                CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_sambo_head_attack_3))
+                CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_head_attack_3), LW(3), LW(4))
                 CASE_EQUAL(2)
                 CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-                CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_sambo_head_attack_2))
-                CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_sambo_head_attack_2), LW(3), LW(4))
+                CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_sambo_head_attack_2))
+                CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_head_attack_2), LW(3), LW(4))
             END_SWITCH
             IF_INT_NOT_EQUAL(LW(3), -1)
                 CALL_CHILD(PTR(attack_head_2_event))
@@ -751,313 +970,658 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static s32 attack_head_2_event[] = {
-    131122, -29999994, -29999989, 262235, (s32)btlevtcmd_CheckStatus, -2, 11, -29999995,
-    65570, -29999990, 65572, 4, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000,
-    262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, (s32)weapon_sambo_head_attack_4, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_sambo_head_attack_4,
-    -29999997, -29999996, 65572, 3, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000,
-    262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, (s32)weapon_sambo_head_attack_3, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_sambo_head_attack_3,
-    -29999997, -29999996, 65572, 2, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000,
-    262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, (s32)weapon_sambo_head_attack_2, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_sambo_head_attack_2,
-    -29999997, -29999996, 49, 131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken,
-    -2, 16, -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered,
-    2, 33, 65540, 99, 33, 262235, (s32)btlevtcmd_AttackDeclare, -2,
-    -29999997, -29999996, 65627, (s32)btlevtcmd_WaitGuardMove, 65570, -29999990, 65572, 4,
-    196699, (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_sambo_head_attack_4, 131163, (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_sambo_head_attack_4, 65572,
-    3, 196699, (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_sambo_head_attack_3, 131163, (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_sambo_head_attack_3,
-    65572, 2, 196699, (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_sambo_head_attack_2, 131163, (s32)btlevtcmd_WeaponAftereffect,
-    (s32)weapon_sambo_head_attack_2, 49, 196699, (s32)evt_btl_camera_set_mode, 0, 8, 262235, (s32)evt_btl_camera_set_homing_unit,
-    0, -2, -29999997, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699,
-    (s32)evt_btl_camera_set_zoom, 0, 200, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000,
-    -29999999, -29999998, 65570, -29999990, 65572, 4, 131096, -29999995,
-    0, 262235, (s32)btlevtcmd_FaceDirectionAdd, -29999997, -30000000, 60, 32, 262235,
-    (s32)btlevtcmd_FaceDirectionAdd, -29999997, -30000000, 42, 33, 65572, 3, 131096,
-    -29999995, 0, 262235, (s32)btlevtcmd_FaceDirectionAdd, -29999997, -30000000, 40, 32,
-    262235, (s32)btlevtcmd_FaceDirectionAdd, -29999997, -30000000, 28, 33, 65572, 2,
-    131096, -29999995, 0, 262235, (s32)btlevtcmd_FaceDirectionAdd, -29999997, -30000000, 20,
-    32, 262235, (s32)btlevtcmd_FaceDirectionAdd, -29999997, -30000000, 14, 33, 49,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999994, 40, 196699, (s32)btlevtcmd_SetMoveSpeed, -2,
-    -229997952, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition,
-    -2, -30000000, -29999999, -29999998, 0, -1, 0, 262235,
-    (s32)btlevtcmd_AnimeChangePoseType, -2, -29999994, 43, 458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1,
-    -29999997, -29999996, 16, -29999985, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985,
-    458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996, 16, -29999985,
-    131122, -29999986, 40, 131096, -29999985, -1, 131122, -29999986,
-    -40, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_ATTACK1", -250000000, 0,
-    -250000000, 327771, (s32)btlevtcmd_SetRotateOffset, -2, 0, 0, 0, 327771,
-    (s32)evt_sub_intpl_init, 11, 0, -29999986, 40, 65539, 0, 65627,
-    (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, -30000000, 65545,
-    1, 131096, -29999999, 1, 65540, 0, 33, 458843,
-    (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996, 16, -29999985, 131122,
-    -29999987, 40, 131122, -29999986, -90, 131096, -29999985, -1,
-    131122, -29999987, -40, 131122, -29999986, 90, 33, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_ATTACK4", -250000000, 0, -250000000, 327771, (s32)evt_sub_intpl_init,
-    1, -29999987, -29999986, 10, 65539, 3, 65627, (s32)evt_sub_intpl_get_value,
-    327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, -30000000, 65545, 1,
-    131096, -29999999, 1, 65540, 3, 33, 65570, -29999990,
-    65572, 4, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996, (s32)weapon_sambo_head_attack_4,
-    256, -29999995, 65572, 3, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997,
-    -29999996, (s32)weapon_sambo_head_attack_3, 256, -29999995, 65572, 2, 458843, (s32)btlevtcmd_PreCheckDamage,
-    -2, -29999997, -29999996, (s32)weapon_sambo_head_attack_2, 256, -29999995, 49, 65570,
-    -29999995, 65579, 4, 65540, 90, 46, 65572, 3,
-    196699, (s32)btlevtcmd_StartAvoid, -29999997, 38, 65540, 90, 46, 65572,
-    6, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 39, 65540, 90, 65572,
-    2, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 65540, 90, 65572,
-    1, 65540, 91, 46, 42, 65540, 98, 46,
-    49, 65539, 90, 458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997,
-    -29999996, 16, -29999985, 131122, -29999986, -90, 131096, -29999985,
-    -1, 131122, -29999986, 90, 33, 327771, (s32)evt_sub_intpl_init, 0,
-    -29999986, 0, 10, 65539, 4, 65627, (s32)evt_sub_intpl_get_value, 327771,
-    (s32)btlevtcmd_SetRotate, -2, 0, 0, -30000000, 65545, 1, 131096,
-    -29999999, 1, 65540, 4, 33, 65540, 98, 65539,
-    91, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0, 65570,
-    -29999990, 65572, 4, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, (s32)weapon_sambo_head_attack_4, 458843,
-    (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, (s32)weapon_sambo_head_attack_4, 256, -29999995, 65572,
-    3, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, (s32)weapon_sambo_head_attack_3, 458843, (s32)btlevtcmd_CheckDamage, -2,
-    -29999997, -29999996, (s32)weapon_sambo_head_attack_3, 256, -29999995, 65572, 2, 196699,
-    (s32)btlevtcmd_ResultACDefence, -29999997, (s32)weapon_sambo_head_attack_2, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996,
-    (s32)weapon_sambo_head_attack_2, 256, -29999995, 49, 327771, (s32)btlevtcmd_SetRotate, -2, 0,
-    0, 90, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999994, 43, 196699,
-    (s32)evt_btl_camera_set_mode, 0, 0, 458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997,
-    -29999996, 16, -29999985, 131122, -29999986, -90, 131096, -29999985,
-    -1, 131122, -29999986, 90, 33, 327771, (s32)evt_sub_intpl_init, 0,
-    -29999986, 0, 20, 65539, 5, 65627, (s32)evt_sub_intpl_get_value, 327771,
-    (s32)btlevtcmd_SetRotate, -2, 0, 0, -30000000, 65545, 1, 131096,
-    -29999999, 1, 65540, 5, 33, 65539, 98, 196699,
-    (s32)evt_btl_camera_set_mode, 0, 0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999994, 41,
-    196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229995904, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000,
-    -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998,
-    0, -1, 0, 65539, 99, 131163, (s32)btlevtcmd_ResetFaceDirection, -2,
-    131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+static EVT_BEGIN(attack_head_2_event)
+    SET_VALUE(LW(6), LW(11))
+    CALL(btlevtcmd_CheckStatus, -2, 11, LW(5))
+    SWITCH(LW(10))
+        CASE_EQUAL(4)
+        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_sambo_head_attack_4))
+        CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_head_attack_4), LW(3), LW(4))
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_sambo_head_attack_3))
+        CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_head_attack_3), LW(3), LW(4))
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_sambo_head_attack_2))
+        CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_head_attack_2), LW(3), LW(4))
+    END_SWITCH
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    SWITCH(LW(10))
+        CASE_EQUAL(4)
+        CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_sambo_head_attack_4))
+        CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_sambo_head_attack_4))
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_sambo_head_attack_3))
+        CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_sambo_head_attack_3))
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_sambo_head_attack_2))
+        CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_sambo_head_attack_2))
+    END_SWITCH
+    CALL(evt_btl_camera_set_mode, 0, 8)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 200)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    SWITCH(LW(10))
+        CASE_EQUAL(4)
+        IF_INT_EQUAL(LW(5), 0)
+            CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 60)
+        ELSE
+            CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 42)
+        END_IF
+        CASE_EQUAL(3)
+        IF_INT_EQUAL(LW(5), 0)
+            CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 40)
+        ELSE
+            CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 28)
+        END_IF
+        CASE_EQUAL(2)
+        IF_INT_EQUAL(LW(5), 0)
+            CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 20)
+        ELSE
+            CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 14)
+        END_IF
+    END_SWITCH
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(6), 40)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(2.0f))
+    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(6), 43)
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    SET_VALUE(LW(14), 40)
+    IF_INT_EQUAL(LW(15), -1)
+        SET_VALUE(LW(14), -40)
+    END_IF
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_ATTACK1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_SetRotateOffset, -2, 0, 0, 0)
+    CALL(evt_sub_intpl_init, 11, 0, LW(14), 40)
+    LABEL(0)
+    CALL(evt_sub_intpl_get_value)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(0)
+    END_IF
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    SET_VALUE(LW(13), 40)
+    SET_VALUE(LW(14), -90)
+    IF_INT_EQUAL(LW(15), -1)
+        SET_VALUE(LW(13), -40)
+        SET_VALUE(LW(14), 90)
+    END_IF
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_ATTACK4"), -250000000, 0, -250000000)
+    CALL(evt_sub_intpl_init, 1, LW(13), LW(14), 10)
+    LABEL(3)
+    CALL(evt_sub_intpl_get_value)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(3)
+    END_IF
+    SWITCH(LW(10))
+        CASE_EQUAL(4)
+        CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_sambo_head_attack_4), 256, LW(5))
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_sambo_head_attack_3), 256, LW(5))
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_sambo_head_attack_2), 256, LW(5))
+    END_SWITCH
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+    END_SWITCH
+    LABEL(90)
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    SET_VALUE(LW(14), -90)
+    IF_INT_EQUAL(LW(15), -1)
+        SET_VALUE(LW(14), 90)
+    END_IF
+    CALL(evt_sub_intpl_init, 0, LW(14), 0, 10)
+    LABEL(4)
+    CALL(evt_sub_intpl_get_value)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(4)
+    END_IF
+    GOTO(98)
+    LABEL(91)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+    SWITCH(LW(10))
+        CASE_EQUAL(4)
+        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_sambo_head_attack_4))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_sambo_head_attack_4), 256, LW(5))
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_sambo_head_attack_3))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_sambo_head_attack_3), 256, LW(5))
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_sambo_head_attack_2))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_sambo_head_attack_2), 256, LW(5))
+    END_SWITCH
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, 90)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(6), 43)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    SET_VALUE(LW(14), -90)
+    IF_INT_EQUAL(LW(15), -1)
+        SET_VALUE(LW(14), 90)
+    END_IF
+    CALL(evt_sub_intpl_init, 0, LW(14), 0, 20)
+    LABEL(5)
+    CALL(evt_sub_intpl_get_value)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(5)
+    END_IF
+    LABEL(98)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(6), 41)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    LABEL(99)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
-static s32 attack_head_1_event[] = {
-    196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000,
-    (s32)weapon_sambo_head_attack_1, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_sambo_head_attack_1, -29999997, -29999996, 131096, -29999997,
-    -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16, -30000000, 131097, -30000000,
-    0, 65630, (s32)subsetevt_confuse_flustered, 2, 33, 65540, 99, 33,
-    131163, (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_sambo_head_attack_1, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996,
-    65627, (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_sambo_head_attack_1, 196699, (s32)evt_btl_camera_set_mode,
-    0, 8, 262235, (s32)evt_btl_camera_set_homing_unit, 0, -2, -29999997, 196699,
-    (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0, 200, 196699,
-    (s32)btlevtcmd_SetMoveSpeed, -2, -229997952, 196699, (s32)btlevtcmd_SetFallAccel, -2, -229999386, 393307,
-    (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999995, -29999994, -29999993, 262235, (s32)btlevtcmd_TransStageFloorPosition,
-    -29999995, -29999994, -29999993, 262235, (s32)btlevtcmd_FaceDirectionAdd, -29999997, -29999995, 50,
-    131122, -29999992, 35, 65630, (s32)sambo_rabbit_move, 65545, 10, 458843,
-    (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996, (s32)weapon_sambo_head_attack_1, 256, -29999995, 65570,
-    -29999995, 65579, 4, 65540, 90, 46, 65572, 3,
-    196699, (s32)btlevtcmd_StartAvoid, -29999997, 38, 65540, 90, 46, 65572,
-    6, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 39, 65540, 90, 65572,
-    2, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 65540, 90, 65572,
-    1, 65540, 91, 46, 42, 65540, 98, 46,
-    49, 65539, 90, 196699, (s32)btlevtcmd_SetFallAccel, -2, -229999693, 393307,
-    (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionSub,
-    -29999997, -30000000, 5, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998,
-    131125, -29999999, 10, 110, 65545, 2, 458843, (s32)btlevtcmd_CalculateFaceDirection,
-    -2, -1, -29999997, -29999996, 16, -29999985, 131122, -29999986,
-    -10, 131096, -29999985, -1, 131122, -29999986, 10, 33,
-    131122, -30000000, 0, 65541, 15, 131125, -30000000, -29999986,
-    327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, -30000000, 65545, 1,
-    6, 112, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_MOVE3", -250000000, 0,
-    -250000000, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 44,
-    -1, 327771, (s32)btlevtcmd_SetRotateOffset, -2, 0, 10, 0, 110,
-    65545, 2, 458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996,
-    16, -29999985, 131122, -30000000, 180, 65541, 12, 131096,
-    -29999985, -1, 131125, -30000000, 15, 131096, -30000000, 360,
-    131122, -30000000, 0, 33, 32, 131126, -30000000, 15,
-    131096, -30000000, 0, 131122, -30000000, 360, 33, 33,
-    327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, -30000000, 65545, 1,
-    6, 327771, (s32)btlevtcmd_SetRotateOffset, -2, 0, 0, 0, 112,
-    196699, (s32)btlevtcmd_SetFallAccel, -2, -229998976, 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
-    -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999997, -30000000, 30, 262235,
-    (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000,
-    -29999999, -29999998, 12, -1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_MOVE2",
-    -250000000, 0, -250000000, 65545, 30, 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 65540, 98, 65539, 91, 393307, (s32)btlevtcmd_GetHitPos, -29999997,
-    -29999996, -30000000, -29999999, -29999998, 131125, -29999999, 10, 196699,
-    (s32)btlevtcmd_SetFallAccel, -2, -229999693, 110, 65545, 2, 458843, (s32)btlevtcmd_CalculateFaceDirection,
-    -2, -1, -29999997, -29999996, 16, -29999985, 131122, -29999986,
-    -10, 131096, -29999985, -1, 131122, -29999986, 10, 33,
-    131122, -30000000, 0, 65541, 15, 131125, -30000000, -29999986,
-    327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, -30000000, 65545, 1,
-    6, 112, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_MOVE3", -250000000, 0,
-    -250000000, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 36,
-    -1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_ATTACK6", -250000000, 0, -250000000,
-    393307, (s32)evt_btl_camera_shake_h, 0, 1, 1, 8, 0, 196699,
-    (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_add_zoom, 0, -50, 65545,
-    2, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, (s32)weapon_sambo_head_attack_1, 458843, (s32)btlevtcmd_CheckDamage, -2,
-    -29999997, -29999996, (s32)weapon_sambo_head_attack_1, 256, -29999995, 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 196699, (s32)btlevtcmd_SetFallAccel, -2, -229999079, 327771, (s32)btlevtcmd_SetRotate, -2,
-    0, 0, 0, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999,
-    -29999998, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 40, 262235, (s32)btlevtcmd_TransStageFloorPosition,
-    -30000000, -29999999, -29999998, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999,
-    -29999998, 20, -1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_MOVE2", -250000000,
-    0, -250000000, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 30, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 16, -1, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_MOVE2", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_FaceDirectionSub,
-    -2, -30000000, 20, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999,
-    -29999998, 12, -1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_MOVE2", -250000000,
-    0, -250000000, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 10, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 8, -1, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_MOVE2", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePoseType,
-    -2, 4, 43, 65539, 98, 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 4, 41, 196699, (s32)btlevtcmd_SetMoveSpeed,
-    -2, -229996928, 196699, (s32)btlevtcmd_SetFallAccel, -2, -229999488, 327771, (s32)btlevtcmd_GetHomePos,
-    -2, -29999995, -29999994, -29999993, 131122, -29999992, 35, 65630,
-    (s32)sambo_rabbit_move, 65539, 99, 131163, (s32)btlevtcmd_ResetFaceDirection, -2, 131163, (s32)btlevtcmd_StartWaitEvent,
-    -2, 2, 1,
-};
+static EVT_BEGIN(attack_head_1_event)
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_sambo_head_attack_1))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_head_attack_1), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_sambo_head_attack_1))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_sambo_head_attack_1))
+    CALL(evt_btl_camera_set_mode, 0, 8)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 200)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(2.0f))
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.5996094f))
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(5), LW(6), LW(7))
+    CALL(btlevtcmd_TransStageFloorPosition, LW(5), LW(6), LW(7))
+    CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(5), 50)
+    SET_VALUE(LW(8), 35)
+    CALL_CHILD(sambo_rabbit_move)
+    WAIT_FRAMES(10)
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_sambo_head_attack_1), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+    END_SWITCH
+    LABEL(90)
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.2998047f))
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 5)
+    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    ADD(LW(1), 10)
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(2)
+        CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+        SET_VALUE(LW(14), -10)
+        IF_INT_EQUAL(LW(15), -1)
+            SET_VALUE(LW(14), 10)
+        END_IF
+        SET_VALUE(LW(0), 0)
+        LOOP(15)
+            ADD(LW(0), LW(14))
+            CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_MOVE3"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 44, -1)
+    CALL(btlevtcmd_SetRotateOffset, -2, 0, 10, 0)
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(2)
+        CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+        SET_VALUE(LW(0), 180)
+        LOOP(12)
+            IF_INT_EQUAL(LW(15), -1)
+                ADD(LW(0), 15)
+                IF_INT_EQUAL(LW(0), 360)
+                    SET_VALUE(LW(0), 0)
+                END_IF
+            ELSE
+                SUBTRACT(LW(0), 15)
+                IF_INT_EQUAL(LW(0), 0)
+                    SET_VALUE(LW(0), 360)
+                END_IF
+            END_IF
+            CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(btlevtcmd_SetRotateOffset, -2, 0, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(1.0f))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 30)
+    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 12, -1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_MOVE2"), -250000000, 0, -250000000)
+    WAIT_FRAMES(30)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    GOTO(98)
+    LABEL(91)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    ADD(LW(1), 10)
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.2998047f))
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(2)
+        CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+        SET_VALUE(LW(14), -10)
+        IF_INT_EQUAL(LW(15), -1)
+            SET_VALUE(LW(14), 10)
+        END_IF
+        SET_VALUE(LW(0), 0)
+        LOOP(15)
+            ADD(LW(0), LW(14))
+            CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_MOVE3"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 36, -1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_ATTACK6"), -250000000, 0, -250000000)
+    CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_add_zoom, 0, -50)
+    WAIT_FRAMES(2)
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_sambo_head_attack_1))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_sambo_head_attack_1), 256, LW(5))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.89941406f))
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 40)
+    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 20, -1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_MOVE2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 30)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 16, -1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_MOVE2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 20)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 12, -1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_MOVE2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 10)
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 8, -1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_MOVE2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 4, 43)
+    LABEL(98)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 4, 41)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.5f))
+    CALL(btlevtcmd_GetHomePos, -2, LW(5), LW(6), LW(7))
+    SET_VALUE(LW(8), 35)
+    CALL_CHILD(sambo_rabbit_move)
+    LABEL(99)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
-static s32 attack_spike_event[] = {
-    262235, (s32)btlevtcmd_GetUnitWork, -2, 0, -29999990, 65570, -29999990, 65572,
-    4, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2,
-    -30000000, (s32)weapon_sambo_spike_attack_4, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_sambo_spike_attack_4, -29999997, -29999996, 65572,
-    3, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2,
-    -30000000, (s32)weapon_sambo_spike_attack_3, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_sambo_spike_attack_3, -29999997, -29999996, 65572,
-    2, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2,
-    -30000000, (s32)weapon_sambo_spike_attack_2, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, (s32)weapon_sambo_spike_attack_2, -29999997, -29999996, 49,
-    131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16, -30000000,
-    131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered, 2, 33, 65540,
-    99, 33, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996, 65627,
-    (s32)btlevtcmd_WaitGuardMove, 65570, -29999990, 65572, 4, 196699, (s32)btlevtcmd_PayWeaponCost, -2,
-    (s32)weapon_sambo_spike_attack_4, 131163, (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_sambo_spike_attack_4, 65572, 3, 196699, (s32)btlevtcmd_PayWeaponCost,
-    -2, (s32)weapon_sambo_spike_attack_3, 131163, (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_sambo_spike_attack_3, 65572, 2, 196699,
-    (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_sambo_spike_attack_2, 131163, (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_sambo_spike_attack_2, 49, 458843,
-    (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996, 16, -29999985, 196699,
-    (s32)btlevtcmd_ChangeFaceDirection, -2, -29999985, 262235, (s32)btlevtcmd_CheckStatus, -2, 11, -30000000,
-    131097, -30000000, 0, 393307, (s32)btlevtcmd_SetPartsScale, -2, 5, -229999284,
-    -229999284, -229998976, 32, 393307, (s32)btlevtcmd_SetPartsScale, -2, 5, -229998976,
-    -229998976, -229998976, 33, 262235, (s32)btlevtcmd_GetUnitWork, -2, 0, -29999990,
-    131126, -29999990, 1, 262235, (s32)btlevtcmd_SetUnitWork, -2, 0, -29999990,
-    65630, (s32)_body_param_set, 65570, -29999990, 65572, 3, 131122, -29999993,
-    1, 131122, -29999994, 2, 262235, (s32)btlevtcmd_SetStatusIconOffset, -2, 14,
-    60, 327771, (s32)btlevtcmd_SetCutBaseOffset, -2, 0, 30, 0, 327771,
-    (s32)btlevtcmd_SetKissHitOffset, -2, 10, 36, 0, 65572, 2, 131122,
-    -29999993, 2, 131122, -29999994, 3, 262235, (s32)btlevtcmd_SetStatusIconOffset, -2,
-    14, 40, 327771, (s32)btlevtcmd_SetCutBaseOffset, -2, 0, 20, 0,
-    327771, (s32)btlevtcmd_SetKissHitOffset, -2, 10, 26, 0, 65572, 1,
-    131122, -29999993, 3, 131122, -29999994, 4, 196699, (s32)btlevtcmd_SetSwallowParam,
-    -2, 50, 196699, (s32)btlevtcmd_SetSwallowAttribute, -2, 2, 262235, (s32)btlevtcmd_SetStatusIconOffset,
-    -2, 14, 20, 327771, (s32)btlevtcmd_SetCutBaseOffset, -2, 0, 10,
-    0, 327771, (s32)btlevtcmd_SetKissHitOffset, -2, 10, 16, 0, 49,
-    262235, (s32)btlevtcmd_OffPartsAttribute, -2, -29999993, 9, 262235, (s32)btlevtcmd_OnPartsAttribute, -2,
-    -29999993, 50397184, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, -29999994, 9, 262235,
-    (s32)btlevtcmd_OffPartsAttribute, -2, -29999994, 16842752, 262235, (s32)btlevtcmd_CheckStatus, -2, 11,
-    -29999995, 110, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    131096, -29999995, 0, 131122, -29999991, 20, 131122, -29999989,
-    20, 32, 131122, -29999991, 14, 131122, -29999989, 14,
-    33, 131127, -29999991, -29999990, 131126, -29999991, -29999989, 131125,
-    -29999999, -29999991, 393307, (s32)btlevtcmd_SetPartsPos, -2, 5, -30000000, -29999999,
-    -29999998, 262235, (s32)btlevtcmd_OffPartsAttribute, -2, 5, 16777216, 262235, (s32)btlevtcmd_SetPartsFallAccel,
-    -2, 5, -229999386, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 5, (s32)"SNB_B_1",
-    524379, (s32)btlevtcmd_JumpPartsPosition, -2, 5, -30000000, -29999999, -29999998, 30,
-    -1, 112, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_ATTACK3", -250000000, 0,
-    -250000000, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999994, 50, 65545, 24,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_ATTACK4", -250000000, 0, -250000000, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_ATTACK5", -250000000, 0, -29999986, 262235, (s32)btlevtcmd_AnimeChangePoseType,
-    -2, -29999994, 51, 65545, 2, 65545, 5, 65570,
-    -29999990, 65572, 3, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996,
-    (s32)weapon_sambo_spike_attack_4, 256, -29999995, 65572, 2, 458843, (s32)btlevtcmd_PreCheckDamage, -2,
-    -29999997, -29999996, (s32)weapon_sambo_spike_attack_3, 256, -29999995, 65572, 1, 458843,
-    (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996, (s32)weapon_sambo_spike_attack_2, 256, -29999995, 49,
-    65570, -29999995, 65579, 4, 65540, 90, 46, 65572,
-    3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38, 65540, 90, 46,
-    65572, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 39, 65540, 90,
-    65572, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 65540, 90,
-    65572, 1, 65540, 91, 46, 42, 65540, 98,
-    46, 49, 65539, 90, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996,
-    -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_GetStageSize, -30000000, -250000000, -250000000,
-    196699, (s32)btlevtcmd_GetFaceDirection, -2, -29999991, 131127, -30000000, -29999991, 131126,
-    -29999999, 5, 262235, (s32)btlevtcmd_SetPartsMoveSpeed, -2, 5, -229989760, 262235,
-    (s32)btlevtcmd_SetPartsFallAccel, -2, 5, -229999898, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, 5,
-    -30000000, -29999999, -29999998, 0, -1, 131163, (s32)evt_snd_sfxoff, -29999986,
-    262235, (s32)btlevtcmd_OnPartsAttribute, -2, 5, 16777216, 65540, 99, 65539,
-    91, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998,
-    262235, (s32)btlevtcmd_SetPartsMoveSpeed, -2, 5, -229989760, 262235, (s32)btlevtcmd_SetPartsFallAccel, -2,
-    5, -229999898, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, 5, -30000000, -29999999,
-    -29999998, 0, -1, 393307, (s32)evt_btl_camera_shake_h, 0, 1, 1,
-    8, 0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_add_zoom,
-    0, -50, 65570, -29999990, 65572, 3, 131122, -29999988,
-    (s32)weapon_sambo_spike_attack_4, 65572, 2, 131122, -29999988, (s32)weapon_sambo_spike_attack_3, 65572, 1,
-    131122, -29999988, (s32)weapon_sambo_spike_attack_2, 49, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999988,
-    458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, -29999988, 256, -29999995,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -29999994, 43, 131096, -29999995, 21,
-    131163, (s32)evt_snd_sfxoff, -29999986, 196699, (s32)btlevtcmd_GetBodyId, -2, -29999989, 393307,
-    (s32)btlevtcmd_GetHitPos, -2, -29999989, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_SetPartsMoveSpeed,
-    -2, 5, -229995392, 262235, (s32)btlevtcmd_SetPartsFallAccel, -2, 5, -229999591,
-    524379, (s32)btlevtcmd_JumpPartsPosition, -2, 5, -30000000, -29999999, -29999998, 40,
-    -1, 107, 393307, (s32)btlevtcmd_GetPartsPos, -2, 5, -30000000, -29999999,
-    -29999998, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 55, 262235, (s32)btlevtcmd_TransStageFloorPosition,
-    -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_SetPartsMoveSpeed, -2, 5, -229996928,
-    262235, (s32)btlevtcmd_SetPartsFallAccel, -2, 5, -229999898, 720987, (s32)btlevtcmd_DivePartsPosition, -2,
-    5, -30000000, -29999999, -29999998, 0, 25, 0, 0,
-    -1, 262235, (s32)btlevtcmd_SetPartsMoveSpeed, -2, 5, -229997952, 262235, (s32)btlevtcmd_FaceDirectionSub,
-    -2, -30000000, 24, 720987, (s32)btlevtcmd_DivePartsPosition, -2, 5, -30000000,
-    -29999999, -29999998, 0, 21, 0, 0, -1, 262235,
-    (s32)btlevtcmd_SetPartsMoveSpeed, -2, 5, -229998464, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000,
-    20, 720987, (s32)btlevtcmd_DivePartsPosition, -2, 5, -30000000, -29999999, -29999998,
-    0, 20, 0, 0, -1, 262235, (s32)btlevtcmd_OnPartsAttribute, -2,
-    5, 16777216, 109, 458843, (s32)btlevtcmd_CheckDamage, -2, -2, -29999989,
-    -29999988, 256, -29999995, 2, 33, 131163, (s32)evt_snd_sfxoff, -29999986,
-    393307, (s32)btlevtcmd_GetPartsPos, -2, 5, -30000000, -29999999, -29999998, 262235,
-    (s32)btlevtcmd_FaceDirectionSub, -29999997, -30000000, 55, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999,
-    -29999998, 262235, (s32)btlevtcmd_SetPartsMoveSpeed, -2, 5, -229996928, 262235, (s32)btlevtcmd_SetPartsFallAccel,
-    -2, 5, -229999898, 720987, (s32)btlevtcmd_DivePartsPosition, -2, 5, -30000000,
-    -29999999, -29999998, 0, 25, 0, 0, -1, 262235,
-    (s32)btlevtcmd_SetPartsMoveSpeed, -2, 5, -229997952, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999997, -30000000,
-    24, 720987, (s32)btlevtcmd_DivePartsPosition, -2, 5, -30000000, -29999999, -29999998,
-    0, 21, 0, 0, -1, 262235, (s32)btlevtcmd_SetPartsMoveSpeed, -2,
-    5, -229998464, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999997, -30000000, 20, 720987,
-    (s32)btlevtcmd_DivePartsPosition, -2, 5, -30000000, -29999999, -29999998, 0, 20,
-    0, 0, -1, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, 5, 16777216,
-    65539, 98, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 65539, 99,
-    131163, (s32)btlevtcmd_ResetFaceDirection, -2, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
+static EVT_BEGIN(attack_spike_event)
+    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(10))
+    SWITCH(LW(10))
+        CASE_EQUAL(4)
+        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_sambo_spike_attack_4))
+        CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_spike_attack_4), LW(3), LW(4))
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_sambo_spike_attack_3))
+        CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_spike_attack_3), LW(3), LW(4))
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_sambo_spike_attack_2))
+        CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_spike_attack_2), LW(3), LW(4))
+    END_SWITCH
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_WaitGuardMove)
+    SWITCH(LW(10))
+        CASE_EQUAL(4)
+        CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_sambo_spike_attack_4))
+        CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_sambo_spike_attack_4))
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_sambo_spike_attack_3))
+        CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_sambo_spike_attack_3))
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_sambo_spike_attack_2))
+        CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_sambo_spike_attack_2))
+    END_SWITCH
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_CheckStatus, -2, 11, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_SetPartsScale, -2, 5, FLOAT(0.69921875f), FLOAT(0.69921875f), FLOAT(1.0f))
+    ELSE
+        CALL(btlevtcmd_SetPartsScale, -2, 5, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+    END_IF
+    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(10))
+    SUBTRACT(LW(10), 1)
+    CALL(btlevtcmd_SetUnitWork, -2, 0, LW(10))
+    CALL_CHILD(_body_param_set)
+    SWITCH(LW(10))
+        CASE_EQUAL(3)
+        SET_VALUE(LW(7), 1)
+        SET_VALUE(LW(6), 2)
+        CALL(btlevtcmd_SetStatusIconOffset, -2, 14, 60)
+        CALL(btlevtcmd_SetCutBaseOffset, -2, 0, 30, 0)
+        CALL(btlevtcmd_SetKissHitOffset, -2, 10, 36, 0)
+        CASE_EQUAL(2)
+        SET_VALUE(LW(7), 2)
+        SET_VALUE(LW(6), 3)
+        CALL(btlevtcmd_SetStatusIconOffset, -2, 14, 40)
+        CALL(btlevtcmd_SetCutBaseOffset, -2, 0, 20, 0)
+        CALL(btlevtcmd_SetKissHitOffset, -2, 10, 26, 0)
+        CASE_EQUAL(1)
+        SET_VALUE(LW(7), 3)
+        SET_VALUE(LW(6), 4)
+        CALL(btlevtcmd_SetSwallowParam, -2, 50)
+        CALL(btlevtcmd_SetSwallowAttribute, -2, 2)
+        CALL(btlevtcmd_SetStatusIconOffset, -2, 14, 20)
+        CALL(btlevtcmd_SetCutBaseOffset, -2, 0, 10, 0)
+        CALL(btlevtcmd_SetKissHitOffset, -2, 10, 16, 0)
+    END_SWITCH
+    CALL(btlevtcmd_OffPartsAttribute, -2, LW(7), 9)
+    CALL(btlevtcmd_OnPartsAttribute, -2, LW(7), 50397184)
+    CALL(btlevtcmd_OnPartsAttribute, -2, LW(6), 9)
+    CALL(btlevtcmd_OffPartsAttribute, -2, LW(6), 16842752)
+    CALL(btlevtcmd_CheckStatus, -2, 11, LW(5))
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        IF_INT_EQUAL(LW(5), 0)
+            SET_VALUE(LW(9), 20)
+            SET_VALUE(LW(11), 20)
+        ELSE
+            SET_VALUE(LW(9), 14)
+            SET_VALUE(LW(11), 14)
+        END_IF
+        MULTIPLY(LW(9), LW(10))
+        SUBTRACT(LW(9), LW(11))
+        ADD(LW(1), LW(9))
+        CALL(btlevtcmd_SetPartsPos, -2, 5, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_OffPartsAttribute, -2, 5, 16777216)
+        CALL(btlevtcmd_SetPartsFallAccel, -2, 5, FLOAT(0.5996094f))
+        CALL(btlevtcmd_AnimeChangePose, -2, 5, STRING("SNB_B_1"))
+        CALL(btlevtcmd_JumpPartsPosition, -2, 5, LW(0), LW(1), LW(2), 30, -1)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_ATTACK3"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(6), 50)
+    WAIT_FRAMES(24)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_ATTACK4"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_ATTACK5"), -250000000, 0, LW(14))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(6), 51)
+    WAIT_FRAMES(2)
+    WAIT_FRAMES(5)
+    SWITCH(LW(10))
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_sambo_spike_attack_4), 256, LW(5))
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_sambo_spike_attack_3), 256, LW(5))
+        CASE_EQUAL(1)
+        CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_sambo_spike_attack_2), 256, LW(5))
+    END_SWITCH
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+    END_SWITCH
+    LABEL(90)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStageSize, LW(0), -250000000, -250000000)
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(9))
+    MULTIPLY(LW(0), LW(9))
+    SUBTRACT(LW(1), 5)
+    CALL(btlevtcmd_SetPartsMoveSpeed, -2, 5, FLOAT(10.0f))
+    CALL(btlevtcmd_SetPartsFallAccel, -2, 5, FLOAT(0.099609375f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, 5, LW(0), LW(1), LW(2), 0, -1)
+    CALL(evt_snd_sfxoff, LW(14))
+    CALL(btlevtcmd_OnPartsAttribute, -2, 5, 16777216)
+    GOTO(99)
+    LABEL(91)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPartsMoveSpeed, -2, 5, FLOAT(10.0f))
+    CALL(btlevtcmd_SetPartsFallAccel, -2, 5, FLOAT(0.099609375f))
+    CALL(btlevtcmd_JumpPartsPosition, -2, 5, LW(0), LW(1), LW(2), 0, -1)
+    CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_add_zoom, 0, -50)
+    SWITCH(LW(10))
+        CASE_EQUAL(3)
+        SET_VALUE(LW(12), PTR(&weapon_sambo_spike_attack_4))
+        CASE_EQUAL(2)
+        SET_VALUE(LW(12), PTR(&weapon_sambo_spike_attack_3))
+        CASE_EQUAL(1)
+        SET_VALUE(LW(12), PTR(&weapon_sambo_spike_attack_2))
+    END_SWITCH
+    CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(6), 43)
+    IF_INT_EQUAL(LW(5), 21)
+        CALL(evt_snd_sfxoff, LW(14))
+        CALL(btlevtcmd_GetBodyId, -2, LW(11))
+        CALL(btlevtcmd_GetHitPos, -2, LW(11), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetPartsMoveSpeed, -2, 5, FLOAT(4.5f))
+        CALL(btlevtcmd_SetPartsFallAccel, -2, 5, FLOAT(0.39941406f))
+        CALL(btlevtcmd_JumpPartsPosition, -2, 5, LW(0), LW(1), LW(2), 40, -1)
+        BEGIN_INLINE_EVENT
+            CALL(btlevtcmd_GetPartsPos, -2, 5, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 55)
+            CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_SetPartsMoveSpeed, -2, 5, FLOAT(3.0f))
+            CALL(btlevtcmd_SetPartsFallAccel, -2, 5, FLOAT(0.099609375f))
+            CALL(btlevtcmd_DivePartsPosition, -2, 5, LW(0), LW(1), LW(2), 0, 25, 0, 0, -1)
+            CALL(btlevtcmd_SetPartsMoveSpeed, -2, 5, FLOAT(2.0f))
+            CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 24)
+            CALL(btlevtcmd_DivePartsPosition, -2, 5, LW(0), LW(1), LW(2), 0, 21, 0, 0, -1)
+            CALL(btlevtcmd_SetPartsMoveSpeed, -2, 5, FLOAT(1.5f))
+            CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 20)
+            CALL(btlevtcmd_DivePartsPosition, -2, 5, LW(0), LW(1), LW(2), 0, 20, 0, 0, -1)
+            CALL(btlevtcmd_OnPartsAttribute, -2, 5, 16777216)
+        END_INLINE_EVENT
+        CALL(btlevtcmd_CheckDamage, -2, -2, LW(11), LW(12), 256, LW(5))
+        RETURN
+    END_IF
+    CALL(evt_snd_sfxoff, LW(14))
+    CALL(btlevtcmd_GetPartsPos, -2, 5, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 55)
+    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPartsMoveSpeed, -2, 5, FLOAT(3.0f))
+    CALL(btlevtcmd_SetPartsFallAccel, -2, 5, FLOAT(0.099609375f))
+    CALL(btlevtcmd_DivePartsPosition, -2, 5, LW(0), LW(1), LW(2), 0, 25, 0, 0, -1)
+    CALL(btlevtcmd_SetPartsMoveSpeed, -2, 5, FLOAT(2.0f))
+    CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 24)
+    CALL(btlevtcmd_DivePartsPosition, -2, 5, LW(0), LW(1), LW(2), 0, 21, 0, 0, -1)
+    CALL(btlevtcmd_SetPartsMoveSpeed, -2, 5, FLOAT(1.5f))
+    CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 20)
+    CALL(btlevtcmd_DivePartsPosition, -2, 5, LW(0), LW(1), LW(2), 0, 20, 0, 0, -1)
+    CALL(btlevtcmd_OnPartsAttribute, -2, 5, 16777216)
+    LABEL(98)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    LABEL(99)
+    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
-static s32 call_friend_event[] = {
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"SNB_S_1", 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_ENM_SAMBO_SEND_GROUP1_3", -250000000, 0, -250000000, 327771, (s32)evt_sub_intpl_init, 11, 0,
-    -20, 40, 65539, 0, 65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_SetRotate,
-    -2, 0, 0, -30000000, 65545, 1, 131096, -29999999,
-    1, 65540, 0, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_SEND_GROUP1_2",
-    -250000000, 0, -250000000, 327771, (s32)evt_sub_intpl_init, 11, -20, 30,
-    40, 65539, 1, 65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_SetRotate, -2,
-    0, 0, -30000000, 65545, 1, 131096, -29999999, 1,
-    65540, 1, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_SEND_GROUP1_1", -250000000,
-    0, -250000000, 327771, (s32)evt_sub_intpl_init, 11, 30, -40, 40,
-    65539, 2, 65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_SetRotate, -2, 0,
-    0, -30000000, 65545, 1, 131096, -29999999, 1, 65540,
-    2, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_SEND_GROUP2", -250000000, 0,
-    -250000000, 327771, (s32)evt_sub_intpl_init, 11, -40, 90, 20, 65539,
-    3, 65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0,
-    -30000000, 65545, 1, 131096, -29999999, 1, 65540, 3,
-    33, 65545, 40, 107, 393307, (s32)evt_btl_camera_shake_h, 0, 2,
-    0, 10, 13, 109, 262235, (s32)btlevtcmd_SpawnUnit, -29999997, (s32)entry_sambo,
-    0, 131122, -30000000, -29999994, 131122, -29999999, -29999993, 131122,
-    -29999998, -29999992, 131126, -29999999, 80, 327771, (s32)btlevtcmd_SetPos, -29999997,
-    -30000000, -29999999, -29999998, 110, 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000,
-    -29999999, -29999998, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 983131,
-    (s32)evt_eff, 0, (s32)"kemuri_test", 14, -30000000, -29999999, -29999998, -229998464,
-    0, 0, 0, 0, 0, 0, 0, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_SEND_GROUP3\0\0", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -29999997, 1, (s32)"SNB_D_1", 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000, -29999999,
-    -29999998, 196699, (s32)btlevtcmd_SetFallAccel, -29999997, -229999284, 458843, (s32)btlevtcmd_JumpPosition, -29999997,
-    -29999994, -29999993, -29999992, 20, -1, 327771, (s32)btlevtcmd_SetHomePos, -29999997,
-    -29999994, -29999993, -29999992, 65545, 40, 131163, (s32)btlevtcmd_StartWaitEvent, -29999997,
-    112, 262235, (s32)btlevtcmd_GetUnitWork, -2, 1, -29999996, 131125, -29999996,
-    1, 262235, (s32)btlevtcmd_SetUnitWork, -29999997, 1, -29999996, 196699, (s32)evt_btl_camera_set_mode,
-    0, 0, 327771, (s32)evt_sub_intpl_init, 4, 90, -30, 14,
-    65539, 4, 65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_SetRotate, -2, 0,
-    0, -30000000, 65545, 1, 131096, -29999999, 1, 65540,
-    4, 33, 65545, 40, 327771, (s32)evt_sub_intpl_init, 11, -30,
-    0, 20, 65539, 5, 65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_SetRotate,
-    -2, 0, 0, -30000000, 65545, 1, 131096, -29999999,
-    1, 65540, 5, 33, 65545, 40, 2, 1,
-};
+static EVT_BEGIN(call_friend_event)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("SNB_S_1"))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_SEND_GROUP1_3"), -250000000, 0, -250000000)
+    CALL(evt_sub_intpl_init, 11, 0, -20, 40)
+    LABEL(0)
+    CALL(evt_sub_intpl_get_value)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(0)
+    END_IF
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_SEND_GROUP1_2"), -250000000, 0, -250000000)
+    CALL(evt_sub_intpl_init, 11, -20, 30, 40)
+    LABEL(1)
+    CALL(evt_sub_intpl_get_value)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(1)
+    END_IF
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_SEND_GROUP1_1"), -250000000, 0, -250000000)
+    CALL(evt_sub_intpl_init, 11, 30, -40, 40)
+    LABEL(2)
+    CALL(evt_sub_intpl_get_value)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(2)
+    END_IF
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_SEND_GROUP2"), -250000000, 0, -250000000)
+    CALL(evt_sub_intpl_init, 11, -40, 90, 20)
+    LABEL(3)
+    CALL(evt_sub_intpl_get_value)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(3)
+    END_IF
+    WAIT_FRAMES(40)
+    BEGIN_INLINE_EVENT
+        CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
+    END_INLINE_EVENT
+    CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_sambo), 0)
+    SET_VALUE(LW(0), LW(6))
+    SET_VALUE(LW(1), LW(7))
+    SET_VALUE(LW(2), LW(8))
+    SUBTRACT(LW(1), 80)
+    CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+        CALL(evt_eff, 0, STRING("kemuri_test"), 14, LW(0), LW(1), LW(2), FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_SEND_GROUP3\0\0"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_AnimeChangePose, LW(3), 1, STRING("SNB_D_1"))
+        CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetFallAccel, LW(3), FLOAT(0.69921875f))
+        CALL(btlevtcmd_JumpPosition, LW(3), LW(6), LW(7), LW(8), 20, -1)
+        CALL(btlevtcmd_SetHomePos, LW(3), LW(6), LW(7), LW(8))
+        WAIT_FRAMES(40)
+        CALL(btlevtcmd_StartWaitEvent, LW(3))
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(4))
+    ADD(LW(4), 1)
+    CALL(btlevtcmd_SetUnitWork, LW(3), 1, LW(4))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_sub_intpl_init, 4, 90, -30, 14)
+    LABEL(4)
+    CALL(evt_sub_intpl_get_value)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(4)
+    END_IF
+    WAIT_FRAMES(40)
+    CALL(evt_sub_intpl_init, 11, -30, 0, 20)
+    LABEL(5)
+    CALL(evt_sub_intpl_get_value)
+    CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(0))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(5)
+    END_IF
+    WAIT_FRAMES(40)
+    RETURN
+EVT_END()
 
-static __declspec(section ".data") s32 entry_sambo[] = {
-    (s32)&unit_sambo, 16777216, 67108868, -998637568, -998637568, -998637568, 0, 0,
-    0, 0, 0, 0,
+static __declspec(section ".data") BattleUnitSetup entry_sambo = {
+    &unit_sambo, // mUnitKindParams
+    1, // alliance
+    {0}, // pad_05
+    0x4000004, // attackPhase
+    {-1000.0f, -1000.0f, -1000.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
 static EVT_BEGIN(wait_event)
@@ -1077,18 +1641,30 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
-static s32 sambo_rabbit_move[] = {
-    65539, 0, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    131122, -29999989, -29999995, 131126, -29999989, -30000000, 131122, -29999988,
-    -29999989, 131098, -29999988, 0, 131127, -29999988, -1, 33,
-    131099, -29999988, -29999992, 131101, -29999989, 0, 131125, -30000000,
-    -29999992, 32, 131126, -30000000, -29999992, 33, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_SAMBO_MOVE2", -250000000, 0, -250000000, 458843, (s32)btlevtcmd_JumpPosition, -2,
-    -30000000, -29999994, -29999998, 0, -1, 65540, 0, 32,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_MOVE2", -250000000, 0, -250000000, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -29999995, -29999994, -29999993, 0, -1, 33,
-    2, 1,
-};
+static EVT_BEGIN(sambo_rabbit_move)
+    LABEL(0)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    SET_VALUE(LW(11), LW(5))
+    SUBTRACT(LW(11), LW(0))
+    SET_VALUE(LW(12), LW(11))
+    IF_INT_LESS(LW(12), 0)
+        MULTIPLY(LW(12), -1)
+    END_IF
+    IF_INT_GREATER(LW(12), LW(8))
+        IF_INT_GREATER_OR_EQUAL(LW(11), 0)
+            ADD(LW(0), LW(8))
+        ELSE
+            SUBTRACT(LW(0), LW(8))
+        END_IF
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_MOVE2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(6), LW(2), 0, -1)
+        GOTO(0)
+    ELSE
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_SAMBO_MOVE2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_JumpPosition, -2, LW(5), LW(6), LW(7), 0, -1)
+    END_IF
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(_body_param_set)
     CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))

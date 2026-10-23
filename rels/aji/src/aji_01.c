@@ -7,6 +7,7 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_npc.h"
 #include "aji.h"
+#include "mario/mario_pouch.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_exec_wait);
@@ -108,20 +109,20 @@ USER_FUNC(get_password);
 static USER_FUNC(peach_evt_toumei);
 static USER_FUNC(peach_set_pose);
 
-__declspec(section ".data") u64 fd_aji_01_negone_one_374;
-__declspec(section ".data") s32 fd_aji_01_neg_one_382[1];
-__declspec(section ".data") s32 fd_aji_01___local_PI_383[1];
-__declspec(section ".data") s32 fd_aji_01___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_aji_01_one_negone_373;
-__declspec(section ".data") s32 fd_aji_01___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_aji_01_one_381[1];
-__declspec(section ".data") u64 fd_aji_01_negone_one_360;
-__declspec(section ".data") s32 fd_aji_01_neg_one_365[1];
-__declspec(section ".data") s32 fd_aji_01___local_PI_366[1];
-__declspec(section ".data") s32 fd_aji_01___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_aji_01_one_negone_359;
-__declspec(section ".data") s32 fd_aji_01___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_aji_01_one_364[1];
+__declspec(section ".data") f32 fd_aji_01_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_01_neg_one_382;
+__declspec(section ".data") f32 fd_aji_01___local_PI_383;
+__declspec(section ".data") f32 fd_aji_01___local_3PIO2_385;
+__declspec(section ".data") f32 fd_aji_01_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_01___local_PIO2_384;
+__declspec(section ".data") f32 fd_aji_01_one_381;
+__declspec(section ".data") f32 fd_aji_01_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_01_neg_one_365;
+__declspec(section ".data") f32 fd_aji_01___local_PI_366;
+__declspec(section ".data") f32 fd_aji_01___local_3PIO2_368;
+__declspec(section ".data") f32 fd_aji_01_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_aji_01___local_PIO2_367;
+__declspec(section ".data") f32 fd_aji_01_one_364;
 static s32 w1_door_open[22];
 static s32 w1_door_close[22];
 static s32 e1_door_open[22];
@@ -150,8 +151,8 @@ s32 w5_door_open[22];
 s32 w5_door_close[22];
 s32 e5_door_open[22];
 s32 e5_door_close[22];
-static s32 bero_entry_data[225];
-s32 e_bero_5_peach[30];
+static BeroEntry bero_entry_data[15];
+BeroEntry e_bero_5_peach[2];
 __declspec(section ".data") s32 elv_key1[2];
 s32 elv_unlock1[131];
 __declspec(section ".data") s32 elv_key2[2];
@@ -196,56 +197,36 @@ s32 teshita2_regl[35];
 static s32 teshita3_init[46];
 s32 teshita3_talk[14];
 s32 teshita3_regl[35];
-static s32 npcEnt[92];
+static NpcSetupInfo npcEnt[4];
 s32 aji_01_init_evt[171];
 
-__declspec(section ".data") u64 fd_aji_01_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_01_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_01___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_01___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_01_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_01___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_01_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_01_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_aji_01_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_01_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_01___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_01___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_aji_01_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_01___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_01_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_01_one_364 = 1.0f;
 
 static EVT_BEGIN(w1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -471,47 +452,282 @@ EVT_BEGIN(e5_door_close)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero_1", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"aji_00", (s32)"e_bero", 327685, (s32)w1_door_close, (s32)w1_door_open, (s32)"e_bero_1",
-    65546, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"aji_02", (s32)"w_bero", 327685, (s32)e1_door_close, (s32)e1_door_open, (s32)"w_bero_2", 65546,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"aji_03", (s32)"e_bero", 327685, (s32)w2_door_close, (s32)w2_door_open, (s32)"e_bero_2", 65546, 20000,
-    100000, 0, 0, -1, 0, -1, 0, (s32)"aji_04",
-    (s32)"w_bero", 327685, (s32)e2_door_close, (s32)e2_door_open, (s32)"n_bero_1", 65546, 20000, 100000,
-    0, 0, -1, 0, -1, 0, (s32)"aji_06", (s32)"s_bero",
-    327685, (s32)n1_door_close, (s32)n1_door_open, (s32)"n_bero_2", 65546, 20000, 100000, 0,
-    0, -1, 0, -1, 0, (s32)"aji_07", (s32)"s_bero", 327685,
-    (s32)n2_door_close, (s32)n2_door_open, (s32)"n_bero_3", 65546, 20000, 100000, 0, 0,
-    -1, 0, -1, 0, (s32)"aji_08", (s32)"s_bero_1", 327685, (s32)n3_door_close,
-    (s32)n3_door_open, (s32)"n_bero_4", 65546, 20000, 100000, 0, 0, -1,
-    0, -1, 0, (s32)"aji_09", (s32)"s_bero", 327685, (s32)n4_door_close, (s32)n4_door_open,
-    (s32)"w_bero_3", 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"aji_05", (s32)"e_bero", 327685, (s32)w3_door_close, (s32)w3_door_open, (s32)"e_bero3",
-    65546, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"aji_10", (s32)"w_bero", 327685, (s32)e3_door_close, (s32)e3_door_open, (s32)"w_bero_4", 65546,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"aji_12", (s32)"e_bero", 327685, (s32)w4_door_close, (s32)w4_door_open, (s32)"e_bero_4", 65546, 20000,
-    100000, 0, 0, -1, 0, -1, 0, (s32)"aji_18",
-    (s32)"w_bero", 327685, (s32)e4_door_close, (s32)e4_door_open, (s32)"w_bero_5", 65546, 20000, 100000,
-    0, 0, -1, 0, -1, 0, (s32)"aji_16", (s32)"e_bero",
-    327685, (s32)w5_door_close, (s32)w5_door_open, (s32)"e_bero_5", 65546, 20000, 100000, 0,
-    0, -1, 0, -1, 0, (s32)"aji_17", (s32)"w_bero", 327685,
-    (s32)e5_door_close, (s32)e5_door_open, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero_1", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_00", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w1_door_close, // enterAnimeArg
+        (s32)w1_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero_1", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_02", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e1_door_close, // enterAnimeArg
+        (s32)e1_door_open, // exitAnimeArg
+    },
+    {
+        "w_bero_2", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_03", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w2_door_close, // enterAnimeArg
+        (s32)w2_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero_2", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_04", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e2_door_close, // enterAnimeArg
+        (s32)e2_door_open, // exitAnimeArg
+    },
+    {
+        "n_bero_1", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_06", // nextMapName
+        "s_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n1_door_close, // enterAnimeArg
+        (s32)n1_door_open, // exitAnimeArg
+    },
+    {
+        "n_bero_2", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_07", // nextMapName
+        "s_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n2_door_close, // enterAnimeArg
+        (s32)n2_door_open, // exitAnimeArg
+    },
+    {
+        "n_bero_3", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_08", // nextMapName
+        "s_bero_1", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n3_door_close, // enterAnimeArg
+        (s32)n3_door_open, // exitAnimeArg
+    },
+    {
+        "n_bero_4", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_09", // nextMapName
+        "s_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)n4_door_close, // enterAnimeArg
+        (s32)n4_door_open, // exitAnimeArg
+    },
+    {
+        "w_bero_3", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_05", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w3_door_close, // enterAnimeArg
+        (s32)w3_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero3", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_10", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e3_door_close, // enterAnimeArg
+        (s32)e3_door_open, // exitAnimeArg
+    },
+    {
+        "w_bero_4", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_12", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w4_door_close, // enterAnimeArg
+        (s32)w4_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero_4", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_18", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e4_door_close, // enterAnimeArg
+        (s32)e4_door_open, // exitAnimeArg
+    },
+    {
+        "w_bero_5", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_16", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w5_door_close, // enterAnimeArg
+        (s32)w5_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero_5", // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"aji_17", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e5_door_close, // enterAnimeArg
+        (s32)e5_door_open, // exitAnimeArg
+    },
+    {0},
 };
 
-s32 e_bero_5_peach[] = {
-    (s32)"e_bero_5", 0, 20000, 100000, 0, 0, -1, 0,
-    8, 0, (s32)"aji_17", (s32)"w_bero", 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+BeroEntry e_bero_5_peach[] = {
+    {
+        "e_bero_5", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        8, // caseType
+        NULL, // exitEvent
+        (s32)"aji_17", // nextMapName
+        "w_bero", // nextBeroName
+        0, 0, 0, 0, // enterAnimeType..exitAnimeArg
+    },
+    {0},
 };
 
 __declspec(section ".data") s32 elv_key1[] = {
-    27, -1,
+    ITEM_ELEVATOR_KEY_0x1B, -1,
 };
 
 EVT_BEGIN(elv_unlock1)
@@ -549,7 +765,7 @@ EVT_BEGIN(elv_unlock1)
 EVT_END()
 
 __declspec(section ".data") s32 elv_key2[] = {
-    28, -1,
+    ITEM_ELEVATOR_KEY_0x1C, -1,
 };
 
 EVT_BEGIN(elv_unlock2)
@@ -2020,19 +2236,41 @@ EVT_BEGIN(teshita3_regl)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"手下１"*/"\x8E\xE8\x89\xBA\x82\x50", 0, 0, (s32)teshita1_init, 0, (s32)teshita1_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"手下２"*/"\x8E\xE8\x89\xBA\x82\x51",
-    0, 0, (s32)teshita2_init, (s32)teshita2_regl, (s32)teshita2_talk, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"手下３"*/"\x8E\xE8\x89\xBA\x82\x52", 0,
-    0, (s32)teshita3_init, (s32)teshita3_regl, (s32)teshita3_talk, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"手下１"*/"\x8E\xE8\x89\xBA\x82\x50", // name
+        0, 0, // flags..reactionFlags
+        teshita1_init, // initEvent
+        NULL, // regularEvent
+        teshita1_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"手下２"*/"\x8E\xE8\x89\xBA\x82\x51", // name
+        0, 0, // flags..reactionFlags
+        teshita2_init, // initEvent
+        teshita2_regl, // regularEvent
+        teshita2_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"手下３"*/"\x8E\xE8\x89\xBA\x82\x52", // name
+        0, 0, // flags..reactionFlags
+        teshita3_init, // initEvent
+        teshita3_regl, // regularEvent
+        teshita3_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(aji_01_init_evt)

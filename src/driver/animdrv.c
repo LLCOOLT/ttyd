@@ -1102,12 +1102,12 @@ void animPoseMain(s32 poseId) {
     struct APMF { u8 pad[0x2c]; };
     struct APMD { u8 pad[0x28]; struct APMF* f; u8 pad2[0x40 - 0x2c]; struct APMK* k; };
 
-    poses = APM_P(wp, 0x10);
+    poses = (u8*)wp->poses;
     pose = poses + poseId * 0x170;
     file = (u8*)animPoseGetBaseData((AnimationPose*)pose);
     anim = (u8*)((AnimationPoseData*)file)->mpAnims[((AnimationPose*)pose)->animId].data;
     animInitFastCast_();
-    if (APM_S(wp, 0xe8) != 0) {
+    if ((s32)wp->mbUseFloatScratch != 0) {
         grpA = APM_P(wp, 0xf8);
         grpB = APM_P(wp, 0xfc);
     } else {
@@ -1125,33 +1125,33 @@ void animPoseMain(s32 poseId) {
         ms = OSTicksToMilliseconds(gp->renderTime);
     }
     tm = (f32)(u64)(ms - *(s64*)(pose + 0x18));
-    APM_F(pose, 0x20) = 60.0f * tm / 1000.0f;
-    APM_F(pose, 0x20) *= APM_F(pose, 0x44);
-    cur = APM_F(pose, 0x20);
+    ((AnimationPose*)pose)->unk20 = 60.0f * tm / 1000.0f;
+    ((AnimationPose*)pose)->unk20 *= ((AnimationPose*)pose)->localTimeRate;
+    cur = ((AnimationPose*)pose)->unk20;
     f = APM_F(APM_P(anim, 0x24), 8);
     start = APM_F(APM_P(anim, 0x24), 4);
     len = f - start;
     if (0.0f == len) {
-        APM_F(pose, 0x84) = cur - start;
+        ((AnimationPose*)pose)->loopTime = cur - start;
     } else if (loop != 0) {
         tm = cur - start;
         if (tm < 0.0f) {
-            APM_F(pose, 0x84) = 0.0f;
+            ((AnimationPose*)pose)->loopTime = 0.0f;
         } else {
-            APM_F(pose, 0x84) = tm / len;
-            start = cur - (f32)(s32)APM_F(pose, 0x84) * len;
+            ((AnimationPose*)pose)->loopTime = tm / len;
+            start = cur - (f32)(s32)((AnimationPose*)pose)->loopTime * len;
         }
     } else if (cur < start) {
-        APM_F(pose, 0x84) = 0.0f;
+        ((AnimationPose*)pose)->loopTime = 0.0f;
     } else if (cur > f) {
-        APM_F(pose, 0x84) = (cur - start) / len;
+        ((AnimationPose*)pose)->loopTime = (cur - start) / len;
         start = f;
     } else {
-        APM_F(pose, 0x84) = (cur - start) / len;
+        ((AnimationPose*)pose)->loopTime = (cur - start) / len;
         start = cur;
     }
-    APM_F(pose, 0x24) = start;
-    key = APM_F(pose, 0x24);
+    ((AnimationPose*)pose)->localFrame = start;
+    key = ((AnimationPose*)pose)->localFrame;
     cnt = APM_S(anim, 8);
     q = APM_P(anim, 0x28);
     for (i = 0; i < cnt; q += 0x2c, i++) {
@@ -1159,7 +1159,7 @@ void animPoseMain(s32 poseId) {
     }
     APM_S(pose, 0x28) = i - 1;
     APM_S(pose, 0x2c) = APM_S(pose, 0x28) + 1;
-    key = APM_F(pose, 0x24);
+    key = ((AnimationPose*)pose)->localFrame;
     q = APM_P(anim, 0x40);
     cnt = APM_S(anim, 0x20);
     for (i = 0; i < cnt; q += 8, i++) {
@@ -1173,7 +1173,7 @@ void animPoseMain(s32 poseId) {
     }
     APM_S(pose, 0x80) = ((struct APMD*)anim)->k[APM_S(pose, 0x34)].b;
     start = *(f32*)(APM_P(anim, 0x28) + APM_S(pose, 0x28) * 0x2c);
-    tm = APM_F(pose, 0x24) - start;
+    tm = ((AnimationPose*)pose)->localFrame - start;
     if (loop != 0) {
         if (APM_S(pose, 0x2c) >= APM_S(anim, 8)) {
             APM_S(pose, 0x2c) = 0;
@@ -1185,13 +1185,13 @@ void animPoseMain(s32 poseId) {
         len = *(f32*)(APM_P(anim, 0x28) + APM_S(pose, 0x2c) * 0x2c) - start;
     }
     if (0.0f == len) {
-        APM_F(pose, 0x30) = 0.0f;
+        ((AnimationPose*)pose)->unk30 = 0.0f;
     } else {
-        APM_F(pose, 0x30) = tm / len;
+        ((AnimationPose*)pose)->unk30 = tm / len;
     }
     frame = APM_S(pose, 0x28);
     nextFrame = APM_S(pose, 0x2c);
-    t = APM_F(pose, 0x30);
+    t = ((AnimationPose*)pose)->unk30;
     nA = APM_S(file, 0xf0);
     nB = APM_S(file, 0xf8);
     nC = APM_S(file, 0x13c);
@@ -1203,9 +1203,9 @@ void animPoseMain(s32 poseId) {
             kf = (u8*)((struct APMD*)anim)->f;
             if (nA != 0) memcpy_as4(APM_P(pose, 0x48), APM_P(file, 0x154), nA * 0xc);
             if (nB != 0) memcpy_as4(APM_P(pose, 0x50), APM_P(file, 0x15c), nB * 0xc);
-            if (nC != 0) memcpy(APM_P(pose, 0x58), APM_P(file, 0x1a0), nC);
-            if (nD != 0) memcpy_as4(APM_P(pose, 0x60), APM_P(file, 0x1a4), nD * 4);
-            if (nE != 0) memcpy_as4(APM_P(pose, 0x68), APM_P(file, 0x190), nE * 0x18);
+            if (nC != 0) memcpy(((AnimationPose*)pose)->mpBufferGroupVisibility, APM_P(file, 0x1a0), nC);
+            if (nD != 0) memcpy_as4((u8*)((AnimationPose*)pose)->mpBufferNode, APM_P(file, 0x1a4), nD * 4);
+            if (nE != 0) memcpy_as4((u8*)((AnimationPose*)pose)->mpBufferTexAnimEntries, APM_P(file, 0x190), nE * 0x18);
             if (APM_S(pose, 0x3c) == -1) APM_S(pose, 0x3c) = 0;
             s = 0.0625f;
             for (; kf < kfEnd; kf += 0x2c) {
@@ -1238,7 +1238,7 @@ void animPoseMain(s32 poseId) {
                 }
                 }
                 { u8* d; u8* e; u8* v;
-                v = APM_P(pose, 0x58);
+                v = ((AnimationPose*)pose)->mpBufferGroupVisibility;
                 d = APM_P(anim, 0x38) + APM_S(kf, 0x1c) * 2;
                 e = d + APM_S(kf, 0x20) * 2;
                 for (; d < e; d += 2) {
@@ -1247,7 +1247,7 @@ void animPoseMain(s32 poseId) {
                 }
                 }
                 { u8* d; u8* e;
-                v = APM_P(pose, 0x60);
+                v = (u8*)((AnimationPose*)pose)->mpBufferNode;
                 d = APM_P(anim, 0x3c) + APM_S(kf, 0x24) * 4;
                 e = d + APM_S(kf, 0x28) * 4;
                 for (; d < e; d += 4) {
@@ -1257,7 +1257,7 @@ void animPoseMain(s32 poseId) {
                 }
                 }
                 { u8* d; u8* e;
-                v = APM_P(pose, 0x68);
+                v = (u8*)((AnimationPose*)pose)->mpBufferTexAnimEntries;
                 d = APM_P(anim, 0x34) + APM_S(kf, 0x14) * 0xc;
                 e = d + APM_S(kf, 0x18) * 0xc;
                 for (; d < e; d += 0xc) {
@@ -1302,7 +1302,7 @@ void animPoseMain(s32 poseId) {
                 }
                 }
                 { u8* d; u8* e; u8* v;
-                v = APM_P(pose, 0x58);
+                v = ((AnimationPose*)pose)->mpBufferGroupVisibility;
                 d = APM_P(anim, 0x38) + APM_S(kf, 0x1c) * 2;
                 e = d + APM_S(kf, 0x20) * 2;
                 for (; d < e; d += 2) {
@@ -1311,7 +1311,7 @@ void animPoseMain(s32 poseId) {
                 }
                 }
                 { u8* d; u8* e;
-                v = APM_P(pose, 0x60);
+                v = (u8*)((AnimationPose*)pose)->mpBufferNode;
                 d = APM_P(anim, 0x3c) + APM_S(kf, 0x24) * 4;
                 e = d + APM_S(kf, 0x28) * 4;
                 for (; d < e; d += 4) {
@@ -1321,7 +1321,7 @@ void animPoseMain(s32 poseId) {
                 }
                 }
                 { u8* d; u8* e;
-                v = APM_P(pose, 0x68);
+                v = (u8*)((AnimationPose*)pose)->mpBufferTexAnimEntries;
                 d = APM_P(anim, 0x34) + APM_S(kf, 0x14) * 0xc;
                 e = d + APM_S(kf, 0x18) * 0xc;
                 for (; d < e; d += 0xc) {
@@ -1334,12 +1334,12 @@ void animPoseMain(s32 poseId) {
             }
         }
     } else {
-        if (APM_F(pose, 0x40) > t) APM_F(pose, 0x40) = 0.0f;
+        if (((AnimationPose*)pose)->lastFrameTime > t) ((AnimationPose*)pose)->lastFrameTime = 0.0f;
     }
     if (frame == nextFrame) {
         if (nA != 0) memcpy_as4(grpA, APM_P(pose, 0x48), nA * 0xc);
         if (nB != 0) memcpy_as4(grpB, APM_P(pose, 0x50), nB * 0xc);
-        if (nD != 0) memcpy_as4(APM_P(pose, 0x64), APM_P(pose, 0x60), nD * 4);
+        if (nD != 0) memcpy_as4((u8*)((AnimationPose*)pose)->mpNodes, (u8*)((AnimationPose*)pose)->mpBufferNode, nD * 4);
     } else if (frame <= nextFrame) {
         u8* kf;
         kf = APM_P(anim, 0x28) + nextFrame * 0x2c;
@@ -1380,8 +1380,8 @@ void animPoseMain(s32 poseId) {
         d = APM_P(anim, 0x3c) + APM_S(kf, 0x24) * 4;
         e = d + APM_S(kf, 0x28) * 4;
         dt = *(f32*)(APM_P(anim, 0x28) + nextFrame * 0x2c) - *(f32*)(APM_P(anim, 0x28) + frame * 0x2c);
-        p = APM_P(pose, 0x60);
-        v = APM_P(pose, 0x64);
+        p = (u8*)((AnimationPose*)pose)->mpBufferNode;
+        v = (u8*)((AnimationPose*)pose)->mpNodes;
         if (nD != 0) memcpy_as4(v, p, nD * 4);
         for (; d < e; d += 4) {
             b = (s8)d[3];
@@ -1400,20 +1400,20 @@ void animPoseMain(s32 poseId) {
         }
     }
     APM_S(pose, 0x3c) = frame;
-    APM_F(pose, 0x40) = t;
+    ((AnimationPose*)pose)->lastFrameTime = t;
     if (APM_U(pose, 0) & 8) {
         CameraEntry* cam = camGetPtr(CAMERA_3D);
         f = 57.29579f * (f32)atan2(-(cam->cameraAt.x - cam->cameraPos.x), -(cam->cameraAt.z - cam->cameraPos.z));
         while (f < -360.0f) f += 360.0f;
         while (f >= 360.0f) f -= 360.0f;
         if (f < 0.0f) f += 360.0f;
-        f -= APM_F(pose, 0x74);
+        f -= ((AnimationPose*)pose)->rotationY;
         while (f < -360.0f) f += 360.0f;
         while (f >= 360.0f) f -= 360.0f;
         if ((f > 90.0f && f <= 270.0f) || (f < -90.0f && f >= -270.0f)) {
-            APM_F(pose, 0x78) = -1.0f;
+            ((AnimationPose*)pose)->field_0x78 = -1.0f;
         } else {
-            APM_F(pose, 0x78) = 1.0f;
+            ((AnimationPose*)pose)->field_0x78 = 1.0f;
         }
     }
 }
@@ -2403,9 +2403,9 @@ void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f3
     s32 mode;
 
     data = animPoseGetBaseData(pose);
-    arg3 = *(s32*)((u8*)pose + 0x28);
-    arg4 = *(s32*)((u8*)pose + 0x2C);
-    argf = *(f32*)((u8*)pose + 0x30);
+    arg3 = pose->field_0x28;
+    arg4 = pose->unk2C;
+    argf = pose->unk30;
     anim = data->mpAnims[pose->animId].data;
     if (anim == NULL) {
         return;
@@ -2892,13 +2892,13 @@ void animPaperPoseDispSub(s32 unused, AnimationPose* arg) {
             }
             a = 0.5f * b;
             e = 0.14881f * (bottom - top);
-            PP_S(pose, 0x114) = DEMOGetRenderModeObj()->fbWidth / 2 - b - a;
-            PP_S(pose, 0x116) = DEMOGetRenderModeObj()->fbWidth / 2 + b + a;
-            PP_S(pose, 0x118) = top - e;
-            PP_S(pose, 0x11A) = bottom + e;
-            PP_F(pose, 0xF8) = (8.0f / scale) * ((f32)(PP_S(pose, 0x116) - PP_S(pose, 0x114)) / 150.0f);
-            PP_F(pose, 0xFC) = (8.0f / scale) * ((f32)(PP_S(pose, 0x11A) - PP_S(pose, 0x118)) / 215.0f);
-            PP_F(pose, 0x100) = d->x48 + (hh - bottom) / scale;
+            pose->unk114 = DEMOGetRenderModeObj()->fbWidth / 2 - b - a;
+            pose->unk116 = DEMOGetRenderModeObj()->fbWidth / 2 + b + a;
+            pose->unk118 = top - e;
+            pose->unk11A = bottom + e;
+            pose->paperScaleXZ = (8.0f / scale) * ((f32)(pose->unk116 - pose->unk114) / 150.0f);
+            pose->paperScaleY = (8.0f / scale) * ((f32)(pose->unk11A - pose->unk118) / 215.0f);
+            pose->paperOfsY = d->x48 + (hh - bottom) / scale;
             pose->flags &= ~4;
         }
     } else {
@@ -2912,13 +2912,13 @@ void animPaperPoseDispSub(s32 unused, AnimationPose* arg) {
         }
         a = 0.5f * b;
         e = 0.14881f * (bottom - top);
-        PP_S(pose, 0x114) = DEMOGetRenderModeObj()->fbWidth / 2 - b - a;
-        PP_S(pose, 0x116) = DEMOGetRenderModeObj()->fbWidth / 2 + b + a;
-        PP_S(pose, 0x118) = top - e;
-        PP_S(pose, 0x11A) = bottom + e;
-        PP_F(pose, 0xF8) = (8.0f / scale) * ((f32)(PP_S(pose, 0x116) - PP_S(pose, 0x114)) / 150.0f);
-        PP_F(pose, 0xFC) = (8.0f / scale) * ((f32)(PP_S(pose, 0x11A) - PP_S(pose, 0x118)) / 215.0f);
-        PP_F(pose, 0x100) = d->x48 + (hh - bottom) / scale;
+        pose->unk114 = DEMOGetRenderModeObj()->fbWidth / 2 - b - a;
+        pose->unk116 = DEMOGetRenderModeObj()->fbWidth / 2 + b + a;
+        pose->unk118 = top - e;
+        pose->unk11A = bottom + e;
+        pose->paperScaleXZ = (8.0f / scale) * ((f32)(pose->unk116 - pose->unk114) / 150.0f);
+        pose->paperScaleY = (8.0f / scale) * ((f32)(pose->unk11A - pose->unk118) / 215.0f);
+        pose->paperOfsY = d->x48 + (hh - bottom) / scale;
     }
     left -= 2;
     top -= 2;
@@ -2930,17 +2930,17 @@ void animPaperPoseDispSub(s32 unused, AnimationPose* arg) {
     bottom += bottom & 1;
     w = right - left;
     h = bottom - top;
-    PP_F(pose, 0x104) = -((f32)left - PP_S(pose, 0x114)) / (f32)(PP_S(pose, 0x116) - PP_S(pose, 0x114));
-    PP_F(pose, 0x108) = -((f32)top - PP_S(pose, 0x118)) / (f32)(PP_S(pose, 0x11A) - PP_S(pose, 0x118));
-    PP_F(pose, 0x10C) = (f32)(PP_S(pose, 0x116) - PP_S(pose, 0x114)) / (f32)w;
-    PP_F(pose, 0x110) = (f32)(PP_S(pose, 0x11A) - PP_S(pose, 0x118)) / (f32)h;
+    pose->unk104 = -((f32)left - pose->unk114) / (f32)(pose->unk116 - pose->unk114);
+    pose->unk108 = -((f32)top - pose->unk118) / (f32)(pose->unk11A - pose->unk118);
+    pose->unk10C = (f32)(pose->unk116 - pose->unk114) / (f32)w;
+    pose->unk110 = (f32)(pose->unk11A - pose->unk118) / (f32)h;
     GXSetTexCopySrc(left, top, w, h);
     GXSetTexCopyDst(w, h, GX_TF_RGB5A3, GX_FALSE);
-    PP_ENT(pose) = smartAlloc(GXGetTexBufferSize(w, h, GX_TF_RGB5A3, GX_FALSE, 0), 3);
-    GXCopyTex(PP_ENT(pose)->address, GX_TRUE);
+    pose->unk98 = smartAlloc(GXGetTexBufferSize(w, h, GX_TF_RGB5A3, GX_FALSE, 0), 3);
+    GXCopyTex(pose->unk98->address, GX_TRUE);
     GXPixModeSync();
-    GXInitTexObj((GXTexObj*)((u8*)pose + 0xA0), PP_ENT(pose)->address, w, h, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    PP_9C(pose) = 0;
+    GXInitTexObj((GXTexObj*)((u8*)pose + 0xA0), pose->unk98->address, w, h, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    pose->unk9C = 0;
 }
 
 void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f32 scale);

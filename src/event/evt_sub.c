@@ -222,9 +222,8 @@ static s32 kusa_data[] = {
     -230003070, -230002501, -230001249, -230000000,
 };
 
-s32 coinget_window_desc[] = {
-    0, 0, 8, -175, 120, 350, 42, -505963521,
-    0, (s32)coingetDisp,
+WinMgrDesc coinget_window_desc[] = {
+    {0, 0, 8, -175, 120, 350, 42, {0xE1, 0xD7, 0x9B, 0xFF}, NULL, coingetDisp},
 };
 
 #ifdef VERSION_G8ME01
@@ -1504,54 +1503,115 @@ EVT_BEGIN(mail_evt_tou_01)
     RETURN
 EVT_END()
 
-s32 mail_evt_usu_01[] = {
-    131096, -129999981, 1, 2, 33, 327771, (s32)evt_mario_get_pos, 0,
-    -30000000, -29999999, -29999998, 65541, 0, 131122, -29999990, -30000000,
-    131122, -29999989, -29999999, 131122, -29999988, -29999998, 327771, (s32)evt_mario_get_pos,
-    0, -30000000, -29999999, -29999998, 655451, (s32)evt_sub_check_intersect, -30000000, -29999998,
-    -29999990, -29999988, 110, -2000, 110, 2000, -29999995, 131096,
-    -170000000, 187, 131096, -29999995, 1, 7, 33, 33,
-    65545, 1, 6, 131122, -129999981, 1, 131163, (s32)evt_pouch_receive_mail,
-    29, 65630, (s32)mail_evt, 2, 1,
-};
+EVT_BEGIN(mail_evt_usu_01)
+    IF_INT_EQUAL(GSWF(19), 1)
+        RETURN
+    END_IF
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    LOOP(0)
+        SET_VALUE(LW(10), LW(0))
+        SET_VALUE(LW(11), LW(1))
+        SET_VALUE(LW(12), LW(2))
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_sub_check_intersect, LW(0), LW(2), LW(10), LW(12), 110, -2000, 110, 2000, LW(5))
+        IF_INT_EQUAL(GSW(0), 187)
+            IF_INT_EQUAL(LW(5), 1)
+                BREAK_LOOP
+            END_IF
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    SET_VALUE(GSWF(19), 1)
+    CALL(evt_pouch_receive_mail, 29)
+    CALL_CHILD(mail_evt)
+    RETURN
+EVT_END()
 
-s32 mail_evt_gor_01_2[] = {
-    327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 65541, 0,
-    131122, -29999990, -30000000, 131122, -29999989, -29999999, 131122, -29999988,
-    -29999998, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 655451,
-    (s32)evt_sub_check_intersect, -30000000, -29999998, -29999990, -29999988, -2000, 200, 2000,
-    200, -29999995, 131096, -29999995, 1, 131122, -70000000, 0,
-    131096, -170000000, 270, 131096, -129999980, 0, 131122, -129999980,
-    1, 131163, (s32)evt_pouch_receive_mail, 30, 131122, -129999749, 1, 131163,
-    (s32)evt_sub_save_playtime, -169999986, 131122, -70000000, 1, 33, 33, 196699,
-    (s32)irai_mail_check, 0, -29999995, 131096, -29999995, 1, 196699, (s32)irai_mail_check,
-    1, -29999995, 131122, -70000000, 1, 33, 131096, -70000000,
-    1, 65630, (s32)mail_evt, 131122, -70000000, 0, 33, 33,
-    65545, 1, 6, 2, 1,
-};
+EVT_BEGIN(mail_evt_gor_01_2)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    LOOP(0)
+        SET_VALUE(LW(10), LW(0))
+        SET_VALUE(LW(11), LW(1))
+        SET_VALUE(LW(12), LW(2))
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_sub_check_intersect, LW(0), LW(2), LW(10), LW(12), -2000, 200, 2000, 200, LW(5))
+        IF_INT_EQUAL(LW(5), 1)
+            SET_VALUE(LF(0), 0)
+            IF_INT_EQUAL(GSW(0), 270)
+                IF_INT_EQUAL(GSWF(20), 0)
+                    SET_VALUE(GSWF(20), 1)
+                    CALL(evt_pouch_receive_mail, 30)
+                    SET_VALUE(GSWF(251), 1)
+                    CALL(evt_sub_save_playtime, GSW(14))
+                    SET_VALUE(LF(0), 1)
+                END_IF
+            END_IF
+            CALL(irai_mail_check, 0, LW(5))
+            IF_INT_EQUAL(LW(5), 1)
+                CALL(irai_mail_check, 1, LW(5))
+                SET_VALUE(LF(0), 1)
+            END_IF
+            IF_INT_EQUAL(LF(0), 1)
+                CALL_CHILD(mail_evt)
+                SET_VALUE(LF(0), 0)
+            END_IF
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    RETURN
+EVT_END()
 
-s32 mail_evt_rsh_03_a_2[] = {
-    131096, -129999979, 1, 2, 33, 327771, (s32)evt_mario_get_pos, 0,
-    -30000000, -29999999, -29999998, 65541, 0, 131122, -29999990, -30000000,
-    131122, -29999989, -29999999, 131122, -29999988, -29999998, 327771, (s32)evt_mario_get_pos,
-    0, -30000000, -29999999, -29999998, 655451, (s32)evt_sub_check_intersect, -30000000, -29999998,
-    -29999990, -29999988, 400, -2000, 400, 2000, -29999995, 131096,
-    -170000000, 303, 131096, -29999995, 1, 7, 33, 33,
-    65545, 1, 6, 131122, -129999979, 1, 131163, (s32)evt_pouch_receive_mail,
-    31, 65630, (s32)mail_evt, 2, 1,
-};
+EVT_BEGIN(mail_evt_rsh_03_a_2)
+    IF_INT_EQUAL(GSWF(21), 1)
+        RETURN
+    END_IF
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    LOOP(0)
+        SET_VALUE(LW(10), LW(0))
+        SET_VALUE(LW(11), LW(1))
+        SET_VALUE(LW(12), LW(2))
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_sub_check_intersect, LW(0), LW(2), LW(10), LW(12), 400, -2000, 400, 2000, LW(5))
+        IF_INT_EQUAL(GSW(0), 303)
+            IF_INT_EQUAL(LW(5), 1)
+                BREAK_LOOP
+            END_IF
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    SET_VALUE(GSWF(21), 1)
+    CALL(evt_pouch_receive_mail, 31)
+    CALL_CHILD(mail_evt)
+    RETURN
+EVT_END()
 
-s32 mail_evt_pik_00[] = {
-    131096, -129999978, 1, 2, 33, 327771, (s32)evt_mario_get_pos, 0,
-    -30000000, -29999999, -29999998, 65541, 0, 131122, -29999990, -30000000,
-    131122, -29999989, -29999999, 131122, -29999988, -29999998, 327771, (s32)evt_mario_get_pos,
-    0, -30000000, -29999999, -29999998, 655451, (s32)evt_sub_check_intersect, -30000000, -29999998,
-    -29999990, -29999988, -60, -2000, -60, 2000, -29999995, 131096,
-    -170000000, 354, 131096, -129996126, 1, 131096, -29999995, 1,
-    7, 33, 33, 33, 65545, 1, 6, 131122,
-    -129999978, 1, 131163, (s32)evt_pouch_receive_mail, 32, 131122, -129999748, 1,
-    131163, (s32)evt_sub_save_playtime, -169999977, 65630, (s32)mail_evt, 2, 1,
-};
+EVT_BEGIN(mail_evt_pik_00)
+    IF_INT_EQUAL(GSWF(22), 1)
+        RETURN
+    END_IF
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    LOOP(0)
+        SET_VALUE(LW(10), LW(0))
+        SET_VALUE(LW(11), LW(1))
+        SET_VALUE(LW(12), LW(2))
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_sub_check_intersect, LW(0), LW(2), LW(10), LW(12), -60, -2000, -60, 2000, LW(5))
+        IF_INT_EQUAL(GSW(0), 354)
+            IF_INT_EQUAL(GSWF(3874), 1)
+                IF_INT_EQUAL(LW(5), 1)
+                    BREAK_LOOP
+                END_IF
+            END_IF
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    SET_VALUE(GSWF(22), 1)
+    CALL(evt_pouch_receive_mail, 32)
+    SET_VALUE(GSWF(252), 1)
+    CALL(evt_sub_save_playtime, GSW(23))
+    CALL_CHILD(mail_evt)
+    RETURN
+EVT_END()
 
 #ifdef VERSION_G8ME01
 EVT_BEGIN(evt_sub_mail_event)
@@ -1626,21 +1686,71 @@ EVT_BEGIN(evt_sub_mail_event)
 EVT_END()
 #else
 s32 evt_sub_mail_event[] = {
-    131163, (s32)evt_sub_get_system_flag, -30000000, 131102, -30000000, 4096, 2, 33,
-    131163, (s32)evt_mario_get_mode, -30000000, 131097, -30000000, 0, 2, 33,
-    131163, (s32)evt_sub_get_mapname, -30000000, 131084, -30000000, (s32)"nok_01", 65630, (s32)mail_evt_nok_01,
-    2, 33, 131084, -30000000, (s32)"gor_03", 65630, (s32)mail_evt_gor_03, 2,
-    33, 131084, -30000000, (s32)"gor_02", 65628, (s32)mail_evt_gor_02, 65630, (s32)mail_evt_gor_02_2,
-    2, 33, 131084, -30000000, (s32)"gor_01", 65628, (s32)mail_evt_gor_01_2, 65630,
-    (s32)mail_evt_gor_01, 2, 33, 131084, -30000000, (s32)"gor_04", 65630, (s32)mail_evt_gor_04,
-    2, 33, 131084, -30000000, (s32)"rsh_03_a", 65630, (s32)mail_evt_rsh_03_a_2, 65630,
-    (s32)mail_evt_rsh_03_a, 2, 33, 131084, -30000000, (s32)"hom_00", 65630, (s32)mail_evt_hom_00,
-    2, 33, 131084, -30000000, (s32)"bom_01", 65630, (s32)mail_evt_bom_01, 2,
-    33, 131084, -30000000, (s32)"tik_00", 65630, (s32)mail_evt_tik_00, 2, 33,
-    131084, -30000000, (s32)"win_01", 65630, (s32)mail_evt_win_01, 2, 33, 131084,
-    -30000000, (s32)"tou_01", 65630, (s32)mail_evt_tou_01, 2, 33, 131084, -30000000,
-    (s32)"usu_01", 65630, (s32)mail_evt_usu_01, 2, 33, 131084, -30000000, (s32)"pik_00",
-    65630, (s32)mail_evt_pik_00, 2, 33, 2,
+    CALL(evt_sub_get_system_flag, LW(0))
+    IF_BITS_SET(LW(0), 4096)
+        RETURN
+    END_IF
+    CALL(evt_mario_get_mode, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        RETURN
+    END_IF
+    CALL(evt_sub_get_mapname, LW(0))
+    IF_STR_EQUAL(LW(0), STRING("nok_01"))
+        CALL_CHILD(mail_evt_nok_01)
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("gor_03"))
+        CALL_CHILD(mail_evt_gor_03)
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("gor_02"))
+        SPAWN_EVENT(mail_evt_gor_02)
+        CALL_CHILD(mail_evt_gor_02_2)
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("gor_01"))
+        SPAWN_EVENT(mail_evt_gor_01_2)
+        CALL_CHILD(mail_evt_gor_01)
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("gor_04"))
+        CALL_CHILD(mail_evt_gor_04)
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("rsh_03_a"))
+        CALL_CHILD(mail_evt_rsh_03_a_2)
+        CALL_CHILD(mail_evt_rsh_03_a)
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("hom_00"))
+        CALL_CHILD(mail_evt_hom_00)
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("bom_01"))
+        CALL_CHILD(mail_evt_bom_01)
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("tik_00"))
+        CALL_CHILD(mail_evt_tik_00)
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("win_01"))
+        CALL_CHILD(mail_evt_win_01)
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("tou_01"))
+        CALL_CHILD(mail_evt_tou_01)
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("usu_01"))
+        CALL_CHILD(mail_evt_usu_01)
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("pik_00"))
+        CALL_CHILD(mail_evt_pik_00)
+        RETURN
+    END_IF
+    RETURN
 };
 #endif
 
@@ -2181,7 +2291,7 @@ USER_FUNC(evt_sub_get_coin) {
 		iconFlagOn("iraiCoin", 0x102);
 		((s32*)eff->userdata)[14] = 5;
 		marioChgGetItemMotion();
-		event->userdata3 = winMgrEntry((WinMgrDesc*)coinget_window_desc);
+		event->userdata3 = winMgrEntry(coinget_window_desc);
 		winMgrOpen(event->userdata3);
 		winMgrSetParam(event->userdata3, work);
 		work[0] = coin;

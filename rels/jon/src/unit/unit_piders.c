@@ -16,6 +16,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
 #include "party/party_motion.h"
+#include "battle/battle_database_common.h"
 
 typedef struct PidersYarn { f32 x0; f32 y0; f32 z0; f32 x1; f32 y1; f32 z1; u8 alpha; } PidersYarn;
 static void piders_draw_yarn_sub(CameraId camera, void* param);
@@ -74,20 +75,20 @@ static void piders_get_next_target(s32* unitIdx, s32* partIdx);
 static void piders_get_target(s32* unitIdx, s32* partIdx);
 static void piders_draw_yarn_sub(CameraId camera, void* param);
 
-__declspec(section ".data") u64 fd_piders_negone_one_374;
-__declspec(section ".data") s32 fd_piders_neg_one_382[1];
-__declspec(section ".data") s32 fd_piders___local_PI_383[1];
-__declspec(section ".data") s32 fd_piders___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_piders_one_negone_373;
-__declspec(section ".data") s32 fd_piders___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_piders_one_381[1];
-__declspec(section ".data") u64 fd_piders_negone_one_360;
-__declspec(section ".data") s32 fd_piders_neg_one_365[1];
-__declspec(section ".data") s32 fd_piders___local_PI_366[1];
-__declspec(section ".data") s32 fd_piders___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_piders_one_negone_359;
-__declspec(section ".data") s32 fd_piders___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_piders_one_364[1];
+__declspec(section ".data") f32 fd_piders_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_piders_neg_one_382;
+__declspec(section ".data") f32 fd_piders___local_PI_383;
+__declspec(section ".data") f32 fd_piders___local_3PIO2_385;
+__declspec(section ".data") f32 fd_piders_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_piders___local_PIO2_384;
+__declspec(section ".data") f32 fd_piders_one_381;
+__declspec(section ".data") f32 fd_piders_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_piders_neg_one_365;
+__declspec(section ".data") f32 fd_piders___local_PI_366;
+__declspec(section ".data") f32 fd_piders___local_3PIO2_368;
+__declspec(section ".data") f32 fd_piders_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_piders___local_PIO2_367;
+__declspec(section ".data") f32 fd_piders_one_364;
 BattleUnitKind unit_piders;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -95,8 +96,8 @@ static __declspec(section ".data") StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
 static __declspec(section ".data") BattleDataEntry data_table[5];
 static BattleUnitKindPart parts[5];
-static s32 weapon_piders_attack[48];
-static s32 weapon_piders_renzoku_attack[48];
+static BattleWeapon weapon_piders_attack;
+static BattleWeapon weapon_piders_renzoku_attack;
 static s32 init_event[53];
 static s32 dmg_first_attack_pos[19];
 static s32 yarn_event[44];
@@ -130,53 +131,33 @@ static USER_FUNC(piders_yarn_init) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_piders_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_piders_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_piders_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_piders_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_piders___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_piders___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_piders___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_piders___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_piders_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_piders_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_piders___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_piders___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_piders_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_piders_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_piders_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_piders_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_piders_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_piders_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_piders___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_piders___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_piders___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_piders___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_piders_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_piders_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_piders___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_piders___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_piders_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_piders_one_364 = 1.0f;
 
 BattleUnitKind unit_piders = {
     27,
@@ -447,22 +428,76 @@ static void piders_get_next_target(s32* unitIdx, s32* partIdx) {
     }
 }
 
-static s32 weapon_piders_attack[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    2, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 135, 2047, -2147475456,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_piders_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_piders_renzoku_attack[] = {
-    0, 0, 0, 0, 1677721602, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536870912, 770, 0, 135, 2047, -2147475456,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_piders_renzoku_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    2, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x87, // special
+    0x7FF, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static EVT_BEGIN(init_event)
@@ -534,48 +569,82 @@ static __declspec(section ".data") EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-static s32 dead_event[] = {
-    131122, -30000000, 48, 393307, (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_BTL_ENEMY_DIE1_1", -250000000,
-    0, -250000000, 65539, 10, 65545, 1, 327771, (s32)btlevtcmd_AddRotate,
-    -29999990, 0, -15, 0, 131126, -30000000, 1, 131099,
-    -30000000, 0, 65540, 10, 33, 327771, (s32)btlevtcmd_SetRotate, -29999990,
-    0, 0, 0, 393307, (s32)btlevtcmd_snd_se, -29999990, (s32)"SFX_BTL_ENEMY_DIE1_2", -250000000,
-    0, -250000000, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999, -29999998,
-    131125, -29999998, 10, 983131, (s32)evt_eff64, (s32)"", (s32)"expbom_n64", -30000000,
-    -29999999, -29999998, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 196699, (s32)btlevtcmd_GetCoin, -29999990, -30000000, 131163,
-    (s32)btlevtcmd_StoreCoin, -30000000, 196699, (s32)btlevtcmd_GetExp, -29999990, -30000000, 131163, (s32)btlevtcmd_StoreExp,
-    -30000000, 327771, (s32)btlevtcmd_GetPos, -29999990, -29999997, -29999999, -29999998, 131125,
-    -29999998, 10, 131125, -29999999, 30, 327771, (s32)_add_star_point_disp_offset, -29999990,
-    -29999997, -29999999, -29999998, 983131, (s32)evt_eff, (s32)"", (s32)"star_point", 0,
-    -29999997, -29999999, -29999998, -30000000, 0, 0, 0, 0,
-    0, 0, 0, 131101, -30000000, 1, 65541, -30000000,
-    6, 33, 327771, (s32)btlevtcmd_SetRotateOffset, -29999990, 0, 0, 0,
-    131122, -30000000, 30, 65539, 20, 65545, 1, 327771,
-    (s32)btlevtcmd_AddRotate, -29999990, 3, 0, 0, 131126, -30000000, 1,
-    131099, -30000000, 0, 65540, 20, 33, 262235, (s32)btlevtcmd_OnPartsAttribute,
-    -29999990, 1, 16777216, 262235, (s32)btlevtcmd_OnPartsAttribute, -29999990, 1, 33554432,
-    262235, (s32)btlevtcmd_OnPartsAttribute, -29999990, 1, 65536, 196699, (s32)btlevtcmd_OnAttribute, -29999990,
-    268435456, 196699, (s32)btlevtcmd_SetMaxMoveCount, -29999990, 0, 196699, (s32)btlevtcmd_OnAttribute, -29999990,
-    33554432, 327771, (s32)btlevtcmd_SetPos, -29999990, 0, -1000, 0, 196699,
-    (s32)btlevtcmd_KillUnit, -29999990, 1, 2, 1,
-};
+static EVT_BEGIN(dead_event)
+    SET_VALUE(LW(0), 48)
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_1"), -250000000, 0, -250000000)
+    LABEL(10)
+    WAIT_FRAMES(1)
+    CALL(btlevtcmd_AddRotate, LW(10), 0, -15, 0)
+    SUBTRACT(LW(0), 1)
+    IF_INT_GREATER(LW(0), 0)
+        GOTO(10)
+    END_IF
+    CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+    ADD(LW(2), 10)
+    CALL(evt_eff64, STRING(""), STRING("expbom_n64"), LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_GetCoin, LW(10), LW(0))
+    CALL(btlevtcmd_StoreCoin, LW(0))
+    CALL(btlevtcmd_GetExp, LW(10), LW(0))
+    CALL(btlevtcmd_StoreExp, LW(0))
+    CALL(btlevtcmd_GetPos, LW(10), LW(3), LW(1), LW(2))
+    ADD(LW(2), 10)
+    ADD(LW(1), 30)
+    CALL(_add_star_point_disp_offset, LW(10), LW(3), LW(1), LW(2))
+    CALL(evt_eff, STRING(""), STRING("star_point"), 0, LW(3), LW(1), LW(2), LW(0), 0, 0, 0, 0, 0, 0, 0)
+    IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+        LOOP(LW(0))
+        END_LOOP
+    END_IF
+    CALL(btlevtcmd_SetRotateOffset, LW(10), 0, 0, 0)
+    SET_VALUE(LW(0), 30)
+    LABEL(20)
+    WAIT_FRAMES(1)
+    CALL(btlevtcmd_AddRotate, LW(10), 3, 0, 0)
+    SUBTRACT(LW(0), 1)
+    IF_INT_GREATER(LW(0), 0)
+        GOTO(20)
+    END_IF
+    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 65536)
+    CALL(btlevtcmd_OnAttribute, LW(10), 268435456)
+    CALL(btlevtcmd_SetMaxMoveCount, LW(10), 0)
+    CALL(btlevtcmd_OnAttribute, LW(10), 33554432)
+    CALL(btlevtcmd_SetPos, LW(10), 0, -1000, 0)
+    CALL(btlevtcmd_KillUnit, LW(10), 1)
+    RETURN
+EVT_END()
 
-static s32 blow_dead_event[] = {
-    196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_CLAUD_BREATH3", 0, 196699, (s32)btlevtcmd_GetBodyId, -2, -30000000,
-    262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -30000000, 39, 110, 65539, 0,
-    327771, (s32)btlevtcmd_AddRotate, -2, 0, 20, 0, 65545, 1,
-    65540, 0, 112, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229997952, 327771,
-    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_GetStageSize, -30000000,
-    -250000000, -250000000, 131125, -29999999, 40, 655451, (s32)btlevtcmd_DivePosition, -2,
-    -30000000, -29999999, -29999998, 0, -10, 2, 0, -1,
-    196699, (s32)btlevtcmd_GetCoin, -29999990, -30000000, 131163, (s32)btlevtcmd_StoreCoin, -30000000, 196699,
-    (s32)btlevtcmd_GetExp, -29999990, -30000000, 131163, (s32)btlevtcmd_StoreExp, -30000000, 262235, (s32)btlevtcmd_OnPartsAttribute,
-    -29999990, 1, 16777216, 262235, (s32)btlevtcmd_OnPartsAttribute, -29999990, 1, 65536,
-    196699, (s32)btlevtcmd_OnAttribute, -29999990, 268435456, 196699, (s32)btlevtcmd_SetMaxMoveCount, -29999990, 0,
-    196699, (s32)btlevtcmd_OnAttribute, -29999990, 33554432, 327771, (s32)btlevtcmd_SetPos, -29999990, 0,
-    -1000, 0, 196699, (s32)btlevtcmd_KillUnit, -29999990, 1, 2, 1,
-};
+static EVT_BEGIN(blow_dead_event)
+    CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
+    CALL(btlevtcmd_GetBodyId, -2, LW(0))
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(0), 39)
+    BEGIN_SIBLING_EVENT
+        LABEL(0)
+        CALL(btlevtcmd_AddRotate, -2, 0, 20, 0)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(2.0f))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStageSize, LW(0), -250000000, -250000000)
+    ADD(LW(1), 40)
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 0, -10, 2, 0, -1)
+    CALL(btlevtcmd_GetCoin, LW(10), LW(0))
+    CALL(btlevtcmd_StoreCoin, LW(0))
+    CALL(btlevtcmd_GetExp, LW(10), LW(0))
+    CALL(btlevtcmd_StoreExp, LW(0))
+    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 65536)
+    CALL(btlevtcmd_OnAttribute, LW(10), 268435456)
+    CALL(btlevtcmd_SetMaxMoveCount, LW(10), 0)
+    CALL(btlevtcmd_OnAttribute, LW(10), 33554432)
+    CALL(btlevtcmd_SetPos, LW(10), 0, -1000, 0)
+    CALL(btlevtcmd_KillUnit, LW(10), 1)
+    RETURN
+EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(battle_end_event)
     CALL(btlevtcmd_SetUnitWork, -2, 1, 254)
@@ -613,29 +682,50 @@ static EVT_BEGIN(yure_event)
     RETURN
 EVT_END()
 
-static s32 move_kuutei_event[] = {
-    262235, (s32)btlevtcmd_GetUnitWork, -2, 3, -30000000, 131096, -30000000, 1,
-    262235, (s32)btlevtcmd_SetUnitWork, -2, 3, 0, 110, 65541, 4,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_PAIDA_MOVE1", -250000000, 0, -250000000, 65545,
-    7, 6, 112, 32, 110, 65541, 4, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_PAIDA_MOVE2", -250000000, 0, -250000000, 65545, 7,
-    6, 112, 33, 65630, (s32)yure_event, 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 131122, -29999999, 10, 655451, (s32)btlevtcmd_DivePosition,
-    -2, -30000000, -29999999, -29999998, 30, -10, 4, 0,
-    -1, 327771, (s32)btlevtcmd_SetHomePos, -2, -30000000, -29999999, -29999998, 262235,
-    (s32)btlevtcmd_OffPartsAttribute, -2, 1, 6291456, 262235, (s32)btlevtcmd_SetUnitWork, -2, 0,
-    1, 2, 1,
-};
+static EVT_BEGIN(move_kuutei_event)
+    CALL(btlevtcmd_GetUnitWork, -2, 3, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(btlevtcmd_SetUnitWork, -2, 3, 0)
+        BEGIN_SIBLING_EVENT
+            LOOP(4)
+                CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_PAIDA_MOVE1"), -250000000, 0, -250000000)
+                WAIT_FRAMES(7)
+            END_LOOP
+        END_SIBLING_EVENT
+    ELSE
+        BEGIN_SIBLING_EVENT
+            LOOP(4)
+                CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_PAIDA_MOVE2"), -250000000, 0, -250000000)
+                WAIT_FRAMES(7)
+            END_LOOP
+        END_SIBLING_EVENT
+    END_IF
+    CALL_CHILD(yure_event)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    SET_VALUE(LW(1), 10)
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 30, -10, 4, 0, -1)
+    CALL(btlevtcmd_SetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_OffPartsAttribute, -2, 1, 6291456)
+    CALL(btlevtcmd_SetUnitWork, -2, 0, 1)
+    RETURN
+EVT_END()
 
-static s32 move_kuuchu_event[] = {
-    65628, (s32)yure_event, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998,
-    131122, -29999999, 70, 110, 65541, 4, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_PAIDA_MOVE2", -250000000, 0, -250000000, 65545, 7, 6,
-    112, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999, -29999998, 30,
-    10, 4, 0, -1, 327771, (s32)btlevtcmd_SetHomePos, -2, -30000000,
-    -29999999, -29999998, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, 1, 6291456, 262235,
-    (s32)btlevtcmd_SetUnitWork, -2, 0, 0, 2, 1,
-};
+static EVT_BEGIN(move_kuuchu_event)
+    SPAWN_EVENT(yure_event)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    SET_VALUE(LW(1), 70)
+    BEGIN_SIBLING_EVENT
+        LOOP(4)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_PAIDA_MOVE2"), -250000000, 0, -250000000)
+            WAIT_FRAMES(7)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 30, 10, 4, 0, -1)
+    CALL(btlevtcmd_SetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_OnPartsAttribute, -2, 1, 6291456)
+    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), 67108865)
@@ -711,11 +801,11 @@ static EVT_BEGIN(attack_event)
     SUBTRACT(LW(0), 1)
     CALL(evt_sub_random, LW(0), LW(1))
     IF_INT_LESS(LW(1), 50)
-        SET_VALUE(LW(9), PTR(weapon_piders_attack))
+        SET_VALUE(LW(9), PTR(&weapon_piders_attack))
         CALL_CHILD(PTR(normal_attack_event))
         GOTO(99)
     END_IF
-    SET_VALUE(LW(9), PTR(weapon_piders_renzoku_attack))
+    SET_VALUE(LW(9), PTR(&weapon_piders_renzoku_attack))
     CALL_CHILD(PTR(renzoku_attack_event))
     GOTO(99)
     LABEL(99)
@@ -783,46 +873,77 @@ static EVT_BEGIN(damage_check_event_sub)
     RETURN
 EVT_END()
 
-static s32 piders_attack_common_event1[] = {
-    458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996, 16, -29999992,
-    196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999992, 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
-    -29999999, -29999998, 131125, -29999998, -229996928, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    1, (s32)"PAI_A_1", 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"PAI_A_2a", 393307,
-    (s32)btlevtcmd_SetPartsPos, -2, 2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_OffPartsAttribute,
-    -2, 2, 16777216, 196699, (s32)btlevtcmd_GetStatusMg, -2, -29999999, 131124,
-    -30000000, -229969280, 131132, -30000000, -29999999, 393307, (s32)btlevtcmd_SetPartsRotateOffset, -2,
-    2, 0, -30000000, 0, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_PAIDA_ATTACK1",
-    -250000000, 0, -250000000, 327771, (s32)evt_sub_intpl_init, 4, 0, 110,
-    5, 65541, 5, 65627, (s32)evt_sub_intpl_get_value, 131127, -30000000, -29999992,
-    393307, (s32)btlevtcmd_SetPartsRotate, -2, 2, 0, 0, -30000000, 65545,
-    1, 6, 65545, 20, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_PAIDA_ATTACK1",
-    -250000000, 0, -250000000, 327771, (s32)evt_sub_intpl_init, 4, 110, 70,
-    5, 65541, 5, 65627, (s32)evt_sub_intpl_get_value, 131127, -30000000, -29999992,
-    393307, (s32)btlevtcmd_SetPartsRotate, -2, 2, 0, 0, -30000000, 65545,
-    1, 6, 65545, 15, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_PAIDA_ATTACK1",
-    -250000000, 0, -250000000, 327771, (s32)evt_sub_intpl_init, 4, 70, 100,
-    5, 65541, 5, 65627, (s32)evt_sub_intpl_get_value, 131127, -30000000, -29999992,
-    393307, (s32)btlevtcmd_SetPartsRotate, -2, 2, 0, 0, -30000000, 65545,
-    1, 6, 65545, 10, 262235, (s32)btlevtcmd_SetUnitWork, -2, 4,
-    -30000000, 2, 1,
-};
+static EVT_BEGIN(piders_attack_common_event1)
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(8))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(8))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    ADD(LW(2), FLOAT(3.0f))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PAI_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("PAI_A_2a"))
+    CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
+    CALL(btlevtcmd_GetStatusMg, -2, LW(1))
+    SET_FLOAT_VALUE(LW(0), FLOAT(30.0f))
+    MULTIPLY_FLOAT(LW(0), LW(1))
+    CALL(btlevtcmd_SetPartsRotateOffset, -2, 2, 0, LW(0), 0)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_PAIDA_ATTACK1"), -250000000, 0, -250000000)
+    CALL(evt_sub_intpl_init, 4, 0, 110, 5)
+    LOOP(5)
+        CALL(evt_sub_intpl_get_value)
+        MULTIPLY(LW(0), LW(8))
+        CALL(btlevtcmd_SetPartsRotate, -2, 2, 0, 0, LW(0))
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_FRAMES(20)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_PAIDA_ATTACK1"), -250000000, 0, -250000000)
+    CALL(evt_sub_intpl_init, 4, 110, 70, 5)
+    LOOP(5)
+        CALL(evt_sub_intpl_get_value)
+        MULTIPLY(LW(0), LW(8))
+        CALL(btlevtcmd_SetPartsRotate, -2, 2, 0, 0, LW(0))
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_FRAMES(15)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_PAIDA_ATTACK1"), -250000000, 0, -250000000)
+    CALL(evt_sub_intpl_init, 4, 70, 100, 5)
+    LOOP(5)
+        CALL(evt_sub_intpl_get_value)
+        MULTIPLY(LW(0), LW(8))
+        CALL(btlevtcmd_SetPartsRotate, -2, 2, 0, 0, LW(0))
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_FRAMES(10)
+    CALL(btlevtcmd_SetUnitWork, -2, 4, LW(0))
+    RETURN
+EVT_END()
 
-static s32 piders_attack_common_event1_2[] = {
-    458843, (s32)btlevtcmd_CalculateFaceDirection, -2, -1, -29999997, -29999996, 16, -29999992,
-    196699, (s32)btlevtcmd_ChangeFaceDirection, -2, -29999992, 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
-    -29999999, -29999998, 131125, -29999998, -229996928, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    1, (s32)"PAI_A_1", 262235, (s32)btlevtcmd_AnimeChangePose, -2, 2, (s32)"PAI_A_2a", 393307,
-    (s32)btlevtcmd_SetPartsPos, -2, 2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_OffPartsAttribute,
-    -2, 2, 16777216, 262235, (s32)btlevtcmd_CheckStatus, -2, 11, -30000000,
-    196699, (s32)btlevtcmd_GetStatusMg, -2, -29999999, 131124, -30000000, -229969280, 131132,
-    -30000000, -29999999, 393307, (s32)btlevtcmd_SetPartsRotateOffset, -2, 2, 0, -30000000,
-    0, 262235, (s32)btlevtcmd_GetUnitWork, -2, 4, -30000000, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_PAIDA_ATTACK1", -250000000, 0, -250000000, 327771, (s32)evt_sub_intpl_init, 4,
-    -30000000, 100, 5, 65541, 5, 65627, (s32)evt_sub_intpl_get_value, 131127,
-    -30000000, -29999992, 393307, (s32)btlevtcmd_SetPartsRotate, -2, 2, 0, 0,
-    -30000000, 65545, 1, 6, 65545, 5, 262235, (s32)btlevtcmd_SetUnitWork,
-    -2, 4, -30000000, 2, 1,
-};
+static EVT_BEGIN(piders_attack_common_event1_2)
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(8))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(8))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    ADD(LW(2), FLOAT(3.0f))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PAI_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("PAI_A_2a"))
+    CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
+    CALL(btlevtcmd_CheckStatus, -2, 11, LW(0))
+    CALL(btlevtcmd_GetStatusMg, -2, LW(1))
+    SET_FLOAT_VALUE(LW(0), FLOAT(30.0f))
+    MULTIPLY_FLOAT(LW(0), LW(1))
+    CALL(btlevtcmd_SetPartsRotateOffset, -2, 2, 0, LW(0), 0)
+    CALL(btlevtcmd_GetUnitWork, -2, 4, LW(0))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_PAIDA_ATTACK1"), -250000000, 0, -250000000)
+    CALL(evt_sub_intpl_init, 4, LW(0), 100, 5)
+    LOOP(5)
+        CALL(evt_sub_intpl_get_value)
+        MULTIPLY(LW(0), LW(8))
+        CALL(btlevtcmd_SetPartsRotate, -2, 2, 0, 0, LW(0))
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_FRAMES(5)
+    CALL(btlevtcmd_SetUnitWork, -2, 4, LW(0))
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(piders_attack_common_event2)
     CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(8))
@@ -839,17 +960,20 @@ static EVT_BEGIN(piders_attack_common_event2)
     RETURN
 EVT_END()
 
-static s32 piders_attack_common_event3[] = {
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_PAIDA_ATTACK2", -250000000, 0, -250000000, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, -29999993, (s32)"PAI_A_3a", 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
-    -29999999, -29999998, 131125, -29999999, 20, 393307, (s32)btlevtcmd_JumpPartsSetting, -2,
-    -29999993, 0, -229993856, -229999744, 393307, (s32)btlevtcmd_SetPartsPos, -2, -29999993,
-    -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_OffPartsAttribute, -2, -29999993, 16777216,
-    262235, (s32)btlevtcmd_OffPartsAttribute, -2, -29999993, 33554432, 393307, (s32)btlevtcmd_SetPartsScale, -2,
-    -29999993, -229997952, -229997952, -229997952, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996,
-    -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_JumpPartsPosition, -2, -29999993, -30000000,
-    -29999999, -29999998, 0, -1, 2, 1,
-};
+static EVT_BEGIN(piders_attack_common_event3)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_PAIDA_ATTACK2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, LW(7), STRING("PAI_A_3a"))
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    ADD(LW(1), 20)
+    CALL(btlevtcmd_JumpPartsSetting, -2, LW(7), 0, FLOAT(6.0f), FLOAT(0.25f))
+    CALL(btlevtcmd_SetPartsPos, -2, LW(7), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_OffPartsAttribute, -2, LW(7), 16777216)
+    CALL(btlevtcmd_OffPartsAttribute, -2, LW(7), 33554432)
+    CALL(btlevtcmd_SetPartsScale, -2, LW(7), FLOAT(2.0f), FLOAT(2.0f), FLOAT(2.0f))
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPartsPosition, -2, LW(7), LW(0), LW(1), LW(2), 0, -1)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
@@ -993,7 +1117,8 @@ static EVT_BEGIN(renzoku_attack_event_sub_last)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 wait_event[] = {
-    196699, (s32)btlevtcmd_AnimeChangePoseFromTable, -2, 1, 2, 1, 0,
-};
+static __declspec(section ".data") EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    RETURN
+EVT_END_PAD()
 

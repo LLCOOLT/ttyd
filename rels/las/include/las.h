@@ -1,10 +1,11 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "driver/npcdrv.h"
 
 extern s32 box_syutugen[];
-extern s32 btl_las_setup_no_tbl[];
-extern s32 btlsetup_las_tbl[];
+extern NpcTerritoryInfo btl_las_setup_no_tbl[];
+extern NpcSetupBattleInfo btlsetup_las_tbl[];
 extern s32 hikari_evt[];
 extern s32 las_00_init_evt[];
 extern s32 las_01_init_evt[];
@@ -44,15 +45,15 @@ extern s32 shuryolight_head_tenmetu[];
 extern s32 shuryolight_pow_normal[];
 extern s32 shuryolight_pow_tenmetu[];
 extern s32 shuryolight_tue_normal[];
-extern s32 unit_basabasa_chururu[];
-extern s32 unit_boss_black_peach[];
-extern s32 unit_boss_bunbaba[];
-extern s32 unit_honenoko[];
-extern s32 unit_karon[];
-extern s32 unit_phantom[];
-extern s32 unit_super_killer[];
-extern s32 unit_super_mahorn[];
-extern s32 unit_wanwan[];
+extern BattleUnitKind unit_basabasa_chururu;
+extern BattleUnitKind unit_boss_black_peach;
+extern BattleUnitKind unit_boss_bunbaba;
+extern BattleUnitKind unit_honenoko;
+extern BattleUnitKind unit_karon;
+extern BattleUnitKind unit_phantom;
+extern BattleUnitKind unit_super_killer;
+extern BattleUnitKind unit_super_mahorn;
+extern BattleUnitKind unit_wanwan;
 
 extern s32 evt_cloud_main_evt[];
 extern s32 firebar_coin[];

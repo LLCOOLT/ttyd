@@ -60,11 +60,11 @@ USER_FUNC(pre_kurio_use) {
     }
     {
         struct { u8 pad[0x15]; char n[0x20]; }* mobj;
-        hit = *(void**)((u8*)mario + 0x1ec + MW_US);
+        hit = ((MarioWork*)mario)->hitobjPush;
         if (!hit || !(hitGetAttr(hit) & 0x80000000)) {
-            hit = *(void**)((u8*)mario + 0x1e0 + MW_US);
+            hit = ((MarioWork*)mario)->hitobjFront;
             if (!hit || !(hitGetAttr(hit) & 0x80000000)) {
-                hit = *(void**)((u8*)mario + 0x1e4 + MW_US);
+                hit = ((MarioWork*)mario)->hitobjStandOn;
                 if (!hit || !(hitGetAttr(hit) & 0x80000000)) {
                     event->lwData[0] = (s32)"msg_kuri_map";
                     return EVT_RETURN_DONE;
@@ -172,25 +172,24 @@ USER_FUNC(post_kurio_use) {
 }
 
 void kuribo_init_800C23B4(PartyEntry* party) {
-    party->field_32[1] = 1;
-    party->field_32[0] = 0;
+    party->memberKind = 1;
+    party->moveKind = 0;
     party->height = 24.0f;
     party->width = 26.0f;
     msg_ep = 0;
 }
 
 USER_FUNC(evt_msg_print);
-s32 kurio_msg_evt[] = {
-    0x0001005B, (s32)pre_kurio_use,
-    0x00020018, 0xFE363C80, 0x00000000,
-    0x0001005B, (s32)post_kurio_use,
-    0x00000002,
-    0x00000021,
-    0x0005005B, (s32)evt_msg_print, 0x00000000, 0xFE363C80, 0x00000000, (s32)"party",
-    0x0001005B, (s32)post_kurio_use,
-    0x00000002,
-    0x00000001,
-};
+EVT_BEGIN(kurio_msg_evt)
+    CALL(pre_kurio_use)
+    IF_INT_EQUAL(4264967296, 0)
+        CALL(post_kurio_use)
+        RETURN
+    END_IF
+    CALL(evt_msg_print, 0, 4264967296, 0, STRING("party"))
+    CALL(post_kurio_use)
+    RETURN
+EVT_END()
 void* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 angle);
 BOOL partyGetAppearPos3(PartyEntry* party, Vec* pos);
 s32 fbatNpcTalkCheck(void);
@@ -254,7 +253,7 @@ void kuribo_use(PartyEntry* party) {
 
     switch (party->useMotionId) {
     case 0:
-        if (!partyGetAppearPos3(party, (Vec*)((u8*)party + 0x94))) {
+        if (!partyGetAppearPos3(party, &party->moveTarget)) {
             party->flags |= 0x04000000;
             party->flags |= 0x02000000;
         }
@@ -268,7 +267,7 @@ void kuribo_use(PartyEntry* party) {
         party->useMotionId = 1;
         break;
     case 1:
-        if (!partyGetAppearPos3(party, (Vec*)((u8*)party + 0x94))) {
+        if (!partyGetAppearPos3(party, &party->moveTarget)) {
             party->flags |= 0x04000000;
             party->flags |= 0x02000000;
         }

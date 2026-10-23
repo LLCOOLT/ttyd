@@ -35,10 +35,18 @@ typedef struct EffIceN64Work {
     EffIceN64Piece pieces[8]; // 0x30
 } EffIceN64Work;
 
-u32 ice_vtx[14] = { 0xFFF0FFF0, 0x00000000, 0x00000000, 0x00FF0010, 0xFFF00000, 0x08000000, 0x000000FF,
-                    0x00100010, 0x00000800, 0x08000000, 0x00FFFFF0, 0x00100000, 0x00000800, 0x000000FF };
-u32 ice_s_vtx[14] = { 0xFFFCFFFC, 0x00000000, 0x00000000, 0x00FF0004, 0xFFFC0000, 0x08000000, 0x000000FF,
-                      0x00040004, 0x00000800, 0x08000000, 0x00FFFFFC, 0x00040000, 0x00000800, 0x000000FF };
+effN64Vtx ice_vtx[] = {
+    {-16, -16, 0, 0, 0, 0, 0, 0, 255},
+    {16, -16, 0, 2048, 0, 0, 0, 0, 255},
+    {16, 16, 0, 2048, 2048, 0, 0, 0, 255},
+    {-16, 16, 0, 0, 2048, 0, 0, 0, 255},
+};
+effN64Vtx ice_s_vtx[] = {
+    {-4, -4, 0, 0, 0, 0, 0, 0, 255},
+    {4, -4, 0, 2048, 0, 0, 0, 0, 255},
+    {4, 4, 0, 2048, 2048, 0, 0, 0, 255},
+    {-4, 4, 0, 0, 2048, 0, 0, 0, 255},
+};
 
 static void effIceMain(EffectEntry* effect);
 static void effIceDisp(CameraId cameraId, EffectEntry* effect);
@@ -139,7 +147,7 @@ static void effIceDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
     GXTexObj texObj;
     s32 i;
-    u32* vtx;
+    effN64Vtx* vtx;
 
     cam = camGetPtr(cameraId);
     work = effect->userdata;
@@ -175,7 +183,7 @@ static void effIceDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXScale(scale, 0.03125f, 0.03125f, 0.0f);
             GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
         }
-        effSetVtxDescN64((effN64Vtx*)vtx);
+        effSetVtxDescN64(vtx);
         if (i & 1) {
             PSMTXTrans(trans, ((EffIceN64Piece*)work)->x, ((EffIceN64Piece*)work)->y, ((EffIceN64Piece*)work)->z);
         } else {

@@ -5,6 +5,7 @@
 #include "mario/mario.h"
 #include "party.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_npc.h"
 
 double fmod(double x, double y);
 
@@ -54,79 +55,59 @@ USER_FUNC(evt_sub_spline_get_value);
 USER_FUNC(evt_sub_spline_init);
 static USER_FUNC(mario_kirimomi);
 
-__declspec(section ".data") u64 fd_moo_04_negone_one_374;
-__declspec(section ".data") s32 fd_moo_04_neg_one_382[1];
-__declspec(section ".data") s32 fd_moo_04___local_PI_383[1];
-__declspec(section ".data") s32 fd_moo_04___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_moo_04_one_negone_373;
-__declspec(section ".data") s32 fd_moo_04___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_moo_04_one_381[1];
-__declspec(section ".data") u64 fd_moo_04_negone_one_360;
-__declspec(section ".data") s32 fd_moo_04_neg_one_365[1];
-__declspec(section ".data") s32 fd_moo_04___local_PI_366[1];
-__declspec(section ".data") s32 fd_moo_04___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_moo_04_one_negone_359;
-__declspec(section ".data") s32 fd_moo_04___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_moo_04_one_364[1];
-static __declspec(section ".data") s32 spline_dt[9];
+__declspec(section ".data") f32 fd_moo_04_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_moo_04_neg_one_382;
+__declspec(section ".data") f32 fd_moo_04___local_PI_383;
+__declspec(section ".data") f32 fd_moo_04___local_3PIO2_385;
+__declspec(section ".data") f32 fd_moo_04_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_moo_04___local_PIO2_384;
+__declspec(section ".data") f32 fd_moo_04_one_381;
+__declspec(section ".data") f32 fd_moo_04_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_moo_04_neg_one_365;
+__declspec(section ".data") f32 fd_moo_04___local_PI_366;
+__declspec(section ".data") f32 fd_moo_04___local_3PIO2_368;
+__declspec(section ".data") f32 fd_moo_04_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_moo_04___local_PIO2_367;
+__declspec(section ".data") f32 fd_moo_04_one_364;
+static __declspec(section ".data") f32 spline_dt[9];
 static s32 party_damage_pose[52];
 static s32 mario_fly[168];
 s32 kanbu_fly[198];
-static s32 npcEnt[46];
+static NpcSetupInfo npcEnt[2];
 static s32 epilogue_evt[64];
 s32 moo_04_init_evt[220];
 
-__declspec(section ".data") u64 fd_moo_04_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_moo_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_moo_04_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_moo_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_moo_04___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_moo_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_moo_04___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_moo_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_moo_04_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_moo_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_moo_04___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_moo_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_moo_04_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_moo_04_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_moo_04_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_moo_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_moo_04_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_moo_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_moo_04___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_moo_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_moo_04___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_moo_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_moo_04_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_moo_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_moo_04___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_moo_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_moo_04_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_moo_04_one_364 = 1.0f;
 
-static __declspec(section ".data") s32 spline_dt[] = {
-    -1051808838, 1123529511, 1140866681, 1099929585, 1110979381, 1084252494, 1115836149, 1111595424,
-    -1030315019,
+static __declspec(section ".data") f32 spline_dt[] = {
+    -12.916925f, 123.84991f, 512.97614f, 17.94919f, 46.050007f, 5.011878f, 65.15421f, 48.400024f,
+    -75.32023f,
 };
 
 static EVT_BEGIN(party_damage_pose)
@@ -270,13 +251,17 @@ EVT_BEGIN(kanbu_fly)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"幹部"*/"\x8A\xB2\x95\x94", 1073743360, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"幹部"*/"\x8A\xB2\x95\x94", // name
+        0x40000600, // flags
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
+        NULL, 0, // blowEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static EVT_BEGIN(epilogue_evt)

@@ -22,14 +22,14 @@ void shadowDisp(CameraId cameraId, void* param);
 BOOL _filter(HitCheckQuery* query, HitEntry* hit);
 
 //.data (static data from inlined header functions)
-__declspec(section ".data") s32 shadow_lbl_0[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 shadow_negone_one_374[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 shadow_lbl_1[] = {1065353216, -1082130432};
-__declspec(section ".data") s32 shadow_one_negone_373[] = {1065353216, -1082130432};
-__declspec(section ".data") s32 shadow_lbl_2[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 shadow_negone_one_360[] = {-1082130432, 1065353216};
-__declspec(section ".data") s32 shadow_lbl_3[] = {1065353216, -1082130432};
-__declspec(section ".data") s32 shadow_one_negone_359[] = {1065353216, -1082130432};
+__declspec(section ".data") f32 shadow_lbl_0[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 shadow_negone_one_374[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 shadow_lbl_1[] = {1.0f, -1.0f};
+__declspec(section ".data") f32 shadow_one_negone_373[] = {1.0f, -1.0f};
+__declspec(section ".data") f32 shadow_lbl_2[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 shadow_negone_one_360[] = {-1.0f, 1.0f};
+__declspec(section ".data") f32 shadow_lbl_3[] = {1.0f, -1.0f};
+__declspec(section ".data") f32 shadow_one_negone_359[] = {1.0f, -1.0f};
 
 static ShadowConfig shadowConfig[2] = {
     {0, {-100.0f, 256.0f, 335.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, -20.0f, 20.0f, 356.0f, 741.0f, 0, 3, 0, -4.47f},

@@ -32,29 +32,29 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon);
 
-__declspec(section ".data") u64 fd_las_19_negone_one_374;
-__declspec(section ".data") s32 fd_las_19_neg_one_382[1];
-__declspec(section ".data") s32 fd_las_19___local_PI_383[1];
-__declspec(section ".data") s32 fd_las_19___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_las_19_one_negone_373;
-__declspec(section ".data") s32 fd_las_19___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_las_19_one_381[1];
-__declspec(section ".data") u64 fd_las_19_negone_one_360;
-__declspec(section ".data") s32 fd_las_19_neg_one_365[1];
-__declspec(section ".data") s32 fd_las_19___local_PI_366[1];
-__declspec(section ".data") s32 fd_las_19___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_las_19_one_negone_359;
-__declspec(section ".data") s32 fd_las_19___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_las_19_one_364[1];
+__declspec(section ".data") f32 fd_las_19_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_19_neg_one_382;
+__declspec(section ".data") f32 fd_las_19___local_PI_383;
+__declspec(section ".data") f32 fd_las_19___local_3PIO2_385;
+__declspec(section ".data") f32 fd_las_19_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_19___local_PIO2_384;
+__declspec(section ".data") f32 fd_las_19_one_381;
+__declspec(section ".data") f32 fd_las_19_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_19_neg_one_365;
+__declspec(section ".data") f32 fd_las_19___local_PI_366;
+__declspec(section ".data") f32 fd_las_19___local_3PIO2_368;
+__declspec(section ".data") f32 fd_las_19_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_las_19___local_PIO2_367;
+__declspec(section ".data") f32 fd_las_19_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static s32 e1_door_close[22];
 static s32 e1_door_open[22];
 static s32 e2_door_close[22];
 static s32 e2_door_open[22];
-static s32 bero_entry_data[75];
-s32 mapgrp_name_1[18];
-__declspec(section ".data") s32 mapgrp_name_2[5];
+static BeroEntry bero_entry_data[5];
+const char* mapgrp_name_1[18];
+__declspec(section ".data") const char* mapgrp_name_2[5];
 static __declspec(section ".data") s32 cam_shake[8];
 s32 change_map_evt[359];
 static s32 switch1_evt[13];
@@ -62,53 +62,33 @@ static s32 switch2_evt[13];
 static __declspec(section ".data") s32 cloud_evt[5];
 s32 las_19_init_evt[205];
 
-__declspec(section ".data") u64 fd_las_19_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_19_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_19_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_19_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_19___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_19___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_19___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_19___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_19_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_19_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_19___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_19___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_19_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_19_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_las_19_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_las_19_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_las_19_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_las_19_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_las_19___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_las_19___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_las_19___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_las_19___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_las_19_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_las_19_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_las_19___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_las_19___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_las_19_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_las_19_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -158,27 +138,107 @@ static EVT_BEGIN(e2_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 65542, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"las_09", (s32)"e_bero", 327685, (s32)w_door_close, (s32)w_door_open, (s32)"e_bero_1",
-    65542, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"las_21", (s32)"w_bero", 327685, (s32)e1_door_close, (s32)e1_door_open, (s32)"e_bero_2", 65542,
-    20000, 100000, 0, 0, -1, 0, -1, 0,
-    (s32)"las_21", (s32)"w_bero", 327685, (s32)e2_door_close, (s32)e2_door_open, (s32)"n_bero", 0, 20000,
-    100000, 0, 0, -1, 0, -1, 0, (s32)"las_20",
-    (s32)"s_bero_1", 65537, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_09", // nextMapName
+        "e_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero_1", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_21", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e1_door_close, // enterAnimeArg
+        (s32)e1_door_open, // exitAnimeArg
+    },
+    {
+        "e_bero_2", // hitName
+        1, // type
+        6, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_21", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e2_door_close, // enterAnimeArg
+        (s32)e2_door_open, // exitAnimeArg
+    },
+    {
+        "n_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"las_20", // nextMapName
+        "s_bero_1", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {0},
 };
 
-s32 mapgrp_name_1[] = {
-    (s32)"S_kai_02", (s32)"S_kai_03", (s32)"S_kai_04", (s32)"S_kai_05", (s32)"S_kai_06", (s32)"S_kai_07", (s32)"S_kai_08", (s32)"S_kai_09",
-    (s32)"S_kai_10", (s32)"S_kai_11", (s32)"S_kai_12", (s32)"S_kai_13", (s32)"S_kai_14", (s32)"S_kai_15", (s32)"S_kai_16", (s32)"S_kai_17",
-    (s32)"S_kai_18", (s32)"S_kai_25",
+const char* mapgrp_name_1[] = {
+    "S_kai_02",
+    "S_kai_03",
+    "S_kai_04",
+    "S_kai_05",
+    "S_kai_06",
+    "S_kai_07",
+    "S_kai_08",
+    "S_kai_09",
+    "S_kai_10",
+    "S_kai_11",
+    "S_kai_12",
+    "S_kai_13",
+    "S_kai_14",
+    "S_kai_15",
+    "S_kai_16",
+    "S_kai_17",
+    "S_kai_18",
+    "S_kai_25",
 };
 
-__declspec(section ".data") s32 mapgrp_name_2[] = {
-    (s32)"S_kai_20", (s32)"S_kai_21", (s32)"S_kai_22", (s32)"S_kai_23", (s32)"S_kai_24",
+__declspec(section ".data") const char* mapgrp_name_2[] = {
+    "S_kai_20",
+    "S_kai_21",
+    "S_kai_22",
+    "S_kai_23",
+    "S_kai_24",
 };
 
 static __declspec(section ".data") EVT_BEGIN(cam_shake)
@@ -245,7 +305,7 @@ EVT_BEGIN(change_map_evt)
         LOOP(0)
             SET_FLOAT_VALUE(LW(14), FLOAT(30.0f))
             LOOP(24)
-                SET_INT_READ_ADDR(PTR(mapgrp_name_1))
+                SET_INT_READ_ADDR(PTR(&mapgrp_name_1))
                 SET_FLOAT_VALUE(LW(1), LW(14))
                 SET_VALUE(LW(2), 0)
                 LOOP(18)

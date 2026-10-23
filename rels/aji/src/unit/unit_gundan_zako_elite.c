@@ -6,6 +6,7 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
+#include "battle/battle_database_common.h"
 
 #pragma force_active on
 
@@ -29,20 +30,20 @@ USER_FUNC(btlevtcmd_check_battleflag);
 USER_FUNC(evt_btl_camera_set_mode);
 USER_FUNC(evt_sub_random);
 
-__declspec(section ".data") u64 fd_gundan_zako_elite_negone_one_374;
-__declspec(section ".data") s32 fd_gundan_zako_elite_neg_one_382[1];
-__declspec(section ".data") s32 fd_gundan_zako_elite___local_PI_383[1];
-__declspec(section ".data") s32 fd_gundan_zako_elite___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gundan_zako_elite_one_negone_373;
-__declspec(section ".data") s32 fd_gundan_zako_elite___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gundan_zako_elite_one_381[1];
-__declspec(section ".data") u64 fd_gundan_zako_elite_negone_one_360;
-__declspec(section ".data") s32 fd_gundan_zako_elite_neg_one_365[1];
-__declspec(section ".data") s32 fd_gundan_zako_elite___local_PI_366[1];
-__declspec(section ".data") s32 fd_gundan_zako_elite___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gundan_zako_elite_one_negone_359;
-__declspec(section ".data") s32 fd_gundan_zako_elite___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gundan_zako_elite_one_364[1];
+__declspec(section ".data") f32 fd_gundan_zako_elite_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gundan_zako_elite_neg_one_382;
+__declspec(section ".data") f32 fd_gundan_zako_elite___local_PI_383;
+__declspec(section ".data") f32 fd_gundan_zako_elite___local_3PIO2_385;
+__declspec(section ".data") f32 fd_gundan_zako_elite_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gundan_zako_elite___local_PIO2_384;
+__declspec(section ".data") f32 fd_gundan_zako_elite_one_381;
+__declspec(section ".data") f32 fd_gundan_zako_elite_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gundan_zako_elite_neg_one_365;
+__declspec(section ".data") f32 fd_gundan_zako_elite___local_PI_366;
+__declspec(section ".data") f32 fd_gundan_zako_elite___local_3PIO2_368;
+__declspec(section ".data") f32 fd_gundan_zako_elite_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gundan_zako_elite___local_PIO2_367;
+__declspec(section ".data") f32 fd_gundan_zako_elite_one_364;
 BattleUnitKind unit_gundan_zako_elite;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -50,9 +51,9 @@ static __declspec(section ".data") StatusVulnerability regist;
 static PoseTableEntry pose_table[16];
 static __declspec(section ".data") BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
-static s32 weapon_gundan_zako_attack[48];
-static s32 weapon_gundan_zako_jump_attack[48];
-static s32 weapon_gundan_zako_dekadeka_bottle[48];
+static BattleWeapon weapon_gundan_zako_attack;
+static BattleWeapon weapon_gundan_zako_jump_attack;
+static BattleWeapon weapon_gundan_zako_dekadeka_bottle;
 static s32 init_event[42];
 static __declspec(section ".data") s32 damage_event[10];
 static s32 attack_event[98];
@@ -63,53 +64,33 @@ static s32 jump_attack_event[324];
 static s32 dekadeka_event[125];
 static __declspec(section ".data") s32 wait_event[6];
 
-__declspec(section ".data") u64 fd_gundan_zako_elite_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gundan_zako_elite_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gundan_zako_elite_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gundan_zako_elite_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_gundan_zako_elite___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gundan_zako_elite___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gundan_zako_elite___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gundan_zako_elite___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gundan_zako_elite_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gundan_zako_elite_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gundan_zako_elite___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gundan_zako_elite___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gundan_zako_elite_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gundan_zako_elite_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_gundan_zako_elite_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gundan_zako_elite_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gundan_zako_elite_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gundan_zako_elite_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_gundan_zako_elite___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gundan_zako_elite___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gundan_zako_elite___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gundan_zako_elite___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gundan_zako_elite_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gundan_zako_elite_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gundan_zako_elite___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gundan_zako_elite___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gundan_zako_elite_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gundan_zako_elite_one_364 = 1.0f;
 
 BattleUnitKind unit_gundan_zako_elite = {
     120,
@@ -210,31 +191,113 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_gundan_zako_elite", "c_zako_e", 0.0f, 0.0f, 0.0f, 0.0f, 28.0f, 0.0f, 0.0f, 38.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
-static s32 weapon_gundan_zako_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    5, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 553656320, 770, 0, 4231, 2, 8196,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_gundan_zako_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x21002000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x1087, // special
+    2, // counterResistFlags
+    0x2004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_gundan_zako_jump_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    5, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536875008, 770, 0, 20615, 12, -2147475456,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_gundan_zako_jump_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20001000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x5087, // special
+    0xC, // counterResistFlags
+    0x80002000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 weapon_gundan_zako_dekadeka_bottle[] = {
-    0, 0, 0, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 16793632, 536870912, 770, 0, 264, 2047, 0,
-    0, 0, 0, 0, 100, 50462720, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+static BattleWeapon weapon_gundan_zako_dekadeka_bottle = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    NULL, // hpDamageFn
+    {0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1004020, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x108, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, // burnChance..freezeTime
+    100, // sizeChangeChance
+    3, // sizeChangeTime
+    2, // sizeChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
+    0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
+    0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
 static EVT_BEGIN(init_event)
@@ -299,31 +362,51 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static s32 attack_common_event1[] = {
-    131163, (s32)btlevtcmd_WeaponAftereffect, -29999991, 131163, (s32)btlevtcmd_AttackDeclareAll, -2, 65627, (s32)btlevtcmd_WaitGuardMove,
-    196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991, 196699, (s32)evt_btl_camera_set_mode, 0, 8,
-    262235, (s32)evt_btl_camera_set_homing_unit, 0, -2, -29999997, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0,
-    1, 196699, (s32)evt_btl_camera_set_zoom, 0, 250, 458843, (s32)btlevtcmd_CalculateFaceDirection, -2,
-    -1, -29999997, -29999996, 16, -29999986, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2,
-    -29999986, 110, 65541, 9, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_MOVE1",
-    -250000000, 0, -250000000, 65545, 5, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_ENM_3RD1_MOVE2", -250000000, 0, -250000000, 65545, 5, 6, 112,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"R_2", 65541, 9, 327771,
-    (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionSub, -2,
-    -30000000, 10, 131125, -29999998, 1, 983131, (s32)evt_eff, (s32)"",
-    (s32)"kemuri_test", 0, -30000000, -29999999, -29999998, -229999488, 10, 0,
-    0, 0, 0, 0, 0, 65545, 10, 6,
-    262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 10, 983131, (s32)evt_eff, (s32)"",
-    (s32)"kemuri_test", 0, -30000000, -29999999, -29999998, -229999488, 10, 0,
-    0, 0, 0, 0, 0, 65647, -29999985, 65541,
-    0, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_MOVE3", -250000000, 0, -250000000,
-    65545, 5, 6, 112, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"A_1", 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000, -29999999, -29999998,
-    262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 90, 196699, (s32)btlevtcmd_SetMoveSpeed, -2,
-    -229995904, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, 0, -29999998, 0,
-    -1, 0, 65631, -29999985, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000,
-    10, 131125, -29999998, 1, 2, 1,
-};
+static EVT_BEGIN(attack_common_event1)
+    CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(evt_btl_camera_set_mode, 0, 8)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(evt_btl_camera_set_zoom, 0, 250)
+    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(14))
+    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(14))
+    BEGIN_SIBLING_EVENT
+        LOOP(9)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_MOVE1"), -250000000, 0, -250000000)
+            WAIT_FRAMES(5)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_MOVE2"), -250000000, 0, -250000000)
+            WAIT_FRAMES(5)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("R_2"))
+    LOOP(9)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 10)
+        ADD(LW(2), 1)
+        CALL(evt_eff, STRING(""), STRING("kemuri_test"), 0, LW(0), LW(1), LW(2), FLOAT(0.5f), 10, 0, 0, 0, 0, 0, 0)
+        WAIT_FRAMES(10)
+    END_LOOP
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 10)
+    CALL(evt_eff, STRING(""), STRING("kemuri_test"), 0, LW(0), LW(1), LW(2), FLOAT(0.5f), 10, 0, 0, 0, 0, 0, 0)
+    BEGIN_SIBLING_EVENT_GET_ID(LW(15))
+        LOOP(0)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_MOVE3"), -250000000, 0, -250000000)
+            WAIT_FRAMES(5)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1"))
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 90)
+    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), 0, LW(2), 0, -1, 0)
+    DELETE_EVENT(LW(15))
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 10)
+    ADD(LW(2), 1)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(attack_common_event2)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -335,110 +418,222 @@ static EVT_BEGIN(attack_common_event2)
     RETURN
 EVT_END()
 
-static s32 normal_attack_event[] = {
-    131122, -29999991, (s32)weapon_gundan_zako_attack, 196699, (s32)btlevtcmd_check_battleflag, -30000000, 2, 131097,
-    -30000000, 0, 196699, (s32)btlevtcmd_GetFirstAttackTarget, -29999997, -29999996, 32, 196699,
-    (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235, (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999991,
-    262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991, -29999997, -29999996, 33, 131096, -29999997,
-    -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16, -30000000, 131097, -30000000,
-    0, 65630, (s32)subsetevt_confuse_flustered, 2, 33, 65540, 99, 33,
-    65630, (s32)attack_common_event1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_ATTACK1", -250000000, 0,
-    -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_3", 393307, (s32)btlevtcmd_GetHitPos,
-    -29999997, -29999996, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2,
-    -30000000, 20, 327771, (s32)btlevtcmd_JumpSetting, -2, 0, -229995904, -229999796,
-    110, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, 0, -29999998, 0,
-    0, 112, 65541, 0, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996,
-    -29999990, -250000000, -250000000, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -250000000,
-    -250000000, 131096, -29999986, -1, 131100, -30000000, -29999990, 7,
-    33, 32, 131101, -30000000, -29999990, 7, 33, 33,
-    65545, 1, 6, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996,
-    -29999991, 0, -29999995, 65570, -29999995, 65579, 4, 65540,
-    90, 46, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38,
-    65540, 90, 46, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    39, 65540, 90, 65572, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    40, 65540, 90, 65572, 1, 65540, 91, 46,
-    42, 65540, 98, 46, 65539, 90, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_3RD1_MISS1", -250000000, 0, -250000000, 131163, (s32)btlevtcmd_JumpContinue, -2,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"D_2", 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 15,
-    196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229999488, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000,
-    -29999999, -29999998, 0, 0, 1, 65545, 30, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"D_3", 65545, 10, 65540, 98,
-    65539, 91, 393307, (s32)evt_btl_camera_shake_h, 0, 1, 1, 8,
-    0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_add_zoom, 0,
-    -50, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999991, 458843, (s32)btlevtcmd_CheckDamage, -2,
-    -29999997, -29999996, -29999991, 256, -29999995, 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 48,
-    327771, (s32)btlevtcmd_JumpSetting, -2, 0, -229997952, -229999898, 458843, (s32)btlevtcmd_JumpPosition,
-    -2, -30000000, 0, -29999998, 0, 0, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_3RD1_LANDING1", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    1, (s32)"J_1B", 65545, 5, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"S_1", 65545, 20, 65540, 98, 65539, 98, 65630,
-    (s32)attack_common_event2, 2, 1,
-};
+static EVT_BEGIN(normal_attack_event)
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_attack))
+    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
+    ELSE
+        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+        CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    END_IF
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL_CHILD(attack_common_event1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_ATTACK1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_3"))
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 20)
+    CALL(btlevtcmd_JumpSetting, -2, 0, FLOAT(4.0f), FLOAT(0.19921875f))
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), 0, 0)
+    END_SIBLING_EVENT
+    LOOP(0)
+        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), -250000000, -250000000)
+        CALL(btlevtcmd_GetPos, -2, LW(0), -250000000, -250000000)
+        IF_INT_EQUAL(LW(14), -1)
+            IF_INT_LESS_OR_EQUAL(LW(0), LW(10))
+                BREAK_LOOP
+            END_IF
+        ELSE
+            IF_INT_GREATER_OR_EQUAL(LW(0), LW(10))
+                BREAK_LOOP
+            END_IF
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 0, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+        LABEL(90)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_MISS1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_JumpContinue, -2)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("D_2"))
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 15)
+        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(0.5f))
+        CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 1)
+        WAIT_FRAMES(30)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("D_3"))
+        WAIT_FRAMES(10)
+        GOTO(98)
+        LABEL(91)
+        CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
+        CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+        CALL(evt_btl_camera_add_zoom, 0, -50)
+        CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 48)
+        CALL(btlevtcmd_JumpSetting, -2, 0, FLOAT(2.0f), FLOAT(0.099609375f))
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), 0, 0)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_LANDING1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("J_1B"))
+        WAIT_FRAMES(5)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+        WAIT_FRAMES(20)
+        GOTO(98)
+        LABEL(98)
+        CALL_CHILD(attack_common_event2)
+        RETURN
+EVT_END()
 
-static s32 jump_attack_event[] = {
-    131122, -29999991, (s32)weapon_gundan_zako_jump_attack, 196699, (s32)btlevtcmd_GetEnemyBelong, -2, -30000000, 262235,
-    (s32)btlevtcmd_SamplingEnemy, -2, -30000000, -29999991, 262235, (s32)btlevtcmd_ChoiceSamplingEnemy, -29999991, -29999997,
-    -29999996, 131096, -29999997, -1, 262235, (s32)btlevtcmd_CheckToken, -2, 16,
-    -30000000, 131097, -30000000, 0, 65630, (s32)subsetevt_confuse_flustered, 2, 33,
-    65540, 99, 33, 65630, (s32)attack_common_event1, 196699, (s32)evt_btl_camera_nomove_y_onoff, 0,
-    1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_ATTACK2", -250000000, 0, -250000000,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_2", 393307, (s32)btlevtcmd_GetHitPos, -29999997,
-    -29999996, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000,
-    10, 327771, (s32)btlevtcmd_JumpSetting, -2, 0, -229998208, -229999796, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, 0, -29999998, 0, 0, 196699,
-    (s32)evt_btl_camera_nomove_y_onoff, 0, 0, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997, -29999996,
-    -29999991, 0, -29999995, 65570, -29999995, 65579, 4, 65540,
-    90, 46, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 38,
-    65540, 90, 46, 65572, 6, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    39, 65540, 90, 65572, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997,
-    40, 65540, 90, 65572, 1, 65540, 91, 46,
-    42, 65540, 98, 46, 65539, 90, 131163, (s32)btlevtcmd_JumpContinue,
-    -2, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_MISS1", -250000000, 0, -250000000,
-    327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 983131, (s32)evt_eff64,
-    (s32)"", (s32)"kemuri1_n64", 4, -30000000, -29999999, -29999998, 0, 0,
-    0, 0, 0, 0, 0, 0, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"D_2", 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 15,
-    196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229999488, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000,
-    -29999999, -29999998, 0, 0, 1, 65545, 30, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"D_3", 65545, 10, 65540, 98,
-    65539, 91, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999991, 458843, (s32)btlevtcmd_CheckDamage,
-    -2, -29999997, -29999996, -29999991, 256, -29999995, 131163, (s32)btlevtcmd_JumpContinue,
-    -2, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_ATTACK3", -250000000, 0, -250000000,
-    327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 983131, (s32)evt_eff64,
-    (s32)"", (s32)"kemuri1_n64", 4, -30000000, -29999999, -29999998, 0, 0,
-    0, 0, 0, 0, 0, 0, 262235, (s32)btlevtcmd_FaceDirectionAdd,
-    -2, -30000000, 10, 327771, (s32)btlevtcmd_JumpSetting, -2, 0, -229999488,
-    -229999693, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, 0, -29999998, 0,
-    0, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000, 5, 327771, (s32)btlevtcmd_JumpSetting,
-    -2, 0, -229999488, -229999796, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000,
-    0, -29999998, 0, 0, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000,
-    3, 327771, (s32)btlevtcmd_JumpSetting, -2, 0, -229999488, -229999898, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, 0, -29999998, 0, 0, 65545,
-    15, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"S_1", 65545, 10,
-    65540, 98, 65539, 98, 196699, (s32)evt_btl_camera_set_mode, 0, 0,
-    65630, (s32)attack_common_event2, 2, 1,
-};
+static EVT_BEGIN(jump_attack_event)
+    SET_VALUE(LW(9), PTR(&weapon_gundan_zako_jump_attack))
+    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_INT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL_CHILD(subsetevt_confuse_flustered)
+            RETURN
+        END_IF
+        GOTO(99)
+    END_IF
+    CALL_CHILD(attack_common_event1)
+    CALL(evt_btl_camera_nomove_y_onoff, 0, 1)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_ATTACK2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2"))
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 10)
+    CALL(btlevtcmd_JumpSetting, -2, 0, FLOAT(1.75f), FLOAT(0.19921875f))
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), 0, 0)
+    CALL(evt_btl_camera_nomove_y_onoff, 0, 0)
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 0, LW(5))
+    SWITCH(LW(5))
+        CASE_OR_EQUAL(4)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        GOTO(90)
+        CASE_END
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        GOTO(90)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        GOTO(90)
+        CASE_EQUAL(1)
+        GOTO(91)
+        CASE_END
+        CASE_DEFAULT
+        GOTO(98)
+        CASE_END
+        LABEL(90)
+        CALL(btlevtcmd_JumpContinue, -2)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_MISS1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(evt_eff64, STRING(""), STRING("kemuri1_n64"), 4, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("D_2"))
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 15)
+        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(0.5f))
+        CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 1)
+        WAIT_FRAMES(30)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("D_3"))
+        WAIT_FRAMES(10)
+        GOTO(98)
+        LABEL(91)
+        CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_JumpContinue, -2)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_ATTACK3"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(evt_eff64, STRING(""), STRING("kemuri1_n64"), 4, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 10)
+        CALL(btlevtcmd_JumpSetting, -2, 0, FLOAT(0.5f), FLOAT(0.2998047f))
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), 0, 0)
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 5)
+        CALL(btlevtcmd_JumpSetting, -2, 0, FLOAT(0.5f), FLOAT(0.19921875f))
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), 0, 0)
+        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 3)
+        CALL(btlevtcmd_JumpSetting, -2, 0, FLOAT(0.5f), FLOAT(0.099609375f))
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), 0, 0)
+        WAIT_FRAMES(15)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+        WAIT_FRAMES(10)
+        GOTO(98)
+        LABEL(98)
+        CALL(evt_btl_camera_set_mode, 0, 0)
+        CALL_CHILD(attack_common_event2)
+        RETURN
+EVT_END()
 
-static s32 dekadeka_event[] = {
-    131122, -29999997, -2, 131122, -29999996, 1, 131163, (s32)btlevtcmd_WeaponAftereffect,
-    (s32)weapon_gundan_zako_dekadeka_bottle, 262235, (s32)btlevtcmd_AttackDeclare, -2, -29999997, -29999996, 196699, (s32)btlevtcmd_PayWeaponCost,
-    -2, (s32)weapon_gundan_zako_dekadeka_bottle, 196699, (s32)evt_btl_camera_set_mode, 0, 7, 262235, (s32)evt_btl_camera_set_homing_unit,
-    0, -2, -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699,
-    (s32)evt_btl_camera_set_zoom, 0, 300, 65545, 60, 110, 393307, (s32)btlevtcmd_snd_se,
-    -2, (s32)"SFX_ENM_3RD1_BOTTLE1", -250000000, 0, -250000000, 65545, 40, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_BOTTLE2", -250000000, 0, -250000000, 112, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_4A", 65545, 80, 110, 65545,
-    10, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_BOTTLE3", -250000000, 0, -250000000,
-    65545, 30, 65541, 3, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_BOTTLE4",
-    -250000000, 0, -250000000, 65545, 20, 6, 112, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_4B", 65545, 120, 107, 65545,
-    5, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_BOTTLE5\0\0\0", -250000000, 0, -250000000,
-    65545, 55, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 109, 196699,
-    (s32)btlevtcmd_ResultACDefence, -29999997, (s32)weapon_gundan_zako_dekadeka_bottle, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996,
-    (s32)weapon_gundan_zako_dekadeka_bottle, 256, -29999995, 2, 1,
-};
+static EVT_BEGIN(dekadeka_event)
+    SET_VALUE(LW(3), -2)
+    SET_VALUE(LW(4), 1)
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_gundan_zako_dekadeka_bottle))
+    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_gundan_zako_dekadeka_bottle))
+    CALL(evt_btl_camera_set_mode, 0, 7)
+    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    CALL(evt_btl_camera_set_zoom, 0, 300)
+    WAIT_FRAMES(60)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_BOTTLE1"), -250000000, 0, -250000000)
+        WAIT_FRAMES(40)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_BOTTLE2"), -250000000, 0, -250000000)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_4A"))
+    WAIT_FRAMES(80)
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(10)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_BOTTLE3"), -250000000, 0, -250000000)
+        WAIT_FRAMES(30)
+        LOOP(3)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_BOTTLE4"), -250000000, 0, -250000000)
+            WAIT_FRAMES(20)
+        END_LOOP
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_4B"))
+    WAIT_FRAMES(120)
+    BEGIN_INLINE_EVENT
+        WAIT_FRAMES(5)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_BOTTLE5\0\0\0"), -250000000, 0, -250000000)
+        WAIT_FRAMES(55)
+        CALL(evt_btl_camera_set_mode, 0, 0)
+    END_INLINE_EVENT
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_gundan_zako_dekadeka_bottle))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_gundan_zako_dekadeka_bottle), 256, LW(5))
+    RETURN
+EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)

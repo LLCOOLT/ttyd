@@ -23,7 +23,7 @@ typedef struct TimingAWork {
     s32 endTimer;
 } TimingAWork;
 
-#define TA_WORK(ac) ((TimingAWork*)((u8*)(ac) + 0x2BC))
+#define TA_WORK(ac) ((TimingAWork*)(ac)->work)
 
 TimingAEntry _ac_timing_a_timing_lv_0[] = {
     {4, 10}, {5, 9}, {6, 8}, {7, 7}, {8, 6}, {9, 5}, {99999, 1},
@@ -57,7 +57,7 @@ TimingAEntry* _ac_timing_a_timing_tbl[] = {
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
-    s32* frame = (s32*)((u8*)ac + 0x290);
+    s32* frame = (s32*)&ac->disp;
     camGetPtr(8);
     if (TA_WORK(ac)->flags & 1) {
         Vec pos = {0.0f, 0.0f, 0.0f};
@@ -80,21 +80,21 @@ void battleAcDelete_TimingA(BattleWork* work) {
 
 void battleAcDisp_TimingA(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)&work->actionCommands + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&work->actionCommands.disp;
     int new_var;
     switch (work->actionCommands.mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[4], 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->unk20, 20, -300.0f, 30.0f);
         case 100:
             disp->iconX = 30.0f;
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] > 0) {
-                (*(s32*)&disp->field_0x1C[4])--;
+            if (disp->unk20 > 0) {
+                disp->unk20--;
             }
             break;
         case 1000:
         case 1001:
-            if (*(s32*)&disp->field_0x1C[4] >= 40) {
+            if (disp->unk20 >= 40) {
                 new_var = 4; // FAKE: register-held index; also read uninitialized on the else path below. Literal 4 / slot = 4 at decl both differ
                 disp->iconX = intplGetValue(new_var, *(s32*)&disp->field_0x1C[new_var] - 40, 20, 30.0f, -300.0f);
             } else {
@@ -102,7 +102,7 @@ void battleAcDisp_TimingA(CameraId cameraId, void* param) {
             }
             actionCommandDisp(disp->iconX, disp->iconY);
             if (*(s32*)&disp->field_0x1C[new_var] < 60) {
-                (*(s32*)&disp->field_0x1C[4])++;
+                disp->unk20++;
             }
             break;
     }
@@ -188,14 +188,14 @@ s32 battleAcTimingA_GetSuccessFrame(BattleWork* work) {
 s32 battleAcMain_TimingA(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     TimingAWork* tw = TA_WORK(ac);
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
 
     switch (work->actionCommands.mAcState) {
         case 0:
             memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            *(s32*)&disp->field_0x1C[4] = 20;
+            disp->unk20 = 20;
             work->actionCommands.mAcState = 99;
             TA_WORK(&work->actionCommands)->flags &= ~1;
             work->actionCommands.outputParams[0] = 0;

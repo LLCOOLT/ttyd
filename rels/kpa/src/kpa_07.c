@@ -70,83 +70,75 @@ static USER_FUNC(starstone_fall);
 void kpa_stg6_014_cb(s32 type, KpaCbInfo** param);
 void kpa_stg6_012_1_cb(s32 type, KpaCbInfo** param);
 
-__declspec(section ".data") u64 fd_kpa_07_negone_one_374;
-__declspec(section ".data") s32 fd_kpa_07_neg_one_382[1];
-__declspec(section ".data") s32 fd_kpa_07___local_PI_383[1];
-__declspec(section ".data") s32 fd_kpa_07___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_kpa_07_one_negone_373;
-__declspec(section ".data") s32 fd_kpa_07___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_kpa_07_one_381[1];
-__declspec(section ".data") u64 fd_kpa_07_negone_one_360;
-__declspec(section ".data") s32 fd_kpa_07_neg_one_365[1];
-__declspec(section ".data") s32 fd_kpa_07___local_PI_366[1];
-__declspec(section ".data") s32 fd_kpa_07___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_kpa_07_one_negone_359;
-__declspec(section ".data") s32 fd_kpa_07___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_kpa_07_one_364[1];
-static s32 npcEnt[69];
+__declspec(section ".data") f32 fd_kpa_07_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_07_neg_one_382;
+__declspec(section ".data") f32 fd_kpa_07___local_PI_383;
+__declspec(section ".data") f32 fd_kpa_07___local_3PIO2_385;
+__declspec(section ".data") f32 fd_kpa_07_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_07___local_PIO2_384;
+__declspec(section ".data") f32 fd_kpa_07_one_381;
+__declspec(section ".data") f32 fd_kpa_07_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_07_neg_one_365;
+__declspec(section ".data") f32 fd_kpa_07___local_PI_366;
+__declspec(section ".data") f32 fd_kpa_07___local_3PIO2_368;
+__declspec(section ".data") f32 fd_kpa_07_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_kpa_07___local_PIO2_367;
+__declspec(section ".data") f32 fd_kpa_07_one_364;
+static NpcSetupInfo npcEnt[3];
 s32 kpa_07_hipattack_eff[149];
 s32 kpa_07_evt[1224];
 s32 kpa_07_init_evt[52];
 
-__declspec(section ".data") u64 fd_kpa_07_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_kpa_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_kpa_07_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_kpa_07_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_kpa_07___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_kpa_07___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_kpa_07___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_kpa_07___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_kpa_07_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_kpa_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_kpa_07___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_kpa_07___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_kpa_07_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_kpa_07_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_kpa_07_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_kpa_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_kpa_07_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_kpa_07_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_kpa_07___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_kpa_07___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_kpa_07___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_kpa_07___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_kpa_07_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_kpa_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_kpa_07___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_kpa_07___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_kpa_07_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_kpa_07_one_364 = 1.0f;
 
-static s32 npcEnt[] = {
-    (s32)/*"ババ"*/"\x83\x6F\x83\x6F", 32, 0, (s32)npc_init_evt, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ブレッドハート"*/"\x83\x75\x83\x8C\x83\x62\x83\x68\x83\x6E\x81\x5B\x83\x67",
-    32, 0, (s32)npc_init_evt, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"ババ"*/"\x83\x6F\x83\x6F", // name
+        0x20, // flags
+        0, // reactionFlags
+        npc_init_evt, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"ブレッドハート"*/"\x83\x75\x83\x8C\x83\x62\x83\x68\x83\x6E\x81\x5B\x83\x67", // name
+        0x20, // flags
+        0, // reactionFlags
+        npc_init_evt, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(kpa_07_hipattack_eff)

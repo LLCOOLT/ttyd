@@ -211,7 +211,7 @@ void noiseDisp(CameraId cameraId, void* param);
 
 static s32 w_door_close[22];
 static s32 w_door_open[22];
-static s32 bero_entry_data[30];
+static BeroEntry bero_entry_data[2];
 s32 evt_emergency[48];
 s32 evt_last[728];
 s32 evt_last2[339];
@@ -246,7 +246,7 @@ static s32 peach_evt_stg6[1467];
 __declspec(section ".data") static s32 teshita1_init[9];
 __declspec(section ".data") static s32 teshita2_init[9];
 __declspec(section ".data") static s32 syuryo_init[9];
-static s32 npcEnt[92];
+static NpcSetupInfo npcEnt[4];
 s32 tec_talk[36];
 s32 aji_17_init_evt[VERSION_PICK(253, 255)];
 
@@ -284,57 +284,37 @@ static s32 bgm_start_wait(EventEntry* event, BOOL isFirstCall) {
 
 
 #pragma force_active on
-__declspec(section ".data") u64 fd_aji_17_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_17_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_17_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_17_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_17___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_17___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_17___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_17___local_3PIO2_385 = 4.712389f;
 
 __declspec(section ".data") u32 gap_04_0001E124_data[1] = {0};
 
-__declspec(section ".data") u64 fd_aji_17_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_17_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_17___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_17___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_17_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_17_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_aji_17_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_aji_17_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_aji_17_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_aji_17_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_aji_17___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_aji_17___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_aji_17___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_aji_17___local_3PIO2_368 = 4.712389f;
 
 __declspec(section ".data") u32 gap_04_0001E14C_data[1] = {0};
 
-__declspec(section ".data") u64 fd_aji_17_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_aji_17_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_aji_17___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_aji_17___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_aji_17_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_aji_17_one_364 = 1.0f;
 
 #pragma force_active reset
 
@@ -354,11 +334,26 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)("w_bero"), 65546, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)("aji_01"), (s32)("e_bero_5"), 327685, (s32)w_door_close, (s32)w_door_open, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        ("w_bero"), // hitName
+        1, // type
+        10, // sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)("aji_01"), // nextMapName
+        ("e_bero_5"), // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)w_door_close, // enterAnimeArg
+        (s32)w_door_open, // exitAnimeArg
+    },
+    {0},
 };
 static s32 viewport(EventEntry* event, BOOL isFirstCall) {
     s32* args = event->args;
@@ -3159,19 +3154,35 @@ __declspec(section ".data") static EVT_BEGIN(syuryo_init)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"手下１"*/"\216\350\211\272\202P", 0, 0, (s32)teshita1_init, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"手下２"*/"\216\350\211\272\202Q",
-    0, 0, (s32)teshita2_init, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, (s32)/*"シュリョー"*/"\203V\203\205\203\212\203\207\201[", 0,
-    0, (s32)syuryo_init, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"手下１"*/"\216\350\211\272\202P", // name
+        0, 0, // flags..reactionFlags
+        teshita1_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"手下２"*/"\216\350\211\272\202Q", // name
+        0, 0, // flags..reactionFlags
+        teshita2_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {
+        /*"シュリョー"*/"\203V\203\205\203\212\203\207\201[", // name
+        0, 0, // flags..reactionFlags
+        syuryo_init, // initEvent
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 EVT_BEGIN(tec_talk)

@@ -13,6 +13,7 @@
 #include <string.h>
 #include "evt/evt_cam.h"
 #include "evt/evt_damage.h"
+#include "evt/evt_cmd.h"
 
 EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 HitEntry* marioChkLandon(f32* outY, f32 y);
@@ -29,19 +30,23 @@ void marioMakeJumpPara(void);
 #define MF(o) (*(f32*)((u8*)mario + (o)))
 #define MI(o) (*(s32*)((u8*)mario + (o)))
 
-static s32 quake_evt[] = {
-    0x0005005B, (s32)evt_cam_shake, 4, (s32)0xF24A7A8A, (s32)0xF24A7A80, 0x32, 2, 1,
-};
+static EVT_BEGIN(quake_evt)
+    CALL(evt_cam_shake, 4, PTR(0xF24A7A8A), PTR(0xF24A7A80), 50)
+    RETURN
+EVT_END()
 
-static s32 quake_bgmode_evt[] = {
-    0x0005005B, (s32)evt_cam_shake, 4, (s32)0xF24A7A86, (s32)0xF24A7A80, 0x1E, 2, 1,
-};
+static EVT_BEGIN(quake_bgmode_evt)
+    CALL(evt_cam_shake, 4, PTR(0xF24A7A86), PTR(0xF24A7A80), 30)
+    RETURN
+EVT_END()
 
 s32 gazigazi(EventEntry* evt, BOOL isFirstCall);
 
-s32 evt_gazigazi[] = {
-    0x0001005B, (s32)gazigazi, 0x0001005C, (s32)evt_gazigazi_appear, 2, 1,
-};
+EVT_BEGIN(evt_gazigazi)
+    CALL(gazigazi)
+    SPAWN_EVENT(evt_gazigazi_appear)
+    RETURN
+EVT_END()
 
 void marioDmgRetQuakeOn(void) {
     s32* evt;
@@ -68,7 +73,7 @@ void marioSetSplash(s32 kind, Vec* pos) {
 s32 gazigazi(EventEntry* evt, BOOL isFirstCall) {
     MarioWork* mario = marioGetPtr();
     evt->lwData[0] = (s32)mario->position.x;
-    evt->lwData[1] = (s32)MF(MWOFF(0x2A0));
+    evt->lwData[1] = (s32)mario->mot.damage.rootY;
     evt->lwData[2] = (s32)mario->position.z;
     return 2;
 }
@@ -83,7 +88,7 @@ BOOL marioChkDamageSink(void) {
 
 void set_damage_root_ypos(f32 y) {
     MarioWork* mario = marioGetPtr();
-    MF(MWOFF(0x2A0)) = y;
+    mario->mot.damage.rootY = y;
 }
 
 void mot_damage(void) {
@@ -132,7 +137,7 @@ void mot_damage(void) {
 
     switch (mario->currSubMotionId) {
     case 0:
-        if (mario->position.y >= MF(MWOFF(0x2A0)) - 160.0f) {
+        if (mario->position.y >= mario->mot.damage.rootY - 160.0f) {
             marioMakeJumpPara();
             if (mario->jumpVelocityY <= -6.0f) {
                 mario->jumpVelocityY = -6.0f;
@@ -151,9 +156,9 @@ void mot_damage(void) {
         if (--MI(0x48) > 0) {
             break;
         }
-        MI(0x48) = 0;
+        mario->multiTimer = 0;
         mario->currSubMotionId = 10;
-        MF(MWOFF(0x2AC)) = 20.0f;
+        mario->mot.damage.riseSpeed = 20.0f;
         break;
     case 10:
         if (++MI(0x48) == 2) {
@@ -166,18 +171,18 @@ void mot_damage(void) {
     case 11: {
         f32 v;
         f32 prevY = mario->position.y;
-        v = MF(MWOFF(0x2AC));
+        v = mario->mot.damage.riseSpeed;
         mario->position.y += v;
         v -= 1.0f;
         if (v < 10.0f) {
             v = 10.0f;
         }
-        MF(MWOFF(0x2AC)) = v;
-        if (mario->position.y >= MF(MWOFF(0x2A0)) && MF(MWOFF(0x2A0)) > prevY) {
+        mario->mot.damage.riseSpeed = v;
+        if (mario->position.y >= mario->mot.damage.rootY && mario->mot.damage.rootY > prevY) {
             Vec pos = mario->position;
             marioSetSplash(1, &pos);
         }
-        if (mario->position.y < 500.0f + MF(MWOFF(0x2A0))) {
+        if (mario->position.y < 500.0f + mario->mot.damage.rootY) {
             break;
         }
         {
@@ -206,28 +211,28 @@ void mot_damage(void) {
             }
             if (mario->flags & MARIO_FLAG_BG_MODE) {
                 Vec t = {0.0f, 0.0f, 0.0f};
-                t.x = MF(0xE0);
-                t.y = MF(0xE4);
-                t.z = MF(0xE8);
+                t.x = mario->returnPos.x;
+                t.y = mario->returnPos.y;
+                t.z = mario->returnPos.z;
                 dest = t;
             }
             mario->baseSpeed = 8.0f;
             d = distABf(dest.x, dest.z, mario->position.x, mario->position.z);
             mario->multiTimer = (s16)(d / 8);
             mario->directionView = angleABf(mario->position.x, mario->position.z, dest.x, dest.z);
-            mario->wCamVal1 = (dest.y - MF(MWOFF(0x2A0))) / (f32)MI(0x48);
+            mario->mot.damage.camStepY = (dest.y - mario->mot.damage.rootY) / (f32)(s32)mario->multiTimer;
             mario->currSubMotionId = 12;
             mario->dispFlags |= 1;
-            if (MI(0x48) == 0) {
-                MI(0x48) = 10;
-                mario->wCamVal1 = (dest.y - MF(MWOFF(0x2A0))) / (f32)MI(0x48);
+            if ((s32)mario->multiTimer == 0) {
+                mario->multiTimer = 10;
+                mario->mot.damage.camStepY = (dest.y - mario->mot.damage.rootY) / (f32)(s32)mario->multiTimer;
                 mario->currSubMotionId = 14;
             }
         }
         break;
     }
     case 12:
-        mario->camTarget.y += mario->wCamVal1;
+        mario->camTarget.y += mario->mot.damage.camStepY;
         movePos(&mario->position.x, &mario->position.z, mario->baseSpeed, mario->directionView);
         mario->camTarget.x = mario->position.x;
         mario->camTarget.z = mario->position.z;
@@ -238,7 +243,7 @@ void mot_damage(void) {
         mario->flags |= 0x80;
         marioSetFallPara();
         mario->dispFlags &= ~1;
-        MI(0x48) = 1;
+        mario->multiTimer = 1;
         break;
     case 13:
         if (--MI(0x48) > 0) {
@@ -247,7 +252,7 @@ void mot_damage(void) {
         mario->currSubMotionId = 20;
         break;
     case 14:
-        mario->camTarget.y += mario->wCamVal1;
+        mario->camTarget.y += mario->mot.damage.camStepY;
         mario->camTarget.x = mario->position.x;
         mario->camTarget.z = mario->position.z;
         if (--MI(0x48) > 0) {
@@ -364,9 +369,9 @@ void mot_damageToge(void) {
         mario->currSubMotionId = 0;
         mario->airTimer = 0;
         mario->baseSpeed = 0.0f;
-        MF(MWOFF(0x2A0)) = mario->position.y;
+        mario->mot.damage.rootY = mario->position.y;
         mario->multiTimer = 5;
-        MF(MWOFF(0x2AC)) = 4.0f;
+        mario->mot.damage.riseSpeed = 4.0f;
     }
 
     switch (mario->currSubMotionId) {
@@ -383,14 +388,14 @@ void mot_damageToge(void) {
         mario_simple_kemuri();
         mario->currSubMotionId = 11;
     case 11: {
-        f32 v = MF(MWOFF(0x2AC));
+        f32 v = mario->mot.damage.riseSpeed;
         mario->position.y += v;
         v -= 1.0f;
         if (v < 10.0f) {
             v = 10.0f;
         }
-        MF(MWOFF(0x2AC)) = v;
-        if (mario->position.y < 500.0f + MF(MWOFF(0x2A0))) {
+        mario->mot.damage.riseSpeed = v;
+        if (mario->position.y < 500.0f + mario->mot.damage.rootY) {
             break;
         }
         {
@@ -409,13 +414,13 @@ void mot_damageToge(void) {
             d = distABf(dest.x, dest.z, mario->position.x, mario->position.z);
             mario->multiTimer = (s16)(d / 8);
             mario->directionView = angleABf(mario->position.x, mario->position.z, dest.x, dest.z);
-            mario->wCamVal1 = (dest.y - MF(MWOFF(0x2A0))) / (f32)MI(0x48);
+            mario->mot.damage.camStepY = (dest.y - mario->mot.damage.rootY) / (f32)(s32)mario->multiTimer;
             mario->currSubMotionId = 12;
         }
         break;
     }
     case 12:
-        mario->camTarget.y += mario->wCamVal1;
+        mario->camTarget.y += mario->mot.damage.camStepY;
         movePos(&mario->position.x, &mario->position.z, mario->baseSpeed, mario->directionView);
         mario->camTarget.x = mario->position.x;
         mario->camTarget.z = mario->position.z;

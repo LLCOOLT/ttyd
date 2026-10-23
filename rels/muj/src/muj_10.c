@@ -17,6 +17,8 @@
 #include "evt/evt_snd.h"
 #include "party/party_motion.h"
 #include "muj.h"
+#include "driver/hitdrv.h"
+#include "data_tables.h"
 
 typedef struct NanNpc { u8 field_0x0[0x18]; Vec pos; u8 field_0x24[0x30 - 0x24]; Vec basePos; u8 field_0x3C[0x50 - 0x3C]; OSTime time; u8 field_0x58[0x68 - 0x58]; s32 state; s32 duration; u8 field_0x70[0xBF - 0x70]; u8 alpha; } NanNpc;
 typedef struct NanNpcWork { NanNpc* entries; } NanNpcWork;
@@ -87,33 +89,33 @@ USER_FUNC(suifu_option_init_func);
 static USER_FUNC(tornade_alpha_func);
 void elmosalpha_func(NanNpc* npc);
 
-__declspec(section ".data") u64 fd_muj_10_negone_one_374;
-__declspec(section ".data") s32 fd_muj_10_neg_one_382[1];
-__declspec(section ".data") s32 fd_muj_10___local_PI_383[1];
-__declspec(section ".data") s32 fd_muj_10___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_muj_10_one_negone_373;
-__declspec(section ".data") s32 fd_muj_10___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_muj_10_one_381[1];
-__declspec(section ".data") u64 fd_muj_10_negone_one_360;
-__declspec(section ".data") s32 fd_muj_10_neg_one_365[1];
-__declspec(section ".data") s32 fd_muj_10___local_PI_366[1];
-__declspec(section ".data") s32 fd_muj_10___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_muj_10_one_negone_359;
-__declspec(section ".data") s32 fd_muj_10___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_muj_10_one_364[1];
+__declspec(section ".data") f32 fd_muj_10_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_10_neg_one_382;
+__declspec(section ".data") f32 fd_muj_10___local_PI_383;
+__declspec(section ".data") f32 fd_muj_10___local_3PIO2_385;
+__declspec(section ".data") f32 fd_muj_10_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_10___local_PIO2_384;
+__declspec(section ".data") f32 fd_muj_10_one_381;
+__declspec(section ".data") f32 fd_muj_10_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_10_neg_one_365;
+__declspec(section ".data") f32 fd_muj_10___local_PI_366;
+__declspec(section ".data") f32 fd_muj_10___local_3PIO2_368;
+__declspec(section ".data") f32 fd_muj_10_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_muj_10___local_PIO2_367;
+__declspec(section ".data") f32 fd_muj_10_one_364;
 static s32 megane_init[18];
 static __declspec(section ".data") s32 megane_talk[8];
-static s32 npcEnt[46];
+static NpcSetupInfo npcEnt[2];
 static __declspec(section ".data") s32 e_close[12];
 static __declspec(section ".data") s32 e_open[12];
 static s32 door_custom[53];
 static s32 bero_in_event[80];
-static s32 bero_entry_data[45];
+static BeroEntry bero_entry_data[3];
 s32 nazo_event[178];
 s32 oidasare_event[156];
-s32 test_ext_entry_data[93];
-static s32 suifu_animtbl[21];
-static __declspec(section ".data") s32 elmos_animtbl[11];
+ExtTexInfo test_ext_entry_data[31];
+static s16 suifu_animtbl[42];
+static __declspec(section ".data") s16 elmos_animtbl[22];
 s32 senin_event_suifupos[380];
 s32 senin_event_erumospos[180];
 #ifdef VERSION_G8ME01
@@ -122,7 +124,7 @@ s32 senin_event[282];
 s32 senin_event[374];
 #endif
 static s32 dai3_shurai_after[46];
-static s32 hitDmgRetPoints[28];
+static HitDamageReturn hitDmgRetPoints[7];
 #ifdef VERSION_G8ME01
 s32 muj_10_init_evt[207];
 #else
@@ -160,53 +162,33 @@ USER_FUNC(suifu_option_init_func) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_muj_10_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_10_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_10_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj_10___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj_10___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj_10___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj_10___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_10_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj_10___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj_10___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_10_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_10_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_muj_10_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_muj_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_muj_10_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_muj_10_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_muj_10___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_muj_10___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_muj_10___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_muj_10___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_muj_10_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_muj_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_muj_10___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_muj_10___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_muj_10_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_muj_10_one_364 = 1.0f;
 
 static EVT_BEGIN(megane_init)
     SWITCH(GSW(0))
@@ -222,13 +204,20 @@ static __declspec(section ".data") EVT_BEGIN(megane_talk)
     RETURN
 EVT_END()
 
-static s32 npcEnt[] = {
-    (s32)/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76", 1536, 0, (s32)megane_init, 0, (s32)megane_talk, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0,
+static NpcSetupInfo npcEnt[] = {
+    {
+        /*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76", // name
+        0x600, // flags
+        0, // reactionFlags
+        megane_init, // initEvent
+        NULL, // regularEvent
+        megane_talk, // talkEvent
+        NULL, NULL, NULL, NULL, NULL, 0, // deadEvent..territoryType
+        {0}, // territoryBase
+        {0}, // territoryLoiter
+        0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
+    },
+    {0},
 };
 
 static __declspec(section ".data") EVT_BEGIN(e_close)
@@ -296,13 +285,42 @@ static EVT_BEGIN(bero_in_event)
     RETURN
 EVT_END()
 
-static s32 bero_entry_data[] = {
-    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, (s32)bero_in_event,
-    -1, 0, (s32)"dou_11", (s32)"e_bero", 65537, 0, 0, (s32)"A_b_bero03",
-    65538, 2, 100000, 0, 0, -1, (s32)bero_in_event, -1,
-    0, (s32)"muj_11", (s32)"w_bero", 327685, (s32)e_close, (s32)e_open, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
+static BeroEntry bero_entry_data[] = {
+    {
+        "w_bero", // hitName
+        0, 0, // type..sfxId
+        20000, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)bero_in_event, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"dou_11", // nextMapName
+        "e_bero", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "A_b_bero03", // hitName
+        1, // type
+        2, // sfxId
+        2, // directionId
+        100000, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        (s32*)bero_in_event, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        (s32)"muj_11", // nextMapName
+        "w_bero", // nextBeroName
+        5, // enterAnimeType
+        5, // exitAnimeType
+        (s32)e_close, // enterAnimeArg
+        (s32)e_open, // exitAnimeArg
+    },
+    {0},
 };
 
 EVT_BEGIN(nazo_event)
@@ -391,30 +409,53 @@ EVT_BEGIN(oidasare_event)
     RETURN
 EVT_END()
 
-s32 test_ext_entry_data[] = {
-    (s32)"c_boro_k", (s32)"S_1", 0, (s32)"c_boro_k", (s32)"S_1", 1073741824, (s32)"c_boro_k", (s32)"S_1",
-    1082130432, (s32)"c_boro_k", (s32)"S_1", 1086324736, (s32)"c_boro_k", (s32)"S_1", 1090519040, (s32)"c_boro_k",
-    (s32)"S_1", 1092616192, (s32)"c_boro_k", (s32)"S_1", 1094713344, (s32)"c_boro_k", (s32)"S_1", 1096810496,
-    (s32)"c_boro_k", (s32)"S_1", 1098907648, (s32)"c_boro_k", (s32)"S_1", 1099956224, (s32)"c_boro_k", (s32)"S_1",
-    1101004800, (s32)"c_boro_k", (s32)"S_1", 1102053376, (s32)"c_boro_k", (s32)"S_1", 1103101952, (s32)"c_boro_k",
-    (s32)"S_1", 1104150528, (s32)"c_boro_k", (s32)"S_1", 1105199104, (s32)"c_boro_k", (s32)"S_1", 1106247680,
-    (s32)"c_boro_k", (s32)"S_1", 1107296256, (s32)"c_boro_k", (s32)"S_1", 1107820544, (s32)"c_boro_k", (s32)"S_1",
-    1108344832, (s32)"c_boro_k", (s32)"S_1", 1108869120, (s32)"c_elmos", (s32)"S_1", 0, (s32)"c_elmos",
-    (s32)"S_1", 1073741824, (s32)"c_elmos", (s32)"S_1", 1082130432, (s32)"c_elmos", (s32)"S_1", 1086324736,
-    (s32)"c_elmos", (s32)"S_1", 1090519040, (s32)"c_elmos", (s32)"S_1", 1092616192, (s32)"c_elmos", (s32)"S_1",
-    1094713344, (s32)"c_elmos", (s32)"S_1", 1096810496, (s32)"c_elmos", (s32)"S_1", 1098907648, (s32)"c_elmos",
-    (s32)"S_1", 1099956224, 0, 0, 0,
+ExtTexInfo test_ext_entry_data[] = {
+    {"c_boro_k", "S_1", 0.0f},
+    {"c_boro_k", "S_1", 2.0f},
+    {"c_boro_k", "S_1", 4.0f},
+    {"c_boro_k", "S_1", 6.0f},
+    {"c_boro_k", "S_1", 8.0f},
+    {"c_boro_k", "S_1", 10.0f},
+    {"c_boro_k", "S_1", 12.0f},
+    {"c_boro_k", "S_1", 14.0f},
+    {"c_boro_k", "S_1", 16.0f},
+    {"c_boro_k", "S_1", 18.0f},
+    {"c_boro_k", "S_1", 20.0f},
+    {"c_boro_k", "S_1", 22.0f},
+    {"c_boro_k", "S_1", 24.0f},
+    {"c_boro_k", "S_1", 26.0f},
+    {"c_boro_k", "S_1", 28.0f},
+    {"c_boro_k", "S_1", 30.0f},
+    {"c_boro_k", "S_1", 32.0f},
+    {"c_boro_k", "S_1", 34.0f},
+    {"c_boro_k", "S_1", 36.0f},
+    {"c_boro_k", "S_1", 38.0f},
+    {"c_elmos", "S_1", 0.0f},
+    {"c_elmos", "S_1", 2.0f},
+    {"c_elmos", "S_1", 4.0f},
+    {"c_elmos", "S_1", 6.0f},
+    {"c_elmos", "S_1", 8.0f},
+    {"c_elmos", "S_1", 10.0f},
+    {"c_elmos", "S_1", 12.0f},
+    {"c_elmos", "S_1", 14.0f},
+    {"c_elmos", "S_1", 16.0f},
+    {"c_elmos", "S_1", 18.0f},
+    {0},
 };
 
-static s32 suifu_animtbl[] = {
-    0, 65537, 131074, 196611, 262148, 327685, 393222, 458759,
-    524296, 589833, 655370, 720907, 786444, 851981, 917518, 983055,
-    1048592, 1114129, 1179666, 1245203, -65536,
+static s16 suifu_animtbl[] = {
+    0, 0, 1, 1, 2, 2, 3, 3,
+    4, 4, 5, 5, 6, 6, 7, 7,
+    8, 8, 9, 9, 10, 10, 11, 11,
+    12, 12, 13, 13, 14, 14, 15, 15,
+    16, 16, 17, 17, 18, 18, 19, 19,
+    -1, 0,
 };
 
-static __declspec(section ".data") s32 elmos_animtbl[] = {
-    1310740, 1376277, 1441814, 1507351, 1572888, 1638425, 1703962, 1769499,
-    1835036, 1900573, -65536,
+static __declspec(section ".data") s16 elmos_animtbl[] = {
+    20, 20, 21, 21, 22, 22, 23, 23,
+    24, 24, 25, 25, 26, 26, 27, 27,
+    28, 28, 29, 29, -1, 0,
 };
 
 s32 senin_event_suifupos[] = {
@@ -637,11 +678,14 @@ static EVT_BEGIN(dai3_shurai_after)
     RETURN
 EVT_END()
 
-static s32 hitDmgRetPoints[] = {
-    (s32)"A_yuka01", 0, -998637568, 0, (s32)"A_yuka02", 0, -998637568, 0,
-    (s32)"A_yuka03", 0, -998637568, 0, (s32)"A_yuka04", 0, -998637568, 0,
-    (s32)"A_hasi_ita", 0, -998637568, 0, (s32)"ship_change_", 0, -998637568, 0,
-    0, 0, 0, 0,
+static HitDamageReturn hitDmgRetPoints[] = {
+    {"A_yuka01", {0.0f, -1000.0f, 0.0f}},
+    {"A_yuka02", {0.0f, -1000.0f, 0.0f}},
+    {"A_yuka03", {0.0f, -1000.0f, 0.0f}},
+    {"A_yuka04", {0.0f, -1000.0f, 0.0f}},
+    {"A_hasi_ita", {0.0f, -1000.0f, 0.0f}},
+    {"ship_change_", {0.0f, -1000.0f, 0.0f}},
+    {0},
 };
 
 #ifdef VERSION_G8ME01
@@ -712,34 +756,71 @@ EVT_BEGIN(muj_10_init_evt)
     RETURN
 EVT_END()
 #else
-s32 muj_10_init_evt[] = {
-    131098, -170000000, 253, 196699, (s32)evt_snd_bgmon, 512, (s32)"BGM_EVT_STG5_GHOST1", 196699,
-    (s32)evt_snd_envon, 272, (s32)"ENV_STG5_MUJ8", 32, 196699, (s32)evt_snd_bgmon, 512, (s32)"BGM_STG5_DOU1",
-    196699, (s32)evt_snd_envon, 272, (s32)"ENV_STG5_MUJ8", 33, 131163, (s32)evt_snd_set_rev_mode, 2,
-    131122, -30000000, (s32)bero_entry_data, 65627, (s32)evt_bero_get_info, 65630, (s32)evt_bero_info_run, 65627,
-    (s32)evt_cam_road_reset, 131163, (s32)evt_npc_setup, (s32)npcEnt, 458843, (s32)evt_npc_sound_data_set, (s32)/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76", (s32)"SFX_STG5_KANBU_GLASSES_MOVE1L",
-    (s32)"SFX_STG5_KANBU_GLASSES_MOVE1R", -250000000, -250000000, -250000000, 131096, -170000000, 250, 65628,
-    (s32)nazo_event, 33, 131096, -170000000, 253, 65628, (s32)oidasare_event, 33,
-    131096, -170000000, 258, 65628, (s32)senin_event, 33, 131101, -170000000,
-    260, 327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"S_b", 1, 33,
-    262235, (s32)evt_map_playanim, (s32)"mizu", 1, 0, 262235, (s32)evt_map_playanim, (s32)"noname",
-    1, 0, 131098, -170000000, 260, 131097, -170000000, 258,
-    262235, (s32)evt_map_playanim, (s32)"fune", 1, 0, 33, 107, 65541,
-    0, 327771, (s32)evt_mapobj_get_position, (s32)"S_b", -30000000, -29999999, -29999998, 393307,
-    (s32)evt_snd_sfxon_3d, (s32)"SFX_STG5_SHIP_KOR_SHAKE1", -30000000, -29999999, -29999998, 0, 65546, 2000,
-    6, 109, 33, 131101, -170000000, 260, 327771, (s32)evt_mapobj_flag_onoff,
-    1, 1, (s32)"S_hasi_rope01", 1, 327771, (s32)evt_mapobj_flag_onoff, 1, 1,
-    (s32)"S_hasi_rope02", 1, 327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"S_hasi_m", 1,
-    327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"S_10_sui02_01", 1, 262235, (s32)evt_hitobj_onoff,
-    (s32)"A_hasi_ita", 1, 0, 32, 327771, (s32)evt_mapobj_flag_onoff, 1, 1,
-    (s32)"S_hasi_zan", 1, 327771, (s32)evt_mapobj_flag_onoff, 1, 1, (s32)"S_10_sui02_02", 1,
-    33, 131101, -170000000, 257, 131098, -170000000, 258, 65628,
-    (s32)dai3_shurai_after, 33, 33, 131163, (s32)evt_hit_damage_return_set, (s32)hitDmgRetPoints, 65630, (s32)evt_gazigazi_entry,
-    262235, (s32)evt_hitobj_onoff, (s32)"A_b_bero02", 1, 0, 131098, -170000000, 258,
-    524379, (s32)evt_mobj_recovery_blk, (s32)"r_blk", 12, -260, 135, -145, 0,
-    0, 458843, (s32)evt_mobj_save_blk, (s32)"s_blk", -45, 83, 0, 0,
-    0, 33, 2, 1,
-};
+EVT_BEGIN(muj_10_init_evt)
+    IF_INT_LESS(GSW(0), 253)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_STG5_GHOST1"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG5_MUJ8"))
+    ELSE
+        CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_DOU1"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG5_MUJ8"))
+    END_IF
+    CALL(evt_snd_set_rev_mode, 2)
+    SET_VALUE(LW(0), PTR(bero_entry_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(evt_bero_info_run)
+    CALL(evt_cam_road_reset)
+    CALL(evt_npc_setup, PTR(npcEnt))
+    CALL(evt_npc_sound_data_set, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), STRING("SFX_STG5_KANBU_GLASSES_MOVE1L"), STRING("SFX_STG5_KANBU_GLASSES_MOVE1R"), -250000000, -250000000, -250000000)
+    IF_INT_EQUAL(GSW(0), 250)
+        SPAWN_EVENT(nazo_event)
+    END_IF
+    IF_INT_EQUAL(GSW(0), 253)
+        SPAWN_EVENT(oidasare_event)
+    END_IF
+    IF_INT_EQUAL(GSW(0), 258)
+        SPAWN_EVENT(senin_event)
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 260)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_b"), 1)
+    END_IF
+    CALL(evt_map_playanim, STRING("mizu"), 1, 0)
+    CALL(evt_map_playanim, STRING("noname"), 1, 0)
+    IF_INT_LESS(GSW(0), 260)
+        IF_INT_NOT_EQUAL(GSW(0), 258)
+            CALL(evt_map_playanim, STRING("fune"), 1, 0)
+        END_IF
+        BEGIN_INLINE_EVENT
+            LOOP(0)
+                CALL(evt_mapobj_get_position, STRING("S_b"), LW(0), LW(1), LW(2))
+                CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_SHIP_KOR_SHAKE1"), LW(0), LW(1), LW(2), 0)
+                WAIT_MS(2000)
+            END_LOOP
+        END_INLINE_EVENT
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 260)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hasi_rope01"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hasi_rope02"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hasi_m"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_10_sui02_01"), 1)
+        CALL(evt_hitobj_onoff, STRING("A_hasi_ita"), 1, 0)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hasi_zan"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_10_sui02_02"), 1)
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 257)
+        IF_INT_LESS(GSW(0), 258)
+            SPAWN_EVENT(dai3_shurai_after)
+        END_IF
+    END_IF
+    CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
+    CALL_CHILD(evt_gazigazi_entry)
+    CALL(evt_hitobj_onoff, STRING("A_b_bero02"), 1, 0)
+    IF_INT_LESS(GSW(0), 258)
+        CALL(evt_mobj_recovery_blk, STRING("r_blk"), 12, -260, 135, -145, 0, 0)
+        CALL(evt_mobj_save_blk, STRING("s_blk"), -45, 83, 0, 0, 0)
+    END_IF
+    RETURN
+EVT_END()
 #endif
 
 void elmosalpha_func(NanNpc* npc) {

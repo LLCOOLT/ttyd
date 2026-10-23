@@ -19,6 +19,7 @@
 #include "evt/evt_fade.h"
 #include "party/party_motion.h"
 #include "battle/sac/sac_zubastar.h"
+#include "battle/battle_database_common.h"
 
 void BattleAcDrawGauge(s32 x, s32 y, s32 icon, f32 ratio, s32 a, s32 b, s32 c, s32 d, s32 e);
 #define INTPL(m, c, n, a, b) ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(a, b, m, c, n)
@@ -98,13 +99,42 @@ ZubaStarWork* GetZubaStarPtr(void);
 
 s32 weaponGetPower_ZubaStar(void* a, s32* tbl);
 
-s32 weapon_zubastar[] = {
-    (s32)"btl_wn_sac_zubastar", ICON_19B << 16, 0, (s32)"msg_zubastar", 1677723136, 1065353216, 17130546, (s32)weaponGetPower_ZubaStar,
-    0, 3, 6, 9, 12, 15, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 34607712, 536870912, 770, (s32)"msg_sac_8", 131272, 2047, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)marioAttackEvent_ZubaStar, 100, 0, 0,
+BattleWeapon weapon_zubastar = {
+    "btl_wn_sac_zubastar", // name
+    ICON_19B, // icon
+    {0}, // field_0x6
+    0, // itemId
+    "msg_zubastar", // description
+    100, // baseAccuracy
+    0, // baseFpCost
+    6, // baseSpCost
+    0, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    5, // field_0x19
+    100, // mBingoSlotChance
+    50, // field_0x1B
+    weaponGetPower_ZubaStar, // hpDamageFn
+    {0, 3, 6, 9, 12, 15, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x2101260, // targetClassFlags
+    0x20000000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    "msg_sac_8", // acHelpMsg
+    0x200C8, // special
+    0x7FF, // counterResistFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+    {0}, // field_AE
+    marioAttackEvent_ZubaStar, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 s32 zubastar_get_kouten(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy);
 
@@ -949,31 +979,72 @@ s32 zubastar_end(void);
 USER_FUNC(zubastar_main);
 
 
-s32 marioAttackEvent_ZubaStar[] = {
-    65627, (s32)zubastar_init, 110, 65627, (s32)main_star, 112, 65630, (s32)sac_start_camera_evt,
-    65546, 500, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START1", -250000000, 0,
-    -250000000, 65630, (s32)sac_mario_item_on_evt, 65546, 500, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_BTL_SAC_START2", -250000000, 0, -29999989, 65627, (s32)star_stone_appear, 110, 65630,
-    (s32)sac_start_stardust, 112, 65545, 100, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START3",
-    -250000000, 0, -250000000, 131163, (s32)evt_snd_sfxoff, -29999989, 196699, (s32)evt_btl_camera_set_mode,
-    0, 0, 65545, 40, 65630, (s32)sac_mario_item_on_end_evt, 65630, (s32)sac_mario_back_home,
-    65627, (s32)wait_star_stone_up, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_I_Y", 65546,
-    500, 110, 65627, (s32)sac_handbeat, 112, 65627, (s32)sac_ac_help_on, 65627,
-    (s32)zubastar_main, 65627, (s32)sac_ac_help_off, 65627, (s32)sac_handbeat_end, 110, 393307, (s32)evt_fade_entry,
-    17, 1, 255, 255, 255, 65546, 100, 393307,
-    (s32)evt_fade_entry, 16, 250, 255, 255, 255, 112, 107,
-    393307, (s32)evt_btl_camera_shake_h, 0, 10, 0, 60, 0, 65541,
-    6, 393307, (s32)evt_btl_camera_shake_w, 0, 10, 0, 10, 0,
-    65545, 10, 6, 109, 65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost,
-    -2, 196699, (s32)btlevtcmd_CommandGetWeaponAddress, -2, -30000000, 131163, (s32)btlevtcmd_WeaponAftereffect, -30000000,
-    196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 65539, 95, 131096, -29999997,
-    -1, 65540, 97, 33, 327771, (s32)btlevtcmd_CheckPartsAttribute, -29999997, -29999996,
-    16384, -30000000, 131096, -30000000, 0, 458843, (s32)btlevtcmd_CheckDamage, -2,
-    -29999997, -29999996, (s32)weapon_zubastar, 256, -29999995, 33, 196699, (s32)btlevtcmd_GetSelectNextEnemy,
-    -29999997, -29999996, 65540, 95, 65539, 97, 65627, (s32)zubastar_bomb,
-    65627, (s32)zubastar_end, 65539, 99, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2,
-    1,
-};
+EVT_BEGIN(marioAttackEvent_ZubaStar)
+    CALL(zubastar_init)
+    BEGIN_SIBLING_EVENT
+        CALL(main_star)
+    END_SIBLING_EVENT
+    CALL_CHILD(sac_start_camera_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START1"), -250000000, 0, -250000000)
+    CALL_CHILD(sac_mario_item_on_evt)
+    WAIT_MS(500)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START2"), -250000000, 0, LW(11))
+    CALL(star_stone_appear)
+    BEGIN_SIBLING_EVENT
+        CALL_CHILD(sac_start_stardust)
+    END_SIBLING_EVENT
+    WAIT_FRAMES(100)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START3"), -250000000, 0, -250000000)
+    CALL(evt_snd_sfxoff, LW(11))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    WAIT_FRAMES(40)
+    CALL_CHILD(sac_mario_item_on_end_evt)
+    CALL_CHILD(sac_mario_back_home)
+    CALL(wait_star_stone_up)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_I_Y"))
+    WAIT_MS(500)
+    BEGIN_SIBLING_EVENT
+        CALL(sac_handbeat)
+    END_SIBLING_EVENT
+    CALL(sac_ac_help_on)
+    CALL(zubastar_main)
+    CALL(sac_ac_help_off)
+    CALL(sac_handbeat_end)
+    BEGIN_SIBLING_EVENT
+        CALL(evt_fade_entry, 17, 1, 255, 255, 255)
+        WAIT_MS(100)
+        CALL(evt_fade_entry, 16, 250, 255, 255, 255)
+    END_SIBLING_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_btl_camera_shake_h, 0, 10, 0, 60, 0)
+        LOOP(6)
+            CALL(evt_btl_camera_shake_w, 0, 10, 0, 10, 0)
+            WAIT_FRAMES(10)
+        END_LOOP
+    END_INLINE_EVENT
+    CALL(btlevtcmd_WaitGuardMove)
+    CALL(btlevtcmd_CommandPayWeaponCost, -2)
+    CALL(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+    CALL(btlevtcmd_WeaponAftereffect, LW(0))
+    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    LABEL(95)
+    IF_INT_EQUAL(LW(3), -1)
+        GOTO(97)
+    END_IF
+    CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), 16384, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_zubastar), 256, LW(5))
+    END_IF
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    GOTO(95)
+    LABEL(97)
+    CALL(zubastar_bomb)
+    CALL(zubastar_end)
+    LABEL(99)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
 
 
 

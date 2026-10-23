@@ -7,6 +7,8 @@
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
+#include "data_tables.h"
 
 USER_FUNC(btlevtcmd_AddScale);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -66,23 +68,23 @@ USER_FUNC(evt_btl_camera_shake_h);
 USER_FUNC(evt_msg_print);
 USER_FUNC(get_gold_chorobon_id);
 extern s32 chorogun_entry[];
-extern s32 unit_chorobon_gundan[];
+extern BattleUnitKind unit_chorobon_gundan;
 extern s32 chorogun_dead_reward[];
 
-__declspec(section ".data") u64 fd_gold_chorobon_negone_one_374;
-__declspec(section ".data") s32 fd_gold_chorobon_neg_one_382[1];
-__declspec(section ".data") s32 fd_gold_chorobon___local_PI_383[1];
-__declspec(section ".data") s32 fd_gold_chorobon___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gold_chorobon_one_negone_373;
-__declspec(section ".data") s32 fd_gold_chorobon___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gold_chorobon_one_381[1];
-__declspec(section ".data") u64 fd_gold_chorobon_negone_one_360;
-__declspec(section ".data") s32 fd_gold_chorobon_neg_one_365[1];
-__declspec(section ".data") s32 fd_gold_chorobon___local_PI_366[1];
-__declspec(section ".data") s32 fd_gold_chorobon___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gold_chorobon_one_negone_359;
-__declspec(section ".data") s32 fd_gold_chorobon___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gold_chorobon_one_364[1];
+__declspec(section ".data") f32 fd_gold_chorobon_negone_one_374[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gold_chorobon_neg_one_382;
+__declspec(section ".data") f32 fd_gold_chorobon___local_PI_383;
+__declspec(section ".data") f32 fd_gold_chorobon___local_3PIO2_385;
+__declspec(section ".data") f32 fd_gold_chorobon_one_negone_373[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gold_chorobon___local_PIO2_384;
+__declspec(section ".data") f32 fd_gold_chorobon_one_381;
+__declspec(section ".data") f32 fd_gold_chorobon_negone_one_360[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gold_chorobon_neg_one_365;
+__declspec(section ".data") f32 fd_gold_chorobon___local_PI_366;
+__declspec(section ".data") f32 fd_gold_chorobon___local_3PIO2_368;
+__declspec(section ".data") f32 fd_gold_chorobon_one_negone_359[2] __attribute__((aligned(8)));
+__declspec(section ".data") f32 fd_gold_chorobon___local_PIO2_367;
+__declspec(section ".data") f32 fd_gold_chorobon_one_364;
 BattleUnitKind unit_gold_chorobon;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -90,10 +92,10 @@ static __declspec(section ".data") StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
 static BattleDataEntry data_table[15];
 static BattleUnitKindPart parts[1];
-s32 weapon_gold_chorobon_attack[48];
-static s32 pose_sound_timing_table[20];
+BattleWeapon weapon_gold_chorobon_attack;
+static PoseSoundTiming pose_sound_timing_table[4];
 s32 gold_chorobon_rabbit_move[123];
-__declspec(section ".data") s32 entry_chorogun[12];
+__declspec(section ".data") BattleUnitSetup entry_chorogun;
 s32 call_chorogun_event[67];
 s32 escape_chorogun_event[50];
 static s32 init_event[43];
@@ -103,53 +105,33 @@ static s32 return_event[24];
 static s32 attack_event[500];
 static __declspec(section ".data") s32 wait_event[6];
 
-__declspec(section ".data") u64 fd_gold_chorobon_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gold_chorobon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gold_chorobon_neg_one_382[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gold_chorobon_neg_one_382 = -1.0f;
 
-__declspec(section ".data") s32 fd_gold_chorobon___local_PI_383[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gold_chorobon___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gold_chorobon___local_3PIO2_385[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gold_chorobon___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gold_chorobon_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gold_chorobon_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gold_chorobon___local_PIO2_384[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gold_chorobon___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gold_chorobon_one_381[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gold_chorobon_one_381 = 1.0f;
 
-__declspec(section ".data") u64 fd_gold_chorobon_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") f32 fd_gold_chorobon_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") s32 fd_gold_chorobon_neg_one_365[] = {
-    -1082130432,
-};
+__declspec(section ".data") f32 fd_gold_chorobon_neg_one_365 = -1.0f;
 
-__declspec(section ".data") s32 fd_gold_chorobon___local_PI_366[] = {
-    1078530011,
-};
+__declspec(section ".data") f32 fd_gold_chorobon___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") s32 fd_gold_chorobon___local_3PIO2_368[] = {
-    1083624420,
-};
+__declspec(section ".data") f32 fd_gold_chorobon___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u64 fd_gold_chorobon_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") f32 fd_gold_chorobon_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") s32 fd_gold_chorobon___local_PIO2_367[] = {
-    1070141403,
-};
+__declspec(section ".data") f32 fd_gold_chorobon___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") s32 fd_gold_chorobon_one_364[] = {
-    1065353216,
-};
+__declspec(section ".data") f32 fd_gold_chorobon_one_364 = 1.0f;
 
 BattleUnitKind unit_gold_chorobon = {
     20,
@@ -266,43 +248,100 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_gold_chorobon", "c_chorobon_k", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
-s32 weapon_gold_chorobon_attack[] = {
-    0, 0, 0, 0, 1677721601, 1065353216, 16843009, (s32)weaponGetPowerDefault,
-    1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17830496, 536875008, 770, 0, 20487, 0, -2147475452,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 100, 0, 0,
+BattleWeapon weapon_gold_chorobon_attack = {
+    NULL, 0, // name..icon
+    {0}, // field_0x6
+    0, NULL, // itemId..description
+    100, // baseAccuracy
+    0, 0, // baseFpCost..baseSpCost
+    1, // superguardsAllowed
+    1.0f, // field_0x14
+    1, // mStylishCommandMultiplier
+    1, // field_0x19
+    1, // mBingoSlotChance
+    1, // field_0x1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1101260, // targetClassFlags
+    0x20001000, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // field_0x6F
+    NULL, // acHelpMsg
+    0x5007, // special
+    0, // counterResistFlags
+    0x80002004, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // field_AE
+    NULL, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static s32 pose_sound_timing_table[] = {
-    (s32)"CBN_S_1", 1058362709, 0, (s32)"SFX_BOSS_G_CHORO_MOVE1", 1, (s32)"CBN_S_1", 1062557013, 0,
-    (s32)"SFX_BOSS_G_CHORO_WAIT2", 1, (s32)"CBN_S_1", 1070246571, 0, (s32)"SFX_BOSS_G_CHORO_WAIT1", 1, 0,
-    0, 0, 0, 1,
+static PoseSoundTiming pose_sound_timing_table[] = {
+    {"CBN_S_1", 0.5833333f, NULL, "SFX_BOSS_G_CHORO_MOVE1", 0, 1},
+    {"CBN_S_1", 0.8333333f, NULL, "SFX_BOSS_G_CHORO_WAIT2", 0, 1},
+    {"CBN_S_1", 1.5833334f, NULL, "SFX_BOSS_G_CHORO_WAIT1", 0, 1},
+    {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
-s32 gold_chorobon_rabbit_move[] = {
-    65541, 2, 327771, (s32)btlevtcmd_AddScale, -2, -229999837, -230000245, 0,
-    65545, 1, 6, 65539, 0, 327771, (s32)btlevtcmd_GetPos, -2,
-    -30000000, -29999999, -29999998, 131122, -29999989, -29999995, 131126, -29999989,
-    -30000000, 131122, -29999988, -29999989, 131098, -29999988, 0, 131127,
-    -29999988, -1, 33, 131099, -29999988, -29999992, 131101, -29999989,
-    0, 131125, -30000000, -29999992, 32, 131126, -30000000, -29999992,
-    33, 327771, (s32)btlevtcmd_SetScale, -2, -229998976, -229998976, -229998976, 458843,
-    (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999994, -29999998, 0, -1, 65541,
-    2, 327771, (s32)btlevtcmd_AddScale, -2, -229999837, -230000245, 0, 65545,
-    1, 6, 65540, 0, 32, 327771, (s32)btlevtcmd_SetScale, -2,
-    -229998976, -229998976, -229998976, 458843, (s32)btlevtcmd_JumpPosition, -2, -29999995, -29999994,
-    -29999993, 0, 0, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_G_CHORO_ATTACK1", -250000000,
-    0, -250000000, 65541, 2, 327771, (s32)btlevtcmd_AddScale, -2, -229999837,
-    -230000245, 0, 65545, 1, 6, 33, 65541, 2,
-    327771, (s32)btlevtcmd_AddScale, -2, -230000163, -229999755, 0, 65545, 1,
-    6, 2, 1,
-};
+EVT_BEGIN(gold_chorobon_rabbit_move)
+    LOOP(2)
+        CALL(btlevtcmd_AddScale, -2, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    LABEL(0)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    SET_VALUE(LW(11), LW(5))
+    SUBTRACT(LW(11), LW(0))
+    SET_VALUE(LW(12), LW(11))
+    IF_INT_LESS(LW(12), 0)
+        MULTIPLY(LW(12), -1)
+    END_IF
+    IF_INT_GREATER(LW(12), LW(8))
+        IF_INT_GREATER_OR_EQUAL(LW(11), 0)
+            ADD(LW(0), LW(8))
+        ELSE
+            SUBTRACT(LW(0), LW(8))
+        END_IF
+        CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+        CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(6), LW(2), 0, -1)
+        LOOP(2)
+            CALL(btlevtcmd_AddScale, -2, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+        GOTO(0)
+    ELSE
+        CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+        CALL(btlevtcmd_JumpPosition, -2, LW(5), LW(6), LW(7), 0, 0)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_G_CHORO_ATTACK1"), -250000000, 0, -250000000)
+        LOOP(2)
+            CALL(btlevtcmd_AddScale, -2, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_IF
+    LOOP(2)
+        CALL(btlevtcmd_AddScale, -2, FLOAT(-0.15917969f), FLOAT(0.23925781f), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    RETURN
+EVT_END()
 
-__declspec(section ".data") s32 entry_chorogun[] = {
-    (s32)unit_chorobon_gundan, 16777216, 67108868, 1117126656, 0, 0, 0, 0,
-    0, 0, 0, 0,
+__declspec(section ".data") BattleUnitSetup entry_chorogun = {
+    &unit_chorobon_gundan, // mUnitKindParams
+    1, // alliance
+    {0}, // pad_05
+    0x4000004, // attackPhase
+    {75.0f, 0.0f, 0.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
 };
 
 EVT_BEGIN(call_chorogun_event)
@@ -397,7 +436,7 @@ static EVT_BEGIN(damage_event)
         IF_INT_LESS_OR_EQUAL(LW(0), 7)
             IF_INT_GREATER_OR_EQUAL(LW(0), 1)
                 CALL(btlevtcmd_WaitAttackEnd)
-                CALL(btlevtcmd_SpawnUnit, LW(3), PTR(entry_chorogun), 0)
+                CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_chorogun), 0)
                 CALL(btlevtcmd_SetUnitWork, -2, 2, LW(3))
                 CALL_CHILD(PTR(call_chorogun_event))
                 CALL(btlevtcmd_SetUnitWork, -2, 0, 1)
@@ -439,8 +478,8 @@ static EVT_BEGIN(attack_event)
         RETURN
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(weapon_gold_chorobon_attack))
-    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(weapon_gold_chorobon_attack), LW(3), LW(4))
+    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_gold_chorobon_attack))
+    CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_gold_chorobon_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
@@ -449,10 +488,10 @@ static EVT_BEGIN(attack_event)
         END_IF
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_WeaponAftereffect, PTR(weapon_gold_chorobon_attack))
+    CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_gold_chorobon_attack))
     CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(weapon_gold_chorobon_attack))
+    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_gold_chorobon_attack))
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -472,7 +511,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     SUBTRACT(LW(2), 2)
     CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 20, -1)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(weapon_gold_chorobon_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_gold_chorobon_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -516,8 +555,8 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
-    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(weapon_gold_chorobon_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(weapon_gold_chorobon_attack), 256, LW(5))
+    CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_gold_chorobon_attack))
+    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_gold_chorobon_attack), 256, LW(5))
     LOOP(4)
         CALL(btlevtcmd_AddScale, -2, FLOAT(-0.07910156f), FLOAT(0.119140625f), 0)
         WAIT_FRAMES(1)

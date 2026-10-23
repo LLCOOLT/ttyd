@@ -2,4 +2,4 @@
 
 #include "dolphin/types.h"
 
-extern s32 unit_bomzou[];
+extern BattleUnitKind unit_bomzou;
