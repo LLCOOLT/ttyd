@@ -14,7 +14,7 @@ A work-in-progress decompilation of Paper Mario: The Thousand-Year Door.
 
 This project started as a fork of [doldecomp/ttyd](https://github.com/doldecomp/ttyd), which grew out of [NWPlayer123](https://github.com/NWPlayer123)'s original G8MJ01 decomp-toolkit setup. The project structure, build system, splits, symbols and the early decompilation work come from them and their contributors. Many thanks to everyone who worked on it. The original MIT licence and copyright notice are kept in [LICENSE](LICENSE).
 
-It is now an **independent project and is not affiliated with doldecomp**. Most of the code added since the fork was written with the help of AI tools (Anthropic's Claude), so it is kept separate from the upstream project. Please don't take questions about this repository to the doldecomp community; use this repository's issues instead.
+It is now an **independent project and is not affiliated with doldecomp**. All of the code added since the fork was written with the help of AI tools (Anthropic's Claude), so it is kept separate from the upstream project. Please don't take questions about this repository to the doldecomp community; use this repository's issues instead.
 
 Some functions use small behaviour-identical tricks to reach a byte-identical build; each is marked in the code with a `FAKE` comment and listed in [docs/FAKES.md](docs/FAKES.md).
 
