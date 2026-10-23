@@ -84,58 +84,58 @@ s32 yuunpc_pose_check(const char* name, const char* anim);
 void yuunpc_pose_init(YuuNpcData* data);
 void yuunpc_maphit_init(void);
 
-__declspec(section ".data") f32 fd_evt_yuunpc_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_evt_yuunpc_neg_one_382;
-__declspec(section ".data") f32 fd_evt_yuunpc___local_PI_383;
-__declspec(section ".data") f32 fd_evt_yuunpc___local_3PIO2_385;
-__declspec(section ".data") f32 fd_evt_yuunpc_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_evt_yuunpc___local_PIO2_384;
-__declspec(section ".data") f32 fd_evt_yuunpc_one_381;
-__declspec(section ".data") f32 fd_evt_yuunpc_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_evt_yuunpc_neg_one_365;
-__declspec(section ".data") f32 fd_evt_yuunpc___local_PI_366;
-__declspec(section ".data") f32 fd_evt_yuunpc___local_3PIO2_368;
-__declspec(section ".data") f32 fd_evt_yuunpc_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_evt_yuunpc___local_PIO2_367;
-__declspec(section ".data") f32 fd_evt_yuunpc_one_364;
+f32 fd_evt_yuunpc_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_evt_yuunpc_neg_one_382;
+f32 fd_evt_yuunpc___local_PI_383;
+f32 fd_evt_yuunpc___local_3PIO2_385;
+f32 fd_evt_yuunpc_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_evt_yuunpc___local_PIO2_384;
+f32 fd_evt_yuunpc_one_381;
+f32 fd_evt_yuunpc_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_evt_yuunpc_neg_one_365;
+f32 fd_evt_yuunpc___local_PI_366;
+f32 fd_evt_yuunpc___local_3PIO2_368;
+f32 fd_evt_yuunpc_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_evt_yuunpc___local_PIO2_367;
+f32 fd_evt_yuunpc_one_364;
 ExtTexInfo ext_yuunpc_minigame1_data[6];
 ExtTexInfo ext_yuunpc_minigame2_data[6];
 ExtTexInfo ext_yuunpc_minigame3_data[6];
 ExtTexInfo ext_yuunpc_minigame4_data[78];
 s32 chusan_mov_tbl[28];
-__declspec(section ".data") s32 chusan_act_tbl[8];
+s32 chusan_act_tbl[8];
 s32 evt_yuunpc_minigame1[69];
 s32 evt_yuunpc_minigame2[69];
 s32 evt_yuunpc_minigame3[69];
 s32 evt_yuunpc_minigame4[167];
 
-__declspec(section ".data") f32 fd_evt_yuunpc_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_evt_yuunpc_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_evt_yuunpc_neg_one_382 = -1.0f;
+f32 fd_evt_yuunpc_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_evt_yuunpc___local_PI_383 = 3.1415927f;
+f32 fd_evt_yuunpc___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_evt_yuunpc___local_3PIO2_385 = 4.712389f;
+f32 fd_evt_yuunpc___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_evt_yuunpc_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_evt_yuunpc_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_evt_yuunpc___local_PIO2_384 = 1.5707964f;
+f32 fd_evt_yuunpc___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_evt_yuunpc_one_381 = 1.0f;
+f32 fd_evt_yuunpc_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_evt_yuunpc_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_evt_yuunpc_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_evt_yuunpc_neg_one_365 = -1.0f;
+f32 fd_evt_yuunpc_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_evt_yuunpc___local_PI_366 = 3.1415927f;
+f32 fd_evt_yuunpc___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_evt_yuunpc___local_3PIO2_368 = 4.712389f;
+f32 fd_evt_yuunpc___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_evt_yuunpc_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_evt_yuunpc_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_evt_yuunpc___local_PIO2_367 = 1.5707964f;
+f32 fd_evt_yuunpc___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_evt_yuunpc_one_364 = 1.0f;
+f32 fd_evt_yuunpc_one_364 = 1.0f;
 
 f32 yuusintbl[] = {
     0.0f, 0.0174519997f, 0.0348990001f, 0.0523359999f, 0.0697560012f, 0.0871559978f, 0.104528002f, 0.121868998f,
@@ -314,7 +314,7 @@ s32 chusan_mov_tbl[] = {
     0, 0, 0, 0,
 };
 
-__declspec(section ".data") s32 chusan_act_tbl[] = {
+s32 chusan_act_tbl[] = {
     1, 2, 3, 3, 3, 2, 1, 0,
 };
 

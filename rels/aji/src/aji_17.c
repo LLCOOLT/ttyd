@@ -221,9 +221,9 @@ static s32 peach_evt_stg1[1131];
 f32 move_pos_list[15][2];
 s32 peach_dance_move[95];
 s32 peach_dance_pose[44];
-__declspec(section ".data") s32 peach_dance_action_step[2];
+s32 peach_dance_action_step[2];
 s32 dance_action_turn_sub[108];
-__declspec(section ".data") s32 peach_dance_action_turn[12];
+s32 peach_dance_action_turn[12];
 s32 peach_dance_action_reverse[18];
 s32 peach_dance_action_fail[28];
 s32 dance_btn_disp_sub[49];
@@ -243,9 +243,9 @@ static s32 peach_evt_stg4[980];
 static s32 peach_evt_stg5[408];
 static s32 peach_evt_stg5_1[528];
 static s32 peach_evt_stg6[1467];
-__declspec(section ".data") static s32 teshita1_init[9];
-__declspec(section ".data") static s32 teshita2_init[9];
-__declspec(section ".data") static s32 syuryo_init[9];
+static s32 teshita1_init[9];
+static s32 teshita2_init[9];
+static s32 syuryo_init[9];
 static NpcSetupInfo npcEnt[4];
 s32 tec_talk[36];
 s32 aji_17_init_evt[VERSION_PICK(253, 255)];
@@ -284,37 +284,37 @@ static s32 bgm_start_wait(EventEntry* event, BOOL isFirstCall) {
 
 
 #pragma force_active on
-__declspec(section ".data") f32 fd_aji_17_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_aji_17_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_aji_17_neg_one_382 = -1.0f;
+f32 fd_aji_17_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_aji_17___local_PI_383 = 3.1415927f;
+f32 fd_aji_17___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_aji_17___local_3PIO2_385 = 4.712389f;
+f32 fd_aji_17___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") u32 gap_04_0001E124_data[1] = {0};
+u32 gap_04_0001E124_data[1] = {0};
 
-__declspec(section ".data") f32 fd_aji_17_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_aji_17_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_aji_17___local_PIO2_384 = 1.5707964f;
+f32 fd_aji_17___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_aji_17_one_381 = 1.0f;
+f32 fd_aji_17_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_aji_17_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_aji_17_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_aji_17_neg_one_365 = -1.0f;
+f32 fd_aji_17_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_aji_17___local_PI_366 = 3.1415927f;
+f32 fd_aji_17___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_aji_17___local_3PIO2_368 = 4.712389f;
+f32 fd_aji_17___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") u32 gap_04_0001E14C_data[1] = {0};
+u32 gap_04_0001E14C_data[1] = {0};
 
-__declspec(section ".data") f32 fd_aji_17_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_aji_17_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_aji_17___local_PIO2_367 = 1.5707964f;
+f32 fd_aji_17___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_aji_17_one_364 = 1.0f;
+f32 fd_aji_17_one_364 = 1.0f;
 
 #pragma force_active reset
 
@@ -1189,7 +1189,7 @@ EVT_BEGIN(peach_dance_pose)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(peach_dance_action_step)
+EVT_BEGIN(peach_dance_action_step)
     RETURN
 EVT_END()
 
@@ -1233,7 +1233,7 @@ EVT_BEGIN(dance_action_turn_sub)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(peach_dance_action_turn)
+EVT_BEGIN(peach_dance_action_turn)
     CALL(dance_flag_onoff, 2, 1)
     CALL_CHILD(PTR(dance_action_turn_sub))
     CALL(dance_flag_onoff, 2, 0)
@@ -3136,19 +3136,19 @@ static EVT_BEGIN(peach_evt_stg6)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(teshita1_init)
+static EVT_BEGIN(teshita1_init)
     CALL_CHILD(PTR(npc_init_evt))
     CALL(evt_npc_status_onoff, 1, STRING(("me")), 2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(teshita2_init)
+static EVT_BEGIN(teshita2_init)
     CALL_CHILD(PTR(npc_init_evt))
     CALL(evt_npc_status_onoff, 1, STRING(("me")), 2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(syuryo_init)
+static EVT_BEGIN(syuryo_init)
     CALL_CHILD(PTR(npc_init_evt))
     CALL(evt_npc_status_onoff, 1, STRING(("me")), 2)
     RETURN
@@ -3837,7 +3837,7 @@ s32 evt_fuki_btn_set_batu(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
-static __declspec(section ".rodata") const char horogram_pose_suffix[] = "R";
+static const char horogram_pose_suffix[] = "R";
 s32 horogram_set_pose(EventEntry* event, BOOL isFirstCall) {
     char name[24];
     const char* pose = (const char*)evtGetValue(event, event->args[0]);

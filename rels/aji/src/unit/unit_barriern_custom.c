@@ -95,30 +95,30 @@ static USER_FUNC(barriern_zanzou2);
 static USER_FUNC(barriern_zanzou);
 extern BattleUnitKind unit_barriern_custom_satellite;
 
-__declspec(section ".data") f32 fd_barriern_custom_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_barriern_custom_neg_one_382;
-__declspec(section ".data") f32 fd_barriern_custom___local_PI_383;
-__declspec(section ".data") f32 fd_barriern_custom___local_3PIO2_385;
-__declspec(section ".data") f32 fd_barriern_custom_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_barriern_custom___local_PIO2_384;
-__declspec(section ".data") f32 fd_barriern_custom_one_381;
-__declspec(section ".data") f32 fd_barriern_custom_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_barriern_custom_neg_one_365;
-__declspec(section ".data") f32 fd_barriern_custom___local_PI_366;
-__declspec(section ".data") f32 fd_barriern_custom___local_3PIO2_368;
-__declspec(section ".data") f32 fd_barriern_custom_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_barriern_custom___local_PIO2_367;
-__declspec(section ".data") f32 fd_barriern_custom_one_364;
+f32 fd_barriern_custom_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_barriern_custom_neg_one_382;
+f32 fd_barriern_custom___local_PI_383;
+f32 fd_barriern_custom___local_3PIO2_385;
+f32 fd_barriern_custom_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_barriern_custom___local_PIO2_384;
+f32 fd_barriern_custom_one_381;
+f32 fd_barriern_custom_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_barriern_custom_neg_one_365;
+f32 fd_barriern_custom___local_PI_366;
+f32 fd_barriern_custom___local_3PIO2_368;
+f32 fd_barriern_custom_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_barriern_custom___local_PIO2_367;
+f32 fd_barriern_custom_one_364;
 BattleUnitKind unit_barriern_custom;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
 static BattleUnitKindPart parts[11];
-static __declspec(section ".data") StatusVulnerability regist;
+static StatusVulnerability regist;
 static BattleWeapon weapon_wakka_attack;
 static BattleWeapon weapon_wawawa_attack;
-static __declspec(section ".data") BattleUnitSetup entry_barriern_satellite;
+static BattleUnitSetup entry_barriern_satellite;
 static PoseTableEntry pose_table[18];
-static __declspec(section ".data") BattleDataEntry data_table[2];
+static BattleDataEntry data_table[2];
 static Vec splineTableIn1_1[5];
 static Vec splineTableIn2_1[5];
 static Vec splineTableIn2_2[5];
@@ -152,40 +152,40 @@ static s32 wakka_attack_common_event_no_hit[305];
 static s32 wakka_attack_common_event_hit[211];
 static s32 damage_check_event_sub[131];
 static s32 wakka_attack_event[255];
-static __declspec(section ".data") s32 wawawa_attack_event_satellite_blur[10];
+static s32 wawawa_attack_event_satellite_blur[10];
 static s32 wawawa_attack_event[548];
 static s32 wawawa_attack_event_sub[87];
-static __declspec(section ".data") s32 wawawa_attack_event_sub_no_last[10];
+static s32 wawawa_attack_event_sub_no_last[10];
 static s32 wawawa_attack_event_sub_last[93];
 static s32 wait_event[116];
 
-__declspec(section ".data") f32 fd_barriern_custom_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_barriern_custom_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_barriern_custom_neg_one_382 = -1.0f;
+f32 fd_barriern_custom_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_barriern_custom___local_PI_383 = 3.1415927f;
+f32 fd_barriern_custom___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_barriern_custom___local_3PIO2_385 = 4.712389f;
+f32 fd_barriern_custom___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_barriern_custom_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_barriern_custom_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_barriern_custom___local_PIO2_384 = 1.5707964f;
+f32 fd_barriern_custom___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_barriern_custom_one_381 = 1.0f;
+f32 fd_barriern_custom_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_barriern_custom_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_barriern_custom_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_barriern_custom_neg_one_365 = -1.0f;
+f32 fd_barriern_custom_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_barriern_custom___local_PI_366 = 3.1415927f;
+f32 fd_barriern_custom___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_barriern_custom___local_3PIO2_368 = 4.712389f;
+f32 fd_barriern_custom___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_barriern_custom_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_barriern_custom_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_barriern_custom___local_PIO2_367 = 1.5707964f;
+f32 fd_barriern_custom___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_barriern_custom_one_364 = 1.0f;
+f32 fd_barriern_custom_one_364 = 1.0f;
 
 BattleUnitKind unit_barriern_custom = {
     117,
@@ -253,9 +253,9 @@ BattleUnitKind unit_barriern_custom = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
+static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_barriern_custom", "c_baria_c", 0.0f, 0.0f, 0.0f, 0.0f, 12.0f, 0.0f, 0.0f, 22.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
@@ -271,7 +271,7 @@ static BattleUnitKindPart parts[] = {
     {11, "btl_un_barriern_custom", "c_baria_c", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 10, 10, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
-static __declspec(section ".data") StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 100, 0, 100, 0, 0, 0, 0, 100, 0, 100, 100, 10};
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 100, 0, 100, 0, 0, 0, 0, 100, 0, 100, 100, 10};
 
 static BattleWeapon weapon_wakka_attack = {
     NULL, 0, // name..icon
@@ -351,7 +351,7 @@ static BattleWeapon weapon_wawawa_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitSetup entry_barriern_satellite = {
+static BattleUnitSetup entry_barriern_satellite = {
     &unit_barriern_custom_satellite, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -383,7 +383,7 @@ static PoseTableEntry pose_table[] = {
     {69, "S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {48, barriern_dmg_first_attack_pos},
     {0, NULL},
 };
@@ -1261,7 +1261,7 @@ static EVT_BEGIN(wakka_attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wawawa_attack_event_satellite_blur)
+static EVT_BEGIN(wawawa_attack_event_satellite_blur)
     CALL(barriern_satellite_zanzou, -2, LW(0))
     CALL(barriern_satellite_zanzou2, -2, LW(0))
     RETURN
@@ -1459,7 +1459,7 @@ static EVT_BEGIN(wawawa_attack_event_sub)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wawawa_attack_event_sub_no_last)
+static EVT_BEGIN(wawawa_attack_event_sub_no_last)
     SET_VALUE(LW(9), PTR(&weapon_wawawa_attack))
     SET_VALUE(LW(10), 0)
     CALL_CHILD(PTR(damage_check_event_sub))

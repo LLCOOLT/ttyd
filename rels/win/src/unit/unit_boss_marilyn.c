@@ -45,26 +45,26 @@ extern s32 btl_marilyn_zoom[];
 extern s32 majo3_shadow_tail_event[];
 extern s32 majo_unison_phase_event[];
 
-__declspec(section ".data") f32 fd_boss_marilyn_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_marilyn_neg_one_382;
-__declspec(section ".data") f32 fd_boss_marilyn___local_PI_383;
-__declspec(section ".data") f32 fd_boss_marilyn___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_marilyn_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_marilyn___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_marilyn_one_381;
-__declspec(section ".data") f32 fd_boss_marilyn_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_marilyn_neg_one_365;
-__declspec(section ".data") f32 fd_boss_marilyn___local_PI_366;
-__declspec(section ".data") f32 fd_boss_marilyn___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_marilyn_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_marilyn___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_marilyn_one_364;
+f32 fd_boss_marilyn_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_marilyn_neg_one_382;
+f32 fd_boss_marilyn___local_PI_383;
+f32 fd_boss_marilyn___local_3PIO2_385;
+f32 fd_boss_marilyn_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_marilyn___local_PIO2_384;
+f32 fd_boss_marilyn_one_381;
+f32 fd_boss_marilyn_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_marilyn_neg_one_365;
+f32 fd_boss_marilyn___local_PI_366;
+f32 fd_boss_marilyn___local_3PIO2_368;
+f32 fd_boss_marilyn_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_marilyn___local_PIO2_367;
+f32 fd_boss_marilyn_one_364;
 BattleUnitKind unit_boss_marilyn;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
-static __declspec(section ".data") BattleDataEntry data_table[2];
+static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_marilyn_kagenuke_attack1;
 static BattleWeapon weapon_marilyn_thunder_attack1;
@@ -75,7 +75,7 @@ static s32 init_event[37];
 static s32 damage_event[22];
 static s32 dead_event[152];
 static s32 unison_phase_event[83];
-static __declspec(section ".data") s32 phase_event[2];
+static s32 phase_event[2];
 static s32 attack_event[193];
 #ifdef VERSION_G8ME01
 static s32 kagenuke_attack_event[241];
@@ -84,35 +84,35 @@ static s32 kagenuke_attack_event[238];
 #endif
 static s32 thunder_attack_event[235];
 static s32 charge_attack_event[58];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
-__declspec(section ".data") f32 fd_boss_marilyn_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_marilyn_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_marilyn_neg_one_382 = -1.0f;
+f32 fd_boss_marilyn_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_marilyn___local_PI_383 = 3.1415927f;
+f32 fd_boss_marilyn___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_marilyn___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_marilyn___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_marilyn_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_marilyn_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_marilyn___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_marilyn___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_marilyn_one_381 = 1.0f;
+f32 fd_boss_marilyn_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_marilyn_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_marilyn_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_marilyn_neg_one_365 = -1.0f;
+f32 fd_boss_marilyn_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_marilyn___local_PI_366 = 3.1415927f;
+f32 fd_boss_marilyn___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_marilyn___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_marilyn___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_marilyn_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_marilyn_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_marilyn___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_marilyn___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_marilyn_one_364 = 1.0f;
+f32 fd_boss_marilyn_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_marilyn = {
     32,
@@ -180,11 +180,11 @@ BattleUnitKind unit_boss_marilyn = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {80, 80, 80, 100, 80, 100, 100, 60, 100, 80, 100, 80, 100, 95, 70, 0, 0, 100, 70, 100, 100, 0};
+static StatusVulnerability regist = {80, 80, 80, 100, 80, 100, 100, 60, 100, 80, 100, 80, 100, 95, 70, 0, 0, 100, 70, 100, 100, 0};
 
 static PoseTableEntry pose_table[] = {
     {1, "MRR_N_1"},
@@ -207,7 +207,7 @@ static PoseTableEntry pose_table[] = {
     {69, "MRR_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
@@ -460,7 +460,7 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(phase_event)
+static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
@@ -707,7 +707,7 @@ static EVT_BEGIN(charge_attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

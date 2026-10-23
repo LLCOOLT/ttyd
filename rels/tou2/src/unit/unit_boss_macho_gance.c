@@ -54,24 +54,24 @@ static USER_FUNC(wariai_enzan_1f_intpl);
 static USER_FUNC(wariai_enzan_1f);
 static USER_FUNC(wariai_enzan_1);
 
-__declspec(section ".data") f32 fd_boss_macho_gance_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_macho_gance_neg_one_382;
-__declspec(section ".data") f32 fd_boss_macho_gance___local_PI_383;
-__declspec(section ".data") f32 fd_boss_macho_gance___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_macho_gance_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_macho_gance___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_macho_gance_one_381;
-__declspec(section ".data") f32 fd_boss_macho_gance_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_macho_gance_neg_one_365;
-__declspec(section ".data") f32 fd_boss_macho_gance___local_PI_366;
-__declspec(section ".data") f32 fd_boss_macho_gance___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_macho_gance_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_macho_gance___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_macho_gance_one_364;
+f32 fd_boss_macho_gance_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_macho_gance_neg_one_382;
+f32 fd_boss_macho_gance___local_PI_383;
+f32 fd_boss_macho_gance___local_3PIO2_385;
+f32 fd_boss_macho_gance_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_macho_gance___local_PIO2_384;
+f32 fd_boss_macho_gance_one_381;
+f32 fd_boss_macho_gance_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_macho_gance_neg_one_365;
+f32 fd_boss_macho_gance___local_PI_366;
+f32 fd_boss_macho_gance___local_3PIO2_368;
+f32 fd_boss_macho_gance_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_macho_gance___local_PIO2_367;
+f32 fd_boss_macho_gance_one_364;
 BattleUnitKind unit_boss_macho_gance;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_furafura[18];
 static BattleDataEntry data_table[15];
@@ -103,35 +103,35 @@ s32 gance_attack_attack_event[541];
 s32 gance_posing_attack_event[129];
 s32 gance_rariat_attack_attack_event[446];
 s32 gance_body_attack_attack_event[515];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
-__declspec(section ".data") f32 fd_boss_macho_gance_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_macho_gance_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_macho_gance_neg_one_382 = -1.0f;
+f32 fd_boss_macho_gance_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_macho_gance___local_PI_383 = 3.1415927f;
+f32 fd_boss_macho_gance___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_macho_gance___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_macho_gance___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_macho_gance_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_macho_gance_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_macho_gance___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_macho_gance___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_macho_gance_one_381 = 1.0f;
+f32 fd_boss_macho_gance_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_macho_gance_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_macho_gance_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_macho_gance_neg_one_365 = -1.0f;
+f32 fd_boss_macho_gance_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_macho_gance___local_PI_366 = 3.1415927f;
+f32 fd_boss_macho_gance___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_macho_gance___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_macho_gance___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_macho_gance_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_macho_gance_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_macho_gance___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_macho_gance___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_macho_gance_one_364 = 1.0f;
+f32 fd_boss_macho_gance_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_macho_gance = {
     65,
@@ -199,11 +199,11 @@ BattleUnitKind unit_boss_macho_gance = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {50, 40, 50, 100, 50, 100, 100, 30, 0, 75, 100, 75, 100, 90, 60, 0, 0, 100, 60, 100, 100, 0};
+static StatusVulnerability regist = {50, 40, 50, 100, 50, 100, 100, 30, 0, 75, 100, 75, 100, 90, 60, 0, 0, 100, 60, 100, 100, 0};
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -1595,7 +1595,7 @@ EVT_BEGIN(gance_body_attack_attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

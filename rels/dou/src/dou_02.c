@@ -27,64 +27,64 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 
-__declspec(section ".data") f32 fd_dou_02_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_02_neg_one_382;
-__declspec(section ".data") f32 fd_dou_02___local_PI_383;
-__declspec(section ".data") f32 fd_dou_02___local_3PIO2_385;
-__declspec(section ".data") f32 fd_dou_02_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_02___local_PIO2_384;
-__declspec(section ".data") f32 fd_dou_02_one_381;
-__declspec(section ".data") f32 fd_dou_02_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_02_neg_one_365;
-__declspec(section ".data") f32 fd_dou_02___local_PI_366;
-__declspec(section ".data") f32 fd_dou_02___local_3PIO2_368;
-__declspec(section ".data") f32 fd_dou_02_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_02___local_PIO2_367;
-__declspec(section ".data") f32 fd_dou_02_one_364;
+f32 fd_dou_02_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_dou_02_neg_one_382;
+f32 fd_dou_02___local_PI_383;
+f32 fd_dou_02___local_3PIO2_385;
+f32 fd_dou_02_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_dou_02___local_PIO2_384;
+f32 fd_dou_02_one_381;
+f32 fd_dou_02_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_dou_02_neg_one_365;
+f32 fd_dou_02___local_PI_366;
+f32 fd_dou_02___local_3PIO2_368;
+f32 fd_dou_02_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_dou_02___local_PIO2_367;
+f32 fd_dou_02_one_364;
 static BeroEntry bero_entry_data[4];
 static s32 yari_trap_sub[119];
-static __declspec(section ".data") s32 yari_trap[11];
-static __declspec(section ".data") s32 dou_puka_event_init0[8];
+static s32 yari_trap[11];
+static s32 dou_puka_event_init0[8];
 static s32 dou_puka_event_0[24];
-static __declspec(section ".data") s32 dou_puka_event_rev_0[10];
+static s32 dou_puka_event_rev_0[10];
 static s32 dou_puka_event_main0[21];
 static s32 dou_puka_event_sub0[45];
-static __declspec(section ".data") s32 dou_puka_event_init1[8];
+static s32 dou_puka_event_init1[8];
 static s32 dou_puka_event_1[24];
-static __declspec(section ".data") s32 dou_puka_event_rev_1[10];
+static s32 dou_puka_event_rev_1[10];
 static s32 dou_puka_event_main1[21];
 static s32 dou_puka_event_sub1[45];
 static HitDamageReturn hitDmgRetPoints[8];
 static s32 evt_ride_ship[15];
 s32 dou_02_init_evt[139];
 
-__declspec(section ".data") f32 fd_dou_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_dou_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_dou_02_neg_one_382 = -1.0f;
+f32 fd_dou_02_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_dou_02___local_PI_383 = 3.1415927f;
+f32 fd_dou_02___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_dou_02___local_3PIO2_385 = 4.712389f;
+f32 fd_dou_02___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_dou_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_dou_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_dou_02___local_PIO2_384 = 1.5707964f;
+f32 fd_dou_02___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_dou_02_one_381 = 1.0f;
+f32 fd_dou_02_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_dou_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_dou_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_dou_02_neg_one_365 = -1.0f;
+f32 fd_dou_02_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_dou_02___local_PI_366 = 3.1415927f;
+f32 fd_dou_02___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_dou_02___local_3PIO2_368 = 4.712389f;
+f32 fd_dou_02___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_dou_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_dou_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_dou_02___local_PIO2_367 = 1.5707964f;
+f32 fd_dou_02___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_dou_02_one_364 = 1.0f;
+f32 fd_dou_02_one_364 = 1.0f;
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -180,14 +180,14 @@ static EVT_BEGIN(yari_trap_sub)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(yari_trap)
+static EVT_BEGIN(yari_trap)
     CALL(evt_hit_bind_mapobj, STRING("a02_yari"), STRING("s02_yari"))
     SET_VALUE(GW(15), 0)
     SPAWN_EVENT(PTR(yari_trap_sub))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dou_puka_event_init0)
+static EVT_BEGIN(dou_puka_event_init0)
     SET_VALUE(GW(0), 0)
     SET_VALUE(GW(1), 0)
     RETURN
@@ -207,7 +207,7 @@ static EVT_BEGIN(dou_puka_event_0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dou_puka_event_rev_0)
+static EVT_BEGIN(dou_puka_event_rev_0)
     IF_INT_NOT_EQUAL(GW(0), 2)
         RETURN
     END_IF
@@ -250,7 +250,7 @@ static EVT_BEGIN(dou_puka_event_sub0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dou_puka_event_init1)
+static EVT_BEGIN(dou_puka_event_init1)
     SET_VALUE(GW(2), 0)
     SET_VALUE(GW(3), 0)
     RETURN
@@ -270,7 +270,7 @@ static EVT_BEGIN(dou_puka_event_1)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dou_puka_event_rev_1)
+static EVT_BEGIN(dou_puka_event_rev_1)
     IF_INT_NOT_EQUAL(GW(2), 2)
         RETURN
     END_IF

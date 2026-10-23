@@ -32,20 +32,20 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon);
 
-__declspec(section ".data") f32 fd_las_19_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_19_neg_one_382;
-__declspec(section ".data") f32 fd_las_19___local_PI_383;
-__declspec(section ".data") f32 fd_las_19___local_3PIO2_385;
-__declspec(section ".data") f32 fd_las_19_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_19___local_PIO2_384;
-__declspec(section ".data") f32 fd_las_19_one_381;
-__declspec(section ".data") f32 fd_las_19_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_19_neg_one_365;
-__declspec(section ".data") f32 fd_las_19___local_PI_366;
-__declspec(section ".data") f32 fd_las_19___local_3PIO2_368;
-__declspec(section ".data") f32 fd_las_19_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_19___local_PIO2_367;
-__declspec(section ".data") f32 fd_las_19_one_364;
+f32 fd_las_19_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_las_19_neg_one_382;
+f32 fd_las_19___local_PI_383;
+f32 fd_las_19___local_3PIO2_385;
+f32 fd_las_19_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_las_19___local_PIO2_384;
+f32 fd_las_19_one_381;
+f32 fd_las_19_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_las_19_neg_one_365;
+f32 fd_las_19___local_PI_366;
+f32 fd_las_19___local_3PIO2_368;
+f32 fd_las_19_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_las_19___local_PIO2_367;
+f32 fd_las_19_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static s32 e1_door_close[22];
@@ -54,41 +54,41 @@ static s32 e2_door_close[22];
 static s32 e2_door_open[22];
 static BeroEntry bero_entry_data[5];
 const char* mapgrp_name_1[18];
-__declspec(section ".data") const char* mapgrp_name_2[5];
-static __declspec(section ".data") s32 cam_shake[8];
+const char* mapgrp_name_2[5];
+static s32 cam_shake[8];
 s32 change_map_evt[359];
 static s32 switch1_evt[13];
 static s32 switch2_evt[13];
-static __declspec(section ".data") s32 cloud_evt[5];
+static s32 cloud_evt[5];
 s32 las_19_init_evt[205];
 
-__declspec(section ".data") f32 fd_las_19_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_19_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_19_neg_one_382 = -1.0f;
+f32 fd_las_19_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_19___local_PI_383 = 3.1415927f;
+f32 fd_las_19___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_19___local_3PIO2_385 = 4.712389f;
+f32 fd_las_19___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_19_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_19_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_19___local_PIO2_384 = 1.5707964f;
+f32 fd_las_19___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_19_one_381 = 1.0f;
+f32 fd_las_19_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_las_19_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_19_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_19_neg_one_365 = -1.0f;
+f32 fd_las_19_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_19___local_PI_366 = 3.1415927f;
+f32 fd_las_19___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_19___local_3PIO2_368 = 4.712389f;
+f32 fd_las_19___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_19_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_19_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_19___local_PIO2_367 = 1.5707964f;
+f32 fd_las_19___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_19_one_364 = 1.0f;
+f32 fd_las_19_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -233,7 +233,7 @@ const char* mapgrp_name_1[] = {
     "S_kai_25",
 };
 
-__declspec(section ".data") const char* mapgrp_name_2[] = {
+const char* mapgrp_name_2[] = {
     "S_kai_20",
     "S_kai_21",
     "S_kai_22",
@@ -241,7 +241,7 @@ __declspec(section ".data") const char* mapgrp_name_2[] = {
     "S_kai_24",
 };
 
-static __declspec(section ".data") EVT_BEGIN(cam_shake)
+static EVT_BEGIN(cam_shake)
     CALL(evt_cam_shake, 4, FLOAT(0.029296875f), FLOAT(0.029296875f), 200)
     RETURN
 EVT_END()
@@ -353,7 +353,7 @@ static EVT_BEGIN(switch2_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(cloud_evt)
+static EVT_BEGIN(cloud_evt)
     SET_VALUE(GSW(0), 392)
     RETURN
 EVT_END()

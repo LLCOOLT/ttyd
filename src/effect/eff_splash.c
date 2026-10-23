@@ -48,7 +48,7 @@ static u8 geso_shibuki_dl_0_4[] = { 0x98, 0x00, 0x06, 0x10, 0x00, 0x01, 0x10, 0x
 static u8* geso_shibuki_dl_0_tbl[] = { geso_shibuki_dl_0_0, geso_shibuki_dl_0_1, geso_shibuki_dl_0_2, geso_shibuki_dl_0_3, geso_shibuki_dl_0_4 };
 static u8 geso_shibuki_dl_0_size_tbl[] = { 1, 1, 1, 1, 1, 0, 0, 0 };
 #pragma force_active on
-static __declspec(section ".sdata") u32 gap_07_804161FC_sdata[1] = {0};
+static u32 gap_07_804161FC_sdata[1] = {0};
 #pragma force_active reset
 
 EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 size) {

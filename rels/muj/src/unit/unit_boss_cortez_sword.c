@@ -53,73 +53,73 @@ USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
 
-__declspec(section ".data") f32 fd_boss_cortez_sword_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_cortez_sword_neg_one_382;
-__declspec(section ".data") f32 fd_boss_cortez_sword___local_PI_383;
-__declspec(section ".data") f32 fd_boss_cortez_sword___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_cortez_sword_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_cortez_sword___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_cortez_sword_one_381;
-__declspec(section ".data") f32 fd_boss_cortez_sword_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_cortez_sword_neg_one_365;
-__declspec(section ".data") f32 fd_boss_cortez_sword___local_PI_366;
-__declspec(section ".data") f32 fd_boss_cortez_sword___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_cortez_sword_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_cortez_sword___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_cortez_sword_one_364;
+f32 fd_boss_cortez_sword_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_cortez_sword_neg_one_382;
+f32 fd_boss_cortez_sword___local_PI_383;
+f32 fd_boss_cortez_sword___local_3PIO2_385;
+f32 fd_boss_cortez_sword_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_cortez_sword___local_PIO2_384;
+f32 fd_boss_cortez_sword_one_381;
+f32 fd_boss_cortez_sword_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_cortez_sword_neg_one_365;
+f32 fd_boss_cortez_sword___local_PI_366;
+f32 fd_boss_cortez_sword___local_3PIO2_368;
+f32 fd_boss_cortez_sword_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_cortez_sword___local_PIO2_367;
+f32 fd_boss_cortez_sword_one_364;
 BattleUnitKind unit_boss_cortez_sword;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 BattleWeapon weapon_cortez_sword_float_attack;
-static __declspec(section ".data") PoseTableEntry pose_table[6];
-__declspec(section ".data") PoseTableEntry pose_table_otitabuki[4];
-static __declspec(section ".data") PoseTableEntry pose_table_break[4];
+static PoseTableEntry pose_table[6];
+PoseTableEntry pose_table_otitabuki[4];
+static PoseTableEntry pose_table_break[4];
 static BattleDataEntry data_table[21];
 static BattleUnitKindPart parts[1];
 static s32 init_event[47];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 static s32 avoid_thorn_event[33];
 s32 cortez_weapon_get_home_height[144];
 s32 cortez_weapon_set_formation_attribute[27];
 s32 cortez_weapon_unison_phase_event[79];
 s32 cortez_weapon_phase_event[115];
 static s32 attack_event[862];
-static __declspec(section ".data") s32 wait_event[10];
+static s32 wait_event[10];
 static s32 cortez_damage_sub_event[25];
 s32 cortez_weapon_counter_damage_event[113];
-static __declspec(section ".data") s32 dead_event[2];
+static s32 dead_event[2];
 s32 cortez_weapon_dead_event[100];
 s32 cortez_weapon_break_event[88];
 s32 cortez_weapon_blow_dead_event[121];
 
-__declspec(section ".data") f32 fd_boss_cortez_sword_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_cortez_sword_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_cortez_sword_neg_one_382 = -1.0f;
+f32 fd_boss_cortez_sword_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_cortez_sword___local_PI_383 = 3.1415927f;
+f32 fd_boss_cortez_sword___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_cortez_sword___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_cortez_sword___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_cortez_sword_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_cortez_sword_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_cortez_sword___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_cortez_sword___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_cortez_sword_one_381 = 1.0f;
+f32 fd_boss_cortez_sword_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_cortez_sword_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_cortez_sword_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_cortez_sword_neg_one_365 = -1.0f;
+f32 fd_boss_cortez_sword_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_cortez_sword___local_PI_366 = 3.1415927f;
+f32 fd_boss_cortez_sword___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_cortez_sword___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_cortez_sword___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_cortez_sword_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_cortez_sword_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_cortez_sword___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_cortez_sword___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_cortez_sword_one_364 = 1.0f;
+f32 fd_boss_cortez_sword_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_cortez_sword = {
     97,
@@ -187,11 +187,11 @@ BattleUnitKind unit_boss_cortez_sword = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 85, 0, 0, 100, 0, 100, 90, 50, 0, 90, 100, 50, 0, 0, 0};
+static StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 85, 0, 0, 100, 0, 100, 90, 50, 0, 90, 100, 50, 0, 0, 0};
 
 BattleWeapon weapon_cortez_sword_float_attack = {
     NULL, 0, // name..icon
@@ -229,7 +229,7 @@ BattleWeapon weapon_cortez_sword_float_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") PoseTableEntry pose_table[] = {
+static PoseTableEntry pose_table[] = {
     {2, "KRT_Z_1"},
     {9, "KRT_Z_1"},
     {28, "KRT_S_1"},
@@ -238,14 +238,14 @@ static __declspec(section ".data") PoseTableEntry pose_table[] = {
     {69, "KRT_S_1"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_otitabuki[] = {
+PoseTableEntry pose_table_otitabuki[] = {
     {28, "KRT_Z_1"},
     {31, "KRT_Z_1"},
     {39, "KRT_Z_1"},
     {69, "KRT_Z_1"},
 };
 
-static __declspec(section ".data") PoseTableEntry pose_table_break[] = {
+static PoseTableEntry pose_table_break[] = {
     {28, "KRT_Z_1"},
     {31, "KRT_Z_1"},
     {39, "KRT_Z_1"},
@@ -295,7 +295,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -708,7 +708,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeWaitPlayLoopTiming, -2, 1)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
@@ -761,7 +761,7 @@ EVT_BEGIN(cortez_weapon_counter_damage_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dead_event)
+static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 

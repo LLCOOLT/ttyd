@@ -46,55 +46,55 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(fune_eff);
 
-__declspec(section ".data") f32 fd_muj_21_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_21_neg_one_382;
-__declspec(section ".data") f32 fd_muj_21___local_PI_383;
-__declspec(section ".data") f32 fd_muj_21___local_3PIO2_385;
-__declspec(section ".data") f32 fd_muj_21_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_21___local_PIO2_384;
-__declspec(section ".data") f32 fd_muj_21_one_381;
-__declspec(section ".data") f32 fd_muj_21_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_21_neg_one_365;
-__declspec(section ".data") f32 fd_muj_21___local_PI_366;
-__declspec(section ".data") f32 fd_muj_21___local_3PIO2_368;
-__declspec(section ".data") f32 fd_muj_21_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_21___local_PIO2_367;
-__declspec(section ".data") f32 fd_muj_21_one_364;
-__declspec(section ".data") s32 peach_init[12];
+f32 fd_muj_21_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_muj_21_neg_one_382;
+f32 fd_muj_21___local_PI_383;
+f32 fd_muj_21___local_3PIO2_385;
+f32 fd_muj_21_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_muj_21___local_PIO2_384;
+f32 fd_muj_21_one_381;
+f32 fd_muj_21_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_muj_21_neg_one_365;
+f32 fd_muj_21___local_PI_366;
+f32 fd_muj_21___local_3PIO2_368;
+f32 fd_muj_21_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_muj_21___local_PIO2_367;
+f32 fd_muj_21_one_364;
+s32 peach_init[12];
 static NpcSetupInfo npcEnt[2];
 s32 fune_yure[42];
 static s32 epilogue_evt[344];
 s32 muj_21_init_evt[58];
 
-__declspec(section ".data") f32 fd_muj_21_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_21_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_21_neg_one_382 = -1.0f;
+f32 fd_muj_21_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj_21___local_PI_383 = 3.1415927f;
+f32 fd_muj_21___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj_21___local_3PIO2_385 = 4.712389f;
+f32 fd_muj_21___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_21_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_21_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj_21___local_PIO2_384 = 1.5707964f;
+f32 fd_muj_21___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_21_one_381 = 1.0f;
+f32 fd_muj_21_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_muj_21_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_21_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_21_neg_one_365 = -1.0f;
+f32 fd_muj_21_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj_21___local_PI_366 = 3.1415927f;
+f32 fd_muj_21___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj_21___local_3PIO2_368 = 4.712389f;
+f32 fd_muj_21___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_21_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_21_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj_21___local_PIO2_367 = 1.5707964f;
+f32 fd_muj_21___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_21_one_364 = 1.0f;
+f32 fd_muj_21_one_364 = 1.0f;
 
-__declspec(section ".data") EVT_BEGIN(peach_init)
+EVT_BEGIN(peach_init)
     CALL(evt_npc_set_position, STRING("me"), 62, 28, 44)
     CALL(evt_npc_set_ry, STRING("me"), 90)
     RETURN

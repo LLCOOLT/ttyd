@@ -88,32 +88,32 @@ USER_FUNC(urouro_main_func);
 USER_FUNC(win_item_move_3d_position);
 USER_FUNC(mariowalk_wait);
 
-__declspec(section ".data") f32 fd_win_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_00_neg_one_382;
-__declspec(section ".data") f32 fd_win_00___local_PI_383;
-__declspec(section ".data") f32 fd_win_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_win_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_win_00_one_381;
-__declspec(section ".data") f32 fd_win_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_00_neg_one_365;
-__declspec(section ".data") f32 fd_win_00___local_PI_366;
-__declspec(section ".data") f32 fd_win_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_win_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_win_00_one_364;
-__declspec(section ".data") f64 fd_win_00__three_localstatic4_sqrtf;
-__declspec(section ".data") f64 fd_win_00__half_localstatic3_sqrtf;
+f32 fd_win_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_win_00_neg_one_382;
+f32 fd_win_00___local_PI_383;
+f32 fd_win_00___local_3PIO2_385;
+f32 fd_win_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_win_00___local_PIO2_384;
+f32 fd_win_00_one_381;
+f32 fd_win_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_win_00_neg_one_365;
+f32 fd_win_00___local_PI_366;
+f32 fd_win_00___local_3PIO2_368;
+f32 fd_win_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_win_00___local_PIO2_367;
+f32 fd_win_00_one_364;
+f64 fd_win_00__three_localstatic4_sqrtf;
+f64 fd_win_00__half_localstatic3_sqrtf;
 static s32 vivian_init[37];
-static __declspec(section ".data") s32 vivian_talk[8];
+static s32 vivian_talk[8];
 static s32 maririn_init[19];
-__declspec(section ".data") s32 maririn_talk[8];
+s32 maririn_talk[8];
 s32 majorin_init[19];
-__declspec(section ".data") s32 majorin_talk[8];
+s32 majorin_talk[8];
 static s32 fabio_init[21];
 static s32 fabio_talk[26];
 static s32 kizayarou_regl[19];
-static __declspec(section ".data") s32 kizayarou_talk[8];
+static s32 kizayarou_talk[8];
 static s32 kizayarou_init[38];
 static NpcSetupInfo npcEnt[5];
 static BeroEntry bero_entry_data[3];
@@ -123,8 +123,8 @@ s32 witchtrio_picture[533];
 s32 mario_vs_witchtrio[554];
 s32 get_necklace[115];
 s32 witchtrio_lose_item[19];
-__declspec(section ".data") s32 witchtrio_mess_vivi[8];
-__declspec(section ".data") s32 witchtrio_mess_mari[8];
+s32 witchtrio_mess_vivi[8];
+s32 witchtrio_mess_mari[8];
 s32 witchtrio_lose[563];
 static s32 ki_data_evt_01[20];
 static TreeAccess tree_access_data[10];
@@ -133,37 +133,37 @@ s32 iri_28_enemy_dead[13];
 s32 iri_28_init[60];
 s32 win_00_init_evt[85];
 
-__declspec(section ".data") f32 fd_win_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_win_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_win_00_neg_one_382 = -1.0f;
+f32 fd_win_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_win_00___local_PI_383 = 3.1415927f;
+f32 fd_win_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_win_00___local_3PIO2_385 = 4.712389f;
+f32 fd_win_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_win_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_win_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_win_00___local_PIO2_384 = 1.5707964f;
+f32 fd_win_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_win_00_one_381 = 1.0f;
+f32 fd_win_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_win_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_win_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_win_00_neg_one_365 = -1.0f;
+f32 fd_win_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_win_00___local_PI_366 = 3.1415927f;
+f32 fd_win_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_win_00___local_3PIO2_368 = 4.712389f;
+f32 fd_win_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_win_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_win_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_win_00___local_PIO2_367 = 1.5707964f;
+f32 fd_win_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_win_00_one_364 = 1.0f;
+f32 fd_win_00_one_364 = 1.0f;
 
-__declspec(section ".data") f64 fd_win_00__three_localstatic4_sqrtf = 3.0;
+f64 fd_win_00__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") f64 fd_win_00__half_localstatic3_sqrtf = 0.5;
+f64 fd_win_00__half_localstatic3_sqrtf = 0.5;
 
 static EVT_BEGIN(vivian_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 268435456)
@@ -178,7 +178,7 @@ static EVT_BEGIN(vivian_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(vivian_talk)
+static EVT_BEGIN(vivian_talk)
     CALL(evt_msg_print, 0, STRING("stg2_win_e01_18"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -192,7 +192,7 @@ static EVT_BEGIN(maririn_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(maririn_talk)
+EVT_BEGIN(maririn_talk)
     CALL(evt_msg_print, 0, STRING("stg2_win_e01_17"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -206,7 +206,7 @@ EVT_BEGIN(majorin_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(majorin_talk)
+EVT_BEGIN(majorin_talk)
     CALL(evt_msg_print, 0, STRING("stg2_win_e01_16"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -239,7 +239,7 @@ static EVT_BEGIN(kizayarou_regl)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(kizayarou_talk)
+static EVT_BEGIN(kizayarou_talk)
     CALL(evt_msg_print, 0, STRING("stg2_win_00_01"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -865,12 +865,12 @@ EVT_BEGIN(witchtrio_lose_item)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(witchtrio_mess_vivi)
+EVT_BEGIN(witchtrio_mess_vivi)
     CALL(evt_msg_print, 0, STRING("stg2_win_e08_02"), 0, STRING("ビビアン"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(witchtrio_mess_mari)
+EVT_BEGIN(witchtrio_mess_mari)
     CALL(evt_msg_print, 0, STRING("stg2_win_e08_01"), 0, STRING("マリリン"))
     RETURN
 EVT_END()

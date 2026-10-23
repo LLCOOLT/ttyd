@@ -912,8 +912,6 @@ void BattleAudienceCtrlProcessKinopioTransEvt(s32 index) {
 s32 intrudeSound;
 
 __declspec(section ".rodata") static Vec v0 = {0.0f, 0.0f, 0.0f};
-__declspec(section ".rodata") static Vec v1 = {0.0f, 0.0f, 0.0f};
-__declspec(section ".rodata") static Vec v2 = {0.0f, 0.0f, 0.0f};
 void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
     BattleWork* bw = _battleWorkPointer;
     BattleAudienceMember* m;
@@ -989,7 +987,7 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
         if (__fabs(m->position.x) >= 450.0) {
             m->field_0x4 = 16;
             m->field_0x8 = 35;
-            m->field_0x78 = v1;
+            m->field_0x78 = (Vec){0.0f, 0.0f, 0.0f};
         }
         break;
     case 16:
@@ -1105,7 +1103,7 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
     case 75:
         if (__fabs(m->position.x) >= 300.0) {
             m->field_0x4 = 80;
-            m->field_0x78 = v2;
+            m->field_0x78 = (Vec){0.0f, 0.0f, 0.0f};
             psndSFXOff(intrudeSound);
         }
         break;

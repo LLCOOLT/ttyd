@@ -76,15 +76,15 @@ void dispEntry(CameraId camId, f32 order, s32 renderMode, DispCallback callback,
 }
 
 s32 _sort(const void** sortA, const void** sortB) {
-	f32 temp_f0;
-	f32 temp_f1;
+	f32 orderB;
+	f32 orderA;
 
-	temp_f1 = (*(DispEntry**)sortA)->order;
-	temp_f0 = (*(DispEntry**)sortB)->order;
-	if (temp_f1 > temp_f0) {
+	orderA = (*(DispEntry**)sortA)->order;
+	orderB = (*(DispEntry**)sortB)->order;
+	if (orderA > orderB) {
 		return 1;
 	}
-	if (temp_f1 < temp_f0) {
+	if (orderA < orderB) {
 		return -1;
 	}
 	return 0;
@@ -176,5 +176,5 @@ DispEntry* dispGetCurWork(void) {
 	return currentWorkPtr;
 }
 #pragma force_active on
-__declspec(section ".sdata") u32 gap_07_8040F344_sdata[7] = {0, 0, 0, 0, 0, 0, 0};
+u32 gap_07_8040F344_sdata[7] = {0, 0, 0, 0, 0, 0, 0};
 #pragma force_active reset

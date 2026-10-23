@@ -115,30 +115,30 @@ extern s32 majo_unison_phase_event[];
 extern BattleUnitKind unit_boss_majolyne_las;
 extern BattleUnitKind unit_boss_marilyn_las;
 
-__declspec(section ".data") f32 fd_boss_rampell_las_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_rampell_las_neg_one_382;
-__declspec(section ".data") f32 fd_boss_rampell_las___local_PI_383;
-__declspec(section ".data") f32 fd_boss_rampell_las___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_rampell_las_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_rampell_las___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_rampell_las_one_381;
-__declspec(section ".data") f32 fd_boss_rampell_las_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_rampell_las_neg_one_365;
-__declspec(section ".data") f32 fd_boss_rampell_las___local_PI_366;
-__declspec(section ".data") f32 fd_boss_rampell_las___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_rampell_las_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_rampell_las___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_rampell_las_one_364;
+f32 fd_boss_rampell_las_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_rampell_las_neg_one_382;
+f32 fd_boss_rampell_las___local_PI_383;
+f32 fd_boss_rampell_las___local_3PIO2_385;
+f32 fd_boss_rampell_las_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_rampell_las___local_PIO2_384;
+f32 fd_boss_rampell_las_one_381;
+f32 fd_boss_rampell_las_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_rampell_las_neg_one_365;
+f32 fd_boss_rampell_las___local_PI_366;
+f32 fd_boss_rampell_las___local_3PIO2_368;
+f32 fd_boss_rampell_las_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_rampell_las___local_PIO2_367;
+f32 fd_boss_rampell_las_one_364;
 BattleUnitKind unit_boss_rampell_las;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
-static __declspec(section ".data") BattleDataEntry data_table[2];
+static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_rampell_attack;
-static __declspec(section ".data") BattleUnitSetup entry_marilyn;
-static __declspec(section ".data") BattleUnitSetup entry_majolyne;
+static BattleUnitSetup entry_marilyn;
+static BattleUnitSetup entry_majolyne;
 s32 mutate_event[584];
 static s32 init_event[198];
 static s32 entry_event[46];
@@ -148,12 +148,12 @@ static s32 unison_phase_event[87];
 static s32 phase_event[68];
 static s32 attack_event[29];
 static s32 ogg_attack_event[491];
-static __declspec(section ".data") s32 wait_event[6];
-static __declspec(section ".data") BattleUnitDefense defence_fmario;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_fmario;
-static __declspec(section ".data") StatusVulnerability regist_fmario;
+static s32 wait_event[6];
+static BattleUnitDefense defence_fmario;
+static BattleUnitDefenseAttr defence_attr_fmario;
+static StatusVulnerability regist_fmario;
 static PoseTableEntry pose_table_fmario_stay[15];
-static __declspec(section ".data") BattleDataEntry data_table_fmario[2];
+static BattleDataEntry data_table_fmario[2];
 static BattleUnitKindPart parts_fmario[1];
 static BattleWeapon weapon_masao_jump;
 static BattleWeapon weapon_masao_hammer;
@@ -171,31 +171,31 @@ static s32 marioAttackEvent_NormalJump[344];
 static s32 marioAttackEvent_KururinJump[469];
 static s32 marioAttackEvent_NormalHammer[299];
 static s32 marioAttackEvent_KaitenHammer[299];
-static __declspec(section ".data") s32 wait_event_fmario[6];
+static s32 wait_event_fmario[6];
 static BattleWeapon enemyWeapon_ChristineNormalAttack;
-static __declspec(section ".data") BattleUnitDefense defence_christine;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_christine;
-static __declspec(section ".data") StatusVulnerability regist_christine;
-static __declspec(section ".data") BattleDataEntry data_table_christine[2];
+static BattleUnitDefense defence_christine;
+static BattleUnitDefenseAttr defence_attr_christine;
+static StatusVulnerability regist_christine;
+static BattleDataEntry data_table_christine[2];
 static BattleUnitKindPart parts_christine[1];
 static s32 fmario_zoom_christine[19];
 static s32 gparty_zoom_christine[19];
 static s32 init_event_christine[72];
 static s32 dead_event_christine[80];
 static s32 attack_event_christine[690];
-static __declspec(section ".data") s32 wait_event_christine[6];
+static s32 wait_event_christine[6];
 static BattleWeapon enemyWeapon_NokotarouKouraAttack;
 static BattleWeapon enemyWeapon_NokotarouShubibinAttack;
-static __declspec(section ".data") BattleUnitDefense defence_nokotarou;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_nokotarou;
-static __declspec(section ".data") BattleUnitDefense defence_turn_nokotarou;
-static __declspec(section ".data") StatusVulnerability regist_nokotarou;
-static __declspec(section ".data") BattleDataEntry data_table_nokotarou[3];
+static BattleUnitDefense defence_nokotarou;
+static BattleUnitDefenseAttr defence_attr_nokotarou;
+static BattleUnitDefense defence_turn_nokotarou;
+static StatusVulnerability regist_nokotarou;
+static BattleDataEntry data_table_nokotarou[3];
 static BattleUnitKindPart parts_nokotarou[1];
 static s32 dmg_turn_event[64];
 static s32 wakeup_event[67];
 static s32 init_event_nokotarou[92];
-static __declspec(section ".data") s32 damage_event_nokotarou[6];
+static s32 damage_event_nokotarou[6];
 static s32 dead_event_nokotarou[80];
 static s32 _change_koura_pose[34];
 static s32 _change_koura_pose_fast[34];
@@ -205,31 +205,31 @@ static s32 _koura_rotate_stop[13];
 static s32 attack_event_nokotarou[33];
 static s32 attack_event_nokotarou_koura[393];
 static s32 attack_event_nokotarou_shubibin[339];
-static __declspec(section ".data") s32 wait_event_nokotarou[6];
+static s32 wait_event_nokotarou[6];
 static BattleWeapon enemyWeapon_ClaudaNormalAttack;
-static __declspec(section ".data") BattleUnitDefense defence_clauda;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_clauda;
-static __declspec(section ".data") StatusVulnerability regist_clauda;
-static __declspec(section ".data") BattleDataEntry data_table_clauda[2];
+static BattleUnitDefense defence_clauda;
+static BattleUnitDefenseAttr defence_attr_clauda;
+static StatusVulnerability regist_clauda;
+static BattleDataEntry data_table_clauda[2];
 static BattleUnitKindPart parts_clauda[1];
 static s32 init_event_clauda[80];
 static s32 dead_event_clauda[80];
 static s32 attack_event_clauda[393];
-static __declspec(section ".data") s32 wait_event_clauda[6];
+static s32 wait_event_clauda[6];
 static BattleWeapon enemyWeapon_YoshiNormalAttack;
-static __declspec(section ".data") BattleUnitDefense defence_yoshi;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_yoshi;
-static __declspec(section ".data") StatusVulnerability regist_yoshi;
-static __declspec(section ".data") BattleDataEntry data_table_yoshi[2];
+static BattleUnitDefense defence_yoshi;
+static BattleUnitDefenseAttr defence_attr_yoshi;
+static StatusVulnerability regist_yoshi;
+static BattleDataEntry data_table_yoshi[2];
 static BattleUnitKindPart parts_yoshi[1];
 static s32 init_event_yoshi[54];
 static s32 dead_event_yoshi[80];
 static s32 attack_event_yoshi[748];
-static __declspec(section ".data") s32 wait_event_yoshi[6];
-__declspec(section ".data") BattleUnitDefense defence_vivian;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_vivian;
-__declspec(section ".data") StatusVulnerability regist_vivian;
-__declspec(section ".data") BattleDataEntry data_table_vivian[2];
+static s32 wait_event_yoshi[6];
+BattleUnitDefense defence_vivian;
+BattleUnitDefenseAttr defence_attr_vivian;
+StatusVulnerability regist_vivian;
+BattleDataEntry data_table_vivian[2];
 BattleUnitKindPart parts_vivian[1];
 BattleWeapon weapon_vivian_kagenuke_attack;
 static s32 vivian_down[19];
@@ -237,22 +237,22 @@ static s32 vivian_up[27];
 s32 init_event_vivian[64];
 s32 dead_event_vivian[80];
 s32 attack_event_vivian[222];
-__declspec(section ".data") s32 wait_event_vivian[6];
-__declspec(section ".data") BattleUnitDefense defence_sanders;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_sanders;
-__declspec(section ".data") StatusVulnerability regist_sanders;
-__declspec(section ".data") BattleDataEntry data_table_sanders[2];
+s32 wait_event_vivian[6];
+BattleUnitDefense defence_sanders;
+BattleUnitDefenseAttr defence_attr_sanders;
+StatusVulnerability regist_sanders;
+BattleDataEntry data_table_sanders[2];
 BattleUnitKindPart parts_sanders[1];
 BattleWeapon enemyWeapon_SandersNormalAttack;
 s32 init_event_sanders[51];
 s32 dead_event_sanders[80];
 s32 attack_event_sanders[24];
 s32 attack_event_sanders_normal[325];
-__declspec(section ".data") s32 wait_event_sanders[6];
-__declspec(section ".data") BattleUnitDefense defence_chuchurina;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_chuchurina;
-__declspec(section ".data") StatusVulnerability regist_chuchurina;
-__declspec(section ".data") BattleDataEntry data_table_chuchurina[2];
+s32 wait_event_sanders[6];
+BattleUnitDefense defence_chuchurina;
+BattleUnitDefenseAttr defence_attr_chuchurina;
+StatusVulnerability regist_chuchurina;
+BattleDataEntry data_table_chuchurina[2];
 BattleUnitKindPart parts_chuchurina[1];
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackR;
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackL;
@@ -262,35 +262,35 @@ s32 init_event_chuchurina[51];
 s32 dead_event_chuchurina[80];
 s32 attack_event_chuchurina[24];
 s32 attack_event_chuchurina_normal[831];
-__declspec(section ".data") s32 wait_event_chuchurina[6];
+s32 wait_event_chuchurina[6];
 
-__declspec(section ".data") f32 fd_boss_rampell_las_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_rampell_las_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_rampell_las_neg_one_382 = -1.0f;
+f32 fd_boss_rampell_las_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_rampell_las___local_PI_383 = 3.1415927f;
+f32 fd_boss_rampell_las___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_rampell_las___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_rampell_las___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_rampell_las_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_rampell_las_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_rampell_las___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_rampell_las___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_rampell_las_one_381 = 1.0f;
+f32 fd_boss_rampell_las_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_rampell_las_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_rampell_las_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_rampell_las_neg_one_365 = -1.0f;
+f32 fd_boss_rampell_las_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_rampell_las___local_PI_366 = 3.1415927f;
+f32 fd_boss_rampell_las___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_rampell_las___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_rampell_las___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_rampell_las_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_rampell_las_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_rampell_las___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_rampell_las___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_rampell_las_one_364 = 1.0f;
+f32 fd_boss_rampell_las_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_rampell_las = {
     135,
@@ -358,11 +358,11 @@ BattleUnitKind unit_boss_rampell_las = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
+static StatusVulnerability regist = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -385,7 +385,7 @@ static PoseTableEntry pose_table[] = {
     {69, "S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
@@ -430,7 +430,7 @@ static BattleWeapon weapon_rampell_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitSetup entry_marilyn = {
+static BattleUnitSetup entry_marilyn = {
     &unit_boss_marilyn_las, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -441,7 +441,7 @@ static __declspec(section ".data") BattleUnitSetup entry_marilyn = {
     NULL, // itemDropTable
 };
 
-static __declspec(section ".data") BattleUnitSetup entry_majolyne = {
+static BattleUnitSetup entry_majolyne = {
     &unit_boss_majolyne_las, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -986,16 +986,16 @@ static EVT_BEGIN(ogg_attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") BattleUnitDefense defence_fmario = {0};
+static BattleUnitDefense defence_fmario = {0};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_fmario = {0};
+static BattleUnitDefenseAttr defence_attr_fmario = {0};
 
-static __declspec(section ".data") StatusVulnerability regist_fmario = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
+static StatusVulnerability regist_fmario = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 
 static PoseTableEntry pose_table_fmario_stay[] = {
     {1, "EM_N_1"},
@@ -1015,7 +1015,7 @@ static PoseTableEntry pose_table_fmario_stay[] = {
     {69, "EM_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table_fmario[] = {
+static BattleDataEntry data_table_fmario[] = {
     {49, dead_event_fmario},
     {0},
 };
@@ -1669,7 +1669,7 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_fmario)
+static EVT_BEGIN(wait_event_fmario)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
@@ -1710,13 +1710,13 @@ static BattleWeapon enemyWeapon_ChristineNormalAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitDefense defence_christine = {0};
+static BattleUnitDefense defence_christine = {0};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_christine = {0};
+static BattleUnitDefenseAttr defence_attr_christine = {0};
 
-static __declspec(section ".data") StatusVulnerability regist_christine = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
+static StatusVulnerability regist_christine = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 
-static __declspec(section ".data") BattleDataEntry data_table_christine[] = {
+static BattleDataEntry data_table_christine[] = {
     {49, dead_event_christine},
     {0},
 };
@@ -1987,7 +1987,7 @@ static EVT_BEGIN(attack_event_christine)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_christine)
+static EVT_BEGIN(wait_event_christine)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
@@ -2066,15 +2066,15 @@ static BattleWeapon enemyWeapon_NokotarouShubibinAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitDefense defence_nokotarou = {{1, 1, 1, 1, 1}};
+static BattleUnitDefense defence_nokotarou = {{1, 1, 1, 1, 1}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_nokotarou = {0};
+static BattleUnitDefenseAttr defence_attr_nokotarou = {0};
 
-static __declspec(section ".data") BattleUnitDefense defence_turn_nokotarou = {0};
+static BattleUnitDefense defence_turn_nokotarou = {0};
 
-static __declspec(section ".data") StatusVulnerability regist_nokotarou = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 100, 40, 0, 0, 100, 40, 100, 100, 5};
+static StatusVulnerability regist_nokotarou = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 100, 40, 0, 0, 100, 40, 100, 100, 5};
 
-static __declspec(section ".data") BattleDataEntry data_table_nokotarou[] = {
+static BattleDataEntry data_table_nokotarou[] = {
     {49, dead_event_nokotarou},
     {13, dmg_turn_event},
     {0},
@@ -2159,7 +2159,7 @@ static EVT_BEGIN(init_event_nokotarou)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event_nokotarou)
+static EVT_BEGIN(damage_event_nokotarou)
     CALL_CHILD(PTR(_koura_rotate_stop))
     CALL_CHILD(PTR(damage_event))
     RETURN
@@ -2487,7 +2487,7 @@ static EVT_BEGIN(attack_event_nokotarou_shubibin)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_nokotarou)
+static EVT_BEGIN(wait_event_nokotarou)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
@@ -2529,13 +2529,13 @@ static BattleWeapon enemyWeapon_ClaudaNormalAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitDefense defence_clauda = {0};
+static BattleUnitDefense defence_clauda = {0};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_clauda = {0};
+static BattleUnitDefenseAttr defence_attr_clauda = {0};
 
-static __declspec(section ".data") StatusVulnerability regist_clauda = {40, 50, 100, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
+static StatusVulnerability regist_clauda = {40, 50, 100, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 
-static __declspec(section ".data") BattleDataEntry data_table_clauda[] = {
+static BattleDataEntry data_table_clauda[] = {
     {49, dead_event_clauda},
     {0},
 };
@@ -2714,7 +2714,7 @@ static EVT_BEGIN(attack_event_clauda)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_clauda)
+static EVT_BEGIN(wait_event_clauda)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
@@ -2755,13 +2755,13 @@ static BattleWeapon enemyWeapon_YoshiNormalAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitDefense defence_yoshi = {0};
+static BattleUnitDefense defence_yoshi = {0};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_yoshi = {0};
+static BattleUnitDefenseAttr defence_attr_yoshi = {0};
 
-static __declspec(section ".data") StatusVulnerability regist_yoshi = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
+static StatusVulnerability regist_yoshi = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 
-static __declspec(section ".data") BattleDataEntry data_table_yoshi[] = {
+static BattleDataEntry data_table_yoshi[] = {
     {49, dead_event_yoshi},
     {0},
 };
@@ -3022,18 +3022,18 @@ static EVT_BEGIN(attack_event_yoshi)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_yoshi)
+static EVT_BEGIN(wait_event_yoshi)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") BattleUnitDefense defence_vivian = {0};
+BattleUnitDefense defence_vivian = {0};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_vivian = {0};
+BattleUnitDefenseAttr defence_attr_vivian = {0};
 
-__declspec(section ".data") StatusVulnerability regist_vivian = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
+StatusVulnerability regist_vivian = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 
-__declspec(section ".data") BattleDataEntry data_table_vivian[] = {
+BattleDataEntry data_table_vivian[] = {
     {49, dead_event_vivian},
     {0},
 };
@@ -3232,18 +3232,18 @@ EVT_BEGIN(attack_event_vivian)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(wait_event_vivian)
+EVT_BEGIN(wait_event_vivian)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") BattleUnitDefense defence_sanders = {0};
+BattleUnitDefense defence_sanders = {0};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_sanders = {0};
+BattleUnitDefenseAttr defence_attr_sanders = {0};
 
-__declspec(section ".data") StatusVulnerability regist_sanders = {40, 50, 40, 100, 40, 100, 100, 100, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
+StatusVulnerability regist_sanders = {40, 50, 40, 100, 40, 100, 100, 100, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 
-__declspec(section ".data") BattleDataEntry data_table_sanders[] = {
+BattleDataEntry data_table_sanders[] = {
     {49, dead_event_sanders},
     {0},
 };
@@ -3439,18 +3439,18 @@ EVT_BEGIN(attack_event_sanders_normal)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(wait_event_sanders)
+EVT_BEGIN(wait_event_sanders)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") BattleUnitDefense defence_chuchurina = {0};
+BattleUnitDefense defence_chuchurina = {0};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_chuchurina = {0};
+BattleUnitDefenseAttr defence_attr_chuchurina = {0};
 
-__declspec(section ".data") StatusVulnerability regist_chuchurina = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
+StatusVulnerability regist_chuchurina = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 
-__declspec(section ".data") BattleDataEntry data_table_chuchurina[] = {
+BattleDataEntry data_table_chuchurina[] = {
     {49, dead_event_chuchurina},
     {0},
 };
@@ -3948,7 +3948,7 @@ EVT_BEGIN(attack_event_chuchurina_normal)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(wait_event_chuchurina)
+EVT_BEGIN(wait_event_chuchurina)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

@@ -106,21 +106,21 @@ USER_FUNC(evt_party_move_behind_mario);
 #endif
 static USER_FUNC(set_dir);
 
-__declspec(section ".data") f32 fd_hei_01_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hei_01_neg_one_382;
-__declspec(section ".data") f32 fd_hei_01___local_PI_383;
-__declspec(section ".data") f32 fd_hei_01___local_3PIO2_385;
-__declspec(section ".data") f32 fd_hei_01_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hei_01___local_PIO2_384;
-__declspec(section ".data") f32 fd_hei_01_one_381;
-__declspec(section ".data") f32 fd_hei_01_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hei_01_neg_one_365;
-__declspec(section ".data") f32 fd_hei_01___local_PI_366;
-__declspec(section ".data") f32 fd_hei_01___local_3PIO2_368;
-__declspec(section ".data") f32 fd_hei_01_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hei_01___local_PIO2_367;
-__declspec(section ".data") f32 fd_hei_01_one_364;
-__declspec(section ".data") s32 bero_out_event[5];
+f32 fd_hei_01_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_hei_01_neg_one_382;
+f32 fd_hei_01___local_PI_383;
+f32 fd_hei_01___local_3PIO2_385;
+f32 fd_hei_01_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_hei_01___local_PIO2_384;
+f32 fd_hei_01_one_381;
+f32 fd_hei_01_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_hei_01_neg_one_365;
+f32 fd_hei_01___local_PI_366;
+f32 fd_hei_01___local_3PIO2_368;
+f32 fd_hei_01_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_hei_01___local_PIO2_367;
+f32 fd_hei_01_one_364;
+s32 bero_out_event[5];
 static BeroEntry bero_entry_data[5];
 static s32 evt_kusa_2[20];
 static s32 evt_kusa_4[20];
@@ -137,47 +137,47 @@ s32 nokotaro_get[55];
 #endif
 s32 nokotaro_kanyu[40];
 s32 nokotaro_nakama[276];
-static __declspec(section ".data") s32 nokotarou_init[7];
-__declspec(section ".data") s32 nokotarou_reg[2];
+static s32 nokotarou_init[7];
+s32 nokotarou_reg[2];
 s32 nokotarou_talk_2[34];
-static __declspec(section ".data") s32 nokotarou_talk[4];
+static s32 nokotarou_talk[4];
 s32 nokorin_pose[57];
 s32 evt_nokorin[869];
 static NpcSetupInfo npcEnt[3];
-static __declspec(section ".data") HitDamageReturn hitDmgRetPoints[3];
+static HitDamageReturn hitDmgRetPoints[3];
 static s32 peach_mail[287];
 s32 christine_hei_01[46];
 s32 hei_01_init_evt[148];
 
-__declspec(section ".data") f32 fd_hei_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hei_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hei_01_neg_one_382 = -1.0f;
+f32 fd_hei_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_hei_01___local_PI_383 = 3.1415927f;
+f32 fd_hei_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hei_01___local_3PIO2_385 = 4.712389f;
+f32 fd_hei_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hei_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hei_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hei_01___local_PIO2_384 = 1.5707964f;
+f32 fd_hei_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hei_01_one_381 = 1.0f;
+f32 fd_hei_01_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_hei_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hei_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hei_01_neg_one_365 = -1.0f;
+f32 fd_hei_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_hei_01___local_PI_366 = 3.1415927f;
+f32 fd_hei_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hei_01___local_3PIO2_368 = 4.712389f;
+f32 fd_hei_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hei_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hei_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hei_01___local_PIO2_367 = 1.5707964f;
+f32 fd_hei_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hei_01_one_364 = 1.0f;
+f32 fd_hei_01_one_364 = 1.0f;
 
-__declspec(section ".data") EVT_BEGIN(bero_out_event)
+EVT_BEGIN(bero_out_event)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
@@ -531,12 +531,12 @@ EVT_BEGIN(nokotaro_nakama)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(nokotarou_init)
+static EVT_BEGIN(nokotarou_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 1536)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(nokotarou_reg)
+EVT_BEGIN(nokotarou_reg)
     RETURN
 EVT_END()
 
@@ -556,7 +556,7 @@ EVT_BEGIN(nokotarou_talk_2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(nokotarou_talk)
+static EVT_BEGIN(nokotarou_talk)
     SPAWN_EVENT(PTR(nokotarou_talk_2))
     RETURN
 EVT_END()
@@ -860,7 +860,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-static __declspec(section ".data") HitDamageReturn hitDmgRetPoints[] = {
+static HitDamageReturn hitDmgRetPoints[] = {
     {"mod_00", {0.0f, -1000.0f, 0.0f}},
     {"mod_01", {0.0f, -1000.0f, 0.0f}},
     {0},

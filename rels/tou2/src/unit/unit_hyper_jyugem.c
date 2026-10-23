@@ -48,31 +48,31 @@ USER_FUNC(btlevtcmd_get_turn);
 USER_FUNC(evt_eff);
 static USER_FUNC(togezo_copy_status);
 
-__declspec(section ".data") f32 fd_hyper_jyugem_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hyper_jyugem_neg_one_382;
-__declspec(section ".data") f32 fd_hyper_jyugem___local_PI_383;
-__declspec(section ".data") f32 fd_hyper_jyugem___local_3PIO2_385;
-__declspec(section ".data") f32 fd_hyper_jyugem_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hyper_jyugem___local_PIO2_384;
-__declspec(section ".data") f32 fd_hyper_jyugem_one_381;
-__declspec(section ".data") f32 fd_hyper_jyugem_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hyper_jyugem_neg_one_365;
-__declspec(section ".data") f32 fd_hyper_jyugem___local_PI_366;
-__declspec(section ".data") f32 fd_hyper_jyugem___local_3PIO2_368;
-__declspec(section ".data") f32 fd_hyper_jyugem_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hyper_jyugem___local_PIO2_367;
-__declspec(section ".data") f32 fd_hyper_jyugem_one_364;
+f32 fd_hyper_jyugem_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_hyper_jyugem_neg_one_382;
+f32 fd_hyper_jyugem___local_PI_383;
+f32 fd_hyper_jyugem___local_3PIO2_385;
+f32 fd_hyper_jyugem_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_hyper_jyugem___local_PIO2_384;
+f32 fd_hyper_jyugem_one_381;
+f32 fd_hyper_jyugem_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_hyper_jyugem_neg_one_365;
+f32 fd_hyper_jyugem___local_PI_366;
+f32 fd_hyper_jyugem___local_3PIO2_368;
+f32 fd_hyper_jyugem_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_hyper_jyugem___local_PIO2_367;
+f32 fd_hyper_jyugem_one_364;
 static BattleUnitKind unit_hyper_jyugem;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[17];
 static PoseTableEntry pose_table_hold[17];
-static __declspec(section ".data") BattleDataEntry data_table[3];
+static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[2];
 static BattleWeapon weapon_jyugem_attack;
 static BattleWeapon weapon_jyugem_charge;
-static __declspec(section ".data") BattleUnitSetup entry_togezo;
+static BattleUnitSetup entry_togezo;
 static s32 init_event[40];
 static s32 damage_event[322];
 static s32 unison_phase_event[139];
@@ -82,7 +82,7 @@ static s32 attack_event[221];
 static s32 normal_attack_event[585];
 static s32 friend_event[263];
 static s32 charge_event[102];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
 static USER_FUNC(togezo_copy_status) {
     s32* args = event->args;
@@ -97,33 +97,33 @@ static USER_FUNC(togezo_copy_status) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_hyper_jyugem_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hyper_jyugem_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hyper_jyugem_neg_one_382 = -1.0f;
+f32 fd_hyper_jyugem_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_hyper_jyugem___local_PI_383 = 3.1415927f;
+f32 fd_hyper_jyugem___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hyper_jyugem___local_3PIO2_385 = 4.712389f;
+f32 fd_hyper_jyugem___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hyper_jyugem_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hyper_jyugem_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hyper_jyugem___local_PIO2_384 = 1.5707964f;
+f32 fd_hyper_jyugem___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hyper_jyugem_one_381 = 1.0f;
+f32 fd_hyper_jyugem_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_hyper_jyugem_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hyper_jyugem_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hyper_jyugem_neg_one_365 = -1.0f;
+f32 fd_hyper_jyugem_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_hyper_jyugem___local_PI_366 = 3.1415927f;
+f32 fd_hyper_jyugem___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hyper_jyugem___local_3PIO2_368 = 4.712389f;
+f32 fd_hyper_jyugem___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hyper_jyugem_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hyper_jyugem_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hyper_jyugem___local_PIO2_367 = 1.5707964f;
+f32 fd_hyper_jyugem___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hyper_jyugem_one_364 = 1.0f;
+f32 fd_hyper_jyugem_one_364 = 1.0f;
 
 static BattleUnitKind unit_hyper_jyugem = {
     159, // mUnitType
@@ -170,11 +170,11 @@ static BattleUnitKind unit_hyper_jyugem = {
     (BattleDataEntry*)data_table, // dataTable
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {0};
+static BattleUnitDefense defence = {0};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {0};
+static BattleUnitDefenseAttr defence_attr = {0};
 
-static __declspec(section ".data") StatusVulnerability regist = {60, 70, 95, 100, 60, 100, 100, 80, 100, 85, 100, 85, 100, 90, 60, 70, 80, 100, 60, 100, 100, 50};
+static StatusVulnerability regist = {60, 70, 95, 100, 60, 100, 100, 80, 100, 85, 100, 85, 100, 90, 60, 70, 80, 100, 60, 100, 100, 50};
 
 static PoseTableEntry pose_table[] = {
     {1, "JGM_N_1"},
@@ -216,7 +216,7 @@ static PoseTableEntry pose_table_hold[] = {
     {69, "JGM_S_2"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {37, avoid_counter_thorn_head_event},
     {48, dmg_first_attack_pos_event},
     {0},
@@ -328,7 +328,7 @@ static BattleWeapon weapon_jyugem_charge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitSetup entry_togezo = {
+static BattleUnitSetup entry_togezo = {
     &unit_hyper_togezo, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -840,7 +840,7 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

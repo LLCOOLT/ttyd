@@ -41,64 +41,64 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxoff);
 USER_FUNC(evt_snd_sfxon_3d);
 
-__declspec(section ".data") f32 fd_mri_07_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_07_neg_one_382;
-__declspec(section ".data") f32 fd_mri_07___local_PI_383;
-__declspec(section ".data") f32 fd_mri_07___local_3PIO2_385;
-__declspec(section ".data") f32 fd_mri_07_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_07___local_PIO2_384;
-__declspec(section ".data") f32 fd_mri_07_one_381;
-__declspec(section ".data") f32 fd_mri_07_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_07_neg_one_365;
-__declspec(section ".data") f32 fd_mri_07___local_PI_366;
-__declspec(section ".data") f32 fd_mri_07___local_3PIO2_368;
-__declspec(section ".data") f32 fd_mri_07_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_07___local_PIO2_367;
-__declspec(section ".data") f32 fd_mri_07_one_364;
-static __declspec(section ".data") ShopObj obj_list[6];
-static __declspec(section ".data") ShopItem goods_list[6];
+f32 fd_mri_07_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_mri_07_neg_one_382;
+f32 fd_mri_07___local_PI_383;
+f32 fd_mri_07___local_3PIO2_385;
+f32 fd_mri_07_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_mri_07___local_PIO2_384;
+f32 fd_mri_07_one_381;
+f32 fd_mri_07_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_mri_07_neg_one_365;
+f32 fd_mri_07___local_PI_366;
+f32 fd_mri_07___local_3PIO2_368;
+f32 fd_mri_07_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_mri_07___local_PIO2_367;
+f32 fd_mri_07_one_364;
+static ShopObj obj_list[6];
+static ShopItem goods_list[6];
 static ShopDb trade_list[12];
 static ShopperData35 shopper_data;
 s32 chibitoge_nakama[287];
 static s32 chibitoge_init[29];
-static __declspec(section ".data") s32 chibitoge_talk[4];
-__declspec(section ".data") s32 punishop_init[12];
-__declspec(section ".data") s32 punishop_talk[2];
-__declspec(section ".data") s32 puniinfo_init[12];
+static s32 chibitoge_talk[4];
+s32 punishop_init[12];
+s32 punishop_talk[2];
+s32 puniinfo_init[12];
 s32 puniinfo_talk[118];
 static NpcSetupInfo npcEnt[4];
 static BeroEntry bero_entry_data[2];
 s32 mri_07_init_evt[108];
 
-__declspec(section ".data") f32 fd_mri_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_07_neg_one_382 = -1.0f;
+f32 fd_mri_07_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_07___local_PI_383 = 3.1415927f;
+f32 fd_mri_07___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_07___local_3PIO2_385 = 4.712389f;
+f32 fd_mri_07___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_07___local_PIO2_384 = 1.5707964f;
+f32 fd_mri_07___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_07_one_381 = 1.0f;
+f32 fd_mri_07_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_mri_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_07_neg_one_365 = -1.0f;
+f32 fd_mri_07_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_07___local_PI_366 = 3.1415927f;
+f32 fd_mri_07___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_07___local_3PIO2_368 = 4.712389f;
+f32 fd_mri_07___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_07___local_PIO2_367 = 1.5707964f;
+f32 fd_mri_07___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_07_one_364 = 1.0f;
+f32 fd_mri_07_one_364 = 1.0f;
 
-static __declspec(section ".data") ShopObj obj_list[] = {
+static ShopObj obj_list[] = {
     {"S_item_01", "A_item_01"},
     {"S_item_02", "A_item_02"},
     {"S_item_03", "A_item_03"},
@@ -107,7 +107,7 @@ static __declspec(section ".data") ShopObj obj_list[] = {
     {"S_item_06", "A_item_06"},
 };
 
-static __declspec(section ".data") ShopItem goods_list[] = {
+static ShopItem goods_list[] = {
     {ITEM_HP_DRAIN_ITEM, 10},
     {ITEM_ICE_STORM, 15},
     {ITEM_MYSTERY, 3},
@@ -214,22 +214,22 @@ static EVT_BEGIN(chibitoge_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(chibitoge_talk)
+static EVT_BEGIN(chibitoge_talk)
     CALL_CHILD(PTR(chibitoge_nakama))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(punishop_init)
+EVT_BEGIN(punishop_init)
     CALL(evt_npc_set_position, STRING("me"), 207, 0, -6)
     CALL(evt_npc_set_ry, STRING("me"), 270)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(punishop_talk)
+EVT_BEGIN(punishop_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(puniinfo_init)
+EVT_BEGIN(puniinfo_init)
     CALL(evt_npc_set_position, STRING("me"), 235, 0, 124)
     CALL(evt_npc_set_ry, STRING("me"), 270)
     RETURN

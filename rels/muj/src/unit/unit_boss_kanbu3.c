@@ -84,34 +84,34 @@ extern s32 zakogun_entry[];
 extern s32 zakogun_escape3[];
 extern s32 zakogun_ext_init2[];
 
-__declspec(section ".data") f32 fd_boss_kanbu3_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_kanbu3_neg_one_382;
-__declspec(section ".data") f32 fd_boss_kanbu3___local_PI_383;
-__declspec(section ".data") f32 fd_boss_kanbu3___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_kanbu3_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_kanbu3___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_kanbu3_one_381;
-__declspec(section ".data") f32 fd_boss_kanbu3_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_kanbu3_neg_one_365;
-__declspec(section ".data") f32 fd_boss_kanbu3___local_PI_366;
-__declspec(section ".data") f32 fd_boss_kanbu3___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_kanbu3_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_kanbu3___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_kanbu3_one_364;
+f32 fd_boss_kanbu3_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_kanbu3_neg_one_382;
+f32 fd_boss_kanbu3___local_PI_383;
+f32 fd_boss_kanbu3___local_3PIO2_385;
+f32 fd_boss_kanbu3_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_kanbu3___local_PIO2_384;
+f32 fd_boss_kanbu3_one_381;
+f32 fd_boss_kanbu3_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_kanbu3_neg_one_365;
+f32 fd_boss_kanbu3___local_PI_366;
+f32 fd_boss_kanbu3___local_3PIO2_368;
+f32 fd_boss_kanbu3_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_kanbu3___local_PIO2_367;
+f32 fd_boss_kanbu3_one_364;
 BattleUnitKind unit_boss_kanbu3;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefense defence_guard;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
-static __declspec(section ".data") BattleDataEntry data_table[3];
-__declspec(section ".data") BattleDataEntry data_table2[2];
+static BattleUnitDefense defence;
+static BattleUnitDefense defence_guard;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
+static BattleDataEntry data_table[3];
+BattleDataEntry data_table2[2];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_kanbu3_attack;
 BattleWeapon weapon_kanbu3_charge;
-__declspec(section ".data") BattleUnitSetup entry_kenkyu;
-__declspec(section ".data") BattleUnitSetup entry_group1;
-__declspec(section ".data") BattleUnitSetup entry_group2;
-__declspec(section ".data") BattleUnitSetup entry_group3;
+BattleUnitSetup entry_kenkyu;
+BattleUnitSetup entry_group1;
+BattleUnitSetup entry_group2;
+BattleUnitSetup entry_group3;
 static s32 init_event[59];
 static s32 entry_event[45];
 #ifdef VERSION_G8ME01
@@ -127,38 +127,38 @@ static s32 guard_event[56];
 static s32 guard_cancel_event[69];
 s32 no_event[27];
 static s32 charge_event[71];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_guard[18];
 static s32 normal_attack_event[365];
 
-__declspec(section ".data") f32 fd_boss_kanbu3_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_kanbu3_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_kanbu3_neg_one_382 = -1.0f;
+f32 fd_boss_kanbu3_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_kanbu3___local_PI_383 = 3.1415927f;
+f32 fd_boss_kanbu3___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_kanbu3___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_kanbu3___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_kanbu3_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_kanbu3_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_kanbu3___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_kanbu3___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_kanbu3_one_381 = 1.0f;
+f32 fd_boss_kanbu3_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_kanbu3_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_kanbu3_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_kanbu3_neg_one_365 = -1.0f;
+f32 fd_boss_kanbu3_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_kanbu3___local_PI_366 = 3.1415927f;
+f32 fd_boss_kanbu3___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_kanbu3___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_kanbu3___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_kanbu3_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_kanbu3_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_kanbu3___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_kanbu3___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_kanbu3_one_364 = 1.0f;
+f32 fd_boss_kanbu3_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_kanbu3 = {
     99,
@@ -226,21 +226,21 @@ BattleUnitKind unit_boss_kanbu3 = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefense defence_guard = {{2, 2, 2, 2, 2}};
+static BattleUnitDefense defence_guard = {{2, 2, 2, 2, 2}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {80, 70, 60, 100, 80, 100, 100, 60, 100, 85, 100, 85, 100, 90, 60, 0, 0, 100, 60, 100, 0, 0};
+static StatusVulnerability regist = {80, 70, 60, 100, 80, 100, 100, 60, 100, 85, 100, 85, 100, 90, 60, 0, 0, 100, 60, 100, 0, 0};
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, dead_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
-__declspec(section ".data") BattleDataEntry data_table2[] = {
+BattleDataEntry data_table2[] = {
     {48, btldefaultevt_Dummy},
     {0},
 };
@@ -320,7 +320,7 @@ BattleWeapon weapon_kanbu3_charge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-__declspec(section ".data") BattleUnitSetup entry_kenkyu = {
+BattleUnitSetup entry_kenkyu = {
     &unit_gundan_zako_magician, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -331,7 +331,7 @@ __declspec(section ".data") BattleUnitSetup entry_kenkyu = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_group1 = {
+BattleUnitSetup entry_group1 = {
     &unit_boss_gundan_zako_group1, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -342,7 +342,7 @@ __declspec(section ".data") BattleUnitSetup entry_group1 = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_group2 = {
+BattleUnitSetup entry_group2 = {
     &unit_boss_gundan_zako_group2, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -353,7 +353,7 @@ __declspec(section ".data") BattleUnitSetup entry_group2 = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_group3 = {
+BattleUnitSetup entry_group3 = {
     &unit_boss_gundan_zako_group3, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -1043,7 +1043,7 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

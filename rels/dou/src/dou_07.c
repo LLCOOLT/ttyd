@@ -75,21 +75,21 @@ USER_FUNC(lect_cam_load);
 USER_FUNC(lect_cam_save);
 static void majin_callback(s32 type);
 
-__declspec(section ".data") f32 fd_dou_07_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_07_neg_one_382;
-__declspec(section ".data") f32 fd_dou_07___local_PI_383;
-__declspec(section ".data") f32 fd_dou_07___local_3PIO2_385;
-__declspec(section ".data") f32 fd_dou_07_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_07___local_PIO2_384;
-__declspec(section ".data") f32 fd_dou_07_one_381;
-__declspec(section ".data") f32 fd_dou_07_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_07_neg_one_365;
-__declspec(section ".data") f32 fd_dou_07___local_PI_366;
-__declspec(section ".data") f32 fd_dou_07___local_3PIO2_368;
-__declspec(section ".data") f32 fd_dou_07_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_07___local_PIO2_367;
-__declspec(section ".data") f32 fd_dou_07_one_364;
-static __declspec(section ".data") s32 erumosu_regl[2];
+f32 fd_dou_07_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_dou_07_neg_one_382;
+f32 fd_dou_07___local_PI_383;
+f32 fd_dou_07___local_3PIO2_385;
+f32 fd_dou_07_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_dou_07___local_PIO2_384;
+f32 fd_dou_07_one_381;
+f32 fd_dou_07_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_dou_07_neg_one_365;
+f32 fd_dou_07___local_PI_366;
+f32 fd_dou_07___local_3PIO2_368;
+f32 fd_dou_07_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_dou_07___local_PIO2_367;
+f32 fd_dou_07_one_364;
+static s32 erumosu_regl[2];
 #ifdef VERSION_G8ME01
 s32 erumosu_dead[28];
 #else
@@ -97,41 +97,41 @@ s32 erumosu_dead[25];
 #endif
 static NpcSetupInfo npcEnt[2];
 static BeroEntry bero_entry_data[2];
-static __declspec(section ".data") s32 key_tbl[2];
+static s32 key_tbl[2];
 s32 apper_elmos[43];
 s32 peramajin_before[396];
 s32 peramajin_after[297];
 s32 dou_07_init_evt[89];
 
-__declspec(section ".data") f32 fd_dou_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_dou_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_dou_07_neg_one_382 = -1.0f;
+f32 fd_dou_07_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_dou_07___local_PI_383 = 3.1415927f;
+f32 fd_dou_07___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_dou_07___local_3PIO2_385 = 4.712389f;
+f32 fd_dou_07___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_dou_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_dou_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_dou_07___local_PIO2_384 = 1.5707964f;
+f32 fd_dou_07___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_dou_07_one_381 = 1.0f;
+f32 fd_dou_07_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_dou_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_dou_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_dou_07_neg_one_365 = -1.0f;
+f32 fd_dou_07_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_dou_07___local_PI_366 = 3.1415927f;
+f32 fd_dou_07___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_dou_07___local_3PIO2_368 = 4.712389f;
+f32 fd_dou_07___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_dou_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_dou_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_dou_07___local_PIO2_367 = 1.5707964f;
+f32 fd_dou_07___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_dou_07_one_364 = 1.0f;
+f32 fd_dou_07_one_364 = 1.0f;
 
-static __declspec(section ".data") EVT_BEGIN(erumosu_regl)
+static EVT_BEGIN(erumosu_regl)
     RETURN
 EVT_END()
 
@@ -194,7 +194,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-static __declspec(section ".data") s32 key_tbl[] = {
+static s32 key_tbl[] = {
     ITEM_BLACK_KEY_0x24, -1,
 };
 

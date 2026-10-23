@@ -15,75 +15,75 @@ USER_FUNC(evt_snd_envoff);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon);
 
-__declspec(section ".data") f32 fd_muj_11_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_11_neg_one_382;
-__declspec(section ".data") f32 fd_muj_11___local_PI_383;
-__declspec(section ".data") f32 fd_muj_11___local_3PIO2_385;
-__declspec(section ".data") f32 fd_muj_11_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_11___local_PIO2_384;
-__declspec(section ".data") f32 fd_muj_11_one_381;
-__declspec(section ".data") f32 fd_muj_11_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_11_neg_one_365;
-__declspec(section ".data") f32 fd_muj_11___local_PI_366;
-__declspec(section ".data") f32 fd_muj_11___local_3PIO2_368;
-__declspec(section ".data") f32 fd_muj_11_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_11___local_PIO2_367;
-__declspec(section ".data") f32 fd_muj_11_one_364;
-static __declspec(section ".data") s32 w_close[12];
-static __declspec(section ".data") s32 w_open[12];
-static __declspec(section ".data") s32 e_close[12];
-static __declspec(section ".data") s32 e_open[12];
+f32 fd_muj_11_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_muj_11_neg_one_382;
+f32 fd_muj_11___local_PI_383;
+f32 fd_muj_11___local_3PIO2_385;
+f32 fd_muj_11_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_muj_11___local_PIO2_384;
+f32 fd_muj_11_one_381;
+f32 fd_muj_11_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_muj_11_neg_one_365;
+f32 fd_muj_11___local_PI_366;
+f32 fd_muj_11___local_3PIO2_368;
+f32 fd_muj_11_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_muj_11___local_PIO2_367;
+f32 fd_muj_11_one_364;
+static s32 w_close[12];
+static s32 w_open[12];
+static s32 e_close[12];
+static s32 e_open[12];
 static BeroEntry bero_entry_data[3];
 s32 warning_event[38];
 s32 muj_11_init_evt[35];
 
-__declspec(section ".data") f32 fd_muj_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_11_neg_one_382 = -1.0f;
+f32 fd_muj_11_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj_11___local_PI_383 = 3.1415927f;
+f32 fd_muj_11___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj_11___local_3PIO2_385 = 4.712389f;
+f32 fd_muj_11___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_11_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_11_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj_11___local_PIO2_384 = 1.5707964f;
+f32 fd_muj_11___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_11_one_381 = 1.0f;
+f32 fd_muj_11_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_muj_11_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_11_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_11_neg_one_365 = -1.0f;
+f32 fd_muj_11_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj_11___local_PI_366 = 3.1415927f;
+f32 fd_muj_11___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj_11___local_3PIO2_368 = 4.712389f;
+f32 fd_muj_11___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_11_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_11_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj_11___local_PIO2_367 = 1.5707964f;
+f32 fd_muj_11___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_11_one_364 = 1.0f;
+f32 fd_muj_11_one_364 = 1.0f;
 
-static __declspec(section ".data") EVT_BEGIN(w_close)
+static EVT_BEGIN(w_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(w_open)
+static EVT_BEGIN(w_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(e_close)
+static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(e_open)
+static EVT_BEGIN(e_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r"), 0, LW(0), 0)
     RETURN

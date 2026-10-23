@@ -52,88 +52,88 @@ USER_FUNC(btlevtcmd_SetWalkSound);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(btlevtcmd_WaitAttackEnd);
 
-__declspec(section ".data") f32 fd_patamet_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_patamet_neg_one_382;
-__declspec(section ".data") f32 fd_patamet___local_PI_383;
-__declspec(section ".data") f32 fd_patamet___local_3PIO2_385;
-__declspec(section ".data") f32 fd_patamet_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_patamet___local_PIO2_384;
-__declspec(section ".data") f32 fd_patamet_one_381;
-__declspec(section ".data") f32 fd_patamet_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_patamet_neg_one_365;
-__declspec(section ".data") f32 fd_patamet___local_PI_366;
-__declspec(section ".data") f32 fd_patamet___local_3PIO2_368;
-__declspec(section ".data") f32 fd_patamet_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_patamet___local_PIO2_367;
-__declspec(section ".data") f32 fd_patamet_one_364;
+f32 fd_patamet_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_patamet_neg_one_382;
+f32 fd_patamet___local_PI_383;
+f32 fd_patamet___local_3PIO2_385;
+f32 fd_patamet_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_patamet___local_PIO2_384;
+f32 fd_patamet_one_381;
+f32 fd_patamet_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_patamet_neg_one_365;
+f32 fd_patamet___local_PI_366;
+f32 fd_patamet___local_3PIO2_368;
+f32 fd_patamet_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_patamet___local_PIO2_367;
+f32 fd_patamet_one_364;
 BattleUnitKind unit_patamet;
 static BattleWeapon weapon_patamet_attack;
-static __declspec(section ".data") BattleUnitDefense defence_pata;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_pata;
-static __declspec(section ".data") StatusVulnerability regist_pata;
+static BattleUnitDefense defence_pata;
+static BattleUnitDefenseAttr defence_attr_pata;
+static StatusVulnerability regist_pata;
 static PoseTableEntry pose_table_pata[18];
-static __declspec(section ".data") BattleDataEntry data_table_pata[3];
+static BattleDataEntry data_table_pata[3];
 static BattleUnitKindPart parts_pata[1];
 static PoseSoundTiming pose_sound_timing_table[8];
 static s32 init_event_pata[26];
-static __declspec(section ".data") s32 damage_event_pata[10];
+static s32 damage_event_pata[10];
 static s32 dmg_fall_event_pata[106];
 static s32 dmg_first_attack_pos_event_pata[19];
 static s32 attack_event_pata[339];
-static __declspec(section ".data") s32 wait_event_pata[6];
+static s32 wait_event_pata[6];
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_ceil[18];
 static PoseTableEntry pose_table_turn[17];
-static __declspec(section ".data") BattleDataEntry data_table[3];
+static BattleDataEntry data_table[3];
 static BattleDataEntry data_table_ceil[14];
 static BattleWeapon weapon_met_attack;
 static BattleWeapon weapon_met_ceil_attack;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") BattleUnitDefense defence_turn;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_turn;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static BattleUnitDefense defence_turn;
+static BattleUnitDefenseAttr defence_attr_turn;
+static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
-static __declspec(section ".data") s32 init_event[12];
+static s32 init_event[12];
 static s32 init_event2[148];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 static s32 dmg_turn_event[71];
 static s32 wakeup_event[85];
 static s32 attack_event[546];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 static s32 damage_event_ceil[49];
 static s32 counter_damage_event_ceil[76];
 static s32 ceil_fall_ready_event[158];
 static s32 attack_event_ceil[467];
-static __declspec(section ".data") s32 wait_event_ceil[6];
+static s32 wait_event_ceil[6];
 
-__declspec(section ".data") f32 fd_patamet_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_patamet_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_patamet_neg_one_382 = -1.0f;
+f32 fd_patamet_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_patamet___local_PI_383 = 3.1415927f;
+f32 fd_patamet___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_patamet___local_3PIO2_385 = 4.712389f;
+f32 fd_patamet___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_patamet_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_patamet_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_patamet___local_PIO2_384 = 1.5707964f;
+f32 fd_patamet___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_patamet_one_381 = 1.0f;
+f32 fd_patamet_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_patamet_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_patamet_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_patamet_neg_one_365 = -1.0f;
+f32 fd_patamet_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_patamet___local_PI_366 = 3.1415927f;
+f32 fd_patamet___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_patamet___local_3PIO2_368 = 4.712389f;
+f32 fd_patamet___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_patamet_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_patamet_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_patamet___local_PIO2_367 = 1.5707964f;
+f32 fd_patamet___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_patamet_one_364 = 1.0f;
+f32 fd_patamet_one_364 = 1.0f;
 
 BattleUnitKind unit_patamet = {
     89,
@@ -237,11 +237,11 @@ static BattleWeapon weapon_patamet_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitDefense defence_pata = {{4, 99, 4, 99, 4}};
+static BattleUnitDefense defence_pata = {{4, 99, 4, 99, 4}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_pata = {{0, 2, 0, 2, 0}};
+static BattleUnitDefenseAttr defence_attr_pata = {{0, 2, 0, 2, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist_pata = {75, 90, 105, 100, 75, 100, 0, 75, 100, 90, 100, 90, 100, 95, 75, 60, 90, 100, 75, 100, 100, 95};
+static StatusVulnerability regist_pata = {75, 90, 105, 100, 75, 100, 0, 75, 100, 90, 100, 90, 100, 95, 75, 60, 90, 100, 75, 100, 100, 95};
 
 static PoseTableEntry pose_table_pata[] = {
     {1, "PMT_N_1"},
@@ -264,7 +264,7 @@ static PoseTableEntry pose_table_pata[] = {
     {69, "PMT_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table_pata[] = {
+static BattleDataEntry data_table_pata[] = {
     {14, dmg_fall_event_pata},
     {48, dmg_first_attack_pos_event_pata},
     {0, NULL},
@@ -295,7 +295,7 @@ static EVT_BEGIN(init_event_pata)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event_pata)
+static EVT_BEGIN(damage_event_pata)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -436,7 +436,7 @@ static EVT_BEGIN(attack_event_pata)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_pata)
+static EVT_BEGIN(wait_event_pata)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
@@ -503,7 +503,7 @@ static PoseTableEntry pose_table_turn[] = {
     {69, "MET_S_2"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {48, btldefaultevt_Dummy},
     {0},
@@ -598,15 +598,15 @@ static BattleWeapon weapon_met_ceil_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{4, 99, 4, 99, 4}};
+static BattleUnitDefense defence = {{4, 99, 4, 99, 4}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 2, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 2, 0}};
 
-static __declspec(section ".data") BattleUnitDefense defence_turn = {0};
+static BattleUnitDefense defence_turn = {0};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_turn = {0};
+static BattleUnitDefenseAttr defence_attr_turn = {0};
 
-static __declspec(section ".data") StatusVulnerability regist = {75, 90, 75, 100, 75, 100, 0, 75, 100, 90, 100, 90, 100, 95, 75, 60, 30, 100, 75, 100, 100, 95};
+static StatusVulnerability regist = {75, 90, 75, 100, 75, 100, 0, 75, 100, 90, 100, 90, 100, 95, 75, 60, 30, 100, 75, 100, 100, 95};
 
 static BattleUnitKindPart parts[] = {
     {
@@ -627,7 +627,7 @@ static BattleUnitKindPart parts[] = {
     },
 };
 
-static __declspec(section ".data") EVT_BEGIN(init_event)
+static EVT_BEGIN(init_event)
     CALL(btlevtcmd_GetUnitWork, -2, 0, LW(15))
     CALL_CHILD(PTR(init_event2))
     CALL(btlevtcmd_StartWaitEvent, -2)
@@ -669,7 +669,7 @@ static EVT_BEGIN(init_event2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -864,7 +864,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
@@ -1068,7 +1068,7 @@ static EVT_BEGIN(attack_event_ceil)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_ceil)
+static EVT_BEGIN(wait_event_ceil)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

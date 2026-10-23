@@ -35,68 +35,68 @@ static USER_FUNC(eff_ice_barrier);
 static USER_FUNC(eff_ice_barrier_end);
 USER_FUNC(evt_sub_random);
 
-__declspec(section ".data") f32 fd_bllizard_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_bllizard_neg_one_382;
-__declspec(section ".data") f32 fd_bllizard___local_PI_383;
-__declspec(section ".data") f32 fd_bllizard___local_3PIO2_385;
-__declspec(section ".data") f32 fd_bllizard_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_bllizard___local_PIO2_384;
-__declspec(section ".data") f32 fd_bllizard_one_381;
-__declspec(section ".data") f32 fd_bllizard_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_bllizard_neg_one_365;
-__declspec(section ".data") f32 fd_bllizard___local_PI_366;
-__declspec(section ".data") f32 fd_bllizard___local_3PIO2_368;
-__declspec(section ".data") f32 fd_bllizard_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_bllizard___local_PIO2_367;
-__declspec(section ".data") f32 fd_bllizard_one_364;
+f32 fd_bllizard_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_bllizard_neg_one_382;
+f32 fd_bllizard___local_PI_383;
+f32 fd_bllizard___local_3PIO2_385;
+f32 fd_bllizard_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_bllizard___local_PIO2_384;
+f32 fd_bllizard_one_381;
+f32 fd_bllizard_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_bllizard_neg_one_365;
+f32 fd_bllizard___local_PI_366;
+f32 fd_bllizard___local_3PIO2_368;
+f32 fd_bllizard_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_bllizard___local_PIO2_367;
+f32 fd_bllizard_one_364;
 BattleUnitKind unit_bllizard;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_bllizard_attack;
 static BattleWeapon weapon_bllizard_bllizard_attack;
 static s32 attack_event[69];
 static s32 bllizard_event[361];
 static PoseTableEntry pose_table[17];
-static __declspec(section ".data") BattleDataEntry data_table[3];
+static BattleDataEntry data_table[3];
 static s32 init_event[37];
 static s32 barrier_event[37];
 static s32 dmg_first_attack_pos[19];
 static s32 damage_event[36];
-static __declspec(section ".data") s32 counter_event[2];
+static s32 counter_event[2];
 static s32 unison_phase_event[140];
 static s32 normal_attack_event[386];
 static s32 charge_event[58];
-static __declspec(section ".data") s32 wait_event[12];
+static s32 wait_event[12];
 
-__declspec(section ".data") f32 fd_bllizard_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_bllizard_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_bllizard_neg_one_382 = -1.0f;
+f32 fd_bllizard_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_bllizard___local_PI_383 = 3.1415927f;
+f32 fd_bllizard___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_bllizard___local_3PIO2_385 = 4.712389f;
+f32 fd_bllizard___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_bllizard_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_bllizard_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_bllizard___local_PIO2_384 = 1.5707964f;
+f32 fd_bllizard___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_bllizard_one_381 = 1.0f;
+f32 fd_bllizard_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_bllizard_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_bllizard_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_bllizard_neg_one_365 = -1.0f;
+f32 fd_bllizard_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_bllizard___local_PI_366 = 3.1415927f;
+f32 fd_bllizard___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_bllizard___local_3PIO2_368 = 4.712389f;
+f32 fd_bllizard___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_bllizard_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_bllizard_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_bllizard___local_PIO2_367 = 1.5707964f;
+f32 fd_bllizard___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_bllizard_one_364 = 1.0f;
+f32 fd_bllizard_one_364 = 1.0f;
 
 BattleUnitKind unit_bllizard = {
     112,
@@ -164,11 +164,11 @@ BattleUnitKind unit_bllizard = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 1, 3, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 1, 3, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {65, 65, 95, 100, 60, 0, 100, 0, 100, 75, 100, 75, 100, 90, 65, 70, 85, 100, 65, 100, 100, 95};
+static StatusVulnerability regist = {65, 65, 95, 100, 60, 0, 100, 0, 100, 75, 100, 75, 100, 90, 65, 70, 85, 100, 65, 100, 100, 95};
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_bllizard", "c_kmoon_b", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
@@ -411,7 +411,7 @@ static PoseTableEntry pose_table[] = {
     {69, "S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {41, counter_event},
     {48, dmg_first_attack_pos},
     {0, NULL},
@@ -471,7 +471,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(counter_event)
+static EVT_BEGIN(counter_event)
     RETURN
 EVT_END()
 
@@ -669,7 +669,7 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     CALL(btlevtcmd_SetScale, -2, 1, 1, 1)
     RETURN

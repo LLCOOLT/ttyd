@@ -57,37 +57,37 @@ USER_FUNC(_ikasumi_effect);
 extern BattleUnitKind unit_boss_gesso_left_arm;
 extern BattleUnitKind unit_boss_gesso_right_arm;
 
-__declspec(section ".data") f32 fd_boss_gesso_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_gesso_neg_one_382;
-__declspec(section ".data") f32 fd_boss_gesso___local_PI_383;
-__declspec(section ".data") f32 fd_boss_gesso___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_gesso_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_gesso___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_gesso_one_381;
-__declspec(section ".data") f32 fd_boss_gesso_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_gesso_neg_one_365;
-__declspec(section ".data") f32 fd_boss_gesso___local_PI_366;
-__declspec(section ".data") f32 fd_boss_gesso___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_gesso_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_gesso___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_gesso_one_364;
+f32 fd_boss_gesso_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_gesso_neg_one_382;
+f32 fd_boss_gesso___local_PI_383;
+f32 fd_boss_gesso___local_3PIO2_385;
+f32 fd_boss_gesso_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_gesso___local_PIO2_384;
+f32 fd_boss_gesso_one_381;
+f32 fd_boss_gesso_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_gesso_neg_one_365;
+f32 fd_boss_gesso___local_PI_366;
+f32 fd_boss_gesso___local_3PIO2_368;
+f32 fd_boss_gesso_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_gesso___local_PIO2_367;
+f32 fd_boss_gesso_one_364;
 BattleUnitKind unit_boss_gesso;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
-__declspec(section ".data") BattleUnitDefense defence_ceil;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_ceil;
-__declspec(section ".data") StatusVulnerability regist_ceil;
-__declspec(section ".data") s32 R_defence_turn[2];
-__declspec(section ".data") s32 R_defence_attr_turn[2];
-__declspec(section ".data") s32 R_regist_turn[6];
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
+BattleUnitDefense defence_ceil;
+BattleUnitDefenseAttr defence_attr_ceil;
+StatusVulnerability regist_ceil;
+s32 R_defence_turn[2];
+s32 R_defence_attr_turn[2];
+s32 R_regist_turn[6];
 static PoseTableEntry pose_table[11];
 static PoseTableEntry pose_table_ceil[12];
 PoseTableEntry gesso_pose_table_turn[10];
-static __declspec(section ".data") BattleDataEntry data_table[2];
+static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 #ifndef VERSION_G8ME01
-__declspec(section ".data") s32 gesso_arm_wait_event[4];
+s32 gesso_arm_wait_event[4];
 #endif
 #ifdef VERSION_G8ME01
 static s32 battle_entry_event[313];
@@ -95,8 +95,8 @@ static s32 battle_entry_event[313];
 static s32 battle_entry_event[315];
 #endif
 static s32 init_event[121];
-__declspec(section ".data") BattleUnitSetup entry_gesso_left_arm_entry_data;
-__declspec(section ".data") BattleUnitSetup entry_gesso_right_arm_entry_data;
+BattleUnitSetup entry_gesso_left_arm_entry_data;
+BattleUnitSetup entry_gesso_right_arm_entry_data;
 static s32 damage_event[34];
 #ifdef VERSION_G8ME01
 static s32 phase_event[497];
@@ -106,36 +106,36 @@ static s32 phase_event[488];
 static s32 attack_event[48];
 BattleWeapon weapon_gesso_ikasumi_attack;
 s32 gesso_ikasumi_attack[193];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 s32 dead_subevent[48];
 
-__declspec(section ".data") f32 fd_boss_gesso_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_gesso_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_gesso_neg_one_382 = -1.0f;
+f32 fd_boss_gesso_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_gesso___local_PI_383 = 3.1415927f;
+f32 fd_boss_gesso___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_gesso___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_gesso___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_gesso_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_gesso_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_gesso___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_gesso___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_gesso_one_381 = 1.0f;
+f32 fd_boss_gesso_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_gesso_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_gesso_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_gesso_neg_one_365 = -1.0f;
+f32 fd_boss_gesso_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_gesso___local_PI_366 = 3.1415927f;
+f32 fd_boss_gesso___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_gesso___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_gesso___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_gesso_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_gesso_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_gesso___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_gesso___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_gesso_one_364 = 1.0f;
+f32 fd_boss_gesso_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_gesso = {
     8,
@@ -203,27 +203,27 @@ BattleUnitKind unit_boss_gesso = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 0, 0, 100, 100, 0, 0, 0};
+static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 0, 0, 100, 100, 0, 0, 0};
 
-__declspec(section ".data") BattleUnitDefense defence_ceil = {{2, 2, 2, 2, 2}};
+BattleUnitDefense defence_ceil = {{2, 2, 2, 2, 2}};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_ceil = {0};
+BattleUnitDefenseAttr defence_attr_ceil = {0};
 
-__declspec(section ".data") StatusVulnerability regist_ceil = {0};
+StatusVulnerability regist_ceil = {0};
 
-__declspec(section ".data") s32 R_defence_turn[] = {
+s32 R_defence_turn[] = {
     0, 0,
 };
 
-__declspec(section ".data") s32 R_defence_attr_turn[] = {
+s32 R_defence_attr_turn[] = {
     0, 0,
 };
 
-__declspec(section ".data") s32 R_regist_turn[] = {
+s32 R_regist_turn[] = {
     1684300900, 1684300900, 1684300900, 1684300800, 6579200, 0,
 };
 
@@ -269,7 +269,7 @@ PoseTableEntry gesso_pose_table_turn[] = {
     {69, "GSO_V_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {50, dead_subevent},
     {0, NULL},
 };
@@ -279,7 +279,7 @@ static BattleUnitKindPart parts[] = {
 };
 
 #ifndef VERSION_G8ME01
-__declspec(section ".data") EVT_BEGIN(gesso_arm_wait_event)
+EVT_BEGIN(gesso_arm_wait_event)
     CALL(_test_rtn)
     RETURN
 EVT_END()
@@ -390,7 +390,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-__declspec(section ".data") BattleUnitSetup entry_gesso_left_arm_entry_data = {
+BattleUnitSetup entry_gesso_left_arm_entry_data = {
     &unit_boss_gesso_left_arm, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -401,7 +401,7 @@ __declspec(section ".data") BattleUnitSetup entry_gesso_left_arm_entry_data = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_gesso_right_arm_entry_data = {
+BattleUnitSetup entry_gesso_right_arm_entry_data = {
     &unit_boss_gesso_right_arm, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -767,7 +767,7 @@ USER_FUNC(_test_rtn) {
 }
 #endif
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

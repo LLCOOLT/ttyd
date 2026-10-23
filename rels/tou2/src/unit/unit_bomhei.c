@@ -25,29 +25,29 @@ USER_FUNC(btlevtcmd_SetUnitWork);
 USER_FUNC(btlevtcmd_SetWalkSound);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 
-__declspec(section ".data") f32 fd_bomhei_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_bomhei_neg_one_382;
-__declspec(section ".data") f32 fd_bomhei___local_PI_383;
-__declspec(section ".data") f32 fd_bomhei___local_3PIO2_385;
-__declspec(section ".data") f32 fd_bomhei_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_bomhei___local_PIO2_384;
-__declspec(section ".data") f32 fd_bomhei_one_381;
-__declspec(section ".data") f32 fd_bomhei_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_bomhei_neg_one_365;
-__declspec(section ".data") f32 fd_bomhei___local_PI_366;
-__declspec(section ".data") f32 fd_bomhei___local_3PIO2_368;
-__declspec(section ".data") f32 fd_bomhei_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_bomhei___local_PIO2_367;
-__declspec(section ".data") f32 fd_bomhei_one_364;
+f32 fd_bomhei_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_bomhei_neg_one_382;
+f32 fd_bomhei___local_PI_383;
+f32 fd_bomhei___local_3PIO2_385;
+f32 fd_bomhei_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_bomhei___local_PIO2_384;
+f32 fd_bomhei_one_381;
+f32 fd_bomhei_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_bomhei_neg_one_365;
+f32 fd_bomhei___local_PI_366;
+f32 fd_bomhei___local_3PIO2_368;
+f32 fd_bomhei_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_bomhei___local_PIO2_367;
+f32 fd_bomhei_one_364;
 BattleUnitKind unit_bomhei;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_spark[18];
-static __declspec(section ".data") BattleDataEntry data_table[2];
-static __declspec(section ".data") BattleDataEntry data_table_spark[2];
+static BattleDataEntry data_table[2];
+static BattleDataEntry data_table_spark[2];
 static BattleUnitKindPart parts[1];
-static __declspec(section ".data") StatusVulnerability regist;
+static StatusVulnerability regist;
 static BattleWeapon weapon_bomhei_attack;
 static BattleWeapon weapon_bomhei_bomb;
 static s32 bomb_event[106];
@@ -55,38 +55,38 @@ static s32 init_event[42];
 static s32 damage_event[58];
 static s32 change_spark_event[70];
 static s32 attack_event[440];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 static s32 damage_event_spark[25];
 static s32 attack_event_spark[288];
 static s32 wait_event_spark[27];
 
-__declspec(section ".data") f32 fd_bomhei_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_bomhei_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_bomhei_neg_one_382 = -1.0f;
+f32 fd_bomhei_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_bomhei___local_PI_383 = 3.1415927f;
+f32 fd_bomhei___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_bomhei___local_3PIO2_385 = 4.712389f;
+f32 fd_bomhei___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_bomhei_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_bomhei_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_bomhei___local_PIO2_384 = 1.5707964f;
+f32 fd_bomhei___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_bomhei_one_381 = 1.0f;
+f32 fd_bomhei_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_bomhei_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_bomhei_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_bomhei_neg_one_365 = -1.0f;
+f32 fd_bomhei_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_bomhei___local_PI_366 = 3.1415927f;
+f32 fd_bomhei___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_bomhei___local_3PIO2_368 = 4.712389f;
+f32 fd_bomhei___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_bomhei_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_bomhei_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_bomhei___local_PIO2_367 = 1.5707964f;
+f32 fd_bomhei___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_bomhei_one_364 = 1.0f;
+f32 fd_bomhei_one_364 = 1.0f;
 
 BattleUnitKind unit_bomhei = {
     43,
@@ -154,9 +154,9 @@ BattleUnitKind unit_bomhei = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
+static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 static PoseTableEntry pose_table[] = {
     {1, "BOM_N_1"},
@@ -200,12 +200,12 @@ static PoseTableEntry pose_table_spark[] = {
     {69, "BOM_S_2"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table_spark[] = {
+static BattleDataEntry data_table_spark[] = {
     {48, btldefaultevt_Dummy},
     {0},
 };
@@ -214,7 +214,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_bomhei", "c_bomhey", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1000, pose_table},
 };
 
-static __declspec(section ".data") StatusVulnerability regist = {70, 100, 70, 0, 70, 150, 100, 100, 100, 90, 100, 90, 100, 95, 80, 90, 80, 100, 80, 100, 100, 95};
+static StatusVulnerability regist = {70, 100, 70, 0, 70, 150, 100, 100, 100, 90, 100, 90, 100, 95, 80, 90, 80, 100, 80, 100, 100, 95};
 
 static BattleWeapon weapon_bomhei_attack = {
     NULL, 0, // name..icon
@@ -486,7 +486,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

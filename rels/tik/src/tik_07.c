@@ -53,65 +53,65 @@ USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_rumble_onoff);
 
-__declspec(section ".data") f32 fd_tik_07_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tik_07_neg_one_382;
-__declspec(section ".data") f32 fd_tik_07___local_PI_383;
-__declspec(section ".data") f32 fd_tik_07___local_3PIO2_385;
-__declspec(section ".data") f32 fd_tik_07_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tik_07___local_PIO2_384;
-__declspec(section ".data") f32 fd_tik_07_one_381;
-__declspec(section ".data") f32 fd_tik_07_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tik_07_neg_one_365;
-__declspec(section ".data") f32 fd_tik_07___local_PI_366;
-__declspec(section ".data") f32 fd_tik_07___local_3PIO2_368;
-__declspec(section ".data") f32 fd_tik_07_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tik_07___local_PIO2_367;
-__declspec(section ".data") f32 fd_tik_07_one_364;
-__declspec(section ".data") s32 bero_00_open_door[12];
-__declspec(section ".data") s32 bero_00_close_door[12];
+f32 fd_tik_07_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_tik_07_neg_one_382;
+f32 fd_tik_07___local_PI_383;
+f32 fd_tik_07___local_3PIO2_385;
+f32 fd_tik_07_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_tik_07___local_PIO2_384;
+f32 fd_tik_07_one_381;
+f32 fd_tik_07_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_tik_07_neg_one_365;
+f32 fd_tik_07___local_PI_366;
+f32 fd_tik_07___local_3PIO2_368;
+f32 fd_tik_07_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_tik_07___local_PIO2_367;
+f32 fd_tik_07_one_364;
+s32 bero_00_open_door[12];
+s32 bero_00_close_door[12];
 static BeroEntry bero_entry_data[8];
 static BeroEntry bero_entry_data2[2];
 s32 tik_07_down_evt[82];
 static s32 peach_mail[188];
-static __declspec(section ".data") s32 evt_block[8];
+static s32 evt_block[8];
 static s32 mobj_box00[34];
 s32 tik_07_init_evt[323];
 
-__declspec(section ".data") f32 fd_tik_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tik_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tik_07_neg_one_382 = -1.0f;
+f32 fd_tik_07_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_tik_07___local_PI_383 = 3.1415927f;
+f32 fd_tik_07___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tik_07___local_3PIO2_385 = 4.712389f;
+f32 fd_tik_07___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tik_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tik_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tik_07___local_PIO2_384 = 1.5707964f;
+f32 fd_tik_07___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tik_07_one_381 = 1.0f;
+f32 fd_tik_07_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_tik_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tik_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tik_07_neg_one_365 = -1.0f;
+f32 fd_tik_07_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_tik_07___local_PI_366 = 3.1415927f;
+f32 fd_tik_07___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tik_07___local_3PIO2_368 = 4.712389f;
+f32 fd_tik_07___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tik_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tik_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tik_07___local_PIO2_367 = 1.5707964f;
+f32 fd_tik_07___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tik_07_one_364 = 1.0f;
+f32 fd_tik_07_one_364 = 1.0f;
 
-__declspec(section ".data") EVT_BEGIN(bero_00_open_door)
+EVT_BEGIN(bero_00_open_door)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(bero_00_close_door)
+EVT_BEGIN(bero_00_close_door)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
@@ -340,7 +340,7 @@ static EVT_BEGIN(peach_mail)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_block)
+static EVT_BEGIN(evt_block)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("s_hikari"), 1)
     RETURN
 EVT_END()

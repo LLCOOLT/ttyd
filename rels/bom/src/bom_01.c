@@ -37,33 +37,33 @@ USER_FUNC(evt_msg_pri);
 #pragma force_active on
 
 // math-inline function-local statics (negone_one$374 ...) the target keeps at the start of .data
-__declspec(section ".data") f32 fd_bom_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_bom_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_bom_01_neg_one_382 = -1.0f;
+f32 fd_bom_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_bom_01___local_PI_383 = 3.1415927f;
+f32 fd_bom_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_bom_01___local_3PIO2_385 = 4.712389f;
+f32 fd_bom_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_bom_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_bom_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_bom_01___local_PIO2_384 = 1.5707964f;
+f32 fd_bom_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_bom_01_one_381 = 1.0f;
+f32 fd_bom_01_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_bom_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_bom_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_bom_01_neg_one_365 = -1.0f;
+f32 fd_bom_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_bom_01___local_PI_366 = 3.1415927f;
+f32 fd_bom_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_bom_01___local_3PIO2_368 = 4.712389f;
+f32 fd_bom_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_bom_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_bom_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_bom_01___local_PIO2_367 = 1.5707964f;
+f32 fd_bom_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_bom_01_one_364 = 1.0f;
+f32 fd_bom_01_one_364 = 1.0f;
 
 
 typedef struct SightWork { FileEntry* tpl; s32 level[5]; f32 rot; s32 dir; s32 count1; s32 count2; } SightWork;
@@ -256,53 +256,53 @@ void disp_sight(CameraId camera, void* param);
 void drawNum(s32 num, s32 digits, f32 x, f32 y, f32 scale);
 void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot);
 
-__declspec(section ".data") s32 evt_door_1[12];
-__declspec(section ".data") static s32 evt_door_2[12];
-__declspec(section ".data") static s32 evt_wall[12];
-__declspec(section ".data") const char* door_npc[4];
-__declspec(section ".data") static s32 door_open[9];
-__declspec(section ".data") static s32 door_close[10];
+s32 evt_door_1[12];
+static s32 evt_door_2[12];
+static s32 evt_wall[12];
+const char* door_npc[4];
+static s32 door_open[9];
+static s32 door_close[10];
 DoorParam door;
 static BeroEntry bero_entry_data[3];
 static s32 first_evt[148];
 s32 evt_bom_01_karakara[123];
 static ExtTexInfo ext_data[31];
 s32 evt_bom1000[15];
-__declspec(section ".data") s32 gamen_shake[8];
+s32 gamen_shake[8];
 s32 gamen_shake2[26];
 s32 mario_tobideru[54];
 s32 mario_shot[160];
-__declspec(section ".data") s32 effect_delete[11];
+s32 effect_delete[11];
 static s32 mario_kemuri[29];
-__declspec(section ".data") s32 evt_depth[4];
+s32 evt_depth[4];
 s32 cam_outside[48];
 s32 cam_inside[52];
 s32 cam_inside2[52];
 static s32 party_damage_pose[52];
 s32 effect_1[84];
 s32 open_hatch[83];
-__declspec(section ".data") static f32 spline_dt[9];
-__declspec(section ".data") const char* oh_data[8];
+static f32 spline_dt[9];
+const char* oh_data[8];
 static s32 evt_taihou[2446];
 static s32 init_soncho[13];
 static s32 talk_soncho[24];
-__declspec(section ".data") s32 init_nitoro[8];
+s32 init_nitoro[8];
 s32 talk_nitoro[44];
-__declspec(section ".data") s32 init_pentrit[8];
+s32 init_pentrit[8];
 s32 talk_pentrit[44];
-__declspec(section ".data") s32 init_surary[8];
+s32 init_surary[8];
 s32 talk_surary[44];
-__declspec(section ".data") s32 init_murabito_d[8];
+s32 init_murabito_d[8];
 s32 talk_murabito_d[44];
-__declspec(section ".data") static s32 init_murabito_e[8];
+static s32 init_murabito_e[8];
 static s32 talk_murabito_e[28];
-__declspec(section ".data") static s32 init_murabito_f[8];
+static s32 init_murabito_f[8];
 static s32 talk_murabito_f[28];
-__declspec(section ".data") static s32 init_murabito_g[8];
+static s32 init_murabito_g[8];
 static s32 talk_murabito_g[28];
-__declspec(section ".data") static s32 init_murabito_h[8];
+static s32 init_murabito_h[8];
 static s32 talk_murabito_h[28];
-__declspec(section ".data") static s32 init_murabito_i[8];
+static s32 init_murabito_i[8];
 static s32 talk_murabito_i[28];
 static s32 init_white[22];
 static s32 talk_white[39];
@@ -630,38 +630,38 @@ s32 make_ext_table(EventEntry* event, BOOL isFirstCall) {
 
 
 
-__declspec(section ".data") EVT_BEGIN(evt_door_1)
+EVT_BEGIN(evt_door_1)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5546875f))
     CALL(evt_mapobj_rotate, 1, STRING(("s_ie_door")), FLOAT(0.0f), LW(0), FLOAT(0.0f))
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(evt_door_2)
+static EVT_BEGIN(evt_door_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING(("s_ie_door")), LW(0), FLOAT(0.0f), FLOAT(0.0f))
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(evt_wall)
+static EVT_BEGIN(evt_wall)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5f))
     CALL(evt_mapobj_rotate, 1, STRING(("s_ie_kai")), FLOAT(0.0f), LW(0), FLOAT(0.0f))
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* door_npc[] = {
+const char* door_npc[] = {
     /*"ホワイト"*/"\203z\203\217\203C\203g",
     /*"ペントリット"*/"\203y\203\223\203g\203\212\203b\203g",
     /*"スラリー"*/"\203X\203\211\203\212\201[",
     NULL,
 };
 
-__declspec(section ".data") static EVT_BEGIN(door_open)
+static EVT_BEGIN(door_open)
     CALL(evt_snd_envoff, 18432)
     CALL(evt_snd_env_lpf, 0, 800)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(door_close)
+static EVT_BEGIN(door_close)
     CALL(evt_snd_envon, 160, 0)
     CALL(evt_snd_env_lpf, 0, 0)
     RETURN
@@ -1042,7 +1042,7 @@ EVT_BEGIN(evt_bom1000)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(gamen_shake)
+EVT_BEGIN(gamen_shake)
     CALL(evt_cam_shake, 4, FLOAT(0.001953125f), FLOAT(0.0f), 0)
     RETURN
 EVT_END()
@@ -1109,7 +1109,7 @@ EVT_BEGIN(mario_shot)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(effect_delete)
+EVT_BEGIN(effect_delete)
     CALL(evt_eff_delete, STRING(("kemuri")))
     CALL(evt_eff_delete, STRING(("ripple")))
     CALL(evt_eff_delete, STRING(("particle")))
@@ -1125,7 +1125,7 @@ static EVT_BEGIN(mario_kemuri)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_depth)
+EVT_BEGIN(evt_depth)
     CALL(depth)
     RETURN
 EVT_END()
@@ -1228,12 +1228,12 @@ EVT_BEGIN(open_hatch)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static f32 spline_dt[] = {
+static f32 spline_dt[] = {
     -200.0f, 0.0f, 650.0f, 590.0f, 200.0f, -2150.0f, 1380.0f, 100.0f,
     -4950.0f,
 };
 
-__declspec(section ".data") const char* oh_data[] = {
+const char* oh_data[] = {
     /*"\203j\203g\203\215"*/"\203j\203g\203\215", "stg7_bom_65_a",
     /*"\203y\203\223\203g\203\212\203b\203g"*/"\203y\203\223\203g\203\212\203b\203g", "stg7_bom_65_b",
     /*"\203X\203\211\203\212\201["*/"\203X\203\211\203\212\201[", "stg7_bom_65_c",
@@ -1902,7 +1902,7 @@ static EVT_BEGIN(talk_soncho)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_nitoro)
+EVT_BEGIN(init_nitoro)
     CALL(evt_npc_set_position, STRING(("me")), -120, 0, -220)
     RETURN
 EVT_END()
@@ -1923,7 +1923,7 @@ EVT_BEGIN(talk_nitoro)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_pentrit)
+EVT_BEGIN(init_pentrit)
     CALL(evt_npc_set_position, STRING(("me")), -150, 0, 130)
     RETURN
 EVT_END()
@@ -1944,7 +1944,7 @@ EVT_BEGIN(talk_pentrit)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_surary)
+EVT_BEGIN(init_surary)
     CALL(evt_npc_set_position, STRING(("me")), 152, 0, -188)
     RETURN
 EVT_END()
@@ -1965,7 +1965,7 @@ EVT_BEGIN(talk_surary)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_murabito_d)
+EVT_BEGIN(init_murabito_d)
     CALL(evt_npc_set_position, STRING(("me")), 175, 0, 210)
     RETURN
 EVT_END()
@@ -1986,7 +1986,7 @@ EVT_BEGIN(talk_murabito_d)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(init_murabito_e)
+static EVT_BEGIN(init_murabito_e)
     CALL(evt_npc_set_position, STRING(("me")), -200, 0, -80)
     RETURN
 EVT_END()
@@ -2003,7 +2003,7 @@ static EVT_BEGIN(talk_murabito_e)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(init_murabito_f)
+static EVT_BEGIN(init_murabito_f)
     CALL(evt_npc_set_position, STRING(("me")), -150, 0, -80)
     RETURN
 EVT_END()
@@ -2020,7 +2020,7 @@ static EVT_BEGIN(talk_murabito_f)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(init_murabito_g)
+static EVT_BEGIN(init_murabito_g)
     CALL(evt_npc_set_position, STRING(("me")), -100, 0, -80)
     RETURN
 EVT_END()
@@ -2037,7 +2037,7 @@ static EVT_BEGIN(talk_murabito_g)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(init_murabito_h)
+static EVT_BEGIN(init_murabito_h)
     CALL(evt_npc_set_position, STRING(("me")), -50, 0, -80)
     RETURN
 EVT_END()
@@ -2054,7 +2054,7 @@ static EVT_BEGIN(talk_murabito_h)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(init_murabito_i)
+static EVT_BEGIN(init_murabito_i)
     CALL(evt_npc_set_position, STRING(("me")), 0, 0, -80)
     RETURN
 EVT_END()

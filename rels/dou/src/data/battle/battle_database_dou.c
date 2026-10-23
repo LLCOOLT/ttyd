@@ -15,122 +15,122 @@ f32 sinfd(f32 degrees);
 static USER_FUNC(_wave_offset);
 extern BattleUnitKind unit_killer_cannon;
 
-__declspec(section ".data") f32 fd_battle_database_dou_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_dou_neg_one_382;
-__declspec(section ".data") f32 fd_battle_database_dou___local_PI_383;
-__declspec(section ".data") f32 fd_battle_database_dou___local_3PIO2_385;
-__declspec(section ".data") f32 fd_battle_database_dou_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_dou___local_PIO2_384;
-__declspec(section ".data") f32 fd_battle_database_dou_one_381;
-__declspec(section ".data") f32 fd_battle_database_dou_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_dou_neg_one_365;
-__declspec(section ".data") f32 fd_battle_database_dou___local_PI_366;
-__declspec(section ".data") f32 fd_battle_database_dou___local_3PIO2_368;
-__declspec(section ".data") f32 fd_battle_database_dou_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_dou___local_PIO2_367;
-__declspec(section ".data") f32 fd_battle_database_dou_one_364;
+f32 fd_battle_database_dou_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_battle_database_dou_neg_one_382;
+f32 fd_battle_database_dou___local_PI_383;
+f32 fd_battle_database_dou___local_3PIO2_385;
+f32 fd_battle_database_dou_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_battle_database_dou___local_PIO2_384;
+f32 fd_battle_database_dou_one_381;
+f32 fd_battle_database_dou_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_battle_database_dou_neg_one_365;
+f32 fd_battle_database_dou___local_PI_366;
+f32 fd_battle_database_dou___local_3PIO2_368;
+f32 fd_battle_database_dou_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_battle_database_dou___local_PIO2_367;
+f32 fd_battle_database_dou_one_364;
 BattleStageObjectData dou_btlobject_data[51];
 BattleStageData dou_btlstage_data[6];
 BattleUnitSetup btlparty_dou_dou_00_01_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_00_01_off_1;
+BattleGroupSetup btlgrp_dou_dou_00_01_off_1;
 BattleUnitSetup btlparty_dou_dou_01_01_off_01[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_01_01_off_01;
+BattleGroupSetup btlgrp_dou_dou_01_01_off_01;
 BattleUnitSetup btlparty_dou_dou_02_01_off_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_02_01_off_01;
+BattleGroupSetup btlgrp_dou_dou_02_01_off_01;
 BattleUnitSetup btlparty_dou_dou_02_02_off_01[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_02_02_off_01;
+BattleGroupSetup btlgrp_dou_dou_02_02_off_01;
 BattleUnitSetup btlparty_dou_dou_03_01_off_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_03_01_off_01;
+BattleGroupSetup btlgrp_dou_dou_03_01_off_01;
 BattleUnitSetup btlparty_dou_dou_03_99_off_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_03_99_off_01;
+BattleGroupSetup btlgrp_dou_dou_03_99_off_01;
 BattleUnitSetup btlparty_dou_dou_03_02_off_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_03_02_off_01;
+BattleGroupSetup btlgrp_dou_dou_03_02_off_01;
 BattleUnitSetup btlparty_dou_dou_03_03_off_01[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_03_03_off_01;
+BattleGroupSetup btlgrp_dou_dou_03_03_off_01;
 BattleUnitSetup btlparty_dou_dou_05_01_off_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_05_01_off_01;
+BattleGroupSetup btlgrp_dou_dou_05_01_off_01;
 BattleUnitSetup btlparty_dou_dou_05_02_off_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_05_02_off_01;
+BattleGroupSetup btlgrp_dou_dou_05_02_off_01;
 BattleUnitSetup btlparty_dou_dou_06_01_off_01[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_06_01_off_01;
+BattleGroupSetup btlgrp_dou_dou_06_01_off_01;
 BattleUnitSetup btlparty_dou_dou_06_02_off_01[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_06_02_off_01;
-__declspec(section ".data") BattleUnitSetup btlparty_dou_dou_06_03_off_01[1];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_06_03_off_01;
+BattleGroupSetup btlgrp_dou_dou_06_02_off_01;
+BattleUnitSetup btlparty_dou_dou_06_03_off_01[1];
+BattleGroupSetup btlgrp_dou_dou_06_03_off_01;
 BattleUnitSetup btlparty_dou_dou_07_01_off_01[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_07_01_off_01;
+BattleGroupSetup btlgrp_dou_dou_07_01_off_01;
 BattleUnitSetup btlparty_dou_dou_08_01_off_01[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_08_01_off_01;
+BattleGroupSetup btlgrp_dou_dou_08_01_off_01;
 BattleUnitSetup btlparty_dou_dou_09_01_off_01[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_09_01_off_01;
+BattleGroupSetup btlgrp_dou_dou_09_01_off_01;
 BattleUnitSetup btlparty_dou_dou_09_02_off_01[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_09_02_off_01;
+BattleGroupSetup btlgrp_dou_dou_09_02_off_01;
 BattleUnitSetup btlparty_dou_dou_12_01_off_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_12_01_off_01;
+BattleGroupSetup btlgrp_dou_dou_12_01_off_01;
 BattleUnitSetup btlparty_dou_dou_12_99_off_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_12_99_off_01;
+BattleGroupSetup btlgrp_dou_dou_12_99_off_01;
 BattleUnitSetup btlparty_dou_dou_13_01_off_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_13_01_off_01;
+BattleGroupSetup btlgrp_dou_dou_13_01_off_01;
 BattleUnitSetup btlparty_dou_dou_13_99_off_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_13_99_off_01;
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_test1_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_test2_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_test3_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_01_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_02_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_02_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_03_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_03_99_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_03_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_03_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_05_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_05_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_06_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_06_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_06_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_07_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_08_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_09_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_09_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_12_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_12_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_12_99_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_13_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_13_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_13_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_13_04_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_13_99_off[2];
+BattleGroupSetup btlgrp_dou_dou_13_99_off_01;
+NpcBattleSelect btlgrpsel_dou_btlno_dou_test1_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_test2_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_test3_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_01_01_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_02_01_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_02_02_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_03_01_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_03_99_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_03_02_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_03_03_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_05_01_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_05_02_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_06_01_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_06_02_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_06_03_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_07_01_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_08_01_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_09_01_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_09_02_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_12_01_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_12_02_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_12_99_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_13_01_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_13_02_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_13_03_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_13_04_off[2];
+NpcBattleSelect btlgrpsel_dou_btlno_dou_13_99_off[2];
 NpcSetupBattleInfo btlsetup_dou_tbl[28];
 NpcTerritoryInfo btl_dou_setup_no_tbl[28];
 s32 bgset_dou_wave_event[77];
 
-__declspec(section ".data") f32 fd_battle_database_dou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_battle_database_dou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_dou_neg_one_382 = -1.0f;
+f32 fd_battle_database_dou_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_dou___local_PI_383 = 3.1415927f;
+f32 fd_battle_database_dou___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_battle_database_dou___local_3PIO2_385 = 4.712389f;
+f32 fd_battle_database_dou___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_battle_database_dou_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_battle_database_dou_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_dou___local_PIO2_384 = 1.5707964f;
+f32 fd_battle_database_dou___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_battle_database_dou_one_381 = 1.0f;
+f32 fd_battle_database_dou_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_dou_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_battle_database_dou_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_dou_neg_one_365 = -1.0f;
+f32 fd_battle_database_dou_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_dou___local_PI_366 = 3.1415927f;
+f32 fd_battle_database_dou___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_battle_database_dou___local_3PIO2_368 = 4.712389f;
+f32 fd_battle_database_dou___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_battle_database_dou_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_battle_database_dou_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_dou___local_PIO2_367 = 1.5707964f;
+f32 fd_battle_database_dou___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_battle_database_dou_one_364 = 1.0f;
+f32 fd_battle_database_dou_one_364 = 1.0f;
 
 BattleStageObjectData dou_btlobject_data[] = {
     {"taki", 2, 2, {0}, 0, 60, {0}},
@@ -300,7 +300,7 @@ BattleUnitSetup btlparty_dou_dou_00_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_00_01_off_1 = {
+BattleGroupSetup btlgrp_dou_dou_00_01_off_1 = {
     3, // numEnemies
     btlparty_dou_dou_00_01_off_1, // enemyData
     25, // heldItemWeight
@@ -344,7 +344,7 @@ BattleUnitSetup btlparty_dou_dou_01_01_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_01_01_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_01_01_off_01 = {
     3, // numEnemies
     btlparty_dou_dou_01_01_off_01, // enemyData
     25, // heldItemWeight
@@ -378,7 +378,7 @@ BattleUnitSetup btlparty_dou_dou_02_01_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_02_01_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_02_01_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_02_01_off_01, // enemyData
     25, // heldItemWeight
@@ -432,7 +432,7 @@ BattleUnitSetup btlparty_dou_dou_02_02_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_02_02_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_02_02_off_01 = {
     4, // numEnemies
     btlparty_dou_dou_02_02_off_01, // enemyData
     25, // heldItemWeight
@@ -466,7 +466,7 @@ BattleUnitSetup btlparty_dou_dou_03_01_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_03_01_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_03_01_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_03_01_off_01, // enemyData
     25, // heldItemWeight
@@ -500,7 +500,7 @@ BattleUnitSetup btlparty_dou_dou_03_99_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_03_99_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_03_99_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_03_99_off_01, // enemyData
     25, // heldItemWeight
@@ -534,7 +534,7 @@ BattleUnitSetup btlparty_dou_dou_03_02_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_03_02_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_03_02_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_03_02_off_01, // enemyData
     25, // heldItemWeight
@@ -578,7 +578,7 @@ BattleUnitSetup btlparty_dou_dou_03_03_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_03_03_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_03_03_off_01 = {
     3, // numEnemies
     btlparty_dou_dou_03_03_off_01, // enemyData
     25, // heldItemWeight
@@ -612,7 +612,7 @@ BattleUnitSetup btlparty_dou_dou_05_01_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_05_01_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_05_01_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_05_01_off_01, // enemyData
     25, // heldItemWeight
@@ -646,7 +646,7 @@ BattleUnitSetup btlparty_dou_dou_05_02_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_05_02_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_05_02_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_05_02_off_01, // enemyData
     25, // heldItemWeight
@@ -690,7 +690,7 @@ BattleUnitSetup btlparty_dou_dou_06_01_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_06_01_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_06_01_off_01 = {
     3, // numEnemies
     btlparty_dou_dou_06_01_off_01, // enemyData
     25, // heldItemWeight
@@ -744,7 +744,7 @@ BattleUnitSetup btlparty_dou_dou_06_02_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_06_02_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_06_02_off_01 = {
     4, // numEnemies
     btlparty_dou_dou_06_02_off_01, // enemyData
     25, // heldItemWeight
@@ -755,7 +755,7 @@ __declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_06_02_off_01 = {
     5, // field_1C
 };
 
-__declspec(section ".data") BattleUnitSetup btlparty_dou_dou_06_03_off_01[] = {
+BattleUnitSetup btlparty_dou_dou_06_03_off_01[] = {
     {
         &unit_patamet, // mUnitKindParams
         1, // alliance
@@ -768,7 +768,7 @@ __declspec(section ".data") BattleUnitSetup btlparty_dou_dou_06_03_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_06_03_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_06_03_off_01 = {
     1, // numEnemies
     btlparty_dou_dou_06_03_off_01, // enemyData
     25, // heldItemWeight
@@ -812,7 +812,7 @@ BattleUnitSetup btlparty_dou_dou_07_01_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_07_01_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_07_01_off_01 = {
     3, // numEnemies
     btlparty_dou_dou_07_01_off_01, // enemyData
     25, // heldItemWeight
@@ -866,7 +866,7 @@ BattleUnitSetup btlparty_dou_dou_08_01_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_08_01_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_08_01_off_01 = {
     4, // numEnemies
     btlparty_dou_dou_08_01_off_01, // enemyData
     25, // heldItemWeight
@@ -910,7 +910,7 @@ BattleUnitSetup btlparty_dou_dou_09_01_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_09_01_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_09_01_off_01 = {
     3, // numEnemies
     btlparty_dou_dou_09_01_off_01, // enemyData
     25, // heldItemWeight
@@ -954,7 +954,7 @@ BattleUnitSetup btlparty_dou_dou_09_02_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_09_02_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_09_02_off_01 = {
     3, // numEnemies
     btlparty_dou_dou_09_02_off_01, // enemyData
     25, // heldItemWeight
@@ -988,7 +988,7 @@ BattleUnitSetup btlparty_dou_dou_12_01_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_12_01_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_12_01_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_12_01_off_01, // enemyData
     25, // heldItemWeight
@@ -1022,7 +1022,7 @@ BattleUnitSetup btlparty_dou_dou_12_99_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_12_99_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_12_99_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_12_99_off_01, // enemyData
     25, // heldItemWeight
@@ -1056,7 +1056,7 @@ BattleUnitSetup btlparty_dou_dou_13_01_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_13_01_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_13_01_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_13_01_off_01, // enemyData
     25, // heldItemWeight
@@ -1090,7 +1090,7 @@ BattleUnitSetup btlparty_dou_dou_13_99_off_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_13_99_off_01 = {
+BattleGroupSetup btlgrp_dou_dou_13_99_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_13_99_off_01, // enemyData
     25, // heldItemWeight
@@ -1101,137 +1101,137 @@ __declspec(section ".data") BattleGroupSetup btlgrp_dou_dou_13_99_off_01 = {
     5, // field_1C
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_test1_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_test1_off[] = {
     {50, &btlgrp_dou_dou_00_01_off_1, &dou_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_test2_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_test2_off[] = {
     {50, &btlgrp_dou_dou_00_01_off_1, dou_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_test3_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_test3_off[] = {
     {50, &btlgrp_dou_dou_00_01_off_1, &dou_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_01_01_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_01_01_off[] = {
     {20, &btlgrp_dou_dou_01_01_off_01, dou_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_02_01_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_02_01_off[] = {
     {20, &btlgrp_dou_dou_02_01_off_01, &dou_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_02_02_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_02_02_off[] = {
     {20, &btlgrp_dou_dou_02_02_off_01, &dou_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_03_01_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_03_01_off[] = {
     {20, &btlgrp_dou_dou_03_01_off_01, dou_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_03_99_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_03_99_off[] = {
     {20, &btlgrp_dou_dou_03_99_off_01, dou_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_03_02_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_03_02_off[] = {
     {20, &btlgrp_dou_dou_03_02_off_01, dou_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_03_03_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_03_03_off[] = {
     {20, &btlgrp_dou_dou_03_03_off_01, &dou_btlstage_data[4]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_05_01_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_05_01_off[] = {
     {20, &btlgrp_dou_dou_05_01_off_01, dou_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_05_02_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_05_02_off[] = {
     {20, &btlgrp_dou_dou_05_02_off_01, dou_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_06_01_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_06_01_off[] = {
     {20, &btlgrp_dou_dou_06_01_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_06_02_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_06_02_off[] = {
     {20, &btlgrp_dou_dou_06_02_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_06_03_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_06_03_off[] = {
     {20, &btlgrp_dou_dou_06_03_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_07_01_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_07_01_off[] = {
     {20, &btlgrp_dou_dou_07_01_off_01, dou_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_08_01_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_08_01_off[] = {
     {20, &btlgrp_dou_dou_08_01_off_01, &dou_btlstage_data[4]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_09_01_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_09_01_off[] = {
     {20, &btlgrp_dou_dou_09_01_off_01, &dou_btlstage_data[4]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_09_02_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_09_02_off[] = {
     {20, &btlgrp_dou_dou_09_02_off_01, &dou_btlstage_data[4]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_12_01_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_12_01_off[] = {
     {20, &btlgrp_dou_dou_12_01_off_01, &dou_btlstage_data[5]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_12_02_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_12_02_off[] = {
     {20, &btlgrp_dou_dou_12_01_off_01, &dou_btlstage_data[5]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_12_99_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_12_99_off[] = {
     {20, &btlgrp_dou_dou_12_99_off_01, &dou_btlstage_data[5]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_13_01_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_13_01_off[] = {
     {20, &btlgrp_dou_dou_13_01_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_13_02_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_13_02_off[] = {
     {20, &btlgrp_dou_dou_13_01_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_13_03_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_13_03_off[] = {
     {20, &btlgrp_dou_dou_13_01_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_13_04_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_13_04_off[] = {
     {20, &btlgrp_dou_dou_13_01_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_dou_btlno_dou_13_99_off[] = {
+NpcBattleSelect btlgrpsel_dou_btlno_dou_13_99_off[] = {
     {20, &btlgrp_dou_dou_13_99_off_01, &dou_btlstage_data[1]},
     {0},
 };

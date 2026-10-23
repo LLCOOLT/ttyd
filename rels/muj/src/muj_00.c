@@ -207,59 +207,59 @@ void suifu_kyorokyoro_init(NanNpc* npc);
 void suifu_kyorokyoro(NanNpc* npc);
 static void alpha_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") f32 fd_muj_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_00_neg_one_382;
-__declspec(section ".data") f32 fd_muj_00___local_PI_383;
-__declspec(section ".data") f32 fd_muj_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_muj_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_muj_00_one_381;
-__declspec(section ".data") f32 fd_muj_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_00_neg_one_365;
-__declspec(section ".data") f32 fd_muj_00___local_PI_366;
-__declspec(section ".data") f32 fd_muj_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_muj_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_muj_00_one_364;
+f32 fd_muj_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_muj_00_neg_one_382;
+f32 fd_muj_00___local_PI_383;
+f32 fd_muj_00___local_3PIO2_385;
+f32 fd_muj_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_muj_00___local_PIO2_384;
+f32 fd_muj_00_one_381;
+f32 fd_muj_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_muj_00_neg_one_365;
+f32 fd_muj_00___local_PI_366;
+f32 fd_muj_00___local_3PIO2_368;
+f32 fd_muj_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_muj_00___local_PIO2_367;
+f32 fd_muj_00_one_364;
 static ExtTexInfo ext_entry_data[59];
 static s16 suifu_animtbl[42];
-__declspec(section ".data") s32 suifu_animtbl_run[11];
-static __declspec(section ".data") s16 elmos_animtbl[22];
+s32 suifu_animtbl_run[11];
+static s16 elmos_animtbl[22];
 static s16 dai3_animtbl[42];
-__declspec(section ".data") s32 dai3_animtbl_run[11];
+s32 dai3_animtbl_run[11];
 static s32 nannpc_mode_setup[98];
 static s32 back_dark[27];
 static s32 back_light[27];
 s32 suifu_dark[36];
 s32 nannpc_light[36];
 static s32 garawaru_init[14];
-static __declspec(section ".data") s32 garawaru_talk[8];
-static __declspec(section ".data") s32 marco_init[2];
-static __declspec(section ".data") s32 marco_talk[2];
+static s32 garawaru_talk[8];
+static s32 marco_init[2];
+static s32 marco_talk[2];
 static s32 odoodo_init[14];
-static __declspec(section ".data") s32 odoodo_talk[8];
-static __declspec(section ".data") s32 suifu_a_init[2];
-static __declspec(section ".data") s32 suifu_a_talk[2];
-static __declspec(section ".data") s32 suifu_bomb_init[2];
-static __declspec(section ".data") s32 suifu_bomb_talk[2];
+static s32 odoodo_talk[8];
+static s32 suifu_a_init[2];
+static s32 suifu_a_talk[2];
+static s32 suifu_bomb_init[2];
+static s32 suifu_bomb_talk[2];
 static s32 suifu_c_init[14];
 static s32 suifu_c_talk[22];
 static s32 suifu_d_init[14];
 static s32 suifu_d_talk[22];
 static s32 suifu_e_init[14];
 static s32 suifu_e_talk[22];
-static __declspec(section ".data") s32 korutesu_init[11];
+static s32 korutesu_init[11];
 static s32 korutesu_talk[35];
-static __declspec(section ".data") s32 mony_init[2];
+static s32 mony_init[2];
 static s32 mony_talk[30];
-static __declspec(section ".data") s32 peton_init[2];
+static s32 peton_init[2];
 static s32 peton_talk[30];
 s32 koburon_init[31];
 s32 koburon_regp[140];
 s32 koburon_talk[87];
 s32 koburon_dead[139];
 s32 koburon_evt[24];
-static __declspec(section ".data") s32 kiza_talk[8];
+static s32 kiza_talk[8];
 static s32 kiza_entry[30];
 static NpcSetupInfo npcEnt[15];
 static BeroEntry bero_entry_data[4];
@@ -279,11 +279,11 @@ s32 dai3_kurukuru[80];
 s32 kaizoku_vs_dai3_dai3pos[300];
 s32 dai3_butai_setup[69];
 s32 dai3_butai_main[19];
-__declspec(section ".data") s32 dai3_kanbu_setup[2];
+s32 dai3_kanbu_setup[2];
 s32 dai3_kanbu_main[80];
 s32 kaizoku_setup[160];
 s32 kaizoku_main[19];
-__declspec(section ".data") s32 mario_main_init[4];
+s32 mario_main_init[4];
 s32 mario_main[82];
 s32 mario_main2[82];
 s32 kaizoku_move_every[24];
@@ -299,8 +299,8 @@ s32 tobikakari_kemuri[18];
 s32 cam_dai3_vs_kaizoku[58];
 s32 kaizoku_vs_dai3[531];
 s32 senin_kansei[125];
-__declspec(section ".data") f32 dai3_taisan_spline_dt00[9];
-__declspec(section ".data") f32 dai3_taisan_spline_dt01[9];
+f32 dai3_taisan_spline_dt00[9];
+f32 dai3_taisan_spline_dt01[9];
 s32 nameraka_rotate[48];
 s32 dai3_taisan_move_trace00[69];
 s32 dai3_taisan_move_trace01[69];
@@ -797,33 +797,33 @@ USER_FUNC(cam_test_func) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_muj_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_00_neg_one_382 = -1.0f;
+f32 fd_muj_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj_00___local_PI_383 = 3.1415927f;
+f32 fd_muj_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj_00___local_3PIO2_385 = 4.712389f;
+f32 fd_muj_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj_00___local_PIO2_384 = 1.5707964f;
+f32 fd_muj_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_00_one_381 = 1.0f;
+f32 fd_muj_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_muj_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_00_neg_one_365 = -1.0f;
+f32 fd_muj_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj_00___local_PI_366 = 3.1415927f;
+f32 fd_muj_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj_00___local_3PIO2_368 = 4.712389f;
+f32 fd_muj_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj_00___local_PIO2_367 = 1.5707964f;
+f32 fd_muj_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_00_one_364 = 1.0f;
+f32 fd_muj_00_one_364 = 1.0f;
 
 static ExtTexInfo ext_entry_data[] = {
     {"c_boro_k", "S_1", 0.0f},
@@ -896,12 +896,12 @@ static s16 suifu_animtbl[] = {
     -1, 0,
 };
 
-__declspec(section ".data") s32 suifu_animtbl_run[] = {
+s32 suifu_animtbl_run[] = {
     917518, 983055, 1048592, 1114129, 1179666, 1245203, 1310740, 1376277,
     1441814, 1507351, -65536,
 };
 
-static __declspec(section ".data") s16 elmos_animtbl[] = {
+static s16 elmos_animtbl[] = {
     24, 24, 25, 25, 26, 26, 27, 27,
     28, 28, 29, 29, 30, 30, 31, 31,
     32, 32, 33, 33, -1, 0,
@@ -916,7 +916,7 @@ static s16 dai3_animtbl[] = {
     -1, 0,
 };
 
-__declspec(section ".data") s32 dai3_animtbl_run[] = {
+s32 dai3_animtbl_run[] = {
     3145776, 3211313, 3276850, 3342387, 3407924, 3473461, 3538998, 3604535,
     3670072, 3735609, -65536,
 };
@@ -1024,16 +1024,16 @@ static EVT_BEGIN(garawaru_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(garawaru_talk)
+static EVT_BEGIN(garawaru_talk)
     CALL(evt_msg_print, 0, STRING("stg5_muj_117_01"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(marco_init)
+static EVT_BEGIN(marco_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(marco_talk)
+static EVT_BEGIN(marco_talk)
     RETURN
 EVT_END()
 
@@ -1045,24 +1045,24 @@ static EVT_BEGIN(odoodo_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(odoodo_talk)
+static EVT_BEGIN(odoodo_talk)
     CALL(evt_msg_print, 0, STRING("stg5_muj_117_00"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(suifu_a_init)
+static EVT_BEGIN(suifu_a_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(suifu_a_talk)
+static EVT_BEGIN(suifu_a_talk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(suifu_bomb_init)
+static EVT_BEGIN(suifu_bomb_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(suifu_bomb_talk)
+static EVT_BEGIN(suifu_bomb_talk)
     RETURN
 EVT_END()
 
@@ -1120,7 +1120,7 @@ static EVT_BEGIN(suifu_e_talk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(korutesu_init)
+static EVT_BEGIN(korutesu_init)
     SWITCH(GSW(0))
         CASE_GREATER_OR_EQUAL(267)
         CALL(evt_npc_set_ry, STRING("me"), 90)
@@ -1144,7 +1144,7 @@ static EVT_BEGIN(korutesu_talk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(mony_init)
+static EVT_BEGIN(mony_init)
     RETURN
 EVT_END()
 
@@ -1160,7 +1160,7 @@ static EVT_BEGIN(mony_talk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(peton_init)
+static EVT_BEGIN(peton_init)
     RETURN
 EVT_END()
 
@@ -1309,7 +1309,7 @@ EVT_BEGIN(koburon_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(kiza_talk)
+static EVT_BEGIN(kiza_talk)
     CALL(evt_msg_print, 0, STRING("stg5_muj_146_02_01"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -2317,7 +2317,7 @@ EVT_BEGIN(dai3_butai_main)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(dai3_kanbu_setup)
+EVT_BEGIN(dai3_kanbu_setup)
     RETURN
 EVT_END()
 
@@ -2402,7 +2402,7 @@ EVT_BEGIN(kaizoku_main)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(mario_main_init)
+EVT_BEGIN(mario_main_init)
     CALL(mario_main_init_func)
     RETURN
 EVT_END()
@@ -2850,12 +2850,12 @@ EVT_BEGIN(senin_kansei)
     RETURN
 EVT_END()
 
-__declspec(section ".data") f32 dai3_taisan_spline_dt00[] = {
+f32 dai3_taisan_spline_dt00[] = {
     -416.0f, 0.0f, -334.0f, -413.67612f, 0.0f, -365.46518f, -411.63168f, 0.0f,
     -404.80673f,
 };
 
-__declspec(section ".data") f32 dai3_taisan_spline_dt01[] = {
+f32 dai3_taisan_spline_dt01[] = {
     -416.0f, 0.0f, -334.0f, -839.007f, 0.0f, -339.86542f, -1018.9882f, 0.0f,
     -346.33777f,
 };

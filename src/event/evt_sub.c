@@ -2514,6 +2514,6 @@ USER_FUNC(mail_evt_gor_04_keyoff_check) {
 
 #pragma explicit_zero_data on
 #pragma force_active on
-__declspec(section ".sdata") u32 gap_07_804101EC_sdata[1] = {0};
+u32 gap_07_804101EC_sdata[1] = {0};
 #pragma force_active reset
 #pragma explicit_zero_data reset

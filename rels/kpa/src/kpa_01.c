@@ -84,20 +84,20 @@ void kpa_stg1_014_2_cb(s32 type, KpaCbInfo** param);
 void kpa_stg1_036_cb(s32 type, KpaCbInfo** param);
 void kpa_stg1_034_cb(s32 type, KpaCbInfo** param);
 
-__declspec(section ".data") f32 fd_kpa_01_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_kpa_01_neg_one_382;
-__declspec(section ".data") f32 fd_kpa_01___local_PI_383;
-__declspec(section ".data") f32 fd_kpa_01___local_3PIO2_385;
-__declspec(section ".data") f32 fd_kpa_01_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_kpa_01___local_PIO2_384;
-__declspec(section ".data") f32 fd_kpa_01_one_381;
-__declspec(section ".data") f32 fd_kpa_01_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_kpa_01_neg_one_365;
-__declspec(section ".data") f32 fd_kpa_01___local_PI_366;
-__declspec(section ".data") f32 fd_kpa_01___local_3PIO2_368;
-__declspec(section ".data") f32 fd_kpa_01_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_kpa_01___local_PIO2_367;
-__declspec(section ".data") f32 fd_kpa_01_one_364;
+f32 fd_kpa_01_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_kpa_01_neg_one_382;
+f32 fd_kpa_01___local_PI_383;
+f32 fd_kpa_01___local_3PIO2_385;
+f32 fd_kpa_01_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_kpa_01___local_PIO2_384;
+f32 fd_kpa_01_one_381;
+f32 fd_kpa_01_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_kpa_01_neg_one_365;
+f32 fd_kpa_01___local_PI_366;
+f32 fd_kpa_01___local_3PIO2_368;
+f32 fd_kpa_01_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_kpa_01___local_PIO2_367;
+f32 fd_kpa_01_one_364;
 s32 kpa_01_door_open[219];
 s32 kpa_01_door_close[237];
 s32 kpa_01_touzyo_evt[217];
@@ -106,49 +106,49 @@ s32 kpa_01_pos_check[23];
 s32 douzou_1_touch_evt[19];
 s32 douzou_2_touch_evt[19];
 s32 douzou_3_touch_evt[43];
-__declspec(section ".data") s32 togenoko_A_talk_evt[8];
-__declspec(section ".data") s32 togenoko_B_talk_evt[8];
+s32 togenoko_A_talk_evt[8];
+s32 togenoko_B_talk_evt[8];
 s32 togenoko_C_init_evt[14];
 s32 hammer_AB_init_evt[13];
 s32 hammer_AB_talk_evt[111];
 s32 hammer_C_talk_evt[19];
-__declspec(section ".data") s32 hammer_D_talk_evt[8];
-__declspec(section ".data") s32 hammer_E_init_evt[9];
-__declspec(section ".data") s32 hammer_E_talk_evt[8];
+s32 hammer_D_talk_evt[8];
+s32 hammer_E_init_evt[9];
+s32 hammer_E_talk_evt[8];
 s32 baba_init_evt[13];
-__declspec(section ".data") s32 kamek_init_evt[9];
-__declspec(section ".data") s32 hkoopa_init_evt[9];
+s32 kamek_init_evt[9];
+s32 hkoopa_init_evt[9];
 static NpcSetupInfo npcEnt[13];
 static s32 shan_init[46];
 s32 kpa_01_init_evt[88];
 
-__declspec(section ".data") f32 fd_kpa_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_kpa_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_kpa_01_neg_one_382 = -1.0f;
+f32 fd_kpa_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_kpa_01___local_PI_383 = 3.1415927f;
+f32 fd_kpa_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_kpa_01___local_3PIO2_385 = 4.712389f;
+f32 fd_kpa_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_kpa_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_kpa_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_kpa_01___local_PIO2_384 = 1.5707964f;
+f32 fd_kpa_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_kpa_01_one_381 = 1.0f;
+f32 fd_kpa_01_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_kpa_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_kpa_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_kpa_01_neg_one_365 = -1.0f;
+f32 fd_kpa_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_kpa_01___local_PI_366 = 3.1415927f;
+f32 fd_kpa_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_kpa_01___local_3PIO2_368 = 4.712389f;
+f32 fd_kpa_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_kpa_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_kpa_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_kpa_01___local_PIO2_367 = 1.5707964f;
+f32 fd_kpa_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_kpa_01_one_364 = 1.0f;
+f32 fd_kpa_01_one_364 = 1.0f;
 
 EVT_BEGIN(kpa_01_door_open)
     BEGIN_INLINE_EVENT
@@ -915,12 +915,12 @@ EVT_BEGIN(douzou_3_touch_evt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(togenoko_A_talk_evt)
+EVT_BEGIN(togenoko_A_talk_evt)
     CALL(evt_msg_print, 0, STRING("kpa_stg1_002"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(togenoko_B_talk_evt)
+EVT_BEGIN(togenoko_B_talk_evt)
     CALL(evt_msg_print, 0, STRING("kpa_stg1_004"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -984,18 +984,18 @@ EVT_BEGIN(hammer_C_talk_evt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(hammer_D_talk_evt)
+EVT_BEGIN(hammer_D_talk_evt)
     CALL(evt_msg_print, 0, STRING("kpa_stg1_015"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(hammer_E_init_evt)
+EVT_BEGIN(hammer_E_init_evt)
     CALL_CHILD(PTR(npc_init_evt))
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(hammer_E_talk_evt)
+EVT_BEGIN(hammer_E_talk_evt)
     CALL(evt_msg_print, 0, STRING("kpa_stg1_016"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -1007,13 +1007,13 @@ EVT_BEGIN(baba_init_evt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(kamek_init_evt)
+EVT_BEGIN(kamek_init_evt)
     CALL_CHILD(PTR(npc_init_evt))
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(hkoopa_init_evt)
+EVT_BEGIN(hkoopa_init_evt)
     CALL_CHILD(PTR(npc_init_evt))
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN

@@ -231,26 +231,26 @@ USER_FUNC(N_evt_sub_status_gauge_force_update);
 #endif
 extern s32 envSetYami[];
 
-__declspec(section ".data") f32 fd_usu_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_usu_00_neg_one_382;
-__declspec(section ".data") f32 fd_usu_00___local_PI_383;
-__declspec(section ".data") f32 fd_usu_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_usu_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_usu_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_usu_00_one_381;
-__declspec(section ".data") f32 fd_usu_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_usu_00_neg_one_365;
-__declspec(section ".data") f32 fd_usu_00___local_PI_366;
-__declspec(section ".data") f32 fd_usu_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_usu_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_usu_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_usu_00_one_364;
+f32 fd_usu_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_usu_00_neg_one_382;
+f32 fd_usu_00___local_PI_383;
+f32 fd_usu_00___local_3PIO2_385;
+f32 fd_usu_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_usu_00___local_PIO2_384;
+f32 fd_usu_00_one_381;
+f32 fd_usu_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_usu_00_neg_one_365;
+f32 fd_usu_00___local_PI_366;
+f32 fd_usu_00___local_3PIO2_368;
+f32 fd_usu_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_usu_00___local_PIO2_367;
+f32 fd_usu_00_one_364;
 s32 villagerA_init[28];
 s32 villagerA_pig_init[19];
 s32 villagerA_talk[65];
-__declspec(section ".data") s32 villagerB_init[7];
+s32 villagerB_init[7];
 s32 villagerB_talk[52];
-__declspec(section ".data") s32 villagerC_init[7];
+s32 villagerC_init[7];
 s32 villagerC_talk[52];
 s32 villagerD_init[19];
 s32 villagerD_pig_init[19];
@@ -263,23 +263,23 @@ s32 villagerK_pig_init[19];
 s32 villagerK_talk[65];
 s32 village_chief_init[20];
 s32 village_chief_pig_init[27];
-__declspec(section ".data") s32 iri_15_item_tbl[2];
+s32 iri_15_item_tbl[2];
 s32 village_chief_talk[199];
 s32 chief_mario_talk_init[183];
 s32 chief_mario_talk[55];
 static s32 vivian_init[44];
-static __declspec(section ".data") s32 key_tbl[2];
+static s32 key_tbl[2];
 static s32 vivian_talk[29];
-__declspec(section ".data") s32 nise_mario_talk[8];
-__declspec(section ".data") s32 christine_talk[8];
-__declspec(section ".data") s32 nokotaro_talk[8];
-__declspec(section ".data") s32 cloud_talk[8];
-__declspec(section ".data") s32 yoshi_talk[8];
-__declspec(section ".data") s32 crow_a_init[8];
-__declspec(section ".data") s32 crow_b_init[8];
-__declspec(section ".data") s32 crow_c_init[8];
-__declspec(section ".data") s32 crow_d_init[8];
-__declspec(section ".data") s32 crow_e_init[8];
+s32 nise_mario_talk[8];
+s32 christine_talk[8];
+s32 nokotaro_talk[8];
+s32 cloud_talk[8];
+s32 yoshi_talk[8];
+s32 crow_a_init[8];
+s32 crow_b_init[8];
+s32 crow_c_init[8];
+s32 crow_d_init[8];
+s32 crow_e_init[8];
 static s32 urouro_move[24];
 static NpcSetupInfo npcEnt[20];
 s32 usu00_stage4_coming_event[839];
@@ -289,7 +289,7 @@ s32 gra00_2witch_find_ranpel_event[197];
 s32 usu00_vivian_cry_event[58];
 s32 usu00_vivian_joinup_event[608];
 static s32 cam_up[34];
-static __declspec(section ".data") s32 cam_down[8];
+static s32 cam_down[8];
 s32 usu00_check_vivian[33];
 #ifdef VERSION_G8ME01
 s32 usu00_crowAB_talk_event[338];
@@ -303,26 +303,26 @@ s32 usu00_crowCDE_talk_event[307];
 #endif
 s32 chief_pig_event[66];
 static KinopioData kino_dt;
-static __declspec(section ".data") const char* yado_npc[2];
-__declspec(section ".data") const char* yado_mobj[2];
-__declspec(section ".data") const char* village_chief_npc[8];
-static __declspec(section ".data") s32 evt_door_1_1[12];
-static __declspec(section ".data") s32 evt_door_1_2[2];
+static const char* yado_npc[2];
+const char* yado_mobj[2];
+const char* village_chief_npc[8];
+static s32 evt_door_1_1[12];
+static s32 evt_door_1_2[2];
 static s32 evt_wall_1[30];
-__declspec(section ".data") const char* door_1_npc[2];
-static __declspec(section ".data") s32 door_1_open[12];
+const char* door_1_npc[2];
+static s32 door_1_open[12];
 static s32 door_1_close[14];
 static DoorParam door_1;
-__declspec(section ".data") s32 evt_door_2_1[12];
+s32 evt_door_2_1[12];
 s32 evt_door_2_2[15];
 static s32 evt_wall_2[123];
 s32 evt_door2_chk[30];
 s32 evt_door2_close[14];
 static DoorParam door_2;
-static __declspec(section ".data") s32 evt_door_3_1[12];
-static __declspec(section ".data") s32 evt_door_3_2[12];
+static s32 evt_door_3_1[12];
+static s32 evt_door_3_2[12];
 static s32 evt_wall_3[30];
-static __declspec(section ".data") s32 door_3_open[12];
+static s32 door_3_open[12];
 static s32 door_3_close[14];
 static DoorParam door_3;
 s32 dokan_1_evt[32];
@@ -337,20 +337,20 @@ s32 door_ie3_koopa_evt[26];
 static s32 evt_ki_1[20];
 static s32 evt_ki_2[28];
 static TreeAccess tree_tbl[4];
-__declspec(section ".data") s32 usu_00_tree_init[7];
+s32 usu_00_tree_init[7];
 s32 kusa_01_evt[26];
 s32 evt_kusa_04[25];
 s32 evt_kusa_06[25];
 static KusaAccess kusa_tbl[21];
-__declspec(section ".data") s32 usu_00_kusa_init[7];
-__declspec(section ".data") s32 evt_ichikorori_ball_get[5];
+s32 usu_00_kusa_init[7];
+s32 evt_ichikorori_ball_get[5];
 s32 usu_00_touch_ichikorori_ball[72];
 typedef struct BoobooName { const char* name; u8 field_0x4; u8 field_0x5; u8 pad_0x6[2]; } BoobooName; /* field_0x4/0x5 never read */
-static __declspec(section ".data") BoobooName booboo_name[5];
+static BoobooName booboo_name[5];
 ExtTexInfo kpaSen_ext_entry_data[39];
-static __declspec(section ".data") s32 baba_talk[8];
+static s32 baba_talk[8];
 s32 kanbu_regl[48];
-__declspec(section ".data") s32 kanbu_talk[4];
+s32 kanbu_talk[4];
 static s32 koopa_npc_entry[205];
 s32 usu_00_koopa_first_evt[196];
 s32 bakuhatu_evt[64];
@@ -358,7 +358,7 @@ s32 murabito_out[172];
 s32 usu_00_koopa_second_evt[1315];
 static s32 sekai_yami_npc_init[17];
 static s32 sekai_yami_npc[22];
-static __declspec(section ".data") s32 sekai_yami_shake[11];
+static s32 sekai_yami_shake[11];
 static s32 sekai_yami_evt[260];
 static s32 minnnanokoe_npc_entry[94];
 static s32 minnnanokoe_evt[381];
@@ -405,33 +405,33 @@ static USER_FUNC(booboo_main) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_usu_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_usu_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_usu_00_neg_one_382 = -1.0f;
+f32 fd_usu_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_usu_00___local_PI_383 = 3.1415927f;
+f32 fd_usu_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_usu_00___local_3PIO2_385 = 4.712389f;
+f32 fd_usu_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_usu_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_usu_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_usu_00___local_PIO2_384 = 1.5707964f;
+f32 fd_usu_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_usu_00_one_381 = 1.0f;
+f32 fd_usu_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_usu_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_usu_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_usu_00_neg_one_365 = -1.0f;
+f32 fd_usu_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_usu_00___local_PI_366 = 3.1415927f;
+f32 fd_usu_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_usu_00___local_3PIO2_368 = 4.712389f;
+f32 fd_usu_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_usu_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_usu_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_usu_00___local_PIO2_367 = 1.5707964f;
+f32 fd_usu_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_usu_00_one_364 = 1.0f;
+f32 fd_usu_00_one_364 = 1.0f;
 
 EVT_BEGIN(villagerA_init)
     CALL(evt_npc_flag_onoff, 1, STRING("村人Ａ"), 1536)
@@ -475,7 +475,7 @@ EVT_BEGIN(villagerA_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(villagerB_init)
+EVT_BEGIN(villagerB_init)
     CALL(evt_npc_flag_onoff, 1, STRING("村人Ｂ"), 1536)
     RETURN
 EVT_END()
@@ -498,7 +498,7 @@ EVT_BEGIN(villagerB_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(villagerC_init)
+EVT_BEGIN(villagerC_init)
     CALL(evt_npc_flag_onoff, 1, STRING("村人Ｃ"), 1536)
     RETURN
 EVT_END()
@@ -670,7 +670,7 @@ EVT_BEGIN(village_chief_pig_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 iri_15_item_tbl[] = {
+s32 iri_15_item_tbl[] = {
     ITEM_ROUTING_SLIP, -1,
 };
 
@@ -820,7 +820,7 @@ static EVT_BEGIN(vivian_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 key_tbl[] = {
+static s32 key_tbl[] = {
     ITEM_SUPERBOMBOMB, -1,
 };
 
@@ -837,52 +837,52 @@ static EVT_BEGIN(vivian_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(nise_mario_talk)
+EVT_BEGIN(nise_mario_talk)
     CALL(evt_msg_print, 0, STRING("stg4_usu_25_01"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(christine_talk)
+EVT_BEGIN(christine_talk)
     CALL(evt_msg_print, 0, STRING("stg4_usu_25_02"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(nokotaro_talk)
+EVT_BEGIN(nokotaro_talk)
     CALL(evt_msg_print, 0, STRING("stg4_usu_25_03"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(cloud_talk)
+EVT_BEGIN(cloud_talk)
     CALL(evt_msg_print, 0, STRING("stg4_usu_25_04"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(yoshi_talk)
+EVT_BEGIN(yoshi_talk)
     CALL(evt_msg_print, 0, STRING("stg4_usu_25_05"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(crow_a_init)
+EVT_BEGIN(crow_a_init)
     CALL(evt_npc_set_position, STRING("me"), -420, 90, 26)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(crow_b_init)
+EVT_BEGIN(crow_b_init)
     CALL(evt_npc_set_position, STRING("me"), -405, 60, 30)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(crow_c_init)
+EVT_BEGIN(crow_c_init)
     CALL(evt_npc_set_position, STRING("me"), 29, 120, -215)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(crow_d_init)
+EVT_BEGIN(crow_d_init)
     CALL(evt_npc_set_position, STRING("me"), 75, 110, -233)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(crow_e_init)
+EVT_BEGIN(crow_e_init)
     CALL(evt_npc_set_position, STRING("me"), 104, 110, -233)
     RETURN
 EVT_END()
@@ -1629,7 +1629,7 @@ static EVT_BEGIN(cam_up)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(cam_down)
+static EVT_BEGIN(cam_down)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
     RETURN
@@ -1931,17 +1931,17 @@ static KinopioData kino_dt = {
     NULL, NULL, // toBedEvt..fromBedEvt
 };
 
-static __declspec(section ".data") const char* yado_npc[] = {
+static const char* yado_npc[] = {
     /*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5",
     NULL,
 };
 
-__declspec(section ".data") const char* yado_mobj[] = {
+const char* yado_mobj[] = {
     "pblk00",
     NULL,
 };
 
-__declspec(section ".data") const char* village_chief_npc[] = {
+const char* village_chief_npc[] = {
     /*"村長"*/"\x91\xBA\x92\xB7",
     /*"ブタ村長"*/"\x83\x75\x83\x5E\x91\xBA\x92\xB7",
     /*"にせマリオ"*/"\x82\xC9\x82\xB9\x83\x7D\x83\x8A\x83\x49",
@@ -1952,13 +1952,13 @@ __declspec(section ".data") const char* village_chief_npc[] = {
     NULL,
 };
 
-static __declspec(section ".data") EVT_BEGIN(evt_door_1_1)
+static EVT_BEGIN(evt_door_1_1)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5546875f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie1_door"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_door_1_2)
+static EVT_BEGIN(evt_door_1_2)
     RETURN
 EVT_END()
 
@@ -1973,12 +1973,12 @@ static EVT_BEGIN(evt_wall_1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* door_1_npc[] = {
+const char* door_1_npc[] = {
     /*"村人Ｂ"*/"\x91\xBA\x90\x6C\x82\x61",
     NULL,
 };
 
-static __declspec(section ".data") EVT_BEGIN(door_1_open)
+static EVT_BEGIN(door_1_open)
     CALL(evt_snd_bgmoff, 18432)
     CALL(evt_snd_envoff, 18432)
     CALL(evt_snd_env_lpf, 0, 800)
@@ -2012,7 +2012,7 @@ static DoorParam door_1 = {
     door_1_close, // evtClose
 };
 
-__declspec(section ".data") EVT_BEGIN(evt_door_2_1)
+EVT_BEGIN(evt_door_2_1)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5546875f))
     CALL(evt_mapobj_rotate, 1, STRING("S__ie2_door"), 0, LW(0), 0)
     RETURN
@@ -2102,13 +2102,13 @@ static DoorParam door_2 = {
     evt_door2_close, // evtClose
 };
 
-static __declspec(section ".data") EVT_BEGIN(evt_door_3_1)
+static EVT_BEGIN(evt_door_3_1)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5546875f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie3_door"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_door_3_2)
+static EVT_BEGIN(evt_door_3_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie3_door"), LW(0), 0, 0)
     RETURN
@@ -2125,7 +2125,7 @@ static EVT_BEGIN(evt_wall_3)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(door_3_open)
+static EVT_BEGIN(door_3_open)
     CALL(evt_snd_bgmoff, 18432)
     CALL(evt_snd_envoff, 18432)
     CALL(evt_snd_env_lpf, 0, 800)
@@ -2342,7 +2342,7 @@ static TreeAccess tree_tbl[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
-__declspec(section ".data") EVT_BEGIN(usu_00_tree_init)
+EVT_BEGIN(usu_00_tree_init)
     SET_VALUE(LW(0), PTR(tree_tbl))
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
     RETURN
@@ -2405,13 +2405,13 @@ static KusaAccess kusa_tbl[] = {
     {4, NULL, NULL, NULL},
 };
 
-__declspec(section ".data") EVT_BEGIN(usu_00_kusa_init)
+EVT_BEGIN(usu_00_kusa_init)
     SET_VALUE(LW(0), PTR(kusa_tbl))
     CALL_CHILD(PTR(evt_sub_kusa_access_entry))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_ichikorori_ball_get)
+EVT_BEGIN(evt_ichikorori_ball_get)
     SET_VALUE(GSW(0), 205)
     RETURN
 EVT_END()
@@ -2439,7 +2439,7 @@ EVT_BEGIN(usu_00_touch_ichikorori_ball)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") BoobooName booboo_name[] = {
+static BoobooName booboo_name[] = {
     {/*"ブタ村人Ａ"*/"\x83\x75\x83\x5E\x91\xBA\x90\x6C\x82\x60", 2, 1},
     {/*"ブタ村人Ｄ"*/"\x83\x75\x83\x5E\x91\xBA\x90\x6C\x82\x63", 0, 1},
     {/*"ブタ村人Ｅ"*/"\x83\x75\x83\x5E\x91\xBA\x90\x6C\x82\x64", 6, 1},
@@ -2624,7 +2624,7 @@ void kpaSen_ext_shadow_disp(CameraId camera, void* param) {
     extDrawShadow();
 }
 
-static __declspec(section ".data") EVT_BEGIN(baba_talk)
+static EVT_BEGIN(baba_talk)
     CALL(evt_msg_print, 0, STRING("kpa_stg5_009_1"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -2702,7 +2702,7 @@ USER_FUNC(white_off) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") EVT_BEGIN(kanbu_talk)
+EVT_BEGIN(kanbu_talk)
     CALL_CHILD(PTR(usu_00_koopa_second_evt))
     RETURN
 EVT_END()
@@ -3350,7 +3350,7 @@ static EVT_BEGIN(sekai_yami_npc)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(sekai_yami_shake)
+static EVT_BEGIN(sekai_yami_shake)
     LOOP(0)
         CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 500)
     END_LOOP

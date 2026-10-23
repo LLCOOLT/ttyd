@@ -23,60 +23,60 @@ USER_FUNC(btlevtcmd_SetRunSound);
 USER_FUNC(btlevtcmd_SetWalkSound);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 
-__declspec(section ".data") f32 fd_gullible_clauda_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_clauda_neg_one_382;
-__declspec(section ".data") f32 fd_gullible_clauda___local_PI_383;
-__declspec(section ".data") f32 fd_gullible_clauda___local_3PIO2_385;
-__declspec(section ".data") f32 fd_gullible_clauda_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_clauda___local_PIO2_384;
-__declspec(section ".data") f32 fd_gullible_clauda_one_381;
-__declspec(section ".data") f32 fd_gullible_clauda_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_clauda_neg_one_365;
-__declspec(section ".data") f32 fd_gullible_clauda___local_PI_366;
-__declspec(section ".data") f32 fd_gullible_clauda___local_3PIO2_368;
-__declspec(section ".data") f32 fd_gullible_clauda_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_clauda___local_PIO2_367;
-__declspec(section ".data") f32 fd_gullible_clauda_one_364;
+f32 fd_gullible_clauda_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_gullible_clauda_neg_one_382;
+f32 fd_gullible_clauda___local_PI_383;
+f32 fd_gullible_clauda___local_3PIO2_385;
+f32 fd_gullible_clauda_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_gullible_clauda___local_PIO2_384;
+f32 fd_gullible_clauda_one_381;
+f32 fd_gullible_clauda_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_gullible_clauda_neg_one_365;
+f32 fd_gullible_clauda___local_PI_366;
+f32 fd_gullible_clauda___local_3PIO2_368;
+f32 fd_gullible_clauda_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_gullible_clauda___local_PIO2_367;
+f32 fd_gullible_clauda_one_364;
 BattleUnitKind unit_gullible_clauda;
 static BattleWeapon enemyWeapon_ClaudaNormalAttack;
-static __declspec(section ".data") BattleUnitDefense defence_clauda;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_clauda;
-static __declspec(section ".data") StatusVulnerability regist_clauda;
-static __declspec(section ".data") BattleDataEntry data_table_clauda[2];
+static BattleUnitDefense defence_clauda;
+static BattleUnitDefenseAttr defence_attr_clauda;
+static StatusVulnerability regist_clauda;
+static BattleDataEntry data_table_clauda[2];
 static BattleUnitKindPart parts_clauda[1];
 static s32 init_event_clauda[50];
 s32 damage_event_clauda[22];
 static s32 dead_event_clauda[177];
 static s32 attack_event_clauda[393];
-static __declspec(section ".data") s32 wait_event_clauda[6];
+static s32 wait_event_clauda[6];
 
-__declspec(section ".data") f32 fd_gullible_clauda_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gullible_clauda_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gullible_clauda_neg_one_382 = -1.0f;
+f32 fd_gullible_clauda_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_gullible_clauda___local_PI_383 = 3.1415927f;
+f32 fd_gullible_clauda___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gullible_clauda___local_3PIO2_385 = 4.712389f;
+f32 fd_gullible_clauda___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gullible_clauda_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gullible_clauda_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gullible_clauda___local_PIO2_384 = 1.5707964f;
+f32 fd_gullible_clauda___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gullible_clauda_one_381 = 1.0f;
+f32 fd_gullible_clauda_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_gullible_clauda_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gullible_clauda_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gullible_clauda_neg_one_365 = -1.0f;
+f32 fd_gullible_clauda_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_gullible_clauda___local_PI_366 = 3.1415927f;
+f32 fd_gullible_clauda___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gullible_clauda___local_3PIO2_368 = 4.712389f;
+f32 fd_gullible_clauda___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gullible_clauda_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gullible_clauda_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gullible_clauda___local_PIO2_367 = 1.5707964f;
+f32 fd_gullible_clauda___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gullible_clauda_one_364 = 1.0f;
+f32 fd_gullible_clauda_one_364 = 1.0f;
 
 BattleUnitKind unit_gullible_clauda = {
     83,
@@ -181,13 +181,13 @@ static BattleWeapon enemyWeapon_ClaudaNormalAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitDefense defence_clauda = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence_clauda = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_clauda = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr_clauda = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist_clauda = {60, 80, 105, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
+static StatusVulnerability regist_clauda = {60, 80, 105, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
 
-static __declspec(section ".data") BattleDataEntry data_table_clauda[] = {
+static BattleDataEntry data_table_clauda[] = {
     {49, dead_event_clauda},
     {0, NULL},
 };
@@ -382,7 +382,7 @@ static EVT_BEGIN(attack_event_clauda)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_clauda)
+static EVT_BEGIN(wait_event_clauda)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

@@ -74,7 +74,7 @@ s32 r_data[] = {
 };
 
 /* 0x2C bytes in the original: not a whole number of 14-byte effN64Vtx records, so kept as halfwords */
-__declspec(section ".sdata") s16 size300x40_tex32x32[] = {
+s16 size300x40_tex32x32[] = {
     0, 0, 0, 16, 0, -1, -1,
     300, 20, 0, 0, 1024, -5121, -2816,
     300, -20, 0, 1024, 1024, -5121, -2816,
@@ -83,7 +83,7 @@ __declspec(section ".sdata") s16 size300x40_tex32x32[] = {
 
 
 #pragma force_active on
-__declspec(section ".sdata") u32 gap_07_80413CCC_sdata[1] = {0};
+u32 gap_07_80413CCC_sdata[1] = {0};
 #pragma force_active reset
 
 EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {

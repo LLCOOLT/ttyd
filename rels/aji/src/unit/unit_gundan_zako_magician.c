@@ -28,26 +28,26 @@ USER_FUNC(btlevtcmd_check_battleflag);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(kanbu_get_id);
 
-__declspec(section ".data") f32 fd_gundan_zako_magician_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gundan_zako_magician_neg_one_382;
-__declspec(section ".data") f32 fd_gundan_zako_magician___local_PI_383;
-__declspec(section ".data") f32 fd_gundan_zako_magician___local_3PIO2_385;
-__declspec(section ".data") f32 fd_gundan_zako_magician_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gundan_zako_magician___local_PIO2_384;
-__declspec(section ".data") f32 fd_gundan_zako_magician_one_381;
-__declspec(section ".data") f32 fd_gundan_zako_magician_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gundan_zako_magician_neg_one_365;
-__declspec(section ".data") f32 fd_gundan_zako_magician___local_PI_366;
-__declspec(section ".data") f32 fd_gundan_zako_magician___local_3PIO2_368;
-__declspec(section ".data") f32 fd_gundan_zako_magician_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gundan_zako_magician___local_PIO2_367;
-__declspec(section ".data") f32 fd_gundan_zako_magician_one_364;
+f32 fd_gundan_zako_magician_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_gundan_zako_magician_neg_one_382;
+f32 fd_gundan_zako_magician___local_PI_383;
+f32 fd_gundan_zako_magician___local_3PIO2_385;
+f32 fd_gundan_zako_magician_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_gundan_zako_magician___local_PIO2_384;
+f32 fd_gundan_zako_magician_one_381;
+f32 fd_gundan_zako_magician_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_gundan_zako_magician_neg_one_365;
+f32 fd_gundan_zako_magician___local_PI_366;
+f32 fd_gundan_zako_magician___local_3PIO2_368;
+f32 fd_gundan_zako_magician_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_gundan_zako_magician___local_PIO2_367;
+f32 fd_gundan_zako_magician_one_364;
 BattleUnitKind unit_gundan_zako_magician;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[16];
-static __declspec(section ".data") BattleDataEntry data_table[1];
+static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[2];
 static BattleWeapon weapon_gundan_zako_magician_fire_bottle;
 static BattleWeapon weapon_gundan_zako_magician_hunyahunya_bottle;
@@ -57,7 +57,7 @@ static BattleWeapon weapon_gundan_zako_magician_one_recover;
 static BattleWeapon weapon_gundan_zako_magician_all_recover;
 static BattleWeapon weapon_gundan_zako_magician_ziwaziwa_bottle;
 static s32 init_event[21];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 static s32 attack_event[235];
 static s32 attack_common_event1[141];
 static s32 attack_common_event2[332];
@@ -70,7 +70,7 @@ static s32 one_recover_event[128];
 static s32 all_recover_event[155];
 static s32 yokeyoke_bottle_event_with_kanbu[15];
 static s32 ziwaziwa_bottle_event[15];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
 static USER_FUNC(kanbu_get_id) {
     s32* args = event->args;
@@ -95,33 +95,33 @@ static USER_FUNC(kanbu_get_id) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_gundan_zako_magician_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gundan_zako_magician_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gundan_zako_magician_neg_one_382 = -1.0f;
+f32 fd_gundan_zako_magician_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_gundan_zako_magician___local_PI_383 = 3.1415927f;
+f32 fd_gundan_zako_magician___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gundan_zako_magician___local_3PIO2_385 = 4.712389f;
+f32 fd_gundan_zako_magician___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gundan_zako_magician_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gundan_zako_magician_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gundan_zako_magician___local_PIO2_384 = 1.5707964f;
+f32 fd_gundan_zako_magician___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gundan_zako_magician_one_381 = 1.0f;
+f32 fd_gundan_zako_magician_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_gundan_zako_magician_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gundan_zako_magician_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gundan_zako_magician_neg_one_365 = -1.0f;
+f32 fd_gundan_zako_magician_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_gundan_zako_magician___local_PI_366 = 3.1415927f;
+f32 fd_gundan_zako_magician___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gundan_zako_magician___local_3PIO2_368 = 4.712389f;
+f32 fd_gundan_zako_magician___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gundan_zako_magician_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gundan_zako_magician_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gundan_zako_magician___local_PIO2_367 = 1.5707964f;
+f32 fd_gundan_zako_magician___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gundan_zako_magician_one_364 = 1.0f;
+f32 fd_gundan_zako_magician_one_364 = 1.0f;
 
 BattleUnitKind unit_gundan_zako_magician = {
     119,
@@ -189,11 +189,11 @@ BattleUnitKind unit_gundan_zako_magician = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {80, 80, 80, 100, 80, 100, 100, 70, 100, 90, 100, 90, 100, 90, 70, 90, 70, 100, 70, 100, 100, 95};
+static StatusVulnerability regist = {80, 80, 80, 100, 80, 100, 100, 70, 100, 90, 100, 90, 100, 90, 70, 90, 70, 100, 70, 100, 100, 95};
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -214,7 +214,7 @@ static PoseTableEntry pose_table[] = {
     {69, "S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
@@ -495,7 +495,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -1080,7 +1080,7 @@ static EVT_BEGIN(ziwaziwa_bottle_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

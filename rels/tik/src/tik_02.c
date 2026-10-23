@@ -96,28 +96,28 @@ USER_FUNC(tik_npc_buruburu);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 
-__declspec(section ".data") f32 fd_tik_02_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tik_02_neg_one_382;
-__declspec(section ".data") f32 fd_tik_02___local_PI_383;
-__declspec(section ".data") f32 fd_tik_02___local_3PIO2_385;
-__declspec(section ".data") f32 fd_tik_02_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tik_02___local_PIO2_384;
-__declspec(section ".data") f32 fd_tik_02_one_381;
-__declspec(section ".data") f32 fd_tik_02_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tik_02_neg_one_365;
-__declspec(section ".data") f32 fd_tik_02___local_PI_366;
-__declspec(section ".data") f32 fd_tik_02___local_3PIO2_368;
-__declspec(section ".data") f32 fd_tik_02_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tik_02___local_PIO2_367;
-__declspec(section ".data") f32 fd_tik_02_one_364;
+f32 fd_tik_02_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_tik_02_neg_one_382;
+f32 fd_tik_02___local_PI_383;
+f32 fd_tik_02___local_3PIO2_385;
+f32 fd_tik_02_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_tik_02___local_PIO2_384;
+f32 fd_tik_02_one_381;
+f32 fd_tik_02_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_tik_02_neg_one_365;
+f32 fd_tik_02___local_PI_366;
+f32 fd_tik_02___local_3PIO2_368;
+f32 fd_tik_02_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_tik_02___local_PIO2_367;
+f32 fd_tik_02_one_364;
 static BeroEntry bero_entry_data[7];
 static BeroEntry bero_entry_data2[2];
-__declspec(section ".data") s32 geso_init[2];
-__declspec(section ".data") s32 geso_talk[8];
-__declspec(section ".data") s32 geso_dead[7];
+s32 geso_init[2];
+s32 geso_talk[8];
+s32 geso_dead[7];
 static NpcSetupInfo npcEnt[2];
 s32 ukishima_move[134];
-__declspec(section ".data") char geso_checkpose[];
+char geso_checkpose[];
 static s32 ukishima_apper[294];
 s32 geso_battle[676];
 static s32 wall_bomb[142];
@@ -266,33 +266,33 @@ USER_FUNC(geso_set_checkpose) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_tik_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tik_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tik_02_neg_one_382 = -1.0f;
+f32 fd_tik_02_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_tik_02___local_PI_383 = 3.1415927f;
+f32 fd_tik_02___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tik_02___local_3PIO2_385 = 4.712389f;
+f32 fd_tik_02___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tik_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tik_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tik_02___local_PIO2_384 = 1.5707964f;
+f32 fd_tik_02___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tik_02_one_381 = 1.0f;
+f32 fd_tik_02_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_tik_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tik_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tik_02_neg_one_365 = -1.0f;
+f32 fd_tik_02_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_tik_02___local_PI_366 = 3.1415927f;
+f32 fd_tik_02___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tik_02___local_3PIO2_368 = 4.712389f;
+f32 fd_tik_02___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tik_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tik_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tik_02___local_PIO2_367 = 1.5707964f;
+f32 fd_tik_02___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tik_02_one_364 = 1.0f;
+f32 fd_tik_02_one_364 = 1.0f;
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -415,16 +415,16 @@ static BeroEntry bero_entry_data2[] = {
     {0},
 };
 
-__declspec(section ".data") EVT_BEGIN(geso_init)
+EVT_BEGIN(geso_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(geso_talk)
+EVT_BEGIN(geso_talk)
     CALL(evt_msg_print, 0, STRING("mac_0_124"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(geso_dead)
+EVT_BEGIN(geso_dead)
     SET_VALUE(GF(0), 0)
     WAIT_MS(1000)
     RETURN
@@ -491,7 +491,7 @@ EVT_BEGIN(ukishima_move)
     RETURN
 EVT_END()
 
-__declspec(section ".data") char geso_checkpose[] = "M_S_1";
+char geso_checkpose[] = "M_S_1";
 
 static EVT_BEGIN(ukishima_apper)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("ugo_yuka_1"), 2)

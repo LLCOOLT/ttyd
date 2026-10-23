@@ -110,20 +110,20 @@ USER_FUNC(mario_normalize_wait);
 void yuurei_callback(s32 type, void* param);
 void powan_callback(s32 type, void* param);
 
-__declspec(section ".data") f32 fd_rsh_02_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_02_neg_one_382;
-__declspec(section ".data") f32 fd_rsh_02___local_PI_383;
-__declspec(section ".data") f32 fd_rsh_02___local_3PIO2_385;
-__declspec(section ".data") f32 fd_rsh_02_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_02___local_PIO2_384;
-__declspec(section ".data") f32 fd_rsh_02_one_381;
-__declspec(section ".data") f32 fd_rsh_02_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_02_neg_one_365;
-__declspec(section ".data") f32 fd_rsh_02___local_PI_366;
-__declspec(section ".data") f32 fd_rsh_02___local_3PIO2_368;
-__declspec(section ".data") f32 fd_rsh_02_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_02___local_PIO2_367;
-__declspec(section ".data") f32 fd_rsh_02_one_364;
+f32 fd_rsh_02_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_rsh_02_neg_one_382;
+f32 fd_rsh_02___local_PI_383;
+f32 fd_rsh_02___local_3PIO2_385;
+f32 fd_rsh_02_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_rsh_02___local_PIO2_384;
+f32 fd_rsh_02_one_381;
+f32 fd_rsh_02_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_rsh_02_neg_one_365;
+f32 fd_rsh_02___local_PI_366;
+f32 fd_rsh_02___local_3PIO2_368;
+f32 fd_rsh_02_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_rsh_02___local_PIO2_367;
+f32 fd_rsh_02_one_364;
 static BeroEntry bero_data_a[3];
 static BeroEntry bero_data_b[3];
 static BeroEntry bero_data_c[3];
@@ -131,25 +131,25 @@ s32 evt_powan_msg[36];
 s32 evt_nabe[247];
 static s32 init_gurume[38];
 static s32 talk_gurume[176];
-static __declspec(section ".data") s32 talk_powan[2];
+static s32 talk_powan[2];
 s32 init_yuurei[250];
 static s32 evt_shake[39];
-__declspec(section ".data") s32 evt_shake2[6];
-static __declspec(section ".data") s32 item_tbl2[2];
+s32 evt_shake2[6];
+static s32 item_tbl2[2];
 s32 talk_yuurei[451];
 static s32 init_toron[41];
-static __declspec(section ".data") s32 talk_toron[8];
-static __declspec(section ".data") s32 talk_sarary[8];
+static s32 talk_toron[8];
+static s32 talk_sarary[8];
 static NpcSetupInfo npc_data[6];
-static __declspec(section ".data") const char* door_3[7];
-static __declspec(section ".data") const char* door_4[7];
-static __declspec(section ".data") const char* door_5[7];
+static const char* door_3[7];
+static const char* door_4[7];
+static const char* door_5[7];
 s32 evt_1day_end[68];
 s32 evt_2day_end[68];
 s32 evt_normal_yado[119];
 s32 evt_bed[22];
 s32 evt_toron_catch[281];
-static __declspec(section ".data") s32 item_tbl[2];
+static s32 item_tbl[2];
 s32 evt_toron_catch2[359];
 #ifdef VERSION_G8ME01
 s32 evt_toron_appear[437];
@@ -168,7 +168,7 @@ s32 rsh_02_a_init_evt[687];
 s32 rsh_02_a_init_evt[685];
 #endif
 s32 rsh_02_b_init_evt[168];
-static __declspec(section ".data") const char* window_tbl[4];
+static const char* window_tbl[4];
 s32 rsh_02_c_init_evt[142];
 s32 rsh_02_init_evt_nidome[208];
 s32 rsh_02_a_init_evt_nidome[337];
@@ -183,33 +183,33 @@ USER_FUNC(mario_normalize_wait) {
     return EVT_RETURN_BLOCK;
 }
 
-__declspec(section ".data") f32 fd_rsh_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_02_neg_one_382 = -1.0f;
+f32 fd_rsh_02_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh_02___local_PI_383 = 3.1415927f;
+f32 fd_rsh_02___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh_02___local_3PIO2_385 = 4.712389f;
+f32 fd_rsh_02___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh_02___local_PIO2_384 = 1.5707964f;
+f32 fd_rsh_02___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_02_one_381 = 1.0f;
+f32 fd_rsh_02_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_rsh_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_02_neg_one_365 = -1.0f;
+f32 fd_rsh_02_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh_02___local_PI_366 = 3.1415927f;
+f32 fd_rsh_02___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh_02___local_3PIO2_368 = 4.712389f;
+f32 fd_rsh_02___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh_02___local_PIO2_367 = 1.5707964f;
+f32 fd_rsh_02___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_02_one_364 = 1.0f;
+f32 fd_rsh_02_one_364 = 1.0f;
 
 static BeroEntry bero_data_a[] = {
     {
@@ -479,7 +479,7 @@ static EVT_BEGIN(talk_gurume)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(talk_powan)
+static EVT_BEGIN(talk_powan)
     RETURN
 EVT_END()
 
@@ -587,12 +587,12 @@ static EVT_BEGIN(evt_shake)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_shake2)
+EVT_BEGIN(evt_shake2)
     CALL(evt_cam3d_evt_off, 0, 11)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 item_tbl2[] = {
+static s32 item_tbl2[] = {
     ITEM_RAGGED_DIARY, -1,
 };
 
@@ -774,12 +774,12 @@ static EVT_BEGIN(init_toron)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(talk_toron)
+static EVT_BEGIN(talk_toron)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_186"), 0, 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(talk_sarary)
+static EVT_BEGIN(talk_sarary)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_192"), 0, 0)
     RETURN
 EVT_END()
@@ -844,7 +844,7 @@ static NpcSetupInfo npc_data[] = {
     {0},
 };
 
-static __declspec(section ".data") const char* door_3[] = {
+static const char* door_3[] = {
     "heya_3",
     "haikei_3",
     "tobira_3",
@@ -854,7 +854,7 @@ static __declspec(section ".data") const char* door_3[] = {
     "3_door_close",
 };
 
-static __declspec(section ".data") const char* door_4[] = {
+static const char* door_4[] = {
     "heya_4",
     "haikei_4",
     "tobira_4",
@@ -864,7 +864,7 @@ static __declspec(section ".data") const char* door_4[] = {
     "4_door_close",
 };
 
-static __declspec(section ".data") const char* door_5[] = {
+static const char* door_5[] = {
     "heya_5",
     "haikei_5",
     "tobira_5",
@@ -1103,7 +1103,7 @@ EVT_BEGIN(evt_toron_catch)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 item_tbl[] = {
+static s32 item_tbl[] = {
     ITEM_BRIEFCASE, -1,
 };
 
@@ -1742,7 +1742,7 @@ EVT_BEGIN(rsh_02_b_init_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* window_tbl[] = {
+static const char* window_tbl[] = {
     "mado_3_uturu",
     "mado_4_uturu",
     "mado_5_uturu",

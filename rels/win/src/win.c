@@ -22,20 +22,20 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-__declspec(section ".data") f32 fd_win_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_neg_one_382;
-__declspec(section ".data") f32 fd_win___local_PI_383;
-__declspec(section ".data") f32 fd_win___local_3PIO2_385;
-__declspec(section ".data") f32 fd_win_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win___local_PIO2_384;
-__declspec(section ".data") f32 fd_win_one_381;
-__declspec(section ".data") f32 fd_win_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_neg_one_365;
-__declspec(section ".data") f32 fd_win___local_PI_366;
-__declspec(section ".data") f32 fd_win___local_3PIO2_368;
-__declspec(section ".data") f32 fd_win_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win___local_PIO2_367;
-__declspec(section ".data") f32 fd_win_one_364;
+f32 fd_win_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_win_neg_one_382;
+f32 fd_win___local_PI_383;
+f32 fd_win___local_3PIO2_385;
+f32 fd_win_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_win___local_PIO2_384;
+f32 fd_win_one_381;
+f32 fd_win_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_win_neg_one_365;
+f32 fd_win___local_PI_366;
+f32 fd_win___local_3PIO2_368;
+f32 fd_win_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_win___local_PIO2_367;
+f32 fd_win_one_364;
 s32 evt_win_door_open_pure[84];
 s32 evt_win_door_open[16];
 s32 evt_win_door_close_pure[66];
@@ -44,33 +44,33 @@ s32 _tree_anime[106];
 s32 win_tree_entry[25];
 s32 win_puni_walk_se[20];
 
-__declspec(section ".data") f32 fd_win_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_win_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_win_neg_one_382 = -1.0f;
+f32 fd_win_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_win___local_PI_383 = 3.1415927f;
+f32 fd_win___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_win___local_3PIO2_385 = 4.712389f;
+f32 fd_win___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_win_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_win_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_win___local_PIO2_384 = 1.5707964f;
+f32 fd_win___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_win_one_381 = 1.0f;
+f32 fd_win_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_win_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_win_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_win_neg_one_365 = -1.0f;
+f32 fd_win_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_win___local_PI_366 = 3.1415927f;
+f32 fd_win___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_win___local_3PIO2_368 = 4.712389f;
+f32 fd_win___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_win_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_win_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_win___local_PIO2_367 = 1.5707964f;
+f32 fd_win___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_win_one_364 = 1.0f;
+f32 fd_win_one_364 = 1.0f;
 
 EVT_BEGIN(evt_win_door_open_pure)
     BEGIN_INLINE_EVENT

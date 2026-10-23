@@ -33,47 +33,47 @@ USER_FUNC(evt_eff);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(togenoko_getnum);
 
-__declspec(section ".data") f32 fd_togenoko_ace_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_togenoko_ace_neg_one_382;
-__declspec(section ".data") f32 fd_togenoko_ace___local_PI_383;
-__declspec(section ".data") f32 fd_togenoko_ace___local_3PIO2_385;
-__declspec(section ".data") f32 fd_togenoko_ace_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_togenoko_ace___local_PIO2_384;
-__declspec(section ".data") f32 fd_togenoko_ace_one_381;
-__declspec(section ".data") f32 fd_togenoko_ace_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_togenoko_ace_neg_one_365;
-__declspec(section ".data") f32 fd_togenoko_ace___local_PI_366;
-__declspec(section ".data") f32 fd_togenoko_ace___local_3PIO2_368;
-__declspec(section ".data") f32 fd_togenoko_ace_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_togenoko_ace___local_PIO2_367;
-__declspec(section ".data") f32 fd_togenoko_ace_one_364;
+f32 fd_togenoko_ace_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_togenoko_ace_neg_one_382;
+f32 fd_togenoko_ace___local_PI_383;
+f32 fd_togenoko_ace___local_3PIO2_385;
+f32 fd_togenoko_ace_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_togenoko_ace___local_PIO2_384;
+f32 fd_togenoko_ace_one_381;
+f32 fd_togenoko_ace_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_togenoko_ace_neg_one_365;
+f32 fd_togenoko_ace___local_PI_366;
+f32 fd_togenoko_ace___local_3PIO2_368;
+f32 fd_togenoko_ace_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_togenoko_ace___local_PIO2_367;
+f32 fd_togenoko_ace_one_364;
 BattleUnitKind unit_togenoko_ace;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
-static __declspec(section ".data") BattleUnitDefense defence_turn;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_turn;
-static __declspec(section ".data") StatusVulnerability regist_turn;
-static __declspec(section ".data") BattleUnitDefense defence_guard;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_guard;
-static __declspec(section ".data") StatusVulnerability regist_guard;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
+static BattleUnitDefense defence_turn;
+static BattleUnitDefenseAttr defence_attr_turn;
+static StatusVulnerability regist_turn;
+static BattleUnitDefense defence_guard;
+static BattleUnitDefenseAttr defence_attr_guard;
+static StatusVulnerability regist_guard;
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_turn[15];
 static PoseTableEntry pose_table_guard[15];
 static PoseTableEntry pose_table_guard_turn[15];
-static __declspec(section ".data") BattleDataEntry data_table[4];
-static __declspec(section ".data") BattleDataEntry data_table_turn[3];
-static __declspec(section ".data") BattleDataEntry data_table_guard[4];
+static BattleDataEntry data_table[4];
+static BattleDataEntry data_table_turn[3];
+static BattleDataEntry data_table_guard[4];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_togenoko_normal_attack;
 static BattleWeapon weapon_togenoko_shell_attack;
 static BattleWeapon weapon_togenoko_charge;
 static s32 init_event[37];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 static s32 dmg_avoid_counter_thorn_head_event[61];
 static s32 dmg_turn_event[116];
 static s32 wakeup_event[104];
-static __declspec(section ".data") BattleUnitSetup entry_togenoko;
+static BattleUnitSetup entry_togenoko;
 static s32 attack_event[333];
 static s32 normal_attack_event[406];
 static s32 shell_attack_event[489];
@@ -81,35 +81,35 @@ static s32 charge_event[99];
 static s32 guard_event[127];
 static s32 guard_cancel_event[90];
 static s32 friend_event[88];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
-__declspec(section ".data") f32 fd_togenoko_ace_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_togenoko_ace_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_togenoko_ace_neg_one_382 = -1.0f;
+f32 fd_togenoko_ace_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_togenoko_ace___local_PI_383 = 3.1415927f;
+f32 fd_togenoko_ace___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_togenoko_ace___local_3PIO2_385 = 4.712389f;
+f32 fd_togenoko_ace___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_togenoko_ace_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_togenoko_ace_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_togenoko_ace___local_PIO2_384 = 1.5707964f;
+f32 fd_togenoko_ace___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_togenoko_ace_one_381 = 1.0f;
+f32 fd_togenoko_ace_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_togenoko_ace_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_togenoko_ace_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_togenoko_ace_neg_one_365 = -1.0f;
+f32 fd_togenoko_ace_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_togenoko_ace___local_PI_366 = 3.1415927f;
+f32 fd_togenoko_ace___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_togenoko_ace___local_3PIO2_368 = 4.712389f;
+f32 fd_togenoko_ace___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_togenoko_ace_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_togenoko_ace_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_togenoko_ace___local_PIO2_367 = 1.5707964f;
+f32 fd_togenoko_ace___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_togenoko_ace_one_364 = 1.0f;
+f32 fd_togenoko_ace_one_364 = 1.0f;
 
 BattleUnitKind unit_togenoko_ace = {
     60,
@@ -177,23 +177,23 @@ BattleUnitKind unit_togenoko_ace = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
+static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {60, 65, 65, 100, 65, 100, 100, 60, 100, 85, 100, 85, 100, 90, 70, 60, 60, 100, 70, 100, 100, 95};
+static StatusVulnerability regist = {60, 65, 65, 100, 65, 100, 100, 60, 100, 85, 100, 85, 100, 90, 70, 60, 60, 100, 70, 100, 100, 95};
 
-static __declspec(section ".data") BattleUnitDefense defence_turn = {0};
+static BattleUnitDefense defence_turn = {0};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_turn = {0};
+static BattleUnitDefenseAttr defence_attr_turn = {0};
 
-static __declspec(section ".data") StatusVulnerability regist_turn = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+static StatusVulnerability regist_turn = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
-static __declspec(section ".data") BattleUnitDefense defence_guard = {{99, 99, 99, 99, 99}};
+static BattleUnitDefense defence_guard = {{99, 99, 99, 99, 99}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_guard = {{2, 2, 2, 2, 2}};
+static BattleUnitDefenseAttr defence_attr_guard = {{2, 2, 2, 2, 2}};
 
-static __declspec(section ".data") StatusVulnerability regist_guard = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+static StatusVulnerability regist_guard = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -270,20 +270,20 @@ static PoseTableEntry pose_table_guard_turn[] = {
     {69, "G_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {37, dmg_avoid_counter_thorn_head_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table_turn[] = {
+static BattleDataEntry data_table_turn[] = {
     {13, dmg_turn_event},
     {48, btldefaultevt_Dummy},
     {0},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table_guard[] = {
+static BattleDataEntry data_table_guard[] = {
     {37, dmg_avoid_counter_thorn_head_event},
     {13, dmg_turn_event},
     {48, btldefaultevt_Dummy},
@@ -414,7 +414,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -498,7 +498,7 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") BattleUnitSetup entry_togenoko = {
+static BattleUnitSetup entry_togenoko = {
     &unit_togenoko_ace, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -998,7 +998,7 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

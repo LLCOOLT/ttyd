@@ -38,24 +38,24 @@ static USER_FUNC(chain_init);
 static USER_FUNC(chain_main);
 USER_FUNC(evt_btl_camera_set_mode);
 
-__declspec(section ".data") f32 fd_wanwan_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_wanwan_neg_one_382;
-__declspec(section ".data") f32 fd_wanwan___local_PI_383;
-__declspec(section ".data") f32 fd_wanwan___local_3PIO2_385;
-__declspec(section ".data") f32 fd_wanwan_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_wanwan___local_PIO2_384;
-__declspec(section ".data") f32 fd_wanwan_one_381;
-__declspec(section ".data") f32 fd_wanwan_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_wanwan_neg_one_365;
-__declspec(section ".data") f32 fd_wanwan___local_PI_366;
-__declspec(section ".data") f32 fd_wanwan___local_3PIO2_368;
-__declspec(section ".data") f32 fd_wanwan_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_wanwan___local_PIO2_367;
-__declspec(section ".data") f32 fd_wanwan_one_364;
+f32 fd_wanwan_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_wanwan_neg_one_382;
+f32 fd_wanwan___local_PI_383;
+f32 fd_wanwan___local_3PIO2_385;
+f32 fd_wanwan_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_wanwan___local_PIO2_384;
+f32 fd_wanwan_one_381;
+f32 fd_wanwan_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_wanwan_neg_one_365;
+f32 fd_wanwan___local_PI_366;
+f32 fd_wanwan___local_3PIO2_368;
+f32 fd_wanwan_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_wanwan___local_PIO2_367;
+f32 fd_wanwan_one_364;
 BattleUnitKind unit_wanwan;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[19];
 static BattleDataEntry data_table[15];
 static BattleUnitKindPart parts[9];
@@ -69,35 +69,35 @@ static s32 attack_event[452];
 static s32 wait_event[476];
 static s32 sound_gensui_event[22];
 static s32 wait_sound_event1[25];
-static __declspec(section ".data") s32 wait_sound_event2[12];
+static s32 wait_sound_event2[12];
 
-__declspec(section ".data") f32 fd_wanwan_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_wanwan_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_wanwan_neg_one_382 = -1.0f;
+f32 fd_wanwan_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_wanwan___local_PI_383 = 3.1415927f;
+f32 fd_wanwan___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_wanwan___local_3PIO2_385 = 4.712389f;
+f32 fd_wanwan___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_wanwan_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_wanwan_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_wanwan___local_PIO2_384 = 1.5707964f;
+f32 fd_wanwan___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_wanwan_one_381 = 1.0f;
+f32 fd_wanwan_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_wanwan_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_wanwan_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_wanwan_neg_one_365 = -1.0f;
+f32 fd_wanwan_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_wanwan___local_PI_366 = 3.1415927f;
+f32 fd_wanwan___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_wanwan___local_3PIO2_368 = 4.712389f;
+f32 fd_wanwan___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_wanwan_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_wanwan_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_wanwan___local_PIO2_367 = 1.5707964f;
+f32 fd_wanwan___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_wanwan_one_364 = 1.0f;
+f32 fd_wanwan_one_364 = 1.0f;
 
 BattleUnitKind unit_wanwan = {
     127,
@@ -165,11 +165,11 @@ BattleUnitKind unit_wanwan = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{5, 99, 99, 5, 5}};
+static BattleUnitDefense defence = {{5, 99, 99, 5, 5}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 2, 2, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 2, 2, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {0, 70, 65, 100, 65, 100, 0, 70, 100, 90, 100, 90, 100, 95, 65, 45, 30, 100, 65, 100, 100, 90};
+static StatusVulnerability regist = {0, 70, 65, 100, 65, 100, 0, 70, 100, 90, 100, 90, 100, 95, 65, 45, 30, 100, 65, 100, 100, 90};
 
 static PoseTableEntry pose_table[] = {
     {1, "WAN_N_1"},
@@ -637,7 +637,7 @@ static EVT_BEGIN(wait_sound_event1)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_sound_event2)
+static EVT_BEGIN(wait_sound_event2)
     WAIT_FRAMES(LW(10))
     CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_WAN_WAIT4"), LW(11), 0, -250000000)
     RETURN

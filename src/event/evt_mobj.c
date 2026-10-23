@@ -4765,4 +4765,4 @@ USER_FUNC(evt_mobj_koopa_pole) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".sdata") u32 gap_07_80410304_sdata[1] = {0};
+u32 gap_07_80410304_sdata[1] = {0};

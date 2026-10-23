@@ -129,70 +129,70 @@ static void senkaron_ext_dispent(void);
 static void senkaron_ext_disp(CameraId camera, void* param);
 static void senkaron_ext_shadow_disp(CameraId camera, void* param);
 
-__declspec(section ".data") f32 fd_gon_03_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gon_03_neg_one_382;
-__declspec(section ".data") f32 fd_gon_03___local_PI_383;
-__declspec(section ".data") f32 fd_gon_03___local_3PIO2_385;
-__declspec(section ".data") f32 fd_gon_03_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gon_03___local_PIO2_384;
-__declspec(section ".data") f32 fd_gon_03_one_381;
-__declspec(section ".data") f32 fd_gon_03_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gon_03_neg_one_365;
-__declspec(section ".data") f32 fd_gon_03___local_PI_366;
-__declspec(section ".data") f32 fd_gon_03___local_3PIO2_368;
-__declspec(section ".data") f32 fd_gon_03_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gon_03___local_PIO2_367;
-__declspec(section ".data") f32 fd_gon_03_one_364;
+f32 fd_gon_03_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_gon_03_neg_one_382;
+f32 fd_gon_03___local_PI_383;
+f32 fd_gon_03___local_3PIO2_385;
+f32 fd_gon_03_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_gon_03___local_PIO2_384;
+f32 fd_gon_03_one_381;
+f32 fd_gon_03_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_gon_03_neg_one_365;
+f32 fd_gon_03___local_PI_366;
+f32 fd_gon_03___local_3PIO2_368;
+f32 fd_gon_03_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_gon_03___local_PIO2_367;
+f32 fd_gon_03_one_364;
 static NpcSetupInfo npcEnt[4];
-static __declspec(section ".data") s32 door01_close[12];
-static __declspec(section ".data") s32 door01_open[12];
-static __declspec(section ".data") s32 door02_close[12];
-static __declspec(section ".data") s32 door02_open[12];
+static s32 door01_close[12];
+static s32 door01_open[12];
+static s32 door02_close[12];
+static s32 door02_open[12];
 static BeroEntry bero_entry_data[3];
-__declspec(section ".data") const char* nokotaro_pose[2];
+const char* nokotaro_pose[2];
 s32 tegami_event[305];
 static s32 senkaron_event[579];
-static __declspec(section ".data") s32 key_get[5];
+static s32 key_get[5];
 s32 gon_03_init_evt[256];
 s32 richard_init_event[29];
-__declspec(section ".data") s32 richard_regl_event[2];
+s32 richard_regl_event[2];
 s32 richard_talk_event[53];
 s32 leaderkaron_init_event[44];
 s32 leaderkaron_talk_event[40];
 static ExtTexInfo senkaron_ext_entry_data[26];
-__declspec(section ".data") s32 senkarondummy_init_event[8];
-__declspec(section ".data") s32 senkarondummy_regl_event[2];
-__declspec(section ".data") s32 senkarondummy_talk_event[2];
-__declspec(section ".data") s32 senkaron_entry_event[9];
-__declspec(section ".data") s32 senkaron_escape_event[4];
+s32 senkarondummy_init_event[8];
+s32 senkarondummy_regl_event[2];
+s32 senkarondummy_talk_event[2];
+s32 senkaron_entry_event[9];
+s32 senkaron_escape_event[4];
 
-__declspec(section ".data") f32 fd_gon_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gon_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gon_03_neg_one_382 = -1.0f;
+f32 fd_gon_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_gon_03___local_PI_383 = 3.1415927f;
+f32 fd_gon_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gon_03___local_3PIO2_385 = 4.712389f;
+f32 fd_gon_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gon_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gon_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gon_03___local_PIO2_384 = 1.5707964f;
+f32 fd_gon_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gon_03_one_381 = 1.0f;
+f32 fd_gon_03_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_gon_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gon_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gon_03_neg_one_365 = -1.0f;
+f32 fd_gon_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_gon_03___local_PI_366 = 3.1415927f;
+f32 fd_gon_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gon_03___local_3PIO2_368 = 4.712389f;
+f32 fd_gon_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gon_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gon_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gon_03___local_PIO2_367 = 1.5707964f;
+f32 fd_gon_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gon_03_one_364 = 1.0f;
+f32 fd_gon_03_one_364 = 1.0f;
 
 static NpcSetupInfo npcEnt[] = {
     {
@@ -231,7 +231,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-static __declspec(section ".data") EVT_BEGIN(door01_close)
+static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
     RETURN
@@ -240,19 +240,19 @@ EVT_END()
 int rand(void);
 
 
-static __declspec(section ".data") EVT_BEGIN(door01_open)
+static EVT_BEGIN(door01_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(door02_close)
+static EVT_BEGIN(door02_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(door02_open)
+static EVT_BEGIN(door02_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door02"), 0, LW(0), 0)
     RETURN
@@ -298,7 +298,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-__declspec(section ".data") const char* nokotaro_pose[] = {
+const char* nokotaro_pose[] = {
     "PNK_L_1",
     "PNK_L_2",
 };
@@ -591,7 +591,7 @@ static EVT_BEGIN(senkaron_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(key_get)
+static EVT_BEGIN(key_get)
     SET_VALUE(GSW(0), 46)
     RETURN
 EVT_END()
@@ -672,7 +672,7 @@ EVT_BEGIN(richard_init_event)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(richard_regl_event)
+EVT_BEGIN(richard_regl_event)
     RETURN
 EVT_END()
 
@@ -756,25 +756,25 @@ static ExtTexInfo senkaron_ext_entry_data[] = {
     {0},
 };
 
-__declspec(section ".data") EVT_BEGIN(senkarondummy_init_event)
+EVT_BEGIN(senkarondummy_init_event)
     CALL(evt_npc_set_position, STRING("カロン1"), 0, -1000, 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(senkarondummy_regl_event)
+EVT_BEGIN(senkarondummy_regl_event)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(senkarondummy_talk_event)
+EVT_BEGIN(senkarondummy_talk_event)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(senkaron_entry_event)
+EVT_BEGIN(senkaron_entry_event)
     CALL(evt_ext_entry, 1000, PTR(senkaron_ext_entry_data), PTR(senkaron_ext_init), PTR(senkaron_ext_main), PTR(senkaron_ext_dispent))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(senkaron_escape_event)
+EVT_BEGIN(senkaron_escape_event)
     CALL(senkaronToEscape)
     RETURN
 EVT_END()

@@ -52,26 +52,26 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
 
-__declspec(section ".data") f32 fd_tik_03_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tik_03_neg_one_382;
-__declspec(section ".data") f32 fd_tik_03___local_PI_383;
-__declspec(section ".data") f32 fd_tik_03___local_3PIO2_385;
-__declspec(section ".data") f32 fd_tik_03_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tik_03___local_PIO2_384;
-__declspec(section ".data") f32 fd_tik_03_one_381;
-__declspec(section ".data") f32 fd_tik_03_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tik_03_neg_one_365;
-__declspec(section ".data") f32 fd_tik_03___local_PI_366;
-__declspec(section ".data") f32 fd_tik_03___local_3PIO2_368;
-__declspec(section ".data") f32 fd_tik_03_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tik_03___local_PIO2_367;
-__declspec(section ".data") f32 fd_tik_03_one_364;
+f32 fd_tik_03_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_tik_03_neg_one_382;
+f32 fd_tik_03___local_PI_383;
+f32 fd_tik_03___local_3PIO2_385;
+f32 fd_tik_03_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_tik_03___local_PIO2_384;
+f32 fd_tik_03_one_381;
+f32 fd_tik_03_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_tik_03_neg_one_365;
+f32 fd_tik_03___local_PI_366;
+f32 fd_tik_03___local_3PIO2_368;
+f32 fd_tik_03_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_tik_03___local_PIO2_367;
+f32 fd_tik_03_one_364;
 s32 bero_05_custom_in[30];
-__declspec(section ".data") s32 bero_05_custom_out[12];
+s32 bero_05_custom_out[12];
 static BeroEntry bero_entry_data[3];
 static BeroEntry bero_entry_data2[2];
 static s32 guide_init[48];
-static __declspec(section ".data") s32 guide_talk[11];
+static s32 guide_talk[11];
 static NpcSetupInfo npcEnt[2];
 static s32 puni_walk_se[20];
 s32 puni_soguu_3[584];
@@ -82,33 +82,33 @@ s32 puni_nakama[93];
 s32 tik03_switch_evt[70];
 s32 tik_03_init_evt[116];
 
-__declspec(section ".data") f32 fd_tik_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tik_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tik_03_neg_one_382 = -1.0f;
+f32 fd_tik_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_tik_03___local_PI_383 = 3.1415927f;
+f32 fd_tik_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tik_03___local_3PIO2_385 = 4.712389f;
+f32 fd_tik_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tik_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tik_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tik_03___local_PIO2_384 = 1.5707964f;
+f32 fd_tik_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tik_03_one_381 = 1.0f;
+f32 fd_tik_03_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_tik_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tik_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tik_03_neg_one_365 = -1.0f;
+f32 fd_tik_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_tik_03___local_PI_366 = 3.1415927f;
+f32 fd_tik_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tik_03___local_3PIO2_368 = 4.712389f;
+f32 fd_tik_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tik_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tik_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tik_03___local_PIO2_367 = 1.5707964f;
+f32 fd_tik_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tik_03_one_364 = 1.0f;
+f32 fd_tik_03_one_364 = 1.0f;
 
 EVT_BEGIN(bero_05_custom_in)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 112)
@@ -126,7 +126,7 @@ EVT_BEGIN(bero_05_custom_in)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(bero_05_custom_out)
+EVT_BEGIN(bero_05_custom_out)
     IF_INT_EQUAL(GSW(0), 69)
         SET_VALUE(GSW(0), 70)
     END_IF
@@ -209,7 +209,7 @@ static EVT_BEGIN(guide_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(guide_talk)
+static EVT_BEGIN(guide_talk)
     SWITCH(GSW(0))
         CASE_EQUAL(67)
         WAIT_MS(1000)

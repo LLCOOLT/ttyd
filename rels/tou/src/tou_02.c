@@ -158,32 +158,32 @@ static void pose_change(Fan* fan, const char* name, const char* anim);
 static void pose_main(void);
 static void pose_init(void);
 
-__declspec(section ".data") static f32 negone_one$374[2] __attribute__((aligned(8)));
-__declspec(section ".data") static f32 neg_one$382;
-__declspec(section ".data") static f32 __local_PI$383;
-__declspec(section ".data") static f32 __local_3PIO2$385;
-__declspec(section ".data") u32 gap_04_0001116C_data[1];
-__declspec(section ".data") static f32 one_negone$373[2] __attribute__((aligned(8)));
-__declspec(section ".data") static f32 __local_PIO2$384;
-__declspec(section ".data") static f32 one$381;
-__declspec(section ".data") static f32 negone_one$360[2] __attribute__((aligned(8)));
-__declspec(section ".data") static f32 neg_one$365;
-__declspec(section ".data") static f32 __local_PI$366;
-__declspec(section ".data") static f32 __local_3PIO2$368;
-__declspec(section ".data") u32 gap_04_00011194_data[1];
-__declspec(section ".data") static f32 one_negone$359[2] __attribute__((aligned(8)));
-__declspec(section ".data") static f32 __local_PIO2$367;
-__declspec(section ".data") static f32 one$364;
+static f32 negone_one$374[2] __attribute__((aligned(8)));
+static f32 neg_one$382;
+static f32 __local_PI$383;
+static f32 __local_3PIO2$385;
+u32 gap_04_0001116C_data[1];
+static f32 one_negone$373[2] __attribute__((aligned(8)));
+static f32 __local_PIO2$384;
+static f32 one$381;
+static f32 negone_one$360[2] __attribute__((aligned(8)));
+static f32 neg_one$365;
+static f32 __local_PI$366;
+static f32 __local_3PIO2$368;
+u32 gap_04_00011194_data[1];
+static f32 one_negone$359[2] __attribute__((aligned(8)));
+static f32 __local_PIO2$367;
+static f32 one$364;
 static s32 s_door_open[58];
 static s32 s_door_close[58];
 s32 n_1_door_open[22];
 s32 n_1_door_close[22];
 static s32 n_2_door_open[22];
 static s32 n_2_door_close[22];
-__declspec(section ".data") s32 n_3_door_open[12];
-__declspec(section ".data") s32 n_3_door_close[12];
-__declspec(section ".data") s32 n_4_door_open[12];
-__declspec(section ".data") s32 n_4_door_close[12];
+s32 n_3_door_open[12];
+s32 n_3_door_close[12];
+s32 n_4_door_open[12];
+s32 n_4_door_close[12];
 static BeroEntry bero_data[6];
 s32 evt_move_g[63];
 s32 init_gard1[39];
@@ -192,20 +192,20 @@ s32 init_gard2[39];
 s32 talk_gard2[70];
 static s32 init_madam[39];
 static s32 talk_madam[67];
-__declspec(section ".data") s32 init_repo[8];
+s32 init_repo[8];
 s32 talk_repo[112];
-__declspec(section ".data") s32 init_cam1[8];
+s32 init_cam1[8];
 s32 talk_cam1[112];
 s32 init_cam2[19];
 s32 talk_cam2[112];
 s32 init_kino4[13];
 s32 reg_kino4[31];
 s32 talk_kino4[112];
-__declspec(section ".data") s32 init_kino5[8];
+s32 init_kino5[8];
 s32 talk_kino5[236];
-__declspec(section ".data") s32 init_kinopiko[8];
+s32 init_kinopiko[8];
 s32 talk_kinopiko[112];
-__declspec(section ".data") s32 init_kinopio_f[8];
+s32 init_kinopio_f[8];
 s32 talk_kinopio_f[112];
 s32 init_chu[20];
 s32 talk_chu[67];
@@ -229,15 +229,15 @@ ExtTexInfo ext_fan_data[28];
 s32 mario_momikucha_msg[111];
 s32 evt_momikucha[105];
 static s32 evt_key[173];
-__declspec(section ".data") static s32 evt_poster_1[5];
-__declspec(section ".data") static s32 evt_poster_2[5];
-__declspec(section ".data") static s32 evt_poster_3[5];
-__declspec(section ".data") static s32 evt_poster_4[5];
-__declspec(section ".data") static s32 evt_poster_5[5];
-__declspec(section ".data") static s32 evt_poster_6[5];
-__declspec(section ".data") static s32 evt_poster_7[5];
+static s32 evt_poster_1[5];
+static s32 evt_poster_2[5];
+static s32 evt_poster_3[5];
+static s32 evt_poster_4[5];
+static s32 evt_poster_5[5];
+static s32 evt_poster_6[5];
+static s32 evt_poster_7[5];
 static s32 evt_poster_8[VERSION_PICK(46, 60)];
-__declspec(section ".data") static s32 evt_poster_9[5];
+static s32 evt_poster_9[5];
 static s32 evt_after_peach[188];
 s32 tou_02_init_evt[VERSION_PICK(576, 919)];
 
@@ -331,37 +331,37 @@ static f32 randf(f32 min, f32 max) {
     return r * (max - min) + min;
 }
 
-__declspec(section ".data") static f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+static f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") static f32 neg_one$382 = -1.0f;
+static f32 neg_one$382 = -1.0f;
 
-__declspec(section ".data") static f32 __local_PI$383 = 3.1415927f;
+static f32 __local_PI$383 = 3.1415927f;
 
-__declspec(section ".data") static f32 __local_3PIO2$385 = 4.712389f;
+static f32 __local_3PIO2$385 = 4.712389f;
 
-__declspec(section ".data") u32 gap_04_0001116C_data[1] = {0};
+u32 gap_04_0001116C_data[1] = {0};
 
-__declspec(section ".data") static f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+static f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") static f32 __local_PIO2$384 = 1.5707964f;
+static f32 __local_PIO2$384 = 1.5707964f;
 
-__declspec(section ".data") static f32 one$381 = 1.0f;
+static f32 one$381 = 1.0f;
 
-__declspec(section ".data") static f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+static f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") static f32 neg_one$365 = -1.0f;
+static f32 neg_one$365 = -1.0f;
 
-__declspec(section ".data") static f32 __local_PI$366 = 3.1415927f;
+static f32 __local_PI$366 = 3.1415927f;
 
-__declspec(section ".data") static f32 __local_3PIO2$368 = 4.712389f;
+static f32 __local_3PIO2$368 = 4.712389f;
 
-__declspec(section ".data") u32 gap_04_00011194_data[1] = {0};
+u32 gap_04_00011194_data[1] = {0};
 
-__declspec(section ".data") static f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+static f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") static f32 __local_PIO2$367 = 1.5707964f;
+static f32 __local_PIO2$367 = 1.5707964f;
 
-__declspec(section ".data") static f32 one$364 = 1.0f;
+static f32 one$364 = 1.0f;
 
 static EVT_BEGIN(s_door_open)
     IF_FLOAT_EQUAL(LW(0), FLOAT((0.0f)))
@@ -437,25 +437,25 @@ static EVT_BEGIN(n_2_door_close)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(n_3_door_open)
+EVT_BEGIN(n_3_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING(("door_4")), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(n_3_door_close)
+EVT_BEGIN(n_3_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING(("door_4")), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(n_4_door_open)
+EVT_BEGIN(n_4_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING(("door_5")), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(n_4_door_close)
+EVT_BEGIN(n_4_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING(("door_5")), 0, LW(0), 0)
     RETURN
@@ -701,7 +701,7 @@ static EVT_BEGIN(talk_madam)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_repo)
+EVT_BEGIN(init_repo)
     CALL(evt_npc_set_position, STRING(("me")), -100, 0, -25)
     RETURN
 EVT_END()
@@ -746,7 +746,7 @@ EVT_BEGIN(talk_repo)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_cam1)
+EVT_BEGIN(init_cam1)
     CALL(evt_npc_set_position, STRING(("me")), -150, 0, 0)
     RETURN
 EVT_END()
@@ -898,7 +898,7 @@ EVT_BEGIN(talk_kino4)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_kino5)
+EVT_BEGIN(init_kino5)
     CALL(evt_npc_set_position, STRING(("me")), -520, 0, 25)
     RETURN
 EVT_END()
@@ -984,7 +984,7 @@ EVT_BEGIN(talk_kino5)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_kinopiko)
+EVT_BEGIN(init_kinopiko)
     CALL(evt_npc_set_position, STRING(("me")), -490, 0, 25)
     RETURN
 EVT_END()
@@ -1029,7 +1029,7 @@ EVT_BEGIN(talk_kinopiko)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_kinopio_f)
+EVT_BEGIN(init_kinopio_f)
     CALL(evt_npc_set_position, STRING(("\203L\203m\203s\203I\217\227")), 100, 0, 0)
     RETURN
 EVT_END()
@@ -2130,37 +2130,37 @@ s32 evt_end_count(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") static EVT_BEGIN(evt_poster_1)
+static EVT_BEGIN(evt_poster_1)
     SET_VALUE(GSWF(2456), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(evt_poster_2)
+static EVT_BEGIN(evt_poster_2)
     SET_VALUE(GSWF(2457), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(evt_poster_3)
+static EVT_BEGIN(evt_poster_3)
     SET_VALUE(GSWF(2458), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(evt_poster_4)
+static EVT_BEGIN(evt_poster_4)
     SET_VALUE(GSWF(2459), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(evt_poster_5)
+static EVT_BEGIN(evt_poster_5)
     SET_VALUE(GSWF(2460), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(evt_poster_6)
+static EVT_BEGIN(evt_poster_6)
     SET_VALUE(GSWF(2461), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(evt_poster_7)
+static EVT_BEGIN(evt_poster_7)
     SET_VALUE(GSWF(2462), 1)
     RETURN
 EVT_END()
@@ -2200,7 +2200,7 @@ static EVT_BEGIN(evt_poster_8)
 EVT_END()
 #endif
 
-__declspec(section ".data") static EVT_BEGIN(evt_poster_9)
+static EVT_BEGIN(evt_poster_9)
     SET_VALUE(GSWF(2464), 1)
     RETURN
 EVT_END()

@@ -34,34 +34,34 @@ static USER_FUNC(killer_get_angle);
 static USER_FUNC(killer_copy_status);
 extern BattleUnitKind unit_killer;
 
-__declspec(section ".data") f32 fd_killer_cannon_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_killer_cannon_neg_one_382;
-__declspec(section ".data") f32 fd_killer_cannon___local_PI_383;
-__declspec(section ".data") f32 fd_killer_cannon___local_3PIO2_385;
-__declspec(section ".data") f32 fd_killer_cannon_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_killer_cannon___local_PIO2_384;
-__declspec(section ".data") f32 fd_killer_cannon_one_381;
-__declspec(section ".data") f32 fd_killer_cannon_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_killer_cannon_neg_one_365;
-__declspec(section ".data") f32 fd_killer_cannon___local_PI_366;
-__declspec(section ".data") f32 fd_killer_cannon___local_3PIO2_368;
-__declspec(section ".data") f32 fd_killer_cannon_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_killer_cannon___local_PIO2_367;
-__declspec(section ".data") f32 fd_killer_cannon_one_364;
+f32 fd_killer_cannon_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_killer_cannon_neg_one_382;
+f32 fd_killer_cannon___local_PI_383;
+f32 fd_killer_cannon___local_3PIO2_385;
+f32 fd_killer_cannon_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_killer_cannon___local_PIO2_384;
+f32 fd_killer_cannon_one_381;
+f32 fd_killer_cannon_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_killer_cannon_neg_one_365;
+f32 fd_killer_cannon___local_PI_366;
+f32 fd_killer_cannon___local_3PIO2_368;
+f32 fd_killer_cannon_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_killer_cannon___local_PIO2_367;
+f32 fd_killer_cannon_one_364;
 BattleUnitKind unit_killer_cannon;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static BattleUnitKindPart parts[3];
-static __declspec(section ".data") BattleUnitSetup entry_killer;
+static BattleUnitSetup entry_killer;
 static PoseTableEntry pose_table[16];
-static __declspec(section ".data") BattleDataEntry data_table[1];
+static BattleDataEntry data_table[1];
 static s32 init_event[63];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 static s32 attack_event[738];
 static s32 friend_event[244];
 static s32 friend_event_sky[318];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
 static USER_FUNC(killer_copy_status) {
     s32* args = event->args;
@@ -76,33 +76,33 @@ static USER_FUNC(killer_copy_status) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_killer_cannon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_killer_cannon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_killer_cannon_neg_one_382 = -1.0f;
+f32 fd_killer_cannon_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_killer_cannon___local_PI_383 = 3.1415927f;
+f32 fd_killer_cannon___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_killer_cannon___local_3PIO2_385 = 4.712389f;
+f32 fd_killer_cannon___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_killer_cannon_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_killer_cannon_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_killer_cannon___local_PIO2_384 = 1.5707964f;
+f32 fd_killer_cannon___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_killer_cannon_one_381 = 1.0f;
+f32 fd_killer_cannon_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_killer_cannon_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_killer_cannon_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_killer_cannon_neg_one_365 = -1.0f;
+f32 fd_killer_cannon_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_killer_cannon___local_PI_366 = 3.1415927f;
+f32 fd_killer_cannon___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_killer_cannon___local_3PIO2_368 = 4.712389f;
+f32 fd_killer_cannon___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_killer_cannon_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_killer_cannon_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_killer_cannon___local_PIO2_367 = 1.5707964f;
+f32 fd_killer_cannon___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_killer_cannon_one_364 = 1.0f;
+f32 fd_killer_cannon_one_364 = 1.0f;
 
 BattleUnitKind unit_killer_cannon = {
     90,
@@ -170,11 +170,11 @@ BattleUnitKind unit_killer_cannon = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
+static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {0, 0, 0, 0, 0, 150, 100, 100, 100, 90, 100, 90, 100, 95, 50, 0, 15, 100, 50, 100, 100, 95};
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 150, 100, 100, 100, 90, 100, 90, 100, 95, 50, 0, 15, 100, 50, 100, 100, 95};
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_killer_cannon", "c_killtai", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 35, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -182,7 +182,7 @@ static BattleUnitKindPart parts[] = {
     {3, "btl_un_killer_cannon", "c_killtai", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0, 255, &defence, &defence_attr, 0x10000, 0, pose_table},
 };
 
-static __declspec(section ".data") BattleUnitSetup entry_killer = {
+static BattleUnitSetup entry_killer = {
     &unit_killer, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -212,7 +212,7 @@ static PoseTableEntry pose_table[] = {
     {69, "KTA_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
@@ -233,7 +233,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -625,7 +625,7 @@ static USER_FUNC(killer_get_angle) {
     return EVT_RETURN_DONE;
 }
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

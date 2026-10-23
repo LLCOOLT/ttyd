@@ -18,26 +18,26 @@ USER_FUNC(evt_btl_camera_set_mode);
 USER_FUNC(evt_btl_camera_set_moveto);
 static USER_FUNC(vivian_comeback);
 
-__declspec(section ".data") f32 fd_faker_mario_gra_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_faker_mario_gra_neg_one_382;
-__declspec(section ".data") f32 fd_faker_mario_gra___local_PI_383;
-__declspec(section ".data") f32 fd_faker_mario_gra___local_3PIO2_385;
-__declspec(section ".data") f32 fd_faker_mario_gra_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_faker_mario_gra___local_PIO2_384;
-__declspec(section ".data") f32 fd_faker_mario_gra_one_381;
-__declspec(section ".data") f32 fd_faker_mario_gra_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_faker_mario_gra_neg_one_365;
-__declspec(section ".data") f32 fd_faker_mario_gra___local_PI_366;
-__declspec(section ".data") f32 fd_faker_mario_gra___local_3PIO2_368;
-__declspec(section ".data") f32 fd_faker_mario_gra_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_faker_mario_gra___local_PIO2_367;
-__declspec(section ".data") f32 fd_faker_mario_gra_one_364;
+f32 fd_faker_mario_gra_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_faker_mario_gra_neg_one_382;
+f32 fd_faker_mario_gra___local_PI_383;
+f32 fd_faker_mario_gra___local_3PIO2_385;
+f32 fd_faker_mario_gra_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_faker_mario_gra___local_PIO2_384;
+f32 fd_faker_mario_gra_one_381;
+f32 fd_faker_mario_gra_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_faker_mario_gra_neg_one_365;
+f32 fd_faker_mario_gra___local_PI_366;
+f32 fd_faker_mario_gra___local_3PIO2_368;
+f32 fd_faker_mario_gra_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_faker_mario_gra___local_PIO2_367;
+f32 fd_faker_mario_gra_one_364;
 BattleUnitKind unit_faker_mario_gra;
-static __declspec(section ".data") BattleUnitDefense defence_fmario;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_fmario;
-static __declspec(section ".data") StatusVulnerability regist_fmario;
+static BattleUnitDefense defence_fmario;
+static BattleUnitDefenseAttr defence_attr_fmario;
+static StatusVulnerability regist_fmario;
 static PoseTableEntry pose_table_fmario_stay[15];
-static __declspec(section ".data") BattleDataEntry data_table_fmario[2];
+static BattleDataEntry data_table_fmario[2];
 static BattleUnitKindPart parts_fmario[1];
 static BattleWeapon weapon_masao_jump;
 static BattleWeapon weapon_masao_hammer;
@@ -48,43 +48,43 @@ static s32 enemy_zoom[19];
 static s32 fmario_zoom[19];
 static s32 gparty_zoom[19];
 static s32 init_event_fmario[42];
-static __declspec(section ".data") s32 dead_event_fmario[2];
-static __declspec(section ".data") s32 damage_event_fmario[10];
+static s32 dead_event_fmario[2];
+static s32 damage_event_fmario[10];
 static s32 attack_event_fmario[60];
 static s32 jump_attack_voice[36];
 static s32 marioAttackEvent_NormalJump[344];
 static s32 marioAttackEvent_KururinJump[469];
 static s32 marioAttackEvent_NormalHammer[299];
 static s32 marioAttackEvent_KaitenHammer[299];
-static __declspec(section ".data") s32 wait_event_fmario[6];
+static s32 wait_event_fmario[6];
 
-__declspec(section ".data") f32 fd_faker_mario_gra_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_faker_mario_gra_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_faker_mario_gra_neg_one_382 = -1.0f;
+f32 fd_faker_mario_gra_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_faker_mario_gra___local_PI_383 = 3.1415927f;
+f32 fd_faker_mario_gra___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_faker_mario_gra___local_3PIO2_385 = 4.712389f;
+f32 fd_faker_mario_gra___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_faker_mario_gra_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_faker_mario_gra_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_faker_mario_gra___local_PIO2_384 = 1.5707964f;
+f32 fd_faker_mario_gra___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_faker_mario_gra_one_381 = 1.0f;
+f32 fd_faker_mario_gra_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_faker_mario_gra_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_faker_mario_gra_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_faker_mario_gra_neg_one_365 = -1.0f;
+f32 fd_faker_mario_gra_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_faker_mario_gra___local_PI_366 = 3.1415927f;
+f32 fd_faker_mario_gra___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_faker_mario_gra___local_3PIO2_368 = 4.712389f;
+f32 fd_faker_mario_gra___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_faker_mario_gra_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_faker_mario_gra_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_faker_mario_gra___local_PIO2_367 = 1.5707964f;
+f32 fd_faker_mario_gra___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_faker_mario_gra_one_364 = 1.0f;
+f32 fd_faker_mario_gra_one_364 = 1.0f;
 
 BattleUnitKind unit_faker_mario_gra = {
     78,
@@ -152,11 +152,11 @@ BattleUnitKind unit_faker_mario_gra = {
     data_table_fmario,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence_fmario = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence_fmario = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_fmario = {{2, 2, 2, 2, 2}};
+static BattleUnitDefenseAttr defence_attr_fmario = {{2, 2, 2, 2, 2}};
 
-static __declspec(section ".data") StatusVulnerability regist_fmario = {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static StatusVulnerability regist_fmario = {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 static PoseTableEntry pose_table_fmario_stay[] = {
     {1, "EM_N_1"},
@@ -176,7 +176,7 @@ static PoseTableEntry pose_table_fmario_stay[] = {
     {69, "EM_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table_fmario[] = {
+static BattleDataEntry data_table_fmario[] = {
     {49, dead_event_fmario},
     {0, NULL},
 };
@@ -369,11 +369,11 @@ static EVT_BEGIN(init_event_fmario)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dead_event_fmario)
+static EVT_BEGIN(dead_event_fmario)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event_fmario)
+static EVT_BEGIN(damage_event_fmario)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -794,7 +794,7 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_fmario)
+static EVT_BEGIN(wait_event_fmario)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

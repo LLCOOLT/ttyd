@@ -81,20 +81,20 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 
-__declspec(section ".data") f32 fd_mri_11_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_11_neg_one_382;
-__declspec(section ".data") f32 fd_mri_11___local_PI_383;
-__declspec(section ".data") f32 fd_mri_11___local_3PIO2_385;
-__declspec(section ".data") f32 fd_mri_11_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_11___local_PIO2_384;
-__declspec(section ".data") f32 fd_mri_11_one_381;
-__declspec(section ".data") f32 fd_mri_11_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_11_neg_one_365;
-__declspec(section ".data") f32 fd_mri_11___local_PI_366;
-__declspec(section ".data") f32 fd_mri_11___local_3PIO2_368;
-__declspec(section ".data") f32 fd_mri_11_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_11___local_PIO2_367;
-__declspec(section ".data") f32 fd_mri_11_one_364;
+f32 fd_mri_11_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_mri_11_neg_one_382;
+f32 fd_mri_11___local_PI_383;
+f32 fd_mri_11___local_3PIO2_385;
+f32 fd_mri_11_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_mri_11___local_PIO2_384;
+f32 fd_mri_11_one_381;
+f32 fd_mri_11_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_mri_11_neg_one_365;
+f32 fd_mri_11___local_PI_366;
+f32 fd_mri_11___local_3PIO2_368;
+f32 fd_mri_11_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_mri_11___local_PIO2_367;
+f32 fd_mri_11_one_364;
 s32 toge_7_init[17];
 s32 toge_7_talk[44];
 s32 toge_8_init[17];
@@ -122,33 +122,33 @@ static s32 puni_vs_toge[136];
 static KusaAccess ueki_access_data[4];
 s32 mri_11_init_evt[192];
 
-__declspec(section ".data") f32 fd_mri_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_11_neg_one_382 = -1.0f;
+f32 fd_mri_11_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_11___local_PI_383 = 3.1415927f;
+f32 fd_mri_11___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_11___local_3PIO2_385 = 4.712389f;
+f32 fd_mri_11___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_11_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_11_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_11___local_PIO2_384 = 1.5707964f;
+f32 fd_mri_11___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_11_one_381 = 1.0f;
+f32 fd_mri_11_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_mri_11_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_11_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_11_neg_one_365 = -1.0f;
+f32 fd_mri_11_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_11___local_PI_366 = 3.1415927f;
+f32 fd_mri_11___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_11___local_3PIO2_368 = 4.712389f;
+f32 fd_mri_11___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_11_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_11_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_11___local_PIO2_367 = 1.5707964f;
+f32 fd_mri_11___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_11_one_364 = 1.0f;
+f32 fd_mri_11_one_364 = 1.0f;
 
 EVT_BEGIN(toge_7_init)
     SWITCH(GSW(0))

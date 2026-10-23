@@ -35,20 +35,20 @@ USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(ramp_r);
 static void resha_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") f32 fd_hom_10_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hom_10_neg_one_382;
-__declspec(section ".data") f32 fd_hom_10___local_PI_383;
-__declspec(section ".data") f32 fd_hom_10___local_3PIO2_385;
-__declspec(section ".data") f32 fd_hom_10_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hom_10___local_PIO2_384;
-__declspec(section ".data") f32 fd_hom_10_one_381;
-__declspec(section ".data") f32 fd_hom_10_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hom_10_neg_one_365;
-__declspec(section ".data") f32 fd_hom_10___local_PI_366;
-__declspec(section ".data") f32 fd_hom_10___local_3PIO2_368;
-__declspec(section ".data") f32 fd_hom_10_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hom_10___local_PIO2_367;
-__declspec(section ".data") f32 fd_hom_10_one_364;
+f32 fd_hom_10_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_hom_10_neg_one_382;
+f32 fd_hom_10___local_PI_383;
+f32 fd_hom_10___local_3PIO2_385;
+f32 fd_hom_10_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_hom_10___local_PIO2_384;
+f32 fd_hom_10_one_381;
+f32 fd_hom_10_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_hom_10_neg_one_365;
+f32 fd_hom_10___local_PI_366;
+f32 fd_hom_10___local_3PIO2_368;
+f32 fd_hom_10_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_hom_10___local_PIO2_367;
+f32 fd_hom_10_one_364;
 static SharinData sharinDt[29];
 static s32 evt_sharin_main[87];
 static s32 evt_sharin[19];
@@ -59,46 +59,46 @@ static s32 evt_bg[81];
 static s32 evt_hoshi[88];
 s32 hom_10_evt_resha_start[244];
 s32 hom_10_evt_resha_start2[259];
-__declspec(section ".data") s32 hom_10_evt_resha_start3[11];
-__declspec(section ".data") s32 hom_10_evt_resha_start4[11];
+s32 hom_10_evt_resha_start3[11];
+s32 hom_10_evt_resha_start4[11];
 static s32 stop_1[90];
 static s32 stop_2[90];
 s32 hom_10_evt_resha_stop[36];
 static s32 evt_ramp[33];
 static const char* pika_tbl[15];
-static __declspec(section ".data") const char* pika_tbl_rsh_06[10];
+static const char* pika_tbl_rsh_06[10];
 static s32 hom_10_evt_resha_sub[102];
 s32 hom_10_evt_resha_right[35];
 s32 hom_10_evt_resha_left[28];
 s32 hom_10_init_evt[140];
 
-__declspec(section ".data") f32 fd_hom_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hom_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hom_10_neg_one_382 = -1.0f;
+f32 fd_hom_10_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_hom_10___local_PI_383 = 3.1415927f;
+f32 fd_hom_10___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hom_10___local_3PIO2_385 = 4.712389f;
+f32 fd_hom_10___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hom_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hom_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hom_10___local_PIO2_384 = 1.5707964f;
+f32 fd_hom_10___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hom_10_one_381 = 1.0f;
+f32 fd_hom_10_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_hom_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hom_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hom_10_neg_one_365 = -1.0f;
+f32 fd_hom_10_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_hom_10___local_PI_366 = 3.1415927f;
+f32 fd_hom_10___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hom_10___local_3PIO2_368 = 4.712389f;
+f32 fd_hom_10___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hom_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hom_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hom_10___local_PIO2_367 = 1.5707964f;
+f32 fd_hom_10___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hom_10_one_364 = 1.0f;
+f32 fd_hom_10_one_364 = 1.0f;
 
 static SharinData sharinDt[] = {
     {"sha_1_1", 0, 0, FLOAT(1.0f)},
@@ -519,14 +519,14 @@ EVT_BEGIN(hom_10_evt_resha_start2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(hom_10_evt_resha_start3)
+EVT_BEGIN(hom_10_evt_resha_start3)
     SET_VALUE(GSWF(3583), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(-15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(-15.0f))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(hom_10_evt_resha_start4)
+EVT_BEGIN(hom_10_evt_resha_start4)
     SET_VALUE(GSWF(3583), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(15.0f))
@@ -655,7 +655,7 @@ static const char* pika_tbl[] = {
     NULL,
 };
 
-static __declspec(section ".data") const char* pika_tbl_rsh_06[] = {
+static const char* pika_tbl_rsh_06[] = {
     "pika_1_1",
     "pika_1_2",
     "pika_1_3",

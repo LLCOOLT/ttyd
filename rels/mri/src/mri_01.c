@@ -183,47 +183,47 @@ USER_FUNC(evt_countdown_stop);
 #endif
 void mri_stg3_012_cb(s32 type, void* param);
 
-__declspec(section ".data") f32 fd_mri_01_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_01_neg_one_382;
-__declspec(section ".data") f32 fd_mri_01___local_PI_383;
-__declspec(section ".data") f32 fd_mri_01___local_3PIO2_385;
-__declspec(section ".data") f32 fd_mri_01_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_01___local_PIO2_384;
-__declspec(section ".data") f32 fd_mri_01_one_381;
-__declspec(section ".data") f32 fd_mri_01_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_01_neg_one_365;
-__declspec(section ".data") f32 fd_mri_01___local_PI_366;
-__declspec(section ".data") f32 fd_mri_01___local_3PIO2_368;
-__declspec(section ".data") f32 fd_mri_01_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_01___local_PIO2_367;
-__declspec(section ".data") f32 fd_mri_01_one_364;
+f32 fd_mri_01_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_mri_01_neg_one_382;
+f32 fd_mri_01___local_PI_383;
+f32 fd_mri_01___local_3PIO2_385;
+f32 fd_mri_01_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_mri_01___local_PIO2_384;
+f32 fd_mri_01_one_381;
+f32 fd_mri_01_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_mri_01_neg_one_365;
+f32 fd_mri_01___local_PI_366;
+f32 fd_mri_01___local_3PIO2_368;
+f32 fd_mri_01_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_mri_01___local_PIO2_367;
+f32 fd_mri_01_one_364;
 static s32 guide_init[29];
 static s32 guide_talk[20];
 static s32 rival_init[30];
-static __declspec(section ".data") s32 rival_talk[8];
+static s32 rival_talk[8];
 static s32 elder_init[39];
 s32 puni_return_data[204];
 s32 puni_return[99];
 s32 elder_talk_sub[376];
-__declspec(section ".data") s32 irai_item_tbl[2];
-static __declspec(section ".data") s32 iri_17_item_tbl[2];
+s32 irai_item_tbl[2];
+static s32 iri_17_item_tbl[2];
 static s32 elder_talk[177];
 s32 puni_1_init[24];
 s32 puni_1_talk[43];
 s32 puni_2_init[24];
 s32 puni_2_talk[20];
-__declspec(section ".data") s32 puni_init[9];
-static __declspec(section ".data") s32 baba_init[9];
-static __declspec(section ".data") s32 baba_talk[8];
+s32 puni_init[9];
+static s32 baba_init[9];
+static s32 baba_talk[8];
 static s32 sister_init[31];
 s32 sister_jump[48];
 static s32 sister_talk[230];
 static NpcSetupInfo npcEnt[9];
-__declspec(section ".data") s32 bero_00_doa_close[10];
-__declspec(section ".data") s32 bero_00_doa_open[10];
-static __declspec(section ".data") s32 bero_01_doa_close[10];
-static __declspec(section ".data") s32 bero_01_doa_open[10];
-__declspec(section ".data") s32 out_mri_event[5];
+s32 bero_00_doa_close[10];
+s32 bero_00_doa_open[10];
+static s32 bero_01_doa_close[10];
+static s32 bero_01_doa_open[10];
+s32 out_mri_event[5];
 static BeroEntry bero_entry_data[4];
 s32 bigtree_firstbattle[734];
 s32 meet_rival[2247];
@@ -246,7 +246,7 @@ s32 ueki_puni_nigeru[100];
 s32 evt_ueki_01[18];
 static s32 evt_ueki_02[24];
 s32 evt_ueki_03[49];
-static __declspec(section ".data") s32 evt_ueki_08[8];
+static s32 evt_ueki_08[8];
 static KusaAccess ueki_access_data[5];
 s32 puni_mario_wait[49];
 s32 mri_01_koopa_first_evt[400];
@@ -329,33 +329,33 @@ USER_FUNC(elder_talk_sub_fadeoff) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_mri_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_01_neg_one_382 = -1.0f;
+f32 fd_mri_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_01___local_PI_383 = 3.1415927f;
+f32 fd_mri_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_01___local_3PIO2_385 = 4.712389f;
+f32 fd_mri_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_01___local_PIO2_384 = 1.5707964f;
+f32 fd_mri_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_01_one_381 = 1.0f;
+f32 fd_mri_01_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_mri_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_01_neg_one_365 = -1.0f;
+f32 fd_mri_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_01___local_PI_366 = 3.1415927f;
+f32 fd_mri_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_01___local_3PIO2_368 = 4.712389f;
+f32 fd_mri_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_01___local_PIO2_367 = 1.5707964f;
+f32 fd_mri_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_01_one_364 = 1.0f;
+f32 fd_mri_01_one_364 = 1.0f;
 
 static EVT_BEGIN(guide_init)
     SWITCH(GSW(0))
@@ -392,7 +392,7 @@ static EVT_BEGIN(rival_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(rival_talk)
+static EVT_BEGIN(rival_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e12_26"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -591,11 +591,11 @@ EVT_BEGIN(elder_talk_sub)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 irai_item_tbl[] = {
+s32 irai_item_tbl[] = {
     151, -1,
 };
 
-static __declspec(section ".data") s32 iri_17_item_tbl[] = {
+static s32 iri_17_item_tbl[] = {
     ITEM_ROUTING_SLIP, -1,
 };
 
@@ -710,19 +710,19 @@ EVT_BEGIN(puni_2_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(puni_init)
+EVT_BEGIN(puni_init)
     CALL_CHILD(PTR(npc_init_evt))
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(baba_init)
+static EVT_BEGIN(baba_init)
     CALL_CHILD(PTR(npc_init_evt))
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(baba_talk)
+static EVT_BEGIN(baba_talk)
     CALL(evt_msg_print, 0, STRING("kpa_stg3_006"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -924,35 +924,35 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-__declspec(section ".data") EVT_BEGIN(bero_00_doa_close)
+EVT_BEGIN(bero_00_doa_close)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_l_a"))
     SPAWN_EVENT(PTR(evt_mri_door_close))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(bero_00_doa_open)
+EVT_BEGIN(bero_00_doa_open)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_l_a"))
     SPAWN_EVENT(PTR(evt_mri_door_open))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(bero_01_doa_close)
+static EVT_BEGIN(bero_01_doa_close)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_r_a"))
     SPAWN_EVENT(PTR(evt_mri_door_close))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(bero_01_doa_open)
+static EVT_BEGIN(bero_01_doa_open)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_r_a"))
     SPAWN_EVENT(PTR(evt_mri_door_open))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(out_mri_event)
+EVT_BEGIN(out_mri_event)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
@@ -3197,7 +3197,7 @@ EVT_BEGIN(evt_ueki_03)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_ueki_08)
+static EVT_BEGIN(evt_ueki_08)
     IF_INT_EQUAL(GSW(0), 170)
         SPAWN_EVENT(PTR(mri_01_koopa_second_evt))
     END_IF

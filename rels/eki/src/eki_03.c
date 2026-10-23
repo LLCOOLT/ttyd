@@ -39,101 +39,101 @@ USER_FUNC(evt_mobj_blk);
 static USER_FUNC(test_glare);
 static void sun_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 neg_one$382;
-__declspec(section ".data") f32 __local_PI$383;
-__declspec(section ".data") f32 __local_3PIO2$385;
-__declspec(section ".data") u32 gap_04_0000301C_data[1];
-__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 __local_PIO2$384;
-__declspec(section ".data") f32 one$381;
-__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 neg_one$365;
-__declspec(section ".data") f32 __local_PI$366;
-__declspec(section ".data") f32 __local_3PIO2$368;
-__declspec(section ".data") u32 gap_04_00003044_data[1];
-__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 __local_PIO2$367;
-__declspec(section ".data") f32 one$364;
-static __declspec(section ".data") s32 w1_close[12];
-static __declspec(section ".data") s32 w1_open[12];
-static __declspec(section ".data") s32 w2_close[12];
-static __declspec(section ".data") s32 w2_open[12];
+f32 negone_one$374[2] __attribute__((aligned(8)));
+f32 neg_one$382;
+f32 __local_PI$383;
+f32 __local_3PIO2$385;
+u32 gap_04_0000301C_data[1];
+f32 one_negone$373[2] __attribute__((aligned(8)));
+f32 __local_PIO2$384;
+f32 one$381;
+f32 negone_one$360[2] __attribute__((aligned(8)));
+f32 neg_one$365;
+f32 __local_PI$366;
+f32 __local_3PIO2$368;
+u32 gap_04_00003044_data[1];
+f32 one_negone$359[2] __attribute__((aligned(8)));
+f32 __local_PIO2$367;
+f32 one$364;
+static s32 w1_close[12];
+static s32 w1_open[12];
+static s32 w2_close[12];
+static s32 w2_open[12];
 static BeroEntry bero_data[3];
-__declspec(section ".data") s32 evt_poster[10];
+s32 evt_poster[10];
 static s32 evt_chk[74];
-static __declspec(section ".data") s32 evt_poster_1[7];
-static __declspec(section ".data") s32 evt_poster_2[7];
-static __declspec(section ".data") s32 evt_poster_3[7];
-static __declspec(section ".data") s32 evt_poster_4[7];
-static __declspec(section ".data") s32 evt_poster_5[7];
-static __declspec(section ".data") s32 evt_poster_6[7];
-static __declspec(section ".data") s32 evt_poster_7[7];
-static __declspec(section ".data") s32 evt_poster_8[7];
-static __declspec(section ".data") s32 evt_poster_9[7];
-__declspec(section ".data") s32 evt_poster_10[12];
+static s32 evt_poster_1[7];
+static s32 evt_poster_2[7];
+static s32 evt_poster_3[7];
+static s32 evt_poster_4[7];
+static s32 evt_poster_5[7];
+static s32 evt_poster_6[7];
+static s32 evt_poster_7[7];
+static s32 evt_poster_8[7];
+static s32 evt_poster_9[7];
+s32 evt_poster_10[12];
 s32 evt_poster_11[27];
 s32 evt_poster_12[22];
-__declspec(section ".data") s32 evt_poster_13[7];
-__declspec(section ".data") s32 evt_poster_14[7];
-__declspec(section ".data") s32 evt_poster_15[7];
+s32 evt_poster_13[7];
+s32 evt_poster_14[7];
+s32 evt_poster_15[7];
 #ifdef VERSION_G8ME01
 s32 eki_03_init_evt[470];
 #else
 s32 eki_03_init_evt[471];
 #endif
 
-__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 neg_one$382 = -1.0f;
+f32 neg_one$382 = -1.0f;
 
-__declspec(section ".data") f32 __local_PI$383 = 3.1415927f;
+f32 __local_PI$383 = 3.1415927f;
 
-__declspec(section ".data") f32 __local_3PIO2$385 = 4.712389f;
+f32 __local_3PIO2$385 = 4.712389f;
 
-__declspec(section ".data") u32 gap_04_0000301C_data[1] = {0};
+u32 gap_04_0000301C_data[1] = {0};
 
-__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 __local_PIO2$384 = 1.5707964f;
+f32 __local_PIO2$384 = 1.5707964f;
 
-__declspec(section ".data") f32 one$381 = 1.0f;
+f32 one$381 = 1.0f;
 
-__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 neg_one$365 = -1.0f;
+f32 neg_one$365 = -1.0f;
 
-__declspec(section ".data") f32 __local_PI$366 = 3.1415927f;
+f32 __local_PI$366 = 3.1415927f;
 
-__declspec(section ".data") f32 __local_3PIO2$368 = 4.712389f;
+f32 __local_3PIO2$368 = 4.712389f;
 
-__declspec(section ".data") u32 gap_04_00003044_data[1] = {0};
+u32 gap_04_00003044_data[1] = {0};
 
-__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 __local_PIO2$367 = 1.5707964f;
+f32 __local_PIO2$367 = 1.5707964f;
 
-__declspec(section ".data") f32 one$364 = 1.0f;
+f32 one$364 = 1.0f;
 
-static __declspec(section ".data") EVT_BEGIN(w1_close)
+static EVT_BEGIN(w1_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(w1_open)
+static EVT_BEGIN(w1_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(w2_close)
+static EVT_BEGIN(w2_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_2"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(w2_open)
+static EVT_BEGIN(w2_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_2"), 0, LW(0), 0)
     RETURN
@@ -179,7 +179,7 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
-__declspec(section ".data") EVT_BEGIN(evt_poster)
+EVT_BEGIN(evt_poster)
     SET_VALUE(GSW(0), 316)
     SET_VALUE(LW(0), 1)
     CALL_CHILD(PTR(bero_case_switch_on))
@@ -229,61 +229,61 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_poster_1)
+static EVT_BEGIN(evt_poster_1)
     SET_VALUE(GSWF(3729), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_poster_2)
+static EVT_BEGIN(evt_poster_2)
     SET_VALUE(GSWF(3730), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_poster_3)
+static EVT_BEGIN(evt_poster_3)
     SET_VALUE(GSWF(3731), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_poster_4)
+static EVT_BEGIN(evt_poster_4)
     SET_VALUE(GSWF(3732), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_poster_5)
+static EVT_BEGIN(evt_poster_5)
     SET_VALUE(GSWF(3733), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_poster_6)
+static EVT_BEGIN(evt_poster_6)
     SET_VALUE(GSWF(3734), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_poster_7)
+static EVT_BEGIN(evt_poster_7)
     SET_VALUE(GSWF(3735), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_poster_8)
+static EVT_BEGIN(evt_poster_8)
     SET_VALUE(GSWF(3736), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_poster_9)
+static EVT_BEGIN(evt_poster_9)
     SET_VALUE(GSWF(3737), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_poster_10)
+EVT_BEGIN(evt_poster_10)
     SET_VALUE(GSWF(3738), 1)
     CALL(evt_hitobj_onoff, STRING("a_kami_13"), 1, 0)
     CALL_CHILD(PTR(evt_chk))
@@ -309,19 +309,19 @@ EVT_BEGIN(evt_poster_12)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_poster_13)
+EVT_BEGIN(evt_poster_13)
     SET_VALUE(GSWF(3741), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_poster_14)
+EVT_BEGIN(evt_poster_14)
     SET_VALUE(GSWF(3742), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_poster_15)
+EVT_BEGIN(evt_poster_15)
     SET_VALUE(GSWF(3743), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
@@ -531,5 +531,5 @@ static USER_FUNC(test_glare) {
 
 
 #ifndef VERSION_G8ME01
-__declspec(section ".data") u32 gap_04_00003CBC_data[1] = {0};
+u32 gap_04_00003CBC_data[1] = {0};
 #endif

@@ -43,29 +43,29 @@ USER_FUNC(evt_msg_print_battle_party);
 static USER_FUNC(get_id);
 static USER_FUNC(yoshi_exist);
 
-__declspec(section ".data") f32 fd_iron_sinemon_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_iron_sinemon_neg_one_382;
-__declspec(section ".data") f32 fd_iron_sinemon___local_PI_383;
-__declspec(section ".data") f32 fd_iron_sinemon___local_3PIO2_385;
-__declspec(section ".data") f32 fd_iron_sinemon_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_iron_sinemon___local_PIO2_384;
-__declspec(section ".data") f32 fd_iron_sinemon_one_381;
-__declspec(section ".data") f32 fd_iron_sinemon_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_iron_sinemon_neg_one_365;
-__declspec(section ".data") f32 fd_iron_sinemon___local_PI_366;
-__declspec(section ".data") f32 fd_iron_sinemon___local_3PIO2_368;
-__declspec(section ".data") f32 fd_iron_sinemon_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_iron_sinemon___local_PIO2_367;
-__declspec(section ".data") f32 fd_iron_sinemon_one_364;
+f32 fd_iron_sinemon_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_iron_sinemon_neg_one_382;
+f32 fd_iron_sinemon___local_PI_383;
+f32 fd_iron_sinemon___local_3PIO2_385;
+f32 fd_iron_sinemon_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_iron_sinemon___local_PIO2_384;
+f32 fd_iron_sinemon_one_381;
+f32 fd_iron_sinemon_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_iron_sinemon_neg_one_365;
+f32 fd_iron_sinemon___local_PI_366;
+f32 fd_iron_sinemon___local_3PIO2_368;
+f32 fd_iron_sinemon_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_iron_sinemon___local_PIO2_367;
+f32 fd_iron_sinemon_one_364;
 BattleUnitKind unit_iron_sinemon;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") BattleUnitDefense defence_turn;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static BattleUnitDefense defence_turn;
+static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_iron_sinemon_attack;
 static PoseTableEntry pose_table[18];
-static __declspec(section ".data") BattleDataEntry data_table[3];
+static BattleDataEntry data_table[3];
 static s32 init_event1[18];
 static s32 init_event2[18];
 static s32 init_event_sub[47];
@@ -73,35 +73,35 @@ static s32 dmg_avoid_counter_thorn_head_event[76];
 static s32 damage_event[102];
 static s32 phase_event[188];
 static s32 attack_event[385];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
-__declspec(section ".data") f32 fd_iron_sinemon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_iron_sinemon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_iron_sinemon_neg_one_382 = -1.0f;
+f32 fd_iron_sinemon_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_iron_sinemon___local_PI_383 = 3.1415927f;
+f32 fd_iron_sinemon___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_iron_sinemon___local_3PIO2_385 = 4.712389f;
+f32 fd_iron_sinemon___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_iron_sinemon_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_iron_sinemon_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_iron_sinemon___local_PIO2_384 = 1.5707964f;
+f32 fd_iron_sinemon___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_iron_sinemon_one_381 = 1.0f;
+f32 fd_iron_sinemon_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_iron_sinemon_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_iron_sinemon_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_iron_sinemon_neg_one_365 = -1.0f;
+f32 fd_iron_sinemon_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_iron_sinemon___local_PI_366 = 3.1415927f;
+f32 fd_iron_sinemon___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_iron_sinemon___local_3PIO2_368 = 4.712389f;
+f32 fd_iron_sinemon___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_iron_sinemon_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_iron_sinemon_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_iron_sinemon___local_PIO2_367 = 1.5707964f;
+f32 fd_iron_sinemon___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_iron_sinemon_one_364 = 1.0f;
+f32 fd_iron_sinemon_one_364 = 1.0f;
 
 BattleUnitKind unit_iron_sinemon = {
     61,
@@ -169,13 +169,13 @@ BattleUnitKind unit_iron_sinemon = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{4, 4, 4, 4, 4}};
+static BattleUnitDefenseAttr defence_attr = {{4, 4, 4, 4, 4}};
 
-static __declspec(section ".data") BattleUnitDefense defence_turn = {0};
+static BattleUnitDefense defence_turn = {0};
 
-static __declspec(section ".data") StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_iron_sinemon", "c_sinemon_a", 0.0f, 0.0f, 0.0f, 0.0f, 37.0f, 0.0f, 0.0f, 45.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
@@ -242,7 +242,7 @@ static PoseTableEntry pose_table[] = {
     {69, "SIN_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {37, dmg_avoid_counter_thorn_head_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
@@ -501,7 +501,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

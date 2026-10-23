@@ -1916,8 +1916,8 @@ USER_FUNC(_disp_heart_entry_stop_check) {
 
 #pragma force_active on
 #ifdef VERSION_G8ME01
-__declspec(section ".sdata") u8 gap_07_80418358_sdata[8] = {0};
+u8 gap_07_80418358_sdata[8] = {0};
 #else
-__declspec(section ".sdata") u8 gap_07_80412488_sdata[24] = {0};
+u8 gap_07_80412488_sdata[24] = {0};
 #endif
 #pragma force_active reset

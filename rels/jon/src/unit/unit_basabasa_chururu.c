@@ -40,68 +40,68 @@ USER_FUNC(btlevtcmd_SetStatusIconOffset);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(btlevtcmd_WaitAttackEnd);
 
-__declspec(section ".data") f32 fd_basabasa_chururu_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_basabasa_chururu_neg_one_382;
-__declspec(section ".data") f32 fd_basabasa_chururu___local_PI_383;
-__declspec(section ".data") f32 fd_basabasa_chururu___local_3PIO2_385;
-__declspec(section ".data") f32 fd_basabasa_chururu_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_basabasa_chururu___local_PIO2_384;
-__declspec(section ".data") f32 fd_basabasa_chururu_one_381;
-__declspec(section ".data") f32 fd_basabasa_chururu_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_basabasa_chururu_neg_one_365;
-__declspec(section ".data") f32 fd_basabasa_chururu___local_PI_366;
-__declspec(section ".data") f32 fd_basabasa_chururu___local_3PIO2_368;
-__declspec(section ".data") f32 fd_basabasa_chururu_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_basabasa_chururu___local_PIO2_367;
-__declspec(section ".data") f32 fd_basabasa_chururu_one_364;
+f32 fd_basabasa_chururu_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_basabasa_chururu_neg_one_382;
+f32 fd_basabasa_chururu___local_PI_383;
+f32 fd_basabasa_chururu___local_3PIO2_385;
+f32 fd_basabasa_chururu_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_basabasa_chururu___local_PIO2_384;
+f32 fd_basabasa_chururu_one_381;
+f32 fd_basabasa_chururu_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_basabasa_chururu_neg_one_365;
+f32 fd_basabasa_chururu___local_PI_366;
+f32 fd_basabasa_chururu___local_3PIO2_368;
+f32 fd_basabasa_chururu_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_basabasa_chururu___local_PIO2_367;
+f32 fd_basabasa_chururu_one_364;
 BattleUnitKind unit_basabasa_chururu;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
 static BattleWeapon weapon_basabasa_drain_attack_biribiri_counterd;
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_ceil[18];
 static BattleDataEntry data_table[14];
 static BattleUnitKindPart parts[1];
-static __declspec(section ".data") StatusVulnerability regist;
+static StatusVulnerability regist;
 static BattleWeapon weapon_basabasa_attack;
 static PoseSoundTiming pose_sound_timing_table[9];
 static s32 ceil_sky_event[98];
 static s32 init_event[78];
-static __declspec(section ".data") s32 dmg_first_attack_pos[12];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 dmg_first_attack_pos[12];
+static s32 damage_event[10];
 static s32 damage_event_ceil[51];
 static s32 counter_damage_event[16];
 static s32 ceil_fall_ready_event[23];
 static s32 attack_event[683];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
-__declspec(section ".data") f32 fd_basabasa_chururu_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_basabasa_chururu_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_basabasa_chururu_neg_one_382 = -1.0f;
+f32 fd_basabasa_chururu_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_basabasa_chururu___local_PI_383 = 3.1415927f;
+f32 fd_basabasa_chururu___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_basabasa_chururu___local_3PIO2_385 = 4.712389f;
+f32 fd_basabasa_chururu___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_basabasa_chururu_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_basabasa_chururu_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_basabasa_chururu___local_PIO2_384 = 1.5707964f;
+f32 fd_basabasa_chururu___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_basabasa_chururu_one_381 = 1.0f;
+f32 fd_basabasa_chururu_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_basabasa_chururu_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_basabasa_chururu_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_basabasa_chururu_neg_one_365 = -1.0f;
+f32 fd_basabasa_chururu_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_basabasa_chururu___local_PI_366 = 3.1415927f;
+f32 fd_basabasa_chururu___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_basabasa_chururu___local_3PIO2_368 = 4.712389f;
+f32 fd_basabasa_chururu___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_basabasa_chururu_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_basabasa_chururu_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_basabasa_chururu___local_PIO2_367 = 1.5707964f;
+f32 fd_basabasa_chururu___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_basabasa_chururu_one_364 = 1.0f;
+f32 fd_basabasa_chururu_one_364 = 1.0f;
 
 BattleUnitKind unit_basabasa_chururu = {
     123,
@@ -169,9 +169,9 @@ BattleUnitKind unit_basabasa_chururu = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 static BattleWeapon weapon_basabasa_drain_attack_biribiri_counterd = {
     NULL, 0, // name..icon
@@ -269,7 +269,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_basabasa_chururu", "c_cyuru", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table_ceil},
 };
 
-static __declspec(section ".data") StatusVulnerability regist = {70, 75, 100, 100, 70, 100, 100, 70, 100, 80, 100, 80, 100, 90, 70, 70, 85, 100, 70, 100, 100, 95};
+static StatusVulnerability regist = {70, 75, 100, 100, 70, 100, 100, 70, 100, 80, 100, 80, 100, 90, 70, 70, 85, 100, 70, 100, 100, 95};
 
 static BattleWeapon weapon_basabasa_attack = {
     NULL, 0, // name..icon
@@ -365,14 +365,14 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dmg_first_attack_pos)
+static EVT_BEGIN(dmg_first_attack_pos)
     CALL_CHILD(PTR(ceil_sky_event))
     CALL(btlevtcmd_SetPos, -2, LW(0), 10, LW(2))
     CALL(btlevtcmd_WaitAttackEnd)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -609,7 +609,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

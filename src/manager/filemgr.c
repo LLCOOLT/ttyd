@@ -18,7 +18,7 @@ FileManagerWork fileWork;
 //.sdata
 FileManagerWork* afp = &fileWork;
 #pragma force_active on
-__declspec(section ".sdata") u32 gap_07_804125DC_sdata[1] = {0};
+u32 gap_07_804125DC_sdata[1] = {0};
 #pragma force_active reset
 
 //local prototypes

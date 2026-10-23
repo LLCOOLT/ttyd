@@ -254,36 +254,36 @@ static void pose_change(Kyaku* kyaku, const char* name, const char* anim);
 static void pose_main(void);
 static void pose_init(void);
 
-__declspec(section ".data") f32 fd_tou_03_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_03_neg_one_382;
-__declspec(section ".data") f32 fd_tou_03___local_PI_383;
-__declspec(section ".data") f32 fd_tou_03___local_3PIO2_385;
-__declspec(section ".data") f32 fd_tou_03_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_03___local_PIO2_384;
-__declspec(section ".data") f32 fd_tou_03_one_381;
-__declspec(section ".data") f32 fd_tou_03_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_03_neg_one_365;
-__declspec(section ".data") f32 fd_tou_03___local_PI_366;
-__declspec(section ".data") f32 fd_tou_03___local_3PIO2_368;
-__declspec(section ".data") f32 fd_tou_03_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_03___local_PIO2_367;
-__declspec(section ".data") f32 fd_tou_03_one_364;
-__declspec(section ".data") f64 fd_tou_03__three_localstatic4_sqrtf;
-__declspec(section ".data") f64 fd_tou_03__half_localstatic3_sqrtf;
+f32 fd_tou_03_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_tou_03_neg_one_382;
+f32 fd_tou_03___local_PI_383;
+f32 fd_tou_03___local_3PIO2_385;
+f32 fd_tou_03_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_tou_03___local_PIO2_384;
+f32 fd_tou_03_one_381;
+f32 fd_tou_03_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_tou_03_neg_one_365;
+f32 fd_tou_03___local_PI_366;
+f32 fd_tou_03___local_3PIO2_368;
+f32 fd_tou_03_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_tou_03___local_PIO2_367;
+f32 fd_tou_03_one_364;
+f64 fd_tou_03__three_localstatic4_sqrtf;
+f64 fd_tou_03__half_localstatic3_sqrtf;
 ExtTexInfo ext_kyaku_data[51];
-__declspec(section ".data") s32 x[1];
+s32 x[1];
 s32 evt_kyaku[138];
-__declspec(section ".data") static s32 inta_tex[8];
+static s32 inta_tex[8];
 s32 open_main[53];
 s32 close_main[37];
 static s32 w_door_open[22];
 static s32 w_door_close[22];
-__declspec(section ".data") static s32 w_open[5];
-__declspec(section ".data") static s32 w_close[5];
+static s32 w_open[5];
+static s32 w_close[5];
 static s32 e_door_open[22];
 static s32 e_door_close[22];
-__declspec(section ".data") static s32 e_open[5];
-__declspec(section ".data") static s32 e_close[5];
+static s32 e_open[5];
+static s32 e_close[5];
 s32 s1_door_open[22];
 s32 s1_door_close[22];
 s32 s1_door_open2[19];
@@ -323,7 +323,7 @@ s32 evt_default_win[201];
 s32 evt_default_lose[VERSION_PICK(137, 138)];
 static s32 evt_champion[VERSION_PICK(365, 376)];
 s32 evt_champion2[VERSION_PICK(178, 189)];
-__declspec(section ".data") const char* block_data[9];
+const char* block_data[9];
 static s32 evt_shake[39];
 s32 evt_boss_stone[63];
 static s32 evt_boss[VERSION_PICK(1916, 1919)];
@@ -342,37 +342,37 @@ s32 evt_kyaku_check[105];
 s32 tou_03_init_evt[VERSION_PICK(370, 372)];
 
 #pragma force_active on
-__declspec(section ".data") f32 fd_tou_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_03_neg_one_382 = -1.0f;
+f32 fd_tou_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou_03___local_PI_383 = 3.1415927f;
+f32 fd_tou_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou_03___local_3PIO2_385 = 4.712389f;
+f32 fd_tou_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou_03___local_PIO2_384 = 1.5707964f;
+f32 fd_tou_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_03_one_381 = 1.0f;
+f32 fd_tou_03_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_tou_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_03_neg_one_365 = -1.0f;
+f32 fd_tou_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou_03___local_PI_366 = 3.1415927f;
+f32 fd_tou_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou_03___local_3PIO2_368 = 4.712389f;
+f32 fd_tou_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou_03___local_PIO2_367 = 1.5707964f;
+f32 fd_tou_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_03_one_364 = 1.0f;
+f32 fd_tou_03_one_364 = 1.0f;
 
-__declspec(section ".data") f64 fd_tou_03__three_localstatic4_sqrtf = 3.0;
+f64 fd_tou_03__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") f64 fd_tou_03__half_localstatic3_sqrtf = 0.5;
+f64 fd_tou_03__half_localstatic3_sqrtf = 0.5;
 #pragma force_active reset
 
 ExtTexInfo ext_kyaku_data[] = {
@@ -429,7 +429,7 @@ ExtTexInfo ext_kyaku_data[] = {
     {0},
 };
 
-__declspec(section ".data") EVT_BEGIN(x)
+EVT_BEGIN(x)
 EVT_END()
 
 s32 _firstattack_setting(EventEntry* event, BOOL isFirstCall) {
@@ -666,7 +666,7 @@ EVT_BEGIN(evt_kyaku)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static s32 inta_tex[] __attribute__((aligned(32))) = {
+static s32 inta_tex[] __attribute__((aligned(32))) = {
     -1, 0, -1, 0, -1, 0, -1, 0,
 };
 
@@ -717,12 +717,12 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(w_open)
+static EVT_BEGIN(w_open)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(w_close)
+static EVT_BEGIN(w_close)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
@@ -743,12 +743,12 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(e_open)
+static EVT_BEGIN(e_open)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(e_close)
+static EVT_BEGIN(e_close)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
@@ -4242,7 +4242,7 @@ s32 item_jump(EventEntry* event, BOOL isFirstCall) {
     return item_jump_sub(event, isFirstCall, 1.0f, 0.5f);
 }
 
-__declspec(section ".data") const char* block_data[] = {
+const char* block_data[] = {
     "block_1", "block_2", "block_3", "block_4", "block_5", "block_6", "block_7", "block_8",
     "block_9",
 };

@@ -38,42 +38,42 @@ USER_FUNC(evt_sub_random);
 static USER_FUNC(eff_fire);
 static USER_FUNC(bubble_copy_status);
 
-__declspec(section ".data") f32 fd_hermos_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hermos_neg_one_382;
-__declspec(section ".data") f32 fd_hermos___local_PI_383;
-__declspec(section ".data") f32 fd_hermos___local_3PIO2_385;
-__declspec(section ".data") f32 fd_hermos_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hermos___local_PIO2_384;
-__declspec(section ".data") f32 fd_hermos_one_381;
-__declspec(section ".data") f32 fd_hermos_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hermos_neg_one_365;
-__declspec(section ".data") f32 fd_hermos___local_PI_366;
-__declspec(section ".data") f32 fd_hermos___local_3PIO2_368;
-__declspec(section ".data") f32 fd_hermos_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hermos___local_PIO2_367;
-__declspec(section ".data") f32 fd_hermos_one_364;
+f32 fd_hermos_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_hermos_neg_one_382;
+f32 fd_hermos___local_PI_383;
+f32 fd_hermos___local_3PIO2_385;
+f32 fd_hermos_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_hermos___local_PIO2_384;
+f32 fd_hermos_one_381;
+f32 fd_hermos_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_hermos_neg_one_365;
+f32 fd_hermos___local_PI_366;
+f32 fd_hermos___local_3PIO2_368;
+f32 fd_hermos_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_hermos___local_PIO2_367;
+f32 fd_hermos_one_364;
 BattleUnitKind unit_hermos;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
-static __declspec(section ".data") BattleDataEntry data_table[4];
+static BattleDataEntry data_table[4];
 static BattleUnitKindPart parts[2];
 static BattleWeapon weapon_bubble_attack;
 static BattleWeapon weapon_bubble_fire_attack;
 static BattleWeapon weapon_bubble_all_fire_attack;
-static __declspec(section ".data") BattleUnitSetup entry_bubble;
+static BattleUnitSetup entry_bubble;
 static s32 init_event[39];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 static s32 avoid_fire_event[16];
 static s32 damage_fire_explosion_event[103];
 static s32 friend_event[99];
 static s32 attack_event[71];
 static s32 normal_attack_event[412];
 static s32 fire_attack_event[365];
-static __declspec(section ".data") s32 all_fire_attackEvent_sub[10];
+static s32 all_fire_attackEvent_sub[10];
 static s32 all_fire_attack_event[321];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
 static USER_FUNC(bubble_copy_status) {
     s32* args = event->args;
@@ -95,33 +95,33 @@ static USER_FUNC(bubble_copy_status) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_hermos_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hermos_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hermos_neg_one_382 = -1.0f;
+f32 fd_hermos_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_hermos___local_PI_383 = 3.1415927f;
+f32 fd_hermos___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hermos___local_3PIO2_385 = 4.712389f;
+f32 fd_hermos___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hermos_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hermos_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hermos___local_PIO2_384 = 1.5707964f;
+f32 fd_hermos___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hermos_one_381 = 1.0f;
+f32 fd_hermos_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_hermos_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hermos_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hermos_neg_one_365 = -1.0f;
+f32 fd_hermos_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_hermos___local_PI_366 = 3.1415927f;
+f32 fd_hermos___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hermos___local_3PIO2_368 = 4.712389f;
+f32 fd_hermos___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hermos_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hermos_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hermos___local_PIO2_367 = 1.5707964f;
+f32 fd_hermos___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hermos_one_364 = 1.0f;
+f32 fd_hermos_one_364 = 1.0f;
 
 BattleUnitKind unit_hermos = {
     84,
@@ -189,11 +189,11 @@ BattleUnitKind unit_hermos = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 3, 1, 1, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 3, 1, 1, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {50, 90, 105, 100, 75, 100, 0, 50, 100, 90, 100, 90, 100, 95, 75, 50, 90, 100, 75, 100, 100, 95};
+static StatusVulnerability regist = {50, 90, 105, 100, 75, 100, 0, 50, 100, 90, 100, 90, 100, 95, 75, 50, 90, 100, 75, 100, 100, 95};
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -216,7 +216,7 @@ static PoseTableEntry pose_table[] = {
     {69, "S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {11, damage_fire_explosion_event},
     {40, avoid_fire_event},
     {48, btldefaultevt_Dummy},
@@ -348,7 +348,7 @@ static BattleWeapon weapon_bubble_all_fire_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitSetup entry_bubble = {
+static BattleUnitSetup entry_bubble = {
     &unit_hermos, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -371,7 +371,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -754,7 +754,7 @@ static USER_FUNC(eff_all_fire) {
     return EVT_RETURN_BLOCK;
 }
 
-static __declspec(section ".data") EVT_BEGIN(all_fire_attackEvent_sub)
+static EVT_BEGIN(all_fire_attackEvent_sub)
     BEGIN_SIBLING_EVENT
         CALL(eff_all_fire, -2, LW(0))
     END_SIBLING_EVENT
@@ -868,7 +868,7 @@ static EVT_BEGIN(all_fire_attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

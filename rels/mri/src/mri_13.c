@@ -64,20 +64,20 @@ USER_FUNC(evt_target_flag_onoff);
 USER_FUNC(evt_target_set_position);
 USER_FUNC(yuka_fall_check);
 
-__declspec(section ".data") f32 fd_mri_13_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_13_neg_one_382;
-__declspec(section ".data") f32 fd_mri_13___local_PI_383;
-__declspec(section ".data") f32 fd_mri_13___local_3PIO2_385;
-__declspec(section ".data") f32 fd_mri_13_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_13___local_PIO2_384;
-__declspec(section ".data") f32 fd_mri_13_one_381;
-__declspec(section ".data") f32 fd_mri_13_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_13_neg_one_365;
-__declspec(section ".data") f32 fd_mri_13___local_PI_366;
-__declspec(section ".data") f32 fd_mri_13___local_3PIO2_368;
-__declspec(section ".data") f32 fd_mri_13_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_13___local_PIO2_367;
-__declspec(section ".data") f32 fd_mri_13_one_364;
+f32 fd_mri_13_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_mri_13_neg_one_382;
+f32 fd_mri_13___local_PI_383;
+f32 fd_mri_13___local_3PIO2_385;
+f32 fd_mri_13_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_mri_13___local_PIO2_384;
+f32 fd_mri_13_one_381;
+f32 fd_mri_13_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_mri_13_neg_one_365;
+f32 fd_mri_13___local_PI_366;
+f32 fd_mri_13___local_3PIO2_368;
+f32 fd_mri_13_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_mri_13___local_PIO2_367;
+f32 fd_mri_13_one_364;
 BeroEntry bero_dai3_kanbu[1];
 static BeroEntry bero_entry_data[3];
 static s32 punipuni_mario_halt[33];
@@ -85,7 +85,7 @@ static s32 punipuni_ball00_init[54];
 static s32 punipuni_ball00[68];
 static s32 yuka_init[48];
 s32 yuka_slot[113];
-__declspec(section ".data") s32 yuka_shake[11];
+s32 yuka_shake[11];
 s32 yuka_shake2[68];
 static s32 yuka_check[133];
 s32 yuka_event[421];
@@ -93,33 +93,33 @@ static s32 evt_f1_ueki_01[20];
 static KusaAccess ueki_access_data[7];
 s32 mri_13_init_evt[205];
 
-__declspec(section ".data") f32 fd_mri_13_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_13_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_13_neg_one_382 = -1.0f;
+f32 fd_mri_13_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_13___local_PI_383 = 3.1415927f;
+f32 fd_mri_13___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_13___local_3PIO2_385 = 4.712389f;
+f32 fd_mri_13___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_13_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_13_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_13___local_PIO2_384 = 1.5707964f;
+f32 fd_mri_13___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_13_one_381 = 1.0f;
+f32 fd_mri_13_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_mri_13_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_13_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_13_neg_one_365 = -1.0f;
+f32 fd_mri_13_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_13___local_PI_366 = 3.1415927f;
+f32 fd_mri_13___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_13___local_3PIO2_368 = 4.712389f;
+f32 fd_mri_13___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_13_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_13_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_13___local_PIO2_367 = 1.5707964f;
+f32 fd_mri_13___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_13_one_364 = 1.0f;
+f32 fd_mri_13_one_364 = 1.0f;
 
 BeroEntry bero_dai3_kanbu[] = {
     {
@@ -327,7 +327,7 @@ USER_FUNC(evt_puni_force_pose) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") EVT_BEGIN(yuka_shake)
+EVT_BEGIN(yuka_shake)
     LOOP(5)
         CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 1000)
     END_LOOP

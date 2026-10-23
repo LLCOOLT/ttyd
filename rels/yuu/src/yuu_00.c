@@ -104,24 +104,24 @@ void yuuminigame_main_1hikoki(EventEntry* event, BOOL isFirstCall);
 void yuuminigame_init_1hikoki(EventEntry* event, BOOL isFirstCall);
 static void monte_disp(CameraId camera, void* param);
 
-__declspec(section ".data") f32 fd_yuu_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_yuu_00_neg_one_382;
-__declspec(section ".data") f32 fd_yuu_00___local_PI_383;
-__declspec(section ".data") f32 fd_yuu_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_yuu_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_yuu_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_yuu_00_one_381;
-__declspec(section ".data") f32 fd_yuu_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_yuu_00_neg_one_365;
-__declspec(section ".data") f32 fd_yuu_00___local_PI_366;
-__declspec(section ".data") f32 fd_yuu_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_yuu_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_yuu_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_yuu_00_one_364;
+f32 fd_yuu_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_yuu_00_neg_one_382;
+f32 fd_yuu_00___local_PI_383;
+f32 fd_yuu_00___local_3PIO2_385;
+f32 fd_yuu_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_yuu_00___local_PIO2_384;
+f32 fd_yuu_00_one_381;
+f32 fd_yuu_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_yuu_00_neg_one_365;
+f32 fd_yuu_00___local_PI_366;
+f32 fd_yuu_00___local_3PIO2_368;
+f32 fd_yuu_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_yuu_00___local_PIO2_367;
+f32 fd_yuu_00_one_364;
 static MonteTable montetable[4];
-static __declspec(section ".data") s32 minigame_view_monte[4];
-__declspec(section ".data") s32 yuu_00_kaijo_init[12];
-__declspec(section ".data") s32 yuu_00_kaijo_init2[12];
+static s32 minigame_view_monte[4];
+s32 yuu_00_kaijo_init[12];
+s32 yuu_00_kaijo_init2[12];
 s32 light_sub_event[497];
 s32 minigame01_main[35];
 s32 minigame01_start_cam[40];
@@ -137,38 +137,38 @@ s32 minigame01_end[224];
 s32 minigame01_end[236];
 #endif
 #ifdef VERSION_G8ME01
-__declspec(section ".data") s32 yuu_00_init_evt[437];
+s32 yuu_00_init_evt[437];
 #else
-__declspec(section ".data") s32 yuu_00_init_evt[11];
+s32 yuu_00_init_evt[11];
 #endif
 
-__declspec(section ".data") f32 fd_yuu_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_yuu_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_yuu_00_neg_one_382 = -1.0f;
+f32 fd_yuu_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_yuu_00___local_PI_383 = 3.1415927f;
+f32 fd_yuu_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_yuu_00___local_3PIO2_385 = 4.712389f;
+f32 fd_yuu_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_yuu_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_yuu_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_yuu_00___local_PIO2_384 = 1.5707964f;
+f32 fd_yuu_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_yuu_00_one_381 = 1.0f;
+f32 fd_yuu_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_yuu_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_yuu_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_yuu_00_neg_one_365 = -1.0f;
+f32 fd_yuu_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_yuu_00___local_PI_366 = 3.1415927f;
+f32 fd_yuu_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_yuu_00___local_3PIO2_368 = 4.712389f;
+f32 fd_yuu_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_yuu_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_yuu_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_yuu_00___local_PIO2_367 = 1.5707964f;
+f32 fd_yuu_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_yuu_00_one_364 = 1.0f;
+f32 fd_yuu_00_one_364 = 1.0f;
 
 static MonteTable montetable[] = {
     {-1200.0f, -800.0f, 450.0f, 200.0f, 2},
@@ -177,13 +177,13 @@ static MonteTable montetable[] = {
     {0},
 };
 
-static __declspec(section ".data") EVT_BEGIN(minigame_view_monte)
+static EVT_BEGIN(minigame_view_monte)
     CALL(fall_rtn)
     RETURN
 EVT_END()
 
 #ifdef VERSION_G8ME01
-__declspec(section ".data") EVT_BEGIN(minigame01_floor_delete)
+EVT_BEGIN(minigame01_floor_delete)
     CALL(yuuminigame1_floor_chk, LW(0), LW(1))
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(yuuminigame1_floor_on_off, LW(0), 0)
@@ -202,13 +202,13 @@ __declspec(section ".data") EVT_BEGIN(minigame01_floor_delete)
 EVT_END()
 #endif
 
-__declspec(section ".data") EVT_BEGIN(yuu_00_kaijo_init)
+EVT_BEGIN(yuu_00_kaijo_init)
     CALL(evt_mario_set_pos, -1550, 400, 0)
     CALL(evt_mario_set_dir, 90, 0, 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(yuu_00_kaijo_init2)
+EVT_BEGIN(yuu_00_kaijo_init2)
     CALL(evt_mario_set_pos, -1350, 400, 0)
     CALL(evt_mario_set_dir, 90, 0, 0)
     RETURN
@@ -1053,7 +1053,7 @@ EVT_BEGIN(minigame01_end)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(yuu_00_init_evt)
+EVT_BEGIN(yuu_00_init_evt)
     CALL(evt_map_playanim, STRING("neon_02"), 1, 0)
     SPAWN_EVENT(PTR(minigame01_main))
     CALL_CHILD(PTR(evt_yuunpc_minigame1))

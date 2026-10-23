@@ -106,20 +106,20 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
 
-__declspec(section ".data") f32 fd_las_09_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_09_neg_one_382;
-__declspec(section ".data") f32 fd_las_09___local_PI_383;
-__declspec(section ".data") f32 fd_las_09___local_3PIO2_385;
-__declspec(section ".data") f32 fd_las_09_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_09___local_PIO2_384;
-__declspec(section ".data") f32 fd_las_09_one_381;
-__declspec(section ".data") f32 fd_las_09_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_09_neg_one_365;
-__declspec(section ".data") f32 fd_las_09___local_PI_366;
-__declspec(section ".data") f32 fd_las_09___local_3PIO2_368;
-__declspec(section ".data") f32 fd_las_09_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_09___local_PIO2_367;
-__declspec(section ".data") f32 fd_las_09_one_364;
+f32 fd_las_09_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_las_09_neg_one_382;
+f32 fd_las_09___local_PI_383;
+f32 fd_las_09___local_3PIO2_385;
+f32 fd_las_09_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_las_09___local_PIO2_384;
+f32 fd_las_09_one_381;
+f32 fd_las_09_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_las_09_neg_one_365;
+f32 fd_las_09___local_PI_366;
+f32 fd_las_09___local_3PIO2_368;
+f32 fd_las_09_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_las_09___local_PIO2_367;
+f32 fd_las_09_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static s32 e_door_close[22];
@@ -135,42 +135,42 @@ s32 bomb_wanwan2_evt[27];
 s32 switch_1_evt[279];
 s32 switch_2_evt[280];
 s32 goikkou_talk[31];
-__declspec(section ".data") s32 majyorin_init[12];
-static __declspec(section ".data") s32 maririn_init[12];
-__declspec(section ".data") s32 ranpel_init[12];
+s32 majyorin_init[12];
+static s32 maririn_init[12];
+s32 ranpel_init[12];
 static NpcSetupInfo npcEnt[4];
 s32 majyorin_evt_npc_entry[26];
 s32 majyorin_evt_main[652];
 s32 majyorin_evt[55];
 s32 las_09_init_evt[257];
 
-__declspec(section ".data") f32 fd_las_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_09_neg_one_382 = -1.0f;
+f32 fd_las_09_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_09___local_PI_383 = 3.1415927f;
+f32 fd_las_09___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_09___local_3PIO2_385 = 4.712389f;
+f32 fd_las_09___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_09___local_PIO2_384 = 1.5707964f;
+f32 fd_las_09___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_09_one_381 = 1.0f;
+f32 fd_las_09_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_las_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_09_neg_one_365 = -1.0f;
+f32 fd_las_09_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_09___local_PI_366 = 3.1415927f;
+f32 fd_las_09___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_09___local_3PIO2_368 = 4.712389f;
+f32 fd_las_09___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_09___local_PIO2_367 = 1.5707964f;
+f32 fd_las_09___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_09_one_364 = 1.0f;
+f32 fd_las_09_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -751,19 +751,19 @@ EVT_BEGIN(goikkou_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(majyorin_init)
+EVT_BEGIN(majyorin_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 268435456)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(maririn_init)
+static EVT_BEGIN(maririn_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 268435456)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(ranpel_init)
+EVT_BEGIN(ranpel_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 268435456)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN

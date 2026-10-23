@@ -19,8 +19,8 @@
 #ifdef VERSION_G8ME01
 // US-only named constant (dispdrv reads it by name), followed by a zero word
 #pragma force_active on
-__declspec(section ".sdata2") const f32 float_1_8041f770 = 1.0f;
-__declspec(section ".sdata2") const f32 float_0_8041f774 = 0.0f;
+const f32 float_1_8041f770 = 1.0f;
+const f32 float_0_8041f774 = 0.0f;
 #pragma force_active reset
 #endif
 

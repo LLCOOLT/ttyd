@@ -40,30 +40,30 @@ USER_FUNC(evt_sub_get_sincos);
 USER_FUNC(las_24_adjust_for_framerate);
 #endif
 
-__declspec(section ".data") f32 fd_las_24_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_24_neg_one_382;
-__declspec(section ".data") f32 fd_las_24___local_PI_383;
-__declspec(section ".data") f32 fd_las_24___local_3PIO2_385;
-__declspec(section ".data") f32 fd_las_24_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_24___local_PIO2_384;
-__declspec(section ".data") f32 fd_las_24_one_381;
-__declspec(section ".data") f32 fd_las_24_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_24_neg_one_365;
-__declspec(section ".data") f32 fd_las_24___local_PI_366;
-__declspec(section ".data") f32 fd_las_24___local_3PIO2_368;
-__declspec(section ".data") f32 fd_las_24_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_24___local_PIO2_367;
-__declspec(section ".data") f32 fd_las_24_one_364;
+f32 fd_las_24_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_las_24_neg_one_382;
+f32 fd_las_24___local_PI_383;
+f32 fd_las_24___local_3PIO2_385;
+f32 fd_las_24_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_las_24___local_PIO2_384;
+f32 fd_las_24_one_381;
+f32 fd_las_24_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_las_24_neg_one_365;
+f32 fd_las_24___local_PI_366;
+f32 fd_las_24___local_3PIO2_368;
+f32 fd_las_24_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_las_24___local_PIO2_367;
+f32 fd_las_24_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static BeroEntry bero_entry_data[4];
 static const char* haguruma_hontai[15];
-static __declspec(section ".data") const char* haguruma_hontai2[6];
-static __declspec(section ".data") const char* haguruma_kage[12];
-static __declspec(section ".data") const char* haguruma_kage2[5];
+static const char* haguruma_hontai2[6];
+static const char* haguruma_kage[12];
+static const char* haguruma_kage2[5];
 static s32 haguruma_evt[194];
-__declspec(section ".data") s32 cloud_blk_evt[10];
-__declspec(section ".data") s32 break_floor_evt[5];
+s32 cloud_blk_evt[10];
+s32 break_floor_evt[5];
 s32 jump_evt[68];
 #ifdef VERSION_G8ME01
 static s32 dai_evt[17];
@@ -73,33 +73,33 @@ static s32 dai_evt[13];
 static s32 box_evt[33];
 s32 las_24_init_evt[190];
 
-__declspec(section ".data") f32 fd_las_24_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_24_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_24_neg_one_382 = -1.0f;
+f32 fd_las_24_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_24___local_PI_383 = 3.1415927f;
+f32 fd_las_24___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_24___local_3PIO2_385 = 4.712389f;
+f32 fd_las_24___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_24_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_24_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_24___local_PIO2_384 = 1.5707964f;
+f32 fd_las_24___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_24_one_381 = 1.0f;
+f32 fd_las_24_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_las_24_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_24_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_24_neg_one_365 = -1.0f;
+f32 fd_las_24_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_24___local_PI_366 = 3.1415927f;
+f32 fd_las_24___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_24___local_3PIO2_368 = 4.712389f;
+f32 fd_las_24___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_24_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_24_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_24___local_PIO2_367 = 1.5707964f;
+f32 fd_las_24___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_24_one_364 = 1.0f;
+f32 fd_las_24_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -189,7 +189,7 @@ static const char* haguruma_hontai[] = {
     "S_hgm_24a",
 };
 
-static __declspec(section ".data") const char* haguruma_hontai2[] = {
+static const char* haguruma_hontai2[] = {
     "S_hgm_05a",
     "S_hgm_09a",
     "S_hgm_12a",
@@ -198,7 +198,7 @@ static __declspec(section ".data") const char* haguruma_hontai2[] = {
     "S_hgm_18a",
 };
 
-static __declspec(section ".data") const char* haguruma_kage[] = {
+static const char* haguruma_kage[] = {
     "S_hgm_01b",
     "S_hgm_02b",
     "S_hgm_03b",
@@ -213,7 +213,7 @@ static __declspec(section ".data") const char* haguruma_kage[] = {
     "S_hgm_16b",
 };
 
-static __declspec(section ".data") const char* haguruma_kage2[] = {
+static const char* haguruma_kage2[] = {
     "S_hgm_05b",
     "S_hgm_09b",
     "S_hgm_12b",
@@ -285,13 +285,13 @@ static EVT_BEGIN(haguruma_evt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(cloud_blk_evt)
+EVT_BEGIN(cloud_blk_evt)
     SET_VALUE(GSWF(4356), 1)
     CALL(evt_mobj_flag_onoff, 0, STRING("blk"), 256)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(break_floor_evt)
+EVT_BEGIN(break_floor_evt)
     SET_VALUE(GSW(0), 396)
     RETURN
 EVT_END()

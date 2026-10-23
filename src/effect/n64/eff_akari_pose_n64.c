@@ -54,7 +54,7 @@ static u8 a_data2[] = {
 };
 
 #pragma force_active on
-__declspec(section ".sdata") u8 gap_07_80412D70_sdata[16] = {0};
+u8 gap_07_80412D70_sdata[16] = {0};
 #pragma force_active reset
 
 void effAkariPoseMain(EffectEntry* effect);

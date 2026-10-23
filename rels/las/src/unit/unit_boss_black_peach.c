@@ -186,26 +186,26 @@ static void hand_init(void);
 static void pose_main(void);
 static void pose_init(void);
 
-__declspec(section ".data") f32 fd_boss_black_peach_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_black_peach_neg_one_382;
-__declspec(section ".data") f32 fd_boss_black_peach___local_PI_383;
-__declspec(section ".data") f32 fd_boss_black_peach___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_black_peach_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_black_peach___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_black_peach_one_381;
-__declspec(section ".data") f32 fd_boss_black_peach_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_black_peach_neg_one_365;
-__declspec(section ".data") f32 fd_boss_black_peach___local_PI_366;
-__declspec(section ".data") f32 fd_boss_black_peach___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_black_peach_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_black_peach___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_black_peach_one_364;
+f32 fd_boss_black_peach_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_black_peach_neg_one_382;
+f32 fd_boss_black_peach___local_PI_383;
+f32 fd_boss_black_peach___local_3PIO2_385;
+f32 fd_boss_black_peach_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_black_peach___local_PIO2_384;
+f32 fd_boss_black_peach_one_381;
+f32 fd_boss_black_peach_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_black_peach_neg_one_365;
+f32 fd_boss_black_peach___local_PI_366;
+f32 fd_boss_black_peach___local_3PIO2_368;
+f32 fd_boss_black_peach_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_black_peach___local_PIO2_367;
+f32 fd_boss_black_peach_one_364;
 BattleUnitKind unit_boss_black_peach;
-__declspec(section ".data") BattleUnitDefense peach_defence;
-__declspec(section ".data") BattleUnitDefenseAttr peach_defence_attr;
-__declspec(section ".data") StatusVulnerability peach_regist;
+BattleUnitDefense peach_defence;
+BattleUnitDefenseAttr peach_defence_attr;
+StatusVulnerability peach_regist;
 PoseTableEntry peach_pose_table[18];
-__declspec(section ".data") BattleDataEntry peach_data_table[2];
+BattleDataEntry peach_data_table[2];
 BattleUnitKindPart peach_parts[7];
 BattleWeapon weapon_peach_black_thunder_attack;
 BattleWeapon weapon_peach_black_energy_attack;
@@ -220,55 +220,55 @@ BattleWeapon weapon_peach_black_poison_attack;
 BattleWeapon weapon_peach_black_press_attack;
 BattleWeapon weapon_peach_black_1000hand_attack;
 BattleUnitKind unit_boss_shadow_queen;
-__declspec(section ".data") BattleUnitDefense queen_defence;
-__declspec(section ".data") BattleUnitDefenseAttr queen_defence_attr;
-__declspec(section ".data") StatusVulnerability queen_regist;
-__declspec(section ".data") BattleUnitDefense queen_muteki_defence;
-__declspec(section ".data") BattleUnitDefenseAttr queen_muteki_defence_attr;
-__declspec(section ".data") StatusVulnerability queen_muteki_regist;
+BattleUnitDefense queen_defence;
+BattleUnitDefenseAttr queen_defence_attr;
+StatusVulnerability queen_regist;
+BattleUnitDefense queen_muteki_defence;
+BattleUnitDefenseAttr queen_muteki_defence_attr;
+StatusVulnerability queen_muteki_regist;
 PoseTableEntry queen_pose_table[18];
-__declspec(section ".data") PoseTableEntry queen_hand_pose_table[4];
-__declspec(section ".data") BattleDataEntry queen_data_table[2];
+PoseTableEntry queen_hand_pose_table[4];
+BattleDataEntry queen_data_table[2];
 BattleUnitKindPart queen_parts[5];
 f32 hair_offset[36];
 s32 shadow_queen_1000[25];
 BattleUnitKind unit_boss_shadow_hand_1;
-__declspec(section ".data") BattleUnitDefense queen_hand_1_defence;
-__declspec(section ".data") BattleUnitDefenseAttr queen_hand_1_defence_attr;
-__declspec(section ".data") StatusVulnerability queen_hand_1_regist;
+BattleUnitDefense queen_hand_1_defence;
+BattleUnitDefenseAttr queen_hand_1_defence_attr;
+StatusVulnerability queen_hand_1_regist;
 PoseTableEntry queen_hand_1_pose_table[8];
-__declspec(section ".data") BattleDataEntry queen_hand_1_data_table[2];
+BattleDataEntry queen_hand_1_data_table[2];
 BattleUnitKindPart queen_hand_1_parts[1];
 BattleUnitKind unit_boss_shadow_hand_2;
-__declspec(section ".data") BattleUnitDefense queen_hand_2_defence;
-__declspec(section ".data") BattleUnitDefenseAttr queen_hand_2_defence_attr;
-__declspec(section ".data") StatusVulnerability queen_hand_2_regist;
+BattleUnitDefense queen_hand_2_defence;
+BattleUnitDefenseAttr queen_hand_2_defence_attr;
+StatusVulnerability queen_hand_2_regist;
 PoseTableEntry queen_hand_2_pose_table[8];
-__declspec(section ".data") BattleDataEntry queen_hand_2_data_table[2];
+BattleDataEntry queen_hand_2_data_table[2];
 BattleUnitKindPart queen_hand_2_parts[1];
 BattleUnitKind unit_boss_shadow_hand_small;
-__declspec(section ".data") BattleUnitDefense queen_hand_small_defence;
-__declspec(section ".data") BattleUnitDefenseAttr queen_hand_small_defence_attr;
-__declspec(section ".data") StatusVulnerability queen_hand_small_regist;
+BattleUnitDefense queen_hand_small_defence;
+BattleUnitDefenseAttr queen_hand_small_defence_attr;
+StatusVulnerability queen_hand_small_regist;
 PoseTableEntry queen_hand_small_pose_table[8];
-__declspec(section ".data") BattleDataEntry queen_hand_small_data_table[2];
+BattleDataEntry queen_hand_small_data_table[2];
 BattleUnitKindPart queen_hand_small_parts[1];
-__declspec(section ".data") BattleUnitSetup entry_shadow_queen;
-__declspec(section ".data") BattleUnitSetup entry_shadow_hand_1;
-__declspec(section ".data") BattleUnitSetup entry_shadow_hand_2;
-__declspec(section ".data") BattleUnitSetup entry_shadow_hand_small;
+BattleUnitSetup entry_shadow_queen;
+BattleUnitSetup entry_shadow_hand_1;
+BattleUnitSetup entry_shadow_hand_2;
+BattleUnitSetup entry_shadow_hand_small;
 s32 peach_init_event[170];
 s32 peach_entry_event[62];
 s32 peach_damage_event[17];
 s32 peach_change_evt[556];
 s32 peach_phase_event[46];
-__declspec(section ".data") s32 peach_dead_event[11];
+s32 peach_dead_event[11];
 s32 peack_attack_black_thunder[147];
 s32 peack_attack_black_energy[125];
 s32 peack_attack_dark_drag[525];
 s32 peack_attack_drain[526];
 s32 peach_attack_event[85];
-__declspec(section ".data") s32 peach_wait_event[6];
+s32 peach_wait_event[6];
 s32 queen_init_event[225];
 s32 queen_first_attack_message_evt[55];
 s32 queen_next_attack_message_evt[55];
@@ -294,7 +294,7 @@ s32 queen_attack_bress3[278];
 s32 queen_attack_event[163];
 s32 queen_damage_event[63];
 s32 queen_dead_event[347];
-__declspec(section ".data") s32 queen_wait_event[10];
+s32 queen_wait_event[10];
 s32 queen_entry_event[62];
 s32 queen_hand_1_init_event[107];
 s32 queen_hand_1_press_attack[343];
@@ -302,47 +302,47 @@ s32 queen_hand_1_drain_attack[408];
 s32 queen_hand_1_attack_event[41];
 s32 queen_hand_1_damage_event[24];
 s32 queen_hand_1_dead_event[41];
-__declspec(section ".data") s32 queen_hand_1_wait_event[6];
+s32 queen_hand_1_wait_event[6];
 s32 queen_hand_2_init_event[113];
 s32 queen_hand_2_attack_event[41];
 s32 queen_hand_2_damage_event[24];
 s32 queen_hand_2_dead_event[41];
-__declspec(section ".data") s32 queen_hand_2_wait_event[6];
+s32 queen_hand_2_wait_event[6];
 s32 queen_hand_small_init_event[96];
 s32 queen_hand_small_drag_attack[385];
 s32 queen_hand_small_1000hand_attack[VERSION_PICK(266, 274)];
 s32 queen_hand_small_attack_event[35];
 s32 queen_hand_small_damage_event[48];
 s32 queen_hand_small_dead_event[32];
-__declspec(section ".data") s32 queen_hand_small_wait_event[6];
+s32 queen_hand_small_wait_event[6];
 
-__declspec(section ".data") f32 fd_boss_black_peach_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_black_peach_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_black_peach_neg_one_382 = -1.0f;
+f32 fd_boss_black_peach_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_black_peach___local_PI_383 = 3.1415927f;
+f32 fd_boss_black_peach___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_black_peach___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_black_peach___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_black_peach_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_black_peach_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_black_peach___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_black_peach___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_black_peach_one_381 = 1.0f;
+f32 fd_boss_black_peach_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_black_peach_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_black_peach_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_black_peach_neg_one_365 = -1.0f;
+f32 fd_boss_black_peach_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_black_peach___local_PI_366 = 3.1415927f;
+f32 fd_boss_black_peach___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_black_peach___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_black_peach___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_black_peach_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_black_peach_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_black_peach___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_black_peach___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_black_peach_one_364 = 1.0f;
+f32 fd_boss_black_peach_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_black_peach = {
     148,
@@ -410,11 +410,11 @@ BattleUnitKind unit_boss_black_peach = {
     peach_data_table,
 };
 
-__declspec(section ".data") BattleUnitDefense peach_defence = {{0, 0, 0, 0, 0}};
+BattleUnitDefense peach_defence = {{0, 0, 0, 0, 0}};
 
-__declspec(section ".data") BattleUnitDefenseAttr peach_defence_attr = {{0, 0, 0, 0, 0}};
+BattleUnitDefenseAttr peach_defence_attr = {{0, 0, 0, 0, 0}};
 
-__declspec(section ".data") StatusVulnerability peach_regist = {30, 30, 30, 100, 30, 100, 100, 0, 100, 60, 100, 60, 100, 75, 30, 0, 0, 100, 30, 100, 100, 0};
+StatusVulnerability peach_regist = {30, 30, 30, 100, 30, 100, 100, 0, 100, 60, 100, 60, 100, 75, 30, 0, 0, 100, 30, 100, 100, 0};
 
 PoseTableEntry peach_pose_table[] = {
     {1, "KRT_N_1"},
@@ -437,7 +437,7 @@ PoseTableEntry peach_pose_table[] = {
     {69, "KRT_S_1"},
 };
 
-__declspec(section ".data") BattleDataEntry peach_data_table[] = {
+BattleDataEntry peach_data_table[] = {
     {49, peach_dead_event},
     {0, NULL},
 };
@@ -1015,17 +1015,17 @@ BattleUnitKind unit_boss_shadow_queen = {
     queen_data_table,
 };
 
-__declspec(section ".data") BattleUnitDefense queen_defence = {{1, 1, 1, 1, 1}};
+BattleUnitDefense queen_defence = {{1, 1, 1, 1, 1}};
 
-__declspec(section ".data") BattleUnitDefenseAttr queen_defence_attr = {{0, 0, 0, 0, 0}};
+BattleUnitDefenseAttr queen_defence_attr = {{0, 0, 0, 0, 0}};
 
-__declspec(section ".data") StatusVulnerability queen_regist = {30, 30, 30, 100, 30, 100, 100, 0, 100, 0, 100, 0, 100, 60, 30, 0, 0, 100, 30, 0, 0, 0};
+StatusVulnerability queen_regist = {30, 30, 30, 100, 30, 100, 100, 0, 100, 0, 100, 0, 100, 60, 30, 0, 0, 100, 30, 0, 0, 0};
 
-__declspec(section ".data") BattleUnitDefense queen_muteki_defence = {{99, 99, 99, 99, 99}};
+BattleUnitDefense queen_muteki_defence = {{99, 99, 99, 99, 99}};
 
-__declspec(section ".data") BattleUnitDefenseAttr queen_muteki_defence_attr = {{2, 2, 2, 2, 2}};
+BattleUnitDefenseAttr queen_muteki_defence_attr = {{2, 2, 2, 2, 2}};
 
-__declspec(section ".data") StatusVulnerability queen_muteki_regist = {0};
+StatusVulnerability queen_muteki_regist = {0};
 
 PoseTableEntry queen_pose_table[] = {
     {1, "KRT_S_1"},
@@ -1048,14 +1048,14 @@ PoseTableEntry queen_pose_table[] = {
     {69, "KRT_S_1"},
 };
 
-__declspec(section ".data") PoseTableEntry queen_hand_pose_table[] = {
+PoseTableEntry queen_hand_pose_table[] = {
     {28, "KRT_S_1"},
     {31, "KRT_S_1"},
     {39, "KRT_S_1"},
     {69, "KRT_S_1"},
 };
 
-__declspec(section ".data") BattleDataEntry queen_data_table[] = {
+BattleDataEntry queen_data_table[] = {
     {49, queen_dead_event},
     {0, NULL},
 };
@@ -1161,11 +1161,11 @@ BattleUnitKind unit_boss_shadow_hand_1 = {
     queen_hand_1_data_table,
 };
 
-__declspec(section ".data") BattleUnitDefense queen_hand_1_defence = {{0, 0, 0, 0, 0}};
+BattleUnitDefense queen_hand_1_defence = {{0, 0, 0, 0, 0}};
 
-__declspec(section ".data") BattleUnitDefenseAttr queen_hand_1_defence_attr = {{0, 0, 0, 0, 0}};
+BattleUnitDefenseAttr queen_hand_1_defence_attr = {{0, 0, 0, 0, 0}};
 
-__declspec(section ".data") StatusVulnerability queen_hand_1_regist = {30, 30, 30, 0, 30, 0, 100, 0, 0, 0, 0, 0, 0, 80, 30, 0, 0, 0, 0, 0, 0, 0};
+StatusVulnerability queen_hand_1_regist = {30, 30, 30, 0, 30, 0, 100, 0, 0, 0, 0, 0, 0, 80, 30, 0, 0, 0, 0, 0, 0, 0};
 
 PoseTableEntry queen_hand_1_pose_table[] = {
     {28, "KRT_S_1"},
@@ -1178,7 +1178,7 @@ PoseTableEntry queen_hand_1_pose_table[] = {
     {69, "KRT_S_1"},
 };
 
-__declspec(section ".data") BattleDataEntry queen_hand_1_data_table[] = {
+BattleDataEntry queen_hand_1_data_table[] = {
     {49, queen_hand_1_dead_event},
     {0, NULL},
 };
@@ -1253,11 +1253,11 @@ BattleUnitKind unit_boss_shadow_hand_2 = {
     queen_hand_2_data_table,
 };
 
-__declspec(section ".data") BattleUnitDefense queen_hand_2_defence = {{0, 0, 0, 0, 0}};
+BattleUnitDefense queen_hand_2_defence = {{0, 0, 0, 0, 0}};
 
-__declspec(section ".data") BattleUnitDefenseAttr queen_hand_2_defence_attr = {{0, 0, 0, 0, 0}};
+BattleUnitDefenseAttr queen_hand_2_defence_attr = {{0, 0, 0, 0, 0}};
 
-__declspec(section ".data") StatusVulnerability queen_hand_2_regist = {30, 30, 30, 0, 30, 0, 100, 0, 0, 0, 0, 0, 0, 80, 30, 0, 0, 0, 0, 0, 0, 0};
+StatusVulnerability queen_hand_2_regist = {30, 30, 30, 0, 30, 0, 100, 0, 0, 0, 0, 0, 0, 80, 30, 0, 0, 0, 0, 0, 0, 0};
 
 PoseTableEntry queen_hand_2_pose_table[] = {
     {28, "KRT_S_1"},
@@ -1270,7 +1270,7 @@ PoseTableEntry queen_hand_2_pose_table[] = {
     {69, "KRT_S_1"},
 };
 
-__declspec(section ".data") BattleDataEntry queen_hand_2_data_table[] = {
+BattleDataEntry queen_hand_2_data_table[] = {
     {49, queen_hand_2_dead_event},
     {0, NULL},
 };
@@ -1345,11 +1345,11 @@ BattleUnitKind unit_boss_shadow_hand_small = {
     queen_hand_small_data_table,
 };
 
-__declspec(section ".data") BattleUnitDefense queen_hand_small_defence = {{0, 0, 0, 0, 0}};
+BattleUnitDefense queen_hand_small_defence = {{0, 0, 0, 0, 0}};
 
-__declspec(section ".data") BattleUnitDefenseAttr queen_hand_small_defence_attr = {{0, 0, 0, 0, 0}};
+BattleUnitDefenseAttr queen_hand_small_defence_attr = {{0, 0, 0, 0, 0}};
 
-__declspec(section ".data") StatusVulnerability queen_hand_small_regist = {30, 30, 30, 0, 30, 0, 100, 0, 0, 0, 0, 0, 0, 80, 30, 0, 0, 0, 0, 0, 0, 0};
+StatusVulnerability queen_hand_small_regist = {30, 30, 30, 0, 30, 0, 100, 0, 0, 0, 0, 0, 0, 80, 30, 0, 0, 0, 0, 0, 0, 0};
 
 PoseTableEntry queen_hand_small_pose_table[] = {
     {28, "KRT_S_1"},
@@ -1362,7 +1362,7 @@ PoseTableEntry queen_hand_small_pose_table[] = {
     {69, "KRT_S_1"},
 };
 
-__declspec(section ".data") BattleDataEntry queen_hand_small_data_table[] = {
+BattleDataEntry queen_hand_small_data_table[] = {
     {49, queen_hand_small_dead_event},
     {0, NULL},
 };
@@ -1371,7 +1371,7 @@ BattleUnitKindPart queen_hand_small_parts[] = {
     {1, "btl_un_shadow_hand_small", "c_b_hand", 0.0f, 0.0f, 0.0f, 70.0f, 18.0f, 0.0f, 70.0f, 18.0f, 0.0f, 188, 40, 255, &queen_hand_small_defence, &queen_hand_small_defence_attr, 0x3008009, 0, queen_hand_small_pose_table},
 };
 
-__declspec(section ".data") BattleUnitSetup entry_shadow_queen = {
+BattleUnitSetup entry_shadow_queen = {
     &unit_boss_shadow_queen, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -1382,7 +1382,7 @@ __declspec(section ".data") BattleUnitSetup entry_shadow_queen = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_shadow_hand_1 = {
+BattleUnitSetup entry_shadow_hand_1 = {
     &unit_boss_shadow_hand_1, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -1393,7 +1393,7 @@ __declspec(section ".data") BattleUnitSetup entry_shadow_hand_1 = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_shadow_hand_2 = {
+BattleUnitSetup entry_shadow_hand_2 = {
     &unit_boss_shadow_hand_2, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -1404,7 +1404,7 @@ __declspec(section ".data") BattleUnitSetup entry_shadow_hand_2 = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_shadow_hand_small = {
+BattleUnitSetup entry_shadow_hand_small = {
     &unit_boss_shadow_hand_small, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -1804,7 +1804,7 @@ EVT_BEGIN(peach_phase_event)
 EVT_END()
 #endif
 
-__declspec(section ".data") EVT_BEGIN(peach_dead_event)
+EVT_BEGIN(peach_dead_event)
     CALL(btlevtcmd_WaitAttackEnd)
     CALL_CHILD(PTR(peach_change_evt))
     CALL(btlevtcmd_StartWaitEvent, -2)
@@ -2216,7 +2216,7 @@ EVT_BEGIN(peach_attack_event)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(peach_wait_event)
+EVT_BEGIN(peach_wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
@@ -3518,7 +3518,7 @@ EVT_BEGIN(queen_dead_event)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(queen_wait_event)
+EVT_BEGIN(queen_wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 3)
     RETURN
@@ -3858,7 +3858,7 @@ EVT_BEGIN(queen_hand_1_dead_event)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(queen_hand_1_wait_event)
+EVT_BEGIN(queen_hand_1_wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
@@ -3963,7 +3963,7 @@ EVT_BEGIN(queen_hand_2_dead_event)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(queen_hand_2_wait_event)
+EVT_BEGIN(queen_hand_2_wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
@@ -4327,7 +4327,7 @@ EVT_BEGIN(queen_hand_small_dead_event)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(queen_hand_small_wait_event)
+EVT_BEGIN(queen_hand_small_wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

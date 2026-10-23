@@ -7,60 +7,60 @@ USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_SetEventWait);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 
-__declspec(section ".data") f32 fd_act_kinopio_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_act_kinopio_neg_one_382;
-__declspec(section ".data") f32 fd_act_kinopio___local_PI_383;
-__declspec(section ".data") f32 fd_act_kinopio___local_3PIO2_385;
-__declspec(section ".data") f32 fd_act_kinopio_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_act_kinopio___local_PIO2_384;
-__declspec(section ".data") f32 fd_act_kinopio_one_381;
-__declspec(section ".data") f32 fd_act_kinopio_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_act_kinopio_neg_one_365;
-__declspec(section ".data") f32 fd_act_kinopio___local_PI_366;
-__declspec(section ".data") f32 fd_act_kinopio___local_3PIO2_368;
-__declspec(section ".data") f32 fd_act_kinopio_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_act_kinopio___local_PIO2_367;
-__declspec(section ".data") f32 fd_act_kinopio_one_364;
+f32 fd_act_kinopio_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_act_kinopio_neg_one_382;
+f32 fd_act_kinopio___local_PI_383;
+f32 fd_act_kinopio___local_3PIO2_385;
+f32 fd_act_kinopio_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_act_kinopio___local_PIO2_384;
+f32 fd_act_kinopio_one_381;
+f32 fd_act_kinopio_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_act_kinopio_neg_one_365;
+f32 fd_act_kinopio___local_PI_366;
+f32 fd_act_kinopio___local_3PIO2_368;
+f32 fd_act_kinopio_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_act_kinopio___local_PIO2_367;
+f32 fd_act_kinopio_one_364;
 BattleUnitKind unit_act_kinopio;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[7];
-static __declspec(section ".data") BattleDataEntry data_table[1];
+static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
-static __declspec(section ".data") s32 init_event[9];
-static __declspec(section ".data") s32 damage_event[2];
-static __declspec(section ".data") s32 phase_event[2];
-static __declspec(section ".data") s32 attack_event[2];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 init_event[9];
+static s32 damage_event[2];
+static s32 phase_event[2];
+static s32 attack_event[2];
+static s32 wait_event[6];
 
-__declspec(section ".data") f32 fd_act_kinopio_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_act_kinopio_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_act_kinopio_neg_one_382 = -1.0f;
+f32 fd_act_kinopio_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_act_kinopio___local_PI_383 = 3.1415927f;
+f32 fd_act_kinopio___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_act_kinopio___local_3PIO2_385 = 4.712389f;
+f32 fd_act_kinopio___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_act_kinopio_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_act_kinopio_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_act_kinopio___local_PIO2_384 = 1.5707964f;
+f32 fd_act_kinopio___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_act_kinopio_one_381 = 1.0f;
+f32 fd_act_kinopio_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_act_kinopio_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_act_kinopio_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_act_kinopio_neg_one_365 = -1.0f;
+f32 fd_act_kinopio_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_act_kinopio___local_PI_366 = 3.1415927f;
+f32 fd_act_kinopio___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_act_kinopio___local_3PIO2_368 = 4.712389f;
+f32 fd_act_kinopio___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_act_kinopio_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_act_kinopio_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_act_kinopio___local_PIO2_367 = 1.5707964f;
+f32 fd_act_kinopio___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_act_kinopio_one_364 = 1.0f;
+f32 fd_act_kinopio_one_364 = 1.0f;
 
 BattleUnitKind unit_act_kinopio = {
     185,
@@ -128,11 +128,11 @@ BattleUnitKind unit_act_kinopio = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 static PoseTableEntry pose_table[] = {
     {28, "KNP_S_1"},
@@ -144,7 +144,7 @@ static PoseTableEntry pose_table[] = {
     {69, "KNP_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
@@ -152,25 +152,25 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_teresa", "c_kinopio\0\0", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
-static __declspec(section ".data") EVT_BEGIN(init_event)
+static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(phase_event)
+static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(attack_event)
+static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

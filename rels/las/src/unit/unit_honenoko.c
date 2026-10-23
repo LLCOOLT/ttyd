@@ -34,31 +34,31 @@ USER_FUNC(btlevtcmd_check_battleflag);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(honenoko_copy_status);
 
-__declspec(section ".data") f32 fd_honenoko_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_honenoko_neg_one_382;
-__declspec(section ".data") f32 fd_honenoko___local_PI_383;
-__declspec(section ".data") f32 fd_honenoko___local_3PIO2_385;
-__declspec(section ".data") f32 fd_honenoko_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_honenoko___local_PIO2_384;
-__declspec(section ".data") f32 fd_honenoko_one_381;
-__declspec(section ".data") f32 fd_honenoko_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_honenoko_neg_one_365;
-__declspec(section ".data") f32 fd_honenoko___local_PI_366;
-__declspec(section ".data") f32 fd_honenoko___local_3PIO2_368;
-__declspec(section ".data") f32 fd_honenoko_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_honenoko___local_PIO2_367;
-__declspec(section ".data") f32 fd_honenoko_one_364;
+f32 fd_honenoko_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_honenoko_neg_one_382;
+f32 fd_honenoko___local_PI_383;
+f32 fd_honenoko___local_3PIO2_385;
+f32 fd_honenoko_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_honenoko___local_PIO2_384;
+f32 fd_honenoko_one_381;
+f32 fd_honenoko_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_honenoko_neg_one_365;
+f32 fd_honenoko___local_PI_366;
+f32 fd_honenoko___local_3PIO2_368;
+f32 fd_honenoko_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_honenoko___local_PIO2_367;
+f32 fd_honenoko_one_364;
 BattleUnitKind unit_honenoko;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static BattleUnitKindPart parts[4];
 static BattleWeapon weapon_honenoko_attack;
-static __declspec(section ".data") BattleUnitSetup entry_honenoko;
+static BattleUnitSetup entry_honenoko;
 static PoseTableEntry pose_table[19];
-static __declspec(section ".data") BattleDataEntry data_table[4];
+static BattleDataEntry data_table[4];
 static s32 init_event[31];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 static s32 dead_event[190];
 static s32 fake_dead_event[165];
 static s32 rebirth_event[67];
@@ -66,7 +66,7 @@ static s32 attack_event[185];
 static s32 start_avoid[26];
 static s32 normal_attack_event[428];
 static s32 call_friend_event[311];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
 static USER_FUNC(honenoko_copy_status) {
     s32* args = event->args;
@@ -81,33 +81,33 @@ static USER_FUNC(honenoko_copy_status) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_honenoko_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_honenoko_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_honenoko_neg_one_382 = -1.0f;
+f32 fd_honenoko_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_honenoko___local_PI_383 = 3.1415927f;
+f32 fd_honenoko___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_honenoko___local_3PIO2_385 = 4.712389f;
+f32 fd_honenoko___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_honenoko_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_honenoko_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_honenoko___local_PIO2_384 = 1.5707964f;
+f32 fd_honenoko___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_honenoko_one_381 = 1.0f;
+f32 fd_honenoko_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_honenoko_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_honenoko_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_honenoko_neg_one_365 = -1.0f;
+f32 fd_honenoko_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_honenoko___local_PI_366 = 3.1415927f;
+f32 fd_honenoko___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_honenoko___local_3PIO2_368 = 4.712389f;
+f32 fd_honenoko___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_honenoko_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_honenoko_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_honenoko___local_PIO2_367 = 1.5707964f;
+f32 fd_honenoko___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_honenoko_one_364 = 1.0f;
+f32 fd_honenoko_one_364 = 1.0f;
 
 BattleUnitKind unit_honenoko = {
     17,
@@ -175,11 +175,11 @@ BattleUnitKind unit_honenoko = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
+static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {0, 95, 50, 0, 50, 100, 100, 90, 100, 100, 100, 100, 100, 95, 90, 10, 90, 100, 90, 100, 100, 50};
+static StatusVulnerability regist = {0, 95, 50, 0, 50, 100, 100, 90, 100, 100, 100, 100, 100, 95, 90, 10, 90, 100, 90, 100, 100, 50};
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_honenoko", "c_karon_g_h", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -224,7 +224,7 @@ static BattleWeapon weapon_honenoko_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitSetup entry_honenoko = {
+static BattleUnitSetup entry_honenoko = {
     &unit_honenoko, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -257,7 +257,7 @@ static PoseTableEntry pose_table[] = {
     {69, "KRN_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, dead_event},
     {15, fake_dead_event},
     {48, btldefaultevt_Dummy},
@@ -275,7 +275,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -684,7 +684,7 @@ static EVT_BEGIN(call_friend_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

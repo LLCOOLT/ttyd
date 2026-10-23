@@ -28,58 +28,58 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 
-__declspec(section ".data") f32 fd_gra_02_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gra_02_neg_one_382;
-__declspec(section ".data") f32 fd_gra_02___local_PI_383;
-__declspec(section ".data") f32 fd_gra_02___local_3PIO2_385;
-__declspec(section ".data") f32 fd_gra_02_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gra_02___local_PIO2_384;
-__declspec(section ".data") f32 fd_gra_02_one_381;
-__declspec(section ".data") f32 fd_gra_02_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gra_02_neg_one_365;
-__declspec(section ".data") f32 fd_gra_02___local_PI_366;
-__declspec(section ".data") f32 fd_gra_02___local_3PIO2_368;
-__declspec(section ".data") f32 fd_gra_02_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gra_02___local_PIO2_367;
-__declspec(section ".data") f32 fd_gra_02_one_364;
+f32 fd_gra_02_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_gra_02_neg_one_382;
+f32 fd_gra_02___local_PI_383;
+f32 fd_gra_02___local_3PIO2_385;
+f32 fd_gra_02_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_gra_02___local_PIO2_384;
+f32 fd_gra_02_one_381;
+f32 fd_gra_02_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_gra_02_neg_one_365;
+f32 fd_gra_02___local_PI_366;
+f32 fd_gra_02___local_3PIO2_368;
+f32 fd_gra_02_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_gra_02___local_PIO2_367;
+f32 fd_gra_02_one_364;
 s32 shopmaster_pig_init[14];
 s32 shopmaster_talk[33];
 static s32 urouro_move[24];
 static NpcSetupInfo npcEnt[2];
-__declspec(section ".data") s32 w_bero_2_in[5];
+s32 w_bero_2_in[5];
 static BeroEntry bero_entry_data[5];
-__declspec(section ".data") s32 gra02_get_key[5];
+s32 gra02_get_key[5];
 s32 gra02_straw_blow_evt[23];
-static __declspec(section ".data") const char* booboo_name[1];
+static const char* booboo_name[1];
 s32 gra_02_init_evt[86];
 
-__declspec(section ".data") f32 fd_gra_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gra_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gra_02_neg_one_382 = -1.0f;
+f32 fd_gra_02_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_gra_02___local_PI_383 = 3.1415927f;
+f32 fd_gra_02___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gra_02___local_3PIO2_385 = 4.712389f;
+f32 fd_gra_02___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gra_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gra_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gra_02___local_PIO2_384 = 1.5707964f;
+f32 fd_gra_02___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gra_02_one_381 = 1.0f;
+f32 fd_gra_02_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_gra_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gra_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gra_02_neg_one_365 = -1.0f;
+f32 fd_gra_02_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_gra_02___local_PI_366 = 3.1415927f;
+f32 fd_gra_02___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gra_02___local_3PIO2_368 = 4.712389f;
+f32 fd_gra_02___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gra_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gra_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gra_02___local_PIO2_367 = 1.5707964f;
+f32 fd_gra_02___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gra_02_one_364 = 1.0f;
+f32 fd_gra_02_one_364 = 1.0f;
 
 EVT_BEGIN(shopmaster_pig_init)
     SWITCH(GSW(0))
@@ -126,7 +126,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-__declspec(section ".data") EVT_BEGIN(w_bero_2_in)
+EVT_BEGIN(w_bero_2_in)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
@@ -200,7 +200,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-__declspec(section ".data") EVT_BEGIN(gra02_get_key)
+EVT_BEGIN(gra02_get_key)
     SET_VALUE(GSW(0), 184)
     RETURN
 EVT_END()
@@ -217,7 +217,7 @@ EVT_BEGIN(gra02_straw_blow_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* booboo_name[] = {
+static const char* booboo_name[] = {
     /*"ブタお店の主人"*/"\x83\x75\x83\x5E\x82\xA8\x93\x58\x82\xCC\x8E\xE5\x90\x6C",
 };
 

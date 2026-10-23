@@ -72,24 +72,24 @@ static USER_FUNC(eff_magic_get_posX);
 static USER_FUNC(eff_magic);
 static USER_FUNC(hand_end);
 
-__declspec(section ".data") f32 fd_mahorn_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mahorn_neg_one_382;
-__declspec(section ".data") f32 fd_mahorn___local_PI_383;
-__declspec(section ".data") f32 fd_mahorn___local_3PIO2_385;
-__declspec(section ".data") f32 fd_mahorn_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mahorn___local_PIO2_384;
-__declspec(section ".data") f32 fd_mahorn_one_381;
-__declspec(section ".data") f32 fd_mahorn_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mahorn_neg_one_365;
-__declspec(section ".data") f32 fd_mahorn___local_PI_366;
-__declspec(section ".data") f32 fd_mahorn___local_3PIO2_368;
-__declspec(section ".data") f32 fd_mahorn_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mahorn___local_PIO2_367;
-__declspec(section ".data") f32 fd_mahorn_one_364;
+f32 fd_mahorn_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_mahorn_neg_one_382;
+f32 fd_mahorn___local_PI_383;
+f32 fd_mahorn___local_3PIO2_385;
+f32 fd_mahorn_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_mahorn___local_PIO2_384;
+f32 fd_mahorn_one_381;
+f32 fd_mahorn_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_mahorn_neg_one_365;
+f32 fd_mahorn___local_PI_366;
+f32 fd_mahorn___local_3PIO2_368;
+f32 fd_mahorn_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_mahorn___local_PIO2_367;
+f32 fd_mahorn_one_364;
 BattleUnitKind unit_mahorn;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static BattleUnitKindPart parts[5];
 static BattleWeapon weapon_mahorn_attack_magic;
 static BattleWeapon weapon_mahorn_all_attack_magic;
@@ -99,14 +99,14 @@ BattleWeapon weapon_mahorn_confuse_magic;
 static BattleWeapon weapon_mahorn_recover_magic;
 static s32 attack_event[152];
 static PoseTableEntry pose_table[17];
-static __declspec(section ".data") BattleDataEntry data_table[3];
-static __declspec(section ".data") BattleDataEntry data_table_bunsin[3];
+static BattleDataEntry data_table[3];
+static BattleDataEntry data_table_bunsin[3];
 static s32 init_event[88];
 static s32 alpha_down_event[98];
 static s32 alpha_up_event[118];
 static s32 hand_ctrl_event[23];
-static __declspec(section ".data") s32 damage_event[10];
-static __declspec(section ".data") s32 avoid_miss_event[2];
+static s32 damage_event[10];
+static s32 avoid_miss_event[2];
 static s32 attack_punch_event[429];
 static s32 start_avoid[26];
 static s32 attack_enemy_common_event[299];
@@ -126,33 +126,33 @@ static s32 yokeyoke_magic_event[75];
 static s32 recover_magic_event[96];
 static s32 wait_event[386];
 
-__declspec(section ".data") f32 fd_mahorn_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mahorn_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mahorn_neg_one_382 = -1.0f;
+f32 fd_mahorn_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_mahorn___local_PI_383 = 3.1415927f;
+f32 fd_mahorn___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mahorn___local_3PIO2_385 = 4.712389f;
+f32 fd_mahorn___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mahorn_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mahorn_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mahorn___local_PIO2_384 = 1.5707964f;
+f32 fd_mahorn___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mahorn_one_381 = 1.0f;
+f32 fd_mahorn_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_mahorn_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mahorn_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mahorn_neg_one_365 = -1.0f;
+f32 fd_mahorn_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_mahorn___local_PI_366 = 3.1415927f;
+f32 fd_mahorn___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mahorn___local_3PIO2_368 = 4.712389f;
+f32 fd_mahorn___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mahorn_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mahorn_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mahorn___local_PIO2_367 = 1.5707964f;
+f32 fd_mahorn___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mahorn_one_364 = 1.0f;
+f32 fd_mahorn_one_364 = 1.0f;
 
 BattleUnitKind unit_mahorn = {
     161,
@@ -220,11 +220,11 @@ BattleUnitKind unit_mahorn = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{3, 3, 3, 3, 3}};
+static BattleUnitDefense defence = {{3, 3, 3, 3, 3}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {10, 50, 90, 100, 40, 100, 100, 50, 100, 85, 100, 85, 100, 90, 40, 30, 85, 100, 40, 100, 100, 40};
+static StatusVulnerability regist = {10, 50, 90, 100, 40, 100, 100, 50, 100, 85, 100, 85, 100, 90, 40, 30, 85, 100, 40, 100, 100, 40};
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_mahorn", "c_maho", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -546,13 +546,13 @@ static PoseTableEntry pose_table[] = {
     {69, "MAH_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {46, avoid_miss_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table_bunsin[] = {
+static BattleDataEntry data_table_bunsin[] = {
     {46, avoid_miss_event},
     {48, btldefaultevt_Dummy},
     {0},
@@ -652,14 +652,14 @@ static EVT_BEGIN(hand_ctrl_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(avoid_miss_event)
+static EVT_BEGIN(avoid_miss_event)
     RETURN
 EVT_END()
 

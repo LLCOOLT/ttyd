@@ -36,23 +36,23 @@ USER_FUNC(evt_snd_sfxoff);
 USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_snd_sfxon_3d);
 
-__declspec(section ".data") f32 fd_hei_05_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hei_05_neg_one_382;
-__declspec(section ".data") f32 fd_hei_05___local_PI_383;
-__declspec(section ".data") f32 fd_hei_05___local_3PIO2_385;
-__declspec(section ".data") f32 fd_hei_05_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hei_05___local_PIO2_384;
-__declspec(section ".data") f32 fd_hei_05_one_381;
-__declspec(section ".data") f32 fd_hei_05_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hei_05_neg_one_365;
-__declspec(section ".data") f32 fd_hei_05___local_PI_366;
-__declspec(section ".data") f32 fd_hei_05___local_3PIO2_368;
-__declspec(section ".data") f32 fd_hei_05_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hei_05___local_PIO2_367;
-__declspec(section ".data") f32 fd_hei_05_one_364;
+f32 fd_hei_05_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_hei_05_neg_one_382;
+f32 fd_hei_05___local_PI_383;
+f32 fd_hei_05___local_3PIO2_385;
+f32 fd_hei_05_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_hei_05___local_PIO2_384;
+f32 fd_hei_05_one_381;
+f32 fd_hei_05_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_hei_05_neg_one_365;
+f32 fd_hei_05___local_PI_366;
+f32 fd_hei_05___local_3PIO2_368;
+f32 fd_hei_05_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_hei_05___local_PIO2_367;
+f32 fd_hei_05_one_364;
 static BeroEntry bero_entry_data[3];
-static __declspec(section ".data") s32 dead_evt1[10];
-static __declspec(section ".data") s32 dead_evt2[10];
+static s32 dead_evt1[10];
+static s32 dead_evt2[10];
 static NpcSetupInfo npcEnt[3];
 static s32 door_open[98];
 static s32 shake_evt[39];
@@ -60,33 +60,33 @@ static s32 hashira_evt_sub[52];
 static s32 hashira_evt[128];
 s32 hei_05_init_evt[151];
 
-__declspec(section ".data") f32 fd_hei_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hei_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hei_05_neg_one_382 = -1.0f;
+f32 fd_hei_05_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_hei_05___local_PI_383 = 3.1415927f;
+f32 fd_hei_05___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hei_05___local_3PIO2_385 = 4.712389f;
+f32 fd_hei_05___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hei_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hei_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hei_05___local_PIO2_384 = 1.5707964f;
+f32 fd_hei_05___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hei_05_one_381 = 1.0f;
+f32 fd_hei_05_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_hei_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hei_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hei_05_neg_one_365 = -1.0f;
+f32 fd_hei_05_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_hei_05___local_PI_366 = 3.1415927f;
+f32 fd_hei_05___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hei_05___local_3PIO2_368 = 4.712389f;
+f32 fd_hei_05___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hei_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hei_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hei_05___local_PIO2_367 = 1.5707964f;
+f32 fd_hei_05___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hei_05_one_364 = 1.0f;
+f32 fd_hei_05_one_364 = 1.0f;
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -124,14 +124,14 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-static __declspec(section ".data") EVT_BEGIN(dead_evt1)
+static EVT_BEGIN(dead_evt1)
     SET_VALUE(GSWF(1792), 1)
     SET_VALUE(GSWF(1793), 1)
     CALL_CHILD(PTR(enemy_common_dead_event))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dead_evt2)
+static EVT_BEGIN(dead_evt2)
     SET_VALUE(GSWF(1793), 1)
     SET_VALUE(GSWF(1792), 1)
     CALL_CHILD(PTR(enemy_common_dead_event))

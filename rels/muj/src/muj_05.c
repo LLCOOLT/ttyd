@@ -119,48 +119,48 @@ USER_FUNC(evt_sub_random);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(muj_npc_guruguru);
 
-__declspec(section ".data") f32 fd_muj_05_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_05_neg_one_382;
-__declspec(section ".data") f32 fd_muj_05___local_PI_383;
-__declspec(section ".data") f32 fd_muj_05___local_3PIO2_385;
-__declspec(section ".data") f32 fd_muj_05_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_05___local_PIO2_384;
-__declspec(section ".data") f32 fd_muj_05_one_381;
-__declspec(section ".data") f32 fd_muj_05_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_05_neg_one_365;
-__declspec(section ".data") f32 fd_muj_05___local_PI_366;
-__declspec(section ".data") f32 fd_muj_05___local_3PIO2_368;
-__declspec(section ".data") f32 fd_muj_05_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_05___local_PIO2_367;
-__declspec(section ".data") f32 fd_muj_05_one_364;
+f32 fd_muj_05_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_muj_05_neg_one_382;
+f32 fd_muj_05___local_PI_383;
+f32 fd_muj_05___local_3PIO2_385;
+f32 fd_muj_05_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_muj_05___local_PIO2_384;
+f32 fd_muj_05_one_381;
+f32 fd_muj_05_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_muj_05_neg_one_365;
+f32 fd_muj_05___local_PI_366;
+f32 fd_muj_05___local_3PIO2_368;
+f32 fd_muj_05_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_muj_05___local_PIO2_367;
+f32 fd_muj_05_one_364;
 s32 sanders_rotate[28];
 s32 sanders_nakama_sub[13];
 s32 sanders_nakama[173];
 static s32 sanders_init[51];
-static __declspec(section ".data") s32 itemsel_table01[2];
+static s32 itemsel_table01[2];
 s32 sanders_talk_sub[70];
 static s32 sanders_talk[178];
 static s32 marco_init[24];
 static s32 marco_talk[146];
-static __declspec(section ".data") s32 erumosu_regl[4];
+static s32 erumosu_regl[4];
 s32 erumosu_a_dead[23];
-__declspec(section ".data") s32 erumosu_b_dead[12];
+s32 erumosu_b_dead[12];
 static NpcSetupInfo npcEnt[5];
 NpcSetupInfo npcEnt_after[3];
 static BeroEntry bero_entry_data[3];
 s32 hammer_sub[27];
-__declspec(section ".data") s32 hammer_event[10];
+s32 hammer_event[10];
 s32 sanders_kyushutsu_sub[250];
 s32 erumosu_guruguru[13];
-__declspec(section ".data") s32 erumosu_guruguru_dir[11];
+s32 erumosu_guruguru_dir[11];
 s32 sanders_kyushutsu[63];
-__declspec(section ".data") s32 marco_hanauta[2];
+s32 marco_hanauta[2];
 s32 marco_and_jewel[84];
 s32 blueeye_flush[78];
 s32 redeye_flush[78];
 s32 dokuroiwa_flush[51];
-__declspec(section ".data") s32 command_seikai[7];
-static __declspec(section ".data") s32 itemsel_table[2];
+s32 command_seikai[7];
+static s32 itemsel_table[2];
 s32 dokuroiwa_touch[127];
 s32 case_event_entry[45];
 s32 case_event_delete[42];
@@ -173,7 +173,7 @@ s32 iwa01_ride_a[20];
 s32 iwa02_ride[66];
 s32 iwa02_hammer[20];
 s32 iwa02_ride_a[28];
-__declspec(section ".data") s32 iwa02_nonride_a[5];
+s32 iwa02_nonride_a[5];
 static s32 bombwall_bomb[143];
 s32 dokuroiwa_bomb[309];
 s32 dokuroiwa_init[123];
@@ -229,33 +229,33 @@ USER_FUNC(evt_dokuroiwa_command_init) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_muj_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_05_neg_one_382 = -1.0f;
+f32 fd_muj_05_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj_05___local_PI_383 = 3.1415927f;
+f32 fd_muj_05___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj_05___local_3PIO2_385 = 4.712389f;
+f32 fd_muj_05___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj_05___local_PIO2_384 = 1.5707964f;
+f32 fd_muj_05___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_05_one_381 = 1.0f;
+f32 fd_muj_05_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_muj_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_05_neg_one_365 = -1.0f;
+f32 fd_muj_05_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj_05___local_PI_366 = 3.1415927f;
+f32 fd_muj_05___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj_05___local_3PIO2_368 = 4.712389f;
+f32 fd_muj_05___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj_05___local_PIO2_367 = 1.5707964f;
+f32 fd_muj_05___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_05_one_364 = 1.0f;
+f32 fd_muj_05_one_364 = 1.0f;
 
 EVT_BEGIN(sanders_rotate)
     CALL(evt_sub_intpl_msec_init, 0, LW(1), LW(2), LW(3))
@@ -348,7 +348,7 @@ static EVT_BEGIN(sanders_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 itemsel_table01[] = {
+static s32 itemsel_table01[] = {
     ITEM_CHUCKOLA_COLA, -1,
 };
 
@@ -487,7 +487,7 @@ static EVT_BEGIN(marco_talk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(erumosu_regl)
+static EVT_BEGIN(erumosu_regl)
     WAIT_WHILE(1)
     RETURN
 EVT_END()
@@ -501,7 +501,7 @@ EVT_BEGIN(erumosu_a_dead)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(erumosu_b_dead)
+EVT_BEGIN(erumosu_b_dead)
     DELETE_EVENT(GW(1))
     DELETE_EVENT(GW(3))
     CALL(evt_npc_set_position, STRING("エルモス２"), 0, -1000, 0)
@@ -642,7 +642,7 @@ EVT_BEGIN(hammer_sub)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(hammer_event)
+EVT_BEGIN(hammer_event)
     CALL(evt_run_case_evt, 13, 1, STRING("A_ki_02_01"), 0, PTR(hammer_sub), 0)
     RETURN
 EVT_END()
@@ -733,7 +733,7 @@ EVT_BEGIN(erumosu_guruguru)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(erumosu_guruguru_dir)
+EVT_BEGIN(erumosu_guruguru_dir)
     LOOP(0)
         CALL(evt_set_dir_to_target, LW(0), STRING("サンダース"))
         WAIT_FRAMES(1)
@@ -761,7 +761,7 @@ EVT_BEGIN(sanders_kyushutsu)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(marco_hanauta)
+EVT_BEGIN(marco_hanauta)
     RETURN
 EVT_END()
 
@@ -837,11 +837,11 @@ EVT_BEGIN(dokuroiwa_flush)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 command_seikai[] = {
+s32 command_seikai[] = {
     2, 2, 2, 1, 1, 1, 1,
 };
 
-static __declspec(section ".data") s32 itemsel_table[] = {
+static s32 itemsel_table[] = {
     ITEM_SKULL_GEM, -1,
 };
 
@@ -1127,7 +1127,7 @@ EVT_BEGIN(iwa02_ride_a)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(iwa02_nonride_a)
+EVT_BEGIN(iwa02_nonride_a)
     SET_VALUE(GW(13), 0)
     RETURN
 EVT_END()

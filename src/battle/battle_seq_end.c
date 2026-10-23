@@ -199,19 +199,19 @@ RankUpData _rank_up_data[] = {
     {30, 3, "msg_menu_mario_name_3", "butai_03"},
     {0xFFFF, 0, NULL, NULL},
 };
-__declspec(section ".sdata") EVT_BEGIN(_event_MajinaiEnd)
+EVT_BEGIN(_event_MajinaiEnd)
     CALL(btlevtcmd_AnnounceMessage, 0, 0, -36, STRING("btl_msg_mj_last"), 60)
     WAIT_FRAMES(60)
     RETURN
 EVT_END()
 
 #ifdef VERSION_G8ME01
-__declspec(section ".sdata") s32 hp_tex_tbl[6] = {52, 52, 53, 54, 54, 55};
-__declspec(section ".sdata") s32 fp_tex_tbl[6] = {56, 56, 57, 58, 58, 58};
-__declspec(section ".sdata") s32 bp_tex_tbl[6] = {59, 59, 60, 61, 62, 63};
+s32 hp_tex_tbl[6] = {52, 52, 53, 54, 54, 55};
+s32 fp_tex_tbl[6] = {56, 56, 57, 58, 58, 58};
+s32 bp_tex_tbl[6] = {59, 59, 60, 61, 62, 63};
 #endif
 
-__declspec(section ".sdata") EVT_BEGIN(_rank_up_event)
+EVT_BEGIN(_rank_up_event)
     CALL(_get_rank_up_msg, LW(0))
     CALL(evt_msg_print, 0, LW(0), 0, 0)
     RETURN

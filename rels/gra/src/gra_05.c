@@ -60,64 +60,64 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 
-__declspec(section ".data") f32 fd_gra_05_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gra_05_neg_one_382;
-__declspec(section ".data") f32 fd_gra_05___local_PI_383;
-__declspec(section ".data") f32 fd_gra_05___local_3PIO2_385;
-__declspec(section ".data") f32 fd_gra_05_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gra_05___local_PIO2_384;
-__declspec(section ".data") f32 fd_gra_05_one_381;
-__declspec(section ".data") f32 fd_gra_05_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gra_05_neg_one_365;
-__declspec(section ".data") f32 fd_gra_05___local_PI_366;
-__declspec(section ".data") f32 fd_gra_05___local_3PIO2_368;
-__declspec(section ".data") f32 fd_gra_05_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gra_05___local_PIO2_367;
-__declspec(section ".data") f32 fd_gra_05_one_364;
-__declspec(section ".data") s32 gra_05_in_01[5];
+f32 fd_gra_05_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_gra_05_neg_one_382;
+f32 fd_gra_05___local_PI_383;
+f32 fd_gra_05___local_3PIO2_385;
+f32 fd_gra_05_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_gra_05___local_PIO2_384;
+f32 fd_gra_05_one_381;
+f32 fd_gra_05_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_gra_05_neg_one_365;
+f32 fd_gra_05___local_PI_366;
+f32 fd_gra_05___local_3PIO2_368;
+f32 fd_gra_05_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_gra_05___local_PIO2_367;
+f32 fd_gra_05_one_364;
+s32 gra_05_in_01[5];
 s32 gra_05_out_01[149];
-__declspec(section ".data") s32 gra_05_in_02[5];
+s32 gra_05_in_02[5];
 s32 gra_05_out_02[149];
-static __declspec(section ".data") s32 in_evt[5];
+static s32 in_evt[5];
 static s32 out_evt[113];
 static s32 out_evt2[150];
 static BeroEntry bero_entry_data[7];
 s32 gra_05_futa_open_evt[28];
 s32 evt_gra_05iwa_move_init[31];
 s32 evt_gra_05iwa_move_evt[186];
-__declspec(section ".data") s32 evt_break_floor[7];
-static __declspec(section ".data") const char* fukitobashi_tbl[4];
+s32 evt_break_floor[7];
+static const char* fukitobashi_tbl[4];
 s32 gra_05_init_evt[108];
 
-__declspec(section ".data") f32 fd_gra_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gra_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gra_05_neg_one_382 = -1.0f;
+f32 fd_gra_05_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_gra_05___local_PI_383 = 3.1415927f;
+f32 fd_gra_05___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gra_05___local_3PIO2_385 = 4.712389f;
+f32 fd_gra_05___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gra_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gra_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gra_05___local_PIO2_384 = 1.5707964f;
+f32 fd_gra_05___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gra_05_one_381 = 1.0f;
+f32 fd_gra_05_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_gra_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gra_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gra_05_neg_one_365 = -1.0f;
+f32 fd_gra_05_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_gra_05___local_PI_366 = 3.1415927f;
+f32 fd_gra_05___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gra_05___local_3PIO2_368 = 4.712389f;
+f32 fd_gra_05___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gra_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gra_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gra_05___local_PIO2_367 = 1.5707964f;
+f32 fd_gra_05___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gra_05_one_364 = 1.0f;
+f32 fd_gra_05_one_364 = 1.0f;
 
-__declspec(section ".data") EVT_BEGIN(gra_05_in_01)
+EVT_BEGIN(gra_05_in_01)
     SET_VALUE(LW(0), 1)
     RETURN
 EVT_END()
@@ -169,7 +169,7 @@ EVT_BEGIN(gra_05_out_01)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(gra_05_in_02)
+EVT_BEGIN(gra_05_in_02)
     SET_VALUE(LW(0), 1)
     RETURN
 EVT_END()
@@ -221,7 +221,7 @@ EVT_BEGIN(gra_05_out_02)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(in_evt)
+static EVT_BEGIN(in_evt)
     SET_VALUE(LW(0), 1)
     RETURN
 EVT_END()
@@ -484,13 +484,13 @@ EVT_BEGIN(evt_gra_05iwa_move_evt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_break_floor)
+EVT_BEGIN(evt_break_floor)
     SET_VALUE(GSW(0), 191)
     CALL(camera_curve_on)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* fukitobashi_tbl[] = {
+static const char* fukitobashi_tbl[] = {
     "S_futa",
     "S_kura",
     "S_gra04_kusa",

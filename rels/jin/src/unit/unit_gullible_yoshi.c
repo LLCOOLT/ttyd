@@ -19,60 +19,60 @@ USER_FUNC(btlevtcmd_SetEventWait);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(yoshi_original_color_anim_set);
 
-__declspec(section ".data") f32 fd_gullible_yoshi_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_yoshi_neg_one_382;
-__declspec(section ".data") f32 fd_gullible_yoshi___local_PI_383;
-__declspec(section ".data") f32 fd_gullible_yoshi___local_3PIO2_385;
-__declspec(section ".data") f32 fd_gullible_yoshi_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_yoshi___local_PIO2_384;
-__declspec(section ".data") f32 fd_gullible_yoshi_one_381;
-__declspec(section ".data") f32 fd_gullible_yoshi_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_yoshi_neg_one_365;
-__declspec(section ".data") f32 fd_gullible_yoshi___local_PI_366;
-__declspec(section ".data") f32 fd_gullible_yoshi___local_3PIO2_368;
-__declspec(section ".data") f32 fd_gullible_yoshi_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_yoshi___local_PIO2_367;
-__declspec(section ".data") f32 fd_gullible_yoshi_one_364;
+f32 fd_gullible_yoshi_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_gullible_yoshi_neg_one_382;
+f32 fd_gullible_yoshi___local_PI_383;
+f32 fd_gullible_yoshi___local_3PIO2_385;
+f32 fd_gullible_yoshi_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_gullible_yoshi___local_PIO2_384;
+f32 fd_gullible_yoshi_one_381;
+f32 fd_gullible_yoshi_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_gullible_yoshi_neg_one_365;
+f32 fd_gullible_yoshi___local_PI_366;
+f32 fd_gullible_yoshi___local_3PIO2_368;
+f32 fd_gullible_yoshi_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_gullible_yoshi___local_PIO2_367;
+f32 fd_gullible_yoshi_one_364;
 BattleUnitKind unit_gullible_yoshi;
 static BattleWeapon enemyWeapon_YoshiNormalAttack;
-static __declspec(section ".data") BattleUnitDefense defence_yoshi;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_yoshi;
-static __declspec(section ".data") StatusVulnerability regist_yoshi;
-static __declspec(section ".data") BattleDataEntry data_table_yoshi[2];
+static BattleUnitDefense defence_yoshi;
+static BattleUnitDefenseAttr defence_attr_yoshi;
+static StatusVulnerability regist_yoshi;
+static BattleDataEntry data_table_yoshi[2];
 static BattleUnitKindPart parts_yoshi[1];
 static s32 init_event_yoshi[24];
 s32 damage_event_yoshi[22];
 static s32 dead_event_yoshi[177];
 static s32 attack_event_yoshi[748];
-static __declspec(section ".data") s32 wait_event_yoshi[7];
+static s32 wait_event_yoshi[7];
 
-__declspec(section ".data") f32 fd_gullible_yoshi_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gullible_yoshi_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gullible_yoshi_neg_one_382 = -1.0f;
+f32 fd_gullible_yoshi_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_gullible_yoshi___local_PI_383 = 3.1415927f;
+f32 fd_gullible_yoshi___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gullible_yoshi___local_3PIO2_385 = 4.712389f;
+f32 fd_gullible_yoshi___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gullible_yoshi_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gullible_yoshi_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gullible_yoshi___local_PIO2_384 = 1.5707964f;
+f32 fd_gullible_yoshi___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gullible_yoshi_one_381 = 1.0f;
+f32 fd_gullible_yoshi_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_gullible_yoshi_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gullible_yoshi_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gullible_yoshi_neg_one_365 = -1.0f;
+f32 fd_gullible_yoshi_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_gullible_yoshi___local_PI_366 = 3.1415927f;
+f32 fd_gullible_yoshi___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gullible_yoshi___local_3PIO2_368 = 4.712389f;
+f32 fd_gullible_yoshi___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gullible_yoshi_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gullible_yoshi_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gullible_yoshi___local_PIO2_367 = 1.5707964f;
+f32 fd_gullible_yoshi___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gullible_yoshi_one_364 = 1.0f;
+f32 fd_gullible_yoshi_one_364 = 1.0f;
 
 BattleUnitKind unit_gullible_yoshi = {
     82,
@@ -176,13 +176,13 @@ static BattleWeapon enemyWeapon_YoshiNormalAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitDefense defence_yoshi = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence_yoshi = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_yoshi = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr_yoshi = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist_yoshi = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
+static StatusVulnerability regist_yoshi = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
 
-static __declspec(section ".data") BattleDataEntry data_table_yoshi[] = {
+static BattleDataEntry data_table_yoshi[] = {
     {49, dead_event_yoshi},
     {0, NULL},
 };
@@ -459,7 +459,7 @@ static EVT_BEGIN(attack_event_yoshi)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_yoshi)
+static EVT_BEGIN(wait_event_yoshi)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END_PAD()

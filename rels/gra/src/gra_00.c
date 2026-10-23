@@ -95,64 +95,64 @@ USER_FUNC(evt_win_nameent_wait);
 static USER_FUNC(zoom);
 void msg_callback(s32 type, void* param);
 
-__declspec(section ".data") f32 fd_gra_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gra_00_neg_one_382;
-__declspec(section ".data") f32 fd_gra_00___local_PI_383;
-__declspec(section ".data") f32 fd_gra_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_gra_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gra_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_gra_00_one_381;
-__declspec(section ".data") f32 fd_gra_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gra_00_neg_one_365;
-__declspec(section ".data") f32 fd_gra_00___local_PI_366;
-__declspec(section ".data") f32 fd_gra_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_gra_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gra_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_gra_00_one_364;
-__declspec(section ".data") f64 fd_gra_00__three_localstatic4_sqrtf;
-__declspec(section ".data") f64 fd_gra_00__half_localstatic3_sqrtf;
+f32 fd_gra_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_gra_00_neg_one_382;
+f32 fd_gra_00___local_PI_383;
+f32 fd_gra_00___local_3PIO2_385;
+f32 fd_gra_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_gra_00___local_PIO2_384;
+f32 fd_gra_00_one_381;
+f32 fd_gra_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_gra_00_neg_one_365;
+f32 fd_gra_00___local_PI_366;
+f32 fd_gra_00___local_3PIO2_368;
+f32 fd_gra_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_gra_00___local_PIO2_367;
+f32 fd_gra_00_one_364;
+f64 fd_gra_00__three_localstatic4_sqrtf;
+f64 fd_gra_00__half_localstatic3_sqrtf;
 s32 evt_yabure_on[56];
-__declspec(section ".data") s32 evt_yabure_off[5];
+s32 evt_yabure_off[5];
 s32 evt_nameent[109];
 s32 name_seikai[682];
 s32 evt_machibuse[VERSION_PICK(666, 694)];
 static BeroEntry bero_entry_data[3];
 static NpcSetupInfo npcEnt[2];
-static __declspec(section ".data") TreeAccess tree_tbl[2];
-__declspec(section ".data") s32 evt_majin_key[5];
+static TreeAccess tree_tbl[2];
+s32 evt_majin_key[5];
 s32 gra_00_init_evt[74];
 
-__declspec(section ".data") f32 fd_gra_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gra_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gra_00_neg_one_382 = -1.0f;
+f32 fd_gra_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_gra_00___local_PI_383 = 3.1415927f;
+f32 fd_gra_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gra_00___local_3PIO2_385 = 4.712389f;
+f32 fd_gra_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gra_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gra_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gra_00___local_PIO2_384 = 1.5707964f;
+f32 fd_gra_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gra_00_one_381 = 1.0f;
+f32 fd_gra_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_gra_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gra_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gra_00_neg_one_365 = -1.0f;
+f32 fd_gra_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_gra_00___local_PI_366 = 3.1415927f;
+f32 fd_gra_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gra_00___local_3PIO2_368 = 4.712389f;
+f32 fd_gra_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gra_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gra_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gra_00___local_PIO2_367 = 1.5707964f;
+f32 fd_gra_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gra_00_one_364 = 1.0f;
+f32 fd_gra_00_one_364 = 1.0f;
 
-__declspec(section ".data") f64 fd_gra_00__three_localstatic4_sqrtf = 3.0;
+f64 fd_gra_00__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") f64 fd_gra_00__half_localstatic3_sqrtf = 0.5;
+f64 fd_gra_00__half_localstatic3_sqrtf = 0.5;
 
 EVT_BEGIN(evt_yabure_on)
     CALL(evt_paper_entry, STRING("OFF_d_yabu_small"))
@@ -171,7 +171,7 @@ EVT_BEGIN(evt_yabure_on)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_yabure_off)
+EVT_BEGIN(evt_yabure_off)
     CALL(evt_img_release, STRING("img"))
     RETURN
 EVT_END()
@@ -866,12 +866,12 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-static __declspec(section ".data") TreeAccess tree_tbl[] = {
+static TreeAccess tree_tbl[] = {
     {2, "A_ki_1", "S_gra00_ki", NULL, 0, NULL},
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
-__declspec(section ".data") EVT_BEGIN(evt_majin_key)
+EVT_BEGIN(evt_majin_key)
     SET_VALUE(GSWF(2091), 1)
     RETURN
 EVT_END()

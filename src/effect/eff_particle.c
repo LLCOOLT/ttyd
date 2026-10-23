@@ -83,7 +83,7 @@ GXColor hibana_col[32] = {
 
 s32 seed = 1;
 #pragma force_active on
-__declspec(section ".sdata") u32 gap_07_80417BC4_sdata[1] = {0};
+u32 gap_07_80417BC4_sdata[1] = {0};
 #pragma force_active reset
 
 

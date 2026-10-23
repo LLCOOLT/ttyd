@@ -55,26 +55,26 @@ USER_FUNC(evt_msg_print);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(majo3_sort);
 
-__declspec(section ".data") f32 fd_boss_majolyne_las_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_majolyne_las_neg_one_382;
-__declspec(section ".data") f32 fd_boss_majolyne_las___local_PI_383;
-__declspec(section ".data") f32 fd_boss_majolyne_las___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_majolyne_las_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_majolyne_las___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_majolyne_las_one_381;
-__declspec(section ".data") f32 fd_boss_majolyne_las_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_majolyne_las_neg_one_365;
-__declspec(section ".data") f32 fd_boss_majolyne_las___local_PI_366;
-__declspec(section ".data") f32 fd_boss_majolyne_las___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_majolyne_las_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_majolyne_las___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_majolyne_las_one_364;
+f32 fd_boss_majolyne_las_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_majolyne_las_neg_one_382;
+f32 fd_boss_majolyne_las___local_PI_383;
+f32 fd_boss_majolyne_las___local_3PIO2_385;
+f32 fd_boss_majolyne_las_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_majolyne_las___local_PIO2_384;
+f32 fd_boss_majolyne_las_one_381;
+f32 fd_boss_majolyne_las_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_majolyne_las_neg_one_365;
+f32 fd_boss_majolyne_las___local_PI_366;
+f32 fd_boss_majolyne_las___local_3PIO2_368;
+f32 fd_boss_majolyne_las_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_majolyne_las___local_PIO2_367;
+f32 fd_boss_majolyne_las_one_364;
 BattleUnitKind unit_boss_majolyne_las;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
-static __declspec(section ".data") BattleDataEntry data_table[2];
+static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_majolyne_kagenuke_attack1;
 static BattleWeapon weapon_majolyne_blizzard_attack1;
@@ -86,9 +86,9 @@ BattleWeapon weapon_majolyne_powder_attack5;
 static s32 majolyne_down[19];
 static s32 majolyne_up[27];
 static s32 majo3_zoom[25];
-__declspec(section ".data") s32 btl_vivian_zoom[7];
-__declspec(section ".data") s32 btl_marilyn_zoom[7];
-__declspec(section ".data") s32 btl_majolyne_zoom[7];
+s32 btl_vivian_zoom[7];
+s32 btl_marilyn_zoom[7];
+s32 btl_majolyne_zoom[7];
 static s32 init_event[45];
 static s32 damage_event[22];
 static s32 dead_event[122];
@@ -104,36 +104,36 @@ static s32 kagenuke_attack_event[222];
 static s32 blizzard_attack_event[243];
 static s32 powder_attack_check[16];
 static s32 powder_attack_event[179];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 s32 majo3_shadow_tail_event[78];
 
-__declspec(section ".data") f32 fd_boss_majolyne_las_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_majolyne_las_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_majolyne_las_neg_one_382 = -1.0f;
+f32 fd_boss_majolyne_las_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_majolyne_las___local_PI_383 = 3.1415927f;
+f32 fd_boss_majolyne_las___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_majolyne_las___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_majolyne_las___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_majolyne_las_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_majolyne_las_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_majolyne_las___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_majolyne_las___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_majolyne_las_one_381 = 1.0f;
+f32 fd_boss_majolyne_las_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_majolyne_las_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_majolyne_las_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_majolyne_las_neg_one_365 = -1.0f;
+f32 fd_boss_majolyne_las_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_majolyne_las___local_PI_366 = 3.1415927f;
+f32 fd_boss_majolyne_las___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_majolyne_las___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_majolyne_las___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_majolyne_las_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_majolyne_las_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_majolyne_las___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_majolyne_las___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_majolyne_las_one_364 = 1.0f;
+f32 fd_boss_majolyne_las_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_majolyne_las = {
     133,
@@ -201,11 +201,11 @@ BattleUnitKind unit_boss_majolyne_las = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
+static StatusVulnerability regist = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 
 static PoseTableEntry pose_table[] = {
     {1, "MJR_N_1"},
@@ -228,7 +228,7 @@ static PoseTableEntry pose_table[] = {
     {69, "MJR_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
@@ -572,19 +572,19 @@ static EVT_BEGIN(majo3_zoom)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(btl_vivian_zoom)
+EVT_BEGIN(btl_vivian_zoom)
     SET_VALUE(LW(0), GW(10))
     CALL_CHILD(PTR(majo3_zoom))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(btl_marilyn_zoom)
+EVT_BEGIN(btl_marilyn_zoom)
     SET_VALUE(LW(0), GW(9))
     CALL_CHILD(PTR(majo3_zoom))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(btl_majolyne_zoom)
+EVT_BEGIN(btl_majolyne_zoom)
     SET_VALUE(LW(0), GW(8))
     CALL_CHILD(PTR(majo3_zoom))
     RETURN
@@ -1483,7 +1483,7 @@ static EVT_BEGIN(powder_attack_event)
 EVT_END()
 #endif
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

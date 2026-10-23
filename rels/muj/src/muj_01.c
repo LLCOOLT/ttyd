@@ -137,20 +137,20 @@ extern s32 envSetYami[];
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 void envSetYamiView(Mtx mtx);
-__declspec(section ".data") f32 fd_muj_01_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_01_neg_one_382;
-__declspec(section ".data") f32 fd_muj_01___local_PI_383;
-__declspec(section ".data") f32 fd_muj_01___local_3PIO2_385;
-__declspec(section ".data") f32 fd_muj_01_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_01___local_PIO2_384;
-__declspec(section ".data") f32 fd_muj_01_one_381;
-__declspec(section ".data") f32 fd_muj_01_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_01_neg_one_365;
-__declspec(section ".data") f32 fd_muj_01___local_PI_366;
-__declspec(section ".data") f32 fd_muj_01___local_3PIO2_368;
-__declspec(section ".data") f32 fd_muj_01_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_01___local_PIO2_367;
-__declspec(section ".data") f32 fd_muj_01_one_364;
+f32 fd_muj_01_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_muj_01_neg_one_382;
+f32 fd_muj_01___local_PI_383;
+f32 fd_muj_01___local_3PIO2_385;
+f32 fd_muj_01_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_muj_01___local_PIO2_384;
+f32 fd_muj_01_one_381;
+f32 fd_muj_01_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_muj_01_neg_one_365;
+f32 fd_muj_01___local_PI_366;
+f32 fd_muj_01___local_3PIO2_368;
+f32 fd_muj_01_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_muj_01___local_PIO2_367;
+f32 fd_muj_01_one_364;
 s32 custom_door_dark2[34];
 s32 custom_door_light2[30];
 static s32 garawaru_init[39];
@@ -179,30 +179,30 @@ s32 borosuifu_b_init[22];
 s32 borosuifu_b_regl[30];
 s32 borosuifu_b_talk[56];
 static s32 mony_init[14];
-static __declspec(section ".data") s32 mony_talk[8];
+static s32 mony_talk[8];
 static s32 peton_init[14];
-static __declspec(section ".data") s32 peton_talk[8];
+static s32 peton_talk[8];
 static s32 musume_talk[20];
 static s32 musume_a_entry[30];
 static s32 musume_b_entry[30];
 static s32 musume_c_entry[30];
 static NpcSetupInfo npcEnt[17];
-static __declspec(section ".data") s32 bero_in_event[5];
+static s32 bero_in_event[5];
 static BeroEntry bero_entry_data[3];
 s32 muj_00_door_open[247];
 s32 muj_00_door_close[22];
-static __declspec(section ".data") const char* mise_npc[2];
+static const char* mise_npc[2];
 s32 mise_data_open[32];
 s32 mise_data_close[36];
 static DoorParam mise_data;
-static __declspec(section ".data") const char* yado_npc[2];
+static const char* yado_npc[2];
 s32 mise_open_event[22];
 s32 mise_close_event[26];
 static DoorParam yado_data;
 s32 evt_door_entry_custom00[39];
 s32 evt_door_entry_custom01[39];
-static __declspec(section ".data") ShopObj obj_list[6];
-static __declspec(section ".data") ShopItem goods_list[6];
+static ShopObj obj_list[6];
+static ShopItem goods_list[6];
 static ShopDb trade_list[12];
 static ShopperData35 shopper_data;
 static KinopioData kino_dt;
@@ -215,7 +215,7 @@ s32 nakamaware_event[791];
 s32 settoku_event[54];
 s32 settoku_event_main[95];
 static s32 delete_npc_regl_evt[24];
-static __declspec(section ".data") s32 sekai_yami_shake[11];
+static s32 sekai_yami_shake[11];
 static s32 sekai_yami_evt[283];
 static s32 minnnanokoe_evt[402];
 static s32 epilogue_npc_entry[60];
@@ -225,33 +225,33 @@ s32 yakan_anime[17];
 s32 muj_01_init_evt[225];
 
 
-__declspec(section ".data") f32 fd_muj_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_01_neg_one_382 = -1.0f;
+f32 fd_muj_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj_01___local_PI_383 = 3.1415927f;
+f32 fd_muj_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj_01___local_3PIO2_385 = 4.712389f;
+f32 fd_muj_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj_01___local_PIO2_384 = 1.5707964f;
+f32 fd_muj_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_01_one_381 = 1.0f;
+f32 fd_muj_01_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_muj_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_01_neg_one_365 = -1.0f;
+f32 fd_muj_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj_01___local_PI_366 = 3.1415927f;
+f32 fd_muj_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj_01___local_3PIO2_368 = 4.712389f;
+f32 fd_muj_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj_01___local_PIO2_367 = 1.5707964f;
+f32 fd_muj_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_01_one_364 = 1.0f;
+f32 fd_muj_01_one_364 = 1.0f;
 
 EVT_BEGIN(custom_door_dark2)
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, 300)
@@ -883,7 +883,7 @@ static EVT_BEGIN(mony_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(mony_talk)
+static EVT_BEGIN(mony_talk)
     CALL(evt_msg_print, 0, STRING("stg5_muj_147"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -896,7 +896,7 @@ static EVT_BEGIN(peton_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(peton_talk)
+static EVT_BEGIN(peton_talk)
     CALL(evt_msg_print, 0, STRING("stg5_muj_148"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -1124,7 +1124,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-static __declspec(section ".data") EVT_BEGIN(bero_in_event)
+static EVT_BEGIN(bero_in_event)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
@@ -1254,7 +1254,7 @@ EVT_BEGIN(muj_00_door_close)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* mise_npc[] = {
+static const char* mise_npc[] = {
     /*"店員"*/"\x93\x58\x88\xF5",
     NULL,
 };
@@ -1298,7 +1298,7 @@ static DoorParam mise_data = {
     mise_data_close, // evtClose
 };
 
-static __declspec(section ".data") const char* yado_npc[] = {
+static const char* yado_npc[] = {
     /*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5",
     NULL,
 };
@@ -1365,7 +1365,7 @@ EVT_BEGIN(evt_door_entry_custom01)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") ShopObj obj_list[] = {
+static ShopObj obj_list[] = {
     {"S_item_01", "A_item_01"},
     {"S_item_02", "A_item_02"},
     {"S_item_03", "A_item_03"},
@@ -1374,7 +1374,7 @@ static __declspec(section ".data") ShopObj obj_list[] = {
     {"S_item_06", "A_item_06"},
 };
 
-static __declspec(section ".data") ShopItem goods_list[] = {
+static ShopItem goods_list[] = {
     {ITEM_ICE_STORM, 15},
     {ITEM_FIRE_FLOWER, 5},
     {ITEM_SLEEPY_SHEEP, 10},
@@ -1745,7 +1745,7 @@ static EVT_BEGIN(delete_npc_regl_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(sekai_yami_shake)
+static EVT_BEGIN(sekai_yami_shake)
     LOOP(0)
         CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 500)
     END_LOOP

@@ -112,7 +112,7 @@ void batSpotEnd(void);
 #define STG_ALLOC(size) __memAlloc(HEAP_BATTLE, size)
 #define STG_FREE(ptr) __memFree(HEAP_BATTLE, ptr)
 #endif
-__declspec(section ".sdata") u32 gap_07_804117E4_sdata[7] = {0};
+u32 gap_07_804117E4_sdata[7] = {0};
 
 static u8 inta_tex[32] ATTRIBUTE_ALIGN(32) = {0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0};
 

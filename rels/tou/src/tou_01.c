@@ -193,32 +193,32 @@ static USER_FUNC(yami_view);
 void make_shadow_disp(CameraId camera, void* param);
 extern s32 envSetYami[];
 
-__declspec(section ".data") f32 fd_tou_01_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_01_neg_one_382;
-__declspec(section ".data") f32 fd_tou_01___local_PI_383;
-__declspec(section ".data") f32 fd_tou_01___local_3PIO2_385;
-__declspec(section ".data") f32 fd_tou_01_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_01___local_PIO2_384;
-__declspec(section ".data") f32 fd_tou_01_one_381;
-__declspec(section ".data") f32 fd_tou_01_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_01_neg_one_365;
-__declspec(section ".data") f32 fd_tou_01___local_PI_366;
-__declspec(section ".data") f32 fd_tou_01___local_3PIO2_368;
-__declspec(section ".data") f32 fd_tou_01_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_01___local_PIO2_367;
-__declspec(section ".data") f32 fd_tou_01_one_364;
+f32 fd_tou_01_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_tou_01_neg_one_382;
+f32 fd_tou_01___local_PI_383;
+f32 fd_tou_01___local_3PIO2_385;
+f32 fd_tou_01_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_tou_01___local_PIO2_384;
+f32 fd_tou_01_one_381;
+f32 fd_tou_01_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_tou_01_neg_one_365;
+f32 fd_tou_01___local_PI_366;
+f32 fd_tou_01___local_3PIO2_368;
+f32 fd_tou_01_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_tou_01___local_PIO2_367;
+f32 fd_tou_01_one_364;
 static s32 n_door_open[60];
 static s32 n_door_close[58];
 static BeroEntry bero_data[2];
 static s32 evt_door[15];
-static __declspec(section ".data") s32 evt_door2[12];
+static s32 evt_door2[12];
 static s32 evt_wall[22];
-__declspec(section ".data") s32 evt_door_1_open[12];
+s32 evt_door_1_open[12];
 s32 evt_door_1_close[14];
-static __declspec(section ".data") const char* mise_npc[2];
+static const char* mise_npc[2];
 static DoorParam door_1;
-static __declspec(section ".data") s32 evt_door_2[12];
-static __declspec(section ".data") s32 evt_door2_2[12];
+static s32 evt_door_2[12];
+static s32 evt_door2_2[12];
 s32 evt_sakaba_1[26];
 s32 evt_sakaba_2[26];
 s32 evt_sakaba_3[26];
@@ -228,25 +228,25 @@ s32 evt_wall2[38];
 #else
 s32 evt_wall2[19];
 #endif
-__declspec(section ".data") const char* sakaba_npc[7];
-__declspec(section ".data") const char* sakaba_item[2];
-__declspec(section ".data") s32 evt_door_2_open[12];
+const char* sakaba_npc[7];
+const char* sakaba_item[2];
+s32 evt_door_2_open[12];
 s32 evt_door_2_close[14];
 static DoorParam door_2;
 static s32 evt_kanban[51];
 static s32 evt_kanban2[175];
-static __declspec(section ".data") ShopObj obj_list[6];
-static __declspec(section ".data") ShopItem goods_list[6];
+static ShopObj obj_list[6];
+static ShopItem goods_list[6];
 static ShopDb trade_list[13];
 static ShopperData35 shopper_data;
 s32 evt_hotdog[86];
 s32 evt_ship_shadow[91];
-__declspec(section ".data") s32 init_hikuu[12];
+s32 init_hikuu[12];
 s32 talk_hikuu[84];
-__declspec(section ".data") s32 init_sakaba[8];
+s32 init_sakaba[8];
 s32 talk_sakaba[369];
-__declspec(section ".data") s32 init_mise[12];
-__declspec(section ".data") s32 talk_mise[2];
+s32 init_mise[12];
+s32 talk_mise[2];
 s32 init_hot[13];
 s32 talk_hot[21];
 static s32 init_papa[20];
@@ -257,35 +257,35 @@ static s32 init_konari[20];
 static s32 talk_konari[78];
 static s32 talk_musume[132];
 s32 init_musume_1[14];
-__declspec(section ".data") s32 talk_musume_1[4];
+s32 talk_musume_1[4];
 s32 init_musume_2[14];
-__declspec(section ".data") s32 talk_musume_2[4];
+s32 talk_musume_2[4];
 s32 init_musume_3[14];
-__declspec(section ".data") s32 talk_musume_3[4];
+s32 talk_musume_3[4];
 s32 init_kino_1[13];
 s32 reg_kino_1[31];
 s32 talk_kino_1[112];
-__declspec(section ".data") s32 init_kino_2[8];
+s32 init_kino_2[8];
 s32 talk_kino_2[112];
-__declspec(section ".data") s32 init_roten_1[8];
+s32 init_roten_1[8];
 s32 talk_roten_1[112];
-__declspec(section ".data") s32 init_roten_2[8];
+s32 init_roten_2[8];
 s32 talk_roten_2[112];
-__declspec(section ".data") s32 init_jugem_1[8];
+s32 init_jugem_1[8];
 s32 talk_jugem_1[112];
-__declspec(section ".data") s32 init_jugem_2[12];
+s32 init_jugem_2[12];
 s32 talk_jugem_2[112];
 s32 init_bijyo[40];
 s32 talk_bijyo[112];
 static s32 init_kiza[21];
 static s32 talk_kiza[60];
-static __declspec(section ".data") s32 init_sarary[12];
+static s32 init_sarary[12];
 s32 select_number[44];
 static s32 talk_sarary[479];
 static NpcSetupInfo npcEnt[20];
 s32 evt_uron[195];
 s32 evt_tamago_sleep[56];
-__declspec(section ".data") s32 dummy[2];
+s32 dummy[2];
 s32 hot_move_evt[66];
 s32 hot_move_evt2[24];
 s32 evt_oyaji_move[60];
@@ -309,7 +309,7 @@ static s32 minnnanokoe_npc_entry[175];
 static s32 minnnanokoe_evt[446];
 s32 evt_telbox[124];
 s32 evt_mail[175];
-static __declspec(section ".data") s32 evt_key[7];
+static s32 evt_key[7];
 static s32 mobj_box00[36];
 #ifdef VERSION_G8ME01
 s32 tou_01_init_evt[1641];
@@ -330,33 +330,33 @@ static USER_FUNC(proj_off) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_tou_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_01_neg_one_382 = -1.0f;
+f32 fd_tou_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou_01___local_PI_383 = 3.1415927f;
+f32 fd_tou_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou_01___local_3PIO2_385 = 4.712389f;
+f32 fd_tou_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou_01___local_PIO2_384 = 1.5707964f;
+f32 fd_tou_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_01_one_381 = 1.0f;
+f32 fd_tou_01_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_tou_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_01_neg_one_365 = -1.0f;
+f32 fd_tou_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou_01___local_PI_366 = 3.1415927f;
+f32 fd_tou_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou_01___local_3PIO2_368 = 4.712389f;
+f32 fd_tou_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou_01___local_PIO2_367 = 1.5707964f;
+f32 fd_tou_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_01_one_364 = 1.0f;
+f32 fd_tou_01_one_364 = 1.0f;
 
 static EVT_BEGIN(n_door_open)
     IF_FLOAT_EQUAL(LW(0), FLOAT(0.0f))
@@ -429,7 +429,7 @@ static EVT_BEGIN(evt_door)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_door2)
+static EVT_BEGIN(evt_door2)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2"), 0, 0, LW(0))
     RETURN
@@ -443,7 +443,7 @@ static EVT_BEGIN(evt_wall)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_door_1_open)
+EVT_BEGIN(evt_door_1_open)
     CALL(evt_snd_bgmoff, 18432)
     CALL(evt_snd_envoff, 18432)
     CALL(evt_snd_env_lpf, 0, 800)
@@ -457,7 +457,7 @@ EVT_BEGIN(evt_door_1_close)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* mise_npc[] = {
+static const char* mise_npc[] = {
     /*"店員"*/"\x93\x58\x88\xF5",
     NULL,
 };
@@ -482,13 +482,13 @@ static DoorParam door_1 = {
     evt_door_1_close, // evtClose
 };
 
-static __declspec(section ".data") EVT_BEGIN(evt_door_2)
+static EVT_BEGIN(evt_door_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_3"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_door2_2)
+static EVT_BEGIN(evt_door2_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_3"), 0, 0, LW(0))
     RETURN
@@ -569,7 +569,7 @@ EVT_BEGIN(evt_wall2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* sakaba_npc[] = {
+const char* sakaba_npc[] = {
     /*"酒場店主"*/"\x8E\xF0\x8F\xEA\x93\x58\x8E\xE5",
     /*"美女"*/"\x94\xFC\x8F\x97",
     /*"ロテン2"*/"\x83\x8D\x83\x65\x83\x93\x32",
@@ -579,12 +579,12 @@ __declspec(section ".data") const char* sakaba_npc[] = {
     NULL,
 };
 
-__declspec(section ".data") const char* sakaba_item[] = {
+const char* sakaba_item[] = {
     "item_03",
     NULL,
 };
 
-__declspec(section ".data") EVT_BEGIN(evt_door_2_open)
+EVT_BEGIN(evt_door_2_open)
     CALL(evt_snd_bgmoff, 18432)
     CALL(evt_snd_envoff, 18432)
     CALL(evt_snd_env_lpf, 0, 800)
@@ -714,7 +714,7 @@ static EVT_BEGIN(evt_kanban2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") ShopObj obj_list[] = {
+static ShopObj obj_list[] = {
     {"sina_1", "a_sina1"},
     {"sina_2", "a_sina_2"},
     {"sina_3", "a_sina_3"},
@@ -723,7 +723,7 @@ static __declspec(section ".data") ShopObj obj_list[] = {
     {"sina_6", "a_sina_6"},
 };
 
-static __declspec(section ".data") ShopItem goods_list[] = {
+static ShopItem goods_list[] = {
     {ITEM_EARTH_QUAKE, 15},
     {ITEM_THUNDER_BOLT, 12},
     {ITEM_POWER_PUNCH, 15},
@@ -923,7 +923,7 @@ EVT_BEGIN(evt_ship_shadow)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_hikuu)
+EVT_BEGIN(init_hikuu)
     CALL(evt_npc_set_position, STRING("me"), 100, 0, 430)
     CALL(evt_npc_set_ry, STRING("me"), 270)
     RETURN
@@ -957,7 +957,7 @@ EVT_BEGIN(talk_hikuu)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_sakaba)
+EVT_BEGIN(init_sakaba)
     CALL(evt_npc_set_position, STRING("me"), 650, 10, 12)
     RETURN
 EVT_END()
@@ -1078,13 +1078,13 @@ EVT_BEGIN(talk_sakaba)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_mise)
+EVT_BEGIN(init_mise)
     CALL(evt_npc_set_position, STRING("me"), -600, 10, 140)
     CALL(evt_npc_set_ry, STRING("me"), 200)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(talk_mise)
+EVT_BEGIN(talk_mise)
     RETURN
 EVT_END()
 
@@ -1260,7 +1260,7 @@ EVT_BEGIN(init_musume_1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(talk_musume_1)
+EVT_BEGIN(talk_musume_1)
     CALL_CHILD(PTR(talk_musume))
     RETURN
 EVT_END()
@@ -1273,7 +1273,7 @@ EVT_BEGIN(init_musume_2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(talk_musume_2)
+EVT_BEGIN(talk_musume_2)
     CALL_CHILD(PTR(talk_musume))
     RETURN
 EVT_END()
@@ -1286,7 +1286,7 @@ EVT_BEGIN(init_musume_3)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(talk_musume_3)
+EVT_BEGIN(talk_musume_3)
     CALL_CHILD(PTR(talk_musume))
     RETURN
 EVT_END()
@@ -1349,7 +1349,7 @@ EVT_BEGIN(talk_kino_1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_kino_2)
+EVT_BEGIN(init_kino_2)
     CALL(evt_npc_set_position, STRING("me"), -450, 0, 625)
     RETURN
 EVT_END()
@@ -1394,7 +1394,7 @@ EVT_BEGIN(talk_kino_2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_roten_1)
+EVT_BEGIN(init_roten_1)
     CALL(evt_npc_set_position, STRING("ロテン1"), 350, 0, 700)
     RETURN
 EVT_END()
@@ -1439,7 +1439,7 @@ EVT_BEGIN(talk_roten_1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_roten_2)
+EVT_BEGIN(init_roten_2)
     CALL(evt_npc_set_position, STRING("me"), 725, 10, 40)
     RETURN
 EVT_END()
@@ -1484,7 +1484,7 @@ EVT_BEGIN(talk_roten_2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_jugem_1)
+EVT_BEGIN(init_jugem_1)
     CALL(evt_npc_set_position, STRING("me"), -400, 0, 625)
     RETURN
 EVT_END()
@@ -1529,7 +1529,7 @@ EVT_BEGIN(talk_jugem_1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_jugem_2)
+EVT_BEGIN(init_jugem_2)
     CALL(evt_npc_set_position, STRING("me"), 700, 10, 105)
     CALL(evt_npc_set_ry, STRING("me"), 340)
     RETURN
@@ -1664,7 +1664,7 @@ static EVT_BEGIN(talk_kiza)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(init_sarary)
+static EVT_BEGIN(init_sarary)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 345)
         CALL(evt_npc_set_position, STRING("me"), -240, 10, -90)
     END_IF
@@ -2200,7 +2200,7 @@ EVT_BEGIN(evt_tamago_sleep)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(dummy)
+EVT_BEGIN(dummy)
     RETURN
 EVT_END()
 
@@ -3307,7 +3307,7 @@ static USER_FUNC(starstone_set_ry) {
     return EVT_RETURN_DONE;
 }
 
-static __declspec(section ".data") EVT_BEGIN(evt_key)
+static EVT_BEGIN(evt_key)
     SET_VALUE(GSW(0), 146)
     SPAWN_EVENT(PTR(evt_mail))
     RETURN

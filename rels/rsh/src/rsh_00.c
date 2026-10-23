@@ -99,20 +99,20 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
 static void moamoa_pose_main(void);
 static void moamoa_pose_init(void);
 
-__declspec(section ".data") f32 fd_rsh_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_00_neg_one_382;
-__declspec(section ".data") f32 fd_rsh_00___local_PI_383;
-__declspec(section ".data") f32 fd_rsh_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_rsh_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_rsh_00_one_381;
-__declspec(section ".data") f32 fd_rsh_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_00_neg_one_365;
-__declspec(section ".data") f32 fd_rsh_00___local_PI_366;
-__declspec(section ".data") f32 fd_rsh_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_rsh_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_rsh_00_one_364;
+f32 fd_rsh_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_rsh_00_neg_one_382;
+f32 fd_rsh_00___local_PI_383;
+f32 fd_rsh_00___local_3PIO2_385;
+f32 fd_rsh_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_rsh_00___local_PIO2_384;
+f32 fd_rsh_00_one_381;
+f32 fd_rsh_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_rsh_00_neg_one_365;
+f32 fd_rsh_00___local_PI_366;
+f32 fd_rsh_00___local_3PIO2_368;
+f32 fd_rsh_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_rsh_00___local_PIO2_367;
+f32 fd_rsh_00_one_364;
 ExtTexInfo moamoa_data[81];
 static s32 evt_moamoa[324];
 s32 evt_rsh_moamoa_on_window[46];
@@ -124,46 +124,46 @@ s32 regu_unten[210];
 static s32 init_unten[17];
 static s32 talk_unten[236];
 static NpcSetupInfo npc_data[2];
-static __declspec(section ".data") const char* access_tbl[5];
+static const char* access_tbl[5];
 static s32 evt_access[14];
 static s32 evt_access_entry[23];
 s32 rsh_00_init_evt[194];
 s32 rsh_00_a_init_evt[51];
-__declspec(section ".data") s32 rsh_00_b_init_evt[11];
-static __declspec(section ".data") const char* window_tbl[5];
+s32 rsh_00_b_init_evt[11];
+static const char* window_tbl[5];
 s32 rsh_00_c_init_evt[16];
 s32 rsh_00_init_evt_nidome[164];
-__declspec(section ".data") s32 rsh_00_a_init_evt_nidome[11];
-__declspec(section ".data") s32 rsh_00_b_init_evt_nidome[11];
+s32 rsh_00_a_init_evt_nidome[11];
+s32 rsh_00_b_init_evt_nidome[11];
 s32 rsh_00_c_init_evt_nidome[16];
 
-__declspec(section ".data") f32 fd_rsh_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_00_neg_one_382 = -1.0f;
+f32 fd_rsh_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh_00___local_PI_383 = 3.1415927f;
+f32 fd_rsh_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh_00___local_3PIO2_385 = 4.712389f;
+f32 fd_rsh_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh_00___local_PIO2_384 = 1.5707964f;
+f32 fd_rsh_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_00_one_381 = 1.0f;
+f32 fd_rsh_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_rsh_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_00_neg_one_365 = -1.0f;
+f32 fd_rsh_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh_00___local_PI_366 = 3.1415927f;
+f32 fd_rsh_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh_00___local_3PIO2_368 = 4.712389f;
+f32 fd_rsh_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh_00___local_PIO2_367 = 1.5707964f;
+f32 fd_rsh_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_00_one_364 = 1.0f;
+f32 fd_rsh_00_one_364 = 1.0f;
 
 ExtTexInfo moamoa_data[] = {
     {"c_n_moa_a", "S_1", 0.0f},
@@ -916,7 +916,7 @@ static NpcSetupInfo npc_data[] = {
     {0},
 };
 
-static __declspec(section ".data") const char* access_tbl[] = {
+static const char* access_tbl[] = {
     "nittei",
     "stg6_rsh_259",
     "soujyuu",
@@ -1023,7 +1023,7 @@ EVT_BEGIN(rsh_00_a_init_evt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(rsh_00_b_init_evt)
+EVT_BEGIN(rsh_00_b_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_b))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
@@ -1031,7 +1031,7 @@ __declspec(section ".data") EVT_BEGIN(rsh_00_b_init_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* window_tbl[] = {
+static const char* window_tbl[] = {
     "mado_uturi_1",
     "mado_uturi_2",
     "mado_uturi_3",
@@ -1103,7 +1103,7 @@ EVT_BEGIN(rsh_00_init_evt_nidome)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(rsh_00_a_init_evt_nidome)
+EVT_BEGIN(rsh_00_a_init_evt_nidome)
     SET_VALUE(LW(0), PTR(bero_data_a))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
@@ -1111,7 +1111,7 @@ __declspec(section ".data") EVT_BEGIN(rsh_00_a_init_evt_nidome)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(rsh_00_b_init_evt_nidome)
+EVT_BEGIN(rsh_00_b_init_evt_nidome)
     SET_VALUE(LW(0), PTR(bero_data_b))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))

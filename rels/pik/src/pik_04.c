@@ -96,34 +96,34 @@ USER_FUNC(evt_unitwin_free);
 USER_FUNC(unitwincoin_disp_onoff);
 USER_FUNC(unitwincoin_wait);
 
-__declspec(section ".data") f32 fd_pik_04_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_pik_04_neg_one_382;
-__declspec(section ".data") f32 fd_pik_04___local_PI_383;
-__declspec(section ".data") f32 fd_pik_04___local_3PIO2_385;
-__declspec(section ".data") f32 fd_pik_04_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_pik_04___local_PIO2_384;
-__declspec(section ".data") f32 fd_pik_04_one_381;
-__declspec(section ".data") f32 fd_pik_04_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_pik_04_neg_one_365;
-__declspec(section ".data") f32 fd_pik_04___local_PI_366;
-__declspec(section ".data") f32 fd_pik_04___local_3PIO2_368;
-__declspec(section ".data") f32 fd_pik_04_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_pik_04___local_PIO2_367;
-__declspec(section ".data") f32 fd_pik_04_one_364;
+f32 fd_pik_04_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_pik_04_neg_one_382;
+f32 fd_pik_04___local_PI_383;
+f32 fd_pik_04___local_3PIO2_385;
+f32 fd_pik_04_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_pik_04___local_PIO2_384;
+f32 fd_pik_04_one_381;
+f32 fd_pik_04_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_pik_04_neg_one_365;
+f32 fd_pik_04___local_PI_366;
+f32 fd_pik_04___local_3PIO2_368;
+f32 fd_pik_04_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_pik_04___local_PIO2_367;
+f32 fd_pik_04_one_364;
 static BeroEntry bero_data[3];
 static HitDamageReturn dmgReturnPt[9];
-static __declspec(section ".data") const char* name_tbl[6];
-static __declspec(section ".data") s32 evt_door[12];
-static __declspec(section ".data") s32 evt_door2[12];
+static const char* name_tbl[6];
+static s32 evt_door[12];
+static s32 evt_door2[12];
 static s32 evt_wall[29];
-__declspec(section ".data") const char* ie_3_npc[3];
-static __declspec(section ".data") s32 door_1_open[12];
+const char* ie_3_npc[3];
+static s32 door_1_open[12];
 static s32 door_1_close[14];
 static DoorParam door_1;
 s32 evt_door_h[22];
 s32 evt_door2_h[19];
-__declspec(section ".data") s32 evt_wall_h[12];
-__declspec(section ".data") const char* hotel_npc[3];
+s32 evt_wall_h[12];
+const char* hotel_npc[3];
 static s32 door_2_open[18];
 static s32 door_2_close[14];
 static DoorParam door_2;
@@ -132,23 +132,23 @@ s32 imgstart[107];
 s32 imgend[129];
 s32 evt_up[402];
 s32 evt_down[404];
-__declspec(section ".data") s32 init_miyage[8];
-__declspec(section ".data") s32 talk_miyage[2];
+s32 init_miyage[8];
+s32 talk_miyage[2];
 static s32 talk_musume[20];
 s32 init_musume1[13];
-__declspec(section ".data") s32 talk_musume1[4];
+s32 talk_musume1[4];
 s32 init_musume2[13];
-__declspec(section ".data") s32 talk_musume2[4];
+s32 talk_musume2[4];
 s32 init_musume3[13];
-__declspec(section ".data") s32 talk_musume3[4];
-__declspec(section ".data") s32 init_takun1[2];
+s32 talk_musume3[4];
+s32 init_takun1[2];
 s32 talk_takun1[28];
-__declspec(section ".data") s32 init_takun2[2];
+s32 init_takun2[2];
 s32 talk_takun2[28];
-__declspec(section ".data") s32 init_takun3[7];
+s32 init_takun3[7];
 s32 talk_takun3[28];
 static s32 init_kiza[13];
-static __declspec(section ".data") s32 talk_kiza[8];
+static s32 talk_kiza[8];
 static NpcSetupInfo npc_data[9];
 s32 evt_roten[113];
 s32 evt_kinopio_to_bed[29];
@@ -159,33 +159,33 @@ static s32 epilogue_evt_sub[91];
 static s32 epilogue_evt[63];
 s32 pik_04_init_evt[166];
 
-__declspec(section ".data") f32 fd_pik_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_pik_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_pik_04_neg_one_382 = -1.0f;
+f32 fd_pik_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_pik_04___local_PI_383 = 3.1415927f;
+f32 fd_pik_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_pik_04___local_3PIO2_385 = 4.712389f;
+f32 fd_pik_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_pik_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_pik_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_pik_04___local_PIO2_384 = 1.5707964f;
+f32 fd_pik_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_pik_04_one_381 = 1.0f;
+f32 fd_pik_04_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_pik_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_pik_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_pik_04_neg_one_365 = -1.0f;
+f32 fd_pik_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_pik_04___local_PI_366 = 3.1415927f;
+f32 fd_pik_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_pik_04___local_3PIO2_368 = 4.712389f;
+f32 fd_pik_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_pik_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_pik_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_pik_04___local_PIO2_367 = 1.5707964f;
+f32 fd_pik_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_pik_04_one_364 = 1.0f;
+f32 fd_pik_04_one_364 = 1.0f;
 
 static BeroEntry bero_data[] = {
     {
@@ -235,7 +235,7 @@ static HitDamageReturn dmgReturnPt[] = {
     {0},
 };
 
-static __declspec(section ".data") const char* name_tbl[] = {
+static const char* name_tbl[] = {
     "yajirusi_1",
     "yajirusi_2",
     "yajirusi_3",
@@ -244,13 +244,13 @@ static __declspec(section ".data") const char* name_tbl[] = {
     "yajirusi_6",
 };
 
-static __declspec(section ".data") EVT_BEGIN(evt_door)
+static EVT_BEGIN(evt_door)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5546875f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_door2)
+static EVT_BEGIN(evt_door2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), LW(0), 0, 0)
     RETURN
@@ -265,13 +265,13 @@ static EVT_BEGIN(evt_wall)
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* ie_3_npc[] = {
+const char* ie_3_npc[] = {
     /*"ターくん１"*/"\x83\x5E\x81\x5B\x82\xAD\x82\xF1\x82\x50",
     /*"ターくん２"*/"\x83\x5E\x81\x5B\x82\xAD\x82\xF1\x82\x51",
     NULL,
 };
 
-static __declspec(section ".data") EVT_BEGIN(door_1_open)
+static EVT_BEGIN(door_1_open)
     CALL(evt_snd_bgmoff, 18432)
     CALL(evt_snd_envoff, 18432)
     CALL(evt_snd_env_lpf, 0, 800)
@@ -320,13 +320,13 @@ EVT_BEGIN(evt_door2_h)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_wall_h)
+EVT_BEGIN(evt_wall_h)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.75f))
     CALL(evt_mapobj_rotate, 1, STRING("hotel_kabe_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* hotel_npc[] = {
+const char* hotel_npc[] = {
     /*"店員女"*/"\x93\x58\x88\xF5\x8F\x97",
     /*"キザ野郎"*/"\x83\x4C\x83\x55\x96\xEC\x98\x59",
     NULL,
@@ -666,7 +666,7 @@ EVT_BEGIN(evt_down)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_miyage)
+EVT_BEGIN(init_miyage)
 #ifdef VERSION_G8ME01
     CALL(evt_npc_set_position, STRING("me"), -363, 10, 142)
 #else
@@ -675,7 +675,7 @@ __declspec(section ".data") EVT_BEGIN(init_miyage)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(talk_miyage)
+EVT_BEGIN(talk_miyage)
     RETURN
 EVT_END()
 
@@ -694,7 +694,7 @@ EVT_BEGIN(init_musume1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(talk_musume1)
+EVT_BEGIN(talk_musume1)
     CALL_CHILD(PTR(talk_musume))
     RETURN
 EVT_END()
@@ -707,7 +707,7 @@ EVT_BEGIN(init_musume2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(talk_musume2)
+EVT_BEGIN(talk_musume2)
     CALL_CHILD(PTR(talk_musume))
     RETURN
 EVT_END()
@@ -720,12 +720,12 @@ EVT_BEGIN(init_musume3)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(talk_musume3)
+EVT_BEGIN(talk_musume3)
     CALL_CHILD(PTR(talk_musume))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_takun1)
+EVT_BEGIN(init_takun1)
     RETURN
 EVT_END()
 
@@ -741,7 +741,7 @@ EVT_BEGIN(talk_takun1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_takun2)
+EVT_BEGIN(init_takun2)
     RETURN
 EVT_END()
 
@@ -757,7 +757,7 @@ EVT_BEGIN(talk_takun2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_takun3)
+EVT_BEGIN(init_takun3)
     CALL(evt_npc_flag_onoff, 1, STRING("ターくん３"), 132624)
     RETURN
 EVT_END()
@@ -782,7 +782,7 @@ static EVT_BEGIN(init_kiza)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(talk_kiza)
+static EVT_BEGIN(talk_kiza)
     CALL(evt_msg_print, 0, STRING("stg7_pik_clear_19"), 0, STRING("me"))
     RETURN
 EVT_END()

@@ -9,101 +9,101 @@
 
 #pragma force_active on
 
-__declspec(section ".data") f32 fd_battle_database_eki_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_eki_neg_one_382;
-__declspec(section ".data") f32 fd_battle_database_eki___local_PI_383;
-__declspec(section ".data") f32 fd_battle_database_eki___local_3PIO2_385;
-__declspec(section ".data") f32 fd_battle_database_eki_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_eki___local_PIO2_384;
-__declspec(section ".data") f32 fd_battle_database_eki_one_381;
-__declspec(section ".data") f32 fd_battle_database_eki_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_eki_neg_one_365;
-__declspec(section ".data") f32 fd_battle_database_eki___local_PI_366;
-__declspec(section ".data") f32 fd_battle_database_eki___local_3PIO2_368;
-__declspec(section ".data") f32 fd_battle_database_eki_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_eki___local_PIO2_367;
-__declspec(section ".data") f32 fd_battle_database_eki_one_364;
+f32 fd_battle_database_eki_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_battle_database_eki_neg_one_382;
+f32 fd_battle_database_eki___local_PI_383;
+f32 fd_battle_database_eki___local_3PIO2_385;
+f32 fd_battle_database_eki_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_battle_database_eki___local_PIO2_384;
+f32 fd_battle_database_eki_one_381;
+f32 fd_battle_database_eki_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_battle_database_eki_neg_one_365;
+f32 fd_battle_database_eki___local_PI_366;
+f32 fd_battle_database_eki___local_3PIO2_368;
+f32 fd_battle_database_eki_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_battle_database_eki___local_PIO2_367;
+f32 fd_battle_database_eki_one_364;
 BattleStageObjectData eki_btlobject_data[24];
 BattleStageData eki_btlstage_data[4];
 BattleUnitSetup btlparty_eki_eki_06_01_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_06_01_off_1;
+BattleGroupSetup btlgrp_eki_eki_06_01_off_1;
 BattleUnitSetup btlparty_eki_eki_02_01_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_02_01_off_1;
+BattleGroupSetup btlgrp_eki_eki_02_01_off_1;
 BattleUnitSetup btlparty_eki_eki_02_02_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_02_02_off_1;
+BattleGroupSetup btlgrp_eki_eki_02_02_off_1;
 BattleUnitSetup btlparty_eki_eki_02_03_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_02_03_off_1;
+BattleGroupSetup btlgrp_eki_eki_02_03_off_1;
 BattleUnitSetup btlparty_eki_eki_03_01_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_03_01_off_1;
+BattleGroupSetup btlgrp_eki_eki_03_01_off_1;
 BattleUnitSetup btlparty_eki_eki_03_02_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_03_02_off_1;
+BattleGroupSetup btlgrp_eki_eki_03_02_off_1;
 BattleUnitSetup btlparty_eki_eki_03_03_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_03_03_off_1;
+BattleGroupSetup btlgrp_eki_eki_03_03_off_1;
 BattleUnitSetup btlparty_eki_eki_03_05_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_03_05_off_1;
+BattleGroupSetup btlgrp_eki_eki_03_05_off_1;
 BattleUnitSetup btlparty_eki_eki_03_07_off_1[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_03_07_off_1;
+BattleGroupSetup btlgrp_eki_eki_03_07_off_1;
 BattleUnitSetup btlparty_eki_eki_04_01_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_01_off_1;
+BattleGroupSetup btlgrp_eki_eki_04_01_off_1;
 BattleUnitSetup btlparty_eki_eki_04_02_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_02_off_1;
+BattleGroupSetup btlgrp_eki_eki_04_02_off_1;
 BattleUnitSetup btlparty_eki_eki_04_06_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_06_off_1;
+BattleGroupSetup btlgrp_eki_eki_04_06_off_1;
 BattleUnitSetup btlparty_eki_eki_04_03_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_03_off_1;
+BattleGroupSetup btlgrp_eki_eki_04_03_off_1;
 BattleUnitSetup btlparty_eki_eki_04_04_off_1[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_04_off_1;
+BattleGroupSetup btlgrp_eki_eki_04_04_off_1;
 BattleUnitSetup btlparty_eki_eki_04_05_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_05_off_1;
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_test1_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_test2_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_test3_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_06_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_06_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_02_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_02_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_02_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_03_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_03_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_03_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_03_06_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_03_08_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_04_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_04_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_04_06_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_04_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_04_04_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_04_05_off[2];
+BattleGroupSetup btlgrp_eki_eki_04_05_off_1;
+NpcBattleSelect btlgrpsel_eki_btlno_eki_test1_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_test2_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_test3_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_06_01_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_06_02_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_02_01_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_02_02_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_02_03_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_03_01_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_03_02_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_03_03_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_03_06_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_03_08_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_04_01_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_04_02_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_04_06_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_04_03_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_04_04_off[2];
+NpcBattleSelect btlgrpsel_eki_btlno_eki_04_05_off[2];
 NpcSetupBattleInfo btlsetup_eki_tbl[20];
 NpcTerritoryInfo btl_eki_setup_no_tbl[20];
 
-__declspec(section ".data") f32 fd_battle_database_eki_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_battle_database_eki_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_eki_neg_one_382 = -1.0f;
+f32 fd_battle_database_eki_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_eki___local_PI_383 = 3.1415927f;
+f32 fd_battle_database_eki___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_battle_database_eki___local_3PIO2_385 = 4.712389f;
+f32 fd_battle_database_eki___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_battle_database_eki_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_battle_database_eki_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_eki___local_PIO2_384 = 1.5707964f;
+f32 fd_battle_database_eki___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_battle_database_eki_one_381 = 1.0f;
+f32 fd_battle_database_eki_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_eki_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_battle_database_eki_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_eki_neg_one_365 = -1.0f;
+f32 fd_battle_database_eki_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_eki___local_PI_366 = 3.1415927f;
+f32 fd_battle_database_eki___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_battle_database_eki___local_3PIO2_368 = 4.712389f;
+f32 fd_battle_database_eki___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_battle_database_eki_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_battle_database_eki_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_eki___local_PIO2_367 = 1.5707964f;
+f32 fd_battle_database_eki___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_battle_database_eki_one_364 = 1.0f;
+f32 fd_battle_database_eki_one_364 = 1.0f;
 
 BattleStageObjectData eki_btlobject_data[] = {
     {"lamp_01", 2, 0, {-116.0f, 0.0f, -59.0f}, 0, 60, {0}},
@@ -214,7 +214,7 @@ BattleUnitSetup btlparty_eki_eki_06_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_06_01_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_06_01_off_1 = {
     3, // numEnemies
     btlparty_eki_eki_06_01_off_1, // enemyData
     25, // heldItemWeight
@@ -248,7 +248,7 @@ BattleUnitSetup btlparty_eki_eki_02_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_02_01_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_02_01_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_02_01_off_1, // enemyData
     25, // heldItemWeight
@@ -292,7 +292,7 @@ BattleUnitSetup btlparty_eki_eki_02_02_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_02_02_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_02_02_off_1 = {
     3, // numEnemies
     btlparty_eki_eki_02_02_off_1, // enemyData
     25, // heldItemWeight
@@ -326,7 +326,7 @@ BattleUnitSetup btlparty_eki_eki_02_03_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_02_03_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_02_03_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_02_03_off_1, // enemyData
     25, // heldItemWeight
@@ -360,7 +360,7 @@ BattleUnitSetup btlparty_eki_eki_03_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_03_01_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_03_01_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_03_01_off_1, // enemyData
     25, // heldItemWeight
@@ -404,7 +404,7 @@ BattleUnitSetup btlparty_eki_eki_03_02_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_03_02_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_03_02_off_1 = {
     3, // numEnemies
     btlparty_eki_eki_03_02_off_1, // enemyData
     25, // heldItemWeight
@@ -448,7 +448,7 @@ BattleUnitSetup btlparty_eki_eki_03_03_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_03_03_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_03_03_off_1 = {
     3, // numEnemies
     btlparty_eki_eki_03_03_off_1, // enemyData
     25, // heldItemWeight
@@ -482,7 +482,7 @@ BattleUnitSetup btlparty_eki_eki_03_05_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_03_05_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_03_05_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_03_05_off_1, // enemyData
     25, // heldItemWeight
@@ -536,7 +536,7 @@ BattleUnitSetup btlparty_eki_eki_03_07_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_03_07_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_03_07_off_1 = {
     4, // numEnemies
     btlparty_eki_eki_03_07_off_1, // enemyData
     25, // heldItemWeight
@@ -580,7 +580,7 @@ BattleUnitSetup btlparty_eki_eki_04_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_01_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_04_01_off_1 = {
     3, // numEnemies
     btlparty_eki_eki_04_01_off_1, // enemyData
     25, // heldItemWeight
@@ -624,7 +624,7 @@ BattleUnitSetup btlparty_eki_eki_04_02_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_02_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_04_02_off_1 = {
     3, // numEnemies
     btlparty_eki_eki_04_02_off_1, // enemyData
     25, // heldItemWeight
@@ -658,7 +658,7 @@ BattleUnitSetup btlparty_eki_eki_04_06_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_06_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_04_06_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_04_06_off_1, // enemyData
     25, // heldItemWeight
@@ -692,7 +692,7 @@ BattleUnitSetup btlparty_eki_eki_04_03_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_03_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_04_03_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_04_03_off_1, // enemyData
     25, // heldItemWeight
@@ -746,7 +746,7 @@ BattleUnitSetup btlparty_eki_eki_04_04_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_04_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_04_04_off_1 = {
     4, // numEnemies
     btlparty_eki_eki_04_04_off_1, // enemyData
     25, // heldItemWeight
@@ -780,7 +780,7 @@ BattleUnitSetup btlparty_eki_eki_04_05_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_05_off_1 = {
+BattleGroupSetup btlgrp_eki_eki_04_05_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_04_05_off_1, // enemyData
     25, // heldItemWeight
@@ -791,97 +791,97 @@ __declspec(section ".data") BattleGroupSetup btlgrp_eki_eki_04_05_off_1 = {
     5, // field_1C
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_test1_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_test1_off[] = {
     {50, &btlgrp_eki_eki_06_01_off_1, eki_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_test2_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_test2_off[] = {
     {50, &btlgrp_eki_eki_06_01_off_1, &eki_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_test3_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_test3_off[] = {
     {50, &btlgrp_eki_eki_06_01_off_1, &eki_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_06_01_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_06_01_off[] = {
     {50, &btlgrp_eki_eki_06_01_off_1, eki_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_06_02_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_06_02_off[] = {
     {50, &btlgrp_eki_eki_06_01_off_1, eki_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_02_01_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_02_01_off[] = {
     {20, &btlgrp_eki_eki_02_01_off_1, &eki_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_02_02_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_02_02_off[] = {
     {20, &btlgrp_eki_eki_02_02_off_1, &eki_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_02_03_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_02_03_off[] = {
     {20, &btlgrp_eki_eki_02_03_off_1, &eki_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_03_01_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_03_01_off[] = {
     {20, &btlgrp_eki_eki_03_01_off_1, &eki_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_03_02_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_03_02_off[] = {
     {20, &btlgrp_eki_eki_03_02_off_1, &eki_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_03_03_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_03_03_off[] = {
     {20, &btlgrp_eki_eki_03_03_off_1, &eki_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_03_06_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_03_06_off[] = {
     {20, &btlgrp_eki_eki_03_05_off_1, &eki_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_03_08_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_03_08_off[] = {
     {20, &btlgrp_eki_eki_03_07_off_1, &eki_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_04_01_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_04_01_off[] = {
     {20, &btlgrp_eki_eki_04_01_off_1, &eki_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_04_02_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_04_02_off[] = {
     {20, &btlgrp_eki_eki_04_02_off_1, &eki_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_04_06_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_04_06_off[] = {
     {20, &btlgrp_eki_eki_04_06_off_1, &eki_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_04_03_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_04_03_off[] = {
     {20, &btlgrp_eki_eki_04_03_off_1, &eki_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_04_04_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_04_04_off[] = {
     {20, &btlgrp_eki_eki_04_04_off_1, &eki_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_eki_btlno_eki_04_05_off[] = {
+NpcBattleSelect btlgrpsel_eki_btlno_eki_04_05_off[] = {
     {20, &btlgrp_eki_eki_04_05_off_1, &eki_btlstage_data[1]},
     {0},
 };

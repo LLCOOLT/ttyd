@@ -519,25 +519,25 @@ inline Vec initializeVec(Vec* input) {
 void effUltraHammerDisp(enum CameraId camId, void *param)
 {
   u32 new_var2[2]; // FAKE: register-promoted array (vtx fmt + loop counter); separate scalars differ
-  CameraEntry *temp_r31;
+  CameraEntry *cam;
   EffUltraHammerData *data;
   s32 i;
-  s32 temp_r24;
+  s32 mode;
   EffectEntry *effect;
-  Mtx spC0;
-  Mtx sp90;
-  Mtx sp60;
-  Mtx sp30;
-  GXTexObj sp10;
+  Mtx mtx;
+  Mtx yawMtx;
+  Mtx scaleMtx;
+  Mtx baseMtx;
+  GXTexObj texObj;
   effect = param;
   data = effect->userdata;
-  temp_r31 = camGetPtr(camId);
-  temp_r24 = data->unk0;
-  PSMTXTrans(spC0, data->position.x, data->position.y, data->position.z);
-  PSMTXScale(sp60, data->scale, data->scale, data->scale);
-  PSMTXRotRad(sp90, 'y', (-camGetPtr(camId)->viewYaw) * 0.01745329252f);
-  PSMTXConcat(spC0, sp90, spC0);
-  PSMTXConcat(spC0, sp60, sp30);
+  cam = camGetPtr(camId);
+  mode = data->unk0;
+  PSMTXTrans(mtx, data->position.x, data->position.y, data->position.z);
+  PSMTXScale(scaleMtx, data->scale, data->scale, data->scale);
+  PSMTXRotRad(yawMtx, 'y', (-camGetPtr(camId)->viewYaw) * 0.01745329252f);
+  PSMTXConcat(mtx, yawMtx, mtx);
+  PSMTXConcat(mtx, scaleMtx, baseMtx);
   GXSetNumChans(1);
   GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
   GXSetNumTevStages(2);
@@ -553,8 +553,8 @@ void effUltraHammerDisp(enum CameraId camId, void *param)
   GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
   GXSetNumTexGens(1);
   GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 30, 0, 125);
-  effGetTexObj(EFF_TEX(145), &sp10);
-  GXLoadTexObj(&sp10, GX_TEXMAP0);
+  effGetTexObj(EFF_TEX(145), &texObj);
+  GXLoadTexObj(&texObj, GX_TEXMAP0);
   GXSetCullMode(GX_CULL_NONE);
   GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, data->alpha});
   data++;
@@ -562,20 +562,20 @@ void effUltraHammerDisp(enum CameraId camId, void *param)
   {
     if (data->update == 0)
     {
-      PSMTXTrans(spC0, data->position.x, data->position.y, data->position.z);
-      PSMTXScale(sp60, 0.6f * data->scale, 0.6f * data->scale, 0.6f * data->scale);
-      PSMTXConcat(spC0, sp60, spC0);
-      if (temp_r24 != 0)
+      PSMTXTrans(mtx, data->position.x, data->position.y, data->position.z);
+      PSMTXScale(scaleMtx, 0.6f * data->scale, 0.6f * data->scale, 0.6f * data->scale);
+      PSMTXConcat(mtx, scaleMtx, mtx);
+      if (mode != 0)
       {
-        PSMTXScale(sp60, -1.0f, 1.0f, 1.0f);
-        PSMTXConcat(spC0, sp60, spC0);
+        PSMTXScale(scaleMtx, -1.0f, 1.0f, 1.0f);
+        PSMTXConcat(mtx, scaleMtx, mtx);
       }
-      PSMTXConcat(sp30, spC0, spC0);
-      PSMTXConcat(temp_r31->view, spC0, spC0);
-      GXLoadPosMtxImm(spC0, 0);
+      PSMTXConcat(baseMtx, mtx, mtx);
+      PSMTXConcat(cam->view, mtx, mtx);
+      GXLoadPosMtxImm(mtx, 0);
       GXSetCurrentMtx(0);
-      PSMTXTrans(spC0, data->offsetX, data->offsetY, 0.0f);
-      GXLoadTexMtxImm(spC0, 30, GX_MTX2x4);
+      PSMTXTrans(mtx, data->offsetX, data->offsetY, 0.0f);
+      GXLoadTexMtxImm(mtx, 30, GX_MTX2x4);
       GXClearVtxDesc();
       GXSetVtxDesc(GX_VA_POS, GX_INDEX8);
       GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_TEX_ST, GX_RGBA4, 10);

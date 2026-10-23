@@ -64,27 +64,27 @@ USER_FUNC(eff_fall_entry);
 static USER_FUNC(down_ceil);
 USER_FUNC(ceil_exist);
 
-__declspec(section ".data") f32 fd_boss_champion_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_champion_neg_one_382;
-__declspec(section ".data") f32 fd_boss_champion___local_PI_383;
-__declspec(section ".data") f32 fd_boss_champion___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_champion_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_champion___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_champion_one_381;
-__declspec(section ".data") f32 fd_boss_champion_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_champion_neg_one_365;
-__declspec(section ".data") f32 fd_boss_champion___local_PI_366;
-__declspec(section ".data") f32 fd_boss_champion___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_champion_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_champion___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_champion_one_364;
+f32 fd_boss_champion_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_champion_neg_one_382;
+f32 fd_boss_champion___local_PI_383;
+f32 fd_boss_champion___local_3PIO2_385;
+f32 fd_boss_champion_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_champion___local_PIO2_384;
+f32 fd_boss_champion_one_381;
+f32 fd_boss_champion_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_champion_neg_one_365;
+f32 fd_boss_champion___local_PI_366;
+f32 fd_boss_champion___local_3PIO2_368;
+f32 fd_boss_champion_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_champion___local_PIO2_367;
+f32 fd_boss_champion_one_364;
 BattleUnitKind unit_boss_champion;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
 PoseTableEntry pose_table_roof[18];
-static __declspec(section ".data") BattleDataEntry data_table[2];
+static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_champion_drop_kick_attack;
 BattleWeapon weapon_champion_screw_attack;
@@ -98,7 +98,7 @@ s32 to_floor[95];
 static s32 init_event[52];
 static s32 entry_event[354];
 static s32 damage_event[75];
-static __declspec(section ".data") s32 ceil_fall_ready_event[8];
+static s32 ceil_fall_ready_event[8];
 static s32 dead_event[90];
 static s32 phase_event[450];
 static s32 attack_event[221];
@@ -108,7 +108,7 @@ s32 flying_chop_attack_event[326];
 s32 foot_stamp_attack_event[467];
 s32 healing_event[209];
 s32 roof_shake_attack_event[386];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
 USER_FUNC(ceil_exist) {
     s32* args = event->args;
@@ -121,33 +121,33 @@ USER_FUNC(ceil_exist) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_boss_champion_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_champion_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_champion_neg_one_382 = -1.0f;
+f32 fd_boss_champion_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_champion___local_PI_383 = 3.1415927f;
+f32 fd_boss_champion___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_champion___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_champion___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_champion_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_champion_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_champion___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_champion___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_champion_one_381 = 1.0f;
+f32 fd_boss_champion_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_champion_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_champion_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_champion_neg_one_365 = -1.0f;
+f32 fd_boss_champion_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_champion___local_PI_366 = 3.1415927f;
+f32 fd_boss_champion___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_champion___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_champion___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_champion_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_champion_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_champion___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_champion___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_champion_one_364 = 1.0f;
+f32 fd_boss_champion_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_champion = {
     64,
@@ -219,11 +219,11 @@ BattleUnitKind unit_boss_champion = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {60, 50, 60, 100, 60, 100, 100, 40, 0, 85, 100, 85, 100, 90, 60, 0, 0, 100, 70, 100, 100, 0};
+static StatusVulnerability regist = {60, 50, 60, 100, 60, 100, 100, 40, 0, 85, 100, 85, 100, 90, 60, 0, 0, 100, 70, 100, 100, 0};
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -267,7 +267,7 @@ PoseTableEntry pose_table_roof[] = {
     {69, "S_8"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
@@ -734,7 +734,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(ceil_fall_ready_event)
+static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_SetEventCeilFall, -2, 0)
     CALL_CHILD(PTR(to_floor))
     RETURN
@@ -1577,7 +1577,7 @@ EVT_BEGIN(roof_shake_attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

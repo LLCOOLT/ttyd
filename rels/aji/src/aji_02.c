@@ -53,64 +53,64 @@ static USER_FUNC(ride_chk);
 static USER_FUNC(thunder_main);
 static USER_FUNC(loop_onoff);
 
-__declspec(section ".data") f32 fd_aji_02_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_02_neg_one_382;
-__declspec(section ".data") f32 fd_aji_02___local_PI_383;
-__declspec(section ".data") f32 fd_aji_02___local_3PIO2_385;
-__declspec(section ".data") f32 fd_aji_02_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_02___local_PIO2_384;
-__declspec(section ".data") f32 fd_aji_02_one_381;
-__declspec(section ".data") f32 fd_aji_02_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_02_neg_one_365;
-__declspec(section ".data") f32 fd_aji_02___local_PI_366;
-__declspec(section ".data") f32 fd_aji_02___local_3PIO2_368;
-__declspec(section ".data") f32 fd_aji_02_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_02___local_PIO2_367;
-__declspec(section ".data") f32 fd_aji_02_one_364;
+f32 fd_aji_02_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_aji_02_neg_one_382;
+f32 fd_aji_02___local_PI_383;
+f32 fd_aji_02___local_3PIO2_385;
+f32 fd_aji_02_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_aji_02___local_PIO2_384;
+f32 fd_aji_02_one_381;
+f32 fd_aji_02_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_aji_02_neg_one_365;
+f32 fd_aji_02___local_PI_366;
+f32 fd_aji_02___local_3PIO2_368;
+f32 fd_aji_02_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_aji_02___local_PIO2_367;
+f32 fd_aji_02_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static BeroEntry bero_entry_data[2];
-__declspec(section ".data") u8 root_0[12];
-__declspec(section ".data") u8 root_1[16];
-__declspec(section ".data") u8 root_2[16];
+u8 root_0[12];
+u8 root_1[16];
+u8 root_2[16];
 typedef struct RootRoute { u8* panels; s32 count; } RootRoute;
-__declspec(section ".data") RootRoute root_data[3];
-static __declspec(section ".data") s32 hikaru_on[4];
-static __declspec(section ".data") s32 hikaru_off[4];
+RootRoute root_data[3];
+static s32 hikaru_on[4];
+static s32 hikaru_off[4];
 s32 hikaru_yuka[28];
 static s32 evt_box[95];
-static __declspec(section ".data") HitDamageReturn dmgReturnPt[2];
+static HitDamageReturn dmgReturnPt[2];
 static s32 hikaru_yuka_init[83];
 static s32 peach_evt_stg1[56];
 s32 aji_02_init_evt[125];
 
-__declspec(section ".data") f32 fd_aji_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_aji_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_aji_02_neg_one_382 = -1.0f;
+f32 fd_aji_02_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_aji_02___local_PI_383 = 3.1415927f;
+f32 fd_aji_02___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_aji_02___local_3PIO2_385 = 4.712389f;
+f32 fd_aji_02___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_aji_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_aji_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_aji_02___local_PIO2_384 = 1.5707964f;
+f32 fd_aji_02___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_aji_02_one_381 = 1.0f;
+f32 fd_aji_02_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_aji_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_aji_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_aji_02_neg_one_365 = -1.0f;
+f32 fd_aji_02_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_aji_02___local_PI_366 = 3.1415927f;
+f32 fd_aji_02___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_aji_02___local_3PIO2_368 = 4.712389f;
+f32 fd_aji_02___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_aji_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_aji_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_aji_02___local_PIO2_367 = 1.5707964f;
+f32 fd_aji_02___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_aji_02_one_364 = 1.0f;
+f32 fd_aji_02_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -150,33 +150,33 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-__declspec(section ".data") u8 root_0[] = {
+u8 root_0[] = {
     10, 9, 8, 7, 6, 5, 4, 3,
     2, 1, 0, 0,
 };
 
-__declspec(section ".data") u8 root_1[] = {
+u8 root_1[] = {
     21, 8, 7, 6, 20, 19, 18, 17,
     16, 15, 14, 13, 12, 11, 0, 0,
 };
 
-__declspec(section ".data") u8 root_2[] = {
+u8 root_2[] = {
     30, 29, 28, 27, 26, 17, 18, 19,
     20, 6, 5, 25, 24, 23, 22, 0,
 };
 
-__declspec(section ".data") RootRoute root_data[] = {
+RootRoute root_data[] = {
     {root_0, 10},
     {root_1, 14},
     {root_2, 15},
 };
 
-static __declspec(section ".data") EVT_BEGIN(hikaru_on)
+static EVT_BEGIN(hikaru_on)
     CALL(hikaru_on_func)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(hikaru_off)
+static EVT_BEGIN(hikaru_off)
     CALL(hikaru_off_func)
     RETURN
 EVT_END()
@@ -221,7 +221,7 @@ static EVT_BEGIN(evt_box)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") HitDamageReturn dmgReturnPt[] = {
+static HitDamageReturn dmgReturnPt[] = {
     {"mod_01", {0.0f, -1000.0f, 0.0f}},
     {0},
 };

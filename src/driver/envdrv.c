@@ -611,82 +611,82 @@ void envBlurOff(void) {
 //almost 1:1, needs some regalloc work and type changes
 void envGlare(EnvironmentGlare* glare) {
     static f32 frame_cnt = 0.0f;
-    EnvironmentWork* var_r4 = envGetWork();
+    EnvironmentWork* envWork = envGetWork();
     s16 sx;
-    EnvironmentGlareFilter* temp_r30;
-    u32 temp_r20;
-    u32 temp_r21;
-    EnvironmentGlare* var_r21;
-    EnvironmentGlare* var_r22_3;
-    s32 temp_r31;
-    s32 temp_r30_2;
+    EnvironmentGlareFilter* glareFilter;
+    u32 texH;
+    u32 texW;
+    EnvironmentGlare* glareIter;
+    EnvironmentGlare* glareCur;
+    s32 width;
+    s32 y1v;
 
 
 
     s32 x1v;
-    s32 temp_r29;
-    u32 var_r23_2;
+    s32 glareCount;
+    u32 texMtxId;
     s16 sy;
-    s32 var_r28;
+    s32 doneCount;
     u32 kc0;
     u32 kc1;
-    s32 var_r19_3;
-    void* temp_r19;
-    u16 temp_r27;
-    u16 temp_r26;
-    u16 temp_r0;
-    u16 temp_r8;
+    s32 batchCount;
+    void* texBuf;
+    u16 y0;
+    u16 x0;
+    u16 height;
+    u16 tmp;
 
     u32 size;
-    Mtx44 sp88;
-    Mtx sp58;
-    Mtx sp28;
-    GXTexObj sp8;
+    Mtx44 projMtx;
+    Mtx posMtx;
+    Mtx texMtx;
+    GXTexObj texObj;
 
     int i;
 
     frame_cnt += 1.0f;
-    temp_r30 = &var_r4->filter;
-    temp_r27 = var_r4->filter.y0;
-    temp_r26 = var_r4->filter.x0;
-    temp_r31 = (u16)(var_r4->filter.x1 - temp_r26);
-    temp_r0 = (u16)(var_r4->filter.y1 - temp_r27);
-    temp_r20 = temp_r0 >> 1;
-    temp_r21 = temp_r31 >> 1;
-    size = GXGetTexBufferSize((u16)temp_r21, (u16)temp_r20, GX_TF_RGB565, GX_FALSE, 0);
-    temp_r19 = smartAlloc(size, 3)->address;
-    GXSetTexCopySrc(temp_r26, temp_r27, temp_r31, temp_r0);
-    GXSetTexCopyDst((u16)temp_r21, (u16)temp_r20, GX_TF_RGB565, GX_TRUE);
-    GXCopyTex(temp_r19, GX_FALSE);
+    glareFilter = &envWork->filter;
+    y0 = envWork->filter.y0;
+    x0 = envWork->filter.x0;
+    width = (u16)(envWork->filter.x1 - x0);
+    height = (u16)(envWork->filter.y1 - y0);
+    texH = height >> 1;
+    texW = width >> 1;
+    size = GXGetTexBufferSize((u16)texW, (u16)texH, GX_TF_RGB565, GX_FALSE, 0);
+    texBuf = smartAlloc(size, 3)->address;
+    GXSetTexCopySrc(x0, y0, width, height);
+    GXSetTexCopyDst((u16)texW, (u16)texH, GX_TF_RGB565, GX_TRUE);
+    GXCopyTex(texBuf, GX_FALSE);
     GXPixModeSync();
-    GXInitTexObj(&sp8, temp_r19, (u16)temp_r21, (u16)temp_r20, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&sp8, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-    GXLoadTexObj(&sp8, GX_TEXMAP0);
-    temp_r29 = glare->count;
-    var_r28 = 0;
-    temp_r21 = glare->kcolorSel0;
-    temp_r20 = glare->kcolorSel1;
+    GXInitTexObj(&texObj, texBuf, (u16)texW, (u16)texH, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&texObj, GX_TEXMAP0);
+    glareCount = glare->count;
+    doneCount = 0;
+    texW = glare->kcolorSel0;
+    texH = glare->kcolorSel1;
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG1);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_KONST, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-    GXSetTevKColorSel(GX_TEVSTAGE0, temp_r21);
+    GXSetTevKColorSel(GX_TEVSTAGE0, texW);
     GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_C1, GX_CC_KONST, GX_CC_ZERO);
-    GXSetTevKColorSel(GX_TEVSTAGE1, temp_r20);
+    GXSetTevKColorSel(GX_TEVSTAGE1, texH);
     GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     for (i = 0; i < 7; i++) {
         GXSetTevOrder(i * 2 + 2, i + 1, 0, 0xFF);
         GXSetTevColorOp(i * 2 + 2, 1, 0, 0, 1, 2);
         GXSetTevColorIn(i * 2 + 2, 0xE, 0xF, 0xF, 8);
-        GXSetTevKColorSel(i * 2 + 2, temp_r21);
+        GXSetTevKColorSel(i * 2 + 2, texW);
         GXSetTevSwapMode(i * 2 + 2, 0, 0);
         GXSetTevOrder(i * 2 + 3, 0xFF, 0xFF, 0xFF);
         GXSetTevColorOp(i * 2 + 3, 0, 0, 0, 1, 0);
         GXSetTevColorIn(i * 2 + 3, 0xF, 4, 0xE, 0);
-        GXSetTevKColorSel(i * 2 + 3, temp_r20);
+        GXSetTevKColorSel(i * 2 + 3, texH);
         GXSetTevSwapMode(i * 2 + 3, 0, 0);
     }
 
@@ -697,7 +697,7 @@ void envGlare(EnvironmentGlare* glare) {
         }
     }
 
-    if (temp_r30->flags & 1) {
+    if (glareFilter->flags & 1) {
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     } else {
         GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
@@ -707,10 +707,10 @@ void envGlare(EnvironmentGlare* glare) {
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_CLAMP, GX_AF_NONE);
     GXSetViewport(0.0f, 0.0f, (f32)gp->fbWidth, (f32)gp->efbHeight, 0.0f, 1.0f);
     GXSetScissor(0, 0, gp->fbWidth, gp->efbHeight);
-    MTXOrtho(sp88, 0.0f, (f32)gp->efbHeight, 0.0f, (f32)gp->fbWidth, 0.0f, -32767.0f);
-    GXSetProjection(sp88, GX_ORTHOGRAPHIC);
-    PSMTXIdentity(sp58);
-    GXLoadPosMtxImm(sp58, 0);
+    MTXOrtho(projMtx, 0.0f, (f32)gp->efbHeight, 0.0f, (f32)gp->fbWidth, 0.0f, -32767.0f);
+    GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
+    PSMTXIdentity(posMtx);
+    GXLoadPosMtxImm(posMtx, 0);
     GXSetCurrentMtx(0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -718,35 +718,35 @@ void envGlare(EnvironmentGlare* glare) {
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_U16, 0);
     GXSetCullMode(GX_CULL_BACK);
-    GXSetZScaleOffset(1.0f, temp_r30->zscale);
-    temp_r30_2 = temp_r27 + temp_r0;
-    x1v = temp_r26 + temp_r31;
-    sx = temp_r26;
-    sy = temp_r27;
-    var_r21 = glare;
-    while (var_r28 < temp_r29) {
-        var_r22_3 = var_r21;
-        var_r19_3 = 0;
-        var_r23_2 = 0x1E;
-        while ((var_r19_3 < 8) && (var_r28 < temp_r29)) {
-            MTXTrans(sp28, (glare->coordScale * var_r22_3->coords[0].x) / (f32) gp->fbWidth, (glare->coordScale * var_r22_3->coords[0].y) / (f32) gp->efbHeight, 0.0f); //temp_r4, temp_r5_3, as 2 3 and temp_f4 as last
-            GXLoadTexMtxImm(sp28, var_r23_2, 1);
-            var_r23_2 += 3;
-            var_r19_3 += 1;
-            var_r22_3 = (void*)((u32)var_r22_3 + 8);
-            var_r21 = (void*)((u32)var_r21 + 8);
-            var_r28 += 1;
+    GXSetZScaleOffset(1.0f, glareFilter->zscale);
+    y1v = y0 + height;
+    x1v = x0 + width;
+    sx = x0;
+    sy = y0;
+    glareIter = glare;
+    while (doneCount < glareCount) {
+        glareCur = glareIter;
+        batchCount = 0;
+        texMtxId = 0x1E;
+        while ((batchCount < 8) && (doneCount < glareCount)) {
+            MTXTrans(texMtx, (glare->coordScale * glareCur->coords[0].x) / (f32) gp->fbWidth, (glare->coordScale * glareCur->coords[0].y) / (f32) gp->efbHeight, 0.0f); //temp_r4, temp_r5_3, as 2 3 and temp_f4 as last
+            GXLoadTexMtxImm(texMtx, texMtxId, 1);
+            texMtxId += 3;
+            batchCount += 1;
+            glareCur = (void*)((u32)glareCur + 8);
+            glareIter = (void*)((u32)glareIter + 8);
+            doneCount += 1;
         }
-        GXSetNumTevStages((u8)(var_r19_3 * 2));
-        GXSetNumTexGens((u8)var_r19_3);
+        GXSetNumTevStages((u8)(batchCount * 2));
+        GXSetNumTexGens((u8)batchCount);
         GXBegin(GX_QUADS, GX_VTXFMT7, 4);
         GXPosition3s16(sx, sy, 0);
         GXTexCoord2u16(0, 0);
         GXPosition3s16((s16)x1v, sy, 0);
         GXTexCoord2u16(1, 0);
-        GXPosition3s16((s16)x1v, (s16)temp_r30_2, 0);
+        GXPosition3s16((s16)x1v, (s16)y1v, 0);
         GXTexCoord2u16(1, 1);
-        GXPosition3s16(sx, (s16)temp_r30_2, 0);
+        GXPosition3s16(sx, (s16)y1v, 0);
         GXTexCoord2u16(0, 1);
     }
 }

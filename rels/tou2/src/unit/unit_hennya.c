@@ -22,61 +22,61 @@ USER_FUNC(btlevtcmd_SetEventWait);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(evt_eff);
 
-__declspec(section ".data") f32 fd_hennya_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hennya_neg_one_382;
-__declspec(section ".data") f32 fd_hennya___local_PI_383;
-__declspec(section ".data") f32 fd_hennya___local_3PIO2_385;
-__declspec(section ".data") f32 fd_hennya_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hennya___local_PIO2_384;
-__declspec(section ".data") f32 fd_hennya_one_381;
-__declspec(section ".data") f32 fd_hennya_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hennya_neg_one_365;
-__declspec(section ".data") f32 fd_hennya___local_PI_366;
-__declspec(section ".data") f32 fd_hennya___local_3PIO2_368;
-__declspec(section ".data") f32 fd_hennya_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hennya___local_PIO2_367;
-__declspec(section ".data") f32 fd_hennya_one_364;
+f32 fd_hennya_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_hennya_neg_one_382;
+f32 fd_hennya___local_PI_383;
+f32 fd_hennya___local_3PIO2_385;
+f32 fd_hennya_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_hennya___local_PIO2_384;
+f32 fd_hennya_one_381;
+f32 fd_hennya_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_hennya_neg_one_365;
+f32 fd_hennya___local_PI_366;
+f32 fd_hennya___local_3PIO2_368;
+f32 fd_hennya_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_hennya___local_PIO2_367;
+f32 fd_hennya_one_364;
 static BattleUnitKind unit_hennya;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
-static __declspec(section ".data") BattleDataEntry data_table[3];
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
+static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_hannya_attack;
 static PoseTableEntry pose_table[18];
 static s32 init_event[25];
 static s32 dmg_avoid_counter_thorn_head_event[68];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 static s32 attack_event[455];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
-__declspec(section ".data") f32 fd_hennya_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hennya_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hennya_neg_one_382 = -1.0f;
+f32 fd_hennya_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_hennya___local_PI_383 = 3.1415927f;
+f32 fd_hennya___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hennya___local_3PIO2_385 = 4.712389f;
+f32 fd_hennya___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hennya_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hennya_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hennya___local_PIO2_384 = 1.5707964f;
+f32 fd_hennya___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hennya_one_381 = 1.0f;
+f32 fd_hennya_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_hennya_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hennya_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hennya_neg_one_365 = -1.0f;
+f32 fd_hennya_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_hennya___local_PI_366 = 3.1415927f;
+f32 fd_hennya___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hennya___local_3PIO2_368 = 4.712389f;
+f32 fd_hennya___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hennya_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hennya_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hennya___local_PIO2_367 = 1.5707964f;
+f32 fd_hennya___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hennya_one_364 = 1.0f;
+f32 fd_hennya_one_364 = 1.0f;
 
 static BattleUnitKind unit_hennya = {
     163, // mUnitType
@@ -123,13 +123,13 @@ static BattleUnitKind unit_hennya = {
     (BattleDataEntry*)data_table, // dataTable
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
+static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {0};
+static BattleUnitDefenseAttr defence_attr = {0};
 
-static __declspec(section ".data") StatusVulnerability regist = {70, 90, 70, 150, 70, 150, 150, 70, 150, 90, 150, 90, 150, 90, 70, 80, 80, 150, 70, 0, 0, 30};
+static StatusVulnerability regist = {70, 90, 70, 150, 70, 150, 150, 70, 150, 90, 150, 90, 150, 90, 70, 80, 80, 150, 70, 0, 0, 30};
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {37, dmg_avoid_counter_thorn_head_event},
     {48, btldefaultevt_Dummy},
     {0},
@@ -243,7 +243,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -373,7 +373,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

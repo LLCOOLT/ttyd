@@ -30,78 +30,78 @@ USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_random);
 
-__declspec(section ".data") f32 fd_jin_01_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_jin_01_neg_one_382;
-__declspec(section ".data") f32 fd_jin_01___local_PI_383;
-__declspec(section ".data") f32 fd_jin_01___local_3PIO2_385;
-__declspec(section ".data") f32 fd_jin_01_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_jin_01___local_PIO2_384;
-__declspec(section ".data") f32 fd_jin_01_one_381;
-__declspec(section ".data") f32 fd_jin_01_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_jin_01_neg_one_365;
-__declspec(section ".data") f32 fd_jin_01___local_PI_366;
-__declspec(section ".data") f32 fd_jin_01___local_3PIO2_368;
-__declspec(section ".data") f32 fd_jin_01_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_jin_01___local_PIO2_367;
-__declspec(section ".data") f32 fd_jin_01_one_364;
-static __declspec(section ".data") s32 s1_close[12];
-static __declspec(section ".data") s32 s1_open[12];
-static __declspec(section ".data") s32 s2_close[12];
-static __declspec(section ".data") s32 s2_open[12];
+f32 fd_jin_01_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_jin_01_neg_one_382;
+f32 fd_jin_01___local_PI_383;
+f32 fd_jin_01___local_3PIO2_385;
+f32 fd_jin_01_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_jin_01___local_PIO2_384;
+f32 fd_jin_01_one_381;
+f32 fd_jin_01_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_jin_01_neg_one_365;
+f32 fd_jin_01___local_PI_366;
+f32 fd_jin_01___local_3PIO2_368;
+f32 fd_jin_01_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_jin_01___local_PIO2_367;
+f32 fd_jin_01_one_364;
+static s32 s1_close[12];
+static s32 s1_open[12];
+static s32 s2_close[12];
+static s32 s2_open[12];
 static BeroEntry bero_entry_data[3];
 static s32 cam_shake[62];
 s32 evt_kaidan_oku[144];
 static s32 ki_data_evt_01[20];
-static __declspec(section ".data") TreeAccess ki_data[2];
+static TreeAccess ki_data[2];
 s32 jin_01_init_evt[41];
 
-__declspec(section ".data") f32 fd_jin_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_jin_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_jin_01_neg_one_382 = -1.0f;
+f32 fd_jin_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_jin_01___local_PI_383 = 3.1415927f;
+f32 fd_jin_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_jin_01___local_3PIO2_385 = 4.712389f;
+f32 fd_jin_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_jin_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_jin_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_jin_01___local_PIO2_384 = 1.5707964f;
+f32 fd_jin_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_jin_01_one_381 = 1.0f;
+f32 fd_jin_01_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_jin_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_jin_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_jin_01_neg_one_365 = -1.0f;
+f32 fd_jin_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_jin_01___local_PI_366 = 3.1415927f;
+f32 fd_jin_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_jin_01___local_3PIO2_368 = 4.712389f;
+f32 fd_jin_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_jin_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_jin_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_jin_01___local_PIO2_367 = 1.5707964f;
+f32 fd_jin_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_jin_01_one_364 = 1.0f;
+f32 fd_jin_01_one_364 = 1.0f;
 
-static __declspec(section ".data") EVT_BEGIN(s1_close)
+static EVT_BEGIN(s1_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door00"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(s1_open)
+static EVT_BEGIN(s1_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door00"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(s2_close)
+static EVT_BEGIN(s2_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door03"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(s2_open)
+static EVT_BEGIN(s2_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door03"), 0, LW(0), 0)
     RETURN
@@ -228,7 +228,7 @@ static EVT_BEGIN(ki_data_evt_01)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") TreeAccess ki_data[] = {
+static TreeAccess ki_data[] = {
     {2, "A_gorden_tree", "S_golden_tree", NULL, 0, ki_data_evt_01},
     {7, NULL, NULL, NULL, 0, NULL},
 };

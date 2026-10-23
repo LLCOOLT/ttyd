@@ -42,6 +42,45 @@ static inline void OSInitFastCast(void) {
 }
 // clang-format off
 
+static inline s16 __OSf32tos16(register f32 inF) {
+    u32 tmp;
+    register u32* tmpPtr = &tmp;
+    register s16 out;
+    asm {
+        psq_st inF, 0(tmpPtr), 0x1, OS_FASTCAST_S16
+        lha out, 0(tmpPtr)
+    }
+    return out;
+}
+
+static inline void OSf32tos16(f32* f, s16* out) {
+    *out = __OSf32tos16(*f);
+}
+
+static inline f32 __OSs16tof32(register const s16* in) {
+    register f32 out;
+    asm {
+        psq_l out, 0(in), 1, OS_FASTCAST_S16
+    }
+    return out;
+}
+
+static inline void OSs16tof32(const s16* in, f32* out) {
+    *out = __OSs16tof32(in);
+}
+
+static inline f32 __OSs8tof32(register const s8* in) {
+    register f32 out;
+    asm {
+        psq_l out, 0(in), 1, OS_FASTCAST_S8
+    }
+    return out;
+}
+
+static inline void OSs8tof32(const s8* in, f32* out) {
+    *out = __OSs8tof32(in);
+}
+
 #ifdef __cplusplus
 }
 #endif

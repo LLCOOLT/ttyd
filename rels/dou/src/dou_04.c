@@ -77,30 +77,30 @@ USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_mapgrp_translate2);
 
-__declspec(section ".data") f32 fd_dou_04_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_04_neg_one_382;
-__declspec(section ".data") f32 fd_dou_04___local_PI_383;
-__declspec(section ".data") f32 fd_dou_04___local_3PIO2_385;
-__declspec(section ".data") f32 fd_dou_04_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_04___local_PIO2_384;
-__declspec(section ".data") f32 fd_dou_04_one_381;
-__declspec(section ".data") f32 fd_dou_04_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_04_neg_one_365;
-__declspec(section ".data") f32 fd_dou_04___local_PI_366;
-__declspec(section ".data") f32 fd_dou_04___local_3PIO2_368;
-__declspec(section ".data") f32 fd_dou_04_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_04___local_PIO2_367;
-__declspec(section ".data") f32 fd_dou_04_one_364;
+f32 fd_dou_04_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_dou_04_neg_one_382;
+f32 fd_dou_04___local_PI_383;
+f32 fd_dou_04___local_3PIO2_385;
+f32 fd_dou_04_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_dou_04___local_PIO2_384;
+f32 fd_dou_04_one_381;
+f32 fd_dou_04_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_dou_04_neg_one_365;
+f32 fd_dou_04___local_PI_366;
+f32 fd_dou_04___local_3PIO2_368;
+f32 fd_dou_04_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_dou_04___local_PIO2_367;
+f32 fd_dou_04_one_364;
 static BeroEntry bero_entry_data[2];
 s32 box_trans[76];
-__declspec(section ".data") s32 box_pukapuka[5];
+s32 box_pukapuka[5];
 s32 box_event[222];
 s32 lift_event_00[223];
 s32 lift_event_01[236];
 s32 lift_main_00[53];
 s32 lift_main_01[53];
 s32 lift_event_init[17];
-__declspec(section ".data") s32 lift_event[5];
+s32 lift_event[5];
 static HitDamageReturn hitDmgRetPoints[4];
 static s32 kuribo_init[16];
 s32 kuribo_talk[740];
@@ -114,33 +114,33 @@ USER_FUNC(evt_mario_check_menu) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_dou_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_dou_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_dou_04_neg_one_382 = -1.0f;
+f32 fd_dou_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_dou_04___local_PI_383 = 3.1415927f;
+f32 fd_dou_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_dou_04___local_3PIO2_385 = 4.712389f;
+f32 fd_dou_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_dou_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_dou_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_dou_04___local_PIO2_384 = 1.5707964f;
+f32 fd_dou_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_dou_04_one_381 = 1.0f;
+f32 fd_dou_04_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_dou_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_dou_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_dou_04_neg_one_365 = -1.0f;
+f32 fd_dou_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_dou_04___local_PI_366 = 3.1415927f;
+f32 fd_dou_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_dou_04___local_3PIO2_368 = 4.712389f;
+f32 fd_dou_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_dou_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_dou_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_dou_04___local_PIO2_367 = 1.5707964f;
+f32 fd_dou_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_dou_04_one_364 = 1.0f;
+f32 fd_dou_04_one_364 = 1.0f;
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -188,7 +188,7 @@ EVT_BEGIN(box_trans)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(box_pukapuka)
+EVT_BEGIN(box_pukapuka)
     CALL(evt_box_pukapuka, GW(1))
     RETURN
 EVT_END()
@@ -493,7 +493,7 @@ EVT_BEGIN(lift_event_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(lift_event)
+EVT_BEGIN(lift_event)
     SET_VALUE(GF(10), 0)
     RETURN
 EVT_END()

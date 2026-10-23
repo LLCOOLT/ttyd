@@ -55,31 +55,31 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_win_item_select);
 static void alpha_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") f32 fd_dou_05_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_05_neg_one_382;
-__declspec(section ".data") f32 fd_dou_05___local_PI_383;
-__declspec(section ".data") f32 fd_dou_05___local_3PIO2_385;
-__declspec(section ".data") f32 fd_dou_05_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_05___local_PIO2_384;
-__declspec(section ".data") f32 fd_dou_05_one_381;
-__declspec(section ".data") f32 fd_dou_05_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_05_neg_one_365;
-__declspec(section ".data") f32 fd_dou_05___local_PI_366;
-__declspec(section ".data") f32 fd_dou_05___local_3PIO2_368;
-__declspec(section ".data") f32 fd_dou_05_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_05___local_PIO2_367;
-__declspec(section ".data") f32 fd_dou_05_one_364;
+f32 fd_dou_05_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_dou_05_neg_one_382;
+f32 fd_dou_05___local_PI_383;
+f32 fd_dou_05___local_3PIO2_385;
+f32 fd_dou_05_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_dou_05___local_PIO2_384;
+f32 fd_dou_05_one_381;
+f32 fd_dou_05_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_dou_05_neg_one_365;
+f32 fd_dou_05___local_PI_366;
+f32 fd_dou_05___local_3PIO2_368;
+f32 fd_dou_05_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_dou_05___local_PIO2_367;
+f32 fd_dou_05_one_364;
 static BeroEntry bero_entry_data[5];
-static __declspec(section ".data") s32 key_tbl[2];
+static s32 key_tbl[2];
 static s32 evt_chk[23];
-static __declspec(section ".data") s32 evt_unlock[7];
+static s32 evt_unlock[7];
 s32 bigdoor_event_init[36];
 s32 bigdoor_event[152];
 static HitDamageReturn hitDmgRetPoints[6];
 static s32 mobj_box00[28];
 s32 waterfall_main[30];
 s32 waterfall_init[25];
-__declspec(section ".data") s32 ride_waterfall[5];
+s32 ride_waterfall[5];
 s32 nonride_waterfall[19];
 s32 dou_05_init_evt[136];
 
@@ -119,33 +119,33 @@ USER_FUNC(cam_displacement) {
 
 
 
-__declspec(section ".data") f32 fd_dou_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_dou_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_dou_05_neg_one_382 = -1.0f;
+f32 fd_dou_05_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_dou_05___local_PI_383 = 3.1415927f;
+f32 fd_dou_05___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_dou_05___local_3PIO2_385 = 4.712389f;
+f32 fd_dou_05___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_dou_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_dou_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_dou_05___local_PIO2_384 = 1.5707964f;
+f32 fd_dou_05___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_dou_05_one_381 = 1.0f;
+f32 fd_dou_05_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_dou_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_dou_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_dou_05_neg_one_365 = -1.0f;
+f32 fd_dou_05_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_dou_05___local_PI_366 = 3.1415927f;
+f32 fd_dou_05___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_dou_05___local_3PIO2_368 = 4.712389f;
+f32 fd_dou_05___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_dou_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_dou_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_dou_05___local_PIO2_367 = 1.5707964f;
+f32 fd_dou_05___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_dou_05_one_364 = 1.0f;
+f32 fd_dou_05_one_364 = 1.0f;
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -217,7 +217,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-static __declspec(section ".data") s32 key_tbl[] = {
+static s32 key_tbl[] = {
     ITEM_GROTTO_KEY, -1,
 };
 
@@ -232,7 +232,7 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_unlock)
+static EVT_BEGIN(evt_unlock)
     SET_VALUE(LW(0), STRING("e_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
     RETURN
@@ -349,7 +349,7 @@ EVT_BEGIN(waterfall_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(ride_waterfall)
+EVT_BEGIN(ride_waterfall)
     SET_VALUE(GW(0), -4)
     RETURN
 EVT_END()

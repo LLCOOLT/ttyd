@@ -41,39 +41,39 @@ USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_random);
 
-__declspec(section ".data") f32 fd_dou_09_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_09_neg_one_382;
-__declspec(section ".data") f32 fd_dou_09___local_PI_383;
-__declspec(section ".data") f32 fd_dou_09___local_3PIO2_385;
-__declspec(section ".data") f32 fd_dou_09_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_09___local_PIO2_384;
-__declspec(section ".data") f32 fd_dou_09_one_381;
-__declspec(section ".data") f32 fd_dou_09_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_09_neg_one_365;
-__declspec(section ".data") f32 fd_dou_09___local_PI_366;
-__declspec(section ".data") f32 fd_dou_09___local_3PIO2_368;
-__declspec(section ".data") f32 fd_dou_09_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dou_09___local_PIO2_367;
-__declspec(section ".data") f32 fd_dou_09_one_364;
+f32 fd_dou_09_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_dou_09_neg_one_382;
+f32 fd_dou_09___local_PI_383;
+f32 fd_dou_09___local_3PIO2_385;
+f32 fd_dou_09_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_dou_09___local_PIO2_384;
+f32 fd_dou_09_one_381;
+f32 fd_dou_09_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_dou_09_neg_one_365;
+f32 fd_dou_09___local_PI_366;
+f32 fd_dou_09___local_3PIO2_368;
+f32 fd_dou_09_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_dou_09___local_PIO2_367;
+f32 fd_dou_09_one_364;
 static BeroEntry bero_entry_data[5];
-static __declspec(section ".data") s32 dou_puka_event_init0[8];
+static s32 dou_puka_event_init0[8];
 static s32 dou_puka_event_0[24];
-static __declspec(section ".data") s32 dou_puka_event_rev_0[10];
+static s32 dou_puka_event_rev_0[10];
 static s32 dou_puka_event_main0[21];
 static s32 dou_puka_event_sub0[45];
-static __declspec(section ".data") s32 dou_puka_event_init1[8];
+static s32 dou_puka_event_init1[8];
 static s32 dou_puka_event_1[24];
-static __declspec(section ".data") s32 dou_puka_event_rev_1[10];
+static s32 dou_puka_event_rev_1[10];
 static s32 dou_puka_event_main1[21];
 static s32 dou_puka_event_sub1[45];
-static __declspec(section ".data") s32 dou_puka_event_init2[8];
+static s32 dou_puka_event_init2[8];
 static s32 dou_puka_event_2[24];
-static __declspec(section ".data") s32 dou_puka_event_rev_2[10];
+static s32 dou_puka_event_rev_2[10];
 static s32 dou_puka_event_main2[21];
 static s32 dou_puka_event_sub2[45];
-static __declspec(section ".data") s32 dou_puka_event_init3[8];
+static s32 dou_puka_event_init3[8];
 static s32 dou_puka_event_3[24];
-static __declspec(section ".data") s32 dou_puka_event_rev_3[10];
+static s32 dou_puka_event_rev_3[10];
 static s32 dou_puka_event_main3[21];
 static s32 dou_puka_event_sub3[45];
 static HitDamageReturn hitDmgRetPoints[5];
@@ -83,33 +83,33 @@ static s32 bombwall_bomb[138];
 static s32 bombwall_init[40];
 s32 dou_09_init_evt[211];
 
-__declspec(section ".data") f32 fd_dou_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_dou_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_dou_09_neg_one_382 = -1.0f;
+f32 fd_dou_09_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_dou_09___local_PI_383 = 3.1415927f;
+f32 fd_dou_09___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_dou_09___local_3PIO2_385 = 4.712389f;
+f32 fd_dou_09___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_dou_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_dou_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_dou_09___local_PIO2_384 = 1.5707964f;
+f32 fd_dou_09___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_dou_09_one_381 = 1.0f;
+f32 fd_dou_09_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_dou_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_dou_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_dou_09_neg_one_365 = -1.0f;
+f32 fd_dou_09_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_dou_09___local_PI_366 = 3.1415927f;
+f32 fd_dou_09___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_dou_09___local_3PIO2_368 = 4.712389f;
+f32 fd_dou_09___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_dou_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_dou_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_dou_09___local_PIO2_367 = 1.5707964f;
+f32 fd_dou_09___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_dou_09_one_364 = 1.0f;
+f32 fd_dou_09_one_364 = 1.0f;
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -179,7 +179,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-static __declspec(section ".data") EVT_BEGIN(dou_puka_event_init0)
+static EVT_BEGIN(dou_puka_event_init0)
     SET_VALUE(GW(0), 0)
     SET_VALUE(GW(1), 0)
     RETURN
@@ -199,7 +199,7 @@ static EVT_BEGIN(dou_puka_event_0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dou_puka_event_rev_0)
+static EVT_BEGIN(dou_puka_event_rev_0)
     IF_INT_NOT_EQUAL(GW(0), 2)
         RETURN
     END_IF
@@ -242,7 +242,7 @@ static EVT_BEGIN(dou_puka_event_sub0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dou_puka_event_init1)
+static EVT_BEGIN(dou_puka_event_init1)
     SET_VALUE(GW(2), 0)
     SET_VALUE(GW(3), 0)
     RETURN
@@ -262,7 +262,7 @@ static EVT_BEGIN(dou_puka_event_1)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dou_puka_event_rev_1)
+static EVT_BEGIN(dou_puka_event_rev_1)
     IF_INT_NOT_EQUAL(GW(2), 2)
         RETURN
     END_IF
@@ -305,7 +305,7 @@ static EVT_BEGIN(dou_puka_event_sub1)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dou_puka_event_init2)
+static EVT_BEGIN(dou_puka_event_init2)
     SET_VALUE(GW(4), 0)
     SET_VALUE(GW(5), 0)
     RETURN
@@ -325,7 +325,7 @@ static EVT_BEGIN(dou_puka_event_2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dou_puka_event_rev_2)
+static EVT_BEGIN(dou_puka_event_rev_2)
     IF_INT_NOT_EQUAL(GW(4), 2)
         RETURN
     END_IF
@@ -368,7 +368,7 @@ static EVT_BEGIN(dou_puka_event_sub2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dou_puka_event_init3)
+static EVT_BEGIN(dou_puka_event_init3)
     SET_VALUE(GW(6), 0)
     SET_VALUE(GW(7), 0)
     RETURN
@@ -388,7 +388,7 @@ static EVT_BEGIN(dou_puka_event_3)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dou_puka_event_rev_3)
+static EVT_BEGIN(dou_puka_event_rev_3)
     IF_INT_NOT_EQUAL(GW(6), 2)
         RETURN
     END_IF

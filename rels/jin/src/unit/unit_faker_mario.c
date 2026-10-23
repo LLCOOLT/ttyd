@@ -83,35 +83,35 @@ extern BattleUnitKind unit_gullible_clauda;
 extern BattleUnitKind unit_gullible_nokotarou;
 extern BattleUnitKind unit_gullible_yoshi;
 
-__declspec(section ".data") f32 fd_faker_mario_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_faker_mario_neg_one_382;
-__declspec(section ".data") f32 fd_faker_mario___local_PI_383;
-__declspec(section ".data") f32 fd_faker_mario___local_3PIO2_385;
-__declspec(section ".data") f32 fd_faker_mario_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_faker_mario___local_PIO2_384;
-__declspec(section ".data") f32 fd_faker_mario_one_381;
-__declspec(section ".data") f32 fd_faker_mario_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_faker_mario_neg_one_365;
-__declspec(section ".data") f32 fd_faker_mario___local_PI_366;
-__declspec(section ".data") f32 fd_faker_mario___local_3PIO2_368;
-__declspec(section ".data") f32 fd_faker_mario_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_faker_mario___local_PIO2_367;
-__declspec(section ".data") f32 fd_faker_mario_one_364;
+f32 fd_faker_mario_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_faker_mario_neg_one_382;
+f32 fd_faker_mario___local_PI_383;
+f32 fd_faker_mario___local_3PIO2_385;
+f32 fd_faker_mario_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_faker_mario___local_PIO2_384;
+f32 fd_faker_mario_one_381;
+f32 fd_faker_mario_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_faker_mario_neg_one_365;
+f32 fd_faker_mario___local_PI_366;
+f32 fd_faker_mario___local_3PIO2_368;
+f32 fd_faker_mario_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_faker_mario___local_PIO2_367;
+f32 fd_faker_mario_one_364;
 BattleUnitKind unit_faker_mario;
-static __declspec(section ".data") BattleUnitDefense defence_fmario;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_fmario;
-static __declspec(section ".data") StatusVulnerability regist_fmario;
+static BattleUnitDefense defence_fmario;
+static BattleUnitDefenseAttr defence_attr_fmario;
+static StatusVulnerability regist_fmario;
 static PoseTableEntry pose_table_fmario_stay[15];
-static __declspec(section ".data") BattleDataEntry data_table_fmario[2];
+static BattleDataEntry data_table_fmario[2];
 static BattleUnitKindPart parts_fmario[1];
 static BattleWeapon weapon_masao_jump;
 static BattleWeapon weapon_masao_hammer;
 static BattleWeapon weapon_masao_kururin_jump;
 static BattleWeapon weapon_masao_kaiten_hammer;
-__declspec(section ".data") BattleUnitSetup entry_gullible_christine;
-__declspec(section ".data") BattleUnitSetup entry_gullible_nokotarou;
-__declspec(section ".data") BattleUnitSetup entry_gullible_clauda;
-__declspec(section ".data") BattleUnitSetup entry_gullible_yoshi;
+BattleUnitSetup entry_gullible_christine;
+BattleUnitSetup entry_gullible_nokotarou;
+BattleUnitSetup entry_gullible_clauda;
+BattleUnitSetup entry_gullible_yoshi;
 static s32 mario_zoom[19];
 static s32 enemy_zoom[19];
 static s32 fmario_zoom[19];
@@ -129,7 +129,7 @@ static s32 marioAttackEvent_KururinJump[469];
 static s32 marioAttackEvent_NormalHammer[299];
 static s32 marioAttackEvent_KaitenHammer[299];
 s32 party_change_event[196];
-static __declspec(section ".data") s32 wait_event_fmario[6];
+static s32 wait_event_fmario[6];
 
 static USER_FUNC(_anime_load_wait) {
     BattleWork* wp = _battleWorkPointer;
@@ -261,33 +261,33 @@ USER_FUNC(_load_param) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_faker_mario_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_faker_mario_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_faker_mario_neg_one_382 = -1.0f;
+f32 fd_faker_mario_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_faker_mario___local_PI_383 = 3.1415927f;
+f32 fd_faker_mario___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_faker_mario___local_3PIO2_385 = 4.712389f;
+f32 fd_faker_mario___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_faker_mario_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_faker_mario_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_faker_mario___local_PIO2_384 = 1.5707964f;
+f32 fd_faker_mario___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_faker_mario_one_381 = 1.0f;
+f32 fd_faker_mario_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_faker_mario_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_faker_mario_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_faker_mario_neg_one_365 = -1.0f;
+f32 fd_faker_mario_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_faker_mario___local_PI_366 = 3.1415927f;
+f32 fd_faker_mario___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_faker_mario___local_3PIO2_368 = 4.712389f;
+f32 fd_faker_mario___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_faker_mario_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_faker_mario_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_faker_mario___local_PIO2_367 = 1.5707964f;
+f32 fd_faker_mario___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_faker_mario_one_364 = 1.0f;
+f32 fd_faker_mario_one_364 = 1.0f;
 
 BattleUnitKind unit_faker_mario = {
     79,
@@ -355,11 +355,11 @@ BattleUnitKind unit_faker_mario = {
     data_table_fmario,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence_fmario = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence_fmario = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_fmario = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr_fmario = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist_fmario = {50, 50, 70, 50, 50, 50, 100, 40, 100, 70, 100, 70, 100, 90, 50, 0, 0, 100, 50, 100, 100, 3};
+static StatusVulnerability regist_fmario = {50, 50, 70, 50, 50, 50, 100, 40, 100, 70, 100, 70, 100, 90, 50, 0, 0, 100, 50, 100, 100, 3};
 
 static PoseTableEntry pose_table_fmario_stay[] = {
     {1, "EM_N_1"},
@@ -379,7 +379,7 @@ static PoseTableEntry pose_table_fmario_stay[] = {
     {69, "EM_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table_fmario[] = {
+static BattleDataEntry data_table_fmario[] = {
     {49, dead_event_fmario},
     {0, NULL},
 };
@@ -532,7 +532,7 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-__declspec(section ".data") BattleUnitSetup entry_gullible_christine = {
+BattleUnitSetup entry_gullible_christine = {
     &unit_gullible_christine, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -543,7 +543,7 @@ __declspec(section ".data") BattleUnitSetup entry_gullible_christine = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_gullible_nokotarou = {
+BattleUnitSetup entry_gullible_nokotarou = {
     &unit_gullible_nokotarou, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -554,7 +554,7 @@ __declspec(section ".data") BattleUnitSetup entry_gullible_nokotarou = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_gullible_clauda = {
+BattleUnitSetup entry_gullible_clauda = {
     &unit_gullible_clauda, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -565,7 +565,7 @@ __declspec(section ".data") BattleUnitSetup entry_gullible_clauda = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_gullible_yoshi = {
+BattleUnitSetup entry_gullible_yoshi = {
     &unit_gullible_yoshi, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -1543,7 +1543,7 @@ static USER_FUNC(vivian_comeback) {
     return 1;
 }
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_fmario)
+static EVT_BEGIN(wait_event_fmario)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

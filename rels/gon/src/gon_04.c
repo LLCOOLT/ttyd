@@ -78,28 +78,28 @@ USER_FUNC(evt_sub_random);
 USER_FUNC(evt_sub_rumble_onoff);
 USER_FUNC(evt_win_item_select);
 
-__declspec(section ".data") f32 fd_gon_04_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gon_04_neg_one_382;
-__declspec(section ".data") f32 fd_gon_04___local_PI_383;
-__declspec(section ".data") f32 fd_gon_04___local_3PIO2_385;
-__declspec(section ".data") f32 fd_gon_04_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gon_04___local_PIO2_384;
-__declspec(section ".data") f32 fd_gon_04_one_381;
-__declspec(section ".data") f32 fd_gon_04_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gon_04_neg_one_365;
-__declspec(section ".data") f32 fd_gon_04___local_PI_366;
-__declspec(section ".data") f32 fd_gon_04___local_3PIO2_368;
-__declspec(section ".data") f32 fd_gon_04_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gon_04___local_PIO2_367;
-__declspec(section ".data") f32 fd_gon_04_one_364;
-static __declspec(section ".data") s32 w1_door_close[12];
-static __declspec(section ".data") s32 w1_door_open[12];
-static __declspec(section ".data") s32 w2_door_close[12];
-static __declspec(section ".data") s32 w2_door_open[12];
-static __declspec(section ".data") s32 e1_door_close[12];
-static __declspec(section ".data") s32 e1_door_open[12];
-static __declspec(section ".data") s32 e3_door_close[12];
-static __declspec(section ".data") s32 e3_door_open[12];
+f32 fd_gon_04_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_gon_04_neg_one_382;
+f32 fd_gon_04___local_PI_383;
+f32 fd_gon_04___local_3PIO2_385;
+f32 fd_gon_04_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_gon_04___local_PIO2_384;
+f32 fd_gon_04_one_381;
+f32 fd_gon_04_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_gon_04_neg_one_365;
+f32 fd_gon_04___local_PI_366;
+f32 fd_gon_04___local_3PIO2_368;
+f32 fd_gon_04_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_gon_04___local_PIO2_367;
+f32 fd_gon_04_one_364;
+static s32 w1_door_close[12];
+static s32 w1_door_open[12];
+static s32 w2_door_close[12];
+static s32 w2_door_open[12];
+static s32 e1_door_close[12];
+static s32 e1_door_open[12];
+static s32 e3_door_close[12];
+static s32 e3_door_open[12];
 static BeroEntry bero_entry_data[6];
 s32 evt_gon_04flowblock_updown1_init[37];
 #ifdef VERSION_G8ME01
@@ -113,8 +113,8 @@ s32 evt_gon_04flowblock_updown2[465];
 #else
 s32 evt_gon_04flowblock_updown2[491];
 #endif
-__declspec(section ".data") KemuriPos kemuri_pos1[5];
-__declspec(section ".data") KemuriPos kemuri_pos2[5];
+KemuriPos kemuri_pos1[5];
+KemuriPos kemuri_pos2[5];
 s32 evt_kaidan_pera_anime[203];
 s32 evt_kaidan_pera_init[29];
 s32 evt_kaidan_pera[214];
@@ -122,83 +122,83 @@ s32 evt_hashi_pera[209];
 s32 evt_hashi_pera0[16];
 s32 evt_hashi_pera1[16];
 s32 evt_hashi[50];
-static __declspec(section ".data") s32 key_tbl[2];
+static s32 key_tbl[2];
 static s32 evt_chk[23];
-static __declspec(section ".data") s32 evt_unlock[10];
-static __declspec(section ".data") s32 key_get[5];
+static s32 evt_unlock[10];
+static s32 key_get[5];
 s32 gon_04_init_evt[382];
 
-__declspec(section ".data") f32 fd_gon_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gon_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gon_04_neg_one_382 = -1.0f;
+f32 fd_gon_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_gon_04___local_PI_383 = 3.1415927f;
+f32 fd_gon_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gon_04___local_3PIO2_385 = 4.712389f;
+f32 fd_gon_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gon_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gon_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gon_04___local_PIO2_384 = 1.5707964f;
+f32 fd_gon_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gon_04_one_381 = 1.0f;
+f32 fd_gon_04_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_gon_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gon_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gon_04_neg_one_365 = -1.0f;
+f32 fd_gon_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_gon_04___local_PI_366 = 3.1415927f;
+f32 fd_gon_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gon_04___local_3PIO2_368 = 4.712389f;
+f32 fd_gon_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gon_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gon_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gon_04___local_PIO2_367 = 1.5707964f;
+f32 fd_gon_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gon_04_one_364 = 1.0f;
+f32 fd_gon_04_one_364 = 1.0f;
 
-static __declspec(section ".data") EVT_BEGIN(w1_door_close)
+static EVT_BEGIN(w1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(w1_door_open)
+static EVT_BEGIN(w1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(w2_door_close)
+static EVT_BEGIN(w2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(w2_door_open)
+static EVT_BEGIN(w2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(e1_door_close)
+static EVT_BEGIN(e1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door03"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(e1_door_open)
+static EVT_BEGIN(e1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door03"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(e3_door_close)
+static EVT_BEGIN(e3_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door04"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(e3_door_open)
+static EVT_BEGIN(e3_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door04"), 0, LW(0), 0)
     RETURN
@@ -752,7 +752,7 @@ EVT_BEGIN(evt_gon_04flowblock_updown2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") KemuriPos kemuri_pos1[] = {
+KemuriPos kemuri_pos1[] = {
     {150, 20},
     {130, 55},
     {120, 100},
@@ -760,7 +760,7 @@ __declspec(section ".data") KemuriPos kemuri_pos1[] = {
     {185, 75},
 };
 
-__declspec(section ".data") KemuriPos kemuri_pos2[] = {
+KemuriPos kemuri_pos2[] = {
     {315, 75},
     {270, 30},
     {380, 100},
@@ -1008,7 +1008,7 @@ EVT_BEGIN(evt_hashi)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 key_tbl[] = {
+static s32 key_tbl[] = {
     ITEM_CASTLE_KEY_0x0D, -1,
 };
 
@@ -1023,14 +1023,14 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_unlock)
+static EVT_BEGIN(evt_unlock)
     SET_VALUE(LW(0), STRING("e_bero_1"))
     CALL_CHILD(PTR(bero_case_switch_on))
     SET_VALUE(GSW(0), 42)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(key_get)
+static EVT_BEGIN(key_get)
     SET_VALUE(GSW(0), 41)
     RETURN
 EVT_END()

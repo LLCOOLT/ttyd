@@ -76,26 +76,26 @@ static void piders_get_target(s32* unitIdx, s32* partIdx);
 static USER_FUNC(piders_renzoku_attack_set_target);
 static void piders_draw_yarn_sub(CameraId camera, void* param);
 
-__declspec(section ".data") f32 fd_churantalar_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_churantalar_neg_one_382;
-__declspec(section ".data") f32 fd_churantalar___local_PI_383;
-__declspec(section ".data") f32 fd_churantalar___local_3PIO2_385;
-__declspec(section ".data") f32 fd_churantalar_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_churantalar___local_PIO2_384;
-__declspec(section ".data") f32 fd_churantalar_one_381;
-__declspec(section ".data") f32 fd_churantalar_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_churantalar_neg_one_365;
-__declspec(section ".data") f32 fd_churantalar___local_PI_366;
-__declspec(section ".data") f32 fd_churantalar___local_3PIO2_368;
-__declspec(section ".data") f32 fd_churantalar_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_churantalar___local_PIO2_367;
-__declspec(section ".data") f32 fd_churantalar_one_364;
+f32 fd_churantalar_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_churantalar_neg_one_382;
+f32 fd_churantalar___local_PI_383;
+f32 fd_churantalar___local_3PIO2_385;
+f32 fd_churantalar_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_churantalar___local_PIO2_384;
+f32 fd_churantalar_one_381;
+f32 fd_churantalar_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_churantalar_neg_one_365;
+f32 fd_churantalar___local_PI_366;
+f32 fd_churantalar___local_3PIO2_368;
+f32 fd_churantalar_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_churantalar___local_PIO2_367;
+f32 fd_churantalar_one_364;
 BattleUnitKind unit_churantalar;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
-static __declspec(section ".data") BattleDataEntry data_table[5];
+static BattleDataEntry data_table[5];
 static BattleUnitKindPart parts[5];
 static BattleWeapon weapon_piders_attack;
 static BattleWeapon weapon_piders_renzoku_attack;
@@ -103,10 +103,10 @@ static s32 init_event[53];
 static s32 dmg_first_attack_pos[19];
 static s32 yarn_event[44];
 static s32 entry_event[48];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 static s32 dead_event[189];
 static s32 blow_dead_event[104];
-static __declspec(section ".data") s32 battle_end_event[7];
+static s32 battle_end_event[7];
 static s32 yure_event[76];
 static s32 move_kuutei_event[83];
 static s32 move_kuuchu_event[54];
@@ -120,9 +120,9 @@ static s32 piders_attack_common_event3[102];
 static s32 normal_attack_event[87];
 static s32 renzoku_attack_event[331];
 static s32 renzoku_attack_event_sub[55];
-static __declspec(section ".data") s32 renzoku_attack_event_sub_no_last[10];
+static s32 renzoku_attack_event_sub_no_last[10];
 static s32 renzoku_attack_event_sub_last[79];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
 static USER_FUNC(piders_yarn_init) {
     s32 id = BattleTransID(event, -2);
@@ -132,33 +132,33 @@ static USER_FUNC(piders_yarn_init) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_churantalar_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_churantalar_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_churantalar_neg_one_382 = -1.0f;
+f32 fd_churantalar_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_churantalar___local_PI_383 = 3.1415927f;
+f32 fd_churantalar___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_churantalar___local_3PIO2_385 = 4.712389f;
+f32 fd_churantalar___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_churantalar_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_churantalar_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_churantalar___local_PIO2_384 = 1.5707964f;
+f32 fd_churantalar___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_churantalar_one_381 = 1.0f;
+f32 fd_churantalar_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_churantalar_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_churantalar_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_churantalar_neg_one_365 = -1.0f;
+f32 fd_churantalar_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_churantalar___local_PI_366 = 3.1415927f;
+f32 fd_churantalar___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_churantalar___local_3PIO2_368 = 4.712389f;
+f32 fd_churantalar___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_churantalar_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_churantalar_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_churantalar___local_PIO2_367 = 1.5707964f;
+f32 fd_churantalar___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_churantalar_one_364 = 1.0f;
+f32 fd_churantalar_one_364 = 1.0f;
 
 BattleUnitKind unit_churantalar = {
     164,
@@ -226,11 +226,11 @@ BattleUnitKind unit_churantalar = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {70, 70, 30, 100, 70, 100, 100, 70, 100, 80, 100, 80, 100, 85, 70, 80, 30, 100, 70, 100, 100, 30};
+static StatusVulnerability regist = {70, 70, 30, 100, 70, 100, 100, 70, 100, 80, 100, 80, 100, 85, 70, 80, 30, 100, 70, 100, 100, 30};
 
 static PoseTableEntry pose_table[] = {
     {1, "PAI_N_1"},
@@ -253,7 +253,7 @@ static PoseTableEntry pose_table[] = {
     {69, "PAI_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, dead_event},
     {58, blow_dead_event},
     {63, battle_end_event},
@@ -563,7 +563,7 @@ static EVT_BEGIN(entry_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -647,7 +647,7 @@ static EVT_BEGIN(blow_dead_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(battle_end_event)
+static EVT_BEGIN(battle_end_event)
     CALL(btlevtcmd_SetUnitWork, -2, 1, 254)
     RETURN
 EVT_END()
@@ -1144,7 +1144,7 @@ static EVT_BEGIN(renzoku_attack_event_sub)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(renzoku_attack_event_sub_no_last)
+static EVT_BEGIN(renzoku_attack_event_sub_no_last)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(10), 1)
     CALL_CHILD(PTR(damage_check_event_sub))
@@ -1180,7 +1180,7 @@ static EVT_BEGIN(renzoku_attack_event_sub_last)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

@@ -2,6 +2,7 @@
  * Warning, inlining hell
  */
 #include "driver/animdrv.h"
+#include <dolphin/os/OSFastCast.h>
 #include "driver/dispdrv.h"
 #include "driver/mapdrv.h"
 #include "mario/mariost.h"
@@ -276,7 +277,7 @@ extern f32 tanfTbl[0xB2];
 
 //.sdata
 s32 vivihimoTailGroupNo[4] ATTRIBUTE_ALIGN(32) = { 0, 2, -1, -1 };  // G5: target .sdata is 32-aligned
-__declspec(section ".sdata") void* vivihimoData[4] = {
+void* vivihimoData[4] = {
     NULL,
     (u8*)&_vivihimoData,
     (u8*)&_vivihimoData + 0x400,
@@ -1032,26 +1033,6 @@ GXColor animPoseGetMaterialEvtColor(s32 poseId) {
 #define APM_S(p, o) (*(s32*)((u8*)(p) + (o)))
 #define APM_F(p, o) (*(f32*)((u8*)(p) + (o)))
 #define APM_P(p, o) (*(u8**)((u8*)(p) + (o)))
-#define APM_S8(dst, p, off) asm { psq_l dst, off(p), 1, 4 }
-static inline void animInitFastCast_(void) {
-    asm {
-        li r3, 4
-        oris r3, r3, 4
-        mtspr GQR2, r3
-        li r3, 5
-        oris r3, r3, 5
-        mtspr GQR3, r3
-        li r3, 6
-        oris r3, r3, 6
-        mtspr GQR4, r3
-        li r3, 7
-        oris r3, r3, 7
-        mtspr GQR5, r3
-    }
-}
-static inline f32 animS8a_(register u8* p) { register f32 r; asm { psq_l r, 1(p), 1, 4 } return r; }
-static inline f32 animS8b_(register u8* p) { register f32 r; asm { psq_l r, 2(p), 1, 4 } return r; }
-static inline f32 animS8c_(register u8* p) { register f32 r; asm { psq_l r, 3(p), 1, 4 } return r; }
 // FAKE: t3 = t * t2 through an inline so t3 is an inline return temp (numbered above the LICM temp of t2),
 // giving the target FPR order (t3 f7, t2 f8). Behaviour-identical.
 static inline f32 apmMul(f32 a, f32 b) { return a * b; }
@@ -1106,7 +1087,7 @@ void animPoseMain(s32 poseId) {
     pose = poses + poseId * 0x170;
     file = (u8*)animPoseGetBaseData((AnimationPose*)pose);
     anim = (u8*)((AnimationPoseData*)file)->mpAnims[((AnimationPose*)pose)->animId].data;
-    animInitFastCast_();
+    OSInitFastCast();
     if ((s32)wp->mbUseFloatScratch != 0) {
         grpA = APM_P(wp, 0xf8);
         grpB = APM_P(wp, 0xfc);
@@ -1215,9 +1196,9 @@ void animPoseMain(s32 poseId) {
                 e = d + APM_S(kf, 8) * 4;
                 for (; d < e; d += 4) {
                     v += d[0] * 0xc;
-                    x = animS8a_(d);
-                    y = animS8b_(d);
-                    z = animS8c_(d);
+                    x = __OSs8tof32((s8*)(d + 1));
+                    y = __OSs8tof32((s8*)(d + 2));
+                    z = __OSs8tof32((s8*)(d + 3));
                     ((f32*)v)[0] += s * x;
                     ((f32*)v)[1] += s * y;
                     ((f32*)v)[2] += s * z;
@@ -1229,9 +1210,9 @@ void animPoseMain(s32 poseId) {
                 e = d + APM_S(kf, 0x10) * 4;
                 for (; d < e; d += 4) {
                     v += d[0] * 0xc;
-                    x = animS8a_(d);
-                    y = animS8b_(d);
-                    z = animS8c_(d);
+                    x = __OSs8tof32((s8*)(d + 1));
+                    y = __OSs8tof32((s8*)(d + 2));
+                    z = __OSs8tof32((s8*)(d + 3));
                     ((f32*)v)[0] += s * x;
                     ((f32*)v)[1] += s * y;
                     ((f32*)v)[2] += s * z;
@@ -1252,7 +1233,7 @@ void animPoseMain(s32 poseId) {
                 e = d + APM_S(kf, 0x28) * 4;
                 for (; d < e; d += 4) {
                     v += d[0] * 4;
-                    x = animS8a_(d);
+                    x = __OSs8tof32((s8*)(d + 1));
                     ((f32*)v)[0] += s * x;
                 }
                 }
@@ -1279,9 +1260,9 @@ void animPoseMain(s32 poseId) {
                 e = d + APM_S(kf, 8) * 4;
                 for (; d < e; d += 4) {
                     v += d[0] * 0xc;
-                    x = animS8a_(d);
-                    y = animS8b_(d);
-                    z = animS8c_(d);
+                    x = __OSs8tof32((s8*)(d + 1));
+                    y = __OSs8tof32((s8*)(d + 2));
+                    z = __OSs8tof32((s8*)(d + 3));
                     ((f32*)v)[0] += s * x;
                     ((f32*)v)[1] += s * y;
                     ((f32*)v)[2] += s * z;
@@ -1293,9 +1274,9 @@ void animPoseMain(s32 poseId) {
                 e = d + APM_S(kf, 0x10) * 4;
                 for (; d < e; d += 4) {
                     v += d[0] * 0xc;
-                    x = animS8a_(d);
-                    y = animS8b_(d);
-                    z = animS8c_(d);
+                    x = __OSs8tof32((s8*)(d + 1));
+                    y = __OSs8tof32((s8*)(d + 2));
+                    z = __OSs8tof32((s8*)(d + 3));
                     ((f32*)v)[0] += s * x;
                     ((f32*)v)[1] += s * y;
                     ((f32*)v)[2] += s * z;
@@ -1316,7 +1297,7 @@ void animPoseMain(s32 poseId) {
                 e = d + APM_S(kf, 0x28) * 4;
                 for (; d < e; d += 4) {
                     v += d[0] * 4;
-                    x = animS8a_(d);
+                    x = __OSs8tof32((s8*)(d + 1));
                     ((f32*)v)[0] += s * x;
                 }
                 }
@@ -1352,9 +1333,9 @@ void animPoseMain(s32 poseId) {
         if (nA != 0) memcpy_as4(grpA, p, nA * 0xc);
         for (; d < e; d += 4) {
             v += d[0] * 0xc;
-            x = animS8a_(d);
-            y = animS8b_(d);
-            z = animS8c_(d);
+            x = __OSs8tof32((s8*)(d + 1));
+            y = __OSs8tof32((s8*)(d + 2));
+            z = __OSs8tof32((s8*)(d + 3));
             ((f32*)v)[0] += x * s;
             ((f32*)v)[1] += y * s;
             ((f32*)v)[2] += z * s;
@@ -1368,9 +1349,9 @@ void animPoseMain(s32 poseId) {
         if (nB != 0) memcpy_as4(grpB, p, nB * 0xc);
         for (; d < e; d += 4) {
             v += d[0] * 0xc;
-            x = animS8a_(d);
-            y = animS8b_(d);
-            z = animS8c_(d);
+            x = __OSs8tof32((s8*)(d + 1));
+            y = __OSs8tof32((s8*)(d + 2));
+            z = __OSs8tof32((s8*)(d + 3));
             ((f32*)v)[0] += x * s;
             ((f32*)v)[1] += y * s;
             ((f32*)v)[2] += z * s;
@@ -1388,7 +1369,7 @@ void animPoseMain(s32 poseId) {
             v += d[0] * 4;
             if (b < 0x59 && b > -0x59) {
                 f32 h;
-                x = animS8a_(d);
+                x = __OSs8tof32((s8*)(d + 1));
                 t2 = t * t;
                 t3 = apmMul(t, t2);
                 h = -2.0f * t3 + 3.0f * t2;

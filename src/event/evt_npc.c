@@ -117,7 +117,7 @@ USER_FUNC(evt_npc_slave_entry) {
     s32 id;
     const char* animName;
     s32 index;
-    u8 sp2C[0xB8];
+    u8 slaveBuf[0xB8];
     char slaveName[0x20];
     char ident[0x4];
     NpcEntry* slave;
@@ -129,7 +129,7 @@ USER_FUNC(evt_npc_slave_entry) {
     animName = (const char*)evtGetValue(event, *args++);
     index = *args++;
     deadEvent = (void*)evtGetValue(event, *args++);
-    memset(&sp2C, 0, sizeof(sp2C));
+    memset(&slaveBuf, 0, sizeof(slaveBuf));
     sprintf(ident, "_s%d\0", id);
     strcpy(slaveName, npc->description);
     strcat(slaveName, ident);

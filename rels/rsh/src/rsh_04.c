@@ -73,26 +73,26 @@ USER_FUNC(evt_mario_adjust_dir);
 USER_FUNC(evt_mario_get_dispdir);
 #endif
 
-__declspec(section ".data") f32 fd_rsh_04_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_04_neg_one_382;
-__declspec(section ".data") f32 fd_rsh_04___local_PI_383;
-__declspec(section ".data") f32 fd_rsh_04___local_3PIO2_385;
-__declspec(section ".data") f32 fd_rsh_04_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_04___local_PIO2_384;
-__declspec(section ".data") f32 fd_rsh_04_one_381;
-__declspec(section ".data") f32 fd_rsh_04_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_04_neg_one_365;
-__declspec(section ".data") f32 fd_rsh_04___local_PI_366;
-__declspec(section ".data") f32 fd_rsh_04___local_3PIO2_368;
-__declspec(section ".data") f32 fd_rsh_04_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_04___local_PIO2_367;
-__declspec(section ".data") f32 fd_rsh_04_one_364;
+f32 fd_rsh_04_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_rsh_04_neg_one_382;
+f32 fd_rsh_04___local_PI_383;
+f32 fd_rsh_04___local_3PIO2_385;
+f32 fd_rsh_04_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_rsh_04___local_PIO2_384;
+f32 fd_rsh_04_one_381;
+f32 fd_rsh_04_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_rsh_04_neg_one_365;
+f32 fd_rsh_04___local_PI_366;
+f32 fd_rsh_04___local_3PIO2_368;
+f32 fd_rsh_04_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_rsh_04___local_PIO2_367;
+f32 fd_rsh_04_one_364;
 static BeroEntry bero_data_a[3];
 static BeroEntry bero_data_b[3];
 static BeroEntry bero_data_c[3];
-static __declspec(section ".data") const char* door_3[7];
-static __declspec(section ".data") const char* door_4[7];
-static __declspec(section ".data") const char* door_5[7];
+static const char* door_3[7];
+static const char* door_4[7];
+static const char* door_5[7];
 #ifdef VERSION_G8ME01
 s32 evt_rsh_konarikin_irai_party_talk[89];
 #else
@@ -103,18 +103,18 @@ s32 evt_allow_kamotsu[77];
 #else
 s32 evt_allow_kamotsu[73];
 #endif
-__declspec(section ".data") s32 evt_mario_chuumoku[10];
-__declspec(section ".data") s32 evt_party_chuumoku[11];
+s32 evt_mario_chuumoku[10];
+s32 evt_party_chuumoku[11];
 #ifdef VERSION_G8ME01
 s32 evt_shorui_funshitu[362];
 #else
 s32 evt_shorui_funshitu[352];
 #endif
-static __declspec(section ".data") s32 item_tbl[2];
+static s32 item_tbl[2];
 s32 evt_daijisouna_kami[208];
 s32 evt_syasyou_auto_talk[27];
 static s32 init_syashou[56];
-static __declspec(section ".data") s32 item_tbl2[2];
+static s32 item_tbl2[2];
 #ifdef VERSION_G8ME01
 static s32 talk_syashou[413];
 #else
@@ -131,7 +131,7 @@ s32 talk_mama_repeat[40];
 static s32 init_mama[37];
 static s32 talk_mama[57];
 static s32 init_konari[46];
-__declspec(section ".data") s32 item_tbl3[2];
+s32 item_tbl3[2];
 #ifdef VERSION_G8ME01
 static s32 talk_konari[265];
 #else
@@ -158,7 +158,7 @@ s32 rsh_04_init_evt[201];
 #endif
 s32 rsh_04_a_init_evt[96];
 s32 rsh_04_b_init_evt[44];
-static __declspec(section ".data") const char* window_tbl[4];
+static const char* window_tbl[4];
 s32 rsh_04_c_init_evt[67];
 static BeroEntry bero_data_a_return[3];
 static BeroEntry bero_data_b_return[3];
@@ -168,33 +168,33 @@ s32 rsh_04_a_init_evt_nidome[28];
 s32 rsh_04_b_init_evt_nidome[28];
 s32 rsh_04_c_init_evt_nidome[38];
 
-__declspec(section ".data") f32 fd_rsh_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_04_neg_one_382 = -1.0f;
+f32 fd_rsh_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh_04___local_PI_383 = 3.1415927f;
+f32 fd_rsh_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh_04___local_3PIO2_385 = 4.712389f;
+f32 fd_rsh_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh_04___local_PIO2_384 = 1.5707964f;
+f32 fd_rsh_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_04_one_381 = 1.0f;
+f32 fd_rsh_04_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_rsh_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_04_neg_one_365 = -1.0f;
+f32 fd_rsh_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh_04___local_PI_366 = 3.1415927f;
+f32 fd_rsh_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh_04___local_3PIO2_368 = 4.712389f;
+f32 fd_rsh_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh_04___local_PIO2_367 = 1.5707964f;
+f32 fd_rsh_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_04_one_364 = 1.0f;
+f32 fd_rsh_04_one_364 = 1.0f;
 
 static BeroEntry bero_data_a[] = {
     {
@@ -316,7 +316,7 @@ static BeroEntry bero_data_c[] = {
     {0},
 };
 
-static __declspec(section ".data") const char* door_3[] = {
+static const char* door_3[] = {
     "heya_3",
     "haikei_3",
     "tobira_3",
@@ -326,7 +326,7 @@ static __declspec(section ".data") const char* door_3[] = {
     "3_door_close",
 };
 
-static __declspec(section ".data") const char* door_4[] = {
+static const char* door_4[] = {
     "heya_4",
     "haikei_4",
     "tobira_4",
@@ -336,7 +336,7 @@ static __declspec(section ".data") const char* door_4[] = {
     "4_door_close",
 };
 
-static __declspec(section ".data") const char* door_5[] = {
+static const char* door_5[] = {
     "heya_5",
     "haikei_5",
     "tobira_5",
@@ -411,7 +411,7 @@ EVT_BEGIN(evt_allow_kamotsu)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_mario_chuumoku)
+EVT_BEGIN(evt_mario_chuumoku)
     LOOP(0)
         CALL(evt_mario_set_dir_npc, STRING("ポワン探偵"))
         WAIT_FRAMES(1)
@@ -419,7 +419,7 @@ __declspec(section ".data") EVT_BEGIN(evt_mario_chuumoku)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_party_chuumoku)
+EVT_BEGIN(evt_party_chuumoku)
     LOOP(0)
         CALL(evt_party_set_dir_npc, 0, STRING("ポワン探偵"))
         WAIT_FRAMES(1)
@@ -629,7 +629,7 @@ EVT_BEGIN(evt_shorui_funshitu)
 EVT_END()
 #endif
 
-static __declspec(section ".data") s32 item_tbl[] = {
+static s32 item_tbl[] = {
     ITEM_VITAL_PAPER, -1,
 };
 
@@ -724,7 +724,7 @@ static EVT_BEGIN(init_syashou)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 item_tbl2[] = {
+static s32 item_tbl2[] = {
     ITEM_BLANKET, -1,
 };
 
@@ -1125,7 +1125,7 @@ static EVT_BEGIN(init_konari)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 item_tbl3[] = {
+s32 item_tbl3[] = {
     ITEM_AUTOGRAPH, -1,
 };
 
@@ -1702,7 +1702,7 @@ EVT_BEGIN(rsh_04_b_init_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* window_tbl[] = {
+static const char* window_tbl[] = {
     "mado_uturi_1",
     "mado_uturi_2",
     "mado_uturi_3",

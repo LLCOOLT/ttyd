@@ -13,57 +13,57 @@ USER_FUNC(_set_destroy_flag);
 USER_FUNC(_set_offset);
 extern BattleUnitKind unit_boss_moamoa;
 
-__declspec(section ".data") f32 fd_battle_database_rsh_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_rsh_neg_one_382;
-__declspec(section ".data") f32 fd_battle_database_rsh___local_PI_383;
-__declspec(section ".data") f32 fd_battle_database_rsh___local_3PIO2_385;
-__declspec(section ".data") f32 fd_battle_database_rsh_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_rsh___local_PIO2_384;
-__declspec(section ".data") f32 fd_battle_database_rsh_one_381;
-__declspec(section ".data") f32 fd_battle_database_rsh_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_rsh_neg_one_365;
-__declspec(section ".data") f32 fd_battle_database_rsh___local_PI_366;
-__declspec(section ".data") f32 fd_battle_database_rsh___local_3PIO2_368;
-__declspec(section ".data") f32 fd_battle_database_rsh_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_rsh___local_PIO2_367;
-__declspec(section ".data") f32 fd_battle_database_rsh_one_364;
+f32 fd_battle_database_rsh_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_battle_database_rsh_neg_one_382;
+f32 fd_battle_database_rsh___local_PI_383;
+f32 fd_battle_database_rsh___local_3PIO2_385;
+f32 fd_battle_database_rsh_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_battle_database_rsh___local_PIO2_384;
+f32 fd_battle_database_rsh_one_381;
+f32 fd_battle_database_rsh_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_battle_database_rsh_neg_one_365;
+f32 fd_battle_database_rsh___local_PI_366;
+f32 fd_battle_database_rsh___local_3PIO2_368;
+f32 fd_battle_database_rsh_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_battle_database_rsh___local_PIO2_367;
+f32 fd_battle_database_rsh_one_364;
 BattleStageObjectData rsh_btlobject_data[7];
 BattleStageData rsh_btlstage_data[1];
-__declspec(section ".data") BattleUnitSetup btlparty_rsh_rsh_06_01_off_1[1];
-__declspec(section ".data") BattleGroupSetup btlgrp_rsh_rsh_06_01_off_1;
-__declspec(section ".data") NpcBattleSelect btlgrpsel_rsh_btlno_rsh_test1_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_rsh_btlno_rsh_06_01_off[2];
+BattleUnitSetup btlparty_rsh_rsh_06_01_off_1[1];
+BattleGroupSetup btlgrp_rsh_rsh_06_01_off_1;
+NpcBattleSelect btlgrpsel_rsh_btlno_rsh_test1_off[2];
+NpcBattleSelect btlgrpsel_rsh_btlno_rsh_06_01_off[2];
 NpcSetupBattleInfo btlsetup_rsh_tbl[3];
-__declspec(section ".data") NpcTerritoryInfo btl_rsh_setup_no_tbl[3];
+NpcTerritoryInfo btl_rsh_setup_no_tbl[3];
 s32 bgset_rsh_bg_event[30];
 
-__declspec(section ".data") f32 fd_battle_database_rsh_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_battle_database_rsh_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_rsh_neg_one_382 = -1.0f;
+f32 fd_battle_database_rsh_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_rsh___local_PI_383 = 3.1415927f;
+f32 fd_battle_database_rsh___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_battle_database_rsh___local_3PIO2_385 = 4.712389f;
+f32 fd_battle_database_rsh___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_battle_database_rsh_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_battle_database_rsh_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_rsh___local_PIO2_384 = 1.5707964f;
+f32 fd_battle_database_rsh___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_battle_database_rsh_one_381 = 1.0f;
+f32 fd_battle_database_rsh_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_rsh_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_battle_database_rsh_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_rsh_neg_one_365 = -1.0f;
+f32 fd_battle_database_rsh_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_rsh___local_PI_366 = 3.1415927f;
+f32 fd_battle_database_rsh___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_battle_database_rsh___local_3PIO2_368 = 4.712389f;
+f32 fd_battle_database_rsh___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_battle_database_rsh_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_battle_database_rsh_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_rsh___local_PIO2_367 = 1.5707964f;
+f32 fd_battle_database_rsh___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_battle_database_rsh_one_364 = 1.0f;
+f32 fd_battle_database_rsh_one_364 = 1.0f;
 
 BattleStageObjectData rsh_btlobject_data[] = {
     {"r_mae", 2, 1, {170.0f, 0.0f, -50.0f}, 0, 60, {0}},
@@ -89,7 +89,7 @@ BattleStageData rsh_btlstage_data[] = {
     },
 };
 
-__declspec(section ".data") BattleUnitSetup btlparty_rsh_rsh_06_01_off_1[] = {
+BattleUnitSetup btlparty_rsh_rsh_06_01_off_1[] = {
     {
         &unit_boss_moamoa, // mUnitKindParams
         1, // alliance
@@ -102,7 +102,7 @@ __declspec(section ".data") BattleUnitSetup btlparty_rsh_rsh_06_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_rsh_rsh_06_01_off_1 = {
+BattleGroupSetup btlgrp_rsh_rsh_06_01_off_1 = {
     1, // numEnemies
     btlparty_rsh_rsh_06_01_off_1, // enemyData
     0, 0, // heldItemWeight..randomItemWeight
@@ -112,12 +112,12 @@ __declspec(section ".data") BattleGroupSetup btlgrp_rsh_rsh_06_01_off_1 = {
     5, // field_1C
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_rsh_btlno_rsh_test1_off[] = {
+NpcBattleSelect btlgrpsel_rsh_btlno_rsh_test1_off[] = {
     {50, &btlgrp_rsh_rsh_06_01_off_1, rsh_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_rsh_btlno_rsh_06_01_off[] = {
+NpcBattleSelect btlgrpsel_rsh_btlno_rsh_06_01_off[] = {
     {50, &btlgrp_rsh_rsh_06_01_off_1, rsh_btlstage_data},
     {0},
 };
@@ -147,7 +147,7 @@ NpcSetupBattleInfo btlsetup_rsh_tbl[] = {
     {0},
 };
 
-__declspec(section ".data") NpcTerritoryInfo btl_rsh_setup_no_tbl[] = {
+NpcTerritoryInfo btl_rsh_setup_no_tbl[] = {
     {"BTLNO_RSH_TEST1", 0},
     {"BTLNO_RSH_06_01", 1},
     {0},

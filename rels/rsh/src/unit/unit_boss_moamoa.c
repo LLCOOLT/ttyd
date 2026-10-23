@@ -91,50 +91,50 @@ extern BattleUnitKind unit_boss_moamoa_tentacle_a;
 extern BattleUnitKind unit_boss_moamoa_tentacle_b;
 extern BattleUnitKind unit_boss_moamoa_tentacle_c;
 
-__declspec(section ".data") f32 fd_boss_moamoa_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_moamoa_neg_one_382;
-__declspec(section ".data") f32 fd_boss_moamoa___local_PI_383;
-__declspec(section ".data") f32 fd_boss_moamoa___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_moamoa_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_moamoa___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_moamoa_one_381;
-__declspec(section ".data") f32 fd_boss_moamoa_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_moamoa_neg_one_365;
-__declspec(section ".data") f32 fd_boss_moamoa___local_PI_366;
-__declspec(section ".data") f32 fd_boss_moamoa___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_moamoa_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_moamoa___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_moamoa_one_364;
+f32 fd_boss_moamoa_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_moamoa_neg_one_382;
+f32 fd_boss_moamoa___local_PI_383;
+f32 fd_boss_moamoa___local_3PIO2_385;
+f32 fd_boss_moamoa_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_moamoa___local_PIO2_384;
+f32 fd_boss_moamoa_one_381;
+f32 fd_boss_moamoa_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_moamoa_neg_one_365;
+f32 fd_boss_moamoa___local_PI_366;
+f32 fd_boss_moamoa___local_3PIO2_368;
+f32 fd_boss_moamoa_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_moamoa___local_PIO2_367;
+f32 fd_boss_moamoa_one_364;
 BattleUnitKind unit_boss_moamoa;
-__declspec(section ".data") BattleUnitDefense moamoa_defence;
-__declspec(section ".data") s32 moamoa_defence_no_parts[2];
-__declspec(section ".data") BattleUnitDefense moamoa2_defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
-__declspec(section ".data") PoseTableEntry moamoa1_pose_table[4];
-__declspec(section ".data") PoseTableEntry moamoa1_weakness_pose_table[4];
-static __declspec(section ".data") BattleDataEntry data_table[2];
+BattleUnitDefense moamoa_defence;
+s32 moamoa_defence_no_parts[2];
+BattleUnitDefense moamoa2_defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
+PoseTableEntry moamoa1_pose_table[4];
+PoseTableEntry moamoa1_weakness_pose_table[4];
+static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
-__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_a;
-__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_b;
-__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_c;
-__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_mouth;
+BattleUnitSetup entry_boss_moamoa_tentacle_a;
+BattleUnitSetup entry_boss_moamoa_tentacle_b;
+BattleUnitSetup entry_boss_moamoa_tentacle_c;
+BattleUnitSetup entry_boss_moamoa_mouth;
 BattleWeapon weapon_moamoa_tsunami_attack;
 s32 moamoa_zoom[34];
 static s32 mario_party_zoom[34];
 static s32 init_event[159];
-static __declspec(section ".data") s32 damage_event[10];
-__declspec(section ".data") const char* MOAMOA_TAIJOU[4];
+static s32 damage_event[10];
+const char* MOAMOA_TAIJOU[4];
 static s32 dead_event[349];
-__declspec(section ".data") const char* moamoa2_change_tbl[7];
+const char* moamoa2_change_tbl[7];
 s32 moamoa_tentacl_on[208];
 s32 moamoa_mouth_on[132];
 static s32 phase_event[159];
 static s32 attack_event[19];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 static ExtTexInfo ext_moamoa_data[89];
 static s32 evt_moamoa[151];
-__declspec(section ".data") s32 MOAMOA_SET_BODYSCALE[4];
+s32 MOAMOA_SET_BODYSCALE[4];
 
 USER_FUNC(boss_moamoa_check_zenei_kouei) {
     BattleWork* btlwp = _battleWorkPointer;
@@ -168,33 +168,33 @@ void moamoa_mainUnitIdClear(void) {
     wp->unitId = -1;
 }
 
-__declspec(section ".data") f32 fd_boss_moamoa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_moamoa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_moamoa_neg_one_382 = -1.0f;
+f32 fd_boss_moamoa_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_moamoa___local_PI_383 = 3.1415927f;
+f32 fd_boss_moamoa___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_moamoa___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_moamoa___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_moamoa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_moamoa___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_moamoa___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_one_381 = 1.0f;
+f32 fd_boss_moamoa_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_moamoa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_moamoa_neg_one_365 = -1.0f;
+f32 fd_boss_moamoa_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_moamoa___local_PI_366 = 3.1415927f;
+f32 fd_boss_moamoa___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_moamoa___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_moamoa___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_moamoa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_moamoa___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_moamoa___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_one_364 = 1.0f;
+f32 fd_boss_moamoa_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_moamoa = {
     107,
@@ -262,33 +262,33 @@ BattleUnitKind unit_boss_moamoa = {
     data_table,
 };
 
-__declspec(section ".data") BattleUnitDefense moamoa_defence = {{2, 2, 2, 2, 2}};
+BattleUnitDefense moamoa_defence = {{2, 2, 2, 2, 2}};
 
-__declspec(section ".data") s32 moamoa_defence_no_parts[] = {
+s32 moamoa_defence_no_parts[] = {
     0, 0,
 };
 
-__declspec(section ".data") BattleUnitDefense moamoa2_defence = {{1, 1, 1, 1, 1}};
+BattleUnitDefense moamoa2_defence = {{1, 1, 1, 1, 1}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-__declspec(section ".data") PoseTableEntry moamoa1_pose_table[] = {
+PoseTableEntry moamoa1_pose_table[] = {
     {28, "S_1_1"},
     {31, "D_1_1"},
     {39, "D_1_1"},
     {69, "S_1_1"},
 };
 
-__declspec(section ".data") PoseTableEntry moamoa1_weakness_pose_table[] = {
+PoseTableEntry moamoa1_weakness_pose_table[] = {
     {28, "S_1_3"},
     {31, "D_1_3"},
     {39, "D_1_3"},
     {69, "S_1_3"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
@@ -297,7 +297,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_moamoa", "c_g_moamoa_b", 0.0f, 0.0f, 0.0f, -2.0f, 53.0f, 20.0f, -4.0f, 63.0f, 20.0f, 20, 30, 255, &moamoa_defence, &defence_attr, 0x20000001, 0, moamoa1_pose_table},
 };
 
-__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_a = {
+BattleUnitSetup entry_boss_moamoa_tentacle_a = {
     &unit_boss_moamoa_tentacle_a, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -308,7 +308,7 @@ __declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_a = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_b = {
+BattleUnitSetup entry_boss_moamoa_tentacle_b = {
     &unit_boss_moamoa_tentacle_b, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -319,7 +319,7 @@ __declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_b = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_c = {
+BattleUnitSetup entry_boss_moamoa_tentacle_c = {
     &unit_boss_moamoa_tentacle_c, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -330,7 +330,7 @@ __declspec(section ".data") BattleUnitSetup entry_boss_moamoa_tentacle_c = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_boss_moamoa_mouth = {
+BattleUnitSetup entry_boss_moamoa_mouth = {
     &unit_boss_moamoa_mouth, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -446,14 +446,14 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* MOAMOA_TAIJOU[] = {
+const char* MOAMOA_TAIJOU[] = {
     "S_1_2",
     NULL,
     "L_1_4",
@@ -560,7 +560,7 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* moamoa2_change_tbl[] = {
+const char* moamoa2_change_tbl[] = {
     "L_2_1",
     "L_2_3",
     NULL,
@@ -727,7 +727,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
@@ -1227,7 +1227,7 @@ static void ext_moamoa_init(void) {
     }
 }
 
-__declspec(section ".data") EVT_BEGIN(MOAMOA_SET_BODYSCALE)
+EVT_BEGIN(MOAMOA_SET_BODYSCALE)
     CALL(moamoa_set_bodyScale)
     RETURN
 EVT_END()

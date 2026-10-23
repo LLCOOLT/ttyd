@@ -541,8 +541,8 @@ void effMiniGameDisp(CameraId cameraId, EffectEntry* effect) {
 
 #pragma force_active on
 #ifdef VERSION_G8ME01
-__declspec(section ".sdata") u32 gap_minigame_sdata[5] = {0, 0, 0, 0, 0};
+u32 gap_minigame_sdata[5] = {0, 0, 0, 0, 0};
 #else
-__declspec(section ".sdata") u32 gap_minigame_sdata[2] = {0, 0};
+u32 gap_minigame_sdata[2] = {0, 0};
 #endif
 #pragma force_active reset

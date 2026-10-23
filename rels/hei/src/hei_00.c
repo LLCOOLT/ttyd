@@ -146,21 +146,21 @@ USER_FUNC(hei_00_mario_keyoff_check);
 USER_FUNC(cam_test2);
 void make_gonbaba_projection(CameraId camera, void* param);
 
-__declspec(section ".data") f32 fd_hei_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hei_00_neg_one_382;
-__declspec(section ".data") f32 fd_hei_00___local_PI_383;
-__declspec(section ".data") f32 fd_hei_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_hei_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hei_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_hei_00_one_381;
-__declspec(section ".data") f32 fd_hei_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hei_00_neg_one_365;
-__declspec(section ".data") f32 fd_hei_00___local_PI_366;
-__declspec(section ".data") f32 fd_hei_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_hei_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hei_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_hei_00_one_364;
-__declspec(section ".data") s32 make_proj_evt[4];
+f32 fd_hei_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_hei_00_neg_one_382;
+f32 fd_hei_00___local_PI_383;
+f32 fd_hei_00___local_3PIO2_385;
+f32 fd_hei_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_hei_00___local_PIO2_384;
+f32 fd_hei_00_one_381;
+f32 fd_hei_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_hei_00_neg_one_365;
+f32 fd_hei_00___local_PI_366;
+f32 fd_hei_00___local_3PIO2_368;
+f32 fd_hei_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_hei_00___local_PIO2_367;
+f32 fd_hei_00_one_364;
+s32 make_proj_evt[4];
 s32 evt_gonbaba_shadow[161];
 static s32 first_evt[197];
 s32 gonbaba_evt[447];
@@ -174,10 +174,10 @@ s32 moji_msg[22];
 static s32 switch_evt[303];
 static s32 dokan_evt[345];
 s32 setting_sun_stone[43];
-static __declspec(section ".data") s32 itemsel_table00[2];
+static s32 itemsel_table00[2];
 s32 sun_stone_set_event[68];
 s32 setting_moon_stone[43];
-static __declspec(section ".data") s32 itemsel_table01[2];
+static s32 itemsel_table01[2];
 s32 moon_stone_set_event[68];
 static s32 ki_data_evt_01[20];
 s32 ki_data_evt_02[20];
@@ -318,35 +318,35 @@ USER_FUNC(shake_reset) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_hei_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hei_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hei_00_neg_one_382 = -1.0f;
+f32 fd_hei_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_hei_00___local_PI_383 = 3.1415927f;
+f32 fd_hei_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hei_00___local_3PIO2_385 = 4.712389f;
+f32 fd_hei_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hei_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hei_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hei_00___local_PIO2_384 = 1.5707964f;
+f32 fd_hei_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hei_00_one_381 = 1.0f;
+f32 fd_hei_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_hei_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hei_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hei_00_neg_one_365 = -1.0f;
+f32 fd_hei_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_hei_00___local_PI_366 = 3.1415927f;
+f32 fd_hei_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hei_00___local_3PIO2_368 = 4.712389f;
+f32 fd_hei_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hei_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hei_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hei_00___local_PIO2_367 = 1.5707964f;
+f32 fd_hei_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hei_00_one_364 = 1.0f;
+f32 fd_hei_00_one_364 = 1.0f;
 
-__declspec(section ".data") EVT_BEGIN(make_proj_evt)
+EVT_BEGIN(make_proj_evt)
     CALL(make_gonbaba_projection_evt)
     RETURN
 EVT_END()
@@ -1090,7 +1090,7 @@ EVT_BEGIN(setting_sun_stone)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 itemsel_table00[] = {
+static s32 itemsel_table00[] = {
     ITEM_SUN_STONE, -1,
 };
 
@@ -1130,7 +1130,7 @@ EVT_BEGIN(setting_moon_stone)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 itemsel_table01[] = {
+static s32 itemsel_table01[] = {
     ITEM_MOON_STONE, -1,
 };
 

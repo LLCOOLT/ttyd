@@ -35,27 +35,6 @@ typedef struct EffHoraoSpellN64Work {
     f32 scale;    // 0x38
 } EffHoraoSpellN64Work;
 
-static inline s16 __OSf32tos16(register f32 inF) {
-    s32 out;
-    register s16* outPtr = (s16*)&out;
-    asm { psq_st inF, 0(outPtr), 1, OS_FASTCAST_S16 }
-    return *(s16*)&out;
-}
-
-static inline void OSf32tos16(f32* f, s16* out) {
-    *out = __OSf32tos16(*f);
-}
-
-static inline f32 __OSs16tof32(register s16* arg) {
-    register f32 ret;
-    asm { psq_l ret, 0(arg), 1, OS_FASTCAST_S16 }
-    return ret;
-}
-
-static inline void OSs16tof32(s16* in, f32* out) {
-    *out = __OSs16tof32(in);
-}
-
 effN64Vtx horao_spell_vtx[] = {
     {0, -8, 0, 0, 0, 0, 0, 0, 0},
     {0, 8, 0, 0, 1024, 0, 0, 0, 0},
@@ -289,5 +268,5 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
 }
 
 #pragma force_active on
-__declspec(section ".sdata") u8 gap_07_80413A4C_sdata[4] = {0};
+u8 gap_07_80413A4C_sdata[4] = {0};
 #pragma force_active reset

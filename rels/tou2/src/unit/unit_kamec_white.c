@@ -84,32 +84,32 @@ static USER_FUNC(eff_staff2);
 static USER_FUNC(eff_staff1);
 static USER_FUNC(kamec_shuffle);
 
-__declspec(section ".data") f32 fd_kamec_white_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_kamec_white_neg_one_382;
-__declspec(section ".data") f32 fd_kamec_white___local_PI_383;
-__declspec(section ".data") f32 fd_kamec_white___local_3PIO2_385;
-__declspec(section ".data") f32 fd_kamec_white_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_kamec_white___local_PIO2_384;
-__declspec(section ".data") f32 fd_kamec_white_one_381;
-__declspec(section ".data") f32 fd_kamec_white_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_kamec_white_neg_one_365;
-__declspec(section ".data") f32 fd_kamec_white___local_PI_366;
-__declspec(section ".data") f32 fd_kamec_white___local_3PIO2_368;
-__declspec(section ".data") f32 fd_kamec_white_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_kamec_white___local_PIO2_367;
-__declspec(section ".data") f32 fd_kamec_white_one_364;
+f32 fd_kamec_white_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_kamec_white_neg_one_382;
+f32 fd_kamec_white___local_PI_383;
+f32 fd_kamec_white___local_3PIO2_385;
+f32 fd_kamec_white_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_kamec_white___local_PIO2_384;
+f32 fd_kamec_white_one_381;
+f32 fd_kamec_white_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_kamec_white_neg_one_365;
+f32 fd_kamec_white___local_PI_366;
+f32 fd_kamec_white___local_3PIO2_368;
+f32 fd_kamec_white_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_kamec_white___local_PIO2_367;
+f32 fd_kamec_white_one_364;
 BattleUnitKind unit_kamec_white;
 BattleUnitKind unit_kamec_white_bunsin;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
-static __declspec(section ".data") StatusVulnerability regist_bunsin;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
+static StatusVulnerability regist_bunsin;
 static PoseTableEntry pose_table[17];
 static PoseTableEntry pose_table_sky[17];
-static __declspec(section ".data") BattleDataEntry data_table[5];
-static __declspec(section ".data") BattleDataEntry data_table_sky[6];
-static __declspec(section ".data") BattleDataEntry data_table_bunsin[3];
-static __declspec(section ".data") BattleDataEntry data_table_sky_bunsin[4];
+static BattleDataEntry data_table[5];
+static BattleDataEntry data_table_sky[6];
+static BattleDataEntry data_table_bunsin[3];
+static BattleDataEntry data_table_sky_bunsin[4];
 static BattleUnitKindPart parts[2];
 static BattleWeapon weapon_kamec_attack_magic;
 static BattleWeapon weapon_kamec_dekadeka_magic;
@@ -118,7 +118,7 @@ static BattleWeapon weapon_kamec_trans_magic;
 static BattleWeapon weapon_kamec_katikati_magic;
 static BattleWeapon weapon_kamec_recover_magic;
 static BattleWeapon weapon_kamec_all_recover_magic;
-static __declspec(section ".data") BattleUnitSetup entry_kamec;
+static BattleUnitSetup entry_kamec;
 static s32 init_event[22];
 static s32 init_event2[87];
 static s32 alpha_down_event[58];
@@ -129,7 +129,7 @@ static s32 kamec_subset_dead_event[203];
 static s32 kamec_subset_blow_dead_event[78];
 static s32 avoid_miss_event[16];
 static s32 bunsin_kill_event[37];
-static __declspec(section ".data") s32 phase_event[2];
+static s32 phase_event[2];
 static s32 dmg_fall_event[159];
 static s32 dmg_first_attack_pos[19];
 static s32 attack_event[296];
@@ -143,10 +143,10 @@ static s32 attack_magic_event[325];
 static s32 attack_magic_event_sub_no_hit[45];
 static s32 attack_magic_event_sub_hit[30];
 static s32 support_magic_event[140];
-static __declspec(section ".data") s32 dekadeka_magic_event[7];
-static __declspec(section ".data") s32 katikati_magic_event[7];
-static __declspec(section ".data") s32 biribiri_magic_event[7];
-static __declspec(section ".data") s32 trans_magic_event[7];
+static s32 dekadeka_magic_event[7];
+static s32 katikati_magic_event[7];
+static s32 biribiri_magic_event[7];
+static s32 trans_magic_event[7];
 static s32 recover_magic_event[142];
 static s32 all_recover_magic_event[180];
 static s32 bunsin_magic_event[160];
@@ -162,33 +162,33 @@ static USER_FUNC(eff_magic_get_posX) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_kamec_white_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_kamec_white_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_kamec_white_neg_one_382 = -1.0f;
+f32 fd_kamec_white_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_kamec_white___local_PI_383 = 3.1415927f;
+f32 fd_kamec_white___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_kamec_white___local_3PIO2_385 = 4.712389f;
+f32 fd_kamec_white___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_kamec_white_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_kamec_white_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_kamec_white___local_PIO2_384 = 1.5707964f;
+f32 fd_kamec_white___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_kamec_white_one_381 = 1.0f;
+f32 fd_kamec_white_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_kamec_white_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_kamec_white_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_kamec_white_neg_one_365 = -1.0f;
+f32 fd_kamec_white_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_kamec_white___local_PI_366 = 3.1415927f;
+f32 fd_kamec_white___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_kamec_white___local_3PIO2_368 = 4.712389f;
+f32 fd_kamec_white___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_kamec_white_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_kamec_white_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_kamec_white___local_PIO2_367 = 1.5707964f;
+f32 fd_kamec_white___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_kamec_white_one_364 = 1.0f;
+f32 fd_kamec_white_one_364 = 1.0f;
 
 BattleUnitKind unit_kamec_white = {
     51,
@@ -322,13 +322,13 @@ BattleUnitKind unit_kamec_white_bunsin = {
     data_table_bunsin,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {70, 75, 80, 100, 70, 100, 100, 70, 100, 90, 100, 90, 100, 95, 80, 70, 80, 100, 80, 100, 100, 95};
+static StatusVulnerability regist = {70, 75, 80, 100, 70, 100, 100, 70, 100, 90, 100, 90, 100, 95, 80, 70, 80, 100, 80, 100, 100, 95};
 
-static __declspec(section ".data") StatusVulnerability regist_bunsin = {0};
+static StatusVulnerability regist_bunsin = {0};
 
 static PoseTableEntry pose_table[] = {
     {1, "KMW_N_1"},
@@ -370,7 +370,7 @@ static PoseTableEntry pose_table_sky[] = {
     {69, "KMW_S_2"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, kamec_subset_dead_event},
     {58, kamec_subset_blow_dead_event},
     {46, avoid_miss_event},
@@ -378,7 +378,7 @@ static __declspec(section ".data") BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table_sky[] = {
+static BattleDataEntry data_table_sky[] = {
     {49, kamec_subset_dead_event},
     {58, kamec_subset_blow_dead_event},
     {46, avoid_miss_event},
@@ -387,13 +387,13 @@ static __declspec(section ".data") BattleDataEntry data_table_sky[] = {
     {0},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table_bunsin[] = {
+static BattleDataEntry data_table_bunsin[] = {
     {46, avoid_miss_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table_sky_bunsin[] = {
+static BattleDataEntry data_table_sky_bunsin[] = {
     {46, avoid_miss_event},
     {14, dmg_fall_event},
     {48, dmg_first_attack_pos},
@@ -660,7 +660,7 @@ static BattleWeapon weapon_kamec_all_recover_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitSetup entry_kamec = {
+static BattleUnitSetup entry_kamec = {
     &unit_kamec_white_bunsin, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -904,7 +904,7 @@ static EVT_BEGIN(bunsin_kill_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(phase_event)
+static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
@@ -1550,25 +1550,25 @@ static EVT_BEGIN(support_magic_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(dekadeka_magic_event)
+static EVT_BEGIN(dekadeka_magic_event)
     SET_VALUE(LW(15), 10)
     CALL_CHILD(PTR(support_magic_event))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(katikati_magic_event)
+static EVT_BEGIN(katikati_magic_event)
     SET_VALUE(LW(15), 14)
     CALL_CHILD(PTR(support_magic_event))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(biribiri_magic_event)
+static EVT_BEGIN(biribiri_magic_event)
     SET_VALUE(LW(15), 6)
     CALL_CHILD(PTR(support_magic_event))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(trans_magic_event)
+static EVT_BEGIN(trans_magic_event)
     SET_VALUE(LW(15), 18)
     CALL_CHILD(PTR(support_magic_event))
     RETURN

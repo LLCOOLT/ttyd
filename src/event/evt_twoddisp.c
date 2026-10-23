@@ -207,5 +207,5 @@ __declspec(section ".sdata2") const GXColor twod_text_fog_color;
 __declspec(section ".sdata2") const GXColor twod_icon_fog_color;
 
 #pragma force_active on
-__declspec(section ".sdata") u32 gap_07_80411DDC_sdata[1] = {0};
+u32 gap_07_80411DDC_sdata[1] = {0};
 #pragma force_active reset

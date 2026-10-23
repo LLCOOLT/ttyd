@@ -29,56 +29,56 @@ USER_FUNC(evt_snd_bgm_scope);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 
-__declspec(section ".data") f32 fd_bom_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_bom_00_neg_one_382;
-__declspec(section ".data") f32 fd_bom_00___local_PI_383;
-__declspec(section ".data") f32 fd_bom_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_bom_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_bom_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_bom_00_one_381;
-__declspec(section ".data") f32 fd_bom_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_bom_00_neg_one_365;
-__declspec(section ".data") f32 fd_bom_00___local_PI_366;
-__declspec(section ".data") f32 fd_bom_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_bom_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_bom_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_bom_00_one_364;
+f32 fd_bom_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_bom_00_neg_one_382;
+f32 fd_bom_00___local_PI_383;
+f32 fd_bom_00___local_3PIO2_385;
+f32 fd_bom_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_bom_00___local_PIO2_384;
+f32 fd_bom_00_one_381;
+f32 fd_bom_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_bom_00_neg_one_365;
+f32 fd_bom_00___local_PI_366;
+f32 fd_bom_00___local_3PIO2_368;
+f32 fd_bom_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_bom_00___local_PIO2_367;
+f32 fd_bom_00_one_364;
 s32 evt_bom_snowfall[18];
 static TreeAccess tree_tbl[4];
-static __declspec(section ".data") s32 evt_tree[7];
+static s32 evt_tree[7];
 static s32 first_evt_dokan[36];
 static BeroEntry bero_entry_data[3];
 static s32 first_evt[108];
 s32 first_evt2[101];
 s32 bom_00_init_evt[66];
 
-__declspec(section ".data") f32 fd_bom_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_bom_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_bom_00_neg_one_382 = -1.0f;
+f32 fd_bom_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_bom_00___local_PI_383 = 3.1415927f;
+f32 fd_bom_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_bom_00___local_3PIO2_385 = 4.712389f;
+f32 fd_bom_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_bom_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_bom_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_bom_00___local_PIO2_384 = 1.5707964f;
+f32 fd_bom_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_bom_00_one_381 = 1.0f;
+f32 fd_bom_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_bom_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_bom_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_bom_00_neg_one_365 = -1.0f;
+f32 fd_bom_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_bom_00___local_PI_366 = 3.1415927f;
+f32 fd_bom_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_bom_00___local_3PIO2_368 = 4.712389f;
+f32 fd_bom_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_bom_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_bom_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_bom_00___local_PIO2_367 = 1.5707964f;
+f32 fd_bom_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_bom_00_one_364 = 1.0f;
+f32 fd_bom_00_one_364 = 1.0f;
 
 EVT_BEGIN(evt_bom_snowfall)
     CALL(evt_eff64, 0, STRING("snowfall_n64"), 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -92,7 +92,7 @@ static TreeAccess tree_tbl[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
-static __declspec(section ".data") EVT_BEGIN(evt_tree)
+static EVT_BEGIN(evt_tree)
     SET_VALUE(LW(0), PTR(tree_tbl))
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
     RETURN

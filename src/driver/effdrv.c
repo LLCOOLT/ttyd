@@ -1,4 +1,5 @@
 #include "driver/effdrv.h"
+#include <dolphin/os/OSFastCast.h>
 #include "driver/arcdrv.h"
 #include "eff/eff_n64.h"
 #include "manager/dvdmgr.h"
@@ -369,14 +370,12 @@ static inline void effMayaKeyInterp(MayaKey* prev, MayaKey* curr, f32 t, f32* bu
 	out = buf;
 	for (i = 0; i < 22; i++) {
 		register f32 qd0; register f32 qm1; f32 u; register f32 qv1; register f32 qm0; register f32 qv0; f32 dt; f32 s; f32 s3; f32 s2; f32 div;
-		asm {
-			psq_l qv0, 2(pa), 1, 5
-			} asm { psq_l qd0, 4(pa), 1, 5
-			} asm { psq_l qm0, 6(pa), 1, 5
-			} asm { psq_l qv1, 2(pb), 1, 5
-			} asm { psq_l qm1, 4(pb), 1, 5
-			} asm { psq_l qd0, 6(pb), 1, 5
-		}
+		qv0 = __OSs16tof32((s16*)(pa + 2));
+		qd0 = __OSs16tof32((s16*)(pa + 4));
+		qm0 = __OSs16tof32((s16*)(pa + 6));
+		qv1 = __OSs16tof32((s16*)(pb + 2));
+		qm1 = __OSs16tof32((s16*)(pb + 4));
+		qd0 = __OSs16tof32((s16*)(pb + 6));
 		if (pa[9] != 0) {
 			*out = qv0;
 		}

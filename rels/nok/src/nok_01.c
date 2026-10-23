@@ -122,20 +122,20 @@ static USER_FUNC(yami_view);
 void iri_08_msg(s32 type, void** work);
 extern s32 envSetYami[];
 
-__declspec(section ".data") f32 fd_nok_01_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_nok_01_neg_one_382;
-__declspec(section ".data") f32 fd_nok_01___local_PI_383;
-__declspec(section ".data") f32 fd_nok_01___local_3PIO2_385;
-__declspec(section ".data") f32 fd_nok_01_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_nok_01___local_PIO2_384;
-__declspec(section ".data") f32 fd_nok_01_one_381;
-__declspec(section ".data") f32 fd_nok_01_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_nok_01_neg_one_365;
-__declspec(section ".data") f32 fd_nok_01___local_PI_366;
-__declspec(section ".data") f32 fd_nok_01___local_3PIO2_368;
-__declspec(section ".data") f32 fd_nok_01_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_nok_01___local_PIO2_367;
-__declspec(section ".data") f32 fd_nok_01_one_364;
+f32 fd_nok_01_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_nok_01_neg_one_382;
+f32 fd_nok_01___local_PI_383;
+f32 fd_nok_01___local_3PIO2_385;
+f32 fd_nok_01_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_nok_01___local_PIO2_384;
+f32 fd_nok_01_one_381;
+f32 fd_nok_01_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_nok_01_neg_one_365;
+f32 fd_nok_01___local_PI_366;
+f32 fd_nok_01___local_3PIO2_368;
+f32 fd_nok_01_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_nok_01___local_PIO2_367;
+f32 fd_nok_01_one_364;
 s32 nokonoko_G_regl[19];
 s32 nokonoko_G_talk[44];
 s32 nokonoko_H_regl[19];
@@ -155,7 +155,7 @@ s32 boss_noko_open_gate[184];
 #else
 s32 boss_noko_open_gate[181];
 #endif
-static __declspec(section ".data") s32 iri_17_item_tbl[2];
+static s32 iri_17_item_tbl[2];
 s32 boss_noko_talk[352];
 s32 nokorin_init[30];
 #ifdef VERSION_G8ME01
@@ -171,17 +171,17 @@ static s32 odoriko_3_talk[44];
 static s32 odoriko_3_init[33];
 static NpcSetupInfo npcEnt[10];
 static BeroEntry bero_entry_data[4];
-__declspec(section ".data") const char* son_npc[2];
-__declspec(section ".data") const char* son_mobj[2];
-__declspec(section ".data") const char* son_item[2];
+const char* son_npc[2];
+const char* son_mobj[2];
+const char* son_item[2];
 HouseParam son_data;
-__declspec(section ".data") const char* taro_npc[2];
-__declspec(section ".data") const char* taro_map[2];
-__declspec(section ".data") const char* taro_mobj[2];
-__declspec(section ".data") const char* taro_item[2];
+const char* taro_npc[2];
+const char* taro_map[2];
+const char* taro_mobj[2];
+const char* taro_item[2];
 HouseParam taro_data;
-static __declspec(section ".data") const char* ie_npc[2];
-static __declspec(section ".data") const char* ie_map[2];
+static const char* ie_npc[2];
+static const char* ie_map[2];
 static HouseParam ie_data;
 static HitDamageReturn hitDmgRetPoints[13];
 s32 nokotarou_tabidachi[328];
@@ -190,7 +190,7 @@ static s32 sekai_yami_npc[59];
 static s32 sekai_yami_evt[234];
 static s32 minnnanokoe_evt[416];
 static s32 evt_switch_init[17];
-__declspec(section ".data") s32 e3_talk[12];
+s32 e3_talk[12];
 static s32 epilogue_npc_entry[31];
 static s32 epilogue_evt_sub[194];
 static s32 epilogue_evt[148];
@@ -208,33 +208,33 @@ void iri_08_msg(s32 type, void** work) {
     }
 }
 
-__declspec(section ".data") f32 fd_nok_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_nok_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_nok_01_neg_one_382 = -1.0f;
+f32 fd_nok_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_nok_01___local_PI_383 = 3.1415927f;
+f32 fd_nok_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_nok_01___local_3PIO2_385 = 4.712389f;
+f32 fd_nok_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_nok_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_nok_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_nok_01___local_PIO2_384 = 1.5707964f;
+f32 fd_nok_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_nok_01_one_381 = 1.0f;
+f32 fd_nok_01_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_nok_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_nok_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_nok_01_neg_one_365 = -1.0f;
+f32 fd_nok_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_nok_01___local_PI_366 = 3.1415927f;
+f32 fd_nok_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_nok_01___local_3PIO2_368 = 4.712389f;
+f32 fd_nok_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_nok_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_nok_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_nok_01___local_PIO2_367 = 1.5707964f;
+f32 fd_nok_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_nok_01_one_364 = 1.0f;
+f32 fd_nok_01_one_364 = 1.0f;
 
 EVT_BEGIN(nokonoko_G_regl)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
@@ -534,7 +534,7 @@ EVT_BEGIN(boss_noko_open_gate)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 iri_17_item_tbl[] = {
+static s32 iri_17_item_tbl[] = {
     ITEM_ROUTING_SLIP, -1,
 };
 
@@ -985,17 +985,17 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-__declspec(section ".data") const char* son_npc[] = {
+const char* son_npc[] = {
     /*"村長"*/"\x91\xBA\x92\xB7",
     NULL,
 };
 
-__declspec(section ".data") const char* son_mobj[] = {
+const char* son_mobj[] = {
     "kururin3",
     NULL,
 };
 
-__declspec(section ".data") const char* son_item[] = {
+const char* son_item[] = {
     "iri_08",
     NULL,
 };
@@ -1017,22 +1017,22 @@ HouseParam son_data = {
     son_item, // items
 };
 
-__declspec(section ".data") const char* taro_npc[] = {
+const char* taro_npc[] = {
     /*"ノコタロウ"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45",
     NULL,
 };
 
-__declspec(section ".data") const char* taro_map[] = {
+const char* taro_map[] = {
     "S_taro_in",
     NULL,
 };
 
-__declspec(section ".data") const char* taro_mobj[] = {
+const char* taro_mobj[] = {
     "box",
     NULL,
 };
 
-__declspec(section ".data") const char* taro_item[] = {
+const char* taro_item[] = {
     "item_01",
     NULL,
 };
@@ -1054,12 +1054,12 @@ HouseParam taro_data = {
     taro_item, // items
 };
 
-static __declspec(section ".data") const char* ie_npc[] = {
+static const char* ie_npc[] = {
     /*"ノコノコK"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52\x4B",
     NULL,
 };
 
-static __declspec(section ".data") const char* ie_map[] = {
+static const char* ie_map[] = {
     "S_ie_sit",
     NULL,
 };
@@ -1420,7 +1420,7 @@ static EVT_BEGIN(evt_switch_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(e3_talk)
+EVT_BEGIN(e3_talk)
     CALL(evt_msg_print, 0, STRING("nok_01_for_E3"), 0, 0)
     CALL(evt_bero_mapchange, STRING("kpa_02"), 0)
     RETURN

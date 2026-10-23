@@ -44,30 +44,30 @@ USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_rumble_onoff);
 USER_FUNC(evt_win_item_select);
 
-__declspec(section ".data") f32 fd_gon_05_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gon_05_neg_one_382;
-__declspec(section ".data") f32 fd_gon_05___local_PI_383;
-__declspec(section ".data") f32 fd_gon_05___local_3PIO2_385;
-__declspec(section ".data") f32 fd_gon_05_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gon_05___local_PIO2_384;
-__declspec(section ".data") f32 fd_gon_05_one_381;
-__declspec(section ".data") f32 fd_gon_05_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gon_05_neg_one_365;
-__declspec(section ".data") f32 fd_gon_05___local_PI_366;
-__declspec(section ".data") f32 fd_gon_05___local_3PIO2_368;
-__declspec(section ".data") f32 fd_gon_05_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gon_05___local_PIO2_367;
-__declspec(section ".data") f32 fd_gon_05_one_364;
-static __declspec(section ".data") s32 door01_close[12];
-static __declspec(section ".data") s32 door01_open[12];
-static __declspec(section ".data") s32 door02_close[12];
-static __declspec(section ".data") s32 door02_open[12];
-static __declspec(section ".data") s32 door03_close[12];
-static __declspec(section ".data") s32 door03_open[12];
+f32 fd_gon_05_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_gon_05_neg_one_382;
+f32 fd_gon_05___local_PI_383;
+f32 fd_gon_05___local_3PIO2_385;
+f32 fd_gon_05_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_gon_05___local_PIO2_384;
+f32 fd_gon_05_one_381;
+f32 fd_gon_05_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_gon_05_neg_one_365;
+f32 fd_gon_05___local_PI_366;
+f32 fd_gon_05___local_3PIO2_368;
+f32 fd_gon_05_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_gon_05___local_PIO2_367;
+f32 fd_gon_05_one_364;
+static s32 door01_close[12];
+static s32 door01_open[12];
+static s32 door02_close[12];
+static s32 door02_open[12];
+static s32 door03_close[12];
+static s32 door03_open[12];
 s32 door04_close[22];
 s32 door04_open[22];
-__declspec(section ".data") s32 door05_close[12];
-__declspec(section ".data") s32 door05_open[12];
+s32 door05_close[12];
+s32 door05_open[12];
 static BeroEntry bero_entry_data[7];
 static s32 init_0[37];
 #ifdef VERSION_G8ME01
@@ -81,74 +81,74 @@ s32 main_1[465];
 #else
 s32 main_1[491];
 #endif
-__declspec(section ".data") s32 key_tbl00[2];
+s32 key_tbl00[2];
 s32 evt_chk00[23];
-static __declspec(section ".data") s32 evt_unlock00[10];
-__declspec(section ".data") s32 key_tbl01[2];
+static s32 evt_unlock00[10];
+s32 key_tbl01[2];
 s32 evt_chk01[23];
-static __declspec(section ".data") s32 evt_unlock01[10];
-static __declspec(section ".data") s32 key_get[5];
+static s32 evt_unlock01[10];
+static s32 key_get[5];
 s32 gon_05_init_evt[338];
 
-__declspec(section ".data") f32 fd_gon_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gon_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gon_05_neg_one_382 = -1.0f;
+f32 fd_gon_05_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_gon_05___local_PI_383 = 3.1415927f;
+f32 fd_gon_05___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gon_05___local_3PIO2_385 = 4.712389f;
+f32 fd_gon_05___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gon_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gon_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gon_05___local_PIO2_384 = 1.5707964f;
+f32 fd_gon_05___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gon_05_one_381 = 1.0f;
+f32 fd_gon_05_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_gon_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gon_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gon_05_neg_one_365 = -1.0f;
+f32 fd_gon_05_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_gon_05___local_PI_366 = 3.1415927f;
+f32 fd_gon_05___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gon_05___local_3PIO2_368 = 4.712389f;
+f32 fd_gon_05___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gon_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gon_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gon_05___local_PIO2_367 = 1.5707964f;
+f32 fd_gon_05___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gon_05_one_364 = 1.0f;
+f32 fd_gon_05_one_364 = 1.0f;
 
-static __declspec(section ".data") EVT_BEGIN(door01_close)
+static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(door01_open)
+static EVT_BEGIN(door01_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(door02_close)
+static EVT_BEGIN(door02_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(door02_open)
+static EVT_BEGIN(door02_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(door03_close)
+static EVT_BEGIN(door03_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_03"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(door03_open)
+static EVT_BEGIN(door03_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_03"), 0, LW(0), 0)
     RETURN
@@ -170,13 +170,13 @@ EVT_BEGIN(door04_open)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(door05_close)
+EVT_BEGIN(door05_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_05"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(door05_open)
+EVT_BEGIN(door05_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_05"), 0, LW(0), 0)
     RETURN
@@ -748,7 +748,7 @@ EVT_BEGIN(main_1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 key_tbl00[] = {
+s32 key_tbl00[] = {
     ITEM_CASTLE_KEY_0x0C, -1,
 };
 
@@ -763,14 +763,14 @@ EVT_BEGIN(evt_chk00)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_unlock00)
+static EVT_BEGIN(evt_unlock00)
     SET_VALUE(LW(0), STRING("w_bero_3"))
     CALL_CHILD(PTR(bero_case_switch_on))
     SET_VALUE(GSW(0), 47)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 key_tbl01[] = {
+s32 key_tbl01[] = {
     ITEM_CASTLE_KEY_0x0E, -1,
 };
 
@@ -785,14 +785,14 @@ EVT_BEGIN(evt_chk01)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_unlock01)
+static EVT_BEGIN(evt_unlock01)
     SET_VALUE(LW(0), STRING("w_bero_5"))
     CALL_CHILD(PTR(bero_case_switch_on))
     SET_VALUE(GSW(0), 54)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(key_get)
+static EVT_BEGIN(key_get)
     SET_VALUE(GSW(0), 53)
     RETURN
 EVT_END()

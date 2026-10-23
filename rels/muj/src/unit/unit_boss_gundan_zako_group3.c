@@ -65,28 +65,28 @@ USER_FUNC(zakogun_ext_init3);
 USER_FUNC(zakogun_kanbu_on_ball);
 extern s32 zakogun_get_kanbu_id_evtcmd[];
 
-__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 neg_one$382;
-__declspec(section ".data") f32 __local_PI$383;
-__declspec(section ".data") f32 __local_3PIO2$385;
-__declspec(section ".data") u32 gap_04_000314E4_data[1];
-__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 __local_PIO2$384;
-__declspec(section ".data") f32 one$381;
-__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 neg_one$365;
-__declspec(section ".data") f32 __local_PI$366;
-__declspec(section ".data") f32 __local_3PIO2$368;
-__declspec(section ".data") u32 gap_04_0003150C_data[1];
-__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 __local_PIO2$367;
-__declspec(section ".data") f32 one$364;
+f32 negone_one$374[2] __attribute__((aligned(8)));
+f32 neg_one$382;
+f32 __local_PI$383;
+f32 __local_3PIO2$385;
+u32 gap_04_000314E4_data[1];
+f32 one_negone$373[2] __attribute__((aligned(8)));
+f32 __local_PIO2$384;
+f32 one$381;
+f32 negone_one$360[2] __attribute__((aligned(8)));
+f32 neg_one$365;
+f32 __local_PI$366;
+f32 __local_3PIO2$368;
+u32 gap_04_0003150C_data[1];
+f32 one_negone$359[2] __attribute__((aligned(8)));
+f32 __local_PIO2$367;
+f32 one$364;
 BattleUnitKind unit_boss_gundan_zako_group3;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
-static __declspec(section ".data") PoseTableEntry pose_table[4];
-static __declspec(section ".data") BattleDataEntry data_table[3];
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
+static PoseTableEntry pose_table[4];
+static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_gundan_zako_group3_attack;
 static s32 init_event[21];
@@ -94,7 +94,7 @@ static s32 damage_event[129];
 static s32 dead_event[136];
 static s32 attack_event[287];
 static s32 hit_check_event[119];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
 USER_FUNC(zakogun_kanbu_on_ball) {
     BattleUnit* kanbu = BattleGetUnitPtr(_battleWorkPointer, zakogun_get_kanbu_id());
@@ -138,37 +138,37 @@ USER_FUNC(zakogun_ext_init3) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 neg_one$382 = -1.0f;
+f32 neg_one$382 = -1.0f;
 
-__declspec(section ".data") f32 __local_PI$383 = 3.1415927f;
+f32 __local_PI$383 = 3.1415927f;
 
-__declspec(section ".data") f32 __local_3PIO2$385 = 4.712389f;
+f32 __local_3PIO2$385 = 4.712389f;
 
-__declspec(section ".data") u32 gap_04_000314E4_data[1] = {0};
+u32 gap_04_000314E4_data[1] = {0};
 
-__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 __local_PIO2$384 = 1.5707964f;
+f32 __local_PIO2$384 = 1.5707964f;
 
-__declspec(section ".data") f32 one$381 = 1.0f;
+f32 one$381 = 1.0f;
 
-__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 neg_one$365 = -1.0f;
+f32 neg_one$365 = -1.0f;
 
-__declspec(section ".data") f32 __local_PI$366 = 3.1415927f;
+f32 __local_PI$366 = 3.1415927f;
 
-__declspec(section ".data") f32 __local_3PIO2$368 = 4.712389f;
+f32 __local_3PIO2$368 = 4.712389f;
 
-__declspec(section ".data") u32 gap_04_0003150C_data[1] = {0};
+u32 gap_04_0003150C_data[1] = {0};
 
-__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 __local_PIO2$367 = 1.5707964f;
+f32 __local_PIO2$367 = 1.5707964f;
 
-__declspec(section ".data") f32 one$364 = 1.0f;
+f32 one$364 = 1.0f;
 
 BattleUnitKind unit_boss_gundan_zako_group3 = {
     102,
@@ -236,20 +236,20 @@ BattleUnitKind unit_boss_gundan_zako_group3 = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-static __declspec(section ".data") PoseTableEntry pose_table[] = {
+static PoseTableEntry pose_table[] = {
     {28, "Z_1"},
     {31, "Z_1"},
     {39, "Z_1"},
     {69, "Z_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, dead_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
@@ -869,7 +869,7 @@ static EVT_BEGIN(hit_check_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

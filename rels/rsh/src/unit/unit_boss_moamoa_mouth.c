@@ -21,65 +21,65 @@ USER_FUNC(btlevtcmd_StartWaitEvent);
 extern PoseTableEntry moamoa1_weakness_pose_table[];
 extern s32 moamoa_defence_no_parts[];
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_neg_one_382;
-__declspec(section ".data") f32 fd_boss_moamoa_mouth___local_PI_383;
-__declspec(section ".data") f32 fd_boss_moamoa_mouth___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_moamoa_mouth___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_one_381;
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_neg_one_365;
-__declspec(section ".data") f32 fd_boss_moamoa_mouth___local_PI_366;
-__declspec(section ".data") f32 fd_boss_moamoa_mouth___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_moamoa_mouth___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_one_364;
+f32 fd_boss_moamoa_mouth_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_moamoa_mouth_neg_one_382;
+f32 fd_boss_moamoa_mouth___local_PI_383;
+f32 fd_boss_moamoa_mouth___local_3PIO2_385;
+f32 fd_boss_moamoa_mouth_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_moamoa_mouth___local_PIO2_384;
+f32 fd_boss_moamoa_mouth_one_381;
+f32 fd_boss_moamoa_mouth_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_moamoa_mouth_neg_one_365;
+f32 fd_boss_moamoa_mouth___local_PI_366;
+f32 fd_boss_moamoa_mouth___local_3PIO2_368;
+f32 fd_boss_moamoa_mouth_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_moamoa_mouth___local_PIO2_367;
+f32 fd_boss_moamoa_mouth_one_364;
 BattleUnitKind unit_boss_moamoa_mouth;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
-static __declspec(section ".data") PoseTableEntry pose_table[4];
-static __declspec(section ".data") BattleDataEntry data_table[2];
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
+static PoseTableEntry pose_table[4];
+static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_moamoa_attack;
 static s32 init_event[26];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 static s32 dead_event[88];
-static __declspec(section ".data") s32 phase_event[2];
+static s32 phase_event[2];
 static s32 attack_event[21];
 static s32 evt_attack_other_arm[81];
-__declspec(section ".data") const char* mouth_Attack_front[7];
+const char* mouth_Attack_front[7];
 static s32 evt_attack[302];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_moamoa_mouth_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_neg_one_382 = -1.0f;
+f32 fd_boss_moamoa_mouth_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth___local_PI_383 = 3.1415927f;
+f32 fd_boss_moamoa_mouth___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_moamoa_mouth___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_moamoa_mouth_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_moamoa_mouth___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_one_381 = 1.0f;
+f32 fd_boss_moamoa_mouth_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_moamoa_mouth_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_neg_one_365 = -1.0f;
+f32 fd_boss_moamoa_mouth_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth___local_PI_366 = 3.1415927f;
+f32 fd_boss_moamoa_mouth___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_moamoa_mouth___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_moamoa_mouth_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_moamoa_mouth___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_moamoa_mouth_one_364 = 1.0f;
+f32 fd_boss_moamoa_mouth_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_moamoa_mouth = {
     111,
@@ -147,20 +147,20 @@ BattleUnitKind unit_boss_moamoa_mouth = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
+static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-static __declspec(section ".data") PoseTableEntry pose_table[] = {
+static PoseTableEntry pose_table[] = {
     {28, "S_2"},
     {31, "D_2_1"},
     {39, "D_2_1"},
     {69, "S_2"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
@@ -218,7 +218,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -246,7 +246,7 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(phase_event)
+static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
@@ -296,7 +296,7 @@ static EVT_BEGIN(evt_attack_other_arm)
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* mouth_Attack_front[] = {
+const char* mouth_Attack_front[] = {
     "A_2_1",
     "A_2_2",
     NULL,
@@ -419,7 +419,7 @@ static EVT_BEGIN(evt_attack)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

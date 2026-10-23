@@ -1520,7 +1520,7 @@ BOOL winLectureCheck(void) {
 __declspec(section ".data") u32 gap_05_8037631C_data[1] = {0};
 #endif
 
-__declspec(section ".sdata2") const volatile f32 float_0p5_8041dc98 __attribute__((aligned(8))) = 0.5f;
+const volatile f32 float_0p5_8041dc98 __attribute__((aligned(8))) = 0.5f;
 #pragma force_active reset
 
 void winMainStrippedPool(f32* f, s32 i) {

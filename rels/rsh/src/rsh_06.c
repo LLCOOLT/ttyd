@@ -187,20 +187,20 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
 static void moamoa_pose_main(void);
 static void moamoa_pose_init(void);
 
-__declspec(section ".data") f32 fd_rsh_06_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_06_neg_one_382;
-__declspec(section ".data") f32 fd_rsh_06___local_PI_383;
-__declspec(section ".data") f32 fd_rsh_06___local_3PIO2_385;
-__declspec(section ".data") f32 fd_rsh_06_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_06___local_PIO2_384;
-__declspec(section ".data") f32 fd_rsh_06_one_381;
-__declspec(section ".data") f32 fd_rsh_06_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_06_neg_one_365;
-__declspec(section ".data") f32 fd_rsh_06___local_PI_366;
-__declspec(section ".data") f32 fd_rsh_06___local_3PIO2_368;
-__declspec(section ".data") f32 fd_rsh_06_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_06___local_PIO2_367;
-__declspec(section ".data") f32 fd_rsh_06_one_364;
+f32 fd_rsh_06_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_rsh_06_neg_one_382;
+f32 fd_rsh_06___local_PI_383;
+f32 fd_rsh_06___local_3PIO2_385;
+f32 fd_rsh_06_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_rsh_06___local_PIO2_384;
+f32 fd_rsh_06_one_381;
+f32 fd_rsh_06_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_rsh_06_neg_one_365;
+f32 fd_rsh_06___local_PI_366;
+f32 fd_rsh_06___local_3PIO2_368;
+f32 fd_rsh_06_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_rsh_06___local_PIO2_367;
+f32 fd_rsh_06_one_364;
 static ExtTexInfo ext_moamoa_data[71];
 static SharinData sharinDt[29];
 static s32 evt_sharin_main[87];
@@ -212,14 +212,14 @@ static s32 evt_bg[81];
 static s32 evt_hoshi[88];
 static s32 hom_10_evt_resha_start[244];
 static s32 hom_10_evt_resha_start2[259];
-__declspec(section ".data") static s32 hom_10_evt_resha_start3[11];
-__declspec(section ".data") static s32 hom_10_evt_resha_start4[11];
+static s32 hom_10_evt_resha_start3[11];
+static s32 hom_10_evt_resha_start4[11];
 static s32 stop_1[90];
 static s32 stop_2[90];
 static s32 hom_10_evt_resha_stop[36];
 static s32 evt_ramp[33];
 static const char* pika_tbl[15];
-__declspec(section ".data") static const char* pika_tbl_rsh_06[10];
+static const char* pika_tbl_rsh_06[10];
 static s32 hom_10_evt_resha_sub[102];
 static s32 hom_10_evt_resha_right[35];
 static s32 hom_10_evt_resha_left[28];
@@ -228,40 +228,40 @@ s32 evt_resha_init[13];
 static BeroEntry bero_data_a[2];
 static s32 evt_moamoa_init[187];
 s32 evt_great_moamoa[737];
-__declspec(section ".data") const char* pose_name[8];
+const char* pose_name[8];
 s32 moamoa_debug[230];
 s32 rsh_06_init_evt[84];
 s32 rsh_06_a_init_evt[32];
 s32 rsh_06_init_evt_nidome[41];
-__declspec(section ".data") s32 rsh_06_a_init_evt_nidome[11];
+s32 rsh_06_a_init_evt_nidome[11];
 
-__declspec(section ".data") f32 fd_rsh_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_06_neg_one_382 = -1.0f;
+f32 fd_rsh_06_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh_06___local_PI_383 = 3.1415927f;
+f32 fd_rsh_06___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh_06___local_3PIO2_385 = 4.712389f;
+f32 fd_rsh_06___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh_06___local_PIO2_384 = 1.5707964f;
+f32 fd_rsh_06___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_06_one_381 = 1.0f;
+f32 fd_rsh_06_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_rsh_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_06_neg_one_365 = -1.0f;
+f32 fd_rsh_06_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh_06___local_PI_366 = 3.1415927f;
+f32 fd_rsh_06___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh_06___local_3PIO2_368 = 4.712389f;
+f32 fd_rsh_06___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh_06___local_PIO2_367 = 1.5707964f;
+f32 fd_rsh_06___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_06_one_364 = 1.0f;
+f32 fd_rsh_06_one_364 = 1.0f;
 
 static ExtTexInfo ext_moamoa_data[] = {
     {((char*)"c_n_moa_a"), ((char*)"S_1"), 0.0f},
@@ -1096,9 +1096,9 @@ static void ext_moamoa_main(void) {
         x = pose->mtx[0][3] + (15.0f * moa_sinx(rad));
         z = pose->mtx[1][3];
         dist = pose->mtx[2][3] - (15.0f * moa_cosx(rad));
-        { f32 sp1; f32 k; f32 r1 = rand() / 32767.0f; sp1 = r1 * mmI(1.0f - 1.0f) + 1.0f;
+        { f32 hopSpeed; f32 k; f32 r1 = rand() / 32767.0f; hopSpeed = r1 * mmI(1.0f - 1.0f) + 1.0f;
         // FAKE: block-local copies of the float args (behaviour-identical) put the f1..f5 arg moves ahead of the ?: as in the target
-        { f32 g2 = randf(0.4f, 0.4f); { f32 x2 = x; f32 y2 = z; f32 z2 = dist; f32 s2 = sp1; f32 g3 = g2; moamoa_jump(pose, m, (d < 100.0f) ? (m->state) : (0), 0, x2, y2, z2, s2, g3); } } }
+        { f32 g2 = randf(0.4f, 0.4f); { f32 x2 = x; f32 y2 = z; f32 z2 = dist; f32 s2 = hopSpeed; f32 g3 = g2; moamoa_jump(pose, m, (d < 100.0f) ? (m->state) : (0), 0, x2, y2, z2, s2, g3); } } }
       }
         break;
 
@@ -1822,14 +1822,14 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(hom_10_evt_resha_start3)
+static EVT_BEGIN(hom_10_evt_resha_start3)
     SET_VALUE(GSWF(3583), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(-15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(-15.0f))
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(hom_10_evt_resha_start4)
+static EVT_BEGIN(hom_10_evt_resha_start4)
     SET_VALUE(GSWF(3583), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(15.0f))
@@ -1946,7 +1946,7 @@ static const char* pika_tbl[] = {
     "pika_1_2_c", "pika_1_3_c", "pika_1_4_c", "pika_6_c", NULL,
 };
 
-__declspec(section ".data") static const char* pika_tbl_rsh_06[] = {
+static const char* pika_tbl_rsh_06[] = {
     "pika_1_1", "pika_1_2", "pika_1_3", "pika_1_4", "pika_2",
     "pika_3", "pika_4", "pika_5", "pika_6", NULL,
 };
@@ -2308,7 +2308,7 @@ EVT_BEGIN(evt_great_moamoa)
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* pose_name[] = {
+const char* pose_name[] = {
     "Z_1", "H_1", "S_1", "U_1", "H_2", "S_2", "P_1",
     "S_3",
 };
@@ -2439,7 +2439,7 @@ EVT_BEGIN(rsh_06_init_evt_nidome)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(rsh_06_a_init_evt_nidome)
+EVT_BEGIN(rsh_06_a_init_evt_nidome)
     SET_VALUE(LW(0), PTR(bero_data_a))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))

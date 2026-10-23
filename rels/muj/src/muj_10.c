@@ -89,25 +89,25 @@ USER_FUNC(suifu_option_init_func);
 static USER_FUNC(tornade_alpha_func);
 void elmosalpha_func(NanNpc* npc);
 
-__declspec(section ".data") f32 fd_muj_10_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_10_neg_one_382;
-__declspec(section ".data") f32 fd_muj_10___local_PI_383;
-__declspec(section ".data") f32 fd_muj_10___local_3PIO2_385;
-__declspec(section ".data") f32 fd_muj_10_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_10___local_PIO2_384;
-__declspec(section ".data") f32 fd_muj_10_one_381;
-__declspec(section ".data") f32 fd_muj_10_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_10_neg_one_365;
-__declspec(section ".data") f32 fd_muj_10___local_PI_366;
-__declspec(section ".data") f32 fd_muj_10___local_3PIO2_368;
-__declspec(section ".data") f32 fd_muj_10_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_10___local_PIO2_367;
-__declspec(section ".data") f32 fd_muj_10_one_364;
+f32 fd_muj_10_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_muj_10_neg_one_382;
+f32 fd_muj_10___local_PI_383;
+f32 fd_muj_10___local_3PIO2_385;
+f32 fd_muj_10_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_muj_10___local_PIO2_384;
+f32 fd_muj_10_one_381;
+f32 fd_muj_10_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_muj_10_neg_one_365;
+f32 fd_muj_10___local_PI_366;
+f32 fd_muj_10___local_3PIO2_368;
+f32 fd_muj_10_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_muj_10___local_PIO2_367;
+f32 fd_muj_10_one_364;
 static s32 megane_init[18];
-static __declspec(section ".data") s32 megane_talk[8];
+static s32 megane_talk[8];
 static NpcSetupInfo npcEnt[2];
-static __declspec(section ".data") s32 e_close[12];
-static __declspec(section ".data") s32 e_open[12];
+static s32 e_close[12];
+static s32 e_open[12];
 static s32 door_custom[53];
 static s32 bero_in_event[80];
 static BeroEntry bero_entry_data[3];
@@ -115,7 +115,7 @@ s32 nazo_event[178];
 s32 oidasare_event[156];
 ExtTexInfo test_ext_entry_data[31];
 static s16 suifu_animtbl[42];
-static __declspec(section ".data") s16 elmos_animtbl[22];
+static s16 elmos_animtbl[22];
 s32 senin_event_suifupos[380];
 s32 senin_event_erumospos[180];
 #ifdef VERSION_G8ME01
@@ -162,33 +162,33 @@ USER_FUNC(suifu_option_init_func) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_muj_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_10_neg_one_382 = -1.0f;
+f32 fd_muj_10_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj_10___local_PI_383 = 3.1415927f;
+f32 fd_muj_10___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj_10___local_3PIO2_385 = 4.712389f;
+f32 fd_muj_10___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj_10___local_PIO2_384 = 1.5707964f;
+f32 fd_muj_10___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_10_one_381 = 1.0f;
+f32 fd_muj_10_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_muj_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_10_neg_one_365 = -1.0f;
+f32 fd_muj_10_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj_10___local_PI_366 = 3.1415927f;
+f32 fd_muj_10___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj_10___local_3PIO2_368 = 4.712389f;
+f32 fd_muj_10___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj_10___local_PIO2_367 = 1.5707964f;
+f32 fd_muj_10___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_10_one_364 = 1.0f;
+f32 fd_muj_10_one_364 = 1.0f;
 
 static EVT_BEGIN(megane_init)
     SWITCH(GSW(0))
@@ -199,7 +199,7 @@ static EVT_BEGIN(megane_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(megane_talk)
+static EVT_BEGIN(megane_talk)
     CALL(evt_msg_print, 0, STRING("stg5_dou_19_00"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -220,13 +220,13 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-static __declspec(section ".data") EVT_BEGIN(e_close)
+static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_b_doa"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(e_open)
+static EVT_BEGIN(e_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_b_doa"), 0, LW(0), 0)
     RETURN
@@ -452,7 +452,7 @@ static s16 suifu_animtbl[] = {
     -1, 0,
 };
 
-static __declspec(section ".data") s16 elmos_animtbl[] = {
+static s16 elmos_animtbl[] = {
     20, 20, 21, 21, 22, 22, 23, 23,
     24, 24, 25, 25, 26, 26, 27, 27,
     28, 28, 29, 29, -1, 0,

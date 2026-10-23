@@ -1,4 +1,5 @@
 #include "driver/hitdrv.h"
+#include <dolphin/os/OSFastCast.h>
 #include "dolphin/os.h"
 #include "driver/mapdrv.h"
 #include "memory.h"
@@ -506,16 +507,16 @@ void hitReCalcMatrix(HitEntry* hit, Mtx mtx) {
 }
 
 void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion) {
-    int var_r3_3;
+    int doCalc;
 
-    var_r3_3 = 0;
+    doCalc = 0;
     if (hit->flags & 0x40) {
-        var_r3_3 = 1;
+        doCalc = 1;
     }
     if (recursion != 0) {
-        var_r3_3 = 1;
+        doCalc = 1;
     }
-    if (var_r3_3 != 0) {
+    if (doCalc != 0) {
         if (hit->flags & 0x10) {
             PSMTXConcat(mtx, hit->animMtx, hit->worldMtx);
         } else {
@@ -543,11 +544,8 @@ void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion) {
     }
 }
 
-static inline f32 hitDequant(register s16* base, register s32 idx) {
-    register f32 r;
-    register s32 off = idx * 2;
-    asm { psq_lx r, base, off, 1, 5 }
-    return r;
+static inline f32 hitDequant(s16* base, s32 idx) {
+    return __OSs16tof32(base + idx);
 }
 
 #pragma dont_inline on
@@ -672,50 +670,50 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
 #pragma dont_inline reset
 
 inline BOOL tempfunc(HitCheckQuery* query, HitVector* vector) {
-    Vec sp80;
-    Vec sp8C;
-    Vec sp98;
+    Vec toV0;
+    Vec toV1;
+    Vec toV2;
     f32 dotProduct;
-    f32 temp_f2;
+    f32 denom;
 
-    PSVECSubtract(&query->targetPos, &vector->v0, &sp80);
-    dotProduct = PSVECDotProduct(&vector->normal, &sp80);
+    PSVECSubtract(&query->targetPos, &vector->v0, &toV0);
+    dotProduct = PSVECDotProduct(&vector->normal, &toV0);
     if (query->singleSided) {
         if (dotProduct < 0.0f) {
             return 0;
         }
-        if (((sp80.z * vector->edge0.x) - (sp80.x * vector->edge0.z)) < 0.0f) {
+        if (((toV0.z * vector->edge0.x) - (toV0.x * vector->edge0.z)) < 0.0f) {
             return 0;
         }
-        PSVECSubtract(&query->targetPos, &vector->v1, &sp8C);
-        if (((sp8C.z * vector->edge1.x) - (sp8C.x * vector->edge1.z)) < 0.0f) {
+        PSVECSubtract(&query->targetPos, &vector->v1, &toV1);
+        if (((toV1.z * vector->edge1.x) - (toV1.x * vector->edge1.z)) < 0.0f) {
             return 0;
         }
-        PSVECSubtract(&query->targetPos, &vector->v2, &sp98);
-        if (((sp98.z * vector->edge2.x) - (sp98.x * vector->edge2.z)) < 0.0f) {
+        PSVECSubtract(&query->targetPos, &vector->v2, &toV2);
+        if (((toV2.z * vector->edge2.x) - (toV2.x * vector->edge2.z)) < 0.0f) {
             return 0;
         }
     } else {
         if ((vector->normal.y * dotProduct) <= 0.0f) {
             return 0;
         }
-        if ((dotProduct * ((sp80.z * vector->edge0.x) - (sp80.x * vector->edge0.z))) < 0.0f) {
+        if ((dotProduct * ((toV0.z * vector->edge0.x) - (toV0.x * vector->edge0.z))) < 0.0f) {
             return 0;
         }
-        PSVECSubtract(&query->targetPos, &vector->v1, &sp8C);
-        if ((dotProduct * ((sp8C.z * vector->edge1.x) - (sp8C.x * vector->edge1.z))) < 0.0f) {
+        PSVECSubtract(&query->targetPos, &vector->v1, &toV1);
+        if ((dotProduct * ((toV1.z * vector->edge1.x) - (toV1.x * vector->edge1.z))) < 0.0f) {
             return 0;
         }
-        PSVECSubtract(&query->targetPos, &vector->v2, &sp98);
-        if ((dotProduct * ((sp98.z * vector->edge2.x) - (sp98.x * vector->edge2.z))) < 0.0f) {
+        PSVECSubtract(&query->targetPos, &vector->v2, &toV2);
+        if ((dotProduct * ((toV2.z * vector->edge2.x) - (toV2.x * vector->edge2.z))) < 0.0f) {
             return 0;
         }
     }
-    temp_f2 = -vector->normal.y;
-    if ((query->targetDistance >= 0.0f) && ((-dotProduct / temp_f2) >= query->targetDistance)) {
+    denom = -vector->normal.y;
+    if ((query->targetDistance >= 0.0f) && ((-dotProduct / denom) >= query->targetDistance)) {
         return 0;
     }
-    query->targetDistance = -dotProduct / temp_f2;
+    query->targetDistance = -dotProduct / denom;
     query->hitPos.x = query->targetPos.x;
     query->hitPos.y = query->targetPos.y - query->targetDistance;
     query->hitPos.z = query->targetPos.z;
@@ -728,50 +726,50 @@ inline BOOL tempfunc(HitCheckQuery* query, HitVector* vector) {
 }
 
 inline BOOL tempfunc2(HitCheckQuery* query, HitVector* vector) {
-    Vec sp5C;
-    Vec sp68;
-    Vec sp74;
+    Vec toV0;
+    Vec toV1;
+    Vec toV2;
     f32 dotProduct;
-    f32 temp_f2;
+    f32 denom;
 
-    PSVECSubtract(&query->targetPos, &vector->v0, &sp5C);
-    dotProduct = PSVECDotProduct(&vector->normal, &sp5C);
+    PSVECSubtract(&query->targetPos, &vector->v0, &toV0);
+    dotProduct = PSVECDotProduct(&vector->normal, &toV0);
     if (query->singleSided) {
         if (dotProduct < 0.0f) {
             return 0;
         }
-        if (((sp5C.z * vector->edge0.x) - (sp5C.x * vector->edge0.z)) > 0.0f) {
+        if (((toV0.z * vector->edge0.x) - (toV0.x * vector->edge0.z)) > 0.0f) {
             return 0;
         }
-        PSVECSubtract(&query->targetPos, &vector->v1, &sp68);
-        if (((sp68.z * vector->edge1.x) - (sp68.x * vector->edge1.z)) > 0.0f) {
+        PSVECSubtract(&query->targetPos, &vector->v1, &toV1);
+        if (((toV1.z * vector->edge1.x) - (toV1.x * vector->edge1.z)) > 0.0f) {
             return 0;
         }
-        PSVECSubtract(&query->targetPos, &vector->v2, &sp74);
-        if (((sp74.z * vector->edge2.x) - (sp74.x * vector->edge2.z)) > 0.0f) {
+        PSVECSubtract(&query->targetPos, &vector->v2, &toV2);
+        if (((toV2.z * vector->edge2.x) - (toV2.x * vector->edge2.z)) > 0.0f) {
             return 0;
         }
     } else {
         if ((vector->normal.y * dotProduct) >= 0.0f) {
             return 0;
         }
-        if ((dotProduct * ((sp5C.z * vector->edge0.x) - (sp5C.x * vector->edge0.z))) > 0.0f) {
+        if ((dotProduct * ((toV0.z * vector->edge0.x) - (toV0.x * vector->edge0.z))) > 0.0f) {
             return 0;
         }
-        PSVECSubtract(&query->targetPos, &vector->v1, &sp68);
-        if ((dotProduct * ((sp68.z * vector->edge1.x) - (sp68.x * vector->edge1.z))) > 0.0f) {
+        PSVECSubtract(&query->targetPos, &vector->v1, &toV1);
+        if ((dotProduct * ((toV1.z * vector->edge1.x) - (toV1.x * vector->edge1.z))) > 0.0f) {
             return 0;
         }
-        PSVECSubtract(&query->targetPos, &vector->v2, &sp74);
-        if ((dotProduct * ((sp74.z * vector->edge2.x) - (sp74.x * vector->edge2.z))) > 0.0f) {
+        PSVECSubtract(&query->targetPos, &vector->v2, &toV2);
+        if ((dotProduct * ((toV2.z * vector->edge2.x) - (toV2.x * vector->edge2.z))) > 0.0f) {
             return 0;
         }
     }
-    temp_f2 = vector->normal.y;
-    if ((query->targetDistance >= 0.0f) && ((-dotProduct / temp_f2) >= query->targetDistance)) {
+    denom = vector->normal.y;
+    if ((query->targetDistance >= 0.0f) && ((-dotProduct / denom) >= query->targetDistance)) {
         return 0;
     }
-    query->targetDistance = -dotProduct / temp_f2;
+    query->targetDistance = -dotProduct / denom;
     query->hitPos.x = query->targetPos.x;
     query->hitPos.y = query->targetPos.y + query->targetDistance;
     query->hitPos.z = query->targetPos.z;
@@ -784,64 +782,64 @@ inline BOOL tempfunc2(HitCheckQuery* query, HitVector* vector) {
 }
 
 inline BOOL tempfunc3(HitCheckQuery* query, HitVector* vector) {
-    Vec sp8;
-    Vec sp14;
-    Vec sp20;
-    Vec sp2C;
-    Vec sp38;
-    Vec sp44;
-    Vec sp50;
+    Vec toV0;
+    Vec toV1;
+    Vec toV2;
+    Vec cross0;
+    Vec cross1;
+    Vec cross2;
+    Vec scaledDir;
     f32 dotProduct;
-    f32 var_f27;
+    f32 dirDotNormal;
 
-    PSVECSubtract(&query->targetPos, &vector->v0, &sp8);
-    dotProduct = PSVECDotProduct(&vector->normal, &sp8);
+    PSVECSubtract(&query->targetPos, &vector->v0, &toV0);
+    dotProduct = PSVECDotProduct(&vector->normal, &toV0);
     if (query->singleSided) {
         if (dotProduct < 0.0f) {
             return 0;
         }
-        PSVECCrossProduct(&query->targetDir, &vector->edge0, &sp2C);
-        if (PSVECDotProduct(&sp8, &sp2C) < 0.0f) {
+        PSVECCrossProduct(&query->targetDir, &vector->edge0, &cross0);
+        if (PSVECDotProduct(&toV0, &cross0) < 0.0f) {
             return 0;
         }
-        PSVECSubtract(&query->targetPos, &vector->v1, &sp14);
-        PSVECCrossProduct(&query->targetDir, &vector->edge1, &sp38);
-        if (PSVECDotProduct(&sp14, &sp38) < 0.0f) {
+        PSVECSubtract(&query->targetPos, &vector->v1, &toV1);
+        PSVECCrossProduct(&query->targetDir, &vector->edge1, &cross1);
+        if (PSVECDotProduct(&toV1, &cross1) < 0.0f) {
             return 0;
         }
-        PSVECSubtract(&query->targetPos, &vector->v2, &sp20);
-        PSVECCrossProduct(&query->targetDir, &vector->edge2, &sp44);
-        if (PSVECDotProduct(&sp20, &sp44) < 0.0f) {
+        PSVECSubtract(&query->targetPos, &vector->v2, &toV2);
+        PSVECCrossProduct(&query->targetDir, &vector->edge2, &cross2);
+        if (PSVECDotProduct(&toV2, &cross2) < 0.0f) {
             return 0;
         }
-        var_f27 = PSVECDotProduct(&vector->normal, &query->targetDir);
+        dirDotNormal = PSVECDotProduct(&vector->normal, &query->targetDir);
     } else {
-        var_f27 = PSVECDotProduct(&vector->normal, &query->targetDir);
-        if ((var_f27 * dotProduct) >= 0.0f) {
+        dirDotNormal = PSVECDotProduct(&vector->normal, &query->targetDir);
+        if ((dirDotNormal * dotProduct) >= 0.0f) {
             return 0;
         }
-        PSVECCrossProduct(&query->targetDir, &vector->edge0, &sp2C);
-        if ((dotProduct * PSVECDotProduct(&sp8, &sp2C)) < 0.0f) {
+        PSVECCrossProduct(&query->targetDir, &vector->edge0, &cross0);
+        if ((dotProduct * PSVECDotProduct(&toV0, &cross0)) < 0.0f) {
             return 0;
         }
-        PSVECSubtract(&query->targetPos, &vector->v1, &sp14);
-        PSVECCrossProduct(&query->targetDir, &vector->edge1, &sp38);
-        if ((dotProduct * PSVECDotProduct(&sp14, &sp38)) < 0.0f) {
+        PSVECSubtract(&query->targetPos, &vector->v1, &toV1);
+        PSVECCrossProduct(&query->targetDir, &vector->edge1, &cross1);
+        if ((dotProduct * PSVECDotProduct(&toV1, &cross1)) < 0.0f) {
             return 0;
         }
-        PSVECSubtract(&query->targetPos, &vector->v2, &sp20);
-        PSVECCrossProduct(&query->targetDir, &vector->edge2, &sp44);
-        if ((dotProduct * PSVECDotProduct(&sp20, &sp44)) < 0.0f) {
+        PSVECSubtract(&query->targetPos, &vector->v2, &toV2);
+        PSVECCrossProduct(&query->targetDir, &vector->edge2, &cross2);
+        if ((dotProduct * PSVECDotProduct(&toV2, &cross2)) < 0.0f) {
             return 0;
         }
     }
 
-    if ((query->targetDistance >= 0.0f) && ((-dotProduct / var_f27) >= query->targetDistance)) {
+    if ((query->targetDistance >= 0.0f) && ((-dotProduct / dirDotNormal) >= query->targetDistance)) {
         return 0;
     }
-    query->targetDistance = -dotProduct / var_f27;
-    PSVECScale(&query->targetDir, &sp50, query->targetDistance);
-    PSVECAdd(&query->targetPos, &sp50, &query->hitPos);
+    query->targetDistance = -dotProduct / dirDotNormal;
+    PSVECScale(&query->targetDir, &scaledDir, query->targetDistance);
+    PSVECAdd(&query->targetPos, &scaledDir, &query->hitPos);
     if (dotProduct >= 0.0f) {
         query->hitNormal = vector->normal;
     } else {
@@ -854,143 +852,143 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { 
     f32 temp;
     HitVector* vector;
     Vec position;
-    Vec spBC;
+    Vec hitNormalTmp;
     Vec normal;
-    Vec spA4;
-    HitEntry* var_r29;
-    HitEntry* var_r28;
+    Vec endPos;
+    HitEntry* entry;
+    HitEntry* closest;
     int i;
     f32 distance;
-    f32 var_f29;
-    HitVector* var_r31;
-    f32 temp_f28;
+    f32 minDist;
+    HitVector* vec;
+    f32 reach;
 
     mapGetWork();
-    var_r28 = NULL;
+    closest = NULL;
     if (!PSVECSquareMag(&query->targetDir)) {
         return NULL;
     }
-    var_f29 = -1.0f;
+    minDist = -1.0f;
     temp = 0.5f;
-    temp_f28 = query->targetDistance * temp;
-    PSVECScale(&query->targetDir, &spA4, temp_f28);
-    PSVECAdd(&query->targetPos, &spA4, &spA4);
-    var_r29 = hitActiveListTop;
+    reach = query->targetDistance * temp;
+    PSVECScale(&query->targetDir, &endPos, reach);
+    PSVECAdd(&query->targetPos, &endPos, &endPos);
+    entry = hitActiveListTop;
     if (query->targetDir.y == 0.0f) {
-        while (var_r29 != NULL) {
-            if (callback == NULL || callback(query, var_r29)) {
-                if (!(PSVECDistance(&spA4, &var_r29->centerWorld) > temp_f28 + var_r29->radius)) {
-                    if (var_r29->joint->drawMode->cullMode == 1) {
+        while (entry != NULL) {
+            if (callback == NULL || callback(query, entry)) {
+                if (!(PSVECDistance(&endPos, &entry->centerWorld) > reach + entry->radius)) {
+                    if (entry->joint->drawMode->cullMode == 1) {
                         query->singleSided = 1;
                     } else {
                         query->singleSided = 0;
                     }
-                    var_r31 = var_r29->vectors;
-                    for (i = 0; i < var_r29->vectorCount; i++, var_r31++) {
+                    vec = entry->vectors;
+                    for (i = 0; i < entry->vectorCount; i++, vec++) {
                         if ((query->singleSided == 0) ||
-                            !(PSVECDotProduct(&var_r31->normal, &query->targetDir) >= 0.0f)) {
-                            if (checkTriVec_xz(query, var_r31) && (var_f29 < 0.0f || var_f29 > query->targetDistance)) {
-                                var_f29 = query->targetDistance;
-                                var_r28 = var_r29;
-                                distance = var_f29;
+                            !(PSVECDotProduct(&vec->normal, &query->targetDir) >= 0.0f)) {
+                            if (checkTriVec_xz(query, vec) && (minDist < 0.0f || minDist > query->targetDistance)) {
+                                minDist = query->targetDistance;
+                                closest = entry;
+                                distance = minDist;
                                 position = query->hitPos;
-                                spBC = query->hitNormal;
+                                hitNormalTmp = query->hitNormal;
                             }
                         }
                     }
                 }
             }
-            var_r29 = var_r29->siblingActive;
+            entry = entry->siblingActive;
         }
     } else if (query->targetDir.x == 0.0f && query->targetDir.z == 0.0f) {
         if (query->targetDir.y == -1.0f) {
-            while (var_r29 != NULL) {
-                if (callback == NULL || callback(query, var_r29)) {
-                    if (!(PSVECDistance(&spA4, &var_r29->centerWorld) > temp_f28 + var_r29->radius)) {
-                        if (var_r29->joint->drawMode->cullMode == 1) {
+            while (entry != NULL) {
+                if (callback == NULL || callback(query, entry)) {
+                    if (!(PSVECDistance(&endPos, &entry->centerWorld) > reach + entry->radius)) {
+                        if (entry->joint->drawMode->cullMode == 1) {
                             query->singleSided = 1;
                         } else {
                             query->singleSided = 0;
                         }
-                        vector = var_r29->vectors;
-                        for (i = 0; i < var_r29->vectorCount; i++, vector++) {
+                        vector = entry->vectors;
+                        for (i = 0; i < entry->vectorCount; i++, vector++) {
                             if (query->singleSided == 0 || !(vector->normal.y <= 0.0f)) {
-                                if (tempfunc(query, vector) && (var_f29 < 0.0f || var_f29 > query->targetDistance)) {
-                                    var_f29 = query->targetDistance;
-                                    var_r28 = var_r29;
-                                    distance = var_f29;
+                                if (tempfunc(query, vector) && (minDist < 0.0f || minDist > query->targetDistance)) {
+                                    minDist = query->targetDistance;
+                                    closest = entry;
+                                    distance = minDist;
                                     position = query->hitPos;
-                                    spBC = query->hitNormal;
+                                    hitNormalTmp = query->hitNormal;
                                 }
                             }
                         }
                     }
                 }
-                var_r29 = var_r29->siblingActive;
+                entry = entry->siblingActive;
             }
         } else if (query->targetDir.y == 1.0f) {
-            while (var_r29 != NULL) {
-                if (callback == NULL || callback(query, var_r29)) {
-                    if (!(PSVECDistance(&spA4, &var_r29->centerWorld) > temp_f28 + var_r29->radius)) {
-                        if (var_r29->joint->drawMode->cullMode == 1) {
+            while (entry != NULL) {
+                if (callback == NULL || callback(query, entry)) {
+                    if (!(PSVECDistance(&endPos, &entry->centerWorld) > reach + entry->radius)) {
+                        if (entry->joint->drawMode->cullMode == 1) {
                             query->singleSided = 1;
                         } else {
                             query->singleSided = 0;
                         }
-                        vector = var_r29->vectors;
-                        for (i = 0; i < var_r29->vectorCount; i++, vector++) {
+                        vector = entry->vectors;
+                        for (i = 0; i < entry->vectorCount; i++, vector++) {
                             if (query->singleSided == 0 || !(vector->normal.y >= 0.0f)) {
-                                if (tempfunc2(query, vector) && (var_f29 < 0.0f || var_f29 > query->targetDistance)) {
-                                    var_f29 = query->targetDistance;
-                                    var_r28 = var_r29;
-                                    distance = var_f29;
+                                if (tempfunc2(query, vector) && (minDist < 0.0f || minDist > query->targetDistance)) {
+                                    minDist = query->targetDistance;
+                                    closest = entry;
+                                    distance = minDist;
                                     position = query->hitPos;
-                                    spBC = query->hitNormal;
+                                    hitNormalTmp = query->hitNormal;
                                 }
                             }
                         }
                     }
                 }
-                var_r29 = var_r29->siblingActive;
+                entry = entry->siblingActive;
             }
         } else {
             goto label_235;
         }
     } else {
     label_235:
-        while (var_r29 != NULL) {
-            if (callback == NULL || callback(query, var_r29)) {
-                if (!(PSVECDistance(&spA4, &var_r29->centerWorld) > (temp_f28 + var_r29->radius))) {
-                    if (var_r29->joint->drawMode->cullMode == 1) {
+        while (entry != NULL) {
+            if (callback == NULL || callback(query, entry)) {
+                if (!(PSVECDistance(&endPos, &entry->centerWorld) > (reach + entry->radius))) {
+                    if (entry->joint->drawMode->cullMode == 1) {
                         query->singleSided = 1;
                     } else {
                         query->singleSided = 0;
                     }
-                    vector = var_r29->vectors;
-                    for (i = 0; i < var_r29->vectorCount; i++, vector++) {
+                    vector = entry->vectors;
+                    for (i = 0; i < entry->vectorCount; i++, vector++) {
                         if (query->singleSided == 0 || !(PSVECDotProduct(&vector->normal, &query->targetDir) >= 0.0f)) {
-                            if (tempfunc3(query, vector) && (var_f29 < 0.0f || var_f29 > query->targetDistance)) {
-                                var_f29 = query->targetDistance;
-                                var_r28 = var_r29;
-                                distance = var_f29;
+                            if (tempfunc3(query, vector) && (minDist < 0.0f || minDist > query->targetDistance)) {
+                                minDist = query->targetDistance;
+                                closest = entry;
+                                distance = minDist;
                                 position = query->hitPos;
-                                spBC = query->hitNormal;
+                                hitNormalTmp = query->hitNormal;
                             }
                         }
                     }
                 }
             }
-            var_r29 = var_r29->siblingActive;
+            entry = entry->siblingActive;
         }
     }
-    if (var_r28 == NULL) {
+    if (closest == NULL) {
         return NULL;
     }
-    PSVECNormalize(&spBC, &normal);
+    PSVECNormalize(&hitNormalTmp, &normal);
     query->targetDistance = distance;
     query->hitPos = position;
     query->hitNormal = normal;
-    return var_r28;
+    return closest;
 }
 
 HitEntry* hitCheckFilter(HitFilterCallback callback, f32* hitX, f32* hitY, f32* hitZ, f32* distance, f32* hitNX,
@@ -1142,40 +1140,40 @@ HitEntry* hitCheckAttr(s32 user0, f32* hitX, f32* hitY, f32* hitZ, f32* distance
 HitEntry* hitCheckSphereFilter(HitFilterCallback callback, f32 x, f32 y, f32 z,
                                f32 distance) { // almost 1:1, stubborn regalloc
     MapEntry* map = mapGetWork()->entries;
-    MapEntry* var_r31 = map;
+    MapEntry* mapEntry = map;
     int i;
-    Vec sp68;
+    Vec center;
     int j;
-    HitEntry* var_r23;
+    HitEntry* hitObj;
     HitVector* vector;
-    f32 var_f28;
+    f32 minDist;
     s32 objectId;
     s32 fl;
-    f32 temp_f1;
-    f32 var_f30;
-    f32 var_f31;
+    f32 dist;
+    f32 minVecDist;
+    f32 radius;
     s32 entryId;
-    s32 var_r29;
+    s32 entryFlags;
     HitCheckQuery temp;
     HitCheckQuery* query;
-    HitEntry* temp_r27;
+    HitEntry* bestEntry;
 
-    var_f28 = -1.0f;
+    minDist = -1.0f;
     objectId = -1;
     query = &temp;
-    sp68 = (Vec){ x, y, z };
-    for (i = 0; i < map->count; var_r31++, i++) {
-        var_r23 = var_r31->hitEntries;
-        for (j = 0; j < var_r31->hitNumJoints; j++, var_r23++) {
-            if ((var_r23->attributes & 0x80000000) && (var_r23->joint->partCount != 0)) {
-                var_r29 = var_r23->flags;
-                if (!(var_r29 & 1) && !(var_r29 & 0x80)) {
-                    temp_f1 = PSVECDistance(&sp68, &var_r23->centerWorld);
-                    if (!(temp_f1 > (distance + var_r23->radius))) {
-                        if (callback == NULL || callback(query, var_r23)) {
-                            if (var_f28 < 0.0f || var_f28 > temp_f1) {
-                                var_f28 = temp_f1;
-                                var_f31 = var_r23->radius;
+    center = (Vec){ x, y, z };
+    for (i = 0; i < map->count; mapEntry++, i++) {
+        hitObj = mapEntry->hitEntries;
+        for (j = 0; j < mapEntry->hitNumJoints; j++, hitObj++) {
+            if ((hitObj->attributes & 0x80000000) && (hitObj->joint->partCount != 0)) {
+                entryFlags = hitObj->flags;
+                if (!(entryFlags & 1) && !(entryFlags & 0x80)) {
+                    dist = PSVECDistance(&center, &hitObj->centerWorld);
+                    if (!(dist > (distance + hitObj->radius))) {
+                        if (callback == NULL || callback(query, hitObj)) {
+                            if (minDist < 0.0f || minDist > dist) {
+                                minDist = dist;
+                                radius = hitObj->radius;
                                 objectId = j;
                                 entryId = i;
                             }
@@ -1188,32 +1186,32 @@ HitEntry* hitCheckSphereFilter(HitFilterCallback callback, f32 x, f32 y, f32 z,
     if (objectId < 0) {
         return 0;
     }
-    if (var_f28 < (0.5f * var_f31)) {
+    if (minDist < (0.5f * radius)) {
         return &map[entryId].hitEntries[objectId];
     }
     map = &map[entryId];
-    temp_r27 = &map->hitEntries[objectId];
-    PSVECSubtract(&temp_r27->centerWorld, &sp68, &query->targetDir);
+    bestEntry = &map->hitEntries[objectId];
+    PSVECSubtract(&bestEntry->centerWorld, &center, &query->targetDir);
     PSVECNormalize(&query->targetDir, &query->targetDir);
-    var_f30 = -1.0f;
+    minVecDist = -1.0f;
     fl = -1;
-    query->targetPos = sp68;
+    query->targetPos = center;
     query->targetDistance = distance;
-    if (temp_r27->joint->drawMode->cullMode == 1) {
+    if (bestEntry->joint->drawMode->cullMode == 1) {
         query->singleSided = 1;
     } else {
         query->singleSided = 0;
     }
-    vector = temp_r27->vectors;
-    for (i = 0; i < temp_r27->vectorCount; i++, vector++) {
+    vector = bestEntry->vectors;
+    for (i = 0; i < bestEntry->vectorCount; i++, vector++) {
         if ((query->singleSided == 0) || !(PSVECDotProduct(&vector->normal, &query->targetDir) >= 0.0f)) {
-            if (tempfunc3(query, vector) && ((var_f30 < 0.0f) || (var_f30 > query->targetDistance))) {
-                var_f30 = query->targetDistance;
+            if (tempfunc3(query, vector) && ((minVecDist < 0.0f) || (minVecDist > query->targetDistance))) {
+                minVecDist = query->targetDistance;
                 fl = 1;
             }
         }
     }
-    if (var_f30 > distance) {
+    if (minVecDist > distance) {
         return 0;
     }
     if (fl < 0) {
@@ -1248,13 +1246,13 @@ HitEntry* hitNameToPtr(const char* name) { // 1:1
 }
 
 void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion) { // 1:1, awful inlining
-    Vec sp8;
+    Vec center;
 
     if (hit->child != NULL) {
         hitObjGetPosSub(hit->child, position, counter, 1);
     } else {
-        PSMTXMultVec(hit->worldMtx, &hit->centerLocal, &sp8);
-        PSVECAdd(position, &sp8, position);
+        PSMTXMultVec(hit->worldMtx, &hit->centerLocal, &center);
+        PSVECAdd(position, &center, position);
         (*counter)++;
     }
     if (recursion) {
@@ -1265,19 +1263,19 @@ void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion)
 }
 
 void hitObjGetPos(const char* name, Vec* position) { // 1:1
-    Vec spC;
+    Vec sum;
     s32 counter;
     HitEntry* hit;
 
     counter = 0;
-    spC = (Vec){ 0.0f, 0.0f, 0.0f };
+    sum = (Vec){ 0.0f, 0.0f, 0.0f };
     hit = hitNameToPtr(name);
     if (hit == NULL) {
         *position = (Vec){ 0.0f, 0.0f, 0.0f };
         return;
     }
-    hitObjGetPosSub(hit, &spC, &counter, 0);
-    PSVECScale(&spC, position, 1.0f / (f32)counter);
+    hitObjGetPosSub(hit, &sum, &counter, 0);
+    PSVECScale(&sum, position, 1.0f / (f32)counter);
 }
 
 void hitObjGetNormal(const char* name, Vec* normal) { // 1:1

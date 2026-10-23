@@ -217,23 +217,23 @@ s32 evt_win_item_select(EventEntry* event, BOOL isFirstCall);
 s32 img_set_color(EventEntry* event, BOOL isFirstCall);
 s32 img_set_color(EventEntry* event, BOOL isFirstCall);
 
-__declspec(section ".data") f32 fd_eki_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_eki_00_neg_one_382;
-__declspec(section ".data") f32 fd_eki_00___local_PI_383;
-__declspec(section ".data") f32 fd_eki_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_eki_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_eki_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_eki_00_one_381;
-__declspec(section ".data") f32 fd_eki_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_eki_00_neg_one_365;
-__declspec(section ".data") f32 fd_eki_00___local_PI_366;
-__declspec(section ".data") f32 fd_eki_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_eki_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_eki_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_eki_00_one_364;
+f32 fd_eki_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_eki_00_neg_one_382;
+f32 fd_eki_00___local_PI_383;
+f32 fd_eki_00___local_3PIO2_385;
+f32 fd_eki_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_eki_00___local_PIO2_384;
+f32 fd_eki_00_one_381;
+f32 fd_eki_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_eki_00_neg_one_365;
+f32 fd_eki_00___local_PI_366;
+f32 fd_eki_00___local_3PIO2_368;
+f32 fd_eki_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_eki_00___local_PIO2_367;
+f32 fd_eki_00_one_364;
 static ExtTexInfo ext_moamoa_data[47];
-__declspec(section ".data") static s32 e_door_close[12];
-__declspec(section ".data") static s32 e_door_open[12];
+static s32 e_door_close[12];
+static s32 e_door_open[12];
 static s32 s_door_close[22];
 static s32 s_door_open[22];
 static BeroEntry bero_data[3];
@@ -247,40 +247,40 @@ s32 evt_elv_rumble[60];
 static s32 evt_elv_init[49];
 s32 evt_elv_down[554];
 s32 evt_elv_up[456];
-__declspec(section ".data") static s32 item_tbl[2];
+static s32 item_tbl[2];
 s32 evt_elv[61];
 s32 evt_elv_nomsg[14];
 static s32 evt_head[42];
 static s32 evt_kanban[14];
 s32 eki_00_init_evt[99];
 
-__declspec(section ".data") f32 fd_eki_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_eki_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_eki_00_neg_one_382 = -1.0f;
+f32 fd_eki_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_eki_00___local_PI_383 = 3.1415927f;
+f32 fd_eki_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_eki_00___local_3PIO2_385 = 4.712389f;
+f32 fd_eki_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_eki_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_eki_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_eki_00___local_PIO2_384 = 1.5707964f;
+f32 fd_eki_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_eki_00_one_381 = 1.0f;
+f32 fd_eki_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_eki_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_eki_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_eki_00_neg_one_365 = -1.0f;
+f32 fd_eki_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_eki_00___local_PI_366 = 3.1415927f;
+f32 fd_eki_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_eki_00___local_3PIO2_368 = 4.712389f;
+f32 fd_eki_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_eki_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_eki_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_eki_00___local_PIO2_367 = 1.5707964f;
+f32 fd_eki_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_eki_00_one_364 = 1.0f;
+f32 fd_eki_00_one_364 = 1.0f;
 
 static ExtTexInfo ext_moamoa_data[] = {
     {((char*)"c_n_moa_a"), ((char*)"S_1"), 0.0f},
@@ -1083,9 +1083,9 @@ static void ext_moamoa_main(void)
         x = pose->mtx[0][3] + (15.0f * moa_sinx(rad));
         dist = pose->mtx[1][3];
         z = pose->mtx[2][3] - (15.0f * moa_cosx(rad));
-        { f32 sp1; f32 k; f32 r1 = rand() / 32767.0f; sp1 = r1 * (k = 1.0f - 1.0f) + 1.0f;
+        { f32 hopSpeed; f32 k; f32 r1 = rand() / 32767.0f; hopSpeed = r1 * (k = 1.0f - 1.0f) + 1.0f;
         // FAKE: block-local copies of the float args (behaviour-identical) put the f1..f5 arg moves ahead of the ?: as in the target
-        { f32 g2 = randf(0.4f, 0.4f); { f32 x2 = x; f32 y2 = dist; f32 z2 = z; f32 s2 = sp1; f32 g3 = g2; moamoa_jump(pose, moa, (d < 100.0f) ? (moa->state) : (0), 1, x2, y2, z2, s2, g3); } } }
+        { f32 g2 = randf(0.4f, 0.4f); { f32 x2 = x; f32 y2 = dist; f32 z2 = z; f32 s2 = hopSpeed; f32 g3 = g2; moamoa_jump(pose, moa, (d < 100.0f) ? (moa->state) : (0), 1, x2, y2, z2, s2, g3); } } }
       }
         break;
 
@@ -1412,13 +1412,13 @@ static void ext_moamoa_dispent(void) {
     }
 }
 
-__declspec(section ".data") static EVT_BEGIN(e_door_close)
+static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING(((char*)"e_door")), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static EVT_BEGIN(e_door_open)
+static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING(((char*)"e_door")), 0, LW(0), 0)
     RETURN
@@ -1990,7 +1990,7 @@ EVT_BEGIN(evt_elv_up)
     RETURN
 EVT_END()
 
-__declspec(section ".data") static s32 item_tbl[] = {
+static s32 item_tbl[] = {
     ITEM_ELEVATOR_KEY_0x1A, -1,
 };
 

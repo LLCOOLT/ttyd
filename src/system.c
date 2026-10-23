@@ -764,7 +764,7 @@ void sysWaitDrawSync(void) {
 }
 
 void sysDummyDraw(Mtx mtx) {
-    f32 temp_f1, temp_f2;
+    f32 vtxMin, vtxMax;
 
     GXLoadPosMtxImm(mtx, 0);
     GXSetCurrentMtx(0);
@@ -790,13 +790,13 @@ void sysDummyDraw(Mtx mtx) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     GXBegin(GX_TRIANGLES, GX_VTXFMT0, 3);
-    temp_f1 = 0.0f;
-    temp_f2 = 20.0f;
-    GXPosition3f32(temp_f1, temp_f1, 0.0f);
+    vtxMin = 0.0f;
+    vtxMax = 20.0f;
+    GXPosition3f32(vtxMin, vtxMin, 0.0f);
     GXTexCoord2f32(0.0f, 0.0f);
-    GXPosition3f32(temp_f2, temp_f1, 0.0f);
+    GXPosition3f32(vtxMax, vtxMin, 0.0f);
     GXTexCoord2f32(0.0f, 0.0f);
-    GXPosition3f32(temp_f2, temp_f2, 0.0f);
+    GXPosition3f32(vtxMax, vtxMax, 0.0f);
     GXTexCoord2f32(0.0f, 0.0f);
 }
 

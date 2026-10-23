@@ -126,20 +126,20 @@ static USER_FUNC(ramp_r);
 static USER_FUNC(kpa_hikousen_yure);
 static void resha_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") f32 fd_gor_04_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gor_04_neg_one_382;
-__declspec(section ".data") f32 fd_gor_04___local_PI_383;
-__declspec(section ".data") f32 fd_gor_04___local_3PIO2_385;
-__declspec(section ".data") f32 fd_gor_04_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gor_04___local_PIO2_384;
-__declspec(section ".data") f32 fd_gor_04_one_381;
-__declspec(section ".data") f32 fd_gor_04_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gor_04_neg_one_365;
-__declspec(section ".data") f32 fd_gor_04___local_PI_366;
-__declspec(section ".data") f32 fd_gor_04___local_3PIO2_368;
-__declspec(section ".data") f32 fd_gor_04_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gor_04___local_PIO2_367;
-__declspec(section ".data") f32 fd_gor_04_one_364;
+f32 fd_gor_04_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_gor_04_neg_one_382;
+f32 fd_gor_04___local_PI_383;
+f32 fd_gor_04___local_3PIO2_385;
+f32 fd_gor_04_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_gor_04___local_PIO2_384;
+f32 fd_gor_04_one_381;
+f32 fd_gor_04_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_gor_04_neg_one_365;
+f32 fd_gor_04___local_PI_366;
+f32 fd_gor_04___local_3PIO2_368;
+f32 fd_gor_04_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_gor_04___local_PIO2_367;
+f32 fd_gor_04_one_364;
 static SharinData sharinDt[29];
 static s32 evt_sharin_main[87];
 static s32 evt_sharin[19];
@@ -150,14 +150,14 @@ static s32 evt_bg[81];
 static s32 evt_hoshi[88];
 static s32 hom_10_evt_resha_start[244];
 static s32 hom_10_evt_resha_start2[259];
-static __declspec(section ".data") s32 hom_10_evt_resha_start3[11];
-static __declspec(section ".data") s32 hom_10_evt_resha_start4[11];
+static s32 hom_10_evt_resha_start3[11];
+static s32 hom_10_evt_resha_start4[11];
 static s32 stop_1[90];
 static s32 stop_2[90];
 static s32 hom_10_evt_resha_stop[36];
 static s32 evt_ramp[33];
 static const char* pika_tbl[15];
-static __declspec(section ".data") const char* pika_tbl_rsh_06[10];
+static const char* pika_tbl_rsh_06[10];
 static s32 hom_10_evt_resha_sub[102];
 static s32 hom_10_evt_resha_right[35];
 static s32 hom_10_evt_resha_left[28];
@@ -166,23 +166,23 @@ static s32 evt_train[284];
 s32 evt_train2[287];
 static s32 peach_mail[235];
 static BeroEntry bero_entry_data[5];
-__declspec(section ".data") s32 hikosenkakari_init[5];
+s32 hikosenkakari_init[5];
 s32 hikosenkakari_init_ship[16];
 s32 hikosenkakari_talk[211];
 s32 ekiin_init[28];
 s32 ekiin_talk[188];
 s32 jugemu_a_init[13];
 s32 jugemu_a_talk[68];
-static __declspec(section ".data") s32 kinopiko_b_init[8];
+static s32 kinopiko_b_init[8];
 static s32 kinopiko_b_talk[68];
-static __declspec(section ".data") s32 baba_init[7];
-static __declspec(section ".data") s32 hkoopa_init[7];
+static s32 baba_init[7];
+static s32 hkoopa_init[7];
 static s32 luigi_init[18];
-static __declspec(section ".data") s32 luigi_talk[4];
+static s32 luigi_talk[4];
 static NpcSetupInfo luigiEnt[2];
 static s32 luigi_npcEnt[30];
-__declspec(section ".data") s32 scream_init[12];
-__declspec(section ".data") s32 scream_talk[8];
+s32 scream_init[12];
+s32 scream_talk[8];
 NpcSetupInfo screamEnt[2];
 static NpcSetupInfo npcEnt[7];
 s32 evt_hikousen[224];
@@ -195,33 +195,33 @@ s32 gor_04_init_evt[255];
 s32 gor_04_init_evt[253];
 #endif
 
-__declspec(section ".data") f32 fd_gor_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gor_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gor_04_neg_one_382 = -1.0f;
+f32 fd_gor_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_gor_04___local_PI_383 = 3.1415927f;
+f32 fd_gor_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gor_04___local_3PIO2_385 = 4.712389f;
+f32 fd_gor_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gor_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gor_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gor_04___local_PIO2_384 = 1.5707964f;
+f32 fd_gor_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gor_04_one_381 = 1.0f;
+f32 fd_gor_04_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_gor_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gor_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gor_04_neg_one_365 = -1.0f;
+f32 fd_gor_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_gor_04___local_PI_366 = 3.1415927f;
+f32 fd_gor_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gor_04___local_3PIO2_368 = 4.712389f;
+f32 fd_gor_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gor_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gor_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gor_04___local_PIO2_367 = 1.5707964f;
+f32 fd_gor_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gor_04_one_364 = 1.0f;
+f32 fd_gor_04_one_364 = 1.0f;
 
 static SharinData sharinDt[] = {
     {"sha_1_1", 0, 0, FLOAT(1.0f)},
@@ -642,14 +642,14 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(hom_10_evt_resha_start3)
+static EVT_BEGIN(hom_10_evt_resha_start3)
     SET_VALUE(GSWF(3583), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(-15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(-15.0f))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(hom_10_evt_resha_start4)
+static EVT_BEGIN(hom_10_evt_resha_start4)
     SET_VALUE(GSWF(3583), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(15.0f))
@@ -778,7 +778,7 @@ static const char* pika_tbl[] = {
     NULL,
 };
 
-static __declspec(section ".data") const char* pika_tbl_rsh_06[] = {
+static const char* pika_tbl_rsh_06[] = {
     "pika_1_1",
     "pika_1_2",
     "pika_1_3",
@@ -1202,7 +1202,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-__declspec(section ".data") EVT_BEGIN(hikosenkakari_init)
+EVT_BEGIN(hikosenkakari_init)
     SET_VALUE(GF(10), 0)
     RETURN
 EVT_END()
@@ -1379,7 +1379,7 @@ EVT_BEGIN(jugemu_a_talk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(kinopiko_b_init)
+static EVT_BEGIN(kinopiko_b_init)
     CALL(evt_npc_set_position, STRING("me"), -575, 80, 120)
     RETURN
 EVT_END()
@@ -1406,12 +1406,12 @@ static EVT_BEGIN(kinopiko_b_talk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(baba_init)
+static EVT_BEGIN(baba_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(hkoopa_init)
+static EVT_BEGIN(hkoopa_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
@@ -1425,7 +1425,7 @@ static EVT_BEGIN(luigi_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(luigi_talk)
+static EVT_BEGIN(luigi_talk)
     CALL_CHILD(PTR(luigi_gor_first_talk))
     RETURN
 EVT_END()
@@ -1459,13 +1459,13 @@ static EVT_BEGIN(luigi_npcEnt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(scream_init)
+EVT_BEGIN(scream_init)
     CALL(evt_npc_set_position, STRING("me"), 105, 0, 120)
     CALL(evt_npc_set_ry_lr, STRING("me"), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(scream_talk)
+EVT_BEGIN(scream_talk)
     CALL(evt_msg_print, 0, STRING("luigi_npc_05"), 0, STRING("me"))
     RETURN
 EVT_END()

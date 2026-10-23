@@ -12,60 +12,60 @@ USER_FUNC(btlevtcmd_SetEventWait);
 USER_FUNC(btlevtcmd_SetMaxMoveCount);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 
-__declspec(section ".data") f32 fd_npc_christine_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_npc_christine_neg_one_382;
-__declspec(section ".data") f32 fd_npc_christine___local_PI_383;
-__declspec(section ".data") f32 fd_npc_christine___local_3PIO2_385;
-__declspec(section ".data") f32 fd_npc_christine_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_npc_christine___local_PIO2_384;
-__declspec(section ".data") f32 fd_npc_christine_one_381;
-__declspec(section ".data") f32 fd_npc_christine_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_npc_christine_neg_one_365;
-__declspec(section ".data") f32 fd_npc_christine___local_PI_366;
-__declspec(section ".data") f32 fd_npc_christine___local_3PIO2_368;
-__declspec(section ".data") f32 fd_npc_christine_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_npc_christine___local_PIO2_367;
-__declspec(section ".data") f32 fd_npc_christine_one_364;
+f32 fd_npc_christine_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_npc_christine_neg_one_382;
+f32 fd_npc_christine___local_PI_383;
+f32 fd_npc_christine___local_3PIO2_385;
+f32 fd_npc_christine_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_npc_christine___local_PIO2_384;
+f32 fd_npc_christine_one_381;
+f32 fd_npc_christine_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_npc_christine_neg_one_365;
+f32 fd_npc_christine___local_PI_366;
+f32 fd_npc_christine___local_3PIO2_368;
+f32 fd_npc_christine_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_npc_christine___local_PIO2_367;
+f32 fd_npc_christine_one_364;
 BattleUnitKind unit_npc_christine;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
-static __declspec(section ".data") PoseTableEntry pose_table[4];
-static __declspec(section ".data") BattleDataEntry data_table[1];
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
+static PoseTableEntry pose_table[4];
+static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
 static s32 init_event[25];
-static __declspec(section ".data") s32 damage_event[10];
-static __declspec(section ".data") s32 phase_event[2];
-static __declspec(section ".data") s32 attack_event[5];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 damage_event[10];
+static s32 phase_event[2];
+static s32 attack_event[5];
+static s32 wait_event[6];
 
-__declspec(section ".data") f32 fd_npc_christine_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_npc_christine_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_npc_christine_neg_one_382 = -1.0f;
+f32 fd_npc_christine_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_npc_christine___local_PI_383 = 3.1415927f;
+f32 fd_npc_christine___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_npc_christine___local_3PIO2_385 = 4.712389f;
+f32 fd_npc_christine___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_npc_christine_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_npc_christine_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_npc_christine___local_PIO2_384 = 1.5707964f;
+f32 fd_npc_christine___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_npc_christine_one_381 = 1.0f;
+f32 fd_npc_christine_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_npc_christine_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_npc_christine_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_npc_christine_neg_one_365 = -1.0f;
+f32 fd_npc_christine_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_npc_christine___local_PI_366 = 3.1415927f;
+f32 fd_npc_christine___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_npc_christine___local_3PIO2_368 = 4.712389f;
+f32 fd_npc_christine___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_npc_christine_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_npc_christine_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_npc_christine___local_PIO2_367 = 1.5707964f;
+f32 fd_npc_christine___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_npc_christine_one_364 = 1.0f;
+f32 fd_npc_christine_one_364 = 1.0f;
 
 BattleUnitKind unit_npc_christine = {
     221,
@@ -133,20 +133,20 @@ BattleUnitKind unit_npc_christine = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-static __declspec(section ".data") PoseTableEntry pose_table[] = {
+static PoseTableEntry pose_table[] = {
     {28, "PKR_S_1"},
     {31, "PKR_S_1"},
     {39, "PKR_S_1"},
     {69, "PKR_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
@@ -164,23 +164,23 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(phase_event)
+static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(attack_event)
+static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

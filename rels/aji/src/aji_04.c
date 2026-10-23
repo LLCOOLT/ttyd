@@ -77,29 +77,29 @@ USER_FUNC(evt_npc_set_stay_anim);
 static void callback(s32 type, void** work);
 void kuti_callback(s32 type, void** work);
 
-__declspec(section ".data") f32 fd_aji_04_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_04_neg_one_382;
-__declspec(section ".data") f32 fd_aji_04___local_PI_383;
-__declspec(section ".data") f32 fd_aji_04___local_3PIO2_385;
-__declspec(section ".data") f32 fd_aji_04_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_04___local_PIO2_384;
-__declspec(section ".data") f32 fd_aji_04_one_381;
-__declspec(section ".data") f32 fd_aji_04_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_04_neg_one_365;
-__declspec(section ".data") f32 fd_aji_04___local_PI_366;
-__declspec(section ".data") f32 fd_aji_04___local_3PIO2_368;
-__declspec(section ".data") f32 fd_aji_04_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_04___local_PIO2_367;
-__declspec(section ".data") f32 fd_aji_04_one_364;
+f32 fd_aji_04_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_aji_04_neg_one_382;
+f32 fd_aji_04___local_PI_383;
+f32 fd_aji_04___local_3PIO2_385;
+f32 fd_aji_04_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_aji_04___local_PIO2_384;
+f32 fd_aji_04_one_381;
+f32 fd_aji_04_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_aji_04_neg_one_365;
+f32 fd_aji_04___local_PI_366;
+f32 fd_aji_04___local_3PIO2_368;
+f32 fd_aji_04_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_aji_04___local_PIO2_367;
+f32 fd_aji_04_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static BeroEntry bero_entry_data[2];
 s32 sekizou_kaiten[81];
 s32 sekizou_kaiten2[56];
-__declspec(section ".data") s32 sekizou_talk[2];
-__declspec(section ".data") s32 evt_item[5];
+s32 sekizou_talk[2];
+s32 evt_item[5];
 static s32 evt_down_snd[116];
-static __declspec(section ".data") s32 evt_up_snd_[12];
+static s32 evt_up_snd_[12];
 static s32 evt_up_snd__[76];
 s32 offscreen_to_kuizu[127];
 static s32 offscreen_to_normal[121];
@@ -117,33 +117,33 @@ s32 kuizu_sekizou[920];
 s32 sekizou_init[47];
 s32 aji_04_init_evt[55];
 
-__declspec(section ".data") f32 fd_aji_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_aji_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_aji_04_neg_one_382 = -1.0f;
+f32 fd_aji_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_aji_04___local_PI_383 = 3.1415927f;
+f32 fd_aji_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_aji_04___local_3PIO2_385 = 4.712389f;
+f32 fd_aji_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_aji_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_aji_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_aji_04___local_PIO2_384 = 1.5707964f;
+f32 fd_aji_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_aji_04_one_381 = 1.0f;
+f32 fd_aji_04_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_aji_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_aji_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_aji_04_neg_one_365 = -1.0f;
+f32 fd_aji_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_aji_04___local_PI_366 = 3.1415927f;
+f32 fd_aji_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_aji_04___local_3PIO2_368 = 4.712389f;
+f32 fd_aji_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_aji_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_aji_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_aji_04___local_PIO2_367 = 1.5707964f;
+f32 fd_aji_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_aji_04_one_364 = 1.0f;
+f32 fd_aji_04_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -225,11 +225,11 @@ EVT_BEGIN(sekizou_kaiten2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(sekizou_talk)
+EVT_BEGIN(sekizou_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_item)
+EVT_BEGIN(evt_item)
     SET_VALUE(GSW(0), 367)
     RETURN
 EVT_END()
@@ -280,7 +280,7 @@ static EVT_BEGIN(evt_down_snd)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_up_snd_)
+static EVT_BEGIN(evt_up_snd_)
     CALL(evt_snd_sfxon, STRING("SFX_OFF1_PUZZLE_MOVE1"), 0)
     WAIT_MS(366)
     CALL(evt_snd_sfxon, STRING("SFX_OFF1_PUZZLE2"), 0)

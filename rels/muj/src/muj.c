@@ -38,59 +38,59 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-__declspec(section ".data") f32 fd_muj_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_neg_one_382;
-__declspec(section ".data") f32 fd_muj___local_PI_383;
-__declspec(section ".data") f32 fd_muj___local_3PIO2_385;
-__declspec(section ".data") f32 fd_muj_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj___local_PIO2_384;
-__declspec(section ".data") f32 fd_muj_one_381;
-__declspec(section ".data") f32 fd_muj_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj_neg_one_365;
-__declspec(section ".data") f32 fd_muj___local_PI_366;
-__declspec(section ".data") f32 fd_muj___local_3PIO2_368;
-__declspec(section ".data") f32 fd_muj_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_muj___local_PIO2_367;
-__declspec(section ".data") f32 fd_muj_one_364;
-__declspec(section ".data") f64 fd_muj__three_localstatic4_sqrtf;
-__declspec(section ".data") f64 fd_muj__half_localstatic3_sqrtf;
+f32 fd_muj_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_muj_neg_one_382;
+f32 fd_muj___local_PI_383;
+f32 fd_muj___local_3PIO2_385;
+f32 fd_muj_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_muj___local_PIO2_384;
+f32 fd_muj_one_381;
+f32 fd_muj_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_muj_neg_one_365;
+f32 fd_muj___local_PI_366;
+f32 fd_muj___local_3PIO2_368;
+f32 fd_muj_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_muj___local_PIO2_367;
+f32 fd_muj_one_364;
+f64 fd_muj__three_localstatic4_sqrtf;
+f64 fd_muj__half_localstatic3_sqrtf;
 f32 muj_ship_puka_data[16];
 s32 muj_ship_puka[21];
 s32 korutesu_apper[234];
 s32 korutesu_vanish[227];
-__declspec(section ".data") s32 muj_mario_pos_osreport[4];
+s32 muj_mario_pos_osreport[4];
 
-__declspec(section ".data") f32 fd_muj_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_neg_one_382 = -1.0f;
+f32 fd_muj_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj___local_PI_383 = 3.1415927f;
+f32 fd_muj___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj___local_3PIO2_385 = 4.712389f;
+f32 fd_muj___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj___local_PIO2_384 = 1.5707964f;
+f32 fd_muj___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_one_381 = 1.0f;
+f32 fd_muj_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_muj_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_muj_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_muj_neg_one_365 = -1.0f;
+f32 fd_muj_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_muj___local_PI_366 = 3.1415927f;
+f32 fd_muj___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_muj___local_3PIO2_368 = 4.712389f;
+f32 fd_muj___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_muj_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_muj_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_muj___local_PIO2_367 = 1.5707964f;
+f32 fd_muj___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_muj_one_364 = 1.0f;
+f32 fd_muj_one_364 = 1.0f;
 
-__declspec(section ".data") f64 fd_muj__three_localstatic4_sqrtf = 3.0;
+f64 fd_muj__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") f64 fd_muj__half_localstatic3_sqrtf = 0.5;
+f64 fd_muj__half_localstatic3_sqrtf = 0.5;
 
 f32 muj_ship_puka_data[] = {
     -0.0f, -0.5f, -1.0f, -1.5f, -2.0f, -2.2f, -2.5f, -2.7f,
@@ -480,7 +480,7 @@ EVT_BEGIN(korutesu_vanish)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(muj_mario_pos_osreport)
+EVT_BEGIN(muj_mario_pos_osreport)
     CALL(muj_mario_pos_osreport_func)
     RETURN
 EVT_END()

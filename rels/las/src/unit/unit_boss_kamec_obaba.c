@@ -70,20 +70,20 @@ static USER_FUNC(eff_magic_get_posX);
 static USER_FUNC(eff_magic);
 static USER_FUNC(eff_staff);
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_kamec_obaba_neg_one_382;
-__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PI_383;
-__declspec(section ".data") f32 fd_boss_kamec_obaba___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_kamec_obaba_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_kamec_obaba_one_381;
-__declspec(section ".data") f32 fd_boss_kamec_obaba_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_kamec_obaba_neg_one_365;
-__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PI_366;
-__declspec(section ".data") f32 fd_boss_kamec_obaba___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_kamec_obaba_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_kamec_obaba_one_364;
+f32 fd_boss_kamec_obaba_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_kamec_obaba_neg_one_382;
+f32 fd_boss_kamec_obaba___local_PI_383;
+f32 fd_boss_kamec_obaba___local_3PIO2_385;
+f32 fd_boss_kamec_obaba_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_kamec_obaba___local_PIO2_384;
+f32 fd_boss_kamec_obaba_one_381;
+f32 fd_boss_kamec_obaba_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_kamec_obaba_neg_one_365;
+f32 fd_boss_kamec_obaba___local_PI_366;
+f32 fd_boss_kamec_obaba___local_3PIO2_368;
+f32 fd_boss_kamec_obaba_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_kamec_obaba___local_PIO2_367;
+f32 fd_boss_kamec_obaba_one_364;
 BattleWeapon weapon_kamec_obaba_attack_magic;
 BattleWeapon weapon_kamec_obaba_dekadeka_magic;
 BattleWeapon weapon_kamec_obaba_biribiri_magic;
@@ -91,13 +91,13 @@ BattleWeapon weapon_kamec_obaba_katikati_magic;
 BattleWeapon weapon_kamec_obaba_trans_magic;
 BattleWeapon weapon_kamec_obaba_recover_magic;
 BattleUnitKind unit_boss_kamec_obaba;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[17];
 static PoseTableEntry pose_table_sky[17];
-static __declspec(section ".data") PoseTableEntry pose_table_dead[3];
-static __declspec(section ".data") BattleDataEntry data_table[2];
+static PoseTableEntry pose_table_dead[3];
+static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[2];
 static s32 kamec_obaba_zoom[40];
 static s32 init_event[56];
@@ -116,39 +116,39 @@ static s32 attack_magic_event[269];
 s32 magic_select_pri_obaba[52];
 s32 magic_select_pri_koopa[52];
 static s32 dekadeka_magic_event[73];
-static __declspec(section ".data") s32 katikati_magic_event[4];
-static __declspec(section ".data") s32 biribiri_magic_event[4];
-static __declspec(section ".data") s32 trans_magic_event[4];
+static s32 katikati_magic_event[4];
+static s32 biribiri_magic_event[4];
+static s32 trans_magic_event[4];
 static s32 recover_magic_event[90];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_kamec_obaba_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba_neg_one_382 = -1.0f;
+f32 fd_boss_kamec_obaba_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PI_383 = 3.1415927f;
+f32 fd_boss_kamec_obaba___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_kamec_obaba___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_kamec_obaba_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_kamec_obaba___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba_one_381 = 1.0f;
+f32 fd_boss_kamec_obaba_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_kamec_obaba_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba_neg_one_365 = -1.0f;
+f32 fd_boss_kamec_obaba_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PI_366 = 3.1415927f;
+f32 fd_boss_kamec_obaba___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_kamec_obaba___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_kamec_obaba_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_kamec_obaba___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_kamec_obaba_one_364 = 1.0f;
+f32 fd_boss_kamec_obaba_one_364 = 1.0f;
 
 BattleWeapon weapon_kamec_obaba_attack_magic = {
     NULL, 0, // name..icon
@@ -439,11 +439,11 @@ BattleUnitKind unit_boss_kamec_obaba = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {40, 40, 60, 100, 40, 100, 100, 40, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
+static StatusVulnerability regist = {40, 40, 60, 100, 40, 100, 100, 40, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -485,13 +485,13 @@ static PoseTableEntry pose_table_sky[] = {
     {69, "S_2"},
 };
 
-static __declspec(section ".data") PoseTableEntry pose_table_dead[] = {
+static PoseTableEntry pose_table_dead[] = {
     {28, "D_3"},
     {39, "D_3"},
     {69, "D_3"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
@@ -1137,17 +1137,17 @@ static EVT_BEGIN(dekadeka_magic_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(katikati_magic_event)
+static EVT_BEGIN(katikati_magic_event)
     CALL_CHILD(PTR(dekadeka_magic_event))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(biribiri_magic_event)
+static EVT_BEGIN(biribiri_magic_event)
     CALL_CHILD(PTR(dekadeka_magic_event))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(trans_magic_event)
+static EVT_BEGIN(trans_magic_event)
     CALL_CHILD(PTR(dekadeka_magic_event))
     RETURN
 EVT_END()
@@ -1262,7 +1262,7 @@ static USER_FUNC(eff_staff) {
     return EVT_RETURN_BLOCK;
 }
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

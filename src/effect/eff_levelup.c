@@ -298,5 +298,5 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
 }
 
 #pragma force_active on
-__declspec(section ".sdata") u32 gap_07_80415D84_sdata[1] = {0};
+u32 gap_07_80415D84_sdata[1] = {0};
 #pragma force_active reset

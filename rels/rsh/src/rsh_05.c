@@ -166,20 +166,20 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
 static void moamoa_pose_main(void);
 static void moamoa_pose_init(void);
 
-__declspec(section ".data") f32 fd_rsh_05_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_05_neg_one_382;
-__declspec(section ".data") f32 fd_rsh_05___local_PI_383;
-__declspec(section ".data") f32 fd_rsh_05___local_3PIO2_385;
-__declspec(section ".data") f32 fd_rsh_05_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_05___local_PIO2_384;
-__declspec(section ".data") f32 fd_rsh_05_one_381;
-__declspec(section ".data") f32 fd_rsh_05_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_05_neg_one_365;
-__declspec(section ".data") f32 fd_rsh_05___local_PI_366;
-__declspec(section ".data") f32 fd_rsh_05___local_3PIO2_368;
-__declspec(section ".data") f32 fd_rsh_05_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_05___local_PIO2_367;
-__declspec(section ".data") f32 fd_rsh_05_one_364;
+f32 fd_rsh_05_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_rsh_05_neg_one_382;
+f32 fd_rsh_05___local_PI_383;
+f32 fd_rsh_05___local_3PIO2_385;
+f32 fd_rsh_05_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_rsh_05___local_PIO2_384;
+f32 fd_rsh_05_one_381;
+f32 fd_rsh_05_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_rsh_05_neg_one_365;
+f32 fd_rsh_05___local_PI_366;
+f32 fd_rsh_05___local_3PIO2_368;
+f32 fd_rsh_05_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_rsh_05___local_PIO2_367;
+f32 fd_rsh_05_one_364;
 static ExtTexInfo ext_moamoa_data[47];
 static s32 evt_moamoa_init[57];
 static s32 evt_meet_moamoa[185];
@@ -195,7 +195,7 @@ static BeroEntry bero_data_a[3];
 static BeroEntry bero_data_b[3];
 static BeroEntry bero_data_c[3];
 static NpcSetupInfo npc_data[3];
-__declspec(section ".data") s32 evt_ghost_diary[5];
+s32 evt_ghost_diary[5];
 s32 evt_ghost_diary_read[53];
 /* shelf access table: hit, msg; a NULL hit ends it */
 typedef struct ShelfMsg { const char* hit; const char* msg; } ShelfMsg;
@@ -209,33 +209,33 @@ s32 rsh_05_a_init_evt[103];
 s32 rsh_05_init_evt_nidome[59];
 s32 rsh_05_a_init_evt_nidome[29];
 
-__declspec(section ".data") f32 fd_rsh_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_05_neg_one_382 = -1.0f;
+f32 fd_rsh_05_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh_05___local_PI_383 = 3.1415927f;
+f32 fd_rsh_05___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh_05___local_3PIO2_385 = 4.712389f;
+f32 fd_rsh_05___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh_05___local_PIO2_384 = 1.5707964f;
+f32 fd_rsh_05___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_05_one_381 = 1.0f;
+f32 fd_rsh_05_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_rsh_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_05_neg_one_365 = -1.0f;
+f32 fd_rsh_05_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh_05___local_PI_366 = 3.1415927f;
+f32 fd_rsh_05___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh_05___local_3PIO2_368 = 4.712389f;
+f32 fd_rsh_05___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh_05___local_PIO2_367 = 1.5707964f;
+f32 fd_rsh_05___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_05_one_364 = 1.0f;
+f32 fd_rsh_05_one_364 = 1.0f;
 
 static ExtTexInfo ext_moamoa_data[] = {
     {("c_n_moa_a"), ("S_1"), 0.0f},
@@ -1078,9 +1078,9 @@ static void ext_moamoa_main(void) {
         x = pose->mtx[0][3] + (15.0f * moa_sinx(rad));
         dist = pose->mtx[1][3];
         z = pose->mtx[2][3] - (15.0f * moa_cosx(rad));
-        { f32 sp1; f32 k; f32 r1 = rand() / 32767.0f; sp1 = r1 * (k = 1.0f - 1.0f) + 1.0f;
+        { f32 hopSpeed; f32 k; f32 r1 = rand() / 32767.0f; hopSpeed = r1 * (k = 1.0f - 1.0f) + 1.0f;
         // FAKE: block-local copies of the float args (behaviour-identical) put the f1..f5 arg moves ahead of the ?: as in the target
-        { f32 g2 = randf(0.4f, 0.4f); { f32 x2 = x; f32 y2 = dist; f32 z2 = z; f32 s2 = sp1; f32 g3 = g2; moamoa_jump(pose, moa, (d < 100.0f) ? (moa->state) : (0), 1, x2, y2, z2, s2, g3); } } }
+        { f32 g2 = randf(0.4f, 0.4f); { f32 x2 = x; f32 y2 = dist; f32 z2 = z; f32 s2 = hopSpeed; f32 g3 = g2; moamoa_jump(pose, moa, (d < 100.0f) ? (moa->state) : (0), 1, x2, y2, z2, s2, g3); } } }
       }
         break;
 
@@ -1851,7 +1851,7 @@ static NpcSetupInfo npc_data[] = {
     {0},
 };
 
-__declspec(section ".data") EVT_BEGIN(evt_ghost_diary)
+EVT_BEGIN(evt_ghost_diary)
     SET_VALUE(GSW(0), 299)
     RETURN
 EVT_END()

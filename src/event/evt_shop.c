@@ -1017,7 +1017,7 @@ EVT_END()
 
 #ifdef VERSION_G8ME01
 // US: point window icon per language (first object of evt_shop .sdata)
-__declspec(section ".sdata") u16 point_disp_icons[] = {0x226, 0x227, 0x228, 0x227, 0x229, 0x22A};
+u16 point_disp_icons[] = {0x226, 0x227, 0x228, 0x227, 0x229, 0x22A};
 #endif
 
 EVT_BEGIN(evt_shoplist)
@@ -1081,7 +1081,7 @@ void help_disp(WinMgrEntry* entry) {
 
 #ifdef VERSION_G8ME01
 // US: "points" label icon per language (lives in another unit's .sdata)
-extern __declspec(section ".sdata") u16 point_disp_icons[];
+extern u16 point_disp_icons[];
 #endif
 
 void point_disp(WinMgrEntry* entry) {

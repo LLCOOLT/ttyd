@@ -73,20 +73,20 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(N_evt_party_cloud_lock_animations_on_off);
 #endif
 
-__declspec(section ".data") f32 fd_mri_09_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_09_neg_one_382;
-__declspec(section ".data") f32 fd_mri_09___local_PI_383;
-__declspec(section ".data") f32 fd_mri_09___local_3PIO2_385;
-__declspec(section ".data") f32 fd_mri_09_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_09___local_PIO2_384;
-__declspec(section ".data") f32 fd_mri_09_one_381;
-__declspec(section ".data") f32 fd_mri_09_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_09_neg_one_365;
-__declspec(section ".data") f32 fd_mri_09___local_PI_366;
-__declspec(section ".data") f32 fd_mri_09___local_3PIO2_368;
-__declspec(section ".data") f32 fd_mri_09_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_09___local_PIO2_367;
-__declspec(section ".data") f32 fd_mri_09_one_364;
+f32 fd_mri_09_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_mri_09_neg_one_382;
+f32 fd_mri_09___local_PI_383;
+f32 fd_mri_09___local_3PIO2_385;
+f32 fd_mri_09_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_mri_09___local_PIO2_384;
+f32 fd_mri_09_one_381;
+f32 fd_mri_09_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_mri_09_neg_one_365;
+f32 fd_mri_09___local_PI_366;
+f32 fd_mri_09___local_3PIO2_368;
+f32 fd_mri_09_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_mri_09___local_PIO2_367;
+f32 fd_mri_09_one_364;
 BeroEntry bero_bluejail[1];
 static BeroEntry bero_entry_data[5];
 s32 wall_roll_sub[96];
@@ -96,7 +96,7 @@ s32 wall_roll[272];
 s32 wall_roll[264];
 #endif
 static s32 breakyuka_init[17];
-static __declspec(section ".data") s32 breakyuka_main[9];
+static s32 breakyuka_main[9];
 static KusaAccess ueki_access_data[6];
 s32 slot00_event[52];
 s32 slot01_event[52];
@@ -110,33 +110,33 @@ s32 mri_09_init_evt[230];
 s32 mri_09_init_evt[228];
 #endif
 
-__declspec(section ".data") f32 fd_mri_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_09_neg_one_382 = -1.0f;
+f32 fd_mri_09_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_09___local_PI_383 = 3.1415927f;
+f32 fd_mri_09___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_09___local_3PIO2_385 = 4.712389f;
+f32 fd_mri_09___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_09___local_PIO2_384 = 1.5707964f;
+f32 fd_mri_09___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_09_one_381 = 1.0f;
+f32 fd_mri_09_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_mri_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_09_neg_one_365 = -1.0f;
+f32 fd_mri_09_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_09___local_PI_366 = 3.1415927f;
+f32 fd_mri_09___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_09___local_3PIO2_368 = 4.712389f;
+f32 fd_mri_09___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_09___local_PIO2_367 = 1.5707964f;
+f32 fd_mri_09___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_09_one_364 = 1.0f;
+f32 fd_mri_09_one_364 = 1.0f;
 
 BeroEntry bero_bluejail[] = {
     {
@@ -339,7 +339,7 @@ static EVT_BEGIN(breakyuka_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(breakyuka_main)
+static EVT_BEGIN(breakyuka_main)
     CALL(evt_hitobj_onoff, STRING("A_f2_rak_02"), 1, 1)
     CALL(evt_puni_all_fall_check)
     RETURN

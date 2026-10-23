@@ -119,37 +119,37 @@ void kusuri_2_color_tev(MapTevCallbackInfo* info);
 void kusuri_1_color_tev(MapTevCallbackInfo* info);
 void kusuri_naka_color_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") f32 fd_aji_06_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_06_neg_one_382;
-__declspec(section ".data") f32 fd_aji_06___local_PI_383;
-__declspec(section ".data") f32 fd_aji_06___local_3PIO2_385;
-__declspec(section ".data") f32 fd_aji_06_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_06___local_PIO2_384;
-__declspec(section ".data") f32 fd_aji_06_one_381;
-__declspec(section ".data") f32 fd_aji_06_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_06_neg_one_365;
-__declspec(section ".data") f32 fd_aji_06___local_PI_366;
-__declspec(section ".data") f32 fd_aji_06___local_3PIO2_368;
-__declspec(section ".data") f32 fd_aji_06_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_06___local_PIO2_367;
-__declspec(section ".data") f32 fd_aji_06_one_364;
+f32 fd_aji_06_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_aji_06_neg_one_382;
+f32 fd_aji_06___local_PI_383;
+f32 fd_aji_06___local_3PIO2_385;
+f32 fd_aji_06_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_aji_06___local_PIO2_384;
+f32 fd_aji_06_one_381;
+f32 fd_aji_06_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_aji_06_neg_one_365;
+f32 fd_aji_06___local_PI_366;
+f32 fd_aji_06___local_3PIO2_368;
+f32 fd_aji_06_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_aji_06___local_PIO2_367;
+f32 fd_aji_06_one_364;
 static s32 s_door_open[22];
 static s32 s_door_close[22];
 static BeroEntry bero_entry_data[2];
 static s32 bero_peach_evt[31];
 static BeroEntry bero_peach_data[2];
-__declspec(section ".data") s32 g_Kusuri_Col[1];
-__declspec(section ".data") s32 g_Kusuri_Src_Col[4];
-__declspec(section ".data") s32 g_Kusuri2_No[1];
-__declspec(section ".data") s32 g_Kusuri3_No[1];
-__declspec(section ".data") s32 g_Kusuri4_No[1];
+s32 g_Kusuri_Col[1];
+s32 g_Kusuri_Src_Col[4];
+s32 g_Kusuri2_No[1];
+s32 g_Kusuri3_No[1];
+s32 g_Kusuri4_No[1];
 s32 peach_evt_kaihei_open[51];
 s32 peach_evt_kaihei_open_all[28];
 s32 peach_evt_kaihei_close[46];
 s32 peach_evt_kaihei_close_all[28];
-__declspec(section ".data") s32 kusuri_tyogo_list[8];
-__declspec(section ".data") s32 kusuri_list[5];
-__declspec(section ".data") s32 kusuri_id[4];
+s32 kusuri_tyogo_list[8];
+s32 kusuri_list[5];
+s32 kusuri_id[4];
 s32 peach_evt_kusuri_select[73];
 s32 peach_evt_pick_kusuri[55];
 s32 peach_evt_check_all_kusuri_set[72];
@@ -171,7 +171,7 @@ s32 kusuri_color_sippai[93];
 s32 peach_evt_bika_move_data[33];
 s32 peach_evt_tyogo_sub[432];
 s32 peach_evt_tyogo[557];
-__declspec(section ".data") s32 peach_evt_tyogo_entry[6];
+s32 peach_evt_tyogo_entry[6];
 s32 peach_evt_kusuri_aka[19];
 s32 peach_evt_kusuri_ao[19];
 s32 peach_evt_kusuri_ki[19];
@@ -193,33 +193,33 @@ s32 evt_memo3[14];
 s32 evt_memo4[14];
 s32 aji_06_init_evt[232];
 
-__declspec(section ".data") f32 fd_aji_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_aji_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_aji_06_neg_one_382 = -1.0f;
+f32 fd_aji_06_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_aji_06___local_PI_383 = 3.1415927f;
+f32 fd_aji_06___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_aji_06___local_3PIO2_385 = 4.712389f;
+f32 fd_aji_06___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_aji_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_aji_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_aji_06___local_PIO2_384 = 1.5707964f;
+f32 fd_aji_06___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_aji_06_one_381 = 1.0f;
+f32 fd_aji_06_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_aji_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_aji_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_aji_06_neg_one_365 = -1.0f;
+f32 fd_aji_06_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_aji_06___local_PI_366 = 3.1415927f;
+f32 fd_aji_06___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_aji_06___local_3PIO2_368 = 4.712389f;
+f32 fd_aji_06___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_aji_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_aji_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_aji_06___local_PIO2_367 = 1.5707964f;
+f32 fd_aji_06___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_aji_06_one_364 = 1.0f;
+f32 fd_aji_06_one_364 = 1.0f;
 
 static EVT_BEGIN(s_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.16601563f))
@@ -295,22 +295,22 @@ static BeroEntry bero_peach_data[] = {
     {0},
 };
 
-__declspec(section ".data") s32 g_Kusuri_Col[] = {
+s32 g_Kusuri_Col[] = {
     255,
 };
 
-__declspec(section ".data") s32 g_Kusuri_Src_Col[] = {
+s32 g_Kusuri_Src_Col[] = {
     -16776961, 65535, -65281, 16711935,
 };
 
-__declspec(section ".data") EVT_BEGIN(g_Kusuri2_No)
+EVT_BEGIN(g_Kusuri2_No)
 EVT_END()
 
-__declspec(section ".data") s32 g_Kusuri3_No[] = {
+s32 g_Kusuri3_No[] = {
     2,
 };
 
-__declspec(section ".data") s32 g_Kusuri4_No[] = {
+s32 g_Kusuri4_No[] = {
     3,
 };
 
@@ -385,15 +385,15 @@ EVT_BEGIN(peach_evt_kaihei_close_all)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 kusuri_tyogo_list[] = {
+s32 kusuri_tyogo_list[] = {
     1, 2, 3, 2, 3, 1, 3, 4,
 };
 
-__declspec(section ".data") s32 kusuri_list[] = {
+s32 kusuri_list[] = {
     -1, -1, -1, -1, -1,
 };
 
-__declspec(section ".data") s32 kusuri_id[] = {
+s32 kusuri_id[] = {
     102, 101, 103, 104,
 };
 
@@ -1428,7 +1428,7 @@ EVT_BEGIN(peach_evt_tyogo)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(peach_evt_tyogo_entry)
+EVT_BEGIN(peach_evt_tyogo_entry)
     SPAWN_EVENT(PTR(peach_evt_tyogo))
     CALL(evt_exit_case_evt)
     RETURN

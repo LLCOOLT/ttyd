@@ -77,48 +77,48 @@ USER_FUNC(evt_win_item_select);
 USER_FUNC(make_kagi_tbl);
 USER_FUNC(temae_kesu);
 
-__declspec(section ".data") f32 fd_las_10_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_10_neg_one_382;
-__declspec(section ".data") f32 fd_las_10___local_PI_383;
-__declspec(section ".data") f32 fd_las_10___local_3PIO2_385;
-__declspec(section ".data") f32 fd_las_10_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_10___local_PIO2_384;
-__declspec(section ".data") f32 fd_las_10_one_381;
-__declspec(section ".data") f32 fd_las_10_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_10_neg_one_365;
-__declspec(section ".data") f32 fd_las_10___local_PI_366;
-__declspec(section ".data") f32 fd_las_10___local_3PIO2_368;
-__declspec(section ".data") f32 fd_las_10_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_10___local_PIO2_367;
-__declspec(section ".data") f32 fd_las_10_one_364;
+f32 fd_las_10_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_las_10_neg_one_382;
+f32 fd_las_10___local_PI_383;
+f32 fd_las_10___local_3PIO2_385;
+f32 fd_las_10_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_las_10___local_PIO2_384;
+f32 fd_las_10_one_381;
+f32 fd_las_10_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_las_10_neg_one_365;
+f32 fd_las_10___local_PI_366;
+f32 fd_las_10___local_3PIO2_368;
+f32 fd_las_10_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_las_10___local_PIO2_367;
+f32 fd_las_10_one_364;
 static s32 s_door_close[22];
 static s32 s_door_open[22];
-__declspec(section ".data") s32 nw_door_close[12];
-__declspec(section ".data") s32 nw_door_open[12];
-__declspec(section ".data") s32 ne_door_close[12];
-__declspec(section ".data") s32 ne_door_open[12];
-__declspec(section ".data") s32 sw_door_close[12];
-__declspec(section ".data") s32 sw_door_open[12];
-__declspec(section ".data") s32 se_door_close[12];
-__declspec(section ".data") s32 se_door_open[12];
-__declspec(section ".data") s32 nw2_door_close[12];
-__declspec(section ".data") s32 nw2_door_open[12];
-__declspec(section ".data") s32 ne2_door_close[12];
-__declspec(section ".data") s32 ne2_door_open[12];
-__declspec(section ".data") s32 sw2_door_close[12];
-__declspec(section ".data") s32 sw2_door_open[12];
-__declspec(section ".data") s32 se2_door_close[12];
-__declspec(section ".data") s32 se2_door_open[12];
+s32 nw_door_close[12];
+s32 nw_door_open[12];
+s32 ne_door_close[12];
+s32 ne_door_open[12];
+s32 sw_door_close[12];
+s32 sw_door_open[12];
+s32 se_door_close[12];
+s32 se_door_open[12];
+s32 nw2_door_close[12];
+s32 nw2_door_open[12];
+s32 ne2_door_close[12];
+s32 ne2_door_open[12];
+s32 sw2_door_close[12];
+s32 sw2_door_open[12];
+s32 se2_door_close[12];
+s32 se2_door_open[12];
 static BeroEntry bero_entry_data[10];
-__declspec(section ".data") const char* kabe_list_1[8];
-__declspec(section ".data") const char* kabe_list_2[8];
-__declspec(section ".data") const char* kabe_list_3[8];
-__declspec(section ".data") s32 las_10_temae_kabe[12];
+const char* kabe_list_1[8];
+const char* kabe_list_2[8];
+const char* kabe_list_3[8];
+s32 las_10_temae_kabe[12];
 static s32 first_evt[182];
 s32 tenkyugi_evt[311];
 s32 tenkyugi_evt2[134];
 s32 kagi_rotate[69];
-__declspec(section ".data") s32 kagi_tbl[9];
+s32 kagi_tbl[9];
 s32 kagi1_evt[80];
 s32 kagi2_evt[80];
 s32 kagi3_evt[80];
@@ -131,9 +131,9 @@ s32 daiza_up[201];
 s32 kagi_8_off[48];
 const char* daiza_name[25];
 s32 kagi_8_on[365];
-__declspec(section ".data") s32 kagi_8_init[11];
+s32 kagi_8_init[11];
 s32 kagi_8_syutugen[19];
-__declspec(section ".data") s32 daiza_key_tbl[2];
+s32 daiza_key_tbl[2];
 s32 daiza_evt[57];
 s32 las_10_init_evt[294];
 
@@ -153,33 +153,33 @@ USER_FUNC(make_kagi_tbl) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_las_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_10_neg_one_382 = -1.0f;
+f32 fd_las_10_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_10___local_PI_383 = 3.1415927f;
+f32 fd_las_10___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_10___local_3PIO2_385 = 4.712389f;
+f32 fd_las_10___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_10___local_PIO2_384 = 1.5707964f;
+f32 fd_las_10___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_10_one_381 = 1.0f;
+f32 fd_las_10_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_las_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_10_neg_one_365 = -1.0f;
+f32 fd_las_10_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_10___local_PI_366 = 3.1415927f;
+f32 fd_las_10___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_10___local_3PIO2_368 = 4.712389f;
+f32 fd_las_10___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_10___local_PIO2_367 = 1.5707964f;
+f32 fd_las_10___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_10_one_364 = 1.0f;
+f32 fd_las_10_one_364 = 1.0f;
 
 static EVT_BEGIN(s_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -197,97 +197,97 @@ static EVT_BEGIN(s_door_open)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(nw_door_close)
+EVT_BEGIN(nw_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door2"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(nw_door_open)
+EVT_BEGIN(nw_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door2"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(ne_door_close)
+EVT_BEGIN(ne_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door3"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(ne_door_open)
+EVT_BEGIN(ne_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door3"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(sw_door_close)
+EVT_BEGIN(sw_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("S_door4"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(sw_door_open)
+EVT_BEGIN(sw_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("S_door4"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(se_door_close)
+EVT_BEGIN(se_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door5"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(se_door_open)
+EVT_BEGIN(se_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door5"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(nw2_door_close)
+EVT_BEGIN(nw2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door6"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(nw2_door_open)
+EVT_BEGIN(nw2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door6"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(ne2_door_close)
+EVT_BEGIN(ne2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door7"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(ne2_door_open)
+EVT_BEGIN(ne2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door7"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(sw2_door_close)
+EVT_BEGIN(sw2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door8"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(sw2_door_open)
+EVT_BEGIN(sw2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door8"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(se2_door_close)
+EVT_BEGIN(se2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door9"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(se2_door_open)
+EVT_BEGIN(se2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door9"), 0, LW(0), 0)
     RETURN
@@ -459,7 +459,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-__declspec(section ".data") const char* kabe_list_1[] = {
+const char* kabe_list_1[] = {
     "S11_kabe4",
     "S11_kabe5",
     "S14_kabe4",
@@ -470,7 +470,7 @@ __declspec(section ".data") const char* kabe_list_1[] = {
     "S11_kabe3",
 };
 
-__declspec(section ".data") const char* kabe_list_2[] = {
+const char* kabe_list_2[] = {
     "S112_kabe4",
     "S112_kabe5",
     "S115_kabe4",
@@ -481,7 +481,7 @@ __declspec(section ".data") const char* kabe_list_2[] = {
     "S112_kabe3",
 };
 
-__declspec(section ".data") const char* kabe_list_3[] = {
+const char* kabe_list_3[] = {
     "S113_kabe4",
     "S113_kabe5",
     "S116_kabe4",
@@ -492,7 +492,7 @@ __declspec(section ".data") const char* kabe_list_3[] = {
     "S113_kabe3",
 };
 
-__declspec(section ".data") EVT_BEGIN(las_10_temae_kabe)
+EVT_BEGIN(las_10_temae_kabe)
     CALL(evt_seq_wait, 2)
     LOOP(0)
         CALL(temae_kesu)
@@ -718,7 +718,7 @@ EVT_BEGIN(kagi_rotate)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 kagi_tbl[] = {
+s32 kagi_tbl[] = {
     -1, -1, -1, -1, -1, -1, -1, -1,
     -1,
 };
@@ -1164,7 +1164,7 @@ EVT_BEGIN(kagi_8_on)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(kagi_8_init)
+EVT_BEGIN(kagi_8_init)
     IF_INT_LESS(GSW(0), 389)
         CALL_CHILD(PTR(kagi_8_off))
         ELSE
@@ -1181,7 +1181,7 @@ EVT_BEGIN(kagi_8_syutugen)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 daiza_key_tbl[] = {
+s32 daiza_key_tbl[] = {
     37, -1,
 };
 

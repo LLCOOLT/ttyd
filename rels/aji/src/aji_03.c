@@ -62,20 +62,20 @@ USER_FUNC(item_chk);
 void icon_disp(CameraId camera, void* param);
 USER_FUNC(evt_itemNameToItemID);
 
-__declspec(section ".data") f32 fd_aji_03_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_03_neg_one_382;
-__declspec(section ".data") f32 fd_aji_03___local_PI_383;
-__declspec(section ".data") f32 fd_aji_03___local_3PIO2_385;
-__declspec(section ".data") f32 fd_aji_03_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_03___local_PIO2_384;
-__declspec(section ".data") f32 fd_aji_03_one_381;
-__declspec(section ".data") f32 fd_aji_03_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_03_neg_one_365;
-__declspec(section ".data") f32 fd_aji_03___local_PI_366;
-__declspec(section ".data") f32 fd_aji_03___local_3PIO2_368;
-__declspec(section ".data") f32 fd_aji_03_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aji_03___local_PIO2_367;
-__declspec(section ".data") f32 fd_aji_03_one_364;
+f32 fd_aji_03_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_aji_03_neg_one_382;
+f32 fd_aji_03___local_PI_383;
+f32 fd_aji_03___local_3PIO2_385;
+f32 fd_aji_03_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_aji_03___local_PIO2_384;
+f32 fd_aji_03_one_381;
+f32 fd_aji_03_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_aji_03_neg_one_365;
+f32 fd_aji_03___local_PI_366;
+f32 fd_aji_03___local_3PIO2_368;
+f32 fd_aji_03_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_aji_03___local_PIO2_367;
+f32 fd_aji_03_one_364;
 static s32 e_door_close[22];
 static s32 e_door_open[22];
 static BeroEntry bero_entry_data[2];
@@ -83,10 +83,10 @@ s32 evt_kaitentou[44];
 s32 evt_kaitentou2[44];
 static s32 evt_hari[125];
 s32 ufo_hand[129];
-__declspec(section ".data") s32 move_left[5];
-__declspec(section ".data") s32 move_left2[5];
-__declspec(section ".data") s32 move_up[5];
-__declspec(section ".data") s32 move_up2[5];
+s32 move_left[5];
+s32 move_left2[5];
+s32 move_up[5];
+s32 move_up2[5];
 s32 hand_success[65];
 s32 hand_fail[128];
 s32 hand_release[65];
@@ -100,40 +100,40 @@ s32 evt_sw_reinit[88];
 s32 evt_sw0[72];
 s32 evt_sw1[72];
 s32 evt_sw2[72];
-__declspec(section ".data") s32 haguruma_tbl[2];
+s32 haguruma_tbl[2];
 static s32 evt_haguruma[132];
-__declspec(section ".data") s32 badge_evt[5];
-__declspec(section ".data") s32 badge_evt2[5];
-__declspec(section ".data") s32 badge_evt3[5];
+s32 badge_evt[5];
+s32 badge_evt2[5];
+s32 badge_evt3[5];
 s32 aji_03_init_evt[525];
 
-__declspec(section ".data") f32 fd_aji_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_aji_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_aji_03_neg_one_382 = -1.0f;
+f32 fd_aji_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_aji_03___local_PI_383 = 3.1415927f;
+f32 fd_aji_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_aji_03___local_3PIO2_385 = 4.712389f;
+f32 fd_aji_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_aji_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_aji_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_aji_03___local_PIO2_384 = 1.5707964f;
+f32 fd_aji_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_aji_03_one_381 = 1.0f;
+f32 fd_aji_03_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_aji_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_aji_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_aji_03_neg_one_365 = -1.0f;
+f32 fd_aji_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_aji_03___local_PI_366 = 3.1415927f;
+f32 fd_aji_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_aji_03___local_3PIO2_368 = 4.712389f;
+f32 fd_aji_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_aji_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_aji_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_aji_03___local_PIO2_367 = 1.5707964f;
+f32 fd_aji_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_aji_03_one_364 = 1.0f;
+f32 fd_aji_03_one_364 = 1.0f;
 
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
@@ -300,22 +300,22 @@ EVT_BEGIN(ufo_hand)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(move_left)
+EVT_BEGIN(move_left)
     SET_VALUE(GF(10), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(move_left2)
+EVT_BEGIN(move_left2)
     SET_VALUE(GF(10), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(move_up)
+EVT_BEGIN(move_up)
     SET_VALUE(GF(11), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(move_up2)
+EVT_BEGIN(move_up2)
     SET_VALUE(GF(11), 0)
     RETURN
 EVT_END()
@@ -1022,7 +1022,7 @@ EVT_BEGIN(evt_sw2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 haguruma_tbl[] = {
+s32 haguruma_tbl[] = {
     85, -1,
 };
 
@@ -1068,17 +1068,17 @@ static EVT_BEGIN(evt_haguruma)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(badge_evt)
+EVT_BEGIN(badge_evt)
     SET_VALUE(GSWF(4198), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(badge_evt2)
+EVT_BEGIN(badge_evt2)
     SET_VALUE(GSWF(4216), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(badge_evt3)
+EVT_BEGIN(badge_evt3)
     SET_VALUE(GSWF(5665), 1)
     RETURN
 EVT_END()

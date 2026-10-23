@@ -50,7 +50,7 @@ s32 size_table[HEAP_COUNT][2] = {
 #endif
 static SmartWork* wp = &smartWork;
 #pragma force_active on
-__declspec(section ".sdata") u32 gap_07_8040F50C_sdata[1] = {0};
+u32 gap_07_8040F50C_sdata[1] = {0};
 #pragma force_active reset
 
 //.sbss
@@ -87,7 +87,7 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
     MapAllocEntry* entry;
     void* arenaLo;
     void* arenaHi;
-    u32 temp_r31;
+    u32 restSize;
     int i;
     int size;
     u32 temp;
@@ -109,10 +109,10 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
         }
     }
 
-    temp_r31 = (u32)arenaHi - temp;
+    restSize = (u32)arenaHi - temp;
     for (i = 0; i < HEAP_COUNT; i++) {
         if (size_table[i][0] == 0) {
-            size = (size_table[i][1] * (u64)temp_r31) / 100Ull;
+            size = (size_table[i][1] * (u64)restSize) / 100Ull;
             heapStart[i] = (void*)temp;
             size -= (size & 0x1F);
             heapEnd[i] = (void*)(temp + size);

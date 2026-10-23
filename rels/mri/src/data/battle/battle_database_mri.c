@@ -12,108 +12,108 @@
 USER_FUNC(evt_mapobj_flag_onoff);
 extern BattleUnitKind unit_barriern;
 
-__declspec(section ".data") f32 fd_battle_database_mri_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_mri_neg_one_382;
-__declspec(section ".data") f32 fd_battle_database_mri___local_PI_383;
-__declspec(section ".data") f32 fd_battle_database_mri___local_3PIO2_385;
-__declspec(section ".data") f32 fd_battle_database_mri_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_mri___local_PIO2_384;
-__declspec(section ".data") f32 fd_battle_database_mri_one_381;
-__declspec(section ".data") f32 fd_battle_database_mri_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_mri_neg_one_365;
-__declspec(section ".data") f32 fd_battle_database_mri___local_PI_366;
-__declspec(section ".data") f32 fd_battle_database_mri___local_3PIO2_368;
-__declspec(section ".data") f32 fd_battle_database_mri_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_mri___local_PIO2_367;
-__declspec(section ".data") f32 fd_battle_database_mri_one_364;
+f32 fd_battle_database_mri_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_battle_database_mri_neg_one_382;
+f32 fd_battle_database_mri___local_PI_383;
+f32 fd_battle_database_mri___local_3PIO2_385;
+f32 fd_battle_database_mri_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_battle_database_mri___local_PIO2_384;
+f32 fd_battle_database_mri_one_381;
+f32 fd_battle_database_mri_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_battle_database_mri_neg_one_365;
+f32 fd_battle_database_mri___local_PI_366;
+f32 fd_battle_database_mri___local_3PIO2_368;
+f32 fd_battle_database_mri_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_battle_database_mri___local_PIO2_367;
+f32 fd_battle_database_mri_one_364;
 BattleStageObjectData mri_btlobject_data[43];
 BattleStageData mri_btlstage_data[4];
 BattleUnitSetup btlparty_mri_mri_01_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_01_01;
-__declspec(section ".data") BattleUnitSetup btlparty_mri_mri_04_01[1];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_04_01;
+BattleGroupSetup btlgrp_mri_mri_01_01;
+BattleUnitSetup btlparty_mri_mri_04_01[1];
+BattleGroupSetup btlgrp_mri_mri_04_01;
 BattleUnitSetup btlparty_mri_mri_05_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_05_01;
+BattleGroupSetup btlgrp_mri_mri_05_01;
 BattleUnitSetup btlparty_mri_mri_06_2F_02[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_06_2F_02;
+BattleGroupSetup btlgrp_mri_mri_06_2F_02;
 BattleUnitSetup btlparty_mri_mri_06_2F_03[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_06_2F_03;
+BattleGroupSetup btlgrp_mri_mri_06_2F_03;
 BattleUnitSetup btlparty_mri_mri_12_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_12_01;
+BattleGroupSetup btlgrp_mri_mri_12_01;
 BattleUnitSetup btlparty_mri_mri_12_02[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_12_02;
+BattleGroupSetup btlgrp_mri_mri_12_02;
 BattleUnitSetup btlparty_mri_mri_15_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_15_01;
+BattleGroupSetup btlgrp_mri_mri_15_01;
 BattleUnitSetup btlparty_mri_mri_17_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_17_01;
+BattleGroupSetup btlgrp_mri_mri_17_01;
 BattleUnitSetup btlparty_mri_mri_18_02[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_18_02;
+BattleGroupSetup btlgrp_mri_mri_18_02;
 BattleUnitSetup btlparty_mri_mri_18_03[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_18_03;
+BattleGroupSetup btlgrp_mri_mri_18_03;
 BattleUnitSetup btlparty_mri_mri_19_01[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_19_01;
+BattleGroupSetup btlgrp_mri_mri_19_01;
 BattleUnitSetup btlparty_mri_mri_19_02[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_19_02;
+BattleGroupSetup btlgrp_mri_mri_19_02;
 BattleUnitSetup btlparty_mri_mri_19_04[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_19_04;
+BattleGroupSetup btlgrp_mri_mri_19_04;
 BattleUnitSetup btlparty_mri_mri_20_02[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_20_02;
+BattleGroupSetup btlgrp_mri_mri_20_02;
 BattleUnitSetup btlparty_mri_mri_20_03[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_20_03;
-__declspec(section ".data") BattleUnitSetup btlparty_mri_mri_mb[1];
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_mb;
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_test1_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_test2_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_test3_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_test4_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_01_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_04_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_05_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_06_2f_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_06_2f_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_12_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_12_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_15_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_17_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_18_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_18_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_19_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_19_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_19_04_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_20_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_20_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_mb_off[2];
+BattleGroupSetup btlgrp_mri_mri_20_03;
+BattleUnitSetup btlparty_mri_mri_mb[1];
+BattleGroupSetup btlgrp_mri_mri_mb;
+NpcBattleSelect btlgrpsel_mri_btlno_mri_test1_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_test2_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_test3_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_test4_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_01_01_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_04_01_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_05_01_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_06_2f_02_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_06_2f_03_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_12_01_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_12_02_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_15_01_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_17_01_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_18_02_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_18_03_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_19_01_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_19_02_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_19_04_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_20_02_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_20_03_off[2];
+NpcBattleSelect btlgrpsel_mri_btlno_mri_mb_off[2];
 NpcSetupBattleInfo btlsetup_mri_tbl[22];
 NpcTerritoryInfo btl_mri_setup_no_tbl[22];
-__declspec(section ".data") s32 stg_02_1_init_evt[8];
+s32 stg_02_1_init_evt[8];
 
-__declspec(section ".data") f32 fd_battle_database_mri_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_battle_database_mri_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_mri_neg_one_382 = -1.0f;
+f32 fd_battle_database_mri_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_mri___local_PI_383 = 3.1415927f;
+f32 fd_battle_database_mri___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_battle_database_mri___local_3PIO2_385 = 4.712389f;
+f32 fd_battle_database_mri___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_battle_database_mri_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_battle_database_mri_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_mri___local_PIO2_384 = 1.5707964f;
+f32 fd_battle_database_mri___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_battle_database_mri_one_381 = 1.0f;
+f32 fd_battle_database_mri_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_mri_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_battle_database_mri_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_mri_neg_one_365 = -1.0f;
+f32 fd_battle_database_mri_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_mri___local_PI_366 = 3.1415927f;
+f32 fd_battle_database_mri___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_battle_database_mri___local_3PIO2_368 = 4.712389f;
+f32 fd_battle_database_mri___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_battle_database_mri_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_battle_database_mri_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_mri___local_PIO2_367 = 1.5707964f;
+f32 fd_battle_database_mri___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_battle_database_mri_one_364 = 1.0f;
+f32 fd_battle_database_mri_one_364 = 1.0f;
 
 BattleStageObjectData mri_btlobject_data[] = {
     {"S_isk_01", 2, 0, {19.0f, 0.0f, -55.0f}, 0, 60, {0}},
@@ -239,7 +239,7 @@ BattleUnitSetup btlparty_mri_mri_01_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_01_01 = {
+BattleGroupSetup btlgrp_mri_mri_01_01 = {
     2, // numEnemies
     btlparty_mri_mri_01_01, // enemyData
     0, 0, // heldItemWeight..randomItemWeight
@@ -249,7 +249,7 @@ __declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_01_01 = {
     5, // field_1C
 };
 
-__declspec(section ".data") BattleUnitSetup btlparty_mri_mri_04_01[] = {
+BattleUnitSetup btlparty_mri_mri_04_01[] = {
     {
         &unit_gundan_zako, // mUnitKindParams
         1, // alliance
@@ -262,7 +262,7 @@ __declspec(section ".data") BattleUnitSetup btlparty_mri_mri_04_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_04_01 = {
+BattleGroupSetup btlgrp_mri_mri_04_01 = {
     1, // numEnemies
     btlparty_mri_mri_04_01, // enemyData
     0, 0, // heldItemWeight..randomItemWeight
@@ -295,7 +295,7 @@ BattleUnitSetup btlparty_mri_mri_05_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_05_01 = {
+BattleGroupSetup btlgrp_mri_mri_05_01 = {
     2, // numEnemies
     btlparty_mri_mri_05_01, // enemyData
     25, // heldItemWeight
@@ -339,7 +339,7 @@ BattleUnitSetup btlparty_mri_mri_06_2F_02[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_06_2F_02 = {
+BattleGroupSetup btlgrp_mri_mri_06_2F_02 = {
     3, // numEnemies
     btlparty_mri_mri_06_2F_02, // enemyData
     25, // heldItemWeight
@@ -393,7 +393,7 @@ BattleUnitSetup btlparty_mri_mri_06_2F_03[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_06_2F_03 = {
+BattleGroupSetup btlgrp_mri_mri_06_2F_03 = {
     4, // numEnemies
     btlparty_mri_mri_06_2F_03, // enemyData
     25, // heldItemWeight
@@ -427,7 +427,7 @@ BattleUnitSetup btlparty_mri_mri_12_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_12_01 = {
+BattleGroupSetup btlgrp_mri_mri_12_01 = {
     2, // numEnemies
     btlparty_mri_mri_12_01, // enemyData
     25, // heldItemWeight
@@ -481,7 +481,7 @@ BattleUnitSetup btlparty_mri_mri_12_02[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_12_02 = {
+BattleGroupSetup btlgrp_mri_mri_12_02 = {
     4, // numEnemies
     btlparty_mri_mri_12_02, // enemyData
     25, // heldItemWeight
@@ -515,7 +515,7 @@ BattleUnitSetup btlparty_mri_mri_15_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_15_01 = {
+BattleGroupSetup btlgrp_mri_mri_15_01 = {
     2, // numEnemies
     btlparty_mri_mri_15_01, // enemyData
     0, 0, // heldItemWeight..randomItemWeight
@@ -548,7 +548,7 @@ BattleUnitSetup btlparty_mri_mri_17_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_17_01 = {
+BattleGroupSetup btlgrp_mri_mri_17_01 = {
     2, // numEnemies
     btlparty_mri_mri_17_01, // enemyData
     25, // heldItemWeight
@@ -592,7 +592,7 @@ BattleUnitSetup btlparty_mri_mri_18_02[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_18_02 = {
+BattleGroupSetup btlgrp_mri_mri_18_02 = {
     3, // numEnemies
     btlparty_mri_mri_18_02, // enemyData
     25, // heldItemWeight
@@ -636,7 +636,7 @@ BattleUnitSetup btlparty_mri_mri_18_03[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_18_03 = {
+BattleGroupSetup btlgrp_mri_mri_18_03 = {
     3, // numEnemies
     btlparty_mri_mri_18_03, // enemyData
     25, // heldItemWeight
@@ -670,7 +670,7 @@ BattleUnitSetup btlparty_mri_mri_19_01[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_19_01 = {
+BattleGroupSetup btlgrp_mri_mri_19_01 = {
     2, // numEnemies
     btlparty_mri_mri_19_01, // enemyData
     25, // heldItemWeight
@@ -704,7 +704,7 @@ BattleUnitSetup btlparty_mri_mri_19_02[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_19_02 = {
+BattleGroupSetup btlgrp_mri_mri_19_02 = {
     2, // numEnemies
     btlparty_mri_mri_19_02, // enemyData
     25, // heldItemWeight
@@ -758,7 +758,7 @@ BattleUnitSetup btlparty_mri_mri_19_04[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_19_04 = {
+BattleGroupSetup btlgrp_mri_mri_19_04 = {
     4, // numEnemies
     btlparty_mri_mri_19_04, // enemyData
     25, // heldItemWeight
@@ -792,7 +792,7 @@ BattleUnitSetup btlparty_mri_mri_20_02[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_20_02 = {
+BattleGroupSetup btlgrp_mri_mri_20_02 = {
     2, // numEnemies
     btlparty_mri_mri_20_02, // enemyData
     25, // heldItemWeight
@@ -836,7 +836,7 @@ BattleUnitSetup btlparty_mri_mri_20_03[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_20_03 = {
+BattleGroupSetup btlgrp_mri_mri_20_03 = {
     3, // numEnemies
     btlparty_mri_mri_20_03, // enemyData
     25, // heldItemWeight
@@ -847,7 +847,7 @@ __declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_20_03 = {
     5, // field_1C
 };
 
-__declspec(section ".data") BattleUnitSetup btlparty_mri_mri_mb[] = {
+BattleUnitSetup btlparty_mri_mri_mb[] = {
     {
         &unit_boss_magnum_battender, // mUnitKindParams
         1, // alliance
@@ -860,7 +860,7 @@ __declspec(section ".data") BattleUnitSetup btlparty_mri_mri_mb[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_mb = {
+BattleGroupSetup btlgrp_mri_mri_mb = {
     1, // numEnemies
     btlparty_mri_mri_mb, // enemyData
     0, 0, // heldItemWeight..randomItemWeight
@@ -870,107 +870,107 @@ __declspec(section ".data") BattleGroupSetup btlgrp_mri_mri_mb = {
     5, // field_1C
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_test1_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_test1_off[] = {
     {50, &btlgrp_mri_mri_01_01, mri_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_test2_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_test2_off[] = {
     {50, &btlgrp_mri_mri_01_01, &mri_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_test3_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_test3_off[] = {
     {50, &btlgrp_mri_mri_01_01, &mri_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_test4_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_test4_off[] = {
     {50, &btlgrp_mri_mri_01_01, &mri_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_01_01_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_01_01_off[] = {
     {10, &btlgrp_mri_mri_01_01, mri_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_04_01_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_04_01_off[] = {
     {10, &btlgrp_mri_mri_04_01, &mri_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_05_01_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_05_01_off[] = {
     {10, &btlgrp_mri_mri_05_01, &mri_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_06_2f_02_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_06_2f_02_off[] = {
     {10, &btlgrp_mri_mri_06_2F_02, &mri_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_06_2f_03_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_06_2f_03_off[] = {
     {10, &btlgrp_mri_mri_06_2F_03, &mri_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_12_01_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_12_01_off[] = {
     {10, &btlgrp_mri_mri_12_01, &mri_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_12_02_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_12_02_off[] = {
     {10, &btlgrp_mri_mri_12_02, &mri_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_15_01_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_15_01_off[] = {
     {10, &btlgrp_mri_mri_15_01, &mri_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_17_01_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_17_01_off[] = {
     {10, &btlgrp_mri_mri_17_01, &mri_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_18_02_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_18_02_off[] = {
     {10, &btlgrp_mri_mri_18_02, &mri_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_18_03_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_18_03_off[] = {
     {10, &btlgrp_mri_mri_18_03, &mri_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_19_01_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_19_01_off[] = {
     {10, &btlgrp_mri_mri_19_01, &mri_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_19_02_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_19_02_off[] = {
     {10, &btlgrp_mri_mri_19_02, &mri_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_19_04_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_19_04_off[] = {
     {10, &btlgrp_mri_mri_19_04, &mri_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_20_02_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_20_02_off[] = {
     {10, &btlgrp_mri_mri_20_02, &mri_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_20_03_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_20_03_off[] = {
     {10, &btlgrp_mri_mri_20_03, &mri_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_mri_btlno_mri_mb_off[] = {
+NpcBattleSelect btlgrpsel_mri_btlno_mri_mb_off[] = {
     {10, &btlgrp_mri_mri_mb, mri_btlstage_data},
     {0},
 };
@@ -1219,7 +1219,7 @@ NpcTerritoryInfo btl_mri_setup_no_tbl[] = {
     {0},
 };
 
-__declspec(section ".data") EVT_BEGIN(stg_02_1_init_evt)
+EVT_BEGIN(stg_02_1_init_evt)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ueki\0"), 1)
     RETURN
 EVT_END()

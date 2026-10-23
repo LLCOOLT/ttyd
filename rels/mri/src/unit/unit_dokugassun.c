@@ -35,68 +35,68 @@ static USER_FUNC(eff_poison_barrier);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(eff_poison_breath);
 
-__declspec(section ".data") f32 fd_dokugassun_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dokugassun_neg_one_382;
-__declspec(section ".data") f32 fd_dokugassun___local_PI_383;
-__declspec(section ".data") f32 fd_dokugassun___local_3PIO2_385;
-__declspec(section ".data") f32 fd_dokugassun_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dokugassun___local_PIO2_384;
-__declspec(section ".data") f32 fd_dokugassun_one_381;
-__declspec(section ".data") f32 fd_dokugassun_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dokugassun_neg_one_365;
-__declspec(section ".data") f32 fd_dokugassun___local_PI_366;
-__declspec(section ".data") f32 fd_dokugassun___local_3PIO2_368;
-__declspec(section ".data") f32 fd_dokugassun_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_dokugassun___local_PIO2_367;
-__declspec(section ".data") f32 fd_dokugassun_one_364;
+f32 fd_dokugassun_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_dokugassun_neg_one_382;
+f32 fd_dokugassun___local_PI_383;
+f32 fd_dokugassun___local_3PIO2_385;
+f32 fd_dokugassun_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_dokugassun___local_PIO2_384;
+f32 fd_dokugassun_one_381;
+f32 fd_dokugassun_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_dokugassun_neg_one_365;
+f32 fd_dokugassun___local_PI_366;
+f32 fd_dokugassun___local_3PIO2_368;
+f32 fd_dokugassun_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_dokugassun___local_PIO2_367;
+f32 fd_dokugassun_one_364;
 static BattleUnitKind unit_dokugassun;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_dokugassun_attack;
 static BattleWeapon weapon_dokugassun_poisongas_attack;
 static s32 attack_event[69];
 static s32 poisongas_event[303];
 static PoseTableEntry pose_table[17];
-static __declspec(section ".data") BattleDataEntry data_table[3];
+static BattleDataEntry data_table[3];
 static s32 init_event[37];
 static s32 barrier_event[33];
 static s32 dmg_first_attack_pos[19];
-static __declspec(section ".data") s32 damage_event[10];
-static __declspec(section ".data") s32 counter_event[2];
+static s32 damage_event[10];
+static s32 counter_event[2];
 static s32 unison_phase_event[140];
 static s32 normal_attack_event[386];
 static s32 charge_event[58];
 static s32 wait_event[13];
 
-__declspec(section ".data") f32 fd_dokugassun_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_dokugassun_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_dokugassun_neg_one_382 = -1.0f;
+f32 fd_dokugassun_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_dokugassun___local_PI_383 = 3.1415927f;
+f32 fd_dokugassun___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_dokugassun___local_3PIO2_385 = 4.712389f;
+f32 fd_dokugassun___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_dokugassun_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_dokugassun_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_dokugassun___local_PIO2_384 = 1.5707964f;
+f32 fd_dokugassun___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_dokugassun_one_381 = 1.0f;
+f32 fd_dokugassun_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_dokugassun_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_dokugassun_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_dokugassun_neg_one_365 = -1.0f;
+f32 fd_dokugassun_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_dokugassun___local_PI_366 = 3.1415927f;
+f32 fd_dokugassun___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_dokugassun___local_3PIO2_368 = 4.712389f;
+f32 fd_dokugassun___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_dokugassun_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_dokugassun_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_dokugassun___local_PIO2_367 = 1.5707964f;
+f32 fd_dokugassun___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_dokugassun_one_364 = 1.0f;
+f32 fd_dokugassun_one_364 = 1.0f;
 
 static BattleUnitKind unit_dokugassun = {
     166, // mUnitType
@@ -143,11 +143,11 @@ static BattleUnitKind unit_dokugassun = {
     (BattleDataEntry*)data_table, // dataTable
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {0};
+static BattleUnitDefense defence = {0};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {0};
+static BattleUnitDefenseAttr defence_attr = {0};
 
-static __declspec(section ".data") StatusVulnerability regist = {65, 65, 90, 0, 60, 100, 100, 100, 100, 80, 100, 80, 100, 80, 50, 60, 85, 100, 60, 100, 100, 20};
+static StatusVulnerability regist = {65, 65, 90, 0, 60, 100, 100, 100, 100, 80, 100, 80, 100, 80, 50, 60, 85, 100, 60, 100, 100, 20};
 
 static BattleUnitKindPart parts[] = {
     {
@@ -454,7 +454,7 @@ static USER_FUNC(eff_poison_barrier) {
     return EVT_RETURN_DONE;
 }
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {43, counter_event},
     {48, dmg_first_attack_pos},
     {0},
@@ -497,14 +497,14 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(counter_event)
+static EVT_BEGIN(counter_event)
     RETURN
 EVT_END()
 

@@ -51,44 +51,44 @@ USER_FUNC(evt_sub_get_mapname);
 USER_FUNC(evt_sub_get_system_flag);
 USER_FUNC(evt_win_item_select);
 
-__declspec(section ".data") f32 fd_rsh_01_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_01_neg_one_382;
-__declspec(section ".data") f32 fd_rsh_01___local_PI_383;
-__declspec(section ".data") f32 fd_rsh_01___local_3PIO2_385;
-__declspec(section ".data") f32 fd_rsh_01_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_01___local_PIO2_384;
-__declspec(section ".data") f32 fd_rsh_01_one_381;
-__declspec(section ".data") f32 fd_rsh_01_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_01_neg_one_365;
-__declspec(section ".data") f32 fd_rsh_01___local_PI_366;
-__declspec(section ".data") f32 fd_rsh_01___local_3PIO2_368;
-__declspec(section ".data") f32 fd_rsh_01_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_01___local_PIO2_367;
-__declspec(section ".data") f32 fd_rsh_01_one_364;
-__declspec(section ".data") s32 s_bero_close[12];
-__declspec(section ".data") s32 s_bero_open[12];
+f32 fd_rsh_01_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_rsh_01_neg_one_382;
+f32 fd_rsh_01___local_PI_383;
+f32 fd_rsh_01___local_3PIO2_385;
+f32 fd_rsh_01_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_rsh_01___local_PIO2_384;
+f32 fd_rsh_01_one_381;
+f32 fd_rsh_01_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_rsh_01_neg_one_365;
+f32 fd_rsh_01___local_PI_366;
+f32 fd_rsh_01___local_3PIO2_368;
+f32 fd_rsh_01_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_rsh_01___local_PIO2_367;
+f32 fd_rsh_01_one_364;
+s32 s_bero_close[12];
+s32 s_bero_open[12];
 static BeroEntry bero_data_a[4];
 static BeroEntry bero_data_b[4];
 static BeroEntry bero_data_c[4];
-static __declspec(section ".data") const char* door_3[7];
-static __declspec(section ".data") const char* door_4[7];
+static const char* door_3[7];
+static const char* door_4[7];
 static s32 init_toron[70];
 static s32 talk_toron[63];
 static s32 init_madam[52];
-static __declspec(section ".data") s32 item_tbl_madam[2];
+static s32 item_tbl_madam[2];
 static s32 talk_madam_ring_return[67];
 static s32 talk_madam[195];
 static NpcSetupInfo npc_data[7];
 NpcSetupInfo npc_data_2[3];
 static s32 evt_daiji_kami[41];
 s32 evt_pikary_arrival[141];
-static __declspec(section ".data") const char* access_tbl[7];
+static const char* access_tbl[7];
 static s32 evt_access[25];
 static s32 evt_access_entry[24];
 s32 rsh_01_init_evt[190];
 s32 rsh_01_a_init_evt[103];
 s32 rsh_01_b_init_evt[14];
-static __declspec(section ".data") const char* window_tbl[3];
+static const char* window_tbl[3];
 s32 rsh_01_c_init_evt[24];
 s32 talk_syasyou[19];
 static BeroEntry bero_data_a_return[4];
@@ -100,41 +100,41 @@ s32 rsh_01_a_init_evt_nidome[49];
 s32 rsh_01_b_init_evt_nidome[31];
 s32 rsh_01_c_init_evt_nidome[41];
 
-__declspec(section ".data") f32 fd_rsh_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_01_neg_one_382 = -1.0f;
+f32 fd_rsh_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh_01___local_PI_383 = 3.1415927f;
+f32 fd_rsh_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh_01___local_3PIO2_385 = 4.712389f;
+f32 fd_rsh_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh_01___local_PIO2_384 = 1.5707964f;
+f32 fd_rsh_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_01_one_381 = 1.0f;
+f32 fd_rsh_01_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_rsh_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_01_neg_one_365 = -1.0f;
+f32 fd_rsh_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh_01___local_PI_366 = 3.1415927f;
+f32 fd_rsh_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh_01___local_3PIO2_368 = 4.712389f;
+f32 fd_rsh_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh_01___local_PIO2_367 = 1.5707964f;
+f32 fd_rsh_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_01_one_364 = 1.0f;
+f32 fd_rsh_01_one_364 = 1.0f;
 
-__declspec(section ".data") EVT_BEGIN(s_bero_close)
+EVT_BEGIN(s_bero_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.3330078f))
     CALL(evt_mapobj_trans, 0, STRING("s_tobira"), LW(0), 0, 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(s_bero_open)
+EVT_BEGIN(s_bero_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.3330078f))
     CALL(evt_mapobj_trans, 0, STRING("s_tobira"), LW(0), 0, 0)
     RETURN
@@ -314,7 +314,7 @@ static BeroEntry bero_data_c[] = {
     {0},
 };
 
-static __declspec(section ".data") const char* door_3[] = {
+static const char* door_3[] = {
     "heya_3",
     "haikei_3",
     "tobira_3",
@@ -324,7 +324,7 @@ static __declspec(section ".data") const char* door_3[] = {
     "3_door_close",
 };
 
-static __declspec(section ".data") const char* door_4[] = {
+static const char* door_4[] = {
     "heya_4",
     "haikei_4",
     "tobira_4",
@@ -397,7 +397,7 @@ static EVT_BEGIN(init_madam)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 item_tbl_madam[] = {
+static s32 item_tbl_madam[] = {
     ITEM_GOLD_RING, -1,
 };
 
@@ -632,7 +632,7 @@ EVT_BEGIN(evt_pikary_arrival)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* access_tbl[] = {
+static const char* access_tbl[] = {
     "tana_5",
     "stg6_rsh_262",
     "stg6_rsh_267",
@@ -778,7 +778,7 @@ EVT_BEGIN(rsh_01_b_init_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* window_tbl[] = {
+static const char* window_tbl[] = {
     "mado_uturi_3",
     "mado_uturi_4",
     NULL,

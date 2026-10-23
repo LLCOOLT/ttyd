@@ -28,24 +28,24 @@ static s32 shuryolightRunEvt(s32* code, s32 id);
 static void shuryolightSetAnim(s32 index, s32 anim);
 static void shuryolight_callback(void* param, s32 group);
 
-__declspec(section ".data") f32 fd_evt_shuryolight_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_evt_shuryolight_neg_one_382;
-__declspec(section ".data") f32 fd_evt_shuryolight___local_PI_383;
-__declspec(section ".data") f32 fd_evt_shuryolight___local_3PIO2_385;
-__declspec(section ".data") f32 fd_evt_shuryolight_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_evt_shuryolight___local_PIO2_384;
-__declspec(section ".data") f32 fd_evt_shuryolight_one_381;
-__declspec(section ".data") f32 fd_evt_shuryolight_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_evt_shuryolight_neg_one_365;
-__declspec(section ".data") f32 fd_evt_shuryolight___local_PI_366;
-__declspec(section ".data") f32 fd_evt_shuryolight___local_3PIO2_368;
-__declspec(section ".data") f32 fd_evt_shuryolight_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_evt_shuryolight___local_PIO2_367;
-__declspec(section ".data") f32 fd_evt_shuryolight_one_364;
-static __declspec(section ".data") const char* green_light_anim[5];
-static __declspec(section ".data") const char* yellow_light_anim[5];
-static __declspec(section ".data") const char* red_light_anim[5];
-static __declspec(section ".data") const char* orange_light_anim[5];
+f32 fd_evt_shuryolight_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_evt_shuryolight_neg_one_382;
+f32 fd_evt_shuryolight___local_PI_383;
+f32 fd_evt_shuryolight___local_3PIO2_385;
+f32 fd_evt_shuryolight_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_evt_shuryolight___local_PIO2_384;
+f32 fd_evt_shuryolight_one_381;
+f32 fd_evt_shuryolight_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_evt_shuryolight_neg_one_365;
+f32 fd_evt_shuryolight___local_PI_366;
+f32 fd_evt_shuryolight___local_3PIO2_368;
+f32 fd_evt_shuryolight_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_evt_shuryolight___local_PIO2_367;
+f32 fd_evt_shuryolight_one_364;
+static const char* green_light_anim[5];
+static const char* yellow_light_anim[5];
+static const char* red_light_anim[5];
+static const char* orange_light_anim[5];
 s32 shuryolight_pow_normal[44];
 static s32 shuryolight_pow_tenmetu[31];
 s32 shuryolight_head_normal[30];
@@ -53,35 +53,35 @@ static s32 shuryolight_head_tenmetu[20];
 static s32 shuryolight_head_off[14];
 s32 shuryolight_tue_normal[31];
 
-__declspec(section ".data") f32 fd_evt_shuryolight_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_evt_shuryolight_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_evt_shuryolight_neg_one_382 = -1.0f;
+f32 fd_evt_shuryolight_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_evt_shuryolight___local_PI_383 = 3.1415927f;
+f32 fd_evt_shuryolight___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_evt_shuryolight___local_3PIO2_385 = 4.712389f;
+f32 fd_evt_shuryolight___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_evt_shuryolight_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_evt_shuryolight_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_evt_shuryolight___local_PIO2_384 = 1.5707964f;
+f32 fd_evt_shuryolight___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_evt_shuryolight_one_381 = 1.0f;
+f32 fd_evt_shuryolight_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_evt_shuryolight_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_evt_shuryolight_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_evt_shuryolight_neg_one_365 = -1.0f;
+f32 fd_evt_shuryolight_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_evt_shuryolight___local_PI_366 = 3.1415927f;
+f32 fd_evt_shuryolight___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_evt_shuryolight___local_3PIO2_368 = 4.712389f;
+f32 fd_evt_shuryolight___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_evt_shuryolight_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_evt_shuryolight_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_evt_shuryolight___local_PIO2_367 = 1.5707964f;
+f32 fd_evt_shuryolight___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_evt_shuryolight_one_364 = 1.0f;
+f32 fd_evt_shuryolight_one_364 = 1.0f;
 
-static __declspec(section ".data") const char* green_light_anim[] = {
+static const char* green_light_anim[] = {
     "L_1C",
     "L_1B",
     "L_1D",
@@ -89,7 +89,7 @@ static __declspec(section ".data") const char* green_light_anim[] = {
     "L_1E",
 };
 
-static __declspec(section ".data") const char* yellow_light_anim[] = {
+static const char* yellow_light_anim[] = {
     "L_2C",
     "L_2B",
     "L_2D",
@@ -97,7 +97,7 @@ static __declspec(section ".data") const char* yellow_light_anim[] = {
     "L_2E",
 };
 
-static __declspec(section ".data") const char* red_light_anim[] = {
+static const char* red_light_anim[] = {
     "L_3C",
     "L_3B",
     "L_3D",
@@ -105,7 +105,7 @@ static __declspec(section ".data") const char* red_light_anim[] = {
     "L_3E",
 };
 
-static __declspec(section ".data") const char* orange_light_anim[] = {
+static const char* orange_light_anim[] = {
     "L_4C",
     "L_4B",
     "L_4D",

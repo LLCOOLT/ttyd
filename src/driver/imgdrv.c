@@ -24,7 +24,7 @@ static ImageWork work;
 //.sdata
 static ImageWork* wp = &work;
 #pragma explicit_zero_data on
-__declspec(section ".sdata") s32 gap_07_8041034C_sdata = 0;
+s32 gap_07_8041034C_sdata = 0;
 #pragma explicit_zero_data off
 
 //local prototypes

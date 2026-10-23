@@ -122,28 +122,28 @@ static USER_FUNC(make_name);
 USER_FUNC(syuryo_baria);
 USER_FUNC(syuryo_baria_recalc_pos);
 
-__declspec(section ".data") f32 fd_las_28_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_28_neg_one_382;
-__declspec(section ".data") f32 fd_las_28___local_PI_383;
-__declspec(section ".data") f32 fd_las_28___local_3PIO2_385;
-__declspec(section ".data") f32 fd_las_28_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_28___local_PIO2_384;
-__declspec(section ".data") f32 fd_las_28_one_381;
-__declspec(section ".data") f32 fd_las_28_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_28_neg_one_365;
-__declspec(section ".data") f32 fd_las_28___local_PI_366;
-__declspec(section ".data") f32 fd_las_28___local_3PIO2_368;
-__declspec(section ".data") f32 fd_las_28_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_28___local_PIO2_367;
-__declspec(section ".data") f32 fd_las_28_one_364;
+f32 fd_las_28_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_las_28_neg_one_382;
+f32 fd_las_28___local_PI_383;
+f32 fd_las_28___local_3PIO2_385;
+f32 fd_las_28_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_las_28___local_PIO2_384;
+f32 fd_las_28_one_381;
+f32 fd_las_28_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_las_28_neg_one_365;
+f32 fd_las_28___local_PI_366;
+f32 fd_las_28___local_3PIO2_368;
+f32 fd_las_28_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_las_28___local_PIO2_367;
+f32 fd_las_28_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static BeroEntry bero_entry_data[3];
 static s32 syuryo_init[30];
-__declspec(section ".data") s32 koopa_init[7];
-__declspec(section ".data") s32 koopa_talk[8];
-static __declspec(section ".data") s32 baba_init[7];
-static __declspec(section ".data") s32 baba_talk[8];
+s32 koopa_init[7];
+s32 koopa_talk[8];
+static s32 baba_init[7];
+static s32 baba_talk[8];
 static NpcSetupInfo npcEnt[5];
 static s32 first_evt[170];
 s32 syuryo_thunder[419];
@@ -164,33 +164,33 @@ USER_FUNC(syuryo_baria) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_las_28_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_28_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_28_neg_one_382 = -1.0f;
+f32 fd_las_28_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_28___local_PI_383 = 3.1415927f;
+f32 fd_las_28___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_28___local_3PIO2_385 = 4.712389f;
+f32 fd_las_28___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_28_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_28_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_28___local_PIO2_384 = 1.5707964f;
+f32 fd_las_28___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_28_one_381 = 1.0f;
+f32 fd_las_28_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_las_28_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_28_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_28_neg_one_365 = -1.0f;
+f32 fd_las_28_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_28___local_PI_366 = 3.1415927f;
+f32 fd_las_28___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_28___local_3PIO2_368 = 4.712389f;
+f32 fd_las_28___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_28_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_28_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_28___local_PIO2_367 = 1.5707964f;
+f32 fd_las_28___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_28_one_364 = 1.0f;
+f32 fd_las_28_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -258,22 +258,22 @@ static EVT_BEGIN(syuryo_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(koopa_init)
+EVT_BEGIN(koopa_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(koopa_talk)
+EVT_BEGIN(koopa_talk)
     CALL(evt_msg_print, 0, STRING("stg8_las_107"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(baba_init)
+static EVT_BEGIN(baba_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(baba_talk)
+static EVT_BEGIN(baba_talk)
     CALL(evt_msg_print, 0, STRING("stg8_las_107_01"), 0, STRING("me"))
     RETURN
 EVT_END()

@@ -40,12 +40,12 @@ static void rankingInit(void);
 void rankingInit(void);
 typedef struct RankEntry { u16 flags; s32 id; union { s16 score; u8 sw[2]; }; } RankEntry;
 typedef struct RankWork { s32 num; RankEntry* entries; } RankWork;
-static __declspec(section ".data") RankWork* rank_wp;
+static RankWork* rank_wp;
 static void rankingExit(void);
 typedef struct DispWork { f32 y; f32 targetY; s32 page; } DispWork;
 typedef struct FighterData { u16 flags; const char* name; const char* name2; s32 info; s32 msg1; s32 msg2; s16 score; } FighterData;
 typedef struct RuleData { s32 name; const char* msg; s32 id; s32 a; s32 b; } RuleData;
-static __declspec(section ".data") DispWork* dwp;
+static DispWork* dwp;
 static FighterData fighterDt_raw[23];
 #define fighterDt (fighterDt_raw)
 static FighterData fighterDt_re_raw[21];
@@ -67,7 +67,7 @@ static RuleData ruleDt_re_raw[14];
 static s32 tou_bss_1C;
 static RankWork rank_work;
 static DispWork disp_work;
-static __declspec(section ".data") const char* suuji[10];
+static const char* suuji[10];
 void FontDrawMessageMtx(Mtx mtx, const char* msg);
 void FontDrawScale(f32 scale);
 static void disp_proc(CameraId cameraId, void* param);
@@ -215,22 +215,22 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-__declspec(section ".data") f32 fd_tou_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_neg_one_382;
-__declspec(section ".data") f32 fd_tou___local_PI_383;
-__declspec(section ".data") f32 fd_tou___local_3PIO2_385;
-__declspec(section ".data") f32 fd_tou_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou___local_PIO2_384;
-__declspec(section ".data") f32 fd_tou_one_381;
-__declspec(section ".data") f32 fd_tou_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_neg_one_365;
-__declspec(section ".data") f32 fd_tou___local_PI_366;
-__declspec(section ".data") f32 fd_tou___local_3PIO2_368;
-__declspec(section ".data") f32 fd_tou_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou___local_PIO2_367;
-__declspec(section ".data") f32 fd_tou_one_364;
-__declspec(section ".data") f64 fd_tou__three_localstatic4_sqrtf;
-__declspec(section ".data") f64 fd_tou__half_localstatic3_sqrtf;
+f32 fd_tou_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_tou_neg_one_382;
+f32 fd_tou___local_PI_383;
+f32 fd_tou___local_3PIO2_385;
+f32 fd_tou_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_tou___local_PIO2_384;
+f32 fd_tou_one_381;
+f32 fd_tou_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_tou_neg_one_365;
+f32 fd_tou___local_PI_366;
+f32 fd_tou___local_3PIO2_368;
+f32 fd_tou_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_tou___local_PIO2_367;
+f32 fd_tou_one_364;
+f64 fd_tou__three_localstatic4_sqrtf;
+f64 fd_tou__half_localstatic3_sqrtf;
 const char* lockerDt[46];
 s32 evt_close[188];
 static s32 evt_open[VERSION_PICK(165, 173)];
@@ -239,17 +239,17 @@ s32 evt_tou_monitor_on[18];
 s32 evt_tou_monitor_off[18];
 s32 evt_tou_monitor_init[69];
 s32 talk_gardman_doku[18];
-__declspec(section ".data") s32 dummy_party_msg_pkr[10];
-__declspec(section ".data") s32 dummy_party_msg_pnk[10];
-__declspec(section ".data") s32 dummy_party_msg_yos[10];
-__declspec(section ".data") s32 dummy_party_msg_win[10];
+s32 dummy_party_msg_pkr[10];
+s32 dummy_party_msg_pnk[10];
+s32 dummy_party_msg_yos[10];
+s32 dummy_party_msg_win[10];
 s32 party_npc_replace[139];
 static s32 evt_tamago_scale[89];
 static s32 evt_tamago_scale2[83];
 s32 evt_tamago_byebye[160];
 s32 talk_gardman[191];
 static s32 evt_gardman[VERSION_PICK(318, 335)];
-__declspec(section ".data") s32 evt_gardman_spawn[4];
+s32 evt_gardman_spawn[4];
 s32 evt_tou_match_make_default_sub[406];
 s32 evt_tou_match_make_default[303];
 s32 evt_talk_doku_cake[14];
@@ -270,7 +270,7 @@ s32 evt_mail_2[154];
 s32 evt_eat_cake[157];
 s32 evt_cake_init[31];
 s32 evt_cake[37];
-static __declspec(section ".data") s32 evt_koopa_after[5];
+static s32 evt_koopa_after[5];
 s32 evt_mail_3[157];
 s32 evt_mail_4[151];
 s32 evt_mail_5[157];
@@ -773,37 +773,37 @@ static void printRanking(void) {
     }
 }
 
-__declspec(section ".data") f32 fd_tou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_neg_one_382 = -1.0f;
+f32 fd_tou_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou___local_PI_383 = 3.1415927f;
+f32 fd_tou___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou___local_3PIO2_385 = 4.712389f;
+f32 fd_tou___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou___local_PIO2_384 = 1.5707964f;
+f32 fd_tou___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_one_381 = 1.0f;
+f32 fd_tou_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_tou_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_neg_one_365 = -1.0f;
+f32 fd_tou_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou___local_PI_366 = 3.1415927f;
+f32 fd_tou___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou___local_3PIO2_368 = 4.712389f;
+f32 fd_tou___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou___local_PIO2_367 = 1.5707964f;
+f32 fd_tou___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_one_364 = 1.0f;
+f32 fd_tou_one_364 = 1.0f;
 
-__declspec(section ".data") f64 fd_tou__three_localstatic4_sqrtf = 3.0;
+f64 fd_tou__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") f64 fd_tou__half_localstatic3_sqrtf = 0.5;
+f64 fd_tou__half_localstatic3_sqrtf = 0.5;
 
 static FighterData fighterDt_raw[] = {
     {4, "stg3_tou_sensyu_00", "stg3_tou_sensyu2_00", 22, (s32)"stg3_tou_400_02", (s32)"stg3_tou_400_03", 250},
@@ -902,11 +902,11 @@ static RuleData ruleDt_re_raw[] = {
     {(s32)"stg3_tou_re_376", "stg3_tou_cp_054", 63, 255, 255},
 };
 
-static __declspec(section ".data") RankWork* rank_wp = &rank_work;
+static RankWork* rank_wp = &rank_work;
 
-static __declspec(section ".data") DispWork* dwp = &disp_work;
+static DispWork* dwp = &disp_work;
 
-static __declspec(section ".data") const char* suuji[] = {
+static const char* suuji[] = {
     /*"０"*/"\x82\x4F", /*"１"*/"\x82\x50", /*"２"*/"\x82\x51", /*"３"*/"\x82\x52", /*"４"*/"\x82\x53", /*"５"*/"\x82\x54", /*"６"*/"\x82\x55", /*"７"*/"\x82\x56",
     /*"８"*/"\x82\x57", /*"９"*/"\x82\x58",
 };
@@ -1433,25 +1433,25 @@ EVT_BEGIN(talk_gardman_doku)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(dummy_party_msg_pkr)
+EVT_BEGIN(dummy_party_msg_pkr)
     CALL(evt_msg_print, 0, STRING("stg3_tou_303_kur"), 0, STRING("me"))
     CALL_CHILD(PTR(talk_gardman_doku))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(dummy_party_msg_pnk)
+EVT_BEGIN(dummy_party_msg_pnk)
     CALL(evt_msg_print, 0, STRING("stg3_tou_303_nok"), 0, STRING("me"))
     CALL_CHILD(PTR(talk_gardman_doku))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(dummy_party_msg_yos)
+EVT_BEGIN(dummy_party_msg_yos)
     CALL(evt_msg_print, 0, STRING("stg3_tou_303_yos"), 0, STRING("me"))
     CALL_CHILD(PTR(talk_gardman_doku))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(dummy_party_msg_win)
+EVT_BEGIN(dummy_party_msg_win)
     CALL(evt_msg_print, 0, STRING("stg3_tou_303_win"), 0, STRING("me"))
     CALL_CHILD(PTR(talk_gardman_doku))
     RETURN
@@ -1814,7 +1814,7 @@ static EVT_BEGIN(evt_gardman)
 EVT_END()
 
 
-__declspec(section ".data") EVT_BEGIN(evt_gardman_spawn)
+EVT_BEGIN(evt_gardman_spawn)
     CALL_CHILD(PTR(evt_gardman))
     RETURN
 EVT_END()
@@ -3015,7 +3015,7 @@ EVT_BEGIN(evt_cake)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_koopa_after)
+static EVT_BEGIN(evt_koopa_after)
     CALL(evt_msg_print_party, STRING("stg3_tou_403_11"))
     RETURN
 EVT_END()

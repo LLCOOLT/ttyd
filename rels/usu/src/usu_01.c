@@ -173,25 +173,25 @@ USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 static void majin_callback(s32 type);
 
-__declspec(section ".data") f32 fd_usu_01_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_usu_01_neg_one_382;
-__declspec(section ".data") f32 fd_usu_01___local_PI_383;
-__declspec(section ".data") f32 fd_usu_01___local_3PIO2_385;
-__declspec(section ".data") f32 fd_usu_01_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_usu_01___local_PIO2_384;
-__declspec(section ".data") f32 fd_usu_01_one_381;
-__declspec(section ".data") f32 fd_usu_01_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_usu_01_neg_one_365;
-__declspec(section ".data") f32 fd_usu_01___local_PI_366;
-__declspec(section ".data") f32 fd_usu_01___local_3PIO2_368;
-__declspec(section ".data") f32 fd_usu_01_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_usu_01___local_PIO2_367;
-__declspec(section ".data") f32 fd_usu_01_one_364;
-__declspec(section ".data") s32 villagerF_init[7];
+f32 fd_usu_01_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_usu_01_neg_one_382;
+f32 fd_usu_01___local_PI_383;
+f32 fd_usu_01___local_3PIO2_385;
+f32 fd_usu_01_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_usu_01___local_PIO2_384;
+f32 fd_usu_01_one_381;
+f32 fd_usu_01_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_usu_01_neg_one_365;
+f32 fd_usu_01___local_PI_366;
+f32 fd_usu_01___local_3PIO2_368;
+f32 fd_usu_01_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_usu_01___local_PIO2_367;
+f32 fd_usu_01_one_364;
+s32 villagerF_init[7];
 s32 villagerF_talk[52];
-__declspec(section ".data") s32 villagerG_init[7];
+s32 villagerG_init[7];
 s32 villagerG_talk[52];
-__declspec(section ".data") s32 villagerH_init[7];
+s32 villagerH_init[7];
 s32 villagerH_talk[44];
 s32 villagerI_init[19];
 s32 villagerI_pig_init[19];
@@ -201,7 +201,7 @@ s32 villagerJ_pig_init[19];
 s32 villagerJ_talk[57];
 s32 shop_man_init[36];
 s32 shop_man_talk[28];
-__declspec(section ".data") s32 shop_woman_init[7];
+s32 shop_woman_init[7];
 s32 shop_woman_talk[163];
 static s32 kizayarou_init[38];
 s32 kizayarou_pig_init[14];
@@ -215,20 +215,20 @@ s32 aunt_pig_init[29];
 s32 iri_20_out_house[407];
 s32 iri_20_aunt_to_house[149];
 s32 aunt_talk[687];
-__declspec(section ".data") s32 childA_init[7];
+s32 childA_init[7];
 s32 childA_talk[31];
-__declspec(section ".data") s32 childB_init[7];
+s32 childB_init[7];
 s32 childB_talk[31];
-__declspec(section ".data") s32 childC_init[7];
+s32 childC_init[7];
 s32 childC_talk[31];
 s32 gatekeeper_init[38];
 s32 gatekeeper_pig_init[33];
 s32 gatekeeper_talk[145];
-__declspec(section ".data") s32 crow_f_init[8];
-__declspec(section ".data") s32 crow_g_init[8];
-__declspec(section ".data") s32 crow_h_init[8];
-__declspec(section ".data") s32 crow_i_init[8];
-__declspec(section ".data") s32 crow_j_init[8];
+s32 crow_f_init[8];
+s32 crow_g_init[8];
+s32 crow_h_init[8];
+s32 crow_i_init[8];
+s32 crow_j_init[8];
 static s32 musume_talk[84];
 s32 musume_a_init[40];
 static s32 musume_a_entry[15];
@@ -245,24 +245,24 @@ static NpcSetupInfo npcEnt[24];
 s32 village_chief_change_pig_event[166];
 s32 evt_mon_open[112];
 static s32 cam_up[34];
-static __declspec(section ".data") s32 cam_down[8];
+static s32 cam_down[8];
 s32 usu01_check_vivian[36];
 s32 usu01_crowFG_talk_event[VERSION_PICK(355, 394)];
 s32 usu01_crowHI_talk_event[VERSION_PICK(250, 289)];
 s32 usu01_crowJ_talk_event[VERSION_PICK(226, 265)];
-__declspec(section ".data") const char* minka_npc[6];
-__declspec(section ".data") const char* minka_item[2];
-__declspec(section ".data") const char* shop_npc[6];
-__declspec(section ".data") const char* shop_mobj[4];
-__declspec(section ".data") const char* shop_item[5];
-static __declspec(section ".data") s32 evt_door_1_1[12];
-static __declspec(section ".data") s32 evt_door_1_2[12];
+const char* minka_npc[6];
+const char* minka_item[2];
+const char* shop_npc[6];
+const char* shop_mobj[4];
+const char* shop_item[5];
+static s32 evt_door_1_1[12];
+static s32 evt_door_1_2[12];
 static s32 evt_wall_1[28];
-static __declspec(section ".data") s32 door_1_open[12];
+static s32 door_1_open[12];
 static s32 door_1_close[14];
 static DoorParam door_1;
 s32 evt_door_2_1_1[15];
-__declspec(section ".data") s32 evt_door_2_1_2[2];
+s32 evt_door_2_1_2[2];
 s32 evt_wall_2_1[28];
 s32 loop_msg[84];
 s32 mise_kiza_msg[32];
@@ -271,11 +271,11 @@ s32 door_2_1_open[23];
 DoorParam door_2_1;
 s32 evt_ie2_door2_1[244];
 s32 evt_ie2_door2_2[226];
-static __declspec(section ".data") s32 evt_door_3_1[12];
-static __declspec(section ".data") s32 evt_door_3_2[12];
+static s32 evt_door_3_1[12];
+static s32 evt_door_3_2[12];
 static s32 evt_wall_3[30];
-__declspec(section ".data") const char* door_3_item[2];
-static __declspec(section ".data") s32 door_3_open[12];
+const char* door_3_item[2];
+static s32 door_3_open[12];
 static s32 door_3_close[14];
 static DoorParam door_3;
 static BeroEntry bero_entry_data[3];
@@ -284,60 +284,60 @@ s32 evt_monban_buta_main[34];
 s32 evt_monban_buta[18];
 s32 evt_monban_buta2[17];
 s32 evt_monban_look[119];
-static __declspec(section ".data") s32 lock_tbl[2];
+static s32 lock_tbl[2];
 static s32 lock_item_check[41];
 s32 unlock[13];
-static __declspec(section ".data") ShopObj obj_list[6];
-static __declspec(section ".data") ShopItem goods_list[6];
+static ShopObj obj_list[6];
+static ShopItem goods_list[6];
 static ShopDb trade_list[12];
 static ShopperData35 shopper_data;
-__declspec(section ".data") s32 shopper_talk1[11];
-__declspec(section ".data") s32 shopper_talk2[11];
+s32 shopper_talk1[11];
+s32 shopper_talk2[11];
 typedef struct BoobooName { const char* name; u8 field_0x4; u8 field_0x5; u8 pad_0x6[2]; } BoobooName; /* field_0x4/0x5 never read */
 static BoobooName booboo_name[8];
-__declspec(section ".data") s32 evt_roll_get[2];
-static __declspec(section ".data") s32 key_tbl[2];
+s32 evt_roll_get[2];
+static s32 key_tbl[2];
 static s32 evt_majin[330];
 static s32 evt_majin2[237];
 s32 tree_onoff[57];
-static __declspec(section ".data") s32 evt_ki_1[12];
+static s32 evt_ki_1[12];
 static s32 evt_ki_2[20];
 static s32 evt_ki_3[20];
 static TreeAccess tree_tbl[5];
-__declspec(section ".data") s32 usu_01_tree_init[7];
+s32 usu_01_tree_init[7];
 static s32 mobj_box00[34];
 s32 usu_01_init_evt[350];
 
 
-__declspec(section ".data") f32 fd_usu_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_usu_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_usu_01_neg_one_382 = -1.0f;
+f32 fd_usu_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_usu_01___local_PI_383 = 3.1415927f;
+f32 fd_usu_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_usu_01___local_3PIO2_385 = 4.712389f;
+f32 fd_usu_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_usu_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_usu_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_usu_01___local_PIO2_384 = 1.5707964f;
+f32 fd_usu_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_usu_01_one_381 = 1.0f;
+f32 fd_usu_01_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_usu_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_usu_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_usu_01_neg_one_365 = -1.0f;
+f32 fd_usu_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_usu_01___local_PI_366 = 3.1415927f;
+f32 fd_usu_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_usu_01___local_3PIO2_368 = 4.712389f;
+f32 fd_usu_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_usu_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_usu_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_usu_01___local_PIO2_367 = 1.5707964f;
+f32 fd_usu_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_usu_01_one_364 = 1.0f;
+f32 fd_usu_01_one_364 = 1.0f;
 
-__declspec(section ".data") EVT_BEGIN(villagerF_init)
+EVT_BEGIN(villagerF_init)
     CALL(evt_npc_flag_onoff, 1, STRING("村人Ｆ"), 1536)
     RETURN
 EVT_END()
@@ -360,7 +360,7 @@ EVT_BEGIN(villagerF_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(villagerG_init)
+EVT_BEGIN(villagerG_init)
     CALL(evt_npc_flag_onoff, 1, STRING("村人Ｇ"), 1536)
     RETURN
 EVT_END()
@@ -383,7 +383,7 @@ EVT_BEGIN(villagerG_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(villagerH_init)
+EVT_BEGIN(villagerH_init)
     CALL(evt_npc_flag_onoff, 1, STRING("村人Ｈ"), 1536)
     RETURN
 EVT_END()
@@ -506,7 +506,7 @@ EVT_BEGIN(shop_man_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(shop_woman_init)
+EVT_BEGIN(shop_woman_init)
     CALL(evt_npc_flag_onoff, 1, STRING("お店の奥さん"), 1536)
     RETURN
 EVT_END()
@@ -1080,7 +1080,7 @@ EVT_BEGIN(aunt_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(childA_init)
+EVT_BEGIN(childA_init)
     CALL(evt_npc_flag_onoff, 1, STRING("子供Ａ"), 1536)
     RETURN
 EVT_END()
@@ -1103,7 +1103,7 @@ EVT_BEGIN(childA_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(childB_init)
+EVT_BEGIN(childB_init)
     CALL(evt_npc_flag_onoff, 1, STRING("子供Ｂ"), 1536)
     RETURN
 EVT_END()
@@ -1126,7 +1126,7 @@ EVT_BEGIN(childB_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(childC_init)
+EVT_BEGIN(childC_init)
     CALL(evt_npc_flag_onoff, 1, STRING("子供Ｃ"), 1536)
     RETURN
 EVT_END()
@@ -1218,27 +1218,27 @@ EVT_BEGIN(gatekeeper_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(crow_f_init)
+EVT_BEGIN(crow_f_init)
     CALL(evt_npc_set_position, STRING("me"), 275, 83, 355)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(crow_g_init)
+EVT_BEGIN(crow_g_init)
     CALL(evt_npc_set_position, STRING("me"), 250, 112, 355)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(crow_h_init)
+EVT_BEGIN(crow_h_init)
     CALL(evt_npc_set_position, STRING("me"), -147, 110, 346)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(crow_i_init)
+EVT_BEGIN(crow_i_init)
     CALL(evt_npc_set_position, STRING("me"), -175, 110, 348)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(crow_j_init)
+EVT_BEGIN(crow_j_init)
     CALL(evt_npc_set_position, STRING("me"), -195, 100, -157)
     RETURN
 EVT_END()
@@ -1734,7 +1734,7 @@ static EVT_BEGIN(cam_up)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(cam_down)
+static EVT_BEGIN(cam_down)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
     RETURN
@@ -2389,7 +2389,7 @@ EVT_BEGIN(usu01_crowJ_talk_event)
 EVT_END()
 #endif
 
-__declspec(section ".data") const char* minka_npc[] = {
+const char* minka_npc[] = {
     /*"おばさん"*/"\x82\xA8\x82\xCE\x82\xB3\x82\xF1",
     /*"ブタおばさん"*/"\x83\x75\x83\x5E\x82\xA8\x82\xCE\x82\xB3\x82\xF1",
     /*"子供Ａ"*/"\x8E\x71\x8B\x9F\x82\x60",
@@ -2398,12 +2398,12 @@ __declspec(section ".data") const char* minka_npc[] = {
     NULL,
 };
 
-__declspec(section ".data") const char* minka_item[] = {
+const char* minka_item[] = {
     "iri_20",
     NULL,
 };
 
-__declspec(section ".data") const char* shop_npc[] = {
+const char* shop_npc[] = {
     /*"お店の奥さん"*/"\x82\xA8\x93\x58\x82\xCC\x89\x9C\x82\xB3\x82\xF1",
     /*"キザ野郎"*/"\x83\x4C\x83\x55\x96\xEC\x98\x59",
     /*"ブタキザ野郎"*/"\x83\x75\x83\x5E\x83\x4C\x83\x55\x96\xEC\x98\x59",
@@ -2412,14 +2412,14 @@ __declspec(section ".data") const char* shop_npc[] = {
     NULL,
 };
 
-__declspec(section ".data") const char* shop_mobj[] = {
+const char* shop_mobj[] = {
     "usu_00_lock",
     "pera_box",
     "mobj_box00",
     NULL,
 };
 
-__declspec(section ".data") const char* shop_item[] = {
+const char* shop_item[] = {
     "item_02",
     "item_03",
     "item_04",
@@ -2427,13 +2427,13 @@ __declspec(section ".data") const char* shop_item[] = {
     NULL,
 };
 
-static __declspec(section ".data") EVT_BEGIN(evt_door_1_1)
+static EVT_BEGIN(evt_door_1_1)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5546875f))
     CALL(evt_mapobj_rotate, 1, STRING("S_usu01_ie1_door"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_door_1_2)
+static EVT_BEGIN(evt_door_1_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_usu01_ie1_door"), LW(0), 0, 0)
     RETURN
@@ -2449,7 +2449,7 @@ static EVT_BEGIN(evt_wall_1)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(door_1_open)
+static EVT_BEGIN(door_1_open)
     CALL(evt_snd_bgmoff, 18432)
     CALL(evt_snd_envoff, 18432)
     CALL(evt_snd_env_lpf, 0, 800)
@@ -2491,7 +2491,7 @@ EVT_BEGIN(evt_door_2_1_1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_door_2_1_2)
+EVT_BEGIN(evt_door_2_1_2)
     RETURN
 EVT_END()
 
@@ -2920,13 +2920,13 @@ EVT_BEGIN(evt_ie2_door2_2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_door_3_1)
+static EVT_BEGIN(evt_door_3_1)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5546875f))
     CALL(evt_mapobj_rotate, 1, STRING("S_usu01_ie3_door"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_door_3_2)
+static EVT_BEGIN(evt_door_3_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_usu01_ie3_door"), LW(0), 0, 0)
     RETURN
@@ -2943,12 +2943,12 @@ static EVT_BEGIN(evt_wall_3)
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* door_3_item[] = {
+const char* door_3_item[] = {
     "item01",
     NULL,
 };
 
-static __declspec(section ".data") EVT_BEGIN(door_3_open)
+static EVT_BEGIN(door_3_open)
     CALL(evt_snd_bgmoff, 18432)
     CALL(evt_snd_envoff, 18432)
     CALL(evt_snd_env_lpf, 0, 800)
@@ -3119,7 +3119,7 @@ EVT_BEGIN(evt_monban_look)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 lock_tbl[] = {
+static s32 lock_tbl[] = {
     ITEM_SHOP_KEY, -1,
 };
 
@@ -3146,7 +3146,7 @@ EVT_BEGIN(unlock)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") ShopObj obj_list[] = {
+static ShopObj obj_list[] = {
     {"mi02_S_item_01", "A_item_01"},
     {"mi02_mi02_S_item_02", "A_item_02"},
     {"mi02_S_item_03", "A_item_03"},
@@ -3155,7 +3155,7 @@ static __declspec(section ".data") ShopObj obj_list[] = {
     {"mi02_S_item_06", "A_item_06"},
 };
 
-static __declspec(section ".data") ShopItem goods_list[] = {
+static ShopItem goods_list[] = {
     {ITEM_THUNDER_RAGE, 20},
     {ITEM_SPITE_POUCH, 10},
     {ITEM_STOPWATCH, 30},
@@ -3185,13 +3185,13 @@ static ShopperData35 shopper_data = {
     {"usugurashop_00", "usugurashop_01", "usugurashop_02", "usugurashop_03", "usugurashop_04", "usugurashop_05", "usugurashop_06", "usugurashop_07", "usugurashop_08", "usugurashop_09", "usugurashop_10", "usugurashop_11", "usugurashop_12", "usugurashop_13", "usugurashop_14", "usugurashop_15", "usugurashop_16", "usugurashop_17", "usugurashop_18", "usugurashop_19", "usugurashop_20", "usugurashop_21", "usugurashop_22", "usugurashop_23", "usugurashop_24", "usugurashop_25", "usugurashop_26", "usugurashop_27", "usugurashop_28", "usugurashop_29", "usugurashop_30", "usugurashop_31", "usugurashop_32", "usugurashop_33", "usugurashop_34"}, // msgs
 };
 
-__declspec(section ".data") EVT_BEGIN(shopper_talk1)
+EVT_BEGIN(shopper_talk1)
     CALL(evt_msg_print, 0, STRING("stg4_usu_59"), 0, STRING("me"))
     SET_VALUE(LW(0), -100)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(shopper_talk2)
+EVT_BEGIN(shopper_talk2)
     CALL(evt_msg_print, 0, STRING("stg4_usu_60"), 0, STRING("me"))
     SET_VALUE(LW(0), -100)
     RETURN
@@ -3208,11 +3208,11 @@ static BoobooName booboo_name[] = {
     {/*"ブタ３人娘Ｃ"*/"\x83\x75\x83\x5E\x82\x52\x90\x6C\x96\xBA\x82\x62", 4, 1},
 };
 
-__declspec(section ".data") EVT_BEGIN(evt_roll_get)
+EVT_BEGIN(evt_roll_get)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 key_tbl[] = {
+static s32 key_tbl[] = {
     ITEM_BLACK_KEY_0x23, -1,
 };
 
@@ -3432,7 +3432,7 @@ EVT_BEGIN(tree_onoff)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_ki_1)
+static EVT_BEGIN(evt_ki_1)
     CALL(evt_npc_set_anim, STRING("カラスＪ"), STRING("A_1"))
     WAIT_MS(1500)
     CALL(evt_npc_set_anim, STRING("カラスＪ"), STRING("S_1"))
@@ -3465,7 +3465,7 @@ static TreeAccess tree_tbl[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
-__declspec(section ".data") EVT_BEGIN(usu_01_tree_init)
+EVT_BEGIN(usu_01_tree_init)
     SET_VALUE(LW(0), PTR(tree_tbl))
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
     RETURN

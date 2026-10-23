@@ -469,5 +469,5 @@ static void actionCommandDisp(f32 x, f32 y) {
 }
 
 #pragma force_active on
-__declspec(section ".sdata") u32 gap_07_804117CC_sdata[5] = {0};
+u32 gap_07_804117CC_sdata[5] = {0};
 #pragma force_active reset

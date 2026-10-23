@@ -52,32 +52,32 @@ static USER_FUNC(hammer_bros_nagemakuri_set_target);
 static void hammer_bros_get_next_target(s32* unitIdx, s32* partIdx);
 static void hammer_bros_get_target(s32* unitIdx, s32* partIdx);
 
-__declspec(section ".data") f32 fd_hammer_bros_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hammer_bros_neg_one_382;
-__declspec(section ".data") f32 fd_hammer_bros___local_PI_383;
-__declspec(section ".data") f32 fd_hammer_bros___local_3PIO2_385;
-__declspec(section ".data") f32 fd_hammer_bros_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hammer_bros___local_PIO2_384;
-__declspec(section ".data") f32 fd_hammer_bros_one_381;
-__declspec(section ".data") f32 fd_hammer_bros_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hammer_bros_neg_one_365;
-__declspec(section ".data") f32 fd_hammer_bros___local_PI_366;
-__declspec(section ".data") f32 fd_hammer_bros___local_3PIO2_368;
-__declspec(section ".data") f32 fd_hammer_bros_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hammer_bros___local_PIO2_367;
-__declspec(section ".data") f32 fd_hammer_bros_one_364;
+f32 fd_hammer_bros_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_hammer_bros_neg_one_382;
+f32 fd_hammer_bros___local_PI_383;
+f32 fd_hammer_bros___local_3PIO2_385;
+f32 fd_hammer_bros_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_hammer_bros___local_PIO2_384;
+f32 fd_hammer_bros_one_381;
+f32 fd_hammer_bros_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_hammer_bros_neg_one_365;
+f32 fd_hammer_bros___local_PI_366;
+f32 fd_hammer_bros___local_3PIO2_368;
+f32 fd_hammer_bros_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_hammer_bros___local_PIO2_367;
+f32 fd_hammer_bros_one_364;
 BattleUnitKind unit_hammer_bros;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
-static __declspec(section ".data") BattleDataEntry data_table[1];
+static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[6];
 static BattleWeapon weapon_hammer_bros_attack;
 static BattleWeapon weapon_hammer_bros_renzoku_attack;
 static BattleWeapon weapon_hammer_bros_nagemakuri_attack;
 static s32 init_event[21];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 static s32 attack_event[96];
 static s32 start_avoid[26];
 static s32 hammer_bros_attack_common_event1[254];
@@ -92,7 +92,7 @@ static s32 nagemakuri_attack_event[186];
 static s32 nagemakuri_attack_event_sub[49];
 static s32 nagemakuri_attack_event_sub_no_last[13];
 static s32 nagemakuri_attack_event_sub_last[76];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
 #pragma dont_inline on
 static void hammer_bros_get_next_target(s32* unitIdx, s32* partIdx) {
@@ -146,33 +146,33 @@ static USER_FUNC(hammer_bros_nagemakuri_set_target) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_hammer_bros_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hammer_bros_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hammer_bros_neg_one_382 = -1.0f;
+f32 fd_hammer_bros_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_hammer_bros___local_PI_383 = 3.1415927f;
+f32 fd_hammer_bros___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hammer_bros___local_3PIO2_385 = 4.712389f;
+f32 fd_hammer_bros___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hammer_bros_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hammer_bros_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hammer_bros___local_PIO2_384 = 1.5707964f;
+f32 fd_hammer_bros___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hammer_bros_one_381 = 1.0f;
+f32 fd_hammer_bros_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_hammer_bros_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hammer_bros_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hammer_bros_neg_one_365 = -1.0f;
+f32 fd_hammer_bros_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_hammer_bros___local_PI_366 = 3.1415927f;
+f32 fd_hammer_bros___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hammer_bros___local_3PIO2_368 = 4.712389f;
+f32 fd_hammer_bros___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hammer_bros_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hammer_bros_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hammer_bros___local_PIO2_367 = 1.5707964f;
+f32 fd_hammer_bros___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hammer_bros_one_364 = 1.0f;
+f32 fd_hammer_bros_one_364 = 1.0f;
 
 BattleUnitKind unit_hammer_bros = {
     56,
@@ -240,11 +240,11 @@ BattleUnitKind unit_hammer_bros = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
+static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 95, 80, 70, 60, 100, 80, 100, 100, 95};
+static StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 95, 80, 70, 60, 100, 80, 100, 100, 95};
 
 static PoseTableEntry pose_table[] = {
     {1, "BRO_N_1"},
@@ -267,7 +267,7 @@ static PoseTableEntry pose_table[] = {
     {69, "BRO_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
@@ -397,7 +397,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -846,7 +846,7 @@ static EVT_BEGIN(nagemakuri_attack_event_sub_last)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

@@ -17,7 +17,7 @@ static inline f32 sinf(f32 x) { return sin(x); }
 #include <string.h>
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
 #pragma force_active on
-__declspec(section ".sdata") u32 gap_08_804184BC_sbss[1];
+u32 gap_08_804184BC_sbss[1];
 #pragma force_active reset
 void envReInit(void);
 

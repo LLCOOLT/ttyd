@@ -279,33 +279,33 @@ static void alpha_tev(MapTevCallbackInfo* info);
 #define SAVE_EVT evt_memcard_save
 #endif
 
-__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 neg_one$382;
-__declspec(section ".data") f32 __local_PI$383;
-__declspec(section ".data") f32 __local_3PIO2$385;
-__declspec(section ".data") u32 gap_04_0000086C_data[1];
-__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 __local_PIO2$384;
-__declspec(section ".data") f32 one$381;
-__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 neg_one$365;
-__declspec(section ".data") f32 __local_PI$366;
-__declspec(section ".data") f32 __local_3PIO2$368;
-__declspec(section ".data") u32 gap_04_00000894_data[1];
-__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 __local_PIO2$367;
-__declspec(section ".data") f32 one$364;
+f32 negone_one$374[2] __attribute__((aligned(8)));
+f32 neg_one$382;
+f32 __local_PI$383;
+f32 __local_3PIO2$385;
+u32 gap_04_0000086C_data[1];
+f32 one_negone$373[2] __attribute__((aligned(8)));
+f32 __local_PIO2$384;
+f32 one$381;
+f32 negone_one$360[2] __attribute__((aligned(8)));
+f32 neg_one$365;
+f32 __local_PI$366;
+f32 __local_3PIO2$368;
+u32 gap_04_00000894_data[1];
+f32 one_negone$359[2] __attribute__((aligned(8)));
+f32 __local_PIO2$367;
+f32 one$364;
 ExtTexInfo nannpc_entry_data[41];
 static s16 dai3_animtbl[VERSION_PICK(42, 82)];
-__declspec(section ".data") s32 dai3_run_animtbl[VERSION_PICK(11, 21)];
+s32 dai3_run_animtbl[VERSION_PICK(11, 21)];
 s32 no00_custom[48];
 static BeroEntry bero_entry_data[2];
 static s32 mony_init[18];
-__declspec(section ".data") s32 gor_00_mony_regl[VERSION_PICK(9, 11)];
+s32 gor_00_mony_regl[VERSION_PICK(9, 11)];
 s32 mony_peton_talk[286];
 static s32 mony_talk[28];
 static s32 peton_init[18];
-__declspec(section ".data") s32 gor_00_peton_regl[VERSION_PICK(9, 11)];
+s32 gor_00_peton_regl[VERSION_PICK(9, 11)];
 static s32 peton_talk[28];
 static s32 marco_init[32];
 s32 marco_party_move[120];
@@ -315,14 +315,14 @@ static s32 garawaru_init[74];
 s32 garawaru_regl[60];
 static s32 garawaru_talk[77];
 static s32 megane_init[18];
-__declspec(section ".data") s32 megane_regl[2];
+s32 megane_regl[2];
 static s32 megane_talk[14];
 static s32 odoodo_init[61];
 s32 odoodo_regl[29];
 static s32 odoodo_talk[108];
 s32 odoodo_ani_urouro[31];
 s32 odoodo_ani_init[17];
-__declspec(section ".data") s32 odoodo_ani_regl[9];
+s32 odoodo_ani_regl[9];
 s32 odoodo_ani_talk[37];
 static s32 suifu_a_init[36];
 s32 suifu_a_regl[28];
@@ -331,7 +331,7 @@ s32 suifu_b_init[48];
 s32 suifu_b_regl[29];
 s32 suifu_b_talk[116];
 static s32 suifu_d_init[14];
-static __declspec(section ".data") s32 suifu_d_talk[8];
+static s32 suifu_d_talk[8];
 s32 suifubomb_a_urouro2[31];
 s32 suifubomb_a_init[53];
 s32 suifubomb_a_regl[30];
@@ -341,9 +341,9 @@ s32 suifubomb_b_init[39];
 s32 suifubomb_b_regl[60];
 s32 suifubomb_b_talk[116];
 s32 suifubomb_c_init[14];
-__declspec(section ".data") s32 suifubomb_c_talk[8];
+s32 suifubomb_c_talk[8];
 static s32 sanders_init[42];
-static __declspec(section ".data") s32 sanders_talk[8];
+static s32 sanders_talk[8];
 static s32 korutesu_init[19];
 static s32 korutesu_talk[33];
 s32 tentyou_init[36];
@@ -355,13 +355,13 @@ static s32 borodo2_escape[43];
 static s32 borodo2_talk[13];
 s32 mokorim_init[28];
 s32 mokorim_talk[546];
-static __declspec(section ".data") s32 baba_init[9];
+static s32 baba_init[9];
 static s32 luigi_init[18];
-static __declspec(section ".data") s32 luigi_talk[4];
+static s32 luigi_talk[4];
 static NpcSetupInfo luigiEnt[2];
 static s32 luigi_npcEnt[30];
-__declspec(section ".data") s32 rakgan_init[12];
-__declspec(section ".data") s32 rakgan_talk[8];
+s32 rakgan_init[12];
+s32 rakgan_talk[8];
 NpcSetupInfo rakganEnt[2];
 static NpcSetupInfo npcEnt[17];
 s32 ship_a_kaji_animation[51];
@@ -385,14 +385,14 @@ s32 gundan1000tai_afterbattle[1201];
 s32 mony_peton_after[37];
 s32 shukko_event_move_ship_se00[20];
 s32 shukko_event_move_ship_se01[20];
-__declspec(section ".data") const char* shukko_npc_list[10];
+const char* shukko_npc_list[10];
 s32 shukko_event_move_ship[223];
 s32 shukko_event[498];
 ExtTexInfo nannpc_entry_data01[41];
 static s16 suifu_animtbl[42];
-static __declspec(section ".data") s16 suifu_run_animtbl[22];
-__declspec(section ".data") Vec suifu100kaidanDOWN[];
-__declspec(section ".data") Vec suifu100kaidanUP[];
+static s16 suifu_run_animtbl[22];
+Vec suifu100kaidanDOWN[];
+Vec suifu100kaidanUP[];
 s32 marco_run_away[100];
 s32 gorotsuki_kikan[599];
 s32 into_gor_ship[265];
@@ -421,37 +421,37 @@ s32 return_gorotsuki_town_init[25];
 s32 return_gorotsuki_town[625];
 s32 gor_00_init_evt[VERSION_PICK(537, 540)];
 
-__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 neg_one$382 = -1.0f;
+f32 neg_one$382 = -1.0f;
 
-__declspec(section ".data") f32 __local_PI$383 = 3.1415927f;
+f32 __local_PI$383 = 3.1415927f;
 
-__declspec(section ".data") f32 __local_3PIO2$385 = 4.712389f;
+f32 __local_3PIO2$385 = 4.712389f;
 
-__declspec(section ".data") u32 gap_04_0000086C_data[1] = {0};
+u32 gap_04_0000086C_data[1] = {0};
 
-__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 __local_PIO2$384 = 1.5707964f;
+f32 __local_PIO2$384 = 1.5707964f;
 
-__declspec(section ".data") f32 one$381 = 1.0f;
+f32 one$381 = 1.0f;
 
-__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 neg_one$365 = -1.0f;
+f32 neg_one$365 = -1.0f;
 
-__declspec(section ".data") f32 __local_PI$366 = 3.1415927f;
+f32 __local_PI$366 = 3.1415927f;
 
-__declspec(section ".data") f32 __local_3PIO2$368 = 4.712389f;
+f32 __local_3PIO2$368 = 4.712389f;
 
-__declspec(section ".data") u32 gap_04_00000894_data[1] = {0};
+u32 gap_04_00000894_data[1] = {0};
 
-__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 __local_PIO2$367 = 1.5707964f;
+f32 __local_PIO2$367 = 1.5707964f;
 
-__declspec(section ".data") f32 one$364 = 1.0f;
+f32 one$364 = 1.0f;
 
 ExtTexInfo nannpc_entry_data[] = {
     {"c_zako_n", "S_1", 0.0f},
@@ -524,13 +524,13 @@ static s16 dai3_animtbl[] = {
 #endif
 
 #ifdef VERSION_G8ME01
-__declspec(section ".data") s32 dai3_run_animtbl[] = {
+s32 dai3_run_animtbl[] = {
     1310740, 1376277, 1441814, 1507351, 1572888, 1638425, 1703962, 1769499,
     1835036, 1900573, 1966110, 2031647, 2097184, 2162721, 2228258, 2293795,
     2359332, 2424869, 2490406, 2555943, -65536,
 };
 #else
-__declspec(section ".data") s32 dai3_run_animtbl[] = {
+s32 dai3_run_animtbl[] = {
     1310741, 1441815, 1572889, 1703963, 1835037, 1966111, 2097185, 2228259,
     2359333, 2490407, -65536,
 };
@@ -597,7 +597,7 @@ static EVT_BEGIN(mony_init)
 EVT_END()
 
 #ifdef VERSION_G8ME01
-__declspec(section ".data") EVT_BEGIN(gor_00_mony_regl)
+EVT_BEGIN(gor_00_mony_regl)
     SWITCH(GSW(0))
         CASE_EQUAL(278)
         WAIT_WHILE(GF(15))
@@ -606,7 +606,7 @@ __declspec(section ".data") EVT_BEGIN(gor_00_mony_regl)
     RETURN
 EVT_END()
 #else
-__declspec(section ".data") EVT_BEGIN(gor_00_mony_regl)
+EVT_BEGIN(gor_00_mony_regl)
     SWITCH(GSW(0))
         CASE_EQUAL(278)
         CALL_CHILD(PTR(mony_run_away))
@@ -709,7 +709,7 @@ static EVT_BEGIN(peton_init)
 EVT_END()
 
 #ifdef VERSION_G8ME01
-__declspec(section ".data") EVT_BEGIN(gor_00_peton_regl)
+EVT_BEGIN(gor_00_peton_regl)
     SWITCH(GSW(0))
         CASE_EQUAL(278)
         WAIT_WHILE(GF(15))
@@ -718,7 +718,7 @@ __declspec(section ".data") EVT_BEGIN(gor_00_peton_regl)
     RETURN
 EVT_END()
 #else
-__declspec(section ".data") EVT_BEGIN(gor_00_peton_regl)
+EVT_BEGIN(gor_00_peton_regl)
     SWITCH(GSW(0))
         CASE_EQUAL(278)
         CALL_CHILD(PTR(peton_run_away))
@@ -1004,7 +1004,7 @@ static EVT_BEGIN(megane_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(megane_regl)
+EVT_BEGIN(megane_regl)
     RETURN
 EVT_END()
 
@@ -1101,7 +1101,7 @@ EVT_BEGIN(odoodo_ani_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(odoodo_ani_regl)
+EVT_BEGIN(odoodo_ani_regl)
     SWITCH(GSW(0))
         CASE_GREATER_OR_EQUAL(268)
         CALL_CHILD(PTR(odoodo_ani_urouro))
@@ -1254,7 +1254,7 @@ static EVT_BEGIN(suifu_d_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(suifu_d_talk)
+static EVT_BEGIN(suifu_d_talk)
     CALL(evt_msg_print, 0, STRING("mac_4_027"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -1532,7 +1532,7 @@ EVT_BEGIN(suifubomb_c_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(suifubomb_c_talk)
+EVT_BEGIN(suifubomb_c_talk)
     CALL(evt_msg_print, 0, STRING("mac_4_028"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -1553,7 +1553,7 @@ static EVT_BEGIN(sanders_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(sanders_talk)
+static EVT_BEGIN(sanders_talk)
     CALL(evt_msg_print, 0, STRING("mac_4_088"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -2006,7 +2006,7 @@ EVT_BEGIN(mokorim_talk)
 EVT_END()
 #endif
 
-static __declspec(section ".data") EVT_BEGIN(baba_init)
+static EVT_BEGIN(baba_init)
     CALL_CHILD(PTR(npc_init_evt))
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
@@ -2021,7 +2021,7 @@ static EVT_BEGIN(luigi_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(luigi_talk)
+static EVT_BEGIN(luigi_talk)
     CALL_CHILD(PTR(luigi_gor_first_talk))
     RETURN
 EVT_END()
@@ -2055,13 +2055,13 @@ static EVT_BEGIN(luigi_npcEnt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(rakgan_init)
+EVT_BEGIN(rakgan_init)
     CALL(evt_npc_set_position, STRING("me"), 460, 15, -210)
     CALL(evt_npc_set_ry_lr, STRING("me"), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(rakgan_talk)
+EVT_BEGIN(rakgan_talk)
     CALL(evt_msg_print, 0, STRING("luigi_npc_04"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -3728,7 +3728,7 @@ EVT_BEGIN(shukko_event_move_ship_se01)
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* shukko_npc_list[] = {
+const char* shukko_npc_list[] = {
     /*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76",
     /*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52",
     /*"水夫Ｄ"*/"\x90\x85\x95\x76\x82\x63",
@@ -4062,20 +4062,20 @@ static s16 suifu_animtbl[] = {
     -1, 0,
 };
 
-static __declspec(section ".data") s16 suifu_run_animtbl[] = {
+static s16 suifu_run_animtbl[] = {
     20, 21, 22, 23, 24, 25, 26, 27,
     28, 29, 30, 31, 32, 33, 34, 35,
     36, 37, 38, 39, -1, 0,
 };
 
-__declspec(section ".data") Vec suifu100kaidanDOWN[] = {
+Vec suifu100kaidanDOWN[] = {
     {309.0f, 15.0f, -375.0f},
     {322.0f, 15.0f, -397.0f},
     {338.0f, 15.0f, -410.0f},
     {357.0f, 15.0f, -427.0f},
 };
 
-__declspec(section ".data") Vec suifu100kaidanUP[] = {
+Vec suifu100kaidanUP[] = {
     {143.0f, 115.0f, -514.0f},
     {167.0f, 115.0f, -534.0f},
     {189.0f, 115.0f, -553.0f},
@@ -7098,4 +7098,4 @@ EVT_BEGIN(gor_00_init_evt)
 EVT_END()
 #endif
 
-__declspec(section ".data") u32 gap_04_0000F75C_data[1] = {0};
+u32 gap_04_0000F75C_data[1] = {0};

@@ -41,71 +41,71 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_random);
 
-__declspec(section ".data") f32 fd_tou_12_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_12_neg_one_382;
-__declspec(section ".data") f32 fd_tou_12___local_PI_383;
-__declspec(section ".data") f32 fd_tou_12___local_3PIO2_385;
-__declspec(section ".data") f32 fd_tou_12_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_12___local_PIO2_384;
-__declspec(section ".data") f32 fd_tou_12_one_381;
-__declspec(section ".data") f32 fd_tou_12_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_12_neg_one_365;
-__declspec(section ".data") f32 fd_tou_12___local_PI_366;
-__declspec(section ".data") f32 fd_tou_12___local_3PIO2_368;
-__declspec(section ".data") f32 fd_tou_12_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_12___local_PIO2_367;
-__declspec(section ".data") f32 fd_tou_12_one_364;
-static __declspec(section ".data") s32 w_door_open[12];
-static __declspec(section ".data") s32 w_door_close[12];
+f32 fd_tou_12_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_tou_12_neg_one_382;
+f32 fd_tou_12___local_PI_383;
+f32 fd_tou_12___local_3PIO2_385;
+f32 fd_tou_12_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_tou_12___local_PIO2_384;
+f32 fd_tou_12_one_381;
+f32 fd_tou_12_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_tou_12_neg_one_365;
+f32 fd_tou_12___local_PI_366;
+f32 fd_tou_12___local_3PIO2_368;
+f32 fd_tou_12_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_tou_12___local_PIO2_367;
+f32 fd_tou_12_one_364;
+static s32 w_door_open[12];
+static s32 w_door_close[12];
 static BeroEntry bero_data[2];
 static s32 evt_kinoshikowa[111];
 static s32 evt_block_broken[57];
 static s32 init_michel[22];
-__declspec(section ".data") s32 init_michel_dummy[12];
-static __declspec(section ".data") s32 talk_michel[8];
+s32 init_michel_dummy[12];
+static s32 talk_michel[8];
 static s32 init_brots[35];
-__declspec(section ".data") s32 init_brots_dummy[12];
+s32 init_brots_dummy[12];
 static s32 talk_brots[91];
-static __declspec(section ".data") s32 init_kinoshikowa[2];
-static __declspec(section ".data") s32 talk_kinoshikowa[2];
+static s32 init_kinoshikowa[2];
+static s32 talk_kinoshikowa[2];
 static NpcSetupInfo npcEnt[6];
 s32 tou_12_init_evt[133];
 
-__declspec(section ".data") f32 fd_tou_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_12_neg_one_382 = -1.0f;
+f32 fd_tou_12_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou_12___local_PI_383 = 3.1415927f;
+f32 fd_tou_12___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou_12___local_3PIO2_385 = 4.712389f;
+f32 fd_tou_12___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_12_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_12_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou_12___local_PIO2_384 = 1.5707964f;
+f32 fd_tou_12___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_12_one_381 = 1.0f;
+f32 fd_tou_12_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_tou_12_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_12_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_12_neg_one_365 = -1.0f;
+f32 fd_tou_12_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou_12___local_PI_366 = 3.1415927f;
+f32 fd_tou_12___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou_12___local_3PIO2_368 = 4.712389f;
+f32 fd_tou_12___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_12_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_12_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou_12___local_PIO2_367 = 1.5707964f;
+f32 fd_tou_12___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_12_one_364 = 1.0f;
+f32 fd_tou_12_one_364 = 1.0f;
 
-static __declspec(section ".data") EVT_BEGIN(w_door_open)
+static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(w_door_close)
+static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
@@ -196,14 +196,14 @@ static EVT_BEGIN(init_michel)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_michel_dummy)
+EVT_BEGIN(init_michel_dummy)
     IF_INT_LESS(GSW(0), 164)
         CALL(evt_npc_set_position, STRING("マイケルダミー"), 175, 0, -20)
     END_IF
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(talk_michel)
+static EVT_BEGIN(talk_michel)
     CALL(evt_msg_print, 0, STRING("stg3_tou_307_14_01"), 0, STRING("マイケル"))
     RETURN
 EVT_END()
@@ -221,7 +221,7 @@ static EVT_BEGIN(init_brots)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_brots_dummy)
+EVT_BEGIN(init_brots_dummy)
     IF_INT_LESS(GSW(0), 164)
         CALL(evt_npc_set_position, STRING("ブロッツダミー"), 125, 4, -60)
     END_IF
@@ -255,11 +255,11 @@ static EVT_BEGIN(talk_brots)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(init_kinoshikowa)
+static EVT_BEGIN(init_kinoshikowa)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(talk_kinoshikowa)
+static EVT_BEGIN(talk_kinoshikowa)
     RETURN
 EVT_END()
 

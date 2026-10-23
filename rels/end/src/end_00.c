@@ -141,20 +141,20 @@ s32 end_credit_para_evt[50];
 s32 end_credit_batten_evt[83];
 s32 end_credit_queen_evt[89];
 s32 end_credit_moamoa_evt[108];
-__declspec(section ".data") f32 fd_end_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_end_00_neg_one_382;
-__declspec(section ".data") f32 fd_end_00___local_PI_383;
-__declspec(section ".data") f32 fd_end_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_end_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_end_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_end_00_one_381;
-__declspec(section ".data") f32 fd_end_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_end_00_neg_one_365;
-__declspec(section ".data") f32 fd_end_00___local_PI_366;
-__declspec(section ".data") f32 fd_end_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_end_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_end_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_end_00_one_364;
+f32 fd_end_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_end_00_neg_one_382;
+f32 fd_end_00___local_PI_383;
+f32 fd_end_00___local_3PIO2_385;
+f32 fd_end_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_end_00___local_PIO2_384;
+f32 fd_end_00_one_381;
+f32 fd_end_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_end_00_neg_one_365;
+f32 fd_end_00___local_PI_366;
+f32 fd_end_00___local_3PIO2_368;
+f32 fd_end_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_end_00___local_PIO2_367;
+f32 fd_end_00_one_364;
 
 
 
@@ -231,7 +231,7 @@ USER_FUNC(evt_end_credit_npc_get_wait_type) {
     return 2;
 }
 
-__declspec(section ".data") EndWork* end_wp = &end_work;
+EndWork* end_wp = &end_work;
 
 #ifdef VERSION_G8ME01
 CreditMsg end_staff_roll_msg_tbl[] = {
@@ -1140,9 +1140,9 @@ EVT_BEGIN(end_credit_queen_evt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* end_moa_ext_anim = "c_n_moa_a";
+const char* end_moa_ext_anim = "c_n_moa_a";
 
-__declspec(section ".data") const char* end_moa_ext_pose = "S_1";
+const char* end_moa_ext_pose = "S_1";
 
 USER_FUNC(evt_end_image_disp_entry) {
     dispEntry(CAMERA_3D, 0.0f, 7, end_image_disp, NULL);
@@ -1562,30 +1562,30 @@ EVT_BEGIN(end_credit_moamoa_evt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") f32 fd_end_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_end_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_end_00_neg_one_382 = -1.0f;
+f32 fd_end_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_end_00___local_PI_383 = 3.1415927f;
+f32 fd_end_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_end_00___local_3PIO2_385 = 4.712389f;
+f32 fd_end_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_end_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_end_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_end_00___local_PIO2_384 = 1.5707964f;
+f32 fd_end_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_end_00_one_381 = 1.0f;
+f32 fd_end_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_end_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_end_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_end_00_neg_one_365 = -1.0f;
+f32 fd_end_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_end_00___local_PI_366 = 3.1415927f;
+f32 fd_end_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_end_00___local_3PIO2_368 = 4.712389f;
+f32 fd_end_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_end_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_end_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_end_00___local_PIO2_367 = 1.5707964f;
+f32 fd_end_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_end_00_one_364 = 1.0f;
+f32 fd_end_00_one_364 = 1.0f;

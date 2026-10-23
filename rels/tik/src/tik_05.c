@@ -185,22 +185,22 @@ void tiz_broken_draw(CameraId cameraId, void* param);
 static void alpha_tev(MapTevCallbackInfo* info);
 USER_FUNC(starstone_set_scale);
 
-__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 neg_one$382;
-__declspec(section ".data") f32 __local_PI$383;
-__declspec(section ".data") f32 __local_3PIO2$385;
-__declspec(section ".data") u32 gap_04_0000B154_data[1];
-__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 __local_PIO2$384;
-__declspec(section ".data") f32 one$381;
-__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 neg_one$365;
-__declspec(section ".data") f32 __local_PI$366;
-__declspec(section ".data") f32 __local_3PIO2$368;
-__declspec(section ".data") u32 gap_04_0000B17C_data[1];
-__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 __local_PIO2$367;
-__declspec(section ".data") f32 one$364;
+f32 negone_one$374[2] __attribute__((aligned(8)));
+f32 neg_one$382;
+f32 __local_PI$383;
+f32 __local_3PIO2$385;
+u32 gap_04_0000B154_data[1];
+f32 one_negone$373[2] __attribute__((aligned(8)));
+f32 __local_PIO2$384;
+f32 one$381;
+f32 negone_one$360[2] __attribute__((aligned(8)));
+f32 neg_one$365;
+f32 __local_PI$366;
+f32 __local_3PIO2$368;
+u32 gap_04_0000B17C_data[1];
+f32 one_negone$359[2] __attribute__((aligned(8)));
+f32 __local_PIO2$367;
+f32 one$364;
 static s32 n_door_close[22];
 static s32 n_door_open[22];
 static BeroEntry bero_entry_data[4];
@@ -208,8 +208,8 @@ static s32 kurihakase_init[27];
 static s32 kurihakase_talk[23];
 static NpcSetupInfo npcEnt[2];
 s32 mahojin_alpha[70];
-__declspec(section ".data") s32 mahojin_alpha_up[5];
-__declspec(section ".data") s32 mahojin_alpha_down[5];
+s32 mahojin_alpha_up[5];
+s32 mahojin_alpha_down[5];
 s32 large_door_stg0_init[17];
 s32 large_door_stg0[129];
 s32 look_large_door[25];
@@ -218,14 +218,14 @@ s32 evt_mahojin_move[51];
 s32 evt_mahojin_move2[24];
 s32 evt_fogset[42];
 s32 evt_fogreset[82];
-__declspec(section ".data") s32 mahojin_se_event[6];
-__declspec(section ".data") s32 mahojin_se_event_end[2];
+s32 mahojin_se_event[6];
+s32 mahojin_se_event_end[2];
 s32 disp_lighteffect[20];
 s32 disp_treasure_map[21];
-__declspec(section ".data") BrokenWork* broken_wp;
-__declspec(section ".data") f32 param_tbl[5];
-__declspec(section ".data") f32 add_tbl[5];
-static __declspec(section ".data") const char* name_tbl[5];
+BrokenWork* broken_wp;
+f32 param_tbl[5];
+f32 add_tbl[5];
+static const char* name_tbl[5];
 s32 evt_mapwrite[1351];
 s32 fake_fade[30];
 s32 evt_starstone_up[127];
@@ -244,37 +244,37 @@ s32 lastdungeon[103];
 s32 mahojin_event7[VERSION_PICK(2537, 2541)];
 s32 tik_05_init_evt[VERSION_PICK(289, 287)];
 
-__declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 neg_one$382 = -1.0f;
+f32 neg_one$382 = -1.0f;
 
-__declspec(section ".data") f32 __local_PI$383 = 3.1415927f;
+f32 __local_PI$383 = 3.1415927f;
 
-__declspec(section ".data") f32 __local_3PIO2$385 = 4.712389f;
+f32 __local_3PIO2$385 = 4.712389f;
 
-__declspec(section ".data") u32 gap_04_0000B154_data[1] = {0};
+u32 gap_04_0000B154_data[1] = {0};
 
-__declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 __local_PIO2$384 = 1.5707964f;
+f32 __local_PIO2$384 = 1.5707964f;
 
-__declspec(section ".data") f32 one$381 = 1.0f;
+f32 one$381 = 1.0f;
 
-__declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 neg_one$365 = -1.0f;
+f32 neg_one$365 = -1.0f;
 
-__declspec(section ".data") f32 __local_PI$366 = 3.1415927f;
+f32 __local_PI$366 = 3.1415927f;
 
-__declspec(section ".data") f32 __local_3PIO2$368 = 4.712389f;
+f32 __local_3PIO2$368 = 4.712389f;
 
-__declspec(section ".data") u32 gap_04_0000B17C_data[1] = {0};
+u32 gap_04_0000B17C_data[1] = {0};
 
-__declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 __local_PIO2$367 = 1.5707964f;
+f32 __local_PIO2$367 = 1.5707964f;
 
-__declspec(section ".data") f32 one$364 = 1.0f;
+f32 one$364 = 1.0f;
 
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -513,12 +513,12 @@ EVT_BEGIN(mahojin_alpha)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(mahojin_alpha_up)
+EVT_BEGIN(mahojin_alpha_up)
     SET_VALUE(GW(1), FLOAT(6.0f))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(mahojin_alpha_down)
+EVT_BEGIN(mahojin_alpha_down)
     SET_VALUE(GW(1), FLOAT(-6.0f))
     RETURN
 EVT_END()
@@ -691,13 +691,13 @@ EVT_BEGIN(evt_fogreset)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(mahojin_se_event)
+EVT_BEGIN(mahojin_se_event)
     WAIT_MS(3500)
     WAIT_MS(1600)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(mahojin_se_event_end)
+EVT_BEGIN(mahojin_se_event_end)
     RETURN
 EVT_END()
 
@@ -1212,17 +1212,17 @@ USER_FUNC(tiz_broken) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
-__declspec(section ".data") BrokenWork* broken_wp = &broken_work;
+BrokenWork* broken_wp = &broken_work;
 
-__declspec(section ".data") f32 param_tbl[] = {
+f32 param_tbl[] = {
     90.0f, 23.0f, 0.98f, 19.4f, 2.0f,
 };
 
-__declspec(section ".data") f32 add_tbl[] = {
+f32 add_tbl[] = {
     1.0f, 0.1f, 0.01f, 0.1f, 1.0f,
 };
 
-static __declspec(section ".data") const char* name_tbl[] = {
+static const char* name_tbl[] = {
     "delay",
     "v0",
     "vscale",
@@ -3868,5 +3868,5 @@ EVT_END()
 
 
 #pragma force_active on
-__declspec(section ".data") static u32 gap_04_000116AC_data[1] = {0};
+static u32 gap_04_000116AC_data[1] = {0};
 #pragma force_active reset

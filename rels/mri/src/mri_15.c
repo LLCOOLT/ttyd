@@ -36,23 +36,23 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
 
-__declspec(section ".data") f32 fd_mri_15_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_15_neg_one_382;
-__declspec(section ".data") f32 fd_mri_15___local_PI_383;
-__declspec(section ".data") f32 fd_mri_15___local_3PIO2_385;
-__declspec(section ".data") f32 fd_mri_15_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_15___local_PIO2_384;
-__declspec(section ".data") f32 fd_mri_15_one_381;
-__declspec(section ".data") f32 fd_mri_15_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_15_neg_one_365;
-__declspec(section ".data") f32 fd_mri_15___local_PI_366;
-__declspec(section ".data") f32 fd_mri_15___local_3PIO2_368;
-__declspec(section ".data") f32 fd_mri_15_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_15___local_PIO2_367;
-__declspec(section ".data") f32 fd_mri_15_one_364;
-static __declspec(section ".data") s32 bero_s_doa_close[10];
-static __declspec(section ".data") s32 bero_s_doa_open[10];
-__declspec(section ".data") s32 evt_dokan[12];
+f32 fd_mri_15_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_mri_15_neg_one_382;
+f32 fd_mri_15___local_PI_383;
+f32 fd_mri_15___local_3PIO2_385;
+f32 fd_mri_15_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_mri_15___local_PIO2_384;
+f32 fd_mri_15_one_381;
+f32 fd_mri_15_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_mri_15_neg_one_365;
+f32 fd_mri_15___local_PI_366;
+f32 fd_mri_15___local_3PIO2_368;
+f32 fd_mri_15_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_mri_15___local_PIO2_367;
+f32 fd_mri_15_one_364;
+static s32 bero_s_doa_close[10];
+static s32 bero_s_doa_open[10];
+s32 evt_dokan[12];
 static BeroEntry bero_entry_data[3];
 static s32 door_switch_init[17];
 static s32 door_switch[59];
@@ -63,49 +63,49 @@ s32 ueki_evt_01[20];
 static KusaAccess ueki_access_data[7];
 s32 mri_15_init_evt[156];
 
-__declspec(section ".data") f32 fd_mri_15_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_15_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_15_neg_one_382 = -1.0f;
+f32 fd_mri_15_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_15___local_PI_383 = 3.1415927f;
+f32 fd_mri_15___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_15___local_3PIO2_385 = 4.712389f;
+f32 fd_mri_15___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_15_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_15_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_15___local_PIO2_384 = 1.5707964f;
+f32 fd_mri_15___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_15_one_381 = 1.0f;
+f32 fd_mri_15_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_mri_15_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_15_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_15_neg_one_365 = -1.0f;
+f32 fd_mri_15_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_15___local_PI_366 = 3.1415927f;
+f32 fd_mri_15___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_15___local_3PIO2_368 = 4.712389f;
+f32 fd_mri_15___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_15_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_15_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_15___local_PIO2_367 = 1.5707964f;
+f32 fd_mri_15___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_15_one_364 = 1.0f;
+f32 fd_mri_15_one_364 = 1.0f;
 
-static __declspec(section ".data") EVT_BEGIN(bero_s_doa_close)
+static EVT_BEGIN(bero_s_doa_close)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), STRING("S_doa"))
     SPAWN_EVENT(PTR(evt_mri_door_close))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(bero_s_doa_open)
+static EVT_BEGIN(bero_s_doa_open)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), STRING("S_doa"))
     SPAWN_EVENT(PTR(evt_mri_door_open))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_dokan)
+EVT_BEGIN(evt_dokan)
     IF_INT_EQUAL(GSWF(2866), 0)
         SET_VALUE(GSWF(2866), 1)
     END_IF

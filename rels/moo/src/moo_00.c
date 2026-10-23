@@ -72,24 +72,24 @@ USER_FUNC(party_reset);
 USER_FUNC(evt_offscreen_get_boundingbox2);
 #endif
 
-__declspec(section ".data") f32 fd_moo_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_moo_00_neg_one_382;
-__declspec(section ".data") f32 fd_moo_00___local_PI_383;
-__declspec(section ".data") f32 fd_moo_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_moo_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_moo_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_moo_00_one_381;
-__declspec(section ".data") f32 fd_moo_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_moo_00_neg_one_365;
-__declspec(section ".data") f32 fd_moo_00___local_PI_366;
-__declspec(section ".data") f32 fd_moo_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_moo_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_moo_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_moo_00_one_364;
-__declspec(section ".data") f64 fd_moo_00__three_localstatic4_sqrtf;
-__declspec(section ".data") f64 fd_moo_00__half_localstatic3_sqrtf;
+f32 fd_moo_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_moo_00_neg_one_382;
+f32 fd_moo_00___local_PI_383;
+f32 fd_moo_00___local_3PIO2_385;
+f32 fd_moo_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_moo_00___local_PIO2_384;
+f32 fd_moo_00_one_381;
+f32 fd_moo_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_moo_00_neg_one_365;
+f32 fd_moo_00___local_PI_366;
+f32 fd_moo_00___local_3PIO2_368;
+f32 fd_moo_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_moo_00___local_PIO2_367;
+f32 fd_moo_00_one_364;
+f64 fd_moo_00__three_localstatic4_sqrtf;
+f64 fd_moo_00__half_localstatic3_sqrtf;
 static BeroEntry bero_entry_data[3];
-static __declspec(section ".data") f32 spline_dt[9];
+static f32 spline_dt[9];
 static s32 party_damage_pose[52];
 s32 party_damage_pose2[52];
 static s32 evt_first[525];
@@ -110,37 +110,37 @@ static s32 rock_evt1[21];
 #endif
 s32 moo_00_init_evt[133];
 
-__declspec(section ".data") f32 fd_moo_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_moo_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_moo_00_neg_one_382 = -1.0f;
+f32 fd_moo_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_moo_00___local_PI_383 = 3.1415927f;
+f32 fd_moo_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_moo_00___local_3PIO2_385 = 4.712389f;
+f32 fd_moo_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_moo_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_moo_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_moo_00___local_PIO2_384 = 1.5707964f;
+f32 fd_moo_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_moo_00_one_381 = 1.0f;
+f32 fd_moo_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_moo_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_moo_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_moo_00_neg_one_365 = -1.0f;
+f32 fd_moo_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_moo_00___local_PI_366 = 3.1415927f;
+f32 fd_moo_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_moo_00___local_3PIO2_368 = 4.712389f;
+f32 fd_moo_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_moo_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_moo_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_moo_00___local_PIO2_367 = 1.5707964f;
+f32 fd_moo_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_moo_00_one_364 = 1.0f;
+f32 fd_moo_00_one_364 = 1.0f;
 
-__declspec(section ".data") f64 fd_moo_00__three_localstatic4_sqrtf = 3.0;
+f64 fd_moo_00__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") f64 fd_moo_00__half_localstatic3_sqrtf = 0.5;
+f64 fd_moo_00__half_localstatic3_sqrtf = 0.5;
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -178,7 +178,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-static __declspec(section ".data") f32 spline_dt[] = {
+static f32 spline_dt[] = {
     -320.0f, 200.0f, -170.0f, -220.0f, 100.0f, -170.0f, -120.0f, 0.0f,
     -170.0f,
 };

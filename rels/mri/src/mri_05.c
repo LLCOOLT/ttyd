@@ -62,27 +62,27 @@ USER_FUNC(mario_shabon_effdel);
 USER_FUNC(mario_shabon_effpos);
 USER_FUNC(mario_shabon_init);
 
-__declspec(section ".data") f32 fd_mri_05_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_05_neg_one_382;
-__declspec(section ".data") f32 fd_mri_05___local_PI_383;
-__declspec(section ".data") f32 fd_mri_05___local_3PIO2_385;
-__declspec(section ".data") f32 fd_mri_05_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_05___local_PIO2_384;
-__declspec(section ".data") f32 fd_mri_05_one_381;
-__declspec(section ".data") f32 fd_mri_05_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_05_neg_one_365;
-__declspec(section ".data") f32 fd_mri_05___local_PI_366;
-__declspec(section ".data") f32 fd_mri_05___local_3PIO2_368;
-__declspec(section ".data") f32 fd_mri_05_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_05___local_PIO2_367;
-__declspec(section ".data") f32 fd_mri_05_one_364;
+f32 fd_mri_05_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_mri_05_neg_one_382;
+f32 fd_mri_05___local_PI_383;
+f32 fd_mri_05___local_3PIO2_385;
+f32 fd_mri_05_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_mri_05___local_PIO2_384;
+f32 fd_mri_05_one_381;
+f32 fd_mri_05_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_mri_05_neg_one_365;
+f32 fd_mri_05___local_PI_366;
+f32 fd_mri_05___local_3PIO2_368;
+f32 fd_mri_05_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_mri_05___local_PIO2_367;
+f32 fd_mri_05_one_364;
 s32 puni_4_init[17];
 s32 puni_4_talk[20];
 s32 puni_5_init[17];
 s32 puni_5_talk[20];
 static NpcSetupInfo npcEnt[3];
-static __declspec(section ".data") s32 bero_s_doa_close[10];
-static __declspec(section ".data") s32 bero_s_doa_open[10];
+static s32 bero_s_doa_close[10];
+static s32 bero_s_doa_open[10];
 static BeroEntry bero_entry_data[6];
 static s32 door_switch_init[17];
 static s32 door_switch[59];
@@ -93,7 +93,7 @@ static s32 punipuni_ball00[51];
 s32 punipuni_ball01_init[41];
 s32 punipuni_ball01[51];
 s32 mario_shabon_move_sound[14];
-__declspec(section ".data") s32 mario_shabon_break_sound[9];
+s32 mario_shabon_break_sound[9];
 s32 mario_shabon_check[251];
 s32 evt_shabon_s[312];
 s32 mri_05_init_evt[178];
@@ -107,33 +107,33 @@ USER_FUNC(mario_shabon_init) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_mri_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_05_neg_one_382 = -1.0f;
+f32 fd_mri_05_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_05___local_PI_383 = 3.1415927f;
+f32 fd_mri_05___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_05___local_3PIO2_385 = 4.712389f;
+f32 fd_mri_05___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_05___local_PIO2_384 = 1.5707964f;
+f32 fd_mri_05___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_05_one_381 = 1.0f;
+f32 fd_mri_05_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_mri_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_05_neg_one_365 = -1.0f;
+f32 fd_mri_05_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_05___local_PI_366 = 3.1415927f;
+f32 fd_mri_05___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_05___local_3PIO2_368 = 4.712389f;
+f32 fd_mri_05___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_05___local_PIO2_367 = 1.5707964f;
+f32 fd_mri_05___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_05_one_364 = 1.0f;
+f32 fd_mri_05_one_364 = 1.0f;
 
 EVT_BEGIN(puni_4_init)
     SWITCH(GSW(0))
@@ -203,14 +203,14 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-static __declspec(section ".data") EVT_BEGIN(bero_s_doa_close)
+static EVT_BEGIN(bero_s_doa_close)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), STRING("S_doa"))
     SPAWN_EVENT(PTR(evt_mri_door_close))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(bero_s_doa_open)
+static EVT_BEGIN(bero_s_doa_open)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), STRING("S_doa"))
     SPAWN_EVENT(PTR(evt_mri_door_open))
@@ -457,7 +457,7 @@ EVT_BEGIN(mario_shabon_move_sound)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(mario_shabon_break_sound)
+EVT_BEGIN(mario_shabon_break_sound)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_SOAPBALL_BREAK1"), LW(0), LW(1), LW(2), 0)
     RETURN
 EVT_END()

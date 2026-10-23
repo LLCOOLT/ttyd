@@ -11,111 +11,111 @@
 
 extern BattleUnitKind unit_red_honenoko;
 
-__declspec(section ".data") f32 fd_battle_database_gon_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_gon_neg_one_382;
-__declspec(section ".data") f32 fd_battle_database_gon___local_PI_383;
-__declspec(section ".data") f32 fd_battle_database_gon___local_3PIO2_385;
-__declspec(section ".data") f32 fd_battle_database_gon_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_gon___local_PIO2_384;
-__declspec(section ".data") f32 fd_battle_database_gon_one_381;
-__declspec(section ".data") f32 fd_battle_database_gon_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_gon_neg_one_365;
-__declspec(section ".data") f32 fd_battle_database_gon___local_PI_366;
-__declspec(section ".data") f32 fd_battle_database_gon___local_3PIO2_368;
-__declspec(section ".data") f32 fd_battle_database_gon_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_gon___local_PIO2_367;
-__declspec(section ".data") f32 fd_battle_database_gon_one_364;
+f32 fd_battle_database_gon_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_battle_database_gon_neg_one_382;
+f32 fd_battle_database_gon___local_PI_383;
+f32 fd_battle_database_gon___local_3PIO2_385;
+f32 fd_battle_database_gon_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_battle_database_gon___local_PIO2_384;
+f32 fd_battle_database_gon_one_381;
+f32 fd_battle_database_gon_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_battle_database_gon_neg_one_365;
+f32 fd_battle_database_gon___local_PI_366;
+f32 fd_battle_database_gon___local_3PIO2_368;
+f32 fd_battle_database_gon_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_battle_database_gon___local_PIO2_367;
+f32 fd_battle_database_gon_one_364;
 BattleStageObjectData gon_btlobject_data[10];
 BattleStageData gon_btlstage_data[5];
 BattleUnitSetup btlparty_gon_gon_02_02_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_02_02_off_1;
+BattleGroupSetup btlgrp_gon_gon_02_02_off_1;
 BattleUnitSetup btlparty_gon_gon_02_03_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_02_03_off_1;
+BattleGroupSetup btlgrp_gon_gon_02_03_off_1;
 BattleUnitSetup btlparty_gon_gon_02_04_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_02_04_off_1;
+BattleGroupSetup btlgrp_gon_gon_02_04_off_1;
 BattleUnitSetup btlparty_gon_gon_03_01_off_1[5];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_03_01_off_1;
+BattleGroupSetup btlgrp_gon_gon_03_01_off_1;
 BattleUnitSetup btlparty_gon_gon_04_01_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_04_01_off_1;
+BattleGroupSetup btlgrp_gon_gon_04_01_off_1;
 BattleUnitSetup btlparty_gon_gon_04_02_off_1[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_04_02_off_1;
+BattleGroupSetup btlgrp_gon_gon_04_02_off_1;
 BattleUnitSetup btlparty_gon_gon_04_03_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_04_03_off_1;
+BattleGroupSetup btlgrp_gon_gon_04_03_off_1;
 BattleUnitSetup btlparty_gon_gon_06_03_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_06_03_off_1;
+BattleGroupSetup btlgrp_gon_gon_06_03_off_1;
 BattleUnitSetup btlparty_gon_gon_06_04_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_06_04_off_1;
+BattleGroupSetup btlgrp_gon_gon_06_04_off_1;
 BattleUnitSetup btlparty_gon_gon_08_01_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_08_01_off_1;
+BattleGroupSetup btlgrp_gon_gon_08_01_off_1;
 BattleUnitSetup btlparty_gon_gon_08_03_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_08_03_off_1;
+BattleGroupSetup btlgrp_gon_gon_08_03_off_1;
 BattleUnitSetup btlparty_gon_gon_08_05_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_08_05_off_1;
+BattleGroupSetup btlgrp_gon_gon_08_05_off_1;
 BattleUnitSetup btlparty_gon_gon_09_01_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_09_01_off_1;
+BattleGroupSetup btlgrp_gon_gon_09_01_off_1;
 BattleUnitSetup btlparty_gon_gon_09_02_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_09_02_off_1;
+BattleGroupSetup btlgrp_gon_gon_09_02_off_1;
 BattleUnitSetup btlparty_gon_gon_09_04_off_1[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_09_04_off_1;
+BattleGroupSetup btlgrp_gon_gon_09_04_off_1;
 BattleUnitSetup btlparty_gon_gon_10_01_off_1[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_10_01_off_1;
+BattleGroupSetup btlgrp_gon_gon_10_01_off_1;
 BattleUnitSetup btlparty_gon_gon_10_02_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_10_02_off_1;
+BattleGroupSetup btlgrp_gon_gon_10_02_off_1;
 BattleUnitSetup btlparty_gon_gon_10_03_off_1[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_10_03_off_1;
-__declspec(section ".data") BattleUnitSetup btlparty_gon_gon_11_01_off_1[1];
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_11_01_off_1;
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_test1_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_test2_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_test3_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_02_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_02_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_02_04_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_03_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_04_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_04_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_06_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_06_04_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_08_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_08_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_08_05_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_09_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_09_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_09_04_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_10_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_10_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_10_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_11_01_off[2];
+BattleGroupSetup btlgrp_gon_gon_10_03_off_1;
+BattleUnitSetup btlparty_gon_gon_11_01_off_1[1];
+BattleGroupSetup btlgrp_gon_gon_11_01_off_1;
+NpcBattleSelect btlgrpsel_gon_btlno_gon_test1_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_test2_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_test3_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_02_02_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_02_03_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_02_04_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_03_01_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_04_02_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_04_03_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_06_03_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_06_04_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_08_01_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_08_03_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_08_05_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_09_01_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_09_02_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_09_04_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_10_01_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_10_02_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_10_03_off[2];
+NpcBattleSelect btlgrpsel_gon_btlno_gon_11_01_off[2];
 NpcSetupBattleInfo btlsetup_gon_tbl[22];
 NpcTerritoryInfo btl_gon_setup_no_tbl[22];
 
-__declspec(section ".data") f32 fd_battle_database_gon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_battle_database_gon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_gon_neg_one_382 = -1.0f;
+f32 fd_battle_database_gon_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_gon___local_PI_383 = 3.1415927f;
+f32 fd_battle_database_gon___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_battle_database_gon___local_3PIO2_385 = 4.712389f;
+f32 fd_battle_database_gon___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_battle_database_gon_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_battle_database_gon_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_gon___local_PIO2_384 = 1.5707964f;
+f32 fd_battle_database_gon___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_battle_database_gon_one_381 = 1.0f;
+f32 fd_battle_database_gon_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_gon_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_battle_database_gon_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_gon_neg_one_365 = -1.0f;
+f32 fd_battle_database_gon_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_gon___local_PI_366 = 3.1415927f;
+f32 fd_battle_database_gon___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_battle_database_gon___local_3PIO2_368 = 4.712389f;
+f32 fd_battle_database_gon___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_battle_database_gon_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_battle_database_gon_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_gon___local_PIO2_367 = 1.5707964f;
+f32 fd_battle_database_gon___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_battle_database_gon_one_364 = 1.0f;
+f32 fd_battle_database_gon_one_364 = 1.0f;
 
 BattleStageObjectData gon_btlobject_data[] = {
     {"B", 2, 2, {0}, 0, 60, {0}},
@@ -216,7 +216,7 @@ BattleUnitSetup btlparty_gon_gon_02_02_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_02_02_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_02_02_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_02_02_off_1, // enemyData
     25, // heldItemWeight
@@ -250,7 +250,7 @@ BattleUnitSetup btlparty_gon_gon_02_03_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_02_03_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_02_03_off_1 = {
     2, // numEnemies
     btlparty_gon_gon_02_03_off_1, // enemyData
     25, // heldItemWeight
@@ -294,7 +294,7 @@ BattleUnitSetup btlparty_gon_gon_02_04_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_02_04_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_02_04_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_02_04_off_1, // enemyData
     25, // heldItemWeight
@@ -358,7 +358,7 @@ BattleUnitSetup btlparty_gon_gon_03_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_03_01_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_03_01_off_1 = {
     5, // numEnemies
     btlparty_gon_gon_03_01_off_1, // enemyData
     0, 0, // heldItemWeight..randomItemWeight
@@ -391,7 +391,7 @@ BattleUnitSetup btlparty_gon_gon_04_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_04_01_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_04_01_off_1 = {
     2, // numEnemies
     btlparty_gon_gon_04_01_off_1, // enemyData
     25, // heldItemWeight
@@ -445,7 +445,7 @@ BattleUnitSetup btlparty_gon_gon_04_02_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_04_02_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_04_02_off_1 = {
     4, // numEnemies
     btlparty_gon_gon_04_02_off_1, // enemyData
     25, // heldItemWeight
@@ -489,7 +489,7 @@ BattleUnitSetup btlparty_gon_gon_04_03_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_04_03_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_04_03_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_04_03_off_1, // enemyData
     25, // heldItemWeight
@@ -533,7 +533,7 @@ BattleUnitSetup btlparty_gon_gon_06_03_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_06_03_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_06_03_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_06_03_off_1, // enemyData
     25, // heldItemWeight
@@ -577,7 +577,7 @@ BattleUnitSetup btlparty_gon_gon_06_04_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_06_04_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_06_04_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_06_04_off_1, // enemyData
     25, // heldItemWeight
@@ -611,7 +611,7 @@ BattleUnitSetup btlparty_gon_gon_08_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_08_01_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_08_01_off_1 = {
     2, // numEnemies
     btlparty_gon_gon_08_01_off_1, // enemyData
     25, // heldItemWeight
@@ -645,7 +645,7 @@ BattleUnitSetup btlparty_gon_gon_08_03_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_08_03_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_08_03_off_1 = {
     2, // numEnemies
     btlparty_gon_gon_08_03_off_1, // enemyData
     25, // heldItemWeight
@@ -679,7 +679,7 @@ BattleUnitSetup btlparty_gon_gon_08_05_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_08_05_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_08_05_off_1 = {
     2, // numEnemies
     btlparty_gon_gon_08_05_off_1, // enemyData
     25, // heldItemWeight
@@ -723,7 +723,7 @@ BattleUnitSetup btlparty_gon_gon_09_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_09_01_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_09_01_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_09_01_off_1, // enemyData
     25, // heldItemWeight
@@ -767,7 +767,7 @@ BattleUnitSetup btlparty_gon_gon_09_02_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_09_02_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_09_02_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_09_02_off_1, // enemyData
     25, // heldItemWeight
@@ -821,7 +821,7 @@ BattleUnitSetup btlparty_gon_gon_09_04_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_09_04_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_09_04_off_1 = {
     4, // numEnemies
     btlparty_gon_gon_09_04_off_1, // enemyData
     25, // heldItemWeight
@@ -875,7 +875,7 @@ BattleUnitSetup btlparty_gon_gon_10_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_10_01_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_10_01_off_1 = {
     4, // numEnemies
     btlparty_gon_gon_10_01_off_1, // enemyData
     25, // heldItemWeight
@@ -919,7 +919,7 @@ BattleUnitSetup btlparty_gon_gon_10_02_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_10_02_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_10_02_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_10_02_off_1, // enemyData
     25, // heldItemWeight
@@ -973,7 +973,7 @@ BattleUnitSetup btlparty_gon_gon_10_03_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_10_03_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_10_03_off_1 = {
     4, // numEnemies
     btlparty_gon_gon_10_03_off_1, // enemyData
     25, // heldItemWeight
@@ -984,7 +984,7 @@ __declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_10_03_off_1 = {
     5, // field_1C
 };
 
-__declspec(section ".data") BattleUnitSetup btlparty_gon_gon_11_01_off_1[] = {
+BattleUnitSetup btlparty_gon_gon_11_01_off_1[] = {
     {
         &unit_boss_gonbaba, // mUnitKindParams
         1, // alliance
@@ -997,7 +997,7 @@ __declspec(section ".data") BattleUnitSetup btlparty_gon_gon_11_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_11_01_off_1 = {
+BattleGroupSetup btlgrp_gon_gon_11_01_off_1 = {
     1, // numEnemies
     btlparty_gon_gon_11_01_off_1, // enemyData
     0, 0, // heldItemWeight..randomItemWeight
@@ -1007,107 +1007,107 @@ __declspec(section ".data") BattleGroupSetup btlgrp_gon_gon_11_01_off_1 = {
     5, // field_1C
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_test1_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_test1_off[] = {
     {50, &btlgrp_gon_gon_02_02_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_test2_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_test2_off[] = {
     {50, &btlgrp_gon_gon_02_02_off_1, gon_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_test3_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_test3_off[] = {
     {50, &btlgrp_gon_gon_02_02_off_1, &gon_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_02_02_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_02_02_off[] = {
     {50, &btlgrp_gon_gon_02_02_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_02_03_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_02_03_off[] = {
     {10, &btlgrp_gon_gon_02_03_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_02_04_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_02_04_off[] = {
     {10, &btlgrp_gon_gon_02_04_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_03_01_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_03_01_off[] = {
     {10, &btlgrp_gon_gon_03_01_off_1, &gon_btlstage_data[4]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_04_02_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_04_02_off[] = {
     {10, &btlgrp_gon_gon_04_02_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_04_03_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_04_03_off[] = {
     {10, &btlgrp_gon_gon_04_03_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_06_03_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_06_03_off[] = {
     {10, &btlgrp_gon_gon_06_03_off_1, &gon_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_06_04_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_06_04_off[] = {
     {10, &btlgrp_gon_gon_06_04_off_1, &gon_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_08_01_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_08_01_off[] = {
     {10, &btlgrp_gon_gon_08_01_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_08_03_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_08_03_off[] = {
     {10, &btlgrp_gon_gon_08_03_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_08_05_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_08_05_off[] = {
     {10, &btlgrp_gon_gon_08_05_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_09_01_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_09_01_off[] = {
     {10, &btlgrp_gon_gon_09_01_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_09_02_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_09_02_off[] = {
     {10, &btlgrp_gon_gon_09_02_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_09_04_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_09_04_off[] = {
     {10, &btlgrp_gon_gon_09_04_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_10_01_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_10_01_off[] = {
     {10, &btlgrp_gon_gon_10_01_off_1, gon_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_10_02_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_10_02_off[] = {
     {10, &btlgrp_gon_gon_10_02_off_1, gon_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_10_03_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_10_03_off[] = {
     {10, &btlgrp_gon_gon_10_03_off_1, gon_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_gon_btlno_gon_11_01_off[] = {
+NpcBattleSelect btlgrpsel_gon_btlno_gon_11_01_off[] = {
     {20, &btlgrp_gon_gon_11_01_off_1, &gon_btlstage_data[1]},
     {0},
 };

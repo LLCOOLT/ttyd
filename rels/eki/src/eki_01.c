@@ -26,98 +26,98 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_win_item_select);
 
-__declspec(section ".data") f32 fd_eki_01_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_eki_01_neg_one_382;
-__declspec(section ".data") f32 fd_eki_01___local_PI_383;
-__declspec(section ".data") f32 fd_eki_01___local_3PIO2_385;
-__declspec(section ".data") f32 fd_eki_01_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_eki_01___local_PIO2_384;
-__declspec(section ".data") f32 fd_eki_01_one_381;
-__declspec(section ".data") f32 fd_eki_01_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_eki_01_neg_one_365;
-__declspec(section ".data") f32 fd_eki_01___local_PI_366;
-__declspec(section ".data") f32 fd_eki_01___local_3PIO2_368;
-__declspec(section ".data") f32 fd_eki_01_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_eki_01___local_PIO2_367;
-__declspec(section ".data") f32 fd_eki_01_one_364;
-static __declspec(section ".data") s32 e_close[12];
-static __declspec(section ".data") s32 e_open[12];
-static __declspec(section ".data") s32 w_close[12];
-static __declspec(section ".data") s32 w_open[12];
-static __declspec(section ".data") s32 n_close[12];
-static __declspec(section ".data") s32 n_open[12];
+f32 fd_eki_01_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_eki_01_neg_one_382;
+f32 fd_eki_01___local_PI_383;
+f32 fd_eki_01___local_3PIO2_385;
+f32 fd_eki_01_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_eki_01___local_PIO2_384;
+f32 fd_eki_01_one_381;
+f32 fd_eki_01_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_eki_01_neg_one_365;
+f32 fd_eki_01___local_PI_366;
+f32 fd_eki_01___local_3PIO2_368;
+f32 fd_eki_01_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_eki_01___local_PIO2_367;
+f32 fd_eki_01_one_364;
+static s32 e_close[12];
+static s32 e_open[12];
+static s32 w_close[12];
+static s32 w_open[12];
+static s32 n_close[12];
+static s32 n_open[12];
 static BeroEntry bero_data[4];
 static s32 evt_origami[129];
-static __declspec(section ".data") s32 key_tbl[2];
+static s32 key_tbl[2];
 static s32 evt_chk[23];
-static __declspec(section ".data") s32 evt_lock[10];
-__declspec(section ".data") s32 evt_kami_1[5];
-__declspec(section ".data") s32 evt_kami_2[5];
-__declspec(section ".data") s32 evt_kami_3[5];
-__declspec(section ".data") s32 evt_kami_4[5];
-__declspec(section ".data") s32 evt_kami_5[5];
-__declspec(section ".data") s32 evt_kami_6[5];
+static s32 evt_lock[10];
+s32 evt_kami_1[5];
+s32 evt_kami_2[5];
+s32 evt_kami_3[5];
+s32 evt_kami_4[5];
+s32 evt_kami_5[5];
+s32 evt_kami_6[5];
 s32 eki_01_init_evt[223];
 
-__declspec(section ".data") f32 fd_eki_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_eki_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_eki_01_neg_one_382 = -1.0f;
+f32 fd_eki_01_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_eki_01___local_PI_383 = 3.1415927f;
+f32 fd_eki_01___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_eki_01___local_3PIO2_385 = 4.712389f;
+f32 fd_eki_01___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_eki_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_eki_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_eki_01___local_PIO2_384 = 1.5707964f;
+f32 fd_eki_01___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_eki_01_one_381 = 1.0f;
+f32 fd_eki_01_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_eki_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_eki_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_eki_01_neg_one_365 = -1.0f;
+f32 fd_eki_01_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_eki_01___local_PI_366 = 3.1415927f;
+f32 fd_eki_01___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_eki_01___local_3PIO2_368 = 4.712389f;
+f32 fd_eki_01___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_eki_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_eki_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_eki_01___local_PIO2_367 = 1.5707964f;
+f32 fd_eki_01___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_eki_01_one_364 = 1.0f;
+f32 fd_eki_01_one_364 = 1.0f;
 
-static __declspec(section ".data") EVT_BEGIN(e_close)
+static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_3"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(e_open)
+static EVT_BEGIN(e_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_3"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(w_close)
+static EVT_BEGIN(w_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(w_open)
+static EVT_BEGIN(w_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(n_close)
+static EVT_BEGIN(n_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_2"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(n_open)
+static EVT_BEGIN(n_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_2"), 0, LW(0), 0)
     RETURN
@@ -215,7 +215,7 @@ static EVT_BEGIN(evt_origami)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 key_tbl[] = {
+static s32 key_tbl[] = {
     ITEM_STEEPLE_KEY_0x19, -1,
 };
 
@@ -230,39 +230,39 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_lock)
+static EVT_BEGIN(evt_lock)
     SET_VALUE(LW(0), 0)
     CALL_CHILD(PTR(bero_case_switch_on))
     SET_VALUE(GSW(0), 315)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_kami_1)
+EVT_BEGIN(evt_kami_1)
     SET_VALUE(GSWF(3748), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_kami_2)
+EVT_BEGIN(evt_kami_2)
     SET_VALUE(GSWF(3749), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_kami_3)
+EVT_BEGIN(evt_kami_3)
     SET_VALUE(GSWF(3750), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_kami_4)
+EVT_BEGIN(evt_kami_4)
     SET_VALUE(GSWF(3751), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_kami_5)
+EVT_BEGIN(evt_kami_5)
     SET_VALUE(GSWF(3752), 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_kami_6)
+EVT_BEGIN(evt_kami_6)
     SET_VALUE(GSWF(3753), 1)
     RETURN
 EVT_END()

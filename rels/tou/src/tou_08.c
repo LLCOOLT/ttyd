@@ -100,33 +100,33 @@ USER_FUNC(evt_npc_get_reglid);
 USER_FUNC(evt_npc_restart_regular_event);
 #endif
 
-__declspec(section ".data") f32 fd_tou_08_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_08_neg_one_382;
-__declspec(section ".data") f32 fd_tou_08___local_PI_383;
-__declspec(section ".data") f32 fd_tou_08___local_3PIO2_385;
-__declspec(section ".data") f32 fd_tou_08_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_08___local_PIO2_384;
-__declspec(section ".data") f32 fd_tou_08_one_381;
-__declspec(section ".data") f32 fd_tou_08_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_08_neg_one_365;
-__declspec(section ".data") f32 fd_tou_08___local_PI_366;
-__declspec(section ".data") f32 fd_tou_08___local_3PIO2_368;
-__declspec(section ".data") f32 fd_tou_08_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_08___local_PIO2_367;
-__declspec(section ".data") f32 fd_tou_08_one_364;
+f32 fd_tou_08_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_tou_08_neg_one_382;
+f32 fd_tou_08___local_PI_383;
+f32 fd_tou_08___local_3PIO2_385;
+f32 fd_tou_08_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_tou_08___local_PIO2_384;
+f32 fd_tou_08_one_381;
+f32 fd_tou_08_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_tou_08_neg_one_365;
+f32 fd_tou_08___local_PI_366;
+f32 fd_tou_08___local_3PIO2_368;
+f32 fd_tou_08_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_tou_08___local_PIO2_367;
+f32 fd_tou_08_one_364;
 static s32 evt_toile[42];
-static __declspec(section ".data") s32 n_door_open[12];
-static __declspec(section ".data") s32 n_door_close[12];
+static s32 n_door_open[12];
+static s32 n_door_close[12];
 static s32 toile_in[13];
 static s32 toile_out[35];
 static BeroEntry bero_data[3];
-__declspec(section ".data") s32 init_togenoko[12];
+s32 init_togenoko[12];
 s32 talk_togenoko[136];
-__declspec(section ".data") s32 init_togemet[12];
+s32 init_togemet[12];
 s32 talk_togemet[136];
-__declspec(section ".data") s32 init_hammerbros[12];
+s32 init_hammerbros[12];
 s32 talk_hammerbros[136];
-static __declspec(section ".data") s32 init_uranoko[12];
+static s32 init_uranoko[12];
 static s32 talk_uranoko[136];
 static NpcSetupInfo npcEnt[7];
 static s32 evt_sensyu[70];
@@ -139,40 +139,40 @@ s32 evt_champion_win[290];
 #else
 s32 evt_champion_win[271];
 #endif
-static __declspec(section ".data") s32 bed_entry[10];
+static s32 bed_entry[10];
 s32 evt_tou_08_cake[53];
 static s32 epilogue_npc_entry[84];
 static s32 epilogue_evt_sub[322];
 static s32 epilogue_evt[83];
 s32 tou_08_init_evt[289];
 
-__declspec(section ".data") f32 fd_tou_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_08_neg_one_382 = -1.0f;
+f32 fd_tou_08_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou_08___local_PI_383 = 3.1415927f;
+f32 fd_tou_08___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou_08___local_3PIO2_385 = 4.712389f;
+f32 fd_tou_08___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_08_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_08_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou_08___local_PIO2_384 = 1.5707964f;
+f32 fd_tou_08___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_08_one_381 = 1.0f;
+f32 fd_tou_08_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_tou_08_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_08_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_08_neg_one_365 = -1.0f;
+f32 fd_tou_08_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou_08___local_PI_366 = 3.1415927f;
+f32 fd_tou_08___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou_08___local_3PIO2_368 = 4.712389f;
+f32 fd_tou_08___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_08_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_08_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou_08___local_PIO2_367 = 1.5707964f;
+f32 fd_tou_08___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_08_one_364 = 1.0f;
+f32 fd_tou_08_one_364 = 1.0f;
 
 static EVT_BEGIN(evt_toile)
     IF_INT_LESS(GSW(0), 157)
@@ -191,13 +191,13 @@ static EVT_BEGIN(evt_toile)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(n_door_open)
+static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(n_door_close)
+static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
@@ -263,7 +263,7 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
-__declspec(section ".data") EVT_BEGIN(init_togenoko)
+EVT_BEGIN(init_togenoko)
     CALL(evt_npc_set_position, STRING("me"), 90, 0, -50)
     CALL(evt_npc_set_ry, STRING("me"), 270)
     RETURN
@@ -314,7 +314,7 @@ EVT_BEGIN(talk_togenoko)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_togemet)
+EVT_BEGIN(init_togemet)
     CALL(evt_npc_set_position, STRING("トゲメット"), 120, 0, 80)
     CALL(evt_npc_set_ry, STRING("トゲメット"), 270)
     RETURN
@@ -365,7 +365,7 @@ EVT_BEGIN(talk_togemet)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_hammerbros)
+EVT_BEGIN(init_hammerbros)
     CALL(evt_npc_set_position, STRING("ハンマーブロス"), -115, 0, 115)
     CALL(evt_npc_set_ry, STRING("ハンマーブロス"), 90)
     RETURN
@@ -416,7 +416,7 @@ EVT_BEGIN(talk_hammerbros)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(init_uranoko)
+static EVT_BEGIN(init_uranoko)
     CALL(evt_npc_set_position, STRING("me"), -160, 0, -50)
     CALL(evt_npc_set_ry, STRING("me"), 90)
     RETURN
@@ -1018,7 +1018,7 @@ USER_FUNC(icon_off) {
     return EVT_RETURN_DONE;
 }
 
-static __declspec(section ".data") EVT_BEGIN(bed_entry)
+static EVT_BEGIN(bed_entry)
     CALL(evt_run_case_evt, 9, 1, LW(0), 0, PTR(evt_tou_bed), 0)
     RETURN
 EVT_END()

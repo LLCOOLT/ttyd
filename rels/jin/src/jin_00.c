@@ -155,37 +155,37 @@ f32 computeAngle(ExtPose* pose, MarioWork* mp);
 static f32 randf(f32 min, f32 max);
 s32 randn(s32 min, s32 max);
 
-__declspec(section ".data") f32 fd_jin_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_jin_00_neg_one_382;
-__declspec(section ".data") f32 fd_jin_00___local_PI_383;
-__declspec(section ".data") f32 fd_jin_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_jin_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_jin_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_jin_00_one_381;
-__declspec(section ".data") f32 fd_jin_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_jin_00_neg_one_365;
-__declspec(section ".data") f32 fd_jin_00___local_PI_366;
-__declspec(section ".data") f32 fd_jin_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_jin_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_jin_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_jin_00_one_364;
+f32 fd_jin_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_jin_00_neg_one_382;
+f32 fd_jin_00___local_PI_383;
+f32 fd_jin_00___local_3PIO2_385;
+f32 fd_jin_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_jin_00___local_PIO2_384;
+f32 fd_jin_00_one_381;
+f32 fd_jin_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_jin_00_neg_one_365;
+f32 fd_jin_00___local_PI_366;
+f32 fd_jin_00___local_3PIO2_368;
+f32 fd_jin_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_jin_00___local_PIO2_367;
+f32 fd_jin_00_one_364;
 static s32 w_open[22];
 static s32 w_close[22];
-__declspec(section ".data") s32 n3_open[12];
-__declspec(section ".data") s32 n3_close[12];
-static __declspec(section ".data") s32 s_open[12];
-static __declspec(section ".data") s32 s_close[12];
-static __declspec(section ".data") s32 n2_open[12];
-static __declspec(section ".data") s32 n2_close[12];
-__declspec(section ".data") s32 e3_open[12];
-__declspec(section ".data") s32 e3_close[12];
-__declspec(section ".data") s32 e1_open[12];
-__declspec(section ".data") s32 e1_close[12];
-__declspec(section ".data") s32 e2_open[12];
-__declspec(section ".data") s32 e2_close[12];
+s32 n3_open[12];
+s32 n3_close[12];
+static s32 s_open[12];
+static s32 s_close[12];
+static s32 n2_open[12];
+static s32 n2_close[12];
+s32 e3_open[12];
+s32 e3_close[12];
+s32 e1_open[12];
+s32 e1_close[12];
+s32 e2_open[12];
+s32 e2_close[12];
 s32 jin_00_dai[16];
 s32 jin_00_dai_in_sub[83];
-__declspec(section ".data") s32 jin_00_dai_in[9];
+s32 jin_00_dai_in[9];
 static s32 check_roll[16];
 s32 teresa_n_fadein[48];
 s32 teresa_n_fadeout[35];
@@ -197,18 +197,18 @@ BeroEntry bero_stg4majo3nin[1];
 static BeroEntry bero_entry_data[10];
 s32 first_jin00[69];
 static s32 push_evt[297];
-__declspec(section ".data") s32 nopush_evt[5];
-static __declspec(section ".data") s32 evt_key[5];
-static __declspec(section ".data") s32 lock_tbl[2];
+s32 nopush_evt[5];
+static s32 evt_key[5];
+static s32 lock_tbl[2];
 static s32 lock_item_check[23];
-static __declspec(section ".data") s32 evt_unlock[10];
+static s32 evt_unlock[10];
 s32 tyuou_teresa_kusukusu[42];
 s32 tyuou_teresa_look_mario[14];
 s32 tyuou_teresa_init[35];
 s32 tyuou_teresa_talk[391];
 s32 oku_teresa_init[21];
 s32 temae_teresa_init[21];
-__declspec(section ".data") s32 atomic_teresa_init[2];
+s32 atomic_teresa_init[2];
 static NpcSetupInfo npcEnt[12];
 static ExtTexInfo senteresa_ext_entry_data[47];
 s32 senteresa_evt[1248];
@@ -344,33 +344,33 @@ static void senteresa_ext_init(void) {
     g_vecRotCenter.z = mp->position.z;
 }
 
-__declspec(section ".data") f32 fd_jin_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_jin_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_jin_00_neg_one_382 = -1.0f;
+f32 fd_jin_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_jin_00___local_PI_383 = 3.1415927f;
+f32 fd_jin_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_jin_00___local_3PIO2_385 = 4.712389f;
+f32 fd_jin_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_jin_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_jin_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_jin_00___local_PIO2_384 = 1.5707964f;
+f32 fd_jin_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_jin_00_one_381 = 1.0f;
+f32 fd_jin_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_jin_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_jin_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_jin_00_neg_one_365 = -1.0f;
+f32 fd_jin_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_jin_00___local_PI_366 = 3.1415927f;
+f32 fd_jin_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_jin_00___local_3PIO2_368 = 4.712389f;
+f32 fd_jin_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_jin_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_jin_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_jin_00___local_PIO2_367 = 1.5707964f;
+f32 fd_jin_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_jin_00_one_364 = 1.0f;
+f32 fd_jin_00_one_364 = 1.0f;
 
 static EVT_BEGIN(w_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -388,73 +388,73 @@ static EVT_BEGIN(w_close)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(n3_open)
+EVT_BEGIN(n3_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door03"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(n3_close)
+EVT_BEGIN(n3_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door03"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(s_open)
+static EVT_BEGIN(s_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door07"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(s_close)
+static EVT_BEGIN(s_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door07"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(n2_open)
+static EVT_BEGIN(n2_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(n2_close)
+static EVT_BEGIN(n2_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(e3_open)
+EVT_BEGIN(e3_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door06"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(e3_close)
+EVT_BEGIN(e3_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door06"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(e1_open)
+EVT_BEGIN(e1_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door04"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(e1_close)
+EVT_BEGIN(e1_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door04"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(e2_open)
+EVT_BEGIN(e2_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door05"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(e2_close)
+EVT_BEGIN(e2_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door05"), 0, LW(0), 0)
     RETURN
@@ -494,7 +494,7 @@ EVT_BEGIN(jin_00_dai_in_sub)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(jin_00_dai_in)
+EVT_BEGIN(jin_00_dai_in)
     DEBUG_PUT_MSG(STRING("入る"))
     SPAWN_EVENT(PTR(jin_00_dai_in_sub))
     SET_VALUE(LW(0), 0)
@@ -932,17 +932,17 @@ static EVT_BEGIN(push_evt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(nopush_evt)
+EVT_BEGIN(nopush_evt)
     SET_VALUE(GW(10), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_key)
+static EVT_BEGIN(evt_key)
     SET_VALUE(GSW(0), 198)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 lock_tbl[] = {
+static s32 lock_tbl[] = {
     ITEM_STEEPLE_KEY_0x16, -1,
 };
 
@@ -957,7 +957,7 @@ static EVT_BEGIN(lock_item_check)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_unlock)
+static EVT_BEGIN(evt_unlock)
     SET_VALUE(GSW(0), 199)
     SET_VALUE(LW(0), STRING("n_bero_2"))
     CALL_CHILD(PTR(bero_case_switch_on))
@@ -1135,7 +1135,7 @@ EVT_BEGIN(temae_teresa_init)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(atomic_teresa_init)
+EVT_BEGIN(atomic_teresa_init)
     RETURN
 EVT_END()
 

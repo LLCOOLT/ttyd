@@ -415,16 +415,16 @@ void SoundLoadDVD2Free(void) {
 }
 
 BOOL SoundSLibLoadDVD(const char* path) { // regalloc, stack, otherwise 1:1
-    SoundGroup* temp_r0;
+    SoundGroup* groupsHead;
     u32 length2;
     u32 length3;
     SoundGroup* iter;
     SoundGroup* group;
-    SoundGroup* var_r4;
-    u32 temp_r28;
-    u32* var_r27;
+    SoundGroup* tmp;
+    u32 blockSize;
+    u32* cursor;
     u16 id;
-    void* temp_r0_3;
+    void* val;
     DVDEntry* entry;
     u32 length;
     void* pointer;
@@ -456,14 +456,14 @@ BOOL SoundSLibLoadDVD(const char* path) { // regalloc, stack, otherwise 1:1
             }
         }
     }
-    if ((var_r27 = pointer) == NULL) {
+    if ((cursor = pointer) == NULL) {
         return FALSE;
     }
     sound.slibData[sound.slibId] = pointer;
 
     while (1) {
-        temp_r28 = *var_r27;
-        if (*var_r27 == 0xFFFFFFFF) {
+        blockSize = *cursor;
+        if (*cursor == 0xFFFFFFFF) {
             break;
         }
         group = __memAlloc(HEAP_DEFAULT, 0x10);
@@ -471,9 +471,9 @@ BOOL SoundSLibLoadDVD(const char* path) { // regalloc, stack, otherwise 1:1
             while (1)
                 ;
         }
-        temp_r0 = sound.groups;
+        groupsHead = sound.groups;
         id = 0;
-        if (temp_r0 == NULL) {
+        if (groupsHead == NULL) {
             sound.groups = group;
         } else {
             for (iter = sound.groups;; iter = iter->next) {
@@ -488,9 +488,9 @@ BOOL SoundSLibLoadDVD(const char* path) { // regalloc, stack, otherwise 1:1
         group->unk2 = id;
         group->groupId = 0;
         group->songId = 0;
-        group->arrfile = var_r27 + 8;
+        group->arrfile = cursor + 8;
         group->next = 0;
-        var_r27 = (u32*)((u32)var_r27 + (u32)temp_r28);
+        cursor = (u32*)((u32)cursor + (u32)blockSize);
     }
 
     sprintf(str, "%s/%s%s", getMarioStDvdRoot(), path, ".stbl");

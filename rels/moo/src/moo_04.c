@@ -55,21 +55,21 @@ USER_FUNC(evt_sub_spline_get_value);
 USER_FUNC(evt_sub_spline_init);
 static USER_FUNC(mario_kirimomi);
 
-__declspec(section ".data") f32 fd_moo_04_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_moo_04_neg_one_382;
-__declspec(section ".data") f32 fd_moo_04___local_PI_383;
-__declspec(section ".data") f32 fd_moo_04___local_3PIO2_385;
-__declspec(section ".data") f32 fd_moo_04_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_moo_04___local_PIO2_384;
-__declspec(section ".data") f32 fd_moo_04_one_381;
-__declspec(section ".data") f32 fd_moo_04_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_moo_04_neg_one_365;
-__declspec(section ".data") f32 fd_moo_04___local_PI_366;
-__declspec(section ".data") f32 fd_moo_04___local_3PIO2_368;
-__declspec(section ".data") f32 fd_moo_04_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_moo_04___local_PIO2_367;
-__declspec(section ".data") f32 fd_moo_04_one_364;
-static __declspec(section ".data") f32 spline_dt[9];
+f32 fd_moo_04_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_moo_04_neg_one_382;
+f32 fd_moo_04___local_PI_383;
+f32 fd_moo_04___local_3PIO2_385;
+f32 fd_moo_04_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_moo_04___local_PIO2_384;
+f32 fd_moo_04_one_381;
+f32 fd_moo_04_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_moo_04_neg_one_365;
+f32 fd_moo_04___local_PI_366;
+f32 fd_moo_04___local_3PIO2_368;
+f32 fd_moo_04_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_moo_04___local_PIO2_367;
+f32 fd_moo_04_one_364;
+static f32 spline_dt[9];
 static s32 party_damage_pose[52];
 static s32 mario_fly[168];
 s32 kanbu_fly[198];
@@ -77,35 +77,35 @@ static NpcSetupInfo npcEnt[2];
 static s32 epilogue_evt[64];
 s32 moo_04_init_evt[220];
 
-__declspec(section ".data") f32 fd_moo_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_moo_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_moo_04_neg_one_382 = -1.0f;
+f32 fd_moo_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_moo_04___local_PI_383 = 3.1415927f;
+f32 fd_moo_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_moo_04___local_3PIO2_385 = 4.712389f;
+f32 fd_moo_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_moo_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_moo_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_moo_04___local_PIO2_384 = 1.5707964f;
+f32 fd_moo_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_moo_04_one_381 = 1.0f;
+f32 fd_moo_04_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_moo_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_moo_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_moo_04_neg_one_365 = -1.0f;
+f32 fd_moo_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_moo_04___local_PI_366 = 3.1415927f;
+f32 fd_moo_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_moo_04___local_3PIO2_368 = 4.712389f;
+f32 fd_moo_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_moo_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_moo_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_moo_04___local_PIO2_367 = 1.5707964f;
+f32 fd_moo_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_moo_04_one_364 = 1.0f;
+f32 fd_moo_04_one_364 = 1.0f;
 
-static __declspec(section ".data") f32 spline_dt[] = {
+static f32 spline_dt[] = {
     -12.916925f, 123.84991f, 512.97614f, 17.94919f, 46.050007f, 5.011878f, 65.15421f, 48.400024f,
     -75.32023f,
 };

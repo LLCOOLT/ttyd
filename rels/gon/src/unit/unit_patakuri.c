@@ -27,74 +27,74 @@ USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(btlevtcmd_WaitAttackEnd);
 static USER_FUNC(krb_get_dir);
 
-__declspec(section ".data") f32 fd_patakuri_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_patakuri_neg_one_382;
-__declspec(section ".data") f32 fd_patakuri___local_PI_383;
-__declspec(section ".data") f32 fd_patakuri___local_3PIO2_385;
-__declspec(section ".data") f32 fd_patakuri_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_patakuri___local_PIO2_384;
-__declspec(section ".data") f32 fd_patakuri_one_381;
-__declspec(section ".data") f32 fd_patakuri_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_patakuri_neg_one_365;
-__declspec(section ".data") f32 fd_patakuri___local_PI_366;
-__declspec(section ".data") f32 fd_patakuri___local_3PIO2_368;
-__declspec(section ".data") f32 fd_patakuri_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_patakuri___local_PIO2_367;
-__declspec(section ".data") f32 fd_patakuri_one_364;
+f32 fd_patakuri_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_patakuri_neg_one_382;
+f32 fd_patakuri___local_PI_383;
+f32 fd_patakuri___local_3PIO2_385;
+f32 fd_patakuri_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_patakuri___local_PIO2_384;
+f32 fd_patakuri_one_381;
+f32 fd_patakuri_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_patakuri_neg_one_365;
+f32 fd_patakuri___local_PI_366;
+f32 fd_patakuri___local_3PIO2_368;
+f32 fd_patakuri_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_patakuri___local_PIO2_367;
+f32 fd_patakuri_one_364;
 BattleUnitKind unit_patakuri;
-static __declspec(section ".data") BattleUnitDefense defence_patakuri;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_patakuri_attr;
-static __declspec(section ".data") StatusVulnerability regist_patakuri;
+static BattleUnitDefense defence_patakuri;
+static BattleUnitDefenseAttr defence_patakuri_attr;
+static StatusVulnerability regist_patakuri;
 static BattleWeapon weapon_patakuri_attack;
 static BattleUnitKindPart parts_patakuri[1];
 static PoseTableEntry pose_table_patakuri[19];
-static __declspec(section ".data") BattleDataEntry data_table_patakuri[3];
+static BattleDataEntry data_table_patakuri[3];
 static PoseSoundTiming pose_sound_timing_table[7];
 static s32 init_event_patakuri[26];
 static s32 dmg_fall_event[107];
 static s32 patakuri_dmg_first_attack_pos[19];
 static s32 attack_event_patakuri[391];
-static __declspec(section ".data") s32 wait_event_patakuri[12];
+static s32 wait_event_patakuri[12];
 static PoseTableEntry pose_table[20];
-static __declspec(section ".data") BattleDataEntry data_table[2];
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleDataEntry data_table[2];
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_kuriboo_attack;
 static s32 init_event[42];
-static __declspec(section ".data") s32 damage_event[10];
-static __declspec(section ".data") s32 phase_event[2];
+static s32 damage_event[10];
+static s32 phase_event[2];
 static s32 attack_event[492];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
-__declspec(section ".data") f32 fd_patakuri_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_patakuri_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_patakuri_neg_one_382 = -1.0f;
+f32 fd_patakuri_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_patakuri___local_PI_383 = 3.1415927f;
+f32 fd_patakuri___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_patakuri___local_3PIO2_385 = 4.712389f;
+f32 fd_patakuri___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_patakuri_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_patakuri_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_patakuri___local_PIO2_384 = 1.5707964f;
+f32 fd_patakuri___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_patakuri_one_381 = 1.0f;
+f32 fd_patakuri_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_patakuri_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_patakuri_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_patakuri_neg_one_365 = -1.0f;
+f32 fd_patakuri_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_patakuri___local_PI_366 = 3.1415927f;
+f32 fd_patakuri___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_patakuri___local_3PIO2_368 = 4.712389f;
+f32 fd_patakuri___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_patakuri_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_patakuri_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_patakuri___local_PIO2_367 = 1.5707964f;
+f32 fd_patakuri___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_patakuri_one_364 = 1.0f;
+f32 fd_patakuri_one_364 = 1.0f;
 
 BattleUnitKind unit_patakuri = {
     2,
@@ -162,11 +162,11 @@ BattleUnitKind unit_patakuri = {
     data_table_patakuri,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence_patakuri = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence_patakuri = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_patakuri_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_patakuri_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist_patakuri = {100, 110, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 110, 100, 100, 100, 100, 150};
+static StatusVulnerability regist_patakuri = {100, 110, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 110, 100, 100, 100, 100, 150};
 
 static BattleWeapon weapon_patakuri_attack = {
     NULL, 0, // name..icon
@@ -230,7 +230,7 @@ static PoseTableEntry pose_table_patakuri[] = {
     {69, "PTK_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table_patakuri[] = {
+static BattleDataEntry data_table_patakuri[] = {
     {14, dmg_fall_event},
     {48, patakuri_dmg_first_attack_pos},
     {0, NULL},
@@ -393,7 +393,7 @@ static EVT_BEGIN(attack_event_patakuri)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_patakuri)
+static EVT_BEGIN(wait_event_patakuri)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     LABEL(0)
     WAIT_FRAMES(30)
@@ -424,16 +424,16 @@ static PoseTableEntry pose_table[] = {
     {69, "KUR_S_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0},
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {0};
+static BattleUnitDefense defence = {0};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {0};
+static BattleUnitDefenseAttr defence_attr = {0};
 
-static __declspec(section ".data") StatusVulnerability regist = {100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 100, 100, 100, 100, 100, 150};
+static StatusVulnerability regist = {100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 100, 100, 100, 100, 100, 150};
 
 static BattleUnitKindPart parts[] = {
     {
@@ -520,14 +520,14 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(phase_event)
+static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
@@ -664,7 +664,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

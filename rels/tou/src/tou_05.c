@@ -102,23 +102,23 @@ USER_FUNC(evt_sub_save_playtime);
 void gans_msg_callback(s32 type, void** work);
 extern s32 evt_pouch_add_coin[];
 
-__declspec(section ".data") f32 fd_tou_05_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_05_neg_one_382;
-__declspec(section ".data") f32 fd_tou_05___local_PI_383;
-__declspec(section ".data") f32 fd_tou_05___local_3PIO2_385;
-__declspec(section ".data") f32 fd_tou_05_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_05___local_PIO2_384;
-__declspec(section ".data") f32 fd_tou_05_one_381;
-__declspec(section ".data") f32 fd_tou_05_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_05_neg_one_365;
-__declspec(section ".data") f32 fd_tou_05___local_PI_366;
-__declspec(section ".data") f32 fd_tou_05___local_3PIO2_368;
-__declspec(section ".data") f32 fd_tou_05_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_05___local_PIO2_367;
-__declspec(section ".data") f32 fd_tou_05_one_364;
+f32 fd_tou_05_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_tou_05_neg_one_382;
+f32 fd_tou_05___local_PI_383;
+f32 fd_tou_05___local_3PIO2_385;
+f32 fd_tou_05_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_tou_05___local_PIO2_384;
+f32 fd_tou_05_one_381;
+f32 fd_tou_05_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_tou_05_neg_one_365;
+f32 fd_tou_05___local_PI_366;
+f32 fd_tou_05___local_3PIO2_368;
+f32 fd_tou_05_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_tou_05___local_PIO2_367;
+f32 fd_tou_05_one_364;
 static s32 evt_dakuto[90];
-static __declspec(section ".data") s32 n_door_open[12];
-static __declspec(section ".data") s32 n_door_close[12];
+static s32 n_door_open[12];
+static s32 n_door_close[12];
 s32 n_bero_match_reset[14];
 static BeroEntry bero_data[3];
 s32 evt_takurami[352];
@@ -138,33 +138,33 @@ s32 evt_nozoki[769];
 s32 evt_sensyu_reentry[293];
 s32 tou_05_init_evt[445];
 
-__declspec(section ".data") f32 fd_tou_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_05_neg_one_382 = -1.0f;
+f32 fd_tou_05_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou_05___local_PI_383 = 3.1415927f;
+f32 fd_tou_05___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou_05___local_3PIO2_385 = 4.712389f;
+f32 fd_tou_05___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou_05___local_PIO2_384 = 1.5707964f;
+f32 fd_tou_05___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_05_one_381 = 1.0f;
+f32 fd_tou_05_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_tou_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_05_neg_one_365 = -1.0f;
+f32 fd_tou_05_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou_05___local_PI_366 = 3.1415927f;
+f32 fd_tou_05___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou_05___local_3PIO2_368 = 4.712389f;
+f32 fd_tou_05___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou_05___local_PIO2_367 = 1.5707964f;
+f32 fd_tou_05___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_05_one_364 = 1.0f;
+f32 fd_tou_05_one_364 = 1.0f;
 
 static EVT_BEGIN(evt_dakuto)
     CALL(evt_mario_normalize)
@@ -196,13 +196,13 @@ static EVT_BEGIN(evt_dakuto)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(n_door_open)
+static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(n_door_close)
+static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN

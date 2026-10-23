@@ -115,37 +115,37 @@ static USER_FUNC(starstone_fall);
 static USER_FUNC(stone_bg);
 static USER_FUNC(npc_set_pos);
 
-__declspec(section ".data") f32 fd_pik_02_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_pik_02_neg_one_382;
-__declspec(section ".data") f32 fd_pik_02___local_PI_383;
-__declspec(section ".data") f32 fd_pik_02___local_3PIO2_385;
-__declspec(section ".data") f32 fd_pik_02_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_pik_02___local_PIO2_384;
-__declspec(section ".data") f32 fd_pik_02_one_381;
-__declspec(section ".data") f32 fd_pik_02_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_pik_02_neg_one_365;
-__declspec(section ".data") f32 fd_pik_02___local_PI_366;
-__declspec(section ".data") f32 fd_pik_02___local_3PIO2_368;
-__declspec(section ".data") f32 fd_pik_02_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_pik_02___local_PIO2_367;
-__declspec(section ".data") f32 fd_pik_02_one_364;
+f32 fd_pik_02_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_pik_02_neg_one_382;
+f32 fd_pik_02___local_PI_383;
+f32 fd_pik_02___local_3PIO2_385;
+f32 fd_pik_02_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_pik_02___local_PIO2_384;
+f32 fd_pik_02_one_381;
+f32 fd_pik_02_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_pik_02_neg_one_365;
+f32 fd_pik_02___local_PI_366;
+f32 fd_pik_02___local_3PIO2_368;
+f32 fd_pik_02_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_pik_02___local_PIO2_367;
+f32 fd_pik_02_one_364;
 s32 haikei_on[24];
 s32 haikei_off[28];
 s32 evt_return_sub[99];
 s32 evt_return[13];
-__declspec(section ".data") s32 evt_go[7];
+s32 evt_go[7];
 static s32 s_door_open[22];
 static s32 s_door_close[22];
 static BeroEntry bero_data[5];
-__declspec(section ".data") s32 out_room[12];
+s32 out_room[12];
 BeroEntry s_bero_peach[1];
 static s32 init_powan[30];
 static s32 talk_powan[53];
 s32 init_majo[17];
 s32 init_mari[17];
 s32 init_ramp[17];
-__declspec(section ".data") s32 patakuri_init[7];
-static __declspec(section ".data") s32 baba_init[7];
+s32 patakuri_init[7];
+static s32 baba_init[7];
 static NpcSetupInfo npc_data[7];
 s32 evt_garnet[562];
 static s32 evt_sw[89];
@@ -159,33 +159,33 @@ s32 pik_02_init_evt[172];
 s32 pik_02_init_evt[166];
 #endif
 
-__declspec(section ".data") f32 fd_pik_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_pik_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_pik_02_neg_one_382 = -1.0f;
+f32 fd_pik_02_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_pik_02___local_PI_383 = 3.1415927f;
+f32 fd_pik_02___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_pik_02___local_3PIO2_385 = 4.712389f;
+f32 fd_pik_02___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_pik_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_pik_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_pik_02___local_PIO2_384 = 1.5707964f;
+f32 fd_pik_02___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_pik_02_one_381 = 1.0f;
+f32 fd_pik_02_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_pik_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_pik_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_pik_02_neg_one_365 = -1.0f;
+f32 fd_pik_02_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_pik_02___local_PI_366 = 3.1415927f;
+f32 fd_pik_02___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_pik_02___local_3PIO2_368 = 4.712389f;
+f32 fd_pik_02___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_pik_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_pik_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_pik_02___local_PIO2_367 = 1.5707964f;
+f32 fd_pik_02___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_pik_02_one_364 = 1.0f;
+f32 fd_pik_02_one_364 = 1.0f;
 
 EVT_BEGIN(haikei_on)
     CALL(evt_hitobj_onoff, STRING("a_E_yuka"), 1, 1)
@@ -249,7 +249,7 @@ EVT_BEGIN(evt_return)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_go)
+EVT_BEGIN(evt_go)
     CALL_CHILD(PTR(haikei_on))
     SET_VALUE(LW(0), 0)
     RETURN
@@ -345,7 +345,7 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
-__declspec(section ".data") EVT_BEGIN(out_room)
+EVT_BEGIN(out_room)
     CALL(evt_snd_bgmoff_f, 512, 2000)
     CALL(evt_snd_envoff_f, 512, 2000)
     CALL(evt_snd_sfx_all_stop)
@@ -432,12 +432,12 @@ EVT_BEGIN(init_ramp)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(patakuri_init)
+EVT_BEGIN(patakuri_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(baba_init)
+static EVT_BEGIN(baba_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()

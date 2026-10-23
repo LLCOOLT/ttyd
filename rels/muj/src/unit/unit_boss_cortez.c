@@ -91,46 +91,46 @@ extern BattleUnitKind unit_boss_cortez_rapier;
 extern BattleUnitKind unit_boss_cortez_saber;
 extern BattleUnitKind unit_boss_cortez_sword;
 
-__declspec(section ".data") f32 fd_boss_cortez_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_cortez_neg_one_382;
-__declspec(section ".data") f32 fd_boss_cortez___local_PI_383;
-__declspec(section ".data") f32 fd_boss_cortez___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_cortez_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_cortez___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_cortez_one_381;
-__declspec(section ".data") f32 fd_boss_cortez_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_cortez_neg_one_365;
-__declspec(section ".data") f32 fd_boss_cortez___local_PI_366;
-__declspec(section ".data") f32 fd_boss_cortez___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_cortez_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_cortez___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_cortez_one_364;
+f32 fd_boss_cortez_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_cortez_neg_one_382;
+f32 fd_boss_cortez___local_PI_383;
+f32 fd_boss_cortez___local_3PIO2_385;
+f32 fd_boss_cortez_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_cortez___local_PIO2_384;
+f32 fd_boss_cortez_one_381;
+f32 fd_boss_cortez_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_cortez_neg_one_365;
+f32 fd_boss_cortez___local_PI_366;
+f32 fd_boss_cortez___local_3PIO2_368;
+f32 fd_boss_cortez_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_cortez___local_PIO2_367;
+f32 fd_boss_cortez_one_364;
 BattleUnitKind unit_boss_cortez;
-static __declspec(section ".data") StatusVulnerability regist;
-__declspec(section ".data") BattleUnitDefense defence_mode1;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode1;
-__declspec(section ".data") BattleUnitDefense defence_mode2_upper_head;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_upper_head;
-__declspec(section ".data") BattleUnitDefense defence_mode2_upper_rib_open;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_upper_rib_open;
-__declspec(section ".data") BattleUnitDefense defence_mode2_upper_rib_close;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_upper_rib_close;
-__declspec(section ".data") BattleUnitDefense defence_mode2_middle_head;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_middle_head;
-__declspec(section ".data") BattleUnitDefense defence_mode2_middle_rib_open;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_middle_rib_open;
-__declspec(section ".data") BattleUnitDefense defence_mode2_middle_rib_close;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_middle_rib_close;
-__declspec(section ".data") BattleUnitDefense defence_mode2_lower_head;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_lower_head;
-__declspec(section ".data") BattleUnitDefense defence_mode2_lower_rib_open;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_lower_rib_open;
-__declspec(section ".data") BattleUnitDefense defence_mode2_lower_rib_close;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_lower_rib_close;
-__declspec(section ".data") BattleUnitDefense defence_mode3;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode3;
-__declspec(section ".data") BattleUnitDefense defence_honeduka;
-__declspec(section ".data") BattleUnitDefenseAttr defence_honeduka_attr;
+static StatusVulnerability regist;
+BattleUnitDefense defence_mode1;
+BattleUnitDefenseAttr defence_attr_mode1;
+BattleUnitDefense defence_mode2_upper_head;
+BattleUnitDefenseAttr defence_attr_mode2_upper_head;
+BattleUnitDefense defence_mode2_upper_rib_open;
+BattleUnitDefenseAttr defence_attr_mode2_upper_rib_open;
+BattleUnitDefense defence_mode2_upper_rib_close;
+BattleUnitDefenseAttr defence_attr_mode2_upper_rib_close;
+BattleUnitDefense defence_mode2_middle_head;
+BattleUnitDefenseAttr defence_attr_mode2_middle_head;
+BattleUnitDefense defence_mode2_middle_rib_open;
+BattleUnitDefenseAttr defence_attr_mode2_middle_rib_open;
+BattleUnitDefense defence_mode2_middle_rib_close;
+BattleUnitDefenseAttr defence_attr_mode2_middle_rib_close;
+BattleUnitDefense defence_mode2_lower_head;
+BattleUnitDefenseAttr defence_attr_mode2_lower_head;
+BattleUnitDefense defence_mode2_lower_rib_open;
+BattleUnitDefenseAttr defence_attr_mode2_lower_rib_open;
+BattleUnitDefense defence_mode2_lower_rib_close;
+BattleUnitDefenseAttr defence_attr_mode2_lower_rib_close;
+BattleUnitDefense defence_mode3;
+BattleUnitDefenseAttr defence_attr_mode3;
+BattleUnitDefense defence_honeduka;
+BattleUnitDefenseAttr defence_honeduka_attr;
 BattleWeapon weapon_cortez_normal_front_attack;
 BattleWeapon weapon_cortez_normal_rear_attack;
 BattleWeapon weapon_cortez_midaregiri_attack;
@@ -141,22 +141,22 @@ BattleWeapon weapon_cortez_mode3_kamitsuki_attack;
 static PoseSoundTiming pose_sound_timing_table[73];
 PoseTableEntry pose_table_mode_1[10];
 PoseTableEntry pose_table_mode_1_hone[10];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_normal[4];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_upper_normal[4];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_upper_normal_counter[4];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_upper_charge[4];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_upper_charge_counter[4];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_middle_normal[4];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_middle_normal_counter[4];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_middle_charge[4];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_middle_charge_counter[4];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_lower_normal[4];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_lower_normal_counter[4];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_lower_charge[4];
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_lower_charge_counter[4];
-__declspec(section ".data") PoseTableEntry pose_table_fly_bone[4];
+PoseTableEntry pose_table_mode_2_normal[4];
+PoseTableEntry pose_table_mode_2_upper_normal[4];
+PoseTableEntry pose_table_mode_2_upper_normal_counter[4];
+PoseTableEntry pose_table_mode_2_upper_charge[4];
+PoseTableEntry pose_table_mode_2_upper_charge_counter[4];
+PoseTableEntry pose_table_mode_2_middle_normal[4];
+PoseTableEntry pose_table_mode_2_middle_normal_counter[4];
+PoseTableEntry pose_table_mode_2_middle_charge[4];
+PoseTableEntry pose_table_mode_2_middle_charge_counter[4];
+PoseTableEntry pose_table_mode_2_lower_normal[4];
+PoseTableEntry pose_table_mode_2_lower_normal_counter[4];
+PoseTableEntry pose_table_mode_2_lower_charge[4];
+PoseTableEntry pose_table_mode_2_lower_charge_counter[4];
+PoseTableEntry pose_table_fly_bone[4];
 PoseTableEntry pose_table_mode_3[12];
-__declspec(section ".data") PoseTableEntry pose_table_honeduka[4];
+PoseTableEntry pose_table_honeduka[4];
 static BattleDataEntry data_table[7];
 static BattleUnitKindPart parts[19];
 static s32 init_event[260];
@@ -175,11 +175,11 @@ static s32 attack_audience_event[247];
 s32 at3_kamitsuki_attack[264];
 s32 at1_normal_attack[205];
 s32 at1_midaregiri_attack[251];
-static __declspec(section ".data") s32 wait_event[6];
-__declspec(section ".data") BattleUnitSetup entry_claw;
-__declspec(section ".data") BattleUnitSetup entry_rapier;
-__declspec(section ".data") BattleUnitSetup entry_sword;
-__declspec(section ".data") BattleUnitSetup entry_saber;
+static s32 wait_event[6];
+BattleUnitSetup entry_claw;
+BattleUnitSetup entry_rapier;
+BattleUnitSetup entry_sword;
+BattleUnitSetup entry_saber;
 s32 cortez_reset_pose_table[450];
 static s32 cortez_damage_sub_event[153];
 static s32 dead_event[1033];
@@ -188,33 +188,33 @@ s32 mode2_rib_close_event[54];
 s32 mode2_honeduka_damage_event[76];
 s32 mode_change_event[111];
 
-__declspec(section ".data") f32 fd_boss_cortez_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_cortez_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_cortez_neg_one_382 = -1.0f;
+f32 fd_boss_cortez_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_cortez___local_PI_383 = 3.1415927f;
+f32 fd_boss_cortez___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_cortez___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_cortez___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_cortez_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_cortez_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_cortez___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_cortez___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_cortez_one_381 = 1.0f;
+f32 fd_boss_cortez_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_cortez_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_cortez_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_cortez_neg_one_365 = -1.0f;
+f32 fd_boss_cortez_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_cortez___local_PI_366 = 3.1415927f;
+f32 fd_boss_cortez___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_cortez___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_cortez___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_cortez_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_cortez_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_cortez___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_cortez___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_cortez_one_364 = 1.0f;
+f32 fd_boss_cortez_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_cortez = {
     93,
@@ -282,55 +282,55 @@ BattleUnitKind unit_boss_cortez = {
     data_table,
 };
 
-static __declspec(section ".data") StatusVulnerability regist = {40, 40, 50, 100, 50, 100, 100, 25, 0, 0, 100, 0, 100, 90, 50, 0, 0, 100, 50, 0, 0, 0};
+static StatusVulnerability regist = {40, 40, 50, 100, 50, 100, 100, 25, 0, 0, 100, 0, 100, 90, 50, 0, 0, 100, 50, 0, 0, 0};
 
-__declspec(section ".data") BattleUnitDefense defence_mode1 = {{1, 1, 1, 1, 1}};
+BattleUnitDefense defence_mode1 = {{1, 1, 1, 1, 1}};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode1 = {{0, 0, 0, 0, 0}};
+BattleUnitDefenseAttr defence_attr_mode1 = {{0, 0, 0, 0, 0}};
 
-__declspec(section ".data") BattleUnitDefense defence_mode2_upper_head = {{1, 1, 1, 1, 1}};
+BattleUnitDefense defence_mode2_upper_head = {{1, 1, 1, 1, 1}};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_upper_head = {0};
+BattleUnitDefenseAttr defence_attr_mode2_upper_head = {0};
 
-__declspec(section ".data") BattleUnitDefense defence_mode2_upper_rib_open = {0};
+BattleUnitDefense defence_mode2_upper_rib_open = {0};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_upper_rib_open = {{1, 1, 1, 1, 1}};
+BattleUnitDefenseAttr defence_attr_mode2_upper_rib_open = {{1, 1, 1, 1, 1}};
 
-__declspec(section ".data") BattleUnitDefense defence_mode2_upper_rib_close = {{3, 3, 3, 3, 3}};
+BattleUnitDefense defence_mode2_upper_rib_close = {{3, 3, 3, 3, 3}};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_upper_rib_close = {{0, 0, 0, 0, 0}};
+BattleUnitDefenseAttr defence_attr_mode2_upper_rib_close = {{0, 0, 0, 0, 0}};
 
-__declspec(section ".data") BattleUnitDefense defence_mode2_middle_head = {{1, 1, 1, 1, 1}};
+BattleUnitDefense defence_mode2_middle_head = {{1, 1, 1, 1, 1}};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_middle_head = {0};
+BattleUnitDefenseAttr defence_attr_mode2_middle_head = {0};
 
-__declspec(section ".data") BattleUnitDefense defence_mode2_middle_rib_open = {0};
+BattleUnitDefense defence_mode2_middle_rib_open = {0};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_middle_rib_open = {{1, 1, 1, 1, 1}};
+BattleUnitDefenseAttr defence_attr_mode2_middle_rib_open = {{1, 1, 1, 1, 1}};
 
-__declspec(section ".data") BattleUnitDefense defence_mode2_middle_rib_close = {{3, 3, 3, 3, 3}};
+BattleUnitDefense defence_mode2_middle_rib_close = {{3, 3, 3, 3, 3}};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_middle_rib_close = {0};
+BattleUnitDefenseAttr defence_attr_mode2_middle_rib_close = {0};
 
-__declspec(section ".data") BattleUnitDefense defence_mode2_lower_head = {{1, 1, 1, 1, 1}};
+BattleUnitDefense defence_mode2_lower_head = {{1, 1, 1, 1, 1}};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_lower_head = {0};
+BattleUnitDefenseAttr defence_attr_mode2_lower_head = {0};
 
-__declspec(section ".data") BattleUnitDefense defence_mode2_lower_rib_open = {0};
+BattleUnitDefense defence_mode2_lower_rib_open = {0};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_lower_rib_open = {{1, 1, 1, 1, 1}};
+BattleUnitDefenseAttr defence_attr_mode2_lower_rib_open = {{1, 1, 1, 1, 1}};
 
-__declspec(section ".data") BattleUnitDefense defence_mode2_lower_rib_close = {{3, 3, 3, 3, 3}};
+BattleUnitDefense defence_mode2_lower_rib_close = {{3, 3, 3, 3, 3}};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode2_lower_rib_close = {0};
+BattleUnitDefenseAttr defence_attr_mode2_lower_rib_close = {0};
 
-__declspec(section ".data") BattleUnitDefense defence_mode3 = {{1, 1, 1, 1, 1}};
+BattleUnitDefense defence_mode3 = {{1, 1, 1, 1, 1}};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_mode3 = {0};
+BattleUnitDefenseAttr defence_attr_mode3 = {0};
 
-__declspec(section ".data") BattleUnitDefense defence_honeduka = {{1, 1, 1, 1, 1}};
+BattleUnitDefense defence_honeduka = {{1, 1, 1, 1, 1}};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_honeduka_attr = {{0, 0, 0, 0, 0}};
+BattleUnitDefenseAttr defence_honeduka_attr = {{0, 0, 0, 0, 0}};
 
 BattleWeapon weapon_cortez_normal_front_attack = {
     NULL, 0, // name..icon
@@ -701,98 +701,98 @@ PoseTableEntry pose_table_mode_1_hone[] = {
     {69, "KRT_S_1"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_normal[] = {
+PoseTableEntry pose_table_mode_2_normal[] = {
     {28, "KRT_1S_1"},
     {31, "KRT_1S_1"},
     {39, "KRT_1D_1"},
     {69, "KRT_1S_1"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_upper_normal[] = {
+PoseTableEntry pose_table_mode_2_upper_normal[] = {
     {28, "KRT_1S_1"},
     {31, "KRT_1S_1"},
     {39, "KRT_1D_1"},
     {69, "KRT_1S_1"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_upper_normal_counter[] = {
+PoseTableEntry pose_table_mode_2_upper_normal_counter[] = {
     {28, "KRT_1S2_1"},
     {31, "KRT_1S2_1"},
     {39, "KRT_1D2_1"},
     {69, "KRT_1S2_1"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_upper_charge[] = {
+PoseTableEntry pose_table_mode_2_upper_charge[] = {
     {28, "KRT_1S_2"},
     {31, "KRT_1S_2"},
     {39, "KRT_1D_2"},
     {69, "KRT_1S_2"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_upper_charge_counter[] = {
+PoseTableEntry pose_table_mode_2_upper_charge_counter[] = {
     {28, "KRT_1S2_2"},
     {31, "KRT_1S2_2"},
     {39, "KRT_1D2_2"},
     {69, "KRT_1S2_2"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_middle_normal[] = {
+PoseTableEntry pose_table_mode_2_middle_normal[] = {
     {28, "KRT_2S_1"},
     {31, "KRT_2S_1"},
     {39, "KRT_2D_1"},
     {69, "KRT_2S_1"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_middle_normal_counter[] = {
+PoseTableEntry pose_table_mode_2_middle_normal_counter[] = {
     {28, "KRT_2S2_1"},
     {31, "KRT_2S2_1"},
     {39, "KRT_2D2_1"},
     {69, "KRT_2S2_1"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_middle_charge[] = {
+PoseTableEntry pose_table_mode_2_middle_charge[] = {
     {28, "KRT_2S_2"},
     {31, "KRT_2S_2"},
     {39, "KRT_2D_2"},
     {69, "KRT_2S_2"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_middle_charge_counter[] = {
+PoseTableEntry pose_table_mode_2_middle_charge_counter[] = {
     {28, "KRT_2S2_2"},
     {31, "KRT_2S2_2"},
     {39, "KRT_2D2_2"},
     {69, "KRT_2S2_2"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_lower_normal[] = {
+PoseTableEntry pose_table_mode_2_lower_normal[] = {
     {28, "KRT_3S_1"},
     {31, "KRT_3S_1"},
     {39, "KRT_3D_2"},
     {69, "KRT_3S_1"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_lower_normal_counter[] = {
+PoseTableEntry pose_table_mode_2_lower_normal_counter[] = {
     {28, "KRT_3S3_1"},
     {31, "KRT_3S3_1"},
     {39, "KRT_3D3_2"},
     {69, "KRT_3S3_1"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_lower_charge[] = {
+PoseTableEntry pose_table_mode_2_lower_charge[] = {
     {28, "KRT_3S_2"},
     {31, "KRT_3S_2"},
     {39, "KRT_3D_2"},
     {69, "KRT_3S_2"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_mode_2_lower_charge_counter[] = {
+PoseTableEntry pose_table_mode_2_lower_charge_counter[] = {
     {28, "KRT_3S3_2"},
     {31, "KRT_3S3_2"},
     {39, "KRT_3D3_2"},
     {69, "KRT_3S3_2"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_fly_bone[] = {
+PoseTableEntry pose_table_fly_bone[] = {
     {28, "KRT_Z_1"},
     {31, "KRT_Z_1"},
     {39, "KRT_Z_1"},
@@ -814,7 +814,7 @@ PoseTableEntry pose_table_mode_3[] = {
     {69, "KRT_S_1"},
 };
 
-__declspec(section ".data") PoseTableEntry pose_table_honeduka[] = {
+PoseTableEntry pose_table_honeduka[] = {
     {28, "KRT_Z_1"},
     {31, "KRT_Z_1"},
     {39, "KRT_Z_1"},
@@ -1765,12 +1765,12 @@ EVT_BEGIN(at1_midaregiri_attack)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") BattleUnitSetup entry_claw = {
+BattleUnitSetup entry_claw = {
     &unit_boss_cortez_claw, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -1781,7 +1781,7 @@ __declspec(section ".data") BattleUnitSetup entry_claw = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_rapier = {
+BattleUnitSetup entry_rapier = {
     &unit_boss_cortez_rapier, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -1792,7 +1792,7 @@ __declspec(section ".data") BattleUnitSetup entry_rapier = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_sword = {
+BattleUnitSetup entry_sword = {
     &unit_boss_cortez_sword, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -1803,7 +1803,7 @@ __declspec(section ".data") BattleUnitSetup entry_sword = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") BattleUnitSetup entry_saber = {
+BattleUnitSetup entry_saber = {
     &unit_boss_cortez_saber, // mUnitKindParams
     1, // alliance
     {0}, // pad_05

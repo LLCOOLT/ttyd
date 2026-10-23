@@ -24,65 +24,65 @@ USER_FUNC(btlevtcmd_SetRunSound);
 USER_FUNC(btlevtcmd_SetWalkSound);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 
-__declspec(section ".data") f32 fd_sinnosuke_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_sinnosuke_neg_one_382;
-__declspec(section ".data") f32 fd_sinnosuke___local_PI_383;
-__declspec(section ".data") f32 fd_sinnosuke___local_3PIO2_385;
-__declspec(section ".data") f32 fd_sinnosuke_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_sinnosuke___local_PIO2_384;
-__declspec(section ".data") f32 fd_sinnosuke_one_381;
-__declspec(section ".data") f32 fd_sinnosuke_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_sinnosuke_neg_one_365;
-__declspec(section ".data") f32 fd_sinnosuke___local_PI_366;
-__declspec(section ".data") f32 fd_sinnosuke___local_3PIO2_368;
-__declspec(section ".data") f32 fd_sinnosuke_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_sinnosuke___local_PIO2_367;
-__declspec(section ".data") f32 fd_sinnosuke_one_364;
+f32 fd_sinnosuke_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_sinnosuke_neg_one_382;
+f32 fd_sinnosuke___local_PI_383;
+f32 fd_sinnosuke___local_3PIO2_385;
+f32 fd_sinnosuke_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_sinnosuke___local_PIO2_384;
+f32 fd_sinnosuke_one_381;
+f32 fd_sinnosuke_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_sinnosuke_neg_one_365;
+f32 fd_sinnosuke___local_PI_366;
+f32 fd_sinnosuke___local_3PIO2_368;
+f32 fd_sinnosuke_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_sinnosuke___local_PIO2_367;
+f32 fd_sinnosuke_one_364;
 BattleUnitKind unit_sinnosuke;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") BattleUnitDefense defence_turn;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static BattleUnitDefense defence_turn;
+static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_sinnosuke_attack;
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_turn[15];
-static __declspec(section ".data") BattleDataEntry data_table[3];
+static BattleDataEntry data_table[3];
 static s32 init_event[42];
 static s32 damage_event[58];
 static s32 damage_event_sub[51];
 static s32 dmg_turn_event[91];
 static s32 wakeup_event[99];
 static s32 attack_event[454];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
-__declspec(section ".data") f32 fd_sinnosuke_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_sinnosuke_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_sinnosuke_neg_one_382 = -1.0f;
+f32 fd_sinnosuke_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_sinnosuke___local_PI_383 = 3.1415927f;
+f32 fd_sinnosuke___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_sinnosuke___local_3PIO2_385 = 4.712389f;
+f32 fd_sinnosuke___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_sinnosuke_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_sinnosuke_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_sinnosuke___local_PIO2_384 = 1.5707964f;
+f32 fd_sinnosuke___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_sinnosuke_one_381 = 1.0f;
+f32 fd_sinnosuke_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_sinnosuke_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_sinnosuke_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_sinnosuke_neg_one_365 = -1.0f;
+f32 fd_sinnosuke_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_sinnosuke___local_PI_366 = 3.1415927f;
+f32 fd_sinnosuke___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_sinnosuke___local_3PIO2_368 = 4.712389f;
+f32 fd_sinnosuke___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_sinnosuke_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_sinnosuke_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_sinnosuke___local_PIO2_367 = 1.5707964f;
+f32 fd_sinnosuke___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_sinnosuke_one_364 = 1.0f;
+f32 fd_sinnosuke_one_364 = 1.0f;
 
 BattleUnitKind unit_sinnosuke = {
     18,
@@ -150,13 +150,13 @@ BattleUnitKind unit_sinnosuke = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{2, 99, 2, 2, 2}};
+static BattleUnitDefense defence = {{2, 99, 2, 2, 2}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefense defence_turn = {0};
+static BattleUnitDefense defence_turn = {0};
 
-static __declspec(section ".data") StatusVulnerability regist = {50, 100, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 100, 70, 50, 40, 100, 70, 100, 100, 95};
+static StatusVulnerability regist = {50, 100, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 100, 70, 50, 40, 100, 70, 100, 100, 95};
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_sinnosuke", "c_sinnosuke", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2009, 0, pose_table},
@@ -237,7 +237,7 @@ static PoseTableEntry pose_table_turn[] = {
     {69, "SIS_D_2"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
@@ -460,7 +460,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

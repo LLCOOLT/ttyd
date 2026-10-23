@@ -5160,8 +5160,8 @@ s32 searchPSSFXList(const char* name) {
 }
 
 void psndInit(void) { //1:1
-    PaperSoundEnv* temp_r6;
-    PaperSoundEffect* var_r6;
+    PaperSoundEnv* env;
+    PaperSoundEffect* sfx;
     int i;
 
     SoundInit();
@@ -5170,14 +5170,14 @@ void psndInit(void) { //1:1
         psbgm[i].fade.state = 0;
     }
     for (i = 0; i < 40; i++) {
-        var_r6 = &pssfx[i];
-        var_r6->listId = -1;
-        var_r6->channel = -1;
-        var_r6->flags = 0;
+        sfx = &pssfx[i];
+        sfx->listId = -1;
+        sfx->channel = -1;
+        sfx->flags = 0;
     }
     for (i = 0; i < 16; i++) {
-        temp_r6 = &psenv[i];
-        temp_r6->unk4 = 0;
+        env = &psenv[i];
+        env->unk4 = 0;
     }
     psnd.envId[0] = 0;
     psnd.fade[0].state = 0;

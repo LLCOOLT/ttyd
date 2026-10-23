@@ -50,43 +50,43 @@ USER_FUNC(_btlgon_get_escape_param);
 USER_FUNC(_set_gonbaba_light);
 USER_FUNC(_wait_damage_event_end);
 
-__declspec(section ".data") f32 fd_boss_gonbaba_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_gonbaba_neg_one_382;
-__declspec(section ".data") f32 fd_boss_gonbaba___local_PI_383;
-__declspec(section ".data") f32 fd_boss_gonbaba___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_gonbaba_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_gonbaba___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_gonbaba_one_381;
-__declspec(section ".data") f32 fd_boss_gonbaba_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_gonbaba_neg_one_365;
-__declspec(section ".data") f32 fd_boss_gonbaba___local_PI_366;
-__declspec(section ".data") f32 fd_boss_gonbaba___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_gonbaba_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_gonbaba___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_gonbaba_one_364;
+f32 fd_boss_gonbaba_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_gonbaba_neg_one_382;
+f32 fd_boss_gonbaba___local_PI_383;
+f32 fd_boss_gonbaba___local_3PIO2_385;
+f32 fd_boss_gonbaba_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_gonbaba___local_PIO2_384;
+f32 fd_boss_gonbaba_one_381;
+f32 fd_boss_gonbaba_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_gonbaba_neg_one_365;
+f32 fd_boss_gonbaba___local_PI_366;
+f32 fd_boss_gonbaba___local_3PIO2_368;
+f32 fd_boss_gonbaba_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_gonbaba___local_PIO2_367;
+f32 fd_boss_gonbaba_one_364;
 BattleWeapon weapon_gonbaba_fumituke_attack;
 BattleWeapon weapon_gonbaba_firebreath_attack;
 BattleWeapon weapon_gonbaba_kamituki_attack;
 BattleUnitKind unit_boss_gonbaba;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[9];
 static PoseTableEntry pose_table_weak[9];
-static __declspec(section ".data") BattleDataEntry data_table[3];
+static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[3];
 static s32 battle_entry_event[375];
 s32 negotiation_event[1786];
 s32 gon_extra_eaten_event[389];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 s32 gonbaba_damage_sub_event[574];
 static s32 dead_event[283];
 static s32 init_event[160];
-static __declspec(section ".data") s32 phase_event[2];
+static s32 phase_event[2];
 static s32 attack_event[56];
 static s32 fumituke_attack_event[386];
 s32 firebreath_attack_event[261];
-static __declspec(section ".data") s32 wait_event[6];
+static s32 wait_event[6];
 
 s32 weaponGetPower_Gonbaba(BattleUnit* unit, s32* weapon) {
     s32 power = weapon[8];
@@ -110,33 +110,33 @@ static USER_FUNC(_leg_smoke_effect) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_boss_gonbaba_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_gonbaba_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_gonbaba_neg_one_382 = -1.0f;
+f32 fd_boss_gonbaba_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_gonbaba___local_PI_383 = 3.1415927f;
+f32 fd_boss_gonbaba___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_gonbaba___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_gonbaba___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_gonbaba_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_gonbaba_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_gonbaba___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_gonbaba___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_gonbaba_one_381 = 1.0f;
+f32 fd_boss_gonbaba_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_gonbaba_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_gonbaba_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_gonbaba_neg_one_365 = -1.0f;
+f32 fd_boss_gonbaba_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_gonbaba___local_PI_366 = 3.1415927f;
+f32 fd_boss_gonbaba___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_gonbaba___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_gonbaba___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_gonbaba_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_gonbaba_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_gonbaba___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_gonbaba___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_gonbaba_one_364 = 1.0f;
+f32 fd_boss_gonbaba_one_364 = 1.0f;
 
 BattleWeapon weapon_gonbaba_fumituke_attack = {
     NULL, 0, // name..icon
@@ -323,11 +323,11 @@ BattleUnitKind unit_boss_gonbaba = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
+static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {20, 0, 50, 0, 50, 10, 100, 0, 0, 0, 50, 0, 100, 0, 100, 0, 0, 100, 0, 0, 0, 0};
+static StatusVulnerability regist = {20, 0, 50, 0, 50, 10, 100, 0, 0, 0, 50, 0, 100, 0, 100, 0, 0, 100, 0, 0, 0, 0};
 
 static PoseTableEntry pose_table[] = {
     {1, "GNB_N_1"},
@@ -353,7 +353,7 @@ static PoseTableEntry pose_table_weak[] = {
     {69, "GNB_S_4"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {9, gonbaba_damage_sub_event},
     {49, dead_event},
     {0, NULL},
@@ -1089,7 +1089,7 @@ USER_FUNC(_wait_damage_event_end) {
     return EVT_RETURN_DONE;
 }
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -1379,7 +1379,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(phase_event)
+static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
@@ -1605,7 +1605,7 @@ EVT_BEGIN(firebreath_attack_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

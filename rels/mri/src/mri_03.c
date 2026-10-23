@@ -141,20 +141,20 @@ static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
 void puniModeEventparent(PuniData* puni);
 
-__declspec(section ".data") f32 fd_mri_03_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_03_neg_one_382;
-__declspec(section ".data") f32 fd_mri_03___local_PI_383;
-__declspec(section ".data") f32 fd_mri_03___local_3PIO2_385;
-__declspec(section ".data") f32 fd_mri_03_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_03___local_PIO2_384;
-__declspec(section ".data") f32 fd_mri_03_one_381;
-__declspec(section ".data") f32 fd_mri_03_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_03_neg_one_365;
-__declspec(section ".data") f32 fd_mri_03___local_PI_366;
-__declspec(section ".data") f32 fd_mri_03___local_3PIO2_368;
-__declspec(section ".data") f32 fd_mri_03_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_03___local_PIO2_367;
-__declspec(section ".data") f32 fd_mri_03_one_364;
+f32 fd_mri_03_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_mri_03_neg_one_382;
+f32 fd_mri_03___local_PI_383;
+f32 fd_mri_03___local_3PIO2_385;
+f32 fd_mri_03_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_mri_03___local_PIO2_384;
+f32 fd_mri_03_one_381;
+f32 fd_mri_03_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_mri_03_neg_one_365;
+f32 fd_mri_03___local_PI_366;
+f32 fd_mri_03___local_3PIO2_368;
+f32 fd_mri_03_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_mri_03___local_PIO2_367;
+f32 fd_mri_03_one_364;
 s32 jail_alpha_mario_check[24];
 s32 jail_alpha[220];
 s32 after_2hours[73];
@@ -165,9 +165,9 @@ static s32 elder_init[13];
 static s32 elder_talk[13];
 static s32 sister_init[13];
 s32 sister_regl[21];
-static __declspec(section ".data") s32 sister_talk[8];
+static s32 sister_talk[8];
 static s32 guide_init[16];
-static __declspec(section ".data") s32 guide_talk[8];
+static s32 guide_talk[8];
 s32 puni_3_init[17];
 s32 puni_3_talk[20];
 static NpcSetupInfo npcEnt[5];
@@ -177,9 +177,9 @@ static s16 puni_rand_position[178];
 s32 jail_init_00[52];
 s32 red_jail_open[63];
 s32 evt_opendoor00[19];
-static __declspec(section ".data") s32 evt_unlock00[6];
-__declspec(section ".data") s32 evt_unlock00_01[4];
-__declspec(section ".data") s32 key_table00[2];
+static s32 evt_unlock00[6];
+s32 evt_unlock00_01[4];
+s32 key_table00[2];
 s32 evt_check00[23];
 #ifdef VERSION_G8ME01
 s32 blue_jail_open[60];
@@ -188,11 +188,11 @@ s32 blue_jail_open[65];
 #endif
 s32 evt_opendoor01[19];
 #ifdef VERSION_G8ME01
-static __declspec(section ".data") s32 evt_unlock01[9];
+static s32 evt_unlock01[9];
 #else
-static __declspec(section ".data") s32 evt_unlock01[8];
+static s32 evt_unlock01[8];
 #endif
-__declspec(section ".data") s32 key_table01[3];
+s32 key_table01[3];
 s32 evt_check01[90];
 s32 bluejail_alpha[119];
 s32 bluejail_event[249];
@@ -235,33 +235,33 @@ static USER_FUNC(alpha_set_func) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_mri_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_03_neg_one_382 = -1.0f;
+f32 fd_mri_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_03___local_PI_383 = 3.1415927f;
+f32 fd_mri_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_03___local_3PIO2_385 = 4.712389f;
+f32 fd_mri_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_03___local_PIO2_384 = 1.5707964f;
+f32 fd_mri_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_03_one_381 = 1.0f;
+f32 fd_mri_03_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_mri_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_03_neg_one_365 = -1.0f;
+f32 fd_mri_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_03___local_PI_366 = 3.1415927f;
+f32 fd_mri_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_03___local_3PIO2_368 = 4.712389f;
+f32 fd_mri_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_03___local_PIO2_367 = 1.5707964f;
+f32 fd_mri_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_03_one_364 = 1.0f;
+f32 fd_mri_03_one_364 = 1.0f;
 
 EVT_BEGIN(jail_alpha_mario_check)
     LOOP(0)
@@ -609,7 +609,7 @@ EVT_BEGIN(sister_regl)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(sister_talk)
+static EVT_BEGIN(sister_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e14_14"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -622,7 +622,7 @@ static EVT_BEGIN(guide_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(guide_talk)
+static EVT_BEGIN(guide_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e19_04_02"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -827,18 +827,18 @@ EVT_BEGIN(evt_opendoor00)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_unlock00)
+static EVT_BEGIN(evt_unlock00)
     CALL_CHILD(PTR(red_jail_open))
     SPAWN_EVENT(PTR(elder_rescue))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_unlock00_01)
+EVT_BEGIN(evt_unlock00_01)
     SPAWN_EVENT(PTR(red_jail_open))
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 key_table00[] = {
+s32 key_table00[] = {
     ITEM_RED_KEY, -1,
 };
 
@@ -890,7 +890,7 @@ EVT_BEGIN(evt_opendoor01)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_unlock01)
+static EVT_BEGIN(evt_unlock01)
 #ifdef VERSION_G8ME01
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -901,7 +901,7 @@ static __declspec(section ".data") EVT_BEGIN(evt_unlock01)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 key_table01[] = {
+s32 key_table01[] = {
     ITEM_RED_KEY, ITEM_BLUE_KEY, -1,
 };
 

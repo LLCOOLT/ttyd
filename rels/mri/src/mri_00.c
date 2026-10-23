@@ -144,20 +144,20 @@ static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
 extern s32 envSetYami[];
 
-__declspec(section ".data") f32 fd_mri_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_00_neg_one_382;
-__declspec(section ".data") f32 fd_mri_00___local_PI_383;
-__declspec(section ".data") f32 fd_mri_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_mri_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_mri_00_one_381;
-__declspec(section ".data") f32 fd_mri_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_00_neg_one_365;
-__declspec(section ".data") f32 fd_mri_00___local_PI_366;
-__declspec(section ".data") f32 fd_mri_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_mri_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_mri_00_one_364;
+f32 fd_mri_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_mri_00_neg_one_382;
+f32 fd_mri_00___local_PI_383;
+f32 fd_mri_00___local_3PIO2_385;
+f32 fd_mri_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_mri_00___local_PIO2_384;
+f32 fd_mri_00_one_381;
+f32 fd_mri_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_mri_00_neg_one_365;
+f32 fd_mri_00___local_PI_366;
+f32 fd_mri_00___local_3PIO2_368;
+f32 fd_mri_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_mri_00___local_PIO2_367;
+f32 fd_mri_00_one_364;
 static s16 puni_rand_position[196];
 s32 mario_see_you_init[54];
 static f32 spline_dt[24];
@@ -166,13 +166,13 @@ s32 seal_bigtree2[143];
 static s32 guide_init[72];
 static s32 guide_talk[29];
 static s32 rival_init[21];
-static __declspec(section ".data") s32 rival_talk[8];
+static s32 rival_talk[8];
 static s32 chibitoge_init[25];
 static s32 chibitoge_talk[60];
 static s32 sister_init[21];
-static __declspec(section ".data") s32 sister_talk[8];
+static s32 sister_talk[8];
 static s32 elder_init[21];
-static __declspec(section ".data") s32 elder_talk[8];
+static s32 elder_talk[8];
 static s32 fabio_init[20];
 static s32 fabio_talk[20];
 static s32 odoriko_1_talk[20];
@@ -182,17 +182,17 @@ static s32 odoriko_2_init[33];
 static s32 odoriko_3_talk[20];
 static s32 odoriko_3_init[33];
 static NpcSetupInfo npcEnt[7];
-static __declspec(section ".data") s32 bero_01_doa_close[7];
-static __declspec(section ".data") s32 bero_01_doa_open[7];
+static s32 bero_01_doa_close[7];
+static s32 bero_01_doa_open[7];
 static s32 first_time_w_bero[18];
 s32 out_ne_bero[44];
-static __declspec(section ".data") s32 out_w_bero[12];
+static s32 out_w_bero[12];
 s32 out_dokan_1[30];
 BeroEntry bero_lostitem[1];
 static BeroEntry bero_entry_data[4];
 s32 first_bigtree[99];
-static __declspec(section ".data") const char* capturemap[4];
-static __declspec(section ".data") s32 evt_cloud_main_evt[4];
+static const char* capturemap[4];
+static s32 evt_cloud_main_evt[4];
 f32 guide_move_data[15];
 s32 open_bigtree[446];
 s32 mario_see_you[210];
@@ -265,33 +265,33 @@ static void _mapclsofs_all(CloudWork* wp) {
     }
 }
 
-__declspec(section ".data") f32 fd_mri_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_00_neg_one_382 = -1.0f;
+f32 fd_mri_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_00___local_PI_383 = 3.1415927f;
+f32 fd_mri_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_00___local_3PIO2_385 = 4.712389f;
+f32 fd_mri_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_00___local_PIO2_384 = 1.5707964f;
+f32 fd_mri_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_00_one_381 = 1.0f;
+f32 fd_mri_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_mri_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_00_neg_one_365 = -1.0f;
+f32 fd_mri_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_00___local_PI_366 = 3.1415927f;
+f32 fd_mri_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_00___local_3PIO2_368 = 4.712389f;
+f32 fd_mri_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_00___local_PIO2_367 = 1.5707964f;
+f32 fd_mri_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_00_one_364 = 1.0f;
+f32 fd_mri_00_one_364 = 1.0f;
 
 static s16 puni_rand_position[] = {
     83, 10, 33, 31, 176, 118, -98, 49,
@@ -492,7 +492,7 @@ static EVT_BEGIN(rival_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(rival_talk)
+static EVT_BEGIN(rival_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e26_00_09"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -537,7 +537,7 @@ static EVT_BEGIN(sister_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(sister_talk)
+static EVT_BEGIN(sister_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e26_00_08"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -553,7 +553,7 @@ static EVT_BEGIN(elder_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(elder_talk)
+static EVT_BEGIN(elder_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e26_00_10"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -708,13 +708,13 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-static __declspec(section ".data") EVT_BEGIN(bero_01_doa_close)
+static EVT_BEGIN(bero_01_doa_close)
     SET_VALUE(LW(10), STRING("S_doa"))
     SPAWN_EVENT(PTR(evt_mri_door_naname_close))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(bero_01_doa_open)
+static EVT_BEGIN(bero_01_doa_open)
     SET_VALUE(LW(10), STRING("S_doa"))
     SPAWN_EVENT(PTR(evt_mri_door_naname_open))
     RETURN
@@ -747,7 +747,7 @@ EVT_BEGIN(out_ne_bero)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(out_w_bero)
+static EVT_BEGIN(out_w_bero)
     CALL(evt_fade_set_mapchange_type, 1, 2, 500, 1, 500)
     SET_VALUE(LW(0), 0)
     RETURN
@@ -871,7 +871,7 @@ EVT_BEGIN(first_bigtree)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* capturemap[] = {
+static const char* capturemap[] = {
     "S_non",
     "S_ha_10_07",
     "S_kesu",
@@ -1080,7 +1080,7 @@ USER_FUNC(evt_mri_cloud_ent) {
     return EVT_RETURN_DONE;
 }
 
-static __declspec(section ".data") EVT_BEGIN(evt_cloud_main_evt)
+static EVT_BEGIN(evt_cloud_main_evt)
     CALL(evt_cloud_main)
     RETURN
 EVT_END()

@@ -94,28 +94,28 @@ USER_FUNC(evt_target_flag_onoff);
 USER_FUNC(evt_target_set_position);
 static USER_FUNC(set_depthPlaneOffset);
 
-__declspec(section ".data") f32 fd_mri_17_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_17_neg_one_382;
-__declspec(section ".data") f32 fd_mri_17___local_PI_383;
-__declspec(section ".data") f32 fd_mri_17___local_3PIO2_385;
-__declspec(section ".data") f32 fd_mri_17_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_17___local_PIO2_384;
-__declspec(section ".data") f32 fd_mri_17_one_381;
-__declspec(section ".data") f32 fd_mri_17_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_17_neg_one_365;
-__declspec(section ".data") f32 fd_mri_17___local_PI_366;
-__declspec(section ".data") f32 fd_mri_17___local_3PIO2_368;
-__declspec(section ".data") f32 fd_mri_17_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_mri_17___local_PIO2_367;
-__declspec(section ".data") f32 fd_mri_17_one_364;
+f32 fd_mri_17_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_mri_17_neg_one_382;
+f32 fd_mri_17___local_PI_383;
+f32 fd_mri_17___local_3PIO2_385;
+f32 fd_mri_17_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_mri_17___local_PIO2_384;
+f32 fd_mri_17_one_381;
+f32 fd_mri_17_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_mri_17_neg_one_365;
+f32 fd_mri_17___local_PI_366;
+f32 fd_mri_17___local_3PIO2_368;
+f32 fd_mri_17_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_mri_17___local_PIO2_367;
+f32 fd_mri_17_one_364;
 s32 bero_02_into_event[14];
 static BeroEntry bero_entry_data[4];
-static __declspec(section ".data") s32 guide_init[2];
-static __declspec(section ".data") s32 guide_talk[8];
-static __declspec(section ".data") s32 sister_init[2];
-static __declspec(section ".data") s32 sister_talk[8];
-static __declspec(section ".data") s32 rival_init[2];
-static __declspec(section ".data") s32 rival_talk[8];
+static s32 guide_init[2];
+static s32 guide_talk[8];
+static s32 sister_init[2];
+static s32 sister_talk[8];
+static s32 rival_init[2];
+static s32 rival_talk[8];
 static NpcSetupInfo npcEnt[4];
 static KusaAccess ueki_access_data[4];
 s16 trap_position[204];
@@ -127,39 +127,39 @@ s32 trap_event[716];
 s32 trap_check[185];
 static s32 punipuni_ball00_init[34];
 static s32 punipuni_ball00[45];
-static __declspec(section ".data") s32 breakyuka_init[11];
+static s32 breakyuka_init[11];
 static s32 breakyuka_main[131];
 s32 strange_statue[56];
 s32 switch_event[41];
 s32 mri_17_init_evt[208];
 
-__declspec(section ".data") f32 fd_mri_17_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_17_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_17_neg_one_382 = -1.0f;
+f32 fd_mri_17_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_17___local_PI_383 = 3.1415927f;
+f32 fd_mri_17___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_17___local_3PIO2_385 = 4.712389f;
+f32 fd_mri_17___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_17_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_17_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_17___local_PIO2_384 = 1.5707964f;
+f32 fd_mri_17___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_17_one_381 = 1.0f;
+f32 fd_mri_17_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_mri_17_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_mri_17_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_mri_17_neg_one_365 = -1.0f;
+f32 fd_mri_17_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_mri_17___local_PI_366 = 3.1415927f;
+f32 fd_mri_17___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_mri_17___local_3PIO2_368 = 4.712389f;
+f32 fd_mri_17___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_mri_17_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_mri_17_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_mri_17___local_PIO2_367 = 1.5707964f;
+f32 fd_mri_17___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_mri_17_one_364 = 1.0f;
+f32 fd_mri_17_one_364 = 1.0f;
 
 EVT_BEGIN(bero_02_into_event)
     IF_INT_EQUAL(GSWF(2872), 0)
@@ -222,29 +222,29 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-static __declspec(section ".data") EVT_BEGIN(guide_init)
+static EVT_BEGIN(guide_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(guide_talk)
+static EVT_BEGIN(guide_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_06"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(sister_init)
+static EVT_BEGIN(sister_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(sister_talk)
+static EVT_BEGIN(sister_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_07"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(rival_init)
+static EVT_BEGIN(rival_init)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(rival_talk)
+static EVT_BEGIN(rival_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_08"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -727,7 +727,7 @@ static EVT_BEGIN(punipuni_ball00)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(breakyuka_init)
+static EVT_BEGIN(breakyuka_init)
     IF_INT_EQUAL(GSWF(2871), 0)
         CALL(evt_hitobj_onoff, STRING("A_f2_rak_01"), 1, 0)
     END_IF

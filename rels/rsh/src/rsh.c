@@ -80,22 +80,22 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-__declspec(section ".data") f32 fd_rsh_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_neg_one_382;
-__declspec(section ".data") f32 fd_rsh___local_PI_383;
-__declspec(section ".data") f32 fd_rsh___local_3PIO2_385;
-__declspec(section ".data") f32 fd_rsh_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh___local_PIO2_384;
-__declspec(section ".data") f32 fd_rsh_one_381;
-__declspec(section ".data") f32 fd_rsh_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh_neg_one_365;
-__declspec(section ".data") f32 fd_rsh___local_PI_366;
-__declspec(section ".data") f32 fd_rsh___local_3PIO2_368;
-__declspec(section ".data") f32 fd_rsh_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_rsh___local_PIO2_367;
-__declspec(section ".data") f32 fd_rsh_one_364;
-__declspec(section ".data") f64 fd_rsh__three_localstatic4_sqrtf;
-__declspec(section ".data") f64 fd_rsh__half_localstatic3_sqrtf;
+f32 fd_rsh_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_rsh_neg_one_382;
+f32 fd_rsh___local_PI_383;
+f32 fd_rsh___local_3PIO2_385;
+f32 fd_rsh_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_rsh___local_PIO2_384;
+f32 fd_rsh_one_381;
+f32 fd_rsh_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_rsh_neg_one_365;
+f32 fd_rsh___local_PI_366;
+f32 fd_rsh___local_3PIO2_368;
+f32 fd_rsh_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_rsh___local_PIO2_367;
+f32 fd_rsh_one_364;
+f64 fd_rsh__three_localstatic4_sqrtf;
+f64 fd_rsh__half_localstatic3_sqrtf;
 s32 simi_check[57];
 s32 simi_offscreen_check[41];
 s32 kami_check[85];
@@ -106,63 +106,63 @@ s32 evt_rsh_door_open[548];
 s32 evt_rsh_door_close[404];
 s32 evt_rsh_window[30];
 RshRndNpc rsh_01_rnd_npc_1[5];
-__declspec(section ".data") RshRndNpc rsh_01_rnd_npc_2[3];
-__declspec(section ".data") RshRndNpc rsh_01_rnd_npc_3[2];
+RshRndNpc rsh_01_rnd_npc_2[3];
+RshRndNpc rsh_01_rnd_npc_3[2];
 RshRndNpc rsh_03_rnd_npc_1[13];
 RshRndNpc rsh_03_rnd_npc_2[7];
-__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_1[2];
-__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_2[2];
-__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_3[2];
-__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_4[4];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_2_1_talk[8];
+RshRndNpc rsh_04_rnd_npc_1[2];
+RshRndNpc rsh_04_rnd_npc_2[2];
+RshRndNpc rsh_04_rnd_npc_3[2];
+RshRndNpc rsh_04_rnd_npc_4[4];
+s32 evt_rsh_rnd_npc_2_1_talk[8];
 s32 evt_rsh_rnd_npc_2_2_talk[16];
 s32 evt_rsh_rnd_npc_2_3_talk[16];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_2_4_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_2_5_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_2_6_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_2_7_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_2_8_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_2_9_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_2_10_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_3_1_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_3_2_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_3_3_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_3_4_talk[8];
+s32 evt_rsh_rnd_npc_2_4_talk[8];
+s32 evt_rsh_rnd_npc_2_5_talk[8];
+s32 evt_rsh_rnd_npc_2_6_talk[8];
+s32 evt_rsh_rnd_npc_2_7_talk[8];
+s32 evt_rsh_rnd_npc_2_8_talk[8];
+s32 evt_rsh_rnd_npc_2_9_talk[8];
+s32 evt_rsh_rnd_npc_2_10_talk[8];
+s32 evt_rsh_rnd_npc_3_1_talk[8];
+s32 evt_rsh_rnd_npc_3_2_talk[8];
+s32 evt_rsh_rnd_npc_3_3_talk[8];
+s32 evt_rsh_rnd_npc_3_4_talk[8];
 s32 evt_rsh_rnd_npc_3_5_talk[25];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_3_6_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_3_7_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_3_8_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_3_9_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_3_10_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_4_1_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_4_2_talk[8];
+s32 evt_rsh_rnd_npc_3_6_talk[8];
+s32 evt_rsh_rnd_npc_3_7_talk[8];
+s32 evt_rsh_rnd_npc_3_8_talk[8];
+s32 evt_rsh_rnd_npc_3_9_talk[8];
+s32 evt_rsh_rnd_npc_3_10_talk[8];
+s32 evt_rsh_rnd_npc_4_1_talk[8];
+s32 evt_rsh_rnd_npc_4_2_talk[8];
 s32 evt_rsh_rnd_npc_4_3_talk[16];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_4_4_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_4_5_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_4_6_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_4_7_talk[8];
+s32 evt_rsh_rnd_npc_4_4_talk[8];
+s32 evt_rsh_rnd_npc_4_5_talk[8];
+s32 evt_rsh_rnd_npc_4_6_talk[8];
+s32 evt_rsh_rnd_npc_4_7_talk[8];
 s32 evt_rsh_rnd_npc_4_8_talk[39];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_4_9_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_4_10_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_5_1_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_5_2_talk[8];
+s32 evt_rsh_rnd_npc_4_9_talk[8];
+s32 evt_rsh_rnd_npc_4_10_talk[8];
+s32 evt_rsh_rnd_npc_5_1_talk[8];
+s32 evt_rsh_rnd_npc_5_2_talk[8];
 s32 evt_rsh_rnd_npc_5_3_talk[47];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_5_4_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_5_5_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_5_6_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_5_7_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_5_8_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_5_9_talk[8];
-__declspec(section ".data") s32 evt_rsh_rnd_npc_5_10_talk[8];
-__declspec(section ".data") const char* rsh_01_rnd_npc_1_list[5];
-__declspec(section ".data") const char* rsh_01_rnd_npc_2_list[3];
-__declspec(section ".data") const char* rsh_01_rnd_npc_3_list[2];
+s32 evt_rsh_rnd_npc_5_4_talk[8];
+s32 evt_rsh_rnd_npc_5_5_talk[8];
+s32 evt_rsh_rnd_npc_5_6_talk[8];
+s32 evt_rsh_rnd_npc_5_7_talk[8];
+s32 evt_rsh_rnd_npc_5_8_talk[8];
+s32 evt_rsh_rnd_npc_5_9_talk[8];
+s32 evt_rsh_rnd_npc_5_10_talk[8];
+const char* rsh_01_rnd_npc_1_list[5];
+const char* rsh_01_rnd_npc_2_list[3];
+const char* rsh_01_rnd_npc_3_list[2];
 const char* rsh_03_rnd_npc_1_list[13];
-__declspec(section ".data") const char* rsh_03_rnd_npc_2_list[7];
-__declspec(section ".data") const char* rsh_04_rnd_npc_1_list[2];
-__declspec(section ".data") const char* rsh_04_rnd_npc_2_list[2];
-__declspec(section ".data") const char* rsh_04_rnd_npc_3_list[2];
-__declspec(section ".data") const char* rsh_04_rnd_npc_4_list[4];
+const char* rsh_03_rnd_npc_2_list[7];
+const char* rsh_04_rnd_npc_1_list[2];
+const char* rsh_04_rnd_npc_2_list[2];
+const char* rsh_04_rnd_npc_3_list[2];
+const char* rsh_04_rnd_npc_4_list[4];
 s32 debug_print_rnd_npc[61];
 s32 evt_rsh_rnd_npc_init[94];
 s32 evt_rsh_01_rnd_npc_entry[137];
@@ -171,37 +171,37 @@ s32 evt_rsh_03_rnd_npc_entry[95];
 NpcSetupInfo rsh_04_rnd_npc_3_ent[2];
 s32 evt_rsh_04_rnd_npc_entry[185];
 
-__declspec(section ".data") f32 fd_rsh_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_neg_one_382 = -1.0f;
+f32 fd_rsh_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh___local_PI_383 = 3.1415927f;
+f32 fd_rsh___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh___local_3PIO2_385 = 4.712389f;
+f32 fd_rsh___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh___local_PIO2_384 = 1.5707964f;
+f32 fd_rsh___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_one_381 = 1.0f;
+f32 fd_rsh_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_rsh_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_rsh_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_rsh_neg_one_365 = -1.0f;
+f32 fd_rsh_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_rsh___local_PI_366 = 3.1415927f;
+f32 fd_rsh___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_rsh___local_3PIO2_368 = 4.712389f;
+f32 fd_rsh___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_rsh_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_rsh_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_rsh___local_PIO2_367 = 1.5707964f;
+f32 fd_rsh___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_rsh_one_364 = 1.0f;
+f32 fd_rsh_one_364 = 1.0f;
 
-__declspec(section ".data") f64 fd_rsh__three_localstatic4_sqrtf = 3.0;
+f64 fd_rsh__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") f64 fd_rsh__half_localstatic3_sqrtf = 0.5;
+f64 fd_rsh__half_localstatic3_sqrtf = 0.5;
 
 EVT_BEGIN(simi_check)
     SET_VALUE(LF(0), 0)
@@ -657,13 +657,13 @@ RshRndNpc rsh_01_rnd_npc_1[] = {
     {"c_kuribo_n", /*"NPCクリボー"*/"\x4E\x50\x43\x83\x4E\x83\x8A\x83\x7B\x81\x5B", evt_rsh_rnd_npc_2_5_talk},
 };
 
-__declspec(section ".data") RshRndNpc rsh_01_rnd_npc_2[] = {
+RshRndNpc rsh_01_rnd_npc_2[] = {
     {"c_kinopiko_p", /*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", evt_rsh_rnd_npc_2_6_talk},
     {"c_kinopio_b", /*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", evt_rsh_rnd_npc_2_8_talk},
     {"c_kinopiko", /*"キノピオ女"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97", evt_rsh_rnd_npc_2_9_talk},
 };
 
-__declspec(section ".data") RshRndNpc rsh_01_rnd_npc_3[] = {
+RshRndNpc rsh_01_rnd_npc_3[] = {
     {"c_kokinopio_y", /*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", evt_rsh_rnd_npc_2_7_talk},
     {"c_kokinopio_b", /*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", evt_rsh_rnd_npc_2_10_talk},
 };
@@ -694,29 +694,29 @@ RshRndNpc rsh_03_rnd_npc_2[] = {
     {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_4_10_talk},
 };
 
-__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_1[] = {
+RshRndNpc rsh_04_rnd_npc_1[] = {
     {"c_kinopio_g", /*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE", evt_rsh_rnd_npc_5_2_talk},
     {"c_kinopio_b", /*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", evt_rsh_rnd_npc_5_10_talk},
 };
 
-__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_2[] = {
+RshRndNpc rsh_04_rnd_npc_2[] = {
     {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_5_8_talk},
     {"c_kinopio", /*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", evt_rsh_rnd_npc_5_9_talk},
 };
 
-__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_3[] = {
+RshRndNpc rsh_04_rnd_npc_3[] = {
     {"c_kokinopio_g", /*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", evt_rsh_rnd_npc_5_5_talk},
     {"c_kokinopio", /*"キノピオ子"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71", evt_rsh_rnd_npc_5_6_talk},
 };
 
-__declspec(section ".data") RshRndNpc rsh_04_rnd_npc_4[] = {
+RshRndNpc rsh_04_rnd_npc_4[] = {
     {"c_kokinopio_b", /*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", evt_rsh_rnd_npc_5_1_talk},
     {"c_kokinopio_y", /*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", evt_rsh_rnd_npc_5_3_talk},
     {"c_kokinopio_b", /*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", evt_rsh_rnd_npc_5_4_talk},
     {"c_kinopiko", /*"キノピオ女"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97", evt_rsh_rnd_npc_5_7_talk},
 };
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_1_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_2_1_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_15"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -735,57 +735,57 @@ EVT_BEGIN(evt_rsh_rnd_npc_2_3_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_4_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_2_4_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_18"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_5_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_2_5_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_19"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_6_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_2_6_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_20"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_7_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_2_7_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_21"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_8_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_2_8_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_22"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_9_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_2_9_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_23"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_10_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_2_10_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_24"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_1_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_3_1_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_25"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_2_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_3_2_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_26"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_3_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_3_3_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_27"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_4_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_3_4_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_28"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -801,37 +801,37 @@ EVT_BEGIN(evt_rsh_rnd_npc_3_5_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_6_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_3_6_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_30"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_7_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_3_7_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_31"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_8_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_3_8_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_32"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_9_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_3_9_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_33"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_10_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_3_10_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_34"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_1_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_4_1_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_35"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_2_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_4_2_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_36"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -843,22 +843,22 @@ EVT_BEGIN(evt_rsh_rnd_npc_4_3_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_4_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_4_4_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_38"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_5_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_4_5_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_39"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_6_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_4_6_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_40"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_7_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_4_7_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_41"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -879,22 +879,22 @@ EVT_BEGIN(evt_rsh_rnd_npc_4_8_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_9_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_4_9_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_43"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_10_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_4_10_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_44"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_1_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_5_1_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_45"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_2_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_5_2_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_46"), 0, STRING("me"))
     RETURN
 EVT_END()
@@ -918,42 +918,42 @@ EVT_BEGIN(evt_rsh_rnd_npc_5_3_talk)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_4_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_5_4_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_48"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_5_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_5_5_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_49"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_6_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_5_6_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_50"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_7_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_5_7_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_51"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_8_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_5_8_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_52"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_9_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_5_9_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_53"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_10_talk)
+EVT_BEGIN(evt_rsh_rnd_npc_5_10_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_54"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* rsh_01_rnd_npc_1_list[] = {
+const char* rsh_01_rnd_npc_1_list[] = {
     /*"２−１"*/"\x82\x51\x81\x7C\x82\x50",
     /*"２−２"*/"\x82\x51\x81\x7C\x82\x51",
     /*"２−３"*/"\x82\x51\x81\x7C\x82\x52",
@@ -961,13 +961,13 @@ __declspec(section ".data") const char* rsh_01_rnd_npc_1_list[] = {
     /*"２−５"*/"\x82\x51\x81\x7C\x82\x54",
 };
 
-__declspec(section ".data") const char* rsh_01_rnd_npc_2_list[] = {
+const char* rsh_01_rnd_npc_2_list[] = {
     /*"２−６"*/"\x82\x51\x81\x7C\x82\x55",
     /*"２−８"*/"\x82\x51\x81\x7C\x82\x57",
     /*"２−９"*/"\x82\x51\x81\x7C\x82\x58",
 };
 
-__declspec(section ".data") const char* rsh_01_rnd_npc_3_list[] = {
+const char* rsh_01_rnd_npc_3_list[] = {
     /*"２−７"*/"\x82\x51\x81\x7C\x82\x56",
     /*"２−１０"*/"\x82\x51\x81\x7C\x82\x50\x82\x4F",
 };
@@ -988,7 +988,7 @@ const char* rsh_03_rnd_npc_1_list[] = {
     /*"４−５"*/"\x82\x53\x81\x7C\x82\x54",
 };
 
-__declspec(section ".data") const char* rsh_03_rnd_npc_2_list[] = {
+const char* rsh_03_rnd_npc_2_list[] = {
     /*"３−６"*/"\x82\x52\x81\x7C\x82\x55",
     /*"３−１０"*/"\x82\x52\x81\x7C\x82\x50\x82\x4F",
     /*"４−６"*/"\x82\x53\x81\x7C\x82\x55",
@@ -998,22 +998,22 @@ __declspec(section ".data") const char* rsh_03_rnd_npc_2_list[] = {
     /*"４−１０"*/"\x82\x53\x81\x7C\x82\x50\x82\x4F",
 };
 
-__declspec(section ".data") const char* rsh_04_rnd_npc_1_list[] = {
+const char* rsh_04_rnd_npc_1_list[] = {
     /*"５−２"*/"\x82\x54\x81\x7C\x82\x51",
     /*"５−１０"*/"\x82\x54\x81\x7C\x82\x50\x82\x4F",
 };
 
-__declspec(section ".data") const char* rsh_04_rnd_npc_2_list[] = {
+const char* rsh_04_rnd_npc_2_list[] = {
     /*"５−８"*/"\x82\x54\x81\x7C\x82\x57",
     /*"５−９"*/"\x82\x54\x81\x7C\x82\x58",
 };
 
-__declspec(section ".data") const char* rsh_04_rnd_npc_3_list[] = {
+const char* rsh_04_rnd_npc_3_list[] = {
     /*"５−５"*/"\x82\x54\x81\x7C\x82\x54",
     /*"５−６"*/"\x82\x54\x81\x7C\x82\x55",
 };
 
-__declspec(section ".data") const char* rsh_04_rnd_npc_4_list[] = {
+const char* rsh_04_rnd_npc_4_list[] = {
     /*"５−１"*/"\x82\x54\x81\x7C\x82\x50",
     /*"５−３"*/"\x82\x54\x81\x7C\x82\x52",
     /*"５−４"*/"\x82\x54\x81\x7C\x82\x53",

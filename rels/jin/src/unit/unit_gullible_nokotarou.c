@@ -36,28 +36,28 @@ USER_FUNC(btlevtcmd_SetUnitWork);
 USER_FUNC(btlevtcmd_SetWalkSound);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 
-__declspec(section ".data") f32 fd_gullible_nokotarou_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_nokotarou_neg_one_382;
-__declspec(section ".data") f32 fd_gullible_nokotarou___local_PI_383;
-__declspec(section ".data") f32 fd_gullible_nokotarou___local_3PIO2_385;
-__declspec(section ".data") f32 fd_gullible_nokotarou_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_nokotarou___local_PIO2_384;
-__declspec(section ".data") f32 fd_gullible_nokotarou_one_381;
-__declspec(section ".data") f32 fd_gullible_nokotarou_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_nokotarou_neg_one_365;
-__declspec(section ".data") f32 fd_gullible_nokotarou___local_PI_366;
-__declspec(section ".data") f32 fd_gullible_nokotarou___local_3PIO2_368;
-__declspec(section ".data") f32 fd_gullible_nokotarou_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_nokotarou___local_PIO2_367;
-__declspec(section ".data") f32 fd_gullible_nokotarou_one_364;
+f32 fd_gullible_nokotarou_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_gullible_nokotarou_neg_one_382;
+f32 fd_gullible_nokotarou___local_PI_383;
+f32 fd_gullible_nokotarou___local_3PIO2_385;
+f32 fd_gullible_nokotarou_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_gullible_nokotarou___local_PIO2_384;
+f32 fd_gullible_nokotarou_one_381;
+f32 fd_gullible_nokotarou_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_gullible_nokotarou_neg_one_365;
+f32 fd_gullible_nokotarou___local_PI_366;
+f32 fd_gullible_nokotarou___local_3PIO2_368;
+f32 fd_gullible_nokotarou_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_gullible_nokotarou___local_PIO2_367;
+f32 fd_gullible_nokotarou_one_364;
 BattleUnitKind unit_gullible_nokotarou;
 static BattleWeapon enemyWeapon_NokotarouKouraAttack;
 static BattleWeapon enemyWeapon_NokotarouShubibinAttack;
-static __declspec(section ".data") BattleUnitDefense defence_nokotarou;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_nokotarou;
-static __declspec(section ".data") BattleUnitDefense defence_turn_nokotarou;
-static __declspec(section ".data") StatusVulnerability regist_nokotarou;
-static __declspec(section ".data") BattleDataEntry data_table_nokotarou[3];
+static BattleUnitDefense defence_nokotarou;
+static BattleUnitDefenseAttr defence_attr_nokotarou;
+static BattleUnitDefense defence_turn_nokotarou;
+static StatusVulnerability regist_nokotarou;
+static BattleDataEntry data_table_nokotarou[3];
 static BattleUnitKindPart parts_nokotarou[1];
 static s32 dmg_turn_event[64];
 static s32 wakeup_event[67];
@@ -72,35 +72,35 @@ static s32 _koura_rotate_stop[13];
 static s32 attack_event_nokotarou[33];
 static s32 attack_event_nokotarou_koura[393];
 static s32 attack_event_nokotarou_shubibin[339];
-static __declspec(section ".data") s32 wait_event_nokotarou[6];
+static s32 wait_event_nokotarou[6];
 
-__declspec(section ".data") f32 fd_gullible_nokotarou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gullible_nokotarou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gullible_nokotarou_neg_one_382 = -1.0f;
+f32 fd_gullible_nokotarou_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_gullible_nokotarou___local_PI_383 = 3.1415927f;
+f32 fd_gullible_nokotarou___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gullible_nokotarou___local_3PIO2_385 = 4.712389f;
+f32 fd_gullible_nokotarou___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gullible_nokotarou_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gullible_nokotarou_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gullible_nokotarou___local_PIO2_384 = 1.5707964f;
+f32 fd_gullible_nokotarou___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gullible_nokotarou_one_381 = 1.0f;
+f32 fd_gullible_nokotarou_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_gullible_nokotarou_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gullible_nokotarou_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gullible_nokotarou_neg_one_365 = -1.0f;
+f32 fd_gullible_nokotarou_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_gullible_nokotarou___local_PI_366 = 3.1415927f;
+f32 fd_gullible_nokotarou___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gullible_nokotarou___local_3PIO2_368 = 4.712389f;
+f32 fd_gullible_nokotarou___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gullible_nokotarou_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gullible_nokotarou_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gullible_nokotarou___local_PIO2_367 = 1.5707964f;
+f32 fd_gullible_nokotarou___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gullible_nokotarou_one_364 = 1.0f;
+f32 fd_gullible_nokotarou_one_364 = 1.0f;
 
 BattleUnitKind unit_gullible_nokotarou = {
     81,
@@ -242,15 +242,15 @@ static BattleWeapon enemyWeapon_NokotarouShubibinAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitDefense defence_nokotarou = {{1, 1, 1, 1, 1}};
+static BattleUnitDefense defence_nokotarou = {{1, 1, 1, 1, 1}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_nokotarou = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr_nokotarou = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefense defence_turn_nokotarou = {0};
+static BattleUnitDefense defence_turn_nokotarou = {0};
 
-static __declspec(section ".data") StatusVulnerability regist_nokotarou = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
+static StatusVulnerability regist_nokotarou = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
 
-static __declspec(section ".data") BattleDataEntry data_table_nokotarou[] = {
+static BattleDataEntry data_table_nokotarou[] = {
     {49, dead_event_nokotarou},
     {13, dmg_turn_event},
     {0, NULL},
@@ -674,7 +674,7 @@ static EVT_BEGIN(attack_event_nokotarou_shubibin)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_nokotarou)
+static EVT_BEGIN(wait_event_nokotarou)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()

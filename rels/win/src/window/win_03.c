@@ -44,62 +44,62 @@ USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_sfxon_3d);
 
-__declspec(section ".data") f32 fd_win_03_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_03_neg_one_382;
-__declspec(section ".data") f32 fd_win_03___local_PI_383;
-__declspec(section ".data") f32 fd_win_03___local_3PIO2_385;
-__declspec(section ".data") f32 fd_win_03_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_03___local_PIO2_384;
-__declspec(section ".data") f32 fd_win_03_one_381;
-__declspec(section ".data") f32 fd_win_03_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_03_neg_one_365;
-__declspec(section ".data") f32 fd_win_03___local_PI_366;
-__declspec(section ".data") f32 fd_win_03___local_3PIO2_368;
-__declspec(section ".data") f32 fd_win_03_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_03___local_PIO2_367;
-__declspec(section ".data") f32 fd_win_03_one_364;
-__declspec(section ".data") s32 clouda_house_in[12];
+f32 fd_win_03_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_win_03_neg_one_382;
+f32 fd_win_03___local_PI_383;
+f32 fd_win_03___local_3PIO2_385;
+f32 fd_win_03_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_win_03___local_PIO2_384;
+f32 fd_win_03_one_381;
+f32 fd_win_03_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_win_03_neg_one_365;
+f32 fd_win_03___local_PI_366;
+f32 fd_win_03___local_3PIO2_368;
+f32 fd_win_03_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_win_03___local_PIO2_367;
+f32 fd_win_03_one_364;
+s32 clouda_house_in[12];
 s32 clouda_house_out[19];
-__declspec(section ".data") s32 cloud_out[12];
-__declspec(section ".data") s32 cloud_in[12];
+s32 cloud_out[12];
+s32 cloud_in[12];
 static BeroEntry bero_entry_data[5];
 s32 lookat_house[45];
 static s32 cloud_toujou[76];
 s32 cloud_lostitem[215];
 s32 tree_evt_01[20];
 static TreeAccess tree_access_data[5];
-__declspec(section ".data") s32 dummy_event[4];
+s32 dummy_event[4];
 s32 win_03_init_evt[108];
 
-__declspec(section ".data") f32 fd_win_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_win_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_win_03_neg_one_382 = -1.0f;
+f32 fd_win_03_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_win_03___local_PI_383 = 3.1415927f;
+f32 fd_win_03___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_win_03___local_3PIO2_385 = 4.712389f;
+f32 fd_win_03___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_win_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_win_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_win_03___local_PIO2_384 = 1.5707964f;
+f32 fd_win_03___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_win_03_one_381 = 1.0f;
+f32 fd_win_03_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_win_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_win_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_win_03_neg_one_365 = -1.0f;
+f32 fd_win_03_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_win_03___local_PI_366 = 3.1415927f;
+f32 fd_win_03___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_win_03___local_3PIO2_368 = 4.712389f;
+f32 fd_win_03___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_win_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_win_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_win_03___local_PIO2_367 = 1.5707964f;
+f32 fd_win_03___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_win_03_one_364 = 1.0f;
+f32 fd_win_03_one_364 = 1.0f;
 
-__declspec(section ".data") EVT_BEGIN(clouda_house_in)
+EVT_BEGIN(clouda_house_in)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_bero_mapchange, STRING("win_04"), STRING("w_bero"))
     SET_VALUE(LW(0), 1)
@@ -116,13 +116,13 @@ EVT_BEGIN(clouda_house_out)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(cloud_out)
+EVT_BEGIN(cloud_out)
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_WOOD2"), 306, 23, -448, 0)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(cloud_in)
+EVT_BEGIN(cloud_in)
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_WOOD3"), 306, 23, -448, 0)
     SET_VALUE(LW(0), 0)
     RETURN
@@ -359,7 +359,7 @@ static TreeAccess tree_access_data[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
-__declspec(section ".data") EVT_BEGIN(dummy_event)
+EVT_BEGIN(dummy_event)
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()

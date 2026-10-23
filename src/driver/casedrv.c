@@ -27,7 +27,7 @@ typedef struct CaseWork {
 static CaseWork work;
 static CaseWork* wp = &work;
 #pragma force_active on
-__declspec(section ".sdata") u32 gap_07_8041030C_sdata[1] = {0};
+u32 gap_07_8041030C_sdata[1] = {0};
 #pragma force_active reset
 
 

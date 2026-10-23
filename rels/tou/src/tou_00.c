@@ -68,29 +68,29 @@ USER_FUNC(time_shift);
 USER_FUNC(evt_snd_bgmon_f_d);
 static USER_FUNC(npc_set_pos);
 
-__declspec(section ".data") f32 fd_tou_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_00_neg_one_382;
-__declspec(section ".data") f32 fd_tou_00___local_PI_383;
-__declspec(section ".data") f32 fd_tou_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_tou_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_tou_00_one_381;
-__declspec(section ".data") f32 fd_tou_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_00_neg_one_365;
-__declspec(section ".data") f32 fd_tou_00___local_PI_366;
-__declspec(section ".data") f32 fd_tou_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_tou_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_tou_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_tou_00_one_364;
+f32 fd_tou_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_tou_00_neg_one_382;
+f32 fd_tou_00___local_PI_383;
+f32 fd_tou_00___local_3PIO2_385;
+f32 fd_tou_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_tou_00___local_PIO2_384;
+f32 fd_tou_00_one_381;
+f32 fd_tou_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_tou_00_neg_one_365;
+f32 fd_tou_00___local_PI_366;
+f32 fd_tou_00___local_3PIO2_368;
+f32 fd_tou_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_tou_00___local_PIO2_367;
+f32 fd_tou_00_one_364;
 static s32 evt_tou_balloon[85];
 static s32 evt_light[66];
 static s32 evt_wing[125];
 s32 evt_to_tou[293];
 s32 evt_pos_keep[39];
 s32 evt_to_gor[247];
-__declspec(section ".data") const char* kemuri_name[5];
+const char* kemuri_name[5];
 s32 tou_00_koopa_evt[678];
-static __declspec(section ".data") s32 hkoopa_init[7];
+static s32 hkoopa_init[7];
 static NpcSetupInfo npcEnt[2];
 s32 evt_skip[43];
 s32 tou_00_init_evt[76];
@@ -103,33 +103,33 @@ USER_FUNC(time_shift) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_tou_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_00_neg_one_382 = -1.0f;
+f32 fd_tou_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou_00___local_PI_383 = 3.1415927f;
+f32 fd_tou_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou_00___local_3PIO2_385 = 4.712389f;
+f32 fd_tou_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou_00___local_PIO2_384 = 1.5707964f;
+f32 fd_tou_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_00_one_381 = 1.0f;
+f32 fd_tou_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_tou_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_tou_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_tou_00_neg_one_365 = -1.0f;
+f32 fd_tou_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_tou_00___local_PI_366 = 3.1415927f;
+f32 fd_tou_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_tou_00___local_3PIO2_368 = 4.712389f;
+f32 fd_tou_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_tou_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_tou_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_tou_00___local_PIO2_367 = 1.5707964f;
+f32 fd_tou_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_tou_00_one_364 = 1.0f;
+f32 fd_tou_00_one_364 = 1.0f;
 
 static EVT_BEGIN(evt_tou_balloon)
     CALL(evt_mapobj_get_position, STRING("tou_enkei"), LW(13), LW(14), LW(15))
@@ -464,7 +464,7 @@ static USER_FUNC(npc_set_pos) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") const char* kemuri_name[] = {
+const char* kemuri_name[] = {
     "kosyo01",
     "kosyo02",
     "kosyo03",
@@ -702,7 +702,7 @@ EVT_BEGIN(tou_00_koopa_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(hkoopa_init)
+static EVT_BEGIN(hkoopa_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()

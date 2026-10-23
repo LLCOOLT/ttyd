@@ -37,7 +37,7 @@ static GXColor color_tbl[10] = {
     { 0x51, 0x75, 0x9D, 0xFF }, { 0xC8, 0xB2, 0x25, 0xFF },
 };
 u8 size_tbl[12] = { 0x32, 0x32, 0x32, 0x28, 0x0C, 0x0C, 0x0C, 0x0A, 0x0A, 0x0F, 0x00, 0x00 };
-__declspec(section ".sdata") u32 gap_07_804159FC_sdata[1] = {0};
+u32 gap_07_804159FC_sdata[1] = {0};
 
 EffectEntry* effItemGetEntry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;

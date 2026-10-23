@@ -144,21 +144,21 @@ USER_FUNC(pik_00_statuswin_force_off);
 void irai_29_15_cb(s32 type, PikCbInfo** param);
 static void resha_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") f32 fd_pik_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_pik_00_neg_one_382;
-__declspec(section ".data") f32 fd_pik_00___local_PI_383;
-__declspec(section ".data") f32 fd_pik_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_pik_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_pik_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_pik_00_one_381;
-__declspec(section ".data") f32 fd_pik_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_pik_00_neg_one_365;
-__declspec(section ".data") f32 fd_pik_00___local_PI_366;
-__declspec(section ".data") f32 fd_pik_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_pik_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_pik_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_pik_00_one_364;
-static __declspec(section ".data") HitDamageReturn dmgReturnPt[2];
+f32 fd_pik_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_pik_00_neg_one_382;
+f32 fd_pik_00___local_PI_383;
+f32 fd_pik_00___local_3PIO2_385;
+f32 fd_pik_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_pik_00___local_PIO2_384;
+f32 fd_pik_00_one_381;
+f32 fd_pik_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_pik_00_neg_one_365;
+f32 fd_pik_00___local_PI_366;
+f32 fd_pik_00___local_3PIO2_368;
+f32 fd_pik_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_pik_00___local_PIO2_367;
+f32 fd_pik_00_one_364;
+static HitDamageReturn dmgReturnPt[2];
 static SharinData sharinDt[29];
 static s32 evt_sharin_main[87];
 static s32 evt_sharin[19];
@@ -169,91 +169,91 @@ static s32 evt_bg[81];
 static s32 evt_hoshi[88];
 static s32 hom_10_evt_resha_start[244];
 static s32 hom_10_evt_resha_start2[259];
-static __declspec(section ".data") s32 hom_10_evt_resha_start3[11];
-static __declspec(section ".data") s32 hom_10_evt_resha_start4[11];
+static s32 hom_10_evt_resha_start3[11];
+static s32 hom_10_evt_resha_start4[11];
 static s32 stop_1[90];
 static s32 stop_2[90];
 static s32 hom_10_evt_resha_stop[36];
 static s32 evt_ramp[33];
 static const char* pika_tbl[15];
-static __declspec(section ".data") const char* pika_tbl_rsh_06[10];
+static const char* pika_tbl_rsh_06[10];
 static s32 hom_10_evt_resha_sub[102];
 static s32 hom_10_evt_resha_right[35];
 static s32 hom_10_evt_resha_left[28];
 static s32 hom_10_init_evt[140];
-__declspec(section ".data") s32 resha_noru[8];
+s32 resha_noru[8];
 static BeroEntry bero_data[3];
-static __declspec(section ".data") const char* name_tbl[6];
+static const char* name_tbl[6];
 s32 evt_pik_yajirushi[71];
 static s32 evt_train[295];
-__declspec(section ".data") s32 init_ekiin[8];
+s32 init_ekiin[8];
 s32 talk_ekiin[146];
-static __declspec(section ".data") s32 init_papa[8];
+static s32 init_papa[8];
 s32 talk_papa_taihou_kyoka[VERSION_PICK(403, 405)];
 static s32 talk_papa[141];
-static __declspec(section ".data") s32 init_mama[8];
-__declspec(section ".data") s32 iri_29_item_tbl[2];
+static s32 init_mama[8];
+s32 iri_29_item_tbl[2];
 static s32 talk_mama[318];
 static s32 init_konari[13];
 static s32 talk_konari[58];
-static __declspec(section ".data") s32 init_madam[8];
-static __declspec(section ".data") s32 item_tbl_madam[2];
+static s32 init_madam[8];
+static s32 item_tbl_madam[2];
 static s32 talk_madam_ring_return[54];
-__declspec(section ".data") s32 iri_23_item_tbl[2];
+s32 iri_23_item_tbl[2];
 static s32 talk_madam[185];
-static __declspec(section ".data") s32 init_sarary[12];
-static __declspec(section ".data") s32 talk_sarary[8];
+static s32 init_sarary[12];
+static s32 talk_sarary[8];
 static NpcSetupInfo npc_data[7];
 static s32 evt_door[15];
-static __declspec(section ".data") s32 evt_door2[12];
+static s32 evt_door2[12];
 static s32 evt_wall[22];
-__declspec(section ".data") const char* ie1_mobj[2];
-static __declspec(section ".data") s32 door_1_open[12];
+const char* ie1_mobj[2];
+static s32 door_1_open[12];
 static s32 door_1_close[14];
 static DoorParam door_1;
-static __declspec(section ".data") s32 evt_door_2[12];
-static __declspec(section ".data") s32 evt_door2_2[12];
+static s32 evt_door_2[12];
+static s32 evt_door2_2[12];
 static s32 evt_wall_2[29];
-__declspec(section ".data") const char* door_2_npc[2];
-static __declspec(section ".data") s32 door_2_open[12];
+const char* door_2_npc[2];
+static s32 door_2_open[12];
 static s32 door_2_close[14];
 static DoorParam door_2;
 s32 evt_rot_door_sub[63];
-__declspec(section ".data") s32 evt_rot_door[9];
+s32 evt_rot_door[9];
 s32 evt_pik_00_arrival[86];
 s32 evt_seacret[131];
 static s32 mobj_box00[34];
 s32 pik_00_init_evt[410];
 
-__declspec(section ".data") f32 fd_pik_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_pik_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_pik_00_neg_one_382 = -1.0f;
+f32 fd_pik_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_pik_00___local_PI_383 = 3.1415927f;
+f32 fd_pik_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_pik_00___local_3PIO2_385 = 4.712389f;
+f32 fd_pik_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_pik_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_pik_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_pik_00___local_PIO2_384 = 1.5707964f;
+f32 fd_pik_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_pik_00_one_381 = 1.0f;
+f32 fd_pik_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_pik_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_pik_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_pik_00_neg_one_365 = -1.0f;
+f32 fd_pik_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_pik_00___local_PI_366 = 3.1415927f;
+f32 fd_pik_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_pik_00___local_3PIO2_368 = 4.712389f;
+f32 fd_pik_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_pik_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_pik_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_pik_00___local_PIO2_367 = 1.5707964f;
+f32 fd_pik_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_pik_00_one_364 = 1.0f;
+f32 fd_pik_00_one_364 = 1.0f;
 
-static __declspec(section ".data") HitDamageReturn dmgReturnPt[] = {
+static HitDamageReturn dmgReturnPt[] = {
     {"mod_1", {0.0f, -1000.0f, 0.0f}},
     {0},
 };
@@ -677,14 +677,14 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(hom_10_evt_resha_start3)
+static EVT_BEGIN(hom_10_evt_resha_start3)
     SET_VALUE(GSWF(3583), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(-15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(-15.0f))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(hom_10_evt_resha_start4)
+static EVT_BEGIN(hom_10_evt_resha_start4)
     SET_VALUE(GSWF(3583), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(15.0f))
@@ -813,7 +813,7 @@ static const char* pika_tbl[] = {
     NULL,
 };
 
-static __declspec(section ".data") const char* pika_tbl_rsh_06[] = {
+static const char* pika_tbl_rsh_06[] = {
     "pika_1_1",
     "pika_1_2",
     "pika_1_3",
@@ -928,7 +928,7 @@ static EVT_BEGIN(hom_10_init_evt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(resha_noru)
+EVT_BEGIN(resha_noru)
     SET_VALUE(GF(11), 1)
     SET_VALUE(LW(0), 0)
     RETURN
@@ -972,7 +972,7 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
-static __declspec(section ".data") const char* name_tbl[] = {
+static const char* name_tbl[] = {
     "yajirusi_1",
     "yajirusi_2",
     "yajirusi_3",
@@ -1090,7 +1090,7 @@ static EVT_BEGIN(evt_train)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_ekiin)
+EVT_BEGIN(init_ekiin)
     CALL(evt_npc_set_position, STRING("me"), -250, 60, -350)
     RETURN
 EVT_END()
@@ -1142,7 +1142,7 @@ EVT_BEGIN(talk_ekiin)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(init_papa)
+static EVT_BEGIN(init_papa)
     CALL(evt_npc_set_position, STRING("me"), -195, 0, 350)
     RETURN
 EVT_END()
@@ -1468,12 +1468,12 @@ static EVT_BEGIN(talk_papa)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(init_mama)
+static EVT_BEGIN(init_mama)
     CALL(evt_npc_set_position, STRING("me"), -133, 0, 330)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 iri_29_item_tbl[] = {
+s32 iri_29_item_tbl[] = {
     ITEM_PRESENT, -1,
 };
 
@@ -1613,12 +1613,12 @@ static EVT_BEGIN(talk_konari)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(init_madam)
+static EVT_BEGIN(init_madam)
     CALL(evt_npc_set_position, STRING("me"), 352, 12, -86)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 item_tbl_madam[] = {
+static s32 item_tbl_madam[] = {
     ITEM_GOLD_RING, -1,
 };
 
@@ -1639,7 +1639,7 @@ static EVT_BEGIN(talk_madam_ring_return)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 iri_23_item_tbl[] = {
+s32 iri_23_item_tbl[] = {
     ITEM_WRESTLING_MAG, -1,
 };
 
@@ -1705,14 +1705,14 @@ static EVT_BEGIN(talk_madam)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(init_sarary)
+static EVT_BEGIN(init_sarary)
     IF_INT_LESS(GSW(0), 345)
         CALL(evt_npc_set_position, STRING("me"), 85, -5, 35)
     END_IF
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(talk_sarary)
+static EVT_BEGIN(talk_sarary)
     CALL(evt_msg_print, 0, STRING("stg6_pik_05"), 0, 0)
     RETURN
 EVT_END()
@@ -1800,7 +1800,7 @@ static EVT_BEGIN(evt_door)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_door2)
+static EVT_BEGIN(evt_door2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), LW(0), 0, 0)
     RETURN
@@ -1814,12 +1814,12 @@ static EVT_BEGIN(evt_wall)
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* ie1_mobj[] = {
+const char* ie1_mobj[] = {
     "mobj_badge_gat",
     NULL,
 };
 
-static __declspec(section ".data") EVT_BEGIN(door_1_open)
+static EVT_BEGIN(door_1_open)
     CALL(evt_snd_bgmoff, 18432)
     CALL(evt_snd_envoff, 18432)
     CALL(evt_snd_env_lpf, 0, 800)
@@ -1854,13 +1854,13 @@ static DoorParam door_1 = {
     door_1_close, // evtClose
 };
 
-static __declspec(section ".data") EVT_BEGIN(evt_door_2)
+static EVT_BEGIN(evt_door_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_door2_2)
+static EVT_BEGIN(evt_door2_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2"), LW(0), 0, 0)
     RETURN
@@ -1875,12 +1875,12 @@ static EVT_BEGIN(evt_wall_2)
     RETURN
 EVT_END()
 
-__declspec(section ".data") const char* door_2_npc[] = {
+const char* door_2_npc[] = {
     /*"マダム"*/"\x83\x7D\x83\x5F\x83\x80",
     NULL,
 };
 
-static __declspec(section ".data") EVT_BEGIN(door_2_open)
+static EVT_BEGIN(door_2_open)
     CALL(evt_snd_bgmoff, 18432)
     CALL(evt_snd_envoff, 18432)
     CALL(evt_snd_env_lpf, 0, 800)
@@ -1940,7 +1940,7 @@ EVT_BEGIN(evt_rot_door_sub)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(evt_rot_door)
+EVT_BEGIN(evt_rot_door)
     IF_INT_LESS(GW(10), 10)
         ADD_FLOAT(GW(10), FLOAT(0.5f))
     END_IF

@@ -48,73 +48,73 @@ USER_FUNC(evt_win_item_select);
 USER_FUNC(mainwindow_opendisable);
 USER_FUNC(mainwindow_openenable);
 
-__declspec(section ".data") f32 fd_jin_08_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_jin_08_neg_one_382;
-__declspec(section ".data") f32 fd_jin_08___local_PI_383;
-__declspec(section ".data") f32 fd_jin_08___local_3PIO2_385;
-__declspec(section ".data") f32 fd_jin_08_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_jin_08___local_PIO2_384;
-__declspec(section ".data") f32 fd_jin_08_one_381;
-__declspec(section ".data") f32 fd_jin_08_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_jin_08_neg_one_365;
-__declspec(section ".data") f32 fd_jin_08___local_PI_366;
-__declspec(section ".data") f32 fd_jin_08___local_3PIO2_368;
-__declspec(section ".data") f32 fd_jin_08_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_jin_08___local_PIO2_367;
-__declspec(section ".data") f32 fd_jin_08_one_364;
-static __declspec(section ".data") s32 e_close[12];
-static __declspec(section ".data") s32 e_open[12];
+f32 fd_jin_08_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_jin_08_neg_one_382;
+f32 fd_jin_08___local_PI_383;
+f32 fd_jin_08___local_3PIO2_385;
+f32 fd_jin_08_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_jin_08___local_PIO2_384;
+f32 fd_jin_08_one_381;
+f32 fd_jin_08_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_jin_08_neg_one_365;
+f32 fd_jin_08___local_PI_366;
+f32 fd_jin_08___local_3PIO2_368;
+f32 fd_jin_08_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_jin_08___local_PIO2_367;
+f32 fd_jin_08_one_364;
+static s32 e_close[12];
+static s32 e_open[12];
 s32 evt_roll_in[41];
 static BeroEntry bero_entry_data[3];
 static s32 evt_open[73];
 s32 evt_open_kagi[73];
-static __declspec(section ".data") s32 evt_unlock[11];
-__declspec(section ".data") s32 oumu_init[2];
+static s32 evt_unlock[11];
+s32 oumu_init[2];
 s32 oumu_talk[61];
 s32 oumu_juyo_talk[37];
 s32 oumu_check[176];
 static NpcSetupInfo npcEnt[2];
-static __declspec(section ".data") s32 lock_tbl[2];
+static s32 lock_tbl[2];
 static s32 lock_item_check[23];
 static s32 mobj_box01[34];
 static s32 mobj_box02[34];
 s32 jin_08_init_evt[138];
 
-__declspec(section ".data") f32 fd_jin_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_jin_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_jin_08_neg_one_382 = -1.0f;
+f32 fd_jin_08_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_jin_08___local_PI_383 = 3.1415927f;
+f32 fd_jin_08___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_jin_08___local_3PIO2_385 = 4.712389f;
+f32 fd_jin_08___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_jin_08_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_jin_08_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_jin_08___local_PIO2_384 = 1.5707964f;
+f32 fd_jin_08___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_jin_08_one_381 = 1.0f;
+f32 fd_jin_08_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_jin_08_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_jin_08_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_jin_08_neg_one_365 = -1.0f;
+f32 fd_jin_08_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_jin_08___local_PI_366 = 3.1415927f;
+f32 fd_jin_08___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_jin_08___local_3PIO2_368 = 4.712389f;
+f32 fd_jin_08___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_jin_08_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_jin_08_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_jin_08___local_PIO2_367 = 1.5707964f;
+f32 fd_jin_08___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_jin_08_one_364 = 1.0f;
+f32 fd_jin_08_one_364 = 1.0f;
 
-static __declspec(section ".data") EVT_BEGIN(e_close)
+static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door07"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(e_open)
+static EVT_BEGIN(e_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door07"), 0, LW(0), 0)
     RETURN
@@ -219,14 +219,14 @@ EVT_BEGIN(evt_open_kagi)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_unlock)
+static EVT_BEGIN(evt_unlock)
     SET_VALUE(LW(0), STRING("e_bero_1"))
     CALL_CHILD(PTR(bero_case_switch_on))
     CALL(evt_pouch_remove_item, 23, LW(0))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(oumu_init)
+EVT_BEGIN(oumu_init)
     RETURN
 EVT_END()
 
@@ -354,7 +354,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-static __declspec(section ".data") s32 lock_tbl[] = {
+static s32 lock_tbl[] = {
     ITEM_STEEPLE_KEY_0x17, -1,
 };
 

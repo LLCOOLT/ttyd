@@ -42,67 +42,67 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_get_sincos);
 USER_FUNC(evt_win_item_select);
 
-__declspec(section ".data") f32 fd_las_22_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_22_neg_one_382;
-__declspec(section ".data") f32 fd_las_22___local_PI_383;
-__declspec(section ".data") f32 fd_las_22___local_3PIO2_385;
-__declspec(section ".data") f32 fd_las_22_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_22___local_PIO2_384;
-__declspec(section ".data") f32 fd_las_22_one_381;
-__declspec(section ".data") f32 fd_las_22_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_22_neg_one_365;
-__declspec(section ".data") f32 fd_las_22___local_PI_366;
-__declspec(section ".data") f32 fd_las_22___local_3PIO2_368;
-__declspec(section ".data") f32 fd_las_22_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_22___local_PIO2_367;
-__declspec(section ".data") f32 fd_las_22_one_364;
+f32 fd_las_22_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_las_22_neg_one_382;
+f32 fd_las_22___local_PI_383;
+f32 fd_las_22___local_3PIO2_385;
+f32 fd_las_22_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_las_22___local_PIO2_384;
+f32 fd_las_22_one_381;
+f32 fd_las_22_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_las_22_neg_one_365;
+f32 fd_las_22___local_PI_366;
+f32 fd_las_22___local_3PIO2_368;
+f32 fd_las_22_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_las_22___local_PIO2_367;
+f32 fd_las_22_one_364;
 static s32 w_door_close[22];
 static s32 w_door_open[22];
 static s32 e_door_close[22];
 static s32 e_door_open[22];
-__declspec(section ".data") s32 door_dummy[2];
+s32 door_dummy[2];
 static BeroEntry bero_entry_data[4];
 static const char* haguruma_hontai[13];
-static __declspec(section ".data") const char* haguruma_hontai2[7];
-static __declspec(section ".data") const char* haguruma_kage[11];
-static __declspec(section ".data") const char* haguruma_kage2[6];
+static const char* haguruma_hontai2[7];
+static const char* haguruma_kage[11];
+static const char* haguruma_kage2[6];
 static s32 haguruma_evt[194];
 s32 kaitendai_evt[312];
 static s32 dai_evt[13];
-static __declspec(section ".data") s32 key_tbl[2];
-static __declspec(section ".data") s32 key_evt[5];
+static s32 key_tbl[2];
+static s32 key_evt[5];
 static s32 key_check_evt[23];
-static __declspec(section ".data") s32 unlock_evt[10];
+static s32 unlock_evt[10];
 static s32 mobj_box00[34];
 s32 las_22_init_evt[150];
 
-__declspec(section ".data") f32 fd_las_22_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_22_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_22_neg_one_382 = -1.0f;
+f32 fd_las_22_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_22___local_PI_383 = 3.1415927f;
+f32 fd_las_22___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_22___local_3PIO2_385 = 4.712389f;
+f32 fd_las_22___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_22_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_22_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_22___local_PIO2_384 = 1.5707964f;
+f32 fd_las_22___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_22_one_381 = 1.0f;
+f32 fd_las_22_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_las_22_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_22_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_22_neg_one_365 = -1.0f;
+f32 fd_las_22_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_22___local_PI_366 = 3.1415927f;
+f32 fd_las_22___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_22___local_3PIO2_368 = 4.712389f;
+f32 fd_las_22___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_22_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_22_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_22___local_PIO2_367 = 1.5707964f;
+f32 fd_las_22___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_22_one_364 = 1.0f;
+f32 fd_las_22_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -136,7 +136,7 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(door_dummy)
+EVT_BEGIN(door_dummy)
     RETURN
 EVT_END()
 
@@ -212,7 +212,7 @@ static const char* haguruma_hontai[] = {
     "S_hgm_20a",
 };
 
-static __declspec(section ".data") const char* haguruma_hontai2[] = {
+static const char* haguruma_hontai2[] = {
     "S_hgm_05a",
     "S_hgm_09a",
     "S_hgm_11a",
@@ -222,7 +222,7 @@ static __declspec(section ".data") const char* haguruma_hontai2[] = {
     "S_hgm_18a",
 };
 
-static __declspec(section ".data") const char* haguruma_kage[] = {
+static const char* haguruma_kage[] = {
     "S_hgm_01b",
     "S_hgm_02b",
     "S_hgm_03b",
@@ -236,7 +236,7 @@ static __declspec(section ".data") const char* haguruma_kage[] = {
     "S_hgm_16b",
 };
 
-static __declspec(section ".data") const char* haguruma_kage2[] = {
+static const char* haguruma_kage2[] = {
     "S_hgm_05b",
     "S_hgm_09b",
     "S_hgm_11b",
@@ -409,11 +409,11 @@ static EVT_BEGIN(dai_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 key_tbl[] = {
+static s32 key_tbl[] = {
     ITEM_PALACE_KEY_0x2F, -1,
 };
 
-static __declspec(section ".data") EVT_BEGIN(key_evt)
+static EVT_BEGIN(key_evt)
     SET_VALUE(GSW(0), 393)
     RETURN
 EVT_END()
@@ -429,7 +429,7 @@ static EVT_BEGIN(key_check_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(unlock_evt)
+static EVT_BEGIN(unlock_evt)
     SET_VALUE(GSW(0), 394)
     SET_VALUE(LW(0), STRING("w_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))

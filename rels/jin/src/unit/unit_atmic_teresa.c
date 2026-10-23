@@ -67,34 +67,34 @@ void teresa_ext_disp(CameraId camera, void* param);
 void teresa_ext_main(void);
 void teresa_ext_init(void);
 
-__declspec(section ".data") f32 fd_atmic_teresa_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_atmic_teresa_neg_one_382;
-__declspec(section ".data") f32 fd_atmic_teresa___local_PI_383;
-__declspec(section ".data") f32 fd_atmic_teresa___local_3PIO2_385;
-__declspec(section ".data") f32 fd_atmic_teresa_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_atmic_teresa___local_PIO2_384;
-__declspec(section ".data") f32 fd_atmic_teresa_one_381;
-__declspec(section ".data") f32 fd_atmic_teresa_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_atmic_teresa_neg_one_365;
-__declspec(section ".data") f32 fd_atmic_teresa___local_PI_366;
-__declspec(section ".data") f32 fd_atmic_teresa___local_3PIO2_368;
-__declspec(section ".data") f32 fd_atmic_teresa_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_atmic_teresa___local_PIO2_367;
-__declspec(section ".data") f32 fd_atmic_teresa_one_364;
+f32 fd_atmic_teresa_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_atmic_teresa_neg_one_382;
+f32 fd_atmic_teresa___local_PI_383;
+f32 fd_atmic_teresa___local_3PIO2_385;
+f32 fd_atmic_teresa_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_atmic_teresa___local_PIO2_384;
+f32 fd_atmic_teresa_one_381;
+f32 fd_atmic_teresa_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_atmic_teresa_neg_one_365;
+f32 fd_atmic_teresa___local_PI_366;
+f32 fd_atmic_teresa___local_3PIO2_368;
+f32 fd_atmic_teresa_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_atmic_teresa___local_PIO2_367;
+f32 fd_atmic_teresa_one_364;
 BattleUnitKind unit_atmic_teresa;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
 static PoseTableEntry pose_table[17];
 PoseTableEntry pose_table_kaokakusi[17];
-static __declspec(section ".data") BattleDataEntry data_table[1];
+static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
-static __declspec(section ".data") StatusVulnerability regist;
+static StatusVulnerability regist;
 BattleWeapon weapon_atmic_teresa_press;
 BattleWeapon weapon_atmic_teresa_bikkuri;
 BattleWeapon weapon_atmic_teresa_surprise;
 BattleWeapon weapon_atmic_teresa_breath;
 static s32 init_event[26];
-static __declspec(section ".data") s32 damage_event[10];
+static s32 damage_event[10];
 static s32 attack_event[101];
 s32 kaokakusi_event[110];
 s32 press_event[264];
@@ -102,41 +102,41 @@ s32 surprise_event[303];
 s32 bikkuri_event[285];
 static s32 breath_event[254];
 s32 breath_event_sub[102];
-static __declspec(section ".data") s32 wait_event[6];
-__declspec(section ".data") s32 atmic_teresa_id[1];
-__declspec(section ".data") s32 target_unit_id[1];
-__declspec(section ".data") s32 target_parts_id[1];
-__declspec(section ".data") f32 atmic_teresa_scale;
+static s32 wait_event[6];
+s32 atmic_teresa_id[1];
+s32 target_unit_id[1];
+s32 target_parts_id[1];
+f32 atmic_teresa_scale;
 ExtTexInfo teresa_ext_entry_data[17];
 s32 teresa_entry[19];
 
-__declspec(section ".data") f32 fd_atmic_teresa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_atmic_teresa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_atmic_teresa_neg_one_382 = -1.0f;
+f32 fd_atmic_teresa_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_atmic_teresa___local_PI_383 = 3.1415927f;
+f32 fd_atmic_teresa___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_atmic_teresa___local_3PIO2_385 = 4.712389f;
+f32 fd_atmic_teresa___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_atmic_teresa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_atmic_teresa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_atmic_teresa___local_PIO2_384 = 1.5707964f;
+f32 fd_atmic_teresa___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_atmic_teresa_one_381 = 1.0f;
+f32 fd_atmic_teresa_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_atmic_teresa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_atmic_teresa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_atmic_teresa_neg_one_365 = -1.0f;
+f32 fd_atmic_teresa_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_atmic_teresa___local_PI_366 = 3.1415927f;
+f32 fd_atmic_teresa___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_atmic_teresa___local_3PIO2_368 = 4.712389f;
+f32 fd_atmic_teresa___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_atmic_teresa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_atmic_teresa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_atmic_teresa___local_PIO2_367 = 1.5707964f;
+f32 fd_atmic_teresa___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_atmic_teresa_one_364 = 1.0f;
+f32 fd_atmic_teresa_one_364 = 1.0f;
 
 BattleUnitKind unit_atmic_teresa = {
     76,
@@ -208,9 +208,9 @@ BattleUnitKind unit_atmic_teresa = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -252,7 +252,7 @@ PoseTableEntry pose_table_kaokakusi[] = {
     {69, "A_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
@@ -260,7 +260,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_atmic_teresa", "c_atmic_trs", 0.0f, 0.0f, 0.0f, 10.0f, 80.0f, 0.0f, 0.0f, 110.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
 };
 
-static __declspec(section ".data") StatusVulnerability regist = {40, 40, 40, 100, 40, 100, 100, 30, 0, 0, 100, 0, 100, 80, 40, 0, 10, 100, 40, 100, 100, 5};
+static StatusVulnerability regist = {40, 40, 40, 100, 40, 100, 100, 30, 0, 0, 100, 0, 100, 80, 40, 0, 10, 100, 40, 100, 100, 5};
 
 BattleWeapon weapon_atmic_teresa_press = {
     NULL, 0, // name..icon
@@ -432,7 +432,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(damage_event)
+static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -877,24 +877,24 @@ EVT_BEGIN(breath_event_sub)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
-__declspec(section ".data") s32 atmic_teresa_id[] = {
+s32 atmic_teresa_id[] = {
     -1,
 };
 
-__declspec(section ".data") s32 target_unit_id[] = {
+s32 target_unit_id[] = {
     -1,
 };
 
-__declspec(section ".data") s32 target_parts_id[] = {
+s32 target_parts_id[] = {
     -1,
 };
 
-__declspec(section ".data") f32 atmic_teresa_scale = 1.0f;
+f32 atmic_teresa_scale = 1.0f;
 
 ExtTexInfo teresa_ext_entry_data[] = {
     {"c_teresa", "S_1", 0.0f},

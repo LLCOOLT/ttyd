@@ -163,25 +163,25 @@ static USER_FUNC(x_flag_wait);
 static USER_FUNC(x_flag_add);
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start);
 
-__declspec(section ".data") f32 fd_evt_lect_gor_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_evt_lect_gor_neg_one_382;
-__declspec(section ".data") f32 fd_evt_lect_gor___local_PI_383;
-__declspec(section ".data") f32 fd_evt_lect_gor___local_3PIO2_385;
-__declspec(section ".data") f32 fd_evt_lect_gor_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_evt_lect_gor___local_PIO2_384;
-__declspec(section ".data") f32 fd_evt_lect_gor_one_381;
-__declspec(section ".data") f32 fd_evt_lect_gor_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_evt_lect_gor_neg_one_365;
-__declspec(section ".data") f32 fd_evt_lect_gor___local_PI_366;
-__declspec(section ".data") f32 fd_evt_lect_gor___local_3PIO2_368;
-__declspec(section ".data") f32 fd_evt_lect_gor_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_evt_lect_gor___local_PIO2_367;
-__declspec(section ".data") f32 fd_evt_lect_gor_one_364;
+f32 fd_evt_lect_gor_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_evt_lect_gor_neg_one_382;
+f32 fd_evt_lect_gor___local_PI_383;
+f32 fd_evt_lect_gor___local_3PIO2_385;
+f32 fd_evt_lect_gor_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_evt_lect_gor___local_PIO2_384;
+f32 fd_evt_lect_gor_one_381;
+f32 fd_evt_lect_gor_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_evt_lect_gor_neg_one_365;
+f32 fd_evt_lect_gor___local_PI_366;
+f32 fd_evt_lect_gor___local_3PIO2_368;
+f32 fd_evt_lect_gor_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_evt_lect_gor___local_PIO2_367;
+f32 fd_evt_lect_gor_one_364;
 s32 christine_party_lecture_init[46];
 s32 christine_party_lecture[125];
 s32 chuchulina_party_lecture_init[51];
 s32 chuchulina_party_lecture[236];
-static __declspec(section ".data") s32 all_party_lecture_otosub[11];
+static s32 all_party_lecture_otosub[11];
 s32 all_party_lecture[482];
 s32 hammer_lv3_juyoitem_lecture_init[107];
 s32 hammer_lv3_juyoitem_lecture_sub01[29];
@@ -495,33 +495,33 @@ static USER_FUNC(effitemget_busaiku) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") f32 fd_evt_lect_gor_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_evt_lect_gor_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_evt_lect_gor_neg_one_382 = -1.0f;
+f32 fd_evt_lect_gor_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_evt_lect_gor___local_PI_383 = 3.1415927f;
+f32 fd_evt_lect_gor___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_evt_lect_gor___local_3PIO2_385 = 4.712389f;
+f32 fd_evt_lect_gor___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_evt_lect_gor_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_evt_lect_gor_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_evt_lect_gor___local_PIO2_384 = 1.5707964f;
+f32 fd_evt_lect_gor___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_evt_lect_gor_one_381 = 1.0f;
+f32 fd_evt_lect_gor_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_evt_lect_gor_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_evt_lect_gor_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_evt_lect_gor_neg_one_365 = -1.0f;
+f32 fd_evt_lect_gor_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_evt_lect_gor___local_PI_366 = 3.1415927f;
+f32 fd_evt_lect_gor___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_evt_lect_gor___local_3PIO2_368 = 4.712389f;
+f32 fd_evt_lect_gor___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_evt_lect_gor_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_evt_lect_gor_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_evt_lect_gor___local_PIO2_367 = 1.5707964f;
+f32 fd_evt_lect_gor___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_evt_lect_gor_one_364 = 1.0f;
+f32 fd_evt_lect_gor_one_364 = 1.0f;
 
 EVT_BEGIN(christine_party_lecture_init)
     CALL(N_evt_mapdisp_onoff, 0)
@@ -644,7 +644,7 @@ EVT_BEGIN(chuchulina_party_lecture)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(all_party_lecture_otosub)
+static EVT_BEGIN(all_party_lecture_otosub)
     CALL(evt_snd_bgmoff, 1024)
     CALL(evt_snd_bgmon, 1, STRING("BGM_FF_GET_PARTY1"))
     WAIT_MS(2000)

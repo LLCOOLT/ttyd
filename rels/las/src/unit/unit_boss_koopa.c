@@ -71,34 +71,34 @@ static USER_FUNC(party_cannot_use_command);
 static USER_FUNC(mario_cannot_use_command);
 extern BattleUnitKind unit_boss_kamec_obaba;
 
-__declspec(section ".data") f32 fd_boss_koopa_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_koopa_neg_one_382;
-__declspec(section ".data") f32 fd_boss_koopa___local_PI_383;
-__declspec(section ".data") f32 fd_boss_koopa___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_koopa_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_koopa___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_koopa_one_381;
-__declspec(section ".data") f32 fd_boss_koopa_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_koopa_neg_one_365;
-__declspec(section ".data") f32 fd_boss_koopa___local_PI_366;
-__declspec(section ".data") f32 fd_boss_koopa___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_koopa_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_koopa___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_koopa_one_364;
+f32 fd_boss_koopa_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_koopa_neg_one_382;
+f32 fd_boss_koopa___local_PI_383;
+f32 fd_boss_koopa___local_3PIO2_385;
+f32 fd_boss_koopa_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_koopa___local_PIO2_384;
+f32 fd_boss_koopa_one_381;
+f32 fd_boss_koopa_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_koopa_neg_one_365;
+f32 fd_boss_koopa___local_PI_366;
+f32 fd_boss_koopa___local_3PIO2_368;
+f32 fd_boss_koopa_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_koopa___local_PIO2_367;
+f32 fd_boss_koopa_one_364;
 BattleUnitKind unit_boss_koopa;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_forward_leaning[18];
-static __declspec(section ".data") PoseTableEntry pose_table_dead[3];
-static __declspec(section ".data") BattleDataEntry data_table[2];
+static PoseTableEntry pose_table_dead[3];
+static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_koopa_hip_attack;
 static BattleWeapon weapon_koopa_bite_attack;
 static BattleWeapon weapon_koopa_critical_bite_attack;
 static BattleWeapon weapon_koopa_fire_attack;
-__declspec(section ".data") BattleUnitSetup entry_kamec_obaba;
+BattleUnitSetup entry_kamec_obaba;
 static s32 koopa_zoom[25];
 static s32 kamec_obaba_zoom[40];
 static s32 init_event[124];
@@ -114,36 +114,36 @@ static s32 critical_bite_attack_event[261];
 static s32 fire_attack_event[356];
 s32 first_mario_damage_check[33];
 s32 first_mario_damage_event[114];
-static __declspec(section ".data") s32 wait_event[6];
-static __declspec(section ".data") const char* cmd_disable_string[5];
+static s32 wait_event[6];
+static const char* cmd_disable_string[5];
 
-__declspec(section ".data") f32 fd_boss_koopa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_koopa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_koopa_neg_one_382 = -1.0f;
+f32 fd_boss_koopa_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_koopa___local_PI_383 = 3.1415927f;
+f32 fd_boss_koopa___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_koopa___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_koopa___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_koopa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_koopa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_koopa___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_koopa___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_koopa_one_381 = 1.0f;
+f32 fd_boss_koopa_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_koopa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_koopa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_koopa_neg_one_365 = -1.0f;
+f32 fd_boss_koopa_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_koopa___local_PI_366 = 3.1415927f;
+f32 fd_boss_koopa___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_koopa___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_koopa___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_koopa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_koopa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_koopa___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_koopa___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_koopa_one_364 = 1.0f;
+f32 fd_boss_koopa_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_koopa = {
     144,
@@ -211,11 +211,11 @@ BattleUnitKind unit_boss_koopa = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
+static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {30, 30, 30, 100, 40, 100, 100, 25, 100, 75, 100, 75, 100, 80, 30, 0, 0, 100, 30, 100, 100, 5};
+static StatusVulnerability regist = {30, 30, 30, 100, 40, 100, 100, 25, 100, 75, 100, 75, 100, 80, 30, 0, 0, 100, 30, 100, 100, 5};
 
 static PoseTableEntry pose_table[] = {
     {1, "KPA_N_3"},
@@ -259,13 +259,13 @@ static PoseTableEntry pose_table_forward_leaning[] = {
     {69, "KPA_S_8"},
 };
 
-static __declspec(section ".data") PoseTableEntry pose_table_dead[] = {
+static PoseTableEntry pose_table_dead[] = {
     {28, "KPA_Z_3"},
     {39, "KPA_Z_3"},
     {69, "KPA_Z_3"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
@@ -426,7 +426,7 @@ static BattleWeapon weapon_koopa_fire_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-__declspec(section ".data") BattleUnitSetup entry_kamec_obaba = {
+BattleUnitSetup entry_kamec_obaba = {
     &unit_boss_kamec_obaba, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -1257,12 +1257,12 @@ EVT_BEGIN(first_mario_damage_event)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
+static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* cmd_disable_string[] = {
+static const char* cmd_disable_string[] = {
     "btl_jump_cmd_disable",
     "btl_hammer_cmd_disable",
     "btl_item_cmd_disable",

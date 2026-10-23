@@ -105,25 +105,25 @@ static f32 randf(f32 min, f32 max);
 void flower_disp(CameraId camera, void* param);
 void mirror_ball(void* param);
 
-__declspec(section ".data") f32 fd_win_04_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_04_neg_one_382;
-__declspec(section ".data") f32 fd_win_04___local_PI_383;
-__declspec(section ".data") f32 fd_win_04___local_3PIO2_385;
-__declspec(section ".data") f32 fd_win_04_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_04___local_PIO2_384;
-__declspec(section ".data") f32 fd_win_04_one_381;
-__declspec(section ".data") f32 fd_win_04_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_04_neg_one_365;
-__declspec(section ".data") f32 fd_win_04___local_PI_366;
-__declspec(section ".data") f32 fd_win_04___local_3PIO2_368;
-__declspec(section ".data") f32 fd_win_04_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_win_04___local_PIO2_367;
-__declspec(section ".data") f32 fd_win_04_one_364;
-__declspec(section ".data") s32 win_04w_door_open[10];
-__declspec(section ".data") s32 win_04w_door_close[10];
-__declspec(section ".data") s32 win_04e_door_open[10];
-__declspec(section ".data") s32 win_04e_door_close[10];
-static __declspec(section ".data") s32 out_w_bero[12];
+f32 fd_win_04_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_win_04_neg_one_382;
+f32 fd_win_04___local_PI_383;
+f32 fd_win_04___local_3PIO2_385;
+f32 fd_win_04_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_win_04___local_PIO2_384;
+f32 fd_win_04_one_381;
+f32 fd_win_04_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_win_04_neg_one_365;
+f32 fd_win_04___local_PI_366;
+f32 fd_win_04___local_3PIO2_368;
+f32 fd_win_04_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_win_04___local_PIO2_367;
+f32 fd_win_04_one_364;
+s32 win_04w_door_open[10];
+s32 win_04w_door_close[10];
+s32 win_04e_door_open[10];
+s32 win_04e_door_close[10];
+static s32 out_w_bero[12];
 BeroEntry bero_witchtrio[1];
 static BeroEntry bero_entry_data[3];
 s32 meet_clouda[76];
@@ -136,7 +136,7 @@ s32 mirror_rotate[41];
 s32 mario_move_wait[63];
 s32 dummy1_jump[26];
 s32 dummy2_jump[32];
-static __declspec(section ".data") s32 item_list[2];
+static s32 item_list[2];
 s32 clouda_nakama[1556];
 s32 touch_door[39];
 s32 mirror_ball_event[18];
@@ -150,63 +150,63 @@ s32 win_04_init_evt[94];
 
 int rand(void);
 
-__declspec(section ".data") f32 fd_win_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_win_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_win_04_neg_one_382 = -1.0f;
+f32 fd_win_04_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_win_04___local_PI_383 = 3.1415927f;
+f32 fd_win_04___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_win_04___local_3PIO2_385 = 4.712389f;
+f32 fd_win_04___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_win_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_win_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_win_04___local_PIO2_384 = 1.5707964f;
+f32 fd_win_04___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_win_04_one_381 = 1.0f;
+f32 fd_win_04_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_win_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_win_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_win_04_neg_one_365 = -1.0f;
+f32 fd_win_04_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_win_04___local_PI_366 = 3.1415927f;
+f32 fd_win_04___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_win_04___local_3PIO2_368 = 4.712389f;
+f32 fd_win_04___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_win_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_win_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_win_04___local_PIO2_367 = 1.5707964f;
+f32 fd_win_04___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_win_04_one_364 = 1.0f;
+f32 fd_win_04_one_364 = 1.0f;
 
-__declspec(section ".data") EVT_BEGIN(win_04w_door_open)
+EVT_BEGIN(win_04w_door_open)
     SET_VALUE(LW(8), STRING("S_doa_w_l"))
     SET_VALUE(LW(9), STRING("S_doa_w_r"))
     SPAWN_EVENT(PTR(evt_win_door_open))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(win_04w_door_close)
+EVT_BEGIN(win_04w_door_close)
     SET_VALUE(LW(8), STRING("S_doa_w_l"))
     SET_VALUE(LW(9), STRING("S_doa_w_r"))
     SPAWN_EVENT(PTR(evt_win_door_close))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(win_04e_door_open)
+EVT_BEGIN(win_04e_door_open)
     SET_VALUE(LW(8), STRING("S_doa_e_l"))
     SET_VALUE(LW(9), STRING("S_doa_e_r"))
     SPAWN_EVENT(PTR(evt_win_door_open))
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(win_04e_door_close)
+EVT_BEGIN(win_04e_door_close)
     SET_VALUE(LW(8), STRING("S_doa_e_l"))
     SET_VALUE(LW(9), STRING("S_doa_e_r"))
     SPAWN_EVENT(PTR(evt_win_door_close))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(out_w_bero)
+static EVT_BEGIN(out_w_bero)
     CALL(evt_fade_set_mapchange_type, 0, 2, 500, 1, 500)
     SET_VALUE(LW(0), 0)
     RETURN
@@ -588,7 +588,7 @@ USER_FUNC(fade_alpha) {
     return EVT_RETURN_DONE;
 }
 
-static __declspec(section ".data") s32 item_list[] = {
+static s32 item_list[] = {
     ITEM_NECKLACE, -1,
 };
 

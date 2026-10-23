@@ -39,7 +39,7 @@ u32 gap_08_8041889C_sbss;
 
 //.sdata
 const char* version = VERSION_PICK("009", "010");
-__declspec(section ".sdata") u32 gap_07_80410584_sdata[1] = {0};
+u32 gap_07_80410584_sdata[1] = {0};
 
 //local prototypes
 static inline void check_sum(CardSaveSlot* save);
@@ -173,14 +173,14 @@ s32 cardGetCode(void) {
 
 #pragma opt_propagation off //needed for memcard_probe
 void cardMain(void) {
-	s32 temp_r4;
+	s32 inserted;
 
 	if (wp->flags & 0x8000) {
-		temp_r4 = (s32)(s64)-(CARDProbe(0) == 0); //is something inserted?
-		if (wp->prevInserted != temp_r4) {
+		inserted = (s32)(s64)-(CARDProbe(0) == 0); //is something inserted?
+		if (wp->prevInserted != inserted) {
 			wp->flags |= 0x4000;
 		}
-		wp->prevInserted = temp_r4;
+		wp->prevInserted = inserted;
 		if (wp->busyFrames) {
 			wp->busyFrames--;
 		}

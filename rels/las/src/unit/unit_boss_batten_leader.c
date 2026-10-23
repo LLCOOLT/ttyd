@@ -113,20 +113,20 @@ extern s32 bts_x_flag_set[];
 extern s32 bts_x_flag_wait[];
 extern BattleUnitKind unit_boss_batten_satellite;
 
-__declspec(section ".data") f32 fd_boss_batten_leader_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_batten_leader_neg_one_382;
-__declspec(section ".data") f32 fd_boss_batten_leader___local_PI_383;
-__declspec(section ".data") f32 fd_boss_batten_leader___local_3PIO2_385;
-__declspec(section ".data") f32 fd_boss_batten_leader_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_batten_leader___local_PIO2_384;
-__declspec(section ".data") f32 fd_boss_batten_leader_one_381;
-__declspec(section ".data") f32 fd_boss_batten_leader_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_batten_leader_neg_one_365;
-__declspec(section ".data") f32 fd_boss_batten_leader___local_PI_366;
-__declspec(section ".data") f32 fd_boss_batten_leader___local_3PIO2_368;
-__declspec(section ".data") f32 fd_boss_batten_leader_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_boss_batten_leader___local_PIO2_367;
-__declspec(section ".data") f32 fd_boss_batten_leader_one_364;
+f32 fd_boss_batten_leader_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_boss_batten_leader_neg_one_382;
+f32 fd_boss_batten_leader___local_PI_383;
+f32 fd_boss_batten_leader___local_3PIO2_385;
+f32 fd_boss_batten_leader_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_boss_batten_leader___local_PIO2_384;
+f32 fd_boss_batten_leader_one_381;
+f32 fd_boss_batten_leader_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_boss_batten_leader_neg_one_365;
+f32 fd_boss_batten_leader___local_PI_366;
+f32 fd_boss_batten_leader___local_3PIO2_368;
+f32 fd_boss_batten_leader_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_boss_batten_leader___local_PIO2_367;
+f32 fd_boss_batten_leader_one_364;
 s32 batten_leader_zoom[34];
 static s32 mario_party_zoom[34];
 BattleWeapon weapon_batten_leader_thunder;
@@ -136,46 +136,46 @@ BattleWeapon weapon_batten_leader_shikaeshi;
 BattleWeapon weapon_batten_leader_yokeyoke;
 BattleWeapon weapon_batten_leader_stop;
 BattleUnitKind unit_boss_batten_leader;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_muteki;
-static __declspec(section ".data") StatusVulnerability regist;
-__declspec(section ".data") s32 defencecopy[2];
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+BattleUnitDefenseAttr defence_attr_muteki;
+static StatusVulnerability regist;
+s32 defencecopy[2];
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_furafura[18];
-static __declspec(section ".data") BattleDataEntry data_table[3];
+static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[7];
-__declspec(section ".data") s32 hakai_snd_event[9];
-__declspec(section ".data") BattleUnitSetup entry_batten_satellite;
+s32 hakai_snd_event[9];
+BattleUnitSetup entry_batten_satellite;
 /* light blink sequence read by the light event: {mapobj name, frames} steps, then a NULL name */
 typedef struct LightStep { const char* name; s32 time; } LightStep;
 typedef struct LightSeq1 { LightStep steps[1]; const char* end; } LightSeq1;
 typedef struct LightSeq2 { LightStep steps[2]; const char* end; } LightSeq2;
 typedef struct LightSeq3 { LightStep steps[3]; const char* end; } LightSeq3;
 typedef struct LightSeq4 { LightStep steps[4]; const char* end; } LightSeq4;
-__declspec(section ".data") LightSeq3 btl_shuryolight_pow_normal;
-__declspec(section ".data") LightSeq1 btl_shuryolight_pow_tenmetu2;
-__declspec(section ".data") LightSeq2 btl_shuryolight_pow_tenmetu;
-__declspec(section ".data") LightSeq4 btl_shuryolight_head_1_normal;
-__declspec(section ".data") LightSeq4 btl_shuryolight_head_2_normal;
-__declspec(section ".data") LightSeq4 btl_shuryolight_head_3_normal;
-__declspec(section ".data") LightSeq4 btl_shuryolight_head_1_quick;
-__declspec(section ".data") LightSeq4 btl_shuryolight_head_2_quick;
-__declspec(section ".data") LightSeq4 btl_shuryolight_head_3_quick;
-__declspec(section ".data") LightSeq2 btl_shuryolight_head_1_random;
-__declspec(section ".data") LightSeq2 btl_shuryolight_head_2_random;
-__declspec(section ".data") LightSeq2 btl_shuryolight_head_3_random;
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_1_tenmetu;
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_2_tenmetu;
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_3_tenmetu;
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_1_off;
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_2_off;
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_3_off;
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_1_on;
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_2_on;
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_3_on;
-__declspec(section ".data") LightSeq4 btl_shuryolight_rod_normal;
-__declspec(section ".data") LightSeq1 btl_shuryolight_rod_off;
+LightSeq3 btl_shuryolight_pow_normal;
+LightSeq1 btl_shuryolight_pow_tenmetu2;
+LightSeq2 btl_shuryolight_pow_tenmetu;
+LightSeq4 btl_shuryolight_head_1_normal;
+LightSeq4 btl_shuryolight_head_2_normal;
+LightSeq4 btl_shuryolight_head_3_normal;
+LightSeq4 btl_shuryolight_head_1_quick;
+LightSeq4 btl_shuryolight_head_2_quick;
+LightSeq4 btl_shuryolight_head_3_quick;
+LightSeq2 btl_shuryolight_head_1_random;
+LightSeq2 btl_shuryolight_head_2_random;
+LightSeq2 btl_shuryolight_head_3_random;
+LightSeq1 btl_shuryolight_head_1_tenmetu;
+LightSeq1 btl_shuryolight_head_2_tenmetu;
+LightSeq1 btl_shuryolight_head_3_tenmetu;
+LightSeq1 btl_shuryolight_head_1_off;
+LightSeq1 btl_shuryolight_head_2_off;
+LightSeq1 btl_shuryolight_head_3_off;
+LightSeq1 btl_shuryolight_head_1_on;
+LightSeq1 btl_shuryolight_head_2_on;
+LightSeq1 btl_shuryolight_head_3_on;
+LightSeq4 btl_shuryolight_rod_normal;
+LightSeq1 btl_shuryolight_rod_off;
 s32 light_anim_rtn[488];
 s32 light_rod_anim_rtn[122];
 s32 light_pose_change[314];
@@ -220,33 +220,33 @@ s32 batten_leader_yokeyoke_attack_event[176];
 s32 batten_leader_stop_attack_event[328];
 static s32 wait_event[16];
 
-__declspec(section ".data") f32 fd_boss_batten_leader_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_batten_leader_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_batten_leader_neg_one_382 = -1.0f;
+f32 fd_boss_batten_leader_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_batten_leader___local_PI_383 = 3.1415927f;
+f32 fd_boss_batten_leader___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_batten_leader___local_3PIO2_385 = 4.712389f;
+f32 fd_boss_batten_leader___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_batten_leader_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_batten_leader_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_batten_leader___local_PIO2_384 = 1.5707964f;
+f32 fd_boss_batten_leader___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_batten_leader_one_381 = 1.0f;
+f32 fd_boss_batten_leader_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_boss_batten_leader_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_boss_batten_leader_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_boss_batten_leader_neg_one_365 = -1.0f;
+f32 fd_boss_batten_leader_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_boss_batten_leader___local_PI_366 = 3.1415927f;
+f32 fd_boss_batten_leader___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_boss_batten_leader___local_3PIO2_368 = 4.712389f;
+f32 fd_boss_batten_leader___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_boss_batten_leader_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_boss_batten_leader_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_boss_batten_leader___local_PIO2_367 = 1.5707964f;
+f32 fd_boss_batten_leader___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_boss_batten_leader_one_364 = 1.0f;
+f32 fd_boss_batten_leader_one_364 = 1.0f;
 
 EVT_BEGIN(batten_leader_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
@@ -589,15 +589,15 @@ BattleUnitKind unit_boss_batten_leader = {
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
+static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-__declspec(section ".data") BattleUnitDefenseAttr defence_attr_muteki = {{2, 2, 2, 2, 2}};
+BattleUnitDefenseAttr defence_attr_muteki = {{2, 2, 2, 2, 2}};
 
-static __declspec(section ".data") StatusVulnerability regist = {30, 30, 30, 100, 30, 100, 100, 30, 100, 60, 100, 60, 100, 75, 30, 0, 0, 100, 30, 100, 100, 1};
+static StatusVulnerability regist = {30, 30, 30, 100, 30, 100, 100, 30, 100, 60, 100, 60, 100, 75, 30, 0, 0, 100, 30, 100, 100, 1};
 
-__declspec(section ".data") s32 defencecopy[] = {
+s32 defencecopy[] = {
     16843009, 16777216,
 };
 
@@ -643,7 +643,7 @@ static PoseTableEntry pose_table_furafura[] = {
     {69, "X_1"},
 };
 
-static __declspec(section ".data") BattleDataEntry data_table[] = {
+static BattleDataEntry data_table[] = {
     {9, damage_sub_event},
     {49, dead_event},
     {0, NULL},
@@ -659,7 +659,7 @@ static BattleUnitKindPart parts[] = {
     {7, /*"杖のランプ１"*/"\x8F\xF1\x82\xCC\x83\x89\x83\x93\x83\x76\x82\x50", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
 };
 
-__declspec(section ".data") EVT_BEGIN(hakai_snd_event)
+EVT_BEGIN(hakai_snd_event)
     CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_BARRIER_BREAK1"), -250000000, 0, -250000000)
     RETURN
 EVT_END()
@@ -962,7 +962,7 @@ USER_FUNC(battleGetBattenSatelliteInitPos) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") BattleUnitSetup entry_batten_satellite = {
+BattleUnitSetup entry_batten_satellite = {
     &unit_boss_batten_satellite, // mUnitKindParams
     1, // alliance
     {0}, // pad_05
@@ -973,51 +973,51 @@ __declspec(section ".data") BattleUnitSetup entry_batten_satellite = {
     NULL, // itemDropTable
 };
 
-__declspec(section ".data") LightSeq3 btl_shuryolight_pow_normal = {{{"L_1B", -2}, {"L_1A", 80}, {"L_1B", 80}}, NULL};
+LightSeq3 btl_shuryolight_pow_normal = {{{"L_1B", -2}, {"L_1A", 80}, {"L_1B", 80}}, NULL};
 
-__declspec(section ".data") LightSeq1 btl_shuryolight_pow_tenmetu2 = {{{"L_4E", 0}}, NULL};
+LightSeq1 btl_shuryolight_pow_tenmetu2 = {{{"L_4E", 0}}, NULL};
 
-__declspec(section ".data") LightSeq2 btl_shuryolight_pow_tenmetu = {{{"L_1B", -3}, {"L_1A", 200}}, NULL};
+LightSeq2 btl_shuryolight_pow_tenmetu = {{{"L_1B", -3}, {"L_1A", 200}}, NULL};
 
-__declspec(section ".data") LightSeq4 btl_shuryolight_head_1_normal = {{{"L_4A", 400}, {"L_4A", 400}, {"L_4B", 400}, {"L_4A", 400}}, NULL};
+LightSeq4 btl_shuryolight_head_1_normal = {{{"L_4A", 400}, {"L_4A", 400}, {"L_4B", 400}, {"L_4A", 400}}, NULL};
 
-__declspec(section ".data") LightSeq4 btl_shuryolight_head_2_normal = {{{"L_3A", 400}, {"L_3B", 400}, {"L_3A", 400}, {"L_3A", 400}}, NULL};
+LightSeq4 btl_shuryolight_head_2_normal = {{{"L_3A", 400}, {"L_3B", 400}, {"L_3A", 400}, {"L_3A", 400}}, NULL};
 
-__declspec(section ".data") LightSeq4 btl_shuryolight_head_3_normal = {{{"L_2B", 400}, {"L_2A", 400}, {"L_2A", 400}, {"L_2A", 400}}, NULL};
+LightSeq4 btl_shuryolight_head_3_normal = {{{"L_2B", 400}, {"L_2A", 400}, {"L_2A", 400}, {"L_2A", 400}}, NULL};
 
-__declspec(section ".data") LightSeq4 btl_shuryolight_head_1_quick = {{{"L_4A", 200}, {"L_4A", 200}, {"L_4B", 200}, {"L_4A", 200}}, NULL};
+LightSeq4 btl_shuryolight_head_1_quick = {{{"L_4A", 200}, {"L_4A", 200}, {"L_4B", 200}, {"L_4A", 200}}, NULL};
 
-__declspec(section ".data") LightSeq4 btl_shuryolight_head_2_quick = {{{"L_3A", 200}, {"L_3B", 200}, {"L_3A", 200}, {"L_3A", 200}}, NULL};
+LightSeq4 btl_shuryolight_head_2_quick = {{{"L_3A", 200}, {"L_3B", 200}, {"L_3A", 200}, {"L_3A", 200}}, NULL};
 
-__declspec(section ".data") LightSeq4 btl_shuryolight_head_3_quick = {{{"L_2B", 200}, {"L_2A", 200}, {"L_2A", 200}, {"L_2A", 200}}, NULL};
+LightSeq4 btl_shuryolight_head_3_quick = {{{"L_2B", 200}, {"L_2A", 200}, {"L_2A", 200}, {"L_2A", 200}}, NULL};
 
-__declspec(section ".data") LightSeq2 btl_shuryolight_head_1_random = {{{"L_4A", -4}, {"L_4B", -4}}, NULL};
+LightSeq2 btl_shuryolight_head_1_random = {{{"L_4A", -4}, {"L_4B", -4}}, NULL};
 
-__declspec(section ".data") LightSeq2 btl_shuryolight_head_2_random = {{{"L_3A", -4}, {"L_3B", -4}}, NULL};
+LightSeq2 btl_shuryolight_head_2_random = {{{"L_3A", -4}, {"L_3B", -4}}, NULL};
 
-__declspec(section ".data") LightSeq2 btl_shuryolight_head_3_random = {{{"L_2B", -4}, {"L_2A", -4}}, NULL};
+LightSeq2 btl_shuryolight_head_3_random = {{{"L_2B", -4}, {"L_2A", -4}}, NULL};
 
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_1_tenmetu = {{{"L_4E", 0}}, NULL};
+LightSeq1 btl_shuryolight_head_1_tenmetu = {{{"L_4E", 0}}, NULL};
 
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_2_tenmetu = {{{"L_3E", 0}}, NULL};
+LightSeq1 btl_shuryolight_head_2_tenmetu = {{{"L_3E", 0}}, NULL};
 
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_3_tenmetu = {{{"L_2E", 0}}, NULL};
+LightSeq1 btl_shuryolight_head_3_tenmetu = {{{"L_2E", 0}}, NULL};
 
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_1_off = {{{"L_4A", -1}}, NULL};
+LightSeq1 btl_shuryolight_head_1_off = {{{"L_4A", -1}}, NULL};
 
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_2_off = {{{"L_3A", -1}}, NULL};
+LightSeq1 btl_shuryolight_head_2_off = {{{"L_3A", -1}}, NULL};
 
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_3_off = {{{"L_2A", -1}}, NULL};
+LightSeq1 btl_shuryolight_head_3_off = {{{"L_2A", -1}}, NULL};
 
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_1_on = {{{"L_4B", -1}}, NULL};
+LightSeq1 btl_shuryolight_head_1_on = {{{"L_4B", -1}}, NULL};
 
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_2_on = {{{"L_3B", -1}}, NULL};
+LightSeq1 btl_shuryolight_head_2_on = {{{"L_3B", -1}}, NULL};
 
-__declspec(section ".data") LightSeq1 btl_shuryolight_head_3_on = {{{"L_2B", -1}}, NULL};
+LightSeq1 btl_shuryolight_head_3_on = {{{"L_2B", -1}}, NULL};
 
-__declspec(section ".data") LightSeq4 btl_shuryolight_rod_normal = {{{"L_3C", 0}, {"L_3B", 1000}, {"L_3D", 0}, {"L_3A", 1000}}, NULL};
+LightSeq4 btl_shuryolight_rod_normal = {{{"L_3C", 0}, {"L_3B", 1000}, {"L_3D", 0}, {"L_3A", 1000}}, NULL};
 
-__declspec(section ".data") LightSeq1 btl_shuryolight_rod_off = {{{"L_3A", -1}}, NULL};
+LightSeq1 btl_shuryolight_rod_off = {{{"L_3A", -1}}, NULL};
 
 EVT_BEGIN(light_anim_rtn)
     BEGIN_SIBLING_EVENT

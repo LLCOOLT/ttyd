@@ -55,29 +55,29 @@ static void _mapsetofs_all(CloudWork* wp);
 static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
 static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
 
-__declspec(section ".data") f32 fd_las_14_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_14_neg_one_382;
-__declspec(section ".data") f32 fd_las_14___local_PI_383;
-__declspec(section ".data") f32 fd_las_14___local_3PIO2_385;
-__declspec(section ".data") f32 fd_las_14_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_14___local_PIO2_384;
-__declspec(section ".data") f32 fd_las_14_one_381;
-__declspec(section ".data") f32 fd_las_14_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_14_neg_one_365;
-__declspec(section ".data") f32 fd_las_14___local_PI_366;
-__declspec(section ".data") f32 fd_las_14___local_3PIO2_368;
-__declspec(section ".data") f32 fd_las_14_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_las_14___local_PIO2_367;
-__declspec(section ".data") f32 fd_las_14_one_364;
-static __declspec(section ".data") s32 w_door_close[12];
-static __declspec(section ".data") s32 w_door_open[12];
+f32 fd_las_14_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_las_14_neg_one_382;
+f32 fd_las_14___local_PI_383;
+f32 fd_las_14___local_3PIO2_385;
+f32 fd_las_14_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_las_14___local_PIO2_384;
+f32 fd_las_14_one_381;
+f32 fd_las_14_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_las_14_neg_one_365;
+f32 fd_las_14___local_PI_366;
+f32 fd_las_14___local_3PIO2_368;
+f32 fd_las_14_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_las_14___local_PIO2_367;
+f32 fd_las_14_one_364;
+static s32 w_door_close[12];
+static s32 w_door_open[12];
 static BeroEntry bero_entry_data[2];
 static s32 box_evt[30];
-static __declspec(section ".data") const char* capturemap[3];
+static const char* capturemap[3];
 static Vec v_list[8];
-static __declspec(section ".data") s32 evt_cloud_main_evt[4];
+static s32 evt_cloud_main_evt[4];
 static s32 cloud_evt[35];
-__declspec(section ".data") s32 touch_evt[2];
+s32 touch_evt[2];
 static s32 hint_plate[14];
 s32 las_14_init_evt[81];
 
@@ -184,41 +184,41 @@ static void _mapclsofs_all(CloudWork* wp) {
     }
 }
 
-__declspec(section ".data") f32 fd_las_14_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_14_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_14_neg_one_382 = -1.0f;
+f32 fd_las_14_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_14___local_PI_383 = 3.1415927f;
+f32 fd_las_14___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_14___local_3PIO2_385 = 4.712389f;
+f32 fd_las_14___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_14_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_14_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_14___local_PIO2_384 = 1.5707964f;
+f32 fd_las_14___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_14_one_381 = 1.0f;
+f32 fd_las_14_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_las_14_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_las_14_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_las_14_neg_one_365 = -1.0f;
+f32 fd_las_14_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_las_14___local_PI_366 = 3.1415927f;
+f32 fd_las_14___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_las_14___local_3PIO2_368 = 4.712389f;
+f32 fd_las_14___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_las_14_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_las_14_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_las_14___local_PIO2_367 = 1.5707964f;
+f32 fd_las_14___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_las_14_one_364 = 1.0f;
+f32 fd_las_14_one_364 = 1.0f;
 
-static __declspec(section ".data") EVT_BEGIN(w_door_close)
+static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("S_door1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(w_door_open)
+static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("S_door1"), 0, LW(0), 0)
     RETURN
@@ -256,7 +256,7 @@ static EVT_BEGIN(box_evt)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* capturemap[] = {
+static const char* capturemap[] = {
     "S_kabe1",
     "S_ten",
     "",
@@ -273,7 +273,7 @@ static Vec v_list[] = {
     {-50.0f, 0.0f, -50.0f},
 };
 
-static __declspec(section ".data") EVT_BEGIN(evt_cloud_main_evt)
+static EVT_BEGIN(evt_cloud_main_evt)
     CALL(evt_cloud_main)
     RETURN
 EVT_END()
@@ -291,7 +291,7 @@ static EVT_BEGIN(cloud_evt)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(touch_evt)
+EVT_BEGIN(touch_evt)
     RETURN
 EVT_END()
 

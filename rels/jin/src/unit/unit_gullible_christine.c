@@ -26,26 +26,26 @@ USER_FUNC(evt_btl_camera_set_mode);
 USER_FUNC(evt_btl_camera_set_moveto);
 static USER_FUNC(_krb_get_dir);
 
-__declspec(section ".data") f32 fd_gullible_christine_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_christine_neg_one_382;
-__declspec(section ".data") f32 fd_gullible_christine___local_PI_383;
-__declspec(section ".data") f32 fd_gullible_christine___local_3PIO2_385;
-__declspec(section ".data") f32 fd_gullible_christine_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_christine___local_PIO2_384;
-__declspec(section ".data") f32 fd_gullible_christine_one_381;
-__declspec(section ".data") f32 fd_gullible_christine_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_christine_neg_one_365;
-__declspec(section ".data") f32 fd_gullible_christine___local_PI_366;
-__declspec(section ".data") f32 fd_gullible_christine___local_3PIO2_368;
-__declspec(section ".data") f32 fd_gullible_christine_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_gullible_christine___local_PIO2_367;
-__declspec(section ".data") f32 fd_gullible_christine_one_364;
+f32 fd_gullible_christine_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_gullible_christine_neg_one_382;
+f32 fd_gullible_christine___local_PI_383;
+f32 fd_gullible_christine___local_3PIO2_385;
+f32 fd_gullible_christine_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_gullible_christine___local_PIO2_384;
+f32 fd_gullible_christine_one_381;
+f32 fd_gullible_christine_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_gullible_christine_neg_one_365;
+f32 fd_gullible_christine___local_PI_366;
+f32 fd_gullible_christine___local_3PIO2_368;
+f32 fd_gullible_christine_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_gullible_christine___local_PIO2_367;
+f32 fd_gullible_christine_one_364;
 BattleUnitKind unit_gullible_christine;
 static BattleWeapon enemyWeapon_ChristineNormalAttack;
-static __declspec(section ".data") BattleUnitDefense defence_christine;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_christine;
-static __declspec(section ".data") StatusVulnerability regist_christine;
-static __declspec(section ".data") BattleDataEntry data_table_christine[2];
+static BattleUnitDefense defence_christine;
+static BattleUnitDefenseAttr defence_attr_christine;
+static StatusVulnerability regist_christine;
+static BattleDataEntry data_table_christine[2];
 static BattleUnitKindPart parts_christine[1];
 static s32 fmario_zoom_christine[19];
 static s32 gparty_zoom_christine[19];
@@ -53,35 +53,35 @@ static s32 init_event_christine[42];
 s32 damage_event_christine[22];
 static s32 dead_event_christine[147];
 static s32 attack_event_christine[690];
-static __declspec(section ".data") s32 wait_event_christine[7];
+static s32 wait_event_christine[7];
 
-__declspec(section ".data") f32 fd_gullible_christine_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gullible_christine_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gullible_christine_neg_one_382 = -1.0f;
+f32 fd_gullible_christine_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_gullible_christine___local_PI_383 = 3.1415927f;
+f32 fd_gullible_christine___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gullible_christine___local_3PIO2_385 = 4.712389f;
+f32 fd_gullible_christine___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gullible_christine_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gullible_christine_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gullible_christine___local_PIO2_384 = 1.5707964f;
+f32 fd_gullible_christine___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gullible_christine_one_381 = 1.0f;
+f32 fd_gullible_christine_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_gullible_christine_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_gullible_christine_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_gullible_christine_neg_one_365 = -1.0f;
+f32 fd_gullible_christine_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_gullible_christine___local_PI_366 = 3.1415927f;
+f32 fd_gullible_christine___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_gullible_christine___local_3PIO2_368 = 4.712389f;
+f32 fd_gullible_christine___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_gullible_christine_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_gullible_christine_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_gullible_christine___local_PIO2_367 = 1.5707964f;
+f32 fd_gullible_christine___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_gullible_christine_one_364 = 1.0f;
+f32 fd_gullible_christine_one_364 = 1.0f;
 
 BattleUnitKind unit_gullible_christine = {
     80,
@@ -185,13 +185,13 @@ static BattleWeapon enemyWeapon_ChristineNormalAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // field_B4
 };
 
-static __declspec(section ".data") BattleUnitDefense defence_christine = {{0, 0, 0, 0, 0}};
+static BattleUnitDefense defence_christine = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr_christine = {{0, 0, 0, 0, 0}};
+static BattleUnitDefenseAttr defence_attr_christine = {{0, 0, 0, 0, 0}};
 
-static __declspec(section ".data") StatusVulnerability regist_christine = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
+static StatusVulnerability regist_christine = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
 
-static __declspec(section ".data") BattleDataEntry data_table_christine[] = {
+static BattleDataEntry data_table_christine[] = {
     {49, dead_event_christine},
     {0, NULL},
 };
@@ -492,7 +492,7 @@ static USER_FUNC(_krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
-static __declspec(section ".data") EVT_BEGIN(wait_event_christine)
+static EVT_BEGIN(wait_event_christine)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END_PAD()

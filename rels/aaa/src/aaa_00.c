@@ -89,26 +89,26 @@ USER_FUNC(mapdraw);
 void mapdelete(void);
 static void draw(CameraId camera, void* param);
 
-__declspec(section ".data") f32 fd_aaa_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aaa_00_neg_one_382;
-__declspec(section ".data") f32 fd_aaa_00___local_PI_383;
-__declspec(section ".data") f32 fd_aaa_00___local_3PIO2_385[2];
-__declspec(section ".data") f32 fd_aaa_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aaa_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_aaa_00_one_381;
-__declspec(section ".data") f32 fd_aaa_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aaa_00_neg_one_365;
-__declspec(section ".data") f32 fd_aaa_00___local_PI_366;
-__declspec(section ".data") f32 fd_aaa_00___local_3PIO2_368[2];
-__declspec(section ".data") f32 fd_aaa_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_aaa_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_aaa_00_one_364;
+f32 fd_aaa_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_aaa_00_neg_one_382;
+f32 fd_aaa_00___local_PI_383;
+f32 fd_aaa_00___local_3PIO2_385[2];
+f32 fd_aaa_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_aaa_00___local_PIO2_384;
+f32 fd_aaa_00_one_381;
+f32 fd_aaa_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_aaa_00_neg_one_365;
+f32 fd_aaa_00___local_PI_366;
+f32 fd_aaa_00___local_3PIO2_368[2];
+f32 fd_aaa_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_aaa_00___local_PIO2_367;
+f32 fd_aaa_00_one_364;
 static NpcSetupInfo npcEnt[3];
 static s32 evt_door[15];
-static __declspec(section ".data") s32 evt_door2[12];
+static s32 evt_door2[12];
 static s32 evt_wall[22];
-static __declspec(section ".data") const char* ie_npc[2];
-static __declspec(section ".data") s32 door_1_open[12];
+static const char* ie_npc[2];
+static s32 door_1_open[12];
 static s32 door_1_close[14];
 static DoorParam door_1;
 static s32 evt_prologue[713];
@@ -128,42 +128,42 @@ static s32 epilogue_evt2[500];
 #else
 static s32 epilogue_evt2[495];
 #endif
-static __declspec(section ".data") TreeAccess ki_data[2];
+static TreeAccess ki_data[2];
 static KusaAccess kusa_data[11];
 static BeroEntry bero_entry_data[2];
 s32 aaa_00_init_evt[81];
 
-__declspec(section ".data") f32 fd_aaa_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_aaa_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_aaa_00_neg_one_382 = -1.0f;
+f32 fd_aaa_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_aaa_00___local_PI_383 = 3.1415927f;
+f32 fd_aaa_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_aaa_00___local_3PIO2_385[] = {
+f32 fd_aaa_00___local_3PIO2_385[] = {
     4.712389f, 0.0f,
 };
 
-__declspec(section ".data") f32 fd_aaa_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_aaa_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_aaa_00___local_PIO2_384 = 1.5707964f;
+f32 fd_aaa_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_aaa_00_one_381 = 1.0f;
+f32 fd_aaa_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_aaa_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_aaa_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_aaa_00_neg_one_365 = -1.0f;
+f32 fd_aaa_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_aaa_00___local_PI_366 = 3.1415927f;
+f32 fd_aaa_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_aaa_00___local_3PIO2_368[] = {
+f32 fd_aaa_00___local_3PIO2_368[] = {
     4.712389f, 0.0f,
 };
 
-__declspec(section ".data") f32 fd_aaa_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_aaa_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_aaa_00___local_PIO2_367 = 1.5707964f;
+f32 fd_aaa_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_aaa_00_one_364 = 1.0f;
+f32 fd_aaa_00_one_364 = 1.0f;
 
 static NpcSetupInfo npcEnt[] = {
     {
@@ -194,7 +194,7 @@ static EVT_BEGIN(evt_door)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_door2)
+static EVT_BEGIN(evt_door2)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie_door"), 0, 0, LW(0))
     RETURN
@@ -208,12 +208,12 @@ static EVT_BEGIN(evt_wall)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") const char* ie_npc[] = {
+static const char* ie_npc[] = {
     /*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57",
     NULL,
 };
 
-static __declspec(section ".data") EVT_BEGIN(door_1_open)
+static EVT_BEGIN(door_1_open)
     CALL(evt_snd_bgmoff, 18432)
     CALL(evt_snd_envoff, 18432)
     CALL(evt_snd_env_lpf, 0, 800)
@@ -744,7 +744,7 @@ static EVT_BEGIN(epilogue_evt2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") TreeAccess ki_data[] = {
+static TreeAccess ki_data[] = {
     {6, "A_ki_1", "S_ki_1", "S_ha_1", 0, NULL},
     {7, NULL, NULL, NULL, 0, NULL},
 };

@@ -155,7 +155,7 @@ u32 gap_08_80418B74_sbss;
 #pragma force_active on
 
 #ifndef VERSION_G8ME01
-__declspec(section ".sdata") u32 gap_07_8041799C_sdata[1] = {0};
+u32 gap_07_8041799C_sdata[1] = {0};
 #endif
 #pragma force_active reset
 

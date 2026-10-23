@@ -86,40 +86,40 @@ static USER_FUNC(test_glare);
 USER_FUNC(tokei);
 static void sun_tev(MapTevCallbackInfo* info);
 
-__declspec(section ".data") f32 fd_hom_00_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hom_00_neg_one_382;
-__declspec(section ".data") f32 fd_hom_00___local_PI_383;
-__declspec(section ".data") f32 fd_hom_00___local_3PIO2_385;
-__declspec(section ".data") f32 fd_hom_00_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hom_00___local_PIO2_384;
-__declspec(section ".data") f32 fd_hom_00_one_381;
-__declspec(section ".data") f32 fd_hom_00_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hom_00_neg_one_365;
-__declspec(section ".data") f32 fd_hom_00___local_PI_366;
-__declspec(section ".data") f32 fd_hom_00___local_3PIO2_368;
-__declspec(section ".data") f32 fd_hom_00_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_hom_00___local_PIO2_367;
-__declspec(section ".data") f32 fd_hom_00_one_364;
+f32 fd_hom_00_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_hom_00_neg_one_382;
+f32 fd_hom_00___local_PI_383;
+f32 fd_hom_00___local_3PIO2_385;
+f32 fd_hom_00_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_hom_00___local_PIO2_384;
+f32 fd_hom_00_one_381;
+f32 fd_hom_00_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_hom_00_neg_one_365;
+f32 fd_hom_00___local_PI_366;
+f32 fd_hom_00___local_3PIO2_368;
+f32 fd_hom_00_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_hom_00___local_PIO2_367;
+f32 fd_hom_00_one_364;
 static s32 n_2_door_open[22];
 static s32 n_2_door_close[22];
 static BeroEntry bero_data[3];
 BeroEntry bero_data_nidome[2];
 s32 evt_carry_up_bridge[92];
 s32 init_powan_toron_konari_papa_gurume[23];
-static __declspec(section ".data") s32 talk_powan[8];
-static __declspec(section ".data") s32 talk_toron[8];
-static __declspec(section ".data") s32 talk_gurume[8];
-static __declspec(section ".data") s32 talk_papa[8];
-static __declspec(section ".data") s32 talk_konari[8];
-__declspec(section ".data") s32 init_ekiin1[2];
+static s32 talk_powan[8];
+static s32 talk_toron[8];
+static s32 talk_gurume[8];
+static s32 talk_papa[8];
+static s32 talk_konari[8];
+s32 init_ekiin1[2];
 s32 talk_ekiin1[32];
 s32 init_ekiin2[13];
 s32 talk_ekiin2[28];
 static NpcSetupInfo npc_data[9];
 s32 evt_bridge_down[144];
-static __declspec(section ".data") s32 key_tbl[2];
+static s32 key_tbl[2];
 static s32 evt_chk[23];
-static __declspec(section ".data") s32 evt_lock[10];
+static s32 evt_lock[10];
 s32 evt_train_door[13];
 static s32 evt_train[262];
 s32 evt_train_nidome[307];
@@ -131,33 +131,33 @@ s32 hom_00_init_evt[259];
 s32 hom_00_init_evt[247];
 #endif
 
-__declspec(section ".data") f32 fd_hom_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hom_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hom_00_neg_one_382 = -1.0f;
+f32 fd_hom_00_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_hom_00___local_PI_383 = 3.1415927f;
+f32 fd_hom_00___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hom_00___local_3PIO2_385 = 4.712389f;
+f32 fd_hom_00___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hom_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hom_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hom_00___local_PIO2_384 = 1.5707964f;
+f32 fd_hom_00___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hom_00_one_381 = 1.0f;
+f32 fd_hom_00_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_hom_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_hom_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_hom_00_neg_one_365 = -1.0f;
+f32 fd_hom_00_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_hom_00___local_PI_366 = 3.1415927f;
+f32 fd_hom_00___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_hom_00___local_3PIO2_368 = 4.712389f;
+f32 fd_hom_00___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_hom_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_hom_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_hom_00___local_PIO2_367 = 1.5707964f;
+f32 fd_hom_00___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_hom_00_one_364 = 1.0f;
+f32 fd_hom_00_one_364 = 1.0f;
 
 static EVT_BEGIN(n_2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -276,32 +276,32 @@ EVT_BEGIN(init_powan_toron_konari_papa_gurume)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(talk_powan)
+static EVT_BEGIN(talk_powan)
     CALL(evt_msg_print, 0, STRING("stg6_hom_00"), 0, 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(talk_toron)
+static EVT_BEGIN(talk_toron)
     CALL(evt_msg_print, 0, STRING("stg6_hom_01"), 0, 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(talk_gurume)
+static EVT_BEGIN(talk_gurume)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_211"), 0, 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(talk_papa)
+static EVT_BEGIN(talk_papa)
     CALL(evt_msg_print, 0, STRING("stg6_hom_02"), 0, 0)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(talk_konari)
+static EVT_BEGIN(talk_konari)
     CALL(evt_msg_print, 0, STRING("stg6_hom_03"), 0, 0)
     RETURN
 EVT_END()
 
-__declspec(section ".data") EVT_BEGIN(init_ekiin1)
+EVT_BEGIN(init_ekiin1)
     RETURN
 EVT_END()
 
@@ -474,7 +474,7 @@ EVT_BEGIN(evt_bridge_down)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 key_tbl[] = {
+static s32 key_tbl[] = {
     ITEM_STEEPLE_KEY_0x18, -1,
 };
 
@@ -489,7 +489,7 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(evt_lock)
+static EVT_BEGIN(evt_lock)
     SET_VALUE(LW(0), 1)
     CALL_CHILD(PTR(bero_case_switch_on))
     SET_VALUE(GSW(0), 312)

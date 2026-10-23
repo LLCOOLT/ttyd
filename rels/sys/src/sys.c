@@ -75,105 +75,105 @@ static void _unresolved(void);
 static void _epilog(void);
 void _prolog(void);
 
-__declspec(section ".data") f32 fd_sys_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_sys_neg_one_382;
-__declspec(section ".data") f32 fd_sys___local_PI_383;
-__declspec(section ".data") f32 fd_sys___local_3PIO2_385;
-__declspec(section ".data") f32 fd_sys_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_sys___local_PIO2_384;
-__declspec(section ".data") f32 fd_sys_one_381;
-__declspec(section ".data") f32 fd_sys_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_sys_neg_one_365;
-__declspec(section ".data") f32 fd_sys___local_PI_366;
-__declspec(section ".data") f32 fd_sys___local_3PIO2_368;
-__declspec(section ".data") f32 fd_sys_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_sys___local_PIO2_367;
-__declspec(section ".data") f32 fd_sys_one_364;
-__declspec(section ".data") f64 fd_sys__three_localstatic4_sqrtf;
-__declspec(section ".data") f64 fd_sys__half_localstatic3_sqrtf;
-__declspec(section ".data") s32 dummy_evt[2];
+f32 fd_sys_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_sys_neg_one_382;
+f32 fd_sys___local_PI_383;
+f32 fd_sys___local_3PIO2_385;
+f32 fd_sys_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_sys___local_PIO2_384;
+f32 fd_sys_one_381;
+f32 fd_sys_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_sys_neg_one_365;
+f32 fd_sys___local_PI_366;
+f32 fd_sys___local_3PIO2_368;
+f32 fd_sys_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_sys___local_PIO2_367;
+f32 fd_sys_one_364;
+f64 fd_sys__three_localstatic4_sqrtf;
+f64 fd_sys__half_localstatic3_sqrtf;
+s32 dummy_evt[2];
 #ifdef VERSION_G8ME01
-static __declspec(section ".data") u32 niji_tbl[6];
+static u32 niji_tbl[6];
 #else
-static __declspec(section ".data") u32 niji_tbl[2];
+static u32 niji_tbl[2];
 #endif
-static __declspec(section ".data") const char* msg_tbl[9];
-__declspec(section ".data") s8 prologue_jp_tbl[8];
-__declspec(section ".data") s8 stage1_jp_tbl[8];
-__declspec(section ".data") s8 stage2_jp_tbl[8];
-__declspec(section ".data") s8 stage3_jp_tbl[8];
-__declspec(section ".data") s8 stage4_jp_tbl[8];
-__declspec(section ".data") s8 stage5_jp_tbl[8];
-__declspec(section ".data") s8 stage6_jp_tbl[8];
-__declspec(section ".data") s8 stage7_jp_tbl[8];
-__declspec(section ".data") s8 stage8_jp_tbl[8];
-__declspec(section ".data") s8* texid_jp_tbl[9];
+static const char* msg_tbl[9];
+s8 prologue_jp_tbl[8];
+s8 stage1_jp_tbl[8];
+s8 stage2_jp_tbl[8];
+s8 stage3_jp_tbl[8];
+s8 stage4_jp_tbl[8];
+s8 stage5_jp_tbl[8];
+s8 stage6_jp_tbl[8];
+s8 stage7_jp_tbl[8];
+s8 stage8_jp_tbl[8];
+s8* texid_jp_tbl[9];
 #ifdef VERSION_G8ME01
-__declspec(section ".data") s8 prologue_us_tbl[12];
-__declspec(section ".data") s8 stage1_us_tbl[12];
-__declspec(section ".data") s8 stage2_us_tbl[12];
-__declspec(section ".data") s8 stage3_us_tbl[12];
-__declspec(section ".data") s8 stage4_us_tbl[12];
-__declspec(section ".data") s8 stage5_us_tbl[12];
-__declspec(section ".data") s8 stage6_us_tbl[12];
-__declspec(section ".data") s8 stage7_us_tbl[12];
-__declspec(section ".data") s8 stage8_us_tbl[12];
-__declspec(section ".data") s8* texid_us_tbl[9];
-__declspec(section ".data") s8 prologue_lang3_tbl[8];
-__declspec(section ".data") s8 stage1_lang3_tbl[12];
-__declspec(section ".data") s8 stage2_lang3_tbl[12];
-__declspec(section ".data") s8 stage3_lang3_tbl[12];
-__declspec(section ".data") s8 stage4_lang3_tbl[12];
-__declspec(section ".data") s8 stage5_lang3_tbl[12];
-__declspec(section ".data") s8 stage6_lang3_tbl[12];
-__declspec(section ".data") s8 stage7_lang3_tbl[12];
-__declspec(section ".data") s8 stage8_lang3_tbl[12];
-__declspec(section ".data") s8* texid_lang3_tbl[9];
-__declspec(section ".data") s8 prologue_lang4_tbl[12];
-__declspec(section ".data") s8 stage1_lang4_tbl[12];
-__declspec(section ".data") s8 stage2_lang4_tbl[12];
-__declspec(section ".data") s8 stage3_lang4_tbl[12];
-__declspec(section ".data") s8 stage4_lang4_tbl[12];
-__declspec(section ".data") s8 stage5_lang4_tbl[12];
-__declspec(section ".data") s8 stage6_lang4_tbl[12];
-__declspec(section ".data") s8 stage7_lang4_tbl[12];
-__declspec(section ".data") s8 stage8_lang4_tbl[12];
-__declspec(section ".data") s8* texid_lang4_tbl[9];
-__declspec(section ".data") s8 prologue_lang5_tbl[8];
-__declspec(section ".data") s8 stage1_lang5_tbl[8];
-__declspec(section ".data") s8 stage2_lang5_tbl[8];
-__declspec(section ".data") s8 stage3_lang5_tbl[8];
-__declspec(section ".data") s8 stage4_lang5_tbl[8];
-__declspec(section ".data") s8 stage5_lang5_tbl[8];
-__declspec(section ".data") s8 stage6_lang5_tbl[8];
-__declspec(section ".data") s8 stage7_lang5_tbl[8];
-__declspec(section ".data") s8 stage8_lang5_tbl[8];
-__declspec(section ".data") s8* texid_lang5_tbl[9];
-__declspec(section ".data") s8 prologue_lang6_tbl[8];
-__declspec(section ".data") s8 stage1_lang6_tbl[8];
-__declspec(section ".data") s8 stage2_lang6_tbl[8];
-__declspec(section ".data") s8 stage3_lang6_tbl[8];
-__declspec(section ".data") s8 stage4_lang6_tbl[8];
-__declspec(section ".data") s8 stage5_lang6_tbl[8];
-__declspec(section ".data") s8 stage6_lang6_tbl[8];
-__declspec(section ".data") s8 stage7_lang6_tbl[8];
-__declspec(section ".data") s8 stage8_lang6_tbl[8];
-__declspec(section ".data") s8* texid_lang6_tbl[9];
-__declspec(section ".data") s8** lang_tbl[6];
-__declspec(section ".data") const char* lang_prefix[7];
+s8 prologue_us_tbl[12];
+s8 stage1_us_tbl[12];
+s8 stage2_us_tbl[12];
+s8 stage3_us_tbl[12];
+s8 stage4_us_tbl[12];
+s8 stage5_us_tbl[12];
+s8 stage6_us_tbl[12];
+s8 stage7_us_tbl[12];
+s8 stage8_us_tbl[12];
+s8* texid_us_tbl[9];
+s8 prologue_lang3_tbl[8];
+s8 stage1_lang3_tbl[12];
+s8 stage2_lang3_tbl[12];
+s8 stage3_lang3_tbl[12];
+s8 stage4_lang3_tbl[12];
+s8 stage5_lang3_tbl[12];
+s8 stage6_lang3_tbl[12];
+s8 stage7_lang3_tbl[12];
+s8 stage8_lang3_tbl[12];
+s8* texid_lang3_tbl[9];
+s8 prologue_lang4_tbl[12];
+s8 stage1_lang4_tbl[12];
+s8 stage2_lang4_tbl[12];
+s8 stage3_lang4_tbl[12];
+s8 stage4_lang4_tbl[12];
+s8 stage5_lang4_tbl[12];
+s8 stage6_lang4_tbl[12];
+s8 stage7_lang4_tbl[12];
+s8 stage8_lang4_tbl[12];
+s8* texid_lang4_tbl[9];
+s8 prologue_lang5_tbl[8];
+s8 stage1_lang5_tbl[8];
+s8 stage2_lang5_tbl[8];
+s8 stage3_lang5_tbl[8];
+s8 stage4_lang5_tbl[8];
+s8 stage5_lang5_tbl[8];
+s8 stage6_lang5_tbl[8];
+s8 stage7_lang5_tbl[8];
+s8 stage8_lang5_tbl[8];
+s8* texid_lang5_tbl[9];
+s8 prologue_lang6_tbl[8];
+s8 stage1_lang6_tbl[8];
+s8 stage2_lang6_tbl[8];
+s8 stage3_lang6_tbl[8];
+s8 stage4_lang6_tbl[8];
+s8 stage5_lang6_tbl[8];
+s8 stage6_lang6_tbl[8];
+s8 stage7_lang6_tbl[8];
+s8 stage8_lang6_tbl[8];
+s8* texid_lang6_tbl[9];
+s8** lang_tbl[6];
+const char* lang_prefix[7];
 #else
-__declspec(section ".data") s8 prologue_us_tbl[12];
-__declspec(section ".data") s8 stage1_us_tbl[8];
-__declspec(section ".data") s8 stage2_us_tbl[8];
-__declspec(section ".data") s8 stage3_us_tbl[8];
-__declspec(section ".data") s8 stage4_us_tbl[8];
-__declspec(section ".data") s8 stage5_us_tbl[8];
-__declspec(section ".data") s8 stage6_us_tbl[8];
-__declspec(section ".data") s8 stage7_us_tbl[8];
-__declspec(section ".data") s8 stage8_us_tbl[8];
-__declspec(section ".data") s8* texid_us_tbl[9];
-__declspec(section ".data") s8** lang_tbl[2];
-__declspec(section ".data") const char* lang_prefix[2];
+s8 prologue_us_tbl[12];
+s8 stage1_us_tbl[8];
+s8 stage2_us_tbl[8];
+s8 stage3_us_tbl[8];
+s8 stage4_us_tbl[8];
+s8 stage5_us_tbl[8];
+s8 stage6_us_tbl[8];
+s8 stage7_us_tbl[8];
+s8 stage8_us_tbl[8];
+s8* texid_us_tbl[9];
+s8** lang_tbl[2];
+const char* lang_prefix[2];
 #endif
 s32 sys_01_init_evt[135];
 #ifdef VERSION_G8ME01
@@ -199,53 +199,53 @@ void _prolog(void) {
     camGetPtr(CAMERA_2D)->flags |= 0x400;
 }
 
-__declspec(section ".data") f32 fd_sys_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_sys_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_sys_neg_one_382 = -1.0f;
+f32 fd_sys_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_sys___local_PI_383 = 3.1415927f;
+f32 fd_sys___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_sys___local_3PIO2_385 = 4.712389f;
+f32 fd_sys___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_sys_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_sys_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_sys___local_PIO2_384 = 1.5707964f;
+f32 fd_sys___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_sys_one_381 = 1.0f;
+f32 fd_sys_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_sys_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_sys_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_sys_neg_one_365 = -1.0f;
+f32 fd_sys_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_sys___local_PI_366 = 3.1415927f;
+f32 fd_sys___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_sys___local_3PIO2_368 = 4.712389f;
+f32 fd_sys___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_sys_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_sys_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_sys___local_PIO2_367 = 1.5707964f;
+f32 fd_sys___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_sys_one_364 = 1.0f;
+f32 fd_sys_one_364 = 1.0f;
 
-__declspec(section ".data") f64 fd_sys__three_localstatic4_sqrtf = 3.0;
+f64 fd_sys__three_localstatic4_sqrtf = 3.0;
 
-__declspec(section ".data") f64 fd_sys__half_localstatic3_sqrtf = 0.5;
+f64 fd_sys__half_localstatic3_sqrtf = 0.5;
 
-__declspec(section ".data") EVT_BEGIN(dummy_evt)
+EVT_BEGIN(dummy_evt)
     RETURN
 EVT_END()
 
 #ifdef VERSION_G8ME01
-static __declspec(section ".data") u32 niji_tbl[] = {
+static u32 niji_tbl[] = {
     19, 26, 24, 27, 22, 22,
 };
 #else
-static __declspec(section ".data") u32 niji_tbl[] = {
+static u32 niji_tbl[] = {
     19, 22,
 };
 #endif
 
-static __declspec(section ".data") const char* msg_tbl[] = {
+static const char* msg_tbl[] = {
     "msg_stg_seq_prolouge", "msg_stg_seq_stg1", "msg_stg_seq_stg2", "msg_stg_seq_stg3", "msg_stg_seq_stg4", "msg_stg_seq_stg5", "msg_stg_seq_stg6", "msg_stg_seq_stg7",
     "msg_stg_seq_stg8",
 };
@@ -738,302 +738,302 @@ void display_func(CameraId cameraId, void* param) {
     GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 }
 
-__declspec(section ".data") s8 prologue_jp_tbl[8] = {
+s8 prologue_jp_tbl[8] = {
     16, 17, 17, 6, 18, -1,
 };
 
-__declspec(section ".data") s8 stage1_jp_tbl[8] = {
+s8 stage1_jp_tbl[8] = {
     4, 5, 6, 7, 8, -1,
 };
 
-__declspec(section ".data") s8 stage2_jp_tbl[8] = {
+s8 stage2_jp_tbl[8] = {
     4, 5, 6, 7, 9, -1,
 };
 
-__declspec(section ".data") s8 stage3_jp_tbl[8] = {
+s8 stage3_jp_tbl[8] = {
     4, 5, 6, 7, 10, -1,
 };
 
-__declspec(section ".data") s8 stage4_jp_tbl[8] = {
+s8 stage4_jp_tbl[8] = {
     4, 5, 6, 7, 11, -1,
 };
 
-__declspec(section ".data") s8 stage5_jp_tbl[8] = {
+s8 stage5_jp_tbl[8] = {
     4, 5, 6, 7, 12, -1,
 };
 
-__declspec(section ".data") s8 stage6_jp_tbl[8] = {
+s8 stage6_jp_tbl[8] = {
     4, 5, 6, 7, 13, -1,
 };
 
-__declspec(section ".data") s8 stage7_jp_tbl[8] = {
+s8 stage7_jp_tbl[8] = {
     4, 5, 6, 7, 14, -1,
 };
 
-__declspec(section ".data") s8 stage8_jp_tbl[8] = {
+s8 stage8_jp_tbl[8] = {
     4, 5, 6, 7, 15, -1,
 };
 
-__declspec(section ".data") s8* texid_jp_tbl[] = {
+s8* texid_jp_tbl[] = {
     prologue_jp_tbl, stage1_jp_tbl, stage2_jp_tbl, stage3_jp_tbl, stage4_jp_tbl, stage5_jp_tbl, stage6_jp_tbl, stage7_jp_tbl, stage8_jp_tbl,
 };
 
 #ifdef VERSION_G8ME01
 // US: one title texture set per language; -2 marks a word gap
-__declspec(section ".data") s8 prologue_us_tbl[12] = {
+s8 prologue_us_tbl[12] = {
     19, 20, 21, 22, 21, 23, 24, 25, -1,
 };
 
-__declspec(section ".data") s8 stage1_us_tbl[12] = {
+s8 stage1_us_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 11, -1,
 };
 
-__declspec(section ".data") s8 stage2_us_tbl[12] = {
+s8 stage2_us_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 12, -1,
 };
 
-__declspec(section ".data") s8 stage3_us_tbl[12] = {
+s8 stage3_us_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 13, -1,
 };
 
-__declspec(section ".data") s8 stage4_us_tbl[12] = {
+s8 stage4_us_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 14, -1,
 };
 
-__declspec(section ".data") s8 stage5_us_tbl[12] = {
+s8 stage5_us_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 15, -1,
 };
 
-__declspec(section ".data") s8 stage6_us_tbl[12] = {
+s8 stage6_us_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 16, -1,
 };
 
-__declspec(section ".data") s8 stage7_us_tbl[12] = {
+s8 stage7_us_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 17, -1,
 };
 
-__declspec(section ".data") s8 stage8_us_tbl[12] = {
+s8 stage8_us_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 18, -1,
 };
 
-__declspec(section ".data") s8* texid_us_tbl[] = {
+s8* texid_us_tbl[] = {
     prologue_us_tbl, stage1_us_tbl, stage2_us_tbl, stage3_us_tbl, stage4_us_tbl, stage5_us_tbl, stage6_us_tbl, stage7_us_tbl, stage8_us_tbl,
 };
 
-__declspec(section ".data") s8 prologue_lang3_tbl[8] = {
+s8 prologue_lang3_tbl[8] = {
     19, 20, 21, 22, 21, 23, -1,
 };
 
-__declspec(section ".data") s8 stage1_lang3_tbl[12] = {
+s8 stage1_lang3_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 11, -1,
 };
 
-__declspec(section ".data") s8 stage2_lang3_tbl[12] = {
+s8 stage2_lang3_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 12, -1,
 };
 
-__declspec(section ".data") s8 stage3_lang3_tbl[12] = {
+s8 stage3_lang3_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 13, -1,
 };
 
-__declspec(section ".data") s8 stage4_lang3_tbl[12] = {
+s8 stage4_lang3_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 14, -1,
 };
 
-__declspec(section ".data") s8 stage5_lang3_tbl[12] = {
+s8 stage5_lang3_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 15, -1,
 };
 
-__declspec(section ".data") s8 stage6_lang3_tbl[12] = {
+s8 stage6_lang3_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 16, -1,
 };
 
-__declspec(section ".data") s8 stage7_lang3_tbl[12] = {
+s8 stage7_lang3_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 17, -1,
 };
 
-__declspec(section ".data") s8 stage8_lang3_tbl[12] = {
+s8 stage8_lang3_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, -2, 18, -1,
 };
 
-__declspec(section ".data") s8* texid_lang3_tbl[] = {
+s8* texid_lang3_tbl[] = {
     prologue_lang3_tbl, stage1_lang3_tbl, stage2_lang3_tbl, stage3_lang3_tbl, stage4_lang3_tbl, stage5_lang3_tbl, stage6_lang3_tbl, stage7_lang3_tbl, stage8_lang3_tbl,
 };
 
-__declspec(section ".data") s8 prologue_lang4_tbl[12] = {
+s8 prologue_lang4_tbl[12] = {
     20, 21, 22, 23, 22, 24, 25, 26, -1,
 };
 
-__declspec(section ".data") s8 stage1_lang4_tbl[12] = {
+s8 stage1_lang4_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, 11, -2, 12, -1,
 };
 
-__declspec(section ".data") s8 stage2_lang4_tbl[12] = {
+s8 stage2_lang4_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, 11, -2, 13, -1,
 };
 
-__declspec(section ".data") s8 stage3_lang4_tbl[12] = {
+s8 stage3_lang4_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, 11, -2, 14, -1,
 };
 
-__declspec(section ".data") s8 stage4_lang4_tbl[12] = {
+s8 stage4_lang4_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, 11, -2, 15, -1,
 };
 
-__declspec(section ".data") s8 stage5_lang4_tbl[12] = {
+s8 stage5_lang4_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, 11, -2, 16, -1,
 };
 
-__declspec(section ".data") s8 stage6_lang4_tbl[12] = {
+s8 stage6_lang4_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, 11, -2, 17, -1,
 };
 
-__declspec(section ".data") s8 stage7_lang4_tbl[12] = {
+s8 stage7_lang4_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, 11, -2, 18, -1,
 };
 
-__declspec(section ".data") s8 stage8_lang4_tbl[12] = {
+s8 stage8_lang4_tbl[12] = {
     4, 5, 6, 7, 8, 9, 10, 11, -2, 19, -1,
 };
 
-__declspec(section ".data") s8* texid_lang4_tbl[] = {
+s8* texid_lang4_tbl[] = {
     prologue_lang4_tbl, stage1_lang4_tbl, stage2_lang4_tbl, stage3_lang4_tbl, stage4_lang4_tbl, stage5_lang4_tbl, stage6_lang4_tbl, stage7_lang4_tbl, stage8_lang4_tbl,
 };
 
-__declspec(section ".data") s8 prologue_lang5_tbl[8] = {
+s8 prologue_lang5_tbl[8] = {
     16, 17, 18, 19, 20, 21, 20, -1,
 };
 
-__declspec(section ".data") s8 stage1_lang5_tbl[8] = {
+s8 stage1_lang5_tbl[8] = {
     4, 5, 6, 7, -2, 8, -1,
 };
 
-__declspec(section ".data") s8 stage2_lang5_tbl[8] = {
+s8 stage2_lang5_tbl[8] = {
     4, 5, 6, 7, -2, 9, -1,
 };
 
-__declspec(section ".data") s8 stage3_lang5_tbl[8] = {
+s8 stage3_lang5_tbl[8] = {
     4, 5, 6, 7, -2, 10, -1,
 };
 
-__declspec(section ".data") s8 stage4_lang5_tbl[8] = {
+s8 stage4_lang5_tbl[8] = {
     4, 5, 6, 7, -2, 11, -1,
 };
 
-__declspec(section ".data") s8 stage5_lang5_tbl[8] = {
+s8 stage5_lang5_tbl[8] = {
     4, 5, 6, 7, -2, 12, -1,
 };
 
-__declspec(section ".data") s8 stage6_lang5_tbl[8] = {
+s8 stage6_lang5_tbl[8] = {
     4, 5, 6, 7, -2, 13, -1,
 };
 
-__declspec(section ".data") s8 stage7_lang5_tbl[8] = {
+s8 stage7_lang5_tbl[8] = {
     4, 5, 6, 7, -2, 14, -1,
 };
 
-__declspec(section ".data") s8 stage8_lang5_tbl[8] = {
+s8 stage8_lang5_tbl[8] = {
     4, 5, 6, 7, -2, 15, -1,
 };
 
-__declspec(section ".data") s8* texid_lang5_tbl[] = {
+s8* texid_lang5_tbl[] = {
     prologue_lang5_tbl, stage1_lang5_tbl, stage2_lang5_tbl, stage3_lang5_tbl, stage4_lang5_tbl, stage5_lang5_tbl, stage6_lang5_tbl, stage7_lang5_tbl, stage8_lang5_tbl,
 };
 
-__declspec(section ".data") s8 prologue_lang6_tbl[8] = {
+s8 prologue_lang6_tbl[8] = {
     17, 18, 19, 20, 19, 21, 19, -1,
 };
 
-__declspec(section ".data") s8 stage1_lang6_tbl[8] = {
+s8 stage1_lang6_tbl[8] = {
     4, 5, 6, 7, 8, -2, 9, -1,
 };
 
-__declspec(section ".data") s8 stage2_lang6_tbl[8] = {
+s8 stage2_lang6_tbl[8] = {
     4, 5, 6, 7, 8, -2, 10, -1,
 };
 
-__declspec(section ".data") s8 stage3_lang6_tbl[8] = {
+s8 stage3_lang6_tbl[8] = {
     4, 5, 6, 7, 8, -2, 11, -1,
 };
 
-__declspec(section ".data") s8 stage4_lang6_tbl[8] = {
+s8 stage4_lang6_tbl[8] = {
     4, 5, 6, 7, 8, -2, 12, -1,
 };
 
-__declspec(section ".data") s8 stage5_lang6_tbl[8] = {
+s8 stage5_lang6_tbl[8] = {
     4, 5, 6, 7, 8, -2, 13, -1,
 };
 
-__declspec(section ".data") s8 stage6_lang6_tbl[8] = {
+s8 stage6_lang6_tbl[8] = {
     4, 5, 6, 7, 8, -2, 14, -1,
 };
 
-__declspec(section ".data") s8 stage7_lang6_tbl[8] = {
+s8 stage7_lang6_tbl[8] = {
     4, 5, 6, 7, 8, -2, 15, -1,
 };
 
-__declspec(section ".data") s8 stage8_lang6_tbl[8] = {
+s8 stage8_lang6_tbl[8] = {
     4, 5, 6, 7, 8, -2, 16, -1,
 };
 
-__declspec(section ".data") s8* texid_lang6_tbl[] = {
+s8* texid_lang6_tbl[] = {
     prologue_lang6_tbl, stage1_lang6_tbl, stage2_lang6_tbl, stage3_lang6_tbl, stage4_lang6_tbl, stage5_lang6_tbl, stage6_lang6_tbl, stage7_lang6_tbl, stage8_lang6_tbl,
 };
 
-__declspec(section ".data") s8** lang_tbl[] = {
+s8** lang_tbl[] = {
     texid_jp_tbl, texid_us_tbl, texid_lang3_tbl, texid_lang4_tbl, texid_lang5_tbl, texid_lang6_tbl,
 };
 
-__declspec(section ".data") const char* lang_prefix[] = {
+const char* lang_prefix[] = {
     "jp", "us", "ge", "fr", "sp", "it", "du",
 };
 
 #else
-__declspec(section ".data") s8 prologue_us_tbl[12] = {
+s8 prologue_us_tbl[12] = {
     17, 18, 19, 20, 19, 7, 21, 8, -1,
 };
 
-__declspec(section ".data") s8 stage1_us_tbl[8] = {
+s8 stage1_us_tbl[8] = {
     4, 5, 6, 7, 8, 9, -1,
 };
 
-__declspec(section ".data") s8 stage2_us_tbl[8] = {
+s8 stage2_us_tbl[8] = {
     4, 5, 6, 7, 8, 10, -1,
 };
 
-__declspec(section ".data") s8 stage3_us_tbl[8] = {
+s8 stage3_us_tbl[8] = {
     4, 5, 6, 7, 8, 11, -1,
 };
 
-__declspec(section ".data") s8 stage4_us_tbl[8] = {
+s8 stage4_us_tbl[8] = {
     4, 5, 6, 7, 8, 12, -1,
 };
 
-__declspec(section ".data") s8 stage5_us_tbl[8] = {
+s8 stage5_us_tbl[8] = {
     4, 5, 6, 7, 8, 13, -1,
 };
 
-__declspec(section ".data") s8 stage6_us_tbl[8] = {
+s8 stage6_us_tbl[8] = {
     4, 5, 6, 7, 8, 14, -1,
 };
 
-__declspec(section ".data") s8 stage7_us_tbl[8] = {
+s8 stage7_us_tbl[8] = {
     4, 5, 6, 7, 8, 15, -1,
 };
 
-__declspec(section ".data") s8 stage8_us_tbl[8] = {
+s8 stage8_us_tbl[8] = {
     4, 5, 6, 7, 8, 16, -1,
 };
 
-__declspec(section ".data") s8* texid_us_tbl[] = {
+s8* texid_us_tbl[] = {
     prologue_us_tbl, stage1_us_tbl, stage2_us_tbl, stage3_us_tbl, stage4_us_tbl, stage5_us_tbl, stage6_us_tbl, stage7_us_tbl, stage8_us_tbl,
 };
 
-__declspec(section ".data") s8** lang_tbl[] = {
+s8** lang_tbl[] = {
     texid_jp_tbl, texid_us_tbl,
 };
 
-__declspec(section ".data") const char* lang_prefix[] = {
+const char* lang_prefix[] = {
     "jp", "us",
 };
 

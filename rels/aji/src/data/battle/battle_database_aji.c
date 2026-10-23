@@ -14,112 +14,112 @@ extern BattleUnitKind unit_barriern;
 extern BattleUnitKind unit_barriern_custom;
 extern BattleUnitKind unit_barriern_z;
 
-__declspec(section ".data") f32 fd_battle_database_aji_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_aji_neg_one_382;
-__declspec(section ".data") f32 fd_battle_database_aji___local_PI_383;
-__declspec(section ".data") f32 fd_battle_database_aji___local_3PIO2_385;
-__declspec(section ".data") f32 fd_battle_database_aji_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_aji___local_PIO2_384;
-__declspec(section ".data") f32 fd_battle_database_aji_one_381;
-__declspec(section ".data") f32 fd_battle_database_aji_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_aji_neg_one_365;
-__declspec(section ".data") f32 fd_battle_database_aji___local_PI_366;
-__declspec(section ".data") f32 fd_battle_database_aji___local_3PIO2_368;
-__declspec(section ".data") f32 fd_battle_database_aji_one_negone_359[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_battle_database_aji___local_PIO2_367;
-__declspec(section ".data") f32 fd_battle_database_aji_one_364;
+f32 fd_battle_database_aji_negone_one_374[2] __attribute__((aligned(8)));
+f32 fd_battle_database_aji_neg_one_382;
+f32 fd_battle_database_aji___local_PI_383;
+f32 fd_battle_database_aji___local_3PIO2_385;
+f32 fd_battle_database_aji_one_negone_373[2] __attribute__((aligned(8)));
+f32 fd_battle_database_aji___local_PIO2_384;
+f32 fd_battle_database_aji_one_381;
+f32 fd_battle_database_aji_negone_one_360[2] __attribute__((aligned(8)));
+f32 fd_battle_database_aji_neg_one_365;
+f32 fd_battle_database_aji___local_PI_366;
+f32 fd_battle_database_aji___local_3PIO2_368;
+f32 fd_battle_database_aji_one_negone_359[2] __attribute__((aligned(8)));
+f32 fd_battle_database_aji___local_PIO2_367;
+f32 fd_battle_database_aji_one_364;
 BattleStageObjectData aji_btlobject_data[27];
 BattleStageData aji_btlstage_data[7];
-__declspec(section ".data") BattleUnitSetup btlparty_aji_aji_mbmkII[1];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_mbmkII;
+BattleUnitSetup btlparty_aji_aji_mbmkII[1];
+BattleGroupSetup btlgrp_aji_aji_mbmkII;
 BattleUnitSetup btlparty_aji_aji_zako[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_zako;
+BattleGroupSetup btlgrp_aji_aji_zako;
 BattleUnitSetup btlparty_aji_aji_01_01_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_01_off_1;
+BattleGroupSetup btlgrp_aji_aji_01_01_off_1;
 BattleUnitSetup btlparty_aji_aji_01_02_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_02_off_1;
+BattleGroupSetup btlgrp_aji_aji_01_02_off_1;
 BattleUnitSetup btlparty_aji_aji_01_03_off_1[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_03_off_1;
+BattleGroupSetup btlgrp_aji_aji_01_03_off_1;
 BattleUnitSetup btlparty_aji_aji_01_04_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_04_off_1;
+BattleGroupSetup btlgrp_aji_aji_01_04_off_1;
 BattleUnitSetup btlparty_aji_aji_01_05_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_05_off_1;
+BattleGroupSetup btlgrp_aji_aji_01_05_off_1;
 BattleUnitSetup btlparty_aji_aji_01_06_off_1[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_06_off_1;
+BattleGroupSetup btlgrp_aji_aji_01_06_off_1;
 BattleUnitSetup btlparty_aji_aji_01_07_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_07_off_1;
+BattleGroupSetup btlgrp_aji_aji_01_07_off_1;
 BattleUnitSetup btlparty_aji_aji_01_08_off_1[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_08_off_1;
+BattleGroupSetup btlgrp_aji_aji_01_08_off_1;
 BattleUnitSetup btlparty_aji_aji_04_01_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_04_01_off_1;
+BattleGroupSetup btlgrp_aji_aji_04_01_off_1;
 BattleUnitSetup btlparty_aji_aji_06_01_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_06_01_off_1;
+BattleGroupSetup btlgrp_aji_aji_06_01_off_1;
 BattleUnitSetup btlparty_aji_aji_08_01_off_1[3];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_08_01_off_1;
+BattleGroupSetup btlgrp_aji_aji_08_01_off_1;
 BattleUnitSetup btlparty_aji_aji_09_01_off_1[5];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_09_01_off_1;
-__declspec(section ".data") BattleUnitSetup btlparty_aji_aji_10_01_off_1[1];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_10_01_off_1;
+BattleGroupSetup btlgrp_aji_aji_09_01_off_1;
+BattleUnitSetup btlparty_aji_aji_10_01_off_1[1];
+BattleGroupSetup btlgrp_aji_aji_10_01_off_1;
 BattleUnitSetup btlparty_aji_aji_13_01_off_1[4];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_13_01_off_1;
+BattleGroupSetup btlgrp_aji_aji_13_01_off_1;
 BattleUnitSetup btlparty_aji_aji_13_02_off_1[2];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_13_02_off_1;
-__declspec(section ".data") BattleUnitSetup btlparty_aji_aji_15_01_off_1[1];
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_15_01_off_1;
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_test1_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_test2_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_test3_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_test4_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_test5_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_mbmkii_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_00_00_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_03_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_04_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_05_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_06_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_07_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_08_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_04_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_06_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_08_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_09_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_10_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_13_01_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_13_02_off[2];
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_15_01_off[2];
+BattleGroupSetup btlgrp_aji_aji_13_02_off_1;
+BattleUnitSetup btlparty_aji_aji_15_01_off_1[1];
+BattleGroupSetup btlgrp_aji_aji_15_01_off_1;
+NpcBattleSelect btlgrpsel_aji_btlno_aji_test1_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_test2_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_test3_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_test4_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_test5_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_mbmkii_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_00_00_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_01_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_02_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_03_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_04_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_05_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_06_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_07_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_08_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_04_01_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_06_01_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_08_01_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_09_01_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_10_01_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_13_01_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_13_02_off[2];
+NpcBattleSelect btlgrpsel_aji_btlno_aji_15_01_off[2];
 NpcSetupBattleInfo btlsetup_aji_tbl[24];
 NpcTerritoryInfo btl_aji_setup_no_tbl[24];
 s32 bgset_aji_space_event[35];
 
-__declspec(section ".data") f32 fd_battle_database_aji_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_battle_database_aji_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_aji_neg_one_382 = -1.0f;
+f32 fd_battle_database_aji_neg_one_382 = -1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_aji___local_PI_383 = 3.1415927f;
+f32 fd_battle_database_aji___local_PI_383 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_battle_database_aji___local_3PIO2_385 = 4.712389f;
+f32 fd_battle_database_aji___local_3PIO2_385 = 4.712389f;
 
-__declspec(section ".data") f32 fd_battle_database_aji_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_battle_database_aji_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_aji___local_PIO2_384 = 1.5707964f;
+f32 fd_battle_database_aji___local_PIO2_384 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_battle_database_aji_one_381 = 1.0f;
+f32 fd_battle_database_aji_one_381 = 1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_aji_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
+f32 fd_battle_database_aji_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_aji_neg_one_365 = -1.0f;
+f32 fd_battle_database_aji_neg_one_365 = -1.0f;
 
-__declspec(section ".data") f32 fd_battle_database_aji___local_PI_366 = 3.1415927f;
+f32 fd_battle_database_aji___local_PI_366 = 3.1415927f;
 
-__declspec(section ".data") f32 fd_battle_database_aji___local_3PIO2_368 = 4.712389f;
+f32 fd_battle_database_aji___local_3PIO2_368 = 4.712389f;
 
-__declspec(section ".data") f32 fd_battle_database_aji_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
+f32 fd_battle_database_aji_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_database_aji___local_PIO2_367 = 1.5707964f;
+f32 fd_battle_database_aji___local_PIO2_367 = 1.5707964f;
 
-__declspec(section ".data") f32 fd_battle_database_aji_one_364 = 1.0f;
+f32 fd_battle_database_aji_one_364 = 1.0f;
 
 BattleStageObjectData aji_btlobject_data[] = {
     {"dentou_01", 2, 0, {144.0f, 0.0f, -54.0f}, 0, 60, {0}},
@@ -225,7 +225,7 @@ BattleStageData aji_btlstage_data[] = {
     },
 };
 
-__declspec(section ".data") BattleUnitSetup btlparty_aji_aji_mbmkII[] = {
+BattleUnitSetup btlparty_aji_aji_mbmkII[] = {
     {
         &unit_boss_magnum_battender_mkII, // mUnitKindParams
         1, // alliance
@@ -238,7 +238,7 @@ __declspec(section ".data") BattleUnitSetup btlparty_aji_aji_mbmkII[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_mbmkII = {
+BattleGroupSetup btlgrp_aji_aji_mbmkII = {
     1, // numEnemies
     btlparty_aji_aji_mbmkII, // enemyData
     0, 0, // heldItemWeight..randomItemWeight
@@ -271,7 +271,7 @@ BattleUnitSetup btlparty_aji_aji_zako[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_zako = {
+BattleGroupSetup btlgrp_aji_aji_zako = {
     2, // numEnemies
     btlparty_aji_aji_zako, // enemyData
     0, 0, // heldItemWeight..randomItemWeight
@@ -304,7 +304,7 @@ BattleUnitSetup btlparty_aji_aji_01_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_01_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_01_01_off_1 = {
     2, // numEnemies
     btlparty_aji_aji_01_01_off_1, // enemyData
     25, // heldItemWeight
@@ -348,7 +348,7 @@ BattleUnitSetup btlparty_aji_aji_01_02_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_02_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_01_02_off_1 = {
     3, // numEnemies
     btlparty_aji_aji_01_02_off_1, // enemyData
     25, // heldItemWeight
@@ -402,7 +402,7 @@ BattleUnitSetup btlparty_aji_aji_01_03_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_03_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_01_03_off_1 = {
     4, // numEnemies
     btlparty_aji_aji_01_03_off_1, // enemyData
     25, // heldItemWeight
@@ -436,7 +436,7 @@ BattleUnitSetup btlparty_aji_aji_01_04_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_04_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_01_04_off_1 = {
     2, // numEnemies
     btlparty_aji_aji_01_04_off_1, // enemyData
     25, // heldItemWeight
@@ -470,7 +470,7 @@ BattleUnitSetup btlparty_aji_aji_01_05_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_05_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_01_05_off_1 = {
     2, // numEnemies
     btlparty_aji_aji_01_05_off_1, // enemyData
     25, // heldItemWeight
@@ -524,7 +524,7 @@ BattleUnitSetup btlparty_aji_aji_01_06_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_06_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_01_06_off_1 = {
     4, // numEnemies
     btlparty_aji_aji_01_06_off_1, // enemyData
     25, // heldItemWeight
@@ -568,7 +568,7 @@ BattleUnitSetup btlparty_aji_aji_01_07_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_07_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_01_07_off_1 = {
     3, // numEnemies
     btlparty_aji_aji_01_07_off_1, // enemyData
     25, // heldItemWeight
@@ -622,7 +622,7 @@ BattleUnitSetup btlparty_aji_aji_01_08_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_01_08_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_01_08_off_1 = {
     4, // numEnemies
     btlparty_aji_aji_01_08_off_1, // enemyData
     25, // heldItemWeight
@@ -656,7 +656,7 @@ BattleUnitSetup btlparty_aji_aji_04_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_04_01_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_04_01_off_1 = {
     2, // numEnemies
     btlparty_aji_aji_04_01_off_1, // enemyData
     0, 0, // heldItemWeight..randomItemWeight
@@ -689,7 +689,7 @@ BattleUnitSetup btlparty_aji_aji_06_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_06_01_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_06_01_off_1 = {
     2, // numEnemies
     btlparty_aji_aji_06_01_off_1, // enemyData
     25, // heldItemWeight
@@ -733,7 +733,7 @@ BattleUnitSetup btlparty_aji_aji_08_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_08_01_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_08_01_off_1 = {
     3, // numEnemies
     btlparty_aji_aji_08_01_off_1, // enemyData
     25, // heldItemWeight
@@ -797,7 +797,7 @@ BattleUnitSetup btlparty_aji_aji_09_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_09_01_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_09_01_off_1 = {
     5, // numEnemies
     btlparty_aji_aji_09_01_off_1, // enemyData
     25, // heldItemWeight
@@ -808,7 +808,7 @@ __declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_09_01_off_1 = {
     5, // field_1C
 };
 
-__declspec(section ".data") BattleUnitSetup btlparty_aji_aji_10_01_off_1[] = {
+BattleUnitSetup btlparty_aji_aji_10_01_off_1[] = {
     {
         &unit_barriern_custom, // mUnitKindParams
         1, // alliance
@@ -821,7 +821,7 @@ __declspec(section ".data") BattleUnitSetup btlparty_aji_aji_10_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_10_01_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_10_01_off_1 = {
     1, // numEnemies
     btlparty_aji_aji_10_01_off_1, // enemyData
     0, 0, // heldItemWeight..randomItemWeight
@@ -874,7 +874,7 @@ BattleUnitSetup btlparty_aji_aji_13_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_13_01_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_13_01_off_1 = {
     4, // numEnemies
     btlparty_aji_aji_13_01_off_1, // enemyData
     25, // heldItemWeight
@@ -908,7 +908,7 @@ BattleUnitSetup btlparty_aji_aji_13_02_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_13_02_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_13_02_off_1 = {
     2, // numEnemies
     btlparty_aji_aji_13_02_off_1, // enemyData
     25, // heldItemWeight
@@ -919,7 +919,7 @@ __declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_13_02_off_1 = {
     5, // field_1C
 };
 
-__declspec(section ".data") BattleUnitSetup btlparty_aji_aji_15_01_off_1[] = {
+BattleUnitSetup btlparty_aji_aji_15_01_off_1[] = {
     {
         &unit_gundan_zako_elite, // mUnitKindParams
         1, // alliance
@@ -932,7 +932,7 @@ __declspec(section ".data") BattleUnitSetup btlparty_aji_aji_15_01_off_1[] = {
     },
 };
 
-__declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_15_01_off_1 = {
+BattleGroupSetup btlgrp_aji_aji_15_01_off_1 = {
     1, // numEnemies
     btlparty_aji_aji_15_01_off_1, // enemyData
     25, // heldItemWeight
@@ -943,117 +943,117 @@ __declspec(section ".data") BattleGroupSetup btlgrp_aji_aji_15_01_off_1 = {
     5, // field_1C
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_test1_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_test1_off[] = {
     {50, &btlgrp_aji_aji_zako, &aji_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_test2_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_test2_off[] = {
     {50, &btlgrp_aji_aji_zako, &aji_btlstage_data[4]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_test3_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_test3_off[] = {
     {50, &btlgrp_aji_aji_zako, &aji_btlstage_data[5]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_test4_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_test4_off[] = {
     {50, &btlgrp_aji_aji_zako, aji_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_test5_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_test5_off[] = {
     {50, &btlgrp_aji_aji_zako, &aji_btlstage_data[6]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_mbmkii_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_mbmkii_off[] = {
     {50, &btlgrp_aji_aji_mbmkII, &aji_btlstage_data[5]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_00_00_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_00_00_off[] = {
     {50, &btlgrp_aji_aji_zako, &aji_btlstage_data[6]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_01_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_01_off[] = {
     {20, &btlgrp_aji_aji_01_01_off_1, &aji_btlstage_data[6]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_02_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_02_off[] = {
     {20, &btlgrp_aji_aji_01_02_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_03_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_03_off[] = {
     {20, &btlgrp_aji_aji_01_03_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_04_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_04_off[] = {
     {20, &btlgrp_aji_aji_01_04_off_1, &aji_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_05_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_05_off[] = {
     {20, &btlgrp_aji_aji_01_05_off_1, &aji_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_06_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_06_off[] = {
     {20, &btlgrp_aji_aji_01_06_off_1, &aji_btlstage_data[2]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_07_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_07_off[] = {
     {20, &btlgrp_aji_aji_01_07_off_1, &aji_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_01_08_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_01_08_off[] = {
     {20, &btlgrp_aji_aji_01_08_off_1, &aji_btlstage_data[3]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_04_01_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_04_01_off[] = {
     {20, &btlgrp_aji_aji_04_01_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_06_01_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_06_01_off[] = {
     {20, &btlgrp_aji_aji_06_01_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_08_01_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_08_01_off[] = {
     {20, &btlgrp_aji_aji_08_01_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_09_01_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_09_01_off[] = {
     {20, &btlgrp_aji_aji_09_01_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_10_01_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_10_01_off[] = {
     {20, &btlgrp_aji_aji_10_01_off_1, aji_btlstage_data},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_13_01_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_13_01_off[] = {
     {20, &btlgrp_aji_aji_13_01_off_1, &aji_btlstage_data[4]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_13_02_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_13_02_off[] = {
     {20, &btlgrp_aji_aji_13_02_off_1, &aji_btlstage_data[4]},
     {0},
 };
 
-__declspec(section ".data") NpcBattleSelect btlgrpsel_aji_btlno_aji_15_01_off[] = {
+NpcBattleSelect btlgrpsel_aji_btlno_aji_15_01_off[] = {
     {20, &btlgrp_aji_aji_15_01_off_1, &aji_btlstage_data[1]},
     {0},
 };

@@ -95,7 +95,7 @@ void _rule_disp(CameraId cameraId, void* param);
 USER_FUNC(_set_effect_luck);
 
 s32 _set_haikei_entry_scale(EventEntry* event, BOOL isFirstCall);
-__declspec(section ".sdata") EVT_BEGIN(nanika_luck_event)
+EVT_BEGIN(nanika_luck_event)
     BEGIN_SIBLING_EVENT_GET_ID(PTR(0xfe363c8f))
         WAIT_FRAMES(60)
     END_SIBLING_EVENT
@@ -103,7 +103,7 @@ __declspec(section ".sdata") EVT_BEGIN(nanika_luck_event)
     CALL(btlevtcmd_WaitEventEnd, PTR(0xfe363c8f))
     RETURN
 EVT_END()
-__declspec(section ".sdata") EVT_BEGIN(_default_haikei_set_entry_event)
+EVT_BEGIN(_default_haikei_set_entry_event)
     CALL(_set_haikei_entry_scale)
     RETURN
 EVT_END()

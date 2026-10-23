@@ -1066,16 +1066,16 @@ void loadDraw(CameraId camera, void* param) {
     *camGetCurPtr() = saved;
 }
 
-__declspec(section ".sdata") s32 stone_id[7] = {0x197 + 8, 0x198 + 8, 0x19A + 8, 0x19C + 8, 0x19D + 8, 0x199 + 8, 0x19B + 8};
+s32 stone_id[7] = {0x197 + 8, 0x198 + 8, 0x19A + 8, 0x19C + 8, 0x19D + 8, 0x199 + 8, 0x19B + 8};
 
-__declspec(section ".sdata") static EVT_BEGIN(evt_shake)
+static EVT_BEGIN(evt_shake)
     CALL(evt_sub_rumble_onoff, 0, 0)
     WAIT_MS(150)
     CALL(evt_sub_rumble_onoff, 1, 0)
     RETURN
 EVT_END()
 
-__declspec(section ".sdata") EVT_BEGIN(evt_continue)
+EVT_BEGIN(evt_continue)
     CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_mario"))
     CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_kuppa"))
     CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_peach"))
@@ -2310,16 +2310,16 @@ void loadDraw(CameraId camera, void* param) {
     *camGetCurPtr() = saved;
 }
 
-__declspec(section ".sdata") s32 stone_id[7] = {0x197, 0x198, 0x19A, 0x19C, 0x19D, 0x199, 0x19B};
+s32 stone_id[7] = {0x197, 0x198, 0x19A, 0x19C, 0x19D, 0x199, 0x19B};
 
-__declspec(section ".sdata") static EVT_BEGIN(evt_shake)
+static EVT_BEGIN(evt_shake)
     CALL(evt_sub_rumble_onoff, 0, 0)
     WAIT_MS(150)
     CALL(evt_sub_rumble_onoff, 1, 0)
     RETURN
 EVT_END()
 
-__declspec(section ".sdata") EVT_BEGIN(evt_continue)
+EVT_BEGIN(evt_continue)
     CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_mario"))
     CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_kuppa"))
     CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_peach"))
