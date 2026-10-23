@@ -1518,7 +1518,7 @@ config.libs = [
         "end",
         [
             Object(Matching, "end.c"),
-            Object(Matching, "end_unknown.c", extra_cflags=["-inline auto,deferred"]),
+            Object(Matching, "end_00.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
