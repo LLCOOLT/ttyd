@@ -288,7 +288,7 @@ void npcStartForEvent(void);
 void npcStopForOneEvent(NpcEntry* npc);
 void npcStopForEvent(void);
 void npcCheckInterrupt(NpcEntry* npc);
-void npcGroupDead(NpcEntry* npc, BOOL arg1);
+void npcGroupDead(NpcEntry* npc, u16 arg1);
 f32 npcTransRytoFaceDir(NpcEntry* npc);
 
 FieldBattleData* fbatGetPointer(void);

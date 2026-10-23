@@ -697,6 +697,7 @@ void msgDispKeyWait_render(s32 wXluStage) {
 
 char* msgGetCommand(char* msg, char* cmd, char* arg);
 s32 msgIconStr2ID(const char* str);
+u16 hankakuSearch(char c);
 
 typedef struct MsgAChar {
 	u32 value; //0x0
@@ -709,44 +710,40 @@ typedef struct MsgAChar {
 	f32 dyn; //0x14
 } MsgAChar;
 
-// FAKE: the ruby text's second loop as an inline helper; its counter/index become early inline temps, giving the target's
-// register numbering and loop-2 setup order (scale/fv by pointer: they live on the stack in the target) (FAKES.md)
-static inline void msgRubyDraw(MsgWinData* data, MsgAChar** pe, s16* prx, char* tag, s32 n, s32 half, s16 y, f32* psc, u32 flags, f32* pfv) {
-	s32 k2;
-	u16 g;
-	u16 w;
-	s32 ww;
-	for (k2 = 0; k2 < half; k2++) {
-		g = kanjiSearch(*(u16*)&tag[(u32)n]);
-		w = kanjiGetWidth((u16)(g + 0));
-		ww = EXT_LIT(float_0p55_8041a678, 0.55f) * (*psc * (( f32)(w + 4) ));
-		(*pe)->glyph = g;
-		(*pe)->x = *prx;
-		(*pe)->y = (s16)y;
-		(*pe)->scale = EXT_LIT(float_0p55_8041a678, 0.55f) * *psc;
-		(*pe)->value = flags;
-		if (flags & 1) {
-			(*pe)->dyn = *pfv;
-		}
-		(*pe)->time = 0;
-		*prx += ww;
-		n += 2;
-		data->count++;
-		(*pe)++;
-	}
-}
-
+/* FAKE: opt_lifetimes off keeps total as one web, so the rubyW conversion int shares the loop-1 accumulator register
+   as in the target. The webs the target does split are split by hand: glyphD, wwD, wwR and kR (declared first so they take
+   the numbers of the split temps). See FAKES.md */
+#pragma opt_lifetimes off
 void msgAnalize(smartEntry* smart, char* msg) {
-	s16 s230;
-	s16 s232;
+	u16 glyphD;
+	s32 wwD;
+	s32 wwR;
+	s32 kR;
 	s16 s234;
+	s16 s232;
+	s16 s230;
 
 	MsgWinData* data;
+	/* FAKE: nn, fp, fx, ys and yx are one-element arrays (IRO scalarizes them into @ temps). nn is the ruby index copy
+	   of i. fp/fx both hold flags & 1 and ys/yx both hold y for the second ruby loop; a dead guard at the loop top
+	   redefines fp and ys (never runs), and fx/yx are re-copied from fp/ys before time is cleared. Same values; the fx copy
+	   merges only in the second colouring round and the y pair fixes the preheader order, which gives the target
+	   register order (FAKES.md) */
+	s32 nn[1];
+	/* FAKE: zz, z3 and z4 are write-only scratch; the kR init reads them back as 0 + 1 + 2 - 3 = 0. Their three constant
+	   loads only exist before register allocation and fill scheduler slots, so the loop-2 counter init lands after the
+	   rubyW truncation (FAKES.md) */
+	s32 zz[1];
+	s32 z3[1];
+	s32 z4[1];
+	u32 fp[1];
+	u32 fx[1];
+	s32 ys[1];
+	s32 yx[1];
 	WindowEntry* window;
 	MsgAChar* entry;
 	s32 check;
 	u16 glyph;
-	u16 width;
 	s16 x;
 	s16 y; // s16 in the original: extsh before every int->float use (0x20b0, 0x2b98) and after <pos> (0x23b0)
 	s16 rubyX;
@@ -771,10 +768,10 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	s32 i34;
 	MsgWinData* data2;
 	s32 i30;
+	f32 iconScale;
 	s32 i28;
 	// FAKE: int, not s32 (same width/sign; changes colouring)
 	int i24;
-	f32 iconScale;
 	s32 i20;
 	f32 f1c;
 	s32 i18;
@@ -790,13 +787,11 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	char* next;
 	BOOL isHM;
 	s32 i;
+	s32 j;
 	s32 k;
 	s32 k2;
 	s32 half;
-	s32 j;
 	s32 total;
-	u16 rubyW;
-	char* p;
 	s32 ww;
 
 	data = smart->address;
@@ -843,8 +838,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 		check = *(( u8*)msg) ;
 		if (_ismbblead((u8)check)) {
 			glyph = kanjiSearch(*(( u16*)msg) );
-			width = kanjiGetWidth((u16)(glyph + 0));
-			ww = scale * (( f32)(width + 4) );
+			ww = scale * (( f32)(kanjiGetWidth((u16)(glyph + 0)) + 4) );
 			entry->glyph = glyph;
 			entry->x = x;
 			entry->y = y - (s16)(EXT_LIT(float_10_8041a538, 10.0f) * scale);
@@ -902,6 +896,14 @@ void msgAnalize(smartEntry* smart, char* msg) {
 		case '<':
 			next = msgGetCommand(msg + 1, tag, args);
 			msg = next;
+			/* FAKE: dead int guard (COLOURING W): msg is redefined in the arm while next is still live
+			   (the later newline test on next), so msg/next interfere and the target copy mr r21,r15 survives */
+			{
+				s32 gz = 0;
+				if (gz != 0) {
+					msg++;
+				}
+			}
 			if (( strcmp(tag, "k") == 0 ) || ( strcmp(tag, "key") == 0) ) {
 				entry->glyph = 0xFFFE;
 				entry->x = s232;
@@ -1091,8 +1093,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					data->count++;
 				} else {
 					glyph = kanjiSearch(0x94B5);
-					width = kanjiGetWidth((u16)(glyph + 0));
-					iw = scale * (( f32)(width + 4) );
+					iw = scale * (( f32)(kanjiGetWidth((u16)(glyph + 0)) + 4) );
 					entry->glyph = glyph;
 					entry->x = x;
 					entry->y = y - (s16)(EXT_LIT(float_10_8041a538, 10.0f) * scale);
@@ -1108,8 +1109,8 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					}
 					entry->time = time;
 					entry++;
-					time += step;
 					x += iw;
+					time += step;
 					data->count++;
 				}
 			} else if (strcmp(tag, "anim") == 0) {
@@ -1118,7 +1119,10 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				animPoseSetAnim(entry->value, anim2, 1);
 				animPoseSetMaterialFlagOn(entry->value, 0x1800);
 				animPoseSetMaterialFlagOff(entry->value, 0x40);
-				animPoseSetGXFunc(msgw->poseId, msgDispKeyWait_render, 0);
+				/* FAKE: one-trip loop (j is dead here); it enables the backend array-to-register pass that removes the zz/z3/z4 stores */
+				for (j = 0; j < 1; j++) {
+					animPoseSetGXFunc(msgw->poseId, msgDispKeyWait_render, 0);
+				}
 				entry->glyph = 0xFFF4;
 				entry->x = i28;
 				entry->y = s234 - i24;
@@ -1159,13 +1163,46 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				// does it instead and its pointer-IV init in the preheader keeps the dead j/i steps alive, as in the target (FAKES.md)
 				for (k = 0; k < half; k++) {
 					glyph = kanjiSearch(*(u16*)&tag[(u32)j]);
-					width = kanjiGetWidth((u16)(glyph + 0));
-					total += (s32)(EXT_LIT(float_0p55_8041a678, 0.55f) * (scale * (( f32)(width + 4) )));
+					total += (s32)(EXT_LIT(float_0p55_8041a678, 0.55f) * (scale * (( f32)(kanjiGetWidth((u16)(glyph + 0)) + 4) )));
 					j += 2;
 				}
-				rubyW = (u16)total; rubyW = rubyW - ( EXT_LIT(float_0p55_8041a678, 0.55f) * (EXT_LIT(float_4_8041a67c, 4.0f) * scale)) ;
-				rubyX = (( ((f32)(rubyX + x) ) - ( EXT_LIT(float_4_8041a67c, 4.0f) * scale )) - ( (f32)rubyW) ) * EXT_LIT(float_0p5_8041a534, 0.5f);
-				msgRubyDraw(data, &entry, &rubyX, tag, i, half, y, &scale, flags, &fv);
+				total = (u16)total - ( EXT_LIT(float_0p55_8041a678, 0.55f) * (EXT_LIT(float_4_8041a67c, 4.0f) * scale));
+				rubyX = ((rubyX + x) - EXT_LIT(float_4_8041a67c, 4.0f) * scale - (u16)total) / 2;
+				/* second loop open-coded: kR is its counter and glyph its glyph (split webs, numbered as in the target) */
+				yx[0] = y;
+				ys[0] = y;
+				fp[0] = flags & 1;
+				fx[0] = flags & 1;
+				nn[0] = i;
+				*(int*)zz = 0;
+				*(int*)z3 = 1;
+				*(int*)z4 = 2;
+				for (kR = zz[0] + z3[0] + z4[0] - 3; kR < half; kR++) {
+					{
+						s32 gz = 0;
+						if (gz != 0) {
+							fp[0] = fx[0];
+							ys[0] = yx[0] + ys[0];
+						}
+					}
+					glyph = kanjiSearch(*(u16*)&tag[(u32)nn[0]]);
+					wwR = EXT_LIT(float_0p55_8041a678, 0.55f) * (scale * (( f32)(kanjiGetWidth((u16)(glyph + 0)) + 4) ));
+					entry->glyph = glyph;
+					entry->x = rubyX;
+					entry->y = ys[0];
+					entry->scale = EXT_LIT(float_0p55_8041a678, 0.55f) * scale;
+					entry->value = flags;
+					if (fp[0]) {
+						entry->dyn = fv;
+					}
+					fx[0] = fp[0];
+					yx[0] = ys[0];
+					entry->time = 0;
+					rubyX += wwR;
+					entry++;
+					data->count++;
+					nn[0] += 2;
+				}
 				continue;
 			}
 			if (( *( (s8*)next )) == '\n') {
@@ -1174,13 +1211,12 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			continue;
 		default:
 			if (((( (u32)gp->language ) == 0 ) && (( (s8)check ) >= '0' )) && (( (s8)check ) <= '9') ) {
-				glyph = kanjiSearch((u16)(check + 0x821F));
+				glyphD = kanjiSearch((u16)(check + 0x821F));
 			} else {
-				glyph = hankakuSearch(check);
+				glyphD = hankakuSearch(check);
 			}
-			width = kanjiGetWidth((u16)(glyph + 0));
-			ww = scale * (( f32)(width + 2) );
-			entry->glyph = glyph;
+			wwD = scale * (( f32)(kanjiGetWidth((u16)(glyphD + 0)) + 2) );
+			entry->glyph = glyphD;
 			entry->x = x;
 			entry->y = y - (s16)(EXT_LIT(float_10_8041a538, 10.0f) * scale);
 			entry->scale = scale;
@@ -1195,7 +1231,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				maxScale = scale;
 			}
 			entry->time = time;
-			x += ww;
+			x += wwD;
 			msg++;
 			time += step;
 			entry++;
@@ -1204,6 +1240,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 		}
 	}
 }
+#pragma opt_lifetimes reset
 
 MessageWork* L_msgGetWork(void) {
 	return &msgWork;
@@ -1266,32 +1303,35 @@ BOOL _ismbblead(u32 a1) {
 char* msgGetCommand(char* msg, char* cmd, char* arg) {
 	s32 i;
 	BOOL inArg = FALSE;
+	char* m = msg;
+	char* c = cmd;
+	char* a = arg;
 
-	for (i = 0; i < 0x80; i++, msg++) {
-		switch ((s8)*msg) {
+	for (i = 0; i < 0x80; i++, m++) {
+		switch ((s8)*m) {
 		case '>':
 			if (!inArg) {
-				*cmd = 0;
+				*c = 0;
 			}
 			else {
-				*arg = 0;
+				*a = 0;
 			}
-			return msg + 1;
+			return m + 1;
 		case ' ':
 			if (!inArg) {
-				*cmd = 0;
+				*c = 0;
 				inArg = TRUE;
 			}
 			else {
-				*arg++ = *msg;
+				*a++ = *m;
 			}
 			break;
 		default:
 			if (!inArg) {
-				*cmd++ = *msg;
+				*c++ = *m;
 			}
 			else {
-				*arg++ = *msg;
+				*a++ = *m;
 			}
 			break;
 		}
@@ -1923,6 +1963,3 @@ void selectWindow_Disp(CameraId camId, void* param) {
 }
 
 // target pad words (G5: section sizes must match or later DOL addresses shift)
-#pragma force_active on
-__declspec(section ".sdata") u32 gap_07_804103F4_sdata[1] = {0};
-

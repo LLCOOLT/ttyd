@@ -103,7 +103,7 @@ unit/unit_hermos.c:
 	.bss        start:0x00000060 end:0x000000B8
 
 dou_13.c:
-	.rodata     start:0x00002970 end:0x00002A00
+	.rodata     start:0x00002970 end:0x000029FC
 	.data       start:0x00018C70 end:0x00018E28
 
 dou_12.c:

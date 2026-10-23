@@ -96,11 +96,15 @@ void effSleepMain(EffectEntry* effect) {
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 
+// FAKE: same values as the plain form, written so the code generator sees the target's shapes:
+// - sin argument via `(t = tau * x, t *= 0.015625f)`: a compound assignment skips the front end's
+//   commutative swap (CExpr optimizecomm), so the constant stays the right operand;
+// - 0.5f / 0.015625f / 1.0f are literals (LICM-hoisted temps in first-use order), xh = x0 * 0.5f is
+//   computed in the inner loop body, and the y products go through sleepPos so `1.0f * y` is not
+//   folded away by the front end (CExpr_IsOne).
+static inline void sleepPos(f32 x, f32 one, f32 y) { GXPosition3f32(x, one * y, 0.0f); }
 void effSleepDisp(CameraId camId, EffectEntry* effect) {
 	s32 off;
-	f32 half;
-	f32 k;
-	f32 one;
 	f32 tau;
 	f32 x0;
 	Mtx mtx;
@@ -117,6 +121,7 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 	s32 alpha;
 	f32 xh;
 	f32 s0, s1;
+	f32 t;
 
 	data = effect->userdata;
 	cam = camGetPtr(camId);
@@ -158,23 +163,20 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 			GXLoadPosMtxImm(mtx, GX_PNMTX0);
 			GXSetCurrentMtx(GX_PNMTX0);
 			tau = 6.2831855f;
-			k = 0.015625f;
-			half = 0.5f;
-			one = 1.0f;
-			xh = x0 * half;
 			j = 0;
 			off = 0;
 			while (j < 8) {
-				s0 = half * (f32)sin((tau * (f32)(u32)(gp->retraceCount + base + off)) * k);
-				s1 = half * (f32)sin((tau * (f32)(u32)(gp->retraceCount + base + (j + 1) * 10)) * k);
+				s0 = 0.5f * (f32)sin((t = (tau * (f32)(u32)(gp->retraceCount + base + off)), t *= 0.015625f));
+				s1 = 0.5f * (f32)sin((t = (tau * (f32)(u32)(gp->retraceCount + base + (j + 1) * 10)), t *= 0.015625f));
+				xh = x0; xh *= 0.5f;
 				GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-				GXPosition3f32(xh + s1, one * (f32)(j + 1), 0.0f);
+				sleepPos(xh + s1, 1.0f, j + 1);
 				GXTexCoord2f32(0.0f, 0.125f * (f32)(7 - j));
-				GXPosition3f32(4.0f + s1, one * (f32)(j + 1), 0.0f);
+				sleepPos(4.0f + s1, 1.0f, j + 1);
 				GXTexCoord2f32(1.0f, 0.125f * (f32)(7 - j));
-				GXPosition3f32(4.0f + s0, one * (f32)j, 0.0f);
+				sleepPos(4.0f + s0, 1.0f, j);
 				GXTexCoord2f32(1.0f, 0.125f * (f32)(8 - j));
-				GXPosition3f32(xh + s0, one * (f32)j, 0.0f);
+				sleepPos(xh + s0, 1.0f, j);
 				GXTexCoord2f32(0.0f, 0.125f * (f32)(8 - j));
 				j++;
 				off += 10;
@@ -182,6 +184,10 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 		}
 	}
 }
+
+
+
+
 #pragma pop
 
 // target pad words (G5: section sizes must match or later DOL addresses shift)

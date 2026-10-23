@@ -88,3 +88,20 @@ rustc-ice-*.txt
 # Orchestration docs and pipeline script copies: local only (L, 2026-10-13)
 /docs/ORCHESTRATION.md
 /tools/pipeline/
+
+# Stray outputs from mangled Windows paths / closer experiments (2026-10-16)
+/Users*/
+/C:*/
+/rels_tmp/
+/rels_bak_none/
+*.c.out
+/--help
+refs/ttyd-tools/
+
+# Local agent/tool state (2026-10-22)
+/.agents/
+/.claude/
+/skills-lock.json
+
+# Matching pipeline helpers: kept on disk, not committed (L, 2026-10-22)
+/tools/decomp/

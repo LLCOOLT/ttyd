@@ -614,7 +614,7 @@ next:
 #define MTX_TRANS(m, v) PSMTXTrans(m, (v).x, (v).y, (v).z)
 #define CAMDIR(c) angleABf((c)->cameraPos.x, (c)->cameraPos.z, (c)->cameraAt.x, (c)->cameraAt.z)
 
-void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
+void btlUnitPartsDisp(CameraId camId, BattleUnitPart* param) {
 	Mtx uMtx;
 	Mtx drawMtx;
 	Mtx pS2;
@@ -645,19 +645,30 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 	Mtx pS;
 	Mtx mT5;
 	BattleWork* wp;
+	BattleUnitPart* part;
 	BattleUnit* unit;
+	s32 gz;
 	CameraEntry* cam;
 	f32 rotY;
+	f32 ex;
+	f32 ey;
+	f32 ez;
 	f32 x, y, z;
 	f32 angle;
 	f32 dir;
 	f32 camAngle;
 	f32 a;
-	f32 zscale = 1.0f;
+	f32 zscale;
 	GXColor* color;
+	part = param;
 	wp = _battleWorkPointer;
+	zscale = 1.0f;
 	unit = part->mOwner;
 	if (part->poseId < 0) return;
+	// FAKE: dead int guard (COLOURING W). part becomes a multi-def named local (not folded back into the param), so it
+	// numbers above unit, and gz adds wp's missing neighbour; the arm is deleted after colouring and leaves no code.
+	gz = 0;
+	if (gz != 0) part = (BattleUnitPart*)unit;
 
 	MTX_TRANS_NEG(uTN, unit->mRotationOffset);
 	MTX_TRANS(uT, unit->mRotationOffset);
@@ -730,21 +741,21 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 		else {
 			dir = wp->alliances[unit->mAlliance].attackDirection;
 		}
-		x = part->mPositionOffset.x * dir + unit->mPosition.x;
-		y = unit->mPosition.y + part->mPositionOffset.y + getGravityDispOffset(part) + getFloatDispOffset(part);
-		z = unit->mPosition.z + part->mPositionOffset.z;
+		ex = part->mPositionOffset.x * dir + unit->mPosition.x;
+		ey = unit->mPosition.y + part->mPositionOffset.y + getGravityDispOffset(part) + getFloatDispOffset(part);
+		ez = unit->mPosition.z + part->mPositionOffset.z;
 		dir = 0.0f;
 		if (part->mOwner->mAttributeFlags & 0x4000000) {
 			cam = camGetCurPtr();
 			a = CAMDIR(cam);
-			dir = reviseAngle(a - angleABf(cam->cameraPos.x, cam->cameraPos.z, x, z));
+			dir = reviseAngle(a - angleABf(cam->cameraPos.x, cam->cameraPos.z, ex, ez));
 		}
 		MTX_TRANS_NEG(pTN, part->mRotationOffset);
 		MTX_TRANS(pT, part->mRotationOffset);
 		PSMTXRotRad(pRx, 'x', 0.017453292f * (part->mRotation.x + part->mBaseRotation.x));
 		PSMTXRotRad(pRy, 'y', 0.017453292f * (dir + (part->mRotation.y + part->mBaseRotation.y)));
 		PSMTXRotRad(pRz, 'z', 0.017453292f * (part->mRotation.z + part->mBaseRotation.z));
-		PSMTXTrans(pPos, x, y, z);
+		PSMTXTrans(pPos, ex, ey, ez);
 		MTX_TRANS(pDisp, part->mDisplayOffset);
 		rotY = reviseAngle(-1.0f * angle - 90.0f);
 		if (!(part->mOwner->flags & 0x1000000)) {
@@ -1316,8 +1327,8 @@ void BattleStockExpDisp(void) {
 }
 
 void _btlStockExpDisp(CameraId camId, void* param) {
-	static f32 x;
 	static f32 y;
+	static f32 x;
 	s32 exp;
 	s32 tens;
 	s32 ones;

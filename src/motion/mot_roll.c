@@ -142,11 +142,19 @@ static inline s32 angOut(f32 center, f32 half, f32 x) {
 }
 
 /* repurposed unused inline: angOut on the mario stick angle, with everything read inside */
+// FAKE: k025/rabs/rollRad/rollCos/rSin are invented one-line inline helpers. Their result temps get
+// later inline numbering, which gives the target FPR colouring in mot_roll (fmadds operand order, makeVec c
+// in f31) and marioRollCan (v26 in f26, fabs/sin/cos volatiles). Behaviour-identical to the expressions they wrap.
+static inline f32 k025(void) { return 0.025f; }
+static inline f32 rSin(f32 a) { return (f32)sin(a); }
+static inline f32 rabs(f32 x) { return __fabsf(x); }
+static inline f32 rollRad(f32 d) { return 3.1415927f * d / 180.0f; }
+static inline f32 rollCos(f32 a) { return (f32)cos(a); }
 static inline s32 makeVec(f32 half) {
     s32 w = 0;
     s32 r = w;
     MarioWork* m = marioGetPtr();
-    f32 c = trunc10(m->moveDirection);
+    f32 c = (f32)(s32)(10.0f * m->moveDirection) / 10.0f;
     f32 x = angleABf(0.0f, 0.0f, (f32)(s32)*((s8*)m + 0x24e), (f32)(s32)*((s8*)m + 0x24f));
     f32 lo;
     f32 hi;
@@ -183,6 +191,56 @@ static inline s32 makeVec(f32 half) {
     {                                                                                             \
         f32 ty_ = trunc10((m2)->targetYaw); f32 dd = revise360(-(ty_ - trunc10(b))); \
         s32 sgn = (dd < 180.0f) ? 0 : 1;                                                          \
+        if (sgn == 0) {                                                                           \
+            if (__fabsf(b - a) > 90.0f) {                                                            \
+                if (a > b) {                                                                      \
+                    b += 360.0f;                                                                  \
+                }                                                                                 \
+            }                                                                                     \
+        } else {                                                                                  \
+            if (__fabsf(b - a) > 90.0f) {                                                            \
+                if (a < b) {                                                                      \
+                    a += 360.0f;                                                                  \
+                }                                                                                 \
+            }                                                                                     \
+        }                                                                                         \
+    }                                                                                             \
+    if (angOut(b, 90.0f, a) == 0) {                                                               \
+        if (__fabsf(b - a) > 180.0f) {                                                               \
+            if (b > a) {                                                                          \
+                b -= 360.0f;                                                                      \
+            } else {                                                                              \
+                a -= 360.0f;                                                                      \
+            }                                                                                     \
+        }                                                                                         \
+    }                                                                                             \
+    b = 1.2f * (a - b) + b;                                                                       \
+    b = revise360(b);                                                                             \
+    {                                                                                             \
+        f32 md = toMovedir(MF(0x1a8));                                                            \
+        if (MB(0x43)) {                                                                           \
+            md = revise360(180.0f + md);                                                          \
+        }                                                                                         \
+        if (angOut(b, 135.0f, md) == 1) {                                                         \
+            MB(0x43) = (MB(0x43) + 1) & 1;                                                        \
+        }                                                                                         \
+    }                                                                                             \
+    { f32 t_ = 270.0f + MF(0x198) - b; MF(0x1a8) = revise360(t_ + (MB(0x43) ? -180.0f : 0.0f)); } \
+    if (MF(0x1a8) >= 200.0f) {                                                                    \
+        MF(0x1a8) = revise360(270.0f + MF(0x198) - b + (MB(0x43) ? -180.0f : 0.0f));              \
+    }                                                                                             \
+    if (MF(0x1a8) < 170.0f) {                                                                     \
+        MF(0x1a8) = revise360(270.0f + MF(0x198) - b + (MB(0x43) ? -180.0f : 0.0f));              \
+    }
+
+// FAKE: marioSetRollDispDir copy of DISPDIR_BODY: dd = tb_ - ty_ (was -(ty_ - tb_); differs only in the sign of zero, and dd is
+// only compared with 180) and a dead int-guarded re-def of ty_ (COLOURING M) keep ty_ as a named value created before tb_, as the target fsubs f1,f0,f1
+#define DISPDIR_BODY2(a, b, m2)                                                                    \
+    if (angOut(b, 135.0f, a) == 1) {                                                              \
+        b = revise360(180.0f + b);                                                                \
+    }                                                                                             \
+    {                                                                                             \
+        s32 g_; f32 ty_; f32 dd; s32 sgn; f32 tb_; ty_ = trunc10((m2)->targetYaw); tb_ = trunc10(b); g_ = 0; if (g_ != 0) { ty_ = 0.0f; } dd = revise360(tb_ - ty_); sgn = (dd < 180.0f) ? 0 : 1;                                                          \
         if (sgn == 0) {                                                                           \
             if (__fabsf(b - a) > 90.0f) {                                                            \
                 if (a > b) {                                                                      \
@@ -445,7 +503,7 @@ void marioSetRollDispDir(void) {
     a = mario->directionView;
     b = mario->moveDirection;
     m2 = marioGetPtr();
-    DISPDIR_BODY(a, b, m2)
+    DISPDIR_BODY2(a, b, m2)
 }
 
 void rollEvtJumpSetup(void) {
@@ -526,6 +584,8 @@ void mot_roll(void) {
     f32 nz;
     f32 a31;
     f32 b31;
+    f32 s;
+    f32 rd;
     if (mario->trigFlags & 1) {
         mario->trigFlags &= ~1;
         mario->flags &= ~0xF0000;
@@ -991,10 +1051,10 @@ void mot_roll(void) {
         a31 = a31 * v26;
         v26 = v28 * v28;
         if (v29 * v29 + v26 <= a31 * a31) {
-            v29 = nx * 0.025f + v29;
+            v29 = nx * k025() + v29;
         } else {
             f32 n = -a31;
-            v29 = nx * 0.025f + v29;
+            v29 = nx * k025() + v29;
             if (v29 < n) {
                 v29 = n;
             }
@@ -1023,10 +1083,10 @@ void mot_roll(void) {
         }
         b31 = b31 * v30;
         if (v29 * v29 + v26 <= b31 * b31) {
-            v28 = v28 - nz * 0.025f;
+            v28 = v28 - nz * k025();
         } else {
             f32 n = -b31;
-            v28 = v28 - nz * 0.025f;
+            v28 = v28 - nz * k025();
             if (v28 < n) {
                 v28 = n;
             }
@@ -1040,18 +1100,18 @@ void mot_roll(void) {
     v31 = -v28;
     v30 = angleABf(0.0f, 0.0f, v29, v31);
     v27 = 3.1415927f * v30 / 180.0f;
-    v26 = (f32)cos(v27);
+    v26 = rollCos(v27);
     v27 = distABf(0.0f, 0.0f, v29 * (f32)sin(v27), v28 * v26);
-    v27 = 0.05f * v27;
+    s = 0.05f * v27;
     if (!getRollEvtFlag() && mario->forceMoveTimer == 0) {
         v30 = angleABf(0.0f, 0.0f, v29, v31);
         if (!(MI(0x2a4) & 0x10000)) {
-            v27 = v27 * mario->playerGravity;
-            if (v27 < 0.05f) {
-                v27 = 0.0f;
+            s = s * mario->playerGravity;
+            if (s < 0.05f) {
+                s = 0.0f;
             }
-            mario->baseSpeed = v27;
-            if (v27) {
+            mario->baseSpeed = s;
+            if (s) {
                 MF(0x1a0) = v30;
             }
         }
@@ -1069,7 +1129,7 @@ void mot_roll(void) {
             PI(m, 0x2a8) = -1;
         }
     }
-    v28 = rollData[4];
+    rd = rollData[4];
     {
         s32 flip;
         f32 sgn;
@@ -1077,15 +1137,15 @@ void mot_roll(void) {
         f32 pre;
         tcA = MF(0x1a0);
         flip = angOut(tcA, 90.0f, mv);
-        pre = mario->baseSpeed * v28;
+        pre = mario->baseSpeed * rd;
         sgn = (flip == 1) ? -1.0f : 1.0f;
         mario->rot.z = revise360(pre * sgn + mario->rot.z);
     }
-    if (mario->forceMoveTimer == 0 && !getRollEvtFlag() && v27) {
+    if (mario->forceMoveTimer == 0 && !getRollEvtFlag() && s) {
         v31 = mario->moveDirection;
         {
             MarioWork* m2 = marioGetPtr();
-            DISPDIR_BODY(v30, v31, m2)
+            DISPDIR_BODY2(v30, v31, m2)
         }
         MF(0x1a0) = v31;
         mario->moveDirection = v31;
@@ -1174,12 +1234,12 @@ static inline void marioRollCan(void) {
             f32 sq = roll_sqrtf(nrm.x * nrm.x + nrm.z * nrm.z);
             f32 ang = angleABf(0.0f, 0.0f, sq, -nrm.y);
             f32 r = (f32)(s32)(0.5f + ang);
-            if (__fabsf(ang) < 45.0) {
-                v26 = 3.1415927f * r / 180.0f;
-                s = (f32)sin(v26);
-                c = (f32)cos(v26);
+            if (rabs(ang) < 45.0) {
+                v26 = rollRad(r);
+                s = rSin(v26);
+                c = rollCos(v26);
                 {
-                    f32 t1 = 5.0f * s;
+                    f32 t1 = s * 5.0f;
                     f32 t2 = 5.0f * c;
                     mario->dispOfs.x = 6.0f + t1;
                     mario->dispOfs.y = -4.0f + t2;

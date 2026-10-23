@@ -293,6 +293,8 @@ __declspec(section ".data") s32 fd_aji_17___local_3PIO2_385[] = {
     1083624420,
 };
 
+__declspec(section ".data") u32 gap_04_0001E124_data[1] = {0};
+
 __declspec(section ".data") u64 fd_aji_17_one_negone_373 = 0x3F800000BF800000;
 
 __declspec(section ".data") s32 fd_aji_17___local_PIO2_384[] = {
@@ -316,6 +318,8 @@ __declspec(section ".data") s32 fd_aji_17___local_PI_366[] = {
 __declspec(section ".data") s32 fd_aji_17___local_3PIO2_368[] = {
     1083624420,
 };
+
+__declspec(section ".data") u32 gap_04_0001E14C_data[1] = {0};
 
 __declspec(section ".data") u64 fd_aji_17_one_negone_359 = 0x3F800000BF800000;
 
@@ -379,6 +383,7 @@ void noiseDisp(CameraId cameraId, void* param) {
     s32 by;
     s32 off;
     s32 w;
+    s32 i;
     CameraEntry* cam;
     s32 len;
     u8 col;
@@ -387,23 +392,19 @@ void noiseDisp(CameraId cameraId, void* param) {
     u8* buf;
     Mtx mtx;
     s32 start;
-    s32 y1;
     cam = camGetPtr(cameraId);
     buf = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_I8, GX_FALSE, 0), 3)->address;
     for (y = 0; y < 64; y++) {
         for (x = 0; x < 64; x++) {
-            by = y / 4; ry = y % 4; off = (x / 8) * 32 + (by << 8); buf[off + ry * 8 + x % 8] = (y & 1) ? 0xFF : 0;
+            by = y / 4; ry = y % 4; off = x / 8; w = x % 8; buf[((off << 5) + (by << 8)) + (w + ry * 8)] = (y & 1) ? 0xFF : 0;
         }
         n = rand() % 100 + 100;
-        // FAKE: unsigned 256u (by is 0..15 here, same value)
-        by = by * 256u;
-        y1 = ry * 8;
-        for (ry = 0; ry < n; ry++) {
+        for (i = 0; i < n; i++) {
             len = rand() % 4 + 2;
             start = rand() % (65 - len);
             col = rand() % 255;
             for (x = start; x < start + len; x++) {
-                off = x / 8 * 32; off = off + by; w = off + x % 8; w += y1; buf[w] = col;
+                by = y / 4; ry = y % 4; off = x / 8; w = x % 8; buf[((off << 5) + (by << 8)) + (w + ry * 8)] = col;
             }
         }
     }
@@ -3090,7 +3091,6 @@ EVT_END()
 
 // target .data tail pad word
 #pragma force_active on
-__declspec(section ".data") u32 gap_04_000271D4_data[1] = {0};
 #pragma force_active reset
 
 s32 noise(EventEntry* event, BOOL isFirstCall) {

@@ -70,6 +70,7 @@ static inline f32 _cosf(f32 x) {
     f32 x2;
 
     if (x <= PI) {
+        { s32 gz = 0; if (gz != 0) { a = (a / x) / (x / a); } } // FAKE: dead guard, no code (COLOURING W); its float temps keep the hoisted 2.0 deferred (f31)
         if (x <= HALF_PI) {
             x2 = x * x;
             a = a * x2 - b;
@@ -101,14 +102,6 @@ static inline f32 _cosf(f32 x) {
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
-// FAKE: velocity/gravity stores moved into an inline helper with its own spd local (inline-local colouring of the sin/cos constants)
-static inline void spSetVel(EffStarPointWork* work, f32 angle) {
-    f32 spd;
-    work->velX = (spd = 2.0f) * _sinf(angle);
-    work->velZ = spd * _cosf(angle);
-    work->velY = 14.0f;
-    work->gravity = spd;
-}
 EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     s32 delay;
     EffectEntry* effect;
@@ -136,7 +129,10 @@ EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
         work->position.y = 0.0f;
         work->position.z = 0.0f;
         angle = r * 6.2831855f / 360.0f;
-        spSetVel(work, angle);
+        work->velX = 2.0f * _sinf(angle);
+        work->velZ = 2.0f * _cosf(angle);
+        work->velY = 14.0f;
+        work->gravity = 2.0f;
         work->alpha = 0;
         work->delay = delay;
     }

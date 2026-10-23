@@ -7,7 +7,7 @@
 #include "battle/battle_stage_object.h"
 
 EffectEntry* unk_las_bss0000009c[6];
-s8 unk_las_bss00000098;
+s8 unk_las_bss00000098[4];
 EffectEntry* effFireEntry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime);
 void mapObjGetPos(const char* name, Vec* pos);
 
@@ -254,7 +254,7 @@ s32 stg_08_6_init_sub_event[46];
 __declspec(section ".data") s32 stg_08_6_init_event[4];
 
 USER_FUNC(unk_las_0000775c) {
-    unk_las_bss00000098 = 1;
+    unk_las_bss00000098[0] = 1;
     return EVT_RETURN_DONE;
 }
 
@@ -1549,12 +1549,12 @@ USER_FUNC(unk_las_00007774) {
     s32 i;
 
     if (isFirstCall) {
-        unk_las_bss00000098 = 0;
+        unk_las_bss00000098[0] = 0;
         for (i = 0; i < 6; i++) {
             unk_las_bss0000009c[i] = effFireEntry(8, 0.0f, -1000.0f, 0.0f, 1.0f, 1000);
         }
     }
-    if (unk_las_bss00000098) {
+    if (unk_las_bss00000098[0]) {
         for (i = 0; i < 6; i++) {
             effSoftDelete(unk_las_bss0000009c[i]);
         }

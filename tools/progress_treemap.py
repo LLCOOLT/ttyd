@@ -249,9 +249,8 @@ def render_svg(payload, width=960, height=540):
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height + head}" '
         f'viewBox="0 0 {width} {height + head}" font-family="Helvetica,Arial,sans-serif">',
         f'<rect width="{width}" height="{height + head}" fill="#14181a"/>',
-        (f'<text x="8" y="19" font-size="14" fill="#e8ece8">Code {pc(o["code"]):.2f}% · '
-         f'true C {t["true_code"]:.2f}% exact, {t["true_fuzzy"]:.2f}% fuzzy · '
-         f'{t.get("needed_fns", "?")} functions need asm (blue) · {t.get("paved_fns", "?")} more paved over matching C</text>'
+        (f'<text x="8" y="19" font-size="14" fill="#e8ece8">C {t["true_code"]:.2f}% exact, {t["true_fuzzy"]:.2f}% fuzzy · '
+         f'data {pc(o["data"]):.2f}% · functions {t.get("c_fns", "?")}/{t.get("total_fns", "?")} exact</text>'
          if (t := payload.get("true")) and "true_fuzzy" in t else
          f'<text x="8" y="19" font-size="14" fill="#e8ece8">Code {pc(o["code"]):.2f}% matched · '
          f'{100 * o["code"][2] / o["code"][1]:.2f}% fully linked · data {pc(o["data"]):.2f}% · '
@@ -297,7 +296,7 @@ def main():
     ap.add_argument("--baseline-label", default="baseline")
     ap.add_argument("--svg", help="also write a static SVG treemap here (for README embedding)")
     ap.add_argument("--raw", action="store_true",
-                    help="show the report as-is (asm stand-ins counted as matched); default is true C for G8MJ01")
+                    help="show the report as-is; default is the C view for G8MJ01")
     args = ap.parse_args()
 
     report = load(args.report)
@@ -314,12 +313,10 @@ def main():
     out = template.replace("/*__DATA__*/null", data)
     out = out.replace("__COMMIT__", html.escape(commit or "working tree"))
     if (t := payload.get("true")) and "true_fuzzy" in t:
-        note = (f'<p class="cmp">The bars show the build, which is byte-identical. The map shows only the '
-                f'<b>{t.get("needed_fns", "?")} functions whose C never matched</b> and had to use asm to fill the gap: '
-                f'files that link only thanks to them are <b>blue</b>. Another {t.get("paved_fns", "?")} asm stand-ins '
-                f'are paved over C that already matched ({t.get("paved_bytes", 0) / 1024:.0f} KB); the map counts those '
-                f'as C, and they are being converted back. Hover a cell for its counts. True C: <b>{t["true_code"]:.2f}%</b> exact, '
-                f'<b>{t["true_fuzzy"]:.2f}%</b> fuzzy.</p>')
+        note = (f'<p class="cmp">All code is C. The map colours each file by how closely its C matches the original: '
+                f'<b>green</b> = byte-exact and linked. Hover a cell for its counts. '
+                f'C: <b>{t["true_code"]:.2f}%</b> exact, <b>{t["true_fuzzy"]:.2f}%</b> fuzzy · '
+                f'<b>{t.get("c_fns", "?")}/{t.get("total_fns", "?")}</b> functions exact.</p>')
         out = out.replace('<section class="bars"', note + '<section class="bars"', 1)
 
     os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)

@@ -332,6 +332,7 @@ s32 evt_kyaku_7[56];
 s32 evt_kyaku_8[88];
 s32 tou_03_init_evt[370];
 
+#pragma force_active on
 __declspec(section ".data") u64 fd_tou_03_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_tou_03_neg_one_382[] = {
@@ -387,6 +388,7 @@ __declspec(section ".data") s32 fd_tou_03__three_localstatic4_sqrtf[] = {
 __declspec(section ".data") s32 fd_tou_03__half_localstatic3_sqrtf[] = {
     1071644672, 0,
 };
+#pragma force_active reset
 
 s32 ext_kyaku_data[] = {
     (s32)("c_kinopio"), (s32)("KNP_S_1"), 0, (s32)("c_kinopio"), (s32)("KNP_S_1"), 1092616192, (s32)("c_kinopio"), (s32)("KNP_S_1"),
@@ -3001,8 +3003,6 @@ void screen_tev(MapTevCallbackInfo* info) {
     s32 w;
     s32 start;
     u8 col;
-    s32 y0;
-    s32 y1;
     f32 lim;
     f32 x;
     f32 y;
@@ -3013,17 +3013,15 @@ void screen_tev(MapTevCallbackInfo* info) {
             buf = screen_wp->noise;
             for (i = 0; i < 64; i++) {
                 for (j = 0; j < 64; j++) {
-                    by = i / 4; ry = i % 4; off = (j / 8) * 32 + (by << 8); buf[off + ry * 8 + j % 8] = (i & 1) ? 0xFF : 0;
+                    by = i / 4; ry = i % 4; off = j / 8; w = j % 8; buf[((off << 5) + (by << 8)) + (w + ry * 8)] = (i & 1) ? 0xFF : 0;
                 }
                 n = rand() % 100 + 100;
-                y0 = by * 256;
-                y1 = ry * 8;
                 for (k = 0; k < n; k++) {
                     len = rand() % 4 + 2;
                     start = rand() % (65 - len);
                     col = rand() % 256;
                     for (j = start; j < start + len; j++) {
-                        off = j / 8 * 32; off = off + y0; w = off + j % 8; w += y1; buf[w] = col;
+                        by = i / 4; ry = i % 4; off = j / 8; w = j % 8; buf[((off << 5) + (by << 8)) + (w + ry * 8)] = col;
                     }
                 }
             }
@@ -3169,6 +3167,9 @@ static f32 cosf(f32 x) {
 }
 #pragma dont_inline reset
 
+#pragma force_active on
+static const Vec item_jump_zero = {0.0f, 0.0f, 0.0f};
+#pragma force_active reset
 static inline s32 item_jump_sub(EventEntry* event, BOOL isFirstCall, f32 speed, f32 g) {
     s32* args = event->args;
     f32 z;
@@ -3206,7 +3207,6 @@ static inline s32 item_jump_sub(EventEntry* event, BOOL isFirstCall, f32 speed, 
         item->position.y = y;
         item->position.z = z;
         {
-            Vec zero = {0.0f, 0.0f, 0.0f};
             Vec tmp = {0.0f, 0.0f, 0.0f};
             Vec pos;
 

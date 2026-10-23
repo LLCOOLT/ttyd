@@ -399,29 +399,16 @@ USER_FUNC(evt_bero_get_now_number) {
 
 USER_FUNC(evt_bero_get_info) {
 	BeroEntry** table;
-	s32 i;
+	int i;
 	BeroEntry* entry;
 	HitEntry* hit;
 	s32* switches;
 	s32 val;
 
 	table = BeroINFOARR;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
-	*table++ = NULL;
+	for (i = 0; i < 16; i++) {
+		*table++ = NULL;
+	}
 	table = BeroINFOARR;
 	
 	{

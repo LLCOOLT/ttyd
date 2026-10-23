@@ -35,7 +35,11 @@ double floor(double x);
 double fmod(double x, double y);
 double pow(double x, double y);
 
-extern inline float sqrtf(float x) {
+#ifndef MATH_NO_SQRTF
+#ifndef MATH_SQRTF_LINKAGE
+#define MATH_SQRTF_LINKAGE extern
+#endif
+MATH_SQRTF_LINKAGE inline float sqrtf(float x) {
     static const double _half = .5;
     static const double _three = 3.0;
     volatile float y;
@@ -55,7 +59,9 @@ extern inline float sqrtf(float x) {
     return x;
 }
 
-#ifndef MATH_NO_SQRT_HACK
+#endif
+
+#if !defined(MATH_NO_SQRT_HACK) && !defined(MATH_NO_SQRTF)
 // TODO: this isn't correct! It's just to generate sdata2 in GXDraw.o
 extern inline float sqrt(float x) {
     static const double _half = .5;

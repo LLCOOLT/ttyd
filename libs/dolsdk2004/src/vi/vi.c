@@ -88,13 +88,13 @@ static s16 displayOffsetV;
 static volatile u32 changeMode;
 static volatile u64 changed;
 static volatile u32 shdwChangeMode;
-static volatile u16 regs[59];
+static volatile u16 regs[60]; // FAKE: one extra trailing element to match the original symbol size (never used)
 static volatile u64 shdwChanged;
 static VITiming* CurrTiming;
 static u32 CurrTvMode;
 static u32 NextBufAddr;
 static u32 CurrBufAddr;
-static volatile u16 shdwRegs[59];
+static volatile u16 shdwRegs[60]; // FAKE: one extra trailing element to match the original symbol size (never used)
 
 #define MARK_CHANGED(index) (changed |= 1LL << (63 - (index)))
 
@@ -111,7 +111,7 @@ static VITiming timing[10] = {
     { 12, 480, 48, 48, 6, 6, 24, 24, 24, 24, 1038, 1038, 1038, 1038, 1050, 429, 64, 71, 105, 180, 391, 122, 412 }
 };
 
-static u16 taps[25] = {
+static u16 taps[26] = { // FAKE: one extra trailing zero element to match the original symbol size (never read)
     0x01F0, 0x01DC,
     0x01AE, 0x0174,
     0x0129, 0x00DB,
@@ -742,13 +742,13 @@ static void PrintDebugPalCaution(void) {
 
     if (message == 0) {
         message = 1;
-        OSReport("***************************************\n");
-        OSReport(" ! ! ! C A U T I O N ! ! !             \n");
-        OSReport("This TV format \"DEBUG_PAL\" is only for \n");
-        OSReport("temporary solution until PAL DAC board \n");
-        OSReport("is available. Please do NOT use this   \n");
-        OSReport("mode in real games!!!                  \n");
-        OSReport("***************************************\n");
+        OSReport("***************************************\n\0\0\0");
+        OSReport(" ! ! ! C A U T I O N ! ! !             \n\0\0\0");
+        OSReport("This TV format \"DEBUG_PAL\" is only for \n\0\0\0");
+        OSReport("temporary solution until PAL DAC board \n\0\0\0");
+        OSReport("is available. Please do NOT use this   \n\0\0\0");
+        OSReport("mode in real games!!!                  \n\0\0\0");
+        OSReport("***************************************\n\0\0\0");
     }
 }
 
@@ -811,7 +811,7 @@ void VIConfigure(const GXRenderModeObj* rm) {
     default:
     panic:
         OSPanic(__FILE__, 1979,
-                "VIConfigure(): Tried to change mode from (%d) to (%d), which is forbidden\n",
+                "VIConfigure(): Tried to change mode from (%d) to (%d), which is forbidden\n\0",
                 tvInBootrom, tvInGame);
     }
 
@@ -1306,5 +1306,8 @@ int __VIGetLatchPosition(u32 port, s16* px, s16* py) {
     }
 }
 #pragma force_active on
-__declspec(section ".data") u32 gap_05_803BF7D0_data[4] = {0, 0, 0, 0};
+#pragma force_active reset
+
+#pragma force_active on
+__declspec(section ".data") u8 gap_05_803BF7CC_data[20] = {0};
 #pragma force_active reset

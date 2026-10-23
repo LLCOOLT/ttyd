@@ -160,9 +160,12 @@ PoseTableEntry pose_table_vivian_stay[24];
 static BattleDataEntry data_table[20];
 BattleUnitKindPart unitpartsdata_Party_Vivian[1];
 BattleUnitKind unitdata_Party_Vivian;
-static BattleUnitDefense defence;
-static BattleUnitDefenseAttr defence_attr;
-static StatusVulnerability regist;
+typedef struct { BattleUnitDefense d; u8 pad[3]; } VivDef;
+typedef struct { BattleUnitDefenseAttr d; u8 pad[3]; } VivDefAttr;
+typedef struct { StatusVulnerability d; u8 pad[2]; } VivRegist;
+static VivDef defence;
+static VivDefAttr defence_attr;
+static VivRegist regist;
 static s32 attack_event[2];
 static s32 wait_event[6];
 static s32 battle_entry_event[59];
@@ -261,7 +264,7 @@ static BattleDataEntry data_table[] = {
 };
 
 BattleUnitKindPart unitpartsdata_Party_Vivian[] = {
-    {1, "btl_un_vivian", "c_vivian", 0.0f, 0.0f, 0.0f, 16.0f, 24.0f, 5.0f, 0.0f, 24.0f, 0.0f, 20, 24, 255, &defence, &defence_attr, 0x9, 0, pose_table_vivian_stay},
+    {1, "btl_un_vivian", "c_vivian", 0.0f, 0.0f, 0.0f, 16.0f, 24.0f, 5.0f, 0.0f, 24.0f, 0.0f, 20, 24, 255, &defence.d, &defence_attr.d, 0x9, 0, pose_table_vivian_stay},
 };
 
 BattleUnitKind unitdata_Party_Vivian = {
@@ -323,18 +326,18 @@ BattleUnitKind unitdata_Party_Vivian = {
     "SFX_MARIO_DAMAGE_ICE1",
     "SFX_MARIO_DAMAGE_BIRIBIRI1",
     0x2000004,
-    &regist,
+    &regist.d,
     1,
     unitpartsdata_Party_Vivian,
     init_event,
     data_table,
 };
 
-static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static VivDef defence = {{{0, 0, 0, 0, 0}}, {0, 0, 0}};
 
-static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static VivDefAttr defence_attr = {{{0, 0, 0, 0, 0}}, {0, 0, 0}};
 
-static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+static VivRegist regist = {{100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}, {0, 0}};
 
 static EVT_BEGIN(attack_event)
     RETURN
@@ -1190,5 +1193,7 @@ USER_FUNC(_disp_heart_entry_stop_check) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u32 gap_05_8038BA04_data[1] = {0};
-__declspec(section ".sdata") u32 gap_07_80412488_sdata[6] = {0};
+
+#pragma force_active on
+__declspec(section ".sdata") u8 gap_07_80412488_sdata[24] = {0};
+#pragma force_active reset

@@ -23,6 +23,9 @@
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
 
+// FAKE: force_active keeps what the original REL kept: the functions every caller inlines (jump, jump_minnnanokoe, pose_init/main/change, drawNum), the fd_ tables and the unreferenced message strings
+#pragma force_active on
+
 // math-inline function-local statics (negone_one$374 ...) the target keeps at the start of .data
 __declspec(section ".data") u64 fd_bom_01_negone_one_374 = 0xBF8000003F800000;
 
@@ -75,6 +78,8 @@ __declspec(section ".data") s32 fd_bom_01_one_364[] = {
 
 typedef struct SightWork { FileEntry* tpl; s32 level[5]; f32 rot; s32 dir; s32 count1; s32 count2; } SightWork;
 SightWork* sight_wp;
+// make_name's sprintf buffer; file scope so .bss keeps the target order lp, name, sight_wp (a function static is emitted first)
+static char name[64];
 typedef struct BomSoundWork { u8 pad_0[0x330]; u16 sampleBank; u8 pad_332[0x5C0 - 0x332]; s16 samples[2][0x400]; u32 sampleIndex; } BomSoundWork;
 extern BomSoundWork sound;
 void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot);
@@ -95,10 +100,8 @@ s32 extGetPoseNum(void);
 static void pose_change(s32 i, const char* name);
 static void pose_change(s32 i, const char* name);
 static s32 ext_data[93];
-static inline f32 chb_sin(f32 x) { f32 y; f32 x2; f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
-static inline f32 chb_cos(f32 x) { f32 y; f32 x2; f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
-// FAKE: chb_sin with x2 declared before y (declaration order only; used by ext_init so its FPR colouring follows the target)
-static inline f32 chb_sin_x2(f32 x) { f32 x2; f32 y; f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
+static inline f32 chb_sin(f32 x) { f32 y; f32 x2; f32 r; f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; r = a; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; r = a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; r = a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; r = a; } return r; }
+static inline f32 chb_cos(f32 x) { f32 y; f32 x2; f32 r; f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; r = a; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; r = a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; r = a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; r = a; } return r; }
 static void pose_init(void);
 static void pose_init(void);
 void extLoadRenderMode(void);
@@ -434,9 +437,9 @@ void disp_sight(CameraId camera, void* param) {
 
     winTexInit(*sight_wp->tpl->data);
     winTexSet(5, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black);
-    for (id = 0; id < 3; id++) {
-        if ((s32)(gp->retraceCount % 30) / 10 != id) {
-            i = 4 - id;
+    for (j = 0; j < 3; j++) {
+        if ((s32)(gp->retraceCount % 30) / 10 != j) {
+            i = 4 - j;
             drawBG(i, 100.0f, 60.0f, 1.0f, 1.0f, 0.0f);
             drawBG(i, -100.0f, 60.0f, -1.0f, 1.0f, 0.0f);
             drawBG(i, 100.0f, -60.0f, 1.0f, -1.0f, 0.0f);
@@ -488,10 +491,8 @@ void disp_sight(CameraId camera, void* param) {
     winTexInit(*sight_wp->tpl->data);
     for (i = 0; i < 4; i++) {
         on = (gp->retraceCount % 20 > 6 && i == sight_wp->dir) ? 1 : 0;
-        id = 7;
-        if (on != 0) {
-            id = 6;
-        }
+        // FAKE: pointer-typed ?: = id = on ? 6 : 7 without the branchless int select (same value)
+        id = (s32)(on ? (char*)6 : (char*)7);
         if (sight_wp->dir == 4) {
             on = 0;
             id = 7;
@@ -788,17 +789,12 @@ EVT_END()
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
-static inline void ext_init_pos(ExtPose* pose, f32 angle, f32 dist) {
-    pose->mtx[0][3] = dist * chb_sin_x2(angle);
-    pose->mtx[1][3] = 0.0f;
-    pose->mtx[2][3] = dist * chb_cos(angle);
-}
-
 static void ext_init(void) {
     s32 i;
     BomWork* wp;
     ExtPose* pose;
     f32 angle;
+    f32 dist;
 
     lp = smartAlloc(sizeof(BomWork), 1);
     wp = lp->address;
@@ -814,7 +810,10 @@ static void ext_init(void) {
         pose->flags |= 7;
         PSMTXIdentity(pose->mtx);
         angle = 6.2831855f * rand() / 32767.0f;
-        ext_init_pos(pose, angle, 500.0f + 400.0f * rand() / 32767.0f);
+        dist = 500.0f + 400.0f * rand() / 32767.0f;
+        pose->mtx[0][3] = dist * chb_sin(angle);
+        pose->mtx[1][3] = 0.0f;
+        pose->mtx[2][3] = dist * chb_cos(angle);
         pose_change(i, "R_1");
     }
 }
@@ -2254,7 +2253,6 @@ static s32 depth(EventEntry* event, BOOL isFirstCall) {
 
 static s32 make_name(EventEntry* event, BOOL isFirstCall) {
     s32* args = event->args;
-    static char name[64];
 
     sprintf(name, "S_hikari%d", evtGetValue(event, args[0]));
     evtSetValue(event, args[1], (s32)name);

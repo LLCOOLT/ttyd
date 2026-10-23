@@ -468,6 +468,33 @@ static inline s32 unitwin_party_icon(s32 icon) {
 #define ICONGX ((void (*)(Vec*, u16, u16, f32))iconDispGx)
 #define ICONGX2 ((void (*)(Vec*, u16, f32, u16))iconDispGx)
 
+static inline const char* unitwin_party_name(s32 i) {
+	const char* name;
+	switch (i) {
+		case 0:
+			name = msgSearch("name_party0");
+			break;
+		case 1:
+			name = msgSearch("name_party1");
+			break;
+		case 2:
+			name = msgSearch("name_party4");
+			break;
+		case 3:
+			name = pouchGetYoshiName();
+			break;
+		case 4:
+			name = msgSearch("name_party5");
+			break;
+		case 5:
+			name = msgSearch("name_party2");
+			break;
+		case 6:
+			name = msgSearch("name_party6");
+			break;
+	}
+	return name;
+}
 void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 	PouchData* pouch = pouchGetPtr();
 	UnitWinWork* wp = (UnitWinWork*)param;
@@ -478,9 +505,10 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 	s32 flag;
 	s32 lv;
 
+	flag = 0; // FAKE: dead store, moves flag's variable record before i so the case 5-7 flag web is a split temp coloured before i's (target r21)
 	if (wp->flags & 1) {
-		const char* desc = itemDataTable[wp->goods[wp->goodsIdx]].description;
 		const char* name = itemDataTable[wp->goods[wp->goodsIdx]].id;
+		const char* desc = itemDataTable[wp->goods[wp->goodsIdx]].description;
 
 		windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, -150.0f, 120.0f, 300.0f, 50.0f, 20.0f);
 		FontDrawStart();
@@ -662,7 +690,6 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			s32 titleX;
 			const char* desc;
 			s32 max;
-			s32 flag;
 			u32 sl, st, sw, sh;
 
 			row = 0;
@@ -851,13 +878,14 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		case 18: {
 			InformantWork* jdt = &_jdt;
 			InformantInfo* info;
-			s32 h;
 			u8* tbl;
 			const char* title;
+			s32 h;
+			s32 n;
 			u32 sl, st, sw, sh;
 
-			h = 8 - wp->count;
-			h = (h > 0 ? h : 0) * 24;
+			n = 8 - wp->count;
+			h = (n > 0 ? n : 0) * 24;
 			if (mode == 17) {
 				title = msgSearch("msg_window_title_5");
 				tbl = jdt->readFlags.perfectRead;
@@ -916,13 +944,11 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		case 5:
 		case 6:
 		case 7: {
-			const char* name;
 			char msgName[64] = {0};
+			s32 lv;
 			s32 row = 0;
 			s32 h;
 			u32 sl, st, sw, sh;
-			
-			s32 lv;
 			GXColor color;
 
 			h = 8 - wp->count;
@@ -943,6 +969,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			GXGetScissor(&sl, &st, &sw, &sh);
 			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
 			for (i = 0; party_id_table[i]; i++) {
+				const char* name;
 				s32 icon;
 				s32 ty;
 				char buf[32];
@@ -993,29 +1020,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 				ICONGX2(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | 0x10, 0.5f, unitwin_party_icon(party_icon_table[i]));
 				FontDrawStart();
 				FontDrawColor(color);
-				switch (i) {
-					case 0:
-						name = msgSearch("name_party0");
-						break;
-					case 1:
-						name = msgSearch("name_party1");
-						break;
-					case 2:
-						name = msgSearch("name_party4");
-						break;
-					case 3:
-						name = pouchGetYoshiName();
-						break;
-					case 4:
-						name = msgSearch("name_party5");
-						break;
-					case 5:
-						name = msgSearch("name_party2");
-						break;
-					case 6:
-						name = msgSearch("name_party6");
-						break;
-				}
+				name = unitwin_party_name(i);
 				ty = 80 - row * 24;
 				FontDrawString(36.0f, wp->scroll + ty, name);
 				sprintf(buf, "%d", pouch->partyData[party_id_table[i]].techLevel);
@@ -1046,7 +1051,6 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		}
 		case 8: {
 			char msgName[64] = {0};
-			s32 row = 0;
 			s32 h;
 			u32 sl, st, sw, sh;
 			
@@ -1054,8 +1058,8 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			s32 flag;
 			s32 lv;
 			s32 bob;
+			s32 row = 0;
 			s32 iy;
-			s32 iflag;
 			s32 v;
 			s32 ty;
 			GXColor color;
@@ -1097,12 +1101,12 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 					flag = 0x20;
 				}
 				{
-					ICONGX2(&(Vec){11.0f, wp->scroll + (56 - i * 24), 0.0f}, iflag = flag | 0x10, 0.5f, mario_status_icon_table[i]);
+					ICONGX2(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | 0x10, 0.5f, mario_status_icon_table[i]);
 				}
 				FontDrawStart();
 				FontDrawColor(color);
 				sprintf(buf, "%s%3d", mario_status_name_table[i], *mario_status_point_table[i]);
-				FontDrawString(36.0f, wp->scroll + (80 - i * 24), buf);
+				FontDrawString(36.0f, wp->scroll + (80 - row * 24), buf);
 				bob = (gp->retraceCount & 0xF) > 7 ? 0 : 2;
 				if (row == wp->cursor) {
 					if (lv == 0) {
@@ -1119,10 +1123,10 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 						bob = 0;
 					}
 					{
-						ICONGX2(&(Vec){166.0f, bob + (wp->scroll + (56 - i * 24)), 0.0f}, iflag, 0.5f, icon);
+						ICONGX2(&(Vec){166.0f, bob + (wp->scroll + (56 - row * 24)), 0.0f}, flag | 0x10, 0.5f, icon);
 					}
 					{
-						ICONGX2(&(Vec){186.0f, bob + (wp->scroll + (56 - i * 24)), 0.0f}, iflag, 0.5f, icon);
+						ICONGX2(&(Vec){186.0f, bob + (wp->scroll + (56 - row * 24)), 0.0f}, flag | 0x10, 0.5f, icon);
 					}
 				} else {
 					v = *mario_status_point_table[i] - mario_status_henka_table[i];
@@ -1133,7 +1137,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 						bob = 0;
 					}
 					{
-						ICONGX2(&(Vec){176.0f, (wp->scroll + (56 - i * 24)) - bob, 0.0f}, iflag, 0.5f, icon);
+						ICONGX2(&(Vec){176.0f, (wp->scroll + (56 - row * 24)) - bob, 0.0f}, flag | 0x10, 0.5f, icon);
 					}
 				}
 				if (v > 0) {
@@ -1142,7 +1146,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 					sprintf(buf, "  \x81\x48", v);
 				}
 				FontDrawStart();
-				FontDrawString(206.0f, wp->scroll + (80 - i * 24), buf);
+				FontDrawString(206.0f, wp->scroll + (80 - row * 24), buf);
 				row++;
 			}
 			GXSetScissor(sl, st, sw, sh);
@@ -1201,12 +1205,12 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 					j = 0x20;
 				}
 				{
-					ICONGX2(&(Vec){11.0f, wp->scroll + (56 - i * 24), 0.0f}, j | 0x10, 0.5f, mario_status_icon_table[i]);
+					ICONGX2(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, j | 0x10, 0.5f, mario_status_icon_table[i]);
 				}
 				FontDrawStart();
 				FontDrawColor(color);
 				sprintf(buf, "%s%3d", mario_status_name_table[i], *mario_status_point_table[i]);
-				FontDrawString(36.0f, wp->scroll + (80 - i * 24), buf);
+				FontDrawString(36.0f, wp->scroll + (80 - row * 24), buf);
 				if (row == wp->cursor) {
 					if (lv == 0) {
 						sprintf(help, "help");
@@ -1221,7 +1225,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 						sprintf(buf, "  \x81\x48", v);
 					}
 					FontDrawStart();
-					FontDrawString(206.0f, wp->scroll + (80 - i * 24), buf);
+					FontDrawString(206.0f, wp->scroll + (80 - row * 24), buf);
 				}
 				row++;
 			}
@@ -1369,8 +1373,8 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		}
 		line1 = text;
 		lines = 1;
-		for (p = (s8*)line1, k = 0; *p; p++, k++) {
-			if (*p == '\n') {
+		for (k = 0; ((s8*)line1)[k]; k++) {
+			if (((s8*)line1)[k] == '\n') {
 				text[k] = 0;
 				lines = 2;
 				line2 = &text[k] + 1;
@@ -1404,6 +1408,12 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		iconFlagOn("yubicursor_2", 2);
 	}
 }
+
+
+
+
+
+
 
 USER_FUNC(set_new_goods_list) {
 	s32* args = event->args;

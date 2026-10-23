@@ -1,3 +1,4 @@
+#define MATH_NO_SQRTF 1
 #include "musyx/platform.h"
 
 #if MUSY_TARGET == MUSY_TARGET_DOLPHIN

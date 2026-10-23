@@ -1,7 +1,0 @@
-// decl: double sin(double x);
-// proto: static f32 sinf(f32 x);
-#pragma dont_inline on
-static f32 sinf(f32 x) {
-    return sin(x);
-}
-#pragma dont_inline reset

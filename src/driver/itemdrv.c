@@ -174,13 +174,6 @@ void itemInit(void) { // 1:1
     wp->currId = 0;
 }
 
-// FAKE: never called (dead-stripped); stands in for a stripped function whose pooled constant is the
-// 0x18 zero bytes after double_neg1 in .rodata (MWCC pools doubles/strings in REVERSE function order,
-// so an early function lands at the tail).
-const char* itemdrvRodataPad(void) {
-    return "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-}
-
 void itemReInit(void) {
     ItemWork* wp = itemGetWork();
     ItemEntry* entry;
@@ -1729,3 +1722,4 @@ BOOL itemGetCheck(ItemEntry* entry);
 void itemCoinDrop(Vec* position);
 void itemReInit(void);
 void itemInit(void);
+

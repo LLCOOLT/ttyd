@@ -1561,28 +1561,36 @@ u8* ssDecodeDPCM(SoundStream* stream, SoundStreamEntry* entry, s16* out, u32 cou
     }
     return src;
 }
-u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
+u32 _sscallback(void* p_b1, u32 len1, void* p_b2, u32 p_l2, u32 user) {
     s16* dst;
     SoundStream* stream;
     SoundStreamEntry* entry;
+    unsigned int len2;
+    s16* buffer1;
+    s16* buffer2;
     s16* src16;
-    u8* dst8;
-    u8* src8;
     u32 i;
     u32 n;
     s32 j;
+    u8* src8;
+    u8* src8b;
 
+    // FAKE: len2/buffer1/buffer2 are copied from the params into locals of a different type (unsigned int, s16*) so
+    // IRO cannot propagate the copies; the params then coalesce into r3/r5/r6 and these statement copies give the
+    // target order len1 (param web, after the stream add) < len2 < buffer1 < buffer2 (buffer1 lands in r6).
+    len2 = p_l2;
+    buffer1 = p_b1;
+    buffer2 = p_b2;
     stream = &sound.streams[(u8)user];
-    (& sound.streams [(u8) user])->samplePos = 0;
-    dst = buffer1;
+    stream->samplePos = 0;
     if ((stream->flags & 0x8006) || sound.unk214) {
         if (!(stream->flags & 0x100)) {
             for (; len1 != 0; len1--) {
-                *(dst++) = 0;
+                *(buffer1++) = 0;
                 stream->samplePos++;
             }
             for (; len2 != 0; len2--) {
-                *(((s16*)buffer2)++) = 0;
+                *(buffer2++) = 0;
                 stream->samplePos++;
             }
             return stream->samplePos;
@@ -1590,12 +1598,12 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
             j = (s32)(len1 / 14 * 8);
             j /= 2;
             for (; j != 0; j--) {
-                *(((s16*)buffer1)++) = 0;
+                *(buffer1++) = 0;
             }
             j = (s32)(len2 / 14 * 8);
             j /= 2;
             for (; j != 0; j--) {
-                *(((s16*)buffer2)++) = 0;
+                *(buffer2++) = 0;
             }
             return len1 + len2;
         }
@@ -1609,11 +1617,11 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
         ssDecodeDPCM(stream, entry, buffer2, len2,
                      ssDecodeDPCM(stream, entry, buffer1, len1, entry->loadBuffer[entry->curBuf] + entry->srcPos));
     } else if (stream->flags & 0x100) {
-        dst8 = buffer1;
+        dst = buffer1; // FAKE: dst (not a u8* dst8) for the byte copies, so dst's split webs number above i/n
         src8 = entry->loadBuffer[entry->curBuf]; src8 = src8 + entry->srcPos;
         n = ((len1 + 13) / 14) * 8;
         while (n != 0) {
-            *(dst8++) = *(src8++);
+            *(((u8*)dst)++) = *(src8++);
             n--;
             entry->srcPos++;
             if (entry->srcPos >= entry->loadedLen[entry->curBuf]) {
@@ -1637,23 +1645,26 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
                 }
             }
         }
-        dst8 = buffer2;
+        // FAKE: loop 2 reads through its own copy of src8; the copy takes the pre-RA scheduler's cycle-1 slot so `mr dst,buffer2`
+        // issues after mulhwu (magic constant and dst then share r3, as in the target); the copy itself colours to a self-move (FAKES.md)
+        src8b = src8;
+        dst = buffer2;
         n = ((len2 + 13) / 14) * 8;
         while (n != 0) {
-            *(dst8++) = *(src8++);
+            *(((u8*)dst)++) = *(src8b++);
             n--;
             entry->srcPos++;
             if (entry->srcPos >= entry->loadedLen[entry->curBuf]) {
                 if (entry->loaded == 0 && !(stream->flags & 0x4000)) {
                     entry->pos -= entry->srcPos;
                     entry->srcPos = 0;
-                    src8 = entry->loadBuffer[entry->curBuf];
+                    src8b = entry->loadBuffer[entry->curBuf];
                     continue;
                 }
                 entry->loaded = 0;
                 entry->srcPos = 0;
                 entry->curBuf = 1 - entry->curBuf;
-                src8 = entry->loadBuffer[entry->curBuf];
+                src8b = entry->loadBuffer[entry->curBuf];
             }
             entry->pos++;
             if (entry->pos >= stream->loopEnd) {
@@ -1666,12 +1677,12 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
         }
         stream->samplePos = len1 + len2;
     } else {
-        n = len1;
+        i = len1;
         dst = buffer1;
         src16 = (s16*)(entry->loadBuffer[entry->curBuf] + (entry->srcPos & (~1)));
-        while (n != 0) {
+        while (i != 0) {
             *(dst++) = *(src16++);
-            n--;
+            i--;
             stream->samplePos++;
             entry->srcPos += 2;
             if (entry->srcPos >= entry->loadedLen[entry->curBuf]) {
@@ -1695,11 +1706,11 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
                 }
             }
         }
-        n = len2;
+        i = len2;
         dst = buffer2;
-        while (n != 0) {
+        while (i != 0) {
             *(dst++) = *(src16++);
-            n--;
+            i--;
             stream->samplePos++;
             entry->srcPos += 2;
             if (entry->srcPos >= entry->loadedLen[entry->curBuf]) {

@@ -915,35 +915,48 @@ void JUTFont_DrawStart(GXColor color) {
 	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0, 0, 0, 0});
 }
 
-#pragma opt_lifetimes off
+// FAKE: fontHue/fontHueX/fontPos are invented inline helpers. Their params become @ temps created at the vertex 3/4
+// call sites (hr1 = vertex 3 hue, hr0 = vertex 4 hue, x1s = vertex 3 x), which is the register numbering the target needs.
+static inline void fontHue(GXColor* hsv, s32 hr) {
+	hsv->r = hr;
+}
+
+static inline void fontHueX(GXColor* hsv, const s16 x, u8 hue) {
+	fontHue(hsv, x + hue);
+}
+
+static inline void fontPos(const s16 x, s16 y, GXColor* hsv, u8 hue) {
+	GXPosition3s16(x, y, 0);
+	fontHueX(hsv, x, hue);
+}
+
 void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
-	s16 x0, y0, y1;
-	s32 x1;
+	s32 row;
+	u8 hue;
+	s16 x1;
+	u8 n0;
+	s16 y0;
+	u8 n1;
+	s32 x0;
+	s16 y1;
+	u16 v0;
 	GXColor hsv;
 	s32 idx, cell, col;
 	BinaryFontGlyph* glyph;
 	f32 cellh, cellw, tu, w, h, tw;
 	FontWidthEntry* entry;
-	u16 rows;
 	GXColor c;
 	u16 u0, u1, v1;
-	// FAKE: v0 held as s32 = (s16)iv0 (only its low 16 bits are ever used: u16 store, (u16)v0)
-	s32 v0;
-	s16 x1s;
-	s32 row;
 	u8 t0, t1;
 	f32 tv;
 	f32 scale;
-	u8 n0, n1, hue, ew;
+	u8 ew;
 	u8 kern;
-	s32 hr0, hr1;
-	s32 iv0;
 	entry = fontGetWidth(code);
 	kern = entry->kerning;
 	glyph = blockGlyph;
-	rows = glyph->sheetrows;
-	row = (code - glyph->firstcode) / rows;
-	col = (code - glyph->firstcode) % rows;
+	row = (code - glyph->firstcode) / glyph->sheetrows;
+	col = (code - glyph->firstcode) % glyph->sheetrows;
 	row = row % glyph->sheetcolumns;
 	cellh = glyph->cellheight;
 	cellw = glyph->cellwidth;
@@ -956,53 +969,49 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	n0 = irand(64);
 	n1 = irand(64);
-	x0 = x + 0;
+	x0 = x;
 	y0 = y - 1;
 	x1 = x0 + w;
 	hue = x0 - (u8)gp->retraceCount * 2;
 	hsv = (GXColor){0x00, 0xAA, 0xFF, 0xFF};
 	tv = row * cellh;
-	iv0 = 1.0f + tv;
+	v0 = 1.0f + tv;
 	GXPosition3s16(x, y0, 0);
-	hr0 = x0 + hue;
-	hsv.r = hr0;
+	fontHue(&hsv, x0 + hue);
 	c = HSV2RGB(hsv);
-	u0 = (s32)(tu);
+	u0 = tu;
 	GXColor4u8(c.r, c.g, c.b, c.a);
-	GXTexCoord2u16(u0, iv0);
+	GXTexCoord2u16(u0, v0);
 	GXTexCoord2u8(n0, n1);
-	// FAKE: sign-extending copy of iv0; every use truncates back to u16
-	v0 = (s16)iv0;
 
-	x1s = x1;
-	hr1 = x1s + hue;
-	GXPosition3s16(x1, y0, 0);
-	hsv.r = hr1;
+	// FAKE: vertex 2 x written as u16 (same 16 bits) so its first extsh is the vertex 3 fontPos param, not a store temp
+	GXWGFifo.u16 = x1;
+	GXWGFifo.s16 = y0;
+	GXWGFifo.s16 = 0;
+	fontHueX(&hsv, x1, hue);
 	c = HSV2RGB(hsv);
-	u1 = (s32)(tu + tw);
+	u1 = tu + tw;
 	GXColor4u8(c.r, c.g, c.b, c.a);
-	t0 = (s32)(n0 + w);
+	t0 = n0 + w;
 	GXTexCoord2u16(u1, v0);
 	GXTexCoord2u8(t0, n1);
 
 	y1 = (s32)(y0 - h);
-	GXPosition3s16(x1s, y1, 0);
-	hsv.r = hr1;
+	fontPos(x1, y1, &hsv, hue);
 	c = HSV2RGB(hsv);
 	GXColor4u8(c.r, c.g, c.b, c.a);
-	v1 = (s32)((u16)v0 + cellh);
-	t1 = (s32)(n1 + h);
+	v1 = v0 + cellh;
+	t1 = n1 + h;
 	GXTexCoord2u16(u1, v1);
 	GXTexCoord2u8(t0, t1);
 
 	GXPosition3s16(x0, y1, 0);
-	hsv.r = hr0;
+	fontHue(&hsv, x0 + hue);
 	c = HSV2RGB(hsv);
 	GXColor4u8(c.r, c.g, c.b, c.a);
 	GXTexCoord2u16(u0, v1);
 	GXTexCoord2u8(n0, t1);
 }
 
-#pragma opt_lifetimes reset
 #pragma opt_common_subs reset
 

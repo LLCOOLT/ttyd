@@ -272,7 +272,4 @@ void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-#pragma force_active on
-static __declspec(section ".data") u32 gap_05_8039A934_data[1] = {0};
-#pragma force_active reset
 #pragma opt_dead_assignments reset

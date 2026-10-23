@@ -343,7 +343,7 @@ static void moamoa_pose_init(void) {
         wp->defs[wp->numDefs].count = i - start + 1;
         wp->defs[wp->numDefs].speed = data->speed;
         wp->defs[wp->numDefs].loop = 1;
-        if (!strncmp(anim, (char*)"J\0\0\0\0\0\0", 1)) { // FAKE: "J" plus its 6-byte .rodata tail gap as one 8-byte string (section ends at 0x958 as in the target)
+        if (!strncmp(anim, "J", 1)) {
             wp->defs[wp->numDefs].loop = 0;
         }
         i++;
@@ -850,6 +850,8 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 __declspec(section ".rodata") static Vec moamoa_zero_vec = {0.0f, 0.0f, 0.0f};
+#pragma opt_dead_assignments off // FAKE: keeps the named in-argument holder `aa` of case 15 (dead store otherwise dropped by IRO), so the sum is a low-numbered named vreg as in the target
+static inline f32 mmI(f32 x) { return x; } // FAKE: identity; replaces the dead `(k = A - B)` holders of the hand-inlined randf sites, which opt_dead_assignments off would otherwise keep as named vregs
 static void ext_moamoa_main(void) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
@@ -985,7 +987,7 @@ static void ext_moamoa_main(void) {
                 if (m->flags & 0x40) {
                     break;
                 }
-                { f32 k; f32 mn; f32 rr; f32 r = rand() / 32767.0f; rr = (6.2831855f * ((r * (k = 360.0f - 0.0f)) + (mn = 0.0f))) / 360.0f; // FAKE: hand-inlined randf(0.0f, 360.0f) (same rand() call, r*360+0) with the 6.28 factor first, so its pool address is created before 360/0 as in the target
+                { f32 k; f32 mn; f32 rr; f32 r = rand() / 32767.0f; rr = (6.2831855f * ((r * mmI(360.0f - 0.0f)) + (mn = 0.0f))) / 360.0f; // FAKE: hand-inlined randf(0.0f, 360.0f) (same rand() call, r*360+0) with the 6.28 factor first, so its pool address is created before 360/0 as in the target
                 x0 = ( 5.0f * moa_sinx(rr) ) + pose->mtx[0][3];
                 z0 = pose->mtx[2][3] - ( 5.0f * moa_cosx(rr) );
                 }
@@ -1007,7 +1009,7 @@ static void ext_moamoa_main(void) {
                 if (dist > 31.0f) {
                     x1 = ( 30.0f * moa_sinx(( 6.2831855f * angle ) / 360.0f) ) + pose->mtx[0][3];
                     dist = pose->mtx[2][3] - ( 30.0f * moa_cosx(( 6.2831855f * angle ) / 360.0f) );
-                    { f32 r2; f32 k; s = rand() / 32767.0f; r2 = rand() / 32767.0f; moamoa_jump(pose, m, m->state, 0, x1, 215.0f, dist, 2.0f * ((s * (k = 1.0f - 1.0f)) + 1.0f), 2.0f * ((r2 * k) + 0.4f)); }
+                    { f32 k; f32 r2; f32 aa; s = rand() / 32767.0f; r2 = rand() / 32767.0f; moamoa_jump(pose, m, m->state, 0, x1, 215.0f, dist, 2.0f * (aa = (s * (k = 1.0f - 1.0f)) + 1.0f), 2.0f * ((r2 * k) + 0.4f)); } // FAKE: `aa` is a never-read holder kept by opt_dead_assignments off (in-argument sum stays in argument order, numbered below k/r2)
                 } else {
                     moamoa_joint_position(m, &jv);
                     PSVECAdd(&jv, &m->jitter, &jv);
@@ -1067,7 +1069,7 @@ static void ext_moamoa_main(void) {
         x = pose->mtx[0][3] + (15.0f * moa_sinx(rad));
         z = pose->mtx[1][3];
         dist = pose->mtx[2][3] - (15.0f * moa_cosx(rad));
-        { f32 sp1; f32 k; f32 r1 = rand() / 32767.0f; sp1 = r1 * (k = 1.0f - 1.0f) + 1.0f;
+        { f32 sp1; f32 k; f32 r1 = rand() / 32767.0f; sp1 = r1 * mmI(1.0f - 1.0f) + 1.0f;
         // FAKE: block-local copies of the float args (behaviour-identical) put the f1..f5 arg moves ahead of the ?: as in the target
         { f32 g2 = randf(0.4f, 0.4f); { f32 x2 = x; f32 y2 = z; f32 z2 = dist; f32 s2 = sp1; f32 g3 = g2; moamoa_jump(pose, m, (d < 100.0f) ? (m->state) : (0), 0, x2, y2, z2, s2, g3); } } }
       }
@@ -1092,7 +1094,7 @@ static void ext_moamoa_main(void) {
         f32 k;
         f32 r1 = rand() / 32767.0f;
         f32 r2;
-        a2 = 2.0f * ((r1 * (k = 1.0f - 1.0f)) + 1.0f);
+        a2 = 2.0f * ((r1 * mmI(1.0f - 1.0f)) + 1.0f);
         r2 = rand() / 32767.0f;
         b = 2.0f * ((r2 * (k = 0.4f - 0.4f)) + 0.4f);
         // FAKE: block-local copies of the float args (behaviour-identical) put the f1..f5 arg moves ahead of the ?: as in the target
@@ -1185,12 +1187,12 @@ static void ext_moamoa_main(void) {
       {
         f32 k;
         f32 r1 = rand() / 32767.0f;
-        spd = (r1 * (k = 6.0f - 5.0f)) + 5.0f;
+        spd = (r1 * mmI(6.0f - 5.0f)) + 5.0f;
       }
       {
         f32 k;
         f32 r1 = rand() / 32767.0f;
-        s = (r1 * (k = 0.3f - 0.2f)) + 0.2f;
+        s = (r1 * mmI(0.3f - 0.2f)) + 0.2f;
       }
         if (!sndFlag)
       {
@@ -1288,17 +1290,17 @@ static void ext_moamoa_main(void) {
         }
         if (!(m->flags & 0x588)) {
             if (pose->mtx[0][3] > 100.0f) {
-                { f32 k; f32 mn; f32 r = rand() / 32767.0f; pose->mtx[0][3] = 100.0f + ((r * (k = 5.0f - 0.0f)) + (mn = 0.0f)); } // FAKE: hand-inlined randf(0.0f, 5.0f) (same rand() call, same r*5+0 then +c), so the constant is reloaded after the call as in the target
+                { f32 k; f32 mn; f32 r = rand() / 32767.0f; pose->mtx[0][3] = 100.0f + ((r * mmI(5.0f - 0.0f)) + mmI(0.0f)); } // FAKE: hand-inlined randf(0.0f, 5.0f) (same rand() call, same r*5+0 then +c), so the constant is reloaded after the call as in the target
             }
             if (pose->mtx[0][3] < -1870.0f) {
-                { f32 k; f32 mn; f32 r = rand() / 32767.0f; pose->mtx[0][3] = -1870.0f + ((r * (k = 5.0f - 0.0f)) + (mn = 0.0f)); }
+                { f32 k; f32 mn; f32 r = rand() / 32767.0f; pose->mtx[0][3] = -1870.0f + ((r * mmI(5.0f - 0.0f)) + mmI(0.0f)); }
             }
             if (!(m->flags & 0x40)) {
                 if (pose->mtx[2][3] > 45.0f) {
-                    { f32 k; f32 mn; f32 r = rand() / 32767.0f; pose->mtx[2][3] = 45.0f + ((r * (k = 5.0f - 0.0f)) + (mn = 0.0f)); }
+                    { f32 k; f32 mn; f32 r = rand() / 32767.0f; pose->mtx[2][3] = 45.0f + ((r * mmI(5.0f - 0.0f)) + mmI(0.0f)); }
                 }
                 if (pose->mtx[2][3] < -45.0f) {
-                    { f32 k; f32 mn; f32 r = rand() / 32767.0f; pose->mtx[2][3] = -45.0f + ((r * (k = 5.0f - 0.0f)) + (mn = 0.0f)); }
+                    { f32 k; f32 mn; f32 r = rand() / 32767.0f; pose->mtx[2][3] = -45.0f + ((r * mmI(5.0f - 0.0f)) + mmI(0.0f)); }
                 }
             }
         }
@@ -1315,6 +1317,7 @@ static void ext_moamoa_main(void) {
 }
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
+#pragma opt_dead_assignments reset
 static void ext_moamoa_dispent(void) {
     if (wp->flags & 1) {
         dispEntry(CAMERA_3D, 0.0f, 1, ext_disp, NULL);

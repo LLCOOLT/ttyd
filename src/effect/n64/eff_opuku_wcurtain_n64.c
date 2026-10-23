@@ -141,8 +141,6 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
     effN64Vtx* vtx;
     effN64Vtx* p;
-    effN64Vtx* q;
-    s32 k;
     s32 j;
     s32 frame;
     s32 m;
@@ -196,19 +194,16 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
     PSMTXScale(scale, s, s, s);
     PSMTXConcat(mtx, scale, mtx);
-    q = vtx;
-    k = i * 2;
-    for (j = 0; j < k; j++) {
+    for (j = 0; j < i * 2; j++) {
         OSInitFastCast();
-        OSs16tof32(&q->x, &v.x);
-        OSs16tof32(&q->y, &v.y);
-        OSs16tof32(&q->z, &v.z);
+        OSs16tof32(&vtx[j].x, &v.x);
+        OSs16tof32(&vtx[j].y, &v.y);
+        OSs16tof32(&vtx[j].z, &v.z);
         PSMTXMultVec(mtx, &v, &v);
         OSInitFastCast();
-        OSf32tos16(&v.x, &q->x);
-        OSf32tos16(&v.y, &q->y);
-        OSf32tos16(&v.z, &q->z);
-        q++;
+        OSf32tos16(&v.x, &vtx[j].x);
+        OSf32tos16(&v.y, &vtx[j].y);
+        OSf32tos16(&v.z, &vtx[j].z);
     }
     DCFlushRange(vtx, sizeof(effN64Vtx) * 48);
     GXInvalidateVtxCache();

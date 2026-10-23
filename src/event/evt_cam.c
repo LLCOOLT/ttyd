@@ -66,27 +66,23 @@ USER_FUNC(evt_cam_get_at) {
 
 // CameraId id, f32 x, f32 y, s32 msec
 USER_FUNC(evt_cam_shake) {
-    u64 now;
     s32* args = event->args;
     int new_var;
-    u64 last;
-    u32 hi;
     int new_var2;
-    u32 lo;
     CameraId id;
+    u64 now;
     s32 msec;
     f32 x, y;
     f32 len;
     s32 onTime, offTime;
+    u64 last;
 
     id = evtGetValue(event, args[0]);
     x = evtGetFloat(event, args[1]);
     new_var2 = id;
     y = evtGetFloat(event, args[2]);
     msec = evtGetValue(event, args[3]);
-    hi = ((u32*)&event->lifetime)[0];
-    lo = ((u32*)&event->lifetime)[1];
-    now = ((u64)hi << 32) | lo;
+    now = *(u64*)&event->lifetime;
     if (isFirstCall) {
         event->userdata[0] = 0;
         ((u32*)&event->userdata[1])[0] = (now >> 32) & 0xFFFFFFFF;
@@ -116,6 +112,14 @@ USER_FUNC(evt_cam_shake) {
     offTime = 50.0f * (1.0f - len);
     last = event->wInterpRelatedTime;
     if (onTime && offTime) {
+        // FAKE: dead int guard (COLOURING W): its division temps survive to RA and add interference, then the
+        // post-RA peephole folds the branch and deletes the arm (no code). Colours the first u64 compare's dummy r24.
+        {
+            s32 gz = 0;
+            if (gz != 0) {
+                offTime = ((offTime / onTime) / (onTime / offTime)) / (((offTime + 1) / onTime) / (onTime / (offTime + 1)));
+            }
+        }
         if (!*(s32*)&event->userdata3) {
             padRumbleOn(0);
             if (onTime < OSTicksToMilliseconds(now - last)) {

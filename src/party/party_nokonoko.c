@@ -897,14 +897,18 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
     f32 z;
     f32 x;
     f32 yofs;
+    f32 k;
     f32 w;
 
     yofs = 10.0f;
-    y0 = party->position.y + party->height;
-    dist = party->height + 30.0f;
+    x = party->position.x;
+    z = party->position.z;
+    y0 = party->position.y + (w = party->height);
+    k = 30.0f;
+    dist = w + k;
     y0 = yofs + y0;
-    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, party->position.x,
-                         y0, party->position.z, 0.0f, -1.0f, 0.0f);
+    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x,
+                         y0, z, 0.0f, -1.0f, 0.0f);
     if (((hitGetAttr(hit) >> 9) & 1) == 1) {
         hit = NULL;
     }
@@ -1036,8 +1040,10 @@ u32 lookupSafetyPos(Vec pos, f32 height, Vec* out) {
     p[3].y = y;
     z = w * -c + pos.z;
     p[3].z = z;
+    // FAKE: y + height held in the dead c (named copy into the f2 arg) gives the target probe-1 schedule; same value
+    c = y + height;
     dist = EXT_LIT(float_0p1_8041b518, 0.1f) + height;
-    h0 = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, EXT_LIT(float_0_8041b51c, 0.0f), EXT_LIT(float_neg1_8041b520, -1.0f), EXT_LIT(float_0_8041b51c, 0.0f));
+    h0 = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, c, z, EXT_LIT(float_0_8041b51c, 0.0f), EXT_LIT(float_neg1_8041b520, -1.0f), EXT_LIT(float_0_8041b51c, 0.0f));
     rad = (EXT_LIT(float_3p1416_8041b510, 3.1415927f) * revise360(toMovedir(player->displayDirectionTarget) - 90.0f)) / EXT_LIT(float_180_8041b514, 180.0f);
     x = w * (f32)sin(rad) + pos.x;
     p[2].x = x;
@@ -1109,6 +1115,10 @@ u32 lookupSafetyPos(Vec pos, f32 height, Vec* out) {
     return flags;
 }
 
+// FAKE: sin via an inline helper makes each sin result an inline @ temp (numbered after the other temps), which gives the
+// target colouring in lookupSafetyPos2; same value as (f32)sin(rad)
+static inline f32 nokoSin(f32 rad) { return (f32)sin(rad); }
+
 void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
     f32 rad;
     f32 dx;
@@ -1128,15 +1138,13 @@ void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
     MarioWork* player = marioGetPtr();
 
     w = player->wPlayerCollisionBox.x;
+    // (f32)(w * d) keeps the product a separate fmuls (no fmadds), as in the target
     rad = (EXT_LIT(float_3p1416_8041b510, 3.1415927f) * EXT_LIT(float_90_8041b52c, 90.0f)) / EXT_LIT(float_180_8041b514, 180.0f);
-    dx = (f32)sin(rad);
+    dx = nokoSin(rad);
     dz = (f32)cos(rad);
-    dz = -dz;
-    dx = w * dx;
-    dz = w * dz;
-    x = dx + pos.x;
+    x = pos.x + (f32)(w * dx);
     y = pos.y;
-    z = dz + pos.z;
+    z = pos.z + (f32)(w * -dz);
     d = EXT_LIT(float_0p1_8041b518, 0.1f) + height;
     dist = d;
     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, EXT_LIT(float_0_8041b51c, 0.0f), EXT_LIT(float_neg1_8041b520, -1.0f), EXT_LIT(float_0_8041b51c, 0.0f)) != NULL) {
@@ -1146,14 +1154,11 @@ void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
         return;
     }
     rad = (EXT_LIT(float_3p1416_8041b510, 3.1415927f) * EXT_LIT(float_270_8041b5a0, 270.0f)) / EXT_LIT(float_180_8041b514, 180.0f);
-    dx = (f32)sin(rad);
+    dx = nokoSin(rad);
     dz = (f32)cos(rad);
-    dz = -dz;
-    dx = w * dx;
-    dz = w * dz;
-    x = dx + pos.x;
+    x = pos.x + (f32)(w * dx);
     y = pos.y;
-    z = dz + pos.z;
+    z = pos.z + (f32)(w * -dz);
     dist = d;
     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, EXT_LIT(float_0_8041b51c, 0.0f), EXT_LIT(float_neg1_8041b520, -1.0f), EXT_LIT(float_0_8041b51c, 0.0f)) != NULL) {
         out->x = x;
@@ -1162,7 +1167,7 @@ void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
         return;
     }
     rad = (EXT_LIT(float_3p1416_8041b510, 3.1415927f) * EXT_LIT(float_180_8041b514, 180.0f)) / EXT_LIT(float_180_8041b514, 180.0f);
-    dx = (f32)sin(rad);
+    dx = nokoSin(rad);
     dz = (f32)cos(rad);
     x = pos.x;
     z = pos.z;
@@ -1175,14 +1180,11 @@ void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
         return;
     }
     rad = (EXT_LIT(float_3p1416_8041b510, 3.1415927f) * EXT_LIT(float_0_8041b51c, 0.0f)) / EXT_LIT(float_180_8041b514, 180.0f);
-    dx = (f32)sin(rad);
+    dx = nokoSin(rad);
     dz = (f32)cos(rad);
-    dz = -dz;
-    dx = w * dx;
-    dz = w * dz;
-    x = dx + pos.x;
+    x = pos.x + (f32)(w * dx);
     y = pos.y;
-    z = dz + pos.z;
+    z = pos.z + (f32)(w * -dz);
     dist = d;
     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, EXT_LIT(float_0_8041b51c, 0.0f), EXT_LIT(float_neg1_8041b520, -1.0f), EXT_LIT(float_0_8041b51c, 0.0f)) != NULL) {
         out->x = x;
@@ -1202,6 +1204,7 @@ void lookupSafetyPos3(Vec pos, f32 height, Vec* out) {
     f32 dist;
     f32 w;
     f32 x;
+    f32 z2;
     f32 z;
     f32 hx;
     f32 hy;
@@ -1212,15 +1215,13 @@ void lookupSafetyPos3(Vec pos, f32 height, Vec* out) {
     MarioWork* player = marioGetPtr();
 
     w = player->wPlayerCollisionBox.x;
+    // (f32)(w * d) keeps the product a separate fmuls (no fmadds), as in the target
     rad = (3.1415927f * 90.0f) / 180.0f;
     dx = (f32)sin(rad);
     dz = (f32)cos(rad);
-    dz = -dz;
-    dx = w * dx;
-    dz = w * dz;
-    x = dx + pos.x;
+    x = pos.x + (f32)(w * dx);
     y = pos.y;
-    z = dz + pos.z;
+    z = pos.z + (f32)(w * -dz);
     d = 0.1f + height;
     dist = d;
     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, 0.0f, -1.0f, 0.0f) != NULL) {
@@ -1232,16 +1233,13 @@ void lookupSafetyPos3(Vec pos, f32 height, Vec* out) {
     rad = (3.1415927f * 270.0f) / 180.0f;
     dx = (f32)sin(rad);
     dz = (f32)cos(rad);
-    dz = -dz;
-    dx = w * dx;
-    dz = w * dz;
-    x = dx + pos.x;
+    x = pos.x + (f32)(w * dx);
     y = pos.y;
-    z = dz + pos.z;
+    z2 = pos.z + (f32)(w * -dz);
     dist = d;
-    if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, 0.0f, -1.0f, 0.0f) != NULL) {
+    if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z2, 0.0f, -1.0f, 0.0f) != NULL) {
         out->x = x;
-        out->z = z;
+        out->z = z2;
         out->y = y;
         return;
     }

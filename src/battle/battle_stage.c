@@ -103,6 +103,7 @@ static ScreenWork* screen_wp;
 
 //.sdata
 static BattleSpotWork* wp = &work;
+__declspec(section ".sdata") u32 gap_07_804117E4_sdata[7] = {0};
 
 static u8 inta_tex[32] ATTRIBUTE_ALIGN(32) = {0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0};
 
@@ -461,9 +462,11 @@ s32 BattleStageSysLightEntry(const char* name) {
 	return i;
 }
 
-#pragma opt_propagation off
 void BattleStageLightRelease(s32 idx, s32 time, u8 mode) {
-	StageLight* l = &STG->lights[idx];
+	// FAKE: l first holds the stage pointer (two defs), so with propagation on the stage base and idx * 232 + 4 stay separate adds as in the target; this replaces the old opt_propagation off pragma, under which the {0,0,0} template also left a dead stack store
+	StageLight* l = (StageLight*)STG;
+
+	l = ((StageWork*)l)->lights + idx;
 
 	if (l->flags & 1) {
 		if (time == 0) {
@@ -478,7 +481,6 @@ void BattleStageLightRelease(s32 idx, s32 time, u8 mode) {
 		}
 	}
 }
-#pragma opt_propagation reset
 
 #pragma opt_propagation off
 void BattleStageLightSetLightColor(s32 idx, u8 r, u8 g, u8 b, s32 time, u8 mode) {
@@ -840,8 +842,7 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 	Mtx m1;
 	Mtx m2;
 	u8* tex;
-	s32 i, j, n, w, s, k, idx, o;
-	s32 rc[2];
+	s32 i, j, l, n, b, w, s, k, idx, o;
 	u8 c;
 	f32 lim;
 	f32 x, y;
@@ -854,17 +855,15 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 		tex = screen_wp->tex;
 		for (i = 0; i < 64; i++) {
 			for (j = 0; j < 64; j++) {
-				rc[1] = i / 4; rc[0] = i % 4; idx = (j / 8) * 32 + (rc[1] << 8); tex[idx + rc[0] * 8 + j % 8] = (i & 1) ? 0xFF : 0;
+				b = i / 4; k = i % 4; idx = j / 8; o = j % 8; tex[((idx << 5) + (b << 8)) + (o + k * 8)] = (i & 1) ? 0xFF : 0;
 			}
 			n = rand() % 100 + 100;
-			rc[1] = rc[1] * 256;
-			k = rc[0] * 8;
-			for (rc[0] = 0; rc[0] < n; rc[0]++) {
+			for (l = 0; l < n; l++) {
 				w = rand() % 4 + 2;
 				s = rand() % (65 - w);
 				c = rand() % 256;
 				for (j = s; j < s + w; j++) {
-					idx = j / 8 * 32; idx = idx + rc[1]; o = idx + j % 8; o += k; tex[o] = c;
+					b = i / 4; k = i % 4; idx = j / 8; o = j % 8; tex[((idx << 5) + (b << 8)) + (o + k * 8)] = c;
 				}
 			}
 		}

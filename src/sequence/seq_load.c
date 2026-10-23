@@ -823,9 +823,7 @@ void loadDraw(CameraId camera, void* param) {
     f32 x;
     f32 y;
     f32 w;
-    f32* py;
     u64 sec;
-    WinDt* win;
     WinDt* win1;
     s32 i;
     s32 j;
@@ -855,13 +853,16 @@ void loadDraw(CameraId camera, void* param) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXLoadPosMtxImm(cam->view, GX_PNMTX0);
+    // FAKE: win1 reused as a cam alias before its win_dt web, so the win_dt web becomes a lifetime-split temp
+    // (addi straight into win1's register, loop 1 iterates a copy) as in the target
+    win1 = (WinDt*)cam;
+    GXLoadPosMtxImm(((CameraEntry*)win1)->view, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
     loadDrawBg(0x35, EXT_LIT(float_neg304_8041bdec, -304.0f), EXT_LIT(float_240_8041bdf0, 240.0f), EXT_LIT(float_neg272_8041bdf8, -272.0f), EXT_LIT(float_neg240_8041bdf4, -240.0f));
     loadDrawBg(0x34, EXT_LIT(float_neg272_8041bdf8, -272.0f), EXT_LIT(float_240_8041bdf0, 240.0f), EXT_LIT(float_272_8041bdfc, 272.0f), EXT_LIT(float_neg240_8041bdf4, -240.0f));
     loadDrawBg(0x36, EXT_LIT(float_272_8041bdfc, 272.0f), EXT_LIT(float_240_8041bdf0, 240.0f), EXT_LIT(float_304_8041be00, 304.0f), EXT_LIT(float_neg240_8041bdf4, -240.0f));
 
-    win1 = win = win_dt;
+    win1 = win_dt;
     for (i = 0; i < 9; i++) {
         GXColor col = gray;
         if (i == wp->slot) {
@@ -876,21 +877,21 @@ void loadDraw(CameraId camera, void* param) {
         if (i == 5 && (wp->flags & 0x20)) {
             col = dark;
         }
-        switch (win[i].unk10) {
+        switch (win1[i].unk10) {
             case 10:
             case 11:
             case 12:
             case 13: {
                 col.a = 0xfe;
                 winTexInit(*wp->file->data);
-                winTexSet(0xe, (Vec){win[i].x, win[i].y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, col);
+                winTexSet(0xe, (Vec){win1[i].x, win1[i].y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, col);
                 winTexInit(*wp->file->data);
-                winTexSet(win[i].unk10, (Vec){win[i].x, EXT_LIT(float_60_8041be04, 60.0f) + win[i].y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, col);
+                winTexSet(win1[i].unk10, (Vec){win1[i].x, EXT_LIT(float_60_8041be04, 60.0f) + win1[i].y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, col);
                 break;
             }
             default: {
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(win[i].unk10, win[i].unk14, (Vec){win[i].x, win[i].y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, col);
+                winTexSet_x2(win1[i].unk10, win1[i].unk14, (Vec){win1[i].x, win1[i].y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, col);
                 break;
             }
         }
@@ -970,10 +971,10 @@ void loadDraw(CameraId camera, void* param) {
             PSMTXScale(s, EXT_LIT(float_1p5_8041be4c, 1.5f), EXT_LIT(float_1p5_8041be4c, 1.5f), EXT_LIT(float_1p5_8041be4c, 1.5f));
             PSMTXConcat(m, s, m);
             iconDispGxCol(m, 0, 0x201, (GXColor){0, 0, 0, 255});
-            py = &win1->y;
+            // FAKE: y read through a byte offset so the loop-invariant &win1->y becomes a hoisted @ temp (target pop order)
             for (k = 0; k < 7; k++) {
                 if (stars & (1 << (k + 1))) {
-                    PSMTXTrans(m, (win1->x - 106.0f) + k * 32, *py - 52.0f, 0.0f);
+                    PSMTXTrans(m, (win1->x - 106.0f) + k * 32, *(f32*)((u8*)win1 + offsetof(WinDt, y)) - 52.0f, 0.0f);
                     iconDispGxCol(m, 0, (u16)stone_id[k], i == wp->slot ? white : gray);
                 }
             }
@@ -1086,9 +1087,6 @@ __declspec(section ".sdata") s32 evt_continue[] = {
     0x00000002, 0x00000001,
 };
 #pragma force_active on
-#pragma force_active on
-__declspec(section ".sdata") u32 gap_07_80410C9C_sdata[1] = {0};
-
 #pragma force_active on
 #pragma defer_codegen off
 void continueGame(void) {
@@ -1246,7 +1244,4 @@ void continueGame(void) {
     }
 }
 #pragma defer_codegen reset
-
-#pragma force_active on
-__declspec(section ".data") u32 gap_05_8034A0BC_data[1] = {0};
 

@@ -118,7 +118,7 @@ unit/unit_boss_gundan_zako_group2.c:
 unit/unit_boss_gundan_zako_group3.c:
 	.text       start:0x00009DE8 end:0x0000B3B4
 	.rodata     start:0x000059D8 end:0x00005BE8
-	.data       start:0x000314D0 end:0x000323E8
+	.data       start:0x000314D0 end:0x000323E4
 
 unit/unit_gundan_zako_magician.c:
 	.text       start:0x0000B3B4 end:0x0000B46C

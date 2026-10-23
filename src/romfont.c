@@ -5,8 +5,8 @@
 #include <dolphin/os.h>
 
 //.sbss
+static u32 romfont_sbss_pad; /* FAKE: tail pad, emitted after work (sbss is reverse order) */
 static RomFontWork work;
-static u32 romfont_sbss_pad;
 
 //.sdata
 static RomFontWork* wp = &work;

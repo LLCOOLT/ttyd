@@ -162,7 +162,7 @@ data/battle/battle_database_las.c:
 	.text       start:0x00007690 end:0x00007974
 	.rodata     start:0x00004E28 end:0x00005750
 	.data       start:0x0001FC08 end:0x00024AB8
-	.bss        start:0x00000098 end:0x000000B8
+	.bss        start:0x00000098 end:0x000000B4
 
 unit/unit_boss_koopa.c:
 	.text       start:0x00007974 end:0x00007E30

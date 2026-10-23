@@ -349,7 +349,7 @@ EVT_BEGIN(tik_07_init_evt)
         CALL(evt_npc_check_delete, STRING("ハンマーブロス"))
         ELSE
         CALL(evt_npc_check_delete, STRING("ハンニャー１"))
-        CALL(evt_npc_check_delete, STRING("ハンニャー２"))
+        CALL(evt_npc_check_delete, STRING("ハンニャー２\0\0\0"))
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(0), 349)
         IF_INT_LESS(GSW(0), 352)

@@ -1,3 +1,4 @@
+#define MATH_NO_SQRTF 1
 
 /*
 

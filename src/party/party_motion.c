@@ -2129,6 +2129,37 @@ static inline f32 partyJumpHeight(f32 dy) {
     }
 }
 
+static inline void partyJumpCalc(PartyEntry* party, PartyMarioView* mario, f32 d) {
+    f32 t;
+    f32 dy;
+    f32 g;
+    s32 gz;
+    party->unk24 = (10.0f * (0.9f * (d / party->unk104)) + 0.5f) / 10.0f;
+    if (party->unk24 < 12) {
+        party->unk24 = 12;
+    }
+    if (party->unk24 > 40) {
+        party->unk24 = 40;
+    }
+    t = 0.5f * party->unk24;
+    dy = partyJumpHeight(party->unk94.y - party->position.y);
+    // FAKE: dead int-guarded re-definition (folded only by the post-RA peephole) keeps the unk128 value d live
+    // across the jump-height block so it takes f5 and dy f6 as in the target; behaviour-identical (gz is 0).
+    gz = 0;
+    if (gz != 0) {
+        t = d;
+    }
+    g = (dy + dy) / (t * t - t);
+    party->unk114 = mario->unk224 * (g * t);
+    if (party->unk114 > 13.0f) {
+        party->unk114 = 13.0f;
+    }
+    if (party->unk114 < 3.0f) {
+        party->unk114 = 3.0f;
+    }
+    party->unk11C = -g * mario->unk224;
+}
+
 void party_motion_jump(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     s32 id;
@@ -2136,7 +2167,6 @@ void party_motion_jump(PartyEntry* party) {
     f32 dir;
     f32 dist;
     f32 lim;
-    f32 t, dy, g;
     Vec fl;
     f32 s, c;
     f32 x, y, z;
@@ -2206,24 +2236,7 @@ void party_motion_jump(PartyEntry* party) {
             party->unk100 = angleABf(party->position.x, party->position.z, party->unk94.x, party->unk94.z);
             party->unk104 = 2.25f * party->playerPtr->unk224;
         }
-        party->unk24 = (10.0f * (0.9f * (party->unk128 / party->unk104)) + 0.5f) / 10.0f;
-        if (party->unk24 < 12) {
-            party->unk24 = 12;
-        }
-        if (party->unk24 > 40) {
-            party->unk24 = 40;
-        }
-        t = 0.5f * party->unk24;
-        dy = partyJumpHeight(party->unk94.y - party->position.y);
-        g = (dy + dy) / (t * t - t);
-        party->unk114 = mario->unk224 * (g * t);
-        if (party->unk114 > 13.0f) {
-            party->unk114 = 13.0f;
-        }
-        if (party->unk114 < 3.0f) {
-            party->unk114 = 3.0f;
-        }
-        party->unk11C = -g * mario->unk224;
+        partyJumpCalc(party, mario, party->unk128);
         party->flags |= 0x10;
         party->flags &= ~2;
         partyChgPoseId(party, 4);
@@ -2277,7 +2290,6 @@ void party_motion_jump(PartyEntry* party) {
         break;
     }
 }
-
 void party_motion_jump2(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     HitEntry* hit;
@@ -3142,5 +3154,3 @@ static void partyPoseA2(PartyEntry* party) {
     party->unk24 = 30;
 }
 
-// target pad words (G5: section sizes must match or later DOL addresses shift)
-#pragma force_active on

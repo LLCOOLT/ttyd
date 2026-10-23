@@ -49,10 +49,10 @@ def main():
         else badge("C%20exact", tc["c_exact_code"]) if "c_exact_code" in tc
         else badge("True%20C%20exact", tc["true_code"]) if "true_code" in tc
         else badge("Build", pct(total, "matched_code_percent")),
-        "DOL Progress": badge("Functions", 100.0 * tc["true_fns"] / tc["total_fns"]) if tc.get("asm_fns", 1) == 0
+        "Functions Progress": badge("Functions", 100.0 * tc["true_fns"] / tc["total_fns"]) if tc.get("asm_fns", 1) == 0
         else badge("True%20C%20fuzzy", tc["true_fuzzy"]) if "true_fuzzy" in tc
         else badge("DOL", pct(cats.get("DOL", {}), "matched_code_percent")),
-        "RELs Progress": badge("Data", tc["true_data"]) if tc.get("asm_fns", 1) == 0 and "true_data" in tc
+        "Data Progress": badge("Data", tc["true_data"]) if tc.get("asm_fns", 1) == 0 and "true_data" in tc
         else badge("Build%20(with%20asm%20stand--ins)", pct(total, "matched_code_percent"), "lightgrey"),
         "Linked Progress": badge("Linked", pct(total, "complete_code_percent")) if tc.get("asm_fns", 1) == 0
         else badge("Build%20linked", pct(total, "complete_code_percent"), "lightgrey"),
@@ -62,9 +62,9 @@ def main():
         if re.search(rf"^\[{re.escape(name)}\]: .*$", readme, re.M):
             readme = re.sub(rf"^\[{re.escape(name)}\]: .*$", line, readme, count=1, flags=re.M)
         else:
-            readme = readme.replace("[Discord Badge]:", line + "\n[Discord Badge]:", 1)
+            readme = re.sub(r"^(\[Build Status\]: .*)$", lambda m: m.group(1) + "\n" + line, readme, count=1, flags=re.M)
     if "![Linked Progress]" not in readme:
-        readme = readme.replace("![RELs Progress]", "![RELs Progress] ![Linked Progress]", 1)
+        readme = readme.replace("![Data Progress]", "![Data Progress] ![Linked Progress]", 1)
 
     rows = [("All", total)] + [(n, m) for n, m in cats.items()]
     table = [

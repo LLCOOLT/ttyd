@@ -717,7 +717,42 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
     return ret;
 }
 // CC_END
+// FAKE: cos through an inline so the first-block cs is an inline @ temp (numbered above the hoisted +-1 constants, f15 as in the target)
+static inline f32 camRoadCos(f32 x) { return (f32)cos(x); }
+// FAKE: l2 through an inline so it is an inline @ temp (numbered with the sgn ?: temps) -> 2nd-web lim1/lim2 colour f27/f25 as in the target
+static inline f32 crMul(f32 a, f32 b) { return a * b; }
+// FAKE: the t/s solve through an inline (s via pointer) so t is the inline return @ temp, numbered above the CSE temps
+// (v2.x load, frsp dB.x) -> t is simplified before the r1/r2 products and colours f5 as in the target
+static inline f32 camRoadSolve(f32 ax, f32 az, Vec* dB, Vec* v2, f32* sp) {
+    f32 t;
+    if (__fabs(az) > __fabs(ax)) {
+        t = (v2->x - ax * (v2->z / az)) / (dB->x - dB->z * (ax / az));
+        *sp = (v2->z - t * dB->z) / az;
+    } else {
+        t = (v2->z - az * (v2->x / ax)) / (dB->z - az * (dB->x / ax));
+        *sp = (v2->x - t * dB->x) / ax;
+    }
+    return t;
+}
+// FAKE: sgn1/sgn2 as if/else locals of an inline: inline locals get their @ labels at definition time, so the sgn webs
+// are numbered above l2 (crMul) and below cs; with ax/az numbered low this gives the target l2 f14 / sgn1 f15 / sgn2 f28
+static inline void camRoadSgn2(f32 s, f32 t, f32* p1, f32* p2) {
+    f32 a, b;
+    if (s < 0.0f) {
+        a = -1.0f;
+    } else {
+        a = 1.0f;
+    }
+    if (t < 0.0f) {
+        b = -1.0f;
+    } else {
+        b = 1.0f;
+    }
+    *p1 = a;
+    *p2 = b;
+}
 void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g) {
+    f32 ax, az; // FAKE: named dA.x/dA.z copies declared first (numbered low, below l2) -> see camRoadSgn2
     f32 nx;
     f32 ny;
     f32 nz;
@@ -899,21 +934,21 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
         fov = 3.141592f * (wp->map->f_e8->x / 2.0f / 180.0f);
         zoom = 1.0f;
         if (g && hitCurve != NULL && prev->on) {
-            cs = (f32)cos(fov);
+            cs = camRoadCos(fov);
             sn = (f32)sin(fov);
             mnz = -nz;
             w = 0.01f * (prev->f_58 * (zoom * (640.0f * (dist * sn / cs) / 480.0f)));
             found = 0;
             p = posA;
+            ox = w * mnz;
+            oz = w * nx;
+            p.x = p.x + ox;
             p.y = 1000000.0f;
+            p.z = p.z + oz;
             hit2.y = -1000000.0f;
             hit2.dir.z = 0.0f;
             hit2.dir.y = 0.0f;
             hit2.dir.x = 0.0f;
-            ox = w * mnz;
-            oz = w * nx;
-            p.x = p.x + ox;
-            p.z = p.z + oz;
             if (collisionCurve(0, curve, p, &hit2)) {
                 found = 1;
                 p.x = hit2.pos.x;
@@ -944,20 +979,21 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
             found2 = 0;
             flags = 0;
             p2 = posA;
+            ox = w * mnz;
+            oz = w * nx;
+            p2.x = p2.x + ox;
             p2.y = 1000000.0f;
+            p2.z = p2.z + oz;
             hit3.y = -1000000.0f;
             hit3.dir.z = 0.0f;
             hit3.dir.y = 0.0f;
             hit3.dir.x = 0.0f;
-            ox = w * mnz;
-            oz = w * nx;
-            p2.x = p2.x + ox;
-            p2.z = p2.z + oz;
             if (collisionCurve(0, curve, p2, &hit3)) {
                 found2 = 1;
-                flags = hit3.flags;
                 p2.x = hit3.pos.x;
-                p2.y = y;
+                // FAKE: volatile flags load + p2.y store order the lwz between the p2.x and p2.y stores (target 16c8)
+                flags = *(volatile u32*)&hit3.flags;
+                *(volatile f32*)&p2.y = y;
                 p2.z = hit3.pos.z;
             }
             if (curve->f_b4 != 0) {
@@ -994,30 +1030,25 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
             lim1 += getV60FPS(wp->f_19c[0], prev->time, gp->renderFieldTime);
             lim2 = getV60FPS(wp->f_19c[1], prev->time, gp->renderFieldTime);
             l1 = lim1 * wp->f_19c[4];
-            l2 = lim1 * wp->f_19c[5];
+            l2 = crMul(lim1, wp->f_19c[5]);
             spd1 = lim2 * wp->f_19c[4];
             spd2 = lim2 * wp->f_19c[5];
             dA.x = mnz;
             dA.z = nx;
-            dB.x = -dA.z;
-            dB.z = dA.x;
+            ax = dA.x;
+            az = dA.z;
+            dB.x = -az;
+            dB.z = ax;
             dA.y = 0.0f;
             dB.y = 0.0f;
             r1.y = 0.0f;
             r2.y = 0.0f;
-            if (__fabs(dA.z) > __fabs(dA.x)) {
-                t = (v2.x - dA.x * (v2.z / dA.z)) / (dB.x - dB.z * (dA.x / dA.z));
-                s = (v2.z - t * dB.z) / dA.z;
-            } else {
-                t = (v2.z - dA.z * (v2.x / dA.x)) / (dB.z - dA.z * (dB.x / dA.x));
-                s = (v2.x - t * dB.x) / dA.x;
-            }
+            t = camRoadSolve(ax, az, &dB, &v2, &s);
             r1.x = s * dA.x;
             r1.z = s * dA.z;
             r2.x = t * dB.x;
             r2.z = t * dB.z;
-            sgn2 = t < 0.0f ? -1.0f : 1.0f;
-            sgn1 = s < 0.0f ? -1.0f : 1.0f;
+            camRoadSgn2(s, t, &sgn1, &sgn2);
             lim1 = PSVECMag(&r1);
             lim2 = PSVECMag(&r2);
             if (lim1 > l1 && lim1 > spd1) {

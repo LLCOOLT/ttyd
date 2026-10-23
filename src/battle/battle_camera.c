@@ -80,7 +80,9 @@ void battleCameraMain(void) {
   s32 phase2;
   s16 moveLv3;
 
-  BattleGetMarioPtr(wp);
+  part2 = 0; // FAKE: dead store, moves part2's variable record first so its case-8 web is a split temp (target r27)
+  unit = BattleGetMarioPtr(wp); // FAKE: real zero-code first web of unit (the self-assign below emits nothing), so the case-8 unit web is a split temp (target r26)
+  unit->mPosition.x = unit->mPosition.x;
   dX = 0.0f;
   dY = 0.0f;
   dZ = 0.0f;
@@ -193,7 +195,8 @@ void battleCameraMain(void) {
       btl_camera_set_mode(0, 0);
       break;
     }
-    BattleGetUnitPartsPtr(wp->cameraWork.unitId, wp->cameraWork.partsId);
+    part2 = BattleGetUnitPartsPtr(wp->cameraWork.unitId, wp->cameraWork.partsId);
+    part2->shadowScale = part2->shadowScale; // FAKE: zero-code use; makes this discarded result part2's first web
     part2 = BattleGetUnitPartsPtr(wp->cameraWork.unitId2, wp->cameraWork.partsId2);
     BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
     BtlUnit_GetHitPos(unit2, part2, &hit.x, &hit.y, &hit.z);
@@ -220,9 +223,8 @@ void battleCameraMain(void) {
     }
     yy = (wp->cameraWork.homingOffset2.y / 80.0f) * (pos.y - wp->cameraWork.homingOffset2.y);
     atX = (1.0f - t) * wp->cameraWork.homingOffset2.x;
-    zz = 2.0f * wp->cameraWork.zoom;
-    zz = (1.0f - t) * (zz - 1.5f * (w + w2));
-    ofs = -zz / 10.0f;
+    ofs = (1.0f - t) * -(1.5f * (w + w2) - 2.0f * wp->cameraWork.zoom);
+    zz = -ofs / 10.0f;
     if (yy > 100.0f) {
       yy = 100.0f;
     }
@@ -230,7 +232,7 @@ void battleCameraMain(void) {
       yy = 0.0f;
     }
     y = 20.0 * -(1.0 - t) + yy;
-    battleCameraMoveTo(1, 1, atX, 110.0f + y + ofs, 750.0f - zz, atX, 60.0f + y + ofs, -zz, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
+    battleCameraMoveTo(1, 1, atX, 110.0f + y + zz, 750.0f - ofs, atX, 60.0f + y + zz, -ofs, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
     strcpy(name, "\202\251\202\337\202\347\201\100\202\121\202\344\202\311\202\301\202\306\202\251\202\361\202\302\202\242\202\321");
     break;
   }
@@ -303,13 +305,13 @@ void battleCameraMain(void) {
       btl_camera_set_mode(0, 0);
       break;
     }
-    part2 = BattleGetUnitPartsPtr(wp->cameraWork.unitId, wp->cameraWork.partsId);
+    party = (BattleUnit*)BattleGetUnitPartsPtr(wp->cameraWork.unitId, wp->cameraWork.partsId); // FAKE: case-11 part held in party (role swap)
     part = BattleGetUnitPartsPtr(wp->cameraWork.unitId2, wp->cameraWork.partsId2);
-    if (part2 == NULL || part == NULL) {
+    if ((BattleUnitPart*)party == NULL || part == NULL) {
       btl_camera_set_mode(0, 0);
       break;
     }
-    BtlUnit_GetPartsWorldPos(part2, &pos.x, &pos.y, &pos.z);
+    BtlUnit_GetPartsWorldPos((BattleUnitPart*)party, &pos.x, &pos.y, &pos.z);
     BtlUnit_GetHitPos(unit2, part, &hit.x, &hit.y, &hit.z);
     w = BtlUnit_GetWidth(unit) - 24.0f;
     w2 = BtlUnit_GetWidth(unit2) - 24.0f;
@@ -333,8 +335,7 @@ void battleCameraMain(void) {
     }
     yy = (wp->cameraWork.homingOffset2.y / 80.0f) * (pos.y - wp->cameraWork.homingOffset2.y);
     atX = (1.0f - t) * wp->cameraWork.homingOffset2.x;
-    zz = 2.0f * wp->cameraWork.zoom;
-    zz = (1.0f - t) * (zz - 1.5f * (w + w2));
+    zz = (1.0f - t) * -(1.5f * (w + w2) - 2.0f * wp->cameraWork.zoom);
     ofs = -zz / 10.0f;
     if (yy > 100.0f) {
       yy = 100.0f;
@@ -380,18 +381,18 @@ void battleCameraMain(void) {
     if (t < 0.5f) {
       t = 0.5f;
     }
-    yy = pos.y - wp->cameraWork.homingOffset.y;
-    zz = 2.0f * wp->cameraWork.zoom;
+    ofs = pos.y - wp->cameraWork.homingOffset.y;
+    d = 2.0f * wp->cameraWork.zoom;
     atX = (1.0f - t) * wp->cameraWork.homingOffset2.x;
-    yy -= 100.0f;
-    if (yy > 0.0f) {
-      yy = 0.0f;
+    ofs -= 100.0f;
+    if (ofs > 0.0f) {
+      ofs = 0.0f;
     }
-    if (yy < -30.0f) {
-      yy = -30.0f;
+    if (ofs < -30.0f) {
+      ofs = -30.0f;
     }
-    zz = (1.0f - t) * zz;
-    y = -(1.0 - t) * (125.0f - yy);
+    zz = (1.0f - t) * d;
+    y = -(1.0 - t) * (125.0f - ofs);
     battleCameraMoveTo(1, 1, atX, 110.0f + y, 750.0f - zz, atX, 60.0f + y, -zz, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
     strcpy(name, "\202\251\202\337\202\347\201\100\202\344\202\311\202\301\202\306\202\251\202\361\202\253\202\341\202\255\202\251\202\361\202\302\202\242\202\321");
     break;
@@ -438,10 +439,10 @@ void battleCameraMain(void) {
   case 17:
   case 18:
     mario = BattleGetMarioPtr(wp);
-    party = BattleGetPartyPtr(wp);
-    if (party != NULL) {
+    part = (BattleUnitPart*)BattleGetPartyPtr(wp); // FAKE: party held in part (role swap)
+    if ((BattleUnit*)part != NULL) {
       BtlUnit_GetHomePos(mario, &mx, &my, &mz);
-      BtlUnit_GetHomePos(party, &px, &py, &pz);
+      BtlUnit_GetHomePos((BattleUnit*)part, &px, &py, &pz);
       atX = 0.5f * (mx + px);
       atY = 0.5f * (my + py);
       atZ = 0.5f * (mz + pz);

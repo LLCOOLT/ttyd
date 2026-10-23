@@ -17,7 +17,7 @@ aji_01.c:
 
 aji_02.c:
 	.text       start:0x000000C8 end:0x000007B4
-	.rodata     start:0x00000BC8 end:0x00000CD8
+	.rodata     start:0x00000BC8 end:0x00000CD4
 	.data       start:0x00006590 end:0x00006D98
 	.bss        start:0x00000000 end:0x00000078
 
@@ -34,7 +34,7 @@ aji_04.c:
 
 aji_05.c:
 	.text       start:0x00000E78 end:0x000013C4
-	.rodata     start:0x00001530 end:0x00001618
+	.rodata     start:0x00001530 end:0x00001614
 	.data       start:0x0000B908 end:0x0000BE30
 	.bss        start:0x000000B8 end:0x00000118
 
@@ -98,7 +98,7 @@ aji_16.c:
 aji_17.c:
 	.text       start:0x000043E8 end:0x00006144
 	.rodata     start:0x00003F50 end:0x000051E0
-	.data       start:0x0001E110 end:0x000271D8
+	.data       start:0x0001E110 end:0x000271D4
 	.bss        start:0x00000138 end:0x00000150
 
 aji.c:

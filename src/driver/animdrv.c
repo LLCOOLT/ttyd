@@ -496,23 +496,40 @@ void animPoseBattleInit(void) {
     animPoseRefresh();
 }
 
+// FAKE: free-file search as an inline: its local p gets a definition-time @ label (numbered above the call-site @ temps), as the target colouring needs; the result goes through q (hit copies p, not-found sets q = NULL before id = -1) so the not-found exit emits `li ptr,0` before `li idx,-1` and the hit keeps its `bne; b` pair
+static inline AnimationPoseFile* apeFreeFile(s32* id) {
+  AnimationPoseFile* p;
+  AnimationPoseFile* q;
+  for (id[0] = 0; id[0] < wp->totalFiles; id[0]++) {
+    p = &wp->files[id[0]];
+    if (!p->active) {
+      q = p;
+      goto found;
+    }
+  }
+  q = (void *) 0;
+  id[0] = -1;
+found:
+  return q;
+}
 s32 animPoseEntry(const char *animName, s32 type)
 {
   static s32 _dummy = -1;
-  AnimationTextureFile *new_var3[2];
+  // FAKE: counters and found-slot temps are one-element s32 arrays (IRO scalarizes them into @ window temps, giving the
+  // target's `li c,0; mr off,c` loop starts and @ numbering). pc is the pose-loop counter, copied into poseId on a hit
+  // (poseId then numbers below pose), and reused as both texture loops' counter (its second web gets a late @ label).
+  AnimationPose *t[1];
+  AnimationTextureFile *tt[1];
   AnimationPoseFile *file;
-  // FAKE: one-element arrays for the found-slot temps (memory-like temps keep the target's pointer copies)
-  AnimationPoseFile *tempfile[1];
-  AnimationPose *pose;
-  AnimationPose *temp[1];
+  AnimationTextureFile *tex[1];
   AnimationPoseData *data;
-  s32 texId;
-  s32 fileId;
-  FileEntry *new_var2;
-  s32 poseId;
-  AnimationPoseFile *new_var;
-  s32 i;
+  FileEntry *handle;
+  s32 poseId[1];
+  s32 pc[1];
+  s32 fileId[1];
   s32 count;
+  s32 gz;
+  AnimationPose *pose;
   char textureName[256];
   switch (type)
   {
@@ -530,26 +547,26 @@ s32 animPoseEntry(const char *animName, s32 type)
 
   }
 
-  for (i = 0, poseId = 0; i < wp->totalPoses; i++, poseId++)
+  for (pc[0] = 0; pc[0] < wp->totalPoses; pc[0]++)
   {
-    temp[0] = &wp->poses[poseId];
-    if (!temp[0]->flags)
+    t[0] = &wp->poses[pc[0]];
+    if (!t[0]->flags)
     {
-      pose = temp[0];
+      pose = t[0];
+      poseId[0] = pc[0];
       goto label_1;
     }
   }
-
   pose = (void *) 0;
-  poseId = -1;
+  poseId[0] = -1;
   label_1:
   pose->flags |= 1;
 
-  pose->references = pose->typeFlags = fileId = 0;
+  pose->references = pose->typeFlags = fileId[0] = 0;
   count = wp->totalFiles;
-  for (; fileId < count; fileId++)
+  for (; fileId[0] < count; fileId[0]++)
   {
-    file = &wp->files[fileId];
+    file = &wp->files[fileId[0]];
     if (file->active)
     {
       data = *file->handle->data;
@@ -561,27 +578,15 @@ s32 animPoseEntry(const char *animName, s32 type)
     }
   }
 
-  for (fileId = 0; fileId < wp->totalFiles; fileId++)
-  {
-    tempfile[0] = &wp->files[fileId];
-    if (!tempfile[0]->active)
-    {
-      file = tempfile[0];
-      goto label_2;
-    }
-  }
-
-  file = (void *) 0;
-  fileId = -1;
-  label_2:
+  file = apeFreeFile(fileId);
   file->active = 1;
 
   file->references++;
   file->handle = fileAllocf(5, "%s/%s", "a", animName);
-  new_var2 = file->handle;
+  handle = file->handle;
   if (!file->handle)
   {
-    fileId = -2;
+    fileId[0] = -2;
     file->active = 0;
     file->references--;
   }
@@ -590,58 +595,56 @@ s32 animPoseEntry(const char *animName, s32 type)
     data = *file->handle->data;
     if (!data)
     {
-      fileFree(new_var2);
-      fileId = -2;
+      fileFree(handle);
+      fileId[0] = -2;
       file->active = 0;
-      new_var = file;
-      new_var->references--;
+      file->references--;
     }
     else
     {
       sprintf(textureName, "%s/%s-", "a", data->textureName);
       count = wp->totalTextures;
-      for (i = 0; i < count; i++)
+      for (pc[0] = 0; pc[0] < count; pc[0]++)
       {
-        new_var3[0] = &wp->textures[i];
-        if (*((u32 *) (&new_var3[0]->active)))
+        tex[0] = &wp->textures[pc[0]];
+        if (*((u32 *) (&tex[0]->active)))
         {
-          if (new_var3[0]->handle)
+          if (tex[0]->handle)
           {
-            if (!strcmp(new_var3[0]->handle->filename, textureName))
+            if (!strcmp(tex[0]->handle->filename, textureName))
             {
-              new_var3[0]->references++;
-              texId = i;  // correctness: target stores the found index (was totalTextures: out-of-range id -> fileFree crash)
+              // FAKE: dead int guard (COLOURING W), deleted after colouring; its division temps add the texture pointer/count neighbours
+              gz = 0;
+              if (gz != 0) pc[0] = (((s32)tex[0] / count) / (count / (s32)tex[0])) / ((pc[0] / count) / (count / pc[0]));
+              tex[0]->references++;
               goto label_4;
             }
           }
         }
       }
 
-      for (i = 0; i < wp->totalTextures; i++)
+      for (pc[0] = 0; pc[0] < wp->totalTextures; pc[0]++)
       {
-        new_var3[1] = &wp->textures[i];
-        if (!(*((u32 *) (&new_var3[1]->active))))
+        tt[0] = &wp->textures[pc[0]];
+        if (!(*((u32 *) (&tt[0]->active))))
         {
-          new_var3[0] = new_var3[1];
-          texId = i;
+          tex[0] = tt[0];
           goto label_3;
         }
       }
-
-      new_var3[0] = (void *) 0;
-      texId = -1;
+      tex[0] = (void *) 0;
+      pc[0] = -1;
       label_3:
-      new_var3[0]->active = 1;
+      tex[0]->active = 1;
 
-      new_var3[0]->references++;
-      new_var3[0]->handle = fileAlloc(textureName, 4);
+      tex[0]->references++;
+      tex[0]->handle = fileAlloc(textureName, 4);
       label_4:
-      file->textureId = texId;  // was new_var (only set on the other branch): NULL write at boot in the all-C build
-
+      file->textureId = pc[0];
     }
   }
   label_5:
-  pose->fileId = fileId;
+  pose->fileId = fileId[0];
 
   if (pose->fileId == (-2))
   {
@@ -700,7 +703,7 @@ s32 animPoseEntry(const char *animName, s32 type)
   }
   pose->dispCallback = (void *) 0;
   pose->dispUserDataCallback = (void *) 0;
-  return poseId;
+  return poseId[0];
 }
 
 s32 animPaperPoseEntry(const char* animName, s32 group) {
@@ -1055,8 +1058,17 @@ static inline void animInitFastCast_(void) {
 static inline f32 animS8a_(register u8* p) { register f32 r; asm { psq_l r, 1(p), 1, 4 } return r; }
 static inline f32 animS8b_(register u8* p) { register f32 r; asm { psq_l r, 2(p), 1, 4 } return r; }
 static inline f32 animS8c_(register u8* p) { register f32 r; asm { psq_l r, 3(p), 1, 4 } return r; }
+// FAKE: t3 = t * t2 through an inline so t3 is an inline return temp (numbered above the LICM temp of t2),
+// giving the target FPR order (t3 f7, t2 f8). Behaviour-identical.
+static inline f32 apmMul(f32 a, f32 b) { return a * b; }
 void animPoseMain(s32 poseId) {
+    s32 frame;
+    s32 nA;
+    s32 nB;
+    s32 nD;
     s32 nextFrame;
+    u8* kf;
+    u8* kfEnd;
     s32 i;
     u8* file;
     u8* anim;
@@ -1065,8 +1077,6 @@ void animPoseMain(s32 poseId) {
     u8* grpA;
     u8* q;
     f32 key;
-    u8* kf;
-    u8* kfEnd;
     u8* v;
     u8* d;
     f32 x;
@@ -1074,12 +1084,8 @@ void animPoseMain(s32 poseId) {
     u8* pose;
     f32 z;
     s32 loop;
-    s32 nD;
-    s32 frame;
     s32 cnt;
     s32 b;
-    s32 nA;
-    s32 nB;
     s32 nC;
     s32 nE;
     f32 t;
@@ -1341,6 +1347,7 @@ void animPoseMain(s32 poseId) {
         if (nB != 0) memcpy_as4(grpB, APM_P(pose, 0x50), nB * 0xc);
         if (nD != 0) memcpy_as4(APM_P(pose, 0x64), APM_P(pose, 0x60), nD * 4);
     } else if (frame <= nextFrame) {
+        u8* kf;
         kf = APM_P(anim, 0x28) + nextFrame * 0x2c;
         { u8* d; u8* e;
         s = 0.0625f * t;
@@ -1359,7 +1366,7 @@ void animPoseMain(s32 poseId) {
             ((f32*)v)[2] += z * s;
         }
         }
-        { u8* d; u8* e;
+        { u8* d; u8* e; u8* v;
         v = grpB;
         d = APM_P(anim, 0x30) + APM_S(kf, 0xc) * 4;
         e = d + APM_S(kf, 0x10) * 4;
@@ -1376,21 +1383,23 @@ void animPoseMain(s32 poseId) {
         }
         }
         { u8* d; u8* e; u8* v;
-        dt = *(f32*)(APM_P(anim, 0x28) + nextFrame * 0x2c) - *(f32*)(APM_P(anim, 0x28) + frame * 0x2c);
         d = APM_P(anim, 0x3c) + APM_S(kf, 0x24) * 4;
         e = d + APM_S(kf, 0x28) * 4;
-        v = APM_P(pose, 0x64);
+        dt = *(f32*)(APM_P(anim, 0x28) + nextFrame * 0x2c) - *(f32*)(APM_P(anim, 0x28) + frame * 0x2c);
         p = APM_P(pose, 0x60);
+        v = APM_P(pose, 0x64);
         if (nD != 0) memcpy_as4(v, p, nD * 4);
         for (; d < e; d += 4) {
             b = (s8)d[3];
             v += d[0] * 4;
             if (b < 0x59 && b > -0x59) {
+                f32 h;
                 x = animS8a_(d);
                 t2 = t * t;
-                t3 = t * t2;
+                t3 = apmMul(t, t2);
+                h = -2.0f * t3 + 3.0f * t2;
                 ((f32*)v)[0] = ((f32*)v)[0] + ((t + (t3 - 2.0f * t2)) * (dt * tanfTbl[(s8)d[2] + 0x59]) +
-                                (-2.0f * t3 + 3.0f * t2) * (0.0625f * x) +
+                                h * (0.0625f * x) +
                                 (t3 - t2) * (dt * tanfTbl[b + 0x59]));
             }
         }
@@ -1636,37 +1645,49 @@ void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz) {
 #include "sdk/texPalette.h"
 
 void animSetMaterial_Texture(s32 texCount, s32 *texIdRemap, AnimPoseTexEntry *pTexEntries, AnimTexMtx *animEntries, s32 texBindsCapacity, AnimTexBind *texBinds, AnimationTextureFile *texFile);
-void animSetMaterial_Texture(s32 texCount, s32 *texIdRemap, AnimPoseTexEntry *pTexEntries, AnimTexMtx *animEntries, s32 texBindsCapacity, AnimTexBind *texBinds, AnimationTextureFile *texFile)
+void animSetMaterial_Texture(s32 texCount_, s32 *texIdRemap_, AnimPoseTexEntry *pTexEntries_, AnimTexMtx *animEntries, s32 texBindsCapacity, AnimTexBind *texBinds, AnimationTextureFile *texFile)
 {
-  Mtx rot;
-  AnimTexMtx *anim;
-  Mtx trans;
-  s32 texMtx;
+  s32 texCount;
+  s32 * texIdRemap;
+  AnimPoseTexEntry * pTexEntries;
+  s32 wrapT;
+  s32 gz;
   s32 wrapFlags;
+  s32 bindId;
+  Mtx rot;
+  Mtx trans;
   MtxPtr m;
-  GXTexObj obj;
+  TEXHeader *hdr;
+  u32 flags;
+  AnimTexMtx *anim;
+  u32 texId;
+  s32 texMtx;
+  u32 j;
   TEXDescriptor *desc;
   f32 scaleS;
   f32 scaleT;
-  u32 j;
-  TEXHeader *hdr;
-  f32 transS;
-  s32 wrapT;
+  GXTexObj obj;
   GXTlutObj tlut;
-  int i;
-  s32 bindId;
+  f32 transS;
+  s32 i[1];
   Mtx scale;
-  u32 flags;
-  u32 texId;
   Mtx tmp;
-  u32 mipmap;
-  f32 transT;
   s32 wrapS;
+  f32 transT;
   f32 rotate;
-  AnimPoseTexEntry *entry;
-  for (i = 0; i < texCount; i++)
+  u32 mipmap;
+  // FAKE: texCount/texIdRemap/pTexEntries copied into locals (kept as separate webs by the dead guard before loop 2); the incoming
+  // param nodes then neighbour the other params and m but not the counter, which with the counter as a one-element array
+  // (IRO @ temp, numbered above m) makes the counter colour last (r23) and the 7 params r24..r30 in order, as in the target
+  texCount = texCount_;
+  texIdRemap = texIdRemap_;
+  pTexEntries = pTexEntries_;
+  for (i[0] = 0; i[0] < texCount; i[0]++)
   {
-    s32 id = texIdRemap[(u32) ((texCount - i) - 1)];
+    s32 tex2;
+    AnimPoseTexEntry *entry;
+    s32 id;
+    id = texIdRemap[(u32) ((texCount - i[0]) - 1)];
     entry = &pTexEntries[id];
     bindId = entry->bindId + animEntries[id].mTexBindIdx;
     if ((bindId < 0) || (bindId >= texBindsCapacity))
@@ -1683,9 +1704,10 @@ void animSetMaterial_Texture(s32 texCount, s32 *texIdRemap, AnimPoseTexEntry *pT
     {
       continue;
     }
+    tex2 = texId; // FAKE: s32 copy after the continue: texId loads into r4 for the first TEXGet, then mr r19,r4 as in the target
     if (TEXGet(*((TEXPalette **) texFile->handle->data), texId)->CLUTHeader)
     {
-      desc = TEXGet(*((TEXPalette **) texFile->handle->data), texId);
+      desc = TEXGet(*((TEXPalette **) texFile->handle->data), tex2);
       hdr = desc->textureHeader;
       wrapS = hdr->wrapS;
       wrapT = hdr->wrapT;
@@ -1715,11 +1737,11 @@ void animSetMaterial_Texture(s32 texCount, s32 *texIdRemap, AnimPoseTexEntry *pT
       hdr = desc->textureHeader;
       GXInitTexObjLOD(&obj, hdr->minFilter, hdr->magFilter, hdr->minLOD, hdr->maxLOD, hdr->LODBias, (GXBool) 0, hdr->edgeLODEnable, GX_ANISO_1);
       GXLoadTlut(&tlut, 0);
-      GXLoadTexObj(&obj, (GXTexMapID) i);
+      GXLoadTexObj(&obj, (GXTexMapID) i[0]);
     }
     else
     {
-      desc = TEXGet(*((TEXPalette **) texFile->handle->data), texId);
+      desc = TEXGet(*((TEXPalette **) texFile->handle->data), tex2);
       hdr = desc->textureHeader;
       wrapS = hdr->wrapS;
       wrapT = hdr->wrapT;
@@ -1746,14 +1768,22 @@ void animSetMaterial_Texture(s32 texCount, s32 *texIdRemap, AnimPoseTexEntry *pT
       GXInitTexObj(&obj, hdr->data, hdr->width, hdr->height, (GXTexFmt) hdr->format, wrapS, wrapT, hdr->minLOD != hdr->maxLOD);
       hdr = desc->textureHeader;
       GXInitTexObjLOD(&obj, hdr->minFilter, hdr->magFilter, hdr->minLOD, hdr->maxLOD, hdr->LODBias, (GXBool) 0, hdr->edgeLODEnable, GX_ANISO_1);
-      GXLoadTexObj(&obj, (GXTexMapID) i);
+      GXLoadTexObj(&obj, (GXTexMapID) i[0]);
     }
   }
 
-  for (i = 0; i < texCount; i++)
+  // FAKE: dead int guard (no code after RA) keeps the three copies from being propagated away
+  gz = 0;
+  if (gz != 0)
+  {
+    texCount = 0;
+    texIdRemap = 0;
+    pTexEntries = 0;
+  }
+  for (i[0] = 0; i[0] < texCount; i[0]++)
   {
     flags = 0;
-    anim = &animEntries[texIdRemap[(u32) ((texCount - i) - 1)]];
+    anim = &animEntries[texIdRemap[(u32) ((texCount - i[0]) - 1)]];
     rotate = anim->mRotate;
     scaleS = anim->mScaleS;
     scaleT = anim->mScaleT;
@@ -1781,7 +1811,7 @@ void animSetMaterial_Texture(s32 texCount, s32 *texIdRemap, AnimPoseTexEntry *pT
     switch (flags)
     {
       case 0:
-        GXSetTexCoordGen2((GXTexCoordID) i, GX_TG_MTX2x4, (GXTexGenSrc) (GX_TG_TEX0 + i), GX_IDENTITY, (GXBool) 0, GX_PTIDENTITY);
+        GXSetTexCoordGen2((GXTexCoordID) i[0], GX_TG_MTX2x4, (GXTexGenSrc) (GX_TG_TEX0 + i[0]), GX_IDENTITY, (GXBool) 0, GX_PTIDENTITY);
         continue;
 
       case 1:
@@ -1819,9 +1849,9 @@ void animSetMaterial_Texture(s32 texCount, s32 *texIdRemap, AnimPoseTexEntry *pT
 
     }
 
-    j = (u32)i * 3; // FAKE: unsigned multiply (i >= 0, same value) shifts loop-2 colouring toward target
+    j = (u32)i[0] * 3; // FAKE: unsigned multiply (i >= 0, same value) shifts loop-2 colouring toward target
     texMtx = GX_TEXMTX0 + j;
-    GXSetTexCoordGen2((GXTexCoordID) i, GX_TG_MTX2x4, (GXTexGenSrc) (GX_TG_TEX0 + i), texMtx, (GXBool) 0, GX_PTIDENTITY);
+    GXSetTexCoordGen2((GXTexCoordID) i[0], GX_TG_MTX2x4, (GXTexGenSrc) (GX_TG_TEX0 + i[0]), texMtx, (GXBool) 0, GX_PTIDENTITY);
     GXLoadTexMtxImm(m, texMtx, GX_MTX2x4);
   }
 
@@ -1847,7 +1877,7 @@ inline BOOL animSetMaterial_ChangeTexture(AnimationPoseData* data, AnimPoseShape
         dataId = texCount - i - 1;
         dataId = draw->texDataIds[dataId];
         frameExt = texAnim[dataId].mTexBindIdx;
-        bindId = texEntry[dataId].bindId + frameExt;
+        bindId = texEntry[dataId].bindId + texAnim[dataId].mTexBindIdx;
         if (bindId < 0 || bindId >= bindCount) {
             bindId = 0;
             //"Error: animSetMaterial_ChangeTexture: テクスチャがありません frameExt=%d\n"
@@ -1877,6 +1907,7 @@ static s32 tbl[4] = { 2, 1, 3, 0 };  // target g5_tbl_s1109 (g5_tbl_s1109 in the
 
 void materialProc(s32 shapeId, s32 xluStage)
 {
+  AnimationPoseData *cd;
   int i;
   s32 drawCount;
   AnimPoseShapeDraw *draw;
@@ -1926,11 +1957,13 @@ void materialProc(s32 shapeId, s32 xluStage)
         pose = wp->mpCurPose;
         if ((u32)pose->typeFlags != 0)
         {
-          texChange1 = animSetMaterial_ChangeTexture(wp->mpCurPoseData, draw, pose, wp->mpTexObjs[0], wp->mpTexDatas[0], *wp->paperMtxPtr[0], 1);
+          cd = wp->mpCurPoseData;
+          texChange1 = animSetMaterial_ChangeTexture(cd, draw, pose, wp->mpTexObjs[0], wp->mpTexDatas[0], *wp->paperMtxPtr[0], 1);
           check1 = texChange1;
           if (!texChange1)
           {
-            check1 = animSetMaterial_ChangeTexture(wp->mpCurPoseData, draw, wp->mpCurPose, wp->mpTexObjs[1], wp->mpTexDatas[1], *wp->paperMtxPtr[1], 2);
+            cd = wp->mpCurPoseData;
+            check1 = animSetMaterial_ChangeTexture(cd, draw, wp->mpCurPose, wp->mpTexObjs[1], wp->mpTexDatas[1], *wp->paperMtxPtr[1], 2);
           }
           if (check1 && (!draw->drawMode))
           {
@@ -1959,17 +1992,21 @@ void materialProc(s32 shapeId, s32 xluStage)
             }
           }
         }
-        pose = wp->mpCurPose;
-        if (pose->flags & 0x10)
+        { // own pose web for the third ChangeTexture copy (a split web of pose numbers below cd)
+        AnimationPose *pose2;
+        pose2 = wp->mpCurPose;
+        if (pose2->flags & 0x10)
         {
           texObj = wp->mpTexObjs[0];
           if (texObj)
           {
             if (wp->paperMtxPtr[0])
             {
-              animSetMaterial_ChangeTexture(wp->mpCurPoseData, draw, pose, texObj, wp->mpTexDatas[0], *wp->paperMtxPtr[0], 1);
+              cd = wp->mpCurPoseData;
+              animSetMaterial_ChangeTexture(cd, draw, pose2, texObj, wp->mpTexDatas[0], *wp->paperMtxPtr[0], 1);
             }
           }
+        }
         }
       }
 
@@ -1979,36 +2016,34 @@ void materialProc(s32 shapeId, s32 xluStage)
 
 // I'm so sorry, whoever gets tasked with matching this function
 // note: I detect at least 8 inlined functions here, good luck finding the separation
+// FAKE: renderProc's per-draw pose-data read as an inline (the source notes "inlined function here"); its call-site temp gives the target wp/data register order
+static inline AnimationPoseData* rpCurData(void) { return wp->mpCurPoseData; }
 void renderProc(s32 shapeId, s32 unused) {
+    AnimationPoseData* cd;
     s32 texIndex;
     int i;
     AnimationPose* pose;
-    s32 nrmVtxSize;
-    s8* texIds;
-    s32* firstId;
-    AnimDrawCallEntry* drawCall;
     AnimPoseShape *shapes, *shape;
     AnimPoseShapeDraw *draws, *draw;
     s32 dispMode, drawId;
     s32 posFirstVtx, nrmFirstVtx, clr0FirstVtx;
 
     BOOL texChange1, check1, texChange2, check2;
-    s32 posFirstId, nrmFirstId, clr0FirstId;
-    Vec *nrmVtxPtr, *posVtxPtr;
+    Vec *posVtxPtr, *nrmVtxPtr;
 
     u16 *posIndexPtr, *nrmIndexPtr, *clr0IndexPtr, *texIndexPtr;
 
-    int j, k, l, k2;
+    int j, k, l, k2, jj;
 
     // stack variables
-    s32 clr0VtxSize, posVtxSize; // TODO: make sure stack, +0xB0, +0xAC
+    s32 clr0VtxSize, posVtxSize, nrmVtxSize;
     s32 drawCount;               // TODO: make sure stack, +0xA8
     Mtx camMtx, invCamMtx;
     Vec lightPos, lightPos2; // TODO: rename? 2 is probably implicit stack copy
 
     if (shapeId != -1) {
         GXColor* clr0VtxPtr;
-        s32 count;
+        u16 count;
         AnimationPoseData* data;
         GXTexObj* texObj;
         CameraEntry* camera;
@@ -2037,7 +2072,6 @@ void renderProc(s32 shapeId, s32 unused) {
                 f32* buffer;
                 s32 firstDrawId;
                 f32* texVtxIndices[8];
-                s32 texCount;
             GXSetCullMode(tbl[shape->cullMode]);
             data = wp->mpCurPoseData;
             clr0VtxSize = (s32)sizeof(GXColor) * clr0FirstVtx;
@@ -2050,12 +2084,19 @@ void renderProc(s32 shapeId, s32 unused) {
             texVtxIndices[5] = &buffer[2 * shape->vtxTex[5].first];
             texVtxIndices[6] = &buffer[2 * shape->vtxTex[6].first];
             texVtxIndices[7] = &buffer[2 * shape->vtxTex[7].first];
-            nrmVtxSize = (s32)sizeof(Vec) * nrmFirstVtx;
             posVtxSize = (s32)sizeof(Vec) * posFirstVtx;
+            nrmVtxSize = (s32)sizeof(Vec) * nrmFirstVtx;
 
             for (i = 0; i < drawCount; i++, draw++) {
+                int tc2;
+                s32 texCount;
+                s8* texIds;
                 s32 drawCallCount;
-                Mtx* mtx;
+                s32 posFirstId;
+                s32 nrmFirstId;
+                s32 clr0FirstId;
+                s32* firstId;
+                AnimDrawCallEntry* drawCall;
                 texCount = draw->texCount;
                 if ((u32)wp->mpCurPose->disableDraw == 0) {
                     lightPos = (Vec){ 0.0f, 0.0f, 0.0f };
@@ -2077,11 +2118,13 @@ void renderProc(s32 shapeId, s32 unused) {
                 pose = wp->mpCurPose;
                 if ((u32)pose->typeFlags != 0) {
                     GXTexObj* currTexObj;
-                    texChange1 = animSetMaterial_ChangeTexture(wp->mpCurPoseData, draw, pose, wp->mpTexObjs[0], wp->mpTexDatas[0], *wp->paperMtxPtr[0], 1);
+                    cd = wp->mpCurPoseData;
+                    texChange1 = animSetMaterial_ChangeTexture(cd, draw, pose, wp->mpTexObjs[0], wp->mpTexDatas[0], *wp->paperMtxPtr[0], 1);
                     check1 = texChange1;
                     if (!texChange1) {
+                        cd = wp->mpCurPoseData;
                         pose = wp->mpCurPose;
-                        texChange2 = animSetMaterial_ChangeTexture(wp->mpCurPoseData, draw, pose, wp->mpTexObjs[1], wp->mpTexDatas[1], *wp->paperMtxPtr[1], 2);
+                        texChange2 = animSetMaterial_ChangeTexture(cd, draw, pose, wp->mpTexObjs[1], wp->mpTexDatas[1], *wp->paperMtxPtr[1], 2);
                         check1 = texChange2;
                         check2 = texChange2;
                     } else {
@@ -2117,22 +2160,26 @@ void renderProc(s32 shapeId, s32 unused) {
                     }
                 }
 
-                pose = wp->mpCurPose;
-                if (pose->flags & 0x10) {
+                {
+                AnimationPose* pose2;
+                pose2 = wp->mpCurPose;
+                if (pose2->flags & 0x10) {
                     texObj = wp->mpTexObjs[0];
                     if (texObj) {
-                        mtx = wp->paperMtxPtr[0];
-                        if (mtx) {
-                            animSetMaterial_ChangeTexture(wp->mpCurPoseData, draw, pose, texObj, wp->mpTexDatas[0], *mtx, 1);
+                        buffer = (f32*)wp->paperMtxPtr[0]; // FAKE: the paper matrix pointer held in buffer (an earlier web) so it is a split @ web, not a named mtx local
+                        if (buffer) {
+                            cd = wp->mpCurPoseData;
+                            animSetMaterial_ChangeTexture(cd, draw, pose2, texObj, wp->mpTexDatas[0], *(Mtx*)buffer, 1);
                         }
                     }
+                }
                 }
 
                 texIds = (s8*)draw->texArrayIds;
                 firstId = draw->firstIdTex;
-                data = wp->mpCurPoseData; // inlined function here
+                data = rpCurData();
                 drawCall = &data->drawCalls[draw->firstDrawCall];
-                texCount = draw->texCount;
+                tc2 = draw->texCount;
                 drawCallCount = draw->drawCallCount;
                 clr0VtxPtr = (GXColor*)((u8*)data->clr0VtxBuffer + clr0VtxSize);
                 posFirstId = draw->firstIdPos;
@@ -2140,12 +2187,12 @@ void renderProc(s32 shapeId, s32 unused) {
                 clr0FirstId = draw->firstIdClr0;
 
                 if ((s32)wp->mbUseFloatScratch != 0) {
-                    nrmVtxPtr = (Vec*)((u8*)wp->vtxArrayNrm + nrmVtxSize);
                     posVtxPtr = (Vec*)((u8*)wp->vtxArrayPos + posVtxSize);
+                    nrmVtxPtr = (Vec*)((u8*)wp->vtxArrayNrm + nrmVtxSize);
                 } else {
                     pose = wp->mpCurPose;
-                    nrmVtxPtr = (Vec*)((u8*)pose->mpVtxArrayNrm + nrmVtxSize);
                     posVtxPtr = (Vec*)((u8*)pose->mpVtxArrayPos + posVtxSize);
+                    nrmVtxPtr = (Vec*)((u8*)pose->mpVtxArrayNrm + nrmVtxSize);
                 }
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -2158,18 +2205,20 @@ void renderProc(s32 shapeId, s32 unused) {
                 GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
                 GXSetArray(GX_VA_CLR0, clr0VtxPtr, sizeof(GXColor));
 
-                if (texCount == 1) { // just use texIndex[0]
+                if (tc2 == 1) { // just use texIndex[0]
                     GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
                     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
                     GXSetArray(GX_VA_TEX0, texVtxIndices[texIds[0]], sizeof(f32) * 2);
                     for (j = 0; j < drawCallCount; j++, drawCall++) {
+                        u16 *posIndexPtr, *nrmIndexPtr, *clr0IndexPtr, *texIndexPtr;
                         firstDrawId = drawCall->first;
                         data = wp->mpCurPoseData;
+                        count = (u16)drawCall->count;
                         posIndexPtr = (u16*)((u32*)data->posIndex + (firstDrawId + posFirstId)) + 1;
                         nrmIndexPtr = (u16*)((u32*)data->nrmIndex + (firstDrawId + nrmFirstId)) + 1;
                         clr0IndexPtr = (u16*)((u32*)data->clr0Index + (firstDrawId + clr0FirstId)) + 1;
                         texIndexPtr = (u16*)((u32*)data->texIndex[texIds[0]] + (firstDrawId + firstId[texIds[0]])) + 1;
-                        GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, count = (u16)drawCall->count);
+                        GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, count);
                         for (k = count; k > 0; k--) {
                             GXPosition1x16(*posIndexPtr);
                             posIndexPtr += 2;
@@ -2182,30 +2231,30 @@ void renderProc(s32 shapeId, s32 unused) {
                         }
                     }
                 } else { // enumerate texIndex
-                    for (j = 0; j < texCount; j++) {
-                        GXSetVtxDesc(GX_VA_TEX0 + j, GX_INDEX16);
-                        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0 + j, GX_TEX_ST, GX_F32, 0);
-                        GXSetArray(GX_VA_TEX0 + j, texVtxIndices[texIds[texCount - j - 1]], sizeof(f32) * 2);
+                    for (jj = 0; jj < tc2; jj++) {
+                        GXSetVtxDesc(GX_VA_TEX0 + jj, GX_INDEX16);
+                        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0 + jj, GX_TEX_ST, GX_F32, 0);
+                        GXSetArray(GX_VA_TEX0 + jj, texVtxIndices[texIds[tc2 - jj - 1]], sizeof(f32) * 2);
                     }
-                    for (j = 0; j < drawCallCount; j++, drawCall++) {
-                        firstDrawId = drawCall->first;
+                    for (jj = 0; jj < drawCallCount; jj++, drawCall++) {
+                        s32 fd2;
+                        u16 cnt2;
+                        u16 *posIndexPtr, *nrmIndexPtr, *clr0IndexPtr;
+                        fd2 = drawCall->first;
                         data = wp->mpCurPoseData;
-                        count = (u16)drawCall->count;
-                        posIndexPtr = (u16*)((u32*)data->posIndex + (firstDrawId + posFirstId)) + 1;
-                        nrmIndexPtr = (u16*)((u32*)data->nrmIndex + (firstDrawId + nrmFirstId)) + 1;
-                        clr0IndexPtr = (u16*)((u32*)data->clr0Index + (firstDrawId + clr0FirstId)) + 1;
-                        GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, count);
-                        for (k2 = 0; k2 < count; k2++) {
+                        cnt2 = (u16)drawCall->count;
+                        posIndexPtr = (u16*)((u32*)data->posIndex + (fd2 + posFirstId)) + 1;
+                        nrmIndexPtr = (u16*)((u32*)data->nrmIndex + (fd2 + nrmFirstId)) + 1;
+                        clr0IndexPtr = (u16*)((u32*)data->clr0Index + (fd2 + clr0FirstId)) + 1;
+                        GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, cnt2);
+                        for (k2 = 0; k2 < cnt2; k2++, posIndexPtr += 2, nrmIndexPtr += 2, clr0IndexPtr += 2) {
                             GXPosition1x16(*posIndexPtr);
                             GXNormal1x16(*nrmIndexPtr);
                             GXColor1x16(*clr0IndexPtr);
-                            for (l = texCount, index = 0; l > 0; l--, index++) {
-                                texIndex = texIds[(u32)(texCount - index - 1)];
-                                GXTexCoord1x16((&((u32*)wp->mpCurPoseData->texIndex[texIndex])[firstDrawId + firstId[texIndex]])[k2]);
+                            for (l = tc2, index = 0; l > 0; l--, index++) {
+                                texIndex = texIds[(u32)(tc2 - index - 1)];
+                                GXTexCoord1x16((&((u32*)wp->mpCurPoseData->texIndex[texIndex])[fd2 + firstId[texIndex]])[k2]);
                             }
-                            posIndexPtr += 2;
-                            nrmIndexPtr += 2;
-                            clr0IndexPtr += 2;
                         }
                     }
                 }
@@ -2754,7 +2803,8 @@ typedef struct PaperAnimData {
 #define PP_F(p, o) (*(f32*)((u8*)(p) + (o)))
 #define PP_S(p, o) (*(s16*)((u8*)(p) + (o)))
 
-void animPaperPoseDispSub(s32 unused, AnimationPose* pose) {
+void animPaperPoseDispSub(s32 unused, AnimationPose* arg) {
+    AnimationPose* pose;
     PaperAnimData* d;
     Mtx m, save;
     GXColor col1;
@@ -2764,13 +2814,21 @@ void animPaperPoseDispSub(s32 unused, AnimationPose* pose) {
     u32 flags;
     s32 matFlag;
     u16 left, top, right, bottom;
-    u16 w;
     f32 scale, hh;
-    s32 t, e, b, a, x1, y0, y1;
+    s32 t, b, e, a, x1, y0, y1;
+    u16 w;
 
+    pose = arg;
     scale = 8.0f;
-    if (!(pose->flags & 1)) {
+    if (!(arg->flags & 1)) {
         return;
+    }
+    // FAKE: dead int-guarded re-definition (COLOURING M). The second reaching def stops IRO pass-0 copy
+    // propagation, so 'pose' stays a named local (numbered above d) instead of the low parameter vreg;
+    // the arm is folded away (t is reassigned before its next use). Behaviour-identical.
+    t = 0;
+    if (t != 0) {
+        pose = arg;
     }
     d = (PaperAnimData*)animPoseGetBaseData(pose)->mpAnims[pose->animId].data;
     scale *= 25.74f / (d->x54 - d->x48);
@@ -2853,6 +2911,7 @@ void animPaperPoseDispSub(s32 unused, AnimationPose* pose) {
         }
     } else {
         s32 a;
+        s32 e;
         a = DEMOGetRenderModeObj()->fbWidth / 2 - left;
         t = right - DEMOGetRenderModeObj()->fbWidth / 2;
         b = a;

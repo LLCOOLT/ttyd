@@ -1,3 +1,4 @@
+#define MATH_NO_SQRTF 1
 #include "musyx/hardware.h"
 
 void* salMalloc(u32 len) { return salHooks.malloc(len); }

@@ -553,21 +553,24 @@ static inline f32 hitDequant(register s16* base, register s32 idx) {
 #pragma dont_inline on
 s32 hitCalcVtxPosition(HitEntry* hit) {
     s32 i;
-    s32 k;
-    s32* list;
     Vec a;
     MapWork* wp;
     Vec b;
     Vec c;
-    s32 count = 0;
-    s16 i1;
-    s16 i2;
-    HitVector* vec;
-    Vec* pos;
     s32 j;
+    s32 k;
+    s32 stride;
+    s32 count = 0;
     MapFileMesh* mesh;
 
-    if (hit->vectors == NULL) {
+    // FAKE: NULL check through stride gives stride an early web (the packed stride becomes a split @ temp, target r19);
+    // the dead int guard (COLOURING M) keeps stride as the compared operand so the pointer compare stays cmplwi
+    stride = (s32)hit->vectors;
+    i = 0;
+    if (i != 0) {
+        stride = stride;
+    }
+    if ((void*)stride == NULL) {
         return 0;
     }
     for (i = 0; i < hit->joint->partCount; i++) {
@@ -576,6 +579,12 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
             continue;
         }
         if (!mesh->isPackedDisplay) {
+            s32* list;
+            s16 i1;
+            s16 i2;
+            HitVector* vec;
+            Vec* pos;
+            k = 0; // FAKE: dead store, references k before j's first use so the packed k/counter split temps get the target r18/r17
             for (j = 0; j < mesh->displayListCount; j++) {
                 list = (s32*)mesh->displayLists.normalLists[j];
                 for (k = 0; k < *list - 2; k++) {
@@ -596,7 +605,6 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
             }
         } else {
             u32 bit;
-            s32 stride;
             u32 m;
             wp = mapGetWork();
             m = 0; // FAKE: popcount accumulated in m (later reused as the i0 pointer) so stride is a single-def web
@@ -618,14 +626,18 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                     u16 i1;
                     register u32 gqr;
                     HitVector* v2;
+                    base = (s16*)(*(u8**)mesh->vcdTableOffset + 4);
                     v2 = &hit->vectors[count];
+                    m = (u32)list; // FAKE: m (the popcount counter) reused as the i1/i2/i0 address temp gives the target add list,X; lhz 3 and leaves o1 a single web (o0/o1/base colour r4/r5/r3)
+                    m += stride * (j + 1);
+                    i1 = *(u16*)(m + 3);
+                    m = (u32)list;
+                    m += stride * (j + 2);
+                    i2 = *(u16*)(m + 3);
                     even = !(j & 1);
                     m = (u32)list;
                     m += j * stride;
                     i0 = *(u16*)(m + 3);
-                    i1 = *(u16*)&list[stride * (j + 1) + 3];
-                    i2 = *(u16*)&list[stride * (j + 2) + 3];
-                    base = (s16*)(*(u8**)mesh->vcdTableOffset + 4);
                     o0 = i0 * 3;
                     o1 = (u16)(even ? i2 : i1) * 3;
                     o2 = (u16)(even ? i1 : i2) * 3;

@@ -151,9 +151,9 @@ void badgeShop_bottakuruGeneration(void) {
 	s32 table[0x11][2];
 	s32 i;
 	s32 k;
-	s32 count;
-	s32 j;
 	s32 m;
+	s32 j;
+	s16 count;
 
 	for (i = 0; i < sizeof(table) / sizeof(table[0]); i++) {
 		table[i][1] = 200;
@@ -162,7 +162,12 @@ void badgeShop_bottakuruGeneration(void) {
 
 	k = 0;
 	for (i = 0; i < BADGE_MAX - 1; i++) {
-		count = (s16)badgeShop_get(bdsw->bottakuru_table, (s16)(i + 1));
+		count = badgeShop_get(bdsw->bottakuru_table, (s16)(i + 1));
+		// FAKE: dead int-guarded re-definition (COLOURING M): count keeps a second def, so it stays a named web and takes the target r21
+		j = 0;
+		if (j != 0) {
+			count = count;
+		}
 		for (j = 0; j < count; j++) {
 			table[k][1] = irand(100);
 			table[k++][0] = i + 1;
