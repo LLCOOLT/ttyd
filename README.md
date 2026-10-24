@@ -128,7 +128,7 @@ Building
 
   To build another version, specify it with `--version`, for example `python configure.py --version G8ME01` for the US release.
 
-  The first build needs an internet connection: it downloads [decomp-toolkit](https://github.com/encounter/decomp-toolkit), the Metrowerks compilers, binutils and, on Linux, wibo into `build/`. Later builds reuse them.
+  The first build needs an internet connection: it downloads [decomp-toolkit](https://github.com/encounter/decomp-toolkit), objdiff-cli, sjiswrap, the Metrowerks compilers, binutils and, on Linux, wibo into `build/`. Later builds reuse them.
 
 - Build:
 
@@ -177,7 +177,7 @@ Working on the code
 ===================
 
 - Keep the hash check passing for both versions. Rebuild JP and US (`configure.py --version ...` and `ninja` for each) before committing.
-- Use struct fields, never pointer arithmetic on raw offsets. Where the US release changed a struct, the US-only members sit inside `#if defined(VERSION_G8ME01)` in the struct, so field accesses are right for both versions.
+- Use struct fields, never pointer arithmetic on raw offsets. Where the US release changed a struct, the US-only members sit inside `#ifdef VERSION_G8ME01` in the struct, so field accesses are right for both versions.
 - Script values and anything that may hold an address use the named types instead of `s32`: `EvtWord` for script words, `AddrWord` for address arithmetic, `SfxNameWord` for sound parameters that take a name or an id.
 - If a function needs a behaviour-identical trick to match, mark it with a `// FAKE:` comment that says what it does, and add a row to [docs/FAKES.md](docs/FAKES.md).
 - In the game code, inline asm appears only where the original source had it: the hardware helpers in `include/hwaccess.h` and the word copy `memcpy_as4` in `src/system.c`.
