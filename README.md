@@ -18,6 +18,8 @@ It is now an **independent project and is not affiliated with doldecomp**. All o
 
 Some functions use small behaviour-identical tricks to reach a byte-identical build; each is marked in the code with a `FAKE` comment and listed in [docs/FAKES.md](docs/FAKES.md).
 
+Beyond matching, the code has been cleaned up for reading: struct fields instead of raw pointer math, named fields instead of placeholders, typed data instead of raw integer tables, and declarations in headers. The [cleanup table in docs/PROGRESS.md](docs/PROGRESS.md#code-quality-cleanup-since-2026-10-23) shows the before and after counts.
+
 ![Progress treemap: one cell per file, sized by code bytes, colored by match percent](docs/progress.svg)
 
 Live progress maps (interactive versions of the treemap above): [JP (G8MJ01)](https://claude.ai/artifact/74tZKbcCQ7WUWFM577oqmY) and [US (G8ME01)](https://claude.ai/artifact/1Hdacn3R1wrwjtwDQRuwKJ)
@@ -126,11 +128,59 @@ Building
 
   To build another version, specify it with `--version`, for example `python configure.py --version G8ME01` for the US release.
 
+  The first build needs an internet connection: it downloads [decomp-toolkit](https://github.com/encounter/decomp-toolkit), the Metrowerks compilers, binutils and, on Linux, wibo into `build/`. Later builds reuse them.
+
 - Build:
 
   ```sh
   ninja
   ```
+
+Output and checking
+===================
+
+Each version builds into its own folder, `build/G8MJ01/` or `build/G8ME01/`, so both can sit side by side. Run `configure.py` with the version you want before running `ninja`.
+
+- `build/<version>/MarioSt.dol`: the main executable (`sys/main.dol` on the disc).
+- `build/<version>/<area>/<area>.rel`: one REL per area (`aaa.rel`, `aji.rel`, ...), the files in `files/rel/` on the disc.
+
+`ninja` ends by checking every output against the SHA-1 hashes in `config/<version>/build.sha1`. A matching build reports `32 files OK` for JP and `30 files OK` for US. To run only the check again:
+
+```sh
+ninja build/G8MJ01/ok
+```
+
+Running
+=======
+
+An unmodified build is byte-identical to the original files, so it plays exactly like your disc. To try a modified build, give an extracted copy of the game your built files and boot that copy in [Dolphin](https://dolphin-emu.org/).
+
+1. In Dolphin, right-click the game, choose **Properties → Filesystem**, right-click the disc and choose **Extract Entire Disc** into an empty folder. This gives a `sys/` folder and a `files/` folder.
+2. Replace `sys/main.dol` with `build/<version>/MarioSt.dol`.
+3. Replace each `files/rel/<area>.rel` you changed with `build/<version>/<area>/<area>.rel`.
+4. In Dolphin, choose **File → Open** and select `sys/main.dol` in that folder. Dolphin boots the extracted folder as a disc.
+
+Keep your original disc image unchanged and work on the extracted copy.
+
+Project layout
+==============
+
+- `src/`: the main executable, by system: `battle/`, `driver/` (actors, maps, effects, messages and other runtime drivers), `effect/`, `event/` (script commands), `manager/`, `mario/`, `motion/`, `party/`, `sequence/`, `unit/`, `window/`, and core files such as `main.c`, `system.c` and `memory.c`.
+- `rels/<area>/`: one folder per area REL (`aji`, `gor`, `tik`, ...), each with its own `src/` and `include/`. Battle units and area data live under the area that loads them.
+- `include/`: headers for the main executable, mirroring `src/`. Shared types such as the script word (`evt/evt_word.h`) and the address word (`addr_word.h`) are here.
+- `libs/`: the libraries linked into the game: the Dolphin SDK (`dolsdk2004`), MSL, MusyX, the runtime and TRK.
+- `config/<version>/`: decomp-toolkit configuration per version: `config.yml`, `splits.txt` (which file owns which address range), `symbols.txt` and `build.sha1` (the hashes the build is checked against).
+- `docs/`: progress, the cleanup summary and the list of fakes.
+- `tools/`: build and report scripts.
+
+Working on the code
+===================
+
+- Keep the hash check passing for both versions. Rebuild JP and US (`configure.py --version ...` and `ninja` for each) before committing.
+- Use struct fields, never pointer arithmetic on raw offsets. Where the US release changed a struct, the US-only members sit inside `#if defined(VERSION_G8ME01)` in the struct, so field accesses are right for both versions.
+- Script values and anything that may hold an address use the named types instead of `s32`: `EvtWord` for script words, `AddrWord` for address arithmetic, `SfxNameWord` for sound parameters that take a name or an id.
+- If a function needs a behaviour-identical trick to match, mark it with a `// FAKE:` comment that says what it does, and add a row to [docs/FAKES.md](docs/FAKES.md).
+- Inline asm appears only where the original source had it: the hardware helpers in `include/hwaccess.h` and the word copy `memcpy_as4` in `src/system.c`.
 
 Diffing
 =======
