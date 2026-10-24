@@ -1,14 +1,13 @@
 name: Build
 
 on:
-  # The build container (ghcr.io/doldecomp/ttyd-build) is private to doldecomp, so runs on this
-  # repository cannot pull it. Build status comes from the local SHA-1 check (README badge) instead.
+  # Manual runs only. The game files are not part of this repository: the run downloads them from
+  # the URL in the ORIG_ARCHIVE_URL repository secret (an archive with orig/G8MJ01/ and
+  # orig/G8ME01/, each holding that version's disc image).
   workflow_dispatch:
 
 jobs:
   build:
-    container: ghcr.io/doldecomp/ttyd-build:main
-
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -21,39 +20,48 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: recursive
 
-      # Set Git config
-      - name: Git config
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      # Normalize file mod times
-      - name: Restore timestamps
-        run: |
-          uv run https://raw.githubusercontent.com/MestreLion/git-tools/refs/tags/v2022.12/git-restore-mtime \
-              --merge --commit-time
+      - name: Install ninja
+        run: pip install ninja
 
-      # Copy the original files to the workspace
+      # Fetch the original game files
       - name: Prepare
-        run: cp -a /orig .
+        env:
+          ORIG_ARCHIVE_URL: ${{ secrets.ORIG_ARCHIVE_URL }}
+        run: |
+          if [ -z "$ORIG_ARCHIVE_URL" ]; then
+            echo "::error::Set the ORIG_ARCHIVE_URL repository secret to an archive of the orig/ disc images."
+            exit 1
+          fi
+          curl -fsSL "$ORIG_ARCHIVE_URL" -o orig_archive
+          case "$(file -b --mime-type orig_archive)" in
+            application/zip) unzip -q -o orig_archive ;;
+            *) tar -xf orig_archive ;;
+          esac
+          rm orig_archive
+          ls orig/${{ matrix.version }}
 
-      # Restore cached files
-      - name: Cache build
+      # Cache the downloaded build tools between runs
+      - name: Cache tools
         uses: actions/cache@v4
         with:
           path: |
-            build
-            .ninja_deps
-            .ninja_log
-          key: ${{ runner.os }}-${{ matrix.version }}-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-${{ matrix.version }}-
+            build/tools
+            build/compilers
+            build/binutils
+          key: ${{ runner.os }}-tools-${{ hashFiles('configure.py') }}
 
-      # Build the project
+      # Build the project and check it against the original hashes
       - name: Build
         run: |
-          python configure.py --map --version ${{ matrix.version }} \
-              --binutils /binutils --compilers /compilers
-          ninja all_source progress build/${{ matrix.version }}/report.json
+          python configure.py --map --version ${{ matrix.version }}
+          ninja
+          ninja progress build/${{ matrix.version }}/report.json
 
       # Upload map files
       - name: Upload map
