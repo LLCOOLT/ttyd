@@ -96,8 +96,7 @@ static WindowWork* wp;
 #include "mario/mario_party.h"
 #include "pmario_sound.h"
 #include "statuswindow.h"
-typedef struct PartyData { const char* name; u8 pad[0x28 - 0x4]; } PartyData;
-extern PartyData partyDataTbl[];
+#include "data/party_data.h"
 s32 winRootMain(WindowWork* wp);
 void winRootDisp(CameraId camId, WindowWork* wp);
 const char* winGetMapTplName(void);
@@ -310,7 +309,7 @@ void winMain(void) {
                     fileAsyncf(4, 0, "%s/w/jp/%s\0", getMarioStDvdRoot(), name);
 #endif
                 }
-                wp->field_0x24_s32 = 0;
+                wp->active = 0;
                 if (strncmp(gp->currentMapName, "yuu_", 4) == 0) {
                     wp->menuState = 400;
                 } else {
@@ -344,7 +343,7 @@ void winMain(void) {
                             wp->menuState = 100;
                             break;
                         case -3:
-                            if (wp->itemId == 0x4E) {
+                            if (wp->item.useItem == 0x4E) {
                                 wp->menuState = 300;
                             } else {
                                 wp->menuState = 200;
@@ -388,9 +387,9 @@ void winMain(void) {
             case 100:
                 if (marioBgmodeChk()) {
                     MarioWork* m = marioGetPtr();
-                    m->prevPartyMemberId[0] = wp->partyIds[wp->partySel];
+                    m->prevPartyMemberId[0] = wp->party.partyIds[wp->party.cursor];
                     wp->menuState = 3;
-                } else if (animGroupBaseAsync(partyDataTbl[wp->partyIds[wp->partySel]].name, 2, 0)) {
+                } else if (animGroupBaseAsync(partyDataTbl[wp->party.partyIds[wp->party.cursor]].name, 2, 0)) {
                     wp->menuState++;
                 }
                 break;
@@ -402,7 +401,7 @@ void winMain(void) {
 
             case 102:
                 if (!marioGetParty()) {
-                    marioPartyHello(wp->partyIds[wp->partySel]);
+                    marioPartyHello(wp->party.partyIds[wp->party.cursor]);
                     wp->menuState = 3;
                 }
                 break;
@@ -432,11 +431,11 @@ void winMain(void) {
                     }
                 }
                 wp->currentEvent = evtEntryType(evt_item_use, 0, 0, 0);
-                wp->currentEvent->lwData[10] = wp->itemId;
-                wp->currentEvent->lwData[11] = wp->itemTarget == 0 ? 0 : list[wp->itemTarget - 1]->partyId;
+                wp->currentEvent->lwData[10] = wp->item.useItem;
+                wp->currentEvent->lwData[11] = wp->item.useTarget == 0 ? 0 : list[wp->item.useTarget - 1]->partyId;
                 psndClearFlag(0x80);
                 wp->menuState++;
-                pouchRemoveItemIndex(wp->itemId, wp->itemIdx);
+                pouchRemoveItemIndex(wp->item.useItem, wp->item.useIdx);
                 break;
             }
 
@@ -493,7 +492,7 @@ void winDisp(CameraId camId, void* param) {
 }
 
 void winDispKoopa(CameraId camId, void* param) {
-    winTexInit(*((FileEntry*)wp->res)->data);
+    winTexInit(*wp->res->data);
     winTexSet(0xB7, (Vec){ 0.0f, 50.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
 }
 

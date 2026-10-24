@@ -3,7 +3,8 @@
 #include <dolphin/types.h>
 
 typedef struct MailData {
-    u32 flags;         // 0x0
+    u16 flags;         // 0x0, sender group 1/2/4/8 (win_root picks the list icon from 1/2/4); 0x1000 = has a picture (icon)
+    u16 pad_2;         // 0x2
     s32 id;            // 0x4
     const char* name;  // 0x8, message tag of the mail's title
     const char* body;  // 0xC, message tag of the mail's text

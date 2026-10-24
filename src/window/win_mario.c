@@ -1,4 +1,5 @@
 #include "win/win_main.h"
+#include "battle/battle_mario.h"
 #include "icon_ids.h"
 #include "data/item_data.h"
 #include "driver/animdrv.h"
@@ -13,32 +14,8 @@
 #include "libc_decls.h"
 
 extern ItemData itemDataTable[];
-void winMsgEntry(void* wp, s32 a, const char* msg, s32 b);
 void winIconInit(void);
 void winIconSet(u32 id, Vec translate, Vec scale, GXColor color);
-
-typedef struct WinMarioWork {
-    u16 flags;                    // 0x0
-    u8 pad_2[2];                  // 0x2
-    u32 buttonTrg;                // 0x4
-    u32 buttonRep;                // 0x8
-    u32 dirTrg;                   // 0xC
-    u32 dirRep;                   // 0x10
-    u8 pad_14[0x28 - 0x14];       // 0x14
-    struct { u8 pad[0xA0]; void** data; }* file; // 0x28
-    u8 pad_2C[0xC0 - 0x2C];       // 0x2C
-    struct { s32 field_0x0; f32 x; f32 y; f32 w; f32 h; } pos[2]; // 0xC0
-    u8 pad_E8[0x158 - 0xE8];      // 0xE8
-    f32 msgX;                     // 0x158
-    f32 msgY;                     // 0x15C
-    s32 idx;                      // 0x160
-    u8 pad_164[0x188 - 0x164];    // 0x164
-    s32 poseId;                   // 0x188
-    s32 f18C;                     // 0x18C
-    s32 f190;                     // 0x190
-    s32 f194;                     // 0x194
-    s32 f198;                     // 0x198
-} WinMarioWork;
 
 typedef struct LinkDt {
     s16 x;              // 0x0
@@ -52,14 +29,6 @@ typedef struct LinkDt {
     u8 links[4];        // 0x18
 } LinkDt;
 
-typedef struct SuperAction {
-    const char* name;  // 0x0
-    u8 pad_4[0xC - 0x4];
-    const char* desc;  // 0xC
-    u8 pad_10[2];
-    u8 cost;           // 0x12
-} SuperAction;
-extern SuperAction* superActionTable[];
 
 LinkDt linkDt[18] = {
     {-268, 142, ("M_S_1"), NULL, ("S_1"), 0, 0, ("msg_menu_mario_lv"), {6, 1, 11, 9}},
@@ -85,7 +54,7 @@ const char* hammer_help[] = {NULL, ("msg_hammer_1"), ("msg_hammer_2"), ("msg_ham
 const char* boots_help[] = {NULL, ("msg_boots_1"), ("msg_boots_2"), ("msg_boots_3")};
 const char* hammer_pose[] = {NULL, ("M_H_1"), ("M_H_4"), ("M_H_7")};
 
-void winMarioInit(WinMarioWork* w) {
+void winMarioInit(WindowWork* w) {
     PouchData* pouch;
     const char* name;
     s32 i;
@@ -107,8 +76,8 @@ void winMarioInit(WinMarioWork* w) {
                 name = "S_4";
                 break;
         }
-        w->poseId = animPoseEntry("d_mario", 0);
-        animPoseSetAnim(w->poseId, name, 1);
+        w->mario.poseId = animPoseEntry("d_mario", 0);
+        animPoseSetAnim(w->mario.poseId, name, 1);
     } else {
         name = "a_mario";
         switch (marioGetColor()) {
@@ -117,29 +86,29 @@ void winMarioInit(WinMarioWork* w) {
             case 2: name = "a_mario_w"; break;
             case 3: name = "a_mario_wl\0\0\0\0\0"; break;
         }
-        w->poseId = animPoseEntry(name, 0);
-        animPoseSetAnim(w->poseId, "M_S_1", 1);
+        w->mario.poseId = animPoseEntry(name, 0);
+        animPoseSetAnim(w->mario.poseId, "M_S_1", 1);
     }
-    animPoseSetMaterialFlagOn(w->poseId, 0x1800);
+    animPoseSetMaterialFlagOn(w->mario.poseId, 0x1800);
     if (marioGetPtr()->flags & 0x40000000) {
-        animPoseSetMaterialFlagOn(w->poseId, 0x0A000000);
+        animPoseSetMaterialFlagOn(w->mario.poseId, 0x0A000000);
     }
-    w->f18C = 0;
-    w->f190 = 0;
-    w->f194 = 0;
-    w->f198 = 0;
+    w->mario.f18C = 0;
+    w->mario.f190 = 0;
+    w->mario.f194 = 0;
+    w->mario.f198 = 0;
     for (i = 0; i < 8; i++) {
         if (pouch->mStarPowersObtained & (1 << i)) {
-            w->f198++;
+            w->mario.f198++;
         }
     }
 }
 
-void winMarioInit2(WinMarioWork* w) {
-    w->idx = 0;
-    w->msgX = w->msgX = linkDt[w->idx].x;
-    w->msgY = w->msgY = linkDt[w->idx].y;
-    switch (w->idx) {
+void winMarioInit2(WindowWork* w) {
+    w->marioSel = 0;
+    w->helpTgtX = w->helpTgtX = linkDt[w->marioSel].x;
+    w->helpTgtY = w->helpTgtY = linkDt[w->marioSel].y;
+    switch (w->marioSel) {
     case 2:
         winMsgEntry(w, 0, hammer_help[pouchGetHammerLv()], 0);
         break;
@@ -147,16 +116,16 @@ void winMarioInit2(WinMarioWork* w) {
         winMsgEntry(w, 0, boots_help[pouchGetJumpLv()], 0);
         break;
     default:
-        winMsgEntry(w, 0, linkDt[w->idx].msg, 0);
+        winMsgEntry(w, 0, linkDt[w->marioSel].msg, 0);
         break;
     }
-    w->f18C = 0;
-    w->f190 = 0;
-    w->f194 = 0;
+    w->mario.f18C = 0;
+    w->mario.f190 = 0;
+    w->mario.f194 = 0;
 }
 
-void winMarioExit(WinMarioWork* w) {
-    animPoseRelease(w->poseId);
+void winMarioExit(WindowWork* w) {
+    animPoseRelease(w->mario.poseId);
 }
 
 #define COLOR_ANIM(var, base)                         \
@@ -177,30 +146,30 @@ void winMarioExit(WinMarioWork* w) {
     }
 
 #define NAV(n)                                                        \
-    w->idx = linkDt[w->idx].links[n];                                 \
-    p = &linkDt[w->idx];                                              \
+    w->marioSel = linkDt[w->marioSel].links[n];                                 \
+    p = &linkDt[w->marioSel];                                              \
     while (1) {                                                       \
-        if (w->idx == 11 || w->idx == 12) {                           \
-            if (w->f198 != 0) break;                                  \
+        if (w->marioSel == 11 || w->marioSel == 12) {                           \
+            if (w->mario.f198 != 0) break;                                  \
         } else if (p->item == 0 || ((s32(*)(u32))pouchCheckItem)(p->item) != 0) {    \
             break;                                                    \
         }                                                             \
-        w->idx = p->links[n];                                         \
-        p = &linkDt[w->idx];                                          \
+        w->marioSel = p->links[n];                                         \
+        p = &linkDt[w->marioSel];                                          \
     }                                                                 \
     psndSFXOn((const char*)0x20005);
 
-s32 winMarioMain(WinMarioWork* w) {
+s32 winMarioMain(WindowWork* w) {
     const char* anims[2];
     LinkDt* lp;
     LinkDt* p;
 
-    switch (w->f190) {
+    switch (w->mario.f190) {
         case 0:
             if (w->buttonTrg & 0x100) {
-                if (w->idx == 12) {
-                    w->f190 = 1;
-                    w->f194 = 0;
+                if (w->marioSel == 12) {
+                    w->mario.f190 = 1;
+                    w->mario.f194 = 0;
                     psndSFXOn((const char*)0x20012);
                 }
             } else if (w->buttonTrg & 0x200) {
@@ -210,7 +179,7 @@ s32 winMarioMain(WinMarioWork* w) {
                 } else {
                     anims[1] = "M_S_1";
                 }
-                animPoseSetAnim(w->poseId, anims[1], 0);
+                animPoseSetAnim(w->mario.poseId, anims[1], 0);
                 return -1;
             } else if (w->buttonTrg & 0x1000) {
                 return -2;
@@ -223,39 +192,39 @@ s32 winMarioMain(WinMarioWork* w) {
             } else if (w->dirRep & 0x8000) {
                 NAV(3)
             }
-            lp = &linkDt[w->idx];
-            w->msgX = lp->x;
-            w->msgY = lp->y;
-            switch (w->idx) {
+            lp = &linkDt[w->marioSel];
+            w->helpTgtX = lp->x;
+            w->helpTgtY = lp->y;
+            switch (w->marioSel) {
             case 2:
                 if (w->flags & 0x2000) {
                     COLOR_ANIM(anims[0], lp->pose2)
                 } else {
                     anims[0] = hammer_pose[pouchGetHammerLv()];
                 }
-                animPoseSetAnim(w->poseId, anims[0], 0);
-                if (w->f18C == 0) {
-                    if (animPoseGetLoopTimes(w->poseId) >= 0.89f) {
-                        w->f18C = 30;
+                animPoseSetAnim(w->mario.poseId, anims[0], 0);
+                if (w->mario.f18C == 0) {
+                    if (animPoseGetLoopTimes(w->mario.poseId) >= 0.89f) {
+                        w->mario.f18C = 30;
                     }
                 } else {
-                    w->f18C--;
+                    w->mario.f18C--;
                 }
                 if (w->flags & 0x2000) {
-                    w->f18C = 0;
+                    w->mario.f18C = 0;
                 }
                 break;
             default:
-                w->f18C = 0;
+                w->mario.f18C = 0;
                 if (w->flags & 0x2000) {
                     COLOR_ANIM(anims[0], lp->pose2)
                 } else {
                     anims[0] = lp->pose0;
                 }
-                animPoseSetAnim(w->poseId, anims[0], 0);
+                animPoseSetAnim(w->mario.poseId, anims[0], 0);
                 break;
             }
-            switch (w->idx) {
+            switch (w->marioSel) {
                 case 2:
                     winMsgEntry(w, 0, hammer_help[pouchGetHammerLv()], 0);
                     break;
@@ -269,26 +238,26 @@ s32 winMarioMain(WinMarioWork* w) {
             break;
         case 1:
             if (w->dirRep & 0x1000) {
-                w->f194--;
-                if (w->f194 < 0) {
-                    w->f194 = w->f198 - 1;
+                w->mario.f194--;
+                if (w->mario.f194 < 0) {
+                    w->mario.f194 = w->mario.f198 - 1;
                 }
                 psndSFXOn((const char*)0x20005);
             } else if (w->dirRep & 0x2000) {
-                w->f194++;
-                if (w->f194 >= w->f198) {
-                    w->f194 = 0;
+                w->mario.f194++;
+                if (w->mario.f194 >= w->mario.f198) {
+                    w->mario.f194 = 0;
                 }
                 psndSFXOn((const char*)0x20005);
             } else if (w->buttonTrg & 0x200) {
-                w->f190 = 0;
+                w->mario.f190 = 0;
                 psndSFXOn((const char*)0x20013);
             } else if (w->buttonTrg & 0x1000) {
                 return -2;
             }
-            w->msgX = -280.0f;
-            w->msgY = 10.0f + (120.0f - 26.0f * w->f194 - 12.0f);
-            winMsgEntry(w, 0, superActionTable[w->f194]->desc, 0);
+            w->helpTgtX = -280.0f;
+            w->helpTgtY = 10.0f + (120.0f - 26.0f * w->mario.f194 - 12.0f);
+            winMsgEntry(w, 0, superActionTable[w->mario.f194]->description, 0);
             break;
     }
     return 0;
@@ -359,8 +328,8 @@ char* winZenkakuStrPad(s32 n, s32 digits) {
 }
 #endif
 
-static inline void fukiKey(WinMarioWork* w, u16 icon, f32 x, f32 y) {
-    winTexInit(*w->file->data);
+static inline void fukiKey(WindowWork* w, u16 icon, f32 x, f32 y) {
+    winTexInit(*w->res->data);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
     winTexSet(0xB1, (Vec){x + 5.0f, y - 5.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, (GXColor){0x00, 0x00, 0x00, 0x80});
@@ -369,8 +338,8 @@ static inline void fukiKey(WinMarioWork* w, u16 icon, f32 x, f32 y) {
     winIconSet(icon, (Vec){x + 6.0f, y, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 }
 
-static inline void fukiTool(WinMarioWork* w, u16 icon, f32 x, f32 y) {
-    winTexInit(*w->file->data);
+static inline void fukiTool(WindowWork* w, u16 icon, f32 x, f32 y) {
+    winTexInit(*w->res->data);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
     winTexSet(0xB1, (Vec){x + 5.0f, y - 5.0f, 0.0f}, (Vec){-0.8f, 0.8f, 0.8f}, (GXColor){0x00, 0x00, 0x00, 0x80});
@@ -379,7 +348,7 @@ static inline void fukiTool(WinMarioWork* w, u16 icon, f32 x, f32 y) {
     winIconSet(icon, (Vec){x - 6.0f, y, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 }
 
-void fukidashi(WinMarioWork* w, u32 idx, f32 x, f32 y) {
+void fukidashi(WindowWork* w, u32 idx, f32 x, f32 y) {
     switch (idx) {
         case 2:
             if (pouchGetHammerLv() > 0) {
@@ -414,11 +383,6 @@ void fukidashi(WinMarioWork* w, u32 idx, f32 x, f32 y) {
     }
 }
 
-void winBgGX(WinMarioWork* w, s32 a, f32 x, f32 y);
-void winNameGX(WinMarioWork* w, s32 a, f32 x, f32 y, f32 w_, f32 h);
-void winKirinukiGX(WinMarioWork* w, s32 a, f32 x, f32 y, f32 w_, f32 h);
-void winWazaGX(WinMarioWork* w, s32 a, f32 x, f32 y, f32 w_, f32 h);
-void winKageGX(WinMarioWork* w, GXColor color, f32 x, f32 y, f32 z, f32 scale);
 void winZClear(void);
 void winFontInit(void);
 void winFontSet(Vec pos, Vec scale, GXColor color, const char* fmt, ...);
@@ -475,7 +439,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     f32 numX;
     f32 row3;
     f32 rubyW;
-    WinMarioWork* w;
+    WindowWork* w;
     GXColor white;
     GXColor black;
     PouchData* pouch;
@@ -492,8 +456,8 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     pouch = pouchGetPtr();
     white = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
     black = (GXColor){0x00, 0x00, 0x00, 0xFF};
-    x = w->pos[idx].x;
-    y = w->pos[idx].y;
+    x = w->menu[idx].x;
+    y = w->menu[idx].y;
     winBgGX(w, 0, x, y);
     winNameGX(w, 2, x - 265.0f, 154.0f + y, 190.0f, 24.0f);
     cx = 10.0f + (x - 265.0f);
@@ -513,17 +477,17 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     }
     winFontInit();
     winFontSetEdgeWidth((Vec){(190.0f + (x - 265.0f)) - nameW - 10.0f, 152.0f + y, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, 20.0f, buf);
-    winTexInit(*w->file->data);
+    winTexInit(*w->res->data);
     winTexSet(0xB0, (Vec){x - 255.0f, 112.0f + y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     winFontInit();
     winFontSetWidth((Vec){x - 240.0f, 124.0f + y, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, black, 140.0f, msgSearch(BattleGetRankNameLabel(pouch->level)));
 
     for (i = 0; i < 6; i++) {
-        if (w->idx != pri[i]) {
+        if (w->marioSel != pri[i]) {
             fukidashi(w, pri[i], x, y);
         }
     }
-    fukidashi(w, w->idx, x, y);
+    fukidashi(w, w->marioSel, x, y);
 
     winKirinukiGX(w, 0, x - 270.0f, y - 10.0f, 264.0f, 110.0f);
     col = 50.0f + (x - 270.0f);
@@ -544,7 +508,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         rowL = 50.0f + (x - 270.0f) - 2.0f;
         nameW2 = FontGetMessageWidth(N_stat_name_tbl[gp->language][i]);
         rubyW = 0.5f * FontGetMessageWidth(msgSearch(ruby[i]));
-        winTexInit(*w->file->data);
+        winTexInit(*w->res->data);
         GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
         GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
         winTexSet(0xAF, (Vec){rowL, (cx2 = (y - 38.0f) - (f32)(i * 34)) - 4.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, cols[i]);
@@ -561,7 +525,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     winFontSetR((Vec){col3 = 130.0f + (x - 270.0f), row2 = 4.0f + (12.0f + (y - 38.0f)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->currentHP));
     winFontSetR((Vec){col3, rowC = 4.0f + (12.0f + rowB), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->currentFP));
     winFontSetR((Vec){col3, 4.0f + (12.0f + rowA), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumBP));
-    winTexInit(*w->file->data);
+    winTexInit(*w->res->data);
     col4 = 190.0f + (x - 270.0f);
     winTexSet(0x10, (Vec){col4, row0, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     // FAKE: copies read only by the dead guards below; they keep two coalesced FPR nodes live across rowC (register order)
@@ -572,7 +536,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     winFontSet((Vec){col5 = 200.0f + (x - 270.0f), row2, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumHP));
     winFontSet((Vec){col5, rowC, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumFP));
 
-    if (w->f198 > 0) {
+    if (w->mario.f198 > 0) {
         winKirinukiGX(w, 0, 10.0f + x, (20.0f + (130.0f + y)) - 20.0f, 260.0f, 80.0f);
         winIconInit();
         col6 = 10.0f + (40.0f + x);
@@ -584,7 +548,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         winFontSetWidth((Vec){10.0f + (70.0f + x), 10.0f + cx3, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, 175.0f, msgSearch("msg_menu_mario_special"));
         winIconInit();
         cx4 = 10.0f + (80.0f + x);
-        for (i = 0; i < w->f198; i++) {
+        for (i = 0; i < w->mario.f198; i++) {
             if (i < pouch->currentSP / 100) {
                 winIconSet(ICON_1B7 + i, (Vec){cx4 + (f32)(i * 22), nameW3, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
             } else {
@@ -647,7 +611,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     winFontSetR((Vec){2.0f + (2.0f + ((8.0f + (172.0f + x)) - 16.0f)), rowA3, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStrPad(hour, 2));
     winFontSetR((Vec){numX, rowA3, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStrPad(min, 2));
 
-    winTexInit(*w->file->data);
+    winTexInit(*w->res->data);
     cx5 = 10.0f + (190.0f + x);
     for (i = 0; i < 4; i++) {
         winTexSet(0x11, (Vec){cx5, 10.0f + (y - (f32)(i * 28)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
@@ -655,18 +619,18 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     rowB3 = 220.0f + x;
     winTexSet(0x12, (Vec){rowB3, (10.0f + (2.0f + (y - 112.0f))) - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
 
-    animPoseGetAnimPosePtr(w->poseId);
-    anim = animPoseGetAnimDataPtr(w->poseId);
-    if (w->f18C == 0) {
-        animPoseSetLocalTime(w->poseId, (f32)(gp->retraceCount % (s32)anim->loopInfo[2]));
+    animPoseGetAnimPosePtr(w->mario.poseId);
+    anim = animPoseGetAnimDataPtr(w->mario.poseId);
+    if (w->mario.f18C == 0) {
+        animPoseSetLocalTime(w->mario.poseId, (f32)(gp->retraceCount % (s32)anim->loopInfo[2]));
     }
-    animPoseMain(w->poseId);
+    animPoseMain(w->mario.poseId);
     winKageGX(w, (GXColor){0x00, 0x00, 0x00, 0x80}, x - 150.0f, y, 0.0f, 1.0f);
     PSMTXTrans(mtx, x - 150.0f, y, 0.0f);
     winZClear();
-    animPoseDrawMtx(w->poseId, mtx, 2, 0.0f, 5.0f);
+    animPoseDrawMtx(w->mario.poseId, mtx, 2, 0.0f, 5.0f);
 
-    if (w->f190) {
+    if (w->mario.f190) {
         const char* msg = msgSearch("msg_menu_mario_sac_waza");
         winWazaGX(w, 0, x - 270.0f, 160.0f, 270.0f, 254.0f);
         winFontInit();
@@ -675,11 +639,12 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         y2 = 10.0f + (left - 270.0f);
         x2 = (228.0f + x) - 270.0f;
         cx6 = 4.0f + ((17.0f + rowB3) - 270.0f);
-        for (i = 0; i < w->f198; i++) {
+        for (i = 0; i < w->mario.f198; i++) {
             char sbuf[0x20];
 
             winFontSetWidth((Vec){y2, (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, 180.0f, msgSearch(superActionTable[i]->name));
-            sprintf(sbuf, "%s", winZenkakuStr(superActionTable[i]->cost));
+            // FAKE: the star power cost (s8 baseSpCost, never negative) is read unsigned (lbz with no extsb), as by the old u8 view of the move table
+            sprintf(sbuf, "%s", winZenkakuStr((u8)superActionTable[i]->baseSpCost));
             winFontSet((Vec){x2 - (f32)(FontGetMessageWidth(sbuf) / 2), (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, sbuf);
             winFontSet((Vec){cx6, (f32)(120 - i * 26), 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black, msgSearch("btl_cost_disp_AP"));
         }
@@ -688,7 +653,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
 #else
 void winMarioDisp(s32 camId, void* param, s32 idx) {
     static s32 pri[6] = {3, 2, 8, 10, 7, 9};
-    WinMarioWork* w;
+    WindowWork* w;
     GXColor white;
     GXColor black;
     PouchData* pouch;
@@ -721,8 +686,8 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     pouch = pouchGetPtr();
     white = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
     black = (GXColor){0x00, 0x00, 0x00, 0xFF};
-    x = w->pos[idx].x;
-    y = w->pos[idx].y;
+    x = w->menu[idx].x;
+    y = w->menu[idx].y;
     winBgGX(w, 0, x, y);
     winNameGX(w, 2, x - 265.0f, 154.0f + y, 190.0f, 24.0f);
     cx = 10.0f + (x - 265.0f);
@@ -738,17 +703,17 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     sprintf(buf, "%s", winZenkakuStr(pouch->level));
     winFontInit();
     winFontSetEdge((Vec){(190.0f + (x - 265.0f)) - 0.8f * FontGetMessageWidth(buf) - 10.0f, 152.0f + y, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, buf);
-    winTexInit(*w->file->data);
+    winTexInit(*w->res->data);
     winTexSet(0xB0, (Vec){x - 255.0f, 112.0f + y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     winFontInit();
     winFontSet((Vec){x - 240.0f, 124.0f + y, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, black, msgSearch(BattleGetRankNameLabel(pouch->level)));
 
     for (i = 0; i < 6; i++) {
-        if (w->idx != pri[i]) {
+        if (w->marioSel != pri[i]) {
             fukidashi(w, pri[i], x, y);
         }
     }
-    fukidashi(w, w->idx, x, y);
+    fukidashi(w, w->marioSel, x, y);
 
     winKirinukiGX(w, 0, x - 270.0f, y - 10.0f, 264.0f, 110.0f);
     col = 50.0f + (x - 270.0f);
@@ -761,7 +726,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         rowA = 50.0f + (x - 270.0f) - 2.0f;
         nameW = FontGetMessageWidth(N_stat_name_tbl[i]);
         rubyW = 0.5f * FontGetMessageWidth(msgSearch(ruby[i]));
-        winTexInit(*w->file->data);
+        winTexInit(*w->res->data);
         GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
         GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
         winTexSet(0xAF, (Vec){rowA, (cx = (y - 38.0f) - (f32)(i * 34)) - 4.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, cols[i]);
@@ -786,7 +751,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     rowB = 4.0f + (12.0f + rowB);
     winFontSetR((Vec){col, rowB, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->currentFP));
     winFontSetR((Vec){col, 4.0f + (12.0f + rowA), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumBP));
-    winTexInit(*w->file->data);
+    winTexInit(*w->res->data);
     col = 190.0f + (x - 270.0f);
     winTexSet(0x10, (Vec){col, row0, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     winTexSet(0x10, (Vec){col, row1, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
@@ -795,7 +760,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     winFontSet((Vec){col, row2, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumHP));
     winFontSet((Vec){col, rowB, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumFP));
 
-    if (w->f198 > 0) {
+    if (w->mario.f198 > 0) {
         winKirinukiGX(w, 0, 10.0f + x, (20.0f + (130.0f + y)) - 20.0f, 260.0f, 80.0f);
         winIconInit();
         col = 10.0f + (40.0f + x);
@@ -807,7 +772,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         winFontSet((Vec){10.0f + (70.0f + x), 10.0f + cx, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, msgSearch("msg_menu_mario_special"));
         winIconInit();
         cx = 10.0f + (80.0f + x);
-        for (i = 0; i < w->f198; i++) {
+        for (i = 0; i < w->mario.f198; i++) {
             if (i < pouch->currentSP / 100) {
                 winIconSet(0x1B7 + i, (Vec){cx + (f32)(i * 22), rowB, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
             } else {
@@ -856,7 +821,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     winFontSetR((Vec){2.0f + (2.0f + ((8.0f + (172.0f + x)) - 16.0f)), rowA, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStrPad(hour, 2));
     winFontSetR((Vec){numX, rowA, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStrPad(min, 2));
 
-    winTexInit(*w->file->data);
+    winTexInit(*w->res->data);
     cx = 10.0f + (190.0f + x);
     for (i = 0; i < 4; i++) {
         winTexSet(0x11, (Vec){cx, 10.0f + (y - (f32)(i * 28)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
@@ -864,18 +829,18 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     rowB = 220.0f + x;
     winTexSet(0x12, (Vec){rowB, (10.0f + (2.0f + (y - 112.0f))) - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
 
-    animPoseGetAnimPosePtr(w->poseId);
-    anim = animPoseGetAnimDataPtr(w->poseId);
-    if (w->f18C == 0) {
-        animPoseSetLocalTime(w->poseId, (f32)(gp->retraceCount % (s32)anim->loopInfo[2]));
+    animPoseGetAnimPosePtr(w->mario.poseId);
+    anim = animPoseGetAnimDataPtr(w->mario.poseId);
+    if (w->mario.f18C == 0) {
+        animPoseSetLocalTime(w->mario.poseId, (f32)(gp->retraceCount % (s32)anim->loopInfo[2]));
     }
-    animPoseMain(w->poseId);
+    animPoseMain(w->mario.poseId);
     winKageGX(w, (GXColor){0x00, 0x00, 0x00, 0x80}, x - 150.0f, y, 0.0f, 1.0f);
     PSMTXTrans(mtx, x - 150.0f, y, 0.0f);
     winZClear();
-    animPoseDrawMtx(w->poseId, mtx, 2, 0.0f, 5.0f);
+    animPoseDrawMtx(w->mario.poseId, mtx, 2, 0.0f, 5.0f);
 
-    if (w->f190) {
+    if (w->mario.f190) {
         winWazaGX(w, 0, x - 270.0f, 160.0f, 270.0f, 254.0f);
         winFontInit();
         winFontSetEdge((Vec){(90.0f + x) - 270.0f, 155.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, msgSearch("msg_menu_mario_sac_waza"));
@@ -883,11 +848,12 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         y = 10.0f + (left - 270.0f);
         x = (228.0f + x) - 270.0f;
         cx = 4.0f + ((17.0f + rowB) - 270.0f);
-        for (i = 0; i < w->f198; i++) {
+        for (i = 0; i < w->mario.f198; i++) {
             char sbuf[0x20];
 
             winFontSetLabel((Vec){y, (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, superActionTable[i]->name);
-            sprintf(sbuf, "%s", winZenkakuStr(superActionTable[i]->cost));
+            // FAKE: the star power cost (s8 baseSpCost, never negative) is read unsigned (lbz with no extsb), as by the old u8 view of the move table
+            sprintf(sbuf, "%s", winZenkakuStr((u8)superActionTable[i]->baseSpCost));
             winFontSet((Vec){x - (f32)(FontGetMessageWidth(sbuf) / 2), (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, sbuf);
             winFontSet((Vec){cx, (f32)(120 - i * 26), 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black, "\x82\x72\x82\x6F");
         }
