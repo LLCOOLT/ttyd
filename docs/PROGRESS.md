@@ -54,9 +54,13 @@ The cleanup keeps both builds byte-identical; every change is gated on JP (32 fi
 | `extern` declarations moved from `.c` files into headers | ~15,500 in `.c` files | done: 14,948 moved, the rest kept with a reason |
 | Typed data: raw int tables become structs, `f32`, strings, enums or event macros | ~12,000 raw tables | done |
 | Raw pointer math (`*(T*)((u8*)p + N)`) becomes struct fields | 4,644 | 0 (52 look-alikes such as script float encodings and sine-table indexes checked and kept) |
-| Offset-hiding macros (`#define X(p) *(T*)((u8*)p + N)`) | 157 | 6 |
+| Offset-hiding macros (`#define X(p) *(T*)((u8*)p + N)`), including the US layout-shift macros | 157 | 1 (a listed fake) |
+| Array-index casts, type puns, hard-coded strides and per-file views of shared structs | 1,075 | 0 (54 look-alikes such as pixel math and byte-stream reads checked and kept) |
 | Placeholder struct fields (`unk*`, `field_*`) get names | 789 | 0 |
 | `__declspec(section ...)` data placements | 26,648 | 434 (all needed or faithful to the original) |
 | Decompiler-generated local names (`var_r31`, `temp_r3`) | 483 | 0 |
+| Inline asm in game code | 31 | 4, the original's own GQR/MSR writes and word copy, behind named helpers in `hwaccess.h` |
+| Script words: arrays, `args` views and script pointers typed as `EvtWord` | ~11,000 declarations | done |
+| Pointers stored in integers (`(s32)"name"` table fields, pointer values in `s32` slots) | 2,598 casts | 60, at SDK interfaces that take `u32` addresses or in listed fakes |
 
 Placements that stay are needed or kept on purpose: SDK startup sections, padding fillers, and small main-executable data that the original source most likely placed by hand too. Behaviour-identical fakes stay as well, and each is listed in [FAKES.md](FAKES.md).
