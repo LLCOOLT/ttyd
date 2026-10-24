@@ -1772,30 +1772,28 @@ USER_FUNC(btlevtcmd_GetUnitWork) {
 USER_FUNC(btlevtcmd_SetUnitWork) {
     s32* args = event->args;
     s32 btlId, id, value, index;
+    BattleUnit* unit;
 
     btlId = evtGetValue(event, args[0]);
     id = BattleTransID(event, btlId);
     index = evtGetValue(event, args[1]);
     value = evtGetValue(event, args[2]);
-    {
-        s32* p = (s32*)BattleGetUnitPtr(_battleWorkPointer, id) + index;
-        p[BUOFF(0x214)/4] = value;
-    }
+    unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    unit->work[index] = value;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(btlevtcmd_AddUnitWork) {
     s32* args = event->args;
     s32 btlId, id, value, index;
+    BattleUnit* unit;
 
     btlId = evtGetValue(event, args[0]);
     id = BattleTransID(event, btlId);
     index = evtGetValue(event, args[1]);
     value = evtGetValue(event, args[2]);
-    {
-        s32* p = (s32*)BattleGetUnitPtr(_battleWorkPointer, id) + index;
-        p[BUOFF(0x214)/4] += value;
-    }
+    unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    unit->work[index] += value;
     return EVT_RETURN_DONE;
 }
 
@@ -1809,7 +1807,7 @@ USER_FUNC(btlevtcmd_GetUnitWorkFloat) {
     i = evtGetValue(event, args[1]);
     index = args[2];
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    evtSetFloat(event, index, *(f32*)&unit->work[i]);
+    evtSetFloat(event, index, *(f32*)&unit->workf[i]); // FAKE: no-op (f32*)&...[i] cast so the field offset folds into the index (addi/lfsx), as in the target
     return EVT_RETURN_DONE;
 }
 
@@ -1822,7 +1820,7 @@ USER_FUNC(btlevtcmd_SetUnitWorkFloat) {
     id = BattleTransID(event, btlId);
     index = evtGetValue(event, args[1]);
     value = evtGetFloat(event, args[2]);
-    *(f32*)&BattleGetUnitPtr(_battleWorkPointer, id)->work[index] = value;
+    BattleGetUnitPtr(_battleWorkPointer, id)->workf[index] = value;
     return EVT_RETURN_DONE;
 }
 
@@ -2563,14 +2561,14 @@ USER_FUNC(btlevtcmd_SetPartsBlur) {
     color7 = (u8)evtGetValue(event, args[9]);
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     part = BtlUnit_GetPartsPtr(unit, partId);
-    part->blurWork.color[0] = color0;
-    part->blurWork.color[1] = color1;
-    part->blurWork.color[2] = color2;
-    part->blurWork.color[3] = color3;
-    part->blurWork.color[4] = color4;
-    part->blurWork.color[5] = color5;
-    part->blurWork.color[6] = color6;
-    part->blurWork.color[7] = color7;
+    part->blurWork.color[0].r = color0;
+    part->blurWork.color[0].g = color1;
+    part->blurWork.color[0].b = color2;
+    part->blurWork.color[0].a = color3;
+    part->blurWork.color[1].r = color4;
+    part->blurWork.color[1].g = color5;
+    part->blurWork.color[1].b = color6;
+    part->blurWork.color[1].a = color7;
     return EVT_RETURN_DONE;
 }
 
@@ -4522,7 +4520,6 @@ USER_FUNC(btlevtcmd_GetTakeoffPosition) {
     s32 back;
     s32 oz;
     BattleUnitPart* part;
-    u8* al;
     BattleWorkWeaponTargets targets;
     f32 hx, hy, hz, y, x, tx;
     s32 cid, cpno;
@@ -4542,9 +4539,8 @@ USER_FUNC(btlevtcmd_GetTakeoffPosition) {
     BtlUnit_GetHomePos(unit, &hx, &hy, &hz);
     BtlUnit_GetHitPos(target, part, &hx, &y, &hz);
     belong = (s8)BtlUnit_GetEnemyBelong(unit);
-    al = (u8*)wp + belong * 8;
     back = ((s32 (*)(BattleWorkWeaponTargets*, BattleWeapon*, s32, s8, u32, u32, s8))BattleSamplingEnemy)(
-        &targets, NULL, id, belong, 0x1001240, 0x1000000, -*(s8*)(al + 0xA));
+        &targets, NULL, id, belong, 0x1001240, 0x1000000, -wp->alliances[belong].attackDirection);
     BattleChoiceSamplingEnemy(&targets, 4, &cid, &cpno);
     if (targets.numTargets > 0) {
         BattleUnit* u2;
@@ -4557,16 +4553,16 @@ USER_FUNC(btlevtcmd_GetTakeoffPosition) {
             hx = tx;
         }
         if (part == p2) {
-            if (back) hx += *(s8*)((u8*)wp + belong * 8 + 0xA) * -60;
-            else hx += *(s8*)(al + 0xA) * 60;
+            if (back) hx += wp->alliances[belong].attackDirection * -60;
+            else hx += wp->alliances[belong].attackDirection * 60;
         }
         else {
-            if (back) hx += *(s8*)(al + 0xA) * -30;
-            else hx += *(s8*)(al + 0xA) * 30;
+            if (back) hx += wp->alliances[belong].attackDirection * -30;
+            else hx += wp->alliances[belong].attackDirection * 30;
         }
     }
     else {
-        hx += *(s8*)(al + 0xA) * 60;
+        hx += wp->alliances[belong].attackDirection * 60;
     }
     evtSetValue(event, ox, (s32)hx);
     evtSetValue(event, oy, (s32)hy);
@@ -4950,7 +4946,7 @@ USER_FUNC(btlevtcmd_AcSetParamAll) {
     for (i = 0; i < 8; i++) {
         value = evtGetValue(event, *args++);
         if (value != EVTDAT_POINTER_MAX) {
-            ((s32*)wp)[i + 0x1CC8 / 4] = value;
+            wp->actionCommands.params[i] = value;
         }
     }
     return EVT_RETURN_DONE;

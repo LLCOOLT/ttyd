@@ -47,6 +47,8 @@ __declspec(section ".data") f32 nameent_unused_pm1_5[2] __attribute__((aligned(8
 __declspec(section ".data") f32 nameent_unused_pm1_6[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 __declspec(section ".data") f32 nameent_unused_pm1_7[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 #endif
+#define NAMEENT_COLS 14 // characters per row of hiragana_tbl, katakana_tbl and latin_tbl
+
 const char* hiragana_tbl[] = {
 	"\x82\xA0", "\x82\xA2", "\x82\xA4", "\x82\xA6", "\x82\xA8", "\x82\xED",
 	"\x81\x40", "\x82\xF0", "\x81\x40", "\x82\xF1", "\x82\x4F", "\x82\x50",
@@ -415,12 +417,12 @@ s32 nameMain(void) {
 					} else if (wp->nameLen < 8) {
 #ifdef VERSION_G8ME01
 						if ((u32)gp->language == 0) {
-							((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * 14 + off];
+							((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * NAMEENT_COLS + off];
 						} else {
-							((u8*)wp->name)[wp->nameLen] = *(u8*)wp->charTable[wp->cursorY * 14 + off];
+							wp->name[wp->nameLen] = *wp->charTable[wp->cursorY * NAMEENT_COLS + off];
 						}
 #else
-						((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * 14 + off];
+						((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * NAMEENT_COLS + off];
 #endif
 						wp->nameLen++;
 						if (wp->nameLen >= 8) {
@@ -433,12 +435,12 @@ s32 nameMain(void) {
 						wp->nameLen = 7;
 #ifdef VERSION_G8ME01
 						if ((u32)gp->language == 0) {
-							((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * 14 + wp->cursorX];
+							((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * NAMEENT_COLS + wp->cursorX];
 						} else {
-							((u8*)wp->name)[wp->nameLen] = *(u8*)wp->charTable[wp->cursorY * 14 + wp->cursorX];
+							wp->name[wp->nameLen] = *wp->charTable[wp->cursorY * NAMEENT_COLS + wp->cursorX];
 						}
 #else
-						((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * 14 + wp->cursorX];
+						((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * NAMEENT_COLS + wp->cursorX];
 #endif
 						wp->cursorX = 10;
 						wp->cursorY = 7;
@@ -525,7 +527,7 @@ s32 nameMain(void) {
 							wp->state = 0x65;
 							wp->flags |= 2;
 						} else {
-							((u8*)wp->name)[wp->nameLen] = *(u8*)" ";
+							wp->name[wp->nameLen] = *" ";
 							wp->nameLen--;
 							if (wp->nameLen < 0) {
 								wp->nameLen = 0;
@@ -572,7 +574,7 @@ s32 nameMain(void) {
 							if (wp->cursorX >= 11) {
 								wp->cursorX = 0;
 							}
-						} else if (wp->cursorX >= 14) {
+						} else if (wp->cursorX >= NAMEENT_COLS) {
 							wp->cursorX = 0;
 						}
 						psndSFXOn((const char*)5);
@@ -703,9 +705,9 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	nameKirinukiGX(-240.0f, 120.0f, 480.0f, 270.0f);
 	FontDrawStart();
 	for (j = 0; j < 9; j++) {
-		for (n = 0; n < 14; n++) {
-			if (wp->charTable[j * 14 + n]) {
-				FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30 + (24 - FontGetMessageWidth(wp->charTable[j * 14 + n])) / 2), (f32)(112 - j * 28), wp->charTable[j * 14 + n]);
+		for (n = 0; n < NAMEENT_COLS; n++) {
+			if (wp->charTable[j * NAMEENT_COLS + n]) {
+				FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30 + (24 - FontGetMessageWidth(wp->charTable[j * NAMEENT_COLS + n])) / 2), (f32)(112 - j * 28), wp->charTable[j * NAMEENT_COLS + n]);
 			}
 		}
 	}

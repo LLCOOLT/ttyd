@@ -230,10 +230,10 @@ void seq_mapChangeMain(SequenceWork* work) {
         }
         break;
     case 4:
-        if ((s32)gp->mapEventId == 0) {
+        if (gp->mapEventId == 0) {
             camCtrlOn(4);
             work->state++;
-        } else if (!evtCheckID((s32)gp->mapEventId)) {
+        } else if (!evtCheckID(gp->mapEventId)) {
             camCtrlOn(4);
             gp->mapEventId = 0;
             work->state++;

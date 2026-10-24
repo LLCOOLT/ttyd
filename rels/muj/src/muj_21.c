@@ -1,4 +1,5 @@
 #include "battle/battle_unit.h"
+#include "eff/eff_funemizu.h"
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
@@ -258,24 +259,24 @@ static USER_FUNC(fune_eff) {
         event->userdatap[1] = effFunemizuEntry(2, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
         mapObjGetPos("S_fune_m", &pos);
         event->userdataf[2] = pos.x;
-        *(f32*)&event->userdata3 = pos.z;
+        event->userdata3f = pos.z;
     }
     eff1 = event->userdatap[0];
     eff2 = event->userdatap[1];
     mapObjGetPos("S_fune_m", &pos);
     event->userdataf[2] = pos.x;
-    *(f32*)&event->userdata3 = pos.z;
-    ((f32*)eff1->userdata)[17] = 3.0f;
-    ((f32*)eff1->userdata)[1] = pos.x - 81.3f;
-    ((f32*)eff1->userdata)[2] = pos.y - 51.0f;
-    ((f32*)eff1->userdata)[3] = pos.z - 38.9f;
-    ((f32*)eff1->userdata)[4] = 1.0f;
-    ((f32*)eff1->userdata)[5] = 270.0f;
-    ((f32*)eff2->userdata)[1] = pos.x - 49.5f;
-    ((f32*)eff2->userdata)[2] = pos.y - 51.0f;
-    ((f32*)eff2->userdata)[3] = 70.7f + pos.z;
-    ((f32*)eff2->userdata)[4] = 1.0f;
-    ((f32*)eff2->userdata)[5] = 305.0f;
+    event->userdata3f = pos.z;
+    ((EffFunemizuWork*)eff1->userdata)->scale = 3.0f;
+    ((EffFunemizuWork*)eff1->userdata)->position.x = pos.x - 81.3f;
+    ((EffFunemizuWork*)eff1->userdata)->position.y = pos.y - 51.0f;
+    ((EffFunemizuWork*)eff1->userdata)->position.z = pos.z - 38.9f;
+    ((EffFunemizuWork*)eff1->userdata)->f10 = 1.0f;
+    ((EffFunemizuWork*)eff1->userdata)->f14 = 270.0f;
+    ((EffFunemizuWork*)eff2->userdata)->position.x = pos.x - 49.5f;
+    ((EffFunemizuWork*)eff2->userdata)->position.y = pos.y - 51.0f;
+    ((EffFunemizuWork*)eff2->userdata)->position.z = 70.7f + pos.z;
+    ((EffFunemizuWork*)eff2->userdata)->f10 = 1.0f;
+    ((EffFunemizuWork*)eff2->userdata)->f14 = 305.0f;
     if (gp->retraceCount % 15 == 0) {
         effWaterDamageN64Entry(5, 30, 106.1f + pos.x, pos.y - 50.0f, 106.1f + pos.z, 2.0f);
     }

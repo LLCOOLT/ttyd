@@ -18,25 +18,6 @@ s32 BattleACGetButtonIcon(s32 button, s32 pressed);
 
 #pragma optimize_for_size on
 
-typedef struct GT2Params {
-    u8 field_0x0[0x3C];
-    s32 totalFrames; // 0x3C
-    s32 count;       // 0x40
-    s32 bonus;       // 0x44
-} GT2Params;
-
-typedef struct GT2Disp {
-    u8 field_0x0[0xC];
-    GXColor color; // 0xC
-    u8 field_0x10[0x4];
-    f32 iconX; // 0x14
-    f32 iconY; // 0x18
-    u8 field_0x1C[0x4];
-    s32 timer; // 0x20
-    u8 field_0x24[0x4];
-    f32 ratio; // 0x28
-} GT2Disp;
-
 typedef struct GT2Work {
     s32 frame;       // 0x0
     f32 cursor;      // 0x4
@@ -54,8 +35,8 @@ typedef struct GT2Work {
     s32 endTimer; // 0x6C
 } GT2Work;
 
-#define GT_PARAMS(work) ((GT2Params*)&(work)->actionCommands)
-#define GT_DISP(w) ((GT2Disp*)&(w)->actionCommands.disp)
+#define GT_PARAMS(work) (&(work)->actionCommands) // params: 1 total frames, 2 target count, 3 bonus
+#define GT_DISP(w) (&(w)->actionCommands.disp)
 #define GT_WORK(w) ((GT2Work*)(w)->actionCommands.work)
 #define ICON ((void (*)(Vec*, s16, s32, f32))iconDispGx)
 #define TEXPLANE ((void (*)(u32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)
@@ -73,7 +54,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
   s32 i4;
   GT2Work *gw = (GT2Work *)work->actionCommands.work;
   BOOL autoCommand = 0;
-  GT2Disp *disp = (GT2Disp *)&work->actionCommands.disp;
+  BattleACDispParams *disp = &work->actionCommands.disp;
   s32 i;
   BOOL doAuto;
   const char *sfxOk;
@@ -87,21 +68,21 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
       memset(disp, 0, 0x2C);
       disp->iconX = -300.0f;
       disp->iconY = 0.0f;
-      disp->timer = 20;
-      disp->ratio = 0.0f;
+      disp->slideTimer = 20;
+      disp->gaugeRatio = 0.0f;
       disp->color = (GXColor){255, 255, 255, 255};
       gw->frame = 0;
       gw->frame2 = 0;
       work->actionCommands.mAcState = 99;
       work->actionCommands.result = 1;
-      gw->totalFrames = ((GT2Params *) (&work->actionCommands))->totalFrames;
+      gw->totalFrames = work->actionCommands.params[1];
       gw->hit = 0;
       gw->cursor = 0.0f;
       work->actionCommands.outputParams[0] = 0;
-      gw->width = ((GT2Params *) (&work->actionCommands))->count * 60;
-      for (i = 0; i < ((GT2Params *) (&work->actionCommands))->count; i++)
+      gw->width = work->actionCommands.params[2] * 60;
+      for (i = 0; i < work->actionCommands.params[2]; i++)
     {
-      gw->targets[i] = (f32) ((100 / ((GT2Params *) (&work->actionCommands))->count) * (i + 1));
+      gw->targets[i] = (f32) ((100 / work->actionCommands.params[2]) * (i + 1));
       gw->targets[i] -= 4.0f;
       gw->state[i] = 0;
       gw->flag[i] = 0;
@@ -141,7 +122,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
       pressed = 1;
     }
       allDone = 1;
-      for (i = 0; i < ((GT2Params *) (&work->actionCommands))->count; i++)
+      for (i = 0; i < work->actionCommands.params[2]; i++)
     {
       if (!gw->state[i])
       {
@@ -168,7 +149,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
       gw->cursor = (100.0f * ((f32) gw->frame2)) / ((f32) gw->totalFrames);
     {
       new_var[0] = "SFX_AC_COMMAND_NG1";
-      for (i3 = 0; i3 < ((GT2Params *) (&work->actionCommands))->count; i3++)
+      for (i3 = 0; i3 < work->actionCommands.params[2]; i3++)
       {
         if ((!gw->state[i3]) && (gw->cursor > (6.0f + gw->targets[i3])))
         {
@@ -181,7 +162,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
       gw->hit = 0;
     {
       new_var[1] = "SFX_AC_PONE1";
-      for (i = 0; i < ((GT2Params *) (&work->actionCommands))->count; i++)
+      for (i = 0; i < work->actionCommands.params[2]; i++)
       {
         if ((!gw->state[i]) && (__fabs(gw->cursor - gw->targets[i]) <= 6.0))
         {
@@ -199,7 +180,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
     {
       BOOL hit2 = 0;
       s32 j;
-      for (j = 0; j < ((GT2Params *) (&work->actionCommands))->count; j++)
+      for (j = 0; j < work->actionCommands.params[2]; j++)
       {
         if ((!gw->state[j]) && (__fabs(gw->cursor - gw->targets[j]) <= 6.0))
         {
@@ -218,7 +199,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
       sfxNg = "SFX_AC_COMMAND_NG1";
       sfxOk = "SFX_AC_COMMAND_OK1\0";
       found = 0;
-      for (i4 = 0; i4 < ((GT2Params *) (&work->actionCommands))->count; i4++)
+      for (i4 = 0; i4 < work->actionCommands.params[2]; i4++)
       {
         if ((!gw->state[i4]) && (!found))
         {
@@ -243,7 +224,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
             if (d < __fabs(gw->targets[1] - gw->targets[0]))
           {
             gw->flag[i4] = 1;
-            if (i4 == (((GT2Params *) (&work->actionCommands))->count - 1))
+            if (i4 == (work->actionCommands.params[2] - 1))
             {
               gw->state[i4] = -1;
               psndSFXOn(sfxNg);
@@ -264,7 +245,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
       {
         work->actionCommands.result = 2;
         work->actionCommands.mResultCount++;
-        work->actionCommands.outputParams[0] = irand(((GT2Params *) (&work->actionCommands))->count) + 1;
+        work->actionCommands.outputParams[0] = irand(work->actionCommands.params[2]) + 1;
       }
       else
       {
@@ -312,28 +293,28 @@ s32 battleAcResult_GaugeTiming2(BattleWork* work) {
 #pragma opt_propagation off
 void battleAcDisp_GaugeTiming2(CameraId cameraId, BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
-    GT2Disp* disp = (GT2Disp*)&ac->disp;
+    BattleACDispParams* disp = &ac->disp;
     switch (ac->mAcState) {
         case 99:
-            disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(-300.0f, 30.0f, 4, 20 - disp->timer, 20);
+            disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(-300.0f, 30.0f, 4, 20 - disp->slideTimer, 20);
         case 100:
         case 1000:
         case 1002:
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->timer > 0) {
-                disp->timer--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 1003:
         case 1004:
-            if (disp->timer >= 40) {
-                disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(30.0f, -300.0f, 4, disp->timer - 40, 20);
+            if (disp->slideTimer >= 40) {
+                disp->iconX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(30.0f, -300.0f, 4, disp->slideTimer - 40, 20);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->timer < 60) {
-                disp->timer++;
+            if (disp->slideTimer < 60) {
+                disp->slideTimer++;
             }
             break;
     }
@@ -350,7 +331,7 @@ void battleAcDelete_GaugeTiming2(BattleWork* work) {
 #pragma opt_loop_invariants off
 static void actionCommandDisp(f32 x, f32 y) {
     BattleActions* ac = &_battleWorkPointer->actionCommands;
-    GT2Disp* disp = (GT2Disp*)&ac->disp;
+    BattleACDispParams* disp = &ac->disp;
     GT2Work* gw;
     CameraEntry* cam;
     f32 x0; f32 y0; f32 y1; f32 x1; f32 y2; f32 y3; f32 ratio; f32 t;
@@ -388,7 +369,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     if (ratio > 1.0f) {
         ratio = 1.0f;
     }
-    disp->ratio = ratio;
+    disp->gaugeRatio = ratio;
 
     cam = camGetPtr(8);
     y2 = y0 - 16.0f;
@@ -452,7 +433,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     y1 = 25.0f + y;
     {
     f32 y4 = y1 - 25.0f;
-    for (i = 0; i < ((GT2Params*)ac)->count; i++) {
+    for (i = 0; i < ac->params[2]; i++) {
         switch (gw->state[i]) {
             case 1:
                 id = BTL_TEX(0x3E);
@@ -472,7 +453,7 @@ static void actionCommandDisp(f32 x, f32 y) {
 
     {
         Mtx m3; Mtx m1; Mtx m2;
-        s32 num = ac->outputParams[0] + ((GT2Params*)ac)->bonus;
+        s32 num = ac->outputParams[0] + ac->params[3];
         PSMTXTrans(m1, -200.0f + x + ((f32)gw->width) - 60.0f, y1, 0.0f);
         PSMTXScale(m2, 1.0f, 1.0f, 1.0f);
         PSMTXConcat(m1, m2, m3);

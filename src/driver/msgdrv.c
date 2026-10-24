@@ -250,13 +250,13 @@ void msgLoad(const char* filename, s32 index) {
 			msgptr += strlen(msgptr) + 1;
 			msgcount++;
 		}
-		entry->count = (u32)(msgcount / 2); //tag, message
+		entry->count = msgcount / 2; //tag, message
 	}
 
 	if (entry->lookup) {
 		smartFree(entry->lookup);
 	}
-	if (!*(s32*)&entry->count) {
+	if (!entry->count) {
 		entry->lookup = NULL;
 	}
 	else {
@@ -264,7 +264,7 @@ void msgLoad(const char* filename, s32 index) {
 		entry->lookup = smartAlloc(entry->count * sizeof(MsgLookupEntry), 0);
 		str = entry->address;
 		lookup = entry->lookup->address;
-		for (i = 0; i < (s32)entry->count; i++, lookup++) {
+		for (i = 0; i < entry->count; i++, lookup++) {
 			lookup->startaddr = ofs;
 			ofs += strlen(str) + 1;
 			str += strlen(str) + 1;
@@ -457,17 +457,6 @@ s32 msgMain(smartEntry* smart) {
 	return 3;
 }
 
-typedef struct MsgDispChar {
-	u32 value; //0x0
-	u16 glyph; //0x4
-	s16 x; //0x6
-	s16 y; //0x8
-	s16 iconY; //0xA
-	u32 time; //0xC
-	f32 scale; //0x10
-	f32 rot; //0x14
-} MsgDispChar;
-
 double cos(double);
 double sin(double);
 void FontDrawNoise(void);
@@ -502,7 +491,7 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 	s32 hide;
 	s32 w;
 	MsgWinData* data = smart->address;
-	MsgDispChar* c = (MsgDispChar*)data->entries;
+	MsgChar* c = data->entries;
 	s32 i;
 	BOOL ret = FALSE;
 	u8 a;
@@ -525,7 +514,7 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 				}
 				break;
 			case 0xFFF7:
-				FontDrawColor(*(GXColor*)&c->value);
+				FontDrawColor(c->color);
 				break;
 			case 0xFFF6:
 				if (c->value) {
@@ -769,17 +758,6 @@ u16 hankakuSearch(s32 c);
 u16 hankakuSearch(char c);
 #endif
 
-typedef struct MsgAChar {
-	u32 value; //0x0
-	u16 glyph; //0x4
-	s16 x; //0x6
-	s16 y; //0x8
-	s16 extra; //0xA
-	s32 time; //0xC
-	f32 scale; //0x10
-	f32 dyn; //0x14
-} MsgAChar;
-
 /* FAKE: opt_lifetimes off keeps total as one web, so the rubyW conversion int shares the loop-1 accumulator register
    as in the target. The webs the target does split are split by hand: glyphD, wwD, wwR and kR (declared first so they take
    the numbers of the split temps). See FAKES.md */
@@ -811,7 +789,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	s32 ys[1];
 	s32 yx[1];
 	WindowEntry* window;
-	MsgAChar* entry;
+	MsgChar* entry;
 	s32 check;
 	u16 glyph;
 	s16 x;
@@ -871,7 +849,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 
 	data = smart->address;
 	window = data->window;
-	entry = (MsgAChar*)(&data->entries[data->charCount]);
+	entry = &data->entries[data->charCount];
 	flags = 0;
 	maxScale = EXT_LIT(float_0_8041a514, 0.0f);
 #ifdef VERSION_G8ME01
@@ -945,7 +923,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->value |= 8;
 			}
 			if (( flags & 1) != 0 ) {
-				entry->dyn = fv;
+				entry->rot = fv;
 			}
 #ifdef VERSION_G8ME01
 			if (maxScale < scale.y) {
@@ -1243,7 +1221,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					x += 0x28;
 #endif
 					entry->y = y - ( ih * iconScale) ;
-					entry->extra = i34;
+					entry->iconY = i34;
 					entry->scale = iconScale;
 					entry->time = time;
 					entry++;
@@ -1276,7 +1254,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					entry->value |= 8;
 					if (flags & 1) {
 
-						entry->dyn = fv;
+						entry->rot = fv;
 					}
 #ifdef VERSION_G8ME01
 					if (maxScale < scale.y) {
@@ -1307,7 +1285,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->x = i28;
 				entry->y = s234 - i24;
 				entry->scale = f1c;
-				entry->dyn = (i20 == 0) ? ( EXT_LIT(float_0_8041a514, 0.0f) ) : ( EXT_LIT(float_180_8041a568, 180.0f)) ;
+				entry->rot = (i20 == 0) ? ( EXT_LIT(float_0_8041a514, 0.0f) ) : ( EXT_LIT(float_180_8041a568, 180.0f)) ;
 				entry++;
 				time += step;
 				data->charCount++;
@@ -1390,7 +1368,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 #endif
 					entry->value = flags;
 					if (fp[0]) {
-						entry->dyn = fv;
+						entry->rot = fv;
 					}
 					fx[0] = fp[0];
 					yx[0] = ys[0];
@@ -1430,7 +1408,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->value |= 8;
 			}
 			if (flags & 1) {
-				entry->dyn = fv;
+				entry->rot = fv;
 			}
 #ifdef VERSION_G8ME01
 			if (maxScale < scale.y) {
@@ -1484,7 +1462,7 @@ const char* msgSearch(const char* tag) {
 			max = entry->count;
 			while (max >= j) {
 				index = (j + max) / 2; //tag, message
-				if (index >= (s32)entry->count) {
+				if (index >= entry->count) {
 					break;
 				}
 				result = strcmp(tag, (const char*)((u32)entry->address + lookup[index].startaddr));
@@ -1930,7 +1908,7 @@ void msgWindow_Main(WindowEntry* window) {
 		}
 		break;
 	}
-	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->priority, 0, msgWindow_Disp, window);
+	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - window->priority, 0, msgWindow_Disp, window);
 }
 
 #pragma opt_common_subs reset
@@ -1993,7 +1971,7 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 		}
 		break;
 	}
-	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->priority, 0, msgWindow_Disp, window);
+	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - window->priority, 0, msgWindow_Disp, window);
 }
 
 void msgWindow_Disp(CameraId camId, void* param) {
@@ -2173,7 +2151,7 @@ void selectWindow_Main(WindowEntry* window) {
 	case 4:
 		return;
 	}
-	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->priority, 0, selectWindow_Disp, window);
+	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - window->priority, 0, selectWindow_Disp, window);
 }
 
 void selectWindow_Disp(CameraId camId, void* param) {

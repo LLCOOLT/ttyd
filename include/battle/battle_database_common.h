@@ -13,7 +13,7 @@ typedef struct BattleWeapon {
     s8 baseAccuracy;                  // 0x10
     s8 baseFpCost;                    // 0x11
     s8 baseSpCost;                    // 0x12
-    s8 superguardsAllowed;            // 0x13
+    u8 superguardsAllowed;            // 0x13
     f32 reserved_14;                  // 0x14, 1.0f in every weapon table, never read
     s8 mStylishCommandMultiplier;     // 0x18
     s8 reserved_19;                   // 0x19, 1 (5 on player moves); copied to StarPowerInfo.weaponParam, never read
@@ -25,8 +25,8 @@ typedef struct BattleWeapon {
     u32 fpDamageWork[8];              // 0x44
     u32 targetClassFlags;             // 0x64
     u32 targetPropertyFlags;          // 0x68
-    s8 element;                       // 0x6C
-    s8 damagePattern;                 // 0x6D
+    u8 element;                       // 0x6C
+    u8 damagePattern;                 // 0x6D
     s8 acLevel;                       // 0x6E
     s8 reserved_6F;                   // 0x6F, 2 in every weapon table, never read
     const char* acHelpMsg;            // 0x70
@@ -44,9 +44,9 @@ typedef struct BattleWeapon {
     s8 poisonStrength;                // 0x88
     u8 confuseChance;                 // 0x89
     s8 confuseTime;                   // 0x8A
-    s8 electricChance;                // 0x8B
+    u8 electricChance;                // 0x8B
     s8 electricTime;                  // 0x8C
-    s8 dodgyChance;                   // 0x8D
+    u8 dodgyChance;                   // 0x8D
     s8 dodgyTime;                     // 0x8E
     u8 burnChance;                    // 0x8F
     s8 burnTime;                      // 0x90
@@ -72,7 +72,7 @@ typedef struct BattleWeapon {
     u8 frightChance;                  // 0xA4
     u8 galeForceChance;               // 0xA5
     s8 paybackTime;                   // 0xA6
-    u8 holdFastTime;                  // 0xA7
+    s8 holdFastTime;                  // 0xA7
     u8 invisibleChance;               // 0xA8
     s8 invisibleTime;                 // 0xA9
     s8 hpRegenTime;                   // 0xAA

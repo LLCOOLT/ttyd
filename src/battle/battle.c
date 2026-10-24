@@ -512,7 +512,7 @@ void BtlUnit_EquipItem(BattleUnit* unit, EquipFlags flags, ItemType type) {
     if (unit) {
         if (flags & EQUIP_RESET) {
             for (i = 0; i < 40; i++) {
-                ((u8*)unit)[i + offsetof(BattleUnit, badgesEquipped)] = FALSE;
+                unit->badgeCounts[i] = FALSE;
             }
         }
 

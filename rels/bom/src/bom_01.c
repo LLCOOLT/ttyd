@@ -1,4 +1,5 @@
 #include "version.h"
+#include "eff/eff_starstone.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -23,6 +24,7 @@
 #include "stdio.h"
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
+#include "driver/extdrv.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_door.h"
 #include "evt/evt_sub.h"
@@ -78,14 +80,12 @@ void drawNum(s32 num, s32 digits, f32 x, f32 y, f32 scale);
 void drawNum(s32 num, s32 digits, f32 x, f32 y, f32 scale);
 void disp_sight(CameraId camera, void* param);
 void disp_sight(CameraId camera, void* param);
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct ExtAnimDef { const char* file; const char* name; f32 time; } ExtAnimDef;
 typedef struct BomAnim { char name[8]; f32 time; s32 start; s32 count; } BomAnim;
 typedef struct Bom { u8 state; u8 next; u8 pad_2[2]; Vec target; f32 field_0x10; f32 gravity; s16 timer; u8 pad_1a[2]; f32 vy; s32 anim; u8 pad_24[4]; OSTime time; } Bom;
 typedef struct BomWork { u16 flags; u8 pad_2[2]; s32 count; BomAnim anims[8]; s32 animCount; u8 pad_ac[4]; Bom bom[1000]; } BomWork;
 smartEntry* lp;
 #define EXT_DATA ((ExtAnimDef*)ext_data)
-ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
 static void pose_change(s32 i, const char* name);
 static void pose_change(s32 i, const char* name);
@@ -557,14 +557,14 @@ s32 bom_flag(EventEntry* event, BOOL isFirstCall) {
 
 s32 bom_fall(EventEntry* event, BOOL isFirstCall) {
     BomWork* wp = lp->address;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     s32 i;
 
     for (i = 0; i < wp->count; i++, pose++) {
         wp->bom[i].state = 127;
-        pose->mtx[0][3] = 600.0f * rand() / 32767.0f;
-        pose->mtx[1][3] = 300.0f + 3700.0f * rand() / 32767.0f;
-        pose->mtx[2][3] = -650.0f + -450.0f * rand() / 32767.0f;
+        (*pose->mtx)[0][3] = 600.0f * rand() / 32767.0f;
+        (*pose->mtx)[1][3] = 300.0f + 3700.0f * rand() / 32767.0f;
+        (*pose->mtx)[2][3] = -650.0f + -450.0f * rand() / 32767.0f;
         pose_change(i, "S_2");
     }
     return EVT_RETURN_DONE;
@@ -578,7 +578,7 @@ static void pose_main(void) {
     OSTime now;
     BomWork* wp = lp->address;
     s32 i;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     f32 t;
 
     for (i = 0; i < wp->count; i++, pose++) {
@@ -590,7 +590,7 @@ static void pose_main(void) {
             wp->bom[i].time = now;
             t = 0.0f;
         }
-        pose->frame = a->start + (s32)((a->count - 1) * t);
+        pose->texId = a->start + (s32)((a->count - 1) * t);
     }
 }
 
@@ -821,7 +821,7 @@ EVT_END()
 static void ext_init(void) {
     s32 i;
     BomWork* wp;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     f32 angle;
     f32 dist;
 
@@ -837,12 +837,12 @@ static void ext_init(void) {
         wp->bom[i].gravity = 0.0f;
         wp->bom[i].state = 0;
         pose->flags |= 7;
-        PSMTXIdentity(pose->mtx);
+        PSMTXIdentity(*pose->mtx);
         angle = 6.2831855f * rand() / 32767.0f;
         dist = 500.0f + 400.0f * rand() / 32767.0f;
-        pose->mtx[0][3] = dist * chb_sin(angle);
-        pose->mtx[1][3] = 0.0f;
-        pose->mtx[2][3] = dist * chb_cos(angle);
+        (*pose->mtx)[0][3] = dist * chb_sin(angle);
+        (*pose->mtx)[1][3] = 0.0f;
+        (*pose->mtx)[2][3] = dist * chb_cos(angle);
         pose_change(i, "R_1");
     }
 }
@@ -860,23 +860,23 @@ static void ext_disp(CameraId camera, void* param) {
 
 void jump(s32 i, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
     BomWork* wp = lp->address;
-    ExtPose* pose = extGetPosePtr() + i;
+    ExtdrvPose* pose = extGetPosePtr() + i;
     f32 dy;
     f32 dist;
 
     wp->bom[i].target = (Vec){x, y, z};
     wp->bom[i].field_0x10 = speed;
     wp->bom[i].gravity = gravity;
-    dy = y - pose->mtx[1][3];
-    dist = distABf(pose->mtx[0][3], pose->mtx[2][3], x, z);
-    angleABf(pose->mtx[0][3], pose->mtx[2][3], x, z);
+    dy = y - (*pose->mtx)[1][3];
+    dist = distABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], x, z);
+    angleABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], x, z);
     wp->bom[i].timer = dist / wp->bom[i].field_0x10;
     wp->bom[i].vy = dy / wp->bom[i].timer + wp->bom[i].gravity * wp->bom[i].timer / 2;
     wp->bom[i].next = next;
     wp->bom[i].state = 100;
-    pose->rot = angleABf(x, z, pose->mtx[0][3], pose->mtx[2][3]);
+    pose->dir = angleABf(x, z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
     if (i % 20 == 0 && !(wp->flags & 1)) {
-        Vec pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+        Vec pos = (Vec){(*pose->mtx)[0][3], (*pose->mtx)[1][3], (*pose->mtx)[2][3]};
         // FAKE: (char*)(u32) cast makes the front end hoist the literal address (same pointer value)
         psndSFXOn_3D((char*)(u32)"SFX_STG7_BOMB_TOGETHER2", &pos);
     }
@@ -888,7 +888,7 @@ static void ext_main(void) {
     
     s32 i;
     BomWork* wp = lp->address;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     f32 z;
     f32 speed;
     f32 gravity;
@@ -902,7 +902,7 @@ static void ext_main(void) {
 
     for (i = 0; i < wp->count; i++, pose++) {
         Vec center = {0.0f, 0.0f, 0.0f};
-        Vec pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+        Vec pos = (Vec){(*pose->mtx)[0][3], (*pose->mtx)[1][3], (*pose->mtx)[2][3]};
         Vec move = {0.0f, 0.0f, 0.0f};
         Vec dir;
 
@@ -913,10 +913,10 @@ static void ext_main(void) {
                     PSVECNormalize(&dir, &dir);
                     PSVECScale(&dir, &move, 3.0f);
                     PSVECAdd(&pos, &move, &pos);
-                    pose->mtx[0][3] = pos.x;
-                    pose->mtx[1][3] = pos.y;
-                    pose->mtx[2][3] = pos.z;
-                    pose->rot = angleABf(0.0f, 0.0f, pos.x, pos.z);
+                    (*pose->mtx)[0][3] = pos.x;
+                    (*pose->mtx)[1][3] = pos.y;
+                    (*pose->mtx)[2][3] = pos.z;
+                    pose->dir = angleABf(0.0f, 0.0f, pos.x, pos.z);
                 } else {
                     wp->bom[i].state++;
                 }
@@ -956,31 +956,31 @@ static void ext_main(void) {
             case 5:
                 break;
             case 100:
-                pose->mtx[1][3] += wp->bom[i].vy;
+                (*pose->mtx)[1][3] += wp->bom[i].vy;
                 wp->bom[i].vy -= wp->bom[i].gravity;
-                rad = ( 3.1415927f * angleABf(pose->mtx[0][3], pose->mtx[2][3], wp->bom[i].target.x, wp->bom[i].target.z) ) / 180.0f;
-                pose->mtx[0][3] += wp->bom[i].field_0x10 * chb_sin(rad);
-                pose->mtx[2][3] += wp->bom[i].field_0x10 * ( -chb_cos(rad)) ;
+                rad = ( 3.1415927f * angleABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], wp->bom[i].target.x, wp->bom[i].target.z) ) / 180.0f;
+                (*pose->mtx)[0][3] += wp->bom[i].field_0x10 * chb_sin(rad);
+                (*pose->mtx)[2][3] += wp->bom[i].field_0x10 * ( -chb_cos(rad)) ;
                 if ( (--wp->bom[i].timer ) < 0) {
-                    pose->mtx[0][3] = wp->bom[i].target.x;
-                    pose->mtx[1][3] = wp->bom[i].target.y;
-                    pose->mtx[2][3] = wp->bom[i].target.z;
+                    (*pose->mtx)[0][3] = wp->bom[i].target.x;
+                    (*pose->mtx)[1][3] = wp->bom[i].target.y;
+                    (*pose->mtx)[2][3] = wp->bom[i].target.z;
                     wp->bom[i].state = wp->bom[i].next;
                 }
                 break;
             case 127:
-                if (pose->mtx[1][3] > ( -1000.0f) ) { // correctness: target tests y (lfs f2,0x1c), not z
-                    pose->mtx[1][3] = pose->mtx[1][3] - 2.0f;
+                if ((*pose->mtx)[1][3] > ( -1000.0f) ) { // correctness: target tests y (lfs f2,0x1c), not z
+                    (*pose->mtx)[1][3] = (*pose->mtx)[1][3] - 2.0f;
                     pose->flags &= ~2;
                     PSMTXTrans(m1, 0.0f, -20.0f, 0.0f);
                     new_var2 = (f32)sin((i + gp->retraceCount) / 100.0f); PSMTXRotRad(m2, 'z', 0.017453292f * (10.0f * new_var2));
                     PSMTXTrans(m3, 0.0f, 20.0f, 0.0f);
                     PSMTXConcat(m1, m2, m2);
                     PSMTXConcat(m2, m3, m3);
-                    PSMTXTrans(m1, pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]);
-                    PSMTXConcat(m1, m3, pose->mtx);
+                    PSMTXTrans(m1, (*pose->mtx)[0][3], (*pose->mtx)[1][3], (*pose->mtx)[2][3]);
+                    PSMTXConcat(m1, m3, *pose->mtx);
                     if (irand(100) == 0) {
-                        Vec p = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+                        Vec p = (Vec){(*pose->mtx)[0][3], (*pose->mtx)[1][3], (*pose->mtx)[2][3]};
                         // FAKE: (char*)(u32) cast, see jump()
                         psndSFXOn_3D((char*)(u32)"SFX_STG7_BOMB_FALL1", &p);
                     }
@@ -2383,7 +2383,7 @@ s32 make_ext_table_minnnanokoe(EventEntry* event, BOOL isFirstCall) {
 void ext_init_minnnanokoe(void) {
     s32 i;
     BomWork* wp;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     s32 x;
     s32 z;
 
@@ -2399,22 +2399,22 @@ void ext_init_minnnanokoe(void) {
         wp->bom[i].gravity = 0.0f;
         wp->bom[i].state = 5;
         pose->flags |= 3;
-        PSMTXIdentity(pose->mtx);
+        PSMTXIdentity(*pose->mtx);
         x = (i % 14) * 30 - 205 + rand() % 10;
         z = 190 - (i / 14) * 20 + rand() % 20;
-        pose->mtx[0][3] = x;
-        pose->mtx[1][3] = 0.0f;
-        pose->mtx[2][3] = z;
-        pose->rot = 270.0f;
+        (*pose->mtx)[0][3] = x;
+        (*pose->mtx)[1][3] = 0.0f;
+        (*pose->mtx)[2][3] = z;
+        pose->dir = 270.0f;
         pose_change(i, "S_1");
     }
 }
 
 void jump_minnnanokoe(s32 i, f32 h) {
     BomWork* wp = lp->address;
-    ExtPose* pose = extGetPosePtr() + i;
+    ExtdrvPose* pose = extGetPosePtr() + i;
 
-    wp->bom[i].target = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+    wp->bom[i].target = (Vec){(*pose->mtx)[0][3], (*pose->mtx)[1][3], (*pose->mtx)[2][3]};
     wp->bom[i].field_0x10 = 0.0f;
     wp->bom[i].gravity = 0.1f;
     wp->bom[i].timer = 20;
@@ -2422,7 +2422,7 @@ void jump_minnnanokoe(s32 i, f32 h) {
     wp->bom[i].next = 5;
     wp->bom[i].state = 100;
     if (evtGetValue(NULL, GSW(0)) != 401 && i % 5 == 0) {
-        Vec pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+        Vec pos = (Vec){(*pose->mtx)[0][3], (*pose->mtx)[1][3], (*pose->mtx)[2][3]};
         psndSFXOn_3D("SFX_STG7_BOMB_TOGETHER2", &pos);
     }
 }
@@ -2430,7 +2430,7 @@ void jump_minnnanokoe(s32 i, f32 h) {
 void ext_disp_minnnanokoe(CameraId camera, void* param) {
     YamiParam yp;
     YamiParam* p = &yp;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     s32 i;
 
     extLoadRenderMode();
@@ -2442,7 +2442,7 @@ void ext_disp_minnnanokoe(CameraId camera, void* param) {
         yp.field_0x10 = 1;
         yp.numTexGens = 1;
         yp.numIndStages = 0;
-        yp.mtx = pose->mtx;
+        yp.mtx = *pose->mtx;
         envSetYami(p);
         GXSetNumTexGens(yp.numTexGens);
         GXSetNumTevStages(yp.numTevStages);
@@ -2462,8 +2462,8 @@ s32 bom1000_msg(EventEntry* event, BOOL isFirstCall) {
     s32 flag;
     s32 type = evtGetValue(event, *fa++);
     s32 idx = evtGetValue(event, *fa++);
-    ExtPose* pose = extGetPosePtr();
-    ExtPose* p;
+    ExtdrvPose* pose = extGetPosePtr();
+    ExtdrvPose* p;
     s32 row;
     s32 n;
 
@@ -2480,8 +2480,8 @@ s32 bom1000_msg(EventEntry* event, BOOL isFirstCall) {
     p = &pose[n];
     evtSetValue(event, args[0], flag);
     evtSetValue(event, args[1], idx);
-    evtSetFloat(event, fa[0], p->mtx[0][3]);
-    evtSetFloat(event, fa[1], p->mtx[2][3]);
+    evtSetFloat(event, fa[0], (*p->mtx)[0][3]);
+    evtSetFloat(event, fa[1], (*p->mtx)[2][3]);
     return EVT_RETURN_DONE;
 }
 
@@ -2542,9 +2542,9 @@ static s32 starstone_set_pos(EventEntry* event, BOOL isFirstCall) {
     f32 z = evtGetFloat(event, args[3]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[2] = x;
-    ((f32*)eff->userdata)[3] = y;
-    ((f32*)eff->userdata)[4] = z;
+    ((EffStarStoneWork*)eff->userdata)->position.x = x;
+    ((EffStarStoneWork*)eff->userdata)->position.y = y;
+    ((EffStarStoneWork*)eff->userdata)->position.z = z;
     return EVT_RETURN_DONE;
 }
 
@@ -2553,7 +2553,7 @@ static s32 starstone_set_ry(EventEntry* event, BOOL isFirstCall) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 ry = evtGetFloat(event, args[1]);
 
-    ((f32*)effNameToPtr(name)->userdata)[7] = ry;
+    ((EffStarStoneWork*)effNameToPtr(name)->userdata)->rotY = ry;
     return EVT_RETURN_DONE;
 }
 

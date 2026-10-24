@@ -1,6 +1,7 @@
 #include "mario/mario.h"
 #include "mario/mario_party.h"
 #include "driver/itemdrv.h"
+#include "driver/mobjdrv.h"
 #include "party.h"
 #include "pmario_sound.h"
 #include "system.h"
@@ -42,7 +43,6 @@ void sincosf(f32* ret_sin, f32* ret_cos, f32 degree);
 f32 toMovedir(f32 angle);
 #define EXT_LIT(sym, val) (val)
 extern ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range);
-extern void* mobjHitObjPtrToPtr(HitEntry* hit);
 extern void marioChkWallAround(Vec* pos, s32 a1, f32 a2, f32 angle, f32 radius, f32 height);
 #ifdef VERSION_G8ME01
 void partyChkWallAround(PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 width, f32 height);
@@ -194,11 +194,6 @@ void nokonoko_use_post(PartyEntry* party) {
     party->work.nokonoko.word180 = 0;
 }
 
-typedef struct NokoPad94 {
-    u8 pad[0x94];
-    Vec v;
-} NokoPad94;
-#define PV(p, o) (((NokoPad94*)(p))->v)
 
 static inline void noko_se_off(void) {
     marioGetPtr();
@@ -300,12 +295,12 @@ void nokonoko_use(PartyEntry* party) {
         party->work.nokonoko.dashed = 0;
         marioAdjustMoveDir();
         mario->baseSpeed = EXT_LIT(float_0_8041b51c, 0.0f);
-        PV(party, 0x94) = mario->position;
+        party->moveTarget = mario->position;
         movePos(&party->moveTarget.x, &party->moveTarget.z, EXT_LIT(float_2_8041b55c, 2.0f), toMovedirSimple(mario->displayDirectionTarget));
         party->moveFrames = 4;
         party->velY = EXT_LIT(float_0_8041b51c, 0.0f);
-        party->targetDir = angleABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
-        party->moveSpeed = distABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z) /
+        party->targetDir = angleABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z);
+        party->moveSpeed = distABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z) /
                            (f32)party->moveFrames;
         party->displayDirection = revise360(EXT_LIT(float_45_8041b560, 45.0f) + party->displayDirection);
         party->useMotionId = 1;
@@ -319,13 +314,13 @@ void nokonoko_use(PartyEntry* party) {
             break;
         }
         party->displayDirection = revise360(EXT_LIT(float_45_8041b560, 45.0f) + party->displayDirection);
-        party->position.x += (PV(party, 0x94).x - party->position.x) / (f32)party->moveFrames;
-        party->position.y += (PV(party, 0x94).y - party->position.y) / (f32)party->moveFrames;
-        party->position.z += (PV(party, 0x94).z - party->position.z) / (f32)party->moveFrames;
+        party->position.x += (party->moveTarget.x - party->position.x) / (f32)party->moveFrames;
+        party->position.y += (party->moveTarget.y - party->position.y) / (f32)party->moveFrames;
+        party->position.z += (party->moveTarget.z - party->position.z) / (f32)party->moveFrames;
         if (--party->moveFrames > 0) {
             break;
         }
-        party->position = PV(party, 0x94);
+        party->position = party->moveTarget;
         party->moveSpeed = EXT_LIT(float_0_8041b51c, 0.0f);
         party->displayDirectionTarget = mario->displayDirectionTarget;
         party->displayDirection = mario->displayDirectionTarget;
@@ -459,7 +454,7 @@ void nokonoko_use(PartyEntry* party) {
         partyClearJumpPara(party);
         party->useMotionId = 51;
         party->moveSpeed = EXT_LIT(float_0_8041b51c, 0.0f);
-        party->targetDir = angleABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
+        party->targetDir = angleABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z);
         psndSFXOn_3D((const char*)0x92b, &party->position);
         break;
     case 51: {
@@ -509,23 +504,23 @@ void nokonoko_use(PartyEntry* party) {
         (*(f32*)new_var) -= party->moveSpeed;
         if (party->moveSpeed <= EXT_LIT(float_0_8041b51c, 0.0f)) {
             party->moveSpeed = 0.0f;
-            flags = lookupSafetyPos(PV(party, 0x94), party->height, &out);
+            flags = lookupSafetyPos(party->moveTarget, party->height, &out);
             if (party->hitobjStandOn != NULL && ((u32)(flags - 1) <= 1 || flags == 4 || flags == 8)) {
                 party->useMotionId = 70;
                 break;
             }
             switch (flags) {
             case 3:
-                lookupSafetyPosSub(PV(party, 0x94), party->height, EXT_LIT(float_135_8041b594, 135.0f), &out);
+                lookupSafetyPosSub(party->moveTarget, party->height, EXT_LIT(float_135_8041b594, 135.0f), &out);
                 break;
             case 5:
-                lookupSafetyPosSub(PV(party, 0x94), party->height, EXT_LIT(float_315_8041b598, 315.0f), &out);
+                lookupSafetyPosSub(party->moveTarget, party->height, EXT_LIT(float_315_8041b598, 315.0f), &out);
                 break;
             case 10:
-                lookupSafetyPosSub(PV(party, 0x94), party->height, EXT_LIT(float_225_8041b59c, 225.0f), &out);
+                lookupSafetyPosSub(party->moveTarget, party->height, EXT_LIT(float_225_8041b59c, 225.0f), &out);
                 break;
             case 12:
-                lookupSafetyPosSub(PV(party, 0x94), party->height, EXT_LIT(float_315_8041b598, 315.0f), &out);
+                lookupSafetyPosSub(party->moveTarget, party->height, EXT_LIT(float_315_8041b598, 315.0f), &out);
                 break;
             case 7:
             case 14:
@@ -533,19 +528,19 @@ void nokonoko_use(PartyEntry* party) {
                 party->useMotionId = 70;
                 break;
             case 1:
-                lookupSafetyPosSub(PV(party, 0x94), party->height, EXT_LIT(float_270_8041b5a0, 270.0f), &out);
+                lookupSafetyPosSub(party->moveTarget, party->height, EXT_LIT(float_270_8041b5a0, 270.0f), &out);
                 break;
             case 8:
-                lookupSafetyPos3(PV(party, 0x94), party->height, &out);
+                lookupSafetyPos3(party->moveTarget, party->height, &out);
                 break;
             default:
-                lookupSafetyPos2(PV(party, 0x94), party->height, &out);
+                lookupSafetyPos2(party->moveTarget, party->height, &out);
                 break;
             }
             party->useMotionId = 54;
-            PV(party, 0x94) = out;
-            (*(f32*)new_var) = distABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
-            party->targetDir = angleABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
+            party->moveTarget = out;
+            (*(f32*)new_var) = distABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z);
+            party->targetDir = angleABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z);
         }
         break;
     case 54:
@@ -609,7 +604,7 @@ void nokonoko_use(PartyEntry* party) {
     case 80:
         party->useMotionId = 81;
         party->moveSpeed = EXT_LIT(float_0_8041b51c, 0.0f);
-        party->targetDir = angleABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
+        party->targetDir = angleABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z);
         (*(f32*)new_var) += EXT_LIT(float_75_8041b5b0, 75.0f);
         psndSFXOn_3D((const char*)0x92b, &party->position);
     case 81:
@@ -644,10 +639,10 @@ void nokonoko_use(PartyEntry* party) {
         }
         (*(f32*)new_var) -= party->moveSpeed;
         if ((*(f32*)new_var) <= EXT_LIT(float_0_8041b51c, 0.0f)) {
-            (*(f32*)new_var) = distABf(PV(party, 0x94).x, PV(party, 0x94).z, party->position.x, party->position.z);
+            (*(f32*)new_var) = distABf(party->moveTarget.x, party->moveTarget.z, party->position.x, party->position.z);
             party->useMotionId = 84;
             party->work.yoshi.gravityAccel = EXT_LIT(float_50_8041b56c, 50.0f);
-            party->targetDir = angleABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
+            party->targetDir = angleABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z);
         }
         break;
     case 84:
@@ -704,23 +699,23 @@ void nokonoko_use(PartyEntry* party) {
         return;
     case 88:
         party->moveSpeed = EXT_LIT(float_0_8041b51c, 0.0f);
-        flags = lookupSafetyPos(PV(party, 0x94), party->height, &out2);
+        flags = lookupSafetyPos(party->moveTarget, party->height, &out2);
         if (party->hitobjStandOn != NULL && ((u32)(flags - 1) <= 1 || flags == 4 || flags == 8)) {
             party->useMotionId = 70;
             break;
         }
         switch (flags) {
         case 3:
-            lookupSafetyPosSub(PV(party, 0x94), party->height, EXT_LIT(float_135_8041b594, 135.0f), &out2);
+            lookupSafetyPosSub(party->moveTarget, party->height, EXT_LIT(float_135_8041b594, 135.0f), &out2);
             break;
         case 5:
-            lookupSafetyPosSub(PV(party, 0x94), party->height, EXT_LIT(float_315_8041b598, 315.0f), &out2);
+            lookupSafetyPosSub(party->moveTarget, party->height, EXT_LIT(float_315_8041b598, 315.0f), &out2);
             break;
         case 10:
-            lookupSafetyPosSub(PV(party, 0x94), party->height, EXT_LIT(float_225_8041b59c, 225.0f), &out2);
+            lookupSafetyPosSub(party->moveTarget, party->height, EXT_LIT(float_225_8041b59c, 225.0f), &out2);
             break;
         case 12:
-            lookupSafetyPosSub(PV(party, 0x94), party->height, EXT_LIT(float_315_8041b598, 315.0f), &out2);
+            lookupSafetyPosSub(party->moveTarget, party->height, EXT_LIT(float_315_8041b598, 315.0f), &out2);
             break;
         case 7:
         case 14:
@@ -728,19 +723,19 @@ void nokonoko_use(PartyEntry* party) {
             party->useMotionId = 70;
             break;
         case 1:
-            lookupSafetyPosSub(PV(party, 0x94), party->height, EXT_LIT(float_270_8041b5a0, 270.0f), &out2);
+            lookupSafetyPosSub(party->moveTarget, party->height, EXT_LIT(float_270_8041b5a0, 270.0f), &out2);
             break;
         case 8:
-            lookupSafetyPos3(PV(party, 0x94), party->height, &out2);
+            lookupSafetyPos3(party->moveTarget, party->height, &out2);
             break;
         default:
-            lookupSafetyPos2(PV(party, 0x94), party->height, &out2);
+            lookupSafetyPos2(party->moveTarget, party->height, &out2);
             break;
         }
         party->useMotionId = 90;
-        PV(party, 0x94) = out2;
-        (*(f32*)new_var) = distABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
-        party->targetDir = angleABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
+        party->moveTarget = out2;
+        (*(f32*)new_var) = distABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z);
+        party->targetDir = angleABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z);
         party->work.yoshi.gravityAccel = EXT_LIT(float_50_8041b56c, 50.0f);
         break;
     case 90:

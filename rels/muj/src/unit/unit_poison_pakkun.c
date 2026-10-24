@@ -12,10 +12,10 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "battle/battle_database_common.h"
+#include "eff/n64/eff_vapor_n64.h"
 
 f32 intplGetValue(f32 start, f32 end, s32 mode, s32 currStep, s32 steps);
 s32 irand(s32 scalar);
-EffectEntry* effVaporN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 delay);
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -792,7 +792,7 @@ static USER_FUNC(eff_poison_breath) {
     f32 y;
     f32 z;
     EffectEntry* eff;
-    s32* wk;
+    EffVaporN64Work* wk;
 
     if (evtGetValue(event, event->args[0]) == 0) {
         x = -125.0f;
@@ -802,15 +802,15 @@ static USER_FUNC(eff_poison_breath) {
     x += irand(150) - 75;
     y = irand(70);
     z = irand(80) - 40;
-    eff = effVaporN64Entry(0, x, y, z, 2.5f + rand() / 32767.0f, 15);
+    eff = effVaporN64Entry(0, 15, x, y, z, 2.5f + rand() / 32767.0f);
     wk = eff->userdata;
-    wk[6] = 32;
-    wk[7] = 115;
-    wk[8] = 100;
-    wk[9] = 255;
-    wk[10] = 32;
-    wk[11] = 115;
-    wk[12] = 100;
-    wk[13] = 255;
+    wk->r1 = 32;
+    wk->g1 = 115;
+    wk->b1 = 100;
+    wk->alpha = 255;
+    wk->r2 = 32;
+    wk->g2 = 115;
+    wk->b2 = 100;
+    wk->a2 = 255;
     return EVT_RETURN_DONE;
 }

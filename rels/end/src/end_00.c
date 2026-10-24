@@ -27,11 +27,11 @@
 #include "dolphin/mtx.h"
 #include "evt/evt_memcard.h"
 #include "end.h"
+#include "driver/extdrv.h"
 #ifdef VERSION_G8ME01
 #endif
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct EndMoa { Vec pos; s32 chain; s32 idx; } EndMoa;
 typedef struct EndExtData { const char* anim; const char* pose; f32 speed; } EndExtData;
 typedef struct EndWork { FileEntry* tpl; s32 mode; s32 alpha; s32 alpha2; s32 tevAlpha; s32 win1[3]; s32 win2[3]; s32 field_0x2c; s32 pos; EventEntry* evt; } EndWork;
@@ -47,15 +47,6 @@ extern EndWork* end_wp;
 extern CreditMsg end_staff_roll_msg_tbl[50];
 extern CreditNpc R_credits_npc_info[152];
 extern const char* g_moamoa_chain_tbl[][2];
-ExtPose* extGetPosePtr(void);
-s32 extGetPoseNum(void);
-void extReset(void);
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
 int rand(void);
 double tan(double x);
 static inline f32 tanf(f32 x) { return tan(x); }
@@ -1392,14 +1383,14 @@ f32 end_randf(f32 min, f32 max) {
 }
 
 void end_ext_moamoa_init(void) {
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     EndMoa* elem = end_moa_tbl;
     s32 i;
     Vec v;
 
     for (i = 0; i < extGetPoseNum(); i++, pose++, elem++) {
         pose->flags |= 5;
-        PSMTXIdentity(pose->mtx);
+        PSMTXIdentity(*pose->mtx);
         v = (Vec){0.0f, 0.0f, 0.0f};
         v.x = end_randf(-10.0f, 10.0f);
         v.y = end_randf(-10.0f, 10.0f);
@@ -1414,7 +1405,7 @@ void end_ext_moamoa_main(void) {
     NpcEntry* npc = npcNameToPtr("\203\202\203A\203\202\203A");
     Vec* wpos = *animPoseGetAnimPosePtr(npc->poseId)->worldPositions;
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     EndMoa* elem;
     AnimationPose* ap;
     Vec* p;
@@ -1452,8 +1443,8 @@ void end_ext_moamoa_main(void) {
         PSMTXScale(m2, npc->scale.x, npc->scale.y, npc->scale.z);
         PSMTXConcat(m1, m2, m1);
         PSMTXTrans(m3, elem->pos.x, elem->pos.y, elem->pos.z);
-        PSMTXConcat(m1, m3, pose->mtx);
-        pose->frame = (gp->retraceCount + i) % 40;
+        PSMTXConcat(m1, m3, *pose->mtx);
+        pose->texId = (gp->retraceCount + i) % 40;
     }
     ap = animPoseGetAnimPosePtr(npc->poseId);
     n = ap->numWorldPositions;

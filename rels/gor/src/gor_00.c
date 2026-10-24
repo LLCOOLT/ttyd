@@ -1,4 +1,5 @@
 #include "version.h"
+#include "eff/eff_funemizu.h"
 #pragma dollar_identifiers on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -28,6 +29,7 @@
 #include "gor.h"
 #include "data_tables.h"
 #include "driver/hitdrv.h"
+#include "driver/msgdrv.h"
 
 s32 marioShipChanging(void);
 void mapGrpFlagOn(const char* name, u32 flags);
@@ -35,12 +37,8 @@ void mapGrpFlagOff(const char* name, u32 flags);
 EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5);
 EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 void mapObjGetPos(const char* name, Vec* pos);
-typedef struct GorCbInfo { u8 field_0x0[0x8]; u16 field_0x8; } GorCbInfo;
-typedef struct NanNpc { u8 field_0x0[0x18]; Vec pos; Vec posA; Vec posB; u8 field_0x3C[0x50 - 0x3C]; OSTime time; u8 field_0x58[0x60 - 0x58]; f32 dir; void (*func)(struct NanNpc*); s32 state; s32 work6C; s32 work70; s32 work74; f32 work78; f32 work7C; f32 work80; u8 field_0x84[0x88 - 0x84]; Vec posC; u8 field_0x94[0xA4 - 0x94]; s32 workA4; s32 workA8; u8 field_0xAC[0xC0 - 0xAC]; } NanNpc;
-typedef struct NanNpcWork { NanNpc* entries; u8 field_0x4[0xC - 0x4]; s32 count; } NanNpcWork;
-extern NanNpcWork* nanNPCWork;
-void suifu100taikikan_seq01(NanNpc* npc);
-void suifu100taikikan_seq00(NanNpc* npc);
+void suifu100taikikan_seq01(NanNPC* npc);
+void suifu100taikikan_seq00(NanNPC* npc);
 typedef struct KaitenParam { Vec pos; Vec target; f32 angle; f32 dist; } KaitenParam;
 u32 gap_05_0000001C_bss;
 static u8* _ap;
@@ -52,9 +50,8 @@ double sin(double x);
 double cos(double x);
 double atan2(double y, double x);
 static inline f32 fid(f32 x) { return x; }
-void evt_nannpc_set_animtbl_sub(NanNpc* npc, void* animtbl);
-void gundan1000tai_seq01(NanNpc* npc);
-void gundan1000tai_seq00(NanNpc* npc);
+void gundan1000tai_seq01(NanNPC* npc);
+void gundan1000tai_seq00(NanNPC* npc);
 
 USER_FUNC(L_evt_pouch_get_hp);
 USER_FUNC(L_evt_pouch_set_hp);
@@ -263,11 +260,11 @@ USER_FUNC(unitwincoin_wait);
 USER_FUNC(npc_all_delete);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
-void gor_stg4_018_cb(s32 type, GorCbInfo** param);
-void suifu100taikikan_seq01(NanNpc* npc);
-void suifu100taikikan_seq00(NanNpc* npc);
-void gundan1000tai_seq01(NanNpc* npc);
-void gundan1000tai_seq00(NanNpc* npc);
+void gor_stg4_018_cb(s32 type, smartEntry* smart);
+void suifu100taikikan_seq01(NanNPC* npc);
+void suifu100taikikan_seq00(NanNPC* npc);
+void gundan1000tai_seq01(NanNPC* npc);
+void gundan1000tai_seq00(NanNPC* npc);
 void geundan1000tai_circle_pos(Vec* pos);
 static f32 accdec_type(s32 step, s32 total, f32 start, f32 end);
 f32 lineardec_type(s32 step, s32 total, f32 start, f32 end);
@@ -297,7 +294,7 @@ f32 __local_PIO2$367;
 f32 one$364;
 ExtTexInfo nannpc_entry_data[41];
 static s16 dai3_animtbl[VERSION_PICK(42, 82)];
-s32 dai3_run_animtbl[VERSION_PICK(11, 21)];
+s16 dai3_run_animtbl[VERSION_PICK(22, 42)];
 s32 no00_custom[48];
 static BeroEntry bero_entry_data[2];
 static s32 mony_init[18];
@@ -524,15 +521,19 @@ static s16 dai3_animtbl[] = {
 #endif
 
 #ifdef VERSION_G8ME01
-s32 dai3_run_animtbl[] = {
-    1310740, 1376277, 1441814, 1507351, 1572888, 1638425, 1703962, 1769499,
-    1835036, 1900573, 1966110, 2031647, 2097184, 2162721, 2228258, 2293795,
-    2359332, 2424869, 2490406, 2555943, -65536,
+s16 dai3_run_animtbl[] = {
+    20, 20, 21, 21, 22, 22, 23, 23,
+    24, 24, 25, 25, 26, 26, 27, 27,
+    28, 28, 29, 29, 30, 30, 31, 31,
+    32, 32, 33, 33, 34, 34, 35, 35,
+    36, 36, 37, 37, 38, 38, 39, 39,
+    -1, 0,
 };
 #else
-s32 dai3_run_animtbl[] = {
-    1310741, 1441815, 1572889, 1703963, 1835037, 1966111, 2097185, 2228259,
-    2359333, 2490407, -65536,
+s16 dai3_run_animtbl[] = {
+    20, 21, 22, 23, 24, 25, 26, 27,
+    28, 29, 30, 31, 32, 33, 34, 35,
+    36, 37, 38, 39, -1, 0,
 };
 #endif
 
@@ -4190,7 +4191,7 @@ static USER_FUNC(delete_itemsel_table) {
 }
 
 USER_FUNC(fune_yure_func_init) {
-    *(f32*)&event->lwData[0] = evtGetFloat(event, event->args[0]);
+    event->lwDataF[0] = evtGetFloat(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
@@ -4209,19 +4210,19 @@ USER_FUNC(fune_yure_func) {
     done = 0;
     step = 2.0f * amp / sysMsec2FrameFloat(2000.0f);
     if (dir == 0) {
-        *(f32*)&event->lwData[0] += step;
-        if (*(f32*)&event->lwData[0] >= amp) {
-            *(f32*)&event->lwData[0] = amp;
+        event->lwDataF[0] += step;
+        if (event->lwDataF[0] >= amp) {
+            event->lwDataF[0] = amp;
             done = 1;
         }
     } else {
-        *(f32*)&event->lwData[0] -= step;
-        if (*(f32*)&event->lwData[0] <= -amp) {
-            *(f32*)&event->lwData[0] = -amp;
+        event->lwDataF[0] -= step;
+        if (event->lwDataF[0] <= -amp) {
+            event->lwDataF[0] = -amp;
             done = 1;
         }
     }
-    evtSetFloat(event, args[2], *(f32*)&event->lwData[0]);
+    evtSetFloat(event, args[2], event->lwDataF[0]);
     evtSetValue(event, args[3], done);
     return EVT_RETURN_DONE;
 }
@@ -4269,19 +4270,19 @@ USER_FUNC(gundan1000tai_init) {
     f32 base;
     f32 nv;
     s32 i;
-    NanNpc* npc;
-    NanNpcWork* wp = nanNPCWork;
+    NanNPC* npc;
+    NanNPCWork* wp = nanNPCWork;
 
-    for (i = 0; i < wp->count; i++) {
-        npc = &wp->entries[i];
+    for (i = 0; i < wp->num; i++) {
+        npc = &wp->npc[i];
         radius = irand(180) + 120;
         angle = 6.2831855f * irand(360) / 360.0f;
         s = sin(angle);
         c = cos(angle);
-        npc->posA.x = 0.9f * (radius * s);
-        npc->posA.y = 15.0f;
-        npc->posA.z = 0.5f * (radius * c) - 300.0f;
-        if (npc->posA.x < 30.0f) {
+        npc->dest.x = 0.9f * (radius * s);
+        npc->dest.y = 15.0f;
+        npc->dest.z = 0.5f * (radius * c) - 300.0f;
+        if (npc->dest.x < 30.0f) {
             base = -280.0f;
             npc->dir = 90.0f;
         } else {
@@ -4298,18 +4299,18 @@ USER_FUNC(gundan1000tai_init) {
         npc->pos.z = radius * c - 300.0f;
         npc->func = gundan1000tai_seq00;
         npc->state = 0;
-        npc->work74 = i;
+        npc->slot = i;
     }
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(gundan1000tai_totsugeki) {
     s32 i;
-    NanNpc* npc;
-    NanNpcWork* wp = nanNPCWork;
+    NanNPC* npc;
+    NanNPCWork* wp = nanNPCWork;
 
-    for (i = 0; i < wp->count; i++) {
-        npc = &wp->entries[i];
+    for (i = 0; i < wp->num; i++) {
+        npc = &wp->npc[i];
         npc->func = gundan1000tai_seq01;
         npc->state = 0;
     }
@@ -4355,15 +4356,15 @@ USER_FUNC(gundan1000tai_areacheck) {
 
 USER_FUNC(gundan1000tai_totsuend) {
     s32 i;
-    NanNpcWork* wp = nanNPCWork;
+    NanNPCWork* wp = nanNPCWork;
 
-    for (i = 0; i < wp->count; i++) {
-        wp->entries[i].workA8 = 1;
+    for (i = 0; i < wp->num; i++) {
+        wp->npc[i].recall = 1;
     }
     return EVT_RETURN_DONE;
 }
 
-void gundan1000tai_seq00(NanNpc* npc) {
+void gundan1000tai_seq00(NanNPC* npc) {
     MarioWork* mario = marioGetPtr();
     s32 wait;
     f32 dist;
@@ -4372,45 +4373,45 @@ void gundan1000tai_seq00(NanNpc* npc) {
 
     switch (npc->state) {
         case 0:
-            npc->time = gp->renderTime;
-            wait = (npc->work74 % 6) * 500;
-            npc->work6C = wait + irand(500);
+            npc->startTime = gp->renderTime;
+            wait = (npc->slot % 6) * 500;
+            npc->duration = wait + irand(500);
             npc->state++;
         case 1:
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime) > npc->duration) {
                 npc->state++;
             }
             break;
         case 2:
-            dist = distABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
-            angle = angleABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
+            dist = distABf(npc->pos.x, npc->pos.z, npc->dest.x, npc->dest.z);
+            angle = angleABf(npc->pos.x, npc->pos.z, npc->dest.x, npc->dest.z);
             speed = dist / 2.0f + (irand(180) + 180);
             speed = sysFrame2SecFloat(speed / 2.0f);
-            npc->work78 = speed;
-            npc->work7C = angle;
-            npc->work70 = dist / speed;
-            npc->work6C = 0;
-            npc->workA4 = 0;
+            npc->speed = speed;
+            npc->moveDir = angle;
+            npc->frameNum = dist / speed;
+            npc->frame = 0;
+            npc->arrived = 0;
             evt_nannpc_set_animtbl_sub(npc, dai3_run_animtbl);
             npc->state++;
         case 3:
-            movePos(&npc->pos.x, &npc->pos.z, npc->work78, npc->work7C);
-            npc->work6C++;
-            if (npc->work6C >= npc->work70) {
-                npc->pos.x = npc->posA.x;
-                npc->pos.z = npc->posA.z;
-                npc->workA4 = 1;
+            movePos(&npc->pos.x, &npc->pos.z, npc->speed, npc->moveDir);
+            npc->frame++;
+            if (npc->frame >= npc->frameNum) {
+                npc->pos.x = npc->dest.x;
+                npc->pos.z = npc->dest.z;
+                npc->arrived = 1;
                 evt_nannpc_set_animtbl_sub(npc, dai3_animtbl);
                 npc->state++;
             }
             break;
         case 4:
-            npc->posB = npc->pos;
+            npc->basePos = npc->pos;
             break;
     }
 }
 
-void gundan1000tai_seq01(NanNpc* npc) {
+void gundan1000tai_seq01(NanNPC* npc) {
     f32 radius;
     f32 s;
     f32 angle;
@@ -4425,34 +4426,34 @@ void gundan1000tai_seq01(NanNpc* npc) {
 
     switch (npc->state) {
         case 0:
-            npc->posB = npc->pos;
-            npc->workA4 = 0;
-            npc->workA8 = 0;
+            npc->basePos = npc->pos;
+            npc->arrived = 0;
+            npc->recall = 0;
             r = irand(1000);
             if (r < 50) {
                 npc->state = 10;
             } else if (r < 150) {
                 npc->state = 1;
-                npc->work6C = irand(500) + 300;
-                npc->time = gp->renderTime;
+                npc->duration = irand(500) + 300;
+                npc->startTime = gp->renderTime;
             } else {
                 npc->state = 1;
-                npc->work6C = irand(2500) + 500;
-                npc->time = gp->renderTime;
+                npc->duration = irand(2500) + 500;
+                npc->startTime = gp->renderTime;
             }
             break;
         case 1:
-            if (npc->workA8) {
+            if (npc->recall) {
                 npc->state = 100;
-            } else if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
+            } else if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime) > npc->duration) {
                 evt_nannpc_set_animtbl_sub(npc, dai3_run_animtbl);
                 npc->state = 10;
             }
             break;
         case 10:
         case 11:
-            npc->time = gp->renderTime;
-            npc->posA = npc->pos;
+            npc->startTime = gp->renderTime;
+            npc->dest = npc->pos;
             if (npc->state == 10) {
                 radius = irand(25) + 25;
             } else {
@@ -4461,22 +4462,22 @@ void gundan1000tai_seq01(NanNpc* npc) {
             angle = 6.2831855f * irand(360) / 360.0f;
             s = sin(angle);
             c = cos(angle);
-            npc->posC.x = 0.9f * (radius * s) + 30.0f;
-            npc->posC.y = 15.0f;
-            npc->posC.z = 0.5f * (radius * c) - 300.0f;
-            npc->work78 = -4.0f * (irand(60) + 50);
-            npc->work7C = npc->posC.y - npc->posA.y - npc->work78;
-            npc->work6C = irand(500) + VERSION_PICK(600, 1200);
+            npc->jumpEnd.x = 0.9f * (radius * s) + 30.0f;
+            npc->jumpEnd.y = 15.0f;
+            npc->jumpEnd.z = 0.5f * (radius * c) - 300.0f;
+            npc->speed = -4.0f * (irand(60) + 50);
+            npc->moveDir = npc->jumpEnd.y - npc->dest.y - npc->speed;
+            npc->duration = irand(500) + VERSION_PICK(600, 1200);
             if (npc->state == 10) {
-                npc->work70 = 21;
-                if (npc->posA.x < npc->posC.x) {
+                npc->nextState = 21;
+                if (npc->dest.x < npc->jumpEnd.x) {
                     npc->dir = 90.0f;
                 } else {
                     npc->dir = 270.0f;
                 }
             } else {
-                npc->work70 = 22;
-                if (npc->posA.x < npc->posC.x) {
+                npc->nextState = 22;
+                if (npc->dest.x < npc->jumpEnd.x) {
                     npc->dir = 270.0f;
                 } else {
                     npc->dir = 90.0f;
@@ -4486,92 +4487,92 @@ void gundan1000tai_seq01(NanNpc* npc) {
             evt_nannpc_set_animtbl_sub(npc, dai3_run_animtbl);
             break;
         case 20:
-            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time);
-            if (elapsed < npc->work6C) {
-                t = (f32)elapsed / (f32)npc->work6C;
-                npc->pos.x = intplGetValue(0, elapsed, npc->work6C, npc->posA.x, npc->posC.x);
-                npc->pos.z = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(0, npc->posA.z, npc->posC.z, elapsed, npc->work6C);
-                npc->pos.y = npc->posA.y + t * (npc->work78 * t + npc->work7C);
+            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime);
+            if (elapsed < npc->duration) {
+                t = (f32)elapsed / (f32)npc->duration;
+                npc->pos.x = intplGetValue(0, elapsed, npc->duration, npc->dest.x, npc->jumpEnd.x);
+                npc->pos.z = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(0, npc->dest.z, npc->jumpEnd.z, elapsed, npc->duration);
+                npc->pos.y = npc->dest.y + t * (npc->speed * t + npc->moveDir);
             } else {
-                npc->pos = npc->posC;
-                npc->state = npc->work70;
-                npc->time = gp->renderTime;
-                npc->work6C = irand(2000) + 500;
+                npc->pos = npc->jumpEnd;
+                npc->state = npc->nextState;
+                npc->startTime = gp->renderTime;
+                npc->duration = irand(2000) + 500;
             }
             break;
         case 21:
-            if (npc->workA8) {
+            if (npc->recall) {
                 npc->state = 100;
-            } else if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
+            } else if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime) > npc->duration) {
                 npc->state = 11;
             }
             break;
         case 22:
-            if (npc->workA8) {
+            if (npc->recall) {
                 npc->state = 102;
                 break;
             }
-            npc->work6C = irand(2000) + 500;
-            npc->time = gp->renderTime;
-            npc->posB = npc->pos;
-            npc->work78 = 15.0f + npc->posB.x;
-            npc->work7C = npc->posB.x - 15.0f;
+            npc->duration = irand(2000) + 500;
+            npc->startTime = gp->renderTime;
+            npc->basePos = npc->pos;
+            npc->maxX = 15.0f + npc->basePos.x;
+            npc->minX = npc->basePos.x - 15.0f;
             if (irand(1)) {
-                npc->work80 = 1.0f;
+                npc->stepX = 1.0f;
                 npc->dir = 90.0f;
             } else {
-                npc->work80 = -1.0f;
+                npc->stepX = -1.0f;
                 npc->dir = 270.0f;
             }
             npc->state = 30;
             break;
         case 30:
-            if (npc->workA8) {
+            if (npc->recall) {
                 npc->state = 102;
                 break;
             }
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime) > npc->duration) {
                 npc->state = 10;
                 break;
             }
-            if (npc->work78 < npc->pos.x) {
-                npc->work80 = -1.0f;
+            if (npc->maxX < npc->pos.x) {
+                npc->stepX = -1.0f;
                 npc->dir = 270.0f;
             }
-            if (npc->work7C > npc->pos.x) {
-                npc->work80 = 1.0f;
+            if (npc->minX > npc->pos.x) {
+                npc->stepX = 1.0f;
                 npc->dir = 90.0f;
             }
-            npc->pos.x += npc->work80;
+            npc->pos.x += npc->stepX;
             break;
         case 100:
             dir = irand(180) + 120;
             dist = 6.2831855f * irand(360) / 360.0f;
             c = sin(dist);
             s = cos(dist);
-            npc->posC.x = 0.9f * (dir * c) + 30.0f;
-            npc->posC.z = 0.5f * (dir * s) - 300.0f;
-            dist = distABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
-            dir = angleABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
+            npc->jumpEnd.x = 0.9f * (dir * c) + 30.0f;
+            npc->jumpEnd.z = 0.5f * (dir * s) - 300.0f;
+            dist = distABf(npc->pos.x, npc->pos.z, npc->dest.x, npc->dest.z);
+            dir = angleABf(npc->pos.x, npc->pos.z, npc->dest.x, npc->dest.z);
             speed = dist / 2.0f + (irand(180) + 180);
             speed = sysFrame2SecFloat(speed);
-            npc->work78 = speed;
-            npc->work7C = dir;
-            npc->work70 = dist / speed;
-            npc->work6C = 0;
+            npc->speed = speed;
+            npc->moveDir = dir;
+            npc->frameNum = dist / speed;
+            npc->frame = 0;
             npc->state = 101;
         case 101:
-            movePos(&npc->pos.x, &npc->pos.z, npc->work78, npc->work7C);
-            npc->work6C++;
-            if (npc->work6C >= npc->work70) {
-                npc->pos.x = npc->posA.x;
-                npc->pos.z = npc->posA.z;
+            movePos(&npc->pos.x, &npc->pos.z, npc->speed, npc->moveDir);
+            npc->frame++;
+            if (npc->frame >= npc->frameNum) {
+                npc->pos.x = npc->dest.x;
+                npc->pos.z = npc->dest.z;
                 npc->state = 102;
             }
             break;
         case 102:
             evt_nannpc_set_animtbl_sub(npc, dai3_animtbl);
-            npc->workA4 = 1;
+            npc->arrived = 1;
             break;
     }
 }
@@ -4727,11 +4728,11 @@ USER_FUNC(hosei_party_pos) {
 
 USER_FUNC(suifu100taikikan_init) {
     s32 i;
-    NanNpc* npc;
-    NanNpcWork* wp = nanNPCWork;
+    NanNPC* npc;
+    NanNPCWork* wp = nanNPCWork;
 
-    for (i = 0; i < wp->count; i++) {
-        npc = &wp->entries[i];
+    for (i = 0; i < wp->num; i++) {
+        npc = &wp->npc[i];
         npc->dir = 90.0f;
         npc->pos.x = irand(135) - 100;
         npc->pos.y = 15.0f;
@@ -4743,11 +4744,11 @@ USER_FUNC(suifu100taikikan_init) {
 
 USER_FUNC(suifu100taikikan_away) {
     s32 i;
-    NanNpc* npc;
-    NanNpcWork* wp = nanNPCWork;
+    NanNPC* npc;
+    NanNPCWork* wp = nanNPCWork;
 
-    for (i = 0; i < wp->count; i++) {
-        npc = &wp->entries[i];
+    for (i = 0; i < wp->num; i++) {
+        npc = &wp->npc[i];
         npc->dir = 90.0f;
         npc->func = suifu100taikikan_seq01;
         npc->state = 0;
@@ -4755,11 +4756,11 @@ USER_FUNC(suifu100taikikan_away) {
     return EVT_RETURN_DONE;
 }
 
-void suifu100taikikan_seq00(NanNpc* npc) {
+void suifu100taikikan_seq00(NanNPC* npc) {
     npc->state = 0;
 }
 
-void suifu100taikikan_seq01(NanNpc* npc) {
+void suifu100taikikan_seq01(NanNPC* npc) {
     Vec v;
     Vec d;
     s32 elapsed;
@@ -4767,73 +4768,73 @@ void suifu100taikikan_seq01(NanNpc* npc) {
 
     switch (npc->state) {
         case 0:
-            npc->posA = npc->pos;
-            npc->posA.x = -180.0f + irand(50);
-            npc->work78 = 140.0f + irand(120);
+            npc->dest = npc->pos;
+            npc->dest.x = -180.0f + irand(50);
+            npc->speed = 140.0f + irand(120);
             npc->dir = 270.0f;
-            npc->work70 = 1;
+            npc->nextState = 1;
             npc->state = 100;
             break;
         case 1:
-            npc->posA = npc->pos;
-            npc->posA.x = -255.0f + irand(30);
-            npc->posA.z = -230.0f + irand(30);
-            npc->work70 = 10;
+            npc->dest = npc->pos;
+            npc->dest.x = -255.0f + irand(30);
+            npc->dest.z = -230.0f + irand(30);
+            npc->nextState = 10;
             npc->state = 100;
             break;
         case 10:
-            npc->posA = npc->pos;
-            npc->posA.z = -350.0f + irand(50);
-            npc->work70 = 20;
+            npc->dest = npc->pos;
+            npc->dest.z = -350.0f + irand(50);
+            npc->nextState = 20;
             npc->state = 100;
             break;
         case 20:
-            npc->posA = npc->pos;
-            npc->posA.x += 520.0f + irand(50);
+            npc->dest = npc->pos;
+            npc->dest.x += 520.0f + irand(50);
             npc->dir = 90.0f;
-            npc->work70 = 30;
+            npc->nextState = 30;
             npc->state = 100;
             break;
         case 30:
-            npc->posA = suifu100kaidanDOWN[irand(3)];
-            npc->work70 = 40;
+            npc->dest = suifu100kaidanDOWN[irand(3)];
+            npc->nextState = 40;
             npc->state = 100;
             break;
         case 40:
-            npc->posA = suifu100kaidanUP[irand(3)];
+            npc->dest = suifu100kaidanUP[irand(3)];
             npc->dir = 270.0f;
-            npc->work70 = 50;
+            npc->nextState = 50;
             npc->state = 100;
             break;
         case 50:
-            npc->posA = npc->pos;
-            npc->posA.x = -30.0f + irand(60);
-            npc->work70 = 60;
+            npc->dest = npc->pos;
+            npc->dest.x = -30.0f + irand(60);
+            npc->nextState = 60;
             npc->state = 100;
             break;
         case 60:
-            npc->posA = npc->pos;
-            npc->posA.z -= 100.0f;
-            npc->work70 = 99;
+            npc->dest = npc->pos;
+            npc->dest.z -= 100.0f;
+            npc->nextState = 99;
             npc->state = 100;
             break;
         case 99:
             npc->pos = (Vec){0.0f, -1000.0f, 0.0f};
             break;
         case 100:
-            npc->time = gp->renderTime;
-            npc->posB = npc->pos;
+            npc->startTime = gp->renderTime;
+            npc->basePos = npc->pos;
             npc->state = 101;
         case 101:
-            PSVECSubtract(&npc->posA, &npc->posB, &v);
-            duration = 1000.0f * PSVECMag(&v) / npc->work78;
-            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time);
+            PSVECSubtract(&npc->dest, &npc->basePos, &v);
+            duration = 1000.0f * PSVECMag(&v) / npc->speed;
+            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime);
             PSVECScale(&v, &d, (f32)elapsed / (f32)duration);
             if (elapsed < duration) {
-                PSVECAdd(&npc->posB, &d, &npc->pos);
+                PSVECAdd(&npc->basePos, &d, &npc->pos);
             } else {
-                npc->pos = npc->posA;
-                npc->state = npc->work70;
+                npc->pos = npc->dest;
+                npc->state = npc->nextState;
             }
             break;
     }
@@ -5643,12 +5644,12 @@ EVT_BEGIN(gor_muj_ship_pera)
     RETURN
 EVT_END()
 
-void gor_stg4_018_cb(s32 type, GorCbInfo** param) {
-    GorCbInfo* info = *param;
+void gor_stg4_018_cb(s32 type, smartEntry* smart) {
+    MsgWinData* info = smart->address;
 
     switch (type) {
         case 3:
-            if (info->field_0x8 == 1) {
+            if (info->curPage == 1) {
                 evtSetValue(NULL, LSWF(6), 1);
             }
             break;
@@ -5670,15 +5671,15 @@ static USER_FUNC(fune_eff) {
         event->userdatap[1] = effFunemizuEntry(2, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
         mapObjGetPos("S_fune_a", &pos);
         event->userdataf[2] = pos.x;
-        *(f32*)&event->userdata3 = pos.z;
+        event->userdata3f = pos.z;
     }
     eff1 = event->userdatap[0];
     eff2 = event->userdatap[1];
     oldX = event->userdataf[2];
-    oldZ = *(f32*)&event->userdata3;
+    oldZ = event->userdata3f;
     mapObjGetPos("S_fune_a", &pos);
     event->userdataf[2] = pos.x;
-    *(f32*)&event->userdata3 = pos.z;
+    event->userdata3f = pos.z;
     dist = distABf(oldX, oldZ, pos.x, pos.z);
     angle = angleABf(oldX, oldZ, pos.x, pos.z);
     if (angle < 180.0f) {
@@ -5686,21 +5687,21 @@ static USER_FUNC(fune_eff) {
     } else {
         sign = -1.0f;
     }
-    ((f32*)eff1->userdata)[17] = 3.0f;
-    ((f32*)eff1->userdata)[1] = pos.x + 85.0f * sign;
-    ((f32*)eff1->userdata)[2] = pos.y - 51.0f;
-    ((f32*)eff1->userdata)[3] = 30.0f + pos.z;
-    ((f32*)eff1->userdata)[4] = dist;
+    ((EffFunemizuWork*)eff1->userdata)->scale = 3.0f;
+    ((EffFunemizuWork*)eff1->userdata)->position.x = pos.x + 85.0f * sign;
+    ((EffFunemizuWork*)eff1->userdata)->position.y = pos.y - 51.0f;
+    ((EffFunemizuWork*)eff1->userdata)->position.z = 30.0f + pos.z;
+    ((EffFunemizuWork*)eff1->userdata)->f10 = dist;
     if (angle < 180.0f) {
-        ((f32*)eff1->userdata)[5] = 135.0f + angle;
+        ((EffFunemizuWork*)eff1->userdata)->f14 = 135.0f + angle;
     } else {
-        ((f32*)eff1->userdata)[5] = 45.0f + angle;
+        ((EffFunemizuWork*)eff1->userdata)->f14 = 45.0f + angle;
     }
-    ((f32*)eff2->userdata)[1] = pos.x - 15.0f * sign;
-    ((f32*)eff2->userdata)[2] = pos.y - 51.0f;
-    ((f32*)eff2->userdata)[3] = 90.0f + pos.z;
-    ((f32*)eff2->userdata)[4] = dist;
-    ((f32*)eff2->userdata)[5] = 90.0f + angle;
+    ((EffFunemizuWork*)eff2->userdata)->position.x = pos.x - 15.0f * sign;
+    ((EffFunemizuWork*)eff2->userdata)->position.y = pos.y - 51.0f;
+    ((EffFunemizuWork*)eff2->userdata)->position.z = 90.0f + pos.z;
+    ((EffFunemizuWork*)eff2->userdata)->f10 = dist;
+    ((EffFunemizuWork*)eff2->userdata)->f14 = 90.0f + angle;
     if (dist > 1.0f && gp->retraceCount % 15 == 0) {
         effWaterDamageN64Entry(5, 30, pos.x - 150.0f * sign, pos.y - 50.0f, pos.z, 2.0f);
     }

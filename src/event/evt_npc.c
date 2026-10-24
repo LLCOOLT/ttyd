@@ -1960,7 +1960,7 @@ USER_FUNC(evt_npc_battle_start) {
         marioCtrlOff();
         party = partyGetPtr(marioGetPartyId());
         if (party) {
-            partyCtrlOff(party);
+            partyCtrlOff();
         }
         BattleInformationSetResult(info, 0);
         psndSetFlag(0x10);
@@ -1983,7 +1983,7 @@ USER_FUNC(evt_npc_wait_battle_end) {
     marioCtrlOn();
     party = partyGetPtr(marioGetPartyId());
     if (party) {
-        partyCtrlOn(party);
+        partyCtrlOn();
     }
     L_psndBGM_stop();
 #ifdef VERSION_G8ME01

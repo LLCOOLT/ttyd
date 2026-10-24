@@ -161,7 +161,7 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 						*(u32*)((u8*)tpl->descriptorArray + off + 4) -= (u32)tpl;
 					}
 				}
-				*(u32*)&tpl->descriptorArray -= (u32)tpl;
+				tpl->descriptorArray = (TEXDescriptor*)((u32)tpl->descriptorArray - (u32)tpl);
 			}
 			break;
 		case 5:
@@ -331,7 +331,7 @@ if (tpl->versionNumber != 0x0020AF30) {
 				OSPanic("filemgr.c", VERSION_PICK(106, 112), "invalid version number for texture palette\0");
 }
 if ((u32)tpl->descriptorArray < (u32)tpl) {
-*(u32*)&tpl->descriptorArray += (u32)tpl;
+tpl->descriptorArray = (TEXDescriptor*)((u32)tpl->descriptorArray + (u32)tpl);
 for (i = 0; (u16)i < tpl->numDescriptors; i++) {
 off = i * 8;
 img = (*(TEXHeader**)((u8*)tpl->descriptorArray + off));

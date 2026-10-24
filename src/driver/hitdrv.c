@@ -210,7 +210,7 @@ HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapI
 
             if (!mesh->isPackedDisplay) {
                 for (j = 0; j < mesh->displayListCount; j++) {
-                    numVectors += *(s32*)mesh->displayLists.normalLists[j] - 2;
+                    numVectors += mesh->displayLists.normalLists[j]->count - 2;
                 }
             } else {
                 // FAKE: i (dead after the joint search) as the packed counter and j holding the list offset: their later webs become the @ temps that give the target colouring
@@ -577,19 +577,19 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
             continue;
         }
         if (!mesh->isPackedDisplay) {
-            s32* list;
+            MapRawDL* list;
             s16 i1;
             s16 i2;
             HitVector* vec;
             Vec* pos;
             k = 0; // FAKE: dead store, references k before j's first use so the packed k/counter split temps get the target r18/r17
             for (j = 0; j < mesh->displayListCount; j++) {
-                list = (s32*)mesh->displayLists.normalLists[j];
-                for (k = 0; k < *list - 2; k++) {
+                list = mesh->displayLists.normalLists[j];
+                for (k = 0; k < list->count - 2; k++) {
                     s16* idx;
-                    idx = (s16*)((u8*)list + k * 0x18 + 4);
-                    i1 = *(s16*)((u8*)list + (k + 1) * 0x18 + 4);
-                    i2 = *(s16*)((u8*)list + (k + 2) * 0x18 + 4);
+                    idx = &list->vtx[k].pos;
+                    i1 = *(s16*)((u8*)list + (k + 1) * sizeof(MapVtxRec) + offsetof(MapRawDL, vtx)); // FAKE: the next two strip vertices by byte offset ((k + n) * size + 4), which keeps the target's mulli/strength reduction; list->vtx[k + n].pos schedules differently
+                    i2 = *(s16*)((u8*)list + (k + 2) * sizeof(MapVtxRec) + offsetof(MapRawDL, vtx));
                     vec = &hit->vectors[count++];
                     pos = (Vec*)mesh->vcdTable->positions->data;
                     MTXMultVec(hit->worldMtx, &pos[*idx], &vec->v0);

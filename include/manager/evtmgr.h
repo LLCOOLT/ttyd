@@ -177,15 +177,39 @@ struct EventEntry {
     struct EventEntry* waitingOnEvent; // 0x70, we are waiting on some child event
     struct EventEntry* brotherEvent;   // 0x74
     union {
-        s32 userdata[3];
-        f32 userdataf[3];
-        void* userdatap[3];
-    }; // 0x78, TODO check
-    u32 userdata3;             // 0x84, 4th scratch word after userdata[3] (state/counter/window id/float z/saved flags)
-    OSTime wInterpRelatedTime; // 0x88
-    u32 field_0x90[2];         // 0x90, unknown
+        struct {
+            union {
+                s32 userdata[3];
+                f32 userdataf[3];
+                void* userdatap[3];
+            }; // 0x78
+            union {
+                u32 userdata3;
+                f32 userdata3f;
+            };                         // 0x84, 4th scratch word after userdata[3] (state/counter/window id/float z/saved flags)
+            union {
+                OSTime wInterpRelatedTime; // 0x88
+                s32* wInterpWork;          // 0x88, some user funcs keep a work block pointer here instead
+            };
+            u32 field_0x90[2];         // 0x90, unknown
+        };
+        s32 userWork[8]; // 0x78, the same 0x20 bytes as eight scratch words (user functions that keep more state)
+        struct {
+            struct BattleUnit* unit; // 0x78
+            s32 cur;                 // 0x7C, frames shown
+            s32 start;               // 0x80, end of the grow-in
+            s32 end;                 // 0x84, end of the settle
+            s32 total;               // 0x88, frames to show
+            s32 stop;                // 0x8C, set by _disp_heart_entry_stop
+            s32 unitId;              // 0x90
+            s32 partId;              // 0x94
+        } heart; // 0x78, Vivian's heart icon (_disp_heart_entry)
+    };
     UserFunction userfunc;     // 0x98
-    s32 lwData[16];            // 0x9C, validated
+    union {
+        s32 lwData[16];        // 0x9C, validated
+        f32 lwDataF[16];       // 0x9C, the same words used as floats
+    };
     s32 lfData[3];             // 0xDC, validated
     void* loopStartPtrs[8];    // 0xE8
     s32 loopCounters[8];       // 0x108
@@ -207,8 +231,16 @@ struct EventEntry {
     s32 printWindowId;          // 0x178, verified
     s32 selectWindowId;         // 0x17C, verified
     u32 printWindowFlags;       // 0x180, verified, is u32, does use 0x80000000
-    EventEntryMsg msgPos;       // 0x184, message window x,y (z is msgPosZ): evt_msg.c copies it to win->pos
-    u32 msgPosZ;                // 0x18C, f32 message window z
+    union {
+        struct {
+            EventEntryMsg msgPos;       // 0x184, message window x,y (z is msgPosZ): evt_msg.c copies it to win->pos
+            union {
+                u32 msgPosZ;            // 0x18C, message window z (copied as a word by evtmgr)
+                f32 msgPosZf;           // 0x18C, the same z as a float (evt_msg_toge)
+            };
+        };
+        Vec msgPosVec;                  // 0x184, x/y/z as one Vec (evt_msg speaker position)
+    };
     u32 msgPriority;            // 0x190
     u32 field_0x194;            // 0x194
     OSTime savedTime;           // 0x198, TODO rename

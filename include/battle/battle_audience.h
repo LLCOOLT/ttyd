@@ -42,7 +42,7 @@ typedef struct BattleAudienceMember {
     f32 counterF;              // 0xC, per-status float counter
     f32 workF1;                // 0x10, per-status float, cleared on status change
     f32 workF2;                // 0x14, per-status float, cleared on status change
-    u8 colorStep;              // 0x18, added to colorB each frame (+-4)
+    s8 colorStep;              // 0x18, added to colorB each frame (+-4)
     u8 status;                 // 0x19
     u8 texId;                  // 0x1A, palette texture index for the member quad
     u8 type;                   // 0x1B, AudienceMemberType
@@ -65,9 +65,7 @@ typedef struct BattleAudienceMember {
     Vec baseScale;             // 0x60
     Vec dispOffset;            // 0x6C, added to position for the drawn quad
     Vec velocity;              // 0x78, added to position each frame
-    f32 accelX;                // 0x84, added to velocity.x
-    f32 accelY;                // 0x88, added to velocity.y
-    f32 accelZ;                // 0x8C, added to velocity.z
+    Vec accel;                 // 0x84, added to velocity
     Vec facingDir;             // 0x90, (0,0,-1) rotated by the member matrix; dot-product facing test
     Vec mRotation;             // 0x9C
     Vec mRotationOffset;       // 0xA8
@@ -123,9 +121,7 @@ typedef struct BattleAudienceItem {
 typedef struct BattleAudienceStar {
     s32 flags;                // 0x0
     s32 state;                // 0x4, 0 spawn, 5 rise, 10 wait, 15 spiral to the AP gauge, 20 fade
-    f32 x;                    // 0x8
-    f32 y;                    // 0xC
-    f32 z;                    // 0x10, z of the x/y/z position (Vec at 0x8)
+    Vec position;             // 0x8
     f32 reserved_14;          // 0x14, random -20..20 at spawn, never read
     f32 reserved_18;          // 0x18, random 0..10 at spawn, never read
     f32 reserved_1C;          // 0x1C, 0 at spawn, never read
@@ -161,14 +157,15 @@ typedef struct BattleAudienceWindow {
     u8 pad_01[0x8 - 0x1];   // 0x1, never accessed
     f32 x;                  // 0x8, window x
     f32 y;                  // 0xC, window y
-    u8 pad_10[0x18 - 0x10]; // 0x10, never accessed
+    f32 z;                  // 0x10, window z
+    s32 slideTimer;         // 0x14, 0..15 slide-in frames
     f32 count;              // 0x18, number to display for audience count
 } BattleAudienceWindow;
 
 typedef struct BattleAudience {
     s32 flags;                         // 0x0
     EventEntry* event;                 // 0x4
-    u8 apStarSfxId[0xC - 0x8];         // 0x8, s32 SFX_BTL_SYS_AP_STAR1 handle (raw ((s32*)aud)[2] in battle_audience.c)
+    s32 apStarSfxId;                   // 0x8, SFX_BTL_SYS_AP_STAR1 handle
     FileEntry* normalTex;              // 0xC
     FileEntry* guestTex[2];            // 0x10
     AudienceMemberType guestType[2];   // 0x18

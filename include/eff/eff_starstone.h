@@ -3,7 +3,7 @@
 #include "driver/effdrv.h"
 #include "dolphin/types.h"
 #include <dolphin/mtx.h>
-#include <dolphin/gx.h>
+#include <dolphin/gx/GXStruct.h>
 
 typedef struct EffStarStoneWork {
     s32 type;        // 0x0

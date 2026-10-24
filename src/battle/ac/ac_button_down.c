@@ -17,7 +17,6 @@ typedef struct BDWork {
     s32 endTimer;
 } BDWork;
 
-#define OUT (*(s32*)&ac->outputParams[0])
 
 static u32 _button_table[7] = {PAD_BUTTON_A, PAD_BUTTON_B, PAD_BUTTON_X, PAD_BUTTON_Y, PAD_TRIGGER_L, PAD_TRIGGER_R, PAD_TRIGGER_Z};
 
@@ -31,7 +30,7 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
 {
   BattleActions *ac = &work->actionCommands;
   BDWork *p = (BDWork *) work->actionCommands.work;
-  u8 *disp = work->actionCommands.dispData;
+  BattleACDispParams *disp = &work->actionCommands.disp;
   s32 allDone;
   s32 i;
   s32 done;
@@ -51,9 +50,9 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
       {
         ac->result = 1;
         memset(disp, 0, 0x2c);
-        ((f32 *) disp)[5] = -300.0f;
-        ((f32 *) disp)[6] = 0.0f;
-        ((s32 *) disp)[8] = 20;
+        disp->iconX = -300.0f;
+        disp->iconY = 0.0f;
+        disp->slideTimer = 20;
         memset(p->button, 0, 0x34);
         memset(p->pressed, 1, 0x34);
         for (i = 0; i < (work->actionCommands.params[2]); i++)
@@ -298,16 +297,16 @@ s32 battleAcResult_ButtonDown(BattleWork* work) {
 void battleAcDisp_ButtonDown(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
     BattleActions* ac = &work->actionCommands;
-    s32* disp;
+    BattleACDispParams* disp;
     f32 x, y;
-    disp = (s32*)&ac->disp;
+    disp = &ac->disp;
     switch (ac->mAcState) {
         case 99:
         case 0:
-            if (disp[8] > 0) {
-                disp[8]--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
-            x = intplGetValue(4, 20 - disp[8], 20, -300.0f, 0.0f);
+            x = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 0.0f);
             y = 0.0f;
             break;
         default:

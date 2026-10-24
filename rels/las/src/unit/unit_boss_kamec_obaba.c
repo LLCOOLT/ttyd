@@ -1,4 +1,5 @@
 #include "battle/battle_unit.h"
+#include "eff/eff_magic1_n64.h"
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
@@ -1211,7 +1212,7 @@ static USER_FUNC(eff_magic_get_posX) {
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
 
-    evtSetFloat(event, args[1], ((f32*)((EffectEntry*)unit->work[4])->userdata)[4]);
+    evtSetFloat(event, args[1], ((EffMagic1N64Work*)((EffectEntry*)unit->work[4])->userdata)->offset.x);
     return EVT_RETURN_DONE;
 }
 
@@ -1235,7 +1236,7 @@ static USER_FUNC(eff_magic) {
     z += 5.0f;
     eff = effMagic1N64Entry(0, type, x, y, z, a, b, c);
     unit->work[4] = (s32)eff;
-    ((f32*)eff->userdata)[10] = unit->mSizeMultiplier;
+    ((EffMagic1N64Work*)eff->userdata)->scale = unit->mSizeMultiplier;
     return EVT_RETURN_DONE;
 }
 

@@ -15,7 +15,7 @@
 #define ST_CHG_MSG(i) ((StChgMsg*)_battleWorkPointer->announce.stChg.msg + (i)) /* cast keeps the 0x18D88 displacement folded into each access */
 
 BOOL BattleStatusChangeAnnouceMain_Unit(BattleUnit* unit);
-void BattleStatusChangeMsgSetAnnouce(s32* data, s32 index, s32 arg2);
+void BattleStatusChangeMsgSetAnnouce(BattleUnit* unit, s32 index, s32 arg2);
 void BattleStatusChangeInfoWorkInit(BattleUnit* unit);
 void _st_chg_msg_disp(void);
 
@@ -142,7 +142,7 @@ void BSE_Sleep(BattleUnit* unit) {
 		BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &x, &y, &z);
 		dx = 0.5f * (unit->mSizeMultiplier * BtlUnit_GetWidth(unit));
 		dy = 0.95f * (unit->mSizeMultiplier * BtlUnit_GetHeight(unit));
-		if (*(u32*)&unit->mAttributeFlags & 2) {
+		if (unit->mAttributeFlags & 2) {
 			dy = 0.0f;
 		}
 		x += dx;
@@ -179,7 +179,7 @@ void BSE_Biribiri(BattleUnit* unit) {
 		wk = (f32*)EFF_SPARK(unit)->userdata;
 		BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &x, &y, &z);
 		dy = unit->mSizeMultiplier * (BtlUnit_GetHeight(unit) / 2);
-		if (*(u32*)&unit->mAttributeFlags & 2) {
+		if (unit->mAttributeFlags & 2) {
 			dy = 0.0f;
 		}
 		y += dy;
@@ -332,11 +332,11 @@ BOOL BSE_TurnFirstProcessEffectMain(BattleUnit* unit) {
 	u16 st;
 
 	part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
-	st = *(u16*)&unit->mBurnDamageFlameState;
+	st = unit->mBurnDamageFlameState;
 	if (st == 0) {
 		return FALSE;
 	}
-	ac = *(u16*)&unit->mbBurnDamageFlameActive;
+	ac = unit->mbBurnDamageFlameActive;
 	if (ac == 0) {
 		return FALSE;
 	}
@@ -357,7 +357,7 @@ BOOL BSE_TurnFirstProcessEffectMain(BattleUnit* unit) {
 		unit->mBurnDamageFlameScale = 1.6f * sinfd(unit->mBurnDamageFlameAnimTimer * 3) + 0.4f;
 		work[9] = unit->mBurnDamageFlameScale;
 		if (unit->mBurnDamageFlameAnimTimer >= 60) {
-			(*(u16*)&unit->mBurnDamageFlameState)++;
+			unit->mBurnDamageFlameState++;
 		}
 		break;
 	case 3:
@@ -422,7 +422,7 @@ void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 arg2, s32 
 	u8 u, t;
 
 	for (i = 0; i < 6; i++) {
-		n = _get_pri((s8)*(u8*)&e[i].type);
+		n = _get_pri((s8)(u8)e[i].type); // FAKE: no-op (s8)(u8) round trip on the s8 type (lbz, extsb at the call), as in the target
 		if (pri >= (s8)n) break;
 	}
 	if (i >= 6) return;
@@ -499,19 +499,19 @@ void BattleStatusChangeMsgWorkInit(void) {
 }
 #pragma optimize_for_size reset
 
-void BattleStatusChangeMsgSetAnnouce(s32* data, s32 index, s32 arg2) {
+void BattleStatusChangeMsgSetAnnouce(BattleUnit* unit, s32 index, s32 arg2) {
 	StChgMsg* msg = ST_CHG_MSG(index);
 	s32 id;
 
-	msg->unitId = data[0];
+	msg->unitId = unit->unitId;
 	msg->type = index;
 	msg->timer = 0;
 	msg->changed = arg2;
-	id = data[2];
+	id = unit->currentKind;
 	if (id == 0xDE) {
 		msg->flags |= 1;
 	}
-	else if (id >= 0xE0 && id < 0xE7 && ((s8*)data)[0xC] == 0) {
+	else if (id >= 0xE0 && id < 0xE7 && unit->mAlliance == 0) {
 		msg->flags |= 2;
 	}
 	else {
@@ -552,7 +552,7 @@ void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 					k++;
 				}
 				if (found) {
-					BattleStatusChangeMsgSetAnnouce((s32*)unit, t, e[k].changed);
+					BattleStatusChangeMsgSetAnnouce(unit, t, e[k].changed);
 				}
 			}
 		}
@@ -579,12 +579,12 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 		if (msg->type == -1) continue;
 		ret = TRUE;
 		BattleGetUnitPtr(wp, msg->unitId);
-		if (*(u8*)&msg->timer) {
+		if (msg->timer) {
 			msg->timer--;
 			if (BattlePadCheckTrigger(0x300)) {
 				msg->timer = 0;
 			}
-			if (!*(u8*)&msg->timer) {
+			if (!msg->timer) {
 				msg->type = -1;
 			}
 		}

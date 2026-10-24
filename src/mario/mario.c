@@ -538,7 +538,7 @@ void marioFBattlePrepare(void) {
 		wp->flags |= 0x1000;
 	}
 	partyUsePost(partyGetPtr(marioGetPartyId()));
-	((void (*)(void))partyCtrlOff)();
+	partyCtrlOff();
 }
 
 void marioFBattlePost(void) {
@@ -561,7 +561,7 @@ void marioFBattlePost(void) {
 		}
 	}
 #endif
-	((void (*)(void))partyCtrlOn)();
+	partyCtrlOn();
 	if (wp->currMotionId == MARIO_MOTION_HAMMER || wp->currMotionId == MARIO_MOTION_JABARA) {
 		marioChgMot(MARIO_MOTION_STAY);
 	}
@@ -1963,7 +1963,7 @@ void marioPreDisp(void) {
 		if (wp->paperAnimName) {
 			animPoseSetPaperAnim(wp->paperAnimGroupId[0], wp->paperAnimName, TRUE);
 		}
-		animPoseSetLocalTime(wp->paperAnimGroupId[marioAnimeId()], *(u16*)&wp->poseTime);
+		animPoseSetLocalTime(wp->paperAnimGroupId[marioAnimeId()], wp->poseTime);
 	}
 	animPoseMain(wp->paperAnimGroupId[marioAnimeId()]);
 	if (wp->dispFlags & 1) {

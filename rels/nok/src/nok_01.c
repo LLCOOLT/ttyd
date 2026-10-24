@@ -1,4 +1,5 @@
 #include "battle/battle_unit.h"
+#include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
@@ -1460,9 +1461,9 @@ static USER_FUNC(starstone_set_pos) {
     f32 z = evtGetFloat(event, args[3]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[2] = x;
-    ((f32*)eff->userdata)[3] = y;
-    ((f32*)eff->userdata)[4] = z;
+    ((EffStarStoneWork*)eff->userdata)->position.x = x;
+    ((EffStarStoneWork*)eff->userdata)->position.y = y;
+    ((EffStarStoneWork*)eff->userdata)->position.z = z;
     return EVT_RETURN_DONE;
 }
 
@@ -1471,7 +1472,7 @@ static USER_FUNC(starstone_set_ry) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 ry = evtGetFloat(event, args[1]);
 
-    ((f32*)effNameToPtr(name)->userdata)[7] = ry;
+    ((EffStarStoneWork*)effNameToPtr(name)->userdata)->rotY = ry;
     return EVT_RETURN_DONE;
 }
 

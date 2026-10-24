@@ -1,3 +1,4 @@
+#include "mri_puni.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -14,7 +15,6 @@
 #include "mario/mario_pouch.h"
 
 static u8* _ap;
-typedef struct PuniData { u8 field_0x0[0x4]; u32 flags; u8 field_0x8[0xC - 0x8]; s16 field_0xC; u8 field_0xE[0x114 - 0xE]; u16 field_0x114; u8 field_0x116[0x118 - 0x116]; s16 field_0x118; u8 field_0x11A[0x11E - 0x11A]; s16 field_0x11E; u8 field_0x120[0x12C - 0x120]; Vec position; u8 field_0x138[0x15C - 0x138]; Vec field_0x15C; u8 field_0x168[0x174 - 0x168]; f32 field_0x174; u8 field_0x178[0x180 - 0x178]; f32 field_0x180; u8 field_0x184[0x1E0 - 0x184]; s32 field_0x1E0; s32 field_0x1E4; u8 field_0x1E8[0x56C - 0x1E8]; void* field_0x56C; void* field_0x570; u8 field_0x574[0x5A8 - 0x574]; } PuniData;
 void puniMoveAtari(PuniData* puni, Vec pos, Vec dir, s32 flag, f32 speed);
 PuniData* puniGetPunidat(void);
 void puniModeEventparent(PuniData* puni);
@@ -1081,7 +1081,7 @@ void puniModeEventparent(PuniData* puni) {
     Vec pos;
     f32 mag;
 
-    switch (puni->field_0x114) {
+    switch (puni->modeStep) {
         case 0:
             best = 1000000.0f;
             bestIdx = -1;
@@ -1089,38 +1089,38 @@ void puniModeEventparent(PuniData* puni) {
                 p.x = tbl[i * 2];
                 p.y = 0.0f;
                 p.z = tbl[i * 2 + 1];
-                d = PSVECSquareDistance(&p, &puni->position);
+                d = PSVECSquareDistance(&p, &puni->pos);
                 if (best > d) {
                     best = d;
                     bestIdx = i;
                 }
             }
-            puni->field_0x1E0 = bestIdx;
-            puni->field_0x11E = 2;
-            puni->field_0x114 = 1;
+            puni->modeVar0 = bestIdx;
+            puni->prevAnim = 2;
+            puni->modeStep = 1;
         case 1:
-            p.x = tbl[puni->field_0x1E0 * 2];
+            p.x = tbl[puni->modeVar0 * 2];
             p.y = 0.0f;
-            p.z = tbl[puni->field_0x1E0 * 2 + 1];
-            if (PSVECSquareDistance(&p, &puni->position) > 100.0f) {
-                PSVECSubtract(&p, &puni->position, &dir);
+            p.z = tbl[puni->modeVar0 * 2 + 1];
+            if (PSVECSquareDistance(&p, &puni->pos) > 100.0f) {
+                PSVECSubtract(&p, &puni->pos, &dir);
                 PSVECNormalize(&dir, &dir);
                 dir.y = 0.0f;
                 PSVECScale(&dir, &dir, 1.5f);
-                PSVECAdd(&puni->field_0x15C, &dir, &puni->field_0x15C);
-            } else if (puni->field_0x1E0 == puni->field_0x1E4 + 5) {
-                puni->field_0x15C = (Vec){0.0f, 0.0f, 0.0f};
-                puni->field_0x114 = 2;
-            } else if (tbl[puni->field_0x1E0 * 2 + 2] != 10000) {
-                puni->field_0x1E0++;
+                PSVECAdd(&puni->vel, &dir, &puni->vel);
+            } else if (puni->modeVar0 == puni->modeVar1 + 5) {
+                puni->vel = (Vec){0.0f, 0.0f, 0.0f};
+                puni->modeStep = 2;
+            } else if (tbl[puni->modeVar0 * 2 + 2] != 10000) {
+                puni->modeVar0++;
             } else {
-                puni->field_0x15C = (Vec){0.0f, 0.0f, 0.0f};
-                puni->field_0x114 = 2;
+                puni->vel = (Vec){0.0f, 0.0f, 0.0f};
+                puni->modeStep = 2;
             }
             break;
         case 2:
-            puni->field_0x11E = 0;
-            puni->field_0x114 = 3;
+            puni->prevAnim = 0;
+            puni->modeStep = 3;
             break;
         case 3:
         case 4:
@@ -1132,34 +1132,34 @@ void puniModeEventparent(PuniData* puni) {
             break;
         case 10:
             p = (Vec){-160.0f, 0.0f, 40.0f};
-            if (PSVECSquareDistance(&p, &puni->position) < 4900.0f) {
-                PSVECSubtract(&puni->position, &p, &dir);
+            if (PSVECSquareDistance(&p, &puni->pos) < 4900.0f) {
+                PSVECSubtract(&puni->pos, &p, &dir);
                 PSVECNormalize(&dir, &dir);
                 dir.y = 0.0f;
                 PSVECScale(&dir, &dir, 0.7f);
-                PSVECAdd(&puni->field_0x15C, &dir, &puni->field_0x15C);
-                puni->field_0x174 = 2.1f;
-                mag = PSVECMag(&puni->field_0x15C);
-                pos = puni->position;
+                PSVECAdd(&puni->vel, &dir, &puni->vel);
+                puni->maxSpeed = 2.1f;
+                mag = PSVECMag(&puni->vel);
+                pos = puni->pos;
                 pos.y += 1.0f;
                 if (mag != 0.0f) {
-                    PSVECNormalize(&puni->field_0x15C, &dir);
+                    PSVECNormalize(&puni->vel, &dir);
                 } else {
                     dir = (Vec){0.0f, 0.0f, 0.0f};
                 }
                 puniMoveAtari(puni, pos, dir, 0, mag);
             } else {
-                puni->field_0x114 = 11;
+                puni->modeStep = 11;
             }
             break;
         case 11:
-            puni->field_0x15C = (Vec){0.0f, 0.0f, 0.0f};
-            if (puni->position.x < -160.0f) {
-                puni->field_0x180 = 90.0f;
+            puni->vel = (Vec){0.0f, 0.0f, 0.0f};
+            if (puni->pos.x < -160.0f) {
+                puni->dir = 90.0f;
             } else {
-                puni->field_0x180 = 270.0f;
+                puni->dir = 270.0f;
             }
-            puni->field_0x114 = 12;
+            puni->modeStep = 12;
             break;
         case 12:
             break;
@@ -1171,22 +1171,22 @@ USER_FUNC(puni_parent) {
     PuniData* puni = (PuniData*)((u8*)puniGetPunidat() + offset);
     s16 side;
 
-    if (puni->position.x > -180.0f) {
+    if (puni->pos.x > -180.0f) {
         side = 1;
-        puni->field_0x1E4 = event->lwData[11] % 2;
+        puni->modeVar1 = event->lwData[11] % 2;
         event->lwData[11]++;
     } else {
         side = 2;
-        puni->field_0x1E4 = event->lwData[12] % 2;
+        puni->modeVar1 = event->lwData[12] % 2;
         event->lwData[12]++;
     }
     puni->flags |= 0x100000;
-    puni->field_0x118 = side;
-    puni->field_0xC = 29;
-    puni->field_0x114 = 0;
-    puni->field_0x11E = 1000;
-    puni->field_0x56C = puniModeEventparent;
-    puni->field_0x570 = puniMoveDecel;
+    puni->groupId = side;
+    puni->mode = 29;
+    puni->modeStep = 0;
+    puni->prevAnim = 1000;
+    puni->modeFunc = puniModeEventparent;
+    puni->moveFunc = puniMoveDecel;
     return EVT_RETURN_DONE;
 }
 
@@ -1194,7 +1194,7 @@ USER_FUNC(puni_away) {
     s32 offset = evtGetValue(event, event->args[0]) * sizeof(PuniData);
     PuniData* puni = (PuniData*)((u8*)puniGetPunidat() + offset);
 
-    puni->field_0x114 = 10;
+    puni->modeStep = 10;
     return EVT_RETURN_DONE;
 }
 

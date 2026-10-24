@@ -33,6 +33,7 @@ typedef struct MapObjectEntry {
         s32 typeData[4];
         u32 typeDataU[4];
         void* typeDataP[4];
+        s32* typeDataList[4];    // -1-terminated item id lists
         f32 typeDataF[4];
     };
     s32 timer;                               // 0x1B0, per-type countdown (timer switch, blinking, respawn delays)

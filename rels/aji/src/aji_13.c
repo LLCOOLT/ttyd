@@ -498,7 +498,7 @@ static USER_FUNC(mario_chk) {
             work[i].delta = (Vec){0.0f, 0.0f, 0.0f};
         }
         event->userdata[0] = (s32)work;
-        *(f32*)&event->userdata[1] = 0.0f;
+        event->userdataf[1] = 0.0f;
         event->userdata[2] = 0;
     }
     work = (BeltWork*)event->userdata[0];
@@ -545,7 +545,7 @@ static USER_FUNC(mario_chk) {
             continue;
         }
         if (mario->hitobjStandOn == NULL) {
-            *(f32*)&event->userdata[1] = 0.0f;
+            event->userdataf[1] = 0.0f;
             event->userdata[2] = 0;
             continue;
         }
@@ -555,7 +555,7 @@ static USER_FUNC(mario_chk) {
             mtxGetRotationElement(hit->mapObj->transformMtx, m, 'x', 'y');
             PSMTXMultVec(m, &v, &v);
             angle = angleABf(0.0f, 0.0f, v.x, v.y);
-            delta = angle - *(f32*)&event->userdata[1];
+            delta = angle - event->userdataf[1];
             hitObjGetPos((const char*)name_tbl2[i], &v);
             dist = distABf(mario->position.x, mario->position.y, v.x, v.y);
             rot = angleABf(v.x, v.y, mario->position.x, mario->position.y);
@@ -564,7 +564,7 @@ static USER_FUNC(mario_chk) {
                 mario->floorMove.x = (v.x + dist * (f32)sin(rot)) - mario->position.x;
                 mario->floorMove.y = (v.y - dist * (f32)cos(rot)) - mario->position.y;
             }
-            *(f32*)&event->userdata[1] = angle;
+            event->userdataf[1] = angle;
             event->userdata[2] = (s32)hit;
             break;
         }

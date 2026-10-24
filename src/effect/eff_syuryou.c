@@ -5,16 +5,6 @@
 #include "memory.h"
 #include <dolphin/mtx.h>
 
-typedef struct EffSyuryouWork {
-    s32 type;     // 0x0
-    Vec position; // 0x4
-    f32 scale;    // 0x10
-    s32 poseId;   // 0x14
-    s32 alpha;    // 0x18
-    s32 timer;    // 0x1C, counts down while fading out
-    s32 field_0x20; // 0x20
-} EffSyuryouWork;
-
 EffectEntry* effSyuryouEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffSyuryouWork* work;

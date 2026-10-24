@@ -1,6 +1,7 @@
 #pragma optimize_for_size on
 #include "eff/eff_starstone.h"
 #include "battle/battle.h"
+#include "eff/n64/eff_stamp_n64.h"
 #include "battle/battle_audience.h"
 #include "battle/battle_unit.h"
 #include "driver/camdrv.h"
@@ -39,7 +40,6 @@ void BattleAudienceSoundBooingKind(s32 kind);
 void psndSFXOn(const char* name);
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 size);
 EffectEntry* effHitEntry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5);
-EffectEntry* effStampN64Entry(s32 type, f32 x, f32 y, f32 z);
 
 #define INTPL(mode, cur, steps, a, b) ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(a, b, mode, cur, steps)
 
@@ -437,12 +437,12 @@ void main_cursor(void) {
                     BtlUnit_SetAnim(part, "M_D_1");
                     BtlUnit_GetPos(mario, &x, &y, &z);
                     eff = effStampN64Entry(2, x, 20.0f + y, 10.0f + z);
-                    ((u8*)eff->userdata)[0x38] = 0;
-                    ((u8*)eff->userdata)[0x39] = 200;
-                    ((u8*)eff->userdata)[0x3a] = 0;
-                    ((u8*)eff->userdata)[0x3b] = 0;
-                    ((u8*)eff->userdata)[0x3c] = 10;
-                    ((u8*)eff->userdata)[0x3d] = 0;
+                    ((EffStampN64Work*)eff->userdata)->r = 0;
+                    ((EffStampN64Work*)eff->userdata)->g = 200;
+                    ((EffStampN64Work*)eff->userdata)->b = 0;
+                    ((EffStampN64Work*)eff->userdata)->r2 = 0;
+                    ((EffStampN64Work*)eff->userdata)->g2 = 10;
+                    ((EffStampN64Work*)eff->userdata)->b2 = 0;
                     w->t34 = 0;
                     w->flags |= 1;
                     psndSFXOn("SFX_BTL_SAC_BODY5");

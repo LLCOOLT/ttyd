@@ -650,7 +650,7 @@ USER_FUNC(firebar_entry) {
         return EVT_RETURN_DONE;
     }
     mario = marioGetPtr();
-    if (*(u16*)&mario->currMotionId == 0x20 || *(u16*)&mario->currMotionId == 0x1F || mario->mutekiTimer > 0) {
+    if (mario->currMotionId == 0x20 || mario->currMotionId == 0x1F || mario->mutekiTimer > 0) {
         wp->flags |= 4;
     } else {
         wp->flags &= ~4;

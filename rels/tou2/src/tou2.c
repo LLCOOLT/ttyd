@@ -4,9 +4,11 @@
 #include "dolphin/gx.h"
 #include "driver/swdrv.h"
 #include "driver/npcdrv.h"
+#include "battle/battle_unit.h"
 #include "driver/animdrv.h"
 #include "driver/camdrv.h"
 #include "driver/effdrv.h"
+#include "eff/eff_starstone.h"
 #include "driver/dispdrv.h"
 #include "driver/windowdrv.h"
 #include "driver/icondrv.h"
@@ -115,47 +117,13 @@ typedef struct DispWork {
     s32 page;
 } DispWork;
 
-// battle setup table layout (only the fields used here)
-typedef struct TouUnitKind {
-    s32 type;
-} TouUnitKind;
-
-typedef struct TouUnitSetup {
-    TouUnitKind* kind;
-    u8 pad_4[0x30 - 0x4];
-} TouUnitSetup;
-
-typedef struct TouGroupSetup {
-    s32 num;
-    TouUnitSetup* units;
-} TouGroupSetup;
-
-typedef struct TouLoadout {
-    s32 weight;
-    TouGroupSetup* group;
-} TouLoadout;
-
-typedef struct TouBattleSetup {
-    u8 pad_0[0x14];
-    TouLoadout* loadouts;
-    u8 pad_18[0x44 - 0x18];
-} TouBattleSetup;
-
-typedef struct StarStoneWork {
-    u8 pad_0[0x8];
-    Vec pos;
-    u8 pad_14[0x8];
-    f32 rot;
-} StarStoneWork;
-
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
-extern TouBattleSetup btlsetup_tou_tbl[];
+extern NpcSetupBattleInfo btlsetup_tou_tbl[];
 
 double atan2(double y, double x);
 int rand(void);
-EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 void FontDrawScale(f32 scale);
 void FontDrawMessageMtx(Mtx mtx, const char* msg);
 
@@ -324,7 +292,7 @@ USER_FUNC(tou_champion_belt) {
     EffectEntry* eff;
     AnimationPose* pose;
     Vec* positions;
-    StarStoneWork** work;
+    EffStarStoneWork** work;
     s32 group;
     f32 angle;
 
@@ -340,24 +308,25 @@ USER_FUNC(tou_champion_belt) {
     group = animPoseGetGroupIdx(npc->poseId, "locator8");
     angle = reviseAngle(camGetRy() - pose->rotationY);
     eff = event->userdatap[0];
-    work = (StarStoneWork**)&eff->userdata;
-    (*work)->pos.x = positions[group].x;
-    (*work)->pos.y = positions[group].y;
-    (*work)->pos.z = positions[group].z;
+    // FAKE: the work is read through a pointer to the userdata slot, so userdata is reloaded at every store (a plain EffStarStoneWork* local: 86.67%, a cast per access: 99.26%)
+    work = (EffStarStoneWork**)&eff->userdata;
+    (*work)->position.x = positions[group].x;
+    (*work)->position.y = positions[group].y;
+    (*work)->position.z = positions[group].z;
     if ((angle > 90.0f && angle <= 270.0f) || (angle < -90.0f && angle >= -270.0f)) {
-        (*work)->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
+        (*work)->rotY = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
     } else {
-        (*work)->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
+        (*work)->rotY = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
     }
     if (npc->position.y <= -1000.0f) {
-        (*work)->pos.x = 0.0f;
-        (*work)->pos.y = -1000.0f;
-        (*work)->pos.z = 0.0f;
+        (*work)->position.x = 0.0f;
+        (*work)->position.y = -1000.0f;
+        (*work)->position.z = 0.0f;
     }
     if (champion_belt_onoff) {
-        (*work)->pos.x = 0.0f;
-        (*work)->pos.y = -1000.0f;
-        (*work)->pos.z = 0.0f;
+        (*work)->position.x = 0.0f;
+        (*work)->position.y = -1000.0f;
+        (*work)->position.z = 0.0f;
     }
     return EVT_RETURN_BLOCK;
 }
@@ -735,7 +704,7 @@ USER_FUNC(evt_tou_get_fighter_tribe) {
     s32 id = evtGetValue(event, args[0]);
     s32 idx = evtGetValue(event, args[1]);
     s32 setupId = fighterDt[id].setupId;
-    TattleEntry* tattle = battleGetUnitMonosiriPtr(btlsetup_tou_tbl[setupId].loadouts->group->units[idx].kind->type);
+    TattleEntry* tattle = battleGetUnitMonosiriPtr(btlsetup_tou_tbl[setupId].select->groupSetup->enemyData[idx].mUnitKindParams->mUnitType);
     NpcTribeInfo* tribe;
     const char* name;
     BOOL found = FALSE;
@@ -781,7 +750,7 @@ USER_FUNC(evt_tou_get_fighter_num) {
     s32* args = event->args;
     s32 id = evtGetValue(event, args[0]);
 
-    evtSetValue(event, args[1], btlsetup_tou_tbl[fighterDt[id].setupId].loadouts->group->num);
+    evtSetValue(event, args[1], btlsetup_tou_tbl[fighterDt[id].setupId].select->groupSetup->numEnemies);
     return EVT_RETURN_DONE;
 }
 

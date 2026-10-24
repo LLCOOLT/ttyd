@@ -1086,7 +1086,7 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
             sprintf((char*)jdt->infoEnd, "%s_%04d", jdt->prefix, jdt->info[id].storyId);
             jdt->curIndex = id;
             evt->lwData[1] = (s32)jdt->infoEnd;
-            evt->lwData[2] = jdt->info[id].initEndPos;
+            evt->lwData[2] = (s32)jdt->info[id].initEndPos;
             evt->lwData[3] = jdt->info[id].tagEndPos;
             if (johoya_get(jdt->readFlags.luigiRead, jdt->info[id].storyId)) {
                 evt->lwData[4] = 0;
@@ -1702,19 +1702,19 @@ void select_disp_luigi(WinMgrEntry* entry) {
                 continue;
             }
             winFontInit();
-            save = ((char*)info->initEndPos)[info->tagEndPos];
-            ((char*)info->initEndPos)[info->tagEndPos] = 0;
+            save = info->initEndPos[info->tagEndPos];
+            info->initEndPos[info->tagEndPos] = 0;
             if (sel->items[i].flags & 1) {
                 col = &gray;
             } else {
                 col = &black;
             }
 #ifdef VERSION_G8ME01
-            winFontSetWidth((Vec){ent->x + 25, sel->scrollY + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, *col, 200.0f, (char*)info->initEndPos);
+            winFontSetWidth((Vec){ent->x + 25, sel->scrollY + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, *col, 200.0f, info->initEndPos);
 #else
-            winFontSet((Vec){ent->x + 25, sel->scrollY + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, *col, (char*)info->initEndPos);
+            winFontSet((Vec){ent->x + 25, sel->scrollY + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, *col, info->initEndPos);
 #endif
-            ((char*)info->initEndPos)[info->tagEndPos] = save;
+            info->initEndPos[info->tagEndPos] = save;
             if (sel->type == 17 && !(sel->items[i].flags & 1)) {
                 sprintf(buf, "%3d", info->cost);
                 winFontInit();

@@ -2798,7 +2798,7 @@ USER_FUNC(_make_madowase_weapon) {
     src = (void*)evtGetValue(event, index);
     value = evtGetValue(event, args[1]);
     memcpy(weapon, src, sizeof(BattleWeapon));
-    ((u8*)weapon)[0x84] = value;
+    weapon->dizzyChance = value;
     evtSetValue(event, index, (s32)weapon);
     return EVT_RETURN_DONE;
 }

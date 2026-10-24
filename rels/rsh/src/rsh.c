@@ -1270,7 +1270,7 @@ USER_FUNC(debug_print_func) {
 USER_FUNC(evt_rsh_set_rnd_npc_talk_evt) {
     s32* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
-    void* evt = (void*)evtGetValue(event, args[1]);
+    s32* evt = (s32*)evtGetValue(event, args[1]); // event script for the npc talk
 
     evtNpcNameToPtr(event, name)->talkEvt = evt;
     return EVT_RETURN_DONE;

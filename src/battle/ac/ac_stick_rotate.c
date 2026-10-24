@@ -457,7 +457,7 @@ void actionCommandDisp2(f32 x, f32 y) {
             if (sw->iconTimer >= (p->stepsA + p->stepsB) / 2) {
                 int step;
                 sw->iconTimer = 0;
-                step = *(s8*)&sw->roll;
+                step = sw->roll;
                 if (step == 0) {
                     step = -1;
                 }

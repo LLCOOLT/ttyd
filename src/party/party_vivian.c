@@ -52,7 +52,7 @@ void N_marioForceVivianAnime(void) {
     marioChgPose("M_B_3");
     marioChgPaper("PM_B_1");
     mario->poseTime = 0x18;
-    animPoseSetLocalTime(mario->paperAnimGroupId[marioAnimeId()], *(u16*)&mario->poseTime);
+    animPoseSetLocalTime(mario->paperAnimGroupId[marioAnimeId()], mario->poseTime);
 }
 
 #pragma explicit_zero_data reset
@@ -210,11 +210,6 @@ void vivian_move(PartyEntry* party) {
     vivianShadow(party);
 }
 
-typedef struct VivianUseWork {
-    u8 pad0[0x94];
-    Vec target; // 0x94
-} VivianUseWork;
-#define VU(p) ((VivianUseWork*)(p))
 
 extern void L_partyForceSlitOff(PartyEntry* party);
 extern void* marioSearchGround(f32* x, f32* y, f32* z, f32 a, f32 b);

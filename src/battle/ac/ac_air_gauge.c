@@ -57,11 +57,6 @@ typedef struct AirPw {
     s32 flag;
 } AirPw;
 
-typedef struct AirDisp {
-    u8 pad[0x28];
-    f32 ratio;
-} AirDisp;
-
 static void actionCommandDisp(f32 x, f32 y);
 f32 _GetGaugeDecValue(void);
 
@@ -263,8 +258,8 @@ void battleAcDisp_AirGauge(CameraId cameraId, void* param) {
             i = 4;
         case 1000:
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->slideTimerBase[i] > 0) {
-                (*(s32*)&disp->slideTimerBase[i])--;
+            if (AC_SLIDE_TIMER_AT(disp, i) > 0) {
+                (AC_SLIDE_TIMER_AT(disp, i))--;
             }
             break;
         case 1002:
@@ -290,7 +285,7 @@ void battleAcDelete_AirGauge(BattleWork* work) {
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
-    AirDisp* disp = (AirDisp*)&ac->disp;
+    BattleACDispParams* disp = &ac->disp;
     AirPw* pw;
     f32 ratio;
     f32 cur;
@@ -298,18 +293,18 @@ static void actionCommandDisp(f32 x, f32 y) {
     camGetPtr(8);
     pw = (AirPw*)ac->work;
     ratio = pw->gauge / 100.0f;
-    if (disp->ratio <= ratio) {
-        disp->ratio += 0.01f;
-        if (disp->ratio > ratio) {
-            disp->ratio = ratio;
+    if (disp->gaugeRatio <= ratio) {
+        disp->gaugeRatio += 0.01f;
+        if (disp->gaugeRatio > ratio) {
+            disp->gaugeRatio = ratio;
         }
     } else {
-        disp->ratio -= 0.01f;
-        if (disp->ratio < ratio) {
-            disp->ratio = ratio;
+        disp->gaugeRatio -= 0.01f;
+        if (disp->gaugeRatio < ratio) {
+            disp->gaugeRatio = ratio;
         }
     }
-    BattleAcDrawGauge((s32)x, (s32)y, 0xB2, disp->ratio, ac->params[2], ac->params[3], ac->params[4],
+    BattleAcDrawGauge((s32)x, (s32)y, 0xB2, disp->gaugeRatio, ac->params[2], ac->params[3], ac->params[4],
                       ac->params[5], 0);
     if (pw->flag) {
         Vec pos = {0.0f, 0.0f, 0.0f};

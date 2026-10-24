@@ -1,4 +1,6 @@
 #include "battle/battle_unit.h"
+#include "eff/n64/eff_pokopi_pcharge_n64.h"
+#include "eff/eff_puniballoon.h"
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
@@ -417,9 +419,9 @@ USER_FUNC(mario_shabon_effpos) {
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
 
-    ((f32*)marioeff->userdata)[1] = x;
-    ((f32*)marioeff->userdata)[2] = y;
-    ((f32*)marioeff->userdata)[3] = z;
+    ((PuniBalloonWork*)marioeff->userdata)->position.x = x;
+    ((PuniBalloonWork*)marioeff->userdata)->position.y = y;
+    ((PuniBalloonWork*)marioeff->userdata)->position.z = z;
     return EVT_RETURN_DONE;
 }
 
@@ -563,9 +565,9 @@ USER_FUNC(evt_pcharge_pos) {
     f32 z = evtGetFloat(event, args[3]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[1] = x;
-    ((f32*)eff->userdata)[2] = y;
-    ((f32*)eff->userdata)[3] = z;
+    ((EffPokopiPchargeN64Elem*)eff->userdata)->position.x = x;
+    ((EffPokopiPchargeN64Elem*)eff->userdata)->position.y = y;
+    ((EffPokopiPchargeN64Elem*)eff->userdata)->position.z = z;
     return EVT_RETURN_DONE;
 }
 

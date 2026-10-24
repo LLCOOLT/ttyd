@@ -1,4 +1,5 @@
 #include "version.h"
+#include "eff/eff_funemizu.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -25,6 +26,7 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_nannpc.h"
+#include "driver/extdrv.h"
 #include "party/party_motion.h"
 #include "muj.h"
 #include "data_tables.h"
@@ -36,9 +38,6 @@ void mapSetPlayRate(const char* name, f32 rate);
 typedef struct MapAnimRate { f32 fune; f32 funeTarget; f32 nami; f32 namiTarget; } MapAnimRate;
 MapAnimRate mapAnimRate;
 static u8* _ap;
-typedef struct NanNpc { u8 field_0x0[0x10]; NpcEntry* npc; u8 field_0x14[0x18 - 0x14]; Vec pos; u8 field_0x24[0x50 - 0x24]; OSTime time; u8 field_0x58[0x60 - 0x58]; f32 dir; void (*func)(struct NanNpc*); s32 state; s32 duration; s32 index; s32 dist; u8 field_0x78[0xBF - 0x78]; u8 alpha; } NanNpc;
-typedef struct NanNpcWork { NanNpc* entries; u8 field_0x4[0xC - 0x4]; s32 count; u32 flags; } NanNpcWork;
-extern NanNpcWork* nanNPCWork;
 double sin(double x);
 double cos(double x);
 EffectEntry* effMistEntry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5);
@@ -126,7 +125,7 @@ USER_FUNC(urouro_func);
 USER_FUNC(urouro_fuwafuwa_func);
 static void draw(CameraId camera, void* param);
 static void pressStartGX(LogoWork* wp, s32 alpha, f32 x, f32 y);
-void elmos1000tai_seq00(NanNpc* npc);
+void elmos1000tai_seq00(NanNPC* npc);
 USER_FUNC(elmos1000tai_start);
 static void alpha_tev(MapTevCallbackInfo* info);
 USER_FUNC(evt_set_nami_anim_rate);
@@ -657,9 +656,9 @@ static USER_FUNC(alpha_set_func) {
 }
 
 USER_FUNC(elmos1000tai_init) {
-    NanNpcWork* wp = nanNPCWork;
+    NanNPCWork* wp = nanNPCWork;
     s32 i;
-    NanNpc* npc;
+    NanNPC* npc;
     s32 deg;
     s32 a;
     s32 r;
@@ -670,10 +669,10 @@ USER_FUNC(elmos1000tai_init) {
     f32 fdeg;
 
     wp->flags |= 1;
-    for (i = 0; i < wp->count; i++) {
-        npc = &wp->entries[i];
-        npc->npc->flags |= 4;
-        npc->alpha = 0;
+    for (i = 0; i < wp->num; i++) {
+        npc = &wp->npc[i];
+        npc->pose->flags |= 4;
+        npc->color.a = 0;
         npc->dir = 90.0f;
         npc->index = i;
         if (i % 3) {
@@ -702,38 +701,38 @@ USER_FUNC(elmos1000tai_init) {
 
 USER_FUNC(elmos1000tai_start) {
     s32 i;
-    NanNpc* npc;
-    NanNpcWork* wp;
+    NanNPC* npc;
+    NanNPCWork* wp;
 
     wp = nanNPCWork;
 
-    for (i = 0; i < wp->count; i++) {
-        npc = &wp->entries[i];
+    for (i = 0; i < wp->num; i++) {
+        npc = &wp->npc[i];
         npc->func = elmos1000tai_seq00;
         npc->state = 0;
     }
     return EVT_RETURN_DONE;
 }
 
-void elmos1000tai_seq00(NanNpc* npc) {
+void elmos1000tai_seq00(NanNPC* npc) {
     s32 t;
 
     switch (npc->state) {
         case 0:
-            npc->time = gp->renderTime;
+            npc->startTime = gp->renderTime;
             npc->duration = irand(1000) + npc->dist * 3;
             npc->state = 1;
         case 1:
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) >= npc->duration) {
-                npc->time = gp->renderTime;
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime) >= npc->duration) {
+                npc->startTime = gp->renderTime;
                 npc->duration = 500;
                 npc->state = 2;
             }
             break;
         case 2:
-            t = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time);
+            t = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime);
             if (t < npc->duration) {
-                npc->alpha = intplGetValue(0, t, npc->duration, 0.0f, 255.0f);
+                npc->color.a = intplGetValue(0, t, npc->duration, 0.0f, 255.0f);
             } else {
                 npc->state = 3;
             }
@@ -807,14 +806,14 @@ USER_FUNC(kaizoku_fune_eff) {
         event->userdatap[0] = effFunemizuEntry(0, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
         mapObjGetPos("S_b", &pos);
         event->userdataf[2] = pos.x;
-        *(f32*)&event->userdata3 = pos.z;
+        event->userdata3f = pos.z;
     }
     eff = event->userdatap[0];
     oldX = event->userdataf[2];
-    oldZ = *(f32*)&event->userdata3;
+    oldZ = event->userdata3f;
     mapObjGetPos("S_b", &pos);
     event->userdataf[2] = pos.x;
-    *(f32*)&event->userdata3 = pos.z;
+    event->userdata3f = pos.z;
     speed = distABf(oldX, oldZ, pos.x, pos.z);
     angle = angleABf(oldX, oldZ, pos.x, pos.z);
     if (angle < 180.0f) {
@@ -822,15 +821,15 @@ USER_FUNC(kaizoku_fune_eff) {
     } else {
         dir = -1.0f;
     }
-    ((f32*)eff->userdata)[17] = 5.0f;
-    ((f32*)eff->userdata)[1] = 140.0f * dir + pos.x;
-    ((f32*)eff->userdata)[2] = pos.y - 160.0f;
-    ((f32*)eff->userdata)[3] = 40.0f + pos.z;
-    ((f32*)eff->userdata)[4] = speed;
+    ((EffFunemizuWork*)eff->userdata)->scale = 5.0f;
+    ((EffFunemizuWork*)eff->userdata)->position.x = 140.0f * dir + pos.x;
+    ((EffFunemizuWork*)eff->userdata)->position.y = pos.y - 160.0f;
+    ((EffFunemizuWork*)eff->userdata)->position.z = 40.0f + pos.z;
+    ((EffFunemizuWork*)eff->userdata)->f10 = speed;
     if (angle < 180.0f) {
-        ((f32*)eff->userdata)[5] = 135.0f + angle;
+        ((EffFunemizuWork*)eff->userdata)->f14 = 135.0f + angle;
     } else {
-        ((f32*)eff->userdata)[5] = 45.0f + angle;
+        ((EffFunemizuWork*)eff->userdata)->f14 = 45.0f + angle;
     }
     return EVT_RETURN_BLOCK;
 }
@@ -1887,32 +1886,32 @@ static USER_FUNC(fune_eff) {
         event->userdatap[1] = effFunemizuEntry(2, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
         mapObjGetPos("S_fune_m", &pos);
         event->userdataf[2] = pos.x;
-        *(f32*)&event->userdata3 = pos.z;
+        event->userdata3f = pos.z;
     }
     eff1 = event->userdatap[0];
     eff2 = event->userdatap[1];
     oldX = event->userdataf[2];
-    oldZ = *(f32*)&event->userdata3;
+    oldZ = event->userdata3f;
     mapObjGetPos("S_fune_m", &pos);
     event->userdataf[2] = pos.x;
-    *(f32*)&event->userdata3 = pos.z;
+    event->userdata3f = pos.z;
     speed = distABf(oldX, oldZ, pos.x, pos.z);
     angleABf(oldX, oldZ, pos.x, pos.z);
     off85 = 85.0f;
     if (evtGetValue(event, GSW(0)) == 2) {
         speed = 2.0f;
     }
-    ((f32*)eff1->userdata)[17] = 3.0f;
-    ((f32*)eff1->userdata)[1] = pos.x + off85;
-    ((f32*)eff1->userdata)[2] = pos.y - 51.0f;
-    ((f32*)eff1->userdata)[3] = 30.0f + pos.z;
-    ((f32*)eff1->userdata)[4] = speed;
-    ((f32*)eff1->userdata)[5] = 225.0f;
-    ((f32*)eff2->userdata)[1] = pos.x - 15.0f;
-    ((f32*)eff2->userdata)[2] = pos.y - 51.0f;
-    ((f32*)eff2->userdata)[3] = 90.0f + pos.z;
-    ((f32*)eff2->userdata)[4] = speed;
-    ((f32*)eff2->userdata)[5] = 180.0f;
+    ((EffFunemizuWork*)eff1->userdata)->scale = 3.0f;
+    ((EffFunemizuWork*)eff1->userdata)->position.x = pos.x + off85;
+    ((EffFunemizuWork*)eff1->userdata)->position.y = pos.y - 51.0f;
+    ((EffFunemizuWork*)eff1->userdata)->position.z = 30.0f + pos.z;
+    ((EffFunemizuWork*)eff1->userdata)->f10 = speed;
+    ((EffFunemizuWork*)eff1->userdata)->f14 = 225.0f;
+    ((EffFunemizuWork*)eff2->userdata)->position.x = pos.x - 15.0f;
+    ((EffFunemizuWork*)eff2->userdata)->position.y = pos.y - 51.0f;
+    ((EffFunemizuWork*)eff2->userdata)->position.z = 90.0f + pos.z;
+    ((EffFunemizuWork*)eff2->userdata)->f10 = speed;
+    ((EffFunemizuWork*)eff2->userdata)->f14 = 180.0f;
     if (speed > 1.0f && gp->retraceCount % 15 == 0) {
         effWaterDamageN64Entry(5, 30, pos.x - 150.0f, pos.y - 50.0f, pos.z, 2.0f);
     }

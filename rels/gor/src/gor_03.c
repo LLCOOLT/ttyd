@@ -61,7 +61,6 @@ static void monte_disp(CameraId camera, void* param);
 static BOOL get_monte_check(Vec* a, Vec* b);
 void mapGrpFlagOn(const char* name, u32 flags);
 typedef struct SlotDrum { const char* drum[3]; const char* reber; const char* anim; const char* window[3][3]; const char* neon[3]; } SlotDrum;
-#define DRUMNAME ((SlotDrum*)drumname)
 void mapObjRotate(const char* name, f32 x, f32 y, f32 z);
 void goryuugijo_upsidewindow_disp_sub(s32 slot, s32 reel);
 #define UPSIDEGARA ((s32(*)[3][8])upsidegara)
@@ -373,7 +372,7 @@ s32 slot_fall_monte[4];
 s32 slot_set[VERSION_PICK(148, 168)];
 s32 slot1_set[7];
 s32 slot2_set[7];
-const char* drumname[34];
+SlotDrum drumname[2];
 s32* slotevttbl[2];
 s32 slotgara[48];
 s32 upsidegara[48];
@@ -3178,7 +3177,7 @@ EVT_BEGIN(slot2_set)
     RETURN
 EVT_END()
 
-const char* drumname[] = {
+SlotDrum drumname[2] = { // flat initializer, 17 names per slot machine
     "S_srot01_dram_01",
     "S_srot01_dram_02",
     "S_srot01_dram_03",
@@ -6175,15 +6174,15 @@ USER_FUNC(goryuugijo_get_slot_phase) {
 }
 
 void goryuugijo_upsidewindow_dispoff_sub(s32 slot, s32 reel) {
-    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[5], 1);
-    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[6], 1);
-    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[7], 1);
+    mapGrpFlagOn(drumname[slot].window[reel][0], 1);
+    mapGrpFlagOn(drumname[slot].window[reel][1], 1);
+    mapGrpFlagOn(drumname[slot].window[reel][2], 1);
 }
 
 void goryuugijo_upsidewindow_disp_sub(s32 slot, s32 reel) {
-    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[5], 1);
-    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[6], 1);
-    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[7], 1);
+    mapGrpFlagOn(drumname[slot].window[reel][0], 1);
+    mapGrpFlagOn(drumname[slot].window[reel][1], 1);
+    mapGrpFlagOn(drumname[slot].window[reel][2], 1);
 }
 
 USER_FUNC(goryuugijo_door_init_slot) {
@@ -6199,7 +6198,7 @@ USER_FUNC(goryuugijo_door_init_slot) {
                 data->angle[i][j] -= 360.0f;
             }
             data->angle[i][j] = 45.0f * irand(8);
-            mapObjRotate(DRUMNAME[i].drum[j], 0.0f, 0.0f, data->angle[i][j]);
+            mapObjRotate(drumname[i].drum[j], 0.0f, 0.0f, data->angle[i][j]);
             data->face[i][j] = UPSIDEGARA[i][j][irand(8)];
             goryuugijo_upsidewindow_disp_sub(i, j);
         }
@@ -6272,13 +6271,13 @@ void slot_neon_sub(GoryuuWork* wp, SlotWork* data) {
     }
     if (data->flags & 2) {
         if (data->neonCount == 0 || data->neonCount == 12 || data->neonCount == 24) {
-            mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 14], 0, 0);
+            mapPlayAnimationLv(drumname[data->nowSlot].neon[0], 0, 0);
         }
         if (data->neonCount == 6 || data->neonCount == 18) {
-            mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 15], 0, 0);
+            mapPlayAnimationLv(drumname[data->nowSlot].neon[1], 0, 0);
         }
     } else if (data->neonCount == 24) {
-        mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 14], 0, 0);
+        mapPlayAnimationLv(drumname[data->nowSlot].neon[0], 0, 0);
     }
     if (data->neonCount <= 78) {
         data->neonCount++;
@@ -6348,7 +6347,7 @@ s32 slot_rotate_sub(GoryuuWork* wp, SlotWork* data, s32 reel) {
         data->angle[data->nowSlot][reel] += 360.0f;
     }
 rotate:
-    mapObjRotate(DRUMNAME[data->nowSlot].drum[reel], 0.0f, 0.0f, data->angle[data->nowSlot][reel]);
+    mapObjRotate(drumname[data->nowSlot].drum[reel], 0.0f, 0.0f, data->angle[data->nowSlot][reel]);
     return stopped;
 }
 
@@ -6390,7 +6389,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
             } else {
                 data->counter++;
                 data->reberAngle += 4.0f;
-                mapObjRotate((const char*)drumname[data->nowSlot * 17 + 3], 0.0f, 0.0f, data->reberAngle);
+                mapObjRotate(drumname[data->nowSlot].reber, 0.0f, 0.0f, data->reberAngle);
             }
             break;
         case 3:
@@ -6401,7 +6400,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                 } else {
                     data->reberAngle -= 10.0f;
                 }
-                mapObjRotate((const char*)drumname[data->nowSlot * 17 + 3], 0.0f, 0.0f, data->reberAngle);
+                mapObjRotate(drumname[data->nowSlot].reber, 0.0f, 0.0f, data->reberAngle);
                 data->counter++;
             }
             if (data->state[data->cursor] != 2 || (keyGetDirRep(0) & 0xC000)) {
@@ -6476,7 +6475,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                 for (i = 0; i < 3; i++) {
                     goryuugijo_upsidewindow_disp_sub(data->nowSlot, i);
                 }
-                mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 15], 0, 0);
+                mapPlayAnimationLv(drumname[data->nowSlot].neon[1], 0, 0);
                 data->counter = 0;
                 data->phase++;
             }
@@ -6612,7 +6611,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                 caseDelete(data->caseId[0]);
                 caseDelete(data->caseId[1]);
                 data->flags |= 1;
-                mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 16], 1, 0);
+                mapPlayAnimationLv(drumname[data->nowSlot].neon[2], 1, 0);
                 data->flags |= 8;
             } else {
                 data->phase = 11;
@@ -6647,9 +6646,9 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
             break;
         case 10:
             if (data->monteEvt == NULL || !evtCheckID(data->monteEvt->eventId)) {
-                mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 16], 2, 0);
+                mapPlayAnimationLv(drumname[data->nowSlot].neon[2], 2, 0);
                 data->flags &= ~8;
-                mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 15], 0, 0);
+                mapPlayAnimationLv(drumname[data->nowSlot].neon[1], 0, 0);
                 data->counter = 0;
                 data->monteEvt = NULL;
                 data->phase++;
@@ -6674,7 +6673,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                 {s32 n; CaseSetup* s = &setup;
                 for (n = 0; n < 2; n++) {
                     s->conditionId = 0x8009;
-                    s->hitObjName = DRUMNAME[n].anim;
+                    s->hitObjName = drumname[n].anim;
                     s->swFlag = 0;
                     s->activeFunc = NULL;
                     s->evtCode = slotevttbl[n];
@@ -6685,9 +6684,9 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                 }
             }
             if (data->flags & 8) {
-                mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 16], 2, 0);
+                mapPlayAnimationLv(drumname[data->nowSlot].neon[2], 2, 0);
                 data->flags &= ~8;
-                mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 15], 0, 0);
+                mapPlayAnimationLv(drumname[data->nowSlot].neon[1], 0, 0);
             }
             break;
     }
@@ -6710,7 +6709,7 @@ void goryuugijo_disp_slot(CameraId camera, void* param) {
 
     for (i = 0; i < 3; i++) {
         if (data->state[i] == 2 && i == data->cursor) {
-            mapObjGetPos(DRUMNAME[data->nowSlot].drum[i], &pos);
+            mapObjGetPos(drumname[data->nowSlot].drum[i], &pos);
             pos.x -= 25.0f;
             pos.y += 10.0f;
             cam = camGetPtr(CAMERA_3D);

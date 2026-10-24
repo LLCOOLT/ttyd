@@ -109,7 +109,7 @@ void effSheepMain(EffectEntry* effect) {
             }
         }
         psndSFXOff(((EffSheepWork*)effect->userdata)[1].sfxId);
-        psndSFXOff(*(s32*)((u8*)effect->userdata + effect->count * 0x34 - 4));
+        psndSFXOff(((EffSheepWork*)effect->userdata)[effect->count - 1].sfxId);
         effDelete(effect);
         return;
     }

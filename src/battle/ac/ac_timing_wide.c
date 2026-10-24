@@ -39,7 +39,7 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
             memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            *(s32*)&disp->slideTimerBase[4] = 20;
+            disp->slideTimer = 20;
             tw->state = 0;
             tw->frame = 0;
             switch (ac->params[0]) {
@@ -140,14 +140,14 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
                     ac->outputParams[2] = 0;
                 }
                 if (autoCmd) {
-                    if (*(s32*)&ac->outputParams[2]) {
+                    if (ac->outputParams[2]) {
                         pressed = 1;
                     } else {
                         pressed = 0;
                     }
                 }
                 if (pressed) {
-                    if (*(s32*)&ac->outputParams[2]) {
+                    if (ac->outputParams[2]) {
                         ac->result = 2;
                         ac->mResultCount++;
                         ac->outputParams[0] = 1;

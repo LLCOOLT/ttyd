@@ -21,18 +21,6 @@
 #include "evt/evt_sub.h"
 #include "party/party_motion.h"
 
-typedef struct HeartWork {
-    u8 pad[0x78];
-    BattleUnit* unit;
-    s32 cur;
-    s32 start;
-    s32 end;
-    s32 total;
-    s32 stop;
-    s32 unitId;
-    s32 partId;
-} HeartWork;
-
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "icon_ids.h"
@@ -1852,25 +1840,25 @@ USER_FUNC(_disp_heart_entry) {
     id = BattleTransID(event, -2);
     unit = BattleGetUnitPtr(wp, id);
     if (isFirstCall) {
-        ((HeartWork*)event)->unit = unit;
-        ((HeartWork*)event)->cur = 0;
-        ((HeartWork*)event)->start = evtGetValue(event, args[0]);
-        ((HeartWork*)event)->end = evtGetValue(event, args[1]);
-        ((HeartWork*)event)->total = evtGetValue(event, args[2]);
-        ((HeartWork*)event)->stop = 0;
-        ((HeartWork*)event)->unitId = evtGetValue(event, args[3]);
-        ((HeartWork*)event)->partId = evtGetValue(event, args[4]);
+        event->heart.unit = unit;
+        event->heart.cur = 0;
+        event->heart.start = evtGetValue(event, args[0]);
+        event->heart.end = evtGetValue(event, args[1]);
+        event->heart.total = evtGetValue(event, args[2]);
+        event->heart.stop = 0;
+        event->heart.unitId = evtGetValue(event, args[3]);
+        event->heart.partId = evtGetValue(event, args[4]);
     }
-    if (((HeartWork*)event)->stop != 0) {
+    if (event->heart.stop != 0) {
         return EVT_RETURN_DONE;
     }
-    ((HeartWork*)event)->cur++;
+    event->heart.cur++;
     dispEntry(4, 0.0f, 1, (DispCallback)_disp_heart, event);
-    return ((HeartWork*)event)->cur < ((HeartWork*)event)->total ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
+    return event->heart.cur < event->heart.total ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
 void _disp_heart(CameraId camera, void* param) {
-    HeartWork* w;
+    EventEntry* w;
     f32 scale;
     Vec p, b, a, c;
     BattleUnit* unit;
@@ -1879,17 +1867,17 @@ void _disp_heart(CameraId camera, void* param) {
         return;
     }
     w = param;
-    if (w->unit != NULL) {
+    if (w->heart.unit != NULL) {
         {
-            if (w->cur <= w->start) {
-                scale = intplGetValue(5, w->cur, w->start, 0.0f, 1.2f);
-            } else if (w->cur <= w->end) {
-                scale = intplGetValue(0xb, w->cur - w->start, w->end - w->start, 1.2f, 1.0f);
+            if (w->heart.cur <= w->heart.start) {
+                scale = intplGetValue(5, w->heart.cur, w->heart.start, 0.0f, 1.2f);
+            } else if (w->heart.cur <= w->heart.end) {
+                scale = intplGetValue(0xb, w->heart.cur - w->heart.start, w->heart.end - w->heart.start, 1.2f, 1.0f);
             } else {
                 scale = 1.0f;
             }
-            unit = BattleGetUnitPtr(_battleWorkPointer, BattleTransID((EventEntry*)w, w->unitId));
-            BtlUnit_GetHitPos(unit, BtlUnit_GetPartsPtr(unit, w->partId), &p.x, &p.y, &p.z);
+            unit = BattleGetUnitPtr(_battleWorkPointer, BattleTransID(w, w->heart.unitId));
+            BtlUnit_GetHitPos(unit, BtlUnit_GetPartsPtr(unit, w->heart.partId), &p.x, &p.y, &p.z);
             p.z += 10.0f;
             a = p;
             b = p;
@@ -1904,12 +1892,12 @@ void _disp_heart(CameraId camera, void* param) {
 
 USER_FUNC(_disp_heart_entry_stop) {
     EventEntry* e = evtGetPtrID(evtGetValue(event, *event->args));
-    ((HeartWork*)e)->stop = 1;
+    e->heart.stop = 1;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(_disp_heart_entry_stop_check) {
-    evtSetValue(event, *event->args, ((HeartWork*)event)->stop);
+    evtSetValue(event, *event->args, event->heart.stop);
     return EVT_RETURN_DONE;
 }
 

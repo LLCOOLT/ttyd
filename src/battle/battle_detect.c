@@ -530,13 +530,13 @@ void BattleChoiceSamplingEnemy(BattleWorkWeaponTargets* d, u32 flags, s32* unitO
                     }
                     break;
                 default:
-                    if (*(u8*)&itemDataTable[d->weapon->itemId].fp_restored) {
+                    if (itemDataTable[d->weapon->itemId].fp_restored) {
                         s32 mx = BtlUnit_GetMaxFp(unit);
                         if (BtlUnit_GetFp(unit) < mx) {
                             mx = BtlUnit_GetMaxFp(unit);
                             w[id] = w[id] * (1.0f + 0.1f * (mx - BtlUnit_GetFp(unit)));
-                        } else if (!*(u8*)&itemDataTable[d->weapon->itemId].hp_restored
-                                   && !*(u8*)&itemDataTable[d->weapon->itemId].sp_restored) {
+                        } else if (!itemDataTable[d->weapon->itemId].hp_restored
+                                   && !itemDataTable[d->weapon->itemId].sp_restored) {
                             w[id] = 1;
                         }
                     }

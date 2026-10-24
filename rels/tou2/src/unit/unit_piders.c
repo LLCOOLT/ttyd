@@ -131,7 +131,7 @@ static USER_FUNC(piders_yarn_init) {
     s32 id = BattleTransID(event, -2);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
 
-    *(PidersYarn**)&unit->countersetWeapon = BTL_ALLOC(sizeof(PidersYarn));
+    unit->countersetWeapon = (BattleWeapon*)BTL_ALLOC(sizeof(PidersYarn)); // piders keep their yarn work in the counter-set weapon slot
     return EVT_RETURN_DONE;
 }
 
@@ -317,7 +317,7 @@ static USER_FUNC(piders_draw_yarn) {
     u8 alpha = evtGetValue(event, event->args[0]);
     s32 id = BattleTransID(event, -2);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    PidersYarn* yarn = *(PidersYarn**)&unit->countersetWeapon;
+    PidersYarn* yarn = (PidersYarn*)unit->countersetWeapon;
 
     // from the pider down to its hanging height, and up to the ceiling
     BtlUnit_GetHomePos(unit, &yarn->x1, &yarn->y1, &yarn->z1);

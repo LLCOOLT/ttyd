@@ -23,20 +23,18 @@
 #include "evt/evt_sub.h"
 #include "data_tables.h"
 #include "evt/evt_npc.h"
+#include "driver/extdrv.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(N_evt_sub_status_gauge_force_update);
 USER_FUNC(evt_sub_get_language);
 #endif
 
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct Fan { u16 flags; s16 state; s16 animIdx; u8 pad_0x6[2]; u64 time; Vec pos; Vec vel; f32 field_0x28; Vec target; Vec param; s16 timer; } Fan;
 typedef struct FanAnim { char name[16]; char anim[8]; s16 loop; f32 rate; s32 start; s32 count; } FanAnim;
 typedef struct FanWork { s32 num; Fan* fans; s32 animNum; FanAnim anim[32]; s32 hammerTimer; s32 count; s32 sfxId; u8 vol; } FanWork;
 typedef struct FanData { const char* name; const char* anim; f32 rate; } FanData;
 u32 gap_05_00000024_bss;
 FanWork* fan_wp;
-ExtPose* extGetPosePtr(void);
-s32 extGetPoseNum(void);
 static void pose_init(void);
 static void pose_init(void);
 static void pose_change(Fan* fan, const char* name, const char* anim);
@@ -44,12 +42,6 @@ static void pose_change(Fan* fan, const char* name, const char* anim);
 static f32 randf(f32 min, f32 max);
 static f32 randf(f32 min, f32 max);
 u8 psndSFX_get_vol(s32 id);
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
 static inline f32 fan_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
 static inline f32 fan_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
 s32 check_hammer(Fan* fan);
@@ -291,7 +283,7 @@ static void pose_init(void) {
 
 static void pose_main(void) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     Fan* fan;
     FanAnim* a;
     f32 t;
@@ -306,7 +298,7 @@ static void pose_main(void) {
             fan->time = gp->renderTime;
             t = 0.0f;
         }
-        pose->frame = a->start + (s32)((a->count - 1) * t);
+        pose->texId = a->start + (s32)((a->count - 1) * t);
     }
 }
 
@@ -1645,7 +1637,7 @@ ExtTexInfo ext_fan_data[] = {
 
 void ext_fan_init(void) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     Fan* fan;
 
     fan_wp = _mapAlloc(sizeof(FanWork));
@@ -1658,11 +1650,11 @@ void ext_fan_init(void) {
     fan = fan_wp->fans;
     for (i = 0; i < fan_wp->num; i++, pose++, fan++) {
         pose->flags |= 7;
-        PSMTXIdentity(pose->mtx);
-        pose->mtx[0][3] = 0.0f;
-        pose->mtx[1][3] = 0.0f;
-        pose->mtx[2][3] = 0.0f;
-        pose->rot = randf(0.0f, 360.0f);
+        PSMTXIdentity(*pose->mtx);
+        (*pose->mtx)[0][3] = 0.0f;
+        (*pose->mtx)[1][3] = 0.0f;
+        (*pose->mtx)[2][3] = 0.0f;
+        pose->dir = randf(0.0f, 360.0f);
         switch (irand(1000) % 3) {
             case 0:
                 pose_change(fan, "c_kinopio", "KNP_W_1");
@@ -1704,7 +1696,7 @@ static __declspec(section ".rodata") Vec fan_zero;
 void ext_fan_main(void) {
     MarioWork* mario = marioGetPtr();
     Fan* fan;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     s32 li;
     Fan* lfan;
     s32 i;
@@ -1717,7 +1709,7 @@ void ext_fan_main(void) {
         fan_wp->hammerTimer = 0;
     }
     if (evtGetValue(NULL, GF(10))) {
-        ExtPose* pose = extGetPosePtr();
+        ExtdrvPose* pose = extGetPosePtr();
         Fan* fan = fan_wp->fans;
 
         for (i = 0; i < fan_wp->num; i++, fan++, pose++) {
@@ -1926,10 +1918,10 @@ void ext_fan_main(void) {
             } else if (lfan->state != 0) {
                 fan_wp->count--;
             }
-            pose->mtx[0][3] = lfan->pos.x;
-            pose->mtx[1][3] = lfan->pos.y;
-            pose->mtx[2][3] = lfan->pos.z;
-            pose->rot = angleABf(target.x, target.z, lfan->pos.x, lfan->pos.z);
+            (*pose->mtx)[0][3] = lfan->pos.x;
+            (*pose->mtx)[1][3] = lfan->pos.y;
+            (*pose->mtx)[2][3] = lfan->pos.z;
+            pose->dir = angleABf(target.x, target.z, lfan->pos.x, lfan->pos.z);
         }
     }
     psndSFX_pos(fan_wp->sfxId, &target);

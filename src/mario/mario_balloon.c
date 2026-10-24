@@ -199,7 +199,7 @@ void marioBalloonMain(void) {
     npc = fbatNpcTalkCheck();
     if (npc != NULL) {
         if (!(npc->flags & 0x80000000)) {
-            type = *(s8*)&npc->balloonType;
+            type = npc->balloonType;
             show = TRUE;
         }
         if (mario->balloonNpc != npc) {

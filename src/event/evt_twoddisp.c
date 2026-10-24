@@ -42,7 +42,7 @@ static void twoddisp_disp(CameraId camera, void* param) {
 
     for (i = 0; i < 100; i++) {
         p = &twodPtr[i];
-        if (((s8*)p->name)[0] != 0 && (p->flags & 1)) {
+        if ((s8)p->name[0] != 0 && (p->flags & 1)) {
             if (!(p->id & 0x80000000)) {
                 fogi = twod_icon_fog_color;
                 pos.x = p->baseX + p->x;
@@ -122,7 +122,7 @@ s32 evt_twoddisp_entry(EventEntry* evt, BOOL isFirstCall) {
     for (i = 0; i < 100; i++) {
         p = &twodPtr[i];
         strcmp(p->name, name);
-        if (((s8*)p->name)[0] == 0) {
+        if ((s8)p->name[0] == 0) {
             strcpy(p->name, name);
             p->flags = 1;
             p->unk12 = 0;

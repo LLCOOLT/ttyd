@@ -979,7 +979,8 @@ s32 pouchGetHammerLv(void) {
 }
 
 s32 pouchGetPartyAttackLv(PartyId partyId) {
-	return *(s16*)((u8*)mpp + partyId * 14 + 0xA);
+	// FAKE: &mpp->partyData[partyId] is formed by hand (same address) so the scaled index gets the field offset before the base is added (addi + lhax), as in the target
+	return ((PouchPartyData*)((u8*)mpp + partyId * sizeof(PouchPartyData)))->attackLevel;
 }
 
 BOOL pouchAddKeepItem(s16 id) {
@@ -1173,7 +1174,7 @@ void pouchGetStarStone(u32 id) {
 	if (!*sp) {
 		mpp->audienceCount = 2.0f;
 	}
-	*(u16*)&mpp->mStarPowersObtained |= 1 << id;
+	mpp->mStarPowersObtained |= 1 << id;
 	mpp->maximumSP = (s16)(100 * (id + 1));
 	if (mpp->maximumSP < 0) {
 		mpp->maximumSP = 0;

@@ -1,4 +1,5 @@
 #include "battle/battle_unit.h"
+#include "eff/n64/eff_guruguru_n64.h"
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
@@ -159,7 +160,7 @@ USER_FUNC(syuryo_baria) {
     NpcEntry* npc = npcNameToPtr("\x83\x73\x81\x5B\x83\x60\x95\x50");
     EffectEntry* eff = effSyuryouEntry(1, 1000, npc->position.x, npc->position.y - 8.0f, 10.0f + npc->position.z);
 
-    ((f32*)eff->userdata)[4] = 2.0f;
+    ((EffSyuryouWork*)eff->userdata)->scale = 2.0f;
     effSetName(eff, "baria");
     return EVT_RETURN_DONE;
 }
@@ -390,9 +391,9 @@ USER_FUNC(syuryo_baria_recalc_pos) {
     angle = angleABf(cam->cameraPos.x, cam->cameraPos.z, npc->position.x, npc->position.z);
     PSMTXRotRad(mtx, 'Y', 0.017453292f * -angle);
     PSMTXMultVec(mtx, &offset, &offset);
-    ((f32*)eff->userdata)[1] = npc->position.x + offset.x;
-    ((f32*)eff->userdata)[2] = npc->position.y + offset.y;
-    ((f32*)eff->userdata)[3] = npc->position.z + offset.z;
+    ((EffSyuryouWork*)eff->userdata)->position.x = npc->position.x + offset.x;
+    ((EffSyuryouWork*)eff->userdata)->position.y = npc->position.y + offset.y;
+    ((EffSyuryouWork*)eff->userdata)->position.z = npc->position.z + offset.z;
     return EVT_RETURN_DONE;
 }
 
@@ -846,7 +847,7 @@ static USER_FUNC(eff_guruguru) {
     f32 w = evtGetFloat(event, args[4]);
     EffectEntry* eff = effGuruguruN64Entry(0, 3, x, y, z, w);
 
-    ((f32*)eff->userdata)[11] = 0.8f;
+    ((EffGuruguruN64Work*)eff->userdata)->scale = 0.8f;
     effSetName(eff, name);
     return EVT_RETURN_DONE;
 }

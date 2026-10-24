@@ -1,4 +1,5 @@
 #include "version.h"
+#include "eff/eff_starstone.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -10,10 +11,10 @@
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_memcard.h"
 #include "evt/evt_npc.h"
+#include "driver/msgdrv.h"
 #ifdef VERSION_G8ME01
 #endif
 
-typedef struct KpaCbInfo { u8 field_0x0[0x8]; u16 field_0x8; u8 field_0xA[0x10 - 0xA]; s32 field_0x10; } KpaCbInfo;
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 
 USER_FUNC(evt_bero_mapchange);
@@ -67,8 +68,8 @@ static USER_FUNC(set_starstone_pos);
 USER_FUNC(set_starstone_ry);
 static USER_FUNC(starstone_entry);
 static USER_FUNC(starstone_fall);
-void kpa_stg6_014_cb(s32 type, KpaCbInfo** param);
-void kpa_stg6_012_1_cb(s32 type, KpaCbInfo** param);
+void kpa_stg6_014_cb(s32 type, smartEntry* smart);
+void kpa_stg6_012_1_cb(s32 type, smartEntry* smart);
 
 f32 fd_kpa_07_negone_one_374[2] __attribute__((aligned(8)));
 f32 fd_kpa_07_neg_one_382;
@@ -805,19 +806,19 @@ EVT_BEGIN(kpa_07_init_evt)
     RETURN
 EVT_END()
 
-void kpa_stg6_014_cb(s32 type, KpaCbInfo** param) {
-    KpaCbInfo* info = *param;
+void kpa_stg6_014_cb(s32 type, smartEntry* smart) {
+    MsgWinData* info = smart->address;
     NpcEntry* npc;
 
     switch (type) {
         case 3:
-            if (info->field_0x8 == 1) {
+            if (info->curPage == 1) {
                 // ブレッドハート
                 npc = npcNameToPtr("\x83\x75\x83\x8C\x83\x62\x83\x68\x83\x6E\x81\x5B\x83\x67");
                 strcpy(npc->stayAnim, "S_5");
                 strcpy(npc->talkAnim, "T_5");
             }
-            if (info->field_0x8 == 2) {
+            if (info->curPage == 2) {
                 // ブレッドハート
                 npc = npcNameToPtr("\x83\x75\x83\x8C\x83\x62\x83\x68\x83\x6E\x81\x5B\x83\x67");
                 strcpy(npc->stayAnim, "S_1");
@@ -827,8 +828,8 @@ void kpa_stg6_014_cb(s32 type, KpaCbInfo** param) {
     }
 }
 
-void kpa_stg6_012_1_cb(s32 type, KpaCbInfo** param) {
-    KpaCbInfo* info = *param;
+void kpa_stg6_012_1_cb(s32 type, smartEntry* smart) {
+    MsgWinData* info = smart->address;
 
     switch (type) {
         case 0:
@@ -836,7 +837,7 @@ void kpa_stg6_012_1_cb(s32 type, KpaCbInfo** param) {
             animPoseSetAnim(npcNameToPtr("\x83\x6F\x83\x6F")->poseId, "A_2B", TRUE);
             break;
         case 5:
-            if (info->field_0x10 == 8) {
+            if (info->nextEntry == 8) {
                 // ババ
                 animPoseSetAnim(npcNameToPtr("\x83\x6F\x83\x6F")->poseId, "T_1", TRUE);
             }
@@ -855,7 +856,7 @@ static USER_FUNC(starstone_entry) {
     EffectEntry* eff = effStarStoneEntry(type, x, y, z, scale);
 
     effSetName(eff, name);
-    ((u16*)eff->userdata)[2] |= 0x10;
+    ((EffStarStoneWork*)eff->userdata)->flags |= 0x10;
     return EVT_RETURN_DONE;
 }
 
@@ -863,9 +864,9 @@ static USER_FUNC(get_starstone_pos) {
     s32* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
 
-    evtSetFloat(event, args[1], ((f32*)eff->userdata)[2]);
-    evtSetFloat(event, args[2], ((f32*)eff->userdata)[3]);
-    evtSetFloat(event, args[3], ((f32*)eff->userdata)[4]);
+    evtSetFloat(event, args[1], ((EffStarStoneWork*)eff->userdata)->position.x);
+    evtSetFloat(event, args[2], ((EffStarStoneWork*)eff->userdata)->position.y);
+    evtSetFloat(event, args[3], ((EffStarStoneWork*)eff->userdata)->position.z);
     return EVT_RETURN_DONE;
 }
 
@@ -877,9 +878,9 @@ static USER_FUNC(set_starstone_pos) {
     f32 z = evtGetFloat(event, args[3]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[2] = x;
-    ((f32*)eff->userdata)[3] = y;
-    ((f32*)eff->userdata)[4] = z;
+    ((EffStarStoneWork*)eff->userdata)->position.x = x;
+    ((EffStarStoneWork*)eff->userdata)->position.y = y;
+    ((EffStarStoneWork*)eff->userdata)->position.z = z;
     return EVT_RETURN_DONE;
 }
 
@@ -888,14 +889,14 @@ USER_FUNC(set_starstone_ry) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 ry = evtGetFloat(event, args[1]);
 
-    ((f32*)effNameToPtr(name)->userdata)[7] = ry;
+    ((EffStarStoneWork*)effNameToPtr(name)->userdata)->rotY = ry;
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(starstone_fall) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
-    ((s32*)eff->userdata)[15] = 1;
+    ((EffStarStoneWork*)eff->userdata)->state = 1;
     return EVT_RETURN_DONE;
 }
 

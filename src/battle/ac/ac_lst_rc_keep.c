@@ -17,15 +17,6 @@ typedef struct LstRcWork {
     s32 endTimer; // 0x2C8
 } LstRcWork;
 
-typedef struct LstRcDisp {
-    u8 pad0[0x14];
-    f32 iconX;
-    f32 iconY;
-    s32 pad1c;
-    s32 timer;
-    s32 count;
-} LstRcDisp;
-
 #define LR_WORK(ac) ((LstRcWork*)(ac)->work)
 
 s32 ac_lstrckeep_ok_frame[] = {0x50, 0x46, 0x3C, 0x28, 0x14, 0x0A, 0x05};
@@ -220,42 +211,42 @@ s32 battleAcResult_LstRcKeep(BattleWork* work) {
 void battleAcDisp_LstRcKeep(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
     BattleActions* ac = &work->actionCommands;
-    LstRcDisp* disp = (LstRcDisp*)&ac->disp;
+    BattleACDispParams* disp = &ac->disp;
     LstRcWork* lw = (LstRcWork*)ac->work;
     switch (ac->mAcState) {
         case 99:
         case 100:
         case 1000:
-            disp->count = -1;
-            disp->iconX = intplGetValue(4, 20 - disp->timer, 20, -300.0f, 30.0f);
-            actionCommandDisp(disp->iconX, disp->iconY, disp->count);
-            if (disp->timer > 0) {
-                (disp->timer)--;
+            disp->iconStep = -1;
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
+            actionCommandDisp(disp->iconX, disp->iconY, disp->iconStep);
+            if (disp->slideTimer > 0) {
+                (disp->slideTimer)--;
             }
             break;
         case 1001:
-            disp->count = lw->count - 1;
-            disp->iconX = intplGetValue(4, 20 - disp->timer, 20, -300.0f, 30.0f);
-            actionCommandDisp(disp->iconX, disp->iconY, disp->count);
-            if (disp->timer > 0) {
-                (disp->timer)--;
+            disp->iconStep = lw->count - 1;
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
+            actionCommandDisp(disp->iconX, disp->iconY, disp->iconStep);
+            if (disp->slideTimer > 0) {
+                (disp->slideTimer)--;
             }
             break;
         case 1002:
         case 1003:
         case 1004:
-            actionCommandDisp(30.0f, 0.0f, disp->count);
+            actionCommandDisp(30.0f, 0.0f, disp->iconStep);
             break;
         case 1005:
         case 1006:
-            if (disp->timer >= 40) {
-                disp->iconX = intplGetValue(4, disp->timer - 40, 20, 30.0f, -300.0f);
+            if (disp->slideTimer >= 40) {
+                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
-            actionCommandDisp(disp->iconX, disp->iconY, disp->count);
-            if (disp->timer < 60) {
-                (disp->timer)++;
+            actionCommandDisp(disp->iconX, disp->iconY, disp->iconStep);
+            if (disp->slideTimer < 60) {
+                (disp->slideTimer)++;
             }
             break;
     }

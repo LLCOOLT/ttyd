@@ -197,11 +197,11 @@ typedef struct NpcEntry {
     u8 setupIndex;                  // 0x314, slot in the setup list (dead-mask bit)
     u8 btlCoinDropCount;            // 0x315
     u8 baseCoinCount;               // 0x316
-    u8 balloonType;                 // 0x317
-    u8 fbatHitKind[0x31C - 0x318];  // 0x318, u32 kind from fbatHitCheck when this NPC triggered the battle
+    s8 balloonType;                 // 0x317
+    u32 fbatHitKind;                // 0x318, kind from fbatHitCheck when this NPC triggered the battle
     u16 koopaEncounterType;         // 0x31C
     u16 hazardFlags;                // 0x31E, 1 lava (kpa_03), 2/4/8/0x10 hazard deaths already handled
-    s16 wFbatHitCheckRelated;       // 0x320
+    u16 wFbatHitCheckRelated;       // 0x320
     u8 pad_322[2];                  // 0x322
     struct NpcEntry* prev;          // 0x324
     struct NpcEntry* next;          // 0x328
@@ -259,7 +259,7 @@ typedef struct FieldBattleData {
     NpcEntry* target;            // 0x8
     s32 evtId;                   // 0xC
     s32 hitKind;                 // 0x10, fbatHitCheck kind (0x10000000 = forced first attack, tou_03)
-    s32 firstAttackParam;        // 0x14, set to 0x10 by tou_03 _firstattack_setting, not read in C
+    s32 firstAttackParam;        // 0x14, set to 0x10 by tou_03 _firstattack_setting; passed to BattleInformationSetFirstAttack (seq_battle)
     u8 pad_18[0x1C - 0x18];      // 0x18, never accessed
     u32 firstAttackFlags;        // 0x1C, bit 1 cleared by tou_03 _firstattack_setting, not read in C
     FieldBattleInfo info;        // 0x20
@@ -272,7 +272,7 @@ typedef struct FieldBattleData {
     u8 sandersBombTrigger;       // 0x54D
     u8 pad_54E[0x550 - 0x54E];   // 0x54E, never accessed
     FirstStrikeInfo firstStrike; // 0x550
-    u8 pad_570[0x574 - 0x570];   // 0x570, never accessed
+    s32 battleWait;              // 0x570, frames seq_battle has waited for the first-strike announce (gives up at 200)
     s32 kpaComboCount;           // 0x574, Bowser stomp combo, score multiplier
     s32 kpaJumpKills;            // 0x578, Bowser kills during one jump
     s32 kpaJumpScore;            // 0x57C, score banked during one jump, shown on landing

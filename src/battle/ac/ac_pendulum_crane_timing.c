@@ -213,39 +213,31 @@ s32 battleAcResult_PendulumCraneTiming(BattleWork* work) {
 
 static void actionCommandDisp(f32 x, f32 y);
 
-typedef struct PCDisp {
-    u8 pad0[0x14];
-    f32 iconX;
-    f32 iconY;
-    s32 f1c;
-    s32 timer;
-} PCDisp;
-
 void battleAcDisp_PendulumCraneTiming(CameraId cameraId, void* param) {
-    PCDisp* disp;
+    BattleACDispParams* disp;
     BattleWork* w = _battleWorkPointer;
     BattleActions* ac = &w->actionCommands;
-    disp = (PCDisp*)&ac->disp;
+    disp = &ac->disp;
     switch (ac->mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - disp->timer, 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
         case 100:
         case 1000:
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->timer > 0) {
-                disp->timer--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 1002:
         case 1003:
-            if (disp->timer >= 40) {
-                disp->iconX = intplGetValue(4, disp->timer - 40, 20, 30.0f, -300.0f);
+            if (disp->slideTimer >= 40) {
+                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->timer < 60) {
-                (disp->timer)++;
+            if (disp->slideTimer < 60) {
+                (disp->slideTimer)++;
             }
             break;
     }

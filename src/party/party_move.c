@@ -1543,11 +1543,7 @@ static void flyMain(PartyEntry* party) {
 
 #include "mario/mariost.h"
 
-typedef struct AppearNpc {
-    u8 pad[0x8c];
-    Vec position; // 0x8C
-} AppearNpc;
-extern AppearNpc* npcNearDistCheck(f32 x, f32 y, f32 z, f32 r);
+extern NpcEntry* npcNearDistCheck(f32 x, f32 y, f32 z, f32 r);
 extern f32 partyNrmToAngle(Vec* n);
 extern s32 marioPlaneGetFlyingDir(void);
 
@@ -1847,7 +1843,7 @@ BOOL partyGetAppearPos3(PartyEntry* party, Vec* out) {
     HitEntry* hit;
     u32 i;
     MarioWork* mario;
-    AppearNpc* npc;
+    NpcEntry* npc;
     f32 bx;
     f32 by;
     f32 bz;

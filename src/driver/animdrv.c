@@ -458,7 +458,7 @@ void animPose_AllocBuffer(AnimationPose* pose) {
     pose->mpBufferVtxNrm = testAlloc(sizeof(Vec) * animPoseGetBaseData(pose)->mBufferNrmNum);
     pose->mpVtxArrayNrm = testAlloc(sizeof(Vec) * animPoseGetBaseData(pose)->mBufferNrmNum);
 
-    pose->mpBufferGroupVisibility = testAlloc(sizeof(u8) * animPoseGetBaseData(pose)->mBufferVisibilityNum);
+    pose->mpBufferGroupVisibility = testAlloc(sizeof(s8) * animPoseGetBaseData(pose)->mBufferVisibilityNum);
     pose->mpGroupVisibility = pose->mpBufferGroupVisibility;
 
     pose->mpBufferNode = testAlloc(sizeof(AnimPoseNode*) * animPoseGetBaseData(pose)->mBufferNodeNum);
@@ -1041,9 +1041,9 @@ void animPoseMain(s32 poseId) {
     AnimKeyframe* kf;
     AnimKeyframe* kfEnd;
     s32 i;
-    u8* file;
-    u8* anim;
-    u8* poses;
+    AnimationPoseData* file;
+    AnimData* anim;
+    AnimationPose* poses;
     u8* grpB;
     u8* grpA;
     u8* q;
@@ -1052,7 +1052,7 @@ void animPoseMain(s32 poseId) {
     u8* d;
     f32 x;
     f32 y;
-    u8* pose;
+    AnimationPose* pose;
     f32 z;
     s32 loop;
     s32 cnt;
@@ -1073,144 +1073,144 @@ void animPoseMain(s32 poseId) {
     u8* p;
     s64 ms;
 
-    poses = (u8*)wp->poses;
-    pose = poses + poseId * 0x170;
-    file = (u8*)animPoseGetBaseData((AnimationPose*)pose);
-    anim = (u8*)((AnimationPoseData*)file)->mpAnims[((AnimationPose*)pose)->animId].data;
+    poses = wp->poses;
+    pose = &poses[poseId];
+    file = animPoseGetBaseData(pose);
+    anim = file->mpAnims[pose->animId].data;
     OSInitFastCast();
     if ((s32)wp->mbUseFloatScratch != 0) {
         grpA = (u8*)wp->vtxArrayPos;
         grpB = (u8*)wp->vtxArrayNrm;
     } else {
-        grpA = (u8*)((AnimationPose*)pose)->mpVtxArrayPos;
-        grpB = (u8*)((AnimationPose*)pose)->mpVtxArrayNrm;
+        grpA = (u8*)pose->mpVtxArrayPos;
+        grpB = (u8*)pose->mpVtxArrayNrm;
     }
-    if (((AnimationPose*)pose)->paperId != -1 && !(((AnimationPose*)(poses + ((AnimationPose*)pose)->paperId * 0x170))->typeFlags & 2)) {
-        animPoseMain(((AnimationPose*)pose)->paperId);
+    if (pose->paperId != -1 && !(((AnimationPose*)((u8*)poses + pose->paperId * sizeof(AnimationPose)))->typeFlags & 2)) { // FAKE: the paper pose found by byte offset (base + id * size) so the typeFlags offset folds into the index (mulli/addi/lwzx), as in the target
+        animPoseMain(pose->paperId);
     }
     if (anim == NULL) return;
-    loop = *(s32*)((AnimData*)anim)->loopInfo;
-    if (((AnimationPose*)pose)->type == 0) {
+    loop = *(s32*)anim->loopInfo;
+    if (pose->type == 0) {
         ms = OSTicksToMilliseconds(gp->renderFieldTime);
     } else {
         ms = OSTicksToMilliseconds(gp->renderTime);
     }
-    tm = (f32)(u64)(ms - ((AnimationPose*)pose)->localTime);
-    ((AnimationPose*)pose)->rawFrame = 60.0f * tm / 1000.0f;
-    ((AnimationPose*)pose)->rawFrame *= ((AnimationPose*)pose)->localTimeRate;
-    cur = ((AnimationPose*)pose)->rawFrame;
-    f = ((AnimData*)anim)->loopInfo[2];
-    start = ((AnimData*)anim)->loopInfo[1];
+    tm = (f32)(u64)(ms - pose->localTime);
+    pose->rawFrame = 60.0f * tm / 1000.0f;
+    pose->rawFrame *= pose->localTimeRate;
+    cur = pose->rawFrame;
+    f = anim->loopInfo[2];
+    start = anim->loopInfo[1];
     len = f - start;
     if (0.0f == len) {
-        ((AnimationPose*)pose)->loopTime = cur - start;
+        pose->loopTime = cur - start;
     } else if (loop != 0) {
         tm = cur - start;
         if (tm < 0.0f) {
-            ((AnimationPose*)pose)->loopTime = 0.0f;
+            pose->loopTime = 0.0f;
         } else {
-            ((AnimationPose*)pose)->loopTime = tm / len;
-            start = cur - (f32)(s32)((AnimationPose*)pose)->loopTime * len;
+            pose->loopTime = tm / len;
+            start = cur - (f32)(s32)pose->loopTime * len;
         }
     } else if (cur < start) {
-        ((AnimationPose*)pose)->loopTime = 0.0f;
+        pose->loopTime = 0.0f;
     } else if (cur > f) {
-        ((AnimationPose*)pose)->loopTime = (cur - start) / len;
+        pose->loopTime = (cur - start) / len;
         start = f;
     } else {
-        ((AnimationPose*)pose)->loopTime = (cur - start) / len;
+        pose->loopTime = (cur - start) / len;
         start = cur;
     }
-    ((AnimationPose*)pose)->localFrame = start;
-    key = ((AnimationPose*)pose)->localFrame;
-    cnt = ((AnimData*)anim)->keyframeCount;
-    q = (u8*)((AnimData*)anim)->keyframes;
+    pose->localFrame = start;
+    key = pose->localFrame;
+    cnt = anim->keyframeCount;
+    q = (u8*)anim->keyframes;
     for (i = 0; i < cnt; q += 0x2c, i++) {
         if (*(f32*)q > key) break;
     }
-    ((AnimationPose*)pose)->keyframeIdx = i - 1;
-    ((AnimationPose*)pose)->nextKeyframeIdx = ((AnimationPose*)pose)->keyframeIdx + 1;
-    key = ((AnimationPose*)pose)->localFrame;
-    q = (u8*)((AnimData*)anim)->valueKeys;
-    cnt = ((AnimData*)anim)->valueKeyCount;
+    pose->keyframeIdx = i - 1;
+    pose->nextKeyframeIdx = pose->keyframeIdx + 1;
+    key = pose->localFrame;
+    q = (u8*)anim->valueKeys;
+    cnt = anim->valueKeyCount;
     for (i = 0; i < cnt; q += 8, i++) {
         if (*(f32*)q > key) break;
     }
-    ((AnimationPose*)pose)->valueKeyIdx = i - 1;
-    ((AnimationPose*)pose)->nextValueKeyIdx = ((AnimationPose*)pose)->valueKeyIdx + 1;
+    pose->valueKeyIdx = i - 1;
+    pose->nextValueKeyIdx = pose->valueKeyIdx + 1;
     if (loop == 0) {
-        if (((AnimationPose*)pose)->nextKeyframeIdx >= ((AnimData*)anim)->keyframeCount) ((AnimationPose*)pose)->nextKeyframeIdx = ((AnimationPose*)pose)->keyframeIdx;
-        if (((AnimationPose*)pose)->nextValueKeyIdx >= ((AnimData*)anim)->valueKeyCount) ((AnimationPose*)pose)->nextValueKeyIdx = ((AnimationPose*)pose)->valueKeyIdx;
+        if (pose->nextKeyframeIdx >= anim->keyframeCount) pose->nextKeyframeIdx = pose->keyframeIdx;
+        if (pose->nextValueKeyIdx >= anim->valueKeyCount) pose->nextValueKeyIdx = pose->valueKeyIdx;
     }
-    ((AnimationPose*)pose)->curKeyValue = ((AnimData*)anim)->valueKeys[((AnimationPose*)pose)->valueKeyIdx].value;
-    start = ((AnimData*)anim)->keyframes[((AnimationPose*)pose)->keyframeIdx].time;
-    tm = ((AnimationPose*)pose)->localFrame - start;
+    pose->curKeyValue = anim->valueKeys[pose->valueKeyIdx].value;
+    start = anim->keyframes[pose->keyframeIdx].time;
+    tm = pose->localFrame - start;
     if (loop != 0) {
-        if (((AnimationPose*)pose)->nextKeyframeIdx >= ((AnimData*)anim)->keyframeCount) {
-            ((AnimationPose*)pose)->nextKeyframeIdx = 0;
-            len = ((AnimData*)anim)->loopInfo[2] - ((AnimData*)anim)->keyframes[((AnimationPose*)pose)->keyframeIdx].time;
+        if (pose->nextKeyframeIdx >= anim->keyframeCount) {
+            pose->nextKeyframeIdx = 0;
+            len = anim->loopInfo[2] - anim->keyframes[pose->keyframeIdx].time;
         } else {
-            len = ((AnimData*)anim)->keyframes[((AnimationPose*)pose)->nextKeyframeIdx].time - start;
+            len = anim->keyframes[pose->nextKeyframeIdx].time - start;
         }
     } else {
-        len = ((AnimData*)anim)->keyframes[((AnimationPose*)pose)->nextKeyframeIdx].time - start;
+        len = anim->keyframes[pose->nextKeyframeIdx].time - start;
     }
     if (0.0f == len) {
-        ((AnimationPose*)pose)->keyframeBlend = 0.0f;
+        pose->keyframeBlend = 0.0f;
     } else {
-        ((AnimationPose*)pose)->keyframeBlend = tm / len;
+        pose->keyframeBlend = tm / len;
     }
-    frame = ((AnimationPose*)pose)->keyframeIdx;
-    nextFrame = ((AnimationPose*)pose)->nextKeyframeIdx;
-    t = ((AnimationPose*)pose)->keyframeBlend;
-    nA = ((AnimationPoseData*)file)->mBufferPosNum;
-    nB = ((AnimationPoseData*)file)->mBufferNrmNum;
-    nC = ((AnimationPoseData*)file)->mBufferVisibilityNum;
-    nD = ((AnimationPoseData*)file)->mBufferNodeNum;
-    nE = ((AnimationPoseData*)file)->mBufferTexAnimNum;
-    if (((AnimationPose*)pose)->lastFrameZero != frame) {
-        if (((AnimationPose*)pose)->lastFrameZero == -1 || ((AnimationPose*)pose)->lastFrameZero > frame) {
-            kfEnd = &((AnimData*)anim)->keyframes[frame] + 1;
-            kf = ((AnimData*)anim)->keyframes;
-            if (nA != 0) memcpy_as4((u8*)((AnimationPose*)pose)->mpBufferVtxPos, (u8*)((AnimationPoseData*)file)->bufferVtxPos, nA * 0xc);
-            if (nB != 0) memcpy_as4((u8*)((AnimationPose*)pose)->mpBufferVtxNrm, (u8*)((AnimationPoseData*)file)->nrmVtxBuffer, nB * 0xc);
-            if (nC != 0) memcpy(((AnimationPose*)pose)->mpBufferGroupVisibility, ((AnimationPoseData*)file)->groupVisibility, nC);
-            if (nD != 0) memcpy_as4((u8*)((AnimationPose*)pose)->mpBufferNode, (u8*)((AnimationPoseData*)file)->nodeData, nD * 4);
-            if (nE != 0) memcpy_as4((u8*)((AnimationPose*)pose)->mpBufferTexAnimEntries, (u8*)((AnimationPoseData*)file)->texAnimEntries, nE * 0x18);
-            if (((AnimationPose*)pose)->lastFrameZero == -1) ((AnimationPose*)pose)->lastFrameZero = 0;
+    frame = pose->keyframeIdx;
+    nextFrame = pose->nextKeyframeIdx;
+    t = pose->keyframeBlend;
+    nA = file->mBufferPosNum;
+    nB = file->mBufferNrmNum;
+    nC = file->mBufferVisibilityNum;
+    nD = file->mBufferNodeNum;
+    nE = file->mBufferTexAnimNum;
+    if (pose->lastFrameZero != frame) {
+        if (pose->lastFrameZero == -1 || pose->lastFrameZero > frame) {
+            kfEnd = &anim->keyframes[frame] + 1;
+            kf = anim->keyframes;
+            if (nA != 0) memcpy_as4((u8*)pose->mpBufferVtxPos, (u8*)file->bufferVtxPos, nA * sizeof(Vec));
+            if (nB != 0) memcpy_as4((u8*)pose->mpBufferVtxNrm, (u8*)file->nrmVtxBuffer, nB * sizeof(Vec));
+            if (nC != 0) memcpy(pose->mpBufferGroupVisibility, file->groupVisibility, nC);
+            if (nD != 0) memcpy_as4((u8*)pose->mpBufferNode, (u8*)file->nodeData, nD * 4);
+            if (nE != 0) memcpy_as4((u8*)pose->mpBufferTexAnimEntries, (u8*)file->texAnimEntries, nE * sizeof(AnimTexMtx));
+            if (pose->lastFrameZero == -1) pose->lastFrameZero = 0;
             s = 0.0625f;
             for (; kf < kfEnd; kf++) {
                 { u8* d; u8* e;
-                v = (u8*)((AnimationPose*)pose)->mpBufferVtxPos;
-                d = ((AnimData*)anim)->vtxPosDeltas + kf->vtxPosStart * 4;
+                v = (u8*)pose->mpBufferVtxPos;
+                d = anim->vtxPosDeltas + kf->vtxPosStart * 4;
                 e = d + kf->vtxPosCount * 4;
                 for (; d < e; d += 4) {
-                    v += d[0] * 0xc;
+                    v += d[0] * sizeof(Vec);
                     x = __OSs8tof32((s8*)(d + 1));
                     y = __OSs8tof32((s8*)(d + 2));
                     z = __OSs8tof32((s8*)(d + 3));
-                    ((f32*)v)[0] += s * x;
-                    ((f32*)v)[1] += s * y;
-                    ((f32*)v)[2] += s * z;
+                    ((Vec*)v)->x += s * x;
+                    ((Vec*)v)->y += s * y;
+                    ((Vec*)v)->z += s * z;
                 }
                 }
                 { u8* d; u8* e;
-                v = (u8*)((AnimationPose*)pose)->mpBufferVtxNrm;
-                d = ((AnimData*)anim)->vtxNrmDeltas + kf->vtxNrmStart * 4;
+                v = (u8*)pose->mpBufferVtxNrm;
+                d = anim->vtxNrmDeltas + kf->vtxNrmStart * 4;
                 e = d + kf->vtxNrmCount * 4;
                 for (; d < e; d += 4) {
-                    v += d[0] * 0xc;
+                    v += d[0] * sizeof(Vec);
                     x = __OSs8tof32((s8*)(d + 1));
                     y = __OSs8tof32((s8*)(d + 2));
                     z = __OSs8tof32((s8*)(d + 3));
-                    ((f32*)v)[0] += s * x;
-                    ((f32*)v)[1] += s * y;
-                    ((f32*)v)[2] += s * z;
+                    ((Vec*)v)->x += s * x;
+                    ((Vec*)v)->y += s * y;
+                    ((Vec*)v)->z += s * z;
                 }
                 }
-                { u8* d; u8* e; u8* v;
-                v = ((AnimationPose*)pose)->mpBufferGroupVisibility;
-                d = ((AnimData*)anim)->visDeltas + kf->visStart * 2;
+                { u8* d; u8* e; s8* v;
+                v = pose->mpBufferGroupVisibility;
+                d = anim->visDeltas + kf->visStart * 2;
                 e = d + kf->visCount * 2;
                 for (; d < e; d += 2) {
                     v += d[0];
@@ -1218,63 +1218,63 @@ void animPoseMain(s32 poseId) {
                 }
                 }
                 { u8* d; u8* e;
-                v = (u8*)((AnimationPose*)pose)->mpBufferNode;
-                d = ((AnimData*)anim)->nodeDeltas + kf->nodeStart * 4;
+                v = (u8*)pose->mpBufferNode;
+                d = anim->nodeDeltas + kf->nodeStart * 4;
                 e = d + kf->nodeCount * 4;
                 for (; d < e; d += 4) {
                     v += d[0] * 4;
                     x = __OSs8tof32((s8*)(d + 1));
-                    ((f32*)v)[0] += s * x;
+                    *(f32*)v += s * x;
                 }
                 }
                 { u8* d; u8* e;
-                v = (u8*)((AnimationPose*)pose)->mpBufferTexAnimEntries;
-                d = (u8*)((AnimData*)anim)->texDeltas + kf->texStart * 0xc;
-                e = d + kf->texCount * 0xc;
-                for (; d < e; d += 0xc) {
-                    v += d[0] * 0x18;
+                v = (u8*)pose->mpBufferTexAnimEntries;
+                d = (u8*)&anim->texDeltas[kf->texStart];
+                e = d + kf->texCount * sizeof(AnimTexDelta);
+                for (; d < e; d += sizeof(AnimTexDelta)) {
+                    v += d[0] * sizeof(AnimTexMtx);
                     v[0] += d[1];
                     ((AnimTexMtx*)v)->mTransS += ((AnimTexDelta*)d)->transS;
                     ((AnimTexMtx*)v)->mTransT += ((AnimTexDelta*)d)->transT;
                 }
                 }
             }
-        } else if (((AnimationPose*)pose)->lastFrameZero < frame) {
-            kf = &((AnimData*)anim)->keyframes[((AnimationPose*)pose)->lastFrameZero + 1];
-            kfEnd = &((AnimData*)anim)->keyframes[frame + 1];
+        } else if (pose->lastFrameZero < frame) {
+            kf = &anim->keyframes[pose->lastFrameZero + 1];
+            kfEnd = &anim->keyframes[frame + 1];
             s = 0.0625f;
             for (; kf < kfEnd; kf++) {
                 { u8* d; u8* e;
-                v = (u8*)((AnimationPose*)pose)->mpBufferVtxPos;
-                d = ((AnimData*)anim)->vtxPosDeltas + kf->vtxPosStart * 4;
+                v = (u8*)pose->mpBufferVtxPos;
+                d = anim->vtxPosDeltas + kf->vtxPosStart * 4;
                 e = d + kf->vtxPosCount * 4;
                 for (; d < e; d += 4) {
-                    v += d[0] * 0xc;
+                    v += d[0] * sizeof(Vec);
                     x = __OSs8tof32((s8*)(d + 1));
                     y = __OSs8tof32((s8*)(d + 2));
                     z = __OSs8tof32((s8*)(d + 3));
-                    ((f32*)v)[0] += s * x;
-                    ((f32*)v)[1] += s * y;
-                    ((f32*)v)[2] += s * z;
+                    ((Vec*)v)->x += s * x;
+                    ((Vec*)v)->y += s * y;
+                    ((Vec*)v)->z += s * z;
                 }
                 }
                 { u8* d; u8* e;
-                v = (u8*)((AnimationPose*)pose)->mpBufferVtxNrm;
-                d = ((AnimData*)anim)->vtxNrmDeltas + kf->vtxNrmStart * 4;
+                v = (u8*)pose->mpBufferVtxNrm;
+                d = anim->vtxNrmDeltas + kf->vtxNrmStart * 4;
                 e = d + kf->vtxNrmCount * 4;
                 for (; d < e; d += 4) {
-                    v += d[0] * 0xc;
+                    v += d[0] * sizeof(Vec);
                     x = __OSs8tof32((s8*)(d + 1));
                     y = __OSs8tof32((s8*)(d + 2));
                     z = __OSs8tof32((s8*)(d + 3));
-                    ((f32*)v)[0] += s * x;
-                    ((f32*)v)[1] += s * y;
-                    ((f32*)v)[2] += s * z;
+                    ((Vec*)v)->x += s * x;
+                    ((Vec*)v)->y += s * y;
+                    ((Vec*)v)->z += s * z;
                 }
                 }
-                { u8* d; u8* e; u8* v;
-                v = ((AnimationPose*)pose)->mpBufferGroupVisibility;
-                d = ((AnimData*)anim)->visDeltas + kf->visStart * 2;
+                { u8* d; u8* e; s8* v;
+                v = pose->mpBufferGroupVisibility;
+                d = anim->visDeltas + kf->visStart * 2;
                 e = d + kf->visCount * 2;
                 for (; d < e; d += 2) {
                     v += d[0];
@@ -1282,21 +1282,21 @@ void animPoseMain(s32 poseId) {
                 }
                 }
                 { u8* d; u8* e;
-                v = (u8*)((AnimationPose*)pose)->mpBufferNode;
-                d = ((AnimData*)anim)->nodeDeltas + kf->nodeStart * 4;
+                v = (u8*)pose->mpBufferNode;
+                d = anim->nodeDeltas + kf->nodeStart * 4;
                 e = d + kf->nodeCount * 4;
                 for (; d < e; d += 4) {
                     v += d[0] * 4;
                     x = __OSs8tof32((s8*)(d + 1));
-                    ((f32*)v)[0] += s * x;
+                    *(f32*)v += s * x;
                 }
                 }
                 { u8* d; u8* e;
-                v = (u8*)((AnimationPose*)pose)->mpBufferTexAnimEntries;
-                d = (u8*)((AnimData*)anim)->texDeltas + kf->texStart * 0xc;
-                e = d + kf->texCount * 0xc;
-                for (; d < e; d += 0xc) {
-                    v += d[0] * 0x18;
+                v = (u8*)pose->mpBufferTexAnimEntries;
+                d = (u8*)&anim->texDeltas[kf->texStart];
+                e = d + kf->texCount * sizeof(AnimTexDelta);
+                for (; d < e; d += sizeof(AnimTexDelta)) {
+                    v += d[0] * sizeof(AnimTexMtx);
                     v[0] += d[1];
                     ((AnimTexMtx*)v)->mTransS += ((AnimTexDelta*)d)->transS;
                     ((AnimTexMtx*)v)->mTransT += ((AnimTexDelta*)d)->transT;
@@ -1305,54 +1305,54 @@ void animPoseMain(s32 poseId) {
             }
         }
     } else {
-        if (((AnimationPose*)pose)->lastFrameTime > t) ((AnimationPose*)pose)->lastFrameTime = 0.0f;
+        if (pose->lastFrameTime > t) pose->lastFrameTime = 0.0f;
     }
     if (frame == nextFrame) {
-        if (nA != 0) memcpy_as4(grpA, (u8*)((AnimationPose*)pose)->mpBufferVtxPos, nA * 0xc);
-        if (nB != 0) memcpy_as4(grpB, (u8*)((AnimationPose*)pose)->mpBufferVtxNrm, nB * 0xc);
-        if (nD != 0) memcpy_as4((u8*)((AnimationPose*)pose)->mpNodes, (u8*)((AnimationPose*)pose)->mpBufferNode, nD * 4);
+        if (nA != 0) memcpy_as4(grpA, (u8*)pose->mpBufferVtxPos, nA * sizeof(Vec));
+        if (nB != 0) memcpy_as4(grpB, (u8*)pose->mpBufferVtxNrm, nB * sizeof(Vec));
+        if (nD != 0) memcpy_as4((u8*)pose->mpNodes, (u8*)pose->mpBufferNode, nD * 4);
     } else if (frame <= nextFrame) {
         AnimKeyframe* kf;
-        kf = &((AnimData*)anim)->keyframes[nextFrame];
+        kf = &anim->keyframes[nextFrame];
         { u8* d; u8* e;
         s = 0.0625f * t;
         v = grpA;
-        d = ((AnimData*)anim)->vtxPosDeltas + kf->vtxPosStart * 4;
+        d = anim->vtxPosDeltas + kf->vtxPosStart * 4;
         e = d + kf->vtxPosCount * 4;
-        p = (u8*)((AnimationPose*)pose)->mpBufferVtxPos;
-        if (nA != 0) memcpy_as4(grpA, p, nA * 0xc);
+        p = (u8*)pose->mpBufferVtxPos;
+        if (nA != 0) memcpy_as4(grpA, p, nA * sizeof(Vec));
         for (; d < e; d += 4) {
-            v += d[0] * 0xc;
+            v += d[0] * sizeof(Vec);
             x = __OSs8tof32((s8*)(d + 1));
             y = __OSs8tof32((s8*)(d + 2));
             z = __OSs8tof32((s8*)(d + 3));
-            ((f32*)v)[0] += x * s;
-            ((f32*)v)[1] += y * s;
-            ((f32*)v)[2] += z * s;
+            ((Vec*)v)->x += x * s;
+            ((Vec*)v)->y += y * s;
+            ((Vec*)v)->z += z * s;
         }
         }
         { u8* d; u8* e; u8* v;
         v = grpB;
-        d = ((AnimData*)anim)->vtxNrmDeltas + kf->vtxNrmStart * 4;
+        d = anim->vtxNrmDeltas + kf->vtxNrmStart * 4;
         e = d + kf->vtxNrmCount * 4;
-        p = (u8*)((AnimationPose*)pose)->mpBufferVtxNrm;
-        if (nB != 0) memcpy_as4(grpB, p, nB * 0xc);
+        p = (u8*)pose->mpBufferVtxNrm;
+        if (nB != 0) memcpy_as4(grpB, p, nB * sizeof(Vec));
         for (; d < e; d += 4) {
-            v += d[0] * 0xc;
+            v += d[0] * sizeof(Vec);
             x = __OSs8tof32((s8*)(d + 1));
             y = __OSs8tof32((s8*)(d + 2));
             z = __OSs8tof32((s8*)(d + 3));
-            ((f32*)v)[0] += x * s;
-            ((f32*)v)[1] += y * s;
-            ((f32*)v)[2] += z * s;
+            ((Vec*)v)->x += x * s;
+            ((Vec*)v)->y += y * s;
+            ((Vec*)v)->z += z * s;
         }
         }
         { u8* d; u8* e; u8* v;
-        d = ((AnimData*)anim)->nodeDeltas + kf->nodeStart * 4;
+        d = anim->nodeDeltas + kf->nodeStart * 4;
         e = d + kf->nodeCount * 4;
-        dt = ((AnimData*)anim)->keyframes[nextFrame].time - ((AnimData*)anim)->keyframes[frame].time;
-        p = (u8*)((AnimationPose*)pose)->mpBufferNode;
-        v = (u8*)((AnimationPose*)pose)->mpNodes;
+        dt = anim->keyframes[nextFrame].time - anim->keyframes[frame].time;
+        p = (u8*)pose->mpBufferNode;
+        v = (u8*)pose->mpNodes;
         if (nD != 0) memcpy_as4(v, p, nD * 4);
         for (; d < e; d += 4) {
             b = (s8)d[3];
@@ -1363,28 +1363,28 @@ void animPoseMain(s32 poseId) {
                 t2 = t * t;
                 t3 = apmMul(t, t2);
                 h = -2.0f * t3 + 3.0f * t2;
-                ((f32*)v)[0] = ((f32*)v)[0] + ((t + (t3 - 2.0f * t2)) * (dt * tanfTbl[(s8)d[2] + 0x59]) +
+                *(f32*)v = *(f32*)v + ((t + (t3 - 2.0f * t2)) * (dt * tanfTbl[(s8)d[2] + 0x59]) +
                                 h * (0.0625f * x) +
                                 (t3 - t2) * (dt * tanfTbl[b + 0x59]));
             }
         }
         }
     }
-    ((AnimationPose*)pose)->lastFrameZero = frame;
-    ((AnimationPose*)pose)->lastFrameTime = t;
-    if (((AnimationPose*)pose)->flags & 8) {
+    pose->lastFrameZero = frame;
+    pose->lastFrameTime = t;
+    if (pose->flags & 8) {
         CameraEntry* cam = camGetPtr(CAMERA_3D);
         f = 57.29579f * (f32)atan2(-(cam->cameraAt.x - cam->cameraPos.x), -(cam->cameraAt.z - cam->cameraPos.z));
         while (f < -360.0f) f += 360.0f;
         while (f >= 360.0f) f -= 360.0f;
         if (f < 0.0f) f += 360.0f;
-        f -= ((AnimationPose*)pose)->rotationY;
+        f -= pose->rotationY;
         while (f < -360.0f) f += 360.0f;
         while (f >= 360.0f) f -= 360.0f;
         if ((f > 90.0f && f <= 270.0f) || (f < -90.0f && f >= -270.0f)) {
-            ((AnimationPose*)pose)->scaleZFlip = -1.0f;
+            pose->scaleZFlip = -1.0f;
         } else {
-            ((AnimationPose*)pose)->scaleZFlip = 1.0f;
+            pose->scaleZFlip = 1.0f;
         }
     }
 }
@@ -2179,10 +2179,10 @@ void renderProc(s32 shapeId, s32 unused) {
                         firstDrawId = drawCall->first;
                         data = wp->mpCurPoseData;
                         count = (u16)drawCall->count;
-                        posIndexPtr = (u16*)((u32*)data->posIndex + (firstDrawId + posFirstId)) + 1;
-                        nrmIndexPtr = (u16*)((u32*)data->nrmIndex + (firstDrawId + nrmFirstId)) + 1;
-                        clr0IndexPtr = (u16*)((u32*)data->clr0Index + (firstDrawId + clr0FirstId)) + 1;
-                        texIndexPtr = (u16*)((u32*)data->texIndex[texIds[0]] + (firstDrawId + firstId[texIds[0]])) + 1;
+                        posIndexPtr = (u16*)(data->posIndex + (firstDrawId + posFirstId)) + 1;
+                        nrmIndexPtr = (u16*)(data->nrmIndex + (firstDrawId + nrmFirstId)) + 1;
+                        clr0IndexPtr = (u16*)(data->clr0Index + (firstDrawId + clr0FirstId)) + 1;
+                        texIndexPtr = (u16*)(data->texIndex[texIds[0]] + (firstDrawId + firstId[texIds[0]])) + 1;
                         GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, count);
                         for (k = count; k > 0; k--) {
                             GXPosition1x16(*posIndexPtr);
@@ -2208,9 +2208,9 @@ void renderProc(s32 shapeId, s32 unused) {
                         fd2 = drawCall->first;
                         data = wp->mpCurPoseData;
                         cnt2 = (u16)drawCall->count;
-                        posIndexPtr = (u16*)((u32*)data->posIndex + (fd2 + posFirstId)) + 1;
-                        nrmIndexPtr = (u16*)((u32*)data->nrmIndex + (fd2 + nrmFirstId)) + 1;
-                        clr0IndexPtr = (u16*)((u32*)data->clr0Index + (fd2 + clr0FirstId)) + 1;
+                        posIndexPtr = (u16*)(data->posIndex + (fd2 + posFirstId)) + 1;
+                        nrmIndexPtr = (u16*)(data->nrmIndex + (fd2 + nrmFirstId)) + 1;
+                        clr0IndexPtr = (u16*)(data->clr0Index + (fd2 + clr0FirstId)) + 1;
                         GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, cnt2);
                         for (k2 = 0; k2 < cnt2; k2++, posIndexPtr += 2, nrmIndexPtr += 2, clr0IndexPtr += 2) {
                             GXPosition1x16(*posIndexPtr);
@@ -2218,7 +2218,7 @@ void renderProc(s32 shapeId, s32 unused) {
                             GXColor1x16(*clr0IndexPtr);
                             for (l = tc2, index = 0; l > 0; l--, index++) {
                                 texIndex = texIds[(u32)(tc2 - index - 1)];
-                                GXTexCoord1x16((&((u32*)wp->mpCurPoseData->texIndex[texIndex])[fd2 + firstId[texIndex]])[k2]);
+                                GXTexCoord1x16((&wp->mpCurPoseData->texIndex[texIndex][fd2 + firstId[texIndex]])[k2]);
                             }
                         }
                     }
@@ -2247,7 +2247,7 @@ void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 arg3, f32 arg4) {
     pose = wp->mpCurPose;
     data = wp->mpCurPoseData;
     group = &data->groups[groupId];
-    if (*(s8*)&pose->mpGroupVisibility[group->visibilityId]) {
+    if (pose->mpGroupVisibility[group->visibilityId]) {
         pose = wp->mpCurPose;
         node = (AnimPoseNode*)((u32*)pose->mpNodes + group->nodeId);
         if (group->useSSC) {
@@ -2595,8 +2595,8 @@ void animPoseDrawMtx(s32 poseId, Mtx matrix, s32 xluMode, f32 rotY, f32 scale)
       animPoseMain(pose->paperId);
     }
     {
-      void *t0 = (void*)pose->paperCapture0;
-      void *t1 = (void*)pose->paperCapture1;
+      struct smartEntry* t0 = pose->paperCapture0;
+      struct smartEntry* t1 = pose->paperCapture1;
       wp->mpTexObjs[0] = (t0) ? &pose->paperTexObj[0] : ((void *) 0);
       wp->mpTexObjs[1] = (t1) ? &pose->paperTexObj[1] : ((void *) 0);
       wp->mpCurTexObj = (void *) 0;
@@ -3127,7 +3127,7 @@ void evalProc(s32 parentId, s32 groupId) {
     pose = wp->mpCurPose;
     data = wp->mpCurPoseData;
     group = &data->groups[groupId];
-    if (*(s8*)&pose->mpGroupVisibility[group->visibilityId]) {
+    if (pose->mpGroupVisibility[group->visibilityId]) {
         pose = wp->mpCurPose;
         node = (AnimPoseNode*)((u32*)pose->mpNodes + group->nodeId);
         if (group->useSSC) {

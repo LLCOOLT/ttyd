@@ -526,14 +526,14 @@ void effStarStoneMain(EffectEntry* effect) {
             effStardustN64SetDrawCam(e, cam);
         }
         if (w->state == 0) {
-            ((s32*)w->dust->userdata)[0x68 / 4] = cam;
-            ((f32*)w->dust->userdata)[1] = w->position.x;
-            ((f32*)w->dust->userdata)[2] = w->position.y - 10.0f * w->scale;
-            ((f32*)w->dust->userdata)[3] = w->position.z;
+            ((EffSnowDustN64Work*)w->dust->userdata)->camId = cam;
+            ((EffSnowDustN64Work*)w->dust->userdata)->position.x = w->position.x;
+            ((EffSnowDustN64Work*)w->dust->userdata)->position.y = w->position.y - 10.0f * w->scale;
+            ((EffSnowDustN64Work*)w->dust->userdata)->position.z = w->position.z;
         } else {
-            ((f32*)w->dust->userdata)[1] = 0.0f;
-            ((f32*)w->dust->userdata)[2] = -1000.0f;
-            ((f32*)w->dust->userdata)[3] = 0.0f;
+            ((EffSnowDustN64Work*)w->dust->userdata)->position.x = 0.0f;
+            ((EffSnowDustN64Work*)w->dust->userdata)->position.y = -1000.0f;
+            ((EffSnowDustN64Work*)w->dust->userdata)->position.z = 0.0f;
         }
         if (w->state < 3 && cam == 4) {
             U_shadowSetMode(shadowEntry(w->position.x, w->position.y, w->position.z, 8.0f * w->scale), w->a);

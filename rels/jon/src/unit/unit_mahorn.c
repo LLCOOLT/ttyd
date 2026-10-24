@@ -1,4 +1,5 @@
 #include "version.h"
+#include "eff/eff_mahorn2.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -16,7 +17,6 @@
 #include "battle/battle_weapon_power.h"
 #include "battle/battle_database_common.h"
 
-EffectEntry* effMahorn2Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b, f32 c, f32 scale, f32 speed);
 double __fabs(double x);
 static inline double mahorn_fabs(double x) { return __fabs(x); }
 void BtlUnit_SetAnim(BattleUnitPart* part, const char* anim);
@@ -1473,12 +1473,12 @@ static USER_FUNC(eff_magic_get_posX) {
     s32 id = BattleTransID(event, evtGetValue(event, *args++));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
     EffectEntry* eff = (EffectEntry*)unit->work[7];
-    f32* work = eff->userdata;
+    effMahorn2Data* work = eff->userdata;
     s32 i;
 
-    for (i = 0; i < eff->count; i++, work += 15) {
-        if (((s32*)work)[11] == 3) {
-            evtSetFloat(event, *args++, work[1]);
+    for (i = 0; i < eff->count; i++, work++) {
+        if (work->type == 3) {
+            evtSetFloat(event, *args++, work->position.x);
             break;
         }
     }

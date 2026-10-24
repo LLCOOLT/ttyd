@@ -7,10 +7,10 @@
 typedef struct WindowWork {
     u16 flags;                  // 0x0
     u8 align_2[2];              // 0x2
-    u32 buttonTrg;              // 0x4
-    u32 buttonRep;              // 0x8
-    u32 dirTrg;                 // 0xC
-    u32 dirRep;                 // 0x10
+    s32 buttonTrg;              // 0x4
+    s32 buttonRep;              // 0x8
+    s32 dirTrg;                 // 0xC
+    s32 dirRep;                 // 0x10
     union {
         u8 pad_14[0x20 - 0x14]; // 0x14, sizes the union
         struct {

@@ -754,7 +754,7 @@ USER_FUNC(evt_mario_normalize) {
         if (off) {
             event->userdata[1] = 1;
             marioCtrlOn();
-            ((void (*)(void))partyCtrlOn)();
+            partyCtrlOn();
         }
         event->userdata[0] = 0;
         if (mp->currMotionId != 0x1a && mp->currMotionId != 0x16 && mp->currMotionId != 0x1c &&
@@ -765,7 +765,7 @@ USER_FUNC(evt_mario_normalize) {
             } else {
                 if (event->userdata[1]) {
                     marioCtrlOff();
-                    ((void (*)(void))partyCtrlOff)();
+                    partyCtrlOff();
                 }
                 mp->trigFlags &= ~0x80000000;
                 return EVT_RETURN_DONE;
@@ -860,7 +860,7 @@ USER_FUNC(evt_mario_normalize) {
         mp->trigFlags &= ~0x80000000;
         if (event->userdata[1]) {
             marioCtrlOff();
-            ((void (*)(void))partyCtrlOff)();
+            partyCtrlOff();
         }
     }
     return ret;

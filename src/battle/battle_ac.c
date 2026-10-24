@@ -144,7 +144,7 @@ s32 BattleActionCommandCheckDefence(BattleUnit* unit, BattleWeapon* weapon) {
 	superguard = super_frames[diff];
 	normal = normal_frames[diff];
 
-	if (*(u8*)&weapon->superguardsAllowed && unit->currentHp > 0) {
+	if (weapon->superguardsAllowed && unit->currentHp > 0) {
 		if (AC_GUARD_TIMER(wp) > 0) {
 			AC_GUARD_TIMER(wp)--;
 			done = 1;

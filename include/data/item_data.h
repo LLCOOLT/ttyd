@@ -15,9 +15,9 @@ typedef struct ItemData {
 	u16 star_piece_price; //0x18
 	u16 sell_price; //0x1A
 	s8 bp_cost; //0x1C
-	s8 hp_restored; //0x1D
-	s8 fp_restored; //0x1E
-	s8 sp_restored; //0x1F
+	u8 hp_restored; //0x1D
+	u8 fp_restored; //0x1E
+	u8 sp_restored; //0x1F
 	u16 icon_id; //0x20
 	s16 pad_22; //0x22, always 0 (alignment before battle_params)
 	BattleWeapon* battle_params; //0x24

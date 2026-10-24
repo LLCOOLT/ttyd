@@ -1,4 +1,5 @@
 #include "win/win_main.h"
+#include "eff/eff_recovery.h"
 #include "data/item_data.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -100,7 +101,6 @@ extern PartyData partyDataTbl[];
 s32 winRootMain(WindowWork* wp);
 void winRootDisp(CameraId camId, WindowWork* wp);
 const char* winGetMapTplName(void);
-EffectEntry* effRecoveryEntry(f32 x, f32 y, f32 z, s32 type, s32 amount);
 s32 kpaGetStageViewType(void);
 void kpaPauseSE2(void);
 double sin(double);
@@ -284,7 +284,7 @@ void winMain(void) {
                 } else {
                     marioCtrlOff2();
                 }
-                ((void (*)(void))partyCtrlOff)();
+                partyCtrlOff();
                 psndSetFlag(0x80);
                 if (mario->characterId == 2) {
                     kpaPauseSE2();
@@ -368,7 +368,7 @@ void winMain(void) {
                 } else {
                     marioCtrlOn2();
                 }
-                ((void (*)(void))partyCtrlOn)();
+                partyCtrlOn();
                 fbatChangeMode(1);
                 psndClearFlag(0x80);
                 statusWinForceUpdate();
@@ -830,13 +830,13 @@ USER_FUNC(itemUseFunc) {
         case 0:
             statusWinForceOpen();
             if (event->lwData[11] == 0) {
-                ((void (*)(s32))pouchSetHP)(((s32 (*)(void))pouchGetHP)() + *(u8*)&item->hp_restored);
-                ((void (*)(s32))pouchSetFP)(((s32 (*)(void))pouchGetFP)() + *(u8*)&item->fp_restored);
-                ((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() + *(u8*)&item->sp_restored);
+                ((void (*)(s32))pouchSetHP)(((s32 (*)(void))pouchGetHP)() + item->hp_restored);
+                ((void (*)(s32))pouchSetFP)(((s32 (*)(void))pouchGetFP)() + item->fp_restored);
+                ((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() + item->sp_restored);
             } else {
-                ((void (*)(s32, s32))pouchSetPartyHP)(event->lwData[11], ((s32 (*)(s32))pouchGetPartyHP)(event->lwData[11]) + *(u8*)&item->hp_restored);
-                ((void (*)(s32))pouchSetFP)(((s32 (*)(void))pouchGetFP)() + *(u8*)&item->fp_restored);
-                ((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() + *(u8*)&item->sp_restored);
+                ((void (*)(s32, s32))pouchSetPartyHP)(event->lwData[11], ((s32 (*)(s32))pouchGetPartyHP)(event->lwData[11]) + item->hp_restored);
+                ((void (*)(s32))pouchSetFP)(((s32 (*)(void))pouchGetFP)() + item->fp_restored);
+                ((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() + item->sp_restored);
             }
             cnt++;
             break;
@@ -845,11 +845,11 @@ USER_FUNC(itemUseFunc) {
                 cnt = 200;
                 break;
             }
-            if (!*(u8*)&item->hp_restored) {
+            if (!item->hp_restored) {
                 cnt = 100;
                 break;
             }
-            effRecoveryEntry(mario->position.x, mario->position.y + mario->wPlayerCollisionBox.y, mario->position.z, 0, *(u8*)&item->hp_restored);
+            effRecoveryEntry(0, item->hp_restored, mario->position.x, mario->position.y + mario->wPlayerCollisionBox.y, mario->position.z);
             cnt++;
             break;
         case 31:
@@ -859,21 +859,21 @@ USER_FUNC(itemUseFunc) {
             cnt = 100;
             break;
         case 100:
-            if (!*(u8*)&item->fp_restored) {
+            if (!item->fp_restored) {
                 cnt = 999;
                 break;
             }
-            effRecoveryEntry(mario->position.x, mario->position.y + mario->wPlayerCollisionBox.y, mario->position.z, 1, *(u8*)&item->fp_restored);
+            effRecoveryEntry(1, item->fp_restored, mario->position.x, mario->position.y + mario->wPlayerCollisionBox.y, mario->position.z);
         case 130:
             cnt = 999;
             break;
         case 200:
-            if (!*(u8*)&item->hp_restored) {
+            if (!item->hp_restored) {
                 cnt = 300;
                 break;
             }
-            eff = effRecoveryEntry(party->position.x, party->position.y + party->height, party->position.z, 0, *(u8*)&item->hp_restored);
-            ((f32*)eff->userdata)[0x10] = -party->height * HALF_F;
+            eff = effRecoveryEntry(0, item->hp_restored, party->position.x, party->position.y + party->height, party->position.z);
+            ((RecoveryWork*)eff->userdata)->baseY = -party->height * HALF_F;
             cnt++;
             break;
         case 230:
@@ -883,11 +883,11 @@ USER_FUNC(itemUseFunc) {
             cnt = 300;
             break;
         case 300:
-            if (!*(u8*)&item->fp_restored) {
+            if (!item->fp_restored) {
                 cnt = 999;
                 break;
             }
-            effRecoveryEntry(party->position.x, party->position.y + party->height, party->position.z, 1, *(u8*)&item->fp_restored);
+            effRecoveryEntry(1, item->fp_restored, party->position.x, party->position.y + party->height, party->position.z);
             cnt++;
             break;
         case 330:
@@ -1470,7 +1470,7 @@ void winLectureKeyMask(void) {
                 wp->buttonRep = 0;
                 wp->dirTrg &= 0x8000;
                 wp->dirRep &= 0x8000;
-                if (*(s32*)&wp->dirTrg || *(s32*)&wp->dirRep) {
+                if (wp->dirTrg || wp->dirRep) {
                     wp->lectureStep++;
                 }
                 break;
@@ -1482,7 +1482,7 @@ void winLectureKeyMask(void) {
                 wp->buttonRep &= PAD_BUTTON_A;
                 wp->dirTrg = 0;
                 wp->dirRep = 0;
-                if (*(s32*)&wp->buttonTrg || *(s32*)&wp->buttonRep) {
+                if (wp->buttonTrg || wp->buttonRep) {
                     wp->lectureStep++;
                 }
                 break;
@@ -1491,7 +1491,7 @@ void winLectureKeyMask(void) {
                 wp->buttonRep &= PAD_BUTTON_START;
                 wp->dirTrg = 0;
                 wp->dirRep = 0;
-                if (*(s32*)&wp->buttonTrg || *(s32*)&wp->buttonRep) {
+                if (wp->buttonTrg || wp->buttonRep) {
                     wp->lectureStep++;
                 }
                 break;

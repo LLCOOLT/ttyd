@@ -55,7 +55,7 @@ extern BattleUnitKind unit_yami_patakuri;
 extern BattleUnitKind unit_yami_togekuri;
 extern BattleUnitKind unit_yamitogedaruma;
 
-extern s32 enemy_100[];
+extern u8 enemy_100[];
 extern s32 iri_12_makkino_okiru[];
 extern s32 jon_init_evt[];
 extern NpcSetupInfo npcEnt_wanwan[];

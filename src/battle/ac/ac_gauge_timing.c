@@ -42,18 +42,6 @@ typedef struct GaugeAC {
     u32 out0; // 0x58
 } GaugeAC;
 
-typedef struct GaugeDisp {
-    u8 field_0x0[0xC];
-    GXColor color; // 0xC
-    u8 field_0x10[4];
-    f32 iconX; // 0x14
-    f32 iconY; // 0x18
-    s32 field_0x1C;
-    s32 timer; // 0x20
-    s32 field_0x24;
-    f32 ratio; // 0x28
-} GaugeDisp;
-
 typedef struct GaugeWork {
     s32 frame;     // 0x0
     f32 gauge;     // 0x4
@@ -78,24 +66,24 @@ typedef struct GaugeWork {
 s32 battleAcMain_GaugeTiming(BattleWork* work) {
     GaugeWork* cw;
     BOOL autoCommand;
-    GaugeDisp* disp;
+    BattleACDispParams* disp;
     BattleActions* ac;
 
     ac = &work->actionCommands;
     autoCommand = FALSE;
     cw = (GaugeWork*)ac->work;
-    disp = (GaugeDisp*)&ac->disp;
+    disp = &ac->disp;
     if (work->actionCommands.mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
     }
 
     switch (work->actionCommands.mAcState) {
         case 0:
-            memset(disp, 0, sizeof(GaugeDisp));
+            memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            disp->timer = 20;
-            disp->ratio = 0.0f;
+            disp->slideTimer = 20;
+            disp->gaugeRatio = 0.0f;
             disp->color = (GXColor){255, 255, 255, 255};
             cw->frame = 0;
             cw->cnt = 0;
@@ -336,30 +324,30 @@ s32 battleAcResult_GaugeTiming(BattleWork* work) {
 
 void battleAcDisp_GaugeTiming(CameraId cameraId, void* param) {
     BattleActions* ac = &((BattleWork*)param)->actionCommands;
-    GaugeDisp* disp = (GaugeDisp*)&ac->disp;
+    BattleACDispParams* disp = &ac->disp;
 
     switch (ac->mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - disp->timer, 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
         case 100:
         case 1000:
         case 1001:
         case 1003:
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->timer > 0) {
-                disp->timer--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 1004:
         case 1005:
-            if (disp->timer >= 40) {
-                disp->iconX = intplGetValue(4, disp->timer - 40, 20, 30.0f, -300.0f);
+            if (disp->slideTimer >= 40) {
+                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->timer < 60) {
-                disp->timer++;
+            if (disp->slideTimer < 60) {
+                disp->slideTimer++;
             }
             break;
     }
@@ -374,7 +362,7 @@ void battleAcDelete_GaugeTiming(BattleWork* work) {
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
-    GaugeDisp* disp = (GaugeDisp*)&ac->disp;
+    BattleACDispParams* disp = &ac->disp;
     GaugeAC* g;
     GaugeWork* cw;
     f32 rx;
@@ -398,11 +386,11 @@ static void actionCommandDisp(f32 x, f32 y) {
     if (ratio > 1.0f) {
         ratio = 1.0f;
     }
-    disp->ratio = ratio;
+    disp->gaugeRatio = ratio;
     switch (g->mode) {
     case 1: {
         u16 icon;
-        t = 100.0f * disp->ratio / (f32)g->target;
+        t = 100.0f * disp->gaugeRatio / (f32)g->target;
         if (t > 100.0f) {
             t = 100.0f;
         }

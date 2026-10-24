@@ -1,3 +1,4 @@
+#include "data_tables.h"
 #include "version.h"
 #include "battle/battle.h"
 #include "battle/battle_database_common.h"
@@ -28,7 +29,7 @@ void btlDispTexPlane(u32 id, GXColor color, s32 unk, f32 tX, f32 tY, f32 tZ, f32
 
 typedef struct YoshiGundanPart YoshiGundanPart;
 void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p);
-void _yoshi_slide_move_sound(void* w, void* s);
+void _yoshi_slide_move_sound(BattleUnit* unit, PoseSoundTiming* s);
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
 typedef struct YoshiGundanPart {
@@ -61,16 +62,6 @@ typedef struct YoshiSweatWork {
     f32 z;
 } YoshiSweatWork;
 
-typedef struct YoshiSlideW {
-    u8 pad[BUOFF(0x224)];
-    s32 a;
-    s32 b;
-} YoshiSlideW;
-
-typedef struct YoshiSlideS {
-    u8 pad[0xC];
-    const char* name;
-} YoshiSlideS;
 
 
 USER_FUNC(_attack_aud);
@@ -177,7 +168,7 @@ static s32 party_win_reaction[25];
 static s32 attack_audience_event[290];
 static s32 attack_event[2];
 static s32 wait_event[6];
-s32 _yoshig_tpl_no_tbl[2];
+u8 _yoshig_tpl_no_tbl[8] __attribute__((aligned(4)));
 
 
 __declspec(section ".data") f32 unit_party_yoshi_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
@@ -1996,8 +1987,9 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
-s32 _yoshig_tpl_no_tbl[] = {
-    VERSION_PICK(1179207494, 0x5C5F5D5C), VERSION_PICK(1246232576, 0x605E0000), // US battle tex ids +0x16
+u8 _yoshig_tpl_no_tbl[8] __attribute__((aligned(4))) = { // battle tex id per sweat frame (US ids +0x16)
+    VERSION_PICK(0x46, 0x5C), VERSION_PICK(0x49, 0x5F), VERSION_PICK(0x47, 0x5D), VERSION_PICK(0x46, 0x5C),
+    VERSION_PICK(0x4A, 0x60), VERSION_PICK(0x48, 0x5E), 0, 0,
 };
 
 USER_FUNC(yoshi_original_color_anim_set) {
@@ -2179,7 +2171,7 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_move) {
         } else {
             sweatAngle = 50.0f;
         }
-        event->userdata[2] = (s32)effSweatN64Entry(1, 16, unit->mMoveCurrentPos.x, unit->mMoveCurrentPos.y + unit->mSizeMultiplier * (0.5f * BtlUnit_GetHeight(unit)), unit->mMoveCurrentPos.z, 5.0f * unit->mSizeMultiplier, sweatAngle);
+        event->userdata[2] = (s32)effSweatN64Entry(1, unit->mMoveCurrentPos.x, unit->mMoveCurrentPos.y + unit->mSizeMultiplier * (0.5f * BtlUnit_GetHeight(unit)), unit->mMoveCurrentPos.z, 5.0f * unit->mSizeMultiplier, sweatAngle, 16);
     } else {
         eff = (EffectEntry*)event->userdata[2];
         if (event->userdata[1] < 16) {
@@ -2196,10 +2188,8 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_move) {
     return EVT_RETURN_BLOCK;
 }
 
-void _yoshi_slide_move_sound(void* w, void* s) {
-    YoshiSlideW* ww = (YoshiSlideW*)w;
-    YoshiSlideS* ss = (YoshiSlideS*)s;
-    BtlUnit_snd_se((BattleUnit*)w, ss->name, -250000000, (s16)(ww->a * ww->b / 100));
+void _yoshi_slide_move_sound(BattleUnit* unit, PoseSoundTiming* s) {
+    BtlUnit_snd_se(unit, s->sfxName, -250000000, (s16)(unit->work[4] * unit->work[5] / 100)); // work[4] * work[5] / 100: slide sound volume
 }
 
 USER_FUNC(_get_nomikomi_hit_position) {
@@ -2417,7 +2407,7 @@ USER_FUNC(_gundan_yoshi_run_effect) {
 void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p) {
     f32 s;
     s = (p->vx < 0.0f) ? 0.4f : -0.4f;
-    ((void (*)(f32, f32, f32, f32, f32, u32, GXColor, s32))btlDispTexPlane)(p->x, p->y + 20.0f, p->z, s, 0.4f, ((u8*)_yoshig_tpl_no_tbl)[p->frame], (GXColor){255,255,255,255}, 0);
+    ((void (*)(f32, f32, f32, f32, f32, u32, GXColor, s32))btlDispTexPlane)(p->x, p->y + 20.0f, p->z, s, 0.4f, _yoshig_tpl_no_tbl[p->frame], (GXColor){255,255,255,255}, 0);
 }
 
 void yoshiStrippedPool(f32* f, s32 i) {

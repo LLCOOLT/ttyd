@@ -11,6 +11,7 @@
 #include "battle/battle_unit.h"
 #include "battle/battle_sub.h"
 #include "eff/eff_syuryou.h"
+#include "eff/n64/eff_cloud_n64.h"
 #include "driver/animdrv.h"
 #include "string.h"
 #include "memory.h"
@@ -140,7 +141,7 @@ static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 BattleUnitDefenseAttr defence_attr_muteki;
 static StatusVulnerability regist;
-s32 defencecopy[2];
+u8 defencecopy[8] __attribute__((aligned(4)));
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_furafura[18];
 static BattleDataEntry data_table[3];
@@ -597,8 +598,8 @@ BattleUnitDefenseAttr defence_attr_muteki = {{2, 2, 2, 2, 2}};
 
 static StatusVulnerability regist = {30, 30, 30, 100, 30, 100, 100, 30, 100, 60, 100, 60, 100, 75, 30, 0, 0, 100, 30, 100, 100, 1};
 
-s32 defencecopy[] = {
-    16843009, 16777216,
+u8 defencecopy[8] __attribute__((aligned(4))) = { // defenses[5] copied into the part defense, padded to 8
+    1, 1, 1, 1, 1, 0, 0, 0,
 };
 
 static PoseTableEntry pose_table[] = {
@@ -681,14 +682,14 @@ USER_FUNC(evt_eff_pokopi_thunder) {
 USER_FUNC(evt_eff_colorchange00) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
-    ((s32*)eff->userdata)[6] = 255;
-    ((s32*)eff->userdata)[7] = 255;
-    ((s32*)eff->userdata)[8] = 255;
-    ((s32*)eff->userdata)[10] = 255;
-    ((s32*)eff->userdata)[11] = 245;
-    ((s32*)eff->userdata)[12] = 0;
-    ((f32*)eff->userdata)[2] = 65.0f + ((f32*)eff->userdata)[2];
-    ((f32*)eff->userdata)[3] = 10.0f + ((f32*)eff->userdata)[3];
+    ((EffCloudN64Work*)eff->userdata)->r = 255;
+    ((EffCloudN64Work*)eff->userdata)->g = 255;
+    ((EffCloudN64Work*)eff->userdata)->b = 255;
+    ((EffCloudN64Work*)eff->userdata)->r2 = 255;
+    ((EffCloudN64Work*)eff->userdata)->g2 = 245;
+    ((EffCloudN64Work*)eff->userdata)->b2 = 0;
+    ((EffCloudN64Work*)eff->userdata)->position.y = 65.0f + ((EffCloudN64Work*)eff->userdata)->position.y;
+    ((EffCloudN64Work*)eff->userdata)->position.z = 10.0f + ((EffCloudN64Work*)eff->userdata)->position.z;
 
     return EVT_RETURN_DONE;
 }
@@ -696,7 +697,7 @@ USER_FUNC(evt_eff_barriersizechange) {
     s32* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
 
-    ((f32*)eff->userdata)[4] = evtGetFloat(event, args[1]);
+    ((EffSyuryouWork*)eff->userdata)->scale = evtGetFloat(event, args[1]);
     return EVT_RETURN_DONE;
 }
 USER_FUNC(evt_eff_firechange00) {
@@ -714,8 +715,8 @@ USER_FUNC(evt_eff_firechange00) {
     target.x = evtGetValue(event, args[2]);
     target.y = evtGetValue(event, args[3]);
     target.z = 0.0f;
-    pos.x = ((f32*)eff->userdata)[14];
-    pos.y = ((f32*)eff->userdata)[15];
+    pos.x = ((EffCloudN64Work*)eff->userdata)->pos.x;
+    pos.y = ((EffCloudN64Work*)eff->userdata)->pos.y;
     pos.z = 0.0f;
     if (isFirstCall) {
         event->userdata3 = 0;
@@ -724,12 +725,12 @@ USER_FUNC(evt_eff_firechange00) {
             PSVECNormalize(&nowv, &nowv);
             maer = rand() % 60 - 30;
             maer += (maer < 0.0f) ? -30 : 31;
-            ((s32*)eff->userdata)[6] = 255;
-            ((s32*)eff->userdata)[7] = 255;
-            ((s32*)eff->userdata)[8] = 255;
-            ((s32*)eff->userdata)[10] = 255;
-            ((s32*)eff->userdata)[11] = 65;
-            ((s32*)eff->userdata)[12] = 20;
+            ((EffCloudN64Work*)eff->userdata)->r = 255;
+            ((EffCloudN64Work*)eff->userdata)->g = 255;
+            ((EffCloudN64Work*)eff->userdata)->b = 255;
+            ((EffCloudN64Work*)eff->userdata)->r2 = 255;
+            ((EffCloudN64Work*)eff->userdata)->g2 = 65;
+            ((EffCloudN64Work*)eff->userdata)->b2 = 20;
         }
     }
     switch (event->userdata3) {
@@ -767,14 +768,14 @@ USER_FUNC(evt_eff_firechange00) {
     PSVECScale(&nowv, &dir, 15.0f);
     PSVECAdd(&pos, &dir, &pos);
     if (pos.y < 10.0f) {
-        if (((f32*)eff->userdata)[15] >= 10.0f) {
+        if (((EffCloudN64Work*)eff->userdata)->pos.y >= 10.0f) {
             nowv.y = -nowv.y;
         } else if (nowv.y < 0.0f) {
             nowv.y = -nowv.y;
         }
     }
-    ((f32*)eff->userdata)[14] = pos.x;
-    ((f32*)eff->userdata)[15] = pos.y;
+    ((EffCloudN64Work*)eff->userdata)->pos.x = pos.x;
+    ((EffCloudN64Work*)eff->userdata)->pos.y = pos.y;
     switch (event->userdata3) {
         case 0:
             if (PSVECSquareDistance(&pos, &target) < 225.0f) {
@@ -871,7 +872,7 @@ USER_FUNC(check_satellite) {
         part2->attributes &= ~0x20000000;
         part->defenseAttr = &defence_attr;
         for (i = 0; i < 5; i++) {
-            part->defense->defenses[i] = ((u8*)defencecopy)[i];
+            part->defense->defenses[i] = defencecopy[i];
         }
         part->defense->defenses[0] += count;
     } else {
@@ -903,7 +904,7 @@ USER_FUNC(check_satellite) {
         part2->attributes |= 0x20000000;
         part->defenseAttr = &defence_attr_muteki;
         for (i = 0; i < 5; i++) {
-            part->defense->defenses[i] = ((u8*)defencecopy)[i];
+            part->defense->defenses[i] = defencecopy[i];
         }
         part->defense->defenses[0] += count;
     }

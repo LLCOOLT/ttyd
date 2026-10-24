@@ -3,13 +3,6 @@
 #include <dolphin/mtx.h>
 #include <string.h>
 
-typedef struct EffRippleN64Work {
-    s32 field_0x0;              // 0x0
-    Vec position;               // 0x4
-    u8 field_0x10[0x34 - 0x10]; // 0x10
-    s32 cameraId;               // 0x34
-} EffRippleN64Work;
-
 EffectEntry* effRippleEntry(s32 type, f32 x, f32 y, f32 z) {
     return effRippleN64Entry(type, x, y, z, 0.0f);
 }

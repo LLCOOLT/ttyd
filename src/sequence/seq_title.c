@@ -1,3 +1,4 @@
+#define MATH_NO_SQRTF 1 // FAKE: sound.h reaches math.h; keep its sqrtf inline statics out of this unit's .rodata (never calls sqrt)
 #include "seq/seq_title.h"
 #include "driver/animdrv.h"
 #include "driver/camdrv.h"
@@ -7,6 +8,7 @@
 #include "mario/mariost.h"
 #include "manager/fontmgr.h"
 #include "pmario_sound.h"
+#include "sound.h"
 #include "sdk/texPalette.h"
 #include "system.h"
 #include "win/win_main.h"
@@ -15,19 +17,7 @@
 #include <string.h>
 #include "eff/eff_magic1_n64.h"
 
-typedef struct SoundStream {
-	u16 flags; //0x0
-	u8 unk2[0x138 - 0x2]; //0x2
-} SoundStream;
 
-typedef struct SoundWork {
-	u8 unk0[0x100]; //0x0
-	SoundStream* streams; //0x100
-} SoundWork;
-
-void SoundSetOutputMode(s32 mode);
-
-extern SoundWork sound;
 #ifdef VERSION_G8ME01
 #define PSTATIC
 #else

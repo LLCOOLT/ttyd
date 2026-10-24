@@ -1,4 +1,5 @@
 #include "driver/itemdrv.h"
+#include "eff/eff_itemget.h"
 #include "driver/swdrv.h"
 #define iconEntry iconEntry_hidden
 #define iconChange iconChange_hidden
@@ -219,7 +220,7 @@ BOOL itemGetCheck(ItemEntry* entry) {
 		if (marioStGetSystemLevel() != 0U) return FALSE;
 		if (mario->flags & 0xA) return FALSE;
 	}
-	if (*(s32*)&gp->mapEventId) return FALSE;
+	if (gp->mapEventId) return FALSE;
 	if (seqGetSeq() != 2) return FALSE;
 	if (mario->currMotionId == 0x19) return FALSE;
 	if (mario->currMotionId == 0x18) return FALSE;
@@ -263,7 +264,7 @@ BOOL itemGetNokoCheck(ItemEntry* entry) {
 	if (marioStGetSystemLevel() != 0U) return FALSE;
 	if (mario->flags & 0xA) return FALSE;
 	if (entry->flags2 & 0x2000000) return FALSE;
-	if (*(s32*)&gp->mapEventId) return FALSE;
+	if (gp->mapEventId) return FALSE;
 	if (seqGetSeq() != 2) return FALSE;
 	if (mario->currMotionId == 0x19) return FALSE;
 	if (vivianGetStatus()) return FALSE;
@@ -1070,12 +1071,12 @@ void itemseq_GetItem(ItemEntry* entry) {
 			}
 			wp->effect = effItemGetEntry(type, mario->position.x, 62.0f + mario->position.y, mario->position.z);
 			if (entry->flags2 & 0x2000) {
-				((s32*)wp->effect->userdata)[14] = 5;
+				((ItemGetWork*)wp->effect->userdata)->camera = 5;
 				iconFlagOn(entry->name, 0x200);
 				marioSetCamId(7);
 			}
 			else {
-				((s32*)wp->effect->userdata)[14] = 5;
+				((ItemGetWork*)wp->effect->userdata)->camera = 5;
 				iconFlagOn(entry->name, 0x100);
 				if (type == 0 || type == 3) {
 					marioSetCamId(5);

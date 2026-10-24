@@ -7,18 +7,6 @@
 #include <dolphin/mtx.h>
 
 
-typedef struct EffKemuri12N64Work {
-    u16 type;       // 0x0
-    u8 pad_2[2];    // 0x2
-    Vec position;   // 0x4
-    f32 scale;      // 0x10
-    s32 timer;      // 0x14
-    s32 frame;      // 0x18
-    s32 duration;   // 0x1C
-    f32 progress;   // 0x20
-    u8 r, g, b, a;  // 0x24
-} EffKemuri12N64Work;
-
 static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, -16, 0, 0, 0, 0, 0, 0, 255},
     {16, -16, 0, -1024, 0, 0, 0, 0, 255},

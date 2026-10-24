@@ -315,7 +315,7 @@ BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkSta
 	entry->scale = (Vec){1.0f,1.0f,1.0f};
 	entry->pivot = (Vec){0.0f,0.0f,0.0f};
 	entry->rot = (Vec){0.0f,0.0f,0.0f};
-	*(GXColor*)&entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
+	entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	entry->flags = disp->something2;
 	entry->trans = (Vec){0.0f,0.0f,0.0f};
 	return TRUE;
@@ -339,7 +339,7 @@ BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusI
 	v = (Vec){0.0f,0.0f,0.0f};
 	v.z = unit->mStatusIconWork.dizzyAngle;
 	entry->rot = v;
-	*(GXColor*)&entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
+	entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	entry->flags = disp->something2;
 	entry->trans = (Vec){0.0f,4.0f,0.0f};
 	return TRUE;
@@ -359,7 +359,7 @@ BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIc
 	entry->scale = (Vec){1.0f,1.0f,1.0f};
 	entry->pivot = (Vec){0.0f,0.0f,0.0f};
 	entry->rot = (Vec){0.0f,0.0f,0.0f};
-	*(GXColor*)&entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
+	entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	entry->flags = disp->something2;
 	entry->trans = (Vec){0.0f,0.0f,0.0f};
 	unit->mStatusIconWork.allergyBlinkTimer++;
@@ -403,7 +403,7 @@ BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusI
 	entry->icon = disp->something;
 	entry->pivot = (Vec){0.0f,0.0f,0.0f};
 	entry->rot = (Vec){0.0f,0.0f,0.0f};
-	*(GXColor*)&entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
+	entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	entry->flags = disp->something2;
 	entry->trans = (Vec){0.0f,0.0f,0.0f};
 	return TRUE;
@@ -444,7 +444,7 @@ BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkSta
 	col.r = intplGetValue(11, t, 360, c0.r, c1.r);
 	col.g = intplGetValue(11, t, 360, c0.g, c1.g);
 	col.b = intplGetValue(11, t, 360, c0.b, c1.b);
-	*(GXColor*)&entry->color = col;
+	entry->color = col;
 	entry->flags = disp->something2;
 	entry->trans = (Vec){0.0f,0.0f,0.0f};
 	return TRUE;

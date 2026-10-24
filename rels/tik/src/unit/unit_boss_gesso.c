@@ -1,3 +1,4 @@
+#include "eff/n64/eff_opuku_jetw_n64.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -695,13 +696,13 @@ USER_FUNC(_ikasumi_effect) {
     pos.x -= 95.0f;
     pos.y += 75.0f;
     eff = effOpukuJetwN64Entry(0, count, pos.x, pos.y, pos.z, 2.0f);
-    ((f32*)eff->userdata)[14] = 135.0f;
-    ((s32*)eff->userdata)[6] = 0;
-    ((s32*)eff->userdata)[7] = 0;
-    ((s32*)eff->userdata)[8] = 0;
-    ((s32*)eff->userdata)[10] = 0;
-    ((s32*)eff->userdata)[11] = 0;
-    ((s32*)eff->userdata)[12] = 0;
+    ((EffOpukuJetwN64Work*)eff->userdata)->rotZ = 135.0f;
+    ((EffOpukuJetwN64Work*)eff->userdata)->colorR = 0;
+    ((EffOpukuJetwN64Work*)eff->userdata)->colorG = 0;
+    ((EffOpukuJetwN64Work*)eff->userdata)->colorB = 0;
+    ((EffOpukuJetwN64Work*)eff->userdata)->color2R = 0;
+    ((EffOpukuJetwN64Work*)eff->userdata)->color2G = 0;
+    ((EffOpukuJetwN64Work*)eff->userdata)->color2B = 0;
     return EVT_RETURN_DONE;
 }
 

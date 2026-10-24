@@ -1,4 +1,6 @@
 #include "evt/evt_cmd.h"
+#include "evt/evt_nannpc.h"
+#include "driver/extdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/hitdrv.h"
 #include "mario/mariost.h"
@@ -13,73 +15,7 @@
 
 void qqsort(void* array, s32 num, s32 size, s32 (*cmp)(void*, void*));
 
-typedef struct ExtPose {
-    u32 flags;   // 0x0
-    f32 rot;     // 0x4
-    f32 shadowY; // 0x8
-    Mtx* mtx;    // 0xC
-    s32 poseId;  // 0x10
-    u8 pad[0xC];
-} ExtPose;
 
-ExtPose* extGetPosePtr(void);
-s32 extGetPoseNum(void);
-void extPoseDraw(s32 idx);
-void extLoadShadowMtx(Mtx mtx);
-void extLoadShadowRenderMode(void);
-void extLoadShadowVertex(void);
-void extLoadShadowTev(void);
-void extDrawShadow(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTextureExit(void);
-void extLoadRenderMode(void);
-void extLoadTev(void);
-void extDraw(void);
-void extEntry(s32 count, void* name, void* initf, void* mainf, void* dispf);
-
-typedef struct NanNPC {
-    s8 name[0x10];    // 0x0
-    ExtPose* pose;    // 0x10
-    u16 flags;        // 0x14
-    u16 field_16;     // 0x16
-    Vec pos;          // 0x18
-    Vec hosei;        // 0x24
-    Vec field_30;     // 0x30
-    Vec move;         // 0x3C
-    f32 sizeX;        // 0x48
-    f32 sizeY;        // 0x4C
-    OSTime startTime; // 0x50
-    s16* animtbl;     // 0x58
-    s16 animnum;      // 0x5C
-    s16 anim;         // 0x5E
-    f32 dir;          // 0x60
-    void (*func)(struct NanNPC*); // 0x64
-    s32 ipos[3];      // 0x68
-    u8 pad_74[0x14];  // 0x74
-    Vec startPos;     // 0x88
-    u8 pad_94[0x10];  // 0x94
-    s32 work[4];      // 0xA4
-    HitEntry* hit0;   // 0xB4
-    HitEntry* hit1;   // 0xB8
-    GXColor color;    // 0xBC
-} NanNPC;
-
-typedef struct NanNPCSort {
-    s32 idx;
-    f32 z;
-} NanNPCSort;
-
-typedef struct NanNPCWork {
-    NanNPC* npc;       // 0x0
-    NanNPCSort* sort;  // 0x4
-    s16* tbl;          // 0x8
-    s32 num;           // 0xC
-    u32 flags;         // 0x10
-    void (*func14)();  // 0x14
-    void (*func18)();  // 0x18
-    void (*func1c)();  // 0x1C
-} NanNPCWork;
 void evt_nannpc_set_animtbl_sub(NanNPC* npc, s16* tbl);
 s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall);
 void nannpc_ext_dispent();
@@ -241,7 +177,7 @@ void nanNPCOption(void) {
     // FAKE: r (loop 3 start) assigned in loop 2's exit test, as the target loads it there (no mr copy); w->npc is not changed by loop 2
     for (p = ((NanNPCWork*)w)->npc; p < (r = ((NanNPCWork*)w)->npc) + ((NanNPCWork*)w)->num; p++) {
         if (p->flags & 4) {
-            PSVECSubtract(&p->field_30, &p->pos, &diff);
+            PSVECSubtract(&p->target, &p->pos, &diff);
             mag = PSVECMag(&diff);
             if (mag > 0.8f * p->sizeY) {
                 PSVECNormalize(&diff, &diff);
@@ -332,10 +268,10 @@ void nannpc_ext_shadow_disp() {
 
 void nannpc_ext_init() {
     s32 i;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     for (i = extGetPoseNum() - 1; i >= 0; i--, pose++) {
         pose->flags = 3;
-        pose->rot = 0.0f;
+        pose->dir = 0.0f;
         PSMTXIdentity(*pose->mtx);
         (*pose->mtx)[0][3] = 0.0f;
         (*pose->mtx)[1][3] = -1000.0f;
@@ -367,8 +303,8 @@ void nannpc_ext_main_sub_fast() {
             if (p->animtbl) {
                 p->anim = p->animtbl[(gp->retraceCount + i * i) % p->animnum];
             }
-            p->pose->poseId = p->anim;
-            p->pose->rot = -p->dir;
+            p->pose->texId = p->anim;
+            p->pose->dir = -p->dir;
             if (p->flags & 2) {
                 (*p->pose->mtx)[0][3] = 0.0f;
                 (*p->pose->mtx)[1][3] = -1000.0f;
@@ -409,11 +345,11 @@ USER_FUNC(evt_nannpc_init) {
     s32* args = event->args;
     NanNPCWork* w;
     s32 i;
-    s32 name = evtGetValue(event, args[0]);
+    ExtdrvTexInfo* texInfo = (ExtdrvTexInfo*)evtGetValue(event, args[0]);
     s16* tbl = (s16*)evtGetValue(event, args[1]);
-    void* initf = (void*)evtGetValue(event, args[2]);
-    void* mainf = (void*)evtGetValue(event, args[3]);
-    void* dispf = nannpc_ext_dispent;
+    void (*initf)(void) = (void (*)(void))evtGetValue(event, args[2]);
+    void (*mainf)(void) = (void (*)(void))evtGetValue(event, args[3]);
+    void (*dispf)(void) = nannpc_ext_dispent;
     if (isFirstCall) {
         return 0;
     }
@@ -436,7 +372,7 @@ USER_FUNC(evt_nannpc_init) {
     if (!mainf) {
         mainf = nannpc_ext_main;
     }
-    extEntry(w->num, (void*)name, initf, mainf, dispf);
+    extEntry(w->num, texInfo, initf, mainf, dispf);
     for (i = 0; i < w->num; i++) {
         NanNPC* p = &w->npc[i];
         p->name[0] = 0;
@@ -444,7 +380,7 @@ USER_FUNC(evt_nannpc_init) {
         p->flags = 0;
         p->field_16 = 0;
         p->pos = (Vec){0.0f, -1000.0f, 0.0f};
-        p->field_30 = (Vec){0.0f, -1000.0f, 0.0f};
+        p->target = (Vec){0.0f, -1000.0f, 0.0f};
         p->hosei = (Vec){0.0f, 0.0f, 0.0f};
         p->sizeX = 32.0f;
         p->sizeY = 32.0f;
@@ -490,7 +426,7 @@ USER_FUNC(evt_nannpc_set_subfunc) {
 s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall)
 {
   NanNPC *p;
-  ExtPose *pose;
+  ExtdrvPose *pose;
   char *str;
   s32 off;
   s32 name;
@@ -519,14 +455,14 @@ s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall)
       p->flags = 0;
       p->field_16 = 0;
       p->pos = (Vec){0.0f, -1000.0f, 0.0f};
-      p->field_30 = (Vec){0.0f, -1000.0f, 0.0f};
+      p->target = (Vec){0.0f, -1000.0f, 0.0f};
       p->hosei = (Vec){0.0f, 0.0f, 0.0f};
       p->sizeX = 32.0f;
       p->sizeY = 32.0f;
       p->startTime = 0;
       p->animnum = 0;
       p->dir = 0.0f;
-      p->pose->rot = -p->dir;
+      p->pose->dir = -p->dir;
       p->color = (GXColor){255, 255, 255, 255};
       break;
     }
@@ -540,13 +476,13 @@ USER_FUNC(evt_nannpc_set_position) {
     NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     f32 x = evtGetFloat(event, args[1]);
     npc->pos.x = x;
-    npc->field_30.x = x;
+    npc->target.x = x;
     x = evtGetFloat(event, args[2]);
     npc->pos.y = x;
-    npc->field_30.y = x;
+    npc->target.y = x;
     x = evtGetFloat(event, args[3]);
     npc->pos.z = x;
-    npc->field_30.z = x;
+    npc->target.z = x;
     return 2;
 }
 

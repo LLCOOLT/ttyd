@@ -18,6 +18,7 @@
 #include "evt/evt_sub.h"
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
+#include "driver/extdrv.h"
 
 typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; Vec ofs; Vec rot; } ZakoGun;
 typedef struct ZakoGunWork { s32 flag; s32 targetId;
@@ -25,16 +26,8 @@ typedef struct ZakoGunWork { s32 flag; s32 targetId;
     u8 us_pad08[0xC]; // US: 12 more bytes here
 #endif
     s32 state; s32 timer; Vec pos; u8 field_0x1c[0x34 - 0x1c]; f32 radius; f32 angle; f32 speed; u8 field_0x40[0x48 - 0x40]; Vec start; Vec end; s32 timer2; s32 steps; s32 count; s32 sfx; ZakoGun* zako; } ZakoGunWork;
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 extern ZakoGun* zakogun;
 extern ZakoGunWork* work;
-ExtPose* extGetPosePtr(void);
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
 void zakogun_ext_main1(void);
 void zakogun_ext_main2(void);
 void zakogun_ext_main3(void);
@@ -83,7 +76,7 @@ USER_FUNC(zakogun_start_sukima);
 USER_FUNC(zakogun_escape1);
 USER_FUNC(zakogun_dead1);
 void zakogun_ext_main1(void);
-void zakogun_ext_init123_common(ExtPose* pose, s32 i);
+void zakogun_ext_init123_common(ExtdrvPose* pose, s32 i);
 USER_FUNC(zakogun_ext_init1);
 s32 zakogun_get_kanbu_id(void);
 USER_FUNC(zakogun_get_kanbu_id_evtcmd);
@@ -677,7 +670,7 @@ s32 zakogun_get_kanbu_id(void) {
 
 USER_FUNC(zakogun_ext_init1) {
     s32 i;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
 
     work->flag = 0;
     for (i = 0; i < 6; i++, pose++) {
@@ -686,13 +679,13 @@ USER_FUNC(zakogun_ext_init1) {
     return EVT_RETURN_DONE;
 }
 
-void zakogun_ext_init123_common(ExtPose* pose, s32 i) {
+void zakogun_ext_init123_common(ExtdrvPose* pose, s32 i) {
     pose->flags = 1;
-    PSMTXIdentity(pose->mtx);
-    pose->mtx[0][3] = 0.0f;
-    pose->mtx[1][3] = -1000.0f;
-    pose->mtx[2][3] = 0.0f;
-    pose->rot = 90.0f;
+    PSMTXIdentity(*pose->mtx);
+    (*pose->mtx)[0][3] = 0.0f;
+    (*pose->mtx)[1][3] = -1000.0f;
+    (*pose->mtx)[2][3] = 0.0f;
+    pose->dir = 90.0f;
     zakogun[i].field_0x0 = 0;
     zakogun[i].state = 0;
     zakogun[i].timer = 0;
@@ -704,7 +697,7 @@ void zakogun_ext_init123_common(ExtPose* pose, s32 i) {
 void zakogun_ext_main1(void) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit = zakogun_get_ptr();
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     ZakoGun* zako;
     s32 i;
     s32 n;
@@ -715,7 +708,7 @@ void zakogun_ext_main1(void) {
 
     for (i = 0; i < 6; i++, pose++) {
         zako = &zakogun[i];
-        pose->frame = zako->poseBase + zako->poseCount / zako->poseDiv;
+        pose->texId = zako->poseBase + zako->poseCount / zako->poseDiv;
         zako->poseCount++;
         if (zako->poseCount >= zako->poseNum * zako->poseDiv) {
             zako->poseCount = 0;
@@ -1201,16 +1194,16 @@ void zakogun_ext_main1(void) {
                 }
                 break;
         }
-        PSMTXIdentity(pose->mtx);
+        PSMTXIdentity(*pose->mtx);
         PSMTXRotRad(m, 'x', 0.017453292f * zako->rot.x);
-        PSMTXConcat(pose->mtx, m, pose->mtx);
+        PSMTXConcat(*pose->mtx, m, *pose->mtx);
         PSMTXRotRad(m, 'y', 0.017453292f * zako->rot.y);
-        PSMTXConcat(pose->mtx, m, pose->mtx);
+        PSMTXConcat(*pose->mtx, m, *pose->mtx);
         PSMTXRotRad(m, 'z', 0.017453292f * zako->rot.z);
-        PSMTXConcat(pose->mtx, m, pose->mtx);
-        pose->mtx[0][3] = zako->pos.x;
-        pose->mtx[1][3] = zako->pos.y;
-        pose->mtx[2][3] = zako->pos.z + i * 0.25f;
+        PSMTXConcat(*pose->mtx, m, *pose->mtx);
+        (*pose->mtx)[0][3] = zako->pos.x;
+        (*pose->mtx)[1][3] = zako->pos.y;
+        (*pose->mtx)[2][3] = zako->pos.z + i * 0.25f;
     }
 }
 

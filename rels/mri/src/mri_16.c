@@ -1,3 +1,4 @@
+#include "mri_puni.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -9,7 +10,6 @@
 #include "driver/hitdrv.h"
 
 static s32 ssf;
-typedef struct PuniData { u8 field_0x0[0x116]; s16 id; u8 field_0x118[0x5A8 - 0x118]; } PuniData;
 PuniData* puniGetPunidat(void);
 
 USER_FUNC(evt_bero_get_info);
@@ -111,7 +111,7 @@ USER_FUNC(puni_get_id) {
 
     offset = evtGetValue(event, args[0]) * sizeof(PuniData);
     puni = (PuniData*)((u8*)puniGetPunidat() + offset);
-    evtSetValue(event, args[1], puni->id);
+    evtSetValue(event, args[1], puni->index);
     return EVT_RETURN_DONE;
 }
 

@@ -6,6 +6,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
+#include "eff/n64/eff_glass_n64.h"
 
 typedef struct EffFreezeN64Work {
     s32 type;           // 0x0
@@ -20,19 +21,6 @@ typedef struct EffFreezeN64Work {
     EffectEntry* dust;  // 0x28
 } EffFreezeN64Work;
 
-typedef struct EffFreezeGlassWork {
-    u8 pad[0x3C];
-    f32 f3C;
-    f32 f40;
-    f32 f44;
-    f32 f48;
-    f32 f4C;
-    f32 f50;
-    f32 f54;
-    f32 f58;
-} EffFreezeGlassWork;
-
-EffectEntry* effGlassN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale);
 EffectEntry* effVaporN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale);
 EffectEntry* effSnowDustN64Entry(s32 a, s32 b, s32 c, f32 x, f32 y, f32 z, f32 d, f32 e, f32 f);
 
@@ -127,14 +115,14 @@ void effFreezeMain(EffectEntry* effect) {
                                      work->scale * (f32)(rand() % 40) + work->position.y, 3.0f + work->position.z,
                                      work->scale * (0.1f * (0.7f * (rand() % 10)) + 0.3f));
 
-            ((EffFreezeGlassWork*)glass->userdata)->f44 = 0.1f * (f32)(rand() % 10);
-            ((EffFreezeGlassWork*)glass->userdata)->f48 = 0.01f * (f32)(rand() % 30) + 0.1f;
-            ((EffFreezeGlassWork*)glass->userdata)->f3C = rand() % 360;
-            ((EffFreezeGlassWork*)glass->userdata)->f40 = rand() % 20;
-            ((EffFreezeGlassWork*)glass->userdata)->f4C = rand() % 10 - 5;
-            ((EffFreezeGlassWork*)glass->userdata)->f50 = rand() % 10 - 5;
-            ((EffFreezeGlassWork*)glass->userdata)->f54 = 0.0f;
-            ((EffFreezeGlassWork*)glass->userdata)->f58 = -0.1f;
+            ((EffGlassN64Work*)glass->userdata)->texV = 0.1f * (f32)(rand() % 10);
+            ((EffGlassN64Work*)glass->userdata)->texVSpeed = 0.01f * (f32)(rand() % 30) + 0.1f;
+            ((EffGlassN64Work*)glass->userdata)->rotZ = rand() % 360;
+            ((EffGlassN64Work*)glass->userdata)->rotY = rand() % 20;
+            ((EffGlassN64Work*)glass->userdata)->vx = rand() % 10 - 5;
+            ((EffGlassN64Work*)glass->userdata)->vy = rand() % 10 - 5;
+            ((EffGlassN64Work*)glass->userdata)->vz = 0.0f;
+            ((EffGlassN64Work*)glass->userdata)->gravity = -0.1f;
         }
         effDelete(work->dust);
         effDelete(effect);

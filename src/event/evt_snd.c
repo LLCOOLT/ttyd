@@ -1,26 +1,16 @@
 // NOTE: in G8MJ01 the event/evt_snd.c split (0x80077EC4..0x80077F88) actually holds
 // the tail of seq_gameover.c (seq_gameOverExit/Init); the real evt_snd functions
 // live at 0x8014C488 inside the party/party_motion.c split.
+#define MATH_NO_SQRTF 1 // FAKE: sound.h reaches math.h; keep its sqrtf inline statics out of this unit's .rodata (never calls sqrt)
 #include "evt/evt_snd.h"
 #include "driver/camdrv.h"
 #include "driver/seqdrv.h"
 #include "mario/mario_pouch.h"
 #include "mario/mariost.h"
 #include "pmario_sound.h"
+#include "sound.h"
 #include "win/win_main.h"
 
-// sound.h pulls in math.h's sqrt localstatics (.rodata); use a minimal view instead
-typedef struct SoundStream {
-    u16 flags;              // 0x0
-    u8 unk2[0x138 - 0x2];   // 0x2
-} SoundStream;
-
-typedef struct SoundWork {
-    u8 unk0[0x100];         // 0x0
-    SoundStream* streams;   // 0x100
-} SoundWork;
-
-extern SoundWork sound;
 
 void psndSetReverb(s32 mode);
 BOOL N_pouchUnEquipBadgeID(s32 badgeId);

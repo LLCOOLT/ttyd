@@ -1,4 +1,6 @@
 #include "battle/battle_unit.h"
+#include "eff/eff_itemget.h"
+#include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
@@ -534,7 +536,7 @@ USER_FUNC(hoshi_delete) {
 USER_FUNC(hoshi_r) {
     EffectEntry* eff = (EffectEntry*)event->lwData[10];
 
-    ((f32*)eff->userdata)[7] = evtGetValue(event, event->args[0]);
+    ((EffStarStoneWork*)eff->userdata)->rotY = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
@@ -590,14 +592,14 @@ USER_FUNC(get_starstone_seq) {
     s32* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
 
-    evtSetValue(event, args[1], ((s32*)eff->userdata)[15]);
+    evtSetValue(event, args[1], ((EffStarStoneWork*)eff->userdata)->state);
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(starstone_fall) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
-    ((s32*)eff->userdata)[15] = 1;
+    ((EffStarStoneWork*)eff->userdata)->state = 1;
     return EVT_RETURN_DONE;
 }
 
@@ -609,9 +611,9 @@ static USER_FUNC(set_starstone_pos) {
     f32 z = evtGetFloat(event, args[3]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[2] = x;
-    ((f32*)eff->userdata)[3] = y;
-    ((f32*)eff->userdata)[4] = z;
+    ((EffStarStoneWork*)eff->userdata)->position.x = x;
+    ((EffStarStoneWork*)eff->userdata)->position.y = y;
+    ((EffStarStoneWork*)eff->userdata)->position.z = z;
     return EVT_RETURN_DONE;
 }
 
@@ -619,9 +621,9 @@ static USER_FUNC(get_starstone_pos) {
     s32* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
 
-    evtSetFloat(event, args[1], ((f32*)eff->userdata)[2]);
-    evtSetFloat(event, args[2], ((f32*)eff->userdata)[3]);
-    evtSetFloat(event, args[3], ((f32*)eff->userdata)[4]);
+    evtSetFloat(event, args[1], ((EffStarStoneWork*)eff->userdata)->position.x);
+    evtSetFloat(event, args[2], ((EffStarStoneWork*)eff->userdata)->position.y);
+    evtSetFloat(event, args[3], ((EffStarStoneWork*)eff->userdata)->position.z);
     return EVT_RETURN_DONE;
 }
 
@@ -636,7 +638,7 @@ static USER_FUNC(starstone_entry) {
     EffectEntry* eff = effStarStoneEntry(type, x, y, z, scale);
 
     effSetName(eff, name);
-    ((u16*)eff->userdata)[2] |= 0x10;
+    ((EffStarStoneWork*)eff->userdata)->flags |= 0x10;
     return EVT_RETURN_DONE;
 }
 
@@ -644,9 +646,9 @@ static USER_FUNC(stone_bg) {
     EffectEntry* eff;
 
     eff = effNameToPtr("sub_bg");
-    ((s32*)eff->userdata)[14] = 5;
+    ((ItemGetWork*)eff->userdata)->camera = 5;
     eff = effNameToPtr("nise");
-    ((s32*)eff->userdata)[14] = 5;
+    ((EffStarStoneWork*)eff->userdata)->cam = 5;
     marioSetCamId(5);
     return EVT_RETURN_DONE;
 }
@@ -654,7 +656,7 @@ static USER_FUNC(stone_bg) {
 USER_FUNC(reset_stone_cam) {
     EffectEntry* eff = effNameToPtr("nise");
 
-    ((s32*)eff->userdata)[14] = 4;
+    ((EffStarStoneWork*)eff->userdata)->cam = 4;
     return EVT_RETURN_DONE;
 }
 

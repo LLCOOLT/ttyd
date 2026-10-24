@@ -1,5 +1,6 @@
 #include "mario/mario.h"
 #include "eff/eff_n64.h"
+#include "eff/n64/eff_whirlwind_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -8,28 +9,6 @@
 #include <dolphin/mtx.h>
 #include <stdlib.h>
 
-
-typedef struct WhirlwindTarget {
-    u8 pad0[0x8C];
-    Vec position; // 0x8C
-    u8 pad1[MWOFF(0x1B8) - 0x98];
-    f32 size; // 0x1B8
-} WhirlwindTarget;
-
-typedef struct EffWhirlwindN64Work {
-    s32 type;                // 0x0
-    WhirlwindTarget* target; // 0x4
-    Vec position;            // 0x8
-    f32 scale;               // 0x14
-    f32 baseScale;           // 0x18
-    s32 alpha;               // 0x1C
-    s32 duration;            // 0x20
-    s32 life;                // 0x24
-    s32 frame;               // 0x28
-    Vec rot;                 // 0x2C
-    Vec vel;                 // 0x38
-    u8 r, g, b, a;           // 0x44
-} EffWhirlwindN64Work;
 
 u8 col_r[4] = {0xFF, 0xFF, 0x40, 0x00};
 u8 col_g[4] = {0xFF, 0x40, 0x40, 0x00};

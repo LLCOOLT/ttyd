@@ -20,7 +20,6 @@
 #include "npc_event.h"
 #include "jon.h"
 
-typedef struct JonBtlSetup { const char* name; u8 pad[0x40]; } JonBtlSetup;
 void raster_disp(CameraId cameraId, void* param);
 double sin(double x);
 typedef void (*voidfunctionptr)(void);
@@ -201,7 +200,7 @@ s32 jon_init_evt[400];
 #else
 s32 jon_init_evt[391];
 #endif
-s32 enemy_100[25];
+u8 enemy_100[100];
 NpcSetupInfo npcEnt_kuriboo[2];
 NpcSetupInfo npcEnt_patakuri[2];
 NpcSetupInfo npcEnt_hannya[2];
@@ -457,11 +456,12 @@ EVT_BEGIN(jon_init_evt)
     RETURN
 EVT_END()
 
-s32 enemy_100[] = {
-    16909060, 83952131, 67438087, 134810118, 117967114, 185339150, 252382221, 235868177,
-    303240208, 286397204, 353769240, 420812311, 404298267, 471670298, 454827294, 522199330,
-    589242401, 572728357, 640100388, 623257384, 690629420, 757672491, 741158447, 808529455,
-    808529459,
+u8 enemy_100[] = {
+    1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 6, 7, 8, 9, 10,
+    11, 12, 13, 14, 15, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 16, 17, 18, 19, 20,
+    21, 22, 23, 24, 25, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 26, 27, 28, 29, 30,
+    31, 32, 33, 34, 35, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 36, 37, 38, 39, 40,
+    41, 42, 43, 44, 45, 41, 42, 43, 44, 45, 46, 47, 48, 49, 46, 47, 48, 49, 46, 51,
 };
 
 NpcSetupInfo npcEnt_kuriboo[] = {
@@ -3068,8 +3068,8 @@ USER_FUNC(yattukeFlag) {
 USER_FUNC(enemy_info) {
     s32* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
-    s32 no = ((u8*)enemy_100)[idx];
-    JonBtlSetup* setup = &((JonBtlSetup*)btlsetup_jon_tbl)[no];
+    s32 no = enemy_100[idx];
+    NpcSetupBattleInfo* setup = &btlsetup_jon_tbl[no];
     NpcTribeInfo* tribe = npcTribe;
     const char* name;
     BOOL found = FALSE;
@@ -3094,7 +3094,7 @@ USER_FUNC(enemy_info) {
 }
 
 USER_FUNC(evt_raster) {
-    f32* work = (f32*)event->lwData;
+    f32* work = event->lwDataF;
 
     if (isFirstCall) {
         work[0] = 0.0f;
@@ -3116,8 +3116,8 @@ inline s32 ia8_ofs(s32 x, s32 y) {
 void raster_disp(CameraId cameraId, void* param) {
     EventEntry* event = param;
     CameraEntry* cam = camGetPtr(cameraId);
-    f32 amp = ((f32*)event->lwData)[0];
-    f32 phase = ((f32*)event->lwData)[1];
+    f32 amp = event->lwDataF[0];
+    f32 phase = event->lwDataF[1];
     f32 mtx[2][3];
     GXTexObj obj;
     void* copyBuf;

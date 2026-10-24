@@ -21,7 +21,6 @@ USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_sub_get_language);
 #endif
 
-typedef struct MiniGameWork { EventEntry* event; EventEntry* subEvent; u16 flags; s32 type; s32 (*init)(EventEntry* event, BOOL isFirstCall); s32 (*main)(EventEntry* event, BOOL isFirstCall); void (*disp)(CameraId camera, void* param); void* data; } MiniGameWork;
 typedef struct FuneWork { u32 flags; s32 phase; s32 coins; s32 result; s32 index; s32 state; f32 dist; Vec dir; s32 timer; f32 y; f32 x; s32 monteCount; EventEntry* viewEvent; } FuneWork;
 s32 yuucounter_get_data(void);
 void yuucounter_flag_on(s32 flag);

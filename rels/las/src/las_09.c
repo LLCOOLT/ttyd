@@ -1,3 +1,4 @@
+#include "eff/n64/eff_guruguru_n64.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -1078,7 +1079,7 @@ static USER_FUNC(eff_guruguru) {
     f32 w = evtGetFloat(event, args[4]);
     EffectEntry* eff = effGuruguruN64Entry(0, 3, x, y, z, w);
 
-    ((f32*)eff->userdata)[11] = 0.8f;
+    ((EffGuruguruN64Work*)eff->userdata)->scale = 0.8f;
     effSetName(eff, name);
     return EVT_RETURN_DONE;
 }

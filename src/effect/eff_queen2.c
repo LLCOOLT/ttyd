@@ -20,17 +20,6 @@ typedef struct EffQueen2Work {
     EffectEntry* charge; // 0x28
 } EffQueen2Work;
 
-typedef struct EffAkariChargeN64Work {
-    u8 field_0x0[0x18 - 0x0]; // 0x0
-    s32 field_0x18;           // 0x18
-    s32 field_0x1C;           // 0x1C
-    s32 field_0x20;           // 0x20
-    s32 field_0x24;           // 0x24
-    s32 field_0x28;           // 0x28
-    s32 field_0x2C;           // 0x2C
-    s32 field_0x30;           // 0x30
-} EffAkariChargeN64Work;
-
 EffectEntry* effQueen2Entry(s32 type, f32 x, f32 y, f32 z) {
     EffQueen2Work* work;
     EffectEntry* effect;
@@ -96,12 +85,12 @@ void effQueen2Main(EffectEntry* effect) {
                 work->state++;
                 work->charge = effAkariChargeN64Entry(0, 0, work->position.x, work->position.y,
                                                       work->position.z, 1.0f);
-                ((EffAkariChargeN64Work*)work->charge->userdata)->field_0x18 = 0;
-                ((EffAkariChargeN64Work*)work->charge->userdata)->field_0x1C = 0x9A;
-                ((EffAkariChargeN64Work*)work->charge->userdata)->field_0x20 = 0xFF;
-                ((EffAkariChargeN64Work*)work->charge->userdata)->field_0x28 = 0xFF;
-                ((EffAkariChargeN64Work*)work->charge->userdata)->field_0x2C = 0xFF;
-                ((EffAkariChargeN64Work*)work->charge->userdata)->field_0x30 = 0xFF;
+                ((EffAkariChargeN64Work*)work->charge->userdata)->elem[0].r = 0;
+                ((EffAkariChargeN64Work*)work->charge->userdata)->elem[0].g = 0x9A;
+                ((EffAkariChargeN64Work*)work->charge->userdata)->elem[0].b = 0xFF;
+                ((EffAkariChargeN64Work*)work->charge->userdata)->elem[0].r2 = 0xFF;
+                ((EffAkariChargeN64Work*)work->charge->userdata)->elem[0].g2 = 0xFF;
+                ((EffAkariChargeN64Work*)work->charge->userdata)->elem[0].b2 = 0xFF;
             }
             break;
         case 2:

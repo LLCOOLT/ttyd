@@ -170,18 +170,18 @@ typedef struct AnimationPoseData {
     AnimPoseShape* shapes;         // 0x14C
     AnimDrawCallEntry* drawCalls;  // 0x150, finished name
     Vec* bufferVtxPos;             // 0x154
-    u16* posIndex;                 // 0x158
+    u32* posIndex;                 // 0x158, 32-bit index entries; GX draws use the low 16 bits
     Vec* nrmVtxBuffer;             // 0x15C
-    u16* nrmIndex;                 // 0x160
+    u32* nrmIndex;                 // 0x160, same entries as posIndex
     GXColor* clr0VtxBuffer;        // 0x164, finished name
-    u16* clr0Index;                // 0x168, finished name
-    u16* texIndex[8];              // 0x16C, finished name
+    u32* clr0Index;                // 0x168, finished name, same entries as posIndex
+    u32* texIndex[8];              // 0x16C, finished name, same entries as posIndex
     f32* texVtxBuffer;             // 0x18C, finished name, pointer to list of [S, T]
     AnimTexMtx* texAnimEntries;    // 0x190, copied into the pose buffer each keyframe reset
     AnimPoseTexEntry* texData;     // 0x194, TODO: rename
     AnimTexBind* texBinds;         // 0x198, TODO: rename
     AnimPoseShapeDraw* draws;      // 0x19C
-    u8* groupVisibility;           // 0x1A0, copied into the pose buffer each keyframe reset
+    s8* groupVisibility;           // 0x1A0, copied into the pose buffer each keyframe reset
     AnimPoseNode* nodeData;        // 0x1A4, copied into the pose buffer each keyframe reset
     AnimPoseGroup* groups;         // 0x1A8
     AnimTableEntry* mpAnims;       // 0x1AC
@@ -209,8 +209,8 @@ typedef struct AnimationPose {
     Vec* mpVtxArrayPos;                 // 0x4C
     Vec* mpBufferVtxNrm;                // 0x50
     Vec* mpVtxArrayNrm;                 // 0x54
-    u8* mpBufferGroupVisibility;        // 0x58
-    u8* mpGroupVisibility;              // 0x5C
+    s8* mpBufferGroupVisibility;        // 0x58
+    s8* mpGroupVisibility;              // 0x5C
     AnimPoseNode* mpBufferNode;         // 0x60
     AnimPoseNode* mpNodes;              // 0x64
     AnimTexMtx* mpBufferTexAnimEntries; // 0x68

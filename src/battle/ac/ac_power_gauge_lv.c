@@ -142,25 +142,25 @@ void battleAcDisp_PowerGaugeLv(CameraId cameraId, void* param) {
     s32 i = 4;
     switch (work->actionCommands.mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->slideTimerBase[i], 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - AC_SLIDE_TIMER_AT(disp, i), 20, -300.0f, 30.0f);
         case 100:
         case 1000:
         case 1002:
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->slideTimerBase[i] > 0) {
-                (*(s32*)&disp->slideTimerBase[i])--;
+            if (AC_SLIDE_TIMER_AT(disp, i) > 0) {
+                (AC_SLIDE_TIMER_AT(disp, i))--;
             }
             break;
         case 1003:
         case 1004:
-            if (*(s32*)&disp->slideTimerBase[i] >= 40) {
-                disp->iconX = intplGetValue(4, *(s32*)&disp->slideTimerBase[i] - 40, 20, 30.0f, -300.0f);
+            if (AC_SLIDE_TIMER_AT(disp, i) >= 40) {
+                disp->iconX = intplGetValue(4, AC_SLIDE_TIMER_AT(disp, i) - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->slideTimerBase[i] < 60) {
-                (*(s32*)&disp->slideTimerBase[i])++;
+            if (AC_SLIDE_TIMER_AT(disp, i) < 60) {
+                (AC_SLIDE_TIMER_AT(disp, i))++;
             }
             break;
     }

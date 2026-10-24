@@ -1,6 +1,7 @@
 #include "dolphin/types.h"
 #include "driver/animdrv.h"
 #include "driver/effdrv.h"
+#include "eff/n64/eff_sweat_n64.h"
 #include "driver/hitdrv.h"
 #include "mario/mario_sbr.h"
 #include "mario/mario.h"
@@ -38,7 +39,6 @@ extern void psndSFXOff(s32 id);
 extern void partyUpdateKeyData(PartyEntry* party);
 extern s32 psndSFXOn_3D(s32 id, Vec* pos);
 extern void* marioSearchHead(Vec* pos, f32 range, f32* height);
-extern EffectEntry* effSweatN64Entry(s32 type, f32 x, f32 y, f32 z, f32 base, f32 angle, s32 life);
 extern s32 marioChkDamageSink(void);
 extern void marioUpdateCamCollision(Vec* pos);
 double sin(double);
@@ -112,9 +112,9 @@ void L_sweatMain(PartyEntry* party) {
         f32 x = party->position.x;
         f32 y = party->position.y + 18.0f;
         f32 z = party->position.z;
-        ((f32*)((YoshiWork*)party->useStruct)->effect->userdata)[1] = x;
-        ((f32*)((YoshiWork*)party->useStruct)->effect->userdata)[2] = y;
-        ((f32*)((YoshiWork*)party->useStruct)->effect->userdata)[3] = z;
+        ((EffSweatN64Work*)((YoshiWork*)party->useStruct)->effect->userdata)->position.x = x;
+        ((EffSweatN64Work*)((YoshiWork*)party->useStruct)->effect->userdata)->position.y = y;
+        ((EffSweatN64Work*)((YoshiWork*)party->useStruct)->effect->userdata)->position.z = z;
         if (--((YoshiWork*)party->useStruct)->timer <= 0) {
             effDelete(((YoshiWork*)party->useStruct)->effect);
             ((YoshiWork*)party->useStruct)->effect = NULL;

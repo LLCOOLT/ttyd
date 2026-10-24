@@ -148,7 +148,10 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
     s32 pass;
     s32 j;
-    PointGetTex* tbl = ((PointGetTex**)texid_tbl)[gp->language * 3 + (work->number > 1 ? 1 : 0)];
+    // FAKE: the digit table is read with one flat index over the rows' three words
+    // (language * 3 + slot) through row 0's tbl[], as the target computes it; the natural
+    // texid_tbl[gp->language].tbl[slot] shares the row address with .count and differs.
+    PointGetTex* tbl = texid_tbl[0].tbl[gp->language * 3 + (work->number > 1 ? 1 : 0)];
     s32 count = texid_tbl[gp->language].count;
     s32 kind;
     s32 id;

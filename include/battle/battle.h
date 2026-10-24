@@ -79,7 +79,7 @@ typedef struct BattleActRecord {   // u8 counters for the battle-condition rules
 typedef struct StChgMsg {
     s8 type;     // 0x0, -1 = free
     u8 flags;    // 0x1
-    s8 timer;    // 0x2, frames left on screen; a 0x300 press clears it
+    u8 timer;    // 0x2, frames left on screen; a 0x300 press clears it
     u8 pad_3;    // 0x3
     s32 unitId;  // 0x4
     s32 changed; // 0x8, 1: strength changed / newly inflicted (selects msg1), as StChgInfo.changed
@@ -108,12 +108,8 @@ struct BattleAlliance {
     u16 allianceId;     // 0x0
     s8 attackDirection; // 0x2
     // pad 1 byte
-    u32 clearConditionMet; // 0x4
+    BOOL clearConditionMet; // 0x4
 };
-
-typedef struct BtlStatusCopy {
-    u8 data[0x1E]; // BattleUnit status turns/strengths from mSleepTurns, copied as one block
-} BtlStatusCopy;
 
 typedef struct BattleWorkPartyInfo {
     f32 sizeMultiplier;       // 0x0, saved BattleUnit.mSizeMultiplier

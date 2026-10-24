@@ -210,7 +210,7 @@ f32 marioChkOverheadJabara(s32* a, s32* b);
 void marioChkOverhead(void);
 void* marioSearchHead(Vec* p, f32* h, f32 r);
 void* marioSearchHead_jabara(Vec* p, f32* a, f32* b, f32 r);
-void* marioChkLandon2(f32* out, f32 y, f32 z);
+HitEntry* marioChkLandon2(f32* out, f32 y, f32 z);
 void marioChgSmallJumpMotion(void);
 void swingMain(void);
 f32 marioGetFallSpd(void);
@@ -529,7 +529,7 @@ void mot_jabara(void) {
 		mario->dispOfs.z += f28 * (f32)sin(3.1415927f * mario->targetYaw / 180.0f);
 		f28 = -1.0f * (f32)sin(1.5707963705062866);
 		{
-			void* land = marioChkLandon2(&hitY, f28, mario->dispOfs.y);
+			HitEntry* land = marioChkLandon2(&hitY, f28, mario->dispOfs.y);
 			if (land == NULL) {
 				mario->position.y += f28;
 				if ((f32)mario->screenY > 480.0f) {

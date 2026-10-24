@@ -9,22 +9,6 @@
 double sin(double);
 double cos(double);
 
-typedef struct EffStampN64Work {
-    s16 type;      // 0x0
-    Vec position;  // 0x4
-    Vec velocity;  // 0x10
-    f32 scaleY;    // 0x1C
-    f32 scaleX;    // 0x20
-    s32 lifetime;  // 0x24
-    s32 frame;     // 0x28
-    f32 angle;     // 0x2C
-    f32 radius;    // 0x30
-    s32 alpha;     // 0x34
-    u8 r, g, b;    // 0x38
-    u8 r2, g2, b2; // 0x3B
-    u8 pad[2];
-} EffStampN64Work;
-
 static effN64Vtx size16x16_tex64x32_vtx[] = {
     {-8, 0, 0, 0, 0, 0, 0, 0, 0},
     {8, 0, 0, 2048, 0, 0, 0, 0, 0},

@@ -233,7 +233,7 @@ void iconMain(void) {
             if (entry->uflags & 0x2000) {
                 entry->uflags &= ~0x2000;
 #ifdef VERSION_G8ME01
-                data = iconGetBinData(*(u16*)&entry->iconId);
+                data = iconGetBinData(entry->iconId);
 #endif
                 // warning: data may be invalid (JP)
                 entry->width = data->width;
@@ -255,7 +255,7 @@ void iconMain(void) {
                     if (entry->currIcon >= entry->numIcons) {
                         entry->currIcon = 0;
                     }
-                    data = iconGetBinData(*(u16*)&entry->iconId);
+                    data = iconGetBinData(entry->iconId);
                     entry->tplId = data->frames[entry->currIcon].tplId;
                     entry->frameDelay = data->frames[entry->currIcon].delay;
                 }
@@ -301,7 +301,7 @@ void iconEntry(const char* name, s16 iconId) {
     entry->color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
     strcpy(entry->name, name);
     entry->iconId = iconId;
-    data = iconGetBinData(*(u16*)&entry->iconId);
+    data = iconGetBinData(entry->iconId);
     if (data) {
         entry->width = data->width;
         entry->height = data->height;
@@ -343,7 +343,7 @@ void iconEntry2D(const char* name, s16 iconId) {
     entry->color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
     strcpy(entry->name, name);
     entry->iconId = iconId;
-    data = iconGetBinData(*(u16*)&entry->iconId);
+    data = iconGetBinData(entry->iconId);
     if (data) {
         entry->width = data->width;
         entry->height = data->height;
@@ -378,7 +378,7 @@ void iconChange(const char* name, s16 iconId) {
     IconBinData* data;
 
     entry->iconId = iconId;
-    data = iconGetBinData(*(u16*)&entry->iconId);
+    data = iconGetBinData(entry->iconId);
     entry->width = data->width;
     entry->height = data->height;
     entry->numIcons = data->numIcons;
@@ -488,7 +488,7 @@ void iconDispGx2(Mtx mtx, s16 flags, s16 iconId)
   {
   }
 #ifdef VERSION_G8ME01
-  /* FAKE: (u16)(s16) round-trip is a no-op on the s16 field; it steers MWCC's register choice */
+  /* FAKE: (u16)(s16) round-trip is a no-op on the u16 field (the s32 id goes through s16 first); it steers MWCC's register choice */
   ep->iconId = (u16)(s16)iconId;
   data = iconGetBinData((u16)iconId);
 #else
@@ -546,7 +546,7 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {
     if (icon_bin_ok && icon_bin_ok) {
     }
 #ifdef VERSION_G8ME01
-    /* FAKE: (u16)(s16) round-trip is a no-op on the s16 field; it steers MWCC's register choice */
+    /* FAKE: (u16)(s16) round-trip is a no-op on the u16 field (the s32 id goes through s16 first); it steers MWCC's register choice */
     ep->iconId = (u16)(s16)iconId;
     data = iconGetBinData((u16)iconId);
 #else
@@ -741,12 +741,12 @@ void iconGX(Mtx mtx, IconEntry* entry) {
         y *= 0.6f;
         w *= 0.6f;
         hn *= 0.6f;
-        if (*(u16*)&entry->iconId == ICON_18B) {
+        if (entry->iconId == ICON_18B) {
             x *= 0.8f;
             y *= 0.8f;
             w *= 0.8f;
             hn *= 0.8f;
-        } else if (*(u16*)&entry->iconId == ICON_18D) {
+        } else if (entry->iconId == ICON_18D) {
             x *= 0.9f;
             y *= 0.9f;
             w *= 0.9f;

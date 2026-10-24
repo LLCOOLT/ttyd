@@ -6,22 +6,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-typedef struct EffStoneSmokeN64Work {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
-    s32 timer;     // 0x10
-    s32 frame;     // 0x14
-    s32 r;         // 0x18
-    s32 g;         // 0x1C
-    s32 b;         // 0x20
-    s32 alpha;     // 0x24
-    s32 r2;        // 0x28
-    s32 g2;        // 0x2C
-    s32 b2;        // 0x30
-    f32 baseScale; // 0x34
-    f32 scale;     // 0x38
-} EffStoneSmokeN64Work;
-
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
     {8, -8, 0, 1024, 0, 0, 0, 0, 255},

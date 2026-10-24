@@ -11,14 +11,7 @@
 #include "evt/evt_sub.h"
 #include "evt/evt_snd.h"
 #include "unit/party/unit_party_yoshi.h"
-
-
-typedef struct WhirlwindN64Work {
-    u8 field_0x0[0x8 - 0x0]; // 0x0
-    Vec position;            // 0x8
-} WhirlwindN64Work;
-
-EffectEntry* effWhirlwindN64Entry(BOOL flip, s32 type, f32 scale, s32 lifetime);
+#include "eff/n64/eff_whirlwind_n64.h"
 
 USER_FUNC(_binta_effect);
 USER_FUNC(btlevtcmd_AddRotate);
@@ -2284,9 +2277,9 @@ USER_FUNC(_binta_effect) {
 
     unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
     BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-    eff = effWhirlwindN64Entry(dir < 0, 0, unit->mSizeMultiplier, 90);
-    ((WhirlwindN64Work*)eff->userdata)->position.x = pos.x;
-    ((WhirlwindN64Work*)eff->userdata)->position.y = pos.y;
-    ((WhirlwindN64Work*)eff->userdata)->position.z = pos.z;
+    eff = effWhirlwindN64Entry(dir < 0, NULL, unit->mSizeMultiplier, 90);
+    ((EffWhirlwindN64Work*)eff->userdata)->position.x = pos.x;
+    ((EffWhirlwindN64Work*)eff->userdata)->position.y = pos.y;
+    ((EffWhirlwindN64Work*)eff->userdata)->position.z = pos.z;
     return EVT_RETURN_DONE;
 }

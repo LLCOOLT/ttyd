@@ -45,9 +45,9 @@ static inline void peachStepSe(s32 d1, s32 d2) {
         a = 0x7E9;
         b = 0x7E8;
     }
-    if (*(s32*)&mp->multiTimer % d1 == 0) {
+    if (mp->multiTimer % d1 == 0) {
         psndSFXOn_3D((char*)a, &mp->position);
-    } else if (*(s32*)&mp->multiTimer % d2 == 0) {
+    } else if (mp->multiTimer % d2 == 0) {
         psndSFXOn_3D((char*)b, &mp->position);
     }
     mp->multiTimer++;
@@ -277,7 +277,7 @@ s32 peachMain(void) {
 
 void peach_stay(void) {
     MarioWork* mp = marioGetPtr();
-#define MT (*(s32*)&mp->multiTimer)
+#define MT (mp->multiTimer)
     if (mp->trigFlags & 1) {
         mp->trigFlags &= ~1;
         mp->flags &= 0xFFF0FFFF;

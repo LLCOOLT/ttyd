@@ -12,15 +12,6 @@
 
 extern ItemData itemDataTable[];
 
-typedef struct BTexRef {
-    TEXPalette* tpl;
-} BTexRef;
-
-typedef struct BRes {
-    u8 pad_0[0xA0];
-    BTexRef* tex;
-} BRes;
-
 typedef struct BEnt {
     s32 equipped;
     s32 idx;
@@ -41,7 +32,7 @@ typedef struct BWin {
     /* 0x00C */ u32 dtrg;
     /* 0x010 */ u32 drep;
     /* 0x014 */ u8 pad_14[0x28 - 0x14];
-    /* 0x028 */ BRes* res;
+    /* 0x028 */ FileEntry* res; // data: TPL
     /* 0x02C */ u8 pad_2C[0xC4 - 0x2C];
     /* 0x0C4 */ BWinPos pos[4];
     /* 0x114 */ u8 pad_114[0x124 - 0x114];
@@ -368,12 +359,12 @@ void winBadgeDisp(s32 camId, void* param, s32 n) {
     for (i = 0; i < 2; i++) {
         off = i * VERSION_PICK(40, 45);
         if (i == w->tab) {
-            winTexInit(w->res->tex->tpl);
+            winTexInit((TEXPalette*)*w->res->data);
             winTexSet(0xB4, (Vec){x - 190.0f, VERSION_PICK(20.0f, 25.0f) + (a - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x80});
-            winTexInit_x2(w->res->tex->tpl);
+            winTexInit_x2((TEXPalette*)*w->res->data);
             winTexSet_x2(i + 0x1A, 0xB4, (Vec){c, VERSION_PICK(20.0f, 25.0f) + (b - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         } else {
-            winTexInit_x2(w->res->tex->tpl);
+            winTexInit_x2((TEXPalette*)*w->res->data);
             winTexSet_x2(i + 0x1A, 0xB4, (Vec){x - 190.0f, VERSION_PICK(20.0f, 25.0f) + (a - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0x80, 0x80, 0x80, 0xFF});
         }
     }
@@ -396,7 +387,7 @@ void winBadgeDisp(s32 camId, void* param, s32 n) {
     winFontSet((Vec){x - 180.0f, ((20.0f + (y - 108.0f)) - 18.0f) + (10 - Q) * 13, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black, msgSearch("msg_menu_badge_nokori"));
 #endif
     winFontSetR((Vec){VERSION_PICK((x - 145.0f) - 16.0f, 4.0f + ((x - 145.0f) - 16.0f)), ((20.0f + (y - 102.0f)) - 18.0f) + (10 - Q) * 13, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%s", winZenkakuStr(pouch->availableBP));
-    winTexInit(w->res->tex->tpl);
+    winTexInit((TEXPalette*)*w->res->data);
     d = 28.0f + y;
     for (i = 0; i < pouch->availableBP; i++) {
         winTexSet(0x1C, (Vec){(x - 242.0f) + (i % 10) * 13, (20.0f + (d - (i / 10) * 13)) - 18.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
@@ -456,7 +447,7 @@ void badge_disp(BWin* w, f32 xo, f32 yo) {
             break;
         }
         if (equipped) {
-            winTexInit(w->res->tex->tpl);
+            winTexInit((TEXPalette*)*w->res->data);
             winTexSet(0x1E, (Vec){82.0f + xo, (scroll + ((yo + 110.0f) - (f32)rowOff)), 0.0f}, (Vec){44.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         }
         if (!equipped && itemDataTable[badge].bp_cost > pouchGetPtr()->availableBP) {
@@ -482,7 +473,7 @@ void badge_disp(BWin* w, f32 xo, f32 yo) {
         cost = &item->bp_cost;
         sprintf(buf, "%s", winZenkakuStr(*cost));
         winFontSet((Vec){(142.0f + xo) - (f32)(FontGetMessageWidth(buf) / 2), scroll + (12.0f + ((yo + 110.0f) - (f32)rowOff)), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, colB, buf);
-        winTexInit(w->res->tex->tpl);
+        winTexInit((TEXPalette*)*w->res->data);
         for (j = 0; j < *cost; j++) {
             { s32 t; winTexSet((t = 0x1D, equipped ? t = 0x1C : 0, t), (Vec){(160.0f + xo) + j * 13, (scroll + ((yo + 110.0f) - (f32)rowOff)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, colA); }
         }
@@ -494,14 +485,14 @@ void badge_disp(BWin* w, f32 xo, f32 yo) {
         colD = (GXColor){0, 0, 0, 255};
 
         if (w->page[w->tab] > 0) {
-            winTexInit(w->res->tex->tpl);
+            winTexInit((TEXPalette*)*w->res->data);
             ax = 250.0f + xo;
             winTexSet(0x17, (Vec){ax, 20.0f + (18.0f + (110.0f + yo)), 0.0f}, (Vec){-1.0f, -1.0f, -1.0f}, colU);
             winIconInit();
             winIconSet(ICON_07E, (Vec){ax, 20.0f + (113.0f + yo), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, colU);
         }
         if (cnt > w->page[w->tab] * 8 + 8) {
-            winTexInit(w->res->tex->tpl);
+            winTexInit((TEXPalette*)*w->res->data);
             ax = 250.0f + xo;
             winTexSet(0x17, (Vec){ax, 20.0f + ((yo - 90.0f) - 15.0f), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, colU);
             winIconInit();

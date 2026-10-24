@@ -17,6 +17,7 @@
 #include "evt/evt_sub.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
+#include "driver/extdrv.h"
 
 typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; Vec ofs; Vec rot; } ZakoGun;
 typedef struct ZakoGunWork { s32 flag; s32 targetId;
@@ -24,14 +25,12 @@ typedef struct ZakoGunWork { s32 flag; s32 targetId;
     u8 us_pad08[0xC]; // US: 12 more bytes here
 #endif
     s32 state; s32 timer; Vec pos; u8 field_0x1c[0x34 - 0x1c]; f32 radius; f32 angle; f32 speed; u8 field_0x40[0x48 - 0x40]; Vec start; Vec end; s32 timer2; s32 steps; s32 count; s32 sfx; } ZakoGunWork;
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 extern ZakoGun* zakogun;
 extern ZakoGunWork* work;
-ExtPose* extGetPosePtr(void);
 BattleUnit* zakogun_get_ptr(void);
 s32 zakogun_get_kanbu_id(void);
 void zakogun_set_pose(ZakoGun* zako, s32 base, s32 num, s32 div);
-void zakogun_ext_init123_common(ExtPose* pose, s32 i);
+void zakogun_ext_init123_common(ExtdrvPose* pose, s32 i);
 void psndSFXOff(s32 id);
 int rand(void);
 double sqrt(double x);
@@ -104,7 +103,7 @@ USER_FUNC(zakogun_kanbu_on_ball) {
 
 USER_FUNC(zakogun_ext_init3) {
     s32 i;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     BattleUnit* kanbu;
     s32 a;
     s32 b;
@@ -477,7 +476,7 @@ EVT_END()
 void zakogun_ext_main3(void) {
     s32 i;
     BattleUnit* unit = zakogun_get_ptr();
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     ZakoGun* zako;
     f32 left;
     f32 top;
@@ -488,7 +487,7 @@ void zakogun_ext_main3(void) {
 
     for (i = 0; i < 500; i++, pose++) {
         zako = &zakogun[i];
-        pose->frame = zako->poseBase + zako->poseCount / zako->poseDiv;
+        pose->texId = zako->poseBase + zako->poseCount / zako->poseDiv;
         zako->poseCount++;
         if (zako->poseCount >= zako->poseNum * zako->poseDiv) {
             zako->poseCount = 0;
@@ -660,31 +659,31 @@ void zakogun_ext_main3(void) {
                 break;
         }
         if (zako->state >= 35 && zako->state <= 40) {
-            PSMTXIdentity(pose->mtx);
+            PSMTXIdentity(*pose->mtx);
             PSMTXRotRad(m, 'z', 0.017453292f * zako->rot.z);
-            PSMTXConcat(pose->mtx, m, pose->mtx);
-            pose->mtx[0][3] = zako->ofs.x;
-            pose->mtx[1][3] = zako->ofs.y;
-            pose->mtx[2][3] = work->pos.z + 0.05f * i;
+            PSMTXConcat(*pose->mtx, m, *pose->mtx);
+            (*pose->mtx)[0][3] = zako->ofs.x;
+            (*pose->mtx)[1][3] = zako->ofs.y;
+            (*pose->mtx)[2][3] = work->pos.z + 0.05f * i;
             PSMTXRotRad(m, 'z', 0.017453292f * work->angle);
-            PSMTXConcat(m, pose->mtx, pose->mtx);
-            pose->mtx[0][3] += work->pos.x;
-            pose->mtx[1][3] += work->pos.y;
-            pose->mtx[2][3] += work->pos.z;
-            zako->pos.x = pose->mtx[0][3];
-            zako->pos.y = pose->mtx[1][3];
-            zako->pos.z = pose->mtx[2][3];
+            PSMTXConcat(m, *pose->mtx, *pose->mtx);
+            (*pose->mtx)[0][3] += work->pos.x;
+            (*pose->mtx)[1][3] += work->pos.y;
+            (*pose->mtx)[2][3] += work->pos.z;
+            zako->pos.x = (*pose->mtx)[0][3];
+            zako->pos.y = (*pose->mtx)[1][3];
+            zako->pos.z = (*pose->mtx)[2][3];
         } else {
-            PSMTXIdentity(pose->mtx);
+            PSMTXIdentity(*pose->mtx);
             PSMTXRotRad(m2, 'x', 0.017453292f * zako->rot.x);
-            PSMTXConcat(pose->mtx, m2, pose->mtx);
+            PSMTXConcat(*pose->mtx, m2, *pose->mtx);
             PSMTXRotRad(m2, 'y', 0.017453292f * zako->rot.y);
-            PSMTXConcat(pose->mtx, m2, pose->mtx);
+            PSMTXConcat(*pose->mtx, m2, *pose->mtx);
             PSMTXRotRad(m2, 'z', 0.017453292f * zako->rot.z);
-            PSMTXConcat(pose->mtx, m2, pose->mtx);
-            pose->mtx[0][3] = zako->pos.x;
-            pose->mtx[1][3] = zako->pos.y;
-            pose->mtx[2][3] = zako->pos.z + 0.03f * i;
+            PSMTXConcat(*pose->mtx, m2, *pose->mtx);
+            (*pose->mtx)[0][3] = zako->pos.x;
+            (*pose->mtx)[1][3] = zako->pos.y;
+            (*pose->mtx)[2][3] = zako->pos.z + 0.03f * i;
         }
     }
 }

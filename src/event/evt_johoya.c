@@ -174,7 +174,7 @@ USER_FUNC(johoya_keti_oldspeak_makelabel) {
             if (target == n) {
                 sprintf((char*)wp->infoEnd, "%s_%04d", wp->prefix, wp->info[i].storyId);
                 evtSetValue(event, args[1], (s32)wp->infoEnd);
-                evtSetValue(event, args[2], wp->info[i].initEndPos);
+                evtSetValue(event, args[2], (s32)wp->info[i].initEndPos);
                 evtSetValue(event, args[3], wp->info[i].tagEndPos);
                 evtSetValue(event, args[4], 0);
                 wp->curIndex = i;
@@ -295,7 +295,7 @@ s32 johoya_data_make(const char* prefix, s32 type) {
             if (labelId != -1 && labelId <= maxLabel) {
                 if (type & 1) {
                     wp->info[infoId].labelId = (s16)labelId;
-                    wp->info[infoId].initEndPos = initEndPos;
+                    wp->info[infoId].initEndPos = (char*)initEndPos;
                     wp->info[infoId].tagEndPos = tagEndPos;
                     wp->info[infoId].cost = 5;
                     wp->info[infoId].storyId = (s16)storyId;

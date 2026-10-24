@@ -31,8 +31,6 @@
 #pragma dont_inline on
 
 #define STAGE_WORK(wp) (&(wp)->stageObjectWork)
-#define EVT_UW(evt, n) (((s32*)(evt)->userdata)[n])
-#define UNIT_FIELD(unit, type, off) (*(type*)((u8*)(unit) + BUOFF(off)))
 
 void mapGrpFlagOn(const char* name, u32 flags);
 void mapGrpFlagOff(const char* name, u32 flags);
@@ -1335,9 +1333,9 @@ USER_FUNC(_set_mobj_rotate_x) {
 				}
 				break;
 			case 2:
-				EVT_UW(event, 1) = 0;
-				EVT_UW(event, 2) = 60;
-				EVT_UW(event, 3) = 0;
+				event->userWork[1] = 0;
+				event->userWork[2] = 60;
+				event->userWork[3] = 0;
 				break;
 		}
 	}
@@ -1373,18 +1371,18 @@ USER_FUNC(_set_mobj_rotate_x) {
 			}
 			break;
 		case 2:
-			if (EVT_UW(event, 1)) {
-				EVT_UW(event, 1)--;
+			if (event->userWork[1]) {
+				event->userWork[1]--;
 				busy = TRUE;
 			}
 			else {
-				if (EVT_UW(event, 3) == 0) {
+				if (event->userWork[3] == 0) {
 					fall2 = "SFX_BTL_STAGE_SET_FALL2";
 					psndSFXOn_3D(fall2, &(Vec){0.0f, 0.0f, -100.0f});
 				}
-				EVT_UW(event, 3)++;
-				sw->bgRotation.x = (s32)intpl_sub(2, 0.0f, 90.0f, EVT_UW(event, 3), EVT_UW(event, 2));
-				if (EVT_UW(event, 3) < EVT_UW(event, 2)) {
+				event->userWork[3]++;
+				sw->bgRotation.x = (s32)intpl_sub(2, 0.0f, 90.0f, event->userWork[3], event->userWork[2]);
+				if (event->userWork[3] < event->userWork[2]) {
 					busy = TRUE;
 				}
 			}
@@ -1674,10 +1672,10 @@ USER_FUNC(_nozzle_turn) {
 	f32 rotX, rotY, from, to;
 
 	if (isFirstCall) {
-		EVT_UW(event, 2) = 0;
-		EVT_UW(event, 3) = 0;
+		event->userWork[2] = 0;
+		event->userWork[3] = 0;
 		if (sw->nozzleDir[index]) {
-			EVT_UW(event, 2) = 30;
+			event->userWork[2] = 30;
 		}
 	}
 	switch (index) {
@@ -1694,15 +1692,15 @@ USER_FUNC(_nozzle_turn) {
 			return EVT_RETURN_DONE;
 	}
 	BattleSearchObjectPtr(name);
-	if (EVT_UW(event, 2) < 30) {
-		EVT_UW(event, 2)++;
-		rotX = intpl_sub(2, 0.0f, -80.0f, EVT_UW(event, 2), 30);
+	if (event->userWork[2] < 30) {
+		event->userWork[2]++;
+		rotX = intpl_sub(2, 0.0f, -80.0f, event->userWork[2], 30);
 	}
 	else {
 		rotX = -80.0f;
 	}
-	if (EVT_UW(event, 3) < 30) {
-		EVT_UW(event, 3)++;
+	if (event->userWork[3] < 30) {
+		event->userWork[3]++;
 		switch (sw->nozzleDir[index]) {
 			case 1:
 				from = 45.0f;
@@ -1733,7 +1731,7 @@ USER_FUNC(_nozzle_turn) {
 				to = 0.0f;
 				break;
 		}
-		rotY = intpl_sub(12, from, to, EVT_UW(event, 3), 30);
+		rotY = intpl_sub(12, from, to, event->userWork[3], 30);
 	}
 	switch (index) {
 		case 0:
@@ -1746,7 +1744,7 @@ USER_FUNC(_nozzle_turn) {
 			mapObjRotate("n_head_r", rotX, rotY, 0.0f);
 			break;
 	}
-	if (EVT_UW(event, 2) >= 30 && EVT_UW(event, 3) >= 30) {
+	if (event->userWork[2] >= 30 && event->userWork[3] >= 30) {
 		sw->nozzleDir[index] = sw->nozzleNextDir[index];
 		sw->nozzleTurnEvtId[index] = 0;
 		return EVT_RETURN_DONE;
@@ -1859,12 +1857,12 @@ USER_FUNC(_fall_frame) {
 	sw = STAGE_WORK(wp);
 	body = BattleSearchObjectPtr("if_body");
 	if (isFirstCall) {
-		EVT_UW(event, 2) = 0;
-		EVT_UW(event, 3) = body->mPosition.y;
+		event->userWork[2] = 0;
+		event->userWork[3] = body->mPosition.y;
 	}
-	EVT_UW(event, 2)++;
-	body->mPosition.y = intpl_sub(2, EVT_UW(event, 3), 0.0f, EVT_UW(event, 2) * EVT_UW(event, 2) / 60, 60);
-	if (EVT_UW(event, 2) < 60) {
+	event->userWork[2]++;
+	body->mPosition.y = intpl_sub(2, event->userWork[3], 0.0f, event->userWork[2] * event->userWork[2] / 60, 60);
+	if (event->userWork[2] < 60) {
 		return EVT_RETURN_BLOCK;
 	}
 	evtSetValue(event, arg, (s32)sw->fallObjectData);
@@ -1876,11 +1874,11 @@ USER_FUNC(_fall_frame_delete) {
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
 
 	if (isFirstCall) {
-		EVT_UW(event, 2) = 255;
+		event->userWork[2] = 255;
 	}
-	EVT_UW(event, 2) -= 5;
-	mapGrpSetColor("if_body", (GXColor){255, 255, 255, EVT_UW(event, 2)});
-	if (EVT_UW(event, 2) > 0) {
+	event->userWork[2] -= 5;
+	mapGrpSetColor("if_body", (GXColor){255, 255, 255, event->userWork[2]});
+	if (event->userWork[2] > 0) {
 		return EVT_RETURN_BLOCK;
 	}
 	sw->fallFrameEvtId = 0;
@@ -1985,7 +1983,7 @@ USER_FUNC(_nozzle_work_effect) {
 			evtSetValue(event, out, 0);
 			return EVT_RETURN_DONE;
 		}
-		EVT_UW(event, 0) = 90;
+		event->userWork[0] = 90;
 		switch (sw->nozzleType) {
 			case 1:
 				sfx = "SFX_BTL_STAGE_SMOKE1";
@@ -2008,24 +2006,24 @@ USER_FUNC(_nozzle_work_effect) {
 				angle1 = _get_nozzle_dir(0);
 				if (sw->nozzleDir[0]) {
 					if (sfx) {
-						EVT_UW(event, 5) = psndSFXOn_3D(sfx, &obj->mPosition);
+						event->userWork[5] = psndSFXOn_3D(sfx, &obj->mPosition);
 					}
 					else {
-						EVT_UW(event, 5) = -1;
+						event->userWork[5] = -1;
 					}
 					rot = 90.0f + angle1;
 					rot = reviseAngle(rot);
 					z = 10.0f * sinfd(angle1) + obj->mPosition.z;
-					EVT_UW(event, 1) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle1), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
+					event->userWork[1] = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle1), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
 				}
 				else {
 					if (sfx) {
-						EVT_UW(event, 5) = psndSFXOn_3D(sfx, &obj->mPosition);
+						event->userWork[5] = psndSFXOn_3D(sfx, &obj->mPosition);
 					}
 					else {
-						EVT_UW(event, 5) = -1;
+						event->userWork[5] = -1;
 					}
-					EVT_UW(event, 1) = (s32)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
+					event->userWork[1] = (s32)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
 					if (fog == 0) {
 						effConfettiN64Entry(4, 90, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 1.0f);
 					}
@@ -2034,23 +2032,23 @@ USER_FUNC(_nozzle_work_effect) {
 				angle2 = _get_nozzle_dir(1);
 				if (sw->nozzleDir[1]) {
 					if (sfx) {
-						EVT_UW(event, 6) = psndSFXOn_3D(sfx, &obj->mPosition);
+						event->userWork[6] = psndSFXOn_3D(sfx, &obj->mPosition);
 					}
 					else {
-						EVT_UW(event, 6) = -1;
+						event->userWork[6] = -1;
 					}
 					rot = reviseAngle(90.0f + angle2);
 					z = 10.0f * sinfd(angle2) + obj->mPosition.z;
-					EVT_UW(event, 2) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle2), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
+					event->userWork[2] = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle2), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
 				}
 				else {
 					if (sfx) {
-						EVT_UW(event, 6) = psndSFXOn_3D(sfx, &obj->mPosition);
+						event->userWork[6] = psndSFXOn_3D(sfx, &obj->mPosition);
 					}
 					else {
-						EVT_UW(event, 6) = -1;
+						event->userWork[6] = -1;
 					}
-					EVT_UW(event, 2) = (s32)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
+					event->userWork[2] = (s32)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
 					if (fog == 0) {
 						effConfettiN64Entry(4, 90, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 1.0f);
 					}
@@ -2059,23 +2057,23 @@ USER_FUNC(_nozzle_work_effect) {
 				angle3 = _get_nozzle_dir(2);
 				if (sw->nozzleDir[2]) {
 					if (sfx) {
-						EVT_UW(event, 7) = psndSFXOn_3D(sfx, &obj->mPosition);
+						event->userWork[7] = psndSFXOn_3D(sfx, &obj->mPosition);
 					}
 					else {
-						EVT_UW(event, 7) = -1;
+						event->userWork[7] = -1;
 					}
 					z = reviseAngle(90.0f + angle3);
 					rot = 10.0f * sinfd(angle3) + obj->mPosition.z;
-					EVT_UW(event, 3) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle3), 12.0f + obj->mPosition.y, rot, -80.0f, z, 90);
+					event->userWork[3] = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle3), 12.0f + obj->mPosition.y, rot, -80.0f, z, 90);
 				}
 				else {
 					if (sfx) {
-						EVT_UW(event, 7) = psndSFXOn_3D(sfx, &obj->mPosition);
+						event->userWork[7] = psndSFXOn_3D(sfx, &obj->mPosition);
 					}
 					else {
-						EVT_UW(event, 7) = -1;
+						event->userWork[7] = -1;
 					}
-					EVT_UW(event, 3) = (s32)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
+					event->userWork[3] = (s32)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
 					if (fog == 0) {
 						effConfettiN64Entry(4, 90, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 1.0f);
 					}
@@ -2084,17 +2082,17 @@ USER_FUNC(_nozzle_work_effect) {
 				break;
 			default:
 				if (fog && !sw->fogEffect) {
-					EVT_UW(event, 0) = 120;
-					EVT_UW(event, 1) = 0;
-					EVT_UW(event, 3) = 0;
-					EVT_UW(event, 2) = 0;
+					event->userWork[0] = 120;
+					event->userWork[1] = 0;
+					event->userWork[3] = 0;
+					event->userWork[2] = 0;
 					sw->fogEffect = effNozleEntry(3, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1000);
-					EVT_UW(event, 3) = (s32)sw->fogEffect;
+					event->userWork[3] = (s32)sw->fogEffect;
 					sw->fogTimer = 2;
-					EVT_UW(event, 5) = psndSFXOn_3D("SFX_BTL_STAGE_DRYICE1", &BattleSearchObjectPtr("nozzle_c")->mPosition);
+					event->userWork[5] = psndSFXOn_3D("SFX_BTL_STAGE_DRYICE1", &BattleSearchObjectPtr("nozzle_c")->mPosition);
 					started = TRUE;
-					EVT_UW(event, 6) = -1;
-					EVT_UW(event, 7) = -1;
+					event->userWork[6] = -1;
+					event->userWork[7] = -1;
 				}
 				break;
 		}
@@ -2103,17 +2101,17 @@ USER_FUNC(_nozzle_work_effect) {
 			return EVT_RETURN_DONE;
 		}
 	}
-	if (EVT_UW(event, 0) > 0) {
-		EVT_UW(event, 0)--;
-		if (EVT_UW(event, 0) <= 0) {
-			if ((u32)EVT_UW(event, 5) != 0xFFFFFFFF) {
-				psndSFXOff(EVT_UW(event, 5));
+	if (event->userWork[0] > 0) {
+		event->userWork[0]--;
+		if (event->userWork[0] <= 0) {
+			if ((u32)event->userWork[5] != 0xFFFFFFFF) {
+				psndSFXOff(event->userWork[5]);
 			}
-			if ((u32)EVT_UW(event, 6) != 0xFFFFFFFF) {
-				psndSFXOff(EVT_UW(event, 6));
+			if ((u32)event->userWork[6] != 0xFFFFFFFF) {
+				psndSFXOff(event->userWork[6]);
 			}
-			if ((u32)EVT_UW(event, 7) != 0xFFFFFFFF) {
-				psndSFXOff(EVT_UW(event, 7));
+			if ((u32)event->userWork[7] != 0xFFFFFFFF) {
+				psndSFXOff(event->userWork[7]);
 			}
 		}
 		return EVT_RETURN_BLOCK;
@@ -2444,8 +2442,8 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
   if (isFirstCall)
   {
     w = BattleAlloc(sizeof(FallObjectWork));
-    ((s32 *) event->userdata)[0] = (s32) w;
-    ((s32 *) event->userdata)[1] = 0;
+    event->userdatap[0] = w;
+    event->userdata[1] = 0;
     memset(w, 0, sizeof(FallObjectWork));
     w->entries[0].index = -1;
     for (i = 0; i < 3; i++)
@@ -2455,7 +2453,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
 
     if (BattleCheckConcluded(wp))
     {
-      evtSetValue(event, arg0, ((s32 *) event->userdata)[1]);
+      evtSetValue(event, arg0, event->userdata[1]);
       return 2;
     }
     w->count = 1;
@@ -2518,7 +2516,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
           e->partId = -1;
           e->unitId = BattleAudience_HaitiRandForFallObject();
           found = 1;
-          ((s32 *) event->userdata)[1] = 1;
+          event->userdata[1] = 1;
         }
       }
       if (e->kind == 0)
@@ -2526,7 +2524,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
         BattleSamplingEnemy(&targets, weapon, BattleGetSystemPtr(wp)->unitId, 1, weapon->targetClassFlags, weapon->targetPropertyFlags, -wp->alliances[1].attackDirection);
         if (targets.numTargets <= 0)
         {
-          evtSetValue(event, arg0, ((s32 *) event->userdata)[1]);
+          evtSetValue(event, arg0, event->userdata[1]);
           return 2;
         }
         found = 1;
@@ -2548,7 +2546,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
 
     if (!found)
     {
-      evtSetValue(event, arg0, ((s32 *) event->userdata)[1]);
+      evtSetValue(event, arg0, event->userdata[1]);
       return 2;
     }
     for (i = 0; i < w->count; i++)
@@ -2592,7 +2590,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
   sfxTub2 = (0, "SFX_BTL_STAGE_DAMAGE_TUB1"); // FAKE: comma expr makes the literal an early @ temp (same pointer)
   sfxNormal = "SFX_BTL_STAGE_DAMAGE_NORMAL1";
   sfxRest = "SFX_REST_CONDITION1";
-  w = (FallObjectWork *) ((s32 *) event->userdata)[0];
+  w = event->userdatap[0];
   done = 1;
   for (i = 0; i < w->count; i++)
   {
@@ -2844,7 +2842,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
                   }
                   p.x -= 45.0f;
                   eff = effNiceEntry(6, p.x, p.y, p.z);
-                  ((f32 *) eff->userdata)[7] = 0.75f;
+                  ((NiceEffectWork*)eff->userdata)->overallScale = 0.75f;
                   unit2->damagePattern = 0;
                   BattleRunHitEvent(unit2, 0x126);
                   break;
@@ -2881,7 +2879,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
   {
     return 0;
   }
-  BattleFree((void *) ((s32 *) event->userdata)[0]);
-  evtSetValue(event, arg0, ((s32 *) event->userdata)[1]);
+  BattleFree(event->userdatap[0]);
+  evtSetValue(event, arg0, event->userdata[1]);
   return 2;
 }

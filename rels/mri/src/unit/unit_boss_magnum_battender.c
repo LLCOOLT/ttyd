@@ -1,3 +1,4 @@
+#include "eff/n64/eff_hokori_n64.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -515,12 +516,12 @@ USER_FUNC(eff_hokori) {
     f32 z = evtGetFloat(event, args[2]);
     EffectEntry* eff = effHokoriN64Entry(0, evtGetValue(event, args[3]), x, y, z);
 
-    ((s32*)eff->userdata)[12] = 255;
-    ((s32*)eff->userdata)[13] = 255;
-    ((s32*)eff->userdata)[14] = 255;
-    ((s32*)eff->userdata)[15] = 0;
-    ((s32*)eff->userdata)[16] = 0;
-    ((s32*)eff->userdata)[17] = 0;
+    ((EffHokoriN64Work*)eff->userdata)->r = 255;
+    ((EffHokoriN64Work*)eff->userdata)->g = 255;
+    ((EffHokoriN64Work*)eff->userdata)->b = 255;
+    ((EffHokoriN64Work*)eff->userdata)->r2 = 0;
+    ((EffHokoriN64Work*)eff->userdata)->g2 = 0;
+    ((EffHokoriN64Work*)eff->userdata)->b2 = 0;
     return EVT_RETURN_DONE;
 }
 

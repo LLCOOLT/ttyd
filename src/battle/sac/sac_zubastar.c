@@ -76,9 +76,7 @@ typedef struct ZubaStarWork {
 	/* 0x088 */ f32 gaugeV;
 	/* 0x08C */ f32 gaugeAcc;
 	/* 0x090 */ f32 f90;
-	/* 0x094 */ f32 gx;
-	/* 0x098 */ f32 gy;
-	/* 0x09C */ f32 gz;
+	/* 0x094 */ Vec gaugePos; // gauge screen position
 	/* 0x0A0 */ u8 alpha;
 	/* 0x0A1 */ u8 fa1;
 	/* 0x0A4 */ s32 sfx;
@@ -670,7 +668,7 @@ USER_FUNC(zubastar_main) {
 	case 5:
 		w->gaugeState = 6;
 		w->gaugeTimer = 0;
-		*(Vec*)&w->gx = (Vec){-1000.0f, 0.0f, 0.0f};
+		w->gaugePos = (Vec){-1000.0f, 0.0f, 0.0f};
 		w->f90 = 200.0f;
 		w->gauge = 0.0f;
 		w->gaugeV = 0.0f;
@@ -680,7 +678,7 @@ USER_FUNC(zubastar_main) {
 		break;
 	case 6:
 		w->gaugeTimer++;
-		w->gx = INTPL(4, w->gaugeTimer, 30, -1000.0f, 50.0f);
+		w->gaugePos.x = INTPL(4, w->gaugeTimer, 30, -1000.0f, 50.0f);
 		if (w->gaugeTimer >= 30) w->gaugeState = 10;
 		break;
 	case 10:
@@ -709,7 +707,7 @@ USER_FUNC(zubastar_main) {
 		w->gaugeAcc = 0.0f;
 		w->fa1 = 0;
 		w->gaugeTimer++;
-		w->gx = INTPL(4, w->gaugeTimer, 30, 50.0f, -1000.0f);
+		w->gaugePos.x = INTPL(4, w->gaugeTimer, 30, 50.0f, -1000.0f);
 		if (w->gaugeTimer >= 30) w->gaugeTimer = 30;
 		break;
 	case 16:
@@ -725,7 +723,7 @@ USER_FUNC(zubastar_main) {
 		break;
 	case 21:
 		w->gaugeTimer++;
-		w->gx = INTPL(4, w->gaugeTimer, 30, 50.0f, -1000.0f);
+		w->gaugePos.x = INTPL(4, w->gaugeTimer, 30, 50.0f, -1000.0f);
 		if (w->gaugeTimer >= 30) w->gaugeTimer = 30;
 		break;
 	}
@@ -926,10 +924,10 @@ void zubastar_disp2D(CameraId cam, void* param) {
 	if (w->gaugeState >= 5) {
 		s32 icon = (w->fa1 <= 3U) ? ICON_064 : ICON_065;
 		Vec pos = {0.0f, 0.0f, 0.0f};
-		pos.x = w->gx - 200.0f;
-		pos.y = 60.0f + w->gy;
+		pos.x = w->gaugePos.x - 200.0f;
+		pos.y = 60.0f + w->gaugePos.y;
 		((void (*)(Vec*, s16, s32, f32))iconDispGx)(&pos, 0x10, icon, 1.0f);
-		BattleAcDrawGauge(w->gx, w->gy, 0xb1, 0.01f * w->gauge, 4, 0x1a, 0x34, 0x4e, 0);
+		BattleAcDrawGauge(w->gaugePos.x, w->gaugePos.y, 0xb1, 0.01f * w->gauge, 4, 0x1a, 0x34, 0x4e, 0);
 	}
 	GXSetCullMode(GX_CULL_NONE);
 	GXClearVtxDesc();

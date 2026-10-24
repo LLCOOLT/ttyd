@@ -44,13 +44,6 @@ typedef struct EffDogabonAttackN64Work {
     s32 timer[PIECES];  // 0x734
 } EffDogabonAttackN64Work;
 
-typedef struct SmokeWork {
-    u8 pad[0x28];
-    s32 a;
-    s32 b;
-    s32 c;
-} SmokeWork;
-
 void effDogabonAttackMain(EffectEntry* effect);
 void effDogabonAttackDisp(CameraId cameraId, EffectEntry* effect);
 
@@ -294,9 +287,9 @@ void effDogabonAttackMain(EffectEntry* effect) {
             PSMTXConcat(rot, trans, trans);
             smoke = effStoneSmokeN64Entry(0, 16, work->position.x + trans[0][3], work->position.y + trans[1][3],
                                           work->position.z + trans[2][3], 1.0f);
-            ((SmokeWork*)smoke->userdata)->a = 100;
-            ((SmokeWork*)smoke->userdata)->b = 0;
-            ((SmokeWork*)smoke->userdata)->c = 0;
+            ((EffStoneSmokeN64Work*)smoke->userdata)->r2 = 100;
+            ((EffStoneSmokeN64Work*)smoke->userdata)->g2 = 0;
+            ((EffStoneSmokeN64Work*)smoke->userdata)->b2 = 0;
             work->state[i] = 7;
             break;
         }

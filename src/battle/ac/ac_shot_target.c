@@ -14,21 +14,6 @@ void btlDispTex4(s32 id, Vec pos, Vec scale, Vec rot, GXColor color);
 void btlGetScreenPoint(Vec* in, Vec* out);
 f32 sinfd(f32 degrees);
 
-typedef struct ShotTargetDisp {
-    u8 field_0x0[0xC];
-    GXColor color; // 0xC
-    u8 b10;        // 0x10
-    s8 b11;        // 0x11
-    s8 b12;        // 0x12
-    u8 b13;        // 0x13
-    f32 iconX;     // 0x14
-    f32 iconY;     // 0x18
-    u8 field_0x1C[4];
-    s32 timer;     // 0x20
-    u8 field_0x24[4];
-    f32 f28;       // 0x28
-} ShotTargetDisp;
-
 typedef struct ShotTargetWork {
     s32 frame;    // 0x0
     s32 endTimer; // 0x4
@@ -45,19 +30,8 @@ typedef struct ShotTargetWork {
     s32 sfxId;    // 0x38
 } ShotTargetWork;
 
-typedef struct ShotTargetParams {
-    u8 field_0x0[0x38];
-    s32 unitId;     // 0x38
-    s32 partsId;    // 0x3C
-    s32 startFrame; // 0x40
-    u32 difficulty; // 0x44
-    u8 field_0x48[0x88 - 0x48];
-    s16 shotCount;  // 0x88
-} ShotTargetParams;
-
-#define ST_PARAMS(ac) ((ShotTargetParams*)(ac))
 #define ST_WORK(ac) ((ShotTargetWork*)(ac)->work)
-#define ST_DISP(ac) ((ShotTargetDisp*)&(ac)->disp)
+#define ST_DISP(ac) (&(ac)->disp)
 
 #pragma optimize_for_size on
 #pragma dont_inline on
@@ -83,7 +57,7 @@ s32 battleAcMain_ShotTarget(BattleWork* work) {
     if (ac->mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
     }
-    difficulty = ((ShotTargetParams*)&work->actionCommands)->difficulty;
+    difficulty = work->actionCommands.params[3];
     do {
         sfxName = "SFX_AC_CURSOR_MOVE1";
         repeat = FALSE;
@@ -91,8 +65,8 @@ s32 battleAcMain_ShotTarget(BattleWork* work) {
             case 0:
                 _ac_disp_init(work);
                 ac->result = 1;
-                unit = BattleGetUnitPtr(work, ((ShotTargetParams*)&work->actionCommands)->unitId);
-                parts = BtlUnit_GetPartsPtr(unit, ((ShotTargetParams*)&work->actionCommands)->partsId);
+                unit = BattleGetUnitPtr(work, work->actionCommands.params[0]);
+                parts = BtlUnit_GetPartsPtr(unit, work->actionCommands.params[1]);
                 BtlUnit_GetHitPos(unit, parts, &hit.x, &hit.y, &hit.z);
                 cw->hitPos = hit;
                 cw->inRange = 0;
@@ -109,12 +83,12 @@ s32 battleAcMain_ShotTarget(BattleWork* work) {
             case 99:
                 break;
             case 100:
-                cw->frame = ((ShotTargetParams*)&work->actionCommands)->startFrame;
+                cw->frame = work->actionCommands.params[2];
                 ac->mAcState = 1000;
                 cw->sfxId = ((s32(*)(const char*))psndSFXOn)(sfxName);
             case 1000:
-                if (((ShotTargetParams*)&work->actionCommands)->shotCount > 0) {
-                    (((ShotTargetParams*)&work->actionCommands)->shotCount)--;
+                if (work->actionCommands.countdown > 0) {
+                    (work->actionCommands.countdown)--;
                     ac->result = 2;
                     repeat = TRUE;
                     ac->mResultCount++;
@@ -250,7 +224,7 @@ s32 battleAcResult_ShotTarget(BattleWork* work) {
 void battleAcDisp_ShotTarget(CameraId cameraId, void* param) {
     BattleWork* work = param;
     BattleActions* ac = &work->actionCommands;
-    ShotTargetDisp* d = ST_DISP(ac);
+    BattleACDispParams* d = ST_DISP(ac);
 
     switch (ac->mAcState) {
         case 99:
@@ -258,22 +232,22 @@ void battleAcDisp_ShotTarget(CameraId cameraId, void* param) {
         case 1000:
         case 1001:
         case 1002:
-            d->iconX = intplGetValue(4, 20 - d->timer, 20, -200.0f, 30.0f);
+            d->iconX = intplGetValue(4, 20 - d->slideTimer, 20, -200.0f, 30.0f);
             actionCommandDisp(d->iconX, d->iconY);
-            if (d->timer > 0) {
-                d->timer--;
+            if (d->slideTimer > 0) {
+                d->slideTimer--;
             }
             break;
         case 1003:
         case 1004:
-            if (d->timer >= 40) {
-                d->iconX = intplGetValue(4, d->timer - 40, 20, 30.0f, -200.0f);
+            if (d->slideTimer >= 40) {
+                d->iconX = intplGetValue(4, d->slideTimer - 40, 20, 30.0f, -200.0f);
             } else {
                 d->iconX = 30.0f;
             }
             actionCommandDisp(d->iconX, d->iconY);
-            if (d->timer < 60) {
-                d->timer++;
+            if (d->slideTimer < 60) {
+                d->slideTimer++;
             }
             break;
     }
@@ -284,17 +258,17 @@ void battleAcDelete_ShotTarget(BattleWork* work) {
 }
 
 static void _ac_disp_init(BattleWork* work) {
-    ShotTargetDisp* d = ST_DISP(&work->actionCommands);
+    BattleACDispParams* d = ST_DISP(&work->actionCommands);
     memset(d, 0, 0x2C);
     d->iconX = -200.0f;
     d->iconY = 0.0f;
-    d->timer = 20;
+    d->slideTimer = 20;
     d->color = (GXColor){255, 255, 255, 255};
-    d->b10 = 0;
-    d->b11 = -16;
-    d->b12 = -16;
-    d->b13 = 0;
-    d->f28 = 0.0f;
+    d->colorStep[0] = 0;
+    d->colorStep[1] = -16;
+    d->colorStep[2] = -16;
+    d->colorStep[3] = 0;
+    d->gaugeRatio = 0.0f;
 }
 
 static void actionCommandDisp(f32 x, f32 y) {

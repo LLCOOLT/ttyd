@@ -1,3 +1,4 @@
+#include "eff/n64/eff_kameki_tornade_n64.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -20,9 +21,6 @@
 #include "driver/hitdrv.h"
 #include "data_tables.h"
 
-typedef struct NanNpc { u8 field_0x0[0x18]; Vec pos; u8 field_0x24[0x30 - 0x24]; Vec basePos; u8 field_0x3C[0x50 - 0x3C]; OSTime time; u8 field_0x58[0x68 - 0x58]; s32 state; s32 duration; u8 field_0x70[0xBF - 0x70]; u8 alpha; } NanNpc;
-typedef struct NanNpcWork { NanNpc* entries; } NanNpcWork;
-extern NanNpcWork* nanNPCWork;
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_exec_wait);
@@ -87,7 +85,7 @@ USER_FUNC(suifu_option_init_func);
 #ifdef VERSION_G8ME01
 #endif
 static USER_FUNC(tornade_alpha_func);
-void elmosalpha_func(NanNpc* npc);
+void elmosalpha_func(NanNPC* npc);
 
 f32 fd_muj_10_negone_one_374[2] __attribute__((aligned(8)));
 f32 fd_muj_10_neg_one_382;
@@ -136,28 +134,28 @@ static USER_FUNC(tornade_alpha_func) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 alpha = evtGetFloat(event, args[1]);
 
-    ((f32*)effNameToPtr(name)->userdata)[82] = alpha;
+    ((EffKamekiTornadeN64Work*)effNameToPtr(name)->userdata)->alphaScale = alpha;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(suifu_option_func) {
     f32 y = evtGetFloat(event, event->args[0]);
-    NanNpcWork* wp = nanNPCWork;
+    NanNPCWork* wp = nanNPCWork;
     s32 i;
 
     for (i = 0; i < 95; i++) {
         // "- -y" reproduces the operand order of the original fadds
-        wp->entries[i].pos.y = wp->entries[i].basePos.y - -y;
+        wp->npc[i].pos.y = wp->npc[i].basePos.y - -y;
     }
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(suifu_option_init_func) {
-    NanNpcWork* wp = nanNPCWork;
+    NanNPCWork* wp = nanNPCWork;
     s32 i;
 
     for (i = 0; i < 95; i++) {
-        wp->entries[i].basePos = wp->entries[i].pos;
+        wp->npc[i].basePos = wp->npc[i].pos;
     }
     return EVT_RETURN_DONE;
 }
@@ -823,25 +821,25 @@ EVT_BEGIN(muj_10_init_evt)
 EVT_END()
 #endif
 
-void elmosalpha_func(NanNpc* npc) {
+void elmosalpha_func(NanNPC* npc) {
     s32 elapsed;
 
     switch (npc->state) {
         case 0:
-            npc->time = gp->renderTime;
+            npc->startTime = gp->renderTime;
             npc->duration = irand(1000);
             npc->state = 1;
         case 1:
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) >= npc->duration) {
-                npc->time = gp->renderTime;
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime) >= npc->duration) {
+                npc->startTime = gp->renderTime;
                 npc->duration = 500;
                 npc->state = 2;
             }
             break;
         case 2:
-            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time);
+            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime);
             if (elapsed < npc->duration) {
-                npc->alpha = intplGetValue(0, elapsed, npc->duration, 0.0f, 255.0f);
+                npc->color.a = intplGetValue(0, elapsed, npc->duration, 0.0f, 255.0f);
             } else {
                 npc->state = 3;
             }

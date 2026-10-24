@@ -32,20 +32,16 @@
 static u8 muj_00_bss_0C[4];
 static u8* _ap;
 typedef struct TobiWork { Vec pos; s32 type; } TobiWork;
-typedef struct NanNpc { u8 field_0x0[0x18]; Vec pos; Vec start; Vec target; u8 field_0x3C[0x50 - 0x3C]; OSTime time; u8 field_0x58[0x60 - 0x58]; f32 dir; void (*func)(struct NanNpc*); s32 state; s32 duration; s32 nextState; u8 field_0x74[0x78 - 0x74]; f32 vy; f32 dy; u8 field_0x80[0xA0 - 0x80]; TobiWork* work; s32 angle; s32 radius; u8 field_0xAC[0xC0 - 0xAC]; } NanNpc;
-typedef struct NanNpcWork { NanNpc* entries; } NanNpcWork;
-extern NanNpcWork* nanNPCWork;
-void suifu_kyorokyoro(NanNpc* npc);
+void suifu_kyorokyoro(NanNPC* npc);
 double sin(double x);
 double cos(double x);
 typedef struct OrbitData { f32 angle; f32 dist; } OrbitData;
 OrbitData* _op;
 NpcEntry* evtNpcNameToPtr(EventEntry* event, const char* name);
 #define ORBIT(i, p) op[i].angle += d; t = op[i].angle; rad = orbit_update(t); r = op[i].dist; x = r * sinf_l(rad) + cx; t = r * cosf_l(rad) + cz; p.x = x; p.z = t; (void)0
-NanNpc* random_choice_target(s32 type);
-void evt_nannpc_set_animtbl_sub(NanNpc* npc, void* animtbl);
+NanNPC* random_choice_target(s32 type);
 TobiWork* Tobidat;
-void tobikakari_seq00(NanNpc* npc);
+void tobikakari_seq00(NanNPC* npc);
 double atan2(double y, double x);
 static inline f32 sinf_l(f32 x) { f32 v = sin(x); return v; }
 static inline f32 cosf_l(f32 x) { return cos(x); }
@@ -201,10 +197,10 @@ USER_FUNC(tobikakaru_init);
 #ifdef VERSION_G8ME01
 USER_FUNC(N_evt_sub_status_gauge_force_update);
 #endif
-void tobikakari_seq00(NanNpc* npc);
-NanNpc* random_choice_target(s32 type);
-void suifu_kyorokyoro_init(NanNpc* npc);
-void suifu_kyorokyoro(NanNpc* npc);
+void tobikakari_seq00(NanNPC* npc);
+NanNPC* random_choice_target(s32 type);
+void suifu_kyorokyoro_init(NanNPC* npc);
+void suifu_kyorokyoro(NanNPC* npc);
 static void alpha_tev(MapTevCallbackInfo* info);
 
 f32 fd_muj_00_negone_one_374[2] __attribute__((aligned(8)));
@@ -223,10 +219,10 @@ f32 fd_muj_00___local_PIO2_367;
 f32 fd_muj_00_one_364;
 static ExtTexInfo ext_entry_data[59];
 static s16 suifu_animtbl[42];
-s32 suifu_animtbl_run[11];
+s16 suifu_animtbl_run[22];
 static s16 elmos_animtbl[22];
 static s16 dai3_animtbl[42];
-s32 dai3_animtbl_run[11];
+s16 dai3_animtbl_run[22];
 static s32 nannpc_mode_setup[98];
 static s32 back_dark[27];
 static s32 back_light[27];
@@ -360,10 +356,10 @@ USER_FUNC(koburon_get_encount_info) {
     return EVT_RETURN_DONE;
 }
 
-void suifu_kyorokyoro(NanNpc* npc) {
+void suifu_kyorokyoro(NanNPC* npc) {
     switch (npc->state) {
         case 0:
-            npc->time = gp->renderTime;
+            npc->startTime = gp->renderTime;
             npc->state = 1;
             npc->duration = irand(1000) + 100;
             if (npc->dir == 90.0f) {
@@ -373,8 +369,8 @@ void suifu_kyorokyoro(NanNpc* npc) {
             }
             break;
         case 1:
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->duration) {
-                npc->time = gp->renderTime;
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime) > npc->duration) {
+                npc->startTime = gp->renderTime;
                 npc->state = 2;
                 npc->duration = irand(350) + 350;
                 if (npc->dir == 90.0f) {
@@ -385,8 +381,8 @@ void suifu_kyorokyoro(NanNpc* npc) {
             }
             break;
         case 2:
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->duration) {
-                npc->time = gp->renderTime;
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime) > npc->duration) {
+                npc->startTime = gp->renderTime;
                 npc->state = 3;
                 npc->duration = irand(350) + 350;
                 if (npc->dir == 90.0f) {
@@ -397,7 +393,7 @@ void suifu_kyorokyoro(NanNpc* npc) {
             }
             break;
         case 3:
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->duration) {
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime) > npc->duration) {
                 npc->func = NULL;
                 if (npc->dir == 90.0f) {
                     npc->dir = 270.0f;
@@ -407,7 +403,7 @@ void suifu_kyorokyoro(NanNpc* npc) {
     }
 }
 
-void suifu_kyorokyoro_init(NanNpc* npc) {
+void suifu_kyorokyoro_init(NanNPC* npc) {
     npc->state = 0;
     npc->func = suifu_kyorokyoro;
 }
@@ -420,17 +416,17 @@ USER_FUNC(dai3_butai_main_func) {
     f32 cx = evtGetValue(event, args[2]);
     f32 cz = evtGetValue(event, args[3]);
     s32 i;
-    NanNpc* npc;
+    NanNPC* npc;
     f32 s;
     f32 rad;
     f32 r;
     f32 c;
-    NanNpcWork* wp = nanNPCWork;
+    NanNPCWork* wp = nanNPCWork;
 
     d = b - a;
 
     for (i = 0; i < 100; i++) {
-        npc = &wp->entries[i + 205];
+        npc = &wp->npc[i + 205];
         npc->angle += d;
         r = npc->radius;
         rad = npc->angle;
@@ -451,15 +447,15 @@ USER_FUNC(kaizoku_main_func) {
     f32 cz = evtGetValue(event, args[3]);
     s32 d = b - a;
     s32 i;
-    NanNpc* npc;
+    NanNPC* npc;
     f32 r;
     f32 rad;
     f32 s;
     f32 c;
-    NanNpcWork* wp = nanNPCWork;
+    NanNPCWork* wp = nanNPCWork;
 
     for (i = 0; i < 95; i++) {
-        npc = &wp->entries[i + 10];
+        npc = &wp->npc[i + 10];
         npc->angle += d;
         r = npc->radius;
         rad = npc->angle;
@@ -470,7 +466,7 @@ USER_FUNC(kaizoku_main_func) {
         npc->pos.z = r * c + cz;
     }
     for (i = 0; i < 100; i++) {
-        npc = &wp->entries[i + 105];
+        npc = &wp->npc[i + 105];
         npc->angle += d;
         s = npc->radius;
         rad = npc->angle;
@@ -574,8 +570,8 @@ USER_FUNC(mario_main_func) {
     return EVT_RETURN_DONE;
 }
 
-NanNpc* random_choice_target(s32 type) {
-    NanNpcWork* wp = nanNPCWork;
+NanNPC* random_choice_target(s32 type) {
+    NanNPCWork* wp = nanNPCWork;
     s32 idx;
 
     switch (type) {
@@ -592,12 +588,12 @@ NanNpc* random_choice_target(s32 type) {
             }
             break;
     }
-    return &wp->entries[idx];
+    return &wp->npc[idx];
 }
 
-void tobikakari_seq00(NanNpc* npc) {
-    TobiWork* work = npc->work;
-    NanNpc* target;
+void tobikakari_seq00(NanNPC* npc) {
+    TobiWork* work = npc->tobi;
+    NanNPC* target;
     s32 r;
     s32 elapsed;
     f32 t;
@@ -608,20 +604,20 @@ void tobikakari_seq00(NanNpc* npc) {
             if (r < 100) {
                 npc->state = 10;
             } else if (r < 200) {
-                npc->time = (s32)gp->renderTime;
+                npc->startTime = (s32)gp->renderTime;
                 npc->duration = irand(500) + 1;
                 npc->state = 21;
             } else {
-                npc->time = (s32)gp->renderTime;
+                npc->startTime = (s32)gp->renderTime;
                 npc->duration = irand(2000) + 500;
                 npc->state = 22;
             }
             break;
         case 10:
-            npc->time = (s32)gp->renderTime;
+            npc->startTime = (s32)gp->renderTime;
             npc->start = npc->pos;
             target = random_choice_target(work->type);
-            npc->target = target->work->pos;
+            npc->target = target->tobi->pos;
             npc->target.z += 2.0f;
             npc->vy = -4.0f * (f32)(irand(30) + 100);
             npc->dy = npc->target.y - npc->start.y - npc->vy;
@@ -635,7 +631,7 @@ void tobikakari_seq00(NanNpc* npc) {
             npc->nextState = 21;
             break;
         case 11:
-            npc->time = (s32)gp->renderTime;
+            npc->startTime = (s32)gp->renderTime;
             npc->start = npc->pos;
             npc->target = work->pos;
             npc->vy = -4.0f * (f32)(irand(30) + 100);
@@ -645,7 +641,7 @@ void tobikakari_seq00(NanNpc* npc) {
             npc->nextState = 22;
             break;
         case 20:
-            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time);
+            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime);
             if (elapsed < npc->duration) {
                 t = (f32)elapsed / (f32)npc->duration;
                 npc->pos.x = intplGetValue(0, elapsed, npc->duration, npc->start.x, npc->target.x);
@@ -653,18 +649,18 @@ void tobikakari_seq00(NanNpc* npc) {
                 npc->pos.y = npc->start.y + t * (npc->vy * t + npc->dy);
             } else {
                 npc->pos = npc->target;
-                npc->time = (s32)gp->renderTime;
+                npc->startTime = (s32)gp->renderTime;
                 npc->duration = irand(2000) + 500;
                 npc->state = npc->nextState;
             }
             break;
         case 21:
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->duration) {
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime) > npc->duration) {
                 npc->state = 11;
             }
             break;
         case 22:
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->duration) {
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->startTime) > npc->duration) {
                 npc->state = 10;
             }
             break;
@@ -672,37 +668,37 @@ void tobikakari_seq00(NanNpc* npc) {
 }
 
 USER_FUNC(tobikakaru_init) {
-    NanNpcWork* wp = nanNPCWork;
+    NanNPCWork* wp = nanNPCWork;
     TobiWork* p;
     s32 i;
-    NanNpc* npc;
+    NanNPC* npc;
 
     p = _mapAlloc(0x1310);
     Tobidat = p;
     for (i = 0; i < 95; i++) {
-        npc = &wp->entries[i + 10];
+        npc = &wp->npc[i + 10];
         npc->func = tobikakari_seq00;
         npc->state = 0;
-        npc->work = p;
+        npc->tobi = p;
         evt_nannpc_set_animtbl_sub(npc, suifu_animtbl_run);
         p->pos = npc->pos;
         p->type = 0;
         p++;
     }
     for (i = 0; i < 100; i++) {
-        npc = &wp->entries[i + 105];
+        npc = &wp->npc[i + 105];
         npc->func = tobikakari_seq00;
         npc->state = 0;
-        npc->work = p;
+        npc->tobi = p;
         p->pos = npc->pos;
         p->type = 1;
         p++;
     }
     for (i = 0; i < 100; i++) {
-        npc = &wp->entries[i + 205];
+        npc = &wp->npc[i + 205];
         npc->func = tobikakari_seq00;
         npc->state = 0;
-        npc->work = p;
+        npc->tobi = p;
         evt_nannpc_set_animtbl_sub(npc, dai3_animtbl_run);
         p->pos = npc->pos;
         p->type = 2;
@@ -712,21 +708,21 @@ USER_FUNC(tobikakaru_init) {
 }
 
 USER_FUNC(tobikakaru_end) {
-    NanNpcWork* wp = nanNPCWork;
-    NanNpc* npc;
+    NanNPCWork* wp = nanNPCWork;
+    NanNPC* npc;
     s32 i;
 
     for (i = 0; i < 95; i++) {
-        npc = &wp->entries[i + 10];
+        npc = &wp->npc[i + 10];
         npc->func = NULL;
         evt_nannpc_set_animtbl_sub(npc, suifu_animtbl);
     }
     for (i = 0; i < 100; i++) {
-        npc = &wp->entries[i + 105];
+        npc = &wp->npc[i + 105];
         npc->func = NULL;
     }
     for (i = 0; i < 100; i++) {
-        npc = &wp->entries[i + 205];
+        npc = &wp->npc[i + 205];
         npc->func = NULL;
         evt_nannpc_set_animtbl_sub(npc, dai3_animtbl);
     }
@@ -896,9 +892,10 @@ static s16 suifu_animtbl[] = {
     -1, 0,
 };
 
-s32 suifu_animtbl_run[] = {
-    917518, 983055, 1048592, 1114129, 1179666, 1245203, 1310740, 1376277,
-    1441814, 1507351, -65536,
+s16 suifu_animtbl_run[] = {
+    14, 14, 15, 15, 16, 16, 17, 17,
+    18, 18, 19, 19, 20, 20, 21, 21,
+    22, 22, 23, 23, -1, 0,
 };
 
 static s16 elmos_animtbl[] = {
@@ -916,9 +913,10 @@ static s16 dai3_animtbl[] = {
     -1, 0,
 };
 
-s32 dai3_animtbl_run[] = {
-    3145776, 3211313, 3276850, 3342387, 3407924, 3473461, 3538998, 3604535,
-    3670072, 3735609, -65536,
+s16 dai3_animtbl_run[] = {
+    48, 48, 49, 49, 50, 50, 51, 51,
+    52, 52, 53, 53, 54, 54, 55, 55,
+    56, 56, 57, 57, -1, 0,
 };
 
 static EVT_BEGIN(nannpc_mode_setup)

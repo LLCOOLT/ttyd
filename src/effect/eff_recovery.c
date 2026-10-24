@@ -1,4 +1,5 @@
 #include "driver/camdrv.h"
+#include "eff/eff_recovery.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
 #include "eff/eff_maya_data.h"
@@ -54,22 +55,6 @@ MayaAnim* effMayaAnimAlloc(MayaAnimData* data);
 void effDeleteMayaAnim(MayaAnim* anim);
 void effPlayMayaAnim(MayaAnim* anim);
 void effCalcMayaAnim(MayaAnim* anim);
-
-typedef struct RecoveryWork {
-    s8 type;         // 0x0
-    s8 amount;       // 0x1
-    s8 state;        // 0x2
-    s32 alpha;       // 0x4
-    Vec position;    // 0x8
-    Vec velocity;    // 0x14
-    Vec scale;       // 0x20
-    s16 timer;       // 0x2c
-    f32 angle;       // 0x30
-    u32 tick;        // 0x34
-    MayaAnim* anim;  // 0x38
-    s32 delay;       // 0x3c
-    f32 baseY;       // 0x40
-} RecoveryWork;
 
 #define QUAD(l, r, t, b, u) \
     GXBegin(GX_QUADS, GX_VTXFMT0, 4); \

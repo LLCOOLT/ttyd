@@ -96,9 +96,9 @@ USER_FUNC(evt_party_cont_onoff) {
 		return EVT_RETURN_DONE;
 	}
 	if (evtGetValue(event, args[1]) == 0) {
-		((void (*)())partyCtrlOff)();
+		partyCtrlOff();
 	} else {
-		((void (*)())partyCtrlOn)();
+		partyCtrlOn();
 	}
 	return EVT_RETURN_DONE;
 }
@@ -509,9 +509,9 @@ USER_FUNC(evt_party_jump_pos) {
 		mode = 0;
 		ff = p->velY;
 		{
-			void* hit = partySearchGround(p, __fabsf(ff), __fabsf(ff));
+			HitEntry* hit = partySearchGround(p, __fabsf(ff), __fabsf(ff));
 			if (hit != NULL && p->position.y + ff <= p->groundY) {
-				p->hitobjStandOn = (HitEntry*)hit;
+				p->hitobjStandOn = hit;
 				mode = 1;
 				p->position.y = p->groundY;
 				p->flags &= ~0x70;

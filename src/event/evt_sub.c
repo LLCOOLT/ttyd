@@ -1,4 +1,5 @@
 #include "version.h"
+#include "eff/eff_itemget.h"
 #include "icon_ids.h"
 #include "evt/evt_cmd.h"
 #include "countdown.h"
@@ -2280,17 +2281,17 @@ USER_FUNC(evt_sub_get_coin) {
 		event->userdatap[1] = effItemGetEntry(7, a.x, a.y, a.z);
 		event->userdata[2] = 0;
 		event->userdata3 = 0;
-		*(void**)&event->wInterpRelatedTime = _mapAlloc(8);
+		event->wInterpWork = _mapAlloc(8);
 	}
 	state = event->userdata[0];
 	eff = event->userdatap[1];
-	work = *(s32**)&event->wInterpRelatedTime;
+	work = event->wInterpWork;
 	switch (state) {
 	case 0:
 		iconEntry("iraiCoin", ICON_18B);
 		iconSetPos("iraiCoin", b.x, b.y, b.z);
 		iconFlagOn("iraiCoin", 0x102);
-		((s32*)eff->userdata)[14] = 5;
+		((ItemGetWork*)eff->userdata)->camera = 5;
 		marioChgGetItemMotion();
 		event->userdata3 = winMgrEntry(coinget_window_desc);
 		winMgrOpen(event->userdata3);
@@ -2364,7 +2365,7 @@ USER_FUNC(stone_bg) {
 	cam = camGetPtr(8);
 	cam->letterBoxCamId = 5;
 	eff = effNameToPtr("sub_bg");
-	((s32*)eff->userdata)[14] = 5;
+	((ItemGetWork*)eff->userdata)->camera = 5;
 	item = (u8*)itemNameToPtr(name);
 	((EffStarStoneWork*)((ItemEntry*)item)->effect->userdata)->cam = 5;
 	if (npcNameToPtr_NoAssert("\x82\xC9\x82\xB9\x83\x7D\x83\x8A\x83\x49") != NULL && evtGetValue(event, GSW(0)) < 211) {
@@ -2377,7 +2378,7 @@ USER_FUNC(stone_bg) {
 
 USER_FUNC(stone_bg_open) {
 	EffectEntry* e = effNameToPtr("sub_bg");
-	((s32*)e->userdata)[8] = 1;
+	((ItemGetWork*)e->userdata)->state = 1;
 	return EVT_RETURN_DONE;
 }
 

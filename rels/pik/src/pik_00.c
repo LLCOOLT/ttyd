@@ -1,3 +1,5 @@
+#include "driver/msgdrv.h"
+#include "memory.h"
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -29,7 +31,6 @@ typedef struct ClankData { const char* name; s32 field_0x4; s32 field_0x8; EvtFl
 HitEntry* marioSearchUnder(void);
 void mapGrpFlagOn(const char* name, u32 flags);
 void mapGrpFlagOff(const char* name, u32 flags);
-typedef struct PikCbInfo { u8 field_0x0[0x8]; u16 field_0x8; } PikCbInfo;
 
 USER_FUNC(evt_bero_get_entername);
 USER_FUNC(evt_bero_get_info);
@@ -141,7 +142,7 @@ static USER_FUNC(zoom);
 #ifdef VERSION_G8ME01
 USER_FUNC(pik_00_statuswin_force_off);
 #endif
-void irai_29_15_cb(s32 type, PikCbInfo** param);
+void irai_29_15_cb(s32 type, smartEntry* smart);
 static void resha_tev(MapTevCallbackInfo* info);
 
 f32 fd_pik_00_negone_one_374[2] __attribute__((aligned(8)));
@@ -2179,10 +2180,10 @@ USER_FUNC(under) {
     return EVT_RETURN_BLOCK;
 }
 
-void irai_29_15_cb(s32 type, PikCbInfo** param) {
-    PikCbInfo* info = *param;
+void irai_29_15_cb(s32 type, smartEntry* smart) {
+    MsgWinData* info = smart->address;
 
-    if (type == 3 && info->field_0x8 == 1) {
+    if (type == 3 && info->curPage == 1) {
         psndBGMOn(0x200, "BGM_EVT_NOKO_SAIKAI1");
     }
 }

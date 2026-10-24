@@ -184,11 +184,11 @@ void unitwin_point_disp(WinMgrEntry* entry) {
 			GXColor c = {0xFF, 0xFF, 0xFF, 0xFF};
 			iconNumberDispGx(trans, wp->coinDisp, 0, c);
 		}
-		d = *(s16*)&pouch->mShopPoints - wp->coinDisp;
+		d = pouch->mShopPoints - wp->coinDisp;
 		if (d) {
 			d /= 10;
 			if (!d) {
-				d = *(s16*)&pouch->mShopPoints > wp->coinDisp ? 1 : -1;
+				d = pouch->mShopPoints > wp->coinDisp ? 1 : -1;
 			}
 			wp->coinDisp += d;
 		}
@@ -626,7 +626,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		sprintf(buf, "%04d", lotteryGetPtr()->number);
 		for (i = 0; i < 4; i++) {
 			PSMTXTrans(mtx, 20.0f * i + -126.0f - 60.0f, -168.0f, 0.0f);
-			iconNumberDispGx(mtx, ((s8*)buf)[i] - '0', 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			iconNumberDispGx(mtx, (s8)buf[i] - '0', 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 		}
 	}
 
@@ -923,12 +923,12 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 					color = (GXColor){0x00, 0x00, 0x00, 0xFF};
 				}
 				FontDrawStart();
-				c = ((char*)info->initEndPos)[info->tagEndPos];
-				((char*)info->initEndPos)[info->tagEndPos] = 0;
+				c = info->initEndPos[info->tagEndPos];
+				info->initEndPos[info->tagEndPos] = 0;
 				FontDrawColor(color);
 				FontDrawScale(0.8f);
-				FontDrawString(1.0f, wp->scroll + (80 - i * 24), (char*)info->initEndPos);
-				((char*)info->initEndPos)[info->tagEndPos] = c;
+				FontDrawString(1.0f, wp->scroll + (80 - i * 24), info->initEndPos);
+				info->initEndPos[info->tagEndPos] = c;
 				if (wp->field_0x50 == 17) {
 					FontDrawStart();
 					FontDrawColor(color);

@@ -25,6 +25,8 @@ static USER_FUNC(_get_mario_hammer_lv);
 #include "eff/eff_energy.h"
 #include "eff/eff_hibashira.h"
 #include "eff/eff_majinai.h"
+#include "eff/n64/eff_kameki_tornade_n64.h"
+#include "eff/n64/eff_whirlwind_n64.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr.h"
 #include "manager/evtmgr_cmd.h"
@@ -37,7 +39,6 @@ void BattleMajinaiDone(void);
 void BattleMajinaiEndCheck(void);
 void BattleAudience_Case_JumpNewRecord(void);
 void BtlUnit_SetAnim(BattleUnitPart* part, s32 anim);
-EffectEntry* effWhirlwindN64Entry(s32 a, s32 b, s32 c, f32 scale);
 void BtlUnit_SetPos(BattleUnit* unit, f32 x, f32 y, f32 z);
 f32 sinfd(f32);
 f32 cosfd(f32);
@@ -10330,10 +10331,10 @@ USER_FUNC(_whirlwind_effect) {
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
     BtlUnit_GetPos(unit, &pos[0], &pos[1], &pos[2]);
-    eff = effWhirlwindN64Entry(unit->faceDirection < 0, 0, arg1, unit->mSizeMultiplier);
-    ((f32*)eff->userdata)[2] = pos[0];
-    ((f32*)eff->userdata)[3] = pos[1];
-    ((f32*)eff->userdata)[4] = pos[2];
+    eff = effWhirlwindN64Entry(unit->faceDirection < 0, NULL, unit->mSizeMultiplier, arg1);
+    ((EffWhirlwindN64Work*)eff->userdata)->position.x = pos[0];
+    ((EffWhirlwindN64Work*)eff->userdata)->position.y = pos[1];
+    ((EffWhirlwindN64Work*)eff->userdata)->position.z = pos[2];
     return EVT_RETURN_DONE;
 }
 
@@ -10401,12 +10402,11 @@ USER_FUNC(_wait_jyabara_hit_iron_frame) {
     return EVT_RETURN_DONE;
 }
 
-EffectEntry* effKamekiTornadeN64Entry(s32 a, s32 b, f32 x, f32 y, f32 z, f32 scale);
 void psndSFX_pos(s32 id, Vec* position);
 
 USER_FUNC(_tatsumaki_effect) {
     BattleWork* wp = _battleWorkPointer;
-    s32* ud = event->userdata;
+    s32* ud = event->userWork;
     BattleUnit* unit;
     s32 id = evtGetValue(event, *event->args);
     f32 r;
@@ -10439,12 +10439,12 @@ USER_FUNC(_tatsumaki_effect) {
         ang = ud[1] * 4;
         dx = r * cosfd(ang);
         dz = r * sinfd(ang);
-        ((f32*)((EffectEntry*)ud[5])->userdata)[1] = ud[2] + dx;
-        ((f32*)((EffectEntry*)ud[5])->userdata)[2] = ud[3];
-        ((f32*)((EffectEntry*)ud[5])->userdata)[3] = ud[4] + dz;
-        ((f32*)((EffectEntry*)ud[6])->userdata)[1] = ud[2] - dx;
-        ((f32*)((EffectEntry*)ud[6])->userdata)[2] = ud[3];
-        ((f32*)((EffectEntry*)ud[6])->userdata)[3] = ud[4] - dz;
+        ((EffKamekiTornadeN64Work*)((EffectEntry*)ud[5])->userdata)->position.x = ud[2] + dx;
+        ((EffKamekiTornadeN64Work*)((EffectEntry*)ud[5])->userdata)->position.y = ud[3];
+        ((EffKamekiTornadeN64Work*)((EffectEntry*)ud[5])->userdata)->position.z = ud[4] + dz;
+        ((EffKamekiTornadeN64Work*)((EffectEntry*)ud[6])->userdata)->position.x = ud[2] - dx;
+        ((EffKamekiTornadeN64Work*)((EffectEntry*)ud[6])->userdata)->position.y = ud[3];
+        ((EffKamekiTornadeN64Work*)((EffectEntry*)ud[6])->userdata)->position.z = ud[4] - dz;
         if (ud[1] >= 90) {
             psndSFXOff(ud[7]);
             return EVT_RETURN_DONE;

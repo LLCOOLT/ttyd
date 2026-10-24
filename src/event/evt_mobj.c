@@ -1315,7 +1315,7 @@ s32 mobj_float_blk(MapObjectEntry* mobj) {
     const char* cur;
     switch (mobj->state) {
     case 99:
-        if (((s8*)mobj->linkedName)[0] == 0) {
+        if ((s8)mobj->linkedName[0] == 0) {
             if ((s32)blkHitCheck(mobj)) {
                 if (strcmp((const char*)animPoseGetCurrentAnim(mobj->poseId), "S_1")) {
                     animPoseSetAnim(mobj->poseId, "S_1", 1);
@@ -1328,7 +1328,7 @@ s32 mobj_float_blk(MapObjectEntry* mobj) {
         } else {
             other = mobjNameToPtr(mobj->linkedName);
             cur = (const char*)animPoseGetCurrentAnim(other->poseId);
-            if (((const s8*)cur)[0] == 'A' && ((const s8*)cur)[2] >= '1' && ((const s8*)cur)[2] <= '3') {
+            if ((s8)cur[0] == 'A' && (s8)cur[2] >= '1' && (s8)cur[2] <= '3') {
                 animPoseSetAnim(mobj->poseId, "A_1", 0);
             } else {
                 animPoseSetAnim(mobj->poseId, "S_1", 1);
@@ -1449,7 +1449,7 @@ s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
             break;
         }
         mobj->typeData[1] = (mobj->typeData[1] & 0x40000000) | switchAnimIdx(mobj->poseId);
-        if (((s8*)mobj->linkedName)[0]) {
+        if ((s32)(s8)mobj->linkedName[0]) {
             if ((s32)blkHitCheck(mobjNameToPtr(mobj->linkedName))) {
                 if (evtCheckID(mobj->eventId)) {
                     if (isAnimA13((const s8*)animPoseGetCurrentAnim(mobj->poseId))) {
@@ -1515,7 +1515,7 @@ s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
         if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
             break;
         }
-        if (((s8*)mobj->linkedName)[0]) {
+        if ((s32)(s8)mobj->linkedName[0]) {
             mobjNameToPtr(mobj->linkedName);
         }
         {
@@ -1562,7 +1562,7 @@ s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
         if (mobj->timer != 0) {
             break;
         }
-        if (((s8*)mobj->linkedName)[0]) {
+        if ((s32)(s8)mobj->linkedName[0]) {
             if ((s32)blkHitCheck(mobjNameToPtr(mobj->linkedName))) {
                 animPoseSetAnim(mobj->poseId, "S_1", 0);
             } else {
@@ -1713,7 +1713,7 @@ s32 mobj_lock(MapObjectEntry* mobj) {
             item = 0;
 #ifdef VERSION_G8ME01
             for (i = 0; ; i++) {
-                s32* list = (s32*)mobj->typeDataP[0];
+                s32* list = mobj->typeDataList[0];
                 s32 r;
                 if (list[i] == -1) {
                     break;
@@ -1726,7 +1726,7 @@ s32 mobj_lock(MapObjectEntry* mobj) {
             }
 #else
             for (i = 0; ; i++) {
-                s32 it = ((s32*)mobj->typeDataP[0])[i];
+                s32 it = mobj->typeDataList[0][i];
                 s32 r;
                 if (it == -1) {
                     break;
@@ -2975,7 +2975,7 @@ USER_FUNC(evt_mobj_brick) {
 }
 
 s32 mobj_breaking_floor(MapObjectEntry* mobj) {
-    void* mario = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     GXColor c3;
     GXColor c2;
     GXColor c1 = {0xff, 0xff, 0xff, 0xff};

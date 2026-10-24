@@ -90,12 +90,12 @@ void battleAcDisp_TimingA(CameraId cameraId, void* param) {
         case 1001:
             if (disp->slideTimer >= 40) {
                 new_var = 4; // FAKE: register-held index; also read uninitialized on the else path below. Literal 4 / slot = 4 at decl both differ
-                disp->iconX = intplGetValue(new_var, *(s32*)&disp->slideTimerBase[new_var] - 40, 20, 30.0f, -300.0f);
+                disp->iconX = intplGetValue(new_var, AC_SLIDE_TIMER_AT(disp, new_var) - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->slideTimerBase[new_var] < 60) {
+            if (AC_SLIDE_TIMER_AT(disp, new_var) < 60) {
                 disp->slideTimer++;
             }
             break;

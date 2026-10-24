@@ -17,8 +17,6 @@
 #include "evt/evt_npc.h"
 #include "data_tables.h"
 
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
-ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
 void extLoadShadowMtx(Mtx mtx);
 void extLoadShadowRenderMode(void);
@@ -37,7 +35,7 @@ typedef struct Teresa { Vec pos; Vec dst; f32 t; f32 field_0x1C; f32 field_0x20;
 static Teresa* pTeresa;
 static s32 g_nNumEndProc[1];
 s32 g_nNumOutBox[1];
-void computePosHermite(ExtPose* pose, Teresa* ter);
+void computePosHermite(ExtdrvPose* pose, Teresa* ter);
 f32 randf(f32 min, f32 max);
 int rand(void);
 double cos(double x);
@@ -107,7 +105,7 @@ static void senteresa_ext_shadow_disp(void);
 static void senteresa_ext_disp(CameraId camera, void* param);
 static void senteresa_ext_dispent(void);
 static void senteresa_ext_main(void);
-void computePosHermite(ExtPose* pose, Teresa* ter);
+void computePosHermite(ExtdrvPose* pose, Teresa* ter);
 static f32 computePos(f32 a, f32 b, f32 t);
 static void senteresa_ext_init(void);
 static f32 randf(f32 min, f32 max);
@@ -322,7 +320,7 @@ static f32 randf(f32 min, f32 max) {
 }
 
 static void senteresa_ext_init(void) {
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     s32 n = extGetPoseNum();
     s32 i;
     f32 a;
@@ -331,14 +329,14 @@ static void senteresa_ext_init(void) {
     pTeresa = _mapAlloc(sizeof(Teresa) * 200);
     for (i = 0; i < n; i++, pose++) {
         pose->flags = 2;
-        pose->rot = 270.0f;
-        PSMTXIdentity(pose->mtx);
+        pose->dir = 270.0f;
+        PSMTXIdentity(*pose->mtx);
         pTeresa[i].pos.x = 0.0f;
-        pose->mtx[0][3] = 0.0f;
+        (*pose->mtx)[0][3] = 0.0f;
         pTeresa[i].pos.y = 6.0f;
-        pose->mtx[1][3] = 6.0f;
+        (*pose->mtx)[1][3] = 6.0f;
         pTeresa[i].pos.z = 80.0f;
-        pose->mtx[2][3] = 80.0f;
+        (*pose->mtx)[2][3] = 80.0f;
         a = randf(0.0f, 360.0f);
         r = randf(10.0f, 30.0f);
         pTeresa[i].dst.x = 200.0f;
@@ -363,7 +361,7 @@ inline f32 jin07HermiteMul3(f32 a, f32 b, f32 c) {
     return (a * b) * c;
 }
 
-void computePosHermite(ExtPose* pose, Teresa* ter) {
+void computePosHermite(ExtdrvPose* pose, Teresa* ter) {
     Vec m0 = {0.0f, 0.0f, 0.0f};
     Vec m1 = {1.0f, 0.0f, 0.0f};
     f32 t = ter->t;
@@ -378,13 +376,13 @@ void computePosHermite(ExtPose* pose, Teresa* ter) {
     h01 = (3.0f - t2) * (t * t);
     m0.x = ter->field_0x24;
     m0.y = 3.4f * ter->dst.y;
-    pose->mtx[0][3] = ter->pos.x * h00 + m0.x * h10 + m1.x * h11 + ter->dst.x * h01;
-    pose->mtx[1][3] = ter->pos.y * h00 + m0.y * h10 + m1.y * h11 + ter->dst.y * h01;
-    pose->mtx[2][3] = ter->pos.z * h00 + m0.z * h10 + m1.z * h11 + ter->dst.z * h01;
+    (*pose->mtx)[0][3] = ter->pos.x * h00 + m0.x * h10 + m1.x * h11 + ter->dst.x * h01;
+    (*pose->mtx)[1][3] = ter->pos.y * h00 + m0.y * h10 + m1.y * h11 + ter->dst.y * h01;
+    (*pose->mtx)[2][3] = ter->pos.z * h00 + m0.z * h10 + m1.z * h11 + ter->dst.z * h01;
 }
 
 static void senteresa_ext_main(void) {
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     s32 n;
     s32 i;
 
@@ -393,7 +391,7 @@ static void senteresa_ext_main(void) {
     for (i = 0; i < n; i++, pose++) {
         switch (pTeresa[i].state) {
             case 0:
-                pose->frame = 0;
+                pose->texId = 0;
                 pTeresa[i].wait--;
                 if (pTeresa[i].wait == 0) {
                     pose->flags |= 1;
@@ -402,15 +400,15 @@ static void senteresa_ext_main(void) {
                 }
                 break;
             case 1:
-                pose->frame = (gp->retraceCount + i * i) % 3 + 1;
+                pose->texId = (gp->retraceCount + i * i) % 3 + 1;
                 computePosHermite(pose, &pTeresa[i]);
                 pTeresa[i].t += 0.015f;
                 if (pTeresa[i].t >= 1.0f) {
-                    pTeresa[i].pos.x = pose->mtx[0][3];
-                    pTeresa[i].pos.y = pose->mtx[1][3];
-                    pTeresa[i].pos.z = pose->mtx[2][3];
+                    pTeresa[i].pos.x = (*pose->mtx)[0][3];
+                    pTeresa[i].pos.y = (*pose->mtx)[1][3];
+                    pTeresa[i].pos.z = (*pose->mtx)[2][3];
                     pTeresa[i].dst.x = 200.0f;
-                    pTeresa[i].dst.y = pose->mtx[1][3];
+                    pTeresa[i].dst.y = (*pose->mtx)[1][3];
                     pTeresa[i].dst.z = 50.0f;
                     pTeresa[i].t = 0.01f;
                     pTeresa[i].state = 99;
@@ -454,12 +452,12 @@ static void senteresa_ext_shadow_disp(void) {
 
 USER_FUNC(senteresa_get_position) {
     s32* args = event->args;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
 
     pose += evtGetValue(event, args[0]);
-    evtSetFloat(event, args[1], pose->mtx[0][3]);
-    evtSetFloat(event, args[2], pose->mtx[1][3]);
-    evtSetFloat(event, args[3], pose->mtx[2][3]);
+    evtSetFloat(event, args[1], (*pose->mtx)[0][3]);
+    evtSetFloat(event, args[2], (*pose->mtx)[1][3]);
+    evtSetFloat(event, args[3], (*pose->mtx)[2][3]);
     return EVT_RETURN_DONE;
 }
 

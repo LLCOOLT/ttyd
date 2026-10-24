@@ -425,7 +425,7 @@ typedef struct PouchData {
     u32 mEmailReceivedFlags[4];        // 0x580
     u32 mEmailReadFlags[4];            // 0x590
     u8 pad_5A0[0x10];              // 0x5A0, never accessed
-    u16 mShopPoints;                   // 0x5B0
+    s16 mShopPoints;                   // 0x5B0
     u8 pad_5B2[2];                 // 0x5B2, never accessed
     u32 shopPointRewardFlags; //0x5B4, bit i = shop point reward i claimed (evt_shop.c)
     u8 mMerleeCurseUsesRemaining;      // 0x5B8

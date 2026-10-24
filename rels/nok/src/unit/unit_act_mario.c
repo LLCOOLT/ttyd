@@ -1,4 +1,5 @@
 #include "battle/battle_unit.h"
+#include "eff/n64/eff_kumokumo_n64.h"
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
@@ -745,13 +746,13 @@ static USER_FUNC(_clauda_breath_effect_fire) {
     pos.x += unit->mSizeMultiplier * (unit->faceDirection * 25);
     pos.y += 15.0f * unit->mSizeMultiplier;
     eff = effKumokumoN64Entry(0, 0, pos.x, pos.y, pos.z, 0.0f, -2.0f, 1.0f);
-    ((s32*)eff->userdata)[6] = 76;
-    ((s32*)eff->userdata)[7] = 167;
-    ((s32*)eff->userdata)[8] = 202;
-    ((s32*)eff->userdata)[10] = 125;
-    ((s32*)eff->userdata)[11] = 27;
-    ((s32*)eff->userdata)[12] = 245;
-    ((f32*)eff->userdata)[22] = -10.0f;
+    ((EffKumokumoN64Particle*)eff->userdata)->r1 = 76;
+    ((EffKumokumoN64Particle*)eff->userdata)->g1 = 167;
+    ((EffKumokumoN64Particle*)eff->userdata)->b1 = 202;
+    ((EffKumokumoN64Particle*)eff->userdata)->r2 = 125;
+    ((EffKumokumoN64Particle*)eff->userdata)->g2 = 27;
+    ((EffKumokumoN64Particle*)eff->userdata)->b2 = 245;
+    ((EffKumokumoN64Particle*)eff->userdata)->rot = -10.0f;
     evtSetValue(event, var, (s32)eff);
     return EVT_RETURN_DONE;
 }
@@ -769,12 +770,12 @@ static USER_FUNC(_clauda_breath_effect_ready) {
     pos.x += unit->mSizeMultiplier * (unit->faceDirection * 20);
     pos.y += 25.0f * unit->mSizeMultiplier;
     eff = effKumokumoN64Entry(0, 60, pos.x, pos.y, pos.z, 0.0f, 2.0f, 1.0f);
-    ((s32*)eff->userdata)[6] = 76;
-    ((s32*)eff->userdata)[7] = 167;
-    ((s32*)eff->userdata)[8] = 202;
-    ((s32*)eff->userdata)[10] = 125;
-    ((s32*)eff->userdata)[11] = 27;
-    ((s32*)eff->userdata)[12] = 245;
+    ((EffKumokumoN64Particle*)eff->userdata)->r1 = 76;
+    ((EffKumokumoN64Particle*)eff->userdata)->g1 = 167;
+    ((EffKumokumoN64Particle*)eff->userdata)->b1 = 202;
+    ((EffKumokumoN64Particle*)eff->userdata)->r2 = 125;
+    ((EffKumokumoN64Particle*)eff->userdata)->g2 = 27;
+    ((EffKumokumoN64Particle*)eff->userdata)->b2 = 245;
     return EVT_RETURN_DONE;
 }
 

@@ -9,27 +9,21 @@
 double cos(double);
 s32 rand(void);
 
+// One element per flare: element 0 is the head (type, position, fade and timers),
+// elements 1-5 are the rings (angle, scale, distance along the flare axis, speed).
 typedef struct EffLensflareN64Elem {
-    u8 pad0[0x14];
-    s32 alpha; // 0x14
-    u8 pad18[8];
-    f32 angle; // 0x20
-    u8 pad24[4];
-    f32 scale;  // 0x28
-    f32 offset; // 0x2C
-    f32 speed;  // 0x30
-} EffLensflareN64Elem;
-
-typedef struct EffLensflareN64Work {
-    s32 pad0;
+    s32 pad0;     // 0x0
     s32 type;     // 0x4
     Vec position; // 0x8
     s32 alpha;    // 0x14
     s32 lifetime; // 0x18
     s32 frame;    // 0x1C
-    u8 pad20[0x14];
-    EffLensflareN64Elem elem[5]; // 0x34
-} EffLensflareN64Work;
+    f32 angle;    // 0x20
+    u8 pad24[4];  // 0x24
+    f32 scale;    // 0x28
+    f32 offset;   // 0x2C
+    f32 speed;    // 0x30
+} EffLensflareN64Elem;
 
 static effN64Vtx size48x48_tex32x32_vtx[] = {
     {-24, -24, 0, 0, 0, 0, 0, 0, 255},
@@ -62,14 +56,14 @@ void effLensflareDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effLensflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
-    EffLensflareN64Work* work;
+    EffLensflareN64Elem* work;
     EffLensflareN64Elem* e;
     s32 i;
 
     effect = effEntry();
     effect->type = "LensflareN64\0\0\0";
     effect->count = 6;
-    work = __memAlloc(HEAP_EFFECT, sizeof(EffLensflareN64Work));
+    work = __memAlloc(HEAP_EFFECT, sizeof(EffLensflareN64Elem) * 6);
     effect->userdata = work;
     effect->callback = effLensflareMain;
     effect->flags |= 2;
@@ -84,7 +78,7 @@ EffectEntry* effLensflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
-    e = work->elem;
+    e = work + 1;
     for (i = 1; i < 6; i++, e++) {
         e->angle = (f32)(rand() % 360);
         e->offset = (f32)((i * 2) % 20 + 60);
@@ -101,26 +95,26 @@ void effLensflareMain(EffectEntry* effect) {
     s32 i;
     f32 cs;
 
-    tmp.x = ((EffLensflareN64Work*)e)->position.x;
-    tmp.y = ((EffLensflareN64Work*)e)->position.y;
-    tmp.z = ((EffLensflareN64Work*)e)->position.z;
+    tmp.x = e->position.x;
+    tmp.y = e->position.y;
+    tmp.z = e->position.z;
     position = tmp;
     if (effect->flags & 4) {
         effect->flags &= ~4;
-        ((EffLensflareN64Work*)e)->lifetime = 30;
+        e->lifetime = 30;
     }
-    if (((EffLensflareN64Work*)e)->lifetime < 100) {
-        ((EffLensflareN64Work*)e)->lifetime--;
+    if (e->lifetime < 100) {
+        e->lifetime--;
     }
-    ((EffLensflareN64Work*)e)->frame++;
-    if (((EffLensflareN64Work*)e)->lifetime < 0) {
+    e->frame++;
+    if (e->lifetime < 0) {
         effDelete(effect);
         return;
     }
-    if (20 >= ((EffLensflareN64Work*)e)->frame) {
-        ((EffLensflareN64Work*)e)->alpha = ((EffLensflareN64Work*)e)->frame * 12;
-    } else if (20 > ((EffLensflareN64Work*)e)->lifetime) {
-        ((EffLensflareN64Work*)e)->alpha = ((EffLensflareN64Work*)e)->lifetime * 12;
+    if (20 >= e->frame) {
+        e->alpha = e->frame * 12;
+    } else if (20 > e->lifetime) {
+        e->alpha = e->lifetime * 12;
     }
     for (i = 1, e++; i < effect->count; i++, e++) {
         cs = (f32)cos(6.2831855f * (90.0f * (e->offset - 70.0f) / 10.0f) / 360.0f);
@@ -153,13 +147,13 @@ void effLensflareDisp(CameraId cameraId, EffectEntry* effect) {
 
     camera = camGetPtr(cameraId);
     e = effect->userdata;
-    frame = ((EffLensflareN64Work*)e)->frame;
-    alpha = ((EffLensflareN64Work*)e)->alpha;
+    frame = e->frame;
+    alpha = e->alpha;
     odd = frame & 1;
     if (odd) {
         alpha = (s32)(0.95f * alpha);
     }
-    PSMTXTrans(A, ((EffLensflareN64Work*)e)->position.x, ((EffLensflareN64Work*)e)->position.y, ((EffLensflareN64Work*)e)->position.z);
+    PSMTXTrans(A, e->position.x, e->position.y, e->position.z);
     PSMTXRotRad(B, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
     PSMTXConcat(A, B, C);
     PSMTXConcat(camera->view, C, C);

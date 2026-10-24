@@ -83,7 +83,7 @@ typedef struct PuniData {
     s16 groupId;                        // 0x118
     s16 depth;                          // 0x11A
     u16 anim;                           // 0x11C
-    s16 prevAnim;                       // 0x11E
+    u16 prevAnim;                       // 0x11E
     u8 animHoldCount;                   // 0x120
     u8 flag1Timer;                      // 0x121
     u8 pad_122[0x124 - 0x122];          // 0x122

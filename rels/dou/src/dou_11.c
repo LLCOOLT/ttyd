@@ -1883,11 +1883,11 @@ USER_FUNC(dou_mario_kaiten_hosei) {
     f32 rot;
 
     if (isFirstCall) {
-        *(f32*)&event->userdata[1] = 0.0f;
+        event->userdataf[1] = 0.0f;
         event->userdata[2] = 0;
     }
     if (mario->hitobjStandOn == NULL) {
-        *(f32*)&event->userdata[1] = 0.0f;
+        event->userdataf[1] = 0.0f;
         event->userdata[2] = 0;
         return EVT_RETURN_BLOCK;
     }
@@ -1896,7 +1896,7 @@ USER_FUNC(dou_mario_kaiten_hosei) {
         mtxGetRotationElement(hit->mapObj->transformMtx, m, 'x', 'y');
         PSMTXMultVec(m, &v, &v);
         angle = angleABf(0.0f, 0.0f, v.x, v.y);
-        delta = angle - *(f32*)&event->userdata[1];
+        delta = angle - event->userdataf[1];
         hitObjGetPos(name, &v);
         dist = distABf(mario->position.x, mario->position.y, v.x, v.y);
         rot = angleABf(v.x, v.y, mario->position.x, mario->position.y);
@@ -1905,7 +1905,7 @@ USER_FUNC(dou_mario_kaiten_hosei) {
             mario->floorMove.x = (v.x + dist * (f32)sin(rot)) - mario->position.x;
             mario->floorMove.y = (v.y - dist * (f32)cos(rot)) - mario->position.y;
         }
-        *(f32*)&event->userdata[1] = angle;
+        event->userdataf[1] = angle;
         event->userdata[2] = (s32)hit;
     }
     return EVT_RETURN_BLOCK;

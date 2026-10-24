@@ -85,7 +85,7 @@ USER_FUNC(evt_cam_shake) {
         event->userdata[0] = 0;
         ((u32*)&event->userdata[1])[0] = (now >> 32) & 0xFFFFFFFF;
         ((u32*)&event->userdata[1])[1] = now & 0xFFFFFFFF;
-        *(s32*)&event->userdata3 = 0;
+        event->userWork[3] = 0;
         ((u32*)&event->wInterpRelatedTime)[0] = (now >> 32) & 0xFFFFFFFF;
         ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
     }
@@ -118,11 +118,11 @@ USER_FUNC(evt_cam_shake) {
                 offTime = ((offTime / onTime) / (onTime / offTime)) / (((offTime + 1) / onTime) / (onTime / (offTime + 1)));
             }
         }
-        if (!*(s32*)&event->userdata3) {
+        if (!event->userWork[3]) {
             padRumbleOn(0);
             if (onTime < OSTicksToMilliseconds(now - last)) {
                 new_var = 32;
-                event->userdata3 = 1 - event->userdata3;
+                event->userWork[3] = 1 - event->userWork[3];
                 ((u32*)&event->wInterpRelatedTime)[0] = (now >> new_var) & 0xFFFFFFFF;
                 ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
             }
@@ -130,7 +130,7 @@ USER_FUNC(evt_cam_shake) {
         else {
             padRumbleOff(0);
             if (offTime < OSTicksToMilliseconds(now - last)) {
-                event->userdata3 = 1 - event->userdata3;
+                event->userWork[3] = 1 - event->userWork[3];
                 ((u32*)&event->wInterpRelatedTime)[0] = (now >> 32) & 0xFFFFFFFF;
                 ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
             }

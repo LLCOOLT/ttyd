@@ -201,20 +201,6 @@ f32 angleABf(f32, f32, f32, f32);
 f32 distABf(f32, f32, f32, f32);
 f32 PSVECDistance(const Vec*, const Vec*);
 
-typedef struct KuriboParty {
-    u8 pad0[0x24];
-    s32 timer;          // 0x24
-    u8 pad28[0x94 - 0x28];
-    Vec target;         // 0x94
-    u8 padA0[0xEC - 0xA0];
-    f32 fieldEC;        // 0xEC
-    u8 padF0[0x114 - 0xF0];
-    f32 field114;       // 0x114
-} KuriboParty;
-#define KTIMER(p) (((KuriboParty*)(p))->timer)
-#define KTARGET(p) (((KuriboParty*)(p))->target)
-#define KEC(p) (((KuriboParty*)(p))->fieldEC)
-#define K114(p) (((KuriboParty*)(p))->field114)
 
 void kuribo_use_post(PartyEntry* party) {
     party->flags &= ~0x04000000;
@@ -236,7 +222,7 @@ void kuribo_use(PartyEntry* party) {
             wall = partySearchFrontWall(party, &pos, 150.0f,
                 angleABf(party->position.x, party->position.z, player->position.x, player->position.z));
             if (wall) {
-                if (KEC(party) < distABf(party->position.x, party->position.z, player->position.x, player->position.z)) {
+                if (party->frontWallDist < distABf(party->position.x, party->position.z, player->position.x, player->position.z)) {
                     party->useMotionId = 0;
                 } else {
                     wall = NULL;
@@ -245,7 +231,7 @@ void kuribo_use(PartyEntry* party) {
             if (!wall) {
                 partyChgPoseId(party, 1);
                 party->moveSpeed = 0.0f;
-                KTIMER(party) = 100;
+                party->moveFrames = 100;
                 party->useMotionId = 10;
             }
         }
@@ -257,13 +243,13 @@ void kuribo_use(PartyEntry* party) {
             party->flags |= 0x04000000;
             party->flags |= 0x02000000;
         }
-        KTIMER(party) = 4;
-        party->moveDir = angleABf(party->position.x, party->position.z, KTARGET(party).x, KTARGET(party).z);
+        party->moveFrames = 4;
+        party->moveDir = angleABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z);
         party->targetDir = party->moveDir;
         party->displayDirection = player->displayDirection;
         party->displayDirectionTarget = player->displayDirection;
-        party->moveSpeed = distABf(party->position.x, party->position.z, KTARGET(party).x, KTARGET(party).z) / KTIMER(party);
-        K114(party) = 0.0f;
+        party->moveSpeed = distABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z) / party->moveFrames;
+        party->velY = 0.0f;
         party->useMotionId = 1;
         break;
     case 1:
@@ -271,15 +257,15 @@ void kuribo_use(PartyEntry* party) {
             party->flags |= 0x04000000;
             party->flags |= 0x02000000;
         }
-        party->position.x += (KTARGET(party).x - party->position.x) / KTIMER(party);
-        party->position.y += (KTARGET(party).y - party->position.y) / KTIMER(party);
-        party->position.z += (KTARGET(party).z - party->position.z) / KTIMER(party);
-        if (--KTIMER(party) > 0) {
+        party->position.x += (party->moveTarget.x - party->position.x) / party->moveFrames;
+        party->position.y += (party->moveTarget.y - party->position.y) / party->moveFrames;
+        party->position.z += (party->moveTarget.z - party->position.z) / party->moveFrames;
+        if (--party->moveFrames > 0) {
             return;
         }
         partyChgPoseId(party, 1);
         party->moveSpeed = 0.0f;
-        KTIMER(party) = 100;
+        party->moveFrames = 100;
         party->useMotionId = 10;
         break;
     case 10:
@@ -289,10 +275,10 @@ void kuribo_use(PartyEntry* party) {
         party->useMotionId = 15;
         break;
     case 20:
-        KTIMER(party) = 5;
+        party->moveFrames = 5;
         party->useMotionId = 21;
     case 21:
-        if (--KTIMER(party) > 0) {
+        if (--party->moveFrames > 0) {
             break;
         }
         partyChgRunMode(party, 2);

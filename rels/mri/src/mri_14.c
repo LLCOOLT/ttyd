@@ -1,4 +1,5 @@
 #include "battle/battle_unit.h"
+#include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
@@ -368,7 +369,7 @@ USER_FUNC(starstone_rotate_func) {
     char* name = (char*)evtGetValue(event, args[0]);
     f32 angle = evtGetValue(event, args[1]);
 
-    ((f32*)itemNameToPtr(name)->effect->userdata)[7] = angle;
+    ((EffStarStoneWork*)itemNameToPtr(name)->effect->userdata)->rotY = angle;
     return EVT_RETURN_BLOCK;
 }
 

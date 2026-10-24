@@ -23,18 +23,6 @@ f32 cosfd(f32 degrees);
 s32 psndSFXOn(const char* name);
 void psndSFXOff(s32 id);
 
-typedef struct ShotDisp {
-    u8 field_0x0[0xC];
-    GXColor col;      // 0xC
-    s8 delta[4];      // 0x10
-    f32 iconX;        // 0x14
-    f32 iconY;        // 0x18
-    s32 field_0x1C;
-    s32 counter;      // 0x20
-    s32 field_0x24;
-    f32 progress;     // 0x28
-} ShotDisp;
-
 typedef struct ShotWork {
     s32 timer;        // 0x0
     s32 field_0x4;
@@ -66,7 +54,7 @@ typedef struct ShotParams {
     s32 e;            // 0x50
 } ShotParams;
 
-#define SH_DISP(ac) ((ShotDisp*)&(ac)->disp)
+#define SH_DISP(ac) (&(ac)->disp)
 #define SH_WORK(ac) ((ShotWork*)(ac)->work)
 #define SH_PARAMS(ac) ((ShotParams*)(ac)->params)
 #define SH_OUT(ac) ((s32*)(ac)->outputParams)
@@ -276,7 +264,7 @@ static void actionCommandDisp(f32 x, f32 y);
 void battleAcDisp_Shot(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
     BattleActions* ac = &work->actionCommands;
-    ShotDisp* disp = SH_DISP(ac);
+    BattleACDispParams* disp = SH_DISP(ac);
     switch (ac->mAcState) {
         case 99:
         case 100:
@@ -284,22 +272,22 @@ void battleAcDisp_Shot(CameraId cameraId, void* param) {
         case 1001:
         case 1002:
         case 1003:
-            disp->iconX = intplGetValue(4, 20 - disp->counter, 20, -200.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -200.0f, 30.0f);
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->counter > 0) {
-                disp->counter--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 1004:
         case 1005:
-            if (disp->counter >= 40) {
-                disp->iconX = intplGetValue(4, disp->counter - 40, 20, 30.0f, -200.0f);
+            if (disp->slideTimer >= 40) {
+                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -200.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->counter < 60) {
-                disp->counter++;
+            if (disp->slideTimer < 60) {
+                disp->slideTimer++;
             }
             break;
     }
@@ -311,17 +299,17 @@ void battleAcDelete_Shot(BattleWork* work) {
 
 #pragma dont_inline on
 static void _ac_disp_init(BattleWork* work) {
-    ShotDisp* disp = SH_DISP(&work->actionCommands);
+    BattleACDispParams* disp = SH_DISP(&work->actionCommands);
     memset(disp, 0, 0x2C);
     disp->iconX = -200.0f;
     disp->iconY = 0.0f;
-    disp->counter = 20;
-    disp->col = (GXColor){255, 255, 255, 255};
-    disp->delta[0] = 0;
-    disp->delta[1] = -16;
-    disp->delta[2] = -16;
-    disp->delta[3] = 0;
-    disp->progress = 0.0f;
+    disp->slideTimer = 20;
+    disp->color = (GXColor){255, 255, 255, 255};
+    disp->colorStep[0] = 0;
+    disp->colorStep[1] = -16;
+    disp->colorStep[2] = -16;
+    disp->colorStep[3] = 0;
+    disp->gaugeRatio = 0.0f;
 }
 #pragma dont_inline reset
 
@@ -330,7 +318,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
     ShotWork* sw = SH_WORK(ac);
-    ShotDisp* disp = SH_DISP(ac);
+    BattleACDispParams* disp = SH_DISP(ac);
     Mtx m3;
     Mtx m1;
     Mtx m2;
@@ -342,31 +330,31 @@ static void actionCommandDisp(f32 x, f32 y) {
         pos.y = 25.0f + y;
         iconDispGx(&pos, 0x10, 0x8c + AC_ICON_OFS, 1.0f);
         limit = sw->speed / 100.0f;
-        if (disp->progress <= limit) {
-            disp->progress += 0.01f;
-            if (disp->progress > limit) {
-                disp->progress = limit;
+        if (disp->gaugeRatio <= limit) {
+            disp->gaugeRatio += 0.01f;
+            if (disp->gaugeRatio > limit) {
+                disp->gaugeRatio = limit;
             }
         } else {
-            disp->progress -= 0.01f;
-            if (disp->progress < limit) {
-                disp->progress = limit;
+            disp->gaugeRatio -= 0.01f;
+            if (disp->gaugeRatio < limit) {
+                disp->gaugeRatio = limit;
             }
         }
-        if (disp->progress >= 1.0f) {
-            disp->col.g += disp->delta[1];
-            disp->col.b += disp->delta[2];
-            if (disp->col.g <= 0x80 && disp->delta[1] < 0) {
-                disp->delta[1] = disp->delta[2] = 16;
+        if (disp->gaugeRatio >= 1.0f) {
+            disp->color.g += disp->colorStep[1];
+            disp->color.b += disp->colorStep[2];
+            if (disp->color.g <= 0x80 && disp->colorStep[1] < 0) {
+                disp->colorStep[1] = disp->colorStep[2] = 16;
             }
-            if (disp->col.g >= 0xF5 && disp->delta[1] > 0) {
-                disp->delta[1] = disp->delta[2] = -16;
+            if (disp->color.g >= 0xF5 && disp->colorStep[1] > 0) {
+                disp->colorStep[1] = disp->colorStep[2] = -16;
             }
         }
-        MTXTrans(m1, px - 88.0f * (1.0f - disp->progress), 33.0f + y, 0.0f);
-        MTXScale(m2, disp->progress, 1.0f, 1.0f);
+        MTXTrans(m1, px - 88.0f * (1.0f - disp->gaugeRatio), 33.0f + y, 0.0f);
+        MTXScale(m2, disp->gaugeRatio, 1.0f, 1.0f);
         MTXConcat(m1, m2, m3);
-        iconDispGxCol(m3, 0x10, 0x8d + AC_ICON_OFS, (GXColor){disp->col.r, disp->col.g, disp->col.b, disp->col.a});
+        iconDispGxCol(m3, 0x10, 0x8d + AC_ICON_OFS, (GXColor){disp->color.r, disp->color.g, disp->color.b, disp->color.a});
     }
 }
 #pragma dont_inline reset

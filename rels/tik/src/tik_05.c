@@ -1,5 +1,11 @@
 #pragma dollar_identifiers on
 #include "eff/eff_starstone.h"
+#include "eff/n64/eff_crystal_n64.h"
+#include "eff/n64/eff_pokopi_pcharge_n64.h"
+#include "eff/eff_mist2.h"
+#include "eff/eff_mahojin.h"
+#include "eff/eff_treasure_map.h"
+#include "eff/eff_itemget.h"
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -51,8 +57,6 @@ void tiz_broken_draw(CameraId cameraId, void* param);
 void N_mapDispOn(void);
 void N_mapDispOff(void);
 void effStarStoneDraw(CameraId camera, void* param);
-typedef struct MahojinStone { EffectEntry* eff; void* draw; u8 field_0x8[0x30 - 0x8]; } MahojinStone;
-typedef struct MahojinWork { u8 field_0x0[0x88]; MahojinStone stones[7]; } MahojinWork;
 s32 EXIGetType(s32 chan, u32 dev, u32* type);
 
 static USER_FUNC(alpha_init_func);
@@ -392,18 +396,18 @@ USER_FUNC(starstone_set_position) {
     f32 z = evtGetFloat(event, args[3]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[2] = x;
-    ((f32*)eff->userdata)[3] = y;
-    ((f32*)eff->userdata)[4] = z;
+    ((EffStarStoneWork*)eff->userdata)->position.x = x;
+    ((EffStarStoneWork*)eff->userdata)->position.y = y;
+    ((EffStarStoneWork*)eff->userdata)->position.z = z;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(starstone_get_position) {
     s32* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
-    f32 x = ((f32*)eff->userdata)[2];
-    f32 y = ((f32*)eff->userdata)[3];
-    f32 z = ((f32*)eff->userdata)[4];
+    f32 x = ((EffStarStoneWork*)eff->userdata)->position.x;
+    f32 y = ((EffStarStoneWork*)eff->userdata)->position.y;
+    f32 z = ((EffStarStoneWork*)eff->userdata)->position.z;
 
     evtSetFloat(event, args[1], x);
     evtSetFloat(event, args[2], y);
@@ -417,7 +421,7 @@ static USER_FUNC(starstone_set_ry) {
     f32 ry = evtGetFloat(event, args[1]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[7] = ry - 360.0f * ((s32)ry / 360);
+    ((EffStarStoneWork*)eff->userdata)->rotY = ry - 360.0f * ((s32)ry / 360);
     return EVT_RETURN_DONE;
 }
 
@@ -426,7 +430,7 @@ USER_FUNC(starstone_set_alpha) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     u8 alpha = evtGetValue(event, args[1]);
 
-    ((u8*)effNameToPtr(name)->userdata)[0x5F] = alpha;
+    ((EffStarStoneWork*)effNameToPtr(name)->userdata)->a = alpha;
     return EVT_RETURN_DONE;
 }
 
@@ -435,7 +439,7 @@ USER_FUNC(starstone_set_scale) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 scale = evtGetFloat(event, args[1]);
 
-    ((f32*)effNameToPtr(name)->userdata)[5] = scale;
+    ((EffStarStoneWork*)effNameToPtr(name)->userdata)->scale = scale;
     return EVT_RETURN_DONE;
 }
 
@@ -458,9 +462,9 @@ USER_FUNC(starstone_circle_link_func) {
     s = sin(angle);
     c = cos(angle);
 
-    ((f32*)eff->userdata)[2] = s * r + x;
-    ((f32*)eff->userdata)[3] = y;
-    ((f32*)eff->userdata)[4] = -c * r + z;
+    ((EffStarStoneWork*)eff->userdata)->position.x = s * r + x;
+    ((EffStarStoneWork*)eff->userdata)->position.y = y;
+    ((EffStarStoneWork*)eff->userdata)->position.z = -c * r + z;
     return EVT_RETURN_DONE;
 }
 
@@ -865,9 +869,9 @@ USER_FUNC(disp_lighteffect_func) {
 
     s = sin(angle);
     c = cos(angle);
-    ((f32*)eff->userdata)[1] = 30.0f * s + x;
-    ((f32*)eff->userdata)[2] = y;
-    ((f32*)eff->userdata)[3] = 30.0f * -c + z;
+    ((EffPokopiPchargeN64Elem*)eff->userdata)->position.x = 30.0f * s + x;
+    ((EffPokopiPchargeN64Elem*)eff->userdata)->position.y = y;
+    ((EffPokopiPchargeN64Elem*)eff->userdata)->position.z = 30.0f * -c + z;
     return EVT_RETURN_DONE;
 }
 
@@ -881,11 +885,11 @@ USER_FUNC(disp_treasure_map_func) {
     u8 alpha = evtGetValue(event, args[5]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[1] = x;
-    ((f32*)eff->userdata)[2] = y;
-    ((f32*)eff->userdata)[3] = z;
-    ((f32*)eff->userdata)[8] = 180.0f + ry;
-    ((s32*)eff->userdata)[5] = alpha;
+    ((EffTreasureMapWork*)eff->userdata)->position.x = x;
+    ((EffTreasureMapWork*)eff->userdata)->position.y = y;
+    ((EffTreasureMapWork*)eff->userdata)->position.z = z;
+    ((EffTreasureMapWork*)eff->userdata)->rotY = 180.0f + ry;
+    ((EffTreasureMapWork*)eff->userdata)->alpha = alpha;
     return EVT_RETURN_DONE;
 }
 
@@ -894,7 +898,7 @@ USER_FUNC(mahojin_effect_alpha) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     u8 alpha = evtGetValue(event, args[1]);
 
-    ((s32*)effNameToPtr(name)->userdata)[8] = alpha;
+    ((EffMahojinWork*)effNameToPtr(name)->userdata)->alpha = alpha;
     return EVT_RETURN_DONE;
 }
 
@@ -909,28 +913,28 @@ USER_FUNC(effect_position) {
     z = 5.0f * (f32)cos(angle);
     eff = effNameToPtr("map_wave");
     if (eff != NULL) {
-        ((f32*)eff->userdata)[1] = item->position.x + x;
-        ((f32*)eff->userdata)[2] = item->position.y;
-        ((f32*)eff->userdata)[3] = item->position.z + z;
+        ((EffCrystalN64Work*)eff->userdata)->position.x = item->position.x + x;
+        ((EffCrystalN64Work*)eff->userdata)->position.y = item->position.y;
+        ((EffCrystalN64Work*)eff->userdata)->position.z = item->position.z + z;
     }
     x = 10.0f * (f32)sin(angle);
     z = 10.0f * (f32)cos(angle);
     eff = effNameToPtr("map_map");
     if (eff != NULL) {
-        ((f32*)eff->userdata)[1] = item->position.x + x;
-        ((f32*)eff->userdata)[2] = item->position.y;
-        ((f32*)eff->userdata)[3] = item->position.z + z;
-        ((f32*)eff->userdata)[8] = 180.0f - camGetPtr(CAMERA_3D)->viewYaw;
-        ((s32*)eff->userdata)[5] = evtGetValue(event, (s32)0xFD050F8B);
-        ((f32*)eff->userdata)[4] = 0.9f;
+        ((EffTreasureMapWork*)eff->userdata)->position.x = item->position.x + x;
+        ((EffTreasureMapWork*)eff->userdata)->position.y = item->position.y;
+        ((EffTreasureMapWork*)eff->userdata)->position.z = item->position.z + z;
+        ((EffTreasureMapWork*)eff->userdata)->rotY = 180.0f - camGetPtr(CAMERA_3D)->viewYaw;
+        ((EffTreasureMapWork*)eff->userdata)->alpha = evtGetValue(event, (s32)0xFD050F8B);
+        ((EffTreasureMapWork*)eff->userdata)->scale = 0.9f;
     }
     x = 15.0f * (f32)sin(angle);
     z = 15.0f * (f32)cos(angle);
     eff = effNameToPtr("map_ball");
     if (eff != NULL) {
-        ((f32*)eff->userdata)[1] = item->position.x + x;
-        ((f32*)eff->userdata)[2] = item->position.y;
-        ((f32*)eff->userdata)[3] = item->position.z + z;
+        ((EffPokopiPchargeN64Elem*)eff->userdata)->position.x = item->position.x + x;
+        ((EffPokopiPchargeN64Elem*)eff->userdata)->position.y = item->position.y;
+        ((EffPokopiPchargeN64Elem*)eff->userdata)->position.z = item->position.z + z;
     }
     return EVT_RETURN_BLOCK;
 }
@@ -963,9 +967,9 @@ USER_FUNC(tiz_stone) {
     }
     eff = effNameToPtr("tiz_stone");
     if (eff != NULL) {
-        ((s32*)eff->userdata)[14] = 7;
-        ((u8*)eff->userdata)[0x5F] = 255.0f * t;
-        ((f32*)eff->userdata)[7] = 5.0f * (360.0f * t);
+        ((EffStarStoneWork*)eff->userdata)->cam = 7;
+        ((EffStarStoneWork*)eff->userdata)->a = 255.0f * t;
+        ((EffStarStoneWork*)eff->userdata)->rotY = 5.0f * (360.0f * t);
     }
     eff = effNameToPtr("tiz_dust2");
     if (eff != NULL) {
@@ -1290,7 +1294,7 @@ USER_FUNC(map_disp_onoff) {
 USER_FUNC(crystal_bgmode) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
-    ((s32*)eff->userdata)[14] = 5;
+    ((EffCrystalN64Work*)eff->userdata)->camera = 5;
     return EVT_RETURN_DONE;
 }
 
@@ -1300,10 +1304,10 @@ USER_FUNC(map_bgmode) {
     const char* name2 = (const char*)evtGetValue(event, args[1]);
     EffectEntry* eff = effNameToPtr(name1);
 
-    ((s32*)eff->userdata)[14] = 5;
-    ((f32*)eff->userdata)[5] = 4.3f;
+    ((ItemGetWork*)eff->userdata)->camera = 5;
+    ((ItemGetWork*)eff->userdata)->size = 4.3f;
     eff = effNameToPtr(name2);
-    ((s32*)eff->userdata)[10] = 5;
+    ((EffTreasureMapWork*)eff->userdata)->cameraId = 5;
     marioSetCamId(5);
     return EVT_RETURN_DONE;
 }
@@ -1315,9 +1319,9 @@ USER_FUNC(map_bgmode_end) {
     EffectEntry* eff;
 
     eff = effNameToPtr(name1);
-    ((s32*)eff->userdata)[14] = 4;
+    ((ItemGetWork*)eff->userdata)->camera = 4;
     eff = effNameToPtr(name2);
-    ((s32*)eff->userdata)[10] = 4;
+    ((EffTreasureMapWork*)eff->userdata)->cameraId = 4;
     marioSetCamId(4);
     return EVT_RETURN_DONE;
 }
@@ -1379,8 +1383,8 @@ USER_FUNC(starstone_setting) {
     EffectEntry* mahojin = effNameToPtr("mahojin");
 
     ((EffStarStoneWork*)eff->userdata)->flags |= 0x20;
-    ((MahojinWork*)mahojin->userdata)->stones[idx].eff = eff;
-    ((MahojinWork*)mahojin->userdata)->stones[idx].draw = effStarStoneDraw;
+    ((EffMahojinWork*)mahojin->userdata)[idx + 2].arg = eff;
+    ((EffMahojinWork*)mahojin->userdata)[idx + 2].func = effStarStoneDraw;
     return EVT_RETURN_DONE;
 }
 
@@ -1392,9 +1396,9 @@ USER_FUNC(kemuri_set_position) {
     f32 z = evtGetFloat(event, args[3]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[1] = x;
-    ((f32*)eff->userdata)[2] = y;
-    ((f32*)eff->userdata)[3] = z;
+    ((EffMist2Work*)eff->userdata)->position.x = x;
+    ((EffMist2Work*)eff->userdata)->position.y = y;
+    ((EffMist2Work*)eff->userdata)->position.z = z;
     return EVT_RETURN_DONE;
 }
 
@@ -1406,10 +1410,10 @@ USER_FUNC(kemuri_set_color) {
     u8 b = evtGetValue(event, args[3]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((u8*)eff->userdata)[0x38] = r;
-    ((u8*)eff->userdata)[0x39] = g;
-    ((u8*)eff->userdata)[0x3A] = b;
-    ((f32*)eff->userdata)[6] = 1.0f + irand(30) / 10.0f;
+    ((EffMist2Work*)eff->userdata)->r = r;
+    ((EffMist2Work*)eff->userdata)->g = g;
+    ((EffMist2Work*)eff->userdata)->b8 = b;
+    ((EffMist2Work*)eff->userdata)->scale = 1.0f + irand(30) / 10.0f;
     return EVT_RETURN_DONE;
 }
 
@@ -1421,9 +1425,9 @@ USER_FUNC(pcharge_set_position) {
     f32 z = evtGetFloat(event, args[3]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[1] = x;
-    ((f32*)eff->userdata)[2] = y;
-    ((f32*)eff->userdata)[3] = z;
+    ((EffPokopiPchargeN64Elem*)eff->userdata)->position.x = x;
+    ((EffPokopiPchargeN64Elem*)eff->userdata)->position.y = y;
+    ((EffPokopiPchargeN64Elem*)eff->userdata)->position.z = z;
     return EVT_RETURN_DONE;
 }
 

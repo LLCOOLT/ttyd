@@ -14,7 +14,7 @@ typedef struct BattleCommandAct {
     s32 type;          // 0x0
     s32 enabled;       // 0x4
     const char* name;  // 0x8
-    s16 icon;          // 0xC
+    u16 icon;          // 0xC
     u8 padE[2];        // 0xE
     s32 disableReason; // 0x10
 } BattleCommandAct;
@@ -35,7 +35,7 @@ typedef struct BattleCommandOperation {
     s32 enabled;       // 0x4
     s32 disableReason; // 0x8
     const char* name;  // 0xC
-    s16 icon;          // 0x10
+    u16 icon;          // 0x10
     u8 pad12[2];       // 0x12
     const char* help;  // 0x14
     s32 cost;          // 0x18
@@ -45,7 +45,7 @@ typedef struct BattleCommandParty {
     s32 kind;          // 0x0
     s32 enabled;       // 0x4
     const char* name;  // 0x8
-    s16 icon;          // 0xC
+    u16 icon;          // 0xC
     u8 padE[2];        // 0xE
     const char* help;  // 0x10
     s16 hp;            // 0x14
@@ -56,7 +56,7 @@ typedef struct BattleCommandMultiItem {
     s32 enabled;       // 0x0
     const char* name;  // 0x4
     const char* help;  // 0x8
-    s16 icon;          // 0xC
+    u16 icon;          // 0xC
     u8 padE[2];        // 0xE
     s32 cost;          // 0x10
     s32 disableReason; // 0x14

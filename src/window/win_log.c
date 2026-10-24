@@ -75,15 +75,6 @@ typedef struct WinLogEnemy {
     u8 id;
 } WinLogEnemy;
 
-typedef struct WinLogTex {
-    TEXPalette* tpl;
-} WinLogTex;
-
-typedef struct WinLogRes {
-    u8 pad_0[0xA0];
-    WinLogTex* tex;  // 0xA0
-} WinLogRes;
-
 typedef struct WinLogPos {
     f32 x;
     f32 y;
@@ -98,7 +89,7 @@ typedef struct WinLogWork {
     u32 dtrg;                 // 0xC
     u32 drep;                 // 0x10
     u8 pad_14[0x28 - 0x14];
-    WinLogRes* res;           // 0x28
+    FileEntry* res;           // 0x28
     u8 pad_2c[0x30 - 0x2C];
     FileEntry* file;          // 0x30
     u8 pad_34[0xC4 - 0x34];
@@ -138,9 +129,9 @@ typedef struct WinLogWork {
     f32 fE7C;                 // 0xE7C
     f32 fE80;                 // 0xE80
     WinLogPage page0;         // 0xE84
-    u16 list0[100];           // 0xEB8
+    s16 list0[100];           // 0xEB8
     WinLogPage page1;         // 0xF80
-    u16 list1[58];            // 0xFB4
+    s16 list1[58];            // 0xFB4
     f32 f1028;                // 0x1028
     f32 f102C;                // 0x102C
     f32 f1030;                // 0x1030
@@ -850,8 +841,8 @@ s32 winLogMain(WinLogWork* w) {
         }
         w->msgX = w->page0.cursor % 28 % 7 * 56 - 140;
         w->msgY = 90 - w->page0.cursor % 28 / 7 * 56;
-        if (swGet(((s16*)w->list0)[w->page0.cursor] + 0x80)) {
-            winMsgEntry(w, -2, itemDataTable[((s16*)w->list0)[w->page0.cursor] + 0xF0].menu_description, itemDataTable[((s16*)w->list0)[w->page0.cursor] + 0xF0].name);
+        if (swGet(w->list0[w->page0.cursor] + 0x80)) {
+            winMsgEntry(w, -2, itemDataTable[w->list0[w->page0.cursor] + 0xF0].menu_description, itemDataTable[w->list0[w->page0.cursor] + 0xF0].name);
         } else {
             winMsgEntry(w, -2, "msg_menu_stone_none_help", "msg_menu_stone_none_name");
         }
@@ -907,8 +898,8 @@ s32 winLogMain(WinLogWork* w) {
         }
         w->msgX = w->page1.cursor % 28 % 7 * 56 - 140;
         w->msgY = 90 - w->page1.cursor % 28 / 7 * 56;
-        if (swGet(((s16*)w->list1)[w->page1.cursor] + 0x41)) {
-            winMsgEntry(w, -2, itemDataTable[((s16*)w->list1)[w->page1.cursor] + 0xB3].menu_description, itemDataTable[((s16*)w->list1)[w->page1.cursor] + 0xB3].name);
+        if (swGet(w->list1[w->page1.cursor] + 0x41)) {
+            winMsgEntry(w, -2, itemDataTable[w->list1[w->page1.cursor] + 0xB3].menu_description, itemDataTable[w->list1[w->page1.cursor] + 0xB3].name);
         } else {
             winMsgEntry(w, -2, "msg_menu_stone_none_help", "msg_menu_stone_none_name");
         }
@@ -1131,7 +1122,7 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
         mapGX(w, x + w->fE2C, y + w->fE34);
     }
     if (y + w->fE70 > -480.0f) {
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         winTexSet(0x24, (Vec){x + w->fE68, y + w->fE70, 0.0f}, (Vec){60.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, w->fE78});
         for (i = 0; i < 7; i++) {
             Vec v = {0.0f, 0.0f, 170.0f};
@@ -1168,11 +1159,11 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
                        (Vec){0.75f, 0.75f, 0.75f}, black, buf);
         }
 #endif
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         winTexSet(0x95, (Vec){x + w->page0.f24, y + w->page0.f2C, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
-        if (swGet(((s16*)w->list0)[w->page0.cursor] + 0x80)) {
+        if (swGet(w->list0[w->page0.cursor] + 0x80)) {
             winIconInit();
-            winIconSet(itemDataTable[((s16*)w->list0)[w->page0.cursor] + 0xF0].icon_id, (Vec){x + w->page0.f24, (y + w->page0.f2C) - 4.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
+            winIconSet(itemDataTable[w->list0[w->page0.cursor] + 0xF0].icon_id, (Vec){x + w->page0.f24, (y + w->page0.f2C) - 4.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
         }
     }
     if (w->page1.x < 320.0f && w->page1.y > -240.0f) {
@@ -1192,11 +1183,11 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
                        (Vec){0.75f, 0.75f, 0.75f}, black, buf);
         }
 #endif
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         winTexSet(0x96, (Vec){x + w->page1.f24, y + w->page1.f2C, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
-        if (swGet(((s16*)w->list1)[w->page1.cursor] + 0x41)) {
+        if (swGet(w->list1[w->page1.cursor] + 0x41)) {
             winIconInit();
-            winIconSet(itemDataTable[((s16*)w->list1)[w->page1.cursor] + 0xB3].icon_id, (Vec){x + w->page1.f24, (y + w->page1.f2C) - 10.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
+            winIconSet(itemDataTable[w->list1[w->page1.cursor] + 0xB3].icon_id, (Vec){x + w->page1.f24, (y + w->page1.f2C) - 10.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
         }
     }
     if (w->fD68 == 14 || (u32)(w->fD68 - 20) <= 2 || w->fD68 == 1001) {
@@ -1204,12 +1195,12 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
     }
     for (i = 0; i < w->count; i++) {
         if (i == w->cursor) {
-            winTexInit(w->res->tex->tpl);
+            winTexInit(*w->res->data);
             winTexSet(0xB5, (Vec){x + w->menu[i].x, y + w->menu[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0x00, 0x00, 0x00, 0x80});
-            winTexInit_x2(w->res->tex->tpl);
+            winTexInit_x2(*w->res->data);
             winTexSet_x2(w->menu[i].id + 0x1F, 0xB5, (Vec){(x + w->menu[i].x) - 8.0f, 8.0f + (y + w->menu[i].y), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c3);
         } else {
-            winTexInit_x2(w->res->tex->tpl);
+            winTexInit_x2(*w->res->data);
             winTexSet_x2(w->menu[i].id + 0x1F, 0xB5, (Vec){x + w->menu[i].x, y + w->menu[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0x80, 0x80, 0x80, 0xFF});
         }
     }
@@ -1261,7 +1252,7 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
         GXSetScissor(((304.0f + x) - 230.0f) - 2.0f, (240.0f - top) - 2.0f, 0x1D0, 0xF4);
         winTexInit(*(TEXPalette**)w->file->data);
         winTexSet(0, (Vec){mx, my, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         for (i = 0; i < sizeof(tubuDt) / sizeof(TubuDt); i++) {
             t = &tubuDt[i];
             if (swByteGet(0) >= t->id || tubuCheck(t->type)) {
@@ -1315,23 +1306,23 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
             animPoseDrawMtx(w->pose, m, 3, 0.0f, scale);
         }
         GXSetScissor(0, 0, 0x260, 0x1E0);
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         winTexSet(0xBF, (Vec){(x - 230.0f) - 4.0f, y, 0.0f}, (Vec){1.0f, 32.0f, 1.0f}, white);
         winTexSet(0xBF, (Vec){4.0f + (230.0f + x), y, 0.0f}, (Vec){1.0f, 32.0f, 1.0f}, white);
         winTexSet(0xBF, (Vec){x, 4.0f + top, 0.0f}, (Vec){59.5f, 1.0f, 1.0f}, white);
         winTexSet(0xBF, (Vec){x, (y - 120.0f) - 4.0f, 0.0f}, (Vec){59.5f, 1.0f, 1.0f}, white);
         s = fabs(2.0f * (f32)sin((f32)gp->retraceCount / 8.0f));
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         o = -240.0f == w->scrollY ? 0.0f : s;
         winTexSet(0xBD, (Vec){x, top + o, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         o = -148.0f == w->scrollX ? 0.0f : s;
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         winTexSet(0xBC, (Vec){(220.0f + x) + o, y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         o = 0.0f == w->scrollY ? 0.0f : s;
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         winTexSet(0xBE, (Vec){x, (y - 120.0f) - o, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         o = 0.0f == w->scrollX ? 0.0f : s;
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         winTexSet(0xBB, (Vec){(x - 220.0f) - o, y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     }
 }
@@ -1417,13 +1408,13 @@ void monoshiriGX(WinLogWork* w, f32 x, f32 y) {
 #endif
     }
     if (w->f1044 > 0) {
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         winTexSet(0x17, (Vec){440.0f + x, 18.0f + y, 0.0f}, (Vec){-1.0f, -1.0f, -1.0f}, white);
         winIconInit();
         winIconSet(ICON_07E, (Vec){440.0f + x, y, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
     }
     if (w->f1044 < (w->enemyNum + 15) / 16 - 1) {
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         winTexSet(0x17, (Vec){440.0f + x, (y - 15.0f) - 240.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         winIconInit();
         winIconSet(ICON_080, (Vec){440.0f + x, y - 240.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
@@ -1561,11 +1552,11 @@ typedef struct MonoDat {
     f32 scale;
 } MonoDat;
 
-typedef struct AnimBBox {
-    u8 pad_0[0x44];
-    f32 minX, minY, minZ;  // 0x44
-    f32 maxX, maxY, maxZ;  // 0x50
-} AnimBBox;
+/* header of the monosiri position file (file2): entry table pointer, then its size in bytes */
+typedef struct MonoDatFile {
+    MonoDat* entries; // 0x0
+    u32 size;         // 0x4
+} MonoDatFile;
 
 typedef struct MoaChain {
     const char* a;
@@ -1582,7 +1573,7 @@ void animPoseVivianMain(s32 poseId, Vec* v);
 
 void capture(CameraId camera, void* param) {
     MonosiriWork* m = param;
-    AnimBBox* data;
+    AnimData* data;
     Vec min;
     Vec max;
     CameraEntry bak;
@@ -1615,9 +1606,9 @@ void capture(CameraId camera, void* param) {
     Vec* b;
     s32 k;
 
-    data = (AnimBBox*)animPoseGetAnimDataPtr(m->pose1);
-    min = (Vec){data->minX, data->minY, data->minZ};
-    max = (Vec){data->maxX, data->maxY, data->maxZ};
+    data = animPoseGetAnimDataPtr(m->pose1);
+    min = (Vec){data->bboxMin.x, data->bboxMin.y, data->bboxMin.z};
+    max = (Vec){data->bboxMax.x, data->bboxMax.y, data->bboxMax.z};
     cx = (max.x + min.x) / 2.0f;
     cy = (max.y + min.y) / 2.0f;
     GXGetViewportv(vp);
@@ -1636,8 +1627,8 @@ void capture(CameraId camera, void* param) {
         dist = ((608.0f * (max.y - cy)) / 480.0f) / (f32)tan(0.21816615760326385);
     }
     C_MTXLookAt(view, &(Vec){cx, cy, dist}, &(Vec){0.0f, 1.0f, 0.0f}, &(Vec){cx, cy, 0.0f});
-    n = ((u32*)m->file2->data)[1] / sizeof(MonoDat);
-    e = ((MonoDat**)m->file2->data)[0];
+    n = ((MonoDatFile*)m->file2->data)->size / sizeof(MonoDat);
+    e = ((MonoDatFile*)m->file2->data)->entries;
     for (i = 0; i < n; i++, e++) {
         if (e->id == m->id) break;
     }

@@ -34,7 +34,7 @@ void PSVECSubtract(const Vec* a, const Vec* b, Vec* ab);
 USER_FUNC(mahoon_get_groupname) {
     s32* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
-    evtSetValue(event, args[0], ((s32*)npc->tribe)[1]);
+    evtSetValue(event, args[0], (s32)npc->tribe->modelName);
     return EVT_RETURN_DONE;
 }
 

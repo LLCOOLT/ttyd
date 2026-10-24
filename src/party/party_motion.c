@@ -12,11 +12,6 @@
 
 #include "party.h"
 #include "mario/mario.h"
-typedef struct PartyCamView {
-    u8 unk0[0x114];
-    f32 unk114;
-} PartyCamView;
-
 PartyEntry* partyGetPtr(s32 index);
 s32 marioGetPartyId(void);
 s32 marioGetExtraPartyId(void);
@@ -1673,7 +1668,7 @@ void party_motion_homing_fly(PartyEntry* party) {
 }
 
 void party_set_behind_dir(PartyEntry* party, f32 dir) {
-    party->homeDir = revise360(dir + ((PartyCamView*)camGetPtr((CameraId)4))->unk114);
+    party->homeDir = revise360(dir + camGetPtr((CameraId)4)->viewYaw);
     party->trigFlags |= 0x100000;
 }
 

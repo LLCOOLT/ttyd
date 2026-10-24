@@ -6,7 +6,7 @@
 typedef struct {
     u16 flags; //0x0, bit 1 = already heard (read flag)
     s16 labelId; //0x2
-    s32 initEndPos; //0x4
+    char* initEndPos; //0x4, rumor text after the tag (evt var holds it as s32)
     s16 tagEndPos; //0x8
     s16 cost; //0xA, always 5, handed to the evt script with the rumor message (meaning unconfirmed)
     s16 storyId; //0xC

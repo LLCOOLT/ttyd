@@ -1,3 +1,4 @@
+#include "eff/n64/eff_pokopi_thunder_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -68,7 +69,7 @@ static inline f32 sqrtf(f32 x) {
     }
 }
 
-u8 yuragi_data[] = {
+u8 yuragi_data[11][24] = {
 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 9, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0,
 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0,
 35, 5, 25, 5, 0, 25, 35, 5, 15, 0, 0, 0, 10, 13, 15, 12, 11, 13, 10, 12, 5, 1, 0, 0,
@@ -81,7 +82,7 @@ u8 yuragi_data[] = {
 30, 30, 25, 25, 35, 20, 15, 10, 15, 15, 5, 0, 2, 2, 2, 2, 2, 2, 6, 2, 2, 2, 6, 5,
 27, 27, 22, 22, 32, 17, 12, 7, 12, 12, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0
 };
-u8 yuragi_data2[] = {
+u8 yuragi_data2[11][24] = {
 25, 25, 25, 5, 25, 5, 25, 25, 5, 25, 25, 25, 4, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0,
 15, 15, 15, 25, 15, 15, 5, 25, 25, 15, 25, 25, 4, 4, 4, 4, 4, 3, 2, 1, 0, 0, 0, 0,
 25, 25, 25, 5, 15, 25, 5, 5, 15, 5, 5, 0, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 0, 0,
@@ -95,33 +96,9 @@ u8 yuragi_data2[] = {
 30, 30, 25, 25, 35, 20, 15, 10, 15, 15, 5, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 0
 };
 
-static u8* yuragi_data_table[2] = {yuragi_data, yuragi_data2};
+static u8 (*yuragi_data_table[2])[24] = {yuragi_data, yuragi_data2};
 
 
-
-typedef struct EffPokopiThunderN64Work {
-    s32 type;     // 0x0
-    Vec position; // 0x4
-    Vec start;    // 0x10
-    Vec end;      // 0x1C
-    s32 unk28;    // 0x28
-    s32 frame;    // 0x2C
-    s32 r;        // 0x30
-    s32 g;        // 0x34
-    s32 b;        // 0x38
-    s32 alpha;    // 0x3C
-    s32 r2;       // 0x40
-    s32 g2;       // 0x44
-    s32 b2;       // 0x48
-    f32 scale;    // 0x4C
-    f32 x[12];    // 0x50
-    f32 y[12];    // 0x80
-    f32 z[12];    // 0xB0
-    f32 w[12];    // 0xE0
-    s32 seed;     // 0x110
-    f32 length;   // 0x114
-    s32 cameraId; // 0x118
-} EffPokopiThunderN64Work;
 
 void effPokopiThunderMain(EffectEntry* effect);
 void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect);
@@ -302,16 +279,16 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     idx = frame - 1;
     if (type != 2) {
         if (idx < 11) {
-            data = yuragi_data_table[type] + idx * 0x18;
+            data = yuragi_data_table[type][idx];
         } else {
-            data = yuragi_data_table[type] + 0xf0;
+            data = yuragi_data_table[type][10];
         }
     } else if (idx < 8) {
-        data = yuragi_data_table[0] + idx * 0x18;
+        data = yuragi_data_table[0][idx];
     } else if (idx < 36) {
-        data = yuragi_data_table[0] + (idx % 6 + 2) * 0x18;
+        data = yuragi_data_table[0][idx % 6 + 2];
     } else {
-        data = yuragi_data_table[0] + 0xf0;
+        data = yuragi_data_table[0][10];
     }
     for (i = 0; i < 12; i++) {
         f32 w, dx, dy, a, s, c, off;

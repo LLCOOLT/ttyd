@@ -1,3 +1,5 @@
+#include "driver/msgdrv.h"
+#include "memory.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -11,7 +13,6 @@
 #include "evt/evt_case.h"
 #include "evt/evt_sub.h"
 
-typedef struct KpaCbInfo { u8 field_0x0[0x8]; u16 field_0x8; u8 field_0xA[0x10 - 0xA]; s32 field_0x10; } KpaCbInfo;
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_mapchange);
@@ -79,10 +80,10 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(get_togenoko_pos);
 USER_FUNC(kpa_chg_pose);
 static USER_FUNC(make_name);
-void kpa_stg1_008_cb(s32 type, KpaCbInfo** param);
-void kpa_stg1_014_2_cb(s32 type, KpaCbInfo** param);
-void kpa_stg1_036_cb(s32 type, KpaCbInfo** param);
-void kpa_stg1_034_cb(s32 type, KpaCbInfo** param);
+void kpa_stg1_008_cb(s32 type, smartEntry* smart);
+void kpa_stg1_014_2_cb(s32 type, smartEntry* smart);
+void kpa_stg1_036_cb(s32 type, smartEntry* smart);
+void kpa_stg1_034_cb(s32 type, smartEntry* smart);
 
 f32 fd_kpa_01_negone_one_374[2] __attribute__((aligned(8)));
 f32 fd_kpa_01_neg_one_382;
@@ -1199,48 +1200,48 @@ static USER_FUNC(make_name) {
     return EVT_RETURN_DONE;
 }
 
-void kpa_stg1_008_cb(s32 type, KpaCbInfo** param) {
-    KpaCbInfo* info = *param;
+void kpa_stg1_008_cb(s32 type, smartEntry* smart) {
+    MsgWinData* info = smart->address;
 
     switch (type) {
         case 3:
-            if (info->field_0x8 == 1) {
+            if (info->curPage == 1) {
                 evtSetValue(NULL, LSWF(1), 1);
             }
             break;
     }
 }
 
-void kpa_stg1_014_2_cb(s32 type, KpaCbInfo** param) {
-    KpaCbInfo* info = *param;
+void kpa_stg1_014_2_cb(s32 type, smartEntry* smart) {
+    MsgWinData* info = smart->address;
 
     switch (type) {
         case 3:
-            if (info->field_0x8 == 2) {
+            if (info->curPage == 2) {
                 evtSetValue(NULL, LSWF(1), 1);
             }
             break;
     }
 }
 
-void kpa_stg1_036_cb(s32 type, KpaCbInfo** param) {
-    KpaCbInfo* info = *param;
+void kpa_stg1_036_cb(s32 type, smartEntry* smart) {
+    MsgWinData* info = smart->address;
 
     switch (type) {
         case 3:
-            if (info->field_0x8 == 2) {
+            if (info->curPage == 2) {
                 evtSetValue(NULL, LSWF(1), 1);
             }
             break;
     }
 }
 
-void kpa_stg1_034_cb(s32 type, KpaCbInfo** param) {
-    KpaCbInfo* info = *param;
+void kpa_stg1_034_cb(s32 type, smartEntry* smart) {
+    MsgWinData* info = smart->address;
 
     switch (type) {
         case 5:
-            if (info->field_0x10 > 117) {
+            if (info->nextEntry > 117) {
                 evtSetValue(NULL, LSWF(1), 1);
             }
             break;

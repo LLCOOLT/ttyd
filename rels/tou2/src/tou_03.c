@@ -1,5 +1,7 @@
 #include "version.h"
 #define GXSetTexCoordGen GXSetTexCoordGen_inline_hidden
+#include "eff/n64/eff_pokopi_pcharge_n64.h"
+#include "eff/eff_starstone.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -29,6 +31,7 @@
 #include "evt/evt_sub.h"
 #include "tou2.h"
 #include "data_tables.h"
+#include "driver/extdrv.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_mario_balloon_off);
 USER_FUNC(evt_mario_balloon_tenten);
@@ -41,9 +44,6 @@ USER_FUNC(evt_msg_togelr);
 #undef GXSetTexCoordGen
 static void callback(MapTevCallbackInfo* info);
 static void callback(MapTevCallbackInfo* info);
-typedef struct StoneEffWork { s32 field_0x0; Vec pos; } StoneEffWork;
-typedef struct StoneEffWork2 { u8 field_0x0[0x1C]; f32 rot; } StoneEffWork2;
-typedef struct StoneEffWork3 { s32 field_0x0; u16 flags; } StoneEffWork3;
 void mapObjGetPos(const char* name, Vec* pos);
 static f32 cosf(f32 x);
 static f32 cosf(f32 x);
@@ -62,13 +62,6 @@ void kyaku_disp(CameraId camera, void* param);
 void kyaku_disp(CameraId camera, void* param);
 static void pose_main(void);
 static void pose_main(void);
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct Kyaku { u16 flags; u8 pad_0x2[2]; Vec pos; s16 animIdx; u8 pad_0x12[6]; u64 time; } Kyaku;
 typedef struct KyakuAnim { char name[16]; char anim[8]; s16 loop; f32 rate; s32 start; s32 count; } KyakuAnim;
 typedef struct KyakuWork { s32 field_0x0; s32 num; Kyaku* kyakus; s32 animNum; KyakuAnim anim[32]; } KyakuWork;
@@ -77,8 +70,6 @@ static s32 tou_03_bss_0xC;
 KyakuWork* kyaku_wp;
 static ScreenWork* screen_wp;
 s32 gans_alpha;
-ExtPose* extGetPosePtr(void);
-s32 extGetPoseNum(void);
 static void pose_init(void);
 static void pose_init(void);
 static void pose_change(Kyaku* kyaku, const char* name, const char* anim);
@@ -480,7 +471,7 @@ static void pose_init(void) {
 #pragma dont_inline on
 static void pose_main(void) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     Kyaku* kyaku;
     KyakuAnim* a;
     f32 t;
@@ -495,7 +486,7 @@ static void pose_main(void) {
             kyaku->time = gp->renderTime;
             t = 0.0f;
         }
-        pose->frame = a->start + (s32)((a->count - 1) * t);
+        pose->texId = a->start + (s32)((a->count - 1) * t);
     }
 }
 #pragma dont_inline reset
@@ -541,7 +532,7 @@ static f32 randf(f32 min, f32 max) {
 void ext_kyaku_init(void) {
     s32 far;
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     Kyaku* kyaku;
     s32 side;
     f32 dist;
@@ -567,7 +558,7 @@ void ext_kyaku_init(void) {
     kyaku = kyaku_wp->kyakus;
     for (i = 0; i < kyaku_wp->num; i++, pose++, kyaku++) {
         pose->flags |= 7;
-        PSMTXIdentity(pose->mtx);
+        PSMTXIdentity(*pose->mtx);
         while (TRUE) {
             far = __tou_rand() % 100 >= 30;
             angle = randf(0.0f, 6.283184f);
@@ -590,31 +581,31 @@ void ext_kyaku_init(void) {
                 if (0.0f != hy) {
                     continue;
                 }
-                pose->mtx[0][3] = hx;
-                pose->mtx[2][3] = hz;
-                pose->rot = angleABf(0.0f, 0.0f, hx, hz);
+                (*pose->mtx)[0][3] = hx;
+                (*pose->mtx)[2][3] = hz;
+                pose->dir = angleABf(0.0f, 0.0f, hx, hz);
             } else {
                 hd = 100000.0f;
                 if (hitCheckFilter(NULL, &hx, &hy, &hz, &hd, &nx, &ny, &nz, x, 500.0f, z, 0.0f, -1.0f, 0.0f) == NULL) {
                     continue;
                 }
-                pose->mtx[0][3] = hx;
-                pose->mtx[1][3] = hy;
-                pose->mtx[2][3] = hz;
+                (*pose->mtx)[0][3] = hx;
+                (*pose->mtx)[1][3] = hy;
+                (*pose->mtx)[2][3] = hz;
                 if (hz > 570.0f && __fabsf(hx) > 40.0f && __fabsf(hx) < 60.0f) {
-                    pose->mtx[0][3] += hx > 0.0f ? -15 : 15;
+                    (*pose->mtx)[0][3] += hx > 0.0f ? -15 : 15;
                 }
-                pose->rot = angleABf(0.0f, 0.0f, hx, hz);
+                pose->dir = angleABf(0.0f, 0.0f, hx, hz);
             }
             break;
         }
-        if (strcmp(gp->beroEnterName, "s_bero_2") != 0 && pose->mtx[2][3] > 350.0f) {
+        if (strcmp(gp->beroEnterName, "s_bero_2") != 0 && (*pose->mtx)[2][3] > 350.0f) {
             pose->flags &= ~1;
         }
-        if (0.0f != pose->mtx[1][3]) {
+        if (0.0f != (*pose->mtx)[1][3]) {
             kyaku->flags |= 1;
         }
-        kyaku->pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+        kyaku->pos = (Vec){(*pose->mtx)[0][3], (*pose->mtx)[1][3], (*pose->mtx)[2][3]};
         switch (irand(1000) % 4) {
             case 0:
                 pose_change(kyaku, "c_kinopio", "KNP_S_1");
@@ -4306,10 +4297,10 @@ s32 starstone_sound_onoff(EventEntry* event, BOOL isFirstCall) {
 
     if (eff) {
         if (flag == 0) {
-            ((StoneEffWork3*)eff->userdata)->flags &= ~4;
+            ((EffStarStoneWork*)eff->userdata)->flags &= ~4;
         }
         if (flag == 1) {
-            ((StoneEffWork3*)eff->userdata)->flags |= 4;
+            ((EffStarStoneWork*)eff->userdata)->flags |= 4;
         }
     }
     return EVT_RETURN_DONE;
@@ -4319,7 +4310,7 @@ s32 evt_boss_stone_r(EventEntry* event, BOOL isFirstCall) {
     s32* args = event->args;
     EffectEntry* eff = itemNameToPtr("stone")->effect;
 
-    ((StoneEffWork2*)eff->userdata)->rot = evtGetFloat(event, args[0]);
+    ((EffStarStoneWork*)eff->userdata)->rotY = evtGetFloat(event, args[0]);
     return EVT_RETURN_DONE;
 }
 
@@ -4330,14 +4321,14 @@ s32 eff_pos(EventEntry* event, BOOL isFirstCall) {
 
     if (item) {
         if (eff1) {
-            ((StoneEffWork*)eff1->userdata)->pos.x = item->position.x;
-            ((StoneEffWork*)eff1->userdata)->pos.y = 15.0f + item->position.y;
-            ((StoneEffWork*)eff1->userdata)->pos.z = item->position.z;
+            ((EffPokopiPchargeN64Elem*)eff1->userdata)->position.x = item->position.x;
+            ((EffPokopiPchargeN64Elem*)eff1->userdata)->position.y = 15.0f + item->position.y;
+            ((EffPokopiPchargeN64Elem*)eff1->userdata)->position.z = item->position.z;
         }
         if (eff2) {
-            ((StoneEffWork*)eff2->userdata)->pos.x = item->position.x;
-            ((StoneEffWork*)eff2->userdata)->pos.y = 15.0f + item->position.y;
-            ((StoneEffWork*)eff2->userdata)->pos.z = item->position.z;
+            ((EffPokopiPchargeN64Elem*)eff2->userdata)->position.x = item->position.x;
+            ((EffPokopiPchargeN64Elem*)eff2->userdata)->position.y = 15.0f + item->position.y;
+            ((EffPokopiPchargeN64Elem*)eff2->userdata)->position.z = item->position.z;
         }
     }
     return EVT_RETURN_BLOCK;

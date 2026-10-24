@@ -11,8 +11,7 @@ typedef struct DisplayList {
 
 typedef struct PackedDisplayList {
     u32 offset;      // 0x00 - Offset to packed data
-    u16 vertexCount; // 0x04 - Number of vertices
-    u8 padding[2];   // 0x06
+    u32 size;        // 0x04 - display list size in bytes (GXCallDisplayList)
 } PackedDisplayList;
 
 // "vcd_table" chunk arrays: an element count, then the elements
@@ -33,6 +32,19 @@ typedef struct MapVcdTable {
     s32 texFrac[8];            // 0x48, fraction bits of the packed s16 tex coords
 } MapVcdTable;
 
+typedef struct MapVtxRec {
+    s16 pos;     // 0x0
+    s16 nrm;     // 0x2
+    s16 clr;     // 0x4
+    s16 unk6;    // 0x6
+    s16 tex[8];  // 0x8
+} MapVtxRec;
+
+typedef struct MapRawDL {
+    s32 count;        // 0x0, vertices in the strip
+    MapVtxRec vtx[];  // 0x4
+} MapRawDL;
+
 typedef struct MapFileMesh {
     u8 reserved_00;              // 0x0, map file byte, not read
     u8 padding[2];        // 0x1
@@ -41,7 +53,7 @@ typedef struct MapFileMesh {
     u32 elementMask;      // 0x8
     MapVcdTable* vcdTable; // 0xC
   union {
-    u32* normalLists[1];               // unpacked: stride 4, count = *normalLists[j]
+    MapRawDL* normalLists[1];          // unpacked: stride 4
     PackedDisplayList packedLists[1];  // packed:   stride 8, count = *(u16*)((u8*)packedLists[j].offset + 1)
 } displayLists;  // at 0x10
 } MapFileMesh;
@@ -56,11 +68,16 @@ typedef struct MapTexInfo {
 } MapTexInfo;
 
 typedef struct MapTexXform {
-    f32 tx;  // 0x0
-    f32 ty;  // 0x4
-    f32 sx;  // 0x8
-    f32 sy;  // 0xC
-    f32 rot; // 0x10
+    union {
+        struct {
+            f32 tx;  // 0x0
+            f32 ty;  // 0x4
+            f32 sx;  // 0x8
+            f32 sy;  // 0xC
+            f32 rot; // 0x10
+        };
+        f32 ch[5];   // 0x0, tx..rot as the five material-animation channels
+    };
     f32 cx;  // 0x14
     f32 cy;  // 0x18
 } MapTexXform;
@@ -144,7 +161,7 @@ typedef struct MapFileInfo {
 typedef struct MapHeader {
     MapFileHeader file;         // 0x0
     void* data;                 // 0x20, TODO re-type?
-    void* rel;                  // 0x24, TODO: re-type?
+    u32* rel;                   // 0x24, relocation table: offsets into data of the pointers to rebase
     MapFileChunk* chunks;       // 0x28
     void* unused;               // 0x2C
     const char* strings;        // 0x30

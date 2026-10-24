@@ -1,4 +1,5 @@
 #include "eff/eff_starstone.h"
+#include "eff/eff_mahojin.h"
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -52,8 +53,6 @@ double sin(double);
 double cos(double);
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 void effStarStoneDraw(CameraId camera, void* param);
-typedef struct MahojinStone { EffectEntry* eff; void* draw; u8 field_0x8[0x30 - 0x8]; } MahojinStone;
-typedef struct MahojinWork { u8 field_0x0[0x88]; MahojinStone stones[7]; } MahojinWork;
 s32* iri_09_item_tbl;
 int rand(void);
 s32 naniga_okorukana_cook(void);
@@ -479,8 +478,8 @@ USER_FUNC(nancy_block_init_func) {
     f32 z;
 
     z = npc->position.z;
-    ((f32*)event->lwData)[10] = z;
-    ((f32*)event->lwData)[11] = z;
+    event->lwDataF[10] = z;
+    event->lwDataF[11] = z;
     npc->flags |= 0x400000;
     return EVT_RETURN_DONE;
 }
@@ -492,7 +491,7 @@ USER_FUNC(nancy_block_func) {
     f32 base;
     f32 limit;
 
-    ((f32*)event->lwData)[10] = npc->position.z;
+    event->lwDataF[10] = npc->position.z;
     if (distABf(npc->position.x, npc->position.z, mario->position.x, mario->position.z) < 30.0f) {
         return EVT_RETURN_DONE;
     }
@@ -500,7 +499,7 @@ USER_FUNC(nancy_block_func) {
         return EVT_RETURN_DONE;
     }
     z = mario->position.z;
-    base = ((f32*)event->lwData)[11];
+    base = event->lwDataF[11];
     limit = z;
     if (z > 40.0f + base) {
         limit = 40.0f + base;
@@ -6954,8 +6953,8 @@ static USER_FUNC(starstone_entry) {
         effSetName(eff, name);
         ((EffStarStoneWork*)eff->userdata)->flags &= ~4;
         ((EffStarStoneWork*)eff->userdata)->flags |= 0x20;
-        ((MahojinWork*)effNameToPtr("mahojin")->userdata)->stones[i].eff = eff;
-        ((MahojinWork*)effNameToPtr("mahojin")->userdata)->stones[i].draw = effStarStoneDraw;
+        ((EffMahojinWork*)effNameToPtr("mahojin")->userdata)[i + 2].arg = eff;
+        ((EffMahojinWork*)effNameToPtr("mahojin")->userdata)[i + 2].func = effStarStoneDraw;
     }
     return EVT_RETURN_DONE;
 }
@@ -6978,9 +6977,9 @@ static USER_FUNC(starstone_set_pos) {
         c = cos(angle);
         sprintf(name, "starstone%d", i);
         eff = effNameToPtr(name);
-        ((f32*)eff->userdata)[2] = 140.0f * s + x;
-        ((f32*)eff->userdata)[3] = y;
-        ((f32*)eff->userdata)[4] = z - 140.0f * c;
+        ((EffStarStoneWork*)eff->userdata)->position.x = 140.0f * s + x;
+        ((EffStarStoneWork*)eff->userdata)->position.y = y;
+        ((EffStarStoneWork*)eff->userdata)->position.z = z - 140.0f * c;
     }
     return EVT_RETURN_DONE;
 }
@@ -6992,7 +6991,7 @@ static USER_FUNC(starstone_set_ry) {
 
     for (i = 0; i < 7; i++) {
         sprintf(name, "starstone%d", i);
-        ((f32*)effNameToPtr(name)->userdata)[7] = ry;
+        ((EffStarStoneWork*)effNameToPtr(name)->userdata)->rotY = ry;
     }
     return EVT_RETURN_DONE;
 }

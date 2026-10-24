@@ -40,7 +40,7 @@ typedef struct IconEntry {
     f32 scale;        // 0x10
     GXColor color;    // 0x14
     char name[16];    // 0x18
-    s16 iconId;       // 0x28
+    u16 iconId;       // 0x28
     u16 width;        // 0x2A
     u16 height;       // 0x2C
     u16 numIcons;     // 0x2E

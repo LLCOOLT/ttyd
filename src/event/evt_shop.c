@@ -29,7 +29,7 @@ USER_FUNC(evt_msg_fmt_int);
 USER_FUNC(evt_msg_fmt_str);
 #endif
 
-#define SHOP_PTS(p) (*(s16*)&(p)->mShopPoints)
+#define SHOP_PTS(p) ((p)->mShopPoints)
 
 extern ItemData itemDataTable[];
 void FontDrawString(f32 x, f32 y, const char* str);

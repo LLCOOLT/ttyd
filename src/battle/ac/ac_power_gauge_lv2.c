@@ -16,18 +16,6 @@ void BattleAcGaugeSeInit(void);
 void BattleAcGaugeSeUpdate(f32 value);
 void BattleAcGaugeSeDelete(void);
 
-typedef struct PGLv2Disp {
-    u8 pad0[0xC]; // 0x0
-    u8 col[4];    // 0xC
-    s8 delta[4];  // 0x10
-    f32 iconX;    // 0x14
-    f32 iconY;    // 0x18
-    s32 field_1C; // 0x1C
-    s32 timer;    // 0x20
-    s32 field_24; // 0x24
-    f32 ratio;    // 0x28
-} PGLv2Disp;
-
 typedef struct PGLv2Work {
     s32 timer;     // 0x0
     s32 maxFrames; // 0x4
@@ -42,17 +30,7 @@ typedef struct PGLv2Work {
     s32 endTimer;  // 0x28
 } PGLv2Work;
 
-typedef struct PGLv2Ac {
-    u8 pad0[0xC];
-    s32 state;
-    u8 pad10[0x78 - 0x10];
-    s32 tbl[4];
-    u8 pad88[0x290 - 0x88];
-    PGLv2Disp disp;
-    PGLv2Work w;
-} PGLv2Ac;
-
-#define AC_DISP(ac) ((PGLv2Disp*)&(ac)->disp)
+#define AC_DISP(ac) (&(ac)->disp)
 #define AC_WORK(ac) ((PGLv2Work*)(ac)->work)
 
 static s32 _power_table[] = {300, 200, 150, 100, 80, 60, 40};
@@ -63,7 +41,7 @@ static void actionCommandDisp(f32 x, f32 y);
 s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     PGLv2Work* g = AC_WORK(ac);
-    PGLv2Disp* disp = AC_DISP(ac);
+    BattleACDispParams* disp = AC_DISP(ac);
     s32 diff = ((s32 (*)(BattleWork*))BattleActionCommandGetDifficulty)(work);
     s32 flag = 0;
     s32 pressed;
@@ -76,13 +54,13 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
             memset(disp, 0, 0x2C);
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
-            disp->timer = 20;
-            disp->ratio = 0.0f;
-            *(GXColor*)disp->col = (GXColor){255, 255, 255, 255};
-            disp->delta[0] = 0;
-            disp->delta[1] = -16;
-            disp->delta[2] = -16;
-            disp->delta[3] = 0;
+            disp->slideTimer = 20;
+            disp->gaugeRatio = 0.0f;
+            disp->color = (GXColor){255, 255, 255, 255};
+            disp->colorStep[0] = 0;
+            disp->colorStep[1] = -16;
+            disp->colorStep[2] = -16;
+            disp->colorStep[3] = 0;
             g->timer = 0;
             ac->outputParams[0] = 0;
             ac->mAcState = 99;
@@ -218,28 +196,28 @@ s32 battleAcResult_PowerGaugeLv2(BattleWork* work) {
 void battleAcDisp_PowerGaugeLv2(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
     BattleActions* ac = &work->actionCommands;
-    PGLv2Disp* disp = AC_DISP(ac);
+    BattleACDispParams* disp = AC_DISP(ac);
     switch (ac->mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - disp->timer, 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
         case 100:
         case 1000:
         case 1002:
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->timer > 0) {
-                disp->timer--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 1003:
         case 1004:
-            if (disp->timer >= 40) {
-                disp->iconX = intplGetValue(4, disp->timer - 40, 20, 30.0f, -300.0f);
+            if (disp->slideTimer >= 40) {
+                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (disp->timer < 60) {
-                disp->timer++;
+            if (disp->slideTimer < 60) {
+                disp->slideTimer++;
             }
             break;
     }
@@ -255,7 +233,7 @@ void battleAcDelete_PowerGaugeLv2(BattleWork* work) {
 #define ICON ((void (*)(Vec*, s32, s32, f32))iconDispGx)
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
-    PGLv2Ac* ac = (PGLv2Ac*)&work->actionCommands;
+    BattleActions* ac = &work->actionCommands;
     f32 ratio;
     s32 full;
     s32 tmp[4];
@@ -275,22 +253,22 @@ static void actionCommandDisp(f32 x, f32 y) {
         ICON(&pos, 0x10, ICON_08C, 1.0f);
     }
     full = 0;
-    ratio = ac->w.gauge / 100.0f;
+    ratio = AC_WORK(ac)->gauge / 100.0f;
     if (ratio > 1.0f) {
         ratio = 1.0f;
     }
-    ac->disp.ratio = ratio;
-    if (ac->w.full) {
-        ac->disp.col[1] += ac->disp.delta[1];
-        ac->disp.col[2] += ac->disp.delta[2];
-        if (ac->disp.ratio >= 1.0f) {
+    ac->disp.gaugeRatio = ratio;
+    if (AC_WORK(ac)->full) {
+        ac->disp.color.g += ac->disp.colorStep[1];
+        ac->disp.color.b += ac->disp.colorStep[2];
+        if (ac->disp.gaugeRatio >= 1.0f) {
             full |= 1;
         }
-        if (ac->disp.col[1] <= 0x80 && ac->disp.delta[1] < 0) {
-            ac->disp.delta[1] = ac->disp.delta[2] = 0x10;
+        if (ac->disp.color.g <= 0x80 && ac->disp.colorStep[1] < 0) {
+            ac->disp.colorStep[1] = ac->disp.colorStep[2] = 0x10;
         }
-        if (ac->disp.col[1] >= 0xF5 && ac->disp.delta[1] > 0) {
-            ac->disp.delta[1] = ac->disp.delta[2] = -0x10;
+        if (ac->disp.color.g >= 0xF5 && ac->disp.colorStep[1] > 0) {
+            ac->disp.colorStep[1] = ac->disp.colorStep[2] = -0x10;
         }
     }
     cnt = 0;
@@ -298,15 +276,15 @@ static void actionCommandDisp(f32 x, f32 y) {
         tmp[i] = 100;
     }
     for (i = 0; i < 4; i++, cnt++) {
-        tmp[i] = ac->tbl[i];
+        tmp[i] = ac->gaugeParams[i];
         if (i != 0 && !(tmp[i] - tmp[i - 1] > 0)) {
             break;
         }
     }
-    BattleAcDrawGauge(ac->disp.ratio, (s32)x, (s32)y, 0xB2, cnt, tmp[0], tmp[1], tmp[2], full);
-    pressedIcon = BattleACGetButtonIcon(ac->w.button, 1);
-    icon = BattleACGetButtonIcon(ac->w.button, 0);
-    switch (ac->state) {
+    BattleAcDrawGauge(ac->disp.gaugeRatio, (s32)x, (s32)y, 0xB2, cnt, tmp[0], tmp[1], tmp[2], full);
+    pressedIcon = BattleACGetButtonIcon(AC_WORK(ac)->button, 1);
+    icon = BattleACGetButtonIcon(AC_WORK(ac)->button, 0);
+    switch (ac->mAcState) {
         case 99:
         case 100:
         case 1002:
@@ -319,7 +297,7 @@ static void actionCommandDisp(f32 x, f32 y) {
             break;
         }
         case 1000:
-            if (ac->w.inZone) {
+            if (AC_WORK(ac)->inZone) {
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = px;
                 pos.y = 70.0f + y;
@@ -335,7 +313,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     {
         s32 id = ICON_091;
         Vec pos;
-        if (ac->w.inZone) {
+        if (AC_WORK(ac)->inZone) {
             id = ICON_095;
         }
         {

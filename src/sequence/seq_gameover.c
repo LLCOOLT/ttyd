@@ -2,6 +2,7 @@
 // event/evt_snd.c split (0x80077EC4..0x80077F88), which is really the tail of this TU.
 // mapdrv.h declares mapPreLoad(void), but this version takes the map name
 #define mapPreLoad mapPreLoad_unused
+#define MATH_NO_SQRTF 1 // FAKE: sound.h reaches math.h; keep its sqrtf inline statics out of this unit's .rodata (never calls sqrt)
 #include "driver/camdrv.h"
 #include "driver/fadedrv.h"
 #include "driver/seqdrv.h"
@@ -13,27 +14,16 @@
 #include "mario/mariost.h"
 #include "nameent.h"
 #include "pmario_sound.h"
+#include "sound.h"
 #include "system.h"
 #include <string.h>
 #include "seq/seq_gameover.h"
 #undef mapPreLoad
 
-// sound.h pulls in math.h's sqrt localstatics (.rodata); use a minimal view instead
-typedef struct SoundStream {
-    u16 flags;              // 0x0
-    u8 unk2[0x138 - 0x2];   // 0x2
-} SoundStream;
-
-typedef struct SoundWork {
-    u8 unk0[0x100];         // 0x0
-    SoundStream* streams;   // 0x100
-} SoundWork;
-
 typedef struct GameOverWork {
     EventEntry* evt; // 0x0
 } GameOverWork;
 
-extern SoundWork sound;
 
 BOOL mapPreLoad(const char* map);
 void _relUnLoad(void);

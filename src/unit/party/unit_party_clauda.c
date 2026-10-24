@@ -1,4 +1,5 @@
 #include "battle/battle.h"
+#include "eff/n64/eff_kumokumo_n64.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_stage.h"
 #include "battle/battle_sub.h"
@@ -1409,12 +1410,12 @@ static USER_FUNC(_clauda_breath_effect_ready) {
     } else {
         eff = effKumokumoN64Entry(0, 60, pos.x, pos.y, pos.z, 180.0f, 2.0f, 1.0f);
     }
-    ((s32*)eff->userdata)[6] = 76;
-    ((s32*)eff->userdata)[7] = 167;
-    ((s32*)eff->userdata)[8] = 202;
-    ((s32*)eff->userdata)[10] = 125;
-    ((s32*)eff->userdata)[11] = 27;
-    ((s32*)eff->userdata)[12] = 245;
+    ((EffKumokumoN64Particle*)eff->userdata)->r1 = 76;
+    ((EffKumokumoN64Particle*)eff->userdata)->g1 = 167;
+    ((EffKumokumoN64Particle*)eff->userdata)->b1 = 202;
+    ((EffKumokumoN64Particle*)eff->userdata)->r2 = 125;
+    ((EffKumokumoN64Particle*)eff->userdata)->g2 = 27;
+    ((EffKumokumoN64Particle*)eff->userdata)->b2 = 245;
     return EVT_RETURN_DONE;
 }
 
@@ -1438,13 +1439,13 @@ static USER_FUNC(_clauda_breath_effect_fire) {
     } else {
         eff = effKumokumoN64Entry(0, 0, pos.x, pos.y, pos.z, 180.0f, -2.0f, 1.0f);
     }
-    ((s32*)eff->userdata)[6] = 76;
-    ((s32*)eff->userdata)[7] = 167;
-    ((s32*)eff->userdata)[8] = 202;
-    ((s32*)eff->userdata)[10] = 125;
-    ((s32*)eff->userdata)[11] = 27;
-    ((s32*)eff->userdata)[12] = 245;
-    ((f32*)eff->userdata)[22] = -10.0f;
+    ((EffKumokumoN64Particle*)eff->userdata)->r1 = 76;
+    ((EffKumokumoN64Particle*)eff->userdata)->g1 = 167;
+    ((EffKumokumoN64Particle*)eff->userdata)->b1 = 202;
+    ((EffKumokumoN64Particle*)eff->userdata)->r2 = 125;
+    ((EffKumokumoN64Particle*)eff->userdata)->g2 = 27;
+    ((EffKumokumoN64Particle*)eff->userdata)->b2 = 245;
+    ((EffKumokumoN64Particle*)eff->userdata)->rot = -10.0f;
     evtSetValue(event, var, (s32)eff);
     return EVT_RETURN_DONE;
 }
@@ -1465,7 +1466,7 @@ USER_FUNC(_make_breath_weapon) {
     src = (void*)evtGetValue(event, index);
     value = evtGetValue(event, args[1]);
     memcpy(weapon, src, sizeof(BattleWeapon));
-    ((u8*)weapon)[0xA5] = value;
+    weapon->galeForceChance = value;
     evtSetValue(event, index, (s32)weapon);
     return EVT_RETURN_DONE;
 }

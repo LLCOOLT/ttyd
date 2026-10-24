@@ -1,4 +1,5 @@
 #include "evt/evt_bero.h"
+#include "cam_road.h"
 #include "driver/hitdrv.h"
 #include "driver/seqdrv.h"
 #include "evt/evt_cmd.h"
@@ -315,8 +316,8 @@ USER_FUNC(evt_bero_get_info_anime) {
 	s32* args = event->args;
 
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
-	evtSetValue(event, args[1], *(u16*)&bero->enterAnimeType);
-	evtSetValue(event, args[2], *(u16*)&bero->exitAnimeType);
+	evtSetValue(event, args[1], bero->enterAnimeType);
+	evtSetValue(event, args[2], bero->exitAnimeType);
 	evtSetValue(event, args[3], bero->enterAnimeArg);
 	evtSetValue(event, args[4], bero->exitAnimeArg);
 	return EVT_RETURN_DONE;
@@ -335,7 +336,7 @@ USER_FUNC(evt_bero_get_info_length) {
 		evtSetFloat(event, args[1], (f32)v5);
 		return EVT_RETURN_DONE;
 	}
-	switch (*(u16*)&bero->type & 0xFFF) {
+	switch (bero->type & 0xFFF) {
 		case 0:
 		case 3:
 		case 0xF00:
@@ -360,8 +361,8 @@ USER_FUNC(evt_bero_get_info_kinddir) {
 	s32* args = event->args;
 
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
-	evtSetValue(event, args[1], *(u16*)&bero->type);
-	evtSetValue(event, args[2], *(u16*)&bero->sfxId);
+	evtSetValue(event, args[1], bero->type);
+	evtSetValue(event, args[2], bero->sfxId);
 	evtSetValue(event, args[3], bero->directionId);
 	return EVT_RETURN_DONE;
 }
@@ -443,7 +444,7 @@ static inline s32 bero_get_kind(BeroEntry* bero, s32 walk) {
 		if (kind == 10000) {
 			kind = 10000;
 		} else {
-		switch (*(u16*)&bero->type & 0xFFF) {
+		switch (bero->type & 0xFFF) {
 			case 0:
 			case 1:
 				if (walk) {
@@ -491,7 +492,7 @@ USER_FUNC(evt_bero_get_into_info) {
 		event->lwData[1] = 0;
 		event->lwData[2] = BeroNUM;
 		event->lwData[3] = (s32)bero->hitName;
-		event->lwData[4] = *(u16*)&bero->type;
+		event->lwData[4] = bero->type;
 		event->lwData[5] = bero_get_kind(bero, 0);
 		event->lwData[6] = (s32)&bero->centerPosition;
 		evt = bero->enterEvent;
@@ -503,7 +504,7 @@ USER_FUNC(evt_bero_get_into_info) {
 		event->lwData[1] = i;
 		event->lwData[2] = BeroNUM;
 		event->lwData[3] = (s32)gp->beroEnterName;
-		event->lwData[4] = *(u16*)&bero->type;
+		event->lwData[4] = bero->type;
 		event->lwData[5] = bero_get_kind(bero, 0);
 		event->lwData[6] = (s32)&bero->centerPosition;
 		evt = bero->enterEvent;
@@ -551,7 +552,7 @@ USER_FUNC(evt_bero_get_info_num) {
 	s32* evt;
 
 	event->lwData[3] = (s32)bero->hitName;
-	event->lwData[4] = *(u16*)&bero->type;
+	event->lwData[4] = bero->type;
 	event->lwData[5] = bero_get_kind(bero, 1);
 	event->lwData[6] = (s32)&bero->centerPosition;
 	evt = bero->enterEvent;
@@ -561,7 +562,7 @@ USER_FUNC(evt_bero_get_info_num) {
 	event->lwData[9] = BeroSW[id];
 	event->lwData[10] = bero->caseType;
 	if (bero->caseType == -1) {
-		switch (*(u16*)&bero->type & 0xFFF) {
+		switch (bero->type & 0xFFF) {
 			case 0xF00: event->lwData[10] = 0; break;
 			case 0: event->lwData[10] = 10; break;
 			case 1: event->lwData[10] = 9; break;
@@ -726,15 +727,13 @@ USER_FUNC(bero_get_position_pipe_pure) {
 	return EVT_RETURN_DONE;
 }
 
-typedef struct { Vec f_0; Vec pos; Vec at; } BeroCamRoadOut;
-extern void camRoadMain(BeroCamRoadOut* out, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
 
 USER_FUNC(bero_get_position_pipe2) {
 	s32* args = event->args;
 	s32 id = evtGetValue(event, args[0]);
 	s32 a = evtGetFloat(event, args[1]);
 	Vec start, end;
-	BeroCamRoadOut out;
+	CamRoadOut out;
 	bero_get_position_pipe_sub(id, a, event->lwData[3], event->lwData[5], &start, &end);
 	end.y += 1.0f;
 	camRoadReset();
@@ -1276,7 +1275,7 @@ USER_FUNC(evt_camera_change_event_from_road) {
 	MarioWork* mario = marioGetPtr();
 	CameraEntry* cam = camGetPtr(4);
 	f32 bank;
-	BeroCamRoadOut out;
+	CamRoadOut out;
 	camShiftMain(cam, mario, &bank);
 	camRoadMain(&out, mario->position.x, cam->marioPos.y, mario->position.z, mario->position.x, cam->marioPos.y, mario->position.z, bank);
 	{

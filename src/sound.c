@@ -20,6 +20,8 @@ SND_AUX_REVERBHI revH;
 SND_AUX_REVERBSTD revS;
 SND_AUX_CHORUS cho;
 SND_AUX_DELAY dly;
+#define SS_LOAD_BUFFER_SIZE 0x8000 // bytes in each stream load buffer, the size of one DVD/ARAM read
+
 SoundWork sound;
 
 //.sbss
@@ -186,14 +188,14 @@ void SoundInit(void) { // 1:1, assuming sndMalloc inlines
     for (i = 0; i < 3; i++, temp++) {
         temp->flags = 0;
 
-        ptr = sndMalloc(0x8000);
+        ptr = sndMalloc(SS_LOAD_BUFFER_SIZE);
         if (ptr == 0) {
             while (1)
                 ;
         } // infinite loop
         temp->entries[0].loadBuffer[0] = ptr;
 
-        ptr = sndMalloc(0x8000);
+        ptr = sndMalloc(SS_LOAD_BUFFER_SIZE);
         if (ptr == 0) {
             while (1)
                 ;
@@ -208,14 +210,14 @@ void SoundInit(void) { // 1:1, assuming sndMalloc inlines
         } // infinite loop
         temp->entries[0].buffer = ptr;
 
-        ptr = sndMalloc(0x8000);
+        ptr = sndMalloc(SS_LOAD_BUFFER_SIZE);
         if (ptr == 0) {
             while (1)
                 ;
         } // infinite loop
         temp->entries[1].loadBuffer[0] = ptr;
 
-        ptr = sndMalloc(0x8000);
+        ptr = sndMalloc(SS_LOAD_BUFFER_SIZE);
         if (ptr == 0) {
             while (1)
                 ;
@@ -1290,13 +1292,13 @@ static inline u32 _ssAlign32(u32 x) {
 static inline u32 _ssCalcLen(SoundStreamEntry* entry) {
     u32 len;
     int i;
-    len = 0x8000;
-    if (entry->offset + 0x8000 > entry->size) {
+    len = SS_LOAD_BUFFER_SIZE;
+    if (entry->offset + SS_LOAD_BUFFER_SIZE > entry->size) {
         len = entry->size - entry->offset;
     } else {
         for (i = 2; i < 6; i++) {
-            if (entry->offset + i * 0x8000 > entry->size) {
-                len -= (0x8000 - (entry->size - (entry->offset + (i - 1) * 0x8000))) / i;
+            if (entry->offset + i * SS_LOAD_BUFFER_SIZE > entry->size) {
+                len -= (SS_LOAD_BUFFER_SIZE - (entry->size - (entry->offset + (i - 1) * SS_LOAD_BUFFER_SIZE))) / i;
                 len += 0x20 - (len % 0x20);
                 break;
             }
@@ -1323,7 +1325,7 @@ inline void _ssDVDReadAsync(SoundStream* stream, int ch) {
                         stream->dataOffset + entry->offset + extra, _ssDVDReadAsync_activeChk);
     } else {
         addr = stream->dataOffset + entry->offset + extra + sound.aramAddr[stream->slot];
-        DCInvalidateRange(entry->loadBuffer[1 - entry->curBuf], 0x8000);
+        DCInvalidateRange(entry->loadBuffer[1 - entry->curBuf], SS_LOAD_BUFFER_SIZE);
         ARQPostRequest(&entry->request, (u32)entry, 1, 0, addr, (u32)entry->loadBuffer[1 - entry->curBuf], aligned,
                        cache_flush);
     }
@@ -1460,10 +1462,10 @@ void _ssDVDReadAsync_cache_aram(u32 pointerToARQRequest) {
         }
     } else {
         len = DVDMgrGetLength(stream->entries[0].dvd);
-        if (stream->entries[0].offset + 0x8000 >= len) {
+        if (stream->entries[0].offset + SS_LOAD_BUFFER_SIZE >= len) {
             len = len - stream->entries[0].offset;
         } else {
-            len = 0x8000;
+            len = SS_LOAD_BUFFER_SIZE;
         }
         DVDMgrReadAsync(stream->entries[0].dvd, stream->entries[0].loadBuffer[0], (len + 0x1F) & ~0x1F,
                         stream->entries[0].offset, _ssDVDReadAsync_cache_next);
@@ -1483,9 +1485,9 @@ void _ssDVDReadAsync_cache_next(s32 result, DVDFileInfo* fileInfo) {
             if (result >= 0) {
                 stream->entries[0].offset += stream->entries[0].requestLength;
                 dest = stream->entries[0].pos + sound.aramAddr[stream->slot];
-                DCFlushRange(stream->entries[0].loadBuffer[0], 0x8000);
+                DCFlushRange(stream->entries[0].loadBuffer[0], SS_LOAD_BUFFER_SIZE);
                 ARQPostRequest(&stream->entries[0].request, (owner_no++ << 16) | i, 0, 0,
-                               (u32)stream->entries[0].loadBuffer[0], dest, 0x8000, _ssDVDReadAsync_cache_aram);
+                               (u32)stream->entries[0].loadBuffer[0], dest, SS_LOAD_BUFFER_SIZE, _ssDVDReadAsync_cache_aram);
                 stream->entries[0].pos += stream->entries[0].requestLength;
             }
             break;
@@ -1937,10 +1939,10 @@ void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo) {
         SoundSSSetPanCh(i, stream->pan);
         if (stream->flags & 0x400) {
             len = DVDMgrGetLength(stream->entries[0].dvd);
-            if (stream->entries[0].offset + 0x8000 >= len) {
+            if (stream->entries[0].offset + SS_LOAD_BUFFER_SIZE >= len) {
                 size = len - stream->entries[0].offset;
             } else {
-                size = 0x8000;
+                size = SS_LOAD_BUFFER_SIZE;
             }
             DVDMgrReadAsync(stream->entries[0].dvd, stream->entries[0].loadBuffer[0], (size + 0x1F) & ~0x1F,
                             stream->entries[0].offset, _ssDVDReadAsync_cache_next);

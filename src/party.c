@@ -321,8 +321,8 @@ void partyChgPaper(PartyEntry* party, char* paper) {
     }
 }
 
-void partyCtrlOff(PartyEntry* party) {
-    party = partyPtrTbl[0];
+void partyCtrlOff(void) {
+    PartyEntry* party = partyPtrTbl[0];
     if (party) {
         party->flags |= PARTY_FLAG_CTRL_OFF;
     }
@@ -332,8 +332,8 @@ void partyCtrlOff(PartyEntry* party) {
     }
 }
 
-void partyCtrlOn(PartyEntry* party) {
-    party = partyPtrTbl[0];
+void partyCtrlOn(void) {
+    PartyEntry* party = partyPtrTbl[0];
     if (party) {
         party->flags &= ~PARTY_FLAG_CTRL_OFF;
     }
@@ -3053,8 +3053,8 @@ s32 partyEntryHello(s32 memberId);
 void partySetForceMove(PartyEntry* party, s16 a2, f32 a3, f32 a4);
 void partyStop(PartyEntry* party);
 void partyRun(PartyEntry* party);
-void partyCtrlOn(PartyEntry* party);
-void partyCtrlOff(PartyEntry* party);
+void partyCtrlOn(void);
+void partyCtrlOff(void);
 void partyChgPaper(PartyEntry* party, char* paper);
 void partyChgPose(PartyEntry* party, char* pose);
 char* partyChgPoseId(PartyEntry* party, s32 index);

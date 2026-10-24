@@ -52,13 +52,13 @@ void* BattleEnemyUseItemCheck(BattleUnit* self) {
     case 0x9E:
         return _check_fp_recover_item(self);
     default:
-        if ((u8)itemDataTable[itemId].hp_restored != 0) {
+        if (itemDataTable[itemId].hp_restored != 0) {
             r = _check_hp_recover_item(self);
             if (r != NULL) {
                 return r;
             }
         }
-        if ((u8)itemDataTable[itemId].fp_restored != 0) {
+        if (itemDataTable[itemId].fp_restored != 0) {
             r = _check_fp_recover_item(self);
             if (r != NULL) {
                 return r;

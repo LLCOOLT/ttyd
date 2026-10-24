@@ -71,7 +71,6 @@ static inline BOOL isBombRock(HitEntry* hit) {
     return FALSE;
 }
 
-#define PF(p, off, T) (*(T*)((u8*)(p) + (off)))
 
 #define BOMHEI_CLEAN_SFX(p)                    \
     if ((u32)(p)->work.bomhei.sfxId != 0xFFFFFFFFU) {             \
@@ -268,11 +267,6 @@ typedef struct BomheiWork {
 extern void partyChgPose(PartyEntry* party, const char* pose);
 extern void marioSetSplash(s32 kind, Vec pos);
 
-typedef struct BomheiTarget {
-    u8 pad[0x94];
-    Vec target;  // 0x94
-} BomheiTarget;
-
 static inline f32 bomheiNeg(f32 x) {
     return -x;
 }
@@ -281,11 +275,7 @@ static inline s16 bomheiToS16(f32 x) {
     return x;
 }
 
-#define BTGT(p) (((BomheiTarget*)(p))->target)
 #define BWORK(p) ((BomheiWork*)(p)->useStruct)
-#define BTIMER(p) PF(p, 0x24, s32)
-#define BVY(p) PF(p, 0x114, f32)
-#define BGRAV(p) PF(p, 0x118, f32)
 
 static inline BOOL bomheiChkHitAttr(PartyEntry* party) {
     HitEntry* hit;
@@ -334,7 +324,6 @@ static inline void bomheiSetHoldPos(PartyEntry* party) {
 
 void bomhei_use_main(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
-    BomheiTarget* bt = (BomheiTarget*)party;
     f32 x, z;
     f32 tmp;
 
@@ -353,37 +342,37 @@ void bomhei_use_main(PartyEntry* party) {
         party->useMotionId = 1;
         party->work.bomhei.state = 100;
         party->work.bomhei.timer = 0;
-        BTIMER(party) = 4;
+        party->moveFrames = 4;
         BWORK(party)->timer = 0;
         BWORK(party)->flags = 0;
         partyChgPose(party, "R_1");
     case 1:
-        bt->target = mario->position;
-        movePos(&bt->target.x, &bt->target.z, -6.0f, toMovedirSimple(mario->displayDirectionTarget));
-        party->position.x += (bt->target.x - party->position.x) / BTIMER(party);
-        party->position.y += (bt->target.y - party->position.y) / BTIMER(party);
-        party->position.z += (bt->target.z - party->position.z) / BTIMER(party);
-        if (--BTIMER(party) > 0) {
+        party->moveTarget = mario->position;
+        movePos(&party->moveTarget.x, &party->moveTarget.z, -6.0f, toMovedirSimple(mario->displayDirectionTarget));
+        party->position.x += (party->moveTarget.x - party->position.x) / party->moveFrames;
+        party->position.y += (party->moveTarget.y - party->position.y) / party->moveFrames;
+        party->position.z += (party->moveTarget.z - party->position.z) / party->moveFrames;
+        if (--party->moveFrames > 0) {
             break;
         }
-        BTIMER(party) = 9;
+        party->moveFrames = 9;
         x = mario->position.x;
         z = mario->position.z;
         movePos(&x, &z, -6.0f, toMovedirSimple(mario->displayDirectionTarget));
         party->moveSpeed = distABf(party->position.x, party->position.z, x, z) / 18.0f;
         party->targetDir = angleABf(party->position.x, party->position.z, x, z);
         party->moveDir = party->targetDir;
-        BVY(party) = 7.5f;
+        party->velY = 7.5f;
         tmp = 0.8333333f;
-        BGRAV(party) = -tmp;
+        party->accelY = -tmp;
         partyChgPose(party, "J_1A");
         party->useMotionId = 2;
         party->work.bomhei.state = 10;
         break;
     case 2:
-        party->position.y += BVY(party);
-        BVY(party) += BGRAV(party);
-        if (--BTIMER(party) > 0) {
+        party->position.y += party->velY;
+        party->velY += party->accelY;
+        if (--party->moveFrames > 0) {
             break;
         }
         party->flags2 |= 0x10;
@@ -416,25 +405,25 @@ void bomhei_use_main(PartyEntry* party) {
         party->moveSpeed = distABf(party->position.x, party->position.z, x, z) / 20.0f;
         party->targetDir = angleABf(party->position.x, party->position.z, x, z);
         party->moveDir = party->targetDir;
-        BVY(party) = 3.5555556f;
+        party->velY = 3.5555556f;
         tmp = 0.35555556f;
-        BGRAV(party) = -tmp;
+        party->accelY = -tmp;
         tmp = 10.5f;
-        BTIMER(party) = (s16)tmp;
+        party->moveFrames = (s16)tmp;
         party->flags2 &= ~0x10;
         party->flags |= 0x10;
         bomheiChkHitAttr(party);
         break;
     case 21:
         partyMoveNoHosei(party);
-        if (--BTIMER(party) > 0) {
+        if (--party->moveFrames > 0) {
             bomheiChkHitAttr(party);
             break;
         }
-        BVY(party) = 0.0f;
-        BGRAV(party) = -0.33333334f;
+        party->velY = 0.0f;
+        party->accelY = -0.33333334f;
         tmp = 10.5f;
-        BTIMER(party) = (s16)tmp;
+        party->moveFrames = (s16)tmp;
         party->flags &= ~0x10;
         if (party->hitobjStandOn != NULL) {
             party->useMotionId = 30;
@@ -450,7 +439,7 @@ void bomhei_use_main(PartyEntry* party) {
         }
         break;
     case 30:
-        BTIMER(party) = sysMsec2Frame(200);
+        party->moveFrames = sysMsec2Frame(200);
         party->useMotionId = 31;
     case 31:
         if (!(party->flags & 0x80000000) && (gp->buttonNew[0] & 0x400)) {
@@ -458,7 +447,7 @@ void bomhei_use_main(PartyEntry* party) {
             party->useMotionId = 50;
         }
         partyChgPose(party, "S_1");
-        if (--BTIMER(party) > 0) {
+        if (--party->moveFrames > 0) {
             bomheiChkHitAttr(party);
             break;
         }
@@ -506,15 +495,15 @@ void bomhei_use_main(PartyEntry* party) {
         BWORK(party)->flags |= 2;
         party->flags |= 0x2000000;
         party->useMotionId = 41;
-        BTIMER(party) = 6;
+        party->moveFrames = 6;
         break;
     case 41:
-        party->position.y += BVY(party);
-        BVY(party) += BGRAV(party);
-        if (--BTIMER(party) <= 0) {
+        party->position.y += party->velY;
+        party->velY += party->accelY;
+        if (--party->moveFrames <= 0) {
             party->useMotionId = 42;
-            BVY(party) = 0.0f;
-            BGRAV(party) = 0.0f;
+            party->velY = 0.0f;
+            party->accelY = 0.0f;
         }
     case 42:
         tmp = 0.1f * (-1.0f - party->moveSpeed);
@@ -536,7 +525,7 @@ void bomhei_use_main(PartyEntry* party) {
         }
         partyChgPose(party, "A_3");
         party->useMotionId = 51;
-        BTIMER(party) = 40;
+        party->moveFrames = 40;
     case 51:
         if (!(mario->flags & 0x2000)) {
             if (party->flags & 2) {
@@ -546,7 +535,7 @@ void bomhei_use_main(PartyEntry* party) {
         } else {
             bomheiSetHoldPos(party);
         }
-        if (--BTIMER(party) > 0) {
+        if (--party->moveFrames > 0) {
             bomheiChkHitAttr(party);
             break;
         }
@@ -587,29 +576,29 @@ void bomhei_use_main(PartyEntry* party) {
     }
     case 70:
         party->moveSpeed = 0.0f;
-        BVY(party) = 8.0f;
-        BGRAV(party) = 0.0f;
-        BTIMER(party) = 60;
+        party->velY = 8.0f;
+        party->accelY = 0.0f;
+        party->moveFrames = 60;
         party->useMotionId = 71;
     case 71: {
         f32 sx, sy, sz;
-        party->position.y += BVY(party);
+        party->position.y += party->velY;
         marioGetScreenPos(party->position, &sx, &sy, &sz);
         if (sy <= -300.0f) {
-            BTIMER(party) = sysMsec2Frame(800);
+            party->moveFrames = sysMsec2Frame(800);
             party->useMotionId = 80;
         }
         break;
     }
     case 80:
-        if (--BTIMER(party) <= 0) {
+        if (--party->moveFrames <= 0) {
             Vec pos;
             partyGetAppearPos(party, &pos);
             party->position.x = pos.x;
             party->position.y = 200.0f + pos.y;
             party->position.z = pos.z;
-            BVY(party) = 0.0f;
-            BGRAV(party) = -1.0f;
+            party->velY = 0.0f;
+            party->accelY = -1.0f;
             party->moveSpeed = 0.0f;
             party->flags &= ~0x10;
             party->flags |= 0x20;
@@ -625,7 +614,7 @@ void bomhei_use_main(PartyEntry* party) {
         if (37.0f + mario->position.y > party->position.y) {
             party->flags &= ~0x2000000;
         }
-        hit = partySearchGround(party, 11.0f, BVY(party));
+        hit = partySearchGround(party, 11.0f, party->velY);
         limit = mario->screenY - 25.0f;
         marioGetScreenPos(party->position, &sx, &sy, &sz);
         if (sy > limit) {
@@ -635,9 +624,9 @@ void bomhei_use_main(PartyEntry* party) {
             party->flags &= ~0x2000000;
         }
         partyMove(party);
-        if (BVY(party) <= -6.0f) {
-            BGRAV(party) = 0.0f;
-            BVY(party) = -6.0f;
+        if (party->velY <= -6.0f) {
+            party->accelY = 0.0f;
+            party->velY = -6.0f;
         }
         if (!(party->flags & 0x2000000)) {
             if (party->position.y < -2000.0f) {
@@ -648,14 +637,14 @@ void bomhei_use_main(PartyEntry* party) {
             if (party->hitobjStandOn != NULL && !((hitGetAttr(party->hitobjStandOn) >> 9) & 1)) {
                 partyChgPose(party, "F_1");
                 party->useMotionId = 82;
-                BTIMER(party) = 30;
+                party->moveFrames = 30;
                 psndSFXOn_3D((const char*)0x93A, &party->position);
             }
         }
         break;
     }
     case 82:
-        if (--BTIMER(party) <= 0) {
+        if (--party->moveFrames <= 0) {
             party->useMotionId = 100;
         }
         partyMove(party);

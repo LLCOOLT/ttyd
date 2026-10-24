@@ -1,4 +1,9 @@
 #include "eff/eff_starstone.h"
+#include "eff/n64/eff_pokopi_pcharge_n64.h"
+#include "eff/n64/eff_radiation_n64.h"
+#include "eff/n64/eff_pokopi_thunder_n64.h"
+#include "eff/eff_mist2.h"
+#include "eff/eff_fire.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -28,12 +33,10 @@ double cos(double);
 void* effMistEntry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 angle);
 int rand(void);
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
-EffectEntry* effPokopiPchargeN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime);
 EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 void npcSetTalkPose(const char* name);
 void npcSetStayPose(const char* name);
 EffectEntry* effPokopiThunderN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz, f32 scale);
-EffectEntry* effFireEntry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime);
 void mapObjGetPos(const char* name, Vec* pos);
 void _hikariEntry(const char* name, s32 type, f32 scale);
 typedef struct HikariData { s32 key; s32 id; } HikariData;
@@ -523,9 +526,9 @@ void _hikariEntry(const char* name, s32 type, f32 scale) {
     EffectEntry* eff;
 
     mapObjGetPos(name, &pos);
-    eff = effFireEntry(type, pos.x, pos.y - 7.0f, pos.z, 1.0f, 1000);
-    ((f32*)eff->userdata)[30] = scale;
-    ((f32*)eff->userdata)[31] = scale;
+    eff = effFireEntry(type, 1000, pos.x, pos.y - 7.0f, pos.z, 1.0f);
+    ((EffFireWork*)eff->userdata)->scaleX = scale;
+    ((EffFireWork*)eff->userdata)->scaleY = scale;
     effSetName(eff, name);
 }
 
@@ -564,8 +567,8 @@ USER_FUNC(rou_hikari_front_onoff) {
         func(name, 1);
         sprintf(name, "hi%d", i);
         eff = effNameToPtr(name);
-        ((f32*)eff->userdata)[30] = scale;
-        ((f32*)eff->userdata)[31] = scale;
+        ((EffFireWork*)eff->userdata)->scaleX = scale;
+        ((EffFireWork*)eff->userdata)->scaleY = scale;
     }
     return EVT_RETURN_DONE;
 }
@@ -579,8 +582,8 @@ USER_FUNC(hikari_set_scale) {
 
     sprintf(name, "hi%d", n);
     eff = effNameToPtr(name);
-    ((f32*)eff->userdata)[30] = scale;
-    ((f32*)eff->userdata)[31] = scale;
+    ((EffFireWork*)eff->userdata)->scaleX = scale;
+    ((EffFireWork*)eff->userdata)->scaleY = scale;
     return EVT_RETURN_DONE;
 }
 
@@ -706,8 +709,8 @@ USER_FUNC(all_hikari_onoff) {
     for (i = 1; i <= 66; i++) {
         sprintf(name, "hi%d", i);
         eff = effNameToPtr(name);
-        ((f32*)eff->userdata)[30] = scale;
-        ((f32*)eff->userdata)[31] = scale;
+        ((EffFireWork*)eff->userdata)->scaleX = scale;
+        ((EffFireWork*)eff->userdata)->scaleY = scale;
     }
     return EVT_RETURN_DONE;
 }
@@ -719,12 +722,12 @@ USER_FUNC(b_peach_thunder) {
     f32 z = evtGetFloat(event, args[2]);
     EffectEntry* eff = effPokopiThunderN64Entry(0, 150, 35.0f + x, 160.0f + y, z, x, y, z, 2.0f);
 
-    ((s32*)eff->userdata)[12] = 255;
-    ((s32*)eff->userdata)[13] = 160;
-    ((s32*)eff->userdata)[14] = 192;
-    ((s32*)eff->userdata)[16] = 20;
-    ((s32*)eff->userdata)[17] = 20;
-    ((s32*)eff->userdata)[18] = 20;
+    ((EffPokopiThunderN64Work*)eff->userdata)->r = 255;
+    ((EffPokopiThunderN64Work*)eff->userdata)->g = 160;
+    ((EffPokopiThunderN64Work*)eff->userdata)->b = 192;
+    ((EffPokopiThunderN64Work*)eff->userdata)->r2 = 20;
+    ((EffPokopiThunderN64Work*)eff->userdata)->g2 = 20;
+    ((EffPokopiThunderN64Work*)eff->userdata)->b2 = 20;
     return EVT_RETURN_DONE;
 }
 
@@ -777,9 +780,9 @@ USER_FUNC(radiation_set_pos) {
     f32 z = evtGetFloat(event, args[3]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[4] = x;
-    ((f32*)eff->userdata)[5] = y;
-    ((f32*)eff->userdata)[6] = z;
+    ((EffRadiationN64Work*)eff->userdata)->position.x = x;
+    ((EffRadiationN64Work*)eff->userdata)->position.y = y;
+    ((EffRadiationN64Work*)eff->userdata)->position.z = z;
     return EVT_RETURN_DONE;
 }
 
@@ -790,7 +793,7 @@ USER_FUNC(pcharge_entry) {
     f32 y = evtGetFloat(event, args[2]);
     f32 z = evtGetFloat(event, args[3]);
 
-    effSetName(effPokopiPchargeN64Entry(8, x, y, z, 1.0f, 0), name);
+    effSetName(effPokopiPchargeN64Entry(8, 0, x, y, z, 1.0f), name);
     return EVT_RETURN_DONE;
 }
 
@@ -802,9 +805,9 @@ USER_FUNC(pcharge_set_pos) {
     f32 z = evtGetFloat(event, args[3]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[1] = x;
-    ((f32*)eff->userdata)[2] = y;
-    ((f32*)eff->userdata)[3] = z;
+    ((EffPokopiPchargeN64Elem*)eff->userdata)->position.x = x;
+    ((EffPokopiPchargeN64Elem*)eff->userdata)->position.y = y;
+    ((EffPokopiPchargeN64Elem*)eff->userdata)->position.z = z;
     return EVT_RETURN_DONE;
 }
 
@@ -860,9 +863,9 @@ static USER_FUNC(starstone_set_pos) {
         s = sin(angle);
         sprintf(name, "starstone%d", i);
         eff = effNameToPtr(name);
-        ((f32*)eff->userdata)[2] = r * c + x;
-        ((f32*)eff->userdata)[3] = y;
-        ((f32*)eff->userdata)[4] = r * s + z;
+        ((EffStarStoneWork*)eff->userdata)->position.x = r * c + x;
+        ((EffStarStoneWork*)eff->userdata)->position.y = y;
+        ((EffStarStoneWork*)eff->userdata)->position.z = r * s + z;
     }
     return EVT_RETURN_DONE;
 }
@@ -874,7 +877,7 @@ static USER_FUNC(starstone_set_ry) {
 
     for (i = 0; i < 7; i++) {
         sprintf(name, "starstone%d", i);
-        ((f32*)effNameToPtr(name)->userdata)[7] = ry;
+        ((EffStarStoneWork*)effNameToPtr(name)->userdata)->rotY = ry;
     }
     return EVT_RETURN_DONE;
 }
@@ -962,7 +965,7 @@ USER_FUNC(mist_add_vy) {
 
     for (i = 0; i < 10; i++) {
         sprintf(name, "mist%d", i);
-        ((f32*)effNameToPtr(name)->userdata)[2] += vy;
+        ((EffMist2Work*)effNameToPtr(name)->userdata)->position.y += vy;
     }
     return EVT_RETURN_DONE;
 }

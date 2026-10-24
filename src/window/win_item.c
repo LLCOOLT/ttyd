@@ -15,15 +15,6 @@
 #include "data/mail_data.h"
 #include "icon_ids.h"
 
-typedef struct ITexRef {
-    TEXPalette* tpl;
-} ITexRef;
-
-typedef struct IRes {
-    u8 pad_0[0xA0];
-    ITexRef* tex;
-} IRes;
-
 typedef struct IWinPos {
     f32 x;
     f32 y;
@@ -40,7 +31,7 @@ typedef struct ItemWork {
     /* 0x00C */ u32 dtrg;
     /* 0x010 */ u32 drep;
     /* 0x014 */ u8 pad_14[0x28 - 0x14];
-    /* 0x028 */ IRes* res;
+    /* 0x028 */ FileEntry* res;
     /* 0x02C */ FileEntry* mailTex;
     /* 0x030 */ u8 pad_30[0xC4 - 0x30];
     /* 0x0C4 */ IWinPos pos[3];
@@ -674,14 +665,14 @@ s32 winItemMain(ItemWork* w) {
                 }
             }
             if (w->sel < 1) {
-                ((void (*)(s32))pouchSetHP)(((s32 (*)(void))pouchGetHP)() + (u8)itemDataTable[w->f2D4].hp_restored);
-                ((void (*)(s32))pouchSetFP)(((s32 (*)(void))pouchGetFP)() + (u8)itemDataTable[w->f2D4].fp_restored);
-                ((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() + (u8)itemDataTable[w->f2D4].sp_restored);
+                ((void (*)(s32))pouchSetHP)(((s32 (*)(void))pouchGetHP)() + itemDataTable[w->f2D4].hp_restored);
+                ((void (*)(s32))pouchSetFP)(((s32 (*)(void))pouchGetFP)() + itemDataTable[w->f2D4].fp_restored);
+                ((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() + itemDataTable[w->f2D4].sp_restored);
             } else {
                 party = list[w->sel - 1]->partyId;
-                ((void (*)(s32, s32))pouchSetPartyHP)(party, ((s32 (*)(s32))pouchGetPartyHP)(party) + (u8)itemDataTable[w->f2D4].hp_restored);
-                ((void (*)(s32))pouchSetFP)(((s32 (*)(void))pouchGetFP)() + (u8)itemDataTable[w->f2D4].fp_restored);
-                ((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() + (u8)itemDataTable[w->f2D4].sp_restored);
+                ((void (*)(s32, s32))pouchSetPartyHP)(party, ((s32 (*)(s32))pouchGetPartyHP)(party) + itemDataTable[w->f2D4].hp_restored);
+                ((void (*)(s32))pouchSetFP)(((s32 (*)(void))pouchGetFP)() + itemDataTable[w->f2D4].fp_restored);
+                ((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() + itemDataTable[w->f2D4].sp_restored);
             }
             w->blink = 0;
             w->state = 301;
@@ -783,12 +774,12 @@ void winItemDisp(s32 camId, void* param, s32 n) {
     b = 4.0f + a;
     for (i = 0, off = 0; i < 2; i++, off += VERSION_PICK(40, 50)) {
         if (i == w->mode) {
-            winTexInit(w->res->tex->tpl);
+            winTexInit(*w->res->data);
             winTexSet(0xB3, (Vec){x - 215.0f, 20.0f + (a - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x80});
-            winTexInit_x2(w->res->tex->tpl);
+            winTexInit_x2(*w->res->data);
             winTexSet_x2(i + 0x18, 0xB3, (Vec){c, 20.0f + (b - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         } else {
-            winTexInit_x2(w->res->tex->tpl);
+            winTexInit_x2(*w->res->data);
             winTexSet_x2(i + 0x18, 0xB3, (Vec){x - 215.0f, 20.0f + (a - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0x80, 0x80, 0x80, 0xFF});
         }
     }
@@ -863,14 +854,14 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
     }
     GXSetScissor(0, 0, 0x260, 0x1E0);
     if ((&w->page[0])[w->mode] > 0) {
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         width = 250.0f + xo;
         winTexSet(0x17, (Vec){width, 20.0f + (18.0f + (110.0f + yo)), 0.0f}, (Vec){-1.0f, -1.0f, -1.0f}, white2);
         winIconInit();
         winIconSet(ICON_07E, (Vec){width, 20.0f + (113.0f + yo), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white2);
     }
     if (cnt > (&w->page[0])[w->mode] * 10 + 10) {
-        winTexInit(w->res->tex->tpl);
+        winTexInit(*w->res->data);
         w3 = 250.0f + xo;
         winTexSet(0x17, (Vec){w3, 20.0f + ((yo - 90.0f) - 15.0f), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
         winIconInit();
@@ -963,7 +954,7 @@ void itemUseDisp(WinMgrEntry* entry) {
                     winIconInit();
                 }
                 winIconSet(ICON_19E, (Vec){entry->x + 30, entry->y - 20 - off, 0.0f}, (Vec){0.65f, 0.65f, 0.65f}, white3);
-                winTexInit(w->res->tex->tpl);
+                winTexInit(*w->res->data);
                 GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
                 GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
                 winTexSet(0xAF, (Vec){entry->x + 220 + 0.9f * FontGetMessageWidth(WI_HP_NAME)  / 2, entry->y - 19 - off, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xCB, 0x8C, 0xA2, 0xFE});
@@ -974,7 +965,7 @@ void itemUseDisp(WinMgrEntry* entry) {
                 winFontSetR((Vec){entry->x + 245, entry->y - 8 - off, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%d", ((s32 (*)(void))pouchGetHP)());
                 winFontSetR((Vec){entry->x + 267, entry->y - 8 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, WI_SLASH);
                 winFontSet((Vec){entry->x + 310, entry->y - 10 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", ((s32 (*)(void))pouchGetMaxHP)());
-                if (*(u8*)&itemDataTable[w->f2D4].fp_restored) {
+                if (itemDataTable[w->f2D4].fp_restored) {
                     if (w->blink % 20 > 15) {
                         continue;
                     }
@@ -990,7 +981,7 @@ void itemUseDisp(WinMgrEntry* entry) {
                 if (w->blink % 20 > 15 && i == w->sel) {
                     continue;
                 }
-                winTexInit(w->res->tex->tpl);
+                winTexInit(*w->res->data);
                 GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
                 GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
                 winTexSet(0xAF, (Vec){entry->x + 220 + 0.9f * FontGetMessageWidth(WI_HP_NAME)  / 2, (yoff + (entry->y - 8 - i * 28)) - 14.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xCB, 0x8C, 0xA2, 0xF4});
@@ -1015,7 +1006,7 @@ void itemUseDisp(WinMgrEntry* entry) {
             }
         }
     }
-    winTexInit(w->res->tex->tpl);
+    winTexInit(*w->res->data);
     winTexSet(0, (Vec){2.0f + w->f150, w->f154 - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x80});
     winTexSet(0, (Vec){w->f150, w->f154, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
 }

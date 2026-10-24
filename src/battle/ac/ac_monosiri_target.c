@@ -5,7 +5,7 @@
 #include "driver/icondrv.h"
 #include "pmario_sound.h"
 #include "system.h"
-#include <string.h>
+#include <string.h>
 #include "version.h"
 // US battle texture ids are 0x16 higher for these entries.
 #define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
@@ -17,12 +17,6 @@ void btlDispTex4(s32 id, Vec pos, Vec scale, Vec rot, GXColor color);
 void btlGetScreenPoint(Vec* in, Vec* out);
 s32 BattleACGetButtonIcon(s32 button, s32 pressed);
 s32 _getmaxcount(void);
-
-typedef struct MonosiriTargetParams {
-    u8 field_0x0[0x38];
-    s32 unitId;  // 0x38
-    s32 partsId; // 0x3C
-} MonosiriTargetParams;
 
 typedef struct MonosiriTargetWork {
     s32 frame;      // 0x0
@@ -37,7 +31,7 @@ typedef struct MonosiriTargetWork {
     s32 endTimer;   // 0x3C
 } MonosiriTargetWork;
 
-#define MT_PARAMS(work) ((MonosiriTargetParams*)&(work)->actionCommands)
+#define MT_PARAMS(work) (&(work)->actionCommands) // params: 0 unit id, 1 parts id
 
 static void actionCommandDisp(f32 x, f32 y);
 
@@ -64,8 +58,8 @@ s32 battleAcMain_MonosiriTarget(BattleWork* work) {
     if (work->actionCommands.mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
     }
-    unit = BattleGetUnitPtr(work, MT_PARAMS(work)->unitId);
-    parts = BtlUnit_GetPartsPtr(unit, MT_PARAMS(work)->partsId);
+    unit = BattleGetUnitPtr(work, MT_PARAMS(work)->params[0]);
+    parts = BtlUnit_GetPartsPtr(unit, MT_PARAMS(work)->params[1]);
 
     switch (work->actionCommands.mAcState) {
         case 0:

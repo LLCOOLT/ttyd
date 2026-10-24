@@ -30,6 +30,11 @@ static inline double my_fabsf(float x) { return __fabs(x); }
 void scissor_disp_control(CameraId camera, void* param);
 void* memset(void*, int, u32);
 
+typedef struct ScissorTri {
+    f32 x[3]; // 0x0
+    f32 y[3]; // 0xC
+} ScissorTri;
+
 typedef struct ScissorWork {
     /* 0x000 */ u32 flags;
     /* 0x004 */ u8 pad0[8];
@@ -64,7 +69,7 @@ typedef struct ScissorWork {
     /* 0x10C */ f32 unk_10c;
     /* 0x110 */ u8 pad110[4];
     /* 0x114 */ void* buf114;
-    /* 0x118 */ void* buf118;
+    /* 0x118 */ struct ScissorTri* tris; // triangle list (0x3000 bytes), drawn by scissor_ofscreen_ok
     /* 0x11C */ s32 phase;
     /* 0x120 */ s32 unk_120;
     /* 0x124 */ Vec pos;
@@ -548,7 +553,7 @@ s32 scissor_tess(void) {
     memcpy(p, w->buf114, w->stars.count * 8);
     w->unk_14 = 0;
     tess(p, w->stars.count);
-    DCFlushRange(w->buf118, 0x3000);
+    DCFlushRange(w->tris, 0x3000);
     return 2;
 }
 
@@ -560,10 +565,10 @@ void tess(Pt* pts, s32 n) {
     Pt* a;
     Pt* b;
     if (n == 3) {
-        f32* tri = (f32*)((u8*)w->buf118 + w->unk_14 * 0x18);
+        ScissorTri* tri = &w->tris[w->unk_14];
         for (k = 0; k < 3; k++) {
-            tri[k] = pts[k].x;
-            tri[3 + k] = pts[k].y;
+            tri->x[k] = pts[k].x;
+            tri->y[k] = pts[k].y;
         }
         w->unk_14++;
         BattleFree(pts);
@@ -591,10 +596,10 @@ void tess(Pt* pts, s32 n) {
         }
     }
     {
-        f32* tri = (f32*)((u8*)w->buf118 + w->unk_14 * 0x18);
+        ScissorTri* tri = &w->tris[w->unk_14];
         for (k = 0; k < 3; k++) {
-            tri[k] = pts[k].x;
-            tri[3 + k] = pts[k].y;
+            tri->x[k] = pts[k].x;
+            tri->y[k] = pts[k].y;
         }
         w->unk_14++;
         BattleFree(pts);
@@ -1080,12 +1085,13 @@ s32 scissor_damage_sub2(Vec pt) {
     f32 c[3];
     s32 i, j;
     for (i = 0; i < n; i++) {
-        f32* t = (f32*)((u8*)w->buf118 + i * 0x18);
+        ScissorTri* t = &w->tris[i];
         for (j = 0; j < 3; j++) {
             s32 k = (j + 1) % 3;
-            q = t + j; y0 = q[3];
+            // FAKE: y[j] read as q[3] through q = &x[j] keeps the target register order (t->y[j] / t->x[j]: 99.65%)
+            q = &t->x[j]; y0 = q[3];
             x0 = q[0];
-            c[j] = (pt.x - x0) * (t[3 + k] - y0) - (pt.y - y0) * (t[k] - x0);
+            c[j] = (pt.x - x0) * (t->y[k] - y0) - (pt.y - y0) * (t->x[k] - x0);
         }
         if ((c[0] > 0.0f && c[1] > 0.0f && c[2] > 0.0f) || (c[0] < 0.0f && c[1] < 0.0f && c[2] < 0.0f)) {
             return 1;
@@ -1165,7 +1171,7 @@ void scissor_disp_region(CameraId camera, void* param) {
     Mtx mtx;
     u16 left, top, right, bottom;
     s32 i;
-    f32* t;
+    ScissorTri* t;
     sysWaitDrawSync();
     GXClearBoundingBox();
     GXSetCullMode(0);
@@ -1189,12 +1195,12 @@ void scissor_disp_region(CameraId camera, void* param) {
     GXSetTevAlphaIn(0, 7, 7, 7, 6);
     GXSetTevKAlphaSel(0, 0);
     GXLoadPosMtxImm(camGetPtr(8)->view, 0);
-    t = (f32*)w->buf118;
+    t = w->tris;
     GXBegin(0x90, 0, w->unk_14 * 3);
-    for (i = 0; i < w->unk_14; i++, t += 6) {
-        GXPosition3f32(t[0], t[3], 0.0f);
-        GXPosition3f32(t[1], t[4], 0.0f);
-        GXPosition3f32(t[2], t[5], 0.0f);
+    for (i = 0; i < w->unk_14; i++, t++) {
+        GXPosition3f32(t->x[0], t->y[0], 0.0f);
+        GXPosition3f32(t->x[1], t->y[1], 0.0f);
+        GXPosition3f32(t->x[2], t->y[2], 0.0f);
     }
     sysWaitDrawSync();
     if (w->smart != NULL) {
@@ -1215,7 +1221,7 @@ s32 scissor_init(void) {
     memset(w, 0, 0x174);
     w->timer = 0x3BF;
     w->buf114 = BattleAlloc(0x1000);
-    w->buf118 = BattleAlloc(0x3000);
+    w->tris = BattleAlloc(0x3000);
     w->stars.unk_b4 = 0.0f;
     w->stars.unk_b8 = 0.0f;
     w->unk_0c = 0;
@@ -1232,7 +1238,7 @@ s32 scissor_end(void) {
         w->smart = NULL;
     }
     BattleFree(w->buf114);
-    BattleFree(w->buf118);
+    BattleFree(w->tris);
     return 2;
 }
 

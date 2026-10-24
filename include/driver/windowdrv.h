@@ -25,7 +25,7 @@ typedef enum WindowType {
 struct WindowEntry {
 	u8 state[2]; //0x0, u16 message-window state (WIN_STATE in msgdrv.c)
 	u16 flags; //0x2
-	u16 priority; //0x4, windowEntry argument; display z = 400 - priority
+	s16 priority; //0x4, windowEntry argument; display z = 400 - priority
 	s16 alpha; //0x6, window alpha
 	s32 type; //0x8, WindowType
 	f32 x; //0xC, window xpos

@@ -260,9 +260,6 @@ void _audience_Whistle_control(void);
 void btlseqEnd_DispInit(BattleWork* wp);
 void btlseqEnd_DispMain(CameraId camId, void* param);
 
-typedef struct { s32 a; s32 b; } P2;
-typedef struct { u16 a; s8 b; s32 c; } AllS;
-typedef struct { s32 pad[3]; P2 arr[3]; } W3;
 #define SS(v) BattleSetSeq(wp, (BattleSequence)7, (v))
 void _GetExpIcon_End(SeqEndWork* work);
 void btl_camera_set_posoffset(s32 pri, f32 x, f32 y, f32 z);
@@ -292,9 +289,9 @@ void btlseqEnd(BattleWork* wp) {
             BattleInformationSetResult(info, 4);
         } else if (flags & 0x20) {
             BattleInformationSetResult(info, 5);
-        } else if (((AllS*)wp->alliances)[marioBelong].c) {
+        } else if (wp->alliances[marioBelong].clearConditionMet) {
             BattleInformationSetResult(info, 3);
-        } else if (((AllS*)wp->alliances)[enemyBelong].c) {
+        } else if (wp->alliances[enemyBelong].clearConditionMet) {
             BattleInformationSetResult(info, 1);
         } else if (flags & 0x10) {
             BattleInformationSetResult(info, 4);

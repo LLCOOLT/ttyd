@@ -1,5 +1,6 @@
 #pragma defer_codegen on
 #include "battle/battle_unit.h"
+#include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
@@ -26,26 +27,13 @@
 #include "evt/evt_npc.h"
 #include "usu.h"
 #include "data_tables.h"
+#include "driver/msgdrv.h"
+#include "driver/extdrv.h"
 
-typedef struct UsuCbInfo { u8 field_0x0[0x8]; u16 field_0x8; } UsuCbInfo;
 typedef struct KpaSen { s8 state; u8 field_0x1; u16 wait; f32 t; Vec start; Vec end; u8 pose99Lo; u8 pose99Hi; u8 pose1Lo; u8 pose1Hi; } KpaSen;
 static s32 kpaSen_pad;
 KpaSen* kpaSen;
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
-ExtPose* extGetPosePtr(void);
-s32 extGetPoseNum(void);
 s32 calcPose(s32 i, s32 lo, s32 hi, s32 flag);
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
-void extLoadShadowMtx(Mtx mtx);
-void extLoadShadowRenderMode(void);
-void extLoadShadowVertex(void);
-void extLoadShadowTev(void);
-void extDrawShadow(void);
 void kpaSen_ext_disp(CameraId camera, void* param);
 void kpaSen_ext_shadow_disp(CameraId camera, void* param);
 void effKemuTestDrawCam(EffectEntry* effect, s32 camera);
@@ -224,7 +212,7 @@ void kpaSen_ext_disp(CameraId camera, void* param);
 void kpaSen_ext_main(void);
 s32 calcPose(s32 i, s32 lo, s32 hi, s32 flag);
 void kpaSen_ext_init(void);
-void kpa_stg5_009_7_cb(s32 type, UsuCbInfo** param);
+void kpa_stg5_009_7_cb(s32 type, smartEntry* smart);
 USER_FUNC(party_tev);
 #ifdef VERSION_G8ME01
 USER_FUNC(N_evt_sub_status_gauge_force_update);
@@ -383,12 +371,12 @@ USER_FUNC(party_tev) {
     return EVT_RETURN_DONE;
 }
 
-void kpa_stg5_009_7_cb(s32 type, UsuCbInfo** param) {
-    UsuCbInfo* info = *param;
+void kpa_stg5_009_7_cb(s32 type, smartEntry* smart) {
+    MsgWinData* info = smart->address;
 
     switch (type) {
         case 3:
-            if (info->field_0x8 == 1) {
+            if (info->curPage == 1) {
                 psndBGMOn(0x201, "BGM_FF_GET_ITEM1\0\0\0");
             }
             break;
@@ -2490,35 +2478,35 @@ ExtTexInfo kpaSen_ext_entry_data[] = {
 };
 
 void kpaSen_ext_init(void) {
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     Vec base = {85.0f, 0.0f, 75.0f};
     s32 i;
 
     kpaSen = _mapAlloc(sizeof(KpaSen) * 200);
     for (i = 0; i < extGetPoseNum(); i++, pose++) {
         pose->flags |= 3;
-        PSMTXIdentity(pose->mtx);
+        PSMTXIdentity(*pose->mtx);
         if (i < 100) {
-            pose->rot = 90.0f;
+            pose->dir = 90.0f;
             kpaSen[i].end.x = (base.x + 30.0f * ((f32)i / 10.0f)) - 9.0f;
             kpaSen[i].end.y = 0.0f;
             kpaSen[i].end.z = base.z + 50.0f * (f32)(i % 10 - 5);
-            pose->mtx[0][3] = kpaSen[i].start.x = base.x + 200.0f;
-            pose->mtx[1][3] = kpaSen[i].start.y = 0.0f;
-            pose->mtx[2][3] = kpaSen[i].start.z = base.z + 20.0f * (f32)(i % 10 - 5);
+            (*pose->mtx)[0][3] = kpaSen[i].start.x = base.x + 200.0f;
+            (*pose->mtx)[1][3] = kpaSen[i].start.y = 0.0f;
+            (*pose->mtx)[2][3] = kpaSen[i].start.z = base.z + 20.0f * (f32)(i % 10 - 5);
             kpaSen[i].wait = (i / 10) * 3 + 1;
             kpaSen[i].pose99Lo = 0;
             kpaSen[i].pose99Hi = 5;
             kpaSen[i].pose1Lo = 6;
             kpaSen[i].pose1Hi = 8;
         } else {
-            pose->rot = 270.0f;
+            pose->dir = 270.0f;
             kpaSen[i].end.x = (base.x + -30.0f * ((f32)(i - 100) / 10.0f)) - 150.0f;
             kpaSen[i].end.y = 0.0f;
             kpaSen[i].end.z = base.z + 50.0f * (f32)((i - 100) % 10 - 5);
-            pose->mtx[0][3] = kpaSen[i].start.x = base.x - 350.0f;
-            pose->mtx[1][3] = kpaSen[i].start.y = 0.0f;
-            pose->mtx[2][3] = kpaSen[i].start.z = base.z + 20.0f * (f32)((i - 100) % 10 - 5);
+            (*pose->mtx)[0][3] = kpaSen[i].start.x = base.x - 350.0f;
+            (*pose->mtx)[1][3] = kpaSen[i].start.y = 0.0f;
+            (*pose->mtx)[2][3] = kpaSen[i].start.z = base.z + 20.0f * (f32)((i - 100) % 10 - 5);
             kpaSen[i].wait = ((i - 100) / 10) * 3 + 1;
             switch (rand() % 3) {
                 case 0:
@@ -2561,7 +2549,7 @@ s32 calcPose(s32 i, s32 lo, s32 hi, s32 flag) {
 }
 
 void kpaSen_ext_main(void) {
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     s32 i;
 
     for (i = 0; i < extGetPoseNum(); i++, pose++) {
@@ -2574,25 +2562,25 @@ void kpaSen_ext_main(void) {
                 break;
             case 1:
                 if (i < 100) {
-pose->frame = calcPose(i, kpaSen[i].pose1Lo, kpaSen[i].pose1Hi, 1); if (i % 10 == 0) { kpaSen[i].t = kpaSen[i].t; pose[i / 10].rot = pose[i / 10].rot; pose[i / 10].mtx[0][3] = pose[i / 10].mtx[0][3]; }
+pose->texId = calcPose(i, kpaSen[i].pose1Lo, kpaSen[i].pose1Hi, 1); if (i % 10 == 0) { kpaSen[i].t = kpaSen[i].t; pose[i / 10].dir = pose[i / 10].dir; (*pose[i / 10].mtx)[0][3] = (*pose[i / 10].mtx)[0][3]; }
                 } else {
-                    pose->frame = calcPose(i - 100, kpaSen[i].pose1Lo, kpaSen[i].pose1Hi, 1);
+                    pose->texId = calcPose(i - 100, kpaSen[i].pose1Lo, kpaSen[i].pose1Hi, 1);
                 }
-                pose->mtx[0][3] = kpaSen[i].start.x * (1.0f - kpaSen[i].t) + kpaSen[i].end.x * kpaSen[i].t;
-                pose->mtx[2][3] = kpaSen[i].start.z * (1.0f - kpaSen[i].t) + kpaSen[i].end.z * kpaSen[i].t;
+                (*pose->mtx)[0][3] = kpaSen[i].start.x * (1.0f - kpaSen[i].t) + kpaSen[i].end.x * kpaSen[i].t;
+                (*pose->mtx)[2][3] = kpaSen[i].start.z * (1.0f - kpaSen[i].t) + kpaSen[i].end.z * kpaSen[i].t;
                 kpaSen[i].t += 0.03;
                 kpaSen[i].wait++;
                 if (kpaSen[i].t >= 1.0f) {
-                    pose->mtx[0][3] = kpaSen[i].end.x;
-                    pose->mtx[2][3] = kpaSen[i].end.z;
+                    (*pose->mtx)[0][3] = kpaSen[i].end.x;
+                    (*pose->mtx)[2][3] = kpaSen[i].end.z;
                     kpaSen[i].state = 99;
                 }
                 break;
             case 99:
                 if (i < 100) {
-                    pose->frame = calcPose(i, kpaSen[i].pose99Lo, kpaSen[i].pose99Hi, 0);
+                    pose->texId = calcPose(i, kpaSen[i].pose99Lo, kpaSen[i].pose99Hi, 0);
                 } else {
-                    { s32 lo = kpaSen[i].pose99Lo; s32 hi = kpaSen[i].pose99Hi; pose->frame = calcPose(i - 100, lo, hi, 0); }
+                    { s32 lo = kpaSen[i].pose99Lo; s32 hi = kpaSen[i].pose99Hi; pose->texId = calcPose(i - 100, lo, hi, 0); }
                 }
                 break;
             case -1:
@@ -3314,9 +3302,9 @@ static USER_FUNC(starstone_set_pos) {
     f32 z = evtGetFloat(event, args[3]);
     EffectEntry* eff = effNameToPtr(name);
 
-    ((f32*)eff->userdata)[2] = x;
-    ((f32*)eff->userdata)[3] = y;
-    ((f32*)eff->userdata)[4] = z;
+    ((EffStarStoneWork*)eff->userdata)->position.x = x;
+    ((EffStarStoneWork*)eff->userdata)->position.y = y;
+    ((EffStarStoneWork*)eff->userdata)->position.z = z;
     return EVT_RETURN_DONE;
 }
 
@@ -3325,7 +3313,7 @@ static USER_FUNC(starstone_set_ry) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 ry = evtGetFloat(event, args[1]);
 
-    ((f32*)effNameToPtr(name)->userdata)[7] = ry;
+    ((EffStarStoneWork*)effNameToPtr(name)->userdata)->rotY = ry;
     return EVT_RETURN_DONE;
 }
 

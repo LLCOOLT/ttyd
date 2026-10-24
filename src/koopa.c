@@ -38,7 +38,7 @@ void marioBoots(void);
 void marioForceMoveMain(void);
 void marioMove(void);
 void marioCheckWall(f32, f32);
-void* kpaHitCheck(void);
+struct HitEntry* kpaHitCheck(void);
 void kpaSearchFrontUnder(void);
 void kpaFireAttack(void);
 void kpaFireMain(void);
@@ -390,7 +390,7 @@ void kpa2DMain(void) {
 
 void kpa3DMain(void) {
     MarioWork* mp = marioGetPtr();
-    void* h = kpaHitCheck();
+    struct HitEntry* h = kpaHitCheck();
     if (h) {
         mp->hitobjHead = h;
     }

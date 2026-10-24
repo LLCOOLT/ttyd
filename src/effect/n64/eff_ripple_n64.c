@@ -8,21 +8,6 @@
 #include <dolphin/mtx.h>
 #include <stdlib.h>
 
-typedef struct EffRippleN64Work {
-    s32 type;     // 0x0
-    Vec position; // 0x4
-    f32 scale;    // 0x10
-    f32 scaleY;   // 0x14
-    s32 alpha;    // 0x18
-    s32 lifetime; // 0x1C
-    s32 frame;    // 0x20
-    s32 offset;   // 0x24
-    f32 unk28;    // 0x28
-    f32 rx;       // 0x2C
-    f32 rz;       // 0x30
-    s32 priority; // 0x34
-} EffRippleN64Work;
-
 
 
 effN64Vtx size16x16_tex32x32_0_vtx[] = {
@@ -150,7 +135,7 @@ void effRippleMain(EffectEntry* effect) {
         work->offset -= 32;
     }
     work->scale += 0.1f;
-    dispEntry(work->priority, dispCalcZ(&position), 2, (DispCallback)effRippleDisp, effect);
+    dispEntry(work->cameraId, dispCalcZ(&position), 2, (DispCallback)effRippleDisp, effect);
 }
 
 #pragma dont_inline on
@@ -173,7 +158,7 @@ EffectEntry* effRippleN64Entry(s32 type, f32 x, f32 y, f32 z, f32 arg4) {
     work->rx = 0.0f;
     work->rz = 0.0f;
     work->scaleY = 1.0f;
-    work->priority = 4;
+    work->cameraId = 4;
     switch (type) {
         case 1:
         case 10:

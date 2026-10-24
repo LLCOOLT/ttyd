@@ -5,13 +5,17 @@
 #include "memory.h"
 
 typedef struct MsgChar {
-	u32 value; //0x0
+	union {
+		u32 value; //0x0
+		GXColor color; //0x0, colour-change entries
+	};
 	u16 glyph; //0x4
 	s16 x; //0x6 (page-break entries: page number)
 	s16 y; //0x8 (page-scroll entries: scroll amount)
-	u8 pad_0A[0xC - 0xA]; //0xA
+	s16 iconY; //0xA, icon entries: extra y offset
 	u32 time; //0xC
-	u8 pad_10[0x18 - 0x10]; //0x10
+	f32 scale; //0x10
+	f32 rot; //0x14, animation entries: rotation; dynamic-scale entries: current scale
 } MsgChar;
 
 typedef struct MsgWinData {
@@ -66,7 +70,7 @@ typedef struct MsgWinData {
 typedef struct MessageEntry {
 	u32 length; //0x0
 	void* address; //0x4
-	u32 count; //0x8
+	s32 count; //0x8
 	smartEntry* lookup; //0xC
 } MessageEntry;
 

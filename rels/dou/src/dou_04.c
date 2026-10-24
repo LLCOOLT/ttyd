@@ -792,7 +792,7 @@ USER_FUNC(evt_mapgrp_translate2) {
     f32 y = evtGetFloat(event, args[2]);
     f32 z = evtGetFloat(event, args[3]);
     const char* hitName = (const char*)evtGetValue(event, args[4]);
-    f32* prev = (f32*)&event->lwData[6];
+    f32* prev = &event->lwDataF[6];
     HitEntry* hit;
 
     mapObjTranslate(name, x, y, z);

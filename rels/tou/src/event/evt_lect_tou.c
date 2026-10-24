@@ -1,4 +1,7 @@
 #include "icon_ids.h"
+#include "eff/eff_mario_balloon.h"
+#include "eff/eff_fukidashi.h"
+#include "eff/eff_itemget.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -456,7 +459,7 @@ static USER_FUNC(effitemgetchange_cam) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 camId = evtGetValue(event, args[1]);
 
-    ((s32*)effNameToPtr(name)->userdata)[14] = camId;
+    ((ItemGetWork*)effNameToPtr(name)->userdata)->camera = camId;
     return EVT_RETURN_DONE;
 }
 
@@ -464,21 +467,21 @@ static USER_FUNC(effitemgetchange_cam_ptr) {
     s32* args = event->args;
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, args[0]);
 
-    ((s32*)eff->userdata)[14] = evtGetValue(event, args[1]);
+    ((ItemGetWork*)eff->userdata)->camera = evtGetValue(event, args[1]);
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(effitemget_open) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
-    ((s32*)eff->userdata)[8] = 1;
+    ((ItemGetWork*)eff->userdata)->state = 1;
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(effitemget_open_ptr) {
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, event->args[0]);
 
-    ((s32*)eff->userdata)[8] = 1;
+    ((ItemGetWork*)eff->userdata)->state = 1;
     return EVT_RETURN_DONE;
 }
 
@@ -1165,7 +1168,7 @@ static USER_FUNC(lect_npc_balloon_on_off) {
 
     if (evtGetValue(event, args[1])) {
         eff = effMarioBalloonEntry(1, npc);
-        ((s32*)eff->userdata)[7] = 7;
+        ((MarioBalloonWork*)eff->userdata)->camera = 7;
     } else {
         effDelete(eff);
     }
@@ -1177,7 +1180,7 @@ static USER_FUNC(efffukidashichange_cam) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 camId = evtGetValue(event, args[1]);
 
-    ((s32*)effNameToPtr(name)->userdata)[19] = camId;
+    ((EffFukidashiWork*)effNameToPtr(name)->userdata)->camera = camId;
     return EVT_RETURN_DONE;
 }
 

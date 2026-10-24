@@ -14,6 +14,7 @@ void N_battleMapAlloc(void);
 #include "driver/itemdrv.h"
 #include "driver/msgdrv.h"
 #include "driver/npcdrv.h"
+#include "driver/lightdrv.h"
 #include "driver/offscreendrv.h"
 #include "driver/seqdrv.h"
 #include "evt/evt_cmd.h"
@@ -25,6 +26,7 @@ void N_battleMapAlloc(void);
 #include "mario/mario_pouch.h"
 #include "mario/mariost.h"
 #include "memory.h"
+#include "party.h"
 #include "pmario_sound.h"
 #include "seq/seq_title.h"
 #include "system.h"
@@ -37,43 +39,12 @@ typedef struct BattleSeqWork {
     s32 counter;    // 0x10
 } BattleSeqWork;
 
-typedef struct FBatView {
-    s16 mode;           // 0x0
-    u8 unk2[6];         // 0x2
-    NpcEntry* target;   // 0x8
-    u8 unkC[4];         // 0xC
-    u32 flags;          // 0x10
-    s32 partner;        // 0x14
-    u8 unk18[4];        // 0x18
-    u32 flags1C;        // 0x1C
-    FieldBattleInfo info; // 0x20
-    u8 unk3C[0x550 - 0x3C];
-    s32 fsEnabled;      // 0x550
-    u32 fs554;          // 0x554
-    s32 fsType;         // 0x558
-    u8 unk55C[0x570 - 0x55C];
-    s32 waitCount;      // 0x570
-} FBatView;
-
-typedef struct LightView {
-    u8 unk0[0x24];
-    Vec pos; // 0x24
-} LightView;
-
 BOOL bmapLoad(const char* a, const char* b);
 void bmapUnLoad(void);
-LightView* lightGetPaperCraft(void);
 BattleUnitType BattleTransPartyIdToUnitKind(s32 id);
 void psndBGMOn_f(u32 a, u32 b, u32 c, u32 d);
 BOOL psndBGMOff(u32 flags);
 BOOL psndENVOn(u32 a, char* b);
-typedef struct PartyView {
-    u8 unk0[0x31];
-    s8 id;
-} PartyView;
-PartyView* partyGetPtr(s32 index);
-void partyCtrlOn(void);
-void partyCtrlOff(void);
 void mobjReset(BOOL inBattle);
 void animPoseAutoRelease(BOOL inBattle);
 
@@ -87,11 +58,11 @@ static inline BOOL loadTpl(const char* path) {
 #define GSW0 (-170000000)
 
 void seq_battleInit(BattleSeqWork* work) {
-    FBatView* fbat;
+    FieldBattleData* fbat;
     NpcEntry* npc;
 
     debug_battle_flag = gp->debugBattle;
-    fbat = (FBatView*)fbatGetPointer();
+    fbat = fbatGetPointer();
     npc = fbat->target;
     if (evtGetValue(NULL, GSW0) < 109 || evtGetValue(NULL, GSW0) >= 111) {
         if (evtGetValue(NULL, GSW0) != 402) {
@@ -103,7 +74,7 @@ void seq_battleInit(BattleSeqWork* work) {
     padRumbleOff(0);
     evtStopAll(4);
     psndSetFlag(0x80);
-    switch (((FBatView*)fbatGetPointer())->flags) {
+    switch (fbatGetPointer()->hitKind) {
         case 0x1000000:
         case 0x800000:
             if (debug_battle_flag == 0) {
@@ -126,7 +97,7 @@ static const char bti03[7];
 static const char bti04[7];
 
 void seq_battleMain(BattleSeqWork* work) {
-    FBatView* fbat;
+    FieldBattleData* fbat;
     BattleStageData* stage;
     PouchData* pouch;
 
@@ -152,7 +123,7 @@ void seq_battleMain(BattleSeqWork* work) {
             break;
         case 2:
             pouchGetPtr();
-            switch (((FBatView*)fbatGetPointer())->flags) {
+            switch (fbatGetPointer()->hitKind) {
                 case 0x1000000:
                 case 0x800000:
                     if (debug_battle_flag == 0) {
@@ -168,27 +139,27 @@ void seq_battleMain(BattleSeqWork* work) {
                     }
                     break;
             }
-            fbat = (FBatView*)fbatGetPointer();
-            fbat->waitCount = 0;
+            fbat = fbatGetPointer();
+            fbat->battleWait = 0;
             work->state++;
         case 3: {
             BOOL wait;
-            fbat = (FBatView*)fbatGetPointer();
+            fbat = fbatGetPointer();
             stage = fbat->target->battleInfo.stageData;
             pouch = pouchGetPtr();
-            if (fbat->fsEnabled != 0) {
+            if (fbat->firstStrike.enabled != 0) {
                 BOOL ok = TRUE;
-                switch (fbat->fsType) {
+                switch (fbat->firstStrike.type) {
                     case 1:
                     case 2:
-                        if (fbat->fs554 != 0) {
+                        if (fbat->firstStrike.hitKind != 0) {
                             ok = FALSE;
                         }
                         break;
                 }
                 if (ok == FALSE) {
-                    fbat->waitCount++;
-                    if (fbat->waitCount < 200) {
+                    fbat->battleWait++;
+                    if (fbat->battleWait < 200) {
                         wait = TRUE;
                         goto check;
                     }
@@ -266,13 +237,13 @@ void seq_battleMain(BattleSeqWork* work) {
 }
 
 BOOL battle_init(void) {
-    FBatView* fbat;
+    FieldBattleData* fbat;
     NpcEntry* npc;
     PouchData* pouch;
     FieldBattleInfo* info;
-    PartyView* party;
+    PartyEntry* party;
 
-    fbat = (FBatView*)fbatGetPointer();
+    fbat = fbatGetPointer();
     npc = fbat->target;
     pouch = pouchGetPtr();
     camSetMode(4, 2);
@@ -301,16 +272,16 @@ BOOL battle_init(void) {
     BattleInformationSetMode(info, 0);
     party = partyGetPtr(marioGetPartyId());
     if (party) {
-        s32 id = party->id;
+        s32 id = party->currentMemberId;
         BattleUnitType kind = BattleTransPartyIdToUnitKind(id);
         if (!(pouch->partyData[id].flags & 2)) {
             BattleInformationSetParty(info, kind);
         }
     }
-    if (fbat->flags1C & 1) {
+    if (fbat->firstAttackFlags & 1) {
         BattleInformationSetFirstAttack(info, 0);
     } else {
-        switch (fbat->flags) {
+        switch (fbat->hitKind) {
             case 0x20000:
                 BattleInformationSetFirstAttack(info, 1);
                 break;
@@ -336,7 +307,7 @@ BOOL battle_init(void) {
                 BattleInformationSetFirstAttack(info, 8);
                 break;
             case 0x10000000:
-                BattleInformationSetFirstAttack(info, fbat->partner);
+                BattleInformationSetFirstAttack(info, fbat->firstAttackParam);
                 break;
             default:
                 BattleInformationSetFirstAttack(info, 0);
@@ -352,7 +323,7 @@ BOOL battle_init(void) {
 }
 
 void battle_exit(void) {
-    LightView* light;
+    LightEntry* light;
     Mtx mtx;
 
     BattleEnd();
@@ -390,9 +361,9 @@ void battle_exit(void) {
     L_psndBGM_stop();
     psndClearFlag(0x80);
     light = lightGetPaperCraft();
-    { Vec v = {-200.0f, 100.0f, 100.0f}; light->pos = v; }
+    { Vec v = {-200.0f, 100.0f, 100.0f}; light->position = v; }
     PSMTXScale(mtx, 3.0f, 3.0f, 3.0f);
-    PSMTXMultVec(mtx, &light->pos, &light->pos);
+    PSMTXMultVec(mtx, &light->position, &light->position);
     if (evtGetValue(NULL, GSW0) >= 109 && evtGetValue(NULL, GSW0) < 111) {
         psndBGMOn_f(0x120, 0, 0x2EE, 1);
     } else if (evtGetValue(NULL, GSW0) != 402 && seqGetNextSeq() != 5) {

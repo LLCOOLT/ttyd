@@ -316,12 +316,12 @@ typedef struct BattleDataEntry {
 
 // TODO: move/rename?
 typedef struct BattleUnitDefense {
-    u8 defenses[5]; // 0x0
+    s8 defenses[5]; // 0x0
 } BattleUnitDefense;
 
 // TODO: move/rename?
 typedef struct BattleUnitDefenseAttr {
-    u8 defenseAttrs[5]; // 0x0
+    s8 defenseAttrs[5]; // 0x0
 } BattleUnitDefenseAttr;
 
 typedef struct StatusVulnerability {
@@ -424,12 +424,12 @@ typedef struct BattleWorkUnitPartBlurEntry {
     Mtx orientation; // 0x4
     f32 rotation;    // 0x34
     GXColor base;    // 0x38
-    s8 blurColor[8]; // 0x3C, TODO: blur?
+    GXColor blurColor[2]; // 0x3C, newest / oldest after-image tint (copied from BattleWorkUnitPartBlur.color)
 } BattleWorkUnitPartBlurEntry;
 
 typedef struct BattleWorkUnitPartBlur {
     s32 flags;                            // 0x0
-    s8 color[8];                          // 0x4
+    GXColor color[2];                     // 0x4, after-image tint, newest / oldest (btlevtcmd_SetPartsBlur)
     BattleWorkUnitPartBlurEntry work[10]; // 0xC
 } BattleWorkUnitPartBlur;
 
@@ -573,6 +573,10 @@ typedef struct StChgInfo {
     s32 changed;     // 0x8, 1: strength changed / newly inflicted (selects msg1)
 } StChgInfo;                  // status-change message queue entry
 
+typedef struct BtlStatusCopy {
+    u8 data[0x1E]; // BattleUnit status turns/strengths from mSleepTurns, copied as one block
+} BtlStatusCopy;
+
 typedef struct BattleUnit {
     s32 unitId;                                  // 0x0
     BattleUnitType initialKind;                  // 0x4
@@ -625,36 +629,41 @@ typedef struct BattleUnit {
     s16 baseMaxFp;                               // 0x110
     s16 currentFp;                               // 0x112
     f32 mSizeMultiplier;                         // 0x114
-    s8 mSleepTurns;                              // 0x118
-    s8 mSleepStrength;                           // 0x119
-    s8 mStopTurns;                               // 0x11A
-    s8 mDizzyTurns;                              // 0x11B
-    s8 mPoisonTurns;                             // 0x11C
-    s8 mPoisonStrength;                          // 0x11D
-    s8 mConfusionTurns;                          // 0x11E
-    s8 mElectricTurns;                           // 0x11F
-    s8 mDodgyTurns;                              // 0x120
-    s8 mBurnTurns;                               // 0x121
-    s8 mFreezeTurns;                             // 0x122
-    s8 mSizeChangeTurns;                         // 0x123
-    s8 mSizeChangeStrength;                      // 0x124
-    s8 mAtkChangeTurns;                          // 0x125
-    s8 mAtkChangeStrength;                       // 0x126
-    s8 mDefChangeTurns;                          // 0x127
-    s8 mDefChangeStrength;                       // 0x128
-    s8 mChargeStrength;                          // 0x129
-    s8 mAllergicTurns;                           // 0x12A
-    s8 flippedTurns;                             // 0x12B, turn count left until flipping back
-    s8 mInvisibleTurns;                          // 0x12C
-    s8 mPaybackTurns;                            // 0x12D
-    s8 mHoldFastTurns;                           // 0x12E
-    s8 mFastTurns;                               // 0x12F
-    s8 mSlowTurns;                               // 0x130
-    s8 mHpRegenTurns;                            // 0x131
-    s8 mHpRegenStrength;                         // 0x132
-    s8 mFpRegenTurns;                            // 0x133
-    s8 mFpRegenStrength;                         // 0x134
-    s8 mInstantKillStrength;                     // 0x135
+    union {
+        struct {
+            s8 mSleepTurns;                              // 0x118
+            s8 mSleepStrength;                           // 0x119
+            s8 mStopTurns;                               // 0x11A
+            s8 mDizzyTurns;                              // 0x11B
+            s8 mPoisonTurns;                             // 0x11C
+            s8 mPoisonStrength;                          // 0x11D
+            s8 mConfusionTurns;                          // 0x11E
+            s8 mElectricTurns;                           // 0x11F
+            s8 mDodgyTurns;                              // 0x120
+            s8 mBurnTurns;                               // 0x121
+            s8 mFreezeTurns;                             // 0x122
+            s8 mSizeChangeTurns;                         // 0x123
+            s8 mSizeChangeStrength;                      // 0x124
+            s8 mAtkChangeTurns;                          // 0x125
+            s8 mAtkChangeStrength;                       // 0x126
+            s8 mDefChangeTurns;                          // 0x127
+            s8 mDefChangeStrength;                       // 0x128
+            s8 mChargeStrength;                          // 0x129
+            s8 mAllergicTurns;                           // 0x12A
+            s8 flippedTurns;                             // 0x12B, turn count left until flipping back
+            s8 mInvisibleTurns;                          // 0x12C
+            s8 mPaybackTurns;                            // 0x12D
+            s8 mHoldFastTurns;                           // 0x12E
+            s8 mFastTurns;                               // 0x12F
+            s8 mSlowTurns;                               // 0x130
+            s8 mHpRegenTurns;                            // 0x131
+            s8 mHpRegenStrength;                         // 0x132
+            s8 mFpRegenTurns;                            // 0x133
+            s8 mFpRegenStrength;                         // 0x134
+            s8 mInstantKillStrength;                     // 0x135
+        };
+        BtlStatusCopy statusTurns;                // 0x118, the 0x1E status bytes as one block (party info save/restore)
+    };
     u8 pad_136[2];                               // 0x136, never accessed
     s32 mStatusFlags;                            // 0x138
 #ifdef VERSION_G8ME01
@@ -679,7 +688,10 @@ typedef struct BattleUnit {
     u8 pad_1A4[0x1C0 - 0x1A4];                   // 0x1A4 (US 0x1A8), never accessed
     BtlPoseSoundTable moveSndTable;              // 0x1C0 (US 0x1C4), jump names + run/walk/dive entries (btlevtcmd_SetJump/Run/Walk/DiveSound)
     BattleWorkHpGauge hpGauge;                   // 0x1F8
-    s32 work[16];                                // 0x214
+    union {
+        s32 work[16];                            // 0x214, unit work words (btlevtcmd_SetUnitWork / GetUnitWork)
+        f32 workf[16];                           // 0x214, the same words as floats (btlevtcmd_SetUnitWorkFloat / GetUnitWorkFloat)
+    };
     BattleUnitPart* currentTarget;           // 0x254
     s32 reserved_258;                            // 0x258 (US 0x25C), only cleared at turn start (battle_seq)
     s16 hpDamageCount;                           // 0x25C, number of damaging moves
@@ -718,7 +730,10 @@ typedef struct BattleUnit {
     s32 talkPartId;                                  // 0x2D0 (US 0x2D4)
     const char* talkPose;                        // 0x2D4 (US 0x2D8), pose type 0x41 (btlevtcmd talk anim)
     const char* stayPose;                        // 0x2D8 (US 0x2DC), pose type 0x2B
-    BattleWorkUnitBadgesEquipped badgesEquipped; // 0x2DC
+    union {
+        BattleWorkUnitBadgesEquipped badgesEquipped; // 0x2DC
+        u8 badgeCounts[sizeof(BattleWorkUnitBadgesEquipped)]; // 0x2DC, the same 40 counters by index
+    };
     ItemType heldItem;                           // 0x304, 4 bytes
     ItemDropData* dropTable;                     // 0x308
     u8 stolenCoins;                              // 0x30C, coins a Bandit (borodo) stole; dropped back as its held coin item
@@ -734,8 +749,8 @@ typedef struct BattleUnit {
     EffectEntry* iceEff;                         // 0x328
     EffectEntry* sparkEff;                       // 0x32C
     struct IconEntry* kageIcon;                  // 0x330, BSE_Kagegakure
-    s16 mBurnDamageFlameState;                   // 0x334
-    s16 mbBurnDamageFlameActive;                 // 0x336
+    u16 mBurnDamageFlameState;                   // 0x334
+    u16 mbBurnDamageFlameActive;                 // 0x336
     s32 mBurnDamageFlameAnimTimer;               // 0x338
     f32 mBurnDamageFlameScale;                   // 0x33C
     EffectEntry* mBurnDamageFlameEff;            // 0x340

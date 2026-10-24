@@ -137,9 +137,9 @@ void BattleStageMain(void) {
 		if (l->flags & 1) {
 			if (l->colorTime > 0) {
 				l->colorTime--;
-				l->color.r = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->colorMode, l->colorStart.r, l->colorTarget.r, l->colorMax - l->colorTime, l->colorMax);
-				l->color.g = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->colorMode, l->colorStart.g, l->colorTarget.g, l->colorMax - l->colorTime, l->colorMax);
-				l->color.b = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->colorMode, l->colorStart.b, l->colorTarget.b, l->colorMax - l->colorTime, l->colorMax);
+				l->color.r = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->colorMode, l->colorStart.r, l->colorTarget.r, l->colorMax - l->colorTime, l->colorMax);
+				l->color.g = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->colorMode, l->colorStart.g, l->colorTarget.g, l->colorMax - l->colorTime, l->colorMax);
+				l->color.b = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->colorMode, l->colorStart.b, l->colorTarget.b, l->colorMax - l->colorTime, l->colorMax);
 				if ((l->flags & 2) && l->color.r == 0 && l->color.g == 0 && l->color.b == 0) {
 					l->flags = 0;
 					continue;
@@ -147,13 +147,13 @@ void BattleStageMain(void) {
 			}
 			if (l->widthTime > 0) {
 				l->widthTime--;
-				l->width = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->widthMode, l->widthStart, l->widthTarget, l->widthMax - l->widthTime, l->widthMax);
+				l->width = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->widthMode, l->widthStart, l->widthTarget, l->widthMax - l->widthTime, l->widthMax);
 			}
 			if (l->posTime > 0) {
 				l->posTime--;
-				l->pos.x = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->posMode, l->posStart.x, l->posTarget.x, l->posMax - l->posTime, l->posMax);
-				l->pos.y = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->posMode, l->posStart.y, l->posTarget.y, l->posMax - l->posTime, l->posMax);
-				l->pos.z = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->posMode, l->posStart.z, l->posTarget.z, l->posMax - l->posTime, l->posMax);
+				l->pos.x = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->posMode, l->posStart.x, l->posTarget.x, l->posMax - l->posTime, l->posMax);
+				l->pos.y = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->posMode, l->posStart.y, l->posTarget.y, l->posMax - l->posTime, l->posMax);
+				l->pos.z = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->posMode, l->posStart.z, l->posTarget.z, l->posMax - l->posTime, l->posMax);
 			}
 			if (l->flags & 4) {
 				sp = l->data;
@@ -171,9 +171,9 @@ void BattleStageMain(void) {
 			} else {
 				if (l->targetTime > 0) {
 					l->targetTime--;
-					l->target.x = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->targetMode, l->targetStart.x, l->targetTarget.x, l->targetMax - l->targetTime, l->targetMax);
-					l->target.y = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->targetMode, l->targetStart.y, l->targetTarget.y, l->targetMax - l->targetTime, l->targetMax);
-					l->target.z = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->targetMode, l->targetStart.z, l->targetTarget.z, l->targetMax - l->targetTime, l->targetMax);
+					l->target.x = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->targetMode, l->targetStart.x, l->targetTarget.x, l->targetMax - l->targetTime, l->targetMax);
+					l->target.y = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->targetMode, l->targetStart.y, l->targetTarget.y, l->targetMax - l->targetTime, l->targetMax);
+					l->target.z = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->targetMode, l->targetStart.z, l->targetTarget.z, l->targetMax - l->targetTime, l->targetMax);
 				}
 				if (l->data != NULL) {
 					STG_FREE(l->data);
@@ -182,9 +182,9 @@ void BattleStageMain(void) {
 			}
 			if (l->upTime > 0) {
 				l->upTime--;
-				l->up.x = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->upMode, l->upStart.x, l->upTarget.x, l->upMax - l->upTime, l->upMax);
-				l->up.y = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->upMode, l->upStart.y, l->upTarget.y, l->upMax - l->upTime, l->upMax);
-				l->up.z = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&l->upMode, l->upStart.z, l->upTarget.z, l->upMax - l->upTime, l->upMax);
+				l->up.x = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->upMode, l->upStart.x, l->upTarget.x, l->upMax - l->upTime, l->upMax);
+				l->up.y = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->upMode, l->upStart.y, l->upTarget.y, l->upMax - l->upTime, l->upMax);
+				l->up.z = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(l->upMode, l->upStart.z, l->upTarget.z, l->upMax - l->upTime, l->upMax);
 			}
 		} else {
 			if (l->data != NULL) {
@@ -195,19 +195,19 @@ void BattleStageMain(void) {
 	}
 	if (s->stgDark.time > 0) {
 		s->stgDark.time--;
-		s->stgDark.cur = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&s->stgDark.mode, s->stgDark.start, s->stgDark.target, s->stgDark.max - s->stgDark.time, s->stgDark.max);
+		s->stgDark.cur = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(s->stgDark.mode, s->stgDark.start, s->stgDark.target, s->stgDark.max - s->stgDark.time, s->stgDark.max);
 	}
 	if (s->stgDark.baseTime > 0) {
 		s->stgDark.baseTime--;
-		s->stgDark.base = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&s->stgDark.baseMode, s->stgDark.baseStart, s->stgDark.baseTarget, s->stgDark.baseMax - s->stgDark.baseTime, s->stgDark.baseMax);
+		s->stgDark.base = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(s->stgDark.baseMode, s->stgDark.baseStart, s->stgDark.baseTarget, s->stgDark.baseMax - s->stgDark.baseTime, s->stgDark.baseMax);
 	}
 	if (s->audDark.time > 0) {
 		s->audDark.time--;
-		s->audDark.cur = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&s->audDark.mode, s->audDark.start, s->audDark.target, s->audDark.max - s->audDark.time, s->audDark.max);
+		s->audDark.cur = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(s->audDark.mode, s->audDark.start, s->audDark.target, s->audDark.max - s->audDark.time, s->audDark.max);
 	}
 	if (s->audDark.baseTime > 0) {
 		s->audDark.baseTime--;
-		s->audDark.base = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(*(s8*)&s->audDark.baseMode, s->audDark.baseStart, s->audDark.baseTarget, s->audDark.baseMax - s->audDark.baseTime, s->audDark.baseMax);
+		s->audDark.base = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(s->audDark.baseMode, s->audDark.baseStart, s->audDark.baseTarget, s->audDark.baseMax - s->audDark.baseTime, s->audDark.baseMax);
 	}
 }
 
@@ -616,7 +616,7 @@ void batSpotInit(void) {
 		entry->pos = (Vec){50.0f * i + -100.0f, 0.0f, -50.0f};
 		entry->rot = (Vec){0.0f, 0.0f, 0.0f};
 		entry->scale = (Vec){20.0f, 20.0f, 150.0f};
-		*(GXColor*)&entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
+		entry->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	}
 }
 #pragma dont_inline reset
@@ -683,7 +683,7 @@ void batSpotDisp(CameraId camId, void* param) {
 			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 			GXSetBlendMode(GX_BM_BLEND, GX_BL_DSTALPHA, GX_BL_INVDSTALPHA, GX_LO_CLEAR);
 			GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_CLAMP, GX_AF_NONE);
-			GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&e->color);
+			GXSetChanMatColor(GX_COLOR0A0, e->color);
 			drawCone(camId, e);
 		}
 	}
@@ -711,7 +711,7 @@ void drawCone(CameraId camId, BattleSpotEntry* e) {
 	GXSetCurrentMtx(GX_PNMTX0);
 	GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, 32);
 	GXPosition3f32(0.0f, 0.0f, 0.0f);
-	GXColor4u8(0, 0, 0, ((GXColor*)&e->color)->a);
+	GXColor4u8(0, 0, 0, e->color.a);
 	for (i = 0; i < 31; i++) {
 		if (i == 30) {
 			a = 0.0f;
@@ -721,7 +721,7 @@ void drawCone(CameraId camId, BattleSpotEntry* e) {
 		s = (f32)sin(a);
 		c = (f32)cos(a);
 		GXPosition3f32(c, s, -1.0f);
-		GXColor4u8(0, 0, 0, ((GXColor*)&e->color)->a / 3);
+		GXColor4u8(0, 0, 0, e->color.a / 3);
 	}
 }
 #pragma dont_inline reset
@@ -740,7 +740,7 @@ BattleSpotEntry* batSpotEntry(void) {
 	entry->pos = (Vec){0.0, 0.0, 0.0};
 	entry->scale = (Vec){1.0, 1.0, 1.0};
 	entry->rot = (Vec){0.0, 0.0, 0.0};
-	*(GXColor*)&entry->color = (GXColor){0, 0, 0, 0};
+	entry->color = (GXColor){0, 0, 0, 0};
 	entry->flags |= 1;
 
 	return entry;
@@ -786,14 +786,7 @@ USER_FUNC(tou_gamen_screen_tev_init) {
 	return 2;
 }
 
-typedef struct TevCbWork {
-	u8 pad_0[0xC];
-	s32 field_C;
-	s32 field_10;
-	s32 field_14;
-} TevCbWork;
-
-void tou_gamen_screen_tev(TevCbWork* p) {
+void tou_gamen_screen_tev(MapTevCallbackInfo* p) {
 	GXTexObj obj;
 	Mtx m;
 	Mtx m1;
@@ -883,8 +876,8 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 	PSMTXScale(m, 1.0f, 16.0f + 6.0f * ((100.0f - camf[5]) / 1000.0f), 1.0f);
 	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
 	GXLoadTexMtxImm(m, GX_TEXMTX1, GX_MTX2x4);
-	p->field_C = 2;
-	p->field_14 = 2;
-	p->field_10 = 2;
+	p->tevStage = 2;
+	p->texMap = 2;
+	p->texCoord = 2;
 }
 

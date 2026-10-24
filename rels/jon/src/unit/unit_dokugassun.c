@@ -1,3 +1,4 @@
+#include "eff/n64/eff_vapor_n64.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -16,7 +17,6 @@
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
 
-EffectEntry* effVaporN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 delay);
 
 USER_FUNC(btlevtcmd_CheckPartsCounterAttribute);
 USER_FUNC(btlevtcmd_EnemyItemUseCheck);
@@ -611,22 +611,22 @@ static USER_FUNC(eff_poison_barrier) {
 
     for (i = 0; i < 3; i++) {
         EffectEntry* eff;
-        s32* wk;
+        EffVaporN64Work* wk;
 
         BtlUnit_GetPos(unit, &x, &y, &z);
         x += irand(20) - 10;
         y += irand(30);
-        eff = effVaporN64Entry(2, x, y, z, 0.5f + 0.5f * rand() / 32767.0f, (i + 1) * 10);
+        eff = effVaporN64Entry(2, (i + 1) * 10, x, y, z, 0.5f + 0.5f * rand() / 32767.0f);
         wk = eff->userdata;
-        wk[6] = 32;
-        wk[7] = 115;
-        wk[8] = 100;
-        wk[9] = 255;
-        wk[10] = 32;
-        wk[11] = 115;
-        wk[12] = 100;
-        wk[13] = 255;
-        ((f32*)wk)[16] = unit->mSizeMultiplier;
+        wk->r1 = 32;
+        wk->g1 = 115;
+        wk->b1 = 100;
+        wk->alpha = 255;
+        wk->r2 = 32;
+        wk->g2 = 115;
+        wk->b2 = 100;
+        wk->a2 = 255;
+        wk->scale = unit->mSizeMultiplier;
     }
     return EVT_RETURN_DONE;
 }
@@ -636,7 +636,7 @@ static USER_FUNC(eff_poison_breath) {
     f32 y;
     f32 z;
     EffectEntry* eff;
-    s32* wk;
+    EffVaporN64Work* wk;
 
     if (evtGetValue(event, event->args[0]) == 0) {
         x = -125.0f;
@@ -646,16 +646,16 @@ static USER_FUNC(eff_poison_breath) {
     x += irand(150) - 75;
     y = irand(70);
     z = irand(80) - 40;
-    eff = effVaporN64Entry(0, x, y, z, 2.5f + rand() / 32767.0f, 15);
+    eff = effVaporN64Entry(0, 15, x, y, z, 2.5f + rand() / 32767.0f);
     wk = eff->userdata;
-    wk[6] = 32;
-    wk[7] = 115;
-    wk[8] = 100;
-    wk[9] = 255;
-    wk[10] = 32;
-    wk[11] = 115;
-    wk[12] = 100;
-    wk[13] = 255;
+    wk->r1 = 32;
+    wk->g1 = 115;
+    wk->b1 = 100;
+    wk->alpha = 255;
+    wk->r2 = 32;
+    wk->g2 = 115;
+    wk->b2 = 100;
+    wk->a2 = 255;
     return EVT_RETURN_DONE;
 }
 

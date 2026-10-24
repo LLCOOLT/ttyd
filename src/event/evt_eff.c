@@ -135,7 +135,8 @@
 #include "eff/eff_gonbaba_breath.h"
 #include "eff/eff_majinai.h"
 #include "mario/mario_party.h"
-#include "manager/evtmgr_cmd.h"
+#include "manager/evtmgr_cmd.h"
+
 #include "party.h"
 
 extern EffectEntry* effFlowerN64Entry(s32, s32, f32, f32, f32);
@@ -234,9 +235,9 @@ USER_FUNC(evt_eff) {
 			break;
 		case 13:
 			entry = effBreathFireEntry(int2, int9, int10, int11, float3, float4, float5, float6, float7, float8);
-			((f32*)entry->userdata)[14] = float12;
-			((f32*)entry->userdata)[12] = float12;
-			((f32*)entry->userdata)[13] = float13;
+			((EffBreathFireN64Work*)entry->userdata)->scale = float12;
+			((EffBreathFireN64Work*)entry->userdata)->unk30 = float12;
+			((EffBreathFireN64Work*)entry->userdata)->unk34 = float13;
 			break;
 		case 4:
 			entry = effHitEntry(int2, int7, float3, float4, float5, float6);
@@ -592,7 +593,7 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
       break;
 
     case 32:
-      effect = effSweatN64Entry(int2, int8, float3, float4, float5, float6, float7);
+      effect = effSweatN64Entry(int2, float3, float4, float5, float6, float7, int8);
       break;
 
     case 33:

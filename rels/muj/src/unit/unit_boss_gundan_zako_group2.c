@@ -13,6 +13,7 @@ f32 intplGetValue(f32 start, f32 end, s32 mode, s32 cur, s32 steps);
 s32 irand(s32 scalar);
 #include "dolphin/mtx.h"
 #include "battle/battle_database_common.h"
+#include "driver/extdrv.h"
 
 typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; u8 field_0x58[0x64 - 0x58]; Vec rot; } ZakoGun;
 #ifdef VERSION_G8ME01
@@ -25,13 +26,11 @@ typedef struct ZakoGunWork { s32 flag; s32 targetId; Vec targetPos; u8 field_0x1
 #else
 typedef struct ZakoGunWork { s32 flag; s32 targetId; u8 field_0x8[ZAKOGUNWORK_PAD - 0x8]; Vec start; Vec end; s32 timer; s32 steps; s32 count; s32 sfx; } ZakoGunWork;
 #endif
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 extern ZakoGun* zakogun;
 extern ZakoGunWork* work;
 s32 psndSFXOn(const char* name);
 void psndSFXOff(s32 id);
-ExtPose* extGetPosePtr(void);
-void zakogun_ext_init123_common(ExtPose* pose, s32 i);
+void zakogun_ext_init123_common(ExtdrvPose* pose, s32 i);
 BattleUnit* zakogun_get_ptr(void);
 void zakogun_set_pose(ZakoGun* zako, s32 base, s32 num, s32 div);
 int rand(void);
@@ -594,7 +593,7 @@ USER_FUNC(shake_ceil) {
 
 USER_FUNC(zakogun_ext_init2) {
     s32 i;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
 
     work->flag = 1;
     for (i = 0; i < 25; i++, pose++) {
@@ -606,7 +605,7 @@ USER_FUNC(zakogun_ext_init2) {
 void zakogun_ext_main2(void) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit = zakogun_get_ptr();
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     BattleStageObject* body;
     s32 i;
     ZakoGun* zako;
@@ -625,7 +624,7 @@ void zakogun_ext_main2(void) {
     se3 = "SFX_BOSS_TEAM_3RD_ATTACK2";
     for (i = 0; i < 25; i++, pose++) {
         zako = &zakogun[i];
-        pose->frame = zako->poseBase + zako->poseCount / zako->poseDiv;
+        pose->texId = zako->poseBase + zako->poseCount / zako->poseDiv;
         zako->poseCount++;
         if (zako->poseCount >= zako->poseNum * zako->poseDiv) {
             zako->poseCount = 0;
@@ -871,14 +870,14 @@ void zakogun_ext_main2(void) {
                 zako->state = -1;
                 break;
         }
-        PSMTXIdentity(pose->mtx);
+        PSMTXIdentity(*pose->mtx);
         PSMTXRotRad(m, 'x', zako->rot.x * 0.017453292f);
-        PSMTXConcat(pose->mtx, m, pose->mtx);
+        PSMTXConcat(*pose->mtx, m, *pose->mtx);
         PSMTXRotRad(m, 'y', zako->rot.y * 0.017453292f);
-        PSMTXConcat(pose->mtx, m, pose->mtx);
-        pose->mtx[0][3] = zako->pos.x;
-        pose->mtx[1][3] = zako->pos.y;
-        pose->mtx[2][3] = zako->pos.z + i * 0.25f;
+        PSMTXConcat(*pose->mtx, m, *pose->mtx);
+        (*pose->mtx)[0][3] = zako->pos.x;
+        (*pose->mtx)[1][3] = zako->pos.y;
+        (*pose->mtx)[2][3] = zako->pos.z + i * 0.25f;
     }
 }
 

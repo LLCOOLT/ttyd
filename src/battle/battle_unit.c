@@ -1587,7 +1587,7 @@ void BtlUnit_SetParamFromPouch(BattleUnit* unit) {
         info = &wp->partyInfo[unit->currentKind - TYPE_PARTNER_MIN];
         unit->mSizeMultiplier = info->sizeMultiplier;
         unit->mStatusFlags = info->statusFlags;
-        *(BtlStatusCopy*)&unit->mSleepTurns = info->statusTurns;
+        unit->statusTurns = info->statusTurns;
 #ifdef VERSION_G8ME01
         unit->usCommandDisabled[0] = info->usCommandDisabled[0];
         unit->usCommandDisabled[1] = info->usCommandDisabled[1];
@@ -1646,11 +1646,11 @@ void BtlUnit_SetParamToPouch(BattleUnit* unit) {
     }
     else if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
         s32 id = BattleTransPartyId(unit->currentKind);
-        *(s16*)((u8*)pouch + id * 0xE + 6) = unit->currentHp;
+        *(s16*)((u8*)pouch + id * sizeof(PouchPartyData) + offsetof(PouchPartyData, currentHP)) = unit->currentHp; // FAKE: byte-offset store so the field offset folds into the index (mulli/addi/sthx), as in the target
         info = &wp->partyInfo[unit->currentKind - TYPE_PARTNER_MIN];
         info->sizeMultiplier = unit->mSizeMultiplier;
         info->statusFlags = unit->mStatusFlags;
-        info->statusTurns = *(BtlStatusCopy*)&unit->mSleepTurns;
+        info->statusTurns = unit->statusTurns;
 #ifdef VERSION_G8ME01
         info->usCommandDisabled[0] = unit->usCommandDisabled[0];
         info->usCommandDisabled[1] = unit->usCommandDisabled[1];

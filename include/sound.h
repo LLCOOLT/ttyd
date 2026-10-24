@@ -185,6 +185,8 @@ typedef struct SoundWork {
     u32 sampleIndex;           // 0x15C0
 } SoundWork;
 
+extern SoundWork sound;
+
 void SoundInit(void);
 void SoundMain(void);
 void SoundMainInt(void);

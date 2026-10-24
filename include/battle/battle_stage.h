@@ -10,7 +10,7 @@ typedef struct BattleSpotEntry {
 	Vec pos; // 0x4, cone position
 	Vec rot; // 0x10, cone rotation, degrees
 	Vec scale; // 0x1C, cone scale
-	s32 color; // 0x28, GXColor (cast), alpha drives the cone
+	GXColor color; // 0x28, alpha drives the cone
 } BattleSpotEntry;
 
 typedef struct BattleSpotWork {
@@ -48,31 +48,31 @@ typedef struct StageLight {
 	GXColor colorTarget;    // 0x2C
 	s32 colorTime;          // 0x30
 	s32 colorMax;           // 0x34
-	u8 colorMode;           // 0x38
+	s8 colorMode;           // 0x38
 	f32 width;              // 0x3C
 	f32 widthStart;         // 0x40
 	f32 widthTarget;        // 0x44
 	s32 widthTime;          // 0x48
 	s32 widthMax;           // 0x4C
-	u8 widthMode;           // 0x50
+	s8 widthMode;           // 0x50
 	Vec pos;                // 0x54
 	Vec posStart;           // 0x60
 	Vec posTarget;          // 0x6C
 	s32 posTime;            // 0x78
 	s32 posMax;             // 0x7C
-	u8 posMode;             // 0x80
+	s8 posMode;             // 0x80
 	Vec target;             // 0x84
 	Vec targetStart;        // 0x90
 	Vec targetTarget;       // 0x9C
 	s32 targetTime;         // 0xA8
 	s32 targetMax;          // 0xAC
-	u8 targetMode;          // 0xB0
+	s8 targetMode;          // 0xB0
 	Vec up;                 // 0xB4
 	Vec upStart;            // 0xC0
 	Vec upTarget;           // 0xCC
 	s32 upTime;             // 0xD8
 	s32 upMax;              // 0xDC
-	u8 upMode;              // 0xE0
+	s8 upMode;              // 0xE0
 	void* data;             // 0xE4
 } StageLight;
 
@@ -89,8 +89,8 @@ typedef struct StageDark {
 	s32 baseTime;   // 0x10
 	s32 max;        // 0x14
 	s32 baseMax;    // 0x18
-	u8 mode;        // 0x1C
-	u8 baseMode;    // 0x1D
+	s8 mode;        // 0x1C
+	s8 baseMode;    // 0x1D
 } StageDark;
 
 typedef struct BattleWorkStage {

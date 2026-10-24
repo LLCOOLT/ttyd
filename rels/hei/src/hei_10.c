@@ -26,6 +26,7 @@ void* _mapAlloc(u32 size);
 #else
 #include "memory.h"
 #endif
+#include "driver/extdrv.h"
 AnimationPose* animPoseGetAnimPosePtr(s32 poseId);
 f32 animPoseGetLoopTimes(s32 id);
 void dispEntry(CameraId camera, f32 order, s32 renderMode, DispCallback callback, void* param);
@@ -36,29 +37,14 @@ void *memset(void *dest, int ch, size_t count);
 NpcEntry* npcNameToPtr(const char* name);
 s32 psndSFXOn_3D(const char* name, Vec* position);
 
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct Chorobon { s16 flags; s16 state; s16 field_0x4; u8 field_0x6[2]; Vec target; f32 vy; s16 timer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[0x30 - 0x26]; } Chorobon;
 typedef struct ChorobonWork { s32 field_0x0; s32 count; Chorobon* chb; } ChorobonWork;
 static ChorobonWork* wp;
-ExtPose* extGetPosePtr(void);
-s32 extGetPoseNum(void);
 static f32 randf(f32 min, f32 max);
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
-void extLoadShadowMtx(Mtx mtx);
-void extLoadShadowRenderMode(void);
-void extLoadShadowVertex(void);
-void extLoadShadowTev(void);
-void extDrawShadow(void);
 static inline f32 chb_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a; a = a * y; a = -a; } return a; }
 static inline f32 chb_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a; } return a; }
-void chb_jump(ExtPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
+void chb_jump(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
 static void ext_disp(CameraId camera, void* param);
-void extReset(void);
 
 s32 evt_bero_get_info(EventEntry* event, BOOL isFirstCall);
 s32 evt_cam3d_event_from_road(EventEntry* event, BOOL isFirstCall);
@@ -97,7 +83,7 @@ s32 wait_anim_end(EventEntry* event, BOOL isFirstCall);
 s32 wait_anim_frame(EventEntry* event, BOOL isFirstCall);
 static void ext_dispent(void);
 static void ext_main(void);
-void chb_jump(ExtPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
+void chb_jump(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
 static void ext_shadow_disp(CameraId camera, void* param);
 static void ext_disp(CameraId camera, void* param);
 static void ext_init(void);
@@ -142,7 +128,7 @@ static f32 randf(f32 min, f32 max) {
 
 static void ext_init(void) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     Chorobon* chb;
 
     wp = _mapAlloc(sizeof(ChorobonWork));
@@ -154,10 +140,10 @@ static void ext_init(void) {
     chb = wp->chb;
     for (i = 0; i < wp->count; i++, pose++, chb++) {
         pose->flags |= 7;
-        PSMTXIdentity(pose->mtx);
-        pose->mtx[0][3] = randf(-230.0f, 230.0f);
-        pose->mtx[1][3] = -15.0f;
-        pose->mtx[2][3] = randf(-100.0f, 100.0f);
+        PSMTXIdentity(*pose->mtx);
+        (*pose->mtx)[0][3] = randf(-230.0f, 230.0f);
+        (*pose->mtx)[1][3] = -15.0f;
+        (*pose->mtx)[2][3] = randf(-100.0f, 100.0f);
         chb->flags = 0;
         chb->state = 0;
         chb->field_0x4 = 0;
@@ -292,7 +278,7 @@ static void ext_shadow_disp(CameraId camera, void* param) {
     extDrawShadow();
 }
 
-void chb_jump(ExtPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
+void chb_jump(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
     f32 dy;
     f32 dist;
     f32 angle;
@@ -300,24 +286,24 @@ void chb_jump(ExtPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 s
     chb->target = (Vec){x, y, z};
     chb->speed = speed;
     chb->gravity = gravity;
-    dy = chb->target.y - pose->mtx[1][3];
-    dist = distABf(pose->mtx[0][3], pose->mtx[2][3], chb->target.x, chb->target.z);
-    angle = angleABf(pose->mtx[0][3], pose->mtx[2][3], chb->target.x, chb->target.z);
+    dy = chb->target.y - (*pose->mtx)[1][3];
+    dist = distABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], chb->target.x, chb->target.z);
+    angle = angleABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], chb->target.x, chb->target.z);
     chb->timer = dist / chb->speed;
     chb->vy = dy / chb->timer + chb->gravity * chb->timer / 2;
     chb->state = 100;
     chb->next = next;
 }
-static inline void jump(ExtPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 rs, f32 smin, f32 smax, f32 rg, f32 gmin, f32 gmax) { chb_jump(pose, chb, next, x, y, z, rs * (smax - smin) + smin, rg * (gmax - gmin) + gmin); } static inline void escape(ExtPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 rs, f32 smin, f32 smax, f32 rg, f32 gmin, f32 gmax) { chb_jump(pose, chb, next, x, y, z, 2.0f * (rs * (smax - smin) + smin), rg * (gmax - gmin) + gmin); }
+static inline void jump(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 rs, f32 smin, f32 smax, f32 rg, f32 gmin, f32 gmax) { chb_jump(pose, chb, next, x, y, z, rs * (smax - smin) + smin, rg * (gmax - gmin) + gmin); } static inline void escape(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 rs, f32 smin, f32 smax, f32 rg, f32 gmin, f32 gmax) { chb_jump(pose, chb, next, x, y, z, 2.0f * (rs * (smax - smin) + smin), rg * (gmax - gmin) + gmin); }
 #pragma push
 #pragma opt_lifetimes off
 #pragma opt_dead_assignments off
-static inline void jump_r(ExtPose* pose, Chorobon* chb, f32 x, f32 y, f32 z) {
+static inline void jump_r(ExtdrvPose* pose, Chorobon* chb, f32 x, f32 y, f32 z) {
     f32 rs = rand() / 32767.0f;
     f32 rg = rand01();
     jump(pose, chb, chb->state, x, y, z, rs, 0.3f, 0.5f, rg, 0.5f, 0.8f);
 }
-static inline void escape_r(ExtPose* pose, Chorobon* chb, f32 x, f32 y, f32 z) {
+static inline void escape_r(ExtdrvPose* pose, Chorobon* chb, f32 x, f32 y, f32 z) {
     f32 rs = rand() / 32767.0f;
     f32 rg = rand01();
     escape(pose, chb, chb->state, x, y, z, rs, 1.0f, 1.2f, rg, 0.8f, 0.8f);
@@ -326,7 +312,7 @@ static void ext_main(void) {
     MarioWork* mario = marioGetPtr();
     const char* sfx;
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     Chorobon* chb;
     f32 dist;
     f32 speed;
@@ -348,28 +334,28 @@ static void ext_main(void) {
                 dist = randf(4.0f, 7.0f);
                 {
                     f32 rad = 3.1415927f * randf_scale(x, 0.0f, 360.0f) / 180.0f;
-                    x = pose->mtx[0][3] + chb_sin(rad) * dist;
-                    y = pose->mtx[1][3];
-                    z = pose->mtx[2][3] - dist * chb_cos(rad);
+                    x = (*pose->mtx)[0][3] + chb_sin(rad) * dist;
+                    y = (*pose->mtx)[1][3];
+                    z = (*pose->mtx)[2][3] - dist * chb_cos(rad);
                 }
                 jump_r(pose, chb, x, y, z);
                 break;
             }
             case 1:
-                if (distABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]) < 800.0f) {
+                if (distABf(mario->position.x, mario->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]) < 800.0f) {
                     speed = rand() / 32767.0f;
-                    z = angleABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]);
+                    z = angleABf(mario->position.x, mario->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
                     z = z + randf_scale(speed, -45.0f, 45.0f);
                     dist = randf(15.0f, 20.0f);
                     {
                         f32 rad = 3.1415927f * z / 180.0f;
-                        x = pose->mtx[0][3] + chb_sin(rad) * dist;
-                        y = pose->mtx[1][3];
-                        z = pose->mtx[2][3] - dist * chb_cos(rad);
+                        x = (*pose->mtx)[0][3] + chb_sin(rad) * dist;
+                        y = (*pose->mtx)[1][3];
+                        z = (*pose->mtx)[2][3] - dist * chb_cos(rad);
                     }
                     escape_r(pose, chb, x, y, z);
                     if (rand() % 150 == 0) {
-                        pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+                        pos = (Vec){(*pose->mtx)[0][3], (*pose->mtx)[1][3], (*pose->mtx)[2][3]};
                         psndSFXOn_3D(sfx, &pos);
                     }
                 } else {
@@ -379,42 +365,42 @@ static void ext_main(void) {
             case 99:
                 break;
             case 100:
-                pose->mtx[1][3] += chb->vy;
+                (*pose->mtx)[1][3] += chb->vy;
                 chb->vy -= chb->gravity;
-                angle = angleABf(pose->mtx[0][3], pose->mtx[2][3], chb->target.x, chb->target.z);
+                angle = angleABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], chb->target.x, chb->target.z);
                 {
                     f32 rad = 3.1415927f * angle / 180.0f;
-                    pose->mtx[0][3] += chb->speed * chb_sin(rad);
-                    pose->mtx[2][3] += chb->speed * -chb_cos(rad);
+                    (*pose->mtx)[0][3] += chb->speed * chb_sin(rad);
+                    (*pose->mtx)[2][3] += chb->speed * -chb_cos(rad);
                 }
                 if (--chb->timer < 0) {
-                    pose->mtx[0][3] = chb->target.x;
-                    pose->mtx[1][3] = chb->target.y;
-                    pose->mtx[2][3] = chb->target.z;
+                    (*pose->mtx)[0][3] = chb->target.x;
+                    (*pose->mtx)[1][3] = chb->target.y;
+                    (*pose->mtx)[2][3] = chb->target.z;
                     chb->state = chb->next;
                 }
                 break;
         }
         switch (chb->state) {
             case 0:
-                if (pose->mtx[0][3] > 230.0f) {
-                    pose->mtx[0][3] = 230.0f;
+                if ((*pose->mtx)[0][3] > 230.0f) {
+                    (*pose->mtx)[0][3] = 230.0f;
                 }
-                if (pose->mtx[0][3] < -230.0f) {
-                    pose->mtx[0][3] = -230.0f;
+                if ((*pose->mtx)[0][3] < -230.0f) {
+                    (*pose->mtx)[0][3] = -230.0f;
                 }
-                if (pose->mtx[2][3] > 100.0f) {
-                    pose->mtx[2][3] = 100.0f;
+                if ((*pose->mtx)[2][3] > 100.0f) {
+                    (*pose->mtx)[2][3] = 100.0f;
                 }
-                if (pose->mtx[2][3] < -100.0f) {
-                    pose->mtx[2][3] = -100.0f;
+                if ((*pose->mtx)[2][3] < -100.0f) {
+                    (*pose->mtx)[2][3] = -100.0f;
                 }
                 break;
             case 1:
                 break;
         }
         if (gp->retraceCount & 1) {
-            pose->frame = (gp->retraceCount + i) % 20;
+            pose->texId = (gp->retraceCount + i) % 20;
         }
     }
 }
@@ -430,7 +416,7 @@ static void ext_dispent(void) {
 }
 
 s32 evt_chorobon_escape(EventEntry* event, BOOL isFirstCall) {
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     s32 i;
     Chorobon* chb = wp->chb;
 
@@ -442,7 +428,7 @@ s32 evt_chorobon_escape(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 evt_chorobon_wait(EventEntry* event, BOOL isFirstCall) {
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     Chorobon* chb = wp->chb;
     s32 i;
 

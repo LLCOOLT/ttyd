@@ -1,3 +1,4 @@
+#include "eff/n64/eff_kameki_tornade_n64.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -325,7 +326,7 @@ static USER_FUNC(tornade_alpha_func) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 alpha = evtGetFloat(event, args[1]);
 
-    ((f32*)effNameToPtr(name)->userdata)[0x148 / 4] = alpha;
+    ((EffKamekiTornadeN64Work*)effNameToPtr(name)->userdata)->alphaScale = alpha;
     return EVT_RETURN_DONE;
 }
 

@@ -17,26 +17,18 @@
 #include "rsh.h"
 #include "evt/evt_npc.h"
 #include "data_tables.h"
+#include "driver/extdrv.h"
 
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
 typedef struct Moamoa { u16 flags; s16 state; s16 timer; Vec pos; f32 angle; s16 pose; u64 startTime; } Moamoa;
 typedef struct MoamoaWork { s32 field_0x0; s32 count; Moamoa* moa; s32 numDefs; MoamoaPoseDef defs[32]; } MoamoaWork;
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
 static s32 wp_pad;
 static MoamoaWork* wp;
-ExtPose* extGetPosePtr(void);
-s32 extGetPoseNum(void);
 int rand(void);
 static f32 randf(f32 min, f32 max);
 static void moamoa_pose_init(void);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
 double sin(double x);
 double cos(double x);
 static void moamoa_pose_main(void);
@@ -289,7 +281,7 @@ static void moamoa_pose_main(void) {
     f32 t;
     u64 now;
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     Moamoa* moa;
     MoamoaPoseDef* def;
 
@@ -308,7 +300,7 @@ static void moamoa_pose_main(void) {
                 t = 1.0f;
             }
         }
-        pose->frame = def->start + (s32)((def->count - 1) * t);
+        pose->texId = def->start + (s32)((def->count - 1) * t);
     }
 }
 
@@ -338,7 +330,7 @@ static f32 randf(f32 min, f32 max) {
 
 void moamoa_init(void) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     Moamoa* moa;
     f32 x, y, z;
 
@@ -351,7 +343,7 @@ void moamoa_init(void) {
     pose = extGetPosePtr();
     moa = wp->moa;
     for (i = 0; i < wp->count; i++, pose++, moa++) {
-        PSMTXIdentity(pose->mtx);
+        PSMTXIdentity(*pose->mtx);
         pose->flags |= 5;
         moa->flags = 0;
         moa->state = 0;
@@ -387,19 +379,19 @@ void moamoa_init(void) {
                 pos.z = z - 100.0f;
                 moa->pos = pos;
             }
-            pose->mtx[0][3] = 0.0f;
-            pose->mtx[1][3] = -1000.0f;
-            pose->mtx[2][3] = 0.0f;
+            (*pose->mtx)[0][3] = 0.0f;
+            (*pose->mtx)[1][3] = -1000.0f;
+            (*pose->mtx)[2][3] = 0.0f;
             if (!(x < 185.0f)) {
                 if (x < 257.0f) {
                     Mtx m;
                     PSMTXRotRad(m, 'y', -0.7853982f);
-                    PSMTXConcat(pose->mtx, m, pose->mtx);
+                    PSMTXConcat(*pose->mtx, m, *pose->mtx);
                     moa->flags |= 1;
                 } else {
                     Mtx m;
                     PSMTXRotRad(m, 'y', 1.5707964f);
-                    PSMTXConcat(pose->mtx, m, pose->mtx);
+                    PSMTXConcat(*pose->mtx, m, *pose->mtx);
                     moa->flags |= 1;
                 }
             }
@@ -422,9 +414,9 @@ void moamoa_init(void) {
                 pos.z = z;
                 moa->pos = pos;
             }
-            pose->mtx[0][3] = 0.0f;
-            pose->mtx[1][3] = -1000.0f;
-            pose->mtx[2][3] = 0.0f;
+            (*pose->mtx)[0][3] = 0.0f;
+            (*pose->mtx)[1][3] = -1000.0f;
+            (*pose->mtx)[2][3] = 0.0f;
         }
     }
 }
@@ -440,7 +432,7 @@ static void ext_disp(CameraId camera, void* param) {
 
 void moamoa_main(void) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     Moamoa* moa;
     f32 r;
 
@@ -465,27 +457,27 @@ void moamoa_main(void) {
                 if (moa->timer < 20) {
                     if (!(moa->flags & 1)) {
                         r = intplGetValue(2, ++moa->timer, 20, 50.0f, 0.0f);
-                        pose->mtx[0][3] = moa->pos.x + r * (f32)sin(moa->angle);
-                        pose->mtx[1][3] = moa->pos.y - r * (f32)cos(moa->angle);
-                        pose->mtx[2][3] = moa->pos.z;
+                        (*pose->mtx)[0][3] = moa->pos.x + r * (f32)sin(moa->angle);
+                        (*pose->mtx)[1][3] = moa->pos.y - r * (f32)cos(moa->angle);
+                        (*pose->mtx)[2][3] = moa->pos.z;
                     } else {
                         r = intplGetValue(2, ++moa->timer, 20, 50.0f, 0.0f);
-                        pose->mtx[0][3] = moa->pos.x;
-                        pose->mtx[1][3] = moa->pos.y - r * (f32)cos(moa->angle);
-                        pose->mtx[2][3] = moa->pos.z;
+                        (*pose->mtx)[0][3] = moa->pos.x;
+                        (*pose->mtx)[1][3] = moa->pos.y - r * (f32)cos(moa->angle);
+                        (*pose->mtx)[2][3] = moa->pos.z;
                     }
                 } else {
                     moa->state++;
                 }
                 break;
             case 4:
-                pose->mtx[0][3] = moa->pos.x;
-                pose->mtx[1][3] = moa->pos.y;
-                pose->mtx[2][3] = moa->pos.z;
+                (*pose->mtx)[0][3] = moa->pos.x;
+                (*pose->mtx)[1][3] = moa->pos.y;
+                (*pose->mtx)[2][3] = moa->pos.z;
                 break;
         }
-        if (pose->mtx[2][3] > 45.0f) {
-            pose->mtx[2][3] = 45.0f;
+        if ((*pose->mtx)[2][3] > 45.0f) {
+            (*pose->mtx)[2][3] = 45.0f;
         }
     }
     moamoa_pose_main();
@@ -503,13 +495,13 @@ USER_FUNC(evt_moamoa_set_one) {
     f32 y = evtGetFloat(event, args[2]);
     f32 z = evtGetFloat(event, args[3]);
     Mtx m;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     moa = wp->moa;
     moa[idx].state = 3;
     moa[idx].pos = (Vec){x, y, z};
     if (!(moa[idx].flags & 1)) {
         PSMTXRotRad(m, 'y', 1.5707964f);
-        PSMTXConcat(pose[idx].mtx, m, pose[idx].mtx);
+        PSMTXConcat(*pose[idx].mtx, m, *pose[idx].mtx);
         moa[idx].flags |= 1;
     }
     return EVT_RETURN_DONE;

@@ -1,3 +1,4 @@
+#include "eff/n64/eff_shock_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -6,21 +7,6 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-typedef struct EffShockN64Work {
-    s32 type;     // 0x0
-    Vec position; // 0x4
-    s32 c10;      // 0x10
-    s32 c14;      // 0x14
-    s32 c18;      // 0x18
-    s32 life;     // 0x1c
-    s32 age;      // 0x20
-    f32 scale;    // 0x24
-    f32 offset;   // 0x28
-    f32 offset2;  // 0x2c
-    s32 col0[3];  // 0x30
-    s32 col1[3];  // 0x3c
-} EffShockN64Work;
 
 GXColor shock_zero_color0;
 GXColor shock_zero_color1;

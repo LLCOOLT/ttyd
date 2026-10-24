@@ -127,11 +127,11 @@ s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, s32 msg, s32 
 				break;
 			case 2:
 				win->tailMode = 7;
-				win->speakerPos = *(Vec*)&event->msgPos;
+				win->speakerPos = event->msgPosVec;
 				break;
 			case 3:
 				win->tailMode = 2;
-				win->speakerPos = *(Vec*)&event->msgPos;
+				win->speakerPos = event->msgPosVec;
 				break;
 		}
 		if (event->printWindowFlags & 0x80000000) {
@@ -462,7 +462,7 @@ USER_FUNC(evt_msg_toge) {
 	event->printWindowFlags |= v;
 	event->msgPos.x = evtGetFloat(event, args[1]);
 	event->msgPos.y = evtGetFloat(event, args[2]);
-	*(f32*)&event->msgPosZ = evtGetFloat(event, args[3]);
+	event->msgPosZf = evtGetFloat(event, args[3]);
 	return EVT_RETURN_DONE;
 }
 

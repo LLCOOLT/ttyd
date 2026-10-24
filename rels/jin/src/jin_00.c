@@ -29,7 +29,6 @@
 #include "mario/mario_pouch.h"
 
 int rand(void);
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct Teresa { Vec vel; f32 angle; Vec ofs; f32 field_0x1C; f32 field_0x20; Vec from; Vec to; s32 wait; u8 alpha; u8 seq; } Teresa;
 static Teresa* pTeresa;
 Vec g_vecRotCenter;
@@ -39,7 +38,6 @@ s32 g_nNumHuttobasu[1];
 s32 g_nNumHarituku[1];
 static s32 g_nNumEndProc[1];
 f32 g_fSpeed;
-ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
 static f32 randf(f32 min, f32 max);
 double sin(double x);
@@ -47,8 +45,8 @@ static inline f32 sinf(f32 x) { return sin(x); }
 f32 marioGetAngleKaitenHammer(void);
 static void computePos(Teresa* ter, Vec* out);
 s32 computeAlpha(Teresa* ter, MarioWork* mp, f32 angle);
-void computeMtx(ExtPose* pose, f32 angle);
-f32 computeAngle(ExtPose* pose, MarioWork* mp);
+void computeMtx(ExtdrvPose* pose, f32 angle);
+f32 computeAngle(ExtdrvPose* pose, MarioWork* mp);
 static void senteresa_ext_disp(CameraId camera, void* param);
 void extLoadVertex(void);
 void extLoadTexture(void);
@@ -150,8 +148,8 @@ static void senteresa_ext_main(void);
 static void senteresa_ext_init(void);
 static void computePos(Teresa* ter, Vec* out);
 s32 computeAlpha(Teresa* ter, MarioWork* mp, f32 angle);
-void computeMtx(ExtPose* pose, f32 angle);
-f32 computeAngle(ExtPose* pose, MarioWork* mp);
+void computeMtx(ExtdrvPose* pose, f32 angle);
+f32 computeAngle(ExtdrvPose* pose, MarioWork* mp);
 static f32 randf(f32 min, f32 max);
 s32 randn(s32 min, s32 max);
 
@@ -237,8 +235,8 @@ static f32 randf(f32 min, f32 max) {
     return r * (max - min) + min;
 }
 
-f32 computeAngle(ExtPose* pose, MarioWork* mp) {
-    f32 a = angleABf(mp->position.x, mp->position.z, pose->mtx[0][3], pose->mtx[2][3]);
+f32 computeAngle(ExtdrvPose* pose, MarioWork* mp) {
+    f32 a = angleABf(mp->position.x, mp->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
 
     if (0.0f <= a && a < 90.0f) {
         return 90.0f - a;
@@ -252,19 +250,19 @@ f32 computeAngle(ExtPose* pose, MarioWork* mp) {
     return 90.0f + (360.0f - a);
 }
 
-void computeMtx(ExtPose* pose, f32 angle) {
+void computeMtx(ExtdrvPose* pose, f32 angle) {
     Mtx m;
 
     PSMTXRotRad(m, 'Y', 0.017453292f * angle);
-    pose->mtx[0][0] = m[0][0];
-    pose->mtx[0][1] = m[0][1];
-    pose->mtx[0][2] = m[0][2];
-    pose->mtx[1][0] = m[1][0];
-    pose->mtx[1][1] = m[1][1];
-    pose->mtx[1][2] = m[1][2];
-    pose->mtx[2][0] = m[2][0];
-    pose->mtx[2][1] = m[2][1];
-    pose->mtx[2][2] = m[2][2];
+    (*pose->mtx)[0][0] = m[0][0];
+    (*pose->mtx)[0][1] = m[0][1];
+    (*pose->mtx)[0][2] = m[0][2];
+    (*pose->mtx)[1][0] = m[1][0];
+    (*pose->mtx)[1][1] = m[1][1];
+    (*pose->mtx)[1][2] = m[1][2];
+    (*pose->mtx)[2][0] = m[2][0];
+    (*pose->mtx)[2][1] = m[2][1];
+    (*pose->mtx)[2][2] = m[2][2];
 }
 
 s32 computeAlpha(Teresa* ter, MarioWork* mp, f32 angle) {
@@ -307,7 +305,7 @@ static void computePos(Teresa* ter, Vec* out) {
 }
 
 static void senteresa_ext_init(void) {
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     MarioWork* mp = marioGetPtr();
     s32 n = extGetPoseNum();
     s32 i;
@@ -315,7 +313,7 @@ static void senteresa_ext_init(void) {
     pTeresa = _mapAlloc(sizeof(Teresa) * 200);
     for (i = 0; i < n; i++, pose++) {
         pose->flags = 3;
-        PSMTXIdentity(pose->mtx);
+        PSMTXIdentity(*pose->mtx);
         pTeresa[i].angle = 0.0f;
         pTeresa[i].wait = (i % 100 + 1) * 3;
         pTeresa[i].alpha = 0;
@@ -324,13 +322,13 @@ static void senteresa_ext_init(void) {
         pTeresa[i].ofs.x = randf(-300.0f, 300.0f);
         pTeresa[i].ofs.y = 0.0f;
         pTeresa[i].ofs.z = randf(-235.0f, 235.0f);
-        pose->mtx[0][3] = mp->position.x + pTeresa[i].ofs.x;
-        pose->mtx[1][3] = randf(10.0f, 400.0f);
-        pose->mtx[2][3] = mp->position.z + pTeresa[i].ofs.z;
-        if (mp->position.x < pose->mtx[0][3]) {
-            pose->rot = 90.0f;
+        (*pose->mtx)[0][3] = mp->position.x + pTeresa[i].ofs.x;
+        (*pose->mtx)[1][3] = randf(10.0f, 400.0f);
+        (*pose->mtx)[2][3] = mp->position.z + pTeresa[i].ofs.z;
+        if (mp->position.x < (*pose->mtx)[0][3]) {
+            pose->dir = 90.0f;
         } else {
-            pose->rot = 270.0f;
+            pose->dir = 270.0f;
         }
     }
     g_nNumEndProc[0] = 0;
@@ -1299,7 +1297,7 @@ static ExtTexInfo senteresa_ext_entry_data[] = {
 };
 
 static void senteresa_ext_main(void) {
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     MarioWork* mp = marioGetPtr();
     s32 n = extGetPoseNum();
     s32 i;
@@ -1367,7 +1365,7 @@ static void senteresa_ext_main(void) {
     for (i = 0; i < n; i++, pose++) {
         switch (pTeresa[i].seq) {
             case 0:
-                pose->frame = 0;
+                pose->texId = 0;
                 pTeresa[i].wait--;
                 if (pTeresa[i].wait == 0) {
                     if (i == 0) {
@@ -1378,17 +1376,17 @@ static void senteresa_ext_main(void) {
                 }
                 break;
             case 1:
-                pose->frame = (gp->retraceCount / 5 + i * i) % 16;
-                if (mp->position.x < pose->mtx[0][3]) {
-                    pose->rot = 90.0f;
+                pose->texId = (gp->retraceCount / 5 + i * i) % 16;
+                if (mp->position.x < (*pose->mtx)[0][3]) {
+                    pose->dir = 90.0f;
                 } else {
-                    pose->rot = 270.0f;
+                    pose->dir = 270.0f;
                 }
                 computePos(&pTeresa[i], &v);
-                pose->mtx[0][3] = g_vecRotCenter.x + v.x;
-                pose->mtx[2][3] = g_vecRotCenter.z + v.z;
-                v.y = pose->mtx[1][3];
-                pose->mtx[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
+                (*pose->mtx)[0][3] = g_vecRotCenter.x + v.x;
+                (*pose->mtx)[2][3] = g_vecRotCenter.z + v.z;
+                v.y = (*pose->mtx)[1][3];
+                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
                 pTeresa[i].field_0x1C += 0.08f;
                 if (pTeresa[i].field_0x1C > 3.1415927f) {
                     pTeresa[i].field_0x1C -= 3.1415927f;
@@ -1418,17 +1416,17 @@ static void senteresa_ext_main(void) {
                 }
                 break;
             case 2:
-                pose->frame = (gp->retraceCount / 5 + i * i) % 16;
-                if (mp->position.x < pose->mtx[0][3]) {
-                    pose->rot = 90.0f;
+                pose->texId = (gp->retraceCount / 5 + i * i) % 16;
+                if (mp->position.x < (*pose->mtx)[0][3]) {
+                    pose->dir = 90.0f;
                 } else {
-                    pose->rot = 270.0f;
+                    pose->dir = 270.0f;
                 }
                 computePos(&pTeresa[i], &v);
-                pose->mtx[0][3] = g_vecRotCenter.x + v.x;
-                pose->mtx[2][3] = g_vecRotCenter.z + v.z;
-                v.y = pose->mtx[1][3];
-                pose->mtx[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
+                (*pose->mtx)[0][3] = g_vecRotCenter.x + v.x;
+                (*pose->mtx)[2][3] = g_vecRotCenter.z + v.z;
+                v.y = (*pose->mtx)[1][3];
+                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
                 pTeresa[i].field_0x1C += 0.08f;
                 if (pTeresa[i].field_0x1C > 3.1415927f) {
                     pTeresa[i].field_0x1C -= 3.1415927f;
@@ -1441,17 +1439,17 @@ static void senteresa_ext_main(void) {
                 }
                 break;
             case 3:
-                pose->frame = (gp->retraceCount / 5 + i * i) % 16;
-                if (mp->position.x < pose->mtx[0][3]) {
-                    pose->rot = 90.0f;
+                pose->texId = (gp->retraceCount / 5 + i * i) % 16;
+                if (mp->position.x < (*pose->mtx)[0][3]) {
+                    pose->dir = 90.0f;
                 } else {
-                    pose->rot = 270.0f;
+                    pose->dir = 270.0f;
                 }
                 computePos(&pTeresa[i], &v);
-                pose->mtx[0][3] = g_vecRotCenter.x + v.x;
-                pose->mtx[2][3] = g_vecRotCenter.z + v.z;
-                v.y = pose->mtx[1][3];
-                pose->mtx[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
+                (*pose->mtx)[0][3] = g_vecRotCenter.x + v.x;
+                (*pose->mtx)[2][3] = g_vecRotCenter.z + v.z;
+                v.y = (*pose->mtx)[1][3];
+                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
                 pTeresa[i].field_0x1C += 0.08f;
                 pTeresa[i].wait--;
                 if (pTeresa[i].wait == 0) {
@@ -1461,12 +1459,12 @@ static void senteresa_ext_main(void) {
                 }
                 break;
             case 4:
-                pose->frame = (gp->retraceCount + i * i) % 10 + 16;
+                pose->texId = (gp->retraceCount + i * i) % 10 + 16;
                 computePos(&pTeresa[i], &v);
-                v.y = pose->mtx[1][3];
-                pose->mtx[0][3] = g_vecRotCenter.x + v.x;
-                pose->mtx[1][3] = v.y;
-                pose->mtx[2][3] = g_vecRotCenter.z + v.z;
+                v.y = (*pose->mtx)[1][3];
+                (*pose->mtx)[0][3] = g_vecRotCenter.x + v.x;
+                (*pose->mtx)[1][3] = v.y;
+                (*pose->mtx)[2][3] = g_vecRotCenter.z + v.z;
                 pTeresa[i].field_0x1C += 0.08f;
                 if (pTeresa[i].field_0x1C > 3.1415927f) {
                     pTeresa[i].field_0x1C -= 3.1415927f;
@@ -1498,17 +1496,17 @@ static void senteresa_ext_main(void) {
                 }
                 break;
             case 5:
-                pose->frame = (gp->retraceCount + i * i) % 10 + 16;
-                v.x = pose->mtx[0][3];
-                v.y = pose->mtx[1][3];
-                v.z = pose->mtx[2][3];
+                pose->texId = (gp->retraceCount + i * i) % 10 + 16;
+                v.x = (*pose->mtx)[0][3];
+                v.y = (*pose->mtx)[1][3];
+                v.z = (*pose->mtx)[2][3];
                 PSVECSubtract(&mp->position, &v, &d);
                 PSVECNormalize(&d, &d);
                 PSVECScale(&d, &d, 1.8f);
                 PSVECAdd(&v, &d, &v);
-                pose->mtx[0][3] = v.x;
-                pose->mtx[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
-                pose->mtx[2][3] = v.z;
+                (*pose->mtx)[0][3] = v.x;
+                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
+                (*pose->mtx)[2][3] = v.z;
                 pTeresa[i].field_0x1C += 0.08f;
                 if (pTeresa[i].field_0x1C > 3.1415927f) {
                     pTeresa[i].field_0x1C -= 3.1415927f;
@@ -1516,11 +1514,11 @@ static void senteresa_ext_main(void) {
                 if (!party) {
                     PSVECSubtract(&v, &mp->position, &v);
                     if (PSVECMag(&v) <= 25.0f) {
-                        f32 dy = pose->mtx[1][3] - mp->position.y;
+                        f32 dy = (*pose->mtx)[1][3] - mp->position.y;
                         if (dy > -2.0f && dy < 10.0f) {
-                            pTeresa[i].ofs.x = pose->mtx[0][3] - mp->position.x;
-                            pTeresa[i].ofs.y = pose->mtx[1][3] - mp->position.y;
-                            pTeresa[i].ofs.z = pose->mtx[2][3] - mp->position.z;
+                            pTeresa[i].ofs.x = (*pose->mtx)[0][3] - mp->position.x;
+                            pTeresa[i].ofs.y = (*pose->mtx)[1][3] - mp->position.y;
+                            pTeresa[i].ofs.z = (*pose->mtx)[2][3] - mp->position.z;
                             pTeresa[i].seq++;
                             if (!bero) {
                                 g_nNumHarituku[0]++;
@@ -1533,16 +1531,16 @@ static void senteresa_ext_main(void) {
                 computeAlpha(&pTeresa[i], mp, angle);
                 break;
             case 6:
-                pose->frame = (gp->retraceCount + i * i) % 10 + 16;
-                pose->mtx[0][3] = mp->position.x + pTeresa[i].ofs.x;
-                pose->mtx[1][3] = mp->position.y + pTeresa[i].ofs.y;
-                pose->mtx[2][3] = mp->position.z + pTeresa[i].ofs.z;
+                pose->texId = (gp->retraceCount + i * i) % 10 + 16;
+                (*pose->mtx)[0][3] = mp->position.x + pTeresa[i].ofs.x;
+                (*pose->mtx)[1][3] = mp->position.y + pTeresa[i].ofs.y;
+                (*pose->mtx)[2][3] = mp->position.z + pTeresa[i].ofs.z;
                 angle = computeAngle(pose, mp);
                 computeAlpha(&pTeresa[i], mp, angle);
                 if (hammer) {
-                    v.x = pose->mtx[0][3];
-                    v.y = pose->mtx[1][3];
-                    v.z = pose->mtx[2][3];
+                    v.x = (*pose->mtx)[0][3];
+                    v.y = (*pose->mtx)[1][3];
+                    v.z = (*pose->mtx)[2][3];
                     PSVECSubtract(&v, &mp->position, &d);
                     PSVECNormalize(&d, &d);
                     pTeresa[i].vel.x = 4.2f * d.x;
@@ -1559,20 +1557,20 @@ static void senteresa_ext_main(void) {
                     g_nNumHuttobasu[0]++;
                     {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        pos.x = pose->mtx[0][3];
-                        pos.y = pose->mtx[1][3];
-                        pos.z = pose->mtx[2][3];
+                        pos.x = (*pose->mtx)[0][3];
+                        pos.y = (*pose->mtx)[1][3];
+                        pos.z = (*pose->mtx)[2][3];
                         psndSFXOn_3D((const char*)0x5D7, &pos);
                     }
                 }
                 break;
             case 9:
-                pose->frame = (s32)(12.0f * ((100.0f - pTeresa[i].wait) / 100.0f)) + 34;
+                pose->texId = (s32)(12.0f * ((100.0f - pTeresa[i].wait) / 100.0f)) + 34;
                 computePos(&pTeresa[i], &v);
-                v.y = pose->mtx[1][3];
-                pose->mtx[0][3] = g_vecRotCenter.x + v.x;
-                pose->mtx[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
-                pose->mtx[2][3] = g_vecRotCenter.z + v.z;
+                v.y = (*pose->mtx)[1][3];
+                (*pose->mtx)[0][3] = g_vecRotCenter.x + v.x;
+                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
+                (*pose->mtx)[2][3] = g_vecRotCenter.z + v.z;
                 pTeresa[i].field_0x1C += 0.08f;
                 if (pTeresa[i].field_0x1C > 3.1415927f) {
                     pTeresa[i].field_0x1C -= 3.1415927f;
@@ -1591,23 +1589,23 @@ static void senteresa_ext_main(void) {
                 }
                 break;
             case 10:
-                pose->frame = (gp->retraceCount + i * i) % 8 + 26;
-                pose->mtx[0][3] += pTeresa[i].vel.x;
-                pose->mtx[1][3] += pTeresa[i].vel.y;
-                pose->mtx[2][3] += pTeresa[i].vel.z;
+                pose->texId = (gp->retraceCount + i * i) % 8 + 26;
+                (*pose->mtx)[0][3] += pTeresa[i].vel.x;
+                (*pose->mtx)[1][3] += pTeresa[i].vel.y;
+                (*pose->mtx)[2][3] += pTeresa[i].vel.z;
                 pTeresa[i].vel.y -= 0.3f;
-                if (pose->mtx[1][3] < -20.0f) {
+                if ((*pose->mtx)[1][3] < -20.0f) {
                     pose->flags = 0;
                     pTeresa[i].seq = 99;
                 }
                 break;
             case 20:
-                pose->frame = (gp->retraceCount + i * i) % 10 + 16;
+                pose->texId = (gp->retraceCount + i * i) % 10 + 16;
                 computePos(&pTeresa[i], &v);
-                v.y = pose->mtx[1][3];
-                pose->mtx[0][3] = g_vecRotCenter.x + v.x;
-                pose->mtx[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
-                pose->mtx[2][3] = g_vecRotCenter.z + v.z;
+                v.y = (*pose->mtx)[1][3];
+                (*pose->mtx)[0][3] = g_vecRotCenter.x + v.x;
+                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
+                (*pose->mtx)[2][3] = g_vecRotCenter.z + v.z;
                 pTeresa[i].field_0x1C += 0.08f;
                 if (pTeresa[i].field_0x1C > 3.1415927f) {
                     pTeresa[i].field_0x1C -= 3.1415927f;
@@ -1622,9 +1620,9 @@ static void senteresa_ext_main(void) {
                 pTeresa[i].wait--;
                 if (pTeresa[i].wait == 0) {
                     pose->flags = 3;
-                    pTeresa[i].from.x = pose->mtx[0][3];
-                    pTeresa[i].from.y = pose->mtx[1][3];
-                    pTeresa[i].from.z = pose->mtx[2][3];
+                    pTeresa[i].from.x = (*pose->mtx)[0][3];
+                    pTeresa[i].from.y = (*pose->mtx)[1][3];
+                    pTeresa[i].from.z = (*pose->mtx)[2][3];
                     pTeresa[i].field_0x1C = 0.0f;
                     pTeresa[i].seq++;
                 }
@@ -1632,15 +1630,15 @@ static void senteresa_ext_main(void) {
             case 21: {
                 f32 t;
 
-                pose->frame = (gp->retraceCount + i * i) % 10 + 16;
+                pose->texId = (gp->retraceCount + i * i) % 10 + 16;
                 t = pTeresa[i].field_0x1C;
                 if (t >= 1.0f) {
                     pTeresa[i].seq = 22;
                     {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        pos.x = pose->mtx[0][3];
-                        pos.y = pose->mtx[1][3];
-                        pos.z = pose->mtx[2][3];
+                        pos.x = (*pose->mtx)[0][3];
+                        pos.y = (*pose->mtx)[1][3];
+                        pos.z = (*pose->mtx)[2][3];
                         psndSFXOn_3D((const char*)0x5D4, &pos);
                     }
                     g_nNumEndProc[0]++;
@@ -1648,37 +1646,37 @@ static void senteresa_ext_main(void) {
                     v.x = (1.0f - t) * pTeresa[i].from.x + t * pTeresa[i].to.x;
                     v.y = (1.0f - t) * pTeresa[i].from.y + t * pTeresa[i].to.y;
                     v.z = (1.0f - t) * pTeresa[i].from.z + t * pTeresa[i].to.z;
-                    pose->mtx[0][3] = v.x;
-                    pose->mtx[1][3] = 20.0f * (f32)sin(6.28f * pTeresa[i].field_0x1C) + v.y;
-                    pose->mtx[2][3] = v.z;
+                    (*pose->mtx)[0][3] = v.x;
+                    (*pose->mtx)[1][3] = 20.0f * (f32)sin(6.28f * pTeresa[i].field_0x1C) + v.y;
+                    (*pose->mtx)[2][3] = v.z;
                     pTeresa[i].field_0x1C += 0.01f;
                 }
                 break;
             }
             case 22:
-                pose->frame = (gp->retraceCount + i * i) % 10 + 16;
+                pose->texId = (gp->retraceCount + i * i) % 10 + 16;
                 if ((pTeresa[i].wait & 7) == 0) {
-                    pose->mtx[0][3] += 2.0f;
+                    (*pose->mtx)[0][3] += 2.0f;
                 } else if ((pTeresa[i].wait & 7) == 3) {
-                    pose->mtx[0][3] -= 2.0f;
+                    (*pose->mtx)[0][3] -= 2.0f;
                 }
                 pTeresa[i].wait++;
                 break;
             case 30:
-                pose->frame = (gp->retraceCount + i * i) % 8 + 26;
-                pose->mtx[0][3] += pTeresa[i].vel.x;
-                pose->mtx[1][3] += pTeresa[i].vel.y;
-                pose->mtx[2][3] += pTeresa[i].vel.z;
+                pose->texId = (gp->retraceCount + i * i) % 8 + 26;
+                (*pose->mtx)[0][3] += pTeresa[i].vel.x;
+                (*pose->mtx)[1][3] += pTeresa[i].vel.y;
+                (*pose->mtx)[2][3] += pTeresa[i].vel.z;
                 pTeresa[i].vel.y -= 0.3f;
-                if (pose->mtx[1][3] < -10.0f) {
+                if ((*pose->mtx)[1][3] < -10.0f) {
                     pose->flags = 0;
                     pTeresa[i].seq = 99;
                     g_nNumEndProc[0]++;
                 }
                 break;
             case 80:
-                pose->frame = (gp->retraceCount + i * i) % 10 + 16;
-                pose->mtx[1][3] = mp->position.y + pTeresa[i].ofs.y;
+                pose->texId = (gp->retraceCount + i * i) % 10 + 16;
+                (*pose->mtx)[1][3] = mp->position.y + pTeresa[i].ofs.y;
                 break;
             case 99:
                 break;
@@ -1753,13 +1751,13 @@ USER_FUNC(senteresa_get_seq) {
 
 USER_FUNC(senteresa_get_random_position) {
     s32* args = event->args;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     s32 n = extGetPoseNum();
 
     pose += rand() % n;
-    evtSetFloat(event, args[0], pose->mtx[0][3]);
-    evtSetFloat(event, args[1], pose->mtx[1][3]);
-    evtSetFloat(event, args[2], pose->mtx[2][3]);
+    evtSetFloat(event, args[0], (*pose->mtx)[0][3]);
+    evtSetFloat(event, args[1], (*pose->mtx)[1][3]);
+    evtSetFloat(event, args[2], (*pose->mtx)[2][3]);
     return EVT_RETURN_DONE;
 }
 
@@ -1777,7 +1775,7 @@ USER_FUNC(senteresa_tikaduku_stop) {
 }
 
 USER_FUNC(senteresa_syugo) {
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     NpcEntry* npc = npcNameToPtr("\222\206\211\233\203e\203\214\203T");
     s32 n = extGetPoseNum();
     s32 i;
@@ -1786,9 +1784,9 @@ USER_FUNC(senteresa_syugo) {
 
     g_nNumEndProc[0] = 0;
     for (i = 0; i < n; i++, pose++) {
-        pTeresa[i].from.x = pose->mtx[0][3];
-        pTeresa[i].from.y = pose->mtx[1][3];
-        pTeresa[i].from.z = pose->mtx[2][3];
+        pTeresa[i].from.x = (*pose->mtx)[0][3];
+        pTeresa[i].from.y = (*pose->mtx)[1][3];
+        pTeresa[i].from.z = (*pose->mtx)[2][3];
         a = randf(0.0f, 6.2831f);
         r = randf(0.0f, 25.0f);
         pTeresa[i].to.x = r * cosf(a) + npc->position.x;
@@ -1799,16 +1797,16 @@ USER_FUNC(senteresa_syugo) {
         pTeresa[i].alpha = 255;
         pTeresa[i].seq = 20;
         if (pTeresa[i].from.x < pTeresa[i].to.x) {
-            pose->rot = 270.0f;
+            pose->dir = 270.0f;
         } else {
-            pose->rot = 90.0f;
+            pose->dir = 90.0f;
         }
     }
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(senteresa_dispoff) {
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     s32 n = extGetPoseNum();
     s32 i;
 
@@ -1819,7 +1817,7 @@ USER_FUNC(senteresa_dispoff) {
 }
 
 USER_FUNC(senteresa_huttobu) {
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     NpcEntry* npc = npcNameToPtr("\203A\203g\203~\203b\203N\203e\203\214\203T");
     s32 n = extGetPoseNum();
     s32 i;
@@ -1828,9 +1826,9 @@ USER_FUNC(senteresa_huttobu) {
     g_nNumEndProc[0] = 0;
     for (i = 0; i < n; i++, pose++) {
         pose->flags = 3;
-        pose->mtx[0][3] = npc->position.x;
-        pose->mtx[1][3] = npc->position.y;
-        pose->mtx[2][3] = npc->position.z;
+        (*pose->mtx)[0][3] = npc->position.x;
+        (*pose->mtx)[1][3] = npc->position.y;
+        (*pose->mtx)[2][3] = npc->position.z;
         pTeresa[i].vel.x = 4.0f * (f32)sin(pTeresa[i].angle);
         pTeresa[i].vel.y = randf(6.0f, 12.0f);
         pTeresa[i].vel.z = cos(pTeresa[i].angle);
@@ -1844,9 +1842,9 @@ USER_FUNC(senteresa_huttobu) {
         pTeresa[i].seq = 30;
         if (i & 1) {
             Vec pos = {0.0f, 0.0f, 0.0f};
-            pos.x = pose->mtx[0][3];
-            pos.y = pose->mtx[1][3];
-            pos.z = pose->mtx[2][3];
+            pos.x = (*pose->mtx)[0][3];
+            pos.y = (*pose->mtx)[1][3];
+            pos.z = (*pose->mtx)[2][3];
             psndSFXOn_3D((const char*)0x5D7, &pos);
         }
     }

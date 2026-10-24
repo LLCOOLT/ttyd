@@ -21,15 +21,13 @@
 #include "evt/evt_eff.h"
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
+#include "driver/extdrv.h"
 
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct MoamoaGroup { char anim[16]; char pose[8]; f32 speed; s32 start; s32 num; } MoamoaGroup;
 typedef struct Moamoa { u16 flags; u8 field_0x2[2]; Vec pos; s16 group; u8 field_0x12[6]; OSTime time; s16 chain; s16 order; f32 t; s32 poseId; s32 type; s32* owner; Vec vel; Vec pos2; u8 field_0x4c[4]; } Moamoa;
 typedef struct MoamoaWork { s32 field_0x0; s32 count; Moamoa* elems; s32 numGroups; MoamoaGroup groups[32]; s16 chainNum[128]; s16 chainIdx[128][2]; s32 poseId[5]; s32 unitId; Vec center; f32 angle; f32 radius; f32 targetScale; f32 scale; } MoamoaWork;
 typedef struct MoamoaExtData { const char* anim; const char* pose; f32 speed; } MoamoaExtData;
 static MoamoaWork* wp;
-ExtPose* extGetPosePtr(void);
-void extReset(void);
 int rand(void);
 void moamoa_mainUnitIdClear(void);
 static f32 randf(f32 min, f32 max);
@@ -37,12 +35,6 @@ extern const char* g_moamoa_chain_tbl[][2];
 USER_FUNC(moamoa1_on);
 void moamoa_pose(Moamoa* elem);
 void moamoa_draw(CameraId cameraId, void* param);
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -827,7 +819,7 @@ static ExtTexInfo ext_moamoa_data[] = {
 USER_FUNC(moamoa_guruguru) {
     s32 i;
     Moamoa* elem;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     f32 cnt;
     f32 ang;
     Vec v;
@@ -840,9 +832,9 @@ USER_FUNC(moamoa_guruguru) {
     cnt = 0.0f;
     for (i = 0; i < wp->count; i++, pose++, elem++) {
         if (*elem->owner != -1) {
-            v.x = pose->mtx[0][3];
-            v.y = pose->mtx[1][3];
-            v.z = pose->mtx[2][3];
+            v.x = (*pose->mtx)[0][3];
+            v.y = (*pose->mtx)[1][3];
+            v.z = (*pose->mtx)[2][3];
             if (v.y >= 0.0f) {
                 elem->flags |= 1;
                 cnt += 1.0f;
@@ -858,9 +850,9 @@ USER_FUNC(moamoa_guruguru) {
     ang = 0.0f;
     for (i = 0; i < wp->count; i++, pose++, elem++) {
         if (elem->flags & 1) {
-            elem->vel.x = pose->mtx[0][3];
-            elem->vel.y = pose->mtx[1][3];
-            elem->vel.z = pose->mtx[2][3];
+            elem->vel.x = (*pose->mtx)[0][3];
+            elem->vel.y = (*pose->mtx)[1][3];
+            elem->vel.z = (*pose->mtx)[2][3];
             elem->pos2 = (Vec){0.0f, 1.0f, 0.0f};
             PSMTXRotRad(m, 'Z', 0.017453292f * ang);
             PSMTXMultVec(m, &elem->pos2, &elem->pos2);
@@ -874,11 +866,11 @@ USER_FUNC(moamoa_guruguru) {
 }
 
 USER_FUNC(moamoa_bomb) {
-    ExtPose* p2;
+    ExtdrvPose* p2;
     Moamoa* e2;
     s32 k;
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     Moamoa* elem;
     s32 n;
 
@@ -898,16 +890,16 @@ USER_FUNC(moamoa_bomb) {
         n = 0;
         e2 = wp->elems;
         for (k = 0; k < wp->count; k++, p2++, e2++) {
-            if (p2->mtx[1][3] >= 0.0f && !(e2->flags & 1)) {
+            if ((*p2->mtx)[1][3] >= 0.0f && !(e2->flags & 1)) {
                 e2->flags |= 1;
                 if (e2->flags & 1) {
                     e2->vel.x = randf(0.0f, 60.0f) - 30.0f;
                     e2->vel.y = randf(0.0f, 35.0f);
                     e2->vel.z = 60.0f + randf(0.0f, 30.0f);
                     n++;
-                    e2->pos2.x = p2->mtx[0][3];
-                    e2->pos2.y = p2->mtx[1][3];
-                    e2->pos2.z = p2->mtx[2][3];
+                    e2->pos2.x = (*p2->mtx)[0][3];
+                    e2->pos2.y = (*p2->mtx)[1][3];
+                    e2->pos2.z = (*p2->mtx)[2][3];
                 }
             }
             if (n >= 10) {
@@ -925,15 +917,15 @@ USER_FUNC(moamoa_bomb) {
                 elem->pos2.z += elem->vel.z;
                 elem->vel.y -= 1.0f;
             }
-            pose->mtx[0][3] = elem->pos2.x;
-            pose->mtx[1][3] = elem->pos2.y;
-            pose->mtx[2][3] = elem->pos2.z;
+            (*pose->mtx)[0][3] = elem->pos2.x;
+            (*pose->mtx)[1][3] = elem->pos2.y;
+            (*pose->mtx)[2][3] = elem->pos2.z;
         }
     }
     pose = extGetPosePtr();
     n = 0;
     for (i = 0; i < wp->count; i++, pose++) {
-        if (pose->mtx[1][3] >= -200.0f) {
+        if ((*pose->mtx)[1][3] >= -200.0f) {
             n++;
         }
     }
@@ -1213,7 +1205,7 @@ void moamoa_pose(Moamoa* elem) {
 
 static void ext_moamoa_init(void) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     Moamoa* elem;
 
     pose = extGetPosePtr();
@@ -1222,7 +1214,7 @@ static void ext_moamoa_init(void) {
     wp->scale = 1.0f;
     for (i = 0; i < wp->count; i++, pose++, elem++) {
         pose->flags |= 5;
-        PSMTXIdentity(pose->mtx);
+        PSMTXIdentity(*pose->mtx);
         moamoa_pose(elem);
     }
 }
@@ -1240,7 +1232,7 @@ static void ext_moamoa_main(void) {
     s32 k3;
     s32 k;
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     s32 j;
     BattleUnit* unit;
     AnimationPose* ap;
@@ -1275,7 +1267,7 @@ static void ext_moamoa_main(void) {
         if (n >= grp->num) {
             n = grp->num - 1;
         }
-        pose->frame = grp->start + n;
+        pose->texId = grp->start + n;
     }
 
     if (wp->unitId != -1) {
@@ -1291,9 +1283,9 @@ static void ext_moamoa_main(void) {
         e4 = wp->elems;
         for (k4 = 0; k4 < wp->count; k4++, pose++, e4++) {
             if (*e4->owner == -1) {
-                pose->mtx[0][3] = 0.0f;
-                pose->mtx[1][3] = -1000.0f;
-                pose->mtx[2][3] = 0.0f;
+                (*pose->mtx)[0][3] = 0.0f;
+                (*pose->mtx)[1][3] = -1000.0f;
+                (*pose->mtx)[2][3] = 0.0f;
                 continue;
             }
             ap = animPoseGetAnimPosePtr(e4->poseId);
@@ -1320,11 +1312,11 @@ static void ext_moamoa_main(void) {
                 }
             }
             if (e4->chain >= 46) {
-                pose->mtx[0][0] = pose->mtx[1][1] = wp->scale;
+                (*pose->mtx)[0][0] = (*pose->mtx)[1][1] = wp->scale;
             }
-            pose->mtx[0][3] += (v.x - pose->mtx[0][3]) / 2;
-            pose->mtx[1][3] += (v.y - pose->mtx[1][3]) / 2;
-            pose->mtx[2][3] += (v.z - pose->mtx[2][3]) / 2;
+            (*pose->mtx)[0][3] += (v.x - (*pose->mtx)[0][3]) / 2;
+            (*pose->mtx)[1][3] += (v.y - (*pose->mtx)[1][3]) / 2;
+            (*pose->mtx)[2][3] += (v.z - (*pose->mtx)[2][3]) / 2;
         }
     } else {
         wp->angle += 8.571428f;
@@ -1344,9 +1336,9 @@ static void ext_moamoa_main(void) {
                 PSMTXMultVec(m, &r, &r);
                 PSVECScale(&r, &r, wp->radius);
                 PSVECAdd(&r, &wp->center, &r);
-                pose->mtx[0][3] += (r.x - pose->mtx[0][3]) / 2;
-                pose->mtx[1][3] += (r.y - pose->mtx[1][3]) / 2;
-                pose->mtx[2][3] += (r.z - pose->mtx[2][3]) / 2;
+                (*pose->mtx)[0][3] += (r.x - (*pose->mtx)[0][3]) / 2;
+                (*pose->mtx)[1][3] += (r.y - (*pose->mtx)[1][3]) / 2;
+                (*pose->mtx)[2][3] += (r.z - (*pose->mtx)[2][3]) / 2;
             }
         }
     }

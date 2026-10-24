@@ -691,7 +691,7 @@ USER_FUNC(dou_namiatari_check) {
 }
 
 USER_FUNC(nami_running_func) {
-    f32* lwf = (f32*)event->lwData;
+    f32* lwf = event->lwDataF;
     s32* args = event->args;
     f32 s;
 
@@ -739,7 +739,7 @@ USER_FUNC(nami_running_func) {
 }
 
 USER_FUNC(nami_running_init_func) {
-    f32* lwf = (f32*)event->lwData;
+    f32* lwf = event->lwDataF;
 
     lwf[6] = event->lwData[11];
     lwf[7] = event->lwData[12];

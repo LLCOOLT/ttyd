@@ -980,7 +980,8 @@ static inline HitEntry* landonHitCheck(LandonRay* ray, Vec* outPos, Vec* outNrm,
     HitEntry* hit;
     f32 rf;
 
-    *(LandonRay*)&query.targetPos = *ray;
+    query.targetPos = ray->pos;
+    query.targetDir = ray->dir;
     query.targetDistance = *dist;
     if (marioGetPtr()->currMotionId == 0x1c) {
         hit = hitCheckVecFilter(&query, chkfilterVecVivian);

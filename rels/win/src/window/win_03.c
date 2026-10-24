@@ -227,8 +227,8 @@ USER_FUNC(camera_action) {
         f32 speed;
         f32 dist;
 
-        ((f32*)event->lwData)[0] = 0.0f;
-        ((f32*)event->lwData)[1] = 2.5f;
+        event->lwDataF[0] = 0.0f;
+        event->lwDataF[1] = 2.5f;
         event->lwData[2] = 0;
         speed = 0.0f;
         dist = 0.0f;
@@ -239,17 +239,17 @@ USER_FUNC(camera_action) {
             speed += 0.01f;
             dist += speed;
         }
-        ((f32*)event->lwData)[2] = dist - 2.5f;
+        event->lwDataF[2] = dist - 2.5f;
     }
-    if (((f32*)event->lwData)[0] < 300.0f - ((f32*)event->lwData)[2]) {
-        ((f32*)event->lwData)[0] += ((f32*)event->lwData)[1];
-        x = -10.0f + ((f32*)event->lwData)[0];
+    if (event->lwDataF[0] < 300.0f - event->lwDataF[2]) {
+        event->lwDataF[0] += event->lwDataF[1];
+        x = -10.0f + event->lwDataF[0];
         event->lwData[10] = 0;
         at.x = pos.x = x;
-    } else if (((f32*)event->lwData)[0] < 300.0f) {
-        ((f32*)event->lwData)[0] += ((f32*)event->lwData)[1];
-        ((f32*)event->lwData)[1] -= 0.01f;
-        x = -10.0f + ((f32*)event->lwData)[0];
+    } else if (event->lwDataF[0] < 300.0f) {
+        event->lwDataF[0] += event->lwDataF[1];
+        event->lwDataF[1] -= 0.01f;
+        x = -10.0f + event->lwDataF[0];
         event->lwData[10] = 0;
         at.x = pos.x = x;
     } else {

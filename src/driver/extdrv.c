@@ -92,7 +92,7 @@ void extInit(void) {
 	wp->poses = NULL;
 }
 
-void extEntry(s32 poseNum, void* texInfo, void* initFunc, s32 mainFunc, s32 mainFunc2) {
+void extEntry(s32 poseNum, ExtdrvTexInfo* texInfo, void (*initFunc)(void), void (*mainFunc)(void), void (*mainFunc2)(void)) {
     static f32 Normals[] = {0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f};
     static GXColor Colors[] = {{0xFF, 0xFF, 0xFF, 0xFF}};
     static f32 UVs[] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
@@ -106,8 +106,8 @@ void extEntry(s32 poseNum, void* texInfo, void* initFunc, s32 mainFunc, s32 main
     }
     wp->poses = __memAlloc(HEAP_EXT, poseNum * sizeof(ExtdrvPose));
     wp->poseNum = poseNum;
-    wp->mainFunc = (void (*)(void))mainFunc;
-    wp->mainFunc2 = (void (*)(void))mainFunc2;
+    wp->mainFunc = mainFunc;
+    wp->mainFunc2 = mainFunc2;
     wp->texs = __memAlloc(HEAP_EXT, texNum * sizeof(ExtdrvTex));
     wp->texNum = texNum;
     wp->mtxs = __memAlloc(HEAP_EXT, poseNum * sizeof(Mtx));
@@ -116,8 +116,8 @@ void extEntry(s32 poseNum, void* texInfo, void* initFunc, s32 mainFunc, s32 main
     wp->colors = Colors;
     wp->uvs = UVs;
     wp->sort = __memAlloc(HEAP_EXT, poseNum * sizeof(ExtdrvSort));
-    wp->dl = __memAlloc(HEAP_EXT, texNum * 0x80);
-    DCInvalidateRange(wp->dl, texNum * 0x80);
+    wp->dl = __memAlloc(HEAP_EXT, texNum * sizeof(*wp->dl));
+    DCInvalidateRange(wp->dl, texNum * sizeof(*wp->dl));
     wp->dlSize = __memAlloc(HEAP_EXT, texNum * sizeof(u32));
     memset(wp->poses, 0, wp->poseNum * sizeof(ExtdrvPose));
     for (i = 0; i < poseNum; i++) {
@@ -127,7 +127,7 @@ void extEntry(s32 poseNum, void* texInfo, void* initFunc, s32 mainFunc, s32 main
     PSMTXIdentity(wp->shadowMtx);
     dispEntry(CAMERA_OFFSCREEN, 0.0f, 1, extMakeTexture, texInfo);
     if (initFunc != NULL) {
-        ((void (*)(void))initFunc)();
+        initFunc();
     }
 }
 
@@ -164,7 +164,7 @@ void extMakeTexture(CameraId camId, void* param) {
         wp->vtx[n++] = x0 / 2.0f;
         wp->vtx[n++] = -y1 / 2.0f;
         wp->vtx[n++] = 0.0f;
-        GXBeginDisplayList(&wp->dl[i * 0x80], 0x80);
+        GXBeginDisplayList(wp->dl[i], sizeof(wp->dl[i]));
         v = i * 4;
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
         GXPosition1x16(v++);
@@ -333,7 +333,7 @@ void extPoseDraw(s32 index) {
         PSMTXInvXpose(mtx, nrm);
         GXLoadNrmMtxImm(nrm, 0);
         GXSetCurrentMtx(0);
-        GXCallDisplayList(&wp->dl[pose->texId * 0x80], wp->dlSize[pose->texId]);
+        GXCallDisplayList(wp->dl[pose->texId], wp->dlSize[pose->texId]);
     }
 }
 
@@ -358,7 +358,7 @@ void extDraw(void) {
             PSMTXConcat(camGetCurPtr()->view, *pose->mtx, mtx);
             GXLoadPosMtxImm(mtx, 0);
             GXSetCurrentMtx(0);
-            GXCallDisplayList(&wp->dl[texId * 0x80], wp->dlSize[texId]);
+            GXCallDisplayList(wp->dl[texId], wp->dlSize[texId]);
         }
     }
 }

@@ -690,7 +690,7 @@ static inline void* mapSearchChunk(MapHeader* header, const char* name) {
 static inline void mapLoadReloc_(MapEntry* entry) {
 	u32 k;
 	for (k = 0; k < (u32)entry->header.file.relCount; k++) {
-		u32* rel = (u32*)((u8*)entry->header.data + ((u32*)entry->header.rel)[k]);
+		u32* rel = (u32*)((u8*)entry->header.data + entry->header.rel[k]);
 		if (*rel <= 0x80000000) {
 			*rel += (u32)entry->header.data;
 		}
@@ -719,7 +719,7 @@ static inline void mapLoadHeader_(MapWork* wp, BOOL group) {
 				sizeCheck += sizeof(MapFileHeader);
 			}
 			if ((u32)wp->entries[group].header.file.relCount != 0u) {
-				wp->entries[group].header.rel = &data[sizeCheck];
+				wp->entries[group].header.rel = (u32*)&data[sizeCheck];
 				sizeCheck += 4 * wp->entries[group].header.file.relCount;
 			}
 			if ((u32)wp->entries[group].header.file.chunkCount != 0u) {
@@ -1403,10 +1403,10 @@ static inline void mapMainMatKeys_(MapAnim* a_, MapAnimMatData* d, u8* obj) {
 
 		for (c = 0; c < 5; c++) {
 			if (k0->ch[c].step) {
-				(&((MapMaterial*)obj)->xforms[d->idx].tx)[c] = k0->ch[c].value;
+				((MapMaterial*)obj)->xforms[d->idx].ch[c] = k0->ch[c].value;
 			}
 			else {
-				(&((MapMaterial*)obj)->xforms[d->idx].tx)[c] = mapHermiteCh(cur, k0->time, k1->time, &k0->ch[c], &k1->ch[c]);
+				((MapMaterial*)obj)->xforms[d->idx].ch[c] = mapHermiteCh(cur, k0->time, k1->time, &k0->ch[c], &k1->ch[c]);
 			}
 		}
 		((MapMaterial*)obj)->xforms[d->idx].cx = d->u;
@@ -1731,7 +1731,7 @@ static inline void callPackedLists(MapFileMesh* mesh) {
   int j;
   for (j = 0; j < mesh->displayListCount; j++)
   {
-    GXCallDisplayList((void *) mesh->displayLists.packedLists[j].offset, *((u32 *) (&mesh->displayLists.packedLists[j].vertexCount)));
+    GXCallDisplayList((void *) mesh->displayLists.packedLists[j].offset, mesh->displayLists.packedLists[j].size);
   }
 }
 
@@ -3297,19 +3297,6 @@ void mapSetMaterialLight(s32 flags, Vec position) {
 }
 
 
-typedef struct MapVtxRec {
-	s16 pos;     // 0x0
-	s16 nrm;     // 0x2
-	s16 clr;     // 0x4
-	s16 unk6;    // 0x6
-	s16 tex[8];  // 0x8
-} MapVtxRec;
-
-typedef struct MapRawDL {
-	s32 count;        // 0x0
-
-	MapVtxRec vtx[];  // 0x4
-} MapRawDL;
 const GXVtxAttrFmtList attr_fmt[12] = {
 	{GX_VA_POS, GX_POS_XYZ, GX_F32, 0},
 	{GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0},
@@ -3359,7 +3346,7 @@ void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
 			GXSetArray(GX_VA_TEX0 + i, mesh->vcdTable->texCoords[i]->data, 8);
 		}
 		for (i = 0; i < mesh->displayListCount; i++) {
-			dl = (MapRawDL*)mesh->displayLists.normalLists[i];
+			dl = mesh->displayLists.normalLists[i];
 			GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, (u16)dl->count);
 			for (j = 0; j < dl->count; j++) {
 				v = &dl->vtx[j];
@@ -3400,7 +3387,7 @@ void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
 			GXSetArray(GX_VA_TEX0 + i, mesh->vcdTable->texCoords[i]->data, 4);
 		}
 		for (i = 0; i < mesh->displayListCount; i++) {
-			GXCallDisplayList((void*)mesh->displayLists.packedLists[i].offset, *(u32*)&mesh->displayLists.packedLists[i].vertexCount);
+			GXCallDisplayList((void*)mesh->displayLists.packedLists[i].offset, mesh->displayLists.packedLists[i].size);
 		}
 	}
 }

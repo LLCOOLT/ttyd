@@ -1815,15 +1815,15 @@ void BattleAudienceApSrcCtrlProcess(void) {
 			cnt++;
 		}
 	}
-	if (psndSFXChk(((s32*)base)[2]) != -1) {
-		psndSFX_vol(((s32*)base)[2], 63.0f * cnt / 100.0f + 64.0f);
+	if (psndSFXChk(base->apStarSfxId) != -1) {
+		psndSFX_vol(base->apStarSfxId, 63.0f * cnt / 100.0f + 64.0f);
 	}
 	if (base->starPowerGain > 0) {
 		if (BattleAudienceApSrcEntry() == TRUE) {
 			(base->starPowerGain)--;
 		}
-		if (cnt == 0 && psndSFXChk(((s32*)base)[2]) == -1) {
-			((s32*)base)[2] = ((s32 (*)(const char*))psndSFXOn)("SFX_BTL_SYS_AP_STAR1");
+		if (cnt == 0 && psndSFXChk(base->apStarSfxId) == -1) {
+			base->apStarSfxId = ((s32 (*)(const char*))psndSFXOn)("SFX_BTL_SYS_AP_STAR1");
 		}
 	} else {
 		for (k = 0, i = 0; i < 100; i++) {
@@ -1834,8 +1834,8 @@ void BattleAudienceApSrcCtrlProcess(void) {
 		}
 		if (k == 100) {
 			*(u32*)base &= ~2;
-			psndSFXOff(((s32*)base)[2]);
-			((s32*)base)[2] = 0;
+			psndSFXOff(base->apStarSfxId);
+			base->apStarSfxId = 0;
 			base->starPowerGain = 0;
 			BattleStatusWindowAPRecoveryOff();
 			return;
@@ -1850,7 +1850,7 @@ void BattleAudienceApSrcCtrlProcess(void) {
 		switch (s->state) {
 		case 0:
 			s->state = 5;
-			s->targetPos = *(Vec*)&s->x;
+			s->targetPos = s->position;
 			s->startPos = s->targetPos;
 			s->targetPos.x += 50.0f * rand() / 32767.0f - 25.0f;
 			s->targetPos.y += 25.0f;
@@ -1860,9 +1860,9 @@ void BattleAudienceApSrcCtrlProcess(void) {
 		case 5:
 			(s->timer)++;
 			dx = s->startPos.x; dy = s->targetPos.x;
-			s->x = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(dx, dy, 5, s->timer, s->duration);
+			s->position.x = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(dx, dy, 5, s->timer, s->duration);
 			dx = s->startPos.y; dy = s->targetPos.y;
-			s->y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(dx, dy, 5, s->timer, s->duration);
+			s->position.y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(dx, dy, 5, s->timer, s->duration);
 			if (s->timer >= s->duration - 20) {
 				s->scale.y = intplGetValue(4, s->timer - (s->duration - 20), 10, 0.9f, 0.8f);
 			}
@@ -1879,7 +1879,7 @@ void BattleAudienceApSrcCtrlProcess(void) {
 				s->state = 15;
 				s->timer = 0;
 				s->duration = 20 + irand(20);
-				s->startPos = *(Vec*)&s->x;
+				s->startPos = s->position;
 				statusGetApPos(&tmp);
 				s->targetPos = tmp;
 				dx = s->startPos.x - s->targetPos.x;
@@ -1897,14 +1897,14 @@ void BattleAudienceApSrcCtrlProcess(void) {
 			if (s->angle < 0.0f) {
 				s->angle += 6.283184f;
 			}
-			s->x = s->radius * (f32)cos(s->angle) + s->targetPos.x;
-			s->y = s->radius * (f32)sin(s->angle) + s->targetPos.y;
+			s->position.x = s->radius * (f32)cos(s->angle) + s->targetPos.x;
+			s->position.y = s->radius * (f32)sin(s->angle) + s->targetPos.y;
 			if (s->timer >= s->duration) {
 				s->state = 20;
 				s->timer = 0;
 				s->duration = 15;
 				statusGetApPos(&tmp2);
-				*(Vec*)&s->x = tmp2;
+				s->position = tmp2;
 			}
 			break;
 		case 20:
@@ -1954,19 +1954,19 @@ BOOL BattleAudienceApSrcEntry(void) {
 	star->scale = (Vec){0.75f, 0.75f, 0.75f};
 	star->alpha = 0x80;
 	m = BattleAudienceGetPtr(list[irand(count)]);
-	star->x = m->position.x;
-	star->y = 20.0f + m->position.y;
-	star->z = 1.0f + m->position.z;
+	star->position.x = m->position.x;
+	star->position.y = 20.0f + m->position.y;
+	star->position.z = 1.0f + m->position.z;
 	cam = camGetPtr(CAMERA_3D);
-	PSMTXMultVec(cam->view, (Vec*)&star->x, (Vec*)&star->x);
-	PSMTX44MultVec(cam->projection, (Vec*)&star->x, (Vec*)&star->x);
-	star->x *= 304.0f;
-	star->y *= 240.0f;
-	star->z = 0.0f;
+	PSMTXMultVec(cam->view, &star->position, &star->position);
+	PSMTX44MultVec(cam->projection, &star->position, &star->position);
+	star->position.x *= 304.0f;
+	star->position.y *= 240.0f;
+	star->position.z = 0.0f;
 	star->reserved_14 = 40.0f * rand() / 32767.0f - 20.0f;
 	star->reserved_18 = 10.0f * rand() / 32767.0f;
 	star->reserved_1C = 0.0f;
-	star->startPos = *(Vec*)&star->x;
+	star->startPos = star->position;
 	star->targetPos = (Vec){-96.0f, 106.0f, 0.0f};
 	return TRUE;
 }
@@ -1996,19 +1996,19 @@ void BattleAudienceWinCtrlProcess(void) {
 	}
 
 	if (win->mActive) {
-		((s32*)win)[5]++;
-		if (((s32*)win)[5] > 15) {
-			((s32*)win)[5] = 15;
+		win->slideTimer++;
+		if (win->slideTimer > 15) {
+			win->slideTimer = 15;
 		}
 	} else {
-		((s32*)win)[5]--;
-		if (((s32*)win)[5] < 0) {
-			((s32*)win)[5] = 0;
+		win->slideTimer--;
+		if (win->slideTimer < 0) {
+			win->slideTimer = 0;
 		}
 	}
-	((f32*)win)[2] = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(-500.0f, -280.0f, 4, ((s32*)win)[5], 15);
-	((f32*)win)[3] = -160.0f;
-	((f32*)win)[4] = 0.0f;
+	win->x = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(-500.0f, -280.0f, 4, win->slideTimer, 15);
+	win->y = -160.0f;
+	win->z = 0.0f;
 }
 
 //@@ BattleAudienceGXInit
@@ -2150,7 +2150,7 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 	hw = 20.0f;
 	nhw = -hw;
 	for (; i < 200; i++, m++) {
-		if (((u8*)dispGetCurWork())[1] != 2) {
+		if (dispGetCurWork()->renderMode != 2) {
 			if (m->colorA != 0xFF) continue;
 		} else {
 			if (m->colorA == 0xFF) continue;
@@ -2296,7 +2296,7 @@ void BattleAudienceDispApSrc(CameraId camId, void* param) {
 		if (star->flags & 1) {
 			PSMTXScale(scale, star->scale.x, star->scale.y, star->scale.z);
 			PSMTXRotRad(rot, 'z', 0.0f);
-			PSMTXTrans(trans, star->x, star->y, 0.0f);
+			PSMTXTrans(trans, star->position.x, star->position.y, 0.0f);
 			PSMTXConcat(scale, rot, mtx);
 			PSMTXConcat(trans, mtx, mtx);
 			iconDispGxCol(mtx, 0x10, ICON_1B2, (GXColor){0xFF, 0xFF, 0xFF, star->alpha});
@@ -2407,8 +2407,8 @@ void BattleAudience_Entry_Sub(s32 index, s32 type, u8 status) {
 	if (m->status == 11) {
 		m->position.y = -2000.0f;
 	}
-	*(Vec*)&m->accelX = (Vec){0.0f, 0.0f, 0.0f};
-	m->velocity = *(Vec*)&m->accelX;
+	m->accel = (Vec){0.0f, 0.0f, 0.0f};
+	m->velocity = m->accel;
 	m->facingDir = (Vec){0.0f, 0.0f, -1.0f};
 	m->mRotation = (Vec){0.0f, 0.0f, 0.0f};
 	m->mRotationOffset = (Vec){0.0f, 0.0f, 0.0f};
@@ -3080,7 +3080,7 @@ void BattleAudience_ApRecoveryBuild(StarPowerInfo* info) {
 	} else {
 		audience->starPowerGain = audience->starPowerGain + (s32)((mm * (cnt * (scale * root * (a + b)))) * pm);
 	}
-	if (irand(100) < ((u8*)info)[0xA]) {
+	if (irand(100) < (u8)info->mBingoSlotChance) {
 		BattleBreakSlot_PointInc();
 	}
 }

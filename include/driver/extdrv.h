@@ -43,7 +43,7 @@ typedef struct ExtdrvWork {
     GXColor* colors;         // 0x1C
     f32* uvs;                // 0x20
     ExtdrvSort* sort;        // 0x24
-    u8* dl;                  // 0x28
+    u8 (*dl)[0x80];          // 0x28, one 0x80-byte display list per texture
     u32* dlSize;             // 0x2C
     void (*mainFunc)(void);  // 0x30
     void (*mainFunc2)(void); // 0x34
@@ -55,4 +55,18 @@ typedef struct ExtdrvWork {
 void extInit(void);
 void extMain(void);
 void extReset(void);
-void extEntry(s32 count, void* data, void* data2, s32 arg3, s32 arg4);
+void extEntry(s32 poseNum, ExtdrvTexInfo* texInfo, void (*initFunc)(void), void (*mainFunc)(void), void (*mainFunc2)(void));
+ExtdrvPose* extGetPosePtr(void);
+s32 extGetPoseNum(void);
+void extPoseDraw(s32 index);
+void extDraw(void);
+void extLoadRenderMode(void);
+void extLoadVertex(void);
+void extLoadTexture(void);
+void extLoadTextureExit(void);
+void extLoadTev(void);
+void extLoadShadowVertex(void);
+void extLoadShadowTev(void);
+void extLoadShadowRenderMode(void);
+void extLoadShadowMtx(Mtx mtx);
+void extDrawShadow(void);

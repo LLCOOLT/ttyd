@@ -1,4 +1,5 @@
 #include "battle/battle_unit.h"
+#include "eff/eff_itemget.h"
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
@@ -1308,8 +1309,8 @@ USER_FUNC(start) {
 USER_FUNC(bg) {
     EffectEntry* eff = effItemGetEntry(0, 0.0f, 0.0f, 0.0f);
 
-    ((s32*)eff->userdata)[8] = 1;
-    ((s32*)eff->userdata)[14] = 5;
+    ((ItemGetWork*)eff->userdata)->state = 1;
+    ((ItemGetWork*)eff->userdata)->camera = 5;
     return EVT_RETURN_DONE;
 }
 

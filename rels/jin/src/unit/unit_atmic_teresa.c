@@ -16,20 +16,12 @@
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
+#include "driver/extdrv.h"
 
 typedef struct AtmTeresa { u8 state; u8 flag; s32 anim; s32 wait; s32 timer; Vec vel; Vec start; Vec target; u8 mode; } AtmTeresa;
 AtmTeresa* teresa;
 #define ATMIC_TERESA_SCALE atmic_teresa_scale
-s32 extGetPoseNum(void);
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 s32 teresa_count;
-ExtPose* extGetPosePtr(void);
 s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* name, u32 flags, s32 arg3, Vec* pos);
 s32 irand(s32 scalar);
 f32 intplGetValue(s32 mode, f32 start, f32 end, s32 cur, s32 steps);
@@ -925,16 +917,16 @@ EVT_END()
 
 void teresa_ext_init(void) {
     s32 i;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
 
     teresa = BattleAlloc(sizeof(AtmTeresa) * 30);
     for (i = 0; i < extGetPoseNum(); i++, pose++) {
         pose->flags = 1;
-        PSMTXIdentity(pose->mtx);
-        pose->mtx[0][3] = 0.0f;
-        pose->mtx[1][3] = -1000.0f;
-        pose->mtx[2][3] = 0.0f;
-        pose->rot = 90.0f;
+        PSMTXIdentity(*pose->mtx);
+        (*pose->mtx)[0][3] = 0.0f;
+        (*pose->mtx)[1][3] = -1000.0f;
+        (*pose->mtx)[2][3] = 0.0f;
+        pose->dir = 90.0f;
         teresa[i].state = 0;
         teresa[i].flag = 0;
         teresa[i].anim = 0;
@@ -948,7 +940,7 @@ void teresa_ext_init(void) {
 void teresa_ext_main(void) {
     s32 i;
     s32 j;
-    ExtPose* pose = extGetPosePtr();
+    ExtdrvPose* pose = extGetPosePtr();
     AtmTeresa* t;
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, atmic_teresa_id[0]);
     BattleUnit* target = BattleGetUnitPtr(_battleWorkPointer, target_unit_id[0]);
@@ -1001,11 +993,11 @@ void teresa_ext_main(void) {
             case 1:
                 t->anim++;
                 if (t->anim <= 30) {
-                    pose->frame = 8;
+                    pose->texId = 8;
                 } else if (t->anim < 44) {
-                    pose->frame = (t->anim - 30) / 2 + 9;
+                    pose->texId = (t->anim - 30) / 2 + 9;
                 } else {
-                    pose->frame = 15;
+                    pose->texId = 15;
                 }
                 break;
             default:
@@ -1013,36 +1005,36 @@ void teresa_ext_main(void) {
                 if (t->anim >= 24) {
                     t->anim -= 24;
                 }
-                pose->frame = t->anim / 3;
+                pose->texId = t->anim / 3;
                 break;
         }
         if (t->wait >= 1) {
             t->wait--;
             continue;
         }
-        pose->mtx[0][3] += t->vel.x;
-        pose->mtx[1][3] += t->vel.y;
-        pose->mtx[2][3] += t->vel.z;
-        if (pose->mtx[1][3] < 0.0f) {
-            pose->mtx[1][3] = 0.0f;
+        (*pose->mtx)[0][3] += t->vel.x;
+        (*pose->mtx)[1][3] += t->vel.y;
+        (*pose->mtx)[2][3] += t->vel.z;
+        if ((*pose->mtx)[1][3] < 0.0f) {
+            (*pose->mtx)[1][3] = 0.0f;
         }
 
         switch (t->state) {
             case 0:
-                pose->mtx[0][3] = 0.0f;
-                pose->mtx[1][3] = -1000.0f;
-                pose->mtx[2][3] = 0.0f;
-                pose->rot = 90.0f;
-                pose->mtx[1][1] = 1.0f;
-                pose->mtx[0][0] = 1.0f;
+                (*pose->mtx)[0][3] = 0.0f;
+                (*pose->mtx)[1][3] = -1000.0f;
+                (*pose->mtx)[2][3] = 0.0f;
+                pose->dir = 90.0f;
+                (*pose->mtx)[1][1] = 1.0f;
+                (*pose->mtx)[0][0] = 1.0f;
                 break;
             case 1:
                 pose->flags &= ~2;
-                pose->mtx[0][3] = x;
-                pose->mtx[1][3] = y;
-                pose->mtx[2][3] = z - 5.0f;
-                pose->mtx[0][0] = 0.0f;
-                pose->mtx[1][1] = 0.0f;
+                (*pose->mtx)[0][3] = x;
+                (*pose->mtx)[1][3] = y;
+                (*pose->mtx)[2][3] = z - 5.0f;
+                (*pose->mtx)[0][0] = 0.0f;
+                (*pose->mtx)[1][1] = 0.0f;
                 angle = 0.785398f * i;
                 t->vel.x = 2.0f * (f32)cos(angle);
                 t->vel.y = 2.0f * (f32)sin(angle);
@@ -1057,14 +1049,14 @@ void teresa_ext_main(void) {
                     ATMIC_TERESA_SCALE -= 0.05f;
                     if (i % 2 == 0) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        pos.x = pose->mtx[0][3];
-                        pos.y = pose->mtx[1][3];
-                        pos.z = pose->mtx[2][3];
+                        pos.x = (*pose->mtx)[0][3];
+                        pos.y = (*pose->mtx)[1][3];
+                        pos.z = (*pose->mtx)[2][3];
                         BtlUnit_snd_se_pos(unit, "SFX_BOSS_ATMTLSA_DIVIDE1", 0xF1194D80, 0, &pos);
                     }
                 }
-                pose->mtx[0][0] += 0.02f;
-                pose->mtx[1][1] += 0.02f;
+                (*pose->mtx)[0][0] += 0.02f;
+                (*pose->mtx)[1][1] += 0.02f;
                 if (t->timer <= 0) {
                     pose->flags |= 2;
                     t->state = 10;
@@ -1074,9 +1066,9 @@ void teresa_ext_main(void) {
                     t->vel.z = 0.0f;
                     if (i % 2 == 0) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        pos.x = pose->mtx[0][3];
-                        pos.y = pose->mtx[1][3];
-                        pos.z = pose->mtx[2][3];
+                        pos.x = (*pose->mtx)[0][3];
+                        pos.y = (*pose->mtx)[1][3];
+                        pos.z = (*pose->mtx)[2][3];
                         BtlUnit_snd_se_pos(unit, "SFX_BOSS_ATMTLSA_S_MOVE1", 0xF1194D80, 0, &pos);
                     }
                 }
@@ -1086,14 +1078,14 @@ void teresa_ext_main(void) {
                 t->target.x = 90.0f * (f32)cos(angle) - 100.0f;
                 t->target.y = 10.0f;
                 t->target.z = 90.0f * (f32)sin(angle);
-                if (pose->mtx[0][3] >= -100.0f) {
-                    pose->rot = 90.0f;
+                if ((*pose->mtx)[0][3] >= -100.0f) {
+                    pose->dir = 90.0f;
                 } else {
-                    pose->rot = 270.0f;
+                    pose->dir = 270.0f;
                 }
-                t->vel.x = (t->target.x - pose->mtx[0][3]) / 20.0f;
-                t->vel.y = (t->target.y - pose->mtx[1][3]) / 20.0f;
-                t->vel.z = (t->target.z - pose->mtx[2][3]) / 20.0f;
+                t->vel.x = (t->target.x - (*pose->mtx)[0][3]) / 20.0f;
+                t->vel.y = (t->target.y - (*pose->mtx)[1][3]) / 20.0f;
+                t->vel.z = (t->target.z - (*pose->mtx)[2][3]) / 20.0f;
                 if (t->timer <= 0) {
                     t->state = 15;
                     t->vel.x = 0.0f;
@@ -1107,14 +1099,14 @@ void teresa_ext_main(void) {
                 t->target.x = 90.0f * (f32)cos(angle) - 100.0f;
                 t->target.y = 10.0f;
                 t->target.z = 90.0f * (f32)sin(angle);
-                if (pose->mtx[0][3] >= -100.0f) {
-                    pose->rot = 90.0f;
+                if ((*pose->mtx)[0][3] >= -100.0f) {
+                    pose->dir = 90.0f;
                 } else {
-                    pose->rot = 270.0f;
+                    pose->dir = 270.0f;
                 }
-                t->vel.x = (t->target.x - pose->mtx[0][3]) / 20.0f;
-                t->vel.y = (t->target.y - pose->mtx[1][3]) / 20.0f;
-                t->vel.z = (t->target.z - pose->mtx[2][3]) / 20.0f;
+                t->vel.x = (t->target.x - (*pose->mtx)[0][3]) / 20.0f;
+                t->vel.y = (t->target.y - (*pose->mtx)[1][3]) / 20.0f;
+                t->vel.z = (t->target.z - (*pose->mtx)[2][3]) / 20.0f;
                 n = 0;
                 for (j = 0; j < 8; j++) {
                     if (teresa[j].state != 15) {
@@ -1141,7 +1133,7 @@ void teresa_ext_main(void) {
                     t->anim = 0;
                     t->timer = 60;
                     t->wait = waits[i];
-                    pose->rot = 90.0f;
+                    pose->dir = 90.0f;
                 }
                 break;
             case 23:
@@ -1152,16 +1144,16 @@ void teresa_ext_main(void) {
                 t->state = 25;
                 if (i % 2 == 0) {
                     Vec pos = {0.0f, 0.0f, 0.0f};
-                    pos.x = pose->mtx[0][3];
-                    pos.y = pose->mtx[1][3];
-                    pos.z = pose->mtx[2][3];
+                    pos.x = (*pose->mtx)[0][3];
+                    pos.y = (*pose->mtx)[1][3];
+                    pos.z = (*pose->mtx)[2][3];
                     BtlUnit_snd_se_pos(unit, "SFX_BOSS_ATMTLSA_S_MOVE1", 0xF1194D80, 0, &pos);
                 }
                 break;
             case 25:
-                t->vel.x = (t->target.x - pose->mtx[0][3]) / 20.0f;
-                t->vel.y = (t->target.y - pose->mtx[1][3]) / 20.0f;
-                t->vel.z = (t->target.z - pose->mtx[2][3]) / 20.0f;
+                t->vel.x = (t->target.x - (*pose->mtx)[0][3]) / 20.0f;
+                t->vel.y = (t->target.y - (*pose->mtx)[1][3]) / 20.0f;
+                t->vel.z = (t->target.z - (*pose->mtx)[2][3]) / 20.0f;
                 if (t->timer <= 0) {
                     t->state = 30;
                     t->vel.x = 0.0f;
@@ -1172,26 +1164,26 @@ void teresa_ext_main(void) {
                 t->timer--;
                 break;
             case 31:
-                pose->mtx[0][0] -= 0.0125f;
-                pose->mtx[1][1] = pose->mtx[0][0];
-                if (pose->mtx[0][0] <= 0.0f) {
+                (*pose->mtx)[0][0] -= 0.0125f;
+                (*pose->mtx)[1][1] = (*pose->mtx)[0][0];
+                if ((*pose->mtx)[0][0] <= 0.0f) {
                     t->state = 0;
                 }
                 break;
             case 51:
             case 52:
                 pose->flags &= ~2;
-                pose->mtx[0][3] = x - 15.0f;
-                pose->mtx[1][3] = y - 5.0f;
-                pose->mtx[2][3] = 5.0f + z;
-                pose->mtx[1][1] = 0.0f;
-                pose->mtx[0][0] = 0.0f;
+                (*pose->mtx)[0][3] = x - 15.0f;
+                (*pose->mtx)[1][3] = y - 5.0f;
+                (*pose->mtx)[2][3] = 5.0f + z;
+                (*pose->mtx)[1][1] = 0.0f;
+                (*pose->mtx)[0][0] = 0.0f;
                 t->vel.x = 0.0f;
                 t->vel.y = 0.0f;
                 t->vel.z = 0.0f;
-                t->start.x = pose->mtx[0][3];
-                t->start.y = pose->mtx[1][3];
-                t->start.z = pose->mtx[2][3];
+                t->start.x = (*pose->mtx)[0][3];
+                t->start.y = (*pose->mtx)[1][3];
+                t->start.z = (*pose->mtx)[2][3];
                 if (t->state == 51) {
                     t->target.x = (hx + ofs[i][0]) - 200.0f;
                 } else {
@@ -1213,14 +1205,14 @@ void teresa_ext_main(void) {
                 t->state = 55;
                 break;
             case 55:
-                pose->mtx[0][0] += 0.04f;
-                if (pose->mtx[0][0] >= 1.0f) {
-                    pose->mtx[0][0] = 1.0f;
+                (*pose->mtx)[0][0] += 0.04f;
+                if ((*pose->mtx)[0][0] >= 1.0f) {
+                    (*pose->mtx)[0][0] = 1.0f;
                 }
-                pose->mtx[1][1] = pose->mtx[0][0];
-                pose->mtx[0][3] = intplGetValue(t->mode, t->start.x, t->target.x, t->timer, 30);
-                pose->mtx[1][3] = intplGetValue(t->mode, t->start.y, t->target.y, t->timer, 30);
-                pose->mtx[2][3] = intplGetValue(t->mode, t->start.z, t->target.z, t->timer, 30);
+                (*pose->mtx)[1][1] = (*pose->mtx)[0][0];
+                (*pose->mtx)[0][3] = intplGetValue(t->mode, t->start.x, t->target.x, t->timer, 30);
+                (*pose->mtx)[1][3] = intplGetValue(t->mode, t->start.y, t->target.y, t->timer, 30);
+                (*pose->mtx)[2][3] = intplGetValue(t->mode, t->start.z, t->target.z, t->timer, 30);
                 if (t->timer >= 30) {
                     t->state = 60;
                 }
@@ -1234,16 +1226,16 @@ void teresa_ext_main(void) {
                 t->state = 65;
                 if (i % 2 == 0) {
                     Vec pos = {0.0f, 0.0f, 0.0f};
-                    pos.x = pose->mtx[0][3];
-                    pos.y = pose->mtx[1][3];
-                    pos.z = pose->mtx[2][3];
+                    pos.x = (*pose->mtx)[0][3];
+                    pos.y = (*pose->mtx)[1][3];
+                    pos.z = (*pose->mtx)[2][3];
                     BtlUnit_snd_se_pos(unit, "SFX_BOSS_ATMTLSA_S_MOVE1", 0xF1194D80, 0, &pos);
                 }
                 break;
             case 65:
-                t->vel.x = (t->target.x - pose->mtx[0][3]) / 15.0f;
-                t->vel.y = (t->target.y - pose->mtx[1][3]) / 15.0f;
-                t->vel.z = (t->target.z - pose->mtx[2][3]) / 15.0f;
+                t->vel.x = (t->target.x - (*pose->mtx)[0][3]) / 15.0f;
+                t->vel.y = (t->target.y - (*pose->mtx)[1][3]) / 15.0f;
+                t->vel.z = (t->target.z - (*pose->mtx)[2][3]) / 15.0f;
                 if (t->timer <= 0) {
                     t->state = 70;
                     t->vel.x = 0.0f;
@@ -1253,9 +1245,9 @@ void teresa_ext_main(void) {
                 t->timer--;
                 break;
             case 71:
-                pose->mtx[0][0] -= 0.0125f;
-                pose->mtx[1][1] = pose->mtx[0][0];
-                if (pose->mtx[0][0] <= 0.0f) {
+                (*pose->mtx)[0][0] -= 0.0125f;
+                (*pose->mtx)[1][1] = (*pose->mtx)[0][0];
+                if ((*pose->mtx)[0][0] <= 0.0f) {
                     t->state = 0;
                 }
                 break;

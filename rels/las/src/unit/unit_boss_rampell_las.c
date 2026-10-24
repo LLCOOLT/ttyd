@@ -1,4 +1,5 @@
 #include "battle/battle_unit.h"
+#include "eff/eff_scanning.h"
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
@@ -3964,7 +3965,7 @@ static USER_FUNC(eff_scanning) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
     EffectEntry* eff = effScanningEntry(0, x, y, z);
 
-    ((f32*)eff->userdata)[4] = unit->mSizeMultiplier;
+    ((effScanningData*)eff->userdata)->field_0x10 = unit->mSizeMultiplier;
     return EVT_RETURN_DONE;
 }
 BOOL BtlUnit_CheckShadowGuard(BattleUnit* unit);

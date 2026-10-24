@@ -1,3 +1,4 @@
+#include "eff/n64/eff_kemuri12_n64.h"
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -719,7 +720,7 @@ USER_FUNC(kemuri_move) {
     if (isFirstCall) {
         return EVT_RETURN_BLOCK;
     }
-    ((f32*)eff->userdata)[1] += dy;
+    ((EffKemuri12N64Work*)eff->userdata)->position.x += dy;
     return EVT_RETURN_BLOCK;
 }
 

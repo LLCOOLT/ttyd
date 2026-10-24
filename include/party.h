@@ -274,8 +274,8 @@ typedef struct PartyEntry {
 } PartyEntry; // size 0x188
 
 PartyEntry* partyGetPtr(s32 index);
-void partyCtrlOn(PartyEntry* party);
-void partyCtrlOff(PartyEntry* party);
+void partyCtrlOn(void);
+void partyCtrlOff(void);
 PartyEntry* anotherPartyGetPtr(s32 index);
 BOOL partyPaperOn(PartyEntry* party, const char* animName);
 

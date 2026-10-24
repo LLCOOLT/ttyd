@@ -212,7 +212,7 @@ s32 uranaisi_data_make_next(const char* prefix, s32 type);
 					tagdata++; \
 					if (tagNum == 0) { \
 						tag[mbbpos] = '\0'; \
-						initEndPos = (s32)tagdata; \
+						initEndPos = (u8*)tagdata; \
 					} else { \
 						tagEndPos = (s16)mbbpos; \
 					} \
@@ -419,7 +419,7 @@ s32 uranaisi_data_make_next(const char* prefix, s32 type) {
 	BOOL tagdone;
 	const s8* tagdata;
 	s32 infoId;
-	s32 initEndPos;
+	u8* initEndPos;
 	s16 tagEndPos;
 	const s8* msg;
 	s32 labelId;
@@ -495,7 +495,7 @@ s32 uranaisi_data_make_starpiece(const char* prefix, s32 type) {
 	s32 tagNum;
 	BOOL tagdone;
 	s32 infoId;
-	s32 initEndPos;
+	u8* initEndPos;
 	s16 tagEndPos;
 	const s8* msg;
 	const s8* tagdata;
@@ -528,10 +528,10 @@ s32 uranaisi_data_make_starpiece(const char* prefix, s32 type) {
 		if (strcmp(tag, "")) {
 			labelId = search_evt_no(tag);
 			if (labelId != -1 && labelId <= maxLabel) {
-				saved = ((u8*)initEndPos)[tagEndPos];
-				((u8*)initEndPos)[tagEndPos] = 0;
+				saved = initEndPos[tagEndPos];
+				initEndPos[tagEndPos] = 0;
 				flagId = starpiece_search((const char*)initEndPos);
-				((u8*)initEndPos)[tagEndPos] = saved;
+				initEndPos[tagEndPos] = saved;
 				if (flagId != -1 && evtGetValue(0, flagId) == 0) {
 					if (type & 1) {
 						wp->info[infoId].labelId = (s16)labelId;
@@ -566,7 +566,7 @@ s32 uranaisi_data_make_supercoin(const char* prefix, s32 type) {
 	s32 tagNum;
 	BOOL tagdone;
 	s32 infoId;
-	s32 initEndPos;
+	u8* initEndPos;
 	s16 tagEndPos;
 	const s8* msg;
 	const s8* tagdata;
@@ -599,10 +599,10 @@ s32 uranaisi_data_make_supercoin(const char* prefix, s32 type) {
 		if (strcmp(tag, "")) {
 			labelId = search_evt_no(tag);
 			if (labelId != -1 && labelId <= maxLabel) {
-				saved = ((u8*)initEndPos)[tagEndPos];
-				((u8*)initEndPos)[tagEndPos] = 0;
+				saved = initEndPos[tagEndPos];
+				initEndPos[tagEndPos] = 0;
 				flagId = supercoin_search((const char*)initEndPos);
-				((u8*)initEndPos)[tagEndPos] = saved;
+				initEndPos[tagEndPos] = saved;
 				if (flagId != -1 && evtGetValue(0, flagId) == 0) {
 					if (type & 1) {
 						wp->info[infoId].labelId = (s16)labelId;

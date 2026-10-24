@@ -1,3 +1,5 @@
+#include "eff/n64/eff_shock_n64.h"
+#include "eff/n64/eff_pokopi_thunder_n64.h"
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -26,7 +28,6 @@
 USER_FUNC(btlevtcmd_WaitEventEnd);
 #endif
 
-typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct HandElem { u16 flip; u8 field_0x2[2]; s32 animIdx; OSTime time; s16 ofs; s16 phase; f32 speed; Vec pos; s32 field_0x24; } HandElem;
 typedef struct HandAnim { char name[16]; char anim[8]; f32 rate; s32 start; s32 count; } HandAnim;
 typedef struct HandWork { HandElem* elems; s32 num; HandAnim anim[32]; u8 field_0x488[0x49C - 0x488]; f32 y; u8 field_0x4a0[4]; s32 animNum; s32 timer; s32 state; } HandWork;
@@ -34,17 +35,10 @@ typedef struct HandData { const char* name; const char* anim; f32 rate; } HandDa
 typedef struct QueenConnect { s32 poseId[3]; u8 field_0xc[0x40 - 0xC]; s32 idx[2]; } QueenConnect;
 HandData hand_data[32];
 HandWork* hand_wp;
-ExtPose* extGetPosePtr(void);
-s32 extGetPoseNum(void);
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
 s32 psndSFXOn_3D(const char* name, Vec* position);
 void BattleAudienceAddTargetNum(f32 a, f32 b);
 #include "battle/battle_break_slot.h"
+#include "driver/extdrv.h"
 u8* lightGetPaperCraft(void);
 EffectEntry* effShockN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b);
 EffectEntry* effPokopiThunderN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz, f32 scale);
@@ -4352,7 +4346,7 @@ USER_FUNC(queen_hand_small_1000hand_set_offset_evt) {
 
 USER_FUNC(queen_hand_small_1000hand_2_evt) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     if (isFirstCall) {
@@ -4366,17 +4360,17 @@ USER_FUNC(queen_hand_small_1000hand_2_evt) {
             for (i = 0; i < hand_wp->num; i++, pose++, elem++) {
                 pose->flags |= 1;
                 pose->flags &= ~2;
-                PSMTXIdentity(pose->mtx);
+                PSMTXIdentity(*pose->mtx);
                 elem->ofs = irand(20);
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 20 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
                 elem->pos.z = (i / 10) * -15 + 70 + irand(15);
-                pose->rot = irand(20) - 10;
-                pose->mtx[0][0] = 50.0f / (50.0f + irand(50));
-                pose->mtx[1][1] = 50.0f / (50.0f + irand(50));
+                pose->dir = irand(20) - 10;
+                (*pose->mtx)[0][0] = 50.0f / (50.0f + irand(50));
+                (*pose->mtx)[1][1] = 50.0f / (50.0f + irand(50));
                 if (elem->flip) {
-                    pose->mtx[0][0] *= -1.0f;
+                    (*pose->mtx)[0][0] *= -1.0f;
                 }
             }
             hand_wp->state++;
@@ -4447,7 +4441,7 @@ USER_FUNC(queen_hand_small_1000hand_1_evt) {
 
 USER_FUNC(queen_hand_small_drag_1_evt) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     if (isFirstCall) {
@@ -4461,17 +4455,17 @@ USER_FUNC(queen_hand_small_drag_1_evt) {
             for (i = 0; i < hand_wp->num; i++, pose++, elem++) {
                 pose->flags |= 1;
                 pose->flags &= ~2;
-                PSMTXIdentity(pose->mtx);
+                PSMTXIdentity(*pose->mtx);
                 elem->ofs = irand(20);
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 20 - 200 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
                 elem->pos.z = (i / 10) * -15 + 70 + irand(15);
-                pose->rot = irand(20) - 10;
-                pose->mtx[0][0] = 50.0f / (50.0f + irand(50));
-                pose->mtx[1][1] = 50.0f / (50.0f + irand(50));
+                pose->dir = irand(20) - 10;
+                (*pose->mtx)[0][0] = 50.0f / (50.0f + irand(50));
+                (*pose->mtx)[1][1] = 50.0f / (50.0f + irand(50));
                 if (elem->flip) {
-                    pose->mtx[0][0] *= -1.0f;
+                    (*pose->mtx)[0][0] *= -1.0f;
                 }
             }
             hand_wp->state++;
@@ -4523,7 +4517,7 @@ USER_FUNC(queen_hand_small_drag_1_evt) {
 
 USER_FUNC(queen_hand_small_drag_2_evt) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     if (isFirstCall) {
@@ -4558,7 +4552,7 @@ USER_FUNC(queen_hand_small_drag_2_evt) {
 
 USER_FUNC(queen_hand_small_drag_3_evt) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     if (isFirstCall) {
@@ -4572,17 +4566,17 @@ USER_FUNC(queen_hand_small_drag_3_evt) {
             for (i = 0; i < hand_wp->num; i++, pose++, elem++) {
                 pose->flags |= 1;
                 pose->flags &= ~2;
-                PSMTXIdentity(pose->mtx);
+                PSMTXIdentity(*pose->mtx);
                 elem->ofs = irand(20);
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 20 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
                 elem->pos.z = (i / 10) * -15 + 70 + irand(15);
-                pose->rot = irand(20) - 10;
-                pose->mtx[0][0] = 50.0f / (50.0f + irand(50));
-                pose->mtx[1][1] = 50.0f / (50.0f + irand(50));
+                pose->dir = irand(20) - 10;
+                (*pose->mtx)[0][0] = 50.0f / (50.0f + irand(50));
+                (*pose->mtx)[1][1] = 50.0f / (50.0f + irand(50));
                 if (elem->flip) {
-                    pose->mtx[0][0] *= -1.0f;
+                    (*pose->mtx)[0][0] *= -1.0f;
                 }
             }
             hand_wp->state++;
@@ -4607,7 +4601,7 @@ USER_FUNC(queen_hand_small_drag_3_evt) {
 
 USER_FUNC(queen_hand_small_drag_4_evt) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     if (isFirstCall) {
@@ -4642,7 +4636,7 @@ USER_FUNC(queen_hand_small_drag_4_evt) {
 
 USER_FUNC(queen_hand_small_dead_evt) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     if (isFirstCall) {
@@ -4677,7 +4671,7 @@ USER_FUNC(queen_hand_small_dead_evt) {
 
 USER_FUNC(queen_hand_small_entry_evt) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     if (isFirstCall) {
@@ -4691,17 +4685,17 @@ USER_FUNC(queen_hand_small_entry_evt) {
             for (i = 0; i < hand_wp->num; i++, pose++, elem++) {
                 pose->flags |= 1;
                 pose->flags &= ~2;
-                PSMTXIdentity(pose->mtx);
+                PSMTXIdentity(*pose->mtx);
                 elem->ofs = irand(20);
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 20 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
                 elem->pos.z = (i / 10) * -15 + 70 + irand(15);
-                pose->rot = irand(20) - 10;
-                pose->mtx[0][0] = 50.0f / (50.0f + irand(50));
-                pose->mtx[1][1] = 50.0f / (50.0f + irand(50));
+                pose->dir = irand(20) - 10;
+                (*pose->mtx)[0][0] = 50.0f / (50.0f + irand(50));
+                (*pose->mtx)[1][1] = 50.0f / (50.0f + irand(50));
                 if (elem->flip) {
-                    pose->mtx[0][0] *= -1.0f;
+                    (*pose->mtx)[0][0] *= -1.0f;
                 }
             }
             hand_wp->state++;
@@ -4737,18 +4731,18 @@ USER_FUNC(peach_shock_evt) {
     EffectEntry* eff;
 
     eff = effShockN64Entry(3, x, y, z, 200.0f, 150.0f);
-    ((s32*)eff->userdata)[12] = 10;
-    ((s32*)eff->userdata)[13] = 10;
-    ((s32*)eff->userdata)[14] = 10;
-    ((s32*)eff->userdata)[15] = irand(50) + 155;
-    ((s32*)eff->userdata)[16] = irand(50) + 155;
-    ((s32*)eff->userdata)[17] = irand(50) + 155;
+    ((EffShockN64Work*)eff->userdata)->col0[0] = 10;
+    ((EffShockN64Work*)eff->userdata)->col0[1] = 10;
+    ((EffShockN64Work*)eff->userdata)->col0[2] = 10;
+    ((EffShockN64Work*)eff->userdata)->col1[0] = irand(50) + 155;
+    ((EffShockN64Work*)eff->userdata)->col1[1] = irand(50) + 155;
+    ((EffShockN64Work*)eff->userdata)->col1[2] = irand(50) + 155;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(queen_hp_drain_5_evt) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     if (isFirstCall) {
@@ -4762,17 +4756,17 @@ USER_FUNC(queen_hp_drain_5_evt) {
             for (i = 0; i < hand_wp->num; i++, pose++, elem++) {
                 pose->flags |= 1;
                 pose->flags &= ~2;
-                PSMTXIdentity(pose->mtx);
+                PSMTXIdentity(*pose->mtx);
                 elem->ofs = irand(20);
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 20 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
                 elem->pos.z = (i / 10) * -15 + 70 + irand(15);
-                pose->rot = irand(20) - 10;
-                pose->mtx[0][0] = 50.0f / (50.0f + irand(50));
-                pose->mtx[1][1] = 50.0f / (50.0f + irand(50));
+                pose->dir = irand(20) - 10;
+                (*pose->mtx)[0][0] = 50.0f / (50.0f + irand(50));
+                (*pose->mtx)[1][1] = 50.0f / (50.0f + irand(50));
                 if (elem->flip) {
-                    pose->mtx[0][0] *= -1.0f;
+                    (*pose->mtx)[0][0] *= -1.0f;
                 }
             }
             hand_wp->state++;
@@ -4839,7 +4833,7 @@ USER_FUNC(queen_hp_drain_4_evt) {
 
 USER_FUNC(queen_hp_drain_3_evt) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     if (isFirstCall) {
@@ -4874,7 +4868,7 @@ USER_FUNC(queen_hp_drain_3_evt) {
 
 USER_FUNC(queen_hp_drain_2_evt) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     if (isFirstCall) {
@@ -4889,17 +4883,17 @@ USER_FUNC(queen_hp_drain_2_evt) {
             for (i = 0; i < hand_wp->num; i++, pose++, elem++) {
                 pose->flags |= 1;
                 pose->flags &= ~2;
-                PSMTXIdentity(pose->mtx);
+                PSMTXIdentity(*pose->mtx);
                 elem->ofs = irand(20);
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 40 - 200 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
                 elem->pos.z = (i / 10) * -15 + 270 + irand(15);
-                pose->rot = irand(20) - 10;
-                pose->mtx[0][0] = 50.0f / (50.0f + irand(50));
-                pose->mtx[1][1] = 50.0f / (50.0f + irand(50));
+                pose->dir = irand(20) - 10;
+                (*pose->mtx)[0][0] = 50.0f / (50.0f + irand(50));
+                (*pose->mtx)[1][1] = 50.0f / (50.0f + irand(50));
                 if (elem->flip) {
-                    pose->mtx[0][0] *= -1.0f;
+                    (*pose->mtx)[0][0] *= -1.0f;
                 }
             }
             hand_wp->state++;
@@ -4924,7 +4918,7 @@ USER_FUNC(queen_hp_drain_2_evt) {
 
 USER_FUNC(queen_hp_drain_1_evt) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     if (isFirstCall) {
@@ -4979,7 +4973,7 @@ USER_FUNC(queen_kankyaku_delete_evt) {
 
 USER_FUNC(peach_hand1000_dark_drag_1_evt) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     if (isFirstCall) {
@@ -4993,17 +4987,17 @@ USER_FUNC(peach_hand1000_dark_drag_1_evt) {
             for (i = 0; i < hand_wp->num; i++, pose++, elem++) {
                 pose->flags |= 1;
                 pose->flags &= ~2;
-                PSMTXIdentity(pose->mtx);
+                PSMTXIdentity(*pose->mtx);
                 elem->ofs = irand(20);
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 20 - 200 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
                 elem->pos.z = (i / 10) * -15 + 70 + irand(15);
-                pose->rot = irand(20) - 10;
-                pose->mtx[0][0] = 50.0f / (50.0f + irand(50));
-                pose->mtx[1][1] = 50.0f / (50.0f + irand(50));
+                pose->dir = irand(20) - 10;
+                (*pose->mtx)[0][0] = 50.0f / (50.0f + irand(50));
+                (*pose->mtx)[1][1] = 50.0f / (50.0f + irand(50));
                 if (elem->flip) {
-                    pose->mtx[0][0] *= -1.0f;
+                    (*pose->mtx)[0][0] *= -1.0f;
                 }
             }
             hand_wp->state++;
@@ -5086,19 +5080,19 @@ USER_FUNC(queen_thunder) {
     pos.z = z;
     psndSFXOn_3D((const char*)0xF1E, &pos);
     eff = effPokopiThunderN64Entry(0, 40, 20.0f + x + irand(20), 150.0f, 20.0f + z, x, 0.0f, z, 1.0f);
-    ((s32*)eff->userdata)[12] = 255;
-    ((s32*)eff->userdata)[13] = 160;
-    ((s32*)eff->userdata)[14] = 192;
-    ((s32*)eff->userdata)[16] = 20;
-    ((s32*)eff->userdata)[17] = 20;
-    ((s32*)eff->userdata)[18] = 20;
+    ((EffPokopiThunderN64Work*)eff->userdata)->r = 255;
+    ((EffPokopiThunderN64Work*)eff->userdata)->g = 160;
+    ((EffPokopiThunderN64Work*)eff->userdata)->b = 192;
+    ((EffPokopiThunderN64Work*)eff->userdata)->r2 = 20;
+    ((EffPokopiThunderN64Work*)eff->userdata)->g2 = 20;
+    ((EffPokopiThunderN64Work*)eff->userdata)->b2 = 20;
     eff = effShockN64Entry(3, x, 0.0f, z, 80.0f, 80.0f);
-    ((s32*)eff->userdata)[12] = 20;
-    ((s32*)eff->userdata)[13] = 20;
-    ((s32*)eff->userdata)[14] = 20;
-    ((s32*)eff->userdata)[15] = 255;
-    ((s32*)eff->userdata)[16] = 160;
-    ((s32*)eff->userdata)[17] = 192;
+    ((EffShockN64Work*)eff->userdata)->col0[0] = 20;
+    ((EffShockN64Work*)eff->userdata)->col0[1] = 20;
+    ((EffShockN64Work*)eff->userdata)->col0[2] = 20;
+    ((EffShockN64Work*)eff->userdata)->col1[0] = 255;
+    ((EffShockN64Work*)eff->userdata)->col1[1] = 160;
+    ((EffShockN64Work*)eff->userdata)->col1[2] = 192;
     btl_camera_shake_w(0, 8, 0, 1.0f, 1.0f);
     return EVT_RETURN_DONE;
 }
@@ -5118,7 +5112,7 @@ USER_FUNC(change_pose) {
 
 // same body as pose_main; hand_main inlines it (register/stack order only match this way)
 inline void hand_pose_inl(void) {
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
     s32 i;
     HandAnim* a;
@@ -5136,19 +5130,19 @@ inline void hand_pose_inl(void) {
             elem->time = gp->renderTime;
             t -= 1.0f;
         }
-        pose->frame = a->start + (s32)((a->count - 1) * t);
+        pose->texId = a->start + (s32)((a->count - 1) * t);
         id = evtGetValue(NULL, GW(10));
         if (id == -1) {
-            pose->mtx[0][3] = elem->pos.x;
-            pose->mtx[1][3] = elem->pos.y;
-            pose->mtx[2][3] = elem->pos.z;
+            (*pose->mtx)[0][3] = elem->pos.x;
+            (*pose->mtx)[1][3] = elem->pos.y;
+            (*pose->mtx)[2][3] = elem->pos.z;
         } else {
             BattleGetUnitPtr(_battleWorkPointer, id);
             BtlUnit_GetPos(BattleGetUnitPtr(_battleWorkPointer, id), &x, &y, &z);
             BtlUnit_GetHomePos(BattleGetUnitPtr(_battleWorkPointer, id), &hx, &hy, &hz);
-            pose->mtx[0][3] = elem->pos.x + x - hx;
-            pose->mtx[1][3] = elem->pos.y + y - hy;
-            pose->mtx[2][3] = elem->pos.z + z - hz;
+            (*pose->mtx)[0][3] = elem->pos.x + x - hx;
+            (*pose->mtx)[1][3] = elem->pos.y + y - hy;
+            (*pose->mtx)[2][3] = elem->pos.z + z - hz;
         }
     }
 }
@@ -5168,7 +5162,7 @@ void hand_draw(CameraId cameraId, void* param) {
 
 static void hand_init(void) {
     s32 i;
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
 
     hand_wp = BTL_ALLOC(sizeof(HandWork));
@@ -5181,7 +5175,7 @@ static void hand_init(void) {
     elem = hand_wp->elems;
     for (i = 0; i < hand_wp->num; i++, pose++, elem++) {
         pose->flags |= 6;
-        PSMTXIdentity(pose->mtx);
+        PSMTXIdentity(*pose->mtx);
         elem->animIdx = 0;
         elem->time = gp->renderTime - (u64)irand(100) * 10000000;
         elem->flip = irand(1);
@@ -5189,7 +5183,7 @@ static void hand_init(void) {
 }
 
 static void pose_main(void) {
-    ExtPose* pose;
+    ExtdrvPose* pose;
     HandElem* elem;
     s32 i;
     HandAnim* a;
@@ -5207,19 +5201,19 @@ static void pose_main(void) {
             elem->time = gp->renderTime;
             t -= 1.0f;
         }
-        pose->frame = a->start + (s32)((a->count - 1) * t);
+        pose->texId = a->start + (s32)((a->count - 1) * t);
         id = evtGetValue(NULL, GW(10));
         if (id == -1) {
-            pose->mtx[0][3] = elem->pos.x;
-            pose->mtx[1][3] = elem->pos.y;
-            pose->mtx[2][3] = elem->pos.z;
+            (*pose->mtx)[0][3] = elem->pos.x;
+            (*pose->mtx)[1][3] = elem->pos.y;
+            (*pose->mtx)[2][3] = elem->pos.z;
         } else {
             BattleGetUnitPtr(_battleWorkPointer, id);
             BtlUnit_GetPos(BattleGetUnitPtr(_battleWorkPointer, id), &x, &y, &z);
             BtlUnit_GetHomePos(BattleGetUnitPtr(_battleWorkPointer, id), &hx, &hy, &hz);
-            pose->mtx[0][3] = elem->pos.x + x - hx;
-            pose->mtx[1][3] = elem->pos.y + y - hy;
-            pose->mtx[2][3] = elem->pos.z + z - hz;
+            (*pose->mtx)[0][3] = elem->pos.x + x - hx;
+            (*pose->mtx)[1][3] = elem->pos.y + y - hy;
+            (*pose->mtx)[2][3] = elem->pos.z + z - hz;
         }
     }
 }

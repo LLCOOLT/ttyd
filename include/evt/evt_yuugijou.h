@@ -11,13 +11,13 @@ typedef struct PiantaParlorWork {
 	// four minigames x five ranks (+1 spare slot); defaults set in yuugijou_init
 #ifdef VERSION_G8ME01
 	// US keeps eight record rows (0x258 bytes in all): recordScore 0xD4, recordParam 0x194, pad_134 at 0x254
-	u32 recordOn[8][6]; //0x14
-	u32 recordScore[8][6]; //0xD4
-	u32 recordParam[8][6]; //0x194
+	s32 recordOn[8][6]; //0x14
+	s32 recordScore[8][6]; //0xD4
+	s32 recordParam[8][6]; //0x194
 #else
-	u32 recordOn[4][6]; //0x14, all set to 1 at init
-	u32 recordScore[4][6]; //0x74, default record values (game 1 ascending: times)
-	u32 recordParam[4][6]; //0xD4, per-rank value derived from recordScore (game 0: constants)
+	s32 recordOn[4][6]; //0x14, all set to 1 at init
+	s32 recordScore[4][6]; //0x74, default record values (game 1 ascending: times)
+	s32 recordParam[4][6]; //0xD4, per-rank value derived from recordScore (game 0: constants)
 #endif
 	u32 pad_134; //0x134, never accessed
 } PiantaParlorWork;

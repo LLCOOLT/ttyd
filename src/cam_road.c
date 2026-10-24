@@ -7,38 +7,6 @@
 #include "cam_shift.h"
 #include "libc_decls.h"
 #include "cam_road.h"
-typedef struct CamRoadCurveX {
-    u8 pad0[0x20];
-    u32 f_20;              // 0x20
-    f32 f_24;              // 0x24
-    u32 off;               // 0x28
-    u8 pad1[0x58 - 0x2c];
-    f32 f_58;              // 0x58
-    u8 pad2[0x64 - 0x5c];
-    f32 f_64;              // 0x64
-    u8 pad3[0x70 - 0x68];
-    f32 f_70;              // 0x70
-    u8 pad4[0x7c - 0x74];
-    f32 f_7c;              // 0x7c
-    u8 pad5[0x8c - 0x80];
-    f32 height;            // 0x8c
-    u8 pad6[0xa8 - 0x90];
-    s32 grpOfs;            // 0xa8
-    s32 grpNum;            // 0xac
-    s32 f_b0;              // 0xb0
-    s32 f_b4;              // 0xb4
-} CamRoadCurveX;
-typedef struct CamRoadGroup {
-    u8 pad0[0x58];
-    s32 vtxOfs;            // 0x58
-    u8 pad1[4];
-    s32 stripOfs;          // 0x60
-    s32 stripNum;          // 0x64
-} CamRoadGroup;
-typedef struct CamRoadStrip {
-    s32 idxOfs;
-    s32 num;
-} CamRoadStrip;
 typedef struct CamRoadHit {
     f32 t;                 // 0x00
     f32 f_04;              // 0x04
@@ -112,12 +80,12 @@ s32 camRoadSetup(const char* name) {
     if ((u32)wp->map->f_e8 < (u32)wp->map) {
         wp->map->f_e8 = (Vec*)((u32)wp->map->f_e8 + (u32)wp->map);
         wp->map->curves = (CamRoadCurve*)((u32)wp->map->curves + (u32)wp->map);
-        wp->map->f_f0 = (void*)((u32)wp->map->f_f0 + (u32)wp->map);
-        wp->map->f_f4 = (void*)((u32)wp->map->f_f4 + (u32)wp->map);
-        wp->map->f_f8 = (void*)((u32)wp->map->f_f8 + (u32)wp->map);
-        wp->map->f_fc = (void*)((u32)wp->map->f_fc + (u32)wp->map);
-        wp->map->f_100 = (void*)((u32)wp->map->f_100 + (u32)wp->map);
-        wp->map->f_104 = (void*)((u32)wp->map->f_104 + (u32)wp->map);
+        wp->map->f_f0 = (CamRoadGroup*)((u32)wp->map->f_f0 + (u32)wp->map);
+        wp->map->f_f4 = (CamRoadStrip*)((u32)wp->map->f_f4 + (u32)wp->map);
+        wp->map->f_f8 = (Vec*)((u32)wp->map->f_f8 + (u32)wp->map);
+        wp->map->f_fc = (Vec*)((u32)wp->map->f_fc + (u32)wp->map);
+        wp->map->f_100 = (s32*)((u32)wp->map->f_100 + (u32)wp->map);
+        wp->map->f_104 = (CamRoadGroup*)((u32)wp->map->f_104 + (u32)wp->map);
         wp->map->f_108 = (void*)((u32)wp->map->f_108 + (u32)wp->map);
     }
     if (strcmp(wp->map->version, "1.01") == 0) {
@@ -264,18 +232,6 @@ s32 collisionTri_simple(Vec P, Vec A, Vec B, Vec C, f32* dist) {
     return 1;
 }
 // CC_BEGIN
-typedef struct CamRoadCC {
-    u8 pad0[0x40];
-    s32 idxA;              // 0x40
-    s32 idxB;              // 0x44
-    f32 limA;              // 0x48
-    f32 limB;              // 0x4c
-    u8 pad1[0x84 - 0x50];
-    s32 flag;              // 0x84
-    u8 pad2[0xa0 - 0x88];
-    s32 vtxOfs;            // 0xa0
-    s32 vtxNum;            // 0xa4
-} CamRoadCC;
  static inline f32 crLen2(f32 x, f32 z) {
     f32 l = x * x + z * z;
     if (l != 0.0) {
@@ -302,11 +258,11 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
     minDist = 100000000.0f;
     ret = 0;
     if (mode == 0) {
-        CamRoadCC* c = (CamRoadCC*)curve;
+        CamRoadCurve* c = (CamRoadCurve*)curve;
         isGrp = 0;
         half = c->vtxNum / 2;
-        pt = &((Vec*)wp->map->f_f8)[c->vtxOfs];
-        nrm = &((Vec*)wp->map->f_f8)[c->vtxOfs + half];
+        pt = &wp->map->f_f8[c->vtxOfs];
+        nrm = &wp->map->f_f8[c->vtxOfs + half];
         limA = c->limA;
         limB = c->limB;
         idxA = c->idxA;
@@ -318,8 +274,8 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
         idxB = 1;
         half = g->stripNum / 2;
         limB = limA = 0.0f;
-        pt = &((Vec*)wp->map->f_f8)[g->stripOfs];
-        nrm = &((Vec*)wp->map->f_f8)[g->stripOfs + half];
+        pt = &wp->map->f_f8[g->stripOfs];
+        nrm = &wp->map->f_f8[g->stripOfs + half];
         flag = 0;
         isGrp = 1;
     }
@@ -689,7 +645,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     s32* idxp;
     s32 j;
     s32 l;
-    CamRoadCurveX* curve;
+    CamRoadCurve* curve;
     void* hitCurve;
     s32 n;
     CamRoadGroup* grp;
@@ -733,7 +689,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     s32 i;
     f32 fov;
     f32 l1, l2, lim2, lim1;
-    curve = (CamRoadCurveX*)wp->map->curves;
+    curve = wp->map->curves;
     best = -100000000.0f;
     hitCurve = NULL;
     posA.x = a;
@@ -743,7 +699,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     posB.y = e;
     posB.z = f;
     for (i = 0; i < wp->map->curveNum; i++, curve++) {
-        grp = &((CamRoadGroup*)wp->map->f_f0)[curve->grpOfs];
+        grp = &wp->map->f_f0[curve->grpOfs];
         n = curve->grpNum;
         if (wp->state == 0x65 && curve->off != 0) {
             continue;
@@ -759,13 +715,13 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
             continue;
         }
         for (j = 0; j < n; j++, grp++) {
-            verts = &((Vec*)wp->map->f_fc)[grp->vtxOfs];
+            verts = &wp->map->f_fc[grp->vtxOfs];
             m = grp->stripNum;
-            strip = &((CamRoadStrip*)wp->map->f_f4)[grp->stripOfs];
+            strip = &wp->map->f_f4[grp->stripOfs];
             for (k = 0; k < m; k++, strip++) {
                 cnt = strip->num;
         cnt = cnt - 1;
-                idx = &((s32*)wp->map->f_100)[strip->idxOfs];
+                idx = &wp->map->f_100[strip->idxOfs];
                 idxp = idx + 1;
                 for (l = 1; cnt > l; idxp++, l++) {
                     if (collisionTri_simple(posB, verts[idx[0]], verts[idxp[0]], verts[idxp[1]], &best)) {
@@ -785,9 +741,9 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
             hitCurve = NULL;
         }
     }
-    curve = (CamRoadCurveX*)hitCurve;
+    curve = hitCurve;
     if (curve == NULL) {
-        curve = prev->on ? (CamRoadCurveX*)prev->cam : NULL;
+        curve = prev->on ? prev->cam : NULL;
         if (curve == NULL) {
             wp->out[0] = a;
             wp->out[1] = b;
@@ -846,7 +802,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
         nz *= -1.0f;
     }
     if (curve->f_b4 != 0) {
-        grp = &((CamRoadGroup*)wp->map->f_104)[curve->f_b0];
+        grp = &wp->map->f_104[curve->f_b0];
         q.y = 100000000.0f;
         q.x = x;
         q.z = z;
@@ -883,7 +839,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
                 p.z = hit2.pos.z;
             }
             if (curve->f_b4 != 0) {
-                grp = &((CamRoadGroup*)wp->map->f_104)[curve->f_b0];
+                grp = &wp->map->f_104[curve->f_b0];
                 hit2.y = -1000000.0f;
                 if (collisionCurve(1, grp, p, &hit2)) {
                     found = 1;
@@ -924,7 +880,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
                 p2.z = hit3.pos.z;
             }
             if (curve->f_b4 != 0) {
-                grp = &((CamRoadGroup*)wp->map->f_104)[curve->f_b0];
+                grp = &wp->map->f_104[curve->f_b0];
                 hit3.y = -1000000.0f;
                 if (collisionCurve(1, grp, p2, &hit3)) {
                     found2 = 1;
@@ -1007,7 +963,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     out->in[3] = d;
     out->in[4] = e;
     out->in[5] = f;
-    out->cam = (CamRoadCam*)curve;
+    out->cam = curve;
     out->pos.x = x;
     out->pos.y = y;
     out->pos.z = z;
@@ -1037,11 +993,11 @@ u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
         if (__abs(d) <= 1) {
             return 0;
         }
-        n = a->cam->f_44 - a->cam->f_40 - 1;
+        n = a->cam->idxB - a->cam->idxA - 1;
         if (__abs(d) >= n) {
             return 0;
         }
-        n = a->cam->f_44 - a->cam->f_40 - 2;
+        n = a->cam->idxB - a->cam->idxA - 2;
         if (__abs(d) >= n) {
             flags |= 0x20;
         }
@@ -1315,7 +1271,6 @@ void camRoadCurveOff(const char* name);
 void camRoadCurveOn(const char* name);
 void camRoadReset(void);
 f32 camRoadGetCurrentShiftXRate(void);
-void camRoadMain(CamRoadOut* out, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
 void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t);
 u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed);
 void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);

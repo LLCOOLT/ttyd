@@ -629,7 +629,7 @@ void npcMoveG(NpcEntry* npc);
 BOOL npcCheckHitMarioSide(NpcEntry* npc);
 HitEntry* npcHitCheckSide(NpcEntry* npc, f32* outX, f32* outZ, f32* angle, f32 dx, f32 dz);
 s32 vivianGetStatus(void);
-#define NPC_CHKMARIO(ok) do {     m = marioGetPtr();     if (*(u32*)m & 0x82000000) { ok = 0; break; }     if (*(u32*)m & 0xA) { ok = 0; break; }     if (*(s32*)((u8*)gp + 0x164) != 0) { ok = 0; break; }     if (seqGetSeq() != 2) { ok = 0; break; }     if (*(u16*)((u8*)m + 0x2E) == 0x19) { ok = 0; break; }     if (vivianGetStatus() != 0 && vivianGetStatus() != 1) { ok = 0; } else { ok = 1; } } while (0)
+#define NPC_CHKMARIO(ok) do {     m = marioGetPtr();     if (m->flags & 0x82000000) { ok = 0; break; }     if (m->flags & 0xA) { ok = 0; break; }     if (gp->mapEventId != 0) { ok = 0; break; }     if (seqGetSeq() != 2) { ok = 0; break; }     if (m->currMotionId == 0x19) { ok = 0; break; }     if (vivianGetStatus() != 0 && vivianGetStatus() != 1) { ok = 0; } else { ok = 1; } } while (0)
 void shadowSetCollision(s32 shadow, s32 val);
 s32 shadowEntry(f32 x, f32 y, f32 z, f32 size);
 void animPoseVivianMain(s32 poseId, Vec* pos);
@@ -688,8 +688,8 @@ void npcMain(void) {
                 entry->jumpFlags &= ~0x10;
             }
 
-            if (*(u16*)&entry->wFbatHitCheckRelated) {
-                entry->wFbatHitCheckRelated = *(u16*)&entry->wFbatHitCheckRelated - 1;
+            if (entry->wFbatHitCheckRelated) {
+                entry->wFbatHitCheckRelated = entry->wFbatHitCheckRelated - 1;
             }
 
             if (entry->jumpFlags & 0x10) {
@@ -983,7 +983,7 @@ interrupt:
                         }
                         prio *= -1.0f;
                         if (!(entry->flags & 0x80) &&
-                            (!(*(u16*)&entry->wFbatHitCheckRelated & 2) || (entry->jumpFlags & 0x10000))) {
+                            (!(entry->wFbatHitCheckRelated & 2) || (entry->jumpFlags & 0x10000))) {
                             if (entry->color.a != 0xFF) {
                                 dispEntry((CameraId)entry->cameraId, prio, 2, npcDisp_xlu, entry);
                             } else {
@@ -1958,9 +1958,9 @@ void fbatEncountCheck(void)
         return;
       }
       data->mode = 2;
-      ((u8 *) data)[2] = 0;
+      data->subState = 0;
       data->npc = npc;
-      *((u32 *) npc->fbatHitKind) = 0;
+      npc->fbatHitKind = 0;
       return;
     }
   }
@@ -1976,9 +1976,9 @@ void fbatEncountCheck(void)
       if (d->mode == 1)
       {
         d->mode = 3;
-        ((u8 *) d)[2] = 0;
+        d->subState = 0;
         d->npc = npc;
-        *((u32 *) npc->fbatHitKind) = k;
+        npc->fbatHitKind = k;
       }
       switch (*kind)
       {
@@ -3105,7 +3105,7 @@ USER_FUNC(_majinai_effect) {
     if (isFirstCall) {
         event->userdatap[0] = effMajinaiEntry(0, mario->position.x, mario->position.y + mario->wPlayerCollisionBox.y + 16.0f, mario->position.z);
         effect = event->userdatap[0];
-        ((f32*)effect->userdata)[4] = 0.8f;
+        ((EffMajinaiWork*)effect->userdata)->scale = 0.8f;
         effSetName(event->userdatap[0], "mjef_coinup");
     }
     if (event->userdata[0] && effNameToPtr("mjef_coinup")) {

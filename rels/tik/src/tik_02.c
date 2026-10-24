@@ -1,3 +1,5 @@
+#include "eff/n64/eff_ripple_n64.h"
+#include "eff/n64/eff_hokori_n64.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -245,16 +247,16 @@ USER_FUNC(ripple_scale_func) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 scale = evtGetFloat(event, args[1]);
 
-    ((f32*)effNameToPtr(name)->userdata)[5] = scale;
+    ((EffRippleN64Work*)effNameToPtr(name)->userdata)->scaleY = scale;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(hokori_color_func) {
     EffectEntry* effect = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
-    ((s32*)effect->userdata)[12] = 0x70;
-    ((s32*)effect->userdata)[13] = 0x58;
-    ((s32*)effect->userdata)[14] = 0x58;
+    ((EffHokoriN64Work*)effect->userdata)->r = 0x70;
+    ((EffHokoriN64Work*)effect->userdata)->g = 0x58;
+    ((EffHokoriN64Work*)effect->userdata)->b = 0x58;
     return EVT_RETURN_DONE;
 }
 

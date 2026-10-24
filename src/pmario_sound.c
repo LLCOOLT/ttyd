@@ -6641,7 +6641,7 @@ void psndENVMain(void) {
 	f32 ang, r, a2; s32 rr;
 	PaperSoundEnv* ent;
 	if ((psnd.flags & 0x20) && !(psnd.flags & 0x40)) lim = 80;
-	if (seqGetSeq() != 3 && (((u32*)gp)[7] & 1)) {
+	if (seqGetSeq() != 3 && (gp->retraceCount & 1)) {
 		if (psnd.envVolume < lim) psnd.envVolume++;
 		if (psnd.envVolume > lim) psnd.envVolume--;
 	}

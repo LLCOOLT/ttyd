@@ -1,4 +1,5 @@
 #include "driver/camdrv.h"
+#include "eff/eff_mist2.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
 #include "driver/mapdrv.h"
@@ -9,26 +10,6 @@
 #include <dolphin/mtx.h>
 double sin(double);
 double cos(double);
-
-typedef struct EffMist2Work {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
-    f32 pad10;     // 0x10
-    f32 scaleTarget; // 0x14
-    f32 scale;     // 0x18
-    f32 a;         // 0x1C
-    f32 b;         // 0x20
-    f32 rot;       // 0x24
-    f32 rotSpeed;  // 0x28
-    f32 alpha;     // 0x2C
-    s32 timer;     // 0x30
-    s32 life;      // 0x34
-    u8 r, g, b8;   // 0x38
-    u8 pad;
-    s32 delay;     // 0x3C
-    f32 decay;     // 0x40
-    f32 vy;        // 0x44
-} EffMist2Work;
 
 void effMist2Main(EffectEntry* effect);
 void effMist2Disp(CameraId cameraId, EffectEntry* effect);

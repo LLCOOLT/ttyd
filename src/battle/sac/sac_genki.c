@@ -2,6 +2,7 @@
 #include "icon_ids.h"
 #pragma optimize_for_size on
 #include "battle/battle.h"
+#include "eff/n64/eff_stamp_n64.h"
 #include "battle/battle_audience.h"
 #include "battle/battle_unit.h"
 #include "driver/camdrv.h"
@@ -125,7 +126,6 @@ EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 EffectEntry* effStardustEntry(s32 type, s32 arg1, s32 arg2, f32 x, f32 y, f32 z, f32 arg6, f32 arg7);
 EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 size);
 EffectEntry* effHitEntry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5);
-EffectEntry* effStampN64Entry(s32 type, f32 x, f32 y, f32 z);
 void BattleAudienceSoundBooingKind(s32 kind);
 void BattleAudienceSoundCallKind(s32 kind);
 void BattleAudienceSoundHandBeat(void);
@@ -392,12 +392,12 @@ void main_mario(void) {
         BtlUnit_SetAnim(part, "M_D_1");
         BtlUnit_GetPos(mario, &x, &y, &z);
         eff = effStampN64Entry(2, x, 20.0f + y, 10.0f + z);
-        ((u8*)eff->userdata)[0x38] = 0;
-        ((u8*)eff->userdata)[0x39] = 200;
-        ((u8*)eff->userdata)[0x3A] = 0;
-        ((u8*)eff->userdata)[0x3B] = 0;
-        ((u8*)eff->userdata)[0x3C] = 10;
-        ((u8*)eff->userdata)[0x3D] = 0;
+        ((EffStampN64Work*)eff->userdata)->r = 0;
+        ((EffStampN64Work*)eff->userdata)->g = 200;
+        ((EffStampN64Work*)eff->userdata)->b = 0;
+        ((EffStampN64Work*)eff->userdata)->r2 = 0;
+        ((EffStampN64Work*)eff->userdata)->g2 = 10;
+        ((EffStampN64Work*)eff->userdata)->b2 = 0;
     case 4:
         w->marioTimer++;
         if (w->marioTimer == 30) {

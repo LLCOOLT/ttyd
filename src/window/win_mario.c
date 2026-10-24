@@ -129,7 +129,7 @@ void winMarioInit(WinMarioWork* w) {
     w->f194 = 0;
     w->f198 = 0;
     for (i = 0; i < 8; i++) {
-        if (*(u16*)&pouch->mStarPowersObtained & (1 << i)) {
+        if (pouch->mStarPowersObtained & (1 << i)) {
             w->f198++;
         }
     }

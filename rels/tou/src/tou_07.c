@@ -1,4 +1,5 @@
 #include "battle/battle_unit.h"
+#include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
@@ -906,7 +907,7 @@ USER_FUNC(tou_07_belt_camid) {
     // ベルト
     NpcEntry* npc = npcNameToPtr("\x83\x78\x83\x8B\x83\x67");
 
-    ((s32*)eff->userdata)[14] = 7;
+    ((EffStarStoneWork*)eff->userdata)->cam = 7;
     npc->cameraId = 7;
     return EVT_RETURN_DONE;
 }
