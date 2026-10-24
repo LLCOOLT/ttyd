@@ -1,6 +1,6 @@
 # Fakes
 
-Policy: C-level fakes are allowed, also when they only bring a function closer to 100%. A fake is a behaviour-identical C trick (extra temp, no-op cast, dead guard, padding, inline helper, pragma) that makes the compiler emit the target code or layout. Assembly is not used anywhere: no asm blocks, no asm-backed functions.
+Policy: C-level fakes are allowed, also when they only bring a function closer to 100%. A fake is a behaviour-identical C trick (extra temp, no-op cast, dead guard, padding, inline helper, pragma) that makes the compiler emit the target code or layout. No fake uses assembly: there are no asm blocks or asm-backed functions in place of C.
 
 Every fake is marked at its site with a `// FAKE: ...` (or `/* FAKE: ... */`) comment and has a row here, one row per function. Cleanup means replacing a fake with natural C that still matches (check with objcheck.sh), then deleting its comment and its row.
 
