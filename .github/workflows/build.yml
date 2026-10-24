@@ -1,67 +1,53 @@
 name: Build
 
+# Manual runs only, on main, by the repository owner, on the owner's self-hosted runner. The game
+# files never leave that machine: the runner's .env sets TTYD_ORIG to a folder holding G8MJ01/ and
+# G8ME01/, each with that version's extracted sys/main.dol and files/rel/.
 on:
-  # Manual runs only. The game files are not part of this repository: the run downloads them from
-  # the URL in the ORIG_ARCHIVE_URL repository secret (an archive with orig/G8MJ01/ and
-  # orig/G8ME01/, each holding that version's disc image).
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.actor == github.repository_owner
+    runs-on: [self-hosted, Windows, ttyd]
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         version: [G8MJ01, G8ME01]
+    defaults:
+      run:
+        shell: powershell
 
     steps:
-      # Checkout the repository
+      # Keep build/ between runs so the downloaded build tools are reused
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          clean: false
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      - name: Clean the workspace (keeping build tools)
+        run: git clean -ffdx -e build/tools -e build/compilers -e build/binutils -e .ninja_log
 
-      - name: Install ninja
-        run: pip install ninja
-
-      # Fetch the original game files
+      # Copy the original files from the runner machine
       - name: Prepare
-        env:
-          ORIG_ARCHIVE_URL: ${{ secrets.ORIG_ARCHIVE_URL }}
         run: |
-          if [ -z "$ORIG_ARCHIVE_URL" ]; then
-            echo "::error::Set the ORIG_ARCHIVE_URL repository secret to an archive of the orig/ disc images."
-            exit 1
-          fi
-          curl -fsSL "$ORIG_ARCHIVE_URL" -o orig_archive
-          case "$(file -b --mime-type orig_archive)" in
-            application/zip) unzip -q -o orig_archive ;;
-            *) tar -xf orig_archive ;;
-          esac
-          rm orig_archive
-          ls orig/${{ matrix.version }}
-
-      # Cache the downloaded build tools between runs
-      - name: Cache tools
-        uses: actions/cache@v4
-        with:
-          path: |
-            build/tools
-            build/compilers
-            build/binutils
-          key: ${{ runner.os }}-tools-${{ hashFiles('configure.py') }}
+          if (-not $env:TTYD_ORIG) { Write-Error "Set TTYD_ORIG in the runner's .env file."; exit 1 }
+          $src = Join-Path $env:TTYD_ORIG "${{ matrix.version }}"
+          $dst = "orig\${{ matrix.version }}"
+          New-Item -ItemType Directory -Force $dst | Out-Null
+          Copy-Item -Recurse -Force (Join-Path $src "sys"), (Join-Path $src "files") $dst
 
       # Build the project and check it against the original hashes
       - name: Build
         run: |
           python configure.py --map --version ${{ matrix.version }}
-          ninja
-          ninja progress build/${{ matrix.version }}/report.json
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -m ninja
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -m ninja progress build/${{ matrix.version }}/report.json
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
       # Upload map files
       - name: Upload map
