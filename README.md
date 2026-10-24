@@ -1,8 +1,8 @@
 Paper Mario: The Thousand-Year Door
-![Build Status] ![Progress] ![Functions Progress] ![Data Progress] ![Linked Progress]
+[![Build Status]](https://github.com/LLCOOLT/ttyd/actions/workflows/build.yml) ![Progress] ![Functions Progress] ![Data Progress] ![Linked Progress]
 =============
 
-[Build Status]: https://img.shields.io/badge/Build-passing%20(SHA--1%20OK)-brightgreen
+[Build Status]: https://github.com/LLCOOLT/ttyd/actions/workflows/build.yml/badge.svg?branch=main
 [Progress]: https://img.shields.io/badge/Code-100.00%25-blue
 [Functions Progress]: https://img.shields.io/badge/Functions-100.00%25-blue
 [Data Progress]: https://img.shields.io/badge/Data-100.00%25-blue
