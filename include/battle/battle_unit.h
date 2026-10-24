@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dolphin/types.h>
+#include "evt/evt_word.h"
 #include "battle/battle_damage.h"
 #include "battle/battle_status_effect.h"
 #include "battle/battle_status_icon.h"
@@ -463,7 +464,7 @@ typedef struct BattleWorkUnitPart {
     BecSndWork moveSnd;                                    // 0xC0, move-sound loop (BtlUnit_LoadSeMode / _MoveSoundControlCore)
     u8 pad_DC[0xF8 - 0xDC];                                // 0xDC, never accessed
     BtlPoseSoundTable moveSndTable;                        // 0xF8, btlevtcmd_SetPartsJump/Run/Walk/DiveSound
-    s32 work[16];                                          // 0x130
+    EvtWord work[16];                                      // 0x130, part work words (btlevtcmd_SetPartsWork / GetPartsWork): numbers and table pointers
     Vec mHitBaseOffset;                                    // 0x170, guess
     Vec mHitOffset;                                        // 0x17C
     Vec mHitCursorBaseOffset;                              // 0x188, guess
@@ -692,10 +693,7 @@ typedef struct BattleUnit {
     u8 pad_1BC[0x1C0 - 0x1BC];                   // 0x1BC (US 0x1C0), never accessed
     BtlPoseSoundTable moveSndTable;              // 0x1C0 (US 0x1C4), jump names + run/walk/dive entries (btlevtcmd_SetJump/Run/Walk/DiveSound)
     BattleWorkHpGauge hpGauge;                   // 0x1F8
-    union {
-        s32 work[16];                            // 0x214, unit work words (btlevtcmd_SetUnitWork / GetUnitWork)
-        f32 workf[16];                           // 0x214, the same words as floats (btlevtcmd_SetUnitWorkFloat / GetUnitWorkFloat)
-    };
+    EvtWord work[16];                            // 0x214, unit work words (btlevtcmd_SetUnitWork / GetUnitWork): numbers, effect and work pointers; floats stored in the word (SetUnitWorkFloat / GetUnitWorkFloat)
     BattleUnitPart* currentTarget;           // 0x254
     s32 reserved_258;                            // 0x258 (US 0x25C), only cleared at turn start (battle_seq)
     s16 hpDamageCount;                           // 0x25C, number of damaging moves

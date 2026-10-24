@@ -8,6 +8,7 @@
 #include "mario/mariost.h"
 #include "memory.h"
 #include "system.h"
+#include "addr_word.h"
 
 #include <stdio.h>
 
@@ -315,18 +316,18 @@ void initTestHeap(void) {
     if (!wp->testHeap) { // allocate 1.5MiB test heap
         wp->testHeap = __memAlloc(HEAP_DEFAULT, TESTHEAP_SIZE);
     }
-    wp->testAlloc = (u32)wp->testHeap;
+    wp->testAlloc = wp->testHeap;
 }
 
 // heavily inlined
 void* testAlloc(u32 size) {
-    void* alloc = (void*)wp->testAlloc;
+    void* alloc = wp->testAlloc;
 
     if (size & 31) {
         size += 32 - (size & 31);
     }
     wp->testAlloc += size;
-    if ((u32)wp->testAlloc >= (u32)wp->testHeap + TESTHEAP_SIZE) { // need to allocate more
+    if (wp->testAlloc >= (u8*)wp->testHeap + TESTHEAP_SIZE) { // need to allocate more
         animPoseRefresh();
         alloc = testAlloc(size);
     }
@@ -432,7 +433,7 @@ void animInit(void) {
     file = fileAllocf(0, "a/vivian.bin");
     if (file) {
         memcpy_as4(vivihimoData[1], *file->data, sizeof(_vivihimoData));
-        memcpy_as4(vivihimoTailGroupNo, (void*)((u32)*file->data + sizeof(_vivihimoData)), sizeof(vivihimoTailGroupNo));
+        memcpy_as4(vivihimoTailGroupNo, (u8*)*file->data + sizeof(_vivihimoData), sizeof(vivihimoTailGroupNo));
         fileFree(file);
     }
     fileSetCurrentArchiveType(0);
@@ -611,7 +612,7 @@ s32 animPoseEntry(const char *animName, s32 type)
             {
               // FAKE: dead int guard (COLOURING W), deleted after colouring; its division temps add the texture pointer/count neighbours
               gz = 0;
-              if (gz != 0) pc[0] = (((s32)tex[0] / count) / (count / (s32)tex[0])) / ((pc[0] / count) / (count / pc[0]));
+              if (gz != 0) pc[0] = (((s32)(AddrWord)tex[0] / count) / (count / (s32)(AddrWord)tex[0])) / ((pc[0] / count) / (count / pc[0]));
               tex[0]->references++;
               goto label_4;
             }
@@ -803,10 +804,14 @@ void animPoseSetStartTime(s32 poseId, OSTime startTime) {
 }
 
 #define animPosePaperAnimId(pose) ((pose)->paperAnimIdx)
+/* An anim name parameter holds a name (an address in main memory, negative as
+ * an s32) or an anim index (non-negative). */
+#define ANIM_NAME_INDEX(name) ((s32)(AddrWord)(name))
+#define ANIM_INDEX_NAME(idx) ((const char*)(AddrWord)(idx))
 #define animPoseGetBaseDataId(id) (*(AnimationPoseData**)(wp->files[wp->poses[id].fileId].handle->data))
 
 inline s32 animPoseGetAnimIdx(AnimationPoseData* data, const char* name) {
-    s32 i = (s32)name;
+    s32 i = ANIM_NAME_INDEX(name);
     s32 count = data->mAnimCount;
 
     if (i < 0) {
@@ -2580,11 +2585,11 @@ void animPoseDrawMtx(s32 poseId, Mtx matrix, s32 xluMode, f32 rotY, f32 scale)
       new_var[1] = pd->mBufferPosNum;
       new_var[0] = pd->mBufferNrmNum;
       apdScratchN(new_var[1], new_var[0]);
-      name = (const char *) pose->paperAnimIdx;
-      if ((s32) name != -1)
+      name = ANIM_INDEX_NAME(pose->paperAnimIdx);
+      if (ANIM_NAME_INDEX(name) != -1)
       {
         // FAKE: the inlined animPoseSetAnim (its animName param re-reads the paper anim id) adds the coalesced param copy the target has (p2 r29 / xluMode r28)
-        animPoseSetAnim(pose->paperId, (const char*)animPosePaperAnimId(pose), FALSE);
+        animPoseSetAnim(pose->paperId, ANIM_INDEX_NAME(animPosePaperAnimId(pose)), FALSE);
       }
       paper->localTime = animTimeGetTime(paper->type);
       paper->lastFrameZero = -1;
@@ -3073,7 +3078,7 @@ const char* animGetTexName(const char* name) {
     s32 i;
     char* entry;
 
-    size = (s32)data[1];
+    size = ((smartEntry*)data)->size; // file data handle: address, then size
     entry = data[0];
 
     for (i = 0; i < size; entry += 0x20, i += 0x20) {
@@ -3247,7 +3252,7 @@ void animPoseSetDispCallBack(s32 poseId, void* callback, void* userData) {
 }
 
 inline void animPoseMainSub(AnimationPose* pose) {
-    s32 id = ((u32)pose - (u32)wp->poses) / sizeof(AnimationPose);
+    s32 id = (u32)((u8*)pose - (u8*)wp->poses) / sizeof(AnimationPose);
     if (pose->typeFlags & 2) {
         AnimationPoseData* data = animPoseGetBaseData(pose);
         s32 posNum = data->mBufferPosNum;

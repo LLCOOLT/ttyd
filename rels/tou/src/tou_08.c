@@ -237,12 +237,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tou_04", // nextMapName
+        "tou_04", // nextMapName
         "s_bero_6", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)n_door_close, // enterAnimeArg
-        (s32)n_door_open, // exitAnimeArg
+        n_door_close, // enterAnimeArg
+        n_door_open, // exitAnimeArg
     },
     {
         "dokan", // hitName
@@ -255,7 +255,7 @@ static BeroEntry bero_data[] = {
         (s32*)toile_in, // enterEvent
         6, // caseType
         (s32*)toile_out, // exitEvent
-        (s32)"tou_04", // nextMapName
+        "tou_04", // nextMapName
         "toire2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

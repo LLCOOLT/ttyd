@@ -7,6 +7,7 @@
 #include "mario/mariost.h"
 #include "memory.h"
 #include "system.h"
+#include "pmario_sound.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "eff/n64/eff_water_damage_n64.h"
@@ -93,8 +94,6 @@ static EVT_BEGIN(evt_shake)
     RETURN
 EVT_END()
 
-s32 psndSFXOn_3D(const char* name, Vec* position);
-void psndSFXOff(s32 id);
 EffectEntry* effKemuri1N64Entry(s32 type, f32 a2, f32 a3, f32 a4, f32 a5);
 void effFallMain(EffectEntry* effect);
 void effFallDisp(CameraId cameraId, EffectEntry* effect);
@@ -371,7 +370,7 @@ static inline void effFallRelease(EffectEntry* effect) {
         psndSFXOff(e->sfx);
     }
 }
-// FAKE: the seven sfx names are spelled (const char*)(u32)"lit" at each call (no locals) so each becomes a hoisted
+// FAKE: the seven sfx names are spelled SFX_NAME_WORD("lit") at each call (no locals) so each becomes a hoisted
 // loop-invariant @ temp (UNBLOCK.log lever); plain literals in calls are not hoisted. Same string addresses.
 void effFallMain(EffectEntry* effect) {
     Vec sndPos;
@@ -426,15 +425,15 @@ void effFallMain(EffectEntry* effect) {
                         if (e->timer == 0) {
                             e->state++;
                             if (type == 1) {
-                                psndSFXOn_3D((const char*)(u32)"SFX_BTL_STAGE_FALL_BUG1", &sndPos);
+                                psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_BUG1"), &sndPos);
                             } else if (i == 1) {
-                                psndSFXOn_3D((const char*)(u32)"SFX_BTL_STAGE_FALL_BUG2", &sndPos);
+                                psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_BUG2"), &sndPos);
                             }
                         }
                         break;
                     case 1:
                         if (type == 0 && i > 1 && !played && gp->retraceCount % 6 == 0) {
-                            psndSFXOn_3D((const char*)(u32)"SFX_BTL_STAGE_FALL_BUG2", &sndPos);
+                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_BUG2"), &sndPos);
                             played = 1;
                         }
                         e->pos.y += e->f34;
@@ -500,7 +499,7 @@ void effFallMain(EffectEntry* effect) {
                             e->pos.y = y;
                             e->timer = 0;
                             e->state++;
-                            psndSFXOn_3D((const char*)(u32)"SFX_BTL_STAGE_DAMAGE_FORK1\0", &sndPos);
+                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_DAMAGE_FORK1\0"), &sndPos);
                         }
                         break;
                     case 1:
@@ -687,7 +686,7 @@ void effFallMain(EffectEntry* effect) {
                         if (e->pose0 == -1) {
                             e->pose0 = animPoseEntry("EFF_koopa\0\0", group);
                             animPoseSetAnim(e->pose0, "Z_1", 1);
-                            psndSFXOn_3D((const char*)(u32)"SFX_BTL_STAGE_FALL_KOOPA1\0\0", &sndPos);
+                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_KOOPA1\0\0"), &sndPos);
                         }
                         e->pos.x += e->vel.x;
                         e->pos.y += e->vel.y;
@@ -712,7 +711,7 @@ void effFallMain(EffectEntry* effect) {
                             e->state++;
                         }
                         if (e->timer == 100) {
-                            psndSFXOn_3D((const char*)(u32)"SFX_BTL_STAGE_FALL_KOOPA1\0\0", &sndPos);
+                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_KOOPA1\0\0"), &sndPos);
                         }
                         break;
                     case 2:
@@ -728,7 +727,7 @@ void effFallMain(EffectEntry* effect) {
                             done++;
                         }
                         if (e->timer == 70) {
-                            psndSFXOn_3D((const char*)(u32)"SFX_BTL_STAGE_FALL_KOOPA1\0\0", &sndPos);
+                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_KOOPA1\0\0"), &sndPos);
                         }
                         break;
                 }
@@ -742,7 +741,7 @@ void effFallMain(EffectEntry* effect) {
                         if (!animGroupBaseAsync("EFF_inseki\0", group, 0)) {
                             break;
                         }
-                        psndSFXOn_3D((const char*)(u32)"SFX_BTL_STAGE_FALL_METEOR1\0", &sndPos);
+                        psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_METEOR1\0"), &sndPos);
                         if (e->pose0 == -1) {
                             e->pose0 = animPoseEntry("EFF_inseki\0", group);
                             animPoseSetAnim(e->pose0, "Z_1", 1);
@@ -785,7 +784,7 @@ void effFallMain(EffectEntry* effect) {
                             e->pos.z = e->vel.z;
                             e->state++;
                             if (e->state == 2) {
-                                e->sfx = psndSFXOn_3D((const char*)(u32)"SFX_BTL_STAGE_DAMAGE_METEOR2\0\0\0", &sndPos);
+                                e->sfx = psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_DAMAGE_METEOR2\0\0\0"), &sndPos);
                             }
                             if (e->state != 8) {
                                 effKemuri1N64Entry(4, sndPos.x + e->pos.x, sndPos.y + e->pos.y - 40.0f, sndPos.z + e->pos.z, 0.0f);
@@ -837,7 +836,7 @@ void effFallMain(EffectEntry* effect) {
                             evtEntry(evt_shake, 0, 0);
                             animPoseSetAnim(e->pose0, "A_1", 1);
                             e->state++;
-                            psndSFXOn_3D((const char*)(u32)"SFX_BTL_STAGE_DAMAGE_LIGHT1", &sndPos);
+                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_DAMAGE_LIGHT1"), &sndPos);
                         }
                         break;
                     case 3:

@@ -46,9 +46,9 @@ static inline void peachStepSe(s32 d1, s32 d2) {
         b = 0x7E8;
     }
     if (mp->multiTimer % d1 == 0) {
-        psndSFXOn_3D((char*)a, &mp->position);
+        psndSFXOn_3D(SFX_NAME_WORD(a), &mp->position);
     } else if (mp->multiTimer % d2 == 0) {
-        psndSFXOn_3D((char*)b, &mp->position);
+        psndSFXOn_3D(SFX_NAME_WORD(b), &mp->position);
     }
     mp->multiTimer++;
 }

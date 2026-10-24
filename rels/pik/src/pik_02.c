@@ -289,12 +289,12 @@ static BeroEntry bero_data[] = {
         haikei_off, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"pik_01", // nextMapName
+        "pik_01", // nextMapName
         "n_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)s_door_close, // enterAnimeArg
-        (s32)s_door_open, // exitAnimeArg
+        s_door_close, // enterAnimeArg
+        s_door_open, // exitAnimeArg
     },
     {
         "dokan", // hitName
@@ -338,7 +338,7 @@ static BeroEntry bero_data[] = {
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, 0, NULL, // enterEvent..exitEvent
-        (s32)"pik_03", // nextMapName
+        "pik_03", // nextMapName
         "s_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -366,12 +366,12 @@ BeroEntry s_bero_peach[] = {
         (s32*)haikei_off, // enterEvent
         -1, // caseType
         (s32*)out_room, // exitEvent
-        (s32)"aji_10", // nextMapName
+        "aji_10", // nextMapName
         NULL, // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)s_door_close, // enterAnimeArg
-        (s32)s_door_open, // exitAnimeArg
+        s_door_close, // enterAnimeArg
+        s_door_open, // exitAnimeArg
     },
 };
 
@@ -524,7 +524,7 @@ static USER_FUNC(npc_set_pos) {
 }
 
 USER_FUNC(hoshi) {
-    event->lwData[10] = (s32)effStarStoneEntry(5, 0.0f, 60.0f, -950.0f, 1.0f);
+    event->lwData[10] = (EvtWord)effStarStoneEntry(5, 0.0f, 60.0f, -950.0f, 1.0f);
     return EVT_RETURN_DONE;
 }
 

@@ -5,7 +5,7 @@
 #include <string.h>
 
 static inline s32 _caseEntry(s32 conditionId, BOOL flag, const char* hitObjName, u32 swFlag,
-                             void* evtCode, s32* lwData, s32 priority) {
+                             void* evtCode, EvtWord* lwData, s32 priority) {
     CaseSetup setup;
     CaseSetup* ptr = &setup;
 
@@ -91,7 +91,7 @@ USER_FUNC(evt_run_case_evt_bero) {
 }
 
 s32 evtRunCaseEntry(s32 conditionId, BOOL flag, const char* hitObjName, u32 swFlag, void* evtCode,
-                    s32* lwData) {
+                    EvtWord* lwData) {
     return _caseEntry(conditionId, flag, hitObjName, swFlag, evtCode, lwData, 0);
 }
 

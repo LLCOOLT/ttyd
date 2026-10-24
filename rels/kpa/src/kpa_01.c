@@ -1196,7 +1196,7 @@ static USER_FUNC(make_name) {
     static char name[8];
 
     sprintf(name, "hi_%d", evtGetValue(event, args[0]));
-    evtSetValue(event, args[1], (s32)name);
+    evtSetValue(event, args[1], (EvtWord)name);
     return EVT_RETURN_DONE;
 }
 

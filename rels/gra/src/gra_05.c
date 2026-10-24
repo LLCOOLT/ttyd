@@ -317,7 +317,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gra_04", // nextMapName
+        "gra_04", // nextMapName
         "e_bero_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -333,7 +333,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gra_06", // nextMapName
+        "gra_06", // nextMapName
         "sw_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -350,7 +350,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)in_evt, // enterEvent
         0, // caseType
         (s32*)out_evt, // exitEvent
-        (s32)"gra_05", // nextMapName
+        "gra_05", // nextMapName
         "ana_2", // nextBeroName
         4, // enterAnimeType
         4, // exitAnimeType
@@ -367,7 +367,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)in_evt, // enterEvent
         0, // caseType
         (s32*)out_evt2, // exitEvent
-        (s32)"gra_05", // nextMapName
+        "gra_05", // nextMapName
         "ana_1", // nextBeroName
         4, // enterAnimeType
         4, // exitAnimeType

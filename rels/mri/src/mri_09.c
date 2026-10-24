@@ -149,7 +149,7 @@ BeroEntry bero_bluejail[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"mri_03", // nextMapName
+        "mri_03", // nextMapName
         "", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -168,7 +168,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"mri_08", // nextMapName
+        "mri_08", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -184,7 +184,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"mri_10", // nextMapName
+        "mri_10", // nextMapName
         "s_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

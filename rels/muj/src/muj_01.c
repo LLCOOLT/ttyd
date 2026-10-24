@@ -1141,7 +1141,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)bero_in_event, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"muj_00", // nextMapName
+        "muj_00", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -1157,7 +1157,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)bero_in_event, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"muj_02", // nextMapName
+        "muj_02", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -1773,7 +1773,7 @@ static USER_FUNC(make_itemsel_table) {
     }
     *p = -1;
     evtSetValue(event, args[0], count);
-    event->lwData[10] = (s32)itemsel_table_ram;
+    event->lwData[10] = (EvtWord)itemsel_table_ram;
     return EVT_RETURN_DONE;
 }
 
@@ -1791,12 +1791,12 @@ USER_FUNC(evt_mario_get_reqdir) {
 
 USER_FUNC(muj_get_door_check) {
     EvtWord* args = event->args;
-    s32* door = (s32*)evtGetValue(event, args[0]);
+    DoorParam* door = (DoorParam*)evtGetValue(event, args[0]);
     f32 range = evtGetFloat(event, args[1]);
     Vec hitPos;
     Vec marioPos;
 
-    hitObjGetPos((const char*)door[5], &hitPos);
+    hitObjGetPos(door->hitOut, &hitPos);
     marioPos = marioGetPtr()->position;
     marioPos.y = hitPos.y = 0.0f;
     if (PSVECDistance(&hitPos, &marioPos) > range) {

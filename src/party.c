@@ -389,6 +389,7 @@ s32 partyEntry(s32 memberId) {
 s32 partyEntryPos(s32 memberId, f32 x, f32 y, f32 z) {
     PartyEntry* party;
     s32 index;
+    char* pose;
     s32 id;
     BOOL lowHp;
     MarioWork* player;
@@ -411,14 +412,14 @@ s32 partyEntryPos(s32 memberId, f32 x, f32 y, f32 z) {
             index = 12;
         }
         if (!(party->flags2 & 0x8000)) {
-            index = (s32)partyPoseTbl[party->currentMemberId][index];
+            pose = partyPoseTbl[party->currentMemberId][index];
         } else if (party->currentMemberId != PARTY_MEMBER_YOSHI) {
-            index = (s32)partyDotPoseTbl[party->currentMemberId][index];
+            pose = partyDotPoseTbl[party->currentMemberId][index];
         } else {
-            index = (s32)yoshiDotPoseTbl[pouchGetPartyColor(PARTNER_YOSHI)][index];
+            pose = yoshiDotPoseTbl[pouchGetPartyColor(PARTNER_YOSHI)][index];
         }
-        if (party->animName == NULL || strcmp(party->animName, (char*)index)) {
-            party->animName = (char*)index;
+        if (party->animName == NULL || strcmp(party->animName, pose)) {
+            party->animName = pose;
             party->poseTime = 0;
             party->trigFlags |= 0x2000;
         }
@@ -1265,7 +1266,7 @@ s32 partyHelloMain(PartyEntry* party) {
             party->motionStep = 2;
             break;
         }
-        if ((u32)party->hitobjStandOn == 0) {
+        if (party->hitobjStandOn == NULL) {
             // FAKE: no-op (PartyEntry*) cast on the shrink-timer reads/stores of moveFrames; the plain field access reschedules the int->float conversion
             s32 n = 16 - ((PartyEntry*)party)->moveFrames;
         f32 v = (f32)n / 16.0f;
@@ -2195,7 +2196,7 @@ void partyRideMain(PartyEntry *party)
       party->motionStep = 111;
       break;
     }
-      if (((u32)party->hitobjStandOn) == 0)
+      if (party->hitobjStandOn == NULL)
     {
       // FAKE: no-op (PartyEntry*) cast on the shrink-timer reads/stores of moveFrames; the plain field access reschedules the int->float conversion
       shrink = (f32) (16 - ((((PartyEntry*)party)->moveFrames)));

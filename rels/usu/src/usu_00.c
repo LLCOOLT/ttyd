@@ -2173,7 +2173,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)dokan_1_evt, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"tik_08", // nextMapName
+        "tik_08", // nextMapName
         "dokan", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -2189,7 +2189,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"usu_01", // nextMapName
+        "usu_01", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 #include "kpa.h"
 #include "evt/evt_npc.h"
 #include "kpa_stage_data.h"
@@ -36,8 +37,8 @@ f32 fd_kpa_05___local_3PIO2_368;
 f32 fd_kpa_05_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_kpa_05___local_PIO2_367;
 f32 fd_kpa_05_one_364;
-static s32 kpa_act_stg3_mobj[118];
-s32 kpa_act_stg3_item[79];
+static EvtWord kpa_act_stg3_mobj[118];
+EvtWord kpa_act_stg3_item[79];
 static EvtWord kpa_fall[92];
 static EvtWord jumpstand_evt[60];
 static NpcSetupInfo npcEnt[1];
@@ -71,7 +72,7 @@ f32 fd_kpa_05___local_PIO2_367 = 1.5707964f;
 
 f32 fd_kpa_05_one_364 = 1.0f;
 
-static s32 kpa_act_stg3_mobj[] = {
+static EvtWord kpa_act_stg3_mobj[] = {
     KPA_OBJ_FIREBAR_DODAI_0(-1062.5f, 100.0f, 3, -229998976),
     KPA_OBJ_FIREBAR_DODAI_0(-687.5f, 100.0f, 2, -229997952),
     KPA_OBJ_FIREBAR_DODAI_1(-512.5f, 225.0f, 3, -229998976), KPA_OBJ_OJAMA_BLK(-325.0f, 200.0f),
@@ -84,12 +85,12 @@ static s32 kpa_act_stg3_mobj[] = {
     KPA_OBJ_STONE_BLK(500.0f, 25.0f), KPA_OBJ_STONE_BLK(500.0f, 75.0f), KPA_OBJ_STONE_BLK(550.0f, 25.0f),
     KPA_OBJ_BRICK_3(725.0f, 0.0f), KPA_OBJ_BRICK_3(775.0f, 0.0f), KPA_OBJ_OJAMA_BLK(700.0f, 175.0f),
     KPA_OBJ_BRICK_3(950.0f, 25.0f), KPA_OBJ_BRICK_3(1000.0f, 25.0f), KPA_OBJ_BRICK_3(1050.0f, 50.0f),
-    KPA_OBJ_BRICK_3(1050.0f, 100.0f), KPA_OBJ_JUMPSTAND_RED(1125.0f, 0.0f, (s32)jumpstand_evt),
+    KPA_OBJ_BRICK_3(1050.0f, 100.0f), KPA_OBJ_JUMPSTAND_RED(1125.0f, 0.0f, (EvtWord)jumpstand_evt),
     KPA_OBJ_BRICK_3(1200.0f, 50.0f), KPA_OBJ_BRICK_3(1200.0f, 100.0f), KPA_OBJ_BRICK_3(1250.0f, 25.0f),
     KPA_OBJ_BRICK_3(1300.0f, 25.0f), KPA_OBJ_DOKAN_2(1475.0f, 200.0f), KPA_OBJ_END,
 };
 
-s32 kpa_act_stg3_item[] = {
+EvtWord kpa_act_stg3_item[] = {
     KPA_ITEM(-175.0f, 175.0f), KPA_ITEM(-125.0f, 175.0f), KPA_ITEM(-25.0f, 175.0f), KPA_ITEM(25.0f, 175.0f),
     KPA_ITEM(250.0f, 0.0f), KPA_ITEM(300.0f, 0.0f), KPA_ITEM(350.0f, 0.0f), KPA_ITEM(350.0f, 25.0f),
     KPA_ITEM(350.0f, 50.0f), KPA_ITEM(400.0f, 50.0f), KPA_ITEM(450.0f, 50.0f), KPA_ITEM(450.0f, 25.0f),

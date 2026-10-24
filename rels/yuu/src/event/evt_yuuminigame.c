@@ -143,10 +143,10 @@ USER_FUNC(evt_yuuminigame_alloc) {
     MiniGameWork* wp = _mapAlloc(sizeof(MiniGameWork));
 
     memset(wp, 0, sizeof(MiniGameWork));
-    evtSetValue(event, args[0], (s32)wp);
+    evtSetValue(event, args[0], (EvtWord)wp);
     wp->type = evtGetValue(event, args[1]);
     wp->event = evtEntry(main_evt, 0, 0);
-    wp->event->lwData[0] = (s32)wp;
+    wp->event->lwData[0] = (EvtWord)wp;
     wp->subEvent = NULL;
     switch (wp->type) {
         case 0:

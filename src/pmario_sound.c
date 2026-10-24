@@ -4956,7 +4956,7 @@ void SoundSSMuteOn(s32 chan);
 void SoundSSSetVolCh(s32 chan, u8 vol);
 void SoundSSSetPanCh(s32 chan, u8 pan);
 void SoundSSSetSrndPanCh(s32 chan, u8 span);
-void SoundSSPlayCh(s32 chan, s32 id);
+void SoundSSPlayCh(s32 chan, const char* name);
 void SoundSSContinueCh(s32 chan);
 void SoundSSFadeoutCh(s32 chan);
 void SoundSongSetVolCh(s32 chan, u8 vol);
@@ -5144,8 +5144,8 @@ s32 searchPSSFXList(const char* name) {
 	SoundEffectEntry* entry = pssfxlist;
 	int i;
 
-	if ((s32)name >= 0) { //address, return
-		return (s32)name;
+	if (SFX_NAME_IS_ID(name)) {
+		return SFX_NAME_ID(name);
 	}
 	for (i = 0; i < 4242; i++) {
 		if (!strcmp(entry->name, name)) {
@@ -5549,8 +5549,8 @@ static inline s32 psndBGMSearch(char* name) {
   SoundBGMEntry* entry;
   s32 i;
   entry = psbgmlist;
-  if (((s32) name) >= 0) {
-    return (s32) name;
+  if (SFX_NAME_IS_ID(name)) {
+    return SFX_NAME_ID(name);
   }
   for (i = 0; i < 0x106; i++, entry++) {
     if (!strcmp(entry->name, name)) {
@@ -5561,14 +5561,14 @@ static inline s32 psndBGMSearch(char* name) {
     i = 0;
   }
   // FAKE: dead int guard (COLOURING W) keeps name live to the return with 3 division pairs: name degree 22 -> 32, so it is simplified late and colours r24 as in the target; folded after RA, no code
-  { s32 gz = 0; if (gz != 0) { i = (((((s32) name / i) / (i / (s32) name)) / (((s32) name / (i + 1)) / ((i + 1) / (s32) name))) / (((s32) name / (i + 2)) / ((i + 2) / (s32) name))); } }
+  { s32 gz = 0; if (gz != 0) { i = ((((SFX_NAME_ID(name) / i) / (i / SFX_NAME_ID(name))) / ((SFX_NAME_ID(name) / (i + 1)) / ((i + 1) / SFX_NAME_ID(name)))) / ((SFX_NAME_ID(name) / (i + 2)) / ((i + 2) / SFX_NAME_ID(name)))); } }
   return i;
 }
 static inline void psndBGMSearchP(char* name, s32* pi) {
   SoundBGMEntry* entry;
   entry = psbgmlist;
-  if (((s32) name) >= 0) {
-    *pi = (s32) name;
+  if (SFX_NAME_IS_ID(name)) {
+    *pi = SFX_NAME_ID(name);
     return;
   }
   for (*pi = 0; *pi < 0x106; (*pi)++, entry++) {
@@ -5580,7 +5580,7 @@ static inline void psndBGMSearchP(char* name, s32* pi) {
     *pi = 0;
   }
   // FAKE: dead int guard (COLOURING W) keeps name live to the return with 3 division pairs: name degree 22 -> 32, so it is simplified late and colours r24 as in the target; folded after RA, no code
-  { s32 gz = 0; if (gz != 0) { *pi = (((((s32) name / *pi) / (*pi / (s32) name)) / (((s32) name / (*pi + 1)) / ((*pi + 1) / (s32) name))) / (((s32) name / (*pi + 2)) / ((*pi + 2) / (s32) name))); } }
+  { s32 gz = 0; if (gz != 0) { *pi = ((((SFX_NAME_ID(name) / *pi) / (*pi / SFX_NAME_ID(name))) / ((SFX_NAME_ID(name) / (*pi + 1)) / ((*pi + 1) / SFX_NAME_ID(name)))) / ((SFX_NAME_ID(name) / (*pi + 2)) / ((*pi + 2) / SFX_NAME_ID(name)))); } }
 }
 BOOL psndBGMOn_f_d(u32 flags, char *bgm_name, u32 fadetime, u32 fadeout, s32 r7)
 {
@@ -5814,7 +5814,7 @@ BOOL psndBGMOn_f_d(u32 flags, char *bgm_name, u32 fadetime, u32 fadeout, s32 r7)
     {
       goto fail;
     }
-    SoundSSPlayCh(bgm->streamId, (s32) entry->path);
+    SoundSSPlayCh(bgm->streamId, entry->path);
     SoundSSMuteOn(bgm->streamId);
     SoundSSSetVolCh(bgm->streamId, vol);
     SoundSSSetPanCh(bgm->streamId, pan);
@@ -5996,7 +5996,7 @@ u8 SoundSSGetVolCh(s32 chan);
 void SoundSSSetVolCh(s32 chan, u8 vol);
 void SoundSSSetPanCh(s32 chan, u8 pan);
 void SoundSSSetSrndPanCh(s32 chan, u8 span);
-void SoundSSPlayCh(s32 chan, s32 id);
+void SoundSSPlayCh(s32 chan, const char* name);
 static inline s32 sfxvol(PaperSoundEffect* s) {
 	s32 v = s->volume * s->entryVolume / 127 - s->attenuation;
 	if (v < 0) v = 0;
@@ -6133,7 +6133,7 @@ void psndSFXMain(void) {
 ssfound:
 				sfx[0]->channel = ch[0];
 				if (sfx[0]->channel != none) {
-					SoundSSPlayCh(sfx[0]->channel, (s32)e->streamName);
+					SoundSSPlayCh(sfx[0]->channel, e->streamName);
 					SoundSSSetPanCh(sfx[0]->channel, sfx[0]->pan);
 					SoundSSSetVolCh(sfx[0]->channel, SFX_VOL(sfx[0]));
 				}
@@ -6663,7 +6663,7 @@ void psndENVMain(void) {
 				r = rr;
 				e->position.x += r * (f32)sin(a2);
 				e->position.z -= r * (f32)cos(a2);
-				{ u8 vv; ENVVOL(e, &psnd, vv) e->sfx = __psndSFXOn((const char*)(e->sfxId | 0x5000000), vv, 0xff, 0, &e->position, 0, e->dist, 0); }
+				{ u8 vv; ENVVOL(e, &psnd, vv) e->sfx = __psndSFXOn(SFX_NAME_WORD(e->sfxId | 0x5000000), vv, 0xff, 0, &e->position, 0, e->dist, 0); }
 				e->state++;
 				break;
 			case 2:
@@ -6678,7 +6678,7 @@ void psndENVMain(void) {
 		case 1:
 			switch (e->state) {
 			case 0:
-				{ u8 vv; ENVVOL(e, &psnd, vv) e->sfx = __psndSFXOn((const char*)(e->sfxId | 0x4000000), vv, 0xff, 0, &e->position, 0, e->dist, 0); }
+				{ u8 vv; ENVVOL(e, &psnd, vv) e->sfx = __psndSFXOn(SFX_NAME_WORD(e->sfxId | 0x4000000), vv, 0xff, 0, &e->position, 0, e->dist, 0); }
 				e->state++;
 				break;
 			case 1:
@@ -6697,7 +6697,7 @@ void psndENVMain(void) {
 				if (e->timer == 0) e->state++;
 				break;
 			case 1:
-				{ u8 vv; ENVVOL(e, &psnd, vv) e->sfx = __psndSFXOn((const char*)(e->sfxId | 0x4000000), vv, 0xff, 0, &e->position, 0, e->dist, 0); }
+				{ u8 vv; ENVVOL(e, &psnd, vv) e->sfx = __psndSFXOn(SFX_NAME_WORD(e->sfxId | 0x4000000), vv, 0xff, 0, &e->position, 0, e->dist, 0); }
 				e->state++;
 				break;
 			case 2:
@@ -6712,7 +6712,7 @@ void psndENVMain(void) {
 		case 3:
 			switch (e->state) {
 			case 0:
-				{ u8 vv; ENVVOL(e, &psnd, vv) e->sfx = __psndSFXOn((const char*)(e->sfxId | 0x6000000), vv, 0xff, 0, &e->position, 0, e->dist, 0); }
+				{ u8 vv; ENVVOL(e, &psnd, vv) e->sfx = __psndSFXOn(SFX_NAME_WORD(e->sfxId | 0x6000000), vv, 0xff, 0, &e->position, 0, e->dist, 0); }
 				e->state++;
 				break;
 			case 1:
@@ -6781,8 +6781,8 @@ BOOL psndENVOn(u32 flags, const char* name) {
 typedef struct PairU32_ { u32 a, b; } PairU32_;
 static inline s32 psndENVSearch(const char** names, const char* name) {
 	s32 id;
-	if ((s32)name >= 0) {
-		return (s32)name;
+	if (SFX_NAME_IS_ID(name)) {
+		return SFX_NAME_ID(name);
 	}
 	for (id = 0; id < 0x76; id++, names++) {
 		if (strcmp(*names, name) == 0) break;

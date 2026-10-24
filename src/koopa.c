@@ -844,7 +844,8 @@ void kpaFireMain(void) {
     f32 f31;
     f32 f30;
     f32 f29;
-    KPW(mp)->flameHit = (struct HitEntry*)(flag = 0);
+    KPW(mp)->flameHit = NULL;
+    flag = 0;
     if (fireefp && (f32)flag == 0.0f) {
         f32 dir;
         f32 scale;
@@ -938,5 +939,5 @@ s32 kpaJumpChk(void) {
 }
 
 void kpaPauseSE2(void) {
-    psndSFXOn((char*)(kpaPauseSeTable[irand(28)] | 0x20000));
+    psndSFXOn(SFX_NAME_WORD(kpaPauseSeTable[irand(28)] | 0x20000));
 }

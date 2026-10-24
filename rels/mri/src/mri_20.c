@@ -79,7 +79,7 @@ BeroEntry bero_black_shadow[] = {
         NULL, // enterEvent
         10, // caseType
         NULL, // exitEvent
-        (s32)"mri_04", // nextMapName
+        "mri_04", // nextMapName
         "", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -99,7 +99,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         10, // caseType
         NULL, // exitEvent
-        (s32)"mri_03", // nextMapName
+        "mri_03", // nextMapName
         "dokan", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -116,7 +116,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"mri_02", // nextMapName
+        "mri_02", // nextMapName
         "dokan3", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

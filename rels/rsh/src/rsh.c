@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "stdio.h"
@@ -1282,7 +1283,7 @@ USER_FUNC(evt_rsh_get_rnd_npc_talk_evt) {
     s32 group = evtGetValue(event, args[1]);
     s32 index = evtGetValue(event, args[2]);
 
-    evtSetValue(event, args[3], (s32)_get_rnd_npc_data(room, group, index)->talkEvt);
+    evtSetValue(event, args[3], (EvtWord)_get_rnd_npc_data(room, group, index)->talkEvt);
     return EVT_RETURN_DONE;
 }
 
@@ -1293,8 +1294,8 @@ USER_FUNC(evt_rsh_get_rnd_npc_data) {
     s32 index = evtGetValue(event, args[2]);
     RshRndNpc* data = _get_rnd_npc_data(room, group, index);
 
-    evtSetValue(event, args[3], (s32)data->name);
-    evtSetValue(event, args[4], (s32)data->model);
+    evtSetValue(event, args[3], (EvtWord)data->name);
+    evtSetValue(event, args[4], (EvtWord)data->model);
     return EVT_RETURN_DONE;
 }
 

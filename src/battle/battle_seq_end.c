@@ -298,7 +298,7 @@ void btlseqEnd(BattleWork* wp) {
         }
         switch (BattleInformationGetResult(info)) {
         case 1:
-            if ((u32)fbatGetPointer()->postBattleEvent) {
+            if (fbatGetPointer()->postBattleEvent != NULL) {
                 SS(0x7000003);
                 return;
             }
@@ -2191,7 +2191,7 @@ USER_FUNC(_check_guard_koura) {
 USER_FUNC(_get_rank_up_msg) {
     s32 index = event->args[0];
 
-    evtSetValue(event, index, (s32)_get_rank_data(pouchGetPtr()->level)->rankUpMessage);
+    evtSetValue(event, index, (EvtWord)_get_rank_data(pouchGetPtr()->level)->rankUpMessage);
     return 2;
 }
 //

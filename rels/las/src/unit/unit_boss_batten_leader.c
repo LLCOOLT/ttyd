@@ -885,7 +885,7 @@ USER_FUNC(check_satellite) {
 
             BtlUnit_snd_se(unit, "SFX_BOSS_SRYO_LIGHT_ROUND1", 0xF1194D80, 0);
             BtlUnit_GetPos(unit, &px, &py, &pz);
-            unit->work[8] = (s32)effSyuryouEntry(1, 1000, 0.0f, -1000.0f, 0.0f);
+            unit->work[8] = (EvtWord)effSyuryouEntry(1, 1000, 0.0f, -1000.0f, 0.0f);
         }
         if (unit->work[8] != 0) {
             f32* ud = ((EffectEntry*)unit->work[8])->userdata;
@@ -2584,7 +2584,7 @@ USER_FUNC(btlevtcmd_AnimeGetPose) {
     part = BattleGetUnitPartsPtr(id, partNo);
 
 
-    evtSetValue(event, args[2], (s32)animPoseGetCurrentAnim(part->poseId));
+    evtSetValue(event, args[2], (EvtWord)animPoseGetCurrentAnim(part->poseId));
     return EVT_RETURN_DONE;
 }
 static USER_FUNC(enzan_lw_save) {
@@ -2634,7 +2634,7 @@ USER_FUNC(pose_check_evt_run) {
     xevt->unitId = event->unitId;
     xevt->ownerNPC = event->ownerNPC;
     xmemo[0] = 0;
-    xevt->lwData[0] = (s32)xmemo;
+    xevt->lwData[0] = (EvtWord)xmemo;
     xevt->uwBase = event->uwBase;
     xevt->ufBase = event->ufBase;
     return EVT_RETURN_DONE;
@@ -2764,12 +2764,12 @@ u8 battenSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table) {
     if (unit->work[9 + n] == -1) {
         return FALSE;
     }
-    unit->work[13 + n] = (s32)sp;
+    unit->work[13 + n] = (EvtWord)sp;
     sp->n = 5;
     sp->table = table;
     sp->count = 0;
     spline_maketable(5, sp->table, sp->a, sp->b);
-    BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[9 + n]), 1)->work[1] = (s32)table;
+    BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[9 + n]), 1)->work[1] = (EvtWord)table;
     return TRUE;
 }
 u8 battenSatelliteTo_Main(BattleUnit* unit, s32 n) {
@@ -2816,36 +2816,36 @@ USER_FUNC(battenSatelliteToInside) {
     if (isFirstCall) {
         for (i = 0; i < 4; i++) {
             if (unit->work[9 + i] != -1) {
-                s32 table = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[9 + i]), 1)->work[1];
+                EvtWord table = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[9 + i]), 1)->work[1];
 
-                if (table == (s32)splineTableOut1_1) {
+                if (table == (EvtWord)splineTableOut1_1) {
                     battenSatelliteTo_Init(unit, i, splineTableIn1_1);
                 }
-                if (table == (s32)splineTableOut2_1) {
+                if (table == (EvtWord)splineTableOut2_1) {
                     battenSatelliteTo_Init(unit, i, splineTableIn2_1);
                 }
-                if (table == (s32)splineTableOut2_2) {
+                if (table == (EvtWord)splineTableOut2_2) {
                     battenSatelliteTo_Init(unit, i, splineTableIn2_2);
                 }
-                if (table == (s32)splineTableOut3_1) {
+                if (table == (EvtWord)splineTableOut3_1) {
                     battenSatelliteTo_Init(unit, i, splineTableIn3_1);
                 }
-                if (table == (s32)splineTableOut3_2) {
+                if (table == (EvtWord)splineTableOut3_2) {
                     battenSatelliteTo_Init(unit, i, splineTableIn3_2);
                 }
-                if (table == (s32)splineTableOut3_3) {
+                if (table == (EvtWord)splineTableOut3_3) {
                     battenSatelliteTo_Init(unit, i, splineTableIn3_3);
                 }
-                if (table == (s32)splineTableOut4_1) {
+                if (table == (EvtWord)splineTableOut4_1) {
                     battenSatelliteTo_Init(unit, i, splineTableIn4_1);
                 }
-                if (table == (s32)splineTableOut4_2) {
+                if (table == (EvtWord)splineTableOut4_2) {
                     battenSatelliteTo_Init(unit, i, splineTableIn4_2);
                 }
-                if (table == (s32)splineTableOut4_3) {
+                if (table == (EvtWord)splineTableOut4_3) {
                     battenSatelliteTo_Init(unit, i, splineTableIn4_3);
                 }
-                if (table == (s32)splineTableOut4_4) {
+                if (table == (EvtWord)splineTableOut4_4) {
                     battenSatelliteTo_Init(unit, i, splineTableIn4_4);
                 }
             }

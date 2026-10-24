@@ -1,6 +1,7 @@
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "driver/hitdrv.h"
@@ -238,12 +239,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)evt_snd_stop, // exitEvent
-        (s32)"aji_18", // nextMapName
+        "aji_18", // nextMapName
         "e_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w_door_close, // enterAnimeArg
-        (s32)w_door_open, // exitAnimeArg
+        w_door_close, // enterAnimeArg
+        w_door_open, // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -256,12 +257,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)evt_snd_stop, // exitEvent
-        (s32)"aji_14", // nextMapName
+        "aji_14", // nextMapName
         "w_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e_door_close, // enterAnimeArg
-        (s32)e_door_open, // exitAnimeArg
+        e_door_close, // enterAnimeArg
+        e_door_open, // exitAnimeArg
     },
     {
         "dokan_1", // hitName
@@ -497,7 +498,7 @@ static USER_FUNC(mario_chk) {
             work[i].pos = (Vec){0.0f, 0.0f, 0.0f};
             work[i].delta = (Vec){0.0f, 0.0f, 0.0f};
         }
-        event->userdata[0] = (s32)work;
+        event->userdata[0] = (EvtWord)work;
         event->userdataf[1] = 0.0f;
         event->userdata[2] = 0;
     }
@@ -565,7 +566,7 @@ static USER_FUNC(mario_chk) {
                 mario->floorMove.y = (v.y - dist * (f32)cos(rot)) - mario->position.y;
             }
             event->userdataf[1] = angle;
-            event->userdata[2] = (s32)hit;
+            event->userdata[2] = (EvtWord)hit;
             break;
         }
     }

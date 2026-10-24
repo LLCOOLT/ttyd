@@ -221,7 +221,7 @@ USER_FUNC(yuu_03_icon_monte_restart) {
             data->viewEvent = NULL;
             _mapFree(yuu_03_monte_p);
             data->viewEvent = evtEntryType(yuu_03_icon_monte_entry_evt, 0, 0, 0);
-            data->viewEvent->lwData[0] = (s32)yuu_03_monte_p->wp;
+            data->viewEvent->lwData[0] = (EvtWord)yuu_03_monte_p->wp;
         }
     }
     return EVT_RETURN_DONE;
@@ -948,12 +948,12 @@ BOOL yuuminigame4_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                 if (irand(2)) {
                     data->state = 1;
                     ev = evtEntryType(ryushi_event, 0, 0, 0);
-                    ev->lwData[0] = (s32)wp;
+                    ev->lwData[0] = (EvtWord)wp;
                     ev->lwData[1] = 1;
                 } else {
                     data->state = 5;
                     ev = evtEntryType(ryushi_event, 0, 0, 0);
-                    ev->lwData[0] = (s32)wp;
+                    ev->lwData[0] = (EvtWord)wp;
                     ev->lwData[1] = 0;
                 }
                 data->timer = 60;

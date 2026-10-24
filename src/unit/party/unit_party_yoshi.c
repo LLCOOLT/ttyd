@@ -2171,7 +2171,7 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_move) {
         } else {
             sweatAngle = 50.0f;
         }
-        event->userdata[2] = (s32)effSweatN64Entry(1, unit->mMoveCurrentPos.x, unit->mMoveCurrentPos.y + unit->mSizeMultiplier * (0.5f * BtlUnit_GetHeight(unit)), unit->mMoveCurrentPos.z, 5.0f * unit->mSizeMultiplier, sweatAngle, 16);
+        event->userdata[2] = (EvtWord)effSweatN64Entry(1, unit->mMoveCurrentPos.x, unit->mMoveCurrentPos.y + unit->mSizeMultiplier * (0.5f * BtlUnit_GetHeight(unit)), unit->mMoveCurrentPos.z, 5.0f * unit->mSizeMultiplier, sweatAngle, 16);
     } else {
         eff = (EffectEntry*)event->userdata[2];
         if (event->userdata[1] < 16) {

@@ -144,6 +144,8 @@ void psndStopAllFadeOut(void);
 BOOL psndENVOff(u32 r3);
 void psndSFXAllOff(void);
 
+#include "sfx_name_word.h"
+
 void psndSFXOn(const char* name);
 s32 psndSFXOn_3D(const char* name, Vec* position);
 

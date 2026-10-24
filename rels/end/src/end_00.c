@@ -1486,7 +1486,7 @@ USER_FUNC(evt_end_moamoa_init) {
         end_moa_ext_data[i].pose = end_moa_ext_pose;
         end_moa_ext_data[i].speed = i;
     }
-    evtSetValue(event, LW(10), (s32)end_moa_ext_data);
+    evtSetValue(event, LW(10), (EvtWord)end_moa_ext_data);
     ap = animPoseGetAnimPosePtr(npc->poseId);
     n = ap->numWorldPositions;
     p = *ap->worldPositions;

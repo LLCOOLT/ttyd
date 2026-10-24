@@ -1446,7 +1446,7 @@ static USER_FUNC(_clauda_breath_effect_fire) {
     ((EffKumokumoN64Particle*)eff->userdata)->g2 = 27;
     ((EffKumokumoN64Particle*)eff->userdata)->b2 = 245;
     ((EffKumokumoN64Particle*)eff->userdata)->rot = -10.0f;
-    evtSetValue(event, var, (s32)eff);
+    evtSetValue(event, var, (EvtWord)eff);
     return EVT_RETURN_DONE;
 }
 
@@ -1467,7 +1467,7 @@ USER_FUNC(_make_breath_weapon) {
     value = evtGetValue(event, args[1]);
     memcpy(weapon, src, sizeof(BattleWeapon));
     weapon->galeForceChance = value;
-    evtSetValue(event, index, (s32)weapon);
+    evtSetValue(event, index, (EvtWord)weapon);
     return EVT_RETURN_DONE;
 }
 
@@ -1487,7 +1487,7 @@ USER_FUNC(_make_kiss_weapon) {
     src = (void*)evtGetValue(event, index);
     evtGetValue(event, args[1]);
     memcpy(weapon, src, sizeof(BattleWeapon));
-    evtSetValue(event, index, (s32)weapon);
+    evtSetValue(event, index, (EvtWord)weapon);
     return EVT_RETURN_DONE;
 }
 
@@ -1546,6 +1546,6 @@ USER_FUNC(_make_kumoguard_weapon) {
     value = evtGetValue(event, args[1]);
     memcpy(weapon, src, sizeof(BattleWeapon));
     weapon->dodgyTime = value;
-    evtSetValue(event, index, (s32)weapon);
+    evtSetValue(event, index, (EvtWord)weapon);
     return EVT_RETURN_DONE;
 }

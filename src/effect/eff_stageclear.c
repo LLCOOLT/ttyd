@@ -23,7 +23,7 @@ typedef struct StageClearWork {
     f32 scale;    // 0x14
     s32 delay;    // 0x18
     s32 frame;    // 0x1C
-    u32 shake;    // 0x20
+    EventEntry* shake; // 0x20
     s32 confetti; // 0x24
     s32 done;     // 0x28
 } StageClearWork;
@@ -200,7 +200,7 @@ void effStageClearMain(EffectEntry* effect) {
         if (p->delay != 0) {
             p->delay--;
             if (p->delay == 0) {
-                psndSFXOn((const char*)(type == 0 ? 0x29b : 0x82e));
+                psndSFXOn(SFX_NAME_WORD(type == 0 ? 0x29b : 0x82e));
             }
         } else {
             if ((u32)p->frame < 11) {
@@ -208,15 +208,15 @@ void effStageClearMain(EffectEntry* effect) {
             }
             p->frame++;
             if (p->scale > 0.9f) {
-                if (p->shake == 0U) {
+                if (p->shake == NULL) {
                     s32* d;
-                    p->shake = (s32)evtEntry(evt_shake, 0, 0);
+                    p->shake = evtEntry(evt_shake, 0, 0);
                     d = shake_dt;
                     if (i == effect->count - 1) {
                         d = shake_dt2;
                     }
-                    ((EventEntry*)p->shake)->lwData[0] = (s32)d;
-                    ((EventEntry*)p->shake)->lwData[1] = (effect->count - 1 - i) == 0;
+                    p->shake->lwData[0] = (EvtWord)d;
+                    p->shake->lwData[1] = (effect->count - 1 - i) == 0;
                 }
                 n++;
             }

@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "seq/seq_demo.h"
@@ -202,11 +203,11 @@ USER_FUNC(evt_action_sub) {
     bit = 1 << i;
     EXIGetType(0, 2, &type);
     if (type != 0x05070000) {
-        evtSetValue(event, *args++, (s32)npcGetTribe(name)->modelName);
-        evtSetValue(event, *args++, (s32)name);
+        evtSetValue(event, *args++, (EvtWord)npcGetTribe(name)->modelName);
+        evtSetValue(event, *args++, (EvtWord)name);
     } else {
-        evtSetValue(event, *args++, (s32)"a_mario");
-        evtSetValue(event, *args++, (s32)"\202\311\202\271\203}\203\212\203I\202Q");
+        evtSetValue(event, *args++, (EvtWord)"a_mario");
+        evtSetValue(event, *args++, (EvtWord)"\202\311\202\271\203}\203\212\203I\202Q");
     }
     evtSetValue(event, *args++, bit);
     evtSetValue(event, *args++, ANIM_TBL[idx].anim);

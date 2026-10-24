@@ -21,6 +21,7 @@ double sqrt(double);
 double fabs(double);
 double __fabs(double);
 s32 rand();
+BattleUnit* BattleAudienceDetectTargetAll(void);
 s32 BattleAudienceDetectPakkunEatTarget(s32 index);
 void BattleAudiencePuniAllEscape(void);
 void BattleAudienceSoundSing(s32 index);
@@ -857,12 +858,12 @@ void BattleAudienceCtrlProcessKinopioTransEvt(s32 index) {
     switch (m->step) {
     case 0:
         BattleAudience_SetAnim(index, 1, FALSE);
-        m->targetUnit = (s32)BattleAudienceDetectTargetAll();
+        m->targetUnit = BattleAudienceDetectTargetAll();
         m->counter = 0;
         psndSFXOn_3D("SFX_AUDIENCE_TELESA_MOVE1", &m->position);
         m->step = 5;
     case 5:
-        unit = (BattleUnit*)m->targetUnit;
+        unit = m->targetUnit;
         parts = BattleGetUnitPartsPtr(BtlUnit_GetUnitId(unit), BtlUnit_GetBodyPartsId(unit));
 
         m->counter++;
@@ -879,7 +880,7 @@ void BattleAudienceCtrlProcessKinopioTransEvt(s32 index) {
             }
             m->step = 10;
             m->counter = 0;
-            unit = (BattleUnit*)m->targetUnit;
+            unit = m->targetUnit;
             parts = BattleGetUnitPartsPtr(BtlUnit_GetUnitId(unit), BtlUnit_GetBodyPartsId(unit));
             BtlUnit_GetHitPos(unit, parts, &x, &y, &z);
             psndSFXOn_3D("SFX_AUDIENCE_TELESA_MOVE1", &m->position);
@@ -891,7 +892,7 @@ void BattleAudienceCtrlProcessKinopioTransEvt(s32 index) {
         m->position.y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(80.0f, y - 15.0f, 4, m->counter, 30);
         m->position.z = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(100.0f, z, 0, m->counter, 30);
         if (m->counter == 30) {
-            unit = (BattleUnit*)m->targetUnit;
+            unit = m->targetUnit;
             parts = BattleGetUnitPartsPtr(BtlUnit_GetUnitId(unit), BtlUnit_GetBodyPartsId(unit));
             BtlUnit_GetStatus(unit, 0x12, &st1, &st0);
             if (st1 < 1 && !BtlUnit_CheckShadowGuard(unit)) {

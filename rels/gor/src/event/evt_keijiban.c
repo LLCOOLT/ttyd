@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "driver/msgdrv.h"
@@ -133,12 +134,12 @@ USER_FUNC(keijiban_joho_makelabel) {
 
     if (idx >= 0 && idx < kj->count) {
         sprintf(kj->label, "%s_%04d", kj->prefix, kj->entries[idx].index);
-        evtSetValue(event, args[1], (s32)kj->label);
+        evtSetValue(event, args[1], (EvtWord)kj->label);
         kj->current = idx;
         return EVT_RETURN_DONE;
     }
     kj->label[0] = '\0';
-    evtSetValue(event, args[1], (s32)kj->label);
+    evtSetValue(event, args[1], (EvtWord)kj->label);
     return EVT_RETURN_DONE;
 }
 

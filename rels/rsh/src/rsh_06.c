@@ -993,7 +993,7 @@ static void ext_moamoa_main(void) {
         }
         if (((( wp->flags & 1) && ( !(m->flags & 0x444) )) && ( i == ( gp->retraceCount % wp->count ))) && ( irand(1000) < 200) ) {
             /* FAKE: named Vec + static zero template instead of a compound literal (same values) */ { Vec tmp; static const Vec z0 = {0.0f, 0.0f, 0.0f}; tmp = z0; tmp.x = (*pose->mtx)[0][3]; tmp.y = (*pose->mtx)[1][3]; tmp.z = (*pose->mtx)[2][3]; sp = tmp; }
-            psndSFXOn_3D((char*)(u32)"SFX_STG6_MOAMOA_VOICE1", &sp); /* FAKE: integer cast hoists the literal as an @ temp (sfx local removed) */
+            psndSFXOn_3D(SFX_NAME_WORD("SFX_STG6_MOAMOA_VOICE1"), &sp); /* FAKE: integer cast hoists the literal as an @ temp (sfx local removed) */
         }
         switch (m->state) {
             case 0:
@@ -2059,7 +2059,7 @@ static BeroEntry bero_data_a[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)((char*)"rsh_05_a"), // nextMapName
+        "rsh_05_a", // nextMapName
         ((char*)"w_bero"), // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

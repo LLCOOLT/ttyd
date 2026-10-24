@@ -37,10 +37,10 @@ typedef struct BattleStageObject {
 	f32 mShakeAngle; //0x78
 } BattleStageObject;
 
-// raw words, so the tables don't depend on how much of BattleWeapon is named
+// one weapon of the stage tables; the tables initialise `weapon`
 typedef union BattleWeaponData {
-	u32 raw[0xC0 / 4];
 	BattleWeapon weapon;
+	u32 raw[0xC0 / 4];
 } BattleWeaponData;
 
 typedef struct BattleStageNozzleData {

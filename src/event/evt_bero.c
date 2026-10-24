@@ -219,7 +219,7 @@ void bero_clear_Offset(void) {
 	BeroOZ = 0.0f;
 }
 
-s32 bero_id_filter(s32 id) { //1:1, cursed function, do not touch
+s32 bero_id_filter(EvtWord id) { //1:1, cursed function, do not touch
 	BeroEntry** temp, **table = BeroINFOARR;
 	s32 newId = id;
 	const char *string, *test;
@@ -259,7 +259,7 @@ USER_FUNC(evt_bero_mapchange) {
 
 //s32 retIndex
 USER_FUNC(evt_bero_get_entername) {
-	evtSetValue(event, *event->args, (s32)&gp->beroEnterName);
+	evtSetValue(event, *event->args, (EvtWord)&gp->beroEnterName);
 	return EVT_RETURN_DONE;
 }
 
@@ -318,8 +318,8 @@ USER_FUNC(evt_bero_get_info_anime) {
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
 	evtSetValue(event, args[1], bero->enterAnimeType);
 	evtSetValue(event, args[2], bero->exitAnimeType);
-	evtSetValue(event, args[3], bero->enterAnimeArg);
-	evtSetValue(event, args[4], bero->exitAnimeArg);
+	evtSetValue(event, args[3], (EvtWord)bero->enterAnimeArg);
+	evtSetValue(event, args[4], (EvtWord)bero->exitAnimeArg);
 	return EVT_RETURN_DONE;
 }
 
@@ -372,8 +372,8 @@ USER_FUNC(evt_bero_get_info_nextarea) {
 	EvtWord* args = event->args;
 
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
-	evtSetValue(event, args[1], bero->nextMapName);
-	evtSetValue(event, args[2], (s32)bero->nextBeroName);
+	evtSetValue(event, args[1], (EvtWord)bero->nextMapName);
+	evtSetValue(event, args[2], (EvtWord)bero->nextBeroName);
 	return EVT_RETURN_DONE;
 }
 
@@ -491,25 +491,25 @@ USER_FUNC(evt_bero_get_into_info) {
 		bero = BeroINFOARR[0];
 		event->lwData[1] = 0;
 		event->lwData[2] = BeroNUM;
-		event->lwData[3] = (s32)bero->hitName;
+		event->lwData[3] = (EvtWord)bero->hitName;
 		event->lwData[4] = bero->type;
 		event->lwData[5] = bero_get_kind(bero, 0);
-		event->lwData[6] = (s32)&bero->centerPosition;
+		event->lwData[6] = (EvtWord)&bero->centerPosition;
 		evt = bero->enterEvent;
 		if (!evt) evt = default_entevt;
-		event->lwData[7] = (s32)evt;
+		event->lwData[7] = (EvtWord)evt;
 		event->lwData[8] = 0xFFFF0000;
 		return EVT_RETURN_DONE;
 	} else {
 		event->lwData[1] = i;
 		event->lwData[2] = BeroNUM;
-		event->lwData[3] = (s32)gp->beroEnterName;
+		event->lwData[3] = (EvtWord)gp->beroEnterName;
 		event->lwData[4] = bero->type;
 		event->lwData[5] = bero_get_kind(bero, 0);
-		event->lwData[6] = (s32)&bero->centerPosition;
+		event->lwData[6] = (EvtWord)&bero->centerPosition;
 		evt = bero->enterEvent;
 		if (!evt) evt = default_entevt;
-		event->lwData[7] = (s32)evt;
+		event->lwData[7] = (EvtWord)evt;
 		event->lwData[8] = 0xFFFF0000;
 		return EVT_RETURN_DONE;
 	}
@@ -551,13 +551,13 @@ USER_FUNC(evt_bero_get_info_num) {
 	s32 kind;
 	EvtWord* evt;
 
-	event->lwData[3] = (s32)bero->hitName;
+	event->lwData[3] = (EvtWord)bero->hitName;
 	event->lwData[4] = bero->type;
 	event->lwData[5] = bero_get_kind(bero, 1);
-	event->lwData[6] = (s32)&bero->centerPosition;
+	event->lwData[6] = (EvtWord)&bero->centerPosition;
 	evt = bero->enterEvent;
 	if (!evt) evt = default_entevt;
-	event->lwData[7] = (s32)evt;
+	event->lwData[7] = (EvtWord)evt;
 	event->lwData[8] = 0xFFFF0000;
 	event->lwData[9] = BeroSW[id];
 	event->lwData[10] = bero->caseType;
@@ -572,10 +572,10 @@ USER_FUNC(evt_bero_get_info_num) {
 	}
 	evt = bero->exitEvent;
 	if (!evt) evt = default_outevt;
-	event->lwData[11] = (s32)evt;
+	event->lwData[11] = (EvtWord)evt;
 	event->lwData[12] = 0xFFFF0000;
-	event->lwData[13] = bero->nextMapName;
-	event->lwData[14] = (s32)bero->nextBeroName;
+	event->lwData[13] = (EvtWord)bero->nextMapName;
+	event->lwData[14] = (EvtWord)bero->nextBeroName;
 	return EVT_RETURN_DONE;
 }
 
@@ -659,7 +659,7 @@ s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall)
   return 2;
 }
 
-void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end) {
+void bero_get_position_pipe_sub(s32 id, s32 a, EvtWord name, s32 kind, Vec* start, Vec* end) {
 	f32 hx, hy, hz, dist, nx, ny, nz;
 	f32 ofs;
 	hz = hy = hx = 0.0f;
@@ -1023,7 +1023,7 @@ USER_FUNC(evt_bero_switch_on) {
 	BeroEntry** table = BeroINFOARR;
 	EvtWord* args = event->args;
 	BeroEntry** temp;
-	s32 id = evtGetValue(event, *args++);
+	EvtWord id = evtGetValue(event, *args++);
 	s32 newId = id;
 	const char *string, *test;
 	if (id < 0 || id >= 16) {
@@ -1057,7 +1057,7 @@ USER_FUNC(evt_bero_switch_off) {
 	BeroEntry** table = BeroINFOARR;
 	EvtWord* args = event->args;
 	BeroEntry** temp;
-	s32 id = evtGetValue(event, *args++);
+	EvtWord id = evtGetValue(event, *args++);
 	s32 newId = id;
 	const char *string, *test;
 	if (id < 0 || id >= 16) {
@@ -1091,7 +1091,7 @@ USER_FUNC(evt_bero_get_number) {
 	BeroEntry** table = BeroINFOARR;
 	EvtWord* args = event->args;
 	BeroEntry** temp;
-	s32 id = evtGetValue(event, *args++);
+	EvtWord id = evtGetValue(event, *args++);
 	s32 newId = id;
 	const char *string, *test;
 	if (id < 0 || id >= 16) {
@@ -1201,7 +1201,7 @@ USER_FUNC(evt_bero_move_mario_speed) {
 USER_FUNC(evt_bero_overwrite) {
 	BeroEntry** temp, **table = BeroINFOARR;
 	EvtWord* args = event->args;
-	s32 id = evtGetValue(event, args[0]);
+	EvtWord id = evtGetValue(event, args[0]);
 	s32 newId = id;
 	const char *string, *test;
 	if (id < 0 || id >= 16) {

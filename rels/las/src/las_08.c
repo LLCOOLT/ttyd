@@ -180,12 +180,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)door_matigai_evt, // exitEvent
-        (s32)"las_07", // nextMapName
+        "las_07", // nextMapName
         "e_bero_1", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w1_door_close, // enterAnimeArg
-        (s32)w1_door_open, // exitAnimeArg
+        w1_door_close, // enterAnimeArg
+        w1_door_open, // exitAnimeArg
     },
     {
         "e_bero_1", // hitName
@@ -198,12 +198,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)door_seikai_evt, // exitEvent
-        (s32)"las_09", // nextMapName
+        "las_09", // nextMapName
         "w_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e1_door_close, // enterAnimeArg
-        (s32)e1_door_open, // exitAnimeArg
+        e1_door_close, // enterAnimeArg
+        e1_door_open, // exitAnimeArg
     },
     {
         "w_bero_2", // hitName
@@ -216,12 +216,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)door_matigai_evt, // exitEvent
-        (s32)"las_07", // nextMapName
+        "las_07", // nextMapName
         "e_bero_2", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w2_door_close, // enterAnimeArg
-        (s32)w2_door_open, // exitAnimeArg
+        w2_door_close, // enterAnimeArg
+        w2_door_open, // exitAnimeArg
     },
     {
         "e_bero_2", // hitName
@@ -234,12 +234,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)door_matigai_evt, // exitEvent
-        (s32)"las_07", // nextMapName
+        "las_07", // nextMapName
         "w_bero_2", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e2_door_close, // enterAnimeArg
-        (s32)e2_door_open, // exitAnimeArg
+        e2_door_close, // enterAnimeArg
+        e2_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -256,12 +256,12 @@ BeroEntry e_bero_1_matigai[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)door_matigai_evt, // exitEvent
-        (s32)"las_07", // nextMapName
+        "las_07", // nextMapName
         "w_bero_1", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e1_door_close, // enterAnimeArg
-        (s32)e1_door_open, // exitAnimeArg
+        e1_door_close, // enterAnimeArg
+        e1_door_open, // exitAnimeArg
     },
 };
 
@@ -277,12 +277,12 @@ BeroEntry e_bero_1_seikai[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)door_seikai_evt, // exitEvent
-        (s32)"las_08", // nextMapName
+        "las_08", // nextMapName
         "w_bero_1", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e1_door_close, // enterAnimeArg
-        (s32)e1_door_open, // exitAnimeArg
+        e1_door_close, // enterAnimeArg
+        e1_door_open, // exitAnimeArg
     },
 };
 
@@ -298,12 +298,12 @@ BeroEntry e_bero_2_seikai[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)door_seikai_evt, // exitEvent
-        (s32)"las_08", // nextMapName
+        "las_08", // nextMapName
         "w_bero_2", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e2_door_close, // enterAnimeArg
-        (s32)e2_door_open, // exitAnimeArg
+        e2_door_close, // enterAnimeArg
+        e2_door_open, // exitAnimeArg
     },
 };
 

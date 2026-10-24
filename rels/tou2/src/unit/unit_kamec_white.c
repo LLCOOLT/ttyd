@@ -1751,7 +1751,7 @@ static USER_FUNC(eff_magic) {
     y += 20.0f * unit->mSizeMultiplier;
     z += 5.0f;
     eff = effMagic1N64Entry(0, type, x, y, z, a, b, c);
-    unit->work[5] = (s32)eff;
+    unit->work[5] = (EvtWord)eff;
     ((EffMagic1N64Work*)eff->userdata)->scale = unit->mSizeMultiplier;
     return EVT_RETURN_DONE;
 }
@@ -1765,7 +1765,7 @@ static USER_FUNC(eff_staff2) {
     f32* wk;
 
     if (isFirstCall) {
-        unit->work[4] = (s32)effPokopiPchargeN64Entry(0, 0.0f, -1000.0f, 0.0f, 1.0f, 60);
+        unit->work[4] = (EvtWord)effPokopiPchargeN64Entry(0, 0.0f, -1000.0f, 0.0f, 1.0f, 60);
     }
     if (!(((EffectEntry*)unit->work[4])->flags & 1)) {
         return EVT_RETURN_DONE;
@@ -1788,7 +1788,7 @@ static USER_FUNC(eff_staff1) {
     f32* wk;
 
     if (isFirstCall) {
-        unit->work[4] = (s32)effThunderflareN64Entry(0, 0.0f, -1000.0f, 0.0f, 1.0f, 60);
+        unit->work[4] = (EvtWord)effThunderflareN64Entry(0, 0.0f, -1000.0f, 0.0f, 1.0f, 60);
     }
     if (!(((EffectEntry*)unit->work[4])->flags & 1)) {
         return EVT_RETURN_DONE;

@@ -352,7 +352,7 @@ s32 bakuGameDecideWeapon(EventEntry *event, BOOL isFirstCall)
     q[2] = 0;
     q[3] = 0;
   }
-  evtSetValue(event, args[2], (s32) w->weapon);
+  evtSetValue(event, args[2], (EvtWord) w->weapon);
   return 2;
 }
 

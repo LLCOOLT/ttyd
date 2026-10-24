@@ -2,6 +2,7 @@
 #include "evt/evt_seq.h"
 #include "manager/evtmgr.h"
 #include "manager/filemgr.h"
+#include "memory.h"
 #include "mario/mario.h"
 #include "driver/camdrv.h"
 #include "driver/fadedrv.h"
@@ -188,13 +189,13 @@ void seq_mapChangeMain(SequenceWork* work) {
                     file = fileAllocf(0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
                     if (file) {
                         if (!strncmp(area_name, mc_tst, 3)) {
-                            gp->relocationBase = _mapAlloc((u32)file->data[1]);
+                            gp->relocationBase = _mapAlloc(((smartEntry*)file->data)->size);
                         } else if (!strncmp(area_name, mc_jon, 3)) {
-                            gp->relocationBase = _mapAlloc((u32)file->data[1]);
+                            gp->relocationBase = _mapAlloc(((smartEntry*)file->data)->size);
                         } else {
                             gp->relocationBase = gp->mapAlloc;
                         }
-                        memcpy(gp->relocationBase, file->data[0], (u32)file->data[1]);
+                        memcpy(gp->relocationBase, ((smartEntry*)file->data)->address, ((smartEntry*)file->data)->size);
                         fileFree(file);
                     }
                     if (gp->relocationBase) {

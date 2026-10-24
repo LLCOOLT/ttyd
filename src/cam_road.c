@@ -7,6 +7,7 @@
 #include "cam_shift.h"
 #include "libc_decls.h"
 #include "cam_road.h"
+#include "addr_word.h"
 typedef struct CamRoadHit {
     f32 t;                 // 0x00
     f32 f_04;              // 0x04
@@ -77,16 +78,16 @@ s32 camRoadSetup(const char* name) {
             return 0;
         }
     }
-    if ((u32)wp->map->f_e8 < (u32)wp->map) {
-        wp->map->f_e8 = (Vec*)((u32)wp->map->f_e8 + (u32)wp->map);
-        wp->map->curves = (CamRoadCurve*)((u32)wp->map->curves + (u32)wp->map);
-        wp->map->f_f0 = (CamRoadGroup*)((u32)wp->map->f_f0 + (u32)wp->map);
-        wp->map->f_f4 = (CamRoadStrip*)((u32)wp->map->f_f4 + (u32)wp->map);
-        wp->map->f_f8 = (Vec*)((u32)wp->map->f_f8 + (u32)wp->map);
-        wp->map->f_fc = (Vec*)((u32)wp->map->f_fc + (u32)wp->map);
-        wp->map->f_100 = (s32*)((u32)wp->map->f_100 + (u32)wp->map);
-        wp->map->f_104 = (CamRoadGroup*)((u32)wp->map->f_104 + (u32)wp->map);
-        wp->map->f_108 = (void*)((u32)wp->map->f_108 + (u32)wp->map);
+    if ((u8*)wp->map->f_e8 < (u8*)wp->map) {
+        ADDR_WORD(wp->map->f_e8) += (AddrWord)wp->map;
+        ADDR_WORD(wp->map->curves) += (AddrWord)wp->map;
+        ADDR_WORD(wp->map->f_f0) += (AddrWord)wp->map;
+        ADDR_WORD(wp->map->f_f4) += (AddrWord)wp->map;
+        ADDR_WORD(wp->map->f_f8) += (AddrWord)wp->map;
+        ADDR_WORD(wp->map->f_fc) += (AddrWord)wp->map;
+        ADDR_WORD(wp->map->f_100) += (AddrWord)wp->map;
+        ADDR_WORD(wp->map->f_104) += (AddrWord)wp->map;
+        ADDR_WORD(wp->map->f_108) += (AddrWord)wp->map;
     }
     if (strcmp(wp->map->version, "1.01") == 0) {
         wp->state = 0x65;

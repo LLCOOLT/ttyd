@@ -79,7 +79,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_13", // nextMapName
+        "dou_13", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -95,7 +95,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_07", // nextMapName
+        "dou_07", // nextMapName
         "s_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

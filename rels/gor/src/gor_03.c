@@ -579,7 +579,7 @@ USER_FUNC(evt_exchange_msg_set) {
 #else
     sprintf(exchange_msgp, msg, value, exchange_ryokin_medal_tbl[n * 6 + 1], exchange_ryokin_medal_tbl[n * 6], exchange_ryokin_medal_tbl[n * 6 + 3], exchange_ryokin_medal_tbl[n * 6 + 2], exchange_ryokin_medal_tbl[n * 6 + 5], exchange_ryokin_medal_tbl[n * 6 + 4]);
 #endif
-    evtSetValue(event, args[2], (s32)exchange_msgp);
+    evtSetValue(event, args[2], (EvtWord)exchange_msgp);
     return EVT_RETURN_DONE;
 }
 
@@ -634,7 +634,7 @@ USER_FUNC(minigameselect_msg_set) {
     exchange_msgp[k] = val / 10 + '0';
     k++;
     exchange_msgp[k] = val % 10 + '0';
-    evtSetValue(event, args[1], (s32)exchange_msgp);
+    evtSetValue(event, args[1], (EvtWord)exchange_msgp);
     return EVT_RETURN_DONE;
 }
 
@@ -794,7 +794,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)debug_event, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gor_04", // nextMapName
+        "gor_04", // nextMapName
         "s_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -810,7 +810,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)debug_event, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gor_01", // nextMapName
+        "gor_01", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -827,7 +827,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)debug_event, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"tik_07", // nextMapName
+        "tik_07", // nextMapName
         "dokan_4", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -844,7 +844,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)debug_event, // enterEvent
         -1, // caseType
         (s32*)gor_03_down_evt, // exitEvent
-        (s32)"tik_07", // nextMapName
+        "tik_07", // nextMapName
         NULL, // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -861,7 +861,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"yuu_00", // nextMapName
+        "yuu_00", // nextMapName
         "", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -882,7 +882,7 @@ BeroEntry yuu_00_data[] = {
         NULL, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"yuu_00", // nextMapName
+        "yuu_00", // nextMapName
         "", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -902,7 +902,7 @@ BeroEntry yuu_01_data[] = {
         NULL, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"yuu_01", // nextMapName
+        "yuu_01", // nextMapName
         "", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -922,7 +922,7 @@ BeroEntry yuu_02_data[] = {
         NULL, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"yuu_02", // nextMapName
+        "yuu_02", // nextMapName
         "", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -942,7 +942,7 @@ BeroEntry yuu_03_data[] = {
         NULL, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"yuu_03", // nextMapName
+        "yuu_03", // nextMapName
         "", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

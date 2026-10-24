@@ -594,7 +594,7 @@ void winMgrHelpDraw(WinMgrEntry* entry) {
     }
 }
 
-WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
+WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 a2, BOOL a3) {
     s32 n;
     WinMgrDesc* desc;
     WinMgrSelect* sel;
@@ -988,7 +988,7 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
                     break;
             }
 
-            evt->lwData[3] = (s32)name;
+            evt->lwData[3] = (EvtWord)name;
             break;
         case 8:
             evt->lwData[2] = party_id_table[id];
@@ -1016,11 +1016,11 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
                     break;
             }
 
-            evt->lwData[4] = (s32)name;
+            evt->lwData[4] = (EvtWord)name;
             break;
         case 9:
             evt->lwData[1] = id;
-            evt->lwData[2] = (s32)MARIO_STATUS_NAME(id);
+            evt->lwData[2] = (EvtWord)MARIO_STATUS_NAME(id);
             evt->lwData[5] = *mario_status_point_table[0];
             evt->lwData[6] = *mario_status_point_table[1];
             evt->lwData[7] = *mario_status_point_table[2];
@@ -1028,42 +1028,42 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
             break;
         case 10:
             evt->lwData[1] = id;
-            evt->lwData[3] = (s32)MARIO_STATUS_NAME(id);
+            evt->lwData[3] = (EvtWord)MARIO_STATUS_NAME(id);
             evt->lwData[5 + id] -= mario_status_henka_table[id];
             break;
         case 11:
             evt->lwData[1] = id;
-            evt->lwData[2] = (s32)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
+            evt->lwData[2] = (EvtWord)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
             evt->lwData[3] = itemDataTable[id].buy_price;
             evt->lwData[4] = itemDataTable[id].bp_cost;
             break;
         case 12:
             evt->lwData[1] = id;
-            evt->lwData[2] = (s32)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
+            evt->lwData[2] = (EvtWord)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
             evt->lwData[3] = itemDataTable[id].sell_price;
             evt->lwData[4] = sel->cursor;
             break;
         case 13:
             evt->lwData[1] = id;
-            evt->lwData[2] = (s32)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
+            evt->lwData[2] = (EvtWord)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
             evt->lwData[3] = itemDataTable[id].star_piece_price;
             evt->lwData[4] = itemDataTable[id].bp_cost;
             break;
         case 14:
             evt->lwData[1] = id;
-            evt->lwData[2] = (s32)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
+            evt->lwData[2] = (EvtWord)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
             evt->lwData[3] = (itemDataTable[id].buy_price * 12) / 10;
             evt->lwData[4] = itemDataTable[id].bp_cost;
             break;
         case 15:
             evt->lwData[1] = id;
-            evt->lwData[2] = (s32)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
+            evt->lwData[2] = (EvtWord)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
             evt->lwData[3] = ((evtGetValue(NULL, GSW(1321)) + 11) * itemDataTable[id].buy_price) / 10;
             evt->lwData[4] = itemDataTable[id].bp_cost;
             break;
         case 16:
             evt->lwData[1] = id;
-            evt->lwData[2] = (s32)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
+            evt->lwData[2] = (EvtWord)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
             evt->lwData[3] = (itemDataTable[id].buy_price * 2 + 2) / 3;
             evt->lwData[4] = itemDataTable[id].bp_cost;
             break;
@@ -1072,8 +1072,8 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
             sprintf(buf, "jperfect_title_%04d", jdt->info[id].storyId);
             jdt->curIndex = id;
             name = msgSearch(buf);
-            evt->lwData[1] = (s32)jdt->infoEnd;
-            evt->lwData[2] = (s32)name;
+            evt->lwData[1] = (EvtWord)jdt->infoEnd;
+            evt->lwData[2] = (EvtWord)name;
             evt->lwData[3] = strlen(name);
             if (johoya_get(jdt->readFlags.perfectRead, jdt->info[id].storyId)) {
                 evt->lwData[4] = 0;
@@ -1085,8 +1085,8 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
         case 18:
             sprintf((char*)jdt->infoEnd, "%s_%04d", jdt->prefix, jdt->info[id].storyId);
             jdt->curIndex = id;
-            evt->lwData[1] = (s32)jdt->infoEnd;
-            evt->lwData[2] = (s32)jdt->info[id].initEndPos;
+            evt->lwData[1] = (EvtWord)jdt->infoEnd;
+            evt->lwData[2] = (EvtWord)jdt->info[id].initEndPos;
             evt->lwData[3] = jdt->info[id].tagEndPos;
             if (johoya_get(jdt->readFlags.luigiRead, jdt->info[id].storyId)) {
                 evt->lwData[4] = 0;

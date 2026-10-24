@@ -224,12 +224,12 @@ BeroEntry bero_witchtrio[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)out_w_bero, // exitEvent
-        (s32)"win_00", // nextMapName
+        "win_00", // nextMapName
         "", // nextBeroName
         4, // enterAnimeType
         4, // exitAnimeType
-        (s32)win_04w_door_close, // enterAnimeArg
-        (s32)win_04w_door_open, // exitAnimeArg
+        win_04w_door_close, // enterAnimeArg
+        win_04w_door_open, // exitAnimeArg
     },
 };
 
@@ -245,12 +245,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"win_03", // nextMapName
+        "win_03", // nextMapName
         "n_bero", // nextBeroName
         4, // enterAnimeType
         4, // exitAnimeType
-        (s32)win_04w_door_close, // enterAnimeArg
-        (s32)win_04w_door_open, // exitAnimeArg
+        win_04w_door_close, // enterAnimeArg
+        win_04w_door_open, // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -263,12 +263,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"win_05", // nextMapName
+        "win_05", // nextMapName
         "w_bero", // nextBeroName
         4, // enterAnimeType
         4, // exitAnimeType
-        (s32)win_04e_door_close, // enterAnimeArg
-        (s32)win_04e_door_open, // exitAnimeArg
+        win_04e_door_close, // enterAnimeArg
+        win_04e_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -1448,7 +1448,7 @@ USER_FUNC(evt_flower_init) {
 
     wp->count = 55;
     wp->flowers = _mapAlloc(wp->count * sizeof(Flower));
-    event->lwData[10] = (s32)wp;
+    event->lwData[10] = (EvtWord)wp;
     return EVT_RETURN_DONE;
 }
 

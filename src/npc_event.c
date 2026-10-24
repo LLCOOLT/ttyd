@@ -34,7 +34,7 @@ void PSVECSubtract(const Vec* a, const Vec* b, Vec* ab);
 USER_FUNC(mahoon_get_groupname) {
     EvtWord* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
-    evtSetValue(event, args[0], (s32)npc->tribe->modelName);
+    evtSetValue(event, args[0], (EvtWord)npc->tribe->modelName);
     return EVT_RETURN_DONE;
 }
 
@@ -79,7 +79,7 @@ USER_FUNC(pressCheck) {
 
 USER_FUNC(_2d_dead_jump) {
     EvtWord* args = event->args;
-    s32 id = evtGetValue(event, args[0]);
+    const char* id = (const char*)evtGetValue(event, args[0]);
     f32 tx = evtGetFloat(event, args[1]);
     f32 ty = evtGetFloat(event, args[2]);
     f32 tz = evtGetFloat(event, args[3]);
@@ -90,7 +90,7 @@ USER_FUNC(_2d_dead_jump) {
     f32 h;
     NpcEntry* npc;
     Vec d;
-    npc = evtNpcNameToPtr(event, (const char*)id);
+    npc = evtNpcNameToPtr(event, id);
     h = vy;
     npc->jumpFlags |= 0x10;
     npc->jumpFlags |= 0x1000;
@@ -196,7 +196,7 @@ USER_FUNC(killer_make_name) {
     len = strlen(name);
     name[len] = n + 0x31;
     name[len + 1] = 0;
-    evtSetValue(event, args[1], (s32)name);
+    evtSetValue(event, args[1], (EvtWord)name);
     return EVT_RETURN_DONE;
 }
 
@@ -2454,7 +2454,7 @@ USER_FUNC(kamec_fire_magic) {
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
     EffectEntry* eff = effMagic1N64Entry(0, 60, (f32)a, (f32)b, (f32)c, (f32)d, (f32)e, (f32)f);
     effSetName(eff, npc->description);
-    evtSetValue(event, args[6], (s32)eff);
+    evtSetValue(event, args[6], (EvtWord)eff);
     return EVT_RETURN_DONE;
 }
 
@@ -4467,14 +4467,14 @@ USER_FUNC(npc_fire_eff_fadeout) {
         npc->unitWork[1] = (void*)eff;
     }
     eff = npc->unitWork[0];
-    npc->unitWork[1] = (void*)((s32)npc->unitWork[1] - 1);
-    if ((s32)npc->unitWork[1] <= 30) {
-        f32 sc = intplGetValue(1, 30 - (s32)npc->unitWork[1], 30, 1.0f, 0.0f);
+    npc->unitWork[1] = (char*)npc->unitWork[1] - 1;
+    if ((EvtWord)npc->unitWork[1] <= 30) {
+        f32 sc = intplGetValue(1, 30 - (EvtWord)npc->unitWork[1], 30, 1.0f, 0.0f);
         ((EffFireWork*)eff->userdata)->scaleX = sc;
         ((EffFireWork*)eff->userdata)->scaleY = sc;
-        ((EffFireWork*)eff->userdata)->alpha = (u8)intplGetValue(0, 30 - (s32)npc->unitWork[1], 30, 255.0f, 0.0f);
+        ((EffFireWork*)eff->userdata)->alpha = (u8)intplGetValue(0, 30 - (EvtWord)npc->unitWork[1], 30, 255.0f, 0.0f);
     }
-    if ((s32)npc->unitWork[1] <= 0) {
+    if ((EvtWord)npc->unitWork[1] <= 0) {
         effDelete(eff);
         return EVT_RETURN_DONE;
     }

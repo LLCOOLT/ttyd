@@ -122,7 +122,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_12", // nextMapName
+        "dou_12", // nextMapName
         "e_bero_1", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -138,7 +138,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)dou_03_custom, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_12", // nextMapName
+        "dou_12", // nextMapName
         "e_bero_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -154,7 +154,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_04", // nextMapName
+        "dou_04", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -170,7 +170,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)dou_03_custom, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_05", // nextMapName
+        "dou_05", // nextMapName
         "w_bero_1", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -186,7 +186,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_05", // nextMapName
+        "dou_05", // nextMapName
         "w_bero_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -202,7 +202,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_05", // nextMapName
+        "dou_05", // nextMapName
         "w_bero_3", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -218,7 +218,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_09", // nextMapName
+        "dou_09", // nextMapName
         "n_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

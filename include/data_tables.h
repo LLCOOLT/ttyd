@@ -89,7 +89,7 @@ typedef struct TreeAccess {
     const char* hit;   // 0x4
     const char* trunk; // 0x8
     const char* leaf;  // 0xC
-    s32 reserved_10;    // 0x10, 0 in every table, no C reader
+    const char* leafBack; // 0x10, back leaf model (0 in most tables, no C reader)
     void* evt;         // 0x14
 } TreeAccess;
 

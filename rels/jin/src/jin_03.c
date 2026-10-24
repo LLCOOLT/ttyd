@@ -145,12 +145,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"jin_01", // nextMapName
+        "jin_01", // nextMapName
         "s_bero_2", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)n_close, // enterAnimeArg
-        (s32)n_open, // exitAnimeArg
+        n_close, // enterAnimeArg
+        n_open, // exitAnimeArg
     },
     {
         "s_bero", // hitName
@@ -163,12 +163,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"jin_02", // nextMapName
+        "jin_02", // nextMapName
         "n_bero_2", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)s_close, // enterAnimeArg
-        (s32)s_open, // exitAnimeArg
+        s_close, // enterAnimeArg
+        s_open, // exitAnimeArg
     },
     {
         "w_bero3", // hitName
@@ -181,12 +181,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"jin_00", // nextMapName
+        "jin_00", // nextMapName
         "e_bero_3", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w1_close, // enterAnimeArg
-        (s32)w1_open, // exitAnimeArg
+        w1_close, // enterAnimeArg
+        w1_open, // exitAnimeArg
     },
     {
         "w_bero1", // hitName
@@ -199,12 +199,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"jin_00", // nextMapName
+        "jin_00", // nextMapName
         "e_bero_1", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w3_close, // enterAnimeArg
-        (s32)w3_open, // exitAnimeArg
+        w3_close, // enterAnimeArg
+        w3_open, // exitAnimeArg
     },
     {
         "w_bero2", // hitName
@@ -217,12 +217,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"jin_00", // nextMapName
+        "jin_00", // nextMapName
         "e_bero_2", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w2_close, // enterAnimeArg
-        (s32)w2_open, // exitAnimeArg
+        w2_close, // enterAnimeArg
+        w2_open, // exitAnimeArg
     },
     {0},
 };

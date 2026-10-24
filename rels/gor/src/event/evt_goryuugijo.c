@@ -77,10 +77,10 @@ USER_FUNC(evt_goryuugijo_alloc) {
     GoryuuWork* wp = _mapAlloc(sizeof(GoryuuWork));
 
     memset(wp, 0, sizeof(GoryuuWork));
-    evtSetValue(event, args[0], (s32)wp);
+    evtSetValue(event, args[0], (EvtWord)wp);
     wp->type = evtGetValue(event, args[1]);
     wp->event = evtEntry(main_evt, 0, 0);
-    wp->event->lwData[0] = (s32)wp;
+    wp->event->lwData[0] = (EvtWord)wp;
     wp->subEvent = NULL;
     switch (wp->type) {
         case 0:

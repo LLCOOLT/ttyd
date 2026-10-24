@@ -159,7 +159,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tik_00", // nextMapName
+        "tik_00", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -175,7 +175,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tik_02", // nextMapName
+        "tik_02", // nextMapName
         "w_bero_1", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -191,7 +191,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tik_02", // nextMapName
+        "tik_02", // nextMapName
         "w_bwro_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -208,7 +208,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"tik_15", // nextMapName
+        "tik_15", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -225,7 +225,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)dokan_2_in_evt, // enterEvent
         10, // caseType
         NULL, // exitEvent
-        (s32)"gor_02", // nextMapName
+        "gor_02", // nextMapName
         "dokan", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -304,7 +304,7 @@ static BeroEntry bero_entry_data[] = {
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, 0, NULL, // enterEvent..exitEvent
-        (s32)"tik_11", // nextMapName
+        "tik_11", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -319,7 +319,7 @@ static BeroEntry bero_entry_data[] = {
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, 0, NULL, // enterEvent..exitEvent
-        (s32)"tik_12", // nextMapName
+        "tik_12", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

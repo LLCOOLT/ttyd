@@ -33,8 +33,8 @@ void partyFlyMain(PartyEntry* party);
 void N__cloud_use(PartyEntry* party);
 void getHitBreatheout2(PartyEntry* party, f32 unk);
 void partyChgRunMode(PartyEntry* party, s32 mode);
-s32 partyChgPoseId(PartyEntry* party, s32 id);
-void partyChgPose(PartyEntry* party, s32 pose);
+char* partyChgPoseId(PartyEntry* party, s32 id);
+void partyChgPose(PartyEntry* party, const char* pose);
 void partyChgMot(PartyEntry* party, s32 mot);
 
 
@@ -177,10 +177,10 @@ f32 cloudGetBreathPower(f32 param_1, Vec* param_2) {
     return breathPower;
 }
 
-s32 cloudGetHitBreathout(s32 param_1) {
+struct HitEntry* cloudGetHitBreathout(s32 param_1) {
     u32 partyId = marioGetPartyId();
     PartyEntry* party = partyGetPtr(partyId);
-    s32 hitBreathout;
+    struct HitEntry* hitBreathout;
 
     if (party == NULL) {
         return 0;
@@ -194,18 +194,18 @@ s32 cloudGetHitBreathout(s32 param_1) {
             return 0;
     }
 
-    hitBreathout = 0;
+    hitBreathout = NULL;
     if (param_1 == 0) {
-        hitBreathout = (s32)((PartyCloud*)party->useStruct)->hitFront;
+        hitBreathout = ((PartyCloud*)party->useStruct)->hitFront;
     }
     else if (param_1 == 1) { 
-        hitBreathout = (s32)((PartyCloud*)party->useStruct)->hitDown;
+        hitBreathout = ((PartyCloud*)party->useStruct)->hitDown;
     }
     else if (param_1 == 2) {
-        hitBreathout = (s32)((PartyCloud*)party->useStruct)->hitSweep[0];
+        hitBreathout = ((PartyCloud*)party->useStruct)->hitSweep[0];
     }
     else if (param_1 == 3) { 
-        hitBreathout = (s32)((PartyCloud*)party->useStruct)->hitSweep[1];
+        hitBreathout = ((PartyCloud*)party->useStruct)->hitSweep[1];
     }
     
     return hitBreathout;
@@ -235,12 +235,12 @@ f32 cloudGetBreathDist() {
 #ifdef VERSION_G8ME01
 void N_cloudLockAnimationsOff(PartyEntry* party) {
     party->work.cloud.lockAnims = 0;
-    partyChgPose(party, (s32)"PWD_S_1");
+    partyChgPose(party, "PWD_S_1");
 }
 
 void N_cloudLockAnimationsOn(PartyEntry* party) {
     party->work.cloud.lockAnims = 1;
-    partyChgPose(party, (s32)"PWD_Z_1");
+    partyChgPose(party, "PWD_Z_1");
 }
 #endif
 
@@ -408,7 +408,7 @@ void N__cloud_use(PartyEntry* party) {
         }
         marioChgMot(0x1B);
         marioChgPose("M_A_2A");
-        partyChgPose(party, (s32)"PWD_A_5");
+        partyChgPose(party, "PWD_A_5");
         party->moveFrames = 16;
         party->useMotionId = 11;
         mario->dispFlags |= 4;
@@ -429,7 +429,7 @@ void N__cloud_use(PartyEntry* party) {
         if (--party->moveFrames > 0) {
             break;
         }
-        partyChgPose(party, (s32)"PWD_A_6");
+        partyChgPose(party, "PWD_A_6");
 #ifdef VERSION_G8ME01
         if (mario->currMotionId == 0x1B)
 #endif

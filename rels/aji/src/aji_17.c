@@ -238,7 +238,7 @@ EvtWord peach_evt_dance[VERSION_PICK(504, 521)];
 static EvtWord peach_evt_stg2[900];
 static EvtWord peach_evt_stg3[352];
 static EvtWord peach_evt_stg3_1[650];
-s32 peach_evt_stg4_quiz_data[5][4];
+EvtWord peach_evt_stg4_quiz_data[5][4];
 static EvtWord peach_evt_stg4[980];
 static EvtWord peach_evt_stg5[408];
 static EvtWord peach_evt_stg5_1[528];
@@ -346,12 +346,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("aji_01"), // nextMapName
+        "aji_01", // nextMapName
         ("e_bero_5"), // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w_door_close, // enterAnimeArg
-        (s32)w_door_open, // exitAnimeArg
+        w_door_close, // enterAnimeArg
+        w_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -423,7 +423,7 @@ void noiseDisp(CameraId cameraId, void* param) {
     GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
-    GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, (u8)(s32)param});
+    GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, (u8)(EvtWord)param});
     GXLoadPosMtxImm(cam->view, GX_PNMTX0);
     GXSetCurrentMtx(0);
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
@@ -2248,10 +2248,10 @@ static EVT_BEGIN(peach_evt_stg3_1)
     RETURN
 EVT_END()
 
-s32 peach_evt_stg4_quiz_data[5][4] = {
-    (s32)("peach_aji_174"), (s32)("peach_aji_175"), (s32)("peach_aji_175_sel"), 1, (s32)("peach_aji_178"), (s32)("peach_aji_179"), (s32)("peach_aji_179_sel"), 0,
-    (s32)("peach_aji_180"), (s32)("peach_aji_181"), (s32)("peach_aji_183_sel"), 2, (s32)("peach_aji_184"), (s32)("peach_aji_185"), (s32)("peach_aji_185_sel"), 1,
-    (s32)("peach_aji_186"), (s32)("peach_aji_187"), (s32)("peach_aji_187_sel"), 2,
+EvtWord peach_evt_stg4_quiz_data[5][4] = {
+    (EvtWord)("peach_aji_174"), (EvtWord)("peach_aji_175"), (EvtWord)("peach_aji_175_sel"), 1, (EvtWord)("peach_aji_178"), (EvtWord)("peach_aji_179"), (EvtWord)("peach_aji_179_sel"), 0,
+    (EvtWord)("peach_aji_180"), (EvtWord)("peach_aji_181"), (EvtWord)("peach_aji_183_sel"), 2, (EvtWord)("peach_aji_184"), (EvtWord)("peach_aji_185"), (EvtWord)("peach_aji_185_sel"), 1,
+    (EvtWord)("peach_aji_186"), (EvtWord)("peach_aji_187"), (EvtWord)("peach_aji_187_sel"), 2,
 };
 
 static EVT_BEGIN(peach_evt_stg4)
@@ -3393,7 +3393,7 @@ EVT_END()
 #pragma force_active reset
 
 s32 noise(EventEntry* event, BOOL isFirstCall) {
-    s32 alpha = evtGetValue(event, event->args[0]);
+    EvtWord alpha = evtGetValue(event, event->args[0]);
     dispEntry(CAMERA_2D, 1100.0f, 0, noiseDisp, (void*)alpha);
     return EVT_RETURN_DONE;
 }

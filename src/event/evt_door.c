@@ -21,7 +21,7 @@ double cos(double);
 
 typedef struct HouseData {
     s32 type;               // 0x0
-    s32 hit[4];             // 0x4
+    const char* hit[4];     // 0x4, hit object names
     s32 anim[4];            // 0x14
     s32 outside;            // 0x24
     s32 door;               // 0x28
@@ -254,37 +254,37 @@ USER_FUNC(door_entry) {
     switch (d->type) {
         case 0:
         case 1:
-            hitObjGetPos((const char*)d->hit[1], &pos);
-            hitObjGetNormal((const char*)d->hit[1], &nrm);
+            hitObjGetPos(d->hit[1], &pos);
+            hitObjGetNormal(d->hit[1], &nrm);
             w->out.x = pos.x + 40.0f * nrm.x - 10.0f * nrm.z;
             w->out.z = pos.z + 40.0f * nrm.z + 10.0f * nrm.x;
-            hitObjGetPos((const char*)d->hit[3], &pos);
-            hitObjGetNormal((const char*)d->hit[3], &nrm);
+            hitObjGetPos(d->hit[3], &pos);
+            hitObjGetNormal(d->hit[3], &nrm);
             w->in.x = pos.x + 30.0f * nrm.x;
             w->in.z = pos.z + 30.0f * nrm.z;
             break;
         case 2:
-            hitObjGetPos((const char*)d->hit[1], &pos);
-            hitObjGetNormal((const char*)d->hit[1], &nrm);
+            hitObjGetPos(d->hit[1], &pos);
+            hitObjGetNormal(d->hit[1], &nrm);
             w->out.x = pos.x + 40.0f * nrm.x + 10.0f * nrm.z;
             w->out.z = pos.z + 40.0f * nrm.z - 10.0f * nrm.x;
-            hitObjGetPos((const char*)d->hit[3], &pos);
-            hitObjGetNormal((const char*)d->hit[3], &nrm);
+            hitObjGetPos(d->hit[3], &pos);
+            hitObjGetNormal(d->hit[3], &nrm);
             w->in.x = pos.x + 30.0f * nrm.x;
             w->in.z = pos.z + 30.0f * nrm.z;
             break;
         case 3:
-            hitObjGetPos((const char*)d->hit[1], &pos);
-            hitObjGetNormal((const char*)d->hit[1], &nrm);
+            hitObjGetPos(d->hit[1], &pos);
+            hitObjGetNormal(d->hit[1], &nrm);
             w->out.x = pos.x + 40.0f * nrm.x;
             w->out.z = pos.z + 40.0f * nrm.z;
-            hitObjGetPos((const char*)d->hit[3], &pos);
-            hitObjGetNormal((const char*)d->hit[3], &nrm);
+            hitObjGetPos(d->hit[3], &pos);
+            hitObjGetNormal(d->hit[3], &nrm);
             w->in.x = pos.x + 40.0f * nrm.x;
             w->in.z = pos.z + 40.0f * nrm.z;
             break;
     }
-    evtSetValue(event, args[1], (s32)w);
+    evtSetValue(event, args[1], (EvtWord)w);
     return EVT_RETURN_DONE;
 }
 
@@ -1360,10 +1360,10 @@ EVT_END()
 USER_FUNC(inout_hit) {
     EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
-    evtSetValue(event, args[1], w->data->hit[0]);
-    evtSetValue(event, args[2], w->data->hit[1]);
-    evtSetValue(event, args[3], w->data->hit[2]);
-    evtSetValue(event, args[4], w->data->hit[3]);
+    evtSetValue(event, args[1], (EvtWord)w->data->hit[0]);
+    evtSetValue(event, args[2], (EvtWord)w->data->hit[1]);
+    evtSetValue(event, args[3], (EvtWord)w->data->hit[2]);
+    evtSetValue(event, args[4], (EvtWord)w->data->hit[3]);
     return EVT_RETURN_DONE;
 }
 
@@ -1484,7 +1484,7 @@ USER_FUNC(get_noclip_map) {
     const char** list = w->data->noclip;
 
     if (list && list[idx]) {
-        evtSetValue(event, args[2], (s32)list[idx]);
+        evtSetValue(event, args[2], (EvtWord)list[idx]);
         return EVT_RETURN_DONE;
     }
     evtSetValue(event, args[2], -1);
@@ -1663,17 +1663,17 @@ USER_FUNC(evt_door_param) {
             evtSetValue(event, args[2], d->type);
             break;
         case 1:
-            evtSetValue(event, args[2], (s32)d->mapobj);
-            evtSetValue(event, args[3], (s32)d->hitIn);
-            evtSetValue(event, args[4], (s32)d->hitOut);
+            evtSetValue(event, args[2], (EvtWord)d->mapobj);
+            evtSetValue(event, args[3], (EvtWord)d->hitIn);
+            evtSetValue(event, args[4], (EvtWord)d->hitOut);
             break;
         case 2:
-            evtSetValue(event, args[2], (s32)d->outside);
-            evtSetValue(event, args[3], (s32)d->outsideHit);
+            evtSetValue(event, args[2], (EvtWord)d->outside);
+            evtSetValue(event, args[3], (EvtWord)d->outsideHit);
             break;
         case 3:
-            evtSetValue(event, args[2], (s32)d->inside);
-            evtSetValue(event, args[3], (s32)d->insideHit);
+            evtSetValue(event, args[2], (EvtWord)d->inside);
+            evtSetValue(event, args[3], (EvtWord)d->insideHit);
             break;
         case 4:
             DOOR_PARAM_POS(in, FALSE)
@@ -1682,13 +1682,13 @@ USER_FUNC(evt_door_param) {
             DOOR_PARAM_POS(out, FALSE)
             break;
         case 6:
-            evtSetValue(event, args[2], (s32)d->evtIn);
-            evtSetValue(event, args[3], (s32)d->evtOut);
-            evtSetValue(event, args[4], (s32)d->evtWall);
+            evtSetValue(event, args[2], (EvtWord)d->evtIn);
+            evtSetValue(event, args[3], (EvtWord)d->evtOut);
+            evtSetValue(event, args[4], (EvtWord)d->evtWall);
             break;
         case 7:
-            evtSetValue(event, args[2], (s32)d->evtOpen);
-            evtSetValue(event, args[3], (s32)d->evtClose);
+            evtSetValue(event, args[2], (EvtWord)d->evtOpen);
+            evtSetValue(event, args[3], (EvtWord)d->evtClose);
             break;
         case 8:
             evtSetValue(event, args[2], d->se);
@@ -1753,7 +1753,7 @@ USER_FUNC(evt_door_data_copy) {
     DoorParam* src = (DoorParam*)evtGetValue(event, args[0]);
     DoorParam* dst = _mapAlloc(sizeof(DoorParam));
     *dst = *src;
-    evtSetValue(event, args[1], (s32)dst);
+    evtSetValue(event, args[1], (EvtWord)dst);
     return EVT_RETURN_DONE;
 }
 
@@ -1761,7 +1761,7 @@ USER_FUNC(evt_door_set_param) {
     EvtWord* args = event->args;
     DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
     s32 kind = evtGetValue(event, args[1]);
-    s32 val = evtGetValue(event, args[2]);
+    EvtWord val = evtGetValue(event, args[2]);
     switch (kind) {
         case 0:
             d->npcs = (const char**)val;

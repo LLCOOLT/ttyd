@@ -108,12 +108,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"win_04", // nextMapName
+        "win_04", // nextMapName
         "e_bero", // nextBeroName
         4, // enterAnimeType
         4, // exitAnimeType
-        (s32)win_05_door_close, // enterAnimeArg
-        (s32)win_05_door_open, // exitAnimeArg
+        win_05_door_close, // enterAnimeArg
+        win_05_door_open, // exitAnimeArg
     },
     {0},
 };

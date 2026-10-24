@@ -1388,7 +1388,7 @@ USER_FUNC(evt_shop_setup) {
 	}
 	{ NpcEntry* npc = npcNameToPtr(shopper->name); npc->talkEvt = shopper_talk_evt; }
 	wp->mainEvt = evtEntryType(main_evt, 0, 0x20, 0);
-	wp->mainEvt->lwData[0] = (s32)wp;
+	wp->mainEvt->lwData[0] = (EvtWord)wp;
 	for (i = 0; i < 3; i++) {
 		wp->win[i] = winMgrEntry(&window_desc[i]);
 	}
@@ -1487,14 +1487,14 @@ USER_FUNC(chk_shop_point) {
 			if (SHOP_PTS(pouch) != 300) {
 				evtSetValue(event, args[0], 0);
 				evtSetValue(event, args[1], p->item);
-				evtSetValue(event, args[2], (s32)msgSearch(itemDataTable[p->item].name));
+				evtSetValue(event, args[2], (EvtWord)msgSearch(itemDataTable[p->item].name));
 			}
 			else {
 				for (j = 0; shopPointList[j].pts != 300; j++) {
 				}
 				evtSetValue(event, args[0], 0);
 				evtSetValue(event, args[1], shopPointList[j].item);
-				evtSetValue(event, args[2], (s32)msgSearch(itemDataTable[shopPointList[j].item].name));
+				evtSetValue(event, args[2], (EvtWord)msgSearch(itemDataTable[shopPointList[j].item].name));
 			}
 			return EVT_RETURN_DONE;
 		}
@@ -1530,7 +1530,7 @@ USER_FUNC(shop_point_item) {
 	for (p = shopPointList; (v = p->pts) != -1; p++) {
 		if (v == pts) {
 			evtSetValue(event, args[1], p->item);
-			evtSetValue(event, args[2], (s32)msgSearch(itemDataTable[p->item].name));
+			evtSetValue(event, args[2], (EvtWord)msgSearch(itemDataTable[p->item].name));
 			return EVT_RETURN_DONE;
 		}
 	}
@@ -1540,7 +1540,7 @@ USER_FUNC(shop_point_item) {
 }
 
 USER_FUNC(shopper_name) {
-	evtSetValue(event, event->args[0], (s32)_wp->shopper->name);
+	evtSetValue(event, event->args[0], (EvtWord)_wp->shopper->name);
 	return EVT_RETURN_DONE;
 }
 
@@ -1553,7 +1553,7 @@ static USER_FUNC(disp_off) {
 static USER_FUNC(get_value) {
 	EvtWord* args = event->args;
 	ShopWork* wp = (ShopWork*)evtGetValue(event, args[0]);
-	evtSetValue(event, args[1], (s32)msgSearch(itemDataTable[wp->items[wp->cur].id].name));
+	evtSetValue(event, args[1], (EvtWord)msgSearch(itemDataTable[wp->items[wp->cur].id].name));
 	evtSetValue(event, args[2], wp->items[wp->cur].id);
 	evtSetValue(event, args[3], wp->items[wp->cur].price);
 	return EVT_RETURN_DONE;
@@ -1563,12 +1563,12 @@ USER_FUNC(get_msg) {
 	EvtWord* args = event->args;
 	ShopWork* wp = (ShopWork*)evtGetValue(event, args[0]);
 	s32 i = evtGetValue(event, args[1]);
-	evtSetValue(event, args[2], (s32)wp->shopper->msgs[i]);
+	evtSetValue(event, args[2], (EvtWord)wp->shopper->msgs[i]);
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(get_buy_evt) {
-	evtSetValue(event, event->args[0], (s32)_wp->shopper->buy_evt);
+	evtSetValue(event, event->args[0], (EvtWord)_wp->shopper->buy_evt);
 	return EVT_RETURN_DONE;
 }
 
@@ -1578,19 +1578,19 @@ USER_FUNC(set_buy_item_id) {
 }
 
 static USER_FUNC(get_ptr) {
-	evtSetValue(event, event->args[0], (s32)_wp);
+	evtSetValue(event, event->args[0], (EvtWord)_wp);
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(get_fook_evt) {
-	evtSetValue(event, event->args[0], (s32)_wp->shopper->fook_evt);
+	evtSetValue(event, event->args[0], (EvtWord)_wp->shopper->fook_evt);
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(name_price) {
 	EvtWord* args = event->args;
 	s32 id = evtGetValue(event, args[0]);
-	evtSetValue(event, args[1], (s32)msgSearch(itemDataTable[id].name));
+	evtSetValue(event, args[1], (EvtWord)msgSearch(itemDataTable[id].name));
 	evtSetValue(event, args[2], itemDataTable[id].sell_price);
 	return EVT_RETURN_DONE;
 }
@@ -1708,7 +1708,7 @@ USER_FUNC(evt_shop_main_func) {
 			if (trg & 0x100) {
 				marioKeyOff();
 				wp->buyEvt = evtEntry(buy_evt, 0, 0);
-				wp->buyEvt->lwData[0] = (s32)wp;
+				wp->buyEvt->lwData[0] = (EvtWord)wp;
 				wp->flags |= 2;
 				winMgrClose(wp->win[0]);
 				winMgrClose(wp->win[1]);

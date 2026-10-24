@@ -959,7 +959,7 @@ static void ext_moamoa_main(void) {
             }
         }
         if ((wp->flags & 1) && !(moa->flags & 0x444) && i == gp->retraceCount % wp->count && irand(1000) < 200) {
-            /* FAKE: named Vec + static zero template instead of a compound literal; integer cast hoists the literal as an @ temp (same values) */ { Vec tmp; static const Vec z0 = {0.0f, 0.0f, 0.0f}; tmp = z0; tmp.x = (*pose->mtx)[0][3]; tmp.y = (*pose->mtx)[1][3]; tmp.z = (*pose->mtx)[2][3]; sp2_ = tmp; } psndSFXOn_3D((char*)(u32)"SFX_STG6_MOAMOA_VOICE1", &sp2_);
+            /* FAKE: named Vec + static zero template instead of a compound literal; integer cast hoists the literal as an @ temp (same values) */ { Vec tmp; static const Vec z0 = {0.0f, 0.0f, 0.0f}; tmp = z0; tmp.x = (*pose->mtx)[0][3]; tmp.y = (*pose->mtx)[1][3]; tmp.z = (*pose->mtx)[2][3]; sp2_ = tmp; } psndSFXOn_3D(SFX_NAME_WORD("SFX_STG6_MOAMOA_VOICE1"), &sp2_);
         }
     switch (moa->state)
     {
@@ -1711,12 +1711,12 @@ static BeroEntry bero_data_a[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("rsh_04_a"), // nextMapName
+        "rsh_04_a", // nextMapName
         ("w_bero"), // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)("e_door_close"), // enterAnimeArg
-        (s32)("e_door_open"), // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {
         ("w_bero"), // hitName
@@ -1728,7 +1728,7 @@ static BeroEntry bero_data_a[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("rsh_06_a"), // nextMapName
+        "rsh_06_a", // nextMapName
         ("w_bero"), // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -1749,12 +1749,12 @@ static BeroEntry bero_data_b[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("rsh_04_b"), // nextMapName
+        "rsh_04_b", // nextMapName
         ("w_bero"), // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)("e_door_close"), // enterAnimeArg
-        (s32)("e_door_open"), // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {
         ("w_bero"), // hitName
@@ -1766,7 +1766,7 @@ static BeroEntry bero_data_b[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("rsh_06_a"), // nextMapName
+        "rsh_06_a", // nextMapName
         ("w_bero"), // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -1787,12 +1787,12 @@ static BeroEntry bero_data_c[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("rsh_04_c"), // nextMapName
+        "rsh_04_c", // nextMapName
         ("w_bero"), // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)("e_door_close"), // enterAnimeArg
-        (s32)("e_door_open"), // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {
         ("w_bero"), // hitName
@@ -1804,7 +1804,7 @@ static BeroEntry bero_data_c[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("rsh_06_a"), // nextMapName
+        "rsh_06_a", // nextMapName
         ("w_bero"), // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

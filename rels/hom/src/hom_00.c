@@ -187,12 +187,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)evt_train_door, // exitEvent
-        (s32)"rsh_01_b", // nextMapName
+        "rsh_01_b", // nextMapName
         "s_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"n_1_door_close", // enterAnimeArg
-        (s32)"n_1_door_open", // exitAnimeArg
+        "n_1_door_close", // enterAnimeArg
+        "n_1_door_open", // exitAnimeArg
     },
     {
         "n_bero_2", // hitName
@@ -205,12 +205,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"eki_00", // nextMapName
+        "eki_00", // nextMapName
         "s_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)n_2_door_close, // enterAnimeArg
-        (s32)n_2_door_open, // exitAnimeArg
+        n_2_door_close, // enterAnimeArg
+        n_2_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -227,12 +227,12 @@ BeroEntry bero_data_nidome[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)evt_train_nidome, // exitEvent
-        (s32)"rsh_01_b", // nextMapName
+        "rsh_01_b", // nextMapName
         "s_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"n_1_door_close", // enterAnimeArg
-        (s32)"n_1_door_open", // exitAnimeArg
+        "n_1_door_close", // enterAnimeArg
+        "n_1_door_open", // exitAnimeArg
     },
     {0},
 };

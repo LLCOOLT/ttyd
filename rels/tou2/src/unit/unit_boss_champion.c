@@ -1458,7 +1458,7 @@ USER_FUNC(eff_fall_entry) {
     s32 e = evtGetValue(event, args[9]);
     EffectEntry* eff = effFallEntry(type, x, y, z, a, b, c, d, e);
 
-    evtSetValue(event, var, (s32)eff);
+    evtSetValue(event, var, (EvtWord)eff);
     return EVT_RETURN_DONE;
 }
 

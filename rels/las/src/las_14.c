@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "driver/hitdrv.h"
@@ -28,7 +29,7 @@ static u8 cloud_once_flag;
 static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
 static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
-static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
+static void _img_alloc_capture(EvtWord a0, EvtWord a1, EvtWord a2, EvtWord a3, EvtWord a4, EvtWord a5, EvtWord a6, EvtWord a7);
 
 USER_FUNC(evt_bero_get_info);
 static USER_FUNC(evt_cloud_main);
@@ -53,7 +54,7 @@ USER_FUNC(evt_snd_set_rev_mode);
 static void _mapclsofs_all(CloudWork* wp);
 static void _mapsetofs_all(CloudWork* wp);
 static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
-static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
+static void _img_alloc_capture(EvtWord a0, EvtWord a1, EvtWord a2, EvtWord a3, EvtWord a4, EvtWord a5, EvtWord a6, EvtWord a7);
 
 f32 fd_las_14_negone_one_374[2] __attribute__((aligned(8)));
 f32 fd_las_14_neg_one_382;
@@ -81,9 +82,9 @@ EvtWord touch_evt[2];
 static EvtWord hint_plate[14];
 EvtWord las_14_init_evt[81];
 
-static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7) {
+static void _img_alloc_capture(EvtWord a0, EvtWord a1, EvtWord a2, EvtWord a3, EvtWord a4, EvtWord a5, EvtWord a6, EvtWord a7) {
     EventEntry event;
-    s32 args[10];
+    EvtWord args[10];
 
     event.args = args;
     args[0] = a0;
@@ -236,12 +237,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"las_10", // nextMapName
+        "las_10", // nextMapName
         "se_bero_1", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w_door_close, // enterAnimeArg
-        (s32)w_door_open, // exitAnimeArg
+        w_door_close, // enterAnimeArg
+        w_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -391,7 +392,7 @@ static USER_FUNC(evt_cloud_main) {
             if (!_get_boundingbox(wp->hitName, &wp->x, &wp->y, &wp->w, &wp->h)) {
                 break;
             }
-            _img_alloc_capture((s32)wp->imgName, 0, (s32)wp->offscreenName, 1, wp->x, wp->y, wp->w, wp->h);
+            _img_alloc_capture((EvtWord)wp->imgName, 0, (EvtWord)wp->offscreenName, 1, wp->x, wp->y, wp->w, wp->h);
             wp->state = 223;
             break;
         case 223:
@@ -400,7 +401,7 @@ static USER_FUNC(evt_cloud_main) {
             wp->state = 3;
         case 3:
             img = imgNameToPtr(wp->imgName, group);
-            img->animName = (s32)"A_1";
+            img->animName = "A_1";
             img->animTime = animTimeGetTime(group);
             img->flags &= ~2;
             wp->timer = 30;
@@ -442,7 +443,7 @@ static USER_FUNC(evt_cloud_main) {
                 evtEntry(wp->endEvt, 0, 0);
             }
             img = imgNameToPtr(wp->imgName, group);
-            img->animName = (s32)"A_2";
+            img->animName = "A_2";
             img->animTime = animTimeGetTime(group);
             wp->timer = 60;
             wp->state++;
@@ -525,7 +526,7 @@ USER_FUNC(evt_las_cloud_ent) {
     wp->state = 0;
     wp->timer = 0;
     wp->evt = evtEntry(evt_cloud_main_evt, 0, 0);
-    wp->evt->lwData[0] = (s32)wp;
+    wp->evt->lwData[0] = (EvtWord)wp;
     return EVT_RETURN_DONE;
 }
 

@@ -25,6 +25,7 @@ BOOL npcCheckInterrupt(NpcEntry* npc);
 #include "mario/mario.h"
 #include "mario/mariost.h"
 #include "memory.h"
+#include "addr_word.h"
 #include "system.h"
 #include "driver/dispdrv.h"
 #include "driver/offscreendrv.h"
@@ -43,6 +44,7 @@ static inline f32 npc_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1
 static inline f32 npc_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; } return a; }
 void FontDrawScale(f32 scale);
 void FontDrawStringShake(f32 x, f32 y, const char* message);
+ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z);
 
 #define NPC_RAD2DEG(r) ((r) * 57.29579f)
 static inline s32 npc_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
@@ -643,7 +645,7 @@ s32 kpaGetLevel(void);
 static inline void npcMoveSide(NpcEntry* entry, f32 mx, f32 mz) {
     f32 wx = entry->position.x;
     f32 wz = entry->position.z;
-    entry->wallHit = (u32)npcHitCheckSide(entry, &wx, &wz, &entry->moveDir, mx, mz);
+    entry->wallHit = npcHitCheckSide(entry, &wx, &wz, &entry->moveDir, mx, mz);
     if (entry->wallHit) {
         npcHitCheckSide(entry, &entry->position.x, &entry->position.z, &entry->moveDir, wx - entry->position.x,
                         wz - entry->position.z);
@@ -667,7 +669,7 @@ void npcMain(void) {
 
     npcwork = gp->inBattle ? &work.battle : &work.field;
     // npcwork = npcGetWorkPtr();
-    marioGetPtr()->targetNpc = 0;
+    marioGetPtr()->targetNpc = NULL;
     kpaSfx = "SFX_KUPPA_3RD_WATER_FALL1";
 
     npcMainCount++;
@@ -755,7 +757,7 @@ void npcMain(void) {
 #ifdef VERSION_G8ME01
                                 npcMoveSide(entry, mx, mz);
 #else
-                                entry->wallHit = (u32)npcHitCheckSide(entry, &entry->position.x, &entry->position.z,
+                                entry->wallHit = npcHitCheckSide(entry, &entry->position.x, &entry->position.z,
                                                                         &entry->moveDir, mx, mz);
 #endif
                             }
@@ -1239,7 +1241,7 @@ BOOL npcCheckHitMarioSide(NpcEntry* npc) {
     if (dist > range) {
         return FALSE;
     }
-    mario->targetNpc = (s32)npc;
+    mario->targetNpc = npc;
     angle = angleABf(mario->position.x, mario->position.z, npc->position.x, npc->position.z);
     if (__fabsf(compAngle(angle, mario->directionView)) < 40.0f) {
         dx = (range - dist) * ( -npc_sin((6.2831855f * mario->directionView) / 360.0f) );
@@ -2072,7 +2074,7 @@ static inline void fbatRecoverItems(NpcEntry* npc) {
     do {
         if (b->recoveredItems[i]) {
 #ifdef VERSION_G8ME01
-            void* item = (void*)itemEntry(NULL, b->recoveredItems[i], 11, -1, 0, npc->position.x, npc->position.y,
+            ItemEntry* item = itemEntry(NULL, b->recoveredItems[i], 11, -1, 0, npc->position.x, npc->position.y,
                                           npc->position.z);
             if (item) {
                 itemFlagOn(item, 0x100);
@@ -2248,8 +2250,8 @@ void fbatBattleMode(void) {
                 {
                     s32 gz = 0;
                     if (gz != 0) {
-                        stolen = (res / (s32)info4) + ((s32)info4 / res) + ((res + 1) / (s32)info4) +
-                                 (((s32)info4 + 1) / res) + ((res + 2) / (s32)info4) + (((s32)info4 + 2) / res);
+                        stolen = (res / (s32)(AddrWord)info4) + ((s32)(AddrWord)info4 / res) + ((res + 1) / (s32)(AddrWord)info4) +
+                                 (((s32)(AddrWord)info4 + 1) / res) + ((res + 2) / (s32)(AddrWord)info4) + (((s32)(AddrWord)info4 + 2) / res);
                         res = 0;
                     }
                 }
@@ -2817,7 +2819,7 @@ void npcSetupBattleInfo(NpcEntry* npc, NpcSetupBattleInfo* setup) {
         info->itemDropped = 0;
         info->heartsDropped = 0;
         info->flowersDropped = 0;
-        info->bgmName = (s32)setup->bgmName;
+        info->bgmName = setup->bgmName;
         if (setup->swFlag >= -EVTDAT_GSWF_BASE && setup->swFlag <= EVTDAT_GSWF_MAX) {
             if (swGet(setup->swFlag + EVTDAT_GSWF_BASE)) {
                 select = setup->altSelect;
@@ -3171,7 +3173,7 @@ void npcGetBackItemEntry(NpcEntry* npc) {
     for (i = 0; i < 8; i++) {
         if (info->recoveredItems[i]) {
 #ifdef VERSION_G8ME01
-            void* item = (void*)itemEntry(NULL, info->recoveredItems[i], 11, -1, 0, npc->position.x,
+            ItemEntry* item = itemEntry(NULL, info->recoveredItems[i], 11, -1, 0, npc->position.x,
                                           npc->position.y, npc->position.z);
             if (item) {
                 itemFlagOn(item, 0x100);

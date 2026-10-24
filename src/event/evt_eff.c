@@ -911,7 +911,7 @@ USER_FUNC(evt_eff_delete_ptr) {
 	return EVT_RETURN_DONE;
 }
 
-extern EffectEntry* effFukidashiEntry(s32 a, s32 b, s32 c, s32 d, f32 x, f32 y, f32 z, f32 w, f32 e);
+extern EffectEntry* effFukidashiEntry(s32 a, s32 b, NpcEntry* npc, s32 d, f32 x, f32 y, f32 z, f32 w, f32 e);
 
 #pragma push
 #pragma opt_propagation off
@@ -936,24 +936,24 @@ USER_FUNC(evt_eff_fukidashi) {
 	switch (mode) {
 		case 0:
 			h = marioGetPtr()->wPlayerCollisionBox.y;
-			{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, -1, d, 0.0f, yy, 0.0f, ww, e); }
+			{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, (NpcEntry*)-1, d, 0.0f, yy, 0.0f, ww, e); }
 			break;
 		case 1:
 			p = !strcmp(npcName, "me") ? (void*)event->ownerNPC : (void*)npcNameToPtr(npcName);
-			{ f32 yy = 2.0f * ((NpcEntry*)p)->height / 3.0f; f32 ww = ((NpcEntry*)p)->height / 3.0f; entry = effFukidashiEntry(a, b, (s32)p, d, 0.0f, yy, 0.0f, ww, e); }
+			{ f32 yy = 2.0f * ((NpcEntry*)p)->height / 3.0f; f32 ww = ((NpcEntry*)p)->height / 3.0f; entry = effFukidashiEntry(a, b, (NpcEntry*)p, d, 0.0f, yy, 0.0f, ww, e); }
 			break;
 		case 2:
-			entry = effFukidashiEntry(a, b, 0, d, x, y, z, w, e);
+			entry = effFukidashiEntry(a, b, NULL, d, x, y, z, w, e);
 			break;
 		case 3:
 			p = partyGetPtr(marioGetPartyId());
 			if (p) {
 #ifdef VERSION_G8ME01
 				// US: the Flurrie bubble sits at a fixed height
-				{ f32 yy = 2.0f * ((PartyEntry*)p)->height / 3.0f; f32 ww; if (((PartyEntry*)p)->currentMemberId == 5) yy = 30.0f; ww = ((PartyEntry*)p)->height / 3.0f; entry = effFukidashiEntry(a, b, -2, d, 0.0f, yy, 0.0f, ww, e); }
+				{ f32 yy = 2.0f * ((PartyEntry*)p)->height / 3.0f; f32 ww; if (((PartyEntry*)p)->currentMemberId == 5) yy = 30.0f; ww = ((PartyEntry*)p)->height / 3.0f; entry = effFukidashiEntry(a, b, (NpcEntry*)-2, d, 0.0f, yy, 0.0f, ww, e); }
 #else
 				h = ((PartyEntry*)p)->height;
-				{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, -2, d, 0.0f, yy, 0.0f, ww, e); }
+				{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, (NpcEntry*)-2, d, 0.0f, yy, 0.0f, ww, e); }
 #endif
 			}
 			break;
@@ -961,7 +961,7 @@ USER_FUNC(evt_eff_fukidashi) {
 			p = partyGetPtr(marioGetExtraPartyId());
 			if (p) {
 				h = ((PartyEntry*)p)->height;
-				{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, -3, d, 0.0f, yy, 0.0f, ww, e); }
+				{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, (NpcEntry*)-3, d, 0.0f, yy, 0.0f, ww, e); }
 			}
 			break;
 	}

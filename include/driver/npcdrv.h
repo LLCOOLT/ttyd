@@ -87,7 +87,7 @@ typedef struct NpcBattleInfo {
         struct {
             s32 scriptWork[4];         // 0x9C, btlSetupWork[0..3] (npcGet/SetBtlSetupWork)
             NpcBattleRandom random;    // 0xAC, btlSetupWork[4..8]
-            s32 bgmName;               // 0xC0, btlSetupWork[9], const char* battle BGM played by seq_battle
+            const char* bgmName;       // 0xC0, btlSetupWork[9], battle BGM played by seq_battle
         };
     };
     u8 battleRule[3];                  // 0xC4
@@ -192,7 +192,7 @@ typedef struct NpcEntry {
     f32 homingAngle;                // 0x22C, verified
     NpcBattleInfo battleInfo;       // 0x230
     s32 attackMode;                 // 0x2F8, evt_npc_set_attack_mode
-    u32 wallHit;                    // 0x2FC, npcHitCheckSide result (HitEntry*)
+    struct HitEntry* wallHit;       // 0x2FC, npcHitCheckSide result
     struct HitEntry* groundHit;     // 0x300, hit object found by the fall/landing checks
     void* unitWork[4];              // 0x304
     u8 setupIndex;                  // 0x314, slot in the setup list (dead-mask bit)

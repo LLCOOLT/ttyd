@@ -186,7 +186,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"muj_03", // nextMapName
+        "muj_03", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -202,7 +202,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"muj_05", // nextMapName
+        "muj_05", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -621,21 +621,21 @@ EVT_END()
 USER_FUNC(mario_moveride_check) {
     s32 i;
     const char* name;
-    s32 anim;
+    const char* anim;
     HitEntry* hit = marioGetPtr()->hitobjStandOn;
 
     name = NULL;
     for (i = 0; i < 17; i++) {
-        if (hit != NULL && strcmp(hitGetName(hit), (const char*)hitname[i]) == 0) {
-            name = (const char*)hitname[i];
-            anim = (s32)mapanim[i];
+        if (hit != NULL && strcmp(hitGetName(hit), hitname[i]) == 0) {
+            name = hitname[i];
+            anim = mapanim[i];
             break;
         }
     }
     event->lwData[0] = 0;
-    if (name != NULL && event->lwData[1] != (s32)name) {
-        event->lwData[0] = anim;
+    if (name != NULL && event->lwData[1] != (EvtWord)name) {
+        event->lwData[0] = (EvtWord)anim;
     }
-    event->lwData[1] = (s32)name;
+    event->lwData[1] = (EvtWord)name;
     return EVT_RETURN_DONE;
 }

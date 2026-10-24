@@ -163,7 +163,7 @@ USER_FUNC(get_ryoukin) {
 }
 
 USER_FUNC(get_npcname) {
-	evtSetValue(event, event->args[0], (s32)(*wp)->npcName);
+	evtSetValue(event, event->args[0], (EvtWord)(*wp)->npcName);
 	return 2;
 }
 

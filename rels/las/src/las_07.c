@@ -153,12 +153,12 @@ static BeroEntry bero_entry_data[] = {
         (s32*)door_matigai_evt, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"las_06", // nextMapName
+        "las_06", // nextMapName
         "e_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w1_door_close, // enterAnimeArg
-        (s32)w1_door_open, // exitAnimeArg
+        w1_door_close, // enterAnimeArg
+        w1_door_open, // exitAnimeArg
     },
     {
         "e_bero_1", // hitName
@@ -171,12 +171,12 @@ static BeroEntry bero_entry_data[] = {
         (s32*)door_matigai_evt, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"las_08", // nextMapName
+        "las_08", // nextMapName
         "w_bero_1", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e1_door_close, // enterAnimeArg
-        (s32)e1_door_open, // exitAnimeArg
+        e1_door_close, // enterAnimeArg
+        e1_door_open, // exitAnimeArg
     },
     {
         "w_bero_2", // hitName
@@ -189,12 +189,12 @@ static BeroEntry bero_entry_data[] = {
         (s32*)door_matigai_evt, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"las_08", // nextMapName
+        "las_08", // nextMapName
         "e_bero_2", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w2_door_close, // enterAnimeArg
-        (s32)w2_door_open, // exitAnimeArg
+        w2_door_close, // enterAnimeArg
+        w2_door_open, // exitAnimeArg
     },
     {
         "e_bero_2", // hitName
@@ -207,12 +207,12 @@ static BeroEntry bero_entry_data[] = {
         (s32*)door_matigai_evt, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"las_08", // nextMapName
+        "las_08", // nextMapName
         "w_bero_2", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e2_door_close, // enterAnimeArg
-        (s32)e2_door_open, // exitAnimeArg
+        e2_door_close, // enterAnimeArg
+        e2_door_open, // exitAnimeArg
     },
     {0},
 };

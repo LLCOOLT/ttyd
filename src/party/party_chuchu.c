@@ -275,17 +275,17 @@ USER_FUNC(set_msg) {
 
     if (type >= 0) {
         if (range == 150.0f) {
-            event->lwData[0] = (s32)"map_exist_near";
+            event->lwData[0] = (EvtWord)"map_exist_near";
             event->lwData[1] = 2;
         } else {
-            event->lwData[0] = (s32)"map_exist_far";
+            event->lwData[0] = (EvtWord)"map_exist_far";
             event->lwData[1] = 1;
         }
         cp->field_110 = (angle <= 180.0f) ? 180.0f : 0.0f;
         cp->field_FC = partyToMovedir(party, cp->field_110);
         cp->field_100 = cp->field_FC;
     } else {
-        event->lwData[0] = (s32)"map_no_exist";
+        event->lwData[0] = (EvtWord)"map_no_exist";
         event->lwData[1] = 0;
     }
     return EVT_RETURN_DONE;

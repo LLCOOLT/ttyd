@@ -180,7 +180,7 @@ struct EventEntry {
     union {
         struct {
             union {
-                s32 userdata[3];
+                EvtWord userdata[3];
                 f32 userdataf[3];
                 void* userdatap[3];
             }; // 0x78
@@ -194,7 +194,7 @@ struct EventEntry {
             };
             u32 field_0x90[2];         // 0x90, unknown
         };
-        s32 userWork[8]; // 0x78, the same 0x20 bytes as eight scratch words (user functions that keep more state)
+        EvtWord userWork[8]; // 0x78, the same 0x20 bytes as eight scratch words (user functions that keep more state)
         struct {
             struct BattleUnit* unit; // 0x78
             s32 cur;                 // 0x7C, frames shown

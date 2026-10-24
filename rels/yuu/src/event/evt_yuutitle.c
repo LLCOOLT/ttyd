@@ -90,7 +90,7 @@ USER_FUNC(evt_yuutitle_alloc) {
     wp->startY = wp->y = 200.0f + wp->targetY;
     wp->alpha = 0;
     wp->event = evtEntry(main_evt, 0, 0);
-    wp->event->lwData[0] = (s32)wp;
+    wp->event->lwData[0] = (EvtWord)wp;
     return EVT_RETURN_DONE;
 }
 

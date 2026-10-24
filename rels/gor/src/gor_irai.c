@@ -671,7 +671,7 @@ USER_FUNC(irai_init_func) {
     wp->top = 0;
     wp->field_0x94 = 0;
     wp->scroll = 0.0f;
-    event->lwData[10] = (s32)wp;
+    event->lwData[10] = (EvtWord)wp;
     return EVT_RETURN_DONE;
 }
 
@@ -826,7 +826,7 @@ USER_FUNC(irai_main_func) {
 
 USER_FUNC(irai_check_func) {
     if (event->lwData[0] != -1) {
-        event->lwData[12] = (s32)irai_msg_kakunin[event->lwData[0] - 1];
+        event->lwData[12] = (EvtWord)irai_msg_kakunin[event->lwData[0] - 1];
         event->lwData[11] = event->lwData[0];
     } else {
         event->lwData[12] = 0;

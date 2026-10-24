@@ -172,12 +172,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tou_04", // nextMapName
+        "tou_04", // nextMapName
         "s_bero_2", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)n_door_close, // enterAnimeArg
-        (s32)n_door_open, // exitAnimeArg
+        n_door_close, // enterAnimeArg
+        n_door_open, // exitAnimeArg
     },
     {
         "dokan", // hitName
@@ -190,7 +190,7 @@ static BeroEntry bero_data[] = {
         (s32*)toile_in, // enterEvent
         6, // caseType
         (s32*)toile_out, // exitEvent
-        (s32)"tou_04", // nextMapName
+        "tou_04", // nextMapName
         "toire", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -207,12 +207,12 @@ static BeroEntry bero_data[] = {
         (s32*)evt_in, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tou_11", // nextMapName
+        "tou_11", // nextMapName
         "e_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w_door_close, // enterAnimeArg
-        (s32)w_door_open, // exitAnimeArg
+        w_door_close, // enterAnimeArg
+        w_door_open, // exitAnimeArg
     },
     {0},
 };

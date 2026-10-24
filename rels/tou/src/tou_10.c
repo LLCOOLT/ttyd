@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "mario/mario.h"
@@ -318,12 +319,12 @@ static BeroEntry bero_data[] = {
         (s32*)room_out, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tou_04", // nextMapName
+        "tou_04", // nextMapName
         "s_bero_7", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)n_door_close, // enterAnimeArg
-        (s32)n_door_open, // exitAnimeArg
+        n_door_close, // enterAnimeArg
+        n_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -1887,7 +1888,7 @@ USER_FUNC(name_check) {
 
     // a full-width space
     if (strcmp((const char*)evtGetValue(event, args[0]), "\x81\x40") == 0) {
-        evtSetValue(event, args[0], (s32)msgSearch("name_party3"));
+        evtSetValue(event, args[0], (EvtWord)msgSearch("name_party3"));
     }
     return EVT_RETURN_DONE;
 }

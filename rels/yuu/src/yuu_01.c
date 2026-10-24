@@ -1278,8 +1278,8 @@ USER_FUNC(yuuminigame2_get_name) {
     EvtWord* args = event->args;
     s32 i = evtGetValue(event, args[0]);
 
-    evtSetValue(event, args[1], (s32)s_nametbl[i]);
-    evtSetValue(event, args[2], (s32)a_nametbl[i]);
+    evtSetValue(event, args[1], (EvtWord)s_nametbl[i]);
+    evtSetValue(event, args[2], (EvtWord)a_nametbl[i]);
     evtSetValue(event, args[3], turn_tbl[i]);
     return EVT_RETURN_DONE;
 }
@@ -1302,7 +1302,7 @@ static USER_FUNC(re_fall_rtn) {
             data->viewEvent = NULL;
             _mapFree(monte_p);
             data->viewEvent = evtEntryType(minigame_view_monte, 0, 0, 0);
-            data->viewEvent->lwData[0] = (s32)monte_p->wp;
+            data->viewEvent->lwData[0] = (EvtWord)monte_p->wp;
         }
     }
     return EVT_RETURN_DONE;
@@ -1316,7 +1316,7 @@ static USER_FUNC(fall_rtn) {
     s32 i;
     s32 t;
     s32 k;
-    s32 sfx;
+    SfxNameWord sfx;
     s32 j;
     f32 lo;
     f32 hi;
@@ -1376,7 +1376,7 @@ static USER_FUNC(fall_rtn) {
         }
     }
     for (i = 0; i < monte_p->num; i++) {
-        sfx = (0, (s32)"SFX_EVT_GAME_MONTE_COUNT1");
+        sfx = (0, (SfxNameWord)"SFX_EVT_GAME_MONTE_COUNT1");
         m = &monte_p[i];
         switch (m->state) {
             case 0:

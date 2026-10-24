@@ -2799,7 +2799,7 @@ USER_FUNC(_make_madowase_weapon) {
     value = evtGetValue(event, args[1]);
     memcpy(weapon, src, sizeof(BattleWeapon));
     weapon->dizzyChance = value;
-    evtSetValue(event, index, (s32)weapon);
+    evtSetValue(event, index, (EvtWord)weapon);
     return EVT_RETURN_DONE;
 }
 

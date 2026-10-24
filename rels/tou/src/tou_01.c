@@ -413,12 +413,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         9, // caseType
         NULL, // exitEvent
-        (s32)"tou_02", // nextMapName
+        "tou_02", // nextMapName
         "s_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)n_door_close, // enterAnimeArg
-        (s32)n_door_open, // exitAnimeArg
+        n_door_close, // enterAnimeArg
+        n_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -860,7 +860,7 @@ USER_FUNC(make_shadow) {
 
     if (isFirstCall) {
         wp = _mapAlloc(sizeof(ShadowWork));
-        event->userdata[0] = (s32)wp;
+        event->userdata[0] = (EvtWord)wp;
         wp->tex = smartAlloc(GXGetTexBufferSize(128, 128, GX_TF_RGB5A3, GX_FALSE, 0), 1);
     }
     wp = (ShadowWork*)event->userdata[0];

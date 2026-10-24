@@ -219,12 +219,12 @@ USER_FUNC(_set_actend_event) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     s32 id = evtGetValue(event, args[0]);
-    s32 evt = evtGetValue(event, args[1]);
+    EvtWord* evt = (EvtWord*)evtGetValue(event, args[1]);
     BattleUnit* unit;
 
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
-    unit->actEndEvent = (void*)evt;
+    unit->actEndEvent = evt;
     return EVT_RETURN_DONE;
 }
 

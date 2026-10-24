@@ -1,6 +1,7 @@
 #pragma once
 
 #include "driver/effdrv.h"
+#include "evt/evt_word.h"
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 
@@ -11,7 +12,7 @@ typedef struct ItemEntry {
 	s32 evtId; //0x8, TODO: better name?
 	char name[0x10]; //0xC
 	EffectEntry* effect; //0x1C
-	s32 evtCode; //0x20, event script run on pickup (evtEntry)
+	EvtWord evtCode; //0x20, event script run on pickup (evtEntry)
 	u16 mode; //0x24
 	u16 subState; //0x26, per-sequence state
 	s32 winId[3]; //0x28

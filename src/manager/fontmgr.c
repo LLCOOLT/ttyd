@@ -77,7 +77,7 @@ static inline FontWidthEntry* fontGetWidth(u16 code) {
 				}
 				break;
 		}
-		block = (FontWidthBlock*)((u32)block + block->size);
+		block = (FontWidthBlock*)((u8*)block + block->size);
 	}
 	return NULL;
 }
@@ -909,7 +909,7 @@ void JUTFontSetup(u16 font) {
 				default:
 					break;
 			}
-			ptr = (BinaryFontBlock*)((u32)ptr + ptr->size);
+			ptr = (BinaryFontBlock*)((u8*)ptr + ptr->size);
 		}
 		GXInitTexObj(&fgTexObj, &blockGlyph[1], blockGlyph->sheetwidth, blockGlyph->sheetheight,
 			GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
@@ -994,7 +994,7 @@ u16 JUTFont_CodeToGlyph(u32 code) {
 				break;
 			}
 		}
-		map = (BinaryFontMap*)((u32)map + map->size);
+		map = (BinaryFontMap*)((u8*)map + map->size);
 	}
 	return glyph;
 }

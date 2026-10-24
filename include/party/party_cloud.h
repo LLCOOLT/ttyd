@@ -30,7 +30,7 @@ void cloudGetAt(Vec* position);
 void cloudResetAt();
 u8 cloudGetStatus();
 f32 cloudGetBreathDir(void);
-s32 cloudGetHitBreathout(s32 param_1);
+struct HitEntry* cloudGetHitBreathout(s32 param_1);
 
 void cloud_exit(PartyEntry* party);
 void cloud_hover_init(PartyEntry* party);

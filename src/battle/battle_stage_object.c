@@ -542,21 +542,67 @@ __declspec(section ".data") f32 battle_stage_object_one_negone_b[2] __attribute_
 __declspec(section ".data") f32 fd_battle_stage_object_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 BattleWeaponData _nozzle_at_base_mario = {{
-	0, 0, 0, 0, 0x64000002, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0x02000070, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0x00000064, 0, 0,
+	NULL, 0, // name..icon
+	{0}, // pad_06
+	0, // itemId
+	NULL, // description
+	100, // baseAccuracy
+	0, 0, // baseFpCost..baseSpCost
+	2, // superguardsAllowed
+	0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+	NULL, // hpDamageFn
+	{0}, // hpDamageWork
+	NULL, // fpDamageFn
+	{0}, // fpDamageWork
+	0x2000070, // targetClassFlags
+	0x20000000, // targetPropertyFlags
+	0, 0, // element..damagePattern
+	3, // acLevel
+	2, // reserved_6F
+	NULL, // acHelpMsg
+	0, // special
+	0x7FF, // counterResistFlags
+	0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+	0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+	0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+	0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+	0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+	0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+	{0}, // pad_AE
+	NULL, // mAttackEvtScript
+	{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 }};
 
 BattleWeaponData _nozzle_at_base_monster = {{
-	0, 0, 0, 0, 0x64000002, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0x0200006F, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0x00000064, 0, 0,
+	NULL, 0, // name..icon
+	{0}, // pad_06
+	0, // itemId
+	NULL, // description
+	100, // baseAccuracy
+	0, 0, // baseFpCost..baseSpCost
+	2, // superguardsAllowed
+	0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+	NULL, // hpDamageFn
+	{0}, // hpDamageWork
+	NULL, // fpDamageFn
+	{0}, // fpDamageWork
+	0x200006F, // targetClassFlags
+	0x20000000, // targetPropertyFlags
+	0, 0, // element..damagePattern
+	3, // acLevel
+	2, // reserved_6F
+	NULL, // acHelpMsg
+	0, // special
+	0x7FF, // counterResistFlags
+	0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+	0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+	0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+	0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+	0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+	0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+	{0}, // pad_AE
+	NULL, // mAttackEvtScript
+	{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 }};
 
 BattleStageNozzleData battle_stage_nozzle_data[] = {
@@ -568,36 +614,128 @@ BattleStageNozzleData battle_stage_nozzle_data[] = {
 #endif
 		{
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 		},
 	},
@@ -609,36 +747,128 @@ BattleStageNozzleData battle_stage_nozzle_data[] = {
 #endif
 		{
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x02000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0x00640100, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				NULL, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				2, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 100, 1, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 		},
 	},
@@ -650,36 +880,128 @@ BattleStageNozzleData battle_stage_nozzle_data[] = {
 #endif
 		{
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x02000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0x00640100, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				NULL, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				2, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 100, 1, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000002, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x03000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				3, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 		},
 	},
@@ -691,36 +1013,128 @@ BattleStageNozzleData battle_stage_nozzle_data[] = {
 #endif
 		{
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x02000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0x00640100, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				NULL, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				2, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 100, 1, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000002, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x03000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				3, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x01000302, 0, 0, 0x000007FF, 0,
-				0, 0, 0, 0x00000064, 0x03000000, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				1, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				100, 3, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 		},
 	},
@@ -729,341 +1143,1261 @@ BattleStageNozzleData battle_stage_nozzle_data[] = {
 BattleStageFallObjectData battle_stage_fall_object_data[] = {
 	{
 		{{
-			0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-			0x00000001, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0,
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			NULL, 0, // name..icon
+			{0}, // pad_06
+			0, // itemId
+			NULL, // description
+			100, // baseAccuracy
+			0, 0, // baseFpCost..baseSpCost
+			2, // superguardsAllowed
+			0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+			weaponGetPowerDefault, // hpDamageFn
+			{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+			NULL, // fpDamageFn
+			{0}, // fpDamageWork
+			0x2100060, // targetClassFlags
+			0x20000000, // targetPropertyFlags
+			0, 10, // element..damagePattern
+			3, // acLevel
+			2, // reserved_6F
+			NULL, // acHelpMsg
+			0, // special
+			0x7FF, // counterResistFlags
+			0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+			0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+			0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+			0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+			0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+			0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+			{0}, // pad_AE
+			NULL, // mAttackEvtScript
+			{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 		}},
 		{0, 10, 0, 0, 0, 0, 0, 0, 10},
 		{
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0x32030000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 50, 3, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0x32030000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 50, 3, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00010302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00320300, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				NULL, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 1, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 50, 3, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00320300, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 50, 3, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000002, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0x64000000, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 100, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0x00000100, 0x000007FF, 0x80000000,
-				0x64006400, 0x64006400, 0x00640064, 0x00000064, 0x00640000, 0, 0, 0x0000009D,
-				0, 0x00009D00, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				NULL, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0x100, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 100, 0, 100, 0, 100, 0, 100, // targetWeightFlags..poisonChance
+				0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
+				100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				-99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000005, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00640300, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 10, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 100, 3, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000003, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0x32030000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 10, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 50, 3, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00000019, 0x03000000, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 10, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 25, 3, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 		},
 	},
 	{
 		{{
-			0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-			0x00000001, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0,
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			NULL, 0, // name..icon
+			{0}, // pad_06
+			0, // itemId
+			NULL, // description
+			100, // baseAccuracy
+			0, 0, // baseFpCost..baseSpCost
+			2, // superguardsAllowed
+			0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+			weaponGetPowerDefault, // hpDamageFn
+			{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+			NULL, // fpDamageFn
+			{0}, // fpDamageWork
+			0x2100060, // targetClassFlags
+			0x20000000, // targetPropertyFlags
+			0, 10, // element..damagePattern
+			3, // acLevel
+			2, // reserved_6F
+			NULL, // acHelpMsg
+			0, // special
+			0x7FF, // counterResistFlags
+			0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+			0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+			0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+			0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+			0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+			0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+			{0}, // pad_AE
+			NULL, // mAttackEvtScript
+			{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 		}},
 		{10, 10, 0, 0, 0, 10, 0, 0, 10},
 		{
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0x32030000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 50, 3, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0x32030000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 50, 3, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00010302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00320300, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				NULL, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 1, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 50, 3, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00320300, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 50, 3, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000002, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0x64000000, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 100, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0x00000100, 0x000007FF, 0x80000000,
-				0x64006400, 0x64006400, 0x00640064, 0x00000064, 0x00640000, 0, 0, 0x0000009D,
-				0, 0x00009D00, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				NULL, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0x100, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 100, 0, 100, 0, 100, 0, 100, // targetWeightFlags..poisonChance
+				0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
+				100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				-99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000005, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00640300, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 10, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 100, 3, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000003, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0x32030000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 10, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 50, 3, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00000019, 0x03000000, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 10, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 25, 3, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 		},
 	},
 	{
 		{{
-			0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-			0x00000001, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0,
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			NULL, 0, // name..icon
+			{0}, // pad_06
+			0, // itemId
+			NULL, // description
+			100, // baseAccuracy
+			0, 0, // baseFpCost..baseSpCost
+			2, // superguardsAllowed
+			0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+			weaponGetPowerDefault, // hpDamageFn
+			{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+			NULL, // fpDamageFn
+			{0}, // fpDamageWork
+			0x2100060, // targetClassFlags
+			0x20000000, // targetPropertyFlags
+			0, 10, // element..damagePattern
+			3, // acLevel
+			2, // reserved_6F
+			NULL, // acHelpMsg
+			0, // special
+			0x7FF, // counterResistFlags
+			0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+			0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+			0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+			0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+			0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+			0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+			{0}, // pad_AE
+			NULL, // mAttackEvtScript
+			{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 		}},
 		{10, 10, 10, 10, 10, 10, 0, 0, 10},
 		{
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0x32030000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 50, 3, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0x32030000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 50, 3, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00010302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00320300, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				NULL, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 1, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 50, 3, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00320300, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 50, 3, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000002, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0x64000000, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 100, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0x00000100, 0x000007FF, 0x80000000,
-				0x64006400, 0x64006400, 0x00640064, 0x00000064, 0x00640000, 0, 0, 0x0000009D,
-				0, 0x00009D00, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				NULL, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0x100, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 100, 0, 100, 0, 100, 0, 100, // targetWeightFlags..poisonChance
+				0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
+				100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				-99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000005, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00640300, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 10, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 100, 3, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000003, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0x32030000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 10, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 50, 3, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00000019, 0x03000000, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 10, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 25, 3, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 		},
 	},
 	{
 		{{
-			0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-			0x00000001, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0,
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			NULL, 0, // name..icon
+			{0}, // pad_06
+			0, // itemId
+			NULL, // description
+			100, // baseAccuracy
+			0, 0, // baseFpCost..baseSpCost
+			2, // superguardsAllowed
+			0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+			weaponGetPowerDefault, // hpDamageFn
+			{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+			NULL, // fpDamageFn
+			{0}, // fpDamageWork
+			0x2100060, // targetClassFlags
+			0x20000000, // targetPropertyFlags
+			0, 10, // element..damagePattern
+			3, // acLevel
+			2, // reserved_6F
+			NULL, // acHelpMsg
+			0, // special
+			0x7FF, // counterResistFlags
+			0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+			0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+			0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+			0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+			0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+			0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+			{0}, // pad_AE
+			NULL, // mAttackEvtScript
+			{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 		}},
 		{10, 10, 10, 10, 10, 10, 10, 10, 10},
 		{
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0x32030000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 50, 3, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0x32030000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 50, 3, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00010302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00320300, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				NULL, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 1, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 50, 3, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00320300, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 50, 3, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000002, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
-				0x64000000, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 100, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x00000302, 0, 0x00000100, 0x000007FF, 0x80000000,
-				0x64006400, 0x64006400, 0x00640064, 0x00000064, 0x00640000, 0, 0, 0x0000009D,
-				0, 0x00009D00, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				NULL, // hpDamageFn
+				{0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 0, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0x100, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 100, 0, 100, 0, 100, 0, 100, // targetWeightFlags..poisonChance
+				0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
+				100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				-99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000005, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00640300, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 10, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 100, 3, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000003, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0x32030000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x2100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 10, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 50, 3, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 			{{
-				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
-				0x00000001, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0x01100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
-				0, 0, 0x00000019, 0x03000000, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+				NULL, 0, // name..icon
+				{0}, // pad_06
+				0, // itemId
+				NULL, // description
+				100, // baseAccuracy
+				0, 0, // baseFpCost..baseSpCost
+				2, // superguardsAllowed
+				0.0f, 0, 0, 0, 0, // reserved_14..reserved_1B
+				weaponGetPowerDefault, // hpDamageFn
+				{1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+				NULL, // fpDamageFn
+				{0}, // fpDamageWork
+				0x1100060, // targetClassFlags
+				0x20000000, // targetPropertyFlags
+				0, 10, // element..damagePattern
+				3, // acLevel
+				2, // reserved_6F
+				NULL, // acHelpMsg
+				0, // special
+				0x7FF, // counterResistFlags
+				0x80000000, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
+				0, 0, 0, 0, 25, 3, 0, 0, // poisonTime..dodgyTime
+				0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
+				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+				0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
+				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
+				{0}, // pad_AE
+				NULL, // mAttackEvtScript
+				{0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 			}},
 		},
 	},
@@ -1498,7 +2832,7 @@ USER_FUNC(_get_bgset_attack_data) {
 	if (weapon && !weapon->hpDamageFn) {
 		weapon = NULL;
 	}
-	evtSetValue(event, out, (s32)weapon);
+	evtSetValue(event, out, (EvtWord)weapon);
 	return EVT_RETURN_DONE;
 }
 
@@ -1865,7 +3199,7 @@ USER_FUNC(_fall_frame) {
 	if (event->userWork[2] < 60) {
 		return EVT_RETURN_BLOCK;
 	}
-	evtSetValue(event, arg, (s32)sw->fallObjectData);
+	evtSetValue(event, arg, (EvtWord)sw->fallObjectData);
 	return EVT_RETURN_DONE;
 }
 
@@ -2014,7 +3348,7 @@ USER_FUNC(_nozzle_work_effect) {
 					rot = 90.0f + angle1;
 					rot = reviseAngle(rot);
 					z = 10.0f * sinfd(angle1) + obj->mPosition.z;
-					event->userWork[1] = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle1), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
+					event->userWork[1] = (EvtWord)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle1), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
 				}
 				else {
 					if (sfx) {
@@ -2023,7 +3357,7 @@ USER_FUNC(_nozzle_work_effect) {
 					else {
 						event->userWork[5] = -1;
 					}
-					event->userWork[1] = (s32)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
+					event->userWork[1] = (EvtWord)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
 					if (fog == 0) {
 						effConfettiN64Entry(4, 90, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 1.0f);
 					}
@@ -2039,7 +3373,7 @@ USER_FUNC(_nozzle_work_effect) {
 					}
 					rot = reviseAngle(90.0f + angle2);
 					z = 10.0f * sinfd(angle2) + obj->mPosition.z;
-					event->userWork[2] = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle2), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
+					event->userWork[2] = (EvtWord)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle2), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
 				}
 				else {
 					if (sfx) {
@@ -2048,7 +3382,7 @@ USER_FUNC(_nozzle_work_effect) {
 					else {
 						event->userWork[6] = -1;
 					}
-					event->userWork[2] = (s32)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
+					event->userWork[2] = (EvtWord)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
 					if (fog == 0) {
 						effConfettiN64Entry(4, 90, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 1.0f);
 					}
@@ -2064,7 +3398,7 @@ USER_FUNC(_nozzle_work_effect) {
 					}
 					z = reviseAngle(90.0f + angle3);
 					rot = 10.0f * sinfd(angle3) + obj->mPosition.z;
-					event->userWork[3] = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle3), 12.0f + obj->mPosition.y, rot, -80.0f, z, 90);
+					event->userWork[3] = (EvtWord)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle3), 12.0f + obj->mPosition.y, rot, -80.0f, z, 90);
 				}
 				else {
 					if (sfx) {
@@ -2073,7 +3407,7 @@ USER_FUNC(_nozzle_work_effect) {
 					else {
 						event->userWork[7] = -1;
 					}
-					event->userWork[3] = (s32)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
+					event->userWork[3] = (EvtWord)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
 					if (fog == 0) {
 						effConfettiN64Entry(4, 90, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 1.0f);
 					}
@@ -2087,7 +3421,7 @@ USER_FUNC(_nozzle_work_effect) {
 					event->userWork[3] = 0;
 					event->userWork[2] = 0;
 					sw->fogEffect = effNozleEntry(3, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1000);
-					event->userWork[3] = (s32)sw->fogEffect;
+					event->userWork[3] = (EvtWord)sw->fogEffect;
 					sw->fogTimer = 2;
 					event->userWork[5] = psndSFXOn_3D("SFX_BTL_STAGE_DRYICE1", &BattleSearchObjectPtr("nozzle_c")->mPosition);
 					started = TRUE;
@@ -2283,7 +3617,7 @@ USER_FUNC(_nozzle_work_get_weapon_address) {
 	EvtWord* args = event->args;
 	s32 index = evtGetValue(event, args[0]);
 
-	evtSetValue(event, args[1], (s32)sw->nozzleWeapons[index]);
+	evtSetValue(event, args[1], (EvtWord)sw->nozzleWeapons[index]);
 	return EVT_RETURN_DONE;
 }
 
@@ -2730,7 +4064,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
           case 0:
 
           case 1:
-            psndSFXOn_3D((const char *)(u32)"SFX_BTL_STAGE_DAMAGE_TUB1", &sfxPos); // FAKE: integer cast makes the literal a hoisted @ temp (same pointer)
+            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_DAMAGE_TUB1"), &sfxPos); // FAKE: integer cast makes the literal a hoisted @ temp (same pointer)
             break;
 
           default:
@@ -2782,7 +4116,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
               case 0:
 
               case 1:
-                psndSFXOn_3D((const char *)(u32)"SFX_BTL_STAGE_DAMAGE_TUB1", &sfxPos); // FAKE: integer cast makes the literal a hoisted @ temp (same pointer)
+                psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_DAMAGE_TUB1"), &sfxPos); // FAKE: integer cast makes the literal a hoisted @ temp (same pointer)
                 break;
 
               case 5:

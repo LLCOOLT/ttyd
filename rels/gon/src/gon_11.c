@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "driver/npcdrv.h"
@@ -30,7 +31,7 @@ static u8 cloud_once_flag;
 static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
 static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
-static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
+static void _img_alloc_capture(const char* a0, s32 a1, const char* a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_set);
@@ -109,7 +110,7 @@ USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(gonbaba_wait_landon);
-static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
+static void _img_alloc_capture(const char* a0, s32 a1, const char* a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
 static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
 static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
@@ -207,12 +208,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)evt_sound, // exitEvent
-        (s32)"gon_10", // nextMapName
+        "gon_10", // nextMapName
         "w_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)door01_close, // enterAnimeArg
-        (s32)door01_open, // exitAnimeArg
+        door01_close, // enterAnimeArg
+        door01_open, // exitAnimeArg
     },
     {0},
 };
@@ -675,14 +676,14 @@ static EVT_BEGIN(evt_cloud_main_evt)
     RETURN
 EVT_END()
 
-static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7) {
+static void _img_alloc_capture(const char* a0, s32 a1, const char* a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7) {
     EventEntry event;
-    s32 args[10];
+    EvtWord args[10];
 
     event.args = args;
-    args[0] = a0;
+    args[0] = (EvtWord)a0;
     args[1] = a1;
-    args[2] = a2;
+    args[2] = (EvtWord)a2;
     args[3] = a3;
     args[4] = a4;
     args[5] = a5;
@@ -856,7 +857,7 @@ static s32 evt_cloud_main(EventEntry *event, BOOL isFirstCall)
     {
       break;
     }
-      _img_alloc_capture((s32) wp->imgName, 0, (s32) wp->offscreenName, 1, wp->x, wp->y, wp->w, wp->h);
+      _img_alloc_capture(wp->imgName, 0, wp->offscreenName, 1, wp->x, wp->y, wp->w, wp->h);
       wp->state = 223;
       break;
 
@@ -867,7 +868,7 @@ static s32 evt_cloud_main(EventEntry *event, BOOL isFirstCall)
 
     case 3:
       img = imgNameToPtr(wp->imgName, inBattle);
-      img->animName = (s32) "A_1";
+      img->animName = "A_1";
       *(&img->animTime) = animTimeGetTime(inBattle);
       img->flags &= ~2;
       wp->timer = 30;
@@ -924,7 +925,7 @@ static s32 evt_cloud_main(EventEntry *event, BOOL isFirstCall)
       evtEntry(wp->endEvt, 0, 0);
     }
       img = imgNameToPtr(wp->imgName, inBattle);
-      img->animName = (s32) "A_2";
+      img->animName = "A_2";
       *(&img->animTime) = animTimeGetTime(inBattle);
       wp->timer = 60;
       wp->state++;
@@ -1015,7 +1016,7 @@ USER_FUNC(evt_iri_16_cloud_ent) {
     wp->state = 0;
     wp->timer = 0;
     wp->evt = evtEntry(evt_cloud_main_evt, 0, 0);
-    wp->evt->lwData[0] = (s32)wp;
+    wp->evt->lwData[0] = (EvtWord)wp;
     return EVT_RETURN_DONE;
 }
 

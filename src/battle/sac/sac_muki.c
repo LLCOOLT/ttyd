@@ -970,7 +970,7 @@ static USER_FUNC(set_weapon) {
         w->weapon[0x9b] = power;
         break;
     }
-    evtSetValue(event, args[2], (s32)w->weapon);
+    evtSetValue(event, args[2], (EvtWord)w->weapon);
     return 2;
 }
 

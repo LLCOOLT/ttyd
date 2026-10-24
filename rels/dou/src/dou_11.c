@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "driver/hitdrv.h"
@@ -497,7 +498,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_10", // nextMapName
+        "dou_10", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -513,7 +514,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"muj_10", // nextMapName
+        "muj_10", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -529,7 +530,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"muj_00", // nextMapName
+        "muj_00", // nextMapName
         "n_bero_02", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -1906,7 +1907,7 @@ USER_FUNC(dou_mario_kaiten_hosei) {
             mario->floorMove.y = (v.y - dist * (f32)cos(rot)) - mario->position.y;
         }
         event->userdataf[1] = angle;
-        event->userdata[2] = (s32)hit;
+        event->userdata[2] = (EvtWord)hit;
     }
     return EVT_RETURN_BLOCK;
 }

@@ -344,7 +344,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tik_07", // nextMapName
+        "tik_07", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -360,7 +360,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tik_01", // nextMapName
+        "tik_01", // nextMapName
         "w_bero_1", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -376,7 +376,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tik_00", // nextMapName
+        "tik_00", // nextMapName
         "tensou", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -674,7 +674,7 @@ USER_FUNC(evt_uranaisi_msg_set) {
         ofs[k] -= FontGetMessageWidth(num);
     }
     sprintf(uranaisi_msgp, buf, ofs[0], uranaisi_ryokin_rtn(0), ofs[1], uranaisi_ryokin_rtn(1), ofs[2], uranaisi_ryokin_rtn(2));
-    evtSetValue(event, args[1], (s32)uranaisi_msgp);
+    evtSetValue(event, args[1], (EvtWord)uranaisi_msgp);
     return EVT_RETURN_DONE;
 }
 #else
@@ -683,7 +683,7 @@ USER_FUNC(evt_uranaisi_msg_set) {
     const char* msg = msgSearch((const char*)evtGetValue(event, args[0]));
 
     sprintf(uranaisi_msgp, msg, uranaisi_ryokin_rtn(0), uranaisi_ryokin_rtn(1), uranaisi_ryokin_rtn(2));
-    evtSetValue(event, args[1], (s32)uranaisi_msgp);
+    evtSetValue(event, args[1], (EvtWord)uranaisi_msgp);
     return EVT_RETURN_DONE;
 }
 #endif
@@ -693,7 +693,7 @@ static USER_FUNC(evt_osreport) {
 
     switch (evtGetValue(event, args[0])) {
         case 0:
-            evtSetValue(event, args[1], (s32)search_evt_moji(evtGetValue(event, GSW(0))));
+            evtSetValue(event, args[1], (EvtWord)search_evt_moji(evtGetValue(event, GSW(0))));
             break;
     }
     return EVT_RETURN_DONE;

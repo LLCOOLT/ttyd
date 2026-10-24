@@ -125,7 +125,7 @@ USER_FUNC(lect_juyoitem_rel_set) {
 
 // void* evt (out)
 USER_FUNC(lect_juyoitem_rel_get) {
-    evtSetValue(event, *event->args, (s32)lect_work);
+    evtSetValue(event, *event->args, (EvtWord)lect_work);
     return EVT_RETURN_DONE;
 }
 

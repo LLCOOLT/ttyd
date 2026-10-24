@@ -8,6 +8,7 @@ typedef struct MsgChar {
 	union {
 		u32 value; //0x0
 		GXColor color; //0x0, colour-change entries
+		struct NpcEntry* npc; //0x0, paper entries (NULL = the speaker)
 	};
 	u16 glyph; //0x4
 	s16 x; //0x6 (page-break entries: page number)

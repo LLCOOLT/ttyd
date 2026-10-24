@@ -307,7 +307,7 @@ USER_FUNC(uranaisi_next_makelabel) {
 	s32 n = evtGetValue(event, args[0]);
 
 	sprintf(wp->buf, "%s_%04d", wp->prefix, wp->info[n].idx);
-	evtSetValue(event, args[1], (s32)wp->buf);
+	evtSetValue(event, args[1], (EvtWord)wp->buf);
 	return 2;
 }
 
@@ -342,7 +342,7 @@ USER_FUNC(uranaisi_starpiece_makelabel) {
 		if (johoya_get(wp->starpiece, wp->info[i].idx) == 0) {
 			if (target == n) {
 				sprintf(wp->buf, "%s_%04d", wp->prefix, wp->info[i].idx);
-				evtSetValue(event, args[1], (s32)wp->buf);
+				evtSetValue(event, args[1], (EvtWord)wp->buf);
 				wp->cur = i;
 				return 2;
 			}
@@ -350,7 +350,7 @@ USER_FUNC(uranaisi_starpiece_makelabel) {
 		}
 	}
 	*wp->buf = 0;
-	evtSetValue(event, args[1], (s32)wp->buf);
+	evtSetValue(event, args[1], (EvtWord)wp->buf);
 	return 2;
 }
 
@@ -390,7 +390,7 @@ USER_FUNC(uranaisi_supercoin_makelabel) {
 		if (johoya_get(wp->supercoin, wp->info[i].idx) == 0) {
 			if (target == n) {
 				sprintf(wp->buf, "%s_%04d", wp->prefix, wp->info[i].idx);
-				evtSetValue(event, args[1], (s32)wp->buf);
+				evtSetValue(event, args[1], (EvtWord)wp->buf);
 				wp->cur = i;
 				return 2;
 			}
@@ -398,7 +398,7 @@ USER_FUNC(uranaisi_supercoin_makelabel) {
 		}
 	}
 	*wp->buf = 0;
-	evtSetValue(event, args[1], (s32)wp->buf);
+	evtSetValue(event, args[1], (EvtWord)wp->buf);
 	return 2;
 }
 

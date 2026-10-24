@@ -200,12 +200,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tou_04", // nextMapName
+        "tou_04", // nextMapName
         "s_bero_4", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)n_door_close, // enterAnimeArg
-        (s32)n_door_open, // exitAnimeArg
+        n_door_close, // enterAnimeArg
+        n_door_open, // exitAnimeArg
     },
     {
         "w_bero", // hitName
@@ -218,12 +218,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tou_12", // nextMapName
+        "tou_12", // nextMapName
         "w_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w_door_close, // enterAnimeArg
-        (s32)w_door_open, // exitAnimeArg
+        w_door_close, // enterAnimeArg
+        w_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -717,7 +717,7 @@ USER_FUNC(iri_13_make_name) {
     EvtWord* args = event->args;
 
     sprintf(name, "pants%02d\0\0", evtGetValue(event, args[0]));
-    evtSetValue(event, args[1], (s32)name);
+    evtSetValue(event, args[1], (EvtWord)name);
     return EVT_RETURN_DONE;
 }
 

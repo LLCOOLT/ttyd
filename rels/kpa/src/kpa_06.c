@@ -33,7 +33,7 @@ f32 fd_kpa_06___local_3PIO2_368;
 f32 fd_kpa_06_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_kpa_06___local_PIO2_367;
 f32 fd_kpa_06_one_364;
-static s32 kpa_act_stg3_mobj[68];
+static EvtWord kpa_act_stg3_mobj[68];
 static EvtWord kpa_fall[41];
 static EvtWord kpa_goal[22];
 static NpcSetupInfo npcEnt[1];
@@ -67,7 +67,7 @@ f32 fd_kpa_06___local_PIO2_367 = 1.5707964f;
 
 f32 fd_kpa_06_one_364 = 1.0f;
 
-static s32 kpa_act_stg3_mobj[] = {
+static EvtWord kpa_act_stg3_mobj[] = {
     KPA_OBJ_DOKAN_0(-225.0f, 0.0f), KPA_OBJ_BRICK_2(-175.0f, 0.0f), KPA_OBJ_BRICK_2(-125.0f, 0.0f),
     KPA_OBJ_BRICK_2(-125.0f, 50.0f), KPA_OBJ_BRICK_2(-75.0f, 0.0f), KPA_OBJ_BRICK_2(-75.0f, 50.0f),
     KPA_OBJ_BRICK_2(-75.0f, 100.0f), KPA_OBJ_BRICK_2(-25.0f, 0.0f), KPA_OBJ_BRICK_2(-25.0f, 50.0f),

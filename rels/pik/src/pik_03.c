@@ -129,7 +129,7 @@ static BeroEntry bero_data[] = {
         (s32*)bero_in, // enterEvent
         8, // caseType
         (s32*)bero_out, // exitEvent
-        (s32)"pik_02", // nextMapName
+        "pik_02", // nextMapName
         "h_bero", // nextBeroName
         4, // enterAnimeType
         4, // exitAnimeType

@@ -556,7 +556,7 @@ static USER_FUNC(get_value) {
 #ifdef VERSION_G8ME01
     evtSetValue(event, args[1], (s32)msgSearch(itemDataTable[wp->items[wp->sel]].name));
 #else
-    evtSetValue(event, args[1], (s32)itemDataTable[wp->items[wp->sel]].id);
+    evtSetValue(event, args[1], (EvtWord)itemDataTable[wp->items[wp->sel]].id);
 #endif
     evtSetValue(event, args[2], wp->items[wp->sel]);
     evtSetValue(event, args[3], itemDataTable[wp->items[wp->sel]].discount_price);
@@ -3160,7 +3160,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gor_02", // nextMapName
+        "gor_02", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -3176,7 +3176,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gor_03", // nextMapName
+        "gor_03", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -3192,7 +3192,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)christine_nakama_before, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gor_00", // nextMapName
+        "gor_00", // nextMapName
         "n_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -7024,7 +7024,7 @@ USER_FUNC(iri_09_item_tbl_make) {
         iri_09_item_tbl[i] = 143;
     }
     iri_09_item_tbl[i] = -1;
-    evtSetValue(event, args[1], (s32)iri_09_item_tbl);
+    evtSetValue(event, args[1], (EvtWord)iri_09_item_tbl);
     return EVT_RETURN_DONE;
 }
 
@@ -7151,7 +7151,7 @@ USER_FUNC(get_item_name) {
     ItemData* data = &itemDataTable[item];
     evtSetValue(event, args[1], (s32)msgSearch(data->name));
 #else
-    evtSetValue(event, args[1], (s32)itemDataTable[item].id);
+    evtSetValue(event, args[1], (EvtWord)itemDataTable[item].id);
 #endif
     return EVT_RETURN_DONE;
 }

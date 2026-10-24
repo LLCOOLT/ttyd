@@ -96,7 +96,7 @@ BOOL nokonoko_holdItem(void) {
     if (party->currentMemberId != 2 || !(party->flags & 0x100)) {
         return FALSE;
     }
-    return party->work.nokonoko.heldItem != 0;
+    return party->work.nokonoko.heldItem != NULL;
 }
 
 void nokonoko_bye(PartyEntry* party) {
@@ -173,9 +173,9 @@ void nokonoko_use_cancel(void) {
 }
 
 void nokonoko_use_post(PartyEntry* party) {
-    if (party->work.nokonoko.heldItem != 0) {
-        itemNokoForceGet((ItemEntry*)party->work.nokonoko.heldItem);
-        party->work.nokonoko.heldItem = 0;
+    if (party->work.nokonoko.heldItem != NULL) {
+        itemNokoForceGet(party->work.nokonoko.heldItem);
+        party->work.nokonoko.heldItem = NULL;
     }
     marioGetPtr();
     if ((u32)nokoSe != 0xFFFFFFFFU) {
@@ -219,7 +219,7 @@ static inline void noko_star(PartyEntry* party, s32 n) {
     effSmallStarN64Entry(3, n, party->position.x, party->position.y + party->height, party->position.z, s, EXT_LIT(float_neg1_8041b520, -1.0f), -c);
 }
 
-#define NOKO_ITEM(party, body)                                                                              if (party->work.nokonoko.heldItem == 0) {                                                                                  party->work.nokonoko.heldItem = (u32)itemNearDistCheck(party->position.x, party->position.y, party->position.z,                                                   0.5f * party->width + 12.0f);                                    if (party->work.nokonoko.heldItem != 0) {                                                                                  itemPickUp((ItemEntry*)party->work.nokonoko.heldItem);                                                                 body                                                                                                  }                                                                                                     }
+#define NOKO_ITEM(party, body)                                                                              if (party->work.nokonoko.heldItem == NULL) {                                                                                  party->work.nokonoko.heldItem = itemNearDistCheck(party->position.x, party->position.y, party->position.z,                                                   0.5f * party->width + 12.0f);                                    if (party->work.nokonoko.heldItem != NULL) {                                                                                  itemPickUp(party->work.nokonoko.heldItem);                                                                 body                                                                                                  }                                                                                                     }
 void nokonoko_use(PartyEntry* party);
 void nokonoko_use(PartyEntry* party) {
     Vec out;
@@ -264,7 +264,7 @@ void nokonoko_use(PartyEntry* party) {
     }
     if (party->trigFlags & 8) {
         party->trigFlags &= ~8;
-        party->work.nokonoko.heldItem = 0;
+        party->work.nokonoko.heldItem = NULL;
         party->work.nokonoko.shellSpinBits = 0;
         party->work.nokonoko.word17C = 0;
         party->work.nokonoko.word180 = 0;
@@ -291,7 +291,7 @@ void nokonoko_use(PartyEntry* party) {
         party->height = EXT_LIT(float_18p5_8041b558, 18.5f);
         party->useMotionId = 1;
         party->moveFrames = 100;
-        party->work.nokonoko.heldItem = 0;
+        party->work.nokonoko.heldItem = NULL;
         party->work.nokonoko.dashed = 0;
         marioAdjustMoveDir();
         mario->baseSpeed = EXT_LIT(float_0_8041b51c, 0.0f);
@@ -592,9 +592,9 @@ void nokonoko_use(PartyEntry* party) {
         party->useMotionId = 71;
         break;
     case 71:
-        if (party->work.nokonoko.heldItem != 0) {
-            itemNokoForceGet((ItemEntry*)party->work.nokonoko.heldItem);
-            party->work.nokonoko.heldItem = 0;
+        if (party->work.nokonoko.heldItem != NULL) {
+            itemNokoForceGet(party->work.nokonoko.heldItem);
+            party->work.nokonoko.heldItem = NULL;
         }
         nokonoko_finish(party);
         return;
@@ -683,17 +683,17 @@ void nokonoko_use(PartyEntry* party) {
         }
         party->moveSpeed = EXT_LIT(float_0_8041b51c, 0.0f);
         party->flags2 &= ~0x10;
-        if (party->work.nokonoko.heldItem != 0) {
-            itemNokoForceGet((ItemEntry*)party->work.nokonoko.heldItem);
-            party->work.nokonoko.heldItem = 0;
+        if (party->work.nokonoko.heldItem != NULL) {
+            itemNokoForceGet(party->work.nokonoko.heldItem);
+            party->work.nokonoko.heldItem = NULL;
         }
         if (party->hitobjStandOn == NULL) {
             party->useMotionId = 88;
             break;
         }
-        if (party->work.nokonoko.heldItem != 0) {
-            itemNokoForceGet((ItemEntry*)party->work.nokonoko.heldItem);
-            party->work.nokonoko.heldItem = 0;
+        if (party->work.nokonoko.heldItem != NULL) {
+            itemNokoForceGet(party->work.nokonoko.heldItem);
+            party->work.nokonoko.heldItem = NULL;
         }
         nokonoko_finish(party);
         return;

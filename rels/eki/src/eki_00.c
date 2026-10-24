@@ -964,7 +964,7 @@ static void ext_moamoa_main(void)
       tmp = z0;
       tmp.x = (*pose->mtx)[0][3]; tmp.y = (*pose->mtx)[1][3]; tmp.z = (*pose->mtx)[2][3];
       sp = tmp;
-      psndSFXOn_3D((char*)(u32)"SFX_STG6_MOAMOA_VOICE1", &sp); // FAKE: integer cast hoists the literal as an @ temp
+      psndSFXOn_3D(SFX_NAME_WORD("SFX_STG6_MOAMOA_VOICE1"), &sp); // FAKE: integer cast hoists the literal as an @ temp
     }
     switch (moa->state)
     {
@@ -1438,12 +1438,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)((char*)"eki_01"), // nextMapName
+        "eki_01", // nextMapName
         ((char*)"w_dero"), // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e_door_close, // enterAnimeArg
-        (s32)e_door_open, // exitAnimeArg
+        e_door_close, // enterAnimeArg
+        e_door_open, // exitAnimeArg
     },
     {
         ((char*)"s_bero"), // hitName
@@ -1456,12 +1456,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)((char*)"hom_00"), // nextMapName
+        "hom_00", // nextMapName
         ((char*)"n_bero_2"), // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)s_door_close, // enterAnimeArg
-        (s32)s_door_open, // exitAnimeArg
+        s_door_close, // enterAnimeArg
+        s_door_open, // exitAnimeArg
     },
     {0},
 };

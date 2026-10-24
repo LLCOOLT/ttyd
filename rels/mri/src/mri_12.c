@@ -89,7 +89,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"mri_11", // nextMapName
+        "mri_11", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -105,7 +105,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"mri_17", // nextMapName
+        "mri_17", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -154,7 +154,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"mri_18", // nextMapName
+        "mri_18", // nextMapName
         "dokan1", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

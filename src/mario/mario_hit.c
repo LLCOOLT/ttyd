@@ -38,7 +38,7 @@ extern HitEntry* marioSearchHead(Vec* pos, f32* h, f32 d);
 #ifdef VERSION_G8ME01
 extern s32 kpaGetLevel(void);
 #endif
-extern BOOL marioChkWallAround(Vec* pos, void* p, f32 dx, f32 dz, f32 w, f32 h);
+extern BOOL marioChkWallAround(Vec* pos, s32 mode, f32 dx, f32 dz, f32 w, f32 h);
 
 static inline BOOL marioChkBeroSub(s32 attr) {
     BOOL r = TRUE;
@@ -1708,7 +1708,7 @@ void marioCheckWall(f32 dx, f32 dz) {
     } else {
         w->position = pos;
     }
-    marioChkWallAround(&w->position, NULL, dx, dz, w->wPlayerCollisionBox.z, w->wPlayerCollisionBox.y);
+    marioChkWallAround(&w->position, 0, dx, dz, w->wPlayerCollisionBox.z, w->wPlayerCollisionBox.y);
     dou10_yoko_yari(&w->frontWallDist);
 }
 
@@ -1763,7 +1763,7 @@ void marioSearchFrontWall_staying(f32 dz) {
         }
     }
     pos = w->position;
-    marioChkWallAround(&pos, NULL, 0.0f, dz, w->wPlayerCollisionBox.z, w->wPlayerCollisionBox.y);
+    marioChkWallAround(&pos, 0, 0.0f, dz, w->wPlayerCollisionBox.z, w->wPlayerCollisionBox.y);
     w->position.x = pos.x;
     w->position.z = pos.z;
 }
@@ -1843,7 +1843,7 @@ void marioCheckWall_roll(f32 dx, f32 dz) {
         w->position = pos;
     }
     pos = w->position;
-    marioChkWallAround(&pos, NULL, dx, dz, w->wPlayerCollisionBox.z, w->wPlayerCollisionBox.y);
+    marioChkWallAround(&pos, 0, dx, dz, w->wPlayerCollisionBox.z, w->wPlayerCollisionBox.y);
     w->position.x = pos.x;
     w->position.z = pos.z;
 }
@@ -2336,7 +2336,7 @@ static inline void wallCopy(Vec* out, Vec* in) {
     *out = t;
 }
 
-BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
+BOOL marioChkWallAround(Vec* pos, s32 mode, f32 unused, f32 dir, f32 w, f32 h) {
     Vec hi;
     Vec lo;
     Vec d;
@@ -2399,7 +2399,7 @@ BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
         return hitAny;
     }
     lim = 0.125f * w;
-    if ((s32)p == 0) {
+    if (mode == 0) {
         MarioWork* m = marioGetPtr();
         if (m->currMotionId == 10 || m->currMotionId == 11) {
             lim = 0.25f * w;
@@ -2583,7 +2583,7 @@ void marioCheckWallShip(f32 dx, f32 dz) {
     old = pos;
     w->position = pos;
     tmp = pos;
-    marioChkWallAround(&w->position, NULL, dx, dz, w->wPlayerCollisionBox.z, 4.0f);
+    marioChkWallAround(&w->position, 0, dx, dz, w->wPlayerCollisionBox.z, 4.0f);
     max = w->mBaseDashSpeed;
     PSVECSubtract(&w->position, &old, &diff);
     mag = PSVECMag(&diff);
@@ -2596,7 +2596,7 @@ void marioCheckWallShip(f32 dx, f32 dz) {
 // prototypes for asm stopgap forward references
 void marioCheckWallShip(f32 dx, f32 dz);
 BOOL marioSlitChkWallAround(void);
-BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h);
+BOOL marioChkWallAround(Vec* pos, s32 mode, f32 unused, f32 dir, f32 w, f32 h);
 HitEntry* marioChkFrontStep(f32* y, f32* h, f32* ang);
 HitEntry* N_dou10_yoko_yari3(void);
 HitEntry* dou10_yoko_yari2(f32* out);

@@ -1631,7 +1631,7 @@ void puniParaAttack(PuniData* a, PuniData* b) {
                 Vec paraVecA = { 0.0f, 0.0f, 0.0f };
                 b->vel = paraVecA;
             }
-            b->target = (s32)a;
+            b->target = a;
             b->flags |= 0x2000;
             b->flags &= ~0x8000000;
             b->flags2 &= ~2;
@@ -1645,7 +1645,7 @@ void puniParaAttack(PuniData* a, PuniData* b) {
             Vec paraVecB = { 0.0f, 0.0f, 0.0f };
             a->vel = paraVecB;
         }
-        a->target = (s32)b;
+        a->target = b;
         a->flags |= 0x2000;
         a->flags &= ~0x8000000;
         a->flags2 &= ~2;
@@ -1913,9 +1913,9 @@ PuniData* searchBattleTeki(PuniData* self) {
 void puniSearch(PuniData* p) {
     if ((s32)(gp->retraceCount & 3) == (*( s16*)( &p->index) & 3)) {
         if (p->flags & 1) {
-            p->target = (s32)searchBattleTeki_inl(p);
+            p->target = searchBattleTeki_inl(p);
         } else {
-            p->target = (s32)searchBattleMikata_inl(p);
+            p->target = searchBattleMikata_inl(p);
         }
     }
 }
@@ -1937,7 +1937,7 @@ void puniModeChangeAttack(void) {
                     f = searchBattleMikata_inl(p);
                 }
                 if (f) {
-                    p->target = (s32)f;
+                    p->target = f;
                     p->mode = 7;
                     p->modeStep = 0;
                     p->depth = 0;
@@ -2632,16 +2632,16 @@ void puniModeAttack(PuniData* p) {
                 break;
             }
             puniSearch(p);
-            if ((PuniData*)p->target != NULL) {
-                PSVECSubtract(&((PuniData*)p->target)->pos, &p->pos, &d);
-                if (PSVECMag(&d) > ((PuniData*)p->target)->followRange) {
+            if (p->target != NULL) {
+                PSVECSubtract(&p->target->pos, &p->pos, &d);
+                if (PSVECMag(&d) > p->target->followRange) {
                     PSVECNormalize(&d, &d);
                     d.y = 0.0f;
                     PSVECScale(&d, &d, 1.0f);
                     PSVECAdd(&p->vel, &d, &p->vel);
                     p->maxSpeed = 3.0f;
                 } else {
-                    puniParaAttack(p, (PuniData*)p->target);
+                    puniParaAttack(p, p->target);
                 }
             }
             break;
@@ -2659,7 +2659,7 @@ void puniModeDamage(PuniData* p) {
             if (Punigp->fightSfxCount2++ < 6) psndSFXOn_3D("SFX_STG2_FIGHT_TOGE2", &p->pos);
             p->modeStep = 2;
         case 2:
-            PSVECSubtract(&p->pos, &((PuniData*)p->target)->pos, &d);
+            PSVECSubtract(&p->pos, &p->target->pos, &d);
             if (0.0f == PSVECMag(&d)) {
                 {
                     Vec v_ = {0.0f, 0.0f, 0.0f};
@@ -2785,13 +2785,13 @@ void puniModeEscape(PuniData* p) {
     }
     if ((s32)(gp->retraceCount & 3) == (p->index & 3)) {
         if (p->flags & 1) {
-            p->target = (s32)searchBattleTeki_inl(p);
+            p->target = searchBattleTeki_inl(p);
         } else {
-            p->target = (s32)searchBattleMikata_inl(p);
+            p->target = searchBattleMikata_inl(p);
         }
     }
-    if ((PuniData*)p->target == NULL) return;
-    PSVECSubtract(&((PuniData*)p->target)->pos, &p->pos, &d);
+    if (p->target == NULL) return;
+    PSVECSubtract(&p->target->pos, &p->pos, &d);
     dist = PSVECMag(&d);
     if (dist >= 120.0f) {
         {
@@ -2848,14 +2848,14 @@ void puniModeRecover(PuniData* p) {
             } else {
                 if (((s32)gp->retraceCount & 3) == (*(s16 *) (&p->index) & 3)) {
                     if (p->flags & 1) {
-                        p->target = (s32)searchBattleTeki_inl(p);
+                        p->target = searchBattleTeki_inl(p);
                     } else {
-                        p->target = (s32)searchBattleMikata_inl(p);
+                        p->target = searchBattleMikata_inl(p);
                     }
                 }
-                if ((PuniData*)p->target != NULL) {
+                if (p->target != NULL) {
                     Vec d;
-                    PSVECSubtract(&((PuniData*)p->target)->pos, &p->pos, &d);
+                    PSVECSubtract(&p->target->pos, &p->pos, &d);
                     if (PSVECMag(&d) < 80.0f) {
                         p->mode = 8;
                         p->anim = 2;
@@ -4122,7 +4122,7 @@ void puni_puni_init(void) {
     Punigp->seed0 = (s32)(lo + r * (100000000.0f - lo)) + (u32)gp->renderTime + 0x3A3B01F9;
     Punigp->seed1 = 0x21708331;
     p = Punidat;
-    Punigp->marioPuni = (s32)p;
+    Punigp->marioPuni = p;
     p->flags |= 0x180404;
     p->pos = mario->position;
     p->prevPos = p->pos;
@@ -4906,7 +4906,7 @@ void puni_puni_main(void) {
     Vec v;
 
     mario = marioGetPtr();
-    t = (PuniData*)Punigp->marioPuni;
+    t = Punigp->marioPuni;
     t->pos = mario->position;
     puniMapFindbuff(t->pos);
     puniModeALLCheck();
@@ -5124,9 +5124,9 @@ s32 evt_puni_init(EventEntry *event, BOOL isFirstCall)
   EvtWord *args = event->args;
   s32 a = evtGetValue(event, args[0]);
   PuniTexInfo *tex = Punitex;
-  s32 b = evtGetValue(event, args[1]);
-  s32 c = evtGetValue(event, args[2]);
-  s32 d = evtGetValue(event, args[3]);
+  EvtWord b = evtGetValue(event, args[1]);
+  EvtWord c = evtGetValue(event, args[2]);
+  EvtWord d = evtGetValue(event, args[3]);
   if (isFirstCall)
   {
     puniInit();
@@ -6643,7 +6643,8 @@ USER_FUNC(puni_disp_info_kassencheck) {
     return EVT_RETURN_DONE;
 }
 
-void puniCountDisp(s32 unused, s32 packed) {
+void puniCountDisp(CameraId unused, void* param) {
+    EvtWord packed = (EvtWord)param;
     Mtx m;
     GXColor c1 = {0xFF, 0xFF, 0xFF, 0x99};
     GXColor c2 = {0, 0, 0, 0xFF};
@@ -6680,7 +6681,7 @@ USER_FUNC(puni_disp_info_sub) {
     s32 total;
     BOOL done;
     s32 i;
-    s32 packed;
+    EvtWord packed;
     for (i = 1; i < 103; i++) {
         if ((Punidat[i].flags & 0x400) && !(Punidat[i].flags & 0x804000) && !(Punidat[i].flags & 0x80)) {
             if (Punidat[i].mode != 16 && Punidat[i].mode != 15) {
@@ -6722,7 +6723,7 @@ USER_FUNC(puni_disp_info_sub) {
     }
     packed = (count << 16) | total;
     if (Punigp->showPuniCounter && total >= 10) {
-        dispEntry((CameraId)8, 1000.0f, 0, (void (*)(CameraId, void*))puniCountDisp, (void*)packed);
+        dispEntry((CameraId)8, 1000.0f, 0, puniCountDisp, (void*)packed);
     }
     return EVT_RETURN_DONE;
 }

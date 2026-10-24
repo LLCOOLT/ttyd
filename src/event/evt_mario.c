@@ -58,13 +58,13 @@ void marioRollForceCancel(void);
 
 #define HITOBJ(n, field)                                   \
     USER_FUNC(evt_mario_get_name_hitobj_##n) {             \
-        s32 id = event->args[0];                           \
+        EvtWord id = event->args[0];                       \
         const char* name = NULL;                           \
         MarioWork* mp = marioGetPtr();                     \
         if (mp->field) {                                   \
             name = hitGetName(mp->field);                  \
         }                                                  \
-        evtSetValue(event, id, (s32)name);                 \
+        evtSetValue(event, id, (EvtWord)name);             \
         return EVT_RETURN_DONE;                            \
     }
 
@@ -652,8 +652,8 @@ USER_FUNC(evt_mario_set_dispdir) {
 USER_FUNC(evt_mario_set_dir_npc) {
     EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
-    s32 name = evtGetValue(event, args[0]);
-    NpcEntry* npc = evtNpcNameToPtr(event, (const char*)name);
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    NpcEntry* npc = evtNpcNameToPtr(event, name);
     f32 camAngle;
     f32 angle;
     if (!npc) {
@@ -914,7 +914,7 @@ USER_FUNC(evt_mario_cancel_roll_motion) {
 
 USER_FUNC(evt_mario_get_pose) {
     EvtWord* args = event->args;
-    evtSetValue(event, args[0], (s32)marioGetPtr()->animName);
+    evtSetValue(event, args[0], (EvtWord)marioGetPtr()->animName);
     return EVT_RETURN_DONE;
 }
 
@@ -1704,10 +1704,11 @@ USER_FUNC(evt_mario_wait_movable) {
 }
 
 USER_FUNC(evt_mario_get_state) {
-    s32 id = (s32)event->args;
+    EvtWord id;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     s32 v;
-    id = *(s32*)id;
+    id = *args;
     if (marioChkSlitThrouhEnd()) {
         evtSetValue(event, id, 2);
         return EVT_RETURN_DONE;

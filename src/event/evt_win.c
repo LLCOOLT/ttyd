@@ -211,7 +211,7 @@ USER_FUNC(evt_unitwin_alloc) {
 	iconFlagOn("yubicursor_2", 4);
 	if (!(wp->flags & 0x80)) {
 		wp->evt = evtEntry(main_evt, 0, 0);
-		wp->evt->lwData[0] = (s32)wp;
+		wp->evt->lwData[0] = (EvtWord)wp;
 	}
 	mario_status_point_table[0] = &pouchGetPtr()->baseMaxHP;
 	mario_status_point_table[1] = &pouchGetPtr()->baseMaxFP;
@@ -273,7 +273,7 @@ USER_FUNC(evt_unitwin_selltable_setup) {
 		}
 	}
 	wp->evt = evtEntryType(select_evt, 0, 0x20, 0);
-	wp->evt->lwData[0] = (s32)wp;
+	wp->evt->lwData[0] = (EvtWord)wp;
 	for (i = 0; i < 3; i++) {
 		wp->winId[i] = winMgrEntry(&unitwin_desc[i]);
 	}
@@ -386,7 +386,7 @@ USER_FUNC(evt_unitwin_select_func) {
 			if (btn & 0x100) {
 				marioKeyOff();
 				wp->childEvt = evtEntry(wp->entries[wp->goodsIdx].evt, 0, 0);
-				wp->childEvt->lwData[0] = (s32)wp;
+				wp->childEvt->lwData[0] = (EvtWord)wp;
 				wp->flags |= 2;
 				winMgrClose(wp->winId[0]);
 				winMgrClose(wp->winId[1]);
@@ -1430,7 +1430,7 @@ USER_FUNC(set_new_goods_list) {
 }
 
 USER_FUNC(unitwin_get_work_ptr) {
-	evtSetValue(event, event->args[0], (s32)_wp);
+	evtSetValue(event, event->args[0], (EvtWord)_wp);
 	return EVT_RETURN_DONE;
 }
 

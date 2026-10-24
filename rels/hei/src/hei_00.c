@@ -253,7 +253,7 @@ USER_FUNC(make_gonbaba_projection_evt) {
     GonbabaProj* wp;
 
     if (isFirstCall) {
-        event->userdata[0] = (s32)_mapAlloc(sizeof(GonbabaProj));
+        event->userdata[0] = (EvtWord)_mapAlloc(sizeof(GonbabaProj));
     }
     wp = (GonbabaProj*)event->userdata[0];
     wp->tex = smartAlloc(GXGetTexBufferSize(608, 480, GX_TF_RGBA8, GX_FALSE, 0), 3);
@@ -662,7 +662,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"hei_13", // nextMapName
+        "hei_13", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -677,7 +677,7 @@ static BeroEntry bero_entry_data[] = {
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, 0, NULL, // enterEvent..exitEvent
-        (s32)"gon_00", // nextMapName
+        "gon_00", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -726,7 +726,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)first_evt_dokan, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"tik_02", // nextMapName
+        "tik_02", // nextMapName
         "dokan", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -747,7 +747,7 @@ static BeroEntry e3_bero[] = {
         NULL, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"hei_00", // nextMapName
+        "hei_00", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -1173,9 +1173,9 @@ EVT_BEGIN(ki_data_evt_02)
 EVT_END()
 
 static TreeAccess ki_data[] = {
-    {0, "a_ki_1", "miki_1", "ha_temae_1", (s32)"ha_usiro_1", ki_data_evt_01},
-    {0, "a_ki_2", "miki_2", "ha_temae_2", (s32)"ha_usiro_2", ki_data_evt_02},
-    {0, "a_ki_3", "miki_3", "ha_temae_3", (s32)"ha_usiro_3", NULL},
+    {0, "a_ki_1", "miki_1", "ha_temae_1", "ha_usiro_1", ki_data_evt_01},
+    {0, "a_ki_2", "miki_2", "ha_temae_2", "ha_usiro_2", ki_data_evt_02},
+    {0, "a_ki_3", "miki_3", "ha_temae_3", "ha_usiro_3", NULL},
     {7, NULL, NULL, NULL, 0, NULL},
 };
 

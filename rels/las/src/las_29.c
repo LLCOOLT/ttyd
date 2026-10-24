@@ -303,12 +303,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"las_30", // nextMapName
+        "las_30", // nextMapName
         "e_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w_door_close, // enterAnimeArg
-        (s32)w_door_open, // exitAnimeArg
+        w_door_close, // enterAnimeArg
+        w_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -892,7 +892,7 @@ USER_FUNC(make_koe_label) {
         evtSetValue(event, args[0], 1);
     }
     sprintf(name, "stg8_las_148_74_%02d", n + 1);
-    evtSetValue(event, args[1], (s32)name);
+    evtSetValue(event, args[1], (EvtWord)name);
     return EVT_RETURN_DONE;
 }
 
@@ -954,7 +954,7 @@ USER_FUNC(make_mist_name) {
     EvtWord* args = event->args;
 
     sprintf(name, "mist%d", evtGetValue(event, args[0]));
-    evtSetValue(event, args[1], (s32)name);
+    evtSetValue(event, args[1], (EvtWord)name);
     return EVT_RETURN_DONE;
 }
 

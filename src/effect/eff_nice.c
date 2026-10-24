@@ -367,7 +367,7 @@ void acrobatMain(EffectEntry* effect) {
 	pos = tmp;
 	for (i = 1, wp++; i < effect->count; i++, wp++) {
 		// FAKE: integer cast makes the literal a CSE/loop-invariant @ temp (numbers below the SR temps)
-		char* sfx2 = (char*)(u32)"SFX_SYSTEM_ACROBAT1";
+		const char* sfx2 = SFX_NAME_WORD("SFX_SYSTEM_ACROBAT1");
 		switch (wp->state) {
 		case 0:
 			wp->timer = i * 4;

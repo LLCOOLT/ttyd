@@ -39,7 +39,7 @@ USER_FUNC(evt_iwamove_ent) {
     wk->script = (EvtWord*)event->args[0];
     wk->state = 0;
     wk->event = evtEntry(evt_iwamove_main_evt, 0, 0);
-    wk->event->lwData[0] = (s32)&iwamove;
+    wk->event->lwData[0] = (EvtWord)&iwamove;
     return EVT_RETURN_DONE;
 }
 

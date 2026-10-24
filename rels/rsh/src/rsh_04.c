@@ -208,12 +208,12 @@ static BeroEntry bero_data_a[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_05_a", // nextMapName
+        "rsh_05_a", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"w_door_close", // enterAnimeArg
-        (s32)"w_door_open", // exitAnimeArg
+        "w_door_close", // enterAnimeArg
+        "w_door_open", // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -226,12 +226,12 @@ static BeroEntry bero_data_a[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_03_a", // nextMapName
+        "rsh_03_a", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"e_door_close", // enterAnimeArg
-        (s32)"e_door_open", // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {0},
 };
@@ -248,12 +248,12 @@ static BeroEntry bero_data_b[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_05_a", // nextMapName
+        "rsh_05_a", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"w_door_close", // enterAnimeArg
-        (s32)"w_door_open", // exitAnimeArg
+        "w_door_close", // enterAnimeArg
+        "w_door_open", // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -266,12 +266,12 @@ static BeroEntry bero_data_b[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_03_b", // nextMapName
+        "rsh_03_b", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"e_door_close", // enterAnimeArg
-        (s32)"e_door_open", // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {0},
 };
@@ -288,12 +288,12 @@ static BeroEntry bero_data_c[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_05_a", // nextMapName
+        "rsh_05_a", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"w_door_close", // enterAnimeArg
-        (s32)"w_door_open", // exitAnimeArg
+        "w_door_close", // enterAnimeArg
+        "w_door_open", // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -306,12 +306,12 @@ static BeroEntry bero_data_c[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_03_c", // nextMapName
+        "rsh_03_c", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"e_door_close", // enterAnimeArg
-        (s32)"e_door_open", // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {0},
 };
@@ -1749,12 +1749,12 @@ static BeroEntry bero_data_a_return[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_07_a", // nextMapName
+        "rsh_07_a", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"w_door_close", // enterAnimeArg
-        (s32)"w_door_open", // exitAnimeArg
+        "w_door_close", // enterAnimeArg
+        "w_door_open", // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -1767,12 +1767,12 @@ static BeroEntry bero_data_a_return[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_03_a", // nextMapName
+        "rsh_03_a", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"e_door_close", // enterAnimeArg
-        (s32)"e_door_open", // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {0},
 };
@@ -1789,12 +1789,12 @@ static BeroEntry bero_data_b_return[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_07_b", // nextMapName
+        "rsh_07_b", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"w_door_close", // enterAnimeArg
-        (s32)"w_door_open", // exitAnimeArg
+        "w_door_close", // enterAnimeArg
+        "w_door_open", // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -1807,12 +1807,12 @@ static BeroEntry bero_data_b_return[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_03_b", // nextMapName
+        "rsh_03_b", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"e_door_close", // enterAnimeArg
-        (s32)"e_door_open", // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {0},
 };
@@ -1829,12 +1829,12 @@ static BeroEntry bero_data_c_return[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_07_c", // nextMapName
+        "rsh_07_c", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"w_door_close", // enterAnimeArg
-        (s32)"w_door_open", // exitAnimeArg
+        "w_door_close", // enterAnimeArg
+        "w_door_open", // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -1847,12 +1847,12 @@ static BeroEntry bero_data_c_return[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_03_c", // nextMapName
+        "rsh_03_c", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"e_door_close", // enterAnimeArg
-        (s32)"e_door_open", // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {0},
 };

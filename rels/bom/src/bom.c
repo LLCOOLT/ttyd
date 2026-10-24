@@ -113,10 +113,10 @@ USER_FUNC(bress) {
         event->userdata[0] = 30;
         event->userdata[1] = 30;
         event->userdata[2] = 30;
-        event->userdata3 = (u32)(timers = _mapAlloc(npcWork->total * sizeof(s32)));
+        event->userWork[3] = (EvtWord)(timers = _mapAlloc(npcWork->total * sizeof(s32)));
         memset(timers, 0, npcWork->total * sizeof(s32));
     }
-    timers = (s32*)event->userdata3;
+    timers = (s32*)event->userWork[3];
     if (event->userdata[0] != 0) {
         event->userdata[0]--;
     }

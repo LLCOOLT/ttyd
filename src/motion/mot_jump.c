@@ -346,7 +346,7 @@ static inline void jumpSfx(MarioWork* mario) {
 	} else {
 		id = 0xA1;
 	}
-	psndSFXOn_3D((char*)id, &mario->position);
+	psndSFXOn_3D(SFX_NAME_WORD(id), &mario->position);
 }
 
 #ifdef VERSION_G8ME01

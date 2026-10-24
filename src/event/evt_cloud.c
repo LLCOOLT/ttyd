@@ -71,10 +71,10 @@ static USER_FUNC(evt_cloud_main) {
     if (party == NULL) {
         return EVT_RETURN_BLOCK;
     }
-    hit0 = (HitEntry*)cloudGetHitBreathout(0);
-    hit1 = (HitEntry*)cloudGetHitBreathout(1);
-    hit2 = (HitEntry*)cloudGetHitBreathout(2);
-    hit3 = (HitEntry*)cloudGetHitBreathout(3);
+    hit0 = cloudGetHitBreathout(0);
+    hit1 = cloudGetHitBreathout(1);
+    hit2 = cloudGetHitBreathout(2);
+    hit3 = cloudGetHitBreathout(3);
     switch (wp->state) {
         case 0:
             if ((s32)cloud_once_flag == 1) {
@@ -115,7 +115,7 @@ static USER_FUNC(evt_cloud_main) {
             u16 uw, uh;
             Vec pos;
             EventEntry evt;
-            s32 args[10];
+            EvtWord args[10];
 
             if (wp->w != 0 && wp->h != 0) {
                 mapObjGetPos(wp->groupName, &pos);
@@ -153,9 +153,9 @@ static USER_FUNC(evt_cloud_main) {
             img->poseId = animPaperPoseGetId(wp->animName, group);
             img->animTime = animTimeGetTime(group);
             evt.args = args;
-            args[0] = (s32)wp->imgName;
+            args[0] = (EvtWord)wp->imgName;
             args[1] = 0;
-            args[2] = (s32)wp->offscreenName;
+            args[2] = (EvtWord)wp->offscreenName;
             args[3] = 1;
             args[4] = x;
             args[5] = y;
@@ -170,7 +170,7 @@ static USER_FUNC(evt_cloud_main) {
         case 3:
             img = imgNameToPtr(wp->imgName, group);
             img->flags &= ~2;
-            img->animName = (s32)"A_1";
+            img->animName = "A_1";
             img->animTime = animTimeGetTime(group);
             mapGrpFlagOn(wp->groupName, 1);
             wp->timer = 30;
@@ -213,7 +213,7 @@ static USER_FUNC(evt_cloud_main) {
                 evtEntry(wp->endEvt, 0, 0);
             }
             img = imgNameToPtr(wp->imgName, group);
-            img->animName = (s32)"A_2";
+            img->animName = "A_2";
             img->animTime = animTimeGetTime(group);
             hitObjFlagOn(wp->hitName, 1);
             wp->timer = 60;
@@ -303,7 +303,7 @@ USER_FUNC(evt_cloud_ent) {
     wp->w = 0;
     wp->h = 0;
     wp->evt = evtEntry(evt_cloud_main_evt, 0, 0);
-    wp->evt->lwData[0] = (s32)wp;
+    wp->evt->lwData[0] = (EvtWord)wp;
     cloud_p = wp;
     if (multi != 0) {
         wp->groupNames = (char**)groupName;

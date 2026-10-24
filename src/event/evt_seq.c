@@ -2,6 +2,7 @@
 #include "evt/evt_seq.h"
 #include "driver/seqdrv.h"
 #include "evt/evt_word.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(evt_seq_set_seq) {
 	EvtWord* args = event->args;

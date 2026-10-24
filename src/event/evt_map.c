@@ -456,30 +456,30 @@ USER_FUNC(evt_map_entry_airport_harbor) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
-    s32 hit = evtGetValue(event, args[2]);
-    s32 lw[16];
+    const char* hit = (const char*)evtGetValue(event, args[2]);
+    EvtWord lw[16];
     mapGetMapObj(name);
     switch (type) {
     case 0:
         if (!animGroupBaseAsync("p_hikohki", 0, NULL)) return EVT_RETURN_BLOCK;
         if ((s32)pouchCheckItem(4) == 1) {
-            lw[0] = (s32)name;
-            lw[1] = hit;
-            evtRunCaseEntry(0, 0, (const char*)hit, 0, evt_ride_airport, lw);
-            lw[0] = (s32)name;
-            lw[1] = hit;
-            evtRunCaseEntry(1, 0, (const char*)hit, 0, evt_nonride_airport, lw);
+            lw[0] = (EvtWord)name;
+            lw[1] = (EvtWord)hit;
+            evtRunCaseEntry(0, 0, hit, 0, evt_ride_airport, lw);
+            lw[0] = (EvtWord)name;
+            lw[1] = (EvtWord)hit;
+            evtRunCaseEntry(1, 0, hit, 0, evt_nonride_airport, lw);
         }
         break;
     case 1:
         if (!animGroupBaseAsync("p_hune", 0, NULL)) return EVT_RETURN_BLOCK;
         if ((s32)pouchCheckItem(5) == 1) {
-            lw[0] = (s32)name;
-            lw[1] = hit;
-            evtRunCaseEntry(0, 0, (const char*)hit, 0, evt_ride_airport, lw);
-            lw[0] = (s32)name;
-            lw[1] = hit;
-            evtRunCaseEntry(1, 0, (const char*)hit, 0, evt_nonride_airport, lw);
+            lw[0] = (EvtWord)name;
+            lw[1] = (EvtWord)hit;
+            evtRunCaseEntry(0, 0, hit, 0, evt_ride_airport, lw);
+            lw[0] = (EvtWord)name;
+            lw[1] = (EvtWord)hit;
+            evtRunCaseEntry(1, 0, hit, 0, evt_nonride_airport, lw);
         }
         break;
     }

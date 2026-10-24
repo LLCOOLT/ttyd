@@ -400,7 +400,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)patolight_sound_off, // exitEvent
-        (s32)"mri_09", // nextMapName
+        "mri_09", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -416,7 +416,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)patolight_sound_off, // exitEvent
-        (s32)"mri_06", // nextMapName
+        "mri_06", // nextMapName
         "e_bero02", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

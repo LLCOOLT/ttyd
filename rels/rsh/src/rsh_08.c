@@ -70,12 +70,12 @@ BeroEntry bero_data_a_nidome[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_01_a", // nextMapName
+        "rsh_01_a", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"e_door_close", // enterAnimeArg
-        (s32)"e_door_open", // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {0},
 };
@@ -92,12 +92,12 @@ BeroEntry bero_data_b_nidome[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_01_b", // nextMapName
+        "rsh_01_b", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"e_door_close", // enterAnimeArg
-        (s32)"e_door_open", // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {0},
 };
@@ -114,12 +114,12 @@ BeroEntry bero_data_c_nidome[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_01_c", // nextMapName
+        "rsh_01_c", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"e_door_close", // enterAnimeArg
-        (s32)"e_door_open", // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {0},
 };

@@ -1,5 +1,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr.h"
+#include "manager/evtmgr_cmd.h"
 #include "manager/fontmgr.h"
 #include "driver/dispdrv.h"
 #include "mario/mario.h"

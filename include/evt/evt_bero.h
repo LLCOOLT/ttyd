@@ -20,12 +20,12 @@ typedef struct BeroEntry {
 	EvtWord* enterEvent; //0x1C;
 	s32 caseType; //0x20, -1 = default for type
 	EvtWord* exitEvent; //0x24
-	s32 nextMapName; //0x28, const char* held as s32
+	const char* nextMapName; //0x28
 	const char* nextBeroName; //0x2C
 	u16 enterAnimeType; //0x30
 	u16 exitAnimeType; //0x32
-	s32 enterAnimeArg; //0x34
-	s32 exitAnimeArg; //0x38
+	const void* enterAnimeArg; //0x34, map animation name or script, by anime type
+	const void* exitAnimeArg; //0x38, map animation name or script, by anime type
 } BeroEntry;
 
 EVT_DEF(evt_bero_info_run);
@@ -42,7 +42,7 @@ f32 bero_get_BeroEY(void);
 f32 bero_get_BeroEZ(void);
 BeroEntry** bero_get_ptr(void);
 void bero_clear_Offset(void);
-s32 bero_id_filter(s32 id);
+s32 bero_id_filter(EvtWord id);
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_bero_get_entername);
 USER_FUNC(evt_bero_exec_onoff);
@@ -78,7 +78,7 @@ extern EvtWord bero_case_exec_none[];
 extern EvtWord bero_case_exec_pipe_sub[];
 extern EvtWord bero_case_exec_road[];
 extern EvtWord bero_case_init_check[];
-void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end);
+void bero_get_position_pipe_sub(s32 id, s32 a, EvtWord name, s32 kind, Vec* start, Vec* end);
 extern BeroEntry bero_null[];
 extern EvtWord bero_play_out_anime[];
 extern EvtWord default_entevt[];

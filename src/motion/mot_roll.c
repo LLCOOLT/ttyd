@@ -984,7 +984,7 @@ void mot_roll(void) {
             nz = nz * (f32)cos(3.1415927f * ((MarioWork*)mario)->directionView / 180.0f);
         }
     }
-    if ((void*)mario->targetNpc) {
+    if (mario->targetNpc) {
         if (!marioChkBero(mario->hitobjFront)) {
             v29 = 0.05f * -v29 + v29;
             v28 = 0.05f * -v28 + v28;

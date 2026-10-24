@@ -98,7 +98,7 @@ void movePos(float* ret_sin, float* ret_cos, f32 a3, f32 degree);
 double __fabs(double);
 void marioMakeJumpPara();
 void N_marioSetBottomlessRespawnPosOnBeroEntry();
-s32 marioChkLandon(f32, f32*);
+HitEntry* marioChkLandon(f32, f32*);
 
 #define SHIP_DIR (marioGetPtr()->motShip->flags & 1)
 
@@ -217,8 +217,7 @@ void marioReInit_ship(void) {
 	marioGetPtr()->motShip->bobAngle = b;
 	a = 4.25f;
 	marioGetPtr()->motShip->bobSpeed = a;
-	t = (s32)effFunemizuEntry(0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	marioGetPtr()->motShip->wakeEff = (EffectEntry*)t;
+	marioGetPtr()->motShip->wakeEff = effFunemizuEntry(0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	u = m->camId;
 	((EffFunemizuWork*)marioGetPtr()->motShip->wakeEff->userdata)->cam = u;
 	allPartyForceRideOn();
@@ -247,8 +246,7 @@ void mot_ship_post(void) {
 	marioOfsRotReset();
 	if (marioGetPtr()->motStruct != NULL) {
 		__memFree(HEAP_DEFAULT, marioGetPtr()->motStruct);
-		t = 0;
-		marioGetPtr()->motStruct = (void*)t;
+		marioGetPtr()->motStruct = NULL;
 	}
 }
 
@@ -309,7 +307,7 @@ static inline void shipDecideDir(MarioWork* m, Vec* pp1, Vec* pp2) {
 
 void mot_ship(void) {
 	MarioWork* m = marioGetPtr();
-	MarioWork* m2;
+	MotShipWork* newWork;
 	MotShipWork* ms;
 	s32 r29, r27;
 	f32 f30, f31;
@@ -320,11 +318,10 @@ void mot_ship(void) {
 	if (m->trigFlags & 1) {
 		m->trigFlags &= ~1;
 		m->flags &= ~0xF0000;
-		m2 = (MarioWork*)__memAlloc(0, 0x48);
-		marioGetPtr()->motStruct = m2;
+		newWork = __memAlloc(0, 0x48);
+		marioGetPtr()->motShip = newWork;
 		memset(marioGetPtr()->motStruct, 0, 0x48);
-		m2 = (MarioWork*)-1;
-		marioGetPtr()->motShip->sfxId = (s32)m2;
+		marioGetPtr()->motShip->sfxId = -1;
 		marioGetPtr()->motShip->turnAccel = 0.0f;
 		marioGetPtr()->motShip->bobAngle = 0.0f;
 		marioGetPtr()->motShip->bobSpeed = 4.25f;
@@ -520,7 +517,7 @@ void mot_ship(void) {
 	}
 	case 11: {
 		s32 ok;
-		u32 land;
+		HitEntry* land;
 		f32 ly;
 		MarioWork* mm;
 		movePos(&m->position.x, &m->position.z, m->baseSpeed, m->directionView);
@@ -534,7 +531,7 @@ void mot_ship(void) {
 		{
 			f32 d;
 			if (land && ((d = mm->position.y - ly) <= 0.0f || d + f30 <= 0.0f)) {
-				mm->hitobjStandOn = (void*)land;
+				mm->hitobjStandOn = land;
 				mm->position.y = ly;
 				mm->flags &= ~0xF0000;
 				mm->jumpDistance = __fabsf(distABf(mm->position.x, mm->position.z, mm->lastGroundPos.x, mm->lastGroundPos.z));
@@ -796,8 +793,7 @@ void mot_ship(void) {
 		N_marioReloadMapOnBottomlessOff();
 		if (marioGetPtr()->motStruct != NULL) {
 			__memFree(HEAP_DEFAULT, marioGetPtr()->motStruct);
-			r29 = 0;
-			marioGetPtr()->motStruct = (void*)r29;
+			marioGetPtr()->motStruct = NULL;
 		}
 		if (!(m->trigFlags & 4)) {
 			camGetPtr(8)->flags &= ~0x200;
@@ -806,7 +802,7 @@ void mot_ship(void) {
 	case 50:
 		m->currSubMotionId = 0x34;
 	case 52:
-		if ((u32)m->hitobjStandOn != 0) {
+		if (m->hitobjStandOn != NULL) {
 			marioGetPtr()->motShip->bobAngle = revise360(marioGetPtr()->motShip->bobAngle - marioGetPtr()->motShip->bobSpeed);
 			m->dispOfs.y = 3.0f * (f32)sin(3.1415927f * marioGetPtr()->motShip->bobAngle / 180.0f) + -13.0f;
 		}
@@ -814,14 +810,14 @@ void mot_ship(void) {
 			shipEff(m->baseSpeed);
 			break;
 		}
-		if ((u32)m->hitobjStandOn == 0) {
+		if (m->hitobjStandOn == NULL) {
 			m->wStickDir1 = 0;
 			m->wStickDir2 = 0;
 		}
 		shipMove();
 		if ((s32)m->flags & 0x20000) {
 			MarioWork* mm;
-			s32 ok; u32 land;
+			s32 ok; HitEntry* land;
 			f32 ly;
 			marioMakeJumpPara();
 			if (m->jumpVelocityY <= -7.0f) {
@@ -835,7 +831,7 @@ void mot_ship(void) {
 			{
 				f32 d;
 				if (land && ((d = mm->position.y - ly) <= 0.0f || d + f30 <= 0.0f)) {
-					mm->hitobjStandOn = (void*)land;
+					mm->hitobjStandOn = land;
 					mm->position.y = ly;
 					mm->flags &= ~0xF0000;
 					mm->jumpDistance = __fabsf(distABf(mm->position.x, mm->position.z, mm->lastGroundPos.x, mm->lastGroundPos.z));
@@ -1006,7 +1002,7 @@ void shipMove(void)
   if (!spd)
   {
     fr = shipData[0];
-    if (((u32) ((s32)m->hitobjWall)) != 0)
+    if (m->hitobjWall != NULL)
     {
       fr = shipData[1];
     }

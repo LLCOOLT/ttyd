@@ -127,7 +127,7 @@ USER_FUNC(evt_yuucounter_alloc) {
             break;
     }
     wp->event = evtEntry(main_evt, 0, 0);
-    wp->event->lwData[0] = (s32)wp;
+    wp->event->lwData[0] = (EvtWord)wp;
     if (wp->type == 1) {
         evtYuuSetWindowEvt(yuucounter_window_disp_evt);
     } else {

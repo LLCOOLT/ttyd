@@ -20,7 +20,7 @@
 #define KPA_OBJ_SANGO(x, z) 12, FLOAT(x), FLOAT(z)
 #define KPA_OBJ_FIREBAR_DODAI_0(x, z, a, b) 13, FLOAT(x), FLOAT(z), a, b
 #define KPA_OBJ_FIREBAR_DODAI_1(x, z, a, b) 14, FLOAT(x), FLOAT(z), a, b
-#define KPA_OBJ_POLE(x, z, clear_evt) 15, FLOAT(x), FLOAT(z), (s32)(clear_evt)
+#define KPA_OBJ_POLE(x, z, clear_evt) 15, FLOAT(x), FLOAT(z), (EvtWord)(clear_evt)
 #define KPA_OBJ_JUMPSTAND_RED(x, z, a) 16, FLOAT(x), FLOAT(z), a
 #define KPA_OBJ_JUMPSTAND_BLUE(x, z, a) 17, FLOAT(x), FLOAT(z), a
 

@@ -44,7 +44,7 @@ USER_FUNC(evt_img_set_paper) {
 USER_FUNC(evt_img_set_paper_anim) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
-    s32 anim = evtGetValue(event, args[1]);
+    const char* anim = (const char*)evtGetValue(event, args[1]);
     s32 group = gp->inBattle != 0;
     ImageEntry* img = imgNameToPtr(name, group);
     img->animName = anim;

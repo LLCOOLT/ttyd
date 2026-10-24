@@ -133,6 +133,6 @@ USER_FUNC(evt_pouch_set_yoshiname) {
 }
 USER_FUNC(evt_pouch_get_yoshiname) {
 	EvtWord* args = event->args;
-	evtSetValue(event, args[0], (s32)pouchGetYoshiName());
+	evtSetValue(event, args[0], (EvtWord)pouchGetYoshiName());
 	return EVT_RETURN_DONE;
 }

@@ -150,8 +150,8 @@ void imgDisp(CameraId camId, void* param) {
 	animSetPaperTexMtx(mp[0], mp[1], mp[2]);
 	animSetPaperTexObj(texs[0], texs[1], texs[2], datas[0], datas[1], datas[2],
 	                   entry->shadows[0].offscreenId != -1 ? 1 : 0, entry->shadows[1].offscreenId != -1 ? 1 : 0);
-	if ((u32)entry->animName != 0) {
-		animPoseSetAnim(entry->poseId, (const char*)entry->animName, FALSE);
+	if (entry->animName != NULL) {
+		animPoseSetAnim(entry->poseId, entry->animName, FALSE);
 	}
 	animPoseSetStartTime(entry->poseId, entry->animTime);
 	animPoseMain(entry->poseId);
@@ -413,7 +413,7 @@ s32 imgEntry(const char* name, s32 type) { //1:1, needs variable names
 	entry->type = type;
 	strcpy(entry->name, name);
 	entry->poseId = -1;
-	entry->animName = 0;
+	entry->animName = NULL;
 	entry->width = 0;
 	entry->height = 0;
 	entry->offsetX = 0.0f;
@@ -607,7 +607,7 @@ void imgShadowDisp(CameraId camId, void* param) {
 	animSetPaperTexMtx((void*)mp[0], (void*)mp[1], (void*)mp[2]);
 	animSetPaperTexObj(objs[0], objs[1], objs[2], datas[0], datas[1], datas[2],
 	                   entry->shadows[0].offscreenId != -1 ? 1 : 0, entry->shadows[1].offscreenId != -1 ? 1 : 0);
-	if ((u32)entry->animName != 0) animPoseSetAnim(entry->poseId, (const char*)entry->animName, 0);
+	if (entry->animName != NULL) animPoseSetAnim(entry->poseId, entry->animName, 0);
 	animPoseSetStartTime(entry->poseId, entry->animTime);
 	animPoseMain(entry->poseId);
 	animPoseSetMaterialLightFlagOn(entry->poseId, 1);

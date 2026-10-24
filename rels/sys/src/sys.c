@@ -1,6 +1,7 @@
 #include "battle/battle_unit.h"
 #include "eff/eff_itemget.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "data/mapdata.h"
@@ -1238,7 +1239,7 @@ USER_FUNC(display) {
     g_wp = wp;
     switch (wp->state) {
         case 0:
-            if ((void*)fileAsyncf(4, NULL, "%s/e/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]) != NULL) {
+            if (fileAsyncf(4, NULL, "%s/e/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]) != 0U) {
                 wp->file = fileAllocf(4, "%s/e/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]);
                 wp->state++;
             }

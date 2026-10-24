@@ -323,7 +323,7 @@ USER_FUNC(kpa_make_mobj_name) {
 
     sprintf(name, "mobj%x", no);
     no++;
-    evtSetValue(event, args[0], (s32)name);
+    evtSetValue(event, args[0], (EvtWord)name);
     return EVT_RETURN_DONE;
 }
 
@@ -334,7 +334,7 @@ USER_FUNC(kpa_make_item_name) {
 
     sprintf(name, "item%2x", no);
     no++;
-    evtSetValue(event, args[0], (s32)name);
+    evtSetValue(event, args[0], (EvtWord)name);
     return EVT_RETURN_DONE;
 }
 
@@ -659,7 +659,7 @@ USER_FUNC(kpa_get_msg) {
         n = 30;
     }
     sprintf(label, "kpa_start_%03d", n + (stage - 1) * 30 - 1);
-    evtSetValue(event, args[0], (s32)label);
+    evtSetValue(event, args[0], (EvtWord)label);
     return EVT_RETURN_DONE;
 }
 

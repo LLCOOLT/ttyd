@@ -137,7 +137,7 @@ USER_FUNC(evt_npc_slave_entry) {
     slave->deadEvent = deadEvent;
     slave->battleInfo = npc->battleInfo;
     npcSetSlave(npc, slave, id);
-    evtSetValue(event, index, (s32)&slave->description);
+    evtSetValue(event, index, (EvtWord)&slave->description);
     return EVT_RETURN_DONE;
 }
 
@@ -2194,7 +2194,7 @@ USER_FUNC(evt_npc_get_unitwork) {
     const char* npcName = (const char*)evtGetValue(event, *args++);
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     s32 index = evtGetValue(event, *args++);
-    evtSetValue(event, *args++, (s32)npc->unitWork[index]);
+    evtSetValue(event, *args++, (EvtWord)npc->unitWork[index]);
     return EVT_RETURN_DONE;
 }
 

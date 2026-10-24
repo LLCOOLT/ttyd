@@ -1371,7 +1371,7 @@ static USER_FUNC(party_cannot_use_command) {
             break;
     }
 #endif
-    event->lwData[0] = (s32)cmd_disable_string[r + 3];
+    event->lwData[0] = (EvtWord)cmd_disable_string[r + 3];
     evtSetValue(event, var, weapon);
     return EVT_RETURN_DONE;
 }
@@ -1408,7 +1408,7 @@ static USER_FUNC(mario_cannot_use_command) {
 #endif
             break;
     }
-    event->lwData[0] = (s32)cmd_disable_string[r];
+    event->lwData[0] = (EvtWord)cmd_disable_string[r];
     evtSetValue(event, var, weapon);
     return EVT_RETURN_DONE;
 }

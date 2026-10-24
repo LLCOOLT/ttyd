@@ -3,6 +3,7 @@
 #include <string.h>
 #include "libc_decls.h"
 #include "evt/evt_word.h"
+#include "manager/evtmgr_cmd.h"
 
 //.data
 InformantWork _jdt = {0};
@@ -121,8 +122,8 @@ USER_FUNC(johoya_keti_newjoho_makelabel) {
                 sprintf((char*)wp->infoEnd, "%s_%04d", wp->prefix, wp->info[i].storyId);
                 sprintf(tmp, "jketi_title_%04d\0\0\0", wp->info[i].storyId);
                 msg = msgSearch(tmp);
-                evtSetValue(event, args[1], (s32)wp->infoEnd);
-                evtSetValue(event, args[2], (s32)msg);
+                evtSetValue(event, args[1], (EvtWord)wp->infoEnd);
+                evtSetValue(event, args[2], (EvtWord)msg);
                 evtSetValue(event, args[3], strlen(msg));
                 evtSetValue(event, args[4], wp->info[i].cost);
                 wp->curIndex = i;
@@ -132,8 +133,8 @@ USER_FUNC(johoya_keti_newjoho_makelabel) {
         }
     }
     *(char*)wp->infoEnd = 0;
-    evtSetValue(event, args[1], (s32)wp->infoEnd);
-    evtSetValue(event, args[2], (s32)wp->infoEnd);
+    evtSetValue(event, args[1], (EvtWord)wp->infoEnd);
+    evtSetValue(event, args[2], (EvtWord)wp->infoEnd);
     evtSetValue(event, args[3], 0);
     evtSetValue(event, args[4], 0);
     return 2;
@@ -174,8 +175,8 @@ USER_FUNC(johoya_keti_oldspeak_makelabel) {
         if (johoya_get(table, wp->info[i].storyId) != 0 && (wp->info[i].flags & 1) == 0) {
             if (target == n) {
                 sprintf((char*)wp->infoEnd, "%s_%04d", wp->prefix, wp->info[i].storyId);
-                evtSetValue(event, args[1], (s32)wp->infoEnd);
-                evtSetValue(event, args[2], (s32)wp->info[i].initEndPos);
+                evtSetValue(event, args[1], (EvtWord)wp->infoEnd);
+                evtSetValue(event, args[2], (EvtWord)wp->info[i].initEndPos);
                 evtSetValue(event, args[3], wp->info[i].tagEndPos);
                 evtSetValue(event, args[4], 0);
                 wp->curIndex = i;
@@ -185,8 +186,8 @@ USER_FUNC(johoya_keti_oldspeak_makelabel) {
         }
     }
     *(char*)wp->infoEnd = 0;
-    evtSetValue(event, args[1], (s32)wp->infoEnd);
-    evtSetValue(event, args[2], (s32)wp->infoEnd);
+    evtSetValue(event, args[1], (EvtWord)wp->infoEnd);
+    evtSetValue(event, args[2], (EvtWord)wp->infoEnd);
     evtSetValue(event, args[3], 0);
     evtSetValue(event, args[4], 0);
     return 2;
@@ -217,7 +218,7 @@ s32 johoya_data_make(const char* prefix, s32 type) {
     s32 tagNum;
     BOOL tagdone;
     s32 infoId;
-    s32 initEndPos;
+    const s8* initEndPos;
     s16 tagEndPos;
     const s8* msg;
     const s8* tagdata;
@@ -266,7 +267,7 @@ s32 johoya_data_make(const char* prefix, s32 type) {
                         tagdata++;
                         if (tagNum == 0) {
                             tag[mbbpos] = '\0'; //terminate string
-                            initEndPos = (s32)tagdata;
+                            initEndPos = tagdata;
                         }
                         else {
                             tagEndPos = (s16)mbbpos;

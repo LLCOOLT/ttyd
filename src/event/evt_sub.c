@@ -63,8 +63,8 @@ s32 stop;
 typedef struct SplineWork {
 	s32 n;         // 0x0
 	f32* ts;       // 0x4
-	void* pts;     // 0x8
-	void* tbl;     // 0xC
+	Vec* pts;      // 0x8
+	Vec* tbl;      // 0xC
 	s32 cur;       // 0x10
 	s32 steps;     // 0x14
 	s32 mode;      // 0x18
@@ -73,8 +73,8 @@ typedef struct SplineWork {
 	s32 manual;    // 0x28
 } SplineWork;
 
-void spline_getvalue(f32* out, f32 t, s32 n, void* pts, f32* ts, void* tbl);
-void spline_maketable(s32 n, void* pts, f32* ts, void* tbl);
+void spline_getvalue(f32* out, f32 t, s32 n, Vec* pts, f32* ts, Vec* tbl);
+void spline_maketable(s32 n, Vec* pts, f32* ts, Vec* tbl);
 #define INTPL_F(mode, cur, steps, a, b) ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(mode, a, b, cur, steps)
 
 #define EVT_FLOAT_OF(x) ((s32)(1024.0f * (x)) - 230000000)
@@ -1885,15 +1885,15 @@ USER_FUNC(evt_sub_spline_init) {
 	EvtWord* args = event->args;
 	s32 manual = evtGetValue(event, args[0]);
 	s32 mode = evtGetValue(event, args[1]);
-	s32 pts = evtGetValue(event, args[2]);
+	Vec* pts = (Vec*)evtGetValue(event, args[2]);
 	s32 n = evtGetValue(event, args[3]);
 	s32 steps = evtGetValue(event, args[4]);
 	s32 msec = evtGetValue(event, args[5]);
 	SplineWork* w = _mapAlloc(sizeof(SplineWork));
-	event->lwData[15] = (s32)w;
+	event->lwData[15] = (EvtWord)w;
 	w->n = n;
 	w->ts = _mapAlloc(n * 4);
-	w->pts = (void*)pts;
+	w->pts = pts;
 	w->tbl = _mapAlloc(n * 12);
 	spline_maketable(n, w->pts, w->ts, w->tbl);
 	w->manual = manual;
@@ -2092,12 +2092,12 @@ KEYFN(evt_key_get_button, keyGetButton)
 KEYFN(evt_key_get_buttontrg, keyGetButtonTrg)
 
 USER_FUNC(evt_sub_get_mapname) {
-	evtSetValue(event, event->args[0], (s32)gp->currentMapName);
+	evtSetValue(event, event->args[0], (EvtWord)gp->currentMapName);
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_sub_get_areaname) {
-	evtSetValue(event, event->args[0], (s32)gp->currentAreaName);
+	evtSetValue(event, event->args[0], (EvtWord)gp->currentAreaName);
 	return EVT_RETURN_DONE;
 }
 
@@ -2170,8 +2170,8 @@ USER_FUNC(evt_sub_get_language) {
 }
 
 USER_FUNC(evt_sub_animgroup_async) {
-	s32 group = evtGetValue(event, event->args[0]);
-	s32 r = animGroupBaseAsync((const char*)group, gp->inBattle != 0, NULL);
+	const char* group = (const char*)evtGetValue(event, event->args[0]);
+	s32 r = animGroupBaseAsync(group, gp->inBattle != 0, NULL);
 	if (r == 0) {
 		return EVT_RETURN_BLOCK;
 	}
@@ -2348,9 +2348,9 @@ USER_FUNC(evt_sub_get_coin) {
 
 USER_FUNC(stone_ry) {
 	EvtWord* args = event->args;
-	s32 name = evtGetValue(event, args[0]);
+	char* name = (char*)evtGetValue(event, args[0]);
 	s32 ang = evtGetValue(event, args[1]);
-	EffectEntry* item = itemNameToPtr((char*)name)->effect;
+	EffectEntry* item = itemNameToPtr(name)->effect;
 	((EffStarStoneWork*)item->userdata)->flags &= ~4;
 	((EffStarStoneWork*)item->userdata)->rotY = ang % 360;
 	return EVT_RETURN_DONE;

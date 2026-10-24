@@ -687,7 +687,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)gor_02_event_00, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gor_01", // nextMapName
+        "gor_01", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -704,7 +704,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)gor_02_event_01, // exitEvent
-        (s32)"tik_01", // nextMapName
+        "tik_01", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -4011,7 +4011,7 @@ USER_FUNC(iri_13_update_item_tbl) {
         }
         iri_13_item_tbl[i] = -1;
     }
-    evtSetValue(event, args[0], (s32)iri_13_item_tbl);
+    evtSetValue(event, args[0], (EvtWord)iri_13_item_tbl);
     evtSetValue(event, args[1], count);
     return EVT_RETURN_DONE;
 }
@@ -4133,7 +4133,7 @@ USER_FUNC(monosiri_on) {
     TattleEntry* tattle = battleGetUnitMonosiriPtr(id);
 
     swSet(id + 0x117A);
-    evtSetValue(event, args[1], (s32)msgSearch(tattle->enemyTag));
+    evtSetValue(event, args[1], (EvtWord)msgSearch(tattle->enemyTag));
     return EVT_RETURN_DONE;
 }
 

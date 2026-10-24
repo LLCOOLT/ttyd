@@ -16,7 +16,7 @@ BOOL arcDataCheck(void* addr) {
 	int i;
 
 	for (i = 0; i < 4; i++) {
-		if ((u32)work[i].data <= (u32)addr && (u32)work[i].data + work[i].size >= (u32)addr) {
+		if ((u8*)work[i].data <= (u8*)addr && (u8*)work[i].data + work[i].size >= (u8*)addr) {
 			return TRUE;
 		}
 	}

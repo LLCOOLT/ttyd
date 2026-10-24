@@ -846,12 +846,12 @@ static BeroEntry bero_data[] = {
         (s32*)w_open, // enterEvent
         -1, // caseType
         (s32*)w_close, // exitEvent
-        (s32)("tou_04"), // nextMapName
+        "tou_04", // nextMapName
         ("n_bero_2"), // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w_door_close, // enterAnimeArg
-        (s32)w_door_open, // exitAnimeArg
+        w_door_close, // enterAnimeArg
+        w_door_open, // exitAnimeArg
     },
     {
         ("e_bero"), // hitName
@@ -864,12 +864,12 @@ static BeroEntry bero_data[] = {
         (s32*)e_open, // enterEvent
         -1, // caseType
         (s32*)e_close, // exitEvent
-        (s32)("tou_04"), // nextMapName
+        "tou_04", // nextMapName
         ("n_bero_1"), // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e_door_close, // enterAnimeArg
-        (s32)e_door_open, // exitAnimeArg
+        e_door_close, // enterAnimeArg
+        e_door_open, // exitAnimeArg
     },
     {
         ("s_bero_1"), // hitName
@@ -882,12 +882,12 @@ static BeroEntry bero_data[] = {
         (s32*)s1_open, // enterEvent
         -1, // caseType
         (s32*)s1_close, // exitEvent
-        (s32)("tou_02"), // nextMapName
+        "tou_02", // nextMapName
         ("n_bero_1"), // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)s1_door_close, // enterAnimeArg
-        (s32)s1_door_open, // exitAnimeArg
+        s1_door_close, // enterAnimeArg
+        s1_door_open, // exitAnimeArg
     },
     {
         ("s_bero_2"), // hitName
@@ -900,12 +900,12 @@ static BeroEntry bero_data[] = {
         (s32*)s2_open, // enterEvent
         -1, // caseType
         (s32*)s2_close, // exitEvent
-        (s32)("tou_02"), // nextMapName
+        "tou_02", // nextMapName
         ("n_bero_2"), // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)s2_door_close, // enterAnimeArg
-        (s32)s2_door_open, // exitAnimeArg
+        s2_door_close, // enterAnimeArg
+        s2_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -4157,7 +4157,7 @@ s32 confupose(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, args[0]));
 
-    evtSetValue(event, args[1], (s32)npc->tribe->confuseAnimation);
+    evtSetValue(event, args[1], (EvtWord)npc->tribe->confuseAnimation);
     return EVT_RETURN_DONE;
 }
 

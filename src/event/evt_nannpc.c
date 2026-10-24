@@ -63,7 +63,7 @@ static inline NanNPC* nanNPCSearch(char* name) {
     NanNPCWork* w = nanNPCWork;
     for (i = 0; i < w->num; i++) {
         p = &w->npc[i];
-        if (!((u32)name & 0x80000000)) {
+        if (!((EvtWord)name & 0x80000000)) {
             sprintf(makestring, "%06x", name);
             name = makestring;
         }
@@ -429,7 +429,7 @@ s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall)
   ExtdrvPose *pose;
   char *str;
   s32 off;
-  s32 name;
+  EvtWord name;
   s32 i;
   EvtWord *args;
   NanNPCWork *w;
@@ -441,7 +441,7 @@ s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall)
   {
     p = (NanNPC *) (((u8 *) w->npc) - (-off));
     str = (char *) name;
-    if (!(((u32) str) & 0x80000000))
+    if (!(((EvtWord) str) & 0x80000000))
     {
  do { } while (0);
       sprintf(makestring, "%06x", name);
@@ -647,7 +647,7 @@ USER_FUNC(evt_nannpc_jump_position) {
 
 USER_FUNC(evt_nannpc_flag_onoff) {
     EvtWord* args = event->args;
-    s32 name = evtGetValue(event, args[0]);
+    EvtWord name = evtGetValue(event, args[0]);
     s32 onoff = evtGetValue(event, args[1]);
     NanNPC* npc = nanNPCSearch((char*)name);
     u16 flag = evtGetValue(event, args[2]);
@@ -661,7 +661,7 @@ USER_FUNC(evt_nannpc_flag_onoff) {
 
 USER_FUNC(evt_nannpc_ppflag_onoff) {
     EvtWord* args = event->args;
-    s32 name = evtGetValue(event, args[0]);
+    EvtWord name = evtGetValue(event, args[0]);
     s32 onoff = evtGetValue(event, args[1]);
     NanNPC* npc = nanNPCSearch((char*)name);
     u16 flag = evtGetValue(event, args[2]);

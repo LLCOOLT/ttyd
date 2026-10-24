@@ -216,12 +216,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gon_03", // nextMapName
+        "gon_03", // nextMapName
         "e_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w1_door_close, // enterAnimeArg
-        (s32)w1_door_open, // exitAnimeArg
+        w1_door_close, // enterAnimeArg
+        w1_door_open, // exitAnimeArg
     },
     {
         "w_bero_2", // hitName
@@ -234,12 +234,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gon_08", // nextMapName
+        "gon_08", // nextMapName
         "e_bero_1", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w2_door_close, // enterAnimeArg
-        (s32)w2_door_open, // exitAnimeArg
+        w2_door_close, // enterAnimeArg
+        w2_door_open, // exitAnimeArg
     },
     {
         "e_bero_1", // hitName
@@ -252,12 +252,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gon_05", // nextMapName
+        "gon_05", // nextMapName
         "w_bero_1", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e1_door_close, // enterAnimeArg
-        (s32)e1_door_open, // exitAnimeArg
+        e1_door_close, // enterAnimeArg
+        e1_door_open, // exitAnimeArg
     },
     {
         "e_bero_2", // hitName
@@ -269,7 +269,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gon_05", // nextMapName
+        "gon_05", // nextMapName
         "w_bero_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -286,12 +286,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gon_05", // nextMapName
+        "gon_05", // nextMapName
         "w_bero_3", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e3_door_close, // enterAnimeArg
-        (s32)e3_door_open, // exitAnimeArg
+        e3_door_close, // enterAnimeArg
+        e3_door_open, // exitAnimeArg
     },
     {0},
 };

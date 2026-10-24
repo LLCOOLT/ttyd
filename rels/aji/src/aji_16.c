@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "mario/mario.h"
@@ -169,12 +170,12 @@ static BeroEntry bero_entry_data[] = {
         (s32*)w_bero_in_evt, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"aji_15", // nextMapName
+        "aji_15", // nextMapName
         "e_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w_door_close, // enterAnimeArg
-        (s32)w_door_open, // exitAnimeArg
+        w_door_close, // enterAnimeArg
+        w_door_open, // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -187,12 +188,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"aji_01", // nextMapName
+        "aji_01", // nextMapName
         "w_bero_5", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e_door_close, // enterAnimeArg
-        (s32)e_door_open, // exitAnimeArg
+        e_door_close, // enterAnimeArg
+        e_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -209,7 +210,7 @@ static BeroEntry bero_peach_data[] = {
         NULL, // enterEvent
         8, // caseType
         NULL, // exitEvent
-        (s32)"aji_01", // nextMapName
+        "aji_01", // nextMapName
         "w_bero_5", // nextBeroName
         0, 0, 0, 0, // enterAnimeType..exitAnimeArg
     },

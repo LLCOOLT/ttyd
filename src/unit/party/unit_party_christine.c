@@ -2374,7 +2374,7 @@ USER_FUNC(btlevtcmd_get_monosiri_msg_no) {
     evtGetValue(event, args[1]);
     index = args[2];
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    evtSetValue(event, index, (s32)battleGetUnitMonosiriPtr(unit->currentKind)->tattleBtlTag);
+    evtSetValue(event, index, (EvtWord)battleGetUnitMonosiriPtr(unit->currentKind)->tattleBtlTag);
     return EVT_RETURN_DONE;
 }
 
@@ -2431,7 +2431,7 @@ USER_FUNC(_dictionary) {
             break;
     }
     unit->work[0] = state;
-    unit->work[1] = (s32)work;
+    unit->work[1] = (EvtWord)work;
     return EVT_RETURN_DONE;
 }
 

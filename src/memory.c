@@ -90,7 +90,7 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
     u32 restSize;
     int i;
     int size;
-    u32 temp;
+    u8* temp;
 
     arenaLo = OSGetArenaLo();
     arenaHi = OSGetArenaHi();
@@ -98,24 +98,24 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
     OSSetArenaLo(arenaLo);
     arenaLo = (void*)OSRoundUp32B(arenaLo);
     arenaHi = (void*)OSRoundDown32B(arenaHi);
-    temp = (u32)arenaLo;
+    temp = arenaLo;
 
     for (i = 0; i < HEAP_COUNT; i++) {
         if (size_table[i][0] == 1) {
-            heapStart[i] = (void*)temp;
+            heapStart[i] = temp;
             size = size_table[i][1] << 10;
-            heapEnd[i] = (void*)(temp + size);
+            heapEnd[i] = temp + size;
             temp += size;
         }
     }
 
-    restSize = (u32)arenaHi - temp;
+    restSize = (u8*)arenaHi - temp;
     for (i = 0; i < HEAP_COUNT; i++) {
         if (size_table[i][0] == 0) {
             size = (size_table[i][1] * (u64)restSize) / 100Ull;
-            heapStart[i] = (void*)temp;
+            heapStart[i] = temp;
             size -= (size & 0x1F);
-            heapEnd[i] = (void*)(temp + size);
+            heapEnd[i] = temp + size;
             temp += size;
         }
     }
@@ -136,7 +136,7 @@ static inline void mapallocInit(void) {
 	MapAllocEntry* entry;
 	u32 total;
 
-	size = (u32)heapEnd[1] - (u32)heapStart[1] - sizeof(MapAllocEntry);
+	size = (u8*)heapEnd[1] - (u8*)heapStart[1] - sizeof(MapAllocEntry);
 	mapalloc_size = size;
 	entry = OSAllocFromHeap(heapHandle[HEAP_MALLOC], size);
 	if (entry) {
@@ -154,7 +154,7 @@ static inline void mapallocInit(void) {
 	MapAllocEntry* entry;
 	u32 size;
 
-	size = (u32)heapEnd[1] - (u32)heapStart[1] - sizeof(MapAllocEntry);
+	size = (u8*)heapEnd[1] - (u8*)heapStart[1] - sizeof(MapAllocEntry);
 	entry = OSAllocFromHeap(heapHandle[HEAP_MALLOC], size);
 	if (entry) {
 		memset(entry, 0, size);
@@ -244,7 +244,7 @@ void* (_mapAlloc)(MAPBASE_PARAM u32 size) {
 	if (maxSize) {
 		usableData = (void*)(currEntry + 1);
 
-		currEntry->next = (void*)((u32)currEntry + fullSize);
+		currEntry->next = (void*)((u8*)currEntry + fullSize);
 		currEntry->size = usableSize;
 		currEntry->inuse = 1;
 #ifndef VERSION_G8ME01
@@ -299,7 +299,7 @@ void* (_mapAllocTail)(MAPBASE_PARAM u32 size) {
 		memset(currEntry, 0, fullSize);
 		DCFlushRange(currEntry, fullSize);
 
-		currEntry->next = (MapAllocEntry*)(((u32)currEntry + maxSize) - fullSize);
+		currEntry->next = (MapAllocEntry*)(((u8*)currEntry + maxSize) - fullSize);
 		currEntry->size = maxSize - fullSize;
 		currEntry->inuse = 0;
 #ifndef VERSION_G8ME01
@@ -351,7 +351,7 @@ void (_mapFree)(MAPBASE_PARAM void* alloc) {
 			}
 			break;
 		}
-		if ((u32)loopEntry > (u32)entry || !loopEntry->next) break;
+		if (loopEntry > entry || !loopEntry->next) break;
 		loopEntry = loopEntry->next;
 	}
 	entry->next = nextEntry;
@@ -368,7 +368,7 @@ void smartInit(void) {
 	void* ptr;
 	int i;
 
-	size = (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32;
+	size = (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32;
 	ptr = OSAllocFromHeap(heapHandle[SMART_HEAP], size);
 	if (ptr) {
 		memset(ptr, 0, size);
@@ -377,8 +377,8 @@ void smartInit(void) {
 	wp->ptr = ptr;
 	wp->allocHead = 0;
 	wp->allocTail = 0;
-	wp->bytesLeft = (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32;
-	memset(wp->ptr, 0, (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32);
+	wp->bytesLeft = (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32;
+	memset(wp->ptr, 0, (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32);
 	memset(wp->work, 0, sizeof(wp->work));
 	e = wp->work;
 	for (i = 0; i < 0x800; i++, e++) {
@@ -399,8 +399,8 @@ void L_smartReInit(void) {
 
 	wp->allocHead = 0;
 	wp->allocTail = 0;
-	wp->bytesLeft = (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32;
-	memset(wp->ptr, 0, (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32);
+	wp->bytesLeft = (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32;
+	memset(wp->ptr, 0, (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32);
 	memset(wp->work, 0, sizeof(wp->work));
 	e = wp->work;
 	for (i = 0; i < 0x800; i++, e++) {
@@ -543,7 +543,7 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 		}
 		wp->allocHead = entry2;
 		if (!entry2->next) {
-			entry2->spaceAfter = ((u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32) + (u32)wp->ptr - (u32)entry2->address - entry2->size;
+			entry2->spaceAfter = ((u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32) + (u8*)wp->ptr - (u8*)entry2->address - entry2->size;
 			wp->allocTail = entry2;
 		}
 		return entry2;
@@ -551,7 +551,7 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 	else {
 		for (entry1 = wp->allocHead; entry1; entry1 = entry1->next) {
 			if (entry1->spaceAfter >= sz) {
-				entry2->address = (void*)((u32)entry1->address + entry1->size);
+				entry2->address = (u8*)entry1->address + entry1->size;
 				entry2->spaceAfter = entry1->spaceAfter - sz;
 				entry2->next = entry1->next;
 				entry2->prev = entry1;
@@ -580,7 +580,7 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 			smartGarbage();
 			entry1 = wp->allocTail;
 			if (entry1->spaceAfter >= sz) {
-				entry2->address = (void*)((u32)entry1->address + entry1->size);
+				entry2->address = (u8*)entry1->address + entry1->size;
 				entry2->spaceAfter = entry1->spaceAfter - sz;
 				entry2->next = entry1->next;
 				entry2->prev = entry1;
@@ -611,7 +611,7 @@ void smartGarbage(void) {
 		wp->bytesLeft = 0;
 	}
 	else {
-		wp->bytesLeft = (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32;
+		wp->bytesLeft = (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32;
 	}
 	prev = NULL;
 	ptr = wp->ptr;
@@ -642,9 +642,9 @@ void smartGarbage(void) {
 	}
 	entry = wp->allocTail;
 	if (entry) {
-		entry->spaceAfter = ((u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32) + (u32)wp->ptr - (u32)entry->address - entry->size;
+		entry->spaceAfter = ((u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32) + (u8*)wp->ptr - (u8*)entry->address - entry->size;
 	}
-	DCFlushRange(wp->ptr, (u32)heapEnd[SMART_HEAP] - (u32)heapStart[SMART_HEAP] - 32);
+	DCFlushRange(wp->ptr, (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32);
 }
 
 GXTexObj* smartTexObj(GXTexObj* obj, void** image_ptr) {

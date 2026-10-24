@@ -1,5 +1,6 @@
 #include "eff/eff_fukidashi.h"
 #include "driver/camdrv.h"
+#include "evt/evt_word.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
 #include "driver/icondrv.h"
@@ -88,6 +89,12 @@ u8 moja_model_dl_0_size_tbl[] = { 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
     GXPosition3f32(l, b, 0.0f);       \
     GXTexCoord2f32(0.0f, v);
 
+/* The speaker is an NpcEntry* or one of these script ids (signed compare) */
+#define FUKIDASHI_MARIO       -1
+#define FUKIDASHI_PARTY       -2
+#define FUKIDASHI_EXTRA_PARTY -3
+#define SPEAKER(npc)          ((EvtWord)(npc))
+
 #define SETPOS(src)                                                                \
     work->position.x = rot[0][1] * (16.0f + work->size) + ((src)->position.x + work->base.x); \
     work->position.y = rot[1][1] * (16.0f + work->size) + ((src)->position.y + work->base.y); \
@@ -101,17 +108,17 @@ void calc_pos(EffFukidashiWork* work, s32 flag) {
     camera = camGetPtr(CAMERA_3D);
     axis = (Vec){ (f32)sin(MTXDegToRad(camera->viewYaw)), 0.0f, -(f32)cos(MTXDegToRad(camera->viewYaw)) };
     PSMTXRotAxisRad(rot, &axis, MTXDegToRad(-((work->angle - 20.0f) + (f32)(flag * 20))));
-    if ((s32)work->npc == -1) {
+    if (SPEAKER(work->npc) == FUKIDASHI_MARIO) {
         MarioWork* mario = marioGetPtr();
         SETPOS(mario)
     }
-    else if ((s32)work->npc == -2) {
+    else if (SPEAKER(work->npc) == FUKIDASHI_PARTY) {
         PartyEntry* party = partyGetPtr(marioGetPartyId());
         if (party) {
             SETPOS(party)
         }
     }
-    else if ((s32)work->npc == -3) {
+    else if (SPEAKER(work->npc) == FUKIDASHI_EXTRA_PARTY) {
         PartyEntry* party = partyGetPtr(marioGetExtraPartyId());
         if (party) {
             SETPOS(party)
@@ -163,13 +170,13 @@ EffectEntry* effFukidashiEntry(s32 type, s32 number, NpcEntry* npc, f32 x, f32 y
     if (type == 6) {
         work->rot = -450.0f;
     }
-    if ((s32)work->npc == -1) {
+    if (SPEAKER(work->npc) == FUKIDASHI_MARIO) {
         MarioWork* mario = marioGetPtr();
         x += mario->position.x;
         y += mario->position.y;
         z += mario->position.z;
     }
-    else if ((s32)work->npc == -2) {
+    else if (SPEAKER(work->npc) == FUKIDASHI_PARTY) {
         PartyEntry* party = partyGetPtr(marioGetPartyId());
         if (party) {
             x += party->position.x;
@@ -177,7 +184,7 @@ EffectEntry* effFukidashiEntry(s32 type, s32 number, NpcEntry* npc, f32 x, f32 y
             z += party->position.z;
         }
     }
-    else if ((s32)work->npc == -3) {
+    else if (SPEAKER(work->npc) == FUKIDASHI_EXTRA_PARTY) {
         PartyEntry* party = partyGetPtr(marioGetExtraPartyId());
         if (party) {
             x += party->position.x;
@@ -190,7 +197,7 @@ EffectEntry* effFukidashiEntry(s32 type, s32 number, NpcEntry* npc, f32 x, f32 y
         y = work->npc->position.y;
         z = work->npc->position.z;
     }
-    if ((s32)npc == -2 || (s32)npc == -3) {
+    if (SPEAKER(npc) == FUKIDASHI_PARTY || SPEAKER(npc) == FUKIDASHI_EXTRA_PARTY) {
         switch (type) {
             case 0: {
                 Vec pos = { 0.0f, 0.0f, 0.0f };
@@ -210,7 +217,7 @@ EffectEntry* effFukidashiEntry(s32 type, s32 number, NpcEntry* npc, f32 x, f32 y
             }
         }
     }
-    else if (npc && (s32)npc != -1) {
+    else if (npc && SPEAKER(npc) != FUKIDASHI_MARIO) {
         switch (type) {
             case 0: {
                 Vec pos = { 0.0f, 0.0f, 0.0f };

@@ -277,14 +277,14 @@ USER_FUNC(evt_party_set_dir_npc) {
 	EvtWord* args = event->args;
 	PartyEntry* p = partyGetPtr(args[0]);
 	NpcEntry* npc;
-	s32 nm;
+	const char* nm;
 	f32 x, z, camYaw, a;
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
 	}
 	if (isFirstCall) {
-		nm = evtGetValue(event, args[1]);
-		npc = evtNpcNameToPtr(event, (const char*)nm);
+		nm = (const char*)evtGetValue(event, args[1]);
+		npc = evtNpcNameToPtr(event, nm);
 		if (npc == NULL) {
 			return EVT_RETURN_DONE;
 		}
@@ -664,7 +664,7 @@ USER_FUNC(evt_party_get_name_hitobj_head) {
 	if (p->hitobjHead != NULL) {
 		name = hitGetName(p->hitobjHead);
 	}
-	evtSetValue(event, dst, (s32)name);
+	evtSetValue(event, dst, (EvtWord)name);
 	return EVT_RETURN_DONE;
 }
 
@@ -682,7 +682,7 @@ USER_FUNC(evt_party_get_name_hitobj_ride) {
 	if (p->hitobjStandOn != NULL) {
 		name = hitGetName(p->hitobjStandOn);
 	}
-	evtSetValue(event, dst, (s32)name);
+	evtSetValue(event, dst, (EvtWord)name);
 	return EVT_RETURN_DONE;
 }
 

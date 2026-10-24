@@ -478,7 +478,7 @@ static USER_FUNC(re_fall_rtn) {
             data->viewEvent = NULL;
             _mapFree(monte_p);
             data->viewEvent = evtEntryType(minigame_view_monte, 0, 0, 0);
-            data->viewEvent->lwData[0] = (s32)monte_p->wp;
+            data->viewEvent->lwData[0] = (EvtWord)monte_p->wp;
         }
     }
     return EVT_RETURN_DONE;

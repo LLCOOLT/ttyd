@@ -232,7 +232,7 @@ void marioStInit(void) {
 #endif
 	VISetPostRetraceCallback(viPostCallback);
 	romFontInit();
-	OSCreateThread(&DvdCheckThread, gcDvdCheckThread, NULL, (void*)((u32)&stack + sizeof(stack)), sizeof(stack), 16, OS_THREAD_ATTR_DETACH);
+	OSCreateThread(&DvdCheckThread, gcDvdCheckThread, NULL, stack + sizeof(stack), sizeof(stack), 16, OS_THREAD_ATTR_DETACH);
 	DvdCheckTreadOn = TRUE;
 	OSResumeThread(&DvdCheckThread);
 	DVDMgrInit();

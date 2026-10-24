@@ -34,7 +34,7 @@ static u8 cloud_once_flag;
 static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
 static s32 _ofs_get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
-static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
+static void _img_alloc_capture(EvtWord a0, EvtWord a1, EvtWord a2, EvtWord a3, EvtWord a4, EvtWord a5, EvtWord a6, EvtWord a7);
 void envSetYamiView(Mtx mtx);
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
@@ -139,7 +139,7 @@ static USER_FUNC(starstone_set_pos);
 static USER_FUNC(starstone_set_ry);
 static USER_FUNC(sysflag);
 static USER_FUNC(yami_view);
-static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
+static void _img_alloc_capture(EvtWord a0, EvtWord a1, EvtWord a2, EvtWord a3, EvtWord a4, EvtWord a5, EvtWord a6, EvtWord a7);
 static s32 _ofs_get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
 static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
@@ -209,9 +209,9 @@ EvtWord mri_00_init_evt[377];
 EvtWord mri_00_init_evt[296];
 #endif
 
-static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7) {
+static void _img_alloc_capture(EvtWord a0, EvtWord a1, EvtWord a2, EvtWord a3, EvtWord a4, EvtWord a5, EvtWord a6, EvtWord a7) {
     EventEntry event;
-    s32 args[10];
+    EvtWord args[10];
 
     event.args = args;
     args[0] = a0;
@@ -781,7 +781,7 @@ BeroEntry bero_lostitem[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)out_w_bero, // exitEvent
-        (s32)"win_03", // nextMapName
+        "win_03", // nextMapName
         "", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -800,7 +800,7 @@ static BeroEntry bero_entry_data[] = {
         (s32*)first_time_w_bero, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"win_01", // nextMapName
+        "win_01", // nextMapName
         "n_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -817,12 +817,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)out_ne_bero, // exitEvent
-        (s32)"mri_01", // nextMapName
+        "mri_01", // nextMapName
         "w_bero", // nextBeroName
         4, // enterAnimeType
         4, // exitAnimeType
-        (s32)bero_01_doa_close, // enterAnimeArg
-        (s32)bero_01_doa_open, // exitAnimeArg
+        bero_01_doa_close, // enterAnimeArg
+        bero_01_doa_open, // exitAnimeArg
     },
     {
         "dokan_1", // hitName
@@ -835,7 +835,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)out_dokan_1, // exitEvent
-        (s32)"tik_16", // nextMapName
+        "tik_16", // nextMapName
         "dokan_1", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -943,7 +943,7 @@ static USER_FUNC(evt_cloud_main) {
             if (!_ofs_get_boundingbox(wp->offscreenName, &wp->x, &wp->y, &wp->w, &wp->h)) {
                 break;
             }
-            _img_alloc_capture((s32)wp->imgName, 0, 0, 1, wp->x, wp->y, wp->w, wp->h);
+            _img_alloc_capture((EvtWord)wp->imgName, 0, 0, 1, wp->x, wp->y, wp->w, wp->h);
             wp->state = 223;
             break;
         case 223:
@@ -952,7 +952,7 @@ static USER_FUNC(evt_cloud_main) {
             wp->state = 3;
         case 3:
             img = imgNameToPtr(wp->imgName, group);
-            img->animName = (s32)"A_1";
+            img->animName = "A_1";
             img->animTime = animTimeGetTime(group);
             img->flags &= ~2;
             wp->timer = 30;
@@ -994,7 +994,7 @@ static USER_FUNC(evt_cloud_main) {
                 evtEntry(wp->endEvt, 0, 0);
             }
             img = imgNameToPtr(wp->imgName, group);
-            img->animName = (s32)"A_2";
+            img->animName = "A_2";
             img->animTime = animTimeGetTime(group);
             wp->timer = 60;
             wp->state++;
@@ -1077,7 +1077,7 @@ USER_FUNC(evt_mri_cloud_ent) {
     wp->state = 0;
     wp->timer = 0;
     wp->evt = evtEntry(evt_cloud_main_evt, 0, 0);
-    wp->evt->lwData[0] = (s32)wp;
+    wp->evt->lwData[0] = (EvtWord)wp;
     return EVT_RETURN_DONE;
 }
 

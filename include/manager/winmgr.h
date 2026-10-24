@@ -1,6 +1,7 @@
 #pragma once
 
 #include "driver/dispdrv.h"
+#include "evt/evt_word.h"
 #include <dolphin/gx.h>
 #include <dolphin/types.h>
 
@@ -83,7 +84,7 @@ WinMgrEntry* winMgrGetPtr(s32 id);
 void winMgrHelpInit(WinMgrEntry* entry);
 void winMgrHelpMain(WinMgrEntry* entry);
 void winMgrHelpDraw(WinMgrEntry* entry);
-WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3);
+WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 a2, BOOL a3);
 s32 winMgrSelect(WinMgrSelect* select);
 s32 winMgrSelectOther(WinMgrSelect* select, struct EventEntry* evt);
 void winMgrSelectDelete(WinMgrSelect* select);

@@ -10406,7 +10406,7 @@ void psndSFX_pos(s32 id, Vec* position);
 
 USER_FUNC(_tatsumaki_effect) {
     BattleWork* wp = _battleWorkPointer;
-    s32* ud = event->userWork;
+    EvtWord* ud = event->userWork;
     BattleUnit* unit;
     s32 id = evtGetValue(event, *event->args);
     f32 r;
@@ -10426,8 +10426,8 @@ USER_FUNC(_tatsumaki_effect) {
         ud[2] = (s32) * &unit->mPosition.x;
         ud[3] = (s32) * &unit->mPosition.y - 40;
         ud[4] = (s32) * &unit->mPosition.z;
-        ud[5] = (s32)effKamekiTornadeN64Entry(0, 90, ud[2], ud[3], ud[4], 3.0f);
-        ud[6] = (s32)effKamekiTornadeN64Entry(0, 90, ud[2], ud[3], ud[4], 3.0f);
+        ud[5] = (EvtWord)effKamekiTornadeN64Entry(0, 90, ud[2], ud[3], ud[4], 3.0f);
+        ud[6] = (EvtWord)effKamekiTornadeN64Entry(0, 90, ud[2], ud[3], ud[4], 3.0f);
         ud[7] = ((s32(*)(const char*))psndSFXOn)("SFX_BTL_JUMP_TATUMAKI2\000");
         v.x = ud[2];
         v.y = ud[3];
@@ -10588,7 +10588,7 @@ USER_FUNC(_mario_fire_ball_controll) {
     EffectEntry* eff;
     if (isFirstCall) {
         event->userdata[0] = 0;
-        event->userdata[1] = (s32)effFireEntry(5, 0.0f, 0.0f, 0.0f, battle_mario_one, 1000);
+        event->userdata[1] = (EvtWord)effFireEntry(5, 0.0f, 0.0f, 0.0f, battle_mario_one, 1000);
 
     }
     eff = (EffectEntry*)event->userdata[1];
@@ -10609,7 +10609,7 @@ USER_FUNC(_fire_wave) {
     f32 z = evtGetValue(event, args[2]);
     f32 scale = 0.6f * evtGetValue(event, args[3]);
     if (isFirstCall) {
-        event->userdata[0] = (s32)effHibashiraEntry(0, 1, 90, x, y, z, x, y, z, scale);
+        event->userdata[0] = (EvtWord)effHibashiraEntry(0, 1, 90, x, y, z, x, y, z, scale);
     }
     return EVT_RETURN_DONE;
 }
@@ -10633,7 +10633,7 @@ USER_FUNC(_battle_majinai_effect) {
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
     if (isFirstCall) {
         Vec v = majinai_effect_pos;
-        event->userdata[0] = (s32)effMajinaiEntry(0, v.x, v.y, v.z);
+        event->userdata[0] = (EvtWord)effMajinaiEntry(0, v.x, v.y, v.z);
         effSetName((EffectEntry*)event->userdata[0], "mjef_coinup");
     }
     if (event->userdata[0] && effNameToPtr("mjef_coinup")) {

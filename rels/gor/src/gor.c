@@ -125,7 +125,7 @@ USER_FUNC(evt_gor_msg_cat_alloc) {
     gor_msg_cat_buf = _mapAlloc(size);
     memset(gor_msg_cat_buf, 0, size);
     sprintf(gor_msg_cat_buf, "%s%s%s", head, msg, tail);
-    evtSetValue(event, args[3], (s32)gor_msg_cat_buf);
+    evtSetValue(event, args[3], (EvtWord)gor_msg_cat_buf);
     return EVT_RETURN_DONE;
 }
 

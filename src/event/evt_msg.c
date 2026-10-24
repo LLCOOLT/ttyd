@@ -19,7 +19,7 @@ void evt_msg_init(void) {
 }
 
 
-s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 a, s32 b, s32 c, s32 d);
+s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const char* msg, s32 a3, EvtWord name);
 void msgWindow_Add(const char* msg, s32 id);
 
 #include "evt/evt_npc.h"
@@ -36,21 +36,21 @@ void BtlUnit_GetTalkTogePos(s32 unit, f32* x, f32* y, f32* z);
 // the message window's MsgWinData lives in its userdata block
 #define MSGW(w) ((MsgWinData*)(w)->userdata->address)
 
-s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, s32 msg, s32 a3, s32 name) {
+s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const char* msg, s32 a3, EvtWord name) {
 	NpcEntry* npc = NULL;
 	WindowEntry* win;
 	const char* m;
 	if (isFirstCall) {
 		if (!(flags & 1)) {
-			m = msgSearch((const char*)msg);
+			m = msgSearch(msg);
 		} else {
-			m = (const char*)msg;
-			msg = (s32)"DIRECT\0";
+			m = msg;
+			msg = "DIRECT\0";
 		}
 		event->printWindowId = msgWindow_Entry(m, a3, (s16)event->msgPriority);
 		event->msgPriority = 0;
 		win = windowGetPointer(event->printWindowId);
-		MSGW(win)->tag = (const char*)msg;
+		MSGW(win)->tag = msg;
 		MSGW(win)->event = event;
 		if (!(flags & 2)) {
 			if (event->wNpcEventType == 6) {
@@ -157,9 +157,9 @@ s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, s32 msg, s32 
 USER_FUNC(evt_msg_print) {
 	EvtWord* args = event->args;
 	s32 a = evtGetValue(event, args[0]);
-	s32 b = evtGetValue(event, args[1]);
+	const char* b = (const char*)evtGetValue(event, args[1]);
 	s32 c = evtGetValue(event, args[2]);
-	s32 d = evtGetValue(event, args[3]);
+	EvtWord d = evtGetValue(event, args[3]);
 	return _evt_msg_print(event, isFirstCall, a, b, c, d);
 }
 
@@ -283,7 +283,7 @@ USER_FUNC(evt_msg_print_party) {
 	}
 	strcpy(partyLabel, msg);
 	strcat(partyLabel, partyMsgStr[id]);
-	return _evt_msg_print(event, isFirstCall, 0, (s32)partyLabel, 0, (s32)"party");
+	return _evt_msg_print(event, isFirstCall, 0, partyLabel, 0, (EvtWord)"party");
 }
 
 USER_FUNC(evt_msg_print_party_add) {
@@ -316,7 +316,7 @@ USER_FUNC(evt_msg_print_battle_party) {
 	}
 	strcpy(partyLabel, msg);
 	strcat(partyLabel, battlePartyMsgStr[(s32)unit->currentKind - 0xE0]);
-	return _evt_msg_print(event, isFirstCall, 2, (s32)partyLabel, 0, -4);
+	return _evt_msg_print(event, isFirstCall, 2, partyLabel, 0, -4);
 }
 
 USER_FUNC(evt_msg_print_insert) {
@@ -349,7 +349,7 @@ USER_FUNC(evt_msg_print_insert) {
 			case 4: sprintf(buf, m, vals[0], vals[1], vals[2], vals[3]); break;
 		}
 	}
-	return _evt_msg_print(event, isFirstCall, flags | 1, (s32)buf, c, d);
+	return _evt_msg_print(event, isFirstCall, flags | 1, buf, c, d);
 }
 
 USER_FUNC(evt_msg_print_add) {
@@ -751,7 +751,7 @@ USER_FUNC(evt_msg_fmt_str) {
     }
     strcpy(msg_article_buf, name);
     evtMsgFmtStr(msg_article_buf, item);
-    evtSetValue(event, out, (s32)msg_article_buf);
+    evtSetValue(event, out, (EvtWord)msg_article_buf);
     return EVT_RETURN_DONE;
 }
 
@@ -934,7 +934,7 @@ USER_FUNC(evt_msg_fmt_int) {
     }
     strcpy(msg_count_buf, name);
     evtMsgFmtInt(msg_count_buf, count);
-    evtSetValue(event, out, (s32)msg_count_buf);
+    evtSetValue(event, out, (EvtWord)msg_count_buf);
     return EVT_RETURN_DONE;
 }
 #endif

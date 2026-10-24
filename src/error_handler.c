@@ -2,6 +2,7 @@
 #include "hwaccess.h"
 #include "memory.h"
 #include "system.h"
+#include "addr_word.h"
 #include "sdk/DEMOInit.h"
 #include "pmario_sound.h"
 #include <dolphin/mtx.h>
@@ -31,7 +32,8 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 	s32 scroll;
 #endif
 	int px, py;
-	u32 count, stack;
+	u32 count;
+	AddrWord stack; // stack frame address: back chain at +0, saved LR at +4
 	s16 px2, py2, x2, y2;
 	s32 tx, ty;
 	//stack vars
@@ -93,12 +95,12 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 	i = 0;
 	while ((stack != 0) && (stack != 0xFFFFFFFF) && (i++ < 16)) {
 #ifdef VERSION_G8ME01
-		sprintf(print_buffer2, "0x%08x:  0x%08x   0x%08x\n", stack, *(u32*)stack, *(u32*)(stack + 4));
+		sprintf(print_buffer2, "0x%08x:  0x%08x   0x%08x\n", stack, *(AddrWord*)stack, *(AddrWord*)(stack + 4));
 #else
-		sprintf(print_buffer2, "0x%08x:   0x%08x    0x%08x\n", stack, *(u32*)stack, *(u32*)(stack + 4));
+		sprintf(print_buffer2, "0x%08x:   0x%08x    0x%08x\n", stack, *(AddrWord*)stack, *(AddrWord*)(stack + 4));
 #endif
 		strcat(print_buffer, print_buffer2);
-		stack = *(u32*)stack;
+		stack = *(AddrWord*)stack;
 	}
 	strcat(print_buffer, "\n");
 	sprintf(print_buffer2, "Instruction at 0x%x\n(read from SRR0) attempted to access\ninvalid address 0x%x (read from DAR)\n", context->srr0, dar);

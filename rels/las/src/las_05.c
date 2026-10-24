@@ -673,12 +673,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"las_04", // nextMapName
+        "las_04", // nextMapName
         "e_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w_door_close, // enterAnimeArg
-        (s32)w_door_open, // exitAnimeArg
+        w_door_close, // enterAnimeArg
+        w_door_open, // exitAnimeArg
     },
     {
         "e_bero_1", // hitName
@@ -691,12 +691,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"las_06", // nextMapName
+        "las_06", // nextMapName
         "w_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)e_door_close, // enterAnimeArg
-        (s32)e_door_open, // exitAnimeArg
+        e_door_close, // enterAnimeArg
+        e_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -1722,7 +1722,7 @@ static USER_FUNC(make_name) {
     s32 b = evtGetValue(event, args[1]);
 
     sprintf(name, "S_shan_%02d_rou_%02d", a, b);
-    evtSetValue(event, args[2], (s32)name);
+    evtSetValue(event, args[2], (EvtWord)name);
     return EVT_RETURN_DONE;
 }
 

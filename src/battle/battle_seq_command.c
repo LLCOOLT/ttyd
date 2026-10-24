@@ -1121,7 +1121,7 @@ s32 BattleCommandInput(BattleWork* work) {
 	s32 i;
 	BattleWorkTarget* t;
 
-	wp = (BattleWork*)(u32)work;
+	wp = (BattleWork*)(void*)work; // FAKE: the void* hop keeps wp its own copy of work (r24 as in the target)
 	unit = BattleGetUnitPtr(work, work->activeUnitId);
 	cmd = &wp->commandMenu;
 	if (cmd == NULL) {
@@ -2470,7 +2470,7 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 			}
 			break;
 		case 2:
-			if ((s32)weapon == (s32)&ItemWeaponData_Naniga_Okorukana) break;
+			if ((EvtWord)weapon == (EvtWord)&ItemWeaponData_Naniga_Okorukana) break; // FAKE: integer compare gives the target's signed cmpw
 			if (unit->currentKind == 0xde) {
 				if (_check_weapon_type_attack(weapon)) {
 					BtlActRec_AddCount(&wp->actRecord.marioAttackItems);
@@ -2910,7 +2910,7 @@ USER_FUNC(_get_msg) {
 			msg = "btl_msg_cmderror_no_select_now";
 			break;
 	}
-	evtSetValue(event, index, (s32)msg);
+	evtSetValue(event, index, (EvtWord)msg);
 	return 2;
 }
 

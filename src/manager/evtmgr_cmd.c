@@ -136,7 +136,7 @@ inline s32 evt_debug_name(EventEntry* entry); // 116
 inline s32 evt_debug_rem(EventEntry* entry); // 117
 inline s32 evt_debug_bp(EventEntry* entry); // 118
 
-inline EvtWord* evtSearchLabel(EventEntry* entry, s32 id);
+inline EvtWord* evtSearchLabel(EventEntry* entry, EvtWord id);
 inline EvtWord* evtSearchElse(EventEntry* entry);
 inline EvtWord* evtSearchEndIf(EventEntry* entry);
 inline EvtWord* evtSearchEndSwitch(EventEntry* entry);
@@ -180,7 +180,7 @@ s32 evt_lbl(EventEntry* entry) { // 3
 }
 
 s32 evt_goto(EventEntry* entry) { // 4
-    s32 lbl;
+    EvtWord lbl;
 
     lbl = evtGetValue(entry, *entry->args);
     entry->nextCommand = evtSearchLabel(entry, lbl);
@@ -1271,7 +1271,7 @@ s32 evt_alloc_user_wrk(EventEntry* entry) { // 76
     count = evtGetValue(entry, args[0]);
     index = args[1];
     entry->uwBase = _mapAlloc(count * sizeof(s32));
-    evtSetValue(entry, index, (s32)entry->uwBase);
+    evtSetValue(entry, index, (EvtWord)entry->uwBase);
     
     return EVT_RETURN_DONE;
 }
@@ -2644,7 +2644,7 @@ f32 evtSetFloat(EventEntry* entry, EvtWord index, f32 value) {
     return value;
 }
 
-EvtWord* evtSearchLabel(EventEntry* entry, s32 lbl) {
+EvtWord* evtSearchLabel(EventEntry* entry, EvtWord lbl) {
     EvtWord* args = entry->args;
     s32 n;
     

@@ -699,7 +699,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("bom_04"), // nextMapName
+        "bom_04", // nextMapName
         ("e_bero4"), // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -715,7 +715,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("bom_02"), // nextMapName
+        "bom_02", // nextMapName
         ("w_bero"), // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -877,8 +877,8 @@ void jump(s32 i, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
     pose->dir = angleABf(x, z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
     if (i % 20 == 0 && !(wp->flags & 1)) {
         Vec pos = (Vec){(*pose->mtx)[0][3], (*pose->mtx)[1][3], (*pose->mtx)[2][3]};
-        // FAKE: (char*)(u32) cast makes the front end hoist the literal address (same pointer value)
-        psndSFXOn_3D((char*)(u32)"SFX_STG7_BOMB_TOGETHER2", &pos);
+        // FAKE: SFX_NAME_WORD (integer round trip) makes the front end hoist the literal address (same pointer value)
+        psndSFXOn_3D(SFX_NAME_WORD("SFX_STG7_BOMB_TOGETHER2"), &pos);
     }
 }
 
@@ -981,8 +981,8 @@ static void ext_main(void) {
                     PSMTXConcat(m1, m3, *pose->mtx);
                     if (irand(100) == 0) {
                         Vec p = (Vec){(*pose->mtx)[0][3], (*pose->mtx)[1][3], (*pose->mtx)[2][3]};
-                        // FAKE: (char*)(u32) cast, see jump()
-                        psndSFXOn_3D((char*)(u32)"SFX_STG7_BOMB_FALL1", &p);
+                        // FAKE: SFX_NAME_WORD (integer round trip), see jump()
+                        psndSFXOn_3D(SFX_NAME_WORD("SFX_STG7_BOMB_FALL1"), &p);
                     }
                 }
                 break;
@@ -2358,7 +2358,7 @@ static s32 make_name(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
 
     sprintf(name, "S_hikari%d", evtGetValue(event, args[0]));
-    evtSetValue(event, args[1], (s32)name);
+    evtSetValue(event, args[1], (EvtWord)name);
     return EVT_RETURN_DONE;
 }
 

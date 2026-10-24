@@ -21,7 +21,7 @@ typedef struct TwodEntry {
     f32 y;            // 0x18
     f32 baseX;        // 0x1C
     f32 baseY;        // 0x20
-    u32 id;           // 0x24
+    EvtWord id;       // 0x24, icon id, or a text pointer (top bit set)
     f32 scale;        // 0x28
     u8 pad[0x34 - 0x2C];
 } TwodEntry;

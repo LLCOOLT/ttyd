@@ -40,7 +40,7 @@ USER_FUNC(urouro_init_func) {
     s32 flags = evtGetValue(event, args[5]);
     UrouroWork* work;
 
-    event->lwData[10] = (s32)_mapAlloc(sizeof(UrouroWork));
+    event->lwData[10] = (EvtWord)_mapAlloc(sizeof(UrouroWork));
     work = (UrouroWork*)event->lwData[10];
     work->flags = flags;
     work->state = 0;

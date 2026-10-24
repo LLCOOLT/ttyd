@@ -753,7 +753,7 @@ static USER_FUNC(_clauda_breath_effect_fire) {
     ((EffKumokumoN64Particle*)eff->userdata)->g2 = 27;
     ((EffKumokumoN64Particle*)eff->userdata)->b2 = 245;
     ((EffKumokumoN64Particle*)eff->userdata)->rot = -10.0f;
-    evtSetValue(event, var, (s32)eff);
+    evtSetValue(event, var, (EvtWord)eff);
     return EVT_RETURN_DONE;
 }
 

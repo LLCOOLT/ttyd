@@ -412,12 +412,12 @@ void fadeSetOffscreenCallback(OffscreenCallback callback, void* param) {
 
 static inline void fadeCapture(const char* name, const char* off, s32 mode) {
 	EventEntry evt;
-	s32 args[10];
+	EvtWord args[10];
 
 	evt.args = args;
-	args[0] = (s32)name;
+	args[0] = (EvtWord)name;
 	args[1] = 0;
-	args[2] = (s32)off;
+	args[2] = (EvtWord)off;
 	args[3] = mode;
 	args[4] = 0;
 	args[5] = 0;
@@ -508,7 +508,7 @@ void fadeMain(void) {
 						entry->image = imgNameToPtr("fImg_dokan", entry->imageType);
 						entry->image->poseId = animPaperPoseGetId(entry->animFile, entry->imageType);
 						entry->image->animTime = animTimeGetTime(entry->imageType);
-						entry->image->animName = (s32)entry->animName;
+						entry->image->animName = entry->animName;
 						imgClearVirtualPoint(entry->image);
 						fadeCapture("fImg_dokan", NULL, 0);
 						switch (entry->type) {
@@ -573,7 +573,7 @@ void fadeMain(void) {
 						entry->image = imgNameToPtr("fImg_peron", entry->imageType);
 						entry->image->poseId = animPaperPoseGetId(entry->animFile, entry->imageType);
 						entry->image->animTime = animTimeGetTime(entry->imageType);
-						entry->image->animName = (s32)entry->animName;
+						entry->image->animName = entry->animName;
 						imgClearVirtualPoint(entry->image);
 						switch (entry->type) {
 							case 0x34:
@@ -602,7 +602,7 @@ void fadeMain(void) {
 							switch (entry->type) {
 								case 0x37: case 0x39: case 0x3B: case 0x3C: case 0x3D: case 0x3E:
 									entry->image->animTime = animTimeGetTime(entry->imageType);
-									*(const char**)&entry->image->animName = "A_2";
+									entry->image->animName = "A_2";
 									break;
 								default:
 									entry->flags |= 2;
@@ -625,7 +625,7 @@ void fadeMain(void) {
 						entry->image = imgNameToPtr("fImg_peron", entry->imageType);
 						entry->image->poseId = animPaperPoseGetId(entry->animFile, entry->imageType);
 						entry->image->animTime = animTimeGetTime(entry->imageType);
-						entry->image->animName = (s32)entry->animName;
+						entry->image->animName = entry->animName;
 						imgClearVirtualPoint(entry->image);
 						switch (entry->type) {
 							case 0x36: case 0x38: case 0x3A:

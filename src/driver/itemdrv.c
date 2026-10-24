@@ -133,7 +133,7 @@ static inline BOOL itemGetPouch(ItemEntry* entry) {
 		_swSet(entry->evtId);
 	}
 	if ((u32)entry->evtCode != 0) {
-		evt = evtEntry((void*)entry->evtCode, 0, 0x20);
+		evt = evtEntry((EvtWord*)entry->evtCode, 0, 0x20);
 		evt->lwData[0] = FLOAT(entry->position.x);
 		evt->lwData[1] = FLOAT(entry->position.y);
 		evt->lwData[2] = FLOAT(entry->position.z);
@@ -1274,8 +1274,8 @@ void itemseq_GetItem(ItemEntry* entry) {
 			break;
 		case 6:
 			wp->lectureEvt = evtEntryType(all_juyoitem_lecture, 0, 0, 0);
-			wp->lectureEvt->lwData[8] = (s32)entry;
-			wp->lectureEvt->lwData[9] = (s32)wp->effect;
+			wp->lectureEvt->lwData[8] = (EvtWord)entry;
+			wp->lectureEvt->lwData[9] = (EvtWord)wp->effect;
 			psndClearFlag(0x80);
 			entry->subState = 7;
 			break;

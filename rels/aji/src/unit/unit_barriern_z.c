@@ -1544,12 +1544,12 @@ static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table) {
         return FALSE;
     }
     sp = BTL_ALLOC(sizeof(BarriernSpline));
-    unit->work[10 + n] = (s32)sp;
+    unit->work[10 + n] = (EvtWord)sp;
     sp->n = 5;
     sp->table = table;
     sp->count = 0;
     spline_maketable(5, sp->table, sp->a, sp->b);
-    BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4 + n]), 1)->work[2] = (s32)table;
+    BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4 + n]), 1)->work[2] = (EvtWord)table;
     return TRUE;
 }
 
@@ -1598,36 +1598,36 @@ static USER_FUNC(barriernSatelliteToInside) {
     if (isFirstCall) {
         for (i = 0; i < 4; i++) {
             if (unit->work[4 + i] != -1) {
-                s32 table = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4 + i]), 1)->work[2];
+                EvtWord table = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4 + i]), 1)->work[2];
 
-                if (table == (s32)splineTableOut1_1) {
+                if (table == (EvtWord)splineTableOut1_1) {
                     barriernSatelliteTo_Init(unit, i, splineTableIn1_1);
                 }
-                if (table == (s32)splineTableOut2_1) {
+                if (table == (EvtWord)splineTableOut2_1) {
                     barriernSatelliteTo_Init(unit, i, splineTableIn2_1);
                 }
-                if (table == (s32)splineTableOut2_2) {
+                if (table == (EvtWord)splineTableOut2_2) {
                     barriernSatelliteTo_Init(unit, i, splineTableIn2_2);
                 }
-                if (table == (s32)splineTableOut3_1) {
+                if (table == (EvtWord)splineTableOut3_1) {
                     barriernSatelliteTo_Init(unit, i, splineTableIn3_1);
                 }
-                if (table == (s32)splineTableOut3_2) {
+                if (table == (EvtWord)splineTableOut3_2) {
                     barriernSatelliteTo_Init(unit, i, splineTableIn3_2);
                 }
-                if (table == (s32)splineTableOut3_3) {
+                if (table == (EvtWord)splineTableOut3_3) {
                     barriernSatelliteTo_Init(unit, i, splineTableIn3_3);
                 }
-                if (table == (s32)splineTableOut4_1) {
+                if (table == (EvtWord)splineTableOut4_1) {
                     barriernSatelliteTo_Init(unit, i, splineTableIn4_1);
                 }
-                if (table == (s32)splineTableOut4_2) {
+                if (table == (EvtWord)splineTableOut4_2) {
                     barriernSatelliteTo_Init(unit, i, splineTableIn4_2);
                 }
-                if (table == (s32)splineTableOut4_3) {
+                if (table == (EvtWord)splineTableOut4_3) {
                     barriernSatelliteTo_Init(unit, i, splineTableIn4_3);
                 }
-                if (table == (s32)splineTableOut4_4) {
+                if (table == (EvtWord)splineTableOut4_4) {
                     barriernSatelliteTo_Init(unit, i, splineTableIn4_4);
                 }
             }
@@ -1754,38 +1754,38 @@ static USER_FUNC(outSplineTableSet) {
     switch (evtGetValue(event, args[1])) {
         case 1:
             part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4]), 1);
-            part->work[2] = (s32)splineTableOut1_1;
+            part->work[2] = (EvtWord)splineTableOut1_1;
             break;
         case 2:
             part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4]), 1);
-            part->work[2] = (s32)splineTableOut2_1;
+            part->work[2] = (EvtWord)splineTableOut2_1;
             part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[5]), 1);
-            part->work[2] = (s32)splineTableOut2_2;
+            part->work[2] = (EvtWord)splineTableOut2_2;
             break;
         case 3:
             part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4]), 1);
-            part->work[2] = (s32)splineTableOut3_1;
+            part->work[2] = (EvtWord)splineTableOut3_1;
             part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[5]), 1);
-            part->work[2] = (s32)splineTableOut3_2;
+            part->work[2] = (EvtWord)splineTableOut3_2;
             part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[6]), 1);
-            part->work[2] = (s32)splineTableOut3_3;
+            part->work[2] = (EvtWord)splineTableOut3_3;
             break;
         case 4:
             part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4]), 1);
-            part->work[2] = (s32)splineTableOut4_1;
+            part->work[2] = (EvtWord)splineTableOut4_1;
             part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[5]), 1);
-            part->work[2] = (s32)splineTableOut4_2;
+            part->work[2] = (EvtWord)splineTableOut4_2;
             part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[6]), 1);
-            part->work[2] = (s32)splineTableOut4_3;
+            part->work[2] = (EvtWord)splineTableOut4_3;
             part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[7]), 1);
-            part->work[2] = (s32)splineTableOut4_4;
+            part->work[2] = (EvtWord)splineTableOut4_4;
             break;
     }
     return EVT_RETURN_DONE;
 }
 
 static void outSplineTableSet_Sub(BattleUnit* unit, s32 n, Vec* table) {
-    BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4 + n]), 1)->work[2] = (s32)table;
+    BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4 + n]), 1)->work[2] = (EvtWord)table;
 }
 
 static USER_FUNC(barriern_wawawa_set_target) {
@@ -1888,7 +1888,7 @@ static USER_FUNC(_check_satellite) {
 
             BtlUnit_snd_se(unit, "SFX_ENM_BARRI_BARRIER1", 0xF1194D80, 0);
             BtlUnit_GetPos(unit, &px, &py, &pz);
-            unit->work[3] = (s32)effSyuryouEntry(1, 1000, 0.0f, -1000.0f, 0.0f);
+            unit->work[3] = (EvtWord)effSyuryouEntry(1, 1000, 0.0f, -1000.0f, 0.0f);
         }
         part->attributes |= 0x20000000;
         evtSetValue(event, args[0], 1);

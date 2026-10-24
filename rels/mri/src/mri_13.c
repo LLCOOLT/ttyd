@@ -132,7 +132,7 @@ BeroEntry bero_dai3_kanbu[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"mri_14", // nextMapName
+        "mri_14", // nextMapName
         "", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -151,7 +151,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"mri_14", // nextMapName
+        "mri_14", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -168,7 +168,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         10, // caseType
         NULL, // exitEvent
-        (s32)"mri_16", // nextMapName
+        "mri_16", // nextMapName
         "dokan7", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

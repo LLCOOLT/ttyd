@@ -74,7 +74,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"hei_05", // nextMapName
+        "hei_05", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -90,7 +90,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"hei_07", // nextMapName
+        "hei_07", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -100,10 +100,10 @@ static BeroEntry bero_entry_data[] = {
 };
 
 static TreeAccess ki_data[] = {
-    {0, "a_ki_1", "miki__1", "ha_temae_1", (s32)"ha_usiro_1", NULL},
-    {0, "a_ki_2", "miki__2", "ha_temae_2", (s32)"ha_usiro_2", NULL},
-    {0, "a_ki_3", "miki__3", "ha_temae_3", (s32)"ha_usiro_3", NULL},
-    {0, "a_ki_4", "miki__4", "ha_temae_4", (s32)"ha_usiro_4", NULL},
+    {0, "a_ki_1", "miki__1", "ha_temae_1", "ha_usiro_1", NULL},
+    {0, "a_ki_2", "miki__2", "ha_temae_2", "ha_usiro_2", NULL},
+    {0, "a_ki_3", "miki__3", "ha_temae_3", "ha_usiro_3", NULL},
+    {0, "a_ki_4", "miki__4", "ha_temae_4", "ha_usiro_4", NULL},
     {7, NULL, NULL, NULL, 0, NULL},
 };
 

@@ -138,7 +138,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_09", // nextMapName
+        "dou_09", // nextMapName
         "e_bero_1", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -154,7 +154,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_09", // nextMapName
+        "dou_09", // nextMapName
         "e_bero_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -170,7 +170,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_06", // nextMapName
+        "dou_06", // nextMapName
         "s_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -186,7 +186,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"dou_11", // nextMapName
+        "dou_11", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -859,7 +859,7 @@ USER_FUNC(evt_sub_entrymgr_init) {
     EvtWord* args = event->args;
     EntryMgr* mgr = _mapAlloc(sizeof(EntryMgr));
 
-    evtSetValue(event, args[0], (s32)mgr);
+    evtSetValue(event, args[0], (EvtWord)mgr);
     mgr->count = evtGetValue(event, args[1]);
     mgr->entries = _mapAlloc(mgr->count * sizeof(EntryMgrEntry));
     memset(mgr->entries, 0, mgr->count * sizeof(EntryMgrEntry));

@@ -36,7 +36,7 @@ typedef struct PuniWork {
     f32 stuckBottom0;               // 0x354
     f32 stuckTop1;               // 0x358
     f32 stuckBottom1;               // 0x35C
-    s32 marioPuni;               // 0x360
+    struct PuniData* marioPuni;  // 0x360
     struct PuniData* reserved_364;  // 0x364
     struct PuniData* reserved_368;  // 0x368
     struct PuniData* reserved_36C;  // 0x36C
@@ -124,7 +124,7 @@ typedef struct PuniData {
     struct PuniData* parent;            // 0x1D0
     struct PuniData* child1;            // 0x1D4
     struct PuniData* child2;            // 0x1D8
-    s32 target;                         // 0x1DC
+    struct PuniData* target;            // 0x1DC
     s32 modeVar0;                       // 0x1E0
     s32 modeVar1;                       // 0x1E4
     s32 modeVar2;                       // 0x1E8

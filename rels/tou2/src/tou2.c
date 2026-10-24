@@ -643,7 +643,7 @@ static USER_FUNC(evt_tou_get_rule_msg2) {
     if (i == num) {
         i = num - 1;
     }
-    evtSetValue(event, args[1], (s32)msgSearch(rules[i].desc));
+    evtSetValue(event, args[1], (EvtWord)msgSearch(rules[i].desc));
     return EVT_RETURN_DONE;
 }
 
@@ -692,7 +692,7 @@ static USER_FUNC(evt_tou_get_rule_info) {
     } else {
         i = rand() % num;
     }
-    evtSetValue(event, args[1], (s32)rules[i].name);
+    evtSetValue(event, args[1], (EvtWord)rules[i].name);
     evtSetValue(event, args[2], rules[i].id);
     evtSetValue(event, args[3], rules[i].field_C);
     evtSetValue(event, args[4], rules[i].field_10);
@@ -741,8 +741,8 @@ USER_FUNC(evt_tou_get_fighter_tribe) {
         name = "\x83\x6E\x83\x43\x83\x70\x81\x5B\x83\x67\x83\x51\x83\x81\x83\x62\x83\x67";
         tribe = npcGetTribe(name);
     }
-    evtSetValue(event, args[2], (s32)tribe->modelName);
-    evtSetValue(event, args[3], (s32)name);
+    evtSetValue(event, args[2], (EvtWord)tribe->modelName);
+    evtSetValue(event, args[3], (EvtWord)name);
     return EVT_RETURN_DONE;
 }
 
@@ -759,8 +759,8 @@ USER_FUNC(evt_tou_get_fighter_battle_msg) {
     s32 id = evtGetValue(event, args[0]);
     FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
 
-    evtSetValue(event, args[1], (s32)fighters[id].taunt);
-    evtSetValue(event, args[2], (s32)fighters[id].victory);
+    evtSetValue(event, args[1], (EvtWord)fighters[id].taunt);
+    evtSetValue(event, args[2], (EvtWord)fighters[id].victory);
     return EVT_RETURN_DONE;
 }
 
@@ -788,7 +788,7 @@ USER_FUNC(evt_tou_get_fighter_name2) {
     s32 id = evtGetValue(event, args[0]);
     FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
 
-    evtSetValue(event, args[1], (s32)msgSearch(fighters[id].title));
+    evtSetValue(event, args[1], (EvtWord)msgSearch(fighters[id].title));
     return EVT_RETURN_DONE;
 }
 
@@ -797,7 +797,7 @@ USER_FUNC(evt_tou_get_fighter_info) {
     s32 id = evtGetValue(event, args[0]);
     FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
 
-    evtSetValue(event, args[1], (s32)msgSearch(fighters[id].name));
+    evtSetValue(event, args[1], (EvtWord)msgSearch(fighters[id].name));
     evtSetValue(event, args[2], fighterDt[id].setupId);
     return EVT_RETURN_DONE;
 }

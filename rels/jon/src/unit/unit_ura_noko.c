@@ -725,7 +725,7 @@ static USER_FUNC(eff_aura) {
     f32 x, y, z;
 
     if (isFirstCall) {
-        unit->work[2] = (s32)effUranokoEntry(0, 120, 0.0f, -1000.0f, 0.0f);
+        unit->work[2] = (EvtWord)effUranokoEntry(0, 120, 0.0f, -1000.0f, 0.0f);
     }
     BtlUnit_GetPos(unit, &x, &y, &z);
     eff = (EffectEntry*)unit->work[2];

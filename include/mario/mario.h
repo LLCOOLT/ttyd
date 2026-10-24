@@ -375,7 +375,7 @@ typedef struct MarioWork {
     f32 wallPushDir;               // 0x1CC, direction of that push
     s32 wallPushHold;              // 0x1D0, frames the push is held (14)
     void* touchNpc;                // 0x1D4, NpcEntry* (marioGetTouchNpcPtr)
-    s32 targetNpc;                 // 0x1D8, NpcEntry* in range for interaction (npcdrv)
+    struct NpcEntry* targetNpc;    // 0x1D8, NPC in range for interaction (npcdrv)
     void* hitobjFrontA;             // 0x1DC, wall in front found on an A press
     void* hitobjFront;              // 0x1E0
 	void* hitobjStandOn;           // 0x1E4, 0x1E8 US HitEntry

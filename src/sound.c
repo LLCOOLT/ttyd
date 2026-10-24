@@ -492,7 +492,7 @@ BOOL SoundSLibLoadDVD(const char* path) { // regalloc, stack, otherwise 1:1
         group->songId = 0;
         group->arrfile = cursor + 8;
         group->next = 0;
-        cursor = (u32*)((u32)cursor + (u32)blockSize);
+        cursor = (u32*)((u8*)cursor + blockSize);
     }
 
     sprintf(str, "%s/%s%s", getMarioStDvdRoot(), path, ".stbl");

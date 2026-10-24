@@ -8,6 +8,7 @@
 #include "manager/dvdmgr.h"
 #include "manager/fontmgr.h"
 #include "mario/mariost.h"
+#include "pmario_sound.h"
 #include "memory.h"
 #include "system.h"
 #include <string.h>
@@ -303,7 +304,7 @@ static inline void msgCheckSkip(smartEntry* smart, MsgWinData* data) {
 static inline void msgVoiceSE(smartEntry* smart) {
 	MsgWinData* d = smart->address;
 	if (d->window->type != 1 && !msgSEflag) {
-		psndSFXOnVol((const char*)0x20044, d->talkVolume);
+		psndSFXOnVol(SFX_NAME_WORD(0x20044), d->talkVolume);
 		msgSEflag = 1;
 	}
 }
@@ -342,7 +343,7 @@ s32 msgMain(smartEntry* smart) {
 		data->pageAdvanced = 1;
 		data->curPage++;
 		data->pageState = 0;
-		psndSFXOn((const char*)0x2003D);
+		psndSFXOn(SFX_NAME_WORD(0x2003D));
 		data->playTime += 100;
 		if (MSG_CB(data)) {
 			MSG_CB(data)(3, smart);
@@ -412,7 +413,7 @@ s32 msgMain(smartEntry* smart) {
 			}
 			break;
 		case 0xFFF3:
-			npc = (NpcEntry*)entry->value;
+			npc = entry->npc;
 			if (!npc) {
 				npc = npcNameToPtr(data->speakerName);
 			}
@@ -421,7 +422,7 @@ s32 msgMain(smartEntry* smart) {
 			animPoseSetPaperAnim(npc->poseId, paperPoseTbl[entry->time], 1);
 			break;
 		case 0xFFF2:
-			npc = (NpcEntry*)entry->value;
+			npc = entry->npc;
 			if (data->pageState) {
 				i--;
 				break;
@@ -1291,14 +1292,14 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				data->charCount++;
 			} else if (strcmp(tag, "paper") == 0) {
 				sscanf(args, "%s%d", paper, &i18);
-				entry->value = (strcmp(paper, "me") != 0) ? (( u32)npcNameToPtr(paper) ) : ( 0) ;
+				entry->npc = (strcmp(paper, "me") != 0) ? npcNameToPtr(paper) : NULL;
 				entry->glyph = 0xFFF3;
 				entry->time = i18;
 				entry++;
 				data->charCount++;
 			} else if (strcmp(tag, "/paper") == 0) {
 				sscanf(args, "%s", paper2);
-				entry->value = (strcmp(paper2, "me") != 0) ? (( u32)npcNameToPtr(paper2) ) : ( 0) ;
+				entry->npc = (strcmp(paper2, "me") != 0) ? npcNameToPtr(paper2) : NULL;
 				entry->glyph = 0xFFF2;
 				entry++;
 				data->charCount++;
@@ -1465,9 +1466,9 @@ const char* msgSearch(const char* tag) {
 				if (index >= entry->count) {
 					break;
 				}
-				result = strcmp(tag, (const char*)((u32)entry->address + lookup[index].startaddr));
+				result = strcmp(tag, (const char*)entry->address + lookup[index].startaddr);
 				if (!result) {
-					return (const char*)((u32)entry->address + lookup[index].endaddr);
+					return (const char*)entry->address + lookup[index].endaddr;
 				}
 				if (result < 0) {
 					max = index - 1;
@@ -1757,7 +1758,7 @@ void msgWindow_Main(WindowEntry* window) {
 		if (!(window->flags & 8)) {
 			se = msgWindowOpen_SE_Data[window->type * 2];
 			if (se >= 0) {
-				psndSFXOn((const char*)(se | 0x20000));
+				psndSFXOn(SFX_NAME_WORD(se | 0x20000));
 			}
 		}
 		window->timestamp = gp->renderTime;
@@ -1776,7 +1777,7 @@ void msgWindow_Main(WindowEntry* window) {
 		if (!(window->flags & 8)) {
 			se = msgWindowOpen_SE_Data[window->type * 2 + 1];
 			if (se >= 0) {
-				psndSFXOn((const char*)(se | 0x20000));
+				psndSFXOn(SFX_NAME_WORD(se | 0x20000));
 			}
 		}
 		window->timestamp = gp->renderTime;
@@ -1842,7 +1843,7 @@ void msgWindow_Main(WindowEntry* window) {
 			if (msgWinPrevPage(window) != 0U) {
 				WIN_STATE(window) = 9;
 				window->timestamp = gp->renderTime;
-				psndSFXOn((const char*)0x20041);
+				psndSFXOn(SFX_NAME_WORD(0x20041));
 				data->flags |= 0x40;
 			}
 		}
@@ -1885,7 +1886,7 @@ void msgWindow_Main(WindowEntry* window) {
 			WIN_STATE(window) = 10;
 			window->timestamp = gp->renderTime;
 			msgWinNextPage(window);
-			psndSFXOn((const char*)0x20041);
+			psndSFXOn(SFX_NAME_WORD(0x20041));
 		}
 #ifdef VERSION_G8ME01
 		else // US: one key per frame
@@ -1894,7 +1895,7 @@ void msgWindow_Main(WindowEntry* window) {
 			WIN_STATE(window) = 10;
 			window->timestamp = gp->renderTime;
 			data->page = data->pageCount - 1;
-			psndSFXOn((const char*)0x20041);
+			psndSFXOn(SFX_NAME_WORD(0x20041));
 		}
 #ifdef VERSION_G8ME01
 		else // US: one key per frame
@@ -1903,7 +1904,7 @@ void msgWindow_Main(WindowEntry* window) {
 			WIN_STATE(window) = 9;
 			window->timestamp = gp->renderTime;
 			if (msgWinPrevPage(window) != 0U) {
-				psndSFXOn((const char*)0x20041);
+				psndSFXOn(SFX_NAME_WORD(0x20041));
 			}
 		}
 		break;
@@ -2114,7 +2115,7 @@ void selectWindow_Main(WindowEntry* window) {
 			data->sel = 0;
 		}
 		if (prev != data->sel) {
-			psndSFXOn((const char*)0x20005);
+			psndSFXOn(SFX_NAME_WORD(0x20005));
 		}
 		if (keyGetButtonTrg(0) & 0x200) {
 			switch (data->cancel) {
@@ -2123,18 +2124,18 @@ void selectWindow_Main(WindowEntry* window) {
 			case -2:
 				data->sel = -1;
 				WIN_STATE(window) = 7;
-				psndSFXOn((const char*)0x20013);
+				psndSFXOn(SFX_NAME_WORD(0x20013));
 				break;
 			default:
 				data->sel = data->cancel;
 				WIN_STATE(window) = 7;
-				psndSFXOn((const char*)0x20013);
+				psndSFXOn(SFX_NAME_WORD(0x20013));
 				break;
 			}
 		}
 		else if (keyGetButtonTrg(0) & 0x100) {
 			WIN_STATE(window) = 7;
-			psndSFXOn((const char*)0x20012);
+			psndSFXOn(SFX_NAME_WORD(0x20012));
 		}
 		break;
 	case 7:

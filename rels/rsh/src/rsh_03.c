@@ -1,5 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "mario/mario_pouch.h"
@@ -225,7 +226,7 @@ USER_FUNC(iri_22_make_item_tbl) {
     if (!(bought & 4) && (s32)pouchCheckItem(0xAA) != 0) {
         iri_22_item_tbl[n++] = 0xAA;
     }
-    evtSetValue(event, args[0], (s32)iri_22_item_tbl);
+    evtSetValue(event, args[0], (EvtWord)iri_22_item_tbl);
     evtSetValue(event, args[1], n);
     return EVT_RETURN_DONE;
 }
@@ -312,12 +313,12 @@ static BeroEntry bero_data_a[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_04_a", // nextMapName
+        "rsh_04_a", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"w_door_close", // enterAnimeArg
-        (s32)"w_door_open", // exitAnimeArg
+        "w_door_close", // enterAnimeArg
+        "w_door_open", // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -330,12 +331,12 @@ static BeroEntry bero_data_a[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_02_a", // nextMapName
+        "rsh_02_a", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"e_door_close", // enterAnimeArg
-        (s32)"e_door_open", // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {0},
 };
@@ -352,12 +353,12 @@ static BeroEntry bero_data_b[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_04_b", // nextMapName
+        "rsh_04_b", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"w_door_close", // enterAnimeArg
-        (s32)"w_door_open", // exitAnimeArg
+        "w_door_close", // enterAnimeArg
+        "w_door_open", // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -370,12 +371,12 @@ static BeroEntry bero_data_b[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_02_b", // nextMapName
+        "rsh_02_b", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"e_door_close", // enterAnimeArg
-        (s32)"e_door_open", // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {0},
 };
@@ -392,12 +393,12 @@ static BeroEntry bero_data_c[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_04_c", // nextMapName
+        "rsh_04_c", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"w_door_close", // enterAnimeArg
-        (s32)"w_door_open", // exitAnimeArg
+        "w_door_close", // enterAnimeArg
+        "w_door_open", // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -410,12 +411,12 @@ static BeroEntry bero_data_c[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"rsh_02_c", // nextMapName
+        "rsh_02_c", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
-        (s32)"e_door_close", // enterAnimeArg
-        (s32)"e_door_open", // exitAnimeArg
+        "e_door_close", // enterAnimeArg
+        "e_door_open", // exitAnimeArg
     },
     {0},
 };

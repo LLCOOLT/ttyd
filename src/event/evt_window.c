@@ -144,7 +144,7 @@ USER_FUNC(evt_win_item_maketable) {
 	if (n == 0) {
 		table = NULL;
 	}
-	evtSetValue(event, args[1], (s32)table);
+	evtSetValue(event, args[1], (EvtWord)table);
 	return EVT_RETURN_DONE;
 }
 
@@ -174,7 +174,7 @@ USER_FUNC(evt_win_nameent_wait) {
 
 USER_FUNC(evt_win_nameent_name) {
 	EvtWord* args = event->args;
-	evtSetValue(event, args[0], (s32)nameEntGetName());
+	evtSetValue(event, args[0], (EvtWord)nameEntGetName());
 	return EVT_RETURN_DONE;
 }
 
@@ -330,7 +330,7 @@ USER_FUNC(evt_win_coin_on) {
 	}
 	winMgrSetParam(w->id, w);
 	winMgrOpen(w->id);
-	evtSetValue(event, args[1], (s32)w);
+	evtSetValue(event, args[1], (EvtWord)w);
 	return EVT_RETURN_DONE;
 }
 

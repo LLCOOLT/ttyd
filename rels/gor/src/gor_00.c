@@ -566,7 +566,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         (s32*)no00_custom, // exitEvent
-        (s32)"gor_01", // nextMapName
+        "gor_01", // nextMapName
         "s_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -4181,7 +4181,7 @@ static USER_FUNC(make_itemsel_table) {
     }
     *p = -1;
     evtSetValue(event, args[0], count);
-    event->lwData[10] = (s32)itemsel_table_ram;
+    event->lwData[10] = (EvtWord)itemsel_table_ram;
     return EVT_RETURN_DONE;
 }
 

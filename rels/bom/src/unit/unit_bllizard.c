@@ -639,7 +639,7 @@ static USER_FUNC(eff_ice_barrier) {
     f32 x, y, z;
 
     if (isFirstCall && unit->work[1] == 0) {
-        unit->work[1] = (s32)effKumokumoN64Entry(3, 1000, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+        unit->work[1] = (EvtWord)effKumokumoN64Entry(3, 1000, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f, 1.0f);
     }
     eff = (EffectEntry*)unit->work[1];
     BtlUnit_GetPos(unit, &x, &y, &z);

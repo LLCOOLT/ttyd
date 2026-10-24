@@ -125,12 +125,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"mri_06", // nextMapName
+        "mri_06", // nextMapName
         "e_bero", // nextBeroName
         4, // enterAnimeType
         4, // exitAnimeType
-        (s32)bero_s_doa_close, // enterAnimeArg
-        (s32)bero_s_doa_open, // exitAnimeArg
+        bero_s_doa_close, // enterAnimeArg
+        bero_s_doa_open, // exitAnimeArg
     },
     {
         "dokan", // hitName
@@ -143,7 +143,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)evt_dokan, // exitEvent
-        (s32)"mri_14", // nextMapName
+        "mri_14", // nextMapName
         "dokan", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

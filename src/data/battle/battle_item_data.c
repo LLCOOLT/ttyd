@@ -4421,7 +4421,7 @@ USER_FUNC(_naniga_okorukana_check) {
         for (i = 0; R_mystery_item_table[i] != 0; i++) {
         }
         item = R_mystery_item_table[irand(i)];
-        event->userdata[0] = (s32)effNanigaEntry(0, R_mystery_item_table, item, pos.x, pos.y, pos.z);
+        event->userdata[0] = (EvtWord)effNanigaEntry(0, R_mystery_item_table, item, pos.x, pos.y, pos.z);
         effSetName((EffectEntry*)event->userdata[0], "effNaniga\0\0");
         evtSetValue(event, out, item);
         if (unit->currentKind == 0xDE) {

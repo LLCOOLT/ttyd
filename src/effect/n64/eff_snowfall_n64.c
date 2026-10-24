@@ -7,6 +7,7 @@
 #endif
 #include "memory.h"
 #include <dolphin/gx.h>
+#include <dolphin/os.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
 #include <string.h>
@@ -224,10 +225,10 @@ void effSnowfallDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texB;
     GXColor blend;
     s32 count;
-    u32 dataA;
+    u8* dataA;
     s32 i;
     s32 alpha;
-    u32 dataB;
+    u8* dataB;
     int j;
 
     cam = camGetPtr(cameraId);
@@ -250,11 +251,11 @@ void effSnowfallDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_A0, GX_CA_ZERO);
     effGetTexObjN64(99, &texA);
     effGetTexObjN64(100, &texB);
-    dataA = (u32)GXGetTexObjData(&texA) + 0x80000000;
-    dataB = (u32)GXGetTexObjData(&texB) + 0x80000000;
+    dataA = (u8*)GXGetTexObjData(&texA) + OS_BASE_CACHED; // physical -> cached
+    dataB = (u8*)GXGetTexObjData(&texB) + OS_BASE_CACHED;
     dataA += GXGetTexBufferSize(64, 64, 0, 1, 2);
-    memcpy((void*)dataA, (void*)dataB, GXGetTexBufferSize(16, 16, 0, 0, 0));
-    DCFlushRange((void*)dataA, GXGetTexBufferSize(64, 64, 0, 1, 3));
+    memcpy(dataA, dataB, GXGetTexBufferSize(16, 16, 0, 0, 0));
+    DCFlushRange(dataA, GXGetTexBufferSize(64, 64, 0, 1, 3));
     GXInitTexObjLOD(&texA, GX_LIN_MIP_LIN, GX_LINEAR, 0.0f, 2.0f, 0.0f, GX_TRUE, GX_TRUE, GX_ANISO_1);
     GXLoadTexObj(&texA, GX_TEXMAP0);
     if (mapGetWork()->entries[0].flags & 2) {

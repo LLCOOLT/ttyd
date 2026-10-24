@@ -701,7 +701,7 @@ static USER_FUNC(set_weapon) {
     OhkoRateTbl tbl = N_ohko_rate_tbl;
     memcpy(w->weapon, &weapon, 0xC0);
     w->weapon[0x9E] = tbl.rate[idx - 1];
-    evtSetValue(event, args[1], (s32)w->weapon);
+    evtSetValue(event, args[1], (EvtWord)w->weapon);
     return 2;
 }
 
@@ -757,7 +757,7 @@ USER_FUNC(get_img_name) {
     EvtWord* args = event->args;
     s8 idx = evtGetValue(event, args[0]);
     SukiWork* w = get_ptr();
-    evtSetValue(event, args[1], (s32)w->names[idx]);
+    evtSetValue(event, args[1], (EvtWord)w->names[idx]);
     return 2;
 }
 

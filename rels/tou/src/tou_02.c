@@ -2,6 +2,7 @@
 #pragma dollar_identifiers on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "string.h"
@@ -465,12 +466,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("tou_01"), // nextMapName
+        "tou_01", // nextMapName
         ("a_door_mon"), // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)s_door_close, // enterAnimeArg
-        (s32)s_door_open, // exitAnimeArg
+        s_door_close, // enterAnimeArg
+        s_door_open, // exitAnimeArg
     },
     {
         ("n_bero_1"), // hitName
@@ -483,12 +484,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("tou_03"), // nextMapName
+        "tou_03", // nextMapName
         ("s_bero_1"), // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)n_1_door_close, // enterAnimeArg
-        (s32)n_1_door_open, // exitAnimeArg
+        n_1_door_close, // enterAnimeArg
+        n_1_door_open, // exitAnimeArg
     },
     {
         ("n_bero_2"), // hitName
@@ -501,12 +502,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("tou_03"), // nextMapName
+        "tou_03", // nextMapName
         ("s_bero_2"), // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)n_2_door_close, // enterAnimeArg
-        (s32)n_2_door_open, // exitAnimeArg
+        n_2_door_close, // enterAnimeArg
+        n_2_door_open, // exitAnimeArg
     },
     {
         ("n_bero_3"), // hitName
@@ -519,12 +520,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("tou_04"), // nextMapName
+        "tou_04", // nextMapName
         ("e_bero"), // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)n_3_door_close, // enterAnimeArg
-        (s32)n_3_door_open, // exitAnimeArg
+        n_3_door_close, // enterAnimeArg
+        n_3_door_open, // exitAnimeArg
     },
     {
         ("n_bero_4"), // hitName
@@ -537,12 +538,12 @@ static BeroEntry bero_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)("tou_04"), // nextMapName
+        "tou_04", // nextMapName
         ("w_bero"), // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)n_4_door_close, // enterAnimeArg
-        (s32)n_4_door_open, // exitAnimeArg
+        n_4_door_close, // enterAnimeArg
+        n_4_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -1820,7 +1821,7 @@ void ext_fan_main(void) {
                         fan->timer = dist / fan->param.y;
                         fan->param.x = dy / fan->timer + fan->param.z * fan->timer / 2.0f;
                         // FAKE: integer cast makes the literal a CSE/loop-invariant temp (target addi r30 + mr r29 copy)
-                        psndSFXOn_3D((const char*)(u32)"SFX_STG3_AUDIENCE_FAN_FLY1", &fan->pos);
+                        psndSFXOn_3D(SFX_NAME_WORD("SFX_STG3_AUDIENCE_FAN_FLY1"), &fan->pos);
                         break;
                     case 2: {
 
@@ -1836,7 +1837,7 @@ void ext_fan_main(void) {
                         fan->param.z = spd * -fan_cos(angle);
                         fan->timer = 120;
                         // FAKE: integer cast makes the literal a CSE/loop-invariant temp (target addi r30 + mr r29 copy)
-                        psndSFXOn_3D((const char*)(u32)"SFX_STG3_AUDIENCE_FAN_FLY1", &fan->pos);
+                        psndSFXOn_3D(SFX_NAME_WORD("SFX_STG3_AUDIENCE_FAN_FLY1"), &fan->pos);
                         break;
                     }
                 }

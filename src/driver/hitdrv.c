@@ -1,4 +1,5 @@
 #include "driver/hitdrv.h"
+#include "addr_word.h"
 #include "hwaccess.h"
 #include <dolphin/os/OSFastCast.h>
 #include "dolphin/os.h"
@@ -217,7 +218,7 @@ HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapI
                 // FAKE: i (dead after the joint search) as the packed counter and j holding the list offset: their later webs become the @ temps that give the target colouring
                 for (i = 0; i < mesh->displayListCount; i++) {
                     j = mesh->displayLists.packedLists[i].offset;
-                    numVectors += *(u16*)(j + 1) - 2;
+                    numVectors += *(u16*)((AddrWord)j + 1) - 2;
                 }
             }
         }
@@ -564,12 +565,12 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
 
     // FAKE: NULL check through stride gives stride an early web (the packed stride becomes a split @ temp, target r19);
     // the dead int guard (COLOURING M) keeps stride as the compared operand so the pointer compare stays cmplwi
-    stride = (s32)hit->vectors;
+    stride = (s32)(AddrWord)hit->vectors;
     i = 0;
     if (i != 0) {
         stride = stride;
     }
-    if ((void*)stride == NULL) {
+    if ((void*)(AddrWord)stride == NULL) {
         return 0;
     }
     for (i = 0; i < hit->joint->partCount; i++) {
@@ -604,7 +605,7 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
             }
         } else {
             u32 bit;
-            u32 m;
+            AddrWord m;
             wp = mapGetWork();
             m = 0; // FAKE: popcount accumulated in m (later reused as the i0 pointer) so stride is a single-def web
             for (bit = 0; bit < 12; bit++) {
@@ -612,7 +613,7 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
             }
             stride = m * 2;
             for (k = 0; k < mesh->displayListCount; k++) {
-                u8* list = (u8*)mesh->displayLists.packedLists[k].offset;
+                u8* list = (u8*)(AddrWord)mesh->displayLists.packedLists[k].offset;
                 bit = *(u16*)(list + 1) - 2; // FAKE: loop bound in the dead popcount counter (its later web becomes an @ temp); (s32) keeps the signed compare
                 for (j = 0; j < (s32)bit; j++) {
                     u16 i0;
@@ -627,14 +628,14 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                     HitVector* v2;
                     base = (s16*)mesh->vcdTable->positions->data;
                     v2 = &hit->vectors[count];
-                    m = (u32)list; // FAKE: m (the popcount counter) reused as the i1/i2/i0 address temp gives the target add list,X; lhz 3 and leaves o1 a single web (o0/o1/base colour r4/r5/r3)
+                    m = (AddrWord)list; // FAKE: m (the popcount counter) reused as the i1/i2/i0 address temp gives the target add list,X; lhz 3 and leaves o1 a single web (o0/o1/base colour r4/r5/r3)
                     m += stride * (j + 1);
                     i1 = *(u16*)(m + 3);
-                    m = (u32)list;
+                    m = (AddrWord)list;
                     m += stride * (j + 2);
                     i2 = *(u16*)(m + 3);
                     even = !(j & 1);
-                    m = (u32)list;
+                    m = (AddrWord)list;
                     m += j * stride;
                     i0 = *(u16*)(m + 3);
                     o0 = i0 * 3;
@@ -1292,7 +1293,8 @@ const char* hitGetName(HitEntry* hit) { // 1:1
     MapEntry* map;
     s32 count;
     int i;
-    u32 start, size;
+    u8* start;
+    u32 size;
 
     if (hit == NULL) {
         return NULL;
@@ -1300,9 +1302,9 @@ const char* hitGetName(HitEntry* hit) { // 1:1
     map = mapGetWork()->entries;
     count = map->count;
     for (i = 0; i < count; map++, i++) {
-        start = (u32)map->hitEntries;
+        start = (u8*)map->hitEntries;
         size = OSRoundUp32B((map->hitNumJoints + 0x80) * sizeof(HitEntry));
-        if ((u32)hit >= start && (u32)hit < start + size) {
+        if ((u8*)hit >= start && (u8*)hit < start + size) {
             break;
         }
     }

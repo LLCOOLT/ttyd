@@ -1907,7 +1907,7 @@ BeroEntry bero_boss[] = {
         NULL, // enterEvent
         10, // caseType
         (s32*)floor_clear, // exitEvent
-        (s32)"tik_06", // nextMapName
+        "tik_06", // nextMapName
         "dokan_3", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -1950,7 +1950,7 @@ BeroEntry bero_return[] = {
         NULL, // enterEvent
         10, // caseType
         (s32*)floor_clear, // exitEvent
-        (s32)"tik_06", // nextMapName
+        "tik_06", // nextMapName
         "dokan_3", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -1967,7 +1967,7 @@ BeroEntry bero_return[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)floor_inc, // exitEvent
-        (s32)"jon_00", // nextMapName
+        "jon_00", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -1988,7 +1988,7 @@ BeroEntry bero_return2[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)floor_inc, // exitEvent
-        (s32)"jon_01", // nextMapName
+        "jon_01", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -2009,7 +2009,7 @@ BeroEntry bero_return3[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)floor_inc, // exitEvent
-        (s32)"jon_02", // nextMapName
+        "jon_02", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -2094,7 +2094,7 @@ BeroEntry bero_prev_return[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)floor_inc, // exitEvent
-        (s32)"jon_03", // nextMapName
+        "jon_03", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -2115,7 +2115,7 @@ BeroEntry bero_prev_return2[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)floor_inc, // exitEvent
-        (s32)"jon_04", // nextMapName
+        "jon_04", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -2136,7 +2136,7 @@ BeroEntry bero_prev_return3[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)floor_inc, // exitEvent
-        (s32)"jon_05", // nextMapName
+        "jon_05", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -2157,7 +2157,7 @@ BeroEntry bero_prev_return4[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)floor_inc, // exitEvent
-        (s32)"jon_06", // nextMapName
+        "jon_06", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -2223,7 +2223,7 @@ BeroEntry bero_normal[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)floor_inc, // exitEvent
-        (s32)"jon_00", // nextMapName
+        "jon_00", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -2244,7 +2244,7 @@ BeroEntry bero_normal2[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)floor_inc, // exitEvent
-        (s32)"jon_01", // nextMapName
+        "jon_01", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -2265,7 +2265,7 @@ BeroEntry bero_normal3[] = {
         NULL, // enterEvent
         6, // caseType
         (s32*)floor_inc, // exitEvent
-        (s32)"jon_02", // nextMapName
+        "jon_02", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -2997,7 +2997,7 @@ USER_FUNC(wait_landon) {
     // マッキノ
     NpcEntry* npc = npcNameToPtr("\203}\203b\203L\203m");
 
-    if (!(npc->flags & 0x10) || (u32)npc->groundHit != 0) {
+    if (!(npc->flags & 0x10) || npc->groundHit != NULL) {
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;
@@ -3087,8 +3087,8 @@ USER_FUNC(enemy_info) {
     } else {
         name = tribe->nameJp;
     }
-    evtSetValue(event, args[1], (s32)tribe->modelName);
-    evtSetValue(event, args[2], (s32)name);
+    evtSetValue(event, args[1], (EvtWord)tribe->modelName);
+    evtSetValue(event, args[2], (EvtWord)name);
     evtSetValue(event, args[3], no);
     return EVT_RETURN_DONE;
 }

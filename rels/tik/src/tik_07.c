@@ -129,12 +129,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tik_08", // nextMapName
+        "tik_08", // nextMapName
         "s_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)bero_00_close_door, // enterAnimeArg
-        (s32)bero_00_open_door, // exitAnimeArg
+        bero_00_close_door, // enterAnimeArg
+        bero_00_open_door, // exitAnimeArg
     },
     {
         "e_bero", // hitName
@@ -146,7 +146,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"tik_00", // nextMapName
+        "tik_00", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -163,7 +163,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"bom_00", // nextMapName
+        "bom_00", // nextMapName
         "dokan", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -180,7 +180,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"tik_18", // nextMapName
+        "tik_18", // nextMapName
         "dokan_2", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -213,7 +213,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         10, // caseType
         NULL, // exitEvent
-        (s32)"gor_03", // nextMapName
+        "gor_03", // nextMapName
         "dokan_1", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -250,7 +250,7 @@ static BeroEntry bero_entry_data2[] = {
         NULL, // enterEvent
         6, // caseType
         NULL, // exitEvent
-        (s32)"sys_01", // nextMapName
+        "sys_01", // nextMapName
         "stg_7", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType

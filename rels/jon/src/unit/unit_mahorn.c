@@ -1504,7 +1504,7 @@ static USER_FUNC(eff_magic) {
     x += unit->mSizeMultiplier * unit->faceDirection;
     y += 18.0f * unit->mSizeMultiplier;
     z += 5.0f;
-    unit->work[7] = (s32)effMahorn2Entry(0, x, y, z, a, y, z, unit->mSizeMultiplier, mahorn_fabs((a - x) / time));
+    unit->work[7] = (EvtWord)effMahorn2Entry(0, x, y, z, a, y, z, unit->mSizeMultiplier, mahorn_fabs((a - x) / time));
     return EVT_RETURN_DONE;
 }
 
@@ -1654,7 +1654,7 @@ static USER_FUNC(hand_init) {
     for (j = 0, i = 2; i <= 5; i++, j++) {
         BtlUnit_SetAnim(BtlUnit_GetPartsPtr(unit, i), "MAH_Z_2");
         dest = BTL_ALLOC(12);
-        unit->work[j] = (s32)dest;
+        unit->work[j] = (EvtWord)dest;
         dest[0] = 0.0f;
         dest[1] = 0.0f;
         dest[2] = 0.0f;

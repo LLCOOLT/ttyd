@@ -217,7 +217,7 @@ USER_FUNC(evt_moving_floor_alloc) {
 	w->prev[2] = w->pos3[2];
 	w->prevYoff = w->yoff;
 	WOBBLE(w)
-	evtSetValue(event, args[0], (s32)w);
+	evtSetValue(event, args[0], (EvtWord)w);
 	return EVT_RETURN_DONE;
 }
 
@@ -528,7 +528,7 @@ USER_FUNC(moving_floor_set_se) {
 		if ((psndGetFlag() & 0x100) && !(obj->flags & 0x1800)) {
 			flags = 0x10000;
 		}
-		w->seId = psndSFXOn_3D((const char*)(flags | 0x424), &pos);
+		w->seId = psndSFXOn_3D(SFX_NAME_WORD(flags | 0x424), &pos);
 	}
 	return EVT_RETURN_DONE;
 }

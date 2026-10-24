@@ -82,7 +82,7 @@ typedef struct PartyWorkYoshi {  // party_yoshi.c
 } PartyWorkYoshi;
 
 typedef struct PartyWorkNokonoko { // party_nokonoko.c
-    u32 heldItem;                // 0x174, ItemEntry* picked up while in the shell (PW u32)
+    struct ItemEntry* heldItem;  // 0x174, item picked up while in the shell
     union {
         u32 shellSpinBits;       // 0x178, zeroed as u32
         f32 shellSpin;           // 0x178, 50.0 then -= 2.2 per frame

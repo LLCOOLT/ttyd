@@ -34,8 +34,8 @@ f32 fd_kpa_03___local_3PIO2_368;
 f32 fd_kpa_03_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_kpa_03___local_PIO2_367;
 f32 fd_kpa_03_one_364;
-static s32 kpa_act_stg2_mobj[209];
-s32 kpa_act_stg2_item[85];
+static EvtWord kpa_act_stg2_mobj[209];
+EvtWord kpa_act_stg2_item[85];
 static EvtWord kpa_fall[41];
 EvtWord kairyu_evt[38];
 static EvtWord jumpstand_evt[60];
@@ -70,7 +70,7 @@ f32 fd_kpa_03___local_PIO2_367 = 1.5707964f;
 
 f32 fd_kpa_03_one_364 = 1.0f;
 
-static s32 kpa_act_stg2_mobj[] = {
+static EvtWord kpa_act_stg2_mobj[] = {
     KPA_OBJ_SANGO(-1275.0f, 0.0f), KPA_OBJ_BRICK_2(-1100.0f, 200.0f), KPA_OBJ_SANGO(-1100.0f, 250.0f),
     KPA_OBJ_BRICK_2(-925.0f, 0.0f), KPA_OBJ_BRICK_2(-925.0f, 50.0f), KPA_OBJ_BRICK_2(-925.0f, 100.0f),
     KPA_OBJ_OJAMA_BLK(-775.0f, 100.0f), KPA_OBJ_BRICK_2(-725.0f, 0.0f), KPA_OBJ_BRICK_2(-725.0f, 50.0f),
@@ -88,7 +88,7 @@ static s32 kpa_act_stg2_mobj[] = {
     KPA_OBJ_BRICK_2(550.0f, 250.0f), KPA_OBJ_BRICK_2(600.0f, 250.0f), KPA_OBJ_BRICK_2(650.0f, 250.0f),
     KPA_OBJ_BRICK_2(700.0f, 250.0f), KPA_OBJ_BRICK_2(750.0f, 250.0f), KPA_OBJ_BRICK_2(800.0f, 250.0f),
     KPA_OBJ_BRICK_2(850.0f, 250.0f), KPA_OBJ_BRICK_2(900.0f, 300.0f), KPA_OBJ_BRICK_2(900.0f, 350.0f),
-    KPA_OBJ_SANGO(975.0f, 0.0f), KPA_OBJ_JUMPSTAND_RED(1150.0f, 0.0f, (s32)jumpstand_evt),
+    KPA_OBJ_SANGO(975.0f, 0.0f), KPA_OBJ_JUMPSTAND_RED(1150.0f, 0.0f, (EvtWord)jumpstand_evt),
     KPA_OBJ_BRICK_2(1325.0f, 0.0f), KPA_OBJ_BRICK_2(1375.0f, 0.0f), KPA_OBJ_BRICK_2(1375.0f, 50.0f),
     KPA_OBJ_BRICK_2(1425.0f, 0.0f), KPA_OBJ_BRICK_2(1425.0f, 50.0f), KPA_OBJ_BRICK_2(1425.0f, 100.0f),
     KPA_OBJ_BRICK_2(1425.0f, 250.0f), KPA_OBJ_BRICK_2(1425.0f, 300.0f), KPA_OBJ_BRICK_2(1425.0f, 350.0f),
@@ -97,7 +97,7 @@ static s32 kpa_act_stg2_mobj[] = {
     KPA_OBJ_BRICK_2(1475.0f, 350.0f), KPA_OBJ_END,
 };
 
-s32 kpa_act_stg2_item[] = {
+EvtWord kpa_act_stg2_item[] = {
     KPA_ITEM(-1050.0f, 212.5f), KPA_ITEM(-1000.0f, 212.5f), KPA_ITEM(-875.0f, 12.5f),
     KPA_ITEM(-875.0f, 62.5f), KPA_ITEM(-825.0f, 12.5f), KPA_ITEM(-825.0f, 62.5f), KPA_ITEM(-775.0f, 12.5f),
     KPA_ITEM(-775.0f, 62.5f), KPA_ITEM(125.0f, 0.0f), KPA_ITEM(175.0f, 0.0f), KPA_ITEM(225.0f, 0.0f),

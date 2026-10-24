@@ -174,12 +174,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"aji_01", // nextMapName
+        "aji_01", // nextMapName
         "e_bero_2", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)w_door_close, // enterAnimeArg
-        (s32)w_door_open, // exitAnimeArg
+        w_door_close, // enterAnimeArg
+        w_door_open, // exitAnimeArg
     },
     {0},
 };
@@ -804,7 +804,7 @@ static void callback(s32 type, void** work) {
     }
     evt = ((MsgWinData*)*work)->event;
     if (((EventEntry*)evt->lwData[8] == NULL || !evtCheckID(((EventEntry*)evt->lwData[8])->eventId)) && type == 5) {
-        evt->lwData[8] = (s32)evtEntry(UNK_0x00022c3c, 0, 0);
+        evt->lwData[8] = (EvtWord)evtEntry(UNK_0x00022c3c, 0, 0);
     }
 }
 
@@ -812,7 +812,7 @@ void kuti_callback(s32 type, void** work) {
     EventEntry* evt = ((MsgWinData*)*work)->event;
 
     if (((EventEntry*)evt->lwData[8] == NULL || !evtCheckID(((EventEntry*)evt->lwData[8])->eventId)) && type == 5) {
-        evt->lwData[8] = (s32)evtEntry(UNK_0x00022c3c, 0, 0);
+        evt->lwData[8] = (EvtWord)evtEntry(UNK_0x00022c3c, 0, 0);
     }
 }
 

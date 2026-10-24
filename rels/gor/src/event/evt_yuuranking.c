@@ -1019,7 +1019,7 @@ USER_FUNC(evt_yuuranking_alloc) {
         wp->dispFlags |= 4;
     }
     wp->event = evtEntry(main_evt, 0, 0);
-    wp->event->lwData[0] = (s32)wp;
+    wp->event->lwData[0] = (EvtWord)wp;
     return EVT_RETURN_DONE;
 }
 

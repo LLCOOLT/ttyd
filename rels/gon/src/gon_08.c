@@ -187,12 +187,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gon_04", // nextMapName
+        "gon_04", // nextMapName
         "w_bero_2", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)door01_close, // enterAnimeArg
-        (s32)door01_open, // exitAnimeArg
+        door01_close, // enterAnimeArg
+        door01_open, // exitAnimeArg
     },
     {
         "e_bero_2", // hitName
@@ -205,12 +205,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gon_09", // nextMapName
+        "gon_09", // nextMapName
         "w_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)door02_close, // enterAnimeArg
-        (s32)door02_open, // exitAnimeArg
+        door02_close, // enterAnimeArg
+        door02_open, // exitAnimeArg
     },
     {
         "w_bero", // hitName
@@ -223,12 +223,12 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gon_12", // nextMapName
+        "gon_12", // nextMapName
         "e_bero", // nextBeroName
         5, // enterAnimeType
         5, // exitAnimeType
-        (s32)door03_close, // enterAnimeArg
-        (s32)door03_open, // exitAnimeArg
+        door03_close, // enterAnimeArg
+        door03_open, // exitAnimeArg
     },
     {0},
 };

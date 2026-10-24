@@ -81,7 +81,7 @@ typedef struct BattleAudienceMember {
     u8 pad_E0[0xE4 - 0xE0];    // 0xE0, never accessed
     f32 hopAccel;              // 0xE4, hop gravity (0 = hop finished)
     f32 angle;                 // 0xE8, init 270, wrapped to 0..360
-    s32 targetUnit;            // 0xEC, BattleUnit* the member targets (stored as s32)
+    struct BattleUnit* targetUnit; // 0xEC, the unit the member targets
     s16 targetMemberId;        // 0xF0, index of another member it interacts with
     u8 pad_F2[0xF4 - 0xF2];    // 0xF2, never accessed
     s32 statusDelay;           // 0xF4, countdown before status 13 -> 3

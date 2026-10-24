@@ -101,7 +101,7 @@ BadgeShopWork badgeshopwork;
 BadgeShopWork* bdsw;
 
 //local prototypes
-s32 bottakuruComp(const void** sortA, const void** sortB);
+s32 bottakuruComp(const s32* sortA, const s32* sortB);
 
 s32 getBadgeBottakuru100TableMaxCount(void) {
 	return (sizeof(badge_bottakuru100_table) / sizeof(s32)) - 1;
@@ -147,11 +147,11 @@ void badgeShop_init(void) {
 	}
 }
 
-s32 bottakuruComp(const void** sortA, const void** sortB) {
+s32 bottakuruComp(const s32* sortA, const s32* sortB) {
 	s32 a, b;
 
-	a = (s32)sortA[1];
-	b = (s32)sortB[1];
+	a = sortA[1];
+	b = sortB[1];
 	if (a < b) {
 		return -1;
 	}
@@ -508,7 +508,7 @@ s32 badgeShop_add(u8* table, s16 id, s32 value) { // 1:1, can blow up in your fa
 }
 
 USER_FUNC(badgeShop_getBargainTable) {
-	evtSetValue(event, *event->args, (s32)&bdsw->bargainBadges);
+	evtSetValue(event, *event->args, (EvtWord)&bdsw->bargainBadges);
 	return EVT_RETURN_DONE;
 }
 

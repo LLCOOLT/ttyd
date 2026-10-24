@@ -66,7 +66,7 @@ USER_FUNC(pre_kurio_use) {
             if (!hit || !(hitGetAttr(hit) & 0x80000000)) {
                 hit = ((MarioWork*)mario)->hitobjStandOn;
                 if (!hit || !(hitGetAttr(hit) & 0x80000000)) {
-                    event->lwData[0] = (s32)"msg_kuri_map";
+                    event->lwData[0] = (EvtWord)"msg_kuri_map";
                     return EVT_RETURN_DONE;
                 }
             }
@@ -144,7 +144,7 @@ USER_FUNC(pre_kurio_use) {
             msg = "msg_kuri_map";
         }
         if (msg) {
-            event->lwData[0] = (s32)msg;
+            event->lwData[0] = (EvtWord)msg;
             partyChgPoseId(party, 7);
         }
         return EVT_RETURN_DONE;

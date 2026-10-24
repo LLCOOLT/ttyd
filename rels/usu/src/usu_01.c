@@ -1,6 +1,7 @@
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 
 #pragma force_active on
 #include "mario/mario.h"
@@ -2652,7 +2653,7 @@ USER_FUNC(get_item_list) {
         }
     }
     list[n] = -1;
-    evtSetValue(event, args[0], (s32)list);
+    evtSetValue(event, args[0], (EvtWord)list);
     return EVT_RETURN_DONE;
 }
 
@@ -2994,7 +2995,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"gra_00", // nextMapName
+        "gra_00", // nextMapName
         "w_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
@@ -3010,7 +3011,7 @@ static BeroEntry bero_entry_data[] = {
         NULL, // enterEvent
         -1, // caseType
         NULL, // exitEvent
-        (s32)"usu_00", // nextMapName
+        "usu_00", // nextMapName
         "e_bero", // nextBeroName
         1, // enterAnimeType
         1, // exitAnimeType
