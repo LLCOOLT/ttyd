@@ -93,25 +93,25 @@ BattleWeapon weapon_champion_foot_stamp_attack;
 BattleWeapon weapon_champion_healing;
 BattleWeapon weapon_champion_roof_shake_attack;
 BattleWeapon weapon_champion_roof_shake_last_attack;
-s32 to_ceiling[103];
-s32 to_floor[95];
-static s32 init_event[52];
-static s32 entry_event[354];
-static s32 damage_event[75];
-static s32 ceil_fall_ready_event[8];
-static s32 dead_event[90];
-static s32 phase_event[450];
-static s32 attack_event[221];
-s32 drop_kick_attack_event[299];
-s32 screw_attack_event[295];
-s32 flying_chop_attack_event[326];
-s32 foot_stamp_attack_event[467];
-s32 healing_event[209];
-s32 roof_shake_attack_event[386];
-static s32 wait_event[6];
+EvtWord to_ceiling[103];
+EvtWord to_floor[95];
+static EvtWord init_event[52];
+static EvtWord entry_event[354];
+static EvtWord damage_event[75];
+static EvtWord ceil_fall_ready_event[8];
+static EvtWord dead_event[90];
+static EvtWord phase_event[450];
+static EvtWord attack_event[221];
+EvtWord drop_kick_attack_event[299];
+EvtWord screw_attack_event[295];
+EvtWord flying_chop_attack_event[326];
+EvtWord foot_stamp_attack_event[467];
+EvtWord healing_event[209];
+EvtWord roof_shake_attack_event[386];
+static EvtWord wait_event[6];
 
 USER_FUNC(ceil_exist) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (_battleWorkPointer->stageObjectWork.flags & 0x20) {
         evtSetValue(event, args[0], 0);
@@ -1445,7 +1445,7 @@ USER_FUNC(check_ceil) {
 }
 
 USER_FUNC(eff_fall_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 var = args[0];
     s32 type = evtGetValue(event, args[1]);
     f32 x = evtGetFloat(event, args[2]);

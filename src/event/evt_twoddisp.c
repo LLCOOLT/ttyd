@@ -111,7 +111,7 @@ s32 evt_twoddisp_init(EventEntry* evt, BOOL isFirstCall) {
 s32 evt_twoddisp_entry(EventEntry* evt, BOOL isFirstCall) {
     s32 id;
     s32 i;
-    s32* args;
+    EvtWord* args;
     char* name;
     TwodEntry* p;
 
@@ -152,7 +152,7 @@ static inline TwodEntry* twod_find(const char* name) {
 }
 
 s32 evt_twoddisp_set_position(EventEntry* evt, BOOL isFirstCall) {
-    s32* args = evt->args;
+    EvtWord* args = evt->args;
     char* name = (char*)evtGetValue(evt, args[0]);
     TwodEntry* p;
     s32 i;
@@ -164,7 +164,7 @@ s32 evt_twoddisp_set_position(EventEntry* evt, BOOL isFirstCall) {
 }
 
 s32 evt_twoddisp_set_base_position(EventEntry* evt, BOOL isFirstCall) {
-    s32* args = evt->args;
+    EvtWord* args = evt->args;
     char* name = (char*)evtGetValue(evt, args[0]);
     TwodEntry* p;
     s32 i;
@@ -179,7 +179,7 @@ s32 evt_twoddisp_flag_onoff(EventEntry* evt, BOOL isFirstCall) {
     s32 onoff;
     TwodEntry* p;
     s32 i;
-    s32* args;
+    EvtWord* args;
     char* name;
 
     args = evt->args;

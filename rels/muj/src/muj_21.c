@@ -61,11 +61,11 @@ f32 fd_muj_21___local_3PIO2_368;
 f32 fd_muj_21_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_muj_21___local_PIO2_367;
 f32 fd_muj_21_one_364;
-s32 peach_init[12];
+EvtWord peach_init[12];
 static NpcSetupInfo npcEnt[2];
-s32 fune_yure[42];
-static s32 epilogue_evt[344];
-s32 muj_21_init_evt[58];
+EvtWord fune_yure[42];
+static EvtWord epilogue_evt[344];
+EvtWord muj_21_init_evt[58];
 
 f32 fd_muj_21_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

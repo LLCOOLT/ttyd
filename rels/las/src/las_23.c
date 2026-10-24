@@ -31,19 +31,19 @@ f32 fd_las_23___local_3PIO2_368;
 f32 fd_las_23_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_23___local_PIO2_367;
 f32 fd_las_23_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
-static s32 e1_door_close[22];
-static s32 e1_door_open[22];
-static s32 e2_door_close[22];
-static s32 e2_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
+static EvtWord e1_door_close[22];
+static EvtWord e1_door_open[22];
+static EvtWord e2_door_close[22];
+static EvtWord e2_door_open[22];
 static BeroEntry bero_entry_data[6];
 static BeroEntry w_bero_mapchg[1];
 static HitDamageReturn dmgRetPoint[6];
 #ifdef VERSION_G8ME01
-s32 las_23_init_evt[98];
+EvtWord las_23_init_evt[98];
 #else
-s32 las_23_init_evt[93];
+EvtWord las_23_init_evt[93];
 #endif
 
 f32 fd_las_23_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};

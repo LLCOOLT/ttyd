@@ -31,13 +31,13 @@ f32 fd_tik_08___local_3PIO2_368;
 f32 fd_tik_08_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tik_08___local_PIO2_367;
 f32 fd_tik_08_one_364;
-s32 oshimodo_event_sub[33];
-static s32 oshimodo_event[10];
+EvtWord oshimodo_event_sub[33];
+static EvtWord oshimodo_event[10];
 static BeroEntry bero_oshimodo[1];
 static BeroEntry bero_entry_data[3];
 static BeroEntry bero_entry_data2[2];
-static s32 evt_kanban[16];
-s32 tik_08_init_evt[68];
+static EvtWord evt_kanban[16];
+EvtWord tik_08_init_evt[68];
 
 f32 fd_tik_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

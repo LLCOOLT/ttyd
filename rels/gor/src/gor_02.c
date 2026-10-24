@@ -331,7 +331,7 @@ USER_FUNC(_door_color_init_func) {
 }
 
 USER_FUNC(_door_color_main_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     DoorColorWork* door = _door;
 
     door->color.r = evtGetValue(event, args[0]);
@@ -342,7 +342,7 @@ USER_FUNC(_door_color_main_func) {
 }
 
 USER_FUNC(_door_color2_main_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     DoorColorWork* door = _door;
 
     door->color2.r = evtGetValue(event, args[0]);
@@ -379,203 +379,203 @@ f32 fd_gor_02___local_3PIO2_368;
 f32 fd_gor_02_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gor_02___local_PIO2_367;
 f32 fd_gor_02_one_364;
-s32 gor_02_hitobj_off[27];
-s32 gor_02_hitobj_on[54];
-s32 gor_02_event_00[18];
-s32 gor_02_event_01[30];
+EvtWord gor_02_hitobj_off[27];
+EvtWord gor_02_hitobj_on[54];
+EvtWord gor_02_event_00[18];
+EvtWord gor_02_event_01[30];
 static BeroEntry bero_entry_data[3];
-s32 powerupya_party_lank_rtn[786];
+EvtWord powerupya_party_lank_rtn[786];
 #ifdef VERSION_G8ME01
-s32 powerupya_party_rtn[170];
+EvtWord powerupya_party_rtn[170];
 #else
-s32 powerupya_party_rtn[167];
+EvtWord powerupya_party_rtn[167];
 #endif
-s32 powerupya_table_talk[91];
-s32 powerupya_direct_talk[96];
+EvtWord powerupya_table_talk[91];
+EvtWord powerupya_direct_talk[96];
 s32 powerupya_item_tbl[2];
-s32 powerupya_stardust[32];
-s32 powerupya_mario_move[48];
-s32 powerupya_party_move[38];
-s32 powerupya_orb_use[544];
-s32 powerupya_talk[119];
-s32 mapball_init[19];
-s32 powerupya_init[58];
+EvtWord powerupya_stardust[32];
+EvtWord powerupya_mario_move[48];
+EvtWord powerupya_party_move[38];
+EvtWord powerupya_orb_use[544];
+EvtWord powerupya_talk[119];
+EvtWord mapball_init[19];
+EvtWord powerupya_init[58];
 #ifdef VERSION_G8ME01
-s32 johoyaperfect_talk[169];
+EvtWord johoyaperfect_talk[169];
 #else
-s32 johoyaperfect_talk[146];
+EvtWord johoyaperfect_talk[146];
 #endif
-static s32 kurihakase_init[134];
-static s32 kurihakase_talk[421];
-s32 oyabun_init[7];
-s32 oyabun_talk[364];
-s32 tozokudan1_init[36];
-s32 tozokudan1_talk[285];
-s32 tozokudan2_init[24];
+static EvtWord kurihakase_init[134];
+static EvtWord kurihakase_talk[421];
+EvtWord oyabun_init[7];
+EvtWord oyabun_talk[364];
+EvtWord tozokudan1_init[36];
+EvtWord tozokudan1_talk[285];
+EvtWord tozokudan2_init[24];
 static s32 key_tbl[2];
-static s32 evt_chk[23];
-s32 tozokudan2_house_door[139];
-s32 mario_yokeru[127];
-s32 evt_unlock_mario[78];
-static s32 evt_unlock[6];
-s32 evt_unlock_npc[97];
-s32 tozokudan2_talk[121];
-s32 tozokudan3_init[17];
-s32 tozokudan3_talk[22];
-s32 sanders_open_door[56];
-static s32 sanders_init[37];
-static s32 sanders_talk[574];
-s32 kuribo4_init[13];
-s32 kuribo4_regl[19];
+static EvtWord evt_chk[23];
+EvtWord tozokudan2_house_door[139];
+EvtWord mario_yokeru[127];
+EvtWord evt_unlock_mario[78];
+static EvtWord evt_unlock[6];
+EvtWord evt_unlock_npc[97];
+EvtWord tozokudan2_talk[121];
+EvtWord tozokudan3_init[17];
+EvtWord tozokudan3_talk[22];
+EvtWord sanders_open_door[56];
+static EvtWord sanders_init[37];
+static EvtWord sanders_talk[574];
+EvtWord kuribo4_init[13];
+EvtWord kuribo4_regl[19];
 static s32 item_tbl[2];
-s32 kuribo4_talk[276];
-s32 chusan3_init[2];
-s32 chusan3_talk[76];
-s32 roten3_init[2];
-s32 roten3_talk[174];
-s32 borodo1_init[26];
-s32 borodo1_regl[26];
-s32 borodo1_talk[76];
-static s32 borodo2_init[35];
-static s32 borodo2_escape[51];
-static s32 borodo2_talk[100];
-s32 kuragarisan_init[7];
-s32 kuragarisan_write_name[435];
-s32 kuragarisan_talk[108];
-static s32 luigi_init[18];
-static s32 luigi_talk[4];
+EvtWord kuribo4_talk[276];
+EvtWord chusan3_init[2];
+EvtWord chusan3_talk[76];
+EvtWord roten3_init[2];
+EvtWord roten3_talk[174];
+EvtWord borodo1_init[26];
+EvtWord borodo1_regl[26];
+EvtWord borodo1_talk[76];
+static EvtWord borodo2_init[35];
+static EvtWord borodo2_escape[51];
+static EvtWord borodo2_talk[100];
+EvtWord kuragarisan_init[7];
+EvtWord kuragarisan_write_name[435];
+EvtWord kuragarisan_talk[108];
+static EvtWord luigi_init[18];
+static EvtWord luigi_talk[4];
 static NpcSetupInfo npcEnt[16];
-static s32 evt_door_01_00[12];
-static s32 evt_door_01_01[12];
-static s32 evt_wall_01[15];
+static EvtWord evt_door_01_00[12];
+static EvtWord evt_door_01_01[12];
+static EvtWord evt_wall_01[15];
 static const char* door_data_01_npc[2];
-static s32 evt_door_01_open[88];
-static s32 evt_door_01_close[85];
+static EvtWord evt_door_01_open[88];
+static EvtWord evt_door_01_close[85];
 static DoorParam door_data_01;
-static s32 evt_door_02_00[12];
-s32 evt_door_02_01[12];
-static s32 evt_wall_02[15];
+static EvtWord evt_door_02_00[12];
+EvtWord evt_door_02_01[12];
+static EvtWord evt_wall_02[15];
 static const char* door_data_02_npc[2];
-s32 evt_door_02_open[127];
-s32 evt_door_02_close[76];
+EvtWord evt_door_02_open[127];
+EvtWord evt_door_02_close[76];
 static DoorParam door_data_02;
-s32 evt_door_02_entry[64];
-static s32 evt_door_03_00[12];
-s32 evt_door_03_01[12];
-static s32 evt_wall_03[15];
+EvtWord evt_door_02_entry[64];
+static EvtWord evt_door_03_00[12];
+EvtWord evt_door_03_01[12];
+static EvtWord evt_wall_03[15];
 static const char* door_data_03_npc[2];
 static const char* door_data_03_mobj[2];
-static s32 evt_door_03_close[166];
-static s32 evt_door_03_open[14];
+static EvtWord evt_door_03_close[166];
+static EvtWord evt_door_03_open[14];
 static DoorParam door_data_03;
-s32 evt_door_sanders_open[27];
-s32 evt_door_sanders_close[27];
-static s32 evt_door_03_entry[64];
-static s32 evt_door_03_caseopen[51];
-s32 evt_door_03_roll_open[163];
-s32 evt_door_03_roll_close[12];
-s32 evt_wall_03_roll[15];
+EvtWord evt_door_sanders_open[27];
+EvtWord evt_door_sanders_close[27];
+static EvtWord evt_door_03_entry[64];
+static EvtWord evt_door_03_caseopen[51];
+EvtWord evt_door_03_roll_open[163];
+EvtWord evt_door_03_roll_close[12];
+EvtWord evt_wall_03_roll[15];
 static DoorParam door_data_03_roll;
-s32 evt_door_03_roll_entry[20];
-static s32 evt_door_04_00[12];
-static s32 evt_door_04_01[12];
-static s32 evt_wall_04[38];
+EvtWord evt_door_03_roll_entry[20];
+static EvtWord evt_door_04_00[12];
+static EvtWord evt_door_04_01[12];
+static EvtWord evt_wall_04[38];
 #ifdef VERSION_G8ME01
-static s32 evt_door_04_open[19];
+static EvtWord evt_door_04_open[19];
 #else
-static s32 evt_door_04_open[14];
+static EvtWord evt_door_04_open[14];
 #endif
 #ifdef VERSION_G8ME01
-static s32 evt_door_04_close[21];
+static EvtWord evt_door_04_close[21];
 #else
-static s32 evt_door_04_close[16];
+static EvtWord evt_door_04_close[16];
 #endif
 static const char* door_data_04_npc[2];
 static const char* door_data_04_item[4];
 static DoorParam door_data_04;
-s32 evt_door_04_junbi[20];
-s32 evt_door_04_00_ura[12];
-s32 evt_door_04_01_ura[12];
-s32 evt_wall_04_ura[21];
+EvtWord evt_door_04_junbi[20];
+EvtWord evt_door_04_00_ura[12];
+EvtWord evt_door_04_01_ura[12];
+EvtWord evt_wall_04_ura[21];
 DoorParam door_data_04_ura;
-s32 evt_door_05_00[12];
-s32 evt_wall_05[28];
+EvtWord evt_door_05_00[12];
+EvtWord evt_wall_05[28];
 const char* door_data_05_npc[4];
 const char* door_data_05_npc_01[3];
-s32 evt_door_05_open[14];
-s32 evt_door_05_close[23];
+EvtWord evt_door_05_open[14];
+EvtWord evt_door_05_close[23];
 DoorParam door_data_05;
-s32 evt_door_06_00[12];
-s32 evt_wall_06_00[62];
-s32 evt_wall_06_01[59];
-s32 evt_wall_06_02[62];
-s32 evt_wall_06[12];
+EvtWord evt_door_06_00[12];
+EvtWord evt_wall_06_00[62];
+EvtWord evt_wall_06_01[59];
+EvtWord evt_wall_06_02[62];
+EvtWord evt_wall_06[12];
 const char* door_data_06_npc[2];
 const char* door_data_06_npc_01[1];
-s32 evt_door_06_open[14];
-s32 evt_door_06_close[16];
+EvtWord evt_door_06_open[14];
+EvtWord evt_door_06_close[16];
 DoorParam door_data_06;
-s32 evt_gor_door_open_sanders[80];
-s32 evt_gor_door_open_sub[44];
-s32 evt_gor_door_dark_sub[200];
-s32 evt_gor_door_open[82];
-s32 evt_gor_door_close_sanders[80];
-s32 evt_gor_door_close_sub[31];
-s32 evt_gor_door_light_sub[194];
-s32 evt_gor_door_close[66];
-s32 evt_gor_offscren_door_entry[26];
-static s32 mario_kirimomi_event[67];
-s32 cam_yurasu_event[8];
-s32 steel_coin[386];
-s32 kurihakase_first_talk[787];
-s32 kurihakase_wall_remove[257];
-s32 kurihakase_lecture[286];
-s32 kurihakase_door[84];
+EvtWord evt_gor_door_open_sanders[80];
+EvtWord evt_gor_door_open_sub[44];
+EvtWord evt_gor_door_dark_sub[200];
+EvtWord evt_gor_door_open[82];
+EvtWord evt_gor_door_close_sanders[80];
+EvtWord evt_gor_door_close_sub[31];
+EvtWord evt_gor_door_light_sub[194];
+EvtWord evt_gor_door_close[66];
+EvtWord evt_gor_offscren_door_entry[26];
+static EvtWord mario_kirimomi_event[67];
+EvtWord cam_yurasu_event[8];
+EvtWord steel_coin[386];
+EvtWord kurihakase_first_talk[787];
+EvtWord kurihakase_wall_remove[257];
+EvtWord kurihakase_lecture[286];
+EvtWord kurihakase_door[84];
 #ifdef VERSION_G8ME01
-s32 kurihakase_lecture_badge[282];
+EvtWord kurihakase_lecture_badge[282];
 #else
-s32 kurihakase_lecture_badge[272];
+EvtWord kurihakase_lecture_badge[272];
 #endif
-s32 Mario_Party_position[33];
-s32 book_open[42];
-s32 book_close[42];
-s32 book_center_init[22];
+EvtWord Mario_Party_position[33];
+EvtWord book_open[42];
+EvtWord book_close[42];
+EvtWord book_center_init[22];
 #ifdef VERSION_G8ME01
-s32 epigraphy_map[621];
+EvtWord epigraphy_map[621];
 #else
-s32 epigraphy_map[614];
-#endif
-#ifdef VERSION_G8ME01
-s32 epigraphy_map_after_stage1[258];
-#else
-s32 epigraphy_map_after_stage1[251];
+EvtWord epigraphy_map[614];
 #endif
 #ifdef VERSION_G8ME01
-s32 epigraphy_map_after_stage2[400];
+EvtWord epigraphy_map_after_stage1[258];
 #else
-s32 epigraphy_map_after_stage2[393];
+EvtWord epigraphy_map_after_stage1[251];
 #endif
 #ifdef VERSION_G8ME01
-s32 epigraphy_map_after_stage3[368];
+EvtWord epigraphy_map_after_stage2[400];
 #else
-s32 epigraphy_map_after_stage3[361];
+EvtWord epigraphy_map_after_stage2[393];
 #endif
 #ifdef VERSION_G8ME01
-s32 epigraphy_map_after_stage4[297];
+EvtWord epigraphy_map_after_stage3[368];
 #else
-s32 epigraphy_map_after_stage4[290];
+EvtWord epigraphy_map_after_stage3[361];
 #endif
 #ifdef VERSION_G8ME01
-s32 epigraphy_map_after_stage5[225];
+EvtWord epigraphy_map_after_stage4[297];
 #else
-s32 epigraphy_map_after_stage5[218];
+EvtWord epigraphy_map_after_stage4[290];
 #endif
-s32 epigraphy_map_after_stage6[245];
-s32 kurihakase_after3minutes[177];
+#ifdef VERSION_G8ME01
+EvtWord epigraphy_map_after_stage5[225];
+#else
+EvtWord epigraphy_map_after_stage5[218];
+#endif
+EvtWord epigraphy_map_after_stage6[245];
+EvtWord kurihakase_after3minutes[177];
 static HitDamageReturn hitDmgRetPoints[13];
-static s32 gor_goki1_urouro[116];
-static s32 gor_goki2_urouro[109];
-static s32 mobj_box01[34];
+static EvtWord gor_goki1_urouro[116];
+static EvtWord gor_goki2_urouro[109];
+static EvtWord mobj_box01[34];
 s32 stg0_list[1];
 s32 stg1_list[4];
 s32 stg2_list[4];
@@ -585,17 +585,17 @@ s32 stg6_list[1];
 s32 stg7_list[6];
 s32 stg8_list[10];
 MonosiriFollow follow[8];
-s32 evt_monosiri[39];
-s32 evt_monosiri_follow[18];
-s32 evt_cloud[10];
-s32 iri_19_init[20];
-static s32 epilogue_npc_entry[40];
-static s32 epilogue_evt_sub[56];
-static s32 epilogue_evt[101];
-s32 dearu_event[13];
-s32 front_wall_keshi[27];
-s32 tobiori_check[48];
-s32 gor_02_init_evt[543];
+EvtWord evt_monosiri[39];
+EvtWord evt_monosiri_follow[18];
+EvtWord evt_cloud[10];
+EvtWord iri_19_init[20];
+static EvtWord epilogue_npc_entry[40];
+static EvtWord epilogue_evt_sub[56];
+static EvtWord epilogue_evt[101];
+EvtWord dearu_event[13];
+EvtWord front_wall_keshi[27];
+EvtWord tobiori_check[48];
+EvtWord gor_02_init_evt[543];
 
 f32 fd_gor_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -725,7 +725,7 @@ static USER_FUNC(alpha_set_func) {
 }
 
 static USER_FUNC(effect_stardust) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -740,7 +740,7 @@ static USER_FUNC(effect_stardust) {
 }
 
 static USER_FUNC(wariai_enzan_1) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);
@@ -751,7 +751,7 @@ static USER_FUNC(wariai_enzan_1) {
 }
 
 static USER_FUNC(wariai_enzan_1f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);
@@ -762,7 +762,7 @@ static USER_FUNC(wariai_enzan_1f) {
 }
 
 static USER_FUNC(wariai_enzan_1f_intpl) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);
@@ -786,7 +786,7 @@ static USER_FUNC(wariai_enzan_1f_intpl) {
 }
 
 static USER_FUNC(wariai_enzan_0) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]) - 1.0f;
     f32 c = evtGetFloat(event, args[2]);
@@ -797,7 +797,7 @@ static USER_FUNC(wariai_enzan_0) {
 }
 
 static USER_FUNC(wariai_enzan_0f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]) - 1.0f;
     f32 c = evtGetFloat(event, args[2]);
@@ -808,7 +808,7 @@ static USER_FUNC(wariai_enzan_0f) {
 }
 
 static USER_FUNC(enzan_cam_turn_keisan) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 angle = evtGetValue(event, args[0]) % 360;
     s32 xVar = args[1];
     s32 zVar = args[2];
@@ -3896,7 +3896,7 @@ EVT_BEGIN(evt_gor_door_open_sub)
 EVT_END()
 
 static USER_FUNC(enzan_set_i_f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 var = args[0];
 
     evtSetValue(event, var, evtGetFloat(event, args[1]));
@@ -3904,7 +3904,7 @@ static USER_FUNC(enzan_set_i_f) {
 }
 
 static USER_FUNC(enzan_set_f_i) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 var = args[0];
 
     evtSetFloat(event, var, evtGetValue(event, args[1]));
@@ -3973,7 +3973,7 @@ USER_FUNC(stonechangertn) {
 }
 
 USER_FUNC(get_mario_dir_target) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetFloat(event, args[0], marioGetPtr()->displayDirectionTarget);
     return EVT_RETURN_DONE;
@@ -4001,7 +4001,7 @@ USER_FUNC(iri_13_make_item_tbl) {
 }
 
 USER_FUNC(iri_13_update_item_tbl) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 count = pouchCheckItem(0x6B);
     s32 i;
 
@@ -4037,7 +4037,7 @@ void kuragarisan_msgcb(s32 type, void* param) {
 }
 
 USER_FUNC(evt_gor_door_in_info) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec outPos = {0.0f, 0.0f, 0.0f};
     Vec inPos = {0.0f, 0.0f, 0.0f};
 
@@ -4049,7 +4049,7 @@ USER_FUNC(evt_gor_door_in_info) {
 }
 
 USER_FUNC(evt_gor_door_out_info) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec outPos = {0.0f, 0.0f, 0.0f};
     Vec inPos = {0.0f, 0.0f, 0.0f};
 
@@ -4071,7 +4071,7 @@ static USER_FUNC(evt_StatusClose) {
 }
 
 static USER_FUNC(set_depthPlaneOffset) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     ImageEntry* img = imgNameToPtr((const char*)evtGetValue(event, args[0]), gp->inBattle != 0);
 
     img->offsetZ = evtGetFloat(event, args[1]);
@@ -4089,7 +4089,7 @@ USER_FUNC(lecture) {
 }
 
 USER_FUNC(monosiri_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 seq = evtGetValue(event, GSW(0));
     u32 i;
     s32 j;
@@ -4128,7 +4128,7 @@ USER_FUNC(monosiri_check) {
 }
 
 USER_FUNC(monosiri_on) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     TattleEntry* tattle = battleGetUnitMonosiriPtr(id);
 
@@ -4138,7 +4138,7 @@ USER_FUNC(monosiri_on) {
 }
 
 USER_FUNC(camera_front_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 angle = reviseAngle((100.0f * camGetPtr(CAMERA_3D)->viewYaw + 5.0f) / 100.0f);
 
 #ifdef VERSION_G8ME01
@@ -4166,7 +4166,7 @@ USER_FUNC(get_camcurve_init) {
 }
 
 USER_FUNC(get_camcurve) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     CamRoadWork* road = camRoadGetWorkPtr();
     s32 ret = 0;
 

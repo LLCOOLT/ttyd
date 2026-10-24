@@ -1,8 +1,9 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "evt/evt_word.h"
 
-extern s32 marioAttackEvent_Deka[];
+extern EvtWord marioAttackEvent_Deka[];
 s32 weaponGetPower_Deka(void);
 
-extern s32 dmg_evt[];
+extern EvtWord dmg_evt[];

@@ -117,7 +117,7 @@ static const LangTbl lang_tbl = {{"jp", "us"}};
 void seq_mapChangeMain(SequenceWork* work) {
     BOOL newarea = strcmp(_next_area, gp->currentAreaName) != 0;
     const char* area_name;
-    s32* evtCode;
+    EvtWord* evtCode;
     u32 fres;
     BOOL fok;
     switch (work->state) {

@@ -47,7 +47,7 @@ EVT_BEGIN(evt_gazigazi)
 EVT_END()
 
 void marioDmgRetQuakeOn(void) {
-    s32* evt;
+    EvtWord* evt;
     if (marioBgmodeChk() == 0) {
         evt = quake_evt;
     } else {

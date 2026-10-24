@@ -155,7 +155,7 @@ s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, s32 msg, s32 
 }
 
 USER_FUNC(evt_msg_print) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 a = evtGetValue(event, args[0]);
 	s32 b = evtGetValue(event, args[1]);
 	s32 c = evtGetValue(event, args[2]);
@@ -323,7 +323,7 @@ USER_FUNC(evt_msg_print_insert) {
 	char buf[MSG_BUF_SIZE];
 	s32 vals[4];
 	s32* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 n = (args[-2] >> 16) - 5;
 	s32 flags = evtGetValue(event, *args++);
 	const char* msg = (const char*)evtGetValue(event, *args++);
@@ -353,7 +353,7 @@ USER_FUNC(evt_msg_print_insert) {
 }
 
 USER_FUNC(evt_msg_print_add) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 flags = evtGetValue(event, args[0]);
 	const char* msg = (const char*)evtGetValue(event, args[1]);
 	if (isFirstCall) {
@@ -373,7 +373,7 @@ USER_FUNC(evt_msg_print_add_insert) {
 	char buf[MSG_BUF_SIZE];
 	s32 vals[4];
 	s32* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 n = (args[-2] >> 16) - 3;
 	s32 flags = evtGetValue(event, *args++);
 	const char* msg = (const char*)evtGetValue(event, *args++);
@@ -433,7 +433,7 @@ USER_FUNC(evt_msg_close) {
 }
 
 USER_FUNC(evt_msg_select) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 flags = evtGetValue(event, args[0]);
 	const char* msg = (const char*)evtGetValue(event, args[1]);
 	if (isFirstCall) {
@@ -456,7 +456,7 @@ USER_FUNC(evt_msg_select) {
 }
 
 USER_FUNC(evt_msg_toge) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 v = evtGetValue(event, args[0]);
 	event->printWindowFlags &= 0xE1000000;
 	event->printWindowFlags |= v;
@@ -734,7 +734,7 @@ void evtMsgFmtStr(char* buf, const char* name) {
 }
 
 USER_FUNC(evt_msg_fmt_str) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 mode = args[0];
     s32 out = args[1];
     const char* src = (const char*)evtGetValue(event, args[2]);
@@ -917,7 +917,7 @@ void evtMsgFmtInt(char* buf, s32 count) {
 }
 
 USER_FUNC(evt_msg_fmt_int) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 mode = args[0];
     s32 out = args[1];
     const char* src = (const char*)evtGetValue(event, args[2]);

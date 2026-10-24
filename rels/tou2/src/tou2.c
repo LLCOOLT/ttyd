@@ -558,7 +558,7 @@ USER_FUNC(evt_tou_set_rule_result) {
 }
 
 USER_FUNC(evt_tou_set_ranking_win_lose) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 lose = evtGetValue(event, args[0]);
     s32 id = evtGetValue(event, args[1]);
     s16 min;
@@ -607,7 +607,7 @@ USER_FUNC(evt_tou_set_ranking_win_lose) {
 }
 
 static USER_FUNC(evt_tou_get_rule_msg2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 num;
     RuleData* rules;
@@ -648,7 +648,7 @@ static USER_FUNC(evt_tou_get_rule_msg2) {
 }
 
 static USER_FUNC(evt_tou_get_rule_info) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     s32 num;
     RuleData* rules;
@@ -700,7 +700,7 @@ static USER_FUNC(evt_tou_get_rule_info) {
 }
 
 USER_FUNC(evt_tou_get_fighter_tribe) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 idx = evtGetValue(event, args[1]);
     s32 setupId = fighterDt[id].setupId;
@@ -747,7 +747,7 @@ USER_FUNC(evt_tou_get_fighter_tribe) {
 }
 
 USER_FUNC(evt_tou_get_fighter_num) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
 
     evtSetValue(event, args[1], btlsetup_tou_tbl[fighterDt[id].setupId].select->groupSetup->numEnemies);
@@ -755,7 +755,7 @@ USER_FUNC(evt_tou_get_fighter_num) {
 }
 
 USER_FUNC(evt_tou_get_fighter_battle_msg) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
 
@@ -765,7 +765,7 @@ USER_FUNC(evt_tou_get_fighter_battle_msg) {
 }
 
 static USER_FUNC(evt_tou_get_fighter_rank) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 rank = 0;
     s32 i;
@@ -784,7 +784,7 @@ static USER_FUNC(evt_tou_get_fighter_rank) {
 }
 
 USER_FUNC(evt_tou_get_fighter_name2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
 
@@ -793,7 +793,7 @@ USER_FUNC(evt_tou_get_fighter_name2) {
 }
 
 USER_FUNC(evt_tou_get_fighter_info) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
 
@@ -803,7 +803,7 @@ USER_FUNC(evt_tou_get_fighter_info) {
 }
 
 static USER_FUNC(evt_tou_get_next_match) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BOOL reverse = evtGetValue(event, GSWF(2443));
     s32 list[32];
     s32 i;
@@ -841,7 +841,7 @@ static USER_FUNC(evt_tou_get_next_match) {
 }
 
 USER_FUNC(evt_tou_get_ranking) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 i;
     s32 rank;
 

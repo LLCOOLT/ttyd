@@ -64,18 +64,18 @@ f32 fd_tou_11___local_3PIO2_368;
 f32 fd_tou_11_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tou_11___local_PIO2_367;
 f32 fd_tou_11_one_364;
-static s32 n_door_open[12];
-static s32 n_door_close[12];
-static s32 e_door_open[12];
-static s32 e_door_close[12];
+static EvtWord n_door_open[12];
+static EvtWord n_door_close[12];
+static EvtWord e_door_open[12];
+static EvtWord e_door_close[12];
 static BeroEntry bero_data[3];
 static NpcSetupInfo npcEnt[2];
-s32 evt_tojikome[296];
-s32 evt_tojikome_nidome[104];
-s32 evt_tojikome_sandome[37];
-static s32 evt_tojikome_msg[30];
-s32 evt_postar[23];
-s32 tou_11_init_evt[178];
+EvtWord evt_tojikome[296];
+EvtWord evt_tojikome_nidome[104];
+EvtWord evt_tojikome_sandome[37];
+static EvtWord evt_tojikome_msg[30];
+EvtWord evt_postar[23];
+EvtWord tou_11_init_evt[178];
 
 f32 fd_tou_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

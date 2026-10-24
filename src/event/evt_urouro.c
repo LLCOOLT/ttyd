@@ -30,7 +30,7 @@ typedef struct UrouroWork {
 } UrouroWork;
 
 USER_FUNC(urouro_init_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
     f32 x = evtGetFloat(event, args[1]);

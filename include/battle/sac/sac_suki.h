@@ -1,9 +1,10 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "evt/evt_word.h"
 
-extern s32 marioAttackEvent_Suki[];
+extern EvtWord marioAttackEvent_Suki[];
 
-extern s32 flash_cancel_evt[];
-extern s32 flash_evt[];
-extern s32 flash_main_evt[];
+extern EvtWord flash_cancel_evt[];
+extern EvtWord flash_evt[];
+extern EvtWord flash_main_evt[];

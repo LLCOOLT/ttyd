@@ -50,10 +50,10 @@ f32 fd_kpa_00___local_3PIO2_368;
 f32 fd_kpa_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_kpa_00___local_PIO2_367;
 f32 fd_kpa_00_one_364;
-s32 kpa_00_first_evt[61];
-s32 kpa_00_fly_evt[380];
+EvtWord kpa_00_first_evt[61];
+EvtWord kpa_00_fly_evt[380];
 static NpcSetupInfo npcEnt[3];
-s32 kpa_00_init_evt[24];
+EvtWord kpa_00_init_evt[24];
 
 f32 fd_kpa_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

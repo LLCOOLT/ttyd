@@ -45,9 +45,9 @@ f32 fd_gon_13_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gon_13___local_PIO2_367;
 f32 fd_gon_13_one_364;
 static BeroEntry bero_entry_data[2];
-s32 item_get03[34];
-static s32 switch_evt[68];
-s32 gon_13_init_evt[56];
+EvtWord item_get03[34];
+static EvtWord switch_evt[68];
+EvtWord gon_13_init_evt[56];
 
 f32 fd_gon_13_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -75,18 +75,18 @@ static PoseTableEntry pose_table[9];
 static PoseTableEntry pose_table_weak[9];
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[3];
-static s32 battle_entry_event[375];
-s32 negotiation_event[1786];
-s32 gon_extra_eaten_event[389];
-static s32 damage_event[10];
-s32 gonbaba_damage_sub_event[574];
-static s32 dead_event[283];
-static s32 init_event[160];
-static s32 phase_event[2];
-static s32 attack_event[56];
-static s32 fumituke_attack_event[386];
-s32 firebreath_attack_event[261];
-static s32 wait_event[6];
+static EvtWord battle_entry_event[375];
+EvtWord negotiation_event[1786];
+EvtWord gon_extra_eaten_event[389];
+static EvtWord damage_event[10];
+EvtWord gonbaba_damage_sub_event[574];
+static EvtWord dead_event[283];
+static EvtWord init_event[160];
+static EvtWord phase_event[2];
+static EvtWord attack_event[56];
+static EvtWord fumituke_attack_event[386];
+EvtWord firebreath_attack_event[261];
+static EvtWord wait_event[6];
 
 s32 weaponGetPower_Gonbaba(BattleUnit* unit, s32* weapon) {
     s32 power = weapon[8];
@@ -101,7 +101,7 @@ s32 weaponGetPower_Gonbaba(BattleUnit* unit, s32* weapon) {
 struct EffectEntry* effKemuri9N64Entry(s32 type, s32 arg1, s32 arg2, f32 x, f32 y, f32 z, f32 arg6, f32 arg7);
 
 static USER_FUNC(_leg_smoke_effect) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -461,7 +461,7 @@ static EVT_BEGIN(battle_entry_event)
 EVT_END()
 
 USER_FUNC(_btlgon_get_escape_param) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
     s32 y = evtGetValue(event, args[1]);
     s32 dxVar = args[2];
@@ -1073,7 +1073,7 @@ EVT_END()
 
 USER_FUNC(_wait_damage_event_end) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id;
     BattleUnit* unit;
 

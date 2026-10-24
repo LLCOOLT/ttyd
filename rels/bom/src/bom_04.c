@@ -29,9 +29,9 @@ f32 fd_bom_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_bom_04___local_PIO2_367;
 f32 fd_bom_04_one_364;
 static TreeAccess tree_tbl[4];
-static s32 evt_tree[7];
+static EvtWord evt_tree[7];
 static BeroEntry bero_entry_data[3];
-s32 bom_04_init_evt[47];
+EvtWord bom_04_init_evt[47];
 
 f32 fd_bom_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

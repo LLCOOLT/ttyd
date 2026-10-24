@@ -118,27 +118,27 @@ f32 fd_yuu_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_yuu_00___local_PIO2_367;
 f32 fd_yuu_00_one_364;
 static MonteTable montetable[4];
-static s32 minigame_view_monte[4];
-s32 yuu_00_kaijo_init[12];
-s32 yuu_00_kaijo_init2[12];
-s32 light_sub_event[497];
-s32 minigame01_main[35];
-s32 minigame01_start_cam[40];
-s32 minigame01_start_cam_cancel[20];
+static EvtWord minigame_view_monte[4];
+EvtWord yuu_00_kaijo_init[12];
+EvtWord yuu_00_kaijo_init2[12];
+EvtWord light_sub_event[497];
+EvtWord minigame01_main[35];
+EvtWord minigame01_start_cam[40];
+EvtWord minigame01_start_cam_cancel[20];
 #ifdef VERSION_G8ME01
-s32 minigame01_start[1504];
+EvtWord minigame01_start[1504];
 #else
-s32 minigame01_start[355];
+EvtWord minigame01_start[355];
 #endif
 #ifdef VERSION_G8ME01
-s32 minigame01_end[224];
+EvtWord minigame01_end[224];
 #else
-s32 minigame01_end[236];
+EvtWord minigame01_end[236];
 #endif
 #ifdef VERSION_G8ME01
-s32 yuu_00_init_evt[437];
+EvtWord yuu_00_init_evt[437];
 #else
-s32 yuu_00_init_evt[11];
+EvtWord yuu_00_init_evt[11];
 #endif
 
 f32 fd_yuu_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
@@ -1283,7 +1283,7 @@ USER_FUNC(evt_change_plane) {
 }
 
 USER_FUNC(yuuminigame1_set_phase) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HikokiWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
 
     data->phase = evtGetValue(event, args[1]);
@@ -1291,7 +1291,7 @@ USER_FUNC(yuuminigame1_set_phase) {
 }
 
 USER_FUNC(yuuminigame1_opening_on_off) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HikokiWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
 
     if (evtGetValue(event, args[1])) {
@@ -1303,7 +1303,7 @@ USER_FUNC(yuuminigame1_opening_on_off) {
 }
 
 USER_FUNC(yuuminigame1_opening_chk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MiniGameWork* wp = (MiniGameWork*)evtGetValue(event, args[0]);
 
     if (((HikokiWork*)wp->data)->flags & 1) {
@@ -1316,7 +1316,7 @@ USER_FUNC(yuuminigame1_opening_chk) {
 
 #ifdef VERSION_G8ME01
 USER_FUNC(yuuminigame1_floor_on_off) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u32* flags = &((HikokiWork*)((MiniGameWork*)evtGetValue(event, args[0]))->data)->flags;
 
     if (evtGetValue(event, args[1])) {
@@ -1328,7 +1328,7 @@ USER_FUNC(yuuminigame1_floor_on_off) {
 }
 
 USER_FUNC(yuuminigame1_floor_chk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u32* flags = &((HikokiWork*)((MiniGameWork*)evtGetValue(event, args[0]))->data)->flags;
 
     if (*flags & 2) {

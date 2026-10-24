@@ -3,6 +3,7 @@
 #include "dolphin/types.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_word.h"
 
 extern NpcTerritoryInfo btl_jon_setup_no_tbl[];
 extern NpcSetupBattleInfo btlsetup_jon_tbl[];
@@ -56,6 +57,6 @@ extern BattleUnitKind unit_yami_togekuri;
 extern BattleUnitKind unit_yamitogedaruma;
 
 extern u8 enemy_100[];
-extern s32 iri_12_makkino_okiru[];
-extern s32 jon_init_evt[];
+extern EvtWord iri_12_makkino_okiru[];
+extern EvtWord jon_init_evt[];
 extern NpcSetupInfo npcEnt_wanwan[];

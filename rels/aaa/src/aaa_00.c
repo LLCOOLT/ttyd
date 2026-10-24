@@ -104,34 +104,34 @@ f32 fd_aaa_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aaa_00___local_PIO2_367;
 f32 fd_aaa_00_one_364;
 static NpcSetupInfo npcEnt[3];
-static s32 evt_door[15];
-static s32 evt_door2[12];
-static s32 evt_wall[22];
+static EvtWord evt_door[15];
+static EvtWord evt_door2[12];
+static EvtWord evt_wall[22];
 static const char* ie_npc[2];
-static s32 door_1_open[12];
-static s32 door_1_close[14];
+static EvtWord door_1_open[12];
+static EvtWord door_1_close[14];
 static DoorParam door_1;
-static s32 evt_prologue[713];
+static EvtWord evt_prologue[713];
 #ifdef VERSION_G8ME01
-s32 evt_prologue2[196];
+EvtWord evt_prologue2[196];
 #else
-s32 evt_prologue2[193];
+EvtWord evt_prologue2[193];
 #endif
 #ifdef VERSION_G8ME01
-static s32 epilogue_evt[328];
+static EvtWord epilogue_evt[328];
 #else
-static s32 epilogue_evt[318];
+static EvtWord epilogue_evt[318];
 #endif
-static s32 epilogue_npc_entry[68];
+static EvtWord epilogue_npc_entry[68];
 #ifdef VERSION_G8ME01
-static s32 epilogue_evt2[500];
+static EvtWord epilogue_evt2[500];
 #else
-static s32 epilogue_evt2[495];
+static EvtWord epilogue_evt2[495];
 #endif
 static TreeAccess ki_data[2];
 static KusaAccess kusa_data[11];
 static BeroEntry bero_entry_data[2];
-s32 aaa_00_init_evt[81];
+EvtWord aaa_00_init_evt[81];
 
 f32 fd_aaa_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

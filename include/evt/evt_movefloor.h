@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "evt/evt_word.h"
 
-extern s32 moving_floor[];
-extern s32 ridedown_floor[];
+extern EvtWord moving_floor[];
+extern EvtWord ridedown_floor[];

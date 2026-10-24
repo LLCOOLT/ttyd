@@ -47,13 +47,13 @@ static BattleUnitDefenseAttr defence_attr_christine;
 static StatusVulnerability regist_christine;
 static BattleDataEntry data_table_christine[2];
 static BattleUnitKindPart parts_christine[1];
-static s32 fmario_zoom_christine[19];
-static s32 gparty_zoom_christine[19];
-static s32 init_event_christine[42];
-s32 damage_event_christine[22];
-static s32 dead_event_christine[147];
-static s32 attack_event_christine[690];
-static s32 wait_event_christine[7];
+static EvtWord fmario_zoom_christine[19];
+static EvtWord gparty_zoom_christine[19];
+static EvtWord init_event_christine[42];
+EvtWord damage_event_christine[22];
+static EvtWord dead_event_christine[147];
+static EvtWord attack_event_christine[690];
+static EvtWord wait_event_christine[7];
 
 f32 fd_gullible_christine_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -475,7 +475,7 @@ static EVT_BEGIN(attack_event_christine)
 EVT_END()
 
 static USER_FUNC(_krb_get_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
     f32 z1 = evtGetFloat(event, args[1]);
     f32 x2 = evtGetFloat(event, args[2]);

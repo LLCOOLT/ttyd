@@ -19,7 +19,7 @@ void BattleStageSetStgDarkBase(u8 a, s32 b, s32 c);
 void BattleStageSetStgDark(u8 a, s32 b, s32 c);
 
 USER_FUNC(evt_batstage_set_stg_dark) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u8 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
@@ -28,7 +28,7 @@ USER_FUNC(evt_batstage_set_stg_dark) {
 }
 
 USER_FUNC(evt_batstage_set_stg_dark_base) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u8 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
@@ -37,7 +37,7 @@ USER_FUNC(evt_batstage_set_stg_dark_base) {
 }
 
 USER_FUNC(evt_batstage_return_stg_dark_base) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
     BattleStageReturnStgDarkBase(a, b);
@@ -45,7 +45,7 @@ USER_FUNC(evt_batstage_return_stg_dark_base) {
 }
 
 USER_FUNC(evt_batstage_set_aud_dark) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u8 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
@@ -54,7 +54,7 @@ USER_FUNC(evt_batstage_set_aud_dark) {
 }
 
 USER_FUNC(evt_batstage_set_aud_dark_base) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u8 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
@@ -63,7 +63,7 @@ USER_FUNC(evt_batstage_set_aud_dark_base) {
 }
 
 USER_FUNC(evt_batstage_return_aud_dark_base) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
     BattleStageReturnAudDarkBase(a, b);
@@ -71,7 +71,7 @@ USER_FUNC(evt_batstage_return_aud_dark_base) {
 }
 
 USER_FUNC(evt_batstage_light_set_player_on) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* bw = _battleWorkPointer;
     s32 sel = evtGetValue(event, *args++);
     s32 i;

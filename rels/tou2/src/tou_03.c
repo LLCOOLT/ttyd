@@ -262,75 +262,75 @@ f32 fd_tou_03_one_364;
 f64 fd_tou_03__three_localstatic4_sqrtf;
 f64 fd_tou_03__half_localstatic3_sqrtf;
 ExtTexInfo ext_kyaku_data[51];
-s32 x[1];
-s32 evt_kyaku[138];
+EvtWord x[1];
+EvtWord evt_kyaku[138];
 static s32 inta_tex[8];
-s32 open_main[53];
-s32 close_main[37];
-static s32 w_door_open[22];
-static s32 w_door_close[22];
-static s32 w_open[5];
-static s32 w_close[5];
-static s32 e_door_open[22];
-static s32 e_door_close[22];
-static s32 e_open[5];
-static s32 e_close[5];
-s32 s1_door_open[22];
-s32 s1_door_close[22];
-s32 s1_door_open2[19];
-static s32 s1_open[18];
-static s32 s1_close[17];
-s32 s2_door_open[22];
-s32 s2_door_close[22];
-s32 s2_door_open2[19];
-static s32 s2_open[18];
-static s32 s2_close[17];
+EvtWord open_main[53];
+EvtWord close_main[37];
+static EvtWord w_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_open[5];
+static EvtWord w_close[5];
+static EvtWord e_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_open[5];
+static EvtWord e_close[5];
+EvtWord s1_door_open[22];
+EvtWord s1_door_close[22];
+EvtWord s1_door_open2[19];
+static EvtWord s1_open[18];
+static EvtWord s1_close[17];
+EvtWord s2_door_open[22];
+EvtWord s2_door_close[22];
+EvtWord s2_door_open2[19];
+static EvtWord s2_open[18];
+static EvtWord s2_close[17];
 static BeroEntry bero_data[5];
-s32 evt_tougi[777];
-s32 init_kinosikowa[13];
+EvtWord evt_tougi[777];
+EvtWord init_kinosikowa[13];
 static NpcSetupInfo npcEnt[5];
-s32 evt_damage_pose[63];
-static s32 evt_kime_pose[56];
-s32 npc_entry[623];
-s32 evt_random_battle[VERSION_PICK(335, 338)];
-s32 evt_random_battle2[VERSION_PICK(317, 326)];
-s32 evt_teki_nyuujyou[107];
-s32 evt_teki_nyuujyou_default[183];
-s32 burst_chain_entry[289];
-s32 burst_wangwang[69];
-s32 evt_match[VERSION_PICK(362, 381)];
-s32 evt_kurikuri_opening[442];
-s32 evt_kurikuri_win[231];
-s32 evt_kurikuri_lose[146];
-s32 evt_shinemon_opening[647];
-s32 evt_shinemon_win[199];
-s32 evt_shinemon_lose[84];
-s32 evt_champ_opening[556];
-s32 evt_champ_opening_re[767];
-s32 evt_champ_win[335];
-s32 evt_champ_lose[124];
-s32 evt_default_opening[748];
-s32 evt_default_win[201];
-s32 evt_default_lose[VERSION_PICK(137, 138)];
-static s32 evt_champion[VERSION_PICK(365, 376)];
-s32 evt_champion2[VERSION_PICK(178, 189)];
+EvtWord evt_damage_pose[63];
+static EvtWord evt_kime_pose[56];
+EvtWord npc_entry[623];
+EvtWord evt_random_battle[VERSION_PICK(335, 338)];
+EvtWord evt_random_battle2[VERSION_PICK(317, 326)];
+EvtWord evt_teki_nyuujyou[107];
+EvtWord evt_teki_nyuujyou_default[183];
+EvtWord burst_chain_entry[289];
+EvtWord burst_wangwang[69];
+EvtWord evt_match[VERSION_PICK(362, 381)];
+EvtWord evt_kurikuri_opening[442];
+EvtWord evt_kurikuri_win[231];
+EvtWord evt_kurikuri_lose[146];
+EvtWord evt_shinemon_opening[647];
+EvtWord evt_shinemon_win[199];
+EvtWord evt_shinemon_lose[84];
+EvtWord evt_champ_opening[556];
+EvtWord evt_champ_opening_re[767];
+EvtWord evt_champ_win[335];
+EvtWord evt_champ_lose[124];
+EvtWord evt_default_opening[748];
+EvtWord evt_default_win[201];
+EvtWord evt_default_lose[VERSION_PICK(137, 138)];
+static EvtWord evt_champion[VERSION_PICK(365, 376)];
+EvtWord evt_champion2[VERSION_PICK(178, 189)];
 const char* block_data[9];
-static s32 evt_shake[39];
-s32 evt_boss_stone[63];
-static s32 evt_boss[VERSION_PICK(1916, 1919)];
-s32 evt_watch_match[515];
-s32 evt_kyaku_1[56];
-s32 evt_kyaku_2[56];
-s32 evt_kyaku_3[56];
-s32 evt_kyaku_4[88];
-s32 evt_kyaku_5[56];
-s32 evt_kyaku_6[56];
-s32 evt_kyaku_7[56];
-s32 evt_kyaku_8[88];
+static EvtWord evt_shake[39];
+EvtWord evt_boss_stone[63];
+static EvtWord evt_boss[VERSION_PICK(1916, 1919)];
+EvtWord evt_watch_match[515];
+EvtWord evt_kyaku_1[56];
+EvtWord evt_kyaku_2[56];
+EvtWord evt_kyaku_3[56];
+EvtWord evt_kyaku_4[88];
+EvtWord evt_kyaku_5[56];
+EvtWord evt_kyaku_6[56];
+EvtWord evt_kyaku_7[56];
+EvtWord evt_kyaku_8[88];
 #ifdef VERSION_G8ME01
-s32 evt_kyaku_check[105];
+EvtWord evt_kyaku_check[105];
 #endif
-s32 tou_03_init_evt[VERSION_PICK(370, 372)];
+EvtWord tou_03_init_evt[VERSION_PICK(370, 372)];
 
 #pragma force_active on
 f32 fd_tou_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
@@ -4098,7 +4098,7 @@ void screen_tev(MapTevCallbackInfo* info) {
 }
 
 s32 tribe_chk(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     const char* tribe = (const char*)evtGetValue(event, args[1]);
 
@@ -4111,7 +4111,7 @@ s32 tribe_chk(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 burst_chain(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 id = evtGetValue(event, args[1]);
     NpcEntry* npc = npcNameToPtr(name);
@@ -4154,7 +4154,7 @@ s32 snd_sfx_stop(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 confupose(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, args[0]));
 
     evtSetValue(event, args[1], (s32)npc->tribe->confuseAnimation);
@@ -4177,7 +4177,7 @@ static f32 cosf(f32 x) {
 static const Vec item_jump_zero = {0.0f, 0.0f, 0.0f};
 #pragma force_active reset
 static inline s32 item_jump_sub(EventEntry* event, BOOL isFirstCall, f32 speed, f32 g) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 z;
     f32 y;
     f32 x;
@@ -4307,7 +4307,7 @@ s32 starstone_sound_onoff(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 evt_boss_stone_r(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EffectEntry* eff = itemNameToPtr("stone")->effect;
 
     ((EffStarStoneWork*)eff->userdata)->rotY = evtGetFloat(event, args[0]);

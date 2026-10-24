@@ -52,9 +52,9 @@ f32 fd_las___local_PIO2_367;
 f32 fd_las_one_364;
 f64 fd_las__three_localstatic4_sqrtf;
 f64 fd_las__half_localstatic3_sqrtf;
-s32 box_syutugen[177];
-s32 move_dai[130];
-s32 hikari_evt[54];
+EvtWord box_syutugen[177];
+EvtWord move_dai[130];
+EvtWord hikari_evt[54];
 
 void _prolog(void) {
     voidfunctionptr* ctor;
@@ -108,7 +108,7 @@ void _unresolved(void) {
 }
 
 USER_FUNC(mobj_set_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 r = evtGetValue(event, args[1]);
     s32 g = evtGetValue(event, args[2]);
@@ -128,7 +128,7 @@ USER_FUNC(mobj_color_off) {
 }
 
 USER_FUNC(mobj_set_ry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MapObjectEntry* mobj = mobjNameToPtr((const char*)evtGetValue(event, args[0]));
 
     mobj->rotation.y = evtGetFloat(event, args[1]);

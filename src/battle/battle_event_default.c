@@ -121,24 +121,24 @@ USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_random);
 
-s32 btldefaultevt_Damage[1133];
-s32 btldefaultevt_ChangeParty[174];
-s32 btldefaultevt_BiribiriMove[29];
-s32 btldefaultevt_guard_move[85];
-s32 btldefaultevt_guard_return[98];
-s32 btldefaultevt_Appeal[145];
-s32 _Defence_core[81];
-s32 btldefaultevt_Escape[657];
-s32 btldefaultevt_Confuse[19];
-s32 btldefaultevt_CantMoveZeroGravity[44];
-s32 btldefaultevt_SuitoruBadgeEffect[122];
-s32 btldefaultevt_avoid_counter_event[34];
-s32 btldefaultevt_ProtectPartner[10];
-s32 btldefaultevt_Dummy[2];
-s32 btldefaultevt_Wait[5];
-s32 btldefaultevt_LectureEnd[6];
-s32 btldefaultevt_Defend[7];
-s32 btldefaultevt_DefendParty[7];
+EvtWord btldefaultevt_Damage[1133];
+EvtWord btldefaultevt_ChangeParty[174];
+EvtWord btldefaultevt_BiribiriMove[29];
+EvtWord btldefaultevt_guard_move[85];
+EvtWord btldefaultevt_guard_return[98];
+EvtWord btldefaultevt_Appeal[145];
+EvtWord _Defence_core[81];
+EvtWord btldefaultevt_Escape[657];
+EvtWord btldefaultevt_Confuse[19];
+EvtWord btldefaultevt_CantMoveZeroGravity[44];
+EvtWord btldefaultevt_SuitoruBadgeEffect[122];
+EvtWord btldefaultevt_avoid_counter_event[34];
+EvtWord btldefaultevt_ProtectPartner[10];
+EvtWord btldefaultevt_Dummy[2];
+EvtWord btldefaultevt_Wait[5];
+EvtWord btldefaultevt_LectureEnd[6];
+EvtWord btldefaultevt_Defend[7];
+EvtWord btldefaultevt_DefendParty[7];
 
 EVT_BEGIN(btldefaultevt_Damage)
     CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
@@ -1104,7 +1104,7 @@ USER_FUNC(_get_escape_rate) {
 
 USER_FUNC(_get_heart_suitoru_point) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = *args++;
     s32 out = *args++;
 
@@ -1125,7 +1125,7 @@ USER_FUNC(_get_heart_suitoru_point) {
 
 USER_FUNC(_get_flower_suitoru_point) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = *args++;
     s32 out = *args++;
 

@@ -78,27 +78,27 @@ f32 fd_mri_05___local_3PIO2_368;
 f32 fd_mri_05_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_mri_05___local_PIO2_367;
 f32 fd_mri_05_one_364;
-s32 puni_4_init[17];
-s32 puni_4_talk[20];
-s32 puni_5_init[17];
-s32 puni_5_talk[20];
+EvtWord puni_4_init[17];
+EvtWord puni_4_talk[20];
+EvtWord puni_5_init[17];
+EvtWord puni_5_talk[20];
 static NpcSetupInfo npcEnt[3];
-static s32 bero_s_doa_close[10];
-static s32 bero_s_doa_open[10];
+static EvtWord bero_s_doa_close[10];
+static EvtWord bero_s_doa_open[10];
 static BeroEntry bero_entry_data[6];
-static s32 door_switch_init[17];
-static s32 door_switch[59];
-static s32 evt_ueki_04[20];
+static EvtWord door_switch_init[17];
+static EvtWord door_switch[59];
+static EvtWord evt_ueki_04[20];
 static KusaAccess ueki_access_data[6];
-static s32 punipuni_ball00_init[41];
-static s32 punipuni_ball00[51];
-s32 punipuni_ball01_init[41];
-s32 punipuni_ball01[51];
-s32 mario_shabon_move_sound[14];
-s32 mario_shabon_break_sound[9];
-s32 mario_shabon_check[251];
-s32 evt_shabon_s[312];
-s32 mri_05_init_evt[178];
+static EvtWord punipuni_ball00_init[41];
+static EvtWord punipuni_ball00[51];
+EvtWord punipuni_ball01_init[41];
+EvtWord punipuni_ball01[51];
+EvtWord mario_shabon_move_sound[14];
+EvtWord mario_shabon_break_sound[9];
+EvtWord mario_shabon_check[251];
+EvtWord evt_shabon_s[312];
+EvtWord mri_05_init_evt[178];
 
 USER_FUNC(mario_shabon_init) {
     MarioWork* mario = marioGetPtr();
@@ -404,7 +404,7 @@ EVT_BEGIN(punipuni_ball01_init)
 EVT_END()
 
 USER_FUNC(mario_shabon_eff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -414,7 +414,7 @@ USER_FUNC(mario_shabon_eff) {
 }
 
 USER_FUNC(mario_shabon_effpos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -558,7 +558,7 @@ EVT_BEGIN(mario_shabon_check)
 EVT_END()
 
 USER_FUNC(evt_pcharge_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = 15.0f + evtGetFloat(event, args[2]);

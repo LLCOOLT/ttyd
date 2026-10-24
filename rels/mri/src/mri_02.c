@@ -71,16 +71,16 @@ f32 fd_mri_02_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_mri_02___local_PIO2_367;
 f32 fd_mri_02_one_364;
 static BeroEntry bero_entry_data[4];
-static s32 evt_ueki_04[20];
+static EvtWord evt_ueki_04[20];
 static KusaAccess ueki_access_data[6];
-s32 punipuni_switch[4];
-s32 dokan_event[123];
-s32 dokan_init[35];
-static s32 yuka_main[51];
-static s32 yuka_move[130];
-static s32 punipuni_ball00_init[35];
-static s32 punipuni_ball00[59];
-s32 mri_02_init_evt[167];
+EvtWord punipuni_switch[4];
+EvtWord dokan_event[123];
+EvtWord dokan_init[35];
+static EvtWord yuka_main[51];
+static EvtWord yuka_move[130];
+static EvtWord punipuni_ball00_init[35];
+static EvtWord punipuni_ball00[59];
+EvtWord mri_02_init_evt[167];
 
 f32 fd_mri_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -244,7 +244,7 @@ USER_FUNC(setPuniWeight) {
 }
 
 USER_FUNC(getSwitch) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = FALSE;
 
     if (mri02switch.pos <= -10.0f) {

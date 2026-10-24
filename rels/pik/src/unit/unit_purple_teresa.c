@@ -62,18 +62,18 @@ static BattleWeapon weapon_teresa_trans;
 static BattleWeapon weapon_teresa_move;
 static PoseTableEntry pose_table[17];
 static BattleDataEntry data_table[1];
-static s32 init_event[47];
-static s32 damage_event[10];
-static s32 attack_event[153];
-static s32 normal_attack_event[354];
-static s32 trans_myself_event[196];
-static s32 trans_event[289];
-static s32 move_event[84];
-static s32 move_event_sub[103];
-static s32 wait_event[6];
+static EvtWord init_event[47];
+static EvtWord damage_event[10];
+static EvtWord attack_event[153];
+static EvtWord normal_attack_event[354];
+static EvtWord trans_myself_event[196];
+static EvtWord trans_event[289];
+static EvtWord move_event[84];
+static EvtWord move_event_sub[103];
+static EvtWord wait_event[6];
 
 static USER_FUNC(teresa_check_teresa) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 result = 0;
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -93,7 +93,7 @@ static USER_FUNC(teresa_check_teresa) {
 }
 
 static USER_FUNC(teresa_check_move) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 num = 0;
     s32 i;
 
@@ -117,7 +117,7 @@ static USER_FUNC(teresa_check_move) {
 }
 
 static USER_FUNC(teresa_check_trans) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 num = 0;
     s32 id = evtGetValue(event, args[0]);
     s32 self;

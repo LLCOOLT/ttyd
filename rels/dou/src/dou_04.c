@@ -92,23 +92,23 @@ f32 fd_dou_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_dou_04___local_PIO2_367;
 f32 fd_dou_04_one_364;
 static BeroEntry bero_entry_data[2];
-s32 box_trans[76];
-s32 box_pukapuka[5];
-s32 box_event[222];
-s32 lift_event_00[223];
-s32 lift_event_01[236];
-s32 lift_main_00[53];
-s32 lift_main_01[53];
-s32 lift_event_init[17];
-s32 lift_event[5];
+EvtWord box_trans[76];
+EvtWord box_pukapuka[5];
+EvtWord box_event[222];
+EvtWord lift_event_00[223];
+EvtWord lift_event_01[236];
+EvtWord lift_main_00[53];
+EvtWord lift_main_01[53];
+EvtWord lift_event_init[17];
+EvtWord lift_event[5];
 static HitDamageReturn hitDmgRetPoints[4];
-static s32 kuribo_init[16];
-s32 kuribo_talk[740];
+static EvtWord kuribo_init[16];
+EvtWord kuribo_talk[740];
 static NpcSetupInfo npcEnt[2];
-s32 dou_04_init_evt[96];
+EvtWord dou_04_init_evt[96];
 
 USER_FUNC(evt_mario_check_menu) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetValue(event, args[0], marioCheckMenuDisable());
     return EVT_RETURN_DONE;
@@ -769,7 +769,7 @@ EVT_BEGIN(dou_04_init_evt)
 EVT_END()
 
 USER_FUNC(evt_box_pukapuka) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 y;
 
     if (isFirstCall) {
@@ -785,7 +785,7 @@ USER_FUNC(evt_box_pukapuka) {
 }
 
 USER_FUNC(evt_mapgrp_translate2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);

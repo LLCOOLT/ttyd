@@ -52,15 +52,15 @@ f32 fd_aji_05___local_3PIO2_368;
 f32 fd_aji_05_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_05___local_PIO2_367;
 f32 fd_aji_05_one_364;
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[2];
-static s32 evt_box[95];
-static s32 hikaru_on[4];
-static s32 hikaru_off[4];
+static EvtWord evt_box[95];
+static EvtWord hikaru_on[4];
+static EvtWord hikaru_off[4];
 static HitDamageReturn dmgReturnPt[2];
-static s32 hikaru_yuka_init[48];
-s32 aji_05_init_evt[77];
+static EvtWord hikaru_yuka_init[48];
+EvtWord aji_05_init_evt[77];
 
 f32 fd_aji_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -171,7 +171,7 @@ static HitDamageReturn dmgReturnPt[] = {
     {0},
 };
 
-static s32 hikaru_yuka_init[] = {
+static EvtWord hikaru_yuka_init[] = {
     CALL_CHILD(hikaru_off)
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("A_no1"), 2048)
     CALL(evt_mobj_itembox, STRING("box"), -255, 10, -10, 2, 0, PTR(evt_box), GSWF(4178))

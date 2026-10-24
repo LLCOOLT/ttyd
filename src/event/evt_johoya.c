@@ -2,6 +2,7 @@
 #include "driver/msgdrv.h"
 #include <string.h>
 #include "libc_decls.h"
+#include "evt/evt_word.h"
 
 //.data
 InformantWork _jdt = {0};
@@ -90,7 +91,7 @@ USER_FUNC(johoya_data_free) {
 
 USER_FUNC(johoya_keti_newjoho_check) {
     InformantWork* wp = &_jdt;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u8* table = wp->readFlags.ketiRead;
     s32 count = 0;
     s32 i;
@@ -105,7 +106,7 @@ USER_FUNC(johoya_keti_newjoho_check) {
 }
 
 USER_FUNC(johoya_keti_newjoho_makelabel) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     char tmp[64];
     const char* msg;
     s32 target = evtGetValue(event, args[0]);
@@ -147,7 +148,7 @@ USER_FUNC(johoya_keti_newjoho_setreadflag) {
 
 USER_FUNC(johoya_keti_oldspeak_check) {
     InformantWork* wp = &_jdt;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u8* table = wp->readFlags.ketiRead;
     s32 count = 0;
     s32 i;
@@ -162,7 +163,7 @@ USER_FUNC(johoya_keti_oldspeak_check) {
 }
 
 USER_FUNC(johoya_keti_oldspeak_makelabel) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 target = evtGetValue(event, args[0]);
     InformantWork* wp = &_jdt;
     u8* table = wp->readFlags.ketiRead;

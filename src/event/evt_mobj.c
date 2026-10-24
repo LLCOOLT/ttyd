@@ -127,7 +127,7 @@ USER_FUNC(evt_mobj_delete);
 USER_FUNC(evt_mobj_entry);
 
 extern void hitGrpFlagOn(const char* name, u32 flag);
-extern EventEntry* mobjRunEvent(MapObjectEntry* mobj, s32* eventCode);
+extern EventEntry* mobjRunEvent(MapObjectEntry* mobj, EvtWord* eventCode);
 extern s32 psndSFXOn_3D(const char* name, Vec* position);
 extern void kpaPowUp(void);
 extern void hitGrpFlagOff(const char* name, u32 flag);
@@ -256,7 +256,7 @@ static USER_FUNC(kpa_get_level);
 // ---- BEGIN tail (defined in reverse of target order) ----
 
 USER_FUNC(evt_mobj_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     const char* anim = (const char*)evtGetValue(event, args[1]);
     if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
@@ -272,14 +272,14 @@ USER_FUNC(evt_mobj_delete) {
 }
 
 USER_FUNC(evt_mobj_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MapObjectEntry* mobj = mobjNameToPtrNoAssert((const char*)evtGetValue(event, args[0]));
     evtSetValue(event, args[1], (s32)mobj);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_mobj_flag_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     s32 mask = args[2];
@@ -293,14 +293,14 @@ USER_FUNC(evt_mobj_flag_onoff) {
 }
 
 USER_FUNC(evt_mobj_get_kindname) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MapObjectEntry* mobj = mobjNameToPtr((const char*)evtGetValue(event, args[0]));
     evtSetValue(event, args[1], (s32)mobj->animName);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_mobj_set_scale) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     MapObjectEntry* mobj;
     f32 x, y, z;
@@ -322,7 +322,7 @@ USER_FUNC(evt_mobj_set_scale) {
 }
 
 USER_FUNC(evt_mobj_get_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MapObjectEntry* mobj = MOBJ_PTR(event, (const char*)evtGetValue(event, args[0]));
     evtSetFloat(event, args[1], mobj->position.x);
     evtSetFloat(event, args[2], mobj->position.y);
@@ -331,7 +331,7 @@ USER_FUNC(evt_mobj_get_position) {
 }
 
 USER_FUNC(evt_mobj_get_x_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     MapObjectEntry* mobj = MOBJ_PTR(event, name);
     evtSetFloat(event, args[1], mobj->position.x);
@@ -339,7 +339,7 @@ USER_FUNC(evt_mobj_get_x_position) {
 }
 
 USER_FUNC(evt_mobj_get_y_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     MapObjectEntry* mobj = MOBJ_PTR(event, name);
     evtSetFloat(event, args[1], mobj->position.y);
@@ -347,7 +347,7 @@ USER_FUNC(evt_mobj_get_y_position) {
 }
 
 USER_FUNC(evt_mobj_get_z_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     MapObjectEntry* mobj = MOBJ_PTR(event, name);
     evtSetFloat(event, args[1], mobj->position.z);
@@ -355,7 +355,7 @@ USER_FUNC(evt_mobj_get_z_position) {
 }
 
 USER_FUNC(evt_mobj_set_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -371,7 +371,7 @@ USER_FUNC(evt_mobj_set_position) {
 }
 
 USER_FUNC(evt_mobj_set_x_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MapObjectEntry* mobj = MOBJ_PTR(event, (const char*)evtGetValue(event, args[0]));
     Vec pos = mobj->position;
     pos.x = evtGetFloat(event, args[1]);
@@ -381,7 +381,7 @@ USER_FUNC(evt_mobj_set_x_position) {
 }
 
 USER_FUNC(evt_mobj_set_y_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MapObjectEntry* mobj = MOBJ_PTR(event, (const char*)evtGetValue(event, args[0]));
     Vec pos = mobj->position;
     pos.y = evtGetFloat(event, args[1]);
@@ -391,7 +391,7 @@ USER_FUNC(evt_mobj_set_y_position) {
 }
 
 USER_FUNC(evt_mobj_set_z_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MapObjectEntry* mobj = MOBJ_PTR(event, (const char*)evtGetValue(event, args[0]));
     Vec pos = mobj->position;
     pos.z = evtGetFloat(event, args[1]);
@@ -407,7 +407,7 @@ USER_FUNC(evt_mobj_exec_cancel) {
 }
 
 USER_FUNC(evt_mobj_set_gravity_bound) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 a = evtGetFloat(event, args[1]);
     f32 b = evtGetFloat(event, args[2]);
@@ -418,7 +418,7 @@ USER_FUNC(evt_mobj_set_gravity_bound) {
 }
 
 USER_FUNC(evt_mobj_set_anim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     const char* anim = (const char*)evtGetValue(event, args[1]);
     MapObjectEntry* mobj = MOBJ_PTR(event, name);
@@ -436,7 +436,7 @@ USER_FUNC(evt_mobj_wait_animation_end) {
 }
 
 USER_FUNC(evt_mobj_set_camid) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     u8 cam = evtGetValue(event, args[1]);
     MapObjectEntry* mobj = MOBJ_PTR(event, name);
@@ -445,7 +445,7 @@ USER_FUNC(evt_mobj_set_camid) {
 }
 
 USER_FUNC(evt_mobj_hitevt_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
     MapObjectEntry* mobj = MOBJ_PTR(event, name);
@@ -458,7 +458,7 @@ USER_FUNC(evt_mobj_hitevt_onoff) {
 }
 
 USER_FUNC(evt_mobj_hit_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
     MapObjectEntry* mobj = mobjNameToPtr(name);
@@ -512,7 +512,7 @@ s32 mobj_switch_blue(MapObjectEntry* mobj) {
 USER_FUNC(evt_mobj_switch_blue) {
     s32 arg6;
     s32 val;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 kind;
     s32 inBattle;
     const char* anim;
@@ -562,7 +562,7 @@ USER_FUNC(evt_mobj_switch_blue) {
 }
 
 USER_FUNC(evt_mobj_floatswitch_blue) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 arg6;
     f32 x, y, z;
     const char* name;
@@ -600,7 +600,7 @@ USER_FUNC(evt_mobj_floatswitch_blue) {
 }
 
 USER_FUNC(evt_mobj_tornadoswitch_blue) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 arg6;
     f32 x, y, z;
     const char* name;
@@ -672,7 +672,7 @@ s32 mobj_switch_red(MapObjectEntry* mobj) {
 USER_FUNC(evt_mobj_switch_red) {
     s32 arg6;
     s32 val;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 kind;
     s32 inBattle;
     const char* anim;
@@ -713,7 +713,7 @@ USER_FUNC(evt_mobj_switch_red) {
 }
 
 USER_FUNC(evt_mobj_floatswitch_red) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 arg6;
     f32 x, y, z;
     const char* name;
@@ -835,7 +835,7 @@ USER_FUNC(evt_mobj_timerswitch) {
     f32 y[2];
     f32 z[2];
     MapObjectEntry* mobjs[2];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 kind = evtGetValue(event, args[0]);
     s32 inBattle = gp->inBattle != 0;
     const char* anims[2] = {"MOBJ_BlueTimerSwitch", "MOBJ_RedTimerSwitch"};
@@ -954,7 +954,7 @@ void evt_mobj_rideswitch(void) {
 USER_FUNC(evt_mobj_rideswitch_lightblue) {
     s32 val2;
     s32 val;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     f32 x, y, z;
     s32 arg6;
@@ -1055,7 +1055,7 @@ s32 mobj_jumpstand_red(MapObjectEntry* mobj) {
 
 USER_FUNC(evt_mobj_jumpstand_red) {
     MapObjectEntry* mobj;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 kind = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     f32 x = evtGetFloat(event, args[2]);
@@ -1146,7 +1146,7 @@ s32 mobj_jumpstand_blue(MapObjectEntry* mobj) {
 
 USER_FUNC(evt_mobj_jumpstand_blue) {
     MapObjectEntry* mobj;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 kind = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     f32 power = evtGetFloat(event, args[2]);
@@ -1274,7 +1274,7 @@ s32 mobj_lv_blk_evt(MapObjectEntry* mobj) {
 USER_FUNC(evt_mobj_lv_blk) {
     s32 val;
     s32 arg5;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* anim;
     const char* name;
     s32 inBattle;
@@ -1341,7 +1341,7 @@ s32 mobj_float_blk(MapObjectEntry* mobj) {
 
 USER_FUNC(evt_mobj_float_blk) {
     s32 arg7;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s32 color;
     s32 size;
@@ -1583,7 +1583,7 @@ USER_FUNC(evt_mobj_switch_float_blk) {
     const char* name;
     s32 partner;
     s32 val;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 color;
     const char* anim;
     MapObjectEntry* mobj;
@@ -1818,7 +1818,7 @@ s32 mobj_lock(MapObjectEntry* mobj) {
 }
 
 USER_FUNC(evt_mobj_lock) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     MapObjectEntry* mobj;
     s32 inBattle;
@@ -1993,7 +1993,7 @@ s32 mobj_itembox(MapObjectEntry* mobj) {
 
 USER_FUNC(evt_mobj_itembox) {
     s32 arg7;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     MapObjectEntry* mobj;
     s32 val, val2, kind, inBattle;
@@ -2077,7 +2077,7 @@ s32 mobj_signboard(MapObjectEntry* mobj) {
 
 USER_FUNC(evt_mobj_signboard) {
     s32 val;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s32 arg5;
     MapObjectEntry* mobj;
@@ -2271,7 +2271,7 @@ s32 mobj_recovery_blk(MapObjectEntry* mobj) {
 USER_FUNC(evt_mobj_recovery_blk) {
     BOOL inBattle;
     s32 arg6;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* anim;
     s32 kind;
     const char* name;
@@ -2382,7 +2382,7 @@ s32 mobj_save_blk(MapObjectEntry* mobj) {
 USER_FUNC(evt_mobj_save_blk) {
     s32 arg5;
     s32 val;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     const char* anim;
     MapObjectEntry* mobj;
@@ -2460,7 +2460,7 @@ s32 mobj_blk(MapObjectEntry* mobj) {
 }
 
 USER_FUNC(evt_mobj_blk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     f32 x, y, z;
     s32 kind;
@@ -2580,7 +2580,7 @@ s32 mobj_badgeblk(MapObjectEntry* mobj) {
 }
 
 USER_FUNC(evt_mobj_badgeblk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* anim;
     f32 x, y, z;
     const char* name;
@@ -2684,7 +2684,7 @@ USER_FUNC(evt_mobj_powerupblk) {
     f32 x, y, z;
     s32 arg5;
     s32 val;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     name = (const char*)evtGetValue(event, args[0]);
     x = evtGetFloat(event, args[1]);
     y = evtGetFloat(event, args[2]);
@@ -2851,7 +2851,7 @@ s32 mobj_10countblk(MapObjectEntry* mobj) {
 
 USER_FUNC(evt_mobj_brick) {
     f32 x, y, z;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s32 item;
     s32 inBattle;
@@ -3025,7 +3025,7 @@ USER_FUNC(evt_mobj_breaking_floor) {
     char anim[128];
     s32 arg6;
     s32 val;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 kind;
     const char* name;
     s32 inBattle;
@@ -3309,7 +3309,7 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
 USER_FUNC(evt_mobj_kururing_floor) {
     s32 grp;
     s32 arg6;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     const char* anim;
     MapObjectEntry* mobj;
@@ -3348,7 +3348,7 @@ USER_FUNC(evt_mobj_kururing_floor) {
 }
 
 USER_FUNC(kpa_powerup) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec pos;
     pos.x = evtGetFloat(event, args[0]);
     pos.y = evtGetFloat(event, args[1]);
@@ -3431,7 +3431,7 @@ s32 mobj_koopa_ojama_blk_evt(MapObjectEntry* mobj) {
 USER_FUNC(evt_mobj_koopa_ojama_blk) {
     s32 val;
     s32 arg5;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* anim;
     const char* name;
     MapObjectEntry* mobj;
@@ -3478,7 +3478,7 @@ s32 mobj_koopa_stone_blk_evt(MapObjectEntry* mobj) {
 USER_FUNC(evt_mobj_koopa_stone_blk) {
     s32 val;
     s32 arg5;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* anim;
     const char* name;
     MapObjectEntry* mobj;
@@ -3593,7 +3593,7 @@ USER_FUNC(evt_mobj_koopa_brick) {
     const char* name;
     s32 arg7;
     s32 val;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 item;
     s32 kind;
     const char* anim;
@@ -3737,7 +3737,7 @@ s32 mobj_koopa_badgeblk(MapObjectEntry* mobj) {
 USER_FUNC(evt_mobj_koopa_badgeblk) {
     s32 val;
     s32 item;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 arg6;
     int new_var; // FAKE: separate inBattle temp needed for the target register allocation
     const char* name;
@@ -3780,7 +3780,7 @@ USER_FUNC(evt_mobj_koopa_hidden_blk) {
     const char* name;
     const char* anim;
     s32 item;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 inBattle;
     s32 arg7;
     f32 x, y, z;
@@ -3861,7 +3861,7 @@ s32 mobj_koopa_blk(MapObjectEntry* mobj) {
 
 USER_FUNC(evt_mobj_koopa_blk) {
     s32 val;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 arg6;
     const char* name;
     MapObjectEntry* mobj;
@@ -3945,7 +3945,7 @@ s32 mobj_koopa_dokan_evt(MapObjectEntry* mobj) {
 USER_FUNC(evt_mobj_koopa_dokan) {
     s32 kind;
     s32 val;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 arg6;
     const char* name;
     const char* anim;
@@ -3993,7 +3993,7 @@ USER_FUNC(evt_mobj_koopa_dokan) {
 }
 
 USER_FUNC(fire_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -4100,7 +4100,7 @@ s32 mobj_koopa_sango_evt(MapObjectEntry* mobj) {
 USER_FUNC(evt_mobj_koopa_sango) {
     s32 val;
     s32 arg5;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     MapObjectEntry* mobj;
     f32 x, y, z;
@@ -4249,7 +4249,7 @@ s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
 USER_FUNC(evt_mobj_koopa_fireber_dodai) {
     const char* name;
     s32 dir, count, arg7, arg8, i;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MapObjectEntry* mobj;
     NpcEntry* npc;
     f32 x, y, z, spd, base, step;
@@ -4311,7 +4311,7 @@ USER_FUNC(evt_mobj_koopa_fireber_dodai) {
 
 USER_FUNC(kpa_get_pole_name) {
     MapObjectEntry* mobj = event->thisMapObj;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     if (mobj != NULL) {
         evtSetValue(event, args[0], (s32)mobj->name);
     } else {
@@ -4322,7 +4322,7 @@ USER_FUNC(kpa_get_pole_name) {
 
 USER_FUNC(kpa_get_hata_name) {
     MapObjectEntry* mobj = event->thisMapObj;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     if (mobj != NULL) {
         evtSetValue(event, args[0], (s32)mobj->linkedName);
     } else {
@@ -4332,13 +4332,13 @@ USER_FUNC(kpa_get_hata_name) {
 }
 
 static USER_FUNC(kpa_get_level) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], kpaGetLevel());
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(kpa_get_width) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], (s32)marioGetPtr()->wPlayerCollisionBox.x);
     return EVT_RETURN_DONE;
 }
@@ -4376,7 +4376,7 @@ void kpa_disp_pole_score(CameraId camId, void* param) {
 }
 
 USER_FUNC(kpa_disp_pole_score_main) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -4714,7 +4714,7 @@ USER_FUNC(evt_mobj_koopa_pole) {
     s32 val2;
     s32 val;
     const char* name;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 arg6;
     MapObjectEntry* mobj;
     MapObjectEntry* hata;

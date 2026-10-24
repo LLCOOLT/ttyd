@@ -137,39 +137,39 @@ f32 fd_nok_01___local_3PIO2_368;
 f32 fd_nok_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_nok_01___local_PIO2_367;
 f32 fd_nok_01_one_364;
-s32 nokonoko_G_regl[19];
-s32 nokonoko_G_talk[44];
-s32 nokonoko_H_regl[19];
-s32 nokonoko_H_talk[52];
-s32 nokonoko_I_regl[19];
-s32 nokonoko_I_talk[44];
-s32 open_gate[221];
-s32 monban_init[14];
-s32 monban_talk[56];
-static s32 nokotarou_init[26];
-static s32 nokotarou_talk[36];
-s32 nokopapa_init[19];
-s32 nokopapa_talk[72];
-s32 nokonoko_K_talk[69];
+EvtWord nokonoko_G_regl[19];
+EvtWord nokonoko_G_talk[44];
+EvtWord nokonoko_H_regl[19];
+EvtWord nokonoko_H_talk[52];
+EvtWord nokonoko_I_regl[19];
+EvtWord nokonoko_I_talk[44];
+EvtWord open_gate[221];
+EvtWord monban_init[14];
+EvtWord monban_talk[56];
+static EvtWord nokotarou_init[26];
+static EvtWord nokotarou_talk[36];
+EvtWord nokopapa_init[19];
+EvtWord nokopapa_talk[72];
+EvtWord nokonoko_K_talk[69];
 #ifdef VERSION_G8ME01
-s32 boss_noko_open_gate[184];
+EvtWord boss_noko_open_gate[184];
 #else
-s32 boss_noko_open_gate[181];
+EvtWord boss_noko_open_gate[181];
 #endif
 static s32 iri_17_item_tbl[2];
-s32 boss_noko_talk[352];
-s32 nokorin_init[30];
+EvtWord boss_noko_talk[352];
+EvtWord nokorin_init[30];
 #ifdef VERSION_G8ME01
-s32 nokorin_talk[281];
+EvtWord nokorin_talk[281];
 #else
-s32 nokorin_talk[267];
+EvtWord nokorin_talk[267];
 #endif
-static s32 odoriko_1_talk[44];
-static s32 odoriko_1_init[33];
-static s32 odoriko_2_talk[44];
-static s32 odoriko_2_init[33];
-static s32 odoriko_3_talk[44];
-static s32 odoriko_3_init[33];
+static EvtWord odoriko_1_talk[44];
+static EvtWord odoriko_1_init[33];
+static EvtWord odoriko_2_talk[44];
+static EvtWord odoriko_2_init[33];
+static EvtWord odoriko_3_talk[44];
+static EvtWord odoriko_3_init[33];
 static NpcSetupInfo npcEnt[10];
 static BeroEntry bero_entry_data[4];
 const char* son_npc[2];
@@ -185,21 +185,21 @@ static const char* ie_npc[2];
 static const char* ie_map[2];
 static HouseParam ie_data;
 static HitDamageReturn hitDmgRetPoints[13];
-s32 nokotarou_tabidachi[328];
-s32 nokotarou_tabidachi_init[89];
-static s32 sekai_yami_npc[59];
-static s32 sekai_yami_evt[234];
-static s32 minnnanokoe_evt[416];
-static s32 evt_switch_init[17];
-s32 e3_talk[12];
-static s32 epilogue_npc_entry[31];
-static s32 epilogue_evt_sub[194];
-static s32 epilogue_evt[148];
-static s32 evt_kusa_4[25];
-static s32 evt_kusa_5[25];
-static s32 evt_kusa_6[25];
+EvtWord nokotarou_tabidachi[328];
+EvtWord nokotarou_tabidachi_init[89];
+static EvtWord sekai_yami_npc[59];
+static EvtWord sekai_yami_evt[234];
+static EvtWord minnnanokoe_evt[416];
+static EvtWord evt_switch_init[17];
+EvtWord e3_talk[12];
+static EvtWord epilogue_npc_entry[31];
+static EvtWord epilogue_evt_sub[194];
+static EvtWord epilogue_evt[148];
+static EvtWord evt_kusa_4[25];
+static EvtWord evt_kusa_5[25];
+static EvtWord evt_kusa_6[25];
 static KusaAccess kusa_data[4];
-s32 nok_01_init_evt[337];
+EvtWord nok_01_init_evt[337];
 
 void iri_08_msg(s32 type, void** work) {
     u16* msg = *work;
@@ -1428,7 +1428,7 @@ EVT_BEGIN(e3_talk)
 EVT_END()
 
 static USER_FUNC(anim_tevcallback) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 flag = evtGetValue(event, args[1]);
     NpcEntry* npc = npcNameToPtr_NoAssert(name);
@@ -1443,7 +1443,7 @@ static USER_FUNC(anim_tevcallback) {
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 
 static USER_FUNC(starstone_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -1454,7 +1454,7 @@ static USER_FUNC(starstone_entry) {
 }
 
 static USER_FUNC(starstone_set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -1468,7 +1468,7 @@ static USER_FUNC(starstone_set_pos) {
 }
 
 static USER_FUNC(starstone_set_ry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 ry = evtGetFloat(event, args[1]);
 

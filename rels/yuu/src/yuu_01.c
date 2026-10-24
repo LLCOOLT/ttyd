@@ -115,15 +115,15 @@ const char* a_nametbl[21];
 s32 turn_tbl[22];
 s32 hoko_tbl[22];
 static MonteTable montetable[6];
-static s32 minigame_view_monte[4];
-s32 yuu_01_kaijo_init[12];
-s32 yuu_01_kaijo_init2[12];
-s32 minigame02_main[37];
-s32 minigame02_start_cam[40];
-s32 minigame02_start_cam_cancel[17];
-s32 minigame02_start[101];
-s32 minigame02_end[172];
-s32 yuu_01_init_evt[VERSION_PICK(1076, 1166)];
+static EvtWord minigame_view_monte[4];
+EvtWord yuu_01_kaijo_init[12];
+EvtWord yuu_01_kaijo_init2[12];
+EvtWord minigame02_main[37];
+EvtWord minigame02_start_cam[40];
+EvtWord minigame02_start_cam_cancel[17];
+EvtWord minigame02_start[101];
+EvtWord minigame02_end[172];
+EvtWord yuu_01_init_evt[VERSION_PICK(1076, 1166)];
 
 f32 fd_yuu_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1251,7 +1251,7 @@ void yuuminigame_init_2fune(EventEntry* event, BOOL isFirstCall) {
 }
 
 USER_FUNC(yuuminigame2_opening_chk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MiniGameWork* wp = (MiniGameWork*)evtGetValue(event, args[0]);
 
     if (((FuneWork*)wp->data)->flags & 1) {
@@ -1263,7 +1263,7 @@ USER_FUNC(yuuminigame2_opening_chk) {
 }
 
 USER_FUNC(yuuminigame2_opening_on_off) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     FuneWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
 
     if (evtGetValue(event, args[1])) {
@@ -1275,7 +1275,7 @@ USER_FUNC(yuuminigame2_opening_on_off) {
 }
 
 USER_FUNC(yuuminigame2_get_name) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 i = evtGetValue(event, args[0]);
 
     evtSetValue(event, args[1], (s32)s_nametbl[i]);
@@ -1285,7 +1285,7 @@ USER_FUNC(yuuminigame2_get_name) {
 }
 
 USER_FUNC(yuuminigame2_set_phase) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     FuneWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
 
     data->phase = evtGetValue(event, args[1]);

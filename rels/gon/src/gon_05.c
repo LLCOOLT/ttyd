@@ -58,37 +58,37 @@ f32 fd_gon_05___local_3PIO2_368;
 f32 fd_gon_05_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gon_05___local_PIO2_367;
 f32 fd_gon_05_one_364;
-static s32 door01_close[12];
-static s32 door01_open[12];
-static s32 door02_close[12];
-static s32 door02_open[12];
-static s32 door03_close[12];
-static s32 door03_open[12];
-s32 door04_close[22];
-s32 door04_open[22];
-s32 door05_close[12];
-s32 door05_open[12];
+static EvtWord door01_close[12];
+static EvtWord door01_open[12];
+static EvtWord door02_close[12];
+static EvtWord door02_open[12];
+static EvtWord door03_close[12];
+static EvtWord door03_open[12];
+EvtWord door04_close[22];
+EvtWord door04_open[22];
+EvtWord door05_close[12];
+EvtWord door05_open[12];
 static BeroEntry bero_entry_data[7];
-static s32 init_0[37];
+static EvtWord init_0[37];
 #ifdef VERSION_G8ME01
-static s32 main_0[465];
+static EvtWord main_0[465];
 #else
-static s32 main_0[491];
+static EvtWord main_0[491];
 #endif
-s32 init_1[37];
+EvtWord init_1[37];
 #ifdef VERSION_G8ME01
-s32 main_1[465];
+EvtWord main_1[465];
 #else
-s32 main_1[491];
+EvtWord main_1[491];
 #endif
 s32 key_tbl00[2];
-s32 evt_chk00[23];
-static s32 evt_unlock00[10];
+EvtWord evt_chk00[23];
+static EvtWord evt_unlock00[10];
 s32 key_tbl01[2];
-s32 evt_chk01[23];
-static s32 evt_unlock01[10];
-static s32 key_get[5];
-s32 gon_05_init_evt[338];
+EvtWord evt_chk01[23];
+static EvtWord evt_unlock01[10];
+static EvtWord key_get[5];
+EvtWord gon_05_init_evt[338];
 
 f32 fd_gon_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -72,20 +72,20 @@ f32 fd_gra_06___local_3PIO2_368;
 f32 fd_gra_06_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gra_06___local_PIO2_367;
 f32 fd_gra_06_one_364;
-s32 ne_close[22];
-s32 ne_open[22];
-s32 gra_06_ido[12];
-s32 gra_06_ido_in_sub[77];
-s32 gra_06_ido_in[7];
+EvtWord ne_close[22];
+EvtWord ne_open[22];
+EvtWord gra_06_ido[12];
+EvtWord gra_06_ido_in_sub[77];
+EvtWord gra_06_ido_in[7];
 static BeroEntry bero_entry_data[4];
-s32 gra_06_saku_open[288];
-s32 first_gra06jin[138];
+EvtWord gra_06_saku_open[288];
+EvtWord first_gra06jin[138];
 #ifdef VERSION_G8ME01
-s32 teresa_oidasare_evt[282];
+EvtWord teresa_oidasare_evt[282];
 #else
-s32 teresa_oidasare_evt[274];
+EvtWord teresa_oidasare_evt[274];
 #endif
-s32 gra_06_init_evt[148];
+EvtWord gra_06_init_evt[148];
 
 f32 fd_gra_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

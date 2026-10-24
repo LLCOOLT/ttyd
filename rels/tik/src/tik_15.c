@@ -32,7 +32,7 @@ f32 fd_tik_15___local_PIO2_367;
 f32 fd_tik_15_one_364;
 static BeroEntry bero_entry_data[7];
 static HitDamageReturn hitDmgRetPoints[13];
-s32 tik_15_init_evt[91];
+EvtWord tik_15_init_evt[91];
 
 f32 fd_tik_15_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -36,13 +36,13 @@ f32 fd_win___local_3PIO2_368;
 f32 fd_win_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_win___local_PIO2_367;
 f32 fd_win_one_364;
-s32 evt_win_door_open_pure[84];
-s32 evt_win_door_open[16];
-s32 evt_win_door_close_pure[66];
-s32 evt_win_door_close[41];
-s32 _tree_anime[106];
-s32 win_tree_entry[25];
-s32 win_puni_walk_se[20];
+EvtWord evt_win_door_open_pure[84];
+EvtWord evt_win_door_open[16];
+EvtWord evt_win_door_close_pure[66];
+EvtWord evt_win_door_close[41];
+EvtWord _tree_anime[106];
+EvtWord win_tree_entry[25];
+EvtWord win_puni_walk_se[20];
 
 f32 fd_win_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

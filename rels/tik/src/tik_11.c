@@ -104,27 +104,27 @@ f32 fd_tik_11___local_3PIO2_368;
 f32 fd_tik_11_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tik_11___local_PIO2_367;
 f32 fd_tik_11_one_364;
-s32 powerdownya_face_left[16];
+EvtWord powerdownya_face_left[16];
 #ifdef VERSION_G8ME01
-s32 powerdownya_mario_level_rtn[639];
+EvtWord powerdownya_mario_level_rtn[639];
 #else
-s32 powerdownya_mario_level_rtn[616];
+EvtWord powerdownya_mario_level_rtn[616];
 #endif
 #ifdef VERSION_G8ME01
-s32 powerdownya_party_lank_rtn[963];
+EvtWord powerdownya_party_lank_rtn[963];
 #else
-s32 powerdownya_party_lank_rtn[937];
+EvtWord powerdownya_party_lank_rtn[937];
 #endif
 #ifdef VERSION_G8ME01
-s32 powerdownya_table_talk[105];
+EvtWord powerdownya_table_talk[105];
 #else
-s32 powerdownya_table_talk[84];
+EvtWord powerdownya_table_talk[84];
 #endif
-s32 powerdownya_direct_talk[8];
-s32 powerdownya_init[10];
+EvtWord powerdownya_direct_talk[8];
+EvtWord powerdownya_init[10];
 static NpcSetupInfo npcEnt[2];
 static BeroEntry bero_entry_data[2];
-s32 tik_11_init_evt[31];
+EvtWord tik_11_init_evt[31];
 
 static USER_FUNC(setmertn) {
     event->ownerNPC = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
@@ -132,7 +132,7 @@ static USER_FUNC(setmertn) {
 }
 
 static USER_FUNC(effect_stardust) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -147,7 +147,7 @@ static USER_FUNC(effect_stardust) {
 }
 
 static USER_FUNC(wariai_enzan_1) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);
@@ -158,7 +158,7 @@ static USER_FUNC(wariai_enzan_1) {
 }
 
 static USER_FUNC(wariai_enzan_1f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);
@@ -169,7 +169,7 @@ static USER_FUNC(wariai_enzan_1f) {
 }
 
 static USER_FUNC(wariai_enzan_0) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]) - 1.0f;
     f32 c = evtGetFloat(event, args[2]);
@@ -180,7 +180,7 @@ static USER_FUNC(wariai_enzan_0) {
 }
 
 static USER_FUNC(wariai_enzan_0f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]) - 1.0f;
     f32 c = evtGetFloat(event, args[2]);
@@ -191,7 +191,7 @@ static USER_FUNC(wariai_enzan_0f) {
 }
 
 static USER_FUNC(enzan_cam_turn_keisan) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 angle = evtGetValue(event, args[0]) % 360;
     s32 xVar = args[1];
     s32 zVar = args[2];
@@ -242,7 +242,7 @@ static USER_FUNC(enzan_cam_turn_keisan_f) {
 }
 
 static USER_FUNC(enzan_set_i_f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 var = args[0];
 
     evtSetValue(event, var, evtGetFloat(event, args[1]));
@@ -250,7 +250,7 @@ static USER_FUNC(enzan_set_i_f) {
 }
 
 static USER_FUNC(enzan_set_f_i) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 var = args[0];
 
     evtSetFloat(event, var, evtGetValue(event, args[1]));

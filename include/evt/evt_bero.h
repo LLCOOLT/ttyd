@@ -17,9 +17,9 @@ typedef struct BeroEntry {
 	s32 centerPositionY; //0x10
 	s32 centerPositionZ; //0x14
 	s32 length; //0x18, -1 = default for type
-	s32* enterEvent; //0x1C;
+	EvtWord* enterEvent; //0x1C;
 	s32 caseType; //0x20, -1 = default for type
-	s32* exitEvent; //0x24
+	EvtWord* exitEvent; //0x24
 	s32 nextMapName; //0x28, const char* held as s32
 	const char* nextBeroName; //0x2C
 	u16 enterAnimeType; //0x30
@@ -59,36 +59,36 @@ USER_FUNC(evt_bero_get_now_number);
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_bero_get_into_info);
 
-extern s32 bero_case_entry[];
-extern s32 bero_case_exec_pipe[];
-extern s32 bero_case_switch_off[];
-extern s32 bero_case_switch_on[];
-extern s32 bero_close_door_play_se[];
-extern s32 bero_open_door_play_se[];
-extern s32 bero_play_enter_anime[];
-extern s32 evt_bero_info_run[];
+extern EvtWord bero_case_entry[];
+extern EvtWord bero_case_exec_pipe[];
+extern EvtWord bero_case_switch_off[];
+extern EvtWord bero_case_switch_on[];
+extern EvtWord bero_close_door_play_se[];
+extern EvtWord bero_open_door_play_se[];
+extern EvtWord bero_play_enter_anime[];
+extern EvtWord evt_bero_info_run[];
 
 extern s32 BeroID[16];
 extern BeroEntry* BeroINFOARR[16];
 extern s32 BeroSW[16]; //switches
-extern s32 bero_case_entry_sub[];
-extern s32 bero_case_exec_door[];
-extern s32 bero_case_exec_gate[];
-extern s32 bero_case_exec_none[];
-extern s32 bero_case_exec_pipe_sub[];
-extern s32 bero_case_exec_road[];
-extern s32 bero_case_init_check[];
+extern EvtWord bero_case_entry_sub[];
+extern EvtWord bero_case_exec_door[];
+extern EvtWord bero_case_exec_gate[];
+extern EvtWord bero_case_exec_none[];
+extern EvtWord bero_case_exec_pipe_sub[];
+extern EvtWord bero_case_exec_road[];
+extern EvtWord bero_case_init_check[];
 void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end);
 extern BeroEntry bero_null[];
-extern s32 bero_play_out_anime[];
-extern s32 default_entevt[];
-extern s32 default_outevt[];
-extern s32 evt_bero_info_run_door[];
-extern s32 evt_bero_info_run_gate[];
-extern s32 evt_bero_info_run_none[];
-extern s32 evt_bero_info_run_pipe[];
-extern s32 evt_bero_info_run_pipe_sub00[];
-extern s32 evt_bero_info_run_road[];
-extern s32 evt_bero_initial_pos[];
-extern s32 evt_bero_mario_enter[];
-extern s32 evt_bero_nonride_check[];
+extern EvtWord bero_play_out_anime[];
+extern EvtWord default_entevt[];
+extern EvtWord default_outevt[];
+extern EvtWord evt_bero_info_run_door[];
+extern EvtWord evt_bero_info_run_gate[];
+extern EvtWord evt_bero_info_run_none[];
+extern EvtWord evt_bero_info_run_pipe[];
+extern EvtWord evt_bero_info_run_pipe_sub00[];
+extern EvtWord evt_bero_info_run_road[];
+extern EvtWord evt_bero_initial_pos[];
+extern EvtWord evt_bero_mario_enter[];
+extern EvtWord evt_bero_nonride_check[];

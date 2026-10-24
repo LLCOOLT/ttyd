@@ -80,7 +80,7 @@ extern BattleUnitKind unit_boss_gundan_zako_group1;
 extern BattleUnitKind unit_boss_gundan_zako_group2;
 extern BattleUnitKind unit_boss_gundan_zako_group3;
 extern BattleUnitKind unit_gundan_zako_magician;
-extern s32 zakogun_entry[];
+extern EvtWord zakogun_entry[];
 extern s32 zakogun_escape3[];
 extern s32 zakogun_ext_init2[];
 
@@ -112,25 +112,25 @@ BattleUnitSetup entry_kenkyu;
 BattleUnitSetup entry_group1;
 BattleUnitSetup entry_group2;
 BattleUnitSetup entry_group3;
-static s32 init_event[59];
-static s32 entry_event[45];
+static EvtWord init_event[59];
+static EvtWord entry_event[45];
 #ifdef VERSION_G8ME01
-static s32 damage_event[337];
+static EvtWord damage_event[337];
 #else
-static s32 damage_event[315];
+static EvtWord damage_event[315];
 #endif
-static s32 dead_event[402];
-static s32 phase_event[55];
-s32 call_event[284];
-static s32 attack_event[136];
-static s32 guard_event[56];
-static s32 guard_cancel_event[69];
-s32 no_event[27];
-static s32 charge_event[71];
-static s32 wait_event[6];
+static EvtWord dead_event[402];
+static EvtWord phase_event[55];
+EvtWord call_event[284];
+static EvtWord attack_event[136];
+static EvtWord guard_event[56];
+static EvtWord guard_cancel_event[69];
+EvtWord no_event[27];
+static EvtWord charge_event[71];
+static EvtWord wait_event[6];
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_guard[18];
-static s32 normal_attack_event[365];
+static EvtWord normal_attack_event[365];
 
 f32 fd_boss_kanbu3_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1288,7 +1288,7 @@ EVT_END()
 
 USER_FUNC(check_exist_group) {
     s32 i;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     s32 id = -1;
 
@@ -1303,7 +1303,7 @@ USER_FUNC(check_exist_group) {
 }
 USER_FUNC(check_exist_kenkyu) {
     s32 i;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     s32 id = -1;
 

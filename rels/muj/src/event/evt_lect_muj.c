@@ -137,10 +137,10 @@ f32 fd_evt_lect_muj___local_3PIO2_368;
 f32 fd_evt_lect_muj_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_evt_lect_muj___local_PIO2_367;
 f32 fd_evt_lect_muj_one_364;
-s32 sanders_party_lecture_init[48];
-s32 sanders_party_lecture[71];
-static s32 all_party_lecture_otosub[11];
-s32 all_party_lecture[492];
+EvtWord sanders_party_lecture_init[48];
+EvtWord sanders_party_lecture[71];
+static EvtWord all_party_lecture_otosub[11];
+EvtWord all_party_lecture[492];
 
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start) {
     f32 rem = total - elapsed;
@@ -149,7 +149,7 @@ static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start) {
 }
 
 static USER_FUNC(lect_mario_ido_sum) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
     s32 frames = evtGetValue(event, args[0]);
     s32 elapsed;
@@ -184,7 +184,7 @@ static USER_FUNC(lect_status_on) {
 }
 
 static USER_FUNC(x_flag_set) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     x_flag_data[index] = evtGetValue(event, args[1]);
@@ -192,7 +192,7 @@ static USER_FUNC(x_flag_set) {
 }
 
 static USER_FUNC(x_flag_add) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     x_flag_data[index] += evtGetValue(event, args[1]);
@@ -200,7 +200,7 @@ static USER_FUNC(x_flag_add) {
 }
 
 static USER_FUNC(x_flag_get) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     evtSetValue(event, args[1], x_flag_data[index]);
@@ -208,7 +208,7 @@ static USER_FUNC(x_flag_get) {
 }
 
 static USER_FUNC(x_flag_wait) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     s32 value = evtGetValue(event, args[1]);
 
@@ -303,7 +303,7 @@ static USER_FUNC(lecture_button_rtn) {
 }
 
 static USER_FUNC(lecture_button_set_icon_id) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     s32 value = evtGetValue(event, args[1]);
     LectButton* btn = &lbtn[index];
@@ -313,7 +313,7 @@ static USER_FUNC(lecture_button_set_icon_id) {
 }
 
 static USER_FUNC(lecture_button_set_alpha) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     s32 value = evtGetValue(event, args[1]);
     LectButton* btn = &lbtn[index];
@@ -323,7 +323,7 @@ static USER_FUNC(lecture_button_set_alpha) {
 }
 
 static USER_FUNC(lecture_button_flag_on_off) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     u8 flag = evtGetValue(event, args[1]);
 
@@ -339,7 +339,7 @@ static USER_FUNC(lecture_button_flag_on_off) {
 }
 
 static USER_FUNC(lecture_button_set_seq) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     s32 value = evtGetValue(event, args[1]);
     LectButton* btn = &lbtn[index];
@@ -349,7 +349,7 @@ static USER_FUNC(lecture_button_set_seq) {
 }
 
 static USER_FUNC(lecture_button_get_icon_id) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     LectButton* btn = &lbtn[index];
 
@@ -358,7 +358,7 @@ static USER_FUNC(lecture_button_get_icon_id) {
 }
 
 static USER_FUNC(lecture_button_seq_wait) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     s32 seq = evtGetValue(event, args[1]);
     LectButton* btn = &lbtn[index];
@@ -370,7 +370,7 @@ static USER_FUNC(lecture_button_seq_wait) {
 }
 
 static USER_FUNC(lecture_button_set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -392,7 +392,7 @@ static void lect_map_cam_chg_sub(MapObject* obj, s32 camId, BOOL siblings) {
 }
 
 static USER_FUNC(lect_map_cam_chg) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 camId = evtGetValue(event, args[1]);
     MapObject* obj = mapGetMapObj(name);
@@ -404,7 +404,7 @@ static USER_FUNC(lect_map_cam_chg) {
 }
 
 static USER_FUNC(effitemgetchange_cam) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 camId = evtGetValue(event, args[1]);
 
@@ -413,7 +413,7 @@ static USER_FUNC(effitemgetchange_cam) {
 }
 
 static USER_FUNC(effitemgetchange_cam_ptr) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, args[0]);
 
     ((ItemGetWork*)eff->userdata)->camera = evtGetValue(event, args[1]);
@@ -671,7 +671,7 @@ static USER_FUNC(lect_mobj_hit_nasi) {
 }
 
 static USER_FUNC(lect_itemget_kesan) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PartyEntry* party = partyGetPtr(args[0] == 0 ? partyCtrlNo : 1);
     f32 dist = evtGetFloat(event, args[1]);
     CameraEntry* cam = camGetPtr(4);
@@ -697,7 +697,7 @@ static USER_FUNC(lect_itemget_kesan) {
 }
 
 static USER_FUNC(lect_npc_balloon_on_off) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
 
@@ -711,7 +711,7 @@ static USER_FUNC(lect_npc_balloon_on_off) {
 }
 
 static USER_FUNC(efffukidashichange_cam) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 camId = evtGetValue(event, args[1]);
 
@@ -726,7 +726,7 @@ static f32 lect_party_ido_sub(f32 elapsed, f32 total, f32 end, f32 start) {
 }
 
 static USER_FUNC(lect_party_ido_sum) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PartyEntry* party = partyGetPtr(args[0] == 0 ? partyCtrlNo : 1);
     s32 frames = evtGetValue(event, args[1]);
     s32 elapsed;

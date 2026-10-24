@@ -83,18 +83,18 @@ f32 fd_tou_00___local_3PIO2_368;
 f32 fd_tou_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tou_00___local_PIO2_367;
 f32 fd_tou_00_one_364;
-static s32 evt_tou_balloon[85];
-static s32 evt_light[66];
-static s32 evt_wing[125];
-s32 evt_to_tou[293];
-s32 evt_pos_keep[39];
-s32 evt_to_gor[247];
+static EvtWord evt_tou_balloon[85];
+static EvtWord evt_light[66];
+static EvtWord evt_wing[125];
+EvtWord evt_to_tou[293];
+EvtWord evt_pos_keep[39];
+EvtWord evt_to_gor[247];
 const char* kemuri_name[5];
-s32 tou_00_koopa_evt[678];
-static s32 hkoopa_init[7];
+EvtWord tou_00_koopa_evt[678];
+static EvtWord hkoopa_init[7];
 static NpcSetupInfo npcEnt[2];
-s32 evt_skip[43];
-s32 tou_00_init_evt[76];
+EvtWord evt_skip[43];
+EvtWord tou_00_init_evt[76];
 
 USER_FUNC(time_shift) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
@@ -453,7 +453,7 @@ EVT_BEGIN(evt_to_gor)
 EVT_END()
 
 static USER_FUNC(npc_set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -709,7 +709,7 @@ static EVT_BEGIN(hkoopa_init)
 EVT_END()
 
 USER_FUNC(kemuri_move) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 dy = evtGetFloat(event, args[1]);
     EffectEntry* eff = effNameToPtr(name);

@@ -213,10 +213,10 @@ f32 fd_gor_10___local_3PIO2_368;
 f32 fd_gor_10_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gor_10___local_PIO2_367;
 f32 fd_gor_10_one_364;
-s32 tegami_init_evt[78];
-s32 evt_mezame[226];
-s32 mezame_init_evt[61];
-s32 gor_10_init_evt[29];
+EvtWord tegami_init_evt[78];
+EvtWord evt_mezame[226];
+EvtWord mezame_init_evt[61];
+EvtWord gor_10_init_evt[29];
 
 f32 fd_gor_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

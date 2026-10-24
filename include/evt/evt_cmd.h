@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dolphin/types.h>
+#include "evt/evt_word.h"
 #include "manager/evtmgr.h"
 
 // Script Helpers
@@ -9,15 +10,15 @@
 #define PP_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, N, ...) N
 #define PP_RSEQ_N() 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 
-#define PTR(value) (s32)(value)
+#define PTR(value) (EvtWord)(value)
 #define STRING(value) PTR(value)
 #define FLOAT(value) ((s32)(value * 1024.0f) - EVTDAT_FLOAT_BASE)
 
 #define EVT_CMD(param_count, opcode) (((param_count) << 16) | (opcode))
 
-#define EVT_DEF(name) s32(name)[]
+#define EVT_DEF(name) EvtWord(name)[]
 
-#define EVT_BEGIN(name) s32(name)[] = {
+#define EVT_BEGIN(name) EvtWord(name)[] = {
 
 #define EVT_END()     \
     OPCODE_END_SCRIPT \
@@ -176,7 +177,7 @@
 #define GET_FLOAT_INDEXED(indexVar, destVar) EVT_CMD(2, OPCODE_GETRF), indexVar, destVar,
 
 // Native Calls
-#define CALL(...) EVT_CMD(NUMARGS((s32)__VA_ARGS__), OPCODE_USER_FUNC), (s32)__VA_ARGS__,
+#define CALL(...) EVT_CMD(NUMARGS((EvtWord)__VA_ARGS__), OPCODE_USER_FUNC), (EvtWord)__VA_ARGS__,
 
 // Spawning / Controlling Events
 #define SPAWN_EVENT(script) EVT_CMD(1, OPCODE_RUN_EVENT), PTR(script),

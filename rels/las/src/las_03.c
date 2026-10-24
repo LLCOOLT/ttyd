@@ -45,16 +45,16 @@ f32 fd_las_03___local_3PIO2_368;
 f32 fd_las_03_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_03___local_PIO2_367;
 f32 fd_las_03_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[3];
 static HitDamageReturn dmgRetPoint[3];
 const char* toge_data[18];
-s32 toge_evt_sub[121];
-s32 toge_evt[86];
-s32 las_03_init_evt[32];
+EvtWord toge_evt_sub[121];
+EvtWord toge_evt[86];
+EvtWord las_03_init_evt[32];
 
 f32 fd_las_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -267,21 +267,21 @@ EVT_BEGIN(las_03_init_evt)
 EVT_END()
 
 USER_FUNC(get_toge_name) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     evtSetValue(event, args[1], toge_data[idx * 2]);
     evtSetValue(event, args[2], toge_data[idx * 2 + 1]);
     return EVT_RETURN_DONE;
 }
 USER_FUNC(toge_check_flag) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 bit = evtGetValue(event, args[0]);
 
     evtSetValue(event, args[1], toge_flag & (1 << bit));
     return EVT_RETURN_DONE;
 }
 USER_FUNC(toge_flag_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 bit = evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
 

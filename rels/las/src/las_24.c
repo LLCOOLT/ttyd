@@ -54,24 +54,24 @@ f32 fd_las_24___local_3PIO2_368;
 f32 fd_las_24_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_24___local_PIO2_367;
 f32 fd_las_24_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[4];
 static const char* haguruma_hontai[15];
 static const char* haguruma_hontai2[6];
 static const char* haguruma_kage[12];
 static const char* haguruma_kage2[5];
-static s32 haguruma_evt[194];
-s32 cloud_blk_evt[10];
-s32 break_floor_evt[5];
-s32 jump_evt[68];
+static EvtWord haguruma_evt[194];
+EvtWord cloud_blk_evt[10];
+EvtWord break_floor_evt[5];
+EvtWord jump_evt[68];
 #ifdef VERSION_G8ME01
-static s32 dai_evt[17];
+static EvtWord dai_evt[17];
 #else
-static s32 dai_evt[13];
+static EvtWord dai_evt[13];
 #endif
-static s32 box_evt[33];
-s32 las_24_init_evt[190];
+static EvtWord box_evt[33];
+EvtWord las_24_init_evt[190];
 
 f32 fd_las_24_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -394,7 +394,7 @@ EVT_END()
 #include "manager/evtmgr_cmd.h"
 
 USER_FUNC(las_24_adjust_for_framerate) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 value = evtGetValue(event, args[0]);
 
     if (gp->framerate != 60) {

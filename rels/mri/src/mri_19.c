@@ -39,8 +39,8 @@ f32 fd_mri_19___local_PIO2_367;
 f32 fd_mri_19_one_364;
 static BeroEntry bero_entry_data[5];
 static KusaAccess ueki_access_data[7];
-static s32 cloud_wind_event[39];
-s32 mri_19_init_evt[146];
+static EvtWord cloud_wind_event[39];
+EvtWord mri_19_init_evt[146];
 
 f32 fd_mri_19_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

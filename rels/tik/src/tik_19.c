@@ -80,9 +80,9 @@ f32 fd_tik_19___local_PIO2_367;
 f32 fd_tik_19_one_364;
 static BeroEntry bero_entry_data[2];
 static s32 key_tbl[2];
-static s32 evt_majin[487];
-static s32 evt_majin2[237];
-s32 tik_19_init_evt[52];
+static EvtWord evt_majin[487];
+static EvtWord evt_majin2[237];
+EvtWord tik_19_init_evt[52];
 
 f32 fd_tik_19_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

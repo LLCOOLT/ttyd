@@ -114,20 +114,20 @@ f32 fd_tik_02___local_PIO2_367;
 f32 fd_tik_02_one_364;
 static BeroEntry bero_entry_data[7];
 static BeroEntry bero_entry_data2[2];
-s32 geso_init[2];
-s32 geso_talk[8];
-s32 geso_dead[7];
+EvtWord geso_init[2];
+EvtWord geso_talk[8];
+EvtWord geso_dead[7];
 static NpcSetupInfo npcEnt[2];
-s32 ukishima_move[134];
+EvtWord ukishima_move[134];
 char geso_checkpose[];
-static s32 ukishima_apper[294];
-s32 geso_battle[676];
-static s32 wall_bomb[142];
+static EvtWord ukishima_apper[294];
+EvtWord geso_battle[676];
+static EvtWord wall_bomb[142];
 static HitDamageReturn hitDmgRetPoints[7];
-s32 tik_02_init_evt[207];
+EvtWord tik_02_init_evt[207];
 
 USER_FUNC(tik_npc_buruburu) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
     s32 axis = evtGetValue(event, args[1]);
@@ -223,7 +223,7 @@ static BOOL hitIsGroup(HitEntry* target, HitEntry* group) {
 }
 
 USER_FUNC(mario_hosei_all) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HitEntry* hit = hitNameToPtr((const char*)evtGetValue(event, args[0]));
     f32 value = evtGetFloat(event, args[1]);
     MarioWork* mario = marioGetPtr();
@@ -243,7 +243,7 @@ USER_FUNC(mario_hosei_all) {
 }
 
 USER_FUNC(ripple_scale_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 scale = evtGetFloat(event, args[1]);
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "evt/evt_word.h"
 
-extern s32 evt_gazigazi_appear[];
-extern s32 evt_gazigazi_entry[];
+extern EvtWord evt_gazigazi_appear[];
+extern EvtWord evt_gazigazi_entry[];

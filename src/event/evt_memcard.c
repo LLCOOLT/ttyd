@@ -20,7 +20,7 @@ USER_FUNC(evt_seq_load_keep_msg_window);
 
 // Functions are emitted in reverse source order (deferred inlining)
 USER_FUNC(memcard_code) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 code = cardGetCode();
 
     if (cardIsExec()) {
@@ -41,7 +41,7 @@ USER_FUNC(memcard_watch_start) {
 }
 
 USER_FUNC(memcard_watch_chk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (cardInsertChanged()) {
         evtSetValue(event, args[0], 1);
@@ -88,7 +88,7 @@ USER_FUNC(memcard_create) {
 }
 
 USER_FUNC(memcard_delete) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 slot = evtGetValue(event, args[0]) - 1;
 
     if (isFirstCall) {
@@ -101,7 +101,7 @@ USER_FUNC(memcard_delete) {
 }
 
 USER_FUNC(memcard_copy) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 from = evtGetValue(event, args[0]) - 1;
     s32 to = evtGetValue(event, args[1]) - 1;
 
@@ -130,7 +130,7 @@ USER_FUNC(memcard_ipl) {
 }
 
 USER_FUNC(memcard_file_existance) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 slot = evtGetValue(event, args[0]) - 1;
 
     if (cardGetFilePtr()->saves[slot].data.flags & 1) {
@@ -151,12 +151,12 @@ USER_FUNC(memcard_write) {
     return EVT_RETURN_DONE;
 }
 
-s32 evt_memcard_nosave[19];
-s32 evt_memcard_check[322];
-s32 evt_memcard_start[32];
-s32 evt_memcard_delete[80];
-s32 evt_memcard_copy[126];
-s32 evt_memcard_save[510];
+EvtWord evt_memcard_nosave[19];
+EvtWord evt_memcard_check[322];
+EvtWord evt_memcard_start[32];
+EvtWord evt_memcard_delete[80];
+EvtWord evt_memcard_copy[126];
+EvtWord evt_memcard_save[510];
 
 EVT_BEGIN(evt_memcard_nosave)
     CALL(evt_msg_print_add, 0, STRING("msg_nosave_start"))

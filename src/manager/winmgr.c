@@ -197,7 +197,7 @@ static inline const char* select_party_name(u16 id) /* */ {
 USER_FUNC(evt_win_party_lankup_chk) {
     PouchData* pouch;
     u16* p;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 max;
 
     pouch = pouchGetPtr();
@@ -222,7 +222,7 @@ USER_FUNC(evt_win_party_lankup_chk) {
 USER_FUNC(evt_win_party_lankdown_chk) {
     PouchData* pouch;
     u16* p;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 num, canRank, hasRank;
     s32 max;
 

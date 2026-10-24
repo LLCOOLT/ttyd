@@ -119,34 +119,34 @@ f32 fd_win_04___local_3PIO2_368;
 f32 fd_win_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_win_04___local_PIO2_367;
 f32 fd_win_04_one_364;
-s32 win_04w_door_open[10];
-s32 win_04w_door_close[10];
-s32 win_04e_door_open[10];
-s32 win_04e_door_close[10];
-static s32 out_w_bero[12];
+EvtWord win_04w_door_open[10];
+EvtWord win_04w_door_close[10];
+EvtWord win_04e_door_open[10];
+EvtWord win_04e_door_close[10];
+static EvtWord out_w_bero[12];
 BeroEntry bero_witchtrio[1];
 static BeroEntry bero_entry_data[3];
-s32 meet_clouda[76];
-s32 meet_clouda2[139];
-s32 clouda_inai[17];
-s32 clouda_irai[444];
-s32 clouda_irai_ato[20];
-s32 mirror_trans[35];
-s32 mirror_rotate[41];
-s32 mario_move_wait[63];
-s32 dummy1_jump[26];
-s32 dummy2_jump[32];
+EvtWord meet_clouda[76];
+EvtWord meet_clouda2[139];
+EvtWord clouda_inai[17];
+EvtWord clouda_irai[444];
+EvtWord clouda_irai_ato[20];
+EvtWord mirror_trans[35];
+EvtWord mirror_rotate[41];
+EvtWord mario_move_wait[63];
+EvtWord dummy1_jump[26];
+EvtWord dummy2_jump[32];
 static s32 item_list[2];
-s32 clouda_nakama[1556];
-s32 touch_door[39];
-s32 mirror_ball_event[18];
+EvtWord clouda_nakama[1556];
+EvtWord touch_door[39];
+EvtWord mirror_ball_event[18];
 static u32 texture_0[1248];
 Vec rose_table_direct[55];
 f32 rose_table[120];
-s32 flower_event[28];
-s32 flower_disp_pos[21];
-static s32 cloud_toujou[95];
-s32 win_04_init_evt[94];
+EvtWord flower_event[28];
+EvtWord flower_disp_pos[21];
+static EvtWord cloud_toujou[95];
+EvtWord win_04_init_evt[94];
 
 int rand(void);
 
@@ -561,7 +561,7 @@ EVT_END()
 
 USER_FUNC(ss_ch_check) {
     u64 out; // FAKEMATCH (decomp-permuter): reorders the args[1] load
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     out = args[1];
@@ -570,7 +570,7 @@ USER_FUNC(ss_ch_check) {
 }
 
 USER_FUNC(ss_ch_set) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     ssf[index] = evtGetValue(event, args[1]);
@@ -578,7 +578,7 @@ USER_FUNC(ss_ch_set) {
 }
 
 USER_FUNC(fade_alpha) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 r = evtGetValue(event, args[0]);
     s32 g = evtGetValue(event, args[1]);
     s32 b = evtGetValue(event, args[2]);

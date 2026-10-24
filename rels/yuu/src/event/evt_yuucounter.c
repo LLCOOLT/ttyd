@@ -16,7 +16,7 @@
 typedef struct YuuCounterWork { EventEntry* event; u16 flags; u32 dispFlags; s32 type; f32 x; f32 y; s32 data; s32 field_0x1C; s64 elapsed; OSTime lastTime; s32 limit; s32 field_0x34; } YuuCounterWork;
 static void* yuunpc_wp;
 static YuuCounterWork* _wp;
-void evtYuuSetWindowEvt(s32* evt);
+void evtYuuSetWindowEvt(EvtWord* evt);
 void evt_yuucounter_disp_func(CameraId camera, void* param);
 static const GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 static const GXColor bgColor = {0xFF, 0xFF, 0xFF, 0x99};
@@ -48,9 +48,9 @@ f32 fd_evt_yuucounter___local_3PIO2_368;
 f32 fd_evt_yuucounter_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_evt_yuucounter___local_PIO2_367;
 f32 fd_evt_yuucounter_one_364;
-static s32 main_evt[4];
-s32 yuucounter_window_disp_evt[6];
-s32 yuucounter_window_null_evt[2];
+static EvtWord main_evt[4];
+EvtWord yuucounter_window_disp_evt[6];
+EvtWord yuucounter_window_null_evt[2];
 
 u32 yuucounter_flag(u32 mask) {
     if (_wp == NULL) {
@@ -105,7 +105,7 @@ USER_FUNC(evt_yuucounter_free) {
 }
 
 USER_FUNC(evt_yuucounter_alloc) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     YuuCounterWork* wp = _mapAlloc(sizeof(YuuCounterWork));
     s32 value;
 
@@ -315,7 +315,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
 }
 
 USER_FUNC(yuucounter_disp_flag_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BOOL on = evtGetValue(event, args[0]);
     u32 mask = evtGetValue(event, args[1]);
     YuuCounterWork* wp = _wp;

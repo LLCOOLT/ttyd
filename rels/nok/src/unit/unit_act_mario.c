@@ -69,21 +69,21 @@ static StatusVulnerability regist;
 static PoseTableEntry pose_table[7];
 static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
-static s32 init_event[15];
-static s32 damage_event[10];
-static s32 phase_event[2];
-static s32 attack_event[5];
-static s32 wait_event[6];
+static EvtWord init_event[15];
+static EvtWord damage_event[10];
+static EvtWord phase_event[2];
+static EvtWord attack_event[5];
+static EvtWord wait_event[6];
 BattleUnitSetup entry_unit_data[8];
-static s32 battle_entry_event[168];
-s32 _battle_event[155];
-s32 _act_target_enemy[33];
-s32 _act_target_mario[26];
-s32 _act_mario_jump_attack[240];
-s32 _act_clauda_press_attack[350];
-s32 _act_clauda_breath_attack[269];
-s32 _act_teresa_attack[190];
-s32 _act_atmic_teresa_press_attack[188];
+static EvtWord battle_entry_event[168];
+EvtWord _battle_event[155];
+EvtWord _act_target_enemy[33];
+EvtWord _act_target_mario[26];
+EvtWord _act_mario_jump_attack[240];
+EvtWord _act_clauda_press_attack[350];
+EvtWord _act_clauda_breath_attack[269];
+EvtWord _act_teresa_attack[190];
+EvtWord _act_atmic_teresa_press_attack[188];
 
 f32 fd_act_mario_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -732,7 +732,7 @@ EVT_END()
 
 static USER_FUNC(_clauda_breath_effect_fire) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id;
     BattleUnit* unit;
     s32 var;

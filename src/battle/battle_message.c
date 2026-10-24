@@ -22,7 +22,7 @@ USER_FUNC(btlevtcmd_AnnounceMessage) {
 #ifdef VERSION_G8ME01
     const char* text;
 #endif
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type, x, y, frames;
     const char* msg;
 #ifndef VERSION_G8ME01
@@ -94,7 +94,7 @@ void _disp(CameraId cameraId, void* param) {
 
 // s32 index, s32 value
 USER_FUNC(btlevtcmd_AnnounceSetParam) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleAnnounce* announce = &_battleWorkPointer->announce;
     s32 index;
 

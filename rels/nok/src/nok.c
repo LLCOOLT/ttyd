@@ -40,7 +40,7 @@ f32 fd_nok___local_PIO2_367;
 f32 fd_nok_one_364;
 f64 fd_nok__three_localstatic4_sqrtf;
 f64 fd_nok__half_localstatic3_sqrtf;
-s32 nokonoko_urouro_regl[97];
+EvtWord nokonoko_urouro_regl[97];
 
 void _prolog(void) {
     voidfunctionptr* ctor;
@@ -65,7 +65,7 @@ void _unresolved(void) {
 }
 
 USER_FUNC(evt_nokonoko_urouro_check_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 xVar = args[0];
     s32 zVar = args[1];
     f32 cx = evtGetFloat(event, args[2]);

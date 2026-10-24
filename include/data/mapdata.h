@@ -1,10 +1,11 @@
 #pragma once
 
 #include <dolphin/types.h>
+#include "evt/evt_word.h"
 
 typedef struct MapData {
     const char* mapName;
-    s32* eventAddr;
+    EvtWord* eventAddr;
 } MapData;
 
 typedef struct AreaData {
@@ -23,5 +24,5 @@ typedef struct WorldData {
 
 MapData* mapDataPtr(const char* mapName);
 AreaData* areaDataPtr(const char* areaName);
-void relSetEvtAddr(const char* mapName, s32* eventAddr);
+void relSetEvtAddr(const char* mapName, EvtWord* eventAddr);
 void relSetBtlAddr(const char* areaName, void* btlSetupTbl, void* btlSetupNoTbl);

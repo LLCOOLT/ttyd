@@ -118,15 +118,15 @@ static const GXColor shop_list_item_color = {0x00, 0x00, 0x00, 0xFF};
 static WinMgrDesc window_desc[3];
 ShopPoint shopPointList[11];
 WinMgrDesc list_desc[3];
-static s32 buy_evt[VERSION_PICK(326, 366)];
-s32 shopper_talk_evt[VERSION_PICK(352, 396)];
-s32 first_shopping_evt[86];
-static s32 sell_evt[VERSION_PICK(196, 207)];
-s32 keep_evt[VERSION_PICK(148, 167)];
-s32 unkeep_evt[147];
-s32 point_evt[VERSION_PICK(15, 35)];
-s32 evt_shoplist[10];
-static s32 main_evt[4];
+static EvtWord buy_evt[VERSION_PICK(326, 366)];
+EvtWord shopper_talk_evt[VERSION_PICK(352, 396)];
+EvtWord first_shopping_evt[86];
+static EvtWord sell_evt[VERSION_PICK(196, 207)];
+EvtWord keep_evt[VERSION_PICK(148, 167)];
+EvtWord unkeep_evt[147];
+EvtWord point_evt[VERSION_PICK(15, 35)];
+EvtWord evt_shoplist[10];
+static EvtWord main_evt[4];
 
 static WinMgrDesc window_desc[] = {
     {0, 0, 8, -150, 120, 300, 50, {0x2B, 0xA4, 0xFF, 0xFF}, NULL, name_disp},
@@ -1342,7 +1342,7 @@ USER_FUNC(disp_list) {
 USER_FUNC(evt_shop_setup) {
 	s32 i;
 	ShopWork* wp;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ShopObj* objs = (ShopObj*)evtGetValue(event, args[0]);
 	ShopItem* items = (ShopItem*)evtGetValue(event, args[1]);
 	ShopperData* shopper = (ShopperData*)evtGetValue(event, args[2]);
@@ -1422,7 +1422,7 @@ USER_FUNC(point_wait) {
 }
 
 USER_FUNC(shop_flag_onoff) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 on = evtGetValue(event, args[0]);
 	s32 mask = evtGetValue(event, args[1]);
 	ShopWork* wp = _wp;
@@ -1436,14 +1436,14 @@ USER_FUNC(shop_flag_onoff) {
 }
 
 USER_FUNC(get_shop_point) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	PouchData* pouch = pouchGetPtr();
 	evtSetValue(event, args[0], SHOP_PTS(pouch));
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(add_shop_point) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 add = evtGetValue(event, args[0]);
 	s32 t1 = evtGetValue(event, args[1]);
 	s32 t2 = evtGetValue(event, args[2]);
@@ -1474,7 +1474,7 @@ USER_FUNC(reset_shop_point) {
 }
 
 USER_FUNC(chk_shop_point) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	PouchData* pouch = pouchGetPtr();
 	s32 i = 0;
 	s32 j;
@@ -1521,7 +1521,7 @@ USER_FUNC(exchange_shop_point) {
 }
 
 USER_FUNC(shop_point_item) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 pts = evtGetValue(event, args[0]);
 	ShopPoint* p;
 	s32 v;
@@ -1551,7 +1551,7 @@ static USER_FUNC(disp_off) {
 }
 
 static USER_FUNC(get_value) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ShopWork* wp = (ShopWork*)evtGetValue(event, args[0]);
 	evtSetValue(event, args[1], (s32)msgSearch(itemDataTable[wp->items[wp->cur].id].name));
 	evtSetValue(event, args[2], wp->items[wp->cur].id);
@@ -1560,7 +1560,7 @@ static USER_FUNC(get_value) {
 }
 
 USER_FUNC(get_msg) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ShopWork* wp = (ShopWork*)evtGetValue(event, args[0]);
 	s32 i = evtGetValue(event, args[1]);
 	evtSetValue(event, args[2], (s32)wp->shopper->msgs[i]);
@@ -1588,7 +1588,7 @@ USER_FUNC(get_fook_evt) {
 }
 
 USER_FUNC(name_price) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 id = evtGetValue(event, args[0]);
 	evtSetValue(event, args[1], (s32)msgSearch(itemDataTable[id].name));
 	evtSetValue(event, args[2], itemDataTable[id].sell_price);

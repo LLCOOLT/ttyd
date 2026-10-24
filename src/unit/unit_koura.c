@@ -37,17 +37,17 @@ static PoseTableEntry pose_table[5];
 PoseTableEntry pose_table_crack_lv1[5];
 PoseTableEntry pose_table_crack_lv2[5];
 static BattleUnitKindPart parts[2];
-static s32 init_event[46];
-static s32 phase_event[38];
-s32 koura_open[72];
-s32 koura_close[79];
-s32 damage_core[92];
-s32 pose_tbl_reset[58];
-static s32 dead_event[243];
-s32 destroy_event[47];
-static s32 damage_event[10];
-static s32 wait_event[6];
-static s32 attack_event[2];
+static EvtWord init_event[46];
+static EvtWord phase_event[38];
+EvtWord koura_open[72];
+EvtWord koura_close[79];
+EvtWord damage_core[92];
+EvtWord pose_tbl_reset[58];
+static EvtWord dead_event[243];
+EvtWord destroy_event[47];
+static EvtWord damage_event[10];
+static EvtWord wait_event[6];
+static EvtWord attack_event[2];
 
 BattleUnitKind unit_koura = {
     223,

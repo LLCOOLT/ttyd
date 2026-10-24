@@ -52,7 +52,7 @@ f32 fd_evt_yuuminigame___local_3PIO2_368;
 f32 fd_evt_yuuminigame_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_evt_yuuminigame___local_PIO2_367;
 f32 fd_evt_yuuminigame_one_364;
-static s32 main_evt[4];
+static EvtWord main_evt[4];
 
 USER_FUNC(yuu_atai_init) {
     stackp = 0;
@@ -60,7 +60,7 @@ USER_FUNC(yuu_atai_init) {
 }
 
 USER_FUNC(yuu_atai_pop) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (stackp > 0) {
         stackp--;
@@ -70,7 +70,7 @@ USER_FUNC(yuu_atai_pop) {
 }
 
 USER_FUNC(yuu_atai_push) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (stackp < 4) {
         stackt[stackp] = evtGetValue(event, args[0]);
@@ -80,7 +80,7 @@ USER_FUNC(yuu_atai_push) {
 }
 
 USER_FUNC(eff_call_minigame) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -91,7 +91,7 @@ USER_FUNC(eff_call_minigame) {
 }
 
 USER_FUNC(yuuminigame_set_dataadr) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     if (index < 32) {
@@ -101,7 +101,7 @@ USER_FUNC(yuuminigame_set_dataadr) {
 }
 
 USER_FUNC(yuuminigame_get_dataadr) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     if (index >= 32) {
@@ -113,7 +113,7 @@ USER_FUNC(yuuminigame_get_dataadr) {
 }
 
 USER_FUNC(evt_yuuminigame_free) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MiniGameWork* wp = (MiniGameWork*)evtGetValue(event, args[0]);
 
     if (wp == NULL) {
@@ -139,7 +139,7 @@ USER_FUNC(evt_yuuminigame_free) {
 }
 
 USER_FUNC(evt_yuuminigame_alloc) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MiniGameWork* wp = _mapAlloc(sizeof(MiniGameWork));
 
     memset(wp, 0, sizeof(MiniGameWork));

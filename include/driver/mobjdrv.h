@@ -4,6 +4,7 @@
 #include "driver/camdrv.h"
 #include "driver/hitdrv.h"
 #include <dolphin/types.h>
+#include "evt/evt_word.h"
 #include <dolphin/mtx.h>
 
 typedef struct MapObjectHitEntry {
@@ -42,8 +43,8 @@ typedef struct MapObjectEntry {
     struct EffectEntry* effect;              // 0x1C8, coin fukidashi effect (evt_mobj.c)
     s32 eventId;                             // 0x1CC
     s32 (*mainFunc)(struct MapObjectEntry*); // 0x1D0
-    s32 event;                               // 0x1D4
-    s32 extraEvent;                          // 0x1D8, second event script run via mobjRunEvent
+    EvtWord event;                           // 0x1D4
+    EvtWord extraEvent;                      // 0x1D8, second event script run via mobjRunEvent
     s32 state;                               // 0x1DC
     s32 hitFlag;                             // 0x1E0
     s32 flagVar;                             // 0x1E4

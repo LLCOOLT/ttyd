@@ -151,33 +151,33 @@ f32 fd_mri___local_PIO2_367;
 f32 fd_mri_one_364;
 f64 fd_mri__three_localstatic4_sqrtf;
 f64 fd_mri__half_localstatic3_sqrtf;
-s32 evt_mri_door_open_pure[95];
-s32 evt_mri_door_open[14];
-s32 evt_mri_door_close_pure[104];
-s32 evt_mri_door_close[10];
-s32 evt_mri_door_naname_open_pure[52];
-s32 evt_mri_door_naname_open[10];
-s32 evt_mri_door_naname_close_pure[61];
-s32 evt_mri_door_naname_close[10];
-s32 _ueki_anime[64];
-s32 mri_ueki_entry[32];
-s32 mri_puni_save[6];
+EvtWord evt_mri_door_open_pure[95];
+EvtWord evt_mri_door_open[14];
+EvtWord evt_mri_door_close_pure[104];
+EvtWord evt_mri_door_close[10];
+EvtWord evt_mri_door_naname_open_pure[52];
+EvtWord evt_mri_door_naname_open[10];
+EvtWord evt_mri_door_naname_close_pure[61];
+EvtWord evt_mri_door_naname_close[10];
+EvtWord _ueki_anime[64];
+EvtWord mri_ueki_entry[32];
+EvtWord mri_puni_save[6];
 s32 mri_itemsel_table[2];
-s32 mri_punipuni_setup[16];
-s32 mri_punipuni_itemselect[40];
-s32 mri_punipuni_itemset[36];
-s32 mri_punipuni_itemremove[29];
-s32 mri_hikari_color[66];
+EvtWord mri_punipuni_setup[16];
+EvtWord mri_punipuni_itemselect[40];
+EvtWord mri_punipuni_itemset[36];
+EvtWord mri_punipuni_itemremove[29];
+EvtWord mri_hikari_color[66];
 #ifdef VERSION_G8ME01
-s32 mri_countdown[176];
+EvtWord mri_countdown[176];
 #else
-s32 mri_countdown[174];
+EvtWord mri_countdown[174];
 #endif
-s32 mri_waterfall_effect[26];
-s32 mri_guide_hagure_check[50];
-s32 mri_guide_goryu[63];
-s32 mri_puni_walk_se[20];
-s32 mri_puni_jump_se[15];
+EvtWord mri_waterfall_effect[26];
+EvtWord mri_guide_hagure_check[50];
+EvtWord mri_guide_goryu[63];
+EvtWord mri_puni_walk_se[20];
+EvtWord mri_puni_jump_se[15];
 
 f32 fd_mri_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -363,7 +363,7 @@ EVT_BEGIN(evt_mri_door_naname_close)
 EVT_END()
 
 USER_FUNC(evt_mri_door_naname_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x0 = evtGetFloat(event, args[1]);
     f32 z0 = evtGetFloat(event, args[2]);
@@ -473,7 +473,7 @@ EVT_BEGIN(mri_punipuni_itemremove)
 EVT_END()
 
 USER_FUNC(hakari_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 now = evtGetValue(event, args[1]);
     s32 max = evtGetValue(event, args[2]);
@@ -488,7 +488,7 @@ USER_FUNC(hakari_color) {
 }
 
 USER_FUNC(evt_mri_get16bitdata) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s16* table = (s16*)evtGetValue(event, args[0]);
     s32 index = evtGetValue(event, args[1]);
     evtSetValue(event, args[2], table[index]);
@@ -519,7 +519,7 @@ EVT_BEGIN(mri_hikari_color)
 EVT_END()
 
 USER_FUNC(mri_npc_buruburu) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
     s32 axis = evtGetValue(event, args[1]);
@@ -807,7 +807,7 @@ void togeMakeRetsu(Vec* pos, s16 leader, s16 start, s16 end) {
 }
 
 USER_FUNC(evt_mri_toge_make_retsu) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec pos;
     s16 leader;
     s16 start;
@@ -824,7 +824,7 @@ USER_FUNC(evt_mri_toge_make_retsu) {
 }
 
 USER_FUNC(evt_mri_toge_retsu_stop) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s16 leader = evtGetValue(event, args[0]);
     s16 start = evtGetValue(event, args[1]);
     s16 end = evtGetValue(event, args[2]);
@@ -879,7 +879,7 @@ USER_FUNC(evt_mri_puni_win_init) {
 }
 
 USER_FUNC(evt_mri_puni_win_attack) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x0 = evtGetValue(event, args[0]);
     f32 y0 = evtGetValue(event, args[1]);
     f32 z0 = evtGetValue(event, args[2]);
@@ -918,7 +918,7 @@ USER_FUNC(evt_mri_puni_win_attack) {
 }
 
 USER_FUNC(evt_mri_puni_win_end) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x0 = evtGetValue(event, args[0]);
     f32 y0 = evtGetValue(event, args[1]);
     f32 z0 = evtGetValue(event, args[2]);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "evt/evt_word.h"
 #include "driver/mobjdrv.h"
 #include "driver/npcdrv.h"
 #include <dolphin/os.h>
@@ -170,9 +171,9 @@ struct EventEntry {
     u8 wNpcEventType;                  // 0x10
     u8 pad_11[3];                      // 0x11
     void* nextCommand;                 // 0x14, validated
-    s32* args;                         // 0x18, validated
+    EvtWord* args;                     // 0x18, validated
     s8 labelIdTable[16];               // 0x1C
-    s32* labelAddressTable[16];        // 0x2C
+    EvtWord* labelAddressTable[16];    // 0x2C
     struct EventEntry* waitingEvent;   // 0x6C, this parent event is waiting on us
     struct EventEntry* waitingOnEvent; // 0x70, we are waiting on some child event
     struct EventEntry* brotherEvent;   // 0x74
@@ -207,19 +208,19 @@ struct EventEntry {
     };
     UserFunction userfunc;     // 0x98
     union {
-        s32 lwData[16];        // 0x9C, validated
+        EvtWord lwData[16];    // 0x9C, validated
         f32 lwDataF[16];       // 0x9C, the same words used as floats
     };
     s32 lfData[3];             // 0xDC, validated
     void* loopStartPtrs[8];    // 0xE8
-    s32 loopCounters[8];       // 0x108
+    EvtWord loopCounters[8];   // 0x108
     s8 switchStates[8];        // 0x128, validated
-    s32 switchValues[8];       // 0x130, validated
+    EvtWord switchValues[8];   // 0x130, validated
     union {                    // Current addr for read/readf instructions
-        s32* readAddr;
+        EvtWord* readAddr;
         f32* readfAddr;
     }; // 0x150
-    s32* uwBase;                // 0x154, validated
+    EvtWord* uwBase;            // 0x154, validated
     s32* ufBase;                // 0x158, validated
     s32 eventId;                // 0x15C, validated
     s32 unitId;                 // 0x160
@@ -252,7 +253,7 @@ struct EventEntry {
 
 typedef struct EventWork {
     s32 count;           // 0x0
-    s32 gwData[32];      // 0x4
+    EvtWord gwData[32];  // 0x4
     s32 gfData[3];       // 0x84
     EventEntry* entries; // 0x90
     u32 pad_94;      // 0x94

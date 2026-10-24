@@ -102,10 +102,10 @@ ExtTexInfo ext_yuunpc_minigame3_data[6];
 ExtTexInfo ext_yuunpc_minigame4_data[78];
 s32 chusan_mov_tbl[28];
 s32 chusan_act_tbl[8];
-s32 evt_yuunpc_minigame1[69];
-s32 evt_yuunpc_minigame2[69];
-s32 evt_yuunpc_minigame3[69];
-s32 evt_yuunpc_minigame4[167];
+EvtWord evt_yuunpc_minigame1[69];
+EvtWord evt_yuunpc_minigame2[69];
+EvtWord evt_yuunpc_minigame3[69];
+EvtWord evt_yuunpc_minigame4[167];
 
 f32 fd_evt_yuunpc_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

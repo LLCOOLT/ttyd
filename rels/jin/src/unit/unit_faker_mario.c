@@ -112,28 +112,28 @@ BattleUnitSetup entry_gullible_christine;
 BattleUnitSetup entry_gullible_nokotarou;
 BattleUnitSetup entry_gullible_clauda;
 BattleUnitSetup entry_gullible_yoshi;
-static s32 mario_zoom[19];
-static s32 enemy_zoom[19];
-static s32 fmario_zoom[19];
-static s32 gparty_zoom[19];
-static s32 init_event_fmario[189];
-s32 fmario_entry_event[24];
-s32 dead_event_fmario_down[53];
-static s32 dead_event_fmario[198];
-static s32 damage_event_fmario[22];
-s32 phase_event_fmario[VERSION_PICK(400, 403)];
-static s32 attack_event_fmario[60];
-static s32 jump_attack_voice[36];
-static s32 marioAttackEvent_NormalJump[344];
-static s32 marioAttackEvent_KururinJump[469];
-static s32 marioAttackEvent_NormalHammer[299];
-static s32 marioAttackEvent_KaitenHammer[299];
-s32 party_change_event[196];
-static s32 wait_event_fmario[6];
+static EvtWord mario_zoom[19];
+static EvtWord enemy_zoom[19];
+static EvtWord fmario_zoom[19];
+static EvtWord gparty_zoom[19];
+static EvtWord init_event_fmario[189];
+EvtWord fmario_entry_event[24];
+EvtWord dead_event_fmario_down[53];
+static EvtWord dead_event_fmario[198];
+static EvtWord damage_event_fmario[22];
+EvtWord phase_event_fmario[VERSION_PICK(400, 403)];
+static EvtWord attack_event_fmario[60];
+static EvtWord jump_attack_voice[36];
+static EvtWord marioAttackEvent_NormalJump[344];
+static EvtWord marioAttackEvent_KururinJump[469];
+static EvtWord marioAttackEvent_NormalHammer[299];
+static EvtWord marioAttackEvent_KaitenHammer[299];
+EvtWord party_change_event[196];
+static EvtWord wait_event_fmario[6];
 
 static USER_FUNC(_anime_load_wait) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, *args++);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
     s32 anime;
@@ -161,7 +161,7 @@ static USER_FUNC(_anime_load_wait) {
 
 static USER_FUNC(_anime_load) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, *args++);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
     s32 anime;
@@ -187,7 +187,7 @@ static USER_FUNC(_anime_load) {
 
 USER_FUNC(_save_param) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id1 = evtGetValue(event, args[0]);
     s32 id2 = evtGetValue(event, args[1]);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id1));
@@ -225,7 +225,7 @@ USER_FUNC(_save_param) {
 
 USER_FUNC(_load_param) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id1 = evtGetValue(event, args[0]);
     s32 id2 = evtGetValue(event, args[1]);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id1));

@@ -18,7 +18,7 @@
 #include "npc_event.h"
 #include "rsh.h"
 
-typedef struct RshRndNpc { const char* name; const char* model; s32* talkEvt; } RshRndNpc;
+typedef struct RshRndNpc { const char* name; const char* model; EvtWord* talkEvt; } RshRndNpc;
 double tan(double x);
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
@@ -96,15 +96,15 @@ f32 fd_rsh___local_PIO2_367;
 f32 fd_rsh_one_364;
 f64 fd_rsh__three_localstatic4_sqrtf;
 f64 fd_rsh__half_localstatic3_sqrtf;
-s32 simi_check[57];
-s32 simi_offscreen_check[41];
-s32 kami_check[85];
-s32 kami_offscreen_check[41];
-s32 evt_rsh_door_init[23];
-s32 evt_rsh_door_entry[46];
-s32 evt_rsh_door_open[548];
-s32 evt_rsh_door_close[404];
-s32 evt_rsh_window[30];
+EvtWord simi_check[57];
+EvtWord simi_offscreen_check[41];
+EvtWord kami_check[85];
+EvtWord kami_offscreen_check[41];
+EvtWord evt_rsh_door_init[23];
+EvtWord evt_rsh_door_entry[46];
+EvtWord evt_rsh_door_open[548];
+EvtWord evt_rsh_door_close[404];
+EvtWord evt_rsh_window[30];
 RshRndNpc rsh_01_rnd_npc_1[5];
 RshRndNpc rsh_01_rnd_npc_2[3];
 RshRndNpc rsh_01_rnd_npc_3[2];
@@ -114,46 +114,46 @@ RshRndNpc rsh_04_rnd_npc_1[2];
 RshRndNpc rsh_04_rnd_npc_2[2];
 RshRndNpc rsh_04_rnd_npc_3[2];
 RshRndNpc rsh_04_rnd_npc_4[4];
-s32 evt_rsh_rnd_npc_2_1_talk[8];
-s32 evt_rsh_rnd_npc_2_2_talk[16];
-s32 evt_rsh_rnd_npc_2_3_talk[16];
-s32 evt_rsh_rnd_npc_2_4_talk[8];
-s32 evt_rsh_rnd_npc_2_5_talk[8];
-s32 evt_rsh_rnd_npc_2_6_talk[8];
-s32 evt_rsh_rnd_npc_2_7_talk[8];
-s32 evt_rsh_rnd_npc_2_8_talk[8];
-s32 evt_rsh_rnd_npc_2_9_talk[8];
-s32 evt_rsh_rnd_npc_2_10_talk[8];
-s32 evt_rsh_rnd_npc_3_1_talk[8];
-s32 evt_rsh_rnd_npc_3_2_talk[8];
-s32 evt_rsh_rnd_npc_3_3_talk[8];
-s32 evt_rsh_rnd_npc_3_4_talk[8];
-s32 evt_rsh_rnd_npc_3_5_talk[25];
-s32 evt_rsh_rnd_npc_3_6_talk[8];
-s32 evt_rsh_rnd_npc_3_7_talk[8];
-s32 evt_rsh_rnd_npc_3_8_talk[8];
-s32 evt_rsh_rnd_npc_3_9_talk[8];
-s32 evt_rsh_rnd_npc_3_10_talk[8];
-s32 evt_rsh_rnd_npc_4_1_talk[8];
-s32 evt_rsh_rnd_npc_4_2_talk[8];
-s32 evt_rsh_rnd_npc_4_3_talk[16];
-s32 evt_rsh_rnd_npc_4_4_talk[8];
-s32 evt_rsh_rnd_npc_4_5_talk[8];
-s32 evt_rsh_rnd_npc_4_6_talk[8];
-s32 evt_rsh_rnd_npc_4_7_talk[8];
-s32 evt_rsh_rnd_npc_4_8_talk[39];
-s32 evt_rsh_rnd_npc_4_9_talk[8];
-s32 evt_rsh_rnd_npc_4_10_talk[8];
-s32 evt_rsh_rnd_npc_5_1_talk[8];
-s32 evt_rsh_rnd_npc_5_2_talk[8];
-s32 evt_rsh_rnd_npc_5_3_talk[47];
-s32 evt_rsh_rnd_npc_5_4_talk[8];
-s32 evt_rsh_rnd_npc_5_5_talk[8];
-s32 evt_rsh_rnd_npc_5_6_talk[8];
-s32 evt_rsh_rnd_npc_5_7_talk[8];
-s32 evt_rsh_rnd_npc_5_8_talk[8];
-s32 evt_rsh_rnd_npc_5_9_talk[8];
-s32 evt_rsh_rnd_npc_5_10_talk[8];
+EvtWord evt_rsh_rnd_npc_2_1_talk[8];
+EvtWord evt_rsh_rnd_npc_2_2_talk[16];
+EvtWord evt_rsh_rnd_npc_2_3_talk[16];
+EvtWord evt_rsh_rnd_npc_2_4_talk[8];
+EvtWord evt_rsh_rnd_npc_2_5_talk[8];
+EvtWord evt_rsh_rnd_npc_2_6_talk[8];
+EvtWord evt_rsh_rnd_npc_2_7_talk[8];
+EvtWord evt_rsh_rnd_npc_2_8_talk[8];
+EvtWord evt_rsh_rnd_npc_2_9_talk[8];
+EvtWord evt_rsh_rnd_npc_2_10_talk[8];
+EvtWord evt_rsh_rnd_npc_3_1_talk[8];
+EvtWord evt_rsh_rnd_npc_3_2_talk[8];
+EvtWord evt_rsh_rnd_npc_3_3_talk[8];
+EvtWord evt_rsh_rnd_npc_3_4_talk[8];
+EvtWord evt_rsh_rnd_npc_3_5_talk[25];
+EvtWord evt_rsh_rnd_npc_3_6_talk[8];
+EvtWord evt_rsh_rnd_npc_3_7_talk[8];
+EvtWord evt_rsh_rnd_npc_3_8_talk[8];
+EvtWord evt_rsh_rnd_npc_3_9_talk[8];
+EvtWord evt_rsh_rnd_npc_3_10_talk[8];
+EvtWord evt_rsh_rnd_npc_4_1_talk[8];
+EvtWord evt_rsh_rnd_npc_4_2_talk[8];
+EvtWord evt_rsh_rnd_npc_4_3_talk[16];
+EvtWord evt_rsh_rnd_npc_4_4_talk[8];
+EvtWord evt_rsh_rnd_npc_4_5_talk[8];
+EvtWord evt_rsh_rnd_npc_4_6_talk[8];
+EvtWord evt_rsh_rnd_npc_4_7_talk[8];
+EvtWord evt_rsh_rnd_npc_4_8_talk[39];
+EvtWord evt_rsh_rnd_npc_4_9_talk[8];
+EvtWord evt_rsh_rnd_npc_4_10_talk[8];
+EvtWord evt_rsh_rnd_npc_5_1_talk[8];
+EvtWord evt_rsh_rnd_npc_5_2_talk[8];
+EvtWord evt_rsh_rnd_npc_5_3_talk[47];
+EvtWord evt_rsh_rnd_npc_5_4_talk[8];
+EvtWord evt_rsh_rnd_npc_5_5_talk[8];
+EvtWord evt_rsh_rnd_npc_5_6_talk[8];
+EvtWord evt_rsh_rnd_npc_5_7_talk[8];
+EvtWord evt_rsh_rnd_npc_5_8_talk[8];
+EvtWord evt_rsh_rnd_npc_5_9_talk[8];
+EvtWord evt_rsh_rnd_npc_5_10_talk[8];
 const char* rsh_01_rnd_npc_1_list[5];
 const char* rsh_01_rnd_npc_2_list[3];
 const char* rsh_01_rnd_npc_3_list[2];
@@ -163,13 +163,13 @@ const char* rsh_04_rnd_npc_1_list[2];
 const char* rsh_04_rnd_npc_2_list[2];
 const char* rsh_04_rnd_npc_3_list[2];
 const char* rsh_04_rnd_npc_4_list[4];
-s32 debug_print_rnd_npc[61];
-s32 evt_rsh_rnd_npc_init[94];
-s32 evt_rsh_01_rnd_npc_entry[137];
+EvtWord debug_print_rnd_npc[61];
+EvtWord evt_rsh_rnd_npc_init[94];
+EvtWord evt_rsh_01_rnd_npc_entry[137];
 NpcSetupInfo rsh_03_rnd_npc_2_ent[2];
-s32 evt_rsh_03_rnd_npc_entry[95];
+EvtWord evt_rsh_03_rnd_npc_entry[95];
 NpcSetupInfo rsh_04_rnd_npc_3_ent[2];
-s32 evt_rsh_04_rnd_npc_entry[185];
+EvtWord evt_rsh_04_rnd_npc_entry[185];
 
 f32 fd_rsh_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1208,7 +1208,7 @@ EVT_BEGIN(evt_rsh_04_rnd_npc_entry)
 EVT_END()
 
 USER_FUNC(debug_print_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
     s32 group = evtGetValue(event, args[1]);
     s32 index = evtGetValue(event, args[2]);
@@ -1268,16 +1268,16 @@ USER_FUNC(debug_print_func) {
 }
 
 USER_FUNC(evt_rsh_set_rnd_npc_talk_evt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
-    s32* evt = (s32*)evtGetValue(event, args[1]); // event script for the npc talk
+    EvtWord* evt = (EvtWord*)evtGetValue(event, args[1]); // event script for the npc talk
 
     evtNpcNameToPtr(event, name)->talkEvt = evt;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_rsh_get_rnd_npc_talk_evt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
     s32 group = evtGetValue(event, args[1]);
     s32 index = evtGetValue(event, args[2]);
@@ -1287,7 +1287,7 @@ USER_FUNC(evt_rsh_get_rnd_npc_talk_evt) {
 }
 
 USER_FUNC(evt_rsh_get_rnd_npc_data) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
     s32 group = evtGetValue(event, args[1]);
     s32 index = evtGetValue(event, args[2]);
@@ -1350,7 +1350,7 @@ RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index) {
 }
 
 USER_FUNC(evt_rsh_set_rnd_npc) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
     s32 group = evtGetValue(event, args[1]);
     s32 index = evtGetValue(event, args[2]);
@@ -1407,7 +1407,7 @@ USER_FUNC(evt_rsh_set_rnd_npc) {
 }
 
 USER_FUNC(evt_rsh_get_rnd_npc) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
     s32 group = evtGetValue(event, args[1]);
     s32 value;

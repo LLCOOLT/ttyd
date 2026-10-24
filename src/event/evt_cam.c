@@ -30,7 +30,7 @@ static inline f32 cam_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); g
 
 // CameraId id, BOOL on
 USER_FUNC(evt_cam_ctrl_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     CameraId id = evtGetValue(event, args[0]);
 
     if (evtGetValue(event, args[1])) {
@@ -43,7 +43,7 @@ USER_FUNC(evt_cam_ctrl_onoff) {
 }
 
 USER_FUNC(evt_cam_get_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     CameraEntry* camera = camGetPtr(evtGetValue(event, args[0]));
 
     evtSetFloat(event, args[1], camera->cameraPos.x);
@@ -53,7 +53,7 @@ USER_FUNC(evt_cam_get_pos) {
 }
 
 USER_FUNC(evt_cam_get_at) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     CameraEntry* camera = camGetPtr(evtGetValue(event, args[0]));
 
     evtSetFloat(event, args[1], camera->cameraAt.x);
@@ -64,7 +64,7 @@ USER_FUNC(evt_cam_get_at) {
 
 // CameraId id, f32 x, f32 y, s32 msec
 USER_FUNC(evt_cam_shake) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     int new_var;
     int new_var2;
     CameraId id;
@@ -141,7 +141,7 @@ USER_FUNC(evt_cam_shake) {
 
 // s32 percent, s32 msec, s32 dist, s32 curve
 USER_FUNC(evt_cam3d_evt_zoom_in) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 percent, msec, dist, curve;
     CameraEntry* camera;
     Vec pos;
@@ -171,7 +171,7 @@ USER_FUNC(evt_cam3d_evt_zoom_in) {
 
 // s32 x, s32 y, s32 z, s32 percent, s32 msec, s32 curve
 USER_FUNC(evt_cam3d_evt_set_at) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 x, y, z, percent, msec, curve;
     CameraEntry* camera;
     Vec at;
@@ -202,7 +202,7 @@ USER_FUNC(evt_cam3d_evt_set_at) {
 
 // s32 posX, posY, posZ, atX, atY, atZ, msec, curve
 USER_FUNC(evt_cam3d_evt_set) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 px, py, pz, ax, ay, az;
     s32 msec, curve;
     CameraEntry* camera;
@@ -232,7 +232,7 @@ USER_FUNC(evt_cam3d_evt_set) {
 
 // s32 posX, posY, posZ (relative to at), atX, atY, atZ (relative to mario), msec, curve
 USER_FUNC(evt_cam3d_evt_set_rel) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 px, py, pz, ax, ay, az;
     s32 msec, curve;
     CameraEntry* camera;
@@ -277,7 +277,7 @@ USER_FUNC(evt_cam3d_evt_set_rel) {
 
 // const char* npc, s32 posX, posY, posZ, atX, atY, atZ, msec, curve
 USER_FUNC(evt_cam3d_evt_set_npc_rel) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     f32 px, py, pz, ax, ay, az;
     s32 msec, curve;
@@ -314,7 +314,7 @@ USER_FUNC(evt_cam3d_evt_set_npc_rel) {
 
 // s32 posX, posY, posZ, atX, atY, atZ (rotated by camera yaw), msec, curve
 USER_FUNC(evt_cam3d_evt_set_rel_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 px, py, pz, ax, ay, az;
     s32 msec, curve;
     f32 yaw;
@@ -360,7 +360,7 @@ static void evt_cam_debug_print(f32 a) /* restore */ {
 
 // s32 msec, s32 curve
 USER_FUNC(evt_cam3d_evt_off) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 msec, curve;
     CameraEntry* camera;
 
@@ -392,7 +392,7 @@ USER_FUNC(evt_cam3d_road_shift_onoff) {
 
 // s32 x, s32 y, s32 z, s32 dolly, s32 msec, s32 curve
 USER_FUNC(evt_cam3d_evt_set_xyz) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 x, y, z, dolly, msec, curve;
     CameraEntry* camera;
 
@@ -416,7 +416,7 @@ USER_FUNC(evt_cam3d_evt_set_xyz) {
 
 // s32 msec, s32 curve
 USER_FUNC(evt_cam3d_evt_xyz_off) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 msec, curve;
     CameraEntry* camera;
 
@@ -434,7 +434,7 @@ USER_FUNC(evt_cam3d_evt_xyz_off) {
 
 // f32 x, f32 y, f32 z, out f32 shift
 USER_FUNC(evt_cam3d_get_shift) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mario;
     CameraEntry* camera;
     f32 x, y, z;
@@ -476,7 +476,7 @@ USER_FUNC(evt_cam3d_evt_set_now) {
 
 // f32 x, f32 y, f32 z, f32 w, out f32 posX, posY, posZ, atX, atY, atZ
 USER_FUNC(evt_cam3d_event_from_road) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x, y, z, w;
     CamRoadOut out;
 
@@ -513,7 +513,7 @@ USER_FUNC(evt_cam_road_reset) {
 
 // f32 x, f32 y, f32 z
 USER_FUNC(evt_cam_road_reset2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x, y, z;
     MarioWork* mario;
     CameraEntry* camera;
@@ -546,7 +546,7 @@ USER_FUNC(evt_cam_shift_reset) {
 
 // BOOL ortho, CameraId id
 USER_FUNC(evt_cam_type_change) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     CameraId id = evtGetValue(event, args[1]);
 
@@ -561,7 +561,7 @@ USER_FUNC(evt_cam_type_change) {
 
 // BOOL on, BOOL flag
 USER_FUNC(evt_cam_letter_box_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 flag = evtGetValue(event, args[1]);
     CameraEntry* camera = camGetPtr(CAMERA_2D);

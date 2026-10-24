@@ -81,23 +81,23 @@ PoseTableEntry pose_table_clauda_stay[25];
 static BattleDataEntry data_table[8];
 BattleUnitKindPart unitpartsdata_Party_Clauda[1];
 BattleUnitKind unitdata_Party_Clauda;
-static s32 battle_entry_event[59];
-static s32 init_event[60];
-static s32 damage_event[16];
-s32 partyClaudaAttack_NormalAttack[700];
-s32 partyClaudaAttack_BreathAttack[520];
-s32 partyClaudaAttack_PredationAttack[875];
-s32 partyClaudaAttack_KumoGuard[290];
-s32 clauda_appeal_event[71];
-static s32 attack_audience_event[15];
-s32 attack_bad_audience_event[348];
-s32 attack_good_audience_event[216];
+static EvtWord battle_entry_event[59];
+static EvtWord init_event[60];
+static EvtWord damage_event[16];
+EvtWord partyClaudaAttack_NormalAttack[700];
+EvtWord partyClaudaAttack_BreathAttack[520];
+EvtWord partyClaudaAttack_PredationAttack[875];
+EvtWord partyClaudaAttack_KumoGuard[290];
+EvtWord clauda_appeal_event[71];
+static EvtWord attack_audience_event[15];
+EvtWord attack_bad_audience_event[348];
+EvtWord attack_good_audience_event[216];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
-static s32 attack_event[2];
-static s32 wait_event[6];
-static s32 party_win_reaction[11];
+static EvtWord attack_event[2];
+static EvtWord wait_event[6];
+static EvtWord party_win_reaction[11];
 
 
 
@@ -1381,7 +1381,7 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
 }
 
 USER_FUNC(_check_blow_rate) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     s32 id, out;
     BattleUnit* unit;
@@ -1421,7 +1421,7 @@ static USER_FUNC(_clauda_breath_effect_ready) {
 
 static USER_FUNC(_clauda_breath_effect_fire) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id;
     BattleUnit* unit;
     s32 var;
@@ -1452,7 +1452,7 @@ static USER_FUNC(_clauda_breath_effect_fire) {
 
 USER_FUNC(_make_breath_weapon) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 index;
     BattleWeapon* weapon;
@@ -1473,7 +1473,7 @@ USER_FUNC(_make_breath_weapon) {
 
 USER_FUNC(_make_kiss_weapon) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 index;
     BattleWeapon* weapon;
@@ -1492,7 +1492,7 @@ USER_FUNC(_make_kiss_weapon) {
 }
 
 USER_FUNC(_get_clauda_kiss_hit_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec pos, tmp;
     s32 dir;
     BattleUnit* target;
@@ -1531,7 +1531,7 @@ USER_FUNC(_get_clauda_kiss_hit_position) {
 
 USER_FUNC(_make_kumoguard_weapon) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 index;
     BattleWeapon* weapon;

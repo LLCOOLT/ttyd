@@ -59,17 +59,17 @@ static PoseTableEntry pose_table[4];
 BattleDataEntry gesso_right_arm_data_table[13];
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[1];
-static s32 init_event[25];
-static s32 damage_event[31];
-s32 gesso_right_arm_damage_event[93];
-static s32 phase_event[2];
+static EvtWord init_event[25];
+static EvtWord damage_event[31];
+EvtWord gesso_right_arm_damage_event[93];
+static EvtWord phase_event[2];
 BattleWeapon weapon_gesso_right_arm_front_attack;
 BattleWeapon weapon_gesso_right_arm_rear_attack;
-static s32 attack_event[273];
-static s32 wait_event[6];
-s32 gesso_arm_dead_event[130];
-s32 gesso_fall_check[219];
-s32 gesso_arm_damage_pose_event[35];
+static EvtWord attack_event[273];
+static EvtWord wait_event[6];
+EvtWord gesso_arm_dead_event[130];
+EvtWord gesso_fall_check[219];
+EvtWord gesso_arm_damage_pose_event[35];
 
 f32 fd_boss_gesso_right_arm_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -560,7 +560,7 @@ EVT_END()
 
 static USER_FUNC(_check_zenei_kouei) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 out = args[1];
     f32 x, y, z;

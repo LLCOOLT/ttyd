@@ -72,18 +72,18 @@ static BattleUnitKindPart parts[7];
 BattleWeapon weapon_fire_bros_attack;
 BattleWeapon weapon_fire_bros_renzoku_attack;
 BattleWeapon weapon_fire_bros_nagemakuri_attack;
-static s32 init_event[21];
-static s32 damage_event[10];
-static s32 attack_event[92];
-static s32 damage_check_sub[167];
-static s32 damage_check_no_last[7];
-static s32 damage_check_last[113];
-s32 fire_move_event[605];
-static s32 normal_attack_event[125];
-static s32 renzoku_attack_event[141];
-static s32 nagemakuri_attack_event[316];
-s32 nagemakuri_judge_last_attack_event[73];
-static s32 wait_event[6];
+static EvtWord init_event[21];
+static EvtWord damage_event[10];
+static EvtWord attack_event[92];
+static EvtWord damage_check_sub[167];
+static EvtWord damage_check_no_last[7];
+static EvtWord damage_check_last[113];
+EvtWord fire_move_event[605];
+static EvtWord normal_attack_event[125];
+static EvtWord renzoku_attack_event[141];
+static EvtWord nagemakuri_attack_event[316];
+EvtWord nagemakuri_judge_last_attack_event[73];
+static EvtWord wait_event[6];
 
 #pragma dont_inline on
 void fire_bros_get_next_target(s32* unitIdx, s32* partIdx) {
@@ -112,7 +112,7 @@ void fire_bros_get_target(s32* unitIdx, s32* partIdx) {
 #pragma dont_inline reset
 
 USER_FUNC(fire_bros_nagemakuri_set_target) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 unitIdx[20];
     s32 partIdx[20];
     s32 i;

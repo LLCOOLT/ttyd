@@ -90,37 +90,37 @@ PoseTableEntry pose_table_nokotarou_turn[12];
 static BattleDataEntry data_table[12];
 BattleUnitKindPart unitpartsdata_Party_Nokotarou[1];
 BattleUnitKind unitdata_Party_Nokotarou;
-static s32 battle_entry_event[59];
-static s32 init_event[78];
-s32 change_party_spawn_init_event[28];
-static s32 dmg_turn_event[65];
-static s32 wakeup_event[67];
+static EvtWord battle_entry_event[59];
+static EvtWord init_event[78];
+EvtWord change_party_spawn_init_event[28];
+static EvtWord dmg_turn_event[65];
+static EvtWord wakeup_event[67];
 BattleWeapon partyWeapon_NokotarouFirstAttack;
 BattleWeapon partyWeapon_NokotarouKouraAttack;
 BattleWeapon partyWeapon_NokotarouSyubibinKoura;
 BattleWeapon partyWeapon_NokotarouKouraGuard;
 BattleWeapon partyWeapon_NokotarouTsuranukiKoura;
-static s32 _change_koura_pose[34];
-static s32 _change_koura_pose_fast[78];
-static s32 _restore_koura_pose[47];
-static s32 _koura_rotate_start[199];
-static s32 _koura_rotate_stop[13];
-s32 partyNokotarouAttack_FirstAttack[236];
-s32 partyNokotarouAttack_NormalAttack[VERSION_PICK(793, 804)];
-s32 partyNokotarouAttack_SyubibinKoura[VERSION_PICK(691, 702)];
-s32 partyNokotarouAttack_KouraGuard[838];
-s32 partyNokotarouAttack_TsuranukiKoura[VERSION_PICK(931, 942)];
-s32 nokotarou_appeal_event[34];
-static s32 party_win_reaction[16];
-static s32 attack_audience_event[263];
-s32 nokotarou_revive_event[16];
+static EvtWord _change_koura_pose[34];
+static EvtWord _change_koura_pose_fast[78];
+static EvtWord _restore_koura_pose[47];
+static EvtWord _koura_rotate_start[199];
+static EvtWord _koura_rotate_stop[13];
+EvtWord partyNokotarouAttack_FirstAttack[236];
+EvtWord partyNokotarouAttack_NormalAttack[VERSION_PICK(793, 804)];
+EvtWord partyNokotarouAttack_SyubibinKoura[VERSION_PICK(691, 702)];
+EvtWord partyNokotarouAttack_KouraGuard[838];
+EvtWord partyNokotarouAttack_TsuranukiKoura[VERSION_PICK(931, 942)];
+EvtWord nokotarou_appeal_event[34];
+static EvtWord party_win_reaction[16];
+static EvtWord attack_audience_event[263];
+EvtWord nokotarou_revive_event[16];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static BattleUnitDefense defence_turn;
 static StatusVulnerability regist;
-static s32 damage_event[10];
-static s32 attack_event[2];
-static s32 wait_event[6];
+static EvtWord damage_event[10];
+static EvtWord attack_event[2];
+static EvtWord wait_event[6];
 BattleUnitSetup entry_koura;
 
 __declspec(section ".data") f32 unit_party_nokotarou_negone_one_a[] = {
@@ -2618,7 +2618,7 @@ USER_FUNC(_check_mario_move_count) {
 }
 
 USER_FUNC(_color_lv_set) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 id, index, set, value;
@@ -2689,7 +2689,7 @@ USER_FUNC(_tsuranuki_effect_control) {
 
 static USER_FUNC(_check_guard_koura) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     BattleUnit* koura;
     s32 id, index;

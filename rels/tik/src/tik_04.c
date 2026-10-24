@@ -80,15 +80,15 @@ f32 fd_tik_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tik_04___local_PIO2_367;
 f32 fd_tik_04_one_364;
 static BeroEntry bero_entry_data[5];
-static s32 puni_walk_se[20];
-s32 puni_soguu_1[102];
-s32 puni_soguu_2[146];
-s32 plane_tobashi_check[87];
-s32 tik04_wall_blow_evt[5];
-s32 kaidan_pera[122];
-s32 tik_04_switch_evt[41];
-static s32 mobj_box00[34];
-s32 tik_04_init_evt[220];
+static EvtWord puni_walk_se[20];
+EvtWord puni_soguu_1[102];
+EvtWord puni_soguu_2[146];
+EvtWord plane_tobashi_check[87];
+EvtWord tik04_wall_blow_evt[5];
+EvtWord kaidan_pera[122];
+EvtWord tik_04_switch_evt[41];
+static EvtWord mobj_box00[34];
+EvtWord tik_04_init_evt[220];
 
 f32 fd_tik_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

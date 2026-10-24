@@ -108,30 +108,30 @@ f32 fd_mri_17___local_3PIO2_368;
 f32 fd_mri_17_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_mri_17___local_PIO2_367;
 f32 fd_mri_17_one_364;
-s32 bero_02_into_event[14];
+EvtWord bero_02_into_event[14];
 static BeroEntry bero_entry_data[4];
-static s32 guide_init[2];
-static s32 guide_talk[8];
-static s32 sister_init[2];
-static s32 sister_talk[8];
-static s32 rival_init[2];
-static s32 rival_talk[8];
+static EvtWord guide_init[2];
+static EvtWord guide_talk[8];
+static EvtWord sister_init[2];
+static EvtWord sister_talk[8];
+static EvtWord rival_init[2];
+static EvtWord rival_talk[8];
 static NpcSetupInfo npcEnt[4];
 static KusaAccess ueki_access_data[4];
 s16 trap_position[204];
-s32 trap_main[122];
-s32 trap_restore[59];
-s32 wana_kemuri[130];
-s32 wana_offscreen[219];
-s32 trap_event[716];
-s32 trap_check[185];
-static s32 punipuni_ball00_init[34];
-static s32 punipuni_ball00[45];
-static s32 breakyuka_init[11];
-static s32 breakyuka_main[131];
-s32 strange_statue[56];
-s32 switch_event[41];
-s32 mri_17_init_evt[208];
+EvtWord trap_main[122];
+EvtWord trap_restore[59];
+EvtWord wana_kemuri[130];
+EvtWord wana_offscreen[219];
+EvtWord trap_event[716];
+EvtWord trap_check[185];
+static EvtWord punipuni_ball00_init[34];
+static EvtWord punipuni_ball00[45];
+static EvtWord breakyuka_init[11];
+static EvtWord breakyuka_main[131];
+EvtWord strange_statue[56];
+EvtWord switch_event[41];
+EvtWord mri_17_init_evt[208];
 
 f32 fd_mri_17_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -873,7 +873,7 @@ EVT_BEGIN(mri_17_init_evt)
 EVT_END()
 
 static USER_FUNC(set_depthPlaneOffset) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     ImageEntry* img = imgNameToPtr((const char*)evtGetValue(event, args[0]), gp->inBattle != 0);
 
     img->offsetZ = evtGetFloat(event, args[1]);

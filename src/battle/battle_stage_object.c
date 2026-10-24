@@ -1316,7 +1316,7 @@ USER_FUNC(_set_mobj_rotate_x) {
 	BattleStageObjectWork* sw;
 	BattleStageObject* obj;
 
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	busy = FALSE;
 	sw = STAGE_WORK(wp = _battleWorkPointer);
 	layer = evtGetValue(event, *args++);
@@ -1412,7 +1412,7 @@ EVT_END()
 #endif
 
 USER_FUNC(_mobj_set_alpha) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 layer = evtGetValue(event, args[0]);
 	u8 alpha = evtGetValue(event, args[1]);
 
@@ -1478,7 +1478,7 @@ USER_FUNC(_mobj_destroy) {
 
 USER_FUNC(_get_bgset_attack_data) {
 	BattleWork* wp = _battleWorkPointer;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 type = evtGetValue(event, args[0]);
 	s32 out = args[1];
 	BattleWeapon* weapon;
@@ -1508,7 +1508,7 @@ USER_FUNC(_bgset_kemuri_effect) {
 	const char* sfxA2;
 	const char* sfxB;
 	BattleWork* wp;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	int i;
 	BattleStageObject* obj;
 	f32 x, y, z;
@@ -1966,7 +1966,7 @@ f32 _get_nozzle_dir(s32 index) {
 USER_FUNC(_nozzle_work_effect) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	const char* sfx;
 	s32 effType = 0;
 	BOOL started;
@@ -2280,7 +2280,7 @@ void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src) {
 USER_FUNC(_nozzle_work_get_weapon_address) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 index = evtGetValue(event, args[0]);
 
 	evtSetValue(event, args[1], (s32)sw->nozzleWeapons[index]);
@@ -2407,7 +2407,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
   const char *sfxNormal;
   BOOL done;
   s32 acCount;
-  s32 *args = event->args;
+  EvtWord *args = event->args;
   s32 arg0 = *(args++);
   FallObjectEntry *e3;
   BattleUnit *unit;

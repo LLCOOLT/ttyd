@@ -16,7 +16,7 @@ USER_FUNC(evt_offscreen_delete) {
 
 // const char* name, s32 x (out), s32 y (out), s32 width (out), s32 height (out)
 USER_FUNC(evt_offscreen_get_boundingbox) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s32 x, y, width, height;
     u16 left, top, right, bottom;
@@ -38,7 +38,7 @@ USER_FUNC(evt_offscreen_get_boundingbox) {
 
 // same as above, but gives up waiting for a valid box after 5 frames
 USER_FUNC(evt_offscreen_get_boundingbox2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s32 x, y, width, height, id;
     BOOL valid;
@@ -68,7 +68,7 @@ USER_FUNC(evt_offscreen_get_boundingbox2) {
 
 // const char* name, s32 format, s32 param
 USER_FUNC(evt_offscreen_set_texture_fmt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s32 format, param;
     OffscreenEntry* entry;

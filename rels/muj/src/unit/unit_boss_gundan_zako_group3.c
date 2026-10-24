@@ -88,12 +88,12 @@ static PoseTableEntry pose_table[4];
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_gundan_zako_group3_attack;
-static s32 init_event[21];
-static s32 damage_event[129];
-static s32 dead_event[136];
-static s32 attack_event[287];
-static s32 hit_check_event[119];
-static s32 wait_event[6];
+static EvtWord init_event[21];
+static EvtWord damage_event[129];
+static EvtWord dead_event[136];
+static EvtWord attack_event[287];
+static EvtWord hit_check_event[119];
+static EvtWord wait_event[6];
 
 USER_FUNC(zakogun_kanbu_on_ball) {
     BattleUnit* kanbu = BattleGetUnitPtr(_battleWorkPointer, zakogun_get_kanbu_id());

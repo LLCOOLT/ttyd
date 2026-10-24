@@ -44,13 +44,13 @@ f32 fd_aji_19___local_3PIO2_368;
 f32 fd_aji_19_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_19___local_PIO2_367;
 f32 fd_aji_19_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[3];
-s32 evt_hajimete[33];
-s32 aji_19_init_evt[56];
+EvtWord evt_hajimete[33];
+EvtWord aji_19_init_evt[56];
 
 f32 fd_aji_19_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -46,10 +46,10 @@ f32 fd_win_02_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_win_02___local_PIO2_367;
 f32 fd_win_02_one_364;
 static BeroEntry bero_entry_data[5];
-s32 evt_hikou_nobiru_init[89];
-s32 evt_hikou_nobiru[203];
+EvtWord evt_hikou_nobiru_init[89];
+EvtWord evt_hikou_nobiru[203];
 static TreeAccess tree_access_data[3];
-s32 win_02_init_evt[87];
+EvtWord win_02_init_evt[87];
 
 f32 fd_win_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -95,13 +95,13 @@ BOOL psndBGMOff(s32 a);
 void psndBGMOn_f(s32 a, s32 b, s32 c, s32 d);
 
 USER_FUNC(evt_snd_bgmon) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     psndBGMOn(args[0], (char*)args[1]);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_snd_bgmon_f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a = args[0];
     s32 b = args[1];
     s32 c = evtGetValue(event, args[2]);
@@ -110,7 +110,7 @@ USER_FUNC(evt_snd_bgmon_f) {
 }
 
 USER_FUNC(evt_snd_bgmon_f_d) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a = args[0];
     s32 b = args[1];
     s32 c = evtGetValue(event, args[2]);
@@ -125,7 +125,7 @@ USER_FUNC(evt_snd_bgmoff) {
 }
 
 USER_FUNC(evt_snd_bgmoff_f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a = args[0];
     s32 t = evtGetValue(event, args[1]);
     ((BOOL (*)(s32, s32, s32))psndBGMOff_f_d)(a, t, 0);
@@ -133,7 +133,7 @@ USER_FUNC(evt_snd_bgmoff_f) {
 }
 
 USER_FUNC(evt_snd_bgm_freq) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a = args[0];
     s32 t = evtGetValue(event, args[1]);
     psndBGM_rate(a, t);
@@ -141,7 +141,7 @@ USER_FUNC(evt_snd_bgm_freq) {
 }
 
 USER_FUNC(evt_snd_bgm_scope) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a = args[0];
     s32 t = evtGetValue(event, args[1]);
     psndBGMScope(a, t);
@@ -149,7 +149,7 @@ USER_FUNC(evt_snd_bgm_scope) {
 }
 
 USER_FUNC(evt_snd_sfxon) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)args[0];
     s32 out = args[1];
     if (!out) {
@@ -161,7 +161,7 @@ USER_FUNC(evt_snd_sfxon) {
 }
 
 USER_FUNC(evt_snd_sfxon__) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 out = args[1];
     if (!out) {
@@ -173,7 +173,7 @@ USER_FUNC(evt_snd_sfxon__) {
 }
 
 USER_FUNC(evt_snd_sfxon_) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)args[0];
     s32 out = args[1];
     if (!out) {
@@ -185,7 +185,7 @@ USER_FUNC(evt_snd_sfxon_) {
 }
 
 USER_FUNC(evt_snd_sfxon_3d) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)args[0];
     Vec pos;
     s32 out;
@@ -202,7 +202,7 @@ USER_FUNC(evt_snd_sfxon_3d) {
 }
 
 USER_FUNC(evt_snd_sfxon_3d_ex) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)args[0];
     Vec pos;
     u16 a, b, c, d;
@@ -229,13 +229,13 @@ USER_FUNC(evt_snd_sfxoff) {
 }
 
 USER_FUNC(evt_snd_sfxchk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[1], psndSFXChk(evtGetValue(event, args[0])));
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_snd_sfx_pit) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 t = evtGetValue(event, args[1]);
     psndSFX_pit(id, t);
@@ -243,7 +243,7 @@ USER_FUNC(evt_snd_sfx_pit) {
 }
 
 USER_FUNC(evt_snd_sfx_vol) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 t = evtGetValue(event, args[1]);
     psndSFX_vol(id, t);
@@ -251,7 +251,7 @@ USER_FUNC(evt_snd_sfx_vol) {
 }
 
 USER_FUNC(evt_snd_sfx_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec pos;
     s32 id = evtGetValue(event, args[0]);
     pos.x = evtGetFloat(event, args[1]);
@@ -262,20 +262,20 @@ USER_FUNC(evt_snd_sfx_pos) {
 }
 
 USER_FUNC(evt_snd_sfx_dist) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     psndSFX_dist(id, evtGetValue(event, args[1]));
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_snd_envon) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     psndENVOn(args[0], args[1]);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_snd_envon_f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a = args[0];
     s32 b = args[1];
     s32 c = evtGetValue(event, args[2]);
@@ -289,7 +289,7 @@ USER_FUNC(evt_snd_envoff) {
 }
 
 USER_FUNC(evt_snd_envoff_f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a = args[0];
     s32 t = evtGetValue(event, args[1]);
     psndENVOff_f_d(a, t, 0);
@@ -297,7 +297,7 @@ USER_FUNC(evt_snd_envoff_f) {
 }
 
 USER_FUNC(evt_snd_env_lpf) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a = args[0];
     psndENV_LPF(a, evtGetValue(event, args[1]));
     return EVT_RETURN_DONE;

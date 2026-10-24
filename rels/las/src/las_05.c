@@ -171,27 +171,27 @@ f32 fd_las_05___local_3PIO2_368;
 f32 fd_las_05_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_05___local_PIO2_367;
 f32 fd_las_05_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[3];
-s32 kurokaron_move[103];
+EvtWord kurokaron_move[103];
 static ExtTexInfo senkaron_ext_entry_data[26];
 s32 move_check_list[20];
-static s32 senkaron_event[917];
-s32 kurokaron_init[29];
-s32 kurokaron_talk[13];
+static EvtWord senkaron_event[917];
+EvtWord kurokaron_init[29];
+EvtWord kurokaron_talk[13];
 static NpcSetupInfo npcEnt[3];
-static s32 key_evt[5];
+static EvtWord key_evt[5];
 static s32 key_tbl[2];
-static s32 key_check_evt[23];
-static s32 unlock_evt[10];
-static s32 shan_init[68];
-s32 las_05_init_evt[63];
+static EvtWord key_check_evt[23];
+static EvtWord unlock_evt[10];
+static EvtWord shan_init[68];
+EvtWord las_05_init_evt[63];
 
 USER_FUNC(kurokaron_flag_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 mask = evtGetValue(event, args[0]);
 
     evtSetValue(event, args[1], kurokaron_move_flag & mask);
@@ -199,7 +199,7 @@ USER_FUNC(kurokaron_flag_check) {
 }
 
 USER_FUNC(kurokaron_get_move_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetFloat(event, args[0], kurokaron_move_list[kurokaron_move_index][0]);
     evtSetFloat(event, args[1], kurokaron_move_list[kurokaron_move_index][1]);
@@ -345,7 +345,7 @@ void _kurokaron_next_move_index(void) {
 }
 
 USER_FUNC(kurokaron_move_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -1535,14 +1535,14 @@ static USER_FUNC(senkaronGetMarioPushedFlag) {
 }
 
 USER_FUNC(get_mario_y_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetFloat(event, args[0], marioGetPtr()->position.y);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(set_mario_y_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 y = evtGetFloat(event, args[0]);
 
     marioGetPtr()->position.y = y;
@@ -1550,7 +1550,7 @@ USER_FUNC(set_mario_y_pos) {
 }
 
 USER_FUNC(get_party_y_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PartyEntry* party = partyGetPtr(partyCtrlNo);
 
     if (party != NULL) {
@@ -1560,7 +1560,7 @@ USER_FUNC(get_party_y_pos) {
 }
 
 static USER_FUNC(set_party_y_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 y = evtGetFloat(event, args[0]);
     PartyEntry* party = partyGetPtr(partyCtrlNo);
 
@@ -1589,7 +1589,7 @@ USER_FUNC(party_land_on) {
 }
 
 USER_FUNC(chk_mario_ctrloff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetValue(event, args[0], marioCtrlOffChk());
     return EVT_RETURN_DONE;
@@ -1598,7 +1598,7 @@ USER_FUNC(chk_mario_ctrloff) {
 USER_FUNC(party_hit) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     NpcEntry* npc = npcNameToPtr("\x8D\x95\x83\x4A\x83\x8D\x83\x93");
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 dir;
 
     if (party_hit_check(npc->position.x, npc->position.z, &dir) &&
@@ -1716,7 +1716,7 @@ EVT_END()
 
 static USER_FUNC(make_name) {
     static char name[20];
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     s32 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);

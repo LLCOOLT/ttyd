@@ -71,19 +71,19 @@ static StatusVulnerability regist;
 static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 BattleUnitSetup entry_lecture_frankli;
-static s32 init_event[78];
-static s32 damage_event[10];
-s32 lecture_christine_ac_counter_damage_event[117];
-static s32 phase_event[2];
-static s32 wait_event[6];
-static s32 attack_event[19];
+static EvtWord init_event[78];
+static EvtWord damage_event[10];
+EvtWord lecture_christine_ac_counter_damage_event[117];
+static EvtWord phase_event[2];
+static EvtWord wait_event[6];
+static EvtWord attack_event[19];
 BattleWeapon lec_weapon_zutsuki_1;
 BattleWeapon lec_weapon_zutsuki_2;
-s32 lecture_zutsuki_attack_event[570];
+EvtWord lecture_zutsuki_attack_event[570];
 
 USER_FUNC(_get_defence_ac_result) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 var = args[0];
     s32 result = 0;
 
@@ -546,7 +546,7 @@ EVT_BEGIN(lecture_zutsuki_attack_event)
 EVT_END_PAD()
 
 static USER_FUNC(_krb_get_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
     f32 z1 = evtGetFloat(event, args[1]);
     f32 x2 = evtGetFloat(event, args[2]);
@@ -565,7 +565,7 @@ static USER_FUNC(_krb_get_dir) {
 
 static USER_FUNC(_battle_set_lecture_unit_id) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 value;
 
     value = evtGetValue(event, *args++);

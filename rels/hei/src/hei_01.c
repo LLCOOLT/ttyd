@@ -120,34 +120,34 @@ f32 fd_hei_01___local_3PIO2_368;
 f32 fd_hei_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_hei_01___local_PIO2_367;
 f32 fd_hei_01_one_364;
-s32 bero_out_event[5];
+EvtWord bero_out_event[5];
 static BeroEntry bero_entry_data[5];
-static s32 evt_kusa_2[20];
-static s32 evt_kusa_4[20];
-static s32 evt_kusa_7[20];
+static EvtWord evt_kusa_2[20];
+static EvtWord evt_kusa_4[20];
+static EvtWord evt_kusa_7[20];
 static KusaAccess kusa_data[7];
-s32 kusa_dokan[59];
+EvtWord kusa_dokan[59];
 static const char* name_tbl[25];
-s32 bridge_evt_02[192];
-s32 bridge_evt[30];
+EvtWord bridge_evt_02[192];
+EvtWord bridge_evt[30];
 #ifdef VERSION_G8ME01
-s32 nokotaro_get[73];
+EvtWord nokotaro_get[73];
 #else
-s32 nokotaro_get[55];
+EvtWord nokotaro_get[55];
 #endif
-s32 nokotaro_kanyu[40];
-s32 nokotaro_nakama[276];
-static s32 nokotarou_init[7];
-s32 nokotarou_reg[2];
-s32 nokotarou_talk_2[34];
-static s32 nokotarou_talk[4];
-s32 nokorin_pose[57];
-s32 evt_nokorin[869];
+EvtWord nokotaro_kanyu[40];
+EvtWord nokotaro_nakama[276];
+static EvtWord nokotarou_init[7];
+EvtWord nokotarou_reg[2];
+EvtWord nokotarou_talk_2[34];
+static EvtWord nokotarou_talk[4];
+EvtWord nokorin_pose[57];
+EvtWord evt_nokorin[869];
 static NpcSetupInfo npcEnt[3];
 static HitDamageReturn hitDmgRetPoints[3];
-static s32 peach_mail[287];
-s32 christine_hei_01[46];
-s32 hei_01_init_evt[148];
+static EvtWord peach_mail[287];
+EvtWord christine_hei_01[46];
+EvtWord hei_01_init_evt[148];
 
 f32 fd_hei_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

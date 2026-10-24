@@ -139,8 +139,8 @@ void main_cursor(void);
 
 
 static BattleWeapon weapon;
-s32 nice_event_pow[8];
-s32 marioAttackEvent_Muki[254];
+EvtWord nice_event_pow[8];
+EvtWord marioAttackEvent_Muki[254];
 
 static BattleWeapon weapon = {
     "btl_wn_sac_mukimuki_body", // name
@@ -188,7 +188,7 @@ EVT_END()
 
 USER_FUNC(main_muki) {
     MukiWork* w = get_ptr();
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 i;
 
     if (isFirstCall) {
@@ -953,7 +953,7 @@ static MukiWork* get_ptr(void) {
 #pragma dont_inline reset
 
 static USER_FUNC(set_weapon) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     s32 power = evtGetValue(event, args[1]);
     MukiWork* w = get_ptr();
@@ -982,7 +982,7 @@ static USER_FUNC(start_game) {
 
 static USER_FUNC(wait_game_end) {
     MukiWork* w = get_ptr();
-    s32* args = event->args;
+    EvtWord* args = event->args;
     if (w->state == 7) {
         evtSetValue(event, args[0], (s32)w->f14);
         evtSetValue(event, args[1], (s32)w->f1c);

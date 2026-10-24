@@ -189,37 +189,37 @@ f32 fd_rsh_06___local_PIO2_367;
 f32 fd_rsh_06_one_364;
 static ExtTexInfo ext_moamoa_data[71];
 static SharinData sharinDt[29];
-static s32 evt_sharin_main[87];
-static s32 evt_sharin[19];
+static EvtWord evt_sharin_main[87];
+static EvtWord evt_sharin[19];
 static ClankData clankDt[9];
-static s32 evt_clank_main[104];
-static s32 evt_clank[21];
-static s32 evt_bg[81];
-static s32 evt_hoshi[88];
-static s32 hom_10_evt_resha_start[244];
-static s32 hom_10_evt_resha_start2[259];
-static s32 hom_10_evt_resha_start3[11];
-static s32 hom_10_evt_resha_start4[11];
-static s32 stop_1[90];
-static s32 stop_2[90];
-static s32 hom_10_evt_resha_stop[36];
-static s32 evt_ramp[33];
+static EvtWord evt_clank_main[104];
+static EvtWord evt_clank[21];
+static EvtWord evt_bg[81];
+static EvtWord evt_hoshi[88];
+static EvtWord hom_10_evt_resha_start[244];
+static EvtWord hom_10_evt_resha_start2[259];
+static EvtWord hom_10_evt_resha_start3[11];
+static EvtWord hom_10_evt_resha_start4[11];
+static EvtWord stop_1[90];
+static EvtWord stop_2[90];
+static EvtWord hom_10_evt_resha_stop[36];
+static EvtWord evt_ramp[33];
 static const char* pika_tbl[15];
 static const char* pika_tbl_rsh_06[10];
-static s32 hom_10_evt_resha_sub[102];
-static s32 hom_10_evt_resha_right[35];
-static s32 hom_10_evt_resha_left[28];
-static s32 hom_10_init_evt[140];
-s32 evt_resha_init[13];
+static EvtWord hom_10_evt_resha_sub[102];
+static EvtWord hom_10_evt_resha_right[35];
+static EvtWord hom_10_evt_resha_left[28];
+static EvtWord hom_10_init_evt[140];
+EvtWord evt_resha_init[13];
 static BeroEntry bero_data_a[2];
-static s32 evt_moamoa_init[187];
-s32 evt_great_moamoa[737];
+static EvtWord evt_moamoa_init[187];
+EvtWord evt_great_moamoa[737];
 const char* pose_name[8];
-s32 moamoa_debug[230];
-s32 rsh_06_init_evt[84];
-s32 rsh_06_a_init_evt[32];
-s32 rsh_06_init_evt_nidome[41];
-s32 rsh_06_a_init_evt_nidome[11];
+EvtWord moamoa_debug[230];
+EvtWord rsh_06_init_evt[84];
+EvtWord rsh_06_a_init_evt[32];
+EvtWord rsh_06_init_evt_nidome[41];
+EvtWord rsh_06_a_init_evt_nidome[11];
 
 f32 fd_rsh_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -434,7 +434,7 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
     }
 }
 static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 mask = evtGetValue(event, args[1]);
 
@@ -508,7 +508,7 @@ static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 all = evtGetValue(event, args[1]);
     s32 i;

@@ -114,7 +114,7 @@ s32 scissor_tess();
 
 BattleWeapon weapon_scissor;
 BattleWeapon weapon_scissor_finish;
-s32 marioAttackEvent_Scissor[300];
+EvtWord marioAttackEvent_Scissor[300];
 
 BattleWeapon weapon_scissor = {
     "btl_wn_sac_scissor", // name
@@ -805,7 +805,7 @@ void star_disp2D_sub(s32 idx, s32 alpha) {
 
 s32 scissor_timer_get(EventEntry* evt) {
     ScissorWork* w = GetScissorPtr();
-    s32* args = evt->args;
+    EvtWord* args = evt->args;
     if (w->timer <= 59) {
         w->phase = 6;
     }
@@ -959,7 +959,7 @@ s32 scissor_damage(EventEntry* evt, BOOL first) {
     ScissorWork* w;
     s32 aud;
     s32 i, hit;
-    s32* args;
+    EvtWord* args;
     s32 n, ok;
     args = evt->args;
     wp = _battleWorkPointer;
@@ -1102,7 +1102,7 @@ s32 scissor_damage_sub2(Vec pt) {
 
 #pragma dont_inline reset
 s32 scissor_ofscreen_ok(EventEntry* evt) {
-    s32* args = evt->args;
+    EvtWord* args = evt->args;
     ScissorWork* w = GetScissorPtr();
     if (w->flags & 1) {
         evtSetValue(evt, args[0], 1);

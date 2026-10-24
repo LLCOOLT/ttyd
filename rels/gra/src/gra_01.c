@@ -41,9 +41,9 @@ f32 fd_gra_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gra_01___local_PIO2_367;
 f32 fd_gra_01_one_364;
 static BeroEntry bero_entry_data[3];
-s32 gra_01_after_ranpel2[94];
+EvtWord gra_01_after_ranpel2[94];
 static TreeAccess tree_tbl[4];
-s32 gra_01_init_evt[107];
+EvtWord gra_01_init_evt[107];
 
 f32 fd_gra_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

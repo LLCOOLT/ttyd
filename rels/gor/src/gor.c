@@ -70,10 +70,10 @@ f32 fd_gor___local_PIO2_367;
 f32 fd_gor_one_364;
 f64 fd_gor__three_localstatic4_sqrtf;
 f64 fd_gor__half_localstatic3_sqrtf;
-s32 gor_villager_urouro[19];
-s32 inemuri_snd[27];
-s32 mario_and_party_sleep[259];
-s32 luigi_gor_first_talk[205];
+EvtWord gor_villager_urouro[19];
+EvtWord inemuri_snd[27];
+EvtWord mario_and_party_sleep[259];
+EvtWord luigi_gor_first_talk[205];
 
 void _prolog(void) {
     voidfunctionptr* ctor;
@@ -116,7 +116,7 @@ USER_FUNC(evt_gor_msg_cat_free) {
 }
 
 USER_FUNC(evt_gor_msg_cat_alloc) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* head = (const char*)evtGetValue(event, args[0]);
     const char* msg = msgSearch((const char*)evtGetValue(event, args[1]));
     const char* tail = (const char*)evtGetValue(event, args[2]);
@@ -130,7 +130,7 @@ USER_FUNC(evt_gor_msg_cat_alloc) {
 }
 
 USER_FUNC(evt_gor_villager_urouro_check_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 xVar = args[0];
     s32 zVar = args[1];
     f32 cx = evtGetFloat(event, args[2]);
@@ -152,7 +152,7 @@ USER_FUNC(evt_gor_villager_urouro_check_func) {
 }
 
 USER_FUNC(evt_goki_sub_intpl_init) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 mode = evtGetValue(event, args[0]);
     s32 x0 = evtGetValue(event, args[1]);
     s32 x1 = evtGetValue(event, args[2]);

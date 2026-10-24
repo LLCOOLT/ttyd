@@ -128,18 +128,18 @@ f32 fd_kpa___local_3PIO2_368;
 f32 fd_kpa_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_kpa___local_PIO2_367;
 f32 fd_kpa_one_364;
-s32 kpa_init[49];
-s32 kpa_read_mobj[291];
-s32 kpa_coin_evt[7];
-s32 kpa_read_item[34];
-s32 kpa_dead[168];
-s32 kpa_fall_sub[37];
-s32 kpa_bgm_change[180];
-s32 kpa_stage_start[168];
+EvtWord kpa_init[49];
+EvtWord kpa_read_mobj[291];
+EvtWord kpa_coin_evt[7];
+EvtWord kpa_read_item[34];
+EvtWord kpa_dead[168];
+EvtWord kpa_fall_sub[37];
+EvtWord kpa_bgm_change[180];
+EvtWord kpa_stage_start[168];
 s32 numeric_id[5];
-s32 kpa_status_main_evt[9];
-s32 kpa_time[88];
-s32 kpa_stage_clear[35];
+EvtWord kpa_status_main_evt[9];
+EvtWord kpa_time[88];
+EvtWord kpa_stage_clear[35];
 
 f32 fd_kpa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -319,7 +319,7 @@ USER_FUNC(kpa_mobj_on) {
 USER_FUNC(kpa_make_mobj_name) {
     static char name[16];
     static s32 no;
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     sprintf(name, "mobj%x", no);
     no++;
@@ -330,7 +330,7 @@ USER_FUNC(kpa_make_mobj_name) {
 USER_FUNC(kpa_make_item_name) {
     static char name[16];
     static s32 no;
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     sprintf(name, "item%2x", no);
     no++;
@@ -339,7 +339,7 @@ USER_FUNC(kpa_make_item_name) {
 }
 
 USER_FUNC(kpa_add_coin) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     kpaAddCoinPos(1, &(Vec){evtGetFloat(event, args[0]), evtGetFloat(event, args[1]), evtGetFloat(event, args[2])});
     pouchAddCoin(-1);
@@ -651,7 +651,7 @@ EVT_END()
 
 USER_FUNC(kpa_get_msg) {
     static char label[16];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 n = kwp->lives;
     s32 stage = kwp->stage;
 
@@ -765,7 +765,7 @@ USER_FUNC(kpa_status_main) {
 }
 
 USER_FUNC(kpa_status_init) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 stage = evtGetValue(event, args[0]);
     s32 lives = evtGetValue(event, args[1]);
     s32 time = evtGetValue(event, args[2]);
@@ -790,7 +790,7 @@ USER_FUNC(kpa_status_init) {
 }
 
 USER_FUNC(kpa_set_time) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 sec = evtGetValue(event, args[0]) / 1000;
     s32 time = 180 - (sec + evtGetValue(event, args[1]) * 10);
 
@@ -848,7 +848,7 @@ USER_FUNC(kpa_time_countdown) {
 }
 
 USER_FUNC(kpa_get_cam_pt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     CameraEntry* cam = camGetPtr(CAMERA_3D);
 
     evtSetFloat(event, args[0], cam->cameraPos.x);

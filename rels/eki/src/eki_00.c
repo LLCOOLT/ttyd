@@ -218,27 +218,27 @@ f32 fd_eki_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_eki_00___local_PIO2_367;
 f32 fd_eki_00_one_364;
 static ExtTexInfo ext_moamoa_data[47];
-static s32 e_door_close[12];
-static s32 e_door_open[12];
-static s32 s_door_close[22];
-static s32 s_door_open[22];
+static EvtWord e_door_close[12];
+static EvtWord e_door_open[12];
+static EvtWord s_door_close[22];
+static EvtWord s_door_open[22];
 static BeroEntry bero_data[3];
-s32 evt_bridge[14];
-s32 evt_bridge2[118];
-static s32 evt_origami[198];
-static s32 evt_moamoa_init[29];
-static s32 evt_meet_moamoa[215];
-static s32 evt_moamoa_escape[47];
-s32 evt_elv_rumble[60];
-static s32 evt_elv_init[49];
-s32 evt_elv_down[554];
-s32 evt_elv_up[456];
+EvtWord evt_bridge[14];
+EvtWord evt_bridge2[118];
+static EvtWord evt_origami[198];
+static EvtWord evt_moamoa_init[29];
+static EvtWord evt_meet_moamoa[215];
+static EvtWord evt_moamoa_escape[47];
+EvtWord evt_elv_rumble[60];
+static EvtWord evt_elv_init[49];
+EvtWord evt_elv_down[554];
+EvtWord evt_elv_up[456];
 static s32 item_tbl[2];
-s32 evt_elv[61];
-s32 evt_elv_nomsg[14];
-static s32 evt_head[42];
-static s32 evt_kanban[14];
-s32 eki_00_init_evt[99];
+EvtWord evt_elv[61];
+EvtWord evt_elv_nomsg[14];
+static EvtWord evt_head[42];
+static EvtWord evt_kanban[14];
+EvtWord eki_00_init_evt[99];
 
 f32 fd_eki_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -429,7 +429,7 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
     }
 }
 static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 mask = evtGetValue(event, args[1]);
 
@@ -503,7 +503,7 @@ static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 all = evtGetValue(event, args[1]);
     s32 i;
@@ -1654,7 +1654,7 @@ EVT_END()
 s32 img_set_color(EventEntry* event, BOOL isFirstCall);
 
 s32 img_set_color(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     u8 r = evtGetValue(event, args[1]);
     u8 g = evtGetValue(event, args[2]);

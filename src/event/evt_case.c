@@ -48,7 +48,7 @@ static inline s32 _evtCaseEntry(EventEntry* event, s32 conditionId, BOOL flag,
 // u16 conditionId, BOOL flag, const char* hitObjName, u32 swFlag, void* evtCode,
 // s32 caseIdStoreIndex
 USER_FUNC(evt_run_case_evt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 conditionId;
     BOOL flag;
     const char* hitObjName;
@@ -70,7 +70,7 @@ USER_FUNC(evt_run_case_evt) {
 
 // same as evt_run_case_evt, but with priority 20
 USER_FUNC(evt_run_case_evt_bero) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 conditionId;
     BOOL flag;
     const char* hitObjName;
@@ -102,7 +102,7 @@ USER_FUNC(evt_exit_case_evt) {
 
 // BOOL keepEvent, s32 caseId
 USER_FUNC(evt_del_case_evt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BOOL keepEvent;
     s32 caseId;
     CaseEntry* entry;
@@ -121,7 +121,7 @@ USER_FUNC(evt_del_case_evt) {
 
 // s32 caseId, s32 index, s32 value
 USER_FUNC(evt_set_case_wrk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 caseId, index, value;
     CaseEntry* entry;
 

@@ -42,11 +42,11 @@ f32 fd_dou_00___local_3PIO2_368;
 f32 fd_dou_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_dou_00___local_PIO2_367;
 f32 fd_dou_00_one_364;
-static s32 bero_in_event[11];
+static EvtWord bero_in_event[11];
 static BeroEntry bero_entry_data[3];
-static s32 back_light[35];
-s32 totsunyu_event[46];
-s32 dou_00_init_evt[61];
+static EvtWord back_light[35];
+EvtWord totsunyu_event[46];
+EvtWord dou_00_init_evt[61];
 
 f32 fd_dou_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

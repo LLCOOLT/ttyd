@@ -84,21 +84,21 @@ s32 irai_item_data25[2];
 s32 irai_item_data29[2];
 s32 irai_item_null[1];
 s32* irai_item_table[30];
-s32 irai_start_event_null[2];
-s32 irai_start_event01[13];
-s32 irai_start_event04[8];
-s32* irai_start_event[30];
-s32 irai_end_event_null[2];
-s32 irai_end_event01[13];
-s32 irai_end_event04[8];
+EvtWord irai_start_event_null[2];
+EvtWord irai_start_event01[13];
+EvtWord irai_start_event04[8];
+EvtWord* irai_start_event[30];
+EvtWord irai_end_event_null[2];
+EvtWord irai_end_event01[13];
+EvtWord irai_end_event04[8];
 #ifdef VERSION_G8ME01
-s32 irai_end_event19[15];
+EvtWord irai_end_event19[15];
 #endif
-s32* irai_end_event[30];
-s32 gor_irai_init[18];
-s32 gor_irai_lecture[40];
-s32 gor_irai_main[VERSION_PICK(105, 126)];
-s32 gor_irai_tenshu_main[VERSION_PICK(258, 261)];
+EvtWord* irai_end_event[30];
+EvtWord gor_irai_init[18];
+EvtWord gor_irai_lecture[40];
+EvtWord gor_irai_main[VERSION_PICK(105, 126)];
+EvtWord gor_irai_tenshu_main[VERSION_PICK(258, 261)];
 
 f32 fd_gor_irai_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -280,7 +280,7 @@ EVT_BEGIN(irai_start_event04)
     RETURN
 EVT_END()
 
-s32* irai_start_event[] = {
+EvtWord* irai_start_event[] = {
     irai_start_event01, irai_start_event_null, irai_start_event_null, irai_start_event04, irai_start_event_null,
     irai_start_event_null, irai_start_event_null, irai_start_event_null, irai_start_event_null,
     irai_start_event_null, irai_start_event_null, irai_start_event_null, irai_start_event_null,
@@ -317,7 +317,7 @@ EVT_BEGIN(irai_end_event19)
 EVT_END()
 #endif
 
-s32* irai_end_event[] = {
+EvtWord* irai_end_event[] = {
     irai_end_event01, irai_end_event_null, irai_end_event_null, irai_end_event04, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
     irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
 #ifdef VERSION_G8ME01

@@ -16,16 +16,16 @@ USER_FUNC(btlevtcmd_SetMaxMoveCount);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 
 static BattleUnitKindPart parts[1];
-static s32 init_event[25];
-static s32 damage_event[14];
+static EvtWord init_event[25];
+static EvtWord damage_event[14];
 static s32 _data[35];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
 static PoseTableEntry pose_table[4];
 static BattleDataEntry data_table[1];
-static s32 attack_event[5];
-static s32 wait_event[2];
+static EvtWord attack_event[5];
+static EvtWord wait_event[2];
 
 BattleUnitKind unit_object_tree = {
     216,

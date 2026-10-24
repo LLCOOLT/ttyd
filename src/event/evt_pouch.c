@@ -20,7 +20,7 @@ typedef s32 (*SetFn)(s32);
 
 #define GETTER(name, fn) \
 	USER_FUNC(name) { \
-		s32* args = event->args; \
+		EvtWord* args = event->args; \
 		evtSetValue(event, args[0], fn()); \
 		return EVT_RETURN_DONE; \
 	}
@@ -35,7 +35,7 @@ SETTER(evt_pouch_add_starpiece, RAW_SET(pouchAddStarPiece))
 SETTER(evt_pouch_get_starstone, pouchGetStarStone)
 
 USER_FUNC(evt_pouch_add_item) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	if (pouchGetItem(evtGetValue(event, args[0])) == 1) {
 		evtSetValue(event, args[1], 0);
 	} else {
@@ -45,7 +45,7 @@ USER_FUNC(evt_pouch_add_item) {
 }
 
 USER_FUNC(evt_pouch_remove_item) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	if (pouchRemoveItem(evtGetValue(event, args[0])) == 1) {
 		pouchReviseMarioParam();
 		pouchRevisePartyParam();
@@ -57,7 +57,7 @@ USER_FUNC(evt_pouch_remove_item) {
 }
 
 USER_FUNC(N_evt_pouch_remove_item_index) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 a = evtGetValue(event, args[0]);
 	s32 b = evtGetValue(event, args[1]);
 	if (pouchRemoveItemIndex(a, b) == 1) {
@@ -71,7 +71,7 @@ USER_FUNC(N_evt_pouch_remove_item_index) {
 }
 
 USER_FUNC(evt_pouch_add_keepitem) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	if (RAW_SET(pouchAddKeepItem)(evtGetValue(event, args[0]))) {
 		evtSetValue(event, args[1], 0);
 	} else {
@@ -81,7 +81,7 @@ USER_FUNC(evt_pouch_add_keepitem) {
 }
 
 USER_FUNC(evt_pouch_remove_keepitem) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 a = evtGetValue(event, args[0]);
 	s32 b = evtGetValue(event, args[1]);
 	if (pouchRemoveKeepItem(a, b)) {
@@ -93,7 +93,7 @@ USER_FUNC(evt_pouch_remove_keepitem) {
 }
 
 USER_FUNC(evt_pouch_check_item) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	evtSetValue(event, args[1], pouchCheckItem(evtGetValue(event, args[0])));
 	return EVT_RETURN_DONE;
 }
@@ -132,7 +132,7 @@ USER_FUNC(evt_pouch_set_yoshiname) {
 	return EVT_RETURN_DONE;
 }
 USER_FUNC(evt_pouch_get_yoshiname) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	evtSetValue(event, args[0], (s32)pouchGetYoshiName());
 	return EVT_RETURN_DONE;
 }

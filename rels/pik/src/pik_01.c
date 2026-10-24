@@ -142,51 +142,51 @@ f32 fd_pik_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_pik_01___local_PIO2_367;
 f32 fd_pik_01_one_364;
 static HitDamageReturn dmgReturnPt[9];
-static s32 n_door_open[22];
-static s32 n_door_close[22];
+static EvtWord n_door_open[22];
+static EvtWord n_door_close[22];
 static BeroEntry bero_data[4];
 static const char* name_tbl[2];
-s32 evt_powan[346];
-static s32 init_powan[18];
-static s32 talk_powan[8];
-s32 miyageya_talk[563];
-s32 miyageya_init[24];
+EvtWord evt_powan[346];
+static EvtWord init_powan[18];
+static EvtWord talk_powan[8];
+EvtWord miyageya_talk[563];
+EvtWord miyageya_init[24];
 s32 iri_29_item_tbl1[2];
 s32 iri_29_item_tbl2[2];
 s32 iri_29_item_tbl3[2];
-s32 konarikin_talk[426];
-s32 konarikin_init[29];
-s32 narikin_papa_mama_talk[55];
-s32 narikin_papa_init[23];
-s32 narikin_mama_init[23];
-s32 madam_talk[19];
-s32 madam_init[18];
-static s32 baba_talk[8];
-static s32 baba_init[9];
-s32 takun4_init[7];
-s32 takun4_talk[37];
-s32 takun5_init[25];
-s32 takun5_talk[28];
-s32 takun6_init[25];
-s32 takun6_talk[28];
+EvtWord konarikin_talk[426];
+EvtWord konarikin_init[29];
+EvtWord narikin_papa_mama_talk[55];
+EvtWord narikin_papa_init[23];
+EvtWord narikin_mama_init[23];
+EvtWord madam_talk[19];
+EvtWord madam_init[18];
+static EvtWord baba_talk[8];
+static EvtWord baba_init[9];
+EvtWord takun4_init[7];
+EvtWord takun4_talk[37];
+EvtWord takun5_init[25];
+EvtWord takun5_talk[28];
+EvtWord takun6_init[25];
+EvtWord takun6_talk[28];
 static NpcSetupInfo npc_data[8];
-s32 teresa_fuwafuwa[54];
-s32 resaresa_talk[8];
-s32 resaresa_entry[35];
-s32 sebaschan_talk[8];
-s32 sebaschan_entry[35];
-s32 koopa_door_evt[227];
-s32 pik_01_koopa_evt[241];
-static s32 delete_npc_regl_evt[35];
-static s32 sekai_yami_shake[11];
-static s32 sekai_yami_evt[140];
-static s32 minnnanokoe_evt[391];
-static s32 evt_switch_init[17];
-s32 iri_27_npc_entry[26];
-s32 pik_01_init_evt[486];
+EvtWord teresa_fuwafuwa[54];
+EvtWord resaresa_talk[8];
+EvtWord resaresa_entry[35];
+EvtWord sebaschan_talk[8];
+EvtWord sebaschan_entry[35];
+EvtWord koopa_door_evt[227];
+EvtWord pik_01_koopa_evt[241];
+static EvtWord delete_npc_regl_evt[35];
+static EvtWord sekai_yami_shake[11];
+static EvtWord sekai_yami_evt[140];
+static EvtWord minnnanokoe_evt[391];
+static EvtWord evt_switch_init[17];
+EvtWord iri_27_npc_entry[26];
+EvtWord pik_01_init_evt[486];
 
 USER_FUNC(chk_luigi_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (marioGetColor() == 1) {
         evtSetValue(event, args[0], 1);
@@ -1151,7 +1151,7 @@ static USER_FUNC(yami_view) {
 }
 
 static USER_FUNC(anim_tevcallback) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 flag = evtGetValue(event, args[1]);
     NpcEntry* npc = npcNameToPtr_NoAssert(name);
@@ -1166,7 +1166,7 @@ static USER_FUNC(anim_tevcallback) {
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 
 static USER_FUNC(starstone_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -1177,7 +1177,7 @@ static USER_FUNC(starstone_entry) {
 }
 
 static USER_FUNC(starstone_set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -1191,7 +1191,7 @@ static USER_FUNC(starstone_set_pos) {
 }
 
 static USER_FUNC(starstone_set_ry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 ry = evtGetFloat(event, args[1]);
 

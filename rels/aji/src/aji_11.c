@@ -61,21 +61,21 @@ f32 fd_aji_11___local_3PIO2_368;
 f32 fd_aji_11_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_11___local_PIO2_367;
 f32 fd_aji_11_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[2];
-s32 peach_evt_bero[50];
+EvtWord peach_evt_bero[50];
 static BeroEntry bero_peach_data[2];
-static s32 key_evt[5];
-s32 evt_gajigaji_anim[13];
-s32 evt_gajigaji_main[96];
-s32 evt_gajigaji[50];
+static EvtWord key_evt[5];
+EvtWord evt_gajigaji_anim[13];
+EvtWord evt_gajigaji_main[96];
+EvtWord evt_gajigaji[50];
 static s32 item_list[2];
-s32 peach_evt_disksys[164];
-s32 peach_evt_tana1[50];
-s32 peach_evt_tana2[31];
-static s32 peach_evt_stg5[105];
-s32 aji_11_init_evt[111];
+EvtWord peach_evt_disksys[164];
+EvtWord peach_evt_tana1[50];
+EvtWord peach_evt_tana2[31];
+static EvtWord peach_evt_stg5[105];
+EvtWord aji_11_init_evt[111];
 
 f32 fd_aji_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -399,7 +399,7 @@ EVT_BEGIN(aji_11_init_evt)
 EVT_END()
 
 USER_FUNC(map_anim_flag_off) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 mask = evtGetValue(event, args[1]);
     MapEntryAnimData* anim = mapSearchAnmObj(name);

@@ -31,7 +31,7 @@ AnimationPose* animPoseGetAnimPosePtr(s32 poseId);
 f32 animPoseGetLoopTimes(s32 id);
 void dispEntry(CameraId camera, f32 order, s32 renderMode, DispCallback callback, void* param);
 f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2);
-f32 evtGetFloat(EventEntry* entry, s32 index);
+f32 evtGetFloat(EventEntry* entry, EvtWord index);
 MarioWork* marioGetPtr(void);
 void *memset(void *dest, int ch, size_t count);
 NpcEntry* npcNameToPtr(const char* name);
@@ -106,9 +106,9 @@ f32 fd_hei_10___local_PIO2_367;
 f32 fd_hei_10_one_364;
 static BeroEntry bero_entry_data[4];
 static ExtTexInfo ext_data[21];
-s32 golden_se[55];
-s32 evt_golden[319];
-s32 hei_10_init_evt[80];
+EvtWord golden_se[55];
+EvtWord evt_golden[319];
+EvtWord hei_10_init_evt[80];
 
 int rand(void);
 
@@ -441,14 +441,14 @@ s32 evt_chorobon_wait(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
-static inline s32 npc_jump_get_time(EventEntry* event, s32* args) {
+static inline s32 npc_jump_get_time(EventEntry* event, EvtWord* args) {
     return evtGetValue(event, args[6]);
 }
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static s32 npc_jump(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);

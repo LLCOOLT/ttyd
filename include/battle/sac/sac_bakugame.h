@@ -2,11 +2,12 @@
 
 #include <dolphin/types.h>
 #include "battle/battle_ac.h"
+#include "evt/evt_word.h"
 
 //BattleACExtraParams* GetBakuGamePtr(void);
 
-extern s32 marioAttackEvent_BakuGame[];
+extern EvtWord marioAttackEvent_BakuGame[];
 
-extern s32 hitCheck_AudienceTeam[];
-extern s32 hitCheck_EnemyTeam[];
-extern s32 hitCheck_MarioTeam[];
+extern EvtWord hitCheck_AudienceTeam[];
+extern EvtWord hitCheck_EnemyTeam[];
+extern EvtWord hitCheck_MarioTeam[];

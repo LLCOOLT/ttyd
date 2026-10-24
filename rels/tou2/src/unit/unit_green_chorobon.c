@@ -56,20 +56,20 @@ static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_chorobon_drain_attack;
-static s32 attack_event[139];
+static EvtWord attack_event[139];
 static BattleUnitSetup entry_chorobon;
-static s32 friend_event[223];
+static EvtWord friend_event[223];
 static BattleWeapon weapon_chorobon_drain_attack_biribiri_counterd;
 static PoseTableEntry pose_table[18];
 static BattleDataEntry data_table[14];
-static s32 rabbit_move[123];
+static EvtWord rabbit_move[123];
 static PoseSoundTiming pose_sound_timing_table[4];
-static s32 init_event[31];
-static s32 damage_event[10];
-static s32 counter_damage_event[41];
-static s32 return_event[24];
-static s32 drain_attack_event[887];
-static s32 wait_event[6];
+static EvtWord init_event[31];
+static EvtWord damage_event[10];
+static EvtWord counter_damage_event[41];
+static EvtWord return_event[24];
+static EvtWord drain_attack_event[887];
+static EvtWord wait_event[6];
 
 f32 fd_green_chorobon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -743,7 +743,7 @@ static EVT_BEGIN(drain_attack_event)
 EVT_END()
 
 static USER_FUNC(chorobon_copy_status) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
     s32 id2 = BattleTransID(event, evtGetValue(event, args[1]));
     BattleWork* wp = _battleWorkPointer;

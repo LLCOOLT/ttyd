@@ -54,15 +54,15 @@ static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_kanbu1_attack;
 BattleUnitSetup entry_npc_christine;
-static s32 init_event[82];
-static s32 phase_event[282];
-static s32 damage_event[10];
-static s32 attack_event[24];
-static s32 wait_event[6];
-static s32 dead_event[276];
+static EvtWord init_event[82];
+static EvtWord phase_event[282];
+static EvtWord damage_event[10];
+static EvtWord attack_event[24];
+static EvtWord wait_event[6];
+static EvtWord dead_event[276];
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_guard[18];
-static s32 normal_attack_event[365];
+static EvtWord normal_attack_event[365];
 
 f32 fd_boss_kanbu1_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

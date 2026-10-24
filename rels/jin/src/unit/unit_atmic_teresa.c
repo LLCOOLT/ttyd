@@ -85,22 +85,22 @@ BattleWeapon weapon_atmic_teresa_press;
 BattleWeapon weapon_atmic_teresa_bikkuri;
 BattleWeapon weapon_atmic_teresa_surprise;
 BattleWeapon weapon_atmic_teresa_breath;
-static s32 init_event[26];
-static s32 damage_event[10];
-static s32 attack_event[101];
-s32 kaokakusi_event[110];
-s32 press_event[264];
-s32 surprise_event[303];
-s32 bikkuri_event[285];
-static s32 breath_event[254];
-s32 breath_event_sub[102];
-static s32 wait_event[6];
+static EvtWord init_event[26];
+static EvtWord damage_event[10];
+static EvtWord attack_event[101];
+EvtWord kaokakusi_event[110];
+EvtWord press_event[264];
+EvtWord surprise_event[303];
+EvtWord bikkuri_event[285];
+static EvtWord breath_event[254];
+EvtWord breath_event_sub[102];
+static EvtWord wait_event[6];
 s32 atmic_teresa_id[1];
 s32 target_unit_id[1];
 s32 target_parts_id[1];
 f32 atmic_teresa_scale;
 ExtTexInfo teresa_ext_entry_data[17];
-s32 teresa_entry[19];
+EvtWord teresa_entry[19];
 
 f32 fd_atmic_teresa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1273,7 +1273,7 @@ USER_FUNC(atmic_teresa_id_set) {
 }
 
 USER_FUNC(target_id_set) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 parts = evtGetValue(event, args[1]);
 

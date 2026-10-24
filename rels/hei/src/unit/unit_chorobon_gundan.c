@@ -67,7 +67,7 @@ void chorogun_ext_disp(CameraId camera, void* param);
 void chorogun_ext_main(void);
 void chorogun_ext_init(void);
 BattleUnit* chorogun_get_ptr(void);
-extern s32 escape_chorogun_event[];
+extern EvtWord escape_chorogun_event[];
 
 f32 negone_one$374[2] __attribute__((aligned(8)));
 f32 neg_one$382;
@@ -96,13 +96,13 @@ static PoseTableEntry pose_table[15];
 static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_chorobon_gundan_attack;
-s32 chorogun_dead_reward[73];
-static s32 init_event[26];
-static s32 damage_event[59];
-static s32 attack_event[217];
-static s32 wait_event[6];
+EvtWord chorogun_dead_reward[73];
+static EvtWord init_event[26];
+static EvtWord damage_event[59];
+static EvtWord attack_event[217];
+static EvtWord wait_event[6];
 ExtTexInfo chorogun_ext_entry_data[21];
-s32 chorogun_entry[19];
+EvtWord chorogun_entry[19];
 
 BattleUnit* chorogun_get_ptr(void) {
     s32 i;
@@ -744,7 +744,7 @@ void chorogun_ext_disp(CameraId camera, void* param) {
 }
 
 USER_FUNC(chorogun_get_alive_num) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 i;
     s32 n = 0;
 
@@ -809,7 +809,7 @@ USER_FUNC(chorogun_dive_target) {
     s32 frames;
     s32 n;
     s32 sel;
-    s32* args;
+    EvtWord* args;
     Chorogun* c;
     s32 list[1000];
     s32 i;

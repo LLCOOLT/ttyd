@@ -137,23 +137,23 @@ f32 fd_las_28___local_3PIO2_368;
 f32 fd_las_28_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_28___local_PIO2_367;
 f32 fd_las_28_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[3];
-static s32 syuryo_init[30];
-s32 koopa_init[7];
-s32 koopa_talk[8];
-static s32 baba_init[7];
-static s32 baba_talk[8];
+static EvtWord syuryo_init[30];
+EvtWord koopa_init[7];
+EvtWord koopa_talk[8];
+static EvtWord baba_init[7];
+static EvtWord baba_talk[8];
 static NpcSetupInfo npcEnt[5];
-static s32 first_evt[170];
-s32 syuryo_thunder[419];
-s32 syuryo_evt[1254];
-s32 gareki_fall[45];
-s32 koopa_evt[1671];
-static s32 shuryolight_init[18];
-static s32 shan_init[46];
-s32 las_28_init_evt[238];
+static EvtWord first_evt[170];
+EvtWord syuryo_thunder[419];
+EvtWord syuryo_evt[1254];
+EvtWord gareki_fall[45];
+EvtWord koopa_evt[1671];
+static EvtWord shuryolight_init[18];
+static EvtWord shan_init[46];
+EvtWord las_28_init_evt[238];
 
 USER_FUNC(syuryo_baria) {
     // ピーチ単
@@ -839,7 +839,7 @@ EVT_END()
 EffectEntry* effGuruguruN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5);
 
 static USER_FUNC(eff_guruguru) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -1407,7 +1407,7 @@ EVT_BEGIN(las_28_init_evt)
 EVT_END()
 
 static USER_FUNC(make_name) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     sprintf(name, "hi%d", evtGetValue(event, args[0]));
     evtSetValue(event, args[1], (s32)name);

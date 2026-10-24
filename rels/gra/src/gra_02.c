@@ -42,16 +42,16 @@ f32 fd_gra_02___local_3PIO2_368;
 f32 fd_gra_02_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gra_02___local_PIO2_367;
 f32 fd_gra_02_one_364;
-s32 shopmaster_pig_init[14];
-s32 shopmaster_talk[33];
-static s32 urouro_move[24];
+EvtWord shopmaster_pig_init[14];
+EvtWord shopmaster_talk[33];
+static EvtWord urouro_move[24];
 static NpcSetupInfo npcEnt[2];
-s32 w_bero_2_in[5];
+EvtWord w_bero_2_in[5];
 static BeroEntry bero_entry_data[5];
-s32 gra02_get_key[5];
-s32 gra02_straw_blow_evt[23];
+EvtWord gra02_get_key[5];
+EvtWord gra02_straw_blow_evt[23];
 static const char* booboo_name[1];
-s32 gra_02_init_evt[86];
+EvtWord gra_02_init_evt[86];
 
 f32 fd_gra_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

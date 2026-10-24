@@ -50,15 +50,15 @@ static BattleUnitKindPart parts[1];
 static StatusVulnerability regist;
 static BattleWeapon weapon_bomhei_attack;
 static BattleWeapon weapon_bomhei_bomb;
-static s32 bomb_event[106];
-static s32 init_event[42];
-static s32 damage_event[58];
-static s32 change_spark_event[70];
-static s32 attack_event[440];
-static s32 wait_event[6];
-static s32 damage_event_spark[25];
-static s32 attack_event_spark[288];
-static s32 wait_event_spark[27];
+static EvtWord bomb_event[106];
+static EvtWord init_event[42];
+static EvtWord damage_event[58];
+static EvtWord change_spark_event[70];
+static EvtWord attack_event[440];
+static EvtWord wait_event[6];
+static EvtWord damage_event_spark[25];
+static EvtWord attack_event_spark[288];
+static EvtWord wait_event_spark[27];
 
 f32 fd_bomhei_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -132,68 +132,68 @@ f32 fd_tou_10___local_3PIO2_368;
 f32 fd_tou_10_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tou_10___local_PIO2_367;
 f32 fd_tou_10_one_364;
-s32 room_out[8];
-static s32 n_door_open[12];
-static s32 n_door_close[12];
+EvtWord room_out[8];
+static EvtWord n_door_open[12];
+static EvtWord n_door_close[12];
 static BeroEntry bero_data[2];
-s32 init_kino[13];
-s32 talk_kino[24];
-s32 init_gard[2];
-s32 talk_gard[69];
-static s32 init_michel[42];
-static s32 talk_michel[94];
-s32 init_octo[17];
-s32 talk_octo[141];
-static s32 init_brots[49];
-static s32 talk_brots[38];
-s32 init_gangan[17];
-s32 talk_gangan[141];
-s32 init_poku[43];
-s32 talk_poku[55];
-s32 init_iron[45];
-s32 talk_iron[30];
-s32 init_iron2[45];
-s32 talk_iron2[30];
+EvtWord init_kino[13];
+EvtWord talk_kino[24];
+EvtWord init_gard[2];
+EvtWord talk_gard[69];
+static EvtWord init_michel[42];
+static EvtWord talk_michel[94];
+EvtWord init_octo[17];
+EvtWord talk_octo[141];
+static EvtWord init_brots[49];
+static EvtWord talk_brots[38];
+EvtWord init_gangan[17];
+EvtWord talk_gangan[141];
+EvtWord init_poku[43];
+EvtWord talk_poku[55];
+EvtWord init_iron[45];
+EvtWord talk_iron[30];
+EvtWord init_iron2[45];
+EvtWord talk_iron2[30];
 static NpcSetupInfo npcEnt[11];
 #ifdef VERSION_G8ME01
-s32 evt_saisyo_after[733];
+EvtWord evt_saisyo_after[733];
 #else
-s32 evt_saisyo_after[691];
+EvtWord evt_saisyo_after[691];
 #endif
 #ifdef VERSION_G8ME01
-s32 evt_saisyo_after_re[367];
+EvtWord evt_saisyo_after_re[367];
 #else
-s32 evt_saisyo_after_re[325];
+EvtWord evt_saisyo_after_re[325];
 #endif
-s32 evt_tou_chibi_yoshi[424];
+EvtWord evt_tou_chibi_yoshi[424];
 #ifdef VERSION_G8ME01
-static s32 evt_1st_leagu[235];
+static EvtWord evt_1st_leagu[235];
 #else
-static s32 evt_1st_leagu[214];
+static EvtWord evt_1st_leagu[214];
 #endif
 #ifdef VERSION_G8ME01
-s32 evt_1st_leagu_re[249];
+EvtWord evt_1st_leagu_re[249];
 #else
-s32 evt_1st_leagu_re[228];
+EvtWord evt_1st_leagu_re[228];
 #endif
-static s32 evt_door[25];
-s32 evt_rec[274];
+static EvtWord evt_door[25];
+EvtWord evt_rec[274];
 #ifdef VERSION_G8ME01
-static s32 evt_gardman[202];
+static EvtWord evt_gardman[202];
 #else
-static s32 evt_gardman[198];
+static EvtWord evt_gardman[198];
 #endif
-s32 evt_match_make_sub[138];
-s32 evt_match_make[116];
-static s32 bed_entry[10];
-s32 evt_okorareru[301];
-s32 evt_syorui[92];
-s32 first_tamago[52];
-static s32 evt_block[5];
-s32 tou_10_init_evt[254];
+EvtWord evt_match_make_sub[138];
+EvtWord evt_match_make[116];
+static EvtWord bed_entry[10];
+EvtWord evt_okorareru[301];
+EvtWord evt_syorui[92];
+EvtWord first_tamago[52];
+static EvtWord evt_block[5];
+EvtWord tou_10_init_evt[254];
 
 USER_FUNC(tou_10_mario_keyoff_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (marioKeyOffChk() || marioCtrlOffChk()) {
         evtSetValue(event, args[0], 1);
@@ -226,7 +226,7 @@ USER_FUNC(tou_10_mario_free_wait) {
 }
 
 static USER_FUNC(getYoshiColor) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], pouchGetPartyColor(4));
     return EVT_RETURN_DONE;
 }
@@ -1883,7 +1883,7 @@ EVT_BEGIN(tou_10_init_evt)
 EVT_END()
 
 USER_FUNC(name_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     // a full-width space
     if (strcmp((const char*)evtGetValue(event, args[0]), "\x81\x40") == 0) {

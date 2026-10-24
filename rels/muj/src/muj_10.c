@@ -101,36 +101,36 @@ f32 fd_muj_10___local_3PIO2_368;
 f32 fd_muj_10_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_muj_10___local_PIO2_367;
 f32 fd_muj_10_one_364;
-static s32 megane_init[18];
-static s32 megane_talk[8];
+static EvtWord megane_init[18];
+static EvtWord megane_talk[8];
 static NpcSetupInfo npcEnt[2];
-static s32 e_close[12];
-static s32 e_open[12];
-static s32 door_custom[53];
-static s32 bero_in_event[80];
+static EvtWord e_close[12];
+static EvtWord e_open[12];
+static EvtWord door_custom[53];
+static EvtWord bero_in_event[80];
 static BeroEntry bero_entry_data[3];
-s32 nazo_event[178];
-s32 oidasare_event[156];
+EvtWord nazo_event[178];
+EvtWord oidasare_event[156];
 ExtTexInfo test_ext_entry_data[31];
 static s16 suifu_animtbl[42];
 static s16 elmos_animtbl[22];
 s32 senin_event_suifupos[380];
 s32 senin_event_erumospos[180];
 #ifdef VERSION_G8ME01
-s32 senin_event[282];
+EvtWord senin_event[282];
 #else
-s32 senin_event[374];
+EvtWord senin_event[374];
 #endif
-static s32 dai3_shurai_after[46];
+static EvtWord dai3_shurai_after[46];
 static HitDamageReturn hitDmgRetPoints[7];
 #ifdef VERSION_G8ME01
-s32 muj_10_init_evt[207];
+EvtWord muj_10_init_evt[207];
 #else
-s32 muj_10_init_evt[204];
+EvtWord muj_10_init_evt[204];
 #endif
 
 static USER_FUNC(tornade_alpha_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 alpha = evtGetFloat(event, args[1]);
 

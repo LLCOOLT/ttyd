@@ -52,14 +52,14 @@ f32 fd_las_00___local_3PIO2_368;
 f32 fd_las_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_00___local_PIO2_367;
 f32 fd_las_00_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[3];
-static s32 first_evt[184];
-static s32 shan_init[46];
-s32 las_00_init_evt[32];
+static EvtWord first_evt[184];
+static EvtWord shan_init[46];
+EvtWord las_00_init_evt[32];
 
 f32 fd_las_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -248,7 +248,7 @@ EVT_BEGIN(las_00_init_evt)
 EVT_END()
 
 static USER_FUNC(make_name) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     static char name[16];
 
     sprintf(name, "S_shan_rou_0%d\0", evtGetValue(event, args[0]));

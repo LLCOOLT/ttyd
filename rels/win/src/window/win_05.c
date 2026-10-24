@@ -47,12 +47,12 @@ f32 fd_win_05___local_3PIO2_368;
 f32 fd_win_05_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_win_05___local_PIO2_367;
 f32 fd_win_05_one_364;
-s32 win_05_door_open[10];
-s32 win_05_door_close[10];
+EvtWord win_05_door_open[10];
+EvtWord win_05_door_close[10];
 static BeroEntry bero_entry_data[2];
-static s32 item_get00[34];
-static s32 cloud_toujou[126];
-s32 win_05_init_evt[42];
+static EvtWord item_get00[34];
+static EvtWord cloud_toujou[126];
+EvtWord win_05_init_evt[42];
 
 f32 fd_win_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

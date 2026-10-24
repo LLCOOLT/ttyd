@@ -35,7 +35,7 @@ NpcBattleSelect btlgrpsel_rsh_btlno_rsh_test1_off[2];
 NpcBattleSelect btlgrpsel_rsh_btlno_rsh_06_01_off[2];
 NpcSetupBattleInfo btlsetup_rsh_tbl[3];
 NpcTerritoryInfo btl_rsh_setup_no_tbl[3];
-s32 bgset_rsh_bg_event[30];
+EvtWord bgset_rsh_bg_event[30];
 
 f32 fd_battle_database_rsh_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -166,7 +166,7 @@ EVT_BEGIN(bgset_rsh_bg_event)
 EVT_END()
 
 USER_FUNC(_set_offset) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 outVar = args[1];
     s32 step = evtGetValue(event, outVar);

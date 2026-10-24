@@ -31,7 +31,7 @@ f32 fd_dou_12___local_PIO2_367;
 f32 fd_dou_12_one_364;
 static BeroEntry bero_entry_data[5];
 static HitDamageReturn hitDmgRetPoints[5];
-s32 dou_12_init_evt[47];
+EvtWord dou_12_init_evt[47];
 
 f32 fd_dou_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

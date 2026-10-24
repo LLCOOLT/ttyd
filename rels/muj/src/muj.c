@@ -56,10 +56,10 @@ f32 fd_muj_one_364;
 f64 fd_muj__three_localstatic4_sqrtf;
 f64 fd_muj__half_localstatic3_sqrtf;
 f32 muj_ship_puka_data[16];
-s32 muj_ship_puka[21];
-s32 korutesu_apper[234];
-s32 korutesu_vanish[227];
-s32 muj_mario_pos_osreport[4];
+EvtWord muj_ship_puka[21];
+EvtWord korutesu_apper[234];
+EvtWord korutesu_vanish[227];
+EvtWord muj_mario_pos_osreport[4];
 
 f32 fd_muj_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -141,7 +141,7 @@ void _unresolved(void) {
 }
 
 USER_FUNC(muj_ship_puka_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     f32 value = evtGetFloat(event, args[1]);
 
@@ -150,7 +150,7 @@ USER_FUNC(muj_ship_puka_func) {
 }
 
 USER_FUNC(muj_npc_guruguru) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
     f32 cx = evtGetFloat(event, args[1]);
@@ -205,7 +205,7 @@ USER_FUNC(muj_npc_guruguru) {
 }
 
 USER_FUNC(muj_npc_fuwafuwa) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
     s32 axis = evtGetValue(event, args[1]);
@@ -246,7 +246,7 @@ USER_FUNC(muj_npc_fuwafuwa) {
 }
 
 USER_FUNC(muj_npc_buruburu) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
     s32 axis = evtGetValue(event, args[1]);
@@ -322,7 +322,7 @@ USER_FUNC(muj_npc_buruburu) {
 }
 
 static USER_FUNC(tornade_alpha_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 alpha = evtGetFloat(event, args[1]);
 

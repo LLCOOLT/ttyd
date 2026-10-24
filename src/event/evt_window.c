@@ -55,7 +55,7 @@ WinMgrDesc coin_desc = {
 };
 
 USER_FUNC(evt_win_item_select) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 flag = evtGetValue(event, args[0]);
 	s32 type = evtGetValue(event, args[1]);
 	WinMgrSelect* sel;
@@ -81,7 +81,7 @@ USER_FUNC(evt_win_item_select) {
 }
 
 USER_FUNC(evt_win_other_select) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 type = evtGetValue(event, args[0]);
 	WinMgrSelect* sel;
 	s32 result;
@@ -108,7 +108,7 @@ USER_FUNC(evt_win_item_maketable) {
 	s32* src;
 	s32* item;
 	s32* t;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32* table;
 	s32 count;
 	s32 i;
@@ -149,7 +149,7 @@ USER_FUNC(evt_win_item_maketable) {
 }
 
 USER_FUNC(evt_win_item_desttable) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 #ifdef VERSION_G8ME01
 	void* p = (void*)evtGetValue(event, args[0]);
 	_mapFree(p);
@@ -173,7 +173,7 @@ USER_FUNC(evt_win_nameent_wait) {
 }
 
 USER_FUNC(evt_win_nameent_name) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	evtSetValue(event, args[0], (s32)nameEntGetName());
 	return EVT_RETURN_DONE;
 }
@@ -311,7 +311,7 @@ static void coin_disp(WinMgrEntry* entry) {
 }
 
 USER_FUNC(evt_win_coin_on) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	CoinWin* w = _mapAlloc(sizeof(CoinWin));
 	s32 type = evtGetValue(event, args[0]);
 	w->type = type;

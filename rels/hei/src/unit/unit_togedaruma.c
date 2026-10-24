@@ -46,14 +46,14 @@ static PoseTableEntry pose_table_turn[15];
 static BattleDataEntry data_table[6];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_togedaruma_attack;
-static s32 init_event[21];
-static s32 dmg_avoid_counter_thorn_head_event[63];
-static s32 dmg_avoid_counter_thorn_front_event[121];
-static s32 damage_event[10];
-static s32 dmg_turn_event[131];
-static s32 wakeup_event[134];
-static s32 attack_event[358];
-static s32 wait_event[102];
+static EvtWord init_event[21];
+static EvtWord dmg_avoid_counter_thorn_head_event[63];
+static EvtWord dmg_avoid_counter_thorn_front_event[121];
+static EvtWord damage_event[10];
+static EvtWord dmg_turn_event[131];
+static EvtWord wakeup_event[134];
+static EvtWord attack_event[358];
+static EvtWord wait_event[102];
 
 f32 fd_togedaruma_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

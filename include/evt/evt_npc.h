@@ -89,4 +89,4 @@ USER_FUNC(evt_npc_stop_for_event);
 USER_FUNC(evt_npc_wait_battle_end);
 USER_FUNC(evt_npc_wait_pera);
 USER_FUNC(evt_set_dir_to_target);
-extern s32 npc_init_evt[];
+extern EvtWord npc_init_evt[];

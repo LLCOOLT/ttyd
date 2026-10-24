@@ -1,5 +1,6 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "evt/evt_word.h"
 
-extern s32 marioAttackEvent_Muki[];
+extern EvtWord marioAttackEvent_Muki[];

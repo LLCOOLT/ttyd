@@ -9,14 +9,14 @@ USER_FUNC(btlevtcmd_StartWaitEvent);
 
 static BattleUnitKindPart parts[1];
 BattleUnitKind unit_system;
-static s32 init_event[21];
+static EvtWord init_event[21];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static BattleDataEntry data_table[1];
 static StatusVulnerability regist;
-static s32 damage_event[2];
-static s32 attack_event[2];
-static s32 wait_event[2];
+static EvtWord damage_event[2];
+static EvtWord attack_event[2];
+static EvtWord wait_event[2];
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_system", NULL, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3010009, 0, NULL},

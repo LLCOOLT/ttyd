@@ -86,30 +86,30 @@ f32 fd_gon_08___local_3PIO2_368;
 f32 fd_gon_08_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gon_08___local_PIO2_367;
 f32 fd_gon_08_one_364;
-static s32 door01_close[12];
-static s32 door01_open[12];
-static s32 door02_close[12];
-static s32 door02_open[12];
-static s32 door03_close[12];
-static s32 door03_open[12];
+static EvtWord door01_close[12];
+static EvtWord door01_open[12];
+static EvtWord door02_close[12];
+static EvtWord door02_open[12];
+static EvtWord door03_close[12];
+static EvtWord door03_open[12];
 static BeroEntry bero_entry_data[4];
-static s32 init_0[37];
+static EvtWord init_0[37];
 #ifdef VERSION_G8ME01
-static s32 main_0[465];
+static EvtWord main_0[465];
 #else
-static s32 main_0[491];
+static EvtWord main_0[491];
 #endif
 static s32 key_tbl[2];
-static s32 evt_chk[23];
-static s32 evt_unlock[10];
-s32 nokkosu_init[16];
+static EvtWord evt_chk[23];
+static EvtWord evt_unlock[10];
+EvtWord nokkosu_init[16];
 #ifdef VERSION_G8ME01
-s32 nokkosu_talk[226];
+EvtWord nokkosu_talk[226];
 #else
-s32 nokkosu_talk[157];
+EvtWord nokkosu_talk[157];
 #endif
 static NpcSetupInfo npcEnt[2];
-s32 gon_08_init_evt[220];
+EvtWord gon_08_init_evt[220];
 
 f32 fd_gon_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

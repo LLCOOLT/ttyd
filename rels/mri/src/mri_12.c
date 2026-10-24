@@ -42,13 +42,13 @@ f32 fd_mri_12_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_mri_12___local_PIO2_367;
 f32 fd_mri_12_one_364;
 static BeroEntry bero_entry_data[6];
-static s32 punipuni_ball00_init[32];
-static s32 punipuni_ball00[51];
-static s32 evt_f1_ueki_01[20];
+static EvtWord punipuni_ball00_init[32];
+static EvtWord punipuni_ball00[51];
+static EvtWord evt_f1_ueki_01[20];
 static KusaAccess ueki_access_data[8];
-static s32 breakyuka_init[11];
-static s32 breakyuka_main[9];
-s32 mri_12_init_evt[140];
+static EvtWord breakyuka_init[11];
+static EvtWord breakyuka_main[9];
+EvtWord mri_12_init_evt[140];
 
 f32 fd_mri_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

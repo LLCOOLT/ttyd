@@ -65,15 +65,15 @@ static BattleUnitKindPart parts[1];
 static StatusVulnerability regist;
 static BattleWeapon weapon_basabasa_attack;
 static PoseSoundTiming pose_sound_timing_table[9];
-static s32 ceil_sky_event[98];
-static s32 init_event[78];
-static s32 dmg_first_attack_pos[12];
-static s32 damage_event[10];
-static s32 damage_event_ceil[51];
-static s32 counter_damage_event[16];
-static s32 ceil_fall_ready_event[23];
-static s32 attack_event[683];
-static s32 wait_event[6];
+static EvtWord ceil_sky_event[98];
+static EvtWord init_event[78];
+static EvtWord dmg_first_attack_pos[12];
+static EvtWord damage_event[10];
+static EvtWord damage_event_ceil[51];
+static EvtWord counter_damage_event[16];
+static EvtWord ceil_fall_ready_event[23];
+static EvtWord attack_event[683];
+static EvtWord wait_event[6];
 
 f32 fd_basabasa_green_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

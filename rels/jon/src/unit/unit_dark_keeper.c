@@ -51,14 +51,14 @@ static BattleUnitKindPart parts[2];
 static BattleWeapon weapon_monban_attack;
 static BattleWeapon weapon_monban_throw_attack;
 static PoseSoundTiming pose_sound_timing_table[2];
-static s32 init_event[46];
-static s32 dmg_avoid_counter_thorn_head_event[76];
-static s32 damage_event[10];
-static s32 phase_event[2];
-static s32 attack_event[52];
-static s32 normal_attack_event[391];
-static s32 throw_attack_event[343];
-static s32 wait_event[6];
+static EvtWord init_event[46];
+static EvtWord dmg_avoid_counter_thorn_head_event[76];
+static EvtWord damage_event[10];
+static EvtWord phase_event[2];
+static EvtWord attack_event[52];
+static EvtWord normal_attack_event[391];
+static EvtWord throw_attack_event[343];
+static EvtWord wait_event[6];
 
 f32 fd_dark_keeper_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

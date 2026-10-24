@@ -99,18 +99,18 @@ f32 fd_aji_13___local_3PIO2_368;
 f32 fd_aji_13_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_13___local_PIO2_367;
 f32 fd_aji_13_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
-static s32 e_door_close[22];
-static s32 e_door_open[22];
-s32 evt_snd_stop[12];
-static s32 evt_haikei_in[16];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
+EvtWord evt_snd_stop[12];
+static EvtWord evt_haikei_in[16];
 static BeroEntry bero_entry_data[15];
 static const char* name_tbl[13];
 const char* name_tbl2[6];
-s32 move_left_right[128];
-s32 move_up_down[226];
-s32 move_r[84];
+EvtWord move_left_right[128];
+EvtWord move_up_down[226];
+EvtWord move_r[84];
 /* moving-floor gimmick read by shikake_init: hit, mapobj, two motion params, time; a NULL mapobj ends the table */
 typedef struct ShikakeMove { const char* hit; const char* mapobj; s32 param0; s32 param1; s32 time; } ShikakeMove;
 typedef struct ShikakeMoveTbl7 { ShikakeMove rows[7]; const char* end[2]; } ShikakeMoveTbl7;
@@ -119,15 +119,15 @@ typedef struct ShikakeMoveTbl6 { ShikakeMove rows[6]; const char* end[2]; } Shik
 ShikakeMoveTbl6 up_down_tbl;
 typedef struct ShikakeMoveTbl15 { ShikakeMove rows[15]; const char* end[2]; } ShikakeMoveTbl15;
 ShikakeMoveTbl15 r_tbl;
-s32 shikake_init[66];
-static s32 evt_sw[134];
-static s32 evt_hari[70];
-static s32 evt_ramp[68];
-s32 evt_bcv_sw[99];
-s32 evt_key_get[5];
+EvtWord shikake_init[66];
+static EvtWord evt_sw[134];
+static EvtWord evt_hari[70];
+static EvtWord evt_ramp[68];
+EvtWord evt_bcv_sw[99];
+EvtWord evt_key_get[5];
 static s32 key_tbl[2];
-static s32 evt_door_msg[87];
-s32 aji_13_init_evt[295];
+static EvtWord evt_door_msg[87];
+EvtWord aji_13_init_evt[295];
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) {
     if (strcmp(target->joint->name, node->joint->name) == 0) {
@@ -1163,7 +1163,7 @@ EVT_END()
 
 
 USER_FUNC(hit_group_chk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
     const char* name2 = (const char*)evtGetValue(event, args[1]);
     HitEntry* hit1 = name1 != NULL ? hitNameToPtr(name1) : NULL;

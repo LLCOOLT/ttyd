@@ -165,7 +165,7 @@ extern EffectEntry* effNozleEntry(s32, s32, f32, f32, f32, f32, f32);
 extern EffectEntry* effParticleEntry(s32, s32, s32, f32, f32, f32, f32, f32, f32);
 
 USER_FUNC(evt_eff) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32* p;
 	s32* q;
 	s32* r;
@@ -389,7 +389,7 @@ USER_FUNC(evt_eff) {
 #pragma optimization_level 2
 s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
 {
-  s32 *args;
+  EvtWord *args;
   s32 *pi;
   s32 *pr;
   s32 *pf;
@@ -916,7 +916,7 @@ extern EffectEntry* effFukidashiEntry(s32 a, s32 b, s32 c, s32 d, f32 x, f32 y, 
 #pragma push
 #pragma opt_propagation off
 USER_FUNC(evt_eff_fukidashi) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 mode = evtGetValue(event, args[0]);
 	const char* effName = (const char*)evtGetValue(event, args[1]);
 	const char* npcName = (const char*)evtGetValue(event, args[2]);

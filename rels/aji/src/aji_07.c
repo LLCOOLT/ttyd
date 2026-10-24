@@ -66,15 +66,15 @@ f32 fd_aji_07___local_3PIO2_368;
 f32 fd_aji_07_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_07___local_PIO2_367;
 f32 fd_aji_07_one_364;
-static s32 s_door_open[22];
-static s32 s_door_close[22];
+static EvtWord s_door_open[22];
+static EvtWord s_door_close[22];
 static BeroEntry bero_entry_data[2];
-s32 tensou_ride[245];
-s32 tensou_switch[62];
-s32 evt_tensou2[216];
-s32 tensou_init[69];
-static s32 evt_haguruma[5];
-s32 aji_07_init_evt[118];
+EvtWord tensou_ride[245];
+EvtWord tensou_switch[62];
+EvtWord evt_tensou2[216];
+EvtWord tensou_init[69];
+static EvtWord evt_haguruma[5];
+EvtWord aji_07_init_evt[118];
 
 f32 fd_aji_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

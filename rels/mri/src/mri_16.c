@@ -75,15 +75,15 @@ f32 fd_mri_16_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_mri_16___local_PIO2_367;
 f32 fd_mri_16_one_364;
 static BeroEntry bero_entry_data[7];
-static s32 cam_shake[33];
-static s32 cam_shake2[27];
-s32 water_shikake[312];
-s32 bar_shikake[7];
-s32 bar_shikake_up[7];
-s32 switch_up_down[106];
+static EvtWord cam_shake[33];
+static EvtWord cam_shake2[27];
+EvtWord water_shikake[312];
+EvtWord bar_shikake[7];
+EvtWord bar_shikake_up[7];
+EvtWord switch_up_down[106];
 static HitDamageReturn hitDmgRetPoints[5];
-static s32 mobj_box00[34];
-s32 mri_16_init_evt[282];
+static EvtWord mobj_box00[34];
+EvtWord mri_16_init_evt[282];
 
 static USER_FUNC(ss_check) {
     s32 a;
@@ -106,7 +106,7 @@ static USER_FUNC(ss_set) {
 
 USER_FUNC(puni_get_id) {
     s32 offset;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PuniData* puni;
 
     offset = evtGetValue(event, args[0]) * sizeof(PuniData);

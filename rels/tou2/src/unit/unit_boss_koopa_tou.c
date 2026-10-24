@@ -82,19 +82,19 @@ static BattleWeapon weapon_koopa_hip_attack;
 static BattleWeapon weapon_koopa_bite_attack;
 static BattleWeapon weapon_koopa_critical_bite_attack;
 static BattleWeapon weapon_koopa_fire_attack;
-static s32 koopa_zoom[25];
-static s32 init_event[72];
-static s32 entry_event[45];
-static s32 damage_event[10];
-static s32 dead_event[111];
-static s32 phase_event[31];
-static s32 harf_hp_event[62];
-static s32 attack_event[108];
-static s32 hip_attack_event[VERSION_PICK(419, 420)];
-static s32 bite_attack_event[267];
-static s32 critical_bite_attack_event[250];
-static s32 fire_attack_event[345];
-static s32 wait_event[6];
+static EvtWord koopa_zoom[25];
+static EvtWord init_event[72];
+static EvtWord entry_event[45];
+static EvtWord damage_event[10];
+static EvtWord dead_event[111];
+static EvtWord phase_event[31];
+static EvtWord harf_hp_event[62];
+static EvtWord attack_event[108];
+static EvtWord hip_attack_event[VERSION_PICK(419, 420)];
+static EvtWord bite_attack_event[267];
+static EvtWord critical_bite_attack_event[250];
+static EvtWord fire_attack_event[345];
+static EvtWord wait_event[6];
 static const char* cmd_disable_string[5];
 
 f32 fd_boss_koopa_tou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
@@ -1081,7 +1081,7 @@ static void _disp_icon(CameraId camera, void* param) {
 }
 
 static USER_FUNC(_icon_jump_icon) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 icon = evtGetValue(event, args[0]);
     f32 x0 = evtGetFloat(event, args[1]);
     f32 y0 = evtGetFloat(event, args[2]);

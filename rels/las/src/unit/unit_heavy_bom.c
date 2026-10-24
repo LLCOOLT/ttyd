@@ -75,16 +75,16 @@ static PoseTableEntry pose_table_1_to_0[13];
 static BattleDataEntry data_table[3];
 static PoseSoundTiming pose_sound_timing_table[9];
 static BattleUnitKindPart parts[2];
-static s32 init_event[57];
-static s32 damage_event[118];
-static s32 phase_event[126];
-static s32 attack_event[175];
-static s32 wait_event[6];
-static s32 dead_event[52];
+static EvtWord init_event[57];
+static EvtWord damage_event[118];
+static EvtWord phase_event[126];
+static EvtWord attack_event[175];
+static EvtWord wait_event[6];
+static EvtWord dead_event[52];
 #ifdef VERSION_G8ME01
-static s32 explosion_event[254];
+static EvtWord explosion_event[254];
 #else
-static s32 explosion_event[247];
+static EvtWord explosion_event[247];
 #endif
 
 f32 fd_heavy_bom_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};

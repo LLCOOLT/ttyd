@@ -54,15 +54,15 @@ static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_gundan_zako_attack;
 static BattleWeapon weapon_gundan_zako_jump_attack;
 static BattleWeapon weapon_gundan_zako_dekadeka_bottle;
-static s32 init_event[42];
-static s32 damage_event[10];
-static s32 attack_event[98];
-static s32 attack_common_event1[182];
-static s32 attack_common_event2[33];
-static s32 normal_attack_event[307];
-static s32 jump_attack_event[324];
-static s32 dekadeka_event[125];
-static s32 wait_event[6];
+static EvtWord init_event[42];
+static EvtWord damage_event[10];
+static EvtWord attack_event[98];
+static EvtWord attack_common_event1[182];
+static EvtWord attack_common_event2[33];
+static EvtWord normal_attack_event[307];
+static EvtWord jump_attack_event[324];
+static EvtWord dekadeka_event[125];
+static EvtWord wait_event[6];
 
 f32 fd_gundan_zako_elite_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

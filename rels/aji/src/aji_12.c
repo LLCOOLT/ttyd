@@ -52,14 +52,14 @@ f32 fd_aji_12___local_3PIO2_368;
 f32 fd_aji_12_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_12___local_PIO2_367;
 f32 fd_aji_12_one_364;
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[2];
 const char* hit_list[50];
-static s32 evt_box[89];
+static EvtWord evt_box[89];
 static HitDamageReturn dmgReturnPt[2];
-static s32 hikaru_yuka_init[40];
-s32 aji_12_init_evt[71];
+static EvtWord hikaru_yuka_init[40];
+EvtWord aji_12_init_evt[71];
 
 f32 fd_aji_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -102,17 +102,17 @@ static BattleUnitKindPart parts[3];
 BattleWeapon weapon_batten_stamp_attack;
 BattleWeapon weapon_batten_shake_attack;
 static BattleUnitSetup entry_rocket_punch;
-static s32 init_event[92];
-static s32 waku_event[23];
-static s32 damage_event[111];
-static s32 dead_event[234];
-static s32 entry_event[78];
-static s32 attack_event[150];
-s32 stamp_attack_event[352];
-static s32 shake_attack_event[324];
-static s32 arm_bunri_event[199];
-static s32 arm_return_event[151];
-static s32 wait_event[6];
+static EvtWord init_event[92];
+static EvtWord waku_event[23];
+static EvtWord damage_event[111];
+static EvtWord dead_event[234];
+static EvtWord entry_event[78];
+static EvtWord attack_event[150];
+EvtWord stamp_attack_event[352];
+static EvtWord shake_attack_event[324];
+static EvtWord arm_bunri_event[199];
+static EvtWord arm_return_event[151];
+static EvtWord wait_event[6];
 BattleUnitKind unit_boss_rocket_punch;
 static BattleUnitDefense defence_r;
 static BattleUnitDefenseAttr defence_attr_r;
@@ -121,12 +121,12 @@ static PoseTableEntry pose_table_r[14];
 static BattleDataEntry data_table_r[1];
 static BattleUnitKindPart parts_r[1];
 static BattleWeapon weapon_batten_rocket_attack;
-static s32 init_event_r[191];
-static s32 arm_event[59];
-static s32 arm_event_end[35];
-static s32 damage_event_r[30];
-static s32 attack_event_r[368];
-static s32 wait_event_r[18];
+static EvtWord init_event_r[191];
+static EvtWord arm_event[59];
+static EvtWord arm_event_end[35];
+static EvtWord damage_event_r[30];
+static EvtWord attack_event_r[368];
+static EvtWord wait_event_r[18];
 
 f32 fd_boss_magnum_battender_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -284,7 +284,7 @@ static BattleUnitKindPart parts[] = {
 
 static USER_FUNC(waku_main) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, *args++);
     BattleUnit* unit;
     BattleUnitPart* part;
@@ -313,7 +313,7 @@ static USER_FUNC(waku_main) {
 
 static USER_FUNC(arm_check) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 side = evtGetValue(event, args[0]);
     s32 found = -1;
     BattleUnit* unit;
@@ -495,7 +495,7 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 static USER_FUNC(eff_dead) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -510,7 +510,7 @@ static USER_FUNC(eff_dead_delete) {
 }
 
 USER_FUNC(eff_hokori) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -1350,7 +1350,7 @@ static USER_FUNC(arm_init2) {
 }
 
 static USER_FUNC(arm_main) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 id = evtGetValue(event, args[0]);

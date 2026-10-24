@@ -114,27 +114,27 @@ f32 fd_tou_06___local_3PIO2_368;
 f32 fd_tou_06_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tou_06___local_PIO2_367;
 f32 fd_tou_06_one_364;
-static s32 n_door_open[12];
-static s32 n_door_close[12];
-static s32 w_door_open[12];
-static s32 w_door_close[12];
+static EvtWord n_door_open[12];
+static EvtWord n_door_close[12];
+static EvtWord w_door_open[12];
+static EvtWord w_door_close[12];
 static BeroEntry bero_data[3];
-s32 evt_ana[9];
-s32 evt_kontena[21];
-s32 evt_kaidan[91];
+EvtWord evt_ana[9];
+EvtWord evt_kontena[21];
+EvtWord evt_kaidan[91];
 const char* cloud_kontena2_list[5];
-s32 evt_kontena2[23];
-static s32 evt_block_broken[5];
+EvtWord evt_kontena2[23];
+static EvtWord evt_block_broken[5];
 static s32 key_tbl[2];
-static s32 evt_chk[23];
-static s32 evt_lock[14];
-s32 evt_chuchu[626];
+static EvtWord evt_chk[23];
+static EvtWord evt_lock[14];
+EvtWord evt_chuchu[626];
 static s32 list[75];
-s32 iri_13_pants_00_evt[5];
-s32 iri_13_init[124];
+EvtWord iri_13_pants_00_evt[5];
+EvtWord iri_13_init[124];
 static NpcSetupInfo npcEnt[2];
-static s32 mobj_box00[34];
-s32 tou_06_init_evt[544];
+static EvtWord mobj_box00[34];
+EvtWord tou_06_init_evt[544];
 
 f32 fd_tou_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -714,7 +714,7 @@ EVT_END()
 
 USER_FUNC(iri_13_make_name) {
     static char name[8];
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     sprintf(name, "pants%02d\0\0", evtGetValue(event, args[0]));
     evtSetValue(event, args[1], (s32)name);
@@ -728,7 +728,7 @@ USER_FUNC(free_tbl) {
 }
 
 static USER_FUNC(get_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 n = evtGetValue(event, args[0]);
     s32* t = tbl;
     s32 idx = t[n];

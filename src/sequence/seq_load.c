@@ -133,7 +133,7 @@ static LoadWork work;
 static LoadWork* wp = &work;
 __declspec(section ".sdata2") const u32 seq_logo_zero_color[2];
 
-static s32 evt_shake[12];
+static EvtWord evt_shake[12];
 
 s32 evt_seq_load_keep_msg_window(EventEntry* evt, BOOL isFirstCall) {
     fadeReset(4);
@@ -1297,11 +1297,11 @@ typedef struct WinDt {
     u8 next[4]; // 0x18
 } WinDt;
 
-extern s32 evt_memcard_check[];
-extern s32 evt_memcard_start[];
-extern s32 evt_memcard_save[];
-extern s32 evt_memcard_delete[];
-extern s32 evt_memcard_copy[];
+extern EvtWord evt_memcard_check[];
+extern EvtWord evt_memcard_start[];
+extern EvtWord evt_memcard_save[];
+extern EvtWord evt_memcard_delete[];
+extern EvtWord evt_memcard_copy[];
 extern s32 evt_sub_rumble_onoff(EventEntry* evt, BOOL isFirstCall);
 extern s32 evt_sub_animgroup_async(EventEntry* evt, BOOL isFirstCall);
 extern void SoundSetOutputMode(s32 mode);
@@ -1373,8 +1373,8 @@ static LoadWork work;
 static LoadWork* wp = &work;
 
 extern s32 stone_id[];
-static s32 evt_shake[12];
-extern s32 evt_continue[];
+static EvtWord evt_shake[12];
+extern EvtWord evt_continue[];
 
 s32 evt_seq_load_keep_msg_window(EventEntry* evt, BOOL isFirstCall) {
     fadeReset(4);

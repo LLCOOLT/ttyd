@@ -43,14 +43,14 @@ f32 fd_bom_00___local_3PIO2_368;
 f32 fd_bom_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_bom_00___local_PIO2_367;
 f32 fd_bom_00_one_364;
-s32 evt_bom_snowfall[18];
+EvtWord evt_bom_snowfall[18];
 static TreeAccess tree_tbl[4];
-static s32 evt_tree[7];
-static s32 first_evt_dokan[36];
+static EvtWord evt_tree[7];
+static EvtWord first_evt_dokan[36];
 static BeroEntry bero_entry_data[3];
-static s32 first_evt[108];
-s32 first_evt2[101];
-s32 bom_00_init_evt[66];
+static EvtWord first_evt[108];
+EvtWord first_evt2[101];
+EvtWord bom_00_init_evt[66];
 
 f32 fd_bom_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

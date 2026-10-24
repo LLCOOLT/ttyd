@@ -37,17 +37,17 @@ f32 fd_rsh_07_one_364;
 static BeroEntry bero_data_a[2];
 static BeroEntry bero_data_b[2];
 static BeroEntry bero_data_c[2];
-static s32 init_unten[6];
-static s32 talk_unten[19];
+static EvtWord init_unten[6];
+static EvtWord talk_unten[19];
 static NpcSetupInfo npc_data[2];
 static const char* access_tbl[5];
-static s32 evt_access[14];
-static s32 evt_access_entry[23];
-s32 rsh_07_init_evt[113];
-s32 rsh_07_a_init_evt[11];
-s32 rsh_07_b_init_evt[11];
+static EvtWord evt_access[14];
+static EvtWord evt_access_entry[23];
+EvtWord rsh_07_init_evt[113];
+EvtWord rsh_07_a_init_evt[11];
+EvtWord rsh_07_b_init_evt[11];
 static const char* window_tbl[5];
-s32 rsh_07_c_init_evt[16];
+EvtWord rsh_07_c_init_evt[16];
 
 f32 fd_rsh_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

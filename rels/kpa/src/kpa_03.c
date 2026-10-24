@@ -36,11 +36,11 @@ f32 fd_kpa_03___local_PIO2_367;
 f32 fd_kpa_03_one_364;
 static s32 kpa_act_stg2_mobj[209];
 s32 kpa_act_stg2_item[85];
-static s32 kpa_fall[41];
-s32 kairyu_evt[38];
-static s32 jumpstand_evt[60];
+static EvtWord kpa_fall[41];
+EvtWord kairyu_evt[38];
+static EvtWord jumpstand_evt[60];
 static NpcSetupInfo npcEnt[1];
-s32 kpa_03_init_evt[44];
+EvtWord kpa_03_init_evt[44];
 
 f32 fd_kpa_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

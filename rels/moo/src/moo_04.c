@@ -70,12 +70,12 @@ f32 fd_moo_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_moo_04___local_PIO2_367;
 f32 fd_moo_04_one_364;
 static f32 spline_dt[9];
-static s32 party_damage_pose[52];
-static s32 mario_fly[168];
-s32 kanbu_fly[198];
+static EvtWord party_damage_pose[52];
+static EvtWord mario_fly[168];
+EvtWord kanbu_fly[198];
 static NpcSetupInfo npcEnt[2];
-static s32 epilogue_evt[64];
-s32 moo_04_init_evt[220];
+static EvtWord epilogue_evt[64];
+EvtWord moo_04_init_evt[220];
 
 f32 fd_moo_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

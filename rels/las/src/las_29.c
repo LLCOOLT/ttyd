@@ -195,56 +195,56 @@ f32 fd_las_29___local_3PIO2_368;
 f32 fd_las_29_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_29___local_PIO2_367;
 f32 fd_las_29_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[2];
-static s32 syuryo_init[16];
-s32 q_kage_init[10];
+static EvtWord syuryo_init[16];
+EvtWord q_kage_init[10];
 static NpcSetupInfo npcEnt[8];
 HikariList40 hikari_data;
 HikariList27 hikari_data_2;
-s32 hikari_off_evt[42];
-s32 hikari_on_evt[63];
-s32 flush_on[106];
-s32 flush_off[106];
-s32 last_evt_1[1078];
+EvtWord hikari_off_evt[42];
+EvtWord hikari_on_evt[63];
+EvtWord flush_on[106];
+EvtWord flush_off[106];
+EvtWord last_evt_1[1078];
 #ifdef VERSION_G8ME01
-s32 last_evt_2[358];
+EvtWord last_evt_2[358];
 #else
-s32 last_evt_2[383];
+EvtWord last_evt_2[383];
 #endif
 #ifndef VERSION_G8ME01
-s32 nise_mario_init[29];
+EvtWord nise_mario_init[29];
 #endif
 #ifdef VERSION_G8ME01
-s32 last_evt_3[1349];
+EvtWord last_evt_3[1349];
 #else
-s32 last_evt_3[1379];
+EvtWord last_evt_3[1379];
 #endif
-s32 b_peach_fuwafuwa[39];
+EvtWord b_peach_fuwafuwa[39];
 #ifdef VERSION_G8ME01
-s32 last_evt_3_1[524];
+EvtWord last_evt_3_1[524];
 #else
-s32 last_evt_3_1[540];
+EvtWord last_evt_3_1[540];
 #endif
 #ifdef VERSION_G8ME01
-s32 koe_evt[78];
+EvtWord koe_evt[78];
 #else
-s32 koe_evt[65];
+EvtWord koe_evt[65];
 #endif
-s32 majo_kyorokyoro[84];
+EvtWord majo_kyorokyoro[84];
 #ifdef VERSION_G8ME01
-s32 last_evt_3_2[1837];
+EvtWord last_evt_3_2[1837];
 #else
-s32 last_evt_3_2[1821];
+EvtWord last_evt_3_2[1821];
 #endif
-s32 last_evt_4[1836];
-static s32 shuryolight_init[14];
-s32 shuryolight_delete[20];
+EvtWord last_evt_4[1836];
+static EvtWord shuryolight_init[14];
+EvtWord shuryolight_delete[20];
 #ifdef VERSION_G8ME01
-s32 las_29_init_evt[180];
+EvtWord las_29_init_evt[180];
 #else
-s32 las_29_init_evt[182];
+EvtWord las_29_init_evt[182];
 #endif
 
 f32 fd_las_29_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
@@ -552,7 +552,7 @@ static USER_FUNC(rousoku_init) {
 
 USER_FUNC(rou_hikari_front_onoff) {
     char name[8];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     void (*func)(const char*, u32);
     f32 scale;
@@ -575,7 +575,7 @@ USER_FUNC(rou_hikari_front_onoff) {
 
 USER_FUNC(hikari_set_scale) {
     char name[8];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 n = evtGetValue(event, args[0]);
     f32 scale = evtGetFloat(event, args[1]);
     EffectEntry* eff;
@@ -589,7 +589,7 @@ USER_FUNC(hikari_set_scale) {
 
 USER_FUNC(hikari_change) {
     char name[8];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 n = evtGetValue(event, args[0]);
     s32 type = evtGetValue(event, args[1]) ? 3 : 8;
 
@@ -602,7 +602,7 @@ USER_FUNC(hikari_change) {
 USER_FUNC(hikari_se) {
     char name[8];
     Vec pos;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 n = evtGetValue(event, args[0]);
     s32 off = evtGetValue(event, args[1]);
     s32 dark = evtGetValue(event, args[2]);
@@ -626,14 +626,14 @@ USER_FUNC(hikari_se) {
 }
 
 USER_FUNC(hikari_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HikariData* tbl = (HikariData*)args[0];
     s32 val = evtGetValue(event, args[1]);
     s32 off = evtGetValue(event, args[2]);
     s32 start = evtGetValue(event, args[3]);
     s32 limit = evtGetValue(event, args[4]);
     s32 key = tbl[start].key;
-    s32* evt = off ? hikari_off_evt : hikari_on_evt;
+    EvtWord* evt = off ? hikari_off_evt : hikari_on_evt;
     EventEntry* e;
     s32 i;
 
@@ -716,7 +716,7 @@ USER_FUNC(all_hikari_onoff) {
 }
 
 USER_FUNC(b_peach_thunder) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -745,7 +745,7 @@ void b_peach_msgcb(s32 type, void* param) {
 }
 
 USER_FUNC(add_vy) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 dir = evtGetValue(event, args[0]);
     s32 n = evtGetValue(event, args[1]);
     f32 base;
@@ -761,7 +761,7 @@ USER_FUNC(add_vy) {
 }
 
 USER_FUNC(radiation_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -773,7 +773,7 @@ USER_FUNC(radiation_entry) {
 }
 
 USER_FUNC(radiation_set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -787,7 +787,7 @@ USER_FUNC(radiation_set_pos) {
 }
 
 USER_FUNC(pcharge_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -798,7 +798,7 @@ USER_FUNC(pcharge_entry) {
 }
 
 USER_FUNC(pcharge_set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -813,7 +813,7 @@ USER_FUNC(pcharge_set_pos) {
 
 static USER_FUNC(starstone_entry) {
     char name[16];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x;
     f32 z;
     f32 r;
@@ -842,7 +842,7 @@ static USER_FUNC(starstone_entry) {
 
 static USER_FUNC(starstone_set_pos) {
     char name[16];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -884,7 +884,7 @@ static USER_FUNC(starstone_set_ry) {
 
 USER_FUNC(make_koe_label) {
     static char name[32];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 n = evtGetValue(event, args[0]);
 
     if (n == 18 && !partyChkJoin(7)) {
@@ -897,7 +897,7 @@ USER_FUNC(make_koe_label) {
 }
 
 USER_FUNC(make_koe_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a = ((rand() >> 1) % 41) * 10;
     s32 b = ((rand() >> 1) % 33) * 10;
     s32 x = a - 200;
@@ -951,7 +951,7 @@ USER_FUNC(eff_b_peach_mist) {
 
 USER_FUNC(make_mist_name) {
     static char name[8];
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     sprintf(name, "mist%d", evtGetValue(event, args[0]));
     evtSetValue(event, args[1], (s32)name);

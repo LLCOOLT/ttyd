@@ -317,7 +317,7 @@ USER_FUNC(end_bakugame) {
 
 s32 bakuGameDecideWeapon(EventEntry *event, BOOL isFirstCall)
 {
-  s32 *args = event->args;
+  EvtWord *args = event->args;
   s32 v;
   BakuWork *w;
   u8 *q;
@@ -369,7 +369,7 @@ USER_FUNC(bakuGameBombEntry) {
 USER_FUNC(bakuGameMain) {
     s32 unused[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     BakuWork* w = GetBakuGamePtr();
-    s32* args;
+    EvtWord* args;
     BattleWork* bw = _battleWorkPointer;
     BattleUnit* mario = BattleGetUnitPtr(bw, BattleTransID(event, -3));
     BattleUnit* party = BattleGetUnitPtr(bw, BattleTransID(event, -4));

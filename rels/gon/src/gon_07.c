@@ -76,14 +76,14 @@ f32 fd_gon_07___local_3PIO2_368;
 f32 fd_gon_07_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gon_07___local_PIO2_367;
 f32 fd_gon_07_one_364;
-static s32 door01_close[12];
-static s32 door01_open[12];
-s32 out_func[14];
+static EvtWord door01_close[12];
+static EvtWord door01_open[12];
+EvtWord out_func[14];
 static BeroEntry bero_entry_data[3];
-static s32 shake_evt[150];
-static s32 item_evt[268];
-static s32 bomb_wall_evt[179];
-s32 gon_07_init_evt[86];
+static EvtWord shake_evt[150];
+static EvtWord item_evt[268];
+static EvtWord bomb_wall_evt[179];
+EvtWord gon_07_init_evt[86];
 
 f32 fd_gon_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

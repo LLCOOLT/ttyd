@@ -1,9 +1,10 @@
 //1:1, very short, TODO: better header
 #include "evt/evt_seq.h"
 #include "driver/seqdrv.h"
+#include "evt/evt_word.h"
 
 USER_FUNC(evt_seq_set_seq) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	SequenceType type;
 	const char *map, *bero;
 

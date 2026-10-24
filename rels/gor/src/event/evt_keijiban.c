@@ -127,7 +127,7 @@ s32 keijiban_data_make(const char* prefix, BOOL fill) {
 }
 
 USER_FUNC(keijiban_joho_makelabel) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     KeijibanData* kj = KJDT;
 

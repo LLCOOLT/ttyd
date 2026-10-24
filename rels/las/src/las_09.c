@@ -121,29 +121,29 @@ f32 fd_las_09___local_3PIO2_368;
 f32 fd_las_09_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_09___local_PIO2_367;
 f32 fd_las_09_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
-static s32 e_door_close[22];
-static s32 e_door_open[22];
-static s32 n_door_close[22];
-static s32 n_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
+static EvtWord n_door_close[22];
+static EvtWord n_door_open[22];
 static BeroEntry bero_entry_data[8];
 static HitDamageReturn dmgRetPoint[58];
-static s32 first_evt[210];
-s32 bomb_wanwan[149];
-s32 bomb_wanwan1_evt[27];
-s32 bomb_wanwan2_evt[27];
-s32 switch_1_evt[279];
-s32 switch_2_evt[280];
-s32 goikkou_talk[31];
-s32 majyorin_init[12];
-static s32 maririn_init[12];
-s32 ranpel_init[12];
+static EvtWord first_evt[210];
+EvtWord bomb_wanwan[149];
+EvtWord bomb_wanwan1_evt[27];
+EvtWord bomb_wanwan2_evt[27];
+EvtWord switch_1_evt[279];
+EvtWord switch_2_evt[280];
+EvtWord goikkou_talk[31];
+EvtWord majyorin_init[12];
+static EvtWord maririn_init[12];
+EvtWord ranpel_init[12];
 static NpcSetupInfo npcEnt[4];
-s32 majyorin_evt_npc_entry[26];
-s32 majyorin_evt_main[652];
-s32 majyorin_evt[55];
-s32 las_09_init_evt[257];
+EvtWord majyorin_evt_npc_entry[26];
+EvtWord majyorin_evt_main[652];
+EvtWord majyorin_evt[55];
+EvtWord las_09_init_evt[257];
 
 f32 fd_las_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1071,7 +1071,7 @@ EVT_END()
 EffectEntry* effGuruguruN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5);
 
 static USER_FUNC(eff_guruguru) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);

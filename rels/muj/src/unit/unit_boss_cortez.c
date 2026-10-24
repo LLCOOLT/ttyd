@@ -84,8 +84,8 @@ USER_FUNC(_cortez_recovery_audience);
 USER_FUNC(_cortez_drain_energy);
 USER_FUNC(_cortez_collect_energy);
 USER_FUNC(_cortez_get_sfx_vol);
-extern s32 cortez_weapon_get_home_height[];
-extern s32 cortez_weapon_set_formation_attribute[];
+extern EvtWord cortez_weapon_get_home_height[];
+extern EvtWord cortez_weapon_set_formation_attribute[];
 extern BattleUnitKind unit_boss_cortez_claw;
 extern BattleUnitKind unit_boss_cortez_rapier;
 extern BattleUnitKind unit_boss_cortez_saber;
@@ -159,34 +159,34 @@ PoseTableEntry pose_table_mode_3[12];
 PoseTableEntry pose_table_honeduka[4];
 static BattleDataEntry data_table[7];
 static BattleUnitKindPart parts[19];
-static s32 init_event[260];
-static s32 damage_event[70];
-s32 cortez_ac_counter_damage_event[98];
-static s32 avoid_thorn_event[89];
-static s32 phase_event[196];
-s32 attack_event_mode1[44];
-s32 attack_event_mode2[47];
-s32 at2_head_bat_event[202];
-s32 at2_hone_charge_event[146];
-s32 at2_hone_rain_attack_event[605];
-s32 _bone_rain_event[114];
-s32 attack_event_mode3[52];
-static s32 attack_audience_event[247];
-s32 at3_kamitsuki_attack[264];
-s32 at1_normal_attack[205];
-s32 at1_midaregiri_attack[251];
-static s32 wait_event[6];
+static EvtWord init_event[260];
+static EvtWord damage_event[70];
+EvtWord cortez_ac_counter_damage_event[98];
+static EvtWord avoid_thorn_event[89];
+static EvtWord phase_event[196];
+EvtWord attack_event_mode1[44];
+EvtWord attack_event_mode2[47];
+EvtWord at2_head_bat_event[202];
+EvtWord at2_hone_charge_event[146];
+EvtWord at2_hone_rain_attack_event[605];
+EvtWord _bone_rain_event[114];
+EvtWord attack_event_mode3[52];
+static EvtWord attack_audience_event[247];
+EvtWord at3_kamitsuki_attack[264];
+EvtWord at1_normal_attack[205];
+EvtWord at1_midaregiri_attack[251];
+static EvtWord wait_event[6];
 BattleUnitSetup entry_claw;
 BattleUnitSetup entry_rapier;
 BattleUnitSetup entry_sword;
 BattleUnitSetup entry_saber;
-s32 cortez_reset_pose_table[450];
-static s32 cortez_damage_sub_event[153];
-static s32 dead_event[1033];
-s32 mode2_rib_open_event[54];
-s32 mode2_rib_close_event[54];
-s32 mode2_honeduka_damage_event[76];
-s32 mode_change_event[111];
+EvtWord cortez_reset_pose_table[450];
+static EvtWord cortez_damage_sub_event[153];
+static EvtWord dead_event[1033];
+EvtWord mode2_rib_open_event[54];
+EvtWord mode2_rib_close_event[54];
+EvtWord mode2_honeduka_damage_event[76];
+EvtWord mode_change_event[111];
 
 f32 fd_boss_cortez_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -2347,7 +2347,7 @@ EVT_END()
 
 static USER_FUNC(_check_zenei_kouei) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 out = args[1];
     f32 x, y, z;
@@ -2364,7 +2364,7 @@ static USER_FUNC(_check_zenei_kouei) {
 
 USER_FUNC(_cortez_recovery_audience) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, *args++);
     CortezWork* work;
     BOOL done;
@@ -2421,7 +2421,7 @@ USER_FUNC(_cortez_recovery_audience) {
 
 USER_FUNC(_cortez_drain_energy) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 out = args[1];
     CortezWork* work;
@@ -2441,7 +2441,7 @@ USER_FUNC(_cortez_drain_energy) {
 
 USER_FUNC(_cortez_collect_energy) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, *args++);
     BattleUnit* unit;
     CortezWork* work;
@@ -2532,7 +2532,7 @@ USER_FUNC(_cortez_collect_energy) {
 
 USER_FUNC(_cortez_check_drain_audience) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 out = args[1];
     s32 seat;
@@ -2557,7 +2557,7 @@ USER_FUNC(_cortez_check_drain_audience) {
 }
 
 USER_FUNC(_cortez_get_sfx_vol) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 out = args[1];
 
@@ -2567,7 +2567,7 @@ USER_FUNC(_cortez_get_sfx_vol) {
 
 USER_FUNC(_make_cortez_work_area) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 id;
 

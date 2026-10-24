@@ -46,11 +46,11 @@ f32 fd_pik_03___local_3PIO2_368;
 f32 fd_pik_03_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_pik_03___local_PIO2_367;
 f32 fd_pik_03_one_364;
-s32 bero_in[45];
-s32 bero_out[53];
+EvtWord bero_in[45];
+EvtWord bero_out[53];
 static BeroEntry bero_data[2];
-static s32 evt_daiza[28];
-s32 pik_03_init_evt[113];
+static EvtWord evt_daiza[28];
+EvtWord pik_03_init_evt[113];
 
 f32 fd_pik_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

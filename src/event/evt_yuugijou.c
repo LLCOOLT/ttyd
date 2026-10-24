@@ -366,7 +366,7 @@ void monteCountDisp(void) {
 }
 
 USER_FUNC(yuugijou_add_montemedal) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 a = evtGetValue(event, args[0]);
 	s32 sum = yuwp->tokens + evtGetValue(event, args[1]);
 	if (sum < 0x1869F) {
@@ -384,7 +384,7 @@ USER_FUNC(yuugijou_get_montemedal) {
 }
 
 USER_FUNC(yuugijou_get_montemedal_keep) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	if (yuwp->flags & 2) {
 		evtSetValue(event, args[0], 0);
 	} else {
@@ -394,7 +394,7 @@ USER_FUNC(yuugijou_get_montemedal_keep) {
 }
 
 USER_FUNC(yuugijou_add_montemedal_moto) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	evtGetValue(event, args[0]);
 	if (yuwp->flags & 2) {
 		yuwp->keptTokens += evtGetValue(event, args[1]);
@@ -438,7 +438,7 @@ USER_FUNC(yuugijou_montemedal_return) {
 }
 
 USER_FUNC(yuugijou_get_takeoutflag) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	if (yuwp->flags & 2) {
 		evtSetValue(event, args[0], 1);
 	} else {

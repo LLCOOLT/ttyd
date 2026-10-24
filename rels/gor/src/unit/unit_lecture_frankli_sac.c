@@ -83,13 +83,13 @@ static StatusVulnerability regist;
 static PoseTableEntry pose_table[5];
 static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
-s32 _test_event[20];
-s32 stop_wait_event[20];
-static s32 init_event[61];
-static s32 phase_event[105];
-s32 actend_event[538];
-static s32 damage_event[75];
-static s32 wait_event[6];
+EvtWord _test_event[20];
+EvtWord stop_wait_event[20];
+static EvtWord init_event[61];
+static EvtWord phase_event[105];
+EvtWord actend_event[538];
+static EvtWord damage_event[75];
+static EvtWord wait_event[6];
 
 f32 fd_lecture_frankli_sac_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -216,7 +216,7 @@ EVT_BEGIN(_test_event)
 EVT_END()
 
 USER_FUNC(_set_actend_event) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     s32 id = evtGetValue(event, args[0]);
     s32 evt = evtGetValue(event, args[1]);
@@ -230,7 +230,7 @@ USER_FUNC(_set_actend_event) {
 
 static USER_FUNC(_battle_set_lecture_unit_id) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 value;
 
     value = evtGetValue(event, *args++);
@@ -318,7 +318,7 @@ USER_FUNC(blinkAP) {
 }
 
 USER_FUNC(spot_square) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 time;
     s32 wait;
 

@@ -1,15 +1,16 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "evt/evt_word.h"
 
-extern s32 hom_00_init_evt[];
-extern s32 hom_10_evt_resha_left[];
-extern s32 hom_10_evt_resha_right[];
-extern s32 hom_10_evt_resha_start[];
-extern s32 hom_10_evt_resha_start2[];
-extern s32 hom_10_evt_resha_start3[];
-extern s32 hom_10_evt_resha_start4[];
-extern s32 hom_10_evt_resha_stop[];
-extern s32 hom_10_init_evt[];
-extern s32 hom_11_init_evt[];
-extern s32 hom_12_init_evt[];
+extern EvtWord hom_00_init_evt[];
+extern EvtWord hom_10_evt_resha_left[];
+extern EvtWord hom_10_evt_resha_right[];
+extern EvtWord hom_10_evt_resha_start[];
+extern EvtWord hom_10_evt_resha_start2[];
+extern EvtWord hom_10_evt_resha_start3[];
+extern EvtWord hom_10_evt_resha_start4[];
+extern EvtWord hom_10_evt_resha_stop[];
+extern EvtWord hom_10_init_evt[];
+extern EvtWord hom_11_init_evt[];
+extern EvtWord hom_12_init_evt[];

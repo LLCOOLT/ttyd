@@ -5,7 +5,7 @@
 
 // s32 type, s32 msec (0 = forever)
 USER_FUNC(evt_env_blur_on) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type, msec;
     s64 now;
 

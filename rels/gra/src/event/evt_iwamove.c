@@ -6,7 +6,7 @@
 #include "driver/hitdrv.h"
 #include "system.h"
 
-typedef struct IwaMoveWork { s32 init; s32 timer; s32 state; EventEntry* event; s32* script; } IwaMoveWork;
+typedef struct IwaMoveWork { s32 init; s32 timer; s32 state; EventEntry* event; EvtWord* script; } IwaMoveWork;
 IwaMoveWork iwamove;
 void partyKeyOn(void);
 void partyKeyOff(void);
@@ -31,12 +31,12 @@ f32 fd_evt_iwamove___local_3PIO2_368;
 f32 fd_evt_iwamove_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_evt_iwamove___local_PIO2_367;
 f32 fd_evt_iwamove_one_364;
-s32 evt_iwamove_main_evt[4];
+EvtWord evt_iwamove_main_evt[4];
 
 USER_FUNC(evt_iwamove_ent) {
     IwaMoveWork* wk = &iwamove;
 
-    wk->script = (s32*)event->args[0];
+    wk->script = (EvtWord*)event->args[0];
     wk->state = 0;
     wk->event = evtEntry(evt_iwamove_main_evt, 0, 0);
     wk->event->lwData[0] = (s32)&iwamove;

@@ -237,7 +237,7 @@ static inline s32 uranaiCount(UranaiWork* w) {
 USER_FUNC(uranaisi_data_alloc) {
 	const char* prefix;
 	UranaiWork* wp = &_udt;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 count;
 
 	_udt.mode = evtGetValue(event, args[0]);
@@ -302,7 +302,7 @@ USER_FUNC(uranaisi_next_check) {
 }
 
 USER_FUNC(uranaisi_next_makelabel) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	UranaiWork* wp = &_udt;
 	s32 n = evtGetValue(event, args[0]);
 
@@ -313,7 +313,7 @@ USER_FUNC(uranaisi_next_makelabel) {
 
 USER_FUNC(uranaisi_starpiece_check) {
 	UranaiWork* wp = &_udt;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 i;
 	s32 count = 0;
 
@@ -329,7 +329,7 @@ USER_FUNC(uranaisi_starpiece_check) {
 USER_FUNC(uranaisi_starpiece_makelabel) {
 	UranaiWork* wp;
 	s32 target;
-	s32* args;
+	EvtWord* args;
 	s32 i;
 	s32 n;
 
@@ -361,7 +361,7 @@ USER_FUNC(uranaisi_starpiece_setreadflag) {
 }
 USER_FUNC(uranaisi_supercoin_check) {
 	UranaiWork* wp = &_udt;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 i;
 	s32 count = 0;
 
@@ -377,7 +377,7 @@ USER_FUNC(uranaisi_supercoin_check) {
 USER_FUNC(uranaisi_supercoin_makelabel) {
 	UranaiWork* wp;
 	s32 target;
-	s32* args;
+	EvtWord* args;
 	s32 i;
 	s32 n;
 
@@ -626,7 +626,7 @@ s32 uranaisi_ryokin_rtn(s32 mode) {
 }
 
 USER_FUNC(uranaisi_ryokin) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 mode = evtGetValue(event, args[0]);
 	s32 price;
 

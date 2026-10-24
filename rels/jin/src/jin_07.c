@@ -124,19 +124,19 @@ f32 fd_jin_07___local_3PIO2_368;
 f32 fd_jin_07_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_jin_07___local_PIO2_367;
 f32 fd_jin_07_one_364;
-static s32 w_close[12];
-static s32 w_open[12];
-static s32 e_close[12];
-static s32 e_open[12];
-s32 jin_07_juyo_oumu_vivian[59];
-static s32 check_roll[16];
+static EvtWord w_close[12];
+static EvtWord w_open[12];
+static EvtWord e_close[12];
+static EvtWord e_open[12];
+EvtWord jin_07_juyo_oumu_vivian[59];
+static EvtWord check_roll[16];
 static BeroEntry bero_entry_data[4];
-s32 evt_locked[14];
-static s32 evt_unlock[7];
+EvtWord evt_locked[14];
+static EvtWord evt_unlock[7];
 static NpcSetupInfo npcEnt[2];
 static ExtTexInfo senteresa_ext_entry_data[5];
-s32 evt_teresa_box_open[576];
-s32 jin_07_init_evt[151];
+EvtWord evt_teresa_box_open[576];
+EvtWord jin_07_init_evt[151];
 
 f32 fd_jin_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -451,7 +451,7 @@ static void senteresa_ext_shadow_disp(void) {
 }
 
 USER_FUNC(senteresa_get_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     ExtdrvPose* pose = extGetPosePtr();
 
     pose += evtGetValue(event, args[0]);
@@ -462,7 +462,7 @@ USER_FUNC(senteresa_get_position) {
 }
 
 USER_FUNC(senteresa_okure_move_init) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     event->lwData[10] = evtGetValue(event, args[0]);
     event->lwData[11] = evtGetValue(event, args[1]);
@@ -474,7 +474,7 @@ USER_FUNC(senteresa_okure_move_init) {
 }
 
 USER_FUNC(senteresa_okure_move) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = npcNameToPtr("\203e\203\214\203T");
     f32 t = evtGetFloat(event, args[0]);
     Vec pos;

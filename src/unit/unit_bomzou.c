@@ -36,15 +36,15 @@ static PoseTableEntry pose_table_1[4];
 BattleUnitKind unit_bomzou;
 BattleWeapon weapon_bomzou_explosion;
 static BattleUnitKindPart parts[1];
-static s32 init_event[70];
-static s32 phase_event[67];
-static s32 wait_event[57];
-s32 end_battle_evt[19];
-static s32 explosion_event[173];
+static EvtWord init_event[70];
+static EvtWord phase_event[67];
+static EvtWord wait_event[57];
+EvtWord end_battle_evt[19];
+static EvtWord explosion_event[173];
 static BattleDataEntry data_table[4];
-static s32 damage_event[10];
-static s32 attack_event[5];
-static s32 dead_event[6];
+static EvtWord damage_event[10];
+static EvtWord attack_event[5];
+static EvtWord dead_event[6];
 
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 

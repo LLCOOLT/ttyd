@@ -112,16 +112,16 @@ f32 fd_gra_00___local_PIO2_367;
 f32 fd_gra_00_one_364;
 f64 fd_gra_00__three_localstatic4_sqrtf;
 f64 fd_gra_00__half_localstatic3_sqrtf;
-s32 evt_yabure_on[56];
-s32 evt_yabure_off[5];
-s32 evt_nameent[109];
-s32 name_seikai[682];
-s32 evt_machibuse[VERSION_PICK(666, 694)];
+EvtWord evt_yabure_on[56];
+EvtWord evt_yabure_off[5];
+EvtWord evt_nameent[109];
+EvtWord name_seikai[682];
+EvtWord evt_machibuse[VERSION_PICK(666, 694)];
 static BeroEntry bero_entry_data[3];
 static NpcSetupInfo npcEnt[2];
 static TreeAccess tree_tbl[2];
-s32 evt_majin_key[5];
-s32 gra_00_init_evt[74];
+EvtWord evt_majin_key[5];
+EvtWord gra_00_init_evt[74];
 
 f32 fd_gra_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -944,7 +944,7 @@ void msg_callback(s32 type, void* param) {
 }
 
 static USER_FUNC(zoom) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     CameraEntry* cam = camGetPtr(CAMERA_3D);
     Vec v;
 

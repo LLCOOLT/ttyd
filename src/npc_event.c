@@ -32,14 +32,14 @@ void PSVECSubtract(const Vec* a, const Vec* b, Vec* ab);
 // functions are defined in reverse of target order (deferred inlining)
 
 USER_FUNC(mahoon_get_groupname) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
     evtSetValue(event, args[0], (s32)npc->tribe->modelName);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(npc_check_wall_stop) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
     if (npc->wallHit) {
         evtSetValue(event, args[0], 1);
@@ -61,7 +61,7 @@ USER_FUNC(_wait_blow_end) {
 }
 
 USER_FUNC(pressCheck) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
     f32 hx, hy, hz, dist, nx, ny, nz;
     if (kpaGetLevel() == 0) {
@@ -78,7 +78,7 @@ USER_FUNC(pressCheck) {
 }
 
 USER_FUNC(_2d_dead_jump) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     f32 tx = evtGetFloat(event, args[1]);
     f32 ty = evtGetFloat(event, args[2]);
@@ -166,7 +166,7 @@ USER_FUNC(_2d_dead_jump) {
 }
 
 USER_FUNC(_2d_get_dead_jump_offset) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 d;
     f32 k;
     const char* nm = (const char*)evtGetValue(event, args[0]);
@@ -188,7 +188,7 @@ USER_FUNC(_2d_get_dead_jump_offset) {
 
 USER_FUNC(killer_make_name) {
     static char name[32];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
     s32 n = evtGetValue(event, args[0]);
     s32 len;
@@ -201,7 +201,7 @@ USER_FUNC(killer_make_name) {
 }
 
 USER_FUNC(piders_get_height) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
     evtSetFloat(event, args[0], npc->territoryLoiter.z);
     return EVT_RETURN_DONE;
@@ -310,244 +310,244 @@ USER_FUNC(kamec_fire_magic);
 USER_FUNC(evt_fbat_trans_floor_position_wide);
 #endif
 
-s32 enemy_common_dead_event[156];
-s32 enemy_event_dead_event_sub[36];
-s32 enemy_common_blow_event[13];
-s32 enemy_2d_common_dead_event[415];
-s32 _2d_dead_rotate_event[16];
-s32 testenemynpc_move_event[13];
-s32 npc_urouro_move_event[21];
-s32 npc_urouro_return_event[37];
-s32 kuriboo_move_event[39];
-s32 kuriboo_find_event[54];
-s32 kuriboo_lost_event[31];
-s32 kuriboo_return_event[37];
-s32 patakuri_move_event[148];
-s32 patakuri_find_event[90];
-s32 patakuri_lost_event[31];
-s32 patakuri_return_event[170];
-s32 nokonoko_shell_return_event[50];
-s32 nokonoko_init_event[28];
-s32 nokonoko_move_event[58];
-s32 nokonoko_find_event[172];
-s32 nokonoko_lost_event[46];
-s32 nokonoko_return_event[55];
-s32 togenoko_shell_return_event[50];
-s32 togenoko_init_event[28];
-s32 togenoko_move_event[58];
-s32 togenoko_find_event[172];
-s32 togenoko_lost_event[46];
-s32 togenoko_return_event[55];
-s32 patapata_move_event[123];
-s32 patapata_find_event[131];
-s32 patapata_lost_event[44];
-s32 patapata_return_event[135];
-s32 met_init_event_common[21];
-s32 met_set_anim_wait_event[48];
-s32 met_set_anim_walk_event[48];
-s32 met_init_event[19];
-s32 met_init_event_ceil[14];
-s32 togemet_init_event[19];
-s32 togemet_init_event_ceil[14];
-s32 met_move_event[54];
-s32 met_find_event[269];
-s32 met_lost_event[43];
-s32 met_return_event[51];
-s32 patamet_move_event[151];
-s32 patamet_find_event[108];
-s32 patamet_lost_event[34];
-s32 patamet_return_event[143];
+EvtWord enemy_common_dead_event[156];
+EvtWord enemy_event_dead_event_sub[36];
+EvtWord enemy_common_blow_event[13];
+EvtWord enemy_2d_common_dead_event[415];
+EvtWord _2d_dead_rotate_event[16];
+EvtWord testenemynpc_move_event[13];
+EvtWord npc_urouro_move_event[21];
+EvtWord npc_urouro_return_event[37];
+EvtWord kuriboo_move_event[39];
+EvtWord kuriboo_find_event[54];
+EvtWord kuriboo_lost_event[31];
+EvtWord kuriboo_return_event[37];
+EvtWord patakuri_move_event[148];
+EvtWord patakuri_find_event[90];
+EvtWord patakuri_lost_event[31];
+EvtWord patakuri_return_event[170];
+EvtWord nokonoko_shell_return_event[50];
+EvtWord nokonoko_init_event[28];
+EvtWord nokonoko_move_event[58];
+EvtWord nokonoko_find_event[172];
+EvtWord nokonoko_lost_event[46];
+EvtWord nokonoko_return_event[55];
+EvtWord togenoko_shell_return_event[50];
+EvtWord togenoko_init_event[28];
+EvtWord togenoko_move_event[58];
+EvtWord togenoko_find_event[172];
+EvtWord togenoko_lost_event[46];
+EvtWord togenoko_return_event[55];
+EvtWord patapata_move_event[123];
+EvtWord patapata_find_event[131];
+EvtWord patapata_lost_event[44];
+EvtWord patapata_return_event[135];
+EvtWord met_init_event_common[21];
+EvtWord met_set_anim_wait_event[48];
+EvtWord met_set_anim_walk_event[48];
+EvtWord met_init_event[19];
+EvtWord met_init_event_ceil[14];
+EvtWord togemet_init_event[19];
+EvtWord togemet_init_event_ceil[14];
+EvtWord met_move_event[54];
+EvtWord met_find_event[269];
+EvtWord met_lost_event[43];
+EvtWord met_return_event[51];
+EvtWord patamet_move_event[151];
+EvtWord patamet_find_event[108];
+EvtWord patamet_lost_event[34];
+EvtWord patamet_return_event[143];
 #ifdef VERSION_G8ME01
-s32 chorobon_move_event[71];
+EvtWord chorobon_move_event[71];
 #else
-s32 chorobon_move_event[69];
+EvtWord chorobon_move_event[69];
 #endif
-s32 chorobon_find_event[63];
-s32 chorobon_lost_event[14];
-s32 chorobon_return_event[43];
-s32 pansy_move_event[42];
-s32 pansy_find_event[46];
-s32 pansy_lost_event[35];
-s32 pansy_return_event[45];
-s32 twinkling_pansy_move_event[42];
-s32 twinkling_pansy_find_event[54];
-s32 twinkling_pansy_lost_event[35];
-s32 twinkling_pansy_return_event[45];
-s32 karon_init_event[36];
-s32 karon_move_event[57];
-s32 karon_find_event[150];
-s32 karon_lost_event[18];
-s32 karon_return_event[37];
-s32 karon_blow_event[19];
-s32 honenoko2_init_event[18];
-s32 honenoko2_move_event[49];
-s32 honenoko2_find_event[58];
-s32 honenoko2_lost_event[36];
-s32 honenoko2_return_event[46];
-s32 killer_init_event[19];
-s32 killer_move_event[79];
-s32 killer_dead_event[156];
-s32 killer_cannon_init_event[13];
-s32 killer_cannon_move_event[157];
-s32 sambo_move_event[22];
-s32 sambo_find_event[33];
-s32 sambo_lost_event[22];
-s32 sambo_return_event[30];
-s32 sinnosuke_init_event[26];
-s32 sinnosuke_move_event[21];
-s32 sinnosuke_find_event[146];
-s32 sinnosuke_lost_event[36];
-s32 sinnosuke_return_event[94];
-s32 sinemon_init_event[26];
-s32 sinemon_move_event[26];
-s32 sinemon_find_event[146];
-s32 sinemon_lost_event[36];
-s32 sinemon_return_event[94];
-s32 togedaruma_move_event[49];
-s32 togedaruma_find_event[61];
-s32 togedaruma_lost_event[38];
-s32 togedaruma_return_event[44];
-s32 barriern_init_event[37];
+EvtWord chorobon_find_event[63];
+EvtWord chorobon_lost_event[14];
+EvtWord chorobon_return_event[43];
+EvtWord pansy_move_event[42];
+EvtWord pansy_find_event[46];
+EvtWord pansy_lost_event[35];
+EvtWord pansy_return_event[45];
+EvtWord twinkling_pansy_move_event[42];
+EvtWord twinkling_pansy_find_event[54];
+EvtWord twinkling_pansy_lost_event[35];
+EvtWord twinkling_pansy_return_event[45];
+EvtWord karon_init_event[36];
+EvtWord karon_move_event[57];
+EvtWord karon_find_event[150];
+EvtWord karon_lost_event[18];
+EvtWord karon_return_event[37];
+EvtWord karon_blow_event[19];
+EvtWord honenoko2_init_event[18];
+EvtWord honenoko2_move_event[49];
+EvtWord honenoko2_find_event[58];
+EvtWord honenoko2_lost_event[36];
+EvtWord honenoko2_return_event[46];
+EvtWord killer_init_event[19];
+EvtWord killer_move_event[79];
+EvtWord killer_dead_event[156];
+EvtWord killer_cannon_init_event[13];
+EvtWord killer_cannon_move_event[157];
+EvtWord sambo_move_event[22];
+EvtWord sambo_find_event[33];
+EvtWord sambo_lost_event[22];
+EvtWord sambo_return_event[30];
+EvtWord sinnosuke_init_event[26];
+EvtWord sinnosuke_move_event[21];
+EvtWord sinnosuke_find_event[146];
+EvtWord sinnosuke_lost_event[36];
+EvtWord sinnosuke_return_event[94];
+EvtWord sinemon_init_event[26];
+EvtWord sinemon_move_event[26];
+EvtWord sinemon_find_event[146];
+EvtWord sinemon_lost_event[36];
+EvtWord sinemon_return_event[94];
+EvtWord togedaruma_move_event[49];
+EvtWord togedaruma_find_event[61];
+EvtWord togedaruma_lost_event[38];
+EvtWord togedaruma_return_event[44];
+EvtWord barriern_init_event[37];
 #ifdef VERSION_G8ME01
-s32 barriern_move_event[90];
+EvtWord barriern_move_event[90];
 #else
-s32 barriern_move_event[89];
+EvtWord barriern_move_event[89];
 #endif
 #ifdef VERSION_G8ME01
-s32 barriern2_move_event[90];
+EvtWord barriern2_move_event[90];
 #else
-s32 barriern2_move_event[70];
+EvtWord barriern2_move_event[70];
 #endif
-s32 barriern_dead_event[17];
-s32 barriern_find_event[189];
-s32 barriern_lost_event[17];
+EvtWord barriern_dead_event[17];
+EvtWord barriern_find_event[189];
+EvtWord barriern_lost_event[17];
 #ifdef VERSION_G8ME01
-s32 barriern_return_event[43];
+EvtWord barriern_return_event[43];
 #else
-s32 barriern_return_event[42];
+EvtWord barriern_return_event[42];
 #endif
-s32 barriern_blow_event[27];
-s32 piders_move_event[111];
-s32 piders_find_event[206];
-s32 piders_blow_event[13];
-s32 pakkun_attack_event[74];
-s32 pakkun_init_event[34];
-s32 pakkun_move_event[17];
-s32 pakkun_find_event[106];
-s32 pakkun_return_event[81];
-s32 dokugassun_init_event[14];
-s32 dokugassun_move_event[153];
-s32 dokugassun_find_event[69];
-s32 dokugassun_lost_event[27];
-s32 dokugassun_return_event[158];
-s32 basabasa_init_event[17];
+EvtWord barriern_blow_event[27];
+EvtWord piders_move_event[111];
+EvtWord piders_find_event[206];
+EvtWord piders_blow_event[13];
+EvtWord pakkun_attack_event[74];
+EvtWord pakkun_init_event[34];
+EvtWord pakkun_move_event[17];
+EvtWord pakkun_find_event[106];
+EvtWord pakkun_return_event[81];
+EvtWord dokugassun_init_event[14];
+EvtWord dokugassun_move_event[153];
+EvtWord dokugassun_find_event[69];
+EvtWord dokugassun_lost_event[27];
+EvtWord dokugassun_return_event[158];
+EvtWord basabasa_init_event[17];
 #ifdef VERSION_G8ME01
-s32 basabasa_move_event[72];
+EvtWord basabasa_move_event[72];
 #else
-s32 basabasa_move_event[67];
+EvtWord basabasa_move_event[67];
 #endif
-s32 basabasa_find_event[69];
-s32 basabasa_lost_event[31];
-s32 basabasa_return_event[44];
-s32 basabasa2_move_event[148];
-s32 basabasa2_find_event[60];
-s32 basabasa2_lost_event[31];
-s32 basabasa2_return_event[140];
-s32 teresa_move_event[165];
-s32 teresa_find_event[60];
-s32 teresa_lost_event[31];
-s32 teresa_return_event[104];
-s32 bubble_move_event[159];
-s32 bubble_find_event[63];
-s32 bubble_lost_event[34];
-s32 bubble_return_event[151];
-s32 hbom_move_event[41];
-s32 hbom_find_event[54];
-s32 hbom_lost_event[31];
-s32 hbom_return_event[37];
-s32 zakowiz_init_event[38];
-s32 zakowiz_move_event[70];
-s32 zakowiz_find_event[159];
-s32 zakowiz_lost_event[18];
-s32 zakowiz_return_event[37];
-s32 zakowiz_blow_event[19];
-s32 hannya_move_event[37];
-s32 hannya_find_event[86];
-s32 hannya_lost_event[23];
-s32 hannya_return_event[29];
-s32 mahoon_init_event[120];
-s32 mahoon_move_event[259];
-s32 mahoon_dead_event[24];
-s32 mahoon_find_event[177];
-s32 mahoon_lost_event[142];
-s32 mahoon_return_event[251];
-s32 kamec_init_event[54];
-s32 kamec_move_event[177];
-s32 kamec_find_event[150];
-s32 kamec_lost_event[31];
-s32 kamec_return_event[150];
-s32 kamec_blow_event[19];
-s32 kamec2_init_event[54];
-s32 kamec2_move_event[58];
-s32 kamec2_find_event[153];
-s32 kamec2_lost_event[31];
-s32 kamec2_return_event[37];
-s32 kamec2_blow_event[19];
-s32 hbross_init_event[36];
-s32 hbross_move_event[57];
-s32 hbross_find_event[141];
-s32 hbross_lost_event[18];
-s32 hbross_return_event[37];
-s32 hbross_blow_event[19];
-s32 enemy_event_dead_event[10];
-s32 enemy_slave_common_dead_event[8];
-s32 enemy_common_flag_init_event[12];
-s32 testenemynpc_init_event[4];
-s32 npc_urouro_init_event[12];
-s32 kuriboo_init_event[4];
-s32 patakuri_init_event[12];
-s32 patapata_init_event[12];
-s32 patamet_init_event[12];
-s32 chorobon_init_event[12];
-s32 pansy_init_event[4];
-s32 twinkling_pansy_init_event[4];
-s32 karon_dead_event[9];
-s32 sambo_init_event[12];
-s32 togedaruma_init_event[4];
-s32 piders_init_event[9];
-s32 basabasa_dead_event[4];
-s32 basabasa2_init_event[12];
-s32 basabasa2_dead_event[4];
-s32 teresa_init_event[12];
-s32 teresa_dead_event[4];
-s32 bubble_init_event[12];
-s32 hbom_init_event[4];
-s32 zakowiz_dead_event[9];
-s32 hannya_init_event[9];
-s32 kamec_dead_event[9];
-s32 kamec2_dead_event[9];
-s32 hbross_dead_event[9];
-s32 zakoM2D_dead_event[9];
-s32 wanwan_init_event[64];
-s32 wanwan_init_event_sub[64];
-s32 wanwan_move_event[151];
-s32 wanwan_find_event[90];
-s32 kuriboo2D_init_event[22];
-s32 kuriboo2D_move_event[72];
-s32 kuriboo2D_find_event[70];
-s32 zako2D_init_event[27];
-s32 zako2D_move_event[244];
-s32 zako2D_find_event[74];
-s32 dokan2D_init_event[19];
-s32 dokan2D_regl_event[48];
-s32 fall2D_init_event[19];
-s32 fall2D_regl_event[34];
-s32 zakoM2D_init_event[37];
-s32 zakoM2D_move_event[95];
-s32 zakoM2D_find_event[179];
-s32 zakoM2D_find_start_event[88];
-s32 gesso2D_init_event[34];
-s32 gesso2D_move_event[262];
+EvtWord basabasa_find_event[69];
+EvtWord basabasa_lost_event[31];
+EvtWord basabasa_return_event[44];
+EvtWord basabasa2_move_event[148];
+EvtWord basabasa2_find_event[60];
+EvtWord basabasa2_lost_event[31];
+EvtWord basabasa2_return_event[140];
+EvtWord teresa_move_event[165];
+EvtWord teresa_find_event[60];
+EvtWord teresa_lost_event[31];
+EvtWord teresa_return_event[104];
+EvtWord bubble_move_event[159];
+EvtWord bubble_find_event[63];
+EvtWord bubble_lost_event[34];
+EvtWord bubble_return_event[151];
+EvtWord hbom_move_event[41];
+EvtWord hbom_find_event[54];
+EvtWord hbom_lost_event[31];
+EvtWord hbom_return_event[37];
+EvtWord zakowiz_init_event[38];
+EvtWord zakowiz_move_event[70];
+EvtWord zakowiz_find_event[159];
+EvtWord zakowiz_lost_event[18];
+EvtWord zakowiz_return_event[37];
+EvtWord zakowiz_blow_event[19];
+EvtWord hannya_move_event[37];
+EvtWord hannya_find_event[86];
+EvtWord hannya_lost_event[23];
+EvtWord hannya_return_event[29];
+EvtWord mahoon_init_event[120];
+EvtWord mahoon_move_event[259];
+EvtWord mahoon_dead_event[24];
+EvtWord mahoon_find_event[177];
+EvtWord mahoon_lost_event[142];
+EvtWord mahoon_return_event[251];
+EvtWord kamec_init_event[54];
+EvtWord kamec_move_event[177];
+EvtWord kamec_find_event[150];
+EvtWord kamec_lost_event[31];
+EvtWord kamec_return_event[150];
+EvtWord kamec_blow_event[19];
+EvtWord kamec2_init_event[54];
+EvtWord kamec2_move_event[58];
+EvtWord kamec2_find_event[153];
+EvtWord kamec2_lost_event[31];
+EvtWord kamec2_return_event[37];
+EvtWord kamec2_blow_event[19];
+EvtWord hbross_init_event[36];
+EvtWord hbross_move_event[57];
+EvtWord hbross_find_event[141];
+EvtWord hbross_lost_event[18];
+EvtWord hbross_return_event[37];
+EvtWord hbross_blow_event[19];
+EvtWord enemy_event_dead_event[10];
+EvtWord enemy_slave_common_dead_event[8];
+EvtWord enemy_common_flag_init_event[12];
+EvtWord testenemynpc_init_event[4];
+EvtWord npc_urouro_init_event[12];
+EvtWord kuriboo_init_event[4];
+EvtWord patakuri_init_event[12];
+EvtWord patapata_init_event[12];
+EvtWord patamet_init_event[12];
+EvtWord chorobon_init_event[12];
+EvtWord pansy_init_event[4];
+EvtWord twinkling_pansy_init_event[4];
+EvtWord karon_dead_event[9];
+EvtWord sambo_init_event[12];
+EvtWord togedaruma_init_event[4];
+EvtWord piders_init_event[9];
+EvtWord basabasa_dead_event[4];
+EvtWord basabasa2_init_event[12];
+EvtWord basabasa2_dead_event[4];
+EvtWord teresa_init_event[12];
+EvtWord teresa_dead_event[4];
+EvtWord bubble_init_event[12];
+EvtWord hbom_init_event[4];
+EvtWord zakowiz_dead_event[9];
+EvtWord hannya_init_event[9];
+EvtWord kamec_dead_event[9];
+EvtWord kamec2_dead_event[9];
+EvtWord hbross_dead_event[9];
+EvtWord zakoM2D_dead_event[9];
+EvtWord wanwan_init_event[64];
+EvtWord wanwan_init_event_sub[64];
+EvtWord wanwan_move_event[151];
+EvtWord wanwan_find_event[90];
+EvtWord kuriboo2D_init_event[22];
+EvtWord kuriboo2D_move_event[72];
+EvtWord kuriboo2D_find_event[70];
+EvtWord zako2D_init_event[27];
+EvtWord zako2D_move_event[244];
+EvtWord zako2D_find_event[74];
+EvtWord dokan2D_init_event[19];
+EvtWord dokan2D_regl_event[48];
+EvtWord fall2D_init_event[19];
+EvtWord fall2D_regl_event[34];
+EvtWord zakoM2D_init_event[37];
+EvtWord zakoM2D_move_event[95];
+EvtWord zakoM2D_find_event[179];
+EvtWord zakoM2D_find_start_event[88];
+EvtWord gesso2D_init_event[34];
+EvtWord gesso2D_move_event[262];
 
 EVT_BEGIN(enemy_common_dead_event)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 1024)
@@ -1229,7 +1229,7 @@ EVT_BEGIN(patapata_return_event)
     RETURN
 EVT_END()
 
-s32 met_init_event_common[] = {
+EvtWord met_init_event_common[] = {
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 8)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 1048592)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
@@ -2444,7 +2444,7 @@ USER_FUNC(piders_draw_yawn) {
 
 
 USER_FUNC(kamec_fire_magic) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
@@ -3939,14 +3939,14 @@ USER_FUNC(chain_main) {
 
 
 USER_FUNC(camGetPos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetFloat(event, args[0], camGetPtr(CAMERA_3D)->cameraPos.x);
     return EVT_RETURN_DONE;
 }
 
 
 USER_FUNC(cliffCheck) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
     f32 dirv;
     f32 hx, hy, hz, dist, nx, ny, nz;
@@ -3973,7 +3973,7 @@ USER_FUNC(cliffCheck) {
 
 
 USER_FUNC(upperCheck) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
     f32 hx, hy, hz, dist, nx, ny, nz;
     HitEntry* h1;
@@ -3991,7 +3991,7 @@ USER_FUNC(upperCheck) {
 
 
 USER_FUNC(getSpdWalk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
     evtSetFloat(event, args[0], npc->territoryLoiter.z);
     return EVT_RETURN_DONE;
@@ -3999,7 +3999,7 @@ USER_FUNC(getSpdWalk) {
 
 
 USER_FUNC(getSpdRun) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
     evtSetFloat(event, args[0], npc->territoryHoming.z);
     return EVT_RETURN_DONE;
@@ -4380,7 +4380,7 @@ USER_FUNC(zakoEntryDokan) {
 
 
 USER_FUNC(dokanCheck) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     char name[32];
     NpcEntry* me = evtNpcNameToPtr(event, "me");
     if (!strcmp(me->description, "\214R\222c\203U\203R\202\252\202\305\202\351\223y\212\307\202P\000\000\000")) {
@@ -4452,7 +4452,7 @@ USER_FUNC(zakoEntryFall) {
 
 
 USER_FUNC(npc_fire_eff_fadeout) {
-    s32* args;
+    EvtWord* args;
     NpcEntry* npc;
     f32 x, y, z;
     EffectEntry* eff;
@@ -4491,7 +4491,7 @@ USER_FUNC(set_bottle_flag_init) {
 
 
 USER_FUNC(gesso_ground_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
     f32 hx, hy, hz, dist, nx, ny, nz;
     dist = 5.0f;

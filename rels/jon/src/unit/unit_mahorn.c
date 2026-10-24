@@ -97,34 +97,34 @@ static BattleWeapon weapon_mahorn_dekadeka_magic;
 static BattleWeapon weapon_mahorn_katikati_magic;
 BattleWeapon weapon_mahorn_confuse_magic;
 static BattleWeapon weapon_mahorn_recover_magic;
-static s32 attack_event[152];
+static EvtWord attack_event[152];
 static PoseTableEntry pose_table[17];
 static BattleDataEntry data_table[3];
 static BattleDataEntry data_table_bunsin[3];
-static s32 init_event[88];
-static s32 alpha_down_event[98];
-static s32 alpha_up_event[118];
-static s32 hand_ctrl_event[23];
-static s32 damage_event[10];
-static s32 avoid_miss_event[2];
-static s32 attack_punch_event[429];
-static s32 start_avoid[26];
-static s32 attack_enemy_common_event[299];
-static s32 attack_enemy_all_common_event[189];
-static s32 attack_enemy_common_event_sub1[90];
-static s32 attack_enemy_common_event_sub2[231];
-static s32 attack_enemy_common_event_sub_no_hit[65];
-static s32 attack_enemy_common_event_sub_hit[50];
-static s32 attack_magic_event[54];
-static s32 confuse_magic_event[41];
-static s32 all_attack_magic_event[41];
-static s32 support_friend_common_event[227];
-static s32 dekadeka_magic_event[75];
-static s32 katikati_magic_event[75];
-static s32 trans_magic_event[75];
-static s32 yokeyoke_magic_event[75];
-static s32 recover_magic_event[96];
-static s32 wait_event[386];
+static EvtWord init_event[88];
+static EvtWord alpha_down_event[98];
+static EvtWord alpha_up_event[118];
+static EvtWord hand_ctrl_event[23];
+static EvtWord damage_event[10];
+static EvtWord avoid_miss_event[2];
+static EvtWord attack_punch_event[429];
+static EvtWord start_avoid[26];
+static EvtWord attack_enemy_common_event[299];
+static EvtWord attack_enemy_all_common_event[189];
+static EvtWord attack_enemy_common_event_sub1[90];
+static EvtWord attack_enemy_common_event_sub2[231];
+static EvtWord attack_enemy_common_event_sub_no_hit[65];
+static EvtWord attack_enemy_common_event_sub_hit[50];
+static EvtWord attack_magic_event[54];
+static EvtWord confuse_magic_event[41];
+static EvtWord all_attack_magic_event[41];
+static EvtWord support_friend_common_event[227];
+static EvtWord dekadeka_magic_event[75];
+static EvtWord katikati_magic_event[75];
+static EvtWord trans_magic_event[75];
+static EvtWord yokeyoke_magic_event[75];
+static EvtWord recover_magic_event[96];
+static EvtWord wait_event[386];
 
 f32 fd_mahorn_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1469,7 +1469,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static USER_FUNC(eff_magic_get_posX) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, *args++));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
     EffectEntry* eff = (EffectEntry*)unit->work[7];
@@ -1489,7 +1489,7 @@ static USER_FUNC(eff_magic_get_posX) {
 }
 
 static USER_FUNC(eff_magic) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
     f32 a = evtGetFloat(event, args[1]);
@@ -1509,7 +1509,7 @@ static USER_FUNC(eff_magic) {
 }
 
 static USER_FUNC(mahorn_get_bunsin) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 copies[4];
     s32 n = 0;
     s32 i;
@@ -1539,7 +1539,7 @@ static USER_FUNC(set_hand_dest) {
     s32 hand;
     BattleUnit* unit;
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id;
     f32* dest;
     f32 x;
@@ -1574,7 +1574,7 @@ static USER_FUNC(set_hand_dest) {
 }
 
 static USER_FUNC(hand_ctrl) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     s32 id = evtGetValue(event, *args++);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
@@ -1623,7 +1623,7 @@ static USER_FUNC(hand_ctrl) {
 
 static USER_FUNC(hand_end) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, *args++);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
     s32 i;
@@ -1639,7 +1639,7 @@ static USER_FUNC(hand_end) {
 }
 
 static USER_FUNC(hand_init) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     s32 id = evtGetValue(event, *args++);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));

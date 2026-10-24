@@ -128,8 +128,8 @@ f32 fd_boss_batten_leader___local_3PIO2_368;
 f32 fd_boss_batten_leader_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_boss_batten_leader___local_PIO2_367;
 f32 fd_boss_batten_leader_one_364;
-s32 batten_leader_zoom[34];
-static s32 mario_party_zoom[34];
+EvtWord batten_leader_zoom[34];
+static EvtWord mario_party_zoom[34];
 BattleWeapon weapon_batten_leader_thunder;
 BattleWeapon weapon_batten_leader_fire;
 BattleWeapon weapon_batten_leader_ice;
@@ -146,7 +146,7 @@ static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_furafura[18];
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[7];
-s32 hakai_snd_event[9];
+EvtWord hakai_snd_event[9];
 BattleUnitSetup entry_batten_satellite;
 /* light blink sequence read by the light event: {mapobj name, frames} steps, then a NULL name */
 typedef struct LightStep { const char* name; s32 time; } LightStep;
@@ -177,17 +177,17 @@ LightSeq1 btl_shuryolight_head_2_on;
 LightSeq1 btl_shuryolight_head_3_on;
 LightSeq4 btl_shuryolight_rod_normal;
 LightSeq1 btl_shuryolight_rod_off;
-s32 light_anim_rtn[488];
-s32 light_rod_anim_rtn[122];
-s32 light_pose_change[314];
-s32 maiframeanimcheck[21];
-static s32 init_event[149];
-static s32 entry_event[94];
-static s32 damage_event[47];
-s32 damage_sub_event[148];
-static s32 phase_event[28];
-s32 monster_before_phase_event[195];
-static s32 dead_event[165];
+EvtWord light_anim_rtn[488];
+EvtWord light_rod_anim_rtn[122];
+EvtWord light_pose_change[314];
+EvtWord maiframeanimcheck[21];
+static EvtWord init_event[149];
+static EvtWord entry_event[94];
+static EvtWord damage_event[47];
+EvtWord damage_sub_event[148];
+static EvtWord phase_event[28];
+EvtWord monster_before_phase_event[195];
+static EvtWord dead_event[165];
 static Vec splineTableIn1_1[5];
 static Vec splineTableIn2_1[5];
 static Vec splineTableIn2_2[5];
@@ -208,18 +208,18 @@ static Vec splineTableOut4_1[5];
 static Vec splineTableOut4_2[5];
 static Vec splineTableOut4_3[5];
 static Vec splineTableOut4_4[5];
-static s32 satellite_blur_on[42];
-static s32 satellite_blur_off[29];
-s32 sub_call_satellite[87];
-s32 player_before_phase_event[170];
-static s32 attack_event[141];
-s32 batten_leader_thunder_attack_event[377];
-s32 batten_leader_fire_attack_event[376];
-s32 batten_leader_ice_attack_event[321];
-s32 batten_leader_shikaeshi_attack_event[176];
-s32 batten_leader_yokeyoke_attack_event[176];
-s32 batten_leader_stop_attack_event[328];
-static s32 wait_event[16];
+static EvtWord satellite_blur_on[42];
+static EvtWord satellite_blur_off[29];
+EvtWord sub_call_satellite[87];
+EvtWord player_before_phase_event[170];
+static EvtWord attack_event[141];
+EvtWord batten_leader_thunder_attack_event[377];
+EvtWord batten_leader_fire_attack_event[376];
+EvtWord batten_leader_ice_attack_event[321];
+EvtWord batten_leader_shikaeshi_attack_event[176];
+EvtWord batten_leader_yokeyoke_attack_event[176];
+EvtWord batten_leader_stop_attack_event[328];
+static EvtWord wait_event[16];
 
 f32 fd_boss_batten_leader_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -667,7 +667,7 @@ EVT_END()
 
 USER_FUNC(evt_eff_pokopi_thunder) {
     f32 top;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -694,7 +694,7 @@ USER_FUNC(evt_eff_colorchange00) {
     return EVT_RETURN_DONE;
 }
 USER_FUNC(evt_eff_barriersizechange) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
 
     ((EffSyuryouWork*)eff->userdata)->scale = evtGetFloat(event, args[1]);
@@ -705,7 +705,7 @@ USER_FUNC(evt_eff_firechange00) {
     Vec target;
     Vec pos;
     Vec dir;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
     s32 mode = evtGetValue(event, args[1]);
     BOOL reset;
@@ -911,7 +911,7 @@ USER_FUNC(check_satellite) {
     return EVT_RETURN_DONE;
 }
 USER_FUNC(battleGetBattenSatelliteInitPos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 num;
     s32 index;
@@ -2574,7 +2574,7 @@ EVT_END_PAD()
 
 USER_FUNC(btlevtcmd_AnimeGetPose) {
     s32 id;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 partNo;
     BattleUnitPart* part;
 
@@ -2645,7 +2645,7 @@ USER_FUNC(pose_check_evt_stop) {
 }
 USER_FUNC(btl_hitoffsetx) {
     s32 id;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 partNo;
     BattleUnitPart* part;
 
@@ -2746,7 +2746,7 @@ void _light_point_callback(BattleUnitPart* part, s32 group) {
 }
 USER_FUNC(_hp_gauge_flag_on) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, *args++);
     BattleUnit* unit;
 
@@ -2804,7 +2804,7 @@ u8 battenSatelliteTo_Main(BattleUnit* unit, s32 n) {
     return TRUE;
 }
 USER_FUNC(battenSatelliteToInside) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 num = evtGetValue(event, args[1]);
     BattleUnit* unit;
@@ -2860,7 +2860,7 @@ USER_FUNC(battenSatelliteToInside) {
     return moving == FALSE ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 USER_FUNC(battenSatelliteToOutside) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 num = evtGetValue(event, args[1]);
     BattleUnit* unit;

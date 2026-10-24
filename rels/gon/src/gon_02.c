@@ -35,12 +35,12 @@ f32 fd_gon_02___local_3PIO2_368;
 f32 fd_gon_02_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gon_02___local_PIO2_367;
 f32 fd_gon_02_one_364;
-static s32 door01_close[22];
-static s32 door01_open[22];
-static s32 door02_close[12];
-static s32 door02_open[12];
+static EvtWord door01_close[22];
+static EvtWord door01_open[22];
+static EvtWord door02_close[12];
+static EvtWord door02_open[12];
 static BeroEntry bero_entry_data[4];
-s32 gon_02_init_evt[248];
+EvtWord gon_02_init_evt[248];
 
 f32 fd_gon_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

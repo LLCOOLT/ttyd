@@ -44,16 +44,16 @@ f32 fd_jin_01___local_3PIO2_368;
 f32 fd_jin_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_jin_01___local_PIO2_367;
 f32 fd_jin_01_one_364;
-static s32 s1_close[12];
-static s32 s1_open[12];
-static s32 s2_close[12];
-static s32 s2_open[12];
+static EvtWord s1_close[12];
+static EvtWord s1_open[12];
+static EvtWord s2_close[12];
+static EvtWord s2_open[12];
 static BeroEntry bero_entry_data[3];
-static s32 cam_shake[62];
-s32 evt_kaidan_oku[144];
-static s32 ki_data_evt_01[20];
+static EvtWord cam_shake[62];
+EvtWord evt_kaidan_oku[144];
+static EvtWord ki_data_evt_01[20];
 static TreeAccess ki_data[2];
-s32 jin_01_init_evt[41];
+EvtWord jin_01_init_evt[41];
 
 f32 fd_jin_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -41,9 +41,9 @@ USER_FUNC(btlevtcmd_StatusWindowOnOff);
 USER_FUNC(btlevtcmd_WaitAttackEnd);
 USER_FUNC(evt_btl_camera_set_mode);
 USER_FUNC(evt_msg_print);
-extern s32 btl_marilyn_zoom[];
-extern s32 majo3_shadow_tail_event[];
-extern s32 majo_unison_phase_event[];
+extern EvtWord btl_marilyn_zoom[];
+extern EvtWord majo3_shadow_tail_event[];
+extern EvtWord majo_unison_phase_event[];
 
 f32 fd_boss_marilyn_negone_one_374[2] __attribute__((aligned(8)));
 f32 fd_boss_marilyn_neg_one_382;
@@ -69,22 +69,22 @@ static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_marilyn_kagenuke_attack1;
 static BattleWeapon weapon_marilyn_thunder_attack1;
 static BattleWeapon weapon_marilyn_charge1;
-static s32 marilyn_down[19];
-static s32 marilyn_up[27];
-static s32 init_event[37];
-static s32 damage_event[22];
-static s32 dead_event[152];
-static s32 unison_phase_event[83];
-static s32 phase_event[2];
-static s32 attack_event[193];
+static EvtWord marilyn_down[19];
+static EvtWord marilyn_up[27];
+static EvtWord init_event[37];
+static EvtWord damage_event[22];
+static EvtWord dead_event[152];
+static EvtWord unison_phase_event[83];
+static EvtWord phase_event[2];
+static EvtWord attack_event[193];
 #ifdef VERSION_G8ME01
-static s32 kagenuke_attack_event[241];
+static EvtWord kagenuke_attack_event[241];
 #else
-static s32 kagenuke_attack_event[238];
+static EvtWord kagenuke_attack_event[238];
 #endif
-static s32 thunder_attack_event[235];
-static s32 charge_attack_event[58];
-static s32 wait_event[6];
+static EvtWord thunder_attack_event[235];
+static EvtWord charge_attack_event[58];
+static EvtWord wait_event[6];
 
 f32 fd_boss_marilyn_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

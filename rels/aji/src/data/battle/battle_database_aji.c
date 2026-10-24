@@ -91,7 +91,7 @@ NpcBattleSelect btlgrpsel_aji_btlno_aji_13_02_off[2];
 NpcBattleSelect btlgrpsel_aji_btlno_aji_15_01_off[2];
 NpcSetupBattleInfo btlsetup_aji_tbl[24];
 NpcTerritoryInfo btl_aji_setup_no_tbl[24];
-s32 bgset_aji_space_event[35];
+EvtWord bgset_aji_space_event[35];
 
 f32 fd_battle_database_aji_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1338,7 +1338,7 @@ EVT_BEGIN(bgset_aji_space_event)
 EVT_END()
 
 static USER_FUNC(_space_rotate) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 outVar = args[1];
     s32 step = evtGetValue(event, outVar);

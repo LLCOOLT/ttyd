@@ -48,14 +48,14 @@ f32 fd_las_18___local_3PIO2_368;
 f32 fd_las_18_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_18___local_PIO2_367;
 f32 fd_las_18_one_364;
-static s32 w_door_close[12];
-static s32 w_door_open[12];
+static EvtWord w_door_close[12];
+static EvtWord w_door_open[12];
 static BeroEntry bero_entry_data[2];
-static s32 box_evt[30];
-s32 vivian_check[92];
-static s32 switch_evt[48];
-static s32 hint_plate[14];
-s32 las_18_init_evt[71];
+static EvtWord box_evt[30];
+EvtWord vivian_check[92];
+static EvtWord switch_evt[48];
+static EvtWord hint_plate[14];
+EvtWord las_18_init_evt[71];
 
 f32 fd_las_18_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -200,7 +200,7 @@ EVT_BEGIN(vivian_check)
 EVT_END()
 
 USER_FUNC(get_mobj_seq) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MapObjectEntry* mobj = mobjNameToPtrNoAssert((const char*)evtGetValue(event, args[0]));
 
     if (mobj == NULL) {

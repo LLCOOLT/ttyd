@@ -82,33 +82,33 @@ f32 fd_aji_09___local_3PIO2_368;
 f32 fd_aji_09_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_09___local_PIO2_367;
 f32 fd_aji_09_one_364;
-static s32 s_door_open[22];
-static s32 s_door_close[22];
+static EvtWord s_door_open[22];
+static EvtWord s_door_close[22];
 static BeroEntry bero_entry_data[2];
-s32 peach_evt_bero_out1[25];
+EvtWord peach_evt_bero_out1[25];
 BeroEntry bero_data_peach1[2];
-s32 peach_evt_bero_out2[25];
+EvtWord peach_evt_bero_out2[25];
 BeroEntry bero_data_peach2[2];
-s32 evt_kou1[115];
-s32 evt_kou2[155];
+EvtWord evt_kou1[115];
+EvtWord evt_kou2[155];
 const char* rokka_data[21];
-s32 evt_rokka_open[127];
-s32 evt_rokka_close[165];
-s32 evt_rokka_init[34];
-s32 peach_evt_fuku_g[36];
-s32 peach_evt_ka_open[46];
-s32 peach_evt_ka_close[46];
-s32 peach_evt_kou_in[172];
-s32 peach_evt_kou_out[89];
-s32 peach_evt_kou1_in[72];
-s32 peach_evt_kou1_out[43];
-s32 peach_evt_kou2_in[72];
-s32 peach_evt_kou2_out[43];
-s32 s_bero_out[90];
-static s32 peach_evt_stg3[262];
-static s32 evt_memo1[21];
-static s32 evt_memo2[14];
-s32 aji_09_init_evt[226];
+EvtWord evt_rokka_open[127];
+EvtWord evt_rokka_close[165];
+EvtWord evt_rokka_init[34];
+EvtWord peach_evt_fuku_g[36];
+EvtWord peach_evt_ka_open[46];
+EvtWord peach_evt_ka_close[46];
+EvtWord peach_evt_kou_in[172];
+EvtWord peach_evt_kou_out[89];
+EvtWord peach_evt_kou1_in[72];
+EvtWord peach_evt_kou1_out[43];
+EvtWord peach_evt_kou2_in[72];
+EvtWord peach_evt_kou2_out[43];
+EvtWord s_bero_out[90];
+static EvtWord peach_evt_stg3[262];
+static EvtWord evt_memo1[21];
+static EvtWord evt_memo2[14];
+EvtWord aji_09_init_evt[226];
 
 f32 fd_aji_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -911,7 +911,7 @@ static USER_FUNC(peach_set_pose) {
     return EVT_RETURN_DONE;
 }
 USER_FUNC(check_kou_evt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 value;
     s32 result;
 

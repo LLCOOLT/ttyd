@@ -33,9 +33,9 @@ PoseTableEntry pose_table_chuchurina_stay[24];
 static BattleDataEntry data_table[8];
 BattleUnitKindPart unitpartsdata_Party_Chuchurina[4];
 BattleUnitKind unitdata_Party_Chuchurina;
-static s32 battle_entry_event[59];
-static s32 init_event[48];
-static s32 damage_event[16];
+static EvtWord battle_entry_event[59];
+static EvtWord init_event[48];
+static EvtWord damage_event[16];
 BattleWeapon partyWeapon_ChuchurinaNormalAttackLeft;
 BattleWeapon partyWeapon_ChuchurinaNormalAttackRight;
 BattleWeapon partyWeapon_ChuchurinaNormalAttackLeftLast;
@@ -43,19 +43,19 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackRightLast;
 BattleWeapon partyWeapon_ChuchurinaMadowaseAttack;
 BattleWeapon partyWeapon_ChuchurinaItemSteal;
 BattleWeapon partyWeapon_ChuchurinaKiss;
-s32 partyChuchurinaAttack_NormalAttack[1590];
-s32 partyChuchurinaAttack_MadowaseAttack[2020];
-s32 partyChuchurinaAttack_ItemSteal[VERSION_PICK(788, 961)];
-s32 partyChuchurinaAttack_Kiss[568];
-s32 chuchurina_appeal_event[86];
-static s32 party_win_reaction[18];
-static s32 attack_audience_event[VERSION_PICK(204, 205)];
+EvtWord partyChuchurinaAttack_NormalAttack[1590];
+EvtWord partyChuchurinaAttack_MadowaseAttack[2020];
+EvtWord partyChuchurinaAttack_ItemSteal[VERSION_PICK(788, 961)];
+EvtWord partyChuchurinaAttack_Kiss[568];
+EvtWord chuchurina_appeal_event[86];
+static EvtWord party_win_reaction[18];
+static EvtWord attack_audience_event[VERSION_PICK(204, 205)];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
-static s32 attack_event[2];
-static s32 wait_event[6];
-static s32 main_evt[4];
+static EvtWord attack_event[2];
+static EvtWord wait_event[6];
+static EvtWord main_evt[4];
 
 USER_FUNC(_chuchu_make_extra_work_area);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -2757,7 +2757,7 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
 
 USER_FUNC(_get_binta_hit_position) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     Vec pos;
     s32 id, targetId, dir;
@@ -2784,7 +2784,7 @@ USER_FUNC(_get_binta_hit_position) {
 
 USER_FUNC(_make_madowase_weapon) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 index;
     BattleWeapon* weapon;
@@ -2805,7 +2805,7 @@ USER_FUNC(_make_madowase_weapon) {
 
 USER_FUNC(_get_itemsteal_param) {
     BattleWork* wp;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 id, out1, out2, rate, resist;
 
@@ -2832,7 +2832,7 @@ USER_FUNC(_chuchu_item_steal) {
     BattleUnit* unit;
     s32 id;
     u16 item;
-    s32* args;
+    EvtWord* args;
 
     args = event->args;
     wp = _battleWorkPointer;

@@ -76,36 +76,36 @@ f32 fd_aji_03___local_3PIO2_368;
 f32 fd_aji_03_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_03___local_PIO2_367;
 f32 fd_aji_03_one_364;
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[2];
-s32 evt_kaitentou[44];
-s32 evt_kaitentou2[44];
-static s32 evt_hari[125];
-s32 ufo_hand[129];
-s32 move_left[5];
-s32 move_left2[5];
-s32 move_up[5];
-s32 move_up2[5];
-s32 hand_success[65];
-s32 hand_fail[128];
-s32 hand_release[65];
-s32 ufo_main[525];
-s32 evt_ufo_init[115];
-s32 evt_zenmai[141];
-s32 blink_sw[33];
-s32 evt_ufo_sousaban[VERSION_PICK(267, 279)];
-static s32 evt_sw[141];
-s32 evt_sw_reinit[88];
-s32 evt_sw0[72];
-s32 evt_sw1[72];
-s32 evt_sw2[72];
+EvtWord evt_kaitentou[44];
+EvtWord evt_kaitentou2[44];
+static EvtWord evt_hari[125];
+EvtWord ufo_hand[129];
+EvtWord move_left[5];
+EvtWord move_left2[5];
+EvtWord move_up[5];
+EvtWord move_up2[5];
+EvtWord hand_success[65];
+EvtWord hand_fail[128];
+EvtWord hand_release[65];
+EvtWord ufo_main[525];
+EvtWord evt_ufo_init[115];
+EvtWord evt_zenmai[141];
+EvtWord blink_sw[33];
+EvtWord evt_ufo_sousaban[VERSION_PICK(267, 279)];
+static EvtWord evt_sw[141];
+EvtWord evt_sw_reinit[88];
+EvtWord evt_sw0[72];
+EvtWord evt_sw1[72];
+EvtWord evt_sw2[72];
 s32 haguruma_tbl[2];
-static s32 evt_haguruma[132];
-s32 badge_evt[5];
-s32 badge_evt2[5];
-s32 badge_evt3[5];
-s32 aji_03_init_evt[525];
+static EvtWord evt_haguruma[132];
+EvtWord badge_evt[5];
+EvtWord badge_evt2[5];
+EvtWord badge_evt3[5];
+EvtWord aji_03_init_evt[525];
 
 f32 fd_aji_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1214,7 +1214,7 @@ EVT_BEGIN(aji_03_init_evt)
 EVT_END()
 
 USER_FUNC(evt_sousa_icon) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     s32 x = evtGetValue(event, args[1]);
     s32 y = evtGetValue(event, args[2]);
@@ -1260,7 +1260,7 @@ void icon_disp(CameraId camera, void* param) {
 
 USER_FUNC(evt_itemNameToItemID) {
     static char tmp[64];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     char* name = (char*)evtGetValue(event, args[0]);
     ItemEntry* item = itemNameToPtr(name);
 
@@ -1272,7 +1272,7 @@ USER_FUNC(evt_itemNameToItemID) {
 
 USER_FUNC(item_chk) {
     char name[256];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetValue(event, GW(10));
     f32 z = evtGetValue(event, GW(11));
     f32 minDist = 20.0f;

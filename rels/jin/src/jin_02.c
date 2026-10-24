@@ -40,14 +40,14 @@ f32 fd_jin_02___local_3PIO2_368;
 f32 fd_jin_02_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_jin_02___local_PIO2_367;
 f32 fd_jin_02_one_364;
-static s32 n2_close[12];
-static s32 n2_open[12];
-s32 n1_close[12];
-s32 n1_open[12];
+static EvtWord n2_close[12];
+static EvtWord n2_open[12];
+EvtWord n1_close[12];
+EvtWord n1_open[12];
 static BeroEntry bero_entry_data[3];
-static s32 cam_shake[62];
-s32 evt_kaidan_temae[144];
-s32 jin_02_init_evt[33];
+static EvtWord cam_shake[62];
+EvtWord evt_kaidan_temae[144];
+EvtWord jin_02_init_evt[33];
 
 f32 fd_jin_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

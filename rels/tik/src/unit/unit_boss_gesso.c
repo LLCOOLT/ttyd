@@ -88,27 +88,27 @@ PoseTableEntry gesso_pose_table_turn[10];
 static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 #ifndef VERSION_G8ME01
-s32 gesso_arm_wait_event[4];
+EvtWord gesso_arm_wait_event[4];
 #endif
 #ifdef VERSION_G8ME01
-static s32 battle_entry_event[313];
+static EvtWord battle_entry_event[313];
 #else
-static s32 battle_entry_event[315];
+static EvtWord battle_entry_event[315];
 #endif
-static s32 init_event[121];
+static EvtWord init_event[121];
 BattleUnitSetup entry_gesso_left_arm_entry_data;
 BattleUnitSetup entry_gesso_right_arm_entry_data;
-static s32 damage_event[34];
+static EvtWord damage_event[34];
 #ifdef VERSION_G8ME01
-static s32 phase_event[497];
+static EvtWord phase_event[497];
 #else
-static s32 phase_event[488];
+static EvtWord phase_event[488];
 #endif
-static s32 attack_event[48];
+static EvtWord attack_event[48];
 BattleWeapon weapon_gesso_ikasumi_attack;
-s32 gesso_ikasumi_attack[193];
-static s32 wait_event[6];
-s32 dead_subevent[48];
+EvtWord gesso_ikasumi_attack[193];
+static EvtWord wait_event[6];
+EvtWord dead_subevent[48];
 
 f32 fd_boss_gesso_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -685,7 +685,7 @@ EVT_END()
 
 USER_FUNC(_ikasumi_effect) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 count = evtGetValue(event, args[1]);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));

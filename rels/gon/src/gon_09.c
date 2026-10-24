@@ -54,18 +54,18 @@ f32 fd_gon_09___local_3PIO2_368;
 f32 fd_gon_09_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gon_09___local_PIO2_367;
 f32 fd_gon_09_one_364;
-static s32 door01_close[12];
-static s32 door01_open[12];
-static s32 door02_close[12];
-static s32 door02_open[12];
+static EvtWord door01_close[12];
+static EvtWord door01_open[12];
+static EvtWord door02_close[12];
+static EvtWord door02_open[12];
 static BeroEntry bero_entry_data[3];
-static s32 init_0[37];
+static EvtWord init_0[37];
 #ifdef VERSION_G8ME01
-static s32 main_0[465];
+static EvtWord main_0[465];
 #else
-static s32 main_0[491];
+static EvtWord main_0[491];
 #endif
-s32 gon_09_init_evt[239];
+EvtWord gon_09_init_evt[239];
 
 f32 fd_gon_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

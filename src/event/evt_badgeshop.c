@@ -563,7 +563,7 @@ USER_FUNC(evt_badgeShop_bottakuru_dec) {
 
 #pragma opt_common_subs reset
 USER_FUNC(evt_badgeShop_throw_get_kind_cnt) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s16 badge;
 	s32 count;
 	int i;
@@ -579,7 +579,7 @@ USER_FUNC(evt_badgeShop_throw_get_kind_cnt) {
 }
 
 USER_FUNC(evt_badgeShop_starmaniac_get_kind_cnt) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s16 badge;
 	s32 count;
 	int i;
@@ -595,7 +595,7 @@ USER_FUNC(evt_badgeShop_starmaniac_get_kind_cnt) {
 }
 
 USER_FUNC(evt_badgeShop_bottakuru_get_kind_cnt) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 count;
 	int i;
 
@@ -609,7 +609,7 @@ USER_FUNC(evt_badgeShop_bottakuru_get_kind_cnt) {
 }
 
 USER_FUNC(U_evt_badgeShop_get_special_zaiko) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s16 badge;
 	s32 count;
 	int i;
@@ -625,7 +625,7 @@ USER_FUNC(U_evt_badgeShop_get_special_zaiko) {
 }
 
 USER_FUNC(evt_badgeShop_bteresa_get_kind_cnt) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s16 badge;
 	s32 count;
 	int i;

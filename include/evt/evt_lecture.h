@@ -10,4 +10,4 @@ USER_FUNC(lect_cam_load);
 USER_FUNC(lect_juyoitem_rel_set);
 USER_FUNC(lect_juyoitem_rel_get);
 
-extern s32 all_juyoitem_lecture[];
+extern EvtWord all_juyoitem_lecture[];

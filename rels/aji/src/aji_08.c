@@ -42,14 +42,14 @@ f32 fd_aji_08___local_3PIO2_368;
 f32 fd_aji_08_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_08___local_PIO2_367;
 f32 fd_aji_08_one_364;
-static s32 s_door_open[22];
-static s32 s_door_close[22];
-s32 evt_slit0[15];
-s32 evt_slit1[15];
-s32 evt_slit2[15];
+static EvtWord s_door_open[22];
+static EvtWord s_door_close[22];
+EvtWord evt_slit0[15];
+EvtWord evt_slit1[15];
+EvtWord evt_slit2[15];
 static BeroEntry bero_entry_data[5];
-s32 heya_tenura_onoff[68];
-s32 aji_08_init_evt[148];
+EvtWord heya_tenura_onoff[68];
+EvtWord aji_08_init_evt[148];
 
 f32 fd_aji_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -262,7 +262,7 @@ EVT_BEGIN(aji_08_init_evt)
 EVT_END()
 
 USER_FUNC(camAtY) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetValue(event, args[0], camGetPtr(CAMERA_3D)->cameraAt.y);
     return EVT_RETURN_DONE;

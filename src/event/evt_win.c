@@ -250,7 +250,7 @@ USER_FUNC(evt_unitwin_free) {
 
 USER_FUNC(evt_unitwin_selltable_setup) {
 	s32 i;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	UnitWinEntry* tbl = (UnitWinEntry*)evtGetValue(event, args[0]);
 	s32* goods = (s32*)evtGetValue(event, args[1]);
 	UnitWinWork* wp = _wp;
@@ -317,7 +317,7 @@ USER_FUNC(unitwin_lottery_disp_onoff) {
 }
 
 USER_FUNC(unitwin_set_bought) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	UnitWinWork* wp = (UnitWinWork*)evtGetValue(event, args[0]);
 	wp->bought = evtGetValue(event, args[1]);
 	return EVT_RETURN_DONE;
@@ -1413,7 +1413,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 
 
 USER_FUNC(set_new_goods_list) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	UnitWinWork* wp = (UnitWinWork*)evtGetValue(event, args[0]);
 	s32 item = evtGetValue(event, args[1]);
 	char name[32];
@@ -1435,7 +1435,7 @@ USER_FUNC(unitwin_get_work_ptr) {
 }
 
 USER_FUNC(unitwin_getpartylank) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	PouchData* pouch = pouchGetPtr();
 	s32 idx = evtGetValue(event, args[0]);
 	evtSetValue(event, args[1], pouch->partyData[idx].techLevel);
@@ -1447,7 +1447,7 @@ USER_FUNC(unitwin_setpartylank) {
 	u32 ofs;
 	s16 v;
 	s32 ofs2;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	PouchData* pouch = pouchGetPtr();
 	ofs = evtGetValue(event, args[0]) * sizeof(PouchPartyData); // byte offset of partyData[i]: the target multiplies right after the read
 	v = evtGetValue(event, args[1]);
@@ -1461,7 +1461,7 @@ USER_FUNC(unitwin_setpartylank) {
 }
 
 USER_FUNC(unitwin_setmariolevel) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	PouchData* pouch = pouchGetPtr();
 	s32 i;
 	BOOL r;

@@ -56,20 +56,20 @@ f32 fd_las_21___local_3PIO2_368;
 f32 fd_las_21_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_21___local_PIO2_367;
 f32 fd_las_21_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
-static s32 e1_door_close[22];
-static s32 e1_door_open[22];
-static s32 e2_door_close[22];
-static s32 e2_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
+static EvtWord e1_door_close[22];
+static EvtWord e1_door_open[22];
+static EvtWord e2_door_close[22];
+static EvtWord e2_door_open[22];
 static BeroEntry bero_entry_data[5];
 static BeroEntry w_bero_mapchg[1];
-s32 floatblk_stop_se[47];
-s32 floatblk_shake[27];
-s32 floatblk_evt[336];
-s32 floatblk21_1_evt[62];
-s32 floatblk21_2_evt[62];
-s32 las_21_init_evt[211];
+EvtWord floatblk_stop_se[47];
+EvtWord floatblk_shake[27];
+EvtWord floatblk_evt[336];
+EvtWord floatblk21_1_evt[62];
+EvtWord floatblk21_2_evt[62];
+EvtWord las_21_init_evt[211];
 
 f32 fd_las_21_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -512,7 +512,7 @@ EVT_BEGIN(las_21_init_evt)
 EVT_END()
 
 static USER_FUNC(set_party_y_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PartyEntry* party = partyGetPtr(0);
 
     if (party == NULL) {
@@ -522,7 +522,7 @@ static USER_FUNC(set_party_y_pos) {
     return EVT_RETURN_DONE;
 }
 USER_FUNC(set_mobj_y_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     MapObjectEntry* mobj = mobjNameToPtr(name);

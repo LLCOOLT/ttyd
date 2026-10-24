@@ -76,14 +76,14 @@ f32 fd_dig_00___local_PIO2_367;
 f32 fd_dig_00_one_364;
 static s32* wp[1];
 static DigAnim anim_tbl[48];
-s32 evt_action_1_2[154];
-s32 evt_action_1[7];
-s32 evt_action_2[7];
-s32 evt_action_jump[42];
-s32 evt_action_fall[45];
-s32 evt_action_walk[57];
-s32 evt_action[111];
-s32 dig_00_init_evt[107];
+EvtWord evt_action_1_2[154];
+EvtWord evt_action_1[7];
+EvtWord evt_action_2[7];
+EvtWord evt_action_jump[42];
+EvtWord evt_action_fall[45];
+EvtWord evt_action_walk[57];
+EvtWord evt_action[111];
+EvtWord dig_00_init_evt[107];
 
 void dig_thpInit(void) {
     u32 type;
@@ -166,7 +166,7 @@ USER_FUNC(gravity_scale) {
 }
 
 USER_FUNC(evt_action_sub) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx;
     u32* maskp;
     u32 mask;

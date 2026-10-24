@@ -107,22 +107,22 @@ f32 fd_jin_04___local_3PIO2_368;
 f32 fd_jin_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_jin_04___local_PIO2_367;
 f32 fd_jin_04_one_364;
-static s32 s_close[12];
-static s32 s_open[12];
+static EvtWord s_close[12];
+static EvtWord s_open[12];
 static BeroEntry bero_entry_data[2];
-s32 ranperu_toujou[338];
-s32 starstone_jump_se[15];
-s32 irekawatta_mario_init[67];
-s32 irekawatta_mario[495];
-s32 yoshi_color[65];
-s32 ranperu_lastbattle[378];
-s32 hontonosugata_mario_init[125];
-s32 hontonosugata_mario[948];
-s32 ranperu_init[20];
-s32 nisemario_init[22];
+EvtWord ranperu_toujou[338];
+EvtWord starstone_jump_se[15];
+EvtWord irekawatta_mario_init[67];
+EvtWord irekawatta_mario[495];
+EvtWord yoshi_color[65];
+EvtWord ranperu_lastbattle[378];
+EvtWord hontonosugata_mario_init[125];
+EvtWord hontonosugata_mario[948];
+EvtWord ranperu_init[20];
+EvtWord nisemario_init[22];
 static NpcSetupInfo npcEnt[7];
-s32 jin_04_jumpstand[181];
-s32 jin_04_init_evt[103];
+EvtWord jin_04_jumpstand[181];
+EvtWord jin_04_init_evt[103];
 
 f32 fd_jin_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1010,7 +1010,7 @@ EVT_BEGIN(jin_04_init_evt)
 EVT_END()
 
 static USER_FUNC(getYoshiColor) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], pouchGetPartyColor(4));
     return EVT_RETURN_DONE;
 }

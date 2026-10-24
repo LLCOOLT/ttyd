@@ -162,7 +162,7 @@ USER_FUNC(main_genki) {
     GenkiWork* w = get_ptr();
     s32 i;
     s32 j;
-    s32* args;
+    EvtWord* args;
     if (isFirstCall) {
         args = event->args;
         memset(w, 0, sizeof(GenkiWork));
@@ -1525,7 +1525,7 @@ static USER_FUNC(wait_game_end) {
 
 USER_FUNC(get_score) {
     GenkiWork* w = get_ptr();
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], w->score0);
     evtSetValue(event, args[1], w->score1);
     evtSetValue(event, args[2], w->score2);

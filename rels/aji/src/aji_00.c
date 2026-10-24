@@ -59,15 +59,15 @@ f32 fd_aji_00___local_PIO2_367;
 f32 fd_aji_00_one_364;
 f64 fd_aji_00__three_localstatic4_sqrtf;
 f64 fd_aji_00__half_localstatic3_sqrtf;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[3];
-static s32 first_evt[333];
-static s32 evt_door_msg[14];
+static EvtWord first_evt[333];
+static EvtWord evt_door_msg[14];
 static NpcSetupInfo npcEnt[3];
-s32 aji_00_init_evt[91];
+EvtWord aji_00_init_evt[91];
 
 f32 fd_aji_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

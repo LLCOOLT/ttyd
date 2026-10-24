@@ -53,11 +53,11 @@ static StatusVulnerability regist;
 static PoseTableEntry pose_table[5];
 static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
-static s32 init_event[53];
-static s32 entry_event[29];
-static s32 phase_event[160];
-static s32 damage_event[10];
-static s32 wait_event[6];
+static EvtWord init_event[53];
+static EvtWord entry_event[29];
+static EvtWord phase_event[160];
+static EvtWord damage_event[10];
+static EvtWord wait_event[6];
 
 static USER_FUNC(lecture_init) {
     return EVT_RETURN_DONE;
@@ -65,7 +65,7 @@ static USER_FUNC(lecture_init) {
 
 static USER_FUNC(_battle_set_lecture_unit_id) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 value;
 
     value = evtGetValue(event, *args++);

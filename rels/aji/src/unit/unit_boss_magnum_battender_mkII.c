@@ -35,7 +35,7 @@ void psndSFXOff(s32 id);
 typedef struct AudMember { s32 flags; s32 step; s32 counter; u8 pad_0C[0x48 - 0xC]; Vec position; u8 pad_54[0x60 - 0x54]; Vec scale; u8 pad_6C[0x9C - 0x6C]; Vec rotation; u8 pad_A8[0xB4 - 0xA8]; Vec home; u8 pad_C0[0xF8 - 0xC0]; s32 frame; s32 frames; } AudMember;
 s32 irand(s32 scalar);
 int rand(void);
-extern s32 aud_hit_event[];
+extern EvtWord aud_hit_event[];
 void aud_get_pod_pos(BattleUnit* unit, f32* x, f32* y, f32* z);
 void aud_fire_eff(f32 x, f32 y, f32 z);
 void effKemuTestSetRxRz(EffectEntry* eff, f32 rx, f32 rz);
@@ -147,21 +147,21 @@ BattleWeapon weapon_batten_drill_attack;
 BattleWeapon weapon_batten_boomerang_attack;
 BattleWeapon weapon_batten_aud_attack;
 static BattleUnitSetup entry_rocket_punch;
-s32 aud_hit_event[24];
-s32 aud_no_hit_event[16];
-static s32 init_event[92];
-static s32 waku_event[23];
-static s32 damage_event[111];
-static s32 dead_event[234];
-static s32 entry_event[78];
-static s32 attack_event[320];
-s32 drill_attack_event[392];
-s32 boomerang_attack_event[324];
-s32 aud_attack_event[823];
-s32 aud_attack_event_sub[139];
-static s32 arm_bunri_event[199];
-static s32 arm_return_event[151];
-static s32 wait_event[6];
+EvtWord aud_hit_event[24];
+EvtWord aud_no_hit_event[16];
+static EvtWord init_event[92];
+static EvtWord waku_event[23];
+static EvtWord damage_event[111];
+static EvtWord dead_event[234];
+static EvtWord entry_event[78];
+static EvtWord attack_event[320];
+EvtWord drill_attack_event[392];
+EvtWord boomerang_attack_event[324];
+EvtWord aud_attack_event[823];
+EvtWord aud_attack_event_sub[139];
+static EvtWord arm_bunri_event[199];
+static EvtWord arm_return_event[151];
+static EvtWord wait_event[6];
 BattleUnitKind unit_boss_rocket_punch_mkII;
 static BattleUnitDefense defence_r;
 static BattleUnitDefenseAttr defence_attr_r;
@@ -170,12 +170,12 @@ static PoseTableEntry pose_table_r[14];
 static BattleDataEntry data_table_r[1];
 static BattleUnitKindPart parts_r[1];
 static BattleWeapon weapon_batten_rocket_attack;
-static s32 init_event_r[191];
-static s32 arm_event[59];
-static s32 arm_event_end[35];
-static s32 damage_event_r[30];
-static s32 attack_event_r[368];
-static s32 wait_event_r[18];
+static EvtWord init_event_r[191];
+static EvtWord arm_event[59];
+static EvtWord arm_event_end[35];
+static EvtWord damage_event_r[30];
+static EvtWord attack_event_r[368];
+static EvtWord wait_event_r[18];
 
 f32 fd_boss_magnum_battender_mkII_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -480,7 +480,7 @@ EVT_END()
 
 static USER_FUNC(waku_main) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, *args++);
     BattleUnit* unit;
     BattleUnitPart* part;
@@ -509,7 +509,7 @@ static USER_FUNC(waku_main) {
 
 static USER_FUNC(arm_check) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 side = evtGetValue(event, args[0]);
     s32 found = -1;
     BattleUnit* unit;
@@ -632,7 +632,7 @@ USER_FUNC(aud_jet_end) {
 }
 
 USER_FUNC(get_aud_num) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetValue(event, args[0], BattleAudience_GetAudienceNum());
     return EVT_RETURN_DONE;
@@ -736,7 +736,7 @@ void aud_fire_eff(f32 x, f32 y, f32 z) {
 }
 
 USER_FUNC(aud_fire_hit) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     s32 target = BattleTransID(event, evtGetValue(event, args[1]));
     s32 start = evtGetValue(event, args[2]);
@@ -785,7 +785,7 @@ USER_FUNC(aud_fire_hit) {
 }
 
 USER_FUNC(aud_fire_no_hit) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     s32 target = BattleTransID(event, evtGetValue(event, args[1]));
     s32 start = evtGetValue(event, args[2]);
@@ -829,7 +829,7 @@ USER_FUNC(aud_fire_no_hit) {
 }
 
 USER_FUNC(aud_target_mark) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetValue(event, args[0]);
     f32 y = evtGetValue(event, args[1]);
     f32 z = evtGetValue(event, args[2]);
@@ -891,7 +891,7 @@ USER_FUNC(aud_target_mark) {
 }
 
 static USER_FUNC(eff_dead) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -2149,7 +2149,7 @@ static USER_FUNC(arm_init2) {
 }
 
 static USER_FUNC(arm_main) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 id = evtGetValue(event, args[0]);

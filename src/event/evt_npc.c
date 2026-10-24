@@ -95,7 +95,7 @@ EVT_END();
 
 // const char* npcDesc, const char* npcName
 USER_FUNC(evt_npc_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char *desc, *name;
 
     desc = (const char*)evtGetValue(event, *args++);
@@ -109,7 +109,7 @@ USER_FUNC(evt_npc_entry) {
 
 // const char* lookupName, s32 slaveId, const char* animName, s32 retIndex, void* deadEvent
 USER_FUNC(evt_npc_slave_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     s32 id;
@@ -167,7 +167,7 @@ USER_FUNC(evt_npc_check_delete) {
 
 // BOOL inBattle, s32 evtIndex
 USER_FUNC(evt_npc_get_ReactionOfLivingBody) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index, value;
     BOOL inBattle;
 
@@ -264,7 +264,7 @@ USER_FUNC(evt_npc_setup) {
 
 // const char* lookupName, f32 x, f32 y, f32 z
 USER_FUNC(evt_npc_set_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     f32 x, y, z;
@@ -283,7 +283,7 @@ USER_FUNC(evt_npc_set_position) {
 
 // const char* lookupName, f32 width
 USER_FUNC(evt_npc_set_width) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     f32 width;
 
@@ -295,7 +295,7 @@ USER_FUNC(evt_npc_set_width) {
 
 // const char* lookupName, f32 width
 USER_FUNC(evt_npc_set_height) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     f32 height;
 
@@ -307,7 +307,7 @@ USER_FUNC(evt_npc_set_height) {
 
 // const char* lookupName, s32 evtStoreIndex
 USER_FUNC(evt_npc_get_height) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     s32 index;
@@ -321,7 +321,7 @@ USER_FUNC(evt_npc_get_height) {
 
 // const char* lookupName, f32 x, f32 y, f32 z
 USER_FUNC(evt_npc_set_scale) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     f32 x, y, z;
@@ -339,7 +339,7 @@ USER_FUNC(evt_npc_set_scale) {
 
 // const char* lookupName, s32 xStoreIndex, s32 yStoreIndex, s32 zStoreIndex
 USER_FUNC(evt_npc_get_scale) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     s32 x, y, z;
@@ -357,7 +357,7 @@ USER_FUNC(evt_npc_get_scale) {
 
 // const char* lookupName, s32 xStoreIndex, s32 yStoreIndex, s32 zStoreIndex
 USER_FUNC(evt_npc_get_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     s32 x, y, z;
@@ -375,7 +375,7 @@ USER_FUNC(evt_npc_get_position) {
 
 // const char* lookupName, s32 xStoreIndex, s32 yStoreIndex, s32 zStoreIndex
 USER_FUNC(evt_npc_get_home_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     s32 x, y, z;
@@ -394,7 +394,7 @@ USER_FUNC(evt_npc_get_home_position) {
 // devs forgot to change s32 to f32 when copypasting, fix in rewrite
 // const char* lookupName, f32 x, f32 y, f32 z
 USER_FUNC(evt_npc_set_home_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     s32 x, y, z;
@@ -412,7 +412,7 @@ USER_FUNC(evt_npc_set_home_position) {
 
 // const char* lookupName, s32 xStoreIndex, s32 yStoreIndex, s32 zStoreIndex
 USER_FUNC(evt_npc_get_rotate) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     s32 x, y, z;
@@ -431,7 +431,7 @@ USER_FUNC(evt_npc_get_rotate) {
 // devs forgot to use evtGetFloat when copypasting, fix in rewrite
 // const char* lookupName, f32 x, f32 y, f32 z
 USER_FUNC(evt_npc_set_rotate) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     f32 x, y, z;
@@ -448,7 +448,7 @@ USER_FUNC(evt_npc_set_rotate) {
 // devs forgot to use evtGetFloat when copypasting, fix in rewrite
 // const char* lookupName, f32 x, f32 y, f32 z
 USER_FUNC(evt_npc_add_rotate) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     f32 x, y, z;
@@ -467,7 +467,7 @@ USER_FUNC(evt_npc_add_rotate) {
 // devs forgot to use evtGetFloat when copypasting, fix in rewrite
 // const char* lookupName, f32 x, f32 y, f32 z
 USER_FUNC(evt_npc_set_rotate_offset) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     f32 x, y, z;
@@ -482,7 +482,7 @@ USER_FUNC(evt_npc_set_rotate_offset) {
 }
 
 USER_FUNC(evt_npc_move_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     const char* npcName = (const char*)evtGetValue(event, *args++);
     f32 targetX = evtGetFloat(event, *args++);
@@ -613,7 +613,7 @@ USER_FUNC(evt_npc_move_position) {
 }
 
 USER_FUNC(evt_npc_jump_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     const char* npcName = (const char*)evtGetValue(event, *args++);
     f32 targetX = evtGetFloat(event, *args++);
@@ -779,7 +779,7 @@ USER_FUNC(evt_npc_jump_position) {
 }
 
 USER_FUNC(evt_npc_jump_position_nohit) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     const char* npcName = (const char*)evtGetValue(event, *args++);
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
@@ -843,7 +843,7 @@ USER_FUNC(evt_npc_jump_position_nohit) {
 // const char* lookupName, f32 x, f32 y, f32 z, s32 msec, f32 speed, f32 arcHeight,
 // s32 intplMode, s32 flags
 USER_FUNC(evt_npc_glide_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     const char* npcName = (const char*)evtGetValue(event, *args++);
     f32 targetX = evtGetFloat(event, *args++);
@@ -980,7 +980,7 @@ USER_FUNC(evt_npc_glide_position) {
 
 // const char* lookupName
 USER_FUNC(evt_npc_return_interrupt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
 
@@ -993,7 +993,7 @@ USER_FUNC(evt_npc_return_interrupt) {
 // const char* lookupName, const char* targetName, s32 msec, f32 speed, f32 stopDistance,
 // f32 turnRate, s32 flags
 USER_FUNC(evt_npc_homing_target) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     const char* npcName = (const char*)evtGetValue(event, *args++);
     const char* targetName = (const char*)evtGetValue(event, *args++);
@@ -1211,7 +1211,7 @@ f32 _intplGetFloat(s32 mode, f32 t) {
 
 // const char* lookupName, f32 ry
 USER_FUNC(evt_npc_set_ry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     f32 ry;
 
@@ -1223,7 +1223,7 @@ USER_FUNC(evt_npc_set_ry) {
 
 // const char* lookupName, f32 side (0 = left of camera, else right)
 USER_FUNC(evt_npc_set_ry_lr) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     s32 side, angle;
@@ -1246,7 +1246,7 @@ USER_FUNC(evt_npc_set_ry_lr) {
 
 // const char* lookupName
 USER_FUNC(evt_npc_reverse_ry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
 
@@ -1258,7 +1258,7 @@ USER_FUNC(evt_npc_reverse_ry) {
 
 // const char* lookupName, s32 dirStoreIndex
 USER_FUNC(evt_npc_get_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
 
@@ -1270,7 +1270,7 @@ USER_FUNC(evt_npc_get_dir) {
 
 // const char* lookupName, const char* animName
 USER_FUNC(evt_npc_set_anim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     const char* anim;
     NpcEntry* npc;
@@ -1287,7 +1287,7 @@ USER_FUNC(evt_npc_set_anim) {
 
 #define NPC_SET_TRIBE_ANIM(funcName, field)                                      \
     USER_FUNC(funcName) {                                                        \
-        s32* args = event->args;                                                 \
+        EvtWord* args = event->args;                                                 \
         const char* name;                                                        \
         NpcEntry* npc;                                                           \
         const char* anim;                                                        \
@@ -1313,7 +1313,7 @@ NPC_SET_TRIBE_ANIM(evt_npc_set_run_anim, runAnimation)
 
 // const char* lookupName, const char* paperGroup
 USER_FUNC(evt_npc_set_paper) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     const char* group;
     NpcEntry* npc;
@@ -1328,7 +1328,7 @@ USER_FUNC(evt_npc_set_paper) {
 
 // const char* lookupName, const char* paperAnim
 USER_FUNC(evt_npc_set_paper_anim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     const char* anim;
 
@@ -1340,7 +1340,7 @@ USER_FUNC(evt_npc_set_paper_anim) {
 
 // const char* lookupName
 USER_FUNC(evt_npc_clear_paper) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
 
@@ -1352,7 +1352,7 @@ USER_FUNC(evt_npc_clear_paper) {
 
 // const char* lookupName, const char* animName
 USER_FUNC(evt_npc_set_force_regl_anim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     const char* anim;
     NpcEntry* npc;
@@ -1367,7 +1367,7 @@ USER_FUNC(evt_npc_set_force_regl_anim) {
 
 // const char* lookupName
 USER_FUNC(evt_npc_wait_pera) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
 
@@ -1381,7 +1381,7 @@ USER_FUNC(evt_npc_wait_pera) {
 
 // const char* lookupName, f32 loopCount
 USER_FUNC(evt_npc_wait_anim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     f32 loops;
 
@@ -1395,7 +1395,7 @@ USER_FUNC(evt_npc_wait_anim) {
 
 // s32 type (off/on), const char* npcName, s32 mask
 USER_FUNC(evt_npc_flag_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type, mask;
     const char* name;
     NpcEntry* npc;
@@ -1416,7 +1416,7 @@ USER_FUNC(evt_npc_flag_onoff) {
 
 // const char* lookupName, s32 mask, s32 storeIndex
 USER_FUNC(evt_npc_flag_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s32 mask;
     NpcEntry* npc;
@@ -1430,7 +1430,7 @@ USER_FUNC(evt_npc_flag_check) {
 
 // s32 type (off/on), const char* npcName, s32 mask
 USER_FUNC(evt_npc_reaction_flag_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type, mask;
     const char* name;
     NpcEntry* npc;
@@ -1451,7 +1451,7 @@ USER_FUNC(evt_npc_reaction_flag_onoff) {
 
 // s32 type (off/on), const char* npcName, s32 mask
 USER_FUNC(evt_npc_status_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type, mask;
     const char* name;
     NpcEntry* npc;
@@ -1472,7 +1472,7 @@ USER_FUNC(evt_npc_status_onoff) {
 
 // const char* lookupName, s32 mask, s32 storeIndex
 USER_FUNC(evt_npc_status_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s32 mask;
     NpcEntry* npc;
@@ -1486,7 +1486,7 @@ USER_FUNC(evt_npc_status_check) {
 
 // const char* lookupName, s32 type (off/on)
 USER_FUNC(evt_npc_pera_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s32 type;
     NpcEntry* npc;
@@ -1506,7 +1506,7 @@ USER_FUNC(evt_npc_pera_onoff) {
 
 // const char* lookupName, CameraId cameraId
 USER_FUNC(evt_npc_set_camid) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s32 cameraId;
 
@@ -1540,7 +1540,7 @@ f32 _get_target_dir(EventEntry* event, NpcEntry* npc, const char* targetName) {
 
 // const char* lookupName, const char* targetName, f32 dirStoreIndex
 USER_FUNC(evt_get_target_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     const char* target;
     s32 index;
@@ -1556,7 +1556,7 @@ USER_FUNC(evt_get_target_dir) {
 
 // const char* lookupName, const char* targetName
 USER_FUNC(evt_set_dir_to_target) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     const char* target;
     NpcEntry* npc;
@@ -1570,7 +1570,7 @@ USER_FUNC(evt_set_dir_to_target) {
 
 // const char* lookupName, unused
 USER_FUNC(evt_set_dir_to_home) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
 
@@ -1584,7 +1584,7 @@ USER_FUNC(evt_set_dir_to_home) {
 
 // f32 x (in/out), f32 z (in/out), f32 dir, f32 dist
 USER_FUNC(evt_npc_add_dirdist) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 xIndex, zIndex;
     f32 dir, dist, x, sinv, rad, z, cosv;
 
@@ -1606,7 +1606,7 @@ USER_FUNC(evt_npc_add_dirdist) {
 
 // f32 dir (in/out), f32 min, f32 max
 USER_FUNC(evt_npc_get_loiter_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index;
     f32 min, max, range, dir;
 
@@ -1627,7 +1627,7 @@ USER_FUNC(evt_npc_get_loiter_dir) {
 
 // const char* lookupName, s32 type, void* evt
 USER_FUNC(evt_npc_change_interrupt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s32 type;
     void* evt;
@@ -1665,7 +1665,7 @@ USER_FUNC(evt_npc_change_interrupt) {
 
 // const char* lookupName, s32 storeIndex
 USER_FUNC(evt_npc_get_reglid) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
 
@@ -1677,7 +1677,7 @@ USER_FUNC(evt_npc_get_reglid) {
 
 // const char* lookupName
 USER_FUNC(evt_npc_restart_regular_event) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
 
@@ -1690,7 +1690,7 @@ USER_FUNC(evt_npc_restart_regular_event) {
 
 // const char* lookupName, f32 base, f32 amount, (out) s32 base storeIndex
 USER_FUNC(evt_npc_facedirection_add) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     f32 base, amount, sign;
 
@@ -1800,7 +1800,7 @@ USER_FUNC(evt_npc_start_for_event) {
 
 // const char* lookupName
 USER_FUNC(evt_npc_stop_for_one_event) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
 
@@ -1812,7 +1812,7 @@ USER_FUNC(evt_npc_stop_for_one_event) {
 
 // const char* lookupName
 USER_FUNC(evt_npc_start_for_one_event) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
 
@@ -1830,7 +1830,7 @@ USER_FUNC(evt_npc_change_fbat_mode) {
 
 // const char* lookupName, const char* offscreenName
 USER_FUNC(evt_npc_set_offscreen) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     const char* offscreen;
     NpcEntry* npc;
@@ -1849,7 +1849,7 @@ USER_FUNC(evt_npc_set_offscreen) {
 
 // const char* lookupName, u8 r, u8 g, u8 b, u8 a
 USER_FUNC(evt_npc_set_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     u8 r, g, b, a;
 
@@ -1865,7 +1865,7 @@ USER_FUNC(evt_npc_set_color) {
 
 // BOOL enable, const char* lookupName
 USER_FUNC(evt_npc_blur_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BOOL enable;
     const char* name;
 
@@ -1883,7 +1883,7 @@ USER_FUNC(evt_npc_blur_onoff) {
 
 // const char* lookupName, BOOL storeIndex (out)
 USER_FUNC(evt_npc_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (npcNameToPtr_NoAssert((const char*)evtGetValue(event, args[0])) == NULL) {
         evtSetValue(event, args[1], FALSE);
@@ -1896,7 +1896,7 @@ USER_FUNC(evt_npc_check) {
 
 // const char* lookupName, s16 mode
 USER_FUNC(evt_npc_set_attack_mode) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s16 mode;
 
@@ -1908,7 +1908,7 @@ USER_FUNC(evt_npc_set_attack_mode) {
 
 // const char* lookupName, s32 battleInfoId
 USER_FUNC(evt_npc_set_battle_info) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     s32 battleInfoId;
     NpcEntry* npc;
@@ -1922,7 +1922,7 @@ USER_FUNC(evt_npc_set_battle_info) {
 
 // const char* lookupName, u8 rule0, u8 rule1, u8 rule2
 USER_FUNC(evt_npc_set_battle_rule) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     s32 rule0, rule1, rule2;
@@ -1940,7 +1940,7 @@ USER_FUNC(evt_npc_set_battle_rule) {
 
 // const char* lookupName, unused
 USER_FUNC(evt_npc_battle_start) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     FieldBattleData* fbat;
     FieldBattleInfo* info;
@@ -1994,7 +1994,7 @@ USER_FUNC(evt_npc_wait_battle_end) {
 
 // s32 resultStoreIndex
 USER_FUNC(evt_npc_get_battle_result) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = args[0];
 
     evtSetValue(event, index, BattleInformationGetResult(&fbatGetPointer()->info));
@@ -2003,7 +2003,7 @@ USER_FUNC(evt_npc_get_battle_result) {
 
 // s32 result
 USER_FUNC(evt_npc_check_escape_battle) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (evtGetValue(event, args[0]) == 4) {
         marioSetMutekiTime(3000);
@@ -2013,7 +2013,7 @@ USER_FUNC(evt_npc_check_escape_battle) {
 
 // s32 storeIndex
 USER_FUNC(evt_npc_get_battle_rule_keep_result) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = args[0];
 
     FieldBattleData* fbat = fbatGetPointer();
@@ -2024,7 +2024,7 @@ USER_FUNC(evt_npc_get_battle_rule_keep_result) {
 
 // const char* lookupName, s32 workIndex, s32 storeIndex
 USER_FUNC(evt_npc_get_btlsetup_work) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     s32 workIndex, storeIndex;
@@ -2039,7 +2039,7 @@ USER_FUNC(evt_npc_get_btlsetup_work) {
 
 // const char* lookupName, s32 workIndex, s32 value
 USER_FUNC(evt_npc_set_btlsetup_work) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
     s32 workIndex, value;
@@ -2054,7 +2054,7 @@ USER_FUNC(evt_npc_set_btlsetup_work) {
 
 // const char* lookupName, const char* otherName
 USER_FUNC(evt_npc_set_link) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     const char* otherName;
     NpcEntry* npc;
@@ -2070,7 +2070,7 @@ USER_FUNC(evt_npc_set_link) {
 
 // const char* lookupName, ItemType storeIndex (out)
 USER_FUNC(evt_npc_get_drop_fixitem) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     NpcEntry* npc;
 
@@ -2081,7 +2081,7 @@ USER_FUNC(evt_npc_get_drop_fixitem) {
 }
 
 USER_FUNC(evt_npc_get_drop_item) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* npcName = (const char*)evtGetValue(event, *args++);
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     s32 index = *args++;
@@ -2095,7 +2095,7 @@ USER_FUNC(evt_npc_get_drop_item) {
 }
 
 USER_FUNC(evt_npc_get_drop_heart) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* npcName = (const char*)evtGetValue(event, *args++);
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     s32 index = *args++;
@@ -2120,7 +2120,7 @@ USER_FUNC(evt_npc_get_drop_heart) {
 }
 
 USER_FUNC(evt_npc_get_drop_flower) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* npcName = (const char*)evtGetValue(event, *args++);
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     s32 index = *args++;
@@ -2167,7 +2167,7 @@ void _npc_check_coin_group(NpcEntry* npc, s32* value) {
 #pragma dont_inline reset
 
 USER_FUNC(evt_npc_get_drop_coin) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* npcName = (const char*)evtGetValue(event, *args++);
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     s32 index = *args++;
@@ -2190,7 +2190,7 @@ USER_FUNC(evt_npc_getback_item_entry) {
 }
 
 USER_FUNC(evt_npc_get_unitwork) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* npcName = (const char*)evtGetValue(event, *args++);
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     s32 index = evtGetValue(event, *args++);
@@ -2199,7 +2199,7 @@ USER_FUNC(evt_npc_get_unitwork) {
 }
 
 USER_FUNC(evt_npc_set_unitwork) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* npcName = (const char*)evtGetValue(event, *args++);
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     s32 index = evtGetValue(event, *args++);
@@ -2208,7 +2208,7 @@ USER_FUNC(evt_npc_set_unitwork) {
 }
 
 USER_FUNC(evt_npc_wait_msec) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* npcName = (const char*)evtGetValue(event, args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
 
@@ -2236,7 +2236,7 @@ USER_FUNC(evt_npc_wait_msec) {
 }
 
 USER_FUNC(evt_npc_set_balloontype) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* npcName = (const char*)evtGetValue(event, *args++);
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     npc->balloonType = evtGetValue(event, *args++);
@@ -2244,7 +2244,7 @@ USER_FUNC(evt_npc_set_balloontype) {
 }
 
 USER_FUNC(evt_npc_set_tribe) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* npcName = (const char*)evtGetValue(event, *args++);
     const char* tribeName = (const char*)evtGetValue(event, *args++);
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
@@ -2274,7 +2274,7 @@ USER_FUNC(evt_npc_set_tribe) {
 }
 
 USER_FUNC(evt_npc_set_autotalkpose) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* npcName = (const char*)evtGetValue(event, *args++);
     const char* stayAnim = (const char*)evtGetValue(event, *args++);
     const char* talkAnim = (const char*)evtGetValue(event, *args++);
@@ -2294,7 +2294,7 @@ USER_FUNC(evt_npc_set_autotalkpose) {
 }
 
 USER_FUNC(evt_npc_majo_disp_on) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     const char* npcName = (const char*)evtGetValue(event, *args++);
     f32 prevX = evtGetFloat(event, *args++);
@@ -2447,7 +2447,7 @@ USER_FUNC(evt_npc_majo_disp_off) {
 }
 
 USER_FUNC(evt_npc_get_kpencount_type) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* npcName = (const char*)evtGetValue(event, *args++);
     s32 index = *args++;
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
@@ -2499,7 +2499,7 @@ void _kamek_houki_kemuri(NpcEntry* npc, s32 arg1) {
 #pragma dont_inline reset
 
 USER_FUNC(evt_npc_kamek_move_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     const char* npcName = (const char*)evtGetValue(event, *args++);
     f32 temp1;
@@ -2640,7 +2640,7 @@ block_7:
 }
 
 USER_FUNC(evt_npc_kamek_kemuri2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     const char* npcName = (const char*)evtGetValue(event, *args++);
     f32 moveTime = (f32)evtGetValue(event, *args++) / 1000.0f;
@@ -2666,7 +2666,7 @@ USER_FUNC(evt_npc_kamek_kemuri2) {
 }
 
 USER_FUNC(evt_fbat_trans_floor_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     f32 hitX, hitY, hitZ;
     f32 distance;
@@ -2695,7 +2695,7 @@ USER_FUNC(evt_fbat_trans_floor_position) {
 #ifdef VERSION_G8ME01
 // US-only: like evt_fbat_trans_floor_position, but also probes at x +/- width/2 and keeps the highest floor
 USER_FUNC(evt_fbat_trans_floor_position_wide) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     f32 hitX, hitY, hitZ;
     f32 distance;
@@ -2757,7 +2757,7 @@ USER_FUNC(evt_npc_sound_data_reset) {
 }
 
 USER_FUNC(evt_npc_sound_data_set) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     const char* npcName = (const char*)evtGetValue(event, *args++);
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);

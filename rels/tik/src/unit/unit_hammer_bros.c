@@ -76,23 +76,23 @@ static BattleUnitKindPart parts[6];
 static BattleWeapon weapon_hammer_bros_attack;
 static BattleWeapon weapon_hammer_bros_renzoku_attack;
 static BattleWeapon weapon_hammer_bros_nagemakuri_attack;
-static s32 init_event[21];
-static s32 damage_event[10];
-static s32 attack_event[96];
-static s32 start_avoid[26];
-static s32 hammer_bros_attack_common_event1[254];
-static s32 hammer_bros_attack_common_event2[112];
-static s32 hammer_bros_attack_common_event3[59];
-static s32 damage_check_event_sub[137];
-static s32 normal_attack_event[112];
-static s32 renzoku_attack_event[111];
-static s32 renzoku_attack_event_sub_no_last[13];
-static s32 renzoku_attack_event_sub_last[39];
-static s32 nagemakuri_attack_event[186];
-static s32 nagemakuri_attack_event_sub[49];
-static s32 nagemakuri_attack_event_sub_no_last[13];
-static s32 nagemakuri_attack_event_sub_last[76];
-static s32 wait_event[6];
+static EvtWord init_event[21];
+static EvtWord damage_event[10];
+static EvtWord attack_event[96];
+static EvtWord start_avoid[26];
+static EvtWord hammer_bros_attack_common_event1[254];
+static EvtWord hammer_bros_attack_common_event2[112];
+static EvtWord hammer_bros_attack_common_event3[59];
+static EvtWord damage_check_event_sub[137];
+static EvtWord normal_attack_event[112];
+static EvtWord renzoku_attack_event[111];
+static EvtWord renzoku_attack_event_sub_no_last[13];
+static EvtWord renzoku_attack_event_sub_last[39];
+static EvtWord nagemakuri_attack_event[186];
+static EvtWord nagemakuri_attack_event_sub[49];
+static EvtWord nagemakuri_attack_event_sub_no_last[13];
+static EvtWord nagemakuri_attack_event_sub_last[76];
+static EvtWord wait_event[6];
 
 static void hammer_bros_get_next_target(s32* unitIdx, s32* partIdx) {
     BattleWorkWeaponTargets* wt = &_battleWorkPointer->weaponTargets;
@@ -117,7 +117,7 @@ static void hammer_bros_get_target(s32* unitIdx, s32* partIdx) {
 }
 
 static USER_FUNC(hammer_bros_nagemakuri_set_target) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 unitIdx[20];
     s32 partIdx[20];
     s32 i;

@@ -67,9 +67,9 @@ USER_FUNC(evt_btl_camera_set_zoom);
 USER_FUNC(evt_btl_camera_shake_h);
 USER_FUNC(evt_msg_print);
 USER_FUNC(get_gold_chorobon_id);
-extern s32 chorogun_entry[];
+extern EvtWord chorogun_entry[];
 extern BattleUnitKind unit_chorobon_gundan;
-extern s32 chorogun_dead_reward[];
+extern EvtWord chorogun_dead_reward[];
 
 f32 fd_gold_chorobon_negone_one_374[2] __attribute__((aligned(8)));
 f32 fd_gold_chorobon_neg_one_382;
@@ -94,16 +94,16 @@ static BattleDataEntry data_table[15];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_gold_chorobon_attack;
 static PoseSoundTiming pose_sound_timing_table[4];
-s32 gold_chorobon_rabbit_move[123];
+EvtWord gold_chorobon_rabbit_move[123];
 BattleUnitSetup entry_chorogun;
-s32 call_chorogun_event[67];
-s32 escape_chorogun_event[50];
-static s32 init_event[43];
-static s32 damage_event[131];
-static s32 counter_damage_event[30];
-static s32 return_event[24];
-static s32 attack_event[500];
-static s32 wait_event[6];
+EvtWord call_chorogun_event[67];
+EvtWord escape_chorogun_event[50];
+static EvtWord init_event[43];
+static EvtWord damage_event[131];
+static EvtWord counter_damage_event[30];
+static EvtWord return_event[24];
+static EvtWord attack_event[500];
+static EvtWord wait_event[6];
 
 f32 fd_gold_chorobon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -618,7 +618,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 USER_FUNC(get_gold_chorobon_id) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     s32 i;
 

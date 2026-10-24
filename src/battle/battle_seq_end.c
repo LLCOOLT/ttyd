@@ -1576,7 +1576,7 @@ USER_FUNC(N__display_select_one_to_upgrade_text) {
 #endif
 
 USER_FUNC(_nozzle_set_offset) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     f32 ofs;
     BattleStageObject* obj;
@@ -1634,7 +1634,7 @@ USER_FUNC(_disable_enemy_unit_disp) {
 }
 
 USER_FUNC(_set_confetti_control_evtid) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     SeqEndWork* work = SEW(_battleWorkPointer);
     if (!_battleWorkPointer->seqEndWork && !_battleWorkPointer->seqEndWork && !_battleWorkPointer->seqEndWork) {
     }
@@ -1661,7 +1661,7 @@ USER_FUNC(_lvup_select_obj_lvup_param_disp) {
 }
 
 USER_FUNC(_lvup_obj_set_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     SeqEndWork* work = SEW(_battleWorkPointer);
     SeqEndObj* obj;
 
@@ -1674,7 +1674,7 @@ USER_FUNC(_lvup_obj_set_color) {
 }
 
 USER_FUNC(_lvup_disp_flag_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     SeqEndWork* work = SEW(_battleWorkPointer);
     s32 on = evtGetValue(event, args[0]);
     u32 mask = args[1];
@@ -1689,7 +1689,7 @@ USER_FUNC(_lvup_disp_flag_onoff) {
 
 USER_FUNC(_lvup_spot_on) {
     BattleSpotWork* spot = BatSpotGetPtr();
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 n;
     SeqEndSpot* e;
 
@@ -1804,7 +1804,7 @@ USER_FUNC(_lvup_spot_move) {
 
 USER_FUNC(_lvup_spot_off) {
     BattleSpotWork* spot = BatSpotGetPtr();
-    s32* args = event->args;
+    EvtWord* args = event->args;
     SeqEndSpot* e;
     s32 i;
 
@@ -2166,7 +2166,7 @@ void _BattleMarioKouraDelete(void) {
 
 USER_FUNC(_check_guard_koura) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     BattleUnit* koura;
     s32 out;

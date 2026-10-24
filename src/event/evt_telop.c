@@ -42,7 +42,7 @@ static TelopWork* wp = &work;
 void telop(CameraId cameraId, void* param);
 
 USER_FUNC(evt_telop_entry) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	u32 ms;
 
 	if (isFirstCall) {

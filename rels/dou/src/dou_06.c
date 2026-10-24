@@ -26,7 +26,7 @@ f32 fd_dou_06_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_dou_06___local_PIO2_367;
 f32 fd_dou_06_one_364;
 static BeroEntry bero_entry_data[3];
-s32 dou_06_init_evt[41];
+EvtWord dou_06_init_evt[41];
 
 f32 fd_dou_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

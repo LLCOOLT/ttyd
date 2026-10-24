@@ -76,16 +76,16 @@ f32 fd_las_04___local_3PIO2_368;
 f32 fd_las_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_04___local_PIO2_367;
 f32 fd_las_04_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[3];
-s32 firebar_coin[68];
+EvtWord firebar_coin[68];
 FirebarSetup firebardesc[7];
-s32 firebar_evt[102];
+EvtWord firebar_evt[102];
 static HitDamageReturn dmgRetPoint[4];
-s32 las_04_init_evt[55];
+EvtWord las_04_init_evt[55];
 
 f32 fd_las_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -717,7 +717,7 @@ void firebar_disp(CameraId camera, void* param) {
 }
 
 USER_FUNC(coin_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
     s32 y = evtGetValue(event, args[1]);
     s32 z = evtGetValue(event, args[2]);

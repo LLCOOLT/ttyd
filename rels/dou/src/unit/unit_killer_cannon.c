@@ -56,15 +56,15 @@ static BattleUnitKindPart parts[3];
 static BattleUnitSetup entry_killer;
 static PoseTableEntry pose_table[16];
 static BattleDataEntry data_table[1];
-static s32 init_event[63];
-static s32 damage_event[10];
-static s32 attack_event[738];
-static s32 friend_event[244];
-static s32 friend_event_sky[318];
-static s32 wait_event[6];
+static EvtWord init_event[63];
+static EvtWord damage_event[10];
+static EvtWord attack_event[738];
+static EvtWord friend_event[244];
+static EvtWord friend_event_sky[318];
+static EvtWord wait_event[6];
 
 static USER_FUNC(killer_copy_status) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
     s32 id2 = BattleTransID(event, evtGetValue(event, args[1]));
     BattleWork* wp = _battleWorkPointer;
@@ -614,7 +614,7 @@ EVT_END()
 double atan(double x);
 
 static USER_FUNC(killer_get_angle) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
     f32 y1 = evtGetFloat(event, args[1]);
     f32 x2 = evtGetFloat(event, args[2]);

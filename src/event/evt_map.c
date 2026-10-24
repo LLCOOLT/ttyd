@@ -85,7 +85,7 @@ USER_FUNC(evt_mapobj_rotate);
 USER_FUNC(evt_mapobj_trans);
 
 USER_FUNC(evt_mapobj_trans) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     f32 x = evtGetFloat(event, args[2]);
@@ -100,7 +100,7 @@ USER_FUNC(evt_mapobj_trans) {
 }
 
 USER_FUNC(evt_mapobj_rotate) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     f32 x = evtGetFloat(event, args[2]);
@@ -115,7 +115,7 @@ USER_FUNC(evt_mapobj_rotate) {
 }
 
 USER_FUNC(evt_mapobj_scale) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     f32 x = evtGetFloat(event, args[2]);
@@ -130,7 +130,7 @@ USER_FUNC(evt_mapobj_scale) {
 }
 
 USER_FUNC(evt_map_set_fog) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     f32 start = evtGetFloat(event, args[1]);
     f32 end = evtGetFloat(event, args[2]);
@@ -142,7 +142,7 @@ USER_FUNC(evt_map_set_fog) {
 }
 
 USER_FUNC(evt_map_get_fog) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type;
     f32 start;
     f32 end;
@@ -167,7 +167,7 @@ USER_FUNC(evt_map_fog_onoff) {
 }
 
 USER_FUNC(evt_map_set_blend) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     s32 r = evtGetValue(event, args[1]);
     s32 g = evtGetValue(event, args[2]);
@@ -191,7 +191,7 @@ USER_FUNC(evt_map_blend_off) {
 }
 
 USER_FUNC(evt_map_blend_set_flag) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     u32 flags = evtGetValue(event, args[2]);
@@ -233,7 +233,7 @@ USER_FUNC(evt_map_blend_set_flag) {
 }
 
 USER_FUNC(evt_map_blend_set_mobj_flag) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     u32 flags = evtGetValue(event, args[2]);
@@ -247,7 +247,7 @@ USER_FUNC(evt_map_blend_set_mobj_flag) {
 }
 
 USER_FUNC(evt_mapobj_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     u8 r = evtGetValue(event, args[2]);
@@ -263,7 +263,7 @@ USER_FUNC(evt_mapobj_color) {
 }
 
 USER_FUNC(evt_map_playanim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 a = evtGetValue(event, args[1]);
     s32 b = evtGetValue(event, args[2]);
@@ -272,7 +272,7 @@ USER_FUNC(evt_map_playanim) {
 }
 
 USER_FUNC(evt_map_checkanim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BOOL valid;
     f32 f;
     mapCheckAnimation((const char*)evtGetValue(event, args[0]), &valid, &f);
@@ -282,7 +282,7 @@ USER_FUNC(evt_map_checkanim) {
 }
 
 USER_FUNC(evt_map_pauseanim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 all = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     if (all) {
@@ -294,7 +294,7 @@ USER_FUNC(evt_map_pauseanim) {
 }
 
 USER_FUNC(evt_map_replayanim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 all = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     if (all) {
@@ -306,14 +306,14 @@ USER_FUNC(evt_map_replayanim) {
 }
 
 USER_FUNC(evt_map_set_playrate) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     mapSetPlayRate(name, evtGetFloat(event, args[1]));
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_mapobj_flag_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
     const char* name = (const char*)evtGetValue(event, args[2]);
@@ -335,7 +335,7 @@ USER_FUNC(evt_mapobj_flag_onoff) {
 }
 
 USER_FUNC(evt_mapobj_set_offscreen) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     s32 val = evtGetValue(event, args[2]);
@@ -348,7 +348,7 @@ USER_FUNC(evt_mapobj_set_offscreen) {
 }
 
 USER_FUNC(evt_mapobj_clear_offscreen) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     if (type == 0) {
@@ -360,7 +360,7 @@ USER_FUNC(evt_mapobj_clear_offscreen) {
 }
 
 USER_FUNC(evt_mapobj_get_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec pos;
     mapObjGetPos((const char*)evtGetValue(event, args[0]), &pos);
     evtSetValue(event, args[1], FLOAT(pos.x));
@@ -370,7 +370,7 @@ USER_FUNC(evt_mapobj_get_position) {
 }
 
 USER_FUNC(evt_map_set_tevcallback) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     MapTevCallback cb = (MapTevCallback)evtGetValue(event, args[1]);
     mapSetTevCallback(index, cb);
@@ -378,7 +378,7 @@ USER_FUNC(evt_map_set_tevcallback) {
 }
 
 USER_FUNC(evt_map_set_flush_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
     const char* name = (const char*)evtGetValue(event, args[2]);
@@ -399,7 +399,7 @@ USER_FUNC(evt_map_set_flush_onoff) {
 }
 
 USER_FUNC(evt_map_set_flush_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     s32 r = evtGetValue(event, args[2]);
@@ -415,7 +415,7 @@ USER_FUNC(evt_map_set_flush_color) {
 }
 
 USER_FUNC(evt_map_get_flush_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u8 r;
     u8 g;
     u8 b;
@@ -429,7 +429,7 @@ USER_FUNC(evt_map_get_flush_color) {
 }
 
 static USER_FUNC(check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     evtSetValue(event, args[0], 0);
     if (mp->hitobjStandOn) {
@@ -441,7 +441,7 @@ static USER_FUNC(check) {
 }
 
 USER_FUNC(check2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     evtSetValue(event, args[0], 0);
     if (mp->hitobjStandOn) {
@@ -453,7 +453,7 @@ USER_FUNC(check2) {
 }
 
 USER_FUNC(evt_map_entry_airport_harbor) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     s32 hit = evtGetValue(event, args[2]);
@@ -487,7 +487,7 @@ USER_FUNC(evt_map_entry_airport_harbor) {
 }
 
 USER_FUNC(evt_map_replace_mapobj) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 type = evtGetValue(event, args[1]);
     Vec pos;

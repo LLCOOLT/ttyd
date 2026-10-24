@@ -3,24 +3,25 @@
 #include "dolphin/types.h"
 #include "dolphin/mtx.h"
 #include "driver/npcdrv.h"
+#include "evt/evt_word.h"
 
-extern s32 all_juyoitem_lecture_rel[];
-extern s32 all_party_lecture[];
+extern EvtWord all_juyoitem_lecture_rel[];
+extern EvtWord all_party_lecture[];
 extern NpcTerritoryInfo btl_gor_setup_no_tbl[];
 extern NpcSetupBattleInfo btlsetup_gor_tbl[];
 extern const char* door_data_05_npc[];
 extern const char* door_data_05_npc_01[];
-extern s32 gor_00_init_evt[];
-extern s32 gor_01_init_evt[];
-extern s32 gor_02_init_evt[];
-extern s32 gor_03_init_evt[];
-extern s32 gor_04_init_evt[];
-extern s32 gor_10_init_evt[];
-extern s32 gor_11_init_evt[];
-extern s32 gor_12_init_evt[];
-extern s32 gor_irai_init[];
-extern s32 gor_villager_urouro[];
-extern s32 luigi_gor_first_talk[];
+extern EvtWord gor_00_init_evt[];
+extern EvtWord gor_01_init_evt[];
+extern EvtWord gor_02_init_evt[];
+extern EvtWord gor_03_init_evt[];
+extern EvtWord gor_04_init_evt[];
+extern EvtWord gor_10_init_evt[];
+extern EvtWord gor_11_init_evt[];
+extern EvtWord gor_12_init_evt[];
+extern EvtWord gor_irai_init[];
+extern EvtWord gor_villager_urouro[];
+extern EvtWord luigi_gor_first_talk[];
 extern BattleUnitKind unit_lecture_frankli_sac;
 extern BattleUnitKind unit_monban;
 

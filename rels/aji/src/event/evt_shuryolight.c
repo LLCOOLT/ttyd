@@ -24,7 +24,7 @@ USER_FUNC(evt_shuryolight_run_evt);
 static USER_FUNC(evt_shuryolight_get_status);
 static USER_FUNC(evt_shuryolight_get_anim_time);
 USER_FUNC(evt_shuryolight_init);
-static s32 shuryolightRunEvt(s32* code, s32 id);
+static s32 shuryolightRunEvt(EvtWord* code, s32 id);
 static void shuryolightSetAnim(s32 index, s32 anim);
 static void shuryolight_callback(void* param, s32 group);
 
@@ -46,12 +46,12 @@ static const char* green_light_anim[5];
 static const char* yellow_light_anim[5];
 static const char* red_light_anim[5];
 static const char* orange_light_anim[5];
-s32 shuryolight_pow_normal[44];
-static s32 shuryolight_pow_tenmetu[31];
-s32 shuryolight_head_normal[30];
-static s32 shuryolight_head_tenmetu[20];
-static s32 shuryolight_head_off[14];
-s32 shuryolight_tue_normal[31];
+EvtWord shuryolight_pow_normal[44];
+static EvtWord shuryolight_pow_tenmetu[31];
+EvtWord shuryolight_head_normal[30];
+static EvtWord shuryolight_head_tenmetu[20];
+static EvtWord shuryolight_head_off[14];
+EvtWord shuryolight_tue_normal[31];
 
 f32 fd_evt_shuryolight_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -213,7 +213,7 @@ static void shuryolightSetAnim(s32 index, s32 anim) {
     light->status = anim;
     animPoseSetAnim(light->npc->poseId, light->anims[anim], TRUE);
 }
-static s32 shuryolightRunEvt(s32* code, s32 id) {
+static s32 shuryolightRunEvt(EvtWord* code, s32 id) {
     if (evtCheckID(id)) {
         evtDeleteID(id);
     }
@@ -273,7 +273,7 @@ USER_FUNC(evt_shuryolight_init) {
     return EVT_RETURN_DONE;
 }
 static USER_FUNC(evt_shuryolight_set_anim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     shuryolightSetAnim(index, evtGetValue(event, args[1]));
@@ -289,7 +289,7 @@ static USER_FUNC(evt_shuryolight_wait_anim_end) {
     return EVT_RETURN_DONE;
 }
 static USER_FUNC(evt_shuryolight_get_anim_time) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     ShuryoLight* light = &slhp->lights[index];
     AnimData* data = animPoseGetAnimDataPtr(light->npc->poseId);
@@ -298,7 +298,7 @@ static USER_FUNC(evt_shuryolight_get_anim_time) {
     return EVT_RETURN_DONE;
 }
 static USER_FUNC(evt_shuryolight_get_status) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     ShuryoLight* light = &slhp->lights[index];
 
@@ -306,7 +306,7 @@ static USER_FUNC(evt_shuryolight_get_status) {
     return EVT_RETURN_DONE;
 }
 USER_FUNC(evt_shuryolight_run_evt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32* power = (s32*)evtGetValue(event, args[0]);
     s32* head = (s32*)evtGetValue(event, args[1]);
     s32* tue = (s32*)evtGetValue(event, args[2]);
@@ -323,19 +323,19 @@ USER_FUNC(evt_shuryolight_run_evt) {
     return EVT_RETURN_DONE;
 }
 static USER_FUNC(evt_shuryolight_run_power_evt) {
-    s32* code = (s32*)evtGetValue(event, event->args[0]);
+    EvtWord* code = (EvtWord*)evtGetValue(event, event->args[0]);
 
     slhp->powerEvt = shuryolightRunEvt(code, slhp->powerEvt);
     return EVT_RETURN_DONE;
 }
 static USER_FUNC(evt_shuryolight_run_head_evt) {
-    s32* code = (s32*)evtGetValue(event, event->args[0]);
+    EvtWord* code = (EvtWord*)evtGetValue(event, event->args[0]);
 
     slhp->headEvt = shuryolightRunEvt(code, slhp->headEvt);
     return EVT_RETURN_DONE;
 }
 static USER_FUNC(evt_shuryolight_run_tue_evt) {
-    s32* code = (s32*)evtGetValue(event, event->args[0]);
+    EvtWord* code = (EvtWord*)evtGetValue(event, event->args[0]);
 
     slhp->tueEvt = shuryolightRunEvt(code, slhp->tueEvt);
     return EVT_RETURN_DONE;

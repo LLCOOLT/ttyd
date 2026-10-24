@@ -85,7 +85,7 @@ NpcBattleSelect btlgrpsel_mri_btlno_mri_20_03_off[2];
 NpcBattleSelect btlgrpsel_mri_btlno_mri_mb_off[2];
 NpcSetupBattleInfo btlsetup_mri_tbl[22];
 NpcTerritoryInfo btl_mri_setup_no_tbl[22];
-s32 stg_02_1_init_evt[8];
+EvtWord stg_02_1_init_evt[8];
 
 f32 fd_battle_database_mri_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

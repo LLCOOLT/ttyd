@@ -43,12 +43,12 @@ static BattleUnitKindPart parts[6];
 static StatusVulnerability regist;
 static PoseTableEntry pose_table[17];
 static BattleDataEntry data_table[1];
-static s32 init_event[29];
-static s32 damage_event[10];
-static s32 phase_event[2];
-static s32 unison_phase_event[5];
-static s32 attack_event[5];
-static s32 wait_event[56];
+static EvtWord init_event[29];
+static EvtWord damage_event[10];
+static EvtWord phase_event[2];
+static EvtWord unison_phase_event[5];
+static EvtWord attack_event[5];
+static EvtWord wait_event[56];
 
 f32 fd_barriern_custom_satellite_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -238,7 +238,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static USER_FUNC(battleGetBarriernSatelliteInitPos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 num;
     s32 index;

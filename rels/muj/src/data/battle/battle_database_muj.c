@@ -100,8 +100,8 @@ NpcBattleSelect btlgrpsel_muj_btlno_muj_03_02_off[4];
 NpcBattleSelect btlgrpsel_muj_btlno_muj_03_04_off[4];
 NpcSetupBattleInfo btlsetup_muj_tbl[16];
 NpcTerritoryInfo btl_muj_setup_no_tbl[16];
-s32 bgset_muj_wave_event[59];
-s32 bgset_muj_sun_event[18];
+EvtWord bgset_muj_wave_event[59];
+EvtWord bgset_muj_sun_event[18];
 
 f32 fd_battle_database_muj_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1486,7 +1486,7 @@ EVT_BEGIN(bgset_muj_sun_event)
 EVT_END()
 
 static USER_FUNC(_wave_offset) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 varX = args[1];
     s32 stepX = evtGetValue(event, varX);

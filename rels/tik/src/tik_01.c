@@ -85,15 +85,15 @@ f32 fd_tik_01___local_3PIO2_368;
 f32 fd_tik_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tik_01___local_PIO2_367;
 f32 fd_tik_01_one_364;
-s32 lecture_badge_after_00_evt[34];
-s32 dokan_2_in_evt[22];
+EvtWord lecture_badge_after_00_evt[34];
+EvtWord dokan_2_in_evt[22];
 static BeroEntry bero_entry_data[12];
-s32 ashioto[35];
-s32 gorotuki_sanninngumi[694];
-s32 wall_bomb00[139];
-s32 wall_bomb01[140];
-static s32 mobj_box00[34];
-s32 tik_01_init_evt[208];
+EvtWord ashioto[35];
+EvtWord gorotuki_sanninngumi[694];
+EvtWord wall_bomb00[139];
+EvtWord wall_bomb01[140];
+static EvtWord mobj_box00[34];
+EvtWord tik_01_init_evt[208];
 
 f32 fd_tik_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

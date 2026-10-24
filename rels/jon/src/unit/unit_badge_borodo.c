@@ -77,17 +77,17 @@ static BattleDataEntry data_table[2];
 static BattleDataEntry data_table[1];
 #endif
 static BattleUnitKindPart parts[1];
-static s32 init_event[57];
-static s32 damage_event[10];
-static s32 phase_event[2];
-static s32 attack_event[59];
-static s32 _borodo_normal_attack[503];
-static s32 _borodo_steal_attack[610];
-static s32 escape_event[115];
-static s32 wait_event[26];
+static EvtWord init_event[57];
+static EvtWord damage_event[10];
+static EvtWord phase_event[2];
+static EvtWord attack_event[59];
+static EvtWord _borodo_normal_attack[503];
+static EvtWord _borodo_steal_attack[610];
+static EvtWord escape_event[115];
+static EvtWord wait_event[26];
 
 static USER_FUNC(_steal_item) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();
     BattleUnit* unit;
     BattleUnit* target;
@@ -378,7 +378,7 @@ static PoseTableEntry pose_table_item_have[] = {
 };
 
 #ifdef VERSION_G8ME01
-extern s32 _badge_borodo_emergency_revival_event[];
+extern EvtWord _badge_borodo_emergency_revival_event[];
 static BattleDataEntry data_table[] = {
     {51, _badge_borodo_emergency_revival_event},
     {0, NULL},

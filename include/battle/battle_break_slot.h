@@ -2,6 +2,7 @@
 
 #include "dolphin/types.h"
 #include <dolphin/mtx.h>
+#include "evt/evt_word.h"
 
 typedef struct BreakSlotReel {
 	s32 kind;        // 0x00
@@ -45,13 +46,13 @@ void BattleBreakSlot_End(void);
 void BattleBreakSlot_DecBreakTurn(void);
 BreakSlotWork* BattleBreakSlotGetPtr(void);
 
-extern s32 doku_kinoko_effect[];
-extern s32 flower_effect[];
-extern s32 kinoko_effect[];
-extern s32 msg_fault[];
-extern s32 msg_fp_max[];
-extern s32 msg_hp_max[];
-extern s32 msg_star_max[];
-extern s32 msg_super_max[];
-extern s32 shine_effect[];
-extern s32 star_effect[];
+extern EvtWord doku_kinoko_effect[];
+extern EvtWord flower_effect[];
+extern EvtWord kinoko_effect[];
+extern EvtWord msg_fault[];
+extern EvtWord msg_fp_max[];
+extern EvtWord msg_hp_max[];
+extern EvtWord msg_star_max[];
+extern EvtWord msg_super_max[];
+extern EvtWord shine_effect[];
+extern EvtWord star_effect[];

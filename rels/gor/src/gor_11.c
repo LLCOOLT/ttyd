@@ -34,8 +34,8 @@ f32 fd_gor_11___local_3PIO2_368;
 f32 fd_gor_11_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gor_11___local_PIO2_367;
 f32 fd_gor_11_one_364;
-static s32 epilogue_evt[62];
-s32 gor_11_init_evt[29];
+static EvtWord epilogue_evt[62];
+EvtWord gor_11_init_evt[29];
 
 f32 fd_gor_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

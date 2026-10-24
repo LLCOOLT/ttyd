@@ -20,7 +20,7 @@ HitDamageReturn* hitDmgretPtr;
 static void name_callback_sub(const char* name, void* evt, BOOL flag);
 
 USER_FUNC(evt_hitobj_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 isGroup = evtGetValue(event, args[1]);
     s32 off = evtGetValue(event, args[2]);
@@ -80,7 +80,7 @@ USER_FUNC(evt_hit_damage_return_set) {
 }
 
 USER_FUNC(evt_hit_bind_mapobj) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* hitName = (const char*)evtGetValue(event, args[0]);
     const char* mapobjName = (const char*)evtGetValue(event, args[1]);
     hitBindMapObj(hitName, mapobjName);
@@ -93,7 +93,7 @@ USER_FUNC(evt_hit_bind_update) {
 }
 
 USER_FUNC(evt_hit_get_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec pos;
 
     hitObjGetPos((const char*)evtGetValue(event, args[0]), &pos);
@@ -104,7 +104,7 @@ USER_FUNC(evt_hit_get_position) {
 }
 
 USER_FUNC(L_evt_hitobj_flag_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 isGroup = evtGetValue(event, args[0]);
     s32 off = evtGetValue(event, args[1]);
     const char* name = (const char*)evtGetValue(event, args[2]);
@@ -130,7 +130,7 @@ USER_FUNC(L_evt_hitobj_flag_onoff) {
 }
 
 USER_FUNC(evt_hitobj_attr_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 isGroup = evtGetValue(event, args[0]);
     s32 off = evtGetValue(event, args[1]);
     const char* name = (const char*)evtGetValue(event, args[2]);
@@ -169,7 +169,7 @@ static void name_callback_sub(const char* name, void* evt, BOOL flag) {
 }
 
 USER_FUNC(evt_hitobj_name_callback) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     void* evt = (void*)evtGetValue(event, args[1]);
     name_callback_sub(name, evt, FALSE);

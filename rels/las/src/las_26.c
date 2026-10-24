@@ -107,16 +107,16 @@ f32 fd_las_26___local_3PIO2_368;
 f32 fd_las_26_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_26___local_PIO2_367;
 f32 fd_las_26_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[3];
-static s32 box_evt[30];
-s32 bonbaba_evt[819];
-s32 bonbaba_init[62];
+static EvtWord box_evt[30];
+EvtWord bonbaba_evt[819];
+EvtWord bonbaba_init[62];
 static NpcSetupInfo npcEnt[2];
-static s32 sekai_yami_evt[118];
-s32 bomb_wall[155];
-s32 las_26_init_evt[194];
+static EvtWord sekai_yami_evt[118];
+EvtWord bomb_wall[155];
+EvtWord las_26_init_evt[194];
 
 f32 fd_las_26_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

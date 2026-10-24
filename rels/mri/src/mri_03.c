@@ -155,61 +155,61 @@ f32 fd_mri_03___local_3PIO2_368;
 f32 fd_mri_03_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_mri_03___local_PIO2_367;
 f32 fd_mri_03_one_364;
-s32 jail_alpha_mario_check[24];
-s32 jail_alpha[220];
-s32 after_2hours[73];
+EvtWord jail_alpha_mario_check[24];
+EvtWord jail_alpha[220];
+EvtWord after_2hours[73];
 static f32 spline_dt[24];
 f32 spline_dt1[15];
-s32 elder_rescue[771];
-static s32 elder_init[13];
-static s32 elder_talk[13];
-static s32 sister_init[13];
-s32 sister_regl[21];
-static s32 sister_talk[8];
-static s32 guide_init[16];
-static s32 guide_talk[8];
-s32 puni_3_init[17];
-s32 puni_3_talk[20];
+EvtWord elder_rescue[771];
+static EvtWord elder_init[13];
+static EvtWord elder_talk[13];
+static EvtWord sister_init[13];
+EvtWord sister_regl[21];
+static EvtWord sister_talk[8];
+static EvtWord guide_init[16];
+static EvtWord guide_talk[8];
+EvtWord puni_3_init[17];
+EvtWord puni_3_talk[20];
 static NpcSetupInfo npcEnt[5];
-s32 bero_custom_00[37];
+EvtWord bero_custom_00[37];
 static BeroEntry bero_entry_data[3];
 static s16 puni_rand_position[178];
-s32 jail_init_00[52];
-s32 red_jail_open[63];
-s32 evt_opendoor00[19];
-static s32 evt_unlock00[6];
-s32 evt_unlock00_01[4];
+EvtWord jail_init_00[52];
+EvtWord red_jail_open[63];
+EvtWord evt_opendoor00[19];
+static EvtWord evt_unlock00[6];
+EvtWord evt_unlock00_01[4];
 s32 key_table00[2];
-s32 evt_check00[23];
+EvtWord evt_check00[23];
 #ifdef VERSION_G8ME01
-s32 blue_jail_open[60];
+EvtWord blue_jail_open[60];
 #else
-s32 blue_jail_open[65];
+EvtWord blue_jail_open[65];
 #endif
-s32 evt_opendoor01[19];
+EvtWord evt_opendoor01[19];
 #ifdef VERSION_G8ME01
-static s32 evt_unlock01[9];
+static EvtWord evt_unlock01[9];
 #else
-static s32 evt_unlock01[8];
+static EvtWord evt_unlock01[8];
 #endif
 s32 key_table01[3];
-s32 evt_check01[90];
-s32 bluejail_alpha[119];
-s32 bluejail_event[249];
-static s32 mario_kirimomi_event[50];
-s32 party_kirimomi_event[57];
+EvtWord evt_check01[90];
+EvtWord bluejail_alpha[119];
+EvtWord bluejail_event[249];
+static EvtWord mario_kirimomi_event[50];
+EvtWord party_kirimomi_event[57];
 s32 JailAwayTable_New[15];
-s32 kinoko_small[35];
+EvtWord kinoko_small[35];
 #ifdef VERSION_G8ME01
-s32 guide_sister[769];
+EvtWord guide_sister[769];
 #else
-s32 guide_sister[775];
+EvtWord guide_sister[775];
 #endif
-s32 elder_shaberi[13];
-s32 toraware_elder[423];
-s32 guide_sister_before[128];
+EvtWord elder_shaberi[13];
+EvtWord toraware_elder[423];
+EvtWord guide_sister_before[128];
 static KusaAccess ueki_access_data[5];
-s32 mri_03_init_evt[206];
+EvtWord mri_03_init_evt[206];
 
 static void alpha_tev(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;

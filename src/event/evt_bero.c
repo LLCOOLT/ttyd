@@ -161,7 +161,7 @@ EVT_END()
 extern void N_marioSetBottomlessRespawnPosOnBeroEntry(f32 x, f32 y, f32 z);
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_on_bero_entry) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 x, y, z;
 
 	x = evtGetValue(event, args[0]);
@@ -246,7 +246,7 @@ s32 bero_id_filter(s32 id) { //1:1, cursed function, do not touch
 
 //const char** mapName, const char** beroName
 USER_FUNC(evt_bero_mapchange) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	const char *map, *bero;
 
 	map = (const char*)evtGetValue(event, args[0]);
@@ -265,7 +265,7 @@ USER_FUNC(evt_bero_get_entername) {
 
 //BOOL* on/off, s32* mask
 USER_FUNC(evt_bero_exec_onoff) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	BOOL onoff;
 	s32 mask, value;
 
@@ -292,7 +292,7 @@ USER_FUNC(evt_bero_exec_wait) {
 
 //f32 retX, f32 retY, f32 retZ
 USER_FUNC(evt_bero_get_start_position) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 
 	evtSetFloat(event, args[0], BeroSX);
 	evtSetFloat(event, args[1], BeroSY);
@@ -302,7 +302,7 @@ USER_FUNC(evt_bero_get_start_position) {
 
 //f32 retX, f32 retY, f32 retZ
 USER_FUNC(evt_bero_get_end_position) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 
 	evtSetFloat(event, args[0], BeroEX);
 	evtSetFloat(event, args[1], BeroEY);
@@ -313,7 +313,7 @@ USER_FUNC(evt_bero_get_end_position) {
 //s32* id, s32 retIndex1, s32 retIndex2, s32 retIndex3, s32 retIndex4
 USER_FUNC(evt_bero_get_info_anime) {
 	BeroEntry* bero;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
 	evtSetValue(event, args[1], bero->enterAnimeType);
@@ -325,7 +325,7 @@ USER_FUNC(evt_bero_get_info_anime) {
 
 USER_FUNC(evt_bero_get_info_length) {
 	BeroEntry* bero;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 v5;
 	f32 storeme;
 
@@ -358,7 +358,7 @@ USER_FUNC(evt_bero_get_info_length) {
 
 USER_FUNC(evt_bero_get_info_kinddir) {
 	BeroEntry* bero;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
 	evtSetValue(event, args[1], bero->type);
@@ -369,7 +369,7 @@ USER_FUNC(evt_bero_get_info_kinddir) {
 
 USER_FUNC(evt_bero_get_info_nextarea) {
 	BeroEntry* bero;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
 	evtSetValue(event, args[1], bero->nextMapName);
@@ -475,7 +475,7 @@ static inline s32 bero_get_kind(BeroEntry* bero, s32 walk) {
 USER_FUNC(evt_bero_get_into_info) {
 	s32 i;
 	BeroEntry* bero;
-	s32* evt;
+	EvtWord* evt;
 	BeroEntry** table;
 
 	for (i = 0;; i++) {
@@ -539,17 +539,17 @@ USER_FUNC(evt_bero_read_mario_pera) {
 }
 
 USER_FUNC(evt_bero_id_filter) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	evtSetValue(event, args[0], bero_id_filter(evtGetValue(event, args[0])));
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_bero_get_info_num) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 id = evtGetValue(event, args[0]);
 	BeroEntry* bero = BeroINFOARR[id];
 	s32 kind;
-	s32* evt;
+	EvtWord* evt;
 
 	event->lwData[3] = (s32)bero->hitName;
 	event->lwData[4] = bero->type;
@@ -581,7 +581,7 @@ USER_FUNC(evt_bero_get_info_num) {
 
 s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall)
 {
-  s32 *args = event->args;
+  EvtWord *args = event->args;
   MarioWork *wp = marioGetPtr();
   s32 dir = evtGetValue(event, args[0]);
   float new_var3;
@@ -711,7 +711,7 @@ void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, V
 }
 
 USER_FUNC(bero_get_position_pipe_pure) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 id = evtGetValue(event, args[0]);
 	s32 a = evtGetFloat(event, args[1]);
 	s32 kind = event->lwData[5];
@@ -729,7 +729,7 @@ USER_FUNC(bero_get_position_pipe_pure) {
 
 
 USER_FUNC(bero_get_position_pipe2) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 id = evtGetValue(event, args[0]);
 	s32 a = evtGetFloat(event, args[1]);
 	Vec start, end;
@@ -1021,7 +1021,7 @@ s32 bero_set_disp_position_pipe(BeroPipeInfo* info) {
 
 USER_FUNC(evt_bero_switch_on) {
 	BeroEntry** table = BeroINFOARR;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	BeroEntry** temp;
 	s32 id = evtGetValue(event, *args++);
 	s32 newId = id;
@@ -1055,7 +1055,7 @@ USER_FUNC(evt_bero_switch_on) {
 
 USER_FUNC(evt_bero_switch_off) {
 	BeroEntry** table = BeroINFOARR;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	BeroEntry** temp;
 	s32 id = evtGetValue(event, *args++);
 	s32 newId = id;
@@ -1089,7 +1089,7 @@ USER_FUNC(evt_bero_switch_off) {
 
 USER_FUNC(evt_bero_get_number) {
 	BeroEntry** table = BeroINFOARR;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	BeroEntry** temp;
 	s32 id = evtGetValue(event, *args++);
 	s32 newId = id;
@@ -1116,14 +1116,14 @@ USER_FUNC(evt_bero_get_number) {
 }
 
 USER_FUNC(evt_bero_case_id_save) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 id = evtGetValue(event, args[0]);
 	BeroID[id] = evtGetValue(event, args[1]);
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_bero_case_id_load) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 id = evtGetValue(event, args[0]);
 	evtSetValue(event, args[1], BeroID[id]);
 	return EVT_RETURN_DONE;
@@ -1146,7 +1146,7 @@ USER_FUNC(evt_bero_disppos_load) {
 #include "system.h"
 
 USER_FUNC(evt_bero_move_mario_speed) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	f32 speed = evtGetFloat(event, args[0]);
 	OSTime now = gp->inBattle ? gp->renderTime : gp->renderFieldTime;
 	f32 s, c;
@@ -1200,7 +1200,7 @@ USER_FUNC(evt_bero_move_mario_speed) {
 
 USER_FUNC(evt_bero_overwrite) {
 	BeroEntry** temp, **table = BeroINFOARR;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 id = evtGetValue(event, args[0]);
 	s32 newId = id;
 	const char *string, *test;
@@ -1226,7 +1226,7 @@ USER_FUNC(evt_bero_overwrite) {
 }
 
 USER_FUNC(evt_bero_cam3d_change) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	CameraEntry* cam = camGetPtr(4);
 	s32 time = evtGetValue(event, args[0]);
 	s32 curve = evtGetValue(event, args[1]);
@@ -1262,7 +1262,7 @@ USER_FUNC(evt_bero_mario_go_wait) {
 }
 
 USER_FUNC(evt_bero_1stcheck) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	if (strcmp((const char*)event->lwData[13], "sys_01") == 0) {
 		evtSetValue(event, args[0], 1);
 	} else {

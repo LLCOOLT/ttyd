@@ -38,8 +38,8 @@ f32 fd_evt_kagemario___local_3PIO2_368;
 f32 fd_evt_kagemario_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_evt_kagemario___local_PIO2_367;
 f32 fd_evt_kagemario_one_364;
-static s32 evt_check[4];
-s32 evt_usu_kagemario_party_kill[42];
+static EvtWord evt_check[4];
+EvtWord evt_usu_kagemario_party_kill[42];
 
 static void callback(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;

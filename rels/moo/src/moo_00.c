@@ -90,25 +90,25 @@ f64 fd_moo_00__three_localstatic4_sqrtf;
 f64 fd_moo_00__half_localstatic3_sqrtf;
 static BeroEntry bero_entry_data[3];
 static f32 spline_dt[9];
-static s32 party_damage_pose[52];
-s32 party_damage_pose2[52];
-static s32 evt_first[525];
+static EvtWord party_damage_pose[52];
+EvtWord party_damage_pose2[52];
+static EvtWord evt_first[525];
 #ifdef VERSION_G8ME01
-s32 rock_main[105];
+EvtWord rock_main[105];
 #else
-static s32 rock_main[79];
+static EvtWord rock_main[79];
 #endif
 #ifdef VERSION_G8ME01
-static s32 rock_evt0[15];
+static EvtWord rock_evt0[15];
 #else
-static s32 rock_evt0[21];
+static EvtWord rock_evt0[21];
 #endif
 #ifdef VERSION_G8ME01
-static s32 rock_evt1[15];
+static EvtWord rock_evt1[15];
 #else
-static s32 rock_evt1[21];
+static EvtWord rock_evt1[21];
 #endif
-s32 moo_00_init_evt[133];
+EvtWord moo_00_init_evt[133];
 
 f32 fd_moo_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -104,17 +104,17 @@ f32 fd_gon_06___local_3PIO2_368;
 f32 fd_gon_06_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gon_06___local_PIO2_367;
 f32 fd_gon_06_one_364;
-static s32 door01_close[12];
-static s32 door01_open[12];
-static s32 door02_close[12];
-static s32 door02_open[12];
+static EvtWord door01_close[12];
+static EvtWord door01_open[12];
+static EvtWord door02_close[12];
+static EvtWord door02_open[12];
 static BeroEntry bero_entry_data[3];
-s32 evt_ori_open[130];
-s32 tsuritenjo_event[143];
+EvtWord evt_ori_open[130];
+EvtWord tsuritenjo_event[143];
 static s32 key_tbl[2];
-static s32 evt_majin[409];
-static s32 evt_majin2[241];
-s32 gon_06_init_evt[340];
+static EvtWord evt_majin[409];
+static EvtWord evt_majin2[241];
+EvtWord gon_06_init_evt[340];
 
 f32 fd_gon_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

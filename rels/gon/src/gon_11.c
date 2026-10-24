@@ -128,22 +128,22 @@ f32 fd_gon_11___local_3PIO2_368;
 f32 fd_gon_11_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gon_11___local_PIO2_367;
 f32 fd_gon_11_one_364;
-s32 evt_sound[8];
-static s32 door01_close[22];
-static s32 door01_open[22];
+EvtWord evt_sound[8];
+static EvtWord door01_close[22];
+static EvtWord door01_open[22];
 static BeroEntry bero_entry_data[2];
-static s32 gonbaba_standup_shake[23];
-static s32 gonbaba_fog_change[87];
-static s32 gonbaba_down_shake[83];
-s32 gonbaba_event[1410];
+static EvtWord gonbaba_standup_shake[23];
+static EvtWord gonbaba_fog_change[87];
+static EvtWord gonbaba_down_shake[83];
+EvtWord gonbaba_event[1410];
 static const char* capturemap[2];
 static Vec v_list[8];
-static s32 evt_cloud_main_evt[4];
-s32 iri_16_box_evt[33];
-s32 iri_16_cloud_evt[36];
-s32 iri_16_touch_evt[2];
-static s32 iri_16_init[57];
-s32 gon_11_init_evt[101];
+static EvtWord evt_cloud_main_evt[4];
+EvtWord iri_16_box_evt[33];
+EvtWord iri_16_cloud_evt[36];
+EvtWord iri_16_touch_evt[2];
+static EvtWord iri_16_init[57];
+EvtWord gon_11_init_evt[101];
 
 f32 fd_gon_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -979,7 +979,7 @@ USER_FUNC(evt_iri_16_cloud_init) {
 }
 
 USER_FUNC(evt_iri_16_cloud_ent) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     char** groups;
     char* hitName;
     void* endEvt;

@@ -140,7 +140,7 @@ static f32 sintbl[450] = {
 	}
 
 USER_FUNC(evt_moving_floor_alloc) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = (MovingFloor*)_mapAlloc(sizeof(MovingFloor));
 	memset(w, 0, sizeof(MovingFloor));
 	w->mode = event->lwData[6];
@@ -222,7 +222,7 @@ USER_FUNC(evt_moving_floor_alloc) {
 }
 
 USER_FUNC(evt_moving_floor_free) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = GETW();
 	if (w == NULL) {
 		return EVT_RETURN_DONE;
@@ -379,7 +379,7 @@ USER_FUNC(evt_moving_floor_init) {
 }
 
 USER_FUNC(evt_moving_floor_main) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = GETW();
 	s32 us = (((u32)event->lifetime - (u32)w->start) * 8) / (OS_TIMER_CLOCK / 125000);
 	f32 t = (f32)us;
@@ -404,7 +404,7 @@ USER_FUNC(evt_moving_floor_main2) {
 }
 
 USER_FUNC(moving_floor_get_end) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = GETW();
 	s32 a = (s32)w->cur;
 	s32 b = (s32)((f32)w->time[w->idx] * w->scale);
@@ -417,7 +417,7 @@ USER_FUNC(moving_floor_get_end) {
 }
 
 USER_FUNC(moving_floor_get_pause) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = GETW();
 	if (w->flags & 2) {
 		evtSetValue(event, args[1], 1);
@@ -428,21 +428,21 @@ USER_FUNC(moving_floor_get_pause) {
 }
 
 USER_FUNC(moving_floor_get_kind) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = GETW();
 	evtSetValue(event, args[1], w->kind);
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(moving_floor_get_mode) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = GETW();
 	evtSetValue(event, args[1], w->mode);
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(moving_floor_update_turn) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = GETW();
 	w->angle += w->turn;
 	if (w->angle < 0.0f) {
@@ -456,7 +456,7 @@ USER_FUNC(moving_floor_update_turn) {
 }
 
 USER_FUNC(moving_floor_getf_pos) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = GETW();
 	w->prevYoff = w->yoff;
 	WOBBLE(w)
@@ -467,7 +467,7 @@ USER_FUNC(moving_floor_getf_pos) {
 }
 
 USER_FUNC(moving_floor_getf_now_bpoint) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = GETW();
 	evtSetFloat(event, args[1], w->pos3[0] - w->prev[0]);
 	evtSetFloat(event, args[2], (w->pos3[1] + w->yoff) - (w->prev[1] + w->prevYoff));
@@ -476,7 +476,7 @@ USER_FUNC(moving_floor_getf_now_bpoint) {
 }
 
 USER_FUNC(moving_floor_get_stmsec) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = GETW();
 	if (w->flags & 1) {
 		evtSetValue(event, args[1], 0);
@@ -487,7 +487,7 @@ USER_FUNC(moving_floor_get_stmsec) {
 }
 
 USER_FUNC(moving_floor_getf_xz_scale) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = GETW();
 	f32 v = evtGetFloat(event, (s32)(w->pos3[1] + w->yoff));
 	evtSetFloat(event, args[1], (500.0f - v) / 500.0f);
@@ -508,7 +508,7 @@ USER_FUNC(moving_floor_reverse) {
 }
 
 USER_FUNC(moving_floor_set_se) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	MovingFloor* w = GETW();
 	char* name = (char*)evtGetValue(event, args[1]);
 	MapObject* obj;

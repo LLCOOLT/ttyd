@@ -44,15 +44,15 @@ f32 fd_las_13___local_3PIO2_368;
 f32 fd_las_13_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_13___local_PIO2_367;
 f32 fd_las_13_one_364;
-static s32 e_door_close[12];
-static s32 e_door_open[12];
+static EvtWord e_door_close[12];
+static EvtWord e_door_open[12];
 static BeroEntry bero_entry_data[2];
-static s32 box_evt[30];
-s32 switch_check[114];
-static s32 switch1_evt[11];
-static s32 switch2_evt[15];
-static s32 hint_plate[14];
-s32 las_13_init_evt[79];
+static EvtWord box_evt[30];
+EvtWord switch_check[114];
+static EvtWord switch1_evt[11];
+static EvtWord switch2_evt[15];
+static EvtWord hint_plate[14];
+EvtWord las_13_init_evt[79];
 
 f32 fd_las_13_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -210,7 +210,7 @@ EVT_BEGIN(las_13_init_evt)
 EVT_END()
 
 static USER_FUNC(small_star) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);

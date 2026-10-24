@@ -98,25 +98,25 @@ typedef struct { StatusVulnerability d; u8 pad[2]; } VivRegist;
 static VivDef defence;
 static VivDefAttr defence_attr;
 static VivRegist regist;
-static s32 attack_event[2];
-static s32 wait_event[6];
-static s32 battle_entry_event[59];
-static s32 init_event[68];
-static s32 damage_event[16];
-s32 vivian_hide_event[209];
+static EvtWord attack_event[2];
+static EvtWord wait_event[6];
+static EvtWord battle_entry_event[59];
+static EvtWord init_event[68];
+static EvtWord damage_event[16];
+EvtWord vivian_hide_event[209];
 BattleWeapon partyWeapon_VivianNormalAttack;
 BattleWeapon partyWeapon_VivianShadowGuard;
 BattleWeapon partyWeapon_VivianMagicalPowder;
 BattleWeapon partyWeapon_VivianCharmKissAttack;
-s32 partyVivianAttack_NormalAttack[581];
-s32 partyVivianAttack_ShadowGuard[430];
-s32 partyVivianAttack_MagicalPowder[VERSION_PICK(442, 448)];
-s32 partyVivianAttack_CharmKissAttack[464];
-s32 vivian_shadow_tail_event[78];
-s32 vivian_counter_damage_event[177];
-s32 vivian_appeal_event[80];
-static s32 party_win_reaction[18];
-static s32 attack_audience_event[189];
+EvtWord partyVivianAttack_NormalAttack[581];
+EvtWord partyVivianAttack_ShadowGuard[430];
+EvtWord partyVivianAttack_MagicalPowder[VERSION_PICK(442, 448)];
+EvtWord partyVivianAttack_CharmKissAttack[464];
+EvtWord vivian_shadow_tail_event[78];
+EvtWord vivian_counter_damage_event[177];
+EvtWord vivian_appeal_event[80];
+static EvtWord party_win_reaction[18];
+static EvtWord attack_audience_event[189];
 
 
 
@@ -283,7 +283,7 @@ EVT_END()
 #define INTPL(mode, cur, steps, a, b) ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(a, b, mode, cur, steps)
 
 USER_FUNC(battle_evt_majo_disp_on) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     BattleUnitPart* part;
     s32 id, partNo, flag;
@@ -1637,7 +1637,7 @@ EVT_END()
 #define INTPL(mode, cur, steps, a, b) ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(a, b, mode, cur, steps)
 
 USER_FUNC(battle_evt_majo_disp_off) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     BattleUnitPart* part;
     s32 id, partNo, flag, flag2;
@@ -1747,7 +1747,7 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
 double sqrt(double);
 
 USER_FUNC(_get_move_frame) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec a, b, d;
     f32 speed;
     s32 frames, out;
@@ -1773,7 +1773,7 @@ f32 BattleGetFloorHeight(BattleWork* wp, f32 x, f32 y, f32 z);
 
 USER_FUNC(_get_vivian_attack_position) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* self;
     BattleUnit* target;
     s32 targetId, x, y, z;
@@ -1811,7 +1811,7 @@ USER_FUNC(_get_vivian_attack_position) {
 
 USER_FUNC(_make_kagenuke_weapon) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 index;
     BattleWeapon* weapon;
@@ -1833,7 +1833,7 @@ USER_FUNC(_make_kagenuke_weapon) {
 
 USER_FUNC(_disp_heart_entry) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 id;
 

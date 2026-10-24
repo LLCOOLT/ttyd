@@ -58,18 +58,18 @@ f32 fd_win_03___local_3PIO2_368;
 f32 fd_win_03_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_win_03___local_PIO2_367;
 f32 fd_win_03_one_364;
-s32 clouda_house_in[12];
-s32 clouda_house_out[19];
-s32 cloud_out[12];
-s32 cloud_in[12];
+EvtWord clouda_house_in[12];
+EvtWord clouda_house_out[19];
+EvtWord cloud_out[12];
+EvtWord cloud_in[12];
 static BeroEntry bero_entry_data[5];
-s32 lookat_house[45];
-static s32 cloud_toujou[76];
-s32 cloud_lostitem[215];
-s32 tree_evt_01[20];
+EvtWord lookat_house[45];
+static EvtWord cloud_toujou[76];
+EvtWord cloud_lostitem[215];
+EvtWord tree_evt_01[20];
 static TreeAccess tree_access_data[5];
-s32 dummy_event[4];
-s32 win_03_init_evt[108];
+EvtWord dummy_event[4];
+EvtWord win_03_init_evt[108];
 
 f32 fd_win_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

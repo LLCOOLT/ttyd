@@ -40,7 +40,7 @@ extern s32 cloudGetStatus();
 USER_FUNC(evt_party_flg_onoff) {
 	PartyEntry* p;
 	int mask;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -57,7 +57,7 @@ USER_FUNC(evt_party_flg_onoff) {
 USER_FUNC(evt_party_dispflg_onoff) {
 	PartyEntry* p;
 	int mask;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -74,7 +74,7 @@ USER_FUNC(evt_party_dispflg_onoff) {
 USER_FUNC(evt_party_trigflg_onoff) {
 	PartyEntry* p;
 	int mask;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -90,7 +90,7 @@ USER_FUNC(evt_party_trigflg_onoff) {
 
 USER_FUNC(evt_party_cont_onoff) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -114,7 +114,7 @@ USER_FUNC(evt_party_init_camid) {
 
 USER_FUNC(evt_party_set_camid) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -168,7 +168,7 @@ USER_FUNC(evt_party_force_reset_outofscreen) {
 
 USER_FUNC(evt_party_outofscreen) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -179,7 +179,7 @@ USER_FUNC(evt_party_outofscreen) {
 
 USER_FUNC(evt_party_set_pos) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -192,7 +192,7 @@ USER_FUNC(evt_party_set_pos) {
 
 USER_FUNC(evt_party_set_hosei_xyz) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -205,7 +205,7 @@ USER_FUNC(evt_party_set_hosei_xyz) {
 
 USER_FUNC(evt_party_get_pos) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		evtSetFloat(event, args[1], -5000.0f);
@@ -224,7 +224,7 @@ inline float inline_fn(f32 arg0, f32 arg1, f32 arg2, s32 arg3) {
 }
 
 USER_FUNC(evt_party_set_dir) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	PartyEntry* p;
 	f32 ang, t, st;
 	s32 fr, v, c;
@@ -274,7 +274,7 @@ USER_FUNC(evt_party_set_dir) {
 }
 
 USER_FUNC(evt_party_set_dir_npc) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	PartyEntry* p = partyGetPtr(args[0]);
 	NpcEntry* npc;
 	s32 nm;
@@ -299,7 +299,7 @@ USER_FUNC(evt_party_set_dir_npc) {
 }
 
 USER_FUNC(evt_party_set_dir_pos) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	PartyEntry* p = partyGetPtr(args[0]);
 	f32 x, z, camYaw, a;
 	if (p == NULL) {
@@ -316,7 +316,7 @@ USER_FUNC(evt_party_set_dir_pos) {
 
 USER_FUNC(evt_party_get_dispdir) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		evtSetFloat(event, args[1], 0.0f);
@@ -328,7 +328,7 @@ USER_FUNC(evt_party_get_dispdir) {
 
 USER_FUNC(evt_party_set_dispdir) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -356,7 +356,7 @@ USER_FUNC(evt_party_run) {
 
 USER_FUNC(evt_party_move_pos) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	f32 x, z, spd;
 	if (isFirstCall) {
 		event->userdata[2] = 0;
@@ -392,7 +392,7 @@ USER_FUNC(evt_party_move_pos) {
 
 USER_FUNC(evt_party_move_pos2) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	f32 x, z, spd, dist;
 	if (isFirstCall) {
 		event->userdata[2] = 0;
@@ -431,7 +431,7 @@ USER_FUNC(evt_party_wait_landon) {
 
 USER_FUNC(evt_party_jump_pos) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	f32 y, ff, half, dy, x, z, hgt, g;
 	s32 ms, mode;
 	f32 tmp[2];
@@ -537,7 +537,7 @@ USER_FUNC(evt_party_jump_pos) {
 
 USER_FUNC(evt_party_move_behind_mario) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 v;
 	p = GETPARTY(args);
 	if (p == NULL) {
@@ -550,7 +550,7 @@ USER_FUNC(evt_party_move_behind_mario) {
 
 USER_FUNC(evt_party_move_beside_mario) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 v;
 	p = GETPARTY(args);
 	if (p == NULL) {
@@ -563,7 +563,7 @@ USER_FUNC(evt_party_move_beside_mario) {
 
 USER_FUNC(evt_party_set_homing_dist) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -574,7 +574,7 @@ USER_FUNC(evt_party_set_homing_dist) {
 
 USER_FUNC(evt_party_set_pose) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 v;
 	p = GETPARTY(args);
 	if (p == NULL) {
@@ -605,7 +605,7 @@ USER_FUNC(evt_party_sleep_off) {
 
 USER_FUNC(evt_party_set_breed_pose) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 v;
 	p = GETPARTY(args);
 	if (p != NULL) {
@@ -618,7 +618,7 @@ USER_FUNC(evt_party_set_breed_pose) {
 USER_FUNC(L_evt_party_dokan) {
 	PartyEntry* p;
 	s32 dst, v;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -634,7 +634,7 @@ USER_FUNC(L_evt_party_dokan) {
 }
 
 USER_FUNC(evt_party_get_status) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 id = args[0];
 	s32 dst = args[1];
 	s32 st;
@@ -652,7 +652,7 @@ USER_FUNC(evt_party_get_status) {
 
 USER_FUNC(evt_party_get_name_hitobj_head) {
 	PartyEntry* p;
-	s32* args;
+	EvtWord* args;
 	const char* name = NULL;
 	s32 dst;
 	args = event->args;
@@ -670,7 +670,7 @@ USER_FUNC(evt_party_get_name_hitobj_head) {
 
 USER_FUNC(evt_party_get_name_hitobj_ride) {
 	PartyEntry* p;
-	s32* args;
+	EvtWord* args;
 	const char* name = NULL;
 	s32 dst;
 	args = event->args;
@@ -688,7 +688,7 @@ USER_FUNC(evt_party_get_name_hitobj_ride) {
 
 USER_FUNC(evt_party_thunders_use) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -709,7 +709,7 @@ USER_FUNC(evt_party_thunders_use) {
 
 USER_FUNC(evt_party_vivian_hold) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -730,7 +730,7 @@ USER_FUNC(evt_party_vivian_hold) {
 
 USER_FUNC(evt_party_vivian_unhold) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -745,7 +745,7 @@ USER_FUNC(evt_party_vivian_unhold) {
 
 USER_FUNC(L_evt_party_vivian_tail) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -759,7 +759,7 @@ USER_FUNC(L_evt_party_vivian_tail) {
 }
 
 USER_FUNC(evt_party_yoshi_ride) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	PartyEntry* p;
 	s32 ride;
 	p = GETPARTY(args);
@@ -795,7 +795,7 @@ USER_FUNC(evt_party_yoshi_ride) {
 
 USER_FUNC(evt_party_yoshi_fly) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -817,7 +817,7 @@ USER_FUNC(evt_party_yoshi_fly) {
 
 USER_FUNC(evt_party_nokotaro_kick) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -843,7 +843,7 @@ USER_FUNC(evt_party_nokotaro_kick) {
 
 USER_FUNC(evt_party_nokotaro_kick_hold) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -870,7 +870,7 @@ USER_FUNC(evt_party_nokotaro_kick_hold) {
 USER_FUNC(evt_party_nokotaro_hold_cancel) {
 	PartyEntry* p;
 	s32 ret = 0;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -908,7 +908,7 @@ USER_FUNC(evt_party_nokotaro_hold_cancel) {
 USER_FUNC(evt_party_nokotaro_get_status) {
 	s32 dst;
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -923,7 +923,7 @@ USER_FUNC(evt_party_nokotaro_get_status) {
 
 USER_FUNC(evt_party_cloud_breathout) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -954,7 +954,7 @@ extern void N_cloudLockAnimationsOff(PartyEntry* party);
 // US only.
 USER_FUNC(N_evt_party_cloud_lock_animations_on_off) {
 	PartyEntry* p;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
 		return EVT_RETURN_DONE;

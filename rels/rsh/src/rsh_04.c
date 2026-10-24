@@ -94,79 +94,79 @@ static const char* door_3[7];
 static const char* door_4[7];
 static const char* door_5[7];
 #ifdef VERSION_G8ME01
-s32 evt_rsh_konarikin_irai_party_talk[89];
+EvtWord evt_rsh_konarikin_irai_party_talk[89];
 #else
-s32 evt_rsh_konarikin_irai_party_talk[85];
+EvtWord evt_rsh_konarikin_irai_party_talk[85];
 #endif
 #ifdef VERSION_G8ME01
-s32 evt_allow_kamotsu[77];
+EvtWord evt_allow_kamotsu[77];
 #else
-s32 evt_allow_kamotsu[73];
+EvtWord evt_allow_kamotsu[73];
 #endif
-s32 evt_mario_chuumoku[10];
-s32 evt_party_chuumoku[11];
+EvtWord evt_mario_chuumoku[10];
+EvtWord evt_party_chuumoku[11];
 #ifdef VERSION_G8ME01
-s32 evt_shorui_funshitu[362];
+EvtWord evt_shorui_funshitu[362];
 #else
-s32 evt_shorui_funshitu[352];
+EvtWord evt_shorui_funshitu[352];
 #endif
 static s32 item_tbl[2];
-s32 evt_daijisouna_kami[208];
-s32 evt_syasyou_auto_talk[27];
-static s32 init_syashou[56];
+EvtWord evt_daijisouna_kami[208];
+EvtWord evt_syasyou_auto_talk[27];
+static EvtWord init_syashou[56];
 static s32 item_tbl2[2];
 #ifdef VERSION_G8ME01
-static s32 talk_syashou[413];
+static EvtWord talk_syashou[413];
 #else
-static s32 talk_syashou[367];
+static EvtWord talk_syashou[367];
 #endif
-s32 talk_sarary_repeat[43];
-static s32 init_sarary[55];
-static s32 talk_sarary[72];
-s32 talk_papa_mama[167];
-s32 talk_papa_repeat[40];
-static s32 init_papa[46];
-static s32 talk_papa[49];
-s32 talk_mama_repeat[40];
-static s32 init_mama[37];
-static s32 talk_mama[57];
-static s32 init_konari[46];
+EvtWord talk_sarary_repeat[43];
+static EvtWord init_sarary[55];
+static EvtWord talk_sarary[72];
+EvtWord talk_papa_mama[167];
+EvtWord talk_papa_repeat[40];
+static EvtWord init_papa[46];
+static EvtWord talk_papa[49];
+EvtWord talk_mama_repeat[40];
+static EvtWord init_mama[37];
+static EvtWord talk_mama[57];
+static EvtWord init_konari[46];
 s32 item_tbl3[2];
 #ifdef VERSION_G8ME01
-static s32 talk_konari[265];
+static EvtWord talk_konari[265];
 #else
-static s32 talk_konari[219];
+static EvtWord talk_konari[219];
 #endif
-s32 talk_powan_repeat[43];
-static s32 init_powan[64];
-static s32 talk_powan[204];
+EvtWord talk_powan_repeat[43];
+static EvtWord init_powan[64];
+static EvtWord talk_powan[204];
 static NpcSetupInfo npc_data[7];
-s32 evt_tana_5[50];
+EvtWord evt_tana_5[50];
 /* shelf access table read by READ_INT4: hit, msg, event, second msg; a NULL hit ends it */
-typedef struct ShelfAccess { const char* hit; const char* msg; s32* evt; const char* msg2; } ShelfAccess;
+typedef struct ShelfAccess { const char* hit; const char* msg; EvtWord* evt; const char* msg2; } ShelfAccess;
 typedef struct ShelfAccessTbl3 { ShelfAccess rows[3]; const char* end[1]; } ShelfAccessTbl3;
 static ShelfAccessTbl3 access_tbl;
-static s32 evt_access[32];
-static s32 evt_access_entry[25];
-static s32 evt_door_msg[102];
-s32 evt_narikin_room[87];
-s32 evt_powan_room[83];
+static EvtWord evt_access[32];
+static EvtWord evt_access_entry[25];
+static EvtWord evt_door_msg[102];
+EvtWord evt_narikin_room[87];
+EvtWord evt_powan_room[83];
 #ifdef VERSION_G8ME01
-s32 rsh_04_init_evt[214];
+EvtWord rsh_04_init_evt[214];
 #else
-s32 rsh_04_init_evt[201];
+EvtWord rsh_04_init_evt[201];
 #endif
-s32 rsh_04_a_init_evt[96];
-s32 rsh_04_b_init_evt[44];
+EvtWord rsh_04_a_init_evt[96];
+EvtWord rsh_04_b_init_evt[44];
 static const char* window_tbl[4];
-s32 rsh_04_c_init_evt[67];
+EvtWord rsh_04_c_init_evt[67];
 static BeroEntry bero_data_a_return[3];
 static BeroEntry bero_data_b_return[3];
 static BeroEntry bero_data_c_return[3];
-s32 rsh_04_init_evt_nidome[149];
-s32 rsh_04_a_init_evt_nidome[28];
-s32 rsh_04_b_init_evt_nidome[28];
-s32 rsh_04_c_init_evt_nidome[38];
+EvtWord rsh_04_init_evt_nidome[149];
+EvtWord rsh_04_a_init_evt_nidome[28];
+EvtWord rsh_04_b_init_evt_nidome[28];
+EvtWord rsh_04_c_init_evt_nidome[38];
 
 f32 fd_rsh_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1963,7 +1963,7 @@ EVT_END()
 BOOL winGhostDiaryChk(void);
 
 static USER_FUNC(mario_flag) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
     if (fbatGetPointer()->mode == 2 || winGhostDiaryChk()) {
         evtSetValue(event, args[0], 1);

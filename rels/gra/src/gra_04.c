@@ -55,13 +55,13 @@ f32 fd_gra_04___local_3PIO2_368;
 f32 fd_gra_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gra_04___local_PIO2_367;
 f32 fd_gra_04_one_364;
-static s32 in_evt[5];
-static s32 out_evt[142];
-static s32 out_evt2[110];
+static EvtWord in_evt[5];
+static EvtWord out_evt[142];
+static EvtWord out_evt2[110];
 static BeroEntry bero_entry_data[5];
-s32 gra_04_tree_open_evt[41];
+EvtWord gra_04_tree_open_evt[41];
 static const char* fukitobashi_tbl[6];
-s32 gra_04_init_evt[64];
+EvtWord gra_04_init_evt[64];
 
 f32 fd_gra_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -311,7 +311,7 @@ EVT_END()
 s32 marioRollCancelDisable(void);
 
 USER_FUNC(roll_release_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], marioRollCancelDisable() == 0);
     return EVT_RETURN_DONE;
 }

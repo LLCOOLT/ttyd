@@ -131,34 +131,34 @@ f32 fd_pik_02___local_3PIO2_368;
 f32 fd_pik_02_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_pik_02___local_PIO2_367;
 f32 fd_pik_02_one_364;
-s32 haikei_on[24];
-s32 haikei_off[28];
-s32 evt_return_sub[99];
-s32 evt_return[13];
-s32 evt_go[7];
-static s32 s_door_open[22];
-static s32 s_door_close[22];
+EvtWord haikei_on[24];
+EvtWord haikei_off[28];
+EvtWord evt_return_sub[99];
+EvtWord evt_return[13];
+EvtWord evt_go[7];
+static EvtWord s_door_open[22];
+static EvtWord s_door_close[22];
 static BeroEntry bero_data[5];
-s32 out_room[12];
+EvtWord out_room[12];
 BeroEntry s_bero_peach[1];
-static s32 init_powan[30];
-static s32 talk_powan[53];
-s32 init_majo[17];
-s32 init_mari[17];
-s32 init_ramp[17];
-s32 patakuri_init[7];
-static s32 baba_init[7];
+static EvtWord init_powan[30];
+static EvtWord talk_powan[53];
+EvtWord init_majo[17];
+EvtWord init_mari[17];
+EvtWord init_ramp[17];
+EvtWord patakuri_init[7];
+static EvtWord baba_init[7];
 static NpcSetupInfo npc_data[7];
-s32 evt_garnet[562];
-static s32 evt_sw[89];
-s32 evt_kaiga[14];
-static s32 evt_daiza[27];
-s32 pik_02_koopa_evt[1256];
-s32 nise_starstone_init[18];
+EvtWord evt_garnet[562];
+static EvtWord evt_sw[89];
+EvtWord evt_kaiga[14];
+static EvtWord evt_daiza[27];
+EvtWord pik_02_koopa_evt[1256];
+EvtWord nise_starstone_init[18];
 #ifdef VERSION_G8ME01
-s32 pik_02_init_evt[172];
+EvtWord pik_02_init_evt[172];
 #else
-s32 pik_02_init_evt[166];
+EvtWord pik_02_init_evt[166];
 #endif
 
 f32 fd_pik_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
@@ -511,7 +511,7 @@ static NpcSetupInfo npc_data[] = {
 };
 
 static USER_FUNC(npc_set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -589,7 +589,7 @@ USER_FUNC(hoshi_jump) {
 #pragma opt_lifetimes reset
 
 USER_FUNC(get_starstone_seq) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
 
     evtSetValue(event, args[1], ((EffStarStoneWork*)eff->userdata)->state);
@@ -604,7 +604,7 @@ static USER_FUNC(starstone_fall) {
 }
 
 static USER_FUNC(set_starstone_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -618,7 +618,7 @@ static USER_FUNC(set_starstone_pos) {
 }
 
 static USER_FUNC(get_starstone_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
 
     evtSetFloat(event, args[1], ((EffStarStoneWork*)eff->userdata)->position.x);
@@ -628,7 +628,7 @@ static USER_FUNC(get_starstone_pos) {
 }
 
 static USER_FUNC(starstone_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 type = evtGetValue(event, args[1]);
     f32 x = evtGetFloat(event, args[2]);

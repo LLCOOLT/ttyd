@@ -140,25 +140,25 @@ static Vec splineTableOut4_1[5];
 static Vec splineTableOut4_2[5];
 static Vec splineTableOut4_3[5];
 static Vec splineTableOut4_4[5];
-static s32 init_event[143];
-static s32 damage_event[17];
-static s32 barriern_dmg_first_attack_pos[19];
-static s32 satellite_blur_on[42];
-static s32 satellite_blur_off[29];
-static s32 unison_phase_event[190];
-static s32 attack_event[106];
-static s32 recovery_event[69];
-static s32 start_avoid[26];
-static s32 wakka_attack_common_event_no_hit[305];
-static s32 wakka_attack_common_event_hit[211];
-static s32 damage_check_event_sub[131];
-static s32 wakka_attack_event[255];
-static s32 wawawa_attack_event_satellite_blur[10];
-static s32 wawawa_attack_event[548];
-static s32 wawawa_attack_event_sub[87];
-static s32 wawawa_attack_event_sub_no_last[10];
-static s32 wawawa_attack_event_sub_last[93];
-static s32 wait_event[116];
+static EvtWord init_event[143];
+static EvtWord damage_event[17];
+static EvtWord barriern_dmg_first_attack_pos[19];
+static EvtWord satellite_blur_on[42];
+static EvtWord satellite_blur_off[29];
+static EvtWord unison_phase_event[190];
+static EvtWord attack_event[106];
+static EvtWord recovery_event[69];
+static EvtWord start_avoid[26];
+static EvtWord wakka_attack_common_event_no_hit[305];
+static EvtWord wakka_attack_common_event_hit[211];
+static EvtWord damage_check_event_sub[131];
+static EvtWord wakka_attack_event[255];
+static EvtWord wawawa_attack_event_satellite_blur[10];
+static EvtWord wawawa_attack_event[548];
+static EvtWord wawawa_attack_event_sub[87];
+static EvtWord wawawa_attack_event_sub_no_last[10];
+static EvtWord wawawa_attack_event_sub_last[93];
+static EvtWord wait_event[116];
 
 f32 fd_barriern_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -747,7 +747,7 @@ static s32 barriern_zanzou_sub(BOOL isFirstCall, BattleUnit* unit, f32* scales, 
 }
 
 static USER_FUNC(barriern_satellite_zanzou) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     s32 n = evtGetValue(event, args[1]);
     BattleWork* wp = _battleWorkPointer;
@@ -760,7 +760,7 @@ static USER_FUNC(barriern_satellite_zanzou) {
 }
 
 static USER_FUNC(barriern_satellite_zanzou2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     s32 n = evtGetValue(event, args[1]);
     BattleWork* wp = _battleWorkPointer;
@@ -1595,7 +1595,7 @@ static u8 barriernSatelliteTo_Main(BattleUnit* unit, s32 n) {
 }
 
 static USER_FUNC(barriernSatelliteToInside) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 num = evtGetValue(event, args[1]);
     BattleUnit* unit;
@@ -1652,7 +1652,7 @@ static USER_FUNC(barriernSatelliteToInside) {
 }
 
 static USER_FUNC(barriernSatelliteToOutside) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 num = evtGetValue(event, args[1]);
     BattleUnit* unit;
@@ -1755,7 +1755,7 @@ static USER_FUNC(barriernSatelliteToOutside) {
 }
 
 static USER_FUNC(outSplineTableSet) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
     BattleUnitPart* part;
@@ -1798,7 +1798,7 @@ static void outSplineTableSet_Sub(BattleUnit* unit, s32 n, Vec* table) {
 }
 
 static USER_FUNC(barriern_wawawa_set_target) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 unitIdx[10];
     s32 partIdx[10];
     s32 i;
@@ -1848,7 +1848,7 @@ static void barriern_wawawa_get_next_target(s32* unitIdx, s32* partIdx) {
 static USER_FUNC(_check_satellite) {
     s32 id = BattleTransID(event, -2);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnitPart* part;
     f32 x;
     f32 y;
@@ -1915,7 +1915,7 @@ static USER_FUNC(_check_satellite) {
 }
 
 static USER_FUNC(battleGetBarriernSatelliteInitPos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 num;
     s32 index;

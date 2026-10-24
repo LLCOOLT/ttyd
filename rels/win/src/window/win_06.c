@@ -66,11 +66,11 @@ f32 fd_win_06___local_3PIO2_368;
 f32 fd_win_06_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_win_06___local_PIO2_367;
 f32 fd_win_06_one_364;
-static s32 first_evt_dokan[18];
+static EvtWord first_evt_dokan[18];
 static BeroEntry bero_entry_data[3];
-s32 welcome_wonderforest_init[6];
-s32 welcome_wonderforest[260];
-s32 win_06_init_evt[82];
+EvtWord welcome_wonderforest_init[6];
+EvtWord welcome_wonderforest[260];
+EvtWord win_06_init_evt[82];
 
 f32 fd_win_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -260,7 +260,7 @@ EVT_BEGIN(win_06_init_evt)
 EVT_END()
 
 static USER_FUNC(cam_kaiten_set_para) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     KaitenParam* p;
 
     switch (evtGetValue(event, args[0])) {
@@ -287,7 +287,7 @@ static USER_FUNC(cam_kaiten_set_para) {
 }
 
 static USER_FUNC(cam_kaiten_get_para) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     KaitenParam* p;
 
     switch (evtGetValue(event, args[0])) {
@@ -336,7 +336,7 @@ static inline f32 fid(f32 x) {
 }
 
 static USER_FUNC(cam_kaiten_init) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec target;
     Vec pos;
     f32 dist;

@@ -3,19 +3,19 @@
 #include "evt/evt_cmd.h"
 #include <dolphin/types.h>
 
-extern s32 btldefaultevt_Damage[];
-extern s32 btldefaultevt_Confuse[];
+extern EvtWord btldefaultevt_Damage[];
+extern EvtWord btldefaultevt_Confuse[];
 
-extern s32 btldefaultevt_Appeal[];
-extern s32 btldefaultevt_BiribiriMove[];
-extern s32 btldefaultevt_CantMoveZeroGravity[];
-extern s32 btldefaultevt_ChangeParty[];
-extern s32 btldefaultevt_Defend[];
-extern s32 btldefaultevt_DefendParty[];
-extern s32 btldefaultevt_Dummy[];
-extern s32 btldefaultevt_Escape[];
-extern s32 btldefaultevt_LectureEnd[];
-extern s32 btldefaultevt_ProtectPartner[];
-extern s32 btldefaultevt_SuitoruBadgeEffect[];
-extern s32 btldefaultevt_Wait[];
-extern s32 btldefaultevt_avoid_counter_event[];
+extern EvtWord btldefaultevt_Appeal[];
+extern EvtWord btldefaultevt_BiribiriMove[];
+extern EvtWord btldefaultevt_CantMoveZeroGravity[];
+extern EvtWord btldefaultevt_ChangeParty[];
+extern EvtWord btldefaultevt_Defend[];
+extern EvtWord btldefaultevt_DefendParty[];
+extern EvtWord btldefaultevt_Dummy[];
+extern EvtWord btldefaultevt_Escape[];
+extern EvtWord btldefaultevt_LectureEnd[];
+extern EvtWord btldefaultevt_ProtectPartner[];
+extern EvtWord btldefaultevt_SuitoruBadgeEffect[];
+extern EvtWord btldefaultevt_Wait[];
+extern EvtWord btldefaultevt_avoid_counter_event[];

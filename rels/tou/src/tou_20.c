@@ -48,11 +48,11 @@ f32 fd_tou_20___local_3PIO2_368;
 f32 fd_tou_20_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tou_20___local_PIO2_367;
 f32 fd_tou_20_one_364;
-static s32 evt_tou_balloon[85];
-s32 evt_anim[66];
+static EvtWord evt_tou_balloon[85];
+EvtWord evt_anim[66];
 static f32 spline_dt[9];
-s32 evt_anim2[147];
-s32 tou_20_init_evt[223];
+EvtWord evt_anim2[147];
+EvtWord tou_20_init_evt[223];
 
 f32 fd_tou_20_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

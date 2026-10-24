@@ -232,52 +232,52 @@ f32 fd_tou_one_364;
 f64 fd_tou__three_localstatic4_sqrtf;
 f64 fd_tou__half_localstatic3_sqrtf;
 const char* lockerDt[46];
-s32 evt_close[188];
-static s32 evt_open[VERSION_PICK(165, 173)];
-s32 evt_tou_locker_init[109];
-s32 evt_tou_monitor_on[18];
-s32 evt_tou_monitor_off[18];
-s32 evt_tou_monitor_init[69];
-s32 talk_gardman_doku[18];
-s32 dummy_party_msg_pkr[10];
-s32 dummy_party_msg_pnk[10];
-s32 dummy_party_msg_yos[10];
-s32 dummy_party_msg_win[10];
-s32 party_npc_replace[139];
-static s32 evt_tamago_scale[89];
-static s32 evt_tamago_scale2[83];
-s32 evt_tamago_byebye[160];
-s32 talk_gardman[191];
-static s32 evt_gardman[VERSION_PICK(318, 335)];
-s32 evt_gardman_spawn[4];
-s32 evt_tou_match_make_default_sub[406];
-s32 evt_tou_match_make_default[303];
-s32 evt_talk_doku_cake[14];
-s32 evt_eat_doku_cake[270];
-s32 evt_doku_cake[234];
-s32 evt_michel_1[39];
-s32 evt_michel_2[42];
-s32 evt_michel_3_sub[97];
-s32 evt_michel_3[256];
-s32 evt_michel_4[312];
-s32 evt_michel_5[42];
-s32 evt_michel_6[42];
-s32 evt_michel_7[42];
-s32 evt_michel_8[VERSION_PICK(620, 616)];
-s32 evt_michel_9[40];
-s32 evt_mail_1[157];
-s32 evt_mail_2[154];
-s32 evt_eat_cake[157];
-s32 evt_cake_init[31];
-s32 evt_cake[37];
-static s32 evt_koopa_after[5];
-s32 evt_mail_3[157];
-s32 evt_mail_4[151];
-s32 evt_mail_5[157];
-s32 evt_tamago_hello[41];
-s32 evt_tamago_hello2[75];
-s32 evt_tou_ranking_msg[62];
-s32 evt_tou_match_after_default[VERSION_PICK(1474, 1621)];
+EvtWord evt_close[188];
+static EvtWord evt_open[VERSION_PICK(165, 173)];
+EvtWord evt_tou_locker_init[109];
+EvtWord evt_tou_monitor_on[18];
+EvtWord evt_tou_monitor_off[18];
+EvtWord evt_tou_monitor_init[69];
+EvtWord talk_gardman_doku[18];
+EvtWord dummy_party_msg_pkr[10];
+EvtWord dummy_party_msg_pnk[10];
+EvtWord dummy_party_msg_yos[10];
+EvtWord dummy_party_msg_win[10];
+EvtWord party_npc_replace[139];
+static EvtWord evt_tamago_scale[89];
+static EvtWord evt_tamago_scale2[83];
+EvtWord evt_tamago_byebye[160];
+EvtWord talk_gardman[191];
+static EvtWord evt_gardman[VERSION_PICK(318, 335)];
+EvtWord evt_gardman_spawn[4];
+EvtWord evt_tou_match_make_default_sub[406];
+EvtWord evt_tou_match_make_default[303];
+EvtWord evt_talk_doku_cake[14];
+EvtWord evt_eat_doku_cake[270];
+EvtWord evt_doku_cake[234];
+EvtWord evt_michel_1[39];
+EvtWord evt_michel_2[42];
+EvtWord evt_michel_3_sub[97];
+EvtWord evt_michel_3[256];
+EvtWord evt_michel_4[312];
+EvtWord evt_michel_5[42];
+EvtWord evt_michel_6[42];
+EvtWord evt_michel_7[42];
+EvtWord evt_michel_8[VERSION_PICK(620, 616)];
+EvtWord evt_michel_9[40];
+EvtWord evt_mail_1[157];
+EvtWord evt_mail_2[154];
+EvtWord evt_eat_cake[157];
+EvtWord evt_cake_init[31];
+EvtWord evt_cake[37];
+static EvtWord evt_koopa_after[5];
+EvtWord evt_mail_3[157];
+EvtWord evt_mail_4[151];
+EvtWord evt_mail_5[157];
+EvtWord evt_tamago_hello[41];
+EvtWord evt_tamago_hello2[75];
+EvtWord evt_tou_ranking_msg[62];
+EvtWord evt_tou_match_after_default[VERSION_PICK(1474, 1621)];
 
 void _prolog(void) {
     voidfunctionptr* ctor;
@@ -527,7 +527,7 @@ static void rankingControll(void) {
 }
 
 USER_FUNC(evt_tou_get_ranking) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 rank;
     s32 i;
 
@@ -537,7 +537,7 @@ USER_FUNC(evt_tou_get_ranking) {
 }
 
 static USER_FUNC(evt_tou_get_next_match) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 flag = evtGetValue(event, GSWF(2443));
     s32 rank;
     RankEntry* entry;
@@ -568,7 +568,7 @@ static USER_FUNC(evt_tou_get_next_match) {
 }
 
 USER_FUNC(evt_tou_get_fighter_info) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     FighterData* dt;
 
@@ -583,7 +583,7 @@ USER_FUNC(evt_tou_get_fighter_info) {
 }
 
 static USER_FUNC(evt_tou_get_fighter_name2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     FighterData* dt;
 
@@ -597,7 +597,7 @@ static USER_FUNC(evt_tou_get_fighter_name2) {
 }
 
 static USER_FUNC(evt_tou_get_fighter_rank) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 rank = 0;
     s32 i;
@@ -617,7 +617,7 @@ static USER_FUNC(evt_tou_get_fighter_rank) {
 }
 
 static USER_FUNC(evt_tou_get_fighter_battle_msg) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     FighterData* dt;
 
@@ -632,7 +632,7 @@ static USER_FUNC(evt_tou_get_fighter_battle_msg) {
 }
 
 static USER_FUNC(evt_tou_get_rule_info) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 mode = evtGetValue(event, args[0]);
     s32 num;
     RuleData* dt;
@@ -676,7 +676,7 @@ static USER_FUNC(evt_tou_get_rule_info) {
 }
 
 USER_FUNC(evt_tou_get_rule_msg2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 num;
     RuleData* dt;
@@ -709,7 +709,7 @@ USER_FUNC(evt_tou_get_rule_msg2) {
 }
 
 static USER_FUNC(evt_tou_set_ranking_win_lose) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 lose = evtGetValue(event, args[0]);
     s32 id = evtGetValue(event, args[1]);
     s32 i;
@@ -1318,7 +1318,7 @@ static USER_FUNC(evt_tou_print_ranking) {
 
 #ifdef VERSION_G8ME01
 USER_FUNC(tou_mario_keyoff_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (marioKeyOffChk() || marioCtrlOffChk()) {
         evtSetValue(event, args[0], 1);
@@ -2509,13 +2509,13 @@ USER_FUNC(onoff) {
 }
 
 static USER_FUNC(getYoshiColor) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], pouchGetPartyColor(4));
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(chk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], partyChkJoin(4) != 0);
     return EVT_RETURN_DONE;
 }
@@ -2542,7 +2542,7 @@ USER_FUNC(tou_mario_talk_end_wait) {
 }
 #else
 USER_FUNC(tou_mario_keyoff_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (marioKeyOffChk() || marioCtrlOffChk()) {
         evtSetValue(event, args[0], 1);
@@ -2577,7 +2577,7 @@ USER_FUNC(octo_start) {
 
 
 USER_FUNC(fight_money) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 rank = evtGetValue(event, args[0]);
     s32 win = evtGetValue(event, args[1]);
     s32 money;

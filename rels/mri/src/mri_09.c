@@ -89,25 +89,25 @@ f32 fd_mri_09___local_PIO2_367;
 f32 fd_mri_09_one_364;
 BeroEntry bero_bluejail[1];
 static BeroEntry bero_entry_data[5];
-s32 wall_roll_sub[96];
+EvtWord wall_roll_sub[96];
 #ifdef VERSION_G8ME01
-s32 wall_roll[272];
+EvtWord wall_roll[272];
 #else
-s32 wall_roll[264];
+EvtWord wall_roll[264];
 #endif
-static s32 breakyuka_init[17];
-static s32 breakyuka_main[9];
+static EvtWord breakyuka_init[17];
+static EvtWord breakyuka_main[9];
 static KusaAccess ueki_access_data[6];
-s32 slot00_event[52];
-s32 slot01_event[52];
-s32 slot02_event[52];
-s32 slot03_event[52];
-s32 slot_event[66];
-s32 get_blue_jail_key[143];
+EvtWord slot00_event[52];
+EvtWord slot01_event[52];
+EvtWord slot02_event[52];
+EvtWord slot03_event[52];
+EvtWord slot_event[66];
+EvtWord get_blue_jail_key[143];
 #ifdef VERSION_G8ME01
-s32 mri_09_init_evt[230];
+EvtWord mri_09_init_evt[230];
 #else
-s32 mri_09_init_evt[228];
+EvtWord mri_09_init_evt[228];
 #endif
 
 f32 fd_mri_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};

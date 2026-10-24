@@ -54,11 +54,11 @@ static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_kuriboo_attack;
-static s32 init_event[46];
-static s32 damage_event[10];
-static s32 phase_event[122];
-static s32 attack_event[492];
-static s32 wait_event[6];
+static EvtWord init_event[46];
+static EvtWord damage_event[10];
+static EvtWord phase_event[122];
+static EvtWord attack_event[492];
+static EvtWord wait_event[6];
 
 f32 fd_kurikuri_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -425,7 +425,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static USER_FUNC(krb_get_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
     f32 z1 = evtGetFloat(event, args[1]);
     f32 x2 = evtGetFloat(event, args[2]);

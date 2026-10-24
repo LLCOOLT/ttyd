@@ -31,7 +31,7 @@ f32 fd_hom_12___local_3PIO2_368;
 f32 fd_hom_12_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_hom_12___local_PIO2_367;
 f32 fd_hom_12_one_364;
-s32 hom_12_init_evt[140];
+EvtWord hom_12_init_evt[140];
 
 f32 fd_hom_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

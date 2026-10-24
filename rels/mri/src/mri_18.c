@@ -33,9 +33,9 @@ f32 fd_mri_18_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_mri_18___local_PIO2_367;
 f32 fd_mri_18_one_364;
 static BeroEntry bero_entry_data[5];
-static s32 evt_ueki_04[20];
+static EvtWord evt_ueki_04[20];
 static KusaAccess ueki_access_data[7];
-s32 mri_18_init_evt[105];
+EvtWord mri_18_init_evt[105];
 
 f32 fd_mri_18_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

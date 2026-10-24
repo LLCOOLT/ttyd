@@ -34,10 +34,10 @@ f32 fd_kpa_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_kpa_04___local_PIO2_367;
 f32 fd_kpa_04_one_364;
 static s32 kpa_act_stg2_mobj[80];
-static s32 kpa_fall[41];
-static s32 kpa_goal[22];
+static EvtWord kpa_fall[41];
+static EvtWord kpa_goal[22];
 static NpcSetupInfo npcEnt[1];
-s32 kpa_04_init_evt[58];
+EvtWord kpa_04_init_evt[58];
 
 f32 fd_kpa_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

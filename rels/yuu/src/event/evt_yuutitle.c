@@ -37,7 +37,7 @@ f32 fd_evt_yuutitle___local_3PIO2_368;
 f32 fd_evt_yuutitle_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_evt_yuutitle___local_PIO2_367;
 f32 fd_evt_yuutitle_one_364;
-static s32 main_evt[4];
+static EvtWord main_evt[4];
 
 void evt_yuutitle_disp_func(CameraId camera, void* param) {
     YuuTitleWork* wp = param;
@@ -78,7 +78,7 @@ USER_FUNC(evt_yuutitle_main_func) {
 }
 
 USER_FUNC(evt_yuutitle_alloc) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     YuuTitleWork* wp = _mapAlloc(sizeof(YuuTitleWork));
 
     memset(wp, 0, sizeof(YuuTitleWork));

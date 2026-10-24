@@ -160,37 +160,37 @@ f32 fd_hei_00___local_3PIO2_368;
 f32 fd_hei_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_hei_00___local_PIO2_367;
 f32 fd_hei_00_one_364;
-s32 make_proj_evt[4];
-s32 evt_gonbaba_shadow[161];
-static s32 first_evt[197];
-s32 gonbaba_evt[447];
-static s32 first_evt_dokan[18];
+EvtWord make_proj_evt[4];
+EvtWord evt_gonbaba_shadow[161];
+static EvtWord first_evt[197];
+EvtWord gonbaba_evt[447];
+static EvtWord first_evt_dokan[18];
 static BeroEntry bero_entry_data[6];
 static BeroEntry e3_bero[2];
-static s32 cam_shake[33];
-static s32 cam_shake2[27];
-s32 evt_snd[234];
-s32 moji_msg[22];
-static s32 switch_evt[303];
-static s32 dokan_evt[345];
-s32 setting_sun_stone[43];
+static EvtWord cam_shake[33];
+static EvtWord cam_shake2[27];
+EvtWord evt_snd[234];
+EvtWord moji_msg[22];
+static EvtWord switch_evt[303];
+static EvtWord dokan_evt[345];
+EvtWord setting_sun_stone[43];
 static s32 itemsel_table00[2];
-s32 sun_stone_set_event[68];
-s32 setting_moon_stone[43];
+EvtWord sun_stone_set_event[68];
+EvtWord setting_moon_stone[43];
 static s32 itemsel_table01[2];
-s32 moon_stone_set_event[68];
-static s32 ki_data_evt_01[20];
-s32 ki_data_evt_02[20];
+EvtWord moon_stone_set_event[68];
+static EvtWord ki_data_evt_01[20];
+EvtWord ki_data_evt_02[20];
 static TreeAccess ki_data[4];
 static NpcSetupInfo npcEnt[2];
 #ifdef VERSION_G8ME01
-s32 hei_00_koopa_evt[272];
+EvtWord hei_00_koopa_evt[272];
 #else
-s32 hei_00_koopa_evt[269];
+EvtWord hei_00_koopa_evt[269];
 #endif
-static s32 epilogue_npc_entry[30];
-static s32 epilogue_evt[90];
-s32 hei_00_init_evt[297];
+static EvtWord epilogue_npc_entry[30];
+static EvtWord epilogue_evt[90];
+EvtWord hei_00_init_evt[297];
 
 static USER_FUNC(proj_on) {
     animPoseSetMaterialFlagOn(marioGetPtr()->paperAnimGroupId[0], 0x400);
@@ -265,7 +265,7 @@ USER_FUNC(make_gonbaba_projection_evt) {
 }
 
 static USER_FUNC(proj_mtx) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 px = evtGetFloat(event, args[0]);
     f32 py = evtGetFloat(event, args[1]);
     f32 pz = evtGetFloat(event, args[2]);
@@ -1066,7 +1066,7 @@ static EVT_BEGIN(dokan_evt)
 EVT_END()
 
 USER_FUNC(hei_00_mario_keyoff_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (marioKeyOffChk() || marioCtrlOffChk()) {
         evtSetValue(event, args[0], TRUE);

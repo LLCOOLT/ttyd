@@ -63,20 +63,20 @@ static BattleWeapon weapon_bubble_attack;
 static BattleWeapon weapon_bubble_fire_attack;
 static BattleWeapon weapon_bubble_all_fire_attack;
 static BattleUnitSetup entry_bubble;
-static s32 init_event[39];
-static s32 damage_event[10];
-static s32 avoid_fire_event[16];
-static s32 damage_fire_explosion_event[103];
-static s32 friend_event[99];
-static s32 attack_event[71];
-static s32 normal_attack_event[412];
-static s32 fire_attack_event[365];
-static s32 all_fire_attackEvent_sub[10];
-static s32 all_fire_attack_event[321];
-static s32 wait_event[6];
+static EvtWord init_event[39];
+static EvtWord damage_event[10];
+static EvtWord avoid_fire_event[16];
+static EvtWord damage_fire_explosion_event[103];
+static EvtWord friend_event[99];
+static EvtWord attack_event[71];
+static EvtWord normal_attack_event[412];
+static EvtWord fire_attack_event[365];
+static EvtWord all_fire_attackEvent_sub[10];
+static EvtWord all_fire_attack_event[321];
+static EvtWord wait_event[6];
 
 static USER_FUNC(bubble_copy_status) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
     s32 id2 = BattleTransID(event, evtGetValue(event, args[1]));
     BattleWork* wp = _battleWorkPointer;
@@ -731,7 +731,7 @@ static EVT_BEGIN(fire_attack_event)
 EVT_END()
 
 static USER_FUNC(eff_all_fire) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     s32 index = evtGetValue(event, args[1]);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);

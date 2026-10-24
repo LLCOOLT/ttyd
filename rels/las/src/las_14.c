@@ -69,17 +69,17 @@ f32 fd_las_14___local_3PIO2_368;
 f32 fd_las_14_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_14___local_PIO2_367;
 f32 fd_las_14_one_364;
-static s32 w_door_close[12];
-static s32 w_door_open[12];
+static EvtWord w_door_close[12];
+static EvtWord w_door_open[12];
 static BeroEntry bero_entry_data[2];
-static s32 box_evt[30];
+static EvtWord box_evt[30];
 static const char* capturemap[3];
 static Vec v_list[8];
-static s32 evt_cloud_main_evt[4];
-static s32 cloud_evt[35];
-s32 touch_evt[2];
-static s32 hint_plate[14];
-s32 las_14_init_evt[81];
+static EvtWord evt_cloud_main_evt[4];
+static EvtWord cloud_evt[35];
+EvtWord touch_evt[2];
+static EvtWord hint_plate[14];
+EvtWord las_14_init_evt[81];
 
 static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7) {
     EventEntry event;
@@ -489,7 +489,7 @@ USER_FUNC(evt_las_cloud_init) {
 }
 
 USER_FUNC(evt_las_cloud_ent) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     char** groups;
     char* hitName;
     void* endEvt;

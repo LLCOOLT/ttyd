@@ -32,11 +32,11 @@ f32 fd_hei_02_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_hei_02___local_PIO2_367;
 f32 fd_hei_02_one_364;
 static BeroEntry bero_entry_data[3];
-s32 evt_ki_6[20];
+EvtWord evt_ki_6[20];
 static TreeAccess ki_data[8];
-static s32 evt_kusa_1[20];
+static EvtWord evt_kusa_1[20];
 static KusaAccess kusa_data[16];
-s32 hei_02_init_evt[129];
+EvtWord hei_02_init_evt[129];
 
 f32 fd_hei_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

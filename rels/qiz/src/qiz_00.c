@@ -20,7 +20,7 @@ f32 fd_qiz_00___local_PIO2_367;
 f32 fd_qiz_00_one_364;
 f64 fd_qiz_00__three_localstatic4_sqrtf;
 f64 fd_qiz_00__half_localstatic3_sqrtf;
-s32 qiz_00_init_evt[2];
+EvtWord qiz_00_init_evt[2];
 
 f32 fd_qiz_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

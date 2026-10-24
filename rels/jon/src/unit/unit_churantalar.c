@@ -99,30 +99,30 @@ static BattleDataEntry data_table[5];
 static BattleUnitKindPart parts[5];
 static BattleWeapon weapon_piders_attack;
 static BattleWeapon weapon_piders_renzoku_attack;
-static s32 init_event[53];
-static s32 dmg_first_attack_pos[19];
-static s32 yarn_event[44];
-static s32 entry_event[48];
-static s32 damage_event[10];
-static s32 dead_event[189];
-static s32 blow_dead_event[104];
-static s32 battle_end_event[7];
-static s32 yure_event[76];
-static s32 move_kuutei_event[83];
-static s32 move_kuuchu_event[54];
-static s32 unison_phase_event[120];
-static s32 attack_event[72];
-static s32 damage_check_event_sub[157];
-static s32 piders_attack_common_event1[163];
-static s32 piders_attack_common_event1_2[109];
-static s32 piders_attack_common_event2[47];
-static s32 piders_attack_common_event3[102];
-static s32 normal_attack_event[87];
-static s32 renzoku_attack_event[331];
-static s32 renzoku_attack_event_sub[55];
-static s32 renzoku_attack_event_sub_no_last[10];
-static s32 renzoku_attack_event_sub_last[79];
-static s32 wait_event[6];
+static EvtWord init_event[53];
+static EvtWord dmg_first_attack_pos[19];
+static EvtWord yarn_event[44];
+static EvtWord entry_event[48];
+static EvtWord damage_event[10];
+static EvtWord dead_event[189];
+static EvtWord blow_dead_event[104];
+static EvtWord battle_end_event[7];
+static EvtWord yure_event[76];
+static EvtWord move_kuutei_event[83];
+static EvtWord move_kuuchu_event[54];
+static EvtWord unison_phase_event[120];
+static EvtWord attack_event[72];
+static EvtWord damage_check_event_sub[157];
+static EvtWord piders_attack_common_event1[163];
+static EvtWord piders_attack_common_event1_2[109];
+static EvtWord piders_attack_common_event2[47];
+static EvtWord piders_attack_common_event3[102];
+static EvtWord normal_attack_event[87];
+static EvtWord renzoku_attack_event[331];
+static EvtWord renzoku_attack_event_sub[55];
+static EvtWord renzoku_attack_event_sub_no_last[10];
+static EvtWord renzoku_attack_event_sub_last[79];
+static EvtWord wait_event[6];
 
 static USER_FUNC(piders_yarn_init) {
     s32 id = BattleTransID(event, -2);
@@ -315,7 +315,7 @@ static USER_FUNC(piders_draw_yarn) {
 static USER_FUNC(piders_get_num) {
     BattleUnit* unit;
     s32 i;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 num = 0;
     BattleWork* wp = _battleWorkPointer;
 
@@ -332,7 +332,7 @@ static USER_FUNC(piders_get_num) {
 static USER_FUNC(piders_get_zyun) {
     s32 id;
     s32 i;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 order = 0;
     BattleWork* wp;
     BattleUnit* unit;
@@ -357,7 +357,7 @@ static USER_FUNC(piders_get_zyun) {
 
 static USER_FUNC(piders_get_first_pos_attr) {
     s32 i;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 attr;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -382,7 +382,7 @@ static USER_FUNC(piders_get_first_pos_attr) {
 }
 
 static USER_FUNC(piders_renzoku_attack_set_target) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 unitIdx[20];
     s32 partIdx[20];
     s32 i;

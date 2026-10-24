@@ -110,30 +110,30 @@ f32 fd_mri_14___local_3PIO2_368;
 f32 fd_mri_14_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_mri_14___local_PIO2_367;
 f32 fd_mri_14_one_364;
-static s32 first_time_w_bero[60];
+static EvtWord first_time_w_bero[60];
 static BeroEntry bero_entry_data[3];
-s32 npc_rotate[28];
-s32 kanbu_urouro[75];
-s32 dai3_kanbu[192];
-s32 flash_and_wait[16];
-s32 flash2_and_wait[26];
-s32 starstone_rotate[6];
-s32 starstone_rotate_exec[13];
-static s32 starstone_fuwafuwa[71];
-s32 npc_dokan[209];
-static s32 punipuni_mario_halt[33];
+EvtWord npc_rotate[28];
+EvtWord kanbu_urouro[75];
+EvtWord dai3_kanbu[192];
+EvtWord flash_and_wait[16];
+EvtWord flash2_and_wait[26];
+EvtWord starstone_rotate[6];
+EvtWord starstone_rotate_exec[13];
+static EvtWord starstone_fuwafuwa[71];
+EvtWord npc_dokan[209];
+static EvtWord punipuni_mario_halt[33];
 #ifdef VERSION_G8ME01
-s32 time_bomb[931];
+EvtWord time_bomb[931];
 #else
-s32 time_bomb[937];
+EvtWord time_bomb[937];
 #endif
-s32 bomb_check[14];
-static s32 yuka_move[96];
-static s32 yuka_check[116];
+EvtWord bomb_check[14];
+static EvtWord yuka_move[96];
+static EvtWord yuka_check[116];
 static KusaAccess ueki_access_data[7];
-static s32 punipuni_ball00_init[35];
-static s32 punipuni_ball00[57];
-s32 mri_14_init_evt[179];
+static EvtWord punipuni_ball00_init[35];
+static EvtWord punipuni_ball00[57];
+EvtWord mri_14_init_evt[179];
 
 static USER_FUNC(evtflash) {
     if (isFirstCall) {
@@ -365,7 +365,7 @@ EVT_BEGIN(flash_and_wait)
 EVT_END()
 
 USER_FUNC(starstone_rotate_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     char* name = (char*)evtGetValue(event, args[0]);
     f32 angle = evtGetValue(event, args[1]);
 
@@ -374,7 +374,7 @@ USER_FUNC(starstone_rotate_func) {
 }
 
 USER_FUNC(evt_npc_set_anim_localtime) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 time = evtGetFloat(event, args[1]);
 

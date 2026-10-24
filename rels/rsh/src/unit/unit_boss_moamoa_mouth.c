@@ -43,15 +43,15 @@ static PoseTableEntry pose_table[4];
 static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_moamoa_attack;
-static s32 init_event[26];
-static s32 damage_event[10];
-static s32 dead_event[88];
-static s32 phase_event[2];
-static s32 attack_event[21];
-static s32 evt_attack_other_arm[81];
+static EvtWord init_event[26];
+static EvtWord damage_event[10];
+static EvtWord dead_event[88];
+static EvtWord phase_event[2];
+static EvtWord attack_event[21];
+static EvtWord evt_attack_other_arm[81];
 const char* mouth_Attack_front[7];
-static s32 evt_attack[302];
-static s32 wait_event[6];
+static EvtWord evt_attack[302];
+static EvtWord wait_event[6];
 
 f32 fd_boss_moamoa_mouth_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

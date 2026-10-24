@@ -40,11 +40,11 @@ static BattleUnitDefenseAttr defence_attr_yoshi;
 static StatusVulnerability regist_yoshi;
 static BattleDataEntry data_table_yoshi[2];
 static BattleUnitKindPart parts_yoshi[1];
-static s32 init_event_yoshi[24];
-s32 damage_event_yoshi[22];
-static s32 dead_event_yoshi[177];
-static s32 attack_event_yoshi[748];
-static s32 wait_event_yoshi[7];
+static EvtWord init_event_yoshi[24];
+EvtWord damage_event_yoshi[22];
+static EvtWord dead_event_yoshi[177];
+static EvtWord attack_event_yoshi[748];
+static EvtWord wait_event_yoshi[7];
 
 f32 fd_gullible_yoshi_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -102,7 +102,7 @@ NpcBattleSelect btlgrpsel_dou_btlno_dou_13_04_off[2];
 NpcBattleSelect btlgrpsel_dou_btlno_dou_13_99_off[2];
 NpcSetupBattleInfo btlsetup_dou_tbl[28];
 NpcTerritoryInfo btl_dou_setup_no_tbl[28];
-s32 bgset_dou_wave_event[77];
+EvtWord bgset_dou_wave_event[77];
 
 f32 fd_battle_database_dou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1542,7 +1542,7 @@ NpcTerritoryInfo btl_dou_setup_no_tbl[] = {
 };
 
 static USER_FUNC(_wave_offset) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 varX = args[1];
     s32 stepX = evtGetValue(event, varX);

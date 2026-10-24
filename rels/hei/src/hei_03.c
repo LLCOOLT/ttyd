@@ -53,15 +53,15 @@ f32 fd_hei_03_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_hei_03___local_PIO2_367;
 f32 fd_hei_03_one_364;
 static BeroEntry bero_entry_data[3];
-static s32 dead_evt1[10];
-static s32 dead_evt2[10];
+static EvtWord dead_evt1[10];
+static EvtWord dead_evt2[10];
 static NpcSetupInfo npcEnt[3];
-static s32 door_open[96];
-static s32 shake_evt[39];
-static s32 hashira_evt_sub[56];
-static s32 hashira_evt[132];
-s32 mon_msg[14];
-s32 hei_03_init_evt[165];
+static EvtWord door_open[96];
+static EvtWord shake_evt[39];
+static EvtWord hashira_evt_sub[56];
+static EvtWord hashira_evt[132];
+EvtWord mon_msg[14];
+EvtWord hei_03_init_evt[165];
 
 f32 fd_hei_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -130,22 +130,22 @@ f32 fd_yuu_02_one_364;
 f64 fd_yuu_02__three_localstatic4_sqrtf;
 f64 fd_yuu_02__half_localstatic3_sqrtf;
 Vec fukkipoint[15];
-s32 yuu_02_icon_monte_entry_evt[4];
+EvtWord yuu_02_icon_monte_entry_evt[4];
 static MonteTable montetable[11];
-static s32 minigame_view_monte[4];
-s32 yuu_02_jumpret[164];
-s32 yuu_02_kaijo_init[12];
-s32 yuu_02_kaijo_init2[12];
-s32 minigame03_main[33];
-s32 minigame03_start_cam[40];
-s32 minigame03_start_cam_cancel[17];
-s32 minigame03_start[193];
-s32 minigame03_end[217];
-s32 s_en1_turn[30];
+static EvtWord minigame_view_monte[4];
+EvtWord yuu_02_jumpret[164];
+EvtWord yuu_02_kaijo_init[12];
+EvtWord yuu_02_kaijo_init2[12];
+EvtWord minigame03_main[33];
+EvtWord minigame03_start_cam[40];
+EvtWord minigame03_start_cam_cancel[17];
+EvtWord minigame03_start[193];
+EvtWord minigame03_end[217];
+EvtWord s_en1_turn[30];
 #ifdef VERSION_G8ME01
-s32 yuu_02_init_evt[262];
+EvtWord yuu_02_init_evt[262];
 #else
-s32 yuu_02_init_evt[29];
+EvtWord yuu_02_init_evt[29];
 #endif
 
 f32 fd_yuu_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
@@ -236,7 +236,7 @@ void yuu_02_icon_monte_off(s32 idx) {
 }
 
 USER_FUNC(yuu_02_icon_monte_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 idx = evtGetValue(event, args[1]);
 
@@ -485,7 +485,7 @@ static USER_FUNC(re_fall_rtn) {
 }
 
 USER_FUNC(yuuminigame3_set_phase) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     RollWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
 
     data->phase = evtGetValue(event, args[1]);
@@ -502,7 +502,7 @@ USER_FUNC(yuuminigame3_roll_fix_off) {
 }
 
 USER_FUNC(yuuminigame3_opening_on_off) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     RollWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
 
     if (evtGetValue(event, args[1])) {
@@ -514,7 +514,7 @@ USER_FUNC(yuuminigame3_opening_on_off) {
 }
 
 USER_FUNC(yuuminigame3_opening_chk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MiniGameWork* wp = (MiniGameWork*)evtGetValue(event, args[0]);
 
     if (((RollWork*)wp->data)->flags & 1) {

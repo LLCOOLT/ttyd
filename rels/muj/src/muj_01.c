@@ -152,78 +152,78 @@ f32 fd_muj_01___local_3PIO2_368;
 f32 fd_muj_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_muj_01___local_PIO2_367;
 f32 fd_muj_01_one_364;
-s32 custom_door_dark2[34];
-s32 custom_door_light2[30];
-static s32 garawaru_init[39];
-static s32 garawaru_talk[270];
-static s32 marco_init[31];
-s32 marco_kyorokyoro[28];
+EvtWord custom_door_dark2[34];
+EvtWord custom_door_light2[30];
+static EvtWord garawaru_init[39];
+static EvtWord garawaru_talk[270];
+static EvtWord marco_init[31];
+EvtWord marco_kyorokyoro[28];
 #ifdef VERSION_G8ME01
-static s32 marco_talk[848];
+static EvtWord marco_talk[848];
 #else
-static s32 marco_talk[831];
+static EvtWord marco_talk[831];
 #endif
-static s32 megane_init[14];
-static s32 megane_talk[54];
-static s32 odoodo_init[14];
-static s32 odoodo_talk[54];
-static s32 suifu_a_init[14];
-static s32 suifu_a_talk[48];
-static s32 suifu_bomb_init[14];
-static s32 suifu_bomb_talk[48];
-static s32 suifu_d_init[13];
-s32 suifu_d_regl[24];
-static s32 suifu_d_talk[56];
-s32 borosuifu_a_init[13];
-s32 borosuifu_a_talk[56];
-s32 borosuifu_b_init[22];
-s32 borosuifu_b_regl[30];
-s32 borosuifu_b_talk[56];
-static s32 mony_init[14];
-static s32 mony_talk[8];
-static s32 peton_init[14];
-static s32 peton_talk[8];
-static s32 musume_talk[20];
-static s32 musume_a_entry[30];
-static s32 musume_b_entry[30];
-static s32 musume_c_entry[30];
+static EvtWord megane_init[14];
+static EvtWord megane_talk[54];
+static EvtWord odoodo_init[14];
+static EvtWord odoodo_talk[54];
+static EvtWord suifu_a_init[14];
+static EvtWord suifu_a_talk[48];
+static EvtWord suifu_bomb_init[14];
+static EvtWord suifu_bomb_talk[48];
+static EvtWord suifu_d_init[13];
+EvtWord suifu_d_regl[24];
+static EvtWord suifu_d_talk[56];
+EvtWord borosuifu_a_init[13];
+EvtWord borosuifu_a_talk[56];
+EvtWord borosuifu_b_init[22];
+EvtWord borosuifu_b_regl[30];
+EvtWord borosuifu_b_talk[56];
+static EvtWord mony_init[14];
+static EvtWord mony_talk[8];
+static EvtWord peton_init[14];
+static EvtWord peton_talk[8];
+static EvtWord musume_talk[20];
+static EvtWord musume_a_entry[30];
+static EvtWord musume_b_entry[30];
+static EvtWord musume_c_entry[30];
 static NpcSetupInfo npcEnt[17];
-static s32 bero_in_event[5];
+static EvtWord bero_in_event[5];
 static BeroEntry bero_entry_data[3];
-s32 muj_00_door_open[247];
-s32 muj_00_door_close[22];
+EvtWord muj_00_door_open[247];
+EvtWord muj_00_door_close[22];
 static const char* mise_npc[2];
-s32 mise_data_open[32];
-s32 mise_data_close[36];
+EvtWord mise_data_open[32];
+EvtWord mise_data_close[36];
 static DoorParam mise_data;
 static const char* yado_npc[2];
-s32 mise_open_event[22];
-s32 mise_close_event[26];
+EvtWord mise_open_event[22];
+EvtWord mise_close_event[26];
 static DoorParam yado_data;
-s32 evt_door_entry_custom00[39];
-s32 evt_door_entry_custom01[39];
+EvtWord evt_door_entry_custom00[39];
+EvtWord evt_door_entry_custom01[39];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[12];
 static ShopperData35 shopper_data;
 static KinopioData kino_dt;
-s32 kyoshu_event[196];
-s32 maruco_buruburu[17];
-s32 garawaru_buruburu[17];
-s32 suifu_a_buruburu[17];
-s32 suifu_bom_buruburu[17];
-s32 nakamaware_event[791];
-s32 settoku_event[54];
-s32 settoku_event_main[95];
-static s32 delete_npc_regl_evt[24];
-static s32 sekai_yami_shake[11];
-static s32 sekai_yami_evt[283];
-static s32 minnnanokoe_evt[402];
-static s32 epilogue_npc_entry[60];
-static s32 epilogue_evt_sub[117];
-static s32 epilogue_evt[88];
-s32 yakan_anime[17];
-s32 muj_01_init_evt[225];
+EvtWord kyoshu_event[196];
+EvtWord maruco_buruburu[17];
+EvtWord garawaru_buruburu[17];
+EvtWord suifu_a_buruburu[17];
+EvtWord suifu_bom_buruburu[17];
+EvtWord nakamaware_event[791];
+EvtWord settoku_event[54];
+EvtWord settoku_event_main[95];
+static EvtWord delete_npc_regl_evt[24];
+static EvtWord sekai_yami_shake[11];
+static EvtWord sekai_yami_evt[283];
+static EvtWord minnnanokoe_evt[402];
+static EvtWord epilogue_npc_entry[60];
+static EvtWord epilogue_evt_sub[117];
+static EvtWord epilogue_evt[88];
+EvtWord yakan_anime[17];
+EvtWord muj_01_init_evt[225];
 
 
 f32 fd_muj_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
@@ -1754,7 +1754,7 @@ static EVT_BEGIN(sekai_yami_shake)
 EVT_END()
 
 static USER_FUNC(make_itemsel_table) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();
     s32* p;
     s32 count;
@@ -1783,14 +1783,14 @@ static USER_FUNC(delete_itemsel_table) {
 }
 
 USER_FUNC(evt_mario_get_reqdir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetFloat(event, args[0], marioGetPtr()->displayDirectionTarget);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(muj_get_door_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32* door = (s32*)evtGetValue(event, args[0]);
     f32 range = evtGetFloat(event, args[1]);
     Vec hitPos;
@@ -1817,7 +1817,7 @@ static USER_FUNC(yami_view) {
 }
 
 static USER_FUNC(anim_tevcallback) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 flag = evtGetValue(event, args[1]);
     NpcEntry* npc = npcNameToPtr_NoAssert(name);
@@ -1830,7 +1830,7 @@ static USER_FUNC(anim_tevcallback) {
 }
 
 static USER_FUNC(anim_tevcallback_mobj) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 flag = evtGetValue(event, args[1]);
     MapObjectEntry* mobj = mobjNameToPtrNoAssert(name);
@@ -1856,7 +1856,7 @@ USER_FUNC(sekai_yami_omise) {
 }
 
 static USER_FUNC(starstone_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -1867,7 +1867,7 @@ static USER_FUNC(starstone_entry) {
 }
 
 static USER_FUNC(starstone_set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -1881,7 +1881,7 @@ static USER_FUNC(starstone_set_pos) {
 }
 
 static USER_FUNC(starstone_set_ry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 ry = evtGetFloat(event, args[1]);
 

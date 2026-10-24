@@ -67,15 +67,15 @@ f32 fd_tik_07___local_3PIO2_368;
 f32 fd_tik_07_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tik_07___local_PIO2_367;
 f32 fd_tik_07_one_364;
-s32 bero_00_open_door[12];
-s32 bero_00_close_door[12];
+EvtWord bero_00_open_door[12];
+EvtWord bero_00_close_door[12];
 static BeroEntry bero_entry_data[8];
 static BeroEntry bero_entry_data2[2];
-s32 tik_07_down_evt[82];
-static s32 peach_mail[188];
-static s32 evt_block[8];
-static s32 mobj_box00[34];
-s32 tik_07_init_evt[323];
+EvtWord tik_07_down_evt[82];
+static EvtWord peach_mail[188];
+static EvtWord evt_block[8];
+static EvtWord mobj_box00[34];
+EvtWord tik_07_init_evt[323];
 
 f32 fd_tik_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

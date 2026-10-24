@@ -59,16 +59,16 @@ static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[12];
 static ShopperData35 shopper_data;
-s32 chibitoge_nakama[287];
-static s32 chibitoge_init[29];
-static s32 chibitoge_talk[4];
-s32 punishop_init[12];
-s32 punishop_talk[2];
-s32 puniinfo_init[12];
-s32 puniinfo_talk[118];
+EvtWord chibitoge_nakama[287];
+static EvtWord chibitoge_init[29];
+static EvtWord chibitoge_talk[4];
+EvtWord punishop_init[12];
+EvtWord punishop_talk[2];
+EvtWord puniinfo_init[12];
+EvtWord puniinfo_talk[118];
 static NpcSetupInfo npcEnt[4];
 static BeroEntry bero_entry_data[2];
-s32 mri_07_init_evt[108];
+EvtWord mri_07_init_evt[108];
 
 f32 fd_mri_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

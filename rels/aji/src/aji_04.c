@@ -92,31 +92,31 @@ f32 fd_aji_04___local_3PIO2_368;
 f32 fd_aji_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_04___local_PIO2_367;
 f32 fd_aji_04_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[2];
-s32 sekizou_kaiten[81];
-s32 sekizou_kaiten2[56];
-s32 sekizou_talk[2];
-s32 evt_item[5];
-static s32 evt_down_snd[116];
-static s32 evt_up_snd_[12];
-static s32 evt_up_snd__[76];
-s32 offscreen_to_kuizu[127];
-static s32 offscreen_to_normal[121];
+EvtWord sekizou_kaiten[81];
+EvtWord sekizou_kaiten2[56];
+EvtWord sekizou_talk[2];
+EvtWord evt_item[5];
+static EvtWord evt_down_snd[116];
+static EvtWord evt_up_snd_[12];
+static EvtWord evt_up_snd__[76];
+EvtWord offscreen_to_kuizu[127];
+static EvtWord offscreen_to_normal[121];
 QuizEntry kuizu_data[7];
-s32 UNK_0x00022a90[46];
-s32 quiz_ok[19];
-s32 quiz_ng[21];
-s32 UNK_0x00022be8[21];
-s32 UNK_0x00022c3c[66];
+EvtWord UNK_0x00022a90[46];
+EvtWord quiz_ok[19];
+EvtWord quiz_ng[21];
+EvtWord UNK_0x00022be8[21];
+EvtWord UNK_0x00022c3c[66];
 #ifdef VERSION_G8ME01
-s32 kuizu_sekizou[980];
+EvtWord kuizu_sekizou[980];
 #else
-s32 kuizu_sekizou[920];
+EvtWord kuizu_sekizou[920];
 #endif
-s32 sekizou_init[47];
-s32 aji_04_init_evt[55];
+EvtWord sekizou_init[47];
+EvtWord aji_04_init_evt[55];
 
 f32 fd_aji_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

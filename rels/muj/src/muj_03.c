@@ -35,14 +35,14 @@ f32 fd_muj_03___local_3PIO2_368;
 f32 fd_muj_03_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_muj_03___local_PIO2_367;
 f32 fd_muj_03_one_364;
-s32 muj_03_event_01[22];
+EvtWord muj_03_event_01[22];
 static BeroEntry bero_entry_data[3];
-s32 nigeru_suifu01[271];
-static s32 evt_kusa_5[20];
-static s32 evt_kusa_7[20];
+EvtWord nigeru_suifu01[271];
+static EvtWord evt_kusa_5[20];
+static EvtWord evt_kusa_7[20];
 static TreeAccess tree_tbl[5];
 static KusaAccess kusa_tbl[9];
-s32 muj_03_init_evt[112];
+EvtWord muj_03_init_evt[112];
 
 f32 fd_muj_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -93,7 +93,7 @@ USER_FUNC(camdir) {
 
 // const char* name, s32 x0, s32 y0, s32 z0, s32 x1, s32 y1, s32 z1, s32 msec, s32 mode
 USER_FUNC(evt_gazigazi_move_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     f32 y0, x0, z0, x1, y1, z1;
     s32 msec;

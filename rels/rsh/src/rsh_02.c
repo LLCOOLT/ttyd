@@ -128,54 +128,54 @@ f32 fd_rsh_02_one_364;
 static BeroEntry bero_data_a[3];
 static BeroEntry bero_data_b[3];
 static BeroEntry bero_data_c[3];
-s32 evt_powan_msg[36];
-s32 evt_nabe[247];
-static s32 init_gurume[38];
-static s32 talk_gurume[176];
-static s32 talk_powan[2];
-s32 init_yuurei[250];
-static s32 evt_shake[39];
-s32 evt_shake2[6];
+EvtWord evt_powan_msg[36];
+EvtWord evt_nabe[247];
+static EvtWord init_gurume[38];
+static EvtWord talk_gurume[176];
+static EvtWord talk_powan[2];
+EvtWord init_yuurei[250];
+static EvtWord evt_shake[39];
+EvtWord evt_shake2[6];
 static s32 item_tbl2[2];
-s32 talk_yuurei[451];
-static s32 init_toron[41];
-static s32 talk_toron[8];
-static s32 talk_sarary[8];
+EvtWord talk_yuurei[451];
+static EvtWord init_toron[41];
+static EvtWord talk_toron[8];
+static EvtWord talk_sarary[8];
 static NpcSetupInfo npc_data[6];
 static const char* door_3[7];
 static const char* door_4[7];
 static const char* door_5[7];
-s32 evt_1day_end[68];
-s32 evt_2day_end[68];
-s32 evt_normal_yado[119];
-s32 evt_bed[22];
-s32 evt_toron_catch[281];
+EvtWord evt_1day_end[68];
+EvtWord evt_2day_end[68];
+EvtWord evt_normal_yado[119];
+EvtWord evt_bed[22];
+EvtWord evt_toron_catch[281];
 static s32 item_tbl[2];
-s32 evt_toron_catch2[359];
+EvtWord evt_toron_catch2[359];
 #ifdef VERSION_G8ME01
-s32 evt_toron_appear[437];
+EvtWord evt_toron_appear[437];
 #else
-s32 evt_toron_appear[414];
+EvtWord evt_toron_appear[414];
 #endif
-static s32 evt_daiji_kami[88];
-static s32 evt_yuka_simi[45];
-static s32 evt_access[14];
-static s32 evt_access2[44];
-static s32 evt_access_entry[62];
-s32 rsh_02_init_evt[247];
+static EvtWord evt_daiji_kami[88];
+static EvtWord evt_yuka_simi[45];
+static EvtWord evt_access[14];
+static EvtWord evt_access2[44];
+static EvtWord evt_access_entry[62];
+EvtWord rsh_02_init_evt[247];
 #ifdef VERSION_G8ME01
-s32 rsh_02_a_init_evt[687];
+EvtWord rsh_02_a_init_evt[687];
 #else
-s32 rsh_02_a_init_evt[685];
+EvtWord rsh_02_a_init_evt[685];
 #endif
-s32 rsh_02_b_init_evt[168];
+EvtWord rsh_02_b_init_evt[168];
 static const char* window_tbl[4];
-s32 rsh_02_c_init_evt[142];
-s32 rsh_02_init_evt_nidome[208];
-s32 rsh_02_a_init_evt_nidome[337];
-s32 rsh_02_b_init_evt_nidome[213];
-s32 rsh_02_c_init_evt_nidome[136];
-s32 evt_nidome_bed[126];
+EvtWord rsh_02_c_init_evt[142];
+EvtWord rsh_02_init_evt_nidome[208];
+EvtWord rsh_02_a_init_evt_nidome[337];
+EvtWord rsh_02_b_init_evt_nidome[213];
+EvtWord rsh_02_c_init_evt_nidome[136];
+EvtWord evt_nidome_bed[126];
 
 USER_FUNC(mario_normalize_wait) {
     if (!marioRollCancelDisable() && !U_marioSlitContinueChk()) {

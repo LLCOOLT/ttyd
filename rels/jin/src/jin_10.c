@@ -48,16 +48,16 @@ f32 fd_jin_10___local_3PIO2_368;
 f32 fd_jin_10_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_jin_10___local_PIO2_367;
 f32 fd_jin_10_one_364;
-static s32 door_close[12];
-static s32 door_open[12];
+static EvtWord door_close[12];
+static EvtWord door_open[12];
 static BeroEntry bero_entry_data[3];
-static s32 push_evt[132];
-s32 unpush_evt[252];
-s32 vivi_chk[42];
-s32 jin_10_init_evt[59];
+static EvtWord push_evt[132];
+EvtWord unpush_evt[252];
+EvtWord vivi_chk[42];
+EvtWord jin_10_init_evt[59];
 
 static USER_FUNC(get_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
 
     evtSetFloat(event, args[0], mario->position.x);
@@ -145,7 +145,7 @@ static BeroEntry bero_entry_data[] = {
 };
 
 USER_FUNC(set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -332,7 +332,7 @@ EVT_BEGIN(jin_10_init_evt)
 EVT_END()
 
 USER_FUNC(get_width) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PartyEntry* party = partyGetPtr(evtGetValue(event, args[0]));
 
     evtSetFloat(event, args[1], 0.8f * party->width);

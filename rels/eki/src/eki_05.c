@@ -47,20 +47,20 @@ f32 fd_eki_05___local_3PIO2_368;
 f32 fd_eki_05_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_eki_05___local_PIO2_367;
 f32 fd_eki_05_one_364;
-static s32 n_close[12];
-static s32 n_open[12];
-static s32 w_close[12];
-static s32 w_open[12];
+static EvtWord n_close[12];
+static EvtWord n_open[12];
+static EvtWord w_close[12];
+static EvtWord w_open[12];
 static BeroEntry bero_data[4];
-s32 grass_open_1[14];
-s32 grass_open_2[23];
-s32 evt_boots[42];
-s32 evt_elvkey[5];
-static s32 evt_head[38];
+EvtWord grass_open_1[14];
+EvtWord grass_open_2[23];
+EvtWord evt_boots[42];
+EvtWord evt_elvkey[5];
+static EvtWord evt_head[38];
 #ifdef VERSION_G8ME01
-s32 eki_05_init_evt[112];
+EvtWord eki_05_init_evt[112];
 #else
-s32 eki_05_init_evt[106];
+EvtWord eki_05_init_evt[106];
 #endif
 
 f32 fd_eki_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};

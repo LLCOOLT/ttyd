@@ -62,7 +62,7 @@ f32 fd_evt_yuuranking___local_3PIO2_368;
 f32 fd_evt_yuuranking_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_evt_yuuranking___local_PIO2_367;
 f32 fd_evt_yuuranking_one_364;
-static s32 main_evt[4];
+static EvtWord main_evt[4];
 
 static s32 fontlenpitch(const char* str, s32 pitch) {
     s32 i;
@@ -838,7 +838,7 @@ static s32 yuu_kesan(s32 type, s32 score, s32 bonus, s32 mul, s32 max) {
 }
 
 USER_FUNC(evt_yuuranking_alloc) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     YuuRankingWork* wp = _mapAlloc(sizeof(YuuRankingWork));
 #ifdef VERSION_G8ME01
     s32 score;

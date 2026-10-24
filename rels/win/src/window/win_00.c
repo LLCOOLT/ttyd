@@ -104,34 +104,34 @@ f32 fd_win_00___local_PIO2_367;
 f32 fd_win_00_one_364;
 f64 fd_win_00__three_localstatic4_sqrtf;
 f64 fd_win_00__half_localstatic3_sqrtf;
-static s32 vivian_init[37];
-static s32 vivian_talk[8];
-static s32 maririn_init[19];
-s32 maririn_talk[8];
-s32 majorin_init[19];
-s32 majorin_talk[8];
-static s32 fabio_init[21];
-static s32 fabio_talk[26];
-static s32 kizayarou_regl[19];
-static s32 kizayarou_talk[8];
-static s32 kizayarou_init[38];
+static EvtWord vivian_init[37];
+static EvtWord vivian_talk[8];
+static EvtWord maririn_init[19];
+EvtWord maririn_talk[8];
+EvtWord majorin_init[19];
+EvtWord majorin_talk[8];
+static EvtWord fabio_init[21];
+static EvtWord fabio_talk[26];
+static EvtWord kizayarou_regl[19];
+static EvtWord kizayarou_talk[8];
+static EvtWord kizayarou_init[38];
 static NpcSetupInfo npcEnt[5];
 static BeroEntry bero_entry_data[3];
-s32 witchtrio_momeru[880];
-s32 majorin_have_picture[25];
-s32 witchtrio_picture[533];
-s32 mario_vs_witchtrio[554];
-s32 get_necklace[115];
-s32 witchtrio_lose_item[19];
-s32 witchtrio_mess_vivi[8];
-s32 witchtrio_mess_mari[8];
-s32 witchtrio_lose[563];
-static s32 ki_data_evt_01[20];
+EvtWord witchtrio_momeru[880];
+EvtWord majorin_have_picture[25];
+EvtWord witchtrio_picture[533];
+EvtWord mario_vs_witchtrio[554];
+EvtWord get_necklace[115];
+EvtWord witchtrio_lose_item[19];
+EvtWord witchtrio_mess_vivi[8];
+EvtWord witchtrio_mess_mari[8];
+EvtWord witchtrio_lose[563];
+static EvtWord ki_data_evt_01[20];
 static TreeAccess tree_access_data[10];
-s32 iri_28_enemy_all_dead[148];
-s32 iri_28_enemy_dead[13];
-s32 iri_28_init[60];
-s32 win_00_init_evt[85];
+EvtWord iri_28_enemy_all_dead[148];
+EvtWord iri_28_enemy_dead[13];
+EvtWord iri_28_init[60];
+EvtWord win_00_init_evt[85];
 
 f32 fd_win_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1135,7 +1135,7 @@ USER_FUNC(mariowalk_wait) {
 }
 
 USER_FUNC(win_item_move_3d_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     char* name = (char*)evtGetValue(event, args[0]);
     f32 x = evtGetValue(event, args[1]);
     f32 y = evtGetValue(event, args[2]);

@@ -40,8 +40,8 @@ f32 fd_mri_10_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_mri_10___local_PIO2_367;
 f32 fd_mri_10_one_364;
 static BeroEntry bero_entry_data[2];
-static s32 item_evt[68];
-s32 mri_10_init_evt[100];
+static EvtWord item_evt[68];
+EvtWord mri_10_init_evt[100];
 
 f32 fd_mri_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

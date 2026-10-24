@@ -41,7 +41,7 @@ f32 fd_tik___local_PIO2_367;
 f32 fd_tik_one_364;
 f64 fd_tik__three_localstatic4_sqrtf;
 f64 fd_tik__half_localstatic3_sqrtf;
-s32 tik_villager_urouro[101];
+EvtWord tik_villager_urouro[101];
 
 void _prolog(void) {
     voidfunctionptr* ctor;
@@ -86,7 +86,7 @@ void _unresolved(void) {
 }
 
 USER_FUNC(evt_tik_villager_urouro_check_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 xVar = args[0];
     s32 zVar = args[1];
     f32 cx = evtGetFloat(event, args[2]);

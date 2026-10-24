@@ -1,13 +1,14 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "evt/evt_word.h"
 
-extern s32 evt_memcard_save[];
+extern EvtWord evt_memcard_save[];
 
-extern s32 evt_memcard_check[];
-extern s32 evt_memcard_copy[];
-extern s32 evt_memcard_delete[];
+extern EvtWord evt_memcard_check[];
+extern EvtWord evt_memcard_copy[];
+extern EvtWord evt_memcard_delete[];
 #ifdef VERSION_G8ME01
-extern s32 evt_memcard_save_wrapper[];
+extern EvtWord evt_memcard_save_wrapper[];
 #endif
-extern s32 evt_memcard_start[];
+extern EvtWord evt_memcard_start[];

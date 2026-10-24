@@ -69,30 +69,30 @@ PoseTableEntry pose_table_christine_stay[25];
 static BattleDataEntry data_table[8];
 BattleUnitKindPart unitpartsdata_Party_Christine[1];
 BattleUnitKind unitdata_Party_Christine;
-static s32 battle_entry_event[59];
-static s32 init_event[51];
-static s32 damage_event[16];
+static EvtWord battle_entry_event[59];
+static EvtWord init_event[51];
+static EvtWord damage_event[16];
 BattleWeapon partyWeapon_ChristineNormalAttack;
 BattleWeapon partyWeapon_ChristineMonosiri;
 BattleWeapon partyWeapon_ChristineRenzokuAttack;
 BattleWeapon partyWeapon_ChristineKiss;
-s32 partyChristineAttack_NormalAttack[824];
-s32 christine_dictionary_event[26];
-s32 partyChristineAttack_Monosiri[397];
+EvtWord partyChristineAttack_NormalAttack[824];
+EvtWord christine_dictionary_event[26];
+EvtWord partyChristineAttack_Monosiri[397];
 #ifdef VERSION_G8ME01
-s32 partyChristineAttack_RenzokuAttack[1078];
+EvtWord partyChristineAttack_RenzokuAttack[1078];
 #else
-s32 partyChristineAttack_RenzokuAttack[1071];
+EvtWord partyChristineAttack_RenzokuAttack[1071];
 #endif
-s32 partyChristineAttack_Kiss[546];
-s32 christine_appeal_event[71];
-static s32 party_win_reaction[14];
-static s32 attack_audience_event[392];
+EvtWord partyChristineAttack_Kiss[546];
+EvtWord christine_appeal_event[71];
+static EvtWord party_win_reaction[14];
+static EvtWord attack_audience_event[392];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
-static s32 attack_event[2];
-static s32 wait_event[6];
+static EvtWord attack_event[2];
+static EvtWord wait_event[6];
 
 __declspec(section ".data") f32 unit_party_christine_negone_one_a[] = {
     -1.0f, 1.0f,
@@ -2303,7 +2303,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static USER_FUNC(krb_get_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x1, y1, x2, y2;
     f32 dx, dy;
     s32 value;
@@ -2366,7 +2366,7 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
 }
 
 USER_FUNC(btlevtcmd_get_monosiri_msg_no) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 id, index;
 
@@ -2386,7 +2386,7 @@ USER_FUNC(_monosiri_flag_on) {
 }
 
 USER_FUNC(_dictionary) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 state;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;

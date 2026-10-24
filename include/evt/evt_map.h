@@ -13,5 +13,5 @@ USER_FUNC(evt_map_set_fog);
 USER_FUNC(evt_mapobj_flag_onoff);
 USER_FUNC(evt_mapobj_get_position);
 USER_FUNC(evt_mapobj_trans);
-extern s32 evt_nonride_airport[];
-extern s32 evt_ride_airport[];
+extern EvtWord evt_nonride_airport[];
+extern EvtWord evt_ride_airport[];

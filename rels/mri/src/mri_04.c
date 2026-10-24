@@ -101,17 +101,17 @@ f32 fd_mri_04___local_3PIO2_368;
 f32 fd_mri_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_mri_04___local_PIO2_367;
 f32 fd_mri_04_one_364;
-static s32 bero_custom[13];
+static EvtWord bero_custom[13];
 static BeroEntry bero_entry_data[2];
-static s32 chibitoge_init[21];
-static s32 chibitoge_talk[111];
+static EvtWord chibitoge_init[21];
+static EvtWord chibitoge_talk[111];
 static NpcSetupInfo npcEnt[2];
-static s32 chuchurina_sogu[814];
-s32 black_shadow[341];
-static s32 evt_ueki_02[20];
+static EvtWord chuchurina_sogu[814];
+EvtWord black_shadow[341];
+static EvtWord evt_ueki_02[20];
 static KusaAccess ueki_access_data[5];
-s32 item_mri_04[34];
-s32 mri_04_init_evt[178];
+EvtWord item_mri_04[34];
+EvtWord mri_04_init_evt[178];
 
 f32 fd_mri_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -228,7 +228,7 @@ static NpcSetupInfo npcEnt[] = {
 };
 
 static USER_FUNC(evt_chuchu_back_loop) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     // チュチュリーナ
     NpcEntry* npc = evtNpcNameToPtr(event, "\x83\x60\x83\x85\x83\x60\x83\x85\x83\x8A\x81\x5B\x83\x69");
     s32 total = evtGetValue(event, args[0]);

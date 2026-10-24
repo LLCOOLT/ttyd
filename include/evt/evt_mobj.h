@@ -18,4 +18,4 @@ USER_FUNC(evt_mobj_set_scale);
 USER_FUNC(evt_mobj_set_x_position);
 USER_FUNC(evt_mobj_set_y_position);
 
-extern s32 mobj_save_blk_sysevt[];
+extern EvtWord mobj_save_blk_sysevt[];

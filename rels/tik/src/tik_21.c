@@ -41,10 +41,10 @@ f32 fd_tik_21_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tik_21___local_PIO2_367;
 f32 fd_tik_21_one_364;
 static BeroEntry bero_entry_data[2];
-s32 hari_trap[107];
+EvtWord hari_trap[107];
 static HitDamageReturn hitDmgRetPoints[3];
-static s32 mobj_box00[34];
-s32 tik_21_init_evt[35];
+static EvtWord mobj_box00[34];
+EvtWord tik_21_init_evt[35];
 
 f32 fd_tik_21_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

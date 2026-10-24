@@ -545,7 +545,7 @@ int maxAreaInWorld(void) {
     return n;
 }
 
-void relSetEvtAddr(const char* mapName, s32* eventAddr) {
+void relSetEvtAddr(const char* mapName, EvtWord* eventAddr) {
     MapData* map = mapDataPtr(mapName);
     if (map != NULL) {
         map->eventAddr = eventAddr;

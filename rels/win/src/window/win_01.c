@@ -63,14 +63,14 @@ f32 fd_win_01___local_3PIO2_368;
 f32 fd_win_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_win_01___local_PIO2_367;
 f32 fd_win_01_one_364;
-s32 evt_dokan1_message[52];
-s32 evt_dokan1[11];
+EvtWord evt_dokan1_message[52];
+EvtWord evt_dokan1[11];
 static BeroEntry bero_entry_data[6];
-s32 guide_bigtree[336];
-static s32 peach_mail[257];
-s32 ki_data_evt_03[20];
+EvtWord guide_bigtree[336];
+static EvtWord peach_mail[257];
+EvtWord ki_data_evt_03[20];
 static TreeAccess tree_access_data[5];
-s32 win_01_init_evt[46];
+EvtWord win_01_init_evt[46];
 
 f32 fd_win_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -37,10 +37,10 @@ f32 fd_dou_one_364;
 f64 fd_dou__three_localstatic4_sqrtf;
 f64 fd_dou__half_localstatic3_sqrtf;
 f32 dou_normal_puka_data[16];
-s32 dou_normal_puka[19];
-s32 dou_puka_event_sub[54];
-s32 dou_puka_event[40];
-s32 dou_mario_pos_osreport[4];
+EvtWord dou_normal_puka[19];
+EvtWord dou_puka_event_sub[54];
+EvtWord dou_puka_event[40];
+EvtWord dou_mario_pos_osreport[4];
 
 f32 fd_dou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

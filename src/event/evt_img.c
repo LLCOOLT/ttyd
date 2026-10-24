@@ -19,7 +19,7 @@ USER_FUNC(evt_img_entry) {
 }
 
 USER_FUNC(evt_img_set_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -30,7 +30,7 @@ USER_FUNC(evt_img_set_position) {
 }
 
 USER_FUNC(evt_img_set_paper) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     const char* anim = (const char*)evtGetValue(event, args[1]);
     s32 group = gp->inBattle != 0;
@@ -42,7 +42,7 @@ USER_FUNC(evt_img_set_paper) {
 }
 
 USER_FUNC(evt_img_set_paper_anim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 anim = evtGetValue(event, args[1]);
     s32 group = gp->inBattle != 0;
@@ -53,7 +53,7 @@ USER_FUNC(evt_img_set_paper_anim) {
 }
 
 USER_FUNC(evt_img_alloc_capture) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 shadowId = evtGetValue(event, args[1]);
     const char* offName = (const char*)evtGetValue(event, args[2]);
@@ -124,7 +124,7 @@ USER_FUNC(evt_img_alloc_capture) {
 }
 
 USER_FUNC(evt_img_free_capture) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 shadowId = evtGetValue(event, args[1]);
     imgFreeCapture(imgNameToPtr(name, gp->inBattle != 0), shadowId);
@@ -132,7 +132,7 @@ USER_FUNC(evt_img_free_capture) {
 }
 
 USER_FUNC(evt_img_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
     ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
@@ -145,7 +145,7 @@ USER_FUNC(evt_img_onoff) {
 }
 
 USER_FUNC(evt_img_set_virtual_point) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -184,7 +184,7 @@ USER_FUNC(evt_img_wait_animend) {
 }
 
 USER_FUNC(evt_img_set_shadow) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 id = evtGetValue(event, args[1]);
     imgSetShadow(imgNameToPtr(name, gp->inBattle != 0), id);
@@ -192,7 +192,7 @@ USER_FUNC(evt_img_set_shadow) {
 }
 
 USER_FUNC(evt_img_set_paper_timerate) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 rate = evtGetFloat(event, args[1]);
     ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
@@ -201,7 +201,7 @@ USER_FUNC(evt_img_set_paper_timerate) {
 }
 
 USER_FUNC(evt_img_set_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     u8 r = evtGetValue(event, args[1]);
     u8 g = evtGetValue(event, args[2]);
@@ -214,7 +214,7 @@ USER_FUNC(evt_img_set_color) {
 }
 
 USER_FUNC(N_evt_img_set_z) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 z = evtGetFloat(event, args[1]);
     imgNameToPtr(name, gp->inBattle != 0)->order = z;

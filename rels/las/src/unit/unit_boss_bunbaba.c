@@ -81,20 +81,20 @@ BattleWeapon weapon_bunbaba_poison_attack;
 BattleWeapon weapon_bunbaba_eq_attack;
 BattleWeapon weapon_bunbaba_charge;
 BattleWeapon weapon_bunbaba_mega_attack;
-static s32 battle_entry_event[360];
-static s32 init_event[53];
-static s32 damage_event[10];
-s32 bunbaba_damage_sub_event[45];
-static s32 dead_event[264];
-static s32 phase_event[160];
-static s32 fumituke_attack_event[356];
-static s32 kamituki_attack_event[141];
-s32 eq_attack_event[177];
-s32 poison_attack_event[261];
-s32 mega_attack_event[256];
-static s32 charge_event[55];
-static s32 attack_event[237];
-static s32 wait_event[6];
+static EvtWord battle_entry_event[360];
+static EvtWord init_event[53];
+static EvtWord damage_event[10];
+EvtWord bunbaba_damage_sub_event[45];
+static EvtWord dead_event[264];
+static EvtWord phase_event[160];
+static EvtWord fumituke_attack_event[356];
+static EvtWord kamituki_attack_event[141];
+EvtWord eq_attack_event[177];
+EvtWord poison_attack_event[261];
+EvtWord mega_attack_event[256];
+static EvtWord charge_event[55];
+static EvtWord attack_event[237];
+static EvtWord wait_event[6];
 
 f32 fd_boss_bunbaba_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1203,7 +1203,7 @@ EVT_END()
 struct EffectEntry* effKemuri9N64Entry(s32 type, s32 arg1, s32 arg2, f32 x, f32 y, f32 z, f32 arg6, f32 arg7);
 
 static USER_FUNC(_leg_smoke_effect) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);

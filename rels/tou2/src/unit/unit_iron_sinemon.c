@@ -66,14 +66,14 @@ static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_iron_sinemon_attack;
 static PoseTableEntry pose_table[18];
 static BattleDataEntry data_table[3];
-static s32 init_event1[18];
-static s32 init_event2[18];
-static s32 init_event_sub[47];
-static s32 dmg_avoid_counter_thorn_head_event[76];
-static s32 damage_event[102];
-static s32 phase_event[188];
-static s32 attack_event[385];
-static s32 wait_event[6];
+static EvtWord init_event1[18];
+static EvtWord init_event2[18];
+static EvtWord init_event_sub[47];
+static EvtWord dmg_avoid_counter_thorn_head_event[76];
+static EvtWord damage_event[102];
+static EvtWord phase_event[188];
+static EvtWord attack_event[385];
+static EvtWord wait_event[6];
 
 f32 fd_iron_sinemon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -507,7 +507,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static USER_FUNC(get_id) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 i;
     s32 id1;
     s32 id2;
@@ -528,7 +528,7 @@ static USER_FUNC(get_id) {
     return EVT_RETURN_DONE;
 }
 static USER_FUNC(yoshi_exist) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();
     s32 exist = 0;
 

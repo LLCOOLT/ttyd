@@ -204,7 +204,7 @@ EVT_END()
 
 USER_FUNC(main_suki) {
     SukiWork* w = get_ptr();
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 posTbl[18] = {
         95.0f, 35.0f, -150.0f, 180.0f, 80.0f, -150.0f, 95.0f, 110.0f, -150.0f,
         10.0f, 80.0f, -150.0f, 30.0f, -10.0f, -150.0f, 160.0f, -10.0f, -150.0f,
@@ -641,7 +641,7 @@ static USER_FUNC(start_game) {
 
 static USER_FUNC(wait_game_end) {
     SukiWork* w = get_ptr();
-    s32* args = event->args;
+    EvtWord* args = event->args;
     if (w->state == 5) {
         evtSetValue(event, args[0], w->round + 1);
         return 2;
@@ -661,7 +661,7 @@ USER_FUNC(wait_star_stone_up_end) {
 
 USER_FUNC(star_stone_get_attack_point) {
     SukiWork* w = get_ptr();
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 i = evtGetValue(event, args[0]);
     evtSetFloat(event, args[1], w->starPos[i].x);
     evtSetFloat(event, args[2], w->starPos[i].y);
@@ -695,7 +695,7 @@ typedef struct OhkoRateTbl {
 const OhkoRateTbl N_ohko_rate_tbl = {{50, 60, 70, 80, 90, 100}};
 
 static USER_FUNC(set_weapon) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     SukiWork* w = get_ptr();
     OhkoRateTbl tbl = N_ohko_rate_tbl;
@@ -706,7 +706,7 @@ static USER_FUNC(set_weapon) {
 }
 
 USER_FUNC(aud_set_draw) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleAudience* a = BattleAudienceBaseGetPtr();
     if (evtGetValue(event, args[0]) == 0) {
         a->flags |= 0x20000;
@@ -723,7 +723,7 @@ USER_FUNC(flash_update) {
 }
 
 USER_FUNC(exist_map) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     if (mapGetMapObj((char*)evtGetValue(event, args[0]))) {
         evtSetValue(event, args[1], 1);
     } else {
@@ -733,7 +733,7 @@ USER_FUNC(exist_map) {
 }
 
 USER_FUNC(get_screen_point) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec v;
     v.x = evtGetFloat(event, args[0]);
     v.y = evtGetFloat(event, args[1]);
@@ -745,7 +745,7 @@ USER_FUNC(get_screen_point) {
 }
 
 USER_FUNC(eff_crystal) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     EffectEntry* e = effCrystalN64Entry(6, 60, x, y, 30.0f, 1.0f);
@@ -754,7 +754,7 @@ USER_FUNC(eff_crystal) {
 }
 
 USER_FUNC(get_img_name) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s8 idx = evtGetValue(event, args[0]);
     SukiWork* w = get_ptr();
     evtSetValue(event, args[1], (s32)w->names[idx]);

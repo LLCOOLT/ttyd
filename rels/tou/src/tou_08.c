@@ -115,37 +115,37 @@ f32 fd_tou_08___local_3PIO2_368;
 f32 fd_tou_08_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tou_08___local_PIO2_367;
 f32 fd_tou_08_one_364;
-static s32 evt_toile[42];
-static s32 n_door_open[12];
-static s32 n_door_close[12];
-static s32 toile_in[13];
-static s32 toile_out[35];
+static EvtWord evt_toile[42];
+static EvtWord n_door_open[12];
+static EvtWord n_door_close[12];
+static EvtWord toile_in[13];
+static EvtWord toile_out[35];
 static BeroEntry bero_data[3];
-s32 init_togenoko[12];
-s32 talk_togenoko[136];
-s32 init_togemet[12];
-s32 talk_togemet[136];
-s32 init_hammerbros[12];
-s32 talk_hammerbros[136];
-static s32 init_uranoko[12];
-static s32 talk_uranoko[136];
+EvtWord init_togenoko[12];
+EvtWord talk_togenoko[136];
+EvtWord init_togemet[12];
+EvtWord talk_togemet[136];
+EvtWord init_hammerbros[12];
+EvtWord talk_hammerbros[136];
+static EvtWord init_uranoko[12];
+static EvtWord talk_uranoko[136];
 static NpcSetupInfo npcEnt[7];
-static s32 evt_sensyu[70];
-s32 evt_1st_sub[107];
-static s32 evt_1st_leagu[747];
-s32 evt_toile_door[236];
-s32 evt_toile_door2[136];
+static EvtWord evt_sensyu[70];
+EvtWord evt_1st_sub[107];
+static EvtWord evt_1st_leagu[747];
+EvtWord evt_toile_door[236];
+EvtWord evt_toile_door2[136];
 #ifdef VERSION_G8ME01
-s32 evt_champion_win[290];
+EvtWord evt_champion_win[290];
 #else
-s32 evt_champion_win[271];
+EvtWord evt_champion_win[271];
 #endif
-static s32 bed_entry[10];
-s32 evt_tou_08_cake[53];
-static s32 epilogue_npc_entry[84];
-static s32 epilogue_evt_sub[322];
-static s32 epilogue_evt[83];
-s32 tou_08_init_evt[289];
+static EvtWord bed_entry[10];
+EvtWord evt_tou_08_cake[53];
+static EvtWord epilogue_npc_entry[84];
+static EvtWord epilogue_evt_sub[322];
+static EvtWord epilogue_evt[83];
+EvtWord tou_08_init_evt[289];
 
 f32 fd_tou_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1348,7 +1348,7 @@ EVT_BEGIN(tou_08_init_evt)
 EVT_END()
 
 static USER_FUNC(get_yoshi_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], pouchGetPartyColor(4));
     return EVT_RETURN_DONE;
 }

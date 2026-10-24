@@ -59,24 +59,24 @@ static StatusVulnerability regist;
 PoseTableEntry pose_table_object[3];
 BattleUnitKindPart unitpartsdata_Mario[3];
 BattleUnitKind unitdata_Mario;
-static s32 battle_entry_event[73];
-s32 mario_ride_btl_entry_event[120];
-static s32 init_event[75];
+static EvtWord battle_entry_event[73];
+EvtWord mario_ride_btl_entry_event[120];
+static EvtWord init_event[75];
 #ifdef VERSION_G8ME01
-s32 mario_dead_event[67];
+EvtWord mario_dead_event[67];
 #else
-s32 mario_dead_event[57];
+EvtWord mario_dead_event[57];
 #endif
-s32 mario_emergency_revival_event[130];
-s32 mario_appeal_event[30];
-static s32 attack_audience_event[15];
-s32 btlataudevtMarioJump[237];
-s32 btlataudevtMarioHammer[356];
+EvtWord mario_emergency_revival_event[130];
+EvtWord mario_appeal_event[30];
+static EvtWord attack_audience_event[15];
+EvtWord btlataudevtMarioJump[237];
+EvtWord btlataudevtMarioHammer[356];
 static PoseSoundTiming pose_sound_timing_table[2];
-static s32 damage_event[10];
-static s32 attack_event[2];
-static s32 wait_event[6];
-s32 mario_win_reaction[9];
+static EvtWord damage_event[10];
+static EvtWord attack_event[2];
+static EvtWord wait_event[6];
+EvtWord mario_win_reaction[9];
 
 PoseTableEntry pose_table_mario_stay[] = {
     {4, "M_S_3"},
@@ -291,7 +291,7 @@ static EVT_BEGIN(init_event)
 EVT_END()
 
 USER_FUNC(_get_local_frame) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = args[0];
     BattleUnitPart* part;
     AnimationPose* pose;
@@ -352,7 +352,7 @@ static USER_FUNC(_mario_makkuro_set) {
 
 USER_FUNC(_mario_super_emblem_anim_set) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnitPart* part;
     const char* animName;
     s32 id, type;

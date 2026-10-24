@@ -70,7 +70,7 @@ void marioRollForceCancel(void);
 
 #define FLAGONOFF(n, field)                                \
     USER_FUNC(evt_mario_##n##_onoff) {                     \
-        s32* args = event->args;                           \
+        EvtWord* args = event->args;                           \
         MarioWork* mp = marioGetPtr();                     \
         if (evtGetValue(event, args[0])) {                 \
             mp->field |= evtGetValue(event, args[1]);      \
@@ -186,7 +186,7 @@ void partyMoveBehindMario3(PartyEntry* party, s32 a, f32 dir);
 void partySetDispDirToMario(PartyEntry* party);
 
 USER_FUNC(evt_mario_dokan_prepare) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     PartyEntry* party;
     s32 type;
@@ -222,7 +222,7 @@ USER_FUNC(evt_mario_dokan_prepare) {
 
 
 USER_FUNC(evt_mario_paper_pose_dokan) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     s32 type = evtGetValue(event, args[0]);
     PartyEntry* party;
@@ -463,7 +463,7 @@ USER_FUNC(evt_mario_cont_onoff) {
 }
 
 USER_FUNC(evt_mario_key_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     marioGetPtr();
     if (!evtGetValue(event, args[0])) {
         marioKeyOff();
@@ -532,7 +532,7 @@ USER_FUNC(evt_mario_set_camid) {
 }
 
 USER_FUNC(evt_mario_get_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     if (!evtGetValue(event, args[0])) {
         evtSetFloat(event, args[1], mp->position.x);
@@ -547,7 +547,7 @@ USER_FUNC(evt_mario_get_pos) {
 }
 
 USER_FUNC(evt_mario_set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     mp->position.x = evtGetFloat(event, args[0]);
     mp->position.y = evtGetFloat(event, args[1]);
@@ -557,7 +557,7 @@ USER_FUNC(evt_mario_set_pos) {
 
 USER_FUNC(evt_mario_set_hosei_xyz) {
     MarioWork* mp = marioGetPtr();
-    s32* args = event->args;
+    EvtWord* args = event->args;
     mp->floorMove.x = evtGetFloat(event, args[0]);
     mp->floorMove.y = evtGetFloat(event, args[1]);
     mp->floorMove.z = evtGetFloat(event, args[2]);
@@ -583,7 +583,7 @@ USER_FUNC(evt_mario_get_dir) {
 }
 
 USER_FUNC(evt_mario_set_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     f32 dir = evtGetFloat(event, args[0]);
     s32 frames = sysMsec2Frame(evtGetValue(event, args[1]));
@@ -642,7 +642,7 @@ USER_FUNC(evt_mario_get_dispdir) {
 }
 
 USER_FUNC(evt_mario_set_dispdir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     mp->displayDirectionTarget = reviseAngle(evtGetFloat(event, args[0]));
     mp->displayDirection = mp->displayDirectionTarget;
@@ -650,7 +650,7 @@ USER_FUNC(evt_mario_set_dispdir) {
 }
 
 USER_FUNC(evt_mario_set_dir_npc) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     s32 name = evtGetValue(event, args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, (const char*)name);
@@ -668,7 +668,7 @@ USER_FUNC(evt_mario_set_dir_npc) {
 }
 
 USER_FUNC(evt_mario_set_dir_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     f32 x = evtGetValue(event, args[0]);
     f32 z = evtGetValue(event, args[1]);
@@ -708,7 +708,7 @@ USER_FUNC(evt_mario_set_pose) {
     s32 i;
     BOOL notFound;
     const char* name;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     if (mp->currMotionId == 0x18 || mp->currMotionId == 0x19 || mp->currMotionId == 0x16 ||
         mp->currMotionId == 0x15) {
@@ -867,7 +867,7 @@ USER_FUNC(evt_mario_normalize) {
 }
 
 USER_FUNC(evt_mario_get_motion) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     s32 id = args[0];
     if (mp->trigFlags & 1) {
@@ -884,7 +884,7 @@ USER_FUNC(evt_mario_set_motion) {
 }
 
 USER_FUNC(evt_mario_chk_hipbump) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 val;
     s32 id;
     MarioWork* mp = marioGetPtr();
@@ -913,13 +913,13 @@ USER_FUNC(evt_mario_cancel_roll_motion) {
 }
 
 USER_FUNC(evt_mario_get_pose) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], (s32)marioGetPtr()->animName);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_mario_set_force_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     if (mp->airTimer > 0) {
         mp->flags |= 0x40;
@@ -929,7 +929,7 @@ USER_FUNC(evt_mario_set_force_dir) {
 }
 
 USER_FUNC(evt_mario_mov_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     if (isFirstCall) {
         f32 x = evtGetFloat(event, args[0]);
@@ -953,7 +953,7 @@ USER_FUNC(evt_mario_mov_pos) {
 }
 
 USER_FUNC(evt_mario_mov_pos2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     f32 x = evtGetFloat(event, args[0]);
     f32 z = evtGetFloat(event, args[1]);
@@ -993,7 +993,7 @@ static inline f32 doorAngle(f32 cam) {
     return 270.0f;
 }
 USER_FUNC(evt_mario_party_door_move) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     f32 x = evtGetFloat(event, args[0]);
     f32 z = evtGetFloat(event, args[1]);
@@ -1127,7 +1127,7 @@ USER_FUNC(evt_mario_party_door_move) {
 }
 
 USER_FUNC(evt_mario_party_bero_move) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     f32 x = evtGetFloat(event, args[0]);
     f32 z = evtGetFloat(event, args[1]);
@@ -1251,7 +1251,7 @@ USER_FUNC(evt_mario_party_bero_move) {
 }
 
 USER_FUNC(evt_mario_jump_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     f32 t, y, frames, x, z, h;
     s32 msec;
@@ -1368,7 +1368,7 @@ USER_FUNC(evt_mario_jump_pos) {
 }
 
 USER_FUNC(evt_mario_jump_jumpstand) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     f32 tx, ty, tz, x2, y2, z2, h, x1, y1, z1;
     s32 mode;
@@ -1574,7 +1574,7 @@ USER_FUNC(evt_mario_wait_rideon) {
 }
 
 USER_FUNC(evt_mario_check_landon) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     if (marioGetPtr()->hitobjStandOn && marioChkLanding()) {
         evtSetValue(event, args[0], 1);
         return EVT_RETURN_YIELD;
@@ -1584,7 +1584,7 @@ USER_FUNC(evt_mario_check_landon) {
 }
 
 USER_FUNC(evt_koopa_hip_attack) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     f32 x, y, z, h, frames;
     if (isFirstCall) {
@@ -1658,7 +1658,7 @@ USER_FUNC(evt_koopa_hip_attack) {
 }
 
 USER_FUNC(evt_koopa_fire) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     if (isFirstCall) {
         event->userdata[0] = 0;
@@ -1678,14 +1678,14 @@ USER_FUNC(evt_koopa_fire) {
 }
 
 USER_FUNC(evt_koopa_chk_dead) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     evtSetValue(event, args[0], (mp->kpaWork->flags >> 28) & 1);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_koopa_weary) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     if (args[0]) {
         mp->kpaWork->flags |= 0x1000000;
@@ -1732,7 +1732,7 @@ USER_FUNC(evt_mario_set_mode) {
 }
 
 USER_FUNC(evt_koopa_get_level) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], kpaGetLevel());
     return EVT_RETURN_DONE;
 }
@@ -1781,7 +1781,7 @@ USER_FUNC(evt_mario_get_exparty) {
 }
 
 USER_FUNC(evt_mario_chk_join_party) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = args[0];
     evtSetValue(event, id, partyChkJoin(evtGetValue(event, args[1])));
     return EVT_RETURN_DONE;
@@ -1800,7 +1800,7 @@ USER_FUNC(evt_mario_party_use_check) {
 
 USER_FUNC(evt_mario_set_prev_party_dokan) {
     s32 slot;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     slot = args[0];
     if (isFirstCall) {
@@ -1833,7 +1833,7 @@ USER_FUNC(evt_mario_set_prev_party_dokan) {
 
 USER_FUNC(evt_mario_hello_party) {
     s32 slot;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     PartyEntry* party;
     slot = args[0];
@@ -1867,7 +1867,7 @@ USER_FUNC(evt_mario_hello_party) {
 
 USER_FUNC(evt_mario_hello_exparty_pos) {
     s32 member;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     PartyEntry* party;
     if (isFirstCall) {
@@ -1898,7 +1898,7 @@ USER_FUNC(evt_mario_hello_exparty_pos) {
 
 USER_FUNC(evt_mario_set_party) {
     s32 slot;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     slot = args[0];
     if (isFirstCall) {
@@ -1927,7 +1927,7 @@ USER_FUNC(evt_mario_set_party) {
 USER_FUNC(evt_mario_set_party_pos) {
     s32 slot;
     s32 member;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     slot = args[0];
     if (isFirstCall) {
@@ -1955,7 +1955,7 @@ USER_FUNC(evt_mario_set_party_pos) {
 
 USER_FUNC(evt_mario_set_prev_party) {
     s32 slot;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     slot = args[0];
     if (isFirstCall) {
@@ -1986,7 +1986,7 @@ USER_FUNC(evt_mario_set_prev_party) {
 
 USER_FUNC(evt_mario_set_prev_party_pos) {
     s32 slot;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     slot = args[0];
     if (isFirstCall) {
@@ -2083,7 +2083,7 @@ USER_FUNC(evt_mario_sleep_off) {
 }
 
 USER_FUNC(evt_mario_check_key_item) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 item = evtGetValue(event, args[0]);
     s32 id = args[1];
     if (((s32(*)(s32))pouchCheckItem)(item)) {
@@ -2116,7 +2116,7 @@ USER_FUNC(L_evt_mario_keyon_wait) {
 
 USER_FUNC(evt_mario_paper_plane) {
     s32 mode;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     mode = args[0];
 

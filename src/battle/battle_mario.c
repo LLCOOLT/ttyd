@@ -156,43 +156,43 @@ BattleWeapon marioWeapon_Deka;
 BattleWeapon marioWeapon_Muki;
 BattleWeapon marioWeapon_Suki;
 BattleWeapon* superActionTable[18];
-static s32 marioAttackEvent_NormalJump[VERSION_PICK(889, 963)];
-static s32 marioAttackEvent_KururinJump[1210];
-s32 marioAttackEvent_JyabaraJump[VERSION_PICK(1675, 1696)];
-s32 marioAttackEvent_GatsuDokaJump[VERSION_PICK(624, 638)];
-s32 marioAttackEvent_TatsumakiJump[VERSION_PICK(1668, 1679)];
-s32 marioAttackEvent_RenzokuJump[840];
-s32 marioAttackEvent_TugiTugiJump[VERSION_PICK(793, 775)];
-s32 marioAttackEvent_NormalHammer_Core[VERSION_PICK(1326, 1333)];
-static s32 marioAttackEvent_KaitenHammer[1060];
-s32 marioAttackEvent_FirstAttackKaitenHammer[19];
-s32 marioAttackEvent_JishinHammer[VERSION_PICK(834, 845)];
-s32 marioAttackEvent_UltraJishinHammer[665];
-s32 marioAttackEvent_HammerRotate[25];
-s32 marioAttackEvent_HammerNageru[VERSION_PICK(446, 457)];
-s32 marioAttackEvent_HammerNageru_object[VERSION_PICK(240, 247)];
-s32 marioAttackEvent_FireNaguri[702];
-s32 marioAttackEvent_FireNaguri_object[374];
-s32 _NormalCharge_core[103];
-s32 _SuperCharge_core[103];
-s32 marioAttackEvent_GatsunJump[7];
-s32 marioAttackEvent_DokanJump[7];
-s32 marioAttackEvent_MiniminiFumi[4];
-s32 marioAttackEvent_NemuraseFumi[4];
-s32 marioAttackEvent_FunyafunyaJump[4];
-static s32 marioAttackEvent_NormalHammer[7];
-s32 marioAttackEvent_GatsunHammer[7];
-s32 marioAttackEvent_IceNaguri[7];
-s32 marioAttackEvent_TsuranukiHammer[7];
-s32 marioAttackEvent_NormalCharge[7];
-s32 marioAttackEvent_NormalChargeP[7];
-s32 marioAttackEvent_SuperCharge[7];
-s32 marioAttackEvent_SuperChargeP[7];
-s32 marioAttackEvent_MajinaiPowerUpCheck[35];
-s32 marioAttackEvent_MajinaiJump[43];
-s32 _MajinaiPoseReset[14];
-s32 marioAttackEvent_MajinaiDefenceUp[29];
-s32 marioAttackEvent_MajinaiExpUp[27];
+static EvtWord marioAttackEvent_NormalJump[VERSION_PICK(889, 963)];
+static EvtWord marioAttackEvent_KururinJump[1210];
+EvtWord marioAttackEvent_JyabaraJump[VERSION_PICK(1675, 1696)];
+EvtWord marioAttackEvent_GatsuDokaJump[VERSION_PICK(624, 638)];
+EvtWord marioAttackEvent_TatsumakiJump[VERSION_PICK(1668, 1679)];
+EvtWord marioAttackEvent_RenzokuJump[840];
+EvtWord marioAttackEvent_TugiTugiJump[VERSION_PICK(793, 775)];
+EvtWord marioAttackEvent_NormalHammer_Core[VERSION_PICK(1326, 1333)];
+static EvtWord marioAttackEvent_KaitenHammer[1060];
+EvtWord marioAttackEvent_FirstAttackKaitenHammer[19];
+EvtWord marioAttackEvent_JishinHammer[VERSION_PICK(834, 845)];
+EvtWord marioAttackEvent_UltraJishinHammer[665];
+EvtWord marioAttackEvent_HammerRotate[25];
+EvtWord marioAttackEvent_HammerNageru[VERSION_PICK(446, 457)];
+EvtWord marioAttackEvent_HammerNageru_object[VERSION_PICK(240, 247)];
+EvtWord marioAttackEvent_FireNaguri[702];
+EvtWord marioAttackEvent_FireNaguri_object[374];
+EvtWord _NormalCharge_core[103];
+EvtWord _SuperCharge_core[103];
+EvtWord marioAttackEvent_GatsunJump[7];
+EvtWord marioAttackEvent_DokanJump[7];
+EvtWord marioAttackEvent_MiniminiFumi[4];
+EvtWord marioAttackEvent_NemuraseFumi[4];
+EvtWord marioAttackEvent_FunyafunyaJump[4];
+static EvtWord marioAttackEvent_NormalHammer[7];
+EvtWord marioAttackEvent_GatsunHammer[7];
+EvtWord marioAttackEvent_IceNaguri[7];
+EvtWord marioAttackEvent_TsuranukiHammer[7];
+EvtWord marioAttackEvent_NormalCharge[7];
+EvtWord marioAttackEvent_NormalChargeP[7];
+EvtWord marioAttackEvent_SuperCharge[7];
+EvtWord marioAttackEvent_SuperChargeP[7];
+EvtWord marioAttackEvent_MajinaiPowerUpCheck[35];
+EvtWord marioAttackEvent_MajinaiJump[43];
+EvtWord _MajinaiPoseReset[14];
+EvtWord marioAttackEvent_MajinaiDefenceUp[29];
+EvtWord marioAttackEvent_MajinaiExpUp[27];
 
 #ifdef VERSION_G8ME01
 BattleWeapon marioDefaultWeapon_Jump = {
@@ -10322,7 +10322,7 @@ static USER_FUNC(_get_mario_hammer_lv) {
 
 USER_FUNC(_whirlwind_effect) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 arg1 = evtGetValue(event, args[1]);
     BattleUnit* unit;
@@ -10339,7 +10339,7 @@ USER_FUNC(_whirlwind_effect) {
 }
 
 USER_FUNC(_jump_star_effect) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 id = evtGetValue(event, args[0]);
@@ -10474,7 +10474,7 @@ USER_FUNC(_record_renzoku_count) {
 }
 
 USER_FUNC(mario_get_renzoku_count_max) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 count = evtGetValue(event, args[1]);
     s32 ret = args[2];
@@ -10503,7 +10503,7 @@ USER_FUNC(mario_get_renzoku_count_max) {
 }
 
 USER_FUNC(_hammer_star_effect) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 id = evtGetValue(event, args[0]);
@@ -10538,7 +10538,7 @@ USER_FUNC(_hammer_star_effect) {
 USER_FUNC(_kaiten_hammer_acrobat_rotate) {
     BattleUnit* unit;
     BattleUnitPart* part;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     s32 n;
     s32 anim;
@@ -10580,7 +10580,7 @@ USER_FUNC(_kaiten_hammer_acrobat_rotate) {
 
 USER_FUNC(_mario_fire_ball_controll) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 partId = evtGetValue(event, args[1]);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
@@ -10603,7 +10603,7 @@ USER_FUNC(_mario_fire_ball_controll) {
     return EVT_RETURN_BLOCK;
 }
 USER_FUNC(_fire_wave) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetValue(event, args[0]);
     f32 y = evtGetValue(event, args[1]);
     f32 z = evtGetValue(event, args[2]);
@@ -10643,7 +10643,7 @@ USER_FUNC(_battle_majinai_effect) {
 }
 
 USER_FUNC(_paper_light_off) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 part;
     id = BattleTransID(event, id);

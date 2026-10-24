@@ -117,16 +117,16 @@ f32 fd_dmo_00___local_PIO2_367;
 f32 fd_dmo_00_one_364;
 f64 fd_dmo_00__three_localstatic4_sqrtf;
 f64 fd_dmo_00__half_localstatic3_sqrtf;
-s32 buttonCheck[32];
-s32 demo_evt[1489];
-static s32 koushukei_dai[63];
-s32 roten_move[25];
-s32 kuribo_move[25];
-s32 chusan_move[25];
+EvtWord buttonCheck[32];
+EvtWord demo_evt[1489];
+static EvtWord koushukei_dai[63];
+EvtWord roten_move[25];
+EvtWord kuribo_move[25];
+EvtWord chusan_move[25];
 #ifdef VERSION_G8ME01
-s32 dmo_00_init_evt[268];
+EvtWord dmo_00_init_evt[268];
 #else
-s32 dmo_00_init_evt[262];
+EvtWord dmo_00_init_evt[262];
 #endif
 
 USER_FUNC(demo_init) {
@@ -505,7 +505,7 @@ USER_FUNC(demo_draw) {
 }
 
 USER_FUNC(demo_winonoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     wp->winOn = evtGetValue(event, args[0]);
     return EVT_RETURN_DONE;
@@ -529,7 +529,7 @@ USER_FUNC(demo_scale) {
 }
 
 USER_FUNC(book_r) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     wp->bookRot = evtGetFloat(event, args[0]);
     return EVT_RETURN_DONE;
@@ -541,7 +541,7 @@ static USER_FUNC(next) {
 }
 
 USER_FUNC(adjust) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Mtx trans;
     Mtx scale;
     ImageEntry* img;
@@ -572,7 +572,7 @@ USER_FUNC(eff_cam1) {
 }
 
 USER_FUNC(make_msg) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u16 lines;
     u16 width;
 

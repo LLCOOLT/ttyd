@@ -56,29 +56,29 @@ f32 fd_moo_02___local_3PIO2_368;
 f32 fd_moo_02_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_moo_02___local_PIO2_367;
 f32 fd_moo_02_one_364;
-s32 n_bero_in[25];
-s32 n_bero_out[12];
+EvtWord n_bero_in[25];
+EvtWord n_bero_out[12];
 static BeroEntry bero_entry_data[6];
 #ifdef VERSION_G8ME01
-static s32 dokan_evt[122];
+static EvtWord dokan_evt[122];
 #else
-static s32 dokan_evt[102];
+static EvtWord dokan_evt[102];
 #endif
 #ifdef VERSION_G8ME01
 #else
-static s32 rock_main[79];
+static EvtWord rock_main[79];
 #endif
 #ifdef VERSION_G8ME01
-static s32 rock_evt0[15];
+static EvtWord rock_evt0[15];
 #else
-static s32 rock_evt0[21];
+static EvtWord rock_evt0[21];
 #endif
 #ifdef VERSION_G8ME01
-static s32 rock_evt1[15];
+static EvtWord rock_evt1[15];
 #else
-static s32 rock_evt1[21];
+static EvtWord rock_evt1[21];
 #endif
-s32 moo_02_init_evt[132];
+EvtWord moo_02_init_evt[132];
 
 f32 fd_moo_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

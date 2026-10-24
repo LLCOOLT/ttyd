@@ -133,65 +133,65 @@ f32 fd_aji_06___local_3PIO2_368;
 f32 fd_aji_06_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_06___local_PIO2_367;
 f32 fd_aji_06_one_364;
-static s32 s_door_open[22];
-static s32 s_door_close[22];
+static EvtWord s_door_open[22];
+static EvtWord s_door_close[22];
 static BeroEntry bero_entry_data[2];
-static s32 bero_peach_evt[31];
+static EvtWord bero_peach_evt[31];
 static BeroEntry bero_peach_data[2];
 s32 g_Kusuri_Col[1];
 s32 g_Kusuri_Src_Col[4];
-s32 g_Kusuri2_No[1];
+EvtWord g_Kusuri2_No[1];
 s32 g_Kusuri3_No[1];
 s32 g_Kusuri4_No[1];
-s32 peach_evt_kaihei_open[51];
-s32 peach_evt_kaihei_open_all[28];
-s32 peach_evt_kaihei_close[46];
-s32 peach_evt_kaihei_close_all[28];
+EvtWord peach_evt_kaihei_open[51];
+EvtWord peach_evt_kaihei_open_all[28];
+EvtWord peach_evt_kaihei_close[46];
+EvtWord peach_evt_kaihei_close_all[28];
 s32 kusuri_tyogo_list[8];
 s32 kusuri_list[5];
 s32 kusuri_id[4];
-s32 peach_evt_kusuri_select[73];
-s32 peach_evt_pick_kusuri[55];
-s32 peach_evt_check_all_kusuri_set[72];
-s32 peach_evt_kusuri_dasu[141];
-s32 peach_evt_seikai_evt[33];
-s32 peach_evt_kaihei1[187];
-s32 peach_evt_kaihei2[174];
-s32 peach_evt_kaihei3[174];
-s32 peach_evt_kaihei4[174];
-s32 peach_evt_stop_renji[15];
-s32 peach_evt_pato_on[46];
-s32 peach_evt_pato_off[18];
-s32 peach_evt_hari_on[100];
-s32 peach_evt_hari_off[27];
-s32 peach_evt_sugata_modoru[85];
-s32 peach_evt_kusuri_nomu[435];
-s32 kusuri_color_seiko[52];
-s32 kusuri_color_sippai[93];
+EvtWord peach_evt_kusuri_select[73];
+EvtWord peach_evt_pick_kusuri[55];
+EvtWord peach_evt_check_all_kusuri_set[72];
+EvtWord peach_evt_kusuri_dasu[141];
+EvtWord peach_evt_seikai_evt[33];
+EvtWord peach_evt_kaihei1[187];
+EvtWord peach_evt_kaihei2[174];
+EvtWord peach_evt_kaihei3[174];
+EvtWord peach_evt_kaihei4[174];
+EvtWord peach_evt_stop_renji[15];
+EvtWord peach_evt_pato_on[46];
+EvtWord peach_evt_pato_off[18];
+EvtWord peach_evt_hari_on[100];
+EvtWord peach_evt_hari_off[27];
+EvtWord peach_evt_sugata_modoru[85];
+EvtWord peach_evt_kusuri_nomu[435];
+EvtWord kusuri_color_seiko[52];
+EvtWord kusuri_color_sippai[93];
 s32 peach_evt_bika_move_data[33];
-s32 peach_evt_tyogo_sub[432];
-s32 peach_evt_tyogo[557];
-s32 peach_evt_tyogo_entry[6];
-s32 peach_evt_kusuri_aka[19];
-s32 peach_evt_kusuri_ao[19];
-s32 peach_evt_kusuri_ki[19];
-s32 peach_evt_kusuri_mid[19];
-s32 peach_evt_wait_memo[18];
-s32 peach_evt_memo1[20];
-s32 peach_evt_memo2[20];
-s32 peach_evt_memo3[20];
-s32 peach_evt_memo4[20];
-static s32 peach_evt_stg5[385];
-s32 peach_evt_matigai_kusuri[14];
-s32 peach_evt_tadashii_kusuri[155];
-s32 peach_evt_door[75];
-static s32 peach_evt_stg5_1[258];
-s32 kikai_init[137];
-static s32 evt_memo1[14];
-static s32 evt_memo2[14];
-s32 evt_memo3[14];
-s32 evt_memo4[14];
-s32 aji_06_init_evt[232];
+EvtWord peach_evt_tyogo_sub[432];
+EvtWord peach_evt_tyogo[557];
+EvtWord peach_evt_tyogo_entry[6];
+EvtWord peach_evt_kusuri_aka[19];
+EvtWord peach_evt_kusuri_ao[19];
+EvtWord peach_evt_kusuri_ki[19];
+EvtWord peach_evt_kusuri_mid[19];
+EvtWord peach_evt_wait_memo[18];
+EvtWord peach_evt_memo1[20];
+EvtWord peach_evt_memo2[20];
+EvtWord peach_evt_memo3[20];
+EvtWord peach_evt_memo4[20];
+static EvtWord peach_evt_stg5[385];
+EvtWord peach_evt_matigai_kusuri[14];
+EvtWord peach_evt_tadashii_kusuri[155];
+EvtWord peach_evt_door[75];
+static EvtWord peach_evt_stg5_1[258];
+EvtWord kikai_init[137];
+static EvtWord evt_memo1[14];
+static EvtWord evt_memo2[14];
+EvtWord evt_memo3[14];
+EvtWord evt_memo4[14];
+EvtWord aji_06_init_evt[232];
 
 f32 fd_aji_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1909,7 +1909,7 @@ USER_FUNC(peach_chg_pose) {
 }
 
 USER_FUNC(peach_evt_toumei_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
 
     if (evtGetValue(event, args[0])) {
@@ -1937,7 +1937,7 @@ USER_FUNC(peach_set_scale) {
 }
 
 USER_FUNC(peach_evt_seikai_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     s32 v = evtGetValue(event, args[1]);
 
@@ -1950,7 +1950,7 @@ USER_FUNC(peach_evt_seikai_check) {
 }
 
 USER_FUNC(kusuri_list_get_no) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 i;
 
@@ -2040,7 +2040,7 @@ void kusuri_naka_color_tev(MapTevCallbackInfo* info) {
 }
 
 USER_FUNC(kusuri_color_get) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetValue(event, args[0], KUSURI_COL.r);
     evtSetValue(event, args[1], KUSURI_COL.g);
@@ -2049,7 +2049,7 @@ USER_FUNC(kusuri_color_get) {
 }
 
 USER_FUNC(kusuri_color_set_rgb) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 r = evtGetValue(event, args[0]);
     s32 g = evtGetValue(event, args[1]);
     s32 b = evtGetValue(event, args[2]);
@@ -2061,7 +2061,7 @@ USER_FUNC(kusuri_color_set_rgb) {
 }
 
 USER_FUNC(kusuri_color_set) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 no = evtGetValue(event, args[0]);
     s32 frames = evtGetValue(event, args[1]);
     OSTime now = gp->renderTime;

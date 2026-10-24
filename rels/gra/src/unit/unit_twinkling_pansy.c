@@ -43,15 +43,15 @@ static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_twinkling_pansy_attack;
-static s32 attack_event[46];
+static EvtWord attack_event[46];
 static PoseTableEntry pose_table[18];
 static BattleDataEntry data_table[2];
-static s32 init_event[23];
-static s32 twink_event[56];
-static s32 damage_event[10];
-static s32 song_event[300];
-static s32 escape_event[96];
-static s32 wait_event[6];
+static EvtWord init_event[23];
+static EvtWord twink_event[56];
+static EvtWord damage_event[10];
+static EvtWord song_event[300];
+static EvtWord escape_event[96];
+static EvtWord wait_event[6];
 
 f32 fd_twinkling_pansy_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

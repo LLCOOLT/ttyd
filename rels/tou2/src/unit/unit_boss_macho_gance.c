@@ -84,26 +84,26 @@ BattleWeapon weapon_gance_attack;
 BattleWeapon weapon_gance_posing;
 BattleWeapon weapon_gance_rariat_attack;
 BattleWeapon weapon_gance_body_attack;
-s32 macho_gance_zoom[65];
-s32 macho_gance_blur_zoom[46];
-static s32 mario_party_zoom[34];
-static s32 init_event[79];
-static s32 entry_event[62];
-static s32 damage_event[97];
-s32 base_size_change[99];
-static s32 phase_event[482];
-static s32 dead_event[64];
-s32 macho_gance_damage_event[238];
-static s32 attack_event[151];
-s32 gance_macho_speed_attack_event[119];
-s32 gance_build_up_attack_event[119];
-s32 gance_body_attack_event[126];
-s32 gance_footwork_attack_event[119];
-s32 gance_attack_attack_event[541];
-s32 gance_posing_attack_event[129];
-s32 gance_rariat_attack_attack_event[446];
-s32 gance_body_attack_attack_event[515];
-static s32 wait_event[6];
+EvtWord macho_gance_zoom[65];
+EvtWord macho_gance_blur_zoom[46];
+static EvtWord mario_party_zoom[34];
+static EvtWord init_event[79];
+static EvtWord entry_event[62];
+static EvtWord damage_event[97];
+EvtWord base_size_change[99];
+static EvtWord phase_event[482];
+static EvtWord dead_event[64];
+EvtWord macho_gance_damage_event[238];
+static EvtWord attack_event[151];
+EvtWord gance_macho_speed_attack_event[119];
+EvtWord gance_build_up_attack_event[119];
+EvtWord gance_body_attack_event[126];
+EvtWord gance_footwork_attack_event[119];
+EvtWord gance_attack_attack_event[541];
+EvtWord gance_posing_attack_event[129];
+EvtWord gance_rariat_attack_attack_event[446];
+EvtWord gance_body_attack_attack_event[515];
+static EvtWord wait_event[6];
 
 f32 fd_boss_macho_gance_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1601,7 +1601,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static USER_FUNC(x_flag_wait) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     s32 value = evtGetValue(event, args[1]);
 
@@ -1612,7 +1612,7 @@ static USER_FUNC(x_flag_wait) {
 }
 
 static USER_FUNC(x_flag_get) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     evtSetValue(event, args[1], x_flag_data[index]);
@@ -1620,7 +1620,7 @@ static USER_FUNC(x_flag_get) {
 }
 
 static USER_FUNC(x_flag_add) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     x_flag_data[index] += evtGetValue(event, args[1]);
@@ -1628,7 +1628,7 @@ static USER_FUNC(x_flag_add) {
 }
 
 static USER_FUNC(x_flag_set) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     x_flag_data[index] = evtGetValue(event, args[1]);
@@ -1636,7 +1636,7 @@ static USER_FUNC(x_flag_set) {
 }
 
 static USER_FUNC(wariai_enzan_0f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]) - 1.0f;
     f32 c = evtGetFloat(event, args[2]);
@@ -1647,7 +1647,7 @@ static USER_FUNC(wariai_enzan_0f) {
 }
 
 static USER_FUNC(wariai_enzan_0) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]) - 1.0f;
     f32 c = evtGetFloat(event, args[2]);
@@ -1658,7 +1658,7 @@ static USER_FUNC(wariai_enzan_0) {
 }
 
 USER_FUNC(wariai_enzan_1f_intpl_w) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);
@@ -1696,7 +1696,7 @@ USER_FUNC(wariai_enzan_1f_intpl_w) {
 }
 
 static USER_FUNC(wariai_enzan_1f_intpl) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);
@@ -1720,7 +1720,7 @@ static USER_FUNC(wariai_enzan_1f_intpl) {
 }
 
 static USER_FUNC(wariai_enzan_1f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);
@@ -1731,7 +1731,7 @@ static USER_FUNC(wariai_enzan_1f) {
 }
 
 static USER_FUNC(wariai_enzan_1) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);

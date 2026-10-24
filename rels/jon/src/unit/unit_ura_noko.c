@@ -50,14 +50,14 @@ static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_nokonoko_attack;
 static BattleWeapon weapon_ura_noko_ura_attack;
-static s32 init_event[41];
-static s32 damage_event[10];
-static s32 dmg_turn_event[78];
-static s32 wakeup_event[80];
-static s32 first_attack_event[302];
-static s32 attack_event[548];
-static s32 ura_attack_event[560];
-static s32 wait_event[6];
+static EvtWord init_event[41];
+static EvtWord damage_event[10];
+static EvtWord dmg_turn_event[78];
+static EvtWord wakeup_event[80];
+static EvtWord first_attack_event[302];
+static EvtWord attack_event[548];
+static EvtWord ura_attack_event[560];
+static EvtWord wait_event[6];
 
 f32 fd_ura_noko_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

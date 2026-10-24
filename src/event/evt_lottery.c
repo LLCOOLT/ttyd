@@ -24,7 +24,7 @@ USER_FUNC(evt_lottery) {
 	s32 day;
 	s32 v;
 	OSCalendarTime a1, a2, b1, b2, c1, c2, d1, d2, e;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 idx = evtGetValue(event, args[0]);
 
 	OSTime now = OSGetTime();
@@ -185,7 +185,7 @@ USER_FUNC(evt_lottery) {
 }
 
 USER_FUNC(evt_lottery_buy) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	OSTime now = OSGetTime();
 	lottery_info* lot = &gp->mLotteryInfo;
 
@@ -228,7 +228,7 @@ USER_FUNC(evt_lottery_todaynum) {
 USER_FUNC(evt_lottery_error_check) {
 	OSCalendarTime a, b;
 	GlobalWork* g = gp;
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	OSTime now = OSGetTime();
 	lottery_info* lot = &g->mLotteryInfo;
 	u16 flags = lot->flags;

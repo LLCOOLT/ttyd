@@ -43,8 +43,8 @@ f32 fd_jin_09_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_jin_09___local_PIO2_367;
 f32 fd_jin_09_one_364;
 static BeroEntry bero_entry_data[2];
-s32 jin_09_jumpstand[21];
-s32 jin_09_init_evt[214];
+EvtWord jin_09_jumpstand[21];
+EvtWord jin_09_init_evt[214];
 
 f32 fd_jin_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

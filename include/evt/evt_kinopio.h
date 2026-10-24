@@ -4,6 +4,6 @@
 #include "dolphin/types.h"
 
 USER_FUNC(evt_kinopio_setup);
-extern s32 kinopio_house_talk_evt[];
+extern EvtWord kinopio_house_talk_evt[];
 
-extern s32 evt_50[];
+extern EvtWord evt_50[];

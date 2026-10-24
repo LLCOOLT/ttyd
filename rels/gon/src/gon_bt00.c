@@ -18,7 +18,7 @@ f32 fd_gon_bt00___local_3PIO2_368;
 f32 fd_gon_bt00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gon_bt00___local_PIO2_367;
 f32 fd_gon_bt00_one_364;
-s32 gon_bt00_init_evt[2];
+EvtWord gon_bt00_init_evt[2];
 
 f32 fd_gon_bt00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

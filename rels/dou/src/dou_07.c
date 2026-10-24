@@ -89,19 +89,19 @@ f32 fd_dou_07___local_3PIO2_368;
 f32 fd_dou_07_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_dou_07___local_PIO2_367;
 f32 fd_dou_07_one_364;
-static s32 erumosu_regl[2];
+static EvtWord erumosu_regl[2];
 #ifdef VERSION_G8ME01
-s32 erumosu_dead[28];
+EvtWord erumosu_dead[28];
 #else
-s32 erumosu_dead[25];
+EvtWord erumosu_dead[25];
 #endif
 static NpcSetupInfo npcEnt[2];
 static BeroEntry bero_entry_data[2];
 static s32 key_tbl[2];
-s32 apper_elmos[43];
-s32 peramajin_before[396];
-s32 peramajin_after[297];
-s32 dou_07_init_evt[89];
+EvtWord apper_elmos[43];
+EvtWord peramajin_before[396];
+EvtWord peramajin_after[297];
+EvtWord dou_07_init_evt[89];
 
 f32 fd_dou_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

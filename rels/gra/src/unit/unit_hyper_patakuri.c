@@ -53,11 +53,11 @@ static BattleUnitKindPart parts_patakuri[1];
 static PoseTableEntry pose_table_patakuri[19];
 static BattleDataEntry data_table_patakuri[3];
 static PoseSoundTiming pose_sound_timing_table[7];
-static s32 init_event_patakuri[26];
-static s32 dmg_fall_event[107];
-static s32 patakuri_dmg_first_attack_pos[19];
-static s32 attack_event_patakuri[532];
-static s32 wait_event_patakuri[12];
+static EvtWord init_event_patakuri[26];
+static EvtWord dmg_fall_event[107];
+static EvtWord patakuri_dmg_first_attack_pos[19];
+static EvtWord attack_event_patakuri[532];
+static EvtWord wait_event_patakuri[12];
 static PoseTableEntry pose_table[20];
 static BattleDataEntry data_table[2];
 static BattleUnitDefense defence;
@@ -66,11 +66,11 @@ static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_kuriboo_attack;
 static BattleWeapon weapon_kuriboo_charge;
-static s32 init_event[47];
-static s32 damage_event[10];
-static s32 phase_event[2];
-static s32 attack_event[638];
-static s32 wait_event[6];
+static EvtWord init_event[47];
+static EvtWord damage_event[10];
+static EvtWord phase_event[2];
+static EvtWord attack_event[638];
+static EvtWord wait_event[6];
 
 f32 fd_hyper_patakuri_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -800,7 +800,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static USER_FUNC(krb_get_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
     f32 z1 = evtGetFloat(event, args[1]);
     f32 x2 = evtGetFloat(event, args[2]);

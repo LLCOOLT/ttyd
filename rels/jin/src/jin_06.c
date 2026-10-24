@@ -50,13 +50,13 @@ f32 fd_jin_06___local_3PIO2_368;
 f32 fd_jin_06_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_jin_06___local_PIO2_367;
 f32 fd_jin_06_one_364;
-static s32 w_close[12];
-static s32 w_open[12];
+static EvtWord w_close[12];
+static EvtWord w_open[12];
 static BeroEntry bero_entry_data[2];
-s32 jin_06_wall_open_evt[5];
-s32 jin_06_jumpstand[53];
-static s32 mobj_box00[34];
-s32 jin_06_init_evt[165];
+EvtWord jin_06_wall_open_evt[5];
+EvtWord jin_06_jumpstand[53];
+static EvtWord mobj_box00[34];
+EvtWord jin_06_init_evt[165];
 
 f32 fd_jin_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

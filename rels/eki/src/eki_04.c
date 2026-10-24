@@ -29,13 +29,13 @@ f32 fd_eki_04___local_3PIO2_368;
 f32 fd_eki_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_eki_04___local_PIO2_367;
 f32 fd_eki_04_one_364;
-static s32 e_close[12];
-static s32 e_open[12];
-static s32 s_close[12];
-static s32 s_open[12];
+static EvtWord e_close[12];
+static EvtWord e_open[12];
+static EvtWord s_close[12];
+static EvtWord s_open[12];
 static BeroEntry bero_data[3];
-s32 evt_jump[21];
-s32 eki_04_init_evt[66];
+EvtWord evt_jump[21];
+EvtWord eki_04_init_evt[66];
 
 f32 fd_eki_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -56,7 +56,7 @@ NpcBattleSelect btlgrpsel_bom_btlno_bom_04_02_off[3];
 NpcBattleSelect btlgrpsel_bom_btlno_bom_04_03_off[2];
 NpcSetupBattleInfo btlsetup_bom_tbl[8];
 NpcTerritoryInfo btl_bom_setup_no_tbl[8];
-s32 bgset_bom_snow_event[4];
+EvtWord bgset_bom_snow_event[4];
 
 f32 fd_battle_database_bom_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

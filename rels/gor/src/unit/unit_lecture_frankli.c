@@ -61,14 +61,14 @@ BattleWeapon _lec_weapon_jump;
 BattleWeapon _lec_weapon_hammer;
 static BattleDataEntry data_table[4];
 static BattleUnitKindPart parts[1];
-static s32 init_event[38];
-static s32 damage_event[10];
-static s32 phase_event[681];
-static s32 attack_event[5];
-static s32 wait_event[6];
-s32 lecAttackEvent_Jump[735];
-s32 lecAttackEvent_Hammer[651];
-s32 lecture_end_event[51];
+static EvtWord init_event[38];
+static EvtWord damage_event[10];
+static EvtWord phase_event[681];
+static EvtWord attack_event[5];
+static EvtWord wait_event[6];
+EvtWord lecAttackEvent_Jump[735];
+EvtWord lecAttackEvent_Hammer[651];
+EvtWord lecture_end_event[51];
 
 f32 fd_lecture_frankli_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

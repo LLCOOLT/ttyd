@@ -28,11 +28,11 @@ static StatusVulnerability regist;
 static PoseTableEntry pose_table[7];
 static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
-static s32 init_event[9];
-static s32 damage_event[2];
-static s32 phase_event[2];
-static s32 attack_event[2];
-static s32 wait_event[6];
+static EvtWord init_event[9];
+static EvtWord damage_event[2];
+static EvtWord phase_event[2];
+static EvtWord attack_event[2];
+static EvtWord wait_event[6];
 
 f32 fd_act_kinopiko_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

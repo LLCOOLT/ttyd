@@ -52,15 +52,15 @@ f32 fd_tik_06___local_3PIO2_368;
 f32 fd_tik_06_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tik_06___local_PIO2_367;
 f32 fd_tik_06_one_364;
-static s32 oshimodo_event[32];
+static EvtWord oshimodo_event[32];
 static BeroEntry bero_entry_data[5];
-s32 iri_12_kino_makkino_talk[284];
-s32 iri_12_kino_talk[36];
-static s32 iri_12_makkino_talk[7];
-static s32 iri_12_init[85];
-static s32 evt_kanban[16];
-static s32 evt_kanban2[45];
-s32 tik_06_init_evt[47];
+EvtWord iri_12_kino_makkino_talk[284];
+EvtWord iri_12_kino_talk[36];
+static EvtWord iri_12_makkino_talk[7];
+static EvtWord iri_12_init[85];
+static EvtWord evt_kanban[16];
+static EvtWord evt_kanban2[45];
+EvtWord tik_06_init_evt[47];
 
 f32 fd_tik_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

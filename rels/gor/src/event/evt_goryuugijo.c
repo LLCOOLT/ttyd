@@ -38,10 +38,10 @@ f32 fd_evt_goryuugijo___local_3PIO2_368;
 f32 fd_evt_goryuugijo_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_evt_goryuugijo___local_PIO2_367;
 f32 fd_evt_goryuugijo_one_364;
-static s32 main_evt[4];
+static EvtWord main_evt[4];
 
 USER_FUNC(eff_call_yuugijo) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -52,7 +52,7 @@ USER_FUNC(eff_call_yuugijo) {
 }
 
 USER_FUNC(evt_goryuugijo_free) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     GoryuuWork* wp = (GoryuuWork*)evtGetValue(event, args[0]);
 
     if (wp == NULL) {
@@ -73,7 +73,7 @@ USER_FUNC(evt_goryuugijo_free) {
 }
 
 USER_FUNC(evt_goryuugijo_alloc) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     GoryuuWork* wp = _mapAlloc(sizeof(GoryuuWork));
 
     memset(wp, 0, sizeof(GoryuuWork));

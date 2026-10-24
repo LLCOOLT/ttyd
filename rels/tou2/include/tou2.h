@@ -6,7 +6,7 @@
 
 extern NpcTerritoryInfo btl_tou_setup_no_tbl[];
 USER_FUNC(evt_tou_get_fighter_tribe);
-extern s32 tou_03_init_evt[];
+extern EvtWord tou_03_init_evt[];
 extern BattleUnitKind unit_basabasa;
 extern BattleUnitKind unit_bomhei;
 extern BattleUnitKind unit_boomerang_bros;

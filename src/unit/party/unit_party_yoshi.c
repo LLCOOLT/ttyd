@@ -146,9 +146,9 @@ PoseTableEntry pose_table_egg_y[4];
 PoseTableEntry pose_table_egg_p[4];
 BattleUnitKindPart unitpartsdata_Party_Yoshi[7];
 BattleUnitKind unitdata_Party_Yoshi;
-static s32 battle_entry_event[59];
-static s32 init_event[54];
-static s32 damage_event[16];
+static EvtWord battle_entry_event[59];
+static EvtWord init_event[54];
+static EvtWord damage_event[16];
 BattleWeapon partyWeapon_YoshiNormalAttack;
 BattleWeapon partyWeapon_YoshiNomikomi_Shot;
 BattleWeapon partyWeapon_YoshiNomikomi_Spew;
@@ -158,16 +158,16 @@ BattleWeapon partyWeapon_YoshiNomikomi_Involved;
 BattleWeapon partyWeapon_YoshiEggAttack_Minimini;
 BattleWeapon partyWeapon_YoshiCallGuard;
 PoseSoundTiming posesound_normal_attack[15];
-s32 partyYoshiAttack_NormalAttack[1025];
-s32 partyYoshiAttack_Nomikomi[1000];
-s32 partyYoshiAttack_EggAttack[1266];
-s32 _egg_attack_event[195];
-s32 partyYoshiAttack_CallGuard[553];
-s32 yoshi_appeal_event[39];
-static s32 party_win_reaction[25];
-static s32 attack_audience_event[290];
-static s32 attack_event[2];
-static s32 wait_event[6];
+EvtWord partyYoshiAttack_NormalAttack[1025];
+EvtWord partyYoshiAttack_Nomikomi[1000];
+EvtWord partyYoshiAttack_EggAttack[1266];
+EvtWord _egg_attack_event[195];
+EvtWord partyYoshiAttack_CallGuard[553];
+EvtWord yoshi_appeal_event[39];
+static EvtWord party_win_reaction[25];
+static EvtWord attack_audience_event[290];
+static EvtWord attack_event[2];
+static EvtWord wait_event[6];
 u8 _yoshig_tpl_no_tbl[8] __attribute__((aligned(4)));
 
 
@@ -1996,7 +1996,7 @@ USER_FUNC(yoshi_original_color_anim_set) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnitPart* part;
     const char* name;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id;
 
     if (part && part) { // FAKE: empty test of the uninitialised part pointer; removing it changes codegen
@@ -2080,7 +2080,7 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_calc_param) {
     s32 id, outSpeed, outFrames;
     f32 tx, ty, tz, speed;
     f32 x, y, z;
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -2120,7 +2120,7 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_calc_param) {
 
 USER_FUNC(btl_yoshi_yoroyoro_jump_move) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 id;
     f32 sweatAngle;
@@ -2194,7 +2194,7 @@ void _yoshi_slide_move_sound(BattleUnit* unit, PoseSoundTiming* s) {
 
 USER_FUNC(_get_nomikomi_hit_position) {
     BattleWork* wp;
-    s32* args;
+    EvtWord* args;
     BattleUnit* unit;
     Vec pos;
     s32 id, targetId, dir;
@@ -2226,7 +2226,7 @@ USER_FUNC(_get_swallow_param) {
     BattleUnit* unit;
     s32 id;
     s32 out;
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -2241,7 +2241,7 @@ USER_FUNC(_check_swallow_attribute) {
     BattleUnit* unit;
     s32 id, out;
     u16 mask;
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);

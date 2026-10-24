@@ -80,32 +80,32 @@ static BattleWeapon weapon_majolyne_kagenuke_attack1;
 static BattleWeapon weapon_majolyne_blizzard_attack1;
 static BattleWeapon weapon_majolyne_powder_attack1;
 static BattleWeapon weapon_majolyne_powder_attack2;
-static s32 majolyne_down[19];
-static s32 majolyne_up[27];
-static s32 majo3_zoom[25];
-s32 btl_vivian_zoom[7];
-s32 btl_marilyn_zoom[7];
-s32 btl_majolyne_zoom[7];
-static s32 init_event[45];
-static s32 damage_event[22];
-static s32 dead_event[122];
-s32 majo_unison_phase_event[238];
-static s32 unison_phase_event[83];
-static s32 phase_event[337];
-static s32 attack_event[241];
+static EvtWord majolyne_down[19];
+static EvtWord majolyne_up[27];
+static EvtWord majo3_zoom[25];
+EvtWord btl_vivian_zoom[7];
+EvtWord btl_marilyn_zoom[7];
+EvtWord btl_majolyne_zoom[7];
+static EvtWord init_event[45];
+static EvtWord damage_event[22];
+static EvtWord dead_event[122];
+EvtWord majo_unison_phase_event[238];
+static EvtWord unison_phase_event[83];
+static EvtWord phase_event[337];
+static EvtWord attack_event[241];
 #ifdef VERSION_G8ME01
-static s32 kagenuke_attack_event[225];
+static EvtWord kagenuke_attack_event[225];
 #else
-static s32 kagenuke_attack_event[222];
+static EvtWord kagenuke_attack_event[222];
 #endif
-static s32 blizzard_attack_event[243];
-static s32 powder_attack_check[16];
-static s32 powder_attack_event[179];
-static s32 wait_event[6];
+static EvtWord blizzard_attack_event[243];
+static EvtWord powder_attack_check[16];
+static EvtWord powder_attack_event[179];
+static EvtWord wait_event[6];
 #ifdef VERSION_G8ME01
-s32 majo3_shadow_tail_event[79];
+EvtWord majo3_shadow_tail_event[79];
 #else
-s32 majo3_shadow_tail_event[78];
+EvtWord majo3_shadow_tail_event[78];
 #endif
 
 f32 fd_boss_majolyne_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};

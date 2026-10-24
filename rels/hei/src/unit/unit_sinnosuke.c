@@ -48,13 +48,13 @@ static BattleWeapon weapon_sinnosuke_attack;
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_turn[15];
 static BattleDataEntry data_table[3];
-static s32 init_event[42];
-static s32 damage_event[58];
-static s32 damage_event_sub[51];
-static s32 dmg_turn_event[91];
-static s32 wakeup_event[99];
-static s32 attack_event[454];
-static s32 wait_event[6];
+static EvtWord init_event[42];
+static EvtWord damage_event[58];
+static EvtWord damage_event_sub[51];
+static EvtWord dmg_turn_event[91];
+static EvtWord wakeup_event[99];
+static EvtWord attack_event[454];
+static EvtWord wait_event[6];
 
 f32 fd_sinnosuke_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -81,13 +81,13 @@ f32 fd_tik_12___local_PIO2_367;
 f32 fd_tik_12_one_364;
 s32 majinaisi_ryokin_kaisu_tbl[6];
 static BeroEntry bero_entry_data[2];
-s32 suisyou_kirakira[30];
-s32 majinaisi_table_talk[877];
+EvtWord suisyou_kirakira[30];
+EvtWord majinaisi_table_talk[877];
 s32 iri_14_item_tbl[2];
-s32 majinaisi_direct_talk[108];
-s32 majinaisi_init[10];
+EvtWord majinaisi_direct_talk[108];
+EvtWord majinaisi_init[10];
 static NpcSetupInfo npcEnt[2];
-s32 tik_12_init_evt[58];
+EvtWord tik_12_init_evt[58];
 
 f32 fd_tik_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -482,7 +482,7 @@ EVT_BEGIN(tik_12_init_evt)
 EVT_END()
 
 static USER_FUNC(effect_stardust) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -500,7 +500,7 @@ static USER_FUNC(setmertn) {
     return EVT_RETURN_DONE;
 }
 USER_FUNC(majinaisi_ryokin_kaisu) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     evtSetValue(event, args[1], majinaisi_ryokin_kaisu_tbl[idx * 2]);
     evtSetValue(event, args[2], majinaisi_ryokin_kaisu_tbl[idx * 2 + 1]);

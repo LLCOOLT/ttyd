@@ -133,62 +133,62 @@ f32 fd_muj_05___local_3PIO2_368;
 f32 fd_muj_05_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_muj_05___local_PIO2_367;
 f32 fd_muj_05_one_364;
-s32 sanders_rotate[28];
-s32 sanders_nakama_sub[13];
-s32 sanders_nakama[173];
-static s32 sanders_init[51];
+EvtWord sanders_rotate[28];
+EvtWord sanders_nakama_sub[13];
+EvtWord sanders_nakama[173];
+static EvtWord sanders_init[51];
 static s32 itemsel_table01[2];
-s32 sanders_talk_sub[70];
-static s32 sanders_talk[178];
-static s32 marco_init[24];
-static s32 marco_talk[146];
-static s32 erumosu_regl[4];
-s32 erumosu_a_dead[23];
-s32 erumosu_b_dead[12];
+EvtWord sanders_talk_sub[70];
+static EvtWord sanders_talk[178];
+static EvtWord marco_init[24];
+static EvtWord marco_talk[146];
+static EvtWord erumosu_regl[4];
+EvtWord erumosu_a_dead[23];
+EvtWord erumosu_b_dead[12];
 static NpcSetupInfo npcEnt[5];
 NpcSetupInfo npcEnt_after[3];
 static BeroEntry bero_entry_data[3];
-s32 hammer_sub[27];
-s32 hammer_event[10];
-s32 sanders_kyushutsu_sub[250];
-s32 erumosu_guruguru[13];
-s32 erumosu_guruguru_dir[11];
-s32 sanders_kyushutsu[63];
-s32 marco_hanauta[2];
-s32 marco_and_jewel[84];
-s32 blueeye_flush[78];
-s32 redeye_flush[78];
-s32 dokuroiwa_flush[51];
+EvtWord hammer_sub[27];
+EvtWord hammer_event[10];
+EvtWord sanders_kyushutsu_sub[250];
+EvtWord erumosu_guruguru[13];
+EvtWord erumosu_guruguru_dir[11];
+EvtWord sanders_kyushutsu[63];
+EvtWord marco_hanauta[2];
+EvtWord marco_and_jewel[84];
+EvtWord blueeye_flush[78];
+EvtWord redeye_flush[78];
+EvtWord dokuroiwa_flush[51];
 s32 command_seikai[7];
 static s32 itemsel_table[2];
-s32 dokuroiwa_touch[127];
-s32 case_event_entry[45];
-s32 case_event_delete[42];
-s32 penalty_event[187];
-static s32 cam_shake[33];
-static s32 cam_shake2[27];
-s32 answer_event[125];
-s32 iwa01_hammer[73];
-s32 iwa01_ride_a[20];
-s32 iwa02_ride[66];
-s32 iwa02_hammer[20];
-s32 iwa02_ride_a[28];
-s32 iwa02_nonride_a[5];
-static s32 bombwall_bomb[143];
-s32 dokuroiwa_bomb[309];
-s32 dokuroiwa_init[123];
-s32 muj_05_first[26];
-s32 yure_yashi_ha1[180];
-s32 yure_yashi[88];
-static s32 evt_kusa_1[20];
+EvtWord dokuroiwa_touch[127];
+EvtWord case_event_entry[45];
+EvtWord case_event_delete[42];
+EvtWord penalty_event[187];
+static EvtWord cam_shake[33];
+static EvtWord cam_shake2[27];
+EvtWord answer_event[125];
+EvtWord iwa01_hammer[73];
+EvtWord iwa01_ride_a[20];
+EvtWord iwa02_ride[66];
+EvtWord iwa02_hammer[20];
+EvtWord iwa02_ride_a[28];
+EvtWord iwa02_nonride_a[5];
+static EvtWord bombwall_bomb[143];
+EvtWord dokuroiwa_bomb[309];
+EvtWord dokuroiwa_init[123];
+EvtWord muj_05_first[26];
+EvtWord yure_yashi_ha1[180];
+EvtWord yure_yashi[88];
+static EvtWord evt_kusa_1[20];
 static TreeAccess tree_tbl[6];
 static KusaAccess kusa_tbl[8];
-s32 muj_05_init_evt[146];
+EvtWord muj_05_init_evt[146];
 
 USER_FUNC(evt_dokuroiwa_command_check) {
     s32 result;
     s32 i;
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     for (i = 0; i < 7; i++) {
     }
@@ -209,7 +209,7 @@ USER_FUNC(evt_dokuroiwa_command_check) {
 }
 
 USER_FUNC(evt_dokuroiwa_command_set) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     if (index < 7) {

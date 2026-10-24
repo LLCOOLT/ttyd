@@ -58,16 +58,16 @@ static BattleWeapon weapon_honenoko_attack;
 static BattleUnitSetup entry_honenoko;
 static PoseTableEntry pose_table[19];
 static BattleDataEntry data_table[4];
-static s32 init_event[31];
-static s32 damage_event[10];
-static s32 dead_event[190];
-static s32 fake_dead_event[165];
-static s32 rebirth_event[67];
-static s32 attack_event[185];
-static s32 start_avoid[26];
-static s32 normal_attack_event[428];
-static s32 call_friend_event[311];
-static s32 wait_event[6];
+static EvtWord init_event[31];
+static EvtWord damage_event[10];
+static EvtWord dead_event[190];
+static EvtWord fake_dead_event[165];
+static EvtWord rebirth_event[67];
+static EvtWord attack_event[185];
+static EvtWord start_avoid[26];
+static EvtWord normal_attack_event[428];
+static EvtWord call_friend_event[311];
+static EvtWord wait_event[6];
 
 f32 fd_red_honenoko_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -678,7 +678,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static USER_FUNC(honenoko_copy_status) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
     s32 id2 = BattleTransID(event, evtGetValue(event, args[1]));
     BattleWork* wp = _battleWorkPointer;

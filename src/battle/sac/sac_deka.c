@@ -169,7 +169,7 @@ static EVT_BEGIN(nice_event)
 EVT_END()
 
 USER_FUNC(main_deka) {
-    s32* args;
+    EvtWord* args;
     DekaWork* w = get_ptr();
     s32 i;
 
@@ -1329,7 +1329,7 @@ static USER_FUNC(star_stone_appear) {
 
 USER_FUNC(get_ride_pos) {
     DekaWork* w = get_ptr();
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 k = 64.0f;
     if (evtGetValue(event, *args++) == 0) {
         evtSetFloat(event, *args++, 0.5f * (0.25f * (w->scale.x * k)) + w->starPos.x);

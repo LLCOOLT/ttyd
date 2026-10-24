@@ -19,7 +19,7 @@ static inline f32 item_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1
 #define ITEM(ev) itemNameToPtr((char*)evtGetValue(ev, args[0]))
 
 USER_FUNC(evt_item_entry) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	char* name = (char*)evtGetValue(event, args[0]);
 	s32 itemId = evtGetValue(event, args[1]);
 	s32 x = evtGetValue(event, args[2]);
@@ -38,7 +38,7 @@ USER_FUNC(evt_item_delete) {
 }
 
 USER_FUNC(evt_item_delete_check) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item = ITEM(event);
 	if (item != NULL) {
 		evtSetValue(event, args[1], 0);
@@ -49,7 +49,7 @@ USER_FUNC(evt_item_delete_check) {
 }
 
 USER_FUNC(evt_item_flag_on) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item = ITEM(event);
 	u16 flags = args[1];
 	if (item == NULL) return EVT_RETURN_DONE;
@@ -58,7 +58,7 @@ USER_FUNC(evt_item_flag_on) {
 }
 
 USER_FUNC(evt_item_flag_off) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item = ITEM(event);
 	u16 flags = args[1];
 	if (item == NULL) return EVT_RETURN_DONE;
@@ -67,7 +67,7 @@ USER_FUNC(evt_item_flag_off) {
 }
 
 USER_FUNC(evt_item_status_on) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item = ITEM(event);
 	u32 flags = args[1];
 	if (item == NULL) return EVT_RETURN_DONE;
@@ -76,7 +76,7 @@ USER_FUNC(evt_item_status_on) {
 }
 
 USER_FUNC(evt_item_set_move_dir_speed) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item = ITEM(event);
 	s32 dir = evtGetValue(event, args[1]);
 	f32 speed = evtGetFloat(event, args[2]);
@@ -87,7 +87,7 @@ USER_FUNC(evt_item_set_move_dir_speed) {
 }
 
 USER_FUNC(evt_item_set_jump_power) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item = ITEM(event);
 	f32 v = evtGetFloat(event, args[1]);
 	if (item == NULL) return EVT_RETURN_DONE;
@@ -96,7 +96,7 @@ USER_FUNC(evt_item_set_jump_power) {
 }
 
 USER_FUNC(evt_item_set_gravity) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item = ITEM(event);
 	f32 v = evtGetFloat(event, args[1]);
 	if (item == NULL) return EVT_RETURN_DONE;
@@ -105,7 +105,7 @@ USER_FUNC(evt_item_set_gravity) {
 }
 
 USER_FUNC(evt_item_set_bound_rate) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item = ITEM(event);
 	f32 v = evtGetFloat(event, args[1]);
 	if (item == NULL) return EVT_RETURN_DONE;
@@ -114,7 +114,7 @@ USER_FUNC(evt_item_set_bound_rate) {
 }
 
 USER_FUNC(evt_item_set_bound_limit) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item = ITEM(event);
 	s32 v = evtGetValue(event, args[1]);
 	if (item == NULL) return EVT_RETURN_DONE;
@@ -123,7 +123,7 @@ USER_FUNC(evt_item_set_bound_limit) {
 }
 
 USER_FUNC(evt_item_get_item) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item = itemNameToPtr((char*)evtGetValue(event, args[0]));
 	if (isFirstCall) {
 		itemForceGet(item);
@@ -144,7 +144,7 @@ USER_FUNC(evt_item_get_item_end_wait) {
 }
 
 USER_FUNC(evt_item_change_mode) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	char* name = (char*)evtGetValue(event, args[0]);
 	s32 mode = evtGetValue(event, args[1]);
 	ItemEntry* item = itemNameToPtr(name);
@@ -154,7 +154,7 @@ USER_FUNC(evt_item_change_mode) {
 }
 
 USER_FUNC(evt_item_set_bound_next_speed) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item = ITEM(event);
 	f32 v = evtGetFloat(event, args[1]);
 	if (item == NULL) return EVT_RETURN_DONE;
@@ -163,7 +163,7 @@ USER_FUNC(evt_item_set_bound_next_speed) {
 }
 
 USER_FUNC(evt_item_set_bound_next_dir) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item = ITEM(event);
 	s32 v = evtGetValue(event, args[1]);
 	if (item == NULL) return EVT_RETURN_DONE;
@@ -172,7 +172,7 @@ USER_FUNC(evt_item_set_bound_next_dir) {
 }
 
 USER_FUNC(evt_item_set_position) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	char* name = (char*)evtGetValue(event, args[0]);
 	f32 x = evtGetFloat(event, args[1]);
 	f32 y = evtGetFloat(event, args[2]);
@@ -186,7 +186,7 @@ USER_FUNC(evt_item_set_position) {
 }
 
 USER_FUNC(evt_item_get_position) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	ItemEntry* item;
 	s32 a1, a2, a3;
 	char* name = (char*)evtGetValue(event, args[0]);
@@ -202,7 +202,7 @@ USER_FUNC(evt_item_get_position) {
 }
 
 USER_FUNC(evt_item_set_scale) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	char* name = (char*)evtGetValue(event, args[0]);
 	f32 v = evtGetFloat(event, args[1]);
 	ItemEntry* item = itemNameToPtr(name);
@@ -212,7 +212,7 @@ USER_FUNC(evt_item_set_scale) {
 }
 
 USER_FUNC(evt_item_set_alpha) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	char* name = (char*)evtGetValue(event, args[0]);
 	u8 v = evtGetValue(event, args[1]);
 	ItemEntry* item = itemNameToPtr(name);
@@ -222,7 +222,7 @@ USER_FUNC(evt_item_set_alpha) {
 }
 
 USER_FUNC(evt_item_move_3d_position) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	char* name = (char*)evtGetValue(event, args[0]);
 	f32 x = (f32)evtGetValue(event, args[1]);
 	f32 y = (f32)evtGetValue(event, args[2]);

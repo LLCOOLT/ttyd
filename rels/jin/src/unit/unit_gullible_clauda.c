@@ -44,11 +44,11 @@ static BattleUnitDefenseAttr defence_attr_clauda;
 static StatusVulnerability regist_clauda;
 static BattleDataEntry data_table_clauda[2];
 static BattleUnitKindPart parts_clauda[1];
-static s32 init_event_clauda[50];
-s32 damage_event_clauda[22];
-static s32 dead_event_clauda[177];
-static s32 attack_event_clauda[393];
-static s32 wait_event_clauda[6];
+static EvtWord init_event_clauda[50];
+EvtWord damage_event_clauda[22];
+static EvtWord dead_event_clauda[177];
+static EvtWord attack_event_clauda[393];
+static EvtWord wait_event_clauda[6];
 
 f32 fd_gullible_clauda_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

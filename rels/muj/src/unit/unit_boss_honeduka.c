@@ -34,10 +34,10 @@ static StatusVulnerability regist;
 static PoseTableEntry pose_table[4];
 static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
-static s32 init_event[21];
-static s32 damage_event[10];
-s32 honeduka_damage_sub_event[14];
-static s32 wait_event[6];
+static EvtWord init_event[21];
+static EvtWord damage_event[10];
+EvtWord honeduka_damage_sub_event[14];
+static EvtWord wait_event[6];
 
 f32 fd_boss_honeduka_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

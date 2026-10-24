@@ -104,16 +104,16 @@ static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_gundan_zako_group2_attack;
 BattleWeapon weapon_gundan_zako_group2_yusuri_attack;
-static s32 init_event[21];
-static s32 damage_event[129];
-static s32 dead_event[136];
-static s32 attack_event[32];
-s32 fall_attack_event[93];
-static s32 shake_attack_event[281];
-static s32 hit_check_event[34];
-s32 hit_check_event2[7];
-s32 hit_check_event_sub[123];
-static s32 wait_event[6];
+static EvtWord init_event[21];
+static EvtWord damage_event[129];
+static EvtWord dead_event[136];
+static EvtWord attack_event[32];
+EvtWord fall_attack_event[93];
+static EvtWord shake_attack_event[281];
+static EvtWord hit_check_event[34];
+EvtWord hit_check_event2[7];
+EvtWord hit_check_event_sub[123];
+static EvtWord wait_event[6];
 
 f32 fd_boss_gundan_zako_group2_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

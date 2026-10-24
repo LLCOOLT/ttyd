@@ -106,28 +106,28 @@ f32 fd_rsh_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_rsh_00___local_PIO2_367;
 f32 fd_rsh_00_one_364;
 ExtTexInfo moamoa_data[81];
-static s32 evt_moamoa[324];
-s32 evt_rsh_moamoa_on_window[46];
+static EvtWord evt_moamoa[324];
+EvtWord evt_rsh_moamoa_on_window[46];
 static BeroEntry bero_data_a[2];
 static BeroEntry bero_data_b[2];
 static BeroEntry bero_data_c[2];
-s32 evt_handle[107];
-s32 regu_unten[210];
-static s32 init_unten[17];
-static s32 talk_unten[236];
+EvtWord evt_handle[107];
+EvtWord regu_unten[210];
+static EvtWord init_unten[17];
+static EvtWord talk_unten[236];
 static NpcSetupInfo npc_data[2];
 static const char* access_tbl[5];
-static s32 evt_access[14];
-static s32 evt_access_entry[23];
-s32 rsh_00_init_evt[194];
-s32 rsh_00_a_init_evt[51];
-s32 rsh_00_b_init_evt[11];
+static EvtWord evt_access[14];
+static EvtWord evt_access_entry[23];
+EvtWord rsh_00_init_evt[194];
+EvtWord rsh_00_a_init_evt[51];
+EvtWord rsh_00_b_init_evt[11];
 static const char* window_tbl[5];
-s32 rsh_00_c_init_evt[16];
-s32 rsh_00_init_evt_nidome[164];
-s32 rsh_00_a_init_evt_nidome[11];
-s32 rsh_00_b_init_evt_nidome[11];
-s32 rsh_00_c_init_evt_nidome[16];
+EvtWord rsh_00_c_init_evt[16];
+EvtWord rsh_00_init_evt_nidome[164];
+EvtWord rsh_00_a_init_evt_nidome[11];
+EvtWord rsh_00_b_init_evt_nidome[11];
+EvtWord rsh_00_c_init_evt_nidome[16];
 
 f32 fd_rsh_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -488,7 +488,7 @@ void moamoa_dispent(void) {
 }
 
 USER_FUNC(evt_moamoa_set_one) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Moamoa* moa;
     s32 idx = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);

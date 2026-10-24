@@ -28,7 +28,7 @@ f32 fd_rsh_08_one_364;
 BeroEntry bero_data_a_nidome[2];
 BeroEntry bero_data_b_nidome[2];
 BeroEntry bero_data_c_nidome[2];
-s32 rsh_08_a_init_evt[72];
+EvtWord rsh_08_a_init_evt[72];
 
 f32 fd_rsh_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -42,13 +42,13 @@ f32 fd_tik_16___local_PIO2_367;
 f32 fd_tik_16_one_364;
 static BeroEntry bero_entry_data[7];
 static HitDamageReturn hitDmgRetPoints[9];
-static s32 evt_switch_00_init[26];
-static s32 evt_switch_00_after[11];
-static s32 evt_switch_00[56];
-static s32 evt_switch_01_init[26];
-static s32 evt_switch_01_after[11];
-static s32 evt_switch_01[56];
-s32 tik_16_init_evt[115];
+static EvtWord evt_switch_00_init[26];
+static EvtWord evt_switch_00_after[11];
+static EvtWord evt_switch_00[56];
+static EvtWord evt_switch_01_init[26];
+static EvtWord evt_switch_01_after[11];
+static EvtWord evt_switch_01[56];
+EvtWord tik_16_init_evt[115];
 
 f32 fd_tik_16_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

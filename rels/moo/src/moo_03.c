@@ -47,9 +47,9 @@ f32 fd_moo_03___local_3PIO2_368;
 f32 fd_moo_03_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_moo_03___local_PIO2_367;
 f32 fd_moo_03_one_364;
-static s32 party_damage_pose[52];
-static s32 mario_fly[203];
-s32 moo_03_init_evt[35];
+static EvtWord party_damage_pose[52];
+static EvtWord mario_fly[203];
+EvtWord moo_03_init_evt[35];
 
 f32 fd_moo_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

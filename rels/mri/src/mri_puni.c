@@ -5121,7 +5121,7 @@ static inline void puniAnimationInit_inl(s16** a, s16** b) {
 }
 s32 evt_puni_init(EventEntry *event, BOOL isFirstCall)
 {
-  s32 *args = event->args;
+  EvtWord *args = event->args;
   s32 a = evtGetValue(event, args[0]);
   PuniTexInfo *tex = Punitex;
   s32 b = evtGetValue(event, args[1]);
@@ -5139,7 +5139,7 @@ s32 evt_puni_init(EventEntry *event, BOOL isFirstCall)
 }
 
 USER_FUNC(evt_puni_set_yuka) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Punigp->floor = evtGetValue(event, args[0]) + 1;
     Punigp->posY[0] = evtGetValue(event, args[1]);
     Punigp->posY[1] = evtGetValue(event, args[2]);
@@ -5152,7 +5152,7 @@ USER_FUNC(evt_puni_set_yuka) {
 }
 
 USER_FUNC(evt_puni_set_hamari) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32* v = &Punigp->recoverPos.x;
     Punigp->recoverPos.x = evtGetValue(event, args[0]);
     Punigp->recoverPos.y = evtGetValue(event, args[1]);
@@ -5273,7 +5273,7 @@ void toge_init_para(PuniData* p, f32 x, f32 y, f32 z) {
 }
 
 USER_FUNC(evt_puni_rnd_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     s32 px = args[1];
     s32 py = args[2];
@@ -5464,7 +5464,7 @@ s32 evt_puni_debug_info(EventEntry *event, BOOL isFirstCall)
 
 extern double fabs(double);
 USER_FUNC(evt_puni_setup) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
     s32 a0 = evtGetValue(event, args[0]);
     s32 a1;
@@ -5625,7 +5625,7 @@ USER_FUNC(evt_puni_setup) {
 
 s32 evt_toge_setup(EventEntry *event, BOOL isFirstCall)
 {
-  s32 *args = event->args;
+  EvtWord *args = event->args;
   s32 end = 1;
   s32 kind = evtGetValue(event, args[0]);
   f32 x = evtGetValue(event, args[1]);
@@ -5781,7 +5781,7 @@ static inline void puni_exit_swset(s32 off, s32 val, Vec* pos) {
 #pragma opt_dead_assignments off
 static const Vec puni_fall_dir;
 USER_FUNC(evt_puni_exit) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 mode = evtGetValue(event, args[0]);
     PuniData* p;
     const char* map;
@@ -5896,7 +5896,7 @@ USER_FUNC(evt_puni_exit) {
 #pragma pop
 
 USER_FUNC(evt_puni_init_puni) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     s32 type = evtGetValue(event, args[1]);
     PuniData* p = &Punidat[idx];
@@ -5970,7 +5970,7 @@ USER_FUNC(evt_puni_init_puni) {
 }
 
 USER_FUNC(evt_puni_init_teki) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     s32 type = evtGetValue(event, args[1]);
     PuniData* p = &Punidat[idx];
@@ -6007,7 +6007,7 @@ USER_FUNC(evt_puni_init_teki) {
 }
 
 USER_FUNC(evt_puni_get_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PuniData* p = &Punidat[evtGetValue(event, args[0])];
     evtSetValue(event, args[1], (s32)p->pos.x);
     evtSetValue(event, args[2], (s32)p->pos.y);
@@ -6016,7 +6016,7 @@ USER_FUNC(evt_puni_get_position) {
 }
 
 USER_FUNC(evt_puni_set_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PuniData* p = &Punidat[evtGetValue(event, args[0])];
     p->pos.x = evtGetValue(event, args[1]);
     p->pos.y = evtGetValue(event, args[2]);
@@ -6028,26 +6028,26 @@ USER_FUNC(evt_puni_set_position) {
 
 
 USER_FUNC(evt_puni_get_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[1], (s32)Punidat[evtGetValue(event, args[0])].dir);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_puni_set_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PuniData* p = &Punidat[evtGetValue(event, args[0])];
     p->dir = evtGetValue(event, args[1]);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_puni_get_anim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[1], Punidat[evtGetValue(event, args[0])].anim);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_puni_set_anim) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PuniData* p = &Punidat[evtGetValue(event, args[0])];
     p->anim = evtGetValue(event, args[1]);
     p->prevAnim = 1000;
@@ -6055,7 +6055,7 @@ USER_FUNC(evt_puni_set_anim) {
 }
 
 USER_FUNC(evt_puni_korokoro) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PuniData* p = &Punidat[evtGetValue(event, args[0])];
 
     switch (p->anim) {
@@ -6081,7 +6081,7 @@ USER_FUNC(evt_puni_korokoro) {
 }
 
 USER_FUNC(evt_puni_move_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PuniData* p = &Punidat[evtGetValue(event, args[0])];
     f32 x = evtGetValue(event, args[1]);
     f32 z = evtGetValue(event, args[2]);
@@ -6107,7 +6107,7 @@ USER_FUNC(evt_puni_move_position) {
 }
 
 USER_FUNC(evt_puni_move_position2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PuniData* p = &Punidat[evtGetValue(event, args[0])];
     f32 x = evtGetValue(event, args[1]);
     f32 z = evtGetValue(event, args[2]);
@@ -6139,7 +6139,7 @@ USER_FUNC(evt_puni_move_position2) {
 }
 
 USER_FUNC(evt_puni_jump_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PuniData* p = &Punidat[evtGetValue(event, args[0])];
     f32 x = evtGetValue(event, args[1]);
     f32 y = evtGetValue(event, args[2]);
@@ -6172,13 +6172,13 @@ USER_FUNC(evt_puni_jump_position) {
 }
 
 USER_FUNC(evt_puni_get_mode) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[1], Punidat[evtGetValue(event, args[0])].mode);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_puni_set_mode) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PuniData* p = &Punidat[evtGetValue(event, args[0])];
     s32 mode = evtGetValue(event, args[1]);
     p->mode = mode;
@@ -6200,13 +6200,13 @@ USER_FUNC(evt_puni_setsudan) {
 }
 
 USER_FUNC(evt_puni_get_flag) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[1], Punidat[evtGetValue(event, args[0])].flags);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_puni_flag_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PuniData* p = &Punidat[evtGetValue(event, args[0])];
     s32 on = evtGetValue(event, args[1]);
     s32 mask = evtGetValue(event, args[2]);
@@ -6219,7 +6219,7 @@ USER_FUNC(evt_puni_flag_onoff) {
 }
 
 USER_FUNC(evt_puni_dokan_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
     PuniData* p = &Punidat[puni_bero_id_filter(id)] + 103;
@@ -6266,7 +6266,7 @@ static inline void puniswGetindex_inl(s32 base, s32 idx, s32* val, Vec* pos) {
 }
 
 USER_FUNC(evt_puni_get_lsw_index) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 base = args[0];
     s32 idx = evtGetValue(event, args[1]);
     s32 val;
@@ -6285,7 +6285,7 @@ USER_FUNC(evt_puni_get_lsw_index) {
 static const Vec puni_fall_dir;
 USER_FUNC(evt_puni_set_lsw_index) {
     s32 off;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 base = args[0];
     s32 idx = evtGetValue(event, args[1]);
     s32 val = evtGetValue(event, args[2]);
@@ -6301,7 +6301,7 @@ USER_FUNC(evt_puni_set_lsw_index) {
 #pragma pop
 
 USER_FUNC(evt_puni_get_trap_index) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 v;
     puniswTrapGetindex(evtGetValue(event, args[0]), &v);
     evtSetValue(event, args[1], v);
@@ -6309,7 +6309,7 @@ USER_FUNC(evt_puni_get_trap_index) {
 }
 
 USER_FUNC(evt_puni_set_trap_index) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     s32 val = evtGetValue(event, args[1]);
     puniswTrapSetindex(idx, &val);
@@ -6343,7 +6343,7 @@ USER_FUNC(evt_puni_all_movestop) {
 }
 
 USER_FUNC(evt_puni_count) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 start, end, i;
     s32 count;
 
@@ -6365,7 +6365,7 @@ USER_FUNC(evt_puni_count) {
 }
 
 USER_FUNC(evt_puni_count_area) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetValue(event, args[0]);
     f32 y = evtGetValue(event, args[1]);
     f32 z = evtGetValue(event, args[2]);
@@ -6385,7 +6385,7 @@ USER_FUNC(evt_puni_count_area) {
 }
 
 USER_FUNC(evt_puni_zenmetsu_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 start;
     s32 end;
     s32 i;
@@ -6413,7 +6413,7 @@ USER_FUNC(evt_puni_zenmetsu_check) {
 }
 
 USER_FUNC(evt_puni_landon_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 kind = evtGetValue(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     s32 start;
@@ -6445,7 +6445,7 @@ USER_FUNC(evt_puni_landon_check) {
 }
 
 USER_FUNC(evt_puni_pera_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PuniData* p = &Punidat[evtGetValue(event, args[0])];
     if (evtGetValue(event, args[1])) {
         p->npc->flags &= ~2;
@@ -6541,7 +6541,7 @@ USER_FUNC(evt_puni_all_save) {
 #pragma pop
 
 USER_FUNC(evt_target_flag_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
     s32 mask = evtGetValue(event, args[2]);
@@ -6555,7 +6555,7 @@ USER_FUNC(evt_target_flag_onoff) {
 }
 
 USER_FUNC(evt_target_set_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 i = evtGetValue(event, args[0]);
     PuniTarget* t = &Punigp->targets[i];
     t->pos.x = evtGetValue(event, args[1]);
@@ -6565,7 +6565,7 @@ USER_FUNC(evt_target_set_position) {
 }
 
 USER_FUNC(evt_target_set_soko) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     PuniTarget* t = &Punigp->targets[idx];
     t->hit = hitNameToPtr((const char*)evtGetValue(event, args[1]));
@@ -6634,7 +6634,7 @@ s32 puni_piders_check_func(EventEntry *event, BOOL isFirstCall)
 }
 
 USER_FUNC(puni_disp_info_kassencheck) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BOOL ret = FALSE;
     if (Punigp->floor == 9 || Punigp->floor == 12) {
         ret = TRUE;
@@ -6675,7 +6675,7 @@ void puniCountDisp(s32 unused, s32 packed) {
 }
 
 USER_FUNC(puni_disp_info_sub) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 count = 0;
     s32 total;
     BOOL done;

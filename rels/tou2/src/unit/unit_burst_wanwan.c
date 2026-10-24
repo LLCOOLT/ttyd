@@ -60,16 +60,16 @@ static PoseTableEntry pose_table[19];
 static BattleDataEntry data_table[15];
 static BattleUnitKindPart parts[9];
 static BattleWeapon weapon_wanwan_attack;
-static s32 init_event[41];
-static s32 chain_event[23];
-static s32 damage_event[33];
-static s32 counter_damage_event[68];
-static s32 dead_event[200];
-static s32 attack_event[452];
-static s32 wait_event[476];
-static s32 sound_gensui_event[22];
-static s32 wait_sound_event1[25];
-static s32 wait_sound_event2[12];
+static EvtWord init_event[41];
+static EvtWord chain_event[23];
+static EvtWord damage_event[33];
+static EvtWord counter_damage_event[68];
+static EvtWord dead_event[200];
+static EvtWord attack_event[452];
+static EvtWord wait_event[476];
+static EvtWord sound_gensui_event[22];
+static EvtWord wait_sound_event1[25];
+static EvtWord wait_sound_event2[12];
 
 f32 fd_burst_wanwan_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -645,7 +645,7 @@ EVT_END_PAD()
 
 static USER_FUNC(chain_main) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id;
     BattleUnit* unit;
     BattleUnitPart* part;
@@ -756,7 +756,7 @@ static USER_FUNC(chain_main) {
 
 static USER_FUNC(chain_init) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id;
     BattleUnit* unit;
     BattleUnitPart* part;

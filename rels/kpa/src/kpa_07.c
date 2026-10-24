@@ -86,9 +86,9 @@ f32 fd_kpa_07_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_kpa_07___local_PIO2_367;
 f32 fd_kpa_07_one_364;
 static NpcSetupInfo npcEnt[3];
-s32 kpa_07_hipattack_eff[149];
-s32 kpa_07_evt[1224];
-s32 kpa_07_init_evt[52];
+EvtWord kpa_07_hipattack_eff[149];
+EvtWord kpa_07_evt[1224];
+EvtWord kpa_07_init_evt[52];
 
 f32 fd_kpa_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -846,7 +846,7 @@ void kpa_stg6_012_1_cb(s32 type, smartEntry* smart) {
 }
 
 static USER_FUNC(starstone_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 type = evtGetValue(event, args[1]);
     f32 x = evtGetFloat(event, args[2]);
@@ -861,7 +861,7 @@ static USER_FUNC(starstone_entry) {
 }
 
 static USER_FUNC(get_starstone_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
 
     evtSetFloat(event, args[1], ((EffStarStoneWork*)eff->userdata)->position.x);
@@ -871,7 +871,7 @@ static USER_FUNC(get_starstone_pos) {
 }
 
 static USER_FUNC(set_starstone_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -885,7 +885,7 @@ static USER_FUNC(set_starstone_pos) {
 }
 
 USER_FUNC(set_starstone_ry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 ry = evtGetFloat(event, args[1]);
 

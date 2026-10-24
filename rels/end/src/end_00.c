@@ -36,7 +36,7 @@ typedef struct EndMoa { Vec pos; s32 chain; s32 idx; } EndMoa;
 typedef struct EndExtData { const char* anim; const char* pose; f32 speed; } EndExtData;
 typedef struct EndWork { FileEntry* tpl; s32 mode; s32 alpha; s32 alpha2; s32 tevAlpha; s32 win1[3]; s32 win2[3]; s32 field_0x2c; s32 pos; EventEntry* evt; } EndWork;
 typedef struct CreditMsg { s32 field_0x0; s32 pos; s32 type; const char* msg1[3]; const char* msg2[3]; } CreditMsg;
-typedef struct CreditNpc { const char* agb; const char* anim; s32* evt; } CreditNpc;
+typedef struct CreditNpc { const char* agb; const char* anim; EvtWord* evt; } CreditNpc;
 typedef struct CreditActor { s32 state; s32 poseId; f32 angle; f32 limit; s32 pos; Mtx mtx; } CreditActor;
 EndWork end_work;
 s32 (*end_moa_chain_group)[2];
@@ -115,23 +115,23 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-s32 end_credit_npc_parade[44];
-s32 end_image_blend_loop[123];
+EvtWord end_credit_npc_parade[44];
+EvtWord end_image_blend_loop[123];
 #ifdef VERSION_G8ME01
 // US: "THE END" texture per language (indexed by gp->language)
 #endif
-s32 end_image_main_evt[187];
-s32 end_return_title_evt[49];
-s32 end_00_init_evt[63];
-s32 end_credit_gesso_evt[48];
-s32 end_credit_gonbaba_evt[89];
-s32 end_credit_batten2_evt[54];
-s32 end_credit_atomic_evt[60];
-s32 end_credit_korutesu_evt[81];
-s32 end_credit_para_evt[50];
-s32 end_credit_batten_evt[83];
-s32 end_credit_queen_evt[89];
-s32 end_credit_moamoa_evt[108];
+EvtWord end_image_main_evt[187];
+EvtWord end_return_title_evt[49];
+EvtWord end_00_init_evt[63];
+EvtWord end_credit_gesso_evt[48];
+EvtWord end_credit_gonbaba_evt[89];
+EvtWord end_credit_batten2_evt[54];
+EvtWord end_credit_atomic_evt[60];
+EvtWord end_credit_korutesu_evt[81];
+EvtWord end_credit_para_evt[50];
+EvtWord end_credit_batten_evt[83];
+EvtWord end_credit_queen_evt[89];
+EvtWord end_credit_moamoa_evt[108];
 f32 fd_end_00_negone_one_374[2] __attribute__((aligned(8)));
 f32 fd_end_00_neg_one_382;
 f32 fd_end_00___local_PI_383;
@@ -205,7 +205,7 @@ void end_credit_npc_disp(CameraId cameraId, void* param) {
 }
 
 USER_FUNC(evt_end_credit_npc_get_wait_type) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u32 id = evtGetValue(event, args[0]);
 
     if (id >= ARRAY_SIZE(R_credits_npc_info)) {

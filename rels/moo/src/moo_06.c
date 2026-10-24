@@ -51,19 +51,19 @@ f32 fd_moo_06_one_364;
 static BeroEntry bero_entry_data[3];
 #ifdef VERSION_G8ME01
 #else
-static s32 rock_main[79];
+static EvtWord rock_main[79];
 #endif
 #ifdef VERSION_G8ME01
-static s32 rock_evt0[15];
+static EvtWord rock_evt0[15];
 #else
-static s32 rock_evt0[21];
+static EvtWord rock_evt0[21];
 #endif
 #ifdef VERSION_G8ME01
-static s32 rock_evt1[15];
+static EvtWord rock_evt1[15];
 #else
-static s32 rock_evt1[21];
+static EvtWord rock_evt1[21];
 #endif
-s32 moo_06_init_evt[93];
+EvtWord moo_06_init_evt[93];
 
 f32 fd_moo_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

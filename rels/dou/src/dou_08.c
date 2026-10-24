@@ -35,10 +35,10 @@ f32 fd_dou_08_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_dou_08___local_PIO2_367;
 f32 fd_dou_08_one_364;
 static BeroEntry bero_entry_data[3];
-static s32 dou_puka_event_main0[60];
-static s32 dou_puka_event_main1[60];
+static EvtWord dou_puka_event_main0[60];
+static EvtWord dou_puka_event_main1[60];
 static HitDamageReturn hitDmgRetPoints[10];
-s32 dou_08_init_evt[82];
+EvtWord dou_08_init_evt[82];
 
 f32 fd_dou_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

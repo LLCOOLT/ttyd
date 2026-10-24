@@ -68,20 +68,20 @@ static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_togenoko_normal_attack;
 static BattleWeapon weapon_togenoko_shell_attack;
 static BattleWeapon weapon_togenoko_charge;
-static s32 init_event[37];
-static s32 damage_event[10];
-static s32 dmg_avoid_counter_thorn_head_event[61];
-static s32 dmg_turn_event[116];
-static s32 wakeup_event[104];
+static EvtWord init_event[37];
+static EvtWord damage_event[10];
+static EvtWord dmg_avoid_counter_thorn_head_event[61];
+static EvtWord dmg_turn_event[116];
+static EvtWord wakeup_event[104];
 static BattleUnitSetup entry_togenoko;
-static s32 attack_event[333];
-static s32 normal_attack_event[406];
-static s32 shell_attack_event[489];
-static s32 charge_event[99];
-static s32 guard_event[127];
-static s32 guard_cancel_event[90];
-static s32 friend_event[88];
-static s32 wait_event[6];
+static EvtWord attack_event[333];
+static EvtWord normal_attack_event[406];
+static EvtWord shell_attack_event[489];
+static EvtWord charge_event[99];
+static EvtWord guard_event[127];
+static EvtWord guard_cancel_event[90];
+static EvtWord friend_event[88];
+static EvtWord wait_event[6];
 
 f32 fd_togenoko_ace_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1004,7 +1004,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static USER_FUNC(togenoko_getnum) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 num = 0;
     s32 i;
 

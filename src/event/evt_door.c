@@ -101,38 +101,38 @@ USER_FUNC(evt_door_end_wait);
 USER_FUNC(evt_door_set_param);
 USER_FUNC(evt_door_data_copy);
 
-s32 door_open_se[151];
-s32 door_close_se[151];
-s32 door_down_se[33];
-s32 house_open_se[32];
-s32 evt_dark[34];
-s32 evt_dark2[34];
-static s32 evt_light[30];
-s32 evt_light2[30];
-s32 door_up_se[2];
-s32 house_close_se[4];
-s32 in_houseanim[80];
-s32 out_houseanim[72];
-s32 in_dooranim[134];
-s32 out_dooranim[121];
-s32 house_in[216];
-s32 house_out[196];
-s32 evt_door_setup[56];
-s32 door_dark[34];
-s32 door_dark2[34];
-s32 door_light[30];
-s32 door_light2[30];
-s32 evt_door_open[508];
+EvtWord door_open_se[151];
+EvtWord door_close_se[151];
+EvtWord door_down_se[33];
+EvtWord house_open_se[32];
+EvtWord evt_dark[34];
+EvtWord evt_dark2[34];
+static EvtWord evt_light[30];
+EvtWord evt_light2[30];
+EvtWord door_up_se[2];
+EvtWord house_close_se[4];
+EvtWord in_houseanim[80];
+EvtWord out_houseanim[72];
+EvtWord in_dooranim[134];
+EvtWord out_dooranim[121];
+EvtWord house_in[216];
+EvtWord house_out[196];
+EvtWord evt_door_setup[56];
+EvtWord door_dark[34];
+EvtWord door_dark2[34];
+EvtWord door_light[30];
+EvtWord door_light2[30];
+EvtWord evt_door_open[508];
 #ifdef VERSION_G8ME01
-s32 evt_door_open_bom_01[336];
+EvtWord evt_door_open_bom_01[336];
 #else
-s32 evt_door_open_bom_01[338];
+EvtWord evt_door_open_bom_01[338];
 #endif
-s32 evt_door_open_roll[225];
-s32 evt_door_close[447];
-s32 evt_door_close_roll[247];
-s32 evt_door_open_quick[220];
-s32 evt_door_entry[77];
+EvtWord evt_door_open_roll[225];
+EvtWord evt_door_close[447];
+EvtWord evt_door_close_roll[247];
+EvtWord evt_door_open_quick[220];
+EvtWord evt_door_entry[77];
 
 EVT_BEGIN(door_open_se)
     CALL(evt_door_param, LW(0), 8, LW(1))
@@ -244,7 +244,7 @@ USER_FUNC(snd_door_out) {
 }
 
 USER_FUNC(door_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HouseData* d = (HouseData*)evtGetValue(event, args[0]);
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec nrm = {0.0f, 0.0f, 0.0f};
@@ -1358,7 +1358,7 @@ EVT_BEGIN(evt_door_entry)
 EVT_END()
 
 USER_FUNC(inout_hit) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
     evtSetValue(event, args[1], w->data->hit[0]);
     evtSetValue(event, args[2], w->data->hit[1]);
@@ -1368,7 +1368,7 @@ USER_FUNC(inout_hit) {
 }
 
 USER_FUNC(out_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
     evtSetValue(event, args[1], w->out.x);
     evtSetValue(event, args[2], w->out.z);
@@ -1376,7 +1376,7 @@ USER_FUNC(out_pos) {
 }
 
 USER_FUNC(in_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
     evtSetValue(event, args[1], w->in.x);
     evtSetValue(event, args[2], w->in.z);
@@ -1384,21 +1384,21 @@ USER_FUNC(in_pos) {
 }
 
 USER_FUNC(outside_group) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
     evtSetValue(event, args[1], w->data->outside);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(door_group) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
     evtSetValue(event, args[1], w->data->door);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(inside_group) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
     evtSetValue(event, args[1], w->data->inside[0]);
     evtSetValue(event, args[2], w->data->inside[1]);
@@ -1406,7 +1406,7 @@ USER_FUNC(inside_group) {
 }
 
 USER_FUNC(init_inside_group) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
     evtSetValue(event, args[1], w->data->initInside[0]);
     evtSetValue(event, args[2], w->data->initInside[1]);
@@ -1414,7 +1414,7 @@ USER_FUNC(init_inside_group) {
 }
 
 USER_FUNC(animation) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
     evtSetValue(event, args[1], w->data->anim[0]);
     evtSetValue(event, args[2], w->data->anim[1]);
@@ -1478,7 +1478,7 @@ USER_FUNC(npc_light) {
 }
 
 USER_FUNC(get_noclip_map) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
     s32 idx = evtGetValue(event, args[1]);
     const char** list = w->data->noclip;
@@ -1638,7 +1638,7 @@ void door_dark_flag_sub(BOOL on, const char** npcs, const char** mobjs, const ch
 }
 
 USER_FUNC(door_dark_flag) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
     BOOL on = evtGetValue(event, args[1]);
     door_dark_flag_sub(on, d->npcs, d->mobjs, d->items);
@@ -1652,7 +1652,7 @@ USER_FUNC(door_dark_flag) {
     evtSetValue(event, args[4], V.z);
 
 USER_FUNC(evt_door_param) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
     s32 kind = evtGetValue(event, args[1]);
     Vec in = {0.0f, 0.0f, 0.0f};
@@ -1729,7 +1729,7 @@ USER_FUNC(evt_door_load_mapflag) {
 }
 
 USER_FUNC(npc_hide_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
     BOOL on = evtGetValue(event, args[1]);
     const char** list = d->npcs;
@@ -1749,7 +1749,7 @@ USER_FUNC(npc_hide_onoff) {
 }
 
 USER_FUNC(evt_door_data_copy) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     DoorParam* src = (DoorParam*)evtGetValue(event, args[0]);
     DoorParam* dst = _mapAlloc(sizeof(DoorParam));
     *dst = *src;
@@ -1758,7 +1758,7 @@ USER_FUNC(evt_door_data_copy) {
 }
 
 USER_FUNC(evt_door_set_param) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
     s32 kind = evtGetValue(event, args[1]);
     s32 val = evtGetValue(event, args[2]);

@@ -223,105 +223,105 @@ s16 suifu_animtbl_run[22];
 static s16 elmos_animtbl[22];
 static s16 dai3_animtbl[42];
 s16 dai3_animtbl_run[22];
-static s32 nannpc_mode_setup[98];
-static s32 back_dark[27];
-static s32 back_light[27];
-s32 suifu_dark[36];
-s32 nannpc_light[36];
-static s32 garawaru_init[14];
-static s32 garawaru_talk[8];
-static s32 marco_init[2];
-static s32 marco_talk[2];
-static s32 odoodo_init[14];
-static s32 odoodo_talk[8];
-static s32 suifu_a_init[2];
-static s32 suifu_a_talk[2];
-static s32 suifu_bomb_init[2];
-static s32 suifu_bomb_talk[2];
-static s32 suifu_c_init[14];
-static s32 suifu_c_talk[22];
-static s32 suifu_d_init[14];
-static s32 suifu_d_talk[22];
-static s32 suifu_e_init[14];
-static s32 suifu_e_talk[22];
-static s32 korutesu_init[11];
-static s32 korutesu_talk[35];
-static s32 mony_init[2];
-static s32 mony_talk[30];
-static s32 peton_init[2];
-static s32 peton_talk[30];
-s32 koburon_init[31];
-s32 koburon_regp[140];
-s32 koburon_talk[87];
-s32 koburon_dead[139];
-s32 koburon_evt[24];
-static s32 kiza_talk[8];
-static s32 kiza_entry[30];
+static EvtWord nannpc_mode_setup[98];
+static EvtWord back_dark[27];
+static EvtWord back_light[27];
+EvtWord suifu_dark[36];
+EvtWord nannpc_light[36];
+static EvtWord garawaru_init[14];
+static EvtWord garawaru_talk[8];
+static EvtWord marco_init[2];
+static EvtWord marco_talk[2];
+static EvtWord odoodo_init[14];
+static EvtWord odoodo_talk[8];
+static EvtWord suifu_a_init[2];
+static EvtWord suifu_a_talk[2];
+static EvtWord suifu_bomb_init[2];
+static EvtWord suifu_bomb_talk[2];
+static EvtWord suifu_c_init[14];
+static EvtWord suifu_c_talk[22];
+static EvtWord suifu_d_init[14];
+static EvtWord suifu_d_talk[22];
+static EvtWord suifu_e_init[14];
+static EvtWord suifu_e_talk[22];
+static EvtWord korutesu_init[11];
+static EvtWord korutesu_talk[35];
+static EvtWord mony_init[2];
+static EvtWord mony_talk[30];
+static EvtWord peton_init[2];
+static EvtWord peton_talk[30];
+EvtWord koburon_init[31];
+EvtWord koburon_regp[140];
+EvtWord koburon_talk[87];
+EvtWord koburon_dead[139];
+EvtWord koburon_evt[24];
+static EvtWord kiza_talk[8];
+static EvtWord kiza_entry[30];
 static NpcSetupInfo npcEnt[15];
 static BeroEntry bero_entry_data[4];
-s32 mujinto_hyochaku[297];
+EvtWord mujinto_hyochaku[297];
 s32 suifu_random_setup[380];
-s32 suifu_random_sub[123];
-s32 tama_shoot[69];
-s32 npc_kyorokyoro[39];
-s32 dai3_shurai_sub[1112];
-s32 dai3_shurai[53];
-static s32 dai3_shurai_after[68];
+EvtWord suifu_random_sub[123];
+EvtWord tama_shoot[69];
+EvtWord npc_kyorokyoro[39];
+EvtWord dai3_shurai_sub[1112];
+EvtWord dai3_shurai[53];
+static EvtWord dai3_shurai_after[68];
 s32 kaizoku_vs_dai3_suifupos[380];
 s32 kaizoku_vs_dai3_elmospos[400];
-s32 iwapera_offscreen[56];
-s32 iwapera_offscreen_end[29];
-s32 dai3_kurukuru[80];
+EvtWord iwapera_offscreen[56];
+EvtWord iwapera_offscreen_end[29];
+EvtWord dai3_kurukuru[80];
 s32 kaizoku_vs_dai3_dai3pos[300];
-s32 dai3_butai_setup[69];
-s32 dai3_butai_main[19];
-s32 dai3_kanbu_setup[2];
-s32 dai3_kanbu_main[80];
-s32 kaizoku_setup[160];
-s32 kaizoku_main[19];
-s32 mario_main_init[4];
-s32 mario_main[82];
-s32 mario_main2[82];
-s32 kaizoku_move_every[24];
-s32 dai3_move_every[33];
+EvtWord dai3_butai_setup[69];
+EvtWord dai3_butai_main[19];
+EvtWord dai3_kanbu_setup[2];
+EvtWord dai3_kanbu_main[80];
+EvtWord kaizoku_setup[160];
+EvtWord kaizoku_main[19];
+EvtWord mario_main_init[4];
+EvtWord mario_main[82];
+EvtWord mario_main2[82];
+EvtWord kaizoku_move_every[24];
+EvtWord dai3_move_every[33];
 f32 dai3_spline_dt[27];
 f32 kaizoku_spline_dt[30];
-s32 kaizoku_move_trace_se[46];
-s32 kaizoku_move_trace[130];
-s32 dai3_move_trace_se[46];
-s32 dai3_move_trace[99];
-static s32 _kemuri_sub[56];
-s32 tobikakari_kemuri[18];
-s32 cam_dai3_vs_kaizoku[58];
-s32 kaizoku_vs_dai3[531];
-s32 senin_kansei[125];
+EvtWord kaizoku_move_trace_se[46];
+EvtWord kaizoku_move_trace[130];
+EvtWord dai3_move_trace_se[46];
+EvtWord dai3_move_trace[99];
+static EvtWord _kemuri_sub[56];
+EvtWord tobikakari_kemuri[18];
+EvtWord cam_dai3_vs_kaizoku[58];
+EvtWord kaizoku_vs_dai3[531];
+EvtWord senin_kansei[125];
 f32 dai3_taisan_spline_dt00[9];
 f32 dai3_taisan_spline_dt01[9];
-s32 nameraka_rotate[48];
-s32 dai3_taisan_move_trace00[69];
-s32 dai3_taisan_move_trace01[69];
-s32 dai3_beat_back[194];
+EvtWord nameraka_rotate[48];
+EvtWord dai3_taisan_move_trace00[69];
+EvtWord dai3_taisan_move_trace01[69];
+EvtWord dai3_beat_back[194];
 s32 leave_island_suifupos[380];
-s32 move_ship_se00[20];
-s32 move_ship_se01[20];
-s32 option_ship_npc[130];
-s32 option_ship_korutesu[46];
-s32 option_ship_marco[49];
-static s32 option_ship_mario[84];
-s32 option_ship_main[30];
-s32 leave_island[765];
-s32 muj_gor_ship_sub[33];
-static s32 muj_gor_ship[53];
-static s32 ship_pera[115];
-s32 muj_gor_ship_start[245];
-s32 into_muj_ship[173];
-s32 mony_peton_boarding_sub[67];
-s32 mony_peton_boarding[115];
+EvtWord move_ship_se00[20];
+EvtWord move_ship_se01[20];
+EvtWord option_ship_npc[130];
+EvtWord option_ship_korutesu[46];
+EvtWord option_ship_marco[49];
+static EvtWord option_ship_mario[84];
+EvtWord option_ship_main[30];
+EvtWord leave_island[765];
+EvtWord muj_gor_ship_sub[33];
+static EvtWord muj_gor_ship[53];
+static EvtWord ship_pera[115];
+EvtWord muj_gor_ship_start[245];
+EvtWord into_muj_ship[173];
+EvtWord mony_peton_boarding_sub[67];
+EvtWord mony_peton_boarding[115];
 static HitDamageReturn hitDmgRetPoints[8];
 #ifdef VERSION_G8ME01
-s32 muj_00_init_evt[550];
+EvtWord muj_00_init_evt[550];
 #else
-s32 muj_00_init_evt[548];
+EvtWord muj_00_init_evt[548];
 #endif
 
 static void alpha_tev(MapTevCallbackInfo* info) {
@@ -410,7 +410,7 @@ void suifu_kyorokyoro_init(NanNPC* npc) {
 
 USER_FUNC(dai3_butai_main_func) {
     s32 d;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetValue(event, args[0]);
     f32 b = evtGetValue(event, args[1]);
     f32 cx = evtGetValue(event, args[2]);
@@ -440,7 +440,7 @@ USER_FUNC(dai3_butai_main_func) {
 }
 
 USER_FUNC(kaizoku_main_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetValue(event, args[0]);
     f32 b = evtGetValue(event, args[1]);
     f32 cx = evtGetValue(event, args[2]);
@@ -485,7 +485,7 @@ USER_FUNC(mario_main_init_func) {
 }
 
 USER_FUNC(mario_main_setup_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 cx = evtGetValue(event, args[0]);
     f32 cz = evtGetValue(event, args[1]);
     OrbitData* op = _op;
@@ -518,7 +518,7 @@ USER_FUNC(mario_main_setup_func) {
 }
 
 USER_FUNC(mario_main_func) {
-    s32* args;
+    EvtWord* args;
     OrbitData* op;
     MarioWork* mario;
     PartyEntry* party;
@@ -730,7 +730,7 @@ USER_FUNC(tobikakaru_end) {
 }
 
 USER_FUNC(ship_rotate) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
     f32 z1 = evtGetFloat(event, args[1]);
     f32 x2 = evtGetFloat(event, args[2]);
@@ -743,7 +743,7 @@ USER_FUNC(ship_rotate) {
 }
 
 USER_FUNC(ship_rotate_rev) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
     f32 z1 = evtGetFloat(event, args[1]);
     f32 x2 = evtGetFloat(event, args[2]);
@@ -757,7 +757,7 @@ USER_FUNC(ship_rotate_rev) {
 }
 
 USER_FUNC(cam_test_init_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec b;
     Vec a;
     f32 dist;
@@ -775,7 +775,7 @@ USER_FUNC(cam_test_init_func) {
 }
 
 USER_FUNC(cam_test_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32* p0 = args++;
     s32* p1 = args++;
     f32 angle = evtGetFloat(event, *args++);

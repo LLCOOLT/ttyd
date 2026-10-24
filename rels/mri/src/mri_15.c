@@ -50,18 +50,18 @@ f32 fd_mri_15___local_3PIO2_368;
 f32 fd_mri_15_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_mri_15___local_PIO2_367;
 f32 fd_mri_15_one_364;
-static s32 bero_s_doa_close[10];
-static s32 bero_s_doa_open[10];
-s32 evt_dokan[12];
+static EvtWord bero_s_doa_close[10];
+static EvtWord bero_s_doa_open[10];
+EvtWord evt_dokan[12];
 static BeroEntry bero_entry_data[3];
-static s32 door_switch_init[17];
-static s32 door_switch[59];
-s32 dai3_escape[32];
-s32 dai3_battle_init[66];
-s32 dai3_battle[140];
-s32 ueki_evt_01[20];
+static EvtWord door_switch_init[17];
+static EvtWord door_switch[59];
+EvtWord dai3_escape[32];
+EvtWord dai3_battle_init[66];
+EvtWord dai3_battle[140];
+EvtWord ueki_evt_01[20];
 static KusaAccess ueki_access_data[7];
-s32 mri_15_init_evt[156];
+EvtWord mri_15_init_evt[156];
 
 f32 fd_mri_15_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

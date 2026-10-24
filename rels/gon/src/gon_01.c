@@ -60,13 +60,13 @@ f32 fd_gon_01___local_3PIO2_368;
 f32 fd_gon_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gon_01___local_PIO2_367;
 f32 fd_gon_01_one_364;
-static s32 door01_close[22];
-static s32 door01_open[22];
+static EvtWord door01_close[22];
+static EvtWord door01_open[22];
 static BeroEntry bero_entry_data[5];
-s32 honenoko_oidasare_evt[466];
-s32 gon_01_GATEEVENT_evt[151];
+EvtWord honenoko_oidasare_evt[466];
+EvtWord gon_01_GATEEVENT_evt[151];
 static HitDamageReturn hitDmgRetPoints[17];
-s32 gon_01_init_evt[102];
+EvtWord gon_01_init_evt[102];
 
 f32 fd_gon_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

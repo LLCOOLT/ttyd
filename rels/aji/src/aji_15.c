@@ -60,13 +60,13 @@ f32 fd_aji_15___local_3PIO2_368;
 f32 fd_aji_15_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_15___local_PIO2_367;
 f32 fd_aji_15_one_364;
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[2];
-s32 peach_evt_yuge[43];
-s32 peach_evt_syawa_main[798];
-s32 peach_evt_syawa_init[63];
-s32 aji_15_init_evt[58];
+EvtWord peach_evt_yuge[43];
+EvtWord peach_evt_syawa_main[798];
+EvtWord peach_evt_syawa_init[63];
+EvtWord aji_15_init_evt[58];
 
 f32 fd_aji_15_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -149,7 +149,7 @@ EVT_BEGIN(peach_evt_yuge)
 EVT_END()
 
 USER_FUNC(peach_set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -448,7 +448,7 @@ EVT_BEGIN(aji_15_init_evt)
 EVT_END()
 
 USER_FUNC(peach_chk_aftershower) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (marioGetPtr()->peachFlags & 0x10) {
         evtSetValue(event, args[0], 1);

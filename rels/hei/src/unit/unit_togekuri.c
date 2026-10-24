@@ -56,12 +56,12 @@ static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_togekuri_attack;
 static PoseTableEntry pose_table[19];
 static BattleDataEntry data_table[3];
-static s32 init_event[42];
-static s32 dmg_avoid_counter_thorn_head_event[127];
-static s32 damage_event[10];
+static EvtWord init_event[42];
+static EvtWord dmg_avoid_counter_thorn_head_event[127];
+static EvtWord damage_event[10];
 static f32 SinTable[91];
-static s32 attack_event[597];
-static s32 wait_event[6];
+static EvtWord attack_event[597];
+static EvtWord wait_event[6];
 
 f32 fd_togekuri_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -472,7 +472,7 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 static USER_FUNC(krb_get_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
     f32 z1 = evtGetFloat(event, args[1]);
     f32 x2 = evtGetFloat(event, args[2]);
@@ -523,7 +523,7 @@ static u16 krb_comp_dir(f32 x, f32 z) {
 
 static USER_FUNC(get_attacker) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit = BattleGetUnitPtr(wp, wp->activeUnitId);
 
     if (unit->initialKind == 0xDE) {

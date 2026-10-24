@@ -29,7 +29,7 @@ f32 fd_hei_11_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_hei_11___local_PIO2_367;
 f32 fd_hei_11_one_364;
 static BeroEntry bero_entry_data[3];
-s32 hei_11_init_evt[44];
+EvtWord hei_11_init_evt[44];
 
 f32 fd_hei_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

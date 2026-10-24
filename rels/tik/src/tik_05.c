@@ -206,48 +206,48 @@ u32 gap_04_0000B17C_data[1];
 f32 one_negone$359[2] __attribute__((aligned(8)));
 f32 __local_PIO2$367;
 f32 one$364;
-static s32 n_door_close[22];
-static s32 n_door_open[22];
+static EvtWord n_door_close[22];
+static EvtWord n_door_open[22];
 static BeroEntry bero_entry_data[4];
-static s32 kurihakase_init[27];
-static s32 kurihakase_talk[23];
+static EvtWord kurihakase_init[27];
+static EvtWord kurihakase_talk[23];
 static NpcSetupInfo npcEnt[2];
-s32 mahojin_alpha[70];
-s32 mahojin_alpha_up[5];
-s32 mahojin_alpha_down[5];
-s32 large_door_stg0_init[17];
-s32 large_door_stg0[129];
-s32 look_large_door[25];
-s32 kaidan_event[69];
-s32 evt_mahojin_move[51];
-s32 evt_mahojin_move2[24];
-s32 evt_fogset[42];
-s32 evt_fogreset[82];
-s32 mahojin_se_event[6];
-s32 mahojin_se_event_end[2];
-s32 disp_lighteffect[20];
-s32 disp_treasure_map[21];
+EvtWord mahojin_alpha[70];
+EvtWord mahojin_alpha_up[5];
+EvtWord mahojin_alpha_down[5];
+EvtWord large_door_stg0_init[17];
+EvtWord large_door_stg0[129];
+EvtWord look_large_door[25];
+EvtWord kaidan_event[69];
+EvtWord evt_mahojin_move[51];
+EvtWord evt_mahojin_move2[24];
+EvtWord evt_fogset[42];
+EvtWord evt_fogreset[82];
+EvtWord mahojin_se_event[6];
+EvtWord mahojin_se_event_end[2];
+EvtWord disp_lighteffect[20];
+EvtWord disp_treasure_map[21];
 BrokenWork* broken_wp;
 f32 param_tbl[5];
 f32 add_tbl[5];
 static const char* name_tbl[5];
-s32 evt_mapwrite[1351];
-s32 fake_fade[30];
-s32 evt_starstone_up[127];
-s32 evt_starstone_set[106];
-s32 mahojin_event[363];
-s32 mahojin_event1[110];
-s32 mahojin_event2[105];
-s32 mahojin_event3[102];
-s32 mahojin_event4[102];
-s32 mahojin_event5[102];
-s32 mahojin_event6[102];
-s32 starstone_circle_link[70];
-s32 lastdungeon_anim_init[52];
-s32 lastdungeon_init[36];
-s32 lastdungeon[103];
-s32 mahojin_event7[VERSION_PICK(2537, 2541)];
-s32 tik_05_init_evt[VERSION_PICK(289, 287)];
+EvtWord evt_mapwrite[1351];
+EvtWord fake_fade[30];
+EvtWord evt_starstone_up[127];
+EvtWord evt_starstone_set[106];
+EvtWord mahojin_event[363];
+EvtWord mahojin_event1[110];
+EvtWord mahojin_event2[105];
+EvtWord mahojin_event3[102];
+EvtWord mahojin_event4[102];
+EvtWord mahojin_event5[102];
+EvtWord mahojin_event6[102];
+EvtWord starstone_circle_link[70];
+EvtWord lastdungeon_anim_init[52];
+EvtWord lastdungeon_init[36];
+EvtWord lastdungeon[103];
+EvtWord mahojin_event7[VERSION_PICK(2537, 2541)];
+EvtWord tik_05_init_evt[VERSION_PICK(289, 287)];
 
 f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -389,7 +389,7 @@ static NpcSetupInfo npcEnt[] = {
 };
 
 USER_FUNC(starstone_set_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -403,7 +403,7 @@ USER_FUNC(starstone_set_position) {
 }
 
 USER_FUNC(starstone_get_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
     f32 x = ((EffStarStoneWork*)eff->userdata)->position.x;
     f32 y = ((EffStarStoneWork*)eff->userdata)->position.y;
@@ -416,7 +416,7 @@ USER_FUNC(starstone_get_position) {
 }
 
 static USER_FUNC(starstone_set_ry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 ry = evtGetFloat(event, args[1]);
     EffectEntry* eff = effNameToPtr(name);
@@ -426,7 +426,7 @@ static USER_FUNC(starstone_set_ry) {
 }
 
 USER_FUNC(starstone_set_alpha) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     u8 alpha = evtGetValue(event, args[1]);
 
@@ -435,7 +435,7 @@ USER_FUNC(starstone_set_alpha) {
 }
 
 USER_FUNC(starstone_set_scale) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 scale = evtGetFloat(event, args[1]);
 
@@ -444,7 +444,7 @@ USER_FUNC(starstone_set_scale) {
 }
 
 USER_FUNC(starstone_circle_link_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 idx = evtGetValue(event, args[1]) - 1;
     f32 x = evtGetFloat(event, args[2]);
@@ -736,7 +736,7 @@ static USER_FUNC(alpha_set_func) {
 }
 
 static USER_FUNC(cam_kaiten_init) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec target;
     Vec pos;
     f32 dist;
@@ -802,7 +802,7 @@ static USER_FUNC(cam_kaiten_set_direct) {
 }
 
 static USER_FUNC(cam_kaiten_get_para) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     KaitenParam* p;
 
     switch (evtGetValue(event, args[0])) {
@@ -829,7 +829,7 @@ static USER_FUNC(cam_kaiten_get_para) {
 }
 
 static USER_FUNC(cam_kaiten_set_para) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     KaitenParam* p;
 
     switch (evtGetValue(event, args[0])) {
@@ -856,7 +856,7 @@ static USER_FUNC(cam_kaiten_set_para) {
 }
 
 USER_FUNC(disp_lighteffect_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -876,7 +876,7 @@ USER_FUNC(disp_lighteffect_func) {
 }
 
 USER_FUNC(disp_treasure_map_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -894,7 +894,7 @@ USER_FUNC(disp_treasure_map_func) {
 }
 
 USER_FUNC(mahojin_effect_alpha) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     u8 alpha = evtGetValue(event, args[1]);
 
@@ -1236,7 +1236,7 @@ static const char* name_tbl[] = {
 };
 
 static USER_FUNC(evtflash) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 in = evtGetValue(event, args[0]);
     s32 wait = evtGetValue(event, args[1]);
     s32 out = evtGetValue(event, args[2]);
@@ -1299,7 +1299,7 @@ USER_FUNC(crystal_bgmode) {
 }
 
 USER_FUNC(map_bgmode) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
     const char* name2 = (const char*)evtGetValue(event, args[1]);
     EffectEntry* eff = effNameToPtr(name1);
@@ -1313,7 +1313,7 @@ USER_FUNC(map_bgmode) {
 }
 
 USER_FUNC(map_bgmode_end) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
     const char* name2 = (const char*)evtGetValue(event, args[1]);
     EffectEntry* eff;
@@ -1329,7 +1329,7 @@ USER_FUNC(map_bgmode_end) {
 USER_FUNC(cam_mahojin_kaiten_main) {
     s32 frames;
     s32 msec;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 start = evtGetFloat(event, args[0]);
     f32 end = evtGetFloat(event, args[1]);
     s32 cont;
@@ -1376,7 +1376,7 @@ USER_FUNC(cam_mahojin_kaiten_main) {
 }
 
 USER_FUNC(starstone_setting) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 idx = evtGetValue(event, args[1]);
     EffectEntry* eff = effNameToPtr(name);
@@ -1389,7 +1389,7 @@ USER_FUNC(starstone_setting) {
 }
 
 USER_FUNC(kemuri_set_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -1403,7 +1403,7 @@ USER_FUNC(kemuri_set_position) {
 }
 
 USER_FUNC(kemuri_set_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     u8 r = evtGetValue(event, args[1]);
     u8 g = evtGetValue(event, args[2]);
@@ -1418,7 +1418,7 @@ USER_FUNC(kemuri_set_color) {
 }
 
 USER_FUNC(pcharge_set_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -1432,7 +1432,7 @@ USER_FUNC(pcharge_set_position) {
 }
 
 USER_FUNC(stardust_setting) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
     const char* name2 = (const char*)evtGetValue(event, args[1]);
     EffectEntry* eff1 = effNameToPtr(name1);

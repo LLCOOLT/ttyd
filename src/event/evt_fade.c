@@ -8,7 +8,7 @@
 void fadeSetAnimVirtualPos(f32 x, f32 y, f32 z);
 
 USER_FUNC(evt_fade_in) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 duration;
 
 	duration = evtGetValue(event, args[0]);
@@ -22,7 +22,7 @@ USER_FUNC(evt_fade_in) {
 }
 
 USER_FUNC(evt_fade_out) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 duration;
 
 	duration = evtGetValue(event, args[0]);
@@ -36,7 +36,7 @@ USER_FUNC(evt_fade_out) {
 }
 
 USER_FUNC(evt_fade_entry) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	FadeType type;
 	s32 duration;
 	u8 r, g, b;
@@ -55,7 +55,7 @@ USER_FUNC(evt_fade_end_wait) {
 }
 
 USER_FUNC(evt_fade_set_spot_pos) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	CameraEntry* camera;
 	s32 x, y, z;
 	f32 sx, sy, sz;
@@ -78,7 +78,7 @@ USER_FUNC(evt_fade_set_spot_pos) {
 }
 
 USER_FUNC(evt_fade_set_anim_ofs_pos) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	f32 x, y;
 
 	x = evtGetFloat(event, args[0]);
@@ -88,7 +88,7 @@ USER_FUNC(evt_fade_set_anim_ofs_pos) {
 }
 
 USER_FUNC(evt_fade_set_anim_virtual_pos) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	f32 x, y, z;
 
 	x = evtGetFloat(event, args[0]);
@@ -99,7 +99,7 @@ USER_FUNC(evt_fade_set_anim_virtual_pos) {
 }
 
 USER_FUNC(evt_fade_set_mapchange_type) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 area, inType, inDuration, outType, outDuration;
 
 	area = evtGetValue(event, args[0]);
@@ -139,7 +139,7 @@ USER_FUNC(evt_fade_set_mapchange_type) {
 }
 
 USER_FUNC(evt_fade_tec_onoff) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 on, soft;
 
 	on = evtGetValue(event, args[0]);
@@ -164,7 +164,7 @@ USER_FUNC(evt_fade_tec_onoff) {
 }
 
 USER_FUNC(evt_fade_softfocus_onoff) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 
 	if (evtGetValue(event, args[0])) {
 		fadeSoftFocusOn();
@@ -176,7 +176,7 @@ USER_FUNC(evt_fade_softfocus_onoff) {
 }
 
 USER_FUNC(evt_fade_reset) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 
 	fadeReset(evtGetValue(event, args[0]));
 	return EVT_RETURN_DONE;

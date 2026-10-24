@@ -77,17 +77,17 @@ static BattleDataEntry data_table_guard[4];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_togezo_attack;
 static BattleWeapon weapon_togezo_charge;
-static s32 init_event[52];
-static s32 dmg_avoid_counter_thorn_event[61];
-static s32 damage_event[10];
-static s32 dmg_turn_event[84];
-static s32 wakeup_event[90];
-static s32 attack_event[109];
-static s32 normal_attack_event[813];
-static s32 guard_event[95];
-static s32 guard_cancel_event[89];
-static s32 charge_event[102];
-static s32 wait_event[6];
+static EvtWord init_event[52];
+static EvtWord dmg_avoid_counter_thorn_event[61];
+static EvtWord damage_event[10];
+static EvtWord dmg_turn_event[84];
+static EvtWord wakeup_event[90];
+static EvtWord attack_event[109];
+static EvtWord normal_attack_event[813];
+static EvtWord guard_event[95];
+static EvtWord guard_cancel_event[89];
+static EvtWord charge_event[102];
+static EvtWord wait_event[6];
 
 f32 fd_hyper_togezo_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

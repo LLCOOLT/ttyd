@@ -54,13 +54,13 @@ f32 fd_las_16___local_3PIO2_368;
 f32 fd_las_16_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_16___local_PIO2_367;
 f32 fd_las_16_one_364;
-static s32 w_door_close[12];
-static s32 w_door_open[12];
+static EvtWord w_door_close[12];
+static EvtWord w_door_open[12];
 static BeroEntry bero_entry_data[2];
-static s32 box_evt[30];
-static s32 bomb_wall_evt[206];
-static s32 hint_plate[14];
-s32 las_16_init_evt[84];
+static EvtWord box_evt[30];
+static EvtWord bomb_wall_evt[206];
+static EvtWord hint_plate[14];
+EvtWord las_16_init_evt[84];
 
 f32 fd_las_16_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

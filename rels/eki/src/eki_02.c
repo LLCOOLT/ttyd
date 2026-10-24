@@ -31,11 +31,11 @@ f32 fd_eki_02___local_3PIO2_368;
 f32 fd_eki_02_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_eki_02___local_PIO2_367;
 f32 fd_eki_02_one_364;
-static s32 s_close[12];
-static s32 s_open[12];
+static EvtWord s_close[12];
+static EvtWord s_open[12];
 static BeroEntry bero_data[2];
-static s32 evt_key[5];
-s32 eki_02_init_evt[54];
+static EvtWord evt_key[5];
+EvtWord eki_02_init_evt[54];
 
 f32 fd_eki_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

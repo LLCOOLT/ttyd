@@ -150,47 +150,47 @@ f32 fd_muj_20___local_3PIO2_368;
 f32 fd_muj_20_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_muj_20___local_PIO2_367;
 f32 fd_muj_20_one_364;
-s32 hiru_yoru_event[46];
-s32 yoru_hiru_event[46];
-s32 urouro[61];
-s32 urouro_fuwafuwa[35];
-s32 buruburu[23];
-s32 fuwafuwa[15];
-s32 kirimomi[29];
-s32 marco_ship_yure[29];
-s32 moya_effect01[52];
-s32 moya_effect02[52];
-s32 moya_effect03[52];
-s32 moya_effect04[52];
-s32 moya_effect05[52];
-s32 nami_alpha[41];
-s32 moonout_effect[53];
-s32 moya_effect[19];
-s32 _kakushuku[32];
-s32 elmos_a_kakushuku[63];
-s32 elmos_a_kaku[13];
-s32 elmos_a_shuku[13];
+EvtWord hiru_yoru_event[46];
+EvtWord yoru_hiru_event[46];
+EvtWord urouro[61];
+EvtWord urouro_fuwafuwa[35];
+EvtWord buruburu[23];
+EvtWord fuwafuwa[15];
+EvtWord kirimomi[29];
+EvtWord marco_ship_yure[29];
+EvtWord moya_effect01[52];
+EvtWord moya_effect02[52];
+EvtWord moya_effect03[52];
+EvtWord moya_effect04[52];
+EvtWord moya_effect05[52];
+EvtWord nami_alpha[41];
+EvtWord moonout_effect[53];
+EvtWord moya_effect[19];
+EvtWord _kakushuku[32];
+EvtWord elmos_a_kakushuku[63];
+EvtWord elmos_a_kaku[13];
+EvtWord elmos_a_shuku[13];
 static ExtTexInfo ext_entry_data[21];
 static s16 elmos_animtbl[22];
-static s32 nannpc_mode_setup[35];
+static EvtWord nannpc_mode_setup[35];
 s32 mist_pos[91];
-s32 mist_setup[45];
-s32 marcoship_shizumu[156];
-s32 onryo_event[2250];
-s32 muj_20_koopa_evt[133];
-s32 kaizoku_hata[65];
-s32 gor_muj_ship[195];
-static s32 muj_gor_ship[195];
-s32 anm_kaji[61];
-s32 anm_wakka[40];
-s32 anm_entotsu[33];
-s32 anm_neji[33];
-s32 anm_yure[132];
-static s32 evt_prologue[182];
-static s32 epilogue_npc_entry[25];
-s32 fune_move[136];
-static s32 epilogue_evt[97];
-s32 muj_20_init_evt[362];
+EvtWord mist_setup[45];
+EvtWord marcoship_shizumu[156];
+EvtWord onryo_event[2250];
+EvtWord muj_20_koopa_evt[133];
+EvtWord kaizoku_hata[65];
+EvtWord gor_muj_ship[195];
+static EvtWord muj_gor_ship[195];
+EvtWord anm_kaji[61];
+EvtWord anm_wakka[40];
+EvtWord anm_entotsu[33];
+EvtWord anm_neji[33];
+EvtWord anm_yure[132];
+static EvtWord evt_prologue[182];
+static EvtWord epilogue_npc_entry[25];
+EvtWord fune_move[136];
+static EvtWord epilogue_evt[97];
+EvtWord muj_20_init_evt[362];
 
 
 f32 fd_muj_20_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
@@ -265,7 +265,7 @@ EVT_END()
 
 USER_FUNC(urouro_func) {
     int t;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 sx = evtGetValue(event, args[1]);
     f32 sz = evtGetValue(event, args[2]);
@@ -307,7 +307,7 @@ USER_FUNC(urouro_func) {
 }
 
 USER_FUNC(urouro_fuwafuwa_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 sx = evtGetValue(event, args[1]);
     f32 sy = evtGetValue(event, args[2]);
@@ -390,7 +390,7 @@ USER_FUNC(marcoship_yure_init_func) {
 
 USER_FUNC(marcoship_yure_func) {
     MarcoShip* ms = marcoship;
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     switch (ms->state) {
         case 0:
@@ -743,7 +743,7 @@ void elmos1000tai_seq00(NanNPC* npc) {
 }
 
 USER_FUNC(mist_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -788,7 +788,7 @@ USER_FUNC(marcoship_shizumu_func) {
 }
 
 USER_FUNC(splash_eff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);

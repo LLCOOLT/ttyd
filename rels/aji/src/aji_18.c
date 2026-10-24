@@ -64,18 +64,18 @@ f32 fd_aji_18___local_3PIO2_368;
 f32 fd_aji_18_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_18___local_PIO2_367;
 f32 fd_aji_18_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[3];
-s32 evt_machine[266];
-s32 key_lock_koujyou[14];
-static s32 evt_koopa_after[118];
+EvtWord evt_machine[266];
+EvtWord key_lock_koujyou[14];
+static EvtWord evt_koopa_after[118];
 #ifdef VERSION_G8ME01
-s32 aji_18_init_evt[301];
+EvtWord aji_18_init_evt[301];
 #else
-s32 aji_18_init_evt[299];
+EvtWord aji_18_init_evt[299];
 #endif
 
 static USER_FUNC(make_list) {

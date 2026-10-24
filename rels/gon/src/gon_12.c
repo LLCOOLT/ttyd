@@ -75,16 +75,16 @@ f32 fd_gon_12___local_3PIO2_368;
 f32 fd_gon_12_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gon_12___local_PIO2_367;
 f32 fd_gon_12_one_364;
-static s32 door_close[12];
-static s32 door_open[12];
+static EvtWord door_close[12];
+static EvtWord door_open[12];
 static BeroEntry bero_entry_data[2];
-static s32 chuchurina_sogu[610];
-s32 chuchurina_talk[2];
+static EvtWord chuchurina_sogu[610];
+EvtWord chuchurina_talk[2];
 static NpcSetupInfo npcEnt[2];
-static s32 item_get00[37];
-s32 item_get01[34];
-s32 item_get02[34];
-s32 gon_12_init_evt[93];
+static EvtWord item_get00[37];
+EvtWord item_get01[34];
+EvtWord item_get02[34];
+EvtWord gon_12_init_evt[93];
 
 f32 fd_gon_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -150,7 +150,7 @@ static BeroEntry bero_entry_data[] = {
 
 static USER_FUNC(evt_chuchu_back_loop) {
     NpcEntry* npc;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     OSTime now;
     s32 total;
     s32 elapsed;

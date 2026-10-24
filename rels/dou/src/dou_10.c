@@ -83,21 +83,21 @@ f32 fd_dou_10___local_PIO2_367;
 f32 fd_dou_10_one_364;
 static BeroEntry bero_entry_data[5];
 const char* namiyoke_mapobj[15];
-s32 nami_running[72];
-s32 namiyoke_fail_kaiten[34];
-s32 namiyoke_fail_shizumu[49];
-s32 namiyoke_fail_recover[190];
-s32 namiyoke_fail[142];
-s32 namiyoke_atari_check[21];
-s32 namiyoke_main[135];
-s32 namiyoke_init[97];
-s32 namiyoke_se[100];
-s32 namiyoke_check[34];
-static s32 yari_trap_sub[107];
-static s32 yari_trap[11];
-static s32 dou_puka_event_main0[60];
+EvtWord nami_running[72];
+EvtWord namiyoke_fail_kaiten[34];
+EvtWord namiyoke_fail_shizumu[49];
+EvtWord namiyoke_fail_recover[190];
+EvtWord namiyoke_fail[142];
+EvtWord namiyoke_atari_check[21];
+EvtWord namiyoke_main[135];
+EvtWord namiyoke_init[97];
+EvtWord namiyoke_se[100];
+EvtWord namiyoke_check[34];
+static EvtWord yari_trap_sub[107];
+static EvtWord yari_trap[11];
+static EvtWord dou_puka_event_main0[60];
 static HitDamageReturn hitDmgRetPoints[4];
-s32 dou_10_init_evt[64];
+EvtWord dou_10_init_evt[64];
 
 f32 fd_dou_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -632,7 +632,7 @@ EVT_BEGIN(dou_10_init_evt)
 EVT_END()
 
 USER_FUNC(namiyoke_se_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
@@ -657,7 +657,7 @@ USER_FUNC(namiyoke_fail_stop) {
 }
 
 USER_FUNC(dou_namiatari_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
@@ -692,7 +692,7 @@ USER_FUNC(dou_namiatari_check) {
 
 USER_FUNC(nami_running_func) {
     f32* lwf = event->lwDataF;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 s;
 
     lwf[6] -= 1.3499999f;
@@ -748,7 +748,7 @@ USER_FUNC(nami_running_init_func) {
 }
 
 USER_FUNC(namiyoke_set_mapobj) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -759,7 +759,7 @@ USER_FUNC(namiyoke_set_mapobj) {
 }
 
 USER_FUNC(evt_sub_entrymgr_getreg) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EntryMgr* mgr = (EntryMgr*)evtGetValue(event, args[0]);
     EntryMgrEntry* e = mgr->entries;
     s32 id = evtGetValue(event, args[1]);
@@ -777,7 +777,7 @@ USER_FUNC(evt_sub_entrymgr_getreg) {
 }
 
 USER_FUNC(evt_sub_entrymgr_setreg) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EntryMgr* mgr = (EntryMgr*)evtGetValue(event, args[0]);
     EntryMgrEntry* e = mgr->entries;
     s32 id = evtGetValue(event, args[1]);
@@ -795,7 +795,7 @@ USER_FUNC(evt_sub_entrymgr_setreg) {
 }
 
 USER_FUNC(evt_sub_entrymgr_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EntryMgr* mgr = (EntryMgr*)evtGetValue(event, args[0]);
     EntryMgrEntry* e = mgr->entries;
     s32 id = evtGetValue(event, args[1]);
@@ -816,7 +816,7 @@ USER_FUNC(evt_sub_entrymgr_check) {
 }
 
 USER_FUNC(evt_sub_entrymgr_delete) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EntryMgr* mgr = (EntryMgr*)evtGetValue(event, args[0]);
     EntryMgrEntry* e = mgr->entries;
     s32 id = evtGetValue(event, args[1]);
@@ -836,7 +836,7 @@ USER_FUNC(evt_sub_entrymgr_delete) {
 }
 
 USER_FUNC(evt_sub_entrymgr_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EntryMgr* mgr = (EntryMgr*)evtGetValue(event, args[0]);
     EntryMgrEntry* e = mgr->entries;
     s32 id = evtGetValue(event, args[1]);
@@ -856,7 +856,7 @@ USER_FUNC(evt_sub_entrymgr_entry) {
 }
 
 USER_FUNC(evt_sub_entrymgr_init) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     EntryMgr* mgr = _mapAlloc(sizeof(EntryMgr));
 
     evtSetValue(event, args[0], (s32)mgr);

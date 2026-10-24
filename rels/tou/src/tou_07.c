@@ -120,32 +120,32 @@ f32 fd_tou_07___local_3PIO2_368;
 f32 fd_tou_07_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tou_07___local_PIO2_367;
 f32 fd_tou_07_one_364;
-static s32 n_door_open[12];
-static s32 n_door_close[12];
+static EvtWord n_door_open[12];
+static EvtWord n_door_close[12];
 static BeroEntry bero_data[3];
-static s32 init_gans[2];
-static s32 talk_gans[2];
+static EvtWord init_gans[2];
+static EvtWord talk_gans[2];
 static NpcSetupInfo npcEnt[4];
-static s32 evt_sensyu[169];
-static s32 evt_champion[578];
-s32 evt_champion_re[308];
-static s32 evt_dakuto[39];
-s32 evt_dakuto2[44];
+static EvtWord evt_sensyu[169];
+static EvtWord evt_champion[578];
+EvtWord evt_champion_re[308];
+static EvtWord evt_dakuto[39];
+EvtWord evt_dakuto2[44];
 #ifdef VERSION_G8ME01
-s32 evt_tou_bed[440];
+EvtWord evt_tou_bed[440];
 #else
-s32 evt_tou_bed[432];
+EvtWord evt_tou_bed[432];
 #endif
-static s32 bed_entry[10];
-static s32 mobj_box00[34];
-s32 tou_07_init_evt[286];
+static EvtWord bed_entry[10];
+static EvtWord mobj_box00[34];
+EvtWord tou_07_init_evt[286];
 
 #ifdef VERSION_G8ME01
 s32 marioKeyOffChk(void);
 s32 marioCtrlOffChk(void);
 
 USER_FUNC(tou_07_mario_keyoff_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (marioKeyOffChk() || marioCtrlOffChk()) {
         evtSetValue(event, args[0], 1);

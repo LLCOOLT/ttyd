@@ -27,7 +27,7 @@ f32 fd_gra_03_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gra_03___local_PIO2_367;
 f32 fd_gra_03_one_364;
 static BeroEntry bero_entry_data[3];
-s32 gra_03_init_evt[41];
+EvtWord gra_03_init_evt[41];
 
 f32 fd_gra_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

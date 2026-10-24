@@ -80,14 +80,14 @@ f32 fd_aji_14___local_3PIO2_368;
 f32 fd_aji_14_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_14___local_PIO2_367;
 f32 fd_aji_14_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[2];
-s32 evt_robot_waku[34];
-static s32 evt_boss[797];
-s32 evt_boss2[147];
+EvtWord evt_robot_waku[34];
+static EvtWord evt_boss[797];
+EvtWord evt_boss2[147];
 static NpcSetupInfo npcEnt[3];
-s32 aji_14_init_evt[71];
+EvtWord aji_14_init_evt[71];
 
 f32 fd_aji_14_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

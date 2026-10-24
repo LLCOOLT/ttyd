@@ -35,26 +35,26 @@ f32 fd_las_08___local_3PIO2_368;
 f32 fd_las_08_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_08___local_PIO2_367;
 f32 fd_las_08_one_364;
-static s32 w1_door_close[22];
-static s32 w1_door_open[22];
-static s32 w2_door_close[22];
-static s32 w2_door_open[22];
-static s32 e1_door_close[22];
-static s32 e1_door_open[22];
-static s32 e2_door_close[22];
-static s32 e2_door_open[22];
-static s32 door_matigai_evt[15];
-s32 door_seikai_evt[19];
+static EvtWord w1_door_close[22];
+static EvtWord w1_door_open[22];
+static EvtWord w2_door_close[22];
+static EvtWord w2_door_open[22];
+static EvtWord e1_door_close[22];
+static EvtWord e1_door_open[22];
+static EvtWord e2_door_close[22];
+static EvtWord e2_door_open[22];
+static EvtWord door_matigai_evt[15];
+EvtWord door_seikai_evt[19];
 static BeroEntry bero_entry_data[5];
 BeroEntry e_bero_1_matigai[1];
 BeroEntry e_bero_1_seikai[1];
 BeroEntry e_bero_2_seikai[1];
 const char* taimatu_data[16];
-s32 hikari_anim[52];
-s32 taimatu_evt[18];
+EvtWord hikari_anim[52];
+EvtWord taimatu_evt[18];
 s32 mugen_kairou_list[7];
-s32 mugen_kairou_init[96];
-s32 las_08_init_evt[22];
+EvtWord mugen_kairou_init[96];
+EvtWord las_08_init_evt[22];
 
 f32 fd_las_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -414,7 +414,7 @@ EVT_END()
 EffectEntry* effTorchEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 
 USER_FUNC(hi_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
     MapObject* obj = mapGetMapObj((const char*)taimatu_data[index * 2]);
@@ -432,7 +432,7 @@ USER_FUNC(hi_onoff) {
 }
 
 USER_FUNC(mugen_kairou_get_list) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
     evtSetValue(event, args[1], mugen_kairou_list[index]);

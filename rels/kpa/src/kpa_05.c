@@ -38,10 +38,10 @@ f32 fd_kpa_05___local_PIO2_367;
 f32 fd_kpa_05_one_364;
 static s32 kpa_act_stg3_mobj[118];
 s32 kpa_act_stg3_item[79];
-static s32 kpa_fall[92];
-static s32 jumpstand_evt[60];
+static EvtWord kpa_fall[92];
+static EvtWord jumpstand_evt[60];
 static NpcSetupInfo npcEnt[1];
-s32 kpa_05_init_evt[44];
+EvtWord kpa_05_init_evt[44];
 
 f32 fd_kpa_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -185,7 +185,7 @@ EVT_END()
 s32 kpaGetLevel(void);
 
 static USER_FUNC(kpa_get_level) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], kpaGetLevel());
     return EVT_RETURN_DONE;
 }

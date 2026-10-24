@@ -265,7 +265,7 @@ USER_FUNC(evt_cloud_init) {
 }
 
 USER_FUNC(evt_cloud_ent) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 multi;
     char* groupName;
     char* hitName;
@@ -313,7 +313,7 @@ USER_FUNC(evt_cloud_ent) {
 }
 
 USER_FUNC(evt_cloud_set_cap_size) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u16 w = evtGetValue(event, args[0]);
     u16 h = evtGetValue(event, args[1]);
 
@@ -323,7 +323,7 @@ USER_FUNC(evt_cloud_set_cap_size) {
 }
 
 USER_FUNC(evt_cloud_get_mode) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (cloud_p == NULL) {
         evtSetValue(event, args[0], -1);

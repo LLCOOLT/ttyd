@@ -227,11 +227,11 @@ NpcBattleSelect btlgrpsel_las_btlno_las_25_05_off[2];
 NpcBattleSelect btlgrpsel_las_btlno_las_25_06_off[2];
 NpcSetupBattleInfo btlsetup_las_tbl[61];
 NpcTerritoryInfo btl_las_setup_no_tbl[61];
-s32 bgset_las_gear_event[38];
-s32 stg_08_1_init_sub_event[97];
-s32 stg_08_1_init_event[4];
-s32 stg_08_6_init_sub_event[46];
-s32 stg_08_6_init_event[4];
+EvtWord bgset_las_gear_event[38];
+EvtWord stg_08_1_init_sub_event[97];
+EvtWord stg_08_1_init_event[4];
+EvtWord stg_08_6_init_sub_event[46];
+EvtWord stg_08_6_init_event[4];
 
 USER_FUNC(hi_fire_end) {
     hi_fire_end_flag[0] = 1;
@@ -3554,7 +3554,7 @@ USER_FUNC(check_battle_end) {
 }
 
 USER_FUNC(_gear_rotate) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
     const char* name2 = (const char*)evtGetValue(event, args[1]);
     s32 frameVar = args[2];

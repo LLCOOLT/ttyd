@@ -31,7 +31,7 @@ f32 fd_gon_00___local_PIO2_367;
 f32 fd_gon_00_one_364;
 static BeroEntry bero_entry_data[4];
 static BeroEntry e3_bero[2];
-s32 gon_00_init_evt[77];
+EvtWord gon_00_init_evt[77];
 
 f32 fd_gon_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

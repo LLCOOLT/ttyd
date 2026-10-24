@@ -1,5 +1,6 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "evt/evt_word.h"
 
-extern s32 aaa_00_init_evt[];
+extern EvtWord aaa_00_init_evt[];

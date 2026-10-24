@@ -256,65 +256,65 @@ void disp_sight(CameraId camera, void* param);
 void drawNum(s32 num, s32 digits, f32 x, f32 y, f32 scale);
 void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot);
 
-s32 evt_door_1[12];
-static s32 evt_door_2[12];
-static s32 evt_wall[12];
+EvtWord evt_door_1[12];
+static EvtWord evt_door_2[12];
+static EvtWord evt_wall[12];
 const char* door_npc[4];
-static s32 door_open[9];
-static s32 door_close[10];
+static EvtWord door_open[9];
+static EvtWord door_close[10];
 DoorParam door;
 static BeroEntry bero_entry_data[3];
-static s32 first_evt[148];
-s32 evt_bom_01_karakara[123];
+static EvtWord first_evt[148];
+EvtWord evt_bom_01_karakara[123];
 static ExtTexInfo ext_data[31];
-s32 evt_bom1000[15];
-s32 gamen_shake[8];
-s32 gamen_shake2[26];
-s32 mario_tobideru[54];
-s32 mario_shot[160];
-s32 effect_delete[11];
-static s32 mario_kemuri[29];
-s32 evt_depth[4];
-s32 cam_outside[48];
-s32 cam_inside[52];
-s32 cam_inside2[52];
-static s32 party_damage_pose[52];
-s32 effect_1[84];
-s32 open_hatch[83];
+EvtWord evt_bom1000[15];
+EvtWord gamen_shake[8];
+EvtWord gamen_shake2[26];
+EvtWord mario_tobideru[54];
+EvtWord mario_shot[160];
+EvtWord effect_delete[11];
+static EvtWord mario_kemuri[29];
+EvtWord evt_depth[4];
+EvtWord cam_outside[48];
+EvtWord cam_inside[52];
+EvtWord cam_inside2[52];
+static EvtWord party_damage_pose[52];
+EvtWord effect_1[84];
+EvtWord open_hatch[83];
 static f32 spline_dt[9];
 const char* oh_data[8];
-static s32 evt_taihou[2446];
-static s32 init_soncho[13];
-static s32 talk_soncho[24];
-s32 init_nitoro[8];
-s32 talk_nitoro[44];
-s32 init_pentrit[8];
-s32 talk_pentrit[44];
-s32 init_surary[8];
-s32 talk_surary[44];
-s32 init_murabito_d[8];
-s32 talk_murabito_d[44];
-static s32 init_murabito_e[8];
-static s32 talk_murabito_e[28];
-static s32 init_murabito_f[8];
-static s32 talk_murabito_f[28];
-static s32 init_murabito_g[8];
-static s32 talk_murabito_g[28];
-static s32 init_murabito_h[8];
-static s32 talk_murabito_h[28];
-static s32 init_murabito_i[8];
-static s32 talk_murabito_i[28];
-static s32 init_white[22];
-static s32 talk_white[39];
-static s32 musume_talk[64];
-static s32 musume_a_entry[26];
-static s32 musume_b_entry[26];
-static s32 musume_c_entry[26];
+static EvtWord evt_taihou[2446];
+static EvtWord init_soncho[13];
+static EvtWord talk_soncho[24];
+EvtWord init_nitoro[8];
+EvtWord talk_nitoro[44];
+EvtWord init_pentrit[8];
+EvtWord talk_pentrit[44];
+EvtWord init_surary[8];
+EvtWord talk_surary[44];
+EvtWord init_murabito_d[8];
+EvtWord talk_murabito_d[44];
+static EvtWord init_murabito_e[8];
+static EvtWord talk_murabito_e[28];
+static EvtWord init_murabito_f[8];
+static EvtWord talk_murabito_f[28];
+static EvtWord init_murabito_g[8];
+static EvtWord talk_murabito_g[28];
+static EvtWord init_murabito_h[8];
+static EvtWord talk_murabito_h[28];
+static EvtWord init_murabito_i[8];
+static EvtWord talk_murabito_i[28];
+static EvtWord init_white[22];
+static EvtWord talk_white[39];
+static EvtWord musume_talk[64];
+static EvtWord musume_a_entry[26];
+static EvtWord musume_b_entry[26];
+static EvtWord musume_c_entry[26];
 static NpcSetupInfo npcEnt[7];
-s32 bom1000_minnnanokoe[21];
-static s32 minnnanokoe_evt[VERSION_PICK(450, 466)];
-static s32 evt_door[14];
-s32 bom_01_init_evt[189];
+EvtWord bom1000_minnnanokoe[21];
+static EvtWord minnnanokoe_evt[VERSION_PICK(450, 466)];
+static EvtWord evt_door[14];
+EvtWord bom_01_init_evt[189];
 
 void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
@@ -542,7 +542,7 @@ s32 sight_dir(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 bom_flag(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 mask = evtGetValue(event, args[1]);
     BomWork* wp = lp->address;
@@ -2355,7 +2355,7 @@ static s32 depth(EventEntry* event, BOOL isFirstCall) {
 }
 
 static s32 make_name(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     sprintf(name, "S_hikari%d", evtGetValue(event, args[0]));
     evtSetValue(event, args[1], (s32)name);
@@ -2457,7 +2457,7 @@ void ext_dispent_minnnanokoe(void) {
 }
 
 s32 bom1000_msg(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32* fa = args;
     s32 flag;
     s32 type = evtGetValue(event, *fa++);
@@ -2509,7 +2509,7 @@ static s32 yami_view(EventEntry* event, BOOL isFirstCall) {
 }
 
 static s32 anim_tevcallback(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 flag = evtGetValue(event, args[1]);
     NpcEntry* npc = npcNameToPtr_NoAssert(name);
@@ -2524,7 +2524,7 @@ static s32 anim_tevcallback(EventEntry* event, BOOL isFirstCall) {
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 
 static s32 starstone_entry(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -2535,7 +2535,7 @@ static s32 starstone_entry(EventEntry* event, BOOL isFirstCall) {
 }
 
 static s32 starstone_set_pos(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -2549,7 +2549,7 @@ static s32 starstone_set_pos(EventEntry* event, BOOL isFirstCall) {
 }
 
 static s32 starstone_set_ry(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 ry = evtGetFloat(event, args[1]);
 

@@ -101,42 +101,42 @@ PoseTableEntry pose_table_counter_sanders[20];
 static BattleDataEntry data_table[9];
 BattleUnitKindPart unitpartsdata_Party_Sanders[1];
 BattleUnitKind unitdata_Party_Sanders;
-static s32 battle_entry_event[59];
-static s32 init_event[63];
-static s32 damage_event[16];
-static s32 wait_event[26];
+static EvtWord battle_entry_event[59];
+static EvtWord init_event[63];
+static EvtWord damage_event[16];
+static EvtWord wait_event[26];
 BattleWeapon partyWeapon_SandersFirstAttack;
 BattleWeapon partyWeapon_SandersNormalAttack;
 BattleWeapon partyWeapon_SandersTimeBombSet;
 BattleWeapon partyWeapon_SandersCounterSet;
 BattleWeapon partyWeapon_SandersSuperBombAttack;
-s32 partySandersAttack_FirstAttack[321];
-s32 partySandersAttack_NormalAttack[970];
+EvtWord partySandersAttack_FirstAttack[321];
+EvtWord partySandersAttack_NormalAttack[970];
 #ifdef VERSION_G8ME01
-s32 partySandersAttack_SuperBombAttack[1118];
+EvtWord partySandersAttack_SuperBombAttack[1118];
 #else
-s32 partySandersAttack_SuperBombAttack[1116];
+EvtWord partySandersAttack_SuperBombAttack[1116];
 #endif
 #ifdef VERSION_G8ME01
-s32 partySandersAttack_CounterSet[242];
+EvtWord partySandersAttack_CounterSet[242];
 #else
-s32 partySandersAttack_CounterSet[201];
+EvtWord partySandersAttack_CounterSet[201];
 #endif
 #ifdef VERSION_G8ME01
-s32 partySandersAttack_TimeBombSet[331];
+EvtWord partySandersAttack_TimeBombSet[331];
 #else
-s32 partySandersAttack_TimeBombSet[290];
+EvtWord partySandersAttack_TimeBombSet[290];
 #endif
-s32 _shot_bomb_event[155];
-s32 sanders_appeal_event[121];
-static s32 attack_audience_event[284];
-s32 sanders_battle_end_event[14];
+EvtWord _shot_bomb_event[155];
+EvtWord sanders_appeal_event[121];
+static EvtWord attack_audience_event[284];
+EvtWord sanders_battle_end_event[14];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
-static s32 attack_event[2];
+static EvtWord attack_event[2];
 BattleUnitSetup entry_bomzou;
-static s32 party_win_reaction[9];
+static EvtWord party_win_reaction[9];
 
 __declspec(section ".data") f32 unit_party_sanders_negone_one_a[] = {
     -1.0f, 1.0f,
@@ -2434,7 +2434,7 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
 
 USER_FUNC(_get_bomb_hit_position) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     Vec pos;
     s32 id, targetId, dir;
@@ -2462,7 +2462,7 @@ USER_FUNC(_get_bomb_hit_position) {
 
 USER_FUNC(_make_counterset_weapon) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleUnit* unit;
     s32 index;
     BattleWeapon* weapon;
@@ -2482,7 +2482,7 @@ USER_FUNC(_make_counterset_weapon) {
 }
 
 USER_FUNC(_shot_move) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     f32 speed, floor;
@@ -2527,7 +2527,7 @@ USER_FUNC(_shot_move) {
 
 USER_FUNC(_judge_on_stage) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BattleStage* stage;
     f32 z, y, x;
     s32 id, index;

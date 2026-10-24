@@ -196,9 +196,9 @@ f32 fd_jon_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_jon___local_PIO2_367;
 f32 fd_jon_one_364;
 #ifdef VERSION_G8ME01
-s32 jon_init_evt[400];
+EvtWord jon_init_evt[400];
 #else
-s32 jon_init_evt[391];
+EvtWord jon_init_evt[391];
 #endif
 u8 enemy_100[100];
 NpcSetupInfo npcEnt_kuriboo[2];
@@ -227,65 +227,65 @@ NpcSetupInfo npcEnt_basabasa2[2];
 NpcSetupInfo npcEnt_togedaruma[2];
 NpcSetupInfo npcEnt_pansy[2];
 NpcSetupInfo npcEnt_zonbaba[2];
-s32 enemy_setup[1055];
+EvtWord enemy_setup[1055];
 s32 treasure_tbl[10];
-s32 evt_open_box[46];
-static s32 move_event[55];
-s32 get_map_name[111];
-s32 talk_idouya[141];
+EvtWord evt_open_box[46];
+static EvtWord move_event[55];
+EvtWord get_map_name[111];
+EvtWord talk_idouya[141];
 NpcSetupInfo npcEnt_idouya[2];
-s32 idouya_setup[38];
+EvtWord idouya_setup[38];
 #ifdef VERSION_G8ME01
-s32 talk_gyousyou[219];
+EvtWord talk_gyousyou[219];
 #else
-s32 talk_gyousyou[207];
+EvtWord talk_gyousyou[207];
 #endif
 NpcSetupInfo npcEnt_gyousyou[2];
-s32 gyousyou_setup[47];
-s32 shikake_setup[117];
-s32 dokan_open[74];
-s32 dokan_open2[70];
-static s32 evt_kanban[25];
-static s32 evt_kanban2[20];
-s32 floor_inc[10];
-s32 floor_clear[8];
+EvtWord gyousyou_setup[47];
+EvtWord shikake_setup[117];
+EvtWord dokan_open[74];
+EvtWord dokan_open2[70];
+static EvtWord evt_kanban[25];
+static EvtWord evt_kanban2[20];
+EvtWord floor_inc[10];
+EvtWord floor_clear[8];
 BeroEntry bero_boss[3];
-s32 setup_boss[9];
+EvtWord setup_boss[9];
 BeroEntry bero_return[4];
 BeroEntry bero_return2[2];
 BeroEntry bero_return3[2];
-s32 setup_return[190];
+EvtWord setup_return[190];
 BeroEntry bero_prev_return[3];
 BeroEntry bero_prev_return2[2];
 BeroEntry bero_prev_return3[2];
 BeroEntry bero_prev_return4[2];
-s32 setup_prev_return[69];
+EvtWord setup_prev_return[69];
 BeroEntry bero_normal[3];
 BeroEntry bero_normal2[2];
 BeroEntry bero_normal3[2];
-s32 setup_normal[53];
-s32 iri_12_dokan_in_sub[202];
-s32 iri_12_dokan_in[16];
-s32 iri_12_makkino_return_dokan[193];
-s32 iri_12_makkino_return[31];
-s32 iri_12_makkino_return_b100[42];
-s32 iri_12_makkino_return_zonbaba[44];
-s32 iri_12_makkino_move_dokan_side[94];
-s32 iri_12_enemy_dead_event[18];
-s32 iri_12_makkino_urouro[25];
-s32 iri_12_makkino_buruburu[44];
-s32 iri_12_makkino_okiru[33];
-static s32 iri_12_makkino_talk[55];
-s32 iri_12_makkino_fall[79];
-s32 iri_12_makkino_fall_return[71];
-s32 iri_12_init_fall[38];
-static s32 iri_12_init[65];
-s32 evt_iri_30_touch_rakugaki[14];
-s32 evt_iri_30_bomb_rakugaki[154];
-static s32 gonbaba_standup_shake[23];
-static s32 gonbaba_fog_change[87];
-static s32 gonbaba_down_shake[83];
-s32 zonbaba_first_event[677];
+EvtWord setup_normal[53];
+EvtWord iri_12_dokan_in_sub[202];
+EvtWord iri_12_dokan_in[16];
+EvtWord iri_12_makkino_return_dokan[193];
+EvtWord iri_12_makkino_return[31];
+EvtWord iri_12_makkino_return_b100[42];
+EvtWord iri_12_makkino_return_zonbaba[44];
+EvtWord iri_12_makkino_move_dokan_side[94];
+EvtWord iri_12_enemy_dead_event[18];
+EvtWord iri_12_makkino_urouro[25];
+EvtWord iri_12_makkino_buruburu[44];
+EvtWord iri_12_makkino_okiru[33];
+static EvtWord iri_12_makkino_talk[55];
+EvtWord iri_12_makkino_fall[79];
+EvtWord iri_12_makkino_fall_return[71];
+EvtWord iri_12_init_fall[38];
+static EvtWord iri_12_init[65];
+EvtWord evt_iri_30_touch_rakugaki[14];
+EvtWord evt_iri_30_bomb_rakugaki[154];
+static EvtWord gonbaba_standup_shake[23];
+static EvtWord gonbaba_fog_change[87];
+static EvtWord gonbaba_down_shake[83];
+EvtWord zonbaba_first_event[677];
 
 f32 fd_jon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -3040,7 +3040,7 @@ USER_FUNC(shikakeFlag) {
 }
 
 USER_FUNC(wanwan_set_home_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
     s32 y = evtGetValue(event, args[1]);
     s32 z = evtGetValue(event, args[2]);
@@ -3066,7 +3066,7 @@ USER_FUNC(yattukeFlag) {
 }
 
 USER_FUNC(enemy_info) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     s32 no = enemy_100[idx];
     NpcSetupBattleInfo* setup = &btlsetup_jon_tbl[no];

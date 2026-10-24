@@ -754,7 +754,7 @@ void btl_camera_set_mode(s32 pri, s32 mode) {
 }
 
 USER_FUNC(evt_btl_camera_set_mode) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   s32 val = evtGetValue(event, args[1]);
   btl_camera_set_mode(pri, val);
@@ -765,7 +765,7 @@ USER_FUNC(evt_btl_camera_set_homing_unit) {
   BattleWork* wp;
   BattleUnit* u;
   BattleUnit* u2;
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 unit;
   s32 unit2;
   BattleUnitPart* part;
@@ -794,7 +794,7 @@ USER_FUNC(evt_btl_camera_set_homing_unit) {
 }
 
 USER_FUNC(evt_btl_camera_set_homing_unitparts) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   BattleWork* wp;
   BattleUnit* u;
   s32 unit, parts, unit2, parts2;
@@ -832,7 +832,7 @@ USER_FUNC(evt_btl_camera_set_homing_unit_audience) {
   s32 audId;
   BattleWork* wp;
   BattleAudience* aud;
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri, unit, parts;
   BattleUnit* u;
   BattleUnitPart* part;
@@ -878,14 +878,14 @@ void btl_camera_add_zoom(s32 pri, f32 zoom) {
 }
 
 USER_FUNC(evt_btl_camera_set_zoom) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   btl_camera_set_zoom(pri, (s32)evtGetFloat(event, args[1]));
   return 2;
 }
 
 USER_FUNC(evt_btl_camera_add_zoom) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   btl_camera_add_zoom(pri, (s32)evtGetFloat(event, args[1]));
   return 2;
@@ -915,7 +915,7 @@ void btl_camera_set_zoomSpeedLv(s32 pri, s32 lv) {
 }
 
 USER_FUNC(evt_btl_camera_set_moveSpeedLv) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   s32 val = evtGetValue(event, args[1]);
   btl_camera_set_moveSpeedLv(pri, val);
@@ -923,7 +923,7 @@ USER_FUNC(evt_btl_camera_set_moveSpeedLv) {
 }
 
 USER_FUNC(evt_btl_camera_set_zoomSpeedLv) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   s32 val = evtGetValue(event, args[1]);
   btl_camera_set_zoomSpeedLv(pri, val);
@@ -954,7 +954,7 @@ void btl_camera_set_moveto(s32 pri, f32 x, f32 y, f32 z, f32 atX, f32 atY, f32 a
 }
 
 USER_FUNC(evt_btl_camera_set_moveto) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   f32 x = evtGetFloat(event, args[1]);
   f32 y = evtGetFloat(event, args[2]);
@@ -983,7 +983,7 @@ void btl_camera_shake_w(s32 pri, f32 a, f32 b, s32 frames, s32 type) {
 }
 
 USER_FUNC(evt_btl_camera_shake_w) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   f32 a = evtGetValue(event, args[1]);
   f32 b = evtGetValue(event, args[2]);
@@ -1008,7 +1008,7 @@ void btl_camera_shake_h(s32 pri, f32 a, f32 b, s32 frames, s32 type) {
 }
 
 USER_FUNC(evt_btl_camera_shake_h) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   f32 a = evtGetValue(event, args[1]);
   f32 b = evtGetValue(event, args[2]);
@@ -1042,7 +1042,7 @@ void btl_camera_nomove_x_onoff(s32 pri, s32 on) {
 }
 
 USER_FUNC(evt_btl_camera_nomove_x_onoff) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   s32 val = evtGetValue(event, args[1]);
   btl_camera_nomove_x_onoff(pri, val);
@@ -1061,7 +1061,7 @@ void btl_camera_nomove_y_onoff(s32 pri, s32 on) {
 }
 
 USER_FUNC(evt_btl_camera_nomove_y_onoff) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   s32 val = evtGetValue(event, args[1]);
   btl_camera_nomove_y_onoff(pri, val);
@@ -1080,7 +1080,7 @@ void btl_camera_nomove_z_onoff(s32 pri, s32 on) {
 }
 
 USER_FUNC(evt_btl_camera_nomove_z_onoff) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   s32 val = evtGetValue(event, args[1]);
   btl_camera_nomove_z_onoff(pri, val);
@@ -1098,7 +1098,7 @@ void btl_camera_set_posoffset(s32 pri, f32 x, f32 y, f32 z) {
 }
 
 USER_FUNC(evt_btl_camera_set_posoffset) {
-  s32* args = event->args;
+  EvtWord* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   f32 x = evtGetFloat(event, args[1]);
   f32 y = evtGetFloat(event, args[2]);

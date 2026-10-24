@@ -92,41 +92,41 @@ f32 fd_gon_04___local_3PIO2_368;
 f32 fd_gon_04_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gon_04___local_PIO2_367;
 f32 fd_gon_04_one_364;
-static s32 w1_door_close[12];
-static s32 w1_door_open[12];
-static s32 w2_door_close[12];
-static s32 w2_door_open[12];
-static s32 e1_door_close[12];
-static s32 e1_door_open[12];
-static s32 e3_door_close[12];
-static s32 e3_door_open[12];
+static EvtWord w1_door_close[12];
+static EvtWord w1_door_open[12];
+static EvtWord w2_door_close[12];
+static EvtWord w2_door_open[12];
+static EvtWord e1_door_close[12];
+static EvtWord e1_door_open[12];
+static EvtWord e3_door_close[12];
+static EvtWord e3_door_open[12];
 static BeroEntry bero_entry_data[6];
-s32 evt_gon_04flowblock_updown1_init[37];
+EvtWord evt_gon_04flowblock_updown1_init[37];
 #ifdef VERSION_G8ME01
-s32 evt_gon_04flowblock_updown1[465];
+EvtWord evt_gon_04flowblock_updown1[465];
 #else
-s32 evt_gon_04flowblock_updown1[491];
+EvtWord evt_gon_04flowblock_updown1[491];
 #endif
-s32 evt_gon_04flowblock_updown2_init[37];
+EvtWord evt_gon_04flowblock_updown2_init[37];
 #ifdef VERSION_G8ME01
-s32 evt_gon_04flowblock_updown2[465];
+EvtWord evt_gon_04flowblock_updown2[465];
 #else
-s32 evt_gon_04flowblock_updown2[491];
+EvtWord evt_gon_04flowblock_updown2[491];
 #endif
 KemuriPos kemuri_pos1[5];
 KemuriPos kemuri_pos2[5];
-s32 evt_kaidan_pera_anime[203];
-s32 evt_kaidan_pera_init[29];
-s32 evt_kaidan_pera[214];
-s32 evt_hashi_pera[209];
-s32 evt_hashi_pera0[16];
-s32 evt_hashi_pera1[16];
-s32 evt_hashi[50];
+EvtWord evt_kaidan_pera_anime[203];
+EvtWord evt_kaidan_pera_init[29];
+EvtWord evt_kaidan_pera[214];
+EvtWord evt_hashi_pera[209];
+EvtWord evt_hashi_pera0[16];
+EvtWord evt_hashi_pera1[16];
+EvtWord evt_hashi[50];
 static s32 key_tbl[2];
-static s32 evt_chk[23];
-static s32 evt_unlock[10];
-static s32 key_get[5];
-s32 gon_04_init_evt[382];
+static EvtWord evt_chk[23];
+static EvtWord evt_unlock[10];
+static EvtWord key_get[5];
+EvtWord gon_04_init_evt[382];
 
 f32 fd_gon_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

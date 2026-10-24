@@ -18,7 +18,7 @@ f32 fd_jon_00___local_3PIO2_368;
 f32 fd_jon_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_jon_00___local_PIO2_367;
 f32 fd_jon_00_one_364;
-s32 jon_00_init_evt[2];
+EvtWord jon_00_init_evt[2];
 
 f32 fd_jon_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

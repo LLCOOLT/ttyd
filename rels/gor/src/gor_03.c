@@ -306,172 +306,172 @@ f32 fd_gor_03___local_3PIO2_368;
 f32 fd_gor_03_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gor_03___local_PIO2_367;
 f32 fd_gor_03_one_364;
-s32 debug_event[16];
-s32 gor_03_down_evt[8];
+EvtWord debug_event[16];
+EvtWord gor_03_down_evt[8];
 static BeroEntry bero_entry_data[6];
 BeroEntry yuu_00_data[1];
 BeroEntry yuu_01_data[1];
 BeroEntry yuu_02_data[1];
 BeroEntry yuu_03_data[1];
-s32 maffiaboss_ticket_put[31];
-s32 maffiaboss_ticket_check[241];
-s32 maffiaboss_init[73];
-s32 maffiaboss_maffiaboss[495];
-s32 maffiaboss_airship_ticket[768];
-s32 maffiaboss_teshita_irai[253];
-s32 maffiaboss_train_ticket_init[50];
-s32 maffiaboss_train_ticket[824];
-s32 maffiaboss_talk_common[106];
-s32 maffiaboss_talk[10];
-s32 maffiaboss_desk_talk[VERSION_PICK(46, 54)];
-s32 maffiaboss_casino_init[17];
-s32 maffiaboss_casino_talk[45];
-s32 maffiaboss_nekomu00[14];
-s32 maffiaboss_nekomu01[14];
-s32 maffiaboss_nekomu02[14];
-s32 maffia1_init[23];
-s32 maffia1_talk[128];
-s32 maffia2_init[23];
-s32 maffia2_talk[128];
-s32 maffia3_init[8];
-s32 maffia3_talk[68];
-static s32 mony_init[54];
-static s32 mony_talk[53];
-static s32 peton_init[69];
+EvtWord maffiaboss_ticket_put[31];
+EvtWord maffiaboss_ticket_check[241];
+EvtWord maffiaboss_init[73];
+EvtWord maffiaboss_maffiaboss[495];
+EvtWord maffiaboss_airship_ticket[768];
+EvtWord maffiaboss_teshita_irai[253];
+EvtWord maffiaboss_train_ticket_init[50];
+EvtWord maffiaboss_train_ticket[824];
+EvtWord maffiaboss_talk_common[106];
+EvtWord maffiaboss_talk[10];
+EvtWord maffiaboss_desk_talk[VERSION_PICK(46, 54)];
+EvtWord maffiaboss_casino_init[17];
+EvtWord maffiaboss_casino_talk[45];
+EvtWord maffiaboss_nekomu00[14];
+EvtWord maffiaboss_nekomu01[14];
+EvtWord maffiaboss_nekomu02[14];
+EvtWord maffia1_init[23];
+EvtWord maffia1_talk[128];
+EvtWord maffia2_init[23];
+EvtWord maffia2_talk[128];
+EvtWord maffia3_init[8];
+EvtWord maffia3_talk[68];
+static EvtWord mony_init[54];
+static EvtWord mony_talk[53];
+static EvtWord peton_init[69];
 s32 iri_19_item_tbl[2];
-s32 peton_talk_common[235];
-static s32 peton_talk[4];
-s32 peton_desk_talk[47];
-static s32 init_gurume[28];
-static s32 talk_gurume[4];
-static s32 luigi_init[18];
-static s32 luigi_talk[4];
-static s32 luigi_npcEnt[19];
-s32 cherry_init[12];
-s32 cherry_talk[8];
+EvtWord peton_talk_common[235];
+static EvtWord peton_talk[4];
+EvtWord peton_desk_talk[47];
+static EvtWord init_gurume[28];
+static EvtWord talk_gurume[4];
+static EvtWord luigi_init[18];
+static EvtWord luigi_talk[4];
+static EvtWord luigi_npcEnt[19];
+EvtWord cherry_init[12];
+EvtWord cherry_talk[8];
 NpcSetupInfo cherryEnt[2];
-s32 bteresa_n_fadein[45];
-s32 bteresa_n_fadeout[42];
-s32 exchange_return_sub[VERSION_PICK(111, 132)];
-s32 exchange_keep_sub[VERSION_PICK(111, 132)];
-s32 gor_03_dokan_init_evt[35];
-s32 gor_03_dokan_up_evt[60];
-s32 gor_03_dokan_down_evt[63];
+EvtWord bteresa_n_fadein[45];
+EvtWord bteresa_n_fadeout[42];
+EvtWord exchange_return_sub[VERSION_PICK(111, 132)];
+EvtWord exchange_keep_sub[VERSION_PICK(111, 132)];
+EvtWord gor_03_dokan_init_evt[35];
+EvtWord gor_03_dokan_up_evt[60];
+EvtWord gor_03_dokan_down_evt[63];
 s32 exchange_ryokin_medal_tbl[54];
-s32 bteresa_talk_sub_minigame[245];
-s32 bteresa_talk_sub_keihin[VERSION_PICK(220, 242)];
-s32 bteresa_table_talk[437];
-s32 bteresa_init[18];
-s32 bteresa_talk[81];
-s32 kyaku1_init[2];
-s32 kyaku1_talk[66];
-s32 kyaku4_init[2];
-s32 kyaku4_talk[66];
+EvtWord bteresa_talk_sub_minigame[245];
+EvtWord bteresa_talk_sub_keihin[VERSION_PICK(220, 242)];
+EvtWord bteresa_table_talk[437];
+EvtWord bteresa_init[18];
+EvtWord bteresa_talk[81];
+EvtWord kyaku1_init[2];
+EvtWord kyaku1_talk[66];
+EvtWord kyaku4_init[2];
+EvtWord kyaku4_talk[66];
 f32 montemedalzpos[2];
-s32 slot_fall_monte[4];
-s32 slot_set[VERSION_PICK(148, 168)];
-s32 slot1_set[7];
-s32 slot2_set[7];
+EvtWord slot_fall_monte[4];
+EvtWord slot_set[VERSION_PICK(148, 168)];
+EvtWord slot1_set[7];
+EvtWord slot2_set[7];
 SlotDrum drumname[2];
-s32* slotevttbl[2];
+EvtWord* slotevttbl[2];
 s32 slotgara[48];
 s32 upsidegara[48];
-s32 ranking_set[65];
-s32 exchange_set[VERSION_PICK(195, 210)];
-s32 roten_4_init[13];
-s32 roten_4_regl[19];
-s32 roten_4_talk[68];
-s32 kinopiko_a_init[8];
-s32 kinopiko_a_talk[68];
-static s32 kinopiko_b_init[13];
-s32 kinopiko_b_regl[19];
-static s32 kinopiko_b_talk[159];
-s32 kinopio_a_init[8];
-s32 kinopio_a_talk[68];
-s32 kokinopio_a_init[8];
-s32 kokinopio_a_talk[68];
-s32 kokinopio_b_init[13];
-s32 kokinopio_b_regl[19];
-s32 kokinopio_b_talk[68];
-s32 nokonoko_a_init[8];
-s32 nokonoko_a_talk[68];
-s32 kuribo_1_init[8];
-s32 kuribo_1_talk[68];
+EvtWord ranking_set[65];
+EvtWord exchange_set[VERSION_PICK(195, 210)];
+EvtWord roten_4_init[13];
+EvtWord roten_4_regl[19];
+EvtWord roten_4_talk[68];
+EvtWord kinopiko_a_init[8];
+EvtWord kinopiko_a_talk[68];
+static EvtWord kinopiko_b_init[13];
+EvtWord kinopiko_b_regl[19];
+static EvtWord kinopiko_b_talk[159];
+EvtWord kinopio_a_init[8];
+EvtWord kinopio_a_talk[68];
+EvtWord kokinopio_a_init[8];
+EvtWord kokinopio_a_talk[68];
+EvtWord kokinopio_b_init[13];
+EvtWord kokinopio_b_regl[19];
+EvtWord kokinopio_b_talk[68];
+EvtWord nokonoko_a_init[8];
+EvtWord nokonoko_a_talk[68];
+EvtWord kuribo_1_init[8];
+EvtWord kuribo_1_talk[68];
 static NpcSetupInfo npcEnt[22];
-static s32 evt_door_01_00[39];
-static s32 evt_wall_01[28];
-s32 evt_door_01_10[39];
+static EvtWord evt_door_01_00[39];
+static EvtWord evt_wall_01[28];
+EvtWord evt_door_01_10[39];
 static const char* door_data_01_npc[2];
-s32 evt_door_01_0_open[31];
-s32 evt_door_01_0_close[69];
-s32 evt_door_01_1_open[132];
-s32 evt_door_01_1_close[146];
+EvtWord evt_door_01_0_open[31];
+EvtWord evt_door_01_0_close[69];
+EvtWord evt_door_01_1_open[132];
+EvtWord evt_door_01_1_close[146];
 DoorParam door_data_01_0;
 DoorParam door_data_01_1;
-s32 evt_door_01_entry[39];
-static s32 evt_door_02_00[44];
-s32 evt_wall_02_0[15];
+EvtWord evt_door_01_entry[39];
+static EvtWord evt_door_02_00[44];
+EvtWord evt_wall_02_0[15];
 const char* door_data_02_0_npc[6];
-s32 door_data_02_0_open_sub[13];
-s32 door_data_02_0_open[28];
-s32 door_data_02_0_close[51];
+EvtWord door_data_02_0_open_sub[13];
+EvtWord door_data_02_0_open[28];
+EvtWord door_data_02_0_close[51];
 const char* door_data_02_mobj[2];
 DoorParam door_data_02_0l;
 DoorParam door_data_02_0r;
-s32 evt_door_02_10[15];
-s32 evt_door_02_11[15];
-s32 evt_wall_02_1[28];
+EvtWord evt_door_02_10[15];
+EvtWord evt_door_02_11[15];
+EvtWord evt_wall_02_1[28];
 const char* door_data_02_1_npc[6];
-s32 desk_talk_check[173];
-s32 evt_door_02_1_open[118];
-s32 evt_door_02_1_close[48];
+EvtWord desk_talk_check[173];
+EvtWord evt_door_02_1_open[118];
+EvtWord evt_door_02_1_close[48];
 DoorParam door_data_02_1;
-static s32 evt_door_03_00[12];
-static s32 evt_wall_03[28];
+static EvtWord evt_door_03_00[12];
+static EvtWord evt_wall_03[28];
 static const char* door_data_03_npc[2];
-s32 door_data_03_open[17];
-s32 door_data_03_close[19];
+EvtWord door_data_03_open[17];
+EvtWord door_data_03_close[19];
 static DoorParam door_data_03;
-static s32 evt_door_03_caseopen[6];
-static s32 evt_door_03_open[170];
-static s32 evt_door_03_close[19];
+static EvtWord evt_door_03_caseopen[6];
+static EvtWord evt_door_03_open[170];
+static EvtWord evt_door_03_close[19];
 static DoorParam door_data_03_roll;
-static s32 evt_door_03_entry[24];
-static s32 evt_door_04_00[12];
-static s32 evt_wall_04[28];
+static EvtWord evt_door_03_entry[24];
+static EvtWord evt_door_04_00[12];
+static EvtWord evt_wall_04[28];
 static const char* door_data_04_npc[3];
-static s32 evt_door_04_open[17];
-s32 evt_door_04_close_snd[19];
+static EvtWord evt_door_04_open[17];
+EvtWord evt_door_04_close_snd[19];
 static DoorParam door_data_04;
-s32 evt_door_04_caseclose[6];
-static s32 evt_door_04_close[70];
+EvtWord evt_door_04_caseclose[6];
+static EvtWord evt_door_04_close[70];
 DoorParam door_data_04_roll;
-static s32 evt_door_04_entry[20];
-s32 wall_bomb_init[51];
-static s32 wall_bomb[146];
-s32 uraguchi_tenin[23];
-s32 uraguchi_event[323];
-s32 uraguchi_check[34];
+static EvtWord evt_door_04_entry[20];
+EvtWord wall_bomb_init[51];
+static EvtWord wall_bomb[146];
+EvtWord uraguchi_tenin[23];
+EvtWord uraguchi_event[323];
+EvtWord uraguchi_check[34];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[12];
 static ShopperData35 shopper_data;
-s32 majorin_nusumigiki[331];
-s32 yuureturn_rtn[101];
-static s32 peach_mail[248];
-s32 kuzi_bomb_talk_normal[372];
-s32 kuzi_bomb_talk_husei[589];
-s32 kuzi_bomb_bomb[152];
-s32 kuzi_keiziban_normal[391];
-s32 kuzi_keiziban_husei[14];
-s32 kuzi_bomb_talk[16];
-s32 kuzi_keiziban_entry[27];
-s32 tenin_fuwafuwa[7];
-s32 casino_fuwafuwa[7];
-s32 debug_event_mode[144];
-s32 monte_evt_door_close[16];
-s32 monte_evt_door_entry[73];
-s32 gor_03_init_evt[VERSION_PICK(462, 681)];
+EvtWord majorin_nusumigiki[331];
+EvtWord yuureturn_rtn[101];
+static EvtWord peach_mail[248];
+EvtWord kuzi_bomb_talk_normal[372];
+EvtWord kuzi_bomb_talk_husei[589];
+EvtWord kuzi_bomb_bomb[152];
+EvtWord kuzi_keiziban_normal[391];
+EvtWord kuzi_keiziban_husei[14];
+EvtWord kuzi_bomb_talk[16];
+EvtWord kuzi_keiziban_entry[27];
+EvtWord tenin_fuwafuwa[7];
+EvtWord casino_fuwafuwa[7];
+EvtWord debug_event_mode[144];
+EvtWord monte_evt_door_close[16];
+EvtWord monte_evt_door_entry[73];
+EvtWord gor_03_init_evt[VERSION_PICK(462, 681)];
 
 static USER_FUNC(setmertn) {
     event->ownerNPC = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
@@ -479,7 +479,7 @@ static USER_FUNC(setmertn) {
 }
 
 USER_FUNC(gor_npc_fuwafuwa) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
     f32 speed = evtGetFloat(event, args[1]);
@@ -538,7 +538,7 @@ s32 exchange_ret_tbl_no(void) {
 }
 
 USER_FUNC(exchange_ryokin_medal) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     ExchangeRyokin (*tbl)[3];
     s32 idx = evtGetValue(event, args[0]);
     s32 no = exchange_ret_tbl_no();
@@ -565,7 +565,7 @@ USER_FUNC(evt_exchange_msg_alloc) {
 }
 
 USER_FUNC(evt_exchange_msg_set) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 value = evtGetValue(event, args[0]);
     const char* msg = msgSearch((const char*)evtGetValue(event, args[1]));
     s32 n = exchange_ret_tbl_no();
@@ -584,7 +584,7 @@ USER_FUNC(evt_exchange_msg_set) {
 }
 
 USER_FUNC(minigameselect_msg_set) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const s8* msg = (const s8*)msgSearch((const char*)evtGetValue(event, args[0]));
     s32 flags[4];
     s32 k;
@@ -639,7 +639,7 @@ USER_FUNC(minigameselect_msg_set) {
 }
 
 USER_FUNC(mario_walkpoint_enzan) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec a;
     Vec b;
     Vec d;
@@ -662,7 +662,7 @@ USER_FUNC(mario_walkpoint_enzan) {
 }
 
 USER_FUNC(goryuugijo_get_dataadr) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
 
     if (idx >= 8) {
@@ -674,7 +674,7 @@ USER_FUNC(goryuugijo_get_dataadr) {
 }
 
 USER_FUNC(goryuugijo_set_dataadr) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
 
     if (idx < 8) {
@@ -697,7 +697,7 @@ void goryuugijo_disp_montemedal(CameraId camera, void* param) {
 }
 
 USER_FUNC(evt_goryuugijo_set_caseid) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     SlotWork* data = ((GoryuuWork*)evtGetValue(event, args[0]))->data;
     s32 idx = evtGetValue(event, args[1]);
 
@@ -706,7 +706,7 @@ USER_FUNC(evt_goryuugijo_set_caseid) {
 }
 
 USER_FUNC(evt_goryuugijo_get_caseid) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     SlotWork* data = ((GoryuuWork*)evtGetValue(event, args[0]))->data;
     s32 idx = evtGetValue(event, args[1]);
 
@@ -715,7 +715,7 @@ USER_FUNC(evt_goryuugijo_get_caseid) {
 }
 
 USER_FUNC(evt_goryuugijo_set_nowslot) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     SlotWork* data = ((GoryuuWork*)evtGetValue(event, args[0]))->data;
 
     data->nowSlot = evtGetValue(event, args[1]);
@@ -3214,7 +3214,7 @@ SlotDrum drumname[2] = { // flat initializer, 17 names per slot machine
     "neon_05",
 };
 
-s32* slotevttbl[] = {
+EvtWord* slotevttbl[] = {
     slot1_set, slot2_set,
 };
 
@@ -6158,7 +6158,7 @@ static USER_FUNC(fall_rtn) {
 }
 
 USER_FUNC(goryuugijo_set_slot_phase) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     SlotWork* data = ((GoryuuWork*)evtGetValue(event, args[0]))->data;
 
     data->phase = evtGetValue(event, args[1]);
@@ -6166,7 +6166,7 @@ USER_FUNC(goryuugijo_set_slot_phase) {
 }
 
 USER_FUNC(goryuugijo_get_slot_phase) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     SlotWork* data = ((GoryuuWork*)evtGetValue(event, args[0]))->data;
 
     evtSetValue(event, args[1], data->phase);
@@ -6752,7 +6752,7 @@ USER_FUNC(desk_talk_init_func) {
 }
 
 USER_FUNC(desk_talk_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 prev = evtGetValue(event, args[1]);
     s32 x = evtGetValue(event, args[2]);
@@ -6772,7 +6772,7 @@ USER_FUNC(desk_talk_func) {
 }
 
 USER_FUNC(get_mario_dispReqDir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
 
     evtSetValue(event, args[0], mario->displayDirectionTarget);
@@ -6780,7 +6780,7 @@ USER_FUNC(get_mario_dispReqDir) {
 }
 
 USER_FUNC(dummy_shadow) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -6791,7 +6791,7 @@ USER_FUNC(dummy_shadow) {
 }
 
 static USER_FUNC(viewport) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 w = evtGetFloat(event, args[2]);
@@ -6855,7 +6855,7 @@ void kuji_bomb_055_callback(s32 type, KujiMsgWork** work) {
 }
 
 USER_FUNC(kuzi_get_keihin) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 item;
 
     switch (evtGetValue(event, args[0])) {
@@ -6890,7 +6890,7 @@ USER_FUNC(kuzi_get_keihin) {
 }
 
 USER_FUNC(kuzi_bomb_bomb_eff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     s32 phase = (0, evtGetValue(event, args[1]));
     NpcEntry* npc = npcNameToPtr("\203O\203\213\203\201\203{\203\200\225\272");

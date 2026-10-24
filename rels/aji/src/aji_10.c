@@ -106,32 +106,32 @@ f32 fd_aji_10___local_3PIO2_368;
 f32 fd_aji_10_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_aji_10___local_PIO2_367;
 f32 fd_aji_10_one_364;
-static s32 w_door_close[22];
-static s32 w_door_open[22];
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[3];
-static s32 bero_peach_evt[30];
+static EvtWord bero_peach_evt[30];
 static BeroEntry bero_peach_data[2];
-s32 monitor_on[33];
-s32 monitor_off[37];
-s32 monitor_init[41];
-static s32 peach_evt_stg1[1411];
-static s32 peach_evt_stg2[463];
-static s32 peach_evt_stg3[251];
-s32 peach_move[72];
-s32 peach_evt_stg3_syuryo_talk[138];
-static s32 peach_evt_stg4[235];
-static s32 peach_evt_stg5[281];
-static s32 peach_evt_stg6[349];
-s32 eff_test[36];
-static s32 teshita1_init[9];
-static s32 teshita2_init[9];
-static s32 teshita3_init[9];
-s32 kanbu_init[9];
-static s32 syuryo_init[24];
+EvtWord monitor_on[33];
+EvtWord monitor_off[37];
+EvtWord monitor_init[41];
+static EvtWord peach_evt_stg1[1411];
+static EvtWord peach_evt_stg2[463];
+static EvtWord peach_evt_stg3[251];
+EvtWord peach_move[72];
+EvtWord peach_evt_stg3_syuryo_talk[138];
+static EvtWord peach_evt_stg4[235];
+static EvtWord peach_evt_stg5[281];
+static EvtWord peach_evt_stg6[349];
+EvtWord eff_test[36];
+static EvtWord teshita1_init[9];
+static EvtWord teshita2_init[9];
+static EvtWord teshita3_init[9];
+EvtWord kanbu_init[9];
+static EvtWord syuryo_init[24];
 static NpcSetupInfo npcEnt[9];
-s32 aji_10_init_evt[279];
+EvtWord aji_10_init_evt[279];
 
 f32 fd_aji_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -403,7 +403,7 @@ static USER_FUNC(peach_set_pose) {
 }
 
 static USER_FUNC(viewport) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 w = evtGetFloat(event, args[2]);

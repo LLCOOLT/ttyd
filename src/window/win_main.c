@@ -72,9 +72,9 @@ USER_FUNC(all_party_slit_off);
 USER_FUNC(party_color);
 USER_FUNC(famicom_check);
 USER_FUNC(itemUseFunc2);
-s32 evt_lecture_msg[];
-s32 evt_item_use[];
-s32 evt_diary_read[];
+EvtWord evt_lecture_msg[];
+EvtWord evt_item_use[];
+EvtWord evt_diary_read[];
 
 //.data
 
@@ -908,7 +908,7 @@ USER_FUNC(itemUseFunc2) {
 }
 
 USER_FUNC(famicom_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (wp->flags & 0x2000) {
         evtSetValue(event, args[0], 1);
@@ -919,7 +919,7 @@ USER_FUNC(famicom_check) {
 }
 
 USER_FUNC(party_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetValue(event, args[0], pouchGetPartyColor(4));
     return EVT_RETURN_DONE;

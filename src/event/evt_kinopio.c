@@ -121,14 +121,14 @@ USER_FUNC(evt_kinopio_setup) {
 }
 
 USER_FUNC(msg_no) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 idx = evtGetValue(event, args[0]);
 	evtSetValue(event, args[1], (*wp)->msg[idx]);
 	return 2;
 }
 
 USER_FUNC(power_chk) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 ok;
 	s32 i;
 	KinopioParty* pouch = (KinopioParty*)pouchGetPtr();
@@ -148,7 +148,7 @@ USER_FUNC(power_chk) {
 }
 
 USER_FUNC(coin_chk) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	if (pouchGetCoin() < (*wp)->ryoukin) {
 		evtSetValue(event, args[0], 1);
 	} else {
@@ -168,7 +168,7 @@ USER_FUNC(get_npcname) {
 }
 
 USER_FUNC(get_bed) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	evtSetFloat(event, args[0], (*wp)->bed.x);
 	evtSetFloat(event, args[1], (*wp)->bed.y);
 	evtSetFloat(event, args[2], (*wp)->bed.z);
@@ -176,7 +176,7 @@ USER_FUNC(get_bed) {
 }
 
 USER_FUNC(get_bedside) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	evtSetFloat(event, args[0], (*wp)->bedside.x);
 	evtSetFloat(event, args[1], (*wp)->bedside.y);
 	evtSetFloat(event, args[2], (*wp)->bedside.z);
@@ -189,7 +189,7 @@ USER_FUNC(get_beddeg) {
 }
 
 USER_FUNC(get_npctalk) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	evtSetFloat(event, args[0], (*wp)->npcTalk.x);
 	evtSetFloat(event, args[1], (*wp)->npcTalk.y);
 	evtSetFloat(event, args[2], (*wp)->npcTalk.z);
@@ -197,7 +197,7 @@ USER_FUNC(get_npctalk) {
 }
 
 USER_FUNC(get_cam) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	evtSetFloat(event, args[0], (*wp)->cam[0]);
 	evtSetFloat(event, args[1], (*wp)->cam[1]);
 	evtSetFloat(event, args[2], (*wp)->cam[2]);
@@ -218,7 +218,7 @@ USER_FUNC(get_from_bed_evt) {
 }
 
 static USER_FUNC(paper_on) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	f32 amount = evtGetFloat(event, *args++);
 	MarioWork* mario = marioGetPtr();
 	if (isFirstCall) {
@@ -251,7 +251,7 @@ static USER_FUNC(paper_off) {
 }
 
 USER_FUNC(offset) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	f32 dist = evtGetFloat(event, args[0]);
 	f32 ang = 6.2831855f * (90.0f + camGetPtr(CAMERA_3D)->viewYaw) / 360.0f;
 	evtSetFloat(event, args[1], dist * -(f32)sin(ang));

@@ -100,7 +100,7 @@ void BtlIcon_Delete(BattleIcon* icon) {
 
 //s32 iconId, f32 x, f32 y, f32 z, s32 evtIndex
 USER_FUNC(btlevtcmd_BtlIconEntry) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	BattleIcon* icon;
 	s32 iconId, index;
 	f32 x, y, z;
@@ -117,7 +117,7 @@ USER_FUNC(btlevtcmd_BtlIconEntry) {
 
 //s32 itemId (index for itemDataTable) , f32 x, f32 y, f32 z, s32 evtIndex
 USER_FUNC(btlevtcmd_BtlIconEntryItemId) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	BattleIcon* icon;
 	s32 itemId, index;
 	f32 x, y, z;
@@ -145,7 +145,7 @@ USER_FUNC(btlevtcmd_BtlIconDelete) {
 
 //s32 index for BtlIconGetPtr, f32 x, f32 y, f32 z
 USER_FUNC(btlevtcmd_BtlIconSetPosition) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	BattleIcon* icon;
 	f32 x, y, z;
 	s32 index;
@@ -163,7 +163,7 @@ USER_FUNC(btlevtcmd_BtlIconSetPosition) {
 
 //s32 index for BtlIconGetPtr, f32 fallAccel
 USER_FUNC(btlevtcmd_BtlIconSetFallAccel) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	s32 index = evtGetValue(event, args[0]);
 	BattleIcon* icon = BtlIconGetPtr(index);
 	icon->fallAccel = evtGetFloat(event, args[1]);
@@ -171,7 +171,7 @@ USER_FUNC(btlevtcmd_BtlIconSetFallAccel) {
 }
 
 USER_FUNC(btlevtcmd_BtlIconJumpPosition) {
-	s32* args = event->args;
+	EvtWord* args = event->args;
 	BattleIcon* icon;
 	s32 index, frames;
 	f32 sx, sy, sz;

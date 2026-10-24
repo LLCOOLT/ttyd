@@ -44,11 +44,11 @@ USER_FUNC(btlevtcmd_WaitAttackEnd);
 USER_FUNC(evt_btl_camera_set_mode);
 USER_FUNC(evt_msg_print);
 USER_FUNC(evt_sub_random);
-extern s32 btl_majolyne_zoom[];
-extern s32 btl_marilyn_zoom[];
-extern s32 btl_vivian_zoom[];
-extern s32 majo3_shadow_tail_event[];
-extern s32 majo_unison_phase_event[];
+extern EvtWord btl_majolyne_zoom[];
+extern EvtWord btl_marilyn_zoom[];
+extern EvtWord btl_vivian_zoom[];
+extern EvtWord majo3_shadow_tail_event[];
+extern EvtWord majo_unison_phase_event[];
 extern BattleUnitKind unit_boss_majolyne;
 extern BattleUnitKind unit_boss_marilyn;
 
@@ -77,25 +77,25 @@ BattleWeapon weapon_vivian_kagenuke_attack1;
 BattleWeapon weapon_vivian_flame_attack1;
 static BattleUnitSetup entry_marilyn;
 static BattleUnitSetup entry_majolyne;
-static s32 vivian_down[19];
-static s32 vivian_up[27];
-static s32 init_event[179];
-static s32 entry_event[46];
-static s32 damage_event[22];
-static s32 dead_event[189];
-static s32 unison_phase_event[81];
-static s32 phase_event[2];
-static s32 attack_event[98];
+static EvtWord vivian_down[19];
+static EvtWord vivian_up[27];
+static EvtWord init_event[179];
+static EvtWord entry_event[46];
+static EvtWord damage_event[22];
+static EvtWord dead_event[189];
+static EvtWord unison_phase_event[81];
+static EvtWord phase_event[2];
+static EvtWord attack_event[98];
 #ifdef VERSION_G8ME01
-static s32 kagenuke_attack_event[207];
+static EvtWord kagenuke_attack_event[207];
 #else
-static s32 kagenuke_attack_event[204];
+static EvtWord kagenuke_attack_event[204];
 #endif
-s32 flame_attack_event[185];
+EvtWord flame_attack_event[185];
 #ifdef VERSION_G8ME01
-static s32 wait_event[7];
+static EvtWord wait_event[7];
 #else
-static s32 wait_event[6];
+static EvtWord wait_event[6];
 #endif
 
 f32 fd_boss_vivian_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};

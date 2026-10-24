@@ -30,12 +30,12 @@ f32 fd_jin_11___local_3PIO2_368;
 f32 fd_jin_11_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_jin_11___local_PIO2_367;
 f32 fd_jin_11_one_364;
-s32 jin_11_ana[12];
-static s32 s_close[12];
-static s32 s_open[12];
+EvtWord jin_11_ana[12];
+static EvtWord s_close[12];
+static EvtWord s_open[12];
 static BeroEntry bero_entry_data[3];
-s32 evt_yuka[5];
-s32 jin_11_init_evt[54];
+EvtWord evt_yuka[5];
+EvtWord jin_11_init_evt[54];
 
 f32 fd_jin_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

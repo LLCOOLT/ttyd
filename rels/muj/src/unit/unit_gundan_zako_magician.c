@@ -56,21 +56,21 @@ static BattleWeapon weapon_gundan_zako_magician_minimini_bottle;
 static BattleWeapon weapon_gundan_zako_magician_one_recover;
 static BattleWeapon weapon_gundan_zako_magician_all_recover;
 static BattleWeapon weapon_gundan_zako_magician_ziwaziwa_bottle;
-static s32 init_event[21];
-static s32 damage_event[10];
-static s32 attack_event[235];
-static s32 attack_common_event1[141];
-static s32 attack_common_event2[332];
-static s32 attack_common_event3[251];
-static s32 fire_bottle_event[56];
-static s32 hunyahunya_bottle_event[43];
-static s32 yokeyoke_bottle_event[74];
-static s32 minimini_bottle_event[314];
-static s32 one_recover_event[128];
-static s32 all_recover_event[155];
-static s32 yokeyoke_bottle_event_with_kanbu[15];
-static s32 ziwaziwa_bottle_event[15];
-static s32 wait_event[6];
+static EvtWord init_event[21];
+static EvtWord damage_event[10];
+static EvtWord attack_event[235];
+static EvtWord attack_common_event1[141];
+static EvtWord attack_common_event2[332];
+static EvtWord attack_common_event3[251];
+static EvtWord fire_bottle_event[56];
+static EvtWord hunyahunya_bottle_event[43];
+static EvtWord yokeyoke_bottle_event[74];
+static EvtWord minimini_bottle_event[314];
+static EvtWord one_recover_event[128];
+static EvtWord all_recover_event[155];
+static EvtWord yokeyoke_bottle_event_with_kanbu[15];
+static EvtWord ziwaziwa_bottle_event[15];
+static EvtWord wait_event[6];
 
 f32 fd_gundan_zako_magician_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1063,7 +1063,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static USER_FUNC(kanbu_get_id) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = -1;
     s32 i;
     BattleWork* wp = _battleWorkPointer;

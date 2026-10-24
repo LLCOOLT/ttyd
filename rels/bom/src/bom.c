@@ -39,7 +39,7 @@ f32 fd_bom___local_PIO2_367;
 f32 fd_bom_one_364;
 f64 fd_bom__three_localstatic4_sqrtf;
 f64 fd_bom__half_localstatic3_sqrtf;
-s32 evt_bress[4];
+EvtWord evt_bress[4];
 
 void _unresolved(void) {
 }

@@ -5,6 +5,7 @@
 #include <dolphin/os.h>
 #include "battle/battle_unit.h"
 #include "mario/mario_pouch.h"
+#include "evt/evt_word.h"
 
 #define NPC_FIELD_MAX_COUNT 36
 #define NPC_BATTLE_MAX_COUNT 16
@@ -315,7 +316,7 @@ NpcTerritoryType dbGetDefData(NpcTerritoryInfo* info, const char* description);
 
 BOOL N_fbatPreventMarioEventChk(void);
 
-extern s32 evt_majinai_effect_se_btl[];
+extern EvtWord evt_majinai_effect_se_btl[];
 void fbatSandersBombTriggerOn(void);
 
-extern s32 _evt_majinai_coin_up_effect[];
+extern EvtWord _evt_majinai_coin_up_effect[];

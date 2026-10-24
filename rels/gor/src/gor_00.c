@@ -295,128 +295,128 @@ f32 one$364;
 ExtTexInfo nannpc_entry_data[41];
 static s16 dai3_animtbl[VERSION_PICK(42, 82)];
 s16 dai3_run_animtbl[VERSION_PICK(22, 42)];
-s32 no00_custom[48];
+EvtWord no00_custom[48];
 static BeroEntry bero_entry_data[2];
-static s32 mony_init[18];
-s32 gor_00_mony_regl[VERSION_PICK(9, 11)];
-s32 mony_peton_talk[286];
-static s32 mony_talk[28];
-static s32 peton_init[18];
-s32 gor_00_peton_regl[VERSION_PICK(9, 11)];
-static s32 peton_talk[28];
-static s32 marco_init[32];
-s32 marco_party_move[120];
-static s32 marco_talk[364];
-s32 garawaru_urouro2[25];
-static s32 garawaru_init[74];
-s32 garawaru_regl[60];
-static s32 garawaru_talk[77];
-static s32 megane_init[18];
-s32 megane_regl[2];
-static s32 megane_talk[14];
-static s32 odoodo_init[61];
-s32 odoodo_regl[29];
-static s32 odoodo_talk[108];
-s32 odoodo_ani_urouro[31];
-s32 odoodo_ani_init[17];
-s32 odoodo_ani_regl[9];
-s32 odoodo_ani_talk[37];
-static s32 suifu_a_init[36];
-s32 suifu_a_regl[28];
-static s32 suifu_a_talk[116];
-s32 suifu_b_init[48];
-s32 suifu_b_regl[29];
-s32 suifu_b_talk[116];
-static s32 suifu_d_init[14];
-static s32 suifu_d_talk[8];
-s32 suifubomb_a_urouro2[31];
-s32 suifubomb_a_init[53];
-s32 suifubomb_a_regl[30];
-s32 suifubomb_a_talk[VERSION_PICK(226, 218)];
-s32 suifubomb_b_urouro2[27];
-s32 suifubomb_b_init[39];
-s32 suifubomb_b_regl[60];
-s32 suifubomb_b_talk[116];
-s32 suifubomb_c_init[14];
-s32 suifubomb_c_talk[8];
-static s32 sanders_init[42];
-static s32 sanders_talk[8];
-static s32 korutesu_init[19];
-static s32 korutesu_talk[33];
-s32 tentyou_init[36];
-s32 tentyou_talk[14];
-s32 tenin_init[36];
-s32 tenin_talk[14];
-static s32 borodo2_init[42];
-static s32 borodo2_escape[43];
-static s32 borodo2_talk[13];
-s32 mokorim_init[28];
-s32 mokorim_talk[546];
-static s32 baba_init[9];
-static s32 luigi_init[18];
-static s32 luigi_talk[4];
+static EvtWord mony_init[18];
+EvtWord gor_00_mony_regl[VERSION_PICK(9, 11)];
+EvtWord mony_peton_talk[286];
+static EvtWord mony_talk[28];
+static EvtWord peton_init[18];
+EvtWord gor_00_peton_regl[VERSION_PICK(9, 11)];
+static EvtWord peton_talk[28];
+static EvtWord marco_init[32];
+EvtWord marco_party_move[120];
+static EvtWord marco_talk[364];
+EvtWord garawaru_urouro2[25];
+static EvtWord garawaru_init[74];
+EvtWord garawaru_regl[60];
+static EvtWord garawaru_talk[77];
+static EvtWord megane_init[18];
+EvtWord megane_regl[2];
+static EvtWord megane_talk[14];
+static EvtWord odoodo_init[61];
+EvtWord odoodo_regl[29];
+static EvtWord odoodo_talk[108];
+EvtWord odoodo_ani_urouro[31];
+EvtWord odoodo_ani_init[17];
+EvtWord odoodo_ani_regl[9];
+EvtWord odoodo_ani_talk[37];
+static EvtWord suifu_a_init[36];
+EvtWord suifu_a_regl[28];
+static EvtWord suifu_a_talk[116];
+EvtWord suifu_b_init[48];
+EvtWord suifu_b_regl[29];
+EvtWord suifu_b_talk[116];
+static EvtWord suifu_d_init[14];
+static EvtWord suifu_d_talk[8];
+EvtWord suifubomb_a_urouro2[31];
+EvtWord suifubomb_a_init[53];
+EvtWord suifubomb_a_regl[30];
+EvtWord suifubomb_a_talk[VERSION_PICK(226, 218)];
+EvtWord suifubomb_b_urouro2[27];
+EvtWord suifubomb_b_init[39];
+EvtWord suifubomb_b_regl[60];
+EvtWord suifubomb_b_talk[116];
+EvtWord suifubomb_c_init[14];
+EvtWord suifubomb_c_talk[8];
+static EvtWord sanders_init[42];
+static EvtWord sanders_talk[8];
+static EvtWord korutesu_init[19];
+static EvtWord korutesu_talk[33];
+EvtWord tentyou_init[36];
+EvtWord tentyou_talk[14];
+EvtWord tenin_init[36];
+EvtWord tenin_talk[14];
+static EvtWord borodo2_init[42];
+static EvtWord borodo2_escape[43];
+static EvtWord borodo2_talk[13];
+EvtWord mokorim_init[28];
+EvtWord mokorim_talk[546];
+static EvtWord baba_init[9];
+static EvtWord luigi_init[18];
+static EvtWord luigi_talk[4];
 static NpcSetupInfo luigiEnt[2];
-static s32 luigi_npcEnt[30];
-s32 rakgan_init[12];
-s32 rakgan_talk[8];
+static EvtWord luigi_npcEnt[30];
+EvtWord rakgan_init[12];
+EvtWord rakgan_talk[8];
 NpcSetupInfo rakganEnt[2];
 static NpcSetupInfo npcEnt[17];
-s32 ship_a_kaji_animation[51];
-s32 ship_a_wakka_animation[56];
-s32 ship_a_entotsu_animation[56];
-s32 ship_a_neji_animation[56];
-s32 ship_a_yure_animation[56];
-s32 ship_a_animation[132];
-static s32 ship_pera[119];
-s32 enter_gorotsuki_town_init[58];
-s32 christine_osoware_setup[82];
-s32 enter_gorotsuki_town[594];
-s32 christine_osoware[357];
-s32 gundan1000tai_beforebattle[524];
-static s32 _kemuri_sub[56];
-s32 gundan1000tai_kemuri[VERSION_PICK(20, 16)];
-s32 gundan1000tai_zaza_se[61];
-s32 gundan1000tai_jump_se[19];
-s32 gundan1000tai_yure[22];
-s32 gundan1000tai_afterbattle[1201];
-s32 mony_peton_after[37];
-s32 shukko_event_move_ship_se00[20];
-s32 shukko_event_move_ship_se01[20];
+EvtWord ship_a_kaji_animation[51];
+EvtWord ship_a_wakka_animation[56];
+EvtWord ship_a_entotsu_animation[56];
+EvtWord ship_a_neji_animation[56];
+EvtWord ship_a_yure_animation[56];
+EvtWord ship_a_animation[132];
+static EvtWord ship_pera[119];
+EvtWord enter_gorotsuki_town_init[58];
+EvtWord christine_osoware_setup[82];
+EvtWord enter_gorotsuki_town[594];
+EvtWord christine_osoware[357];
+EvtWord gundan1000tai_beforebattle[524];
+static EvtWord _kemuri_sub[56];
+EvtWord gundan1000tai_kemuri[VERSION_PICK(20, 16)];
+EvtWord gundan1000tai_zaza_se[61];
+EvtWord gundan1000tai_jump_se[19];
+EvtWord gundan1000tai_yure[22];
+EvtWord gundan1000tai_afterbattle[1201];
+EvtWord mony_peton_after[37];
+EvtWord shukko_event_move_ship_se00[20];
+EvtWord shukko_event_move_ship_se01[20];
 const char* shukko_npc_list[10];
-s32 shukko_event_move_ship[223];
-s32 shukko_event[498];
+EvtWord shukko_event_move_ship[223];
+EvtWord shukko_event[498];
 ExtTexInfo nannpc_entry_data01[41];
 static s16 suifu_animtbl[42];
 static s16 suifu_run_animtbl[22];
 Vec suifu100kaidanDOWN[];
 Vec suifu100kaidanUP[];
-s32 marco_run_away[100];
-s32 gorotsuki_kikan[599];
-s32 into_gor_ship[265];
-s32 mony_run_away[108];
-s32 peton_run_away[88];
-s32 mony_peton_depart[VERSION_PICK(61, 64)];
-s32 gor_00_koopa_evt[1095];
-static s32 peach_mail[209];
+EvtWord marco_run_away[100];
+EvtWord gorotsuki_kikan[599];
+EvtWord into_gor_ship[265];
+EvtWord mony_run_away[108];
+EvtWord peton_run_away[88];
+EvtWord mony_peton_depart[VERSION_PICK(61, 64)];
+EvtWord gor_00_koopa_evt[1095];
+static EvtWord peach_mail[209];
 f32 gor_ship_puka_data[];
-s32 gor_ship_puka[21];
-s32 gor_muj_ship_sub[53];
-static s32 option_ship_mario[139];
-s32 gor_muj_ship_init[42];
-s32 gor_muj_ship_pera[115];
-s32 gor_muj_ship_start[258];
-s32 tsumini[212];
+EvtWord gor_ship_puka[21];
+EvtWord gor_muj_ship_sub[53];
+static EvtWord option_ship_mario[139];
+EvtWord gor_muj_ship_init[42];
+EvtWord gor_muj_ship_pera[115];
+EvtWord gor_muj_ship_start[258];
+EvtWord tsumini[212];
 static HitDamageReturn dmgRetPoint[VERSION_PICK(4, 6)];
-static s32 mobj_box00[34];
-static s32 epilogue_npc_entry[340];
-s32 punio_kinoko[22];
-s32 puniko_kinoko[22];
-static s32 epilogue_evt[1520];
-s32 epilogue_npc_entry2[30];
-static s32 epilogue_evt2[74];
-s32 return_gorotsuki_town_init[25];
-s32 return_gorotsuki_town[625];
-s32 gor_00_init_evt[VERSION_PICK(537, 540)];
+static EvtWord mobj_box00[34];
+static EvtWord epilogue_npc_entry[340];
+EvtWord punio_kinoko[22];
+EvtWord puniko_kinoko[22];
+static EvtWord epilogue_evt[1520];
+EvtWord epilogue_npc_entry2[30];
+static EvtWord epilogue_evt2[74];
+EvtWord return_gorotsuki_town_init[25];
+EvtWord return_gorotsuki_town[625];
+EvtWord gor_00_init_evt[VERSION_PICK(537, 540)];
 
 f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -4143,7 +4143,7 @@ static f32 accdec_type(s32 step, s32 total, f32 start, f32 end) {
 }
 
 static USER_FUNC(make_itemsel_table) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();
     s32* p;
     s32 count;
@@ -4196,7 +4196,7 @@ USER_FUNC(fune_yure_func_init) {
 }
 
 USER_FUNC(fune_yure_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 dir = evtGetValue(event, args[0]);
     f32 amp = evtGetFloat(event, args[1]);
     s32 done;
@@ -4248,7 +4248,7 @@ USER_FUNC(gundan1000tai_circle_pos_func) {
     f32 s;
     f32 c;
     f32 angle;
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     radius = irand(180) + 120;
     angle = 6.2831855f * irand(360) / 360.0f;
@@ -4318,7 +4318,7 @@ USER_FUNC(gundan1000tai_totsugeki) {
 }
 
 USER_FUNC(gundan1000tai_areacheck) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(1);
     s32 area;
@@ -4578,7 +4578,7 @@ void gundan1000tai_seq01(NanNPC* npc) {
 }
 
 static USER_FUNC(cam_kaiten_init) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     Vec target;
     Vec pos;
     f32 dist;
@@ -4644,7 +4644,7 @@ static USER_FUNC(cam_kaiten_set_direct) {
 }
 
 static USER_FUNC(cam_kaiten_get_para) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     KaitenParam* p;
 
     switch (evtGetValue(event, args[0])) {
@@ -4671,7 +4671,7 @@ static USER_FUNC(cam_kaiten_get_para) {
 }
 
 static USER_FUNC(cam_kaiten_set_para) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     KaitenParam* p;
 
     switch (evtGetValue(event, args[0])) {
@@ -4698,7 +4698,7 @@ static USER_FUNC(cam_kaiten_set_para) {
 }
 
 USER_FUNC(hosei_mario_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -4711,7 +4711,7 @@ USER_FUNC(hosei_mario_pos) {
 }
 
 USER_FUNC(hosei_party_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -5709,7 +5709,7 @@ static USER_FUNC(fune_eff) {
 }
 
 USER_FUNC(gor_ship_puka_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     f32 f = evtGetFloat(event, args[1]);
     evtSetFloat(event, args[2], f * gor_ship_puka_data[idx & 0xF]);
@@ -5755,13 +5755,13 @@ USER_FUNC(funeflag_load) {
 }
 
 USER_FUNC(funechange_func) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], marioShipChanging());
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(get_yoshi_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     evtSetValue(event, args[0], pouchGetPartyColor(4));
     return EVT_RETURN_DONE;
 }

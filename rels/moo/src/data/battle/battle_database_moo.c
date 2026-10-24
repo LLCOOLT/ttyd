@@ -94,7 +94,7 @@ NpcBattleSelect btlgrpsel_moo_btlno_moo_05_04_off[2];
 NpcBattleSelect btlgrpsel_moo_btlno_moo_05_05_off[4];
 NpcSetupBattleInfo btlsetup_moo_tbl[17];
 NpcTerritoryInfo btl_moo_setup_no_tbl[17];
-s32 bgset_moo_space_event[35];
+EvtWord bgset_moo_space_event[35];
 
 f32 fd_battle_database_moo_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1419,7 +1419,7 @@ EVT_BEGIN(bgset_moo_space_event)
 EVT_END()
 
 static USER_FUNC(_space_rotate) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 outVar = args[1];
     s32 step = evtGetValue(event, outVar);

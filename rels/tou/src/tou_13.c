@@ -47,10 +47,10 @@ f32 fd_tou_13_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tou_13___local_PIO2_367;
 f32 fd_tou_13_one_364;
 static BeroEntry bero_data[3];
-static s32 evt_dakuto[44];
-s32 evt_nusumi[182];
-static s32 evt_first[42];
-s32 tou_13_init_evt[117];
+static EvtWord evt_dakuto[44];
+EvtWord evt_nusumi[182];
+static EvtWord evt_first[42];
+EvtWord tou_13_init_evt[117];
 
 f32 fd_tou_13_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

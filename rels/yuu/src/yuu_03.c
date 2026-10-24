@@ -132,16 +132,16 @@ f32 fd_yuu_03___local_3PIO2_368;
 f32 fd_yuu_03_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_yuu_03___local_PIO2_367;
 f32 fd_yuu_03_one_364;
-s32 yuu_03_icon_monte_entry_evt[4];
-s32 ryushi_event[25];
-s32 yuu_03_kaijo_init[12];
-s32 yuu_03_kaijo_init2[12];
-s32 minigame04_main[33];
-s32 minigame04_start_cam[40];
-s32 minigame04_start_cam_cancel[20];
-s32 minigame04_start[91];
-s32 minigame04_end[256];
-s32 yuu_03_init_evt[VERSION_PICK(26, 140)];
+EvtWord yuu_03_icon_monte_entry_evt[4];
+EvtWord ryushi_event[25];
+EvtWord yuu_03_kaijo_init[12];
+EvtWord yuu_03_kaijo_init2[12];
+EvtWord minigame04_main[33];
+EvtWord minigame04_start_cam[40];
+EvtWord minigame04_start_cam_cancel[20];
+EvtWord minigame04_start[91];
+EvtWord minigame04_end[256];
+EvtWord yuu_03_init_evt[VERSION_PICK(26, 140)];
 
 USER_FUNC(yuu_03_cam_shift_reset) {
     camShiftReset();
@@ -228,7 +228,7 @@ USER_FUNC(yuu_03_icon_monte_restart) {
 }
 
 USER_FUNC(yuuminigame4_set_phase) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     SlitWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
 
     data->phase = evtGetValue(event, args[1]);
@@ -271,7 +271,7 @@ static USER_FUNC(evt_nomal_cange) {
 }
 
 USER_FUNC(yuuminigame4_opening_on_off) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     SlitWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
 
     if (evtGetValue(event, args[1])) {
@@ -283,7 +283,7 @@ USER_FUNC(yuuminigame4_opening_on_off) {
 }
 
 USER_FUNC(yuuminigame4_opening_chk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MiniGameWork* wp = (MiniGameWork*)evtGetValue(event, args[0]);
 
     if (((SlitWork*)wp->data)->flags & 1) {
@@ -408,7 +408,7 @@ USER_FUNC(evt_ryushi_init) {
 
 USER_FUNC(evt_ryushi_clr) {
     RyushiWork* p = xwp;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 i;
     s32 n = ryuwp;
     s32 j;

@@ -59,12 +59,12 @@ f32 fd_eki_06___local_3PIO2_368;
 f32 fd_eki_06_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_eki_06___local_PIO2_367;
 f32 fd_eki_06_one_364;
-static s32 e_close[12];
-static s32 e_open[12];
+static EvtWord e_close[12];
+static EvtWord e_open[12];
 static BeroEntry bero_data[3];
-s32 evt_box_open[115];
-s32 evt_sw_complete[272];
-s32 eki_06_init_evt[132];
+EvtWord evt_box_open[115];
+EvtWord evt_sw_complete[272];
+EvtWord eki_06_init_evt[132];
 
 f32 fd_eki_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -397,7 +397,7 @@ s32 sw_main(MapObjectEntry* mobj) {
 }
 
 USER_FUNC(sw_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name;
     f32 x, y, z;
     MapObjectEntry* mobj;

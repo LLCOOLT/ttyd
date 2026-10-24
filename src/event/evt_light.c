@@ -63,7 +63,7 @@ USER_FUNC(evt_light_party_lighting_onoff) {
 
 // BOOL on, const char* npcName
 USER_FUNC(evt_light_npc_lighting_onoff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BOOL on;
     NpcEntry* npc;
 
@@ -80,7 +80,7 @@ USER_FUNC(evt_light_npc_lighting_onoff) {
 
 // const char* lightName, const char* mapobjName, s32 mode
 USER_FUNC(evt_light_bind_mapobj) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* lightName;
     const char* mapobjName;
     LightEntry* light;

@@ -106,7 +106,7 @@ NpcBattleSelect btlgrpsel_tou_btlno_tou_01_23_off[2];
 NpcBattleSelect btlgrpsel_tou_btlno_tou_01_24_off[2];
 NpcSetupBattleInfo btlsetup_tou_tbl[26];
 NpcTerritoryInfo btl_tou_setup_no_tbl[26];
-s32 bgset_tou_screen_evt[22];
+EvtWord bgset_tou_screen_evt[22];
 
 f32 fd_battle_database_tou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

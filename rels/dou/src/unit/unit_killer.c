@@ -43,11 +43,11 @@ static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_killer_charge_attack;
 static PoseTableEntry pose_table[18];
 static BattleDataEntry data_table[2];
-static s32 init_event[39];
-static s32 damage_event[10];
-static s32 start_avoid[26];
-static s32 attack_event[407];
-static s32 wait_event[6];
+static EvtWord init_event[39];
+static EvtWord damage_event[10];
+static EvtWord start_avoid[26];
+static EvtWord attack_event[407];
+static EvtWord wait_event[6];
 
 f32 fd_killer_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

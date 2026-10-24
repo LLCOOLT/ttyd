@@ -94,24 +94,24 @@ f32 fd_hei_07_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_hei_07___local_PIO2_367;
 f32 fd_hei_07_one_364;
 static BeroEntry bero_entry_data[3];
-static s32 npc_jump[53];
-s32 dokan_shake[8];
-s32 dokan_shake2[20];
-s32 sekizou_move[136];
-s32 animation_wait[46];
-static s32 shake_evt[52];
-s32 seikai_anime[46];
-s32 seikai_anime_stop[19];
-s32 fuseikai_anime[21];
-s32 fuseikai_anime_stop[19];
-static s32 evt_down_snd[116];
-static s32 evt_up_snd_[12];
-static s32 evt_up_snd__[76];
-s32 offscreen_to_quiz[101];
-static s32 offscreen_to_normal[100];
+static EvtWord npc_jump[53];
+EvtWord dokan_shake[8];
+EvtWord dokan_shake2[20];
+EvtWord sekizou_move[136];
+EvtWord animation_wait[46];
+static EvtWord shake_evt[52];
+EvtWord seikai_anime[46];
+EvtWord seikai_anime_stop[19];
+EvtWord fuseikai_anime[21];
+EvtWord fuseikai_anime_stop[19];
+static EvtWord evt_down_snd[116];
+static EvtWord evt_up_snd_[12];
+static EvtWord evt_up_snd__[76];
+EvtWord offscreen_to_quiz[101];
+static EvtWord offscreen_to_normal[100];
 QuizEntry quiz_data[8];
-s32 a_sekizou_1[1018];
-s32 hei_07_init_evt[114];
+EvtWord a_sekizou_1[1018];
+EvtWord hei_07_init_evt[114];
 
 f32 fd_hei_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -890,7 +890,7 @@ static void callback(s32 type, void** work) {
 }
 
 USER_FUNC(mario_set_dir) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {

@@ -108,15 +108,15 @@ static PoseTableEntry pose_table[4];
 static BattleDataEntry data_table[4];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_gundan_zako_group1_attack;
-static s32 init_event[44];
-static s32 damage_event[134];
-s32 damage_event_kaiten_hammer[30];
-static s32 dead_event[138];
-static s32 attack_event[85];
-static s32 hit_check_event[95];
-static s32 wait_event[6];
+static EvtWord init_event[44];
+static EvtWord damage_event[134];
+EvtWord damage_event_kaiten_hammer[30];
+static EvtWord dead_event[138];
+static EvtWord attack_event[85];
+static EvtWord hit_check_event[95];
+static EvtWord wait_event[6];
 ExtTexInfo zakogun_ext_entry_data[49];
-s32 zakogun_entry[19];
+EvtWord zakogun_entry[19];
 
 USER_FUNC(zakogun_set_target_id) {
     work->targetId = evtGetValue(event, event->args[0]);
@@ -641,7 +641,7 @@ USER_FUNC(zakogun_get_kanbu_id_evtcmd) {
     s32 id = -1;
     BattleWork* wp = _battleWorkPointer;
     s32 i;
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     for (i = 0; i < 64; i++) {
         unit = BattleGetUnitPtr(wp, i);

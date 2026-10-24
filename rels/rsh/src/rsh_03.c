@@ -129,83 +129,83 @@ f32 fd_rsh_03_one_364;
 static BeroEntry bero_data_a[3];
 static BeroEntry bero_data_b[3];
 static BeroEntry bero_data_c[3];
-s32 init_cook[29];
+EvtWord init_cook[29];
 s32 item_tbl_cook[2];
-s32 talk_cook_nabe_return[47];
+EvtWord talk_cook_nabe_return[47];
 s32 iri_22_item_tbl[4];
-s32 talk_cook[351];
-static s32 init_waitless[29];
+EvtWord talk_cook[351];
+static EvtWord init_waitless[29];
 s32 item_tbl_waitless[2];
 #ifdef VERSION_G8ME01
-s32 talk_waitless_pias_return[158];
+EvtWord talk_waitless_pias_return[158];
 #else
-s32 talk_waitless_pias_return[112];
+EvtWord talk_waitless_pias_return[112];
 #endif
-static s32 talk_waitless[268];
-s32 move_waitless[49];
+static EvtWord talk_waitless[268];
+EvtWord move_waitless[49];
 static NpcSetupInfo npc_data[4];
-static s32 talk_toron[20];
-static s32 talk_sarary[31];
-s32 dir_target[21];
-s32 evt_lanch_missing[761];
-static s32 talk_powan[184];
+static EvtWord talk_toron[20];
+static EvtWord talk_sarary[31];
+EvtWord dir_target[21];
+EvtWord evt_lanch_missing[761];
+static EvtWord talk_powan[184];
 NpcSetupInfo npc_data_lunch[7];
 static const char* msg_tbl[10];
 #ifdef VERSION_G8ME01
-s32 evt_lunch_talk[113];
+EvtWord evt_lunch_talk[113];
 #else
-s32 evt_lunch_talk[101];
+EvtWord evt_lunch_talk[101];
 #endif
-s32 evt_shop_moamoa_talk[59];
+EvtWord evt_shop_moamoa_talk[59];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[18];
 static ShopperData35 shopper_data;
-s32 shop_door_open[27];
-s32 shop_door_close[31];
-s32 evt_shop_open[267];
+EvtWord shop_door_open[27];
+EvtWord shop_door_close[31];
+EvtWord evt_shop_open[267];
 #ifdef VERSION_G8ME01
-s32 evt_shop_close[420];
+EvtWord evt_shop_close[420];
 #else
-s32 evt_shop_close[317];
+EvtWord evt_shop_close[317];
 #endif
-s32 evt_shop_door_init[36];
-static s32 evt_yuka_simi[45];
+EvtWord evt_shop_door_init[36];
+static EvtWord evt_yuka_simi[45];
 static const char* access_tbl[16];
-static s32 evt_access[25];
-static s32 evt_access_entry[24];
-s32 rsh_03_init_evt[269];
+static EvtWord evt_access[25];
+static EvtWord evt_access_entry[24];
+EvtWord rsh_03_init_evt[269];
 #ifdef VERSION_G8ME01
-s32 rsh_03_a_init_evt[141];
+EvtWord rsh_03_a_init_evt[141];
 #else
-s32 rsh_03_a_init_evt[62];
+EvtWord rsh_03_a_init_evt[62];
 #endif
 #ifdef VERSION_G8ME01
-s32 rsh_03_b_init_evt[90];
+EvtWord rsh_03_b_init_evt[90];
 #else
-s32 rsh_03_b_init_evt[11];
+EvtWord rsh_03_b_init_evt[11];
 #endif
 static const char* window_tbl[5];
 #ifdef VERSION_G8ME01
-s32 rsh_03_c_init_evt[217];
+EvtWord rsh_03_c_init_evt[217];
 #else
-s32 rsh_03_c_init_evt[71];
+EvtWord rsh_03_c_init_evt[71];
 #endif
 #ifdef VERSION_G8ME01
-s32 rsh_03_init_evt_nidome[219];
+EvtWord rsh_03_init_evt_nidome[219];
 #else
-s32 rsh_03_init_evt_nidome[140];
+EvtWord rsh_03_init_evt_nidome[140];
 #endif
-s32 rsh_03_a_init_evt_nidome[23];
-s32 rsh_03_b_init_evt_nidome[11];
+EvtWord rsh_03_a_init_evt_nidome[23];
+EvtWord rsh_03_b_init_evt_nidome[11];
 #ifdef VERSION_G8ME01
-s32 rsh_03_c_init_evt_nidome[80];
+EvtWord rsh_03_c_init_evt_nidome[80];
 #else
-s32 rsh_03_c_init_evt_nidome[50];
+EvtWord rsh_03_c_init_evt_nidome[50];
 #endif
 
 USER_FUNC(iri_22_make_item_tbl) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     u8 bought;
     s32 n;
     s32 i;
@@ -232,7 +232,7 @@ USER_FUNC(iri_22_make_item_tbl) {
 
 static USER_FUNC(mario_flag) {
     static BOOL flg;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     NpcEntry* npc;
 

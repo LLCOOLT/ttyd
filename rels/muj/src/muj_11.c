@@ -29,13 +29,13 @@ f32 fd_muj_11___local_3PIO2_368;
 f32 fd_muj_11_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_muj_11___local_PIO2_367;
 f32 fd_muj_11_one_364;
-static s32 w_close[12];
-static s32 w_open[12];
-static s32 e_close[12];
-static s32 e_open[12];
+static EvtWord w_close[12];
+static EvtWord w_open[12];
+static EvtWord e_close[12];
+static EvtWord e_open[12];
 static BeroEntry bero_entry_data[3];
-s32 warning_event[38];
-s32 muj_11_init_evt[35];
+EvtWord warning_event[38];
+EvtWord muj_11_init_evt[35];
 
 f32 fd_muj_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

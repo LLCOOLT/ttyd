@@ -13,7 +13,7 @@ USER_FUNC(_rumble_switch);
 static BattleUnitKindPart parts[1];
 static StatusVulnerability regist;
 static BattleDataEntry data_table[1];
-static s32 init_event[25];
+static EvtWord init_event[25];
 
 BattleUnitKind unit_object_switch = {
     UNIT_UNUSED_SWITCH,     // mUnitType
@@ -97,9 +97,9 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
-static s32 attack_event[5];
-static s32 wait_event[2];
-static s32 damage_event[22];
+static EvtWord attack_event[5];
+static EvtWord wait_event[2];
+static EvtWord damage_event[22];
 
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))

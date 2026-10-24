@@ -291,129 +291,129 @@ f32 fd_gor_01___local_3PIO2_368;
 f32 fd_gor_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_gor_01___local_PIO2_367;
 f32 fd_gor_01_one_364;
-static s32 sell_evt[VERSION_PICK(135, 146)];
-s32 zaiko_buy_evt[VERSION_PICK(174, 185)];
-static s32 buy_evt[53];
-s32 badgeshopper_talk_evt[38];
-s32 badgemaster_init[36];
-s32 badgemaster_talk[76];
-s32 kinoji_init[2];
-s32 kinoji_talk[76];
-s32 nancy_init_check[608];
-s32 nancy_init[58];
-s32 nancy_door_anime[99];
-s32 nancy_regl[35];
+static EvtWord sell_evt[VERSION_PICK(135, 146)];
+EvtWord zaiko_buy_evt[VERSION_PICK(174, 185)];
+static EvtWord buy_evt[53];
+EvtWord badgeshopper_talk_evt[38];
+EvtWord badgemaster_init[36];
+EvtWord badgemaster_talk[76];
+EvtWord kinoji_init[2];
+EvtWord kinoji_talk[76];
+EvtWord nancy_init_check[608];
+EvtWord nancy_init[58];
+EvtWord nancy_door_anime[99];
+EvtWord nancy_regl[35];
 s32 item_tbl_nancy[2];
-s32 nancy_talk[175];
-static s32 marco_init[14];
-static s32 marco_talk[519];
-s32 master_init[12];
-s32 iri_20_master_tubuyaki[37];
-s32 master_talk[645];
-s32 shoptender_init[27];
-s32 shoptender_talk[227];
-s32 yadotender_init[2];
-s32 yadotender_talk[2];
-s32 roten1_init[12];
-s32 roten1_regl[25];
-s32 roten1_talk[76];
-s32 roten2_init[7];
-s32 roten2_talk[76];
-s32 kuribo1_init[12];
-s32 kuribo1_regl[25];
-s32 kuribo1_talk[101];
-s32 kuribo2_init[7];
-s32 kuribo2_regl[4];
-s32 kuribo2_talk[76];
-s32 kuribo3_init[2];
-s32 kuribo3_regl[4];
-s32 kuribo3_talk[144];
-s32 chusan1_init[31];
-s32 chusan1_regl[12];
-s32 chusan1_dead[123];
-s32 chusan1_naguru[79];
-s32 chusan1_talk[180];
-s32 chusan2_init[2];
-s32 chusan2_talk[76];
-static s32 bomhei_init[2];
-s32 bomhei_talk[76];
-s32 bottakuru_init[25];
-s32 bottakuru_talk[VERSION_PICK(292, 314)];
-static s32 luigi_init[43];
-static s32 luigi_talk[4];
-static s32 luigi_npcEnt[46];
-s32 kick_init[12];
-s32 kick_talk[8];
+EvtWord nancy_talk[175];
+static EvtWord marco_init[14];
+static EvtWord marco_talk[519];
+EvtWord master_init[12];
+EvtWord iri_20_master_tubuyaki[37];
+EvtWord master_talk[645];
+EvtWord shoptender_init[27];
+EvtWord shoptender_talk[227];
+EvtWord yadotender_init[2];
+EvtWord yadotender_talk[2];
+EvtWord roten1_init[12];
+EvtWord roten1_regl[25];
+EvtWord roten1_talk[76];
+EvtWord roten2_init[7];
+EvtWord roten2_talk[76];
+EvtWord kuribo1_init[12];
+EvtWord kuribo1_regl[25];
+EvtWord kuribo1_talk[101];
+EvtWord kuribo2_init[7];
+EvtWord kuribo2_regl[4];
+EvtWord kuribo2_talk[76];
+EvtWord kuribo3_init[2];
+EvtWord kuribo3_regl[4];
+EvtWord kuribo3_talk[144];
+EvtWord chusan1_init[31];
+EvtWord chusan1_regl[12];
+EvtWord chusan1_dead[123];
+EvtWord chusan1_naguru[79];
+EvtWord chusan1_talk[180];
+EvtWord chusan2_init[2];
+EvtWord chusan2_talk[76];
+static EvtWord bomhei_init[2];
+EvtWord bomhei_talk[76];
+EvtWord bottakuru_init[25];
+EvtWord bottakuru_talk[VERSION_PICK(292, 314)];
+static EvtWord luigi_init[43];
+static EvtWord luigi_talk[4];
+static EvtWord luigi_npcEnt[46];
+EvtWord kick_init[12];
+EvtWord kick_talk[8];
 NpcSetupInfo kickEnt[2];
-s32 torque_init[12];
-s32 torque_talk[8];
+EvtWord torque_init[12];
+EvtWord torque_talk[8];
 NpcSetupInfo torqueEnt[2];
-s32 kick2_init[25];
-s32 kick2_talk[8];
+EvtWord kick2_init[25];
+EvtWord kick2_talk[8];
 NpcSetupInfo kick2Ent[2];
-static s32 borodo2_init[51];
-static s32 borodo2_talk[280];
-s32 thief_init[13];
-s32 thief_talk[163];
+static EvtWord borodo2_init[51];
+static EvtWord borodo2_talk[280];
+EvtWord thief_init[13];
+EvtWord thief_talk[163];
 static NpcSetupInfo npcEnt[22];
-s32 christine_nakama_before[18];
+EvtWord christine_nakama_before[18];
 static BeroEntry bero_entry_data[4];
-static s32 evt_door_01_00[12];
-static s32 evt_door_01_01[12];
-static s32 evt_wall_01[28];
+static EvtWord evt_door_01_00[12];
+static EvtWord evt_door_01_01[12];
+static EvtWord evt_wall_01[28];
 static const char* door_data_01_npc[2];
 const char* door_data_01_item[2];
-static s32 evt_door_01_open[12];
-static s32 evt_door_01_close[14];
+static EvtWord evt_door_01_open[12];
+static EvtWord evt_door_01_close[14];
 static DoorParam door_data_01;
 DoorParam door_data_01_01;
-s32 evt_door_02_00_f1[12];
-s32 evt_wall_02_f1[41];
+EvtWord evt_door_02_00_f1[12];
+EvtWord evt_wall_02_f1[41];
 static const char* door_data_02_npc[3];
 const char* door_data_02_npc_01[2];
-s32 evt_door_02f1_open[12];
-s32 evt_door_02f1_close[14];
+EvtWord evt_door_02f1_open[12];
+EvtWord evt_door_02f1_close[14];
 DoorParam door_data_02_f1;
 DoorParam door_data_02_f1_01;
-s32 evt_door_02_f2_junbityu[14];
-s32 evt_door_02_00_f2[12];
-s32 evt_wall_02_f2[41];
+EvtWord evt_door_02_f2_junbityu[14];
+EvtWord evt_door_02_00_f2[12];
+EvtWord evt_wall_02_f2[41];
 const char* badgemise_npc[3];
-s32 evt_badge_dummy[VERSION_PICK(128, 139)];
+EvtWord evt_badge_dummy[VERSION_PICK(128, 139)];
 UnitWinSell uwnobj_list[6];
-s32 evt_open_02_01_f2[22];
-s32 evt_close_sub[6];
-s32 evt_close_02_01_f2[16];
+EvtWord evt_open_02_01_f2[22];
+EvtWord evt_close_sub[6];
+EvtWord evt_close_02_01_f2[16];
 DoorParam door_data_02_f2;
-s32 house03_f1f2_fade[41];
-s32 luigi_f1_fade_check[27];
-s32 house03_f1_fade[54];
-s32 luigi_f2_fade_check[27];
-s32 house03_f2_fade[54];
-s32 house03_suiteki[49];
-s32 marco_hitorigoto[67];
-s32 evt_door_03_00_f1[12];
-s32 evt_door_03_01_f1[12];
-s32 house_03_f1_open[64];
-s32 house_03_f1_close[54];
-s32 evt_wall_03_f1[47];
+EvtWord house03_f1f2_fade[41];
+EvtWord luigi_f1_fade_check[27];
+EvtWord house03_f1_fade[54];
+EvtWord luigi_f2_fade_check[27];
+EvtWord house03_f2_fade[54];
+EvtWord house03_suiteki[49];
+EvtWord marco_hitorigoto[67];
+EvtWord evt_door_03_00_f1[12];
+EvtWord evt_door_03_01_f1[12];
+EvtWord house_03_f1_open[64];
+EvtWord house_03_f1_close[54];
+EvtWord evt_wall_03_f1[47];
 static const char* door_data_03_npc[10];
 const char* door_data_03_item[2];
 DoorParam door_data_03_f1;
-s32 evt_door_03_00_f2[12];
-s32 house_03_f2_open[48];
-s32 house_03_f2_close[VERSION_PICK(46, 52)];
-s32 evt_wall_03_f2[54];
+EvtWord evt_door_03_00_f2[12];
+EvtWord house_03_f2_open[48];
+EvtWord house_03_f2_close[VERSION_PICK(46, 52)];
+EvtWord evt_wall_03_f2[54];
 DoorParam door_data_03_f2;
-static s32 evt_door_04_00[12];
-static s32 evt_door_04_01[12];
-static s32 evt_wall_04[28];
-static s32 evt_door_04_open[18];
-static s32 evt_door_04_close[21];
+static EvtWord evt_door_04_00[12];
+static EvtWord evt_door_04_01[12];
+static EvtWord evt_wall_04[28];
+static EvtWord evt_door_04_open[18];
+static EvtWord evt_door_04_close[21];
 static const char* door_data_04_npc[2];
 static const char* door_data_04_item[2];
 static DoorParam door_data_04;
-static s32 koushukei_dai[63];
+static EvtWord koushukei_dai[63];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 ShopItem goods_list2[6];
@@ -424,50 +424,50 @@ ShopItem goods_luigi4[6];
 ShopItem goods_luigi5[6];
 static ShopDb trade_list[19];
 static ShopperData35 shopper_data;
-s32 gor_01_shop_setup[156];
+EvtWord gor_01_shop_setup[156];
 static KinopioData kino_dt;
-s32 bar_door_anime[99];
-s32 christine_nakama_init[58];
-s32 christine_nakama[760];
-s32 maffia_turn[84];
-s32 maffia_assault[797];
-s32 christine_nakama_after[82];
-s32 box_copy[19];
-s32 ultrahammer_check[222];
-s32 ultrahammer_get[39];
-s32 keijiban_omote_joho[93];
-s32 keijiban_ura_joho[93];
-s32 gate_disp[42];
-static s32 gor_goki1_urouro[109];
-static s32 gor_goki2_urouro[109];
-static s32 koopa_npc_entry[38];
-s32 gor_01_koopa_evt[584];
-static s32 sekai_yami_npc[59];
-static s32 sekai_yami_evt[185];
-static s32 minnnanokoe_evt[397];
-s32 iri_09_init[10];
-s32 iri_09_tentyo_talk[172];
+EvtWord bar_door_anime[99];
+EvtWord christine_nakama_init[58];
+EvtWord christine_nakama[760];
+EvtWord maffia_turn[84];
+EvtWord maffia_assault[797];
+EvtWord christine_nakama_after[82];
+EvtWord box_copy[19];
+EvtWord ultrahammer_check[222];
+EvtWord ultrahammer_get[39];
+EvtWord keijiban_omote_joho[93];
+EvtWord keijiban_ura_joho[93];
+EvtWord gate_disp[42];
+static EvtWord gor_goki1_urouro[109];
+static EvtWord gor_goki2_urouro[109];
+static EvtWord koopa_npc_entry[38];
+EvtWord gor_01_koopa_evt[584];
+static EvtWord sekai_yami_npc[59];
+static EvtWord sekai_yami_evt[185];
+static EvtWord minnnanokoe_evt[397];
+EvtWord iri_09_init[10];
+EvtWord iri_09_tentyo_talk[172];
 s32 iri_16_item_tbl[2];
-static s32 iri_16_init[34];
-s32 iri_16_tyutyu_talk[445];
-s32 marco_jewel[22];
-static s32 epilogue_npc_entry[48];
-static s32 epilogue_evt_sub[160];
-static s32 epilogue_evt[313];
+static EvtWord iri_16_init[34];
+EvtWord iri_16_tyutyu_talk[445];
+EvtWord marco_jewel[22];
+static EvtWord epilogue_npc_entry[48];
+static EvtWord epilogue_evt_sub[160];
+static EvtWord epilogue_evt[313];
 #ifdef VERSION_G8ME01
-s32 dai_disp[52];
+EvtWord dai_disp[52];
 #endif
-s32 gor_01_init_evt[VERSION_PICK(546, 548)];
+EvtWord gor_01_init_evt[VERSION_PICK(546, 548)];
 SimpleRecipe R_simple_recipe_table[26];
 CookRecipe R_cookbook_recipe_table[VERSION_PICK(289, 292)];
 s32 R_mystery_cook_list[20];
 s32 special_cook_list[16];
-s32 cooking_evt_sub[284];
+EvtWord cooking_evt_sub[284];
 s32 iri_18_item_tbl[2];
-s32 cooking_evt[852];
+EvtWord cooking_evt[852];
 
 USER_FUNC(badgeshop_special_cnt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetValue(event, args[0], U_badgeShop_SpecialCheck());
     return EVT_RETURN_DONE;
@@ -523,7 +523,7 @@ USER_FUNC(nancy_block_func) {
 }
 
 USER_FUNC(chusan1_alwaysencont) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcWork* wp = npcGetWorkPtr();
 
     if (evtGetValue(event, args[0])) {
@@ -550,7 +550,7 @@ static USER_FUNC(disp_off) {
 }
 
 static USER_FUNC(get_value) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     ShopSel* wp = (ShopSel*)evtGetValue(event, args[0]);
 
 #ifdef VERSION_G8ME01
@@ -3566,7 +3566,7 @@ USER_FUNC(house03_f2_fade_func) {
 }
 
 USER_FUNC(chk_marco_fuki) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = fbatNpcTalkCheck(marioGetPtr());
 
     if (npc != NULL && strcmp(npc->description, "\203}\203\213\203R") == 0) {
@@ -3578,7 +3578,7 @@ USER_FUNC(chk_marco_fuki) {
 }
 
 USER_FUNC(maffia_kemuri) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetValue(event, args[0]);
     f32 y = evtGetValue(event, args[1]);
     f32 z = evtGetValue(event, args[2]);
@@ -3588,7 +3588,7 @@ USER_FUNC(maffia_kemuri) {
 }
 
 static USER_FUNC(evt_osreport) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     switch (evtGetValue(event, args[0])) {
         case 0:
@@ -5161,7 +5161,7 @@ static USER_FUNC(yami_view) {
 }
 
 static USER_FUNC(anim_tevcallback) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 flag = evtGetValue(event, args[1]);
     NpcEntry* npc = npcNameToPtr_NoAssert(name);
@@ -5174,7 +5174,7 @@ static USER_FUNC(anim_tevcallback) {
 }
 
 static USER_FUNC(anim_tevcallback_mobj) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 flag = evtGetValue(event, args[1]);
     MapObjectEntry* mobj = mobjNameToPtrNoAssert(name);
@@ -6931,7 +6931,7 @@ s32 special_cook_list[] = {
 
 static USER_FUNC(starstone_entry) {
     char name[16];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x;
     f32 s;
     f32 z;
@@ -6961,7 +6961,7 @@ static USER_FUNC(starstone_entry) {
 
 static USER_FUNC(starstone_set_pos) {
     char name[16];
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -7016,7 +7016,7 @@ USER_FUNC(iri_09_item_tbl_alloc) {
 }
 
 USER_FUNC(iri_09_item_tbl_make) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 n = evtGetValue(event, args[0]);
     s32 i;
 
@@ -7035,7 +7035,7 @@ USER_FUNC(iri_09_item_tbl_free) {
 }
 
 static USER_FUNC(set_fook_evt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32* wp = (s32*)evtGetValue(event, args[0]);
 
     wp[1] = evtGetValue(event, args[1]);
@@ -7066,7 +7066,7 @@ s32 itemNameToID(const char* name) {
 }
 
 USER_FUNC(cook_chk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 item = evtGetValue(event, args[0]);
     ItemData* data = &itemDataTable[item];
     u32 i;
@@ -7090,7 +7090,7 @@ USER_FUNC(cook_chk) {
 }
 
 USER_FUNC(cook_chk2) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 item1 = evtGetValue(event, args[0]);
     s32 item2 = evtGetValue(event, args[1]);
     ItemData* data1 = &itemDataTable[item1];
@@ -7122,7 +7122,7 @@ BOOL chkCookItem(s32 item) {
 }
 
 USER_FUNC(make_item_tbl) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 skip = evtGetValue(event, args[0]);
     s32 cnt = pouchGetHaveItemCnt();
     s32 n = 0;
@@ -7144,7 +7144,7 @@ USER_FUNC(make_item_tbl) {
 }
 
 USER_FUNC(get_item_name) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 item = evtGetValue(event, args[0]);
 
 #ifdef VERSION_G8ME01
@@ -7563,7 +7563,7 @@ EVT_BEGIN(cooking_evt)
 EVT_END()
 
 USER_FUNC(chk_cook_msg) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 item = evtGetValue(event, args[0]);
     s32 msg;
 
@@ -7586,7 +7586,7 @@ USER_FUNC(cooking_flag) {
 }
 
 USER_FUNC(chk_special_cook) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 item = evtGetValue(event, args[0]);
     s32 found = FALSE;
     s32 i;

@@ -54,18 +54,18 @@ static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_ice_pakkun_attack;
-static s32 attack_event[41];
+static EvtWord attack_event[41];
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_ceil[18];
 static BattleDataEntry data_table[15];
-static s32 init_event[31];
-static s32 dmg_avoid_counter_thorn_head_event[71];
-static s32 damage_event[10];
-static s32 counter_damage_event[30];
-static s32 ceil_fall_ready_event[131];
-static s32 return_event[256];
-static s32 normal_attack_event[311];
-static s32 wait_event[6];
+static EvtWord init_event[31];
+static EvtWord dmg_avoid_counter_thorn_head_event[71];
+static EvtWord damage_event[10];
+static EvtWord counter_damage_event[30];
+static EvtWord ceil_fall_ready_event[131];
+static EvtWord return_event[256];
+static EvtWord normal_attack_event[311];
+static EvtWord wait_event[6];
 
 f32 fd_ice_pakkun_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -590,7 +590,7 @@ static USER_FUNC(shadow_scale_memory) {
 }
 
 static USER_FUNC(pakkun_ceil_exist) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (_battleWorkPointer->stageObjectWork.flags & 0x20) {
         evtSetValue(event, args[0], 0);

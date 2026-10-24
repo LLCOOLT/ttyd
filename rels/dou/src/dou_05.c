@@ -72,17 +72,17 @@ f32 fd_dou_05___local_PIO2_367;
 f32 fd_dou_05_one_364;
 static BeroEntry bero_entry_data[5];
 static s32 key_tbl[2];
-static s32 evt_chk[23];
-static s32 evt_unlock[7];
-s32 bigdoor_event_init[36];
-s32 bigdoor_event[152];
+static EvtWord evt_chk[23];
+static EvtWord evt_unlock[7];
+EvtWord bigdoor_event_init[36];
+EvtWord bigdoor_event[152];
 static HitDamageReturn hitDmgRetPoints[6];
-static s32 mobj_box00[28];
-s32 waterfall_main[30];
-s32 waterfall_init[25];
-s32 ride_waterfall[5];
-s32 nonride_waterfall[19];
-s32 dou_05_init_evt[136];
+static EvtWord mobj_box00[28];
+EvtWord waterfall_main[30];
+EvtWord waterfall_init[25];
+EvtWord ride_waterfall[5];
+EvtWord nonride_waterfall[19];
+EvtWord dou_05_init_evt[136];
 
 
 static void alpha_tev(MapTevCallbackInfo* info) {

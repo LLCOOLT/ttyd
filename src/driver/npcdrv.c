@@ -3087,7 +3087,7 @@ void npcExecAllReglEvt(void) {
 }
 
 USER_FUNC(_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = *args++;
 
     if (pouchGetPtr()->mMerleeCurseUsesRemaining) {

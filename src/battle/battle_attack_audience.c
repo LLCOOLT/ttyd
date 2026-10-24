@@ -38,7 +38,7 @@ USER_FUNC(_attack_aud);
 USER_FUNC(_get_attack_aud_no);
 
 s32 _get_attack_aud_no(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 a0 = args[0];
     s32 a1 = args[1];
     s32 a2 = args[2];
@@ -65,7 +65,7 @@ s32 _get_attack_aud_no(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 _attack_aud(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 no;
     s32 mode;
     const char* sfx;
@@ -89,7 +89,7 @@ s32 _attack_aud(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 _check_aud_item_type(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 out = args[0];
     s32 item;
     s32 flag;
@@ -204,7 +204,7 @@ s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
 
 s32 _damage(EventEntry* event, BOOL isFirstCall) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleAudience_GetPresentTargetUnitId();
     BattleUnit* unit = BattleGetUnitPtr(wp, id);
     s32 body = BtlUnit_GetBodyPartsId(unit);
@@ -218,7 +218,7 @@ s32 _damage(EventEntry* event, BOOL isFirstCall) {
     return 2;
 }
 
-s32* btlataudGetMoveEventPtr(void) {
+EvtWord* btlataudGetMoveEventPtr(void) {
     switch (BattleAudience_GetPresentItemType()) {
         case 1:
             return btlataudevtPresentItem_Damage;
@@ -244,7 +244,7 @@ EVT_BEGIN(btlataudevtDummy)
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
-s32* btlataudGetAttackEventPtr(s32 unitId) {
+EvtWord* btlataudGetAttackEventPtr(s32 unitId) {
     s32* p = BtlUnit_GetData(BattleGetUnitPtr(_battleWorkPointer, unitId), 6);
     if (p == NULL) {
         p = btlataudevtDummy;

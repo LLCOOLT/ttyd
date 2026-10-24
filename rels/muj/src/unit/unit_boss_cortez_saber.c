@@ -26,12 +26,12 @@ USER_FUNC(btlevtcmd_SetMaxMoveCount);
 USER_FUNC(btlevtcmd_SetUnitWork);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(evt_eff);
-extern s32 cortez_weapon_blow_dead_event[];
-extern s32 cortez_weapon_break_event[];
-extern s32 cortez_weapon_counter_damage_event[];
-extern s32 cortez_weapon_dead_event[];
-extern s32 cortez_weapon_phase_event[];
-extern s32 cortez_weapon_unison_phase_event[];
+extern EvtWord cortez_weapon_blow_dead_event[];
+extern EvtWord cortez_weapon_break_event[];
+extern EvtWord cortez_weapon_counter_damage_event[];
+extern EvtWord cortez_weapon_dead_event[];
+extern EvtWord cortez_weapon_phase_event[];
+extern EvtWord cortez_weapon_unison_phase_event[];
 
 f32 fd_boss_cortez_saber_negone_one_374[2] __attribute__((aligned(8)));
 f32 fd_boss_cortez_saber_neg_one_382;
@@ -56,12 +56,12 @@ static PoseTableEntry pose_table[6];
 static PoseTableEntry pose_table_break[4];
 static BattleDataEntry data_table[21];
 static BattleUnitKindPart parts[1];
-static s32 init_event[47];
-static s32 damage_event[10];
-static s32 avoid_thorn_event[33];
-static s32 attack_event[414];
-static s32 wait_event[10];
-static s32 cortez_damage_sub_event[25];
+static EvtWord init_event[47];
+static EvtWord damage_event[10];
+static EvtWord avoid_thorn_event[33];
+static EvtWord attack_event[414];
+static EvtWord wait_event[10];
+static EvtWord cortez_damage_sub_event[25];
 
 f32 fd_boss_cortez_saber_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

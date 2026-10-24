@@ -120,42 +120,42 @@ static BattleWeapon weapon_kamec_katikati_magic;
 static BattleWeapon weapon_kamec_recover_magic;
 static BattleWeapon weapon_kamec_all_recover_magic;
 static BattleUnitSetup entry_kamec;
-static s32 init_event[22];
-static s32 init_event2[87];
-static s32 alpha_down_event[58];
-static s32 alpha_up_event[58];
-static s32 damage_event[66];
-static s32 kamec_subset_bunsin_all_kill[68];
-static s32 kamec_subset_dead_event[203];
-static s32 kamec_subset_blow_dead_event[78];
-static s32 avoid_miss_event[16];
-static s32 bunsin_kill_event[37];
-static s32 phase_event[2];
-static s32 dmg_fall_event[159];
-static s32 dmg_first_attack_pos[19];
-static s32 attack_event[296];
-static s32 ground_magic_common_event1[305];
-static s32 ground_magic_common_event2[61];
-static s32 sky_magic_common_event[258];
-static s32 magic_common_event1[27];
-static s32 magic_common_event2[16];
-static s32 start_avoid[26];
-static s32 attack_magic_event[325];
-static s32 attack_magic_event_sub_no_hit[45];
-static s32 attack_magic_event_sub_hit[30];
-static s32 support_magic_event[140];
-static s32 dekadeka_magic_event[7];
-static s32 katikati_magic_event[7];
-static s32 biribiri_magic_event[7];
-static s32 trans_magic_event[7];
-static s32 recover_magic_event[142];
-static s32 all_recover_magic_event[180];
-static s32 bunsin_magic_event[160];
-static s32 spawn_event[66];
-static s32 wait_event[55];
+static EvtWord init_event[22];
+static EvtWord init_event2[87];
+static EvtWord alpha_down_event[58];
+static EvtWord alpha_up_event[58];
+static EvtWord damage_event[66];
+static EvtWord kamec_subset_bunsin_all_kill[68];
+static EvtWord kamec_subset_dead_event[203];
+static EvtWord kamec_subset_blow_dead_event[78];
+static EvtWord avoid_miss_event[16];
+static EvtWord bunsin_kill_event[37];
+static EvtWord phase_event[2];
+static EvtWord dmg_fall_event[159];
+static EvtWord dmg_first_attack_pos[19];
+static EvtWord attack_event[296];
+static EvtWord ground_magic_common_event1[305];
+static EvtWord ground_magic_common_event2[61];
+static EvtWord sky_magic_common_event[258];
+static EvtWord magic_common_event1[27];
+static EvtWord magic_common_event2[16];
+static EvtWord start_avoid[26];
+static EvtWord attack_magic_event[325];
+static EvtWord attack_magic_event_sub_no_hit[45];
+static EvtWord attack_magic_event_sub_hit[30];
+static EvtWord support_magic_event[140];
+static EvtWord dekadeka_magic_event[7];
+static EvtWord katikati_magic_event[7];
+static EvtWord biribiri_magic_event[7];
+static EvtWord trans_magic_event[7];
+static EvtWord recover_magic_event[142];
+static EvtWord all_recover_magic_event[180];
+static EvtWord bunsin_magic_event[160];
+static EvtWord spawn_event[66];
+static EvtWord wait_event[55];
 
 static USER_FUNC(eff_magic_get_posX) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
 
@@ -1733,7 +1733,7 @@ static EVT_BEGIN(bunsin_magic_event)
 EVT_END()
 
 static USER_FUNC(eff_magic) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
     f32 a = evtGetFloat(event, args[1]);
@@ -1803,7 +1803,7 @@ static USER_FUNC(eff_staff1) {
 }
 
 static USER_FUNC(kamec_copy_status) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id1 = evtGetValue(event, args[0]);
     s32 id2 = evtGetValue(event, args[1]);
     BattleWork* wp = _battleWorkPointer;
@@ -1856,7 +1856,7 @@ static USER_FUNC(kamec_shuffle) {
 }
 
 static USER_FUNC(kamec_get_bunsin) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 copies[4];
     s32 n = 0;
     s32 i;
@@ -1884,7 +1884,7 @@ static USER_FUNC(kamec_get_bunsin) {
 
 static USER_FUNC(kamec_get_live_num) {
     s32 i;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 num = 0;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;

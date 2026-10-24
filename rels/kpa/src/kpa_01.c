@@ -99,29 +99,29 @@ f32 fd_kpa_01___local_3PIO2_368;
 f32 fd_kpa_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_kpa_01___local_PIO2_367;
 f32 fd_kpa_01_one_364;
-s32 kpa_01_door_open[219];
-s32 kpa_01_door_close[237];
-s32 kpa_01_touzyo_evt[217];
-s32 kpa_01_syuppatu_evt[1729];
-s32 kpa_01_pos_check[23];
-s32 douzou_1_touch_evt[19];
-s32 douzou_2_touch_evt[19];
-s32 douzou_3_touch_evt[43];
-s32 togenoko_A_talk_evt[8];
-s32 togenoko_B_talk_evt[8];
-s32 togenoko_C_init_evt[14];
-s32 hammer_AB_init_evt[13];
-s32 hammer_AB_talk_evt[111];
-s32 hammer_C_talk_evt[19];
-s32 hammer_D_talk_evt[8];
-s32 hammer_E_init_evt[9];
-s32 hammer_E_talk_evt[8];
-s32 baba_init_evt[13];
-s32 kamek_init_evt[9];
-s32 hkoopa_init_evt[9];
+EvtWord kpa_01_door_open[219];
+EvtWord kpa_01_door_close[237];
+EvtWord kpa_01_touzyo_evt[217];
+EvtWord kpa_01_syuppatu_evt[1729];
+EvtWord kpa_01_pos_check[23];
+EvtWord douzou_1_touch_evt[19];
+EvtWord douzou_2_touch_evt[19];
+EvtWord douzou_3_touch_evt[43];
+EvtWord togenoko_A_talk_evt[8];
+EvtWord togenoko_B_talk_evt[8];
+EvtWord togenoko_C_init_evt[14];
+EvtWord hammer_AB_init_evt[13];
+EvtWord hammer_AB_talk_evt[111];
+EvtWord hammer_C_talk_evt[19];
+EvtWord hammer_D_talk_evt[8];
+EvtWord hammer_E_init_evt[9];
+EvtWord hammer_E_talk_evt[8];
+EvtWord baba_init_evt[13];
+EvtWord kamek_init_evt[9];
+EvtWord hkoopa_init_evt[9];
 static NpcSetupInfo npcEnt[13];
-static s32 shan_init[46];
-s32 kpa_01_init_evt[88];
+static EvtWord shan_init[46];
+EvtWord kpa_01_init_evt[88];
 
 f32 fd_kpa_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1192,7 +1192,7 @@ EVT_BEGIN(kpa_01_init_evt)
 EVT_END_PAD()
 
 static USER_FUNC(make_name) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     static char name[8];
 
     sprintf(name, "hi_%d", evtGetValue(event, args[0]));
@@ -1249,7 +1249,7 @@ void kpa_stg1_034_cb(s32 type, smartEntry* smart) {
 }
 
 USER_FUNC(get_togenoko_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 cx = evtGetFloat(event, args[0]);
     f32 cz = evtGetFloat(event, args[1]);
     f32 x = evtGetFloat(event, args[2]);

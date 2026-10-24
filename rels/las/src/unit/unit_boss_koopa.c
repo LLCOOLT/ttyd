@@ -99,22 +99,22 @@ static BattleWeapon weapon_koopa_bite_attack;
 static BattleWeapon weapon_koopa_critical_bite_attack;
 static BattleWeapon weapon_koopa_fire_attack;
 BattleUnitSetup entry_kamec_obaba;
-static s32 koopa_zoom[25];
-static s32 kamec_obaba_zoom[40];
-static s32 init_event[124];
-static s32 entry_event[55];
-static s32 damage_event[22];
-static s32 dead_event[172];
-static s32 phase_event[134];
-static s32 harf_hp_event[94];
-static s32 attack_event[110];
-static s32 hip_attack_event[VERSION_PICK(431, 432)];
-static s32 bite_attack_event[278];
-static s32 critical_bite_attack_event[261];
-static s32 fire_attack_event[356];
-s32 first_mario_damage_check[33];
-s32 first_mario_damage_event[114];
-static s32 wait_event[6];
+static EvtWord koopa_zoom[25];
+static EvtWord kamec_obaba_zoom[40];
+static EvtWord init_event[124];
+static EvtWord entry_event[55];
+static EvtWord damage_event[22];
+static EvtWord dead_event[172];
+static EvtWord phase_event[134];
+static EvtWord harf_hp_event[94];
+static EvtWord attack_event[110];
+static EvtWord hip_attack_event[VERSION_PICK(431, 432)];
+static EvtWord bite_attack_event[278];
+static EvtWord critical_bite_attack_event[261];
+static EvtWord fire_attack_event[356];
+EvtWord first_mario_damage_check[33];
+EvtWord first_mario_damage_event[114];
+static EvtWord wait_event[6];
 static const char* cmd_disable_string[5];
 
 f32 fd_boss_koopa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
@@ -1277,7 +1277,7 @@ static void _disp_icon(CameraId camera, void* param) {
 }
 
 static USER_FUNC(_icon_jump_icon) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 icon = evtGetValue(event, args[0]);
     f32 x0 = evtGetFloat(event, args[1]);
     f32 y0 = evtGetFloat(event, args[2]);

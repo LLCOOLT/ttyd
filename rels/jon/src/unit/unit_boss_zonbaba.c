@@ -72,19 +72,19 @@ BattleWeapon weapon_zonbaba_confuze_attack;
 BattleWeapon weapon_zonbaba_sleep_attack;
 BattleWeapon weapon_zonbaba_minimini_attack;
 BattleWeapon weapon_zonbaba_recover;
-static s32 battle_entry_event[357];
-static s32 init_event[58];
-static s32 damage_event[10];
-s32 zonbaba_damage_sub_event[45];
-static s32 dead_event[264];
-static s32 phase_event[94];
-static s32 fumituke_attack_event[356];
-static s32 kamituki_attack_event[141];
-s32 breath1_attack_event[315];
-s32 breath2_attack_event[320];
-s32 recover_event[88];
-static s32 attack_event[282];
-static s32 wait_event[6];
+static EvtWord battle_entry_event[357];
+static EvtWord init_event[58];
+static EvtWord damage_event[10];
+EvtWord zonbaba_damage_sub_event[45];
+static EvtWord dead_event[264];
+static EvtWord phase_event[94];
+static EvtWord fumituke_attack_event[356];
+static EvtWord kamituki_attack_event[141];
+EvtWord breath1_attack_event[315];
+EvtWord breath2_attack_event[320];
+EvtWord recover_event[88];
+static EvtWord attack_event[282];
+static EvtWord wait_event[6];
 
 f32 fd_boss_zonbaba_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1226,7 +1226,7 @@ EVT_END()
 struct EffectEntry* effKemuri9N64Entry(s32 type, s32 arg1, s32 arg2, f32 x, f32 y, f32 z, f32 arg6, f32 arg7);
 
 static USER_FUNC(_leg_smoke_effect) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);

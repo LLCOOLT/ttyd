@@ -96,27 +96,27 @@ f32 fd_muj_12___local_3PIO2_368;
 f32 fd_muj_12_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_muj_12___local_PIO2_367;
 f32 fd_muj_12_one_364;
-static s32 back_dark[27];
-static s32 door_custom[53];
-static s32 bero_custom[135];
-static s32 w_close[12];
-static s32 w_open[12];
+static EvtWord back_dark[27];
+static EvtWord door_custom[53];
+static EvtWord bero_custom[135];
+static EvtWord w_close[12];
+static EvtWord w_open[12];
 static BeroEntry bero_entry_data[2];
-s32 korutesu_yure[86];
-s32 korutesu_flush[24];
-s32 korutesu_flush2[36];
-s32 korutesu_rotate[28];
-s32 korutesu_small[56];
-s32 korutesu_small2[56];
-s32 korutesu_rotate2[28];
-s32 korutesu_large[56];
-s32 korutesu_blur[43];
-static s32 starstone_fuwafuwa[53];
-static s32 korutesu_event[627];
-s32 korutesu_event_after[140];
-s32 kosho_event[517];
-s32 coin_effect[151];
-s32 muj_12_init_evt[60];
+EvtWord korutesu_yure[86];
+EvtWord korutesu_flush[24];
+EvtWord korutesu_flush2[36];
+EvtWord korutesu_rotate[28];
+EvtWord korutesu_small[56];
+EvtWord korutesu_small2[56];
+EvtWord korutesu_rotate2[28];
+EvtWord korutesu_large[56];
+EvtWord korutesu_blur[43];
+static EvtWord starstone_fuwafuwa[53];
+static EvtWord korutesu_event[627];
+EvtWord korutesu_event_after[140];
+EvtWord kosho_event[517];
+EvtWord coin_effect[151];
+EvtWord muj_12_init_evt[60];
 
 static const GXColor evtflash_col1 = {0xFF, 0xFF, 0xFF, 0xFF};
 static const GXColor evtflash_col2 = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -873,7 +873,7 @@ static f32 accdec_type(s32 step, s32 total, f32 start, f32 end) {
 }
 
 USER_FUNC(muj_item_move_3d_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     char* name = (char*)evtGetValue(event, args[0]);
     f32 x = evtGetValue(event, args[1]);
     f32 y = evtGetValue(event, args[2]);

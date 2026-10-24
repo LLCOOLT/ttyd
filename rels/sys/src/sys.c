@@ -92,7 +92,7 @@ f32 fd_sys___local_PIO2_367;
 f32 fd_sys_one_364;
 f64 fd_sys__three_localstatic4_sqrtf;
 f64 fd_sys__half_localstatic3_sqrtf;
-s32 dummy_evt[2];
+EvtWord dummy_evt[2];
 #ifdef VERSION_G8ME01
 static u32 niji_tbl[6];
 #else
@@ -176,11 +176,11 @@ s8* texid_us_tbl[9];
 s8** lang_tbl[2];
 const char* lang_prefix[2];
 #endif
-s32 sys_01_init_evt[135];
+EvtWord sys_01_init_evt[135];
 #ifdef VERSION_G8ME01
-s32 evt_start[191];
+EvtWord evt_start[191];
 #else
-s32 evt_start[189];
+EvtWord evt_start[189];
 #endif
 
 void _prolog(void) {

@@ -100,28 +100,28 @@ static PoseTableEntry pose_table_sky[17];
 static PoseTableEntry pose_table_dead[3];
 static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[2];
-static s32 kamec_obaba_zoom[40];
-static s32 init_event[56];
-static s32 damage_event[74];
-static s32 dmg_fall_event[149];
-static s32 dead_event[155];
-static s32 phase_event[216];
-static s32 attack_event[352];
-static s32 ground_magic_common_event1[87];
-static s32 ground_magic_common_event2[76];
-static s32 sky_magic_common_event[76];
-static s32 magic_common_event1[27];
-static s32 magic_common_event2[16];
-static s32 start_avoid[26];
-static s32 attack_magic_event[269];
-s32 magic_select_pri_obaba[52];
-s32 magic_select_pri_koopa[52];
-static s32 dekadeka_magic_event[73];
-static s32 katikati_magic_event[4];
-static s32 biribiri_magic_event[4];
-static s32 trans_magic_event[4];
-static s32 recover_magic_event[90];
-static s32 wait_event[6];
+static EvtWord kamec_obaba_zoom[40];
+static EvtWord init_event[56];
+static EvtWord damage_event[74];
+static EvtWord dmg_fall_event[149];
+static EvtWord dead_event[155];
+static EvtWord phase_event[216];
+static EvtWord attack_event[352];
+static EvtWord ground_magic_common_event1[87];
+static EvtWord ground_magic_common_event2[76];
+static EvtWord sky_magic_common_event[76];
+static EvtWord magic_common_event1[27];
+static EvtWord magic_common_event2[16];
+static EvtWord start_avoid[26];
+static EvtWord attack_magic_event[269];
+EvtWord magic_select_pri_obaba[52];
+EvtWord magic_select_pri_koopa[52];
+static EvtWord dekadeka_magic_event[73];
+static EvtWord katikati_magic_event[4];
+static EvtWord biribiri_magic_event[4];
+static EvtWord trans_magic_event[4];
+static EvtWord recover_magic_event[90];
+static EvtWord wait_event[6];
 
 f32 fd_boss_kamec_obaba_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -1181,7 +1181,7 @@ static EVT_BEGIN(recover_magic_event)
 EVT_END()
 
 USER_FUNC(eff_magic_support) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     s32 type = evtGetValue(event, args[1]);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -1208,7 +1208,7 @@ USER_FUNC(eff_magic_support) {
 }
 
 static USER_FUNC(eff_magic_get_posX) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
 
@@ -1217,7 +1217,7 @@ static USER_FUNC(eff_magic_get_posX) {
 }
 
 static USER_FUNC(eff_magic) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
     f32 a = evtGetFloat(event, args[1]);

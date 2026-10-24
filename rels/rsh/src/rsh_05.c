@@ -167,33 +167,33 @@ f32 fd_rsh_05_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_rsh_05___local_PIO2_367;
 f32 fd_rsh_05_one_364;
 static ExtTexInfo ext_moamoa_data[47];
-static s32 evt_moamoa_init[57];
-static s32 evt_meet_moamoa[185];
-s32 evt_moamoa_help[166];
-s32 evt_moamoa_escape0[15];
-s32 evt_moamoa_escape1[15];
-static s32 evt_moamoa_escape[228];
-static s32 init_syashou[30];
-static s32 talk_syashou[19];
-static s32 init_waitless[30];
-static s32 talk_waitless[19];
+static EvtWord evt_moamoa_init[57];
+static EvtWord evt_meet_moamoa[185];
+EvtWord evt_moamoa_help[166];
+EvtWord evt_moamoa_escape0[15];
+EvtWord evt_moamoa_escape1[15];
+static EvtWord evt_moamoa_escape[228];
+static EvtWord init_syashou[30];
+static EvtWord talk_syashou[19];
+static EvtWord init_waitless[30];
+static EvtWord talk_waitless[19];
 static BeroEntry bero_data_a[3];
 static BeroEntry bero_data_b[3];
 static BeroEntry bero_data_c[3];
 static NpcSetupInfo npc_data[3];
-s32 evt_ghost_diary[5];
-s32 evt_ghost_diary_read[53];
+EvtWord evt_ghost_diary[5];
+EvtWord evt_ghost_diary_read[53];
 /* shelf access table: hit, msg; a NULL hit ends it */
 typedef struct ShelfMsg { const char* hit; const char* msg; } ShelfMsg;
 typedef struct ShelfMsgTbl6 { ShelfMsg rows[6]; const char* end[1]; } ShelfMsgTbl6;
 static ShelfMsgTbl6 access_tbl;
-static s32 evt_access[14];
-static s32 evt_access2[47];
-static s32 evt_access_entry[31];
-s32 rsh_05_init_evt[96];
-s32 rsh_05_a_init_evt[103];
-s32 rsh_05_init_evt_nidome[59];
-s32 rsh_05_a_init_evt_nidome[29];
+static EvtWord evt_access[14];
+static EvtWord evt_access2[47];
+static EvtWord evt_access_entry[31];
+EvtWord rsh_05_init_evt[96];
+EvtWord rsh_05_a_init_evt[103];
+EvtWord rsh_05_init_evt_nidome[59];
+EvtWord rsh_05_a_init_evt_nidome[29];
 
 f32 fd_rsh_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -417,7 +417,7 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
 #pragma dont_inline reset
 
 static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 mask = evtGetValue(event, args[1]);
 
@@ -496,7 +496,7 @@ static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
 }
 
 static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 all = evtGetValue(event, args[1]);
     s32 i;
@@ -1398,7 +1398,7 @@ static void ext_moamoa_dispent(void) {
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static s32 npc_jump(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);

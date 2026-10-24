@@ -164,7 +164,7 @@ NpcBattleSelect btlgrpsel_tik_btlno_tik_20_05_off[2];
 NpcBattleSelect btlgrpsel_tik_btlno_tik_20_06_off[2];
 NpcSetupBattleInfo btlsetup_tik_tbl[30];
 NpcTerritoryInfo btl_tik_setup_no_tbl[30];
-s32 bgset_tik_wave_event[59];
+EvtWord bgset_tik_wave_event[59];
 
 f32 fd_battle_database_tik_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -2630,7 +2630,7 @@ NpcTerritoryInfo btl_tik_setup_no_tbl[] = {
 };
 
 static USER_FUNC(_wave_offset) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 varX = args[1];
     s32 stepX = evtGetValue(event, varX);

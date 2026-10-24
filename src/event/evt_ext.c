@@ -4,7 +4,7 @@
 
 // pose count, texture list, init function, main function, second main function
 USER_FUNC(evt_ext_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 count;
     ExtdrvTexInfo* texInfo;
     void (*initFunc)(void);

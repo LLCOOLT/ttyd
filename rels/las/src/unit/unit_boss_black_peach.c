@@ -225,7 +225,7 @@ PoseTableEntry queen_hand_pose_table[4];
 BattleDataEntry queen_data_table[2];
 BattleUnitKindPart queen_parts[5];
 f32 hair_offset[36];
-s32 shadow_queen_1000[25];
+EvtWord shadow_queen_1000[25];
 BattleUnitKind unit_boss_shadow_hand_1;
 BattleUnitDefense queen_hand_1_defence;
 BattleUnitDefenseAttr queen_hand_1_defence_attr;
@@ -251,64 +251,64 @@ BattleUnitSetup entry_shadow_queen;
 BattleUnitSetup entry_shadow_hand_1;
 BattleUnitSetup entry_shadow_hand_2;
 BattleUnitSetup entry_shadow_hand_small;
-s32 peach_init_event[170];
-s32 peach_entry_event[62];
-s32 peach_damage_event[17];
-s32 peach_change_evt[556];
-s32 peach_phase_event[46];
-s32 peach_dead_event[11];
-s32 peack_attack_black_thunder[147];
-s32 peack_attack_black_energy[125];
-s32 peack_attack_dark_drag[525];
-s32 peack_attack_drain[526];
-s32 peach_attack_event[85];
-s32 peach_wait_event[6];
-s32 queen_init_event[225];
-s32 queen_first_attack_message_evt[55];
-s32 queen_next_attack_message_evt[55];
-s32 queen_last_attack_message_evt[56];
-s32 queen_change_hand_small_evt[75];
-s32 queen_change_hand_big_evt[90];
-s32 queen_hand_big_life_check_evt[75];
-s32 queen_hand_small_life_check_evt[40];
-s32 queen_hp_drain_evt[316];
-s32 queen_hp_drain_evt_miss[41];
-s32 queen_first_damage_evt[74];
-s32 queen_2_hp_msg_evt[39];
-s32 queen_4_hp_msg_evt[39];
-s32 queen_dead_hp_msg_evt[88];
-s32 queen_phase_event[208];
-s32 queen_attack_black_thunder[197];
-s32 queen_attack_charge[166];
-s32 queen_attack_black_wave[445];
-s32 queen_attack_black_energy[164];
-s32 queen_attack_bress1[276];
-s32 queen_attack_bress2[276];
-s32 queen_attack_bress3[278];
-s32 queen_attack_event[163];
-s32 queen_damage_event[63];
-s32 queen_dead_event[347];
-s32 queen_wait_event[10];
-s32 queen_entry_event[62];
-s32 queen_hand_1_init_event[107];
-s32 queen_hand_1_press_attack[343];
-s32 queen_hand_1_drain_attack[408];
-s32 queen_hand_1_attack_event[41];
-s32 queen_hand_1_damage_event[24];
-s32 queen_hand_1_dead_event[41];
-s32 queen_hand_1_wait_event[6];
-s32 queen_hand_2_init_event[113];
-s32 queen_hand_2_attack_event[41];
-s32 queen_hand_2_damage_event[24];
-s32 queen_hand_2_dead_event[41];
-s32 queen_hand_2_wait_event[6];
-s32 queen_hand_small_init_event[96];
-s32 queen_hand_small_drag_attack[385];
-s32 queen_hand_small_1000hand_attack[VERSION_PICK(266, 274)];
-s32 queen_hand_small_attack_event[35];
-s32 queen_hand_small_damage_event[48];
-s32 queen_hand_small_dead_event[32];
-s32 queen_hand_small_wait_event[6];
+EvtWord peach_init_event[170];
+EvtWord peach_entry_event[62];
+EvtWord peach_damage_event[17];
+EvtWord peach_change_evt[556];
+EvtWord peach_phase_event[46];
+EvtWord peach_dead_event[11];
+EvtWord peack_attack_black_thunder[147];
+EvtWord peack_attack_black_energy[125];
+EvtWord peack_attack_dark_drag[525];
+EvtWord peack_attack_drain[526];
+EvtWord peach_attack_event[85];
+EvtWord peach_wait_event[6];
+EvtWord queen_init_event[225];
+EvtWord queen_first_attack_message_evt[55];
+EvtWord queen_next_attack_message_evt[55];
+EvtWord queen_last_attack_message_evt[56];
+EvtWord queen_change_hand_small_evt[75];
+EvtWord queen_change_hand_big_evt[90];
+EvtWord queen_hand_big_life_check_evt[75];
+EvtWord queen_hand_small_life_check_evt[40];
+EvtWord queen_hp_drain_evt[316];
+EvtWord queen_hp_drain_evt_miss[41];
+EvtWord queen_first_damage_evt[74];
+EvtWord queen_2_hp_msg_evt[39];
+EvtWord queen_4_hp_msg_evt[39];
+EvtWord queen_dead_hp_msg_evt[88];
+EvtWord queen_phase_event[208];
+EvtWord queen_attack_black_thunder[197];
+EvtWord queen_attack_charge[166];
+EvtWord queen_attack_black_wave[445];
+EvtWord queen_attack_black_energy[164];
+EvtWord queen_attack_bress1[276];
+EvtWord queen_attack_bress2[276];
+EvtWord queen_attack_bress3[278];
+EvtWord queen_attack_event[163];
+EvtWord queen_damage_event[63];
+EvtWord queen_dead_event[347];
+EvtWord queen_wait_event[10];
+EvtWord queen_entry_event[62];
+EvtWord queen_hand_1_init_event[107];
+EvtWord queen_hand_1_press_attack[343];
+EvtWord queen_hand_1_drain_attack[408];
+EvtWord queen_hand_1_attack_event[41];
+EvtWord queen_hand_1_damage_event[24];
+EvtWord queen_hand_1_dead_event[41];
+EvtWord queen_hand_1_wait_event[6];
+EvtWord queen_hand_2_init_event[113];
+EvtWord queen_hand_2_attack_event[41];
+EvtWord queen_hand_2_damage_event[24];
+EvtWord queen_hand_2_dead_event[41];
+EvtWord queen_hand_2_wait_event[6];
+EvtWord queen_hand_small_init_event[96];
+EvtWord queen_hand_small_drag_attack[385];
+EvtWord queen_hand_small_1000hand_attack[VERSION_PICK(266, 274)];
+EvtWord queen_hand_small_attack_event[35];
+EvtWord queen_hand_small_damage_event[48];
+EvtWord queen_hand_small_dead_event[32];
+EvtWord queen_hand_small_wait_event[6];
 
 f32 fd_boss_black_peach_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -4327,7 +4327,7 @@ EVT_BEGIN(queen_hand_small_wait_event)
 EVT_END()
 
 USER_FUNC(queen_hand_small_1000hand_set_offset_evt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
     s32 y = evtGetValue(event, args[1]);
     s32 z = evtGetValue(event, args[2]);
@@ -4724,7 +4724,7 @@ USER_FUNC(slot_init) {
 }
 
 USER_FUNC(peach_shock_evt) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
     s32 y = evtGetValue(event, args[1]);
     s32 z = evtGetValue(event, args[2]);
@@ -4952,7 +4952,7 @@ USER_FUNC(queen_hp_drain_1_evt) {
 }
 
 USER_FUNC(queen_get_aud_num) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     BattleAudience_GetAudienceNum();
     evtSetValue(event, args[0], BattleAudience_GetAudienceNum());
@@ -5053,7 +5053,7 @@ USER_FUNC(queen_break_slot_flag2_on) {
 }
 
 USER_FUNC(queen_drain) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -5068,7 +5068,7 @@ USER_FUNC(queen_drain) {
 }
 
 USER_FUNC(queen_thunder) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);

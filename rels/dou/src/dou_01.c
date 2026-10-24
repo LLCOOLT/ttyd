@@ -35,8 +35,8 @@ f32 fd_dou_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_dou_01___local_PIO2_367;
 f32 fd_dou_01_one_364;
 static BeroEntry bero_entry_data[3];
-static s32 korutesu_event[74];
-s32 dou_01_init_evt[48];
+static EvtWord korutesu_event[74];
+EvtWord dou_01_init_evt[48];
 
 f32 fd_dou_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

@@ -44,27 +44,27 @@ f32 fd_las_20___local_3PIO2_368;
 f32 fd_las_20_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_las_20___local_PIO2_367;
 f32 fd_las_20_one_364;
-static s32 e_door_close[22];
-static s32 e_door_open[22];
+static EvtWord e_door_close[22];
+static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[4];
 static const char* haguruma_hontai[14];
 static const char* haguruma_hontai2[6];
 static const char* haguruma_kage[12];
 static const char* haguruma_kage2[5];
-static s32 haguruma_evt[194];
-static s32 dai_evt[13];
+static EvtWord haguruma_evt[194];
+static EvtWord dai_evt[13];
 const char* hosi_name[14];
-s32 hosi_sw_check[303];
-s32 hosi_onoff[69];
-s32 hosi_02_sw_evt[15];
-s32 hosi_03_sw_evt[15];
-s32 hosi_04_sw_evt[15];
-s32 hosi_05_sw_evt[15];
-s32 hosi_06_sw_evt[15];
-s32 hosi_07_sw_evt[15];
-s32 hosi_08_sw_evt[15];
-s32 hosi_init[175];
-s32 las_20_init_evt[103];
+EvtWord hosi_sw_check[303];
+EvtWord hosi_onoff[69];
+EvtWord hosi_02_sw_evt[15];
+EvtWord hosi_03_sw_evt[15];
+EvtWord hosi_04_sw_evt[15];
+EvtWord hosi_05_sw_evt[15];
+EvtWord hosi_06_sw_evt[15];
+EvtWord hosi_07_sw_evt[15];
+EvtWord hosi_08_sw_evt[15];
+EvtWord hosi_init[175];
+EvtWord las_20_init_evt[103];
 
 f32 fd_las_20_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -536,7 +536,7 @@ EVT_BEGIN(las_20_init_evt)
 EVT_END()
 
 USER_FUNC(get_hosi_name) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     evtSetValue(event, args[1], hosi_name[idx * 2]);
     evtSetValue(event, args[2], hosi_name[idx * 2 + 1]);

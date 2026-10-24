@@ -51,13 +51,13 @@ static BattleWeapon weapon_sinemon_attack;
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_turn[15];
 static BattleDataEntry data_table[4];
-static s32 init_event[42];
-static s32 dmg_avoid_counter_thorn_head_event[76];
-static s32 damage_event[58];
-static s32 dmg_turn_event[96];
-static s32 wakeup_event[104];
-static s32 attack_event[454];
-static s32 wait_event[6];
+static EvtWord init_event[42];
+static EvtWord dmg_avoid_counter_thorn_head_event[76];
+static EvtWord damage_event[58];
+static EvtWord dmg_turn_event[96];
+static EvtWord wakeup_event[104];
+static EvtWord attack_event[454];
+static EvtWord wait_event[6];
 
 f32 fd_monochrome_sinemon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

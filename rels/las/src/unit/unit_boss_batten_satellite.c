@@ -54,16 +54,16 @@ static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
 static BattleDataEntry data_table[15];
-s32 dmg_counter_event[149];
+EvtWord dmg_counter_event[149];
 static BattleUnitKindPart parts[1];
-static s32 init_event[30];
-static s32 entry_event[2];
-static s32 damage_event[10];
-static s32 phase_event[2];
-static s32 dead_event[2];
-static s32 attack_event[10];
-s32 batten_satellite_attack_attack_event[304];
-static s32 wait_event[6];
+static EvtWord init_event[30];
+static EvtWord entry_event[2];
+static EvtWord damage_event[10];
+static EvtWord phase_event[2];
+static EvtWord dead_event[2];
+static EvtWord attack_event[10];
+EvtWord batten_satellite_attack_attack_event[304];
+static EvtWord wait_event[6];
 
 f32 fd_boss_batten_satellite_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -449,7 +449,7 @@ USER_FUNC(bts_x_flag_set) {
 }
 
 static USER_FUNC(bts_wariai_enzan_0f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]) - 1.0f;
     f32 c = evtGetFloat(event, args[2]);
@@ -460,7 +460,7 @@ static USER_FUNC(bts_wariai_enzan_0f) {
 }
 
 static USER_FUNC(bts_wariai_enzan_0) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]) - 1.0f;
     f32 c = evtGetFloat(event, args[2]);
@@ -471,7 +471,7 @@ static USER_FUNC(bts_wariai_enzan_0) {
 }
 
 USER_FUNC(bts_wariai_enzan_1f_intpl_w) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);
@@ -509,7 +509,7 @@ USER_FUNC(bts_wariai_enzan_1f_intpl_w) {
 }
 
 static USER_FUNC(bts_wariai_enzan_1f_intpl) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);
@@ -533,7 +533,7 @@ static USER_FUNC(bts_wariai_enzan_1f_intpl) {
 }
 
 static USER_FUNC(bts_wariai_enzan_1f) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);
@@ -544,7 +544,7 @@ static USER_FUNC(bts_wariai_enzan_1f) {
 }
 
 static USER_FUNC(bts_wariai_enzan_1) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
     f32 c = evtGetFloat(event, args[2]);

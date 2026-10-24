@@ -24,8 +24,8 @@ USER_FUNC(btlevtcmd_SetEventDamage);
 USER_FUNC(btlevtcmd_SetEventWait);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(btlevtcmd_WaitAttackEnd);
-extern s32 gesso_arm_damage_pose_event[];
-extern s32 gesso_arm_dead_event[];
+extern EvtWord gesso_arm_damage_pose_event[];
+extern EvtWord gesso_arm_dead_event[];
 
 f32 boss_gesso_left_arm_negone_one_374[2] __attribute__((aligned(8)));
 f32 boss_gesso_left_arm_neg_one_382;
@@ -49,13 +49,13 @@ static PoseTableEntry pose_table[4];
 BattleDataEntry gesso_left_arm_data_table[13];
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[1];
-static s32 init_event[25];
-static s32 damage_event[31];
-s32 gesso_left_arm_damage_event[93];
-static s32 phase_event[2];
+static EvtWord init_event[25];
+static EvtWord damage_event[31];
+EvtWord gesso_left_arm_damage_event[93];
+static EvtWord phase_event[2];
 BattleWeapon weapon_gesso_left_arm_attack;
-static s32 attack_event[171];
-static s32 wait_event[6];
+static EvtWord attack_event[171];
+static EvtWord wait_event[6];
 
 f32 boss_gesso_left_arm_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

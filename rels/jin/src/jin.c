@@ -36,7 +36,7 @@ f64 fd_jin__three_localstatic4_sqrtf;
 f64 fd_jin__half_localstatic3_sqrtf;
 
 USER_FUNC(evt_jin_vivian_pose_set) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     partyPoseTbl[6][index] = (char*)evtGetValue(event, args[1]);
     return EVT_RETURN_DONE;

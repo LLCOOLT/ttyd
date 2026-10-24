@@ -69,15 +69,15 @@ static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[2];
 static BattleWeapon weapon_jyugem_attack;
 static BattleUnitSetup entry_togezo;
-static s32 init_event[40];
-static s32 damage_event[322];
-static s32 unison_phase_event[139];
-static s32 avoid_counter_thorn_head_event[61];
-static s32 dmg_first_attack_pos_event[19];
-static s32 attack_event[185];
-static s32 normal_attack_event[585];
-static s32 friend_event[263];
-static s32 wait_event[6];
+static EvtWord init_event[40];
+static EvtWord damage_event[322];
+static EvtWord unison_phase_event[139];
+static EvtWord avoid_counter_thorn_head_event[61];
+static EvtWord dmg_first_attack_pos_event[19];
+static EvtWord attack_event[185];
+static EvtWord normal_attack_event[585];
+static EvtWord friend_event[263];
+static EvtWord wait_event[6];
 
 f32 fd_jyugem_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
@@ -748,7 +748,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static USER_FUNC(togezo_copy_status) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
     s32 id2 = BattleTransID(event, evtGetValue(event, args[1]));
     BattleWork* wp = _battleWorkPointer;

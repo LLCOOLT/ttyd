@@ -52,8 +52,8 @@ f32 fd_hei_12_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_hei_12___local_PIO2_367;
 f32 fd_hei_12_one_364;
 static BeroEntry bero_entry_data[2];
-static s32 evt_chorobon[136];
-s32 hei_12_init_evt[97];
+static EvtWord evt_chorobon[136];
+EvtWord hei_12_init_evt[97];
 
 f32 fd_hei_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

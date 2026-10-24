@@ -208,114 +208,114 @@ f32 fd_tou_01___local_3PIO2_368;
 f32 fd_tou_01_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tou_01___local_PIO2_367;
 f32 fd_tou_01_one_364;
-static s32 n_door_open[60];
-static s32 n_door_close[58];
+static EvtWord n_door_open[60];
+static EvtWord n_door_close[58];
 static BeroEntry bero_data[2];
-static s32 evt_door[15];
-static s32 evt_door2[12];
-static s32 evt_wall[22];
-s32 evt_door_1_open[12];
-s32 evt_door_1_close[14];
+static EvtWord evt_door[15];
+static EvtWord evt_door2[12];
+static EvtWord evt_wall[22];
+EvtWord evt_door_1_open[12];
+EvtWord evt_door_1_close[14];
 static const char* mise_npc[2];
 static DoorParam door_1;
-static s32 evt_door_2[12];
-static s32 evt_door2_2[12];
-s32 evt_sakaba_1[26];
-s32 evt_sakaba_2[26];
-s32 evt_sakaba_3[26];
-s32 evt_sakaba_4[29];
+static EvtWord evt_door_2[12];
+static EvtWord evt_door2_2[12];
+EvtWord evt_sakaba_1[26];
+EvtWord evt_sakaba_2[26];
+EvtWord evt_sakaba_3[26];
+EvtWord evt_sakaba_4[29];
 #ifdef VERSION_G8ME01
-s32 evt_wall2[38];
+EvtWord evt_wall2[38];
 #else
-s32 evt_wall2[19];
+EvtWord evt_wall2[19];
 #endif
 const char* sakaba_npc[7];
 const char* sakaba_item[2];
-s32 evt_door_2_open[12];
-s32 evt_door_2_close[14];
+EvtWord evt_door_2_open[12];
+EvtWord evt_door_2_close[14];
 static DoorParam door_2;
-static s32 evt_kanban[51];
-static s32 evt_kanban2[175];
+static EvtWord evt_kanban[51];
+static EvtWord evt_kanban2[175];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[13];
 static ShopperData35 shopper_data;
-s32 evt_hotdog[86];
-s32 evt_ship_shadow[91];
-s32 init_hikuu[12];
-s32 talk_hikuu[84];
-s32 init_sakaba[8];
-s32 talk_sakaba[369];
-s32 init_mise[12];
-s32 talk_mise[2];
-s32 init_hot[13];
-s32 talk_hot[21];
-static s32 init_papa[20];
-static s32 talk_papa[78];
-static s32 init_mama[20];
-static s32 talk_mama[78];
-static s32 init_konari[20];
-static s32 talk_konari[78];
-static s32 talk_musume[132];
-s32 init_musume_1[14];
-s32 talk_musume_1[4];
-s32 init_musume_2[14];
-s32 talk_musume_2[4];
-s32 init_musume_3[14];
-s32 talk_musume_3[4];
-s32 init_kino_1[13];
-s32 reg_kino_1[31];
-s32 talk_kino_1[112];
-s32 init_kino_2[8];
-s32 talk_kino_2[112];
-s32 init_roten_1[8];
-s32 talk_roten_1[112];
-s32 init_roten_2[8];
-s32 talk_roten_2[112];
-s32 init_jugem_1[8];
-s32 talk_jugem_1[112];
-s32 init_jugem_2[12];
-s32 talk_jugem_2[112];
-s32 init_bijyo[40];
-s32 talk_bijyo[112];
-static s32 init_kiza[21];
-static s32 talk_kiza[60];
-static s32 init_sarary[12];
-s32 select_number[44];
-static s32 talk_sarary[479];
+EvtWord evt_hotdog[86];
+EvtWord evt_ship_shadow[91];
+EvtWord init_hikuu[12];
+EvtWord talk_hikuu[84];
+EvtWord init_sakaba[8];
+EvtWord talk_sakaba[369];
+EvtWord init_mise[12];
+EvtWord talk_mise[2];
+EvtWord init_hot[13];
+EvtWord talk_hot[21];
+static EvtWord init_papa[20];
+static EvtWord talk_papa[78];
+static EvtWord init_mama[20];
+static EvtWord talk_mama[78];
+static EvtWord init_konari[20];
+static EvtWord talk_konari[78];
+static EvtWord talk_musume[132];
+EvtWord init_musume_1[14];
+EvtWord talk_musume_1[4];
+EvtWord init_musume_2[14];
+EvtWord talk_musume_2[4];
+EvtWord init_musume_3[14];
+EvtWord talk_musume_3[4];
+EvtWord init_kino_1[13];
+EvtWord reg_kino_1[31];
+EvtWord talk_kino_1[112];
+EvtWord init_kino_2[8];
+EvtWord talk_kino_2[112];
+EvtWord init_roten_1[8];
+EvtWord talk_roten_1[112];
+EvtWord init_roten_2[8];
+EvtWord talk_roten_2[112];
+EvtWord init_jugem_1[8];
+EvtWord talk_jugem_1[112];
+EvtWord init_jugem_2[12];
+EvtWord talk_jugem_2[112];
+EvtWord init_bijyo[40];
+EvtWord talk_bijyo[112];
+static EvtWord init_kiza[21];
+static EvtWord talk_kiza[60];
+static EvtWord init_sarary[12];
+EvtWord select_number[44];
+static EvtWord talk_sarary[479];
 static NpcSetupInfo npcEnt[20];
-s32 evt_uron[195];
-s32 evt_tamago_sleep[56];
-s32 dummy[2];
-s32 hot_move_evt[66];
-s32 hot_move_evt2[24];
-s32 evt_oyaji_move[60];
-static s32 evt_tamago_scale[89];
-static s32 evt_tamago_scale2[83];
+EvtWord evt_uron[195];
+EvtWord evt_tamago_sleep[56];
+EvtWord dummy[2];
+EvtWord hot_move_evt[66];
+EvtWord hot_move_evt2[24];
+EvtWord evt_oyaji_move[60];
+static EvtWord evt_tamago_scale[89];
+static EvtWord evt_tamago_scale2[83];
 s32 yoshi_data[30];
-s32 evt_tamago_move[306];
-s32 evt_tamago[100];
-s32 talk_tamago[321];
-s32 evt_gondora_updown[143];
-s32 evt_gondora_mon[62];
-s32 evt_gondora[169];
-s32 evt_gondora2[200];
-s32 evt_search_light[82];
-s32 evt_dummy_sw[178];
-s32 evt_peach_after[92];
-static s32 sekai_yami_npc_init[84];
-static s32 sekai_yami_npc[65];
-static s32 sekai_yami_evt[215];
-static s32 minnnanokoe_npc_entry[175];
-static s32 minnnanokoe_evt[446];
-s32 evt_telbox[124];
-s32 evt_mail[175];
-static s32 evt_key[7];
-static s32 mobj_box00[36];
+EvtWord evt_tamago_move[306];
+EvtWord evt_tamago[100];
+EvtWord talk_tamago[321];
+EvtWord evt_gondora_updown[143];
+EvtWord evt_gondora_mon[62];
+EvtWord evt_gondora[169];
+EvtWord evt_gondora2[200];
+EvtWord evt_search_light[82];
+EvtWord evt_dummy_sw[178];
+EvtWord evt_peach_after[92];
+static EvtWord sekai_yami_npc_init[84];
+static EvtWord sekai_yami_npc[65];
+static EvtWord sekai_yami_evt[215];
+static EvtWord minnnanokoe_npc_entry[175];
+static EvtWord minnnanokoe_evt[446];
+EvtWord evt_telbox[124];
+EvtWord evt_mail[175];
+static EvtWord evt_key[7];
+static EvtWord mobj_box00[36];
 #ifdef VERSION_G8ME01
-s32 tou_01_init_evt[1641];
+EvtWord tou_01_init_evt[1641];
 #else
-s32 tou_01_init_evt[627];
+EvtWord tou_01_init_evt[627];
 #endif
 
 static USER_FUNC(proj_off) {
@@ -872,7 +872,7 @@ USER_FUNC(make_shadow) {
 }
 
 static USER_FUNC(proj_mtx) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 px = evtGetFloat(event, args[0]);
     f32 py = evtGetFloat(event, args[1]);
     f32 pz = evtGetFloat(event, args[2]);
@@ -2167,7 +2167,7 @@ USER_FUNC(eff_sleep_off) {
 }
 
 static USER_FUNC(mario_chk) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     BOOL ok = FALSE;
 
     if (marioChkKey() && marioChkCtrl()) {
@@ -3217,7 +3217,7 @@ EVT_BEGIN(evt_mail)
 EVT_END()
 
 static USER_FUNC(anim_tevcallback) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 index = evtGetValue(event, args[1]);
     NpcEntry* obj = npcNameToPtr_NoAssert(name);
@@ -3230,7 +3230,7 @@ static USER_FUNC(anim_tevcallback) {
 }
 
 static USER_FUNC(anim_tevcallback_mobj) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 index = evtGetValue(event, args[1]);
     MapObjectEntry* obj = mobjNameToPtrNoAssert(name);
@@ -3254,7 +3254,7 @@ static USER_FUNC(delete_npc_regl_evt) {
 }
 
 USER_FUNC(yami_oowareru_check) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 limit = evtGetFloat(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
@@ -3275,7 +3275,7 @@ USER_FUNC(yami_oowareru_check) {
 }
 
 static USER_FUNC(starstone_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -3286,7 +3286,7 @@ static USER_FUNC(starstone_entry) {
 }
 
 static USER_FUNC(starstone_set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -3300,7 +3300,7 @@ static USER_FUNC(starstone_set_pos) {
 }
 
 static USER_FUNC(starstone_set_ry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 ry = evtGetFloat(event, args[1]);
 

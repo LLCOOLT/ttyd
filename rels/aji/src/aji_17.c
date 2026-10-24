@@ -209,50 +209,50 @@ void noiseDisp(CameraId cameraId, void* param);
 #define SAVE_EVT evt_memcard_save
 #endif
 
-static s32 w_door_close[22];
-static s32 w_door_open[22];
+static EvtWord w_door_close[22];
+static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[2];
-s32 evt_emergency[48];
-s32 evt_last[728];
-s32 evt_last2[339];
-s32 evt_camera[68];
-s32 mail_sousin_se[36];
-static s32 peach_evt_stg1[1131];
+EvtWord evt_emergency[48];
+EvtWord evt_last[728];
+EvtWord evt_last2[339];
+EvtWord evt_camera[68];
+EvtWord mail_sousin_se[36];
+static EvtWord peach_evt_stg1[1131];
 f32 move_pos_list[15][2];
-s32 peach_dance_move[95];
-s32 peach_dance_pose[44];
-s32 peach_dance_action_step[2];
-s32 dance_action_turn_sub[108];
-s32 peach_dance_action_turn[12];
-s32 peach_dance_action_reverse[18];
-s32 peach_dance_action_fail[28];
-s32 dance_btn_disp_sub[49];
-s32 dance_btn_disp[25];
-s32 dance_btn_batu[20];
-s32 dance_btn_clear[56];
-s32 dance_btn_clear_all[47];
-s32 wait_action_time[16];
-s32 peach_dance_dark[27];
-s32 peach_dance_light[27];
-s32 peach_evt_dance[VERSION_PICK(504, 521)];
-static s32 peach_evt_stg2[900];
-static s32 peach_evt_stg3[352];
-static s32 peach_evt_stg3_1[650];
+EvtWord peach_dance_move[95];
+EvtWord peach_dance_pose[44];
+EvtWord peach_dance_action_step[2];
+EvtWord dance_action_turn_sub[108];
+EvtWord peach_dance_action_turn[12];
+EvtWord peach_dance_action_reverse[18];
+EvtWord peach_dance_action_fail[28];
+EvtWord dance_btn_disp_sub[49];
+EvtWord dance_btn_disp[25];
+EvtWord dance_btn_batu[20];
+EvtWord dance_btn_clear[56];
+EvtWord dance_btn_clear_all[47];
+EvtWord wait_action_time[16];
+EvtWord peach_dance_dark[27];
+EvtWord peach_dance_light[27];
+EvtWord peach_evt_dance[VERSION_PICK(504, 521)];
+static EvtWord peach_evt_stg2[900];
+static EvtWord peach_evt_stg3[352];
+static EvtWord peach_evt_stg3_1[650];
 s32 peach_evt_stg4_quiz_data[5][4];
-static s32 peach_evt_stg4[980];
-static s32 peach_evt_stg5[408];
-static s32 peach_evt_stg5_1[528];
-static s32 peach_evt_stg6[1467];
-static s32 teshita1_init[9];
-static s32 teshita2_init[9];
-static s32 syuryo_init[9];
+static EvtWord peach_evt_stg4[980];
+static EvtWord peach_evt_stg5[408];
+static EvtWord peach_evt_stg5_1[528];
+static EvtWord peach_evt_stg6[1467];
+static EvtWord teshita1_init[9];
+static EvtWord teshita2_init[9];
+static EvtWord syuryo_init[9];
 static NpcSetupInfo npcEnt[4];
-s32 tec_talk[36];
-s32 aji_17_init_evt[VERSION_PICK(253, 255)];
+EvtWord tec_talk[36];
+EvtWord aji_17_init_evt[VERSION_PICK(253, 255)];
 
 #pragma defer_codegen off
 s32 peach_evt_stg4_read_quiz_data(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 no = evtGetValue(event, args[0]);
 
     evtSetValue(event, args[1], peach_evt_stg4_quiz_data[no][0]);
@@ -356,7 +356,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 static s32 viewport(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 w = evtGetFloat(event, args[2]);
@@ -3576,7 +3576,7 @@ s32 horogram_init(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 horogram_flag_onoff(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 mask = evtGetValue(event, args[1]);
 
@@ -3589,7 +3589,7 @@ s32 horogram_flag_onoff(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 get_center(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetFloat(event, args[0], dance_dt.cx);
     evtSetFloat(event, args[1], dance_dt.cy);
@@ -3631,7 +3631,7 @@ s32 dance_data_init(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 dance_flag_onoff(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 mask = evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
 
@@ -3644,7 +3644,7 @@ s32 dance_flag_onoff(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 dance_flag_check(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 mask = evtGetValue(event, args[0]);
 
     if (dance_dt.flags & mask) {
@@ -3665,7 +3665,7 @@ s32 dance_reverse(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 move_center(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x0 = evtGetFloat(event, args[0]);
     f32 z0 = evtGetFloat(event, args[1]);
     f32 x1 = evtGetFloat(event, args[2]);
@@ -3696,7 +3696,7 @@ s32 move_center(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 compute_move_pos(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     if (!(dance_dt.flags & 1)) {
         dance_dt.movePos = (dance_dt.movePos + 1) % 15;
@@ -3711,7 +3711,7 @@ s32 compute_move_pos(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 compute_peach_pos(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 z = evtGetFloat(event, args[1]);
     f32 s = sin(dance_dt.rot);
@@ -3723,7 +3723,7 @@ s32 compute_peach_pos(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 compute_horogram_pos(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 z = evtGetFloat(event, args[1]);
     f32 s = sin(dance_dt.rot);
@@ -3747,7 +3747,7 @@ s32 wait_move_end(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 btn_check(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 dir = evtGetValue(event, args[0]);
     u32 btn = keyGetButtonTrg(0);
     s32 a = btn & 0x100;
@@ -3788,7 +3788,7 @@ s32 btn_check(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 set_npc_pos(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -3807,7 +3807,7 @@ s32 peach_dance_after_fail(EventEntry* event, BOOL isFirstCall) {
 }
 
 s32 evt_fuki_btn(EventEntry* event, BOOL isFirstCall) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     const char* name = (const char*)evtGetValue(event, args[1]);
     const char* npcName = (const char*)evtGetValue(event, args[2]);

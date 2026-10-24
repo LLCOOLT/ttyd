@@ -167,53 +167,53 @@ f32 fd_jin_00___local_3PIO2_368;
 f32 fd_jin_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_jin_00___local_PIO2_367;
 f32 fd_jin_00_one_364;
-static s32 w_open[22];
-static s32 w_close[22];
-s32 n3_open[12];
-s32 n3_close[12];
-static s32 s_open[12];
-static s32 s_close[12];
-static s32 n2_open[12];
-static s32 n2_close[12];
-s32 e3_open[12];
-s32 e3_close[12];
-s32 e1_open[12];
-s32 e1_close[12];
-s32 e2_open[12];
-s32 e2_close[12];
-s32 jin_00_dai[16];
-s32 jin_00_dai_in_sub[83];
-s32 jin_00_dai_in[9];
-static s32 check_roll[16];
-s32 teresa_n_fadein[48];
-s32 teresa_n_fadeout[35];
-s32 door_teresa_n[90];
-s32 teresa_s_fadein[48];
-s32 teresa_s_fadeout[35];
-s32 door_teresa_s[90];
+static EvtWord w_open[22];
+static EvtWord w_close[22];
+EvtWord n3_open[12];
+EvtWord n3_close[12];
+static EvtWord s_open[12];
+static EvtWord s_close[12];
+static EvtWord n2_open[12];
+static EvtWord n2_close[12];
+EvtWord e3_open[12];
+EvtWord e3_close[12];
+EvtWord e1_open[12];
+EvtWord e1_close[12];
+EvtWord e2_open[12];
+EvtWord e2_close[12];
+EvtWord jin_00_dai[16];
+EvtWord jin_00_dai_in_sub[83];
+EvtWord jin_00_dai_in[9];
+static EvtWord check_roll[16];
+EvtWord teresa_n_fadein[48];
+EvtWord teresa_n_fadeout[35];
+EvtWord door_teresa_n[90];
+EvtWord teresa_s_fadein[48];
+EvtWord teresa_s_fadeout[35];
+EvtWord door_teresa_s[90];
 BeroEntry bero_stg4majo3nin[1];
 static BeroEntry bero_entry_data[10];
-s32 first_jin00[69];
-static s32 push_evt[297];
-s32 nopush_evt[5];
-static s32 evt_key[5];
+EvtWord first_jin00[69];
+static EvtWord push_evt[297];
+EvtWord nopush_evt[5];
+static EvtWord evt_key[5];
 static s32 lock_tbl[2];
-static s32 lock_item_check[23];
-static s32 evt_unlock[10];
-s32 tyuou_teresa_kusukusu[42];
-s32 tyuou_teresa_look_mario[14];
-s32 tyuou_teresa_init[35];
-s32 tyuou_teresa_talk[391];
-s32 oku_teresa_init[21];
-s32 temae_teresa_init[21];
-s32 atomic_teresa_init[2];
+static EvtWord lock_item_check[23];
+static EvtWord evt_unlock[10];
+EvtWord tyuou_teresa_kusukusu[42];
+EvtWord tyuou_teresa_look_mario[14];
+EvtWord tyuou_teresa_init[35];
+EvtWord tyuou_teresa_talk[391];
+EvtWord oku_teresa_init[21];
+EvtWord temae_teresa_init[21];
+EvtWord atomic_teresa_init[2];
 static NpcSetupInfo npcEnt[12];
 static ExtTexInfo senteresa_ext_entry_data[47];
-s32 senteresa_evt[1248];
-s32 jin_00_init_evt[221];
+EvtWord senteresa_evt[1248];
+EvtWord jin_00_init_evt[221];
 
 USER_FUNC(get_npc_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, args[0]));
 
     evtSetValue(event, args[1], npc->color.r);
@@ -1742,7 +1742,7 @@ static void senteresa_ext_shadow_disp(void) {
 }
 
 USER_FUNC(senteresa_get_seq) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 i = evtGetValue(event, args[0]);
 
     evtSetValue(event, args[1], pTeresa[i].seq);
@@ -1750,7 +1750,7 @@ USER_FUNC(senteresa_get_seq) {
 }
 
 USER_FUNC(senteresa_get_random_position) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     ExtdrvPose* pose = extGetPosePtr();
     s32 n = extGetPoseNum();
 
@@ -2324,7 +2324,7 @@ USER_FUNC(senteresa_wait_end_seq) {
 }
 
 USER_FUNC(senteresa_get_rot_center) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
 
     evtSetValue(event, args[0], g_vecRotCenter.x);
     evtSetValue(event, args[1], g_vecRotCenter.y);
@@ -2345,7 +2345,7 @@ USER_FUNC(senteresa_mario_spd) {
 }
 
 USER_FUNC(teresa_eff) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);

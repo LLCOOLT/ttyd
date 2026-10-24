@@ -1,11 +1,12 @@
 #pragma once
 
 #include <dolphin/types.h>
+#include "evt/evt_word.h"
 #include "manager/evtmgr.h"
 
 s32 evtmgrCmd(EventEntry* entry);
-s32 evtGetValue(EventEntry* entry, s32 index);
-s32 evtGetNumber(EventEntry* entry, s32 index);
-s32 evtSetValue(EventEntry* entry, s32 index, s32 value);
-f32 evtGetFloat(EventEntry* entry, s32 index);
-f32 evtSetFloat(EventEntry* entry, s32 index, f32 value);
+EvtWord evtGetValue(EventEntry* entry, EvtWord index);
+EvtWord evtGetNumber(EventEntry* entry, EvtWord index);
+EvtWord evtSetValue(EventEntry* entry, EvtWord index, EvtWord value);
+f32 evtGetFloat(EventEntry* entry, EvtWord index);
+f32 evtSetFloat(EventEntry* entry, EvtWord index, f32 value);

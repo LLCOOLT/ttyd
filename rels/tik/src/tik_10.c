@@ -34,8 +34,8 @@ f32 fd_tik_10_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tik_10___local_PIO2_367;
 f32 fd_tik_10_one_364;
 static BeroEntry bero_entry_data[4];
-static s32 item_get00[34];
-s32 tik_10_init_evt[44];
+static EvtWord item_get00[34];
+EvtWord tik_10_init_evt[44];
 
 f32 fd_tik_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

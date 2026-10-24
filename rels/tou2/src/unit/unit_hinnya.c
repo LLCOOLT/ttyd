@@ -44,11 +44,11 @@ static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_hannya_attack;
 static PoseTableEntry pose_table[18];
-static s32 init_event[25];
-static s32 dmg_avoid_counter_thorn_head_event[68];
-static s32 damage_event[10];
-static s32 attack_event[455];
-static s32 wait_event[6];
+static EvtWord init_event[25];
+static EvtWord dmg_avoid_counter_thorn_head_event[68];
+static EvtWord damage_event[10];
+static EvtWord attack_event[455];
+static EvtWord wait_event[6];
 
 f32 fd_hinnya_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

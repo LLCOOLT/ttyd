@@ -62,38 +62,38 @@ USER_FUNC(_check_at_dm_event_wait);
 USER_FUNC(_disable_restore_command_cursor);
 
 #ifdef VERSION_G8ME01
-s32 subsetevt_dead[612];
+EvtWord subsetevt_dead[612];
 #else
-s32 subsetevt_dead[608];
+EvtWord subsetevt_dead[608];
 #endif
-s32 subsetevt_dead_core[193];
-s32 subsetevt_dead_core_nospin_norotate[125];
-s32 btldefaultevt_avoid_guard[92];
-s32 subsetevt_damage[979];
-s32 subsetevt_counter_damage[174];
-s32 btldefaultevt_ChangePosition[186];
-s32 subsetevt_happy_heart[53];
-s32 subsetevt_happy_flower[53];
-s32 subsetevt_terror[51];
-s32 subsetevt_blow_damage[69];
-s32 subsetevt_blow_dead[76];
-s32 subsetevt_shot_damage[31];
-s32 subsetevt_shot_damage_kaiten[288];
-s32 subsetevt_shot_damage_ultra[429];
-s32 subsetevt_swallow_failed_damage[55];
-s32 subsetevt_swallow_spew_damage[55];
-s32 subsetevt_swallow_shot_damage[342];
-s32 subset_ultra_hammer_acrobat_damage_event[63];
-s32 subsetevt_confuse_flustered[43];
-s32 subsetevt_binta_damage_left[48];
-s32 subsetevt_binta_damage_right[48];
-s32 subsetevt_binta_damage_left_last[69];
-s32 subsetevt_binta_damage_right_last[69];
-s32 subsetevt_status_recovery[48];
-s32 subsetevt_check_target_movable[57];
-s32 subsetevt_nodamage_motion[6];
-s32 subsetevt_regeneration[4];
-s32 subset_attack_ready_jump_event[2];
+EvtWord subsetevt_dead_core[193];
+EvtWord subsetevt_dead_core_nospin_norotate[125];
+EvtWord btldefaultevt_avoid_guard[92];
+EvtWord subsetevt_damage[979];
+EvtWord subsetevt_counter_damage[174];
+EvtWord btldefaultevt_ChangePosition[186];
+EvtWord subsetevt_happy_heart[53];
+EvtWord subsetevt_happy_flower[53];
+EvtWord subsetevt_terror[51];
+EvtWord subsetevt_blow_damage[69];
+EvtWord subsetevt_blow_dead[76];
+EvtWord subsetevt_shot_damage[31];
+EvtWord subsetevt_shot_damage_kaiten[288];
+EvtWord subsetevt_shot_damage_ultra[429];
+EvtWord subsetevt_swallow_failed_damage[55];
+EvtWord subsetevt_swallow_spew_damage[55];
+EvtWord subsetevt_swallow_shot_damage[342];
+EvtWord subset_ultra_hammer_acrobat_damage_event[63];
+EvtWord subsetevt_confuse_flustered[43];
+EvtWord subsetevt_binta_damage_left[48];
+EvtWord subsetevt_binta_damage_right[48];
+EvtWord subsetevt_binta_damage_left_last[69];
+EvtWord subsetevt_binta_damage_right_last[69];
+EvtWord subsetevt_status_recovery[48];
+EvtWord subsetevt_check_target_movable[57];
+EvtWord subsetevt_nodamage_motion[6];
+EvtWord subsetevt_regeneration[4];
+EvtWord subset_attack_ready_jump_event[2];
 
 #ifdef VERSION_G8ME01
 EVT_BEGIN(subsetevt_dead)
@@ -2193,7 +2193,7 @@ USER_FUNC(_check_at_dm_event_wait) {
 
 USER_FUNC(_add_star_point_disp_offset) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id;
     BattleUnit* unit;
     s32 xi, yi, zi;
@@ -2231,7 +2231,7 @@ USER_FUNC(_set_hp_gauge_fade_flag) {
 
 USER_FUNC(_check_through_pos) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, *args++);
     s32 pos = evtGetValue(event, *args++);
     s32 a = evtGetValue(event, *args++);
@@ -2268,7 +2268,7 @@ USER_FUNC(_check_through_pos) {
 
 USER_FUNC(_binta_effect) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, *args++);
     s32 dir = evtGetValue(event, *args++);
     BattleUnit* unit;

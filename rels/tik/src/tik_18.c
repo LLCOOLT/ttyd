@@ -35,9 +35,9 @@ f32 fd_tik_18_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_tik_18___local_PIO2_367;
 f32 fd_tik_18_one_364;
 static BeroEntry bero_entry_data[5];
-s32 tik_18_cloud_evt[5];
+EvtWord tik_18_cloud_evt[5];
 static HitDamageReturn hitDmgRetPoints[13];
-s32 tik_18_init_evt[96];
+EvtWord tik_18_init_evt[96];
 
 f32 fd_tik_18_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 

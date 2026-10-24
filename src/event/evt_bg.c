@@ -15,7 +15,7 @@ USER_FUNC(evt_bg_disp_onoff) {
 
 // u8 r, u8 g, u8 b, u8 a
 USER_FUNC(evt_bg_set_color) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 r, g, b, a;
 
     r = evtGetValue(event, args[0]);
@@ -39,7 +39,7 @@ USER_FUNC(evt_bg_auto_scroll_onoff) {
 
 // f32 x, f32 y
 USER_FUNC(evt_bg_set_scrl_offset) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     f32 x, y;
 
     x = evtGetFloat(event, args[0]);

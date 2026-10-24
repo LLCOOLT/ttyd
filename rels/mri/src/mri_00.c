@@ -160,53 +160,53 @@ f32 fd_mri_00_one_negone_359[2] __attribute__((aligned(8)));
 f32 fd_mri_00___local_PIO2_367;
 f32 fd_mri_00_one_364;
 static s16 puni_rand_position[196];
-s32 mario_see_you_init[54];
+EvtWord mario_see_you_init[54];
 static f32 spline_dt[24];
-s32 seal_bigtree[213];
-s32 seal_bigtree2[143];
-static s32 guide_init[72];
-static s32 guide_talk[29];
-static s32 rival_init[21];
-static s32 rival_talk[8];
-static s32 chibitoge_init[25];
-static s32 chibitoge_talk[60];
-static s32 sister_init[21];
-static s32 sister_talk[8];
-static s32 elder_init[21];
-static s32 elder_talk[8];
-static s32 fabio_init[20];
-static s32 fabio_talk[20];
-static s32 odoriko_1_talk[20];
-static s32 odoriko_1_init[33];
-static s32 odoriko_2_talk[20];
-static s32 odoriko_2_init[33];
-static s32 odoriko_3_talk[20];
-static s32 odoriko_3_init[33];
+EvtWord seal_bigtree[213];
+EvtWord seal_bigtree2[143];
+static EvtWord guide_init[72];
+static EvtWord guide_talk[29];
+static EvtWord rival_init[21];
+static EvtWord rival_talk[8];
+static EvtWord chibitoge_init[25];
+static EvtWord chibitoge_talk[60];
+static EvtWord sister_init[21];
+static EvtWord sister_talk[8];
+static EvtWord elder_init[21];
+static EvtWord elder_talk[8];
+static EvtWord fabio_init[20];
+static EvtWord fabio_talk[20];
+static EvtWord odoriko_1_talk[20];
+static EvtWord odoriko_1_init[33];
+static EvtWord odoriko_2_talk[20];
+static EvtWord odoriko_2_init[33];
+static EvtWord odoriko_3_talk[20];
+static EvtWord odoriko_3_init[33];
 static NpcSetupInfo npcEnt[7];
-static s32 bero_01_doa_close[7];
-static s32 bero_01_doa_open[7];
-static s32 first_time_w_bero[18];
-s32 out_ne_bero[44];
-static s32 out_w_bero[12];
-s32 out_dokan_1[30];
+static EvtWord bero_01_doa_close[7];
+static EvtWord bero_01_doa_open[7];
+static EvtWord first_time_w_bero[18];
+EvtWord out_ne_bero[44];
+static EvtWord out_w_bero[12];
+EvtWord out_dokan_1[30];
 BeroEntry bero_lostitem[1];
 static BeroEntry bero_entry_data[4];
-s32 first_bigtree[99];
+EvtWord first_bigtree[99];
 static const char* capturemap[4];
-static s32 evt_cloud_main_evt[4];
+static EvtWord evt_cloud_main_evt[4];
 f32 guide_move_data[15];
-s32 open_bigtree[446];
-s32 mario_see_you[210];
-s32 puni_set[59];
-static s32 sekai_yami_npc[59];
-s32 sekai_yami_puni[70];
-static s32 sekai_yami_evt[322];
-static s32 minnnanokoe_evt[620];
-static s32 evt_switch_init[17];
+EvtWord open_bigtree[446];
+EvtWord mario_see_you[210];
+EvtWord puni_set[59];
+static EvtWord sekai_yami_npc[59];
+EvtWord sekai_yami_puni[70];
+static EvtWord sekai_yami_evt[322];
+static EvtWord minnnanokoe_evt[620];
+static EvtWord evt_switch_init[17];
 #ifdef VERSION_G8ME01
-s32 mri_00_init_evt[377];
+EvtWord mri_00_init_evt[377];
 #else
-s32 mri_00_init_evt[296];
+EvtWord mri_00_init_evt[296];
 #endif
 
 static void _img_alloc_capture(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7) {
@@ -1041,7 +1041,7 @@ USER_FUNC(evt_mri_cloud_init) {
 }
 
 USER_FUNC(evt_mri_cloud_ent) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     char** groups;
     char* hitName;
     void* endEvt;
@@ -1267,7 +1267,7 @@ static USER_FUNC(yami_view) {
 }
 
 static USER_FUNC(anim_tevcallback) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 flag = evtGetValue(event, args[1]);
     NpcEntry* npc = npcNameToPtr_NoAssert(name);
@@ -1280,7 +1280,7 @@ static USER_FUNC(anim_tevcallback) {
 }
 
 USER_FUNC(get_puni_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 x;
     s32 z;
@@ -1295,7 +1295,7 @@ USER_FUNC(get_puni_pos) {
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 
 static USER_FUNC(starstone_entry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -1306,7 +1306,7 @@ static USER_FUNC(starstone_entry) {
 }
 
 static USER_FUNC(starstone_set_pos) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -1320,7 +1320,7 @@ static USER_FUNC(starstone_set_pos) {
 }
 
 static USER_FUNC(starstone_set_ry) {
-    s32* args = event->args;
+    EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 ry = evtGetFloat(event, args[1]);
 
