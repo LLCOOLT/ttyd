@@ -1002,6 +1002,17 @@ asm void* memcpy_as4(void* dest, const void* src, u32 count) {
 	bdnz    @0
 	blr
 }
+#else
+// the same word copy in C
+void* memcpy_as4(void* dest, const void* src, u32 count) {
+	u32* d = (u32*)dest;
+	const u32* s = (const u32*)src;
+	u32 n = count >> 2;
+	while (n--) {
+		*d++ = *s++;
+	}
+	return dest;
+}
 #endif
 // clang-format on
 

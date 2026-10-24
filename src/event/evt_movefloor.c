@@ -381,7 +381,7 @@ USER_FUNC(evt_moving_floor_init) {
 USER_FUNC(evt_moving_floor_main) {
 	s32* args = event->args;
 	MovingFloor* w = GETW();
-	s32 us = (((u32)event->lifetime - (u32)w->start) * 8) / ((*(u32*)0x800000F8 >> 2) / 125000);
+	s32 us = (((u32)event->lifetime - (u32)w->start) * 8) / (OS_TIMER_CLOCK / 125000);
 	f32 t = (f32)us;
 	w->pos += w->speed * t / 1000.0f;
 	w->cur += t / 1000.0f;

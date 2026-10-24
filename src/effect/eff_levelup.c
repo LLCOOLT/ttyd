@@ -231,9 +231,9 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     for (j = 1, xofs = 4; j >= 0; j--, xofs -= 4) {
 #ifdef VERSION_G8ME01
-        for (i = effect->count - 1, ofs = i * 0x24, tofs = i * 4; i >= 1; ofs -= 0x24, tofs -= 4, i--) {
+        for (i = effect->count - 1, ofs = i * sizeof(EffLevelupWork), tofs = i * sizeof(s32); i >= 1; ofs -= sizeof(EffLevelupWork), tofs -= sizeof(s32), i--) {
 #else
-        for (i = effect->count - 1, ofs = i * 0x24, tofs = i * 4; i >= 1; i--, ofs -= 0x24, tofs -= 4) {
+        for (i = effect->count - 1, ofs = i * sizeof(EffLevelupWork), tofs = i * sizeof(s32); i >= 1; i--, ofs -= sizeof(EffLevelupWork), tofs -= sizeof(s32)) {
 #endif
             w = effect->userdata;
             (u8*)w += ofs;
@@ -241,18 +241,18 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
             dy = -j * 4;
             if (j != 0) {
 #ifdef VERSION_G8ME01
-                effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language] + tofs + 8), &texObj);
+                effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language] + tofs + 2 * sizeof(s32)), &texObj);
 #else
-                effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language != 0] + tofs + 8), &texObj);
+                effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language != 0] + tofs + 2 * sizeof(s32)), &texObj);
 #endif
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 color = (GXColor){ 0, 0, 0, 0x80 };
                 GXSetChanMatColor(GX_COLOR0A0, color);
             } else {
 #ifdef VERSION_G8ME01
-                effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language] + tofs - 4), &texObj);
+                effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language] + tofs - sizeof(s32)), &texObj);
 #else
-                effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language != 0] + tofs - 4), &texObj);
+                effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language != 0] + tofs - sizeof(s32)), &texObj);
 #endif
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
@@ -265,7 +265,7 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
             GXLoadPosMtxImm(m0, GX_PNMTX0);
             GXSetCurrentMtx(GX_PNMTX0);
 #ifdef VERSION_G8ME01
-            effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language] + tofs - 4), &texObj2);
+            effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language] + tofs - sizeof(s32)), &texObj2);
             width = GXGetTexObjWidth(&texObj2);
             height = GXGetTexObjHeight(&texObj2);
             if ((u32)gp->language == 3) {

@@ -1,4 +1,5 @@
 /* Original TU name unknown; separate object after eff_ultra_hammer in the retail DOL. */
+#include "hwaccess.h"
 #include "memory.h"
 #include "system.h"
 #include "sdk/DEMOInit.h"
@@ -49,13 +50,7 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 		psndExit();
 #if defined(VERSION_G8ME01) && defined(__MWERKS__)
 		// US: same MSR enable sequence as below (original inline asm), then halt
-		asm{
-			mfmsr	r5
-			ori		r5, r5, 0x8000
-			ori		r5, r5, 2
-			mtmsr	r5
-			isync
-		};
+		HW_ENABLE_MSR_FP_RI();
 		PPCHalt();
 #endif
 		while (1) {} //softlock
@@ -113,15 +108,7 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 	scroll = 0;
 #endif
 	OSFillFPUContext(context);
-#ifdef __MWERKS__
-	asm{
-		mfmsr	r5
-		ori		r5, r5, 0x8000
-		ori		r5, r5, 2
-		mtmsr	r5
-		isync
-	};
-#endif
+	HW_ENABLE_MSR_FP_RI();
 	L_smartReInit();
 	if (OSGetFontEncode() == OS_FONT_ENCODE_SJIS) {
 		fontHeader = smartAlloc(OS_FONT_SIZE_SJIS, 0)->address;

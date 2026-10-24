@@ -1,4 +1,5 @@
 #include "driver/effdrv.h"
+#include "hwaccess.h"
 #include <dolphin/os/OSFastCast.h>
 #include "driver/arcdrv.h"
 #include "eff/eff_n64.h"
@@ -397,7 +398,7 @@ static inline void effMayaKeyInterp(MayaKey* prev, MayaKey* curr, f32 t, f32* bu
 static inline void effMayaSetGQR(void) {
 	register u32 gqr;
 	gqr = 0x06070607;
-	asm { mtspr GQR5, gqr }
+	HW_SET_GQR5(gqr);
 }
 
 void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alpha) {

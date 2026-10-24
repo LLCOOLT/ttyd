@@ -1582,7 +1582,7 @@ void BtlUnit_SetParamFromPouch(BattleUnit* unit) {
         BtlUnit_ReviseHpFp(unit);
     }
     else if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
-        unit->currentHp = *(s16*)((u8*)pouch + BattleTransPartyId(unit->currentKind) * 0xE + 6);
+        unit->currentHp = *(s16*)((u8*)pouch->partyData + BattleTransPartyId(unit->currentKind) * sizeof(PouchPartyData) + offsetof(PouchPartyData, currentHP)); // FAKE: byte-offset load so the field offset folds into the index (mulli/addi/lhax), as in the target
         BtlUnit_ReviseHpFp(unit);
         info = &wp->partyInfo[unit->currentKind - TYPE_PARTNER_MIN];
         unit->mSizeMultiplier = info->sizeMultiplier;

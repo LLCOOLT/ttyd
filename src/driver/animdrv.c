@@ -894,7 +894,7 @@ void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset) {
     animPosePaperAnimId(pose) = idx;
     pose->mLocalTimeInit = animTimeGetTime(pose->type);
     id = pose->paperId;
-    if (id != -1 && !(*(u32*)((u8*)wp->poses + id * sizeof(AnimationPose) + 4) & 2)) {
+    if (id != -1 && !(*(u32*)((u8*)wp->poses + id * sizeof(AnimationPose) + offsetof(AnimationPose, typeFlags)) & 2)) { // FAKE: byte-offset load so the typeFlags offset folds into the index (mulli/addi/lwzx), as in the target
         animPoseMain(pose->paperId);
     }
 }

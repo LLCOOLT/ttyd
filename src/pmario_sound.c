@@ -6817,8 +6817,8 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 r6) {
 	fade = &psnd.fade[idx];
 	if (psnd.flags & 2) return FALSE;
 	// FAKE: env as a byte-offset sum (same address as &psnd.envId[idx]) so the add feeds an lhzu as in the target;
-	// the idx*2 offset is a named local o (declared after fade) shared with the unk1C/envFreq stores (same addresses)
-	o = idx * 2;
+	// the idx * sizeof(u16) offset is a named local o (declared after fade) shared with the unk1C/envFreq stores (same addresses)
+	o = idx * sizeof(u16);
 	env = (u16*)((u8*)psnd.envId + o);
 	if ((cur = *env) != 0) {
 		if (!(flags & 0x10)) {

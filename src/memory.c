@@ -136,7 +136,7 @@ static inline void mapallocInit(void) {
 	MapAllocEntry* entry;
 	u32 total;
 
-	size = (u32)heapEnd[1] - (u32)heapStart[1] - 0x20;
+	size = (u32)heapEnd[1] - (u32)heapStart[1] - sizeof(MapAllocEntry);
 	mapalloc_size = size;
 	entry = OSAllocFromHeap(heapHandle[HEAP_MALLOC], size);
 	if (entry) {
@@ -146,7 +146,7 @@ static inline void mapallocInit(void) {
 	total = mapalloc_size;
 	mapalloc_base_ptr = entry;
 	entry->next = NULL;
-	entry->size = total - 0x20;
+	entry->size = total - sizeof(MapAllocEntry);
 	entry->inuse = 0;
 }
 #else
@@ -154,14 +154,14 @@ static inline void mapallocInit(void) {
 	MapAllocEntry* entry;
 	u32 size;
 
-	size = (u32)heapEnd[1] - (u32)heapStart[1] - 0x20;
+	size = (u32)heapEnd[1] - (u32)heapStart[1] - sizeof(MapAllocEntry);
 	entry = OSAllocFromHeap(heapHandle[HEAP_MALLOC], size);
 	if (entry) {
 		memset(entry, 0, size);
 		DCFlushRange(entry, size);
 	}
 	entry->next = NULL;
-	entry->size = size - 0x20;
+	entry->size = size - sizeof(MapAllocEntry);
 	entry->inuse = 0;
 	mapalloc_base_ptr = entry;
 	mapalloc_size = size;
@@ -202,7 +202,7 @@ void N_battleMapAlloc(void) {
 	size = R_battlemapalloc_size;
 	R_battlemapalloc_base_ptr = entry;
 	entry->next = NULL;
-	entry->size = size - 0x20;
+	entry->size = size - sizeof(MapAllocEntry);
 	entry->inuse = 0;
 }
 
@@ -218,7 +218,7 @@ void* (_mapAlloc)(MAPBASE_PARAM u32 size) {
 	MapAllocEntry* tailEntry; //make sure we don't lose when inserting, might need better name
 	MapAllocEntry* currEntry; //one we're allocating
 	void* usableData; //memory caller can actually use
-	u32 usableSize; //size minus 0x20 header
+	u32 usableSize; //size minus the MapAllocEntry header
 	u32 maxSize; //used to update latest tail
 	u32 fullSize; //size including header
 
@@ -227,7 +227,7 @@ void* (_mapAlloc)(MAPBASE_PARAM u32 size) {
 		return NULL;
 	}
 	entry = MAPBASE;
-	fullSize = usableSize + 0x20;
+	fullSize = usableSize + sizeof(MapAllocEntry);
 	maxSize = 0;
 	tailEntry = 0;
 	while (1) {
@@ -276,14 +276,14 @@ void* (_mapAllocTail)(MAPBASE_PARAM u32 size) {
 	//void* usableData; //memory caller can actually use
 	u32 maxSize; //used to update latest tail
 	u32 fullSize; //size including header
-	u32 usableSize; //size minus 0x20 header
+	u32 usableSize; //size minus the MapAllocEntry header
 
 	usableSize = OSRoundUp32B(size);
 	if (!usableSize) {
 		return NULL;
 	}
 	entry = MAPBASE;
-	fullSize = usableSize + 0x20;
+	fullSize = usableSize + sizeof(MapAllocEntry);
 	maxSize = 0;
 	tailEntry = 0;
 	while (1) {
@@ -334,19 +334,19 @@ void (_mapFree)(MAPBASE_PARAM void* alloc) {
 	MapAllocEntry* entry;
 
 	if (!alloc) return;
-	entry = (MapAllocEntry*)((u32)alloc - 0x20);
+	entry = (MapAllocEntry*)alloc - 1;
 	if (!entry->inuse) return;
 	nextEntry = entry->next;
 	newSize = entry->size;
 	if (nextEntry && !nextEntry->inuse) {
-		newSize += nextEntry->size + 0x20;
+		newSize += nextEntry->size + sizeof(MapAllocEntry);
 		nextEntry = nextEntry->next;
 	}
 	loopEntry = MAPBASE;
 	while (1) {
 		if (loopEntry->next == entry) {
 			if (!loopEntry->inuse) {
-				newSize += loopEntry->size + 0x20;
+				newSize += loopEntry->size + sizeof(MapAllocEntry);
 				entry = loopEntry;
 			}
 			break;

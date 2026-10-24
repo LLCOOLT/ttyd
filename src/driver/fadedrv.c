@@ -1257,7 +1257,7 @@ BOOL fadeIsFinish(void) {
 	if (wp->lastEntryId == -1) {
 		return TRUE;
 	}
-	return (*(u16*)((u8*)wp + wp->lastEntryId * sizeof(FadeEntry) + 8) >> 1) & 1;
+	return (*(u16*)((u8*)wp + wp->lastEntryId * sizeof(FadeEntry) + offsetof(FadeWork, entries[0].flags)) >> 1) & 1; // FAKE: byte-offset load so the entries offset folds into the index (mulli/addi/lhzx), as in the target
 }
 
 void fadeReset(s32 id) { //TODO: better param name?

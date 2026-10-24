@@ -998,7 +998,7 @@ void SoundEfxSetVolume(s32 chan, u8 vol) {
 
 u8 SoundEfxGetVolume(s32 chan) {
     s32 off = chan * sizeof(SoundEffect);
-    return (u8)*(u16*)((u8*)sound.effects + off + 4);
+    return (u8)*(u16*)((u8*)sound.effects + off + offsetof(SoundEffect, vol)); // FAKE: byte-offset load from the chan * sizeof offset (sound.effects[chan].vol schedules differently)
 }
 
 void SoundEfxSetAux1(s32 chan, u8 reverb) {
@@ -1021,7 +1021,7 @@ void SoundEfxSetPan(s32 chan, u8 pan) {
     SND_VOICEID vid;
     s32 off = chan * sizeof(SoundEffect);
 
-    *(u16*)((u8*)sound.effects + off + 6) = pan;
+    *(u16*)((u8*)sound.effects + off + offsetof(SoundEffect, pan)) = pan; // FAKE: byte-offset store, then sfx from the same offset (sfx = &sound.effects[chan]; sfx->pan = pan does not match)
     sfx = (SoundEffect*)((u8*)sound.effects + off);
     if (sfx->flags & 0x10) {
         vid = sndFXCheck(sndEmitterVoiceID(&sfx->emitter));
@@ -1039,7 +1039,7 @@ void SoundEfxSetSrndPan(s32 chan, u8 span) {
     s32 doppler;
     s32 off = chan * sizeof(SoundEffect);
 
-    *(u16*)((u8*)sound.effects + off + 8) = span;
+    *(u16*)((u8*)sound.effects + off + offsetof(SoundEffect, span)) = span; // FAKE: byte-offset store, then sfx from the same offset (sfx = &sound.effects[chan]; sfx->span = span does not match)
     sfx = (SoundEffect*)((u8*)sound.effects + off);
     vid = (sfx->flags & 0x10) ? sndFXCheck(sndEmitterVoiceID(&sfx->emitter))
                               : sndFXCheck(sfx->voiceId);

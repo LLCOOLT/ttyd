@@ -282,9 +282,3 @@ s32 BattleTransPartyId(BattleUnitType kind);
 
 BOOL battleDisableHResetCheck(void);
 
-#ifdef VERSION_G8ME01
-/* raw BattleWork offsets (JP) -> US; constant-folds */
-#define BWOFF(off) ((off) + ((off) >= 0x1904C ? 0x10 : (off) >= 0x18D88 ? 0x18 : (off) >= 0x163B8 ? 0x1C : 0))
-#else
-#define BWOFF(off) (off)
-#endif

@@ -141,7 +141,7 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 			}
 			if ((u32)tpl->descriptorArray >= (u32)tpl) {
 				for (i = 0; (u16)i < tpl->numDescriptors; i++) {
-					off = i * 8;
+					off = i * sizeof(TEXDescriptor); // FAKE: descriptor fields read by byte offset; descriptorArray[i].textureHeader/.CLUTHeader swaps the i and scaled-index registers (99.86%)
 					img = *(TEXHeader**)((u8*)tpl->descriptorArray + off);
 					if (img) {
 						if (img->unpacked) {
@@ -151,14 +151,14 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 						}
 						*(u32*)((u8*)tpl->descriptorArray + off) -= (u32)tpl;
 					}
-					pal = *(CLUTHeader**)((u8*)tpl->descriptorArray + off + 4);
+					pal = *(CLUTHeader**)((u8*)tpl->descriptorArray + off + offsetof(TEXDescriptor, CLUTHeader));
 					if (pal) {
 						if (pal->unpacked) {
 							pal->unpacked = FALSE;
-							pal = *(CLUTHeader**)((u8*)tpl->descriptorArray + off + 4);
+							pal = *(CLUTHeader**)((u8*)tpl->descriptorArray + off + offsetof(TEXDescriptor, CLUTHeader));
 							pal->data -= (u32)tpl;
 						}
-						*(u32*)((u8*)tpl->descriptorArray + off + 4) -= (u32)tpl;
+						*(u32*)((u8*)tpl->descriptorArray + off + offsetof(TEXDescriptor, CLUTHeader)) -= (u32)tpl;
 					}
 				}
 				tpl->descriptorArray = (TEXDescriptor*)((u32)tpl->descriptorArray - (u32)tpl);
@@ -333,7 +333,7 @@ if (tpl->versionNumber != 0x0020AF30) {
 if ((u32)tpl->descriptorArray < (u32)tpl) {
 tpl->descriptorArray = (TEXDescriptor*)((u32)tpl->descriptorArray + (u32)tpl);
 for (i = 0; (u16)i < tpl->numDescriptors; i++) {
-off = i * 8;
+off = i * sizeof(TEXDescriptor);
 img = (*(TEXHeader**)((u8*)tpl->descriptorArray + off));
 if (img) {
 (*(TEXHeader**)((u8*)tpl->descriptorArray + off)) = (TEXHeader*)((u32)tpl + (u32)img);
@@ -343,7 +343,7 @@ img2->data = (char*)((u32)tpl + (u32)img2->data);
 (*(TEXHeader**)((u8*)tpl->descriptorArray + off))->unpacked = TRUE;
 }
 }
-off2 = off + 4;
+off2 = off + offsetof(TEXDescriptor, CLUTHeader);
 pal = (*(CLUTHeader**)((u8*)tpl->descriptorArray + off2));
 if (pal) {
 (*(CLUTHeader**)((u8*)tpl->descriptorArray + off2)) = (CLUTHeader*)((u32)tpl + (u32)pal);

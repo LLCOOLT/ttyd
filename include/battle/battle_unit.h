@@ -685,7 +685,11 @@ typedef struct BattleUnit {
     s8 faceDirection;                            // 0x185
     u8 pad_186[0x188 - 0x186];                   // 0x186 (US 0x18A), never accessed
     BecSndWork moveSnd;                          // 0x188 (US 0x18C)
-    u8 pad_1A4[0x1C0 - 0x1A4];                   // 0x1A4 (US 0x1A8), never accessed
+    Vec mJumpStep;                               // 0x1A4 (US 0x1A8), per-frame XZ/Y step of btlevtcmd_MarioJumpPosition
+    f32 mJumpAngle;                              // 0x1B0 (US 0x1B4), arc angle in degrees
+    f32 mJumpAngleStep;                          // 0x1B4 (US 0x1B8), arc angle added per frame
+    f32 mJumpBaseY;                              // 0x1B8 (US 0x1BC), last Y position of the jump
+    u8 pad_1BC[0x1C0 - 0x1BC];                   // 0x1BC (US 0x1C0), never accessed
     BtlPoseSoundTable moveSndTable;              // 0x1C0 (US 0x1C4), jump names + run/walk/dive entries (btlevtcmd_SetJump/Run/Walk/DiveSound)
     BattleWorkHpGauge hpGauge;                   // 0x1F8
     union {
@@ -916,8 +920,3 @@ void BtlUnit_SetParamFromPouch(BattleUnit* unit);
 s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s32 pan);
 BattleUnit* BtlUnit_GetGuardKouraPtr(BattleUnit* unit);
 
-#ifdef VERSION_G8ME01
-#define BUOFF(off) ((off) + ((off) >= 0x13C ? 4 : 0))
-#else
-#define BUOFF(off) (off)
-#endif

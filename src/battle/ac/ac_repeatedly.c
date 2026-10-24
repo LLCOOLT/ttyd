@@ -351,7 +351,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     r = (RepeatWork*)acw->work;
     d = (RepeatDisp*)acw->dispData;
     camGetPtr(8);
-    if (*(s32*)((u8*)r - 0x2BC + 0x38) != 16) {
+    if (acw->params[0] != 16) {
         switch (r->btn0) {
             case 0x100:
                 icon1 = ICON_065;
@@ -455,7 +455,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         flags |= 2;
     }
     BattleAcDrawGauge((s32)x, (s32)y, d->gauge, r->iconParam, 2,
-                      (*(s32*)((u8*)r - 0x2BC + 0x34) & 2) ? 100 : (s32)r->pos, 100, 100, flags);
+                      (acw->acFlags & 2) ? 100 : (s32)r->pos, 100, 100, flags);
     {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = (-288.0f + x) + (176.0f * r->pos) / 100.0f;

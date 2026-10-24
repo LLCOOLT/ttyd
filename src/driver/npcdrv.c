@@ -2051,7 +2051,7 @@ void fbatTalkMode(void) {
     }
 }
 
-#define NPC_ENEMY_LEVEL(npc) (*(u8*)((u8*)*(void**)(npc)->battleInfo.groupSetup->enemyData + 0xE))
+#define NPC_ENEMY_LEVEL(npc) ((npc)->battleInfo.groupSetup->enemyData->mUnitKindParams->mLevel)
 
 void BattleMajinaiDone(void);
 void marioChgMoveMotion(void);
@@ -2235,7 +2235,7 @@ void fbatBattleMode(void) {
                 {
                     int k;
                     stolen = FALSE;
-                    for (k = 0; k < 32; k += 4) {
+                    for (k = 0; k < sizeof(cur->battleInfo.stolenItems); k += sizeof(ItemType)) {
                         if (*(ItemType*)((u8*)cur->battleInfo.stolenItems + k)) {
                             stolen = TRUE;
                             break;

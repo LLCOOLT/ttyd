@@ -1235,7 +1235,7 @@ USER_FUNC(evt_bero_cam3d_change) {
 	cam->storedPos = BeroPT;
 	cam->storedAt = BeroAT;
 	cam->startTimeA = gp->renderTime;
-	cam->durationA = (u32)(time * ((*(u32*)0x800000F8 / 4) / 1000));
+	cam->durationA = (u32)(time * (OS_TIMER_CLOCK / 1000));
 	cam->stateA = 3;
 	cam->curveA = curve;
 	return EVT_RETURN_DONE;
@@ -1289,7 +1289,7 @@ USER_FUNC(evt_camera_change_event_from_road) {
 	cam->storedPos = pt;
 	cam->storedAt = at;
 	cam->startTimeA = gp->renderTime;
-	cam->durationA = (u32)(500 * ((*(u32*)0x800000F8 / 4) / 1000));
+	cam->durationA = (u32)(500 * (OS_TIMER_CLOCK / 1000));
 	cam->stateA = 3;
 	cam->curveA = 11;
 	}

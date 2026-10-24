@@ -43,7 +43,7 @@ One row per commit window, at most 3 per day. Figures come from an objdiff-cli r
 
 ² There were no progress commits from 2026-10-19 16:00 to 2026-10-21. On 2026-10-21 the asm stand-ins were removed, so from this row on every figure counts C only.
 
-³ The US release was ported from the finished Japanese decomp and reached 100% in one step. The Japanese figures stayed at 100%; on 2026-10-23 one data word was briefly mis-typed and then fixed.
+³ The US release was decompiled starting from the finished Japanese decomp and reached 100% in one step. The Japanese figures stayed at 100%; on 2026-10-23 one data word was briefly mis-typed and then fixed.
 
 ## Code-quality cleanup (since 2026-10-23)
 

@@ -153,7 +153,7 @@ void unitwin_help_main(WinMgrEntry* entry) {
 
 void unitwin_help_disp(WinMgrEntry* entry) {
 	UnitWinWork* wp = _wp;
-	s32 idx = wp->goodsIdx * 4;
+	s32 idx = wp->goodsIdx * sizeof(s32); // FAKE: byte offset of the goods slot computed before winMgrAction (slwi ahead of the call, lwzx after), as in the target; goods[wp->goodsIdx] and an index local both scale after the call
 	s32* goods = wp->goods;
 	if (!winMgrAction(wp->winId[1])) {
 		entry->msg = msgSearch(itemDataTable[*(s32*)((u8*)goods + idx)].description);

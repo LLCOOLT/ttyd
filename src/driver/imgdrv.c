@@ -622,7 +622,7 @@ void imgShadowDisp(CameraId camId, void* param) {
 			sc = 1.0f; z = 0.0f;
 		}
 		if (entry->flags & 4) {
-			x0 = ((u16*)&entry->shadows[first])[4]; y0 = ((u16*)&entry->shadows[first])[5]; w = ((u16*)&entry->shadows[first])[6]; h = ((u16*)&entry->shadows[first])[7];
+			x0 = entry->shadows[first].rect.left; y0 = entry->shadows[first].rect.top; w = entry->shadows[first].rect.width; h = entry->shadows[first].rect.height;
 		} else {
 			x0 = entry->shadows[first].x;
 			y0 = entry->shadows[first].y;

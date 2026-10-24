@@ -1,4 +1,5 @@
 #include "driver/hitdrv.h"
+#include "hwaccess.h"
 #include <dolphin/os/OSFastCast.h>
 #include "dolphin/os.h"
 #include "driver/mapdrv.h"
@@ -641,7 +642,7 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                     o2 = (u16)(even ? i1 : i2) * 3;
                     gqr = (wp->entries[hit->mapIndex].vcdTable->posFrac << 8) | 7;
                     gqr |= gqr << 16;
-                    asm { mtspr GQR5, gqr }
+                    HW_SET_GQR5(gqr);
                     a.x = hitDequant(base, o0);
                     a.y = hitDequant(base, o0 + 1);
                     a.z = hitDequant(base, o0 + 2);

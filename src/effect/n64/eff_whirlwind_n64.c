@@ -46,7 +46,7 @@ effN64Vtx eff_whirlwind_v[] = {
 void effWhirlwindMain(EffectEntry* effect);
 void effWhirlwindDisp(CameraId cameraId, EffectEntry* effect);
 
-EffectEntry* effWhirlwindN64Entry(s32 type, WhirlwindTarget* target, f32 scale, s32 life) {
+EffectEntry* effWhirlwindN64Entry(s32 type, MarioWork* target, f32 scale, s32 life) {
     f32 quarter;
     EffectEntry* effect;
     EffWhirlwindN64Work* work;
@@ -105,7 +105,7 @@ EffectEntry* effWhirlwindN64Entry(s32 type, WhirlwindTarget* target, f32 scale, 
                 break;
             default:
                 work->position.x = 0.0f;
-                work->position.y = 0.5f * target->size;
+                work->position.y = 0.5f * target->wPlayerCollisionBox.y;
                 work->position.z = 0.0f;
                 work->vel.x = (rand() % 2 * 2 - 1) * 4;
                 work->vel.y = 0.0f;

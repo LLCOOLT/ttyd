@@ -3519,7 +3519,6 @@ void BattleActionCommandSetDifficulty(BattleWork* wp, BattleUnit* unit, s32 diff
 void BattleAttackDeclareAll(BattleWork* wp);
 void BattleGetFirstAttackUnit(BattleWork* wp, s32* a, BattleUnit** unit);
 void BattleChoiceSamplingEnemy(BattleWorkWeaponTargets* targets, s32 a, s32* b, s32* c);
-#define BEC_FIELD(wp, off, type) (*(type*)((u8*)(wp) + (off)))
 s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s32 pitch, Vec* pos);
 void BtlUnit_SetSeMode(BecSndWork* work, const char* name0, const char* name1, s16 c, s16 e, s16 unused, s16 a, s16 b);
 void psndSFX_pos(s32 id, Vec* pos);
@@ -4347,7 +4346,6 @@ USER_FUNC(btlevtcmd_MarioJumpParam) {
 }
 
 f32 reviseAngle(f32 a);
-#define MJ_F(u, off) BEC_FIELD(u, BUOFF(off), f32)
 USER_FUNC(btlevtcmd_MarioJumpPosition) {
     BattleUnit* unit;
     s32 id, frames, type, kind;
@@ -4395,42 +4393,42 @@ USER_FUNC(btlevtcmd_MarioJumpPosition) {
             if (unit->moveFrames == 0) {
                 return EVT_RETURN_DONE;
             }
-            MJ_F(unit, 0x1A4) = (MJ_F(unit, 0x15C) - MJ_F(unit, 0x150)) / unit->moveFrames;
-            MJ_F(unit, 0x1A8) = (MJ_F(unit, 0x160) - MJ_F(unit, 0x154)) / unit->moveFrames;
-            MJ_F(unit, 0x1AC) = (MJ_F(unit, 0x164) - MJ_F(unit, 0x158)) / unit->moveFrames;
+            unit->mJumpStep.x = (unit->mMoveTargetPos.x - unit->mMoveCurrentPos.x) / unit->moveFrames;
+            unit->mJumpStep.y = (unit->mMoveTargetPos.y - unit->mMoveCurrentPos.y) / unit->moveFrames;
+            unit->mJumpStep.z = (unit->mMoveTargetPos.z - unit->mMoveCurrentPos.z) / unit->moveFrames;
             unit->mMoveSpeedY = 0.0f;
             unit->mFallAccel = 3.14159265f / unit->moveFrames;
             unit->mMoveSpeedXZ = unit->mMoveSpeedXZ + rem / unit->moveFrames;
             if (type < 3) {
-                MJ_F(unit, 0x1B0) = 90.0f;
-                MJ_F(unit, 0x1B4) = 360.0f / unit->moveFrames;
+                unit->mJumpAngle = 90.0f;
+                unit->mJumpAngleStep = 360.0f / unit->moveFrames;
                 t = unit->mMoveDistance - 20.0;
                 t = t / 6.0;
                 t += 47.0;
-                MJ_F(unit, 0x180) = t;
+                unit->mMoveTotalFrames = t;
                 if (type == 2) {
-                    MJ_F(unit, 0x180) *= 1.12; t = MJ_F(unit, 0x180);
-                    MJ_F(unit, 0x180) = t;
+                    unit->mMoveTotalFrames *= 1.12; t = unit->mMoveTotalFrames;
+                    unit->mMoveTotalFrames = t;
                 }
-                MJ_F(unit, 0x1B8) = 0.0f;
-                MJ_F(unit, 0x1B8) = 0.0f;
-                sn = sin(6.28318531f * MJ_F(unit, 0x1B0) / 360.0f);
+                unit->mJumpBaseY = 0.0f;
+                unit->mJumpBaseY = 0.0f;
+                sn = sin(6.28318531f * unit->mJumpAngle / 360.0f);
                 unit->mMoveSpeedY = unit->mMoveSpeedY + unit->mFallAccel * (0.53 * sn + 1.0);
             }
             else {
-                MJ_F(unit, 0x1B0) = 90.0f;
-                MJ_F(unit, 0x1B4) = (f32)(360 / unit->moveFrames);
+                unit->mJumpAngle = 90.0f;
+                unit->mJumpAngleStep = (f32)(360 / unit->moveFrames);
                 t = unit->mMoveDistance - 20.0;
                 t = t / 6.0;
                 t += 47.0;
-                MJ_F(unit, 0x180) = t;
+                unit->mMoveTotalFrames = t;
                 if (type == 4) {
-                    MJ_F(unit, 0x180) *= 1.25; t = MJ_F(unit, 0x180);
-                    MJ_F(unit, 0x180) = t;
+                    unit->mMoveTotalFrames *= 1.25; t = unit->mMoveTotalFrames;
+                    unit->mMoveTotalFrames = t;
                 }
-                MJ_F(unit, 0x1B8) = 0.0f;
-                MJ_F(unit, 0x1B8) = 0.0f;
-                sn = sin(6.28318531f * MJ_F(unit, 0x1B0) / 360.0f);
+                unit->mJumpBaseY = 0.0f;
+                unit->mJumpBaseY = 0.0f;
+                sn = sin(6.28318531f * unit->mJumpAngle / 360.0f);
                 unit->mMoveSpeedY = unit->mMoveSpeedY + unit->mFallAccel * (0.8 * sn + 1.0);
             }
             BtlUnit_LoadSeMode(2, kind, &unit->moveSndTable, &unit->moveSnd);
@@ -4442,36 +4440,36 @@ USER_FUNC(btlevtcmd_MarioJumpPosition) {
     }
     switch ((s8)event->blocked) {
     case 1:
-        unit->mMoveCurrentPos.x += MJ_F(unit, 0x1A4);
-        unit->mMoveCurrentPos.y += MJ_F(unit, 0x1A8);
-        unit->mMoveCurrentPos.z += MJ_F(unit, 0x1AC);
+        unit->mMoveCurrentPos.x += unit->mJumpStep.x;
+        unit->mMoveCurrentPos.y += unit->mJumpStep.y;
+        unit->mMoveCurrentPos.z += unit->mJumpStep.z;
         BtlUnit_GetPos(unit, &x, &y, &z);
-        MJ_F(unit, 0x1B8) = y;
+        unit->mJumpBaseY = y;
         x = unit->mMoveCurrentPos.x;
         sn = sin(unit->mMoveSpeedY);
-        y = MJ_F(unit, 0x180) * sn + unit->mMoveCurrentPos.y;
+        y = unit->mMoveTotalFrames * sn + unit->mMoveCurrentPos.y;
         z = unit->mMoveCurrentPos.z;
         BtlUnit_SetPos(unit, x, y, z);
-        if (MJ_F(unit, 0x160) > y && unit->moveFrames < 3) {
-            y = MJ_F(unit, 0x160);
+        if (unit->mMoveTargetPos.y > y && unit->moveFrames < 3) {
+            y = unit->mMoveTargetPos.y;
             BtlUnit_SetPos(unit, x, y, z);
         }
-        MJ_F(unit, 0x1B8) = y;
+        unit->mJumpBaseY = y;
         if (type < 3) {
-            sn = sin(6.28318531f * MJ_F(unit, 0x1B0) / 360.0f);
+            sn = sin(6.28318531f * unit->mJumpAngle / 360.0f);
                 unit->mMoveSpeedY = unit->mMoveSpeedY + unit->mFallAccel * (0.53 * sn + 1.0);
         }
         else {
-            sn = sin(6.28318531f * MJ_F(unit, 0x1B0) / 360.0f);
+            sn = sin(6.28318531f * unit->mJumpAngle / 360.0f);
                 unit->mMoveSpeedY = unit->mMoveSpeedY + unit->mFallAccel * (0.8 * sn + 1.0);
         }
-        MJ_F(unit, 0x1B0) = MJ_F(unit, 0x1B0) + MJ_F(unit, 0x1B4);
-        MJ_F(unit, 0x1B0) = reviseAngle(MJ_F(unit, 0x1B0));
+        unit->mJumpAngle = unit->mJumpAngle + unit->mJumpAngleStep;
+        unit->mJumpAngle = reviseAngle(unit->mJumpAngle);
         unit->moveFrames--;
         if (unit->moveFrames == 0) {
-            y = MJ_F(unit, 0x160);
+            y = unit->mMoveTargetPos.y;
             BtlUnit_SetPos(unit, x, y, z);
-            unit->mMoveSpeedY = -(MJ_F(unit, 0x1B8) - MJ_F(unit, 0x1B8));
+            unit->mMoveSpeedY = -(unit->mJumpBaseY - unit->mJumpBaseY);
             unit->mFallAccel = 1.8f;
             return EVT_RETURN_YIELD;
         }
@@ -4480,22 +4478,22 @@ USER_FUNC(btlevtcmd_MarioJumpPosition) {
         if (!BtlUnit_GetACPossibility(unit)) {
             return EVT_RETURN_DONE;
         }
-        unit->mMoveSpeedY = -(MJ_F(unit, 0x1B8) - MJ_F(unit, 0x1B8));
+        unit->mMoveSpeedY = -(unit->mJumpBaseY - unit->mJumpBaseY);
         unit->mFallAccel = 1.8f;
         unit->moveFrames = 1;
-        MJ_F(unit, 0x1B0) = 90.0f;
-        MJ_F(unit, 0x1B4) = (f32)(360 / unit->moveFrames);
-        MJ_F(unit, 0x180) = __fabs(MJ_F(unit, 0x1B8) - MJ_F(unit, 0x1B8)) / 16.5;
+        unit->mJumpAngle = 90.0f;
+        unit->mJumpAngleStep = (f32)(360 / unit->moveFrames);
+        unit->mMoveTotalFrames = __fabs(unit->mJumpBaseY - unit->mJumpBaseY) / 16.5;
         BtlUnit_GetPos(unit, &unit->mMoveCurrentPos.x, &unit->mMoveCurrentPos.y, &unit->mMoveCurrentPos.z);
         event->blocked = 3;
         break;
     case 3:
-        sn = sin(6.28318531f * MJ_F(unit, 0x1B0) / 360.0f);
-        unit->mMoveCurrentPos.x = unit->mMoveCurrentPos.x + MJ_F(unit, 0x180) * sn / 33.0;
-        sn = sin(6.28318531f * MJ_F(unit, 0x1B0) / 360.0f);
-        unit->mMoveCurrentPos.y = unit->mMoveCurrentPos.y - MJ_F(unit, 0x180) * sn;
-        MJ_F(unit, 0x1B0) = MJ_F(unit, 0x1B0) + MJ_F(unit, 0x1B4);
-        MJ_F(unit, 0x1B0) = reviseAngle(MJ_F(unit, 0x1B0));
+        sn = sin(6.28318531f * unit->mJumpAngle / 360.0f);
+        unit->mMoveCurrentPos.x = unit->mMoveCurrentPos.x + unit->mMoveTotalFrames * sn / 33.0;
+        sn = sin(6.28318531f * unit->mJumpAngle / 360.0f);
+        unit->mMoveCurrentPos.y = unit->mMoveCurrentPos.y - unit->mMoveTotalFrames * sn;
+        unit->mJumpAngle = unit->mJumpAngle + unit->mJumpAngleStep;
+        unit->mJumpAngle = reviseAngle(unit->mJumpAngle);
         BtlUnit_SetPos(unit, unit->mMoveCurrentPos.x, unit->mMoveCurrentPos.y, unit->mMoveCurrentPos.z);
         unit->moveFrames--;
         if (unit->moveFrames == 0) {

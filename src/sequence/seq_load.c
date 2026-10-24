@@ -4,7 +4,7 @@
 #include "sdk_decls.h"
 
 #ifdef VERSION_G8ME01
-// US C port: all functions exact (loadDraw needs the two FAKE spellings marked inside it).
+// US version: all functions exact (loadDraw needs the two FAKE spellings marked inside it).
 #include "countdown.h"
 #include "driver/fadedrv.h"
 #include "driver/seqdrv.h"
@@ -969,7 +969,7 @@ void loadDraw(CameraId camera, void* param) {
             iconDispGxCol(m, 0, 0x208, (GXColor){0, 0, 0, 255});
             for (k = 0; k < 7; k++) {
                 if (stars & (1 << (k + 1))) {
-                    PSMTXTrans(m, (win1[0]->x - 106.0f) + k * 32, ((f32*)win1[0])[1] /* FAKE: win1->y read through a float pointer (same load) keeps &win1->y a late loop temp, as in the target's numbering */ - 52.0f, 0.0f);
+                    PSMTXTrans(m, (win1[0]->x - 106.0f) + k * 32, *(f32*)((u8*)win1[0] + offsetof(WinDt, y)) /* FAKE: win1->y read through a byte offset (same load) keeps &win1->y a late loop temp, as in the target's numbering */ - 52.0f, 0.0f);
                     iconDispGxCol(m, 0, (u16)stone_id[k], i == wp->slot ? white : gray);
                 }
             }

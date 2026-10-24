@@ -556,7 +556,7 @@ void marioReInit_roll(void) {
     RW()->spdX = z0;
     z1 = 0.0f;
     RW()->spdZ = z1;
-    *(f32*)(0xb0 + (u8*)mario) = -6.0f;
+    mario->rotOfs.x = -6.0f;
     mario->rotOfs.y = 6.0f;
     mario->dispOfs.x = 6.0f;
     mario->dispOfs.y = 0.0f;

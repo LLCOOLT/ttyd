@@ -15,7 +15,6 @@
 #include "mot/mot_walk.h"
 #include "libc_decls.h"
 
-#define MW(m, off, T) (*(T*)((u8*)(m) + MWOFF(off)))
 #define REVISE360(a) while ((a) < 0.0f) { (a) += 360.0f; } while ((a) >= 360.0f) { (a) -= 360.0f; }
 
 typedef struct RubWork {

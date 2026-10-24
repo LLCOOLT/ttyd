@@ -472,7 +472,7 @@ void mot_ship(void) {
 		m->wPlayerCollisionBox.x = 40.0f;
 		m->wPlayerCollisionBox.y = 40.0f;
 		// FAKE: motStruct derived back from &field (same pointer) so ms is a later-numbered codegen value (target r28)
-		ms = (MotShipWork*)((u8*)&marioGetPtr()->motShip->harborPos - 0x3c);
+		ms = (MotShipWork*)((u8*)&marioGetPtr()->motShip->harborPos - offsetof(MotShipWork, harborPos));
 		hit = (HitEntry*)m->hitobjJumpFrom;
 		mm = marioGetPtr();
 		hitObjGetPos(hitGetName(hit), &pos);
@@ -611,9 +611,9 @@ void mot_ship(void) {
 		m->dispFlags &= ~0x1000;
 		marioGetPtr()->motShip->baseY = marioGetPtr()->motShip->harborPos.y;
 		m->baseSpeed = 2.8f;
-		ms2 = (MotShipWork*)((u8*)&marioGetPtr()->motShip->harborPos.z - 0x44); // FAKE: same derive trick as case 10
+		ms2 = (MotShipWork*)((u8*)&marioGetPtr()->motShip->harborPos.z - offsetof(MotShipWork, harborPos.z)); // FAKE: same derive trick as case 10
 		n = (s32)((10.0f * (2.0f * distABf(m->position.x, m->position.z, marioGetPtr()->motShip->harborPos.x, ms2->harborPos.z) / m->baseSpeed) + 0.5f) / 10.0f);
-		ms2 = (MotShipWork*)((u8*)&marioGetPtr()->motShip->harborPos.z - 0x44); // FAKE: same derive trick as case 10
+		ms2 = (MotShipWork*)((u8*)&marioGetPtr()->motShip->harborPos.z - offsetof(MotShipWork, harborPos.z)); // FAKE: same derive trick as case 10
 		m->directionView = angleABf(m->position.x, m->position.z, marioGetPtr()->motShip->harborPos.x, ms2->harborPos.z);
 		m->moveDirection = m->directionView;
 		r29 = ((m->trigFlags >> 9) & 1) + 1;

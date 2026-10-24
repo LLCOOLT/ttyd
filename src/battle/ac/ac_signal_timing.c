@@ -449,9 +449,9 @@ void battleAcDelete_SignalTiming(BattleWork* work) {
 
 static void actionCommandDisp(f32 x, f32 y) {
     BattleActions* ac = &_battleWorkPointer->actionCommands;
-    // FAKE: work recovered from ac (actionCommands is at 0x1C90) so its web is a codegen temp numbered above the
+    // FAKE: work recovered from ac (container-of through offsetof) so its web is a codegen temp numbered above the
     // rodata base; then work takes r31 and the base r30, as in the target
-    BattleWork* work = (BattleWork*)((u8*)ac - 0x1c90);
+    BattleWork* work = (BattleWork*)((u8*)ac - offsetof(BattleWork, actionCommands));
     SignalTimingWork* w;
     s32 i;
     s32 count;

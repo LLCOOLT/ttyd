@@ -515,13 +515,6 @@ void marioDispBlur(CameraId camId, void* param);
 void marioDisp(CameraId camId, void* param);
 
 #ifdef VERSION_G8ME01
-/* raw MarioWork offsets (JP) -> US layout; constant-folds */
-#define MWOFF(off) ((off) + ((off) >= 0x2A0 ? 0x18 : (off) >= 0x284 ? 0xC : (off) >= 0x190 ? 4 : 0))
-#else
-#define MWOFF(off) (off)
-#endif
-
-#ifdef VERSION_G8ME01
 #define MARIO_STAY(mp) ((mp)->stay)
 #else
 #define MARIO_STAY(mp) ((mp)->mot.stay)
