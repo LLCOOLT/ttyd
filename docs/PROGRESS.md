@@ -47,7 +47,7 @@ One row per commit window, at most 3 per day. Figures come from an objdiff-cli r
 
 ## Code-quality cleanup (since 2026-10-23)
 
-The cleanup keeps both builds byte-identical; every change is gated on JP (32 files OK) and US (30 files OK). These figures are measured on the us-decomp branch:
+The cleanup keeps both builds byte-identical; every change is gated on JP (32 files OK) and US (30 files OK). These figures are measured on the main branch:
 
 | What | Start | Now |
 | --- | --- | --- |
