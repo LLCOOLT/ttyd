@@ -1734,6 +1734,11 @@ s32 mobj_lock(MapObjectEntry* mobj) {
                 }
                 r = pouchCheckItem(it);
                 if (r) {
+                    // BUG (JP only, fixed in US above): pouchCheckItem returns how many of the
+                    // key the player holds, not its id, so this stores the count and the count
+                    // is passed to pouchRemoveItem below as an item id. Holding one key gives
+                    // item 1, ITEM_STRANGE_SACK: unlocking the blue cage door in the Great Tree
+                    // (a lock that takes a list of keys) tries to remove the Strange Sack.
                     item = r;
                     break;
                 }
