@@ -876,6 +876,9 @@ void mot_talk(void) {
 			kpaChgPose("KPA_S_1", "KPA2_S_1");
 			return;
 		}
+		// BUG: fbatGetPointer()->npc is whichever NPC Mario last talked to or battled, from any map. If that
+		// NPC slot is unused on the current map, checkPose is not valid and marioChgPose can crash (seen in
+		// the Petalburg first-entry cutscene where Mario waves at the Koopa).
 		fbat = fbatGetPointer()->npc;
 		if (fbat != NULL) {
 			marioChgPose(((NpcEntry*)fbat)->checkPose);

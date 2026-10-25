@@ -1553,6 +1553,8 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 	smartEntry* smart;
 	s32 id;
 
+	// BUG: windowEntry returns -1 when all 7 window slots are in use; the id is not checked, so
+	// windowGetPointer(-1) points before the window table and the writes below corrupt memory.
 	id = windowEntry(priority);
 	window = windowGetPointer(id);
 	window->main = msgWindow_Main;
@@ -1560,6 +1562,7 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 	WIN_STATE(window) = 5;
 	window->type = -1;
 	window->flags |= 2;
+	// BUG: strlen does not count the terminator, so strcpy writes one byte past the end of the block.
 	copy = __memAlloc(HEAP_DEFAULT, strlen(msg));
 	strcpy(copy, msg);
 	smart = smartAlloc(sizeof(MsgWinData), 1);

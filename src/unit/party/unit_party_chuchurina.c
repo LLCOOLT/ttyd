@@ -842,6 +842,7 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
         BEGIN_SIBLING_EVENT_GET_ID(LW(15))
             SET_VALUE(LW(7), LW(13))
             CALL(btlevtcmd_GetRotate, -2, -250000000, LW(0), -250000000)
+            // BUG: this IF has no END_IF; END_SIBLING_EVENT below comes first (the missing end-if in Love Slap).
             IF_INT_GREATER_OR_EQUAL(LW(0), 180)
                 SUBTRACT(LW(0), 360)
                 CALL(evt_sub_intpl_init, 11, LW(0), 0, 4)
