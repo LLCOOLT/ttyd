@@ -511,14 +511,21 @@ class Module:
 
     def fn_size(self, s, sec, t):
         """A function's size in the target: the source's where the code agrees over it, otherwise that of dtk's
-        function starting there (or the rest of the dtk function it starts in)."""
+        function starting there (or the rest of the dtk function it starts in). dtk ends a function early when its
+        last instructions cannot be reached (an epilogue after a call that never returns, a blr after an endless
+        loop) and makes a function of them; the source size, where the code agrees over it, takes them back."""
         starts, ends = self.tfuncs.get(sec, ([], []))
         k = bisect.bisect_right(starts, t) - 1
         if k < 0 or t >= ends[k] or t + s.size == ends[k]:
             return None
-        if self._bytes_agree(s.sec, s, t, sec) and (starts[k] != t or t + s.size < ends[k]):
+        if self._bytes_agree(s.sec, s, t, sec) and (starts[k] != t or t + s.size < ends[k] or self._tail_unnamed(sec, ends[k], t + s.size)):
             return None
         return ends[k] - t
+
+    def _tail_unnamed(self, sec, a, b):
+        """Whether [a, b) holds nothing dtk named but its own fn_ functions."""
+        syms = [x for x in self.tby_sec.get(sec, []) if a <= x.addr < b]
+        return all(x.name.startswith("fn_") and x.type == "function" for x in syms)
 
     def _set(self, s, taddr, how, size=None):
         if s.type == "function" and not self.fn_start_ok(s.sec, taddr):
@@ -610,7 +617,13 @@ class Module:
             c = choice[i][j]
             if c == 2:
                 s, t = rest[i][0], tleft[j][0]
-                self._set(s, t.addr, f"code-similar {sim[i][j]:.2f}", size=t.size)
+                # dtk's function may stop short of unreachable last instructions: where the code agrees over the
+                # source size (and only dtk's own fn_ functions lie past dtk's end), that size is the function's
+                size = t.size
+                if (s.size > t.size and self._bytes_agree(s.sec, s, t.addr, t.sec)
+                        and self._tail_unnamed(t.sec, t.addr + t.size, t.addr + s.size)):
+                    size = s.size
+                self._set(s, t.addr, f"code-similar {sim[i][j]:.2f}", size=size)
                 i += 1
                 j += 1
             elif c == 0:
@@ -1400,6 +1413,9 @@ def port_splits(mod, header, units):
                 # and ends word-aligned: the bytes up to the next word are its padding
                 up = min((r[1] + 3) & ~3, mod.timg.sections[sec][1])
                 nxt = min((x[0] for x in lst[k + 1:] if x[1] > x[0]), default=None)
+                if nxt is None and syms and syms[-1][1] <= r[1]:
+                    # the section's last unit: dtk ends the section with its last symbol, so no padding follows
+                    up = r[1]
                 if nxt is None or nxt >= up:
                     r[1] = up
             # padding before the next unit belongs to this one

@@ -1,6 +1,6 @@
 # Versions
 
-One source tree builds five versions of the game. This page says what differs between them and how the sources express those differences. Every statement about build flags here comes from `configure.py`; the macros are in `include/version.h`.
+One source tree builds seven versions of the game. This page says what differs between them and how the sources express those differences. Every statement about build flags here comes from `configure.py`; the macros are in `include/version.h`.
 
 | Version | `BUILD_VERSION` | What it is | Code line |
 |---|---|---|---|
@@ -9,6 +9,8 @@ One source tree builds five versions of the game. This page says what differs be
 | `G8MP01` | 2 | European release, Rev 0: English, German, French, Spanish and Italian, 50 Hz and 60 Hz | US plus PAL changes |
 | `G8ME01_DEMO` | 3 | US demo build `MarioSt_MN7_NOA_20040619a` (June 2004), shipped as `zz_PaperMario2_game.tgc` on the Interactive Multi-Game Demo Disc Version 17 (USA) | JP plus demo changes |
 | `G8MJ01_DEMO` | 4 | Japanese store demo, shipped as `files/local/tgc/PaperMarioRPG.tgc` on Gekkan Nintendo Tentou Demo 2004.7.1 (Japan) | the demo code, before the US demo's English localisation |
+| `G8ME01_DEMO2` | 5 | US demo built on 18 September 2004, shipped as `zz_PaperMario2_game.tgc` on the Interactive Multi-Game Demo Disc Version 19 (USA) (also 20-22 and 35) | US plus a few demo changes |
+| `G8MP01_DEMO` | 6 | European demo built on 23 September 2004, shipped as `zz_PaperMario2_PALDEMO_20040924.tgc` on the Interactive Multi-Game Demo Disk - November 2004 (Europe) | PAL plus the same demo changes |
 
 ## Preprocessor macros
 
@@ -80,6 +82,16 @@ The Japanese store demo is the demo code before the US demo's English localisati
 - **Build.** Same small-data thresholds and precompiled-header sets as the US demo. Every unit links from C. `tst.c` registers `tst_nakayama_init_evt`, which this version's `evt_init.c` does not define; the original linker left that reference as 0 with no relocation, and the build reproduces it by dropping the relocation before `dtk rel make` (`config/G8MJ01_DEMO/unresolved_symbols.txt`, see [BUILDING.md](BUILDING.md)).
 - **Configuration.** `config/G8MJ01_DEMO` comes from the original linker maps of this demo (`MarioSt.MAP` and one map per REL except `end` and `tst`, which were ported from JP and PAL), so its object boundaries are the original ones. Symbols keep the names the other versions use.
 
+### The September 2004 demos (`G8ME01_DEMO2`, `G8MP01_DEMO`)
+
+Both are kiosk builds of the release code, made a few days after the US release (`Sep 18 2004`, US `Sep  9 2004`) and a few days before the European one (`Sep 23 2004`, PAL `Sep 26 2004`). Compared function by function with relocations masked:
+
+- **`G8ME01_DEMO2` is the US code.** 6,947 of its 6,967 main executable functions have the US code; where US and PAL differ it follows US in all 209 functions, and none of PAL's changes. Its seven RELs have the US code (980 of 980 functions).
+- **`G8MP01_DEMO` is the PAL code.** 7,023 of its 7,041 main executable functions have the PAL code; where US and PAL differ it follows PAL in 212 functions and US in 2. It predates three PAL changes: `mot_slit` and `mot_slit_post` (`src/motion/mot_slit.c`), `kpa_cancel_attack_mode` and its call from `jumpstand_evt` (`rels/kpa`), and the longer `shopper_talk_evt` (`src/event/evt_shop.c`). Its seven RELs have the PAL code otherwise.
+- **The demo changes** (in both unless noted, the same code in both where US and PAL agree): the kiosk timeout in `marioStMain` and the idle timer start in `marioStInit` (`src/mario/mariost.c`), the logo sequence (`src/sequence/seq_logo.c`) and, in the US demo only, the attract screens (`src/sequence/seq_e3.c`); the US demo also has no progressive-scan screen and picks its video mode from the TV format and the EURGB60 setting as PAL does (`OSGetEuRgb60Mode`, render-mode tables copied in `marioStInit`), the game-over sequence (`seq_gameOverMain`), the status window (`statusWinDisp`, `statusWinMain`), the pad input of `makeKey` (`src/system.c`), the level-up help in `btlseqEnd_DispMain`, the drop item of `evt_npc_get_drop_item` (the June demo's code), `Btl_UnitSetup`, and the event data of `gon_01` and `gon_10`. The build date is in `src/R_build.c`.
+- **Build.** Retail flags (`-sdata 48 -sdata2 6`, the retail precompiled-header sets). Until `include/version.h` has values for them, `configure.py` builds `G8ME01_DEMO2` with the US code paths (it also defines `VERSION_G8ME01`) and `G8MP01_DEMO` with the PAL code paths (`VERSION_G8ME01` and `VERSION_G8MP01`). The units that do not link from C yet are listed in `config/<version>/not_linked.txt` (they build from the original code); the main executables need a `force_active` list in `config.yml`, since their seven RELs leave many of the full game's functions and data unreferenced.
+- **RELs.** `gon`, `gor`, `hei`, `kpa`, `mri`, `nok` and `tik`; no `sys`.
+
 ## REL sets
 
 | Area | JP | US | PAL | Demo | JP demo | | Area | JP | US | PAL | Demo | JP demo |
@@ -102,6 +114,8 @@ The Japanese store demo is the demo code before the US demo's English localisati
 | | | | | | | | `win` | ✓ | ✓ | ✓ | | ✓ |
 | | | | | | | | `yuu` | ✓ | ✓ | ✓ | | ✓ |
 | **Total** | 31 | 29 | 32 | 6 | 32 | | | | | | | |
+
+The two September 2004 demos (`G8ME01_DEMO2`, `G8MP01_DEMO`) have seven: `gon`, `gor`, `hei`, `kpa`, `mri`, `nok` and `tik`.
 
 Each version's set is the list of REL folders in `config/<version>/` and the lines of `config/<version>/build.sha1` (one per REL plus `MarioSt.dol`). [GLOSSARY.md](GLOSSARY.md#area-codes) says what each area is.
 

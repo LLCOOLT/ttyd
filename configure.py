@@ -34,6 +34,8 @@ VERSIONS = [
     "G8MP01",  # 2
     "G8ME01_DEMO",  # 3: the June 2004 prerelease from the Interactive Multi-Game Demo Disc Version 17 (disc ID G8MJ01)
     "G8MJ01_DEMO",  # 4: the Japanese store demo from Gekkan Nintendo Tentou Demo 2004.7.1 (disc ID G8MJ01)
+    "G8ME01_DEMO2",  # 5: the September 2004 US demo from the Interactive Multi-Game Demo Disc Version 19 (disc ID G8ME01)
+    "G8MP01_DEMO",  # 6: the September 2004 European demo from the Interactive Multi-Game Demo Disk - November 2004
 ]
 
 parser = argparse.ArgumentParser()
@@ -235,6 +237,13 @@ cflags_base = [
 # and VERSION_G8MP01 marks what differs in PAL.
 if config.version == "G8MP01":
     cflags_base.append("-DVERSION_G8ME01")
+# The September 2004 demos were built from the release code a few days after it (the US demo from the US code, the
+# European demo from the PAL code): of their main.dol functions, all but a few dozen have the same code as US or
+# PAL (relocations masked). Until version.h has their own values they take the US and PAL code paths.
+if config.version == "G8ME01_DEMO2":
+    cflags_base.append("-DVERSION_G8ME01")
+if config.version == "G8MP01_DEMO":
+    cflags_base.extend(["-DVERSION_G8ME01", "-DVERSION_G8MP01"])
 # The US demo (build MarioSt_MN7_NOA_20040619a) is English, but its code is the JP code before localization: of
 # the main.dol functions where JP and US differ, 373 match JP and none match US. So it takes the JP code paths (no
 # VERSION_G8ME01).
@@ -2293,6 +2302,19 @@ else:
 # original linker left it as 0 with no relocation, so the build drops that relocation before `dtk rel make`.
 if config.version == "G8MJ01_DEMO":
     config.rel_dropped_relocations = {"tst": Path("config/G8MJ01_DEMO/unresolved_symbols.txt")}
+# Units of a new version that do not link from C yet (they build from the original code): one per line in
+# config/<version>/not_linked.txt, `<rel>/<path>` for REL objects and `<path>` for main.dol objects. A unit leaves
+# the list once it links from C and the hashes hold; a version without the file links every unit.
+not_linked_path = Path("config") / config.version / "not_linked.txt"
+if not_linked_path.exists():
+    with open(not_linked_path, encoding="utf-8") as f:
+        not_linked = {line.strip() for line in f if line.strip() and not line.startswith("#")}
+    for lib in config.libs:
+        rel = lib["lib"] + "/" if lib.get("src_dir", "").startswith("rels/") else ""
+        for obj in lib.get("objects", []):
+            if rel + obj.name in not_linked:
+                obj.completed = False
+    config.reconfig_deps.append(not_linked_path)
 for lib in config.libs:
     for obj in lib.get("objects", []):
         if obj.name in MAIN_PCH:

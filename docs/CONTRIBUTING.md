@@ -2,12 +2,12 @@
 
 Contributions are welcome: clearer names and types, comments that explain what code does, documentation, and anything that makes the code easier to read while every version still builds byte-identical. Please open an issue in this repository for questions.
 
-## The five-version check
+## The seven-version check
 
-Every change must keep all five versions byte-identical. Before you commit, build each version whose game files you have and confirm the check line:
+Every change must keep all seven versions byte-identical. Before you commit, build each version whose game files you have and confirm the check line:
 
 ```sh
-for v in G8MJ01 G8ME01 G8MP01 G8ME01_DEMO G8MJ01_DEMO; do
+for v in G8MJ01 G8ME01 G8MP01 G8ME01_DEMO G8MJ01_DEMO G8ME01_DEMO2 G8MP01_DEMO; do
     python configure.py --version $v && ninja || break
 done
 ```
@@ -19,6 +19,8 @@ done
 | `G8MP01` | `33 files OK` |
 | `G8ME01_DEMO` | `7 files OK` |
 | `G8MJ01_DEMO` | `33 files OK` |
+| `G8ME01_DEMO2` | `8 files OK` |
+| `G8MP01_DEMO` | `8 files OK` |
 
 This applies to every kind of change, including comment-only and header-only edits:
 
@@ -62,7 +64,7 @@ When code differs between versions (see [VERSIONS.md](VERSIONS.md)):
 - **Structs.** A member that exists only in some versions sits inside the `#ifdef` in the struct itself, so every field access stays correct for every version. Put the version's offset in the member's comment when it helps (`// 0x2CC (US 0x2D0)`).
 - **Say why.** Start the block with a short comment when the difference is not obvious (`// PAL: the plain modes are 50Hz ...`).
 - **Units and data.** A unit that exists only in some versions is listed once as `Matching` in `configure.py`; its address ranges and symbols go in the `config/<version>/splits.txt` and `symbols.txt` of each version that has it, and the splits alone decide which versions build it.
-- **Check all five builds.**
+- **Check all seven builds.**
 
 ## Commit messages
 
@@ -75,4 +77,4 @@ demo: mapdrv links from C (bmapUnLoad dead guard, see FAKES.md)
 docs: VERSIONS.md lists the REL sets
 ```
 
-Add a body when the reason is not obvious. Keep each commit to one topic, and make sure every commit passes the five-version check on its own.
+Add a body when the reason is not obvious. Keep each commit to one topic, and make sure every commit passes the seven-version check on its own.
